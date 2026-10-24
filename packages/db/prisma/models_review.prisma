@@ -1,0 +1,58 @@
+model MatchReview {
+  id           String @id @default(uuid()) @db.Uuid
+  matchId      String @map("match_id") @db.Uuid
+  reviewerId   String @map("reviewer_id") @db.Uuid
+  revieweeId   String @map("reviewee_id") @db.Uuid
+
+  reviewerRole ReviewerRole @map("reviewer_role")
+  textReview   String?      @map("text_review")
+  isAnonymous  Boolean      @default(true) @map("is_anonymous")
+  profanityFlagged Boolean  @default(false) @map("profanity_flagged")
+
+  submittedAt DateTime @default(now()) @map("submitted_at") @db.Timestamptz(6)
+
+  match    Match   @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  reviewer Profile @relation("ReviewReviewer", fields: [reviewerId], references: [id], onDelete: Cascade)
+  reviewee Profile @relation("ReviewReviewee", fields: [revieweeId], references: [id], onDelete: Cascade)
+
+  ratings MatchReviewRating[]
+
+  @@unique([matchId, reviewerId, revieweeId])
+  @@index([matchId], map: "idx_match_reviews_match_id")
+  @@index([reviewerId], map: "idx_match_reviews_reviewer_id")
+  @@index([revieweeId], map: "idx_match_reviews_reviewee_id")
+  @@index([submittedAt], map: "idx_match_reviews_submitted_at")
+  @@map("match_reviews")
+}
+
+model MatchReviewRating {
+  id          String @id @default(uuid()) @db.Uuid
+  reviewId    String @map("review_id") @db.Uuid
+  dimensionId String @map("dimension_id") @db.Uuid
+  score       Int
+
+  review    MatchReview    @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  dimension SkillDimension @relation(fields: [dimensionId], references: [id], onDelete: Cascade)
+
+  @@unique([reviewId, dimensionId])
+  @@index([reviewId], map: "idx_review_ratings_review_id")
+  @@index([dimensionId], map: "idx_review_ratings_dimension_id")
+  @@map("match_review_ratings")
+}
+
+model PlayerSkillRating {
+  id           String @id @default(uuid()) @db.Uuid
+  playerId     String @map("player_id") @db.Uuid
+  dimensionId  String @map("dimension_id") @db.Uuid
+  currentRating Decimal @default(0) @map("current_rating") @db.Decimal(3, 1)
+  ratingCount  Int     @default(0) @map("rating_count")
+  lastUpdated  DateTime @default(now()) @map("last_updated") @db.Timestamptz(6)
+
+  player    Profile        @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  dimension SkillDimension @relation(fields: [dimensionId], references: [id], onDelete: Cascade)
+
+  @@unique([playerId, dimensionId])
+  @@index([playerId], map: "idx_skill_ratings_player_id")
+  @@index([dimensionId], map: "idx_skill_ratings_dimension_id")
+  @@map("player_skill_ratings")
+}

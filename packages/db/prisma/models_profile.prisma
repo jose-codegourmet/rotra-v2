@@ -1,0 +1,239 @@
+model Profile {
+  id         String  @id @db.Uuid
+  facebookId String? @unique @map("facebook_id")
+  name       String
+  avatarUrl  String? @map("avatar_url")
+  phone      String?
+
+  // Email (from invitation path or manually linked)
+  email           String?
+  emailVerified   Boolean   @default(false) @map("email_verified")
+  emailVerifiedAt DateTime? @map("email_verified_at") @db.Timestamptz(6)
+  // is_verified is a GENERATED ALWAYS column in Postgres; Prisma reads it as a regular field.
+  // Never write this field directly — it is computed from facebook_id + email_verified + onboarding_completed.
+  isVerified Boolean @default(false) @map("is_verified")
+
+  // Admin-only lifecycle fields (null role means regular player profile).
+  adminRole          AdminRole? @map("admin_role")
+  adminIsActive      Boolean    @default(false) @map("admin_is_active")
+  adminInvitedById   String?    @map("admin_invited_by") @db.Uuid
+  adminInvitedAt     DateTime?  @map("admin_invited_at") @db.Timestamptz(6)
+  adminActivatedAt   DateTime?  @map("admin_activated_at") @db.Timestamptz(6)
+  adminDeactivatedAt DateTime?  @map("admin_deactivated_at") @db.Timestamptz(6)
+  adminDeactivatedById String?  @map("admin_deactivated_by") @db.Uuid
+
+  isTesterAccount Boolean @default(false) @map("is_tester_account")
+
+  playingLevel     PlayingLevel?     @map("playing_level")
+  formatPreference FormatPreference? @map("format_preference")
+  courtPosition    CourtPosition?    @map("court_position")
+  playMode         PlayMode?         @map("play_mode")
+
+  // Collected during onboarding wizard
+  age                        Int?
+  playingSince               Int?     @map("playing_since")
+  playingSinceLessThanOneYear Boolean @default(false) @map("playing_since_less_than_one_year")
+  tournamentWinsLastYear     String?  @map("tournament_wins_last_year")
+
+  expTotal                    Int     @default(0) @map("exp_total")
+  mmr                         Int     @default(1000)
+  mmrMatchesPlayed            Int     @default(0) @map("mmr_matches_played")
+  calibrationCompletedAt      DateTime? @map("calibration_completed_at") @db.Timestamptz(6)
+  profileCompletedBonusClaimed Boolean @default(false) @map("profile_completed_bonus_claimed")
+  onboardingCompleted         Boolean @default(false) @map("onboarding_completed")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  ownedClubs                  Club[]                      @relation("ClubOwner")
+  clubMemberships             ClubMember[]
+  clubJoinRequests            ClubJoinRequest[]
+  blacklistEntries            ClubBlacklist[]             @relation("BlacklistPlayer")
+  blacklistsCreated           ClubBlacklist[]             @relation("BlacklistCreatedBy")
+  auditLogsAsPlayer           ClubMembershipAuditLog[]    @relation("AuditPlayer")
+  auditLogsPerformed          ClubMembershipAuditLog[]    @relation("AuditPerformedBy")
+  hostedSessions              QueueSession[]
+  sessionRegistrations        SessionRegistration[]
+  matchesAsUmpire             Match[]                     @relation("MatchUmpire")
+  matchesScoreSubmitted       Match[]                     @relation("MatchScoreSubmittedBy")
+  matchesFinalized            Match[]                     @relation("MatchFinalizedBy")
+  matchesVoided               Match[]                     @relation("MatchVoidedBy")
+  matchPlayers                MatchPlayer[]
+  reviewsWritten              MatchReview[]               @relation("ReviewReviewer")
+  reviewsReceived             MatchReview[]               @relation("ReviewReviewee")
+  skillRatings                PlayerSkillRating[]
+  selfAssessments             PlayerSelfAssessment[]
+  gearItems                   GearItem[]
+  expTransactions             ExpTransaction[]
+  mmrTransactions             MmrTransaction[]
+  rankingTierConfigsUpdated   RankingTierConfig[]         @relation("RankingTierUpdatedBy")
+  sandbaggingFlags            SandbaggingFlag[]           @relation("SandbaggingPlayer")
+  sandbaggingFlagsResolved    SandbaggingFlag[]           @relation("SandbaggingResolvedBy")
+  notifications               Notification[]
+  clubApplicationsSubmitted ClubApplication[]           @relation("ClubApplicationPlayer")
+  clubApplicationsReviewed    ClubApplication[]           @relation("ClubApplicationReviewedBy")
+  adminActionLogs             AdminActionLog[]            @relation("AdminActionActor")
+  killSwitchesUpdated         KillSwitch[]                @relation("KillSwitchUpdatedBy")
+  platformConfigsUpdated      PlatformConfig[]            @relation("PlatformConfigUpdatedBy")
+  moderationFlagsReported     ModerationFlag[]            @relation("ModerationReporter")
+  moderationFlagsReviewed     ModerationFlag[]            @relation("ModerationReviewedBy")
+  adminNotifications          AdminNotification[]         @relation("AdminNotificationRecipient")
+  adminInvitationsSent        AdminInvitation[]           @relation("AdminInvitationInvitedBy")
+  adminInvitationsAccepted    AdminInvitation[]           @relation("AdminInvitationAcceptedBy")
+  adminUsersInvited           Profile[]                   @relation("AdminProfileInvitedBy")
+  adminInvitedBy              Profile?                    @relation("AdminProfileInvitedBy", fields: [adminInvitedById], references: [id], onDelete: SetNull)
+  adminUsersDeactivated       Profile[]                   @relation("AdminProfileDeactivatedBy")
+  adminDeactivatedBy          Profile?                    @relation("AdminProfileDeactivatedBy", fields: [adminDeactivatedById], references: [id], onDelete: SetNull)
+  emailInvitationsCreated     EmailInvitation[]           @relation("InvitedBy")
+  emailInvitationsAccepted    EmailInvitation[]           @relation("AcceptedBy")
+  tagsAssigned                ProfileTag[]                @relation("ProfileTagsOnProfile")
+  tagsCreated                 ProfileTag[]                @relation("ProfileTagsAssignedBy")
+  broadcastsCreated         NotificationBroadcast[]       @relation("BroadcastsCreated")
+  testerInvitationsReceived TesterInvitation[]            @relation("TesterInvitationProfile")
+  testerInvitationsSent     TesterInvitation[]            @relation("TesterInvitedBy")
+  tagDefinitionsCreated     TagDefinition[]               @relation("TagDefinitionCreatedBy")
+  placesSubmitted           Place[]                       @relation("PlaceSubmittedBy")
+  placesReviewed            Place[]                       @relation("PlaceReviewedBy")
+
+  @@index([facebookId], map: "idx_profiles_facebook_id")
+  @@index([email], map: "idx_profiles_email")
+  @@index([isVerified], map: "idx_profiles_is_verified")
+  @@index([adminRole], map: "idx_profiles_admin_role")
+  @@map("profiles")
+}
+
+model ProfileTag {
+  id         String   @id @default(uuid()) @db.Uuid
+  profileId  String   @map("profile_id") @db.Uuid
+  slug       String
+  label      String
+  assignedAt DateTime @default(now()) @map("assigned_at") @db.Timestamptz(6)
+  assignedBy String?  @map("assigned_by") @db.Uuid
+
+  profile  Profile  @relation("ProfileTagsOnProfile", fields: [profileId], references: [id], onDelete: Cascade)
+  assigner Profile? @relation("ProfileTagsAssignedBy", fields: [assignedBy], references: [id], onDelete: SetNull)
+
+  @@unique([profileId, slug])
+  @@index([slug])
+  @@map("profile_tags")
+}
+
+model EmailInvitation {
+  id           String           @id @default(uuid()) @db.Uuid
+  email        String
+  token        String           @unique
+  invitedById  String?          @map("invited_by") @db.Uuid
+  status       InvitationStatus @default(pending)
+  expiresAt    DateTime         @map("expires_at") @db.Timestamptz(6)
+  acceptedById String?          @map("accepted_by") @db.Uuid
+  acceptedAt   DateTime?        @map("accepted_at") @db.Timestamptz(6)
+  createdAt    DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  invitedBy  Profile? @relation("InvitedBy", fields: [invitedById], references: [id], onDelete: SetNull)
+  acceptedBy Profile? @relation("AcceptedBy", fields: [acceptedById], references: [id], onDelete: SetNull)
+
+  @@index([token], map: "idx_email_invitations_token")
+  @@index([email], map: "idx_email_invitations_email")
+  @@index([status], map: "idx_email_invitations_status")
+  @@map("email_invitations")
+}
+
+model TesterInvitation {
+  id          String           @id @default(uuid()) @db.Uuid
+  profileId   String           @map("profile_id") @db.Uuid
+  invitedById String?          @map("invited_by") @db.Uuid
+  status      InvitationStatus @default(pending)
+  expiresAt   DateTime         @map("expires_at") @db.Timestamptz(6)
+  revokedAt   DateTime?        @map("revoked_at") @db.Timestamptz(6)
+  createdAt   DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  profile   Profile  @relation("TesterInvitationProfile", fields: [profileId], references: [id], onDelete: Cascade)
+  invitedBy Profile? @relation("TesterInvitedBy", fields: [invitedById], references: [id], onDelete: SetNull)
+
+  @@index([profileId], map: "idx_tester_invitations_profile")
+  @@index([status], map: "idx_tester_invitations_status")
+  @@map("tester_invitations")
+}
+
+model GearItem {
+  id       String @id @default(uuid()) @db.Uuid
+  playerId String @map("player_id") @db.Uuid
+  category GearCategory
+
+  title       String
+  description String?
+  brand       String?
+  model       String?
+
+  balanceType   RacketBalance? @map("balance_type")
+  stringBrand   String?        @map("string_brand")
+  stringModel   String?        @map("string_model")
+  stringTension Decimal?       @map("string_tension") @db.Decimal(5, 2)
+  grip          String?
+
+  shoeSize Decimal?  @map("shoe_size") @db.Decimal(4, 1)
+  fitType  ShoeFit? @map("fit_type")
+
+  capacity String?
+
+  displayOrder Int      @default(0) @map("display_order")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  player Profile         @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  links  GearItemLink[]
+
+  @@index([playerId], map: "idx_gear_items_player_id")
+  @@index([category], map: "idx_gear_items_category")
+  @@map("gear_items")
+}
+
+model GearItemLink {
+  id         String @id @default(uuid()) @db.Uuid
+  gearItemId String @map("gear_item_id") @db.Uuid
+  label      String?
+  url        String
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  gearItem GearItem @relation(fields: [gearItemId], references: [id], onDelete: Cascade)
+
+  @@index([gearItemId], map: "idx_gear_item_links_gear_item_id")
+  @@map("gear_item_links")
+}
+
+model SkillDimension {
+  id          String  @id @default(uuid()) @db.Uuid
+  name        String  @unique
+  label       String
+  description String?
+  subSkills   Json    @default("[]") @map("sub_skills")
+  weight      Decimal @default(1.0) @db.Decimal(4, 2)
+  isActive    Boolean @default(true) @map("is_active")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  selfAssessments     PlayerSelfAssessment[]
+  matchReviewRatings  MatchReviewRating[]
+  playerSkillRatings  PlayerSkillRating[]
+
+  @@index([isActive], map: "idx_skill_dimensions_active")
+  @@map("skill_dimensions")
+}
+
+model PlayerSelfAssessment {
+  id                   String @id @default(uuid()) @db.Uuid
+  playerId             String @map("player_id") @db.Uuid
+  dimensionId          String @map("dimension_id") @db.Uuid
+  score                Int
+  externalRatingsCount Int    @default(0) @map("external_ratings_count")
+  updatedAt            DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  player    Profile        @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  dimension SkillDimension @relation(fields: [dimensionId], references: [id], onDelete: Cascade)
+
+  @@unique([playerId, dimensionId])
+  @@index([playerId], map: "idx_self_assessments_player_id")
+  @@index([dimensionId], map: "idx_self_assessments_dimension_id")
+  @@map("player_self_assessments")
+}

@@ -1,0 +1,116 @@
+model AdminActionLog {
+  id         String @id @default(uuid()) @db.Uuid
+  adminId    String? @map("admin_id") @db.Uuid
+  action     AdminAction
+  entityType AdminActionEntity @map("entity_type")
+  entityId   String @map("entity_id") @db.Uuid
+
+  beforeValue Json? @map("before_value")
+  afterValue  Json? @map("after_value")
+  note        String?
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  admin Profile? @relation("AdminActionActor", fields: [adminId], references: [id], onDelete: SetNull)
+
+  @@index([adminId], map: "idx_admin_log_admin")
+  @@index([entityType, entityId], map: "idx_admin_log_entity")
+  @@index([createdAt(sort: Desc)], map: "idx_admin_log_created")
+  @@map("admin_action_log")
+}
+
+model AdminInvitation {
+  id          String @id @default(uuid()) @db.Uuid
+  email       String
+  role        AdminRole
+  invitedById String? @map("invited_by") @db.Uuid
+  status      InvitationStatus @default(pending)
+  acceptedById String? @map("accepted_by") @db.Uuid
+  acceptedAt   DateTime? @map("accepted_at") @db.Timestamptz(6)
+  expiresAt    DateTime @default(dbgenerated("(now() + '7 days'::interval)")) @map("expires_at") @db.Timestamptz(6)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  invitedBy Profile? @relation("AdminInvitationInvitedBy", fields: [invitedById], references: [id], onDelete: SetNull)
+  acceptedBy Profile? @relation("AdminInvitationAcceptedBy", fields: [acceptedById], references: [id], onDelete: SetNull)
+
+  @@index([email], map: "idx_admin_invitations_email")
+  @@index([status], map: "idx_admin_invitations_status")
+  @@map("admin_invitations")
+}
+
+model AdminNotification {
+  id        String @id @default(uuid()) @db.Uuid
+  adminId   String @map("admin_id") @db.Uuid
+  type      AdminNotificationType
+  severity  NotificationSeverity @default(info)
+  targetUrl String @map("target_url")
+  title     String
+  body      String?
+  readAt    DateTime? @map("read_at") @db.Timestamptz(6)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  broadcastId String? @map("broadcast_id") @db.Uuid
+
+  admin Profile @relation("AdminNotificationRecipient", fields: [adminId], references: [id], onDelete: Cascade)
+  broadcast NotificationBroadcast? @relation(fields: [broadcastId], references: [id], onDelete: SetNull)
+
+  @@index([adminId, readAt], map: "idx_admin_notif_admin_unread")
+  @@index([createdAt(sort: Desc)], map: "idx_admin_notif_created")
+  @@index([broadcastId], map: "idx_admin_notif_broadcast")
+  @@map("admin_notifications")
+}
+
+model KillSwitch {
+  id          String @id @default(uuid()) @db.Uuid
+  key         String
+  environment Environment
+  label       String
+  description String?
+  isEnabled   Boolean @default(true) @map("is_enabled")
+  updatedById String? @map("updated_by") @db.Uuid
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  updatedBy Profile? @relation("KillSwitchUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@unique([key, environment])
+  @@index([key, environment], map: "idx_kill_switches_key_env")
+  @@index([isEnabled], map: "idx_kill_switches_enabled")
+  @@map("kill_switches")
+}
+
+model PlatformConfig {
+  id          String @id @default(uuid()) @db.Uuid
+  key         String @unique
+  description String?
+  value       Json
+  updatedById String? @map("updated_by") @db.Uuid
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  updatedBy Profile? @relation("PlatformConfigUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@index([key], map: "idx_platform_config_key")
+  @@map("platform_config")
+}
+
+model ModerationFlag {
+  id          String @id @default(uuid()) @db.Uuid
+  reporterId  String? @map("reporter_id") @db.Uuid
+  entityType  ModerationEntity @map("entity_type")
+  entityId    String @map("entity_id") @db.Uuid
+  reason      String
+  status      ModerationStatus @default(pending)
+  reviewedById String? @map("reviewed_by") @db.Uuid
+  reviewNote   String? @map("review_note")
+  reviewedAt   DateTime? @map("reviewed_at") @db.Timestamptz(6)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  reporter   Profile? @relation("ModerationReporter", fields: [reporterId], references: [id], onDelete: SetNull)
+  reviewedBy Profile? @relation("ModerationReviewedBy", fields: [reviewedById], references: [id], onDelete: SetNull)
+
+  @@index([entityType, entityId], map: "idx_moderation_entity")
+  @@index([status], map: "idx_moderation_status")
+  @@index([reporterId], map: "idx_moderation_reporter")
+  @@index([createdAt(sort: Desc)], map: "idx_moderation_created")
+  @@map("moderation_flags")
+}

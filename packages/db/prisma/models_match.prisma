@@ -1,0 +1,67 @@
+model Match {
+  id         String @id @default(uuid()) @db.Uuid
+  sessionId  String @map("session_id") @db.Uuid
+  courtNumber Int   @map("court_number")
+  umpireId   String? @map("umpire_id") @db.Uuid
+
+  status         MatchStatus @default(queued)
+  queuePosition  Int         @default(0) @map("queue_position")
+
+  teamAScore   Int?          @map("team_a_score")
+  teamBScore   Int?          @map("team_b_score")
+  winningTeam  WinningTeam?  @map("winning_team")
+
+  scoreSubmittedById String? @map("score_submitted_by") @db.Uuid
+  finalizedById      String? @map("finalized_by") @db.Uuid
+  finalizedAt        DateTime? @map("finalized_at") @db.Timestamptz(6)
+
+  voidReason String?   @map("void_reason")
+  voidedById String?   @map("voided_by") @db.Uuid
+  voidedAt   DateTime? @map("voided_at") @db.Timestamptz(6)
+
+  startedAt DateTime? @map("started_at") @db.Timestamptz(6)
+  endedAt   DateTime? @map("ended_at") @db.Timestamptz(6)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  session            QueueSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  umpire             Profile?     @relation("MatchUmpire", fields: [umpireId], references: [id])
+  scoreSubmittedBy   Profile?     @relation("MatchScoreSubmittedBy", fields: [scoreSubmittedById], references: [id])
+  finalizedBy        Profile?     @relation("MatchFinalizedBy", fields: [finalizedById], references: [id])
+  voidedBy           Profile?     @relation("MatchVoidedBy", fields: [voidedById], references: [id])
+
+  matchPlayers    MatchPlayer[]
+  reviews         MatchReview[]
+  expTransactions ExpTransaction[]
+  mmrTransactions MmrTransaction[]
+
+  @@index([sessionId], map: "idx_matches_session_id")
+  @@index([status], map: "idx_matches_status")
+  @@index([umpireId], map: "idx_matches_umpire_id")
+  @@index([sessionId, queuePosition], map: "idx_matches_queue_position")
+  @@map("matches")
+}
+
+model MatchPlayer {
+  id       String @id @default(uuid()) @db.Uuid
+  matchId  String @map("match_id") @db.Uuid
+  playerId String @map("player_id") @db.Uuid
+
+  team   Team
+  result MatchResult?
+
+  reviewSubmitted   Boolean   @default(false) @map("review_submitted")
+  reviewSubmittedAt DateTime? @map("review_submitted_at") @db.Timestamptz(6)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  match  Match   @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  player Profile @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@unique([matchId, playerId])
+  @@index([matchId], map: "idx_match_players_match_id")
+  @@index([playerId], map: "idx_match_players_player_id")
+  @@index([team], map: "idx_match_players_team")
+  @@index([result], map: "idx_match_players_result")
+  @@map("match_players")
+}

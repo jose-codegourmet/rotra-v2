@@ -1,0 +1,33 @@
+schema: spec-driven
+
+context: |
+  ROTRA is a badminton session platform monorepo (jose-codegourmet/rotra).
+
+  Apps: apps/landing, apps/client, apps/admin, apps/umpire
+  Packages: packages/db (Prisma), packages/config, packages/legal-content
+
+  OpenSpec specs under openspec/specs/ are the source of truth for CURRENT
+    implemented behavior. Documented product rules from docs/business_logic
+    may appear in a clearly labeled "Documented product rules" section on an
+    existing spec, or in a standalone spec whose Status says they are not
+    implemented. Do not claim planned rules are implemented. If code and
+    business docs disagree, Current requirements win for what the product
+    does now. Do not invent APIs or screens that are not in the docs or
+    existing specs.
+
+  Spec format: openspec/specs/<domain>/spec.md with Purpose, Requirements
+  (SHALL/MUST), and Given/When/Then scenarios. Cite key source file paths
+  at the bottom of each spec.
+
+  Tech stack: TypeScript, Next.js, React, Prisma, Supabase Auth, pnpm + turbo.
+  Commits: conventional commits.
+
+rules:
+  proposal:
+    - Document current implemented behavior only
+    - Include a "Skipped / unimplemented" section when code is stub-only
+  specs:
+    - Use SHALL/MUST for invariants that exist in code
+    - Documented product rules from docs/business_logic must be labeled and not claimed as implemented
+    - Each requirement needs at least one Given/When/Then scenario
+    - End each spec with a Source note listing key file paths

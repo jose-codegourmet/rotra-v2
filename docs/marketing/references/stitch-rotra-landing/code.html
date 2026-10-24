@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ROTRA | Kinetic Precision</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#ffdb79",
+                        "on-background": "#e5e2e3",
+                        "primary-fixed": "#60ff99",
+                        "inverse-surface": "#e5e2e3",
+                        "secondary-container": "#454654",
+                        "on-primary-container": "#007139",
+                        "surface-tint": "#00e479",
+                        "on-secondary": "#2e2f3d",
+                        "surface-dim": "#131314",
+                        "tertiary-fixed": "#ffe08d",
+                        "inverse-primary": "#006d37",
+                        "on-tertiary": "#3d2f00",
+                        "on-primary-fixed": "#00210c",
+                        "error-container": "#93000a",
+                        "primary-container": "#00ff88",
+                        "surface-container-low": "#1c1b1c",
+                        "tertiary-fixed-dim": "#e5c364",
+                        "secondary-fixed-dim": "#c6c5d6",
+                        "surface-container": "#201f20",
+                        "on-secondary-container": "#b4b4c4",
+                        "outline": "#849585",
+                        "on-tertiary-container": "#795f01",
+                        "surface": "#131314",
+                        "surface-bright": "#3a393a",
+                        "outline-variant": "#3b4b3d",
+                        "error": "#ffb4ab",
+                        "surface-container-lowest": "#0e0e0f",
+                        "surface-container-high": "#2a2a2b",
+                        "secondary": "#c6c5d6",
+                        "on-tertiary-fixed": "#241a00",
+                        "on-secondary-fixed-variant": "#454654",
+                        "surface-container-highest": "#353436",
+                        "primary-fixed-dim": "#00e479",
+                        "inverse-on-surface": "#313031",
+                        "background": "#131314",
+                        "on-tertiary-fixed-variant": "#584400",
+                        "tertiary": "#fffaf7",
+                        "on-primary-fixed-variant": "#005228",
+                        "on-error": "#690005",
+                        "secondary-fixed": "#e2e1f2",
+                        "on-error-container": "#ffdad6",
+                        "on-surface": "#e5e2e3",
+                        "surface-variant": "#353436",
+                        "on-primary": "#003919",
+                        "on-surface-variant": "#b9cbb9",
+                        "on-secondary-fixed": "#191b27",
+                        "primary": "#f1ffef"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.5rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #0e0e0f; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .glass-panel { background: rgba(28, 27, 28, 0.7); backdrop-filter: blur(16px); }
+        .neon-glow { box-shadow: 0px 0px 24px rgba(0, 255, 136, 0.12); }
+        .gradient-text { background: linear-gradient(135deg, #f1ffef 0%, #00ff88 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .kinetic-border { border: 1.5px solid rgba(132, 149, 133, 0.2); }
+        .kinetic-border-focus { border: 1.5px solid #00ff88; }
+        .text-neon { color: #00ff88; }
+        .bg-neon { background-color: #00ff88; }
+        .grid-line-x { height: 1px; background: linear-gradient(90deg, transparent, rgba(132, 149, 133, 0.2), transparent); }
+        .grid-line-y { width: 1px; background: linear-gradient(180deg, transparent, rgba(132, 149, 133, 0.2), transparent); }
+    </style>
+</head>
+<body class="text-on-background selection:bg-primary-container selection:text-on-primary-fixed">
+<header class="fixed top-0 left-0 right-0 z-50 glass-panel border-b border-outline-variant/30">
+<div class="max-w-[1440px] mx-auto px-6 h-20 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="size-8 text-primary-container">
+<svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M13.8261 17.4264C16.7203 18.1174 20.2244 18.5217 24 18.5217C27.7756 18.5217 31.2797 18.1174 34.1739 17.4264C36.9144 16.7722 39.9967 15.2331 41.3563 14.1648L24.8486 40.6391C24.4571 41.267 23.5429 41.267 23.1514 40.6391L6.64374 14.1648C8.00331 15.2331 11.0856 16.7722 13.8261 17.4264Z" fill="currentColor"></path>
+</svg>
+</div>
+<h2 class="text-xl font-black tracking-[-0.05em] uppercase italic">ROTRA</h2>
+</div>
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed text-xs font-black tracking-wider uppercase px-6 py-3 rounded-lg hover:brightness-110 transition-all">
+                Get Early Access
+            </button>
+</div>
+</header>
+<section class="relative min-h-screen flex items-center justify-center overflow-hidden">
+<div class="absolute inset-0 z-0">
+<div class="absolute inset-0 bg-gradient-to-b from-surface-container-lowest/40 via-surface-container-lowest/90 to-surface-container-lowest z-10"></div>
+<img alt="Cinematic low angle shot of a dark high-tech badminton court with glowing green neon floor markings and atmospheric mist" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDs6BQavdvfjTM7cSu890ttWNlBcxMTM7RJQGYBiHwKtNCAlnhu9oB7ipSmL3XGXEVXkZ0RvVNdZKO6_csuwagHnYBHXwsIl_jddKca0Y-Up4w2IAh5X0LfbRedHdaQicbOUQ_5ned_YHVBkb6nS2yBljFKFXyORTjTw0Ems76DhDFeDPlsd0EdOKdW39oHdTBzCkAaWlVDR1tZssiaF_QontJ_yyR6CvRdmH2Kae63opCJ9JE784oJW9L8f427r0yrZqsBOsxt4mF2"/>
+</div>
+<div class="relative z-20 max-w-[1440px] mx-auto px-6 w-full pt-20 flex flex-col items-center text-center">
+<div class="max-w-4xl">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full kinetic-border bg-surface-container/50 mb-8">
+<span class="size-2 rounded-full bg-primary-container animate-pulse"></span>
+<span class="text-[10px] font-black uppercase tracking-widest text-primary-fixed-dim">Coming Soon</span>
+</div>
+<h1 class="text-6xl md:text-9xl font-black leading-[0.9] tracking-[-0.05em] uppercase mb-8">
+                    Queue. Play.<br/><span class="gradient-text">Track.</span>
+</h1>
+<p class="text-xl md:text-2xl text-secondary-fixed-dim/80 font-medium tracking-tight mb-12 max-w-2xl mx-auto">
+                    The ultimate operating system for elite competitive performance. Join the future of the game.
+                </p>
+<div class="glass-panel kinetic-border p-1 rounded-xl max-w-lg mx-auto neon-glow">
+<div class="flex flex-col sm:flex-row items-stretch gap-1">
+<input class="bg-transparent border-none focus:ring-0 text-on-background placeholder:text-outline/50 uppercase font-black text-center sm:text-left text-xs tracking-widest flex-1 px-6 py-4" placeholder="ENTER TECHNICAL EMAIL" type="email"/>
+<button class="bg-primary-container text-on-primary-fixed text-xs font-black tracking-wider uppercase px-10 py-5 rounded-lg hover:scale-[1.02] active:scale-95 transition-all">
+                            Join the waitlist
+                        </button>
+</div>
+</div>
+<p class="mt-6 text-[10px] uppercase tracking-widest text-outline">Technical Enrollment Phase 01 / Limited Access Protocols Active</p>
+</div>
+</div>
+</section>
+<section class="relative z-30 py-32 px-6 bg-surface-container-lowest overflow-hidden">
+<div class="max-w-[1440px] mx-auto">
+<div class="flex flex-col md:flex-row items-end justify-between mb-24 gap-8 border-l-4 border-primary-container pl-8">
+<div class="max-w-xl">
+<h2 class="text-xs font-black uppercase tracking-[0.2em] text-primary-container mb-4">Core Architecture</h2>
+<h3 class="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-none">High-Efficiency Protocol</h3>
+</div>
+<p class="text-outline max-w-xs text-sm">Designed for elite players who demand absolute precision and architectural fairness in every match.</p>
+</div>
+<div class="relative">
+<!-- Vertical grid lines -->
+<div class="hidden lg:block absolute left-1/3 top-0 bottom-0 grid-line-y"></div>
+<div class="hidden lg:block absolute left-2/3 top-0 bottom-0 grid-line-y"></div>
+<!-- Horizontal grid lines -->
+<div class="absolute top-1/2 left-0 right-0 grid-line-x hidden lg:block"></div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+<!-- Module 01 -->
+<div class="group relative p-12 transition-all duration-300 border-b lg:border-b-0 border-outline-variant/10">
+<div class="relative z-10">
+<div class="size-12 rounded-lg bg-surface-container-high/50 border border-outline-variant/30 flex items-center justify-center text-primary-container mb-10 group-hover:border-primary-container group-hover:bg-primary-container group-hover:text-on-primary-fixed transition-all">
+<span class="material-symbols-outlined !text-2xl" data-icon="queue">queue</span>
+</div>
+<span class="text-[10px] font-bold text-outline uppercase tracking-widest block mb-2">Module 01</span>
+<h4 class="text-xl font-black uppercase tracking-tight mb-4 group-hover:text-primary-container transition-colors">Fair Queues</h4>
+<p class="text-secondary-fixed-dim/60 text-sm leading-relaxed">Advanced matchmaking algorithms ensure competitive integrity and zero-wait distribution across all active courts.</p>
+</div>
+</div>
+<!-- Module 02 -->
+<div class="group relative p-12 transition-all duration-300 border-b lg:border-b-0 border-outline-variant/10 md:border-l lg:border-l-0">
+<div class="relative z-10">
+<div class="size-12 rounded-lg bg-surface-container-high/50 border border-outline-variant/30 flex items-center justify-center text-primary-container mb-10 group-hover:border-primary-container group-hover:bg-primary-container group-hover:text-on-primary-fixed transition-all">
+<span class="material-symbols-outlined !text-2xl" data-icon="sensors">sensors</span>
+</div>
+<span class="text-[10px] font-bold text-outline uppercase tracking-widest block mb-2">Module 02</span>
+<h4 class="text-xl font-black uppercase tracking-tight mb-4 group-hover:text-primary-container transition-colors">Live Sessions</h4>
+<p class="text-secondary-fixed-dim/60 text-sm leading-relaxed">Real-time interaction with zero-latency overhead. Instant biometric data relay from court to cloud synchronization.</p>
+</div>
+</div>
+<!-- Module 03 -->
+<div class="group relative p-12 transition-all duration-300 border-b lg:border-b-0 border-outline-variant/10 lg:border-l lg:border-outline-variant/10">
+<div class="relative z-10">
+<div class="size-12 rounded-lg bg-surface-container-high/50 border border-outline-variant/30 flex items-center justify-center text-primary-container mb-10 group-hover:border-primary-container group-hover:bg-primary-container group-hover:text-on-primary-fixed transition-all">
+<span class="material-symbols-outlined !text-2xl" data-icon="analytics">analytics</span>
+</div>
+<span class="text-[10px] font-bold text-outline uppercase tracking-widest block mb-2">Module 03</span>
+<h4 class="text-xl font-black uppercase tracking-tight mb-4 group-hover:text-primary-container transition-colors">Performance Tracking</h4>
+<p class="text-secondary-fixed-dim/60 text-sm leading-relaxed">Granular data analytics for every movement. Biometric-grade insights processed through our proprietary ML engine.</p>
+</div>
+</div>
+<!-- Module 04 -->
+<div class="group relative p-12 transition-all duration-300 border-b md:border-b-0 border-outline-variant/10 lg:border-t lg:border-outline-variant/10">
+<div class="relative z-10">
+<div class="size-12 rounded-lg bg-surface-container-high/50 border border-outline-variant/30 flex items-center justify-center text-primary-container mb-10 group-hover:border-primary-container group-hover:bg-primary-container group-hover:text-on-primary-fixed transition-all">
+<span class="material-symbols-outlined !text-2xl" data-icon="scoreboard">scoreboard</span>
+</div>
+<span class="text-[10px] font-bold text-outline uppercase tracking-widest block mb-2">Module 04</span>
+<h4 class="text-xl font-black uppercase tracking-tight mb-4 group-hover:text-primary-container transition-colors">Automated Scoring</h4>
+<p class="text-secondary-fixed-dim/60 text-sm leading-relaxed">Eliminate human error with AI-driven point validation and instant scoreboard synchronization across spectator displays.</p>
+</div>
+</div>
+<!-- Module 05 -->
+<div class="group relative p-12 transition-all duration-300 border-b md:border-b-0 border-outline-variant/10 md:border-l lg:border-l-0 lg:border-t lg:border-outline-variant/10">
+<div class="relative z-10">
+<div class="size-12 rounded-lg bg-surface-container-high/50 border border-outline-variant/30 flex items-center justify-center text-primary-container mb-10 group-hover:border-primary-container group-hover:bg-primary-container group-hover:text-on-primary-fixed transition-all">
+<span class="material-symbols-outlined !text-2xl" data-icon="architecture">architecture</span>
+</div>
+<span class="text-[10px] font-bold text-outline uppercase tracking-widest block mb-2">Module 05</span>
+<h4 class="text-xl font-black uppercase tracking-tight mb-4 group-hover:text-primary-container transition-colors">Skill Calibration</h4>
+<p class="text-secondary-fixed-dim/60 text-sm leading-relaxed">Dynamic Elo-rating adjustments based on high-fidelity performance metrics, ensuring perfectly balanced competition.</p>
+</div>
+</div>
+<!-- Module 06 -->
+<div class="group relative p-12 transition-all duration-300 lg:border-l lg:border-t border-outline-variant/10">
+<div class="relative z-10">
+<div class="size-12 rounded-lg bg-surface-container-high/50 border border-outline-variant/30 flex items-center justify-center text-primary-container mb-10 group-hover:border-primary-container group-hover:bg-primary-container group-hover:text-on-primary-fixed transition-all">
+<span class="material-symbols-outlined !text-2xl" data-icon="monitoring">monitoring</span>
+</div>
+<span class="text-[10px] font-bold text-outline uppercase tracking-widest block mb-2">Module 06</span>
+<h4 class="text-xl font-black uppercase tracking-tight mb-4 group-hover:text-primary-container transition-colors">Club Analytics</h4>
+<p class="text-secondary-fixed-dim/60 text-sm leading-relaxed">Infrastructure-level insights for venue managers. Optimize court utilization and player flow through technical data.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="py-32 px-6 bg-surface-dim relative overflow-hidden">
+<div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-primary-container/10 via-transparent to-transparent opacity-50"></div>
+<div class="max-w-4xl mx-auto text-center relative z-10">
+<h2 class="text-xs font-black uppercase tracking-[0.3em] text-primary-container mb-6">Protocol Access</h2>
+<h3 class="text-5xl md:text-7xl font-black uppercase tracking-tighter leading-none mb-8 italic">Join the Community</h3>
+<p class="text-xl text-secondary-fixed-dim/80 mb-12 leading-relaxed max-w-2xl mx-auto font-medium">
+                Connect with the global network of high-performance athletes. Stay synchronized with the latest deployment updates, technical specs, and exclusive inner circle announcements.
+            </p>
+<div class="flex flex-col items-center gap-12">
+<div class="flex flex-wrap justify-center gap-6">
+<!-- Facebook Icon -->
+<a class="group relative size-16 bg-surface-container/50 kinetic-border rounded-xl flex items-center justify-center hover:border-primary-container transition-all hover:-translate-y-1" href="#">
+<svg class="size-6 text-on-surface group-hover:text-primary-container transition-colors" fill="currentColor" viewbox="0 0 24 24">
+<path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"></path>
+</svg>
+<div class="absolute -inset-2 bg-primary-container/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</a>
+<!-- Instagram Icon -->
+<a class="group relative size-16 bg-surface-container/50 kinetic-border rounded-xl flex items-center justify-center hover:border-primary-container transition-all hover:-translate-y-1" href="#">
+<svg class="size-6 text-on-surface group-hover:text-primary-container transition-colors" fill="currentColor" viewbox="0 0 24 24">
+<path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"></path>
+</svg>
+<div class="absolute -inset-2 bg-primary-container/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</a>
+<!-- Discord Icon -->
+<a class="group relative size-16 bg-surface-container/50 kinetic-border rounded-xl flex items-center justify-center hover:border-primary-container transition-all hover:-translate-y-1" href="#">
+<svg class="size-6 text-on-surface group-hover:text-primary-container transition-colors" fill="currentColor" viewbox="0 0 24 24">
+<path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 11.721 11.721 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"></path>
+</svg>
+<div class="absolute -inset-2 bg-primary-container/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</a>
+</div>
+<div class="flex flex-wrap justify-center gap-6">
+<div class="flex items-center gap-2 px-4 py-2 bg-surface-container/30 kinetic-border rounded-lg">
+<span class="size-1.5 rounded-full bg-primary-container"></span>
+<span class="text-[10px] font-black uppercase tracking-widest text-secondary-fixed-dim/70">Verified Protocol</span>
+</div>
+<div class="flex items-center gap-2 px-4 py-2 bg-surface-container/30 kinetic-border rounded-lg">
+<span class="size-1.5 rounded-full bg-primary-container"></span>
+<span class="text-[10px] font-black uppercase tracking-widest text-secondary-fixed-dim/70">Direct Dev Comms</span>
+</div>
+<div class="flex items-center gap-2 px-4 py-2 bg-surface-container/30 kinetic-border rounded-lg">
+<span class="size-1.5 rounded-full bg-primary-container"></span>
+<span class="text-[10px] font-black uppercase tracking-widest text-secondary-fixed-dim/70">Alpha Access</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<footer class="bg-surface-container-lowest border-t border-outline-variant/20 py-16 px-6">
+<div class="max-w-[1440px] mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-10">
+<div>
+<div class="flex items-center gap-3 mb-4">
+<div class="size-6 text-primary-container">
+<svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M13.8261 17.4264C16.7203 18.1174 20.2244 18.5217 24 18.5217C27.7756 18.5217 31.2797 18.1174 34.1739 17.4264C36.9144 16.7722 39.9967 15.2331 41.3563 14.1648L24.8486 40.6391C24.4571 41.267 23.5429 41.267 23.1514 40.6391L6.64374 14.1648C8.00331 15.2331 11.0856 16.7722 13.8261 17.4264Z" fill="currentColor"></path>
+</svg>
+</div>
+<h2 class="text-lg font-black tracking-[-0.05em] uppercase italic">ROTRA</h2>
+</div>
+<p class="text-outline text-xs tracking-widest uppercase">© 2024 ROTRA Performance Lab. All Rights Reserved.</p>
+</div>
+<div class="flex flex-wrap gap-8">
+<a class="text-xs font-black uppercase tracking-widest hover:text-primary-container transition-colors" href="#">Protocol</a>
+<a class="text-xs font-black uppercase tracking-widest hover:text-primary-container transition-colors" href="#">Architecture</a>
+<a class="text-xs font-black uppercase tracking-widest hover:text-primary-container transition-colors" href="#">Join the waitlist</a>
+<a class="text-xs font-black uppercase tracking-widest hover:text-primary-container transition-colors" href="#">Support</a>
+</div>
+<div class="flex gap-4">
+<div class="size-10 rounded-lg bg-surface-container kinetic-border flex items-center justify-center hover:bg-primary-container hover:text-on-primary-fixed cursor-pointer transition-all">
+<span class="material-symbols-outlined text-lg" data-icon="terminal">terminal</span>
+</div>
+<div class="size-10 rounded-lg bg-surface-container kinetic-border flex items-center justify-center hover:bg-primary-container hover:text-on-primary-fixed cursor-pointer transition-all">
+<span class="material-symbols-outlined text-lg" data-icon="share">share</span>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

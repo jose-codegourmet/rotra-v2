@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <title>ROTRA — Standings</title>
+  <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700&display=swap" />
+  <style>
+    :root {
+      --bg: #0B0B0C;
+      --surface: #1A1A1D;
+      --elevated: #2A2A2E;
+      --overlay: #3A3A3F;
+      --text: #F0F0F2;
+      --text-2: #9090A0;
+      --disabled: #4A4A55;
+      --accent: #00FF88;
+      --accent-dim: #00CC6A;
+      --accent-subtle: #00FF8820;
+      --error: #FF4D4D;
+      --warning: #FFB800;
+      --border: #2A2A2E;
+      --border-strong: #404048;
+      --font: 'Satoshi', Inter, system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      background: #111114;
+      min-height: 100%;
+      font-family: var(--font);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 24px 16px;
+    }
+
+    .phone {
+      width: 390px;
+      height: 844px;
+      background: var(--bg);
+      border-radius: 44px;
+      position: relative;
+      overflow: hidden;
+      box-shadow:
+        0 0 0 1px #2A2A2E,
+        0 0 0 10px #1A1A1D,
+        0 24px 64px rgba(0,0,0,0.55);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .status-bar {
+      height: 50px;
+      padding: 12px 24px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 4;
+    }
+
+    .status-time {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+      width: 54px;
+    }
+
+    .notch {
+      position: absolute;
+      left: 50%;
+      top: 8px;
+      transform: translateX(-50%);
+      width: 118px;
+      height: 26px;
+      background: #000;
+      border-radius: 18px;
+    }
+
+    .status-icons {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      width: 70px;
+      justify-content: flex-end;
+    }
+
+    .status-icons svg { display: block; }
+
+    .app-header {
+      padding: 2px 16px 6px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .brand { display: flex; flex-direction: column; gap: 1px; }
+
+    .wordmark {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.7px;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .tagline {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.2px;
+      color: var(--text-2);
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      height: 22px;
+      padding: 0 8px;
+      background: var(--accent-subtle);
+      border: 1px solid rgba(0,255,136,0.22);
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .chip-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 6px var(--accent);
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      height: 40px;
+      background: var(--elevated);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 3px;
+      gap: 3px;
+      margin: 4px 16px 6px;
+      flex-shrink: 0;
+    }
+
+    .tab {
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text-2);
+      font-family: var(--font);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: default;
+    }
+
+    .tab.active {
+      background: var(--accent-subtle);
+      color: var(--accent);
+      box-shadow: inset 0 0 0 1px rgba(0,255,136,0.18);
+    }
+
+    .scroll {
+      flex: 1;
+      overflow: hidden;
+      padding: 2px 16px 0;
+      max-width: 480px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .status-first { margin: 2px 0 10px; }
+
+    .live-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--text-2);
+      margin-bottom: 5px;
+    }
+
+    .live-pill .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px rgba(0,255,136,0.55);
+    }
+
+    .display {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.8px;
+      line-height: 1.1;
+    }
+
+    .sub {
+      margin-top: 5px;
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-2);
+      line-height: 1.35;
+    }
+
+    .dock {
+      flex-shrink: 0;
+      padding: 8px 16px 8px;
+      background: var(--bg);
+    }
+
+    .home-ind {
+      margin: 4px auto 6px;
+      width: 134px;
+      height: 5px;
+      background: #F0F0F2;
+      border-radius: 99px;
+      opacity: 0.85;
+    }
+
+    @media (max-width: 430px) {
+      body { padding: 0; background: var(--bg); }
+      .phone {
+        border-radius: 0;
+        box-shadow: none;
+        width: 100vw;
+        height: 100vh;
+        max-width: 480px;
+      }
+    }
+
+    .list {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+    }
+
+    .thead {
+      height: 32px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 14px 0 12px;
+      border-bottom: 1px solid var(--border);
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      color: var(--text-2);
+    }
+
+    .thead .col-wl,
+    .thead .col-pts {
+      text-align: right;
+    }
+
+    .srow {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 14px 0 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .srow:last-child { border-bottom: 0; }
+
+    .srow.you {
+      background: var(--accent-subtle);
+    }
+
+    .rank {
+      width: 22px;
+      height: 22px;
+      border-radius: 7px;
+      display: grid;
+      place-items: center;
+      font-size: 11px;
+      font-weight: 700;
+      background: var(--elevated);
+      color: var(--text-2);
+      border: 1px solid var(--border-strong);
+      flex-shrink: 0;
+    }
+
+    .rank.gold {
+      background: rgba(255,184,0,0.16);
+      color: var(--warning);
+      border-color: rgba(255,184,0,0.28);
+    }
+
+    .srow.you .rank {
+      background: rgba(0,255,136,0.16);
+      color: var(--accent);
+      border-color: rgba(0,255,136,0.28);
+    }
+
+    .av {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--elevated);
+      border: 1px solid var(--border-strong);
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.4px;
+      color: var(--text);
+      flex-shrink: 0;
+    }
+
+    .av.you {
+      background: var(--accent-subtle);
+      border-color: rgba(0,255,136,0.28);
+      color: var(--accent);
+    }
+
+    .who { flex: 1; min-width: 0; }
+
+    .pname {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+      line-height: 1.2;
+    }
+
+    .psub {
+      font-size: 12px;
+      color: var(--text-2);
+      margin-top: 2px;
+    }
+
+    .col-wl {
+      width: 44px;
+      text-align: right;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+      flex-shrink: 0;
+    }
+
+    .col-pts {
+      width: 36px;
+      text-align: right;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+      color: var(--text);
+      flex-shrink: 0;
+    }
+
+    .srow.you .col-pts { color: var(--accent); }
+
+    .badge-you {
+      display: inline-flex;
+      align-items: center;
+      height: 18px;
+      padding: 0 6px;
+      margin-left: 6px;
+      border-radius: 999px;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      background: var(--accent-subtle);
+      color: var(--accent);
+      border: 1px solid rgba(0,255,136,0.22);
+      vertical-align: middle;
+    }
+
+    .thead .who { padding-left: 62px; }
+  </style>
+</head>
+<body>
+  <div class="phone" id="frame">
+    <div class="status-bar">
+      <div class="status-time">7:12</div>
+      <div class="notch"></div>
+      <div class="status-icons" aria-hidden="true">
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
+          <rect x="0" y="8" width="3" height="4" rx="0.6" fill="#F0F0F2"/>
+          <rect x="4.5" y="5" width="3" height="7" rx="0.6" fill="#F0F0F2"/>
+          <rect x="9" y="2.5" width="3" height="9.5" rx="0.6" fill="#F0F0F2"/>
+          <rect x="13.5" y="0" width="3" height="12" rx="0.6" fill="#F0F0F2" opacity="0.35"/>
+        </svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+          <path d="M8 3.2c2.1 0 4 1.1 5.2 2.8M2.6 4.2C4.3 2.4 6.1 1.6 8 1.6c1.9 0 3.7.8 5.4 2.6M4.4 6.2C5.5 5 6.7 4.4 8 4.4c1.3 0 2.5.6 3.6 1.8" stroke="#F0F0F2" stroke-width="1.3" stroke-linecap="round"/>
+          <circle cx="8" cy="9.4" r="1.15" fill="#F0F0F2"/>
+        </svg>
+        <svg width="27" height="13" viewBox="0 0 27 13" fill="none">
+          <rect x="0.6" y="0.6" width="22.5" height="11.8" rx="3.2" stroke="#F0F0F2" stroke-width="1.2"/>
+          <rect x="2.2" y="2.2" width="17.2" height="8.6" rx="1.8" fill="#F0F0F2"/>
+          <path d="M24.6 4.4v4.2c.9-.4 1.4-1.1 1.4-2.1s-.5-1.7-1.4-2.1z" fill="#F0F0F2"/>
+        </svg>
+      </div>
+    </div>
+
+    <header class="app-header">
+      <div class="brand">
+        <div class="wordmark">ROTRA</div>
+        <div class="tagline">Run the game.</div>
+      </div>
+      <div class="chip"><span class="chip-dot"></span>You · JO</div>
+    </header>
+    <nav class="tabs" aria-label="Session views">
+      <a class="tab" href="player-courts.html">Courts</a>
+      <a class="tab" href="player-queue.html">Queue</a>
+      <a class="tab active" href="player-standings.html">Standings</a>
+    </nav>
+
+    <main class="scroll">
+      <section class="status-first">
+        <div class="live-pill"><span class="dot"></span>Live · 4 matches in</div>
+        <h1 class="display">Standings</h1>
+        <p class="sub">Smash Hub Ortigas · 7:00–9:00 PM · Doubles</p>
+      </section>
+
+      <section class="list">
+        <div class="thead">
+          <div class="rank" style="opacity:0;border:0;background:transparent"></div>
+          <div class="who">Player</div>
+          <div class="col-wl">W–L</div>
+          <div class="col-pts">Pts</div>
+        </div>
+        <div class="srow">
+          <div class="rank gold">1</div>
+          <div class="av">JL</div>
+          <div class="who">
+            <div class="pname">Jae Lim</div>
+            <div class="psub">On court 1</div>
+          </div>
+          <div class="col-wl">3–0</div>
+          <div class="col-pts">9</div>
+        </div>
+        <div class="srow">
+          <div class="rank">2</div>
+          <div class="av">MR</div>
+          <div class="who">
+            <div class="pname">Mia Reyes</div>
+            <div class="psub">On court 1</div>
+          </div>
+          <div class="col-wl">2–1</div>
+          <div class="col-pts">7</div>
+        </div>
+        <div class="srow you">
+          <div class="rank">3</div>
+          <div class="av you">JO</div>
+          <div class="who">
+            <div class="pname">Jo Cruz <span class="badge-you">You</span></div>
+            <div class="psub">Queued · match 2</div>
+          </div>
+          <div class="col-wl">2–1</div>
+          <div class="col-pts">6</div>
+        </div>
+        <div class="srow">
+          <div class="rank">4</div>
+          <div class="av">KT</div>
+          <div class="who">
+            <div class="pname">Kai Tan</div>
+            <div class="psub">On court 1</div>
+          </div>
+          <div class="col-wl">2–1</div>
+          <div class="col-pts">6</div>
+        </div>
+        <div class="srow">
+          <div class="rank">5</div>
+          <div class="av">LS</div>
+          <div class="who">
+            <div class="pname">Lia Santos</div>
+            <div class="psub">On court 1</div>
+          </div>
+          <div class="col-wl">1–1</div>
+          <div class="col-pts">4</div>
+        </div>
+        <div class="srow">
+          <div class="rank">6</div>
+          <div class="av">NC</div>
+          <div class="who">
+            <div class="pname">Nico Cruz</div>
+            <div class="psub">Next up</div>
+          </div>
+          <div class="col-wl">1–1</div>
+          <div class="col-pts">4</div>
+        </div>
+        <div class="srow">
+          <div class="rank">7</div>
+          <div class="av">BO</div>
+          <div class="who">
+            <div class="pname">Bea Ong</div>
+            <div class="psub">Next up</div>
+          </div>
+          <div class="col-wl">1–2</div>
+          <div class="col-pts">3</div>
+        </div>
+      </section>
+    </main>
+    <div class="dock">
+      <div class="home-ind"></div>
+    </div>
+  </div>
+</body>
+</html>

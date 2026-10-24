@@ -1,0 +1,16 @@
+model TagDefinition {
+  id           String          @id @default(uuid()) @db.Uuid
+  slug         String          @unique
+  label        String
+  description  String?
+  isActive     Boolean         @default(true) @map("is_active")
+  assignableBy TagAssignableBy @default(any_admin) @map("assignable_by")
+  createdById  String?         @map("created_by") @db.Uuid
+  createdAt    DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime        @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  createdBy Profile? @relation("TagDefinitionCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([isActive], map: "idx_tag_definitions_active")
+  @@map("tag_definitions")
+}

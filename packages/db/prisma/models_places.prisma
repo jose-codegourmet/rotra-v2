@@ -1,0 +1,33 @@
+enum PlaceStatus {
+  confirmed
+  unreviewed
+
+  @@map("place_status_enum")
+}
+
+model Place {
+  id          String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String
+  address     String
+  latitude    Float
+  longitude   Float
+  description String?
+  phone       String?
+  website     String?
+  status      PlaceStatus @default(unreviewed)
+
+  submittedBy   Profile? @relation("PlaceSubmittedBy", fields: [submittedById], references: [id], onDelete: SetNull)
+  submittedById String?  @map("submitted_by") @db.Uuid
+
+  reviewedBy   Profile?  @relation("PlaceReviewedBy", fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewedById String?   @map("reviewed_by") @db.Uuid
+  reviewedAt   DateTime? @map("reviewed_at") @db.Timestamptz(6)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([status], map: "idx_places_status")
+  @@index([submittedById], map: "idx_places_submitted_by")
+  @@index([latitude, longitude], map: "idx_places_lat_lng")
+  @@map("places")
+}

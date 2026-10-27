@@ -72,7 +72,11 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
   const s = session.data
   if (session.isError && session.error instanceof MockError && session.error.kind === 'permission')
     notFound()
-  if (s && s.state !== 'prepared') router.replace(sessionHref(s))
+  // A started session has no preparation: go to the console (or the record once it is done).
+  const redirectTo = s && s.state !== 'prepared' ? sessionHref(s) : null
+  useEffect(() => {
+    if (redirectTo) router.replace(redirectTo)
+  }, [redirectTo, router])
 
   const rosterList = roster.data?.roster ?? []
   const waitlist = roster.data?.waitlist ?? []

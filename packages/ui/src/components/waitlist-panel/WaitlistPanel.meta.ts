@@ -8,6 +8,7 @@ export const waitlistPanelMeta = {
     'Use for the Waitlist tab in preparation (Q-PREPARE) and in the live Players view when someone waits or the slots are full.',
     'Rows keep the order players joined; the panel never reorders them.',
     'Mutations stay in the container: the panel only reports Fill, Give slot, Remove and profile taps.',
+    'Pass loading while the roster query runs: the panel shows Skeleton rows in place of the list.',
   ],
   prototype: {
     file: 'docs/frames/queue-app/rotra-queue.html',

@@ -9,6 +9,7 @@ export const joinRequestsPanelMeta = {
     'Use the sheet variant inside the live console\'s "Join requests" Sheet: no card chrome and no heading, since the sheet title names it.',
     'Confirming with no level shows "Choose a level for this club before confirming." and does not call onConfirm. The container owns the confirm/decline mutations and their toasts.',
     'A request\'s phone shows only here, for the Queue Master; never put this panel or its rows on a public screen.',
+    'Pass loading while the roster query runs (the live console sheet): Skeleton rows, never fake names.',
   ],
   prototype: {
     file: 'docs/frames/queue-app/rotra-queue.html',

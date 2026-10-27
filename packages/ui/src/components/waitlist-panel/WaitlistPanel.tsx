@@ -6,6 +6,7 @@ import { cn } from '@rotra/ui/cn'
 import { Icon } from '@rotra/ui/icon'
 import { IconButton } from '@rotra/ui/icon-button'
 import { levelLabel } from '@rotra/ui/level-pill'
+import { Skeleton } from '@rotra/ui/skeleton'
 
 /** One person on the first-come waitlist, in the order they joined */
 export type WaitlistPanelEntry = {
@@ -23,6 +24,8 @@ export type WaitlistPanelProps = {
   rosterCount: number
   courtCount: number
   playersPerCourt: number
+  /** The waitlist is still loading: Skeleton rows in place of the list and the slots line */
+  loading?: boolean
   onFillOpenSlots: () => void
   onGiveSlot: (entryId: string) => void
   onRemove: (entryId: string) => void
@@ -32,13 +35,15 @@ export type WaitlistPanelProps = {
 
 /**
  * The first-come waitlist shared by preparation and the live Players view: slots used against the
- * budget, Fill N open slots, and one row per waiting player with Give slot and remove.
+ * budget, Fill N open slots, and one row per waiting player with Give slot and remove. While loading
+ * it shows the heading and Skeleton rows.
  */
 export function WaitlistPanel({
   entries,
   rosterCount,
   courtCount,
   playersPerCourt,
+  loading = false,
   onFillOpenSlots,
   onGiveSlot,
   onRemove,
@@ -48,6 +53,30 @@ export function WaitlistPanel({
   const capacity = courtCount * playersPerCourt
   const open = Math.max(0, capacity - rosterCount)
   const fill = Math.min(open, entries.length)
+  if (loading)
+    return (
+      <Card asChild className={cn('flex flex-col gap-3', className)}>
+        <section aria-busy aria-label="Loading the waitlist">
+          <div>
+            <h2 className="text-lg font-bold">Waitlist</h2>
+            <Skeleton className="mt-1.5 w-64" />
+          </div>
+          <div className="flex flex-col divide-y divide-border">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="flex items-center gap-3 py-3">
+                <Skeleton className="w-6" />
+                <Skeleton className="size-10 rounded-full" />
+                <span className="flex flex-1 flex-col gap-1.5">
+                  <Skeleton className="w-36" />
+                  <Skeleton className="h-3 w-48" />
+                </span>
+                <Skeleton className="h-9 w-20 rounded-md" />
+              </div>
+            ))}
+          </div>
+        </section>
+      </Card>
+    )
   return (
     <Card asChild className={cn('flex flex-col gap-3', className)}>
       <section>

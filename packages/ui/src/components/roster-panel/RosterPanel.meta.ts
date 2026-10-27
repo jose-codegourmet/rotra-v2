@@ -8,6 +8,7 @@ export const rosterPanelMeta = {
     'Use for the Roster and levels tab of a prepared Queue Session (Q-PREPARE).',
     'Mark all present shows only while someone is not present; Mark all absent only while someone is present.',
     'Do not use in the live console: Queue › Players shows locked levels and no remove action.',
+    'Pass loading while the roster query runs: the panel shows Skeleton rows, never a spinner or fake names. levelsLocked turns every level into locked text.',
   ],
   prototype: {
     file: 'docs/frames/queue-app/rotra-queue.html',

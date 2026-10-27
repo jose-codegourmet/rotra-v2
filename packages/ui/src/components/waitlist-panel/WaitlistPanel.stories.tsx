@@ -54,6 +54,8 @@ type Story = StoryObj<typeof meta>
 /** 10 open slots and three waiting: Fill 3 open slots, Give slot */
 export const OpenSlots: Story = {}
 export const Empty: Story = { args: { entries: [] } }
+/** The waitlist is still loading: heading and Skeleton rows. */
+export const Loading: Story = { args: { entries: [], loading: true } }
 /** Every slot taken: no Fill button, Give slot anyway */
 export const FullWithWaitlist: Story = {
   args: { rosterCount: COURTS * tonight.playersPerCourt },

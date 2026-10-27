@@ -9,6 +9,7 @@ import { Card } from '@rotra/ui/card'
 import { Chip } from '@rotra/ui/chip'
 import { cn } from '@rotra/ui/cn'
 import { LevelSelect } from '@rotra/ui/level-select'
+import { Skeleton } from '@rotra/ui/skeleton'
 import { useId, useState } from 'react'
 
 export type JoinRequestsPanelProps = {
@@ -21,6 +22,8 @@ export type JoinRequestsPanelProps = {
   slotsFull?: boolean
   /** `card` on Preparation; `sheet` drops the card chrome and heading for the live console's sheet */
   variant?: 'card' | 'sheet'
+  /** Requests are still loading: Skeleton rows in place of the list */
+  loading?: boolean
   /** Confirm with the level the Queue Master chose for this club */
   onConfirm: (requestId: string, level: PlayingLevel) => void
   onDecline: (requestId: string) => void
@@ -53,12 +56,13 @@ const LEVEL_ERROR = 'Choose a level for this club before confirming.'
  * Preparation › Join requests, and the live console's Join requests sheet: each waiting guest with
  * initials, name, phone, stated band and time, a level select preset to the middle of that band, and
  * Decline / Confirm guest (Confirm to waitlist when slots are full). Phones show here only, never on
- * public components.
+ * public components. While loading it shows Skeleton rows.
  */
 export function JoinRequestsPanel({
   requests,
   slotsFull = false,
   variant = 'card',
+  loading = false,
   onConfirm,
   onDecline,
   className,
@@ -90,8 +94,36 @@ export function JoinRequestsPanel({
   }
 
   const inSheet = variant === 'sheet'
-  const heading = pending.length ? `Join requests · ${pending.length}` : 'Join requests'
-  const body = (
+  const heading = loading || !pending.length ? 'Join requests' : `Join requests · ${pending.length}`
+  const body = loading ? (
+    <section
+      id="join-requests"
+      aria-busy
+      aria-label="Loading join requests"
+      className={cn('flex min-w-0 flex-col gap-3', inSheet && className)}
+    >
+      {inSheet ? null : <h2>{heading}</h2>}
+      <Skeleton className="w-72" />
+      <div className="flex flex-col divide-y divide-border">
+        {[0, 1].map((i) => (
+          <div key={i} className="flex flex-col gap-2.5 py-3">
+            <div className="flex items-center gap-3">
+              <Skeleton className="size-10 rounded-full" />
+              <span className="flex flex-1 flex-col gap-1.5">
+                <Skeleton className="w-36" />
+                <Skeleton className="h-3 w-56" />
+              </span>
+              <Skeleton className="h-5 w-24 rounded-full" />
+            </div>
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 max-sm:grid-cols-1">
+              <Skeleton className="h-11 w-full rounded-md" />
+              <Skeleton className="h-11 w-56 rounded-md" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  ) : (
     <section
       id="join-requests"
       aria-labelledby={inSheet ? undefined : `${id}-h`}

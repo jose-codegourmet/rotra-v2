@@ -7,7 +7,7 @@ export const rosterRowMeta = {
   usage: [
     'Use inside RosterPanel for every player with a slot in a prepared session.',
     'Do not use in the live console: Queue › Players shows locked levels and no remove action (PlayerPoolCard).',
-    'The level select is highlighted while the level is missing; pass levelLocked once the session started.',
+    'The level select is highlighted while the level is missing; pass levelLocked once the session started: the level becomes text with a lock icon and "Level locked for this session", no edit path.',
   ],
   prototype: {
     file: 'docs/frames/queue-app/rotra-queue.html',

@@ -87,6 +87,12 @@ export type AddPlayerSheetProps = {
   isPending?: boolean
   /** Why the last add was refused; shown on the card or the form, nothing is claimed as added */
   serverError?: string
+  /**
+   * The refusal is final for that pick (already on the roster or waitlist): the sheet drops the
+   * confirmation card and shows serverError above the list instead of keeping the card. Save
+   * failures leave it false so the typed level stays.
+   */
+  serverErrorReturnsToList?: boolean
   /** Status line after an add, e.g. "Marco Lopez added · Intermediate Mid" */
   lastAdded?: string | null
   /** Adds so far while this sheet has been open; a change clears the tab and refocuses it */
@@ -145,7 +151,8 @@ function CandidateRow({
  * Q-ADD-PLAYER: the Add player sheet that stays open while adding. Saved players, Player
  * Information and New player tabs; picking a player shows PlayerConfirmCard (titled Confirm player
  * for unclaimed profiles). After each add the container passes lastAdded and a new addedCount: the
- * tab clears and focus returns to its first field.
+ * tab clears and focus returns to its first field. A refusal (serverError) stays on the card or the
+ * form with what was typed; with serverErrorReturnsToList it drops the card and shows above the list.
  */
 export function AddPlayerSheet({
   open,
@@ -166,6 +173,7 @@ export function AddPlayerSheet({
   onSubmitNewPlayer,
   isPending = false,
   serverError,
+  serverErrorReturnsToList = false,
   lastAdded,
   addedCount = 0,
   initialTab = 'saved',
@@ -207,6 +215,12 @@ export function AddPlayerSheet({
   if (addedCount !== prevAdded) {
     setPrevAdded(addedCount)
     clearTab()
+  }
+  // A refused pick (a duplicate) goes back to the list; the error shows there, nobody is replaced.
+  const [prevError, setPrevError] = useState(serverError)
+  if (serverError !== prevError) {
+    setPrevError(serverError)
+    if (serverError && serverErrorReturnsToList && pick) setPick(null)
   }
 
   // Focus the first field once the sheet has opened or the tab was cleared. The Sheet focuses its
@@ -352,6 +366,7 @@ export function AddPlayerSheet({
             value={tab}
             onChange={(next) => changeTab(next as AddPlayerTab)}
           />
+          {serverError && tab !== 'new' ? <Notice tone="error">{serverError}</Notice> : null}
 
           {tab === 'saved' ? (
             <>

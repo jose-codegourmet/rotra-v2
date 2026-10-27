@@ -25,6 +25,7 @@ const errorMessage = (error: unknown) =>
  * Join requests from the session link: JoinRequestsPanel on useSessionRoster, confirming (with the
  * level the Queue Master chose) through useConfirmJoinRequest and declining through
  * useDeclineJoinRequest. Confirmed guests go to the roster, or to the waitlist once slots are full.
+ * Both mutations toast their result or error; a refused decision leaves the request pending.
  */
 export function JoinRequests({ sessionId, variant = 'card', className }: JoinRequestsProps) {
   const session = useQueueSession(sessionId)
@@ -40,14 +41,17 @@ export function JoinRequests({ sessionId, variant = 'card', className }: JoinReq
   const s = session.data
   const requests = roster.data?.joinRequests ?? []
   const pending = requests.filter((r) => r.status === 'pending').length
-  if (!s || !roster.data) return null
-  if (variant === 'card' && pending === 0) return null
+  // The card only appears once a request is waiting, so it stays hidden while loading; the sheet
+  // always has a body and shows Skeleton rows until the roster arrives.
+  const loading = !s || !roster.data
+  if (variant === 'card' && (loading || pending === 0)) return null
 
-  const capacity = slotCapacity(s.courts.length, s.playersPerCourt)
-  const slotsFull = roster.data.roster.length >= capacity
+  const capacity = s ? slotCapacity(s.courts.length, s.playersPerCourt) : 0
+  const slotsFull = (roster.data?.roster.length ?? 0) >= capacity
 
   return (
     <JoinRequestsPanel
+      loading={loading}
       requests={requests}
       slotsFull={slotsFull}
       variant={variant}

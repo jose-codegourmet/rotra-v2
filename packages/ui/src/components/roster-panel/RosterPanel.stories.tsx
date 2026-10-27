@@ -97,6 +97,9 @@ export const FullWithWaitlist: Story = {
     waitlistCount: sessionWaitlistFixture.length,
   },
 }
+/** The roster is still loading: heading and Skeleton rows, no meter or actions. */
+export const Loading: Story = { args: { players: [], loading: true } }
+/** After the session started: levels are locked text with a lock, no select. */
 export const Locked: Story = {
   args: {
     players: rosterPlayers.map((p) => ({

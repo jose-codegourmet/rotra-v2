@@ -14,7 +14,6 @@ import { useSetPresence } from '@rotra/data/session-roster/useSetPresence'
 import { useSetRosterLevel } from '@rotra/data/session-roster/useSetRosterLevel'
 import { PlayerProfileSheet } from '@rotra/ui/player-profile-sheet'
 import { RosterPanel, type RosterPanelPlayer } from '@rotra/ui/roster-panel'
-import { Skeleton } from '@rotra/ui/skeleton'
 import { toast } from '@rotra/ui/toaster'
 import { WaitlistPanel, type WaitlistPanelEntry } from '@rotra/ui/waitlist-panel'
 import { useState } from 'react'
@@ -37,7 +36,9 @@ const errorMessage = (error: unknown) =>
  * Q-ROSTER in preparation: the Roster and levels tab (RosterPanel) or the Waitlist tab
  * (WaitlistPanel) on useSessionRoster and the roster mutations. Level changes save immediately;
  * removing is immediate with its toast and no dialog. Pictures open PlayerProfileSheet; Add player
- * opens the shared AddPlayer container.
+ * opens the shared AddPlayer container. While the session or roster loads the panels show Skeleton
+ * rows; every mutation toasts its result (offline adds say "Saved on this device, waiting to sync")
+ * or its error, and a refused change leaves the roster as it was.
  */
 export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
   const session = useQueueSession(sessionId)
@@ -101,16 +102,17 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
         title={session.isError ? "Couldn't load this session." : "Couldn't load the roster."}
       />
     )
-  if (!s || !roster.data) return <Skeleton className="h-56 rounded-lg" />
+  const loading = !s || !roster.data
 
   return (
     <>
       {tab === 'roster' ? (
         <RosterPanel
+          loading={loading}
           players={players}
           capacity={capacity}
           waitlistCount={waitlist.length}
-          levelsLocked={s.state !== 'prepared'}
+          levelsLocked={s ? s.state !== 'prepared' : false}
           onMarkAllPresent={() => setAllPresence.mutate({ sessionId, present: true }, options)}
           onMarkAllAbsent={() => setAllPresence.mutate({ sessionId, present: false }, options)}
           onAddPlayer={() => setAddOpen(true)}
@@ -125,10 +127,11 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
         />
       ) : (
         <WaitlistPanel
+          loading={loading}
           entries={entries}
           rosterCount={rosterList.length}
-          courtCount={s.courts.length}
-          playersPerCourt={s.playersPerCourt}
+          courtCount={s?.courts.length ?? 0}
+          playersPerCourt={s?.playersPerCourt ?? 0}
           onFillOpenSlots={() => fillOpenSlots.mutate(sessionId, options)}
           onGiveSlot={(waitlistId) => giveSlot.mutate({ sessionId, waitlistId }, options)}
           onRemove={(waitlistId) => removeFromWaitlist.mutate({ sessionId, waitlistId }, options)}

@@ -10,6 +10,7 @@ export const addPlayerSheetMeta = {
     'Player Information: report the query with onDirectorySearch, pass directoryResults and directoryLoading (Skeleton rows; end it yourself, it never spins forever). offline swaps the tab for the reconnect notice.',
     'onConfirm receives the picked candidate, its source, the chosen level and the identity check (unclaimed profiles only); onSubmitNewPlayer receives the New player form values. needsConfirmStep lets a container add registered profiles with a level in one tap (Q03.6).',
     'Candidates never carry a phone number; phoneHidden only removes the Phone confirmed check and shows the hidden-phone line.',
+    'serverError keeps the card or form with what was typed (a failed save); with serverErrorReturnsToList (a duplicate, refused as a conflict) the sheet drops the card and shows the error above the list, so nobody is ever replaced.',
   ],
   prototype: {
     file: 'docs/frames/queue-app/rotra-queue.html',

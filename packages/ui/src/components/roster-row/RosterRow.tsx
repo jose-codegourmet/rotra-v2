@@ -22,7 +22,7 @@ export type RosterRowProps = {
   /** The club's level for this session; null until the Queue Master sets it */
   level: PlayingLevel | null
   present: boolean
-  /** Levels lock when the session starts */
+  /** Levels lock when the session starts: the level shows as text with a lock, no select */
   levelLocked?: boolean
   onOpenProfile: () => void
   onLevelChange: (level: PlayingLevel) => void
@@ -34,7 +34,8 @@ export type RosterRowProps = {
 /**
  * One confirmed slot on the preparation roster (the prototype's .prow): picture, name, identity,
  * suggestion, the level select with its diff indicator, the Present switch and remove. Phones stack
- * the name, then the level, then Present and remove.
+ * the name, then the level, then Present and remove. Once levels are locked the level is plain text
+ * with a lock icon and an explanation; there is no edit path.
  */
 export function RosterRow({
   name,
@@ -72,14 +73,26 @@ export function RosterRow({
         </div>
       </div>
       <div className="order-2 flex min-w-0 flex-col gap-1 sm:order-none">
-        <LevelSelect
-          value={level}
-          onChange={onLevelChange}
-          missing={level === null}
-          disabled={levelLocked}
-          aria-label={`Level for ${name} at this club`}
-          aria-describedby={diffId}
-        />
+        {levelLocked ? (
+          <>
+            <span className="inline-flex min-w-0 items-center gap-1.5 font-semibold">
+              <Icon name="lock" size={13} className="shrink-0 text-fg2" />
+              {level ? levelLabel(level) : 'No level yet'}
+              <span className="sr-only"> (locked)</span>
+            </span>
+            <span className="text-[13px] text-fg2">
+              Level locked for this session. Levels can't change after the session starts.
+            </span>
+          </>
+        ) : (
+          <LevelSelect
+            value={level}
+            onChange={onLevelChange}
+            missing={level === null}
+            aria-label={`Level for ${name} at this club`}
+            aria-describedby={diffId}
+          />
+        )}
         <LevelDiffIndicator id={diffId} level={level} suggestion={suggestion} />
       </div>
       <div className="order-3 flex flex-nowrap items-center justify-between gap-2 sm:order-none sm:justify-start">

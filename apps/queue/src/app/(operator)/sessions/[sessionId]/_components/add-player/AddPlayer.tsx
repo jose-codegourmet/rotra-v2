@@ -1,6 +1,7 @@
 'use client'
 
 import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
+import { MockError } from '@rotra/data/mock/errors'
 import { slotCapacity } from '@rotra/data/queue-session/queueSession.rules'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { needsConfirmStep } from '@rotra/data/session-roster/sessionRoster.rules'
@@ -36,7 +37,9 @@ const rankLabel = (label: string) =>
 /**
  * Q-ADD-PLAYER container shared by preparation (Add player) and the console (Add late player):
  * AddPlayerSheet on the saved, Player Information and new-player add mutations. The sheet stays
- * open; every add toasts and bumps addedCount so the tab clears and refocuses.
+ * open; every add toasts and bumps addedCount so the tab clears and refocuses. Offline on a
+ * downloaded session the saved and new-player adds save locally (the toast says so) and the Player
+ * Information tab shows its offline notice; the lookup never runs, so nothing spins.
  */
 export function AddPlayer({ sessionId, open, onOpenChange }: AddPlayerProps) {
   const offline = useAppSelector(selectDev).offline
@@ -51,6 +54,9 @@ export function AddPlayer({ sessionId, open, onOpenChange }: AddPlayerProps) {
   const [lastAdded, setLastAdded] = useState<string | null>(null)
   const [addedCount, setAddedCount] = useState(0)
   const [serverError, setServerError] = useState<string | undefined>()
+  // A conflict (already on the roster or waitlist) is final for that pick: the sheet returns to
+  // the list. A failed save (retryable, offline) keeps the card or form with what was typed.
+  const [errorReturnsToList, setErrorReturnsToList] = useState(false)
 
   // A fresh sheet each time it opens: Cancel until someone is added, no stale status line.
   const [prevOpen, setPrevOpen] = useState(open)
@@ -99,6 +105,7 @@ export function AddPlayer({ sessionId, open, onOpenChange }: AddPlayerProps) {
     },
     onError: (error: unknown) => {
       const message = errorMessage(error)
+      setErrorReturnsToList(error instanceof MockError && error.kind === 'conflict')
       setServerError(message)
       toast.error(message)
     },
@@ -153,6 +160,7 @@ export function AddPlayer({ sessionId, open, onOpenChange }: AddPlayerProps) {
       onSubmitNewPlayer={submitNewPlayer}
       isPending={isPending}
       serverError={serverError}
+      serverErrorReturnsToList={errorReturnsToList}
       lastAdded={lastAdded}
       addedCount={addedCount}
     />

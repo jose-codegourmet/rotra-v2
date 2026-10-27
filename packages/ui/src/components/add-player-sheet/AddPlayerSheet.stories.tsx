@@ -113,9 +113,22 @@ export const LiveSession: Story = { args: { live: true } }
 
 export const Pending: Story = { args: { isPending: true } }
 
+/** A save failed on the New player form: the error shows and what was typed stays. */
 export const Refused: Story = {
-  args: { serverError: 'This player is already on the roster or waitlist.' },
+  args: { initialTab: 'new', serverError: 'Changes could not be saved' },
 }
+
+/** A duplicate from Player Information: the pick was refused and the sheet is back on the list. */
+export const DuplicateReturnsToList: Story = {
+  args: {
+    initialTab: 'directory',
+    serverError: 'This player is already on the roster or waitlist.',
+    serverErrorReturnsToList: true,
+  },
+}
+
+/** Offline: the Player Information tab shows its notice; nothing searches or spins. */
+export const Offline: Story = { args: { initialTab: 'directory', offline: true } }
 
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
 export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }

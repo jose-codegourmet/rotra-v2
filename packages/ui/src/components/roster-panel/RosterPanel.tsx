@@ -6,6 +6,7 @@ import { EmptyState } from '@rotra/ui/empty-state'
 import type { Identity } from '@rotra/ui/identity-chip/variants'
 import { Notice } from '@rotra/ui/notice'
 import { RosterRow } from '@rotra/ui/roster-row'
+import { Skeleton } from '@rotra/ui/skeleton'
 import { SlotMeter } from '@rotra/ui/slot-meter'
 
 /** One roster slot with the saved-player details a RosterRow needs */
@@ -27,6 +28,8 @@ export type RosterPanelProps = {
   waitlistCount?: number
   /** Levels lock when the session starts */
   levelsLocked?: boolean
+  /** The roster is still loading: Skeleton rows in place of the list, meter and actions */
+  loading?: boolean
   onMarkAllPresent: () => void
   onMarkAllAbsent: () => void
   onAddPlayer: () => void
@@ -37,15 +40,41 @@ export type RosterPanelProps = {
   className?: string
 }
 
+/** Three placeholder rows shaped like RosterRow: picture, two text lines, a level and a switch. */
+function RosterSkeletonRows() {
+  return (
+    <div className="flex flex-col divide-y divide-border">
+      {[0, 1, 2].map((i) => (
+        <div
+          key={i}
+          className="grid min-w-0 grid-cols-1 gap-2 py-2.5 sm:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_auto] sm:items-center sm:gap-3"
+        >
+          <div className="flex items-center gap-3">
+            <Skeleton className="size-10 rounded-full" />
+            <span className="flex flex-1 flex-col gap-1.5">
+              <Skeleton className="w-36" />
+              <Skeleton className="h-3 w-44" />
+            </span>
+          </div>
+          <Skeleton className="h-11 w-full rounded-md sm:w-48" />
+          <Skeleton className="h-8 w-[54px] rounded-full" />
+        </div>
+      ))}
+    </div>
+  )
+}
+
 /**
  * The preparation "Roster and levels" panel: heading and actions, the SlotMeter, the missing-level
- * warning, one RosterRow per confirmed slot, or the empty line when nobody has a slot yet.
+ * warning, one RosterRow per confirmed slot, or the empty line when nobody has a slot yet. While
+ * loading it shows the heading and Skeleton rows, never fake names.
  */
 export function RosterPanel({
   players,
   capacity,
   waitlistCount,
   levelsLocked,
+  loading = false,
   onMarkAllPresent,
   onMarkAllAbsent,
   onAddPlayer,
@@ -58,6 +87,22 @@ export function RosterPanel({
   const missing = players.filter((p) => p.level === null).length
   const someoneAbsent = players.some((p) => !p.present)
   const someonePresent = players.some((p) => p.present)
+  if (loading)
+    return (
+      <Card asChild className={cn('flex flex-col gap-3', className)}>
+        <section aria-busy aria-label="Loading the roster">
+          <div>
+            <h2 className="text-lg font-bold">Roster and levels</h2>
+            <p className="text-[13px] text-fg2">
+              Confirm each player's slot and set their level for this club. Levels lock when the
+              session starts.
+            </p>
+          </div>
+          <Skeleton className="h-2 w-full rounded-full" />
+          <RosterSkeletonRows />
+        </section>
+      </Card>
+    )
   return (
     <Card asChild className={cn('flex flex-col gap-3', className)}>
       <section>

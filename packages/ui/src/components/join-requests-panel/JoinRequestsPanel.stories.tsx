@@ -35,10 +35,12 @@ export const LevelError: Story = {
 }
 export const EmptyWithHistory: Story = { args: { requests: history } }
 export const EmptyNoHistory: Story = { args: { requests: [] } }
+/** Requests still loading: Skeleton rows, never fake names. */
+export const Loading: Story = { args: { requests: [], loading: true } }
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
 export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }
 
-function SheetDemo({ slotsFull }: { slotsFull?: boolean }) {
+function SheetDemo({ slotsFull, loading }: { slotsFull?: boolean; loading?: boolean }) {
   const [open, setOpen] = useState(true)
   return (
     <>
@@ -52,6 +54,7 @@ function SheetDemo({ slotsFull }: { slotsFull?: boolean }) {
       >
         <JoinRequestsPanel
           variant="sheet"
+          loading={loading}
           requests={joinRequests}
           slotsFull={slotsFull}
           onConfirm={fn()}
@@ -64,6 +67,7 @@ function SheetDemo({ slotsFull }: { slotsFull?: boolean }) {
 
 /** The live console's Join requests sheet: same list, no card chrome, the sheet title names it. */
 export const InSheet: Story = { render: () => <SheetDemo /> }
+export const InSheetLoading: Story = { render: () => <SheetDemo loading /> }
 export const InSheetPhone: Story = {
   render: () => <SheetDemo slotsFull />,
   globals: { viewport: { value: 'phone' } },

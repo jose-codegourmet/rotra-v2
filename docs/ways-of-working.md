@@ -53,8 +53,8 @@ Product (Queue · Player Information · Admin)
 
 - An epic is an issue labeled `epic` plus its product label (`foundation`, `queue`, `player`, `admin`).
 - Tickets are the epic's **sub-issues**, so progress shows on the epic.
-- Draft new epics and tickets in a file first and get the product owner's approval before creating
-  them. Issues are public the moment they exist.
+- Issues are public the moment they exist. New epics need the product owner's go-ahead before they
+  are created.
 
 ### Epic order
 
@@ -100,7 +100,19 @@ How a reviewer checks it (story names, route, steps).
 **Depends on:** #<n>
 ```
 
-Title format: `[<product>/<module>] <Type>: <what>`, e.g. `[queue/sessions] Component: CourtCard`.
+Title format on GitHub: `<seq> · <key> · <Type>: <what>`, e.g. `042 · Q04.1 · Component: CourtCard, MatchCard`.
+`<seq>` is the global build order (001, 002, …); `<key>` is epic + position (`Q04.1` = Queue epic 4, ticket 1).
+Epics are titled `Epic <key> · <Product> › <Module>`.
+
+### Picking up the next ticket (agents)
+
+1. List open tickets: `gh issue list --label ticket --state open --limit 300 --json number,title`.
+2. Take the open ticket with the **lowest `<seq>`** whose **Depends on** issues are all closed. Never skip
+   ahead while an earlier ticket is still open, unless that earlier ticket is labeled `blocked`.
+3. Comment `Picking this up.` on the issue, then branch, build, and verify (§5–7).
+4. If the ticket can't be done as written (missing decision, wrong path, contradiction), comment what is
+   wrong, add the `blocked` label, and move to the next ticket. Don't guess.
+5. One ticket = one PR. When the PR merges, `Closes #<n>` closes the ticket and the epic's progress updates.
 
 ---
 
@@ -120,8 +132,24 @@ Title format: `[<product>/<module>] <Type>: <what>`, e.g. `[queue/sessions] Comp
   `build:`, `ci:`, `revert:`. Scope with the package when it helps: `feat(ui): add CourtCard`.
 - One ticket per PR. The PR body says `Closes #<n>` and includes the verification block (§7).
 - AI-authored commits end with a `Co-Authored-By:` trailer naming the agent.
-- Hooks (to be set up again by Foundation): `pre-commit` runs lint, `pre-push` runs lint + build. Do not
-  bypass them with `--no-verify`.
+- Hooks (set up by Foundation): `pre-commit` runs lint, `commit-msg` runs commitlint. Do not bypass
+  them with `--no-verify`.
+
+### Auto-merge: pipelines never block
+
+PRs merge themselves. There is no branch protection and no required check; CI is advisory.
+
+```bash
+gh pr create --base main --title "<conventional title>" --body-file <body.md>   # body has Closes #<n> + Verified block
+gh pr merge --squash --auto --delete-branch
+```
+
+- Run `nvm use && pnpm lint && pnpm type-check && pnpm build` **locally before** opening the PR. Auto-merge
+  trusts you; it doesn't check for you.
+- Then switch back to `main` and `git pull` before starting the next ticket.
+- If `main` is broken after a merge (build or CI red), fixing it comes before the next ticket: open a
+  `fix:` PR that references the ticket that broke it.
+- The product owner reviews what landed on `main` afterwards, not before merge.
 
 ---
 
@@ -168,7 +196,7 @@ With no test suite, "it builds" proves very little. Every PR has:
 
 | Layer | Policy |
 |---|---|
-| Lint + type-check | Required (CI, once Foundation sets it up) |
+| Lint + type-check + build | Run locally before every PR; CI repeats them as an advisory report |
 | Money and ranking math (break-even, rank, awards) | Unit tests required |
 | Everything else | Deferred. Ask before adding tests or a test runner |
 

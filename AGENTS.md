@@ -132,7 +132,17 @@ nvm use && pnpm build
 
 ---
 
-## 6. Definition of Done (short version)
+## 6. Picking up work
+
+Tickets are GitHub issues labeled `ticket`, sub-issues of `epic` issues, titled
+`<seq> · <key> · <Type>: <what>`. Take the **lowest open `<seq>`** whose *Depends on* issues are closed.
+Open one PR per ticket with `Closes #<n>`, run lint/type-check/build locally, then
+`gh pr merge --squash --auto --delete-branch`. **CI never blocks; PRs auto-merge.** Can't do a ticket as
+written? Comment why, label it `blocked`, take the next. Full rules: [ways-of-working.md §3, §5](docs/ways-of-working.md#picking-up-the-next-ticket-agents).
+
+---
+
+## 7. Definition of Done (short version)
 
 Lint, type-check, and build pass. Components have stories (both themes) and a `.meta.ts`. It matches the
 prototype at 375 px and 1280 px in dark and light. Docs updated in the same PR if anything became untrue.

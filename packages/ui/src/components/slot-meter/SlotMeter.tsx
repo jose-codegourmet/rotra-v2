@@ -34,6 +34,7 @@ export function SlotMeter({ rosterCount, capacity, waitlistCount = 0, className 
           {waitlistCount ? ` · ${waitlistCount} on the waitlist` : ''}
         </span>
       </div>
+      {/* biome-ignore lint/a11y/useSemanticElements: a native <meter> cannot take the prototype's bar styling */}
       <div
         role="meter"
         aria-valuemin={0}

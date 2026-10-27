@@ -7,6 +7,7 @@ import { LevelSelect } from './LevelSelect'
 
 const migs = clubPlayers[0]
 if (!migs) throw new Error('Player fixture missing')
+const label = `Level for ${migs.nickname} at this club`
 
 function Demo({
   initial = null,
@@ -17,14 +18,7 @@ function Demo({
   disabled?: boolean
 }) {
   const [level, setLevel] = useState<PlayingLevel | null>(initial)
-  return (
-    <LevelSelect
-      value={level}
-      onChange={setLevel}
-      aria-label={`Level for ${migs.nickname} at this club`}
-      {...rest}
-    />
-  )
+  return <LevelSelect value={level} onChange={setLevel} aria-label={label} {...rest} />
 }
 
 const meta = {
@@ -37,7 +31,7 @@ const meta = {
       </div>
     ),
   ],
-  args: { value: null, onChange: fn(), 'aria-label': `Level for ${migs.nickname} at this club` },
+  args: { value: null, onChange: fn(), 'aria-label': label },
 } satisfies Meta<typeof LevelSelect>
 
 export default meta

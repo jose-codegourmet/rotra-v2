@@ -1,0 +1,35 @@
+import type { ComponentMeta } from '@rotra/ui/meta'
+
+export const activeMatchMeta = {
+  name: 'ActiveMatch',
+  description:
+    'The in-game control container (Q-ACTIVE-MATCH, Q-MATCH-DONE, D-WINNER, Q-INVALID-MATCH / D-INVALID-MATCH, Q-SUBSTITUTE / D-SUBSTITUTE): one sheet whose step lives in local state, on ActiveMatchSheet, MatchResultForm, ConfirmResultSheet, InvalidMatchSheet and SubstitutionSheet over useQueueSession, useSessionRoster and useSessionMatches, committed with useCompleteMatch, useInvalidateMatch and useSubstitutePlayer.',
+  usage: [
+    'Mounted once by SessionConsole and opened by Open match on an in-game court card (SessionView passes the match id through onOpenMatch). Mounted per match, so each Open match starts on the active step with nothing chosen; "M min in" and the replacement tiles\' rest minutes follow the console clock.',
+    'Match done: MatchResultForm validates the winner or the score (Review result), ConfirmResultSheet shows the winner, score or "No score entered" and the court(s), and Confirm Team A wins calls useCompleteMatch; success toasts "Team A wins match N · Court X free" and closes, and the query invalidation updates the leaderboard, game counts and court cards. Back to result reopens the form with what was entered.',
+    'Mark invalid: InvalidMatchSheet on useInvalidateMatch; success toasts "Match N marked invalid · Court X free" (both courts for 5v5) and closes; Keep playing returns to the active sheet.',
+    'Substitute player: SubstitutionSheet pick (everyone in the match, then present players not in this match and not playing elsewhere) → Confirm substitution → useSubstitutePlayer; success toasts "Kiko in for Jom" and returns to the active sheet, where the substitution line appears. Back on the pick step returns to the active sheet; Back on the confirm step keeps the choice.',
+    'Closing at any step before a confirmation changes nothing and the court stays in use. The operation ID is created when a review or confirm step opens and reused on a retry, so a timeout never produces a competing outcome; a failed commit shows inside the sheet and nothing is claimed as saved. After confirmation there is no Undo, Change winner, Add score later or Reopen.',
+    'Player cards open PlayerProfile with Back to match. When the match is no longer active (confirmed elsewhere, or the session refetched after a decision) the sheet closes.',
+  ],
+  docs: [
+    'docs/screens/product/modules/queue/match-control.md#q-active-match--in-game-control',
+    'docs/screens/product/modules/queue/match-control.md#q-match-done--two-completion-paths',
+    'docs/screens/product/modules/queue/match-control.md#q-invalid-match--end-without-a-counted-game',
+    'docs/screens/product/modules/queue/match-control.md#q-substitute--mid-game-replacement',
+    'docs/screens/product/dialogs.md',
+    'docs/business_logic/product/queue/modules/matches/README.md#start-and-completion',
+    'docs/business_logic/product/queue/modules/matches/README.md#substitutions',
+    'docs/business_logic/product/queue/modules/matches/README.md#invalid-match',
+  ],
+  related: [
+    'ActiveMatchSheet',
+    'MatchResultForm',
+    'ConfirmResultSheet',
+    'InvalidMatchSheet',
+    'SubstitutionSheet',
+    'PlayerProfile',
+    'SessionView',
+    'SessionConsole',
+  ],
+} satisfies ComponentMeta

@@ -14,11 +14,18 @@
     }
   },
   "formatter": {
-    "enabled": true
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
   },
   "javascript": {
     "formatter": {
-      "enabled": true
+      "enabled": true,
+      "quoteStyle": "single",
+      "jsxQuoteStyle": "double",
+      "semicolons": "asNeeded",
+      "trailingCommas": "all"
     }
   },
   "css": {
@@ -29,12 +36,24 @@
   "files": {
     "includes": [
       "**",
-      "!**/node_modules/**",
-      "!**/.next/**",
-      "!**/dist/**",
-      "!**/.turbo/**",
-      "!**/storybook-static/**",
-      "!**/apps/admin/src/email-templates/**"
+      "!**/node_modules",
+      "!**/.next",
+      "!**/dist",
+      "!**/.turbo",
+      "!**/storybook-static",
+      "!**/next-env.d.ts",
+      "!**/.husky/_",
+      "!.claude",
+      "!docs",
+      "!email-templates",
+      "!exported",
+      "!otf-web-fonts",
+      "!openspec"
     ]
+  },
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
   }
 }

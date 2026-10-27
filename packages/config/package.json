@@ -5,9 +5,5 @@
   "exports": {
     "./tsconfig": "./tsconfig/base.json",
     "./tailwind": "./tailwind-config/index.ts"
-  },
-  "devDependencies": {
-    "typescript": "^5.8.3",
-    "tailwindcss": "^4.1.3"
   }
 }

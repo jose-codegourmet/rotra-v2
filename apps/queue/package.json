@@ -1,0 +1,26 @@
+{
+  "name": "@rotra/queue",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --port 3000",
+    "build": "next build",
+    "start": "next start --port 3000",
+    "lint": "biome check .",
+    "check:fix": "biome check --write .",
+    "type-check": "next typegen && tsc --noEmit"
+  },
+  "dependencies": {
+    "next": "16.4.3",
+    "react": "~19.2.9",
+    "react-dom": "~19.2.9"
+  },
+  "devDependencies": {
+    "@rotra/config": "workspace:*",
+    "@types/node": "^24",
+    "@types/react": "~19.2.0",
+    "@types/react-dom": "~19.2.0",
+    "typescript": "^5.9.3"
+  }
+}

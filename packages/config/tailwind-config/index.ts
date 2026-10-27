@@ -4,35 +4,35 @@ const config: Omit<Config, 'content'> = {
   darkMode: 'class',
   theme: {
     screens: {
-      sm:    '640px',
-      md:    '768px',
-      lg:    '1024px',
-      xl:    '1280px',
+      sm: '640px',
+      md: '768px',
+      lg: '1024px',
+      xl: '1280px',
       '2xl': '1536px',
     },
     extend: {
       colors: {
         // Background scale — values defined per-theme in globals.css
-        'bg-base':     'var(--color-bg-base)',
-        'bg-surface':  'var(--color-bg-surface)',
+        'bg-base': 'var(--color-bg-base)',
+        'bg-surface': 'var(--color-bg-surface)',
         'bg-elevated': 'var(--color-bg-elevated)',
-        'bg-overlay':  'var(--color-bg-overlay)',
+        'bg-overlay': 'var(--color-bg-overlay)',
 
         // Text scale
-        'text-primary':   'var(--color-text-primary)',
+        'text-primary': 'var(--color-text-primary)',
         'text-secondary': 'var(--color-text-secondary)',
-        'text-disabled':  'var(--color-text-disabled)',
+        'text-disabled': 'var(--color-text-disabled)',
 
         // Accent
-        accent:          'var(--color-accent)',
-        'accent-dim':    'var(--color-accent-dim)',
+        accent: 'var(--color-accent)',
+        'accent-dim': 'var(--color-accent-dim)',
         'accent-subtle': 'var(--color-accent-subtle)',
 
         // Semantic
-        error:          'var(--color-error)',
-        warning:        'var(--color-warning)',
-        border:         'var(--color-border)',
-        'border-strong':'var(--color-border-strong)',
+        error: 'var(--color-error)',
+        warning: 'var(--color-warning)',
+        border: 'var(--color-border)',
+        'border-strong': 'var(--color-border-strong)',
       },
 
       fontFamily: {

@@ -35,3 +35,6 @@ packages/db/node_modules/.prisma
 
 # Type checking cache
 *.tsbuildinfo
+
+# Next.js generated types
+next-env.d.ts

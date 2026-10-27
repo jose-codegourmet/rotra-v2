@@ -12,15 +12,15 @@ where something belongs. For *how to write* the code, read [coding-conventions.m
 
 | Path | State |
 |---|---|
-| `apps/` | **Empty.** The old Next.js 15 apps (client, admin, umpire, landing) were removed |
+| `apps/` | `queue`, `player`, `admin`: Next.js 16 scaffolds with placeholder home pages (F01.1) |
 | `packages/config` | Old v0 Tailwind 3-style token file and tsconfig. **To be replaced** by the prototype tokens (§6) |
 | `packages/db` | **Empty.** The database epic comes after the mock phase (§9) |
 | `openspec/` | Cleared. Not used in the v1 process |
 | `docs/frames/*/*.html` | The three clickable prototypes: the design source of truth |
-| `Makefile`, root `package.json` scripts | Still reference the old apps; rewritten by the Foundation scaffold ticket |
+| `Makefile`, root `package.json` scripts | Run the three apps through Turborepo (F01.1) |
 | `.husky/`, `.github/` | Missing. Git hooks and CI are set up by Foundation tickets |
 
-Until the Foundation epic lands, there is no app to run and no Storybook. Do not claim a screen works.
+Until the Foundation epic lands, the apps show placeholders only. Do not claim a screen works.
 
 ---
 
@@ -45,7 +45,7 @@ rotra/
 └── email-templates/                  Supabase auth email HTML (copy-paste artifacts)
 ```
 
-Ports are proposed and set by the scaffold ticket.
+Ports are set in each app's `dev` and `start` scripts.
 
 ### Product → app
 
@@ -253,5 +253,5 @@ editing one changes nothing until it is pasted. See [email-templates.md](email-t
 | Real auth details (Supabase Auth setup for club usernames) | Open; auth epic |
 | Mock store persistence across reloads | In-memory for now |
 | Hosting (one Vercel project per app was the old plan) | Open |
-| App ports | Proposed 3000 / 3001 / 3002 |
+| App ports | Settled: 3000 / 3001 / 3002 (F01.1) |
 | Test runner for money and ranking math | Chosen in a Foundation ticket |

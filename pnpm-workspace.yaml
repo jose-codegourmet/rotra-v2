@@ -2,10 +2,4 @@ packages:
   - "apps/*"
   - "packages/*"
 allowBuilds:
-  '@prisma/client': true
-  '@prisma/engines': true
-  core-js-pure: true
-  esbuild: true
-  msw: true
-  prisma: true
   sharp: true

@@ -82,7 +82,7 @@ const errorMessage = (error: unknown) =>
  * waitlist rows open profiles through onOpenProfile; the Present switch calls useSetPresence and
  * toasts its message, which counts the waiting matches that now need attention.
  */
-export function PlayersView({ sessionId, onOpenProfile }: PlayersViewProps) {
+export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps) {
   const session = useQueueSession(sessionId)
   const roster = useSessionRoster(sessionId)
   const matches = useSessionMatches(sessionId)
@@ -131,7 +131,6 @@ export function PlayersView({ sessionId, onOpenProfile }: PlayersViewProps) {
       </div>
     )
 
-  const now = Date.now()
   const rosterList = roster.data.roster
   const waitlist = roster.data.waitlist
   const all = matches.data

@@ -11,9 +11,11 @@ import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { MockError } from '@rotra/data/mock/errors'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
+import { useSyncState } from '@rotra/data/sync/useSyncState'
 import { Button } from '@rotra/ui/button'
 import { Chip } from '@rotra/ui/chip'
 import { ConsoleFooterBar } from '@rotra/ui/console-footer-bar'
+import { Notice } from '@rotra/ui/notice'
 import { formatTime } from '@rotra/ui/now-card/helpers'
 import { PageHeader } from '@rotra/ui/page-header'
 import { Sheet } from '@rotra/ui/sheet'
@@ -21,7 +23,7 @@ import { Skeleton } from '@rotra/ui/skeleton'
 import { type TabItem, Tabs, TabsContent } from '@rotra/ui/tabs'
 import Link from 'next/link'
 import { notFound, useRouter } from 'next/navigation'
-import { type ComponentType, useEffect, useMemo, useState } from 'react'
+import { type ComponentType, useEffect, useMemo, useRef, useState } from 'react'
 import { useDockAction } from '@/app/(operator)/_components/operator-shell/DockAction.context'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import { CourtsAndTime } from '@/app/(operator)/sessions/[sessionId]/_components/courts-and-time/CourtsAndTime'
@@ -32,6 +34,7 @@ import { PlayerProfile } from '@/app/(operator)/sessions/[sessionId]/_components
 import { PlayersView } from '@/app/(operator)/sessions/[sessionId]/_components/players-view/PlayersView'
 import { SessionView } from '@/app/(operator)/sessions/[sessionId]/_components/session-view/SessionView'
 import { sessionHref } from '@/lib/dates'
+import { useNow } from '@/lib/useNow'
 import { useAppSelector } from '@/store/hooks'
 import { selectDev } from '@/store/slices/devSlice'
 
@@ -43,9 +46,14 @@ export type ConsoleSheet = 'join-requests' | 'post' | 'adjust' | 'add-court' | n
 /** What every console view container receives from the shell */
 export type ConsoleViewProps = {
   sessionId: string
+  /** The console clock: the time to measure waits, minutes in game and Booking ended against; moves every 30 s */
+  now: number
   onOpenProfile: (clubPlayerId: string) => void
   onOpenQueue: () => void
 }
+
+const OFFLINE_NOTICE =
+  'Working offline on this device. Matches, results and roster changes save here and sync when you reconnect. Session done needs internet.'
 
 /**
  * The views other tickets add, one container file each; the shell shows a view's tab and panel as
@@ -66,6 +74,11 @@ const MODE_LABELS = { chill: 'Chill', fair: 'Fair', hard: 'Hard' } as const
  * with live counts, the view panels (Session here; the others arrive in their own containers), the
  * ConsoleFooterBar and the dock's Session done pill. Sessions that are not live go to their own
  * screen: prepared to /preparation, finished or invalid to /record, unknown ids to notFound().
+ *
+ * States: offline shows the warn notice and disables Session done in the footer and the dock (every
+ * other action still works and its toast says "Saved on this device, waiting to sync"); the console
+ * clock ticks every 30 s unless a sheet is open, a field has focus or a card is being dragged, and
+ * each tick refetches the session so one finalized or invalidated elsewhere redirects to its record.
  */
 export function SessionConsole({ sessionId }: SessionConsoleProps) {
   const router = useRouter()
@@ -74,6 +87,7 @@ export function SessionConsole({ sessionId }: SessionConsoleProps) {
   const roster = useSessionRoster(sessionId)
   const matches = useSessionMatches(sessionId)
   const standings = useLiveStandings(sessionId)
+  const sync = useSyncState()
   const [view, setView] = useState<ConsoleView>('session')
   const [sheet, setSheet] = useState<ConsoleSheet>(null)
   const [profileId, setProfileId] = useState<string | null>(null)
@@ -86,15 +100,32 @@ export function SessionConsole({ sessionId }: SessionConsoleProps) {
     if (redirectTo) router.replace(redirectTo)
   }, [redirectTo, router])
 
-  // Session done is wired by Queue › Session finalization; until then the pill stays disabled.
+  // The 30-second refresh: the clock the views measure against, paused while a sheet is open here.
+  const now = useNow(undefined, sheet !== null || profileId !== null)
+  const refetchSession = session.refetch
+  const firstTick = useRef(true)
+  useEffect(() => {
+    if (firstTick.current) {
+      firstTick.current = false
+      return
+    }
+    void refetchSession()
+  }, [now, refetchSession])
+
+  // Online from the sync state (the mock follows the DevMenu's Simulate offline toggle).
+  const online = sync.data ? sync.data.online : !dev.offline
+
+  // Session done's handler arrives with Queue › Session finalization; until then there is none, so
+  // the footer button and the dock pill stay disabled. Offline they are disabled either way.
+  const onSessionDone = undefined as (() => void) | undefined
   const sessionDone = useMemo(
     () => ({
       label: 'Session done',
       icon: 'check' as const,
-      disabled: true,
-      onClick: () => undefined,
+      disabled: !online || !onSessionDone,
+      onClick: () => onSessionDone?.(),
     }),
-    [],
+    [online, onSessionDone],
   )
   useDockAction(sessionDone)
 
@@ -154,6 +185,7 @@ export function SessionConsole({ sessionId }: SessionConsoleProps) {
 
   const viewProps: ConsoleViewProps = {
     sessionId,
+    now,
     onOpenProfile: setProfileId,
     onOpenQueue: () => setView(VIEWS.queue ? 'queue' : 'session'),
   }
@@ -214,6 +246,7 @@ export function SessionConsole({ sessionId }: SessionConsoleProps) {
           <Skeleton className="w-72" />
         </div>
       )}
+      {online ? null : <Notice tone="offline">{OFFLINE_NOTICE}</Notice>}
       <Tabs
         aria-label="Console views"
         value={view}
@@ -231,7 +264,8 @@ export function SessionConsole({ sessionId }: SessionConsoleProps) {
         gamesRecorded={recorded}
         inPlay={active.length}
         waiting={waiting.length}
-        online={!dev.offline}
+        online={online}
+        onSessionDone={onSessionDone}
       />
       <Sheet
         open={sheet === 'join-requests'}

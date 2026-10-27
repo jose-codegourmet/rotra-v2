@@ -29,6 +29,8 @@ import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 
 export type SessionViewProps = {
   sessionId: string
+  /** The console clock (moves every 30 s): minutes in game and Booking ended are measured against it */
+  now: number
   /** A player picture was tapped on a court or a queue card */
   onOpenProfile: (clubPlayerId: string) => void
   /** The More queues tile: switch the console to the Queue view */
@@ -48,6 +50,7 @@ export type SessionViewProps = {
  */
 export function SessionView({
   sessionId,
+  now,
   onOpenProfile,
   onOpenQueue,
   onAddCourt,
@@ -81,7 +84,6 @@ export function SessionView({
       </div>
     )
 
-  const now = Date.now()
   const courts = s.courts
   const ctx: MatchContext = { roster: roster.data.roster, matches: matches.data, courts }
   const byId = (id: string) => ctx.roster.find((p) => p.id === id)

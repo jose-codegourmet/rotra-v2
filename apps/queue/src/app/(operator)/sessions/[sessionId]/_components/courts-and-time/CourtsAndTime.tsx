@@ -2,6 +2,7 @@
 
 import { useAddCourt } from '@rotra/data/queue-session/useAddCourt'
 import { useExtendSession } from '@rotra/data/queue-session/useExtendSession'
+import { MockError } from '@rotra/data/mock/errors'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { CourtsAndTimeSheet, type ExtendMinutes } from '@rotra/ui/courts-and-time-sheet'
 import { AddCourtForm } from '@rotra/ui/forms/add-court-form'
@@ -23,11 +24,17 @@ export type CourtsAndTimeProps = {
 const errorMessage = (error: unknown) =>
   error instanceof Error ? error.message : 'Something went wrong. Try again.'
 
+/** A save that could not be made durable on this device ("Changes could not be saved") or offline */
+const isSaveFailure = (error: unknown) =>
+  error instanceof MockError && (error.kind === 'retryable' || error.kind === 'offline')
+
 /**
  * Q-SESSION-ADJUST and Q-ADD-COURT: the Courts and time sheet on useExtendSession ("Session now ends
  * HH:MM") and the Add a court sheet on useAddCourt ("LABEL added · open until HH:MM"). "Add a court…"
  * in the first opens the second; the shell's + Add court tile opens it directly. Courts set to
  * "until the session ends" follow an extension (their openUntil is null); set-time courts keep theirs.
+ * A save failure is an error toast (the sheet stays open with what was typed, nothing is claimed);
+ * any other refusal shows inside the add sheet.
  */
 export function CourtsAndTime({ sessionId, open, onOpenChange }: CourtsAndTimeProps) {
   const session = useQueueSession(sessionId)
@@ -57,7 +64,10 @@ export function CourtsAndTime({ sessionId, open, onOpenChange }: CourtsAndTimePr
           toast(result.message)
           onOpenChange(null)
         },
-        onError: (error) => setServerError(errorMessage(error)),
+        onError: (error) => {
+          if (isSaveFailure(error)) toast.error(errorMessage(error))
+          else setServerError(errorMessage(error))
+        },
       },
     )
   }

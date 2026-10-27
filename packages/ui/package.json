@@ -11,6 +11,7 @@
     "./app-shell/bottom-dock": "./src/components/app-shell/bottom-dock/BottomDock.tsx",
     "./app-shell/side-rail": "./src/components/app-shell/side-rail/SideRail.tsx",
     "./app-shell/top-bar": "./src/components/app-shell/top-bar/TopBar.tsx",
+    "./auth-card": "./src/components/auth-card/AuthCard.tsx",
     "./avatar": "./src/components/avatar/Avatar.tsx",
     "./breadcrumb": "./src/components/breadcrumb/Breadcrumb.tsx",
     "./button": "./src/components/button/Button.tsx",

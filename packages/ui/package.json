@@ -85,7 +85,11 @@
     "./theme-toggle": "./src/components/theme-toggle/ThemeToggle.tsx",
     "./time-field": "./src/components/time-field/TimeField.tsx",
     "./toaster": "./src/components/toaster/Toaster.tsx",
-    "./venue-card": "./src/components/venue-card/VenueCard.tsx"
+    "./venue-card": "./src/components/venue-card/VenueCard.tsx",
+    "./game-row": "./src/components/game-row/GameRow.tsx",
+    "./session-games": "./src/components/session-games/SessionGames.tsx",
+    "./recent-games-card": "./src/components/recent-games-card/RecentGamesCard.tsx",
+    "./match-history": "./src/components/match-history/MatchHistory.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

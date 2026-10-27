@@ -20,3 +20,23 @@ export type Player = {
   nickname: string | null
   rtrId: string
 }
+
+/** Official public history; fixtures contain only valid finalized sessions. */
+export type PlayerGame = {
+  id: string
+  format: import('../match/match.types').MatchFormat
+  partners: string[]
+  opponents: string[]
+  counting: 'counted' | 'fun' | 'partial'
+  result: 'won' | 'lost'
+  score: string | null
+  note?: string
+}
+export type PlayerSessionRecord = {
+  id: string
+  title: string
+  clubName: string
+  finishedAt: string
+  sessionPageUrl: string | null
+  games: PlayerGame[]
+}

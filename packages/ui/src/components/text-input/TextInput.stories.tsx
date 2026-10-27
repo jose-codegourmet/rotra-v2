@@ -19,23 +19,22 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
-export const Filled: Story = { args: { defaultValue: 'Migs Santos' } }
+export const Filled: Story = { args: { defaultValue: 'Miguel Santos' } }
 export const Invalid: Story = { args: { invalid: true, defaultValue: '09' } }
-export const Disabled: Story = { args: { disabled: true, defaultValue: 'Migs Santos' } }
+export const Disabled: Story = { args: { disabled: true, defaultValue: 'Miguel Santos' } }
 
 export const InField: Story = {
   render: () => (
-    <Field
-      label="Mobile number"
-      hint="Philippine mobile, e.g. 0917 123 4567"
-      error="Enter an 11-digit mobile number."
-    >
-      <TextInput inputMode="tel" autoComplete="tel" defaultValue="0917 12" />
+    <Field label="Username" hint="Your club account username, not a player phone or email.">
+      <TextInput autoComplete="username" />
     </Field>
   ),
 }
 
 export const LongValue: Story = {
-  args: { defaultValue: 'RTR-PH-CEB-031526-0001 · Maria Concepcion Villanueva-Dela Cruz' },
+  args: {
+    defaultValue:
+      'RTR-PH-CEB-031526-0001 · Miguel Santos (Migs), a long value that must not push the layout sideways',
+  },
   globals: { viewport: { value: 'phone' } },
 }

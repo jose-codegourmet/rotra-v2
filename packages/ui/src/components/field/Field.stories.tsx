@@ -20,7 +20,7 @@ export const WithHint: Story = {
 export const WithError: Story = {
   args: {
     label: 'Court fee per hour, per court',
-    error: 'Enter the court fee, or 0 if courts are free.',
+    error: 'Use 0 or more, or leave it empty.',
     children: <TextInput inputMode="numeric" defaultValue="-50" />,
   },
 }
@@ -40,8 +40,7 @@ export const Disabled: Story = {
 export const LongLabel: Story = {
   args: {
     label:
-      'Shuttlecock cost per tube, including delivery from the supplier in Tagbilaran City and any bulk discount',
-    hint: 'Used only for the operator-only cost estimate. Never shown to players.',
+      'A deliberately long label that has to wrap onto a second line on a 375 px phone without overflowing',
     optional: true,
     children: <TextInput inputMode="numeric" />,
   },

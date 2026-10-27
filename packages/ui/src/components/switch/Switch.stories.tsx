@@ -5,7 +5,7 @@ import { Switch } from './Switch'
 const meta = {
   title: 'Shared/Fields/Switch',
   component: Switch,
-  args: { 'aria-label': 'Present: Migs Santos' },
+  args: { 'aria-label': 'Present: Miguel Santos' },
 } satisfies Meta<typeof Switch>
 
 export default meta
@@ -29,7 +29,6 @@ export const WithLabel: Story = {
       <div className="flex max-w-sm items-center justify-between gap-4">
         <span>
           <b>Doubles</b>
-          <span className="block text-[13px] text-fg2">Four players per match</span>
         </span>
         <Switch aria-label="Doubles" checked={checked} onChange={setChecked} />
       </div>

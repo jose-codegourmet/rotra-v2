@@ -33,7 +33,7 @@ export const LongLabel: Story = {
   args: {
     label: 'Include Off Day',
     description:
-      'Shows Maria Concepcion Villanueva-Dela Cruz, Jomar Reyes and Migs Santos, who had an off day, in the shared slides.',
+      'Shows Jomar dela Cruz, Kat Lim and Miguel Santos in the shared slides. A long description must wrap, not overflow.',
   },
   globals: { viewport: { value: 'phone' } },
 }

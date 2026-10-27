@@ -81,6 +81,8 @@
     "./level-select": "./src/components/level-select/LevelSelect.tsx",
     "./license-panel": "./src/components/license-panel/LicensePanel.tsx",
     "./list-row": "./src/components/list-row/ListRow.tsx",
+    "./match-card": "./src/components/match-card/MatchCard.tsx",
+    "./match-card/variants": "./src/components/match-card/MatchCard.variants.ts",
     "./match-history": "./src/components/match-history/MatchHistory.tsx",
     "./meta": "./src/lib/meta.ts",
     "./my-position-card": "./src/components/my-position-card/MyPositionCard.tsx",
@@ -137,6 +139,7 @@
     "./time-field": "./src/components/time-field/TimeField.tsx",
     "./toaster": "./src/components/toaster/Toaster.tsx",
     "./top-three-podium": "./src/components/top-three-podium/TopThreePodium.tsx",
+    "./upcoming-queue-row": "./src/components/upcoming-queue-row/UpcomingQueueRow.tsx",
     "./venue-card": "./src/components/venue-card/VenueCard.tsx",
     "./venue-picker-sheet": "./src/components/venue-picker-sheet/VenuePickerSheet.tsx",
     "./waitlist-panel": "./src/components/waitlist-panel/WaitlistPanel.tsx"

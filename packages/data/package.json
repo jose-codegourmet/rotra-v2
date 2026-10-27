@@ -34,6 +34,7 @@
     "./sync/types": "./src/sync/sync.types.ts",
     "./match/types": "./src/match/match.types.ts",
     "./fixtures/licensePayments": "./src/fixtures/licensePayments.ts",
+    "./fixtures/rank-states": "./src/fixtures/rankStates.ts",
     "./fixtures/queueSessions": "./src/fixtures/queueSessions.ts",
     "./club/rules": "./src/club/club.rules.ts",
     "./mock/client": "./src/mock/client.ts",

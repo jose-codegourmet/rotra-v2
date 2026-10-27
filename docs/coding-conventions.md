@@ -34,8 +34,10 @@ in the same PR.
 | Forms | React Hook Form + Zod | §6 |
 | Tables | TanStack Table v8 | §12 |
 | Animation | Motion (`motion/react`) | §11 |
+| Toasts | Sonner (shadcn's toast) | Only through `@rotra/ui/toaster`; restyled to the prototype toast |
 | Lint/format | Biome | `next lint` no longer exists in Next 16 |
 | Components | Storybook (one, in `@rotra/ui`) | §5 |
+| Tests | Vitest (`pnpm test`) | Only money, phone parsing, ranking/standings/awards math and queue rules (§14) |
 
 **Adding any other dependency needs a decision.** Ask before adding one, say why, and add it to this table.
 
@@ -193,7 +195,8 @@ packages/schema/src/
 ├── phone.ts      phoneField   (PH mobile, grouped as typed, normalized to E.164 on parse)
 ├── date.ts       dateField, dateRangeField, timeField
 ├── money.ts      moneyField   (centavos as an integer, never a float)
-└── password.ts   passwordField
+├── password.ts   passwordField (required-only placeholder; auth policy pending)
+└── name.ts       nameField    (trimmed; max length is a placeholder until decided)
 ```
 
 - A form's `.schema.ts` composes them: `z.object({ email: emailField, phone: phoneField.optional() })`.
@@ -323,8 +326,8 @@ packages/data/src/
   functions** in `@rotra/data/<domain>/<domain>.rules.ts`, used by the mock store now and by the server later.
 - Never improvise a formula. If the business docs mark it open ([open decisions](business_logic/product/open-decisions.md)),
   copy the prototype's reference behavior, label it as such in a comment, and keep it in one function.
-- **Money and ranking math need unit tests** (the one place tests are required). Ask before adding tests
-  anywhere else.
+- **Money and ranking math need unit tests** (the one place tests are required). Phone parsing and queue-rule tests are also allowed (F05.1). Ask before adding tests
+  elsewhere.
 
 ---
 

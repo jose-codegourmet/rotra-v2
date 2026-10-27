@@ -25,7 +25,7 @@ The screen tree specifies all agreed v1 workflows. Where behavior is undecided, 
 
 ## Composition/interaction details proposed but not yet fixed
 
-- Exact routes, component names, page-versus-sheet boundaries, field-length limits, design tokens, and export pixel dimensions.
+- Exact routes beyond the approved mock auth boundary (`/login` in all apps, public Queue `/s/[slug]`, public Player `/players/[playerId]`, protected Player `/me`; approved October 27, 2026), component names, page-versus-sheet boundaries, field-length limits, design tokens, and export pixel dimensions.
 - Changing mode/formats/minimum during an active session. They stay visible and fixed until decided.
 - Default number of matches per Auto queue run (the operator picks 2, 3, 4, or 6; the prototype preselects 3).
 - Fully withdrawing a publication (re-publishing a new selection is settled).

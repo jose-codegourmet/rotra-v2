@@ -3,7 +3,7 @@
 The badminton session operating system. *Run the game.*
 
 **Status (October 27, 2026):** v1 rebuild. The docs and the three clickable prototypes are done; the apps
-are being rebuilt from scratch on mock data. `apps/` is empty until the Foundation scaffold lands.
+are being rebuilt from scratch on mock data. The Foundation epic is scaffolding the apps and shared packages.
 
 | Product | App | Design reference |
 |---|---|---|
@@ -30,8 +30,7 @@ Shared packages: `@rotra/ui` (components + Storybook), `@rotra/data` (types, moc
 
 ## Commands
 
-Root scripts and the `Makefile` still reference the removed apps; the Foundation scaffold rewrites them.
-Target commands:
+The root scripts and the `Makefile` (`make dev`, `make lint`, …) run these. Ports: queue 3000, player 3001, admin 3002.
 
 ```bash
 nvm use && pnpm install

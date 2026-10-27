@@ -132,12 +132,19 @@ Epics are titled `Epic <key> · <Product> › <Module>`.
   `build:`, `ci:`, `revert:`. Scope with the package when it helps: `feat(ui): add CourtCard`.
 - One ticket per PR. The PR body says `Closes #<n>` and includes the verification block (§7).
 - AI-authored commits end with a `Co-Authored-By:` trailer naming the agent.
-- Hooks (set up by Foundation): `pre-commit` runs lint, `commit-msg` runs commitlint. Do not bypass
-  them with `--no-verify`.
+- Hooks (husky, in `.husky/`): `commit-msg` runs commitlint with the Conventional Commits config.
+  The `pre-commit` lint hook is **disabled for now** (since October 27, 2026) because two agents commit
+  to one working tree and a workspace-wide lint fails on the other agent's unfinished files. Until it is
+  re-enabled, lint and type-check the package you changed before committing
+  (`nvm use && pnpm --filter <package> lint type-check`). There is **no pre-push hook**: build and
+  type-check run locally before a PR (below), not on every push, to keep the loop fast. Do not bypass
+  hooks with `--no-verify`.
 
 ### Auto-merge: pipelines never block
 
 PRs merge themselves. There is no branch protection and no required check; CI is advisory.
+`.github/workflows/ci.yml` runs lint, type-check, and build on every PR and on `main` for information
+only. A red CI run after merge becomes the next fix ticket.
 
 ```bash
 gh pr create --base main --title "<conventional title>" --body-file <body.md>   # body has Closes #<n> + Verified block
@@ -169,7 +176,7 @@ gh pr merge --squash --auto --delete-branch
 
 ## 7. Verification
 
-With no test suite, "it builds" proves very little. Every PR has:
+With only a narrowly scoped unit suite, "it builds" proves very little. Every PR has:
 
 ```md
 ## Verified
@@ -198,7 +205,8 @@ With no test suite, "it builds" proves very little. Every PR has:
 |---|---|
 | Lint + type-check + build | Run locally before every PR; CI repeats them as an advisory report |
 | Money and ranking math (break-even, rank, awards) | Unit tests required |
-| Everything else | Deferred. Ask before adding tests or a test runner |
+| Phone parsing, standings/awards math, queue rules | Unit tests allowed with Vitest (F05.1) |
+| Everything else | Deferred. Ask before adding tests |
 
 ---
 

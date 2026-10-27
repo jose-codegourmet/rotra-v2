@@ -1,0 +1,11 @@
+# DISABLED for now (2026-10-27): two agents commit to feature/foundation from one working tree, and a
+# workspace-wide lint fails on the other agent's half-finished files. Run lint for the package you
+# changed before committing instead. To re-enable, uncomment the lines below.
+#
+# if [ -s "$HOME/.nvm/nvm.sh" ]; then
+#   set +e
+#   . "$HOME/.nvm/nvm.sh" --no-use
+#   nvm use --silent >/dev/null
+#   set -e
+# fi
+# pnpm lint

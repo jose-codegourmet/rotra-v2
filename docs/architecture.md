@@ -12,15 +12,19 @@ where something belongs. For *how to write* the code, read [coding-conventions.m
 
 | Path | State |
 |---|---|
-| `apps/` | **Empty.** The old Next.js 15 apps (client, admin, umpire, landing) were removed |
-| `packages/config` | Old v0 Tailwind 3-style token file and tsconfig. **To be replaced** by the prototype tokens (§6) |
+| `apps/` | `queue`, `player`, `admin`: Next.js 16 scaffolds with placeholder home pages (F01.1) |
+| `packages/config` | Shared tsconfig and `theme.css`: Tailwind 4 tokens copied from the prototypes (F02.1) |
+| `packages/ui` | `@rotra/ui`: `cn`, `ComponentMeta`, shadcn config and the one Storybook (F03.1). Components arrive in F04 |
+| `packages/schema` | Shared Zod field families, phone/money tests, Vitest (F05.1) |
+| `packages/data` | In-memory store, latency/errors, example club hook, shared prototype identity/venue fixtures (F06.1–F06.2) |
 | `packages/db` | **Empty.** The database epic comes after the mock phase (§9) |
 | `openspec/` | Cleared. Not used in the v1 process |
 | `docs/frames/*/*.html` | The three clickable prototypes: the design source of truth |
-| `Makefile`, root `package.json` scripts | Still reference the old apps; rewritten by the Foundation scaffold ticket |
-| `.husky/`, `.github/` | Missing. Git hooks and CI are set up by Foundation tickets |
+| `Makefile`, root `package.json` scripts | Run the three apps through Turborepo (F01.1) |
+| `.husky/`, `.github/` | Git hooks (lint on commit, commitlint) and an advisory CI workflow (F01.2, F01.3) |
 
-Until the Foundation epic lands, there is no app to run and no Storybook. Do not claim a screen works.
+The apps still show placeholders. Queue home demonstrates a club hook with loading/error/data states;
+all three apps mount QueryClient providers. No product flow, real auth, persistence, or backend is implemented.
 
 ---
 
@@ -45,7 +49,7 @@ rotra/
 └── email-templates/                  Supabase auth email HTML (copy-paste artifacts)
 ```
 
-Ports are proposed and set by the scaffold ticket.
+Ports are set in each app's `dev` and `start` scripts.
 
 ### Product → app
 
@@ -167,8 +171,9 @@ HTTP API, and one write path is easier to review. Adding a Server Action needs a
 | Motion | `motion` (`motion/react`) for component animation; all motion respects reduced-motion |
 | Tables | TanStack Table v8 behind a `@rotra/ui` data-table component |
 
-The old `packages/config/tailwind-config/index.ts` (Satoshi, `bg-base` names) and the old visual spec in
-[branding.md](branding/branding.md) are superseded by the prototypes for every visual decision.
+The tokens live in `packages/config/theme.css` ([its AGENTS.md](../packages/config/AGENTS.md) lists the
+utilities). The old visual spec in [branding.md](branding/branding.md) is superseded by the prototypes
+for every visual decision.
 
 ---
 
@@ -253,5 +258,5 @@ editing one changes nothing until it is pasted. See [email-templates.md](email-t
 | Real auth details (Supabase Auth setup for club usernames) | Open; auth epic |
 | Mock store persistence across reloads | In-memory for now |
 | Hosting (one Vercel project per app was the old plan) | Open |
-| App ports | Proposed 3000 / 3001 / 3002 |
-| Test runner for money and ranking math | Chosen in a Foundation ticket |
+| App ports | Settled: 3000 / 3001 / 3002 (F01.1) |
+| Test runner for money and ranking math | Vitest (F05.1); also allowed for phone parsing and queue rules |

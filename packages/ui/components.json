@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "new-york",
+  "rsc": false,
+  "tsx": true,
+  "tailwind": {
+    "config": "",
+    "css": ".storybook/storybook.css",
+    "baseColor": "neutral",
+    "cssVariables": true,
+    "prefix": ""
+  },
+  "aliases": {
+    "components": "@rotra/ui/components",
+    "ui": "@rotra/ui/components",
+    "utils": "@rotra/ui/cn",
+    "lib": "@rotra/ui/lib",
+    "hooks": "@rotra/ui/hooks"
+  },
+  "iconLibrary": "none"
+}

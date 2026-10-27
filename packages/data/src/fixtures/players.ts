@@ -1,0 +1,208 @@
+import type { ClubPlayer } from '../club-player/clubPlayer.types'
+import type { Player } from '../player/player.types'
+import seed from './players.seed.json'
+
+/** Fictional public identities from all three prototypes, with canonical shared RTR IDs. */
+export const players: Player[] = seed.players
+
+const playersById = new Map(players.map((player) => [player.id, player]))
+function selectPlayers(ids: string[]): Player[] {
+  return ids.map((id) => {
+    const player = playersById.get(id)
+    if (!player) throw new Error('A prototype fixture references a missing player.')
+    return player
+  })
+}
+
+/** Admin prototype: 17 fixed profiles and 168 deterministic generated profiles. */
+export const adminPlayers = selectPlayers(seed.adminPlayerIds)
+
+/** Player prototype: 1,283 sample identities plus Migs at position 128; no rank calculations. */
+export const leaderboardPlayers = selectPlayers(seed.leaderboardPlayerIds)
+
+/** Queue prototype's four directory suggestions (not yet saved club players). */
+export const directoryPlayers = selectPlayers(seed.directoryPlayerIds)
+
+/** Queue prototype's 20 saved players, including four guests with null playerId. */
+export const clubPlayers = [
+  {
+    id: 'c3e0d1c0-f087-5514-8c94-7ce61c54ed3f',
+    clubId: '6cd364d4-0e3a-5c3d-9e75-2116cc845714',
+    playerId: '2c7f6a7b-eed9-5051-9426-6dbce5133fbc',
+    fullName: 'Miguel Santos',
+    nickname: 'Migs',
+    identity: 'registered',
+    playingLevel: 'advanced_low',
+  },
+  {
+    id: '62dc8cc2-6673-5356-b659-51e1fa5d533c',
+    clubId: '6cd364d4-0e3a-5c3d-9e75-2116cc845714',
+    playerId: 'f4081566-70ef-5fdf-a824-b84d69ddad2f',
+    fullName: 'Bea Castillo',
+    nickname: null,
+    identity: 'registered',
+    playingLevel: 'intermediate_high',
+  },
+  {
+    id: '81477e7c-8d55-5b0c-a9a4-b77f54652a0e',
+    clubId: '6cd364d4-0e3a-5c3d-9e75-2116cc845714',
+    playerId: 'bc4c3446-0131-591b-ab03-af19225dbe8a',
+    fullName: 'Jomar dela Cruz',
+    nickname: 'Jom',
+    identity: 'unclaimed',
+    playingLevel: 'intermediate_high',
+  },
+  {
+    id: '86107d84-f50e-5903-8107-12a51cb04f5f',
+    clubId: '6cd364d4-0e3a-5c3d-9e75-2116cc845714',
+    playerId: 'f5a63c91-34fd-53ec-948d-0ef644b5aeac',
+    fullName: 'Kat Lim',
+    nickname: null,
+    identity: 'registered',
+    playingLevel: 'intermediate_mid',
+  },
+  {
+    id: 'a81bdb0d-e70c-5c8d-9581-da1ef734d0ba',
+    clubId: '6cd364d4-0e3a-5c3d-9e75-2116cc845714',
+    playerId: '2b4ebc86-5799-5c21-8005-b7c7a82f373c',
+    fullName: 'Enzo Navarro',
+    nickname: null,
+    identity: 'registered',
+    playingLevel: 'advanced_low',
+  },
+  {
+    id: '84fd1240-17b2-5e17-8647-d8dc7d4f4b64',
+    clubId: '6cd364d4-0e3a-5c3d-9e75-2116cc845714',
+    playerId: 'a5c35992-7597-55cd-bdf9-20c7a9440af4',
+    fullName: 'Joanna Tan',
+    nickname: 'Jo',
+    identity: 'unclaimed',
+    playingLevel: 'intermediate_mid',
+  },
+  {
+    id: 'a8e95e02-f2d7-574d-97c7-26ee8abe0bc0',
+    clubId: '6cd364d4-0e3a-5c3d-9e75-2116cc845714',
+    playerId: '80861dfd-99c7-57bb-a46c-d8c76e9a8dcc',
+    fullName: 'Rafa Aquino',
+    nickname: null,
+    identity: 'registered',
+    playingLevel: 'intermediate_high',
+  },
+  {
+    id: '04e75a8d-2abd-5f74-bb29-50234babc853',
+    clubId: '6cd364d4-0e3a-5c3d-9e75-2116cc845714',
+    playerId: null,
+    fullName: 'Lia Bautista',
+    nickname: null,
+    identity: 'guest',
+    playingLevel: null,
+  },
+  {
+    id: 'c927b4df-93eb-5e9a-a042-d6db900e2788',
+    clubId: '6cd364d4-0e3a-5c3d-9e75-2116cc845714',
+    playerId: '85ae7866-ff62-59fc-8af8-985a594bb5b2',
+    fullName: 'Carlo Medina',
+    nickname: null,
+    identity: 'registered',
+    playingLevel: 'intermediate_mid',
+  },
+  {
+    id: 'af53ebbc-d70a-5d2b-9a2f-d4eea6b2e2af',
+    clubId: '6cd364d4-0e3a-5c3d-9e75-2116cc845714',
+    playerId: '80726593-1823-5c2d-a3fc-5f904e414d80',
+    fullName: 'Nina Ocampo',
+    nickname: null,
+    identity: 'unclaimed',
+    playingLevel: 'intermediate_mid',
+  },
+  {
+    id: 'd566cf90-560d-59a0-8a25-8aad6f9f4a2f',
+    clubId: '6cd364d4-0e3a-5c3d-9e75-2116cc845714',
+    playerId: 'd720c601-da89-5474-9351-00e2fb966e56',
+    fullName: 'Paulo Garcia',
+    nickname: 'Pau',
+    identity: 'registered',
+    playingLevel: 'advanced_low',
+  },
+  {
+    id: '1a31f9b1-a7b8-5f8a-b2ed-28bc867e14d1',
+    clubId: '6cd364d4-0e3a-5c3d-9e75-2116cc845714',
+    playerId: null,
+    fullName: 'Sam Villareal',
+    nickname: null,
+    identity: 'guest',
+    playingLevel: null,
+  },
+  {
+    id: '0cdbe83b-71ae-5b60-9904-5bbc97cc5d65',
+    clubId: '6cd364d4-0e3a-5c3d-9e75-2116cc845714',
+    playerId: 'a22725ed-0ae7-5f29-9ca8-edf1c775b833',
+    fullName: 'Dani Rivera',
+    nickname: null,
+    identity: 'registered',
+    playingLevel: 'intermediate_high',
+  },
+  {
+    id: '54cd5564-f545-59b2-a4c2-b2b010437774',
+    clubId: '6cd364d4-0e3a-5c3d-9e75-2116cc845714',
+    playerId: '9f83495f-9359-5f7f-82ad-4cf01b826471',
+    fullName: 'Theo Ramos',
+    nickname: null,
+    identity: 'registered',
+    playingLevel: 'advanced_low',
+  },
+  {
+    id: 'b7e2b04d-f7dc-5b0c-b8ce-80a3c9f0a468',
+    clubId: '6cd364d4-0e3a-5c3d-9e75-2116cc845714',
+    playerId: null,
+    fullName: 'Ysa Fernandez',
+    nickname: null,
+    identity: 'guest',
+    playingLevel: null,
+  },
+  {
+    id: '4f306c0d-efa8-5aa5-8518-a05f0bcc2891',
+    clubId: '6cd364d4-0e3a-5c3d-9e75-2116cc845714',
+    playerId: '9ae806f4-34ca-5d7d-9574-3169567945bf',
+    fullName: 'Marco Lopez',
+    nickname: null,
+    identity: 'registered',
+    playingLevel: 'intermediate_mid',
+  },
+  {
+    id: 'e327d389-a804-5b91-a047-adc2dd7b3168',
+    clubId: '6cd364d4-0e3a-5c3d-9e75-2116cc845714',
+    playerId: 'b789f194-76fb-5a5b-ad80-a37f022a785a',
+    fullName: 'Gab Torres',
+    nickname: null,
+    identity: 'unclaimed',
+    playingLevel: 'intermediate_high',
+  },
+  {
+    id: '1594ec21-58df-5c86-817b-2eff9e63e70c',
+    clubId: '6cd364d4-0e3a-5c3d-9e75-2116cc845714',
+    playerId: 'b181416a-4006-5133-a6a3-521c33a16273',
+    fullName: 'Iya Mercado',
+    nickname: null,
+    identity: 'registered',
+    playingLevel: 'intermediate_mid',
+  },
+  {
+    id: '703ff4c1-3676-5912-8630-b5d4f756490c',
+    clubId: '6cd364d4-0e3a-5c3d-9e75-2116cc845714',
+    playerId: null,
+    fullName: 'Kiko Salazar',
+    nickname: null,
+    identity: 'guest',
+    playingLevel: null,
+  },
+  {
+    id: '81f2ad7f-728c-5bc8-9df5-d2f6c993a405',
+    clubId: '6cd364d4-0e3a-5c3d-9e75-2116cc845714',
+    playerId: 'd0c2f1f2-5868-5260-b8dc-f9c8a75c3a58',
+    fullName: 'Andi Cruz',
+    nickname: null,
+    identity: 'registered',
+    playingLevel: 'intermediate_low',
+  },
+] satisfies ClubPlayer[]

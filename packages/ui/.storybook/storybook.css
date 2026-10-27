@@ -1,0 +1,11 @@
+@import "tailwindcss";
+@import "@rotra/config/theme.css";
+
+@source "../src";
+
+/* The apps set these with next/font; Storybook loads the same families from Google Fonts. */
+:root {
+  --font: "Manrope";
+  --mono: "JetBrains Mono";
+  --pixel: "Silkscreen";
+}

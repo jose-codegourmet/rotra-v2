@@ -1,0 +1,8 @@
+{
+  "extends": "@rotra/config/tsconfig",
+  "compilerOptions": {
+    "types": ["vite/client"]
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", ".storybook/**/*.ts", ".storybook/**/*.tsx"],
+  "exclude": ["node_modules", "storybook-static"]
+}

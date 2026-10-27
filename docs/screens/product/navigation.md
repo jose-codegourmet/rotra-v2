@@ -87,3 +87,10 @@ flowchart TD
 - Do not add route paths to this document until route architecture is chosen; old routes are not assumed to match the reset.
 
 Inventory total: **86 surfaces across 19 module specifications**, plus the shared confirmation-dialog contract. (Updated October 26, 2026: +8 Queue surfaces from the [ROTRA Queue prototype](../../frames/queue-app/rotra-queue.html). Updated October 27, 2026: +3 Admin surfaces from the [ROTRA Admin prototype](../../frames/admin-app/rotra-admin.html).)
+
+## Foundation route boundary (approved October 27, 2026)
+
+All apps use `/login`. Queue public session links use `/s/[slug]`; the rest of Queue is protected.
+Admin routes except `/login` are protected. Player `/` (leaderboard) and `/players/[playerId]` are
+public; `/me` and its children are protected. The Foundation proxy wires these boundaries only;
+sign-in forms and the remaining screens arrive in their product tickets.

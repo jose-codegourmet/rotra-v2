@@ -11,7 +11,7 @@
 
 1. **Never invent** a screen, route, field, API, component, or domain term. If it isn't in the docs
    or existing code, stop and ask.
-2. **Nothing is built yet.** `apps/` is empty and the docs describe the *target*. Never say a feature
+2. **Almost nothing is built yet.** `apps/` holds the Foundation scaffold; the docs describe the *target*. Never say a feature
    works unless you ran it.
 3. **Match the prototypes.** `docs/frames/*/*.html` are the agreed design. Build to them; don't redesign.
 4. **Words from [product-terms.md](docs/product-terms.md) only.** Queue (never "Que"), Queue Session,
@@ -54,12 +54,12 @@ Supabase + Prisma come later and replace only the fetchers.
 ## 2. Repo map
 
 ```text
-apps/                     queue · player · admin (Next.js 16), empty until the Foundation scaffold
+apps/                     queue · player · admin (Next.js 16); each has its own AGENTS.md for Next 16 docs
 packages/
-  ui/                     every visual component and form + the one Storybook
+  ui/                     every visual component and form + the one Storybook (see its AGENTS.md)
   data/                   types, fixtures, mock store, fetchers, query keys, hooks
   schema/                 shared Zod fields (email, phone, date, money, password)
-  config/                 tsconfig + Tailwind 4 tokens (current file is old; replaced by Foundation)
+  config/                 tsconfig + Tailwind 4 tokens (theme.css; see its AGENTS.md)
   db/                     Prisma + services (database epic, later)
 docs/
   architecture.md         apps, packages, dependency rules, data flow, offline, auth, database
@@ -117,14 +117,14 @@ Behavior: **business docs**. Look and copy: **the prototype**, then the screen d
 
 ## 5. Commands
 
-The scaffold ticket rewrites the root scripts and `Makefile`; until then they point at removed apps.
-Target commands:
+The root scripts and `Makefile` run these (every `make` target loads nvm first). Ports: queue 3000,
+player 3001, admin 3002.
 
 ```bash
 nvm use && pnpm install
 nvm use && pnpm dev                          # all apps
 nvm use && pnpm --filter @rotra/queue dev    # or @rotra/player, @rotra/admin
-nvm use && pnpm --filter @rotra/ui storybook
+nvm use && pnpm --filter @rotra/ui storybook   # or: pnpm storybook, make storybook
 nvm use && pnpm lint                         # Biome
 nvm use && pnpm type-check
 nvm use && pnpm build

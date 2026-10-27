@@ -1,0 +1,48 @@
+import type { ClubLicenseTerm } from '../license/license.types'
+import { DEMO_CLUB_ID } from './clubs'
+export const licensePayments: ClubLicenseTerm[] = [
+  {
+    id: 'LIC-0004',
+    clubId: DEMO_CLUB_ID,
+    plan: 'Yearly',
+    startsAt: '2026-04-01',
+    endsAt: '2027-03-31',
+    amountMinor: 1500000,
+    currency: 'PHP',
+    paidOn: '2026-04-01',
+    paymentReference: 'LIC-0004',
+  },
+  {
+    id: 'LIC-0003',
+    clubId: DEMO_CLUB_ID,
+    plan: 'Monthly',
+    startsAt: '2026-03-01',
+    endsAt: '2026-03-31',
+    amountMinor: 150000,
+    currency: 'PHP',
+    paidOn: '2026-03-02',
+    paymentReference: 'LIC-0003',
+  },
+  {
+    id: 'LIC-0002',
+    clubId: DEMO_CLUB_ID,
+    plan: 'Monthly',
+    startsAt: '2026-02-01',
+    endsAt: '2026-02-28',
+    amountMinor: 150000,
+    currency: 'PHP',
+    paidOn: '2026-02-01',
+    paymentReference: 'LIC-0002',
+  },
+  {
+    id: 'LIC-0001',
+    clubId: DEMO_CLUB_ID,
+    plan: 'Monthly',
+    startsAt: '2026-01-05',
+    endsAt: '2026-01-31',
+    amountMinor: 150000,
+    currency: 'PHP',
+    paidOn: '2026-01-05',
+    paymentReference: 'LIC-0001',
+  },
+]

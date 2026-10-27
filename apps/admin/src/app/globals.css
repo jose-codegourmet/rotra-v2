@@ -1,0 +1,5 @@
+@import "tailwindcss";
+@import "@rotra/config/theme.css";
+
+/* Components live in @rotra/ui; Tailwind must see their class names */
+@source "../../../../packages/ui/src";

@@ -139,7 +139,10 @@
     "./player/rules": "./src/player/player.rules.ts",
     "./leaderboard/query-keys": "./src/leaderboard/queryKeys.ts",
     "./fixtures/ranking-settings": "./src/fixtures/rankingSettings.ts",
-    "./fixtures/session-waitlist": "./src/fixtures/sessionWaitlist.ts"
+    "./fixtures/session-waitlist": "./src/fixtures/sessionWaitlist.ts",
+    "./fixtures/match-cards": "./src/fixtures/matchCards.ts",
+    "./fixtures/match-lineups": "./src/fixtures/matchLineups.ts",
+    "./fixtures/live-standings": "./src/fixtures/liveStandings.ts"
   },
   "scripts": {
     "lint": "biome check .",

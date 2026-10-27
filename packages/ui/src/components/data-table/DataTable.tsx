@@ -36,6 +36,8 @@ export type DataTableProps<TData> = {
   getRowId?: (row: TData) => string
   /** Makes rows clickable (.tbl tr.click); Enter and Space work too */
   onRowClick?: (row: TData) => void
+  /** Extra classes for one row, e.g. the live leaderboard's highlighted top three (.lb tr.top) */
+  rowClassName?: (row: TData, index: number) => string | undefined
   /** Search and filters above the table (.toolbar) */
   toolbar?: ReactNode
   /** Shows skeleton rows instead of data */
@@ -56,6 +58,7 @@ export function DataTable<TData>({
   data,
   getRowId,
   onRowClick,
+  rowClassName,
   toolbar,
   loading,
   empty,
@@ -170,7 +173,7 @@ export function DataTable<TData>({
                   ))
                 : rows.length === 0
                   ? fullRow(empty)
-                  : rows.map((row) => (
+                  : rows.map((row, index) => (
                       <tr
                         key={row.id}
                         tabIndex={onRowClick ? 0 : undefined}
@@ -181,6 +184,7 @@ export function DataTable<TData>({
                         className={cn(
                           'group/row max-[760px]:block max-[760px]:border-b max-[760px]:border-border max-[760px]:py-2.5 max-[760px]:last:border-b-0',
                           onRowClick && 'cursor-pointer',
+                          rowClassName?.(row.original, index),
                         )}
                       >
                         {row.getVisibleCells().map((cell) => {

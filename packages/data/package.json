@@ -127,7 +127,8 @@
     "./match/queue.mutations": "./src/match/queue.mutations.ts",
     "./match/control": "./src/match/control.ts",
     "./fixtures/consoleSessions": "./src/fixtures/consoleSessions.ts",
-    "./fixtures/player-games": "./src/fixtures/playerGames.ts"
+    "./fixtures/player-games": "./src/fixtures/playerGames.ts",
+    "./fixtures/rank-explanation": "./src/fixtures/rankExplanation.ts"
   },
   "scripts": {
     "lint": "biome check .",

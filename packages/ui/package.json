@@ -89,7 +89,10 @@
     "./game-row": "./src/components/game-row/GameRow.tsx",
     "./session-games": "./src/components/session-games/SessionGames.tsx",
     "./recent-games-card": "./src/components/recent-games-card/RecentGamesCard.tsx",
-    "./match-history": "./src/components/match-history/MatchHistory.tsx"
+    "./match-history": "./src/components/match-history/MatchHistory.tsx",
+    "./rank-explanation": "./src/components/rank-explanation/RankExplanation.tsx",
+    "./rank-explanation/weight-split-bar": "./src/components/rank-explanation/weight-split-bar/WeightSplitBar.tsx",
+    "./rank-explanation/skill-ladder-full": "./src/components/rank-explanation/skill-ladder-full/SkillLadderFull.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

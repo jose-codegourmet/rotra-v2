@@ -34,6 +34,7 @@ in the same PR.
 | Forms | React Hook Form + Zod | §6 |
 | Tables | TanStack Table v8 | §12 |
 | Animation | Motion (`motion/react`) | §11 |
+| Toasts | Sonner (shadcn's toast) | Only through `@rotra/ui/toaster`; restyled to the prototype toast |
 | Lint/format | Biome | `next lint` no longer exists in Next 16 |
 | Components | Storybook (one, in `@rotra/ui`) | §5 |
 

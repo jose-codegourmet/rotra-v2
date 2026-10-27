@@ -14,12 +14,14 @@
     "./chip": "./src/components/chip/Chip.tsx",
     "./choice-group": "./src/components/choice-group/ChoiceGroup.tsx",
     "./cn": "./src/lib/cn.ts",
+    "./confirm-sheet": "./src/components/confirm-sheet/ConfirmSheet.tsx",
     "./date-picker": "./src/components/date-picker/DatePicker.tsx",
     "./date-picker/date-calendar": "./src/components/date-picker/date-calendar/DateCalendar.tsx",
     "./empty-state": "./src/components/empty-state/EmptyState.tsx",
     "./error-state": "./src/components/error-state/ErrorState.tsx",
     "./field": "./src/components/field/Field.tsx",
     "./field/variants": "./src/components/field/Field.variants.ts",
+    "./hooks/use-media-query": "./src/hooks/useMediaQuery.ts",
     "./icon": "./src/components/icon/Icon.tsx",
     "./icon-button": "./src/components/icon-button/IconButton.tsx",
     "./key-value-list": "./src/components/key-value-list/KeyValueList.tsx",
@@ -29,6 +31,7 @@
     "./progress-bar": "./src/components/progress-bar/ProgressBar.tsx",
     "./segmented-control": "./src/components/segmented-control/SegmentedControl.tsx",
     "./select": "./src/components/select/Select.tsx",
+    "./sheet": "./src/components/sheet/Sheet.tsx",
     "./skeleton": "./src/components/skeleton/Skeleton.tsx",
     "./spinner": "./src/components/spinner/Spinner.tsx",
     "./switch": "./src/components/switch/Switch.tsx",
@@ -38,7 +41,8 @@
     "./theme-provider": "./src/components/theme-provider/ThemeProvider.tsx",
     "./theme-provider/script": "./src/components/theme-provider/ThemeProvider.script.ts",
     "./theme-toggle": "./src/components/theme-toggle/ThemeToggle.tsx",
-    "./time-field": "./src/components/time-field/TimeField.tsx"
+    "./time-field": "./src/components/time-field/TimeField.tsx",
+    "./toaster": "./src/components/toaster/Toaster.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",
@@ -53,7 +57,9 @@
   "dependencies": {
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "motion": "^14.7.1",
     "radix-ui": "^1.8.1",
+    "sonner": "^2.0.8",
     "tailwind-merge": "^3.7.0"
   },
   "devDependencies": {

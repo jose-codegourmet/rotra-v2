@@ -7,6 +7,7 @@
     "**/*.css"
   ],
   "exports": {
+    "./access-gate": "./src/components/access-gate/AccessGate.tsx",
     "./app-shell": "./src/components/app-shell/AppShell.tsx",
     "./app-shell/bottom-dock": "./src/components/app-shell/bottom-dock/BottomDock.tsx",
     "./app-shell/side-rail": "./src/components/app-shell/side-rail/SideRail.tsx",
@@ -28,6 +29,8 @@
     "./error-state": "./src/components/error-state/ErrorState.tsx",
     "./field": "./src/components/field/Field.tsx",
     "./field/variants": "./src/components/field/Field.variants.ts",
+    "./forms/club-login-form": "./src/forms/club-login-form/ClubLoginForm.tsx",
+    "./forms/club-login-form/schema": "./src/forms/club-login-form/ClubLoginForm.schema.ts",
     "./hooks/use-media-query": "./src/hooks/useMediaQuery.ts",
     "./icon": "./src/components/icon/Icon.tsx",
     "./icon-button": "./src/components/icon-button/IconButton.tsx",
@@ -52,7 +55,8 @@
     "./theme-provider/script": "./src/components/theme-provider/ThemeProvider.script.ts",
     "./theme-toggle": "./src/components/theme-toggle/ThemeToggle.tsx",
     "./time-field": "./src/components/time-field/TimeField.tsx",
-    "./toaster": "./src/components/toaster/Toaster.tsx"
+    "./toaster": "./src/components/toaster/Toaster.tsx",
+    "./dev-menu": "./src/components/dev-menu/DevMenu.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

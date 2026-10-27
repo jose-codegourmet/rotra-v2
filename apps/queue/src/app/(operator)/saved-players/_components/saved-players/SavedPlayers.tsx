@@ -29,6 +29,7 @@ import { useState } from 'react'
 import { longDateLabel, shortDateLabel } from '@/lib/dates'
 import { useAppSelector } from '@/store/hooks'
 import { selectDev } from '@/store/slices/devSlice'
+import { QueryError } from '../../../_components/query-error/QueryError'
 
 type LiveState = { kind: 'playing' | 'waiting'; text: string }
 type LiveStates = Record<string, LiveState>
@@ -181,7 +182,9 @@ export function SavedPlayers() {
           </Button>
         </div>
       ) : null}
-      {list.isPending ? (
+      {list.isError ? (
+        <QueryError query={list} title="Couldn't load saved players." />
+      ) : list.isPending ? (
         <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,140px),1fr))] gap-3">
           {Array.from({ length: 8 }, (_, i) => (
             <Skeleton key={i} className="h-56 rounded-[14px]" />

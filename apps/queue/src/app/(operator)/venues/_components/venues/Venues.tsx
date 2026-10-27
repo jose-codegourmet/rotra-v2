@@ -16,6 +16,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { shortDateLabel } from '@/lib/dates'
+import { QueryError } from '../../../_components/query-error/QueryError'
 
 type Editing = { mode: 'new' } | { mode: 'edit'; id: string }
 
@@ -49,7 +50,9 @@ export function Venues() {
           </Button>
         }
       />
-      {venues.isPending ? (
+      {venues.isError ? (
+        <QueryError query={venues} title="Couldn't load your venues." />
+      ) : venues.isPending ? (
         <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,300px),1fr))] gap-3">
           {Array.from({ length: 3 }, (_, i) => (
             <Skeleton key={i} className="h-60 rounded-[14px]" />

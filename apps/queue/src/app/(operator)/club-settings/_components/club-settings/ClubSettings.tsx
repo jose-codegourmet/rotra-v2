@@ -45,6 +45,7 @@ import { useAppSelector } from '@/store/hooks'
 import { selectAccount } from '@/store/slices/authSlice'
 import { selectDev } from '@/store/slices/devSlice'
 import { useOperatorShell } from '../../../_components/operator-shell/DockAction.context'
+import { QueryError } from '../../../_components/query-error/QueryError'
 import { slugFromSection } from './sections'
 
 const POST_KEY_LIST = POST_KEYS.map(([key, label]) => ({ key, label }))
@@ -133,6 +134,9 @@ function PostPreview({
 function LicenseSection({ clubName }: { clubName: string }) {
   const license = useClubLicense()
   const payments = useLicensePayments()
+  if (license.isError) return <QueryError query={license} title="Couldn't load the license." />
+  if (payments.isError)
+    return <QueryError query={payments} title="Couldn't load the payment history." />
   if (!license.data || !payments.data) return <Skeleton className="h-64 rounded-lg" />
   const exportCsv = () => {
     try {
@@ -165,6 +169,7 @@ function LicenseSection({ clubName }: { clubName: string }) {
 
 function DeviceSection() {
   const downloads = useDeviceDownloads()
+  if (downloads.isError) return <QueryError query={downloads} title="Couldn't load downloads." />
   if (!downloads.data) return <Skeleton className="h-40 rounded-lg" />
   return (
     <ThisDevicePanel
@@ -232,7 +237,9 @@ export function ClubSettings({ section }: ClubSettingsProps) {
   }
 
   const data = club.data
-  const content = !data ? (
+  const content = club.isError ? (
+    <QueryError query={club} title="Couldn't load your club settings." />
+  ) : !data ? (
     <Skeleton className="h-64 rounded-lg" />
   ) : section === 'identity' ? (
     <ClubIdentityPanel

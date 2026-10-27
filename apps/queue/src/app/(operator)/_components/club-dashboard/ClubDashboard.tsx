@@ -17,6 +17,7 @@ import { useState } from 'react'
 import { longDayLabel, sessionHref, toDateParam } from '@/lib/dates'
 import { useAppSelector } from '@/store/hooks'
 import { selectAccount } from '@/store/slices/authSlice'
+import { QueryError } from '../query-error/QueryError'
 
 const KIND: Record<string, CalendarEvent['kind']> = {
   active: 'live',
@@ -76,7 +77,9 @@ export function ClubDashboard() {
 
   return (
     <main className="mx-auto flex max-w-[1240px] flex-col gap-5 px-[max(16px,env(safe-area-inset-left,0px))] pt-5 pb-[120px]">
-      {club.data ? (
+      {club.isError ? (
+        <QueryError query={club} title="Couldn't load the club." />
+      ) : club.data ? (
         <ClubHeader
           clubName={club.data.name}
           initials={club.data.initials}
@@ -100,7 +103,9 @@ export function ClubDashboard() {
           </div>
         </div>
       )}
-      {nowCard.isPending ? (
+      {nowCard.isError ? (
+        <QueryError query={nowCard} title="Couldn't load your sessions." />
+      ) : nowCard.isPending ? (
         <Skeleton className="h-40 rounded-[18px]" />
       ) : live ? (
         <NowCard
@@ -139,7 +144,9 @@ export function ClubDashboard() {
       ) : (
         <NowCard variant="nothing" onCreateSession={() => createSession()} />
       )}
-      {sessions.isPending ? (
+      {sessions.isError ? (
+        <QueryError query={sessions} title="Couldn't load the calendar." />
+      ) : sessions.isPending ? (
         <Skeleton className="h-80 rounded-lg" />
       ) : (
         <SessionCalendar

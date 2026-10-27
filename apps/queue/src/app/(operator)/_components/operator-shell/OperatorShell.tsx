@@ -2,8 +2,10 @@
 
 import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import { useClubVenues } from '@rotra/data/club-venue/useClubVenues'
+import { useClubAccess } from '@rotra/data/license/useClubAccess'
 import { useNowCard } from '@rotra/data/queue-session/useNowCard'
 import { useSyncState } from '@rotra/data/sync/useSyncState'
+import { AccessGate } from '@rotra/ui/access-gate'
 import { AppShell, useAppShell } from '@rotra/ui/app-shell'
 import { BottomDock, type DockAction } from '@rotra/ui/app-shell/bottom-dock'
 import { type RailGroup, SideRail } from '@rotra/ui/app-shell/side-rail'
@@ -17,8 +19,12 @@ import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } fro
 import { DevTools } from '@/providers/DevTools'
 import { DEV_TOOLS_ENABLED } from '@/providers/devToolsEnabled'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
+import { selectAccount } from '@/store/slices/authSlice'
 import { selectNavCollapsed, setNavCollapsed } from '@/store/slices/uiSlice'
 import { OperatorShellContext, type OperatorShellContextValue } from './DockAction.context'
+
+/** Screens the license gate replaces while the license has ended (the console stays reachable). */
+const GATED_PREFIXES = ['/', '/saved-players', '/venues', '/club-settings', '/sessions/new']
 
 /** Per-device memory of the collapsed rail, as the prototype keeps it. */
 const NAV_STORAGE_KEY = 'rotra-queue-nav'
@@ -44,6 +50,8 @@ export function OperatorShell({ children }: { children: ReactNode }) {
   const router = useRouter()
   const dispatch = useAppDispatch()
   const collapsed = useAppSelector(selectNavCollapsed)
+  const account = useAppSelector(selectAccount)
+  const access = useClubAccess()
   const sync = useSyncState()
   const nowCard = useNowCard()
   const players = useClubPlayers()
@@ -162,6 +170,38 @@ export function OperatorShell({ children }: { children: ReactNode }) {
     : { label: 'Create session', icon: 'plus', onClick: () => router.push('/sessions/new') }
 
   const closeSettings = useCallback(() => setSettingsMenuOpen(false), [])
+  const gated =
+    pathname === '/' ||
+    GATED_PREFIXES.some((prefix) => prefix !== '/' && current(prefix)) ||
+    pathname.startsWith('/sessions/new')
+  const expired = access.data?.status === 'expired'
+  const gateName = account?.name ?? 'Your club'
+  const gate =
+    gated && expired ? (
+      <main className="mx-auto flex max-w-[720px] flex-col gap-5 px-[max(16px,env(safe-area-inset-left,0px))] pt-5 pb-[120px]">
+        <AccessGate
+          clubName={gateName}
+          clubInitials={gateName
+            .split(/\s+/)
+            .filter(Boolean)
+            .slice(0, 2)
+            .map((w) => w.charAt(0).toUpperCase())
+            .join('')}
+          status="expired"
+          activeSession={
+            live
+              ? {
+                  title: live.title,
+                  startsAt: new Date(live.scheduledStartAt).toISOString(),
+                  endsAt: new Date(live.scheduledEndAt).toISOString(),
+                  venueName: live.venueName,
+                }
+              : undefined
+          }
+          onContinueActiveSession={live ? () => router.push(`/sessions/${live.id}`) : undefined}
+        />
+      </main>
+    ) : null
   const context = useMemo<OperatorShellContextValue>(
     () => ({ setDockAction: setDockOverride, settingsMenuOpen, setSettingsMenuOpen }),
     [settingsMenuOpen],
@@ -197,7 +237,8 @@ export function OperatorShell({ children }: { children: ReactNode }) {
         }
       >
         <DrawerCoordinator onNavOpen={closeSettings} />
-        {children}
+        {/* The gate renders before any gated page mounts its queries, so no list can flash first. */}
+        {gate ?? (gated && access.isPending ? null : children)}
       </AppShell>
     </OperatorShellContext.Provider>
   )

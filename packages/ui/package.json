@@ -92,6 +92,8 @@
     "./rank-explanation/weight-split-bar": "./src/components/rank-explanation/weight-split-bar/WeightSplitBar.tsx",
     "./recent-games-card": "./src/components/recent-games-card/RecentGamesCard.tsx",
     "./repeat-schedule-panel": "./src/components/repeat-schedule-panel/RepeatSchedulePanel.tsx",
+    "./roster-panel": "./src/components/roster-panel/RosterPanel.tsx",
+    "./roster-row": "./src/components/roster-row/RosterRow.tsx",
     "./saved-player-card": "./src/components/saved-player-card/SavedPlayerCard.tsx",
     "./saved-players-filter-bar": "./src/components/saved-players-filter-bar/SavedPlayersFilterBar.tsx",
     "./segmented-control": "./src/components/segmented-control/SegmentedControl.tsx",
@@ -127,7 +129,8 @@
     "./toaster": "./src/components/toaster/Toaster.tsx",
     "./top-three-podium": "./src/components/top-three-podium/TopThreePodium.tsx",
     "./venue-card": "./src/components/venue-card/VenueCard.tsx",
-    "./venue-picker-sheet": "./src/components/venue-picker-sheet/VenuePickerSheet.tsx"
+    "./venue-picker-sheet": "./src/components/venue-picker-sheet/VenuePickerSheet.tsx",
+    "./waitlist-panel": "./src/components/waitlist-panel/WaitlistPanel.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

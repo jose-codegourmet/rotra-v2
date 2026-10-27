@@ -20,6 +20,7 @@
     "./choice-group": "./src/components/choice-group/ChoiceGroup.tsx",
     "./cn": "./src/lib/cn.ts",
     "./confirm-sheet": "./src/components/confirm-sheet/ConfirmSheet.tsx",
+    "./data-table": "./src/components/data-table/DataTable.tsx",
     "./date-picker": "./src/components/date-picker/DatePicker.tsx",
     "./date-picker/date-calendar": "./src/components/date-picker/date-calendar/DateCalendar.tsx",
     "./empty-state": "./src/components/empty-state/EmptyState.tsx",
@@ -63,6 +64,7 @@
     "react-dom": "^19.2.0"
   },
   "dependencies": {
+    "@tanstack/react-table": "^8.21.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "motion": "^14.7.1",

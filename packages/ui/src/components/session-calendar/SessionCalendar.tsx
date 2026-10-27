@@ -38,8 +38,8 @@ export type SessionCalendarProps = {
   selectedDate?: number
   /** Forces a view; by default it follows the window (> 1024 px month, 641–1024 px week, ≤ 640 px day) */
   view?: CalendarView
-  /** Previous (-1) or Next (1) by the current view's unit */
-  onMove: (direction: -1 | 1) => void
+  /** Previous (-1) or Next (1) by the current view's unit (month, week or day) */
+  onMove: (direction: -1 | 1, view: CalendarView) => void
   onToday: () => void
   /** A date was tapped (month and week open the day dialog; the day strip moves the view) */
   onOpenDay: (date: number) => void
@@ -116,13 +116,13 @@ function Header({
     <div className="flex flex-wrap items-center justify-between gap-3">
       <h2>{title}</h2>
       <div className="flex items-center gap-1">
-        <IconButton size="xs" label={`Previous ${unit}`} onClick={() => onMove(-1)}>
+        <IconButton size="xs" label={`Previous ${unit}`} onClick={() => onMove(-1, unit)}>
           <Icon name="back" />
         </IconButton>
         <Button size="xs" onClick={onToday}>
           Today
         </Button>
-        <IconButton size="xs" label={`Next ${unit}`} onClick={() => onMove(1)}>
+        <IconButton size="xs" label={`Next ${unit}`} onClick={() => onMove(1, unit)}>
           <Icon name="back" className="-scale-x-100" />
         </IconButton>
       </div>

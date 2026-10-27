@@ -57,8 +57,7 @@ const manyToday: CalendarEvent[] = [
 function Demo(props: Partial<SessionCalendarProps> & { view?: CalendarView }) {
   const [reference, setReference] = useState(props.referenceDate ?? today)
   const [selected, setSelected] = useState<number | undefined>()
-  const view = props.view
-  const move = (direction: -1 | 1) => {
+  const move = (direction: -1 | 1, view: CalendarView) => {
     const r = new Date(reference)
     setReference(
       view === 'month'
@@ -83,7 +82,7 @@ function Demo(props: Partial<SessionCalendarProps> & { view?: CalendarView }) {
       onToday={() => setReference(today)}
       onOpenDay={(date) => {
         setSelected(date)
-        if (view === 'day') setReference(date)
+        if (props.view === 'day') setReference(date)
       }}
     />
   )

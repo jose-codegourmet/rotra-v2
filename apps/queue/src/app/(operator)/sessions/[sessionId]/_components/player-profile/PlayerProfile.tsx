@@ -9,6 +9,9 @@ export type PlayerProfileProps = {
   /** The saved player to show; null keeps the sheet closed */
   clubPlayerId: string | null
   onClose: () => void
+  /** Opened from a dialog (Suggested match, Start match, payments): the footer offers Back to it instead of Close */
+  backLabel?: 'suggestion' | 'match' | 'payments'
+  onBack?: () => void
 }
 
 /**
@@ -16,7 +19,7 @@ export type PlayerProfileProps = {
  * the saved player a court, queue card, pool card or leaderboard row points at. Renders nothing
  * until the player is known.
  */
-export function PlayerProfile({ clubPlayerId, onClose }: PlayerProfileProps) {
+export function PlayerProfile({ clubPlayerId, onClose, backLabel, onBack }: PlayerProfileProps) {
   const clubPlayers = useClubPlayers()
   const profile = clubPlayerId
     ? clubPlayers.data?.players.find((p) => p.id === clubPlayerId)
@@ -37,6 +40,8 @@ export function PlayerProfile({ clubPlayerId, onClose }: PlayerProfileProps) {
       addedLabel={longDateLabel(profile.addedAt)}
       sessionsHere={profile.sessionsHere}
       phoneHidden={profile.phoneHidden}
+      backLabel={backLabel}
+      onBack={onBack}
     />
   )
 }

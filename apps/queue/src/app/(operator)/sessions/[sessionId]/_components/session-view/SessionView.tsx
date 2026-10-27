@@ -40,6 +40,8 @@ export type SessionViewProps = {
   onAddCourt: () => void
   /** Edit on an upcoming queue card: open the Edit lineup sheet (Queue › Match editing). Edit is hidden until given. */
   onEditMatch?: (matchId: string) => void
+  /** Add match on a free court card with nothing to start: open the Add match sheet (Queue › Match editing). Hidden until given. */
+  onAddMatch?: () => void
 }
 
 /**
@@ -48,7 +50,8 @@ export type SessionViewProps = {
  * + Add court tile, the footer line, then UpcomingQueueRow with the whole waiting queue. The court
  * actions (Review and start, Pick another, Open match, Add match) and Start on a queue card are
  * wired by Queue › Match control; here the pictures, More queues, Remove on a free court and Remove
- * on a queue card act, and Edit appears once onEditMatch is given (Queue › Match editing). Both
+ * on a queue card act, Edit appears once onEditMatch is given and a free court's Add match once
+ * onAddMatch is given (both Queue › Match editing). Both
  * removes go straight to their mutation with a toast and no dialog (per dialogs.md): a court with
  * "LABEL removed" (an occupied court is refused with "Only a free court can be removed"), a waiting
  * match with "Waiting match N removed".
@@ -60,6 +63,7 @@ export function SessionView({
   onOpenQueue,
   onAddCourt,
   onEditMatch,
+  onAddMatch,
 }: SessionViewProps) {
   const session = useQueueSession(sessionId)
   const roster = useSessionRoster(sessionId)
@@ -173,6 +177,7 @@ export function SessionView({
           }
         : null,
       blockedReason: !next.match && first ? matchStatus(first, ctx).reason : undefined,
+      onAddMatch,
     })
   }
 

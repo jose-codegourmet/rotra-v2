@@ -26,14 +26,20 @@ import { notFound, useRouter } from 'next/navigation'
 import { type ComponentType, useEffect, useMemo, useRef, useState } from 'react'
 import { useDockAction } from '@/app/(operator)/_components/operator-shell/DockAction.context'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
+import { AutoQueue } from '@/app/(operator)/sessions/[sessionId]/_components/auto-queue/AutoQueue'
 import { CourtsAndTime } from '@/app/(operator)/sessions/[sessionId]/_components/courts-and-time/CourtsAndTime'
 import { FacebookPost } from '@/app/(operator)/sessions/[sessionId]/_components/facebook-post/FacebookPost'
 import { JoinRequests } from '@/app/(operator)/sessions/[sessionId]/_components/join-requests/JoinRequests'
 import { LeaderboardView } from '@/app/(operator)/sessions/[sessionId]/_components/leaderboard-view/LeaderboardView'
+import {
+  MatchLineup,
+  type MatchLineupRequest,
+} from '@/app/(operator)/sessions/[sessionId]/_components/match-lineup/MatchLineup'
 import { PlayerProfile } from '@/app/(operator)/sessions/[sessionId]/_components/player-profile/PlayerProfile'
 import { PlayersView } from '@/app/(operator)/sessions/[sessionId]/_components/players-view/PlayersView'
 import { QueueView } from '@/app/(operator)/sessions/[sessionId]/_components/queue-view/QueueView'
 import { SessionView } from '@/app/(operator)/sessions/[sessionId]/_components/session-view/SessionView'
+import { SuggestMatch } from '@/app/(operator)/sessions/[sessionId]/_components/suggest-match/SuggestMatch'
 import { sessionHref } from '@/lib/dates'
 import { useNow } from '@/lib/useNow'
 import { useAppSelector } from '@/store/hooks'
@@ -43,6 +49,8 @@ export type SessionConsoleProps = { sessionId: string }
 
 export type ConsoleView = 'session' | 'queue' | 'players' | 'leaderboard'
 export type ConsoleSheet = 'join-requests' | 'post' | 'adjust' | 'add-court' | null
+/** The Queue › Match editing sheets: Add match / Edit lineup, Suggested match, Auto queue */
+export type MatchSheet = MatchLineupRequest | { mode: 'suggest' } | { mode: 'auto' }
 
 /** What every console view container receives from the shell */
 export type ConsoleViewProps = {
@@ -91,6 +99,7 @@ export function SessionConsole({ sessionId }: SessionConsoleProps) {
   const sync = useSyncState()
   const [view, setView] = useState<ConsoleView>('session')
   const [sheet, setSheet] = useState<ConsoleSheet>(null)
+  const [matchSheet, setMatchSheet] = useState<MatchSheet | null>(null)
   const [profileId, setProfileId] = useState<string | null>(null)
 
   const s = session.data
@@ -102,7 +111,7 @@ export function SessionConsole({ sessionId }: SessionConsoleProps) {
   }, [redirectTo, router])
 
   // The 30-second refresh: the clock the views measure against, paused while a sheet is open here.
-  const now = useNow(undefined, sheet !== null || profileId !== null)
+  const now = useNow(undefined, sheet !== null || matchSheet !== null || profileId !== null)
   const refetchSession = session.refetch
   const firstTick = useRef(true)
   useEffect(() => {
@@ -195,6 +204,14 @@ export function SessionConsole({ sessionId }: SessionConsoleProps) {
     return View ? <View {...viewProps} /> : <Skeleton className="h-56 rounded-lg" />
   }
 
+  // Queue › Match editing: the sheets live here so Edit works from the Session tab too, and a
+  // save, an accepted suggestion or an auto queue run switches the console to the Queue tab.
+  const matchEditing = {
+    onAddMatch: () => setMatchSheet({ mode: 'add' }),
+    onEditMatch: (matchId: string) => setMatchSheet({ mode: 'edit', matchId }),
+  }
+  const showQueue = () => setView(VIEWS.queue ? 'queue' : 'session')
+
   if (session.isError)
     return (
       <main className="mx-auto max-w-[1240px] px-4 pt-5">
@@ -255,9 +272,20 @@ export function SessionConsole({ sessionId }: SessionConsoleProps) {
         items={tabs}
       >
         <TabsContent value="session" className="flex flex-col gap-5">
-          <SessionView {...viewProps} onAddCourt={() => setSheet('add-court')} />
+          <SessionView {...viewProps} onAddCourt={() => setSheet('add-court')} {...matchEditing} />
         </TabsContent>
-        <TabsContent value="queue">{panel('queue')}</TabsContent>
+        <TabsContent value="queue">
+          {VIEWS.queue ? (
+            <QueueView
+              {...viewProps}
+              {...matchEditing}
+              onSuggest={() => setMatchSheet({ mode: 'suggest' })}
+              onAutoQueue={() => setMatchSheet({ mode: 'auto' })}
+            />
+          ) : (
+            panel('queue')
+          )}
+        </TabsContent>
         <TabsContent value="players">{panel('players')}</TabsContent>
         <TabsContent value="leaderboard">{panel('leaderboard')}</TabsContent>
       </Tabs>
@@ -289,6 +317,30 @@ export function SessionConsole({ sessionId }: SessionConsoleProps) {
         sessionId={sessionId}
         open={sheet === 'adjust' || sheet === 'add-court' ? sheet : null}
         onOpenChange={setSheet}
+      />
+      <MatchLineup
+        sessionId={sessionId}
+        now={now}
+        request={
+          matchSheet && (matchSheet.mode === 'add' || matchSheet.mode === 'edit')
+            ? matchSheet
+            : null
+        }
+        onClose={() => setMatchSheet(null)}
+        onSaved={showQueue}
+      />
+      <SuggestMatch
+        sessionId={sessionId}
+        open={matchSheet?.mode === 'suggest'}
+        onOpenChange={(open) => setMatchSheet(open ? { mode: 'suggest' } : null)}
+        onEditThenAdd={(lineup) => setMatchSheet({ mode: 'add', lineup })}
+        onAdded={showQueue}
+      />
+      <AutoQueue
+        sessionId={sessionId}
+        open={matchSheet?.mode === 'auto'}
+        onOpenChange={(open) => setMatchSheet(open ? { mode: 'auto' } : null)}
+        onAdded={showQueue}
       />
       <PlayerProfile clubPlayerId={profileId} onClose={() => setProfileId(null)} />
     </main>

@@ -7,6 +7,7 @@ export const playerProfileMeta = {
   usage: [
     'Mount once in SessionConsole; every view (courts, queue cards, Players, Leaderboard) opens it by passing the clubPlayerId of the tapped picture. Views work with roster ids, so they map a SessionPlayer to its clubPlayerId before calling.',
     'Renders nothing until the saved players are loaded and the id is known; the sheet never shows a phone number.',
+    'A container that opens it from its own sheet (SuggestMatch) passes backLabel and onBack, so the footer reads Back to suggestion and returns to that sheet.',
     'Preparation keeps its own copy inside PreparationRoster; this one is for the console only.',
   ],
   docs: [

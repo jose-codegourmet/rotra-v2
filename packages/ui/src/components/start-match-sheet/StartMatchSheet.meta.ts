@@ -7,7 +7,7 @@ export const startMatchSheetMeta = {
   usage: [
     'Open it from Review and start on a free court, Start on a ready queue card, or Start here in ChooseMatchSheet. Preselect the court that opened it (plus a second free court for 5v5) through courtIds.',
     'Pass status from matchStatus(match, ctx): anything but ready shows the reason as an error notice and keeps Start match disabled. Start match is also disabled until the required courts are chosen.',
-    'Set isPending while useStartMatch runs: Start match cannot fire twice and the sheet cannot be dismissed. When the recheck fails, keep the sheet open and pass message "Something changed. Review the match again."',
+    'Set isPending while useStartMatch runs: Start match cannot fire twice and the sheet cannot be dismissed. When the recheck fails, keep the sheet open and pass message "Something changed. Review the match again."; when the local save fails, keep it open with the same courts and pass error "Changes could not be saved" (the owner also toasts it and retries with the same operation ID).',
     'Starting is an explicit Queue Master action: never open or confirm this sheet automatically when a court frees up.',
   ],
   prototype: {

@@ -57,6 +57,15 @@ export const ConfirmError: Story = {
     error: 'Something changed. Review the match again.',
   },
 }
+/** The local save failed: the match and its lineup are unchanged, the choice stays for the retry */
+export const ConfirmSaveFailed: Story = {
+  args: {
+    step: 'confirm',
+    outId: chosen.outId,
+    inId: chosen.inId,
+    error: 'Changes could not be saved',
+  },
+}
 
 function Flow(args: SubstitutionSheetProps) {
   const [step, setStep] = useState<SubstitutionStep>('pick')

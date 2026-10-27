@@ -53,5 +53,8 @@ export const Failed: Story = {
   args: { error: "You're offline, so nothing was saved. Try again once you're connected." },
 }
 
+/** The local save failed: the match stays active, the score stays, Confirm retries the same operation */
+export const SaveFailed: Story = { args: { error: 'Changes could not be saved' } }
+
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
 export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }

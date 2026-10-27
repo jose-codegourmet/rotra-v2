@@ -84,6 +84,9 @@ export const SomethingChanged: Story = {
   args: { message: 'Something changed. Review the match again.' },
 }
 
+/** The local save failed: the sheet stays open with its courts, the match is still waiting */
+export const SaveFailed: Story = { args: { error: 'Changes could not be saved' } }
+
 export const Phone: Story = {
   args: propsFor(startMatchFixtures.fiveVFive),
   globals: { viewport: { value: 'phone' } },

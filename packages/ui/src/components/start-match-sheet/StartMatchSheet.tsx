@@ -43,6 +43,8 @@ export type StartMatchSheetProps = {
   isPending?: boolean
   /** Shown above the footer, e.g. "Something changed. Review the match again." after a failed recheck */
   message?: ReactNode
+  /** Why the start could not be saved ("Changes could not be saved"); the sheet stays open with its courts and nothing is claimed as started */
+  error?: ReactNode
 }
 
 const FORMAT_LABEL: Record<MatchFormat, string> = {
@@ -77,6 +79,7 @@ export function StartMatchSheet({
   onStart,
   isPending = false,
   message,
+  error,
 }: StartMatchSheetProps) {
   const required = match.format === 'fun_5v5' ? 2 : 1
   const ready = status.kind === 'ready'
@@ -125,6 +128,7 @@ export function StartMatchSheet({
       />
       {ready ? null : <Notice tone="error">{status.reason}</Notice>}
       {message ? <Notice tone="warn">{message}</Notice> : null}
+      {error ? <Notice tone="error">{error}</Notice> : null}
     </Sheet>
   )
 }

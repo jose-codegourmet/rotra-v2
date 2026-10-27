@@ -12,6 +12,7 @@ import { useCompleteMatch } from '@rotra/data/match/useCompleteMatch'
 import { useInvalidateMatch } from '@rotra/data/match/useInvalidateMatch'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { useSubstitutePlayer } from '@rotra/data/match/useSubstitutePlayer'
+import { MockError } from '@rotra/data/mock/errors'
 import type { QueueSession } from '@rotra/data/queue-session/types'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import type { SessionPlayer } from '@rotra/data/session-roster/types'
@@ -51,6 +52,14 @@ type Step =
 const errorMessage = (error: unknown) =>
   error instanceof Error ? error.message : 'Something went wrong. Try again.'
 
+/** The commit could not be made durable on this device ("Changes could not be saved") or offline without a copy */
+const isSaveFailure = (error: unknown) =>
+  error instanceof MockError && (error.kind === 'retryable' || error.kind === 'offline')
+
+/** The recheck at confirmation found a change (player gone, match already decided): refetch so the sheet shows it */
+const isRecheckFailure = (error: unknown) =>
+  error instanceof MockError && error.kind === 'conflict'
+
 /** One confirmation ID per review: a retry after a timeout replays the same operation, never a competing outcome */
 const newOperationId = () => crypto.randomUUID()
 
@@ -63,8 +72,12 @@ const newOperationId = () => crypto.randomUUID()
  * useSubstitutePlayer, then back to the active sheet with "Kiko in for Jom" and the substitution
  * line. Back returns to the previous step with what was entered; closing at any step before a
  * confirmation changes nothing and the court stays in use. A failed commit shows inside the sheet
- * and nothing is claimed as saved; the operation ID is fixed when the review step opens, so a retry
- * replays the same confirmation. Player cards open the profile with Back to match.
+ * and nothing is claimed as saved: a local save failure ("Changes could not be saved") is also an
+ * error toast, the match stays active with its court(s) in use and the typed scores kept, and the
+ * operation ID is fixed when the review step opens, so a retry replays the same confirmation.
+ * "Something changed" refetches so the sheet shows what changed. Offline (with a downloaded copy)
+ * each confirmation saves locally, the outcome is permanent at once and its toast ends in " · Saved
+ * on this device, waiting to sync". Player cards open the profile with Back to match.
  */
 export function ActiveMatch({ sessionId, now, matchId, onClose }: ActiveMatchProps) {
   const session = useQueueSession(sessionId)
@@ -80,6 +93,11 @@ export function ActiveMatch({ sessionId, now, matchId, onClose }: ActiveMatchPro
   }, [gone, onClose])
 
   if (!match || match.state !== 'active' || !s || !roster.data || !matches.data) return null
+  const refresh = () => {
+    void session.refetch()
+    void roster.refetch()
+    void matches.refetch()
+  }
   return (
     <OpenActiveMatch
       key={match.id}
@@ -90,6 +108,7 @@ export function ActiveMatch({ sessionId, now, matchId, onClose }: ActiveMatchPro
       matches={matches.data}
       match={match}
       onClose={onClose}
+      onRefresh={refresh}
     />
   )
 }
@@ -99,6 +118,8 @@ type OpenActiveMatchProps = Omit<ActiveMatchProps, 'matchId'> & {
   roster: SessionPlayer[]
   matches: Match[]
   match: Match
+  /** The recheck refused the commit: refetch so the sheet shows the current players and match */
+  onRefresh: () => void
 }
 
 /** The open sheet: mounted per match, so its step and choices start fresh for each Open match */
@@ -110,6 +131,7 @@ function OpenActiveMatch({
   matches,
   match,
   onClose,
+  onRefresh,
 }: OpenActiveMatchProps) {
   const completeMatch = useCompleteMatch()
   const invalidateMatch = useInvalidateMatch()
@@ -175,7 +197,15 @@ function OpenActiveMatch({
     setError(undefined)
     return true
   }
-  const onFailure = (err: unknown) => setError(errorMessage(err))
+  /**
+   * Nothing was written: the step, its operationId and what was entered stay for the retry. A save
+   * failure is also an error toast ("Changes could not be saved"); a recheck refusal refetches.
+   */
+  const onFailure = (err: unknown) => {
+    setError(errorMessage(err))
+    if (isSaveFailure(err)) toast.error(errorMessage(err))
+    if (isRecheckFailure(err)) onRefresh()
+  }
   const onSettled = () => {
     committing.current = false
   }

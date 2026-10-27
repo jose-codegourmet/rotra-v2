@@ -42,6 +42,9 @@ export const FiveVFive: Story = {
 /** The commit is running: Confirm cannot fire twice, Keep playing is blocked */
 export const Pending: Story = { args: { isPending: true } }
 
+/** The local save failed: the match stays active and its court in use, Confirm retries the same operation */
+export const SaveFailed: Story = { args: { error: 'Changes could not be saved' } }
+
 /** The commit failed: the match stays active */
 export const Failed: Story = {
   args: { error: "You're offline, so nothing was saved. Try again once you're connected." },

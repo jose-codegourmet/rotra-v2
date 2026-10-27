@@ -54,14 +54,16 @@ const errorMessage = (error: unknown) =>
 /** The recheck at confirmation refused the start: the sheet stays open with refreshed data */
 const isRecheckFailure = (error: unknown) =>
   error instanceof MockError && error.kind === 'conflict'
-
 /**
  * Q-DISPATCH / D-START-MATCH and Q-CHOOSE-MATCH: StartMatchSheet on useStartMatch for a waiting
  * match, opened from Review and start (that court preselected), Start on a queue card (the first
  * free court) or Start here in ChooseMatchSheet (that court); a 5v5 preselects a second free court.
  * Each open gets a fresh operationId, so repeated taps cannot start twice. Success toasts
- * "Match N started on Court X" and closes; "Something changed. Review the match again." toasts,
- * stays open and refetches the session, roster and matches so the sheet shows what changed.
+ * "Match N started on Court X" (offline: " · Saved on this device, waiting to sync") and closes;
+ * "Something changed. Review the match again." toasts, stays open and refetches the session, roster
+ * and matches so the sheet shows what changed. A local save failure ("Changes could not be saved")
+ * is an error toast and an error inside the sheet: the match stays waiting, the chosen courts stay
+ * chosen and Start match retries the same operationId.
  * Switching sides calls useSwapPlayers (the waiting match becomes protected, toast as in the Queue
  * view); a player card opens PlayerProfile with Back to match, which returns to the same sheet.
  * No match ever starts without this confirmation.
@@ -187,6 +189,7 @@ function OpenStartMatch({
   const [operationId] = useState(() => crypto.randomUUID())
   const [courtIds, setCourtIds] = useState(() => preselect(match, courtId, ctx))
   const [message, setMessage] = useState<string | undefined>()
+  const [error, setError] = useState<string | undefined>()
   const [profileId, setProfileId] = useState<string | null>(null)
   // One start per attempt: a second tap can land before isPending reaches this render.
   const starting = useRef(false)
@@ -223,6 +226,7 @@ function OpenStartMatch({
     if (starting.current || startMatch.isPending) return
     starting.current = true
     setMessage(undefined)
+    setError(undefined)
     startMatch.mutate(
       { matchId: match.id, courtIds, operationId },
       {
@@ -230,11 +234,15 @@ function OpenStartMatch({
           toast(result.message)
           onClose()
         },
-        onError: (error) => {
-          toast.error(errorMessage(error))
-          if (isRecheckFailure(error)) {
+        onError: (failure) => {
+          toast.error(errorMessage(failure))
+          if (isRecheckFailure(failure)) {
             setMessage(CHANGED)
             onRefresh()
+          } else {
+            // A save failure wrote nothing: the match is still waiting and the courts stay chosen,
+            // so Start match retries the same operationId.
+            setError(errorMessage(failure))
           }
         },
         onSettled: () => {
@@ -273,6 +281,7 @@ function OpenStartMatch({
         onStart={onStart}
         isPending={startMatch.isPending}
         message={message}
+        error={error}
       />
       {/* Back to match closes the profile; the sheet underneath keeps its courts and lineup */}
       <PlayerProfile

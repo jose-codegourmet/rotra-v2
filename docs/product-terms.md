@@ -242,6 +242,8 @@ from the [database design](database_design/product/README.md). Add a row here **
 | Match format | `MatchFormat` | — | `singles` · `doubles` · `fun_1v2` · `fun_3v3` · `fun_4v4` · `fun_5v5` |
 | Session mode | `SessionMode` | — | `chill` · `fair` · `hard` |
 | Player | `Player` | `players` | Global identity across clubs |
+| Ranking settings | `RankingSettings` | `ranking_policy_versions` | Configured assessment weight and match requirement |
+| Player rank | `PlayerRank` | `player_rank_current` | Public shared-rank projection; no numerical formula in the mock phase |
 | Club assessment | `ClubAssessment` | `club_assessments` | |
 | Inventory item | `InventoryItem` | `inventory_items` | |
 | Cost estimate | `SessionCostEstimate` | `session_cost_estimates` | |

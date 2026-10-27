@@ -8,6 +8,7 @@
   ],
   "exports": {
     "./access-gate": "./src/components/access-gate/AccessGate.tsx",
+    "./active-match-sheet": "./src/components/active-match-sheet/ActiveMatchSheet.tsx",
     "./add-court-tile": "./src/components/add-court-tile/AddCourtTile.tsx",
     "./add-player-sheet": "./src/components/add-player-sheet/AddPlayerSheet.tsx",
     "./alphabet-index": "./src/components/alphabet-index/AlphabetIndex.tsx",
@@ -149,6 +150,7 @@
     "./start-match-sheet": "./src/components/start-match-sheet/StartMatchSheet.tsx",
     "./start-session-bar": "./src/components/start-session-bar/StartSessionBar.tsx",
     "./start-session-sheet": "./src/components/start-session-sheet/StartSessionSheet.tsx",
+    "./substitution-sheet": "./src/components/substitution-sheet/SubstitutionSheet.tsx",
     "./suggested-match-sheet": "./src/components/suggested-match-sheet/SuggestedMatchSheet.tsx",
     "./swap-sides-area": "./src/components/swap-sides-area/SwapSidesArea.tsx",
     "./swap-sides-area/swappable-player": "./src/components/swap-sides-area/swappable-player/SwappablePlayer.tsx",

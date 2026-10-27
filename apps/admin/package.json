@@ -15,7 +15,11 @@
     "@rotra/ui": "workspace:*",
     "next": "16.4.3",
     "react": "~19.2.9",
-    "react-dom": "~19.2.9"
+    "react-dom": "~19.2.9",
+    "@rotra/data": "workspace:*",
+    "@rotra/schema": "workspace:*",
+    "@tanstack/react-query": "^5.0.0",
+    "@tanstack/react-query-devtools": "^5.0.0"
   },
   "devDependencies": {
     "@rotra/config": "workspace:*",

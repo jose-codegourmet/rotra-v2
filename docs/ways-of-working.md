@@ -172,7 +172,7 @@ gh pr merge --squash --auto --delete-branch
 
 ## 7. Verification
 
-With no test suite, "it builds" proves very little. Every PR has:
+With only a narrowly scoped unit suite, "it builds" proves very little. Every PR has:
 
 ```md
 ## Verified
@@ -201,7 +201,8 @@ With no test suite, "it builds" proves very little. Every PR has:
 |---|---|
 | Lint + type-check + build | Run locally before every PR; CI repeats them as an advisory report |
 | Money and ranking math (break-even, rank, awards) | Unit tests required |
-| Everything else | Deferred. Ask before adding tests or a test runner |
+| Phone parsing, standings/awards math, queue rules | Unit tests allowed with Vitest (F05.1) |
+| Everything else | Deferred. Ask before adding tests |
 
 ---
 

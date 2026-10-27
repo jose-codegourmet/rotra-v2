@@ -1,0 +1,40 @@
+{
+  "name": "@rotra/data",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./mock/store": "./src/mock/store.ts",
+    "./mock/latency": "./src/mock/latency.ts",
+    "./mock/errors": "./src/mock/errors.ts",
+    "./club": "./src/club/useClub.ts",
+    "./club/types": "./src/club/club.types.ts",
+    "./club/query-keys": "./src/club/queryKeys.ts",
+    "./club/fetchers": "./src/club/fetchers.ts",
+    "./player/types": "./src/player/player.types.ts",
+    "./club-player/types": "./src/club-player/clubPlayer.types.ts",
+    "./club-venue/types": "./src/club-venue/clubVenue.types.ts",
+    "./fixtures/clubs": "./src/fixtures/clubs.ts",
+    "./fixtures/venues": "./src/fixtures/venues.ts",
+    "./fixtures/players": "./src/fixtures/players.ts"
+  },
+  "scripts": {
+    "lint": "biome check .",
+    "type-check": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@rotra/schema": "workspace:*"
+  },
+  "peerDependencies": {
+    "@tanstack/react-query": "^5.0.0",
+    "react": "^19.2.0"
+  },
+  "devDependencies": {
+    "@rotra/config": "workspace:*",
+    "@types/react": "~19.2.14",
+    "react": "~19.2.9",
+    "typescript": "^5.9.3",
+    "vitest": "^5.0.5"
+  }
+}

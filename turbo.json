@@ -12,6 +12,10 @@
       "persistent": true
     },
     "lint": {},
-    "type-check": {}
+    "type-check": {},
+    "test": {
+      "dependsOn": ["^test"],
+      "outputs": []
+    }
   }
 }

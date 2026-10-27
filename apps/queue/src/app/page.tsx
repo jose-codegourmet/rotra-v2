@@ -1,5 +1,8 @@
+import { DEMO_CLUB_ID } from '@rotra/data/fixtures/clubs'
 import { cn } from '@rotra/ui/cn'
 import { ThemeToggle } from '@rotra/ui/theme-toggle'
+
+import { ClubPreview } from './_components/club-preview/ClubPreview'
 
 // Placeholder until the product screens land. The swatches check the theme tokens against the
 // prototype in both themes (use the toggle).
@@ -28,6 +31,7 @@ export default function HomePage() {
         <ThemeToggle />
       </div>
       <p className="text-fg2">Run the game: club sessions, courts and the shared queue.</p>
+      <ClubPreview clubId={DEMO_CLUB_ID} />
       <ul className="grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-3">
         {SWATCHES.map(([name, className]) => (
           <li

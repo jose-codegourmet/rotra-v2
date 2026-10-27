@@ -8,7 +8,7 @@ delivery through **Resend** (custom SMTP). Nothing in `apps/` imports these file
 
 **Which of the 13 slots exist for client vs admin — including every MISSING checkbox — lives
 only in [`docs/email-templates.md`](../docs/email-templates.md).** Do not duplicate that list
-here. Spec: [`openspec/specs/auth-email/spec.md`](../openspec/specs/auth-email/spec.md).
+here. That file's per-app sections still describe the removed apps; see its status note.
 
 | Kind | Path |
 |------|------|

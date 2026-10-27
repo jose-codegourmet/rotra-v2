@@ -48,4 +48,4 @@ The public page and the private operator console serve different purposes. Remov
 - [Proposed database design](../../database_design/product/README.md)
 - [Database design limits](../../database_design/product/open-decisions.md)
 
-Old combined Client/Umpire/EXP/MMR/payment screens are not included just because old code or docs mention them. No change to existing OpenSpecs is implied.
+Old combined Client/Umpire/EXP/MMR/payment screens are not included just because old code or docs once mentioned them.

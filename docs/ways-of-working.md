@@ -1,306 +1,223 @@
-# Ways of Working — ROTRA
+# Ways of working — ROTRA v1
 
-> How work gets proposed, built, verified, and merged in this repo — by humans and AI agents alike.
-> Root `AGENTS.md` tells an agent *what is true*. This file tells it *how to behave*.
+**Last verified:** 2026-10-27 · **Audience:** contributors and AI coding agents.
+[AGENTS.md](../AGENTS.md) says where to look. This file says how work is planned, built, checked, and merged.
 
-**Audience:** contributors and AI coding agents. **Read alongside:** root `AGENTS.md`.
+**Read this when** you pick up a ticket, write tickets, open a PR, review a change, or find two docs
+that disagree.
 
 ---
 
 ## 1. Core stance
 
-Three facts shape every process decision here:
-
-1. **There are almost no automated tests, by decision.** Broad unit testing is deliberately
-   deferred while behavior is still moving (§6.1). CI runs Biome lint and `pnpm type-check`. Every
-   safety net in this repo is a human eye, a type, or a manual check.
-2. **The schema and specs run ahead of the UI.** 36 OpenSpec domains, 36 Prisma models, and a large
-   surface of screens that render mock constants. "It exists in the repo" and "it works" are
-   different claims.
-3. **Documentation drifts.** Parts of `docs/techstack/` describe an architecture the repo moved
-   away from. Trusting docs blindly produces wrong code.
-
-Everything below exists to compensate for those three facts.
+1. **Docs first, then components, then screens.** Product, screen, and database docs are written
+   before code. Code follows them; it doesn't decide product behavior.
+2. **The prototypes are the design.** `docs/frames/*/*.html` are the agreed look and behavior. Build
+   to match them, not to improve them.
+3. **Mock first.** Screens run on `@rotra/data` mocks until the database epic. A finished-looking
+   screen still stores nothing; say so.
+4. **Almost no automated tests, by decision.** Lint and type-check are the only automatic gates.
+   Manual verification (§7) is what keeps quality up, so state honestly what you checked.
 
 ---
 
-## 2. The work loop
+## 2. Which source wins
 
-```
-explore → propose → review → apply → verify → sync/archive
-```
+When sources disagree:
 
-| Stage | Tool | Rule |
-|-------|------|------|
-| **Explore** | `opsx-explore` | Think and read only. **No file edits.** Output is understanding. |
-| **Propose** | `opsx-propose` | Produces `proposal.md`, delta specs, `design.md`, `tasks.md`. **Never implements in the same turn.** |
-| **Review** | human | A human reads the proposal before any code is written. This is the cheapest place to catch a wrong idea. |
-| **Apply** | `opsx-apply` | Implements the tasks in the change. Scope is the task list — nothing else. |
-| **Verify** | human + agent | See §6. Nothing merges unverified. |
-| **Sync / Archive** | `opsx-sync` / `opsx-archive` | Fold delta specs into `openspec/specs/`; archive the completed change. |
+| Question | Wins | Then |
+|---|---|---|
+| What does the product do? | [Business logic](business_logic/product/README.md) | Screen docs, then the prototype |
+| What does it look like, what does the copy say? | The prototype for that app | [Screen docs](screens/product/README.md) |
+| What's still undecided? | The `open-decisions.md` files | **Ask.** Never fill the gap yourself |
+| What is a word called? | [product-terms.md](product-terms.md) | |
+| How is it built and where does it go? | [architecture.md](architecture.md), [coding-conventions.md](coding-conventions.md) | Neighboring code once it exists |
+| What tables and fields? | [Database design](database_design/product/README.md) | |
+| What actually runs? | The code on `main` | Nothing else proves a feature is built |
 
-`opsx-update` revises planning artifacts and **never edits code**.
-
-**Why the split matters:** propose-then-apply is the only review gate this repo has before code
-lands. Collapsing them into one turn removes it.
+The latest explicit decision from the product owner (in a ticket or PR) beats every document. Record it
+in the matching doc in the same PR: the "Settled by the prototype" tables in `open-decisions.md` are the
+pattern.
 
 ---
 
-## 3. Sizing work
+## 3. How work is organised
 
-| Size | Shape | Process |
-|------|-------|---------|
-| **Trivial** | typo, copy, token swap, lint fix | Direct commit. No spec. |
-| **Small** | one component, one route handler, one hook — no behavior change | Direct PR. Note the affected spec if any. |
-| **Medium** | new screen, new API surface, mock→real promotion | Full OpenSpec change. Propose first. |
-| **Large** | new domain, schema migration, cross-app change | OpenSpec change + `design.md` + explicit human sign-off before apply. |
+```text
+Product (Queue · Player Information · Admin)
+└── Epic = one module           e.g. Queue › Sessions, Player › Ranking, Foundation › Mock data layer
+    └── Ticket = one PR-sized piece
+```
 
-**Migrations are always Large.** There are 15 migrations in this repo and no rollback tooling.
-Treat every schema change as irreversible in practice.
+**On GitHub** (`jose-codegourmet/rotra-v2`, a **public** repo):
+
+- An epic is an issue labeled `epic` plus its product label (`foundation`, `queue`, `player`, `admin`).
+- Tickets are the epic's **sub-issues**, so progress shows on the epic.
+- Draft new epics and tickets in a file first and get the product owner's approval before creating
+  them. Issues are public the moment they exist.
+
+### Epic order
+
+1. **Foundation:** agent docs, monorepo scaffold, design tokens + themes, Storybook, base components,
+   `@rotra/schema`, `@rotra/data` mock layer, Git hooks + CI.
+2. **Queue** modules (the main v1 product), then **Player Information**, then **Admin**.
+3. **Later:** Database (Prisma + Supabase), real Auth, offline sync engine, deployment.
+
+### Ticket order inside every epic
+
+Always in this sequence, because each step depends on the one before:
+
+| # | Ticket type | Done means |
+|---|---|---|
+| 1 | **Components + Storybook** | Every `@rotra/ui` component the module needs, with `.stories.tsx` in both themes and `.meta.ts` |
+| 2 | **Mock data** | Types, fixtures, mock store behavior, query keys, hooks for the module |
+| 3 | **Screens** | Routes and `_components` containers that wire hooks to components |
+| 4 | **States and dialogs** | Loading, empty, error, offline, and permission states plus `D-` dialogs, checked against [state-matrix.md](screens/product/state-matrix.md) and [dialogs.md](screens/product/dialogs.md) |
+
+### Ticket template
+
+```md
+**Epic:** #<n> · **Type:** component | mock-data | screen | states · **Product:** queue
+
+## Context
+- Rule: docs/business_logic/product/queue/modules/<module>/README.md#<section>
+- Screen: <Q-/P-/A- ID> in docs/screens/product/modules/<product>/<file>.md
+- Prototype: docs/frames/<app>/<file>.html › <screen / tab>
+
+## Scope
+- …
+
+## Out of scope
+- …
+
+## Acceptance criteria
+- [ ] Matches the prototype in dark and light at 375 px and 1280 px
+- [ ] …
+
+## Verification
+How a reviewer checks it (story names, route, steps).
+
+**Depends on:** #<n>
+```
+
+Title format: `[<product>/<module>] <Type>: <what>`, e.g. `[queue/sessions] Component: CourtCard`.
 
 ---
 
-## 4. Branching and commits
+## 4. Definition of Ready
 
-- Branch from `main`. Name it `<type>/<short-kebab-description>` using Conventional Commit types:
-  `feat/session-cost-settlement`, `fix/onboarding-redirect`, `chore/biome-config`.
-- **Conventional Commits are enforced** by commitlint on `commit-msg`. `feat:`, `fix:`, `chore:`,
-  `docs:`, `refactor:`, `style:`, `perf:`, `build:`, `ci:`, `revert:`.
-- Scope with the package when it helps: `feat(client): add session console roster panel`.
-- Keep commits reviewable. A 40-file "implement queue" commit cannot be reviewed and will not be.
-- Hooks you will hit: `pre-commit` runs `pnpm lint`; `pre-push` runs `pnpm lint && pnpm build`.
-  A slow push is the build hook doing its job — do not bypass with `--no-verify`.
-
-**AI-authored commits** get a trailer so the history stays honest:
-
-```
-feat(admin): persist kill switch toggles
-
-Co-Authored-By: <agent name/model>
-```
+- [ ] The ticket links the business rule, the screen ID, and the prototype screen
+- [ ] Nothing it needs is listed as open in an `open-decisions.md` (or the decision is in the ticket)
+- [ ] The tickets it depends on are merged
+- [ ] Terms in the ticket match [product-terms.md](product-terms.md)
 
 ---
 
-## 5. Definition of Ready / Definition of Done
+## 5. Branches, commits, PRs
 
-### Ready to start
-
-- [ ] The matching `openspec/specs/<domain>/spec.md` has been read
-- [ ] Current implementation status is known — real, mock, or absent
-- [ ] Domain terms in the task use canonical spelling
-- [ ] The write path is decided (route handler + service, not a Server Action)
-- [ ] For a mock→real promotion: the target behavior is described in a spec, not invented
-
-### Done
-
-- [ ] `pnpm lint` passes
-- [ ] `pnpm type-check` passes — CI runs this on PRs after `pnpm db:generate`
-- [ ] `pnpm build` passes for every app touched
-- [ ] Stories exist for new/changed components, fixtures pulled from `app/constants/`
-- [ ] Forms: `Form` + `Controller`, colocated `schema.ts` + `default.ts`, disabled-while-pending,
-      toast on success **and** failure
-- [ ] No leftover `MOCK_*` on the shipping path; no leftover `console.log`
-- [ ] No barrel file, no hardcoded hex, no light-mode styles, no new Server Action
-- [ ] OpenSpec updated (or a change proposed) if behavior moved
-- [ ] PR body lists **what was manually verified**, step by step
+- Branch from `main`: `<type>/<issue#>-<short-kebab>`, e.g. `feat/42-court-card`.
+- **Conventional Commits:** `feat:`, `fix:`, `docs:`, `chore:`, `refactor:`, `style:`, `perf:`,
+  `build:`, `ci:`, `revert:`. Scope with the package when it helps: `feat(ui): add CourtCard`.
+- One ticket per PR. The PR body says `Closes #<n>` and includes the verification block (§7).
+- AI-authored commits end with a `Co-Authored-By:` trailer naming the agent.
+- Hooks (to be set up again by Foundation): `pre-commit` runs lint, `pre-push` runs lint + build. Do not
+  bypass them with `--no-verify`.
 
 ---
 
-## 6. Verification and testing posture
+## 6. Definition of Done
 
-This is the most important section in this document. With no test suite, "it compiles" is the
-weakest possible evidence — and it is the only evidence CI provides.
+- [ ] `nvm use && pnpm lint` and `nvm use && pnpm type-check` pass
+- [ ] `nvm use && pnpm build` passes for every app or package touched
+- [ ] Components: folder layout, `.meta.ts`, and stories in both themes ([coding conventions §3–5](coding-conventions.md#3-components))
+- [ ] Forms: five files, shared fields from `@rotra/schema`, no mutation inside the form
+- [ ] Matches the prototype side by side, dark and light, at 375 px and 1280 px
+- [ ] No hex colors, barrels, Server Actions, `middleware.ts`, Realtime channels, or new dependencies
+      without a decision
+- [ ] Docs updated in the same PR if the change makes any doc untrue (§9)
+- [ ] The PR's verification block says what was checked and what was not
 
-### 6.1 What we test, and what we deliberately don't
+---
 
-Testing is scoped by **cost per bug caught**, not by coverage percentage. Two separate concerns:
-OpenSpec constrains *what gets generated*; verification constrains *what gets accepted*. Specs do
-not substitute for verification — nothing executes a spec, which is exactly how `docs/techstack/`
-came to describe an architecture the repo abandoned.
+## 7. Verification
 
-| Layer | Policy | Rationale |
-|-------|--------|-----------|
-| **`pnpm type-check` in CI** | **Required** | The types are already written. Not enforcing them is free signal thrown away. Highest ROI item in this table. |
-| **Pure domain math** — cost formula, MMR deltas, calibration multiplier, EXP asymmetry, void reversals | **Required** | Pure functions, exact documented formulas, irreversible when wrong. A corrupted ladder is invisible for weeks. ~10–20 tests total. |
-| **Route handler smoke checks** | **At mock→real promotion only** | ~10 lines: does it return the expected shape and persist. Not retroactive. |
-| **Component unit tests** | **Deferred** | Most components render `MOCK_*` fixtures. Testing a fixture tests nothing. |
-| **E2E / integration** | **Deferred** | Flows are still changing shape. Revisit when the `MOCK_` count trends to zero. |
-
-The reason to defer is **maintenance against churning behavior**, not authoring effort — agents
-write tests cheaply now. Do not test behavior that is still under active product debate (e.g. the
-Quick Session create conflict in `AGENTS.md` §7). Settle the spec first.
-
-**Trigger to revisit:** when `scripts/refresh-context.sh` reports the `MOCK_` file count near zero,
-behavior has stopped moving and broader tests start holding their value.
-
-**Agents:** do not add test files or a test runner outside the Required rows above without asking.
-An unsolicited vitest setup is scope creep.
-
-CI job in `.github/workflows/biome.yml` (alongside the Biome lint matrix):
-
-```yaml
-# .github/workflows/biome.yml — type-check job alongside the lint matrix
-type-check:
-  runs-on: ubuntu-latest
-  steps:
-    - uses: actions/checkout@v4
-    - uses: pnpm/action-setup@v4
-    - uses: actions/setup-node@v4
-      with: { node-version-file: '.nvmrc', cache: 'pnpm' }
-    - run: pnpm install --frozen-lockfile
-    - run: pnpm db:generate
-    - run: pnpm type-check
-```
-
-### 6.2 The verification block
-
-Because coverage is intentionally thin, **every PR must include a verification block:**
+With no test suite, "it builds" proves very little. Every PR has:
 
 ```md
 ## Verified
-- Ran `pnpm --filter @rotra/client dev`, logged in via Facebook OAuth
-- Created a Club Que Session (type: MMR) from /dashboard → appeared in /find-sessions
-- Confirmed POST /api/sessions/quick returned 201 and the row exists (pnpm db:studio)
-- Reloaded the page — state persisted (not local component state)
-- Checked mobile viewport at 390px — no overflow
+- Storybook: Queue/CourtCard, all variants, dark + light, 375 px + 1280 px
+- Compared with rotra-queue.html › Live console › Courts: spacing, chips, copy match
+- Keyboard: Tab reaches Start; Escape closes the sheet; focus returns to the trigger
+- Reduced motion: pulse stops
 
 ## Not verified
-- Cost settlement path (no session with payments in local data)
+- Offline state (dev toggle not built yet)
 ```
 
-**Minimum bar by change type:**
+| Change | Minimum check |
+|---|---|
+| Component | Every story, both themes, both widths, keyboard, reduced motion, side by side with the prototype |
+| Form | Valid and invalid submit, pending disables submit, error keeps input, optional fields stay optional |
+| Mock data | Hook returns fixture data; mutation updates every screen that shows it |
+| Screen | Run the app, walk the prototype flow end to end, check loading/empty/error states |
+| Touch UI | Target sizes from the experience contract at ≤ 1024 px |
 
-| Change | Minimum verification |
-|--------|----------------------|
-| UI-only | Render in dev, check dark tokens, check 390px + 1280px, check 44×44px touch targets |
-| Route handler | Call it (curl or the UI), confirm the DB row via `pnpm db:studio` |
-| `@rotra/db` service | Exercise through the route, confirm returned DTO shape |
-| Schema/migration | `db:migrate` locally, `db:generate`, `pnpm build`, confirm no drift on `db:push` |
-| Auth/middleware | Test logged-out, logged-in, and wrong-role paths — all three |
-| Mock→real promotion | Reload the page and confirm state survives. This is the whole point. |
+**"Not verified" is a legitimate entry.** Never write "tested and working" when you only ran a build.
 
-**"Not verified" is a legitimate entry.** Stating a gap honestly is far more useful than an
-implied guarantee. Agents especially: never write "tested and working" when you ran a build.
+### Tests
 
----
-
-## 7. Mock → real promotion checklist
-
-The repo's biggest category of work. Follow this order every time:
-
-1. **Read the spec.** `openspec/specs/<domain>/spec.md`. If it does not describe the behavior,
-   stop and propose a change first.
-2. **Inventory the mock.** Find every `MOCK_*` constant and every local toast the screen relies on.
-3. **Confirm the schema supports it.** Most domains already have models. Check before adding one —
-   the schema is ahead of the UI, not behind it.
-4. **Write the service** in `packages/db/src/<feature>-service.ts`. Domain logic lives here.
-5. **Write the route handler** in `app/api/<feature>/route.ts`. Auth check first, then the service.
-6. **Write the fetch helper + query key** in `lib/api/`.
-7. **Swap the component** from the mock constant to the hook. Handle loading, empty, and error —
-   mock screens never have these three states and they are always missed.
-8. **Move the mock into `app/constants/`** as a Storybook fixture. Do not delete it — stories need
-   it. Do not leave it imported by the runtime component.
-9. **Verify persistence by reloading the page.** If state survives a refresh, it is real.
-10. **Update `.agents/context/implementation-status.md`** — move the row from mock to real.
-11. **Sync the OpenSpec** so it now describes shipped behavior.
-
-Step 10 is skipped constantly and it is what keeps the context files trustworthy.
+| Layer | Policy |
+|---|---|
+| Lint + type-check | Required (CI, once Foundation sets it up) |
+| Money and ranking math (break-even, rank, awards) | Unit tests required |
+| Everything else | Deferred. Ask before adding tests or a test runner |
 
 ---
 
-## 8. Handling drift
+## 8. Reviewing a change (AI-authored especially)
 
-When code and docs disagree:
+Check in this order:
 
-1. Check `.agents/context/known-drift.md` — the contradiction may already be catalogued. The
-   **Reality** column wins, always.
-2. If it is new drift, **do not silently follow either side.** Add a row to the drift file in the
-   same PR.
-3. If the drift is a doc that is simply wrong and cheap to fix, fix the doc in the same PR.
-4. If the drift represents a genuine product question ("should Quick Session create be allowed for
-   players?"), that is a **spec change**, not a code fix. Propose it.
-
-**Never** resolve drift by changing working code to match a stale document.
-
----
-
-## 9. Reviewing AI-authored changes
-
-AI changes fail differently from human changes. Review in this order:
-
-1. **Invented surface** — does it call an API, field, or component that does not exist? This is the
-   single most common failure. Grep every new import and endpoint.
-2. **Vocabulary** — "Queue Master", "leave a review", "Unscored", lowercase "rotra". Instant reject.
-3. **Pattern drift** — a Server Action, a barrel file, a hardcoded `#00FF88`, an async thunk, a
-   `register`-style form. These mean the agent followed stale docs instead of neighboring code.
-4. **Fabricated confidence** — a PR claiming behavior works when only a build was run. Check the
-   verification block against what was plausibly executed.
-5. **Scope creep** — files touched that no task in the change asked for.
-6. **Then** review the logic normally.
-
-Reviewers: it is faster to reject with "read `.agents/context/forms.md` and redo" than to fix an
-agent's pattern violations by hand.
+1. **Invented surface:** a component, route, field, hook, or term that isn't in the docs.
+2. **Design drift:** doesn't match the prototype; hardcoded colors; light theme broken.
+3. **Vocabulary:** "Que", "void", "MMR", lowercase "rotra" in UI, any [not-v1 word](product-terms.md#14-words-that-mean-not-v1--stop-and-ask).
+4. **Pattern drift:** barrel file, Server Action, `middleware.ts`, Redux holding query data, a form
+   that mutates, a container with its own visual markup.
+5. **Overclaiming:** the verification block claims more than could have been run.
+6. **Scope creep:** files no ticket asked for.
+7. Then the logic.
 
 ---
 
-## 10. Documentation hygiene
+## 9. Keeping docs true
 
-| File | Update when | Owner |
-|------|-------------|-------|
-| Root `AGENTS.md` | Non-negotiables, architecture, or routing changes | Whoever changes it |
-| `.agents/context/implementation-status.md` | **Every mock→real promotion or new real surface** | The implementing PR |
-| `.agents/context/known-drift.md` | Any new doc-vs-code contradiction found | The PR that found it |
-| `openspec/specs/<domain>/` | Behavior ships or changes | `opsx-sync` at end of change |
-| `docs/business_logic/` | Product intent changes — **not** implementation | Product owner |
-| `docs/REPO_SUMMARY.md` | Quarterly, or after a structural change | Scheduled re-audit |
+**If a PR makes a document untrue, the same PR fixes the document.** Follow-up doc PRs don't happen.
 
-**Rule of thumb:** if a PR changes what is true about the system, the PR updates the file that
-claims it. Docs updated in a separate follow-up PR do not happen.
+| File | Update when |
+|---|---|
+| `AGENTS.md` | Non-negotiables, routing, or structure change |
+| `docs/architecture.md` | An app, package, dependency rule, or data flow changes |
+| `docs/coding-conventions.md` | A convention is added or changed (including a new dependency) |
+| `docs/product-terms.md` | A term, state name, or code identifier is added or renamed |
+| `docs/business_logic/`, `docs/screens/`, `docs/database_design/` | The product owner decides a behavior. Move it from open to settled |
+| `docs/frames/*` | The product owner saves a new prototype version |
+| `<Name>.meta.ts` | A component's purpose or variants change |
 
-Stamp `Last verified: YYYY-MM-DD` at the top of every context file and update it when you confirm
-its contents — even if nothing changed. A stale-but-verified file is trustworthy; an undated one
-is not.
+Stamp `Last verified: YYYY-MM-DD` at the top of a doc when you confirm it, even if nothing changed.
 
 ---
 
-## 11. Cadence
+## 10. Stop and ask
 
-| Rhythm | Activity |
-|--------|----------|
-| **Every PR** | Lint, type-check, build, manual verification block, status file updated |
-| **Weekly** | Skim open OpenSpec changes; archive anything finished and merged |
-| **Monthly** | Re-verify `implementation-status.md` and `known-drift.md` against the tree |
-| **Quarterly** | Regenerate `docs/REPO_SUMMARY.md` counts; prune dead weight (`.next/` at root, `storybook-static/`, orphaned design notes) |
+Ask the product owner instead of guessing when the work touches:
 
----
+- **Anything open** in an `open-decisions.md`
+- **Money:** cost estimate, break-even, license prices
+- **Ranking math:** rank formula, awards, eligibility windows
+- **Permanent results:** anything that could edit a confirmed winner or invalid decision
+- **Auth, privacy, or contacts:** who can see a phone or email
+- **Irreversible data:** migrations, deletion, retention
+- **A new dependency, package, app, Server Action, or Realtime channel**
+- **Anything not in the docs**
 
-## 12. Anti-patterns
-
-Seen in this repo or likely given its shape. Each one has cost someone an afternoon.
-
-- **Trusting a polished screen.** `/sessions/queue` looks production-ready and stores nothing.
-- **Following `docs/techstack/` verbatim.** It describes `components/shadcn/`, Server Actions, and
-  `next-pwa`. None of those exist here.
-- **Adding a Server Action** because a doc said so. One exists, deliberately.
-- **Adding a Realtime channel** for queue updates. Queue updates are refetches, by design.
-- **Reaching for Redux** for a dropdown's open state.
-- **Inline fixtures in stories** instead of `app/constants/`.
-- **Writing business logic client-side.** Cost math, MMR deltas, and EXP live on the server.
-- **`--no-verify`** to skip a slow pre-push build. The build hook is one of two real gates.
-- **Reading `docs/REPO_SUMMARY.md` in full for a one-line fix.** Start at `AGENTS.md` instead. That is ~14k tokens for a typo.
-- **Claiming a `docs/business_logic` rule ships** because it is written down convincingly.
-
----
-
-## 13. Escalate, don't improvise
-
-Stop and ask a human when the change touches:
-
-- **Money** — cost formula, markup, settlement, payment status transitions
-- **Ranking math** — MMR deltas, calibration multipliers, EXP asymmetry, void reversals
-- **Auth or roles** — middleware, role grants, admin privilege, Quick Umpire tokens
-- **Irreversible data** — migrations, deletions, retention
-- **Anything with no spec** — absence of a spec is a signal to propose one, not to invent
-
-The cost of asking is one message. The cost of improvising ranking math is a corrupted ladder that
-nobody notices for a month.
+Asking costs one message. A wrong guess in money or ranking math stays hidden until a club notices.

@@ -1,289 +1,139 @@
 # AGENTS.md — ROTRA
 
-> **Entry point for AI coding agents.** Read this file completely. It is deliberately small.
-> Everything deeper is loaded **on demand** via the routing table in §2 — do not read the whole
-> `docs/` tree or `docs/REPO_SUMMARY.md` "just in case."
+> **Entry point for AI coding agents.** Read this file completely; it is deliberately short. Everything
+> else is loaded **on demand** through the routing table in §3. Don't read the whole `docs/` tree.
 
-**Last verified against the tree:** 2026-08-30 · **v1 doc pointers:** 2026-10-27 · **Budget:** under 290 lines.
+**Last verified:** 2026-10-27 · **Budget:** under 200 lines.
 
 ---
 
 ## 0. Non-negotiables
 
-Violating any of these produces a diff that will be rejected. They cost you nothing to obey.
-
-1. **Never invent** APIs, screens, routes, DB columns, or domain terms. If it is not in this file,
-   an OpenSpec, or existing code — stop and ask.
-2. **Never claim a documented rule is shipped.** The v1 docs (`docs/business_logic/product/`,
-   `docs/screens/product/`, `docs/database_design/product/`) are **target** behavior; none is built.
-   Only `openspec/specs/` + code prove implementation.
-3. **Polished UI ≠ wired backend.** Grep for `MOCK_` before assuming a screen persists anything.
-4. **Spelling is load-bearing:** existing code and UI copy use `Que Master` / `Que Session` /
-   `Que Schedule`, `Quick Umpire`, `Rate and Review`; do not rename code without a spec. The v1
-   target docs deliberately use **Queue / Queue Master / Queue Session**. **ROTRA** all-caps in UI copy.
-5. **Writes go through route handlers**, not Server Actions. Exactly one `'use server'` file exists
-   (`apps/client/src/lib/auth/login-actions.ts` — Facebook OAuth only) unless a spec says otherwise.
-6. **No new barrel files in app code.** Do not add `index.ts` re-exports under `apps/`. Package
-   entrypoints are the exception: `packages/db/src/index.ts` and `packages/legal-content/src/index.ts`
-   are sanctioned. Existing app barrels are debt — see `docs/tech-debt.md` — not precedent.
-7. **No hardcoded hex in components.** Tailwind / CSS-variable tokens only. **Both themes ship**
-   (dark default, light toggleable on client). Hex literals freeze dark values and break light mode.
-   **Exception: email templates** (§5) — inline hex and table layout are required there.
-8. **Next.js 15 dynamic routes:** `params` and `searchParams` are `Promise<...>` and must be
-   `await`ed. Sync pages without dynamic props are fine and common.
-9. **Mapbox is client-only** — `next/dynamic({ ssr: false })` or `"use client"`. No Google Maps.
-10. **No new realtime channels.** Supabase Realtime is **not built** (zero subscriptions in apps).
-    Two cases are specified but unimplemented. Do not invent channels; use React Query refetch.
-11. **No async thunks in Redux slices.** Async is React Query's job. Redux holds auth + UI chrome only.
-12. **Test coverage is near-zero and that is deliberate.** Nothing catches your regression. Verify
-    manually and state exactly what you verified. Do not add a test runner or component tests
-    unprompted — see `docs/ways-of-working.md` §6.1.
-13. **Always `nvm use` before Node tooling.** Prefix every `pnpm` / `make` / `node` / `npx`
-    command with `nvm use &&` so the shell matches `.nvmrc` (Node 24). If `nvm` is not a
-    function in this shell, `source ~/.nvm/nvm.sh` first. Never assume a leftover Node.
+1. **Never invent** a screen, route, field, API, component, or domain term. If it isn't in the docs
+   or existing code, stop and ask.
+2. **Nothing is built yet.** `apps/` is empty and the docs describe the *target*. Never say a feature
+   works unless you ran it.
+3. **Match the prototypes.** `docs/frames/*/*.html` are the agreed design. Build to them; don't redesign.
+4. **Words from [product-terms.md](docs/product-terms.md) only.** Queue (never "Que"), Queue Session,
+   Queue Master, Match done ≠ Session done, invalid (never "void"). **ROTRA** in all caps in UI copy.
+5. **Every epic starts with components + Storybook**, then mock data, then screens, then states.
+6. **Component folder:** `my-thing/MyThing.tsx` + `MyThing.stories.tsx` + `MyThing.meta.ts`. Forms
+   add `MyForm.defaultValues.ts` + `MyForm.schema.ts`. Field rules that two forms share live in `@rotra/schema`.
+7. **All visual components live in `@rotra/ui`.** A route's `_components/` only wires data to them.
+8. **No barrel files** (`index.ts` re-exports) anywhere. Packages expose `exports` subpaths.
+9. **No hardcoded colors.** Tokens only. Both themes ship; dark is the default.
+10. **Next.js 16:** `await` params / searchParams / cookies / headers; `proxy.ts`, never `middleware.ts`.
+11. **No Server Actions, no Realtime channels, no new dependencies** without a decision.
+12. **Prisma schema is split** into entity-group files by product. Never one big `schema.prisma`.
+13. **Always `nvm use &&` before** `pnpm`, `node`, `npx`, or `make`. If `nvm` isn't a shell function,
+    `source ~/.nvm/nvm.sh` first.
+14. **Ask before guessing** anything listed in an `open-decisions.md`, and anything about money,
+    ranking math, permanent results, auth, contacts, or migrations.
 
 ---
 
 ## 1. What ROTRA is
 
-A **badminton session operating system** for club nights: queue-based match management, player
-identity + peer skill ratings + MMR, transparent court/shuttle cost splitting, club operations,
-and gamified EXP/tiers. Utility infrastructure, **not** a social network. Tagline: *Run the game.*
+A **badminton session operating system** for club nights. *Run the game.* Utility software, not a
+social network. Three v1 products:
 
-Four Next.js apps in a pnpm/Turborepo monorepo:
+| Product | App | Who | Prototype |
+|---|---|---|---|
+| **Queue** (main v1 focus) | `apps/queue` | The club account, run by the Queue Master | [rotra-queue.html](docs/frames/queue-app/rotra-queue.html) |
+| **Player Information** | `apps/player` | Public visitors + registered players | [rotra-player.html](docs/frames/player-app/rotra-player.html) |
+| **Admin** | `apps/admin` | The platform owner | [rotra-admin.html](docs/frames/admin-app/rotra-admin.html) |
 
-| App | Package | Port | Purpose | Maturity |
-|-----|---------|------|---------|----------|
-| Landing | `@rotra/landing` | 3003 | Coming-soon + waitlist + legal | Real, small |
-| Client | `@rotra/client` | 3000 | Players / Club Owners / Que Masters | **Real core + large mock surface** |
-| Admin | `@rotra/admin` | 3001 | Internal ops | **Real core + mock dashboards** |
-| Umpire | `@rotra/umpire` | 3002 | Live scoring PWA | **Stub. One page. Nothing built.** |
+World (nearby-club discovery) is v2. Build nothing for it. Old features (MMR, EXP, peer reviews,
+Umpire, tournaments, Facebook login) are **not** v1. See [product terms §14](docs/product-terms.md#14-words-that-mean-not-v1--stop-and-ask).
 
-Shared: `@rotra/db` (Prisma + domain services), `@rotra/config` (tsconfig + Tailwind tokens),
-`@rotra/legal-content`.
-
-**v1 product reset (Oct 25–26, 2026, docs only — code not yet changed):** target products are
-Queue (club-operated sessions, offline-capable), Player Information, and Admin; World is v2. Peer
-ratings, MMR, EXP, Umpire, and cost splitting are **not** v1 defaults; an optional session cost
-estimate + club inventory is. Design references in `docs/frames/`: `queue-app/rotra-queue.html` (Queue),
-`player-app/rotra-player.html` (Player Information), `admin-app/rotra-admin.html` (Admin).
+**Current phase:** building the apps on **mock data** (TanStack Query hooks over an in-memory mock store).
+Supabase + Prisma come later and replace only the fetchers.
 
 ---
 
-## 2. Context routing — read only what your task needs
+## 2. Repo map
 
-Find your task, load those files, ignore the rest. Each row is roughly self-sufficient.
-
-| If your task is… | Load, in order |
-|------------------|----------------|
-| **Any task** | This file (you are here) |
-| Add/modify a **page or route** | `.agents/context/architecture.md` → the neighboring `page.tsx` |
-| Add/modify an **API route** | `.agents/context/architecture.md` + `.agents/context/data-layer.md` |
-| Touch **state / hooks / Redux** | `.agents/context/state.md` |
-| Touch **Prisma / schema / services** | `.agents/context/data-layer.md` + `packages/db/AGENTS.md` |
-| Build a **component** | `.agents/context/components.md` + `.agents/context/design-tokens.md` |
-| Build or fix a **form** | `.agents/context/forms.md` (then run `/rotra-is-my-form-valid`) |
-| Change **product behavior** | `openspec/specs/<domain>/spec.md` first (+ `.agents/context/spec-index.md`) |
-| Understand the **v1 target** product | `docs/business_logic/product/README.md` → that product's `modules/<module>/README.md` |
-| Build a **v1 Queue screen** | `docs/screens/product/modules/queue/<module>.md` + the prototype `docs/frames/queue-app/rotra-queue.html` |
-| Build a **v1 Player Information screen** | `docs/screens/product/modules/player-information/<module>.md` + the prototype `docs/frames/player-app/rotra-player.html` |
-| Build a **v1 Admin screen** | `docs/screens/product/modules/admin/<module>.md` + the prototype `docs/frames/admin-app/rotra-admin.html` |
-| Design **v1 tables / migrations** | `docs/database_design/product/README.md` + `packages/db/AGENTS.md` |
-| Anything using domain vocabulary | `.agents/context/glossary.md`; v1 terms: `docs/business_logic/product/glossary.md` |
-| "Is X actually built?" | `.agents/context/implementation-status.md` |
-| "Docs contradict the code" | `.agents/context/known-drift.md` — **Reality** wins |
-| Commands / ports / CI / env | `.agents/context/commands.md` |
-| Wire **mock → real** | `docs/ways-of-working.md` Mock→Real checklist |
-| Working inside one app | `apps/<app>/AGENTS.md` |
-| Add/modify an **auth email template** | `docs/email-templates.md` (coverage matrix) + §5 "Auth email" |
-| Human onboarding / deep audit | `docs/REPO_SUMMARY.md` (large — not for typo fixes) |
-
-**Rule:** if a loaded file did not change what you wrote, you did not need it — prefer grepping code.
-
----
-
-## 3. Authority order
-
-When sources disagree:
-
-1. **The code that is wired** — what actually runs
-2. **`openspec/specs/<domain>/spec.md`** — current *implemented* behavior (SHALL/MUST + scenarios)
-3. **`.agents/context/known-drift.md`** — the known list of docs that lie
-4. **This file** — orientation
-5. **`docs/business_logic/product/`** (+ `docs/screens/product/`, `docs/database_design/product/`) —
-   v1 product *intent*; unbuilt. Their `open-decisions.md` files list what is still undecided
-6. **`docs/techstack/`** — conventions, but several sections are stale (see drift file)
-
-`docs/REPO_SUMMARY.md` is a *narrative* view. When it conflicts with an OpenSpec, the spec wins.
-
----
-
-## 4. Vocabulary agents get wrong
-
-Full glossary: `.agents/context/glossary.md`. These four confusions cause the most bad code:
-
-- **Skill Rating ≠ MMR ≠ Tier ≠ Playing level.** Four separate concepts. Skill Rating is peer-
-  computed 1.0–5.0 across six dimensions on all session types. MMR is the competitive ladder
-  (starts 1000, floor 0) and moves **only** in a Club Que Session of type `MMR`. Tier is a
-  cosmetic EXP badge. Playing level is self-declared and cosmetic.
-- **`Fun Games` ≠ `Friendly`.** `Fun Games` is a *club* session type with no EXP/MMR. `Friendly`
-  is an informal clubless session.
-- **Admission state ≠ Player status.** Admission = do you have a seat (Accepted/Waitlisted).
-  Status = what you are doing now (`Not Arrived` → `I Am In` → `I Am Prepared` → Playing/Waiting).
-- **Match Queue ≠ session waitlist ≠ Automatic Queueing.** Ordered matches inside a session vs
-  overflow FIFO for seats vs the matchmaking candidate engine. Three mechanisms.
-
-Also: **Voided** matches reverse EXP/MMR — never call them "Unscored."
-
----
-
-## 5. Architecture in one screen
-
-**Rendering:** client + admin are **SSR-first** at the page layer (server `page.tsx` → client
-islands). Landing is sync Server Components. Umpire is a stub.**The canonical write path — match this:**
-
-```
-Client Component
-  → TanStack Query useMutation
-  → hooks/<useFeature>/server.ts   (typed fetch; queryKey.ts colocated)
-  → app/api/<feature>/route.ts     ← the HTTP boundary
-  → packages/db/src/<feature>-service.ts  (when a service exists)
-  → Prisma → Supabase Postgres
+```text
+apps/                     queue · player · admin (Next.js 16), empty until the Foundation scaffold
+packages/
+  ui/                     every visual component and form + the one Storybook
+  data/                   types, fixtures, mock store, fetchers, query keys, hooks
+  schema/                 shared Zod fields (email, phone, date, money, password)
+  config/                 tsconfig + Tailwind 4 tokens (current file is old; replaced by Foundation)
+  db/                     Prisma + services (database epic, later)
+docs/
+  architecture.md         apps, packages, dependency rules, data flow, offline, auth, database
+  coding-conventions.md   how to write components, forms, pages, hooks, styles, Prisma
+  ways-of-working.md      epics/tickets, PRs, Definition of Done, verification, reviews
+  product-terms.md        every domain word, its meaning, and its code name
+  business_logic/product/ WHAT the product does: rules per product › module (+ flow/ journeys)
+  screens/product/        WHAT each screen shows: layouts, controls, states, dialogs, by screen ID
+  database_design/product/ proposed tables and fields per module
+  frames/                 the three clickable prototypes (+ README per app)
+  branding/               brand identity, logo, characters (visuals: the prototypes win)
+  email-templates.md      Supabase auth email coverage
+email-templates/          auth email HTML, pasted into the Supabase dashboard by hand
 ```
 
-Note: `apps/client/src/lib/api/` is **server-side** Prisma helpers used by routes/SSR — not the
-client fetch layer. Admin has no `lib/api/`. Many routes still call `db.*` inline (debt).
+---
 
-**State split:**
+## 3. Context routing: read only what your task needs
 
-| TanStack Query | Redux Toolkit (auth + UI only) |
-|----------------|--------------------------------|
-| Profiles, sessions live/roster/console, clubs, admin tables | `authSlice` (Supabase user) |
-| All mutations + `invalidateQueries` | `uiSlice` (drawer, dashboard view mode) |
+| If your task is… | Read, in order |
+|---|---|
+| **Anything** | This file |
+| Anything using a domain word, or naming a type/route/component | [product-terms.md](docs/product-terms.md) |
+| Picking up or writing a **ticket / epic / PR** | [ways-of-working.md](docs/ways-of-working.md) §3–7 |
+| Building a **component** in `@rotra/ui` | [coding-conventions.md](docs/coding-conventions.md) §2–5, §8 → the prototype screen named in the ticket |
+| Building a **form** | [coding-conventions.md](docs/coding-conventions.md) §6–7 → the screen doc's field rules |
+| Adding a **page / route / container** | [architecture.md](docs/architecture.md) §4 → [coding-conventions.md](docs/coding-conventions.md) §9 → [navigation.md](docs/screens/product/navigation.md) |
+| **Mock data, hooks, Redux** | [architecture.md](docs/architecture.md) §5, §7 → [coding-conventions.md](docs/coding-conventions.md) §10 |
+| Adding a **package, app, or dependency** | [architecture.md](docs/architecture.md) §2–3 → ask first |
+| **A Queue screen** | [screens/…/queue/\<module\>.md](docs/screens/product/modules/queue/README.md) → [rotra-queue.html](docs/frames/queue-app/rotra-queue.html) → its business module |
+| **A Player Information screen** | [screens/…/player-information/\<module\>.md](docs/screens/product/modules/player-information/README.md) → [rotra-player.html](docs/frames/player-app/rotra-player.html) |
+| **An Admin screen** | [screens/…/admin/\<module\>.md](docs/screens/product/modules/admin/README.md) → [rotra-admin.html](docs/frames/admin-app/rotra-admin.html) |
+| Shared screen rules (sheets, toasts, touch sizes, a11y, sync labels) | [experience-contract.md](docs/screens/product/experience-contract.md) |
+| Loading / empty / error / offline / permission states | [state-matrix.md](docs/screens/product/state-matrix.md) |
+| A confirmation dialog (`D-…`) | [dialogs.md](docs/screens/product/dialogs.md) |
+| **Product behavior** (what a rule is) | [business_logic/product/README.md](docs/business_logic/product/README.md) → that product's `modules/<module>/README.md` |
+| Is something still undecided? | [business open decisions](docs/business_logic/product/open-decisions.md) · [screen open decisions](docs/screens/product/open-decisions.md) · [database open decisions](docs/database_design/product/open-decisions.md) |
+| **Domain math** (cost, minimum games, queue generation, rank, awards) | The business module → [coding-conventions.md](docs/coding-conventions.md) §14 → ask |
+| **Prisma / tables** (database epic) | [database_design/product/README.md](docs/database_design/product/README.md) → [conventions](docs/database_design/product/conventions.md) → [coding-conventions.md](docs/coding-conventions.md) §13 |
+| **Offline** (Queue) | [architecture.md](docs/architecture.md) §9 → [offline module](docs/business_logic/product/queue/modules/offline/README.md) |
+| An **auth email template** | [email-templates.md](docs/email-templates.md) |
+| **Two docs disagree** | [ways-of-working.md](docs/ways-of-working.md) §2 |
 
-Local UI chrome → React local state. Never reach for Redux for something a `useState` covers.
-
-**Realtime:** not implemented. Specs describe two future cases; do not code them without a change.
-
-**Auth:** Client = Facebook OAuth (+ tester/admin gate paths) via Supabase + middleware, no MFA.
-Admin = email + password primary; OTP exists for invite/recovery, not the main login card.
-Umpire = one-time token (**docs only**). Landing = public.
-
-**Auth email:** templates are **copy-paste artifacts, not build inputs**. Authored as standalone
-HTML in `apps/<app>/src/email-templates/` (app-specific) or root `email-templates/` (shared across
-apps), then pasted into **Supabase Dashboard → Authentication → Emails → Templates**. Supabase
-renders the Go-template vars (`{{ .Token }}`, `{{ .ConfirmationURL }}`, `{{ .TokenHash }}`,
-`{{ .RedirectTo }}`, `{{ .Email }}`) and relays delivery through **Resend** (custom SMTP). No app
-code imports these files. Inline CSS + table layout only — no Tailwind, no design tokens, no JSX.
-Supabase exposes **13 slots** (6 authentication + 7 security notification). One project means
-**one deployed body per slot**, so per-app files are audience branches composed at paste time.
-Current coverage is **3 of 26** — the checklist in `docs/email-templates.md` is authoritative.
+**Rule:** if a file you loaded didn't change what you wrote, you didn't need it.
 
 ---
 
-## 6. Where new code goes
+## 4. Which source wins (short version)
 
-| Adding… | Path |
-|---------|------|
-| Page / URL | `apps/<app>/src/app/.../page.tsx` |
-| HTTP API | `apps/<app>/src/app/api/<feature>/route.ts` |
-| DB query/mutation logic | `packages/db/src/<feature>-service.ts`, called from the route |
-| UI primitive | `apps/<app>/src/components/ui/<kebab-name>/` |
-| Feature module UI | `apps/<app>/src/components/modules/<feature>/` |
-| React Query hook | `apps/<app>/src/hooks/useFeature/` — match neighbors |
-| Fetch helpers / query keys | `hooks/useFeature/{server,client,queryKey}.ts` |
-| Auth / UI chrome Redux | `apps/<app>/src/store/slices/<feature>Slice.ts` |
-| Storybook fixtures | `apps/<app>/src/constants/` — prefer shared mocks over inlined |
-| Form | colocated `SomeForm/{SomeForm.tsx,schema.ts,default.ts}` |
-| Shared legal copy | `packages/legal-content` |
-| Design tokens | `packages/config/tailwind-config` |
-| Auth email template (one app) | `apps/<app>/src/email-templates/<name>.html` |
-| Auth email template (shared) | `email-templates/<provider>/<name>.html` |
-
-**Folder names:** `components/ui/` + `components/modules/`. Older docs say `shadcn/` + `rotra/` —
-those directories do not exist. Admin also has `admin-ui/`, `layout/`, `custom/`, `providers/`.
-
-**Naming:** kebab-case UI folders · `PascalCase.tsx` · camelCase hooks (`useSessionLive`) ·
-`[feature]Slice.ts` · `SCREAMING_SNAKE_CASE` constants · `ComponentNameProps` in the `.tsx`.
+Behavior: **business docs**. Look and copy: **the prototype**, then the screen docs. Words:
+**product-terms.md**. Structure and code style: **architecture.md + coding-conventions.md**. What runs:
+**the code**, and only the code. Open decisions: **ask**. Full table: [ways-of-working.md §2](docs/ways-of-working.md#2-which-source-wins).
 
 ---
 
-## 7. Reality check — the traps
+## 5. Commands
 
-Full table: `.agents/context/implementation-status.md`. The ones that burn agents most:
-
-1. **Umpire app is a stub** with 5 OpenSpecs and no implementation.
-2. **Client `/sessions/*` (join, queue, court, attendance, add-match, play Courts/Queue/Standings)** is mock theatre (`MOCK_SESSION_*` / `MOCK_PLAYER_*` +
-   toasts). The **real** live session stack is **`/find-sessions` and `/find-sessions/[sessionId]`**.
-3. **Admin `/dashboard`, `/analytics`, `/moderation`, `/platform-config`, `/kill-switches`,
-   `/skills-management`, `/mmr-management`** are mock or in-memory. Edit does not save.
-4. **Clubs beyond `/clubs/apply`** are mock lists and `ProvisionBox` stubs.
-5. **RLS is enabled on the `places` table only**, despite broad RLS in older database docs and the
-   v1 proposals in `docs/database_design/product/access-retention.md`.
-6. **`/profile` is PARTIAL** — identity from API; stats / match history / skills / gear still
-   `MOCK_PLAYER`.
-7. **Email templates do not ship on merge.** Editing `*/email-templates/*.html` changes nothing
-   until a human pastes it into the Supabase dashboard. Most of the 13 slots have no committed
-   template yet — check `docs/email-templates.md` before assuming one exists.
-
-Known contradiction: canonical rules say only Club Owner / Que Master may create Que Sessions,
-but code allows player **Quick Session** create (`POST /api/sessions/quick`). Do not "fix"
-either side without a spec change.
-
----
-
-## 8. Commands
-
-**Always `nvm use` first** (see §0.13). Then:
+The scaffold ticket rewrites the root scripts and `Makefile`; until then they point at removed apps.
+Target commands:
 
 ```bash
-nvm use && pnpm install        # Node 24, pnpm 11
-nvm use && pnpm approve-builds # first install only
-
-nvm use && make dev            # all apps (+ ngrok); SKIP_NGROK=1 to skip
-nvm use && make dev-client     # or dev-admin / dev-umpire / dev-landing
-
-nvm use && pnpm lint           # biome — CI gate (client/admin/umpire)
-nvm use && pnpm type-check     # tsc --noEmit — CI gate (after pnpm db:generate)
-nvm use && pnpm build          # NOT in CI, but pre-push hook runs it
-nvm use && make check-fix      # biome autofix
-
-nvm use && pnpm db:generate    # also: db:push | db:migrate | db:studio | db:seed
+nvm use && pnpm install
+nvm use && pnpm dev                          # all apps
+nvm use && pnpm --filter @rotra/queue dev    # or @rotra/player, @rotra/admin
+nvm use && pnpm --filter @rotra/ui storybook
+nvm use && pnpm lint                         # Biome
+nvm use && pnpm type-check
+nvm use && pnpm build
 ```
 
-Hooks: `pre-commit` = lint · `pre-push` = lint + build · `commit-msg` = commitlint.
-CI runs **Biome lint** (client/admin/umpire; landing excluded) and **`pnpm type-check`** on PRs.
-
 ---
 
-## 9. Definition of done
+## 6. Definition of Done (short version)
 
-- [ ] `pnpm lint` and `pnpm type-check` pass — both run in CI on PRs
-- [ ] `pnpm build` passes for every app you touched
-- [ ] New/changed components have a `.stories.tsx`; prefer fixtures from `src/constants/`
-- [ ] Forms use `FormProvider` + `Field` + `Controller`, colocated Zod schema, toast on success
-      **and** failure (sonner)
-- [ ] No new `MOCK_` constant left behind as the shipping path
-- [ ] Conventional Commit message (`feat:`, `fix:`, `chore:`, …)
-- [ ] If behavior changed: matching OpenSpec updated or an OpenSpec change proposed
-- [ ] The PR description states **what you manually verified** — coverage is thin by design
-- [ ] Domain math (cost, MMR, EXP) touched? Unit tests are **required** there — see
-      `docs/ways-of-working.md` §6.1. Do not add tests or a test runner elsewhere without asking.
-- [ ] Changed an email template? The PR says so — it takes effect only once pasted into the
-      Supabase dashboard (Authentication → Emails → Templates).
-
----
-
-## 10. Stop and ask
-
-Do not guess. Open a question instead when:
-
-- The task requires an API, screen, or field that does not exist yet
-- `docs/business_logic/product/` and `openspec/specs/` disagree and the drift file does not cover it
-- You would need to add a new Realtime channel, a Server Action, or a new app-level barrel
-- You would need to promote a mock screen to real without a spec describing the behavior
-- The change touches money (cost splitting, v1 cost estimate), MMR math, or EXP — these have exact formulas and
-  reversal semantics; get the spec, do not improvise
-
-Use `.cursor/commands/opsx-explore` to think without implementing, and `opsx-propose` to write
-planning artifacts **without** touching code in the same turn.
+Lint, type-check, and build pass. Components have stories (both themes) and a `.meta.ts`. It matches the
+prototype at 375 px and 1280 px in dark and light. Docs updated in the same PR if anything became untrue.
+The PR says exactly what was verified and what wasn't. Full list: [ways-of-working.md §6–7](docs/ways-of-working.md#6-definition-of-done).

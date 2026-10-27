@@ -3,8 +3,12 @@
 > **Canonical checklist.** Agents: read this before authoring or assuming an auth email
 > template exists. Do not copy these checkboxes into other files — link here instead.
 >
-> Spec: [`openspec/specs/auth-email/spec.md`](../openspec/specs/auth-email/spec.md) ·
-> Agent entry: [`AGENTS.md`](../AGENTS.md) §5 Auth email
+> Agent entry: [`AGENTS.md`](../AGENTS.md) · Architecture: [§11 Email templates](architecture.md#11-email-templates)
+
+> **Status (2026-10-27): needs a rewrite in the auth epic.** The per-app sections below describe the
+> removed `apps/client` and `apps/admin`. v1 audiences are Player Information (registered players:
+> verification, password reset) and Admin. A club account's forgotten password is reset by the platform
+> owner; the method is still open ([open decisions](business_logic/product/open-decisions.md)). Only `email-templates/supabase/magic-link-otp.html` exists in the repo today.
 
 ## Legend
 
@@ -144,4 +148,4 @@ checkbox (and updating the coverage summary counts) in **this file in the same P
 must not leave the matrix stale.
 
 Also: merging HTML does not change delivered mail until someone pastes it into the Supabase
-dashboard — see `AGENTS.md` §7 trap 7 and `openspec/specs/auth-email/spec.md`.
+dashboard. See [architecture §11](architecture.md#11-email-templates).

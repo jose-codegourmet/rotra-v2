@@ -12,7 +12,6 @@
 | [Admin](admin/README.md) | Clubs, licenses, configuration, contact approval |
 | [Transaction boundaries](transactions.md) | Operations that must succeed together or be retried safely |
 | [Access and retention](access-retention.md) | Private contacts, public projections, licensing, deletion |
-| [Existing-schema gaps](existing-schema-gaps.md) | How the inspected repository differs from this target |
 | [Decisions before migrations](open-decisions.md) | Technical proposals and remaining blockers |
 
 Business source: [ecosystem v1](../../business_logic/product/README.md). World is v2; no World tables are proposed.

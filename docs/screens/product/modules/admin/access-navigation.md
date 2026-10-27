@@ -2,7 +2,7 @@
 
 **Surfaces:** `A-LOGIN`, `A-WORKSPACE`.
 
-**Sources:** [v1 Admin scope](../../../../business_logic/product/admin/README.md), [existing Admin auth specification](../../../../../openspec/specs/admin-auth/spec.md) as reference only.
+**Sources:** [v1 Admin scope](../../../../business_logic/product/admin/README.md).
 
 ## A-LOGIN — Platform-owner access
 

@@ -16,7 +16,6 @@ Admin manages club access, user information, feature flags, and agreed business 
 - No multi-manager club-role system in v1.
 - No Admin override for a confirmed winner, score, or invalid-match decision.
 - No manual reconstruction of permanently lost offline results.
-- Existing mock Admin pages do not prove these new controls are implemented.
 
 **Reference prototype:** [`docs/frames/admin-app/rotra-admin.html`](../../../frames/admin-app/rotra-admin.html), also published as the ROTRA Admin artifact. It is a clickable, single-file prototype with fictional data; notes in its [README](../../../frames/admin-app/README.md).
 

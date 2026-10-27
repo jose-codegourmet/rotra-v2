@@ -1,69 +1,58 @@
 # ROTRA documentation
 
-Start with the [v1 business logic](business_logic/README.md), based on the product reset agreed October 25, 2026.
+**Last verified:** 2026-10-27. Agents start at [AGENTS.md](../AGENTS.md), whose routing table says which
+file to read for each task. This page is the map for people.
 
-These documents describe **target business behavior, not shipped functionality**. Queue is the priority; Player Information stays lean; Admin supports both. World is deferred to v2.
+Everything here describes the **v1 target**, agreed October 25–27, 2026. Nothing is built yet.
 
-| Need | Read |
+## Engineering
+
+| Doc | Read when |
 |---|---|
-| Product boundaries | [Ecosystem overview](business_logic/product/README.md) |
-| Feature rules | The relevant product's `modules/<module>/README.md` |
-| Step-by-step journeys | That module's `flow/` directory |
-| Unresolved details | [Open decisions](business_logic/product/open-decisions.md) |
-| Proposed database records and relationships | [V1 database design](database_design/product/README.md) |
-| Screen layouts, controls, states, and flows | [V1 screen specifications](screens/product/README.md) |
-| Clickable Queue app prototype (agreed design reference, October 26, 2026) | [ROTRA Queue prototype](frames/queue-app/rotra-queue.html) — open in a browser |
-| Clickable Player Information app prototype (design reference, October 26, 2026) | [ROTRA Players prototype](frames/player-app/rotra-player.html) — open in a browser; notes in its [README](frames/player-app/README.md) |
-| Clickable Admin app prototype (design reference, October 27, 2026) | [ROTRA Admin prototype](frames/admin-app/rotra-admin.html) — open in a browser; notes in its [README](frames/admin-app/README.md) |
-| Current implementation | Code and the requirements/status in [OpenSpec](../openspec/specs/) |
-| Historical context | [Repository summary](REPO_SUMMARY.md), subject to its verification date and known drift |
+| [Architecture](architecture.md) | You need to know which app or package something belongs in, how data flows, or what is decided |
+| [Coding conventions](coding-conventions.md) | You write a component, form, page, hook, style, or Prisma model |
+| [Ways of working](ways-of-working.md) | You write or pick up a ticket, open or review a PR, or find docs that disagree |
+| [Product terms](product-terms.md) | You use a domain word or name something in code |
+
+## Product
+
+| Doc | What it answers |
+|---|---|
+| [Business logic](business_logic/product/README.md) | What each product does: rules per module, plus `flow/` journeys |
+| [Screens](screens/product/README.md) | What each screen shows: layout, controls, states, dialogs, by screen ID |
+| [Database design](database_design/product/README.md) | Proposed tables and fields per module |
+| Open decisions: [business](business_logic/product/open-decisions.md) · [screens](screens/product/open-decisions.md) · [database](database_design/product/open-decisions.md) | What is still undecided. Never fill these in by guessing |
+
+## Design
+
+| Doc | What it is |
+|---|---|
+| [Queue prototype](frames/queue-app/rotra-queue.html) ([notes](frames/queue-app/README.md)) | Clickable design of the Queue app, the agreed design reference |
+| [Player Information prototype](frames/player-app/rotra-player.html) ([notes](frames/player-app/README.md)) | Clickable design of the Player Information app |
+| [Admin prototype](frames/admin-app/rotra-admin.html) ([notes](frames/admin-app/README.md)) | Clickable design of the Admin app |
+| [Branding](branding/branding.md) | Brand identity, voice, logo, characters. For colors, type, and components the prototypes win |
+
+Open a prototype in any browser; nothing is installed.
+
+## Other
+
+| Doc | What it is |
+|---|---|
+| [Email templates](email-templates.md) | Supabase auth email coverage. Templates are pasted into the Supabase dashboard by hand |
 
 ## Structure
 
 ```text
 docs/
-  business_logic/
-    README.md
-    product/
-      README.md
-      glossary.md
-      open-decisions.md
-      queue/
-        README.md
-        modules/
-          <module>/
-            README.md
-            flow/
-              <journey>.md
-      player-information/
-        README.md
-        modules/...
-      admin/
-        README.md
-        modules/...
-  database_design/
-    product/
-      README.md
-      queue/modules/...
-      player-information/modules/...
-      admin/modules/...
-  screens/
-    README.md
-    product/
-      README.md
-      navigation.md
-      state-matrix.md
-      dialogs.md
-      coverage.md
-      open-decisions.md
-      experience-contract.md
-      modules/
-        README.md
-        queue/...
-        player-information/...
-        admin/...
+  architecture.md · coding-conventions.md · ways-of-working.md · product-terms.md
+  business_logic/product/<product>/modules/<module>/README.md (+ flow/<journey>.md)
+  screens/product/  experience-contract · navigation · state-matrix · dialogs · coverage · open-decisions
+                    modules/<product>/<module>.md
+  database_design/product/  conventions · transactions · access-retention · open-decisions
+                            <product>/modules/<module>.md
+  frames/<app>/     prototype .html + README.md
+  branding/
 ```
 
-`product/` contains product boundaries, not a promise about repository app names or deployment architecture. Modules own their rules; flow documents explain journeys through those rules.
-
-Older docs remain as reference. Their Facebook login, separate owner/Queue Master roles, umpire product, cost tracking, and previous ranking systems are not automatically v1 requirements. Existing OpenSpecs have not been rewritten to imply this reset is implemented.
+`<product>` is `queue`, `player-information`, or `admin`. Products are product boundaries: Queue maps
+to `apps/queue`, Player Information to `apps/player`, Admin to `apps/admin`.

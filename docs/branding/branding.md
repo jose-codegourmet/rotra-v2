@@ -2,6 +2,11 @@
 
 **Version:** 1.0 · **Platform:** Mobile-first web app (PWA) · **Theme:** Dark mode only
 
+> **Status (2026-10-27): partly superseded.** For colors, tokens, typography (the prototypes use Manrope +
+> JetBrains Mono, not Satoshi), both themes (dark default + light), and component looks, the prototypes
+> in [`docs/frames/`](../frames/) win. Keep using this file for brand identity, personality, logo,
+> iconography intent, and the characters in `materials/`.
+
 ---
 
 ## 1. Brand Identity

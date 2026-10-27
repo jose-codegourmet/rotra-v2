@@ -26,6 +26,7 @@ import { notFound, useRouter } from 'next/navigation'
 import { type ComponentType, useEffect, useMemo, useRef, useState } from 'react'
 import { useDockAction } from '@/app/(operator)/_components/operator-shell/DockAction.context'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
+import { ActiveMatch } from '@/app/(operator)/sessions/[sessionId]/_components/active-match/ActiveMatch'
 import { AutoQueue } from '@/app/(operator)/sessions/[sessionId]/_components/auto-queue/AutoQueue'
 import { CourtsAndTime } from '@/app/(operator)/sessions/[sessionId]/_components/courts-and-time/CourtsAndTime'
 import { FacebookPost } from '@/app/(operator)/sessions/[sessionId]/_components/facebook-post/FacebookPost'
@@ -40,6 +41,10 @@ import { PlayersView } from '@/app/(operator)/sessions/[sessionId]/_components/p
 import { QueueView } from '@/app/(operator)/sessions/[sessionId]/_components/queue-view/QueueView'
 import { RegenerateQueue } from '@/app/(operator)/sessions/[sessionId]/_components/regenerate-queue/RegenerateQueue'
 import { SessionView } from '@/app/(operator)/sessions/[sessionId]/_components/session-view/SessionView'
+import {
+  StartMatch,
+  type StartMatchRequest,
+} from '@/app/(operator)/sessions/[sessionId]/_components/start-match/StartMatch'
 import { SuggestMatch } from '@/app/(operator)/sessions/[sessionId]/_components/suggest-match/SuggestMatch'
 import { sessionHref } from '@/lib/dates'
 import { useNow } from '@/lib/useNow'
@@ -56,6 +61,10 @@ export type MatchSheet =
   | { mode: 'suggest' }
   | { mode: 'auto' }
   | { mode: 'regenerate' }
+  /** Open match on an in-game court card: the active match sheet (Queue › Match control) */
+  | { mode: 'active'; matchId: string }
+  /** Review and start, Start on a queue card, Pick another: the Start match and Choose match sheets (Queue › Match control) */
+  | StartMatchRequest
 
 /** What every console view container receives from the shell */
 export type ConsoleViewProps = {
@@ -216,6 +225,11 @@ export function SessionConsole({ sessionId }: SessionConsoleProps) {
     onAddMatch: () => setMatchSheet({ mode: 'add' }),
     onEditMatch: (matchId: string) => setMatchSheet({ mode: 'edit', matchId }),
   }
+  // Queue › Match control: Review and start (with its court), Start on a queue card (first free
+  // court) and Pick another open the StartMatch sheets; no match starts without that confirmation.
+  const onStartMatch = (matchId: string, courtId?: string) =>
+    setMatchSheet({ mode: 'start', matchId, courtId })
+  const onPickAnother = (courtId: string) => setMatchSheet({ mode: 'choose', courtId })
   const showQueue = () => setView(VIEWS.queue ? 'queue' : 'session')
 
   if (session.isError)
@@ -278,13 +292,21 @@ export function SessionConsole({ sessionId }: SessionConsoleProps) {
         items={tabs}
       >
         <TabsContent value="session" className="flex flex-col gap-5">
-          <SessionView {...viewProps} onAddCourt={() => setSheet('add-court')} {...matchEditing} />
+          <SessionView
+            {...viewProps}
+            onAddCourt={() => setSheet('add-court')}
+            {...matchEditing}
+            onOpenMatch={(matchId) => setMatchSheet({ mode: 'active', matchId })}
+            onStartMatch={onStartMatch}
+            onPickAnother={onPickAnother}
+          />
         </TabsContent>
         <TabsContent value="queue">
           {VIEWS.queue ? (
             <QueueView
               {...viewProps}
               {...matchEditing}
+              onStartMatch={onStartMatch}
               onSuggest={() => setMatchSheet({ mode: 'suggest' })}
               onAutoQueue={() => setMatchSheet({ mode: 'auto' })}
               onRegenerate={() => setMatchSheet({ mode: 'regenerate' })}
@@ -353,6 +375,22 @@ export function SessionConsole({ sessionId }: SessionConsoleProps) {
         sessionId={sessionId}
         open={matchSheet?.mode === 'regenerate'}
         onOpenChange={(open) => setMatchSheet(open ? { mode: 'regenerate' } : null)}
+      />
+      <ActiveMatch
+        sessionId={sessionId}
+        now={now}
+        matchId={matchSheet?.mode === 'active' ? matchSheet.matchId : null}
+        onClose={() => setMatchSheet(null)}
+      />
+      <StartMatch
+        sessionId={sessionId}
+        request={
+          matchSheet && (matchSheet.mode === 'start' || matchSheet.mode === 'choose')
+            ? matchSheet
+            : null
+        }
+        onRequestChange={setMatchSheet}
+        onClose={() => setMatchSheet(null)}
       />
       <PlayerProfile clubPlayerId={profileId} onClose={() => setProfileId(null)} />
     </main>

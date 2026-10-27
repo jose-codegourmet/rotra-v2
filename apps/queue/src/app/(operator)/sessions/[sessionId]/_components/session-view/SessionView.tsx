@@ -42,6 +42,12 @@ export type SessionViewProps = {
   onEditMatch?: (matchId: string) => void
   /** Add match on a free court card with nothing to start: open the Add match sheet (Queue › Match editing). Hidden until given. */
   onAddMatch?: () => void
+  /** Review and start on a free court (with that court) or Start on an upcoming queue card (no court): open the Start match sheet (Queue › Match control). Hidden until given. */
+  onStartMatch?: (matchId: string, courtId?: string) => void
+  /** Pick another on a free court: open the Start a match on Court X sheet (Queue › Match control). Hidden until given. */
+  onPickAnother?: (courtId: string) => void
+  /** Open match on an in-game court card: open the active match sheet (Queue › Match control). Hidden until given. */
+  onOpenMatch?: (matchId: string) => void
 }
 
 /**
@@ -64,6 +70,9 @@ export function SessionView({
   onAddCourt,
   onEditMatch,
   onAddMatch,
+  onStartMatch,
+  onPickAnother,
+  onOpenMatch,
 }: SessionViewProps) {
   const session = useQueueSession(sessionId)
   const roster = useSessionRoster(sessionId)
@@ -155,10 +164,12 @@ export function SessionView({
         matchNo: m.matchNo,
         minutes: Math.max(0, Math.round((now - (m.startedAt ?? now)) / 60000)),
         substitutions: m.substitutions.length,
+        onOpenMatch: onOpenMatch ? () => onOpenMatch(m.id) : undefined,
       })
       continue
     }
     const next = nextEligibleForCourt(c.id, ctx)
+    const eligible = next.match
     const first = waiting[0]
     cards.push({
       variant: 'free',
@@ -177,6 +188,10 @@ export function SessionView({
           }
         : null,
       blockedReason: !next.match && first ? matchStatus(first, ctx).reason : undefined,
+      onReviewAndStart:
+        eligible && onStartMatch ? () => onStartMatch(eligible.id, c.id) : undefined,
+      onPickAnother:
+        eligible && waiting.length > 1 && onPickAnother ? () => onPickAnother(c.id) : undefined,
       onAddMatch,
     })
   }
@@ -191,6 +206,7 @@ export function SessionView({
     teamA: m.teamA.map(player),
     teamB: m.teamB.map(player),
     onSelectPlayer: openProfile,
+    onStart: onStartMatch ? () => onStartMatch(m.id) : undefined,
     onEdit: onEditMatch ? () => onEditMatch(m.id) : undefined,
     onRemove: () => onRemoveMatch(m),
   }))

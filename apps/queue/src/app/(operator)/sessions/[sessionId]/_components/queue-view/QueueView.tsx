@@ -36,6 +36,8 @@ export type QueueViewProps = ConsoleViewProps & {
   onAutoQueue?: () => void
   /** Regenerate: opens the Regenerate waiting queue? sheet (Q-REGENERATE). Disabled until given, and when the queue is empty. */
   onRegenerate?: () => void
+  /** Start on a card: opens the Start match sheet for that waiting match (Q-DISPATCH, Queue › Match control). Start is hidden until given. */
+  onStartMatch?: (matchId: string) => void
 }
 
 const MODE_LABELS = { chill: 'Chill', fair: 'Fair', hard: 'Hard' } as const
@@ -62,6 +64,7 @@ export function QueueView({
   onSuggest,
   onAutoQueue,
   onRegenerate,
+  onStartMatch,
 }: QueueViewProps) {
   const session = useQueueSession(sessionId)
   const roster = useSessionRoster(sessionId)
@@ -149,6 +152,7 @@ export function QueueView({
     teamA: m.teamA.map(player),
     teamB: m.teamB.map(player),
     onSelectPlayer: openProfile,
+    onStart: onStartMatch ? () => onStartMatch(m.id) : undefined,
     onEdit: onEditMatch ? () => onEditMatch(m.id) : undefined,
     onRemove: () => onRemove(m),
   }))

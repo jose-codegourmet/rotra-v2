@@ -7,8 +7,11 @@
     "**/*.css"
   ],
   "exports": {
+    "./avatar": "./src/components/avatar/Avatar.tsx",
     "./button": "./src/components/button/Button.tsx",
+    "./card": "./src/components/card/Card.tsx",
     "./checkbox": "./src/components/checkbox/Checkbox.tsx",
+    "./chip": "./src/components/chip/Chip.tsx",
     "./choice-group": "./src/components/choice-group/ChoiceGroup.tsx",
     "./cn": "./src/lib/cn.ts",
     "./date-picker": "./src/components/date-picker/DatePicker.tsx",
@@ -17,6 +20,8 @@
     "./field/variants": "./src/components/field/Field.variants.ts",
     "./icon": "./src/components/icon/Icon.tsx",
     "./icon-button": "./src/components/icon-button/IconButton.tsx",
+    "./key-value-list": "./src/components/key-value-list/KeyValueList.tsx",
+    "./list-row": "./src/components/list-row/ListRow.tsx",
     "./meta": "./src/lib/meta.ts",
     "./segmented-control": "./src/components/segmented-control/SegmentedControl.tsx",
     "./select": "./src/components/select/Select.tsx",

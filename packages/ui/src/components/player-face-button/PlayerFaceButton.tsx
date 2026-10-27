@@ -23,10 +23,10 @@ export type PlayerFaceButtonProps = {
   /** Opens the player's profile */
   onClick: () => void
   /**
-   * Later used by SwapSides (Queue › Match queue): left or right arrow moves the player to the other
-   * team; the hint joins the title and accessible name.
+   * Switch sides (Queue › Match queue): the hint joins the title and accessible name. With onSwap,
+   * the left or right arrow calls it; without, the enclosing SwappablePlayer handles the keys.
    */
-  swap?: { team: 'A' | 'B'; index: number; onSwap: () => void }
+  swap?: { team: 'A' | 'B'; index: number; onSwap?: () => void }
   className?: string
 }
 
@@ -54,11 +54,12 @@ export function PlayerFaceButton({
   className,
 }: PlayerFaceButtonProps) {
   const picture = PICTURE[size]
-  const onKeyDown = swap
+  const onSwap = swap?.onSwap
+  const onKeyDown = onSwap
     ? (e: KeyboardEvent<HTMLButtonElement>) => {
         if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
           e.preventDefault()
-          swap.onSwap()
+          onSwap()
         }
       }
     : undefined

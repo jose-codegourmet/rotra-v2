@@ -9,6 +9,7 @@ export const matchCardMeta = {
     'Do not use for finished matches; the session record has its own row component in Queue › Results.',
     'Start renders only with onStart and is enabled only when the status is ready. Edit and Remove render only with their callbacks.',
     'The grid passes the flow arrow and the reorder behaviour passes handleProps; the card itself does not reorder.',
+    'With swappable inside a SwapSidesArea, each player can be dragged onto the other team or moved across with the arrow keys; the area reports the swap.',
   ],
   prototype: {
     file: 'docs/frames/queue-app/rotra-queue.html',
@@ -20,5 +21,5 @@ export const matchCardMeta = {
     'docs/business_logic/product/queue/modules/queueing/README.md',
   ],
   variants: ['ready', 'needs-attention', 'blocked', 'waiting-for-courts'],
-  related: ['UpcomingQueueRow', 'PlayerFaceButton', 'CourtCard', 'Chip'],
+  related: ['QueueGrid', 'UpcomingQueueRow', 'SwapSidesArea', 'SwappablePlayer', 'PlayerFaceButton', 'CourtCard', 'Chip'],
 } satisfies ComponentMeta

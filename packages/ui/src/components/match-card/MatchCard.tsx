@@ -6,6 +6,7 @@ import { cn } from '@rotra/ui/cn'
 import { Icon } from '@rotra/ui/icon'
 import { IconButton } from '@rotra/ui/icon-button'
 import { PlayerFaceButton } from '@rotra/ui/player-face-button'
+import { SwappablePlayer } from '@rotra/ui/swap-sides-area/swappable-player'
 import type { ComponentProps } from 'react'
 import { matchCardVariants } from './MatchCard.variants'
 
@@ -40,6 +41,11 @@ export type MatchCardProps = {
   flow?: MatchCardFlow | null
   /** Props the reorder behaviour attaches to the ⠿ handle (pointer and key handlers, data attributes) */
   handleProps?: Omit<ComponentProps<'button'>, 'aria-label' | 'children' | 'type'>
+  /**
+   * Switch sides: wraps each player in a SwappablePlayer (drag onto the other team, or ← / →).
+   * Needs an enclosing SwapSidesArea, which reports the swap.
+   */
+  swappable?: boolean
   /** Opens the player's profile */
   onSelectPlayer?: (playerId: string, team: MatchCardTeam) => void
   /** Start: rendered only when given, enabled only when the match is ready */
@@ -65,26 +71,38 @@ const FLOW_ARROW: Record<MatchCardFlow, string> = { right: '→', left: '←', d
 function Faces({
   players,
   team,
+  swappable,
   onSelectPlayer,
 }: {
   players: MatchCardPlayer[]
   team: MatchCardTeam
+  swappable: boolean
   onSelectPlayer?: (playerId: string, team: MatchCardTeam) => void
 }) {
   return (
     <div className="flex flex-wrap justify-center gap-x-2 gap-y-1">
-      {players.map((p) => (
-        <PlayerFaceButton
-          key={p.id}
-          name={p.name}
-          shortName={p.shortName}
-          level={p.level}
-          photoUrl={p.photoUrl}
-          label={`${p.name}, Team ${team}. View profile`}
-          size="queue"
-          onClick={() => onSelectPlayer?.(p.id, team)}
-        />
-      ))}
+      {players.map((p, i) => {
+        const face = (
+          <PlayerFaceButton
+            key={p.id}
+            name={p.name}
+            shortName={p.shortName}
+            level={p.level}
+            photoUrl={p.photoUrl}
+            label={`${p.name}, Team ${team}. View profile`}
+            size="queue"
+            swap={swappable ? { team, index: i } : undefined}
+            onClick={() => onSelectPlayer?.(p.id, team)}
+          />
+        )
+        return swappable ? (
+          <SwappablePlayer key={p.id} team={team} index={i}>
+            {face}
+          </SwappablePlayer>
+        ) : (
+          face
+        )
+      })}
     </div>
   )
 }
@@ -105,6 +123,7 @@ export function MatchCard({
   teamB,
   flow,
   handleProps,
+  swappable = false,
   onSelectPlayer,
   onStart,
   onEdit,
@@ -152,9 +171,9 @@ export function MatchCard({
           ⠿
         </button>
       </div>
-      <Faces players={teamA} team="A" onSelectPlayer={onSelectPlayer} />
+      <Faces players={teamA} team="A" swappable={swappable} onSelectPlayer={onSelectPlayer} />
       <div className="text-center text-[10px] font-extrabold tracking-[1px] text-fg3">VS</div>
-      <Faces players={teamB} team="B" onSelectPlayer={onSelectPlayer} />
+      <Faces players={teamB} team="B" swappable={swappable} onSelectPlayer={onSelectPlayer} />
       <span
         className={cn(
           'flex items-start gap-1.5 text-xs',

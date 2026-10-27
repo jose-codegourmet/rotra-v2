@@ -4,6 +4,8 @@ import { type AvatarVariants, avatarVariants } from './Avatar.variants'
 export type AvatarProps = AvatarVariants & {
   /** Full name: gives the initials fallback and the picture's description */
   name: string
+  /** Use these initials instead of deriving them from name (clubs store their own, e.g. "LS") */
+  initials?: string
   /** Picture URL; initials show when missing */
   src?: string
   /**
@@ -25,7 +27,16 @@ function initialsOf(name: string) {
 }
 
 /** The prototypes' .avatar: a player's picture, or their initials on a neutral circle. */
-export function Avatar({ name, src, size, shape, tone, onClick, className }: AvatarProps) {
+export function Avatar({
+  name,
+  initials,
+  src,
+  size,
+  shape,
+  tone,
+  onClick,
+  className,
+}: AvatarProps) {
   const classes = cn(avatarVariants({ size, shape, tone }), className)
   const face = src ? (
     <span className={classes}>
@@ -33,7 +44,7 @@ export function Avatar({ name, src, size, shape, tone, onClick, className }: Ava
     </span>
   ) : (
     <span aria-hidden className={classes}>
-      {initialsOf(name)}
+      {initials ?? initialsOf(name)}
     </span>
   )
   if (!onClick) return face

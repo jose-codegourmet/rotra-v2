@@ -193,8 +193,13 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
                 presentCount={present}
               />
               <DeviceDownloadCard
-                state={s.downloadState}
+                state={download.isPending ? 'downloading' : s.downloadState}
                 offline={dev.offline}
+                snapshotAge={
+                  download.isError && s.downloadState === 'ready'
+                    ? 'the copy from before this update'
+                    : undefined
+                }
                 onDownload={() =>
                   download.mutate(sessionId, {
                     onSuccess: (result) => toast(result.message),

@@ -1,8 +1,9 @@
 'use client'
 
+import { connectMockQueryClient } from '@rotra/data/mock/client'
 import { MockError } from '@rotra/data/mock/errors'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { lazy, type ReactNode, Suspense, useState } from 'react'
+import { lazy, type ReactNode, Suspense, useEffect, useState } from 'react'
 
 const Devtools =
   process.env.NODE_ENV === 'development'
@@ -27,6 +28,7 @@ export function QueryProvider({ children }: { children: ReactNode }) {
         },
       }),
   )
+  useEffect(() => connectMockQueryClient(queryClient), [queryClient])
   return (
     <QueryClientProvider client={queryClient}>
       {children}

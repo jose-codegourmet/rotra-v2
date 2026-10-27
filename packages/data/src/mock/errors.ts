@@ -7,6 +7,7 @@ export class MockError extends Error {
   constructor(
     readonly kind: MockErrorKind,
     message: string,
+    readonly fieldErrors?: Record<string, string>,
   ) {
     super(message)
   }

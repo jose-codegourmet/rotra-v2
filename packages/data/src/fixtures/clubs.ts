@@ -1,7 +1,7 @@
 import type { Club } from '../club/club.types'
 
 /** Admin prototype's eight clubs, including the free Tagbilaran tester club. */
-export const clubs = [
+const baseClubs = [
   {
     id: '6cd364d4-0e3a-5c3d-9e75-2116cc845714',
     name: 'Lahug Smash Club',
@@ -98,7 +98,35 @@ export const clubs = [
     licenseYearlyMinor: 1000000,
     currency: 'PHP',
   },
-] satisfies Club[]
+]
 
 /** Shared Queue demo club; matches the Admin fixture. */
 export const DEMO_CLUB_ID = '6cd364d4-0e3a-5c3d-9e75-2116cc845714'
+
+export const clubs: Club[] = baseClubs.map((club, index) => ({
+  ...club,
+  licensePricing: club.licensePricing === 'free' ? 'free' : 'paid',
+  currency: 'PHP',
+  logoUrl: null,
+  description:
+    index === 0
+      ? 'Friendly open play for all levels in Lahug. Bring your racket; shuttles are on us.'
+      : '',
+  courtRules: null,
+  postTemplate: null,
+  defaultPlayersPerCourt: 8,
+  defaultEntranceFeeMinor: null,
+  cityCode: club.locationCode,
+  username:
+    [
+      'lahug.smash',
+      'itpark.badminton',
+      'matina.smash',
+      'sampaloc.shuttle',
+      'talamban.racket',
+      'bacolod.rally',
+      'molo.shuttle',
+      'tagbilaran.circle',
+    ][index] ?? '',
+  pendingNameChange: null,
+}))

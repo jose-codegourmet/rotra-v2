@@ -4,7 +4,7 @@
 > Everything deeper is loaded **on demand** via the routing table in §2 — do not read the whole
 > `docs/` tree or `docs/REPO_SUMMARY.md` "just in case."
 
-**Last verified against the tree:** 2026-08-30 · **Budget:** this file stays under 290 lines.
+**Last verified against the tree:** 2026-08-30 · **v1 doc pointers:** 2026-10-27 · **Budget:** under 290 lines.
 
 ---
 
@@ -14,11 +14,13 @@ Violating any of these produces a diff that will be rejected. They cost you noth
 
 1. **Never invent** APIs, screens, routes, DB columns, or domain terms. If it is not in this file,
    an OpenSpec, or existing code — stop and ask.
-2. **Never claim a documented rule is shipped.** `docs/business_logic/` contains rules that were
-   never built. Only `openspec/specs/` + code prove implementation.
+2. **Never claim a documented rule is shipped.** The v1 docs (`docs/business_logic/product/`,
+   `docs/screens/product/`, `docs/database_design/product/`) are **target** behavior; none is built.
+   Only `openspec/specs/` + code prove implementation.
 3. **Polished UI ≠ wired backend.** Grep for `MOCK_` before assuming a screen persists anything.
-4. **Spelling is load-bearing:** `Que Master` (never "Queue Master"), `Que Session` /
-   `Que Schedule` (synonyms), `Quick Umpire`, `Rate and Review`, **ROTRA** all-caps in UI copy.
+4. **Spelling is load-bearing:** existing code and UI copy use `Que Master` / `Que Session` /
+   `Que Schedule`, `Quick Umpire`, `Rate and Review`; do not rename code without a spec. The v1
+   target docs deliberately use **Queue / Queue Master / Queue Session**. **ROTRA** all-caps in UI copy.
 5. **Writes go through route handlers**, not Server Actions. Exactly one `'use server'` file exists
    (`apps/client/src/lib/auth/login-actions.ts` — Facebook OAuth only) unless a spec says otherwise.
 6. **No new barrel files in app code.** Do not add `index.ts` re-exports under `apps/`. Package
@@ -60,6 +62,12 @@ Four Next.js apps in a pnpm/Turborepo monorepo:
 Shared: `@rotra/db` (Prisma + domain services), `@rotra/config` (tsconfig + Tailwind tokens),
 `@rotra/legal-content`.
 
+**v1 product reset (Oct 25–26, 2026, docs only — code not yet changed):** target products are
+Queue (club-operated sessions, offline-capable), Player Information, and Admin; World is v2. Peer
+ratings, MMR, EXP, Umpire, and cost splitting are **not** v1 defaults; an optional session cost
+estimate + club inventory is. Design references in `docs/frames/`: `queue-app/rotra-queue.html` (Queue),
+`player-app/rotra-player.html` (Player Information), `admin-app/rotra-admin.html` (Admin).
+
 ---
 
 ## 2. Context routing — read only what your task needs
@@ -76,7 +84,12 @@ Find your task, load those files, ignore the rest. Each row is roughly self-suff
 | Build a **component** | `.agents/context/components.md` + `.agents/context/design-tokens.md` |
 | Build or fix a **form** | `.agents/context/forms.md` (then run `/rotra-is-my-form-valid`) |
 | Change **product behavior** | `openspec/specs/<domain>/spec.md` first (+ `.agents/context/spec-index.md`) |
-| Anything using domain vocabulary | `.agents/context/glossary.md` |
+| Understand the **v1 target** product | `docs/business_logic/product/README.md` → that product's `modules/<module>/README.md` |
+| Build a **v1 Queue screen** | `docs/screens/product/modules/queue/<module>.md` + the prototype `docs/frames/queue-app/rotra-queue.html` |
+| Build a **v1 Player Information screen** | `docs/screens/product/modules/player-information/<module>.md` + the prototype `docs/frames/player-app/rotra-player.html` |
+| Build a **v1 Admin screen** | `docs/screens/product/modules/admin/<module>.md` + the prototype `docs/frames/admin-app/rotra-admin.html` |
+| Design **v1 tables / migrations** | `docs/database_design/product/README.md` + `packages/db/AGENTS.md` |
+| Anything using domain vocabulary | `.agents/context/glossary.md`; v1 terms: `docs/business_logic/product/glossary.md` |
 | "Is X actually built?" | `.agents/context/implementation-status.md` |
 | "Docs contradict the code" | `.agents/context/known-drift.md` — **Reality** wins |
 | Commands / ports / CI / env | `.agents/context/commands.md` |
@@ -97,7 +110,8 @@ When sources disagree:
 2. **`openspec/specs/<domain>/spec.md`** — current *implemented* behavior (SHALL/MUST + scenarios)
 3. **`.agents/context/known-drift.md`** — the known list of docs that lie
 4. **This file** — orientation
-5. **`docs/business_logic/`** — product *intent*; may be unbuilt
+5. **`docs/business_logic/product/`** (+ `docs/screens/product/`, `docs/database_design/product/`) —
+   v1 product *intent*; unbuilt. Their `open-decisions.md` files list what is still undecided
 6. **`docs/techstack/`** — conventions, but several sections are stale (see drift file)
 
 `docs/REPO_SUMMARY.md` is a *narrative* view. When it conflicts with an OpenSpec, the spec wins.
@@ -204,7 +218,8 @@ Full table: `.agents/context/implementation-status.md`. The ones that burn agent
 3. **Admin `/dashboard`, `/analytics`, `/moderation`, `/platform-config`, `/kill-switches`,
    `/skills-management`, `/mmr-management`** are mock or in-memory. Edit does not save.
 4. **Clubs beyond `/clubs/apply`** are mock lists and `ProvisionBox` stubs.
-5. **RLS is enabled on the `places` table only**, despite broad RLS in `docs/database/`.
+5. **RLS is enabled on the `places` table only**, despite broad RLS in older database docs and the
+   v1 proposals in `docs/database_design/product/access-retention.md`.
 6. **`/profile` is PARTIAL** — identity from API; stats / match history / skills / gear still
    `MOCK_PLAYER`.
 7. **Email templates do not ship on merge.** Editing `*/email-templates/*.html` changes nothing
@@ -264,10 +279,10 @@ CI runs **Biome lint** (client/admin/umpire; landing excluded) and **`pnpm type-
 Do not guess. Open a question instead when:
 
 - The task requires an API, screen, or field that does not exist yet
-- `docs/business_logic/` and `openspec/specs/` disagree and the drift file does not cover it
+- `docs/business_logic/product/` and `openspec/specs/` disagree and the drift file does not cover it
 - You would need to add a new Realtime channel, a Server Action, or a new app-level barrel
 - You would need to promote a mock screen to real without a spec describing the behavior
-- The change touches money (cost splitting), MMR math, or EXP — these have exact formulas and
+- The change touches money (cost splitting, v1 cost estimate), MMR math, or EXP — these have exact formulas and
   reversal semantics; get the spec, do not improvise
 
 Use `.cursor/commands/opsx-explore` to think without implementing, and `opsx-propose` to write

@@ -1,0 +1,1601 @@
+<title>ROTRA Admin</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: internal workspace for the platform owner. A left rail with the five places Admin goes (clubs, players,
+   requests, settings); lists are tables that turn into stacked rows on phones; details put the working column beside
+   account facts on wide screens. Tokens and base components are copied from the Queue and Player prototypes
+   (apps/client globals.css: dark default, light toggleable). */
+:root {
+  --bg: #0b0b0c; --surface: #1a1a1d; --elev: #2a2a2e; --overlay: #3a3a3f;
+  --fg: #f0f0f2; --fg2: #9090a0; --fg3: #5a5a66;
+  --accent: #00ff88; --accent-dim: #00cc6a; --accent-subtle: rgba(0, 255, 136, 0.13); --on-accent: #0b0b0c;
+  --error: #ff4d4d; --error-subtle: rgba(255, 77, 77, 0.12); --warn: #ffb800; --warn-subtle: rgba(255, 184, 0, 0.12);
+  --border: #2a2a2e; --border-strong: #404048; --scrim: rgba(0, 0, 0, 0.6);
+  --font: "Satoshi", "Manrope", system-ui, sans-serif; --mono: "JetBrains Mono", ui-monospace, monospace;
+  --r: 10px; --r-sm: 6px;
+  --shadow: none; --knob: var(--fg); --field: var(--bg);
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) {
+  /* Light: white cards on a soft off-white page, a deeper green that reads as text and carries white labels (AA). */
+  --bg: #f4f5f2; --surface: #ffffff; --elev: #eef0ec; --overlay: #dfe3dc;
+  --fg: #121513; --fg2: #535a54; --fg3: #7a817b;
+  --accent: #0a7d44; --accent-dim: #086a39; --accent-subtle: rgba(10, 125, 68, 0.09); --on-accent: #ffffff;
+  --error: #c62828; --error-subtle: rgba(198, 40, 40, 0.07); --warn: #a35600; --warn-subtle: rgba(217, 119, 6, 0.09);
+  --border: #e2e5df; --border-strong: #cdd2c9; --scrim: rgba(18, 21, 19, 0.4);
+  --shadow: 0 1px 2px rgba(18, 24, 20, 0.05), 0 2px 8px rgba(18, 24, 20, 0.04); --knob: #ffffff; --field: #ffffff;
+  color-scheme: light;
+} }
+:root[data-theme="light"] {
+  --bg: #f4f5f2; --surface: #ffffff; --elev: #eef0ec; --overlay: #dfe3dc;
+  --fg: #121513; --fg2: #535a54; --fg3: #7a817b;
+  --accent: #0a7d44; --accent-dim: #086a39; --accent-subtle: rgba(10, 125, 68, 0.09); --on-accent: #ffffff;
+  --error: #c62828; --error-subtle: rgba(198, 40, 40, 0.07); --warn: #a35600; --warn-subtle: rgba(217, 119, 6, 0.09);
+  --border: #e2e5df; --border-strong: #cdd2c9; --scrim: rgba(18, 21, 19, 0.4);
+  --shadow: 0 1px 2px rgba(18, 24, 20, 0.05), 0 2px 8px rgba(18, 24, 20, 0.04); --knob: #ffffff; --field: #ffffff;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--bg); }
+button, input, select, textarea { font: inherit; color: inherit; }
+h1, h2, h3 { margin: 0; text-wrap: balance; letter-spacing: -0.3px; }
+h1 { font-size: 26px; font-weight: 800; line-height: 1.2; }
+h2 { font-size: 18px; font-weight: 700; }
+h3 { font-size: 15px; font-weight: 700; }
+p { margin: 0; }
+.mono { font-family: var(--mono); font-size: 0.92em; }
+.muted { color: var(--fg2); }
+.small { font-size: 13px; }
+.label { font-size: 12px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; color: var(--fg2); }
+.tnum { font-variant-numeric: tabular-nums; }
+.wrapw { overflow-wrap: anywhere; }
+
+/* Top bar */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); }
+.top-in { display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 8px max(16px, env(safe-area-inset-right, 0px)) 8px max(16px, env(safe-area-inset-left, 0px)); }
+button.brand { display: flex; align-items: baseline; gap: 8px; background: none; border: 0; padding: 0; cursor: pointer; color: inherit; font-weight: 800; letter-spacing: 1.5px; font-size: 17px; }
+.brand b { color: var(--accent); }
+.brand .sub { font-weight: 600; letter-spacing: 0; color: var(--fg2); font-size: 14px; }
+.top .grow { flex: 1; }
+.acct { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--fg2); min-width: 0; padding: 4px 10px; border: 1px solid var(--border); border-radius: 999px; }
+.acct span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 30vw; }
+@media (max-width: 560px) { .acct span { display: none; } .acct { padding: 6px; } }
+.btn.burger { display: none; }
+.band-off { background: var(--warn-subtle); border-bottom: 1px solid var(--warn); font-size: 13px; }
+.band-off .in { display: flex; gap: 10px; align-items: flex-start; padding: 8px max(16px, env(safe-area-inset-right, 0px)) 8px max(16px, env(safe-area-inset-left, 0px)); }
+.band-off svg { color: var(--warn); flex: none; margin-top: 2px; }
+@keyframes pulse { 50% { opacity: .3; } }
+
+/* Shell: rail + main column */
+.shell { --rail: 236px; --topbar: 57px; display: grid; grid-template-columns: var(--rail) minmax(0, 1fr); align-items: start; }
+.shell-main { min-width: 0; }
+.rail { position: sticky; top: calc(var(--topbar) + env(safe-area-inset-top, 0px)); height: calc(100dvh - var(--topbar) - env(safe-area-inset-top, 0px)); overflow-y: auto; display: flex; flex-direction: column; gap: 2px; padding: 12px 10px; border-right: 1px solid var(--border); background: var(--surface); }
+.rail-label { font-size: 11px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: var(--fg3); padding: 14px 12px 4px; }
+.rail-link { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 42px; padding: 9px 12px; border: 0; border-radius: var(--r-sm); background: none; color: var(--fg2); font-weight: 600; text-align: left; white-space: nowrap; cursor: pointer; }
+.rail-link svg { flex: none; }
+.rail-link:hover { background: var(--elev); color: var(--fg); }
+.rail-link.on { background: var(--accent-subtle); color: var(--accent); }
+.rail-link .count { margin-left: auto; font-size: 12px; color: var(--fg3); font-variant-numeric: tabular-nums; }
+.rail-link .count.hot { color: var(--on-accent); background: var(--warn); border-radius: 999px; padding: 0 7px; font-weight: 700; }
+.rail-end { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 2px; }
+.rail-who { padding: 6px 12px 8px; font-size: 12px; color: var(--fg2); overflow-wrap: anywhere; }
+.nav-scrim { display: none; }
+@media (max-width: 900px) {
+  .btn.burger { display: inline-flex; margin-left: -6px; }
+  .shell { --rail: 0px; grid-template-columns: minmax(0, 1fr); }
+  .rail { position: fixed; z-index: 46; top: 0; bottom: 0; left: 0; width: min(280px, 84vw); height: auto; padding-top: calc(16px + env(safe-area-inset-top, 0px)); padding-left: max(10px, env(safe-area-inset-left, 0px)); transform: translateX(-102%); transition: transform .2s ease; box-shadow: 0 0 40px rgba(0, 0, 0, .25); }
+  .nav-open .rail { transform: none; }
+  .nav-open .nav-scrim { display: block; position: fixed; inset: 0; z-index: 45; background: var(--scrim); }
+}
+@media (prefers-reduced-motion: reduce) { .rail { transition: none; } }
+
+.wrap { max-width: 1180px; margin: 0 auto; padding-block: 24px 120px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 20px; }
+.page-head { display: flex; flex-direction: column; gap: 6px; }
+.page-head p { max-width: 68ch; }
+.back { align-self: flex-start; margin-left: -10px; }
+
+/* Buttons */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 0 16px; border-radius: var(--r); border: 1px solid var(--border-strong); background: var(--surface); cursor: pointer; font-weight: 600; text-align: center; }
+.btn:hover:not(:disabled) { background: var(--elev); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.btn.primary:hover:not(:disabled) { background: var(--accent-dim); }
+.btn.danger { border-color: var(--error); color: var(--error); background: transparent; }
+.btn.ghost { background: transparent; border-color: transparent; }
+.btn.ghost:hover:not(:disabled) { background: var(--elev); }
+.btn.sm { min-height: 36px; padding: 0 12px; font-size: 14px; }
+.btn.xs { min-height: 32px; padding: 0 10px; font-size: 13px; border-radius: var(--r-sm); }
+.icon-btn { min-width: 36px; padding: 0; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.row.end { justify-content: flex-end; }
+.between { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.stack { display: flex; flex-direction: column; gap: 12px; }
+.stack.tight { gap: 6px; }
+.link { background: none; border: 0; padding: 0; color: var(--fg); font-weight: 700; cursor: pointer; text-align: left; overflow-wrap: anywhere; }
+.link:hover { text-decoration: underline; text-underline-offset: 3px; }
+.link.acc { color: var(--accent); font-weight: 600; }
+
+/* Surfaces */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 16px; min-width: 0; box-shadow: var(--shadow); }
+.card.warnc { border-color: color-mix(in srgb, var(--warn) 60%, transparent); }
+.chip { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border-strong); color: var(--fg2); white-space: nowrap; }
+.chip.ok { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 45%, transparent); background: var(--accent-subtle); }
+.chip.warn { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 45%, transparent); background: var(--warn-subtle); }
+.chip.bad { color: var(--error); border-color: color-mix(in srgb, var(--error) 45%, transparent); background: var(--error-subtle); }
+.avatar { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 13px; background: var(--elev); color: var(--fg2); flex: none; }
+.avatar.lg { width: 56px; height: 56px; font-size: 18px; border-radius: 16px; background: var(--accent); color: var(--on-accent); font-weight: 800; }
+.logo { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; font-weight: 800; font-size: 12px; letter-spacing: .5px; background: var(--elev); color: var(--fg); flex: none; border: 1px solid var(--border-strong); }
+.logo.lg { width: 56px; height: 56px; font-size: 17px; border-radius: 14px; }
+.logo.acc { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.who { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.who .main { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.notice { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: var(--r); border: 1px solid var(--border-strong); background: var(--surface); font-size: 14px; }
+.notice.warn { border-color: var(--warn); background: var(--warn-subtle); }
+.notice.bad { border-color: var(--error); background: var(--error-subtle); }
+.notice.ok { border-color: var(--accent); background: var(--accent-subtle); }
+.notice svg { flex: none; margin-top: 2px; }
+.notice > div { min-width: 0; }
+.kv { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 16px; font-size: 14px; margin: 0; }
+.kv dt { color: var(--fg2); }
+.kv dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+@media (max-width: 420px) { .kv { grid-template-columns: minmax(0, 1fr); gap: 0; } .kv dd { margin-bottom: 8px; } }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 16px; align-items: start; }
+.empty { padding: 28px 12px; text-align: center; color: var(--fg2); font-size: 14px; display: flex; flex-direction: column; gap: 6px; align-items: center; }
+.empty b { color: var(--fg); font-size: 15px; }
+.bul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+.detail { display: grid; gap: 20px; grid-template-columns: minmax(0, 1fr); align-items: start; }
+.detail > div { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+@media (min-width: 1040px) { .detail { grid-template-columns: minmax(0, 1fr) 340px; } }
+.hero { display: flex; gap: 14px; align-items: center; min-width: 0; }
+.hero .main { min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.hero h1 { overflow-wrap: anywhere; }
+.sec-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.sec-head > div { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+
+/* Tables: rows become stacked label/value blocks on phones */
+.tbl-wrap { overflow-x: auto; margin: 0 -16px; padding: 0 16px; }
+.tbl { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+.tbl th { text-align: left; font-size: 11px; letter-spacing: .6px; text-transform: uppercase; color: var(--fg2); font-weight: 600; padding: 8px 10px; border-bottom: 1px solid var(--border-strong); white-space: nowrap; }
+.tbl td { padding: 11px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.tbl tbody tr:last-child td { border-bottom: 0; }
+.tbl tr.click { cursor: pointer; }
+.tbl tr.click:hover td { background: var(--elev); }
+.tbl .n { text-align: right; }
+.tbl .nw { white-space: nowrap; }
+@media (max-width: 760px) {
+  .tbl-wrap { margin: 0; padding: 0; overflow: visible; }
+  .tbl.cards thead { display: none; }
+  .tbl.cards, .tbl.cards tbody, .tbl.cards tr, .tbl.cards td { display: block; width: 100%; }
+  .tbl.cards tr { padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .tbl.cards tbody tr:last-child { border-bottom: 0; }
+  .tbl.cards td { border: 0; padding: 3px 0; display: flex; justify-content: space-between; align-items: center; gap: 12px; text-align: right; }
+  .tbl.cards td::before { content: attr(data-label); color: var(--fg2); font-size: 13px; text-align: left; flex: none; }
+  .tbl.cards td.lead { text-align: left; padding-bottom: 6px; }
+  .tbl.cards td.lead::before { display: none; }
+  .tbl.cards td:empty { display: none; }
+  .tbl .n { text-align: right; }
+}
+.live { display: inline-flex; align-items: center; gap: 6px; }
+.live i { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: pulse 1.6s infinite; flex: none; }
+@media (prefers-reduced-motion: reduce) { .live i { animation: none; } }
+.more { display: flex; justify-content: center; padding-top: 12px; }
+
+/* Forms */
+.toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.toolbar .search { flex: 1 1 260px; min-width: 0; position: relative; }
+.toolbar .search svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--fg2); pointer-events: none; }
+.toolbar .search .input { padding-left: 36px; }
+.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.field > span { font-size: 13px; font-weight: 600; color: var(--fg2); }
+.hint { font-size: 12px; color: var(--fg2); font-weight: 400; }
+.err { font-size: 13px; color: var(--error); font-weight: 600; }
+.input { width: 100%; min-height: 44px; border-radius: var(--r-sm); border: 1px solid var(--border-strong); background: var(--field); padding: 8px 12px; }
+.input:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: transparent; }
+.input.bad { border-color: var(--error); }
+.affix { display: flex; align-items: stretch; }
+.affix .input { border-radius: 0 var(--r-sm) var(--r-sm) 0; }
+.affix .input.suf { border-radius: var(--r-sm) 0 0 var(--r-sm); }
+.affix > b { display: grid; place-items: center; padding: 0 12px; border: 1px solid var(--border-strong); background: var(--elev); color: var(--fg2); font-weight: 600; }
+.affix > b:first-child { border-right: 0; border-radius: var(--r-sm) 0 0 var(--r-sm); }
+.affix > b:last-child { border-left: 0; border-radius: 0 var(--r-sm) var(--r-sm) 0; }
+.fgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+.pass { position: relative; }
+.pass .input { padding-right: 76px; }
+.pass button { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); }
+.seg { display: inline-flex; border: 1px solid var(--border-strong); border-radius: var(--r); padding: 3px; gap: 3px; flex-wrap: wrap; align-self: flex-start; }
+.seg button { border: 0; background: transparent; min-height: 36px; padding: 0 12px; border-radius: 7px; cursor: pointer; font-weight: 600; color: var(--fg2); display: inline-flex; align-items: center; gap: 6px; }
+.seg button[aria-pressed="true"] { background: var(--elev); color: var(--fg); }
+.seg button .c { font-size: 12px; color: var(--fg3); font-variant-numeric: tabular-nums; }
+.switch { position: relative; width: 46px; height: 28px; border-radius: 999px; background: var(--overlay); border: 0; cursor: pointer; flex: none; transition: background .15s; }
+.switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: var(--knob); box-shadow: var(--shadow); transition: transform .15s; }
+.switch[aria-checked="true"] { background: var(--accent); }
+.switch[aria-checked="true"]::after { transform: translateX(18px); background: var(--on-accent); }
+.switch:disabled { opacity: .45; cursor: not-allowed; }
+.choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr)); gap: 10px; }
+.choice { display: flex; flex-direction: column; gap: 2px; text-align: left; padding: 12px 14px; border-radius: var(--r); border: 1px solid var(--border-strong); background: var(--bg); cursor: pointer; min-width: 0; }
+.choice[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-subtle); }
+.setting { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+.setting .main { min-width: 0; }
+
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); overflow-x: auto; }
+.tabs button { border: 0; background: none; padding: 10px 14px; font-weight: 700; color: var(--fg2); border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap; display: inline-flex; gap: 6px; align-items: center; }
+.tabs button:hover { color: var(--fg); }
+.tabs button[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--accent); }
+.tabs button .c { font-size: 12px; color: var(--fg3); font-variant-numeric: tabular-nums; }
+
+/* Admin specifics */
+.change { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 10px; align-items: center; }
+.change > div { display: flex; flex-direction: column; gap: 2px; border: 1px solid var(--border-strong); border-radius: var(--r-sm); padding: 10px 12px; min-width: 0; overflow-wrap: anywhere; }
+.change > div.to { border-color: var(--accent); background: var(--accent-subtle); }
+.change > svg { color: var(--fg2); }
+@media (max-width: 520px) { .change { grid-template-columns: minmax(0, 1fr); } .change > svg { transform: rotate(90deg); justify-self: center; } }
+.checks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.checks li { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; }
+.checks li svg { flex: none; margin-top: 3px; }
+.checks li.ok svg { color: var(--accent); }
+.checks li.bad svg { color: var(--error); }
+.log { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.log li { display: flex; flex-direction: column; gap: 1px; padding: 9px 0; border-top: 1px solid var(--border); font-size: 13px; }
+.log li:first-child { border-top: 0; padding-top: 0; }
+.log li span { color: var(--fg2); font-size: 12px; }
+.prog { height: 8px; background: var(--elev); border-radius: 999px; overflow: hidden; }
+.prog i { display: block; height: 100%; background: var(--warn); border-radius: 999px; }
+.timeline { display: flex; justify-content: space-between; gap: 12px; font-size: 12px; color: var(--fg2); }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); gap: 10px; }
+.tile { border: 1px solid var(--border); border-radius: var(--r-sm); padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.tile b { font-size: 17px; overflow-wrap: anywhere; }
+.tile .mono { font-size: 20px; font-weight: 600; }
+.total { font-family: var(--mono); font-weight: 600; }
+.total.bad { color: var(--error); }
+.split { display: flex; height: 12px; border-radius: 999px; overflow: hidden; gap: 2px; background: var(--elev); }
+.split .a { background: var(--accent); }
+.split .b { background: color-mix(in srgb, var(--accent) 35%, var(--elev)); }
+.steps { display: flex; gap: 8px; align-items: center; font-size: 12px; font-weight: 700; color: var(--fg3); letter-spacing: .3px; text-transform: uppercase; }
+.steps .on { color: var(--accent); }
+.spin { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--border-strong); border-top-color: var(--accent); animation: spin .8s linear infinite; display: inline-block; flex: none; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spin { animation-duration: 3s; } }
+.diff { display: flex; flex-direction: column; gap: 6px; }
+.diff div { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; padding: 8px 10px; border-radius: var(--r-sm); background: var(--bg); border: 1px solid var(--border); }
+.diff div.ch { border-color: var(--accent); }
+.diff b { font-family: var(--mono); font-weight: 600; white-space: nowrap; }
+.flag { display: flex; gap: 16px; align-items: flex-start; justify-content: space-between; }
+.flag .main { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+
+/* Sheets */
+.scrim { position: fixed; inset: 0; background: var(--scrim); z-index: 40; animation: fade .15s; }
+.sheet { position: fixed; z-index: 41; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(560px, calc(100vw - 24px)); max-height: calc(100dvh - 40px); display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--border-strong); border-radius: 16px; box-shadow: 0 24px 60px rgba(0, 0, 0, .45); animation: pop .16s ease-out; }
+@media (max-width: 640px) {
+  .sheet { left: 0; right: 0; top: auto; bottom: 0; transform: none; width: 100%; max-height: 92dvh; border-radius: 16px 16px 0 0; padding-bottom: env(safe-area-inset-bottom, 0px); animation: up .18s ease-out; }
+}
+.sheet header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 18px 20px 6px; }
+.sheet header h2:focus { outline: none; }
+.sheet .sb { padding: 10px 20px 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
+.sheet footer { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; padding: 12px 20px 18px; border-top: 1px solid var(--border); }
+.sheet footer .btn { flex: 1 1 auto; }
+@keyframes fade { from { opacity: 0; } }
+@keyframes pop { from { opacity: 0; transform: translate(-50%, -48%); } }
+@keyframes up { from { transform: translateY(30px); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .scrim, .sheet { animation: none !important; } }
+.scrim.still, .sheet.still { animation: none; }
+.demo-sec { display: flex; flex-direction: column; gap: 8px; padding-top: 12px; border-top: 1px solid var(--border); }
+.demo-sec:first-of-type { border-top: 0; padding-top: 0; }
+.toasts { position: fixed; z-index: 60; left: 50%; transform: translateX(-50%); bottom: calc(28px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 8px; width: min(440px, calc(100vw - 32px)); pointer-events: none; }
+.toast { background: var(--fg); color: var(--bg); padding: 10px 14px; border-radius: var(--r); font-size: 14px; font-weight: 600; box-shadow: 0 10px 30px rgba(0, 0, 0, .35); }
+
+/* Sign in */
+.login { min-height: calc(100dvh - 80px); display: grid; place-items: center; padding: 24px max(16px, env(safe-area-inset-right, 0px)) 24px max(16px, env(safe-area-inset-left, 0px)); }
+.login .card { width: min(420px, 100%); padding: 28px; display: flex; flex-direction: column; gap: 18px; }
+.mark { display: flex; align-items: baseline; gap: 10px; }
+.mark span { font-size: 36px; font-weight: 800; letter-spacing: 6px; line-height: 1; }
+.mark b { color: var(--accent); }
+.mark em { font-style: normal; font-weight: 700; color: var(--fg2); font-size: 15px; letter-spacing: .5px; text-transform: uppercase; }
+</style>
+
+<div id="app"></div>
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+'use strict';
+
+// ---------- Domain constants (docs/business_logic/product/admin) ----------
+const OWNER = 'owner@rotra.example';
+// Accounts that exist but aren't the platform owner: signing in with them shows Access denied.
+const NON_ADMIN = {
+  'lahug.smash': 'the club account for Lahug Smash Club',
+  'itpark.badminton': 'the club account for IT Park Badminton Club',
+  'migs.santos@example.com': 'the player account for Miguel Santos',
+};
+const LEVELS = ['Beginner Low', 'Beginner Mid', 'Beginner High', 'Intermediate Low', 'Intermediate Mid', 'Intermediate High', 'Advanced Low', 'Advanced Mid', 'Advanced High'];
+const RETENTION_MONTHS = 6; // public pages are deleted after six months of continuous expiry
+const FIELD = { phone: 'phone number', email: 'email' };
+
+// ---------- Dates (YYYY-MM-DD strings, local time) ----------
+const pad = (n) => String(n).padStart(2, '0');
+const toYmd = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const ymdParts = (s) => s.split('-').map(Number);
+const ymdT = (s) => { const [y, m, d] = ymdParts(s); return new Date(y, m - 1, d).getTime(); };
+const todayYmd = () => toYmd(new Date());
+const addDays = (s, n) => { const [y, m, d] = ymdParts(s); return toYmd(new Date(y, m - 1, d + n)); };
+function addMonths(s, n) {
+  const [y, m, d] = ymdParts(s);
+  const t = new Date(y, m - 1 + n, 1);
+  t.setDate(Math.min(d, new Date(t.getFullYear(), t.getMonth() + 1, 0).getDate()));
+  return toYmd(t);
+}
+const diffDays = (a, b) => Math.round((ymdT(b) - ymdT(a)) / 864e5);
+const validYmd = (s) => /^\d{4}-\d{2}-\d{2}$/.test(s || '') && toYmd(new Date(ymdT(s))) === s;
+const termEnd = (from, plan) => addDays(addMonths(from, plan === 'Yearly' ? 12 : 1), -1);
+const fmtYmd = (s) => new Date(ymdT(s)).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+const fmtAt = (t) => new Date(t).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+const fmtTime = (t) => new Date(t).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+function ago(t) {
+  const m = Math.round((Date.now() - t) / 6e4);
+  if (m < 1) return 'just now';
+  if (m < 60) return `${m} min ago`;
+  const h = Math.round(m / 60);
+  if (h < 24) return `${h} hour${h === 1 ? '' : 's'} ago`;
+  const d = Math.round(h / 24);
+  return `${d} day${d === 1 ? '' : 's'} ago`;
+}
+const peso = (v) => `₱${Math.round(v || 0).toLocaleString('en-US')}`;
+const num = (n) => n.toLocaleString('en-US');
+const plural = (n, w) => `${num(n)} ${w}${n === 1 ? '' : 's'}`;
+
+// ---------- Fixtures (fictional) ----------
+const H = 36e5, D = 864e5;
+const term = (paid, plan, from, to, amount, ref) => ({ paid, plan, from, to, amount, ref, by: OWNER });
+function seedClubs() {
+  const now = Date.now();
+  return [
+    { id: 'c1', name: 'Lahug Smash Club', initials: 'LS', accent: true, username: 'lahug.smash', setUp: '2026-01-04', founding: 'Salinas Dr, Lahug, Cebu City', city: 'Cebu City', code: 'PH-CEB',
+      terms: [term('2026-04-01', 'Yearly', '2026-04-01', '2027-03-31', 15000, 'LIC-0004'), term('2026-03-02', 'Monthly', '2026-03-01', '2026-03-31', 1500, 'LIC-0003'), term('2026-02-01', 'Monthly', '2026-02-01', '2026-02-28', 1500, 'LIC-0002'), term('2026-01-05', 'Monthly', '2026-01-05', '2026-01-31', 1500, 'LIC-0001')],
+      nameRequest: { name: 'Lahug Smashers', at: now - 19 * H }, live: { title: 'Tuesday Night Queue', venue: 'Lahug Sports Hub', at: now - 52 * 6e4 }, ret: { cycles: [] }, oldNames: [] },
+    { id: 'c2', name: 'IT Park Badminton Club', initials: 'IP', username: 'itpark.badminton', setUp: '2026-04-28', founding: 'Geonzon St, IT Park, Cebu City', city: 'Cebu City', code: 'PH-CEB',
+      terms: [term('2026-10-03', 'Monthly', '2026-10-03', '2026-11-02', 1500, 'LIC-0009'), term('2026-09-03', 'Monthly', '2026-09-03', '2026-10-02', 1500, 'LIC-0008'), term('2026-08-03', 'Monthly', '2026-08-03', '2026-09-02', 1500, 'LIC-0007'), term('2026-06-01', 'Monthly', '2026-06-01', '2026-06-30', 1500, 'LIC-0006'), term('2026-05-01', 'Monthly', '2026-05-01', '2026-05-31', 1500, 'LIC-0005')],
+      nameRequest: null, live: null, ret: { cycles: [{ expired: '2026-07-01', cancelled: '2026-08-03' }] }, oldNames: [] },
+    { id: 'c3', name: 'Matina Smash Club', initials: 'MS', username: 'matina.smash', setUp: '2026-02-10', founding: 'MacArthur Hwy, Matina, Davao City', city: 'Davao City', code: 'PH-DVO',
+      terms: [term('2026-02-14', 'Yearly', '2026-02-15', '2027-02-14', 15000, 'LIC-0010')], nameRequest: null, live: null, ret: { cycles: [] }, oldNames: [] },
+    { id: 'c4', name: 'Sampaloc Shuttle Club', initials: 'SS', username: 'sampaloc.shuttle', setUp: '2026-07-01', founding: 'Dapitan St, Sampaloc, Manila', city: 'Manila', code: 'PH-MNL',
+      terms: [term('2026-10-10', 'Monthly', '2026-10-10', '2026-11-09', 1500, 'LIC-0014'), term('2026-09-10', 'Monthly', '2026-09-10', '2026-10-09', 1500, 'LIC-0013'), term('2026-08-08', 'Monthly', '2026-08-10', '2026-09-09', 1500, 'LIC-0012'), term('2026-07-10', 'Monthly', '2026-07-10', '2026-08-09', 1500, 'LIC-0011')],
+      nameRequest: { name: 'Sampaloc Shuttle Collective', at: now - 3 * D - 4 * H }, live: null, ret: { cycles: [] }, oldNames: [] },
+    { id: 'c5', name: 'Talamban Racket Club', initials: 'TR', username: 'talamban.racket', setUp: '2026-05-25', founding: 'Gov. M. Cuenco Ave, Talamban, Cebu City', city: 'Cebu City', code: 'PH-CEB',
+      terms: [term('2026-09-01', 'Monthly', '2026-09-01', '2026-09-30', 1500, 'LIC-0017'), term('2026-08-01', 'Monthly', '2026-08-01', '2026-08-31', 1500, 'LIC-0016'), term('2026-06-01', 'Monthly', '2026-06-01', '2026-07-31', 3000, 'LIC-0015')],
+      nameRequest: null, live: null, exception: 'Wednesday Ladder Night was already running when the license ended on Sep 30. It was allowed to finish and synced at 12:40 AM on Oct 1. No new session can start until the license is renewed.', ret: { cycles: [] }, oldNames: [] },
+    { id: 'c6', name: 'Bacolod Rally House', initials: 'BR', username: 'bacolod.rally', setUp: '2025-12-12', founding: 'Lacson St, Bacolod City', city: 'Bacolod City', code: 'PH-BCD',
+      terms: [term('2026-03-20', 'Monthly', '2026-03-20', '2026-04-19', 1500, 'LIC-0020'), term('2026-01-20', 'Monthly', '2026-01-20', '2026-03-19', 3000, 'LIC-0019')],
+      nameRequest: null, live: null, ret: { cycles: [], failedOn: '2026-10-20' }, oldNames: [] },
+    { id: 'c7', name: 'Molo Shuttle Club', initials: 'MO', username: 'molo.shuttle', setUp: '2025-11-03', founding: 'Molo Plaza, Iloilo City', city: 'Iloilo City', code: 'PH-ILO',
+      terms: [term('2025-11-05', 'Monthly', '2025-11-05', '2026-03-31', 7500, 'LIC-0021')], nameRequest: null, live: null, ret: { cycles: [], deletedOn: '2026-10-01' }, oldNames: [] },
+    { id: 'c8', name: 'Tagbilaran Badminton Circle', initials: 'TB', username: 'tagbilaran.circle', setUp: '2026-10-20', founding: 'CPG Ave, Tagbilaran City', city: 'Tagbilaran City', code: 'PH-TAG',
+      terms: [], nameRequest: null, live: null, ret: { cycles: [] }, oldNames: [] },
+  ];
+}
+
+// Each club has its own price, set by the platform owner: [monthly, yearly] in pesos. Yearly costs less than twelve months.
+const SEED_PRICE = { c1: [1500, 15000], c2: [1500, 15000], c3: [1200, 12000], c4: [1800, 18000], c5: [1500, 15000], c6: [1500, 15000], c7: [1500, 15000], c8: [1000, 10000] };
+// Founding cities and the codes they put in new players' RTR IDs.
+const CITY_LIST = [['PH-CEB', 'Cebu City'], ['PH-MNL', 'Manila'], ['PH-DVO', 'Davao City'], ['PH-ILO', 'Iloilo City'], ['PH-BCD', 'Bacolod City'], ['PH-TAG', 'Tagbilaran City']];
+
+const FIRST = ['Andrea', 'Bryan', 'Carla', 'Dennis', 'Elaine', 'Francis', 'Grace', 'Hannah', 'Ian', 'Janelle', 'Karl', 'Lara', 'Mark', 'Nicole', 'Oscar', 'Patricia', 'Ramon', 'Sofia', 'Tristan', 'Vince', 'Wendy', 'Xavier', 'Yvonne', 'Zach', 'Aira', 'Benjie', 'Cris', 'Dianne', 'Earl', 'Faith', 'Gelo', 'Hazel', 'Iñigo', 'Joy', 'Kevin', 'Liza', 'Marvin', 'Nash', 'Pia', 'Renz', 'Shaira', 'Toni'];
+const LAST = ['Abad', 'Bautista', 'Cabrera', 'Dizon', 'Espiritu', 'Flores', 'Gonzaga', 'Hernandez', 'Ignacio', 'Jimenez', 'Katigbak', 'Lacson', 'Macaraeg', 'Natividad', 'Ong', 'Pacquing', 'Quijano', 'Rosales', 'Sison', 'Tolentino', 'Uy', 'Valdez', 'Yap', 'Zamora', 'Alcantara', 'Baluyot', 'Evangelista', 'Fajardo', 'Ilagan', 'Laurel', 'Manalo', 'Pineda', 'Villanueva'];
+const NICKS = ['Ace', 'Bok', 'Dodong', 'Inday', 'Jun', 'Kiko', 'Lyn', 'Nonoy', 'Pao', 'Tintin'];
+const CITY_CLUB = { CEB: ['Lahug Smash Club', 'IT Park Badminton Club', 'Talamban Racket Club'], MNL: ['Sampaloc Shuttle Club'], DVO: ['Matina Smash Club'], ILO: ['Molo Shuttle Club'], BCD: ['Bacolod Rally House'] };
+const CODES = ['CEB', 'CEB', 'CEB', 'CEB', 'MNL', 'DVO', 'ILO', 'BCD'];
+const DATES = ['011526', '020326', '031526', '040226', '041926', '050726', '052126', '061126', '070926', '081326', '090226', '091626', '100726'];
+function hashStr(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+const plain = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
+// Players who also appear in the Queue and Player prototypes keep their names, IDs and contacts.
+const P = (id, name, nick, rtr, club, phone, email, level, recent, o = {}) => ({ id, name, nick, rtr, club, phone, email, claimed: !!email, phoneHidden: false, level, recent, registered: null, ...o });
+function seedPlayers() {
+  const out = [
+    P('p1', 'Miguel Santos', 'Migs', 'RTR-PH-CEB-031526-0001', 'Lahug Smash Club', '+63 917 555 0142', 'migs.santos@example.com', 5, 12, { phoneHidden: true, registered: '2026-03-18' }),
+    P('p2', 'Bea Castillo', '', 'RTR-PH-CEB-031526-0002', 'Lahug Smash Club', '+63 917 555 0213', 'bea.castillo.cebu@example.com', 6, 14, { registered: '2026-03-21' }),
+    P('p3', 'Jomar dela Cruz', 'Jom', 'RTR-PH-CEB-040226-0007', 'Lahug Smash Club', '+63 918 555 0377', '', 3, 9),
+    P('p4', 'Kat Lim', '', 'RTR-PH-CEB-040226-0011', 'Lahug Smash Club', '+63 920 555 0458', 'kat.lim@example.com', 5, 11, { registered: '2026-04-05' }),
+    P('p5', 'Enzo Navarro', '', 'RTR-PH-MNL-050726-0014', 'Sampaloc Shuttle Club', '+63 917 555 0631', 'enzo.navarro@example.com', 7, 15, { registered: '2026-05-09' }),
+    P('p6', 'Joanna Tan', 'Jo', 'RTR-PH-CEB-050726-0019', 'Lahug Smash Club', '+63 919 555 0702', '', null, 2),
+    P('p7', 'Rafa Aquino', '', 'RTR-PH-CEB-061126-0021', 'IT Park Badminton Club', '+63 915 555 0814', 'rafa.aquino@example.com', 6, 10, { registered: '2026-06-14' }),
+    P('p9', 'Carlo Medina', '', 'RTR-PH-CEB-061126-0025', 'IT Park Badminton Club', '+63 916 555 0920', 'carlo.medina@example.com', 4, 8, { registered: '2026-06-20' }),
+    P('p9b', 'Carlo Medina', '', 'RTR-PH-MNL-090226-0102', 'Sampaloc Shuttle Club', '+63 908 555 0175', 'carlo.m.manila@example.com', 2, 3, { registered: '2026-09-04' }),
+    P('p10', 'Nina Ocampo', '', 'RTR-PH-CEB-070926-0030', 'Talamban Racket Club', '+63 917 555 0388', '', 3, 7),
+    P('p11', 'Paulo Garcia', 'Pau', 'RTR-PH-DVO-070926-0031', 'Matina Smash Club', '+63 926 555 0149', 'paulo.garcia@example.com', 6, 13, { registered: '2026-07-12' }),
+    P('p13', 'Dani Rivera', '', 'RTR-PH-CEB-081326-0040', 'Lahug Smash Club', '+63 917 555 0566', 'dani.rivera@example.com', 4, 10, { registered: '2026-08-15' }),
+    P('p14', 'Theo Ramos', '', 'RTR-PH-MNL-081326-0042', 'Sampaloc Shuttle Club', '+63 905 555 0297', 'theo.ramos@example.com', 8, 18, { registered: '2026-08-16' }),
+    P('p16', 'Marco Lopez', '', 'RTR-PH-ILO-090226-0047', 'Molo Shuttle Club', '+63 933 555 0611', 'marco.lopez@example.com', 7, 11, { registered: '2026-09-03' }),
+    P('p17', 'Gab Torres', '', 'RTR-PH-CEB-090226-0050', 'Talamban Racket Club', '', '', 2, 4),
+    P('p18', 'Iya Mercado', '', 'RTR-PH-CEB-091626-0055', 'IT Park Badminton Club', '+63 917 555 0904', 'iya.mercado@example.com', 4, 6, { registered: '2026-09-18' }),
+    P('p20', 'Andi Cruz', '', 'RTR-PH-CEB-100726-0061', 'Lahug Smash Club', '+63 921 555 0730', 'andi.cruz@example.com', null, 0, { registered: '2026-10-09' }),
+  ];
+  for (let i = 0; i < 168; i++) {
+    const h = hashStr(`ap${i}`);
+    const first = FIRST[h % FIRST.length], last = LAST[(h >>> 8) % LAST.length];
+    const code = CODES[(h >>> 12) % CODES.length], date = DATES[(h >>> 6) % DATES.length];
+    const clubs = CITY_CLUB[code];
+    const claimed = (h >>> 4) % 4 !== 0;
+    const lv = (h >>> 20) % 11;
+    const mm = date.slice(0, 2), dd = date.slice(2, 4);
+    out.push(P(`g${i}`, `${first} ${last}`, (h >>> 16) % 6 === 0 ? NICKS[(h >>> 22) % NICKS.length] : '', `RTR-PH-${code}-${date}-${String(200 + i).padStart(4, '0')}`, clubs[(h >>> 14) % clubs.length],
+      claimed || (h >>> 18) % 2 ? `+63 9${10 + ((h >>> 9) % 30)} 555 ${String(1000 + i * 37).slice(-4)}` : '',
+      claimed ? `${plain(first)}.${plain(last)}${i}@example.com` : '', lv > 8 ? null : lv, (h >>> 24) % 19,
+      { phoneHidden: claimed && (h >>> 11) % 3 === 0, registered: claimed ? `2026-${mm}-${pad(Math.min(28, +dd + 3))}` : null }));
+  }
+  return out;
+}
+
+const R = (id, pid, field, from, to, at, status, o = {}) => ({ id, pid, field, from, to, at, status, source: 'app', ...o });
+function seedRequests() {
+  const now = Date.now();
+  return [
+    R('r1', 'p1', 'phone', '+63 917 555 0142', '+63 927 555 0198', now - 2 * H, 'submitted'),
+    R('r2', 'p13', 'phone', '+63 917 555 0566', '+63 917 555 0631', now - 5 * H, 'submitted'),
+    R('r3', 'p11', 'email', 'paulo.garcia@example.com', 'pau.garcia@example.com', now - 3 * D, 'submitted'),
+    R('r4', 'p11', 'email', 'paulo.garcia@example.com', 'paulo.garcia.dvo@example.com', now - 22 * H, 'submitted'),
+    R('r5', 'p4', 'email', 'kat.lim@example.com', 'kat.lim.smash@example.com', now - 26 * H, 'submitted', { source: 'owner' }),
+    R('r6', 'p14', 'phone', '+63 905 555 0297', '+63 905 555 0415', now - 30 * H, 'applying', { approvedAt: now - 12 * 6e4 }),
+    R('r7', 'p7', 'phone', '+63 915 555 0814', '+63 915 555 0990', now - 2 * D, 'failed', { approvedAt: now - 1 * D, error: "The sign-in provider didn't accept the new number." }),
+    R('r8', 'p2', 'email', 'bea.castillo@example.com', 'bea.castillo.cebu@example.com', now - 4 * D, 'applied', { approvedAt: now - 3 * D, appliedAt: now - 3 * D + 4e4 }),
+    R('r9', 'p18', 'email', 'iya.mercado@example.com', 'iya.m@example.com', now - 6 * D, 'rejected', { decidedAt: now - 5 * D }),
+  ];
+}
+function seedLog() {
+  const now = Date.now();
+  const L = (at, t, id, text) => ({ at, actor: OWNER, t, id, text });
+  return [
+    L(now - 1 * D, 'req', 'r7', 'Approved phone number change for Rafa Aquino. Applying failed at the sign-in provider.'),
+    L(now - 3 * D, 'req', 'r8', 'Approved email change for Bea Castillo. Applied.'),
+    L(now - 5 * D, 'req', 'r9', 'Declined email change for Iya Mercado.'),
+    L(ymdT('2026-10-03') + 10 * H, 'club', 'c2', 'Renewed license: Monthly, Oct 3 – Nov 2, 2026 · ₱1,500 · LIC-0009.'),
+    L(ymdT('2026-10-10') + 9 * H, 'club', 'c4', 'Renewed license: Monthly, Oct 10 – Nov 9, 2026 · ₱1,500 · LIC-0014.'),
+    L(ymdT('2026-10-20') + 15 * H, 'club', 'c8', 'Set up the club account tagbilaran.circle.'),
+    L(ymdT('2026-08-03') + 11 * H, 'club', 'c2', 'Renewed license: Monthly, Aug 3 – Sep 2, 2026. Public pages restored; deletion countdown from Jul 1 cancelled.'),
+    L(ymdT('2026-04-01') + 9 * H, 'club', 'c1', 'Renewed license: Yearly, Apr 1, 2026 – Mar 31, 2027 · ₱15,000 · LIC-0004.'),
+  ].sort((a, b) => b.at - a.at);
+}
+
+function freshState() {
+  return {
+    v: 1, online: true, offlineAt: null, me: null, denied: null, ended: false, screen: 'clubs', viewId: null,
+    clubs: seedClubs().map((c) => ({ ...c, price: { monthly: SEED_PRICE[c.id][0], yearly: SEED_PRICE[c.id][1], free: c.id === 'c8' } })), players: seedPlayers(), requests: seedRequests(), log: seedLog(),
+    config: [{ v: 1, assess: 70, perf: 30, threshold: 10, at: ymdT('2026-01-05') + 9 * H, by: OWNER }],
+    flags: [],
+    demo: { timeoutNext: false, failApply: false, failConfig: false, conflictConfig: false },
+    ui: freshUi(),
+  };
+}
+function freshUi() {
+  return {
+    login: { email: '', pass: '', show: false, err: '', pending: false },
+    clubsQ: '', clubsF: 'all', playersQ: '', playersF: 'all', shown: 25, reqF: 'submitted',
+    cfg: null, cfgErr: '', cfgConflict: false, lic: null, sheet: null, nav: false, resetArmed: false, pendingGo: null,
+  };
+}
+
+const KEY = 'rotra-admin-prototype-v1';
+let S;
+try { S = JSON.parse(localStorage.getItem(KEY)); } catch (e) { S = null; }
+if (!S || S.v !== 1) S = freshState();
+// Saves from before per-club prices get the sample prices.
+S.clubs.forEach((c) => { if (!c.price) { const p = SEED_PRICE[c.id] || [1500, 15000]; c.price = { monthly: p[0], yearly: p[1] }; } });
+Object.assign(S.ui, { sheet: null, pendingGo: null, resetArmed: false, nav: false });
+S.ui.login.pending = false;
+if (S.ui.lic && ['saving', 'checking'].includes(S.ui.lic.step)) S.ui.lic = null;
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable: keep working in memory */ } }
+// Light / dark: dark by default (or the device setting until the viewer picks one); the choice is remembered on this device.
+const THEME_KEY = 'rotra-admin-theme';
+const isDark = () => { const t = document.documentElement.dataset.theme; return t ? t === 'dark' : getComputedStyle(document.documentElement).colorScheme.trim() !== 'light'; };
+try { const t = localStorage.getItem(THEME_KEY); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) { /* no storage: follow the device */ }
+matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => { if (!document.documentElement.dataset.theme) render(); });
+
+// ---------- Helpers ----------
+const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const initials = (name) => name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join('');
+const firstName = (p) => p.nick || p.name.split(' ')[0];
+const norm = (v) => String(v || '').replace(/[\s-]/g, '').toLowerCase();
+function toast(text) {
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = text;
+  document.getElementById('toasts').append(el);
+  setTimeout(() => el.remove(), 3800);
+}
+const later = (ms, fn) => setTimeout(() => { fn(); render(); }, ms);
+const clubOf = (id) => S.clubs.find((c) => c.id === id);
+const playerOf = (id) => S.players.find((p) => p.id === id);
+const reqOf = (id) => S.requests.find((r) => r.id === id);
+const eff = () => S.config[S.config.length - 1];
+function log(t, id, text) { S.log.unshift({ at: Date.now(), actor: OWNER, t, id, text }); }
+
+// ---------- Icons ----------
+const svg = (body, w = 16, sw = 2.2) => `<svg width="${w}" height="${w}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
+const I = {
+  sun: svg('<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'),
+  moon: svg('<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>'),
+  alert: svg('<path d="M12 3 2 21h20L12 3z"/><path d="M12 10v5M12 18h.01"/>'),
+  info: svg('<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>'),
+  check: svg('<path d="m5 12 4 4 10-10"/>', 16, 2.6),
+  x: svg('<path d="M6 6l12 12M18 6 6 18"/>', 18, 2.4),
+  xs: svg('<path d="M7 7l10 10M17 7 7 17"/>', 16, 2.6),
+  back: svg('<path d="m15 6-6 6 6 6"/>', 16, 2.4),
+  arrow: svg('<path d="M5 12h14M13 6l6 6-6 6"/>', 18),
+  search: svg('<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>'),
+  menu: svg('<path d="M4 7h16M4 12h16M4 17h16"/>', 20),
+  user: svg('<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>', 14),
+  lock: svg('<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>'),
+  n_club: svg('<path d="M4 21V8l8-5 8 5v13"/><path d="M9 21v-6h6v6"/>', 20, 2),
+  n_players: svg('<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/>', 20, 2),
+  n_contact: svg('<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>', 20, 2),
+  n_name: svg('<path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="m13.5 6.5 4 4"/>', 20, 2),
+  n_rank: svg('<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>', 20, 2),
+  n_flag: svg('<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>', 20, 2),
+  n_out: svg('<path d="M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4M10 17l5-5-5-5M15 12H3"/>', 20, 2),
+};
+const chip = (t, k = '') => `<span class="chip ${k}">${t}</span>`;
+const notice = (kind, html) => `<div class="notice ${kind}">${kind === 'ok' ? I.check : kind ? I.alert : I.info}<div>${html}</div></div>`;
+const sw = (on, act, label, attrs = '') => `<button class="switch" role="switch" aria-checked="${!!on}" aria-label="${esc(label)}" data-act="${act}" ${attrs}></button>`;
+const backBtn = (to, label) => `<button class="btn sm ghost back" data-act="go" data-to="${to}">${I.back} ${esc(label)}</button>`;
+const seg = (act, cur, opts, label) => `<div class="seg" role="group" aria-label="${esc(label)}">${opts.map(([v, l, c]) => `<button type="button" data-act="${act}" data-v="${v}" aria-pressed="${cur === v}">${l}${c != null ? ` <span class="c">${c}</span>` : ''}</button>`).join('')}</div>`;
+const logo = (c, cls = '') => `<span class="logo ${c.accent ? 'acc' : ''} ${cls}" aria-hidden="true">${esc(c.initials)}</span>`;
+const avatar = (p, cls = '') => `<span class="avatar ${cls}" aria-hidden="true">${esc(initials(p.name))}</span>`;
+const errLine = (t) => (t ? `<p class="err" role="alert">${t}</p>` : '');
+const OFFLINE_ERR = "You're offline, so nothing was saved. Try again once you're connected.";
+
+// ---------- Prices (set per club; no fixed price) ----------
+const toNum = (v) => +String(v ?? '').replace(/,/g, '').trim();
+const posInt = (v) => /^\d+$/.test(String(v ?? '').replace(/,/g, '').trim()) && toNum(v) > 0;
+const savePct = (p) => Math.round((1 - p.yearly / (p.monthly * 12)) * 100);
+// A free club (for example a tester) still gets license terms, recorded at ₱0.
+const priceLine = (p) => (p.free ? 'Free (tester club)' : `${peso(p.monthly)} a month · ${peso(p.yearly)} a year${savePct(p) > 0 ? ` (${savePct(p)}% off)` : ''}`);
+const amountText = (n) => (n === 0 ? 'Free' : peso(n));
+function priceErrors(m, y) {
+  const e = {};
+  if (!posInt(m)) e.monthly = 'Enter the monthly price in pesos.';
+  if (!posInt(y)) e.yearly = 'Enter the yearly price in pesos.';
+  else if (!e.monthly && toNum(y) >= toNum(m) * 12) e.yearly = `Make it less than 12 months at the monthly price (${peso(toNum(m) * 12)}). Yearly plans get a discount.`;
+  return e;
+}
+function priceFields(key, d, e) {
+  const m = toNum(d.monthly), y = toNum(d.yearly);
+  const mode = `<div class="choices" role="group" aria-label="Pricing">${[['paid', 'Paid', 'Monthly and yearly price for this club'], ['free', 'Free', 'For tester clubs. Licenses are recorded at ₱0.']].map(([v, l, sub]) => `<button type="button" class="choice" data-act="priceMode" data-k="${key}" data-v="${v}" aria-pressed="${!!d.free === (v === 'free')}"><b>${l}</b><span class="small muted">${sub}</span></button>`).join('')}</div>`;
+  if (d.free) return mode;
+  return `${mode}<div class="fgrid">
+    <label class="field" for="${key}-monthly"><span>Monthly price</span><div class="affix"><b>₱</b><input class="input ${e.monthly ? 'bad' : ''}" id="${key}-monthly" inputmode="numeric" data-bind="ui.${key}.monthly" data-live value="${esc(d.monthly)}"></div>${errLine(e.monthly)}</label>
+    <label class="field" for="${key}-yearly"><span>Yearly price</span><div class="affix"><b>₱</b><input class="input ${e.yearly ? 'bad' : ''}" id="${key}-yearly" inputmode="numeric" data-bind="ui.${key}.yearly" data-live value="${esc(d.yearly)}"></div>${errLine(e.yearly)}</label></div>
+    <p class="hint">${m > 0 ? `Twelve months at the monthly price is ${peso(m * 12)}.${y > 0 && y < m * 12 ? ` This yearly price saves ${Math.round((1 - y / (m * 12)) * 100)}%.` : ''}` : 'Each club has its own price. There is no fixed price.'}</p>`;
+}
+const slugOf = (name) => plain(name).replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter((w) => w && !['club', 'the', 'of', 'and'].includes(w)).slice(0, 2).join('.');
+function genPass() {
+  const a = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789', r = new Uint32Array(12);
+  crypto.getRandomValues(r);
+  return Array.from(r, (n) => a[n % a.length]).join('');
+}
+const flagKeyOf = (name) => plain(name).replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').replace(/^(\d)/, 'f_$1').slice(0, 40);
+function flagErrors(F) {
+  const e = {}, name = F.name.trim(), key = F.key.trim();
+  if (!name) e.name = 'Enter a name.';
+  else if (name.length > 50) e.name = 'Keep the name under 50 characters.';
+  else if (S.flags.some((x) => plain(x.name) === plain(name))) e.name = 'A flag with this name already exists.';
+  if (!key) e.key = 'Enter a key.';
+  else if (!/^[a-z][a-z0-9_]{2,39}$/.test(key)) e.key = 'Use 3 to 40 lowercase letters, numbers and underscores, starting with a letter.';
+  else if (S.flags.some((x) => x.key === key)) e.key = 'That key is already used.';
+  if (F.desc.trim().length < 10) e.desc = 'Describe what the flag does, so it is clear when to use it.';
+  return e;
+}
+function addErrors(A) {
+  const e = A.free ? {} : priceErrors(A.monthly, A.yearly), name = A.name.trim(), user = A.username.trim();
+  if (!name) e.name = 'Enter the club name.';
+  else if (name.length > 60) e.name = 'Keep the name under 60 characters.';
+  else if (S.clubs.some((c) => plain(c.name) === plain(name))) e.name = 'A club with this name already exists.';
+  if (!A.founding.trim()) e.founding = 'Enter the address where the club was founded.';
+  if (!A.code) e.code = 'Choose the founding city.';
+  if (!user) e.username = 'Choose a username.';
+  else if (!/^[a-z0-9]+(\.[a-z0-9]+)*$/.test(user) || user.length < 3 || user.length > 30) e.username = 'Use 3 to 30 lowercase letters, numbers and dots, like lahug.smash.';
+  else if (S.clubs.some((c) => c.username === user) || NON_ADMIN[user]) e.username = 'That username is already taken.';
+  if (A.pass.length < 8) e.pass = 'Use at least 8 characters.';
+  return e;
+}
+
+// ---------- License and retention ----------
+function access(c) {
+  const t = todayYmd(), T = c.terms;
+  if (!T.length) return { state: 'none' };
+  const cur = T.find((x) => x.from <= t && t <= x.to);
+  if (cur) {
+    // Follow back-to-back terms so a renewal that starts the day after shows as one continuous period.
+    let until = cur.to, moved = true;
+    while (moved) { moved = false; T.forEach((x) => { if (x.from <= addDays(until, 1) && x.to > until) { until = x.to; moved = true; } }); }
+    return { state: 'active', until, days: diffDays(t, until), plan: cur.plan };
+  }
+  const past = T.filter((x) => x.to < t);
+  const next = T.filter((x) => x.from > t).sort((a, b) => (a.from < b.from ? -1 : 1))[0];
+  if (!past.length) return { state: 'scheduled', starts: next.from, plan: next.plan };
+  const last = past.reduce((m, x) => (x.to > m.to ? x : m));
+  return { state: 'expired', since: addDays(last.to, 1), ended: last.to, next: next ? next.from : null, plan: last.plan };
+}
+const filterKey = (a) => (a.state === 'scheduled' ? 'none' : a.state);
+function accessChip(a) {
+  if (a.state === 'active') return a.days <= 7 ? chip(a.days === 0 ? 'Ends today' : `Ends in ${a.days} day${a.days === 1 ? '' : 's'}`, 'warn') : chip('Active', 'ok');
+  if (a.state === 'expired') return chip('Expired', 'bad');
+  if (a.state === 'scheduled') return chip(`Starts ${fmtYmd(a.starts)}`, 'warn');
+  return chip('No license yet');
+}
+function retention(c) {
+  const a = access(c), t = todayYmd(), r = c.ret;
+  if (r.deletedOn) return { k: 'deleted', on: r.deletedOn };
+  if (a.state !== 'expired') {
+    const last = r.cycles.filter((x) => x.cancelled).slice(-1)[0];
+    return last ? { k: 'restored', cycle: last } : { k: 'none' };
+  }
+  const deleteOn = addMonths(a.since, RETENTION_MONTHS);
+  const total = diffDays(a.since, deleteOn), elapsed = Math.min(total, Math.max(0, diffDays(a.since, t)));
+  if (r.failedOn) return { k: 'failed', deleteOn, failedOn: r.failedOn, since: a.since };
+  if (t >= deleteOn) return { k: 'due', deleteOn, since: a.since };
+  return { k: 'stale', deleteOn, since: a.since, left: diffDays(t, deleteOn), elapsed, total };
+}
+
+// ---------- Ranks (read-only context; uses the configuration in effect, never a draft) ----------
+function rankOf(p) {
+  if (p.level == null) return { k: 'none', text: 'No rank yet', chip: chip('No rank yet') };
+  const T = eff().threshold;
+  if (p.recent < T) return { k: 'below', text: `${LEVELS[p.level]} · ${p.recent} of ${T} recent matches`, chip: chip('Below requirement') };
+  return { k: 'board', text: `${LEVELS[p.level]} · on the overall leaderboard`, chip: chip('On leaderboard', 'ok') };
+}
+
+// ---------- Contact requests ----------
+const REQ = {
+  submitted: { chip: 'Waiting for review', k: 'warn' },
+  applying: { chip: 'Approved · applying', k: 'warn' },
+  applied: { chip: 'Applied', k: 'ok' },
+  failed: { chip: 'Needs attention', k: 'bad' },
+  rejected: { chip: 'Not approved', k: '' },
+};
+const reqChip = (r) => chip(REQ[r.status].chip, REQ[r.status].k);
+function checks(r) {
+  const p = playerOf(r.pid), f = FIELD[r.field];
+  const other = S.players.find((x) => x.id !== p.id && norm(x[r.field]) === norm(r.to));
+  const newer = S.requests.find((x) => x.id !== r.id && x.pid === r.pid && x.field === r.field && x.at > r.at && ['submitted', 'applying'].includes(x.status));
+  const busy = S.requests.find((x) => x.id !== r.id && x.pid === r.pid && x.status === 'applying');
+  const cur = p[r.field] || '';
+  return [
+    other ? { ok: false, html: `This ${f} is already linked to <button class="link acc" data-act="openPlayer" data-id="${other.id}">${esc(other.name)}</button> (<span class="mono">${esc(other.rtr)}</span>). Approving would put two players on one ${f}, and Admin never merges players.` } : { ok: true, html: `Not linked to any other player` },
+    newer ? { ok: false, html: `A newer request for this ${f} was sent ${ago(newer.at)}. <button class="link acc" data-act="openReview" data-id="${newer.id}">Review that one instead</button>.` } : { ok: true, html: `No newer request for this ${f}` },
+    norm(cur) === norm(r.from) ? { ok: true, html: `Their current ${f} still matches the request` } : { ok: false, html: `Their ${f} has changed since this was sent. It's now <span class="mono">${esc(cur || 'not set')}</span>.` },
+    busy ? { ok: false, html: 'Another contact change for this player is still being applied.' } : { ok: true, html: 'No other change is being applied for this player' },
+  ];
+}
+const blocked = (r) => r.status === 'submitted' && checks(r).some((c) => !c.ok);
+function nextAction(r) {
+  if (r.status === 'submitted') return blocked(r) ? 'Review · blocked' : 'Review';
+  if (r.status === 'applying') return 'Check status';
+  if (r.status === 'failed') return 'Retry application';
+  return 'View';
+}
+const pendingContacts = () => S.requests.filter((r) => r.status === 'submitted').length;
+const attentionContacts = () => S.requests.filter((r) => r.status === 'submitted' || r.status === 'failed').length;
+const pendingNames = () => S.clubs.filter((c) => c.nameRequest).length;
+
+// ---------- Chrome ----------
+function topBar() {
+  const shell = S.me && !S.denied;
+  return `<header class="top"><div class="top-in">
+    ${shell ? `<button class="btn xs ghost icon-btn burger" data-act="toggleNav" aria-label="Menu" aria-expanded="${!!S.ui.nav}" aria-controls="app-nav">${I.menu}</button>` : ''}
+    <button class="brand" data-act="go" data-to="clubs" aria-label="ROTRA Admin, open clubs"><span>ROTR<b>A</b></span><span class="sub">Admin</span></button>
+    <div class="grow"></div>
+    ${shell ? `<span class="acct" title="Signed in as ${OWNER}">${I.user}<span>${OWNER}</span></span>` : ''}
+    <button class="btn xs ghost icon-btn" data-act="toggleTheme" aria-label="Switch to ${isDark() ? 'light' : 'dark'} mode" title="${isDark() ? 'Light' : 'Dark'} mode">${isDark() ? I.sun : I.moon}</button>
+    <button class="btn xs" data-act="openDemo">Prototype</button>
+  </div></header>${S.online ? '' : `<div class="band-off" role="status"><div class="in">${I.alert}<span><b>You're offline.</b> Showing what this browser loaded at ${fmtTime(S.offlineAt || Date.now())}. Activating licenses, approving requests and saving settings need an internet connection.</span></div></div>`}`;
+}
+const HERE = { clubs: 'clubs', club: 'clubs', players: 'players', player: 'players', contacts: 'contacts', review: 'contacts', names: 'names', config: 'config', flags: 'flags' };
+function rail() {
+  const here = HERE[S.screen];
+  const link = (k, label, ic, count, hot) => `<button class="rail-link ${k === here ? 'on' : ''}" data-act="go" data-to="${k}" ${k === here ? 'aria-current="page"' : ''}>${ic}<span>${label}</span>${count != null ? `<span class="count ${hot && count ? 'hot' : ''}">${count}</span>` : ''}</button>`;
+  return `<nav class="rail" id="app-nav" aria-label="Admin">
+    ${link('clubs', 'Clubs and licenses', I.n_club, S.clubs.length)}
+    ${link('players', 'Players', I.n_players, num(S.players.length))}
+    <div class="rail-label">Requests</div>
+    ${link('contacts', 'Contact changes', I.n_contact, attentionContacts(), true)}
+    ${link('names', 'Club names', I.n_name, pendingNames(), true)}
+    <div class="rail-label">Settings</div>
+    ${link('config', 'Ranking', I.n_rank)}
+    ${link('flags', 'Feature flags', I.n_flag, S.flags.length)}
+    <div class="rail-end"><div class="rail-who">Signed in as<br><b>${OWNER}</b></div><button class="rail-link" data-act="signOut">${I.n_out}<span>Sign out</span></button></div>
+  </nav>`;
+}
+const shell = (html) => `<div class="shell ${S.ui.nav ? 'nav-open' : ''}">${rail()}<div class="nav-scrim" data-act="toggleNav"></div><main class="shell-main"><div class="wrap">${html}</div></main></div>`;
+
+// ---------- A-LOGIN ----------
+function viewLogin() {
+  const L = S.ui.login;
+  return `<main class="login"><form class="card" data-form="login" novalidate>
+    <div class="mark"><span>ROTR<b>A</b></span><em>Admin</em></div>
+    <div class="stack tight"><h1>Sign in</h1><p class="muted">Mock sign-in for this prototype. Any email and password work, and nothing is checked or sent.</p></div>
+    ${S.ended ? notice('warn', '<b>Your Admin session ended.</b> Sign in again to continue.') : ''}
+    <label class="field" for="login-email"><span>Email</span><input class="input" id="login-email" type="email" inputmode="email" autocomplete="off" data-bind="ui.login.email" value="${esc(L.email || OWNER)}"></label>
+    <label class="field" for="login-pass"><span>Password</span><input class="input" id="login-pass" type="password" autocomplete="off" placeholder="Anything" data-bind="ui.login.pass" value="${esc(L.pass)}"></label>
+    <button class="btn primary" type="submit" ${L.pending ? 'disabled' : ''}>${L.pending ? 'Signing in…' : 'Sign in'}</button>
+  </form></main>`;
+}
+function viewDenied() {
+  return `<main class="login"><div class="card">
+    <div>${chip('Access denied', 'bad')}</div>
+    <div class="stack tight"><h1>This account can't open Admin</h1><p class="muted">You're signed in with ${esc(S.denied)}. Admin is only for the ROTRA platform owner, so no club or player information is shown here.</p></div>
+    <p class="small muted">Clubs sign in to the Queue app and players to Player Information.</p>
+    <button class="btn" data-act="signOut">Sign out</button>
+  </div></main>`;
+}
+
+// ---------- A-CLUBS ----------
+function viewClubs() {
+  const q = S.ui.clubsQ.trim().toLowerCase(), F = S.ui.clubsF;
+  const n = { all: S.clubs.length, active: 0, expired: 0, none: 0 };
+  S.clubs.forEach((c) => { n[filterKey(access(c))] += 1; });
+  const rows = S.clubs.filter((c) => (F === 'all' || filterKey(access(c)) === F) && (!q || plain([c.name, c.username, c.city, c.code, ...c.oldNames].join(' ')).includes(plain(q))));
+  const body = rows.map((c) => {
+    const a = access(c);
+    const until = a.state === 'active' ? fmtYmd(a.until) : a.state === 'expired' ? `Ended ${fmtYmd(a.ended)}` : a.state === 'scheduled' ? `From ${fmtYmd(a.starts)}` : '—';
+    return `<tr class="click" data-act="openClub" data-id="${c.id}">
+      <td class="lead" data-label="Club"><div class="who">${logo(c)}<div class="main"><button class="link" data-act="openClub" data-id="${c.id}">${esc(c.name)}</button><span class="small muted mono">${esc(c.username)}</span>${c.live ? `<span class="small live"><i></i>Running: ${esc(c.live.title)}</span>` : ''}${c.nameRequest ? `<span>${chip('Name change requested', 'warn')}</span>` : ''}</div></div></td>
+      <td data-label="Founded in">${esc(c.city)} <span class="small muted mono">${c.code}</span></td>
+      <td data-label="Price" class="nw">${c.price.free ? chip('Free · tester', 'ok') : `${peso(c.price.monthly)}<span class="small muted"> /mo</span>`}</td>
+      <td data-label="Plan">${a.plan || '—'}</td>
+      <td data-label="Access">${accessChip(a)}</td>
+      <td data-label="Until" class="nw">${until}</td>
+    </tr>`;
+  }).join('');
+  return shell(`<div class="sec-head"><div class="page-head"><h1>Clubs and licenses</h1><p class="muted">Club accounts, their prices and license terms, and what happens to their public pages after a license ends. Clubs pay outside ROTRA; you record the payment here when you activate or renew.</p></div><button class="btn primary" data-act="openAddClub">Add club</button></div>
+    <div class="toolbar"><div class="search">${I.search}<input class="input" id="clubs-q" type="search" placeholder="Search by club name, username or city" aria-label="Search clubs" data-bind="ui.clubsQ" data-live value="${esc(S.ui.clubsQ)}"></div>
+      ${seg('clubsF', F, [['all', 'All', n.all], ['active', 'Active', n.active], ['expired', 'Expired', n.expired], ['none', 'No license', n.none]], 'Filter by access')}</div>
+    <section class="card">${rows.length ? `<div class="tbl-wrap"><table class="tbl cards"><thead><tr><th>Club</th><th>Founded in</th><th>Price</th><th>Plan</th><th>Access</th><th>Until</th></tr></thead><tbody>${body}</tbody></table></div>`
+      : S.clubs.length ? `<div class="empty"><b>No clubs match.</b><span>Check the spelling, or search by the club's username.</span>${q || F !== 'all' ? '<button class="btn sm" data-act="clearClubs">Clear search and filter</button>' : ''}</div>`
+      : '<div class="empty"><b>No clubs yet.</b><span>Add a club to give it a Queue app sign-in.</span><button class="btn sm primary" data-act="openAddClub">Add club</button></div>'}</section>`);
+}
+
+// ---------- A-CLUB-DETAIL + A-RETENTION ----------
+function retentionCard(c) {
+  const r = retention(c);
+  const head = {
+    none: chip('Pages live', 'ok'), restored: chip('Pages live', 'ok'), stale: chip('Pages stale', 'warn'), due: chip('Deletion due', 'warn'), failed: chip('Deletion failed', 'bad'), deleted: chip('Pages deleted'),
+  }[r.k];
+  let body = '';
+  if (r.k === 'none') body = `<p>No deletion countdown. If the license ends, the club's public session pages go stale and are deleted after six months of continuous expiry.</p>`;
+  if (r.k === 'restored') body = `<p>No deletion countdown. The license ended on ${fmtYmd(addDays(r.cycle.expired, -1))}; the renewal on ${fmtYmd(r.cycle.cancelled)} restored the public pages and cancelled that countdown. If the license ends again, a new six-month countdown starts.</p>`;
+  if (r.k === 'stale') body = `<div class="stack tight"><div class="prog" role="img" aria-label="${r.elapsed} of ${r.total} days of the countdown have passed"><i style="width:${Math.round((r.elapsed / r.total) * 100)}%"></i></div>
+      <div class="timeline"><span>Expired ${fmtYmd(r.since)}</span><span>Deleted ${fmtYmd(r.deleteOn)}</span></div></div>
+    <dl class="kv"><dt>Expired for</dt><dd>${plural(r.elapsed, 'day')}</dd><dt>Pages deleted on</dt><dd>${fmtYmd(r.deleteOn)} · in ${plural(r.left, 'day')}</dd></dl>
+    <p>The public session pages are stale. Renewing before ${fmtYmd(r.deleteOn)} restores them and cancels the deletion.</p>`;
+  if (r.k === 'due') body = `<p>Six months of continuous expiry ended on ${fmtYmd(r.deleteOn)}. Deleting the public pages is in progress; this changes to Pages deleted once it has actually finished.</p>`;
+  if (r.k === 'failed') body = `<dl class="kv"><dt>Expired since</dt><dd>${fmtYmd(r.since)}</dd><dt>Deletion was due</dt><dd>${fmtYmd(r.deleteOn)}</dd><dt>Last attempt</dt><dd>Failed on ${fmtYmd(r.failedOn)} · will be retried</dd></dl>
+    <p>The pages are still online as stale pages; they haven't been deleted. Renewing now restores them and cancels the retry.</p>`;
+  if (r.k === 'deleted') body = `<p>The public session pages were deleted on ${fmtYmd(r.on)} after six months of continuous expiry. Renewing gives the club Queue access again but doesn't bring these pages back.</p>`;
+  return `<section class="card stack"><div class="sec-head"><div><h2>Public pages and retention</h2></div>${head}</div>${body}
+    <div class="grid2" style="gap:12px"><div class="stack tight"><span class="label">Ends with the license</span><p class="small">Queue app access, saved players and past reports. Later, the public session pages.</p></div>
+    <div class="stack tight"><span class="label">Always kept</span><p class="small">Players' match history and earned ranks, still under the normal three-month leaderboard window.</p></div></div>
+    <p class="small muted">Nothing here deletes a club or its players.</p></section>`;
+}
+function viewClub() {
+  const c = clubOf(S.viewId);
+  if (!c) return shell(`${backBtn('clubs', 'Clubs and licenses')}<div class="card empty"><b>Club not found.</b></div>`);
+  const a = access(c), hasTerms = c.terms.length > 0;
+  const terms = [...c.terms].sort((x, y) => (x.from < y.from ? 1 : -1));
+  const nr = c.nameRequest;
+  const history = S.log.filter((l) => l.t === 'club' && l.id === c.id);
+  const licLines = a.state === 'active' ? `<dt>Access</dt><dd>Active until <b>${fmtYmd(a.until)}</b> · ${plural(a.days, 'day')} left</dd><dt>Plan</dt><dd>${a.plan}</dd>`
+    : a.state === 'expired' ? `<dt>Access</dt><dd>Ended ${fmtYmd(a.ended)} · ${plural(diffDays(a.since, todayYmd()), 'day')} ago</dd><dt>Last plan</dt><dd>${a.plan}</dd>${a.next ? `<dt>Next term</dt><dd>Starts ${fmtYmd(a.next)}</dd>` : ''}`
+    : a.state === 'scheduled' ? `<dt>Access</dt><dd>Starts ${fmtYmd(a.starts)}</dd><dt>Plan</dt><dd>${a.plan}</dd>` : '<dt>Access</dt><dd>Never licensed. The club can sign in but can\'t run sessions.</dd>';
+  const r = retention(c);
+  const TABS = [['overview', 'Overview', nr ? chip('1 request', 'warn') : ''], ['license', 'License', ''], ['pages', 'Public pages', ['stale', 'due', 'failed'].includes(r.k) ? chip(r.k === 'failed' ? 'Failed' : 'Countdown', r.k === 'failed' ? 'bad' : 'warn') : ''], ['activity', 'Activity', `<span class="c">${history.length}</span>`]];
+  const tab = TABS.some(([k]) => k === S.ui.clubTab) ? S.ui.clubTab : 'overview';
+  const panels = {
+    overview: `${nr ? `<section class="card stack warnc" id="name-request"><div class="sec-head"><div><h2>Name change requested</h2><p class="small muted">Sent ${fmtAt(nr.at)} · ${ago(nr.at)}</p></div>${chip('Waiting for you', 'warn')}</div>
+        <div class="change"><div><span class="label">Current</span><b>${esc(c.name)}</b></div>${I.arrow}<div class="to"><span class="label">Requested</span><b>${esc(nr.name)}</b></div></div>
+        <p class="small muted">Until you approve, the club keeps its current name everywhere. The club can cancel the request from Club settings.</p>
+        <div class="row end"><button class="btn sm" data-act="openNameReject" data-id="${c.id}">Reject</button><button class="btn sm primary" data-act="openNameApprove" data-id="${c.id}">Approve name change</button></div></section>` : ''}
+      <div class="grid2">
+      <section class="card stack"><h2>Club account</h2><dl class="kv">
+        <dt>Username</dt><dd class="mono">${esc(c.username)}</dd>
+        <dt>Password</dt><dd>${I.lock} Set by the club, never shown</dd>
+        <dt>Set up</dt><dd>${fmtYmd(c.setUp)}</dd></dl>
+        <p class="small muted">The club changes its own password with the current one. If it's forgotten, you reset it; that reset method hasn't been decided, so there's no control for it here.</p>
+        <p class="small muted">One shared account runs the club and its queue. There are no separate manager logins.</p></section>
+      <section class="card stack"><h2>Identity</h2><dl class="kv">
+        <dt>Founding address</dt><dd>${esc(c.founding)}</dd>
+        <dt>City code</dt><dd><span class="mono">${c.code}</span> · used in new players' RTR IDs</dd>
+        ${c.oldNames.length ? `<dt>Earlier names</dt><dd>${c.oldNames.map(esc).join(', ')}</dd>` : ''}</dl>
+        <p class="small muted">The founding address and city code are fixed. Sessions at other venues don't change them. The club changes its own logo.</p></section>
+      <section class="card stack"><h2>Active session</h2>
+        ${c.live ? `<p><span class="live"><i></i><b>${esc(c.live.title)}</b></span></p><p class="small muted">At ${esc(c.live.venue)} · started ${fmtTime(c.live.at)}. If the license ends during a session, that session can still finish and sync.</p>`
+          : c.exception ? `<p class="small">${esc(c.exception)}</p>` : '<p class="small muted">No session running.</p>'}</section>
+      </div>`,
+    license: `<section class="card stack"><div class="sec-head"><div><h2>License</h2><p class="small muted">Monthly or yearly. You activate or renew after the club pays outside ROTRA.</p></div>
+        <button class="btn sm primary" data-act="openLicense" data-id="${c.id}">${hasTerms ? 'Renew license' : 'Activate license'}</button></div>
+        <dl class="kv">${licLines}</dl>
+        <p class="small muted">One active session at a time, on any venue or device. Renewing doesn't change that.</p></section>
+      <section class="card stack"><div class="sec-head"><div><h2>Price</h2><p class="small muted">Set for this club. There's no fixed price.</p></div><button class="btn sm" data-act="openPrice" data-id="${c.id}">Change price</button></div>
+        ${c.price.free ? `<div class="tiles"><div class="tile"><span class="label">Price</span><b>Free</b><span class="small muted">Tester club. Licenses are recorded at ₱0.</span></div></div>`
+          : `<div class="tiles"><div class="tile"><span class="label">Monthly</span><span class="mono">${peso(c.price.monthly)}</span></div><div class="tile"><span class="label">Yearly</span><span class="mono">${peso(c.price.yearly)}</span><span class="small muted">${savePct(c.price) > 0 ? `${savePct(c.price)}% less than 12 months` : 'No yearly discount'}</span></div></div>`}
+        <p class="small muted">The License form fills in the amount from this price. Changing it doesn't change payments already recorded.</p></section>
+      <section class="card stack"><div class="sec-head"><div><h2>Payment history</h2><p class="small muted">Recorded each time you activate or renew. The club sees the same list in Club settings.</p></div></div>
+        ${terms.length ? `<div class="tbl-wrap"><table class="tbl cards"><thead><tr><th>Paid</th><th>Plan</th><th>Covers</th><th class="n">Amount</th><th>Reference</th></tr></thead><tbody>
+          ${terms.map((x) => `<tr><td data-label="Paid" class="nw">${fmtYmd(x.paid)}</td><td data-label="Plan">${x.plan}</td><td data-label="Covers" class="small">${fmtYmd(x.from)} – ${fmtYmd(x.to)}</td><td data-label="Amount" class="n">${amountText(x.amount)}</td><td data-label="Reference" class="mono small">${esc(x.ref || '—')}</td></tr>`).join('')}
+        </tbody></table></div><p class="small muted">What the club actually paid each time. Sample amounts.</p>` : '<div class="empty"><b>No payments recorded.</b><span>Activate the license after the club pays to add the first one.</span></div>'}</section>`,
+    pages: retentionCard(c),
+    activity: `<section class="card stack"><h2>Record of actions</h2>${history.length ? `<ul class="log">${history.map((l) => `<li>${esc(l.text)}<span>${fmtAt(l.at)} · ${esc(l.actor)}</span></li>`).join('')}</ul>` : '<p class="small muted">No Admin actions recorded for this club yet.</p>'}</section>`,
+  };
+  return shell(`${backBtn('clubs', 'Clubs and licenses')}
+    <div class="hero">${logo(c, 'lg')}<div class="main"><h1>${esc(c.name)}</h1><div class="row">${accessChip(a)}${a.plan ? chip(a.plan) : ''}${c.live ? `<span class="small live"><i></i>Session running</span>` : ''}</div></div></div>
+    <div class="tabs" role="tablist" aria-label="Club sections">${TABS.map(([k, l, badge]) => `<button role="tab" id="ctab-${k}" aria-selected="${k === tab}" aria-controls="club-panel" data-act="clubTab" data-v="${k}">${l}${badge}</button>`).join('')}</div>
+    <div id="club-panel" role="tabpanel" aria-labelledby="ctab-${tab}" class="stack" style="gap:20px">${panels[tab]}</div>`);
+}
+
+// ---------- Club names ----------
+function viewNames() {
+  const list = S.clubs.filter((c) => c.nameRequest).sort((a, b) => b.nameRequest.at - a.nameRequest.at);
+  const done = S.log.filter((l) => l.t === 'club' && /name change/i.test(l.text)).slice(0, 6);
+  return shell(`<div class="page-head"><h1>Club name changes</h1><p class="muted">Clubs request a new name from Club settings. It takes effect only when you approve it. Logos don't need approval.</p></div>
+    <section class="card">${list.length ? `<div class="list">${list.map((c) => `<div class="between" style="padding:12px 0;border-bottom:1px solid var(--border)"><div class="who">${logo(c)}<div class="main"><b class="wrapw">${esc(c.name)} → ${esc(c.nameRequest.name)}</b><span class="small muted">Sent ${ago(c.nameRequest.at)} · ${esc(c.username)}</span></div></div>
+        <button class="btn sm" data-act="openClub" data-id="${c.id}" data-anchor="name-request">Review</button></div>`).join('')}</div>`
+      : '<div class="empty"><b>No name changes waiting.</b><span>Requests from clubs show up here.</span></div>'}</section>
+    ${done.length ? `<section class="card stack"><h2>Recently decided</h2><ul class="log">${done.map((l) => `<li>${esc(l.text)}<span>${fmtAt(l.at)} · ${esc(l.actor)}</span></li>`).join('')}</ul></section>` : ''}`);
+}
+
+// ---------- A-PLAYERS ----------
+function playerMatches() {
+  const q = S.ui.playersQ.trim(), F = S.ui.playersF;
+  const qp = plain(q), qd = q.replace(/\D/g, '');
+  return S.players.filter((p) => (F === 'all' || (F === 'registered' ? p.claimed : !p.claimed))
+    && (!q || plain(`${p.name} ${p.nick} ${p.rtr} ${p.email}`).includes(qp) || (qd.length >= 4 && (p.phone.replace(/\D/g, '').includes(qd) || p.phone.replace(/\D/g, '').includes(qd.replace(/^0/, '63'))))));
+}
+function viewPlayers() {
+  const all = playerMatches(), shown = all.slice(0, S.ui.shown);
+  const F = S.ui.playersF;
+  const reg = S.players.filter((p) => p.claimed).length;
+  const byName = {};
+  all.forEach((p) => { byName[p.name] = (byName[p.name] || 0) + 1; });
+  const dupes = Object.entries(byName).filter(([, n]) => n > 1);
+  return shell(`<div class="page-head"><h1>Players</h1><p class="muted">Every player identity with a permanent RTR ID. Guests a club only typed a name for stay in that club's records and aren't listed.</p></div>
+    <div class="toolbar"><div class="search">${I.search}<input class="input" id="players-q" type="search" placeholder="Search by name, RTR ID, phone or email" aria-label="Search players" data-bind="ui.playersQ" data-live value="${esc(S.ui.playersQ)}"></div>
+      ${seg('playersF', F, [['all', 'All', S.players.length], ['registered', 'Registered', reg], ['unclaimed', 'Unclaimed', S.players.length - reg]], 'Filter by account')}</div>
+    <p class="hint">Phone and email search is only available in Admin. Public search on Player Information never matches them.</p>
+    ${dupes.length && S.ui.playersQ.trim() ? notice('warn', dupes.map(([name, n]) => `<b>${n} players are named ${esc(name)}.</b> They're separate people with separate histories. Check the RTR ID before acting.`).join('<br>')) : ''}
+    <section class="card">${all.length ? `<div class="tbl-wrap"><table class="tbl cards"><thead><tr><th>Player</th><th>RTR ID</th><th>Account</th><th>Rank</th><th>Created by</th></tr></thead><tbody>
+      ${shown.map((p) => { const rk = rankOf(p); return `<tr class="click" data-act="openPlayer" data-id="${p.id}">
+        <td class="lead" data-label="Player"><div class="who">${avatar(p)}<div class="main"><button class="link" data-act="openPlayer" data-id="${p.id}">${esc(p.name)}</button>${p.nick ? `<span class="small muted">“${esc(p.nick)}”</span>` : ''}</div></div></td>
+        <td data-label="RTR ID" class="mono small nw">${esc(p.rtr)}</td>
+        <td data-label="Account">${p.claimed ? chip('Registered', 'ok') : chip('Unclaimed')}</td>
+        <td data-label="Rank">${rk.chip}</td>
+        <td data-label="Created by" class="small">${esc(p.club)}</td></tr>`; }).join('')}
+      </tbody></table></div>
+      <div class="more"><span class="small muted">Showing ${num(shown.length)} of ${num(all.length)}</span>${all.length > shown.length ? `<button class="btn sm" data-act="morePlayers" style="margin-left:12px">Show 25 more</button>` : ''}</div>`
+      : `<div class="empty"><b>No players match “${esc(S.ui.playersQ.trim())}”.</b><span>Check the spelling, try the full RTR ID, or type at least four digits of a phone number.</span><button class="btn sm" data-act="clearPlayers">Clear search</button></div>`}</section>`);
+}
+
+// ---------- A-PLAYER-DETAIL ----------
+function viewPlayer() {
+  const p = playerOf(S.viewId);
+  if (!p) return shell(`${backBtn('players', 'Players')}<div class="card empty"><b>Player not found.</b></div>`);
+  const rk = rankOf(p), T = eff().threshold;
+  const reqs = S.requests.filter((r) => r.pid === p.id).sort((a, b) => b.at - a.at);
+  const history = S.log.filter((l) => l.t === 'req' && reqs.some((r) => r.id === l.id));
+  const [mm, dd, yy] = [p.rtr.slice(-11, -9), p.rtr.slice(-9, -7), p.rtr.slice(-7, -5)];
+  const twin = S.players.filter((x) => x.id !== p.id && x.name === p.name);
+  return shell(`${backBtn('players', 'Players')}
+    <div class="hero">${avatar(p, 'lg')}<div class="main"><h1>${esc(p.name)}</h1><div class="row">${p.claimed ? chip('Registered', 'ok') : chip('Unclaimed')}${rk.chip}<span class="mono small muted">${esc(p.rtr)}</span></div></div></div>
+    ${twin.length ? notice('warn', `<b>Another player has the same name.</b> ${twin.map((x) => `<button class="link acc" data-act="openPlayer" data-id="${x.id}">${esc(x.name)}</button> (<span class="mono">${esc(x.rtr)}</span>)`).join(', ')} is a separate identity. Admin doesn't merge players.`) : ''}
+    <div class="detail"><div>
+      <section class="card stack"><h2>Identity</h2><dl class="kv">
+        <dt>Name</dt><dd>${esc(p.name)}</dd><dt>Nickname</dt><dd>${esc(p.nick || '—')}</dd>
+        <dt>RTR ID</dt><dd class="mono">${esc(p.rtr)}</dd>
+        <dt>Created</dt><dd>${fmtYmd(`20${yy}-${mm}-${dd}`)} by ${esc(p.club)}</dd></dl>
+        <p class="small muted">The RTR ID never changes, including after a contact change.</p></section>
+      <section class="card stack"><div class="sec-head"><div><h2>Private contact</h2><p class="small muted">Only Admin sees these. Players can't change them themselves; they send a request.</p></div></div>
+        <dl class="kv"><dt>Phone</dt><dd class="mono">${esc(p.phone || 'Not given')}</dd><dt>Email</dt><dd class="mono">${esc(p.email || 'Not given')}</dd>
+        <dt>Sign in with</dt><dd>${p.claimed ? 'Phone number or email' : 'Nothing yet. The player hasn\'t registered.'}</dd>
+        <dt>Phone shown to clubs</dt><dd>${p.claimed ? (p.phoneHidden ? 'No, hidden by the player' : 'Yes') : 'Entered by the club'}</dd></dl></section>
+      <section class="card stack"><h2>Contact-change requests</h2>
+        ${reqs.length ? `<div class="list">${reqs.map((r) => `<div class="between" style="padding:10px 0;border-bottom:1px solid var(--border)"><div class="stack tight" style="min-width:0"><div class="row">${reqChip(r)}<span class="small muted">${FIELD[r.field][0].toUpperCase() + FIELD[r.field].slice(1)} · sent ${ago(r.at)}</span></div><span class="mono small wrapw">${esc(r.from || '—')} → ${esc(r.to)}</span></div><button class="btn sm" data-act="openReview" data-id="${r.id}">${nextAction(r)}</button></div>`).join('')}</div>`
+          : '<p class="small muted">No requests.</p>'}</section>
+    </div><div>
+      <section class="card stack"><h2>Account</h2><dl class="kv">
+        <dt>Status</dt><dd>${p.claimed ? `Registered ${fmtYmd(p.registered)}` : 'Unclaimed. The club created this profile; the player hasn\'t finished registering.'}</dd></dl></section>
+      <section class="card stack"><h2>Rank and games</h2><dl class="kv">
+        <dt>Rank</dt><dd>${esc(rk.text)}</dd>
+        <dt>Recent matches</dt><dd>${p.recent} complete standard matches in the last three months · leaderboard needs ${T}</dd></dl>
+        <p class="small muted">Read-only. Admin can't change ranks, winners or scores, and can't rebuild lost session records.</p></section>
+      <section class="card stack"><h2>Record of actions</h2>${history.length ? `<ul class="log">${history.map((l) => `<li>${esc(l.text)}<span>${fmtAt(l.at)} · ${esc(l.actor)}</span></li>`).join('')}</ul>` : '<p class="small muted">No Admin actions recorded for this player.</p>'}</section>
+    </div></div>`);
+}
+
+// ---------- A-CONTACT-REQUESTS ----------
+function viewContacts() {
+  const F = S.ui.reqF;
+  const count = (k) => S.requests.filter((r) => r.status === k).length;
+  const list = S.requests.filter((r) => F === 'all' || r.status === F).sort((a, b) => b.at - a.at);
+  return shell(`<div class="page-head"><h1>Contact changes</h1><p class="muted">Players ask to change the phone number or email they sign in with. Nothing changes until you approve it and the change is applied.</p></div>
+    ${seg('reqF', F, [['submitted', 'Waiting', count('submitted')], ['applying', 'Applying', count('applying')], ['failed', 'Needs attention', count('failed')], ['applied', 'Applied', count('applied')], ['rejected', 'Not approved', count('rejected')], ['all', 'All', S.requests.length]], 'Filter by status')}
+    <section class="card">${list.length ? `<div class="tbl-wrap"><table class="tbl cards"><thead><tr><th>Player</th><th>Change</th><th>Sent</th><th>Status</th><th></th></tr></thead><tbody>
+      ${list.map((r) => { const p = playerOf(r.pid), b = blocked(r); return `<tr class="click" data-act="openReview" data-id="${r.id}">
+        <td class="lead" data-label="Player"><div class="who">${avatar(p)}<div class="main"><b class="wrapw">${esc(p.name)}</b><span class="mono small muted">${esc(p.rtr)}</span></div></div></td>
+        <td data-label="Change"><span class="stack tight" style="align-items:inherit"><span>${FIELD[r.field][0].toUpperCase() + FIELD[r.field].slice(1)}</span><span class="mono small muted wrapw">→ ${esc(r.to)}</span></span></td>
+        <td data-label="Sent" class="nw small">${ago(r.at)}</td>
+        <td data-label="Status"><span class="row" style="justify-content:inherit">${reqChip(r)}${b ? chip('Conflict', 'bad') : ''}</span></td>
+        <td data-label="" class="n"><button class="btn xs" data-act="openReview" data-id="${r.id}">${nextAction(r)}</button></td></tr>`; }).join('')}
+      </tbody></table></div>` : `<div class="empty"><b>${F === 'submitted' ? 'Nothing waiting for review.' : 'No requests here.'}</b><span>${F === 'all' ? 'Requests from players show up here.' : 'Try another status.'}</span></div>`}</section>`);
+}
+
+// ---------- A-CONTACT-REVIEW ----------
+function viewReview() {
+  const r = reqOf(S.viewId);
+  if (!r) return shell(`${backBtn('contacts', 'Contact changes')}<div class="card empty"><b>Request not found.</b></div>`);
+  const p = playerOf(r.pid), f = FIELD[r.field], F = f[0].toUpperCase() + f.slice(1);
+  const ch = r.status === 'submitted' ? checks(r) : null, isBlocked = ch && ch.some((c) => !c.ok);
+  const status = {
+    submitted: '',
+    applying: notice('warn', `<div class="row"><span class="spin" aria-hidden="true"></span><b>Approved${r.approvedAt ? ` ${ago(r.approvedAt)}` : ''}. Applying the change.</b></div><p>${esc(firstName(p))} keeps signing in with <span class="mono">${esc(r.from)}</span> until this finishes.</p>`),
+    applied: notice('ok', `<b>Applied${r.appliedAt ? ` ${ago(r.appliedAt)}` : ''}.</b> ${esc(firstName(p))} now signs in with <span class="mono">${esc(r.to)}</span>. RTR ID and match history are unchanged.`),
+    failed: notice('bad', `<b>Approved, but not applied.</b> ${esc(r.error || 'The change could not be applied.')} ${esc(firstName(p))} still signs in with <span class="mono">${esc(r.from)}</span>. Retrying applies this same approved change; it doesn't create anything new.`),
+    rejected: notice('', `<b>Not approved${r.decidedAt ? ` · ${ago(r.decidedAt)}` : ''}.</b> ${esc(firstName(p))} keeps <span class="mono">${esc(r.from)}</span>. They can send a new request.`),
+  }[r.status];
+  const actions = {
+    submitted: `<button class="btn" data-act="go" data-to="contacts">Back without deciding</button><button class="btn danger" data-act="openDecline" data-id="${r.id}">Decline</button><button class="btn primary" data-act="openApprove" data-id="${r.id}" ${isBlocked ? 'disabled' : ''}>Approve</button>`,
+    applying: `<button class="btn" data-act="checkApply" data-id="${r.id}" ${S.ui.checking === r.id ? 'disabled' : ''}>${S.ui.checking === r.id ? 'Checking…' : 'Check status'}</button>`,
+    failed: `<button class="btn primary" data-act="retryApply" data-id="${r.id}">Retry application</button>`,
+    applied: '', rejected: '',
+  }[r.status];
+  return shell(`${backBtn('contacts', 'Contact changes')}
+    <div class="page-head"><div class="row">${reqChip(r)}${isBlocked ? chip('Conflict', 'bad') : ''}</div><h1>${F} change for ${esc(p.name)}</h1></div>
+    ${status}
+    <div class="detail"><div>
+      <section class="card stack"><h2>Requested change</h2>
+        <div class="change"><div><span class="label">Current</span><span class="mono">${esc(r.from || 'Not set')}</span></div>${I.arrow}<div class="to"><span class="label">Requested</span><span class="mono">${esc(r.to)}</span></div></div>
+        <dl class="kv"><dt>Sent</dt><dd>${fmtAt(r.at)} · ${ago(r.at)}</dd><dt>Came from</dt><dd>${r.source === 'app' ? `${esc(firstName(p))}'s signed-in Player Information account` : `${esc(firstName(p))} contacted you; you entered it`}</dd></dl></section>
+      ${ch ? `<section class="card stack"><h2>Checks before approving</h2><ul class="checks">${ch.map((c) => `<li class="${c.ok ? 'ok' : 'bad'}">${c.ok ? I.check : I.xs}<span>${c.html}</span></li>`).join('')}</ul>
+        ${isBlocked ? `<p class="small muted">Approve stays off until every check passes. You can still decline.</p>` : ''}</section>
+      <section class="card stack"><h2>Verification</h2><p class="small">What proof approval needs hasn't been decided, so this prototype doesn't ask for ID documents. The request itself is the only evidence shown.</p></section>` : ''}
+      ${actions ? `<div class="row end">${actions}</div>` : ''}
+    </div><div>
+      <section class="card stack"><div class="who">${avatar(p)}<div class="main"><button class="link" data-act="openPlayer" data-id="${p.id}">${esc(p.name)}</button><span class="mono small muted">${esc(p.rtr)}</span></div></div>
+        <dl class="kv"><dt>Account</dt><dd>${p.claimed ? 'Registered' : 'Unclaimed'}</dd><dt>Phone</dt><dd class="mono">${esc(p.phone || 'Not given')}</dd><dt>Email</dt><dd class="mono">${esc(p.email || 'Not given')}</dd></dl>
+        <p class="small muted">These are the contacts in use right now. An approved change shows here only once it's applied.</p></section>
+      <section class="card stack"><h2>What approval changes</h2><ul class="bul"><li>Only the ${f} ${esc(firstName(p))} signs in with.</li><li>Not the RTR ID, match history, results or rank.</li><li>Never another player's profile.</li></ul></section>
+    </div></div>`);
+}
+
+// ---------- A-RANK-CONFIG ----------
+const cfgDraft = () => { if (!S.ui.cfg) { const e = eff(); S.ui.cfg = { assess: String(e.assess), perf: String(e.perf), threshold: String(e.threshold), base: e.v }; } return S.ui.cfg; };
+function cfgCheck(d) {
+  const e = {};
+  const int = (v) => /^\d+$/.test(String(v).trim());
+  if (!int(d.assess) || +d.assess > 100) e.assess = 'Use a whole number from 0 to 100.';
+  if (!int(d.perf) || +d.perf > 100) e.perf = 'Use a whole number from 0 to 100.';
+  if (!e.assess && !e.perf && +d.assess + +d.perf !== 100) e.total = `The two weights add up to ${+d.assess + +d.perf}%. They must total exactly 100%.`;
+  if (!int(d.threshold) || +d.threshold < 1 || +d.threshold > 100) e.threshold = 'Use a whole number of at least 1.';
+  return e;
+}
+const cfgDirty = () => { if (!S.ui.cfg) return false; const d = S.ui.cfg, b = S.config.find((x) => x.v === d.base) || eff(); return +d.assess !== b.assess || +d.perf !== b.perf || +d.threshold !== b.threshold || String(d.assess).trim() === '' || String(d.perf).trim() === '' || String(d.threshold).trim() === ''; };
+function viewConfig() {
+  const e = eff(), d = cfgDraft(), err = cfgCheck(d), dirty = cfgDirty();
+  const tot = (+d.assess || 0) + (+d.perf || 0);
+  return shell(`<div class="page-head"><h1>Ranking settings</h1><p class="muted">The agreed adjustable settings behind every player's shared rank. Changing them changes the algorithm's settings, never individual match results.</p></div>
+    ${S.ui.cfgConflict ? notice('bad', `<b>Version ${e.v} was saved by someone else while you were editing.</b> Your draft is kept, but it was based on version ${d.base}. Compare it with the values now in effect, then review again. <div style="margin-top:8px"><button class="btn xs" data-act="cfgRebase">Use my draft on version ${e.v}</button> <button class="btn xs ghost" data-act="cfgDiscard">Start over from version ${e.v}</button></div>`) : ''}
+    ${S.ui.cfgErr ? notice('bad', S.ui.cfgErr) : ''}
+    <div class="detail"><div>
+      <form class="card stack" data-form="config" novalidate><div class="sec-head"><div><h2>Edit</h2><p class="small muted">Whole percentages only, so the saved total is exactly 100%.</p></div>${dirty ? chip('Unsaved draft', 'warn') : ''}</div>
+        <div class="fgrid">
+          <label class="field" for="cfg-assess"><span>Club assessment weight</span><div class="affix"><input class="input suf ${err.assess || err.total ? 'bad' : ''}" id="cfg-assess" inputmode="numeric" data-bind="ui.cfg.assess" data-live value="${esc(d.assess)}"><b>%</b></div>${errLine(err.assess)}</label>
+          <label class="field" for="cfg-perf"><span>Match performance weight</span><div class="affix"><input class="input suf ${err.perf || err.total ? 'bad' : ''}" id="cfg-perf" inputmode="numeric" data-bind="ui.cfg.perf" data-live value="${esc(d.perf)}"><b>%</b></div>${errLine(err.perf)}</label>
+        </div>
+        <div class="stack tight"><div class="split" role="img" aria-label="Assessment ${+d.assess || 0} percent, performance ${+d.perf || 0} percent">${tot === 100 ? `<span class="a" style="width:${+d.assess}%"></span><span class="b" style="width:${+d.perf}%"></span>` : ''}</div>
+          <div class="between small"><span>Total <span class="total ${err.total ? 'bad' : ''}">${tot}%</span></span><button type="button" class="btn xs ghost" data-act="cfgBalance" ${err.assess ? 'disabled' : ''}>Set performance to ${err.assess ? '—' : `${100 - +d.assess}%`}</button></div>
+          ${errLine(err.total)}</div>
+        <label class="field" for="cfg-thr" style="max-width:320px"><span>Recent complete standard matches for the overall leaderboard</span><input class="input ${err.threshold ? 'bad' : ''}" id="cfg-thr" inputmode="numeric" data-bind="ui.cfg.threshold" data-live value="${esc(d.threshold)}"><span class="hint">Counted over the last three months. Not the same as the five sessions needed for Most Improved or Off Day.</span>${errLine(err.threshold)}</label>
+        <div class="row end"><button type="button" class="btn" data-act="cfgDiscard" ${dirty ? '' : 'disabled'}>Discard draft</button><button class="btn primary" type="submit" ${dirty && !Object.keys(err).length && !S.ui.cfgConflict ? '' : 'disabled'}>Review changes</button></div>
+      </form>
+      <section class="card stack"><h2>Fixed rules</h2><p class="small muted">Shown for context. These aren't adjustable in Admin.</p><ul class="bul">
+        <li>Each club's latest assessment of a player counts equally.</li>
+        <li>The rank looks back over three months.</li>
+        <li>Most Improved and Off Day need five earlier sessions at the same club within those three months.</li>
+        <li>Fun games, partial games and invalid matches don't count toward the leaderboard requirement.</li></ul></section>
+    </div><div>
+      <section class="card stack"><div class="sec-head"><div><h2>In effect</h2><p class="small muted">Version ${e.v} · since ${fmtAt(e.at)}</p></div>${chip('Live', 'ok')}</div>
+        <div class="tiles"><div class="tile"><span class="label">Assessment</span><span class="mono">${e.assess}%</span></div><div class="tile"><span class="label">Performance</span><span class="mono">${e.perf}%</span></div><div class="tile"><span class="label">Leaderboard</span><span class="mono">${e.threshold}</span><span class="small muted">recent matches</span></div></div>
+        <p class="small muted">Set by ${esc(e.by)}. Player pages describe these values, not your draft.</p></section>
+      <section class="card stack"><h2>Versions</h2><ul class="log">${[...S.config].reverse().map((x) => `<li><b>Version ${x.v}</b> ${x.assess}% / ${x.perf}% · ${x.threshold} matches<span>${fmtAt(x.at)} · ${esc(x.by)}</span></li>`).join('')}</ul></section>
+    </div></div>`);
+}
+
+// ---------- A-FEATURE-FLAGS ----------
+function viewFlags() {
+  return shell(`<div class="sec-head"><div class="page-head"><h1>Feature flags</h1><p class="muted">Switches for platform behavior. Each flag says what it does.</p></div><button class="btn primary" data-act="openAddFlag">Add flag</button></div>
+    ${S.flags.length ? `<section class="card stack">${S.flags.map((x) => `<div class="flag"><div class="main"><div class="row"><b>${esc(x.name)}</b>${x.on ? chip('On', 'ok') : chip('Off')}${x.key ? `<span class="mono small muted">${esc(x.key)}</span>` : ''}</div><p class="small">${esc(x.desc)}</p>
+        <dl class="kv small"><dt>Last change</dt><dd>${x.changed ? `${fmtAt(x.changed)} · ${esc(OWNER)}` : 'Never changed'}</dd></dl></div>
+        ${sw(x.on, 'openFlag', `${x.name}, ${x.on ? 'on' : 'off'}`, `data-id="${x.id}"`)}</div>`).join('<hr style="border:0;border-top:1px solid var(--border);margin:4px 0">')}</section>`
+      : `<section class="card"><div class="empty"><b>No feature flags yet.</b><span>Add a flag to describe a switch and what it does. New flags start off.</span><button class="btn sm primary" data-act="openAddFlag">Add flag</button></div></section>`}
+    <p class="small muted">No flag can change confirmed winners or scores, or bring back lost offline records.</p>`);
+}
+
+// ---------- Sheets ----------
+function sheetWrap(title, body, foot, closable = true) {
+  return `<div class="scrim" data-act="closeSheet"></div><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+    <header><h2 id="sheet-title" tabindex="-1">${title}</h2>${closable ? `<button class="btn xs ghost icon-btn" data-act="closeSheet" aria-label="Close">${I.x}</button>` : ''}</header>
+    <div class="sb">${body}</div>${foot ? `<footer>${foot}</footer>` : ''}</div>`;
+}
+const licFields = (L) => JSON.stringify([L.plan, L.from, L.paid, L.amount, L.ref]);
+const licDirty = () => S.ui.lic && licFields(S.ui.lic) !== S.ui.lic.init;
+function licErrors(L) {
+  const e = {};
+  if (!['Monthly', 'Yearly'].includes(L.plan)) e.plan = 'Choose monthly or yearly.';
+  if (!validYmd(L.from)) e.from = 'Enter the date the term starts.';
+  if (clubOf(L.club).price.free) return e; // free clubs record no payment date or amount
+  if (!validYmd(L.paid)) e.paid = 'Enter the date the club paid.';
+  else if (L.paid > todayYmd()) e.paid = "The payment date can't be in the future.";
+  const amt = String(L.amount).replace(/,/g, '').trim();
+  if (!/^\d+$/.test(amt) || +amt <= 0) e.amount = 'Enter the amount the club paid, in pesos.';
+  if (String(L.ref).length > 40) e.ref = 'Keep the reference under 40 characters.';
+  return e;
+}
+function licEffects(c, L) {
+  const a = access(c), to = termEnd(L.from, L.plan), t = todayYmd(), out = [];
+  out.push(`${esc(c.name)} can use the Queue app from <b>${fmtYmd(L.from)}</b> to <b>${fmtYmd(to)}</b>.`);
+  if (a.state === 'expired') {
+    const r = retention(c);
+    if (L.from > t) out.push(`Until ${fmtYmd(L.from)} the club stays expired and its public pages stay stale.`);
+    else if (r.k === 'deleted') out.push(`The public pages deleted on ${fmtYmd(r.on)} don't come back. Player match history and ranks were kept.`);
+    else out.push(`Restores the club's stale public pages and cancels the ${r.k === 'failed' ? 'pending deletion retry' : `deletion scheduled for ${fmtYmd(r.deleteOn)}`}.`);
+  }
+  out.push('Still one active session at a time.');
+  out.push('Adds a payment record the club sees in Club settings.');
+  return out;
+}
+const SHEETS = {
+  license: () => {
+    const L = S.ui.lic, c = clubOf(L.club), a = access(c), verb = c.terms.length ? 'Renew' : 'Activate', p = c.price;
+    const planPrice = p.free ? 0 : L.plan === 'Yearly' ? p.yearly : L.plan === 'Monthly' ? p.monthly : null;
+    if (L.step === 'leave') return sheetWrap('Discard this entry?', '<p class="muted">Nothing has been saved, and the club\'s access hasn\'t changed.</p>', '<button class="btn" data-act="licBack">Keep editing</button><button class="btn danger" data-act="licDiscard">Discard</button>');
+    if (L.step === 'timeout' || L.step === 'checking') {
+      return sheetWrap(`${verb} license`, `${notice('warn', `<b>No reply from ROTRA.</b> The ${verb === 'Renew' ? 'renewal' : 'activation'} may already be saved. Check its status before trying again, so ${esc(c.name)} isn't given two periods.`)}`,
+        `<button class="btn primary" data-act="licCheck" ${L.step === 'checking' ? 'disabled' : ''}>${L.step === 'checking' ? 'Checking…' : 'Check status'}</button>`, false);
+    }
+    const steps = `<div class="steps"><span class="${L.step === 'form' ? 'on' : ''}">1 Details</span><span aria-hidden="true">·</span><span class="${L.step !== 'form' ? 'on' : ''}">2 Review</span></div>`;
+    if (L.step === 'review' || L.step === 'saving') {
+      const to = termEnd(L.from, L.plan);
+      const overlap = a.state === 'active' && L.from <= a.until ? diffDays(L.from, a.until) + 1 : 0;
+      return sheetWrap(`${verb} license`, `${steps}
+        <dl class="kv"><dt>Club</dt><dd><b>${esc(c.name)}</b> · <span class="mono">${esc(c.username)}</span></dd><dt>Plan</dt><dd>${L.plan}</dd><dt>Covers</dt><dd>${fmtYmd(L.from)} – ${fmtYmd(to)}</dd><dt>Paid</dt><dd>${p.free ? 'Free · tester club' : `${peso(toNum(L.amount))} on ${fmtYmd(L.paid)}`}${!p.free && planPrice != null && toNum(L.amount) !== planPrice ? `<br><span class="small muted">The club's ${L.plan.toLowerCase()} price is ${peso(planPrice)}.</span>` : ''}</dd><dt>Reference</dt><dd class="mono">${esc(L.ref || '—')}</dd></dl>
+        <div class="stack tight"><span class="label">What this does</span><ul class="bul">${licEffects(c, L).map((x) => `<li>${x}</li>`).join('')}</ul></div>
+        ${overlap ? notice('warn', `This term overlaps the current one by ${plural(overlap, 'day')}. How overlapping terms combine hasn't been decided.`) : ''}
+        ${errLine(L.err)}`,
+        `<button class="btn" data-act="licEdit" ${L.step === 'saving' ? 'disabled' : ''}>Back</button><button class="btn primary" data-act="licSave" ${L.step === 'saving' ? 'disabled' : ''}>${L.step === 'saving' ? 'Saving…' : `${verb} license`}</button>`, L.step !== 'saving');
+    }
+    const e = L.showErr ? licErrors(L) : {};
+    const to = validYmd(L.from) && L.plan ? termEnd(L.from, L.plan) : null;
+    return sheetWrap(`${verb} license`, `${steps}
+      <div class="who">${logo(c)}<div class="main"><b>${esc(c.name)}</b><span class="small muted">${a.state === 'active' ? `Active until ${fmtYmd(a.until)}` : a.state === 'expired' ? `Expired since ${fmtYmd(a.since)}` : a.state === 'scheduled' ? `Starts ${fmtYmd(a.starts)}` : 'Never licensed'}</span></div></div>
+      <form data-form="license" class="stack" novalidate>
+        <div class="field"><span>Plan</span><div class="choices" role="group" aria-label="Plan">${[['Monthly', `${p.free ? 'Free' : peso(p.monthly)} for one month`], ['Yearly', `${p.free ? 'Free' : peso(p.yearly)} for one year`]].map(([v, sub]) => `<button type="button" class="choice" data-act="licPlan" data-v="${v}" aria-pressed="${L.plan === v}"><b>${v}</b><span class="small muted">${sub}</span></button>`).join('')}</div>${errLine(e.plan)}</div>
+        <div class="fgrid">
+          <label class="field" for="lic-from"><span>Term starts</span><input class="input ${e.from ? 'bad' : ''}" id="lic-from" type="date" data-bind="ui.lic.from" data-live value="${esc(L.from)}">${to ? `<span class="hint">Ends ${fmtYmd(to)}</span>` : ''}${errLine(e.from)}</label>
+          ${p.free ? `<div class="field"><span>Amount</span><b>Free</b><span class="hint">This is a tester club, so nothing is charged. Change it from the club's Price card.</span></div>` : `<label class="field" for="lic-paid"><span>Paid on</span><input class="input ${e.paid ? 'bad' : ''}" id="lic-paid" type="date" max="${todayYmd()}" data-bind="ui.lic.paid" value="${esc(L.paid)}">${errLine(e.paid)}</label>
+          <label class="field" for="lic-amount"><span>Amount paid</span><div class="affix"><b>₱</b><input class="input ${e.amount ? 'bad' : ''}" id="lic-amount" inputmode="numeric" data-bind="ui.lic.amount" value="${esc(L.amount)}"></div><span class="hint">Filled in from this club's price. Change it if the club paid a different amount.</span>${errLine(e.amount)}</label>`}
+          <label class="field" for="lic-ref"><span>Reference <span class="hint">(optional)</span></span><input class="input ${e.ref ? 'bad' : ''}" id="lic-ref" data-bind="ui.lic.ref" value="${esc(L.ref)}" placeholder="Receipt or transfer reference">${errLine(e.ref)}</label>
+        </div>
+        ${a.state === 'active' ? notice('', 'The start date is suggested as the day after the current term ends. The rule for renewing early hasn\'t been decided, so check it before you continue.') : ''}
+      </form>`,
+      '<button class="btn" data-act="closeSheet">Cancel</button><button class="btn primary" data-act="licReview">Review</button>');
+  },
+  addClub: () => {
+    const A = S.ui.add, saving = A.step === 'saving';
+    if (A.step === 'leave') return sheetWrap('Discard this club?', '<p class="muted">Nothing has been saved, and no club account was created.</p>', '<button class="btn" data-act="addBack">Keep editing</button><button class="btn danger" data-act="addDiscard">Discard</button>');
+    const steps = `<div class="steps"><span class="${A.step === 'form' ? 'on' : ''}">1 Details</span><span aria-hidden="true">·</span><span class="${A.step !== 'form' ? 'on' : ''}">2 Review</span></div>`;
+    if (A.step === 'review' || saving) {
+      const city = CITY_LIST.find(([k]) => k === A.code);
+      return sheetWrap('Add club', `${steps}
+        <dl class="kv"><dt>Club name</dt><dd><b>${esc(A.name.trim())}</b></dd><dt>Founding address</dt><dd>${esc(A.founding.trim())}</dd><dt>City</dt><dd>${city[1]} · <span class="mono">${city[0]}</span></dd>
+          <dt>Username</dt><dd class="mono">${esc(A.username.trim())}</dd><dt>Password</dt><dd>Set · ${A.pass.length} characters</dd><dt>Price</dt><dd>${priceLine({ monthly: toNum(A.monthly), yearly: toNum(A.yearly), free: !!A.free })}</dd></dl>
+        <div class="stack tight"><span class="label">What happens next</span><ul class="bul">
+          <li>The club can sign in to the Queue app with this username and password.</li>
+          <li>It can't run sessions until you activate a license${A.free ? '. As a tester club its licenses are free, recorded at ₱0' : ''}.</li>
+          <li>The founding address and city code can't be changed later.</li>
+          <li>The password isn't shown again. Give it to the club yourself; they can change it in Club settings.</li></ul></div>${errLine(A.err)}`,
+      `<button class="btn" data-act="addEdit" ${saving ? 'disabled' : ''}>Back</button><button class="btn primary" data-act="addCreate" ${saving ? 'disabled' : ''}>${saving ? 'Creating…' : 'Create club'}</button>`, !saving);
+    }
+    const e = A.showErr ? addErrors(A) : {};
+    return sheetWrap('Add club', `${steps}
+      <form data-form="addClub" class="stack" novalidate>
+        <span class="label">Club</span>
+        <label class="field" for="add-name"><span>Club name</span><input class="input ${e.name ? 'bad' : ''}" id="add-name" data-bind="ui.add.name" data-live value="${esc(A.name)}">${errLine(e.name)}</label>
+        <label class="field" for="add-founding"><span>Founding address</span><input class="input ${e.founding ? 'bad' : ''}" id="add-founding" data-bind="ui.add.founding" value="${esc(A.founding)}" placeholder="Street, district"><span class="hint">Where the club was founded. Sessions can be held at other venues.</span>${errLine(e.founding)}</label>
+        <label class="field" for="add-city"><span>Founding city</span><select class="input ${e.code ? 'bad' : ''}" id="add-city" data-bind="ui.add.code" data-live><option value="">Choose a city</option>${CITY_LIST.map(([k, n]) => `<option value="${k}" ${A.code === k ? 'selected' : ''}>${n} (${k})</option>`).join('')}</select><span class="hint">Sets the city code in the RTR IDs of players this club creates. It can't be changed later.</span>${errLine(e.code)}</label>
+        <span class="label" style="padding-top:6px">Sign-in for the Queue app</span>
+        <label class="field" for="add-user"><span>Username</span><input class="input mono ${e.username ? 'bad' : ''}" id="add-user" autocomplete="off" autocapitalize="none" spellcheck="false" data-bind="ui.add.username" value="${esc(A.username)}"><span class="hint">Lowercase letters, numbers and dots, like lahug.smash. One shared account runs the club and its queue.</span>${errLine(e.username)}</label>
+        <div class="field"><label for="add-pass" style="font-size:13px;font-weight:600;color:var(--fg2)">Password</label><div class="pass"><input class="input ${e.pass ? 'bad' : ''}" id="add-pass" type="${A.show ? 'text' : 'password'}" autocomplete="new-password" data-bind="ui.add.pass" value="${esc(A.pass)}"><button type="button" class="btn xs ghost" data-act="addShow" aria-pressed="${A.show}" aria-label="${A.show ? 'Hide' : 'Show'} password">${A.show ? 'Hide' : 'Show'}</button></div>
+          <div class="row"><button type="button" class="btn xs" data-act="addGen">Generate a password</button><span class="hint">At least 8 characters.</span></div>${errLine(e.pass)}</div>
+        <span class="label" style="padding-top:6px">Price</span>
+        ${priceFields('add', A, e)}
+      </form>`,
+    '<button class="btn" data-act="closeSheet">Cancel</button><button class="btn primary" data-act="addReview">Review</button>');
+  },
+  addFlag: () => {
+    const F = S.ui.flag, saving = F.step === 'saving';
+    if (F.step === 'leave') return sheetWrap('Discard this flag?', '<p class="muted">Nothing has been saved.</p>', '<button class="btn" data-act="flagBack">Keep editing</button><button class="btn danger" data-act="flagDiscard">Discard</button>');
+    const e = F.showErr ? flagErrors(F) : {};
+    return sheetWrap('Add feature flag', `<form data-form="addFlag" class="stack" novalidate>
+        <label class="field" for="flag-name"><span>Name</span><input class="input ${e.name ? 'bad' : ''}" id="flag-name" data-bind="ui.flag.name" data-live value="${esc(F.name)}" placeholder="Session cost estimate" ${saving ? 'disabled' : ''}>${errLine(e.name)}</label>
+        <label class="field" for="flag-key"><span>Key</span><input class="input mono ${e.key ? 'bad' : ''}" id="flag-key" autocomplete="off" autocapitalize="none" spellcheck="false" data-bind="ui.flag.key" value="${esc(F.key)}" ${saving ? 'disabled' : ''}><span class="hint">What the apps' code checks. Lowercase letters, numbers and underscores. It can't be changed later.</span>${errLine(e.key)}</label>
+        <label class="field" for="flag-desc"><span>What it does</span><textarea class="input ${e.desc ? 'bad' : ''}" id="flag-desc" rows="3" data-bind="ui.flag.desc" style="min-height:80px;resize:vertical" ${saving ? 'disabled' : ''}>${esc(F.desc)}</textarea><span class="hint">Say what changes for people when it's on.</span>${errLine(e.desc)}</label>
+        <div class="setting"><div class="main"><b>Turn on right away</b><p class="small muted">Off by default, so you can add a flag before the feature is ready.</p></div>${sw(F.on, 'flagOn', 'Turn on right away', saving ? 'disabled' : '')}</div>
+      </form>
+      ${notice('', 'A flag only changes something once the apps have code that reads its key. No flag can change confirmed results or bring back lost offline records.')}${errLine(F.err)}`,
+    `<button class="btn" data-act="closeSheet" ${saving ? 'disabled' : ''}>Cancel</button><button class="btn primary" data-act="flagCreate" ${saving ? 'disabled' : ''}>${saving ? 'Adding…' : 'Add flag'}</button>`, !saving);
+  },
+  price: (sh) => {
+    const c = clubOf(sh.id), d = S.ui.price, e = d.showErr ? priceErrors(d.monthly, d.yearly) : {};
+    return sheetWrap(`Price for ${esc(c.name)}`, `<p class="small muted">Now: ${priceLine(c.price)}</p>
+      <form data-form="price" class="stack" novalidate>${priceFields('price', d, e)}</form>
+      ${notice('', 'The new price fills in the amount for licenses you record from now on. Payments already recorded keep their amounts.')}${errLine(sh.err)}`,
+    `<button class="btn" data-act="closeSheet" ${sh.pending ? 'disabled' : ''}>Cancel</button><button class="btn primary" data-act="doPrice" ${sh.pending ? 'disabled' : ''}>${sh.pending ? 'Saving…' : 'Save price'}</button>`, !sh.pending);
+  },
+  nameApprove: (sh) => {
+    const c = clubOf(sh.id);
+    return sheetWrap('Approve name change?', `<div class="change"><div><span class="label">Current</span><b>${esc(c.name)}</b></div>${I.arrow}<div class="to"><span class="label">New</span><b>${esc(c.nameRequest.name)}</b></div></div>
+      <p>The new name shows on the club's dashboard, its public session pages and future result images.</p><p class="small muted">RTR IDs and the founding address don't change.</p>${errLine(sh.err)}`,
+    `<button class="btn" data-act="closeSheet" ${sh.pending ? 'disabled' : ''}>Back</button><button class="btn primary" data-act="doNameApprove" ${sh.pending ? 'disabled' : ''}>${sh.pending ? 'Approving…' : 'Approve name change'}</button>`, !sh.pending);
+  },
+  nameReject: (sh) => {
+    const c = clubOf(sh.id);
+    return sheetWrap('Reject name change?', `<p>${esc(c.name)} keeps its current name, and the request for “${esc(c.nameRequest.name)}” is closed. The club can send a new request.</p>${errLine(sh.err)}`,
+      `<button class="btn" data-act="closeSheet" ${sh.pending ? 'disabled' : ''}>Back</button><button class="btn danger" data-act="doNameReject" ${sh.pending ? 'disabled' : ''}>${sh.pending ? 'Rejecting…' : 'Reject request'}</button>`, !sh.pending);
+  },
+  approve: (sh) => {
+    const r = reqOf(sh.id), p = playerOf(r.pid), f = FIELD[r.field];
+    return sheetWrap(`Approve ${f} change?`, `<dl class="kv"><dt>Player</dt><dd><b>${esc(p.name)}</b></dd><dt>RTR ID</dt><dd class="mono">${esc(p.rtr)}</dd><dt>From</dt><dd class="mono">${esc(r.from)}</dd><dt>To</dt><dd class="mono">${esc(r.to)}</dd></dl>
+      <p>After you approve, ROTRA applies the change to the account. ${esc(firstName(p))} signs in with the new ${f} once it shows as Applied.</p>
+      <p class="small muted">The RTR ID and match history stay the same. This isn't a correction to any game result.</p>${errLine(sh.err)}`,
+    `<button class="btn" data-act="closeSheet" ${sh.pending ? 'disabled' : ''}>Back</button><button class="btn primary" data-act="doApprove" ${sh.pending ? 'disabled' : ''}>${sh.pending ? 'Approving…' : `Approve ${f} change`}</button>`, !sh.pending);
+  },
+  decline: (sh) => {
+    const r = reqOf(sh.id), p = playerOf(r.pid), f = FIELD[r.field];
+    return sheetWrap('Decline this request?', `<p>${esc(p.name)} keeps <span class="mono">${esc(r.from)}</span> as their ${f}. They see the request as not approved and can send a new one.</p>
+      <p class="small muted">How players are told, and whether you can ask them for more details first, hasn't been decided.</p>${errLine(sh.err)}`,
+    `<button class="btn" data-act="closeSheet" ${sh.pending ? 'disabled' : ''}>Back</button><button class="btn danger" data-act="doDecline" ${sh.pending ? 'disabled' : ''}>${sh.pending ? 'Declining…' : 'Decline request'}</button>`, !sh.pending);
+  },
+  config: (sh) => {
+    const d = S.ui.cfg, e = eff();
+    const row = (label, from, to, unit = '') => `<div class="${from !== to ? 'ch' : ''}"><span>${label}</span><b>${from}${unit}${from !== to ? ` → ${to}${unit}` : ''}</b></div>`;
+    return sheetWrap('Save configuration?', `<div class="diff">${row('Club assessment', e.assess, +d.assess, '%')}${row('Match performance', e.perf, +d.perf, '%')}${row('Leaderboard requirement', e.threshold, +d.threshold, ' matches')}</div>
+      <p>This saves version ${e.v + 1}. It applies to every player's shared rank and to the overall leaderboard.</p>
+      ${notice('warn', 'Whether existing ranks are recalculated right away or only from now on hasn\'t been decided. Don\'t tell players their rank changed until that\'s settled.')}${errLine(sh.err)}`,
+    `<button class="btn" data-act="closeSheet" ${sh.pending ? 'disabled' : ''}>Back</button><button class="btn primary" data-act="doConfig" ${sh.pending ? 'disabled' : ''}>${sh.pending ? 'Saving…' : 'Save configuration'}</button>`, !sh.pending);
+  },
+  flag: (sh) => {
+    const x = S.flags.find((f) => f.id === sh.id);
+    return sheetWrap(`Turn ${x.on ? 'off' : 'on'} ${esc(x.name)}?`, `<dl class="kv"><dt>Now</dt><dd>${x.on ? 'On' : 'Off'}</dd><dt>After saving</dt><dd>${x.on ? 'Off' : 'On'}</dd></dl>
+      <p class="small muted">Saving here doesn't prove an offline Queue device has the change. When devices pick it up hasn't been decided.</p>${errLine(sh.err)}`,
+    `<button class="btn" data-act="closeSheet" ${sh.pending ? 'disabled' : ''}>Back</button><button class="btn primary" data-act="doFlag" ${sh.pending ? 'disabled' : ''}>${sh.pending ? 'Saving…' : `Turn ${x.on ? 'off' : 'on'}`}</button>`, !sh.pending);
+  },
+  discard: () => sheetWrap('Discard your draft?', '<p class="muted">Your changes to the ranking settings haven\'t been saved. The values in effect stay the same.</p>', '<button class="btn" data-act="closeSheet">Keep editing</button><button class="btn danger" data-act="discardGo">Discard draft</button>'),
+  demo: () => {
+    const toggle = (key, title, sub, on, act = 'demoToggle') => `<div class="demo-sec"><div class="setting"><div class="main"><b>${title}</b><p class="small muted">${sub}</p></div>${sw(on, act, title, `data-k="${key}"`)}</div></div>`;
+    return sheetWrap('Prototype', `<p class="small muted">Try the states Admin has to handle. None of these controls are part of the real app.</p>
+      <div class="demo-sec"><span class="label">Account</span><div class="row">${S.me && !S.denied ? `<span class="small">Signed in as <b>${OWNER}</b></span><button class="btn xs" data-act="signOut">Sign out</button><button class="btn xs" data-act="endSession">End the session</button>`
+        : `<button class="btn xs" data-act="demoSignIn">Sign in as the platform owner</button><button class="btn xs" data-act="demoDenied">Sign in with a club account</button>`}</div>
+        <span class="hint">The sign-in screen is a mock: anything you type signs in as the platform owner.</span></div>
+      ${toggle('online', 'Offline', 'Lists stay readable; every save fails without changing anything.', !S.online, 'toggleOnline')}
+      ${toggle('timeoutNext', 'Next license save gets no reply', 'The term is saved, but the reply is lost. Check status finds it instead of adding a second one.', S.demo.timeoutNext)}
+      ${toggle('failApply', 'Next contact change fails to apply', 'Approval saves; applying it to the account fails and needs a retry.', S.demo.failApply)}
+      ${toggle('failConfig', 'Next settings save fails', 'The values in effect stay; the draft is kept.', S.demo.failConfig)}
+      ${toggle('conflictConfig', 'Someone else saves settings first', 'Your next settings save meets a newer version.', S.demo.conflictConfig)}
+      ${toggle('flag', 'Show a placeholder flag', 'Shows how a defined flag looks. It isn\'t a real flag.', S.flags.some((x) => x.id === 'placeholder'), 'demoFlag')}
+      <div class="demo-sec"><button class="btn sm danger" data-act="resetDemo">${S.ui.resetArmed ? 'Tap again to reset everything' : 'Reset demo data'}</button></div>`,
+    '<button class="btn" data-act="closeSheet">Done</button>');
+  },
+};
+
+// ---------- Actions ----------
+function go(to, id, anchor) {
+  if (S.screen === 'config' && to !== 'config' && cfgDirty()) { S.ui.pendingGo = { to, id }; S.ui.sheet = { type: 'discard' }; S.ui.nav = false; render(); return; }
+  if (S.screen === 'config' && to !== 'config') { S.ui.cfg = null; S.ui.cfgErr = ''; S.ui.cfgConflict = false; }
+  S.screen = to;
+  if (id !== undefined) S.viewId = id;
+  S.ui.sheet = null; S.ui.nav = false; S.ui.checking = null;
+  render();
+  const el = anchor && document.getElementById(anchor);
+  if (el) el.scrollIntoView({ block: 'start' }); else window.scrollTo(0, 0);
+}
+function signOutAll(ended = false) {
+  S.me = null; S.denied = null; S.ended = ended; S.screen = 'clubs'; S.viewId = null;
+  S.ui = { ...freshUi(), login: { email: '', pass: '', show: false, err: '', pending: false } };
+  render(); window.scrollTo(0, 0);
+}
+function offlineBlock(target) { if (S.online) return false; target.err = OFFLINE_ERR; target.pending = false; render(); return true; }
+function runApply(id, ms = 1800) {
+  later(ms, () => {
+    const r = reqOf(id);
+    if (!r || r.status !== 'applying') return;
+    S.ui.checking = null;
+    const p = playerOf(r.pid);
+    if (S.demo.failApply) {
+      S.demo.failApply = false;
+      r.status = 'failed'; r.error = "The sign-in provider didn't accept the change.";
+      log('req', r.id, `Applying ${FIELD[r.field]} change for ${p.name} failed at the sign-in provider.`);
+      toast(`Not applied. ${firstName(p)} still signs in with the old ${FIELD[r.field]}.`);
+    } else {
+      p[r.field] = r.to; r.status = 'applied'; r.appliedAt = Date.now(); r.error = '';
+      log('req', r.id, `Applied ${FIELD[r.field]} change for ${p.name}.`);
+      toast(`Applied. ${firstName(p)} now signs in with ${r.to}.`);
+    }
+  });
+}
+function licStart(c) {
+  const a = access(c), t = todayYmd();
+  const last = [...c.terms].sort((x, y) => (x.from < y.from ? 1 : -1))[0];
+  const plan = last ? last.plan : '';
+  const L = { club: c.id, step: 'form', plan, from: a.state === 'active' ? addDays(a.until, 1) : t, paid: t, amount: c.price.free ? '0' : plan ? String(plan === 'Yearly' ? c.price.yearly : c.price.monthly) : '', ref: '', err: '', showErr: false };
+  L.init = licFields(L);
+  S.ui.lic = L; S.ui.sheet = { type: 'license' };
+  render();
+}
+function licCommit() {
+  const L = S.ui.lic, c = clubOf(L.club), a = access(c), t = todayYmd(), verb = c.terms.length ? 'Renewed' : 'Activated';
+  const x = { ...term(L.paid, L.plan, L.from, termEnd(L.from, L.plan), +String(L.amount).replace(/,/g, ''), L.ref.trim()), op: L.op };
+  c.terms.push(x);
+  let extra = '';
+  if (a.state === 'expired' && L.from <= t && x.to >= t) {
+    if (c.ret.deletedOn) extra = ' Public pages were already deleted and were not restored.';
+    else { c.ret.cycles.push({ expired: a.since, cancelled: t }); c.ret.failedOn = null; extra = ` Public pages restored; deletion countdown from ${fmtYmd(a.since)} cancelled.`; }
+  }
+  log('club', c.id, `${verb} license: ${x.plan}, ${fmtYmd(x.from)} – ${fmtYmd(x.to)} · ${amountText(x.amount)}${x.ref ? ` · ${x.ref}` : ''}.${extra}`);
+  return { c, x, verb };
+}
+function licDone(r, found) {
+  S.ui.sheet = null; S.ui.lic = null;
+  toast(`${found ? 'Found it: license' : 'License'} ${r.verb.toLowerCase()} until ${fmtYmd(r.x.to)}.${found ? ' Nothing was added twice.' : ''}`);
+}
+
+const ACT = {
+  go: (el) => go(el.dataset.to, undefined),
+  openClub: (el) => { S.ui.clubTab = 'overview'; go('club', el.dataset.id, el.dataset.anchor); },
+  clubTab: (el) => { S.ui.clubTab = el.dataset.v; render(); },
+  openPlayer: (el) => go('player', el.dataset.id),
+  openReview: (el) => go('review', el.dataset.id),
+  toggleNav: () => { S.ui.nav = !S.ui.nav; render(); },
+  toggleTheme: () => {
+    const t = isDark() ? 'light' : 'dark';
+    document.documentElement.dataset.theme = t;
+    try { localStorage.setItem(THEME_KEY, t); } catch (e) { /* not remembered */ }
+    render();
+  },
+  togglePass: () => { S.ui.login.show = !S.ui.login.show; render(); },
+  signOut: () => signOutAll(false),
+  endSession: () => signOutAll(true),
+  demoSignIn: () => { S.me = OWNER; S.denied = null; S.ended = false; S.ui.sheet = null; S.screen = 'clubs'; render(); },
+  demoDenied: () => { S.me = 'lahug.smash'; S.denied = NON_ADMIN['lahug.smash']; S.ui.sheet = null; render(); },
+  clubsF: (el) => { S.ui.clubsF = el.dataset.v; render(); },
+  clearClubs: () => { S.ui.clubsQ = ''; S.ui.clubsF = 'all'; render(); },
+  playersF: (el) => { S.ui.playersF = el.dataset.v; S.ui.shown = 25; render(); },
+  clearPlayers: () => { S.ui.playersQ = ''; S.ui.playersF = 'all'; S.ui.shown = 25; render(); },
+  morePlayers: () => { S.ui.shown += 25; render(); },
+  reqF: (el) => { S.ui.reqF = el.dataset.v; render(); },
+  closeSheet: () => {
+    const sh = S.ui.sheet;
+    if (!sh || sh.pending) return;
+    if (sh.type === 'license') {
+      const L = S.ui.lic;
+      if (['saving', 'timeout', 'checking'].includes(L.step)) return;
+      if (L.step !== 'leave' && licDirty()) { L.prev = L.step; L.step = 'leave'; render(); return; }
+      S.ui.lic = null;
+    }
+    if (sh.type === 'addClub') {
+      const A = S.ui.add;
+      if (A.step === 'saving') return;
+      if (A.step !== 'leave' && [A.name, A.founding, A.code, A.username, A.pass, A.monthly, A.yearly].some((v) => String(v).trim())) { A.step = 'leave'; render(); return; }
+      S.ui.add = null;
+    }
+    if (sh.type === 'addFlag') {
+      const F = S.ui.flag;
+      if (F.step === 'saving') return;
+      if (F.step !== 'leave' && [F.name, F.key, F.desc].some((v) => String(v).trim())) { F.step = 'leave'; render(); return; }
+      S.ui.flag = null;
+    }
+    if (sh.type === 'discard') S.ui.pendingGo = null;
+    S.ui.sheet = null; render();
+  },
+  // License
+  openLicense: (el) => licStart(clubOf(el.dataset.id)),
+  licPlan: (el) => {
+    // Switching plans fills in that plan's price, unless the amount was typed in by hand.
+    const L = S.ui.lic, p = clubOf(L.club).price, priceFor = (plan) => (p.free ? 0 : plan === 'Yearly' ? p.yearly : plan === 'Monthly' ? p.monthly : null);
+    if (!String(L.amount).trim() || toNum(L.amount) === priceFor(L.plan)) L.amount = String(priceFor(el.dataset.v));
+    L.plan = el.dataset.v; render();
+  },
+  // Add club
+  openAddClub: () => {
+    S.ui.add = { step: 'form', name: '', founding: '', code: '', username: '', userTouched: false, pass: '', show: false, monthly: '', yearly: '', showErr: false, err: '' };
+    S.ui.sheet = { type: 'addClub' }; S.ui.nav = false; render();
+  },
+  addShow: () => { S.ui.add.show = !S.ui.add.show; render(); },
+  addGen: () => { S.ui.add.pass = genPass(); S.ui.add.show = true; render(); },
+  addReview: () => { const A = S.ui.add; A.showErr = true; A.err = ''; if (Object.keys(addErrors(A)).length) { render(); return; } A.step = 'review'; render(); },
+  addEdit: () => { S.ui.add.step = 'form'; S.ui.add.err = ''; render(); },
+  addBack: () => { S.ui.add.step = 'form'; render(); },
+  addDiscard: () => { S.ui.add = null; S.ui.sheet = null; render(); },
+  addCreate: () => {
+    const A = S.ui.add;
+    if (A.step === 'saving') return;
+    if (offlineBlock(A)) return;
+    if (Object.keys(addErrors(A)).length) { A.step = 'form'; render(); return; }
+    A.step = 'saving'; A.err = ''; render();
+    later(1000, () => {
+      const name = A.name.trim();
+      const c = { id: `c${Date.now()}`, name, initials: initials(name), username: A.username.trim(), setUp: todayYmd(), founding: A.founding.trim(), city: CITY_LIST.find(([k]) => k === A.code)[1], code: A.code,
+        terms: [], nameRequest: null, live: null, ret: { cycles: [] }, oldNames: [], price: { monthly: posInt(A.monthly) ? toNum(A.monthly) : 0, yearly: posInt(A.yearly) ? toNum(A.yearly) : 0, free: !!A.free } };
+      S.clubs.push(c);
+      log('club', c.id, `Set up the club account ${c.username}. Price: ${priceLine(c.price)}.`);
+      S.ui.add = null; S.ui.clubTab = 'license';
+      go('club', c.id);
+      toast(`${name} added. Activate a license so it can run sessions.`);
+    });
+  },
+  // Add feature flag
+  openAddFlag: () => { S.ui.flag = { step: 'form', name: '', key: '', keyTouched: false, desc: '', on: false, showErr: false, err: '' }; S.ui.sheet = { type: 'addFlag' }; S.ui.nav = false; render(); },
+  flagOn: () => { S.ui.flag.on = !S.ui.flag.on; render(); },
+  flagBack: () => { S.ui.flag.step = 'form'; render(); },
+  flagDiscard: () => { S.ui.flag = null; S.ui.sheet = null; render(); },
+  flagCreate: () => {
+    const F = S.ui.flag;
+    if (F.step === 'saving') return;
+    F.showErr = true; F.err = '';
+    if (Object.keys(flagErrors(F)).length) { render(); return; }
+    if (offlineBlock(F)) return;
+    F.step = 'saving'; render();
+    later(800, () => {
+      const x = { id: `f${Date.now()}`, key: F.key.trim(), name: F.name.trim(), desc: F.desc.trim(), on: F.on, changed: Date.now() };
+      S.flags.push(x);
+      log('flag', x.id, `Added feature flag ${x.key} (${x.on ? 'on' : 'off'}).`);
+      S.ui.flag = null; S.ui.sheet = null;
+      toast(`${x.name} added. It's ${x.on ? 'on' : 'off'}.`);
+    });
+  },
+  // Price
+  priceMode: (el) => { const d = el.dataset.k === 'add' ? S.ui.add : S.ui.price; d.free = el.dataset.v === 'free'; render(); },
+  openPrice: (el) => { const c = clubOf(el.dataset.id); S.ui.price = { monthly: c.price.monthly ? String(c.price.monthly) : '', yearly: c.price.yearly ? String(c.price.yearly) : '', free: !!c.price.free, showErr: false }; S.ui.sheet = { type: 'price', id: c.id }; render(); },
+  doPrice: () => {
+    const sh = S.ui.sheet, d = S.ui.price;
+    if (sh.pending) return;
+    d.showErr = true;
+    if (!d.free && Object.keys(priceErrors(d.monthly, d.yearly)).length) { render(); return; }
+    // Switching to free keeps the last paid price so it can be restored later.
+    const c = clubOf(sh.id), next = d.free ? { ...c.price, free: true } : { monthly: toNum(d.monthly), yearly: toNum(d.yearly), free: false };
+    if (next.monthly === c.price.monthly && next.yearly === c.price.yearly && next.free === !!c.price.free) { S.ui.sheet = null; render(); return; }
+    if (offlineBlock(sh)) return;
+    sh.pending = true; sh.err = ''; render();
+    later(800, () => {
+      log('club', c.id, `Changed price from ${priceLine(c.price)} to ${priceLine(next)}.`);
+      c.price = next; S.ui.sheet = null; toast(`Price saved: ${priceLine(next)}.`);
+    });
+  },
+  licReview: () => { const L = S.ui.lic; L.showErr = true; L.err = ''; if (Object.keys(licErrors(L)).length) { render(); return; } L.step = 'review'; render(); },
+  licEdit: () => { S.ui.lic.step = 'form'; S.ui.lic.err = ''; render(); },
+  licBack: () => { const L = S.ui.lic; L.step = L.prev || 'form'; render(); },
+  licDiscard: () => { S.ui.lic = null; S.ui.sheet = null; render(); },
+  licSave: () => {
+    const L = S.ui.lic;
+    if (L.step === 'saving') return;
+    if (offlineBlock(L)) return;
+    L.step = 'saving'; L.err = ''; L.op = `op-${Date.now()}`; render();
+    later(1200, () => {
+      if (S.demo.timeoutNext) { S.demo.timeoutNext = false; licCommit(); L.step = 'timeout'; return; }
+      licDone(licCommit(), false);
+    });
+  },
+  licCheck: () => {
+    const L = S.ui.lic;
+    if (!S.online) { toast("You're offline. Check the status once you're connected."); return; }
+    L.step = 'checking'; render();
+    later(900, () => {
+      const c = clubOf(L.club), x = c.terms.find((t) => t.op === L.op);
+      if (x) licDone({ c, x, verb: c.terms.length > 1 ? 'Renewed' : 'Activated' }, true);
+      else { L.step = 'review'; L.err = "It wasn't saved. You can save it again."; }
+    });
+  },
+  // Club names
+  openNameApprove: (el) => { S.ui.sheet = { type: 'nameApprove', id: el.dataset.id }; render(); },
+  openNameReject: (el) => { S.ui.sheet = { type: 'nameReject', id: el.dataset.id }; render(); },
+  doNameApprove: () => {
+    const sh = S.ui.sheet;
+    if (offlineBlock(sh)) return;
+    sh.pending = true; sh.err = ''; render();
+    later(900, () => {
+      const c = clubOf(sh.id), old = c.name;
+      c.oldNames.push(old); c.name = c.nameRequest.name; c.initials = initials(c.name); c.nameRequest = null;
+      log('club', c.id, `Approved name change: ${old} → ${c.name}.`);
+      S.ui.sheet = null; toast(`Name changed to ${c.name}.`);
+    });
+  },
+  doNameReject: () => {
+    const sh = S.ui.sheet;
+    if (offlineBlock(sh)) return;
+    sh.pending = true; sh.err = ''; render();
+    later(800, () => {
+      const c = clubOf(sh.id);
+      log('club', c.id, `Rejected name change to ${c.nameRequest.name}. Kept ${c.name}.`);
+      c.nameRequest = null; S.ui.sheet = null; toast(`Rejected. The club keeps ${c.name}.`);
+    });
+  },
+  // Contact changes
+  openApprove: (el) => { const r = reqOf(el.dataset.id); if (blocked(r)) return; S.ui.sheet = { type: 'approve', id: r.id }; render(); },
+  openDecline: (el) => { S.ui.sheet = { type: 'decline', id: el.dataset.id }; render(); },
+  doApprove: () => {
+    const sh = S.ui.sheet;
+    if (offlineBlock(sh)) return;
+    sh.pending = true; sh.err = ''; render();
+    later(900, () => {
+      const r = reqOf(sh.id), p = playerOf(r.pid);
+      if (blocked(r)) { sh.pending = false; sh.err = 'Something changed while you were reviewing. Check the request again.'; return; }
+      r.status = 'applying'; r.approvedAt = Date.now();
+      log('req', r.id, `Approved ${FIELD[r.field]} change for ${p.name}.`);
+      S.ui.sheet = null; toast('Approved. Applying the change…');
+      runApply(r.id);
+    });
+  },
+  doDecline: () => {
+    const sh = S.ui.sheet;
+    if (offlineBlock(sh)) return;
+    sh.pending = true; sh.err = ''; render();
+    later(800, () => {
+      const r = reqOf(sh.id), p = playerOf(r.pid);
+      r.status = 'rejected'; r.decidedAt = Date.now();
+      log('req', r.id, `Declined ${FIELD[r.field]} change for ${p.name}.`);
+      S.ui.sheet = null; toast(`Declined. ${firstName(p)} keeps the current ${FIELD[r.field]}.`);
+    });
+  },
+  checkApply: (el) => { if (!S.online) { toast("You're offline. Check the status once you're connected."); return; } S.ui.checking = el.dataset.id; render(); runApply(el.dataset.id, 900); },
+  retryApply: (el) => {
+    if (!S.online) { toast(OFFLINE_ERR); return; }
+    const r = reqOf(el.dataset.id);
+    r.status = 'applying'; r.error = '';
+    log('req', r.id, `Retried applying ${FIELD[r.field]} change for ${playerOf(r.pid).name}.`);
+    render(); runApply(r.id);
+  },
+  // Ranking settings
+  cfgBalance: () => { const d = cfgDraft(); if (/^\d+$/.test(String(d.assess).trim()) && +d.assess <= 100) d.perf = String(100 - +d.assess); render(); },
+  cfgDiscard: () => { S.ui.cfg = null; S.ui.cfgErr = ''; S.ui.cfgConflict = false; render(); },
+  cfgRebase: () => { S.ui.cfg.base = eff().v; S.ui.cfgConflict = false; render(); },
+  discardGo: () => { const g = S.ui.pendingGo; S.ui.cfg = null; S.ui.cfgErr = ''; S.ui.cfgConflict = false; S.ui.pendingGo = null; S.ui.sheet = null; if (g) go(g.to, g.id); else render(); },
+  doConfig: () => {
+    const sh = S.ui.sheet;
+    if (offlineBlock(sh)) return;
+    sh.pending = true; sh.err = ''; render();
+    later(1000, () => {
+      const d = S.ui.cfg;
+      if (S.demo.conflictConfig) {
+        S.demo.conflictConfig = false;
+        const e = eff();
+        S.config.push({ v: e.v + 1, assess: e.assess, perf: e.perf, threshold: e.threshold + 2, at: Date.now() - 4 * 6e4, by: `${OWNER} (another browser)` });
+        S.ui.cfgConflict = true; S.ui.sheet = null; return;
+      }
+      if (S.demo.failConfig) { S.demo.failConfig = false; S.ui.sheet = null; S.ui.cfgErr = `<b>Couldn't save.</b> Version ${eff().v} is still in effect. Your draft is kept, so you can try again.`; return; }
+      if (d.base !== eff().v) { S.ui.cfgConflict = true; S.ui.sheet = null; return; }
+      const v = { v: eff().v + 1, assess: +d.assess, perf: +d.perf, threshold: +d.threshold, at: Date.now(), by: OWNER };
+      S.config.push(v); S.ui.cfg = null; S.ui.cfgErr = ''; S.ui.sheet = null;
+      toast(`Saved. Version ${v.v} is in effect.`);
+    });
+  },
+  // Feature flags
+  openFlag: (el) => { S.ui.sheet = { type: 'flag', id: el.dataset.id }; render(); },
+  doFlag: () => {
+    const sh = S.ui.sheet;
+    if (offlineBlock(sh)) return;
+    sh.pending = true; sh.err = ''; render();
+    later(800, () => { const x = S.flags.find((f) => f.id === sh.id); x.on = !x.on; x.changed = Date.now(); S.ui.sheet = null; toast(`${x.name} is ${x.on ? 'on' : 'off'}.`); });
+  },
+  // Prototype
+  openDemo: () => { S.ui.sheet = { type: 'demo' }; S.ui.resetArmed = false; render(); },
+  toggleOnline: () => { S.online = !S.online; S.offlineAt = S.online ? null : Date.now(); render(); },
+  demoToggle: (el) => { const k = el.dataset.k; S.demo[k] = !S.demo[k]; render(); },
+  demoFlag: () => {
+    if (S.flags.some((x) => x.id === 'placeholder')) S.flags = S.flags.filter((x) => x.id !== 'placeholder');
+    else S.flags.unshift({ id: 'placeholder', name: 'Placeholder flag', desc: 'Shows how a defined flag will look in Admin. It is not a real flag and controls nothing.', on: false, changed: null });
+    render();
+  },
+  resetDemo: () => {
+    if (!S.ui.resetArmed) { S.ui.resetArmed = true; render(); return; }
+    S = freshState(); toast('Demo data reset.'); render();
+  },
+};
+
+const FORM = {
+  login: () => {
+    // Mock sign-in: whatever is typed signs in as the platform owner. Access denied stays in the Prototype menu.
+    const L = S.ui.login;
+    if (L.pending) return;
+    L.pending = true; L.err = ''; render();
+    later(400, () => { L.pending = false; L.pass = ''; S.me = OWNER; S.denied = null; S.ended = false; S.screen = 'clubs'; });
+  },
+  license: () => ACT.licReview(),
+  addClub: () => ACT.addReview(),
+  addFlag: () => ACT.flagCreate(),
+  price: () => ACT.doPrice(),
+  config: () => {
+    const d = cfgDraft();
+    if (!cfgDirty() || Object.keys(cfgCheck(d)).length || S.ui.cfgConflict) return;
+    S.ui.cfgErr = ''; S.ui.sheet = { type: 'config' }; render();
+  },
+};
+
+const setPath = (path, v) => { const ks = path.split('.'); let o = S; ks.slice(0, -1).forEach((k) => { o = o[k]; }); o[ks[ks.length - 1]] = v; };
+document.addEventListener('click', (ev) => {
+  const el = ev.target.closest('[data-act]');
+  if (!el || el.disabled) return;
+  // A button inside a clickable row handles the click itself.
+  if (el.tagName === 'TR' && ev.target.closest('button, a, input') && ev.target.closest('button, a, input') !== el) return;
+  const fn = ACT[el.dataset.act];
+  if (fn) { ev.preventDefault(); fn(el); }
+});
+document.addEventListener('submit', (ev) => {
+  const f = ev.target.closest('[data-form]');
+  if (!f) return;
+  ev.preventDefault();
+  const fn = FORM[f.dataset.form];
+  if (fn) fn();
+});
+document.addEventListener('input', (ev) => {
+  const el = ev.target;
+  if (!el.dataset.bind) return;
+  setPath(el.dataset.bind, el.value);
+  if (el.dataset.bind === 'ui.playersQ') S.ui.shown = 25;
+  // The username follows the club name until it's edited by hand.
+  if (el.dataset.bind === 'ui.add.username') S.ui.add.userTouched = true;
+  if (el.dataset.bind === 'ui.add.name' && !S.ui.add.userTouched) S.ui.add.username = slugOf(el.value);
+  if (el.dataset.bind === 'ui.flag.key') S.ui.flag.keyTouched = true;
+  if (el.dataset.bind === 'ui.flag.name' && !S.ui.flag.keyTouched) S.ui.flag.key = flagKeyOf(el.value);
+  if (el.dataset.live !== undefined) render(); else save();
+});
+document.addEventListener('keydown', (ev) => {
+  if (ev.key === 'Escape') { if (S.ui.sheet) ACT.closeSheet(); else if (S.ui.nav) ACT.toggleNav(); }
+});
+
+// ---------- Render ----------
+let lastSheet = null;
+function render() {
+  const a = document.activeElement;
+  const focusId = a && a.id && a !== document.body ? a.id : null;
+  let sel = null;
+  try { sel = a && typeof a.selectionStart === 'number' ? a.selectionStart : null; } catch (e) { sel = null; }
+  let page;
+  if (!S.me) page = viewLogin();
+  else if (S.denied) page = viewDenied();
+  else page = ({ clubs: viewClubs, club: viewClub, players: viewPlayers, player: viewPlayer, contacts: viewContacts, review: viewReview, names: viewNames, config: viewConfig, flags: viewFlags }[S.screen] || viewClubs)();
+  const sh = S.ui.sheet;
+  // Privileged sheets only render inside a signed-in owner session; the Prototype sheet is always available.
+  const showSheet = sh && (sh.type === 'demo' || (S.me && !S.denied));
+  const key = showSheet ? `${sh.type}:${sh.type === 'license' ? S.ui.lic.step : sh.type === 'addClub' ? S.ui.add.step : sh.type === 'addFlag' ? (S.ui.flag.step === 'leave' ? 'leave' : 'form') : ''}` : null;
+  // Re-rendering an open sheet (typing, validation) must not replay its opening animation or lose its scroll position.
+  const same = showSheet && key === lastSheet;
+  const sbTop = same ? document.querySelector('.sheet .sb')?.scrollTop || 0 : 0;
+  let sheetHtml = showSheet ? SHEETS[sh.type](sh) : '';
+  if (same) sheetHtml = sheetHtml.replace('class="scrim"', 'class="scrim still"').replace('class="sheet', 'class="sheet still');
+  document.getElementById('app').innerHTML = topBar() + page + sheetHtml;
+  if (same) { const sb = document.querySelector('.sheet .sb'); if (sb) sb.scrollTop = sbTop; }
+  document.body.style.overflow = showSheet || S.ui.nav ? 'hidden' : '';
+  if (showSheet && key !== lastSheet && !(focusId && document.getElementById(focusId)?.closest('.sheet'))) {
+    const t = document.getElementById('sheet-title');
+    if (t) t.focus();
+  } else if (focusId && document.getElementById(focusId)) {
+    const el = document.getElementById(focusId);
+    el.focus({ preventScroll: true });
+    if (sel != null && el.setSelectionRange) { try { el.setSelectionRange(sel, sel); } catch (e) { /* not a text field */ } }
+  }
+  lastSheet = key;
+  save();
+}
+render();
+})();
+</script>

@@ -1,0 +1,1639 @@
+<title>ROTRA Players</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&family=Silkscreen:wght@400;700&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<style>
+/* Layout: public player directory. One top bar with the two places people go (leaderboard, own profile); profiles put
+   the identity card beside rank, eligibility and games on wide screens and stack on phones.
+   Tokens and base components are copied from the Queue prototype (apps/client globals.css: dark default, light toggleable). */
+:root {
+  --bg: #0b0b0c; --surface: #1a1a1d; --elev: #2a2a2e; --overlay: #3a3a3f;
+  --fg: #f0f0f2; --fg2: #9090a0; --fg3: #5a5a66;
+  --accent: #00ff88; --accent-dim: #00cc6a; --accent-subtle: rgba(0, 255, 136, 0.13); --on-accent: #0b0b0c;
+  --error: #ff4d4d; --error-subtle: rgba(255, 77, 77, 0.12); --warn: #ffb800; --warn-subtle: rgba(255, 184, 0, 0.12);
+  --border: #2a2a2e; --border-strong: #404048; --scrim: rgba(0, 0, 0, 0.6);
+  --font: "Satoshi", "Manrope", system-ui, sans-serif; --mono: "JetBrains Mono", ui-monospace, monospace;
+  --r: 10px; --r-sm: 6px;
+  --court: #14603f; --court-line: rgba(255, 255, 255, 0.85); --court-free: #232328; --court-free-line: rgba(255, 255, 255, 0.16);
+  --shadow: none; --knob: var(--fg); --field: var(--bg);
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) {
+  /* Light: white cards on a soft off-white page, a deeper green that reads as text and carries white labels (AA). */
+  --bg: #f4f5f2; --surface: #ffffff; --elev: #eef0ec; --overlay: #dfe3dc;
+  --fg: #121513; --fg2: #535a54; --fg3: #7a817b;
+  --accent: #0a7d44; --accent-dim: #086a39; --accent-subtle: rgba(10, 125, 68, 0.09); --on-accent: #ffffff;
+  --error: #c62828; --error-subtle: rgba(198, 40, 40, 0.07); --warn: #a35600; --warn-subtle: rgba(217, 119, 6, 0.09);
+  --border: #e2e5df; --border-strong: #cdd2c9; --scrim: rgba(18, 21, 19, 0.4);
+  --court: #2e8b57; --court-line: #ffffff; --court-free: #e8ebe5; --court-free-line: rgba(18, 21, 19, 0.14);
+  --shadow: 0 1px 2px rgba(18, 24, 20, 0.05), 0 2px 8px rgba(18, 24, 20, 0.04); --knob: #ffffff; --field: #ffffff;
+  color-scheme: light;
+} }
+:root[data-theme="light"] {
+  /* Light: white cards on a soft off-white page, a deeper green that reads as text and carries white labels (AA). */
+  --bg: #f4f5f2; --surface: #ffffff; --elev: #eef0ec; --overlay: #dfe3dc;
+  --fg: #121513; --fg2: #535a54; --fg3: #7a817b;
+  --accent: #0a7d44; --accent-dim: #086a39; --accent-subtle: rgba(10, 125, 68, 0.09); --on-accent: #ffffff;
+  --error: #c62828; --error-subtle: rgba(198, 40, 40, 0.07); --warn: #a35600; --warn-subtle: rgba(217, 119, 6, 0.09);
+  --border: #e2e5df; --border-strong: #cdd2c9; --scrim: rgba(18, 21, 19, 0.4);
+  --court: #2e8b57; --court-line: #ffffff; --court-free: #e8ebe5; --court-free-line: rgba(18, 21, 19, 0.14);
+  --shadow: 0 1px 2px rgba(18, 24, 20, 0.05), 0 2px 8px rgba(18, 24, 20, 0.04); --knob: #ffffff; --field: #ffffff;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--bg); }
+button, input, select, textarea { font: inherit; color: inherit; }
+h1, h2, h3 { margin: 0; text-wrap: balance; letter-spacing: -0.3px; }
+h1 { font-size: 26px; font-weight: 800; line-height: 1.2; }
+h2 { font-size: 18px; font-weight: 700; }
+h3 { font-size: 15px; font-weight: 700; }
+p { margin: 0; }
+.mono { font-family: var(--mono); font-size: 0.92em; }
+.muted { color: var(--fg2); }
+.small { font-size: 13px; }
+.label { font-size: 12px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; color: var(--fg2); }
+.tnum { font-variant-numeric: tabular-nums; }
+
+/* Top bar */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); }
+.top-in { max-width: 1240px; margin: 0 auto; display: flex; align-items: center; gap: 12px; padding: 10px max(16px, env(safe-area-inset-right, 0px)) 10px max(16px, env(safe-area-inset-left, 0px)); }
+.brand { display: flex; align-items: baseline; gap: 8px; font-weight: 800; letter-spacing: 1.5px; font-size: 17px; }
+.brand b { color: var(--accent); }
+.brand span { font-weight: 600; letter-spacing: 0; color: var(--fg2); font-size: 14px; }
+.top .grow { flex: 1; }
+.conn { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--border-strong); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 52vw; }
+button.conn { background: transparent; cursor: pointer; min-height: 32px; }
+button.conn:hover { border-color: var(--accent); background: var(--surface); }
+.conn i { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex: none; }
+.sync-head { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border-radius: var(--r); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); background: var(--accent-subtle); }
+.sync-head > i { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); margin-top: 7px; flex: none; }
+.sync-head.off { border-color: var(--warn); background: var(--warn-subtle); }
+.sync-head.off > i { background: var(--warn); }
+.sync-head.sync > i { animation: pulse 1s infinite; }
+@media (prefers-reduced-motion: reduce) { .sync-head.sync > i { animation: none; } }
+.sync-grp { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border-radius: var(--r-sm); border: 1px solid var(--border-strong); background: var(--bg); }
+.sync-grp.wait { border-color: var(--warn); }
+.sync-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
+.sync-list li { display: flex; justify-content: space-between; gap: 12px; min-width: 0; }
+.sync-list li > span:first-child { overflow-wrap: anywhere; }
+.conn.off i { background: var(--warn); }
+.conn.sync i { animation: pulse 1s infinite; }
+@keyframes pulse { 50% { opacity: .3; } }
+@media (prefers-reduced-motion: reduce) { .conn.sync i { animation: none; } }
+
+.wrap { max-width: 1240px; margin: 0 auto; padding-block: 20px 120px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 20px; }
+.narrow { max-width: 760px; }
+.crumb { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+/* Buttons */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 0 16px; border-radius: var(--r); border: 1px solid var(--border-strong); background: var(--surface); cursor: pointer; font-weight: 600; text-align: center; }
+.btn:hover:not(:disabled) { background: var(--elev); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.btn.primary:hover:not(:disabled) { background: var(--accent-dim); }
+.btn.danger { border-color: var(--error); color: var(--error); background: transparent; }
+.btn.ghost { background: transparent; border-color: transparent; }
+.btn.ghost:hover:not(:disabled) { background: var(--elev); }
+.btn.sm { min-height: 36px; padding: 0 12px; font-size: 14px; }
+.btn.xs { min-height: 32px; padding: 0 10px; font-size: 13px; border-radius: var(--r-sm); }
+.btn.block { width: 100%; }
+.btn[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-subtle); }
+.btn.primary[aria-pressed] { background: var(--accent); }
+.icon-btn { min-width: 36px; padding: 0; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.row.end { justify-content: flex-end; }
+.between { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.stack { display: flex; flex-direction: column; gap: 12px; }
+.stack.tight { gap: 6px; }
+
+/* Surfaces */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 16px; min-width: 0; box-shadow: var(--shadow); }
+.card.hl { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-subtle) inset; }
+.list { display: flex; flex-direction: column; }
+.list > * + * { border-top: 1px solid var(--border); }
+.li { display: flex; align-items: center; gap: 12px; padding: 12px 0; min-width: 0; }
+.li .main { flex: 1; min-width: 0; }
+.li.click { cursor: pointer; }
+.card.li { padding: 14px 16px; }
+.chip { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border-strong); color: var(--fg2); white-space: nowrap; }
+.chip.ok { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 45%, transparent); background: var(--accent-subtle); }
+.chip.warn { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 45%, transparent); background: var(--warn-subtle); }
+.chip.bad { color: var(--error); border-color: color-mix(in srgb, var(--error) 45%, transparent); background: var(--error-subtle); }
+.chip.solid { background: var(--elev); color: var(--fg); }
+.avatar { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 13px; background: var(--elev); color: var(--fg2); flex: none; }
+.avatar.lg { width: 52px; height: 52px; font-size: 18px; border-radius: 14px; background: var(--accent); color: var(--on-accent); font-weight: 800; }
+.avatar.photo { background: var(--elev); overflow: hidden; }
+.avatar.photo svg { width: 100%; height: 100%; display: block; }
+.avatar.xl { width: 64px; height: 64px; font-size: 20px; }
+.avatar.xl.photo { box-shadow: 0 0 0 2px var(--surface), 0 0 0 3px var(--border-strong); }
+.notice { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: var(--r); border: 1px solid var(--border-strong); background: var(--surface); font-size: 14px; }
+.notice.warn { border-color: var(--warn); background: var(--warn-subtle); }
+.notice.bad { border-color: var(--error); background: var(--error-subtle); }
+.notice.ok { border-color: var(--accent); background: var(--accent-subtle); }
+.notice svg { flex: none; margin-top: 2px; }
+.kv { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 16px; font-size: 14px; margin: 0; }
+.kv dt { color: var(--fg2); }
+.kv dd { margin: 0; min-width: 0; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 16px; }
+.empty { padding: 24px 12px; text-align: center; color: var(--fg2); font-size: 14px; }
+
+/* Forms */
+.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.field > span { font-size: 13px; font-weight: 600; color: var(--fg2); }
+.field .hint, .hint { font-size: 12px; color: var(--fg2); font-weight: 400; }
+.err { font-size: 13px; color: var(--error); font-weight: 600; }
+.input, select.input, textarea.input { width: 100%; min-height: 44px; border-radius: var(--r-sm); border: 1px solid var(--border-strong); background: var(--field); padding: 8px 12px; }
+textarea.input { min-height: 80px; resize: vertical; }
+.input:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: transparent; }
+.input.bad { border-color: var(--error); }
+.fgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+.seg { display: inline-flex; border: 1px solid var(--border-strong); border-radius: var(--r); padding: 3px; gap: 3px; flex-wrap: wrap; align-self: flex-start; }
+.seg button { border: 0; background: transparent; min-height: 36px; padding: 0 14px; border-radius: 7px; cursor: pointer; font-weight: 600; color: var(--fg2); }
+.seg button[aria-pressed="true"] { background: var(--elev); color: var(--fg); }
+.switch { position: relative; width: 46px; height: 28px; border-radius: 999px; background: var(--overlay); border: 0; cursor: pointer; flex: none; transition: background .15s; }
+.switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: var(--knob); box-shadow: var(--shadow); transition: transform .15s; }
+.switch[aria-checked="true"] { background: var(--accent); }
+.switch[aria-checked="true"]::after { transform: translateX(18px); background: var(--on-accent); }
+.check { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; padding: 10px 12px; border: 1px solid var(--border-strong); border-radius: var(--r-sm); }
+.check input { width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--accent); flex: none; }
+.choice { display: flex; flex-direction: column; gap: 4px; text-align: left; padding: 12px 14px; border-radius: var(--r); border: 1px solid var(--border-strong); background: var(--bg); cursor: pointer; min-width: 0; }
+.choice[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-subtle); }
+.choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); gap: 10px; }
+
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); overflow-x: auto; }
+.tabs button { border: 0; background: none; padding: 10px 14px; font-weight: 700; color: var(--fg2); border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap; display: inline-flex; gap: 6px; align-items: center; }
+.tabs button[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--accent); }
+/* Sheets */
+.scrim { position: fixed; inset: 0; background: var(--scrim); z-index: 40; animation: fade .15s; }
+.sheet { position: fixed; z-index: 41; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(560px, calc(100vw - 24px)); max-height: calc(100dvh - 40px); display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--border-strong); border-radius: 16px; box-shadow: 0 24px 60px rgba(0, 0, 0, .45); animation: pop .16s ease-out; }
+.sheet.wide { width: min(820px, calc(100vw - 24px)); }
+@media (max-width: 640px) {
+  .sheet, .sheet.wide { left: 0; right: 0; top: auto; bottom: 0; transform: none; width: 100%; max-height: 92dvh; border-radius: 16px 16px 0 0; padding-bottom: env(safe-area-inset-bottom, 0px); animation: up .18s ease-out; }
+}
+.sheet header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 18px 20px 6px; }
+.sheet header h2:focus { outline: none; }
+.sheet .sb { padding: 10px 20px 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
+.sheet footer { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; padding: 12px 20px 18px; border-top: 1px solid var(--border); }
+.sheet footer .btn { flex: 1 1 auto; }
+@keyframes fade { from { opacity: 0; } }
+@keyframes pop { from { opacity: 0; transform: translate(-50%, -48%); } }
+@keyframes up { from { transform: translateY(30px); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .scrim, .sheet { animation: none !important; } }
+/* Toast */
+.toasts { position: fixed; z-index: 60; left: 50%; transform: translateX(-50%); bottom: calc(80px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 8px; width: min(440px, calc(100vw - 32px)); pointer-events: none; }
+.toast { background: var(--fg); color: var(--bg); padding: 10px 14px; border-radius: var(--r); font-size: 14px; font-weight: 600; box-shadow: 0 10px 30px rgba(0, 0, 0, .35); }
+
+/* Login */
+.login { min-height: calc(100dvh - 80px); display: grid; place-items: center; padding: 24px max(16px, env(safe-area-inset-right, 0px)) 24px max(16px, env(safe-area-inset-left, 0px)); }
+.login .card { width: min(420px, 100%); padding: 28px; display: flex; flex-direction: column; gap: 18px; }
+.mark { font-size: 40px; font-weight: 800; letter-spacing: 6px; line-height: 1; }
+.mark b { color: var(--accent); }
+
+
+/* ---------- Player Information ---------- */
+:root { --qr-bg: #ffffff; --qr-fg: #0b0b0c; --top-h: 61px; --gold: #f2c14e; --silver: #c3c8d0; --bronze: #d38b52; }
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) { --gold: #946600; --silver: #5f6774; --bronze: #93501f; } }
+:root[data-theme="light"] { --gold: #946600; --silver: #5f6774; --bronze: #93501f; }
+button.brand { background: none; border: 0; padding: 0; cursor: pointer; color: inherit; font: inherit; font-weight: 800; letter-spacing: 1.5px; font-size: 17px; }
+.nav { display: flex; gap: 2px; margin-left: 8px; }
+.nav button { border: 0; background: none; min-height: 36px; padding: 0 12px; border-radius: var(--r-sm); font-weight: 600; color: var(--fg2); cursor: pointer; white-space: nowrap; }
+.nav button:hover { color: var(--fg); background: var(--surface); }
+.nav button[aria-current="page"] { color: var(--fg); background: var(--elev); }
+@media (max-width: 560px) {
+  .top-in { flex-wrap: wrap; row-gap: 6px; }
+  .nav { order: 5; width: 100%; margin: 0; }
+  .nav button { flex: 1; }
+}
+.band-off { background: var(--warn-subtle); border-bottom: 1px solid var(--warn); font-size: 13px; }
+.band-off .in { max-width: 1240px; margin: 0 auto; display: flex; gap: 10px; align-items: flex-start; padding: 8px max(16px, env(safe-area-inset-right, 0px)) 8px max(16px, env(safe-area-inset-left, 0px)); }
+.band-off svg { color: var(--warn); flex: none; margin-top: 2px; }
+.page-head { display: flex; flex-direction: column; gap: 6px; }
+.back { align-self: flex-start; margin-left: -10px; }
+.nowrap { flex-wrap: nowrap; }
+.wrap.mid { max-width: 920px; }
+.wrap.slim { max-width: 640px; }
+
+/* Leaderboard */
+.lb { display: flex; flex-direction: column; }
+.lb-head, .lb-row { display: grid; grid-template-columns: 56px 36px minmax(0, 1fr) minmax(0, auto); gap: 12px; align-items: center; padding: 8px 12px; }
+.lb-head { font-size: 11px; font-weight: 600; letter-spacing: .6px; text-transform: uppercase; color: var(--fg2); border-bottom: 1px solid var(--border); padding-block: 6px; }
+.lb-head span:first-child { text-align: right; }
+.lb-head span:last-child { text-align: right; }
+.lb-row { width: 100%; border: 0; background: transparent; text-align: left; border-radius: var(--r-sm); cursor: pointer; min-height: 56px; }
+.lb-row + .lb-row { box-shadow: 0 -1px 0 var(--border); }
+.lb-row:hover { background: var(--elev); }
+.lb-row.me { background: var(--accent-subtle); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent); }
+.lb-pos { font-family: var(--mono); font-weight: 600; font-size: 15px; color: var(--fg2); text-align: right; font-variant-numeric: tabular-nums; }
+/* Top three: a gold, silver or bronze medal for the position, a matching ring on the picture, and a tinted row. */
+.lb-row.podium { --medal: var(--gold); min-height: 66px; background: linear-gradient(90deg, color-mix(in srgb, var(--medal) 15%, transparent), transparent 75%); }
+.lb-row.p2 { --medal: var(--silver); }
+.lb-row.p3 { --medal: var(--bronze); }
+.lb-row.podium:hover { background: linear-gradient(90deg, color-mix(in srgb, var(--medal) 24%, transparent), var(--elev) 75%); }
+.lb-row.podium .lb-pos { justify-self: end; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; font-size: 16px; font-weight: 700; color: var(--medal); background: color-mix(in srgb, var(--medal) 18%, var(--surface)); box-shadow: inset 0 0 0 2px var(--medal); }
+.lb-row.podium .avatar { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--medal); }
+.lb-row.podium .lb-name b { font-size: 16px; }
+.lb-row.podium .lb-lv { color: var(--fg); }
+/* Podium: a dark stage lit from below in the brand green, with pixel-notched steps and pixel type to match the
+   pixel fire behind #1. Steps run 2nd–1st–3rd left to right; brightness, not metal colors, sets the order. */
+:root { --pixel: "Silkscreen", var(--mono); }
+.podium { position: relative; isolation: isolate; overflow: hidden; display: flex; flex-direction: column; gap: 18px; padding: 18px 18px 0; border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--border));
+  background:
+    radial-gradient(120% 70% at 50% 100%, color-mix(in srgb, var(--accent) 26%, transparent), transparent 70%),
+    repeating-linear-gradient(0deg, color-mix(in srgb, var(--accent) 7%, transparent) 0 1px, transparent 1px 8px),
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--accent) 7%, transparent) 0 1px, transparent 1px 8px),
+    var(--surface); }
+.pod-head { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: baseline; gap: 8px 16px; flex-wrap: wrap; }
+.pod-head h2 { font-family: var(--pixel); font-weight: 700; font-size: 18px; letter-spacing: 1px; text-transform: uppercase; color: var(--accent); }
+.pod-stage { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: end; gap: 10px; padding-top: 40px; }
+.pod { --glow: 30%; display: flex; flex-direction: column; align-items: center; gap: 12px; min-width: 0; padding: 0; border: 0; background: none; color: inherit; cursor: pointer; font: inherit; }
+.pod.p1 { --glow: 100%; order: 2; }
+.pod.p2 { --glow: 55%; order: 1; }
+.pod.p3 { --glow: 38%; order: 3; }
+.pod-who { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center; min-width: 0; max-width: 100%; padding-inline: 4px; }
+.pod-who .avatar { position: relative; z-index: 1; width: 64px; height: 64px; font-size: 20px; margin-bottom: 8px; border-radius: 12px;
+  box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px color-mix(in srgb, var(--accent) var(--glow), var(--border-strong)); }
+.pod.p1 .pod-who .avatar { width: 86px; height: 86px; font-size: 26px; border-radius: 14px;
+  box-shadow: 0 0 0 3px var(--surface), 0 0 0 6px var(--accent), 0 0 32px 6px color-mix(in srgb, var(--accent) 50%, transparent); }
+.pod-name { position: relative; z-index: 1; font-weight: 700; font-size: 15px; line-height: 1.25; overflow-wrap: anywhere; }
+.pod.p1 .pod-name { font-size: 18px; }
+.pod-lv { position: relative; z-index: 1; font-size: 12px; font-weight: 600; color: var(--fg2); }
+.pod.p1 .pod-lv { color: var(--accent); }
+/* Steps: the notched polygon gives each block stepped pixel corners. */
+.pod-step { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 2px; padding-top: 12px; font-family: var(--pixel); line-height: 1;
+  clip-path: polygon(0 8px, 4px 8px, 4px 4px, 8px 4px, 8px 0, calc(100% - 8px) 0, calc(100% - 8px) 4px, calc(100% - 4px) 4px, calc(100% - 4px) 8px, 100% 8px, 100% 100%, 0 100%);
+  color: color-mix(in srgb, var(--accent) var(--glow), var(--fg2));
+  background:
+    repeating-linear-gradient(0deg, transparent 0 7px, color-mix(in srgb, var(--accent) 12%, transparent) 7px 8px),
+    linear-gradient(180deg, color-mix(in srgb, var(--accent) calc(var(--glow) * 0.42), var(--elev)), color-mix(in srgb, var(--accent) calc(var(--glow) * 0.12), var(--surface))); }
+.pod-step b { font-size: 34px; font-weight: 700; }
+.pod-step small { font-size: 12px; letter-spacing: 1px; text-transform: uppercase; }
+.pod.p1 .pod-step { height: 136px; color: var(--on-accent); background:
+    repeating-linear-gradient(0deg, transparent 0 7px, color-mix(in srgb, var(--on-accent) 10%, transparent) 7px 8px),
+    linear-gradient(180deg, var(--accent), color-mix(in srgb, var(--accent) 55%, var(--surface))); }
+.pod.p1 .pod-step b { font-size: 46px; }
+.pod.p2 .pod-step { height: 100px; }
+.pod.p3 .pod-step { height: 76px; }
+.pod:hover .pod-name, .pod:focus-visible .pod-name { text-decoration: underline; text-underline-offset: 3px; }
+.pod:hover .pod-step { filter: brightness(1.12); }
+.pod.me .pod-name::after { content: " · You"; color: var(--accent); }
+.fire { position: absolute; z-index: 0; left: 50%; bottom: calc(100% - 96px); transform: translateX(-50%); width: 180px; height: 150px; image-rendering: pixelated; pointer-events: none; }
+/* Embers: a few pixels drifting up from the floor. */
+.embers { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.embers i { position: absolute; bottom: -6px; width: 4px; height: 4px; background: var(--accent); opacity: 0; animation: ember 5s linear infinite; }
+@keyframes ember { 0% { transform: translateY(0); opacity: 0; } 12% { opacity: .9; } 100% { transform: translateY(-260px); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .embers { display: none; } }
+@media (max-width: 560px) {
+  .podium { padding: 14px 10px 0; }
+  .pod-stage { gap: 6px; padding-top: 32px; }
+  .pod-who .avatar { width: 52px; height: 52px; }
+  .pod.p1 .pod-who .avatar { width: 68px; height: 68px; }
+  .pod-name { font-size: 13px; }
+  .pod.p1 .pod-name { font-size: 14px; }
+  .pod.p1 .pod-step { height: 108px; }
+  .pod.p1 .pod-step b { font-size: 36px; }
+  .pod.p2 .pod-step { height: 80px; }
+  .pod.p3 .pod-step { height: 62px; }
+  .pod-step b { font-size: 26px; }
+  .pod-step small { font-size: 10px; }
+  .fire { width: 140px; height: 118px; bottom: calc(100% - 78px); }
+}
+.lb-name { min-width: 0; display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 6px; row-gap: 2px; }
+.lb-name b { font-weight: 700; overflow-wrap: anywhere; }
+.lb-lv { font-size: 13px; font-weight: 600; color: var(--fg2); text-align: right; }
+@media (max-width: 560px) {
+  .lb-head { display: none; }
+  .lb-row { grid-template-columns: 44px 36px minmax(0, 1fr); row-gap: 0; padding-inline: 8px; }
+  .lb-lv { grid-column: 3; text-align: left; font-size: 12px; }
+  .lb-row .avatar { grid-row: span 2; }
+  .lb-pos { grid-row: span 2; }
+}
+.skel { display: block; background: var(--elev); border-radius: 6px; height: 14px; animation: pulse 1.2s infinite; }
+@media (prefers-reduced-motion: reduce) { .skel { animation: none; } }
+.find-row { display: flex; gap: 8px; }
+.find-row .input { flex: 1; min-width: 0; }
+
+/* Rank */
+.rank-main { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+.rank-label { font-size: 26px; font-weight: 800; letter-spacing: -0.4px; line-height: 1.15; }
+.rank-label.dim { color: var(--fg2); }
+.rank-pos { display: flex; flex-direction: column; align-items: flex-end; gap: 0; }
+.rank-pos b { font-family: var(--mono); font-size: 40px; line-height: 1; font-weight: 600; color: var(--accent); font-variant-numeric: tabular-nums; }
+.rank-pos.none b { font-size: 20px; color: var(--fg2); font-family: var(--font); font-weight: 700; }
+.ladder { display: flex; gap: 10px; }
+.ladder .tier { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.ladder .bands { display: flex; gap: 3px; }
+.ladder i { display: block; flex: 1; height: 10px; border-radius: 2px; background: var(--elev); }
+.ladder i.on { background: color-mix(in srgb, var(--accent) 32%, var(--elev)); }
+.ladder i.cur { background: var(--accent); box-shadow: 0 0 0 2px var(--surface), 0 0 0 3px var(--accent); }
+.ladder.stale i.cur { background: var(--warn); box-shadow: 0 0 0 2px var(--surface), 0 0 0 3px var(--warn); }
+.ladder.stale i.on { background: color-mix(in srgb, var(--warn) 25%, var(--elev)); }
+.ladder .tn { font-size: 11px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: var(--fg2); }
+.ladder-full { display: flex; flex-direction: column; gap: 6px; }
+.ladder-full .lrow { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 12px; align-items: center; }
+.ladder-full .lrow > span { font-size: 13px; font-weight: 600; color: var(--fg2); }
+.ladder-full .cells { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; }
+.ladder-full .cells b { display: grid; place-items: center; min-height: 30px; border-radius: var(--r-sm); background: var(--elev); color: var(--fg2); font-size: 13px; font-weight: 700; }
+.ladder-full .cells b.cur { background: var(--accent); color: var(--on-accent); }
+.ladder-full .cells b.cur.stale { background: var(--warn); color: var(--on-accent); }
+@media (max-width: 480px) { .ladder-full .lrow { grid-template-columns: minmax(0, 1fr); gap: 4px; } }
+.split { display: flex; height: 14px; border-radius: 999px; overflow: hidden; gap: 2px; }
+.split .a { background: var(--accent); }
+.split .b { background: color-mix(in srgb, var(--accent) 35%, var(--elev)); }
+.legend { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 13px; }
+.legend b { font-family: var(--mono); font-size: 18px; }
+.prog { height: 8px; background: var(--elev); border-radius: 999px; overflow: hidden; }
+.prog i { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
+.prog.warn i { background: var(--warn); }
+.big-count { font-family: var(--mono); font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.bul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+
+/* Profile */
+.prof { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (min-width: 920px) {
+  .prof { grid-template-columns: 360px minmax(0, 1fr); }
+  .prof > .side { position: sticky; top: calc(var(--top-h) + 16px + env(safe-area-inset-top, 0px)); }
+}
+.hero { display: flex; flex-direction: column; gap: 14px; }
+.hero .who { display: flex; gap: 14px; align-items: center; min-width: 0; }
+.hero h1 { overflow-wrap: anywhere; }
+.avatar.xxl { width: 88px; height: 88px; border-radius: 20px; font-size: 30px; font-weight: 800; background: var(--accent); color: var(--on-accent); }
+.avatar.xxl.photo { background: var(--elev); }
+.rtr-line { display: flex; align-items: center; gap: 8px; padding: 8px 8px 8px 12px; border-radius: var(--r-sm); border: 1px solid var(--border-strong); background: var(--bg); min-width: 0; }
+.rtr-line code { flex: 1; min-width: 0; font-family: var(--mono); font-size: 14px; letter-spacing: .4px; overflow-wrap: anywhere; }
+.private { border-style: dashed; border-color: var(--border-strong); background: transparent; box-shadow: none; }
+.links { display: flex; flex-direction: column; gap: 8px; }
+.links a { display: flex; align-items: center; gap: 10px; color: var(--fg); text-decoration: none; padding: 8px 10px; border-radius: var(--r-sm); border: 1px solid var(--border); min-width: 0; }
+.links a:hover { border-color: var(--accent); }
+.links a span { overflow-wrap: anywhere; min-width: 0; }
+.links a small { color: var(--fg2); margin-left: auto; flex: none; }
+.acts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); gap: 8px; }
+
+/* Games */
+.sess { display: flex; flex-direction: column; gap: 4px; }
+.sess-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px 12px; flex-wrap: wrap; padding-bottom: 4px; border-bottom: 1px solid var(--border); }
+.game { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 0; }
+.game + .game { border-top: 1px solid var(--border); }
+.res { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; font-weight: 800; font-size: 13px; }
+.res.W { background: var(--accent-subtle); color: var(--accent); }
+.res.L { background: var(--elev); color: var(--fg2); }
+.res.X { background: transparent; border: 1px dashed var(--border-strong); color: var(--fg3); }
+.game .main { min-width: 0; }
+.game .main b { font-weight: 700; }
+.score { font-family: var(--mono); font-size: 14px; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.score.none { font-family: var(--font); font-size: 12px; font-weight: 500; color: var(--fg2); white-space: normal; max-width: 150px; }
+@media (max-width: 480px) {
+  .game { grid-template-columns: 30px minmax(0, 1fr); }
+  .score { grid-column: 2; text-align: left; max-width: none; }
+}
+
+/* Player ID */
+.qr { background: var(--qr-bg); color: var(--qr-fg); padding: 14px; border-radius: 16px; width: min(260px, 100%); aspect-ratio: 1; align-self: center; }
+.qr svg { width: 100%; height: 100%; display: block; }
+.qr.missing { display: grid; place-items: center; text-align: center; font-size: 13px; padding: 20px; }
+.id-big { font-family: var(--mono); font-size: clamp(17px, 4.6vw, 24px); font-weight: 600; letter-spacing: .6px; text-align: center; overflow-wrap: anywhere; }
+.rtr-parts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 96px), 1fr)); gap: 8px; }
+.rtr-parts div { border: 1px solid var(--border); border-radius: var(--r-sm); padding: 8px 10px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.rtr-parts code { font-family: var(--mono); font-weight: 600; color: var(--accent); }
+.rtr-parts span { font-size: 12px; color: var(--fg2); }
+.setting { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+.setting .main { min-width: 0; }
+/* Edit profile: section menu on the left, one section at a time on the right; tabs across the top on phones. */
+.edit-grid { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 20px; align-items: start; }
+.edit-nav { display: flex; flex-direction: column; gap: 2px; position: sticky; top: calc(var(--top-h) + 16px + env(safe-area-inset-top, 0px)); }
+.edit-nav button { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 42px; padding: 0 12px; border: 0; border-radius: var(--r-sm); background: none; color: var(--fg2); font-weight: 600; text-align: left; cursor: pointer; }
+.edit-nav button:hover { background: var(--surface); color: var(--fg); }
+.edit-nav button[aria-selected="true"] { background: var(--elev); color: var(--fg); box-shadow: inset 2px 0 0 var(--accent); }
+.edit-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex: none; }
+.edit-panel { gap: 16px; }
+.edit-save { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding-top: 14px; border-top: 1px solid var(--border); }
+@media (max-width: 720px) {
+  .edit-grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .edit-nav { position: static; flex-direction: row; overflow-x: auto; gap: 4px; border-bottom: 1px solid var(--border); }
+  .edit-nav button { flex: none; border-radius: 0; min-height: 44px; box-shadow: none; }
+  .edit-nav button[aria-selected="true"] { background: none; box-shadow: inset 0 -2px 0 var(--accent); }
+  .edit-save { position: sticky; bottom: 0; margin: 0 -16px -16px; padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px)); background: var(--surface); border-radius: 0 0 var(--r) var(--r); }
+}
+.demo-sec { display: flex; flex-direction: column; gap: 8px; padding-top: 12px; border-top: 1px solid var(--border); }
+.demo-sec:first-of-type { border-top: 0; padding-top: 0; }
+.sheet footer.single .btn { flex: 0 1 auto; }
+</style>
+
+<div id="app"></div>
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+'use strict';
+
+// ---------- Domain constants (docs/business_logic/product/player-information) ----------
+// Nine playing levels, lowest first (index 0–8). There are no I–V subdivisions.
+const TIERS = [['Beginner', [0, 1, 2]], ['Intermediate', [3, 4, 5]], ['Advanced', [6, 7, 8]]];
+const STEPS = ['Low', 'Mid', 'High'];
+const LEVELS = TIERS.flatMap(([tier], t) => STEPS.map((step) => ({ tier: t, step, label: `${tier} ${step}` })));
+// Saves from the 36-step version stored subdivision indexes; old sizes per level were 3,3,3,4,4,4,5,5,5.
+const OLD_SIZES = [3, 3, 3, 4, 4, 4, 5, 5, 5];
+const foldOldLevel = (old) => { let c = 0; for (let k = 0; k < OLD_SIZES.length; k++) { c += OLD_SIZES[k]; if (old < c) return k; } return OLD_SIZES.length - 1; };
+const WINDOW_DAYS = 90; // "the last three months"; exact window boundaries are an open decision
+const SOCIAL = {
+  facebook: { label: 'Facebook', hosts: ['facebook.com', 'fb.com'], eg: 'https://facebook.com/yourname' },
+  instagram: { label: 'Instagram', hosts: ['instagram.com'], eg: 'https://instagram.com/yourname' },
+  youtube: { label: 'YouTube', hosts: ['youtube.com', 'youtu.be'], eg: 'https://youtube.com/@yourchannel' },
+  linkedin: { label: 'LinkedIn', hosts: ['linkedin.com'], eg: 'https://linkedin.com/in/yourname' },
+};
+
+// ---------- Fixtures (fictional) ----------
+// Players per level, highest level first: a sample spread for 1,284 leaderboard players.
+const COUNTS_TOP = [9, 22, 40, 104, 196, 272, 250, 262, 129];
+function levelAt(pos) { let c = 0; for (let k = 0; k < COUNTS_TOP.length; k++) { c += COUNTS_TOP[k]; if (pos <= c) return LEVELS.length - 1 - k; } return 0; }
+const FIRST = ['Andrea', 'Bryan', 'Carla', 'Dennis', 'Elaine', 'Francis', 'Grace', 'Hannah', 'Ian', 'Janelle', 'Karl', 'Lara', 'Mark', 'Nicole', 'Oscar', 'Patricia', 'Ramon', 'Sofia', 'Tristan', 'Vince', 'Wendy', 'Xavier', 'Yvonne', 'Zach', 'Aira', 'Benjie', 'Cris', 'Dianne', 'Earl', 'Faith', 'Gelo', 'Hazel', 'Iñigo', 'Joy', 'Kevin', 'Liza', 'Marvin', 'Nash', 'Pia', 'Renz', 'Shaira', 'Toni', 'Ella', 'Jerome', 'Mika', 'Rico'];
+const LAST = ['Abad', 'Bautista', 'Cabrera', 'Dizon', 'Espiritu', 'Flores', 'Gonzaga', 'Hernandez', 'Ignacio', 'Jimenez', 'Katigbak', 'Lacson', 'Macaraeg', 'Natividad', 'Ong', 'Pacquing', 'Quijano', 'Rosales', 'Sison', 'Tolentino', 'Uy', 'Valdez', 'Yap', 'Zamora', 'Alcantara', 'Baluyot', 'Co', 'Dimaculangan', 'Evangelista', 'Fajardo', 'Go', 'Ilagan', 'Laurel', 'Manalo', 'Ocampo', 'Pineda', 'Reyes', 'Sy', 'Tan', 'Villanueva'];
+const NICKS = ['Ace', 'Bok', 'Dodong', 'Inday', 'Jun', 'Kiko', 'Lyn', 'Nonoy', 'Pao', 'Tintin', 'Yoyo', 'Bebs'];
+const CITIES = ['CEB', 'CEB', 'CEB', 'CEB', 'MNL', 'MNL', 'DVO', 'ILO', 'BCD', 'TAG'];
+const DATES = ['011526', '020326', '031526', '040226', '041926', '050726', '052126', '061126', '070926', '071226', '081326', '090226', '091626', '100726'];
+const CLUBS = [
+  ['Lahug Smash Club', ['Sunday Night Queue', 'Thursday Open Play']],
+  ['IT Park Badminton Club', ['Friday Night Smash', 'Lunch Break Doubles']],
+  ['Mandaue Shuttle Society', ['Saturday Morning Rally']],
+  ['Talamban Racket Club', ['Wednesday Ladder Night']],
+];
+// Players who also appear in the Queue prototype keep their names here (index = order before Migs is placed).
+const FIXED = { 2: ['Theo Ramos'], 40: ['Marco Lopez'], 62: ['Enzo Navarro'], 96: ['Paulo Garcia', 'Pau'], 155: ['Bea Castillo'], 200: ['Rafa Aquino'], 339: ['Kat Lim'], 511: ['Dani Rivera'], 702: ['Carlo Medina'], 860: ['Iya Mercado'] };
+const MIGS_SLOT = 127; // Migs is #128 while he qualifies
+
+function hashStr(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+const BASE = [];
+for (let i = 0; i < 1283; i++) {
+  const h = hashStr(`lb${i}`);
+  const fx = FIXED[i];
+  const name = fx ? fx[0] : `${FIRST[h % FIRST.length]} ${LAST[(h >>> 8) % LAST.length]}`;
+  const nick = fx ? (fx[1] || '') : ((h >>> 16) % 5 === 0 ? NICKS[(h >>> 20) % NICKS.length] : '');
+  const origPos = i + 1 + (i >= MIGS_SLOT ? 1 : 0);
+  BASE.push({
+    id: `b${i}`, name, nick, photo: (h >>> 24) % 6 !== 0, level: levelAt(origPos), recent: 10 + ((h >>> 4) % 16),
+    rtr: `RTR-PH-${CITIES[(h >>> 12) % CITIES.length]}-${DATES[(h >>> 6) % DATES.length]}-${String(100 + i).padStart(4, '0')}`,
+  });
+}
+
+const G = (fmt, partner, opp, res, score, kind = 'counted', note = '') => ({ fmt, partner, opp, res, score, kind, note });
+const MIGS_SESSIONS = [
+  { id: 'm1', title: 'Sunday Night Queue', club: 'Lahug Smash Club', ago: 1, games: [
+    G('Doubles', ['Bea Castillo'], ['Enzo Navarro', 'Kat Lim'], 'W', '21–18'),
+    G('Doubles', ['Rafa Aquino'], ['Paulo Garcia', 'Dani Rivera'], 'L', null),
+    G('Singles', [], ['Carlo Medina'], 'W', '21–15'),
+    G('3v3 fun', ['Jomar dela Cruz', 'Nina Ocampo'], ['Theo Ramos', 'Iya Mercado', 'Gab Torres'], 'W', '21–12', 'fun'),
+  ] },
+  { id: 'm2', title: 'Thursday Open Play', club: 'Lahug Smash Club', ago: 4, games: [
+    G('Doubles', ['Paulo Garcia'], ['Marco Lopez', 'Bea Castillo'], 'W', '21–19'),
+    G('Doubles', ['Kat Lim'], ['Enzo Navarro', 'Rafa Aquino'], 'L', '17–21'),
+    G('Doubles', ['Dani Rivera'], ['Jomar dela Cruz', 'Iya Mercado'], 'W', null),
+  ] },
+  { id: 'm3', title: 'Friday Night Smash', club: 'IT Park Badminton Club', ago: 18, games: [
+    G('Doubles', ['Lara Uy'], ['Karl Sison', 'Janelle Go'], 'W', '21–16'),
+    G('Singles', [], ['Vince Tolentino'], 'L', '19–21'),
+    G('Doubles', ['Iya Mercado'], ['Mark Reyes', 'Pia Tan'], 'L', null, 'partial', 'Came in mid-game for Ramon Yap'),
+    G('Doubles', ['Ramon Yap'], ['Grace Lacson', 'Ian Co'], 'W', '21–14'),
+  ] },
+  { id: 'm4', title: 'Sunday Night Queue', club: 'Lahug Smash Club', ago: 29, pageGone: true, games: [
+    G('Doubles', ['Bea Castillo'], ['Theo Ramos', 'Marco Lopez'], 'L', '15–21'),
+    G('Doubles', ['Enzo Navarro'], ['Kat Lim', 'Carlo Medina'], 'W', '21–17'),
+    G('Singles', [], ['Rafa Aquino'], 'W', null),
+  ] },
+  { id: 'm5', title: 'Thursday Open Play', club: 'Lahug Smash Club', ago: 46, games: [
+    G('Doubles', ['Nina Ocampo'], ['Paulo Garcia', 'Dani Rivera'], 'W', '21–11'),
+    G('Doubles', ['Kat Lim'], ['Bea Castillo', 'Rafa Aquino'], 'L', '20–22'),
+  ] },
+];
+
+// Generated history for every other profile: enough counted games for the leaderboard figure they carry.
+function genSessions(seed, counted) {
+  const h0 = hashStr(seed);
+  const pick = (k) => `${FIRST[hashStr(seed + k) % FIRST.length]} ${LAST[(hashStr(seed + k) >>> 8) % LAST.length]}`;
+  const out = [];
+  let left = counted, n = 0, ago = 1 + (h0 % 5);
+  while (left > 0) {
+    const [club, titles] = CLUBS[(h0 >>> (n % 8)) % CLUBS.length];
+    const games = [];
+    const take = Math.min(left, 2 + ((h0 >>> n) % 3));
+    for (let g = 0; g < take; g++) {
+      const hh = hashStr(`${seed}-${n}-${g}`);
+      const single = hh % 6 === 0;
+      const won = (hh >>> 3) % 5 < 3;
+      const a = 21, b = 9 + ((hh >>> 7) % 11);
+      games.push(G(single ? 'Singles' : 'Doubles', single ? [] : [pick(`p${n}${g}`)], single ? [pick(`o${n}${g}`)] : [pick(`o${n}${g}`), pick(`q${n}${g}`)], won ? 'W' : 'L', (hh >>> 9) % 3 === 0 ? null : (won ? `${a}–${b}` : `${b}–${a}`)));
+    }
+    if (n === 0) games.push(G('4v4 fun', [pick('f1'), pick('f2'), pick('f3')], [pick('f4'), pick('f5'), pick('f6'), pick('f7')], 'L', '18–21', 'fun'));
+    out.push({ id: `${seed}-s${n}`, title: titles[(h0 >>> n) % titles.length], club, ago, pageGone: ago > 60, games });
+    left -= take; n += 1; ago += 2 + ((h0 >>> (n + 2)) % 6);
+  }
+  return out;
+}
+
+function seedAccounts() {
+  return {
+    u1: { id: 'u1', name: 'Miguel Santos', nick: 'Migs', rtr: 'RTR-PH-CEB-031526-0001', phone: '+63 917 555 0142', email: 'migs.santos@example.com', phoneHidden: true, claimed: true, photo: true,
+      style: 'Doubles, mostly at the front. I like fast drives and net kills, and I am working on my clears.', expY: '4', expM: '6',
+      social: { facebook: 'https://facebook.com/migs.santos.badminton', instagram: 'https://instagram.com/migs.smash', youtube: '', linkedin: '' }, level: 5 },
+    u2: { id: 'u2', name: 'Jomar dela Cruz', nick: 'Jom', rtr: 'RTR-PH-CEB-040226-0007', phone: '+63 918 555 0377', email: '', phoneHidden: false, claimed: false, photo: false,
+      style: '', expY: '', expM: '', social: { facebook: 'https://facebook.com/jomar.dc', instagram: '', youtube: '', linkedin: '' }, level: 3 },
+  };
+}
+function freshState() {
+  return {
+    v: 2, online: true, offlineAt: null, screen: 'board', viewId: null, me: null,
+    rank: 'eligible', board: 'ok', shown: 25, q: '', boardAt: Date.now(),
+    config: { weight: 70, threshold: 10 },
+    accounts: seedAccounts(), requests: {},
+    claim: 'valid', resetLink: 'valid', failNext: false,
+    ui: freshUi(),
+  };
+}
+function freshUi() {
+  return {
+    login: { id: '', pass: '', show: false, err: '', pending: false, note: '' },
+    forgot: { email: '', err: '', pending: false, sent: '' },
+    reset: { a: '', b: '', show: false, err: '', pending: false },
+    claim: null, claimErr: {}, claimPending: false, claimChecks: 0, claimConfirmed: false, claimWrong: false,
+    edit: null, editOrig: null, editErr: {}, editPending: false, editFail: '',
+    req: null, reqErr: '', reqPending: false,
+    privacyPending: false, privacyErr: '',
+    sheet: null, hist: 'counted', findId: '', resetArmed: false, pendingGo: null,
+  };
+}
+
+const KEY = 'rotra-player-prototype-v1';
+let S;
+try { S = JSON.parse(localStorage.getItem(KEY)); } catch (e) { S = null; }
+if (S && S.v === 1) { Object.values(S.accounts || {}).forEach((a) => { if (a.level != null) a.level = foldOldLevel(a.level); }); S.v = 2; }
+if (!S || S.v !== 2) S = freshState();
+Object.assign(S.ui, { sheet: null, pendingGo: null, resetArmed: false });
+['login', 'forgot', 'reset'].forEach((k) => { S.ui[k].pending = false; });
+S.ui.claimPending = false; S.ui.editPending = false; S.ui.reqPending = false; S.ui.privacyPending = false;
+if (S.board === 'loading') S.board = 'ok';
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable: keep working in memory */ } }
+// Light / dark: dark by default (or the device setting until the viewer picks one); the choice is remembered on this device.
+const THEME_KEY = 'rotra-player-theme';
+const isDark = () => { const t = document.documentElement.dataset.theme; return t ? t === 'dark' : getComputedStyle(document.documentElement).colorScheme.trim() !== 'light'; };
+try { const t = localStorage.getItem(THEME_KEY); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) { /* no storage: follow the device */ }
+matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => { if (!document.documentElement.dataset.theme) render(); });
+
+// ---------- Helpers ----------
+const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const initials = (name) => name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join('');
+const num = (n) => n.toLocaleString('en-US');
+const dayOf = (ago) => new Date(Date.now() - ago * 864e5);
+const fmtDay = (ago) => dayOf(ago).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric', year: ago > 300 ? 'numeric' : undefined });
+const fmtTime = (t) => new Date(t).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+const lvLabel = (i) => (i == null ? 'No rank yet' : LEVELS[i].label);
+const T = () => S.config.threshold;
+const listNames = (n) => (n.length <= 1 ? n.join('') : `${n.slice(0, -1).join(', ')} and ${n[n.length - 1]}`);
+const firstName = (p) => p.nick || p.name.split(' ')[0];
+const possessive = (s) => (s.endsWith('s') ? `${s}’` : `${s}’s`);
+const SKIN = ['#f3cfae', '#e3b089', '#c98d62', '#ad7349', '#8c5836', '#f6dcc4'];
+const HAIR = ['#1b1817', '#2e211b', '#4a3021', '#6d4a2c', '#8f6b48', '#2a2a31'];
+const BACKDROP = ['#2f6f5e', '#3b4f8a', '#74488a', '#8a5a2f', '#2f6a85', '#7d3b4a', '#4d6b2f', '#5b4a8a'];
+const SHIRT = ['#00cc6a', '#e6e6ec', '#ffb800', '#4a90e2', '#ff6b6b', '#9b6bff', '#24242a'];
+// Sample profile pictures, drawn the same way as in the Queue prototype; profiles without one show initials.
+function faceSVG(p) {
+  const h = hashStr(p.id + p.name);
+  const pick = (arr, k) => arr[(h >>> k) % arr.length];
+  const skin = pick(SKIN, 0), hair = pick(HAIR, 3), bg = pick(BACKDROP, 6), shirt = pick(SHIRT, 9);
+  const style = (h >>> 12) % 5, glasses = (h >>> 16) % 5 === 0;
+  const front = [
+    'M19 27C19 12 45 12 45 27C41 19 23 19 19 27Z',
+    'M18 29C16 11 45 9 46 26C40 17 31 22 22 19C21 22 19 25 18 29Z',
+    'M19 26C21 14 43 14 45 26C38 19 26 19 19 26Z',
+    'M19 27C19 13 45 13 45 27C41 20 23 20 19 27Z',
+    'M20 24C21 15 43 15 44 24C38 20 26 20 20 24Z',
+  ][style];
+  return `<svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" fill="${bg}"/>
+    ${style === 2 ? `<path d="M17 26C17 9 47 9 47 26L48 47C44 49 40 45 41 37H23C24 45 20 49 16 47Z" fill="${hair}"/>` : ''}
+    ${style === 3 ? `<circle cx="32" cy="10" r="6" fill="${hair}"/>` : ''}
+    <path d="M7 64C9 49 21 44 32 44S55 49 57 64Z" fill="${shirt}"/>
+    <rect x="27" y="37" width="10" height="9" rx="3" fill="${skin}"/>
+    <ellipse cx="19.5" cy="29" rx="2.4" ry="3.2" fill="${skin}"/><ellipse cx="44.5" cy="29" rx="2.4" ry="3.2" fill="${skin}"/>
+    <ellipse cx="32" cy="28" rx="12.5" ry="14.5" fill="${skin}"/>
+    <path d="${front}" fill="${hair}" ${style === 4 ? 'opacity=".85"' : ''}/>
+    <path d="M25 25.5h4M35 25.5h4" stroke="${hair}" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="27" cy="29.5" r="1.6" fill="#1b1817"/><circle cx="37" cy="29.5" r="1.6" fill="#1b1817"/>
+    <path d="M27.5 35.5Q32 39 36.5 35.5" fill="none" stroke="#7a3e2e" stroke-width="1.6" stroke-linecap="round"/>
+    ${glasses ? '<g fill="none" stroke="#1b1817" stroke-width="1.3"><circle cx="27" cy="29.5" r="4"/><circle cx="37" cy="29.5" r="4"/><path d="M31 29.5h2"/></g>' : ''}
+  </svg>`;
+}
+const avatar = (p, cls = '') => (p.photo
+  ? `<span class="avatar photo ${cls}" role="img" aria-label="Profile picture of ${esc(p.name)}">${faceSVG(p)}</span>`
+  : `<span class="avatar ${cls}" aria-hidden="true">${esc(initials(p.name))}</span>`);
+function toast(text) {
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = text;
+  document.getElementById('toasts').append(el);
+  setTimeout(() => el.remove(), 3600);
+}
+const later = (ms, fn) => setTimeout(() => { fn(); render(); }, ms);
+
+// ---------- Icons ----------
+const svg = (body, w = 16, sw = 2.2) => `<svg width="${w}" height="${w}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
+const I = {
+  sun: svg('<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'),
+  moon: svg('<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>'),
+  alert: svg('<path d="M12 3 2 21h20L12 3z"/><path d="M12 10v5M12 18h.01"/>'),
+  info: svg('<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>'),
+  check: svg('<path d="m5 12 4 4 10-10"/>', 16, 2.6),
+  x: svg('<path d="M6 6l12 12M18 6 6 18"/>', 18, 2.4),
+  back: svg('<path d="m15 6-6 6 6 6"/>', 16, 2.4),
+  copy: svg('<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>'),
+  qr: svg('<rect x="3.5" y="3.5" width="6" height="6" rx="1"/><rect x="14.5" y="3.5" width="6" height="6" rx="1"/><rect x="3.5" y="14.5" width="6" height="6" rx="1"/><path d="M14.5 14.5h2v2M20.5 14.5v6h-6M17.5 18.5h.01"/>'),
+  edit: svg('<path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="m13.5 6.5 4 4"/>'),
+  lock: svg('<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>'),
+  ext: svg('<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>', 14),
+};
+const chip = (t, k = '') => `<span class="chip ${k}">${t}</span>`;
+const notice = (kind, html) => `<div class="notice ${kind}">${kind === 'ok' ? I.check : kind ? I.alert : I.info}<div>${html}</div></div>`;
+const sw = (on, act, label, attrs = '') => `<button class="switch" role="switch" aria-checked="${!!on}" aria-label="${esc(label)}" data-act="${act}" ${attrs}></button>`;
+const backBtn = (to, label, id = '') => `<button class="btn sm ghost back" data-act="${to}" ${id ? `data-id="${id}"` : ''}>${I.back} ${esc(label)}</button>`;
+
+// ---------- Profiles, rank and eligibility ----------
+function migsSessions() {
+  const r = S.rank;
+  if (r === 'below') return MIGS_SESSIONS.slice(0, 2);
+  if (r === 'new') return [{ ...MIGS_SESSIONS[0], games: MIGS_SESSIONS[0].games.filter((g) => g.fmt !== 'Singles') }];
+  if (r === 'reassess') return MIGS_SESSIONS.map((s) => ({ ...s, ago: s.ago + 100, pageGone: true }));
+  return MIGS_SESSIONS;
+}
+const countedIn = (sessions, days) => sessions.filter((s) => s.ago <= days).reduce((n, s) => n + s.games.filter((g) => g.kind === 'counted').length, 0);
+const countedAll = (sessions) => countedIn(sessions, Infinity);
+const genCache = new Map();
+function profileOf(pid) {
+  if (S.accounts[pid]) {
+    const a = S.accounts[pid];
+    const sessions = pid === 'u1' ? migsSessions() : (genCache.get(pid) || genCache.set(pid, genSessions(pid, 7)).get(pid));
+    const state = pid === 'u1' ? S.rank : 'below';
+    return { ...a, state, level: state === 'new' ? null : a.level, sessions, recent: countedIn(sessions, WINDOW_DAYS) };
+  }
+  const m = /^b(\d+)$/.exec(pid || '');
+  const e = m && BASE[+m[1]];
+  if (!e) return null;
+  if (!genCache.has(pid)) genCache.set(pid, genSessions(pid, e.recent));
+  const sessions = genCache.get(pid);
+  return { ...e, claimed: true, state: 'eligible', style: '', expY: '', expM: '', social: {}, sessions, recent: countedIn(sessions, WINDOW_DAYS) };
+}
+// Migs joins the list only while his own figures qualify; everyone else is filtered by the current threshold.
+const migsOnBoard = () => S.rank !== 'new' && S.rank !== 'reassess' && countedIn(migsSessions(), WINDOW_DAYS) >= T();
+function boardList() {
+  if (S.board === 'empty') return [];
+  const out = [];
+  const migs = migsOnBoard();
+  BASE.forEach((e, i) => {
+    if (i === MIGS_SLOT && migs) out.push({ id: 'u1', name: S.accounts.u1.name, nick: S.accounts.u1.nick, photo: true, level: S.accounts.u1.level });
+    if (e.recent >= T()) out.push(e);
+  });
+  return out;
+}
+const positionOf = (pid) => { const i = boardList().findIndex((e) => e.id === pid); return i < 0 ? null : i + 1; };
+function rankStatus(p, pos) {
+  const t = T(), own = p.id === S.me, first = own ? 'you' : firstName(p), plays = own ? 'play' : 'plays', has = own ? 'You now have' : `${firstName(p)} now has`;
+  if (p.level == null) return { chips: chip('Not calculated'), text: `ROTRA calculates a rank once a club has assessed ${first} and a session with that assessment is done. Until then there is no rank to show.` };
+  if (p.state === 'reassess') return { chips: chip('Needs reassessment', 'warn'), stale: true, text: `Last played more than three months ago, so this rank is out of date and not on the leaderboard. To return, a club gives ${first} a fresh assessment and ${first} ${plays} ${t} standard matches within three months.` };
+  if (pos) return { chips: p.state === 'processing' ? chip('Updating', 'warn') : chip('On the leaderboard', 'ok'), text: `${num(pos)} of ${num(boardList().length)} players on the overall ROTRA leaderboard.` };
+  if (p.recent >= t) return { chips: chip('Qualifies', 'ok'), text: `${has} enough recent matches. The position appears after the next leaderboard update.` };
+  return { chips: chip('Provisional'), text: `No overall position yet. ${p.recent} of ${t} standard matches in the last three months.` };
+}
+
+// ---------- Shared fragments ----------
+function ladder(level, stale = false) {
+  return `<div class="ladder${stale ? ' stale' : ''}" role="img" aria-label="${level == null ? 'No rank on the skill ladder yet' : `${lvLabel(level)}: level ${level + 1} of ${LEVELS.length}`}">${TIERS.map(([name, bands]) => {
+    return `<div class="tier" style="flex:1 1 0"><div class="bands">${bands.map((i) => `<i class="${level != null && i === level ? 'cur' : level != null && i < level ? 'on' : ''}"></i>`).join('')}</div><span class="tn">${name}</span></div>`;
+  }).join('')}</div>`;
+}
+const people = (names) => listNames(names.map(esc));
+function gameRow(g) {
+  const res = g.kind === 'partial' ? '<span class="res X" aria-label="Not counted">–</span>' : `<span class="res ${g.res}" aria-label="${g.res === 'W' ? 'Won' : 'Lost'}">${g.res}</span>`;
+  const score = g.score ? `<span class="score" aria-label="Score ${g.score}">${g.score}</span>` : '<span class="score none">Winner recorded; score not entered</span>';
+  return `<div class="game">${res}<div class="main"><b>${esc(g.fmt)}</b>${g.partner.length ? ` <span class="muted">with ${people(g.partner)}</span>` : ''}
+    <div class="small muted">vs ${people(g.opp)}</div>${g.note ? `<div class="small" style="color:var(--warn)">${esc(g.note)} · not counted</div>` : ''}</div>${score}</div>`;
+}
+function sessionBlock(s, kinds) {
+  const games = s.games.filter((g) => kinds.includes(g.kind));
+  if (!games.length) return '';
+  return `<section class="sess"><div class="sess-head"><div style="min-width:0"><h3>${esc(s.title)}</h3><p class="small muted">${fmtDay(s.ago)} · ${esc(s.club)}</p></div>
+    ${s.pageGone ? '<span class="small muted">Session page no longer available</span>' : `<button class="btn xs ghost" data-act="sessionPage" data-title="${esc(s.title)}">Session page ${I.ext}</button>`}</div>
+    ${games.map(gameRow).join('')}</section>`;
+}
+function eligibility(p, own) {
+  const t = T(), pct = Math.min(100, Math.round((p.recent / t) * 100));
+  const older = countedAll(p.sessions) - p.recent;
+  const you = own ? 'you' : firstName(p);
+  let text;
+  if (p.state === 'reassess') text = `${own ? 'You have' : `${firstName(p)} has`} no standard matches in the last three months${older ? `; ${older} older matches no longer count` : ''}. A fresh club assessment plus ${t} new matches brings ${own ? 'you' : 'them'} back.`;
+  else if (p.recent >= t) text = `${own ? 'You meet' : 'Meets'} the requirement of ${t} completed singles or doubles matches in the last three months. Falling below it removes the leaderboard position, though the rank stays visible.`;
+  else text = `${t - p.recent} more standard ${t - p.recent === 1 ? 'match' : 'matches'} in the next few weeks would put ${you} on the leaderboard. Older matches drop out of the count as they pass three months.`;
+  return `<section class="card stack"><div class="between"><h2>Leaderboard eligibility</h2>${p.recent >= t && p.state !== 'reassess' ? chip('Qualifies', 'ok') : chip('Not yet', p.state === 'reassess' ? 'warn' : '')}</div>
+    <div class="between" style="align-items:baseline"><span class="big-count">${p.recent} <span class="muted" style="font-size:15px">of ${t}</span></span><span class="small muted">standard matches · last three months</span></div>
+    <div class="prog ${p.state === 'reassess' ? 'warn' : ''}" role="progressbar" aria-valuemin="0" aria-valuemax="${t}" aria-valuenow="${Math.min(p.recent, t)}" aria-label="Standard matches in the last three months"><i style="width:${pct}%"></i></div>
+    <p class="small muted">${text}</p>
+    <p class="small muted">Fun games, partial games after a substitution, and invalid games or sessions don't count.</p></section>`;
+}
+
+// ---------- Top bar ----------
+function topBar() {
+  const me = S.me && S.accounts[S.me];
+  const mine = me && ((['profile', 'rank', 'history'].includes(S.screen) && S.viewId === S.me) || ['edit', 'id', 'account'].includes(S.screen));
+  return `<header class="top"><div class="top-in">
+    <button class="brand" data-act="go" data-to="board" aria-label="ROTRA Players, open the leaderboard"><span style="color:inherit;font-size:inherit;font-weight:inherit;letter-spacing:inherit">ROTR<b>A</b></span><span>Players</span></button>
+    <nav class="nav" aria-label="Main">
+      <button data-act="go" data-to="board" ${S.screen === 'board' ? 'aria-current="page"' : ''}>Leaderboard</button>
+      ${me ? `<button data-act="openProfile" data-id="${me.id}" ${mine ? 'aria-current="page"' : ''}>My profile</button>` : `<button data-act="go" data-to="login" ${['login', 'forgot', 'reset'].includes(S.screen) ? 'aria-current="page"' : ''}>Sign in</button>`}
+    </nav>
+    <div class="grow"></div>
+    <button class="btn xs ghost icon-btn" data-act="toggleTheme" aria-label="Switch to ${isDark() ? 'light' : 'dark'} mode" title="${isDark() ? 'Light' : 'Dark'} mode">${isDark() ? I.sun : I.moon}</button>
+    <button class="btn xs" data-act="openDemo">Prototype</button>
+  </div></header>${S.online ? '' : `<div class="band-off" role="status"><div class="in">${I.alert}<span><b>You're offline.</b> Showing what this device saved at ${fmtTime(S.offlineAt || Date.now())}. Signing in and saving changes need an internet connection.</span></div></div>`}`;
+}
+
+// ---------- P-LEADERBOARD ----------
+function lbRow(e, pos) {
+  const me = e.id === S.me;
+  const medal = ['', 'first', 'second', 'third'][pos] || '';
+  return `<button class="lb-row${me ? ' me' : ''}${medal ? ` podium p${pos}` : ''}" id="row-${e.id}" data-act="openProfile" data-id="${e.id}" aria-label="${medal ? `${medal[0].toUpperCase()}${medal.slice(1)} place` : `Number ${pos}`}, ${esc(e.name)}${me ? ' (you)' : ''}, ${lvLabel(e.level)}">
+    <span class="lb-pos">${num(pos)}</span>${avatar(e)}
+    <span class="lb-name"><b>${esc(e.name)}</b>${e.nick ? `<span class="small muted">“${esc(e.nick)}”</span>` : ''}${me ? chip('You', 'ok') : ''}</span>
+    <span class="lb-lv">${lvLabel(e.level)}</span></button>`;
+}
+function meCard(list) {
+  if (!S.me) return '';
+  const p = profileOf(S.me);
+  const pos = list.findIndex((e) => e.id === S.me) + 1;
+  if (pos) return `<section class="card hl between"><div class="row" style="gap:12px">${avatar(p)}<div><p class="small muted">Your position</p><p><b class="mono" style="font-size:20px">#${num(pos)}</b> · ${lvLabel(p.level)}</p></div></div><button class="btn sm" data-act="jumpMe" data-pos="${pos}">Show my row</button></section>`;
+  const st = rankStatus(p, null);
+  return `<section class="card stack tight"><div class="between"><h3>You're not on the leaderboard${p.state === 'reassess' ? ' right now' : ' yet'}</h3>${st.chips}</div><p class="small muted">${st.text}</p>
+    <div class="row"><button class="btn xs" data-act="openProfile" data-id="${p.id}">Open my profile</button></div></section>`;
+}
+function viewBoard() {
+  const list = boardList();
+  const q = S.q.trim();
+  const isId = /^rtr-/i.test(q);
+  const ql = q.toLowerCase();
+  let body;
+  if (S.board === 'loading') {
+    body = `<div class="lb" aria-busy="true" aria-label="Loading the leaderboard">${Array.from({ length: 8 }, (_, i) => `<div class="lb-row" style="cursor:default"><span class="skel" style="width:28px;justify-self:end"></span><span class="avatar"></span><span class="skel" style="width:${50 + ((i * 37) % 40)}%"></span><span class="skel" style="width:110px"></span></div>`).join('')}</div>`;
+  } else if (S.board === 'error') {
+    body = `${notice('bad', '<b>Couldn\'t load the leaderboard.</b> Check your connection, then try again.')}<div class="row"><button class="btn sm" data-act="retryBoard">Try again</button></div>`;
+  } else if (!list.length) {
+    body = `<div class="empty">No players qualify for the leaderboard yet. Players appear after ${T()} standard matches in the last three months.</div>`;
+  } else if (q && !isId) {
+    const hits = list.map((e, i) => ({ e, pos: i + 1 })).filter(({ e }) => e.name.toLowerCase().includes(ql) || (e.nick || '').toLowerCase().includes(ql));
+    body = hits.length
+      ? `<p class="small muted" aria-live="polite">${hits.length} ${hits.length === 1 ? 'player matches' : 'players match'} “${esc(q)}”${hits.length > 50 ? '. Showing the first 50.' : '.'}</p><div class="lb">${lbHead()}${hits.slice(0, 50).map(({ e, pos }) => lbRow(e, pos)).join('')}</div>`
+      : `<div class="empty" aria-live="polite">No one on the leaderboard matches “${esc(q)}”. Players below the match requirement aren't listed here.</div>`;
+  } else {
+    // The podium above holds 1–3, so the list carries on from 4.
+    const shown = Math.min(S.shown, list.length);
+    const from = list.length >= 3 ? 3 : 0;
+    body = `<div class="lb">${lbHead()}${list.slice(from, shown).map((e, i) => lbRow(e, from + i + 1)).join('')}</div>
+      <div class="between"><span class="small muted">Showing 1–${num(shown)} of ${num(list.length)} players</span>${shown < list.length ? '<button class="btn sm" data-act="showMore">Show 25 more</button>' : ''}</div>`;
+  }
+  const showPodium = S.board === 'ok' && list.length >= 3 && !(q && !isId);
+  return `<main class="wrap mid">
+    <section class="page-head"><span class="label">Overall ROTRA ranking</span><h1>Leaderboard</h1>
+      <p class="muted">One list across every club. Singles and doubles share one rank.</p></section>
+    ${showPodium ? podium(list) : ''}
+    ${meCard(list)}
+    <section class="card stack">
+      <form data-form="find" role="search" class="field"><label for="find" style="font-size:13px;font-weight:600;color:var(--fg2)">Search the leaderboard</label>
+        <div class="find-row"><input class="input" id="find" type="search" autocomplete="off" placeholder="Name, nickname or RTR ID" data-bind="q" data-live value="${esc(S.q)}">${isId ? '<button class="btn primary" type="submit">Find</button>' : ''}</div>
+        ${S.ui.findErr ? `<span class="err">${esc(S.ui.findErr)}</span>` : '<span class="hint">To open a profile that isn\'t on the leaderboard, enter its full RTR ID.</span>'}</form>
+      ${!S.online && S.board === 'ok' ? notice('warn', `Saved copy from ${fmtTime(S.offlineAt || Date.now())}. Positions may have changed since then.`) : ''}
+      ${body}
+    </section>
+    <section class="card stack tight"><h2>Who appears here</h2>
+      <ul class="bul muted">
+        <li>Players with <b style="color:var(--fg)">${T()} completed singles or doubles matches</b> in the last three months. It's a rolling count, not a lifetime total.</li>
+        <li>Fun games, partial games after a substitution, and invalid games or sessions don't count.</li>
+        <li>After three months without playing, a player leaves the list until a club reassesses them.</li>
+        <li>Positions come from club assessments and match results. <button class="btn xs ghost" data-act="openRank" data-id="">How ranks work</button></li>
+      </ul></section>
+  </main>`;
+}
+const lbHead = () => '<div class="lb-head" aria-hidden="true"><span>#</span><span></span><span>Player</span><span>Rank</span></div>';
+// Podium: 1st in the middle on the tallest step with pixel fire behind the picture, 2nd left, 3rd right.
+// The DOM stays in 1–2–3 order for screen readers; CSS order places the steps.
+function podium(list) {
+  const place = ['First', 'Second', 'Third'], short = ['1st', '2nd', '3rd'];
+  const embers = Array.from({ length: 14 }, (_, k) => `<i style="left:${4 + ((k * 37) % 92)}%;animation-delay:${((k * 0.73) % 5).toFixed(2)}s;animation-duration:${4 + (k % 4)}s"></i>`).join('');
+  return `<section class="podium" aria-labelledby="pod-title"><span class="embers" aria-hidden="true">${embers}</span>
+    <div class="pod-head"><h2 id="pod-title">Top three</h2><span class="small muted">Overall ROTRA leaderboard · ${num(list.length)} players</span></div>
+    <div class="pod-stage">${list.slice(0, 3).map((e, i) => `
+    <button class="pod p${i + 1}${e.id === S.me ? ' me' : ''}" data-act="openProfile" data-id="${e.id}" aria-label="${place[i]} place, ${esc(e.name)}${e.id === S.me ? ' (you)' : ''}, ${lvLabel(e.level)}">
+      <span class="pod-who">${i === 0 ? '<canvas class="fire" id="fire" width="48" height="40" aria-hidden="true"></canvas>' : ''}${avatar(e, 'pod-av')}
+        <b class="pod-name">${esc(e.name)}</b>${e.nick ? `<span class="small muted">“${esc(e.nick)}”</span>` : ''}<span class="pod-lv">${lvLabel(e.level)}</span></span>
+      <span class="pod-step" aria-hidden="true"><b>${i + 1}</b><small>${short[i]}</small></span></button>`).join('')}</div></section>`;
+}
+
+// Pixel fire (the classic spreading-flame effect) drawn in the brand green. The canvas is tiny and scaled up
+// with crisp pixels; colors come from the --accent token so it follows the theme. Reduced motion gets one still frame.
+const FIRE = { w: 48, h: 40, buf: null, raf: 0, last: 0, key: '', pal: [] };
+function firePalette() {
+  const acc = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+  const dark = isDark();
+  const key = acc + dark;
+  if (key === FIRE.key) return FIRE.pal;
+  const hex = /^#([0-9a-f]{6})$/i.exec(acc);
+  const [r, g, b] = hex ? [0, 2, 4].map((k) => parseInt(hex[1].slice(k, k + 2), 16)) : [0, 255, 136];
+  const mix = (c, t, to) => Math.round(c + (to - c) * t);
+  FIRE.pal = Array.from({ length: 37 }, (_, i) => {
+    const t = i / 36;
+    if (i === 0) return [0, 0, 0, 0];
+    const base = t < 0.55 ? [r, g, b].map((c) => mix(c * 0.35, t / 0.55, c)) : [r, g, b].map((c) => mix(c, (t - 0.55) / 0.45 * (dark ? 0.75 : 0.35), 255));
+    return [...base, t < 0.12 ? 0 : Math.round(255 * Math.min(1, (t - 0.12) * 2.2))];
+  });
+  FIRE.key = key;
+  return FIRE.pal;
+}
+function fireStep() {
+  const { w, h } = FIRE;
+  if (!FIRE.buf) {
+    FIRE.buf = new Uint8Array(w * h);
+    // Only the middle of the bottom row burns, which shapes the flames into a tongue behind the picture.
+    for (let x = 0; x < w; x++) { const d = Math.abs(x - w / 2) / (w / 2); FIRE.buf[(h - 1) * w + x] = d < 0.3 ? 36 : d < 0.62 ? Math.round(36 * (1 - (d - 0.3) / 0.32)) : 0; }
+  }
+  const buf = FIRE.buf;
+  for (let x = 0; x < w; x++) {
+    for (let y = 1; y < h; y++) {
+      const src = y * w + x;
+      const v = buf[src];
+      if (!v) { buf[src - w] = 0; continue; }
+      const rnd = Math.floor(Math.random() * 4);
+      const dst = src - rnd + 1 - w;
+      // Cooling a little over one step per row keeps the flames inside the canvas and ragged at the tips.
+      if (dst >= 0) buf[dst] = Math.max(0, v - (rnd & 1) - (Math.random() < 0.55 ? 1 : 0));
+    }
+  }
+}
+function fireDraw(c) {
+  const ctx = c.getContext('2d');
+  const pal = firePalette();
+  const { w, h } = FIRE;
+  const img = ctx.createImageData(w, h);
+  FIRE.buf.forEach((v, i) => {
+    const p = pal[v] || pal[0];
+    const x = i % w;
+    // Fade the sides so the burn reads as a tongue of flame, not a block.
+    const side = Math.max(0, 1 - ((x - w / 2) / (w * 0.42)) ** 2);
+    img.data.set([p[0], p[1], p[2], Math.round(p[3] * side)], i * 4);
+  });
+  ctx.putImageData(img, 0, 0);
+}
+function fireTick(ts) {
+  const c = document.getElementById('fire');
+  if (!c) { FIRE.raf = 0; return; }
+  if (ts - FIRE.last > 60) { fireStep(); fireDraw(c); FIRE.last = ts; }
+  FIRE.raf = requestAnimationFrame(fireTick);
+}
+function startFire() {
+  const c = document.getElementById('fire');
+  if (!c) return;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (!FIRE.buf) for (let i = 0; i < 60; i++) fireStep();
+    fireDraw(c);
+    return;
+  }
+  if (!FIRE.buf) for (let i = 0; i < 40; i++) fireStep();
+  fireDraw(c);
+  if (!FIRE.raf) FIRE.raf = requestAnimationFrame(fireTick);
+}
+
+// ---------- P-PUBLIC-PROFILE / P-OWN-PROFILE ----------
+function viewProfile() {
+  const p = profileOf(S.viewId);
+  if (!p) return viewNotFound();
+  const own = p.id === S.me;
+  const pos = positionOf(p.id);
+  const st = rankStatus(p, pos);
+  const games = p.sessions.flatMap((s) => s.games.filter((g) => g.kind === 'counted').map((g) => ({ g, s })));
+  const links = Object.entries(p.social || {}).filter(([, v]) => v);
+  const missing = own && (!p.style || !p.expY);
+  return `<main class="wrap"><div class="prof">
+    <aside class="side stack">
+      <section class="card hero">
+        <div class="who">${avatar(p, 'xxl')}<div style="min-width:0" class="stack tight"><h1>${esc(p.name)}</h1>${p.nick ? `<p class="muted">“${esc(p.nick)}”</p>` : ''}${own ? `<div class="row">${chip('This is you', 'ok')}</div>` : ''}</div></div>
+        <div class="stack tight"><span class="label">Player ID</span>
+          <div class="rtr-line"><code id="rtr-${p.id}">${esc(p.rtr)}</code><button class="btn xs" data-act="copyId" data-id="${p.id}" aria-label="Copy player ID">${I.copy} Copy</button></div>
+          <span class="hint">Shows the city and date this profile was first created. It isn't where ${own ? 'you live or which club you play for' : 'this player lives or which club they play for'}.</span></div>
+        ${own ? `<div class="acts"><button class="btn sm" data-act="openEdit">${I.edit} Edit profile</button><button class="btn sm" data-act="go" data-to="id">${I.qr} My player ID</button></div>` : ''}
+      </section>
+      ${own ? privatePanel(p) : ''}
+    </aside>
+    <div class="stack" style="gap:20px">
+      ${!S.online && own ? notice('warn', 'Saved copy. Your rank and games may have changed since this device was last online.') : ''}
+      ${p.state === 'processing' ? notice('warn', `<b>Updating from Sunday Night Queue.</b> Lahug Smash Club finished the session last night. This is ${own ? 'your' : 'the'} last calculated rank until the update is ready.`) : ''}
+      ${missing ? notice('', `Add your playing style and experience so clubs know your game. It's optional. <button class="btn xs" data-act="openEdit" style="margin-left:4px">Add details</button>`) : ''}
+      <section class="card stack">
+        <div class="between"><span class="label">Shared rank</span><button class="btn xs ghost" data-act="openRank" data-id="${p.id}">How this rank works</button></div>
+        <div class="rank-main"><div class="stack tight"><div class="rank-label${p.level == null ? ' dim' : ''}">${lvLabel(p.level)}</div><div class="row">${st.chips}</div></div>
+          ${pos ? `<div class="rank-pos"><span class="label">Overall</span><b>#${num(pos)}</b></div>` : `<div class="rank-pos none"><span class="label">Overall</span><b>No position</b></div>`}</div>
+        ${ladder(p.level, st.stale)}
+        <p class="small muted">${st.text}</p>
+        <p class="small muted">Clubs can still place ${own ? 'you' : firstName(p)} at a different level for their own sessions.</p>
+      </section>
+      ${eligibility(p, own)}
+      <section class="card stack"><div class="between"><h2>Recent games</h2>${games.length ? `<button class="btn xs" data-act="openHistory" data-id="${p.id}">All games (${games.length})</button>` : ''}</div>
+        ${games.length ? `<div>${games.slice(0, 3).map(({ g, s }) => gameRow({ ...g, note: '' }).replace('<div class="small muted">vs', `<div class="small muted">${fmtDay(s.ago)} · ${esc(s.club)}</div><div class="small muted">vs`)).join('')}</div>` : '<div class="empty">No recorded games yet.</div>'}
+      </section>
+      <section class="card stack"><h2>About</h2>
+        <div class="stack tight"><span class="label">Playing style</span><p>${p.style ? esc(p.style) : `<span class="muted">${own ? 'You haven\'t' : 'This player hasn\'t'} added a playing style yet.</span>`}</p></div>
+        <div class="stack tight"><span class="label">Experience</span><p>${expText(p) || '<span class="muted">Not added</span>'}</p>${expText(p) ? '<span class="hint">Self-reported. Clubs may use it for a first assessment; it doesn\'t add rank points.</span>' : ''}</div>
+        ${links.length ? `<div class="stack tight"><span class="label">Links</span><div class="links">${links.map(([k, v]) => `<a href="${esc(v)}" target="_blank" rel="noopener noreferrer">${I.ext}<span>${esc(v.replace(/^https?:\/\/(www\.)?/, ''))}</span><small>${SOCIAL[k].label}</small></a>`).join('')}</div></div>` : ''}
+      </section>
+    </div>
+  </div></main>`;
+}
+const expText = (p) => {
+  const y = +p.expY || 0, m = +p.expM || 0;
+  if (!y && !m) return '';
+  return [y && `${y} ${y === 1 ? 'year' : 'years'}`, m && `${m} ${m === 1 ? 'month' : 'months'}`].filter(Boolean).join(', ') + ' playing';
+};
+function privatePanel(p) {
+  const req = S.requests[p.id];
+  const open = req && ['submitted', 'applying', 'failed'].includes(req.status);
+  return `<section class="card private stack"><div class="between"><h3>Your account</h3><span class="small muted">${I.lock} Only you see this</span></div>
+    <dl class="kv"><dt>Phone</dt><dd class="mono">${esc(p.phone)}</dd><dt>Email</dt><dd style="overflow-wrap:anywhere">${esc(p.email)}</dd><dt>Clubs</dt><dd>${p.phoneHidden ? 'Phone hidden from clubs' : 'Clubs can see your phone'}</dd></dl>
+    ${open ? `<p class="small">${chip(REQ[req.status].chip, REQ[req.status].k)} ${REQ_FIELD[req.field]} change</p>` : ''}
+    <div class="acts"><button class="btn sm" data-act="go" data-to="account">Privacy and contact</button><button class="btn sm ghost" data-act="signOut">Sign out</button></div></section>`;
+}
+
+// ---------- P-RANK-DETAIL ----------
+function viewRank() {
+  const p = S.viewId ? profileOf(S.viewId) : null;
+  const w = S.config.weight;
+  const st = p ? rankStatus(p, positionOf(p.id)) : null;
+  return `<main class="wrap mid">
+    <div class="page-head">${p ? backBtn('openProfile', p.name, p.id) : backBtn('goBoard', 'Leaderboard')}
+      <span class="label">Shared rank</span><h1>How ${p ? `${esc(possessive(firstName(p)))} rank` : 'a rank'} works</h1>
+      <p class="muted">One rank follows a player across clubs and covers both singles and doubles. It mixes what clubs judge with how matches go.</p></div>
+    <section class="card stack"><h2>Two parts</h2>
+      <div class="split" role="img" aria-label="${w}% club assessments, ${100 - w}% match performance"><span class="a" style="flex:${w}"></span><span class="b" style="flex:${100 - w}"></span></div>
+      <div class="legend"><span><b>${w}%</b> club assessments</span><span><b>${100 - w}%</b> match performance</span></div>
+      <div class="grid2">
+        <div class="stack tight"><h3>Club assessments</h3><p class="small muted">Each club where the player was assessed in the last three months counts once, with equal weight. Only that club's latest assessment counts, however often the player goes there.</p></div>
+        <div class="stack tight"><h3>Match performance</h3><p class="small muted">Wins and losses in eligible matches from the same three months, weighed against the levels of partners and opponents. Scores, when a club enters them, show how close a game was. A game with only a winner recorded still counts.</p></div>
+      </div>
+      <p class="small muted">The ROTRA platform owner sets these weights and can change them. This page explains the method; it doesn't list each club's assessment.</p>
+    </section>
+    <section class="card stack"><div class="between"><h2>The skill ladder</h2>${p ? chip(esc(lvLabel(p.level)), p.level == null ? '' : st.stale ? 'warn' : 'ok') : ''}</div>
+      <p class="small muted">Nine levels, from Beginner Low to Advanced High. Clubs assess each player at one of them, such as Intermediate High.</p>
+      <div class="ladder-full">${TIERS.map(([tier, idx]) => `<div class="lrow"><span>${tier}</span><div class="cells">${idx.map((i) => `<b class="${p && p.level === i ? `cur${st.stale ? ' stale' : ''}` : ''}" ${p && p.level === i ? `aria-label="${esc(LEVELS[i].label)}: ${esc(firstName(p))} is here"` : `aria-label="${esc(LEVELS[i].label)}"`}>${LEVELS[i].step}</b>`).join('')}</div></div>`).reverse().join('')}</div>
+    </section>
+    <div class="grid2">
+      <section class="card stack tight"><h2>Clubs set their own levels</h2><p class="small muted">The shared rank is a suggestion. Each club decides the level a player gets in its own sessions, and an Advanced player can be placed lower at a stronger club. Clubs assess players while preparing the roster, and levels stay fixed once the session starts.</p></section>
+      <section class="card stack tight"><h2>When it changes</h2><ul class="bul small muted">
+        <li>A club's new assessment counts once that club's device syncs.</li>
+        <li>Match results count after the club marks a valid session done.</li>
+        <li>Sharing results on social media has no effect on rank.</li>
+        <li>After three months without playing, the rank stays visible marked <b>Needs reassessment</b>.</li></ul></section>
+    </div>
+  </main>`;
+}
+
+// ---------- P-MATCH-HISTORY ----------
+function viewHistory() {
+  const p = profileOf(S.viewId);
+  if (!p) return viewNotFound();
+  const tab = S.ui.hist;
+  const kinds = tab === 'counted' ? ['counted'] : ['fun', 'partial'];
+  const blocks = p.sessions.map((s) => sessionBlock(s, kinds)).filter(Boolean);
+  const nC = countedAll(p.sessions), nF = p.sessions.reduce((n, s) => n + s.games.filter((g) => g.kind !== 'counted').length, 0);
+  return `<main class="wrap mid">
+    <div class="page-head">${backBtn('openProfile', p.name, p.id)}<span class="label">${esc(p.name)}</span><h1>Games</h1>
+      <p class="muted">Official results from finished club sessions. Results are final and can't be edited.</p></div>
+    <div class="tabs" role="tablist" aria-label="Game type">
+      <button role="tab" aria-selected="${tab === 'counted'}" data-act="histTab" data-v="counted">Singles and doubles ${chip(nC, 'solid')}</button>
+      <button role="tab" aria-selected="${tab !== 'counted'}" data-act="histTab" data-v="other">Fun and partial ${chip(nF, 'solid')}</button></div>
+    ${tab !== 'counted' ? notice('', 'These games are kept in the record but don\'t count toward rank or the leaderboard.') : p.state === 'reassess' ? notice('warn', 'None of these games are from the last three months, so they no longer count toward the leaderboard.') : ''}
+    ${p.state === 'processing' && tab === 'counted' ? notice('warn', 'Sunday Night Queue games are in, but the rank update from them is still processing.') : ''}
+    <section class="card stack" style="gap:22px">${blocks.length ? blocks.join('') : `<div class="empty">${tab === 'counted' ? 'No recorded singles or doubles games yet.' : 'No fun or partial games.'}</div>`}</section>
+  </main>`;
+}
+
+// ---------- P-ID-QR ----------
+function qrSVG(text) {
+  if (typeof qrcode !== 'function') return null;
+  try {
+    const q = qrcode(0, 'M');
+    q.addData(text); q.make();
+    const n = q.getModuleCount(), pad = 2;
+    let d = '';
+    for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (q.isDark(r, c)) d += `M${c + pad} ${r + pad}h1v1h-1z`;
+    return `<svg viewBox="0 0 ${n + pad * 2} ${n + pad * 2}" shape-rendering="crispEdges" aria-hidden="true"><path d="${d}" fill="currentColor"/></svg>`;
+  } catch (e) { return null; }
+}
+function viewId() {
+  if (!S.me) return viewLogin();
+  const p = profileOf(S.me);
+  const [, cc, city, date, seq] = p.rtr.split('-');
+  const dt = new Date(2000 + +date.slice(4), +date.slice(0, 2) - 1, +date.slice(2, 4));
+  const code = qrSVG(p.rtr);
+  return `<main class="wrap slim">
+    <div class="page-head">${backBtn('openProfile', 'My profile', p.id)}<h1>My player ID</h1>
+      <p class="muted">Show this to a club so they can find your profile without your phone number.</p></div>
+    <section class="card stack" style="align-items:stretch;gap:16px">
+      ${code ? `<div class="qr" role="img" aria-label="QR code for player ID ${esc(p.rtr)}">${code}</div>` : `<div class="qr missing">The QR code couldn't be drawn here. Read the ID out or let the club type it.</div>`}
+      <p class="id-big" id="rtr-big">${esc(p.rtr)}</p>
+      <div class="row" style="justify-content:center"><button class="btn sm" data-act="copyId" data-id="${p.id}" data-big="1">${I.copy} Copy ID</button></div>
+      <p class="small muted" style="text-align:center">The code holds only this ID. It doesn't contain your phone, email or sign-in details, and scanning it doesn't sign anyone in or reserve a slot.</p>
+    </section>
+    <section class="card stack"><h2>What the ID means</h2>
+      <div class="rtr-parts">
+        <div><code>RTR</code><span>ROTRA</span></div><div><code>${esc(cc)}</code><span>Country</span></div>
+        <div><code>${esc(city)}</code><span>City of the club that added you</span></div>
+        <div><code>${esc(date)}</code><span>First synced ${dt.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })}</span></div>
+        <div><code>${esc(seq)}</code><span>Order that day in that city</span></div></div>
+      <p class="small muted">Your ID never changes, even if you move, play for another club, or change your phone or email.</p>
+      ${!S.online ? notice('warn', 'Saved on this device. A club seeing you for the first time may need internet to look you up.') : ''}
+    </section>
+  </main>`;
+}
+
+// ---------- P-PHONE-PRIVACY + P-CONTACT-REQUEST ----------
+const REQ_FIELD = { phone: 'Phone number', email: 'Email' };
+const REQ = {
+  submitted: { chip: 'Waiting for review', k: 'warn' },
+  applying: { chip: 'Approved · being applied', k: 'warn' },
+  applied: { chip: 'Applied', k: 'ok' },
+  failed: { chip: 'Needs attention', k: 'bad' },
+  rejected: { chip: 'Not approved', k: '' },
+};
+function requestCard(p) {
+  const r = S.requests[p.id];
+  if (!r) return '';
+  const f = REQ_FIELD[r.field].toLowerCase();
+  const text = {
+    submitted: `You asked to change your ${f} to <b>${esc(r.to)}</b>. Changes take effect only after Admin approval. Until then, keep signing in with <span class="mono">${esc(r.from)}</span>.`,
+    applying: `Approved. Your new ${f} is being set up. Keep signing in with <span class="mono">${esc(r.from)}</span> until this says Applied.`,
+    applied: `Your ${f} is now <b>${esc(r.to)}</b>. Your player ID and game history stay the same.`,
+    failed: `The change was approved but couldn't be applied yet. You still sign in with <span class="mono">${esc(r.from)}</span>. ROTRA will retry or contact you.`,
+    rejected: `The platform owner didn't approve changing your ${f} to ${esc(r.to)}. Your current ${f} stays. You can send a new request.`,
+  }[r.status];
+  return `<div class="notice ${r.status === 'applied' ? 'ok' : r.status === 'failed' ? 'bad' : r.status === 'rejected' ? '' : 'warn'}">${r.status === 'applied' ? I.check : I.info}<div class="stack tight"><div class="row">${chip(REQ[r.status].chip, REQ[r.status].k)}<span class="small muted">${REQ_FIELD[r.field]} change · sent ${fmtTime(r.at)}</span></div><p>${text}</p></div></div>`;
+}
+function viewAccount() {
+  if (!S.me) return viewLogin();
+  const p = profileOf(S.me);
+  const r = S.requests[p.id];
+  const open = r && ['submitted', 'applying', 'failed'].includes(r.status);
+  const savedText = p.phoneHidden ? 'Saved: your phone number is hidden from clubs.' : 'Saved: clubs can see your phone number.';
+  return `<main class="wrap slim">
+    <div class="page-head">${backBtn('openProfile', 'My profile', p.id)}<h1>Privacy and contact</h1></div>
+    <section class="card stack"><h2>Phone privacy</h2>
+      <div class="setting"><div class="main stack tight"><label for="sw-phone" style="font-weight:700">Hide my phone number from clubs</label>
+        <p class="small muted">Clubs can find you by your player ID or QR code instead. Your phone and email are never on your public profile or the leaderboard, whatever this is set to.</p></div>
+        ${sw(p.phoneHidden, 'togglePrivacy', 'Hide my phone number from clubs', `id="sw-phone" ${S.ui.privacyPending ? 'disabled aria-busy="true"' : ''}`)}</div>
+      <p class="small" aria-live="polite">${S.ui.privacyPending ? 'Saving…' : esc(savedText)}</p>
+      ${S.ui.privacyErr ? notice('bad', esc(S.ui.privacyErr)) : ''}
+      <p class="small muted">Hiding your number applies from now on. It can't erase what a club has already seen, and a club device that's offline updates when it reconnects. It doesn't change how you sign in.</p>
+    </section>
+    <section class="card stack"><h2>Contact details</h2>
+      <dl class="kv"><dt>Phone</dt><dd class="mono">${esc(p.phone)}</dd><dt>Email</dt><dd style="overflow-wrap:anywhere">${esc(p.email)}</dd></dl>
+      <p class="small muted">You sign in with either one. To change them, ask the ROTRA platform owner. Changes take effect only after Admin approval.</p>
+      ${requestCard(p)}
+      <div class="row">${open ? '' : '<button class="btn sm" data-act="openRequest">Request a change</button>'}</div>
+    </section>
+    <section class="card between"><div><h3>Sign out</h3><p class="small muted">Your public profile stays visible.</p></div><button class="btn sm danger" data-act="signOut">Sign out</button></section>
+  </main>`;
+}
+
+// ---------- P-EDIT-PROFILE ----------
+const editFields = (p) => ({ name: p.name, nick: p.nick || '', style: p.style || '', expY: p.expY ?? '', expM: p.expM ?? '', facebook: p.social.facebook || '', instagram: p.social.instagram || '', youtube: p.social.youtube || '', linkedin: p.social.linkedin || '' });
+const editDirty = () => S.ui.edit && JSON.stringify(S.ui.edit) !== JSON.stringify(S.ui.editOrig);
+function field(id, label, path, value, err, o = {}) {
+  const tag = o.area ? `<textarea class="input${err ? ' bad' : ''}" id="${id}" data-bind="${path}" maxlength="${o.max || 280}" ${err ? `aria-invalid="true" aria-describedby="${id}-err"` : ''}>${esc(value)}</textarea>`
+    : `<input class="input${err ? ' bad' : ''}" id="${id}" data-bind="${path}" value="${esc(value)}" ${o.type ? `type="${o.type}"` : ''} ${o.inputmode ? `inputmode="${o.inputmode}"` : ''} ${o.ac ? `autocomplete="${o.ac}"` : ''} ${o.ph ? `placeholder="${esc(o.ph)}"` : ''} ${err ? `aria-invalid="true" aria-describedby="${id}-err"` : ''}>`;
+  return `<label class="field" for="${id}"><span>${label}${o.req ? ' <span style="color:var(--error)" aria-hidden="true">*</span>' : ''}${o.pub ? ' · <span class="hint">public</span>' : ''}</span>${tag}${err ? `<span class="err" id="${id}-err">${esc(err)}</span>` : o.hint ? `<span class="hint">${o.hint}</span>` : ''}</label>`;
+}
+// Personal fields in three groups. Edit profile shows one group per section; the claim form shows all three.
+const fieldsBasics = (base, d, e, pre) => `<div class="fgrid">${field(`${pre}-name`, 'Full name', `${base}.name`, d.name, e.name, { req: true, pub: true, ac: 'name' })}${field(`${pre}-nick`, 'Nickname', `${base}.nick`, d.nick, e.nick, { pub: true, hint: 'Optional' })}</div>`;
+const fieldsGame = (base, d, e, pre) => `${field(`${pre}-style`, 'Playing style', `${base}.style`, d.style, e.style, { area: true, pub: true, hint: 'Optional. How you play, in a sentence or two.' })}
+    <div class="field"><span>Experience · <span class="hint">public</span></span><div class="fgrid" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+      ${field(`${pre}-expY`, 'Years', `${base}.expY`, d.expY, e.expY, { inputmode: 'numeric', ph: '0' })}${field(`${pre}-expM`, 'Months', `${base}.expM`, d.expM, e.expM, { inputmode: 'numeric', ph: '0' })}</div>
+      <span class="hint">Optional. Clubs may use it for a first assessment; it doesn't add rank points.</span></div>`;
+const fieldsLinks = (base, d, e, pre) => `<p class="hint">Optional. Links describe you to others; you can't sign in with them. Whether links are public is still being decided.</p>
+    <div class="fgrid">${Object.entries(SOCIAL).map(([k, s]) => field(`${pre}-${k}`, s.label, `${base}.${k}`, d[k], e[k], { type: 'url', ph: s.eg, inputmode: 'url' })).join('')}</div>`;
+function personalFields(base, d, e, pre) {
+  return `${fieldsBasics(base, d, e, pre)}${fieldsGame(base, d, e, pre)}
+    <fieldset class="stack" style="border:0;padding:0;margin:0"><legend class="label" style="margin-bottom:8px">Links</legend>${fieldsLinks(base, d, e, pre)}</fieldset>`;
+}
+// Edit profile sections: a menu on the left on wide screens, tabs across the top on phones. All sections share
+// one draft and one Save, so switching sections never loses edits.
+const EDIT_TABS = [
+  { id: 'basics', label: 'Name', intro: 'How you appear on the leaderboard and your profile.', keys: ['name', 'nick'], body: fieldsBasics },
+  { id: 'game', label: 'Playing style', intro: 'Help clubs and other players know your game.', keys: ['style', 'expY', 'expM'], body: fieldsGame },
+  { id: 'links', label: 'Links', intro: 'Social pages shown on your profile.', keys: Object.keys(SOCIAL), body: fieldsLinks },
+  { id: 'account', label: 'Account', intro: 'Private details you sign in with, and your permanent player ID.', keys: [] },
+];
+function viewEdit() {
+  if (!S.me) return viewLogin();
+  const p = profileOf(S.me);
+  if (!S.ui.edit) { S.ui.edit = editFields(p); S.ui.editOrig = editFields(p); }
+  const e = S.ui.editErr, d = S.ui.edit, o = S.ui.editOrig;
+  const tab = EDIT_TABS.find((t) => t.id === S.ui.editTab) || EDIT_TABS[0];
+  const errs = (t) => t.keys.filter((k) => e[k]).length;
+  const dirty = (t) => t.keys.some((k) => String(d[k]) !== String(o[k]));
+  const body = tab.id === 'account'
+    ? `<dl class="kv"><dt>Phone</dt><dd class="mono">${esc(p.phone)}</dd><dt>Email</dt><dd style="overflow-wrap:anywhere">${esc(p.email)}</dd><dt>Player ID</dt><dd class="mono" style="overflow-wrap:anywhere">${esc(p.rtr)}</dd></dl>
+      <p class="small muted">You can't edit these here. Phone and email changes go to the ROTRA platform owner for approval; your player ID never changes.</p>
+      <div class="row"><button type="button" class="btn sm" data-act="openRequest">Request a phone or email change</button><button type="button" class="btn sm ghost" data-act="go" data-to="account">Phone privacy</button></div>
+      <p class="hint">Rank, club levels and game results come from clubs and can't be changed by players.</p>`
+    : tab.body('ui.edit', d, e, 'ed');
+  return `<main class="wrap mid">
+    <div class="page-head">${backBtn('cancelEdit', 'My profile')}<h1>Edit profile</h1>
+      <p class="muted">Fields marked public appear on your profile for anyone to see.</p></div>
+    <div class="edit-grid">
+      <nav class="edit-nav" role="tablist" aria-label="Profile sections">${EDIT_TABS.map((t) => `<button type="button" role="tab" id="etab-${t.id}" aria-selected="${t.id === tab.id}" aria-controls="epanel" data-act="editTab" data-v="${t.id}">
+        <span>${t.label}</span>${errs(t) ? `<span class="chip bad" aria-label="${errs(t)} to fix">${errs(t)}</span>` : dirty(t) ? '<i class="edit-dot" title="Unsaved changes" aria-label="Unsaved changes"></i>' : ''}</button>`).join('')}</nav>
+      <form class="card stack edit-panel" id="epanel" role="tabpanel" aria-labelledby="etab-${tab.id}" data-form="edit" novalidate>
+        <div class="stack tight"><h2>${tab.label}</h2><p class="small muted">${tab.intro}</p></div>
+        ${S.ui.editFail ? notice('bad', esc(S.ui.editFail)) : ''}
+        ${Object.keys(e).length ? notice('bad', `Some details need fixing: ${EDIT_TABS.filter(errs).map((t) => t.label).join(', ')}.`) : ''}
+        ${body}
+        <div class="edit-save"><span class="small muted">${editDirty() ? 'Unsaved changes' : 'No changes yet'}</span>
+          <div class="row"><button type="button" class="btn" data-act="cancelEdit">Cancel</button><button class="btn primary" type="submit" ${S.ui.editPending ? 'disabled' : ''}>${S.ui.editPending ? 'Saving…' : 'Save changes'}</button></div></div>
+      </form>
+    </div>
+  </main>`;
+}
+
+// ---------- P-LOGIN / P-FORGOT / P-RESET ----------
+function viewLogin() {
+  const L = S.ui.login;
+  return `<main class="login"><form class="card" data-form="login" novalidate>
+    <div class="stack tight"><div class="mark">ROTR<b>A</b></div><p class="muted">Your player profile.</p></div>
+    <h1 style="font-size:22px">Sign in</h1>
+    ${L.note ? notice('ok', esc(L.note)) : ''}
+    ${L.err ? notice('bad', esc(L.err)) : ''}
+    ${field('login-id', 'Phone number or email', 'ui.login.id', L.id, '', { ac: 'username', hint: 'Phone numbers are spaced out as you type. Prototype: try 09175550142 or migs.santos@example.com' })}
+    <div class="field"><label for="login-pass" style="font-size:13px;font-weight:600;color:var(--fg2)">Password</label>
+      <div class="row nowrap"><input class="input" id="login-pass" type="${L.show ? 'text' : 'password'}" autocomplete="current-password" data-bind="ui.login.pass" value="${esc(L.pass)}" placeholder="Any password works in this prototype">
+      <button type="button" class="btn sm" data-act="toggleShow" data-k="login" aria-pressed="${!!L.show}" aria-label="${L.show ? 'Hide password' : 'Show password'}">${L.show ? 'Hide' : 'Show'}</button></div></div>
+    <button class="btn primary block" type="submit" ${L.pending ? 'disabled' : ''}>${L.pending ? 'Signing in…' : 'Sign in'}</button>
+    <button type="button" class="btn ghost block" data-act="go" data-to="forgot">Forgot password?</button>
+    <p class="small muted">New to ROTRA? A club adds you first, then sends you a link to finish registering. You don't need an account to view profiles or the leaderboard.</p>
+  </form></main>`;
+}
+function viewForgot() {
+  const F = S.ui.forgot;
+  if (F.sent) return `<main class="login"><div class="card"><h1 style="font-size:22px">Check your email</h1>
+    ${notice('ok', `If an account uses <b>${esc(F.sent)}</b>, we've sent it a link to set a new password.`)}
+    <p class="small muted">It can take a few minutes. Check spam too. Your club can't reset your password for you.</p>
+    <button class="btn block" data-act="openReset" data-v="valid">Open the reset link (prototype)</button>
+    <button class="btn ghost block" data-act="go" data-to="login">Back to sign in</button></div></main>`;
+  return `<main class="login"><form class="card" data-form="forgot" novalidate>
+    ${backBtn('goLogin', 'Sign in')}<h1 style="font-size:22px">Reset your password</h1>
+    <p class="muted small">Enter the email on your ROTRA account. We'll send a link to set a new password.</p>
+    ${F.err ? notice('bad', esc(F.err)) : ''}
+    ${field('forgot-email', 'Email', 'ui.forgot.email', F.email, '', { type: 'email', ac: 'email', inputmode: 'email' })}
+    <button class="btn primary block" type="submit" ${F.pending ? 'disabled' : ''}>${F.pending ? 'Sending…' : 'Send reset link'}</button></form></main>`;
+}
+function viewReset() {
+  const R = S.ui.reset;
+  if (S.resetLink !== 'valid') return `<main class="login"><div class="card"><h1 style="font-size:22px">This link can't be used</h1>
+    ${notice('bad', 'This reset link has expired or was already used.')}
+    <button class="btn primary block" data-act="go" data-to="forgot">Request another reset</button></div></main>`;
+  return `<main class="login"><form class="card" data-form="reset" novalidate><h1 style="font-size:22px">Set a new password</h1>
+    ${R.err ? notice('bad', esc(R.err)) : ''}
+    <div class="field"><label for="reset-a" style="font-size:13px;font-weight:600;color:var(--fg2)">New password</label>
+      <div class="row nowrap"><input class="input" id="reset-a" type="${R.show ? 'text' : 'password'}" autocomplete="new-password" data-bind="ui.reset.a" value="${esc(R.a)}">
+      <button type="button" class="btn sm" data-act="toggleShow" data-k="reset" aria-pressed="${!!R.show}" aria-label="${R.show ? 'Hide passwords' : 'Show passwords'}">${R.show ? 'Hide' : 'Show'}</button></div></div>
+    <label class="field" for="reset-b"><span>Confirm new password</span><input class="input" id="reset-b" type="${R.show ? 'text' : 'password'}" autocomplete="new-password" data-bind="ui.reset.b" value="${esc(R.b)}"></label>
+    <button class="btn primary block" type="submit" ${R.pending ? 'disabled' : ''}>${R.pending ? 'Saving…' : 'Save password'}</button></form></main>`;
+}
+
+// ---------- P-CLAIM / P-CLAIM-STATUS ----------
+const maskPhone = (ph) => ph.replace(/(\+63 \d{3}) (\d{3}) (\d{2})(\d{2})/, '$1 ••• ••$4');
+function claimStatus() {
+  if (S.ui.claimWrong) return 'wrong';
+  if (S.claim === 'valid' && S.accounts.u2.claimed) return 'claimed';
+  return S.claim;
+}
+function viewClaim() {
+  const a = S.accounts.u2;
+  const st = claimStatus();
+  const wrap = (inner) => `<main class="wrap slim"><div class="page-head"><span class="label">Registration link from Lahug Smash Club</span>${inner}</div></main>`;
+  if (st === 'claimed') return wrap(`<h1>This profile is already registered</h1>${notice('', 'This link was already used to finish registering. It can\'t create another account.')}
+    <div class="row"><button class="btn primary" data-act="go" data-to="login">Sign in</button><button class="btn" data-act="go" data-to="forgot">Reset password by email</button></div>`);
+  if (st === 'expired') return wrap(`<h1>This link can't be used</h1>${notice('bad', 'The registration link has expired or was replaced.')}
+    <p class="muted">Ask the club that added you to send a new link. If you already registered, sign in instead.</p><div class="row"><button class="btn" data-act="go" data-to="login">Sign in</button></div>`);
+  if (st === 'wrong') return wrap(`<h1>We've stopped here</h1>${notice('', 'Nothing was changed on this profile.')}
+    <p class="muted">Tell Lahug Smash Club or ROTRA that the link opened someone else's profile, so they can send you the right one.</p><div class="row"><button class="btn" data-act="claimBack">This is me after all</button></div>`);
+  if (st === 'processing') return wrap(`<h1>Setting up your account</h1>${notice('warn', 'Your registration was received and is still being set up. You don\'t need to send it again.')}
+    <div class="row"><button class="btn primary" data-act="claimCheck">Check again</button></div>`);
+  const C = S.ui.claim || (S.ui.claim = { name: a.name, nick: a.nick, email: '', pass: '', pass2: '', show: false, style: '', expY: '', expM: '', facebook: a.social.facebook, instagram: '', youtube: '', linkedin: '' });
+  const e = S.ui.claimErr;
+  if (!S.ui.claimConfirmed) {
+    return wrap(`<h1>Is this you?</h1><p class="muted">Lahug Smash Club added this profile for you. Check it's yours before you set a password.</p>
+      <section class="card stack"><div class="row" style="gap:14px">${avatar(a, 'xl')}<div class="stack tight"><h2>${esc(a.name)}</h2>${a.nick ? `<p class="muted">“${esc(a.nick)}”</p>` : ''}</div></div>
+        <dl class="kv"><dt>Player ID</dt><dd class="mono" style="overflow-wrap:anywhere">${esc(a.rtr)}</dd><dt>Phone</dt><dd class="mono">${esc(maskPhone(a.phone))}</dd></dl>
+        <div class="row"><button class="btn primary" data-act="claimYes">Yes, this is me</button><button class="btn" data-act="claimNo">This isn't me</button></div></section>`);
+  }
+  return `<main class="wrap slim"><div class="page-head"><span class="label">Registration link from Lahug Smash Club</span><h1>Finish registering</h1>
+    <p class="muted">Add your email and a password. Everything else is optional and you can change it later.</p></div>
+    <form class="card stack" data-form="claim" novalidate style="gap:16px">
+      ${S.ui.claimFail ? notice('bad', esc(S.ui.claimFail)) : ''}
+      <div class="stack tight"><span class="label">Contact · private</span>
+        <div class="field"><span>Phone number</span><input class="input mono" id="cl-phone" value="${esc(maskPhone(a.phone))}" readonly aria-describedby="cl-phone-h"><span class="hint" id="cl-phone-h">Linked to this profile and can't be changed here. Not your number? Ask the club or ROTRA for help.</span></div>
+        ${field('cl-email', 'Email', 'ui.claim.email', C.email, e.email, { req: true, type: 'email', ac: 'email', inputmode: 'email', hint: 'Used for password resets. Never shown publicly.' })}
+        <div class="field"><label for="cl-pass" style="font-size:13px;font-weight:600;color:var(--fg2)">Password <span style="color:var(--error)" aria-hidden="true">*</span></label>
+          <div class="row nowrap"><input class="input${e.pass ? ' bad' : ''}" id="cl-pass" type="${C.show ? 'text' : 'password'}" autocomplete="new-password" data-bind="ui.claim.pass" value="${esc(C.pass)}">
+          <button type="button" class="btn sm" data-act="toggleShow" data-k="claim" aria-pressed="${!!C.show}" aria-label="${C.show ? 'Hide passwords' : 'Show passwords'}">${C.show ? 'Hide' : 'Show'}</button></div>${e.pass ? `<span class="err">${esc(e.pass)}</span>` : ''}</div>
+        <label class="field" for="cl-pass2"><span>Confirm password <span style="color:var(--error)" aria-hidden="true">*</span></span><input class="input${e.pass2 ? ' bad' : ''}" id="cl-pass2" type="${C.show ? 'text' : 'password'}" autocomplete="new-password" data-bind="ui.claim.pass2" value="${esc(C.pass2)}">${e.pass2 ? `<span class="err">${esc(e.pass2)}</span>` : ''}</label></div>
+      <div class="stack" style="padding-top:12px;border-top:1px solid var(--border)"><span class="label">About you</span>${personalFields('ui.claim', C, e, 'cl')}</div>
+      <div class="row end"><button class="btn primary" type="submit" ${S.ui.claimPending ? 'disabled' : ''}>${S.ui.claimPending ? 'Completing…' : 'Complete registration'}</button></div>
+    </form></main>`;
+}
+function viewClaimDone() {
+  const p = profileOf('u2');
+  return `<main class="wrap slim"><div class="page-head"><span class="label">Registration complete</span><h1>Welcome, ${esc(firstName(p))}</h1></div>
+    ${notice('ok', 'Your profile is registered. Sign in from now on with your phone number or email and your password.')}
+    <section class="card stack tight"><p>Your player ID stays <span class="mono">${esc(p.rtr)}</span>. Your games and rank carry over.</p>
+      <div class="row"><button class="btn primary" data-act="openProfile" data-id="u2">Go to my profile</button></div></section></main>`;
+}
+function viewNotFound() {
+  return `<main class="wrap slim"><div class="page-head">${backBtn('goBoard', 'Leaderboard')}<h1>Profile not found</h1></div>
+    ${notice('', `No ROTRA profile has the ID <span class="mono">${esc(S.ui.findId || S.viewId || '')}</span>. Check the ID and try again.`)}</main>`;
+}
+
+// ---------- Sheets ----------
+function sheetWrap(title, body, foot, wide = false) {
+  return `<div class="scrim" data-act="closeSheet"></div><div class="sheet${wide ? ' wide' : ''}" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+    <header><h2 id="sheet-title" tabindex="-1">${title}</h2><button class="btn xs ghost icon-btn" data-act="closeSheet" aria-label="Close">${I.x}</button></header>
+    <div class="sb">${body}</div>${foot ? `<footer>${foot}</footer>` : ''}</div>`;
+}
+const SHEETS = {
+  discard: () => sheetWrap('Discard your changes?', '<p class="muted">Your edits to your profile haven\'t been saved.</p>', '<button class="btn" data-act="closeSheet">Keep editing</button><button class="btn danger" data-act="discard">Discard changes</button>'),
+  request: () => {
+    const p = profileOf(S.me), R = S.ui.req;
+    const cur = R.field === 'phone' ? p.phone : p.email;
+    return sheetWrap('Request a contact change', `<div class="seg" role="group" aria-label="Detail to change">${['phone', 'email'].map((f) => `<button type="button" data-act="reqField" data-v="${f}" aria-pressed="${R.field === f}">${REQ_FIELD[f]}</button>`).join('')}</div>
+      <dl class="kv"><dt>Current</dt><dd class="mono" style="overflow-wrap:anywhere">${esc(cur)}</dd></dl>
+      <form data-form="request" novalidate class="stack">${field('req-to', `New ${REQ_FIELD[R.field].toLowerCase()}`, 'ui.req.to', R.to, S.ui.reqErr, { type: R.field === 'email' ? 'email' : 'tel', inputmode: R.field === 'email' ? 'email' : 'tel', ac: R.field === 'email' ? 'email' : 'tel', hint: R.field === 'phone' ? 'A Philippine mobile number, like 0917 555 0142.' : '' })}</form>
+      ${notice('warn', `<b>Changes take effect only after Admin approval.</b> Until then you keep signing in with your current ${REQ_FIELD[R.field].toLowerCase()}. Your player ID and history don't change.`)}`,
+    `<button class="btn" data-act="closeSheet">Cancel</button><button class="btn primary" data-act="submitRequest" ${S.ui.reqPending ? 'disabled' : ''}>${S.ui.reqPending ? 'Sending…' : 'Send request'}</button>`);
+  },
+  demo: () => {
+    const r = S.requests[S.me || 'u1'];
+    const seg = (act, cur, opts) => `<div class="seg" role="group">${opts.map(([v, l]) => `<button type="button" data-act="${act}" data-v="${v}" aria-pressed="${cur === v}">${l}</button>`).join('')}</div>`;
+    const reqBtns = !r ? '<span class="small muted">No request yet. Send one from Privacy and contact.</span>'
+      : `<div class="row">${chip(REQ[r.status].chip, REQ[r.status].k)}${r.status === 'submitted' ? '<button class="btn xs" data-act="reqAdvance" data-v="applying">Approve</button><button class="btn xs" data-act="reqAdvance" data-v="rejected">Decline</button>' : ''}
+        ${r.status === 'applying' ? '<button class="btn xs" data-act="reqAdvance" data-v="applied">Finish applying</button><button class="btn xs" data-act="reqAdvance" data-v="failed">Applying fails</button>' : ''}
+        ${r.status === 'failed' ? '<button class="btn xs" data-act="reqAdvance" data-v="applied">Retry succeeds</button>' : ''}</div>`;
+    return sheetWrap('Prototype', `<p class="small muted">Try the states the Player Information app has to handle. None of these controls are part of the real app.</p>
+      <div class="demo-sec"><span class="label">Account</span><div class="row">${S.me ? `<span class="small">Signed in as <b>${esc(S.accounts[S.me].name)}</b></span><button class="btn xs" data-act="signOut">Sign out</button>` : '<span class="small muted">Not signed in</span><button class="btn xs" data-act="demoSignIn">Sign in as Migs</button>'}</div></div>
+      <div class="demo-sec"><span class="label">Migs's rank</span>${seg('setRank', S.rank, [['eligible', 'On the leaderboard'], ['below', 'Below threshold'], ['reassess', 'Needs reassessment'], ['processing', 'Updating'], ['new', 'No rank yet']])}</div>
+      <div class="demo-sec"><div class="setting"><div class="main"><b>Offline</b><p class="small muted">Shows saved copies; sign-in and saving fail.</p></div>${sw(!S.online, 'toggleOnline', 'Offline')}</div></div>
+      <div class="demo-sec"><span class="label">Leaderboard</span>${seg('setBoard', S.board, [['ok', 'Normal'], ['loading', 'Loading'], ['error', 'Can\'t load'], ['empty', 'No one qualifies']])}</div>
+      <div class="demo-sec"><span class="label">Admin settings</span><div class="fgrid">
+        <label class="field" for="cfg-w"><span>Club assessment weight (%)</span><input class="input" id="cfg-w" type="number" min="0" max="100" step="5" value="${S.config.weight}" data-cfg="weight"></label>
+        <label class="field" for="cfg-t"><span>Leaderboard match requirement</span><input class="input" id="cfg-t" type="number" min="1" max="40" value="${S.config.threshold}" data-cfg="threshold"></label></div>
+        <span class="hint">Copy on the leaderboard, profiles and rank page follows these.</span></div>
+      <div class="demo-sec"><span class="label">Contact-change request (Admin)</span>${reqBtns}</div>
+      <div class="demo-sec"><span class="label">Open a registration link (Jomar)</span><div class="row"><button class="btn xs" data-act="openClaim" data-v="valid">Unused</button><button class="btn xs" data-act="openClaim" data-v="processing">Still processing</button><button class="btn xs" data-act="openClaim" data-v="expired">Expired</button></div>
+        <span class="hint">Once Jomar registers, the unused link shows as already used.</span></div>
+      <div class="demo-sec"><span class="label">Open a password reset link</span><div class="row"><button class="btn xs" data-act="openReset" data-v="valid">Valid</button><button class="btn xs" data-act="openReset" data-v="expired">Expired or used</button></div></div>
+      <div class="demo-sec"><div class="setting"><div class="main"><b>Next profile save fails</b><p class="small muted">Shows the error and keeps the edits.</p></div>${sw(S.failNext, 'toggleFail', 'Next profile save fails')}</div></div>
+      <div class="demo-sec"><button class="btn sm danger" data-act="resetDemo">${S.ui.resetArmed ? 'Tap again to reset everything' : 'Reset demo data'}</button></div>`,
+    '<button class="btn" data-act="closeSheet">Done</button>');
+  },
+};
+
+// ---------- Actions ----------
+function go(to, id) {
+  if (S.screen === 'edit' && to !== 'edit' && editDirty()) { S.ui.pendingGo = { to, id }; S.ui.sheet = { type: 'discard' }; render(); return; }
+  if (S.screen === 'edit') { S.ui.edit = null; S.ui.editErr = {}; S.ui.editFail = ''; }
+  S.screen = to;
+  if (id !== undefined) S.viewId = id;
+  S.ui.sheet = null; S.ui.findErr = '';
+  render();
+  window.scrollTo(0, 0);
+}
+function signIn(uid) {
+  S.me = uid;
+  S.ui.login = { id: '', pass: '', show: false, err: '', pending: false, note: '' };
+  const to = S.ui.after || { to: 'profile', id: uid };
+  S.ui.after = null;
+  go(to.to, to.id);
+}
+const digits = (v) => String(v).replace(/\D/g, '');
+const normPhone = (v) => { const d = digits(v); if (/^09\d{9}$/.test(d)) return `63${d.slice(1)}`; if (/^639\d{9}$/.test(d)) return d; return null; };
+const fmtPhone = (n) => `+63 ${n.slice(2, 5)} ${n.slice(5, 8)} ${n.slice(8)}`;
+const validEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+function accountFor(idv) {
+  const v = idv.trim().toLowerCase();
+  const ph = normPhone(v);
+  return Object.values(S.accounts).find((a) => a.claimed && ((ph && digits(a.phone) === ph) || (a.email && a.email.toLowerCase() === v)));
+}
+function validatePersonal(d) {
+  const e = {};
+  if (!d.name.trim()) e.name = 'Enter your full name.';
+  else if (d.name.trim().length > 60) e.name = 'Keep your name to 60 characters or fewer.';
+  if (d.nick.trim().length > 24) e.nick = 'Keep your nickname to 24 characters or fewer.';
+  const y = String(d.expY).trim(), m = String(d.expM).trim();
+  if (y && (!/^\d+$/.test(y) || +y > 80)) e.expY = 'Enter whole years from 0 to 80.';
+  if (m && (!/^\d+$/.test(m) || +m > 11)) e.expM = 'Enter months from 0 to 11.';
+  Object.entries(SOCIAL).forEach(([k, s]) => {
+    const v = String(d[k] || '').trim();
+    if (!v) return;
+    let ok = false;
+    try { const u = new URL(v); ok = /^https?:$/.test(u.protocol) && s.hosts.some((h) => u.hostname === h || u.hostname.endsWith(`.${h}`)); } catch (err) { ok = false; }
+    if (!ok) e[k] = `Enter a full ${s.label} link, like ${s.eg}.`;
+  });
+  return e;
+}
+const applyPersonal = (a, d) => Object.assign(a, { name: d.name.trim(), nick: d.nick.trim(), style: d.style.trim(), expY: String(d.expY).trim(), expM: String(d.expM).trim(), social: { facebook: d.facebook.trim(), instagram: d.instagram.trim(), youtube: d.youtube.trim(), linkedin: d.linkedin.trim() } });
+
+function copyText(text, el) {
+  const fallback = () => {
+    if (el) { const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+    toast('ID selected. Copy it from your device menu.');
+  };
+  try { navigator.clipboard.writeText(text).then(() => toast('Player ID copied'), fallback); } catch (e) { fallback(); }
+}
+
+const ACT = {
+  go: (el) => go(el.dataset.to),
+  goBoard: () => go('board'),
+  goLogin: () => go('login'),
+  openProfile: (el) => go('profile', el.dataset.id),
+  openRank: (el) => go('rank', el.dataset.id || null),
+  openHistory: (el) => { S.ui.hist = 'counted'; go('history', el.dataset.id); },
+  histTab: (el) => { S.ui.hist = el.dataset.v; render(); },
+  editTab: (el) => { S.ui.editTab = el.dataset.v; render(); },
+  toggleTheme: () => {
+    const t = isDark() ? 'light' : 'dark';
+    document.documentElement.dataset.theme = t;
+    try { localStorage.setItem(THEME_KEY, t); } catch (e) { /* keep for this visit only */ }
+    render();
+  },
+  openDemo: () => { S.ui.resetArmed = false; S.ui.sheet = { type: 'demo' }; render(); },
+  closeSheet: () => { S.ui.sheet = null; S.ui.pendingGo = null; render(); },
+  showMore: () => { S.shown += 25; render(); },
+  jumpMe: (el) => {
+    S.q = ''; S.shown = Math.max(S.shown, Math.ceil(+el.dataset.pos / 25) * 25); render();
+    const row = document.getElementById(`row-${S.me}`);
+    if (row) { row.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); row.focus({ preventScroll: true }); }
+  },
+  retryBoard: () => { S.board = 'loading'; render(); later(900, () => { S.board = S.online ? 'ok' : 'error'; }); },
+  sessionPage: (el) => toast(`Opens the public page for ${el.dataset.title} (see the Queue prototype)`),
+  copyId: (el) => { const p = profileOf(el.dataset.id); copyText(p.rtr, document.getElementById(el.dataset.big ? 'rtr-big' : `rtr-${p.id}`)); },
+  signOut: () => { S.me = null; S.ui.sheet = null; S.ui.edit = null; go('board'); toast('Signed out'); },
+  demoSignIn: () => { S.ui.sheet = null; signIn('u1'); },
+  openEdit: () => { S.ui.edit = null; S.ui.editErr = {}; S.ui.editFail = ''; S.ui.editTab = 'basics'; go('edit'); },
+  cancelEdit: () => go('profile', S.me),
+  discard: () => { const g = S.ui.pendingGo || { to: 'profile', id: S.me }; S.ui.edit = null; S.ui.editOrig = null; S.ui.editErr = {}; S.ui.editFail = ''; S.ui.pendingGo = null; S.ui.sheet = null; go(g.to, g.id); },
+  toggleShow: (el) => { const o = S.ui[el.dataset.k]; o.show = !o.show; render(); },
+  togglePrivacy: () => {
+    const a = S.accounts[S.me];
+    const want = !a.phoneHidden;
+    S.ui.privacyErr = '';
+    S.ui.privacyPending = true; render();
+    later(900, () => {
+      S.ui.privacyPending = false;
+      if (!S.online) { S.ui.privacyErr = `Couldn't save because you're offline. Your phone is still ${a.phoneHidden ? 'hidden from' : 'visible to'} clubs.`; return; }
+      a.phoneHidden = want;
+      toast(want ? 'Your phone number is now hidden from clubs' : 'Clubs can now see your phone number');
+    });
+  },
+  openRequest: () => {
+    const r = S.requests[S.me];
+    if (r && ['submitted', 'applying', 'failed'].includes(r.status)) { toast('You already have a request in progress'); go('account'); return; }
+    S.ui.req = { field: 'email', to: '' }; S.ui.reqErr = ''; S.ui.sheet = { type: 'request' }; render();
+  },
+  reqField: (el) => { S.ui.req = { field: el.dataset.v, to: '' }; S.ui.reqErr = ''; render(); },
+  submitRequest: () => {
+    const R = S.ui.req, a = S.accounts[S.me];
+    const v = R.to.trim();
+    let to = v;
+    S.ui.reqErr = '';
+    if (!v) S.ui.reqErr = `Enter the new ${REQ_FIELD[R.field].toLowerCase()}.`;
+    else if (R.field === 'email' && !validEmail(v)) S.ui.reqErr = 'Enter an email address, like name@example.com.';
+    else if (R.field === 'phone') { const n = normPhone(v); if (!n) S.ui.reqErr = 'Enter a Philippine mobile number, like 0917 555 0142.'; else to = fmtPhone(n); }
+    if (!S.ui.reqErr) {
+      if (to.toLowerCase() === (R.field === 'phone' ? a.phone : a.email).toLowerCase()) S.ui.reqErr = `That's already your ${REQ_FIELD[R.field].toLowerCase()}.`;
+      else if (Object.values(S.accounts).some((o) => o.id !== a.id && (R.field === 'phone' ? o.phone === to : o.email && o.email.toLowerCase() === to.toLowerCase()))) S.ui.reqErr = `That ${REQ_FIELD[R.field].toLowerCase()} belongs to another ROTRA profile. Contact ROTRA for help.`;
+    }
+    if (S.ui.reqErr) { render(); return; }
+    S.ui.reqPending = true; render();
+    later(800, () => {
+      S.ui.reqPending = false;
+      if (!S.online) { S.ui.reqErr = 'Couldn\'t send because you\'re offline. Try again when you\'re connected.'; return; }
+      S.requests[a.id] = { field: R.field, from: R.field === 'phone' ? a.phone : a.email, to, status: 'submitted', at: Date.now() };
+      S.ui.sheet = null; S.screen = 'account';
+      toast('Request sent for review');
+    });
+  },
+  reqAdvance: (el) => {
+    const uid = S.me || 'u1', r = S.requests[uid];
+    r.status = el.dataset.v;
+    if (r.status === 'applied') S.accounts[uid][r.field] = r.to;
+    render();
+  },
+  setRank: (el) => { S.rank = el.dataset.v; render(); },
+  setBoard: (el) => { S.board = el.dataset.v; render(); },
+  toggleOnline: () => { S.online = !S.online; S.offlineAt = S.online ? null : Date.now(); render(); },
+  toggleFail: () => { S.failNext = !S.failNext; render(); },
+  openClaim: (el) => { S.claim = el.dataset.v; S.ui.claimConfirmed = false; S.ui.claimWrong = false; S.ui.claimErr = {}; S.ui.claimFail = ''; S.ui.claimChecks = 0; S.ui.sheet = null; go('claim'); },
+  claimYes: () => { S.ui.claimConfirmed = true; render(); window.scrollTo(0, 0); },
+  claimNo: () => { S.ui.claimWrong = true; render(); },
+  claimBack: () => { S.ui.claimWrong = false; render(); },
+  claimCheck: () => {
+    S.ui.claimChecks += 1;
+    if (S.ui.claimChecks < 2) { toast('Still setting up. Check again in a moment.'); return; }
+    const a = S.accounts.u2;
+    const C = { name: a.name, nick: a.nick, style: '', expY: '', expM: '', facebook: a.social.facebook, instagram: '', youtube: '', linkedin: '', email: '', ...(S.ui.claim || {}) };
+    if (!C.email) C.email = 'jomar.delacruz@example.com';
+    finishClaim(C);
+  },
+  openReset: (el) => { S.resetLink = el.dataset.v; S.ui.reset = { a: '', b: '', show: false, err: '', pending: false }; S.ui.sheet = null; go('reset'); },
+  resetDemo: () => {
+    if (!S.ui.resetArmed) { S.ui.resetArmed = true; render(); return; }
+    S = freshState(); genCache.clear(); save(); render(); toast('Demo data reset');
+  },
+};
+function finishClaim(C) {
+  const a = S.accounts.u2;
+  applyPersonal(a, C);
+  a.email = C.email.trim(); a.claimed = true;
+  S.claim = 'valid'; S.ui.claim = null; S.ui.claimConfirmed = false; S.me = 'u2';
+  go('claimDone');
+}
+
+const FORM = {
+  find: () => {
+    const q = S.q.trim();
+    if (!/^rtr-/i.test(q)) return;
+    const id = q.toUpperCase();
+    const hit = Object.values(S.accounts).find((a) => a.rtr === id) || BASE.find((e) => e.rtr === id);
+    if (hit) { S.q = ''; go('profile', hit.id); } else { S.ui.findId = id; go('notfound', null); }
+  },
+  login: () => {
+    const L = S.ui.login;
+    L.err = ''; L.note = '';
+    if (!L.id.trim()) L.err = 'Enter your phone number or email.';
+    else if (!L.pass) L.err = 'Enter your password.';
+    if (L.err) { render(); return; }
+    L.pending = true; render();
+    later(700, () => {
+      L.pending = false;
+      if (!S.online) { L.err = 'You\'re offline. Signing in needs an internet connection.'; return; }
+      const a = accountFor(L.id);
+      if (!a) { L.err = 'That phone number or email and password don\'t match. Check them and try again.'; return; }
+      signIn(a.id);
+    });
+  },
+  forgot: () => {
+    const F = S.ui.forgot;
+    F.err = '';
+    if (!validEmail(F.email.trim())) { F.err = 'Enter an email address, like name@example.com.'; render(); return; }
+    F.pending = true; render();
+    later(800, () => {
+      F.pending = false;
+      if (!S.online) { F.err = 'Couldn\'t send because you\'re offline. Try again when you\'re connected.'; return; }
+      F.sent = F.email.trim();
+    });
+  },
+  reset: () => {
+    const R = S.ui.reset;
+    R.err = '';
+    if (!R.a) R.err = 'Enter a new password.';
+    else if (R.a !== R.b) R.err = 'The two passwords don\'t match.';
+    if (R.err) { render(); return; }
+    R.pending = true; render();
+    later(800, () => {
+      R.pending = false;
+      if (!S.online) { R.err = 'Couldn\'t save because you\'re offline. Try again when you\'re connected.'; return; }
+      S.resetLink = 'used'; S.ui.forgot = { email: '', err: '', pending: false, sent: '' };
+      S.ui.login.note = 'Password saved. Sign in with your new password.';
+      S.screen = 'login';
+    });
+  },
+  edit: () => {
+    const d = S.ui.edit;
+    S.ui.editErr = validatePersonal(d); S.ui.editFail = '';
+    if (Object.keys(S.ui.editErr).length) { const t = EDIT_TABS.find((x) => x.keys.some((k) => S.ui.editErr[k])); if (t) S.ui.editTab = t.id; render(); const bad = document.querySelector('[aria-invalid="true"]'); if (bad) bad.focus(); return; }
+    S.ui.editPending = true; render();
+    later(900, () => {
+      S.ui.editPending = false;
+      if (!S.online) { S.ui.editFail = 'You\'re offline, so nothing was saved. Your edits are still here; save again when you\'re connected.'; return; }
+      if (S.failNext) { S.failNext = false; S.ui.editFail = 'Couldn\'t save your profile. Your edits are still here. Try again.'; return; }
+      applyPersonal(S.accounts[S.me], d);
+      S.ui.edit = null; S.ui.editOrig = null;
+      S.screen = 'profile'; S.viewId = S.me;
+      toast('Profile saved');
+      window.scrollTo(0, 0);
+    });
+  },
+  claim: () => {
+    const C = S.ui.claim;
+    const e = validatePersonal(C);
+    if (!C.email.trim()) e.email = 'Enter your email.';
+    else if (!validEmail(C.email.trim())) e.email = 'Enter an email address, like name@example.com.';
+    else if (Object.values(S.accounts).some((a) => a.id !== 'u2' && a.email.toLowerCase() === C.email.trim().toLowerCase())) e.email = 'This email belongs to another ROTRA account. Use a different email, or ask ROTRA for help.';
+    if (!C.pass) e.pass = 'Choose a password.';
+    if (C.pass && C.pass !== C.pass2) e.pass2 = 'The two passwords don\'t match.';
+    S.ui.claimErr = e; S.ui.claimFail = '';
+    if (Object.keys(e).length) { render(); const bad = document.querySelector('.input.bad'); if (bad) bad.focus(); return; }
+    S.ui.claimPending = true; render();
+    later(1100, () => {
+      S.ui.claimPending = false;
+      if (!S.online) { S.ui.claimFail = 'You\'re offline, so registration wasn\'t sent. Your details are still here; try again when you\'re connected.'; return; }
+      finishClaim(C);
+    });
+  },
+  request: () => ACT.submitRequest(),
+};
+
+// ---------- Events ----------
+const setPath = (path, v) => { const ks = path.split('.'); let o = S; ks.slice(0, -1).forEach((k) => { o = o[k]; }); o[ks[ks.length - 1]] = v; };
+document.addEventListener('click', (ev) => {
+  const el = ev.target.closest('[data-act]');
+  if (!el || el.disabled) return;
+  const fn = ACT[el.dataset.act];
+  if (fn) { ev.preventDefault(); fn(el); }
+});
+document.addEventListener('submit', (ev) => {
+  const f = ev.target.closest('[data-form]');
+  if (!f) return;
+  ev.preventDefault();
+  const fn = FORM[f.dataset.form];
+  if (fn) fn();
+});
+// Phone input mask: once a field holds only phone characters it is grouped as 0917 555 0142 or +63 917 555 0142,
+// keeping the caret after the same digit. Email text is left alone; deleting doesn't re-mask, so a space can be removed.
+function maskPhoneInput(v) {
+  if (!/^\s*\+?[\d\s()-]*$/.test(v) || !/\d/.test(v)) return v;
+  const d = v.replace(/\D/g, '');
+  if (/^\s*\+/.test(v) || d.startsWith('63')) { const x = d.slice(0, 12); return `+${[x.slice(0, 2), x.slice(2, 5), x.slice(5, 8), x.slice(8)].filter(Boolean).join(' ')}`; }
+  const x = d.slice(0, 11);
+  return [x.slice(0, 4), x.slice(4, 7), x.slice(7)].filter(Boolean).join(' ');
+}
+function applyPhoneMask(el, ev) {
+  if ((ev.inputType || '').startsWith('delete')) return;
+  const next = maskPhoneInput(el.value);
+  if (next === el.value) return;
+  const before = el.value.slice(0, el.selectionStart ?? el.value.length).replace(/\D/g, '').length;
+  el.value = next;
+  let pos = 0, seen = 0;
+  while (pos < next.length && seen < before) { if (/\d/.test(next[pos])) seen += 1; pos += 1; }
+  try { el.setSelectionRange(pos, pos); } catch (e) { /* not a text field */ }
+}
+document.addEventListener('input', (ev) => {
+  const el = ev.target;
+  if (el.id === 'login-id' || (el.id === 'req-to' && el.type === 'tel')) applyPhoneMask(el, ev);
+  if (el.dataset.bind) {
+    setPath(el.dataset.bind, el.value);
+    if (el.dataset.live !== undefined) { S.shown = 25; S.ui.findErr = ''; render(); } else save();
+  }
+  if (el.dataset.cfg) {
+    const n = Math.round(+el.value);
+    if (!Number.isFinite(n) || el.value === '') return;
+    if (el.dataset.cfg === 'weight') S.config.weight = Math.max(0, Math.min(100, n));
+    else S.config.threshold = Math.max(1, Math.min(40, n));
+    render();
+  }
+});
+// Edit profile marks sections with unsaved changes; refresh those marks when a field is left.
+document.addEventListener('change', (ev) => { if ((ev.target.dataset.bind || '').startsWith('ui.edit.')) render(); });
+document.addEventListener('keydown', (ev) => {
+  if (ev.key === 'Escape' && S.ui.sheet) { ACT.closeSheet(); }
+});
+
+// ---------- Render ----------
+let lastSheet = null;
+function render() {
+  const a = document.activeElement;
+  const focusId = a && a.id && a !== document.body ? a.id : null;
+  let sel = null;
+  try { sel = a && typeof a.selectionStart === 'number' ? a.selectionStart : null; } catch (e) { sel = null; }
+  const views = { board: viewBoard, profile: viewProfile, rank: viewRank, history: viewHistory, id: viewId, account: viewAccount, edit: viewEdit, login: viewLogin, forgot: viewForgot, reset: viewReset, claim: viewClaim, claimDone: viewClaimDone, notfound: viewNotFound };
+  const sh = S.ui.sheet;
+  document.getElementById('app').innerHTML = topBar() + (views[S.screen] || viewBoard)() + (sh ? SHEETS[sh.type](sh) : '');
+  document.body.style.overflow = sh ? 'hidden' : '';
+  if (sh && sh.type !== lastSheet) {
+    const t = document.getElementById('sheet-title');
+    if (t) t.focus();
+  } else if (focusId && document.getElementById(focusId)) {
+    const el = document.getElementById(focusId);
+    el.focus({ preventScroll: true });
+    if (sel != null && el.setSelectionRange) { try { el.setSelectionRange(sel, sel); } catch (e) { /* not a text field */ } }
+    // Number fields can't report their caret; re-assigning the value puts it back at the end, where the person was typing.
+    else if (el.type === 'number') { const v = el.value; el.value = ''; el.value = v; }
+  }
+  lastSheet = sh ? sh.type : null;
+  startFire();
+  save();
+}
+render();
+})();
+</script>

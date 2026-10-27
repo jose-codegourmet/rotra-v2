@@ -1,3 +1,5 @@
+> **V1 product reset (2026-10-25):** This document describes the earlier product/repository. For new target business behavior, start with [v1 business logic](business_logic/README.md). Existing implementation claims still require code verification.
+
 # 🏸 Badminton Queueing & Leaderboard App
 
 **Product Design Overview**

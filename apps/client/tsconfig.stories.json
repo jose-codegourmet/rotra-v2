@@ -1,8 +1,0 @@
-{
-	"extends": "./tsconfig.json",
-	"compilerOptions": {
-		"jsx": "react-jsx"
-	},
-	"include": ["next-env.d.ts", "**/*.stories.ts", "**/*.stories.tsx"],
-	"exclude": ["node_modules"]
-}

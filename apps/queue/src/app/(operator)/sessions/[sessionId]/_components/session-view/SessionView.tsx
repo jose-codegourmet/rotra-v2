@@ -15,6 +15,7 @@ import type { Match } from '@rotra/data/match/types'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import type { SessionCourt } from '@rotra/data/queue-session/types'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
+import { useRemoveCourt } from '@rotra/data/queue-session/useRemoveCourt'
 import type { SessionPlayer } from '@rotra/data/session-roster/types'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { AddCourtTile } from '@rotra/ui/add-court-tile'
@@ -22,6 +23,7 @@ import { CourtCard, type CourtCardProps } from '@rotra/ui/court-card'
 import type { CourtPlayer } from '@rotra/ui/court-drawing'
 import { formatTime } from '@rotra/ui/now-card/helpers'
 import { Skeleton } from '@rotra/ui/skeleton'
+import { toast } from '@rotra/ui/toaster'
 import { UpcomingQueueRow, type UpcomingQueueMatch } from '@rotra/ui/upcoming-queue-row'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 
@@ -39,8 +41,10 @@ export type SessionViewProps = {
  * Q-COURTS, the console's Session view: "Courts" with "F of C free", one CourtCard per court from
  * the match rules (in game, or free with the next eligible match or why none can start), the
  * + Add court tile, the footer line, then UpcomingQueueRow with the whole waiting queue. The court
- * and queue-card actions (Review and start, Pick another, Open match, Add match, Start, Edit, Remove)
- * are wired by Queue › Match queue and Match control; here only the pictures and More queues act.
+ * and queue-card actions (Review and start, Pick another, Open match, Add match, Start, Edit) are
+ * wired by Queue › Match queue and Match control; here the pictures, More queues and Remove on a
+ * free court act. Remove goes straight to useRemoveCourt with a "LABEL removed" toast (no dialog,
+ * per dialogs.md); an occupied court is refused with "Only a free court can be removed".
  */
 export function SessionView({
   sessionId,
@@ -51,6 +55,7 @@ export function SessionView({
   const session = useQueueSession(sessionId)
   const roster = useSessionRoster(sessionId)
   const matches = useSessionMatches(sessionId)
+  const removeCourt = useRemoveCourt()
 
   if (session.isError || roster.isError || matches.isError)
     return (
@@ -100,6 +105,19 @@ export function SessionView({
   const active = activeMatches(ctx.matches)
   const free = freeCourts(courts, ctx.matches)
   const untilLabel = (c: SessionCourt) => formatTime(c.openUntil ?? s.scheduledEndAt)
+  const onRemoveCourt = (c: SessionCourt) => {
+    if (removeCourt.isPending) return
+    removeCourt.mutate(
+      { sessionId, courtId: c.id },
+      {
+        onSuccess: (result) => toast(result.message),
+        onError: (error) =>
+          toast.error(
+            error instanceof Error ? error.message : 'Something went wrong. Try again.',
+          ),
+      },
+    )
+  }
 
   // A 5v5 on two courts draws once, as one merged card, under its first court.
   const covered = new Set<string>()
@@ -135,6 +153,7 @@ export function SessionView({
       untilLabel: untilLabel(c),
       bookingEnded: isBookingEnded(c, s.scheduledEndAt, now),
       isLastCourt: courts.length <= 1,
+      onRemove: () => onRemoveCourt(c),
       next: next.match
         ? {
             skippedReason: next.skipped ?? undefined,

@@ -7,9 +7,12 @@
     "**/*.css"
   ],
   "exports": {
+    "./button": "./src/components/button/Button.tsx",
     "./cn": "./src/lib/cn.ts",
-    "./meta": "./src/lib/meta.ts",
     "./icon": "./src/components/icon/Icon.tsx",
+    "./icon-button": "./src/components/icon-button/IconButton.tsx",
+    "./meta": "./src/lib/meta.ts",
+    "./spinner": "./src/components/spinner/Spinner.tsx",
     "./theme-provider": "./src/components/theme-provider/ThemeProvider.tsx",
     "./theme-provider/script": "./src/components/theme-provider/ThemeProvider.script.ts",
     "./theme-toggle": "./src/components/theme-toggle/ThemeToggle.tsx"

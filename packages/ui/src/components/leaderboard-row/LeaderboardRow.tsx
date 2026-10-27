@@ -4,6 +4,7 @@ import { cn } from '@rotra/ui/cn'
 import { type LeaderboardRowVariants, leaderboardRowVariants } from './LeaderboardRow.variants'
 
 export type LeaderboardRowProps = LeaderboardRowVariants & {
+  id?: string
   position: number
   fullName: string
   nickname?: string | null
@@ -18,7 +19,7 @@ function positionLabel(
   variant: LeaderboardRowVariants['variant'],
   isMe: boolean,
 ) {
-  const medal = variant?.replace('medal-', '')
+  const medal = variant?.startsWith('medal-') ? variant.replace('medal-', '') : undefined
   const place = medal === '1' ? 'First place' : medal === '2' ? 'Second place' : 'Third place'
   return `${medal ? place : `Number ${position.toLocaleString('en-PH')}`},${isMe ? ' (you),' : ''}`
 }
@@ -32,6 +33,7 @@ function medalClasses(variant: LeaderboardRowVariants['variant']) {
 
 /** One selectable player in the overall ROTRA leaderboard. */
 export function LeaderboardRow({
+  id,
   position,
   fullName,
   nickname,
@@ -47,6 +49,7 @@ export function LeaderboardRow({
 
   return (
     <button
+      id={id}
       type="button"
       onClick={onSelect}
       aria-label={accessibleName}

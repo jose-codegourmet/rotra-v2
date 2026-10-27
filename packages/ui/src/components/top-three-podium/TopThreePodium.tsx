@@ -3,6 +3,7 @@ import { cn } from '@rotra/ui/cn'
 import { PixelFire } from './pixel-fire/PixelFire'
 
 export type PodiumEntry = {
+  id?: string
   fullName: string
   nickname?: string | null
   levelLabel: string
@@ -43,11 +44,12 @@ export function TopThreePodium({ entries, totalPlayers, onSelect }: TopThreePodi
       <div className="grid grid-cols-3 items-end gap-2.5 pt-10 max-[560px]:gap-1.5 max-[560px]:pt-8">
         {entries.map((entry, index) => (
           <button
-            key={entry.fullName}
+            key={entry.id ?? entry.fullName}
+            id={entry.id}
             type="button"
             onClick={() => onSelect(index)}
             aria-label={`${place[index]} place, ${entry.fullName}${entry.isMe ? ' (you)' : ''}, ${entry.levelLabel}`}
-            className="flex min-w-0 flex-col items-center gap-3 border-0 bg-transparent p-0 text-inherit"
+            className={cn("flex min-w-0 flex-col items-center gap-3 border-0 bg-transparent p-0 text-inherit", index === 0 ? "order-2" : index === 1 ? "order-1" : "order-3")}
           >
             <span className="relative flex min-w-0 flex-col items-center gap-0.5 text-center">
               {index === 0 ? <PixelFire /> : null}

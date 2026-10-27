@@ -59,7 +59,7 @@ packages/
   ui/                     every visual component and form + the one Storybook
   data/                   types, fixtures, mock store, fetchers, query keys, hooks
   schema/                 shared Zod fields (email, phone, date, money, password)
-  config/                 tsconfig + Tailwind 4 tokens (current file is old; replaced by Foundation)
+  config/                 tsconfig + Tailwind 4 tokens (theme.css; see its AGENTS.md)
   db/                     Prisma + services (database epic, later)
 docs/
   architecture.md         apps, packages, dependency rules, data flow, offline, auth, database

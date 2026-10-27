@@ -13,7 +13,7 @@ where something belongs. For *how to write* the code, read [coding-conventions.m
 | Path | State |
 |---|---|
 | `apps/` | `queue`, `player`, `admin`: Next.js 16 scaffolds with placeholder home pages (F01.1) |
-| `packages/config` | Old v0 Tailwind 3-style token file and tsconfig. **To be replaced** by the prototype tokens (§6) |
+| `packages/config` | Shared tsconfig and `theme.css`: Tailwind 4 tokens copied from the prototypes (F02.1) |
 | `packages/db` | **Empty.** The database epic comes after the mock phase (§9) |
 | `openspec/` | Cleared. Not used in the v1 process |
 | `docs/frames/*/*.html` | The three clickable prototypes: the design source of truth |
@@ -167,8 +167,9 @@ HTTP API, and one write path is easier to review. Adding a Server Action needs a
 | Motion | `motion` (`motion/react`) for component animation; all motion respects reduced-motion |
 | Tables | TanStack Table v8 behind a `@rotra/ui` data-table component |
 
-The old `packages/config/tailwind-config/index.ts` (Satoshi, `bg-base` names) and the old visual spec in
-[branding.md](branding/branding.md) are superseded by the prototypes for every visual decision.
+The tokens live in `packages/config/theme.css` ([its AGENTS.md](../packages/config/AGENTS.md) lists the
+utilities). The old visual spec in [branding.md](branding/branding.md) is superseded by the prototypes
+for every visual decision.
 
 ---
 

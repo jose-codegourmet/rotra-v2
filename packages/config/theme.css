@@ -1,0 +1,211 @@
+/*
+ * ROTRA theme: Tailwind 4 tokens copied from the prototypes (docs/frames/*.html › :root).
+ * The only file in the repo allowed to hold hex or rgba colour values.
+ *
+ * Dark is the default (:root). Light is <html data-theme="light">. The app sets data-theme explicitly
+ * (ThemeProvider), so the prototypes' prefers-color-scheme fallback is deliberately not copied.
+ *
+ * Import after tailwindcss:
+ *   @import "tailwindcss";
+ *   @import "@rotra/config/theme.css";
+ *
+ * Fonts are not defined here. Each app loads them with next/font and sets --font, --mono
+ * (and --pixel in apps/player) on <html>; the @theme fonts below fall back to system fonts.
+ */
+
+/* Touch screens and windows up to 1024 px get bigger targets (experience contract › touch sizing). */
+@custom-variant touch (@media (pointer: coarse), (max-width: 1024px));
+
+@theme inline {
+  /* Tokens only: drop Tailwind's default palette so bg-red-500 and friends cannot be used. */
+  --color-*: initial;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-elev: var(--elev);
+  --color-overlay: var(--overlay);
+  --color-fg: var(--fg);
+  --color-fg2: var(--fg2);
+  --color-fg3: var(--fg3);
+  --color-accent: var(--accent);
+  --color-accent-dim: var(--accent-dim);
+  --color-accent-subtle: var(--accent-subtle);
+  --color-on-accent: var(--on-accent);
+  --color-error: var(--error);
+  --color-error-subtle: var(--error-subtle);
+  --color-warn: var(--warn);
+  --color-warn-subtle: var(--warn-subtle);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-scrim: var(--scrim);
+  --color-field: var(--field);
+  --color-knob: var(--knob);
+  --color-court: var(--court);
+  --color-court-line: var(--court-line);
+  --color-court-free: var(--court-free);
+  --color-court-free-line: var(--court-free-line);
+  --color-on-photo: var(--on-photo);
+  --color-photo-label: var(--photo-label);
+  /* Player Information only: podium medals and QR codes */
+  --color-gold: var(--gold);
+  --color-silver: var(--silver);
+  --color-bronze: var(--bronze);
+  --color-qr-bg: var(--qr-bg);
+  --color-qr-fg: var(--qr-fg);
+
+  /* rounded-lg = --r (10px, cards, buttons); rounded-md = --r-sm (6px, inputs, small rows) */
+  --radius-lg: var(--r);
+  --radius-md: var(--r-sm);
+
+  /* shadow-card = the prototypes' --shadow (none in dark, soft lift in light) */
+  --shadow-card: var(--shadow);
+  --shadow-sheet: var(--shadow-sheet);
+  --shadow-pop: var(--shadow-pop);
+  --shadow-drawer: var(--shadow-drawer);
+
+  --font-sans: var(--font, system-ui), system-ui, sans-serif;
+  --font-mono: var(--mono, ui-monospace), ui-monospace, monospace;
+  --font-pixel: var(--pixel, var(--mono, ui-monospace)), ui-monospace, monospace;
+
+  --animate-pulse: pulse 1s infinite;
+
+  @keyframes pulse {
+    50% {
+      opacity: 0.3;
+    }
+  }
+}
+
+:root {
+  --bg: #0b0b0c;
+  --surface: #1a1a1d;
+  --elev: #2a2a2e;
+  --overlay: #3a3a3f;
+  --fg: #f0f0f2;
+  --fg2: #9090a0;
+  --fg3: #5a5a66;
+  --accent: #00ff88;
+  --accent-dim: #00cc6a;
+  --accent-subtle: rgba(0, 255, 136, 0.13);
+  --on-accent: #0b0b0c;
+  --error: #ff4d4d;
+  --error-subtle: rgba(255, 77, 77, 0.12);
+  --warn: #ffb800;
+  --warn-subtle: rgba(255, 184, 0, 0.12);
+  --border: #2a2a2e;
+  --border-strong: #404048;
+  --scrim: rgba(0, 0, 0, 0.6);
+  --r: 10px;
+  --r-sm: 6px;
+  --court: #14603f;
+  --court-line: rgba(255, 255, 255, 0.85);
+  --court-free: #232328;
+  --court-free-line: rgba(255, 255, 255, 0.16);
+  --shadow: none;
+  --knob: var(--fg);
+  --field: var(--bg);
+
+  /* Named here because the prototypes hardcode them inline (same in both themes). */
+  --shadow-sheet: 0 24px 60px rgba(0, 0, 0, 0.45); /* .sheet */
+  --shadow-pop: 0 10px 30px rgba(0, 0, 0, 0.35); /* .toast, floating bars */
+  --shadow-drawer: 0 0 40px rgba(0, 0, 0, 0.25); /* .rail and settings drawers on phones */
+  --on-photo: #ffffff; /* .pf-n: player name over the court drawing */
+  --photo-label: rgba(0, 0, 0, 0.55); /* .pf-n background */
+
+  /* Player Information prototype only */
+  --gold: #f2c14e;
+  --silver: #c3c8d0;
+  --bronze: #d38b52;
+  --qr-bg: #ffffff;
+  --qr-fg: #0b0b0c;
+
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  /* Light: white cards on a soft off-white page, a deeper green that reads as text and carries white labels (AA). */
+  --bg: #f4f5f2;
+  --surface: #ffffff;
+  --elev: #eef0ec;
+  --overlay: #dfe3dc;
+  --fg: #121513;
+  --fg2: #535a54;
+  --fg3: #7a817b;
+  --accent: #0a7d44;
+  --accent-dim: #086a39;
+  --accent-subtle: rgba(10, 125, 68, 0.09);
+  --on-accent: #ffffff;
+  --error: #c62828;
+  --error-subtle: rgba(198, 40, 40, 0.07);
+  --warn: #a35600;
+  --warn-subtle: rgba(217, 119, 6, 0.09);
+  --border: #e2e5df;
+  --border-strong: #cdd2c9;
+  --scrim: rgba(18, 21, 19, 0.4);
+  --court: #2e8b57;
+  --court-line: #ffffff;
+  --court-free: #e8ebe5;
+  --court-free-line: rgba(18, 21, 19, 0.14);
+  --shadow: 0 1px 2px rgba(18, 24, 20, 0.05), 0 2px 8px rgba(18, 24, 20, 0.04);
+  --knob: #ffffff;
+  --field: #ffffff;
+
+  --gold: #946600;
+  --silver: #5f6774;
+  --bronze: #93501f;
+
+  color-scheme: light;
+}
+
+/* Base type from the prototypes' shared stylesheet. */
+@layer base {
+  html,
+  body {
+    min-height: 100%;
+  }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font, system-ui), system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+  h1,
+  h2,
+  h3 {
+    margin: 0;
+    text-wrap: balance;
+    letter-spacing: -0.3px;
+  }
+  h1 {
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1.2;
+  }
+  h2 {
+    font-size: 18px;
+    font-weight: 700;
+  }
+  h3 {
+    font-size: 15px;
+    font-weight: 700;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+}

@@ -1,6 +1,7 @@
 'use client'
 
 import { Button } from '@rotra/ui/button'
+import { Select } from '@rotra/ui/select'
 import { Sheet } from '@rotra/ui/sheet'
 import { Switch } from '@rotra/ui/switch'
 import { TextInput } from '@rotra/ui/text-input'
@@ -22,6 +23,13 @@ export type DevMenuProps = {
     matchRequirement: number
     onChange: (settings: { assessmentWeightPercent: number; matchRequirement: number }) => void
   }
+  playerScenarios?: {
+    rank: string; leaderboard: string
+    rankOptions: { value: string; label: string }[]
+    leaderboardOptions: { value: string; label: string }[]
+    onRankChange: (value: string) => void
+    onLeaderboardChange: (value: string) => void
+  }
   actions?: { label: string; onClick: () => void; disabled?: boolean }[]
 }
 const CONTROLS = [
@@ -40,6 +48,7 @@ export function DevMenu({
   onReset,
   actions,
   rankingSettings,
+  playerScenarios,
 }: DevMenuProps) {
   const settingsId = useId()
   return (
@@ -69,6 +78,14 @@ export function DevMenu({
             />
           </div>
         ))}
+        {playerScenarios && (
+          <section className="flex flex-col gap-3 border-t border-border pt-3">
+            <h3>Migs's rank</h3>
+            <Select aria-label="Migs's rank" value={playerScenarios.rank} options={playerScenarios.rankOptions} onChange={playerScenarios.onRankChange} />
+            <h3>Leaderboard</h3>
+            <Select aria-label="Leaderboard" value={playerScenarios.leaderboard} options={playerScenarios.leaderboardOptions} onChange={playerScenarios.onLeaderboardChange} />
+          </section>
+        )}
         {rankingSettings && (
           <section className="flex flex-col gap-3 border-t border-border pt-3">
             <h3>Admin settings</h3>

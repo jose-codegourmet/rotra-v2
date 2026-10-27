@@ -1,5 +1,6 @@
 'use client'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { playerKeys } from '../player/queryKeys'
 import { leaderboardKeys } from '../leaderboard/queryKeys'
 import { getRankingSettings, setRankingSettings } from './fetchers'
 import { rankingSettingsKeys } from './queryKeys'
@@ -19,6 +20,7 @@ export function useSetRankingSettings() {
       await Promise.all([
         client.invalidateQueries({ queryKey: rankingSettingsKeys.all }),
         client.invalidateQueries({ queryKey: leaderboardKeys.all }),
+        client.invalidateQueries({ queryKey: playerKeys.all }),
       ])
     },
   })

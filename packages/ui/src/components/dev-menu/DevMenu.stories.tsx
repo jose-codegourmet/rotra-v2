@@ -1,4 +1,4 @@
-import { devMenuFixtures } from '@rotra/data/fixtures/dev-menu'
+import { devMenuFixtures, playerRankOptions, leaderboardOptions } from '@rotra/data/fixtures/dev-menu'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 import { DevMenu, type DevMenuProps } from './DevMenu'
@@ -37,3 +37,10 @@ export const Expired: Story = { args: { toggles: devMenuFixtures.expired } }
 export const SaveFailure: Story = { args: { toggles: devMenuFixtures.saveFailure } }
 export const Conflict: Story = { args: { toggles: devMenuFixtures.conflict } }
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
+
+export const PlayerScenarios: Story = {
+  args: { playerScenarios: {
+    rank: 'on-leaderboard', leaderboard: 'normal', rankOptions: playerRankOptions, leaderboardOptions,
+    onRankChange: () => {}, onLeaderboardChange: () => {},
+  } },
+}

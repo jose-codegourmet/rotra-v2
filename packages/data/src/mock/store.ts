@@ -9,6 +9,8 @@ import { rankingSettings } from '../fixtures/rankingSettings'
 import { venues } from '../fixtures/venues'
 import type { ClubLicenseTerm } from '../license/license.types'
 import type { Match } from '../match/match.types'
+import { createPlayerRankFixtures } from '../fixtures/playerRanks'
+import type { PlayerRank, PlayerSessionRecord } from '../player/player.types'
 import type { Player } from '../player/player.types'
 import type { DownloadState, QueueSession, SessionCourt } from '../queue-session/queueSession.types'
 import type { RankingSettings } from '../ranking-settings/rankingSettings.types'
@@ -19,6 +21,8 @@ import type {
 } from '../session-roster/sessionRoster.types'
 import type { SaveOutcome, SyncState } from '../sync/sync.types'
 export type MockState = {
+  playerRanks: Record<string, PlayerRank>
+  playerGames: Record<string, PlayerSessionRecord[]>
   rankingSettings: RankingSettings
   clubs: Club[]
   venues: ClubVenue[]
@@ -49,6 +53,7 @@ function freeze<T>(value: T): DeepReadonly<T> {
 function seedState(): MockState {
   const now = Date.now()
   return structuredClone({
+    ...createPlayerRankFixtures(),
     rankingSettings,
     clubs,
     venues,

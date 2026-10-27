@@ -23,6 +23,7 @@
     "./choice-group": "./src/components/choice-group/ChoiceGroup.tsx",
     "./cn": "./src/lib/cn.ts",
     "./confirm-sheet": "./src/components/confirm-sheet/ConfirmSheet.tsx",
+    "./count-stepper": "./src/components/count-stepper/CountStepper.tsx",
     "./data-table": "./src/components/data-table/DataTable.tsx",
     "./date-picker": "./src/components/date-picker/DatePicker.tsx",
     "./date-picker/date-calendar": "./src/components/date-picker/date-calendar/DateCalendar.tsx",
@@ -33,6 +34,9 @@
     "./field/variants": "./src/components/field/Field.variants.ts",
     "./forms/club-login-form": "./src/forms/club-login-form/ClubLoginForm.tsx",
     "./forms/club-login-form/schema": "./src/forms/club-login-form/ClubLoginForm.schema.ts",
+    "./forms/venue-form": "./src/forms/venue-form/VenueForm.tsx",
+    "./forms/venue-form/default-values": "./src/forms/venue-form/VenueForm.defaultValues.ts",
+    "./forms/venue-form/schema": "./src/forms/venue-form/VenueForm.schema.ts",
     "./hooks/use-media-query": "./src/hooks/useMediaQuery.ts",
     "./icon": "./src/components/icon/Icon.tsx",
     "./icon-button": "./src/components/icon-button/IconButton.tsx",
@@ -63,7 +67,8 @@
     "./theme-provider/script": "./src/components/theme-provider/ThemeProvider.script.ts",
     "./theme-toggle": "./src/components/theme-toggle/ThemeToggle.tsx",
     "./time-field": "./src/components/time-field/TimeField.tsx",
-    "./toaster": "./src/components/toaster/Toaster.tsx"
+    "./toaster": "./src/components/toaster/Toaster.tsx",
+    "./venue-card": "./src/components/venue-card/VenueCard.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

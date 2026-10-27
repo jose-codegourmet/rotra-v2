@@ -170,18 +170,6 @@ export function SavedPlayers() {
         totalCount={all.data?.players.length ?? 0}
         liveSessionTitle={live?.title ?? null}
       />
-      {activeFilters || filters.search ? (
-        <div className="flex justify-end">
-          <Button
-            size="xs"
-            variant="ghost"
-            onClick={() => setFilters(DEFAULT_SAVED_PLAYERS_FILTERS)}
-          >
-            Clear{' '}
-            {activeFilters ? `${activeFilters} filter${activeFilters > 1 ? 's' : ''}` : 'search'}
-          </Button>
-        </div>
-      ) : null}
       {list.isError ? (
         <QueryError query={list} title="Couldn't load saved players." />
       ) : list.isPending ? (

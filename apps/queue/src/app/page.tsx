@@ -1,7 +1,8 @@
 import { cn } from '@rotra/ui/cn'
+import { ThemeToggle } from '@rotra/ui/theme-toggle'
 
 // Placeholder until the product screens land. The swatches check the theme tokens against the
-// prototype; switch <html data-theme> to "light" in devtools to compare the light theme.
+// prototype in both themes (use the toggle).
 const SWATCHES = [
   ['bg', 'bg-bg'],
   ['surface', 'bg-surface'],
@@ -20,9 +21,12 @@ const SWATCHES = [
 export default function HomePage() {
   return (
     <main className="mx-auto flex max-w-[1240px] flex-col gap-5 px-4 py-5">
-      <h1>
-        ROTRA <span className="text-accent">Queue</span>
-      </h1>
+      <div className="flex items-center justify-between gap-3">
+        <h1>
+          ROTRA <span className="text-accent">Queue</span>
+        </h1>
+        <ThemeToggle />
+      </div>
       <p className="text-fg2">Run the game: club sessions, courts and the shared queue.</p>
       <ul className="grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-3">
         {SWATCHES.map(([name, className]) => (

@@ -8,7 +8,11 @@
   ],
   "exports": {
     "./cn": "./src/lib/cn.ts",
-    "./meta": "./src/lib/meta.ts"
+    "./meta": "./src/lib/meta.ts",
+    "./icon": "./src/components/icon/Icon.tsx",
+    "./theme-provider": "./src/components/theme-provider/ThemeProvider.tsx",
+    "./theme-provider/script": "./src/components/theme-provider/ThemeProvider.script.ts",
+    "./theme-toggle": "./src/components/theme-toggle/ThemeToggle.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

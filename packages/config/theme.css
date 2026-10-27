@@ -14,7 +14,14 @@
  */
 
 /* Touch screens and windows up to 1024 px get bigger targets (experience contract › touch sizing). */
-@custom-variant touch (@media (pointer: coarse), (max-width: 1024px));
+@custom-variant touch {
+  @media (pointer: coarse) {
+    @slot;
+  }
+  @media (max-width: 1024px) {
+    @slot;
+  }
+}
 
 @theme inline {
   /* Tokens only: drop Tailwind's default palette so bg-red-500 and friends cannot be used. */

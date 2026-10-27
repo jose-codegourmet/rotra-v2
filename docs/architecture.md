@@ -18,7 +18,7 @@ where something belongs. For *how to write* the code, read [coding-conventions.m
 | `openspec/` | Cleared. Not used in the v1 process |
 | `docs/frames/*/*.html` | The three clickable prototypes: the design source of truth |
 | `Makefile`, root `package.json` scripts | Run the three apps through Turborepo (F01.1) |
-| `.husky/`, `.github/` | Missing. Git hooks and CI are set up by Foundation tickets |
+| `.husky/`, `.github/` | Git hooks (lint on commit, commitlint) and an advisory CI workflow (F01.2, F01.3) |
 
 Until the Foundation epic lands, the apps show placeholders only. Do not claim a screen works.
 

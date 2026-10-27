@@ -139,6 +139,8 @@ Epics are titled `Epic <key> · <Product> › <Module>`.
 ### Auto-merge: pipelines never block
 
 PRs merge themselves. There is no branch protection and no required check; CI is advisory.
+`.github/workflows/ci.yml` runs lint, type-check, and build on every PR and on `main` for information
+only. A red CI run after merge becomes the next fix ticket.
 
 ```bash
 gh pr create --base main --title "<conventional title>" --body-file <body.md>   # body has Closes #<n> + Verified block

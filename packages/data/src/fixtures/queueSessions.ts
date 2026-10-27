@@ -2,8 +2,9 @@ import type { QueueSession, SessionCourt } from '../queue-session/queueSession.t
 import type { SessionPlayer } from '../session-roster/sessionRoster.types'
 import { DEMO_CLUB_ID } from './clubs'
 import { clubPlayers } from './players'
+import { createSessionHistoryFixtures } from './sessionHistory'
 import { venues } from './venues'
-/** Same relative dates as seedSessions/PAST; reset uses a new seed time. */
+/** Same relative dates as seedSessions/PAST and ensureHistory; reset uses a new seed time. */
 export function createQueueFixtures(now = Date.now()) {
   const at = (days: number, hour: number) => {
     const date = new Date(now)
@@ -11,9 +12,8 @@ export function createQueueFixtures(now = Date.now()) {
     date.setHours(hour, 0, 0, 0)
     return date.getTime()
   }
-  const venue = venues[0],
-    other = venues[1]
-  if (!venue || !other) throw new Error('Missing venue fixtures.')
+  const venue = venues[0]
+  if (!venue) throw new Error('Missing venue fixtures.')
   const tonight: QueueSession = {
     id: 's-tonight',
     clubId: DEMO_CLUB_ID,
@@ -34,56 +34,24 @@ export function createQueueFixtures(now = Date.now()) {
     playersPerCourt: 8,
     expectedPlayers: 12,
     startedAt: null,
+    finalizedAt: null,
+    playerRecordsUpdatedAt: null,
     seriesId: null,
     publicSlug: 's-tonight',
     acceptJoinRequests: true,
   }
-  const sessions: QueueSession[] = [
-    tonight,
-    {
-      ...tonight,
-      id: 'h1',
-      publicSlug: 'h1',
-      title: 'Thursday Open Play',
-      scheduledStartAt: at(-3, 19),
-      scheduledEndAt: at(-3, 22),
-      state: 'completed',
-      acceptJoinRequests: false,
-    },
-    {
-      ...tonight,
-      id: 'h2',
-      publicSlug: 'h2',
-      scheduledStartAt: at(-7, 18),
-      scheduledEndAt: at(-7, 21),
-      state: 'completed',
-      acceptJoinRequests: false,
-    },
-    {
-      ...tonight,
-      id: 'h3',
-      publicSlug: 'h3',
-      title: 'Tuesday Drills',
-      scheduledStartAt: at(-12, 19),
-      scheduledEndAt: at(-12, 21),
-      venueId: other.id,
-      venueName: other.name,
-      venueAddress: other.address,
-      state: 'invalid',
-      invalidReason:
-        'The original device was lost before its records synced, so this session could not be recorded.',
-      acceptJoinRequests: false,
-    },
-  ]
-  const courts: SessionCourt[] = sessions.flatMap((s) =>
-    [1, 2, 3].map((n) => ({
-      id: `${s.id}-court-${n}`,
-      sessionId: s.id,
+  const history = createSessionHistoryFixtures(now)
+  const sessions: QueueSession[] = [tonight, ...history.sessions]
+  const courts: SessionCourt[] = [
+    ...[1, 2, 3].map((n) => ({
+      id: `${tonight.id}-court-${n}`,
+      sessionId: tonight.id,
       label: `Court ${n}`,
       openUntil: null,
       removedAt: null,
     })),
-  )
+    ...history.courts,
+  ]
   const roster: SessionPlayer[] = clubPlayers.slice(0, 14).map((p, i) => ({
     id: `s-tonight-player-${i + 1}`,
     sessionId: tonight.id,
@@ -103,7 +71,8 @@ export function createQueueFixtures(now = Date.now()) {
     levelLockedAt: null,
     confirmedAt: now - 14 + i,
   }))
-  return { sessions, courts, roster }
+  /** `roster` is tonight's only; the past sessions' rosters, matches and finalizations live under `history`. */
+  return { sessions, courts, roster, history }
 }
 export const queueSessionFixtures = createQueueFixtures()
 export const liveSessionFixture = {

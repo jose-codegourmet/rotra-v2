@@ -238,6 +238,9 @@ from the [database design](database_design/product/README.md). Add a row here **
 | Waitlist entry | `SessionWaitlistEntry` | `session_waitlist` | Ordered by `added_at` |
 | Roster entry (slot) | `SessionPlayer` | `session_players` | Slot order is `confirmed_at` |
 | Court in a session | `SessionCourt` | `session_courts` | |
+| Session finalization | `SessionFinalization` | `session_finalizations` | `state`: `running` · `committed` · `done` · `failed`; `stage`: `checking` · `finishing` · `player_records` · `slides` (`FinalizationStage`) |
+| Session done review | `SessionDoneReview` | — | Read model for Q-SESSION-DONE: games recorded, participants, pending changes, games in play, unplayed waiting, below minimum |
+| Session record | `SessionRecordSummary` | — | Read model for Q-HISTORY totals; an invalid session counts no games or players |
 | Match | `Match` | `matches` | `state`: `waiting` · `active` · `completed` · `invalid`; `origin`: `manual` · `suggested` · `auto` |
 | Match format | `MatchFormat` | — | `singles` · `doubles` · `fun_1v2` · `fun_3v3` · `fun_4v4` · `fun_5v5` |
 | Session mode | `SessionMode` | — | `chill` · `fair` · `hard` |

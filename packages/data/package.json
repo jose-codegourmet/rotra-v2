@@ -27,6 +27,13 @@
     "./auth/use-sign-in": "./src/auth/useSignIn.ts",
     "./auth/use-sign-out": "./src/auth/useSignOut.ts",
     "./queue-session/types": "./src/queue-session/queueSession.types.ts",
+    "./fixtures/session-history": "./src/fixtures/sessionHistory.ts",
+    "./queue-session/finalization": "./src/queue-session/finalization.ts",
+    "./queue-session/useSessionDoneReview": "./src/queue-session/useSessionDoneReview.ts",
+    "./queue-session/useFinalizeSession": "./src/queue-session/useFinalizeSession.ts",
+    "./queue-session/useFinalizationStatus": "./src/queue-session/useFinalizationStatus.ts",
+    "./queue-session/useInvalidateSession": "./src/queue-session/useInvalidateSession.ts",
+    "./queue-session/useSessionRecord": "./src/queue-session/useSessionRecord.ts",
     "./session-roster/types": "./src/session-roster/sessionRoster.types.ts",
     "./license/types": "./src/license/license.types.ts",
     "./sync/types": "./src/sync/sync.types.ts",
@@ -143,7 +150,11 @@
     "./fixtures/match-cards": "./src/fixtures/matchCards.ts",
     "./fixtures/queue-grid": "./src/fixtures/queueGrid.ts",
     "./fixtures/match-lineups": "./src/fixtures/matchLineups.ts",
-    "./fixtures/live-standings": "./src/fixtures/liveStandings.ts"
+    "./fixtures/active-matches": "./src/fixtures/activeMatches.ts",
+    "./fixtures/match-results": "./src/fixtures/matchResults.ts",
+    "./fixtures/live-standings": "./src/fixtures/liveStandings.ts",
+    "./fixtures/start-match": "./src/fixtures/startMatch.ts",
+    "./fixtures/session-done": "./src/fixtures/sessionDone.ts"
   },
   "scripts": {
     "lint": "biome check .",

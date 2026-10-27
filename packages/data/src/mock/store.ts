@@ -10,7 +10,12 @@ import { venues } from '../fixtures/venues'
 import type { ClubLicenseTerm } from '../license/license.types'
 import type { Match } from '../match/match.types'
 import type { Player } from '../player/player.types'
-import type { DownloadState, QueueSession, SessionCourt } from '../queue-session/queueSession.types'
+import type {
+  DownloadState,
+  QueueSession,
+  SessionCourt,
+  SessionFinalization,
+} from '../queue-session/queueSession.types'
 import type { RankingSettings } from '../ranking-settings/rankingSettings.types'
 import type {
   SessionJoinRequest,
@@ -34,6 +39,7 @@ export type MockState = {
   sync: SyncState
   matches: Match[]
   matchSequences: Record<string, number>
+  finalizations: Record<string, SessionFinalization>
   operations: Record<string, { fingerprint: string; outcome: SaveOutcome & { data: unknown } }>
   privatePhones: Record<string, string>
   sampleRequestIndex: number
@@ -47,20 +53,24 @@ function freeze<T>(value: T): DeepReadonly<T> {
   return value as DeepReadonly<T>
 }
 function seedState(): MockState {
-  const now = Date.now()
+  const now = Date.now(),
+    { sessions, courts, roster, history } = createQueueFixtures(now)
   return structuredClone({
     rankingSettings,
     clubs,
     venues,
     players,
     clubPlayers,
-    ...createQueueFixtures(now),
+    sessions,
+    courts,
+    roster: [...roster, ...history.roster],
     waitlist: [],
     joinRequests: [],
     licensePayments,
     downloads: {},
-    matches: [],
-    matchSequences: {},
+    matches: history.matches,
+    matchSequences: history.matchSequences,
+    finalizations: history.finalizations,
     operations: {},
     privatePhones: {},
     sampleRequestIndex: 0,

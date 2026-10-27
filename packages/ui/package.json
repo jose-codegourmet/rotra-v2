@@ -147,6 +147,7 @@
     "./session-games": "./src/components/session-games/SessionGames.tsx",
     "./session-link-card": "./src/components/session-link-card/SessionLinkCard.tsx",
     "./session-peek-sheet": "./src/components/session-peek-sheet/SessionPeekSheet.tsx",
+    "./session-record-header": "./src/components/session-record-header/SessionRecordHeader.tsx",
     "./session-setup-card": "./src/components/session-setup-card/SessionSetupCard.tsx",
     "./setup-step-bar": "./src/components/setup-step-bar/SetupStepBar.tsx",
     "./shared-rank-card": "./src/components/shared-rank-card/SharedRankCard.tsx",

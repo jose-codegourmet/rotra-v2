@@ -140,6 +140,7 @@
     "./session-calendar": "./src/components/session-calendar/SessionCalendar.tsx",
     "./session-calendar/helpers": "./src/components/session-calendar/SessionCalendar.helpers.ts",
     "./session-defaults-panel": "./src/components/session-defaults-panel/SessionDefaultsPanel.tsx",
+    "./session-done-sheet": "./src/components/session-done-sheet/SessionDoneSheet.tsx",
     "./session-games": "./src/components/session-games/SessionGames.tsx",
     "./session-link-card": "./src/components/session-link-card/SessionLinkCard.tsx",
     "./session-peek-sheet": "./src/components/session-peek-sheet/SessionPeekSheet.tsx",

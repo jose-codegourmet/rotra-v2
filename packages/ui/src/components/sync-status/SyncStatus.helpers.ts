@@ -20,16 +20,22 @@ const LABEL: Record<SyncState, string> = {
   offline: 'Offline',
 }
 
-/** Full label; "Synced" carries the last sync time and "Offline" the pending count, as the prototype shows. */
+/**
+ * Full label; "Synced" carries the last sync time and offline says what is waiting, as the Queue
+ * top bar shows them (access-home.md): "Synced 7:42 PM", "Offline · 3 waiting to sync",
+ * "Working offline".
+ */
 export function syncLabel(state: SyncState, pending = 0, lastSyncedAt?: string): string {
   if (state === 'synced' && lastSyncedAt) return `Synced ${lastSyncedAt}`
-  if (state === 'offline' && pending > 0) return `Offline · ${pending}`
+  if (state === 'offline')
+    return pending > 0 ? `Offline · ${pending} waiting to sync` : 'Working offline'
   return LABEL[state]
 }
 
-/** Phone label (≤ 480 px): "Synced" and "Offline · N"; the other states keep their words. */
+/** Phone label (≤ 480 px): "Synced" and "Offline · N" / "Offline"; the other states keep their words. */
 export function syncShortLabel(state: SyncState, pending = 0): string {
   if (state === 'synced') return 'Synced'
+  if (state === 'offline') return pending > 0 ? `Offline · ${pending}` : 'Offline'
   return syncLabel(state, pending)
 }
 

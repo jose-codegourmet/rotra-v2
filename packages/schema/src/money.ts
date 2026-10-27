@@ -24,3 +24,14 @@ export const moneyField = z.union([
       return Number(centavos)
     }),
 ])
+
+/**
+ * Integer centavos → peso text the way the prototypes show money: thousands commas, no decimals for
+ * whole amounts ("₱1,500"), two decimals otherwise ("₱1,500.50").
+ */
+export function formatPeso(minor: number): string {
+  const pesos = Math.trunc(minor / 100)
+  const cents = Math.abs(minor % 100)
+  const whole = pesos.toLocaleString('en-PH')
+  return cents ? `₱${whole}.${String(cents).padStart(2, '0')}` : `₱${whole}`
+}

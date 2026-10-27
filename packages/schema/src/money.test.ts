@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { moneyField } from './money'
+import { formatPeso, moneyField } from './money'
 
 describe('integer centavos', () => {
   it.each([
@@ -31,4 +31,16 @@ describe('integer centavos', () => {
     Number.MAX_SAFE_INTEGER + 1,
   ])('rejects invalid or unsafe amount %s', (value) =>
     expect(moneyField.safeParse(value).success).toBe(false))
+})
+
+describe('formatPeso', () => {
+  it.each([
+    [150000, '₱1,500'],
+    [150050, '₱1,500.50'],
+    [35000, '₱350'],
+    [5, '₱0.05'],
+    [0, '₱0'],
+  ])('%i centavos → %s', (minor, expected) => {
+    expect(formatPeso(minor)).toBe(expected)
+  })
 })

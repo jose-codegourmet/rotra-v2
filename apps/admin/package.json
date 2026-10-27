@@ -12,6 +12,7 @@
     "type-check": "next typegen && tsc --noEmit"
   },
   "dependencies": {
+    "@rotra/ui": "workspace:*",
     "next": "16.4.3",
     "react": "~19.2.9",
     "react-dom": "~19.2.9"

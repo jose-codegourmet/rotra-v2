@@ -14,6 +14,7 @@ where something belongs. For *how to write* the code, read [coding-conventions.m
 |---|---|
 | `apps/` | `queue`, `player`, `admin`: Next.js 16 scaffolds with placeholder home pages (F01.1) |
 | `packages/config` | Shared tsconfig and `theme.css`: Tailwind 4 tokens copied from the prototypes (F02.1) |
+| `packages/ui` | `@rotra/ui`: `cn`, `ComponentMeta`, shadcn config and the one Storybook (F03.1). Components arrive in F04 |
 | `packages/db` | **Empty.** The database epic comes after the mock phase (§9) |
 | `openspec/` | Cleared. Not used in the v1 process |
 | `docs/frames/*/*.html` | The three clickable prototypes: the design source of truth |

@@ -1,3 +1,5 @@
+import { cn } from '@rotra/ui/cn'
+
 // Placeholder until the product screens land. The swatches check the theme tokens against the
 // prototype; switch <html data-theme> to "light" in devtools to compare the light theme.
 const SWATCHES = [
@@ -28,7 +30,7 @@ export default function HomePage() {
             key={name}
             className="flex flex-col gap-2 rounded-lg border border-border bg-surface p-3 shadow-card"
           >
-            <span className={`h-12 rounded-md border border-border-strong ${className}`} />
+            <span className={cn('h-12 rounded-md border border-border-strong', className)} />
             <span className="font-mono text-[13px]">{name}</span>
           </li>
         ))}

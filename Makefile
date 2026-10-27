@@ -19,9 +19,9 @@ dev-player:
 dev-admin:
 	@$(NVM) && pnpm --filter @rotra/admin dev
 
-# Placeholder until @rotra/ui and its Storybook exist (F03.1)
+# The one Storybook, in @rotra/ui (:6006)
 storybook:
-	@echo "Storybook arrives with @rotra/ui (F03.1)"
+	@$(NVM) && pnpm --filter @rotra/ui storybook
 
 lint:
 	@$(NVM) && pnpm lint

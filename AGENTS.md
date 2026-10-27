@@ -56,7 +56,7 @@ Supabase + Prisma come later and replace only the fetchers.
 ```text
 apps/                     queue · player · admin (Next.js 16); each has its own AGENTS.md for Next 16 docs
 packages/
-  ui/                     every visual component and form + the one Storybook
+  ui/                     every visual component and form + the one Storybook (see its AGENTS.md)
   data/                   types, fixtures, mock store, fetchers, query keys, hooks
   schema/                 shared Zod fields (email, phone, date, money, password)
   config/                 tsconfig + Tailwind 4 tokens (theme.css; see its AGENTS.md)
@@ -124,7 +124,7 @@ player 3001, admin 3002.
 nvm use && pnpm install
 nvm use && pnpm dev                          # all apps
 nvm use && pnpm --filter @rotra/queue dev    # or @rotra/player, @rotra/admin
-nvm use && pnpm --filter @rotra/ui storybook   # from F03.1
+nvm use && pnpm --filter @rotra/ui storybook   # or: pnpm storybook, make storybook
 nvm use && pnpm lint                         # Biome
 nvm use && pnpm type-check
 nvm use && pnpm build

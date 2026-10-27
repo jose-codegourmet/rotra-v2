@@ -24,9 +24,12 @@ import { notFound, useRouter } from 'next/navigation'
 import { type ComponentType, useEffect, useMemo, useState } from 'react'
 import { useDockAction } from '@/app/(operator)/_components/operator-shell/DockAction.context'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
+import { CourtsAndTime } from '@/app/(operator)/sessions/[sessionId]/_components/courts-and-time/CourtsAndTime'
 import { FacebookPost } from '@/app/(operator)/sessions/[sessionId]/_components/facebook-post/FacebookPost'
 import { JoinRequests } from '@/app/(operator)/sessions/[sessionId]/_components/join-requests/JoinRequests'
+import { LeaderboardView } from '@/app/(operator)/sessions/[sessionId]/_components/leaderboard-view/LeaderboardView'
 import { PlayerProfile } from '@/app/(operator)/sessions/[sessionId]/_components/player-profile/PlayerProfile'
+import { PlayersView } from '@/app/(operator)/sessions/[sessionId]/_components/players-view/PlayersView'
 import { SessionView } from '@/app/(operator)/sessions/[sessionId]/_components/session-view/SessionView'
 import { sessionHref } from '@/lib/dates'
 import { useAppSelector } from '@/store/hooks'
@@ -51,8 +54,8 @@ export type ConsoleViewProps = {
  */
 const VIEWS: Partial<Record<Exclude<ConsoleView, 'session'>, ComponentType<ConsoleViewProps>>> = {
   // queue: QueueView,
-  // players: PlayersView,
-  // leaderboard: LeaderboardView,
+  players: PlayersView,
+  leaderboard: LeaderboardView,
 }
 
 const MODE_LABELS = { chill: 'Chill', fair: 'Fair', hard: 'Hard' } as const
@@ -247,7 +250,11 @@ export function SessionConsole({ sessionId }: SessionConsoleProps) {
         open={sheet === 'post'}
         onOpenChange={(open) => setSheet(open ? 'post' : null)}
       />
-      {/* Queue › Courts and time mounts its sheets here: open={sheet === 'adjust'} and open={sheet === 'add-court'} */}
+      <CourtsAndTime
+        sessionId={sessionId}
+        open={sheet === 'adjust' || sheet === 'add-court' ? sheet : null}
+        onOpenChange={setSheet}
+      />
       <PlayerProfile clubPlayerId={profileId} onClose={() => setProfileId(null)} />
     </main>
   )

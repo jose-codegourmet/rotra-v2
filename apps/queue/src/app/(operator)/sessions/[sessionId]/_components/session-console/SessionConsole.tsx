@@ -38,6 +38,7 @@ import {
 import { PlayerProfile } from '@/app/(operator)/sessions/[sessionId]/_components/player-profile/PlayerProfile'
 import { PlayersView } from '@/app/(operator)/sessions/[sessionId]/_components/players-view/PlayersView'
 import { QueueView } from '@/app/(operator)/sessions/[sessionId]/_components/queue-view/QueueView'
+import { RegenerateQueue } from '@/app/(operator)/sessions/[sessionId]/_components/regenerate-queue/RegenerateQueue'
 import { SessionView } from '@/app/(operator)/sessions/[sessionId]/_components/session-view/SessionView'
 import { SuggestMatch } from '@/app/(operator)/sessions/[sessionId]/_components/suggest-match/SuggestMatch'
 import { sessionHref } from '@/lib/dates'
@@ -49,8 +50,12 @@ export type SessionConsoleProps = { sessionId: string }
 
 export type ConsoleView = 'session' | 'queue' | 'players' | 'leaderboard'
 export type ConsoleSheet = 'join-requests' | 'post' | 'adjust' | 'add-court' | null
-/** The Queue › Match editing sheets: Add match / Edit lineup, Suggested match, Auto queue */
-export type MatchSheet = MatchLineupRequest | { mode: 'suggest' } | { mode: 'auto' }
+/** The Queue › Match editing and generation sheets: Add match / Edit lineup, Suggested match, Auto queue, Regenerate */
+export type MatchSheet =
+  | MatchLineupRequest
+  | { mode: 'suggest' }
+  | { mode: 'auto' }
+  | { mode: 'regenerate' }
 
 /** What every console view container receives from the shell */
 export type ConsoleViewProps = {
@@ -204,8 +209,9 @@ export function SessionConsole({ sessionId }: SessionConsoleProps) {
     return View ? <View {...viewProps} /> : <Skeleton className="h-56 rounded-lg" />
   }
 
-  // Queue › Match editing: the sheets live here so Edit works from the Session tab too, and a
-  // save, an accepted suggestion or an auto queue run switches the console to the Queue tab.
+  // Queue › Match editing and generation: the sheets live here so Edit works from the Session tab
+  // too, and a save, an accepted suggestion or an auto queue run switches the console to the Queue
+  // tab. Regenerate (RegenerateQueue) stays on the Queue tab, where its button lives.
   const matchEditing = {
     onAddMatch: () => setMatchSheet({ mode: 'add' }),
     onEditMatch: (matchId: string) => setMatchSheet({ mode: 'edit', matchId }),
@@ -281,6 +287,7 @@ export function SessionConsole({ sessionId }: SessionConsoleProps) {
               {...matchEditing}
               onSuggest={() => setMatchSheet({ mode: 'suggest' })}
               onAutoQueue={() => setMatchSheet({ mode: 'auto' })}
+              onRegenerate={() => setMatchSheet({ mode: 'regenerate' })}
             />
           ) : (
             panel('queue')
@@ -341,6 +348,11 @@ export function SessionConsole({ sessionId }: SessionConsoleProps) {
         open={matchSheet?.mode === 'auto'}
         onOpenChange={(open) => setMatchSheet(open ? { mode: 'auto' } : null)}
         onAdded={showQueue}
+      />
+      <RegenerateQueue
+        sessionId={sessionId}
+        open={matchSheet?.mode === 'regenerate'}
+        onOpenChange={(open) => setMatchSheet(open ? { mode: 'regenerate' } : null)}
       />
       <PlayerProfile clubPlayerId={profileId} onClose={() => setProfileId(null)} />
     </main>

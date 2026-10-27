@@ -18,7 +18,7 @@ import { MatchLineupForm } from '@rotra/ui/forms/match-lineup-form'
 import type { MatchLineupFormValues } from '@rotra/ui/forms/match-lineup-form/schema'
 import type { PlayerPickerCandidate } from '@rotra/ui/player-picker-sheet'
 import { toast } from '@rotra/ui/toaster'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 
 /** What opened the sheet: Add match (optionally pre-filled by Edit then add) or Edit on a waiting match */
 export type MatchLineupRequest =
@@ -60,6 +60,8 @@ export function MatchLineup({ sessionId, now, request, onClose, onSaved }: Match
   const addMatch = useAddMatch()
   const updateLineup = useUpdateMatchLineup()
   const [serverError, setServerError] = useState<string | undefined>()
+  // One save per attempt: a second tap can land before isPending reaches this render.
+  const saving = useRef(false)
 
   const s = session.data
   if (!request || !s || !roster.data || !matches.data) return null
@@ -103,6 +105,8 @@ export function MatchLineup({ sessionId, now, request, onClose, onSaved }: Match
   }
 
   const onSubmit = (values: MatchLineupFormValues) => {
+    if (saving.current || addMatch.isPending || updateLineup.isPending) return
+    saving.current = true
     setServerError(undefined)
     const handlers = {
       onSuccess: (result: { message: string }) => {
@@ -113,6 +117,9 @@ export function MatchLineup({ sessionId, now, request, onClose, onSaved }: Match
       onError: (error: unknown) => {
         if (isSaveFailure(error)) toast.error(errorMessage(error))
         else setServerError(errorMessage(error))
+      },
+      onSettled: () => {
+        saving.current = false
       },
     }
     if (editing) updateLineup.mutate({ sessionId, matchId: editing.id, lineup: values }, handlers)

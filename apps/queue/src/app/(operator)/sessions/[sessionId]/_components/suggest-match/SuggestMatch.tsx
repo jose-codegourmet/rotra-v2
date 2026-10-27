@@ -13,7 +13,7 @@ import { type SuggestedLineup, SuggestedMatchSheet } from '@rotra/ui/suggested-m
 import type { SwapSlot } from '@rotra/ui/swap-sides-area'
 import type { TeamLineupPlayer } from '@rotra/ui/team-lineup'
 import { toast } from '@rotra/ui/toaster'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { PlayerProfile } from '@/app/(operator)/sessions/[sessionId]/_components/player-profile/PlayerProfile'
 
 export type SuggestMatchProps = {
@@ -94,6 +94,8 @@ function OpenSuggestMatch({
   )
   const [switched, setSwitched] = useState(false)
   const [profileId, setProfileId] = useState<string | null>(null)
+  // One add per attempt: a second tap can land before isPending reaches this render.
+  const adding = useRef(false)
 
   const byId = (id: string) => roster.find((p) => p.id === id)
   const player = (id: string): TeamLineupPlayer => {
@@ -136,7 +138,8 @@ function OpenSuggestMatch({
   }
 
   const onAdd = () => {
-    if (!lineup || addSuggested.isPending) return
+    if (!lineup || adding.current || addSuggested.isPending) return
+    adding.current = true
     addSuggested.mutate(
       { sessionId, lineup, switched },
       {
@@ -146,6 +149,9 @@ function OpenSuggestMatch({
           onAdded()
         },
         onError: (error) => toast.error(errorMessage(error)),
+        onSettled: () => {
+          adding.current = false
+        },
       },
     )
   }

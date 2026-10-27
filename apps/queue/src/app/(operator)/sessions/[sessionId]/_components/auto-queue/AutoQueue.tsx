@@ -6,7 +6,7 @@ import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { type AutoQueueCount, AutoQueueSheet } from '@rotra/ui/auto-queue-sheet'
 import { toast } from '@rotra/ui/toaster'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 
 export type AutoQueueProps = {
   sessionId: string
@@ -38,6 +38,8 @@ export function AutoQueue({ sessionId, open, onOpenChange, onAdded }: AutoQueueP
   const autoQueue = useAutoQueue()
   const [count, setCount] = useState<AutoQueueCount>(DEFAULT_COUNT)
   const [error, setError] = useState<string | undefined>()
+  // One run per attempt: a second tap can land before isPending reaches this render.
+  const generating = useRef(false)
 
   const s = session.data
   if (!s) return null
@@ -52,7 +54,8 @@ export function AutoQueue({ sessionId, open, onOpenChange, onAdded }: AutoQueueP
   }
 
   const onGenerate = (n: AutoQueueCount) => {
-    if (autoQueue.isPending) return
+    if (generating.current || autoQueue.isPending) return
+    generating.current = true
     setError(undefined)
     autoQueue.mutate(
       { sessionId, n },
@@ -65,6 +68,9 @@ export function AutoQueue({ sessionId, open, onOpenChange, onAdded }: AutoQueueP
         onError: (failure) => {
           if (isSaveFailure(failure)) toast.error(errorMessage(failure))
           else setError(errorMessage(failure))
+        },
+        onSettled: () => {
+          generating.current = false
         },
       },
     )

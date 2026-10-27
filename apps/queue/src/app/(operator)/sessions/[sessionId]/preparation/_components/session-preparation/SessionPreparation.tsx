@@ -28,6 +28,7 @@ import { useMemo, useState } from 'react'
 import { useDockAction } from '@/app/(operator)/_components/operator-shell/DockAction.context'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import { FacebookPost } from '@/app/(operator)/sessions/[sessionId]/_components/facebook-post/FacebookPost'
+import { PreparationRoster } from '@/app/(operator)/sessions/[sessionId]/preparation/_components/preparation-roster/PreparationRoster'
 import { sessionHref } from '@/lib/dates'
 import { useAppSelector } from '@/store/hooks'
 import { selectDev } from '@/store/slices/devSlice'
@@ -45,7 +46,7 @@ const date = (at: number) =>
 const errorMessage = (error: unknown) =>
   error instanceof Error ? error.message : 'Something went wrong. Try again.'
 
-/** Q-PREPARE: header, tabs (Overview this ticket), Setup and This device cards, the Start bar and dialog. */
+/** Q-PREPARE: header, tabs (Overview, Roster and levels, Waitlist), Setup and This device cards, the Start bar and dialog. */
 export function SessionPreparation({ sessionId }: { sessionId: string }) {
   const router = useRouter()
   const dev = useAppSelector(selectDev)
@@ -218,14 +219,10 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
           )}
         </TabsContent>
         <TabsContent value="roster">
-          <p className="m-0 text-[13px] text-fg2">
-            Roster and levels arrive with Queue › Players and roster.
-          </p>
+          <PreparationRoster sessionId={sessionId} tab="roster" />
         </TabsContent>
         <TabsContent value="waitlist">
-          <p className="m-0 text-[13px] text-fg2">
-            The waitlist arrives with Queue › Players and roster.
-          </p>
+          <PreparationRoster sessionId={sessionId} tab="waitlist" />
         </TabsContent>
       </Tabs>
       {s ? (

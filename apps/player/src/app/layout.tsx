@@ -1,6 +1,7 @@
 import { getThemeScript } from '@rotra/ui/theme-provider/script'
 import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
+import { PlayerShell } from '@/app/_components/player-shell/PlayerShell'
 import { AppProviders } from '@/providers/AppProviders'
 import { THEME_STORAGE_KEY } from '@/providers/themeStorageKey'
 import { fontVariables } from './fonts'
@@ -20,7 +21,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <script dangerouslySetInnerHTML={{ __html: getThemeScript(THEME_STORAGE_KEY) }} />
       </head>
       <body>
-        <AppProviders>{children}</AppProviders>
+        <AppProviders><PlayerShell>{children}</PlayerShell></AppProviders>
       </body>
     </html>
   )

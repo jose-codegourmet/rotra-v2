@@ -11,7 +11,7 @@ export type TopBarProps = {
   product: string
   /** The mark becomes a button (Player and Admin go home from it) */
   onBrandClick?: () => void
-  /** Right side: SyncStatus, ThemeToggle, account */
+  /** Navigation and actions: PlayerNav, SyncStatus, ThemeToggle, account */
   children?: ReactNode
   /** Center the content at 1240 px like Queue; Admin's top bar spans the window */
   contained?: boolean
@@ -45,7 +45,7 @@ export function TopBar({ product, onBrandClick, children, contained = true }: To
     <header className="sticky top-[env(safe-area-inset-top,0px)] z-20 border-b border-border bg-bg/92 backdrop-blur-[8px]">
       <div
         className={cn(
-          'flex items-center gap-3 py-2.5 pr-[max(16px,env(safe-area-inset-right,0px))] pl-[max(16px,env(safe-area-inset-left,0px))] max-[480px]:gap-2',
+          'flex flex-wrap items-center gap-3 py-2.5 pr-[max(16px,env(safe-area-inset-right,0px))] pl-[max(16px,env(safe-area-inset-left,0px))] max-[480px]:gap-2',
           contained && 'mx-auto max-w-[1240px]',
         )}
       >
@@ -76,7 +76,7 @@ export function TopBar({ product, onBrandClick, children, contained = true }: To
             {brand}
           </div>
         )}
-        <div className="flex-1" />
+        {product !== 'Players' ? <div className="flex-1" /> : null}
         {children}
       </div>
     </header>

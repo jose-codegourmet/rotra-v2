@@ -66,7 +66,7 @@ export function PixelFire() {
       aria-hidden
       width={WIDTH}
       height={HEIGHT}
-      className="pointer-events-none absolute -top-10 left-1/2 h-[150px] w-[180px] -translate-x-1/2 [image-rendering:pixelated]"
+      className="pointer-events-none absolute bottom-[calc(100%-96px)] left-1/2 h-[150px] w-[180px] max-[560px]:bottom-[calc(100%-78px)] max-[560px]:h-[118px] max-[560px]:w-[140px] -translate-x-1/2 [image-rendering:pixelated]"
     />
   )
 }

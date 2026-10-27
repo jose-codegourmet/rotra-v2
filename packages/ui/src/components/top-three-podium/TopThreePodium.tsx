@@ -60,11 +60,11 @@ export function TopThreePodium({ entries, totalPlayers, onSelect }: TopThreePodi
                 size={index === 0 ? 88 : 64}
                 shape="square"
                 className={cn(
-                  'relative z-10 ring-3 ring-surface ring-offset-2 ring-offset-border-strong',
-                  index === 0 && 'ring-accent',
+                  'relative z-10 mb-2 ring-3 ring-surface ring-offset-2 ring-offset-border-strong',
+                  index === 0 ? 'ring-accent max-[560px]:size-[68px] max-[560px]:text-[26px]' : 'max-[560px]:size-[52px]',
                 )}
               />
-              <b className="relative z-10 break-words text-[15px] leading-tight">
+              <b className={cn('relative z-10 break-words leading-tight', index === 0 ? 'text-lg max-[560px]:text-sm' : 'text-[15px] max-[560px]:text-[13px]')}>
                 {entry.fullName}
                 {entry.isMe ? <span className="text-accent"> · You</span> : null}
               </b>

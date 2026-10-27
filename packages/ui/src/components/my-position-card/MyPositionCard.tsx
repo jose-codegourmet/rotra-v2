@@ -25,17 +25,17 @@ export function MyPositionCard({
 }: MyPositionCardProps) {
   if (position !== undefined && levelLabel)
     return (
-      <Card className="flex items-center justify-between gap-3 border-accent bg-accent-subtle">
+      <Card className="flex flex-wrap items-center justify-between gap-3 border-accent bg-accent-subtle">
         <div className="flex items-center gap-3">
           <Avatar name={fullName} />
           <div>
             <p className="m-0 text-sm text-fg2">Your position</p>
-            <b className="font-mono text-xl">
-              #{position.toLocaleString('en-PH')} · {levelLabel}
-            </b>
+            <p className="m-0">
+              <b className="font-mono text-xl">#{position.toLocaleString('en-PH')}</b> · {levelLabel}
+            </p>
           </div>
         </div>
-        <Button size="sm" onClick={onShowMyRow}>
+        <Button size="sm" className="shrink-0" onClick={onShowMyRow}>
           Show my row
         </Button>
       </Card>

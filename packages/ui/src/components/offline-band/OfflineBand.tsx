@@ -17,8 +17,8 @@ export function OfflineBand({ savedAt }: OfflineBandProps) {
         <Icon name="alert" className="mt-0.5 flex-none text-warn" />
         <p className="m-0">
           <b>You&apos;re offline.</b> Showing what this device saved at{' '}
-          <time dateTime={savedAt.toISOString()}>{formatSavedAt(savedAt)}</time>. Signing in and saving
-          changes need an internet connection.
+          <time dateTime={savedAt.toISOString()}>{formatSavedAt(savedAt)}</time>. Signing in and
+          saving changes need an internet connection.
         </p>
       </div>
     </div>

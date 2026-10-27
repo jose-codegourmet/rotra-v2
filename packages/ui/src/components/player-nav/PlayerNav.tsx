@@ -32,10 +32,7 @@ export function PlayerNav({
   const second = signedIn
     ? { label: 'My profile', key: 'profile' as const, target: profile }
     : { label: 'Sign in', key: 'sign-in' as const, target: signIn }
-  const items = [
-    { label: 'Leaderboard', key: 'leaderboard' as const, target: leaderboard },
-    second,
-  ]
+  const items = [{ label: 'Leaderboard', key: 'leaderboard' as const, target: leaderboard }, second]
 
   return (
     <nav

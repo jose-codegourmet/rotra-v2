@@ -3,7 +3,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const playerNavMeta = {
   name: 'PlayerNav',
   description:
-    'The Player Information top-bar navigation for the overall leaderboard and either sign-in or the registered player\'s profile.',
+    "The Player Information top-bar navigation for the overall leaderboard and either sign-in or the registered player's profile.",
   usage: [
     'Place beside the Player Information brand in the top bar.',
     'Pass href targets with linkAs={Link}, or navigation callbacks when the host owns navigation.',

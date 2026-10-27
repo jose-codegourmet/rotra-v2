@@ -2,15 +2,16 @@
 import { useSignIn } from '@rotra/data/auth/use-sign-in'
 import { useSignOut } from '@rotra/data/auth/use-sign-out'
 import { useApproveClubNameChange } from '@rotra/data/club/useApproveClubNameChange'
-import { connectMockBridge, notifyMockBridge } from '@rotra/data/mock/bridge'
 import { resetDemoData } from '@rotra/data/mock/reset'
 import { useNowCard } from '@rotra/data/queue-session/useNowCard'
 import { useAddSampleJoinRequest } from '@rotra/data/session-roster/useAddSampleJoinRequest'
 import { DevMenu } from '@rotra/ui/dev-menu'
 import { useQueryClient } from '@tanstack/react-query'
-import { useEffect, useState } from 'react'
-import { useAppDispatch, useAppSelector, useAppStore } from '@/store/hooks'
+import { useState } from 'react'
+import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { resetDev, selectDev, setDevToggle } from '@/store/slices/devSlice'
+
+/** The "Prototype" button and its controls; rendered in the top bars of development builds only. */
 export function DevTools() {
   const approveName = useApproveClubNameChange(),
     sample = useAddSampleJoinRequest(),
@@ -18,30 +19,10 @@ export function DevTools() {
   const session = nowCard.data?.live ?? nowCard.data?.upcoming
   const signIn = useSignIn('club'),
     signOut = useSignOut('club')
-  const store = useAppStore(),
-    dispatch = useAppDispatch(),
+  const dispatch = useAppDispatch(),
     toggles = useAppSelector(selectDev),
     client = useQueryClient()
   const [open, setOpen] = useState(false)
-  useEffect(() => {
-    const disconnect = connectMockBridge({
-      read: () => store.getState().dev,
-      consume: (key) => store.dispatch(setDevToggle({ key, value: false })),
-    })
-    let previous = store.getState().dev
-    const unsubscribe = store.subscribe(() => {
-      const next = store.getState().dev
-      if (next !== previous) {
-        previous = next
-        notifyMockBridge()
-        void client.invalidateQueries()
-      }
-    })
-    return () => {
-      unsubscribe()
-      disconnect()
-    }
-  }, [store, client])
   return (
     <DevMenu
       actions={[

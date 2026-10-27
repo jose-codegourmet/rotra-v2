@@ -20,9 +20,13 @@ type Story = StoryObj<typeof meta>
 
 export const SignedOutOnLeaderboard: Story = {}
 
-export const SignedInOnMyProfile: Story = { args: { signedIn: true, current: 'profile' } }
+export const SignedInOnMyProfile: Story = {
+  args: { signedIn: true, current: 'profile' },
+}
 
-export const SignedInOnLeaderboard: Story = { args: { signedIn: true, current: 'leaderboard' } }
+export const SignedInOnLeaderboard: Story = {
+  args: { signedIn: true, current: 'leaderboard' },
+}
 
 export const Phone: Story = {
   ...SignedOutOnLeaderboard,

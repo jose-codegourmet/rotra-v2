@@ -38,3 +38,6 @@ packages/db/node_modules/.prisma
 
 # Next.js generated types
 next-env.d.ts
+
+# Secondary dev server build dirs (ROTRA_DIST_DIR)
+.next-agent/

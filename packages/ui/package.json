@@ -71,6 +71,7 @@
     "./sync-status/sync-details": "./src/components/sync-status/sync-details/SyncDetails.tsx",
     "./tabs": "./src/components/tabs/Tabs.tsx",
     "./text-input": "./src/components/text-input/TextInput.tsx",
+    "./top-three-podium": "./src/components/top-three-podium/TopThreePodium.tsx",
     "./textarea": "./src/components/textarea/Textarea.tsx",
     "./theme-provider": "./src/components/theme-provider/ThemeProvider.tsx",
     "./theme-provider/script": "./src/components/theme-provider/ThemeProvider.script.ts",

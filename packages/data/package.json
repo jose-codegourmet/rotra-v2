@@ -33,6 +33,7 @@
     "./match/types": "./src/match/match.types.ts",
     "./fixtures/licensePayments": "./src/fixtures/licensePayments.ts",
     "./fixtures/queueSessions": "./src/fixtures/queueSessions.ts",
+    "./fixtures/joinRequests": "./src/fixtures/joinRequests.ts",
     "./club/rules": "./src/club/club.rules.ts",
     "./mock/client": "./src/mock/client.ts",
     "./sync/query-keys": "./src/sync/queryKeys.ts",
@@ -137,7 +138,8 @@
     "./player": "./src/player/player.rules.ts",
     "./player/rules": "./src/player/player.rules.ts",
     "./leaderboard/query-keys": "./src/leaderboard/queryKeys.ts",
-    "./fixtures/ranking-settings": "./src/fixtures/rankingSettings.ts"
+    "./fixtures/ranking-settings": "./src/fixtures/rankingSettings.ts",
+    "./fixtures/session-waitlist": "./src/fixtures/sessionWaitlist.ts"
   },
   "scripts": {
     "lint": "biome check .",

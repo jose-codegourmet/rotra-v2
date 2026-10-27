@@ -133,3 +133,27 @@ export const Phone: Story = {
   args: { initialValues: withVenue },
   globals: { viewport: { value: 'phone' } },
 }
+export const BothFormatsOff: Story = {
+  args: { initialValues: { ...withVenue, allowSingles: false, allowDoubles: false } },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: /Step 2/ }))
+  },
+}
+export const SetByYou: Story = {
+  args: { initialValues: { ...withVenue, minimumIsCalculated: false, minimumGames: '5' } },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: /Step 2/ }))
+  },
+}
+export const ReviewRepeating: Story = {
+  args: RepeatingWithSkippedDate.args,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: /Step 3/ }))
+  },
+}
+export const ReviewEdit: Story = {
+  args: EditBudgetReduction.args,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: /Step 3/ }))
+  },
+}

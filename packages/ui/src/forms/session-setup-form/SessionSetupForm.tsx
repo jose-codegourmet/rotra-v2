@@ -10,6 +10,7 @@ import { type SetupStep, SetupStepBar } from '@rotra/ui/setup-step-bar'
 import { type ReactNode, type Ref, useImperativeHandle, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { sessionSetupDefaultValues } from './SessionSetupForm.defaultValues'
+import { slotBudget } from './SessionSetupForm.helpers'
 import {
   PAGE_FIELDS,
   type SessionSetupInput,
@@ -19,6 +20,9 @@ import {
 } from './SessionSetupForm.schema'
 import { SetupCourtsSection } from './setup-courts-section/SetupCourtsSection'
 import { SetupDetailsSection } from './setup-details-section/SetupDetailsSection'
+import { SetupFormatsSection } from './setup-formats-section/SetupFormatsSection'
+import { SetupMinimumSection } from './setup-minimum-section/SetupMinimumSection'
+import { SetupNotesReviewSection } from './setup-notes-review-section/SetupNotesReviewSection'
 
 export type SetupEstimate = { low: number; high: number; usable: number }
 
@@ -155,7 +159,13 @@ export function SessionSetupForm({
         goTo(0)
         return
       }
-      if (!isPending && !offline) onSubmit(parsedValues)
+      if (!isPending && !offline)
+        onSubmit({
+          ...parsedValues,
+          minimumGames: parsedValues.minimumIsCalculated
+            ? String(estimatedMinimum)
+            : parsedValues.minimumGames,
+        })
     },
     (errors) => {
       const first = PAGE_FIELDS.findIndex((fields) => fields.some((f) => f in errors))
@@ -164,6 +174,12 @@ export function SessionSetupForm({
     },
   )
 
+  const expected = Number(values.expectedPlayers)
+  const estimatedMinimum = computeEstimate(
+    values,
+    editContext?.rosterCount ||
+      (Number.isInteger(expected) && expected > 0 ? expected : slotBudget(values)),
+  ).low
   const last = STEPS.length - 1
   const saveLabel = mode === 'edit' ? 'Save changes' : 'Create session'
   const sections: ReactNode[] = [
@@ -176,14 +192,22 @@ export function SessionSetupForm({
       onViewClash={onViewClash}
     />,
     <SetupCourtsSection key="courts" editContext={editContext} />,
-    null,
-    null,
+    <SetupFormatsSection key="formats" />,
+    <SetupMinimumSection
+      key="minimum"
+      computeEstimate={computeEstimate}
+      rosterCount={editContext?.rosterCount}
+    />,
     financialsSection ?? null,
-    null,
+    <SetupNotesReviewSection
+      key="review"
+      mode={mode}
+      occurrences={occurrences}
+      estimatedMinimum={estimatedMinimum}
+      onEditPage={goTo}
+      costsReviewLine={costsReviewLine}
+    />,
   ]
-  // computeEstimate and costsReviewLine feed pages 2–3 (Q02.3).
-  void computeEstimate
-  void costsReviewLine
 
   return (
     <FormProvider {...form}>

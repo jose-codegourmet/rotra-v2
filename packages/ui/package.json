@@ -47,6 +47,8 @@
     "./invite-sheet": "./src/components/invite-sheet/InviteSheet.tsx",
     "./key-value-list": "./src/components/key-value-list/KeyValueList.tsx",
     "./letter-group": "./src/components/letter-group/LetterGroup.tsx",
+    "./leaderboard-list": "./src/components/leaderboard-list/LeaderboardList.tsx",
+    "./leaderboard-row": "./src/components/leaderboard-row/LeaderboardRow.tsx",
     "./level-pill": "./src/components/level-pill/LevelPill.tsx",
     "./list-row": "./src/components/list-row/ListRow.tsx",
     "./meta": "./src/lib/meta.ts",

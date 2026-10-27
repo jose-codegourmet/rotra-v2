@@ -17,6 +17,8 @@
     "./fixtures/clubs": "./src/fixtures/clubs.ts",
     "./fixtures/venues": "./src/fixtures/venues.ts",
     "./fixtures/players": "./src/fixtures/players.ts",
+    "./fixtures/leaderboard-players": "./src/fixtures/leaderboardPlayers.ts",
+    "./leaderboard/types": "./src/leaderboard/leaderboard.types.ts",
     "./mock/bridge": "./src/mock/bridge.ts",
     "./mock/reset": "./src/mock/reset.ts",
     "./fixtures/dev-menu": "./src/fixtures/devMenu.ts",

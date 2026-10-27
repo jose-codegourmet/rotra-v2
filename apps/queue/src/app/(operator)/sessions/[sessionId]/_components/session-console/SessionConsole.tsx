@@ -23,7 +23,7 @@ import { Skeleton } from '@rotra/ui/skeleton'
 import { type TabItem, Tabs, TabsContent } from '@rotra/ui/tabs'
 import Link from 'next/link'
 import { notFound, useRouter } from 'next/navigation'
-import { type ComponentType, useEffect, useMemo, useRef, useState } from 'react'
+import { type ComponentType, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useDockAction } from '@/app/(operator)/_components/operator-shell/DockAction.context'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import { ActiveMatch } from '@/app/(operator)/sessions/[sessionId]/_components/active-match/ActiveMatch'
@@ -40,6 +40,7 @@ import { PlayerProfile } from '@/app/(operator)/sessions/[sessionId]/_components
 import { PlayersView } from '@/app/(operator)/sessions/[sessionId]/_components/players-view/PlayersView'
 import { QueueView } from '@/app/(operator)/sessions/[sessionId]/_components/queue-view/QueueView'
 import { RegenerateQueue } from '@/app/(operator)/sessions/[sessionId]/_components/regenerate-queue/RegenerateQueue'
+import { SessionDoneFlow } from '@/app/(operator)/sessions/[sessionId]/_components/session-done-flow/SessionDoneFlow'
 import { SessionView } from '@/app/(operator)/sessions/[sessionId]/_components/session-view/SessionView'
 import {
   StartMatch,
@@ -54,7 +55,7 @@ import { selectDev } from '@/store/slices/devSlice'
 export type SessionConsoleProps = { sessionId: string }
 
 export type ConsoleView = 'session' | 'queue' | 'players' | 'leaderboard'
-export type ConsoleSheet = 'join-requests' | 'post' | 'adjust' | 'add-court' | null
+export type ConsoleSheet = 'join-requests' | 'post' | 'adjust' | 'add-court' | 'session-done' | null
 /** The Queue › Match editing and generation sheets: Add match / Edit lineup, Suggested match, Auto queue, Regenerate */
 export type MatchSheet =
   | MatchLineupRequest
@@ -96,7 +97,8 @@ const MODE_LABELS = { chill: 'Chill', fair: 'Fair', hard: 'Hard' } as const
  * Home / Public page / Copy Facebook post / Extend time / Join requests · N actions, the view tabs
  * with live counts, the view panels (Session here; the others arrive in their own containers), the
  * ConsoleFooterBar and the dock's Session done pill. Sessions that are not live go to their own
- * screen: prepared to /preparation, finished or invalid to /record, unknown ids to notFound().
+ * screen: prepared to /preparation, finalizing to /finishing, finished or invalid to /record,
+ * unknown ids to notFound().
  *
  * States: offline shows the warn notice and disables Session done in the footer and the dock (every
  * other action still works and its toast says "Saved on this device, waiting to sync"); the console
@@ -119,7 +121,7 @@ export function SessionConsole({ sessionId }: SessionConsoleProps) {
   const s = session.data
   if (session.isError && session.error instanceof MockError && session.error.kind === 'permission')
     notFound()
-  const redirectTo = s && s.state !== 'active' && s.state !== 'finalizing' ? sessionHref(s) : null
+  const redirectTo = s && s.state !== 'active' ? sessionHref(s) : null
   useEffect(() => {
     if (redirectTo) router.replace(redirectTo)
   }, [redirectTo, router])
@@ -139,15 +141,15 @@ export function SessionConsole({ sessionId }: SessionConsoleProps) {
   // Online from the sync state (the mock follows the DevMenu's Simulate offline toggle).
   const online = sync.data ? sync.data.online : !dev.offline
 
-  // Session done's handler arrives with Queue › Session finalization; until then there is none, so
-  // the footer button and the dock pill stay disabled. Offline they are disabled either way.
-  const onSessionDone = undefined as (() => void) | undefined
+  // Session done opens the three-step sheet from the footer button and the dock pill alike; offline
+  // both are disabled.
+  const onSessionDone = useCallback(() => setSheet('session-done'), [])
   const sessionDone = useMemo(
     () => ({
       label: 'Session done',
       icon: 'check' as const,
-      disabled: !online || !onSessionDone,
-      onClick: () => onSessionDone?.(),
+      disabled: !online,
+      onClick: onSessionDone,
     }),
     [online, onSessionDone],
   )
@@ -393,6 +395,11 @@ export function SessionConsole({ sessionId }: SessionConsoleProps) {
         onClose={() => setMatchSheet(null)}
       />
       <PlayerProfile clubPlayerId={profileId} onClose={() => setProfileId(null)} />
+      <SessionDoneFlow
+        sessionId={sessionId}
+        open={sheet === 'session-done'}
+        onOpenChange={(open) => setSheet(open ? 'session-done' : null)}
+      />
     </main>
   )
 }

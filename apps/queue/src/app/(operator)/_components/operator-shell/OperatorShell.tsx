@@ -26,6 +26,9 @@ import { OperatorShellContext, type OperatorShellContextValue } from './DockActi
 /** Screens the license gate replaces while the license has ended (the console stays reachable). */
 const GATED_PREFIXES = ['/', '/saved-players', '/venues', '/club-settings', '/sessions/new']
 
+/** Screens rendered without the top bar, left nav and dock: the finishing route (the prototype's hasShell). */
+const BARE_ROUTE = /^\/sessions\/[^/]+\/finishing$/
+
 /** Per-device memory of the collapsed rail, as the prototype keeps it. */
 const NAV_STORAGE_KEY = 'rotra-queue-nav'
 
@@ -206,6 +209,9 @@ export function OperatorShell({ children }: { children: ReactNode }) {
     () => ({ setDockAction: setDockOverride, settingsMenuOpen, setSettingsMenuOpen }),
     [settingsMenuOpen],
   )
+
+  if (BARE_ROUTE.test(pathname))
+    return <OperatorShellContext.Provider value={context}>{children}</OperatorShellContext.Provider>
 
   return (
     <OperatorShellContext.Provider value={context}>

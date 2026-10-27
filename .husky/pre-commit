@@ -1,0 +1,9 @@
+# Hooks run outside your shell, so load the .nvmrc Node version first (AGENTS.md rule 13).
+# nvm.sh is not safe under husky's `sh -e`, hence the set +e around it.
+if [ -s "$HOME/.nvm/nvm.sh" ]; then
+  set +e
+  . "$HOME/.nvm/nvm.sh" --no-use
+  nvm use --silent >/dev/null
+  set -e
+fi
+pnpm lint

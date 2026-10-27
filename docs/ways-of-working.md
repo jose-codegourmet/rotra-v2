@@ -132,8 +132,9 @@ Epics are titled `Epic <key> · <Product> › <Module>`.
   `build:`, `ci:`, `revert:`. Scope with the package when it helps: `feat(ui): add CourtCard`.
 - One ticket per PR. The PR body says `Closes #<n>` and includes the verification block (§7).
 - AI-authored commits end with a `Co-Authored-By:` trailer naming the agent.
-- Hooks (set up by Foundation): `pre-commit` runs lint, `commit-msg` runs commitlint. Do not bypass
-  them with `--no-verify`.
+- Hooks (husky, in `.husky/`): `pre-commit` runs `pnpm lint` (Biome), `commit-msg` runs commitlint
+  with the Conventional Commits config. There is **no pre-push hook**: build and type-check run locally
+  before a PR (below), not on every push, to keep the loop fast. Do not bypass hooks with `--no-verify`.
 
 ### Auto-merge: pipelines never block
 

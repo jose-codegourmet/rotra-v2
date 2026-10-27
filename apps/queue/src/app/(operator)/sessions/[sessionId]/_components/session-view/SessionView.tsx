@@ -12,6 +12,7 @@ import {
   waitingMatches,
 } from '@rotra/data/match/match.rules'
 import type { Match } from '@rotra/data/match/types'
+import { useRemoveWaitingMatch } from '@rotra/data/match/useRemoveWaitingMatch'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import type { SessionCourt } from '@rotra/data/queue-session/types'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
@@ -37,16 +38,20 @@ export type SessionViewProps = {
   onOpenQueue: () => void
   /** The + Add court tile: open the Add a court sheet (Queue › Courts and time) */
   onAddCourt: () => void
+  /** Edit on an upcoming queue card: open the Edit lineup sheet (Queue › Match editing). Edit is hidden until given. */
+  onEditMatch?: (matchId: string) => void
 }
 
 /**
  * Q-COURTS, the console's Session view: "Courts" with "F of C free", one CourtCard per court from
  * the match rules (in game, or free with the next eligible match or why none can start), the
  * + Add court tile, the footer line, then UpcomingQueueRow with the whole waiting queue. The court
- * and queue-card actions (Review and start, Pick another, Open match, Add match, Start, Edit) are
- * wired by Queue › Match queue and Match control; here the pictures, More queues and Remove on a
- * free court act. Remove goes straight to useRemoveCourt with a "LABEL removed" toast (no dialog,
- * per dialogs.md); an occupied court is refused with "Only a free court can be removed".
+ * actions (Review and start, Pick another, Open match, Add match) and Start on a queue card are
+ * wired by Queue › Match control; here the pictures, More queues, Remove on a free court and Remove
+ * on a queue card act, and Edit appears once onEditMatch is given (Queue › Match editing). Both
+ * removes go straight to their mutation with a toast and no dialog (per dialogs.md): a court with
+ * "LABEL removed" (an occupied court is refused with "Only a free court can be removed"), a waiting
+ * match with "Waiting match N removed".
  */
 export function SessionView({
   sessionId,
@@ -54,11 +59,13 @@ export function SessionView({
   onOpenProfile,
   onOpenQueue,
   onAddCourt,
+  onEditMatch,
 }: SessionViewProps) {
   const session = useQueueSession(sessionId)
   const roster = useSessionRoster(sessionId)
   const matches = useSessionMatches(sessionId)
   const removeCourt = useRemoveCourt()
+  const removeWaitingMatch = useRemoveWaitingMatch()
 
   if (session.isError || roster.isError || matches.isError)
     return (
@@ -107,18 +114,18 @@ export function SessionView({
   const active = activeMatches(ctx.matches)
   const free = freeCourts(courts, ctx.matches)
   const untilLabel = (c: SessionCourt) => formatTime(c.openUntil ?? s.scheduledEndAt)
+  const options = {
+    onSuccess: (result: { message: string }) => toast(result.message),
+    onError: (error: unknown) =>
+      toast.error(error instanceof Error ? error.message : 'Something went wrong. Try again.'),
+  }
   const onRemoveCourt = (c: SessionCourt) => {
     if (removeCourt.isPending) return
-    removeCourt.mutate(
-      { sessionId, courtId: c.id },
-      {
-        onSuccess: (result) => toast(result.message),
-        onError: (error) =>
-          toast.error(
-            error instanceof Error ? error.message : 'Something went wrong. Try again.',
-          ),
-      },
-    )
+    removeCourt.mutate({ sessionId, courtId: c.id }, options)
+  }
+  const onRemoveMatch = (m: Match) => {
+    if (removeWaitingMatch.isPending) return
+    removeWaitingMatch.mutate({ sessionId, matchId: m.id }, options)
   }
 
   // A 5v5 on two courts draws once, as one merged card, under its first court.
@@ -179,6 +186,8 @@ export function SessionView({
     teamA: m.teamA.map(player),
     teamB: m.teamB.map(player),
     onSelectPlayer: openProfile,
+    onEdit: onEditMatch ? () => onEditMatch(m.id) : undefined,
+    onRemove: () => onRemoveMatch(m),
   }))
   const attentionCount = upcoming.filter((m) => m.status.kind === 'needs-attention').length
 

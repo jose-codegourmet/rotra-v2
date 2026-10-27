@@ -32,6 +32,7 @@ import { JoinRequests } from '@/app/(operator)/sessions/[sessionId]/_components/
 import { LeaderboardView } from '@/app/(operator)/sessions/[sessionId]/_components/leaderboard-view/LeaderboardView'
 import { PlayerProfile } from '@/app/(operator)/sessions/[sessionId]/_components/player-profile/PlayerProfile'
 import { PlayersView } from '@/app/(operator)/sessions/[sessionId]/_components/players-view/PlayersView'
+import { QueueView } from '@/app/(operator)/sessions/[sessionId]/_components/queue-view/QueueView'
 import { SessionView } from '@/app/(operator)/sessions/[sessionId]/_components/session-view/SessionView'
 import { sessionHref } from '@/lib/dates'
 import { useNow } from '@/lib/useNow'
@@ -57,11 +58,11 @@ const OFFLINE_NOTICE =
 
 /**
  * The views other tickets add, one container file each; the shell shows a view's tab and panel as
- * soon as it is listed here. Queue (Queue › Match queue) is hidden until then; Players and
- * Leaderboard (Players and Leaderboard views) keep their tab and a Skeleton panel.
+ * soon as it is listed here; an unlisted Queue hides its tab, while unlisted Players and
+ * Leaderboard keep their tab and a Skeleton panel.
  */
 const VIEWS: Partial<Record<Exclude<ConsoleView, 'session'>, ComponentType<ConsoleViewProps>>> = {
-  // queue: QueueView,
+  queue: QueueView,
   players: PlayersView,
   leaderboard: LeaderboardView,
 }

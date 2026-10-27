@@ -8,14 +8,24 @@
   ],
   "exports": {
     "./button": "./src/components/button/Button.tsx",
+    "./checkbox": "./src/components/checkbox/Checkbox.tsx",
     "./cn": "./src/lib/cn.ts",
+    "./date-picker": "./src/components/date-picker/DatePicker.tsx",
+    "./date-picker/date-calendar": "./src/components/date-picker/date-calendar/DateCalendar.tsx",
+    "./field": "./src/components/field/Field.tsx",
+    "./field/variants": "./src/components/field/Field.variants.ts",
     "./icon": "./src/components/icon/Icon.tsx",
     "./icon-button": "./src/components/icon-button/IconButton.tsx",
     "./meta": "./src/lib/meta.ts",
+    "./select": "./src/components/select/Select.tsx",
     "./spinner": "./src/components/spinner/Spinner.tsx",
+    "./switch": "./src/components/switch/Switch.tsx",
+    "./text-input": "./src/components/text-input/TextInput.tsx",
+    "./textarea": "./src/components/textarea/Textarea.tsx",
     "./theme-provider": "./src/components/theme-provider/ThemeProvider.tsx",
     "./theme-provider/script": "./src/components/theme-provider/ThemeProvider.script.ts",
-    "./theme-toggle": "./src/components/theme-toggle/ThemeToggle.tsx"
+    "./theme-toggle": "./src/components/theme-toggle/ThemeToggle.tsx",
+    "./time-field": "./src/components/time-field/TimeField.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

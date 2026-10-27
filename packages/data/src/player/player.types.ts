@@ -40,3 +40,15 @@ export type PlayerSessionRecord = {
   sessionPageUrl: string | null
   games: PlayerGame[]
 }
+
+export type PlayerRank = {
+  playerId: string
+  fullName: string
+  nickname: string | null
+  levelIndex: number | null
+  state: 'provisional' | 'established' | 'needs_reassessment'
+  updatePending: { sessionTitle: string; clubName: string; finishedAt: string } | null
+  position: number | null
+  recentCount: number
+  olderCount: number
+}

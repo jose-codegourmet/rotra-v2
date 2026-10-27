@@ -128,7 +128,15 @@
     "./match/control": "./src/match/control.ts",
     "./fixtures/consoleSessions": "./src/fixtures/consoleSessions.ts",
     "./fixtures/player-games": "./src/fixtures/playerGames.ts",
-    "./fixtures/rank-explanation": "./src/fixtures/rankExplanation.ts"
+    "./fixtures/rank-explanation": "./src/fixtures/rankExplanation.ts",
+    "./ranking-settings": "./src/ranking-settings/useRankingSettings.ts",
+    "./ranking-settings/types": "./src/ranking-settings/rankingSettings.types.ts",
+    "./ranking-settings/query-keys": "./src/ranking-settings/queryKeys.ts",
+    "./ranking-settings/fetchers": "./src/ranking-settings/fetchers.ts",
+    "./player": "./src/player/player.rules.ts",
+    "./player/rules": "./src/player/player.rules.ts",
+    "./leaderboard/query-keys": "./src/leaderboard/queryKeys.ts",
+    "./fixtures/ranking-settings": "./src/fixtures/rankingSettings.ts"
   },
   "scripts": {
     "lint": "biome check .",

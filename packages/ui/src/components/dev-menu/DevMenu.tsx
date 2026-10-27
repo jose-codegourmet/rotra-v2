@@ -3,6 +3,8 @@
 import { Button } from '@rotra/ui/button'
 import { Sheet } from '@rotra/ui/sheet'
 import { Switch } from '@rotra/ui/switch'
+import { TextInput } from '@rotra/ui/text-input'
+import { useId } from 'react'
 
 export type DevMenuProps = {
   open: boolean
@@ -15,6 +17,11 @@ export type DevMenuProps = {
   }
   onToggle: (key: keyof DevMenuProps['toggles'], value: boolean) => void
   onReset: () => void
+  rankingSettings?: {
+    assessmentWeightPercent: number
+    matchRequirement: number
+    onChange: (settings: { assessmentWeightPercent: number; matchRequirement: number }) => void
+  }
   actions?: { label: string; onClick: () => void; disabled?: boolean }[]
 }
 const CONTROLS = [
@@ -25,7 +32,16 @@ const CONTROLS = [
 ] as const
 
 /** Props-only prototype controls; the app decides whether development tools are enabled. */
-export function DevMenu({ open, onOpenChange, toggles, onToggle, onReset, actions }: DevMenuProps) {
+export function DevMenu({
+  open,
+  onOpenChange,
+  toggles,
+  onToggle,
+  onReset,
+  actions,
+  rankingSettings,
+}: DevMenuProps) {
+  const settingsId = useId()
   return (
     <>
       <Button size="xs" onClick={() => onOpenChange(true)}>
@@ -53,6 +69,48 @@ export function DevMenu({ open, onOpenChange, toggles, onToggle, onReset, action
             />
           </div>
         ))}
+        {rankingSettings && (
+          <section className="flex flex-col gap-3 border-t border-border pt-3">
+            <h3>Admin settings</h3>
+            <label htmlFor={`${settingsId}-weight`} className="flex flex-col gap-1">
+              Club assessment weight (%)
+              <TextInput
+                type="number"
+                min={0}
+                max={100}
+                id={`${settingsId}-weight`}
+                step={5}
+                value={rankingSettings.assessmentWeightPercent}
+                onChange={(e) => {
+                  const v = e.target.valueAsNumber
+                  if (Number.isInteger(v) && v >= 0 && v <= 100)
+                    rankingSettings.onChange({
+                      assessmentWeightPercent: v,
+                      matchRequirement: rankingSettings.matchRequirement,
+                    })
+                }}
+              />
+            </label>
+            <label htmlFor={`${settingsId}-requirement`} className="flex flex-col gap-1">
+              Leaderboard match requirement
+              <TextInput
+                type="number"
+                min={1}
+                id={`${settingsId}-requirement`}
+                max={40}
+                value={rankingSettings.matchRequirement}
+                onChange={(e) => {
+                  const v = e.target.valueAsNumber
+                  if (Number.isInteger(v) && v >= 1 && v <= 40)
+                    rankingSettings.onChange({
+                      assessmentWeightPercent: rankingSettings.assessmentWeightPercent,
+                      matchRequirement: v,
+                    })
+                }}
+              />
+            </label>
+          </section>
+        )}
         {actions?.map((action) => (
           <Button key={action.label} onClick={action.onClick} disabled={action.disabled}>
             {action.label}

@@ -3,12 +3,15 @@ import { useSignIn } from '@rotra/data/auth/use-sign-in'
 import { useSignOut } from '@rotra/data/auth/use-sign-out'
 import { connectMockBridge, notifyMockBridge } from '@rotra/data/mock/bridge'
 import { resetDemoData } from '@rotra/data/mock/reset'
+import { useRankingSettings, useSetRankingSettings } from '@rotra/data/ranking-settings'
 import { DevMenu } from '@rotra/ui/dev-menu'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector, useAppStore } from '@/store/hooks'
 import { resetDev, selectDev, setDevToggle } from '@/store/slices/devSlice'
 export function DevTools() {
+  const settings = useRankingSettings(),
+    setSettings = useSetRankingSettings()
   const signIn = useSignIn('player'),
     signOut = useSignOut('player')
   const store = useAppStore(),
@@ -37,6 +40,11 @@ export function DevTools() {
   }, [store, client])
   return (
     <DevMenu
+      rankingSettings={
+        settings.data
+          ? { ...settings.data, onChange: (value) => setSettings.mutate(value) }
+          : undefined
+      }
       actions={[
         {
           label: 'Sign in',

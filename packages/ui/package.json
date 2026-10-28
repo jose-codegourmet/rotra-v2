@@ -257,7 +257,12 @@
     "./claim-form": "./src/forms/claim-form/ClaimForm.tsx",
     "./hooks/use-submit-once": "./src/hooks/useSubmitOnce.ts",
     "./player-id-qr": "./src/components/player-id-qr/PlayerIdQr.tsx",
-    "./player-id-breakdown": "./src/components/player-id-breakdown/PlayerIdBreakdown.tsx"
+    "./player-id-breakdown": "./src/components/player-id-breakdown/PlayerIdBreakdown.tsx",
+    "./phone-privacy-card": "./src/components/phone-privacy-card/PhonePrivacyCard.tsx",
+    "./contact-details-card": "./src/components/contact-details-card/ContactDetailsCard.tsx",
+    "./contact-request-status": "./src/components/contact-request-status/ContactRequestStatus.tsx",
+    "./contact-request-status/variants": "./src/components/contact-request-status/ContactRequestStatus.variants.ts",
+    "./sign-out-card": "./src/components/sign-out-card/SignOutCard.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

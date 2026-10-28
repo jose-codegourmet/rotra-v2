@@ -21,4 +21,5 @@ Foundation's existing `/login` and protected `/me/*` paths take precedence over 
 `/players/[playerId]`, `/players/[playerId]/rank`, `/players/[playerId]/games`.
 Auth screens use `/login`, `/forgot-password`, `/reset-password/[token]`, `/claim/[token]`.
 Account screens will use `/me/edit`, `/me/player-id`, `/me/privacy-and-contact` under the existing
-proxy boundary. P01 builds the ranking routes; profile and auth screens arrive in their own epics.
+proxy boundary. The public profile destination now exists for leaderboard and RTR ID navigation. Private account,
+profile editing, ID/QR and auth screens remain in their own tickets.

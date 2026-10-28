@@ -125,7 +125,11 @@
     "./toaster": "./src/components/toaster/Toaster.tsx",
     "./top-three-podium": "./src/components/top-three-podium/TopThreePodium.tsx",
     "./venue-card": "./src/components/venue-card/VenueCard.tsx",
-    "./venue-picker-sheet": "./src/components/venue-picker-sheet/VenuePickerSheet.tsx"
+    "./venue-picker-sheet": "./src/components/venue-picker-sheet/VenuePickerSheet.tsx",
+    "./player-id-line": "./src/components/player-id-line/PlayerIdLine.tsx",
+    "./player-identity-card": "./src/components/player-identity-card/PlayerIdentityCard.tsx",
+    "./player-about-card": "./src/components/player-about-card/PlayerAboutCard.tsx",
+    "./profile-layout": "./src/components/profile-layout/ProfileLayout.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

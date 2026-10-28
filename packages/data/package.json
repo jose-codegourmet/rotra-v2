@@ -146,7 +146,9 @@
     "./leaderboard/useMyLeaderboardPosition": "./src/leaderboard/useMyLeaderboardPosition.ts",
     "./player/usePlayerRank": "./src/player/usePlayerRank.ts",
     "./player/usePlayerGames": "./src/player/usePlayerGames.ts",
-    "./player/useFindPlayerByRtrId": "./src/player/useFindPlayerByRtrId.ts"
+    "./player/useFindPlayerByRtrId": "./src/player/useFindPlayerByRtrId.ts",
+    "./player/usePlayerProfile": "./src/player/usePlayerProfile.ts",
+    "./fixtures/player-profiles": "./src/fixtures/playerProfiles.ts"
   },
   "scripts": {
     "lint": "biome check .",

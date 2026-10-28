@@ -1,3 +1,5 @@
+import { readMockState } from '../mock/store'
+import type { PlayerProfile } from './player.types'
 import { playerRequest } from '../leaderboard/request'
 import { playerProjection } from './projection'
 import type { PlayerRank, PlayerSessionRecord } from './player.types'
@@ -14,4 +16,9 @@ export async function findPlayerByRtrId(rtrId: string, signal?: AbortSignal): Pr
   await playerRequest(signal)
   const player = playerProjection().players.find((p) => p.rtrId === rtrId.trim().toUpperCase())
   return player ? { playerId: player.id } : null
+}
+
+export async function getPlayerProfile(playerId: string, signal?: AbortSignal): Promise<PlayerProfile | null> {
+  await playerRequest(signal)
+  return readMockState().playerProfiles.find((player) => player.playerId === playerId) ?? null
 }

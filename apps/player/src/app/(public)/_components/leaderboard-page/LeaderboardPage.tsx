@@ -70,10 +70,10 @@ export function LeaderboardPage() {
   } : undefined
   const retry = () => { setOfflineRetry(dev.offline); void active.refetch(); if (!settings.data) void settings.refetch() }
   const savedAt = active.dataUpdatedAt ? new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' }).format(active.dataUpdatedAt) : null
-  const podiumEntries = entries.slice(0, 3).map((entry) => ({ id: `leaderboard-${entry.id}`, fullName: entry.fullName, nickname: entry.nickname, levelLabel: levelLabel(entry.playingLevel), isMe: entry.id === account?.id }))
+  const podiumEntries = entries.slice(0, 3).map((entry) => ({ id: `leaderboard-${entry.id}`, fullName: entry.fullName, nickname: entry.nickname, levelLabel: levelLabel(entry.playingLevel), picture: { src: entry.pictureUrl ?? undefined }, isMe: entry.id === account?.id }))
   return (
     <main className="mx-auto flex max-w-[920px] flex-col gap-5 px-[max(16px,env(safe-area-inset-left,0px))] pt-5 pb-[120px]">
-      <PageHeader eyebrow="Overall ROTRA ranking" title="Leaderboard" description="One list across every club. Singles and doubles share one rank." />
+      <PageHeader eyebrow="Overall ROTRA ranking" className="[&>div>div:first-child]:text-xs [&>div>div:first-child]:font-semibold [&>div>div:first-child]:tracking-[0.6px] [&>div>div:first-child]:text-fg2 [&>div>div:first-child]:uppercase" title="Leaderboard" description="One list across every club. Singles and doubles share one rank." />
       {podium ? <TopThreePodium entries={podiumEntries as [PodiumEntry, PodiumEntry, PodiumEntry]} totalPlayers={total} onSelect={(i) => { const entry = entries[i]; if (entry) openProfile(entry.id) }} /> : null}
       {account && own.data && requirement !== undefined ? <MyPositionCard fullName={own.data.fullName} levelLabel={own.data.levelIndex === null ? undefined : levelLabel(PLAYING_LEVELS[own.data.levelIndex] ?? '')} position={own.data.position === null ? undefined : position.data ?? own.data.position} onShowMyRow={() => { setQuery(''); setJumpToMe(true) }} onOpenProfile={() => openProfile(account.id)} status={notListedStatus} /> : null}
       <Card className="flex flex-col gap-4">
@@ -86,7 +86,7 @@ export function LeaderboardPage() {
           : <>
             {nameSearch && search.data ? <p className="text-sm text-fg2" aria-live="polite">{search.data.total} {search.data.total === 1 ? 'player matches' : 'players match'} “{query.trim()}”.{search.data.total > 50 ? ' Showing the first 50.' : ''}</p> : null}
             <LeaderboardList busy={active.isFetching} shown={nameSearch ? undefined : entries.length} total={nameSearch ? undefined : total} onShowMore={board.hasNextPage ? () => { if (!board.isFetching) void board.fetchNextPage() } : undefined}>
-              {shownEntries.map((entry) => <LeaderboardRow key={entry.id} id={`leaderboard-${entry.id}`} position={entry.position} fullName={entry.fullName} nickname={entry.nickname} levelLabel={levelLabel(entry.playingLevel)} isMe={entry.id === account?.id} variant={entry.position <= 3 ? `medal-${entry.position as 1 | 2 | 3}` : undefined} onSelect={() => openProfile(entry.id)} />)}
+              {shownEntries.map((entry) => <LeaderboardRow key={entry.id} id={`leaderboard-${entry.id}`} position={entry.position} fullName={entry.fullName} nickname={entry.nickname} picture={{ src: entry.pictureUrl ?? undefined }} levelLabel={levelLabel(entry.playingLevel)} isMe={entry.id === account?.id} variant={entry.position <= 3 ? `medal-${entry.position as 1 | 2 | 3}` : undefined} onSelect={() => openProfile(entry.id)} />)}
             </LeaderboardList>
           </>}
         {dev.offline && active.data && !failed ? <Button size="sm" className="self-start" onClick={retry}>Try again</Button> : null}

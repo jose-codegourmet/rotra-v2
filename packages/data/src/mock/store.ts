@@ -9,6 +9,8 @@ import { rankingSettings } from '../fixtures/rankingSettings'
 import { venues } from '../fixtures/venues'
 import type { ClubLicenseTerm } from '../license/license.types'
 import type { Match } from '../match/match.types'
+import { playerProfiles } from '../fixtures/playerProfiles'
+import type { PlayerProfile } from '../player/player.types'
 import { createPlayerRankFixtures } from '../fixtures/playerRanks'
 import type { PlayerRank, PlayerSessionRecord } from '../player/player.types'
 import type { Player } from '../player/player.types'
@@ -21,6 +23,7 @@ import type {
 } from '../session-roster/sessionRoster.types'
 import type { SaveOutcome, SyncState } from '../sync/sync.types'
 export type MockState = {
+  playerProfiles: PlayerProfile[]
   playerRanks: Record<string, PlayerRank>
   playerGames: Record<string, PlayerSessionRecord[]>
   rankingSettings: RankingSettings
@@ -54,6 +57,7 @@ function seedState(): MockState {
   const now = Date.now()
   return structuredClone({
     ...createPlayerRankFixtures(),
+    playerProfiles,
     rankingSettings,
     clubs,
     venues,

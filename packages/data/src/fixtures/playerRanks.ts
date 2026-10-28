@@ -19,11 +19,13 @@ export function createPlayerRankFixtures() {
     const item = entries.get(player.id)
     const baseIndex = item ? item.index - (item.index > 127 ? 1 : 0) : 0
     const count = item ? 10 + ((hash(`lb${baseIndex}`) >>> 4) % 16) : 7
-    const sessions = player.id === MIGS_PLAYER_ID ? MIGS_SESSIONS : genSessions(player.id, count)
+    // Keep the prototype's bN/u2 seeds so generated opponents, scores and session dates match.
+    const historySeed = item ? `b${baseIndex}` : player.rtrId === 'RTR-PH-CEB-040226-0007' ? 'u2' : player.id
+    const sessions = player.id === MIGS_PLAYER_ID ? MIGS_SESSIONS : genSessions(historySeed, count)
     games[player.id] = sessions
     ranks[player.id] = {
       playerId: player.id, fullName: player.fullName, nickname: player.nickname,
-      levelIndex: item ? PLAYING_LEVELS.indexOf(item.entry.playingLevel) : 5,
+      levelIndex: item ? PLAYING_LEVELS.indexOf(item.entry.playingLevel) : player.rtrId === 'RTR-PH-CEB-040226-0007' ? 3 : 5,
       state: item ? 'established' : 'provisional', updatePending: null, position: null,
       recentCount: countRecentStandardMatches(sessions, PLAYER_FIXTURE_NOW), olderCount: 0,
     }

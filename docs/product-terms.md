@@ -245,6 +245,7 @@ from the [database design](database_design/product/README.md). Add a row here **
 | Ranking settings | `RankingSettings` | `ranking_policy_versions` | Configured assessment weight and match requirement |
 | Leaderboard entry | `LeaderboardEntry` | — | Public projection, no table; overall position comes from eligible fixture order |
 | Player session record / player game | `PlayerSessionRecord` / `PlayerGame` | `player_match_facts` | Public read projection of valid finalized games |
+| Player profile | `PlayerProfile` | — | Public identity, picture, and optional playing details; no contacts |
 | Player rank | `PlayerRank` | `player_rank_current` | Public shared-rank projection; no numerical formula in the mock phase |
 | Club assessment | `ClubAssessment` | `club_assessments` | |
 | Inventory item | `InventoryItem` | `inventory_items` | |

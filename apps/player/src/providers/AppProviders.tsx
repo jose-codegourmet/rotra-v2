@@ -1,5 +1,6 @@
 'use client'
 
+import { Toaster } from '@rotra/ui/toaster'
 import { ThemeProvider } from '@rotra/ui/theme-provider'
 import type { ReactNode } from 'react'
 import { AuthBridge } from './AuthBridge'
@@ -15,6 +16,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
         <QueryProvider>
           <AuthBridge />
           {children}
+          <Toaster />
         </QueryProvider>
       </StoreProvider>
     </ThemeProvider>

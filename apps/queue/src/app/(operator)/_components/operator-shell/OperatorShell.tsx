@@ -1,13 +1,12 @@
 'use client'
 
-import { useInventory } from '@rotra/data/inventory/useInventory'
 import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import { useClubVenues } from '@rotra/data/club-venue/useClubVenues'
+import { useInventory } from '@rotra/data/inventory/useInventory'
 import { useClubAccess } from '@rotra/data/license/useClubAccess'
 import { useNowCard } from '@rotra/data/queue-session/useNowCard'
-import { useSyncStatus } from '@rotra/data/sync/useSyncStatus'
-import { SyncStatusDialog } from '../sync-status-dialog/SyncStatusDialog'
 import { useSyncState } from '@rotra/data/sync/useSyncState'
+import { useSyncStatus } from '@rotra/data/sync/useSyncStatus'
 import { AccessGate } from '@rotra/ui/access-gate'
 import { AppShell, useAppShell } from '@rotra/ui/app-shell'
 import { BottomDock, type DockAction } from '@rotra/ui/app-shell/bottom-dock'
@@ -24,6 +23,7 @@ import { DEV_TOOLS_ENABLED } from '@/providers/devToolsEnabled'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { selectAccount } from '@/store/slices/authSlice'
 import { selectNavCollapsed, setNavCollapsed } from '@/store/slices/uiSlice'
+import { SyncStatusDialog } from '../sync-status-dialog/SyncStatusDialog'
 import { OperatorShellContext, type OperatorShellContextValue } from './DockAction.context'
 
 /** Screens the license gate replaces while the license has ended (the console stays reachable). */

@@ -4,9 +4,9 @@ import { formatPeso } from '@rotra/schema/money'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { cn } from '@rotra/ui/cn'
+import { Notice } from '@rotra/ui/notice'
 import { PaymentCard, type PaymentPlayer } from '@rotra/ui/payments-checklist/payment-card'
 import { SegmentedControl } from '@rotra/ui/segmented-control'
-import { Notice } from '@rotra/ui/notice'
 
 export type PaymentFilter = 'all' | 'unpaid' | 'paid'
 export type PaymentsChecklistProps = {

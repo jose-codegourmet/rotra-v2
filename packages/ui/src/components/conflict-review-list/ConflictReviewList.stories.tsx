@@ -1,7 +1,8 @@
-import { syncConflictsFixture, longSyncConflictFixture } from '@rotra/data/fixtures/sync-recovery'
+import { longSyncConflictFixture, syncConflictsFixture } from '@rotra/data/fixtures/sync-recovery'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import { ConflictReviewList } from './ConflictReviewList'
+
 const meta = {
   title: 'Queue/ConflictReviewList',
   component: ConflictReviewList,

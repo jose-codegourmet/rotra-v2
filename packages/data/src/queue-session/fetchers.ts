@@ -5,7 +5,6 @@ import { delay } from '../mock/latency'
 import { type MockState, readMockState } from '../mock/store'
 import { sessionIn } from '../mock/transaction'
 import { sessionMinutes } from './queueSession.rules'
-import { type SessionRecordHistory, sessionRecordHistory } from './sessionRecord.rules'
 import type {
   QueueSession,
   QueueSessionSummary,
@@ -13,6 +12,7 @@ import type {
   SessionFinalization,
   SessionRecordSummary,
 } from './queueSession.types'
+import { type SessionRecordHistory, sessionRecordHistory } from './sessionRecord.rules'
 export function sessionSummary(state: MockState, session: QueueSession): QueueSessionSummary {
   const matches = state.matches.filter((m) => m.sessionId === session.id),
     roster = state.roster.filter((r) => r.sessionId === session.id)

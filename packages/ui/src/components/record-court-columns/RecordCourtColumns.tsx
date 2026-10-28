@@ -22,7 +22,11 @@ export type RecordCourtColumnsProps = {
  * with "N matches" and its MatchRecordCards in play order, or "No matches.". The columns sit side
  * by side on wide screens and stack on phones.
  */
-export function RecordCourtColumns({ columns, onSelectPlayer, className }: RecordCourtColumnsProps) {
+export function RecordCourtColumns({
+  columns,
+  onSelectPlayer,
+  className,
+}: RecordCourtColumnsProps) {
   return (
     <div
       className={cn(
@@ -31,7 +35,11 @@ export function RecordCourtColumns({ columns, onSelectPlayer, className }: Recor
       )}
     >
       {columns.map((column) => (
-        <section key={column.label} aria-label={column.label} className="flex min-w-0 flex-col gap-2">
+        <section
+          key={column.label}
+          aria-label={column.label}
+          className="flex min-w-0 flex-col gap-2"
+        >
           <div className="flex items-center justify-between gap-2">
             <h3 className="[overflow-wrap:anywhere]">{column.label}</h3>
             <span className="text-[13px] text-fg2">

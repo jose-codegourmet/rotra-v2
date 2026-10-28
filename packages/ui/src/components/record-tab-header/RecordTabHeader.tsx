@@ -29,7 +29,9 @@ export function RecordTabHeader({
     <div className={cn('flex flex-wrap items-center justify-between gap-3', className)}>
       <div className="flex min-w-0 flex-col gap-1">
         <h2 className="[overflow-wrap:anywhere]">{title}</h2>
-        {description ? <p className="m-0 max-w-[68ch] text-[13px] text-fg2">{description}</p> : null}
+        {description ? (
+          <p className="m-0 max-w-[68ch] text-[13px] text-fg2">{description}</p>
+        ) : null}
       </div>
       {aside ? <span className="text-[13px] text-fg2">{aside}</span> : null}
       {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}

@@ -11,8 +11,6 @@ import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { MockError } from '@rotra/data/mock/errors'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
-import { ConsoleDeviceNotice } from '../console-device-notice/ConsoleDeviceNotice'
-import { PaymentsPanel } from '@/app/(operator)/sessions/[sessionId]/_components/payments-panel/PaymentsPanel'
 import { useSyncState } from '@rotra/data/sync/useSyncState'
 import { Button } from '@rotra/ui/button'
 import { Chip } from '@rotra/ui/chip'
@@ -38,6 +36,7 @@ import {
   MatchLineup,
   type MatchLineupRequest,
 } from '@/app/(operator)/sessions/[sessionId]/_components/match-lineup/MatchLineup'
+import { PaymentsPanel } from '@/app/(operator)/sessions/[sessionId]/_components/payments-panel/PaymentsPanel'
 import { PlayerProfile } from '@/app/(operator)/sessions/[sessionId]/_components/player-profile/PlayerProfile'
 import { PlayersView } from '@/app/(operator)/sessions/[sessionId]/_components/players-view/PlayersView'
 import { QueueView } from '@/app/(operator)/sessions/[sessionId]/_components/queue-view/QueueView'
@@ -53,6 +52,7 @@ import { sessionHref } from '@/lib/dates'
 import { useNow } from '@/lib/useNow'
 import { useAppSelector } from '@/store/hooks'
 import { selectDev } from '@/store/slices/devSlice'
+import { ConsoleDeviceNotice } from '../console-device-notice/ConsoleDeviceNotice'
 
 export type SessionConsoleProps = { sessionId: string; resumeSessionDone?: boolean }
 

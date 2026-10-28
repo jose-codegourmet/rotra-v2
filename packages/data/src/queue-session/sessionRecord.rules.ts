@@ -84,9 +84,7 @@ export function sessionRecordHistory(input: {
     invalid: m.state === 'invalid',
     substitutions: m.substitutions.length,
   }))
-  const from = matches.length
-    ? Math.min(...matches.map((m) => m.startedAt))
-    : input.fallbackStart
+  const from = matches.length ? Math.min(...matches.map((m) => m.startedAt)) : input.fallbackStart
   const to = Math.max(from + MINUTE, ...matches.map((m) => m.endedAt))
   return { courtLabels: courts.map((c) => c.label), matches, from, to }
 }

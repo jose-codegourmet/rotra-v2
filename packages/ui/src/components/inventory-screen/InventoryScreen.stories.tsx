@@ -3,6 +3,7 @@ import { InventorySection } from '@rotra/ui/inventory-section'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import { InventoryScreen } from './InventoryScreen'
+
 const meta = {
   title: 'Queue/InventoryScreen',
   component: InventoryScreen,

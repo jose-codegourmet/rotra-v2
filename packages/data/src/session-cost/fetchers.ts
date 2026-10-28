@@ -1,6 +1,6 @@
+import { delay } from '../mock/latency'
 import type { MockState } from '../mock/store'
 import { readMockState } from '../mock/store'
-import { delay } from '../mock/latency'
 import { sessionIn } from '../mock/transaction'
 import { estimateSessionCost } from './sessionCost.rules'
 

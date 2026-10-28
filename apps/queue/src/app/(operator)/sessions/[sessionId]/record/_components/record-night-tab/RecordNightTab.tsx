@@ -1,11 +1,11 @@
 'use client'
 
-import type { SessionRecordSummary } from '@rotra/data/queue-session/types'
 import {
   onCourtAt,
   replayCourtsAt,
   replaySummaryAt,
 } from '@rotra/data/queue-session/sessionRecord.rules'
+import type { SessionRecordSummary } from '@rotra/data/queue-session/types'
 import { useSessionRecordHistory } from '@rotra/data/queue-session/useSessionRecordHistory'
 import { InvalidSessionNotice } from '@rotra/ui/invalid-session-notice'
 import { RecordCourtColumns } from '@rotra/ui/record-court-columns'
@@ -75,7 +75,12 @@ export function RecordNightTab({ sessionId, record }: RecordNightTabProps) {
     return (
       <div className="flex flex-col gap-4">
         {header}
-        <div role="status" aria-busy aria-label="Loading the match history" className="flex flex-col gap-3">
+        <div
+          role="status"
+          aria-busy
+          aria-label="Loading the match history"
+          className="flex flex-col gap-3"
+        >
           <Skeleton className="h-72 rounded-lg" />
           <Skeleton className="h-48 rounded-lg" />
         </div>

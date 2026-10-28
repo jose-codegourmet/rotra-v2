@@ -1,9 +1,9 @@
 'use client'
 
+import { useMarkAllPaid } from '@rotra/data/session-payment/useMarkAllPaid'
 import { useSessionPayments } from '@rotra/data/session-payment/useSessionPayments'
 import { useTogglePaid } from '@rotra/data/session-payment/useTogglePaid'
-import { useMarkAllPaid } from '@rotra/data/session-payment/useMarkAllPaid'
-import { PaymentsChecklist, type PaymentFilter } from '@rotra/ui/payments-checklist'
+import { type PaymentFilter, PaymentsChecklist } from '@rotra/ui/payments-checklist'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { toast } from '@rotra/ui/toaster'
 import { useState } from 'react'

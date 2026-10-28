@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { RecoveryStatusPanel } from './RecoveryStatusPanel'
+
 const meta = {
   title: 'Queue/RecoveryStatusPanel',
   component: RecoveryStatusPanel,

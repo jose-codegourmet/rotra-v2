@@ -1,7 +1,7 @@
 import { dateField, timeField } from '@rotra/schema/date'
 import {
-  sessionFinancialsSchema,
   CUSTOM_FEE_ERROR,
+  sessionFinancialsSchema,
 } from '@rotra/ui/forms/session-financials-fields/schema'
 import { z } from 'zod'
 

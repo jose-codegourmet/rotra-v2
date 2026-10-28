@@ -1,10 +1,11 @@
 import {
-  missingRecordsFixture,
   longMissingRecordsFixture,
+  missingRecordsFixture,
 } from '@rotra/data/fixtures/sync-recovery'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import { InterruptionCheckSheet } from './InterruptionCheckSheet'
+
 const meta = {
   title: 'Queue/InterruptionCheckSheet',
   component: InterruptionCheckSheet,

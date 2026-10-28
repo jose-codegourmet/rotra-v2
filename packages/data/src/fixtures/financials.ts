@@ -1,6 +1,9 @@
 import type { SessionCostEstimate } from '../session-cost/sessionCost.types'
 import type { SessionPlayer } from '../session-roster/sessionRoster.types'
-import { clubPlayers, players } from './players'
+import portraits from './playerPortraits.json'
+import { clubPlayers } from './players'
+
+const pictures: Record<string, string> = portraits
 
 /** Prototype financePanel and histFinancePane values, in integer centavos. */
 export const thursdayEstimate = {
@@ -83,7 +86,7 @@ export const paymentPlayers = clubPlayers
   .map((p, index) => ({
     clubPlayerId: p.id,
     name: p.fullName,
-    picture: players.find((x) => x.id === p.playerId)?.picture,
+    picture: p.playerId ? pictures[p.playerId] : undefined,
     paid: index < 15 ? { amount: 70000, at: Date.UTC(2026, 9, 22, 11, 42) } : undefined,
   }))
   .sort((a, b) => Number(!!a.paid) - Number(!!b.paid) || a.name.localeCompare(b.name))

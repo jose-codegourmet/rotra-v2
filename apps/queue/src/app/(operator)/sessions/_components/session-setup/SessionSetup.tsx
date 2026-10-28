@@ -1,18 +1,10 @@
 'use client'
 
-import { useInventory } from '@rotra/data/inventory/useInventory'
-import { useSessionCostEstimate } from '@rotra/data/session-cost/useSessionCostEstimate'
-import {
-  defaultShuttlePlan,
-  estimateSessionCost,
-  normalizeSessionCost,
-} from '@rotra/data/session-cost/rules'
-import { sessionFinancialsDefaultValues } from '@rotra/ui/forms/session-financials-fields/default-values'
-
 import { useClub } from '@rotra/data/club'
 import { useClubVenues } from '@rotra/data/club-venue/useClubVenues'
 import { useSaveClubVenue } from '@rotra/data/club-venue/useSaveClubVenue'
 import { DEMO_CLUB_ID } from '@rotra/data/fixtures/clubs'
+import { useInventory } from '@rotra/data/inventory/useInventory'
 import { MockError } from '@rotra/data/mock/errors'
 import { estimateMinimum, sessionOccurrences } from '@rotra/data/queue-session/queueSession.rules'
 import type { QueueSessionInput } from '@rotra/data/queue-session/types'
@@ -20,10 +12,17 @@ import { useCreateQueueSession } from '@rotra/data/queue-session/useCreateQueueS
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useQueueSessions } from '@rotra/data/queue-session/useQueueSessions'
 import { useUpdateQueueSession } from '@rotra/data/queue-session/useUpdateQueueSession'
+import {
+  defaultShuttlePlan,
+  estimateSessionCost,
+  normalizeSessionCost,
+} from '@rotra/data/session-cost/rules'
+import { useSessionCostEstimate } from '@rotra/data/session-cost/useSessionCostEstimate'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { Breadcrumb } from '@rotra/ui/breadcrumb'
 import { ChooseDateSheet } from '@rotra/ui/choose-date-sheet'
 import { toYmd } from '@rotra/ui/date-picker/date-calendar/helpers'
+import { sessionFinancialsDefaultValues } from '@rotra/ui/forms/session-financials-fields/default-values'
 import {
   SessionSetupForm,
   type SessionSetupFormHandle,

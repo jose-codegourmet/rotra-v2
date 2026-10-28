@@ -53,7 +53,7 @@ import { useNow } from '@/lib/useNow'
 import { useAppSelector } from '@/store/hooks'
 import { selectDev } from '@/store/slices/devSlice'
 
-export type SessionConsoleProps = { sessionId: string }
+export type SessionConsoleProps = { sessionId: string; resumeSessionDone?: boolean }
 
 export type ConsoleView = 'session' | 'queue' | 'players' | 'leaderboard'
 export type ConsoleSheet = 'join-requests' | 'post' | 'adjust' | 'add-court' | 'session-done' | 'payments' | null
@@ -106,7 +106,7 @@ const MODE_LABELS = { chill: 'Chill', fair: 'Fair', hard: 'Hard' } as const
  * clock ticks every 30 s unless a sheet is open, a field has focus or a card is being dragged, and
  * each tick refetches the session so one finalized or invalidated elsewhere redirects to its record.
  */
-export function SessionConsole({ sessionId }: SessionConsoleProps) {
+export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleProps) {
   const router = useRouter()
   const dev = useAppSelector(selectDev)
   const session = useQueueSession(sessionId)
@@ -115,7 +115,7 @@ export function SessionConsole({ sessionId }: SessionConsoleProps) {
   const standings = useLiveStandings(sessionId)
   const sync = useSyncState()
   const [view, setView] = useState<ConsoleView>('session')
-  const [sheet, setSheet] = useState<ConsoleSheet>(null)
+  const [sheet, setSheet] = useState<ConsoleSheet>(resumeSessionDone ? 'session-done' : null)
   const [matchSheet, setMatchSheet] = useState<MatchSheet | null>(null)
   const [profileId, setProfileId] = useState<string | null>(null)
 

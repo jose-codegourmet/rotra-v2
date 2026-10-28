@@ -236,7 +236,8 @@
     "./unrecoverable-session-panel": "./src/components/unrecoverable-session-panel/UnrecoverableSessionPanel.tsx",
     "./conflict-review-list": "./src/components/conflict-review-list/ConflictReviewList.tsx",
     "./conflict-review-list/conflict-item-card": "./src/components/conflict-review-list/conflict-item-card/ConflictItemCard.tsx",
-    "./device-continue-notice": "./src/components/device-continue-notice/DeviceContinueNotice.tsx"
+    "./device-continue-notice": "./src/components/device-continue-notice/DeviceContinueNotice.tsx",
+    "./session-recovery-screen": "./src/components/session-recovery-screen/SessionRecoveryScreen.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

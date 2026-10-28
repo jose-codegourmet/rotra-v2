@@ -1,16 +1,15 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
-import type { MockAccount as AuthAccount } from '@rotra/data/auth/types'
 
+export type AdminAuthAccount = { email: string } | { accountDescription: string }
 const authSlice = createSlice({
   name: 'auth',
-  initialState: { account: null as AuthAccount | null },
+  initialState: { account: null as AdminAuthAccount | null },
   reducers: {
-    setAccount(state, action: PayloadAction<AuthAccount | null>) {
+    setAccount(state, action: PayloadAction<AdminAuthAccount | null>) {
       state.account = action.payload
     },
   },
 })
 export const { setAccount } = authSlice.actions
 export const authReducer = authSlice.reducer
-export const selectAccount = (state: { auth: { account: AuthAccount | null } }) =>
-  state.auth.account
+export const selectAccount = (state: { auth: { account: AdminAuthAccount | null } }) => state.auth.account

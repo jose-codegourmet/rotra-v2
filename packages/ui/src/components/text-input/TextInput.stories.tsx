@@ -38,3 +38,7 @@ export const LongValue: Story = {
   },
   globals: { viewport: { value: 'phone' } },
 }
+
+export const PasswordVisibility: Story = {
+  args: { type: 'password', passwordVisibility: true, 'aria-label': 'Password', placeholder: undefined },
+}

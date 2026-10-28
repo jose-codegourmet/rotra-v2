@@ -245,7 +245,13 @@
     "./personal-details-fields/schema": "./src/forms/personal-details-fields/PersonalDetailsFields.schema.ts",
     "./personal-details-fields/default-values": "./src/forms/personal-details-fields/PersonalDetailsFields.defaultValues.ts",
     "./edit-profile-form": "./src/forms/edit-profile-form/EditProfileForm.tsx",
-    "./edit-profile-form/schema": "./src/forms/edit-profile-form/EditProfileForm.schema.ts"
+    "./edit-profile-form/schema": "./src/forms/edit-profile-form/EditProfileForm.schema.ts",
+    "./admin-sign-in-form": "./src/forms/admin-sign-in-form/AdminSignInForm.tsx",
+    "./admin-sign-in-form/schema": "./src/forms/admin-sign-in-form/AdminSignInForm.schema.ts",
+    "./access-denied-card": "./src/components/access-denied-card/AccessDeniedCard.tsx",
+    "./admin-nav": "./src/components/admin-nav/AdminNav.tsx",
+    "./admin-account-badge": "./src/components/admin-account-badge/AdminAccountBadge.tsx",
+    "./admin-offline-band": "./src/components/admin-offline-band/AdminOfflineBand.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

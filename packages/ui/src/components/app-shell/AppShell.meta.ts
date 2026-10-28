@@ -5,6 +5,7 @@ export const appShellMeta = {
   description:
     'The signed-in operator layout for Queue and Admin: top bar, left navigation rail, optional phone dock, and the page column.',
   usage: [
+    'Use contentAs and contentClassName to host the Admin main landmark and prototype page spacing.',
     'Use once in the (operator) route group layout. Pass TopBar, SideRail and (Queue only) BottomDock; nav items come from the app.',
     'The rail collapses to icons on wide screens; pass collapsed and onCollapsedChange to remember it on this device (the prototypes use rotra-queue-nav).',
     'At 900 px and below the rail is a drawer opened by the dock Menu (Queue) or the top bar menu button (Admin). Escape or the scrim closes it.',

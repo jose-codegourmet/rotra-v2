@@ -1,6 +1,8 @@
 import { MockError } from './errors'
 
 export type MockDevState = {
+  adminDeniedNextSignIn?: boolean
+  adminNextSignInRejected?: boolean
   offline: boolean
   licenseExpired: boolean
   nextSaveFails: boolean
@@ -40,7 +42,8 @@ export type PlayerMockDevState = MockDevState & {
   leaderboardScenario?: LeaderboardScenario
 }
 let read: () => PlayerMockDevState = () => DEFAULT_DEV_STATE
-let consume = (_key: 'nextSaveFails' | 'nextSaveConflict') => {}
+type ConsumableToggle = 'nextSaveFails' | 'nextSaveConflict' | 'adminDeniedNextSignIn' | 'adminNextSignInRejected'
+let consume = (_key: ConsumableToggle) => {}
 const listeners = new Set<() => void>()
 const saveFailureListeners = new Set<() => void>()
 export function subscribeMockSaveFailure(listener: () => void) {
@@ -89,4 +92,11 @@ export function checkMockSave() {
     consume('nextSaveConflict')
     throw new MockError('conflict', 'Something changed. Review and try again.')
   }
+}
+
+/** One-shot developer scenarios are reset in the app-owned Redux bridge. */
+export function consumeMockDevToggle(key: ConsumableToggle) {
+  if (!read()[key]) return false
+  consume(key)
+  return true
 }

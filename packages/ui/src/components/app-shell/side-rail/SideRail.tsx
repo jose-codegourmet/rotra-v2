@@ -64,7 +64,7 @@ export function SideRail({ groups, footer, linkAs: Link = 'a', ...aria }: SideRa
 
   const itemClass = (item: RailItem) =>
     cn(
-      'flex min-h-[42px] w-full items-center gap-3 rounded-md border-0 bg-transparent px-3 py-[9px] text-left font-semibold whitespace-nowrap text-fg2 no-underline',
+      'flex min-h-[42px] touch:min-h-12 w-full items-center gap-3 rounded-md border-0 bg-transparent px-3 py-[9px] text-left font-semibold whitespace-nowrap text-fg2 no-underline',
       'hover:bg-elev hover:text-fg',
       item.current && 'bg-accent-subtle text-accent hover:bg-accent-subtle hover:text-accent',
       item.live && 'text-accent',

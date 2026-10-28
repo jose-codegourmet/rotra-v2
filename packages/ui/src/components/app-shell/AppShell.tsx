@@ -34,6 +34,8 @@ export type AppShellProps = {
   onCollapsedChange?: (collapsed: boolean) => void
   /** Rail width when expanded: 232 px in Queue, 236 px in Admin */
   railWidth?: 232 | 236
+  contentAs?: 'div' | 'main'
+  contentClassName?: string
   children: ReactNode
 }
 
@@ -49,6 +51,8 @@ export function AppShell({
   collapsed: collapsedProp,
   onCollapsedChange,
   railWidth = 232,
+  contentAs: Content = 'div',
+  contentClassName,
   children,
 }: AppShellProps) {
   const narrow = useMediaQuery(NARROW_QUERY)
@@ -106,14 +110,15 @@ export function AppShell({
         {drawerOpen ? (
           <div aria-hidden className="fixed inset-0 z-45 bg-scrim" onClick={closeDrawer} />
         ) : null}
-        <div
+        <Content
           className={cn(
             'min-w-0',
             dock && 'max-[900px]:pb-[calc(72px+env(safe-area-inset-bottom,0px))]',
+            contentClassName,
           )}
         >
           {children}
-        </div>
+        </Content>
         {dock}
       </div>
     </AppShellContext.Provider>

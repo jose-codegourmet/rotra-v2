@@ -232,6 +232,7 @@ from the [database design](database_design/product/README.md). Add a row here **
 
 | Term | TS type / Prisma model | Table (proposed) | Notes |
 |---|---|---|---|
+| Admin account | `AdminAccount` | `admin_accounts` | Platform owner only |
 | Club | `Club` | `clubs` | |
 | Club account | `ClubAccount` | `club_accounts` | |
 | Venue | `ClubVenue` | `club_venues` | |

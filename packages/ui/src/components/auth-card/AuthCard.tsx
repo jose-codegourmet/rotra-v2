@@ -8,6 +8,8 @@ export type AuthCardProps = {
   /** Recovery screens omit the brand and may put a back action before the heading. */
   showBrand?: boolean
   back?: ReactNode
+  /** Status chip before the heading, used by the Admin access-denied card. */
+  badge?: ReactNode
   /** Line under the ROTRA mark: "Run the game." (Queue), "Your player profile." (Player) */
   tagline?: ReactNode
   /** Product label beside the mark, as Admin shows "ADMIN" */
@@ -30,6 +32,7 @@ export function AuthCard({
   title,
   showBrand = true,
   back,
+  badge,
   tagline,
   product,
   description,
@@ -64,6 +67,7 @@ export function AuthCard({
             </div>
           )
         ) : null}
+        {badge ? <div>{badge}</div> : null}
         <div className="flex flex-col gap-1.5">
           <h1 className={product ? undefined : 'text-[22px]'}>{title}</h1>
           {description ? <p className="m-0 text-fg2">{description}</p> : null}

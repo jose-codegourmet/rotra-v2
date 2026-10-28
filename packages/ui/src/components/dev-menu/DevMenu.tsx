@@ -8,6 +8,7 @@ import { TextInput } from '@rotra/ui/text-input'
 import { type ReactNode, useId, useState } from 'react'
 
 export type DevMenuProps = {
+  audience?: 'queue' | 'admin'
   open: boolean
   onOpenChange: (open: boolean) => void
   toggles: {
@@ -65,6 +66,7 @@ const LABEL = 'text-xs font-semibold tracking-[0.5px] text-fg2 uppercase'
 
 /** Props-only prototype controls; Player Information follows its own prototype's section layout. */
 export function DevMenu({
+  audience = 'queue',
   open,
   onOpenChange,
   toggles,
@@ -325,9 +327,10 @@ export function DevMenu({
         ) : (
           <>
             <p className="text-sm text-fg2">
-              Fake data for a fictional club. Your changes stay in this browser.
+              {audience === 'admin' ? 'Admin prototype controls. These scenarios use fictional accounts and data.' : 'Fake data for a fictional club. Your changes stay in this browser.'}
             </p>
-            {CONTROLS.map(([key, label, description]) => (
+            {audience === 'admin' ? <h3 className={LABEL}>Admin</h3> : null}
+            {CONTROLS.filter(([key]) => audience !== 'admin' || key === 'offline').map(([key, label, description]) => (
               <div key={key} className="flex items-center justify-between gap-3">
                 <div className="min-w-0">
                   <h3>{controlLabels?.[key] ?? label}</h3>

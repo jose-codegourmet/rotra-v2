@@ -102,3 +102,5 @@ export const PlayerSignedIn: Story = {
 }
 export const PlayerOffline: Story = { args: { ...playerArgs, toggles: devMenuFixtures.offline } }
 export const PlayerPhone: Story = { args: playerArgs, globals: { viewport: { value: 'phone' } } }
+
+export const Admin: Story = { args: { audience: 'admin', controlLabels: { offline: 'Offline' } } }

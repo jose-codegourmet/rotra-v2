@@ -10,6 +10,10 @@ Public profiles/leaderboard do not require login. Sign-in is needed for own-prof
 
 Controls (prototype layout in the [module README](README.md#reference-prototype); the field groups phone digits as they're typed, display only): one **Phone number or email** input, Password, show/hide password, Sign in, Forgot password. Required-field errors identify missing input; credential failures avoid exposing private account data. Normalize through the approved identity rules rather than guessing a country from a partial number.
 
+The development mock matches the approved sign-in reference, including the sample phone/email hint
+and any-password placeholder. A claimed fictional account must match; this is not real authentication
+or email delivery.
+
 No Facebook/social sign-in and no club username login on this form. Registration is through the club-issued claim link; do not offer an unagreed unrestricted account-creation path that duplicates existing unclaimed profiles.
 
 Loading disables duplicate submission. Network failure preserves input and offers retry. Offline cannot establish a new authenticated session; cached public content is a separate read state. Success returns to the intended permitted destination or own profile; final routing is implementation work.

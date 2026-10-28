@@ -45,6 +45,10 @@ export function DevTools() {
   }, [store, client])
   return (
     <DevMenu
+      playerLinkPreviews={{ onPasswordReset: (state) => {
+        setOpen(false)
+        router.push(`/reset-password/${state === 'valid' ? 'reset-valid' : 'reset-expired'}`)
+      } }}
       playerScenarios={{
         rank: toggles.playerRankScenario ?? 'on-leaderboard', leaderboard: toggles.leaderboardScenario ?? 'normal',
         rankOptions: playerRankOptions, leaderboardOptions,

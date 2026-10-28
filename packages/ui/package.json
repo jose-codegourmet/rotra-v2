@@ -129,7 +129,12 @@
     "./player-id-line": "./src/components/player-id-line/PlayerIdLine.tsx",
     "./player-identity-card": "./src/components/player-identity-card/PlayerIdentityCard.tsx",
     "./player-about-card": "./src/components/player-about-card/PlayerAboutCard.tsx",
-    "./profile-layout": "./src/components/profile-layout/ProfileLayout.tsx"
+    "./profile-layout": "./src/components/profile-layout/ProfileLayout.tsx",
+    "./phone-or-email-input": "./src/components/phone-or-email-input/PhoneOrEmailInput.tsx",
+    "./sign-in-form": "./src/forms/sign-in-form/SignInForm.tsx",
+    "./forgot-password-form": "./src/forms/forgot-password-form/ForgotPasswordForm.tsx",
+    "./reset-password-form": "./src/forms/reset-password-form/ResetPasswordForm.tsx",
+    "./account-link-status": "./src/components/account-link-status/AccountLinkStatus.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

@@ -1,6 +1,8 @@
 import { DEMO_CLUB_ID } from '../fixtures/clubs'
 import { players } from '../fixtures/players'
-import { requireOnline } from '../mock/bridge'
+import { phoneField } from '@rotra/schema/phone'
+import { readMockState } from '../mock/store'
+import { getMockDevState, requireOnline } from '../mock/bridge'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import type { AuthAudience, MockSession, SignInInput } from './auth.types'
@@ -21,15 +23,26 @@ function readSession(audience: AuthAudience) {
 export async function getSession(audience: AuthAudience): Promise<MockSession | null> {
   return readSession(audience)
 }
-/** Any nonempty credentials enter a fixed fictional account. No credential is sent over the network. */
+/** Mock players match a claimed fixture; club/Admin use nonempty demo credentials. No network auth. */
 export async function signIn(audience: AuthAudience, input: SignInInput): Promise<MockSession> {
   await delay()
+  if (audience === 'player' && getMockDevState().offline)
+    throw new MockError('offline', "You're offline. Signing in needs an internet connection.")
   requireOnline()
   if (!input.identifier.trim() || !input.password)
     throw new MockError('permission', 'Enter your sign-in details.')
   if (typeof document === 'undefined')
     throw new MockError('permission', 'Mock sign-in needs a browser.')
-  const player = players.find((entry) => entry.nickname === 'Migs')
+  let player = players.find((entry) => entry.nickname === 'Migs')
+  // The developer-menu shortcut remains separate from the real form's phone/email inputs.
+  if (audience === 'player' && input.identifier !== 'demo') {
+    const identifier = input.identifier.trim().toLowerCase()
+    const phone = phoneField.safeParse(identifier)
+    const account = readMockState().playerAccounts.find((entry) => entry.claimed &&
+      ((phone.success && entry.phone === phone.data) || (entry.email && entry.email.toLowerCase() === identifier)))
+    player = account ? players.find((entry) => entry.id === account.playerId) : undefined
+    if (!player) throw new MockError('permission', "That phone number or email and password don't match. Check them and try again.")
+  }
   if (!player) throw new Error('Missing mock account fixture.')
   const account =
     audience === 'club'
@@ -40,7 +53,7 @@ export async function signIn(audience: AuthAudience, input: SignInInput): Promis
   const session = { account }
   // biome-ignore lint/suspicious/noDocumentCookie: browser-readable mock marker explicitly required by F06.4
   document.cookie = `${mockCookieName(audience)}=${encodeURIComponent(JSON.stringify(session))}; Path=/; SameSite=Lax${location.protocol === 'https:' ? '; Secure' : ''}`
-  passwords.set(audience, input.password)
+  if (audience !== 'player') passwords.set(audience, input.password)
   return session
 }
 export async function signOut(audience: AuthAudience) {

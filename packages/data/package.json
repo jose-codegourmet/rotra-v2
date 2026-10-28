@@ -148,7 +148,11 @@
     "./player/usePlayerGames": "./src/player/usePlayerGames.ts",
     "./player/useFindPlayerByRtrId": "./src/player/useFindPlayerByRtrId.ts",
     "./player/usePlayerProfile": "./src/player/usePlayerProfile.ts",
-    "./fixtures/player-profiles": "./src/fixtures/playerProfiles.ts"
+    "./fixtures/player-profiles": "./src/fixtures/playerProfiles.ts",
+    "./fixtures/player-accounts": "./src/fixtures/playerAccounts.ts",
+    "./player-account/useRequestPasswordReset": "./src/player-account/useRequestPasswordReset.ts",
+    "./player-account/useResetLink": "./src/player-account/useResetLink.ts",
+    "./player-account/useResetPassword": "./src/player-account/useResetPassword.ts"
   },
   "scripts": {
     "lint": "biome check .",

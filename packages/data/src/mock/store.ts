@@ -1,6 +1,7 @@
 import type { Club } from '../club/club.types'
 import type { ClubPlayer } from '../club-player/clubPlayer.types'
 import type { ClubVenue } from '../club-venue/clubVenue.types'
+import { playerAccounts } from '../fixtures/playerAccounts'
 import { clubs } from '../fixtures/clubs'
 import { licensePayments } from '../fixtures/licensePayments'
 import { clubPlayers, players } from '../fixtures/players'
@@ -23,6 +24,8 @@ import type {
 } from '../session-roster/sessionRoster.types'
 import type { SaveOutcome, SyncState } from '../sync/sync.types'
 export type MockState = {
+  playerAccounts: typeof playerAccounts
+  resetLinks: Record<string, 'valid' | 'used'>
   playerProfiles: PlayerProfile[]
   playerRanks: Record<string, PlayerRank>
   playerGames: Record<string, PlayerSessionRecord[]>
@@ -58,6 +61,8 @@ function seedState(): MockState {
   return structuredClone({
     ...createPlayerRankFixtures(),
     playerProfiles,
+    playerAccounts,
+    resetLinks: { 'reset-valid': 'valid' },
     rankingSettings,
     clubs,
     venues,

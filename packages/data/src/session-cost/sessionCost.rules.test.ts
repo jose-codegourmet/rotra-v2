@@ -44,6 +44,8 @@ describe('session cost estimates in centavos', () => {
   })
   it('drops empty and zero-tube lines and saves no estimate for untouched optional fields', () => {
     expect(normalizeSessionCost(empty)).toBeNull()
+    const saved = normalizeSessionCost({ ...input, notes: 'Private setup notes' } as SessionCostInput)
+    expect(saved).not.toHaveProperty('notes')
     expect(normalizeSessionCost({ ...empty, shuttles: [{ inventoryItemId: '', tubes: 2 }, { inventoryItemId: 'inv1', tubes: 0 }] })).toBeNull()
     expect(normalizeSessionCost({ ...empty, courtFeePerCourtHour: 0 })?.courtFeePerCourtHour).toBe(0)
     expect(normalizeSessionCost({ ...input, paymentMode: 'break_even' })?.customFeePerHead).toBeNull()

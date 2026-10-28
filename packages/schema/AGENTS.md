@@ -17,6 +17,7 @@ compose. One file per field family, one `exports` subpath per file, no barrels.
 | | `dateRangeField` | `{ start, end }` dates; `end` strictly after `start` |
 | | `timeField` | 24-hour `HH:mm` (00:00–23:59), unchanged |
 | `@rotra/schema/money` | `moneyField` | Integer centavos (number) or peso text with up to two decimals and comma groups → integer centavos; never a float. Empty is invalid |
+| | `optionalMoneyField` | Empty peso text → null; otherwise nonnegative integer centavos |
 | | `formatPeso(minor)` | Centavos → `₱1,500` / `₱1,500.50`, as the prototypes show money |
 | `@rotra/schema/password` | `passwordField` | Any non-empty password, unchanged (**placeholder**: no minimum length until the auth spec) |
 | `@rotra/schema/name` | `nameField` | Trimmed, required, max 60 (**placeholder** limit until a product rule) |

@@ -5,6 +5,7 @@ import { useSetPhonePrivacy } from '@rotra/data/player-account/useSetPhonePrivac
 import { Button } from '@rotra/ui/button'
 import { ContactDetailsCard } from '@rotra/ui/contact-details-card'
 import { ContactRequestStatus } from '@rotra/ui/contact-request-status'
+import { ErrorState } from '@rotra/ui/error-state'
 import { PageHeader } from '@rotra/ui/page-header'
 import { PhonePrivacyCard } from '@rotra/ui/phone-privacy-card'
 import { SignOutCard } from '@rotra/ui/sign-out-card'
@@ -14,9 +15,13 @@ import { useState } from 'react'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { selectAccount, setAccount } from '@/store/slices/authSlice'
 import { useContactChangeSheet } from '../../../_components/contact-change-sheet/useContactChangeSheet'
+import { useRequireSignedIn } from '../../../_components/require-signed-in/useRequireSignedIn'
+import Loading from '../../loading'
 
 export function PrivacyAndContact() {
+  const signedOut = useRequireSignedIn()
   const account = useAppSelector(selectAccount)
+  // A different player's private data is never requested: only the signed-in id is passed.
   const playerId = account?.id ?? null
   const myAccount = useMyAccount(playerId)
   const setPrivacy = useSetPhonePrivacy()
@@ -26,7 +31,22 @@ export function PrivacyAndContact() {
   const router = useRouter()
   const dispatch = useAppDispatch()
   const data = myAccount.data
-  if (!account || !data) return null
+  if (signedOut) return null
+  if (!account || !data) {
+    return myAccount.isError ? (
+      <main className="mx-auto max-w-[640px] px-4 pt-5">
+        <ErrorState
+          title="Couldn't load your privacy and contact details."
+          onRetry={() => void myAccount.refetch()}
+          retrying={myAccount.isFetching}
+        >
+          Check your connection, then try again.
+        </ErrorState>
+      </main>
+    ) : (
+      <Loading />
+    )
+  }
   const request = contactChange.request.data
   return (
     <main className="mx-auto flex max-w-[640px] flex-col gap-5 px-4 pt-5 pb-[120px]">

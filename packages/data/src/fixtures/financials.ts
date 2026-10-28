@@ -58,27 +58,26 @@ export const financialEstimateVariants = {
   },
 }
 export const shuttlePlanItems = [
-  { id: 'inv1', name: 'Yonex Aerosensa 30', unit: 'tube', unitCostMinor: 145000, stock: 12 },
-  { id: 'inv2', name: 'RSL Classic', unit: 'tube', unitCostMinor: 115000, stock: 6 },
-  { id: 'inv3', name: 'Victor Master No. 3', unit: 'tube', unitCostMinor: 125000, stock: 2 },
+  { id: 'inv1', name: 'XP2', unit: 'tube', unitCostMinor: 98000, stock: 12 },
+  { id: 'inv2', name: 'XP2 Used', unit: 'tube', unitCostMinor: 0, stock: 2 },
 ]
 export const longShuttlePlanItems = [
-  { ...shuttlePlanItems[0]!, name: 'Yonex Aerosensa 30 Tournament Feather Shuttlecocks' },
+  { ...shuttlePlanItems[0]!, name: 'XP2 Tournament Feather Shuttlecocks, Tube of 12' },
 ]
 export const financialShuttleLines = [
-  { id: 'inv1', name: 'Yonex Aerosensa 30', tubes: 4 },
-  { id: 'inv2', name: 'RSL Classic', tubes: 2 },
+  { id: 'inv1', name: 'XP2', tubes: 4 },
+  { id: 'inv2', name: 'XP2 Used', tubes: 2 },
 ]
 export const sundayEstimate = {
   players: 16,
   court: 315000,
-  shuttle: 575000,
-  total: 890000,
-  breakEven: 55700,
-  perHead: 55700,
-  collect: 891200,
+  shuttle: 392000,
+  total: 707000,
+  breakEven: 44200,
+  perHead: 44200,
+  collect: 707200,
   isCustom: false,
-  result: { kind: 'breaks_even' as const, amount: 1200 },
+  result: { kind: 'breaks_even' as const, amount: 200 },
 }
 
 export const paymentPlayers = clubPlayers
@@ -100,8 +99,8 @@ export const paymentTotalsFixture = {
   total: 18,
   collected: 1050000,
   stillDue: 210000,
-  againstCosts: -183000,
-  cost: 1233000,
+  againstCosts: 235000,
+  cost: 815000,
 }
 
 export function createFinancialFixtures(roster: SessionPlayer[], now = Date.now()) {
@@ -125,7 +124,10 @@ export function createFinancialFixtures(roster: SessionPlayer[], now = Date.now(
       entranceFeePerHead: null,
       paymentMode: 'break_even',
       customFeePerHead: null,
-      shuttles: [{ inventoryItemId: 'inv2', tubes: 5 }],
+      shuttles: [
+        { inventoryItemId: 'inv1', tubes: 3 },
+        { inventoryItemId: 'inv2', tubes: 2 },
+      ],
     },
   }
   const paymentMarks = roster

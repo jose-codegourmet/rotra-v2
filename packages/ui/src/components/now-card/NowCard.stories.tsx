@@ -70,7 +70,7 @@ export const NothingPlanned: Story = { args: { variant: 'nothing', onCreateSessi
 const longTitle: NowCardLive = {
   ...live,
   title: 'Sunday Night Queue and Beginners Welcome Session at the Annex Courts',
-  venueName: 'Banilad Sports Hub Annex Covered Courts',
+  venueName: 'RK Sports Center Annex Covered Courts',
 }
 export const LongTitle: Story = {
   args: longTitle,

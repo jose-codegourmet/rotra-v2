@@ -8,7 +8,7 @@ const meta = {
     children: (
       <div className="flex flex-col gap-1">
         <h2>Sunday Night Queue</h2>
-        <p className="text-[13px] text-fg2">Banilad Sports Hub · 6:00 PM – 9:00 PM</p>
+        <p className="text-[13px] text-fg2">RK Sports Center · 6:00 PM – 9:00 PM</p>
       </div>
     ),
   },
@@ -31,8 +31,8 @@ export const LongContent: Story = {
   args: {
     children: (
       <p className="[overflow-wrap:anywhere]">
-        Gov. M. Cuenco Ave, Banilad, Cebu City · a long address line that must wrap inside the card
-        on a 375 px phone without pushing the page sideways.
+        Lapu-Lapu City, Cebu · a long address line that must wrap inside the card on a 375 px phone
+        without pushing the page sideways.
       </p>
     ),
   },

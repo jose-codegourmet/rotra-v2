@@ -4,27 +4,19 @@ import { clubs } from './clubs'
 export const inventoryItems: InventoryItem[] = [
   {
     id: 'inv1',
-    name: 'Yonex Aerosensa 30',
+    name: 'XP2',
     category: 'shuttlecocks',
     unit: 'tube',
     stock: 12,
-    unitCostMinor: 145000,
+    unitCostMinor: 98000,
   },
   {
     id: 'inv2',
-    name: 'RSL Classic',
-    category: 'shuttlecocks',
-    unit: 'tube',
-    stock: 6,
-    unitCostMinor: 115000,
-  },
-  {
-    id: 'inv3',
-    name: 'Victor Master No. 3',
+    name: 'XP2 Used',
     category: 'shuttlecocks',
     unit: 'tube',
     stock: 2,
-    unitCostMinor: 125000,
+    unitCostMinor: 0,
   },
   {
     id: 'inv4',

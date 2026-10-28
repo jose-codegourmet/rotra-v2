@@ -21,6 +21,6 @@ export default meta
 type Story = StoryObj<typeof meta>
 export const ThursdayOpenPlay: Story = {}
 export const SundayNightQueue: Story = {
-  args: { estimate: sundayEstimate, shuttleLines: [{ id: 'inv2', name: 'RSL Classic', tubes: 5 }] },
+  args: { estimate: sundayEstimate, shuttleLines: [{ id: 'inv1', name: 'XP2', tubes: 4 }] },
 }
 export const NoEstimate: Story = { args: { estimate: null } }

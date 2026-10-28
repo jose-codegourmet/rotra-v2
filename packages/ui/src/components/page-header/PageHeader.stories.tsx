@@ -22,7 +22,7 @@ export const Default: Story = {}
 export const LiveConsole: Story = {
   args: {
     title: 'Sunday Night Queue',
-    description: 'Banilad Sports Hub · Started 6:02 PM · Ends 9:00 PM',
+    description: 'RK Sports Center · Started 6:02 PM · Ends 9:00 PM',
     eyebrow: (
       <>
         <span className="text-xs font-semibold tracking-[0.5px] text-fg2 uppercase">

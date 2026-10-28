@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { inventoryItems } from '../fixtures/inventory'
+import type { InventoryItem } from '../inventory/inventory.types'
 import {
   amountDuePerHead,
   defaultShuttlePlan,
@@ -19,6 +19,28 @@ const input: SessionCostInput = {
     { inventoryItemId: 'inv2', tubes: 2 },
   ],
 }
+/** The prototype's shuttle prices, so these checks match its worked examples. */
+const item = (
+  id: string,
+  category: InventoryItem['category'],
+  stock: number,
+  unitCostMinor: number,
+): InventoryItem => ({
+  id,
+  clubId: 'club',
+  name: id,
+  category,
+  unit: 'tube',
+  stock,
+  unitCostMinor,
+  currency: 'PHP',
+})
+const inventoryItems = [
+  item('inv1', 'shuttlecocks', 12, 145000),
+  item('inv2', 'shuttlecocks', 6, 115000),
+  item('inv3', 'shuttlecocks', 2, 125000),
+  item('inv4', 'equipment', 24, 8000),
+]
 const context = { courts: 3, durationMinutes: 180, players: 14, inventory: inventoryItems }
 const empty: SessionCostInput = {
   courtFeePerCourtHour: null,

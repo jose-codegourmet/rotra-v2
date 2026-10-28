@@ -29,10 +29,10 @@ function SheetDemo(props: Partial<SheetProps>) {
         {props.children ?? (
           <>
             <Field label="Venue name">
-              <TextInput defaultValue="Banilad Sports Hub" />
+              <TextInput defaultValue="RK Sports Center" />
             </Field>
             <Field label="Address" optional>
-              <TextInput defaultValue="Gov. M. Cuenco Ave, Banilad, Cebu City" />
+              <TextInput defaultValue="Lapu-Lapu City, Cebu" />
             </Field>
           </>
         )}

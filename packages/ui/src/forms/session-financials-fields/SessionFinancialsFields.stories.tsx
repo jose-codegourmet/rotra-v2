@@ -58,10 +58,10 @@ type Story = StoryObj<typeof meta>
 export const Empty: Story = { args: { computeEstimate: estimateSessionCost } }
 export const PrefilledFromVenue: Story = {
   args: {
-    venueRate: { venueName: 'Mactan Poona Zone', courtFee: 35000, entranceFee: 6000 },
+    venueRate: { venueName: 'Mactan Poona Zone', courtFee: 45000, entranceFee: 5000 },
     values: {
-      courtFeePerCourtHour: '350',
-      entranceFeePerHead: '60',
+      courtFeePerCourtHour: '450',
+      entranceFeePerHead: '50',
       shuttles: [
         { inventoryItemId: 'inv1', tubes: 4 },
         { inventoryItemId: 'inv2', tubes: 2 },

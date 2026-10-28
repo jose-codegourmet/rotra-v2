@@ -16,8 +16,8 @@ export const venues = [
     clubId: '6cd364d4-0e3a-5c3d-9e75-2116cc845714',
     name: 'Mactan Poona Zone',
     address: 'Lapu-Lapu City, Cebu',
-    courtFeeMinor: 30000,
-    entranceFeeMinor: 8000,
+    courtFeeMinor: 45000,
+    entranceFeeMinor: 5000,
     currency: 'PHP',
   },
 ] satisfies ClubVenue[]

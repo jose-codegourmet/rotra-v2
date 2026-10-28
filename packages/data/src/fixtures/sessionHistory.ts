@@ -45,7 +45,7 @@ export const sessionHistorySpecs: SessionHistorySpec[] = [
     published: true,
     seed: 11,
     invalidSeq: [14],
-    venueIndex: 0,
+    venueIndex: 1,
   },
   {
     id: 'h2',

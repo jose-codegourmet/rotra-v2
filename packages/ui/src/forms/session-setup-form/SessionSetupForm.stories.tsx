@@ -115,7 +115,7 @@ export const RepeatingWithSkippedDate: Story = {
     initialValues: { ...withVenue, repeat: 'weekly', repeatCount: 4 },
     getOccurrences: occurrencesOf({
       title: tonight.title,
-      venueName: 'Lahug Covered Court',
+      venueName: 'Mactan Poona Zone',
       venueId: 'other',
       startsAt: tonight.scheduledStartAt,
       endsAt: tonight.scheduledEndAt,

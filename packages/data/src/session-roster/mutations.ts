@@ -364,10 +364,10 @@ export function setAcceptJoinRequests(input: { sessionId: string; accept: boolea
   })
 }
 const samples = [
-  { name: 'Rico Santos', nickname: 'Rics', phone: '0917 555 0142', statedBand: 'intermediate' },
-  { name: 'Mae Lagman', statedBand: 'beginner' },
-  { name: 'JP Uy', nickname: 'JP', phone: '0928 555 0199', statedBand: 'advanced' },
-  { name: 'Tessa Ramos', phone: '0905 555 0110', statedBand: 'unsure' },
+  { name: 'Tracy', nickname: 'Trace', phone: '0917 555 0142', statedBand: 'intermediate' },
+  { name: 'Gretchen', statedBand: 'beginner' },
+  { name: 'PJ Perez', nickname: 'PJ', phone: '0928 555 0199', statedBand: 'advanced' },
+  { name: 'Jess', phone: '0905 555 0110', statedBand: 'unsure' },
 ] as const
 export function addSampleJoinRequest(sessionId: string) {
   return rosterMutation(sessionId, (s) => {

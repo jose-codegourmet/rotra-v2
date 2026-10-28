@@ -60,8 +60,8 @@ export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }
 
 export const LongNames: Story = {
   args: {
-    venueName: 'Banilad Sports Hub Multi-Purpose Badminton and Community Gymnasium',
-    venueAddress: 'Gov. M. Cuenco Ave corner Paseo Saturnino, Banilad, Cebu City, Cebu 6000',
+    venueName: 'RK Sports Center Multi-Purpose Badminton and Community Gymnasium',
+    venueAddress: 'RK Sports Center Compound, Lapu-Lapu City, Cebu 6015',
     courtLabels: ['Court 1 (near entrance)', 'Court 2', 'Court 3', 'Court 4', 'Court 5', 'Court 6'],
   },
   globals: { viewport: { value: 'phone' } },

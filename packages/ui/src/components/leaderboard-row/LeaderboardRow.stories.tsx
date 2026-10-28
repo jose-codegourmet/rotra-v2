@@ -1,4 +1,5 @@
 import { leaderboardEntries } from '@rotra/data/fixtures/leaderboard-players'
+import { JOSE_PLAYER_ID } from '@rotra/data/fixtures/players'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { LeaderboardRow } from './LeaderboardRow'
 
@@ -6,8 +7,9 @@ const first = leaderboardEntries[0]
 const second = leaderboardEntries[1]
 const third = leaderboardEntries[2]
 const fourth = leaderboardEntries[3]
-const migs = leaderboardEntries[127]
-if (!first || !second || !third || !fourth || !migs)
+const josePosition = leaderboardEntries.findIndex((entry) => entry.id === JOSE_PLAYER_ID) + 1
+const jose = leaderboardEntries[josePosition - 1]
+if (!first || !second || !third || !fourth || !jose)
   throw new Error('Missing leaderboard fixtures.')
 const noop = () => undefined
 
@@ -30,11 +32,11 @@ type Story = StoryObj<typeof meta>
 export const Default: Story = {}
 export const Me: Story = {
   args: {
-    position: 128,
-    fullName: migs.fullName,
-    nickname: migs.nickname,
-    picture: { src: migs.pictureUrl ?? undefined },
-    levelLabel: 'Intermediate High',
+    position: josePosition,
+    fullName: jose.fullName,
+    nickname: jose.nickname,
+    picture: { src: jose.pictureUrl ?? undefined },
+    levelLabel: 'Intermediate Low',
     isMe: true,
   },
 }

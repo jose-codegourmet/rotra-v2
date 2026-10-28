@@ -1,9 +1,9 @@
 /** Prototype rank-detail scenarios, level indexes are zero-based. */
 export const rankExplanationPlayer = {
-  firstName: 'Migs',
-  levelIndex: 5,
+  firstName: 'Jose',
+  levelIndex: 3,
   stale: false,
-  levelLabel: 'Intermediate High',
+  levelLabel: 'Intermediate Low',
 }
 export const rankExplanationNoRank = {
   ...rankExplanationPlayer,

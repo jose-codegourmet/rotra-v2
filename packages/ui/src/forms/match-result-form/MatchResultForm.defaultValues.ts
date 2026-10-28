@@ -7,7 +7,7 @@ export const matchResultFormDefaultValues: MatchResultFormInput = {
   scoreB: '',
 }
 
-/** "Kat", "Kat and Jo", "Kat, Jo and Mia": the prototype's listNames(). */
+/** "Mikee", "Mikee and Dexter", "Mikee, Dexter and Gab": the prototype's listNames(). */
 export function listNames(names: string[]): string {
   return names.length < 3
     ? names.join(' and ')

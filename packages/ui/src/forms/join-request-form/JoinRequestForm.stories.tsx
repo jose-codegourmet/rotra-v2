@@ -13,7 +13,7 @@ const formatTime = (at: number) =>
   new Date(at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
 const sessionLine = `${tonight.title} · ${formatDate(tonight.scheduledStartAt)}, ${formatTime(tonight.scheduledStartAt)} · ${tonight.venueName}`
 
-// Rico, the first sample guest, as he typed his request.
+// Tracy, the first sample guest, as typed in the request.
 const guest = joinRequests[0]
 if (!guest) throw new Error('Join request fixture missing')
 const filled = {

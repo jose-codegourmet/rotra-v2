@@ -8,8 +8,8 @@ const meta = {
   title: 'Shared/ListRow',
   component: ListRow,
   args: {
-    leading: <Avatar name="Miguel Santos" />,
-    title: 'Miguel Santos',
+    leading: <Avatar name="Jose" />,
+    title: 'Jose',
     subtitle: 'RTR-PH-CEB-031526-0001',
     trailing: <Chip tone="accent">Registered</Chip>,
   },
@@ -26,20 +26,20 @@ export const InList: Story = {
     <Card padding="none" className="px-4">
       <div className="divide-y divide-border">
         <ListRow
-          leading={<Avatar name="Miguel Santos" />}
-          title="Miguel Santos"
+          leading={<Avatar name="Jose" />}
+          title="Jose"
           subtitle="Intermediate Mid"
           trailing={<Chip tone="accent">Registered</Chip>}
         />
         <ListRow
-          leading={<Avatar name="Jomar dela Cruz" />}
-          title="Jomar dela Cruz"
+          leading={<Avatar name="Raymark" />}
+          title="Raymark"
           subtitle="Intermediate Low"
           trailing={<Chip>Unclaimed</Chip>}
         />
         <ListRow
-          leading={<Avatar name="Lia Bautista" />}
-          title="Lia Bautista"
+          leading={<Avatar name="Joeriz" />}
+          title="Joeriz"
           subtitle="Guest"
           trailing={<Chip tone="warn">Lookup pending</Chip>}
         />
@@ -50,7 +50,7 @@ export const InList: Story = {
 
 export const LongNameWraps: Story = {
   args: {
-    title: 'Jomar dela Cruz Bautista Villareal Fernandez',
+    title: 'Raymark Bautista Villareal Fernandez',
     subtitle: 'RTR-PH-CEB-040226-0007',
   },
   globals: { viewport: { value: 'phone' } },
@@ -58,7 +58,7 @@ export const LongNameWraps: Story = {
 
 export const LongNameTruncates: Story = {
   args: {
-    title: 'Jomar dela Cruz Bautista Villareal Fernandez',
+    title: 'Raymark Bautista Villareal Fernandez',
     subtitle: 'RTR-PH-CEB-040226-0007',
     truncate: true,
   },

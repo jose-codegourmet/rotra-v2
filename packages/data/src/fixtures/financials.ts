@@ -5,45 +5,48 @@ import { clubPlayers } from './players'
 
 const pictures: Record<string, string> = portraits
 
-/** Prototype financePanel and histFinancePane values, in integer centavos. */
+/** Thursday Open Play at Mactan Poona Zone (₱450 per court-hour, ₱50 entrance), in integer centavos. */
 export const thursdayEstimate = {
   players: 18,
-  court: 315000,
-  shuttle: 810000,
-  entrance: 108000,
-  entranceFeePerHead: 6000,
-  total: 1233000,
-  breakEven: 68500,
+  court: 405000,
+  shuttle: 392000,
+  entrance: 90000,
+  entranceFeePerHead: 5000,
+  total: 887000,
+  breakEven: 49300,
   perHead: 70000,
   isCustom: true,
   collect: 1260000,
-  result: { kind: 'profit' as const, amount: 27000 },
+  result: { kind: 'profit' as const, amount: 373000 },
 }
 export const financialEstimateVariants = {
   profit: thursdayEstimate,
   loss: {
     ...thursdayEstimate,
-    perHead: 60000,
-    collect: 1080000,
-    result: { kind: 'loss' as const, amount: 153000 },
+    perHead: 45000,
+    collect: 810000,
+    result: { kind: 'loss' as const, amount: 77000 },
   },
   breaksEven: {
     ...thursdayEstimate,
-    perHead: 68500,
-    collect: 1233000,
+    shuttle: 0,
+    total: 495000,
+    breakEven: 27500,
+    perHead: 27500,
+    collect: 495000,
     isCustom: false,
     result: { kind: 'breaks_even' as const, amount: 0 },
   },
   roundingSurplus: {
     ...thursdayEstimate,
     players: 17,
-    entrance: 102000,
-    total: 1227000,
-    breakEven: 72200,
-    perHead: 72200,
-    collect: 1227400,
+    entrance: 85000,
+    total: 882000,
+    breakEven: 51900,
+    perHead: 51900,
+    collect: 882300,
     isCustom: false,
-    result: { kind: 'breaks_even' as const, amount: 400 },
+    result: { kind: 'breaks_even' as const, amount: 300 },
   },
   noCosts: {
     players: 18,
@@ -58,27 +61,26 @@ export const financialEstimateVariants = {
   },
 }
 export const shuttlePlanItems = [
-  { id: 'inv1', name: 'Yonex Aerosensa 30', unit: 'tube', unitCostMinor: 145000, stock: 12 },
-  { id: 'inv2', name: 'RSL Classic', unit: 'tube', unitCostMinor: 115000, stock: 6 },
-  { id: 'inv3', name: 'Victor Master No. 3', unit: 'tube', unitCostMinor: 125000, stock: 2 },
+  { id: 'inv1', name: 'XP2', unit: 'tube', unitCostMinor: 98000, stock: 12 },
+  { id: 'inv2', name: 'XP2 Used', unit: 'tube', unitCostMinor: 0, stock: 2 },
 ]
 export const longShuttlePlanItems = [
-  { ...shuttlePlanItems[0]!, name: 'Yonex Aerosensa 30 Tournament Feather Shuttlecocks' },
+  { ...shuttlePlanItems[0]!, name: 'XP2 Tournament Feather Shuttlecocks, Tube of 12' },
 ]
 export const financialShuttleLines = [
-  { id: 'inv1', name: 'Yonex Aerosensa 30', tubes: 4 },
-  { id: 'inv2', name: 'RSL Classic', tubes: 2 },
+  { id: 'inv1', name: 'XP2', tubes: 4 },
+  { id: 'inv2', name: 'XP2 Used', tubes: 2 },
 ]
 export const sundayEstimate = {
   players: 16,
   court: 315000,
-  shuttle: 575000,
-  total: 890000,
-  breakEven: 55700,
-  perHead: 55700,
-  collect: 891200,
+  shuttle: 392000,
+  total: 707000,
+  breakEven: 44200,
+  perHead: 44200,
+  collect: 707200,
   isCustom: false,
-  result: { kind: 'breaks_even' as const, amount: 1200 },
+  result: { kind: 'breaks_even' as const, amount: 200 },
 }
 
 export const paymentPlayers = clubPlayers
@@ -100,14 +102,14 @@ export const paymentTotalsFixture = {
   total: 18,
   collected: 1050000,
   stillDue: 210000,
-  againstCosts: -183000,
-  cost: 1233000,
+  againstCosts: 163000,
+  cost: 887000,
 }
 
 export function createFinancialFixtures(roster: SessionPlayer[], now = Date.now()) {
   const base = {
     courtFeePerCourtHour: 35000,
-    entranceFeePerHead: 6000,
+    entranceFeePerHead: null,
     paymentMode: 'custom' as const,
     customFeePerHead: 70000,
     shuttles: [
@@ -118,14 +120,16 @@ export function createFinancialFixtures(roster: SessionPlayer[], now = Date.now(
   }
   const costEstimates: Record<string, SessionCostEstimate> = {
     's-tonight': { ...base, sessionId: 's-tonight', customFeePerHead: 90000 },
-    h1: { ...base, sessionId: 'h1' },
+    h1: { ...base, sessionId: 'h1', courtFeePerCourtHour: 45000, entranceFeePerHead: 5000 },
     h2: {
       ...base,
       sessionId: 'h2',
-      entranceFeePerHead: null,
       paymentMode: 'break_even',
       customFeePerHead: null,
-      shuttles: [{ inventoryItemId: 'inv2', tubes: 5 }],
+      shuttles: [
+        { inventoryItemId: 'inv1', tubes: 3 },
+        { inventoryItemId: 'inv2', tubes: 2 },
+      ],
     },
   }
   const paymentMarks = roster

@@ -7,7 +7,7 @@ export const suggestedMatchSheetMeta = {
   usage: [
     "Open it from Suggest on the Queue tab. The container generates the lineup (Q05.4) and passes it in with each player's counted games; the sheet never picks players.",
     'Pass lineup null with the reason from the rules ("Only N players are present. Doubles needs 4. …") when nothing can be suggested.',
-    'onSwap changes only the shown lineup (toast "Kat and Jo switched sides"); adding it afterwards puts it in protected.',
+    'onSwap changes only the shown lineup (toast "Mikee and Dexter switched sides"); adding it afterwards puts it in protected.',
     'Never add win probabilities or fatigue scores to the Why this lineup card.',
   ],
   prototype: {

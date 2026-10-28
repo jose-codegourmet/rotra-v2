@@ -41,7 +41,7 @@ function suggest(session: QueueSession, roster: SessionPlayer[], matches: Match[
 
 /**
  * Q-SUGGEST: SuggestedMatchSheet on one lineup from generateMatches(…, 1). Skip suggestion draws a
- * new one; switching two players (drag or ← / →) changes only the shown lineup, toasts "Kat and Jo
+ * new one; switching two players (drag or ← / →) changes only the shown lineup, toasts "Mikee and Dexter
  * switched sides" and marks it switched; Edit then add hands the lineup to the Add match sheet
  * (saving there protects it); Add to queue calls useAddSuggestedMatch, unprotected unless players
  * were switched. A player card opens the profile with Back to suggestion, which returns to the same

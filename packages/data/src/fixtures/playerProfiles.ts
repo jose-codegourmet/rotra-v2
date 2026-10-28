@@ -6,38 +6,38 @@ import { players } from './players'
 // These are image asset colours, not interface theme colours.
 const pictures: Record<string, string> = portraits
 export const playerProfiles: PlayerProfile[] = players.map((player) => {
-  const migs = player.nickname === 'Migs'
-  const jomar = player.rtrId === 'RTR-PH-CEB-040226-0007'
+  const jose = player.fullName === 'Jose'
+  const raymark = player.rtrId === 'RTR-PH-CEB-040226-0007'
   return {
     playerId: player.id,
     rtrId: player.rtrId,
     fullName: player.fullName,
     nickname: player.nickname,
     picture: pictures[player.id] ?? null,
-    playingStyle: migs
+    playingStyle: jose
       ? 'Doubles, mostly at the front. I like fast drives and net kills, and I am working on my clears.'
       : '',
-    experienceYears: migs ? 4 : null,
-    experienceMonths: migs ? 6 : null,
+    experienceYears: jose ? 4 : null,
+    experienceMonths: jose ? 6 : null,
     socialLinks: {
-      facebook: migs
-        ? 'https://facebook.com/migs.santos.badminton'
-        : jomar
-          ? 'https://facebook.com/jomar.dc'
+      facebook: jose
+        ? 'https://facebook.com/rotra.demo.player'
+        : raymark
+          ? 'https://facebook.com/rotra.demo.raymark'
           : '',
-      instagram: migs ? 'https://instagram.com/migs.smash' : '',
+      instagram: jose ? 'https://instagram.com/rotra.demo.player' : '',
       youtube: '',
       linkedin: '',
     },
   }
 })
 
-const jomar = playerProfiles.find((profile) => profile.rtrId === 'RTR-PH-CEB-040226-0007')
-if (!jomar) throw new Error('Missing Jomar profile fixture.')
+const raymark = playerProfiles.find((profile) => profile.rtrId === 'RTR-PH-CEB-040226-0007')
+if (!raymark) throw new Error('Missing Raymark profile fixture.')
 /** Story-only variants of real fixtures, for wrapping and empty-detail states. */
 export const playerProfileScenarios = {
   longNames: {
-    ...jomar,
+    ...raymark,
     fullName: 'Maria Consolacion Villanueva-Bautista',
     nickname: 'The Unstoppable Shuttle Commander',
   },

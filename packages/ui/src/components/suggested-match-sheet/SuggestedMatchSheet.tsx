@@ -52,7 +52,7 @@ const FORMAT_LABEL: Record<MatchFormat, string> = {
 
 const MODE_LABEL: Record<SessionMode, string> = { chill: 'Chill', fair: 'Fair', hard: 'Hard' }
 
-/** "Kat", "Kat and Jo", "Kat, Jo and Mia" */
+/** "Mikee", "Mikee and Dexter", "Mikee, Dexter and Gab" */
 function listNames(names: string[]) {
   return names.length < 3
     ? names.join(' and ')

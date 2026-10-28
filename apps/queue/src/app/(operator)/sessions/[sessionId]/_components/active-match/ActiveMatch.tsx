@@ -68,7 +68,7 @@ const newOperationId = () => crypto.randomUUID()
  * "Team A wins match N · Court X free". Mark invalid: InvalidMatchSheet (D-INVALID-MATCH) →
  * useInvalidateMatch, "Match N marked invalid · Court X free"; Keep playing returns to the active
  * sheet. Substitute player: SubstitutionSheet pick → Confirm substitution (D-SUBSTITUTE) →
- * useSubstitutePlayer, then back to the active sheet with "Kiko in for Jom" and the substitution
+ * useSubstitutePlayer, then back to the active sheet with "Nathan in for Raymark" and the substitution
  * line. Back returns to the previous step with what was entered; closing at any step before a
  * confirmation changes nothing and the court stays in use. A failed commit shows inside the sheet
  * and nothing is claimed as saved: a local save failure ("Changes could not be saved") is also an

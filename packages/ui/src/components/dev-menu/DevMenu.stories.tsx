@@ -9,9 +9,9 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 import { DevMenu, type DevMenuProps } from './DevMenu'
 
-const migs = players.find((player) => player.nickname === 'Migs')
-if (!migs) throw new Error('Missing Migs fixture')
-const migsName = migs.fullName
+const jose = players.find((player) => player.fullName === 'Jose')
+if (!jose) throw new Error('Missing Jose fixture')
+const joseName = jose.fullName
 
 function Demo(args: DevMenuProps) {
   const [open, setOpen] = useState(args.open)
@@ -43,7 +43,7 @@ function Demo(args: DevMenuProps) {
           ? {
               ...args.playerAccount,
               name: accountName,
-              onSignIn: () => setAccountName(migsName),
+              onSignIn: () => setAccountName(joseName),
               onSignOut: () => setAccountName(null),
             }
           : undefined
@@ -98,7 +98,7 @@ const playerArgs = {
 }
 export const PlayerScenarios: Story = { args: playerArgs }
 export const PlayerSignedIn: Story = {
-  args: { ...playerArgs, playerAccount: { ...playerArgs.playerAccount, name: migsName } },
+  args: { ...playerArgs, playerAccount: { ...playerArgs.playerAccount, name: joseName } },
 }
 export const PlayerOffline: Story = { args: { ...playerArgs, toggles: devMenuFixtures.offline } }
 export const PlayerPhone: Story = { args: playerArgs, globals: { viewport: { value: 'phone' } } }

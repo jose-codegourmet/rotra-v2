@@ -6,8 +6,8 @@ const meta = {
   component: KeyValueList,
   args: {
     items: [
-      { label: 'Venue', value: 'Banilad Sports Hub' },
-      { label: 'Address', value: 'Gov. M. Cuenco Ave, Banilad, Cebu City' },
+      { label: 'Venue', value: 'RK Sports Center' },
+      { label: 'Address', value: 'Lapu-Lapu City, Cebu' },
       { label: 'Time', value: '6:00 PM – 9:00 PM' },
       { label: 'Courts', value: 'Court 1, Court 2, Court 3' },
       { label: 'RTR ID', value: <span className="font-mono">RTR-PH-CEB-031526-0001</span> },

@@ -10,7 +10,7 @@ export type LevelSelectProps = {
   onBlur?: () => void
   name?: string
   ref?: Ref<HTMLButtonElement>
-  /** Required accessible name, e.g. "Level for Migs at this club" (also used by a Field label) */
+  /** Required accessible name, e.g. "Level for Jose at this club" (also used by a Field label) */
   'aria-label'?: string
   /** Points at the LevelDiffIndicator */
   'aria-describedby'?: string

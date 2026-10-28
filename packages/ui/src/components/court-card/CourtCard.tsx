@@ -32,7 +32,7 @@ export type CourtCardInGameProps = CourtCardBase & {
 
 /** The waiting match this court can start next */
 export type CourtCardNextMatch = {
-  /** "Skipped #1: Kat is playing on Court 1" when earlier matches are blocked */
+  /** "Skipped #1: Mikee is playing on Court 1" when earlier matches are blocked */
   skippedReason?: string
   /** Position in the queue, 1-based */
   position: number
@@ -64,7 +64,7 @@ export type CourtCardFreeProps = CourtCardBase & {
 
 export type CourtCardProps = CourtCardInGameProps | CourtCardFreeProps
 
-/** Prototype listNames(): "Kat and Jo", "Kat, Jo and Migs" */
+/** Prototype listNames(): "Mikee and Dexter", "Mikee, Dexter and Jose" */
 function listNames(names: string[]) {
   return names.length <= 1
     ? names.join('')

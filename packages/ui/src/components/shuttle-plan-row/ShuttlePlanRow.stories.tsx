@@ -26,7 +26,7 @@ const meta = {
     items: shuttlePlanItems,
     inventoryItemId: 'inv1',
     tubes: 4,
-    lineCost: 580000,
+    lineCost: 392000,
     onItemChange: fn(),
     onTubesChange: fn(),
     onRemove: fn(),
@@ -35,5 +35,5 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 export const Default: Story = {}
-export const OverStock: Story = { args: { inventoryItemId: 'inv3', tubes: 4, lineCost: 500000 } }
+export const OverStock: Story = { args: { inventoryItemId: 'inv2', tubes: 4, lineCost: 0 } }
 export const LongBrand: Story = { args: { items: longShuttlePlanItems } }

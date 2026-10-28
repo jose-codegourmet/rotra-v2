@@ -50,7 +50,7 @@ export function InventoryItemForm({
             control={form.control}
             name="name"
             render={({ field }) => (
-              <TextInput {...field} placeholder="e.g. Yonex Aerosensa 30" disabled={isPending} />
+              <TextInput {...field} placeholder="e.g. XP2" disabled={isPending} />
             )}
           />
         </Field>

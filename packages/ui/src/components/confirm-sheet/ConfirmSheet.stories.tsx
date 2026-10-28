@@ -16,8 +16,8 @@ const INVALID = {
     <KeyValueList
       items={[
         { label: 'Match', value: 'Match 3 · Court 2' },
-        { label: 'Team A', value: 'Miguel Santos and Bea Castillo' },
-        { label: 'Team B', value: 'Jomar dela Cruz and Kat Lim' },
+        { label: 'Team A', value: 'Jose and Aaron' },
+        { label: 'Team B', value: 'Raymark and Mikee Abellana' },
       ]}
     />
   ),

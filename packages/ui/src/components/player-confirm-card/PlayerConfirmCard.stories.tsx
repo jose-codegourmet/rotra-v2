@@ -16,7 +16,7 @@ const byIdentity = (identity: ClubPlayer['identity']) => {
 const unclaimed = byIdentity('unclaimed')
 const registered = byIdentity('registered')
 const guest = byIdentity('guest')
-// Leo Pascual: the Queue prototype's unclaimed Player Information suggestion (Beginner High).
+// Sam: the Queue prototype's unclaimed Player Information suggestion (Beginner High).
 const leo = directoryPlayers[2]
 if (!leo) throw new Error('Directory fixture missing')
 
@@ -64,14 +64,14 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-/** Gab Torres from Saved players: the primary waits until a check is chosen. */
+/** Andrew from Saved players: the primary waits until a check is chosen. */
 export const UnclaimedNoCheck: Story = {}
 
 export const UnclaimedChecked: Story = { args: { check: 'rtr-id' } }
 
 export const HiddenPhone: Story = { args: { phoneHidden: true } }
 
-/** Leo Pascual from Player Information: no level yet at this club, preset to the suggestion. */
+/** Sam from Player Information: no level yet at this club, preset to the suggestion. */
 export const FromPlayerInformation: Story = {
   args: {
     name: leo.fullName,

@@ -10,8 +10,8 @@ import {
   personalDetailsFieldsSchema,
 } from './PersonalDetailsFields.schema'
 
-const migs = playerProfiles.find((p) => p.nickname === 'Migs')
-if (!migs) throw new Error('Missing public profile fixture')
+const jose = playerProfiles.find((p) => p.fullName === 'Jose')
+if (!jose) throw new Error('Missing public profile fixture')
 function StoryForm({
   values,
   validate = false,
@@ -42,7 +42,7 @@ const meta = {
   component: PersonalDetailsFields,
   args: { sections: ['name', 'playing-style', 'links'] },
   render: (args) => (
-    <StoryForm values={personalDetailsFromProfile(migs)}>
+    <StoryForm values={personalDetailsFromProfile(jose)}>
       <PersonalDetailsFields {...args} />
     </StoryForm>
   ),

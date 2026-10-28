@@ -4,7 +4,7 @@ import { fn, within } from 'storybook/test'
 import { VenueForm } from './VenueForm'
 import { feeToInput } from './VenueForm.defaultValues'
 
-const talamban = venues[2]
+const talamban = venues[1]
 if (!talamban) throw new Error('Venue fixtures missing')
 const names = venues.map((v) => v.name)
 

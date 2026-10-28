@@ -67,8 +67,7 @@ export const InvalidSession: Story = {
 /** A long title wraps under the label; nothing scrolls sideways at 375 px */
 export const LongTitle: Story = {
   args: {
-    title:
-      'Thursday Open Play · Banilad regulars and guests · doubles only · bring your own racket',
+    title: 'Thursday Open Play · RK regulars and guests · doubles only · bring your own racket',
   },
   globals: { viewport: { value: 'phone' } },
 }

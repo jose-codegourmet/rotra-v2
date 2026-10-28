@@ -14,7 +14,7 @@ const CONSOLE_TABS: TabItem[] = [
     ],
   },
   { value: 'roster', label: 'Players', badges: [{ text: '13/14', longText: ' present' }] },
-  { value: 'board', label: 'Leaderboard', shortLabel: 'Board', badges: [{ text: 'Migs leads' }] },
+  { value: 'board', label: 'Leaderboard', shortLabel: 'Board', badges: [{ text: 'Jose leads' }] },
 ]
 
 function ConsoleTabs() {

@@ -103,11 +103,11 @@ export const NewPlayerFull: Story = {
 }
 
 export const AfterOneAdd: Story = {
-  args: { lastAdded: 'Marco Lopez added · Intermediate Mid', addedCount: 1 },
+  args: { lastAdded: 'Santino added · Intermediate Mid', addedCount: 1 },
 }
 
 export const AfterThreeAdds: Story = {
-  args: { lastAdded: 'Kiko Salazar added as a guest', addedCount: 3 },
+  args: { lastAdded: 'Nathan added as a guest', addedCount: 3 },
 }
 
 export const SessionFull: Story = {

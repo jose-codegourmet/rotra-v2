@@ -7,7 +7,7 @@ const [banilad, lahug, talamban] = venues
 if (!banilad || !lahug || !talamban) throw new Error('Venue fixtures missing')
 
 // Session counts and the next session come with Q01.11 session fixtures; the values are the Queue
-// prototype's (Sunday Night Queue at Banilad Sports Hub).
+// prototype's (Sunday Night Queue at RK Sports Center).
 const meta = {
   title: 'Queue/VenueCard',
   component: VenueCard,

@@ -7,7 +7,7 @@ import { useState } from 'react'
 import { fn } from 'storybook/test'
 import { RosterPanel, type RosterPanelPlayer, type RosterPanelProps } from './RosterPanel'
 
-// The tonight fixture: 14 players, Joanna missing a level, 10 present, 3 courts × 8 players.
+// The tonight fixture: 14 players, Dexter missing a level, 10 present, 3 courts × 8 players.
 const tonight = queueSessionFixtures.sessions[0]
 if (!tonight) throw new Error('Session fixture missing')
 const CAPACITY = 3 * tonight.playersPerCourt
@@ -84,7 +84,7 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-/** 14 of 24 slots, Joanna needs a level, 10 present */
+/** 14 of 24 slots, Dexter needs a level, 10 present */
 export const Tonight: Story = {}
 export const Empty: Story = { args: { players: [] } }
 export const AllPresent: Story = {

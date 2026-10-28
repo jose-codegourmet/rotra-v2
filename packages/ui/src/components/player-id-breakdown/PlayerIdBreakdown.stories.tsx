@@ -3,12 +3,12 @@ import { Notice } from '@rotra/ui/notice'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { PlayerIdBreakdown } from './PlayerIdBreakdown'
 
-const migs = playerProfiles.find((p) => p.nickname === 'Migs')
-if (!migs) throw new Error('Missing public profile fixture')
+const jose = playerProfiles.find((p) => p.fullName === 'Jose')
+if (!jose) throw new Error('Missing public profile fixture')
 const meta = {
   title: 'Player/PlayerIdBreakdown',
   component: PlayerIdBreakdown,
-  args: { rtrId: migs.rtrId },
+  args: { rtrId: jose.rtrId },
   decorators: [(Story) => <div className="mx-auto max-w-[560px]">{Story()}</div>],
 } satisfies Meta<typeof PlayerIdBreakdown>
 export default meta

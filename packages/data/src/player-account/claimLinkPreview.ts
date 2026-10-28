@@ -2,7 +2,7 @@ import { CLAIM_TOKEN } from '../fixtures/playerAccounts'
 import { mockStore } from '../mock/store'
 /**
  * Dev menu only: puts the prototype's registration link into a state and returns its token, like
- * the prototype's 'Open a registration link (Jomar)'. Unused shows 'claimed' once Jomar registered.
+ * the prototype's 'Open a registration link (Raymark)'. Unused shows 'claimed' once Raymark registered.
  */
 export function openClaimLinkPreview(state: 'valid' | 'processing' | 'expired') {
   mockStore.update((draft) => {

@@ -1,6 +1,6 @@
 import { leaderboardEntries } from '../fixtures/leaderboardPlayers'
 import { PLAYER_FIXTURE_NOW } from '../fixtures/playerGames'
-import { MIGS_PLAYER_ID } from '../fixtures/playerRanks'
+import { JOSE_PLAYER_ID } from '../fixtures/players'
 import { getMockDevState } from '../mock/bridge'
 import { readMockState } from '../mock/store'
 import { countRecentStandardMatches, orderLeaderboard } from './player.rules'
@@ -9,7 +9,7 @@ import { countRecentStandardMatches, orderLeaderboard } from './player.rules'
 export function playerProjection() {
   const store = readMockState()
   const scenario = getMockDevState().playerRankScenario
-  let sessions = store.playerGames[MIGS_PLAYER_ID] ?? []
+  let sessions = store.playerGames[JOSE_PLAYER_ID] ?? []
   if (scenario === 'below-threshold') sessions = sessions.slice(0, 2)
   if (scenario === 'no-rank')
     sessions = sessions
@@ -21,24 +21,24 @@ export function playerProjection() {
       finishedAt: new Date(Date.parse(s.finishedAt) - 100 * 86400000).toISOString(),
       sessionPageUrl: null,
     }))
-  store.playerGames[MIGS_PLAYER_ID] = sessions
-  const migs = store.playerRanks[MIGS_PLAYER_ID]
-  if (migs) {
-    migs.recentCount = countRecentStandardMatches(sessions, PLAYER_FIXTURE_NOW)
-    migs.olderCount =
+  store.playerGames[JOSE_PLAYER_ID] = sessions
+  const jose = store.playerRanks[JOSE_PLAYER_ID]
+  if (jose) {
+    jose.recentCount = countRecentStandardMatches(sessions, PLAYER_FIXTURE_NOW)
+    jose.olderCount =
       sessions.flatMap((s) => s.games).filter((g) => g.counting === 'counted').length -
-      migs.recentCount
-    migs.state =
+      jose.recentCount
+    jose.state =
       scenario === 'needs-reassessment'
         ? 'needs_reassessment'
         : scenario === 'below-threshold' || scenario === 'no-rank'
           ? 'provisional'
           : 'established'
-    if (scenario === 'no-rank') migs.levelIndex = null
+    if (scenario === 'no-rank') jose.levelIndex = null
     if (scenario === 'updating') {
       const latest = sessions[0]
       if (latest)
-        migs.updatePending = {
+        jose.updatePending = {
           sessionTitle: latest.title,
           clubName: latest.clubName,
           finishedAt: latest.finishedAt,

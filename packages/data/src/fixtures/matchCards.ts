@@ -55,7 +55,7 @@ export function createMatchCardFixtures(now = Date.now()) {
     teamB: match.teamB.map(player(context.roster)),
   })
 
-  // #2 waits on Migs, who is playing on Court 1; #3 can start; #4 has an absent player.
+  // #2 waits on Jose, who is playing on Court 1; #3 can start; #4 has an absent player.
   const blocked = card(waiting(2)),
     ready = card(waiting(3)),
     needsAttention = card(waiting(4))

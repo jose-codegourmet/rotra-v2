@@ -27,7 +27,7 @@ export type CourtDrawingProps = {
 const COURT_W = 134
 const COURT_H = 61
 
-/** Prototype listNames(): "Kat", "Kat and Jo", "Kat, Jo and Migs" */
+/** Prototype listNames(): "Mikee", "Mikee and Dexter", "Mikee, Dexter and Jose" */
 function listNames(names: string[]) {
   return names.length <= 1
     ? names.join('')

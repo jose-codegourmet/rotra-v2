@@ -22,7 +22,7 @@ const byName = (name: string) => {
 }
 
 // Sessions here, added dates and hidden phones are not in the F06.2 fixtures yet; values are the Queue
-// prototype's for these players (Miguel Santos and Kat Lim hide their phones).
+// prototype's for these players (Jose and Mikee Abellana hide their phones).
 const propsFor = (
   p: ClubPlayer,
   extra: Partial<PlayerProfileSheetProps> = {},
@@ -45,18 +45,18 @@ const propsFor = (
 const meta = {
   title: 'Queue/PlayerProfileSheet',
   component: PlayerProfileSheet,
-  args: propsFor(byName('Bea Castillo'), { sessionsHere: 7 }),
+  args: propsFor(byName('Aaron'), { sessionsHere: 7 }),
 } satisfies Meta<typeof PlayerProfileSheet>
 
 export default meta
 type Story = StoryObj<typeof meta>
 
 export const Registered: Story = {}
-export const HiddenPhone: Story = { args: propsFor(byName('Miguel Santos'), { phoneHidden: true }) }
-export const Unclaimed: Story = { args: propsFor(byName('Jomar dela Cruz'), { sessionsHere: 5 }) }
-export const Guest: Story = { args: propsFor(byName('Lia Bautista'), { sessionsHere: 1 }) }
+export const HiddenPhone: Story = { args: propsFor(byName('Jose'), { phoneHidden: true }) }
+export const Unclaimed: Story = { args: propsFor(byName('Raymark'), { sessionsHere: 5 }) }
+export const Guest: Story = { args: propsFor(byName('Joeriz'), { sessionsHere: 1 }) }
 export const LookupPending: Story = {
-  args: propsFor(byName('Lia Bautista'), { identity: 'pending', sessionsHere: 0 }),
+  args: propsFor(byName('Joeriz'), { identity: 'pending', sessionsHere: 0 }),
 }
 export const OpenedFromMatch: Story = { args: { backLabel: 'match', onBack: fn() } }
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }

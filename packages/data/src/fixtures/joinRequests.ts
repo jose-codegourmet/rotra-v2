@@ -13,8 +13,8 @@ export function createJoinRequestFixtures(now = Date.now()): SessionJoinRequest[
     {
       id: 'jr-rico',
       sessionId: JOIN_REQUEST_SESSION_ID,
-      name: 'Rico Santos',
-      nickname: 'Rics',
+      name: 'Tracy',
+      nickname: 'Trace',
       phoneE164: '+639175550142',
       statedBand: 'intermediate',
       status: 'pending',
@@ -25,7 +25,7 @@ export function createJoinRequestFixtures(now = Date.now()): SessionJoinRequest[
     {
       id: 'jr-mae',
       sessionId: JOIN_REQUEST_SESSION_ID,
-      name: 'Mae Lagman',
+      name: 'Gretchen',
       nickname: null,
       phoneE164: null,
       statedBand: 'beginner',
@@ -37,8 +37,8 @@ export function createJoinRequestFixtures(now = Date.now()): SessionJoinRequest[
     {
       id: 'jr-jp',
       sessionId: JOIN_REQUEST_SESSION_ID,
-      name: 'JP Uy',
-      nickname: 'JP',
+      name: 'PJ Perez',
+      nickname: 'PJ',
       phoneE164: '+639285550199',
       statedBand: 'advanced',
       status: 'pending',
@@ -49,7 +49,7 @@ export function createJoinRequestFixtures(now = Date.now()): SessionJoinRequest[
     {
       id: 'jr-tessa',
       sessionId: JOIN_REQUEST_SESSION_ID,
-      name: 'Tessa Ramos',
+      name: 'Jess',
       nickname: null,
       phoneE164: '+639055550110',
       statedBand: 'unsure',
@@ -62,8 +62,8 @@ export function createJoinRequestFixtures(now = Date.now()): SessionJoinRequest[
 }
 
 /**
- * The same four guests after the Queue Master decided them: Rico and JP confirmed, Mae declined,
- * Tessa still waiting. For the "No requests waiting. N confirmed, M declined so far." state use
+ * The same four guests after the Queue Master decided them: Tracy and PJ confirmed, Gretchen declined,
+ * Jess still waiting. For the "No requests waiting. N confirmed, M declined so far." state use
  * only the decided ones.
  */
 export function createDecidedJoinRequestFixtures(now = Date.now()): SessionJoinRequest[] {
@@ -85,5 +85,5 @@ export function createDecidedJoinRequestFixtures(now = Date.now()): SessionJoinR
 /** Pending sample requests, oldest first. */
 export const joinRequests = createJoinRequestFixtures()
 
-/** Rico and JP confirmed, Mae declined, Tessa pending. */
+/** Tracy and PJ confirmed, Gretchen declined, Jess pending. */
 export const decidedJoinRequests = createDecidedJoinRequestFixtures()

@@ -65,7 +65,7 @@ export const NoLevel: Story = { args: { level: null } }
 export const LongNameAndNickname: Story = {
   args: {
     name: `${byIdentity('unclaimed').fullName} Bautista Villareal`,
-    nickname: 'Jom the smash machine',
+    nickname: 'Raymark the smash machine',
   },
 }
 

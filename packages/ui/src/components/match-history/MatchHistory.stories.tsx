@@ -1,4 +1,4 @@
-import { MIGS_SESSIONS } from '@rotra/data/fixtures/player-games'
+import { JOSE_SESSIONS } from '@rotra/data/fixtures/player-games'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 import { MatchHistory } from './MatchHistory'
@@ -9,7 +9,7 @@ const meta = { title: 'Player/MatchHistory', component: MatchHistory } satisfies
 export default meta
 type Story = StoryObj<typeof meta>
 export const Counted: Story = {
-  args: { sessions: MIGS_SESSIONS, activeTab: 'counted', onTabChange: () => {} },
+  args: { sessions: JOSE_SESSIONS, activeTab: 'counted', onTabChange: () => {} },
   render: function Render(args) {
     const [tab, setTab] = useState(args.activeTab)
     return <MatchHistory {...args} activeTab={tab} onTabChange={setTab} />

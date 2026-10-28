@@ -114,6 +114,8 @@ export function createQueueSession(input: QueueSessionInput) {
         playersPerCourt: budget,
         expectedPlayers: input.expectedPlayers,
         startedAt: null,
+        finalizedAt: null,
+        playerRecordsUpdatedAt: null,
         seriesId,
         publicSlug: id,
         acceptJoinRequests: true,

@@ -3,13 +3,20 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const sessionPreparationMeta = {
   name: 'SessionPreparation',
   description:
-    "Q-PREPARE container: PageHeader with Edit preparation / Preview public page / Copy Facebook post, the Overview tab (SessionSetupCard from estimateMinimum, DeviceDownloadCard on useDownloadSession), StartSessionBar from startBlocker, StartSessionSheet on useStartSession, and the dock's Start session pill through useDockAction.",
+    "Q-PREPARE container: PageHeader with Edit preparation / Preview public page / Copy Facebook post, the JoinRequests card above the tabs while requests wait, the Overview tab (SessionSetupCard from estimateMinimum, DeviceDownloadCard on useDownloadSession, SessionLinkCard on useSetAcceptJoinRequests), StartSessionBar from startBlocker, StartSessionSheet on useStartSession, and the dock's Start session pill through useDockAction.",
   usage: [
     'Rendered by /sessions/[sessionId]/preparation; active sessions go to the console, finished ones to the record, unknown ids to notFound().',
-    'Roster, Waitlist and Session link content arrive with Queue › Players and roster; Payments with Queue › Financials.',
+    'The Roster and levels (chip N/capacity) and Waitlist (chip N) tabs render PreparationRoster; the start bar and dock pill follow the roster query, so a level set there clears the blocker live. Payments arrives with Queue › Financials.',
+    'The session link is window.location.origin + /s/<publicSlug>: Copy link writes it to the clipboard and toasts "Session link copied"; Open as a guest and Preview public page push /s/<publicSlug> (the public page arrives with Queue › Public session). Turning Accept join requests off only flips the switch text; the card and the Join requests card stay.',
   ],
-  docs: ['docs/screens/product/modules/queue/session-setup.md'],
+  docs: [
+    'docs/screens/product/modules/queue/session-setup.md',
+    'docs/business_logic/product/queue/modules/players/README.md#join-requests-from-the-session-link',
+  ],
   related: [
+    'PreparationRoster',
+    'JoinRequests',
+    'SessionLinkCard',
     'SessionSetupCard',
     'DeviceDownloadCard',
     'StartSessionBar',

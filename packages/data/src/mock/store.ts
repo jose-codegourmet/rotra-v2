@@ -4,17 +4,31 @@ import type { ClubVenue } from '../club-venue/clubVenue.types'
 import { clubs } from '../fixtures/clubs'
 import { licensePayments } from '../fixtures/licensePayments'
 import { playerAccounts } from '../fixtures/playerAccounts'
+import { playerAwardHistory } from '../fixtures/playerAwardHistory'
 import { playerProfiles } from '../fixtures/playerProfiles'
 import { createPlayerRankFixtures } from '../fixtures/playerRanks'
 import { clubPlayers, players } from '../fixtures/players'
 import { createQueueFixtures } from '../fixtures/queueSessions'
 import { rankingSettings } from '../fixtures/rankingSettings'
+import { createSessionPublicationFixtures } from '../fixtures/sessionPublications'
 import { venues } from '../fixtures/venues'
 import type { ClubLicenseTerm } from '../license/license.types'
 import type { Match } from '../match/match.types'
 import type { Player, PlayerProfile, PlayerRank, PlayerSessionRecord } from '../player/player.types'
-import type { DownloadState, QueueSession, SessionCourt } from '../queue-session/queueSession.types'
+import type {
+  DownloadState,
+  QueueSession,
+  SessionCourt,
+  SessionFinalization,
+} from '../queue-session/queueSession.types'
 import type { RankingSettings } from '../ranking-settings/rankingSettings.types'
+import { createResultSnapshot } from '../session-result/sessionResult.rules'
+import type {
+  PlayerAwardHistory,
+  SessionPublication,
+  SessionPublicationEvent,
+  SessionResultSnapshot,
+} from '../session-result/sessionResult.types'
 import type {
   SessionJoinRequest,
   SessionPlayer,
@@ -42,6 +56,12 @@ export type MockState = {
   sync: SyncState
   matches: Match[]
   matchSequences: Record<string, number>
+  finalizations: Record<string, SessionFinalization>
+  awardHistory: PlayerAwardHistory[]
+  /** One private snapshot per validly finalized session; invalid sessions never get one. */
+  resultSnapshots: Record<string, SessionResultSnapshot>
+  publications: Record<string, SessionPublication>
+  publicationEvents: SessionPublicationEvent[]
   operations: Record<string, { fingerprint: string; outcome: SaveOutcome & { data: unknown } }>
   privatePhones: Record<string, string>
   sampleRequestIndex: number
@@ -55,7 +75,25 @@ function freeze<T>(value: T): DeepReadonly<T> {
   return value as DeepReadonly<T>
 }
 function seedState(): MockState {
-  const now = Date.now()
+  const now = Date.now(),
+    { sessions, courts, roster, history } = createQueueFixtures(now),
+    publicationFixtures = createSessionPublicationFixtures(now)
+  // The seeded completed history sessions carry the snapshot their finalization `slides` stage produced.
+  const resultSnapshots = Object.fromEntries(
+    sessions
+      .filter((s) => s.state === 'completed')
+      .map((s) => [
+        s.id,
+        createResultSnapshot({
+          sessionId: s.id,
+          roster: history.roster,
+          matches: history.matches,
+          history: playerAwardHistory,
+          players: clubPlayers,
+          generatedAt: s.finalizedAt ?? now,
+        }),
+      ]),
+  )
   return structuredClone({
     ...createPlayerRankFixtures(),
     playerProfiles,
@@ -66,13 +104,20 @@ function seedState(): MockState {
     venues,
     players,
     clubPlayers,
-    ...createQueueFixtures(now),
+    sessions,
+    courts,
+    roster: [...roster, ...history.roster],
     waitlist: [],
     joinRequests: [],
     licensePayments,
     downloads: {},
-    matches: [],
-    matchSequences: {},
+    matches: history.matches,
+    matchSequences: history.matchSequences,
+    finalizations: history.finalizations,
+    awardHistory: playerAwardHistory,
+    resultSnapshots,
+    publications: publicationFixtures.publications,
+    publicationEvents: publicationFixtures.events,
     operations: {},
     privatePhones: {},
     sampleRequestIndex: 0,

@@ -11,11 +11,13 @@ import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useQueueSessions } from '@rotra/data/queue-session/useQueueSessions'
 import { useStartSession } from '@rotra/data/queue-session/useStartSession'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
+import { useSetAcceptJoinRequests } from '@rotra/data/session-roster/useSetAcceptJoinRequests'
 import { Breadcrumb } from '@rotra/ui/breadcrumb'
 import { Button } from '@rotra/ui/button'
 import { DeviceDownloadCard } from '@rotra/ui/device-download-card'
 import { formatMinutes } from '@rotra/ui/forms/session-setup-form/helpers'
 import { PageHeader } from '@rotra/ui/page-header'
+import { SessionLinkCard } from '@rotra/ui/session-link-card'
 import { SessionSetupCard } from '@rotra/ui/session-setup-card'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { StartSessionBar } from '@rotra/ui/start-session-bar'
@@ -24,10 +26,12 @@ import { Tabs, TabsContent } from '@rotra/ui/tabs'
 import { toast } from '@rotra/ui/toaster'
 import Link from 'next/link'
 import { notFound, useRouter } from 'next/navigation'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useDockAction } from '@/app/(operator)/_components/operator-shell/DockAction.context'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import { FacebookPost } from '@/app/(operator)/sessions/[sessionId]/_components/facebook-post/FacebookPost'
+import { JoinRequests } from '@/app/(operator)/sessions/[sessionId]/_components/join-requests/JoinRequests'
+import { PreparationRoster } from '@/app/(operator)/sessions/[sessionId]/preparation/_components/preparation-roster/PreparationRoster'
 import { sessionHref } from '@/lib/dates'
 import { useAppSelector } from '@/store/hooks'
 import { selectDev } from '@/store/slices/devSlice'
@@ -45,7 +49,10 @@ const date = (at: number) =>
 const errorMessage = (error: unknown) =>
   error instanceof Error ? error.message : 'Something went wrong. Try again.'
 
-/** Q-PREPARE: header, tabs (Overview this ticket), Setup and This device cards, the Start bar and dialog. */
+/**
+ * Q-PREPARE: header, the Join requests card while requests wait, tabs (Overview, Roster and levels,
+ * Waitlist), Setup / This device / Session link cards, the Start bar and dialog.
+ */
 export function SessionPreparation({ sessionId }: { sessionId: string }) {
   const router = useRouter()
   const dev = useAppSelector(selectDev)
@@ -54,14 +61,22 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
   const roster = useSessionRoster(sessionId)
   const download = useDownloadSession()
   const start = useStartSession()
+  const setAcceptJoinRequests = useSetAcceptJoinRequests()
   const [tab, setTab] = useState('overview')
   const [startOpen, setStartOpen] = useState(false)
   const [postOpen, setPostOpen] = useState(false)
+  // The public link is origin + /s/<publicSlug>; the origin is only known in the browser.
+  const [origin, setOrigin] = useState('')
+  useEffect(() => setOrigin(window.location.origin), [])
 
   const s = session.data
   if (session.isError && session.error instanceof MockError && session.error.kind === 'permission')
     notFound()
-  if (s && s.state !== 'prepared') router.replace(sessionHref(s))
+  // A started session has no preparation: go to the console (or the record once it is done).
+  const redirectTo = s && s.state !== 'prepared' ? sessionHref(s) : null
+  useEffect(() => {
+    if (redirectTo) router.replace(redirectTo)
+  }, [redirectTo, router])
 
   const rosterList = roster.data?.roster ?? []
   const waitlist = roster.data?.waitlist ?? []
@@ -113,6 +128,20 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
       },
     })
 
+  const publicHref = s ? `/s/${s.publicSlug}` : '/'
+  const sessionLink = `${origin}${publicHref}`
+  const pendingRequests = (roster.data?.joinRequests ?? []).filter(
+    (r) => r.status === 'pending',
+  ).length
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(sessionLink)
+    } catch {
+      // Clipboard unavailable (insecure context or denied); the link stays selectable in its field.
+    }
+    toast('Session link copied')
+  }
+
   if (session.isError)
     return (
       <main className="mx-auto max-w-[1240px] px-4 pt-5">
@@ -153,6 +182,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
           <Skeleton className="w-72" />
         </div>
       )}
+      <JoinRequests sessionId={sessionId} />
       <Tabs
         aria-label="Preparation"
         value={tab}
@@ -170,41 +200,60 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
       >
         <TabsContent value="overview">
           {s && roster.data ? (
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,320px),1fr))] gap-4">
-              <SessionSetupCard
-                courtLabels={courts.map((c) => c.label)}
-                formatsLabel={formats}
-                modeLabel={MODES[s.sessionMode].label}
-                modeDescription={MODES[s.sessionMode].text}
-                minimumGames={s.minimumGames}
-                minimum={
-                  s.minimumIsCalculated
-                    ? {
-                        kind: 'calculated',
-                        players,
-                        usableCourts: est.usable,
-                        durationLabel: formatMinutes(minutes),
-                        low: est.low,
-                        high: est.high,
-                      }
-                    : { kind: 'set', low: est.low, high: est.high }
-                }
-                rosterCount={rosterList.length}
-                presentCount={present}
-              />
-              <DeviceDownloadCard
-                state={download.isPending ? 'downloading' : s.downloadState}
-                offline={dev.offline}
-                snapshotAge={
-                  download.isError && s.downloadState === 'ready'
-                    ? 'the copy from before this update'
-                    : undefined
-                }
-                onDownload={() =>
-                  download.mutate(sessionId, {
-                    onSuccess: (result) => toast(result.message),
-                    onError: (error) => toast.error(errorMessage(error)),
-                  })
+            <div className="flex flex-col gap-4">
+              <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,320px),1fr))] gap-4">
+                <SessionSetupCard
+                  courtLabels={courts.map((c) => c.label)}
+                  formatsLabel={formats}
+                  modeLabel={MODES[s.sessionMode].label}
+                  modeDescription={MODES[s.sessionMode].text}
+                  minimumGames={s.minimumGames}
+                  minimum={
+                    s.minimumIsCalculated
+                      ? {
+                          kind: 'calculated',
+                          players,
+                          usableCourts: est.usable,
+                          durationLabel: formatMinutes(minutes),
+                          low: est.low,
+                          high: est.high,
+                        }
+                      : { kind: 'set', low: est.low, high: est.high }
+                  }
+                  rosterCount={rosterList.length}
+                  presentCount={present}
+                />
+                <DeviceDownloadCard
+                  state={download.isPending ? 'downloading' : s.downloadState}
+                  offline={dev.offline}
+                  snapshotAge={
+                    download.isError && s.downloadState === 'ready'
+                      ? 'the copy from before this update'
+                      : undefined
+                  }
+                  onDownload={() =>
+                    download.mutate(sessionId, {
+                      onSuccess: (result) => toast(result.message),
+                      onError: (error) => toast.error(errorMessage(error)),
+                    })
+                  }
+                />
+              </div>
+              <SessionLinkCard
+                link={sessionLink}
+                pendingCount={pendingRequests}
+                acceptJoinRequests={s.acceptJoinRequests}
+                onCopyLink={() => void copyLink()}
+                onOpenAsGuest={() => router.push(publicHref)}
+                onPreviewPublicPage={() => router.push(publicHref)}
+                onAcceptJoinRequestsChange={(accept) =>
+                  setAcceptJoinRequests.mutate(
+                    { sessionId, accept },
+                    {
+                      onSuccess: (result) => toast(result.message),
+                      onError: (error) => toast.error(errorMessage(error)),
+                    },
+                  )
                 }
               />
             </div>
@@ -218,14 +267,10 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
           )}
         </TabsContent>
         <TabsContent value="roster">
-          <p className="m-0 text-[13px] text-fg2">
-            Roster and levels arrive with Queue › Players and roster.
-          </p>
+          <PreparationRoster sessionId={sessionId} tab="roster" />
         </TabsContent>
         <TabsContent value="waitlist">
-          <p className="m-0 text-[13px] text-fg2">
-            The waitlist arrives with Queue › Players and roster.
-          </p>
+          <PreparationRoster sessionId={sessionId} tab="waitlist" />
         </TabsContent>
       </Tabs>
       {s ? (

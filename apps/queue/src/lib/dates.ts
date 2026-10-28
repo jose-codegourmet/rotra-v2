@@ -28,7 +28,8 @@ export function longDateLabel(at: number): string {
 
 /** Where a session opens from the dashboard and calendar, by its state */
 export function sessionHref(session: { id: string; state: string }): string {
-  if (session.state === 'active' || session.state === 'finalizing') return `/sessions/${session.id}`
+  if (session.state === 'active') return `/sessions/${session.id}`
+  if (session.state === 'finalizing') return `/sessions/${session.id}/finishing`
   if (session.state === 'prepared') return `/sessions/${session.id}/preparation`
   return `/sessions/${session.id}/record`
 }

@@ -4,6 +4,7 @@ import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, mockStore, readMockState } from '../mock/store'
 import { queueMutation, sessionIn } from '../mock/transaction'
+import { createResultSnapshot } from '../session-result/sessionResult.rules'
 import { recordChange } from '../sync/fetchers'
 import type { SaveOutcome } from '../sync/sync.types'
 import {
@@ -137,6 +138,18 @@ async function run(
       mockStore.update((draft) => {
         sessionIn(draft, sessionId).playerRecordsUpdatedAt = Date.now()
       })
+    // Preparing result slides: the private snapshot (standings + prototype reference awards) is generated here.
+    if (stage === 'slides')
+      mockStore.update((draft) => {
+        draft.resultSnapshots[sessionId] = createResultSnapshot({
+          sessionId,
+          roster: draft.roster,
+          matches: draft.matches,
+          history: draft.awardHistory,
+          players: draft.clubPlayers,
+          generatedAt: Date.now(),
+        })
+      })
   }
   mockStore.update((draft) => {
     draft.finalizations[sessionId] = { sessionId, commandId, state: 'done', stage: 'slides' }
@@ -164,6 +177,9 @@ export function invalidateSession(input: { sessionId: string; reason: string }) 
     s.invalidReason = input.reason.trim()
     s.finalizedAt = null
     s.playerRecordsUpdatedAt = null
+    state.resultSnapshots = Object.fromEntries(
+      Object.entries(state.resultSnapshots).filter(([id]) => id !== input.sessionId),
+    )
     state.finalizations = Object.fromEntries(
       Object.entries(state.finalizations).filter(([id]) => id !== input.sessionId),
     )

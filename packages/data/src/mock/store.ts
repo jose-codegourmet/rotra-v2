@@ -3,9 +3,11 @@ import type { ClubPlayer } from '../club-player/clubPlayer.types'
 import type { ClubVenue } from '../club-venue/clubVenue.types'
 import { clubs } from '../fixtures/clubs'
 import { licensePayments } from '../fixtures/licensePayments'
+import { playerAwardHistory } from '../fixtures/playerAwardHistory'
 import { clubPlayers, players } from '../fixtures/players'
 import { createQueueFixtures } from '../fixtures/queueSessions'
 import { rankingSettings } from '../fixtures/rankingSettings'
+import { createSessionPublicationFixtures } from '../fixtures/sessionPublications'
 import { venues } from '../fixtures/venues'
 import type { ClubLicenseTerm } from '../license/license.types'
 import type { Match } from '../match/match.types'
@@ -17,6 +19,13 @@ import type {
   SessionFinalization,
 } from '../queue-session/queueSession.types'
 import type { RankingSettings } from '../ranking-settings/rankingSettings.types'
+import { createResultSnapshot } from '../session-result/sessionResult.rules'
+import type {
+  PlayerAwardHistory,
+  SessionPublication,
+  SessionPublicationEvent,
+  SessionResultSnapshot,
+} from '../session-result/sessionResult.types'
 import type {
   SessionJoinRequest,
   SessionPlayer,
@@ -40,6 +49,11 @@ export type MockState = {
   matches: Match[]
   matchSequences: Record<string, number>
   finalizations: Record<string, SessionFinalization>
+  awardHistory: PlayerAwardHistory[]
+  /** One private snapshot per validly finalized session; invalid sessions never get one. */
+  resultSnapshots: Record<string, SessionResultSnapshot>
+  publications: Record<string, SessionPublication>
+  publicationEvents: SessionPublicationEvent[]
   operations: Record<string, { fingerprint: string; outcome: SaveOutcome & { data: unknown } }>
   privatePhones: Record<string, string>
   sampleRequestIndex: number
@@ -54,7 +68,24 @@ function freeze<T>(value: T): DeepReadonly<T> {
 }
 function seedState(): MockState {
   const now = Date.now(),
-    { sessions, courts, roster, history } = createQueueFixtures(now)
+    { sessions, courts, roster, history } = createQueueFixtures(now),
+    publicationFixtures = createSessionPublicationFixtures(now)
+  // The seeded completed history sessions carry the snapshot their finalization `slides` stage produced.
+  const resultSnapshots = Object.fromEntries(
+    sessions
+      .filter((s) => s.state === 'completed')
+      .map((s) => [
+        s.id,
+        createResultSnapshot({
+          sessionId: s.id,
+          roster: history.roster,
+          matches: history.matches,
+          history: playerAwardHistory,
+          players: clubPlayers,
+          generatedAt: s.finalizedAt ?? now,
+        }),
+      ]),
+  )
   return structuredClone({
     rankingSettings,
     clubs,
@@ -71,6 +102,10 @@ function seedState(): MockState {
     matches: history.matches,
     matchSequences: history.matchSequences,
     finalizations: history.finalizations,
+    awardHistory: playerAwardHistory,
+    resultSnapshots,
+    publications: publicationFixtures.publications,
+    publicationEvents: publicationFixtures.events,
     operations: {},
     privatePhones: {},
     sampleRequestIndex: 0,

@@ -241,6 +241,12 @@ from the [database design](database_design/product/README.md). Add a row here **
 | Session finalization | `SessionFinalization` | `session_finalizations` | `state`: `running` · `committed` · `done` · `failed`; `stage`: `checking` · `finishing` · `player_records` · `slides` (`FinalizationStage`) |
 | Session done review | `SessionDoneReview` | — | Read model for Q-SESSION-DONE: games recorded, participants, pending changes, games in play, unplayed waiting, below minimum |
 | Session record | `SessionRecordSummary` | — | Read model for Q-HISTORY totals; an invalid session counts no games or players |
+| Result snapshot | `SessionResultSnapshot` | `session_result_snapshots` | Private; generated at the finalization `slides` stage with `calculationVersion: 'prototype-reference'`; never for an invalid session |
+| Standings row | `StandingRow` | — | One line of the snapshot's standings; positions are unique |
+| Award history | `PlayerAwardHistory` | — | Per club player: prior club sessions and baseline win rate behind Most Improved / Off Day |
+| Publication | `SessionPublication` | `session_publications` | `publishedSlides` ⊆ `standings` · `awards`; `includeOffDay` is explicit on every publish |
+| Publication event | `SessionPublicationEvent` | `session_publication_events` | Append-only log of each publish (selection, Off Day choice, time) |
+| Export frame | `ExportFrame` | `result_exports` | One Download images frame; `ExportFormat`: `story` (14 rows) · `feed` (10 rows) |
 | Match | `Match` | `matches` | `state`: `waiting` · `active` · `completed` · `invalid`; `origin`: `manual` · `suggested` · `auto` |
 | Match format | `MatchFormat` | — | `singles` · `doubles` · `fun_1v2` · `fun_3v3` · `fun_4v4` · `fun_5v5` |
 | Session mode | `SessionMode` | — | `chill` · `fair` · `hard` |

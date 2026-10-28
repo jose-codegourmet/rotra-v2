@@ -154,7 +154,19 @@
     "./fixtures/match-results": "./src/fixtures/matchResults.ts",
     "./fixtures/live-standings": "./src/fixtures/liveStandings.ts",
     "./fixtures/start-match": "./src/fixtures/startMatch.ts",
-    "./fixtures/session-done": "./src/fixtures/sessionDone.ts"
+    "./fixtures/session-done": "./src/fixtures/sessionDone.ts",
+    "./fixtures/result-exports": "./src/fixtures/resultExports.ts",
+    "./fixtures/result-slides": "./src/fixtures/resultSlides.ts",
+    "./fixtures/session-record": "./src/fixtures/sessionRecord.ts",
+    "./fixtures/session-publications": "./src/fixtures/sessionPublications.ts",
+    "./fixtures/player-award-history": "./src/fixtures/playerAwardHistory.ts",
+    "./session-result/types": "./src/session-result/sessionResult.types.ts",
+    "./session-result/query-keys": "./src/session-result/queryKeys.ts",
+    "./session-result/fetchers": "./src/session-result/fetchers.ts",
+    "./session-result/sessionResult.rules": "./src/session-result/sessionResult.rules.ts",
+    "./session-result/useSessionResults": "./src/session-result/useSessionResults.ts",
+    "./session-result/useSessionPublication": "./src/session-result/useSessionPublication.ts",
+    "./session-result/usePublishResults": "./src/session-result/usePublishResults.ts"
   },
   "scripts": {
     "lint": "biome check .",

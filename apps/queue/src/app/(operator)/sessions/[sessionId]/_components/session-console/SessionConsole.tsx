@@ -11,6 +11,7 @@ import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { MockError } from '@rotra/data/mock/errors'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
+import { ConsoleDeviceNotice } from '../console-device-notice/ConsoleDeviceNotice'
 import { PaymentsPanel } from '@/app/(operator)/sessions/[sessionId]/_components/payments-panel/PaymentsPanel'
 import { useSyncState } from '@rotra/data/sync/useSyncState'
 import { Button } from '@rotra/ui/button'
@@ -289,6 +290,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
           <Skeleton className="w-72" />
         </div>
       )}
+      <ConsoleDeviceNotice sessionId={sessionId} />
       {online ? null : <Notice tone="offline">{OFFLINE_NOTICE}</Notice>}
       <Tabs
         aria-label="Console views"

@@ -102,6 +102,7 @@ export function SessionDoneFlow({ sessionId, open, onOpenChange }: SessionDoneFl
       gamesRecorded={r.gamesRecorded}
       participants={r.participants}
       pendingChanges={r.pendingChanges}
+      recordsIncomplete={!!integrity.data && integrity.data.state !== 'complete'}
       activeGames={r.activeGames.map((g) => ({ courtLabels: g.courtLabels.join(' + ') }))}
       unplayedWaiting={r.unplayedWaiting}
       belowMinimum={r.belowMinimum}

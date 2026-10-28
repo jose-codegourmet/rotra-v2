@@ -50,7 +50,7 @@ function Team({
 }) {
   const label = `Team ${team}`
   return (
-    <div role="group" aria-label={label} className="flex min-w-0 flex-col gap-2">
+    <fieldset aria-label={label} className="m-0 flex min-w-0 flex-col gap-2 border-0 p-0">
       <span className="text-xs font-bold tracking-[0.04em] text-fg2 uppercase">{label}</span>
       {players.map((p, index) => {
         const card = (
@@ -77,7 +77,7 @@ function Team({
           </div>
         )
       })}
-    </div>
+    </fieldset>
   )
 }
 

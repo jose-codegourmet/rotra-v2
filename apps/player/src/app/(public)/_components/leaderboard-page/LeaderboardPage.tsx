@@ -3,6 +3,7 @@ import { leaderboardKeys } from '@rotra/data/leaderboard/query-keys'
 import { useLeaderboard } from '@rotra/data/leaderboard/useLeaderboard'
 import { useLeaderboardSearch } from '@rotra/data/leaderboard/useLeaderboardSearch'
 import { useMyLeaderboardPosition } from '@rotra/data/leaderboard/useMyLeaderboardPosition'
+import { usePlayerProfile } from '@rotra/data/player/usePlayerProfile'
 import { usePlayerRank } from '@rotra/data/player/usePlayerRank'
 import { rankDisplayStatus } from '@rotra/data/player/rules'
 import { PLAYING_LEVELS } from '@rotra/data/player/types'
@@ -33,6 +34,7 @@ export function LeaderboardPage() {
   const board = useLeaderboard(), search = useLeaderboardSearch(query)
   const settings = useRankingSettings(), own = usePlayerRank(account?.id ?? '')
   const position = useMyLeaderboardPosition(account?.id)
+  const ownProfile = usePlayerProfile(account?.id ?? '')
   const entries = board.data?.pages.flatMap((page) => page.entries) ?? []
   const total = board.data?.pages[0]?.total ?? 0
   const nameSearch = Boolean(query.trim()) && !/^RTR-/i.test(query.trim())
@@ -75,7 +77,7 @@ export function LeaderboardPage() {
     <main className="mx-auto flex max-w-[920px] flex-col gap-5 px-[max(16px,env(safe-area-inset-left,0px))] pt-5 pb-[120px]">
       <PageHeader eyebrow="Overall ROTRA ranking" className="[&>div>div:first-child]:text-xs [&>div>div:first-child]:font-semibold [&>div>div:first-child]:tracking-[0.6px] [&>div>div:first-child]:text-fg2 [&>div>div:first-child]:uppercase" title="Leaderboard" description="One list across every club. Singles and doubles share one rank." />
       {podium ? <TopThreePodium entries={podiumEntries as [PodiumEntry, PodiumEntry, PodiumEntry]} totalPlayers={total} onSelect={(i) => { const entry = entries[i]; if (entry) openProfile(entry.id) }} /> : null}
-      {account && own.data && requirement !== undefined ? <MyPositionCard fullName={own.data.fullName} levelLabel={own.data.levelIndex === null ? undefined : levelLabel(PLAYING_LEVELS[own.data.levelIndex] ?? '')} position={own.data.position === null ? undefined : position.data ?? own.data.position} onShowMyRow={() => { setQuery(''); setJumpToMe(true) }} onOpenProfile={() => openProfile(account.id)} status={notListedStatus} /> : null}
+      {account && own.data && requirement !== undefined ? <MyPositionCard fullName={own.data.fullName} picture={{ src: ownProfile.data?.picture ?? undefined }} levelLabel={own.data.levelIndex === null ? undefined : levelLabel(PLAYING_LEVELS[own.data.levelIndex] ?? '')} position={own.data.position === null ? undefined : position.data ?? own.data.position} onShowMyRow={() => { setQuery(''); setJumpToMe(true) }} onOpenProfile={() => openProfile(account.id)} status={notListedStatus} /> : null}
       <Card className="flex flex-col gap-4">
         <LeaderboardSearch value={query} onChange={changeQuery} onFindId={(id) => router.push(`/find/${encodeURIComponent(id.trim().toUpperCase())}`)} />
         {dev.offline && active.data && savedAt && !failed ? <Notice tone="warn">Saved copy from {savedAt}. Positions may have changed since then.</Notice> : null}

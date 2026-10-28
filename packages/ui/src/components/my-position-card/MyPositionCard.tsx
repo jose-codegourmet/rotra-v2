@@ -1,9 +1,10 @@
-import { Avatar } from '@rotra/ui/avatar'
+import { Avatar, type AvatarProps } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { Chip, type ChipProps } from '@rotra/ui/chip'
 export type MyPositionCardProps = {
   fullName: string
+  picture?: Pick<AvatarProps, 'src' | 'initials'>
   levelLabel?: string
   position?: number
   status?: {
@@ -17,6 +18,7 @@ export type MyPositionCardProps = {
 }
 export function MyPositionCard({
   fullName,
+  picture,
   levelLabel,
   position,
   status,
@@ -25,11 +27,11 @@ export function MyPositionCard({
 }: MyPositionCardProps) {
   if (position !== undefined && levelLabel)
     return (
-      <Card className="flex flex-wrap items-center justify-between gap-3 border-accent bg-accent-subtle">
+      <Card tone="highlight" className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <Avatar name={fullName} />
+          <Avatar name={fullName} src={picture?.src} initials={picture?.initials} />
           <div>
-            <p className="m-0 text-sm text-fg2">Your position</p>
+            <p className="m-0 text-[13px] text-fg2">Your position</p>
             <p className="m-0">
               <b className="font-mono text-xl">#{position.toLocaleString('en-PH')}</b> · {levelLabel}
             </p>

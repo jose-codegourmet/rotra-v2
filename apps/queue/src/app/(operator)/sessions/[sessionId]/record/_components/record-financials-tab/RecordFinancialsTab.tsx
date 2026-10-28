@@ -20,6 +20,6 @@ export function RecordFinancialsTab({ sessionId, record }: RecordFinancialsTabPr
   if (cost.isPending) return <Skeleton className="h-60 rounded-lg" />
   return <>
     <SessionFinancialsSummary estimate={cost.data?.estimate ?? null} courts={cost.data?.courts ?? record.courts} durationLabel={formatMinutes(cost.data?.durationMinutes ?? record.lengthMinutes)} courtFeePerCourtHour={cost.data?.saved.courtFeePerCourtHour ?? 0} shuttleLines={cost.data?.shuttleLines ?? []} />
-    {record.state !== 'invalid' ? <PaymentsPanel sessionId={sessionId} /> : null}
+    {record.state !== 'invalid' ? <PaymentsPanel sessionId={sessionId} className="mt-5" /> : null}
   </>
 }

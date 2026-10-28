@@ -1,3 +1,5 @@
+import type { SessionCostEstimate } from '../session-cost/sessionCost.types'
+import type { SessionPlayer } from '../session-roster/sessionRoster.types'
 import { clubPlayers, players } from './players'
 
 /** Prototype financePanel and histFinancePane values, in integer centavos. */
@@ -31,3 +33,14 @@ export const paymentPlayers = clubPlayers.slice(0, 18).map((p, index) => ({
 export const allPaymentPlayers = paymentPlayers.map((p) => ({ ...p, paid: p.paid ?? { amount: 70000, at: Date.UTC(2026, 9, 22, 11, 42) } }))
 export const unpaidPaymentPlayers = paymentPlayers.map((p) => ({ ...p, paid: undefined }))
 export const paymentTotalsFixture = { paid: 15, total: 18, collected: 1050000, stillDue: 210000, againstCosts: -183000, cost: 1233000 }
+
+export function createFinancialFixtures(roster: SessionPlayer[], now = Date.now()) {
+ const base = { courtFeePerCourtHour: 35000, entranceFeePerHead: 6000, paymentMode: 'custom' as const, customFeePerHead: 70000, shuttles: [{ inventoryItemId: 'inv1', tubes: 4 }, { inventoryItemId: 'inv2', tubes: 2 }], currency: 'PHP' as const }
+ const costEstimates: Record<string, SessionCostEstimate> = {
+  's-tonight': { ...base, sessionId: 's-tonight', customFeePerHead: 90000 },
+  h1: { ...base, sessionId: 'h1' },
+  h2: { ...base, sessionId: 'h2', entranceFeePerHead: null, paymentMode: 'break_even', customFeePerHead: null, shuttles: [{ inventoryItemId: 'inv2', tubes: 5 }] },
+ }
+ const paymentMarks = roster.filter((p) => p.sessionId === 'h1').slice(0, -3).map((p) => ({ sessionId: 'h1', sessionPlayerId: p.id, amountMinor: 70000, markedAt: now - 3 * 86400000, currency: 'PHP' as const }))
+ return { costEstimates, paymentMarks }
+}

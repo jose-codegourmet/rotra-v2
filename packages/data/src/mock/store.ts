@@ -1,3 +1,8 @@
+import { inventoryItems } from '../fixtures/inventory'
+import { createFinancialFixtures } from '../fixtures/financials'
+import type { InventoryItem } from '../inventory/inventory.types'
+import type { SessionCostEstimate } from '../session-cost/sessionCost.types'
+import type { SessionPaymentMark } from '../session-payment/sessionPayment.types'
 import type { Club } from '../club/club.types'
 import type { ClubPlayer } from '../club-player/clubPlayer.types'
 import type { ClubVenue } from '../club-venue/clubVenue.types'
@@ -36,6 +41,9 @@ import type {
 } from '../session-roster/sessionRoster.types'
 import type { SaveOutcome, SyncState } from '../sync/sync.types'
 export type MockState = {
+  inventory: InventoryItem[]
+  costEstimates: Record<string, SessionCostEstimate>
+  paymentMarks: SessionPaymentMark[]
   playerAccounts: typeof playerAccounts
   resetLinks: Record<string, 'valid' | 'used'>
   playerProfiles: PlayerProfile[]
@@ -96,6 +104,8 @@ function seedState(): MockState {
   )
   return structuredClone({
     ...createPlayerRankFixtures(),
+    ...createFinancialFixtures([...roster, ...history.roster], now),
+    inventory: inventoryItems,
     playerProfiles,
     playerAccounts,
     resetLinks: { 'reset-valid': 'valid' },

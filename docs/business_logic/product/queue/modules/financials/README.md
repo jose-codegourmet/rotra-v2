@@ -19,7 +19,7 @@ Every field is optional. A session can be created and run with no financial info
 
 Calculation:
 
-- **Court cost** = court fee × number of courts × session length in hours.
+- **Court cost** = court fee × number of courts × session length in hours, rounded to the nearest centavo (decided October 28, 2026).
 - **Shuttle cost** = sum of (planned tubes × that item's inventory cost per unit). Lines with no item or zero tubes are dropped on save.
 - **Entrance fees** = entrance fee per head × player count (misc).
 - **Total cost** = court cost + shuttle cost + entrance fees.

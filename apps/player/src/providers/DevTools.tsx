@@ -5,6 +5,9 @@ import { playerRankOptions, leaderboardOptions } from '@rotra/data/fixtures/dev-
 import { connectMockBridge, notifyMockBridge, type PlayerRankScenario, type LeaderboardScenario } from '@rotra/data/mock/bridge'
 import { resetDemoData } from '@rotra/data/mock/reset'
 import { useRankingSettings, useSetRankingSettings } from '@rotra/data/ranking-settings'
+import { toast } from '@rotra/ui/toaster'
+import { useRouter } from 'next/navigation'
+import { selectAccount, setAccount } from '@/store/slices/authSlice'
 import { DevMenu } from '@rotra/ui/dev-menu'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
@@ -20,6 +23,7 @@ export function DevTools() {
     toggles = useAppSelector(selectDev),
     client = useQueryClient()
   const [open, setOpen] = useState(false)
+  const account = useAppSelector(selectAccount), router = useRouter()
   useEffect(() => {
     const disconnect = connectMockBridge({
       read: () => store.getState().dev,
@@ -52,31 +56,42 @@ export function DevTools() {
           ? { ...settings.data, onChange: (value) => setSettings.mutate(value) }
           : undefined
       }
-      actions={[
-        {
-          label: 'Sign in as Migs',
-          onClick: () => {
-            signIn.mutate(
-              { identifier: 'demo', password: 'demo' },
-              { onSuccess: () => location.assign('/') },
-            )
+      playerAccount={{
+        name: account?.name ?? null,
+        pending: signIn.isPending || signOut.isPending,
+        onSignIn: () => signIn.mutate({ identifier: 'demo', password: 'demo' }, {
+          onSuccess: (session) => {
+            dispatch(setAccount(session.account))
+            setOpen(false)
+            router.push(`/players/${session.account.id}`)
+            toast('Signed in')
           },
-        },
-        {
-          label: 'Sign out',
-          onClick: () => {
-            signOut.mutate(undefined, { onSuccess: () => location.assign('/login') })
+          onError: (error) => toast.error(error.message),
+        }),
+        onSignOut: () => signOut.mutate(undefined, {
+          onSuccess: () => {
+            dispatch(setAccount(null))
+            setOpen(false)
+            router.push('/')
+            toast('Signed out')
           },
-        },
-      ]}
+          onError: (error) => toast.error(error.message),
+        }),
+      }}
       open={open}
       onOpenChange={setOpen}
       toggles={toggles}
       onToggle={(key, value) => dispatch(setDevToggle({ key, value }))}
       onReset={() => {
-        resetDemoData()
-        dispatch(resetDev())
-        void client.invalidateQueries()
+        signOut.mutate(undefined, { onSuccess: () => {
+          resetDemoData()
+          dispatch(resetDev())
+          dispatch(setAccount(null))
+          void client.invalidateQueries()
+          setOpen(false)
+          router.push('/')
+          toast('Demo data reset')
+        } })
       }}
     />
   )

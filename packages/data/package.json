@@ -218,7 +218,8 @@
     "./sync/useAnswerInterruption": "./src/sync/useAnswerInterruption.ts",
     "./player/useUpdateMyProfile": "./src/player/useUpdateMyProfile.ts",
     "./player-account/types": "./src/player-account/playerAccount.types.ts",
-    "./player-account/useMyAccount": "./src/player-account/useMyAccount.ts"
+    "./player-account/useMyAccount": "./src/player-account/useMyAccount.ts",
+    "./fixtures/admin-accounts": "./src/fixtures/adminAccounts.ts"
   },
   "scripts": {
     "lint": "biome check .",

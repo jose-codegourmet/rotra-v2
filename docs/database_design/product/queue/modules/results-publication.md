@@ -19,7 +19,7 @@
 | `team_a_score`, `team_b_score` | Optional score pair |
 | `fact_version` | Reducer version; not permission to change winner |
 
-Only a valid session finalization can create official facts. Invalid matches produce none. Fun matches can produce club-local facts but are excluded from global performance/standard-match counts. Partial participation can be retained as source evidence while global/minimum eligibility remains false; local win/loss treatment is not yet specified.
+Only a valid session finalization can create official facts. Invalid matches produce none. Fun matches can produce club-local facts but are excluded from global performance/standard-match counts. Partial participation can be retained as source evidence, but both outgoing and incoming substitutes receive no game, win, loss, minimum-game or award credit anywhere (settled October 26, 2026).
 
 Guest facts stay linked to the club player even without a profile. **Owner decision, October 28, 2026:** after identity confirmation, include earlier valid guest games in personal history and ranking under the existing eligibility/window rules. Preserve `player_id_at_finalization` as the historical snapshot rather than rewriting it. Implement an auditable, repeat-safe attribution/projection step using original played dates; its physical design and identity-confirmation evidence remain open. Linking does not duplicate facts, change a winner, or make fun/partial games eligible for global performance.
 
@@ -35,7 +35,7 @@ Compute local standings from wins, losses, head-to-head when applicable, then na
 
 The live console leaderboard uses the same ordering over the provisional projection and adds win % (wins ÷ games). It is a read model only.
 
-MVP needs at least two counted games. The prototype's reference formula (level-index expected win chance with a divisor of 8; Most Improved at +0.15 and Off Day at −0.30 versus a baseline win rate) is a placeholder; store the calculation version in the snapshot so the final formula can replace it without touching facts.
+MVP needs at least two counted games. The nine-level [business reference formula](../../../../business_logic/product/queue/modules/results/README.md#reference-award-formula) uses a divisor of **2** in its level-index expected win chance; Most Improved uses +0.15 and Off Day −0.30 versus a baseline win rate. This corrects the stale divisor of 8; it does **not** approve production award math. Store the calculation version in the snapshot; final formulas and examples remain gated by [#247](https://github.com/jose-codegourmet/rotra-v2/issues/247).
 
 Most Improved/Off Day need five **previous** qualifying sessions at that same club within three months, excluding the current session. Guests qualify via club-player history. Store actual baseline IDs; a count alone cannot explain an award. Exact award math and which attendance constitutes a qualifying prior session remain open.
 

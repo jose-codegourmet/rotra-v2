@@ -1,10 +1,14 @@
 # Club accounts, licenses, and expiry cycles
 
+**Last verified:** 2026-10-28 for club-name uniqueness and the free-club decision boundary.
+
 **Status:** Proposed schema. Updated October 27, 2026: owner-added clubs and per-club prices, from the [ROTRA Admin prototype](../../../../frames/admin-app/rotra-admin.html). Renewal and refund policies are still open.
 
 ## Accounts and club identity
 
 `clubs`: UUID PK; name; logo reference; founding-location FK and founding address; created/updated timestamps and revision. Session venues are separate. Founding-location correction policy is unresolved; historical player ID allocations always retain their original codes.
+
+Club names must be unique, as required by A-ADD-CLUB. Both creation and approved name changes must enforce that invariant under concurrency. Case/whitespace/Unicode comparison and the matching database constraint remain to be approved in [#245](https://github.com/jose-codegourmet/rotra-v2/issues/245); username normalization does not implicitly decide club-name comparison.
 
 `club_accounts`: club ID PK/FK; normalized unique username; unique provider/subject mapping; provisioned/disabled timestamps. One dedicated credential per club in v1. Passwords stay with the selected auth provider: a club's own change-password (current password re-verified by the provider) and the platform owner's reset both go through it, and no password or hash is stored in application tables. This table does not imply Supabase natively supports the required username flow without an adapter; verify that separately.
 
@@ -23,7 +27,7 @@ Each club has its own price; there is no platform price list. Proposed columns o
 | `license_pricing` | `paid` or `free` (free = tester club) |
 | `license_monthly_minor`, `license_yearly_minor` | Positive integers in minor units, `PHP`. Kept when the club is made free, so switching back starts from the last paid price |
 
-Checks: both amounts > 0 and `license_yearly_minor < 12 * license_monthly_minor`. Price changes write an `admin_audit_events` row with before/after values; a separate price-history table is not needed because each license term stores the amount actually recorded. Changing a price never updates existing `club_license_terms`.
+For paid pricing, validate both amounts > 0 and `license_yearly_minor < 12 * license_monthly_minor`. The agreed Add club flow also allows a new Free club without paid prices: do not invent previous prices or apply unconditional NOT NULL/positive checks to that case. Physical nullability and the transition back to paid pricing remain in #245. Retaining an existing paid price when switching to Free is distinct from requiring one for a newly Free club. Price changes write an `admin_audit_events` row with before/after values; each license term stores the amount actually recorded. Changing a price never updates existing `club_license_terms`.
 
 ## `club_license_terms`
 

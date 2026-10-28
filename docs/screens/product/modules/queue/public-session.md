@@ -1,5 +1,7 @@
 # Public session page
 
+**Last verified:** 2026-10-28 for settled documentation reconciliation.
+
 **Surfaces:** `Q-PUBLIC-DETAILS`, `Q-PUBLIC-PARTICIPANTS`, `Q-PUBLIC-RESULTS`, `Q-PUBLIC-STALE`, `Q-PUBLIC-JOIN`.
 
 **Audience:** anyone with the link; no sign-in required. **Sources:** [Queue page brief](../../../../business_logic/product/queue/README.md), [license retention](../../../../business_logic/product/admin/modules/clubs-licenses/README.md). **Reference:** [ROTRA Queue prototype](../../../../frames/queue-app/rotra-queue.html) — **Public page** / **Preview public page**.
@@ -59,7 +61,7 @@ A previously cached copy may show with its last-update time. With no cache, expl
 
 ## Acceptance examples
 
-- A public visitor sees Details/Participants with no login barrier and no join controls.
+- A public visitor sees Details/Participants without signing in and can use Request to join when requests are enabled. A request never reserves a slot; only the Queue Master confirms or declines it.
 - A confirmed guest has no broken fake profile link.
 - Private Off Day never appears in public data or image previews.
 - The session's cost estimate never appears publicly.

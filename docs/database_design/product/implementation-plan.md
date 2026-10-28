@@ -6,7 +6,9 @@ ROTRA can keep its Next.js 16 screens and reusable components while replacing mo
 
 Other decisions approved on October 28: create phone-linked profiles and permanent RTR IDs as soon as the entry successfully syncs; include earlier valid guest games in personal history and ranking after identity confirmation, under existing eligibility/window rules. Existing profiles are reused. Match performance still requires valid finalization, and historical games retain their original dates and outcomes. The identity-confirmation process and auditable linkage implementation remain to be specified.
 
-This plan does not create GitHub epics or tickets, apply migrations, provision paid resources, or authorize production data changes. Existing frontend work can continue against documented mock contracts. New decisions must be recorded in the source business/screen/database docs before dependent implementation starts.
+This plan does not apply migrations, provision paid resources, or authorize production data changes. The owner subsequently authorized backlog creation: [F07 #241](https://github.com/jose-codegourmet/rotra-v2/issues/241) contains tickets 194–227, including [command-contract reconciliation #242](https://github.com/jose-codegourmet/rotra-v2/issues/242) and focused decision gates #243–#248. Existing frontend work can continue against documented mock contracts. New decisions must be recorded in the source business/screen/database docs before dependent implementation starts.
+
+Phase 0 artifacts: [current command/read contracts](command-contracts.md), [callable catalog](callable-catalog.md), and [schema dependency graph](schema-dependencies.md). These inventory the existing interface and expose blockers; they do not freeze unresolved product behavior or approve API routes.
 
 ## Intended data flow
 
@@ -194,7 +196,7 @@ The repository requires lint, type-check, build, and relevant manual verificatio
 
 Ship complete domain journeys into private verification. For a production failure after real writes, do not fall back to the in-memory mock or erase local evidence; preserve data and apply the approved recovery procedure. Public/live-club release waits for the full required offline and permanent-result guarantees, approved calculations, and privacy/retention behavior.
 
-Before opening any new epic, obtain the owner's go-ahead under [ways of working](../../ways-of-working.md#3-how-work-is-organised). Turn each phase into the smallest reviewable tickets with dependencies and acceptance examples; use actual issue sequence numbers only when inspecting the current tracker. This plan creates no public issue or message to the other agent.
+Before opening any additional epic, obtain the owner's go-ahead under [ways of working](../../ways-of-working.md#3-how-work-is-organised). F07 now tracks the authorized database scope with dependencies and acceptance examples. Consult its current issue states before picking up work; remaining browser offline support and full frontend adapter rollout are not automatically completed by the first persisted preparation journey.
 
 ## Current platform references
 

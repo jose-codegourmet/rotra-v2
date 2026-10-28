@@ -12,12 +12,12 @@ where something belongs. For *how to write* the code, read [coding-conventions.m
 
 | Path | State |
 |---|---|
-| `apps/` | Three Next.js 16 apps. Player has mock leaderboard, profile, rank, history, sign-in and password recovery routes; Queue has mock club/session preparation routes; Admin remains a scaffold |
+| `apps/` | Three Next.js 16 apps with mock route/container code. Queue includes preparation, console, results and public sessions; Player includes profiles, ranking/history and account flows; Admin includes sign-in and workspace navigation. File presence is not end-to-end verification |
 | `packages/config` | Shared tsconfig and `theme.css`: Tailwind 4 tokens copied from the prototypes (F02.1) |
 | `packages/ui` | Shared visual components and forms with stories and metadata, plus `cn`, `ComponentMeta` and the one Storybook |
 | `packages/schema` | Shared Zod field families, phone/money tests, Vitest (F05.1) |
 | `packages/data` | In-memory store, mock auth, club/session and Player fixtures, fetchers, query keys and hooks |
-| `packages/db` | **Empty.** The database epic comes after the mock phase (§9) |
+| `packages/db` | **Not created** at the inspected `7d7029d` baseline. Database work is tracked in [F07 #241](https://github.com/jose-codegourmet/rotra-v2/issues/241) (§10) |
 | `openspec/` | Focused Player implementation records restored at the product owner’s request; see `openspec/README.md`. Product and prototype docs retain precedence |
 | `docs/frames/*/*.html` | The three clickable prototypes: the design source of truth |
 | `Makefile`, root `package.json` scripts | Run the three apps through Turborepo (F01.1) |
@@ -33,7 +33,8 @@ engine is implemented.
 ## 2. The shape of the system
 
 Three Next.js 16 apps share a component library and a mock data layer. Real persistence (Supabase +
-Prisma) replaces the mock fetchers later without touching screens.
+Prisma) is intended to preserve the existing screen and hook contracts while replacing mock fetchers
+and adding the server and offline infrastructure described in §5.
 
 ```text
 rotra/
@@ -148,7 +149,8 @@ Route paths above illustrate the pattern; the real route list comes from the scr
 
 ### Real phase (later)
 
-Only `fetchers.ts` changes. It calls the app's route handlers:
+The frontend compatibility goal is to keep visual components and hook contracts stable as
+`fetchers.ts` calls the app's Route Handlers:
 
 ```text
 fetchers.ts ──► app/api/<feature>/route.ts ──► @rotra/db/<feature>-service ──► Prisma ──► Supabase Postgres
@@ -156,6 +158,11 @@ fetchers.ts ──► app/api/<feature>/route.ts ──► @rotra/db/<feature>-s
 
 Writes go through **route handlers**, not Server Actions: the Queue app's offline sync needs a stable
 HTTP API, and one write path is easier to review. Adding a Server Action needs a decision first.
+
+This also requires real session verification, authorized domain services, reviewed Prisma schemas,
+serialization/error contracts, account-scoped caches, and the Queue working copy/outbox/replay
+engine. Mocks are not a fallback after a real write fails. The [command inventory](database_design/product/command-contracts.md)
+records the existing code surface and unresolved transport decisions; it does not approve API URLs.
 
 **No Supabase Realtime.** Screens refetch with TanStack Query. A live channel needs a decision first.
 

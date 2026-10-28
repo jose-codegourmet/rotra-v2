@@ -1,5 +1,7 @@
 # Data conventions and integrity
 
+**Last verified:** 2026-10-28 for money scope.
+
 **Status:** Proposed implementation design; business outcomes remain governed by the v1 docs.
 
 ## Types and identifiers
@@ -9,7 +11,7 @@
 - Times: `timestamptz` for instants, with distinct `occurred_at` and server `received_at` on offline operations. Device timestamps are not authoritative ordering or proof of license validity.
 - Sync sequence/revisions: positive `bigint`; transmit losslessly, for example as decimal strings. Do not assume JavaScript numbers represent arbitrary bigint values exactly.
 - Counts/scores: nonnegative integer. Optional scores are null, not zero-by-default.
-- Money: integer minor units (centavos for PHP) with an ISO 4217 `currency` column, never floating point. Unset optional amounts are null, not 0. Derived estimates (totals, break-even) are computed, not stored. V1 money is estimate-only; there are no payment records.
+- Money: integer minor units (centavos for PHP) with an ISO 4217 `currency` column, never floating point. Unset optional amounts are null, not 0. Derived estimates (totals, break-even) are computed, not stored. V1 includes manual session payment marks and license-term evidence of payments made outside ROTRA; ROTRA never collects money. See the [calculation units](queue/modules/financials-inventory.md#calculation); no-fee marks and lifecycle rules remain gated by [#245](https://github.com/jose-codegourmet/rotra-v2/issues/245).
 - Weights: integer basis points (7000/3000 initially), constrained to total 10000. Calculated rating precision and scale are undecided.
 - Phone/email: normalized text in private records. Proposed phone normalization is E.164; the acceptance/country rules still need specification. Do not apply provider-specific email transformations such as stripping dots.
 - JSONB: versioned sync payloads, permitted profile details, calculation evidence, and display snapshots. Identity, membership, outcomes, and FK relationships remain relational.

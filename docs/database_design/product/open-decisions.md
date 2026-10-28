@@ -6,6 +6,15 @@
 
 This design is concrete enough to review but not safe to translate mechanically into migrations. The [business open decisions](../../business_logic/product/open-decisions.md) still apply.
 
+Execution gates now have focused tickets: [#243 infrastructure](https://github.com/jose-codegourmet/rotra-v2/issues/243),
+[#244 identity/auth/contacts](https://github.com/jose-codegourmet/rotra-v2/issues/244),
+[#245 roster/payments/licenses](https://github.com/jose-codegourmet/rotra-v2/issues/245),
+[#246 offline/finality](https://github.com/jose-codegourmet/rotra-v2/issues/246),
+[#247 calculations](https://github.com/jose-codegourmet/rotra-v2/issues/247), and
+[#248 public/retention](https://github.com/jose-codegourmet/rotra-v2/issues/248).
+Creating those issues did not settle their questions. The [command contracts](command-contracts.md)
+and [schema dependencies](schema-dependencies.md) identify their consumers.
+
 ## Technical proposals introduced here
 
 | Proposal | Why | Unresolved consequence |

@@ -3,7 +3,7 @@
 import { cn } from '@rotra/ui/cn'
 import { Icon } from '@rotra/ui/icon'
 import { IconButton } from '@rotra/ui/icon-button'
-import type { ReactNode } from 'react'
+import type { ElementType, ReactNode } from 'react'
 import { useOptionalAppShell } from '../AppShell.context'
 
 export type TopBarProps = {
@@ -11,6 +11,10 @@ export type TopBarProps = {
   product: string
   /** The mark becomes a button (Player and Admin go home from it) */
   onBrandClick?: () => void
+  brandHref?: string
+  linkAs?: ElementType
+  /** Admin keeps its wide navigation permanently expanded. */
+  menuOnNarrowOnly?: boolean
   /** Navigation and actions: PlayerNav, SyncStatus, ThemeToggle, account */
   children?: ReactNode
   /** Center the content at 1240 px like Queue; Admin's top bar spans the window */
@@ -18,9 +22,9 @@ export type TopBarProps = {
 }
 
 /** The prototypes' .top: sticky, blurred top bar with the menu button, the ROTRA mark and actions. */
-export function TopBar({ product, onBrandClick, children, contained = true }: TopBarProps) {
+export function TopBar({ product, onBrandClick, brandHref, linkAs: Link = 'a', menuOnNarrowOnly = false, children, contained = true }: TopBarProps) {
   const shell = useOptionalAppShell()
-  const showMenu = shell && !(shell.narrow && shell.hasDock)
+  const showMenu = shell && !(shell.narrow && shell.hasDock) && (!menuOnNarrowOnly || shell.narrow)
   const menuLabel = shell?.narrow
     ? shell.drawerOpen
       ? 'Close menu'
@@ -34,7 +38,7 @@ export function TopBar({ product, onBrandClick, children, contained = true }: To
       <span>
         ROTR<b className="text-accent">A</b>
       </span>
-      <span className="text-sm font-semibold tracking-normal text-fg2 max-[480px]:hidden">
+      <span className={cn('text-sm font-semibold tracking-normal text-fg2', product !== 'Admin' && 'max-[480px]:hidden')}>
         {product}
       </span>
     </>
@@ -62,7 +66,9 @@ export function TopBar({ product, onBrandClick, children, contained = true }: To
             <Icon name="menu" />
           </IconButton>
         ) : null}
-        {onBrandClick ? (
+        {brandHref ? (
+          <Link href={brandHref} aria-label={`ROTRA ${product}, open clubs`} className={cn(brandClass, 'text-fg no-underline')}>{brand}</Link>
+        ) : onBrandClick ? (
           <button
             type="button"
             onClick={onBrandClick}

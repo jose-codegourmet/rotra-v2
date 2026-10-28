@@ -40,6 +40,26 @@ nvm use && pnpm --filter @rotra/ui storybook
 nvm use && pnpm lint && pnpm type-check && pnpm build
 ```
 
+## Production deployments
+
+Deployments run through the **Deploy production** GitHub Action
+([`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)). Open **Actions → Deploy production →
+Run workflow**, select **main**, and run it. There are no deployment triggers for pushes or pull requests;
+the job also refuses to deploy any branch other than `main`.
+
+The GitHub **production** environment allows only the `main` branch. It needs:
+
+- Environment variables `VERCEL_ORG_ID` and `VERCEL_PROJECT_ID`, targeting the existing `rotra-v2`
+  Vercel project. These are configured in GitHub, not committed credentials.
+- Environment secret `VERCEL_TOKEN`, created in Vercel with access to that project and added directly
+  in GitHub under **Settings → Environments → production → Environment secrets**.
+
+The workflow installs the locked dependencies, runs lint and type-check, pulls the production Vercel
+configuration, builds the three services, and deploys the build output together. The deployment URL
+appears in the run summary. Vercel's Git connection stays disconnected and `git.deploymentEnabled`
+stays `false`, so the GitHub Action is the deployment entry point. Local `.vercel` configuration and
+build output are ignored by Git.
+
 ## Tech stack
 
 Next.js 16 (App Router) · React 19.2 · TypeScript 5 · Tailwind CSS 4 + shadcn/ui · TanStack Query v5 ·

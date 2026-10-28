@@ -38,6 +38,11 @@ export const Open: Story = {}
 /** Every slot is taken: confirmed guests join the waitlist; Request to join stays. */
 export const Full: Story = { args: { variant: 'full', onRequestToJoin: fn() } }
 
+/** An offline visitor: sending needs internet, so Request to join is disabled */
+export const Offline: Story = {
+  args: { variant: 'open', openSlots, capacity, onRequestToJoin: fn(), disabled: true },
+}
+
 /** Accept join requests is off for this session. */
 export const Off: Story = { args: { variant: 'off' } }
 

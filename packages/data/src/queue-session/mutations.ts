@@ -10,6 +10,7 @@ import { queueMutation, sessionIn } from '../mock/transaction'
 import type { SessionWaitlistEntry } from '../session-roster/sessionRoster.types'
 import {
   estimateMinimum,
+  publicSlugFor,
   rebalanceSlots,
   sessionMinutes,
   sessionOccurrences,
@@ -123,7 +124,7 @@ export function createQueueSession(input: QueueSessionInput) {
         finalizedAt: null,
         playerRecordsUpdatedAt: null,
         seriesId,
-        publicSlug: id,
+        publicSlug: publicSlugFor(id),
         acceptJoinRequests: true,
       }
       state.sessions.push(s)

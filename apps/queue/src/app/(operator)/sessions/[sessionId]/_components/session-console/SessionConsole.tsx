@@ -273,7 +273,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
                 <Link href="/">Home</Link>
               </Button>
               <Button size="sm" asChild>
-                <Link href={`/s/${s.publicSlug}`}>Public page</Link>
+                <Link href={`/sessions/${sessionId}/public-page`}>Public page</Link>
               </Button>
               <Button size="sm" onClick={() => setSheet('post')}>
                 Copy Facebook post

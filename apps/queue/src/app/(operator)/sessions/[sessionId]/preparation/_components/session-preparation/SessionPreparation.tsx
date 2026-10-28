@@ -175,7 +175,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
                 <Link href={`/sessions/${sessionId}/edit`}>Edit preparation</Link>
               </Button>
               <Button size="sm" asChild>
-                <Link href={`/s/${s.publicSlug}`}>Preview public page</Link>
+                <Link href={`/sessions/${sessionId}/public-page`}>Preview public page</Link>
               </Button>
               <Button size="sm" onClick={() => setPostOpen(true)}>
                 Copy Facebook post
@@ -287,7 +287,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
                 acceptJoinRequests={s.acceptJoinRequests}
                 onCopyLink={() => void copyLink()}
                 onOpenAsGuest={() => router.push(publicHref)}
-                onPreviewPublicPage={() => router.push(publicHref)}
+                onPreviewPublicPage={() => router.push(`/sessions/${sessionId}/public-page`)}
                 onAcceptJoinRequestsChange={(accept) =>
                   setAcceptJoinRequests.mutate(
                     { sessionId, accept },

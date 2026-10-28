@@ -47,7 +47,7 @@ export function SessionDoneFlow({ sessionId, open, onOpenChange }: SessionDoneFl
     answer = useAnswerInterruption()
   const [interruptionOpen, setInterruptionOpen] = useState(false)
   const [invalidOpen, setInvalidOpen] = useState(false)
-  const finalize = useFinalizeSession()
+  const finalize = useFinalizeSession(sessionId)
   const [step, setStep] = useState<SessionDoneStep>('review')
   // One confirmation ID per open sheet: the idempotency key the mock finalization dedupes on.
   const commandId = useRef<string | null>(null)
@@ -65,7 +65,10 @@ export function SessionDoneFlow({ sessionId, open, onOpenChange }: SessionDoneFl
   const r = review.data
   if (!s || !r) return null
 
-  const online = sync.data ? sync.data.online : !dev.offline
+  // The DevMenu toggle disables Confirm the moment the device goes offline, before the sync
+  // state refetches; the pending count is the live one, so Confirm enables as soon as it reaches 0.
+  const online = !dev.offline && (sync.data ? sync.data.online : true)
+  const pendingChanges = sync.data ? sync.data.pendingCount : r.pendingChanges
 
   const continueToConfirm = () => {
     if (!integrity.data) return
@@ -83,18 +86,15 @@ export function SessionDoneFlow({ sessionId, open, onOpenChange }: SessionDoneFl
       continueToConfirm()
       return
     }
-    if (finalize.isPending) return
+    if (finalize.isPending || !online || pendingChanges > 0) return
     const id = commandId.current ?? crypto.randomUUID()
     commandId.current = id
-    finalize.mutate(
-      { sessionId, commandId: id },
-      {
-        onError: (error) => {
-          onOpenChange(false)
-          toast.error(errorMessage(error))
-        },
-      },
-    )
+    // A promise handler, not mutate's onError: the console unmounts once the finishing route opens,
+    // and the failure toast must still show. The finishing screen shows the error and its retry.
+    finalize.mutateAsync({ sessionId, commandId: id }).catch((error: unknown) => {
+      onOpenChange(false)
+      toast.error(errorMessage(error))
+    })
     // The finishing screen follows the stages from the finalization status; the sheet goes away.
     router.push(`/sessions/${sessionId}/finishing`)
   }
@@ -109,7 +109,7 @@ export function SessionDoneFlow({ sessionId, open, onOpenChange }: SessionDoneFl
         timeRange={`${formatTime(s.scheduledStartAt)}–${formatTime(s.scheduledEndAt)}`}
         gamesRecorded={r.gamesRecorded}
         participants={r.participants}
-        pendingChanges={r.pendingChanges}
+        pendingChanges={pendingChanges}
         recordsIncomplete={!!integrity.data && integrity.data.state !== 'complete'}
         activeGames={r.activeGames.map((g) => ({ courtLabels: g.courtLabels.join(' + ') }))}
         unplayedWaiting={r.unplayedWaiting}

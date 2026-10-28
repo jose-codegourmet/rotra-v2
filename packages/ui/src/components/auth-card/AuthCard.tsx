@@ -5,6 +5,9 @@ import type { ReactNode } from 'react'
 export type AuthCardProps = {
   /** Heading, e.g. "Club login", "Sign in" */
   title: ReactNode
+  /** Recovery screens omit the brand and may put a back action before the heading. */
+  showBrand?: boolean
+  back?: ReactNode
   /** Line under the ROTRA mark: "Run the game." (Queue), "Your player profile." (Player) */
   tagline?: ReactNode
   /** Product label beside the mark, as Admin shows "ADMIN" */
@@ -25,6 +28,8 @@ export type AuthCardProps = {
  */
 export function AuthCard({
   title,
+  showBrand = true,
+  back,
   tagline,
   product,
   description,
@@ -35,27 +40,30 @@ export function AuthCard({
   return (
     <main className="grid min-h-[calc(100dvh-80px)] place-items-center py-6 pr-[max(16px,env(safe-area-inset-right,0px))] pl-[max(16px,env(safe-area-inset-left,0px))]">
       <Card className="flex w-[min(420px,100%)] flex-col gap-[18px] p-7">
-        {product ? (
-          <div className="flex items-baseline gap-2.5" role="img" aria-label={`ROTRA ${product}`}>
-            <span className="text-4xl leading-none font-extrabold tracking-[6px]">
-              ROTR<b className="text-accent">A</b>
-            </span>
-            <span className="text-[15px] font-bold tracking-[0.5px] text-fg2 uppercase">
-              {product}
-            </span>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-1.5">
-            <div
-              role="img"
-              aria-label="ROTRA"
-              className="text-[40px] leading-none font-extrabold tracking-[6px]"
-            >
-              ROTR<b className="text-accent">A</b>
+        {back}
+        {showBrand ? (
+          product ? (
+            <div className="flex items-baseline gap-2.5" role="img" aria-label={`ROTRA ${product}`}>
+              <span className="text-4xl leading-none font-extrabold tracking-[6px]">
+                ROTR<b className="text-accent">A</b>
+              </span>
+              <span className="text-[15px] font-bold tracking-[0.5px] text-fg2 uppercase">
+                {product}
+              </span>
             </div>
-            {tagline ? <p className="m-0 text-fg2">{tagline}</p> : null}
-          </div>
-        )}
+          ) : (
+            <div className="flex flex-col gap-1.5">
+              <div
+                role="img"
+                aria-label="ROTRA"
+                className="text-[40px] leading-none font-extrabold tracking-[6px]"
+              >
+                ROTR<b className="text-accent">A</b>
+              </div>
+              {tagline ? <p className="m-0 text-fg2">{tagline}</p> : null}
+            </div>
+          )
+        ) : null}
         <div className="flex flex-col gap-1.5">
           <h1 className={product ? undefined : 'text-[22px]'}>{title}</h1>
           {description ? <p className="m-0 text-fg2">{description}</p> : null}

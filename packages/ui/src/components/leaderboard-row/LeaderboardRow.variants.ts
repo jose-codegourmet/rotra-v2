@@ -1,7 +1,7 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 export const leaderboardRowVariants = cva(
-  'grid min-h-14 w-full grid-cols-[56px_36px_minmax(0,1fr)_auto] items-center gap-3 rounded-md border-0 bg-transparent px-3 py-2 text-left',
+  'grid min-h-14 w-full grid-cols-[56px_36px_minmax(0,1fr)_minmax(0,auto)] items-center gap-3 rounded-md border-0 bg-transparent px-3 py-2 text-left max-[560px]:grid-cols-[44px_36px_minmax(0,1fr)] max-[560px]:gap-y-0 max-[560px]:px-2',
   {
     variants: {
       variant: {

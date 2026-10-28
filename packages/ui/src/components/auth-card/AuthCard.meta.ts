@@ -19,6 +19,6 @@ export const authCardMeta = {
     'docs/screens/product/modules/player-information/access-registration.md',
     'docs/screens/product/modules/admin/access-navigation.md',
   ],
-  variants: ['tagline', 'product'],
+  variants: ['tagline', 'product', 'recovery-without-brand'],
   related: ['Card', 'Notice', 'Field'],
 } satisfies ComponentMeta

@@ -1,8 +1,10 @@
 import { Avatar, type AvatarProps } from '@rotra/ui/avatar'
 import { cn } from '@rotra/ui/cn'
 import { PixelFire } from './pixel-fire/PixelFire'
+import './TopThreePodium.css'
 
 export type PodiumEntry = {
+  id?: string
   fullName: string
   nickname?: string | null
   levelLabel: string
@@ -16,40 +18,40 @@ export type TopThreePodiumProps = {
 }
 const place = ['First', 'Second', 'Third'] as const
 const short = ['1st', '2nd', '3rd'] as const
-const stepClass = [
-  'order-2 h-[136px] bg-accent text-on-accent max-[560px]:h-[108px]',
-  'order-1 h-[100px] max-[560px]:h-20',
-  'order-3 h-[76px] max-[560px]:h-[62px]',
-] as const
 
-/** Pixel-styled top three stage. DOM order stays 1–2–3 for screen readers. */
+/** Exact prototype stage; DOM order remains 1–2–3 while CSS places second on the left. */
 export function TopThreePodium({ entries, totalPlayers, onSelect }: TopThreePodiumProps) {
   return (
-    <section
-      aria-labelledby="top-three-title"
-      className="isolate overflow-hidden rounded-2xl border border-accent/40 bg-surface p-[18px] pb-0 max-[560px]:p-2.5 max-[560px]:pb-0"
-    >
-      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
-        <h2
-          id="top-three-title"
-          className="font-pixel text-lg font-bold tracking-[1px] text-accent uppercase"
-        >
-          Top three
-        </h2>
-        <span className="text-sm text-fg2">
+    <section aria-labelledby="top-three-title" className="rotra-podium">
+      <span className="rotra-embers" aria-hidden>
+        {Array.from({ length: 14 }, (_, index) => (
+          <i
+            key={index}
+            style={{
+              left: `${4 + ((index * 37) % 92)}%`,
+              animationDelay: `${((index * 0.73) % 5).toFixed(2)}s`,
+              animationDuration: `${4 + (index % 4)}s`,
+            }}
+          />
+        ))}
+      </span>
+      <div className="rotra-pod-head">
+        <h2 id="top-three-title">Top three</h2>
+        <span className="text-[13px] text-fg2">
           Overall ROTRA leaderboard · {totalPlayers.toLocaleString('en-PH')} players
         </span>
       </div>
-      <div className="grid grid-cols-3 items-end gap-2.5 pt-10 max-[560px]:gap-1.5 max-[560px]:pt-8">
+      <div className="rotra-pod-stage">
         {entries.map((entry, index) => (
           <button
-            key={entry.fullName}
+            key={entry.id ?? entry.fullName}
+            id={entry.id}
             type="button"
             onClick={() => onSelect(index)}
             aria-label={`${place[index]} place, ${entry.fullName}${entry.isMe ? ' (you)' : ''}, ${entry.levelLabel}`}
-            className="flex min-w-0 flex-col items-center gap-3 border-0 bg-transparent p-0 text-inherit"
+            className={cn('rotra-pod', `p${index + 1}`, entry.isMe && 'me')}
           >
-            <span className="relative flex min-w-0 flex-col items-center gap-0.5 text-center">
+            <span className="rotra-pod-who">
               {index === 0 ? <PixelFire /> : null}
               <Avatar
                 name={entry.fullName}
@@ -57,31 +59,17 @@ export function TopThreePodium({ entries, totalPlayers, onSelect }: TopThreePodi
                 initials={entry.picture?.initials}
                 size={index === 0 ? 88 : 64}
                 shape="square"
-                className={cn(
-                  'relative z-10 ring-3 ring-surface ring-offset-2 ring-offset-border-strong',
-                  index === 0 && 'ring-accent',
-                )}
+                className="avatar"
               />
-              <b className="relative z-10 break-words text-[15px] leading-tight">
-                {entry.fullName}
-                {entry.isMe ? <span className="text-accent"> · You</span> : null}
-              </b>
+              <b className="rotra-pod-name">{entry.fullName}</b>
               {entry.nickname ? (
-                <span className="relative z-10 text-xs text-fg2">“{entry.nickname}”</span>
+                <span className="relative z-10 text-[13px] text-fg2">“{entry.nickname}”</span>
               ) : null}
-              <span className="relative z-10 text-xs font-semibold text-fg2">
-                {entry.levelLabel}
-              </span>
+              <span className="rotra-pod-lv">{entry.levelLabel}</span>
             </span>
-            <span
-              aria-hidden
-              className={cn(
-                'flex w-full flex-col items-center bg-elev pt-3 font-pixel leading-none text-fg2',
-                stepClass[index],
-              )}
-            >
-              <b className="text-[34px]">{index + 1}</b>
-              <small className="text-xs tracking-[1px] uppercase">{short[index]}</small>
+            <span className="rotra-pod-step" aria-hidden>
+              <b>{index + 1}</b>
+              <small>{short[index]}</small>
             </span>
           </button>
         ))}

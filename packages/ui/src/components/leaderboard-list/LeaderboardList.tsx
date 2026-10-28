@@ -5,6 +5,8 @@ import type { ReactNode } from 'react'
 export type LeaderboardListProps = {
   children?: ReactNode
   loading?: boolean
+  /** Refresh existing rows without replacing them with placeholders. */
+  busy?: boolean
   shown?: number
   total?: number
   onShowMore?: () => void
@@ -30,6 +32,7 @@ function LoadingRows() {
 export function LeaderboardList({
   children,
   loading = false,
+  busy = false,
   shown,
   total,
   onShowMore,
@@ -38,7 +41,7 @@ export function LeaderboardList({
   return (
     <section
       className="flex flex-col"
-      aria-busy={loading || undefined}
+      aria-busy={loading || busy || undefined}
       aria-label={loading ? 'Loading the leaderboard' : undefined}
     >
       <div

@@ -3,7 +3,10 @@ import type { ClubPlayer } from '../club-player/clubPlayer.types'
 import type { ClubVenue } from '../club-venue/clubVenue.types'
 import { clubs } from '../fixtures/clubs'
 import { licensePayments } from '../fixtures/licensePayments'
+import { playerAccounts } from '../fixtures/playerAccounts'
 import { playerAwardHistory } from '../fixtures/playerAwardHistory'
+import { playerProfiles } from '../fixtures/playerProfiles'
+import { createPlayerRankFixtures } from '../fixtures/playerRanks'
 import { clubPlayers, players } from '../fixtures/players'
 import { createQueueFixtures } from '../fixtures/queueSessions'
 import { rankingSettings } from '../fixtures/rankingSettings'
@@ -11,7 +14,7 @@ import { createSessionPublicationFixtures } from '../fixtures/sessionPublication
 import { venues } from '../fixtures/venues'
 import type { ClubLicenseTerm } from '../license/license.types'
 import type { Match } from '../match/match.types'
-import type { Player } from '../player/player.types'
+import type { Player, PlayerProfile, PlayerRank, PlayerSessionRecord } from '../player/player.types'
 import type {
   DownloadState,
   QueueSession,
@@ -33,6 +36,11 @@ import type {
 } from '../session-roster/sessionRoster.types'
 import type { SaveOutcome, SyncState } from '../sync/sync.types'
 export type MockState = {
+  playerAccounts: typeof playerAccounts
+  resetLinks: Record<string, 'valid' | 'used'>
+  playerProfiles: PlayerProfile[]
+  playerRanks: Record<string, PlayerRank>
+  playerGames: Record<string, PlayerSessionRecord[]>
   rankingSettings: RankingSettings
   clubs: Club[]
   venues: ClubVenue[]
@@ -87,6 +95,10 @@ function seedState(): MockState {
       ]),
   )
   return structuredClone({
+    ...createPlayerRankFixtures(),
+    playerProfiles,
+    playerAccounts,
+    resetLinks: { 'reset-valid': 'valid' },
     rankingSettings,
     clubs,
     venues,

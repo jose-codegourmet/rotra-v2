@@ -1,8 +1,10 @@
 import type { LeaderboardEntry } from '../leaderboard/leaderboard.types'
 import type { PlayingLevel } from '../player/player.types'
+import portraits from './playerPortraits.json'
 import { leaderboardPlayers } from './players'
 
 // The Player prototype's exact population, from Advanced High down to Beginner Low.
+const pictures: Record<string, string> = portraits
 const COUNTS_TOP = [9, 22, 40, 104, 196, 272, 250, 262, 129] as const
 
 function levelAt(position: number): PlayingLevel {
@@ -24,5 +26,5 @@ export const leaderboardEntries: LeaderboardEntry[] = leaderboardPlayers.map((pl
   fullName: player.fullName,
   nickname: player.nickname,
   playingLevel: levelAt(index + 1),
-  pictureUrl: null,
+  pictureUrl: pictures[player.id] ?? null,
 }))

@@ -45,3 +45,5 @@ export const FooterWithMore: Story = {
   ),
 }
 export const FooterComplete: Story = { args: { shown: 1_284, total: 1_284, children: null } }
+
+export const Refreshing: Story = { args: { busy: true } }

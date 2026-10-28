@@ -3,9 +3,12 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { LeaderboardRow } from './LeaderboardRow'
 
 const first = leaderboardEntries[0]
+const second = leaderboardEntries[1]
+const third = leaderboardEntries[2]
 const fourth = leaderboardEntries[3]
 const migs = leaderboardEntries[127]
-if (!first || !fourth || !migs) throw new Error('Missing leaderboard fixtures.')
+if (!first || !second || !third || !fourth || !migs)
+  throw new Error('Missing leaderboard fixtures.')
 const noop = () => undefined
 
 const meta = {
@@ -15,6 +18,7 @@ const meta = {
     position: 4,
     fullName: fourth.fullName,
     nickname: fourth.nickname,
+    picture: { src: fourth.pictureUrl ?? undefined },
     levelLabel: 'Advanced High',
     onSelect: noop,
   },
@@ -29,7 +33,8 @@ export const Me: Story = {
     position: 128,
     fullName: migs.fullName,
     nickname: migs.nickname,
-    levelLabel: 'Advanced Low',
+    picture: { src: migs.pictureUrl ?? undefined },
+    levelLabel: 'Intermediate High',
     isMe: true,
   },
 }
@@ -38,18 +43,27 @@ export const Medal1: Story = {
     position: 1,
     fullName: first.fullName,
     nickname: first.nickname,
+    picture: { src: first.pictureUrl ?? undefined },
     levelLabel: 'Advanced High',
     variant: 'medal-1',
   },
 }
 export const Medal2: Story = {
-  args: { position: 2, fullName: 'Theo Ramos', levelLabel: 'Advanced High', variant: 'medal-2' },
+  args: {
+    position: 2,
+    fullName: second.fullName,
+    nickname: second.nickname,
+    picture: { src: second.pictureUrl ?? undefined },
+    levelLabel: 'Advanced High',
+    variant: 'medal-2',
+  },
 }
 export const Medal3: Story = {
   args: {
     position: 3,
-    fullName: 'Carla Dimaculangan',
-    nickname: 'Tintin',
+    fullName: third.fullName,
+    nickname: third.nickname,
+    picture: { src: third.pictureUrl ?? undefined },
     levelLabel: 'Advanced High',
     variant: 'medal-3',
   },

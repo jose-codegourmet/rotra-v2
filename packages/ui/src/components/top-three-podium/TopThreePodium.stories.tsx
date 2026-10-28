@@ -7,6 +7,7 @@ if (!first || !second || !third) throw new Error('Missing leaderboard fixtures.'
 const entries = [first, second, third].map((entry) => ({
   fullName: entry.fullName,
   nickname: entry.nickname,
+  picture: { src: entry.pictureUrl ?? undefined },
   levelLabel: 'Advanced High',
 })) as unknown as Parameters<typeof TopThreePodium>[0]['entries']
 const meta = {

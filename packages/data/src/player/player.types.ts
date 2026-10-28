@@ -52,3 +52,16 @@ export type PlayerRank = {
   recentCount: number
   olderCount: number
 }
+
+/** Public profile only; private account and contact fields are deliberately excluded. */
+export type PlayerProfile = {
+  playerId: string
+  rtrId: string
+  fullName: string
+  nickname: string | null
+  picture: string | null
+  playingStyle: string
+  experienceYears: number | null
+  experienceMonths: number | null
+  socialLinks: { facebook: string; instagram: string; youtube: string; linkedin: string }
+}

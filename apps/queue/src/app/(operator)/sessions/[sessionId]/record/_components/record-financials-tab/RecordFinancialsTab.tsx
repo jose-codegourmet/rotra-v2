@@ -18,8 +18,16 @@ export function RecordFinancialsTab({ sessionId, record }: RecordFinancialsTabPr
   const cost = useSessionCostEstimate(sessionId)
   if (cost.isError) return <QueryError query={cost} title="Couldn't load the cost estimate." />
   if (cost.isPending) return <Skeleton className="h-60 rounded-lg" />
-  return <>
-    <SessionFinancialsSummary estimate={cost.data?.estimate ?? null} courts={cost.data?.courts ?? record.courts} durationLabel={formatMinutes(cost.data?.durationMinutes ?? record.lengthMinutes)} courtFeePerCourtHour={cost.data?.saved.courtFeePerCourtHour ?? 0} shuttleLines={cost.data?.shuttleLines ?? []} />
-    {record.state !== 'invalid' ? <PaymentsPanel sessionId={sessionId} className="mt-5" /> : null}
-  </>
+  return (
+    <>
+      <SessionFinancialsSummary
+        estimate={cost.data?.estimate ?? null}
+        courts={cost.data?.courts ?? record.courts}
+        durationLabel={formatMinutes(cost.data?.durationMinutes ?? record.lengthMinutes)}
+        courtFeePerCourtHour={cost.data?.saved.courtFeePerCourtHour ?? 0}
+        shuttleLines={cost.data?.shuttleLines ?? []}
+      />
+      {record.state !== 'invalid' ? <PaymentsPanel sessionId={sessionId} className="mt-5" /> : null}
+    </>
+  )
 }

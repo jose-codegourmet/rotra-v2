@@ -25,7 +25,14 @@ import { selectNavCollapsed, setNavCollapsed } from '@/store/slices/uiSlice'
 import { OperatorShellContext, type OperatorShellContextValue } from './DockAction.context'
 
 /** Screens the license gate replaces while the license has ended (the console stays reachable). */
-const GATED_PREFIXES = ['/', '/saved-players', '/venues', '/inventory', '/club-settings', '/sessions/new']
+const GATED_PREFIXES = [
+  '/',
+  '/saved-players',
+  '/venues',
+  '/inventory',
+  '/club-settings',
+  '/sessions/new',
+]
 
 /** Screens rendered without the top bar, left nav and dock: the finishing route (the prototype's hasShell). */
 const BARE_ROUTE = /^\/sessions\/[^/]+\/finishing$/

@@ -2,7 +2,11 @@
 
 import { useInventory } from '@rotra/data/inventory/useInventory'
 import { useSessionCostEstimate } from '@rotra/data/session-cost/useSessionCostEstimate'
-import { defaultShuttlePlan, estimateSessionCost, normalizeSessionCost } from '@rotra/data/session-cost/rules'
+import {
+  defaultShuttlePlan,
+  estimateSessionCost,
+  normalizeSessionCost,
+} from '@rotra/data/session-cost/rules'
 import { sessionFinancialsDefaultValues } from '@rotra/ui/forms/session-financials-fields/default-values'
 
 import { useClub } from '@rotra/data/club'
@@ -88,22 +92,47 @@ export function SessionSetup(props: SessionSetupProps) {
   const existing = useQueueSession(editing ?? '')
   const cost = useSessionCostEstimate(editing ?? '')
   const draftKey = `rotra-setup-draft:${editing ?? 'new'}`
-  const [restored, setRestored] = useState<{ values: Partial<SessionSetupInput>; page: number } | null | undefined>(undefined)
+  const [restored, setRestored] = useState<
+    { values: Partial<SessionSetupInput>; page: number } | null | undefined
+  >(undefined)
   useEffect(() => {
     try {
       const saved = sessionStorage.getItem(draftKey)
       const draft = saved ? JSON.parse(saved) : null
-      setRestored(draft && typeof draft.values === 'object' && Array.isArray(draft.values.courtLabels) && Array.isArray(draft.values.shuttles) ? draft : null)
-    } catch { setRestored(null) }
+      setRestored(
+        draft &&
+          typeof draft.values === 'object' &&
+          Array.isArray(draft.values.courtLabels) &&
+          Array.isArray(draft.values.shuttles)
+          ? draft
+          : null,
+      )
+    } catch {
+      setRestored(null)
+    }
   }, [draftKey])
-  const clearDraft = () => { try { sessionStorage.removeItem(draftKey); sessionStorage.removeItem('rotra-setup-return') } catch {} }
+  const clearDraft = () => {
+    try {
+      sessionStorage.removeItem(draftKey)
+      sessionStorage.removeItem('rotra-setup-return')
+    } catch {}
+  }
   const manageInventory = () => {
     const values = formRef.current?.getValues()
     if (values) {
       try {
-        sessionStorage.setItem(draftKey, JSON.stringify({ values, page: formRef.current?.getPage() ?? 2 }))
-        sessionStorage.setItem('rotra-setup-return', editing ? `/sessions/${editing}/edit` : '/sessions/new')
-      } catch { toast.error('Could not keep the setup draft on this device.'); return }
+        sessionStorage.setItem(
+          draftKey,
+          JSON.stringify({ values, page: formRef.current?.getPage() ?? 2 }),
+        )
+        sessionStorage.setItem(
+          'rotra-setup-return',
+          editing ? `/sessions/${editing}/edit` : '/sessions/new',
+        )
+      } catch {
+        toast.error('Could not keep the setup draft on this device.')
+        return
+      }
     }
     router.push('/inventory?from=setup')
   }
@@ -211,7 +240,15 @@ export function SessionSetup(props: SessionSetupProps) {
       if (!s) return null
       return {
         ...sessionFinancialsDefaultValues,
-        ...(cost.data ? { courtFeePerCourtHour: feeToInput(cost.data.saved.courtFeePerCourtHour), entranceFeePerHead: feeToInput(cost.data.saved.entranceFeePerHead), paymentMode: cost.data.saved.paymentMode, customFeePerHead: feeToInput(cost.data.saved.customFeePerHead), shuttles: cost.data.saved.shuttles } : {}),
+        ...(cost.data
+          ? {
+              courtFeePerCourtHour: feeToInput(cost.data.saved.courtFeePerCourtHour),
+              entranceFeePerHead: feeToInput(cost.data.saved.entranceFeePerHead),
+              paymentMode: cost.data.saved.paymentMode,
+              customFeePerHead: feeToInput(cost.data.saved.customFeePerHead),
+              shuttles: cost.data.saved.shuttles,
+            }
+          : {}),
         title: s.title,
         date: toYmd(new Date(s.scheduledStartAt)),
         startTime: hhmm(s.scheduledStartAt),
@@ -234,14 +271,23 @@ export function SessionSetup(props: SessionSetupProps) {
       ...sessionFinancialsDefaultValues,
       courtFeePerCourtHour: feeToInput(venue?.courtFeeMinor ?? null),
       entranceFeePerHead: feeToInput(entrance ?? null),
-      shuttles: defaultShuttlePlan({ courts: 2, durationMinutes: 180, inventory: inventory.data?.items ?? [] }),
+      shuttles: defaultShuttlePlan({
+        courts: 2,
+        durationMinutes: 180,
+        inventory: inventory.data?.items ?? [],
+      }),
       ...(props.date ? { date: props.date } : {}),
       ...(venue ? { venue: { venueId: venue.id, name: venue.name, address: venue.address } } : {}),
     }
   }
 
   const ready =
-    club.data && venues.data && sessions.data && inventory.data && restored !== undefined && (!isEdit || (existing.data && roster.data && !cost.isPending))
+    club.data &&
+    venues.data &&
+    sessions.data &&
+    inventory.data &&
+    restored !== undefined &&
+    (!isEdit || (existing.data && roster.data && !cost.isPending))
   const initial = ready ? initialValues() : null
   const peek = peekId ? sessions.data?.find((s) => s.id === peekId) : undefined
   const markedDates = (sessions.data ?? [])
@@ -277,7 +323,18 @@ export function SessionSetup(props: SessionSetupProps) {
           ref={formRef}
           mode={props.mode}
           initialPage={restored?.page}
-          financials={{ shuttleItems: inventory.data?.items.filter((i) => i.category === 'shuttlecocks') ?? [], venueRates: venueList.map((v) => ({ id: v.id, venueName: v.name, courtFee: v.courtFeeMinor, entranceFee: v.entranceFeeMinor })), clubDefaultEntranceFee: club.data?.defaultEntranceFeeMinor, computeEstimate: estimateSessionCost, onManageInventory: manageInventory }}
+          financials={{
+            shuttleItems: inventory.data?.items.filter((i) => i.category === 'shuttlecocks') ?? [],
+            venueRates: venueList.map((v) => ({
+              id: v.id,
+              venueName: v.name,
+              courtFee: v.courtFeeMinor,
+              entranceFee: v.entranceFeeMinor,
+            })),
+            clubDefaultEntranceFee: club.data?.defaultEntranceFeeMinor,
+            computeEstimate: estimateSessionCost,
+            onManageInventory: manageInventory,
+          }}
           initialValues={initial}
           playersPerCourtDefault={club.data?.defaultPlayersPerCourt}
           clubName={club.data?.name ?? ''}
@@ -285,7 +342,10 @@ export function SessionSetup(props: SessionSetupProps) {
           isPending={mutation.isPending}
           serverError={serverError}
           onSubmit={onSubmit}
-          onCancel={() => { clearDraft(); router.push(backHref) }}
+          onCancel={() => {
+            clearDraft()
+            router.push(backHref)
+          }}
           onOpenDatePicker={(current) => setDatePicker(current)}
           onOpenVenuePicker={(current) => setVenuePicker(current)}
           onViewClash={setPeekId}

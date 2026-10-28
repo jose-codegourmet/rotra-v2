@@ -51,7 +51,10 @@ export function promoteWaiter(state: MockState, entry: SessionWaitlistEntry, now
   state.waitlist = state.waitlist.filter((w) => w.id !== entry.id)
 }
 function validate(state: MockState, input: QueueSessionInput) {
-  validateSessionCost(input.costEstimate, state.inventory.filter((i) => i.clubId === DEMO_CLUB_ID))
+  validateSessionCost(
+    input.costEstimate,
+    state.inventory.filter((i) => i.clubId === DEMO_CLUB_ID),
+  )
   const venue = state.venues.find((v) => v.id === input.venueId && v.clubId === DEMO_CLUB_ID)
   if (
     !venue ||

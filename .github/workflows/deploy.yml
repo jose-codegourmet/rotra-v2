@@ -1,0 +1,78 @@
+name: Deploy production
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vercel-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.url }}
+    env:
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+      VERCEL_CLI_VERSION: '65.5.0'
+    steps:
+      - name: Check deployment configuration
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          : "${VERCEL_ORG_ID:?Set the VERCEL_ORG_ID production environment variable}"
+          : "${VERCEL_PROJECT_ID:?Set the VERCEL_PROJECT_ID production environment variable}"
+          : "${VERCEL_TOKEN:?Set the VERCEL_TOKEN production environment secret}"
+
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Type-check
+        run: pnpm type-check
+
+      - name: Pull production configuration
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: pnpm dlx "vercel@${VERCEL_CLI_VERSION}" pull --yes --environment=production --scope "$VERCEL_ORG_ID"
+
+      - name: Build production services
+        run: pnpm dlx "vercel@${VERCEL_CLI_VERSION}" build --prod
+
+      - name: Deploy production
+        id: deploy
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          deployment_url="$(pnpm dlx "vercel@${VERCEL_CLI_VERSION}" deploy --prebuilt --prod --yes --scope "$VERCEL_ORG_ID")"
+          DEPLOYMENT_URL="$deployment_url" node --input-type=module -e '
+            const value = process.env.DEPLOYMENT_URL;
+            const url = new URL(value);
+            if (url.protocol !== "https:" || url.origin !== value || !url.hostname.endsWith(".vercel.app")) process.exit(1);
+          '
+          echo "url=$deployment_url" >> "$GITHUB_OUTPUT"
+          {
+            echo '## Production deployment'
+            echo "Commit: $GITHUB_SHA"
+            echo "URL: $deployment_url"
+          } >> "$GITHUB_STEP_SUMMARY"

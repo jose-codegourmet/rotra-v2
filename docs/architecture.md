@@ -259,6 +259,6 @@ editing one changes nothing until it is pasted. See [email-templates.md](email-t
 | Prisma 7 vs 8 | Open; recommend 7 |
 | Real auth details (Supabase Auth setup for club usernames) | Open; auth epic |
 | Mock store persistence across reloads | In-memory for now |
-| Hosting | Settled: one Vercel project with [services](https://vercel.com/docs/services) (`vercel.json`), routed by host: `queue.rotra.club`, `player.rotra.club`, `admin.rotra.club`. Storybook is not deployed. What the bare domain shows is open |
+| Hosting | Settled: one Vercel project with [services](https://vercel.com/docs/services) (`vercel.json`), routed by host: `queue.rotra.club`, `player.rotra.club`, `admin.rotra.club`. Automatic Git deployments are disabled for all branches with `git.deploymentEnabled: false`; deployments are manual. Storybook is not deployed. What the bare domain shows is open |
 | App ports | Settled: 3000 / 3001 / 3002 (F01.1) |
 | Test runner for money and ranking math | Vitest (F05.1); also allowed for phone parsing and queue rules |

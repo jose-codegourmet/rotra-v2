@@ -37,7 +37,9 @@ function subscribe(onChange: () => void) {
 }
 
 function readColumns() {
-  return COLUMN_QUERIES.find((q) => window.matchMedia(`(min-width: ${q.min}px)`).matches)?.columns ?? 1
+  return (
+    COLUMN_QUERIES.find((q) => window.matchMedia(`(min-width: ${q.min}px)`).matches)?.columns ?? 1
+  )
 }
 
 /** 5 columns from 1200 px, 4 from 960, 3 from 700, 2 from 460, else 1. One column before hydration. */

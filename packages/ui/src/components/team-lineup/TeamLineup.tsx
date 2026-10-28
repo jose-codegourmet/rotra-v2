@@ -55,6 +55,7 @@ function Team({
       {players.map((p, index) => {
         const card = (
           <MatchPlayerCard
+            key={p.id}
             id={p.id}
             name={p.name}
             level={p.level}

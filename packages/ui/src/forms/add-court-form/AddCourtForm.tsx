@@ -17,8 +17,8 @@ import {
   type AddCourtFormInput,
   type AddCourtFormValues,
   COURT_LABEL_MAX,
-  type OpenUntilMode,
   makeAddCourtSchema,
+  type OpenUntilMode,
   timeOnSession,
 } from './AddCourtForm.schema'
 
@@ -88,8 +88,7 @@ export function AddCourtForm({
   const label = (typedLabel ?? '').trim() || defaultLabel
 
   // The preview: when the court closes and how long that is from now (prototype's addCourt(sh)).
-  const until =
-    mode === 'end' ? sessionEndsAt : time ? timeOnSession(sessionStartsAt, time) : null
+  const until = mode === 'end' ? sessionEndsAt : time ? timeOnSession(sessionStartsAt, time) : null
   const minutes = until === null ? null : Math.round((until - current) / MINUTE)
   const timeError = errors.time?.message
 

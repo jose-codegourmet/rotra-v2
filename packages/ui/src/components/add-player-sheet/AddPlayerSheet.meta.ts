@@ -14,7 +14,8 @@ export const addPlayerSheetMeta = {
   ],
   prototype: {
     file: 'docs/frames/queue-app/rotra-queue.html',
-    screen: 'SHEETS.add (Saved players / Player Information / New player tabs, pick state), afterAdd()',
+    screen:
+      'SHEETS.add (Saved players / Player Information / New player tabs, pick state), afterAdd()',
   },
   docs: [
     'docs/screens/product/modules/queue/players-roster.md#q-add-player--searchadd-to-roster',

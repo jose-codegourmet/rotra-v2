@@ -13,7 +13,7 @@ import { useInvalidateMatch } from '@rotra/data/match/useInvalidateMatch'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { useSubstitutePlayer } from '@rotra/data/match/useSubstitutePlayer'
 import { MockError } from '@rotra/data/mock/errors'
-import type { QueueSession } from '@rotra/data/queue-session/types'
+import type { QueueSession, SessionCourt } from '@rotra/data/queue-session/types'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import type { SessionPlayer } from '@rotra/data/session-roster/types'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
@@ -57,8 +57,7 @@ const isSaveFailure = (error: unknown) =>
   error instanceof MockError && (error.kind === 'retryable' || error.kind === 'offline')
 
 /** The recheck at confirmation found a change (player gone, match already decided): refetch so the sheet shows it */
-const isRecheckFailure = (error: unknown) =>
-  error instanceof MockError && error.kind === 'conflict'
+const isRecheckFailure = (error: unknown) => error instanceof MockError && error.kind === 'conflict'
 
 /** One confirmation ID per review: a retry after a timeout replays the same operation, never a competing outcome */
 const newOperationId = () => crypto.randomUUID()
@@ -114,7 +113,7 @@ export function ActiveMatch({ sessionId, now, matchId, onClose }: ActiveMatchPro
 }
 
 type OpenActiveMatchProps = Omit<ActiveMatchProps, 'matchId'> & {
-  session: QueueSession
+  session: QueueSession & { courts: SessionCourt[] }
   roster: SessionPlayer[]
   matches: Match[]
   match: Match
@@ -124,7 +123,6 @@ type OpenActiveMatchProps = Omit<ActiveMatchProps, 'matchId'> & {
 
 /** The open sheet: mounted per match, so its step and choices start fresh for each Open match */
 function OpenActiveMatch({
-  sessionId,
   now,
   session,
   roster,

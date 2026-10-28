@@ -104,8 +104,19 @@ export function CourtDrawing({
         {Array.from({ length: courts }, (_, i) => (
           <g key={`court-${i * COURT_H}`} transform={`translate(0 ${i * COURT_H})`}>
             <rect width={COURT_W} height={COURT_H} fill="var(--court-c)" />
-            <g fill="none" stroke="var(--court-l)" strokeWidth={1.5} vectorEffect="non-scaling-stroke">
-              <rect x={0.75} y={0.75} width={132.5} height={59.5} vectorEffect="non-scaling-stroke" />
+            <g
+              fill="none"
+              stroke="var(--court-l)"
+              strokeWidth={1.5}
+              vectorEffect="non-scaling-stroke"
+            >
+              <rect
+                x={0.75}
+                y={0.75}
+                width={132.5}
+                height={59.5}
+                vectorEffect="non-scaling-stroke"
+              />
               <path
                 d="M0 4.6H134M0 56.4H134M7.6 0V61M126.4 0V61M47.2 0V61M86.8 0V61M0 30.5H47.2M86.8 30.5H134"
                 vectorEffect="non-scaling-stroke"

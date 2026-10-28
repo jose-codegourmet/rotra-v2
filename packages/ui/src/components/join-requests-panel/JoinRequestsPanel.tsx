@@ -77,7 +77,8 @@ export function JoinRequestsPanel({
   const confirmed = requests.filter((r) => r.status === 'confirmed').length
   const declined = requests.filter((r) => r.status === 'declined').length
 
-  const levelOf = (r: SessionJoinRequest) => (r.id in levels ? levels[r.id] : bandMid(r.statedBand))
+  const levelOf = (r: SessionJoinRequest) =>
+    r.id in levels ? (levels[r.id] ?? null) : bandMid(r.statedBand)
 
   const setLevel = (requestId: string, level: PlayingLevel) => {
     setLevels((prev) => ({ ...prev, [requestId]: level }))
@@ -178,7 +179,11 @@ export function JoinRequestsPanel({
                     missing={Boolean(error) && level == null}
                   />
                   <div className="flex flex-wrap items-center gap-2 max-sm:[&>*]:flex-1">
-                    <Button size="sm" onClick={() => onDecline(r.id)} aria-label={`Decline ${r.name}`}>
+                    <Button
+                      size="sm"
+                      onClick={() => onDecline(r.id)}
+                      aria-label={`Decline ${r.name}`}
+                    >
                       Decline
                     </Button>
                     <Button

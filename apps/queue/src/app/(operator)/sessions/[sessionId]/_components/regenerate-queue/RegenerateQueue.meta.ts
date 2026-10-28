@@ -16,5 +16,12 @@ export const regenerateQueueMeta = {
     'docs/business_logic/product/queue/modules/queueing/README.md#attention-and-regeneration',
     'docs/screens/product/state-matrix.md',
   ],
-  related: ['RegenerateQueueSheet', 'ConfirmSheet', 'QueueView', 'AutoQueue', 'SuggestMatch', 'SessionConsole'],
+  related: [
+    'RegenerateQueueSheet',
+    'ConfirmSheet',
+    'QueueView',
+    'AutoQueue',
+    'SuggestMatch',
+    'SessionConsole',
+  ],
 } satisfies ComponentMeta

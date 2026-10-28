@@ -74,7 +74,12 @@ export function createDecidedJoinRequestFixtures(now = Date.now()): SessionJoinR
     status: 'confirmed' | 'declined',
     clubPlayerId: string | null,
   ): SessionJoinRequest => ({ ...r, status, decidedAt: r.requestedAt + 4 * 60_000, clubPlayerId })
-  return [decide(rico, 'confirmed', 'cp-jr-rico'), decide(mae, 'declined', null), decide(jp, 'confirmed', 'cp-jr-jp'), tessa]
+  return [
+    decide(rico, 'confirmed', 'cp-jr-rico'),
+    decide(mae, 'declined', null),
+    decide(jp, 'confirmed', 'cp-jr-jp'),
+    tessa,
+  ]
 }
 
 /** Pending sample requests, oldest first. */

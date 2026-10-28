@@ -12,7 +12,8 @@ export const invalidSessionConfirmMeta = {
   ],
   prototype: {
     file: 'docs/frames/queue-app/rotra-queue.html',
-    screen: 'viewHistory › Tuesday Drills (invalid session record); D-INVALID-SESSION has no prototype sheet',
+    screen:
+      'viewHistory › Tuesday Drills (invalid session record); D-INVALID-SESSION has no prototype sheet',
   },
   docs: [
     'docs/screens/product/dialogs.md#d-invalid-session--no-official-session-outcome',

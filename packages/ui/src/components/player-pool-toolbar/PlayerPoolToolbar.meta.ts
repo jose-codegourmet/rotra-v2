@@ -14,5 +14,11 @@ export const playerPoolToolbarMeta = {
     screen: 'Live console › Players › playersPane() (.seg, #pl-sort)',
   },
   docs: ['docs/screens/product/modules/queue/session-console.md#q-pool--players-view'],
-  related: ['PlayerPoolCard', 'SelectionBar', 'SegmentedControl', 'Select', 'SavedPlayersFilterBar'],
+  related: [
+    'PlayerPoolCard',
+    'SelectionBar',
+    'SegmentedControl',
+    'Select',
+    'SavedPlayersFilterBar',
+  ],
 } satisfies ComponentMeta

@@ -25,7 +25,7 @@ import type { CourtPlayer } from '@rotra/ui/court-drawing'
 import { formatTime } from '@rotra/ui/now-card/helpers'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { toast } from '@rotra/ui/toaster'
-import { UpcomingQueueRow, type UpcomingQueueMatch } from '@rotra/ui/upcoming-queue-row'
+import { type UpcomingQueueMatch, UpcomingQueueRow } from '@rotra/ui/upcoming-queue-row'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 
 export type SessionViewProps = {

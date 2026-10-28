@@ -130,6 +130,7 @@ export function SessionConsole({ sessionId }: SessionConsoleProps) {
   const now = useNow(undefined, sheet !== null || matchSheet !== null || profileId !== null)
   const refetchSession = session.refetch
   const firstTick = useRef(true)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `now` is the 30-second tick that triggers the refetch
   useEffect(() => {
     if (firstTick.current) {
       firstTick.current = false

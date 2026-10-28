@@ -15,5 +15,13 @@ export const suggestMatchMeta = {
     'docs/business_logic/product/queue/modules/queueing/README.md#suggest',
     'docs/business_logic/product/queue/modules/queueing/README.md#ways-to-add-waiting-matches',
   ],
-  related: ['SuggestedMatchSheet', 'TeamLineup', 'MatchLineup', 'AutoQueue', 'PlayerProfile', 'QueueView', 'SessionConsole'],
+  related: [
+    'SuggestedMatchSheet',
+    'TeamLineup',
+    'MatchLineup',
+    'AutoQueue',
+    'PlayerProfile',
+    'QueueView',
+    'SessionConsole',
+  ],
 } satisfies ComponentMeta

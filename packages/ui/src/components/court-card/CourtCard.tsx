@@ -198,7 +198,9 @@ function FreeCourtCard({
       ) : (
         <>
           <p className="text-[13px] text-fg2">
-            {blockedReason ? `No waiting match can start: ${blockedReason}.` : 'The queue is empty.'}
+            {blockedReason
+              ? `No waiting match can start: ${blockedReason}.`
+              : 'The queue is empty.'}
           </p>
           {onAddMatch ? (
             <div className="mt-auto flex flex-wrap items-center gap-2">

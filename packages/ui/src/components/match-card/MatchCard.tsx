@@ -182,7 +182,10 @@ export function MatchCard({
       >
         <Icon
           name={ready ? 'check' : attention ? 'alert' : 'info'}
-          className={cn('mt-0.5 flex-none', attention && 'animate-pulse motion-reduce:animate-none')}
+          className={cn(
+            'mt-0.5 flex-none',
+            attention && 'animate-pulse motion-reduce:animate-none',
+          )}
         />
         <span className="line-clamp-2">{status.reason}</span>
       </span>

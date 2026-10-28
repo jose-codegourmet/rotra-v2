@@ -19,7 +19,8 @@ const sessionById = (id: string): QueueSession => {
   if (!s) throw new Error(`No session ${id} in fixtures`)
   return s
 }
-const courtsOf = (id: string) => queueSessionFixtures.courts.filter((c) => c.sessionId === id).length
+const courtsOf = (id: string) =>
+  queueSessionFixtures.courts.filter((c) => c.sessionId === id).length
 
 // Game and player counts are not in the F06.2 fixtures; these are the prototype's simulated totals
 // for Thursday Open Play (h1), Sunday Night Queue (h2) and Tuesday Drills (h3).
@@ -66,7 +67,8 @@ export const InvalidSession: Story = {
 /** A long title wraps under the label; nothing scrolls sideways at 375 px */
 export const LongTitle: Story = {
   args: {
-    title: 'Thursday Open Play · Banilad regulars and guests · doubles only · bring your own racket',
+    title:
+      'Thursday Open Play · Banilad regulars and guests · doubles only · bring your own racket',
   },
   globals: { viewport: { value: 'phone' } },
 }

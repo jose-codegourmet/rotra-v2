@@ -84,7 +84,9 @@ export function StartMatchSheet({
   const required = match.format === 'fun_5v5' ? 2 : 1
   const ready = status.kind === 'ready'
   const canStart =
-    ready && courtIds.length === required && courtIds.every((id) => freeCourts.some((c) => c.id === id))
+    ready &&
+    courtIds.length === required &&
+    courtIds.every((id) => freeCourts.some((c) => c.id === id))
   return (
     <Sheet
       open={open}

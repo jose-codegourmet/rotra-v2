@@ -37,13 +37,15 @@ const candidate = (p: SessionPlayer): PlayerPickerCandidate => {
 }
 
 // The prototype's picker order: off court first, present first, fewest games, longest rest.
-const players = roster.map(candidate).sort(
-  (a, b) =>
-    Number(a.playingOn !== null) - Number(b.playingOn !== null) ||
-    Number(b.present) - Number(a.present) ||
-    a.games - b.games ||
-    b.restMinutes - a.restMinutes,
-)
+const players = roster
+  .map(candidate)
+  .sort(
+    (a, b) =>
+      Number(a.playingOn !== null) - Number(b.playingOn !== null) ||
+      Number(b.present) - Number(a.present) ||
+      a.games - b.games ||
+      b.restMinutes - a.restMinutes,
+  )
 
 // Editing match 3 (players 4 and 6 vs 7 and 8): choosing Team A · player 2 with the others taken.
 const edited = matches[2]

@@ -92,7 +92,8 @@ export function PlayerFaceButton({
         className={cn(
           'max-w-16 truncate rounded-full bg-photo-label px-[5px] text-[10px] leading-[1.3] font-bold text-on-photo',
           compact && 'max-w-[46px]',
-          size === 'queue' && 'bg-transparent px-0 text-[11px] leading-normal text-fg touch:text-xs',
+          size === 'queue' &&
+            'bg-transparent px-0 text-[11px] leading-normal text-fg touch:text-xs',
         )}
       >
         {shortName}

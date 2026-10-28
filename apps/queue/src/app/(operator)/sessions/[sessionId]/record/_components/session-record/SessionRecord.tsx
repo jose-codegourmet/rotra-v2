@@ -97,7 +97,12 @@ export function SessionRecord({ sessionId }: SessionRecordProps) {
           }}
         />
       ) : (
-        <div aria-busy aria-label="Loading the session record" className="flex flex-col gap-5">
+        <div
+          role="status"
+          aria-busy
+          aria-label="Loading the session record"
+          className="flex flex-col gap-5"
+        >
           <div className="flex flex-col gap-2">
             <Skeleton className="w-40" />
             <Skeleton className="h-8 w-64" />

@@ -142,12 +142,14 @@ export function PlayerPickerSheet({
         </div>
       ) : (
         <EmptyState>
-          {filter === 'available' ? 'No one is free right now. Try All present.' : 'No player matches.'}
+          {filter === 'available'
+            ? 'No one is free right now. Try All present.'
+            : 'No player matches.'}
         </EmptyState>
       )}
       <p className="m-0 text-[13px] text-fg2">
-        Fewest games first. A player who is playing now can go into a later match, but it can't start
-        until they're free.
+        Fewest games first. A player who is playing now can go into a later match, but it can't
+        start until they're free.
       </p>
     </Sheet>
   )

@@ -14,5 +14,11 @@ export const preparationRosterMeta = {
     'docs/screens/product/modules/queue/players-roster.md#q-roster--confirmed-slots-and-presence',
     'docs/business_logic/product/queue/modules/players/README.md#slots-and-waitlist',
   ],
-  related: ['RosterPanel', 'WaitlistPanel', 'AddPlayer', 'PlayerProfileSheet', 'SessionPreparation'],
+  related: [
+    'RosterPanel',
+    'WaitlistPanel',
+    'AddPlayer',
+    'PlayerProfileSheet',
+    'SessionPreparation',
+  ],
 } satisfies ComponentMeta

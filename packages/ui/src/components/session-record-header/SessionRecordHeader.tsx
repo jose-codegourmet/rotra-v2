@@ -54,10 +54,7 @@ export function SessionRecordHeader({
     { key: 'length', label: 'Length', value: totals.length },
   ]
   return (
-    <header
-      data-state={state}
-      className={cn(sessionRecordHeaderVariants({ state }), className)}
-    >
+    <header data-state={state} className={cn(sessionRecordHeaderVariants({ state }), className)}>
       <div className="flex min-w-0 flex-col gap-1.5">
         <span className={LABEL}>Session record · read-only</span>
         <h1 className="[overflow-wrap:anywhere]">{title}</h1>

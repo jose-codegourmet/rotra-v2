@@ -12,7 +12,8 @@ export const swapSidesAreaMeta = {
   ],
   prototype: {
     file: 'docs/frames/queue-app/rotra-queue.html',
-    screen: 'Live console › Queue tab, Suggest, Edit lineup, Start match › swapSides()/pdLift()/pdMove()/pdEnd()',
+    screen:
+      'Live console › Queue tab, Suggest, Edit lineup, Start match › swapSides()/pdLift()/pdMove()/pdEnd()',
   },
   docs: [
     'docs/screens/product/modules/queue/match-queue.md',

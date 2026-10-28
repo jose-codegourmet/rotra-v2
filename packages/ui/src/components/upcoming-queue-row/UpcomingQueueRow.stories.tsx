@@ -2,7 +2,7 @@ import type { MatchCardFixture } from '@rotra/data/fixtures/match-cards'
 import { matchCardFixtures } from '@rotra/data/fixtures/match-cards'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
-import { UpcomingQueueRow, type UpcomingQueueMatch } from './UpcomingQueueRow'
+import { type UpcomingQueueMatch, UpcomingQueueRow } from './UpcomingQueueRow'
 
 const toMatch = (c: MatchCardFixture): UpcomingQueueMatch => ({
   position: c.match.queuePosition,

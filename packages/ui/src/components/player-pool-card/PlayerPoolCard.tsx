@@ -119,15 +119,14 @@ export function PlayerPoolCard({
           {games}/{minimumGames} games
         </span>
         {showWait ? (
-          <span className="rounded-md bg-bg px-1.5 py-0.5 tabular-nums">{waitMinutes} min wait</span>
+          <span className="rounded-md bg-bg px-1.5 py-0.5 tabular-nums">
+            {waitMinutes} min wait
+          </span>
         ) : null}
       </div>
       <div className="flex flex-nowrap items-center justify-between gap-3">
         <span
-          className={cn(
-            'text-[13px] text-fg2',
-            state === 'playing' && 'font-semibold text-accent',
-          )}
+          className={cn('text-[13px] text-fg2', state === 'playing' && 'font-semibold text-accent')}
         >
           {statusText(status)}
         </span>

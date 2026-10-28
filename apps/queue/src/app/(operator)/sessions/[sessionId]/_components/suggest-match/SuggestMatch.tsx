@@ -89,9 +89,7 @@ function OpenSuggestMatch({
   onAdded,
 }: OpenSuggestMatchProps) {
   const addSuggested = useAddSuggestedMatch()
-  const [suggestion, setSuggestion] = useState<Suggestion>(() =>
-    suggest(session, roster, matches),
-  )
+  const [suggestion, setSuggestion] = useState<Suggestion>(() => suggest(session, roster, matches))
   const [switched, setSwitched] = useState(false)
   const [profileId, setProfileId] = useState<string | null>(null)
   // One add per attempt: a second tap can land before isPending reaches this render.

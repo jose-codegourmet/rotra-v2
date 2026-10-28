@@ -19,5 +19,12 @@ export const startMatchSheetMeta = {
     'docs/screens/product/dialogs.md',
     'docs/business_logic/product/queue/modules/matches/README.md',
   ],
-  related: ['CourtPicker', 'ChooseMatchSheet', 'TeamLineup', 'MatchPlayerCard', 'SuggestedMatchSheet', 'Notice'],
+  related: [
+    'CourtPicker',
+    'ChooseMatchSheet',
+    'TeamLineup',
+    'MatchPlayerCard',
+    'SuggestedMatchSheet',
+    'Notice',
+  ],
 } satisfies ComponentMeta

@@ -139,7 +139,8 @@ export function RosterPanel({
         <SlotMeter rosterCount={players.length} capacity={capacity} waitlistCount={waitlistCount} />
         {missing ? (
           <Notice tone="warn">
-            {missing} player{missing > 1 ? 's need' : ' needs'} a level before the session can start.
+            {missing} player{missing > 1 ? 's need' : ' needs'} a level before the session can
+            start.
           </Notice>
         ) : null}
         {players.length ? (
@@ -162,7 +163,9 @@ export function RosterPanel({
             ))}
           </div>
         ) : (
-          <EmptyState>No players yet. Add players from your saved list or as new guests.</EmptyState>
+          <EmptyState>
+            No players yet. Add players from your saved list or as new guests.
+          </EmptyState>
         )}
       </section>
     </Card>

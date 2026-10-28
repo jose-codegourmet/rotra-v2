@@ -1,9 +1,4 @@
-import {
-  countedGames,
-  courtNames,
-  substitutionCandidates,
-  waitMinutes,
-} from '../match/match.rules'
+import { countedGames, courtNames, substitutionCandidates, waitMinutes } from '../match/match.rules'
 import type { Match, MatchFormat } from '../match/match.types'
 import type { PlayingLevel } from '../player/player.types'
 import { shortName } from '../session-roster/sessionRoster.rules'

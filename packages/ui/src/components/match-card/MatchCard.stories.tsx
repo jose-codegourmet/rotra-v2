@@ -76,11 +76,7 @@ export const Desktop: Story = {
   render: () => (
     <>
       {matchCardFixtures.upcoming.slice(0, 5).map((c, i, all) => (
-        <MatchCard
-          key={c.match.id}
-          {...propsFor(c)}
-          flow={i === all.length - 1 ? null : 'right'}
-        />
+        <MatchCard key={c.match.id} {...propsFor(c)} flow={i === all.length - 1 ? null : 'right'} />
       ))}
     </>
   ),

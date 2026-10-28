@@ -90,8 +90,7 @@ export function createMatchLineupFixtures(now = Date.now()) {
   // Only three present: doubles cannot be built, and the rules say why.
   const threePresent = roster.map((p, i) => ({ ...p, present: i < 3 }))
   const noLineupReason =
-    generateMatches(session, threePresent, matches, 1, () => 0).error ??
-    'No valid match right now.'
+    generateMatches(session, threePresent, matches, 1, () => 0).error ?? 'No valid match right now.'
   const bothFormatsOff =
     generateMatches({ ...session, allowDoubles: false }, roster, matches, 1, () => 0).error ??
     'No valid match right now.'

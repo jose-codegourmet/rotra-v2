@@ -10,8 +10,8 @@ import {
 } from '@rotra/ui/swap-sides-area'
 import {
   type KeyboardEvent,
-  type PointerEvent as ReactPointerEvent,
   type ReactNode,
+  type PointerEvent as ReactPointerEvent,
   useEffect,
   useRef,
 } from 'react'
@@ -172,7 +172,7 @@ function startPointer(d: Omit<Drag, 'cleanup'>) {
 
 function startTouch(d: Omit<Drag, 'cleanup'>) {
   const onMove = (e: TouchEvent) => {
-    if (!drag || !drag.touch) return
+    if (!drag?.touch) return
     const p = e.touches[0]
     if (!p) return
     if (!drag.on) {

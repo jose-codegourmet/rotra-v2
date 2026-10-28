@@ -4,7 +4,7 @@ import { queueSessionFixtures } from '@rotra/data/fixtures/queueSessions'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 import { fn } from 'storybook/test'
-import { AddPlayerSheet, type AddPlayerCandidate, type AddPlayerSheetProps } from './AddPlayerSheet'
+import { type AddPlayerCandidate, AddPlayerSheet, type AddPlayerSheetProps } from './AddPlayerSheet'
 
 const tonight = queueSessionFixtures.sessions[0]
 if (!tonight) throw new Error('Session fixture missing')
@@ -94,7 +94,12 @@ export const PlayerInformationLoading: Story = {
 export const NewPlayer: Story = { args: { initialTab: 'new' } }
 
 export const NewPlayerFull: Story = {
-  args: { initialTab: 'new', openSlots: 0, inSessionIds: ROSTER_IDS.slice(0, 10), waitlistCount: 2 },
+  args: {
+    initialTab: 'new',
+    openSlots: 0,
+    inSessionIds: ROSTER_IDS.slice(0, 10),
+    waitlistCount: 2,
+  },
 }
 
 export const AfterOneAdd: Story = {

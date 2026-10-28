@@ -178,8 +178,7 @@ export function simulateHistory(spec: SessionHistorySpec, now = Date.now()): Ses
     const avail = roster
       .filter((x) => (free[x.id] ?? 0) <= t0)
       .sort(
-        (a, b) =>
-          (games[a.id] ?? 0) - (games[b.id] ?? 0) || (free[a.id] ?? 0) - (free[b.id] ?? 0),
+        (a, b) => (games[a.id] ?? 0) - (games[b.id] ?? 0) || (free[a.id] ?? 0) - (free[b.id] ?? 0),
       )
     if (avail.length < 4) {
       courtFree[c.id] = t0 + 3 * MINUTE
@@ -278,9 +277,7 @@ export function createSessionHistoryFixtures(now = Date.now()) {
       histories.map((h) => [h.session.id, h.matches.length] as const),
     ),
     finalizations: Object.fromEntries(
-      histories.flatMap((h) =>
-        h.finalization ? [[h.session.id, h.finalization] as const] : [],
-      ),
+      histories.flatMap((h) => (h.finalization ? [[h.session.id, h.finalization] as const] : [])),
     ),
   }
 }

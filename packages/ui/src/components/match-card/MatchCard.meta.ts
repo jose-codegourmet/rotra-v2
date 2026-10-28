@@ -5,7 +5,7 @@ export const matchCardMeta = {
   description:
     'One waiting match in the shared queue: queue position, format, origin, flow arrow and drag handle; Team A, VS, Team B; a status line (ready, needs attention, blocked, waiting for courts) that is always icon + text; Start, Edit and Remove.',
   usage: [
-    'Use for every waiting match in the Queue tab grid and in the Session view\'s upcoming row.',
+    "Use for every waiting match in the Queue tab grid and in the Session view's upcoming row.",
     'Do not use for finished matches; the session record has its own row component in Queue › Results.',
     'Start renders only with onStart and is enabled only when the status is ready. Edit and Remove render only with their callbacks.',
     'The grid passes the flow arrow and the reorder behaviour passes handleProps; the card itself does not reorder.',
@@ -21,5 +21,13 @@ export const matchCardMeta = {
     'docs/business_logic/product/queue/modules/queueing/README.md',
   ],
   variants: ['ready', 'needs-attention', 'blocked', 'waiting-for-courts'],
-  related: ['QueueGrid', 'UpcomingQueueRow', 'SwapSidesArea', 'SwappablePlayer', 'PlayerFaceButton', 'CourtCard', 'Chip'],
+  related: [
+    'QueueGrid',
+    'UpcomingQueueRow',
+    'SwapSidesArea',
+    'SwappablePlayer',
+    'PlayerFaceButton',
+    'CourtCard',
+    'Chip',
+  ],
 } satisfies ComponentMeta

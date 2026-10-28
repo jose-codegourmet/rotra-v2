@@ -61,7 +61,12 @@ export function SessionLinkCard({
             aria-label="Session link"
             className="font-mono text-[13px]"
           />
-          <Button size="sm" variant="primary" onClick={onCopyLink} className="flex-none whitespace-nowrap">
+          <Button
+            size="sm"
+            variant="primary"
+            onClick={onCopyLink}
+            className="flex-none whitespace-nowrap"
+          >
             Copy link
           </Button>
         </div>

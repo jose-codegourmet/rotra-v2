@@ -7,15 +7,15 @@ import { Button } from '@rotra/ui/button'
 import { cn } from '@rotra/ui/cn'
 import { EmptyState } from '@rotra/ui/empty-state'
 import { Field } from '@rotra/ui/field'
-import { NewPlayerForm, addPlayerSubmitLabel } from '@rotra/ui/forms/new-player-form'
+import { addPlayerSubmitLabel, NewPlayerForm } from '@rotra/ui/forms/new-player-form'
 import type { NewPlayerFormValues } from '@rotra/ui/forms/new-player-form/schema'
 import { IdentityChip } from '@rotra/ui/identity-chip'
 import type { Identity } from '@rotra/ui/identity-chip/variants'
 import { Notice } from '@rotra/ui/notice'
 import {
-  PlayerConfirmCard,
   canConfirmPlayer,
   needsIdentityCheck,
+  PlayerConfirmCard,
 } from '@rotra/ui/player-confirm-card'
 import { SegmentedControl } from '@rotra/ui/segmented-control'
 import { Sheet } from '@rotra/ui/sheet'
@@ -382,8 +382,8 @@ export function AddPlayerSheet({
               </Field>
               {alreadyCount > 0 ? (
                 <p className="m-0 text-[13px] text-fg2">
-                  {alreadyCount} saved player{alreadyCount === 1 ? ' is' : 's are'} already in
-                  this session and not listed.
+                  {alreadyCount} saved player{alreadyCount === 1 ? ' is' : 's are'} already in this
+                  session and not listed.
                 </p>
               ) : null}
               <div className="flex max-h-80 flex-col gap-1.5 overflow-y-auto">
@@ -428,6 +428,7 @@ export function AddPlayerSheet({
                 </Field>
                 {directoryLoading ? (
                   <div
+                    role="status"
                     aria-busy
                     aria-label="Searching Player Information"
                     className="flex flex-col gap-1.5"

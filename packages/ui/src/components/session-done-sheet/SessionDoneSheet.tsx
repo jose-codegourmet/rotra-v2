@@ -140,8 +140,7 @@ export function SessionDoneSheet({
             { label: 'Participants', value: participants },
             {
               label: 'Sync',
-              value:
-                pendingChanges > 0 ? `${count(pendingChanges, 'change')} waiting` : 'Complete',
+              value: pendingChanges > 0 ? `${count(pendingChanges, 'change')} waiting` : 'Complete',
             },
           ]}
         />
@@ -162,8 +161,8 @@ export function SessionDoneSheet({
         ) : null}
         {below > 0 ? (
           <Notice tone="warn">
-            {count(below, 'player')} {below === 1 ? 'is' : 'are'} below the minimum of{' '}
-            {minimum} games.
+            {count(below, 'player')} {below === 1 ? 'is' : 'are'} below the minimum of {minimum}{' '}
+            games.
           </Notice>
         ) : null}
       </>

@@ -93,7 +93,11 @@ export function PlayerConfirmCard({
           <span className="flex min-w-0 flex-1 flex-col">
             <b className="[overflow-wrap:anywhere]">{name}</b>
             <span className="text-[13px] text-fg2">
-              {rtrId ? <span className="font-mono text-[0.92em]">{rtrId}</span> : 'Guest · no RTR ID'}
+              {rtrId ? (
+                <span className="font-mono text-[0.92em]">{rtrId}</span>
+              ) : (
+                'Guest · no RTR ID'
+              )}
             </span>
           </span>
           <IdentityChip identity={identity} />
@@ -142,10 +146,7 @@ export function PlayerConfirmCard({
           <span className="text-[13px]">{suggestion ? levelLabel(suggestion) : 'None yet'}</span>
         </div>
 
-        <Field
-          label={`Level for this club${live ? ' (locks immediately)' : ''}`}
-          error={error}
-        >
+        <Field label={`Level for this club${live ? ' (locks immediately)' : ''}`} error={error}>
           <LevelSelect
             value={level}
             onChange={onLevelChange}

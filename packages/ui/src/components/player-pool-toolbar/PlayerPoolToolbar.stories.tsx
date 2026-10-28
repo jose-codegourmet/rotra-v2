@@ -2,11 +2,7 @@ import { consoleSessionFixture } from '@rotra/data/fixtures/consoleSessions'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 import { fn } from 'storybook/test'
-import {
-  PlayerPoolToolbar,
-  type PlayerPoolShow,
-  type PlayerPoolSort,
-} from './PlayerPoolToolbar'
+import { type PlayerPoolShow, type PlayerPoolSort, PlayerPoolToolbar } from './PlayerPoolToolbar'
 
 // Counts from the console fixture: four players are on Court 1 (match 1) and one is away.
 const { roster, matches } = consoleSessionFixture

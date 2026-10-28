@@ -11,9 +11,9 @@ import { useId } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
 import { newPlayerFormDefaultValues } from './NewPlayerForm.defaultValues'
 import {
-  NICKNAME_MAX,
   type NewPlayerFormInput,
   type NewPlayerFormValues,
+  NICKNAME_MAX,
   newPlayerSchema,
 } from './NewPlayerForm.schema'
 

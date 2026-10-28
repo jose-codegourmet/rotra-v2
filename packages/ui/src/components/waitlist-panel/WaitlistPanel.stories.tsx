@@ -1,6 +1,6 @@
 import { clubPlayers } from '@rotra/data/fixtures/players'
 import { queueSessionFixtures } from '@rotra/data/fixtures/queueSessions'
-import { sessionWaitlistFixture } from '@rotra/data/fixtures/sessionWaitlist'
+import { sessionWaitlistFixture } from '@rotra/data/fixtures/session-waitlist'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import { WaitlistPanel, type WaitlistPanelEntry } from './WaitlistPanel'

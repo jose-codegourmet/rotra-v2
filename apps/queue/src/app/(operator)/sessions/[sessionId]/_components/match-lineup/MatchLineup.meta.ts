@@ -15,5 +15,12 @@ export const matchLineupMeta = {
     'docs/screens/product/modules/queue/match-queue.md#q-pick-player--choose-a-slots-player',
     'docs/business_logic/product/queue/modules/queueing/README.md#manual-editor',
   ],
-  related: ['MatchLineupForm', 'PlayerPickerSheet', 'SuggestMatch', 'AutoQueue', 'QueueView', 'SessionConsole'],
+  related: [
+    'MatchLineupForm',
+    'PlayerPickerSheet',
+    'SuggestMatch',
+    'AutoQueue',
+    'QueueView',
+    'SessionConsole',
+  ],
 } satisfies ComponentMeta

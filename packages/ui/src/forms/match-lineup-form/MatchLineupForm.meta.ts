@@ -13,7 +13,8 @@ export const matchLineupFormMeta = {
   ],
   prototype: {
     file: 'docs/frames/queue-app/rotra-queue.html',
-    screen: 'SHEETS.editor (.slots, .slot-col, .slot-btn; ACT.openEditor, ACT.editorFormat, ACT.saveEditor)',
+    screen:
+      'SHEETS.editor (.slots, .slot-col, .slot-btn; ACT.openEditor, ACT.editorFormat, ACT.saveEditor)',
   },
   docs: [
     'docs/screens/product/modules/queue/match-queue.md#q-manual--add-match--edit-lineup',
@@ -21,5 +22,14 @@ export const matchLineupFormMeta = {
     'docs/business_logic/product/queue/modules/matches/README.md#formats',
     'docs/coding-conventions.md#6-forms',
   ],
-  related: ['PlayerPickerSheet', 'PlayerTile', 'SwapSidesArea', 'SwappablePlayer', 'Sheet', 'Button', 'IconButton', 'Avatar'],
+  related: [
+    'PlayerPickerSheet',
+    'PlayerTile',
+    'SwapSidesArea',
+    'SwappablePlayer',
+    'Sheet',
+    'Button',
+    'IconButton',
+    'Avatar',
+  ],
 } satisfies ComponentMeta

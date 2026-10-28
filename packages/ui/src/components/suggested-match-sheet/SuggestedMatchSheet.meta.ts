@@ -5,7 +5,7 @@ export const suggestedMatchSheetMeta = {
   description:
     'Q-SUGGEST: one suggested lineup with format and mode chips, Team A VS Team B that can be switched by dragging or the arrow keys, the Why this lineup card, and Skip suggestion, Edit then add and Add to queue. Shows the reason with Close when no lineup is possible.',
   usage: [
-    'Open it from Suggest on the Queue tab. The container generates the lineup (Q05.4) and passes it in with each player\'s counted games; the sheet never picks players.',
+    "Open it from Suggest on the Queue tab. The container generates the lineup (Q05.4) and passes it in with each player's counted games; the sheet never picks players.",
     'Pass lineup null with the reason from the rules ("Only N players are present. Doubles needs 4. …") when nothing can be suggested.',
     'onSwap changes only the shown lineup (toast "Kat and Jo switched sides"); adding it afterwards puts it in protected.',
     'Never add win probabilities or fatigue scores to the Why this lineup card.',

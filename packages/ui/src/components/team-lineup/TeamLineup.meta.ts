@@ -17,5 +17,11 @@ export const teamLineupMeta = {
     'docs/screens/product/modules/queue/match-queue.md',
     'docs/screens/product/modules/queue/match-control.md',
   ],
-  related: ['MatchPlayerCard', 'SwapSidesArea', 'SwappablePlayer', 'SuggestedMatchSheet', 'MatchCard'],
+  related: [
+    'MatchPlayerCard',
+    'SwapSidesArea',
+    'SwappablePlayer',
+    'SuggestedMatchSheet',
+    'MatchCard',
+  ],
 } satisfies ComponentMeta

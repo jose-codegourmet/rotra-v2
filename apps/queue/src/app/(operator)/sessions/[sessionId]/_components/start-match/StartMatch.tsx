@@ -52,8 +52,7 @@ const errorMessage = (error: unknown) =>
   error instanceof Error ? error.message : 'Something went wrong. Try again.'
 
 /** The recheck at confirmation refused the start: the sheet stays open with refreshed data */
-const isRecheckFailure = (error: unknown) =>
-  error instanceof MockError && error.kind === 'conflict'
+const isRecheckFailure = (error: unknown) => error instanceof MockError && error.kind === 'conflict'
 /**
  * Q-DISPATCH / D-START-MATCH and Q-CHOOSE-MATCH: StartMatchSheet on useStartMatch for a waiting
  * match, opened from Review and start (that court preselected), Start on a queue card (the first

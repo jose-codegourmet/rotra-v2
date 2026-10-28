@@ -14,13 +14,14 @@ import type { Match } from '@rotra/data/match/types'
 import type { SessionCourt } from '@rotra/data/queue-session/types'
 import { AddCourtTile } from '@rotra/ui/add-court-tile'
 import type { CourtPlayer } from '@rotra/ui/court-drawing'
-import type { Meta, StoryObj } from '@storybook/react-vite'
+import type { Decorator, Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import {
   CourtCard,
   type CourtCardFreeProps,
   type CourtCardInGameProps,
   type CourtCardNextMatch,
+  type CourtCardProps,
 } from './CourtCard'
 
 const { session, roster, courts, matches } = consoleSessionFixture
@@ -122,10 +123,10 @@ const meta = {
     ),
   ],
   args: inGame(playing),
-} satisfies Meta<typeof CourtCard>
+} satisfies Meta<CourtCardProps>
 
 export default meta
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<CourtCardProps>
 
 export const DoublesInGame: Story = {}
 export const OneVersusTwoInGame: Story = {
@@ -161,14 +162,14 @@ export const LongNames: Story = {
 }
 
 /** The Courts grid as the console lays it out, with the Add court tile last. */
+const gridDecorator: Decorator = (Story) => (
+  <div className="w-full max-w-5xl">
+    <Story />
+  </div>
+)
+
 export const CourtsGrid: Story = {
-  decorators: [
-    (Story) => (
-      <div className="w-full max-w-5xl">
-        <Story />
-      </div>
-    ),
-  ],
+  decorators: [gridDecorator],
   render: () => (
     <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,250px),1fr))] gap-3">
       <CourtCard {...inGame(playing)} />
@@ -179,7 +180,7 @@ export const CourtsGrid: Story = {
   ),
 }
 export const CourtsGridMerged: Story = {
-  decorators: CourtsGrid.decorators,
+  decorators: [gridDecorator],
   render: () => (
     <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,250px),1fr))] gap-3">
       <CourtCard {...inGame(merged)} />

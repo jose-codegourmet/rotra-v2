@@ -115,7 +115,8 @@ export function AutoQueueSheet({
         </span>
       </div>
       <p className="m-0 text-[13px] text-fg2">
-        Only present players are used. Nothing starts by itself, and fun formats are never generated.
+        Only present players are used. Nothing starts by itself, and fun formats are never
+        generated.
       </p>
       {error ? <Notice tone="warn">{error}</Notice> : null}
     </Sheet>

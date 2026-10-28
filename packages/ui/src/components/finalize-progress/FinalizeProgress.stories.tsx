@@ -58,7 +58,8 @@ export const RetryableError: Story = {
     stages: stagesAt(3),
     statusLine: 'Session finished; results are being prepared',
     error: {
-      message: "Result slides couldn't be prepared. Your session is finished and player records are updated.",
+      message:
+        "Result slides couldn't be prepared. Your session is finished and player records are updated.",
       onRetry: fn(),
     },
   },

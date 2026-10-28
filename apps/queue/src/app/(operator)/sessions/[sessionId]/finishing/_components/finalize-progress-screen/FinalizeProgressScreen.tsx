@@ -74,7 +74,12 @@ export function FinalizeProgressScreen({ sessionId }: FinalizeProgressScreenProp
       {session.isError ? (
         <QueryError query={session} title="Couldn't load this session." />
       ) : !s ? (
-        <div aria-busy aria-label="Loading the session" className="flex flex-col gap-3">
+        <div
+          role="status"
+          aria-busy
+          aria-label="Loading the session"
+          className="flex flex-col gap-3"
+        >
           <Skeleton className="h-8 w-64" />
           <Skeleton className="h-48 rounded-lg" />
         </div>

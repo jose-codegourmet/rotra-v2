@@ -324,7 +324,7 @@ export function SessionCalendar({
       <div
         key={key}
         className={cn(
-          'flex min-h-24 min-w-0 flex-col gap-1 border-r border-b border-border p-1.5 hover:bg-elev',
+          'relative flex min-h-24 min-w-0 flex-col gap-1 border-r border-b border-border p-1.5 hover:bg-elev',
           key === selectedKey && 'bg-accent-subtle',
         )}
       >
@@ -334,7 +334,7 @@ export function SessionCalendar({
           aria-haspopup="dialog"
           aria-label={dayName(at, list.length)}
           className={cn(
-            'size-[26px] self-start rounded-full border-0 bg-transparent p-0 text-[13px] font-bold text-fg tabular-nums',
+            'size-[26px] cursor-pointer self-start rounded-full border-0 bg-transparent p-0 text-[13px] font-bold text-fg tabular-nums after:absolute after:inset-0 focus-visible:after:ring-2 focus-visible:after:ring-accent focus-visible:after:ring-inset',
             isToday && 'bg-accent text-on-accent',
           )}
         >
@@ -349,7 +349,7 @@ export function SessionCalendar({
               title={`${event.title} · ${formatTime(event.startsAt)}`}
               aria-label={`${formatTime(event.startsAt)} ${event.title}, ${KIND_LABEL[event.kind]}`}
               className={cn(
-                'max-w-full truncate rounded-[4px] border-0 border-l-[3px] bg-elev px-1.5 py-0.5 text-left text-[11px] font-semibold whitespace-nowrap text-fg',
+                'relative z-10 max-w-full truncate rounded-[4px] border-0 border-l-[3px] bg-elev px-1.5 py-0.5 text-left text-[11px] font-semibold whitespace-nowrap text-fg',
                 KIND_EDGE[event.kind],
                 event.kind === 'live' && 'bg-accent-subtle',
               )}
@@ -362,7 +362,7 @@ export function SessionCalendar({
               type="button"
               onClick={() => onOpenDay(at)}
               aria-haspopup="dialog"
-              className="border-0 bg-transparent px-1.5 text-left text-[11px] text-fg2"
+              className="relative z-10 border-0 bg-transparent px-1.5 text-left text-[11px] text-fg2"
             >
               +{list.length - 2} more
             </button>

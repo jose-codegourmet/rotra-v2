@@ -1,5 +1,6 @@
 'use client'
 
+import { useInventory } from '@rotra/data/inventory/useInventory'
 import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import { useClubVenues } from '@rotra/data/club-venue/useClubVenues'
 import { useClubAccess } from '@rotra/data/license/useClubAccess'
@@ -24,7 +25,7 @@ import { selectNavCollapsed, setNavCollapsed } from '@/store/slices/uiSlice'
 import { OperatorShellContext, type OperatorShellContextValue } from './DockAction.context'
 
 /** Screens the license gate replaces while the license has ended (the console stays reachable). */
-const GATED_PREFIXES = ['/', '/saved-players', '/venues', '/club-settings', '/sessions/new']
+const GATED_PREFIXES = ['/', '/saved-players', '/venues', '/inventory', '/club-settings', '/sessions/new']
 
 /** Screens rendered without the top bar, left nav and dock: the finishing route (the prototype's hasShell). */
 const BARE_ROUTE = /^\/sessions\/[^/]+\/finishing$/
@@ -59,6 +60,7 @@ export function OperatorShell({ children }: { children: ReactNode }) {
   const nowCard = useNowCard()
   const players = useClubPlayers()
   const venues = useClubVenues()
+  const inventory = useInventory()
   const [dockOverride, setDockOverride] = useState<DockAction | null>(null)
   const [settingsMenuOpen, setSettingsMenuOpen] = useState(false)
 
@@ -138,6 +140,14 @@ export function OperatorShell({ children }: { children: ReactNode }) {
           count: venues.data?.length,
           href: '/venues',
           current: current('/venues'),
+        },
+        {
+          id: 'inventory',
+          label: 'Inventory',
+          icon: 'nav-box',
+          count: inventory.data?.items.length,
+          href: '/inventory',
+          current: current('/inventory'),
         },
         {
           id: 'club',

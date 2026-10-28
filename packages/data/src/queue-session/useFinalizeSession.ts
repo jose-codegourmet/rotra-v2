@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { clubKeys } from '../club/queryKeys'
 import { deviceKeys } from '../device/queryKeys'
 import { matchKeys } from '../match/queryKeys'
+import { publicSessionKeys } from '../public-session/queryKeys'
 import { sessionRosterKeys } from '../session-roster/queryKeys'
 import { syncKeys } from '../sync/queryKeys'
 import { finalizeSession } from './finalization'
@@ -27,6 +28,7 @@ export function useFinalizeSession(sessionId: string) {
         client.invalidateQueries({ queryKey: syncKeys.all }),
         client.invalidateQueries({ queryKey: clubKeys.all }),
         client.invalidateQueries({ queryKey: deviceKeys.all }),
+        client.invalidateQueries({ queryKey: publicSessionKeys.all }),
       ])
     },
   })

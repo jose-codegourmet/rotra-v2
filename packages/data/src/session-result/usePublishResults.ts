@@ -1,5 +1,6 @@
 'use client'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { publicSessionKeys } from '../public-session/queryKeys'
 import { queueSessionKeys } from '../queue-session/queryKeys'
 import { syncKeys } from '../sync/queryKeys'
 import { publishResults } from './fetchers'
@@ -21,6 +22,7 @@ export function usePublishResults() {
         client.invalidateQueries({ queryKey: queueSessionKeys.record(id) }),
         client.invalidateQueries({ queryKey: queueSessionKeys.detail(id) }),
         client.invalidateQueries({ queryKey: syncKeys.all }),
+        client.invalidateQueries({ queryKey: publicSessionKeys.all }),
       ])
     },
   })

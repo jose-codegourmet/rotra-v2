@@ -1,3 +1,4 @@
+import { publicSlugFor } from '../queue-session/queueSession.rules'
 import type { QueueSession, SessionCourt } from '../queue-session/queueSession.types'
 import type { SessionPlayer } from '../session-roster/sessionRoster.types'
 import { DEMO_CLUB_ID } from './clubs'
@@ -37,7 +38,7 @@ export function createQueueFixtures(now = Date.now()) {
     finalizedAt: null,
     playerRecordsUpdatedAt: null,
     seriesId: null,
-    publicSlug: 's-tonight',
+    publicSlug: publicSlugFor('s-tonight'),
     acceptJoinRequests: true,
   }
   const history = createSessionHistoryFixtures(now)

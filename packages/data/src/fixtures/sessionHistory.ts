@@ -1,5 +1,6 @@
 import type { Match } from '../match/match.types'
 import { PLAYING_LEVELS } from '../player/player.types'
+import { publicSlugFor } from '../queue-session/queueSession.rules'
 import type {
   QueueSession,
   SessionCourt,
@@ -156,8 +157,8 @@ export function simulateHistory(spec: SessionHistorySpec, now = Date.now()): Ses
     finalizedAt,
     playerRecordsUpdatedAt: finalizedAt,
     seriesId: null,
-    publicSlug: spec.id,
-    acceptJoinRequests: false,
+    publicSlug: publicSlugFor(spec.id),
+    acceptJoinRequests: true,
   }
   const games: Record<string, number> = {},
     free: Record<string, number> = {},

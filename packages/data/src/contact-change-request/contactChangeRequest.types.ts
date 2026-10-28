@@ -2,7 +2,13 @@
 export type ContactChangeField = 'phone' | 'email'
 
 /** Mirrors player_contact_change_requests.status. 'approved' and 'applying' both mean not yet applied. */
-export type ContactChangeStatus = 'pending' | 'approved' | 'applying' | 'applied' | 'rejected' | 'failed'
+export type ContactChangeStatus =
+  | 'pending'
+  | 'approved'
+  | 'applying'
+  | 'applied'
+  | 'rejected'
+  | 'failed'
 
 /** A player's request to change their login phone or email; it takes effect only after Admin approval. */
 export type ContactChangeRequest = {

@@ -7,8 +7,16 @@ export type RtrIdPart = { code: string; label: string }
 export function rtrIdParts(rtrId: string): RtrIdPart[] | null {
   const [prefix, country, city, date, sequence] = rtrId.split('-')
   if (!prefix || !country || !city || !date || !sequence || !/^\d{6}$/.test(date)) return null
-  const synced = new Date(2000 + Number(date.slice(4)), Number(date.slice(0, 2)) - 1, Number(date.slice(2, 4)))
-  const syncedText = synced.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })
+  const synced = new Date(
+    2000 + Number(date.slice(4)),
+    Number(date.slice(0, 2)) - 1,
+    Number(date.slice(2, 4)),
+  )
+  const syncedText = synced.toLocaleDateString([], {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
   return [
     { code: prefix, label: 'ROTRA' },
     { code: country, label: 'Country' },

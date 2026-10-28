@@ -6,7 +6,7 @@ export const privacyAndContactMeta = {
   usage: [
     'Signed-out visitors never reach it: proxy.ts sends /profile/* to sign-in with returnTo.',
     'The switch shows only the saved value; a failed save keeps it and shows the error in the card and as a toast.',
-    "Request a change opens P-CONTACT-REQUEST through useContactChangeSheet, shared with Edit profile.",
+    'Request a change opens P-CONTACT-REQUEST through useContactChangeSheet, shared with Edit profile.',
   ],
   prototype: {
     file: 'docs/frames/player-app/rotra-player.html',

@@ -8,6 +8,7 @@ export function useSignOutAdmin() {
   return useMutation({
     mutationFn: (input: { sessionEnded?: boolean } | void) => signOutAdmin(input || undefined),
     onSuccess: (session) => replaceAdminSession(client, session),
-    networkMode: 'always', retry: false,
+    networkMode: 'always',
+    retry: false,
   })
 }

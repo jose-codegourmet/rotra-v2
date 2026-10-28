@@ -15,12 +15,21 @@ function formatSavedAt(savedAt: Date) {
 export function OfflineBand({ savedAt, audience = 'player' }: OfflineBandProps) {
   return (
     <div role="status" className="border-b border-warn bg-warn-subtle text-[13px]">
-      <div className={audience === 'admin' ? 'flex items-start gap-2.5 px-4 py-2' : 'mx-auto flex max-w-[1240px] items-start gap-2.5 px-4 py-2'}>
+      <div
+        className={
+          audience === 'admin'
+            ? 'flex items-start gap-2.5 px-4 py-2'
+            : 'mx-auto flex max-w-[1240px] items-start gap-2.5 px-4 py-2'
+        }
+      >
         <Icon name="alert" className="mt-0.5 flex-none text-warn" />
         <p className="m-0">
-          <b>You&apos;re offline.</b> Showing what {audience === 'admin' ? 'this browser loaded' : 'this device saved'} at{' '}
+          <b>You&apos;re offline.</b> Showing what{' '}
+          {audience === 'admin' ? 'this browser loaded' : 'this device saved'} at{' '}
           <time dateTime={savedAt.toISOString()}>{formatSavedAt(savedAt)}</time>.{' '}
-          {audience === 'admin' ? 'Activating licenses, approving requests and saving settings need an internet connection.' : 'Signing in and saving changes need an internet connection.'}
+          {audience === 'admin'
+            ? 'Activating licenses, approving requests and saving settings need an internet connection.'
+            : 'Signing in and saving changes need an internet connection.'}
         </p>
       </div>
     </div>

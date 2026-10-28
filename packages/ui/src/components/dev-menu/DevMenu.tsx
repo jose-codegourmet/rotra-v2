@@ -327,22 +327,26 @@ export function DevMenu({
         ) : (
           <>
             <p className="text-sm text-fg2">
-              {audience === 'admin' ? 'Admin prototype controls. These scenarios use fictional accounts and data.' : 'Fake data for a fictional club. Your changes stay in this browser.'}
+              {audience === 'admin'
+                ? 'Admin prototype controls. These scenarios use fictional accounts and data.'
+                : 'Fake data for a fictional club. Your changes stay in this browser.'}
             </p>
             {audience === 'admin' ? <h3 className={LABEL}>Admin</h3> : null}
-            {CONTROLS.filter(([key]) => audience !== 'admin' || key === 'offline').map(([key, label, description]) => (
-              <div key={key} className="flex items-center justify-between gap-3">
-                <div className="min-w-0">
-                  <h3>{controlLabels?.[key] ?? label}</h3>
-                  <p className="text-sm text-fg2">{description}</p>
+            {CONTROLS.filter(([key]) => audience !== 'admin' || key === 'offline').map(
+              ([key, label, description]) => (
+                <div key={key} className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <h3>{controlLabels?.[key] ?? label}</h3>
+                    <p className="text-sm text-fg2">{description}</p>
+                  </div>
+                  <Switch
+                    checked={toggles[key]}
+                    onChange={(value) => onToggle(key, value)}
+                    aria-label={controlLabels?.[key] ?? label}
+                  />
                 </div>
-                <Switch
-                  checked={toggles[key]}
-                  onChange={(value) => onToggle(key, value)}
-                  aria-label={controlLabels?.[key] ?? label}
-                />
-              </div>
-            ))}
+              ),
+            )}
             {extraToggles?.map((toggle) => (
               <div key={toggle.key} className="flex items-center justify-between gap-3">
                 <div className="min-w-0">

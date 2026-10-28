@@ -15,7 +15,10 @@ export type ContactChangeCurrent = {
  * P-CONTACT-REQUEST: discriminated on field. The new phone parses to E.164 and the new email to lower
  * case, and neither may equal the current value.
  */
-export function makeContactChangeRequestSchema({ currentPhone, currentEmail }: ContactChangeCurrent) {
+export function makeContactChangeRequestSchema({
+  currentPhone,
+  currentEmail,
+}: ContactChangeCurrent) {
   const required = (field: ContactChangeField) =>
     z.string().trim().min(1, `Enter the new ${FIELD_WORD[field]}.`)
   return z.discriminatedUnion('field', [
@@ -37,7 +40,10 @@ export function makeContactChangeRequestSchema({ currentPhone, currentEmail }: C
       toValue: required('email')
         .superRefine((value, context) => {
           if (!emailField.safeParse(value).success)
-            context.addIssue({ code: 'custom', message: 'Enter an email address, like name@example.com.' })
+            context.addIssue({
+              code: 'custom',
+              message: 'Enter an email address, like name@example.com.',
+            })
         })
         .transform((value) => value.toLowerCase())
         .refine((value) => value !== currentEmail.toLowerCase(), "That's already your email."),

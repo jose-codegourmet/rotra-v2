@@ -18,7 +18,15 @@ export function AuthBridge() {
       client.clear()
     }
     previousKind.current = current.kind
-    dispatch(setAccount(current.kind === 'owner' ? { email: current.account.email } : current.kind === 'denied' ? { accountDescription: current.accountDescription } : null))
+    dispatch(
+      setAccount(
+        current.kind === 'owner'
+          ? { email: current.account.email }
+          : current.kind === 'denied'
+            ? { accountDescription: current.accountDescription }
+            : null,
+      ),
+    )
   }, [session.data, dispatch, client])
   return null
 }

@@ -1,4 +1,7 @@
-import type { ContactChangeField, ContactChangeStatus } from '@rotra/data/contact-change-request/types'
+import type {
+  ContactChangeField,
+  ContactChangeStatus,
+} from '@rotra/data/contact-change-request/types'
 import type { ChipProps } from '@rotra/ui/chip'
 import type { NoticeProps } from '@rotra/ui/notice'
 

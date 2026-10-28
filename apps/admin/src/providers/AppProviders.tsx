@@ -16,9 +16,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
         <QueryProvider>
           <AuthBridge />
           {children}
-          {process.env.NODE_ENV !== 'production' ? (
-            <DevTools />
-          ) : null}
+          {process.env.NODE_ENV !== 'production' ? <DevTools /> : null}
         </QueryProvider>
       </StoreProvider>
     </ThemeProvider>

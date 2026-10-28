@@ -1,6 +1,6 @@
 import { playerProfiles } from '@rotra/data/fixtures/player-profiles'
-import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Notice } from '@rotra/ui/notice'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { PlayerIdBreakdown } from './PlayerIdBreakdown'
 
 const migs = playerProfiles.find((p) => p.nickname === 'Migs')

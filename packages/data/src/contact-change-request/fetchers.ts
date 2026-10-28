@@ -68,7 +68,8 @@ export async function submitContactChangeRequest(input: {
         other.playerId !== account.playerId &&
         (field === 'phone' ? other.phone === normalized : other.email.toLowerCase() === normalized),
     )
-    if (taken) throw fieldError(`That ${word} belongs to another ROTRA profile. Contact ROTRA for help.`)
+    if (taken)
+      throw fieldError(`That ${word} belongs to another ROTRA profile. Contact ROTRA for help.`)
     const open = draft.contactChangeRequests.some(
       (request) =>
         request.playerId === account.playerId &&

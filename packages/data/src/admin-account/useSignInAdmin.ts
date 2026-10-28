@@ -19,8 +19,11 @@ export function useSignInAdmin() {
       return signInAdmin(input)
     },
     onSuccess: (session) => replaceAdminSession(client, session),
-    onSettled: () => { submitting.current = false },
-    retry: false, networkMode: 'always',
+    onSettled: () => {
+      submitting.current = false
+    },
+    retry: false,
+    networkMode: 'always',
   })
   return {
     ...mutation,

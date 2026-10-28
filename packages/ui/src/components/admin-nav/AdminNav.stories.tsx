@@ -1,14 +1,32 @@
-import { adminAccount, adminAccessExamples, adminNavExamples } from '@rotra/data/fixtures/admin-accounts'
+import {
+  adminAccessExamples,
+  adminAccount,
+  adminNavExamples,
+} from '@rotra/data/fixtures/admin-accounts'
 import { AppShell } from '@rotra/ui/app-shell'
 import { TopBar } from '@rotra/ui/app-shell/top-bar'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { AdminNav } from './AdminNav'
 
 const meta = {
-  title: 'Admin/AdminNav', component: AdminNav,
-  args: { current: 'clubs', hrefs: adminNavExamples.hrefs, accountEmail: adminAccount.email, onSignOut: () => {} },
+  title: 'Admin/AdminNav',
+  component: AdminNav,
+  args: {
+    current: 'clubs',
+    hrefs: adminNavExamples.hrefs,
+    accountEmail: adminAccount.email,
+    onSignOut: () => {},
+  },
   parameters: { layout: 'fullscreen' },
-  render: (args) => <AppShell railWidth={236} topBar={<TopBar product="Admin" contained={false} menuOnNarrowOnly />} rail={<AdminNav {...args} />}><div /></AppShell>,
+  render: (args) => (
+    <AppShell
+      railWidth={236}
+      topBar={<TopBar product="Admin" contained={false} menuOnNarrowOnly />}
+      rail={<AdminNav {...args} />}
+    >
+      <div />
+    </AppShell>
+  ),
 } satisfies Meta<typeof AdminNav>
 export default meta
 type Story = StoryObj<typeof meta>

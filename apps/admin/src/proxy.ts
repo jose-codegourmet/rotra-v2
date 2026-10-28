@@ -5,9 +5,14 @@ import { type NextRequest, NextResponse } from 'next/server'
 export function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname
   const session = parseAdminSession(request.cookies.get(ADMIN_COOKIE_NAME)?.value)
-  const destination = path === '/login'
-    ? session.kind === 'owner' ? '/clubs' : null
-    : session.kind === 'owner' ? null : '/login'
+  const destination =
+    path === '/login'
+      ? session.kind === 'owner'
+        ? '/clubs'
+        : null
+      : session.kind === 'owner'
+        ? null
+        : '/login'
   const response = destination
     ? NextResponse.redirect(new URL(destination, request.url))
     : NextResponse.next()

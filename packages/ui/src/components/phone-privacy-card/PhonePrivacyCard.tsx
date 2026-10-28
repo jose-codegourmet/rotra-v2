@@ -14,7 +14,12 @@ export type PhonePrivacyCardProps = {
 }
 
 /** P-PHONE-PRIVACY: 'Hide my phone number from clubs' with a separate saved-state line. */
-export function PhonePrivacyCard({ savedHidden, isPending, error, onToggle }: PhonePrivacyCardProps) {
+export function PhonePrivacyCard({
+  savedHidden,
+  isPending,
+  error,
+  onToggle,
+}: PhonePrivacyCardProps) {
   const switchId = useId()
   return (
     <Card asChild>
@@ -48,9 +53,8 @@ export function PhonePrivacyCard({ savedHidden, isPending, error, onToggle }: Ph
         </p>
         {error ? <Notice tone="error">{error}</Notice> : null}
         <p className="m-0 text-fg2 text-sm">
-          Hiding your number applies from now on. It can't erase what a club has already seen, and
-          a club device that's offline updates when it reconnects. It doesn't change how you sign
-          in.
+          Hiding your number applies from now on. It can't erase what a club has already seen, and a
+          club device that's offline updates when it reconnects. It doesn't change how you sign in.
         </p>
       </section>
     </Card>

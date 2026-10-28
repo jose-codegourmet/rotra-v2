@@ -8,7 +8,15 @@ export const devMenuMeta = {
     'Player link previews stay disabled until their callbacks are supplied. Account/private flows are not implemented by this component.',
   ],
   prototype: { file: 'docs/frames/queue-app/rotra-queue.html', screen: 'Prototype controls' },
-  variants: ['admin', 'default', 'offline', 'expired', 'save-failure', 'conflict', 'player-scenarios'],
+  variants: [
+    'admin',
+    'default',
+    'offline',
+    'expired',
+    'save-failure',
+    'conflict',
+    'player-scenarios',
+  ],
   related: ['Sheet', 'Switch', 'SegmentedControl'],
   docs: ['docs/frames/player-app/rotra-player.html'],
 } satisfies ComponentMeta

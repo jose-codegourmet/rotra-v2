@@ -1,6 +1,6 @@
 'use client'
 
-import { useQueries } from '@tanstack/react-query'
+import { queryOptions, useQueries } from '@tanstack/react-query'
 import { useMemo, useSyncExternalStore } from 'react'
 import { parseAdminSession, readAdminSessionMarker } from './cookie'
 import { getAdminSession } from './fetchers'
@@ -20,18 +20,16 @@ export function useAdminSession() {
   const hydrated = marker !== null
   // An empty useQueries list removes the observer on sign-out. A disabled useQuery would
   // still create a session entry and refill the cache immediately after client.clear().
-  const [query] = useQueries({
-    queries:
-      hydrated && session.kind === 'owner'
-        ? [{
-            queryKey: adminAccountKeys.session(),
-            queryFn: getAdminSession,
-            networkMode: 'always' as const,
-            staleTime: Infinity,
-            retry: false,
-          }]
-        : [],
+  const sessionQuery = queryOptions({
+    queryKey: adminAccountKeys.session(),
+    queryFn: getAdminSession,
+    networkMode: 'always',
+    staleTime: Infinity,
+    retry: false,
   })
+  const queries: (typeof sessionQuery)[] =
+    hydrated && session.kind === 'owner' ? [sessionQuery] : []
+  const [query] = useQueries({ queries })
 
   return {
     data: session,
@@ -39,6 +37,6 @@ export function useAdminSession() {
     isError: query?.isError ?? false,
     error: query?.error ?? null,
     loadedAt: query?.dataUpdatedAt ? new Date(query.dataUpdatedAt) : undefined,
-    refetch: () => query ? query.refetch() : getAdminSession(),
+    refetch: () => (query ? query.refetch() : getAdminSession()),
   }
 }

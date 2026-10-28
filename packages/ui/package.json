@@ -217,7 +217,10 @@
     "./account-link-status": "./src/components/account-link-status/AccountLinkStatus.tsx",
     "./cost-estimate-summary": "./src/components/cost-estimate-summary/CostEstimateSummary.tsx",
     "./shuttle-plan-row": "./src/components/shuttle-plan-row/ShuttlePlanRow.tsx",
-    "./session-financials-summary": "./src/components/session-financials-summary/SessionFinancialsSummary.tsx"
+    "./session-financials-summary": "./src/components/session-financials-summary/SessionFinancialsSummary.tsx",
+    "./forms/session-financials-fields": "./src/forms/session-financials-fields/SessionFinancialsFields.tsx",
+    "./forms/session-financials-fields/schema": "./src/forms/session-financials-fields/SessionFinancialsFields.schema.ts",
+    "./forms/session-financials-fields/default-values": "./src/forms/session-financials-fields/SessionFinancialsFields.defaultValues.ts"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

@@ -201,7 +201,8 @@
     "./session-payment/useSessionPayments": "./src/session-payment/useSessionPayments.ts",
     "./session-payment/useTogglePaid": "./src/session-payment/useTogglePaid.ts",
     "./session-payment/useMarkAllPaid": "./src/session-payment/useMarkAllPaid.ts",
-    "./session-cost/rules": "./src/session-cost/sessionCost.rules.ts"
+    "./session-cost/rules": "./src/session-cost/sessionCost.rules.ts",
+    "./fixtures/sync-recovery": "./src/fixtures/syncRecovery.ts"
   },
   "scripts": {
     "lint": "biome check .",

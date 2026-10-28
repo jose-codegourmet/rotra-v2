@@ -228,7 +228,9 @@
     "./forms/inventory-item-form": "./src/forms/inventory-item-form/InventoryItemForm.tsx",
     "./forms/inventory-item-form/schema": "./src/forms/inventory-item-form/InventoryItemForm.schema.ts",
     "./forms/inventory-item-form/default-values": "./src/forms/inventory-item-form/InventoryItemForm.defaultValues.ts",
-    "./inventory-screen": "./src/components/inventory-screen/InventoryScreen.tsx"
+    "./inventory-screen": "./src/components/inventory-screen/InventoryScreen.tsx",
+    "./sync-status-sheet": "./src/components/sync-status-sheet/SyncStatusSheet.tsx",
+    "./sync-attention-notice": "./src/components/sync-attention-notice/SyncAttentionNotice.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

@@ -15,6 +15,8 @@ export type SyncDetailsProps = {
   waiting: SyncGroup[]
   /** Recent changes from this device that have synced */
   synced: SyncGroup[]
+  /** The Sync status sheet's longer banner title; the top-bar pill keeps its compact label. */
+  headline?: ReactNode
 }
 
 const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`
@@ -57,6 +59,7 @@ export function SyncDetails({
   description,
   waiting,
   synced,
+  headline,
 }: SyncDetailsProps) {
   const tone = syncTone(state)
   const waitingCount = waiting.reduce((n, g) => n + g.changes.length, 0)
@@ -81,7 +84,7 @@ export function SyncDetails({
           )}
         />
         <div>
-          <b>{syncLabel(state, pending, lastSyncedAt)}</b>
+          <b>{headline ?? syncLabel(state, pending, lastSyncedAt)}</b>
           <p className="m-0 text-[13px] text-fg2">{description}</p>
         </div>
       </div>

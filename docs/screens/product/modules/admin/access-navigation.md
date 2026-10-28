@@ -47,8 +47,9 @@ Existing old dashboards, moderation, payment collection, and kill-switch concept
 The A01 branch implements presentational access components and the owner workspace shell over a
 browser-readable mock session marker. This is not real authentication. Passwords stay out of Redux
 and the TanStack mutation variables/cache. Leaving the owner session clears cached internal queries
-and mutations; only the public session projection is repopulated. Developer controls are omitted
-from production for Admin.
+and mutations. Signed-out and denied sessions read the mock marker without creating a query,
+so the query cache remains empty. Only the owner session has a cached query. Developer controls
+are omitted from production for Admin.
 
 The mock owner lands on `/clubs`. Navigation targets are `/clubs`, `/players`,
 `/requests/contact-changes`, `/requests/club-names`, `/settings/ranking`, and
@@ -59,5 +60,7 @@ Invalid-credential copy from ticket #186 is **“Email or password is incorrect.
 product-owner confirmation. Offline sign-in uses **“Signing in needs an internet connection.”**
 The final Admin auth/provider/session policy remains open.
 
-For this delivery, the product owner requested no lint, type-check, or build checks. Runtime,
-Storybook, keyboard, and visual verification have not been performed.
+The product owner requested no lint, type-check, or build checks. The #183 follow-up was
+verified in the browser: owner sign-in and sign-out, plus club-account denial. React Query
+Devtools showed zero queries after sign-out and during denial. Full Storybook, keyboard,
+and visual verification remains outstanding.

@@ -7,6 +7,8 @@ export async function replaceAdminSession(client: QueryClient, session: AdminSes
   await client.cancelQueries()
   // Clear every previous account's query AND mutation data before publishing the next session.
   client.clear()
-  client.setQueryData(adminAccountKeys.session(), session)
+  if (session.kind === 'owner') {
+    client.setQueryData(adminAccountKeys.session(), session)
+  }
   notifyAdminSession()
 }

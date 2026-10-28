@@ -20,7 +20,7 @@ export function PaymentsPanel({ sessionId, asSheet }: PaymentsPanelProps) {
   if (payments.isPending) return <Skeleton className="h-60 rounded-lg" />
   if (!payments.data) return null
   return <>
-    <PaymentsChecklist {...payments.data} filter={filter} onFilterChange={setFilter} onTogglePaid={(clubPlayerId) => toggle.mutate({ sessionId, clubPlayerId }, callbacks)} onMarkAllPaid={() => markAll.mutate(sessionId, callbacks)} onSelectPlayer={setProfile} asSheet={asSheet} disabled={toggle.isPending || markAll.isPending} />
+    <PaymentsChecklist {...payments.data} saveError={toggle.error?.message ?? markAll.error?.message} filter={filter} onFilterChange={setFilter} onTogglePaid={(clubPlayerId) => { markAll.reset(); toggle.mutate({ sessionId, clubPlayerId }, callbacks) }} onMarkAllPaid={() => { toggle.reset(); markAll.mutate(sessionId, callbacks) }} onSelectPlayer={setProfile} asSheet={asSheet} disabled={toggle.isPending || markAll.isPending} />
     <PlayerProfile clubPlayerId={profile} onClose={() => setProfile(null)} backLabel={asSheet ? 'payments' : undefined} onBack={() => setProfile(null)} />
   </>
 }

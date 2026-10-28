@@ -6,6 +6,7 @@ import { Card } from '@rotra/ui/card'
 import { cn } from '@rotra/ui/cn'
 import { PaymentCard, type PaymentPlayer } from '@rotra/ui/payments-checklist/payment-card'
 import { SegmentedControl } from '@rotra/ui/segmented-control'
+import { Notice } from '@rotra/ui/notice'
 
 export type PaymentFilter = 'all' | 'unpaid' | 'paid'
 export type PaymentsChecklistProps = {
@@ -21,14 +22,16 @@ export type PaymentsChecklistProps = {
   onSelectPlayer: (id: string) => void
   asSheet?: boolean
   disabled?: boolean
+  saveError?: string
 }
-export function PaymentsChecklist({ amountDue, dueBasis, entranceFeeIncluded, totals, filter, players, onFilterChange, onTogglePaid, onMarkAllPaid, onSelectPlayer, asSheet, disabled }: PaymentsChecklistProps) {
+export function PaymentsChecklist({ amountDue, dueBasis, entranceFeeIncluded, totals, filter, players, onFilterChange, onTogglePaid, onMarkAllPaid, onSelectPlayer, asSheet, disabled, saveError }: PaymentsChecklistProps) {
   const rows = players.filter((p) => filter === 'all' || (filter === 'paid' ? !!p.paid : !p.paid))
   return <section className={cn('flex min-w-0 flex-col gap-4', !asSheet && 'rounded-lg border border-border bg-surface p-4 shadow-card')}>
     <div className="flex flex-wrap items-start justify-between gap-3"><div className="min-w-0 flex-1"><h2 className="m-0 text-lg font-bold">Payments</h2>
       <p className="mt-1 mb-0 text-sm text-fg2">{amountDue === null ? 'No fee set for this session.' : `${formatPeso(amountDue)} per player (${dueBasis === 'custom' ? 'custom amount' : 'break-even share'}${entranceFeeIncluded ? `, includes the ${formatPeso(entranceFeeIncluded)} entrance fee` : ''}).`} Tick players as they pay. ROTRA only records it; money is collected outside the app.</p></div>
       {totals.paid < totals.total ? <Button size="sm" disabled={disabled} onClick={onMarkAllPaid}>Mark all paid</Button> : null}
     </div>
+    {saveError ? <Notice tone="error">{saveError}</Notice> : null}
     <div className="grid grid-cols-2 gap-3 min-[800px]:grid-cols-4">
       {[
         { label: 'Paid', value: `${totals.paid}/${totals.total}` },

@@ -18,3 +18,5 @@ export const NoFeeSet: Story = { args: { amountDue: null, entranceFeeIncluded: u
 export const FilterUnpaidEmpty: Story = { args: { ...AllPaid.args, filter: 'unpaid' } }
 export const NoPlayers: Story = { args: { players: [], totals: { paid: 0, total: 0, collected: 0, stillDue: null, againstCosts: null, cost: null } } }
 export const AsSheet: Story = { args: { asSheet: true } }
+export const SaveFailure: Story = { args: { saveError: 'Changes could not be saved' } }
+export const Saving: Story = { args: { disabled: true } }

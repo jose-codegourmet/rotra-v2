@@ -1,5 +1,7 @@
 # Sessions, club players, and roster
 
+**Last verified:** 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+
 **Status:** Proposed records; field names are new design names, not existing Prisma columns.
 
 ## `club_players`
@@ -15,7 +17,7 @@
 
 Unique `(club_id, id)` supports scoped FKs. Partial unique `(club_id, player_id)` when linked prevents duplicate canonical members of the saved list. Name is **not unique**. Index `(club_id, display_name, id)` for saved-list lookup; substring/fuzzy indexing is a later query-driven choice.
 
-A guest can persist here indefinitely without a global profile. Linking later updates the association but must not automatically backfill old global match facts; backfill is an unresolved business rule.
+A guest can persist here indefinitely without a global profile. After confirmed identity linkage, earlier valid guest games must be included in personal history and ranking under existing eligibility/window rules (owner decision, October 28, 2026). Preserve historical identity snapshots and permanent results; use an auditable, repeat-safe attribution/projection mechanism rather than blindly rewriting old facts. Confirmation evidence and duplicate/mistaken-link resolution remain open.
 
 `club_player_private_inputs`: optional one-to-one private intake for operator-entered normalized phone, email, and preset identity fields, with capture timestamps and resolution state. Do not duplicate already-known hidden contacts. On successful resolution, minimize/purge redundant intake according to a policy still to be decided. Pending contact fields never appear in public roster payloads.
 

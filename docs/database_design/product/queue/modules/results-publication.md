@@ -1,5 +1,7 @@
 # Finalized facts, awards, and publication
 
+**Last verified:** 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+
 **Status:** Proposed data structures, not proposed new award formulas.
 
 ## Durable result facts
@@ -19,7 +21,7 @@
 
 Only a valid session finalization can create official facts. Invalid matches produce none. Fun matches can produce club-local facts but are excluded from global performance/standard-match counts. Partial participation can be retained as source evidence while global/minimum eligibility remains false; local win/loss treatment is not yet specified.
 
-Guest facts stay linked to the club player even without a profile. Do not backfill `player_id_at_finalization` automatically when a guest later claims/links; retrospective attribution needs a policy and an auditable projection step.
+Guest facts stay linked to the club player even without a profile. **Owner decision, October 28, 2026:** after identity confirmation, include earlier valid guest games in personal history and ranking under the existing eligibility/window rules. Preserve `player_id_at_finalization` as the historical snapshot rather than rewriting it. Implement an auditable, repeat-safe attribution/projection step using original played dates; its physical design and identity-confirmation evidence remain open. Linking does not duplicate facts, change a winner, or make fun/partial games eligible for global performance.
 
 Index `(player_id_at_finalization, played_at DESC, match_id)` for player history, `(club_id, club_player_id, played_at DESC)` for club history, and source finalization/session for deduplication/rebuilds.
 

@@ -1,5 +1,7 @@
 # Transaction boundaries and replay behavior
 
+**Last verified:** 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+
 **Status:** Proposed command-level contracts, not implemented endpoints.
 
 Use short transactions for canonical changes. Lock a session/club and related player/court keys in a consistent order; do not hold database locks while waiting for network calls or operator conflict review. Preserve retry identifiers across attempts.
@@ -38,9 +40,13 @@ If a lineup or presence revision changes during generation, recompute or report 
 
 ## 5. Resolve identity and allocate RTR ID
 
+Run identity resolution/allocation as soon as the entry successfully syncs, without waiting for Session done (owner decision, October 28, 2026). Existing profiles keep their IDs. Match-performance contribution still requires valid session finalization.
+
 Use normalized phone uniqueness plus atomic city/day counter allocation in a transaction. Concurrent creators either insert one identity or retry and link to the winner. The counter/allocation belongs to the successful creation, not a device-local guess.
 
 If a link would duplicate an existing club player, do not silently rewrite historical rows. Retain a pending link conflict for an explicit identity-resolution policy. ID/QR is an identifier, not an account credential.
+
+After confirmed historical guest linkage, include earlier valid games in personal history and ranking through auditable, repeat-safe attribution and projection work. Preserve source facts, original played dates, and club history. Commit the accepted linkage and its required projection work coherently so a retry cannot double-count games or leave an accepted link with silently omitted history. Exact linkage storage and confirmation evidence require design approval.
 
 ## 6. Finalize a complete session
 

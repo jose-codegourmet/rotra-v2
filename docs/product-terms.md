@@ -1,6 +1,6 @@
 # Product terms — ROTRA v1
 
-**Last verified:** 2026-10-27 · **Owner:** product owner · **Single source of vocabulary.** If a word here
+**Last verified:** 2026-10-28 · **Owner:** product owner · **Single source of vocabulary.** If a word here
 disagrees with a business, screen, or database doc, this file is wrong and must be fixed in the same PR.
 
 **Read this when** a task uses a domain word, or names a type, component, route, query key, enum value,
@@ -86,6 +86,8 @@ Rules: [Players](business_logic/product/queue/modules/players/README.md) ·
 | Wait time | Minutes since the player's last game ended (or since marked present). Derived, never stored as a status |
 
 Phones and emails are **never public**, never in search results, participant cards, exports, or error text.
+
+**Owner decisions, October 28, 2026:** a phone-linked profile and permanent RTR ID are matched/created as soon as the entry successfully syncs, without waiting for Session done. After a guest's identity is confirmed and linked, earlier valid games also contribute to personal history and ranking under the existing eligibility and rolling-window rules. Original dates, club history, and permanent results are preserved; linking never counts a game twice. Identity-confirmation evidence and mistaken-link handling still need specification.
 
 ---
 

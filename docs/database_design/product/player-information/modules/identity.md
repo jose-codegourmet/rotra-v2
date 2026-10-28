@@ -1,5 +1,7 @@
 # Identity, contacts, accounts, and permanent RTR IDs
 
+**Last verified:** 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+
 **Status:** Proposed logical schema. Provider configuration and contact verification flows remain unresolved.
 
 ## `players`
@@ -54,7 +56,9 @@ Allocation transaction:
 
 IDs stay permanent. Later contact/address changes do not rerun allocation. Do not assume gap-free sequences or truncate values over four digits; overflow presentation is open.
 
-The trigger point for new profile creation (intermediate sync or final Session done) is unresolved. Until chosen, hold private pending identity input rather than claiming the permanent ID was allocated offline.
+**Owner decision, October 28, 2026:** resolve/create the profile and allocate its permanent RTR ID as soon as the entry successfully syncs, without waiting for Session done. Keep unresolved or conflicting input pending; never claim a permanent ID was allocated offline. Identity creation does not grant match-performance credit before valid finalization.
+
+After a historical guest identity is confirmed, attribute earlier valid games to that profile for personal history and ranking under the existing eligibility/window rules. Keep original entry/finalization identity snapshots and permanent outcomes intact; the auditable linkage/projection mechanism, confirmation evidence, and mistaken-link handling must be designed before implementation. Use original played dates and deduplicate contributions.
 
 Indexes: unique phone, non-null email proposal, auth subject, RTR ID, allocation city/date/sequence; name lookup can use a safe public search projection. No public phone index/query API is implied.
 

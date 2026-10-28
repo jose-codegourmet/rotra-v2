@@ -1,5 +1,7 @@
 # Global leaderboard, rank explanation, and game history
 
+**Last verified:** 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+
 **Surfaces:** `P-LEADERBOARD`, `P-RANK-DETAIL`, `P-ELIGIBILITY`, `P-MATCH-HISTORY`.
 
 **Source:** [ranking rules](../../../../business_logic/product/player-information/modules/ranking/README.md).
@@ -45,7 +47,7 @@ No Edit result, dispute/void, add score later, or reconstruct-game action. Those
 
 Separate club-local fun-game history from long-term performance counting. Whether fun/partial games appear in the public history list and exactly which opponent details are public remain open. Do not hide them from the club's retained operational record or silently claim they contributed to rank.
 
-Guest sessions are not automatically backfilled into a newly linked profile; that policy is unresolved. Invalid sessions/games do not appear as official wins, losses, or played games.
+After a guest's identity is confirmed and linked, include their earlier valid games in personal history and ranking under the existing eligibility/window rules (owner decision, October 28, 2026). A name match alone is insufficient. Show processing truthfully until attribution/recalculation completes; use original game dates and count each game once. Confirmation evidence and mistaken-link handling remain open. Invalid sessions/games do not appear as official wins, losses, or played games; fun/partial-game public visibility remains a separate open detail.
 
 If a public session page expires/deletes, preserve player history with a truthful unavailable-link state. Do not render broken link navigation as if history vanished.
 

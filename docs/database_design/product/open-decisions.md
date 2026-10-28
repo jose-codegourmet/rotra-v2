@@ -1,5 +1,7 @@
 # Design decisions before migrations
 
+**Last verified:** 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+
 **Status:** Review register, not a questionnaire or approval request for writing these docs.
 
 This design is concrete enough to review but not safe to translate mechanically into migrations. The [business open decisions](../../business_logic/product/open-decisions.md) still apply.
@@ -10,7 +12,7 @@ This design is concrete enough to review but not safe to translate mechanically 
 |---|---|---|
 | One PostgreSQL database, logical product ownership | Shared identity and atomic finalization | Physical schemas/worker boundaries |
 | Player UUID independent from auth UUID | Unclaimed profiles and permanent history | Migration and account-provider mapping |
-| Club-local player with optional global link | Guest participation and offline identity | Guest-history backfill and duplicate resolution |
+| Club-local player with optional global link | Guest participation and offline identity | Auditable historical attribution after confirmed identity; confirmation evidence and duplicate/mistaken-link resolution |
 | Session reservation before offline start authorization | Prevent a second distinct offline active session | When reservation is acquired/released; no new requirement that all downloads reserve a slot |
 | Enrolled device streams with contiguous sequence and final seals | Detect missing original records before Session done | Device 2 provisioning; conflicting terminal decisions; unknown/unregistered device prevention |
 | Immutable decisions plus conflict quarantine | Preserve touch-move while reconciling | Who selects among conflicting confirmed facts and what selection means |
@@ -22,7 +24,7 @@ This design is concrete enough to review but not safe to translate mechanically 
 - Exact numerical ranking/performance model, label thresholds, global tie behavior, and policy-change retroactivity.
 - Three calendar months versus a day count, and canonical timezone for ID dates/window cutoffs.
 - Authentication provider support/configuration for club username login and player phone-or-email password login; email claim/recovery verification.
-- Whether new profiles/IDs are created on intermediate sync or only valid finalization. Private intake can be staged either way.
+- Historical guest-link confirmation evidence, mistaken-link handling, and the auditable attribution mechanism; including earlier games after confirmed identity is settled below.
 - Whether assessments for no-shows, roster entries removed during preparation, or invalid sessions remain eligible; assessment changes already sync immediately, independently of match performance.
 - Exact award evidence calculations (partial substitutes are now excluded from local standings and awards).
 - Interrupted-device conflict resolution versus irreversible winners. Never implement last-write-wins as an accidental answer.
@@ -34,6 +36,12 @@ This design is concrete enough to review but not safe to translate mechanically 
 - Phone/contact conflict handling and aliasing duplicate offline club-player IDs without rewriting confirmed history.
 - City/country code registry, sequence formatting above 9999, and founding-location corrections.
 - Renewal dates and overlapping terms, refunds, offline expiry enforcement, flag targeting, and when offline devices pick up flag changes. (Per-club prices, free tester clubs, owner-added clubs and owner-created flags were settled October 27, 2026.)
+
+## Owner decisions recorded October 28, 2026
+
+- Match/create phone-linked profiles and allocate new permanent RTR IDs as soon as the entry successfully syncs, without waiting for Session done. Valid finalization still gates match-performance contribution.
+- After identity confirmation, include earlier valid guest games in personal history and ranking under existing eligibility and rolling-window rules. Preserve original facts and club history; apply attribution repeat-safely without duplicate contribution. Confirmation evidence and physical linkage/projection design remain to be specified.
+- Private online testing may precede offline recovery work. Full offline support is required before live club use; this is sequencing approval, not approval to run migrations or release an online-only product.
 
 ## Design limits
 

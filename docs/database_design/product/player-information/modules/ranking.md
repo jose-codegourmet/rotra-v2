@@ -1,5 +1,7 @@
 # Assessments, rank evidence, and rolling eligibility
 
+**Last verified:** 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+
 **Status:** Proposed persistence model. Ranking mathematics is deliberately unspecified beyond agreed weights and input rules.
 
 ## `skill_levels`
@@ -29,7 +31,7 @@ For shared rank, select the **latest eligible assessment per club in the three-m
 
 Index `(player_id_at_assessment, club_id, assessed_at DESC, accepted_revision DESC)` plus `(club_id, club_player_id, assessed_at DESC)`. Late uploaded assessments cannot replace newer ones solely because received later; the accepted assessment-time policy must address device-clock uncertainty before implementation.
 
-Eligibility of assessments for no-shows/invalid sessions and guest backfill remains open. Do not invent rollback behavior; saved assessments already influence rank before Session done when accepted online.
+Eligibility of assessments for no-shows/invalid sessions remains open. Do not invent rollback behavior; saved assessments already influence rank before Session done when accepted online. Earlier valid guest games must contribute after confirmed identity linkage (owner decision, October 28, 2026), subject to normal performance eligibility and original played dates. That decision does not independently settle historical assessment attribution or its eligibility rules.
 
 ## Match evidence
 

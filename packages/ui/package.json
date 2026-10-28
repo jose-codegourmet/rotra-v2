@@ -220,7 +220,9 @@
     "./session-financials-summary": "./src/components/session-financials-summary/SessionFinancialsSummary.tsx",
     "./forms/session-financials-fields": "./src/forms/session-financials-fields/SessionFinancialsFields.tsx",
     "./forms/session-financials-fields/schema": "./src/forms/session-financials-fields/SessionFinancialsFields.schema.ts",
-    "./forms/session-financials-fields/default-values": "./src/forms/session-financials-fields/SessionFinancialsFields.defaultValues.ts"
+    "./forms/session-financials-fields/default-values": "./src/forms/session-financials-fields/SessionFinancialsFields.defaultValues.ts",
+    "./payments-checklist": "./src/components/payments-checklist/PaymentsChecklist.tsx",
+    "./payments-checklist/payment-card": "./src/components/payments-checklist/payment-card/PaymentCard.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

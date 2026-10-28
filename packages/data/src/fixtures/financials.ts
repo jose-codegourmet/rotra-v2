@@ -1,3 +1,5 @@
+import { clubPlayers, players } from './players'
+
 /** Prototype financePanel and histFinancePane values, in integer centavos. */
 export const thursdayEstimate = {
   players: 18, court: 315000, shuttle: 810000, entrance: 108000,
@@ -20,3 +22,12 @@ export const shuttlePlanItems = [
 export const longShuttlePlanItems = [{ ...shuttlePlanItems[0]!, name: 'Yonex Aerosensa 30 Tournament Feather Shuttlecocks' }]
 export const financialShuttleLines = [{ id: 'inv1', name: 'Yonex Aerosensa 30', tubes: 4 }, { id: 'inv2', name: 'RSL Classic', tubes: 2 }]
 export const sundayEstimate = { players: 16, court: 315000, shuttle: 575000, total: 890000, breakEven: 55700, perHead: 55700, collect: 891200, isCustom: false, result: { kind: 'breaks_even' as const, amount: 1200 } }
+
+export const paymentPlayers = clubPlayers.slice(0, 18).map((p, index) => ({
+ clubPlayerId: p.id, name: p.fullName,
+ picture: players.find((x) => x.id === p.playerId)?.pictureUrl,
+ paid: index < 15 ? { amount: 70000, at: Date.UTC(2026, 9, 22, 11, 42) } : undefined,
+})).sort((a, b) => Number(!!a.paid) - Number(!!b.paid) || a.name.localeCompare(b.name))
+export const allPaymentPlayers = paymentPlayers.map((p) => ({ ...p, paid: p.paid ?? { amount: 70000, at: Date.UTC(2026, 9, 22, 11, 42) } }))
+export const unpaidPaymentPlayers = paymentPlayers.map((p) => ({ ...p, paid: undefined }))
+export const paymentTotalsFixture = { paid: 15, total: 18, collected: 1050000, stillDue: 210000, againstCosts: -183000, cost: 1233000 }

@@ -2,7 +2,7 @@ import { phoneField } from '@rotra/schema/phone'
 import type { ClubPlayer } from '../club-player/clubPlayer.types'
 import { clubPlayerView } from '../club-player/fetchers'
 import { DEMO_CLUB_ID } from '../fixtures/clubs'
-import { directoryPlayers } from '../fixtures/players'
+import { directoryPlayers, leaderboardLevels, leaderboardPlayers } from '../fixtures/players'
 import { requireOnline } from '../mock/bridge'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
@@ -92,6 +92,10 @@ export function addSavedPlayerToSession(input: {
     }
   })
 }
+/** A directory suggestion's level is its leaderboard level. */
+function directoryLevel(playerId: string): PlayingLevel {
+  return leaderboardLevels[playerId] ?? 'beginner_low'
+}
 export async function playerDirectorySearch(q: string) {
   await delay()
   requireOnline()
@@ -100,9 +104,9 @@ export async function playerDirectorySearch(q: string) {
   return directoryPlayers
     .map((p, i) => ({
       ...p,
-      identity: i === 2 ? ('unclaimed' as const) : ('registered' as const),
-      suggestion: required(PLAYING_LEVELS[required([6, 5, 2, 4][i])]),
-      rankLabel: required(['#214', '#388', 'Not ranked', '#1042'][i]),
+      identity: 'registered' as const,
+      suggestion: directoryLevel(p.id),
+      rankLabel: `#${leaderboardPlayers.findIndex((entry) => entry.id === p.id) + 1}`,
     }))
     .filter(
       (p) =>
@@ -124,15 +128,14 @@ export function addDirectoryPlayerToSession(input: {
     if (!profile) fail('Player not available.')
     let p = s.clubPlayers.find((p) => p.playerId === profile.id && p.clubId === DEMO_CLUB_ID)
     if (!p) {
-      const i = directoryPlayers.indexOf(profile)
       p = {
         id: crypto.randomUUID(),
         clubId: DEMO_CLUB_ID,
         playerId: profile.id,
         fullName: profile.fullName,
         nickname: profile.nickname,
-        identity: i === 2 ? 'unclaimed' : 'registered',
-        playingLevel: required(PLAYING_LEVELS[required([6, 5, 2, 4][i])]),
+        identity: 'registered',
+        playingLevel: directoryLevel(profile.id),
         addedAt: Date.now(),
       }
       s.clubPlayers.push(p)

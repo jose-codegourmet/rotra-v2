@@ -281,6 +281,30 @@
       "fullName": "Robert",
       "nickname": null,
       "rtrId": "RTR-PH-ILO-071226-0009"
+    },
+    {
+      "id": "8f054e7e-aefb-5d54-b5bb-b245f8673b3a",
+      "fullName": "Joeriz",
+      "nickname": null,
+      "rtrId": "RTR-PH-CEB-050726-0128"
+    },
+    {
+      "id": "66f774e9-3b82-5631-931c-9858ff8eb01f",
+      "fullName": "Klod",
+      "nickname": null,
+      "rtrId": "RTR-PH-DVO-050726-0129"
+    },
+    {
+      "id": "bdc00b5e-c882-52d6-ae19-260104a128ab",
+      "fullName": "Russel",
+      "nickname": null,
+      "rtrId": "RTR-PH-TAG-041926-0130"
+    },
+    {
+      "id": "e8a7e34b-bd3d-5fc4-8331-a20031a545b9",
+      "fullName": "Nathan",
+      "nickname": null,
+      "rtrId": "RTR-PH-MNL-041926-0131"
     }
   ],
   "adminPlayerIds": [
@@ -326,7 +350,15 @@
     "c0ca35ad-6213-524c-bfde-fc8c3e9163f0",
     "95320b10-2cca-526c-af98-e59304f25b5e",
     "2e296fb4-d824-532d-b9d5-7792b3732dab",
-    "17029b99-e522-54a9-a90b-b514b49e0c4a"
+    "17029b99-e522-54a9-a90b-b514b49e0c4a",
+    "c22aca74-9eea-5396-977f-248a5f6ec770",
+    "6c9ffc90-d7f1-5a3f-8881-32a3cca8e70f",
+    "00606718-85cf-591a-b1f1-7bb35b9846c9",
+    "5fa983ab-69d5-5b38-8b71-9e02521ce98a",
+    "8f054e7e-aefb-5d54-b5bb-b245f8673b3a",
+    "66f774e9-3b82-5631-931c-9858ff8eb01f",
+    "bdc00b5e-c882-52d6-ae19-260104a128ab",
+    "e8a7e34b-bd3d-5fc4-8331-a20031a545b9"
   ],
   "leaderboard": [
     {
@@ -342,7 +374,15 @@
       "playingLevel": "advanced_mid"
     },
     {
+      "playerId": "e8a7e34b-bd3d-5fc4-8331-a20031a545b9",
+      "playingLevel": "advanced_mid"
+    },
+    {
       "playerId": "d720c601-da89-5474-9351-00e2fb966e56",
+      "playingLevel": "advanced_mid"
+    },
+    {
+      "playerId": "bdc00b5e-c882-52d6-ae19-260104a128ab",
       "playingLevel": "advanced_mid"
     },
     {
@@ -402,7 +442,15 @@
       "playingLevel": "intermediate_high"
     },
     {
+      "playerId": "bc4c3446-0131-591b-ab03-af19225dbe8a",
+      "playingLevel": "intermediate_high"
+    },
+    {
       "playerId": "f5a63c91-34fd-53ec-948d-0ef644b5aeac",
+      "playingLevel": "intermediate_mid"
+    },
+    {
+      "playerId": "a5c35992-7597-55cd-bdf9-20c7a9440af4",
       "playingLevel": "intermediate_mid"
     },
     {
@@ -411,6 +459,10 @@
     },
     {
       "playerId": "85ae7866-ff62-59fc-8af8-985a594bb5b2",
+      "playingLevel": "intermediate_mid"
+    },
+    {
+      "playerId": "80726593-1823-5c2d-a3fc-5f904e414d80",
       "playingLevel": "intermediate_mid"
     },
     {
@@ -426,6 +478,10 @@
       "playingLevel": "intermediate_low"
     },
     {
+      "playerId": "b789f194-76fb-5a5b-ad80-a37f022a785a",
+      "playingLevel": "intermediate_low"
+    },
+    {
       "playerId": "06d1acef-0069-531a-b599-e3c95cc94ff4",
       "playingLevel": "intermediate_low"
     },
@@ -435,6 +491,10 @@
     },
     {
       "playerId": "6d660378-4cc3-5131-98d4-d9ba3cd5ebf1",
+      "playingLevel": "intermediate_low"
+    },
+    {
+      "playerId": "66f774e9-3b82-5631-931c-9858ff8eb01f",
       "playingLevel": "intermediate_low"
     },
     {
@@ -466,7 +526,31 @@
       "playingLevel": "intermediate_low"
     },
     {
+      "playerId": "c22aca74-9eea-5396-977f-248a5f6ec770",
+      "playingLevel": "beginner_high"
+    },
+    {
+      "playerId": "6c9ffc90-d7f1-5a3f-8881-32a3cca8e70f",
+      "playingLevel": "beginner_high"
+    },
+    {
       "playerId": "71b283f9-9be5-55f4-94ab-c1127906fcd8",
+      "playingLevel": "beginner_high"
+    },
+    {
+      "playerId": "8f054e7e-aefb-5d54-b5bb-b245f8673b3a",
+      "playingLevel": "beginner_high"
+    },
+    {
+      "playerId": "d0c2f1f2-5868-5260-b8dc-f9c8a75c3a58",
+      "playingLevel": "beginner_high"
+    },
+    {
+      "playerId": "00606718-85cf-591a-b1f1-7bb35b9846c9",
+      "playingLevel": "beginner_high"
+    },
+    {
+      "playerId": "5fa983ab-69d5-5b38-8b71-9e02521ce98a",
       "playingLevel": "beginner_high"
     },
     {

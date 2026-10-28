@@ -1,5 +1,5 @@
 import type { ClubPlayer } from '@rotra/data/club-player/types'
-import { clubPlayers, players } from '@rotra/data/fixtures/players'
+import { clubPlayers, players, storyIdentityPlayers } from '@rotra/data/fixtures/players'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import { PlayerProfileSheet, type PlayerProfileSheetProps } from './PlayerProfileSheet'
@@ -53,10 +53,12 @@ type Story = StoryObj<typeof meta>
 
 export const Registered: Story = {}
 export const HiddenPhone: Story = { args: propsFor(byName('Jose'), { phoneHidden: true }) }
-export const Unclaimed: Story = { args: propsFor(byName('Raymark'), { sessionsHere: 5 }) }
-export const Guest: Story = { args: propsFor(byName('Joeriz'), { sessionsHere: 1 }) }
+export const Unclaimed: Story = {
+  args: propsFor(storyIdentityPlayers.unclaimed, { sessionsHere: 5 }),
+}
+export const Guest: Story = { args: propsFor(storyIdentityPlayers.guest, { sessionsHere: 1 }) }
 export const LookupPending: Story = {
-  args: propsFor(byName('Joeriz'), { identity: 'pending', sessionsHere: 0 }),
+  args: propsFor(storyIdentityPlayers.guest, { identity: 'pending', sessionsHere: 0 }),
 }
 export const OpenedFromMatch: Story = { args: { backLabel: 'match', onBack: fn() } }
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }

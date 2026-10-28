@@ -15,9 +15,9 @@ export const playerAccounts = [
   {
     playerId: 'bc4c3446-0131-591b-ab03-af19225dbe8a',
     phone: '+639185550377',
-    email: '',
+    email: 'raymark@example.com',
     phoneHidden: false,
-    claimed: false,
+    claimed: true,
   },
 ]
 export const signInExamples = {

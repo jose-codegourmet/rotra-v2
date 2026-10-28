@@ -1,5 +1,7 @@
 # Session results and sharing
 
+**Last verified:** 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+
 **Status:** Confirmed v1 target rules. Updated October 26, 2026 to match the [ROTRA Queue prototype](../../../../../frames/queue-app/rotra-queue.html).
 
 ## Live leaderboard
@@ -10,7 +12,7 @@ Partial (substituted) games and invalid matches do not count. The live leaderboa
 
 ## Finalization versus publishing
 
-Session done requires internet and complete, reconciled records. A valid finalization automatically syncs eligible player identities and session performance to Player Information, whether or not the club publishes anything.
+Session done requires internet and complete, reconciled records. Phone-linked profiles and permanent RTR IDs are already matched/created as soon as their entries successfully sync; they do not wait for Session done (owner decision, October 28, 2026). A valid finalization automatically contributes eligible session performance to Player Information, whether or not the club publishes anything.
 
 While finishing, the operator sees four stages: checking session records, finishing the session, updating player records, preparing result slides. The results view then opens.
 

@@ -1,5 +1,7 @@
 # Open decisions before implementation
 
+**Last verified:** 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+
 **Status:** Deliberately unresolved. These are not additional approved requirements and are not a new questionnaire. Updated October 26, 2026: items the [ROTRA Queue prototype](../../frames/queue-app/rotra-queue.html) settled are listed under [Settled by the prototype](#settled-by-the-prototype). Updated October 27, 2026: items the platform owner settled with the [ROTRA Admin prototype](../../frames/admin-app/rotra-admin.html) are listed under [Settled by the Admin prototype](#settled-by-the-admin-prototype).
 
 The product direction is sufficiently defined for documentation. Resolve the relevant items during focused design of each module, rather than reopening the whole business interview. Existing code or old docs must not silently supply answers where they conflict with v1.
@@ -26,8 +28,7 @@ The product direction is sufficiently defined for documentation. Resolve the rel
 | Mid-session settings | Whether mode, formats, or the minimum can change after start; they stay fixed until decided |
 | Invalid-session recovery | Whether later recovery of the original device can reopen an already-invalid session; original records are mandatory in every case |
 | Assessment timing | Whether an assessment saved for a roster player who never attends or whose session becomes invalid still contributes; immediate assessment updates were agreed, but rollback/removal rules were not |
-| Profile sync timing | Whether a new phone-linked profile/ID is created during an intermediate sync or only on valid Session done; long-term match performance remains gated by valid finalization |
-| Guest linking | Whether prior name-only guest sessions backfill into a profile when linked; effect on recent rank and eligibility |
+| Guest linking implementation | Who confirms a historical guest identity, what evidence is required, and how mistaken/duplicate links are resolved; including earlier games after identity confirmation is settled below |
 | Session standings | Three-or-more-way ties, conflicting head-to-head results, and identical names; do not replace the agreed wins/losses/head-to-head/name order |
 | Awards | Final MVP, Most Improved, and Off Day math; the prototype formula is a reference only; five prior club sessions within three months and at least two counted games for MVP are fixed |
 | Publication withdrawal | Whether published results can be fully unpublished; re-publishing with a new selection is allowed |
@@ -36,6 +37,14 @@ The product direction is sufficiently defined for documentation. Resolve the rel
 | Profile editing | Exact personal fields and social visibility; whether operator edits of personal information continue after a profile is claimed |
 | Expired-page behavior | Meaning/presentation of stale public pages; restoration after deletion; retention of internal club data beyond public pages |
 | Admin configuration | Effect of changing weights/eligibility on existing ranks; which flags exist, targeting, and when offline devices pick up a flag change |
+
+## Settled by the product owner on October 28, 2026
+
+| Area | Decision |
+|---|---|
+| Profile sync timing | Match an existing profile or create the phone-linked profile and permanent RTR ID as soon as the entry successfully syncs. Do not wait for Session done. Match performance still requires valid session finalization. |
+| Earlier guest games | After the guest's identity is confirmed, include their earlier valid games in personal history and ranking under the existing counting and rolling-window rules. Keep club history and permanent outcomes intact; do not count a game twice. Identity-confirmation evidence and mistaken-link handling still need specification. |
+| Real-data rollout | Private online testing may come first. Offline operation and recovery remain required before clubs use ROTRA live. |
 
 ## Settled by the prototype
 

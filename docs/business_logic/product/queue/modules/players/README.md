@@ -1,5 +1,7 @@
 # Players and roster
 
+**Last verified:** 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+
 **Status:** Confirmed v1 target rules. Updated October 26, 2026 to match the [ROTRA Queue prototype](../../../../../frames/queue-app/rotra-queue.html).
 
 ## Entry and identity
@@ -32,10 +34,10 @@ Registered and unclaimed players with an uploaded picture show it. Guests and pr
 ## Guests and incomplete profiles
 
 - No phone number: retain a club/session guest; bypass automatic Player Information creation.
-- Phone provided: eligible for automatic profile matching or creation through sync and valid finalization.
+- Phone provided: match an existing profile or create the profile and permanent RTR ID as soon as the entry successfully syncs, without waiting for Session done (owner decision, October 28, 2026). Match performance still waits for valid finalization.
 - On a later addition, prompt for missing details or provide a registration link.
 - Claiming requires email and phone. Social links remain optional; Facebook is not required.
-- Guest history stays with the club for return visits and local awards. Retrospective transfer of older guest results after linking is still open.
+- Guest history stays with the club for return visits and local awards. After the guest's identity is confirmed and linked, earlier valid games also contribute to personal history and ranking under the existing eligibility/window rules (owner decision, October 28, 2026). Do not duplicate games or rewrite permanent outcomes. Confirmation evidence and mistaken-link handling remain open.
 
 ## Levels
 

@@ -1,5 +1,7 @@
 # Screen decisions still requiring a focused specification
 
+**Last verified:** 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+
 **Status:** Explicit unresolved details, not omitted screens and not a new interview questionnaire. Updated October 26, 2026: items settled by the [ROTRA Queue prototype](../../frames/queue-app/rotra-queue.html) are listed at the end, followed by those settled with the [ROTRA Admin prototype](../../frames/admin-app/rotra-admin.html) on October 27, 2026.
 
 The screen tree specifies all agreed v1 workflows. Where behavior is undecided, the relevant screen includes its exact boundary and safe pending/error presentation. Do not fill these gaps from old code, placeholder data, or an invented default.
@@ -14,7 +16,7 @@ The screen tree specifies all agreed v1 workflows. Where behavior is undecided, 
 | Conflicting permanent outcomes | Q-CONFLICT | No last-write-wins or generic winner edit |
 | Final policy for games still in play / unused waiting queue | Q-SESSION-DONE | V1 blocks Session done until games are finished or invalidated; unplayed waiting matches are dropped from results; never manufacture winners or silently invalidate |
 | Releasing the active-session slot after invalidation | Q-INVALID-SESSION | Invalidity is permanent, as explicitly agreed; slot-release mechanics still need definition |
-| New-profile allocation moment and guest-history backfill | Q-ADD-PLAYER, P-ID-QR, P-MATCH-HISTORY | Pending identity shown honestly (Lookup pending); no invented permanent ID or automatic old-history transfer |
+| Historical guest identity confirmation and link conflicts | Q-ADD-PLAYER, P-ID-QR, P-MATCH-HISTORY | Profile/ID creation on successful entry sync and inclusion of earlier guest games after identity confirmation are settled below. No name-only transfer or invented offline permanent ID; confirmation evidence and conflict resolution remain open |
 | Post-claim operator edits and contact verification | Q-ADD-PLAYER, P-CLAIM, A-PLAYER-DETAIL | No unrestricted personal/contact overwrite |
 | Claim/reset verification, link lifetime, loss of contacts | P-CLAIM-STATUS, P-FORGOT, P-RESET, P-CONTACT-REQUEST | Defined flow boundaries, no invented SMS/social-login/evidence requirement |
 | Final rank/pairing/award formulas and window boundary | Q-SUGGEST, Q-AUTO, Q-AWARDS-SLIDE, P-RANK-DETAIL | The prototype heuristic and award formula are references; no win probabilities shown to operators |
@@ -35,6 +37,13 @@ The screen tree specifies all agreed v1 workflows. Where behavior is undecided, 
 - Whether inventory edits work offline; currencies other than pesos.
 - Showing player contact details (Facebook, phone, email) next to payments. The paid / not-paid checklist itself is settled; contacts stay private.
 - New Admin auth policy: email/password is a proposed carry-forward from the existing specification, not a newly confirmed product decision.
+
+## Settled by the product owner (October 28, 2026)
+
+| Area | Decision | Screens |
+|---|---|---|
+| Profile and RTR ID availability | Show the real profile/ID after successful entry sync; do not wait for Session done. Lookup pending remains truthful until matching/allocation succeeds | Q-ADD-PLAYER, P-ID-QR |
+| Earlier guest games | After identity confirmation, include earlier valid games in personal history and ranking under existing eligibility/window rules. Keep counts accurate during processing and never transfer by name alone | P-MATCH-HISTORY, P-RANK-DETAIL, P-ELIGIBILITY |
 
 ## Settled by the prototype (October 26, 2026)
 

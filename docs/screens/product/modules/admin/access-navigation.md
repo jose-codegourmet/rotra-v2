@@ -41,3 +41,23 @@ Existing old dashboards, moderation, payment collection, and kill-switch concept
 - A club account reaching an Admin URL receives access denial with no private player data.
 - Losing connectivity prevents an activation/approval from being reported as saved.
 - The workspace remains usable without an invented analytics home page.
+
+## Mock implementation notes — A01
+
+The A01 branch implements presentational access components and the owner workspace shell over a
+browser-readable mock session marker. This is not real authentication. Passwords stay out of Redux
+and the TanStack mutation variables/cache. Leaving the owner session clears cached internal queries
+and mutations; only the public session projection is repopulated. Developer controls are omitted
+from production for Admin.
+
+The mock owner lands on `/clubs`. Navigation targets are `/clubs`, `/players`,
+`/requests/contact-changes`, `/requests/club-names`, `/settings/ranking`, and
+`/settings/feature-flags`; detail routes belong to A02–A04. Until those screens land, unmatched
+links show the Admin not-found state with no placeholder records or counts.
+
+Invalid-credential copy from ticket #186 is **“Email or password is incorrect.”** This copy awaits
+product-owner confirmation. Offline sign-in uses **“Signing in needs an internet connection.”**
+The final Admin auth/provider/session policy remains open.
+
+For this delivery, the product owner requested no lint, type-check, or build checks. Runtime,
+Storybook, keyboard, and visual verification have not been performed.

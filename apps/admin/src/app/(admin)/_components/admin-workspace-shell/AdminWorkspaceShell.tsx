@@ -1,6 +1,10 @@
 'use client'
+import { useAdminConnectivity } from '@rotra/data/admin-account/use-admin-connectivity'
 import { useAdminSession } from '@rotra/data/admin-account/use-admin-session'
 import { useSignOutAdmin } from '@rotra/data/admin-account/use-sign-out-admin'
+import { AccessDeniedCard } from '@rotra/ui/access-denied-card'
+import { Skeleton } from '@rotra/ui/skeleton'
+import { useQueryClient } from '@tanstack/react-query'
 import { AdminAccountBadge } from '@rotra/ui/admin-account-badge'
 import { AdminNav, type AdminNavKey } from '@rotra/ui/admin-nav'
 import { AdminOfflineBand } from '@rotra/ui/admin-offline-band'
@@ -9,9 +13,10 @@ import { TopBar } from '@rotra/ui/app-shell/top-bar'
 import { ThemeToggle } from '@rotra/ui/theme-toggle'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { type ReactNode, useEffect } from 'react'
-import { useAppSelector } from '@/store/hooks'
-import { selectDev } from '@/store/slices/devSlice'
+import { createContext, type ReactNode, useCallback, useContext, useEffect, useState } from 'react'
+
+const AdminWorkspaceAccess = createContext<(() => void) | null>(null)
+export function useAdminWorkspaceAccess() { return useContext(AdminWorkspaceAccess) }
 
 const HREFS: Record<AdminNavKey, string> = {
   clubs: '/clubs', players: '/players',
@@ -22,13 +27,25 @@ const HREFS: Record<AdminNavKey, string> = {
 export function AdminWorkspaceShell({ children }: { children: ReactNode }) {
   const session = useAdminSession()
   const signOut = useSignOutAdmin()
-  const { offline } = useAppSelector(selectDev)
+  const { offline } = useAdminConnectivity()
+  const client = useQueryClient()
+  const [permissionDenied, setPermissionDenied] = useState(false)
+  const reportPermissionDenied = useCallback(() => {
+    void client.cancelQueries()
+    client.clear()
+    setPermissionDenied(true)
+  }, [client])
   const pathname = usePathname()
   const router = useRouter()
   const kind = session.data.kind
   useEffect(() => {
-    if (kind !== 'owner') { router.replace('/login'); router.refresh() }
-  }, [kind, router])
+    if (!session.isPending && kind !== 'owner') { router.replace('/login'); router.refresh() }
+  }, [kind, session.isPending, router])
+  if (permissionDenied) return <>
+    <TopBar product="Admin" contained={false}><ThemeToggle /></TopBar>
+    <AccessDeniedCard accountDescription="the signed-in account" isSigningOut={signOut.isPending} onSignOut={() => signOut.mutate(undefined, { onSuccess: () => { router.replace('/login'); router.refresh() } })} />
+  </>
+  if (session.isPending) return <Skeleton label="Loading Admin" />
   if (session.data.kind !== 'owner') return null
   const email = session.data.account.email
   const current = (Object.keys(HREFS) as AdminNavKey[]).find((key) => pathname === HREFS[key] || pathname.startsWith(`${HREFS[key]}/`)) ?? null
@@ -43,5 +60,5 @@ export function AdminWorkspaceShell({ children }: { children: ReactNode }) {
       {offline && session.loadedAt ? <AdminOfflineBand loadedAt={session.loadedAt} /> : null}
     </>}
     rail={<AdminNav current={current} hrefs={HREFS} linkComponent={Link} accountEmail={email} isSigningOut={signOut.isPending} onSignOut={() => signOut.mutate(undefined, { onSuccess: () => { router.replace('/login'); router.refresh() } })} />}
-  >{children}</AppShell>
+  ><AdminWorkspaceAccess.Provider value={reportPermissionDenied}>{children}</AdminWorkspaceAccess.Provider></AppShell>
 }

@@ -8,6 +8,7 @@ type Story = StoryObj<typeof meta>
 export const Default: Story = {}
 export const Pending: Story = { args: { isPending: true } }
 export const ServerError: Story = { args: { serverError: adminAccessExamples.credentialError, defaultValues: { email: adminAccount.email } } }
+export const Offline: Story = { args: { serverError: 'Signing in needs an internet connection.' } }
 export const SessionEnded: Story = { args: { sessionEnded: true } }
 export const FieldErrors: Story = { play: async ({ canvasElement }) => { canvasElement.querySelector<HTMLButtonElement>('button[type="submit"]')?.click() } }
 export const LongEmail: Story = { args: { defaultValues: { email: adminAccessExamples.longEmail } } }

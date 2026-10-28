@@ -8,7 +8,7 @@ const meta = {
   title: 'Admin/AdminNav', component: AdminNav,
   args: { current: 'clubs', hrefs: adminNavExamples.hrefs, accountEmail: adminAccount.email, onSignOut: () => {} },
   parameters: { layout: 'fullscreen' },
-  render: (args) => <AppShell railWidth={236} topBar={<TopBar product="Admin" contained={false} />} rail={<AdminNav {...args} />}><div /></AppShell>,
+  render: (args) => <AppShell railWidth={236} topBar={<TopBar product="Admin" contained={false} menuOnNarrowOnly />} rail={<AdminNav {...args} />}><div /></AppShell>,
 } satisfies Meta<typeof AdminNav>
 export default meta
 type Story = StoryObj<typeof meta>

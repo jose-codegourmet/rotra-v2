@@ -226,7 +226,8 @@
     "./admin-account/query-keys": "./src/admin-account/queryKeys.ts",
     "./admin-account/use-admin-session": "./src/admin-account/useAdminSession.ts",
     "./admin-account/use-sign-in-admin": "./src/admin-account/useSignInAdmin.ts",
-    "./admin-account/use-sign-out-admin": "./src/admin-account/useSignOutAdmin.ts"
+    "./admin-account/use-sign-out-admin": "./src/admin-account/useSignOutAdmin.ts",
+    "./admin-account/use-admin-connectivity": "./src/admin-account/useAdminConnectivity.ts"
   },
   "scripts": {
     "lint": "biome check .",

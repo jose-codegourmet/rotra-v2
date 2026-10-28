@@ -1,5 +1,7 @@
 'use client'
 import { useSignOut } from '@rotra/data/auth/use-sign-out'
+import { OPEN_CONTACT_CHANGE_STATUSES } from '@rotra/data/contact-change-request/types'
+import { useMyContactChangeRequest } from '@rotra/data/contact-change-request/useMyContactChangeRequest'
 import { PLAYER_FIXTURE_NOW } from '@rotra/data/fixtures/player-games'
 import { useLeaderboard } from '@rotra/data/leaderboard/useLeaderboard'
 import { rankDisplayStatus } from '@rotra/data/player/rules'
@@ -11,6 +13,7 @@ import { useMyAccount } from '@rotra/data/player-account/useMyAccount'
 import { useRankingSettings } from '@rotra/data/ranking-settings'
 import { AccountPanel } from '@rotra/ui/account-panel'
 import { Button } from '@rotra/ui/button'
+import { ContactRequestStatus } from '@rotra/ui/contact-request-status'
 import { EligibilityCard } from '@rotra/ui/eligibility-card'
 import { ErrorState } from '@rotra/ui/error-state'
 import { Notice } from '@rotra/ui/notice'
@@ -50,6 +53,7 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
   const isOwn = account?.id === playerId
   // Ownership is checked first: a visitor's page never requests private contacts.
   const myAccount = useMyAccount(isOwn ? playerId : null),
+    contactRequest = useMyContactChangeRequest(isOwn ? playerId : null),
     signOut = useSignOut('player')
   const player = profile.data,
     current = rank.data
@@ -152,6 +156,12 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
               phone={myAccount.data.phone}
               email={myAccount.data.email}
               phoneHidden={myAccount.data.phoneHidden}
+              requestSlot={
+                contactRequest.data &&
+                OPEN_CONTACT_CHANGE_STATUSES.includes(contactRequest.data.status) ? (
+                  <ContactRequestStatus request={contactRequest.data} variant="compact" />
+                ) : null
+              }
               onOpenPrivacy={() => router.push('/profile/privacy-and-contact')}
               onSignOut={leaveSignedOut}
             />

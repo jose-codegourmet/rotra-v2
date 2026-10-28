@@ -1,5 +1,7 @@
 'use client'
 
+import { PaymentsPanel } from '@/app/(operator)/sessions/[sessionId]/_components/payments-panel/PaymentsPanel'
+import { useSessionPayments } from '@rotra/data/session-payment/useSessionPayments'
 import { useSessionCostEstimate } from '@rotra/data/session-cost/useSessionCostEstimate'
 import { formatPeso } from '@rotra/schema/money'
 import { CostEstimateResult } from '@rotra/ui/cost-estimate-summary'
@@ -60,6 +62,7 @@ const errorMessage = (error: unknown) =>
 export function SessionPreparation({ sessionId }: { sessionId: string }) {
   const router = useRouter()
   const cost = useSessionCostEstimate(sessionId)
+  const payments = useSessionPayments(sessionId)
   const dev = useAppSelector(selectDev)
   const session = useQueueSession(sessionId)
   const sessions = useQueueSessions()
@@ -201,6 +204,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
             badges: [{ text: `${rosterList.length}/${courts.length * (s?.playersPerCourt ?? 8)}` }],
           },
           { value: 'waitlist', label: 'Waitlist', badges: [{ text: String(waitlist.length) }] },
+          { value: 'payments', label: 'Payments', badges: payments.data ? [{ text: `${payments.data.totals.paid}/${payments.data.totals.total}`, longText: ' paid' }] : [] },
         ]}
       >
         <TabsContent value="overview">
@@ -275,6 +279,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
         <TabsContent value="roster">
           <PreparationRoster sessionId={sessionId} tab="roster" />
         </TabsContent>
+        <TabsContent value="payments"><PaymentsPanel sessionId={sessionId} /></TabsContent>
         <TabsContent value="waitlist">
           <PreparationRoster sessionId={sessionId} tab="waitlist" />
         </TabsContent>

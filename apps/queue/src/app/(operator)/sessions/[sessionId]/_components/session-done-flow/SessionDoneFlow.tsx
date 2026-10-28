@@ -3,6 +3,7 @@
 import { useFinalizeSession } from '@rotra/data/queue-session/useFinalizeSession'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionDoneReview } from '@rotra/data/queue-session/useSessionDoneReview'
+import { useSyncStatus } from '@rotra/data/sync/useSyncStatus'
 import { useSessionIntegrity } from '@rotra/data/sync/useSessionIntegrity'
 import { useAnswerInterruption } from '@rotra/data/sync/useAnswerInterruption'
 import { InterruptionCheckSheet } from '@rotra/ui/interruption-check-sheet'
@@ -41,6 +42,7 @@ export function SessionDoneFlow({ sessionId, open, onOpenChange }: SessionDoneFl
   const session = useQueueSession(sessionId)
   const review = useSessionDoneReview(sessionId, { enabled: open })
   const sync = useSyncState()
+  const syncStatus = useSyncStatus()
   const integrity = useSessionIntegrity(sessionId), answer = useAnswerInterruption()
   const [interruptionOpen, setInterruptionOpen] = useState(false)
   const [invalidOpen, setInvalidOpen] = useState(false)
@@ -108,6 +110,7 @@ export function SessionDoneFlow({ sessionId, open, onOpenChange }: SessionDoneFl
       belowMinimum={r.belowMinimum}
       minimum={r.minimum}
       online={online}
+      authorizationBlocked={syncStatus.data?.canFinishAndSync === false}
       isPending={finalize.isPending}
       onBackToSession={() => onOpenChange(false)}
       onContinue={() => r.belowMinimum.length > 0 ? setStep('minimum') : continueToConfirm()}

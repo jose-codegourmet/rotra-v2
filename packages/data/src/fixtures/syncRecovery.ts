@@ -16,6 +16,6 @@ export const syncConflictsFixture: SyncConflict[] = consoleSessionFixture.matche
   return { id: p.clubPlayerId, name: p.nameSnapshot, shortName: p.nicknameSnapshot ?? p.nameSnapshot.split(' ')[0] ?? p.nameSnapshot, level: p.level }
  }
  const teams = { teamA: match.teamA.map(player), teamB: match.teamB.map(player) }
- return { id: `sync-conflict-${index + 1}`, matchNumber: match.matchNo, courtLabel: consoleSessionFixture.courts[index]?.label ?? 'Court 1', versions: [{ ...teams, deviceLabel: 'Device 1', order: 12 + index, winner: 'A', score: { teamA: 21, teamB: 18 } }, { ...teams, deviceLabel: 'Device 2', order: 5 + index, winner: 'B', score: { teamA: 18, teamB: 21 } }] }
+ return { id: `sync-conflict-${index + 1}`, matchNumber: match.matchNo, courtLabel: consoleSessionFixture.courts[index]?.label ?? 'Court 1', versions: [{ ...teams, deviceLabel: 'Device 1', order: 12 + index, winner: 'A' as const, score: { teamA: 21, teamB: 18 } }, { ...teams, deviceLabel: 'Device 2', order: 5 + index, winner: 'B' as const, score: { teamA: 18, teamB: 21 } }] }
 })
 export const longSyncConflictFixture: SyncConflict = { ...syncConflictsFixture[0]!, versions: syncConflictsFixture[0]!.versions.map((v) => ({ ...v, teamA: v.teamA.map((p, index) => index ? p : { ...p, name: 'Maria Consolacion Dela Cruz Villareal', shortName: 'Maria Consolacion' }) })) }

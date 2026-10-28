@@ -6,9 +6,9 @@ import { applyRecoveryDevState, integrityIn } from './integrity'
 import type { SaveOutcome, SyncArea, SyncStatus } from './sync.types'
 
 export function recordChange(state: MockState, change: { text: string; area: SyncArea }, now = Date.now()): SaveOutcome {
-  const dev = getMockDevState(), savedOffline = dev.offline, pending = savedOffline || !!dev.syncFails
+  const dev = getMockDevState(), savedOffline = dev.offline, pending = savedOffline || !!dev.syncFails || !!dev.authorizationExpired && !dev.activeFinishAllowed
   state.sync.online = !savedOffline
-  state.sync.problem = dev.syncFails && !savedOffline ? 'retry' : undefined
+  state.sync.problem = dev.authorizationExpired ? 'authorization' : dev.syncFails && !savedOffline ? 'retry' : undefined
   state.sync.log.unshift({ id: crypto.randomUUID(), at: now, text: change.text, area: change.area, syncedAt: pending ? null : now })
   if (pending) state.sync.pendingCount++
   else state.sync.lastSyncedAt = now
@@ -19,13 +19,15 @@ export function saveToastText(message: string, outcome: { savedOffline: boolean 
 }
 let epoch = 0
 async function reconcile() {
-  const token = ++epoch, dev = getMockDevState(), offline = dev.offline
+  const token = ++epoch, dev = getMockDevState(), offline = dev.offline, authorizationBlocked = !!dev.authorizationExpired && !dev.activeFinishAllowed
   mockStore.update((state) => {
     state.sync.online = !offline
-    state.sync.syncing = !offline && !dev.syncFails && state.sync.pendingCount > 0
+    if (dev.authorizationExpired) state.sync.problem = 'authorization'
+    else if (state.sync.problem === 'authorization') state.sync.problem = undefined
+    state.sync.syncing = !offline && !dev.syncFails && !authorizationBlocked && state.sync.pendingCount > 0
     if (!offline && dev.syncFails && state.sync.pendingCount && state.sync.problem !== 'not_saved') state.sync.problem = 'retry'
   })
-  if (offline || dev.syncFails || !mockStore.getSnapshot().sync.pendingCount) return
+  if (offline || dev.syncFails || authorizationBlocked || !mockStore.getSnapshot().sync.pendingCount) return
   const generation = mockStore.getGeneration()
   await delay(1400)
   if (token !== epoch || getMockDevState().offline || generation !== mockStore.getGeneration()) return
@@ -50,7 +52,7 @@ export function connectMockSync() {
   const unsubscribe = subscribeMockBridge(() => {
     const next = getMockDevState()
     applyRecoveryDevState(previous, next)
-    const connectivityChanged = next.offline !== previous.offline || next.syncFails !== previous.syncFails
+    const connectivityChanged = next.offline !== previous.offline || next.syncFails !== previous.syncFails || next.authorizationExpired !== previous.authorizationExpired || next.activeFinishAllowed !== previous.activeFinishAllowed
     previous = { ...next }
     if (connectivityChanged) void reconcile()
   })
@@ -61,7 +63,7 @@ export function connectMockSync() {
 export async function getSyncState() { return readMockState().sync }
 export async function getSyncStatus(): Promise<SyncStatus> {
   const state = readMockState(), dev = getMockDevState()
-  return { connectivity: dev.offline ? 'offline' : 'online', syncing: state.sync.syncing, pendingCount: state.sync.pendingCount, lastSyncedAt: state.sync.lastSyncedAt, problem: state.sync.problem, incompleteRecords: Object.values(state.sessionIntegrity).some((i) => i.state !== 'complete' && state.sessions.some((s) => s.id === i.sessionId && (s.state === 'active' || s.state === 'prepared'))), canFinishAndSync: true }
+  return { connectivity: dev.offline ? 'offline' : 'online', syncing: state.sync.syncing, pendingCount: state.sync.pendingCount, lastSyncedAt: state.sync.lastSyncedAt, problem: state.sync.problem === 'not_saved' ? 'not_saved' : dev.authorizationExpired ? 'authorization' : state.sync.problem, incompleteRecords: Object.values(state.sessionIntegrity).some((i) => i.state !== 'complete' && state.sessions.some((s) => s.id === i.sessionId && (s.state === 'active' || s.state === 'prepared'))), canFinishAndSync: !dev.authorizationExpired || !!dev.activeFinishAllowed && state.sessions.some((s) => s.state === 'active') }
 }
 export async function getSyncLog() {
   const log = readMockState().sync.log

@@ -245,14 +245,18 @@ export async function downloadSession(sessionId: string) {
     if (generation !== mockStore.getGeneration())
       throw new MockError('conflict', 'Demo data was reset. Download again.')
     requireOnline()
+    if (getMockDevState().downloadFails)
+      throw new MockError('retryable', previous === 'ready' ? 'Download failed. Your previous copy is kept.' : 'Download failed. Try again when connected.')
     mockStore.update((s) => {
       s.downloads[sessionId] = 'ready'
+      s.downloadInfo[sessionId] = { downloadedAt: Date.now() }
     })
     return { message: 'Ready on this device' }
   } catch (error) {
     if (generation === mockStore.getGeneration())
       mockStore.update((s) => {
         s.downloads[sessionId] = previous
+        s.downloadInfo[sessionId] = { downloadedAt: s.downloadInfo[sessionId]?.downloadedAt ?? null, error: error instanceof Error ? error.message : 'Download failed.' }
       })
     throw error
   }

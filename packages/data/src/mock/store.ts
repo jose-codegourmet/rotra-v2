@@ -61,6 +61,7 @@ export type MockState = {
   joinRequests: SessionJoinRequest[]
   licensePayments: ClubLicenseTerm[]
   downloads: Record<string, DownloadState>
+  downloadInfo: Record<string, { downloadedAt: number | null; error?: string }>
   sync: SyncState
   sessionIntegrity: Record<string, SessionIntegrity>
   matches: Match[]
@@ -122,6 +123,7 @@ function seedState(): MockState {
     joinRequests: [],
     licensePayments,
     downloads: {},
+    downloadInfo: {},
     sessionIntegrity: {},
     matches: history.matches,
     matchSequences: history.matchSequences,

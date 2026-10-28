@@ -89,7 +89,7 @@ export type SessionFinalization = {
   stage: FinalizationStage
   failedStage?: FinalizationStage
 }
-export type SessionDoneBlocker = 'offline' | 'pending_changes' | 'games_in_play' | 'incomplete_records'
+export type SessionDoneBlocker = 'offline' | 'pending_changes' | 'games_in_play' | 'incomplete_records' | 'authorization'
 /** Q-HISTORY read model; an invalid session has no games, standings or counted players. */
 export type SessionRecordSummary = {
   sessionId: string

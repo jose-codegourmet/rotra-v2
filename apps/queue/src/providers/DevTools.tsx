@@ -27,6 +27,9 @@ export function DevTools() {
     <DevMenu
       controlLabels={{ nextSaveConflict: 'Sync conflict' }}
       extraToggles={[
+        ['downloadFails', 'Download fails', 'A failed update keeps the previous ready copy and its age.'],
+        ['authorizationExpired', 'Authorization expired', 'Shows the bounded access notice without deleting local records.'],
+        ['activeFinishAllowed', 'Active session can finish and sync', 'Mock authorization scenario only; no real authorization policy is implemented.'],
         ['syncFails', 'Sync fails (retryable)', 'Keeps local changes waiting until sync can retry.'],
         ['recordsMissing', 'Records missing from another device', 'Session done requires original-device recovery.'],
         ['originalDeviceLost', 'Original device lost', 'Shows the unrecoverable path without reconstructing scores.'],

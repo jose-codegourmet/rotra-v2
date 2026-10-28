@@ -29,9 +29,9 @@ function groups(changes: SyncSheetChange[]): SyncGroup[] {
 export function SyncStatusSheet({ open, onOpenChange, status, pendingChanges, syncedChanges, lastSyncedAt, attention, incomplete }: SyncStatusSheetProps) {
   const count = pendingChanges.length
   const description = incomplete ? "This device's sync status does not include records still held by another device."
-    : status === 'syncing' ? `Uploading ${count} changes from this device.`
-    : status === 'offline' ? count ? `${count} changes saved on this device, waiting for internet. They sync automatically when you reconnect.` : 'Nothing is waiting. New changes save on this device until you reconnect.'
-    : count ? `${count} changes saved on this device are waiting to sync.`
+    : status === 'syncing' ? `Uploading ${count} change${count === 1 ? '' : 's'} from this device.`
+    : status === 'offline' ? count ? `${count} change${count === 1 ? '' : 's'} saved on this device, waiting for internet. They sync automatically when you reconnect.` : 'Nothing is waiting. New changes save on this device until you reconnect.'
+    : count ? `${count} change${count === 1 ? ' is' : 's are'} saved on this device and waiting to sync.`
     : `Everything on this device synced.${lastSyncedAt === null ? '' : ` Last sync ${time(lastSyncedAt)}.`}`
   return <Sheet open={open} onOpenChange={onOpenChange} title="Sync status" footer={<Button onClick={() => onOpenChange(false)}>Close</Button>}>
     {attention}

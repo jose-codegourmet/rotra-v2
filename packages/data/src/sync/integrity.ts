@@ -14,13 +14,14 @@ export function applyRecoveryDevState(previous: MockDevState, next: MockDevState
   const changed = previous.recordsMissing !== next.recordsMissing || previous.secondDevice !== next.secondDevice || previous.originalDeviceLost !== next.originalDeviceLost || previous.originalDeviceReconnects !== next.originalDeviceReconnects
   if (!changed) return
   mockStore.update((state) => {
-    const integrity = state.sessionIntegrity[session.id] ?? { sessionId: session.id, state: 'complete', missingSummary: [], conflicts: [] }
+    const integrity: SessionIntegrity = state.sessionIntegrity[session.id] ?? { sessionId: session.id, state: 'complete', missingSummary: [], conflicts: [] }
     if ((next.recordsMissing && !previous.recordsMissing || next.secondDevice && !previous.secondDevice) && integrity.state === 'complete') {
       integrity.state = 'records_missing'
       integrity.missingSummary = structuredClone(missingRecordsFixture)
     }
     integrity.secondDevice = !!next.secondDevice
-    integrity.snapshotAt ??= Date.now()
+    if (next.secondDevice && !previous.secondDevice || integrity.snapshotAt === undefined)
+      integrity.snapshotAt = state.downloadInfo[session.id]?.downloadedAt ?? Date.now()
     if (next.originalDeviceLost && !previous.originalDeviceLost) integrity.state = 'unrecoverable'
     // Once a conflict exists, toggling a dev flag never resolves it or chooses a winner.
     if (next.originalDeviceReconnects && !previous.originalDeviceReconnects && (integrity.state === 'awaiting_original' || integrity.state === 'records_missing')) {

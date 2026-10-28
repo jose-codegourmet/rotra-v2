@@ -33,6 +33,7 @@ export type SessionDoneSheetProps = {
   /** Changes saved on this device and not synced yet */
   pendingChanges: number
   recordsIncomplete?: boolean
+  authorizationBlocked?: boolean
   /** Games still in play; any one of them blocks the review step */
   activeGames: SessionDoneActiveGame[]
   /** Waiting matches that were never played */
@@ -82,6 +83,7 @@ export function SessionDoneSheet({
   participants,
   pendingChanges,
   recordsIncomplete = false,
+  authorizationBlocked = false,
   activeGames,
   unplayedWaiting,
   belowMinimum,
@@ -96,8 +98,8 @@ export function SessionDoneSheet({
 }: SessionDoneSheetProps) {
   const inPlay = activeGames.length
   const below = belowMinimum.length
-  const blocked = inPlay > 0 || !online
-  const cannotConfirm = recordsIncomplete || pendingChanges > 0 || !online || isPending
+  const blocked = inPlay > 0 || !online || authorizationBlocked
+  const cannotConfirm = authorizationBlocked || recordsIncomplete || pendingChanges > 0 || !online || isPending
 
   const body =
     step === 'minimum' ? (
@@ -175,7 +177,7 @@ export function SessionDoneSheet({
     step === 'minimum' ? (
       <>
         <Button onClick={onBackToSession}>Back to session</Button>
-        <Button variant="primary" onClick={onContinueToFinish}>
+        <Button variant="primary" disabled={blocked || isPending} onClick={onContinueToFinish}>
           Continue to finish session
         </Button>
       </>
@@ -208,6 +210,7 @@ export function SessionDoneSheet({
       hideClose={isPending}
       footer={footer}
     >
+      {authorizationBlocked ? <Notice tone="warn">Access must be restored before this session can finish and sync. Your local records are kept.</Notice> : null}
       <div className={sessionDoneSheetVariants({ step })}>{body}</div>
     </Sheet>
   )

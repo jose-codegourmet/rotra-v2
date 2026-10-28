@@ -24,3 +24,6 @@ export const Ready: Story = { args: { state: 'ready' } }
 export const Offline: Story = { args: { offline: true } }
 export const PreviousCopyKept: Story = { args: { state: 'ready', snapshotAge: 'from 7:42 PM' } }
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
+
+export const FailedFirstDownload: Story = { args: { state: 'none', error: 'Download failed. Try again when connected.' } }
+export const FailedUpdateKeepsCopy: Story = { args: { state: 'ready', error: 'Download failed. Your previous copy is kept.', snapshotAge: 'copy from 7:42 PM' } }

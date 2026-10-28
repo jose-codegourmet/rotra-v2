@@ -10,6 +10,9 @@ export type MockDevState = {
   originalDeviceLost?: boolean
   originalDeviceReconnects?: boolean
   secondDevice?: boolean
+  downloadFails?: boolean
+  authorizationExpired?: boolean
+  activeFinishAllowed?: boolean
 }
 export const DEFAULT_DEV_STATE: MockDevState = {
   offline: false,
@@ -21,6 +24,9 @@ export const DEFAULT_DEV_STATE: MockDevState = {
   originalDeviceLost: false,
   originalDeviceReconnects: false,
   secondDevice: false,
+  downloadFails: false,
+  authorizationExpired: false,
+  activeFinishAllowed: true,
 }
 export type PlayerRankScenario =
   | 'on-leaderboard'

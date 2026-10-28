@@ -200,6 +200,8 @@
     "./result-slide-frame": "./src/components/result-slide-frame/ResultSlideFrame.tsx",
     "./results-header": "./src/components/results-header/ResultsHeader.tsx",
     "./standings-slide": "./src/components/standings-slide/StandingsSlide.tsx",
+    "./record-tab-header": "./src/components/record-tab-header/RecordTabHeader.tsx",
+    "./record-court-columns": "./src/components/record-court-columns/RecordCourtColumns.tsx",
     "./forms/join-request-form": "./src/forms/join-request-form/JoinRequestForm.tsx",
     "./forms/join-request-form/default-values": "./src/forms/join-request-form/JoinRequestForm.defaultValues.ts",
     "./forms/join-request-form/schema": "./src/forms/join-request-form/JoinRequestForm.schema.ts",

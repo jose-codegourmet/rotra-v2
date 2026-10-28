@@ -9,6 +9,6 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 export const Empty: Story = {}
-export const NameQuery: Story = { args: { value: 'Migs' } }
+export const NameQuery: Story = { args: { value: 'Jose' } }
 export const RtrId: Story = { args: { value: 'RTR-PH-CEB-031526-0001' } }
 export const InvalidId: Story = { args: { value: 'RTR-PH-XXX', error: 'Enter a full RTR ID.' } }

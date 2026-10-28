@@ -21,6 +21,6 @@ describe('PH mobile parsing', () => {
     expect(formatPhoneForDisplay('09175')).toBe('0917 5')
     expect(formatPhoneForDisplay('+639175550142')).toBe('+63 917 555 0142')
     expect(phoneField.parse(formatPhoneForDisplay('09175550142'))).toBe('+639175550142')
-    expect(formatPhoneForDisplay('migs@example.com')).toBe('migs@example.com')
+    expect(formatPhoneForDisplay('jose@example.com')).toBe('jose@example.com')
   })
 })

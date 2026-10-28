@@ -2,11 +2,11 @@ import { playerProfiles } from '@rotra/data/fixtures/player-profiles'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { PlayerAboutCard } from './PlayerAboutCard'
 
-const full = playerProfiles.find((p) => p.nickname === 'Migs')
+const full = playerProfiles.find((p) => p.fullName === 'Jose')
 const empty = playerProfiles.find(
   (p) => !p.playingStyle && !Object.values(p.socialLinks).some(Boolean),
 )
-const linksOnly = playerProfiles.find((p) => p.nickname === 'Jom')
+const linksOnly = playerProfiles.find((p) => p.fullName === 'Raymark')
 if (!full || !empty || !linksOnly) throw new Error('Missing public profile fixture')
 const meta = {
   title: 'Player/PlayerAboutCard',

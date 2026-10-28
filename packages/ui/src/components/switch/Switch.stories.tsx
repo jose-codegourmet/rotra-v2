@@ -5,7 +5,7 @@ import { Switch } from './Switch'
 const meta = {
   title: 'Shared/Fields/Switch',
   component: Switch,
-  args: { 'aria-label': 'Present: Miguel Santos' },
+  args: { 'aria-label': 'Present: Jose' },
 } satisfies Meta<typeof Switch>
 
 export default meta

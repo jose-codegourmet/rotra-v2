@@ -178,16 +178,16 @@ export function DevMenu({
                       disabled={!playerAccount || playerAccount.pending}
                       onClick={playerAccount?.onSignIn}
                     >
-                      Sign in as Migs
+                      Sign in as Jose
                     </Button>
                   </>
                 )}
               </div>
             </section>
             <section className={SECTION}>
-              <h3 className={LABEL}>Migs's rank</h3>
+              <h3 className={LABEL}>Jose's rank</h3>
               <SegmentedControl
-                aria-label="Migs's rank"
+                aria-label="Jose's rank"
                 className="max-w-full [&>button]:px-[13px]"
                 value={playerScenarios.rank}
                 options={playerScenarios.rankOptions}
@@ -236,7 +236,7 @@ export function DevMenu({
               )}
             </section>
             <section className={SECTION}>
-              <h3 className={LABEL}>Open a registration link (Jomar)</h3>
+              <h3 className={LABEL}>Open a registration link (Raymark)</h3>
               <div className="flex flex-wrap items-center gap-2">
                 <Button
                   size="xs"
@@ -261,7 +261,7 @@ export function DevMenu({
                 </Button>
               </div>
               <p className="text-xs text-fg2">
-                Once Jomar registers, the unused link shows as already used.
+                Once Raymark registers, the unused link shows as already used.
               </p>
               {!playerLinkPreviews?.onRegistration ? (
                 <p className="text-xs text-fg2">

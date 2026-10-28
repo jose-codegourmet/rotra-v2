@@ -3,15 +3,15 @@ import { Chip } from '@rotra/ui/chip'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { AccountPanel } from './AccountPanel'
 
-const migs = playerAccounts.find((account) => account.email === 'migs.santos@example.com')
-if (!migs) throw new Error('Missing private account fixture')
+const jose = playerAccounts.find((account) => account.email === 'jose@example.com')
+if (!jose) throw new Error('Missing private account fixture')
 const meta = {
   title: 'Player/AccountPanel',
   component: AccountPanel,
   args: {
-    phone: migs.phone,
-    email: migs.email,
-    phoneHidden: migs.phoneHidden,
+    phone: jose.phone,
+    email: jose.email,
+    phoneHidden: jose.phoneHidden,
     onOpenPrivacy: () => {},
     onSignOut: () => {},
   },

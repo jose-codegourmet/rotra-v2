@@ -33,7 +33,7 @@ export async function signIn(audience: AuthAudience, input: SignInInput): Promis
     throw new MockError('permission', 'Enter your sign-in details.')
   if (typeof document === 'undefined')
     throw new MockError('permission', 'Mock sign-in needs a browser.')
-  let player = players.find((entry) => entry.nickname === 'Migs')
+  let player = players.find((entry) => entry.fullName === 'Jose')
   // The developer-menu shortcut remains separate from the real form's phone/email inputs.
   if (audience === 'player' && input.identifier !== 'demo') {
     const identifier = input.identifier.trim().toLowerCase()

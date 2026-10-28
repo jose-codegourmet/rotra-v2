@@ -18,7 +18,7 @@ export type MatchResultFixture = {
   minimumGames: number
   teamA: MatchLineupPlayerFixture[]
   teamB: MatchLineupPlayerFixture[]
-  /** Short names in lineup order, for "Team A: Kat and Jo" */
+  /** Short names in lineup order, for "Team A: Mikee and Dexter" */
   teamANames: string[]
   teamBNames: string[]
 }

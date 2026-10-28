@@ -16,7 +16,7 @@ export type AvatarProps = AvatarVariants & {
   className?: string
 }
 
-/** First letters of the first two words, as the prototypes draw them ("Miguel Santos" → "MS"). */
+/** First letters of the first two words, as the prototypes draw them ("Mikee Abellana" → "MA"). */
 function initialsOf(name: string) {
   return name
     .split(/\s+/)

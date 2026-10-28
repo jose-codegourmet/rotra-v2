@@ -1,31 +1,29 @@
 import { countRecentStandardMatches } from '../player/player.rules'
 import { PLAYING_LEVELS, type PlayerRank, type PlayerSessionRecord } from '../player/player.types'
 import { leaderboardEntries } from './leaderboardPlayers'
-import { genSessions, MIGS_SESSIONS, PLAYER_FIXTURE_NOW } from './playerGames'
-import { players } from './players'
+import { genSessions, JOSE_SESSIONS, PLAYER_FIXTURE_NOW } from './playerGames'
+import { JOSE_PLAYER_ID, players } from './players'
 
-export const MIGS_PLAYER_ID = '2c7f6a7b-eed9-5051-9426-6dbce5133fbc'
 function hash(value: string) {
   let result = 2166136261
   for (const character of value) result = Math.imul(result ^ character.charCodeAt(0), 16777619)
   return result >>> 0
 }
-/** Prototype BASE recent counts use the original lb index, before inserting Migs at #128. */
+/** Ranks and match histories for every player; leaderboard players get seeded histories by position. */
 export function createPlayerRankFixtures() {
   const games: Record<string, PlayerSessionRecord[]> = {}
   const ranks: Record<string, PlayerRank> = {}
   const entries = new Map(leaderboardEntries.map((entry, index) => [entry.id, { entry, index }]))
   for (const player of players) {
     const item = entries.get(player.id)
-    const baseIndex = item ? item.index - (item.index > 127 ? 1 : 0) : 0
+    const baseIndex = item?.index ?? 0
     const count = item ? 10 + ((hash(`lb${baseIndex}`) >>> 4) % 16) : 7
-    // Keep the prototype's bN/u2 seeds so generated opponents, scores and session dates match.
     const historySeed = item
       ? `b${baseIndex}`
       : player.rtrId === 'RTR-PH-CEB-040226-0007'
         ? 'u2'
         : player.id
-    const sessions = player.id === MIGS_PLAYER_ID ? MIGS_SESSIONS : genSessions(historySeed, count)
+    const sessions = player.id === JOSE_PLAYER_ID ? JOSE_SESSIONS : genSessions(historySeed, count)
     games[player.id] = sessions
     ranks[player.id] = {
       playerId: player.id,

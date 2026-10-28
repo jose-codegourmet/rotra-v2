@@ -27,7 +27,7 @@ function game(
   }
 }
 // These historical sessions have no corresponding Queue fixture. Preserve their games with no link.
-export const MIGS_SESSIONS: PlayerSessionRecord[] = [
+export const JOSE_SESSIONS: PlayerSessionRecord[] = [
   {
     id: 'm1',
     title: 'Sunday Night Queue',
@@ -35,17 +35,10 @@ export const MIGS_SESSIONS: PlayerSessionRecord[] = [
     finishedAt: daysAgo(1),
     sessionPageUrl: null,
     games: [
-      game('doubles', ['Bea Castillo'], ['Enzo Navarro', 'Kat Lim'], 'won', '21–18'),
-      game('doubles', ['Rafa Aquino'], ['Paulo Garcia', 'Dani Rivera'], 'lost', null),
-      game('singles', [], ['Carlo Medina'], 'won', '21–15'),
-      game(
-        'fun_3v3',
-        ['Jomar dela Cruz', 'Nina Ocampo'],
-        ['Theo Ramos', 'Iya Mercado', 'Gab Torres'],
-        'won',
-        '21–12',
-        'fun',
-      ),
+      game('doubles', ['Aaron'], ['Gab', 'Mikee Abellana'], 'won', '21–18'),
+      game('doubles', ['Dalton'], ['Karl', 'Jasper'], 'lost', null),
+      game('singles', [], ['Albion'], 'won', '21–15'),
+      game('fun_3v3', ['Raymark', 'Vince'], ['Emji', 'Derrick', 'Andrew'], 'won', '21–12', 'fun'),
     ],
   },
   {
@@ -55,9 +48,9 @@ export const MIGS_SESSIONS: PlayerSessionRecord[] = [
     finishedAt: daysAgo(4),
     sessionPageUrl: null,
     games: [
-      game('doubles', ['Paulo Garcia'], ['Marco Lopez', 'Bea Castillo'], 'won', '21–19'),
-      game('doubles', ['Kat Lim'], ['Enzo Navarro', 'Rafa Aquino'], 'lost', '17–21'),
-      game('doubles', ['Dani Rivera'], ['Jomar dela Cruz', 'Iya Mercado'], 'won', null),
+      game('doubles', ['Karl'], ['Santino', 'Aaron'], 'won', '21–19'),
+      game('doubles', ['Mikee Abellana'], ['Gab', 'Dalton'], 'lost', '17–21'),
+      game('doubles', ['Jasper'], ['Raymark', 'Derrick'], 'won', null),
     ],
   },
   {
@@ -67,18 +60,18 @@ export const MIGS_SESSIONS: PlayerSessionRecord[] = [
     finishedAt: daysAgo(18),
     sessionPageUrl: null,
     games: [
-      game('doubles', ['Lara Uy'], ['Karl Sison', 'Janelle Go'], 'won', '21–16'),
-      game('singles', [], ['Vince Tolentino'], 'lost', '19–21'),
+      game('doubles', ['Neil'], ['Klent', 'Tricia'], 'won', '21–16'),
+      game('singles', [], ['Chase'], 'lost', '19–21'),
       game(
         'doubles',
-        ['Iya Mercado'],
-        ['Mark Reyes', 'Pia Tan'],
+        ['Derrick'],
+        ['Mark', 'Lalai'],
         'lost',
         null,
         'partial',
-        'Came in mid-game for Ramon Yap',
+        'Came in mid-game for Troy',
       ),
-      game('doubles', ['Ramon Yap'], ['Grace Lacson', 'Ian Co'], 'won', '21–14'),
+      game('doubles', ['Troy'], ['Dian Tan', 'Ezzy'], 'won', '21–14'),
     ],
   },
   {
@@ -88,9 +81,9 @@ export const MIGS_SESSIONS: PlayerSessionRecord[] = [
     finishedAt: daysAgo(29),
     sessionPageUrl: null,
     games: [
-      game('doubles', ['Bea Castillo'], ['Theo Ramos', 'Marco Lopez'], 'lost', '15–21'),
-      game('doubles', ['Enzo Navarro'], ['Kat Lim', 'Carlo Medina'], 'won', '21–17'),
-      game('singles', [], ['Rafa Aquino'], 'won', null),
+      game('doubles', ['Aaron'], ['Emji', 'Santino'], 'lost', '15–21'),
+      game('doubles', ['Gab'], ['Mikee Abellana', 'Albion'], 'won', '21–17'),
+      game('singles', [], ['Dalton'], 'won', null),
     ],
   },
   {
@@ -100,101 +93,65 @@ export const MIGS_SESSIONS: PlayerSessionRecord[] = [
     finishedAt: daysAgo(46),
     sessionPageUrl: null,
     games: [
-      game('doubles', ['Nina Ocampo'], ['Paulo Garcia', 'Dani Rivera'], 'won', '21–11'),
-      game('doubles', ['Kat Lim'], ['Bea Castillo', 'Rafa Aquino'], 'lost', '20–22'),
+      game('doubles', ['Vince'], ['Karl', 'Jasper'], 'won', '21–11'),
+      game('doubles', ['Mikee Abellana'], ['Aaron', 'Dalton'], 'lost', '20–22'),
     ],
   },
 ]
 
-const FIRST = [
-  'Andrea',
-  'Bryan',
-  'Carla',
-  'Dennis',
-  'Elaine',
-  'Francis',
-  'Grace',
-  'Hannah',
-  'Ian',
-  'Janelle',
-  'Karl',
-  'Lara',
+/** The demo player pool, for generated partners and opponents. */
+const NAMES = [
+  'Gretchen',
+  'Jess',
+  'Natnat',
+  'Camill',
+  'Ley',
+  'Dhin',
+  'Joeriz',
+  'Trixie',
+  'Sam',
+  'Robert',
+  'Maria Steph',
+  'Andrew',
+  'Jay',
+  'Iovanni',
+  'Troy',
+  'Klod',
+  'Derrick',
+  'Neil',
+  'Jose',
   'Mark',
-  'Nicole',
-  'Oscar',
-  'Patricia',
-  'Ramon',
-  'Sofia',
-  'Tristan',
+  'Tracy',
+  'Tirby',
+  'Lalai',
+  'Mikee Abellana',
+  'Dexter',
+  'Dalton',
+  'Albion',
   'Vince',
-  'Wendy',
-  'Xavier',
-  'Yvonne',
-  'Zach',
-  'Aira',
-  'Benjie',
-  'Cris',
-  'Dianne',
-  'Earl',
-  'Faith',
-  'Gelo',
-  'Hazel',
-  'Iñigo',
-  'Joy',
-  'Kevin',
-  'Liza',
-  'Marvin',
-  'Nash',
-  'Pia',
-  'Renz',
-  'Shaira',
-  'Toni',
-  'Ella',
-  'Jerome',
-  'Mika',
-  'Rico',
-]
-const LAST = [
-  'Abad',
-  'Bautista',
-  'Cabrera',
-  'Dizon',
-  'Espiritu',
-  'Flores',
-  'Gonzaga',
-  'Hernandez',
-  'Ignacio',
-  'Jimenez',
-  'Katigbak',
-  'Lacson',
-  'Macaraeg',
-  'Natividad',
-  'Ong',
-  'Pacquing',
-  'Quijano',
-  'Rosales',
-  'Sison',
-  'Tolentino',
-  'Uy',
-  'Valdez',
-  'Yap',
-  'Zamora',
-  'Alcantara',
-  'Baluyot',
-  'Co',
-  'Dimaculangan',
-  'Evangelista',
-  'Fajardo',
-  'Go',
-  'Ilagan',
-  'Laurel',
-  'Manalo',
-  'Ocampo',
-  'Pineda',
-  'Reyes',
-  'Sy',
-  'Tan',
-  'Villanueva',
+  'Jasper',
+  'Santino',
+  'Aaron',
+  'Raymark',
+  'Gab',
+  'CJ',
+  'Emman',
+  'Nathan',
+  'Karl',
+  'Russel',
+  'Rhyco',
+  'Emji',
+  'Anton',
+  'Edrian',
+  'Ezzy',
+  'Klent',
+  'Chase',
+  'David',
+  'Shadow',
+  'Dexter Opalla',
+  'Dian Tan',
+  'Tricia',
+  'PJ Perez',
 ]
 const CLUBS = [
   ['Lahug Smash Club', ['Sunday Night Queue', 'Thursday Open Play']],
@@ -214,8 +171,7 @@ function hashStr(value: string): number {
 /** Deterministic port of the prototype's genSessions; no numeric rating is calculated. */
 export function genSessions(seed: string, counted: number): PlayerSessionRecord[] {
   const h0 = hashStr(seed)
-  const pick = (key: string) =>
-    `${FIRST[hashStr(seed + key) % FIRST.length]} ${LAST[(hashStr(seed + key) >>> 8) % LAST.length]}`
+  const pick = (key: string) => required(NAMES[hashStr(seed + key) % NAMES.length])
   const out: PlayerSessionRecord[] = []
   let left = counted,
     n = 0,
@@ -267,9 +223,9 @@ export function genSessions(seed: string, counted: number): PlayerSessionRecord[
   return out
 }
 
-export function migsSession(index: number): PlayerSessionRecord {
-  return required(MIGS_SESSIONS[index])
+export function joseSession(index: number): PlayerSessionRecord {
+  return required(JOSE_SESSIONS[index])
 }
-export function migsGame(session: number, index: number): PlayerGame {
-  return required(migsSession(session).games[index])
+export function joseGame(session: number, index: number): PlayerGame {
+  return required(joseSession(session).games[index])
 }

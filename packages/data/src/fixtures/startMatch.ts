@@ -89,7 +89,7 @@ export function createStartMatchFixtures(now = Date.now()) {
     }
   }
 
-  // #3 can start on Court 2 or Court 3; #2 waits on Migs, who is playing on Court 1.
+  // #3 can start on Court 2 or Court 3; #2 waits on Jose, who is playing on Court 1.
   const doublesReady = start(waiting(3)),
     blocked = start(waiting(2)),
     funOneVTwo = start({

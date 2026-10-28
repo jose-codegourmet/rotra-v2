@@ -10,7 +10,7 @@ import { SwappablePlayer } from '@rotra/ui/swap-sides-area/swappable-player'
 export type TeamLineupPlayer = {
   id: string
   name: string
-  /** Nickname or first name, for "Kat and Jo switched sides" and the Why this lineup card */
+  /** Nickname or first name, for "Mikee and Dexter switched sides" and the Why this lineup card */
   shortName: string
   level: PlayingLevel | null
   photoUrl?: string

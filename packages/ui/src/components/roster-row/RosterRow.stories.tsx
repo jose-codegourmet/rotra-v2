@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { fn } from 'storybook/test'
 import { RosterRow, type RosterRowProps } from './RosterRow'
 
-// The tonight fixture: 14 players, Joanna (index 5) missing a level, the first 10 present.
+// The tonight fixture: 14 players, Dexter (index 5) missing a level, the first 10 present.
 const rowAt = (i: number): RosterRowProps => {
   const r = queueSessionFixtures.roster[i]
   const p = clubPlayers.find((x) => x.id === r?.clubPlayerId)

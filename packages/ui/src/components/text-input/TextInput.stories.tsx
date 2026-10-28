@@ -19,9 +19,9 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
-export const Filled: Story = { args: { defaultValue: 'Miguel Santos' } }
+export const Filled: Story = { args: { defaultValue: 'Jose' } }
 export const Invalid: Story = { args: { invalid: true, defaultValue: '09' } }
-export const Disabled: Story = { args: { disabled: true, defaultValue: 'Miguel Santos' } }
+export const Disabled: Story = { args: { disabled: true, defaultValue: 'Jose' } }
 
 export const InField: Story = {
   render: () => (
@@ -34,7 +34,7 @@ export const InField: Story = {
 export const LongValue: Story = {
   args: {
     defaultValue:
-      'RTR-PH-CEB-031526-0001 · Miguel Santos (Migs), a long value that must not push the layout sideways',
+      'RTR-PH-CEB-031526-0001 · Jose, a long value that must not push the layout sideways',
   },
   globals: { viewport: { value: 'phone' } },
 }

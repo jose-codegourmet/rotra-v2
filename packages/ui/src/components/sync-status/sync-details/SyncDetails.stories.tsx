@@ -10,7 +10,7 @@ const SYNCED = [
       { id: 'c2', text: 'Match 1 result confirmed', at: '7:31 PM' },
     ],
   },
-  { area: 'Roster', changes: [{ id: 'c3', text: 'Kat Lim marked present', at: '7:05 PM' }] },
+  { area: 'Roster', changes: [{ id: 'c3', text: 'Mikee Abellana marked present', at: '7:05 PM' }] },
 ]
 
 const meta = {

@@ -5,15 +5,15 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn, within } from 'storybook/test'
 import { EditProfileForm } from './EditProfileForm'
 
-const migs = playerProfiles.find((p) => p.nickname === 'Migs')
-const account = playerAccounts.find((a) => a.playerId === migs?.playerId)
-if (!migs || !account) throw new Error('Missing Migs profile fixture')
+const jose = playerProfiles.find((p) => p.fullName === 'Jose')
+const account = playerAccounts.find((a) => a.playerId === jose?.playerId)
+if (!jose || !account) throw new Error('Missing Jose profile fixture')
 const meta = {
   title: 'Player/EditProfileForm',
   component: EditProfileForm,
   args: {
-    defaultValues: personalDetailsFromProfile(migs),
-    account: { phone: account.phone, email: account.email, playerId: migs.rtrId },
+    defaultValues: personalDetailsFromProfile(jose),
+    account: { phone: account.phone, email: account.email, playerId: jose.rtrId },
     onSubmit: fn(),
     onCancel: fn(),
     onRequestContactChange: fn(),
@@ -38,7 +38,7 @@ export const DirtyDots: Story = {
     const canvas = within(canvasElement)
     await userEvent.type(await canvas.findByLabelText(/Nickname/), 's')
     await userEvent.click(canvas.getByRole('tab', { name: /Links/ }))
-    await userEvent.type(await canvas.findByLabelText('YouTube'), 'https://youtube.com/@migs')
+    await userEvent.type(await canvas.findByLabelText('YouTube'), 'https://youtube.com/@jose')
   },
 }
 /** Errors in Name and Links: the summary lists both and submit jumps to Name's first field */

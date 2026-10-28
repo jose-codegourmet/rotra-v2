@@ -3,16 +3,16 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import { ContactChangeRequestForm } from './ContactChangeRequestForm'
 
-const migs = playerAccounts.find((account) => account.email === 'migs.santos@example.com')
-if (!migs) throw new Error('Missing private account fixture')
+const jose = playerAccounts.find((account) => account.email === 'jose@example.com')
+if (!jose) throw new Error('Missing private account fixture')
 const meta = {
   title: 'Player/ContactChangeRequestForm',
   component: ContactChangeRequestForm,
   args: {
     open: true,
     onOpenChange: fn(),
-    currentPhone: migs.phone,
-    currentEmail: migs.email,
+    currentPhone: jose.phone,
+    currentEmail: jose.email,
     onSubmit: fn(),
   },
 } satisfies Meta<typeof ContactChangeRequestForm>
@@ -30,11 +30,11 @@ export const ServerConflict: Story = {
 }
 export const OfflineError: Story = {
   args: {
-    defaultValues: { field: 'email', toValue: 'migs.new@example.com' },
+    defaultValues: { field: 'email', toValue: 'jose.new@example.com' },
     serverError: "Couldn't send because you're offline. Try again when you're connected.",
   },
 }
 export const Pending: Story = {
-  args: { defaultValues: { field: 'email', toValue: 'migs.new@example.com' }, isPending: true },
+  args: { defaultValues: { field: 'email', toValue: 'jose.new@example.com' }, isPending: true },
 }
 export const OnPhone: Story = { globals: { viewport: { value: 'phone' } } }

@@ -65,7 +65,7 @@ export function createResultSlideFixtures(now = Date.now()) {
         name: i === 1 ? 'Maria Antonia Villanueva-Dela Cruz Bautista' : r.name,
       })),
       mvp: { name: 'Maria Antonia Villanueva-Dela Cruz Bautista' },
-      mostImproved: { name: 'Juan Miguel Reyes-Santos Magbanua Jr.', priorSessions: 12 },
+      mostImproved: { name: 'Juan Jose Reyes-Santos Magbanua Jr.', priorSessions: 12 },
       offDay: [{ name: 'Maria Antonia Villanueva-Dela Cruz Bautista', priorSessions: 11 }],
       frame: {
         ...frame,

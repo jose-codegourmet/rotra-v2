@@ -7,26 +7,26 @@ import { clubPlayers } from './players'
  * rate they give. A null baseline means Most Improved and Off Day never consider that player.
  */
 const PROTOTYPE_PRIOR_AND_BASE: readonly [prior: number, base: number | null][] = [
-  [6, 0.62], // p1 Miguel Santos
-  [7, 0.55], // p2 Bea Castillo
-  [5, 0.48], // p3 Jomar dela Cruz
-  [8, 0.51], // p4 Kat Lim
-  [6, 0.66], // p5 Enzo Navarro
-  [2, null], // p6 Joanna Tan
-  [5, 0.58], // p7 Rafa Aquino
-  [1, null], // p8 Lia Bautista (guest)
-  [6, 0.33], // p9 Carlo Medina
-  [5, 0.45], // p10 Nina Ocampo
-  [9, 0.6], // p11 Paulo Garcia
-  [3, null], // p12 Sam Villareal (guest)
-  [5, 0.5], // p13 Dani Rivera
-  [4, null], // p14 Theo Ramos
-  [0, null], // p15 Ysa Fernandez (guest)
-  [6, 0.72], // p16 Marco Lopez
-  [1, null], // p17 Gab Torres
-  [5, 0.4], // p18 Iya Mercado
-  [6, 0.5], // p19 Kiko Salazar (guest)
-  [0, null], // p20 Andi Cruz
+  [6, 0.62], // p1 Jose
+  [7, 0.55], // p2 Aaron
+  [5, 0.48], // p3 Raymark
+  [8, 0.51], // p4 Mikee Abellana
+  [6, 0.66], // p5 Gab
+  [2, null], // p6 Dexter
+  [5, 0.58], // p7 Dalton
+  [1, null], // p8 Joeriz (guest)
+  [6, 0.33], // p9 Albion
+  [5, 0.45], // p10 Vince
+  [9, 0.6], // p11 Karl
+  [3, null], // p12 Klod (guest)
+  [5, 0.5], // p13 Jasper
+  [4, null], // p14 Emji
+  [0, null], // p15 Russel (guest)
+  [6, 0.72], // p16 Santino
+  [1, null], // p17 Andrew
+  [5, 0.4], // p18 Derrick
+  [6, 0.5], // p19 Nathan (guest)
+  [0, null], // p20 Trixie
 ]
 
 export const playerAwardHistory: PlayerAwardHistory[] = PROTOTYPE_PRIOR_AND_BASE.map(

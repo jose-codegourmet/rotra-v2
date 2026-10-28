@@ -5,9 +5,9 @@ import { useState } from 'react'
 import { fn } from 'storybook/test'
 import { LevelSelect } from './LevelSelect'
 
-const migs = clubPlayers[0]
-if (!migs) throw new Error('Player fixture missing')
-const label = `Level for ${migs.nickname} at this club`
+const jose = clubPlayers[0]
+if (!jose) throw new Error('Player fixture missing')
+const label = `Level for ${jose.fullName} at this club`
 
 function Demo({
   initial = null,
@@ -38,6 +38,6 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Empty: Story = { render: () => <Demo /> }
-export const Chosen: Story = { render: () => <Demo initial={migs.playingLevel} /> }
+export const Chosen: Story = { render: () => <Demo initial={jose.playingLevel} /> }
 export const Missing: Story = { render: () => <Demo missing /> }
-export const Locked: Story = { render: () => <Demo initial={migs.playingLevel} disabled /> }
+export const Locked: Story = { render: () => <Demo initial={jose.playingLevel} disabled /> }

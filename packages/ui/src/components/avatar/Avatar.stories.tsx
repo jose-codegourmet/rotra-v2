@@ -6,7 +6,7 @@ const SIZES = [24, 28, 36, 40, 44, 52, 64, 88] as const
 const meta = {
   title: 'Shared/Avatar',
   component: Avatar,
-  args: { name: 'Miguel Santos' },
+  args: { name: 'Jose' },
 } satisfies Meta<typeof Avatar>
 
 export default meta
@@ -18,7 +18,7 @@ export const Sizes: Story = {
   render: () => (
     <div className="flex flex-wrap items-end gap-3">
       {SIZES.map((size) => (
-        <Avatar key={size} name="Bea Castillo" size={size} />
+        <Avatar key={size} name="Aaron" size={size} />
       ))}
     </div>
   ),
@@ -34,17 +34,17 @@ export const ClubTile: Story = {
 }
 
 export const Clickable: Story = {
-  args: { name: 'Jomar dela Cruz', size: 40, onClick: () => {} },
+  args: { name: 'Raymark', size: 40, onClick: () => {} },
 }
 
 export const WithPicture: Story = {
   args: {
-    name: 'Kat Lim',
+    name: 'Mikee Abellana',
     size: 52,
     src: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64"/></svg>',
   },
 }
 
 export const LongName: Story = {
-  args: { name: 'Jomar dela Cruz Bautista Villareal' },
+  args: { name: 'Raymark Bautista Villareal' },
 }

@@ -69,8 +69,8 @@ export const WithEyebrow: Story = {
         type="single"
         aria-label="Winner"
         choices={[
-          { value: 'A', eyebrow: 'Team A', title: 'Miguel Santos and Bea Castillo' },
-          { value: 'B', eyebrow: 'Team B', title: 'Jomar dela Cruz and Kat Lim' },
+          { value: 'A', eyebrow: 'Team A', title: 'Jose and Aaron' },
+          { value: 'B', eyebrow: 'Team B', title: 'Raymark and Mikee Abellana' },
         ]}
         value={value}
         onChange={setValue}

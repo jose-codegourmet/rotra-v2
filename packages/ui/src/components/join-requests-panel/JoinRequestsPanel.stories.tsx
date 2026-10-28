@@ -24,13 +24,13 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-/** The prototype's four sample guests: Rico Santos, Mae Lagman, JP Uy, Tessa Ramos. */
+/** The prototype's four sample guests: Tracy, Gretchen, PJ Perez, Jess. */
 export const FourGuests: Story = {}
 export const SlotsFull: Story = { args: { slotsFull: true } }
-/** Tessa said "Not sure", so her level is empty; Confirm guest shows the error. */
+/** Jess said "Not sure", so the level is empty; Confirm guest shows the error. */
 export const LevelError: Story = {
   play: async ({ canvas, userEvent }) => {
-    await userEvent.click(canvas.getByRole('button', { name: 'Confirm guest Tessa Ramos' }))
+    await userEvent.click(canvas.getByRole('button', { name: 'Confirm guest Jess' }))
   },
 }
 export const EmptyWithHistory: Story = { args: { requests: history } }

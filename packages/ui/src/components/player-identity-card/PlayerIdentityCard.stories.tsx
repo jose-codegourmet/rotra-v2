@@ -2,8 +2,8 @@ import { playerProfileScenarios, playerProfiles } from '@rotra/data/fixtures/pla
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { PlayerIdentityCard } from './PlayerIdentityCard'
 
-const profile = playerProfiles.find((p) => p.nickname === 'Migs')
-const initials = playerProfiles.find((p) => p.nickname === 'Jom')
+const profile = playerProfiles.find((p) => p.fullName === 'Jose')
+const initials = playerProfiles.find((p) => p.fullName === 'Raymark')
 if (!profile || !initials) throw new Error('Missing public profile fixture')
 const meta = {
   title: 'Player/PlayerIdentityCard',

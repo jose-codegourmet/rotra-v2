@@ -93,7 +93,7 @@ export type AddPlayerSheetProps = {
    * failures leave it false so the typed level stays.
    */
   serverErrorReturnsToList?: boolean
-  /** Status line after an add, e.g. "Marco Lopez added · Intermediate Mid" */
+  /** Status line after an add, e.g. "Santino added · Intermediate Mid" */
   lastAdded?: string | null
   /** Adds so far while this sheet has been open; a change clears the tab and refocuses it */
   addedCount?: number

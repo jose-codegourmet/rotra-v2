@@ -10,9 +10,9 @@ export type ChooseMatchRow = {
   matchId: string
   /** Queue position P, shown as "#P" */
   position: number
-  /** Team A by short names, e.g. "Kat, Jo" */
+  /** Team A by short names, e.g. "Mikee, Dexter" */
   teamA: string
-  /** Team B by short names, e.g. "Migs, Bea" */
+  /** Team B by short names, e.g. "Jose, Aaron" */
   teamB: string
   /** "Doubles", "1v2 fun" */
   formatLabel: string

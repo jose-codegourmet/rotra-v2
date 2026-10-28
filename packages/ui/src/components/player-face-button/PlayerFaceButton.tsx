@@ -11,7 +11,7 @@ export type PlayerFaceButtonProps = {
   shortName: string
   level: PlayingLevel | null
   photoUrl?: string
-  /** Accessible name, e.g. "Kat Reyes, Team A. View profile" */
+  /** Accessible name, e.g. "Mikee Abellana, Team A. View profile" */
   label: string
   /**
    * Picture size. Courts shrink with the team size (34 → 28 → 24, the prototype's .pf / .side.nN);

@@ -63,7 +63,7 @@ export function SignInForm({
           <Field
             label="Phone number or email"
             error={errors.identifier?.message}
-            hint="Phone numbers are spaced out as you type. Prototype: try 09175550142 or migs.santos@example.com"
+            hint="Phone numbers are spaced out as you type. Prototype: try 09175550142 or jose@example.com"
           >
             <Controller
               control={form.control}

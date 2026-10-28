@@ -12,8 +12,8 @@ const STATUSES: ContactChangeStatus[] = [
 ]
 const request = {
   field: 'email' as const,
-  fromValue: 'migs.santos@example.com',
-  toValue: 'migs.new@example.com',
+  fromValue: 'jose@example.com',
+  toValue: 'jose.new@example.com',
   status: 'pending' as ContactChangeStatus,
   requestedAt: new Date(2026, 9, 27, 18, 5).getTime(),
 }

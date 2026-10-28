@@ -4,7 +4,7 @@ export const pendingSyncChanges = [
   {
     id: 'sync-presence',
     area: 'Roster',
-    text: 'Miguel Santos marked present',
+    text: 'Jose marked present',
     at: Date.UTC(2026, 9, 28, 11, 30),
   },
   {
@@ -16,7 +16,7 @@ export const pendingSyncChanges = [
   {
     id: 'sync-payment',
     area: 'Payments',
-    text: 'Bea Castillo paid ₱900',
+    text: 'Aaron paid ₱900',
     at: Date.UTC(2026, 9, 28, 11, 44),
   },
 ]

@@ -5,7 +5,7 @@ export const switchMeta = {
   description:
     'An on/off switch, used for player presence (Present), session formats and settings that apply at once.',
   usage: [
-    'Always pass aria-label naming what it controls, e.g. "Present: Miguel Santos".',
+    'Always pass aria-label naming what it controls, e.g. "Present: Jose".',
     'With React Hook Form pass checked={field.value} and onChange={field.onChange}.',
     'Touch screens get the 54 × 32 px Present size automatically.',
   ],

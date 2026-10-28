@@ -1,3 +1,8 @@
+import { inventoryItems } from '../fixtures/inventory'
+import { createFinancialFixtures } from '../fixtures/financials'
+import type { InventoryItem } from '../inventory/inventory.types'
+import type { SessionCostEstimate } from '../session-cost/sessionCost.types'
+import type { SessionPaymentMark } from '../session-payment/sessionPayment.types'
 import type { Club } from '../club/club.types'
 import type { ClubPlayer } from '../club-player/clubPlayer.types'
 import type { ClubVenue } from '../club-venue/clubVenue.types'
@@ -34,8 +39,11 @@ import type {
   SessionPlayer,
   SessionWaitlistEntry,
 } from '../session-roster/sessionRoster.types'
-import type { SaveOutcome, SyncState } from '../sync/sync.types'
+import type { SaveOutcome, SyncState, SessionIntegrity } from '../sync/sync.types'
 export type MockState = {
+  inventory: InventoryItem[]
+  costEstimates: Record<string, SessionCostEstimate>
+  paymentMarks: SessionPaymentMark[]
   playerAccounts: typeof playerAccounts
   resetLinks: Record<string, 'valid' | 'used'>
   playerProfiles: PlayerProfile[]
@@ -53,7 +61,9 @@ export type MockState = {
   joinRequests: SessionJoinRequest[]
   licensePayments: ClubLicenseTerm[]
   downloads: Record<string, DownloadState>
+  downloadInfo: Record<string, { downloadedAt: number | null; error?: string }>
   sync: SyncState
+  sessionIntegrity: Record<string, SessionIntegrity>
   matches: Match[]
   matchSequences: Record<string, number>
   finalizations: Record<string, SessionFinalization>
@@ -96,6 +106,8 @@ function seedState(): MockState {
   )
   return structuredClone({
     ...createPlayerRankFixtures(),
+    ...createFinancialFixtures([...roster, ...history.roster], now),
+    inventory: inventoryItems,
     playerProfiles,
     playerAccounts,
     resetLinks: { 'reset-valid': 'valid' },
@@ -111,6 +123,8 @@ function seedState(): MockState {
     joinRequests: [],
     licensePayments,
     downloads: {},
+    downloadInfo: {},
+    sessionIntegrity: {},
     matches: history.matches,
     matchSequences: history.matchSequences,
     finalizations: history.finalizations,

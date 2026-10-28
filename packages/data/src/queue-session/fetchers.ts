@@ -55,6 +55,8 @@ export async function getQueueSession(id: string) {
     ...sessionSummary(state, session),
     courts: state.courts.filter((c) => c.sessionId === id && !c.removedAt),
     downloadState: state.downloads[id] ?? 'none',
+    downloadedAt: state.downloadInfo[id]?.downloadedAt ?? null,
+    downloadError: state.downloadInfo[id]?.error,
   }
 }
 /** Q-SESSION-DONE: derived from roster, matches and the pending count behind the SyncStatus pill. */

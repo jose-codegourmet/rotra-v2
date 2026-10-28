@@ -239,7 +239,13 @@
     "./conflict-review-list": "./src/components/conflict-review-list/ConflictReviewList.tsx",
     "./conflict-review-list/conflict-item-card": "./src/components/conflict-review-list/conflict-item-card/ConflictItemCard.tsx",
     "./device-continue-notice": "./src/components/device-continue-notice/DeviceContinueNotice.tsx",
-    "./session-recovery-screen": "./src/components/session-recovery-screen/SessionRecoveryScreen.tsx"
+    "./session-recovery-screen": "./src/components/session-recovery-screen/SessionRecoveryScreen.tsx",
+    "./account-panel": "./src/components/account-panel/AccountPanel.tsx",
+    "./personal-details-fields": "./src/forms/personal-details-fields/PersonalDetailsFields.tsx",
+    "./personal-details-fields/schema": "./src/forms/personal-details-fields/PersonalDetailsFields.schema.ts",
+    "./personal-details-fields/default-values": "./src/forms/personal-details-fields/PersonalDetailsFields.defaultValues.ts",
+    "./edit-profile-form": "./src/forms/edit-profile-form/EditProfileForm.tsx",
+    "./edit-profile-form/schema": "./src/forms/edit-profile-form/EditProfileForm.schema.ts"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

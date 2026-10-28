@@ -196,7 +196,10 @@ packages/schema/src/
 ├── date.ts       dateField, dateRangeField, timeField
 ├── money.ts      moneyField   (centavos as an integer, never a float)
 ├── password.ts   passwordField (required-only placeholder; auth policy pending)
-└── name.ts       nameField    (trimmed; max length is a placeholder until decided)
+├── name.ts       nameField    (trimmed; max length is a placeholder until decided)
+├── personal-details.ts  personalDetailsShape, personalProfileSchema (player name, nickname,
+│                        playing style, experience; limits are prototype placeholders)
+└── social-link.ts       socialLinkField(provider), socialLinksShape, SOCIAL_PROVIDERS
 ```
 
 - A form's `.schema.ts` composes them: `z.object({ email: emailField, phone: phoneField.optional() })`.

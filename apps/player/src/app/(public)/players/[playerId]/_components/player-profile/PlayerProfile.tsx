@@ -1,11 +1,15 @@
 'use client'
+import { useSignOut } from '@rotra/data/auth/use-sign-out'
+import { PLAYER_FIXTURE_NOW } from '@rotra/data/fixtures/player-games'
 import { useLeaderboard } from '@rotra/data/leaderboard/useLeaderboard'
 import { rankDisplayStatus } from '@rotra/data/player/rules'
 import { PLAYING_LEVELS } from '@rotra/data/player/types'
 import { usePlayerGames } from '@rotra/data/player/usePlayerGames'
 import { usePlayerProfile } from '@rotra/data/player/usePlayerProfile'
 import { usePlayerRank } from '@rotra/data/player/usePlayerRank'
+import { useMyAccount } from '@rotra/data/player-account/useMyAccount'
 import { useRankingSettings } from '@rotra/data/ranking-settings'
+import { AccountPanel } from '@rotra/ui/account-panel'
 import { Button } from '@rotra/ui/button'
 import { EligibilityCard } from '@rotra/ui/eligibility-card'
 import { ErrorState } from '@rotra/ui/error-state'
@@ -18,10 +22,19 @@ import { RecentGamesCard } from '@rotra/ui/recent-games-card'
 import { SharedRankCard } from '@rotra/ui/shared-rank-card'
 import { toast } from '@rotra/ui/toaster'
 import { useRouter } from 'next/navigation'
-import { useAppSelector } from '@/store/hooks'
-import { selectAccount } from '@/store/slices/authSlice'
+import { useAppDispatch, useAppSelector } from '@/store/hooks'
+import { selectAccount, setAccount } from '@/store/slices/authSlice'
 import { selectDev } from '@/store/slices/devSlice'
 import Loading from '../../loading'
+
+/** "yesterday", "3 days ago", measured from the fixtures' clock like the rest of the rank data. */
+function finishedAgo(finishedAt: string) {
+  const hours = (PLAYER_FIXTURE_NOW.getTime() - Date.parse(finishedAt)) / 3_600_000
+  const format = new Intl.RelativeTimeFormat('en', { numeric: 'auto' })
+  return hours < 24
+    ? format.format(-Math.max(1, Math.round(hours)), 'hour')
+    : format.format(-Math.round(hours / 24), 'day')
+}
 
 export function PlayerProfile({ playerId }: { playerId: string }) {
   const profile = usePlayerProfile(playerId),
@@ -31,10 +44,14 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
     leaderboard = useLeaderboard(),
     router = useRouter()
   const account = useAppSelector(selectAccount),
-    { offline } = useAppSelector(selectDev)
+    { offline } = useAppSelector(selectDev),
+    dispatch = useAppDispatch()
+  const isOwn = account?.id === playerId
+  // Ownership is checked first: a visitor's page never requests private contacts.
+  const myAccount = useMyAccount(isOwn ? playerId : null),
+    signOut = useSignOut('player')
   const player = profile.data,
-    current = rank.data,
-    isOwn = account?.id === playerId
+    current = rank.data
   const failed = profile.isError || rank.isError || games.isError || settings.isError
   const retry = () => {
     void profile.refetch()
@@ -123,15 +140,38 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
       }
     }
   }
+  const leaveSignedOut = () =>
+    signOut.mutate(undefined, {
+      onSuccess: () => {
+        dispatch(setAccount(null))
+        router.push('/')
+        toast('Signed out')
+      },
+      onError: (error) => toast.error(error.message),
+    })
+  const missingDetails = isOwn && (!player.playingStyle || !player.experienceYears)
   return (
     <ProfileLayout
       side={
-        <PlayerIdentityCard
-          profile={player}
-          isOwn={isOwn}
-          idElementId={idElementId}
-          onCopyId={() => void copyId()}
-        />
+        <>
+          <PlayerIdentityCard
+            profile={player}
+            isOwn={isOwn}
+            idElementId={idElementId}
+            onCopyId={() => void copyId()}
+            onEdit={() => router.push('/profile/edit')}
+            onOpenPlayerId={() => router.push('/profile/player-id')}
+          />
+          {isOwn && myAccount.data ? (
+            <AccountPanel
+              phone={myAccount.data.phone}
+              email={myAccount.data.email}
+              phoneHidden={myAccount.data.phoneHidden}
+              onOpenPrivacy={() => router.push('/profile/privacy-and-contact')}
+              onSignOut={leaveSignedOut}
+            />
+          ) : null}
+        </>
       }
       main={
         <>
@@ -147,8 +187,21 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
           ) : null}
           {current.updatePending ? (
             <Notice tone="warn" title={`Updating from ${current.updatePending.sessionTitle}.`}>
-              {current.updatePending.clubName} finished the session. This is{' '}
-              {isOwn ? 'your' : 'the'} last calculated rank until the update is ready.
+              {current.updatePending.clubName} finished the session{' '}
+              {finishedAgo(current.updatePending.finishedAt)}. This is {isOwn ? 'your' : 'the'} last
+              calculated rank until the update is ready.
+            </Notice>
+          ) : null}
+          {missingDetails ? (
+            <Notice
+              tone="info"
+              action={
+                <Button size="xs" onClick={() => router.push('/profile/edit')}>
+                  Add details
+                </Button>
+              }
+            >
+              Add your playing style and experience so clubs know your game. It's optional.
             </Notice>
           ) : null}
           <SharedRankCard

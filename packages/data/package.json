@@ -215,7 +215,10 @@
     "./sync/useSyncLog": "./src/sync/useSyncLog.ts",
     "./sync/useRetrySync": "./src/sync/useRetrySync.ts",
     "./sync/useSessionIntegrity": "./src/sync/useSessionIntegrity.ts",
-    "./sync/useAnswerInterruption": "./src/sync/useAnswerInterruption.ts"
+    "./sync/useAnswerInterruption": "./src/sync/useAnswerInterruption.ts",
+    "./player/useUpdateMyProfile": "./src/player/useUpdateMyProfile.ts",
+    "./player-account/types": "./src/player-account/playerAccount.types.ts",
+    "./player-account/useMyAccount": "./src/player-account/useMyAccount.ts"
   },
   "scripts": {
     "lint": "biome check .",

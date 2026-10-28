@@ -1,19 +1,27 @@
 import type { PlayerProfile } from '@rotra/data/player/types'
 import { Avatar } from '@rotra/ui/avatar'
+import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { Chip } from '@rotra/ui/chip'
+import { Icon } from '@rotra/ui/icon'
 import { PlayerIdLine } from '@rotra/ui/player-id-line'
 export type PlayerIdentityCardProps = {
   profile: PlayerProfile
   isOwn?: boolean
   idElementId: string
   onCopyId: () => void
+  /** Owner only: opens Edit profile */
+  onEdit?: () => void
+  /** Owner only: opens My player ID */
+  onOpenPlayerId?: () => void
 }
 export function PlayerIdentityCard({
   profile,
   isOwn = false,
   idElementId,
   onCopyId,
+  onEdit,
+  onOpenPlayerId,
 }: PlayerIdentityCardProps) {
   return (
     <Card asChild>
@@ -29,7 +37,11 @@ export function PlayerIdentityCard({
           <div className="flex min-w-0 flex-col gap-2">
             <h1 className="[overflow-wrap:anywhere]">{profile.fullName}</h1>
             {profile.nickname ? <p className="text-fg2">“{profile.nickname}”</p> : null}
-            {isOwn ? <Chip tone="accent">This is you</Chip> : null}
+            {isOwn ? (
+              <div className="flex">
+                <Chip tone="accent">This is you</Chip>
+              </div>
+            ) : null}
           </div>
         </div>
         <div className="flex flex-col gap-2">
@@ -45,6 +57,16 @@ export function PlayerIdentityCard({
             .
           </p>
         </div>
+        {isOwn ? (
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,140px),1fr))] gap-2">
+            <Button size="sm" onClick={onEdit}>
+              <Icon name="edit" /> Edit profile
+            </Button>
+            <Button size="sm" onClick={onOpenPlayerId}>
+              <Icon name="qr" /> My player ID
+            </Button>
+          </div>
+        ) : null}
       </section>
     </Card>
   )

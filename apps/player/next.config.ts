@@ -3,7 +3,7 @@ import type { NextConfig } from 'next'
 const nextConfig: NextConfig = {
   turbopack: {
     resolveAlias:
-      process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_ROTRA_DEV_MENU !== '1'
+      process.env.NODE_ENV === 'production'
         ? { '@/providers/DevTools': './src/providers/DisabledDevTools.tsx' }
         : {},
   },

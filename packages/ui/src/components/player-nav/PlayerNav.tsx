@@ -37,13 +37,13 @@ export function PlayerNav({
   return (
     <nav
       aria-label="Main"
-      className="order-5 flex w-full gap-0.5 max-[560px]:mt-1 sm:order-none sm:ml-2 sm:w-auto"
+      className="order-5 flex w-full gap-0.5 max-[560px]:mt-1 sm:order-none sm:mr-auto sm:ml-2 sm:w-auto"
     >
       {items.map((item) => {
         const common = {
           'aria-current': current === item.key ? ('page' as const) : undefined,
           className: cn(
-            'min-h-9 flex-1 rounded-md border-0 bg-transparent px-3 font-semibold whitespace-nowrap text-fg2',
+            'inline-flex min-h-9 items-center justify-center touch:min-h-12 flex-1 rounded-md border-0 bg-transparent px-3 font-semibold whitespace-nowrap text-fg2',
             'hover:bg-surface hover:text-fg sm:flex-none',
             current === item.key && 'bg-elev text-fg hover:bg-elev',
           ),

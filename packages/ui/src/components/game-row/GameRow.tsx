@@ -37,7 +37,7 @@ export function GameRow({ game, dateLine }: GameRowProps) {
       </div>
       <span
         role="img"
-        aria-label={game.score ? `Score ${game.score}` : undefined}
+        aria-label={game.score ? `Score ${game.score}` : 'Winner recorded; score not entered'}
         className={cn(
           'text-right font-mono text-sm font-semibold whitespace-nowrap tabular-nums max-[480px]:col-start-2 max-[480px]:text-left',
           !game.score &&

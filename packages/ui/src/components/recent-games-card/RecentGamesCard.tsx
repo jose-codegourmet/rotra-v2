@@ -12,7 +12,7 @@ export function RecentGamesCard({ sessions, onOpenAll }: RecentGamesCardProps) {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-extrabold">Recent games</h2>
         {games.length > 0 && (
-          <Button variant="ghost" size="sm" onClick={onOpenAll}>
+          <Button size="xs" onClick={onOpenAll}>
             All games ({games.length})
           </Button>
         )}

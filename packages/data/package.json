@@ -137,7 +137,22 @@
     "./player": "./src/player/player.rules.ts",
     "./player/rules": "./src/player/player.rules.ts",
     "./leaderboard/query-keys": "./src/leaderboard/queryKeys.ts",
-    "./fixtures/ranking-settings": "./src/fixtures/rankingSettings.ts"
+    "./fixtures/ranking-settings": "./src/fixtures/rankingSettings.ts",
+    "./player/query-keys": "./src/player/queryKeys.ts",
+    "./player/fetchers": "./src/player/fetchers.ts",
+    "./leaderboard/fetchers": "./src/leaderboard/fetchers.ts",
+    "./leaderboard/useLeaderboard": "./src/leaderboard/useLeaderboard.ts",
+    "./leaderboard/useLeaderboardSearch": "./src/leaderboard/useLeaderboardSearch.ts",
+    "./leaderboard/useMyLeaderboardPosition": "./src/leaderboard/useMyLeaderboardPosition.ts",
+    "./player/usePlayerRank": "./src/player/usePlayerRank.ts",
+    "./player/usePlayerGames": "./src/player/usePlayerGames.ts",
+    "./player/useFindPlayerByRtrId": "./src/player/useFindPlayerByRtrId.ts",
+    "./player/usePlayerProfile": "./src/player/usePlayerProfile.ts",
+    "./fixtures/player-profiles": "./src/fixtures/playerProfiles.ts",
+    "./fixtures/player-accounts": "./src/fixtures/playerAccounts.ts",
+    "./player-account/useRequestPasswordReset": "./src/player-account/useRequestPasswordReset.ts",
+    "./player-account/useResetLink": "./src/player-account/useResetLink.ts",
+    "./player-account/useResetPassword": "./src/player-account/useResetPassword.ts"
   },
   "scripts": {
     "lint": "biome check .",

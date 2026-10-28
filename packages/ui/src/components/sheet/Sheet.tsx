@@ -113,7 +113,7 @@ export function Sheet({
                   className,
                 )}
               >
-                <header className="flex items-start justify-between gap-3 px-5 pt-[18px] pb-1.5">
+                <header className="flex shrink-0 items-start justify-between gap-3 px-5 pt-[18px] pb-1.5">
                   <Dialog.Title ref={titleRef} tabIndex={-1} className="focus:outline-none">
                     {title}
                   </Dialog.Title>
@@ -125,11 +125,11 @@ export function Sheet({
                     </Dialog.Close>
                   )}
                 </header>
-                <div className="flex flex-col gap-3.5 overflow-y-auto px-5 pt-2.5 pb-4">
+                <div className="flex min-h-0 flex-col gap-3.5 overflow-y-auto px-5 pt-2.5 pb-4">
                   {children}
                 </div>
                 {footer ? (
-                  <footer className="flex flex-wrap justify-end gap-2.5 border-t border-border px-5 pt-3 pb-[18px] [&>*]:flex-auto">
+                  <footer className="flex shrink-0 flex-wrap justify-end gap-2.5 border-t border-border px-5 pt-3 pb-[18px] [&>*]:flex-auto">
                     {footer}
                   </footer>
                 ) : null}

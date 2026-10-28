@@ -1,7 +1,9 @@
 import type { Club } from '../club/club.types'
 import type { ClubPlayer } from '../club-player/clubPlayer.types'
 import type { ClubVenue } from '../club-venue/clubVenue.types'
+import type { ContactChangeRequest } from '../contact-change-request/contactChangeRequest.types'
 import { clubs } from '../fixtures/clubs'
+import { contactChangeRequests } from '../fixtures/contactChangeRequests'
 import { createFinancialFixtures } from '../fixtures/financials'
 import { inventoryItems } from '../fixtures/inventory'
 import { licensePayments } from '../fixtures/licensePayments'
@@ -48,6 +50,7 @@ export type MockState = {
   playerAccounts: typeof playerAccounts
   resetLinks: Record<string, 'valid' | 'used'>
   claimLinks: Record<string, ClaimLinkRecord>
+  contactChangeRequests: ContactChangeRequest[]
   playerProfiles: PlayerProfile[]
   playerRanks: Record<string, PlayerRank>
   playerGames: Record<string, PlayerSessionRecord[]>
@@ -114,6 +117,7 @@ function seedState(): MockState {
     playerAccounts,
     resetLinks: { 'reset-valid': 'valid' },
     claimLinks,
+    contactChangeRequests,
     rankingSettings,
     clubs,
     venues,

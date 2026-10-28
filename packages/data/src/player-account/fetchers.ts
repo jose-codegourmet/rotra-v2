@@ -205,3 +205,32 @@ function personalDetailsFromPreset(preset: ClaimLink['preset']): PersonalProfile
     linkedin: '',
   }
 }
+
+/** Sets phoneHidden for the signed-in player. Offline leaves the stored value as it was. */
+export async function setPhonePrivacy(input: { phoneHidden: boolean }): Promise<MyAccount> {
+  await delay(900)
+  const session = await getSession('player')
+  if (!session) throw new MockError('permission', 'Sign in to change your phone privacy.')
+  const stored = readMockState().playerAccounts.find((a) => a.playerId === session.account.id)
+  if (!stored) throw new MockError('permission', 'Sign in to change your phone privacy.')
+  if (getMockDevState().offline)
+    throw new MockError(
+      'offline',
+      `Couldn't save because you're offline. Your phone is still ${stored.phoneHidden ? 'hidden from' : 'visible to'} clubs.`,
+    )
+  checkMockSave()
+  let saved: MyAccount | undefined
+  mockStore.update((draft) => {
+    const account = draft.playerAccounts.find((a) => a.playerId === session.account.id)
+    if (!account) throw new MockError('permission', 'Sign in to change your phone privacy.')
+    account.phoneHidden = input.phoneHidden
+    saved = {
+      playerId: account.playerId,
+      phone: account.phone,
+      email: account.email,
+      phoneHidden: account.phoneHidden,
+    }
+  })
+  if (!saved) throw new Error('Phone privacy save produced no result.')
+  return saved
+}

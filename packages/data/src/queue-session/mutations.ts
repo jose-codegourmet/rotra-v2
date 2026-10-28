@@ -1,3 +1,5 @@
+import { validateSessionCost } from '../session-cost/validation'
+import { normalizeSessionCost } from '../session-cost/sessionCost.rules'
 import { DEMO_CLUB_ID } from '../fixtures/clubs'
 import { checkMockSave, getMockDevState, requireOnline } from '../mock/bridge'
 import { MockError } from '../mock/errors'
@@ -49,6 +51,10 @@ export function promoteWaiter(state: MockState, entry: SessionWaitlistEntry, now
   state.waitlist = state.waitlist.filter((w) => w.id !== entry.id)
 }
 function validate(state: MockState, input: QueueSessionInput) {
+  validateSessionCost(
+    input.costEstimate,
+    state.inventory.filter((i) => i.clubId === DEMO_CLUB_ID),
+  )
   const venue = state.venues.find((v) => v.id === input.venueId && v.clubId === DEMO_CLUB_ID)
   if (
     !venue ||
@@ -121,6 +127,8 @@ export function createQueueSession(input: QueueSessionInput) {
         acceptJoinRequests: true,
       }
       state.sessions.push(s)
+      const cost = normalizeSessionCost(input.costEstimate)
+      if (cost) state.costEstimates[id] = { ...cost, sessionId: id, currency: 'PHP' }
       state.courts.push(
         ...input.courts.map((c) => ({
           id: crypto.randomUUID(),
@@ -162,6 +170,11 @@ export function updateQueueSession({
         )
       if (date.clash)
         throw new MockError('conflict', `${date.clash.text}. Pick another date or time.`)
+      if (values.costEstimate !== undefined) {
+        const cost = normalizeSessionCost(values.costEstimate)
+        if (cost) state.costEstimates[sessionId] = { ...cost, sessionId, currency: 'PHP' }
+        else delete state.costEstimates[sessionId]
+      }
       Object.assign(s, {
         title: values.title.trim(),
         notes: values.notes,

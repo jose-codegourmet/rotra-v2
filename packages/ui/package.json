@@ -214,7 +214,21 @@
     "./sign-in-form": "./src/forms/sign-in-form/SignInForm.tsx",
     "./forgot-password-form": "./src/forms/forgot-password-form/ForgotPasswordForm.tsx",
     "./reset-password-form": "./src/forms/reset-password-form/ResetPasswordForm.tsx",
-    "./account-link-status": "./src/components/account-link-status/AccountLinkStatus.tsx"
+    "./account-link-status": "./src/components/account-link-status/AccountLinkStatus.tsx",
+    "./cost-estimate-summary": "./src/components/cost-estimate-summary/CostEstimateSummary.tsx",
+    "./shuttle-plan-row": "./src/components/shuttle-plan-row/ShuttlePlanRow.tsx",
+    "./session-financials-summary": "./src/components/session-financials-summary/SessionFinancialsSummary.tsx",
+    "./forms/session-financials-fields": "./src/forms/session-financials-fields/SessionFinancialsFields.tsx",
+    "./forms/session-financials-fields/schema": "./src/forms/session-financials-fields/SessionFinancialsFields.schema.ts",
+    "./forms/session-financials-fields/default-values": "./src/forms/session-financials-fields/SessionFinancialsFields.defaultValues.ts",
+    "./payments-checklist": "./src/components/payments-checklist/PaymentsChecklist.tsx",
+    "./payments-checklist/payment-card": "./src/components/payments-checklist/payment-card/PaymentCard.tsx",
+    "./inventory-item-card": "./src/components/inventory-item-card/InventoryItemCard.tsx",
+    "./inventory-section": "./src/components/inventory-section/InventorySection.tsx",
+    "./forms/inventory-item-form": "./src/forms/inventory-item-form/InventoryItemForm.tsx",
+    "./forms/inventory-item-form/schema": "./src/forms/inventory-item-form/InventoryItemForm.schema.ts",
+    "./forms/inventory-item-form/default-values": "./src/forms/inventory-item-form/InventoryItemForm.defaultValues.ts",
+    "./inventory-screen": "./src/components/inventory-screen/InventoryScreen.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

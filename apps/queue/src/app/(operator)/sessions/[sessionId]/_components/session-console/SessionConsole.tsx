@@ -11,6 +11,7 @@ import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { MockError } from '@rotra/data/mock/errors'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
+import { PaymentsPanel } from '@/app/(operator)/sessions/[sessionId]/_components/payments-panel/PaymentsPanel'
 import { useSyncState } from '@rotra/data/sync/useSyncState'
 import { Button } from '@rotra/ui/button'
 import { Chip } from '@rotra/ui/chip'
@@ -55,7 +56,14 @@ import { selectDev } from '@/store/slices/devSlice'
 export type SessionConsoleProps = { sessionId: string }
 
 export type ConsoleView = 'session' | 'queue' | 'players' | 'leaderboard'
-export type ConsoleSheet = 'join-requests' | 'post' | 'adjust' | 'add-court' | 'session-done' | null
+export type ConsoleSheet =
+  | 'join-requests'
+  | 'post'
+  | 'adjust'
+  | 'add-court'
+  | 'session-done'
+  | 'payments'
+  | null
 /** The Queue › Match editing and generation sheets: Add match / Edit lineup, Suggested match, Auto queue, Regenerate */
 export type MatchSheet =
   | MatchLineupRequest
@@ -269,6 +277,9 @@ export function SessionConsole({ sessionId }: SessionConsoleProps) {
               <Button size="sm" onClick={() => setSheet('post')}>
                 Copy Facebook post
               </Button>
+              <Button size="sm" onClick={() => setSheet('payments')}>
+                Payments
+              </Button>
               <Button size="sm" onClick={() => setSheet('adjust')}>
                 Extend time
               </Button>
@@ -339,6 +350,18 @@ export function SessionConsole({ sessionId }: SessionConsoleProps) {
         }
       >
         <JoinRequests sessionId={sessionId} variant="sheet" />
+      </Sheet>
+      <Sheet
+        open={sheet === 'payments'}
+        onOpenChange={(open) => setSheet(open ? 'payments' : null)}
+        title="Payments"
+        footer={
+          <Button variant="primary" onClick={() => setSheet(null)}>
+            Done
+          </Button>
+        }
+      >
+        {sheet === 'payments' ? <PaymentsPanel sessionId={sessionId} asSheet /> : null}
       </Sheet>
       <FacebookPost
         sessionId={sessionId}

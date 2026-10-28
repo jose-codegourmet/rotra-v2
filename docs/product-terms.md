@@ -258,6 +258,8 @@ from the [database design](database_design/product/README.md). Add a row here **
 | Player rank | `PlayerRank` | `player_rank_current` | Public shared-rank projection; no numerical formula in the mock phase |
 | Club assessment | `ClubAssessment` | `club_assessments` | |
 | Inventory item | `InventoryItem` | `inventory_items` | |
+| Shuttle plan line | `SessionShuttlePlanLine` | `session_shuttle_plan_lines` | Planned tubes from one inventory item |
+| Payment mark | `SessionPaymentMark` | `session_payment_marks` | Amount and time when paid was ticked |
 | Cost estimate | `SessionCostEstimate` | `session_cost_estimates` | |
 | Feature flag | `FeatureFlag` | `feature_flags` | |
 

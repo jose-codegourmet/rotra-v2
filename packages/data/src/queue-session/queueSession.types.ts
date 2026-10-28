@@ -57,6 +57,7 @@ export type QueueSessionInput = Pick<
   | 'minimumIsCalculated'
   | 'expectedPlayers'
 > & {
+  costEstimate?: import('../session-cost/sessionCost.types').SessionCostInput | null
   playersPerCourt?: number
   courts: { label: string; openUntil?: number | null }[]
   repeat?: 'none' | 'weekly' | 'biweekly' | 'monthly'

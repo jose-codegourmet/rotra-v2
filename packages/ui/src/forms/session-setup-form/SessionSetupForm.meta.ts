@@ -3,7 +3,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const sessionSetupFormMeta = {
   name: 'SessionSetupForm',
   description:
-    'Q-SETUP: the three-page Create session / Edit preparation wizard with the step bar, page validation, footer actions and the Details, Courts, Formats and mode, Minimum games, Financials (slot) and Notes and review sections.',
+    'Q-SETUP: the three-page Create session / Edit preparation wizard with the step bar, page validation, footer actions and the Details, Courts, Formats and mode, Minimum games, optional Financials and Notes and review sections.',
   usage: [
     'The container owns useCreateQueueSession / useUpdateQueueSession, the date and venue dialogs (set through the ref handle), the clash View it dialog and the toasts.',
     'getOccurrences and computeEstimate are the rules from @rotra/data passed in, so the form stays free of runtime data imports.',
@@ -15,6 +15,7 @@ export const sessionSetupFormMeta = {
   },
   docs: ['docs/screens/product/modules/queue/session-setup.md'],
   related: [
+    'SessionFinancialsFields',
     'SetupStepBar',
     'RepeatSchedulePanel',
     'ClashNotice',

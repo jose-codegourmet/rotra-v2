@@ -1,6 +1,9 @@
 'use client'
 import { useSignIn } from '@rotra/data/auth/use-sign-in'
 import { useSignOut } from '@rotra/data/auth/use-sign-out'
+import type { ContactChangeStatus } from '@rotra/data/contact-change-request/types'
+import { useAdvanceContactChangeRequest } from '@rotra/data/contact-change-request/useAdvanceContactChangeRequest'
+import { useMyContactChangeRequest } from '@rotra/data/contact-change-request/useMyContactChangeRequest'
 import { leaderboardOptions, playerRankOptions } from '@rotra/data/fixtures/dev-menu'
 import {
   connectMockBridge,
@@ -12,6 +15,8 @@ import { resetDemoData } from '@rotra/data/mock/reset'
 import { openClaimLinkPreview } from '@rotra/data/player-account/claim-link-preview'
 import { playerAccountKeys } from '@rotra/data/player-account/query-keys'
 import { useRankingSettings, useSetRankingSettings } from '@rotra/data/ranking-settings'
+import { Button } from '@rotra/ui/button'
+import { ContactRequestStatus } from '@rotra/ui/contact-request-status'
 import { DevMenu } from '@rotra/ui/dev-menu'
 import { toast } from '@rotra/ui/toaster'
 import { useQueryClient } from '@tanstack/react-query'
@@ -38,6 +43,41 @@ export function DevTools() {
   const [open, setOpen] = useState(false)
   const account = useAppSelector(selectAccount),
     router = useRouter()
+  const contactRequest = useMyContactChangeRequest(account?.id ?? null),
+    advance = useAdvanceContactChangeRequest()
+  const request = contactRequest.data
+  // The prototype's Contact-change request (Admin) buttons for each status.
+  const requestActions: Partial<Record<ContactChangeStatus, [ContactChangeStatus, string][]>> = {
+    pending: [
+      ['applying', 'Approve'],
+      ['rejected', 'Decline'],
+    ],
+    applying: [
+      ['applied', 'Finish applying'],
+      ['failed', 'Applying fails'],
+    ],
+    failed: [['applied', 'Retry succeeds']],
+  }
+  const contactRequestSlot = request ? (
+    <div className="flex flex-wrap items-center gap-2">
+      <ContactRequestStatus request={request} variant="compact" />
+      {(requestActions[request.status] ?? []).map(([to, label]) => (
+        <Button
+          key={to}
+          size="xs"
+          disabled={advance.isPending}
+          onClick={() =>
+            advance.mutate(
+              { requestId: request.requestId, to },
+              { onError: (error) => toast.error(error.message) },
+            )
+          }
+        >
+          {label}
+        </Button>
+      ))}
+    </div>
+  ) : undefined
   useEffect(() => {
     const disconnect = connectMockBridge({
       read: () => store.getState().dev,
@@ -112,6 +152,7 @@ export function DevTools() {
             onError: (error) => toast.error(error.message),
           }),
       }}
+      contactRequestSlot={contactRequestSlot}
       open={open}
       onOpenChange={setOpen}
       toggles={toggles}

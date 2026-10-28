@@ -1,6 +1,7 @@
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { Chip } from '@rotra/ui/chip'
+import { Notice } from '@rotra/ui/notice'
 
 export type DeviceDownloadState = 'none' | 'downloading' | 'ready'
 
@@ -10,6 +11,7 @@ export type DeviceDownloadCardProps = {
   offline?: boolean
   /** A previous usable copy survives a failed update: "Copy from 7:42 PM" */
   snapshotAge?: string
+  error?: string
   className?: string
 }
 
@@ -25,6 +27,7 @@ export function DeviceDownloadCard({
   onDownload,
   offline,
   snapshotAge,
+  error,
   className,
 }: DeviceDownloadCardProps) {
   const chip = CHIP[state]
@@ -52,6 +55,7 @@ export function DeviceDownloadCard({
         {offline ? (
           <p className="m-0 text-[13px] text-fg2">Downloading needs an internet connection.</p>
         ) : null}
+        {error ? <Notice tone="error">{error}</Notice> : null}
         {snapshotAge ? (
           <p className="m-0 text-[13px] text-fg2">Previous copy kept: {snapshotAge}</p>
         ) : null}

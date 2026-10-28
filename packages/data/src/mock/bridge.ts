@@ -5,12 +5,28 @@ export type MockDevState = {
   licenseExpired: boolean
   nextSaveFails: boolean
   nextSaveConflict: boolean
+  syncFails?: boolean
+  recordsMissing?: boolean
+  originalDeviceLost?: boolean
+  originalDeviceReconnects?: boolean
+  secondDevice?: boolean
+  downloadFails?: boolean
+  authorizationExpired?: boolean
+  activeFinishAllowed?: boolean
 }
 export const DEFAULT_DEV_STATE: MockDevState = {
   offline: false,
   licenseExpired: false,
   nextSaveFails: false,
   nextSaveConflict: false,
+  syncFails: false,
+  recordsMissing: false,
+  originalDeviceLost: false,
+  originalDeviceReconnects: false,
+  secondDevice: false,
+  downloadFails: false,
+  authorizationExpired: false,
+  activeFinishAllowed: true,
 }
 export type PlayerRankScenario =
   | 'on-leaderboard'
@@ -26,6 +42,13 @@ export type PlayerMockDevState = MockDevState & {
 let read: () => PlayerMockDevState = () => DEFAULT_DEV_STATE
 let consume = (_key: 'nextSaveFails' | 'nextSaveConflict') => {}
 const listeners = new Set<() => void>()
+const saveFailureListeners = new Set<() => void>()
+export function subscribeMockSaveFailure(listener: () => void) {
+  saveFailureListeners.add(listener)
+  return () => {
+    saveFailureListeners.delete(listener)
+  }
+}
 
 /** App-owned Redux supplies the adapter; the data package never imports an app. */
 export function connectMockBridge(adapter: {
@@ -59,6 +82,7 @@ export function requireOnline() {
 export function checkMockSave() {
   if (read().nextSaveFails) {
     consume('nextSaveFails')
+    for (const listener of saveFailureListeners) listener()
     throw new MockError('retryable', 'Changes could not be saved')
   }
   if (read().nextSaveConflict) {

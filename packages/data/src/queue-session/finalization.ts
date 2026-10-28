@@ -1,3 +1,4 @@
+import { integrityIn } from '../sync/integrity'
 import { activeMatches } from '../match/match.rules'
 import { checkMockSave, getMockDevState } from '../mock/bridge'
 import { MockError } from '../mock/errors'
@@ -28,6 +29,16 @@ function sessionDoneBlocker(state: MockState, sessionId: string): SessionDoneErr
   const matches = activeMatches(state.matches.filter((m) => m.sessionId === sessionId))
   if (getMockDevState().offline)
     return new SessionDoneError('offline', 'Connect to finish and sync this session.')
+  if (getMockDevState().authorizationExpired && !getMockDevState().activeFinishAllowed)
+    return new SessionDoneError(
+      'authorization',
+      'Access must be restored before this session can finish and sync. Your local records are kept.',
+    )
+  if (integrityIn(state, sessionId).state !== 'complete')
+    return new SessionDoneError(
+      'incomplete_records',
+      'Original session records are incomplete. Review recovery before Session done.',
+    )
   if (state.sync.pendingCount > 0)
     return new SessionDoneError(
       'pending_changes',

@@ -11,6 +11,7 @@ import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { MockError } from '@rotra/data/mock/errors'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
+import { ConsoleDeviceNotice } from '../console-device-notice/ConsoleDeviceNotice'
 import { PaymentsPanel } from '@/app/(operator)/sessions/[sessionId]/_components/payments-panel/PaymentsPanel'
 import { useSyncState } from '@rotra/data/sync/useSyncState'
 import { Button } from '@rotra/ui/button'
@@ -53,7 +54,7 @@ import { useNow } from '@/lib/useNow'
 import { useAppSelector } from '@/store/hooks'
 import { selectDev } from '@/store/slices/devSlice'
 
-export type SessionConsoleProps = { sessionId: string }
+export type SessionConsoleProps = { sessionId: string; resumeSessionDone?: boolean }
 
 export type ConsoleView = 'session' | 'queue' | 'players' | 'leaderboard'
 export type ConsoleSheet =
@@ -113,7 +114,7 @@ const MODE_LABELS = { chill: 'Chill', fair: 'Fair', hard: 'Hard' } as const
  * clock ticks every 30 s unless a sheet is open, a field has focus or a card is being dragged, and
  * each tick refetches the session so one finalized or invalidated elsewhere redirects to its record.
  */
-export function SessionConsole({ sessionId }: SessionConsoleProps) {
+export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleProps) {
   const router = useRouter()
   const dev = useAppSelector(selectDev)
   const session = useQueueSession(sessionId)
@@ -122,7 +123,7 @@ export function SessionConsole({ sessionId }: SessionConsoleProps) {
   const standings = useLiveStandings(sessionId)
   const sync = useSyncState()
   const [view, setView] = useState<ConsoleView>('session')
-  const [sheet, setSheet] = useState<ConsoleSheet>(null)
+  const [sheet, setSheet] = useState<ConsoleSheet>(resumeSessionDone ? 'session-done' : null)
   const [matchSheet, setMatchSheet] = useState<MatchSheet | null>(null)
   const [profileId, setProfileId] = useState<string | null>(null)
 
@@ -298,6 +299,7 @@ export function SessionConsole({ sessionId }: SessionConsoleProps) {
           <Skeleton className="w-72" />
         </div>
       )}
+      <ConsoleDeviceNotice sessionId={sessionId} />
       {online ? null : <Notice tone="offline">{OFFLINE_NOTICE}</Notice>}
       <Tabs
         aria-label="Console views"

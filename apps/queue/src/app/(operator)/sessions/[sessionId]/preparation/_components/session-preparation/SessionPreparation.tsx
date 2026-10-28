@@ -266,10 +266,13 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
                   state={download.isPending ? 'downloading' : s.downloadState}
                   offline={dev.offline}
                   snapshotAge={
-                    download.isError && s.downloadState === 'ready'
-                      ? 'the copy from before this update'
+                    s.downloadError && s.downloadState === 'ready'
+                      ? s.downloadedAt
+                        ? `copy from ${new Date(s.downloadedAt).toLocaleString('en-PH', { timeZone: 'Asia/Manila', dateStyle: 'medium', timeStyle: 'short' })}`
+                        : 'the copy from before this update'
                       : undefined
                   }
+                  error={s.downloadError ?? download.error?.message}
                   onDownload={() =>
                     download.mutate(sessionId, {
                       onSuccess: (result) => toast(result.message),

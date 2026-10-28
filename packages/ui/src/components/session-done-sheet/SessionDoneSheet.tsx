@@ -32,6 +32,8 @@ export type SessionDoneSheetProps = {
   participants: number
   /** Changes saved on this device and not synced yet */
   pendingChanges: number
+  recordsIncomplete?: boolean
+  authorizationBlocked?: boolean
   /** Games still in play; any one of them blocks the review step */
   activeGames: SessionDoneActiveGame[]
   /** Waiting matches that were never played */
@@ -80,6 +82,8 @@ export function SessionDoneSheet({
   gamesRecorded,
   participants,
   pendingChanges,
+  recordsIncomplete = false,
+  authorizationBlocked = false,
   activeGames,
   unplayedWaiting,
   belowMinimum,
@@ -94,8 +98,9 @@ export function SessionDoneSheet({
 }: SessionDoneSheetProps) {
   const inPlay = activeGames.length
   const below = belowMinimum.length
-  const blocked = inPlay > 0 || !online
-  const cannotConfirm = pendingChanges > 0 || !online || isPending
+  const blocked = inPlay > 0 || !online || authorizationBlocked
+  const cannotConfirm =
+    authorizationBlocked || recordsIncomplete || pendingChanges > 0 || !online || isPending
 
   const body =
     step === 'minimum' ? (
@@ -119,7 +124,11 @@ export function SessionDoneSheet({
         <p className="m-0">
           <b>{sessionTitle}</b> · {timeRange}
         </p>
-        {pendingChanges > 0 ? (
+        {recordsIncomplete ? (
+          <Notice tone="warn">
+            Original session records are incomplete. Review recovery before Session done.
+          </Notice>
+        ) : pendingChanges > 0 ? (
           <Notice tone="warn">
             {count(pendingChanges, 'change')} {pendingChanges === 1 ? 'is' : 'are'} still syncing.
           </Notice>
@@ -140,10 +149,20 @@ export function SessionDoneSheet({
             { label: 'Participants', value: participants },
             {
               label: 'Sync',
-              value: pendingChanges > 0 ? `${count(pendingChanges, 'change')} waiting` : 'Complete',
+              value: recordsIncomplete
+                ? 'Original records incomplete'
+                : pendingChanges > 0
+                  ? `${count(pendingChanges, 'change')} waiting`
+                  : 'Complete',
             },
           ]}
         />
+        {recordsIncomplete ? (
+          <Notice tone="warn">
+            Original records from another device are missing. Recording can continue; Session done
+            requires recovery.
+          </Notice>
+        ) : null}
         {inPlay > 0 ? (
           <Notice
             tone="error"
@@ -172,7 +191,7 @@ export function SessionDoneSheet({
     step === 'minimum' ? (
       <>
         <Button onClick={onBackToSession}>Back to session</Button>
-        <Button variant="primary" onClick={onContinueToFinish}>
+        <Button variant="primary" disabled={blocked || isPending} onClick={onContinueToFinish}>
           Continue to finish session
         </Button>
       </>
@@ -205,6 +224,12 @@ export function SessionDoneSheet({
       hideClose={isPending}
       footer={footer}
     >
+      {authorizationBlocked ? (
+        <Notice tone="warn">
+          Access must be restored before this session can finish and sync. Your local records are
+          kept.
+        </Notice>
+      ) : null}
       <div className={sessionDoneSheetVariants({ step })}>{body}</div>
     </Sheet>
   )

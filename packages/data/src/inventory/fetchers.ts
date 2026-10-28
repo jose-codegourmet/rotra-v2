@@ -26,6 +26,7 @@ async function changeInventory<T>(
   mockStore.update((draft) => {
     outcome = change(draft.inventory)
     checkMockSave()
+    draft.sync.problem = undefined
   })
   if (!outcome) throw new Error('Inventory mutation produced no result.')
   return outcome

@@ -228,7 +228,16 @@
     "./forms/inventory-item-form": "./src/forms/inventory-item-form/InventoryItemForm.tsx",
     "./forms/inventory-item-form/schema": "./src/forms/inventory-item-form/InventoryItemForm.schema.ts",
     "./forms/inventory-item-form/default-values": "./src/forms/inventory-item-form/InventoryItemForm.defaultValues.ts",
-    "./inventory-screen": "./src/components/inventory-screen/InventoryScreen.tsx"
+    "./inventory-screen": "./src/components/inventory-screen/InventoryScreen.tsx",
+    "./sync-status-sheet": "./src/components/sync-status-sheet/SyncStatusSheet.tsx",
+    "./sync-attention-notice": "./src/components/sync-attention-notice/SyncAttentionNotice.tsx",
+    "./interruption-check-sheet": "./src/components/interruption-check-sheet/InterruptionCheckSheet.tsx",
+    "./recovery-status-panel": "./src/components/recovery-status-panel/RecoveryStatusPanel.tsx",
+    "./unrecoverable-session-panel": "./src/components/unrecoverable-session-panel/UnrecoverableSessionPanel.tsx",
+    "./conflict-review-list": "./src/components/conflict-review-list/ConflictReviewList.tsx",
+    "./conflict-review-list/conflict-item-card": "./src/components/conflict-review-list/conflict-item-card/ConflictItemCard.tsx",
+    "./device-continue-notice": "./src/components/device-continue-notice/DeviceContinueNotice.tsx",
+    "./session-recovery-screen": "./src/components/session-recovery-screen/SessionRecoveryScreen.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

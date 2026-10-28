@@ -3,7 +3,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const operatorShellMeta = {
   name: 'OperatorShell',
   description:
-    'The signed-in Queue layout: AppShell with the top bar (sync pill from useSyncState, theme switch, dev menu), the left nav with Saved players / Venues / Inventory counts and the Live session item, and the phone dock whose centre pill a page can override through useDockAction.',
+    'The signed-in Queue layout: AppShell with the top bar (sync pill and dialog from useSyncStatus/useSyncLog, theme switch, dev menu), the left nav with Saved players / Venues / Inventory counts and the Live session item, and the phone dock whose centre pill a page can override through useDockAction.',
   usage: [
     'Rendered once by app/(operator)/layout.tsx. Pages call useDockAction to set Session done / Start session; otherwise the pill is Continue session while live, else Create session.',
     'The collapsed rail is remembered per device under localStorage "rotra-queue-nav".',

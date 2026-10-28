@@ -27,7 +27,7 @@ import { OperatorShellContext, type OperatorShellContextValue } from './DockActi
 const GATED_PREFIXES = ['/', '/saved-players', '/venues', '/club-settings', '/sessions/new']
 
 /** Past-session reports the license gate also replaces: no past reports while the license has ended. */
-const GATED_REPORT = /^\/sessions\/[^/]+\/record$/
+const GATED_REPORT = /^\/sessions\/[^/]+\/(record|results)$/
 
 /** Screens rendered without the top bar, left nav and dock: the finishing route (the prototype's hasShell). */
 const BARE_ROUTE = /^\/sessions\/[^/]+\/finishing$/

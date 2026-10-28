@@ -5,6 +5,8 @@ import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import { useClubVenues } from '@rotra/data/club-venue/useClubVenues'
 import { useClubAccess } from '@rotra/data/license/useClubAccess'
 import { useNowCard } from '@rotra/data/queue-session/useNowCard'
+import { useSyncStatus } from '@rotra/data/sync/useSyncStatus'
+import { SyncStatusDialog } from '../sync-status-dialog/SyncStatusDialog'
 import { useSyncState } from '@rotra/data/sync/useSyncState'
 import { AccessGate } from '@rotra/ui/access-gate'
 import { AppShell, useAppShell } from '@rotra/ui/app-shell'
@@ -57,6 +59,8 @@ export function OperatorShell({ children }: { children: ReactNode }) {
   const account = useAppSelector(selectAccount)
   const access = useClubAccess()
   const sync = useSyncState()
+  const status = useSyncStatus()
+  const [syncOpen, setSyncOpen] = useState(false)
   const nowCard = useNowCard()
   const players = useClubPlayers()
   const venues = useClubVenues()
@@ -94,13 +98,12 @@ export function OperatorShell({ children }: { children: ReactNode }) {
   }, [sync.data])
 
   const live = nowCard.data?.live
-  const syncState: SyncState = !sync.data
-    ? 'synced'
-    : !sync.data.online
-      ? 'offline'
-      : sync.data.syncing
-        ? 'syncing'
-        : 'synced'
+  const syncState: SyncState = !status.data ? 'syncing'
+    : status.data.problem === 'not_saved' ? 'failed'
+    : status.data.problem || status.data.incompleteRecords ? 'needs-attention'
+    : status.data.connectivity === 'offline' ? 'offline'
+    : status.data.syncing ? 'syncing'
+    : status.data.pendingCount > 0 ? 'saved-waiting' : 'synced'
 
   const current = (prefix: string) =>
     prefix === '/' ? pathname === '/' : pathname === prefix || pathname.startsWith(`${prefix}/`)
@@ -232,6 +235,7 @@ export function OperatorShell({ children }: { children: ReactNode }) {
           <TopBar product="Queue">
             <SyncStatus
               state={syncState}
+              onOpen={() => setSyncOpen(true)}
               pending={sync.data?.pendingCount}
               lastSyncedAt={sync.data ? timeOf(sync.data.lastSyncedAt) : undefined}
             />
@@ -253,6 +257,7 @@ export function OperatorShell({ children }: { children: ReactNode }) {
         }
       >
         <DrawerCoordinator onNavOpen={closeSettings} />
+        <SyncStatusDialog open={syncOpen} onOpenChange={setSyncOpen} />
         {/* The gate renders before any gated page mounts its queries, so no list can flash first. */}
         {gate ?? (gated && access.isPending ? null : children)}
       </AppShell>

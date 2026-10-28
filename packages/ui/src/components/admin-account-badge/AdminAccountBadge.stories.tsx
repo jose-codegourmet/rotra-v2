@@ -7,3 +7,10 @@ type Story = StoryObj<typeof meta>
 export const Default: Story = {}
 export const Narrow: Story = { globals: { viewport: { value: 'phone' } } }
 export const LongEmail: Story = { args: { email: adminAccessExamples.longEmail } }
+
+export const WithSignOut: Story = { args: { onSignOut: () => {} } }
+export const SigningOut: Story = { args: { onSignOut: () => {}, isSigningOut: true } }
+export const WithSignOutNarrow: Story = {
+  args: { onSignOut: () => {} },
+  globals: { viewport: { value: 'phone' } },
+}

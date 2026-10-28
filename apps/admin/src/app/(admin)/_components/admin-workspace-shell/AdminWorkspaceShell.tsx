@@ -37,13 +37,16 @@ export function AdminWorkspaceShell({ children }: { children: ReactNode }) {
   }, [client])
   const pathname = usePathname()
   const router = useRouter()
+  const handleSignOut = () => signOut.mutate(undefined, {
+    onSuccess: () => { router.replace('/login'); router.refresh() },
+  })
   const kind = session.data.kind
   useEffect(() => {
     if (!session.isPending && kind !== 'owner') { router.replace('/login'); router.refresh() }
   }, [kind, session.isPending, router])
   if (permissionDenied) return <>
     <TopBar product="Admin" contained={false}><ThemeToggle /></TopBar>
-    <AccessDeniedCard accountDescription="the signed-in account" isSigningOut={signOut.isPending} onSignOut={() => signOut.mutate(undefined, { onSuccess: () => { router.replace('/login'); router.refresh() } })} />
+    <AccessDeniedCard accountDescription="the signed-in account" isSigningOut={signOut.isPending} onSignOut={handleSignOut} />
   </>
   if (session.isPending) return <Skeleton label="Loading Admin" />
   if (session.data.kind !== 'owner') return null
@@ -55,10 +58,10 @@ export function AdminWorkspaceShell({ children }: { children: ReactNode }) {
     contentClassName="mx-auto flex w-full max-w-[1180px] flex-col gap-5 px-4 pt-6 pb-[120px]"
     topBar={<>
       <TopBar product="Admin" contained={false} menuOnNarrowOnly brandHref="/clubs" linkAs={Link}>
-        <AdminAccountBadge email={email} /><ThemeToggle />
+        <AdminAccountBadge email={email} onSignOut={handleSignOut} isSigningOut={signOut.isPending} /><ThemeToggle />
       </TopBar>
       {offline && session.loadedAt ? <AdminOfflineBand loadedAt={session.loadedAt} /> : null}
     </>}
-    rail={<AdminNav current={current} hrefs={HREFS} linkComponent={Link} accountEmail={email} isSigningOut={signOut.isPending} onSignOut={() => signOut.mutate(undefined, { onSuccess: () => { router.replace('/login'); router.refresh() } })} />}
+    rail={<AdminNav current={current} hrefs={HREFS} linkComponent={Link} accountEmail={email} isSigningOut={signOut.isPending} onSignOut={handleSignOut} />}
   ><AdminWorkspaceAccess.Provider value={reportPermissionDenied}>{children}</AdminWorkspaceAccess.Provider></AppShell>
 }

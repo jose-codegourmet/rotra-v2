@@ -1,5 +1,4 @@
 'use client'
-import { adminAccountKeys } from '@rotra/data/admin-account/query-keys'
 import { useAdminSession } from '@rotra/data/admin-account/use-admin-session'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useRef } from 'react'
@@ -17,7 +16,6 @@ export function AuthBridge() {
     if (previousKind.current === 'owner' && current.kind !== 'owner') {
       void client.cancelQueries()
       client.clear()
-      client.setQueryData(adminAccountKeys.session(), current)
     }
     previousKind.current = current.kind
     dispatch(setAccount(current.kind === 'owner' ? { email: current.account.email } : current.kind === 'denied' ? { accountDescription: current.accountDescription } : null))

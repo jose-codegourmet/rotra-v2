@@ -8,7 +8,7 @@
 
 **Entry:** Start session, **Continue session** from home or the calendar, or the license gate's **Continue active session**. Private operator UI, not the public page.
 
-**Header:** “Live session” with chips for mode, formats, and “Min N games”; title; “VENUE · Started HH:MM · Ends HH:MM”. Actions: **Home**, **Public page**, **Copy Facebook post**, **Payments**, **Extend time**, and **Join requests · N** (primary) while guest requests are waiting; it opens the same request list as preparation in a sheet, where confirmed guests are added present with their level locked.
+**Header:** “Live session” with chips for mode, formats, and “Min N games”; title; “VENUE · Started HH:MM · Ends HH:MM”. Actions: **Home**, **Public page**, **Copy Facebook post**, **Extend time**, and **Join requests · N** (primary) while guest requests are waiting; it opens the same request list as preparation in a sheet, where confirmed guests are added present with their level locked.
 
 Offline notice: “Working offline on this device. Matches, results and roster changes save here and sync when you reconnect. Session done needs internet.”
 
@@ -20,6 +20,7 @@ Offline notice: “Working offline on this device. Matches, results and roster c
 | Queue | “N waiting”, plus “N need attention” in warning | [Q-QUEUE](match-queue.md) |
 | Players | “P/R present” | Q-POOL |
 | Leaderboard | “NAME leads” once a game is done | Q-LEADERBOARD |
+| Payments | “P/N paid” | The session's payments checklist ([financials](financials-inventory.md)) |
 
 These are operator workspace views. They do not reintroduce the prohibited public Matches tab.
 

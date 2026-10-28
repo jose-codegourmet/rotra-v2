@@ -10,6 +10,15 @@ Every dialog names the target session/player/match, shows the actual selected va
 
 Title **Start session?** Show session, court count, formats, mode, minimum, roster “N confirmed · M present”. Copy: **“Every player's level locks now. Players you add later get a level when you add them, and it locks too.”** Offline adds “Starting on this device while offline. It syncs when you reconnect.” Primary **Start session**; secondary Back. Eligibility/license/other-active-session checks still apply; a dialog does not bypass them.
 
+## D-DELETE-SESSION — Delete session
+
+Always shown before a delete; it has two forms. Both show session, when, venue, and roster “N confirmed · M on the waitlist · K join requests”.
+
+- **Nobody confirmed:** title **Delete session?** Copy: **“The session, its public link, its waitlist and any join requests are removed. This cannot be undone.”** Primary **Delete session** (danger); secondary **Keep session**. Offline adds “You're offline. Connect to delete this session.” and disables the primary.
+- **Players confirmed:** title **Can't delete this session** Copy: **“N players are confirmed for this session. Remove every confirmed player from the roster first, then delete the session.”** Primary **Open roster** (switches to the Roster and levels tab); secondary Back. No delete button.
+
+The save re-checks: if a player was confirmed meanwhile, the error shows in the dialog and nothing is deleted.
+
 ## D-START-MATCH — Start match
 
 Title **Start match N**. Show teams with levels, format (and Fun game), and free-court buttons — two for 5v5. Primary **Start match** (disabled until courts are chosen and the match is ready); secondary Back. Recheck player/court availability before accepting. It is an explicit operator action, not automatic dispatch on free court.

@@ -297,3 +297,27 @@ export function startSession(sessionId: string) {
     return { data: s, text: 'Session started · levels locked' }
   })
 }
+/** Deletes a prepared session that nobody holds a slot in; confirmed players block it. */
+export function deleteSession(sessionId: string) {
+  return queueMutation({ area: 'Session', onlineOnly: true, clubAccess: true }, (state) => {
+    const s = sessionIn(state, sessionId)
+    if (s.state !== 'prepared')
+      throw new MockError('permission', 'Only a session that has not started can be deleted.')
+    const confirmed = state.roster.filter((p) => p.sessionId === sessionId).length
+    if (confirmed)
+      throw new MockError(
+        'conflict',
+        `${confirmed} ${confirmed === 1 ? 'player is' : 'players are'} confirmed. Remove them from the roster first.`,
+      )
+    const other = (row: { sessionId: string }) => row.sessionId !== sessionId
+    state.sessions = state.sessions.filter((x) => x.id !== sessionId)
+    state.courts = state.courts.filter(other)
+    state.waitlist = state.waitlist.filter(other)
+    state.joinRequests = state.joinRequests.filter(other)
+    state.paymentMarks = state.paymentMarks.filter(other)
+    delete state.costEstimates[sessionId]
+    delete state.downloads[sessionId]
+    delete state.downloadInfo[sessionId]
+    return { data: { id: sessionId }, text: `Session deleted · ${s.title}` }
+  })
+}

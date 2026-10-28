@@ -89,6 +89,7 @@
     "./queue-session/useUpdateQueueSession": "./src/queue-session/useUpdateQueueSession.ts",
     "./queue-session/useDownloadSession": "./src/queue-session/useDownloadSession.ts",
     "./queue-session/useStartSession": "./src/queue-session/useStartSession.ts",
+    "./queue-session/useDeleteSession": "./src/queue-session/useDeleteSession.ts",
     "./queue-session/queueSession.rules": "./src/queue-session/queueSession.rules.ts",
     "./queue-session/mutations": "./src/queue-session/mutations.ts",
     "./session-roster/useAddSavedPlayerToSession": "./src/session-roster/useAddSavedPlayerToSession.ts",

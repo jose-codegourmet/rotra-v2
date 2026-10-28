@@ -10,6 +10,7 @@ import { useLiveStandings } from '@rotra/data/match/useLiveStandings'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { MockError } from '@rotra/data/mock/errors'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
+import { useSessionPayments } from '@rotra/data/session-payment/useSessionPayments'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { useSyncState } from '@rotra/data/sync/useSyncState'
 import { Button } from '@rotra/ui/button'
@@ -56,15 +57,8 @@ import { ConsoleDeviceNotice } from '../console-device-notice/ConsoleDeviceNotic
 
 export type SessionConsoleProps = { sessionId: string; resumeSessionDone?: boolean }
 
-export type ConsoleView = 'session' | 'queue' | 'players' | 'leaderboard'
-export type ConsoleSheet =
-  | 'join-requests'
-  | 'post'
-  | 'adjust'
-  | 'add-court'
-  | 'session-done'
-  | 'payments'
-  | null
+export type ConsoleView = 'session' | 'queue' | 'players' | 'leaderboard' | 'payments'
+export type ConsoleSheet = 'join-requests' | 'post' | 'adjust' | 'add-court' | 'session-done' | null
 /** The Queue › Match editing and generation sheets: Add match / Edit lineup, Suggested match, Auto queue, Regenerate */
 export type MatchSheet =
   | MatchLineupRequest
@@ -93,7 +87,9 @@ const OFFLINE_NOTICE =
  * soon as it is listed here; an unlisted Queue hides its tab, while unlisted Players and
  * Leaderboard keep their tab and a Skeleton panel.
  */
-const VIEWS: Partial<Record<Exclude<ConsoleView, 'session'>, ComponentType<ConsoleViewProps>>> = {
+const VIEWS: Partial<
+  Record<Exclude<ConsoleView, 'session' | 'payments'>, ComponentType<ConsoleViewProps>>
+> = {
   queue: QueueView,
   players: PlayersView,
   leaderboard: LeaderboardView,
@@ -121,6 +117,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
   const roster = useSessionRoster(sessionId)
   const matches = useSessionMatches(sessionId)
   const standings = useLiveStandings(sessionId)
+  const payments = useSessionPayments(sessionId)
   const sync = useSyncState()
   const [view, setView] = useState<ConsoleView>('session')
   const [sheet, setSheet] = useState<ConsoleSheet>(resumeSessionDone ? 'session-done' : null)
@@ -217,6 +214,18 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
         ? [{ text: `${leaderPlayer ? shortName(leaderPlayer) : leader.name} leads` }]
         : [],
     },
+    {
+      value: 'payments',
+      label: 'Payments',
+      badges: payments.data
+        ? [
+            {
+              text: `${payments.data.totals.paid}/${payments.data.totals.total}`,
+              longText: ' paid',
+            },
+          ]
+        : [],
+    },
   ]
 
   const viewProps: ConsoleViewProps = {
@@ -225,7 +234,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
     onOpenProfile: setProfileId,
     onOpenQueue: () => setView(VIEWS.queue ? 'queue' : 'session'),
   }
-  const panel = (key: Exclude<ConsoleView, 'session'>) => {
+  const panel = (key: Exclude<ConsoleView, 'session' | 'payments'>) => {
     const View = VIEWS[key]
     return View ? <View {...viewProps} /> : <Skeleton className="h-56 rounded-lg" />
   }
@@ -277,9 +286,6 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
               </Button>
               <Button size="sm" onClick={() => setSheet('post')}>
                 Copy Facebook post
-              </Button>
-              <Button size="sm" onClick={() => setSheet('payments')}>
-                Payments
               </Button>
               <Button size="sm" onClick={() => setSheet('adjust')}>
                 Extend time
@@ -333,6 +339,9 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
         </TabsContent>
         <TabsContent value="players">{panel('players')}</TabsContent>
         <TabsContent value="leaderboard">{panel('leaderboard')}</TabsContent>
+        <TabsContent value="payments">
+          <PaymentsPanel sessionId={sessionId} />
+        </TabsContent>
       </Tabs>
       <ConsoleFooterBar
         gamesRecorded={recorded}
@@ -352,18 +361,6 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
         }
       >
         <JoinRequests sessionId={sessionId} variant="sheet" />
-      </Sheet>
-      <Sheet
-        open={sheet === 'payments'}
-        onOpenChange={(open) => setSheet(open ? 'payments' : null)}
-        title="Payments"
-        footer={
-          <Button variant="primary" onClick={() => setSheet(null)}>
-            Done
-          </Button>
-        }
-      >
-        {sheet === 'payments' ? <PaymentsPanel sessionId={sessionId} asSheet /> : null}
       </Sheet>
       <FacebookPost
         sessionId={sessionId}

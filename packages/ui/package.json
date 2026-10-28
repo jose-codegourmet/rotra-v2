@@ -35,6 +35,7 @@
     "./cn": "./src/lib/cn.ts",
     "./confirm-result-sheet": "./src/components/confirm-result-sheet/ConfirmResultSheet.tsx",
     "./confirm-sheet": "./src/components/confirm-sheet/ConfirmSheet.tsx",
+    "./delete-session-sheet": "./src/components/delete-session-sheet/DeleteSessionSheet.tsx",
     "./console-footer-bar": "./src/components/console-footer-bar/ConsoleFooterBar.tsx",
     "./count-stepper": "./src/components/count-stepper/CountStepper.tsx",
     "./court-card": "./src/components/court-card/CourtCard.tsx",

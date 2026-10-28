@@ -71,6 +71,8 @@ The minimum is a target, not a guarantee and not a closing rule. Full fun games 
 
 The preparation overview shows setup, the estimate, this device's download state, roster and levels, and Start. The operator can edit the preparation, preview the public page, download for offline use, add or remove roster players, set levels, mark players present (one at a time or **Mark all present**), and start.
 
+**Deleting a session.** A prepared session can be deleted while nobody is confirmed in it. Any confirmed player (roster slot) blocks the delete: the operator removes them from the roster first. Waitlist entries and pending join requests do not block it and are removed with the session, as are its courts, cost estimate and public link. Deleting needs internet and cannot be undone. A session that has started cannot be deleted; in a recurring set, only that one date is deleted.
+
 ## Starting
 
 Start session is blocked when any of these is true:

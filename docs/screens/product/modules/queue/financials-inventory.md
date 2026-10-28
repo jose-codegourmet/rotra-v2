@@ -30,7 +30,7 @@ No financial value appears on the public page, result slides, or image exports.
 
 ## Q-PAYMENTS — Payments checklist
 
-**Where:** the **Payments** tab on the preparation page, a **Payments** sheet from the live console header, and the bottom of the session record's Financials tab.
+**Where:** the **Payments** tab on the preparation page, the **Payments** tab on the live console, and the bottom of the session record's Financials tab.
 
 - Intro: “₱700 per player (custom amount, includes the ₱60 entrance fee).” or “₱594 per player (break-even share).” or “No fee set for this session.”, then “Tick players as they pay. ROTRA only records it; money is collected outside the app.”
 - Tiles: **Paid** “15/18”, **Collected**, **Still due**, **Against costs** (“+₱10” in green or “−₱7,500” in amber, “of ₱11,250 cost”).

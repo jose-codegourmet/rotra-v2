@@ -181,7 +181,8 @@
     "./fixtures/player-accounts": "./src/fixtures/playerAccounts.ts",
     "./player-account/useRequestPasswordReset": "./src/player-account/useRequestPasswordReset.ts",
     "./player-account/useResetLink": "./src/player-account/useResetLink.ts",
-    "./player-account/useResetPassword": "./src/player-account/useResetPassword.ts"
+    "./player-account/useResetPassword": "./src/player-account/useResetPassword.ts",
+    "./fixtures/financials": "./src/fixtures/financials.ts"
   },
   "scripts": {
     "lint": "biome check .",

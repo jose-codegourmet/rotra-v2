@@ -214,7 +214,10 @@
     "./sign-in-form": "./src/forms/sign-in-form/SignInForm.tsx",
     "./forgot-password-form": "./src/forms/forgot-password-form/ForgotPasswordForm.tsx",
     "./reset-password-form": "./src/forms/reset-password-form/ResetPasswordForm.tsx",
-    "./account-link-status": "./src/components/account-link-status/AccountLinkStatus.tsx"
+    "./account-link-status": "./src/components/account-link-status/AccountLinkStatus.tsx",
+    "./cost-estimate-summary": "./src/components/cost-estimate-summary/CostEstimateSummary.tsx",
+    "./shuttle-plan-row": "./src/components/shuttle-plan-row/ShuttlePlanRow.tsx",
+    "./session-financials-summary": "./src/components/session-financials-summary/SessionFinancialsSummary.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

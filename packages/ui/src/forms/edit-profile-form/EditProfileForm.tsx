@@ -3,13 +3,14 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { formatPhoneForDisplay } from '@rotra/schema/phone'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
+import { useSubmitOnce } from '@rotra/ui/hooks/use-submit-once'
 import { KeyValueList } from '@rotra/ui/key-value-list'
 import { Notice } from '@rotra/ui/notice'
 import {
   PersonalDetailsFields,
   type PersonalDetailsSection,
 } from '@rotra/ui/personal-details-fields'
-import { useEffect, useId, useRef, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { editProfileDefaultValues } from './EditProfileForm.defaultValues'
 import { type EditProfileValues, editProfileSchema } from './EditProfileForm.schema'
@@ -77,7 +78,7 @@ export function EditProfileForm({
   const { errors, dirtyFields, isDirty } = form.formState
   const [selected, setSelected] = useState<SectionId>('name')
   const [focusKey, setFocusKey] = useState<keyof EditProfileValues | null>(null)
-  const submitted = useRef(false)
+  const submitOnce = useSubmitOnce(isPending)
   const baseId = useId()
   const panelId = `${baseId}-panel`
   const tabIdPrefix = `${baseId}-tab`
@@ -85,10 +86,6 @@ export function EditProfileForm({
   useEffect(() => {
     onDirtyChange?.(isDirty)
   }, [isDirty, onDirtyChange])
-  // A finished attempt (saved, failed or offline) allows the next deliberate submit.
-  useEffect(() => {
-    if (!isPending) submitted.current = false
-  }, [isPending])
   useEffect(() => {
     if (focusKey) {
       form.setFocus(focusKey)
@@ -100,11 +97,7 @@ export function EditProfileForm({
   const errorCount = (keys: (keyof EditProfileValues)[]) => keys.filter((key) => errors[key]).length
   const failing = SECTIONS.filter((entry) => errorCount(entry.keys))
   const submit = form.handleSubmit(
-    (values) => {
-      if (submitted.current || isPending) return
-      submitted.current = true
-      onSubmit(values)
-    },
+    (values) => submitOnce(() => onSubmit(values)),
     (invalid) => {
       const first = SECTIONS.find((entry) => entry.keys.some((key) => invalid[key]))
       const key = first?.keys.find((entry) => invalid[entry])

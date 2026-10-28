@@ -9,6 +9,8 @@ import {
   type PlayerRankScenario,
 } from '@rotra/data/mock/bridge'
 import { resetDemoData } from '@rotra/data/mock/reset'
+import { openClaimLinkPreview } from '@rotra/data/player-account/claim-link-preview'
+import { playerAccountKeys } from '@rotra/data/player-account/query-keys'
 import { useRankingSettings, useSetRankingSettings } from '@rotra/data/ranking-settings'
 import { DevMenu } from '@rotra/ui/dev-menu'
 import { toast } from '@rotra/ui/toaster'
@@ -58,6 +60,12 @@ export function DevTools() {
   return (
     <DevMenu
       playerLinkPreviews={{
+        onRegistration: (state) => {
+          const token = openClaimLinkPreview(state)
+          void client.invalidateQueries({ queryKey: playerAccountKeys.claimLink(token) })
+          setOpen(false)
+          router.push(`/claim/${token}?opened=${Date.now()}`)
+        },
         onPasswordReset: (state) => {
           setOpen(false)
           router.push(`/reset-password/${state === 'valid' ? 'reset-valid' : 'reset-expired'}`)

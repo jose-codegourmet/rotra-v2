@@ -264,6 +264,7 @@ from the [database design](database_design/product/README.md). Add a row here **
 | Player account | `PlayerAccount` | `player_accounts` | Claimed sign-in link for a player; `MyAccount` is the owner-only read of it in the mock phase |
 | Player private contact | `PlayerPrivateContact` | `player_private_contacts` | Phone, email and phone privacy; never in a public projection |
 | Player social link | `PlayerSocialLink` | `player_social_links` | Facebook, Instagram, YouTube or LinkedIn URL; a description, never a sign-in method |
+| Player claim link | `PlayerClaimLink` (`ClaimLink` in the mock) | `player_claim_links` | Club-issued registration link for one existing profile; shows a masked phone only |
 | Player rank | `PlayerRank` | `player_rank_current` | Public shared-rank projection; no numerical formula in the mock phase |
 | Club assessment | `ClubAssessment` | `club_assessments` | |
 | Inventory item | `InventoryItem` | `inventory_items` | |

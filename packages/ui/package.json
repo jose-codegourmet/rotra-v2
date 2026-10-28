@@ -251,7 +251,11 @@
     "./access-denied-card": "./src/components/access-denied-card/AccessDeniedCard.tsx",
     "./admin-nav": "./src/components/admin-nav/AdminNav.tsx",
     "./admin-account-badge": "./src/components/admin-account-badge/AdminAccountBadge.tsx",
-    "./admin-offline-band": "./src/components/admin-offline-band/AdminOfflineBand.tsx"
+    "./admin-offline-band": "./src/components/admin-offline-band/AdminOfflineBand.tsx",
+    "./account-link-status/link-page": "./src/components/account-link-status/link-page/LinkPage.tsx",
+    "./claim-identity-check": "./src/components/claim-identity-check/ClaimIdentityCheck.tsx",
+    "./claim-form": "./src/forms/claim-form/ClaimForm.tsx",
+    "./hooks/use-submit-once": "./src/hooks/useSubmitOnce.ts"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

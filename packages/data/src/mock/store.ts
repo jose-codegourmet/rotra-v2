@@ -5,7 +5,7 @@ import { clubs } from '../fixtures/clubs'
 import { createFinancialFixtures } from '../fixtures/financials'
 import { inventoryItems } from '../fixtures/inventory'
 import { licensePayments } from '../fixtures/licensePayments'
-import { playerAccounts } from '../fixtures/playerAccounts'
+import { claimLinks, playerAccounts } from '../fixtures/playerAccounts'
 import { playerAwardHistory } from '../fixtures/playerAwardHistory'
 import { playerProfiles } from '../fixtures/playerProfiles'
 import { createPlayerRankFixtures } from '../fixtures/playerRanks'
@@ -18,6 +18,7 @@ import type { InventoryItem } from '../inventory/inventory.types'
 import type { ClubLicenseTerm } from '../license/license.types'
 import type { Match } from '../match/match.types'
 import type { Player, PlayerProfile, PlayerRank, PlayerSessionRecord } from '../player/player.types'
+import type { ClaimLinkRecord } from '../player-account/playerAccount.types'
 import type {
   DownloadState,
   QueueSession,
@@ -46,6 +47,7 @@ export type MockState = {
   paymentMarks: SessionPaymentMark[]
   playerAccounts: typeof playerAccounts
   resetLinks: Record<string, 'valid' | 'used'>
+  claimLinks: Record<string, ClaimLinkRecord>
   playerProfiles: PlayerProfile[]
   playerRanks: Record<string, PlayerRank>
   playerGames: Record<string, PlayerSessionRecord[]>
@@ -111,6 +113,7 @@ function seedState(): MockState {
     playerProfiles,
     playerAccounts,
     resetLinks: { 'reset-valid': 'valid' },
+    claimLinks,
     rankingSettings,
     clubs,
     venues,

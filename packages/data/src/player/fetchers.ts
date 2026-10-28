@@ -39,6 +39,22 @@ export async function getPlayerProfile(
   return readMockState().playerProfiles.find((player) => player.playerId === playerId) ?? null
 }
 
+/** Writes validated personal fields onto a store profile; blank experience is stored as null. */
+export function applyPersonalProfile(profile: PlayerProfile, values: PersonalProfileValues) {
+  const toNumber = (text: string) => (text ? Number(text) : null)
+  profile.fullName = values.fullName
+  profile.nickname = values.nickname || null
+  profile.playingStyle = values.playingStyle
+  profile.experienceYears = toNumber(values.experienceYears)
+  profile.experienceMonths = toNumber(values.experienceMonths)
+  profile.socialLinks = {
+    facebook: values.facebook,
+    instagram: values.instagram,
+    youtube: values.youtube,
+    linkedin: values.linkedin,
+  }
+}
+
 /** Saves the signed-in player's personal fields. Offline and failed saves leave the store unchanged. */
 export async function updateMyProfile(input: PersonalProfileValues): Promise<PlayerProfile> {
   await delay(900)
@@ -52,22 +68,11 @@ export async function updateMyProfile(input: PersonalProfileValues): Promise<Pla
   // Strict: phone, email, the RTR ID or rank in the input are rejected, never silently dropped.
   const values = personalProfileSchema.parse(input)
   checkMockSave()
-  const toNumber = (text: string) => (text ? Number(text) : null)
   let saved: PlayerProfile | undefined
   mockStore.update((draft) => {
     const profile = draft.playerProfiles.find((entry) => entry.playerId === session.account.id)
     if (!profile) throw new MockError('permission', 'This profile is not yours to edit.')
-    profile.fullName = values.fullName
-    profile.nickname = values.nickname || null
-    profile.playingStyle = values.playingStyle
-    profile.experienceYears = toNumber(values.experienceYears)
-    profile.experienceMonths = toNumber(values.experienceMonths)
-    profile.socialLinks = {
-      facebook: values.facebook,
-      instagram: values.instagram,
-      youtube: values.youtube,
-      linkedin: values.linkedin,
-    }
+    applyPersonalProfile(profile, values)
     saved = structuredClone(profile)
   })
   if (!saved) throw new Error('Profile save produced no result.')

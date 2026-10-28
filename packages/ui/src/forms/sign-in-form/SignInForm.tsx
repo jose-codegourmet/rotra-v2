@@ -3,6 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { AuthCard } from '@rotra/ui/auth-card'
 import { Button } from '@rotra/ui/button'
 import { Field } from '@rotra/ui/field'
+import { useSubmitOnce } from '@rotra/ui/hooks/use-submit-once'
 import { Notice } from '@rotra/ui/notice'
 import { PhoneOrEmailInput } from '@rotra/ui/phone-or-email-input'
 import { TextInput } from '@rotra/ui/text-input'
@@ -35,6 +36,7 @@ export function SignInForm({
     defaultValues: { ...signInDefaultValues, ...defaultValues },
   })
   const errors = form.formState.errors
+  const submitOnce = useSubmitOnce(isPending)
   return (
     <AuthCard
       title="Sign in"
@@ -46,7 +48,7 @@ export function SignInForm({
           noValidate
           className="flex flex-col gap-[18px]"
           onSubmit={form.handleSubmit((values) => {
-            if (!isPending && !offline) onSubmit(values)
+            if (!offline) submitOnce(() => onSubmit(values))
           })}
         >
           {successNote ? <Notice tone="success">{successNote}</Notice> : null}

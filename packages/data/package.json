@@ -227,7 +227,13 @@
     "./admin-account/use-admin-session": "./src/admin-account/useAdminSession.ts",
     "./admin-account/use-sign-in-admin": "./src/admin-account/useSignInAdmin.ts",
     "./admin-account/use-sign-out-admin": "./src/admin-account/useSignOutAdmin.ts",
-    "./admin-account/use-admin-connectivity": "./src/admin-account/useAdminConnectivity.ts"
+    "./admin-account/use-admin-connectivity": "./src/admin-account/useAdminConnectivity.ts",
+    "./player-account/rules": "./src/player-account/playerAccount.rules.ts",
+    "./player-account/claim-link-preview": "./src/player-account/claimLinkPreview.ts",
+    "./player-account/useClaimLink": "./src/player-account/useClaimLink.ts",
+    "./player-account/useCompleteClaim": "./src/player-account/useCompleteClaim.ts",
+    "./player-account/useCheckClaimStatus": "./src/player-account/useCheckClaimStatus.ts",
+    "./player-account/query-keys": "./src/player-account/queryKeys.ts"
   },
   "scripts": {
     "lint": "biome check .",

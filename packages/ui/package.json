@@ -230,7 +230,10 @@
     "./forms/inventory-item-form/default-values": "./src/forms/inventory-item-form/InventoryItemForm.defaultValues.ts",
     "./inventory-screen": "./src/components/inventory-screen/InventoryScreen.tsx",
     "./sync-status-sheet": "./src/components/sync-status-sheet/SyncStatusSheet.tsx",
-    "./sync-attention-notice": "./src/components/sync-attention-notice/SyncAttentionNotice.tsx"
+    "./sync-attention-notice": "./src/components/sync-attention-notice/SyncAttentionNotice.tsx",
+    "./interruption-check-sheet": "./src/components/interruption-check-sheet/InterruptionCheckSheet.tsx",
+    "./recovery-status-panel": "./src/components/recovery-status-panel/RecoveryStatusPanel.tsx",
+    "./unrecoverable-session-panel": "./src/components/unrecoverable-session-panel/UnrecoverableSessionPanel.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

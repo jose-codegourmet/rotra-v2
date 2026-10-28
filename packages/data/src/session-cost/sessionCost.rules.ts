@@ -36,5 +36,5 @@ export function normalizeSessionCost(values: SessionCostInput | null | undefined
   if (!values) return null
   const shuttles = values.shuttles.filter((line) => line.inventoryItemId && line.tubes > 0)
   if (values.courtFeePerCourtHour === null && values.entranceFeePerHead === null && !shuttles.length && values.paymentMode === 'break_even') return null
-  return { ...values, shuttles, customFeePerHead: values.paymentMode === 'custom' ? values.customFeePerHead : null }
+  return { courtFeePerCourtHour: values.courtFeePerCourtHour, entranceFeePerHead: values.entranceFeePerHead, paymentMode: values.paymentMode, shuttles, customFeePerHead: values.paymentMode === 'custom' ? values.customFeePerHead : null }
 }

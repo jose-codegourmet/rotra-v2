@@ -1,3 +1,4 @@
+import type { SessionCostInput } from '../session-cost/sessionCost.types'
 import { formatPeso } from '@rotra/schema/money'
 import { getMockDevState } from '../mock/bridge'
 import { MockError } from '../mock/errors'
@@ -20,7 +21,8 @@ export async function getSessionPayments(sessionId: string) {
     return { sessionPlayerId: p.id, clubPlayerId: p.clubPlayerId, name: p.nameSnapshot, picture: state.players.find((player) => player.id === clubPlayer?.playerId)?.picture, paid: mark ? { amount: mark.amountMinor, at: mark.markedAt } : undefined }
   }).sort((a, b) => Number(!!a.paid) - Number(!!b.paid) || a.name.localeCompare(b.name))
   const amountDue = amountDuePerHead(estimate)
-  return { players, amountDue, dueBasis: cost?.saved.paymentMode ?? 'break_even', entranceFeeIncluded: estimate?.entranceFeePerHead, totals: paymentTotals({ marks, total: roster.length, amountDue, cost: estimate?.total ?? null }) }
+  const dueBasis: SessionCostInput['paymentMode'] = cost?.saved.paymentMode ?? 'break_even'
+  return { players, amountDue, dueBasis, entranceFeeIncluded: estimate?.entranceFeePerHead, totals: paymentTotals({ marks, total: roster.length, amountDue, cost: estimate?.total ?? null }) }
 }
 function requirePaymentsWrite(state: MockState, sessionId: string) {
   const session = sessionIn(state, sessionId)

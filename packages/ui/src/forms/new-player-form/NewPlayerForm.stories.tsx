@@ -1,11 +1,10 @@
-import { clubPlayers } from '@rotra/data/fixtures/players'
+import { storyIdentityPlayers } from '@rotra/data/fixtures/players'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn, within } from 'storybook/test'
 import { NewPlayerForm } from './NewPlayerForm'
 
-// A guest from the Queue prototype's saved players, typed in as a new player.
-const guest = clubPlayers.find((p) => p.identity === 'guest')
-if (!guest) throw new Error('Guest fixture missing')
+// A walk-in guest, typed in as a new player.
+const guest = storyIdentityPlayers.guest
 
 const meta = {
   title: 'Queue/NewPlayerForm',

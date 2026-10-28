@@ -261,7 +261,7 @@ export function DevMenu({
                 </Button>
               </div>
               <p className="text-xs text-fg2">
-                Once Raymark registers, the unused link shows as already used.
+                Raymark is already registered, so the unused link shows as already used.
               </p>
               {!playerLinkPreviews?.onRegistration ? (
                 <p className="text-xs text-fg2">

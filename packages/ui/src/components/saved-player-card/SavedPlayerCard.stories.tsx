@@ -1,5 +1,5 @@
 import type { ClubPlayer } from '@rotra/data/club-player/types'
-import { clubPlayers, players } from '@rotra/data/fixtures/players'
+import { clubPlayers, players, storyIdentityPlayers } from '@rotra/data/fixtures/players'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import { SavedPlayerCard, type SavedPlayerCardProps } from './SavedPlayerCard'
@@ -17,7 +17,9 @@ const cityOf = (p: ClubPlayer) => {
   return code ? (CITY[code] ?? code) : null
 }
 const byIdentity = (identity: ClubPlayer['identity']) => {
-  const p = clubPlayers.find((x) => x.identity === identity)
+  const p = [...clubPlayers, ...Object.values(storyIdentityPlayers)].find(
+    (x) => x.identity === identity,
+  )
   if (!p) throw new Error(`No ${identity} player in fixtures`)
   return p
 }
@@ -64,7 +66,7 @@ export const NoLevel: Story = { args: { level: null } }
 
 export const LongNameAndNickname: Story = {
   args: {
-    name: `${byIdentity('unclaimed').fullName} Bautista Villareal`,
+    name: `${byIdentity('registered').fullName} Bautista Villareal`,
     nickname: 'Raymark the smash machine',
   },
 }

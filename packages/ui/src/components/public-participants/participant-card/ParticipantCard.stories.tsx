@@ -1,10 +1,10 @@
-import { clubPlayers } from '@rotra/data/fixtures/players'
+import { clubPlayers, storyIdentityPlayers } from '@rotra/data/fixtures/players'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { ParticipantCard } from './ParticipantCard'
 
 const registered = clubPlayers.find((p) => p.identity === 'registered')
-const guest = clubPlayers.find((p) => p.identity === 'guest')
-if (!registered || !guest) throw new Error('Player fixtures missing')
+const guest = storyIdentityPlayers.guest
+if (!registered) throw new Error('Player fixtures missing')
 
 const meta = {
   title: 'Queue/PublicSession/PublicParticipants/ParticipantCard',

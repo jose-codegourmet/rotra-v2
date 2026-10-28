@@ -1,5 +1,11 @@
 import type { ClubPlayer } from '@rotra/data/club-player/types'
-import { clubPlayers, directoryPlayers, players } from '@rotra/data/fixtures/players'
+import {
+  clubPlayers,
+  directoryPlayers,
+  leaderboardLevels,
+  leaderboardPlayers,
+  players,
+} from '@rotra/data/fixtures/players'
 import { queueSessionFixtures } from '@rotra/data/fixtures/queueSessions'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
@@ -23,18 +29,16 @@ const savedCandidates: AddPlayerCandidate[] = clubPlayers.map((p: ClubPlayer, i)
   phoneHidden: i === 0 || i === 3,
 }))
 
-// The Queue prototype's DIRECTORY: identity, suggestion and rank label for the four fixture profiles.
-const DIRECTORY_EXTRA = [
-  { identity: 'registered', suggestion: 'advanced_low', rankLabel: 'Rank 214' },
-  { identity: 'registered', suggestion: 'intermediate_high', rankLabel: 'Rank 388' },
-  { identity: 'unclaimed', suggestion: 'beginner_high', rankLabel: 'Not ranked yet' },
-  { identity: 'registered', suggestion: 'intermediate_mid', rankLabel: 'Rank 1,042' },
-] as const satisfies readonly Pick<AddPlayerCandidate, 'identity' | 'suggestion' | 'rankLabel'>[]
-const directoryCandidates: AddPlayerCandidate[] = directoryPlayers.map((p, i) => {
-  const extra = DIRECTORY_EXTRA[i]
-  if (!extra) throw new Error('Directory fixture missing')
-  return { id: p.id, name: p.fullName, nickname: p.nickname, rtrId: p.rtrId, ...extra }
-})
+// Directory suggestions: registered players, with their leaderboard level and position.
+const directoryCandidates: AddPlayerCandidate[] = directoryPlayers.map((p) => ({
+  id: p.id,
+  name: p.fullName,
+  nickname: p.nickname,
+  rtrId: p.rtrId,
+  identity: 'registered',
+  suggestion: leaderboardLevels[p.id] ?? null,
+  rankLabel: `Rank ${leaderboardPlayers.findIndex((entry) => entry.id === p.id) + 1}`,
+}))
 
 /** Answers Player Information searches from the fixtures, like the mock store does. */
 function Demo(props: AddPlayerSheetProps) {

@@ -1,11 +1,9 @@
-import { clubPlayers } from '@rotra/data/fixtures/players'
+import { storyIdentityPlayers } from '@rotra/data/fixtures/players'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import { InviteSheet } from './InviteSheet'
 
-const guest = clubPlayers.find((p) => p.identity === 'guest')
-const unclaimed = clubPlayers.find((p) => p.identity === 'unclaimed')
-if (!guest || !unclaimed) throw new Error('Fixtures missing')
+const { guest, unclaimed } = storyIdentityPlayers
 
 // The prototype's sample link shape (rotra.example/join/<code>).
 const meta = {

@@ -1,5 +1,10 @@
 import type { ClubPlayer } from '@rotra/data/club-player/types'
-import { clubPlayers, directoryPlayers, players } from '@rotra/data/fixtures/players'
+import {
+  clubPlayers,
+  directoryPlayers,
+  players,
+  storyIdentityPlayers,
+} from '@rotra/data/fixtures/players'
 import type { PlayingLevel } from '@rotra/data/player/types'
 import type { IdentityCheck } from '@rotra/data/session-roster/types'
 import type { Meta, StoryObj } from '@storybook/react-vite'
@@ -9,14 +14,16 @@ import { PlayerConfirmCard, type PlayerConfirmCardProps } from './PlayerConfirmC
 
 const rtrOf = (p: ClubPlayer) => players.find((x) => x.id === p.playerId)?.rtrId ?? null
 const byIdentity = (identity: ClubPlayer['identity']) => {
-  const p = clubPlayers.find((x) => x.identity === identity)
+  const p = [...clubPlayers, ...Object.values(storyIdentityPlayers)].find(
+    (x) => x.identity === identity,
+  )
   if (!p) throw new Error(`No ${identity} player in fixtures`)
   return p
 }
 const unclaimed = byIdentity('unclaimed')
 const registered = byIdentity('registered')
 const guest = byIdentity('guest')
-// Sam: the Queue prototype's unclaimed Player Information suggestion (Beginner High).
+// Sam: a Player Information suggestion not yet saved at this club (Beginner High).
 const leo = directoryPlayers[2]
 if (!leo) throw new Error('Directory fixture missing')
 
@@ -64,7 +71,7 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-/** Andrew from Saved players: the primary waits until a check is chosen. */
+/** An unclaimed saved player: the primary waits until a check is chosen. */
 export const UnclaimedNoCheck: Story = {}
 
 export const UnclaimedChecked: Story = { args: { check: 'rtr-id' } }
@@ -76,7 +83,7 @@ export const FromPlayerInformation: Story = {
   args: {
     name: leo.fullName,
     rtrId: leo.rtrId,
-    identity: 'unclaimed',
+    identity: 'registered',
     suggestion: 'beginner_high',
     level: 'beginner_high',
   },

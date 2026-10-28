@@ -19,10 +19,10 @@ function toLevel(value: string): PlayingLevel {
   return level
 }
 
-/** Admin Players list: every player except the four directory suggestions. */
+/** Admin Players list: every player. */
 export const adminPlayers = selectPlayers(seed.adminPlayerIds)
 
-/** Ranked identities, from Advanced down to Beginner; unclaimed players are not on the board. */
+/** Ranked identities, from Advanced down to Beginner. */
 export const leaderboardPlayers = selectPlayers(seed.leaderboard.map((entry) => entry.playerId))
 
 /** Each leaderboard player's level, by player ID. */
@@ -36,7 +36,7 @@ export const JOSE_PLAYER_ID = '2c7f6a7b-eed9-5051-9426-6dbce5133fbc'
 /** Queue's four directory suggestions (not yet saved club players). */
 export const directoryPlayers = selectPlayers(seed.directoryPlayerIds)
 
-/** Queue's 20 saved players, including four guests with null playerId. */
+/** Queue's 20 saved players, all registered. */
 export const clubPlayers = [
   {
     id: 'c3e0d1c0-f087-5514-8c94-7ce61c54ed3f',
@@ -62,7 +62,7 @@ export const clubPlayers = [
     playerId: 'bc4c3446-0131-591b-ab03-af19225dbe8a',
     fullName: 'Raymark',
     nickname: null,
-    identity: 'unclaimed',
+    identity: 'registered',
     playingLevel: 'intermediate_high',
   },
   {
@@ -89,7 +89,7 @@ export const clubPlayers = [
     playerId: 'a5c35992-7597-55cd-bdf9-20c7a9440af4',
     fullName: 'Dexter',
     nickname: null,
-    identity: 'unclaimed',
+    identity: 'registered',
     playingLevel: 'intermediate_mid',
   },
   {
@@ -104,11 +104,11 @@ export const clubPlayers = [
   {
     id: '04e75a8d-2abd-5f74-bb29-50234babc853',
     clubId: '6cd364d4-0e3a-5c3d-9e75-2116cc845714',
-    playerId: null,
+    playerId: '8f054e7e-aefb-5d54-b5bb-b245f8673b3a',
     fullName: 'Joeriz',
     nickname: null,
-    identity: 'guest',
-    playingLevel: null,
+    identity: 'registered',
+    playingLevel: 'beginner_high',
   },
   {
     id: 'c927b4df-93eb-5e9a-a042-d6db900e2788',
@@ -125,7 +125,7 @@ export const clubPlayers = [
     playerId: '80726593-1823-5c2d-a3fc-5f904e414d80',
     fullName: 'Vince',
     nickname: null,
-    identity: 'unclaimed',
+    identity: 'registered',
     playingLevel: 'intermediate_mid',
   },
   {
@@ -140,11 +140,11 @@ export const clubPlayers = [
   {
     id: '1a31f9b1-a7b8-5f8a-b2ed-28bc867e14d1',
     clubId: '6cd364d4-0e3a-5c3d-9e75-2116cc845714',
-    playerId: null,
+    playerId: '66f774e9-3b82-5631-931c-9858ff8eb01f',
     fullName: 'Klod',
     nickname: null,
-    identity: 'guest',
-    playingLevel: null,
+    identity: 'registered',
+    playingLevel: 'intermediate_low',
   },
   {
     id: '0cdbe83b-71ae-5b60-9904-5bbc97cc5d65',
@@ -167,11 +167,11 @@ export const clubPlayers = [
   {
     id: 'b7e2b04d-f7dc-5b0c-b8ce-80a3c9f0a468',
     clubId: '6cd364d4-0e3a-5c3d-9e75-2116cc845714',
-    playerId: null,
+    playerId: 'bdc00b5e-c882-52d6-ae19-260104a128ab',
     fullName: 'Russel',
     nickname: null,
-    identity: 'guest',
-    playingLevel: null,
+    identity: 'registered',
+    playingLevel: 'advanced_mid',
   },
   {
     id: '4f306c0d-efa8-5aa5-8518-a05f0bcc2891',
@@ -188,7 +188,7 @@ export const clubPlayers = [
     playerId: 'b789f194-76fb-5a5b-ad80-a37f022a785a',
     fullName: 'Andrew',
     nickname: null,
-    identity: 'unclaimed',
+    identity: 'registered',
     playingLevel: 'intermediate_low',
   },
   {
@@ -203,11 +203,11 @@ export const clubPlayers = [
   {
     id: '703ff4c1-3676-5912-8630-b5d4f756490c',
     clubId: '6cd364d4-0e3a-5c3d-9e75-2116cc845714',
-    playerId: null,
+    playerId: 'e8a7e34b-bd3d-5fc4-8331-a20031a545b9',
     fullName: 'Nathan',
     nickname: null,
-    identity: 'guest',
-    playingLevel: null,
+    identity: 'registered',
+    playingLevel: 'advanced_mid',
   },
   {
     id: '81f2ad7f-728c-5bc8-9df5-d2f6c993a405',
@@ -219,3 +219,28 @@ export const clubPlayers = [
     playingLevel: 'beginner_high',
   },
 ] satisfies ClubPlayer[]
+
+/**
+ * Story-only club players for the guest and unclaimed states. Every demo club player is registered,
+ * so these placeholders are not in clubPlayers or the mock store.
+ */
+export const storyIdentityPlayers = {
+  guest: {
+    id: 'story-guest',
+    clubId: '6cd364d4-0e3a-5c3d-9e75-2116cc845714',
+    playerId: null,
+    fullName: 'Walk-in Guest',
+    nickname: null,
+    identity: 'guest',
+    playingLevel: null,
+  },
+  unclaimed: {
+    id: 'story-unclaimed',
+    clubId: '6cd364d4-0e3a-5c3d-9e75-2116cc845714',
+    playerId: null,
+    fullName: 'Unclaimed Profile',
+    nickname: null,
+    identity: 'unclaimed',
+    playingLevel: 'intermediate_mid',
+  },
+} satisfies Record<string, ClubPlayer>

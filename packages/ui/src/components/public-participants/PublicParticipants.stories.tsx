@@ -31,7 +31,7 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-/** 18 confirmed people (registered, unclaimed and guests) and two on the waitlist. */
+/** 18 confirmed registered players and two on the waitlist. */
 export const EighteenWithWaitlist: Story = {}
 
 export const NoWaitlist: Story = { args: { waitlist: [] } }

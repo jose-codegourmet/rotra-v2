@@ -21,7 +21,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <script dangerouslySetInnerHTML={{ __html: getThemeScript(THEME_STORAGE_KEY) }} />
       </head>
       <body>
-        <AppProviders><PlayerShell>{children}</PlayerShell></AppProviders>
+        <AppProviders>
+          <PlayerShell>{children}</PlayerShell>
+        </AppProviders>
       </body>
     </html>
   )

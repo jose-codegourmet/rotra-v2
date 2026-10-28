@@ -1,7 +1,7 @@
 'use client'
 
-import { Toaster } from '@rotra/ui/toaster'
 import { ThemeProvider } from '@rotra/ui/theme-provider'
+import { Toaster } from '@rotra/ui/toaster'
 import type { ReactNode } from 'react'
 import { AuthBridge } from './AuthBridge'
 import { QueryProvider } from './QueryProvider'

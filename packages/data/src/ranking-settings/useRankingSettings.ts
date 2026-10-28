@@ -1,7 +1,7 @@
 'use client'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { playerKeys } from '../player/queryKeys'
 import { leaderboardKeys } from '../leaderboard/queryKeys'
+import { playerKeys } from '../player/queryKeys'
 import { getRankingSettings, setRankingSettings } from './fetchers'
 import { rankingSettingsKeys } from './queryKeys'
 export function useRankingSettings() {

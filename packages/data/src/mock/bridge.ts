@@ -12,7 +12,12 @@ export const DEFAULT_DEV_STATE: MockDevState = {
   nextSaveFails: false,
   nextSaveConflict: false,
 }
-export type PlayerRankScenario = 'on-leaderboard' | 'below-threshold' | 'needs-reassessment' | 'updating' | 'no-rank'
+export type PlayerRankScenario =
+  | 'on-leaderboard'
+  | 'below-threshold'
+  | 'needs-reassessment'
+  | 'updating'
+  | 'no-rank'
 export type LeaderboardScenario = 'normal' | 'loading' | 'error' | 'empty'
 export type PlayerMockDevState = MockDevState & {
   playerRankScenario?: PlayerRankScenario
@@ -23,7 +28,10 @@ let consume = (_key: 'nextSaveFails' | 'nextSaveConflict') => {}
 const listeners = new Set<() => void>()
 
 /** App-owned Redux supplies the adapter; the data package never imports an app. */
-export function connectMockBridge(adapter: { read: () => PlayerMockDevState; consume: typeof consume }) {
+export function connectMockBridge(adapter: {
+  read: () => PlayerMockDevState
+  consume: typeof consume
+}) {
   read = adapter.read
   consume = adapter.consume
   return () => {

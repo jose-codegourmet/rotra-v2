@@ -8,9 +8,33 @@ import { useState } from 'react'
 import { useAppSelector } from '@/store/hooks'
 import { selectDev } from '@/store/slices/devSlice'
 export function ForgotPassword() {
-  const mutation = useRequestPasswordReset(), router = useRouter(), { offline } = useAppSelector(selectDev)
+  const mutation = useRequestPasswordReset(),
+    router = useRouter(),
+    { offline } = useAppSelector(selectDev)
   const [sentEmail, setSentEmail] = useState<string | null>(null)
-  if (sentEmail !== null) return <AccountLinkStatus variant="reset-sent" email={sentEmail} onBackToSignIn={() => router.push('/login')} />
-  return <ForgotPasswordForm onBack={() => router.push('/login')} isPending={mutation.isPending} offline={offline} serverError={mutation.error?.message}
-    onSubmit={({ email }) => mutation.mutate(email, { onSuccess: () => { setSentEmail(email); toast('Reset link requested') }, onError: (error) => toast.error(error.message) })} />
+  if (sentEmail !== null)
+    return (
+      <AccountLinkStatus
+        variant="reset-sent"
+        email={sentEmail}
+        onBackToSignIn={() => router.push('/login')}
+      />
+    )
+  return (
+    <ForgotPasswordForm
+      onBack={() => router.push('/login')}
+      isPending={mutation.isPending}
+      offline={offline}
+      serverError={mutation.error?.message}
+      onSubmit={({ email }) =>
+        mutation.mutate(email, {
+          onSuccess: () => {
+            setSentEmail(email)
+            toast('Reset link requested')
+          },
+          onError: (error) => toast.error(error.message),
+        })
+      }
+    />
+  )
 }

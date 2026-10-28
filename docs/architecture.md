@@ -1,7 +1,7 @@
 # Architecture — ROTRA v1
 
-**Last verified:** 2026-10-27 · **Status:** target architecture for the v1 rebuild. **Almost nothing below
-is built yet.** Section 1 says exactly what exists today.
+**Last verified:** 2026-10-28 · **Status:** target architecture for the v1 rebuild, with mock
+implementations in progress. Section 1 distinguishes implemented flows from future work.
 
 **Read this when** you add an app, package, route, provider, data hook, or dependency, or need to know
 where something belongs. For *how to write* the code, read [coding-conventions.md](coding-conventions.md).
@@ -12,19 +12,21 @@ where something belongs. For *how to write* the code, read [coding-conventions.m
 
 | Path | State |
 |---|---|
-| `apps/` | `queue`, `player`, `admin`: Next.js 16 scaffolds with placeholder home pages (F01.1) |
+| `apps/` | Three Next.js 16 apps. Player has mock leaderboard, profile, rank, history, sign-in and password recovery routes; Queue has mock club/session preparation routes; Admin remains a scaffold |
 | `packages/config` | Shared tsconfig and `theme.css`: Tailwind 4 tokens copied from the prototypes (F02.1) |
-| `packages/ui` | `@rotra/ui`: `cn`, `ComponentMeta`, shadcn config and the one Storybook (F03.1). Components arrive in F04 |
+| `packages/ui` | Shared visual components and forms with stories and metadata, plus `cn`, `ComponentMeta` and the one Storybook |
 | `packages/schema` | Shared Zod field families, phone/money tests, Vitest (F05.1) |
-| `packages/data` | In-memory store, latency/errors, example club hook, shared prototype identity/venue fixtures (F06.1–F06.2) |
+| `packages/data` | In-memory store, mock auth, club/session and Player fixtures, fetchers, query keys and hooks |
 | `packages/db` | **Empty.** The database epic comes after the mock phase (§9) |
-| `openspec/` | Cleared. Not used in the v1 process |
+| `openspec/` | Focused Player implementation records restored at the product owner’s request; see `openspec/README.md`. Product and prototype docs retain precedence |
 | `docs/frames/*/*.html` | The three clickable prototypes: the design source of truth |
 | `Makefile`, root `package.json` scripts | Run the three apps through Turborepo (F01.1) |
-| `.husky/`, `.github/` | Git hooks (lint on commit, commitlint) and an advisory CI workflow (F01.2, F01.3) |
+| `.husky/`, `.github/` | Commitlint hook (pre-commit lint disabled) and advisory CI; see ways-of-working §5 |
 
-The apps still show placeholders. Queue home demonstrates a club hook with loading/error/data states;
-all three apps mount QueryClient providers. No product flow, real auth, persistence, or backend is implemented.
+All three apps mount QueryClient providers. Implemented flows use in-memory mocks; real auth,
+persistence and backend integration remain future work. Player implementation and remaining account/claim
+scope are recorded in `openspec/specs/player-information/spec.md`; no complete numerical ranking
+engine is implemented.
 
 ---
 

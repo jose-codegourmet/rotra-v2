@@ -8,15 +8,28 @@ export async function playerRequest(signal?: AbortSignal) {
   requireOnline()
   if (getMockDevState().leaderboardScenario === 'loading') {
     await new Promise<void>((resolve, reject) => {
-      const cleanup = () => { unsubscribe(); signal?.removeEventListener('abort', abort) }
-      const abort = () => { cleanup(); reject(signal?.reason) }
+      const cleanup = () => {
+        unsubscribe()
+        signal?.removeEventListener('abort', abort)
+      }
+      const abort = () => {
+        cleanup()
+        reject(signal?.reason)
+      }
       const unsubscribe = subscribeMockBridge(() => {
-        if (getMockDevState().leaderboardScenario !== 'loading' || getMockDevState().offline) { cleanup(); resolve() }
+        if (getMockDevState().leaderboardScenario !== 'loading' || getMockDevState().offline) {
+          cleanup()
+          resolve()
+        }
       })
       signal?.addEventListener('abort', abort, { once: true })
       if (signal?.aborted) abort()
     })
   }
   requireOnline()
-  if (getMockDevState().leaderboardScenario === 'error') throw new MockError('retryable', "Couldn't load the leaderboard. Check your connection, then try again.")
+  if (getMockDevState().leaderboardScenario === 'error')
+    throw new MockError(
+      'retryable',
+      "Couldn't load the leaderboard. Check your connection, then try again.",
+    )
 }

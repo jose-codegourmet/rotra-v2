@@ -1,63 +1,304 @@
 /* Exact token-based podium surfaces and motion from rotra-player.html. */
-.rotra-podium { position: relative; isolation: isolate; overflow: hidden; display: flex; flex-direction: column; gap: 18px; padding: 18px 18px 0; border-radius: 16px;
+.rotra-podium {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 18px 18px 0;
+  border-radius: 16px;
   border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--border));
   background:
-    radial-gradient(120% 70% at 50% 100%, color-mix(in srgb, var(--accent) 26%, transparent), transparent 70%),
-    repeating-linear-gradient(0deg, color-mix(in srgb, var(--accent) 7%, transparent) 0 1px, transparent 1px 8px),
-    repeating-linear-gradient(90deg, color-mix(in srgb, var(--accent) 7%, transparent) 0 1px, transparent 1px 8px),
-    var(--surface); }
-.rotra-pod-head { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: baseline; gap: 8px 16px; flex-wrap: wrap; }
-.rotra-pod-head h2 { font-family: var(--pixel); font-weight: 700; font-size: 18px; letter-spacing: 1px; text-transform: uppercase; color: var(--accent); }
-.rotra-pod-stage { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: end; gap: 10px; padding-top: 40px; }
-.rotra-pod { --glow: 30%; display: flex; flex-direction: column; align-items: center; gap: 12px; min-width: 0; padding: 0; border: 0; background: none; color: inherit; cursor: pointer; font: inherit; }
-.rotra-pod.p1 { --glow: 100%; order: 2; }
-.rotra-pod.p2 { --glow: 55%; order: 1; }
-.rotra-pod.p3 { --glow: 38%; order: 3; }
-.rotra-pod-who { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center; min-width: 0; max-width: 100%; padding-inline: 4px; }
-.rotra-pod-who .avatar { position: relative; z-index: 1; width: 64px; height: 64px; font-size: 20px; margin-bottom: 8px; border-radius: 12px;
-  box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px color-mix(in srgb, var(--accent) var(--glow), var(--border-strong)); }
-.rotra-pod.p1 .rotra-pod-who .avatar { width: 86px; height: 86px; font-size: 26px; border-radius: 14px;
-  box-shadow: 0 0 0 3px var(--surface), 0 0 0 6px var(--accent), 0 0 32px 6px color-mix(in srgb, var(--accent) 50%, transparent); }
-.rotra-pod-name { position: relative; z-index: 1; font-weight: 700; font-size: 15px; line-height: 1.25; overflow-wrap: anywhere; }
-.rotra-pod.p1 .rotra-pod-name { font-size: 18px; }
-.rotra-pod-lv { position: relative; z-index: 1; font-size: 12px; font-weight: 600; color: var(--fg2); }
-.rotra-pod.p1 .rotra-pod-lv { color: var(--accent); }
+    radial-gradient(
+      120% 70% at 50% 100%,
+      color-mix(in srgb, var(--accent) 26%, transparent),
+      transparent 70%
+    ),
+    repeating-linear-gradient(
+      0deg,
+      color-mix(in srgb, var(--accent) 7%, transparent) 0 1px,
+      transparent 1px 8px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--accent) 7%, transparent) 0 1px,
+      transparent 1px 8px
+    ),
+    var(--surface);
+}
+.rotra-pod-head {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px 16px;
+  flex-wrap: wrap;
+}
+.rotra-pod-head h2 {
+  font-family: var(--pixel);
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.rotra-pod-stage {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: end;
+  gap: 10px;
+  padding-top: 40px;
+}
+.rotra-pod {
+  --glow: 30%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+}
+.rotra-pod.p1 {
+  --glow: 100%;
+  order: 2;
+}
+.rotra-pod.p2 {
+  --glow: 55%;
+  order: 1;
+}
+.rotra-pod.p3 {
+  --glow: 38%;
+  order: 3;
+}
+.rotra-pod-who {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-align: center;
+  min-width: 0;
+  max-width: 100%;
+  padding-inline: 4px;
+}
+.rotra-pod-who .avatar {
+  position: relative;
+  z-index: 1;
+  width: 64px;
+  height: 64px;
+  font-size: 20px;
+  margin-bottom: 8px;
+  border-radius: 12px;
+  box-shadow:
+    0 0 0 3px var(--surface),
+    0 0 0 5px color-mix(in srgb, var(--accent) var(--glow), var(--border-strong));
+}
+.rotra-pod.p1 .rotra-pod-who .avatar {
+  width: 86px;
+  height: 86px;
+  font-size: 26px;
+  border-radius: 14px;
+  box-shadow:
+    0 0 0 3px var(--surface),
+    0 0 0 6px var(--accent),
+    0 0 32px 6px color-mix(in srgb, var(--accent) 50%, transparent);
+}
+.rotra-pod-name {
+  position: relative;
+  z-index: 1;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+.rotra-pod.p1 .rotra-pod-name {
+  font-size: 18px;
+}
+.rotra-pod-lv {
+  position: relative;
+  z-index: 1;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fg2);
+}
+.rotra-pod.p1 .rotra-pod-lv {
+  color: var(--accent);
+}
 /* Steps: the notched polygon gives each block stepped pixel corners. */
-.rotra-pod-step { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 2px; padding-top: 12px; font-family: var(--pixel); line-height: 1;
-  clip-path: polygon(0 8px, 4px 8px, 4px 4px, 8px 4px, 8px 0, calc(100% - 8px) 0, calc(100% - 8px) 4px, calc(100% - 4px) 4px, calc(100% - 4px) 8px, 100% 8px, 100% 100%, 0 100%);
+.rotra-pod-step {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding-top: 12px;
+  font-family: var(--pixel);
+  line-height: 1;
+  clip-path: polygon(
+    0 8px,
+    4px 8px,
+    4px 4px,
+    8px 4px,
+    8px 0,
+    calc(100% - 8px) 0,
+    calc(100% - 8px) 4px,
+    calc(100% - 4px) 4px,
+    calc(100% - 4px) 8px,
+    100% 8px,
+    100% 100%,
+    0 100%
+  );
   color: color-mix(in srgb, var(--accent) var(--glow), var(--fg2));
   background:
-    repeating-linear-gradient(0deg, transparent 0 7px, color-mix(in srgb, var(--accent) 12%, transparent) 7px 8px),
-    linear-gradient(180deg, color-mix(in srgb, var(--accent) calc(var(--glow) * 0.42), var(--elev)), color-mix(in srgb, var(--accent) calc(var(--glow) * 0.12), var(--surface))); }
-.rotra-pod-step b { font-size: 34px; font-weight: 700; }
-.rotra-pod-step small { font-size: 12px; letter-spacing: 1px; text-transform: uppercase; }
-.rotra-pod.p1 .rotra-pod-step { height: 136px; color: var(--on-accent); background:
-    repeating-linear-gradient(0deg, transparent 0 7px, color-mix(in srgb, var(--on-accent) 10%, transparent) 7px 8px),
-    linear-gradient(180deg, var(--accent), color-mix(in srgb, var(--accent) 55%, var(--surface))); }
-.rotra-pod.p1 .rotra-pod-step b { font-size: 46px; }
-.rotra-pod.p2 .rotra-pod-step { height: 100px; }
-.rotra-pod.p3 .rotra-pod-step { height: 76px; }
-.rotra-pod:hover .rotra-pod-name, .rotra-pod:focus-visible .rotra-pod-name { text-decoration: underline; text-underline-offset: 3px; }
-.rotra-pod:hover .rotra-pod-step { filter: brightness(1.12); }
-.rotra-pod.me .rotra-pod-name::after { content: " · You"; color: var(--accent); }
-.rotra-fire { position: absolute; z-index: 0; left: 50%; bottom: calc(100% - 96px); transform: translateX(-50%); width: 180px; height: 150px; image-rendering: pixelated; pointer-events: none; }
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 7px,
+      color-mix(in srgb, var(--accent) 12%, transparent) 7px 8px
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--accent) calc(var(--glow) * 0.42), var(--elev)),
+      color-mix(in srgb, var(--accent) calc(var(--glow) * 0.12), var(--surface))
+    );
+}
+.rotra-pod-step b {
+  font-size: 34px;
+  font-weight: 700;
+}
+.rotra-pod-step small {
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.rotra-pod.p1 .rotra-pod-step {
+  height: 136px;
+  color: var(--on-accent);
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 7px,
+      color-mix(in srgb, var(--on-accent) 10%, transparent) 7px 8px
+    ),
+    linear-gradient(180deg, var(--accent), color-mix(in srgb, var(--accent) 55%, var(--surface)));
+}
+.rotra-pod.p1 .rotra-pod-step b {
+  font-size: 46px;
+}
+.rotra-pod.p2 .rotra-pod-step {
+  height: 100px;
+}
+.rotra-pod.p3 .rotra-pod-step {
+  height: 76px;
+}
+.rotra-pod:hover .rotra-pod-name,
+.rotra-pod:focus-visible .rotra-pod-name {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.rotra-pod:hover .rotra-pod-step {
+  filter: brightness(1.12);
+}
+.rotra-pod.me .rotra-pod-name::after {
+  content: " · You";
+  color: var(--accent);
+}
+.rotra-fire {
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  bottom: calc(100% - 96px);
+  transform: translateX(-50%);
+  width: 180px;
+  height: 150px;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
 /* Embers: a few pixels drifting up from the floor. */
-.rotra-embers { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
-.rotra-embers i { position: absolute; bottom: -6px; width: 4px; height: 4px; background: var(--accent); opacity: 0; animation: rotra-podium-ember 5s linear infinite; }
-@keyframes rotra-podium-ember { 0% { transform: translateY(0); opacity: 0; } 12% { opacity: .9; } 100% { transform: translateY(-260px); opacity: 0; } }
-@media (prefers-reduced-motion: reduce) { .rotra-embers { display: none; } }
+.rotra-embers {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.rotra-embers i {
+  position: absolute;
+  bottom: -6px;
+  width: 4px;
+  height: 4px;
+  background: var(--accent);
+  opacity: 0;
+  animation: rotra-podium-ember 5s linear infinite;
+}
+@keyframes rotra-podium-ember {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(-260px);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rotra-embers {
+    display: none;
+  }
+}
 @media (max-width: 560px) {
-  .rotra-podium { padding: 14px 10px 0; }
-  .rotra-pod-stage { gap: 6px; padding-top: 32px; }
-  .rotra-pod-who .avatar { width: 52px; height: 52px; }
-  .rotra-pod.p1 .rotra-pod-who .avatar { width: 68px; height: 68px; }
-  .rotra-pod-name { font-size: 13px; }
-  .rotra-pod.p1 .rotra-pod-name { font-size: 14px; }
-  .rotra-pod.p1 .rotra-pod-step { height: 108px; }
-  .rotra-pod.p1 .rotra-pod-step b { font-size: 36px; }
-  .rotra-pod.p2 .rotra-pod-step { height: 80px; }
-  .rotra-pod.p3 .rotra-pod-step { height: 62px; }
-  .rotra-pod-step b { font-size: 26px; }
-  .rotra-pod-step small { font-size: 10px; }
-  .rotra-fire { width: 140px; height: 118px; bottom: calc(100% - 78px); }
+  .rotra-podium {
+    padding: 14px 10px 0;
+  }
+  .rotra-pod-stage {
+    gap: 6px;
+    padding-top: 32px;
+  }
+  .rotra-pod-who .avatar {
+    width: 52px;
+    height: 52px;
+  }
+  .rotra-pod.p1 .rotra-pod-who .avatar {
+    width: 68px;
+    height: 68px;
+  }
+  .rotra-pod-name {
+    font-size: 13px;
+  }
+  .rotra-pod.p1 .rotra-pod-name {
+    font-size: 14px;
+  }
+  .rotra-pod.p1 .rotra-pod-step {
+    height: 108px;
+  }
+  .rotra-pod.p1 .rotra-pod-step b {
+    font-size: 36px;
+  }
+  .rotra-pod.p2 .rotra-pod-step {
+    height: 80px;
+  }
+  .rotra-pod.p3 .rotra-pod-step {
+    height: 62px;
+  }
+  .rotra-pod-step b {
+    font-size: 26px;
+  }
+  .rotra-pod-step small {
+    font-size: 10px;
+  }
+  .rotra-fire {
+    width: 140px;
+    height: 118px;
+    bottom: calc(100% - 78px);
+  }
 }

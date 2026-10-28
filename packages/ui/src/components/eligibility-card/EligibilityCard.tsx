@@ -18,10 +18,14 @@ export function EligibilityCard({
     <Card className="flex flex-col gap-3">
       <div className="flex justify-between gap-2">
         <h2>Leaderboard eligibility</h2>
-        <Chip tone={qualifies ? 'accent' : needsReassessment ? 'warn' : 'neutral'}>{qualifies ? 'Qualifies' : 'Not yet'}</Chip>
+        <Chip tone={qualifies ? 'accent' : needsReassessment ? 'warn' : 'neutral'}>
+          {qualifies ? 'Qualifies' : 'Not yet'}
+        </Chip>
       </div>
       <div className="flex flex-wrap items-baseline justify-between gap-3">
-        <span className="font-mono text-[22px] font-semibold">{recentCount} <span className="text-[15px] text-fg2">of {matchRequirement}</span></span>
+        <span className="font-mono text-[22px] font-semibold">
+          {recentCount} <span className="text-[15px] text-fg2">of {matchRequirement}</span>
+        </span>
         <span className="text-[13px] text-fg2">standard matches · last three months</span>
       </div>
       <ProgressBar

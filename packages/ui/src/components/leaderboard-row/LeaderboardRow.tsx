@@ -53,7 +53,11 @@ export function LeaderboardRow({
       type="button"
       onClick={onSelect}
       aria-label={accessibleName}
-      className={cn(leaderboardRowVariants({ variant: rowVariant }), 'group/leaderboard-row', rowVariant !== 'me' && 'shadow-[0_-1px_0_var(--border)] first:shadow-none')}
+      className={cn(
+        leaderboardRowVariants({ variant: rowVariant }),
+        'group/leaderboard-row',
+        rowVariant !== 'me' && 'shadow-[0_-1px_0_var(--border)] first:shadow-none',
+      )}
     >
       <span
         className={cn(

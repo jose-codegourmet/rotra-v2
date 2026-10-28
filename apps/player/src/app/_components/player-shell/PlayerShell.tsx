@@ -1,7 +1,7 @@
 'use client'
 import { TopBar } from '@rotra/ui/app-shell/top-bar'
-import { PlayerNav, type PlayerNavCurrent } from '@rotra/ui/player-nav'
 import { OfflineBand } from '@rotra/ui/offline-band'
+import { PlayerNav, type PlayerNavCurrent } from '@rotra/ui/player-nav'
 import { ThemeToggle } from '@rotra/ui/theme-toggle'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
@@ -17,13 +17,28 @@ export function PlayerShell({ children }: { children: ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
   const ownPath = account ? `/players/${account.id}` : null
-  const current: PlayerNavCurrent = pathname === '/' ? 'leaderboard'
-    : (ownPath && (pathname === ownPath || pathname.startsWith(`${ownPath}/`))) || pathname === '/me' || pathname.startsWith('/me/') ? 'profile'
-    : ['/login', '/forgot-password'].includes(pathname) || pathname.startsWith('/reset-password/') ? 'sign-in' : null
+  const current: PlayerNavCurrent =
+    pathname === '/'
+      ? 'leaderboard'
+      : (ownPath && (pathname === ownPath || pathname.startsWith(`${ownPath}/`))) ||
+          pathname === '/me' ||
+          pathname.startsWith('/me/')
+        ? 'profile'
+        : ['/login', '/forgot-password'].includes(pathname) ||
+            pathname.startsWith('/reset-password/')
+          ? 'sign-in'
+          : null
   return (
     <>
       <TopBar product="Players" onBrandClick={() => router.push('/')}>
-        <PlayerNav signedIn={Boolean(account)} current={current} leaderboard={{ href: '/' }} profile={{ href: ownPath ?? '/' }} signIn={{ href: '/login' }} linkAs={Link} />
+        <PlayerNav
+          signedIn={Boolean(account)}
+          current={current}
+          leaderboard={{ href: '/' }}
+          profile={{ href: ownPath ?? '/' }}
+          signIn={{ href: '/login' }}
+          linkAs={Link}
+        />
         <ThemeToggle />
         {process.env.NODE_ENV !== 'production' ? <DevTools /> : null}
       </TopBar>

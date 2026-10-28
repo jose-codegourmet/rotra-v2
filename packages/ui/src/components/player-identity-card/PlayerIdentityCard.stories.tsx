@@ -1,10 +1,15 @@
 import { playerProfiles } from '@rotra/data/fixtures/player-profiles'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { PlayerIdentityCard } from './PlayerIdentityCard'
+
 const profile = playerProfiles.find((p) => p.nickname === 'Migs')
 const initials = playerProfiles.find((p) => p.nickname === 'Jom')
 if (!profile || !initials) throw new Error('Missing public profile fixture')
-const meta = { title: 'Player/PlayerIdentityCard', component: PlayerIdentityCard, args: { profile, idElementId: 'story-player-id', onCopyId: () => {} } } satisfies Meta<typeof PlayerIdentityCard>
+const meta = {
+  title: 'Player/PlayerIdentityCard',
+  component: PlayerIdentityCard,
+  args: { profile, idElementId: 'story-player-id', onCopyId: () => {} },
+} satisfies Meta<typeof PlayerIdentityCard>
 export default meta
 type Story = StoryObj<typeof meta>
 export const Public: Story = {}

@@ -7,7 +7,8 @@ const second = leaderboardEntries[1]
 const third = leaderboardEntries[2]
 const fourth = leaderboardEntries[3]
 const migs = leaderboardEntries[127]
-if (!first || !second || !third || !fourth || !migs) throw new Error('Missing leaderboard fixtures.')
+if (!first || !second || !third || !fourth || !migs)
+  throw new Error('Missing leaderboard fixtures.')
 const noop = () => undefined
 
 const meta = {
@@ -48,7 +49,14 @@ export const Medal1: Story = {
   },
 }
 export const Medal2: Story = {
-  args: { position: 2, fullName: second.fullName, nickname: second.nickname, picture: { src: second.pictureUrl ?? undefined }, levelLabel: 'Advanced High', variant: 'medal-2' },
+  args: {
+    position: 2,
+    fullName: second.fullName,
+    nickname: second.nickname,
+    picture: { src: second.pictureUrl ?? undefined },
+    levelLabel: 'Advanced High',
+    variant: 'medal-2',
+  },
 }
 export const Medal3: Story = {
   args: {

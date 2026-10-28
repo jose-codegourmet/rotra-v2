@@ -33,7 +33,8 @@ export function MyPositionCard({
           <div>
             <p className="m-0 text-[13px] text-fg2">Your position</p>
             <p className="m-0">
-              <b className="font-mono text-xl">#{position.toLocaleString('en-PH')}</b> · {levelLabel}
+              <b className="font-mono text-xl">#{position.toLocaleString('en-PH')}</b> ·{' '}
+              {levelLabel}
             </p>
           </div>
         </div>

@@ -23,19 +23,41 @@ export function SharedRankCard({
   return (
     <Card className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <span className="text-xs font-semibold tracking-[0.6px] text-fg2 uppercase">Shared rank</span>
+        <span className="text-xs font-semibold tracking-[0.6px] text-fg2 uppercase">
+          Shared rank
+        </span>
         <Button size="xs" variant="ghost" onClick={onOpenRankDetail}>
           How this rank works
         </Button>
       </div>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h2 className="text-[26px] leading-tight font-extrabold tracking-[-0.4px]">{levelLabel ?? 'No rank yet'}</h2>
-          <Chip tone={status === 'Needs reassessment' || status === 'Updating' ? 'warn' : status === 'Provisional' || status === 'Not calculated' ? 'neutral' : 'accent'}>{status}</Chip>
+          <h2 className="text-[26px] leading-tight font-extrabold tracking-[-0.4px]">
+            {levelLabel ?? 'No rank yet'}
+          </h2>
+          <Chip
+            tone={
+              status === 'Needs reassessment' || status === 'Updating'
+                ? 'warn'
+                : status === 'Provisional' || status === 'Not calculated'
+                  ? 'neutral'
+                  : 'accent'
+            }
+          >
+            {status}
+          </Chip>
         </div>
         <div className="text-right">
           <span className="text-xs font-semibold tracking-[0.6px] text-fg2 uppercase">Overall</span>
-          <b className={position ? "block font-mono text-[40px] leading-none font-semibold text-accent" : "block text-xl font-bold text-fg2"}>{position ? `#${position}` : 'No position'}</b>
+          <b
+            className={
+              position
+                ? 'block font-mono text-[40px] leading-none font-semibold text-accent'
+                : 'block text-xl font-bold text-fg2'
+            }
+          >
+            {position ? `#${position}` : 'No position'}
+          </b>
         </div>
       </div>
       <SkillLadder level={level} stale={status === 'Needs reassessment'} />

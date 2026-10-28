@@ -1,10 +1,10 @@
+import { phoneField } from '@rotra/schema/phone'
 import { DEMO_CLUB_ID } from '../fixtures/clubs'
 import { players } from '../fixtures/players'
-import { phoneField } from '@rotra/schema/phone'
-import { readMockState } from '../mock/store'
 import { getMockDevState, requireOnline } from '../mock/bridge'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
+import { readMockState } from '../mock/store'
 import type { AuthAudience, MockSession, SignInInput } from './auth.types'
 import { mockCookieName, parseMockSession } from './cookie'
 
@@ -38,10 +38,18 @@ export async function signIn(audience: AuthAudience, input: SignInInput): Promis
   if (audience === 'player' && input.identifier !== 'demo') {
     const identifier = input.identifier.trim().toLowerCase()
     const phone = phoneField.safeParse(identifier)
-    const account = readMockState().playerAccounts.find((entry) => entry.claimed &&
-      ((phone.success && entry.phone === phone.data) || (entry.email && entry.email.toLowerCase() === identifier)))
+    const account = readMockState().playerAccounts.find(
+      (entry) =>
+        entry.claimed &&
+        ((phone.success && entry.phone === phone.data) ||
+          (entry.email && entry.email.toLowerCase() === identifier)),
+    )
     player = account ? players.find((entry) => entry.id === account.playerId) : undefined
-    if (!player) throw new MockError('permission', "That phone number or email and password don't match. Check them and try again.")
+    if (!player)
+      throw new MockError(
+        'permission',
+        "That phone number or email and password don't match. Check them and try again.",
+      )
   }
   if (!player) throw new Error('Missing mock account fixture.')
   const account =

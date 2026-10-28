@@ -7,7 +7,11 @@ if (!migs) throw new Error('Missing Migs fixture')
 const meta = {
   title: 'Player/MyPositionCard',
   component: MyPositionCard,
-  args: { fullName: migs.fullName, picture: { src: migs.pictureUrl ?? undefined }, onOpenProfile: () => undefined },
+  args: {
+    fullName: migs.fullName,
+    picture: { src: migs.pictureUrl ?? undefined },
+    onOpenProfile: () => undefined,
+  },
 } satisfies Meta<typeof MyPositionCard>
 export default meta
 type Story = StoryObj<typeof meta>

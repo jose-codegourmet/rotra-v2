@@ -25,7 +25,7 @@ export const sundayEstimate = { players: 16, court: 315000, shuttle: 575000, tot
 
 export const paymentPlayers = clubPlayers.slice(0, 18).map((p, index) => ({
  clubPlayerId: p.id, name: p.fullName,
- picture: players.find((x) => x.id === p.playerId)?.pictureUrl,
+ picture: players.find((x) => x.id === p.playerId)?.picture,
  paid: index < 15 ? { amount: 70000, at: Date.UTC(2026, 9, 22, 11, 42) } : undefined,
 })).sort((a, b) => Number(!!a.paid) - Number(!!b.paid) || a.name.localeCompare(b.name))
 export const allPaymentPlayers = paymentPlayers.map((p) => ({ ...p, paid: p.paid ?? { amount: 70000, at: Date.UTC(2026, 9, 22, 11, 42) } }))

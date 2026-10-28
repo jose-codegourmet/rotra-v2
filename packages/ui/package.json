@@ -222,7 +222,12 @@
     "./forms/session-financials-fields/schema": "./src/forms/session-financials-fields/SessionFinancialsFields.schema.ts",
     "./forms/session-financials-fields/default-values": "./src/forms/session-financials-fields/SessionFinancialsFields.defaultValues.ts",
     "./payments-checklist": "./src/components/payments-checklist/PaymentsChecklist.tsx",
-    "./payments-checklist/payment-card": "./src/components/payments-checklist/payment-card/PaymentCard.tsx"
+    "./payments-checklist/payment-card": "./src/components/payments-checklist/payment-card/PaymentCard.tsx",
+    "./inventory-item-card": "./src/components/inventory-item-card/InventoryItemCard.tsx",
+    "./inventory-section": "./src/components/inventory-section/InventorySection.tsx",
+    "./forms/inventory-item-form": "./src/forms/inventory-item-form/InventoryItemForm.tsx",
+    "./forms/inventory-item-form/schema": "./src/forms/inventory-item-form/InventoryItemForm.schema.ts",
+    "./forms/inventory-item-form/default-values": "./src/forms/inventory-item-form/InventoryItemForm.defaultValues.ts"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

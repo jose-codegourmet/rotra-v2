@@ -16,7 +16,7 @@ export type PaymentCardProps = {
 export function PaymentCard({ player, amountDue, onTogglePaid, onSelectPlayer, disabled }: PaymentCardProps) {
   return <article className={cn('flex min-w-0 flex-col gap-1 rounded-lg border border-border bg-surface p-3 shadow-card', player.paid && 'border-accent bg-accent-subtle')}>
     <div className="mb-1.5 flex items-center justify-between gap-2">
-      <Avatar name={player.name} src={player.picture ?? undefined} onClick={onSelectPlayer} className={player.paid ? 'ring-2 ring-accent' : undefined} />
+      <Avatar size={44} name={player.name} src={player.picture ?? undefined} onClick={onSelectPlayer} className={player.paid ? 'ring-2 ring-accent' : undefined} />
       <Switch aria-label={`${player.name} paid`} checked={!!player.paid} onChange={onTogglePaid} disabled={disabled} />
     </div>
     <b className="break-words text-sm">{player.name}</b>

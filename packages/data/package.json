@@ -182,7 +182,9 @@
     "./player-account/useRequestPasswordReset": "./src/player-account/useRequestPasswordReset.ts",
     "./player-account/useResetLink": "./src/player-account/useResetLink.ts",
     "./player-account/useResetPassword": "./src/player-account/useResetPassword.ts",
-    "./fixtures/financials": "./src/fixtures/financials.ts"
+    "./fixtures/financials": "./src/fixtures/financials.ts",
+    "./inventory/types": "./src/inventory/inventory.types.ts",
+    "./fixtures/inventory": "./src/fixtures/inventory.ts"
   },
   "scripts": {
     "lint": "biome check .",

@@ -40,5 +40,10 @@ export const LongValue: Story = {
 }
 
 export const PasswordVisibility: Story = {
-  args: { type: 'password', passwordVisibility: true, 'aria-label': 'Password', placeholder: undefined },
+  args: {
+    type: 'password',
+    passwordVisibility: true,
+    'aria-label': 'Password',
+    placeholder: undefined,
+  },
 }

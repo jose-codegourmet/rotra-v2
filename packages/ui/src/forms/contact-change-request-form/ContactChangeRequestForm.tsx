@@ -95,7 +95,9 @@ export function ContactChangeRequestForm({
               { value: 'phone', label: REQUEST_FIELD_LABEL.phone },
               { value: 'email', label: REQUEST_FIELD_LABEL.email },
             ]}
-            onChange={(next) => form.reset({ field: next as ContactChangeRequestInput['field'], toValue: '' })}
+            onChange={(next) =>
+              form.reset({ field: next as ContactChangeRequestInput['field'], toValue: '' })
+            }
           />
           <KeyValueList
             items={[
@@ -119,7 +121,9 @@ export function ContactChangeRequestForm({
             <Field
               label={`New ${fieldWord}`}
               error={error}
-              hint={field === 'phone' ? 'A Philippine mobile number, like 0917 555 0142.' : undefined}
+              hint={
+                field === 'phone' ? 'A Philippine mobile number, like 0917 555 0142.' : undefined
+              }
             >
               <Controller
                 key={field}
@@ -150,8 +154,8 @@ export function ContactChangeRequestForm({
             </Field>
           </form>
           <Notice tone="warn">
-            <b>Changes take effect only after Admin approval.</b> Until then you keep signing in with
-            your current {fieldWord}. Your player ID and history don't change.
+            <b>Changes take effect only after Admin approval.</b> Until then you keep signing in
+            with your current {fieldWord}. Your player ID and history don't change.
           </Notice>
         </div>
       </FormProvider>

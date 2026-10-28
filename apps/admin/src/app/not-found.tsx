@@ -4,5 +4,18 @@ import Link from 'next/link'
 import { AdminWorkspaceShell } from './(admin)/_components/admin-workspace-shell/AdminWorkspaceShell'
 
 export default function AdminNotFound() {
-  return <AdminWorkspaceShell><EmptyState title="Page not found." action={<Button asChild><Link href="/clubs">Back to clubs</Link></Button>}>This page isn't available.</EmptyState></AdminWorkspaceShell>
+  return (
+    <AdminWorkspaceShell>
+      <EmptyState
+        title="Page not found."
+        action={
+          <Button asChild>
+            <Link href="/clubs">Back to clubs</Link>
+          </Button>
+        }
+      >
+        This page isn't available.
+      </EmptyState>
+    </AdminWorkspaceShell>
+  )
 }

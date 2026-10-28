@@ -1,9 +1,9 @@
 'use client'
 
+import { Button } from '@rotra/ui/button'
 import { cn } from '@rotra/ui/cn'
 import { useFieldControl } from '@rotra/ui/field'
 import { inputVariants } from '@rotra/ui/field/variants'
-import { Button } from '@rotra/ui/button'
 import { type ComponentProps, useState } from 'react'
 
 export type TextInputProps = ComponentProps<'input'> & {
@@ -14,7 +14,13 @@ export type TextInputProps = ComponentProps<'input'> & {
 }
 
 /** The prototypes' .input for one line of text, numbers, email or phone. */
-export function TextInput({ invalid, className, type = 'text', passwordVisibility = false, ...props }: TextInputProps) {
+export function TextInput({
+  invalid,
+  className,
+  type = 'text',
+  passwordVisibility = false,
+  ...props
+}: TextInputProps) {
   const field = useFieldControl()
   const [visible, setVisible] = useState(false)
   const reveal = type === 'password' && passwordVisibility

@@ -42,7 +42,11 @@ export type PlayerMockDevState = MockDevState & {
   leaderboardScenario?: LeaderboardScenario
 }
 let read: () => PlayerMockDevState = () => DEFAULT_DEV_STATE
-type ConsumableToggle = 'nextSaveFails' | 'nextSaveConflict' | 'adminDeniedNextSignIn' | 'adminNextSignInRejected'
+type ConsumableToggle =
+  | 'nextSaveFails'
+  | 'nextSaveConflict'
+  | 'adminDeniedNextSignIn'
+  | 'adminNextSignInRejected'
 let consume = (_key: ConsumableToggle) => {}
 const listeners = new Set<() => void>()
 const saveFailureListeners = new Set<() => void>()

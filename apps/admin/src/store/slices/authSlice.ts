@@ -12,4 +12,5 @@ const authSlice = createSlice({
 })
 export const { setAccount } = authSlice.actions
 export const authReducer = authSlice.reducer
-export const selectAccount = (state: { auth: { account: AdminAuthAccount | null } }) => state.auth.account
+export const selectAccount = (state: { auth: { account: AdminAuthAccount | null } }) =>
+  state.auth.account

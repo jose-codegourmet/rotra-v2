@@ -40,9 +40,7 @@ export function AdminAccountBadge({
         className="shrink-0 max-[560px]:min-w-11 max-[560px]:px-0"
       >
         <Icon name="nav-out" />
-        <span className="max-[560px]:sr-only">
-          {isSigningOut ? 'Signing out…' : 'Sign out'}
-        </span>
+        <span className="max-[560px]:sr-only">{isSigningOut ? 'Signing out…' : 'Sign out'}</span>
       </Button>
     </div>
   )

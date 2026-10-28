@@ -12,16 +12,13 @@ export type SkeletonProps = {
  * or numbers. Put aria-busy and an aria-label ("Loading the leaderboard") on the container.
  */
 export function Skeleton({ className, label }: SkeletonProps) {
-  return (
-    <span
-      aria-hidden={label ? undefined : true}
-      role={label ? 'status' : undefined}
-      aria-label={label}
-      aria-busy={label ? true : undefined}
-      className={cn(
-        'block h-3.5 rounded-md bg-elev animate-[pulse_1.2s_infinite] motion-reduce:animate-none',
-        className,
-      )}
-    />
+  const classes = cn(
+    'block h-3.5 rounded-md bg-elev animate-[pulse_1.2s_infinite] motion-reduce:animate-none',
+    className,
+  )
+  return label ? (
+    <span role="status" aria-label={label} aria-busy className={classes} />
+  ) : (
+    <span aria-hidden className={classes} />
   )
 }

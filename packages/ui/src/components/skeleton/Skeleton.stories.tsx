@@ -35,4 +35,6 @@ export const LeaderboardRows: Story = {
   ),
 }
 
-export const NamedLoadingRegion: Story = { args: { label: 'Loading Admin page', className: 'h-8 w-52' } }
+export const NamedLoadingRegion: Story = {
+  args: { label: 'Loading Admin page', className: 'h-8 w-52' },
+}

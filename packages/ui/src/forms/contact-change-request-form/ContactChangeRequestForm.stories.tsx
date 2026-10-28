@@ -19,7 +19,9 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 export const Email: Story = {}
-export const PhoneGrouped: Story = { args: { defaultValues: { field: 'phone', toValue: '0918 555 0377' } } }
+export const PhoneGrouped: Story = {
+  args: { defaultValues: { field: 'phone', toValue: '0918 555 0377' } },
+}
 export const ServerConflict: Story = {
   args: {
     defaultValues: { field: 'email', toValue: 'jom.reyes@example.com' },

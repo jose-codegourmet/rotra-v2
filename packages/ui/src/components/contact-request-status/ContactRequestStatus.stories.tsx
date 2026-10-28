@@ -2,7 +2,14 @@ import type { ContactChangeStatus } from '@rotra/data/contact-change-request/typ
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { ContactRequestStatus } from './ContactRequestStatus'
 
-const STATUSES: ContactChangeStatus[] = ['pending', 'approved', 'applying', 'applied', 'failed', 'rejected']
+const STATUSES: ContactChangeStatus[] = [
+  'pending',
+  'approved',
+  'applying',
+  'applied',
+  'failed',
+  'rejected',
+]
 const request = {
   field: 'email' as const,
   fromValue: 'migs.santos@example.com',
@@ -25,7 +32,12 @@ export const Failed: Story = { args: { request: { ...request, status: 'failed' }
 export const Rejected: Story = { args: { request: { ...request, status: 'rejected' } } }
 export const PhoneChange: Story = {
   args: {
-    request: { ...request, field: 'phone', fromValue: '+63 917 555 0142', toValue: '+63 918 555 0377' },
+    request: {
+      ...request,
+      field: 'phone',
+      fromValue: '+63 917 555 0142',
+      toValue: '+63 918 555 0377',
+    },
   },
 }
 export const EveryStatusFull: Story = {

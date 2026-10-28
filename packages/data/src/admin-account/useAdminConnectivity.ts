@@ -7,7 +7,11 @@ function subscribe(listener: () => void) {
   const unsubscribe = subscribeMockBridge(listener)
   window.addEventListener('online', listener)
   window.addEventListener('offline', listener)
-  return () => { unsubscribe(); window.removeEventListener('online', listener); window.removeEventListener('offline', listener) }
+  return () => {
+    unsubscribe()
+    window.removeEventListener('online', listener)
+    window.removeEventListener('offline', listener)
+  }
 }
 const serverSnapshot = () => false
 export function useAdminConnectivity() {

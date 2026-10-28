@@ -36,26 +36,72 @@ export function DevTools() {
         if (!next.offline) void client.invalidateQueries()
       }
     })
-    return () => { unsubscribe(); disconnect() }
+    return () => {
+      unsubscribe()
+      disconnect()
+    }
   }, [store, client])
   const pending = signIn.isPending || signOut.isPending
   return (
     <DevMenu
       audience="admin"
       actions={[
-        { label: 'Sign in as platform owner', disabled: pending, onClick: () => signIn.mutate({ email: adminAccount.email, password: 'prototype' }, { onSuccess: (result) => { setOpen(false); router.replace(result.kind === 'owner' ? '/clubs' : '/login') } }) },
-        { label: 'End the session', disabled: pending || session.data.kind !== 'owner', onClick: () => signOut.mutate({ sessionEnded: true }, { onSuccess: () => { setOpen(false); router.replace('/login'); router.refresh() } }) },
+        {
+          label: 'Sign in as platform owner',
+          disabled: pending,
+          onClick: () =>
+            signIn.mutate(
+              { email: adminAccount.email, password: 'prototype' },
+              {
+                onSuccess: (result) => {
+                  setOpen(false)
+                  router.replace(result.kind === 'owner' ? '/clubs' : '/login')
+                },
+              },
+            ),
+        },
+        {
+          label: 'End the session',
+          disabled: pending || session.data.kind !== 'owner',
+          onClick: () =>
+            signOut.mutate(
+              { sessionEnded: true },
+              {
+                onSuccess: () => {
+                  setOpen(false)
+                  router.replace('/login')
+                  router.refresh()
+                },
+              },
+            ),
+        },
       ]}
       extraToggles={[
-        { key: 'adminDeniedNextSignIn', label: 'Sign in with a club account', description: 'The next sign-in shows Access denied for the Lahug Smash Club account.', checked: Boolean(toggles.adminDeniedNextSignIn), onChange: (value) => dispatch(setDevToggle({ key: 'adminDeniedNextSignIn', value })) },
-        { key: 'adminNextSignInRejected', label: 'Next sign-in is rejected', description: 'The next sign-in shows the invalid-credential error.', checked: Boolean(toggles.adminNextSignInRejected), onChange: (value) => dispatch(setDevToggle({ key: 'adminNextSignInRejected', value })) },
+        {
+          key: 'adminDeniedNextSignIn',
+          label: 'Sign in with a club account',
+          description: 'The next sign-in shows Access denied for the Lahug Smash Club account.',
+          checked: Boolean(toggles.adminDeniedNextSignIn),
+          onChange: (value) => dispatch(setDevToggle({ key: 'adminDeniedNextSignIn', value })),
+        },
+        {
+          key: 'adminNextSignInRejected',
+          label: 'Next sign-in is rejected',
+          description: 'The next sign-in shows the invalid-credential error.',
+          checked: Boolean(toggles.adminNextSignInRejected),
+          onChange: (value) => dispatch(setDevToggle({ key: 'adminNextSignInRejected', value })),
+        },
       ]}
       controlLabels={{ offline: 'Offline' }}
       open={open}
       onOpenChange={setOpen}
       toggles={toggles}
       onToggle={(key, value) => dispatch(setDevToggle({ key, value }))}
-      onReset={() => { resetDemoData(); dispatch(resetDev()); void client.invalidateQueries() }}
+      onReset={() => {
+        resetDemoData()
+        dispatch(resetDev())
+        void client.invalidateQueries()
+      }}
     />
   )
 }

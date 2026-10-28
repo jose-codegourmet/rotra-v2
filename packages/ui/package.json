@@ -262,7 +262,10 @@
     "./contact-details-card": "./src/components/contact-details-card/ContactDetailsCard.tsx",
     "./contact-request-status": "./src/components/contact-request-status/ContactRequestStatus.tsx",
     "./contact-request-status/variants": "./src/components/contact-request-status/ContactRequestStatus.variants.ts",
-    "./sign-out-card": "./src/components/sign-out-card/SignOutCard.tsx"
+    "./sign-out-card": "./src/components/sign-out-card/SignOutCard.tsx",
+    "./contact-change-request-form": "./src/forms/contact-change-request-form/ContactChangeRequestForm.tsx",
+    "./contact-change-request-form/schema": "./src/forms/contact-change-request-form/ContactChangeRequestForm.schema.ts",
+    "./contact-change-request-form/default-values": "./src/forms/contact-change-request-form/ContactChangeRequestForm.defaultValues.ts"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

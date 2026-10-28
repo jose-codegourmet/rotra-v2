@@ -5,4 +5,6 @@ export const queueSessionKeys = {
   doneReview: (id: string) => ['queue-session', 'done-review', id] as const,
   finalization: (id: string) => ['queue-session', 'finalization', id] as const,
   record: (id: string) => ['queue-session', 'record', id] as const,
+  /** Mutation key of Session done, so the finishing route can tell a finalization is in flight. */
+  finalize: (id: string) => ['queue-session', 'finalize', id] as const,
 }

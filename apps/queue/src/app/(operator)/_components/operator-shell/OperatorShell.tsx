@@ -26,6 +26,9 @@ import { OperatorShellContext, type OperatorShellContextValue } from './DockActi
 /** Screens the license gate replaces while the license has ended (the console stays reachable). */
 const GATED_PREFIXES = ['/', '/saved-players', '/venues', '/club-settings', '/sessions/new']
 
+/** Past-session reports the license gate also replaces: no past reports while the license has ended. */
+const GATED_REPORT = /^\/sessions\/[^/]+\/record$/
+
 /** Screens rendered without the top bar, left nav and dock: the finishing route (the prototype's hasShell). */
 const BARE_ROUTE = /^\/sessions\/[^/]+\/finishing$/
 
@@ -176,7 +179,8 @@ export function OperatorShell({ children }: { children: ReactNode }) {
   const gated =
     pathname === '/' ||
     GATED_PREFIXES.some((prefix) => prefix !== '/' && current(prefix)) ||
-    pathname.startsWith('/sessions/new')
+    pathname.startsWith('/sessions/new') ||
+    GATED_REPORT.test(pathname)
   const expired = access.data?.status === 'expired'
   const gateName = account?.name ?? 'Your club'
   const gate =

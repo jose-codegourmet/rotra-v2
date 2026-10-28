@@ -3,6 +3,7 @@
 import { MockError } from '@rotra/data/mock/errors'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionRecord } from '@rotra/data/queue-session/useSessionRecord'
+import { useSessionPublication } from '@rotra/data/session-result/useSessionPublication'
 import { Breadcrumb } from '@rotra/ui/breadcrumb'
 import { SessionRecordHeader } from '@rotra/ui/session-record-header'
 import { Skeleton } from '@rotra/ui/skeleton'
@@ -40,6 +41,7 @@ export function SessionRecord({ sessionId }: SessionRecordProps) {
   const router = useRouter()
   const session = useQueueSession(sessionId)
   const record = useSessionRecord(sessionId)
+  const publication = useSessionPublication(sessionId)
   const [tab, setTab] = useState('results')
 
   const s = session.data
@@ -88,6 +90,7 @@ export function SessionRecord({ sessionId }: SessionRecordProps) {
           when={when}
           venue={r.venueName}
           state={r.state}
+          published={!!publication.data}
           totals={{
             games: invalid ? null : r.games,
             invalidGames: r.invalidGames,

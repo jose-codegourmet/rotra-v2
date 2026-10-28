@@ -1,5 +1,7 @@
 # Session cost estimates and club inventory
 
+**Last verified:** 2026-10-28 for calculation units; payment lifecycle remains proposed.
+
 **Status:** Proposed data model, added October 26, 2026 for the [financials rules](../../../../business_logic/product/queue/modules/financials/README.md) introduced by the [ROTRA Queue prototype](../../../../frames/queue-app/rotra-queue.html). Field names are new design names, not existing Prisma columns.
 
 These records support an estimate and a manual paid / not-paid checklist. There is deliberately no receipt, gateway, or per-player charge table, and no money moves through ROTRA.
@@ -67,12 +69,15 @@ Unticking deletes the row (keep an audit event if history matters). Marks are or
 
 ## Calculation
 
-Totals are derived, never stored as authoritative values:
+Totals are derived, never stored as authoritative values. For PHP, every monetary value below is in **centavos**, including the returned break-even amount:
 
-- court cost = court fee × court count × session hours (using current courts and scheduled times),
+- court cost = round(court fee × court count × session minutes ÷ 60), to the nearest centavo using current courts and scheduled times,
 - entrance fees = entrance fee per head × players,
 - shuttle cost = Σ tubes × item unit cost,
-- break-even = ceil(total ÷ max(1, players)), where players is the roster count or `queue_sessions.expected_players`.
+- total = rounded court cost + entrance fees + shuttle cost,
+- break-even = 100 × ceil(total ÷ (100 × max(1, players))), where players is the roster count or `queue_sessions.expected_players`.
+
+Thus 100 centavos shared by three players gives a break-even payment of 100 centavos (₱1), not 34 centavos. A custom payment remains its entered minor-unit value; it does not inherit whole-peso break-even rounding. Expected collection uses the current payment per head × player count; actual collected totals sum the amounts recorded in paid marks, not the current fee × paid count. These restate the [settled business rules](../../../../business_logic/product/queue/modules/financials/README.md) and existing money tests; maximum ranges and the meaning of a paid tick without a fee remain decision work in [#245](https://github.com/jose-codegourmet/rotra-v2/issues/245).
 
 The prototype reads the **current** inventory price, so editing an item's cost changes saved estimates. Snapshotting `unit_cost_minor` onto each plan line at save time would freeze estimates instead; that choice is open and should be made before implementation.
 

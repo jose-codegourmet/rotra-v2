@@ -7,6 +7,34 @@
 
 The [implementation plan](implementation-plan.md) follows this review. It proposes work; it does not approve new fields, endpoints, dependencies, migrations, or product behavior.
 
+## Reconciliation status — October 28, 2026
+
+The findings below preserve the original review of `26ffacb`. [F07.1 #242](https://github.com/jose-codegourmet/rotra-v2/issues/242)
+rechecked the current interfaces at `7d7029d` and corrected settled source drift; historical wording
+below is not a claim that every cited mismatch still exists.
+
+| Finding | Source correction / remaining decision |
+|---|---|
+| R1–R2 | Payment lifecycle, roster removal/demotion identity and assessment eligibility remain [#245](https://github.com/jose-codegourmet/rotra-v2/issues/245). Removed the unsupported claim that prepared roster rows are always safe to delete |
+| R3 | Roster doc now requires displaced players ahead of existing waiters without claiming timestamp copying guarantees it. Durable ordering/ties/concurrency remain #245 |
+| R4 | Guest invitation, claims and historical identity proof remain [#244](https://github.com/jose-codegourmet/rotra-v2/issues/244) |
+| R5 | Visitor status ownership remains [#248](https://github.com/jose-codegourmet/rotra-v2/issues/248) |
+| R6 | Added required unique club-name enforcement and distinguished a newly Free club from retained paid prices. Comparison/nullability/renewal remain #245 |
+| R7 | Corrected court-cost centavo rounding and whole-peso break-even conversion; no-fee marks, bounds and price snapshots remain #245 |
+| R8 | [Command contracts](command-contracts.md) map actors, current interfaces, errors and gaps. Actual access/transport design remains [#243](https://github.com/jose-codegourmet/rotra-v2/issues/243)/#244/#248 |
+| R9 | [Schema dependencies](schema-dependencies.md) exposes provenance and insertion cycles. Offline authority, numbering and invalid-session release/recovery reconciliation remain [#246](https://github.com/jose-codegourmet/rotra-v2/issues/246) |
+| R10 | Corrected partial-player zero credit and reference divisor 8 → 2. Production calculations, time windows and projection visibility remain [#247](https://github.com/jose-codegourmet/rotra-v2/issues/247) |
+
+The inventory now includes venues, waitlist, join/name requests and manual payment marks; financial
+and public-join screen statements match the settled flows; the saved-player table distinguishes
+unclaimed identity checks from missing-level confirmation. Architecture/root guidance describes
+observed mock code and the additional backend/offline work. Prepared-level nullability remains
+explicitly unresolved. The invalid-session recovery discrepancy still needs the referenced owner
+decision reconciled in #246; no revival workflow is introduced.
+
+These are documentation changes. The callable catalog was checked against source symbols and
+signatures; no database, auth, migration, privacy or offline-runtime guarantee follows from it.
+
 ## What is already solid
 
 | Design choice | Why it should stay |

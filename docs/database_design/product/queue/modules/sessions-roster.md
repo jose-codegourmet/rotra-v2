@@ -62,11 +62,13 @@ Session timestamps from a device are evidence, not automatic proof of an unexpir
 |---|---|
 | `id`, `club_id`, `session_id`, `club_player_id` | UUID keys with scoped FKs |
 | `skill_level_id` | Level chosen when added; becomes the roster level when given a slot |
-| `added_at` | First-come order |
+| `added_at` | Historical arrival/entry time; insufficient by itself to encode all waitlist priority |
 
 Unique `(session_id, club_player_id)`, and a player can't be both waitlisted and on the roster for the same session (command check). **Give slot** deletes the waitlist row and inserts the `session_players` row in one transaction, recording when it went over budget. Slot counts are derived, never stored.
 
-**Budget changes in preparation** (first come, first served): slot order is `session_players.confirmed_at`. When the setup save command reduces a prepared session's courts or players per court below the roster size, it moves the entries with the latest `confirmed_at` beyond the budget into `session_waitlist` in one transaction, setting each `added_at` to its original `confirmed_at`, so they sort ahead of anyone who joined the waitlist later. When the budget grows, the same command gives the new slots to the oldest waitlist rows. Active sessions are never rebalanced: removing a court there unseats nobody.
+**Budget changes in preparation** (first come, first served): when capacity shrinks, move the latest-confirmed roster entries beyond the budget to the **front of the existing waitlist**, preserving their relative joining order, in one transaction. Growing the budget fills from that resulting order. Active sessions are never rebalanced: removing a court there unseats nobody.
+
+Copying `confirmed_at` into `added_at` does not guarantee this rule: an earlier guest request can already be waiting. Preserve historical timestamps and define ordering separately. Equal-time ties, repeated demotion/promotion and concurrent saves need the reviewed durable ordering contract in [#245](https://github.com/jose-codegourmet/rotra-v2/issues/245); no new position field or timestamp-rewriting scheme is approved here.
 
 ## `session_join_requests`
 
@@ -79,7 +81,7 @@ Guest requests sent from the session link (decided October 26, 2026).
 | `phone_e164` | Optional normalized mobile number; visible to the club only, never on the public page |
 | `stated_band` | `beginner`, `intermediate`, `advanced`, `unsure` (self-declared, not a level) |
 | `status` | `pending`, `confirmed`, `declined` |
-| `requested_at` | Server time; orders the review list and a confirmed guest's waitlist position |
+| `requested_at` | Server request time; orders the review list and supplies initial waitlist arrival evidence, subject to the displacement priority above |
 | `decided_at`, `decided_by_device` | Set on confirm/decline |
 | `club_player_id` | Set on confirm: the club player created for the guest |
 
@@ -109,7 +111,7 @@ Choosing a venue copies its rate into `session_cost_estimates.court_fee_per_cour
 | `present` | Operator-controlled boolean; false when added in preparation, true when added to an active session |
 | `present_changed_at` | Timestamp of the last presence change (reset to the start time at session start); feeds the derived wait time |
 | `assessment_id` | FK to the roster assessment revision selected for this entry |
-| `skill_level_id` | Required FK to one of the nine levels |
+| `skill_level_id` | FK to one of the nine levels; required on confirmation/start/late entry. Permitted missing-level preparation states and physical nullability remain unresolved in #245 |
 | `level_locked_at` | Null before start; set at start or on late entry |
 | `confirmed_at`, `joined_at`, `revision` | Timestamps/revision |
 
@@ -119,9 +121,9 @@ The roster/assessment relationship is cyclic: create the roster and assessment i
 
 Lock existing entries' levels on start and late entrants on insertion into the active session. Prevent level/assessment-reference changes after lock. Presence remains editable. `session_players` carries no resting, waitlist, payment, or player self-admission state; the waitlist, paid marks and guest join requests live in their own tables (`session_waitlist`, `session_payment_marks`, `session_join_requests`).
 
-Start is refused while any entry lacks `skill_level_id`; that means the column is nullable during preparation and required (by command validation) at start and for late entries.
+Start is refused while any entry lacks `skill_level_id`. This defensive check does **not** decide column nullability: business rules require a level to confirm a slot, while screen states include missing-level prepared rows. Specify which states may persist before choosing the constraint ([#245](https://github.com/jose-codegourmet/rotra-v2/issues/245)).
 
-Roster removal is allowed only while the session is `prepared`, before any match can reference the entry; deleting the row is acceptable then. Whether an assessment already synced for that entry still counts is the open "assessment timing" decision. Active sessions cannot remove entries; presence is turned off instead.
+Roster removal is allowed only while the session is `prepared`; this does not authorize physically deleting a row referenced by paid marks or already-synced assessments. The removal/demotion identity and retention policy, and whether those assessments still count, remain open in #245. The Give slot delete/insert description above is a proposal subject to that gate. Active sessions cannot remove entries; presence is turned off instead.
 
 Wait time (minutes since the player's last completed/invalid match ended, or since `present_changed_at`) is derived at read time, never stored.
 

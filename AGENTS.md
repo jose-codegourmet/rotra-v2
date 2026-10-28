@@ -3,7 +3,7 @@
 > **Entry point for AI coding agents.** Read this file completely; it is deliberately short. Everything
 > else is loaded **on demand** through the routing table in §3. Don't read the whole `docs/` tree.
 
-**Last verified:** 2026-10-27 · **Budget:** under 200 lines.
+**Last verified:** 2026-10-28 · **Budget:** under 200 lines.
 
 ---
 
@@ -11,8 +11,8 @@
 
 1. **Never invent** a screen, route, field, API, component, or domain term. If it isn't in the docs
    or existing code, stop and ask.
-2. **Almost nothing is built yet.** `apps/` holds the Foundation scaffold; the docs describe the *target*. Never say a feature
-   works unless you ran it.
+2. **Distinguish mocks from persistence.** `apps/` and `packages/data` contain substantial mock flows;
+   database, real auth and durable offline support remain targets. Never say a feature works unless you ran it.
 3. **Match the prototypes.** `docs/frames/*/*.html` are the agreed design. Build to them; don't redesign.
 4. **Words from [product-terms.md](docs/product-terms.md) only.** Queue (never "Que"), Queue Session,
    Queue Master, Match done ≠ Session done, invalid (never "void"). **ROTRA** in all caps in UI copy.
@@ -47,7 +47,8 @@ World (nearby-club discovery) is v2. Build nothing for it. Old features (MMR, EX
 Umpire, tournaments, Facebook login) are **not** v1. See [product terms §14](docs/product-terms.md#14-words-that-mean-not-v1--stop-and-ask).
 
 **Current phase:** building the apps on **mock data** (TanStack Query hooks over an in-memory mock store).
-Supabase + Prisma come later and replace only the fetchers.
+Supabase + Prisma come later. Keep UI/hook contracts stable while adding authorized Route Handlers,
+database services, real auth and durable offline storage/sync; replacing fetchers alone is insufficient.
 
 ---
 

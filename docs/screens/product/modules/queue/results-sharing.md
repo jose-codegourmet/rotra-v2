@@ -1,5 +1,7 @@
 # Private session results, publishing, exports, and history
 
+**Last verified:** 2026-10-28 for settled documentation reconciliation.
+
 **Surfaces:** `Q-RESULTS`, `Q-STANDINGS-SLIDE`, `Q-AWARDS-SLIDE`, `Q-OFF-DAY-SLIDE`, `Q-PUBLISH`, `Q-EXPORT`, `Q-HISTORY`.
 
 **Source:** [session result rules](../../../../business_logic/product/queue/modules/results/README.md). **Reference:** [ROTRA Queue prototype](../../../../frames/queue-app/rotra-queue.html).
@@ -74,7 +76,7 @@ Below the totals, tabs: **Public page**, **Results** (default, “N games”), *
 | Results | Standings table (rank, player, W, L, games) with **Result slides** and **Download images**. Invalid sessions show only the no-official-result notice |
 | How the night ran | The replay card, then one column per court listing every match in play order per [Q-MATCH-RECORD](match-control.md#q-match-record--read-only-outcome). Invalid sessions: “This session has no official result, so there is no match history or replay.” |
 | Players | A card per roster player, most games first: picture, name, level, rank chip, **games against the minimum**, W–L, and **Above minimum** / **Met minimum** / **N short**. Header: “Minimum N games · M below it”. Invalid sessions show “Not counted” |
-| Financials | The saved cost estimate: court cost with the calculation, shuttle lines, entrance fees (₱fee × players · misc) when set, total, break-even per player, what players paid (custom amount or break-even), and expected collection with profit / loss / breaks even. “No cost estimate was saved for this session.” when none. States that ROTRA doesn't collect or track payments |
+| Financials | The saved cost estimate: court cost with the calculation, shuttle lines, entrance fees (₱fee × players · misc) when set, total, break-even per player, what players paid (custom amount or break-even), and expected collection with profit / loss / breaks even. “No cost estimate was saved for this session.” when none. Includes the manual paid / not-paid checklist; ROTRA does not collect money. Payment updates never edit permanent match results |
 
 **Replay (How the night ran tab).** A card showing every court as it looked at one moment: each busy court drawn with its players stacked on each side of the net (tap a player for their profile) and “#match · N min”, free courts greyed. Under it a play/pause button, the current time, a timeline slider from the first match start to the last match end, and the end time; a summary reads “7:55 PM · 2 games on court · 7 finished so far”. Dragging the slider moves through the night; **Play** advances one session minute every 120 ms (a three-hour night in about 20 seconds) and stops at the end. Matches on court at that moment are highlighted in the court columns below. The slider has an accessible name and reports the time as its value.
 

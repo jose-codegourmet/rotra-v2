@@ -85,7 +85,7 @@ export function PlayerPoolCard({
   }
   return (
     // biome-ignore lint/a11y/useSemanticElements: the card holds a Switch, so it cannot be a <button>
-    <article
+    <div
       role="button"
       tabIndex={0}
       aria-pressed={selected}
@@ -145,6 +145,6 @@ export function PlayerPoolCard({
           />
         </span>
       </div>
-    </article>
+    </div>
   )
 }

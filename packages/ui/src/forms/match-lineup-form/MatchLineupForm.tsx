@@ -154,7 +154,6 @@ export function MatchLineupForm({
     const bad = isBad(id)
     if (!player) {
       return (
-        // biome-ignore lint/suspicious/noArrayIndexKey: slots are positional (Team A player N)
         <SwappablePlayer key={index} team={team} index={index} empty className="items-center">
           <button
             type="button"
@@ -175,7 +174,6 @@ export function MatchLineupForm({
     }
     const note = !player.present ? ' · not present' : player.playingOn ? ' · playing now' : ''
     return (
-      // biome-ignore lint/suspicious/noArrayIndexKey: slots are positional (Team A player N)
       <div key={index} className="flex items-center gap-1.5">
         <SwappablePlayer team={team} index={index} className="flex-1 items-center">
           <button
@@ -259,7 +257,10 @@ export function MatchLineupForm({
               control={form.control}
               name="format"
               render={({ field }) => (
-                <div role="group" aria-label="Format" className="flex flex-wrap items-center gap-2">
+                <fieldset
+                  aria-label="Format"
+                  className="m-0 flex min-w-0 flex-wrap items-center gap-2 border-0 p-0"
+                >
                   {offeredFormats(enabledFormats).map((f) => (
                     <Button
                       key={f}
@@ -270,7 +271,7 @@ export function MatchLineupForm({
                       {MATCH_FORMAT_LABELS[f]}
                     </Button>
                   ))}
-                </div>
+                </fieldset>
               )}
             />
             {isFunFormat(format) ? (

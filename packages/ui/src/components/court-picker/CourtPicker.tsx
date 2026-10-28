@@ -50,11 +50,10 @@ export function CourtPicker({
     )
   }
   return (
-    <div
-      role="group"
+    <fieldset
       aria-labelledby={labelId}
       aria-describedby={hintId}
-      className={cn('flex min-w-0 flex-col gap-1.5', className)}
+      className={cn('m-0 flex min-w-0 flex-col gap-1.5 border-0 p-0', className)}
     >
       <span id={labelId} className="text-[13px] font-semibold text-fg2">
         {required === 2 ? 'Choose two free courts' : 'Court'}
@@ -77,6 +76,6 @@ export function CourtPicker({
           5v5 uses two courts as one match.
         </span>
       ) : null}
-    </div>
+    </fieldset>
   )
 }

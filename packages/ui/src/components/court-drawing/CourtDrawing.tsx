@@ -58,11 +58,10 @@ export function CourtDrawing({
   const side = (players: CourtPlayer[], team: 'A' | 'B') => {
     const n = Math.min(players.length, 5)
     return (
-      <div
-        role="group"
+      <fieldset
         aria-label={`Team ${team}`}
         style={{ gridTemplateRows: `repeat(${rowsFor(players.length)}, auto)` }}
-        className="grid min-w-0 grid-flow-col content-center justify-center gap-x-2.5 gap-y-0.5 p-1.5"
+        className="m-0 grid min-w-0 grid-flow-col content-center justify-center gap-x-2.5 gap-y-0.5 border-0 p-1.5"
       >
         {players.map((p) => (
           <PlayerFaceButton
@@ -77,7 +76,7 @@ export function CourtDrawing({
             onClick={() => onOpenProfile?.(p.id)}
           />
         ))}
-      </div>
+      </fieldset>
     )
   }
 
@@ -92,7 +91,6 @@ export function CourtDrawing({
         className,
       )}
     >
-      {/* biome-ignore lint/a11y/noSvgWithoutTitle: aria-label names the teams; decorative when free */}
       <svg
         viewBox={`0 0 ${COURT_W} ${height}`}
         preserveAspectRatio="none"

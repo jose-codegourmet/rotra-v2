@@ -92,10 +92,9 @@ export function AutoQueueSheet({
         <span id="auto-queue-count-label" className="text-[13px] font-semibold text-fg2">
           Matches to add
         </span>
-        <div
-          role="group"
+        <fieldset
           aria-labelledby="auto-queue-count-label"
-          className="flex flex-wrap items-center gap-2"
+          className="m-0 flex min-w-0 flex-wrap items-center gap-2 border-0 p-0"
         >
           {AUTO_QUEUE_COUNTS.map((n) => (
             <Button
@@ -109,7 +108,7 @@ export function AutoQueueSheet({
               {n}
             </Button>
           ))}
-        </div>
+        </fieldset>
         <span className="text-xs text-fg2">
           Prototype control. ROTRA hasn't decided the default number of rounds.
         </span>

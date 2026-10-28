@@ -161,11 +161,7 @@ export function MatchResultForm({
               )}
             />
           </div>
-          <div
-            role="separator"
-            aria-label="Or"
-            className="flex items-center gap-3 text-xs font-extrabold tracking-[2px] text-fg2 before:h-px before:flex-1 before:bg-border-strong after:h-px after:flex-1 after:bg-border-strong"
-          >
+          <div className="flex items-center gap-3 text-xs font-extrabold tracking-[2px] text-fg2 before:h-px before:flex-1 before:bg-border-strong after:h-px after:flex-1 after:bg-border-strong">
             <span>OR</span>
           </div>
           <div className="flex min-w-0 flex-col gap-2.5">

@@ -277,6 +277,7 @@ export function SwappablePlayer({
   }
 
   return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: the wrapper only lifts the child card for drag and relays its arrow keys; the card inside is the focusable button
     <div
       ref={ref}
       data-swap-area={ctx?.areaId}

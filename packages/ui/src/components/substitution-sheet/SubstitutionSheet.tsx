@@ -126,7 +126,10 @@ export function SubstitutionSheet({
         </>
       }
     >
-      <div role="group" aria-label="Who's coming off?" className="flex min-w-0 flex-col gap-1.5">
+      <fieldset
+        aria-label="Who's coming off?"
+        className="m-0 flex min-w-0 flex-col gap-1.5 border-0 p-0"
+      >
         <span className="text-[13px] font-semibold text-fg2">Who's coming off?</span>
         <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,128px),1fr))] gap-2.5">
           {inMatch.map((p) => (
@@ -143,8 +146,8 @@ export function SubstitutionSheet({
             />
           ))}
         </div>
-      </div>
-      <div role="group" aria-label="Replacement" className="flex min-w-0 flex-col gap-1.5">
+      </fieldset>
+      <fieldset aria-label="Replacement" className="m-0 flex min-w-0 flex-col gap-1.5 border-0 p-0">
         <span className="text-[13px] font-semibold text-fg2">Replacement</span>
         {candidates.length ? (
           <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,128px),1fr))] gap-2.5">
@@ -165,7 +168,7 @@ export function SubstitutionSheet({
         ) : (
           <p className="m-0 text-[13px] text-fg2">No present player is free right now.</p>
         )}
-      </div>
+      </fieldset>
     </Sheet>
   )
 }

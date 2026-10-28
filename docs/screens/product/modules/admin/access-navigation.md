@@ -26,7 +26,9 @@ Proposed navigation:
 
 The initial view can be the clubs list rather than a speculative analytics dashboard. Counts shown in navigation are actual records, not mock revenue, churn, active-user, moderation, or platform-health metrics.
 
-Header identifies the authenticated platform account and sign-out control. Club operator actions remain attributable to their shared club account/device; Admin should not display invented individual manager names.
+Header identifies the authenticated platform account and offers direct sign-out alongside it. At
+560 px and narrower the account and sign-out action use accessible icons. The header and rail
+sign-out controls share the same pending state and return to `/login`. Club operator actions remain attributable to their shared club account/device; Admin should not display invented individual manager names.
 
 Each list/detail screen preserves search/filter context on return. Permission errors do not show partial privileged data. Unsaved form changes require deliberate dismissal; a failed save must not display a success toast or optimistic permanent value.
 
@@ -61,6 +63,8 @@ product-owner confirmation. Offline sign-in uses **“Signing in needs an intern
 The final Admin auth/provider/session policy remains open.
 
 The product owner requested no lint, type-check, or build checks. The #183 follow-up was
-verified in the browser: owner sign-in and sign-out, plus club-account denial. React Query
-Devtools showed zero queries after sign-out and during denial. Full Storybook, keyboard,
-and visual verification remains outstanding.
+verified in the browser: owner sign-in and sign-out, club-account denial, and session expiry.
+React Query Devtools showed zero queries after sign-out, during denial, and after expiry.
+The #185 follow-up verified header sign-out at 375 px and 1280 px in dark and light themes,
+keyboard Enter activation, and signed-out access protection. Full Storybook and remaining
+keyboard/visual verification are outside these follow-up checks.

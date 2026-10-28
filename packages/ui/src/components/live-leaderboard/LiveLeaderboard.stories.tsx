@@ -1,7 +1,8 @@
 import { liveStandingsFixture } from '@rotra/data/fixtures/live-standings'
+import { sessionRecordFixture } from '@rotra/data/fixtures/session-record'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
-import { LiveLeaderboard } from './LiveLeaderboard'
+import { LiveLeaderboard, type LiveLeaderboardProps } from './LiveLeaderboard'
 
 const meta = {
   title: 'Queue/LiveLeaderboard',
@@ -18,10 +19,10 @@ const meta = {
     minimumGames: liveStandingsFixture.minimumGames,
     onOpenProfile: fn(),
   },
-} satisfies Meta<typeof LiveLeaderboard>
+} satisfies Meta<LiveLeaderboardProps>
 
 export default meta
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<LiveLeaderboardProps>
 
 /** A clear leader, then three players at 2–1 ordered by head-to-head, then a bottom tie by name. */
 export const Standings: Story = {}
@@ -40,3 +41,15 @@ export const PhoneEmpty: Story = {
 }
 
 export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }
+
+/** The official standings of Thursday Open Play on the session record's Results tab. */
+export const Record: Story = {
+  args: { variant: 'record', rows: sessionRecordFixture.standings },
+}
+
+export const RecordEmpty: Story = { args: { variant: 'record', rows: [] } }
+
+export const RecordPhone: Story = {
+  args: { variant: 'record', rows: sessionRecordFixture.standings },
+  globals: { viewport: { value: 'phone' } },
+}

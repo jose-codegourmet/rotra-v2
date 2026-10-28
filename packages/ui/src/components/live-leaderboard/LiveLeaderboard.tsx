@@ -22,15 +22,31 @@ export type LiveLeaderboardRow = {
   games: number
 }
 
-export type LiveLeaderboardProps = {
+type LiveLeaderboardBaseProps = {
   /** Pre-sorted standings; the row's index is its rank */
   rows: LiveLeaderboardRow[]
-  /** The session's minimum games, shown after the games count as "g/min" */
-  minimumGames: number
   /** The player's picture opens their profile */
   onOpenProfile: (playerId: string) => void
   className?: string
 }
+
+export type LiveLeaderboardProps = LiveLeaderboardBaseProps &
+  (
+    | {
+        /** Tonight's working standings on the console (default) */
+        variant?: 'live'
+        /** The session's minimum games, shown after the games count as "g/min" */
+        minimumGames: number
+      }
+    | {
+        /**
+         * The official standings on a session record's Results tab: #, Player, W, L, Games, no
+         * heading, no level, no win %
+         */
+        variant: 'record'
+        minimumGames?: never
+      }
+  )
 
 const column = createColumnHelper<LiveLeaderboardRow>()
 
@@ -54,13 +70,19 @@ function RankBadge({ rank }: { rank: number }) {
  * Tonight's standings on the console's Leaderboard view: rank (top three highlighted), player
  * picture, name and level, wins, losses, games against the minimum, and win %. One labelled card
  * per row on phones. A working view for the operator, never official history.
+ *
+ * The record variant is the same table on a session record's Results tab (the prototype's
+ * histResultsPane()): #, Player (picture button and name), W, L and the counted games, without the
+ * heading, the level or the win %.
  */
 export function LiveLeaderboard({
+  variant = 'live',
   rows,
   minimumGames,
   onOpenProfile,
   className,
 }: LiveLeaderboardProps) {
+  const record = variant === 'record'
   const columns = useMemo(
     () => [
       column.display({
@@ -74,20 +96,34 @@ export function LiveLeaderboard({
         header: 'Player',
         enableSorting: false,
         meta: { lead: true },
-        cell: ({ row }) => (
-          <span className="flex min-w-0 items-center gap-2.5">
-            <Avatar
-              name={row.original.name}
-              src={row.original.photoUrl}
-              size={36}
-              onClick={() => onOpenProfile(row.original.playerId)}
-            />
-            <span className="min-w-0">
-              <b className="block [overflow-wrap:anywhere]">{row.original.name}</b>
-              <span className="block text-[13px] text-fg2">{levelLabel(row.original.level)}</span>
+        cell: ({ row }) =>
+          record ? (
+            <span className="flex min-w-0 items-center gap-2.5">
+              <button
+                type="button"
+                onClick={() => onOpenProfile(row.original.playerId)}
+                aria-label={`${row.original.name}. View profile`}
+                title={row.original.name}
+                className="m-0 flex-none rounded-full border-0 bg-transparent p-0 leading-none [&>span]:hover:shadow-[0_0_0_2px_var(--accent)]"
+              >
+                <Avatar name={row.original.name} src={row.original.photoUrl} size={36} />
+              </button>
+              <b className="min-w-0 [overflow-wrap:anywhere]">{row.original.name}</b>
             </span>
-          </span>
-        ),
+          ) : (
+            <span className="flex min-w-0 items-center gap-2.5">
+              <Avatar
+                name={row.original.name}
+                src={row.original.photoUrl}
+                size={36}
+                onClick={() => onOpenProfile(row.original.playerId)}
+              />
+              <span className="min-w-0">
+                <b className="block [overflow-wrap:anywhere]">{row.original.name}</b>
+                <span className="block text-[13px] text-fg2">{levelLabel(row.original.level)}</span>
+              </span>
+            </span>
+          ),
       }),
       column.accessor('wins', {
         header: 'W',
@@ -105,42 +141,54 @@ export function LiveLeaderboard({
         header: 'Games',
         enableSorting: false,
         meta: { align: 'right', nowrap: true },
-        cell: ({ getValue }) => (
-          <span className="tabular-nums">
-            {getValue()}
-            <span className="text-fg2">/{minimumGames}</span>
-          </span>
-        ),
+        cell: ({ getValue }) =>
+          record ? (
+            <span className="tabular-nums">{getValue()}</span>
+          ) : (
+            <span className="tabular-nums">
+              {getValue()}
+              <span className="text-fg2">/{minimumGames}</span>
+            </span>
+          ),
       }),
-      column.display({
-        id: 'winRate',
-        header: 'Win %',
-        enableSorting: false,
-        meta: { align: 'right', nowrap: true },
-        cell: ({ row }) => (
-          <span className="tabular-nums">
-            {row.original.games ? Math.round((row.original.wins / row.original.games) * 100) : 0}%
-          </span>
-        ),
-      }),
+      ...(record
+        ? []
+        : [
+            column.display({
+              id: 'winRate',
+              header: 'Win %',
+              enableSorting: false,
+              meta: { align: 'right', nowrap: true },
+              cell: ({ row }) => (
+                <span className="tabular-nums">
+                  {row.original.games
+                    ? Math.round((row.original.wins / row.original.games) * 100)
+                    : 0}
+                  %
+                </span>
+              ),
+            }),
+          ]),
     ],
-    [minimumGames, onOpenProfile],
+    [record, minimumGames, onOpenProfile],
   )
 
   return (
     <div className={cn('flex flex-col gap-3', className)}>
-      <div>
-        <h2 className="text-lg font-bold">Leaderboard</h2>
-        <p className="mt-1 text-[13px] text-fg2">
-          Tonight's standings from completed games: most wins, then fewest losses, then
-          head-to-head. It updates each time you confirm a result. Partial and invalid games don't
-          count.
-        </p>
-      </div>
+      {record ? null : (
+        <div>
+          <h2 className="text-lg font-bold">Leaderboard</h2>
+          <p className="mt-1 text-[13px] text-fg2">
+            Tonight's standings from completed games: most wins, then fewest losses, then
+            head-to-head. It updates each time you confirm a result. Partial and invalid games don't
+            count.
+          </p>
+        </div>
+      )}
       {rows.length ? (
         <Card padding="none" className="overflow-hidden px-1.5 max-[760px]:px-4">
           <DataTable
-            aria-label="Tonight's standings"
+            aria-label={record ? 'Standings' : "Tonight's standings"}
             columns={columns}
             data={rows}
             getRowId={(row) => row.playerId}
@@ -152,7 +200,9 @@ export function LiveLeaderboard({
       ) : (
         <Card>
           <EmptyState>
-            No completed games yet. Standings appear after the first confirmed result.
+            {record
+              ? 'No counted games were recorded in this session.'
+              : 'No completed games yet. Standings appear after the first confirmed result.'}
           </EmptyState>
         </Card>
       )}

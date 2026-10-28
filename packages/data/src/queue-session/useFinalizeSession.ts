@@ -4,6 +4,7 @@ import { clubKeys } from '../club/queryKeys'
 import { deviceKeys } from '../device/queryKeys'
 import { matchKeys } from '../match/queryKeys'
 import { publicSessionKeys } from '../public-session/queryKeys'
+import { sessionResultKeys } from '../session-result/queryKeys'
 import { sessionRosterKeys } from '../session-roster/queryKeys'
 import { syncKeys } from '../sync/queryKeys'
 import { finalizeSession } from './finalization'
@@ -24,6 +25,8 @@ export function useFinalizeSession(sessionId: string) {
       await Promise.all([
         client.invalidateQueries({ queryKey: queueSessionKeys.all }),
         client.invalidateQueries({ queryKey: matchKeys.all }),
+        // The slides stage writes the private snapshot the results view reads.
+        client.invalidateQueries({ queryKey: sessionResultKeys.all }),
         client.invalidateQueries({ queryKey: sessionRosterKeys.all }),
         client.invalidateQueries({ queryKey: syncKeys.all }),
         client.invalidateQueries({ queryKey: clubKeys.all }),

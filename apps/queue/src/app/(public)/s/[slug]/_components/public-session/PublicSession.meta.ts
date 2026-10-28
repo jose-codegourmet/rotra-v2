@@ -14,7 +14,7 @@ export const publicSessionMeta = {
     'Requests off ("This session isn\'t taking requests online…") and slots full variants come from the projection; a failed send keeps JoinRequestSheet open with serverError and the typed values. Invalid sessions: hero without a status chip, Details and Participants only, no Results section and no join card. "Happening now" shows only for an active session; stale data is never called Live.',
     'Q-PUBLIC-STALE is not built: the open decision "Stale-page access and post-deletion restoration" (docs/business_logic/product/open-decisions.md) has no policy yet, so there is no stale variant and expired-club pages are out of scope.',
     'Leak check: the PublicSessionPage object (React Query devtools: public-session › detail) holds no phone, cost, level, presence or unpublished Off Day for any fixture session, and nothing private is rendered or preloaded.',
-    'All values come from the last synced state: a disconnected operator\'s local edits never show, and Details adds the pending-changes line while the server knows changes are waiting. No fees, costs, phones, levels, presence or unpublished Off Day are ever in the data.',
+    "All values come from the last synced state: a disconnected operator's local edits never show, and Details adds the pending-changes line while the server knows changes are waiting. No fees, costs, phones, levels, presence or unpublished Off Day are ever in the data.",
   ],
   docs: [
     'docs/screens/product/modules/queue/public-session.md',

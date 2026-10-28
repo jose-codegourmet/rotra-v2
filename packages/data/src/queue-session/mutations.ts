@@ -1,5 +1,3 @@
-import { validateSessionCost } from '../session-cost/validation'
-import { normalizeSessionCost } from '../session-cost/sessionCost.rules'
 import { DEMO_CLUB_ID } from '../fixtures/clubs'
 import { checkMockSave, getMockDevState, requireOnline } from '../mock/bridge'
 import { MockError } from '../mock/errors'
@@ -7,6 +5,8 @@ import { delay } from '../mock/latency'
 import { required } from '../mock/required'
 import { type MockState, mockStore } from '../mock/store'
 import { queueMutation, sessionIn } from '../mock/transaction'
+import { normalizeSessionCost } from '../session-cost/sessionCost.rules'
+import { validateSessionCost } from '../session-cost/validation'
 import type { SessionWaitlistEntry } from '../session-roster/sessionRoster.types'
 import {
   estimateMinimum,

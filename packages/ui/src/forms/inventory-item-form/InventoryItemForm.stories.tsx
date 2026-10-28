@@ -2,6 +2,7 @@ import { inventoryItems } from '@rotra/data/fixtures/inventory'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import { InventoryItemForm } from './InventoryItemForm'
+
 const item = inventoryItems[0]!
 const meta = {
   title: 'Queue/InventoryItemForm',

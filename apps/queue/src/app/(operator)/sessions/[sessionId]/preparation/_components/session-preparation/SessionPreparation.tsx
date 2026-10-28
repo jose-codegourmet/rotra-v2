@@ -1,11 +1,5 @@
 'use client'
 
-import { PaymentsPanel } from '@/app/(operator)/sessions/[sessionId]/_components/payments-panel/PaymentsPanel'
-import { useSessionPayments } from '@rotra/data/session-payment/useSessionPayments'
-import { useSessionCostEstimate } from '@rotra/data/session-cost/useSessionCostEstimate'
-import { formatPeso } from '@rotra/schema/money'
-import { CostEstimateResult } from '@rotra/ui/cost-estimate-summary'
-
 import { MockError } from '@rotra/data/mock/errors'
 import {
   estimateMinimum,
@@ -16,10 +10,14 @@ import { useDownloadSession } from '@rotra/data/queue-session/useDownloadSession
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useQueueSessions } from '@rotra/data/queue-session/useQueueSessions'
 import { useStartSession } from '@rotra/data/queue-session/useStartSession'
+import { useSessionCostEstimate } from '@rotra/data/session-cost/useSessionCostEstimate'
+import { useSessionPayments } from '@rotra/data/session-payment/useSessionPayments'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { useSetAcceptJoinRequests } from '@rotra/data/session-roster/useSetAcceptJoinRequests'
+import { formatPeso } from '@rotra/schema/money'
 import { Breadcrumb } from '@rotra/ui/breadcrumb'
 import { Button } from '@rotra/ui/button'
+import { CostEstimateResult } from '@rotra/ui/cost-estimate-summary'
 import { DeviceDownloadCard } from '@rotra/ui/device-download-card'
 import { formatMinutes } from '@rotra/ui/forms/session-setup-form/helpers'
 import { PageHeader } from '@rotra/ui/page-header'
@@ -37,6 +35,7 @@ import { useDockAction } from '@/app/(operator)/_components/operator-shell/DockA
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import { FacebookPost } from '@/app/(operator)/sessions/[sessionId]/_components/facebook-post/FacebookPost'
 import { JoinRequests } from '@/app/(operator)/sessions/[sessionId]/_components/join-requests/JoinRequests'
+import { PaymentsPanel } from '@/app/(operator)/sessions/[sessionId]/_components/payments-panel/PaymentsPanel'
 import { PreparationRoster } from '@/app/(operator)/sessions/[sessionId]/preparation/_components/preparation-roster/PreparationRoster'
 import { sessionHref } from '@/lib/dates'
 import { useAppSelector } from '@/store/hooks'

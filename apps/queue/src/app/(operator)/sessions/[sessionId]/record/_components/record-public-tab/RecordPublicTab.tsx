@@ -73,7 +73,7 @@ export function RecordPublicTab({ sessionId, record }: RecordPublicTabProps) {
       >
         {p.participants.map((x, i) => (
           <ParticipantCard
-            // biome-ignore lint/suspicious/noArrayIndexKey: the public projection carries no ids; order is the roster order
+            // The public projection carries no ids; order is the roster order.
             key={i}
             name={x.name}
             pictureUrl={x.pictureUrl}

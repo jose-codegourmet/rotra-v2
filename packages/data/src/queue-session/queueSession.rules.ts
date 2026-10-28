@@ -2,7 +2,10 @@ import type { SessionPlayer, SessionWaitlistEntry } from '../session-roster/sess
 import type { QueueSession, QueueSessionInput } from './queueSession.types'
 /** The prototype's sessionLink(): the id stripped of non-alphanumerics, last 6 characters, lowercase. */
 export function publicSlugFor(sessionId: string) {
-  return sessionId.replace(/[^a-z0-9]/gi, '').slice(-6).toLowerCase()
+  return sessionId
+    .replace(/[^a-z0-9]/gi, '')
+    .slice(-6)
+    .toLowerCase()
 }
 export function sessionMinutes(start: number, end: number) {
   return ((end > start ? end : end + 86400000) - start) / 60000

@@ -8,9 +8,9 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 import { fn } from 'storybook/test'
 import {
+  type PaymentFilter,
   PaymentsChecklist,
   type PaymentsChecklistProps,
-  type PaymentFilter,
 } from './PaymentsChecklist'
 
 function Interactive(args: PaymentsChecklistProps) {

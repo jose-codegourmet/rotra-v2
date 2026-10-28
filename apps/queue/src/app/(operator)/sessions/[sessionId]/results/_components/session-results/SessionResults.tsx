@@ -3,23 +3,28 @@
 import { useClub } from '@rotra/data/club'
 import { DEMO_CLUB_ID } from '@rotra/data/fixtures/clubs'
 import { MockError } from '@rotra/data/mock/errors'
+import { useFinalizationStatus } from '@rotra/data/queue-session/useFinalizationStatus'
+import { useFinalizeSession } from '@rotra/data/queue-session/useFinalizeSession'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionRecord } from '@rotra/data/queue-session/useSessionRecord'
 import { useSessionPublication } from '@rotra/data/session-result/useSessionPublication'
 import { useSessionResults } from '@rotra/data/session-result/useSessionResults'
 import { AwardsSlide } from '@rotra/ui/awards-slide'
 import { Breadcrumb } from '@rotra/ui/breadcrumb'
+import { ErrorState } from '@rotra/ui/error-state'
 import { OffDaySlide } from '@rotra/ui/off-day-slide'
 import { ResultsHeader } from '@rotra/ui/results-header'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { StandingsSlide } from '@rotra/ui/standings-slide'
 import { type TabItem, Tabs, TabsContent } from '@rotra/ui/tabs'
+import { toast } from '@rotra/ui/toaster'
 import Link from 'next/link'
 import { notFound, useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import { ExportImagesSheetContainer } from '@/app/(operator)/sessions/[sessionId]/results/_components/export-images-sheet/ExportImagesSheetContainer'
 import { PublishResultsSheet } from '@/app/(operator)/sessions/[sessionId]/results/_components/publish-results-sheet/PublishResultsSheet'
+import { sessionHref } from '@/lib/dates'
 
 export type SessionResultsProps = { sessionId: string }
 
@@ -33,6 +38,11 @@ const SLIDES: TabItem[] = [
 const date = (at: number) =>
   new Date(at).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })
 
+const PREPARING = 'Session finished; results are being prepared'
+
+const errorMessage = (error: unknown) =>
+  error instanceof Error ? error.message : 'Something went wrong. Try again.'
+
 const isPermission = (q: { isError: boolean; error: unknown }) =>
   q.isError && q.error instanceof MockError && q.error.kind === 'permission'
 
@@ -41,6 +51,12 @@ const isPermission = (q: { isError: boolean; error: unknown }) =>
  * link Home, ResultsHeader (status chips and actions), the three slide tabs (local state) and the
  * chosen slide from useSessionResults; the Off Day slide is the private variant. Publish results /
  * Update publication and Download images open their sheet containers.
+ *
+ * States (Q08.7): only a completed session has results; an active, prepared, finalizing or invalid
+ * session is sent to its console, preparation, finishing screen or record (sessionHref), so no
+ * provisional slide ever shows. A finished session whose slides stage failed shows "Session
+ * finished; results are being prepared" with Try again (the same finalization command) instead of
+ * slides. Loading shows skeletons only; the license gate is the operator shell's.
  */
 export function SessionResults({ sessionId }: SessionResultsProps) {
   const router = useRouter()
@@ -60,18 +76,52 @@ export function SessionResults({ sessionId }: SessionResultsProps) {
   const snapshot = results.data
   const c = club.data
 
-  if (session.isError || results.isError)
+  // Results exist only for a completed session; everything else goes where it belongs.
+  const redirectTo = s && s.state !== 'completed' ? sessionHref(s) : null
+  useEffect(() => {
+    if (redirectTo) router.replace(redirectTo)
+  }, [redirectTo, router])
+
+  // Committed, but the slides stage has not produced the snapshot yet.
+  const processing = !redirectTo && !!s && results.isSuccess && snapshot === null
+  const finalization = useFinalizationStatus(sessionId, { enabled: processing })
+  const finalize = useFinalizeSession(sessionId)
+  // Only a committed run with outstanding work can be retried; a running one is still finishing.
+  const commandId =
+    finalization.data?.state === 'committed' ? finalization.data.commandId : undefined
+  const retry = () => {
+    if (!commandId || finalize.isPending) return
+    finalize
+      .mutateAsync({ sessionId, commandId })
+      .catch((error: unknown) => toast.error(errorMessage(error)))
+  }
+
+  if (processing)
+    return (
+      <main className="mx-auto flex max-w-[1240px] flex-col gap-5 px-[max(16px,env(safe-area-inset-left,0px))] pt-5 pb-[170px]">
+        <Breadcrumb label="Home" href="/" linkAs={Link} />
+        <ErrorState
+          title={PREPARING}
+          onRetry={commandId ? retry : undefined}
+          retrying={finalize.isPending}
+        >
+          Player records and ranks are already updated. Try again to prepare the result slides.
+        </ErrorState>
+      </main>
+    )
+
+  if (session.isError || (s && !redirectTo && (results.isError || record.isError)))
     return (
       <main className="mx-auto max-w-[1240px] px-4 pt-5">
         <Breadcrumb label="Home" href="/" linkAs={Link} />
         <QueryError
-          query={session.isError ? session : results}
+          query={session.isError ? session : results.isError ? results : record}
           title="Couldn't load these results."
         />
       </main>
     )
 
-  const ready = s && r && snapshot && c && !publication.isPending
+  const ready = !redirectTo && s && r && snapshot && c && !publication.isPending
   const frame = ready
     ? {
         club: { name: c.name, initials: c.initials, logoUrl: c.logoUrl },

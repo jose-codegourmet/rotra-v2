@@ -2,8 +2,8 @@
 
 import type { SessionRecordSummary } from '@rotra/data/queue-session/types'
 import { useSessionCostEstimate } from '@rotra/data/session-cost/useSessionCostEstimate'
-import { SessionFinancialsSummary } from '@rotra/ui/session-financials-summary'
 import { formatMinutes } from '@rotra/ui/forms/session-setup-form/helpers'
+import { SessionFinancialsSummary } from '@rotra/ui/session-financials-summary'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import { PaymentsPanel } from '@/app/(operator)/sessions/[sessionId]/_components/payments-panel/PaymentsPanel'

@@ -34,6 +34,8 @@
     "./queue-session/useFinalizationStatus": "./src/queue-session/useFinalizationStatus.ts",
     "./queue-session/useInvalidateSession": "./src/queue-session/useInvalidateSession.ts",
     "./queue-session/useSessionRecord": "./src/queue-session/useSessionRecord.ts",
+    "./queue-session/useSessionRecordHistory": "./src/queue-session/useSessionRecordHistory.ts",
+    "./queue-session/sessionRecord.rules": "./src/queue-session/sessionRecord.rules.ts",
     "./session-roster/types": "./src/session-roster/sessionRoster.types.ts",
     "./license/types": "./src/license/license.types.ts",
     "./sync/types": "./src/sync/sync.types.ts",

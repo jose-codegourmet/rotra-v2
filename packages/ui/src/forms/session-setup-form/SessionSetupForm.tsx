@@ -2,22 +2,21 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { formatPeso } from '@rotra/schema/money'
+import { Button } from '@rotra/ui/button'
+import { Card } from '@rotra/ui/card'
+import { cn } from '@rotra/ui/cn'
 import {
   SessionFinancialsFields,
   type SessionFinancialsFieldsProps,
 } from '@rotra/ui/forms/session-financials-fields'
 import { sessionFinancialsSchema } from '@rotra/ui/forms/session-financials-fields/schema'
-import { Button } from '@rotra/ui/button'
-import { Card } from '@rotra/ui/card'
-import { cn } from '@rotra/ui/cn'
 import { Notice } from '@rotra/ui/notice'
 import type { RepeatOccurrence } from '@rotra/ui/repeat-schedule-panel'
 import { type SetupStep, SetupStepBar } from '@rotra/ui/setup-step-bar'
 import { type ReactNode, type Ref, useImperativeHandle, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { sessionSetupDefaultValues } from './SessionSetupForm.defaultValues'
-import { slotBudget } from './SessionSetupForm.helpers'
-import { durationMinutes } from './SessionSetupForm.helpers'
+import { durationMinutes, slotBudget } from './SessionSetupForm.helpers'
 import {
   PAGE_FIELDS,
   type SessionSetupInput,

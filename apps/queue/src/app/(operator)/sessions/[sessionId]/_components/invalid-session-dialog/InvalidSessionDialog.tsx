@@ -1,7 +1,7 @@
 'use client'
 
-import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useInvalidateSession } from '@rotra/data/queue-session/useInvalidateSession'
+import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { InvalidSessionConfirm } from '@rotra/ui/invalid-session-confirm'
 import { Notice } from '@rotra/ui/notice'
 import { Sheet } from '@rotra/ui/sheet'

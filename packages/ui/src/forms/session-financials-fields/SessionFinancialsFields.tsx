@@ -2,10 +2,10 @@
 
 import { formatPeso, moneyField } from '@rotra/schema/money'
 import { Button } from '@rotra/ui/button'
-import { CostEstimateSummary, type CostEstimate } from '@rotra/ui/cost-estimate-summary'
+import { type CostEstimate, CostEstimateSummary } from '@rotra/ui/cost-estimate-summary'
 import { Field } from '@rotra/ui/field'
 import { SegmentedControl } from '@rotra/ui/segmented-control'
-import { ShuttlePlanRow, type ShuttlePlanItem } from '@rotra/ui/shuttle-plan-row'
+import { type ShuttlePlanItem, ShuttlePlanRow } from '@rotra/ui/shuttle-plan-row'
 import { TextInput } from '@rotra/ui/text-input'
 import { Controller, useFieldArray, useFormContext, useWatch } from 'react-hook-form'
 import type {

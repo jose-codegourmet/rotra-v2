@@ -3,12 +3,11 @@
 import { useFinalizeSession } from '@rotra/data/queue-session/useFinalizeSession'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionDoneReview } from '@rotra/data/queue-session/useSessionDoneReview'
-import { useSyncStatus } from '@rotra/data/sync/useSyncStatus'
-import { useSessionIntegrity } from '@rotra/data/sync/useSessionIntegrity'
 import { useAnswerInterruption } from '@rotra/data/sync/useAnswerInterruption'
-import { InterruptionCheckSheet } from '@rotra/ui/interruption-check-sheet'
-import { InvalidSessionDialog } from '../invalid-session-dialog/InvalidSessionDialog'
+import { useSessionIntegrity } from '@rotra/data/sync/useSessionIntegrity'
 import { useSyncState } from '@rotra/data/sync/useSyncState'
+import { useSyncStatus } from '@rotra/data/sync/useSyncStatus'
+import { InterruptionCheckSheet } from '@rotra/ui/interruption-check-sheet'
 import { formatTime } from '@rotra/ui/now-card/helpers'
 import { SessionDoneSheet, type SessionDoneStep } from '@rotra/ui/session-done-sheet'
 import { toast } from '@rotra/ui/toaster'
@@ -16,6 +15,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { useAppSelector } from '@/store/hooks'
 import { selectDev } from '@/store/slices/devSlice'
+import { InvalidSessionDialog } from '../invalid-session-dialog/InvalidSessionDialog'
 
 export type SessionDoneFlowProps = {
   sessionId: string

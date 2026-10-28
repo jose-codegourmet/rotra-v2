@@ -9,9 +9,9 @@ import { TextInput } from '@rotra/ui/text-input'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
 import { inventoryItemDefaultValues } from './InventoryItemForm.defaultValues'
 import {
-  inventoryItemSchema,
   type InventoryItemFormInput,
   type InventoryItemFormValues,
+  inventoryItemSchema,
 } from './InventoryItemForm.schema'
 
 export type InventoryItemFormProps = {

@@ -12,6 +12,7 @@ import type {
   SessionFinalization,
   SessionRecordSummary,
 } from './queueSession.types'
+import { type SessionRecordHistory, sessionRecordHistory } from './sessionRecord.rules'
 export function sessionSummary(state: MockState, session: QueueSession): QueueSessionSummary {
   const matches = state.matches.filter((m) => m.sessionId === session.id),
     roster = state.roster.filter((r) => r.sessionId === session.id)
@@ -143,4 +144,21 @@ export async function getSessionRecord(id: string): Promise<SessionRecordSummary
       : playerSummaries.filter((p) => p.completedGames < session.minimumGames).length,
     playerSummaries,
   }
+}
+/**
+ * Q-HISTORY › How the night ran: every match that ran, by court, with the replay bounds. An invalid
+ * session has no match history (its partial records are not shown), so it returns no matches.
+ */
+export async function getSessionRecordHistory(id: string): Promise<SessionRecordHistory> {
+  await delay()
+  const state = readMockState(),
+    session = sessionIn(state, id)
+  if (session.state !== 'completed' && session.state !== 'invalid')
+    throw new MockError('permission', 'This session has no record yet.')
+  return sessionRecordHistory({
+    fallbackStart: session.startedAt ?? session.scheduledStartAt,
+    courts: state.courts.filter((c) => c.sessionId === id),
+    roster: state.roster.filter((r) => r.sessionId === id),
+    matches: session.state === 'invalid' ? [] : state.matches.filter((m) => m.sessionId === id),
+  })
 }

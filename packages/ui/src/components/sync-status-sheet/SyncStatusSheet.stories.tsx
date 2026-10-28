@@ -3,6 +3,7 @@ import { SyncAttentionNotice } from '@rotra/ui/sync-attention-notice'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import { SyncStatusSheet } from './SyncStatusSheet'
+
 const meta = {
   title: 'Queue/SyncStatusSheet',
   component: SyncStatusSheet,

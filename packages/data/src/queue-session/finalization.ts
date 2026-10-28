@@ -1,4 +1,3 @@
-import { integrityIn } from '../sync/integrity'
 import { activeMatches } from '../match/match.rules'
 import { checkMockSave, getMockDevState } from '../mock/bridge'
 import { MockError } from '../mock/errors'
@@ -7,6 +6,7 @@ import { type MockState, mockStore, readMockState } from '../mock/store'
 import { queueMutation, sessionIn } from '../mock/transaction'
 import { createResultSnapshot } from '../session-result/sessionResult.rules'
 import { recordChange } from '../sync/fetchers'
+import { integrityIn } from '../sync/integrity'
 import type { SaveOutcome } from '../sync/sync.types'
 import {
   FINALIZATION_STAGES,

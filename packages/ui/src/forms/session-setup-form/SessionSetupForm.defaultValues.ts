@@ -1,5 +1,5 @@
-import type { SessionSetupInput } from './SessionSetupForm.schema'
 import { sessionFinancialsDefaultValues } from '@rotra/ui/forms/session-financials-fields/default-values'
+import type { SessionSetupInput } from './SessionSetupForm.schema'
 
 const pad = (n: number) => String(n).padStart(2, '0')
 

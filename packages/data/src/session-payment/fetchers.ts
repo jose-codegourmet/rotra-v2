@@ -1,5 +1,5 @@
-import type { SessionCostInput } from '../session-cost/sessionCost.types'
 import { formatPeso } from '@rotra/schema/money'
+import portraits from '../fixtures/playerPortraits.json'
 import { getMockDevState } from '../mock/bridge'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
@@ -7,6 +7,10 @@ import { type MockState, readMockState } from '../mock/store'
 import { queueMutation, requireClubAccess, sessionIn } from '../mock/transaction'
 import { sessionCostIn } from '../session-cost/fetchers'
 import { amountDuePerHead, paymentTotals } from '../session-cost/sessionCost.rules'
+import type { SessionCostInput } from '../session-cost/sessionCost.types'
+
+/** Uploaded pictures by global player id (registered and unclaimed players only). */
+const pictures: Record<string, string> = portraits
 
 export async function getSessionPayments(sessionId: string) {
   await delay()
@@ -27,7 +31,7 @@ export async function getSessionPayments(sessionId: string) {
         sessionPlayerId: p.id,
         clubPlayerId: p.clubPlayerId,
         name: p.nameSnapshot,
-        picture: state.players.find((player) => player.id === clubPlayer?.playerId)?.picture,
+        picture: clubPlayer?.playerId ? pictures[clubPlayer.playerId] : undefined,
         paid: mark ? { amount: mark.amountMinor, at: mark.markedAt } : undefined,
       }
     })

@@ -105,7 +105,7 @@ export function SetupNotesReviewSection({
         1,
       ),
     },
-    ...(costsReviewLine ? [{ label: 'Costs', value: costsReviewLine }] : []),
+    ...(costsReviewLine ? [{ label: 'Costs', value: row(costsReviewLine, 2) }] : []),
   ]
   return (
     <>

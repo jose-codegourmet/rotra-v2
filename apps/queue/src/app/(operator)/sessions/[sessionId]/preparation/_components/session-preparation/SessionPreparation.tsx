@@ -1,5 +1,9 @@
 'use client'
 
+import { useSessionCostEstimate } from '@rotra/data/session-cost/useSessionCostEstimate'
+import { formatPeso } from '@rotra/schema/money'
+import { CostEstimateResult } from '@rotra/ui/cost-estimate-summary'
+
 import { MockError } from '@rotra/data/mock/errors'
 import {
   estimateMinimum,
@@ -55,6 +59,7 @@ const errorMessage = (error: unknown) =>
  */
 export function SessionPreparation({ sessionId }: { sessionId: string }) {
   const router = useRouter()
+  const cost = useSessionCostEstimate(sessionId)
   const dev = useAppSelector(selectDev)
   const session = useQueueSession(sessionId)
   const sessions = useQueueSessions()
@@ -203,6 +208,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
             <div className="flex flex-col gap-4">
               <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,320px),1fr))] gap-4">
                 <SessionSetupCard
+                  extraRows={cost.data ? [{ label: 'Costs', value: <>{formatPeso(cost.data.estimate.total)} estimated · {formatPeso(cost.data.estimate.breakEven)} a player to break even<br />Players pay {formatPeso(cost.data.estimate.perHead)} ({cost.data.estimate.isCustom ? 'custom amount' : 'break-even'}) · <CostEstimateResult result={cost.data.estimate.result} /></> }] : undefined}
                   courtLabels={courts.map((c) => c.label)}
                   formatsLabel={formats}
                   modeLabel={MODES[s.sessionMode].label}

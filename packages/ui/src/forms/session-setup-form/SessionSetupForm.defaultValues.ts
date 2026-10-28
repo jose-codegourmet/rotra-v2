@@ -1,4 +1,5 @@
 import type { SessionSetupInput } from './SessionSetupForm.schema'
+import { sessionFinancialsDefaultValues } from '@rotra/ui/forms/session-financials-fields/default-values'
 
 const pad = (n: number) => String(n).padStart(2, '0')
 
@@ -11,6 +12,7 @@ export function tomorrowYmd(now = new Date()): string {
 /** New-session defaults from the prototype's draftFrom(): tomorrow 19:00–22:00, two courts, Doubles, Fair. */
 export function sessionSetupDefaultValues(playersPerCourt = 8): SessionSetupInput {
   return {
+    ...sessionFinancialsDefaultValues,
     title: '',
     date: tomorrowYmd(),
     startTime: '19:00',

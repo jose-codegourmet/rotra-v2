@@ -233,7 +233,10 @@
     "./sync-attention-notice": "./src/components/sync-attention-notice/SyncAttentionNotice.tsx",
     "./interruption-check-sheet": "./src/components/interruption-check-sheet/InterruptionCheckSheet.tsx",
     "./recovery-status-panel": "./src/components/recovery-status-panel/RecoveryStatusPanel.tsx",
-    "./unrecoverable-session-panel": "./src/components/unrecoverable-session-panel/UnrecoverableSessionPanel.tsx"
+    "./unrecoverable-session-panel": "./src/components/unrecoverable-session-panel/UnrecoverableSessionPanel.tsx",
+    "./conflict-review-list": "./src/components/conflict-review-list/ConflictReviewList.tsx",
+    "./conflict-review-list/conflict-item-card": "./src/components/conflict-review-list/conflict-item-card/ConflictItemCard.tsx",
+    "./device-continue-notice": "./src/components/device-continue-notice/DeviceContinueNotice.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

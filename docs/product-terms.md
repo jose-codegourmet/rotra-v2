@@ -202,6 +202,7 @@ Rules: [Clubs and licenses](business_logic/product/admin/modules/clubs-licenses/
 | Contact-change request | A registered player's request to change phone or email, approved in Admin |
 | Public-page retention | How long public session pages stay up; deleting a page never deletes history |
 | Ranking settings | Admin-adjustable weights (70/30) and match requirement. Saving makes a new version |
+| Sync conflict | `SyncConflict` | `sync_conflicts` | Read-only device evidence; authority-selection rule pending |
 | Feature flag | Platform-wide on/off switch with a fixed key the apps check. New flags start off |
 
 ---
@@ -261,6 +262,7 @@ from the [database design](database_design/product/README.md). Add a row here **
 | Shuttle plan line | `SessionShuttlePlanLine` | `session_shuttle_plan_lines` | Planned tubes from one inventory item |
 | Payment mark | `SessionPaymentMark` | `session_payment_marks` | Amount and time when paid was ticked |
 | Cost estimate | `SessionCostEstimate` | `session_cost_estimates` | |
+| Sync conflict | `SyncConflict` | `sync_conflicts` | Read-only device evidence; authority-selection rule pending |
 | Feature flag | `FeatureFlag` | `feature_flags` | |
 
 URL segments, component names, and query keys use the same words: `sessions/[sessionId]`, `MatchCard`,

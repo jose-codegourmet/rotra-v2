@@ -1,5 +1,11 @@
 'use client'
 
+import { PaymentsPanel } from '@/app/(operator)/sessions/[sessionId]/_components/payments-panel/PaymentsPanel'
+import { useSessionPayments } from '@rotra/data/session-payment/useSessionPayments'
+import { useSessionCostEstimate } from '@rotra/data/session-cost/useSessionCostEstimate'
+import { formatPeso } from '@rotra/schema/money'
+import { CostEstimateResult } from '@rotra/ui/cost-estimate-summary'
+
 import { MockError } from '@rotra/data/mock/errors'
 import {
   estimateMinimum,
@@ -55,6 +61,8 @@ const errorMessage = (error: unknown) =>
  */
 export function SessionPreparation({ sessionId }: { sessionId: string }) {
   const router = useRouter()
+  const cost = useSessionCostEstimate(sessionId)
+  const payments = useSessionPayments(sessionId)
   const dev = useAppSelector(selectDev)
   const session = useQueueSession(sessionId)
   const sessions = useQueueSessions()
@@ -167,7 +175,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
                 <Link href={`/sessions/${sessionId}/edit`}>Edit preparation</Link>
               </Button>
               <Button size="sm" asChild>
-                <Link href={`/s/${s.publicSlug}`}>Preview public page</Link>
+                <Link href={`/sessions/${sessionId}/public-page`}>Preview public page</Link>
               </Button>
               <Button size="sm" onClick={() => setPostOpen(true)}>
                 Copy Facebook post
@@ -196,6 +204,18 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
             badges: [{ text: `${rosterList.length}/${courts.length * (s?.playersPerCourt ?? 8)}` }],
           },
           { value: 'waitlist', label: 'Waitlist', badges: [{ text: String(waitlist.length) }] },
+          {
+            value: 'payments',
+            label: 'Payments',
+            badges: payments.data
+              ? [
+                  {
+                    text: `${payments.data.totals.paid}/${payments.data.totals.total}`,
+                    longText: ' paid',
+                  },
+                ]
+              : [],
+          },
         ]}
       >
         <TabsContent value="overview">
@@ -203,6 +223,25 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
             <div className="flex flex-col gap-4">
               <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,320px),1fr))] gap-4">
                 <SessionSetupCard
+                  extraRows={
+                    cost.data
+                      ? [
+                          {
+                            label: 'Costs',
+                            value: (
+                              <>
+                                {formatPeso(cost.data.estimate.total)} estimated ·{' '}
+                                {formatPeso(cost.data.estimate.breakEven)} a player to break even
+                                <br />
+                                Players pay {formatPeso(cost.data.estimate.perHead)} (
+                                {cost.data.estimate.isCustom ? 'custom amount' : 'break-even'}) ·{' '}
+                                <CostEstimateResult result={cost.data.estimate.result} />
+                              </>
+                            ),
+                          },
+                        ]
+                      : undefined
+                  }
                   courtLabels={courts.map((c) => c.label)}
                   formatsLabel={formats}
                   modeLabel={MODES[s.sessionMode].label}
@@ -227,10 +266,13 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
                   state={download.isPending ? 'downloading' : s.downloadState}
                   offline={dev.offline}
                   snapshotAge={
-                    download.isError && s.downloadState === 'ready'
-                      ? 'the copy from before this update'
+                    s.downloadError && s.downloadState === 'ready'
+                      ? s.downloadedAt
+                        ? `copy from ${new Date(s.downloadedAt).toLocaleString('en-PH', { timeZone: 'Asia/Manila', dateStyle: 'medium', timeStyle: 'short' })}`
+                        : 'the copy from before this update'
                       : undefined
                   }
+                  error={s.downloadError ?? download.error?.message}
                   onDownload={() =>
                     download.mutate(sessionId, {
                       onSuccess: (result) => toast(result.message),
@@ -245,7 +287,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
                 acceptJoinRequests={s.acceptJoinRequests}
                 onCopyLink={() => void copyLink()}
                 onOpenAsGuest={() => router.push(publicHref)}
-                onPreviewPublicPage={() => router.push(publicHref)}
+                onPreviewPublicPage={() => router.push(`/sessions/${sessionId}/public-page`)}
                 onAcceptJoinRequestsChange={(accept) =>
                   setAcceptJoinRequests.mutate(
                     { sessionId, accept },
@@ -268,6 +310,9 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
         </TabsContent>
         <TabsContent value="roster">
           <PreparationRoster sessionId={sessionId} tab="roster" />
+        </TabsContent>
+        <TabsContent value="payments">
+          <PaymentsPanel sessionId={sessionId} />
         </TabsContent>
         <TabsContent value="waitlist">
           <PreparationRoster sessionId={sessionId} tab="waitlist" />

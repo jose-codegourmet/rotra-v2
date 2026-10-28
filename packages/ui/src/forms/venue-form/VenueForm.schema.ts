@@ -1,4 +1,4 @@
-import { moneyField } from '@rotra/schema/money'
+import { optionalMoneyField } from '@rotra/schema/money'
 import { z } from 'zod'
 
 export const VENUE_NAME_MAX = 80
@@ -7,18 +7,7 @@ export const FEE_ERROR = 'Use 0 or more, or leave it empty.'
 export const DUPLICATE_NAME_ERROR = 'You already have a venue with this name.'
 
 /** Optional peso amount as typed: empty stays null (not 0); otherwise integer centavos. */
-const optionalFee = z
-  .string()
-  .trim()
-  .transform((value, ctx) => {
-    if (value === '') return null
-    const parsed = moneyField.safeParse(value)
-    if (!parsed.success) {
-      ctx.addIssue({ code: 'custom', message: FEE_ERROR })
-      return z.NEVER
-    }
-    return parsed.data
-  })
+const optionalFee = optionalMoneyField
 
 /**
  * Venue name, address and fees. Pass the club's other venue names to reject duplicates

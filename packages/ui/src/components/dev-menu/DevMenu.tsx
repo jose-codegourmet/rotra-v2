@@ -45,6 +45,14 @@ export type DevMenuProps = {
   /** The contact-change module supplies the active request and its Admin actions. */
   contactRequestSlot?: ReactNode
   actions?: { label: string; onClick: () => void; disabled?: boolean }[]
+  extraToggles?: {
+    key: string
+    label: string
+    description: string
+    checked: boolean
+    onChange: (value: boolean) => void
+  }[]
+  controlLabels?: Partial<Record<keyof DevMenuProps['toggles'], string>>
 }
 const CONTROLS = [
   ['offline', 'Simulate offline', "See how the app behaves when the venue's internet drops."],
@@ -68,6 +76,8 @@ export function DevMenu({
   playerAccount,
   playerLinkPreviews,
   contactRequestSlot,
+  extraToggles,
+  controlLabels,
 }: DevMenuProps) {
   const settingsId = useId()
   const [resetArmed, setResetArmed] = useState(false)
@@ -320,13 +330,26 @@ export function DevMenu({
             {CONTROLS.map(([key, label, description]) => (
               <div key={key} className="flex items-center justify-between gap-3">
                 <div className="min-w-0">
-                  <h3>{label}</h3>
+                  <h3>{controlLabels?.[key] ?? label}</h3>
                   <p className="text-sm text-fg2">{description}</p>
                 </div>
                 <Switch
                   checked={toggles[key]}
                   onChange={(value) => onToggle(key, value)}
-                  aria-label={label}
+                  aria-label={controlLabels?.[key] ?? label}
+                />
+              </div>
+            ))}
+            {extraToggles?.map((toggle) => (
+              <div key={toggle.key} className="flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <h3>{toggle.label}</h3>
+                  <p className="text-sm text-fg2">{toggle.description}</p>
+                </div>
+                <Switch
+                  aria-label={toggle.label}
+                  checked={toggle.checked}
+                  onChange={toggle.onChange}
                 />
               </div>
             ))}

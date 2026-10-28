@@ -1,3 +1,5 @@
+import { inventoryItems } from '@rotra/data/fixtures/inventory'
+import { estimateSessionCost } from '@rotra/data/session-cost/rules'
 import { clubs } from '@rotra/data/fixtures/clubs'
 import { queueSessionFixtures } from '@rotra/data/fixtures/queueSessions'
 import { venues } from '@rotra/data/fixtures/venues'
@@ -155,5 +157,33 @@ export const ReviewEdit: Story = {
   args: EditBudgetReduction.args,
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole('button', { name: /Step 3/ }))
+  },
+}
+
+export const FinancialsValidation: Story = {
+  args: {
+    initialPage: 2,
+    initialValues: {
+      ...withVenue,
+      courtFeePerCourtHour: '-1',
+      paymentMode: 'custom',
+      customFeePerHead: '',
+    },
+    financials: {
+      shuttleItems: inventoryItems.filter((i) => i.category === 'shuttlecocks'),
+      venueRates: [],
+      computeEstimate: estimateSessionCost,
+      onManageInventory: fn(),
+    },
+  },
+  play: async ({ canvasElement }) => {
+    canvasElement.querySelector('form')?.requestSubmit()
+  },
+}
+export const FinancialsOffline: Story = {
+  args: {
+    ...FinancialsValidation.args,
+    initialValues: { ...withVenue, courtFeePerCourtHour: '350' },
+    offline: true,
   },
 }

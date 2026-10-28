@@ -1,9 +1,12 @@
 'use client'
 
+import { useInventory } from '@rotra/data/inventory/useInventory'
 import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import { useClubVenues } from '@rotra/data/club-venue/useClubVenues'
 import { useClubAccess } from '@rotra/data/license/useClubAccess'
 import { useNowCard } from '@rotra/data/queue-session/useNowCard'
+import { useSyncStatus } from '@rotra/data/sync/useSyncStatus'
+import { SyncStatusDialog } from '../sync-status-dialog/SyncStatusDialog'
 import { useSyncState } from '@rotra/data/sync/useSyncState'
 import { AccessGate } from '@rotra/ui/access-gate'
 import { AppShell, useAppShell } from '@rotra/ui/app-shell'
@@ -24,7 +27,14 @@ import { selectNavCollapsed, setNavCollapsed } from '@/store/slices/uiSlice'
 import { OperatorShellContext, type OperatorShellContextValue } from './DockAction.context'
 
 /** Screens the license gate replaces while the license has ended (the console stays reachable). */
-const GATED_PREFIXES = ['/', '/saved-players', '/venues', '/club-settings', '/sessions/new']
+const GATED_PREFIXES = [
+  '/',
+  '/saved-players',
+  '/venues',
+  '/inventory',
+  '/club-settings',
+  '/sessions/new',
+]
 
 /** Past-session reports the license gate also replaces: no past reports while the license has ended. */
 const GATED_REPORT = /^\/sessions\/[^/]+\/(record|results)$/
@@ -59,9 +69,12 @@ export function OperatorShell({ children }: { children: ReactNode }) {
   const account = useAppSelector(selectAccount)
   const access = useClubAccess()
   const sync = useSyncState()
+  const status = useSyncStatus()
+  const [syncOpen, setSyncOpen] = useState(false)
   const nowCard = useNowCard()
   const players = useClubPlayers()
   const venues = useClubVenues()
+  const inventory = useInventory()
   const [dockOverride, setDockOverride] = useState<DockAction | null>(null)
   const [settingsMenuOpen, setSettingsMenuOpen] = useState(false)
 
@@ -95,13 +108,19 @@ export function OperatorShell({ children }: { children: ReactNode }) {
   }, [sync.data])
 
   const live = nowCard.data?.live
-  const syncState: SyncState = !sync.data
-    ? 'synced'
-    : !sync.data.online
-      ? 'offline'
-      : sync.data.syncing
-        ? 'syncing'
-        : 'synced'
+  const syncState: SyncState = !status.data
+    ? 'syncing'
+    : status.data.problem === 'not_saved'
+      ? 'failed'
+      : status.data.problem || status.data.incompleteRecords
+        ? 'needs-attention'
+        : status.data.connectivity === 'offline'
+          ? 'offline'
+          : status.data.syncing
+            ? 'syncing'
+            : status.data.pendingCount > 0
+              ? 'saved-waiting'
+              : 'synced'
 
   const current = (prefix: string) =>
     prefix === '/' ? pathname === '/' : pathname === prefix || pathname.startsWith(`${prefix}/`)
@@ -141,6 +160,14 @@ export function OperatorShell({ children }: { children: ReactNode }) {
           count: venues.data?.length,
           href: '/venues',
           current: current('/venues'),
+        },
+        {
+          id: 'inventory',
+          label: 'Inventory',
+          icon: 'nav-box',
+          count: inventory.data?.items.length,
+          href: '/inventory',
+          current: current('/inventory'),
         },
         {
           id: 'club',
@@ -226,6 +253,7 @@ export function OperatorShell({ children }: { children: ReactNode }) {
           <TopBar product="Queue">
             <SyncStatus
               state={syncState}
+              onOpen={() => setSyncOpen(true)}
               pending={sync.data?.pendingCount}
               lastSyncedAt={sync.data ? timeOf(sync.data.lastSyncedAt) : undefined}
             />
@@ -247,6 +275,7 @@ export function OperatorShell({ children }: { children: ReactNode }) {
         }
       >
         <DrawerCoordinator onNavOpen={closeSettings} />
+        <SyncStatusDialog open={syncOpen} onOpenChange={setSyncOpen} />
         {/* The gate renders before any gated page mounts its queries, so no list can flash first. */}
         {gate ?? (gated && access.isPending ? null : children)}
       </AppShell>

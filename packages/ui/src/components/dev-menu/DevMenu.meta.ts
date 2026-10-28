@@ -2,7 +2,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const devMenuMeta = {
   name: 'DevMenu',
   description:
-    'Prototype controls with a Player Information section layout, segmented rank/leaderboard states, account status and Admin settings.',
+    'Prototype controls with Queue sync, recovery, download and authorization scenarios, plus Player Information rank/leaderboard and account previews.',
   usage: [
     'Mount only in development or with the explicit developer-menu build flag.',
     'Player link previews stay disabled until their callbacks are supplied. Account/private flows are not implemented by this component.',

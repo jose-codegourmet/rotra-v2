@@ -1,3 +1,5 @@
+import { validateSessionCost } from '../session-cost/validation'
+import { normalizeSessionCost } from '../session-cost/sessionCost.rules'
 import { DEMO_CLUB_ID } from '../fixtures/clubs'
 import { checkMockSave, getMockDevState, requireOnline } from '../mock/bridge'
 import { MockError } from '../mock/errors'
@@ -8,6 +10,7 @@ import { queueMutation, sessionIn } from '../mock/transaction'
 import type { SessionWaitlistEntry } from '../session-roster/sessionRoster.types'
 import {
   estimateMinimum,
+  publicSlugFor,
   rebalanceSlots,
   sessionMinutes,
   sessionOccurrences,
@@ -49,6 +52,10 @@ export function promoteWaiter(state: MockState, entry: SessionWaitlistEntry, now
   state.waitlist = state.waitlist.filter((w) => w.id !== entry.id)
 }
 function validate(state: MockState, input: QueueSessionInput) {
+  validateSessionCost(
+    input.costEstimate,
+    state.inventory.filter((i) => i.clubId === DEMO_CLUB_ID),
+  )
   const venue = state.venues.find((v) => v.id === input.venueId && v.clubId === DEMO_CLUB_ID)
   if (
     !venue ||
@@ -117,10 +124,12 @@ export function createQueueSession(input: QueueSessionInput) {
         finalizedAt: null,
         playerRecordsUpdatedAt: null,
         seriesId,
-        publicSlug: id,
+        publicSlug: publicSlugFor(id),
         acceptJoinRequests: true,
       }
       state.sessions.push(s)
+      const cost = normalizeSessionCost(input.costEstimate)
+      if (cost) state.costEstimates[id] = { ...cost, sessionId: id, currency: 'PHP' }
       state.courts.push(
         ...input.courts.map((c) => ({
           id: crypto.randomUUID(),
@@ -162,6 +171,11 @@ export function updateQueueSession({
         )
       if (date.clash)
         throw new MockError('conflict', `${date.clash.text}. Pick another date or time.`)
+      if (values.costEstimate !== undefined) {
+        const cost = normalizeSessionCost(values.costEstimate)
+        if (cost) state.costEstimates[sessionId] = { ...cost, sessionId, currency: 'PHP' }
+        else delete state.costEstimates[sessionId]
+      }
       Object.assign(s, {
         title: values.title.trim(),
         notes: values.notes,
@@ -235,14 +249,26 @@ export async function downloadSession(sessionId: string) {
     if (generation !== mockStore.getGeneration())
       throw new MockError('conflict', 'Demo data was reset. Download again.')
     requireOnline()
+    if (getMockDevState().downloadFails)
+      throw new MockError(
+        'retryable',
+        previous === 'ready'
+          ? 'Download failed. Your previous copy is kept.'
+          : 'Download failed. Try again when connected.',
+      )
     mockStore.update((s) => {
       s.downloads[sessionId] = 'ready'
+      s.downloadInfo[sessionId] = { downloadedAt: Date.now() }
     })
     return { message: 'Ready on this device' }
   } catch (error) {
     if (generation === mockStore.getGeneration())
       mockStore.update((s) => {
         s.downloads[sessionId] = previous
+        s.downloadInfo[sessionId] = {
+          downloadedAt: s.downloadInfo[sessionId]?.downloadedAt ?? null,
+          error: error instanceof Error ? error.message : 'Download failed.',
+        }
       })
     throw error
   }

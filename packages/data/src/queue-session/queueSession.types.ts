@@ -57,6 +57,7 @@ export type QueueSessionInput = Pick<
   | 'minimumIsCalculated'
   | 'expectedPlayers'
 > & {
+  costEstimate?: import('../session-cost/sessionCost.types').SessionCostInput | null
   playersPerCourt?: number
   courts: { label: string; openUntil?: number | null }[]
   repeat?: 'none' | 'weekly' | 'biweekly' | 'monthly'
@@ -88,7 +89,12 @@ export type SessionFinalization = {
   stage: FinalizationStage
   failedStage?: FinalizationStage
 }
-export type SessionDoneBlocker = 'offline' | 'pending_changes' | 'games_in_play'
+export type SessionDoneBlocker =
+  | 'offline'
+  | 'pending_changes'
+  | 'games_in_play'
+  | 'incomplete_records'
+  | 'authorization'
 /** Q-HISTORY read model; an invalid session has no games, standings or counted players. */
 export type SessionRecordSummary = {
   sessionId: string

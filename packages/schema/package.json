@@ -9,7 +9,9 @@
     "./date": "./src/date.ts",
     "./money": "./src/money.ts",
     "./password": "./src/password.ts",
-    "./name": "./src/name.ts"
+    "./name": "./src/name.ts",
+    "./personal-details": "./src/personal-details.ts",
+    "./social-link": "./src/social-link.ts"
   },
   "scripts": {
     "lint": "biome check .",

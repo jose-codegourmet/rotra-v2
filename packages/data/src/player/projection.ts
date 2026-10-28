@@ -45,9 +45,17 @@ export function playerProjection() {
         }
     }
   }
+  // A saved profile edit renames the player everywhere their public name appears.
+  const names = new Map(
+    store.playerProfiles.map((p) => [p.playerId, { fullName: p.fullName, nickname: p.nickname }]),
+  )
+  for (const [id, rank] of Object.entries(store.playerRanks)) {
+    const name = names.get(id)
+    if (name) Object.assign(rank, name)
+  }
   const candidates = leaderboardEntries.flatMap((entry) => {
     const rank = store.playerRanks[entry.id]
-    return rank ? [{ ...entry, ...rank }] : []
+    return rank ? [{ ...entry, ...rank, ...names.get(entry.id) }] : []
   })
   const entries =
     getMockDevState().leaderboardScenario === 'empty'

@@ -31,3 +31,29 @@ export const playerProfiles: PlayerProfile[] = players.map((player) => {
     },
   }
 })
+
+const jomar = playerProfiles.find((profile) => profile.rtrId === 'RTR-PH-CEB-040226-0007')
+if (!jomar) throw new Error('Missing Jomar profile fixture.')
+/** Story-only variants of real fixtures, for wrapping and empty-detail states. */
+export const playerProfileScenarios = {
+  longNames: {
+    ...jomar,
+    fullName: 'Maria Consolacion Villanueva-Bautista',
+    nickname: 'The Unstoppable Shuttle Commander',
+  },
+} satisfies Record<string, PlayerProfile>
+
+/** Edit-profile input that breaks every personal rule, for form error stories. */
+export const profileEditScenarios = {
+  invalid: {
+    fullName: '',
+    nickname: 'The Unstoppable Shuttle Commander',
+    playingStyle: '',
+    experienceYears: '81',
+    experienceMonths: '12',
+    facebook: 'https://facebook.com.evil.example/x',
+    instagram: 'ftp://instagram.com/x',
+    youtube: 'youtube',
+    linkedin: 'https://example.com/in/x',
+  },
+}

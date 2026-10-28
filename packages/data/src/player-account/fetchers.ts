@@ -1,9 +1,29 @@
 import { emailField } from '@rotra/schema/email'
 import { passwordField } from '@rotra/schema/password'
+import { getSession } from '../auth/fetchers'
+import { playerRequest } from '../leaderboard/request'
 import { getMockDevState } from '../mock/bridge'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { mockStore, readMockState } from '../mock/store'
+import type { MyAccount } from './playerAccount.types'
+
+/** The signed-in player's own contacts; null when signed out. Never a public fetcher. */
+export async function getMyAccount(signal?: AbortSignal): Promise<MyAccount | null> {
+  await playerRequest(signal)
+  const session = await getSession('player')
+  const account = session
+    ? readMockState().playerAccounts.find((entry) => entry.playerId === session.account.id)
+    : undefined
+  return account
+    ? {
+        playerId: account.playerId,
+        phone: account.phone,
+        email: account.email,
+        phoneHidden: account.phoneHidden,
+      }
+    : null
+}
 
 /** Same acknowledgement for known and unknown emails. No email is delivered in the mock. */
 export async function requestPasswordReset(email: string) {

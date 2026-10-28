@@ -12,13 +12,15 @@ const { sessions, courts, roster } = createQueueFixtures()
 const session = sessions[0]
 if (!club || !session) throw new Error('Missing club or session fixtures.')
 
+const sessionCourts = courts.filter((c) => c.sessionId === session.id)
+const slotBudget = sessionCourts.length * session.playersPerCourt
 const input: PostInput = {
   club: { name: club.name, description: club.description, courtRules: club.courtRules },
   session,
-  courts: courts.filter((c) => c.sessionId === session.id),
+  courts: sessionCourts,
   roster: roster.map((r) => ({ name: r.nameSnapshot, nickname: r.nicknameSnapshot })),
   waitlist: [],
-  openSlots: 24 - roster.length,
+  openSlots: slotBudget - roster.length,
   mode: session.sessionMode,
   minimum: session.minimumGames,
 }
@@ -47,6 +49,6 @@ export const facebookPostFixtures = {
   /** Nobody on the roster yet */
   filledEmptyRoster: fillPostTemplate(
     DEFAULT_POST_TEMPLATE,
-    buildPostValues({ ...input, roster: [], openSlots: 24 }),
+    buildPostValues({ ...input, roster: [], openSlots: slotBudget }),
   ),
 }

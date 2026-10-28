@@ -36,7 +36,7 @@ export const JOSE_PLAYER_ID = '2c7f6a7b-eed9-5051-9426-6dbce5133fbc'
 /** Queue's four directory suggestions (not yet saved club players). */
 export const directoryPlayers = selectPlayers(seed.directoryPlayerIds)
 
-/** Queue's 20 saved players, all registered. */
+/** Queue's 23 saved players, all registered. Kenji, Kenjie and Atty Steph are appended last. */
 export const clubPlayers = [
   {
     id: 'c3e0d1c0-f087-5514-8c94-7ce61c54ed3f',
@@ -217,6 +217,33 @@ export const clubPlayers = [
     nickname: null,
     identity: 'registered',
     playingLevel: 'beginner_high',
+  },
+  {
+    id: '7c577815-7bfd-5391-9a3a-c85a7016f0ff',
+    clubId: '6cd364d4-0e3a-5c3d-9e75-2116cc845714',
+    playerId: 'dbd4fc5b-d702-5764-9900-7d76dac686ad',
+    fullName: 'Kenji',
+    nickname: null,
+    identity: 'registered',
+    playingLevel: 'advanced_mid',
+  },
+  {
+    id: '39ca913f-d4cd-540b-8e1e-a377ea21b1de',
+    clubId: '6cd364d4-0e3a-5c3d-9e75-2116cc845714',
+    playerId: '65e0ac29-6df4-5874-9c43-b27ccd89e73d',
+    fullName: 'Kenjie',
+    nickname: null,
+    identity: 'registered',
+    playingLevel: 'advanced_mid',
+  },
+  {
+    id: '9e27a818-8022-5655-a8d6-3d2bf362db34',
+    clubId: '6cd364d4-0e3a-5c3d-9e75-2116cc845714',
+    playerId: 'be7c6b86-6867-5c70-b067-54c97d70c598',
+    fullName: 'Maria Steph',
+    nickname: 'Atty Steph',
+    identity: 'registered',
+    playingLevel: 'intermediate_low',
   },
 ] satisfies ClubPlayer[]
 

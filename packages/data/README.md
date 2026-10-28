@@ -21,11 +21,11 @@ not a new source of domain rules. No contacts or credentials are included in the
 | --- | ---: | --- |
 | clubs | 8 | Admin `seedClubs`, including Tagbilaran's free tester pricing mode |
 | venues | 3 | Queue `seedVenues` |
-| clubPlayers | 20 | Queue `seedPlayers`; 16 linked profiles, 4 guests |
-| adminPlayers | 185 | Admin `seedPlayers`: 17 fixed + 168 generated |
-| leaderboardPlayers | 1,284 | Player `BASE`: 1,283 + Migs at #128 |
-| directoryPlayers | 4 | Queue `DIRECTORY` |
-| players | 1,462 | Union of shared global identities, without guests |
+| clubPlayers | 23 | Saved club roster, all registered. Kenji, Kenjie and Atty Steph (Maria Steph) are last |
+| adminPlayers | 53 | Every player in the seed |
+| leaderboardPlayers | 53 | Ordered by level. Jose is #39 |
+| directoryPlayers | 4 | Camill, Ley, Sam and Robert stay directory suggestions |
+| players | 53 | Seed identities, including Kenji and Kenjie |
 
 UUIDs are fixed fixture identifiers, separate from RTR IDs; they do not implement real ID allocation.
 The Player prototype's ten `FIXED` people reuse the Queue/Admin identity and RTR ID, as does Migs.

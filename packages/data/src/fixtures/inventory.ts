@@ -42,6 +42,14 @@ export const inventoryItems: InventoryItem[] = [
     stock: 3,
     unitCostMinor: 24000,
   },
+  {
+    id: 'inv3',
+    name: 'RSL Used',
+    category: 'shuttlecocks',
+    unit: 'tube',
+    stock: 1,
+    unitCostMinor: 0,
+  },
 ].map((item) => ({
   ...item,
   category: item.category as InventoryItem['category'],

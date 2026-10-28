@@ -5,7 +5,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import { WaitlistPanel, type WaitlistPanelEntry } from './WaitlistPanel'
 
-// The tonight fixture: 14 of 24 slots used (3 courts × 8 players), three saved players waiting.
+// The tonight fixture: 17 of 32 slots used (4 courts × 8 players), three saved players waiting.
 const tonight = queueSessionFixtures.sessions[0]
 if (!tonight) throw new Error('Session fixture missing')
 const COURTS = queueSessionFixtures.courts.filter((c) => c.sessionId === tonight.id).length

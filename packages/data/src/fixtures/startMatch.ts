@@ -102,7 +102,7 @@ export function createStartMatchFixtures(now = Date.now()) {
       teamB: [7, 8].map(pid),
     })
 
-  // 5v5 uses two courts as one match: Court 2 and Court 3 are both free.
+  // 5v5 uses two courts as one match: Court 2, Court 3 and Court 4 are free.
   const everyonePresent = roster.map((p) => ({ ...p, present: true }))
   const fiveVFive = start(
     {

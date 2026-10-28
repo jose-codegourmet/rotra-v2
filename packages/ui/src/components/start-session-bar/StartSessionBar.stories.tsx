@@ -17,7 +17,7 @@ const meta = {
       </div>
     ),
   ],
-  args: { blocker: null, rosterCount: 14, presentCount: 10, onStart: fn() },
+  args: { blocker: null, rosterCount: 17, presentCount: 13, onStart: fn() },
 } satisfies Meta<typeof StartSessionBar>
 
 export default meta

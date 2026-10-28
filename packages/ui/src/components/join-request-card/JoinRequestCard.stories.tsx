@@ -4,7 +4,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import { JoinRequestCard, type JoinRequestCardProps } from './JoinRequestCard'
 
-// Tonight's prepared session: 8 players per court × 3 courts, 14 on the roster.
+// Tonight's prepared session: 8 players per court × 4 courts, 17 on the roster.
 const tonight = queueSessionFixtures.sessions[0]
 if (!tonight) throw new Error('Session fixture missing')
 const capacity =

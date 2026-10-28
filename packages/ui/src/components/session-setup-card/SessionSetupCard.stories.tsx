@@ -12,21 +12,21 @@ const meta = {
     ),
   ],
   args: {
-    courtLabels: ['Court 1', 'Court 2', 'Court 3'],
+    courtLabels: ['Court 1', 'Court 2', 'Court 3', 'Court 4'],
     formatsLabel: 'Doubles',
     modeLabel: 'Fair',
     modeDescription: 'Mainly level-matched games, roughly 10% easy games.',
     minimumGames: 4,
     minimum: {
       kind: 'calculated',
-      players: 14,
-      usableCourts: 3,
+      players: 17,
+      usableCourts: 4,
       durationLabel: '3 h',
       low: 4,
       high: 6,
     },
-    rosterCount: 14,
-    presentCount: 10,
+    rosterCount: 17,
+    presentCount: 13,
   },
 } satisfies Meta<typeof SessionSetupCard>
 

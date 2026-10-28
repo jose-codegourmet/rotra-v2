@@ -7,10 +7,11 @@ import { useState } from 'react'
 import { fn } from 'storybook/test'
 import { RosterPanel, type RosterPanelPlayer, type RosterPanelProps } from './RosterPanel'
 
-// The tonight fixture: 14 players, Dexter missing a level, 10 present, 3 courts × 8 players.
+// The tonight fixture: 17 players, Dexter missing a level, 13 present, 4 courts × 8 players.
 const tonight = queueSessionFixtures.sessions[0]
 if (!tonight) throw new Error('Session fixture missing')
-const CAPACITY = 3 * tonight.playersPerCourt
+const courtCount = queueSessionFixtures.courts.filter((c) => c.sessionId === tonight.id).length
+const CAPACITY = courtCount * tonight.playersPerCourt
 
 const rosterPlayers: RosterPanelPlayer[] = queueSessionFixtures.roster.map((r) => {
   const p = clubPlayers.find((x) => x.id === r.clubPlayerId)
@@ -84,7 +85,7 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-/** 14 of 24 slots, Dexter needs a level, 10 present */
+/** 17 of 32 slots, Dexter needs a level, 13 present */
 export const Tonight: Story = {}
 export const Empty: Story = { args: { players: [] } }
 export const AllPresent: Story = {

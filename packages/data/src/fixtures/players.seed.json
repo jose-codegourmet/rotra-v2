@@ -305,6 +305,18 @@
       "fullName": "Nathan",
       "nickname": null,
       "rtrId": "RTR-PH-MNL-041926-0131"
+    },
+    {
+      "id": "dbd4fc5b-d702-5764-9900-7d76dac686ad",
+      "fullName": "Kenji",
+      "nickname": null,
+      "rtrId": "RTR-PH-CEB-102826-0132"
+    },
+    {
+      "id": "65e0ac29-6df4-5874-9c43-b27ccd89e73d",
+      "fullName": "Kenjie",
+      "nickname": null,
+      "rtrId": "RTR-PH-CEB-102826-0133"
     }
   ],
   "adminPlayerIds": [
@@ -358,7 +370,9 @@
     "8f054e7e-aefb-5d54-b5bb-b245f8673b3a",
     "66f774e9-3b82-5631-931c-9858ff8eb01f",
     "bdc00b5e-c882-52d6-ae19-260104a128ab",
-    "e8a7e34b-bd3d-5fc4-8331-a20031a545b9"
+    "e8a7e34b-bd3d-5fc4-8331-a20031a545b9",
+    "dbd4fc5b-d702-5764-9900-7d76dac686ad",
+    "65e0ac29-6df4-5874-9c43-b27ccd89e73d"
   ],
   "leaderboard": [
     {
@@ -435,6 +449,14 @@
     },
     {
       "playerId": "17029b99-e522-54a9-a90b-b514b49e0c4a",
+      "playingLevel": "advanced_mid"
+    },
+    {
+      "playerId": "dbd4fc5b-d702-5764-9900-7d76dac686ad",
+      "playingLevel": "advanced_mid"
+    },
+    {
+      "playerId": "65e0ac29-6df4-5874-9c43-b27ccd89e73d",
       "playingLevel": "advanced_mid"
     },
     {

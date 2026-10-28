@@ -120,7 +120,7 @@ export function createActiveMatchFixtures(now = Date.now()) {
       restMinutes: waitMinutes(p, list, session.startedAt, now),
     })),
   })
-  // The merged 5v5 uses ten players; with the remaining three not present, nobody is free.
+  // The merged 5v5 uses ten players; everyone from index 11 on is not present, so nobody is free.
   const sub = substitution(playing, matches),
     noReplacement = substitution(
       mergedMatch,

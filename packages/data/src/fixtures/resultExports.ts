@@ -12,7 +12,8 @@ export type ResultExportFrameFixture = {
 
 /**
  * Story-only data for the Download images sheet (Q-EXPORT) and Publish results (Q-PUBLISH): the
- * demo club, a 30-name standings list (the 20 saved club players plus ten other leaderboard players),
+ * demo club, a 30-name standings list (the first 20 saved club players plus ten other leaderboard
+ * players; Kenji, Kenjie and Atty Steph stay off this sample so the 14/14/2 frame split holds),
  * the awards lines and three Off Day names. Frames are paginated by the Q08 session-result rule
  * (14 rows per Story image, 10 per Feed).
  */
@@ -24,7 +25,7 @@ if (!thursday) throw new Error('Missing session history fixture.')
 
 const clubPlayerIds = new Set(clubPlayers.map((p) => p.playerId))
 const standingsNames30: string[] = [
-  ...clubPlayers.map((p) => p.fullName),
+  ...clubPlayers.slice(0, 20).map((p) => p.fullName),
   ...leaderboardPlayers
     .filter((p) => !clubPlayerIds.has(p.id))
     .slice(0, 10)

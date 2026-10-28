@@ -63,6 +63,7 @@ export const financialEstimateVariants = {
 export const shuttlePlanItems = [
   { id: 'inv1', name: 'XP2', unit: 'tube', unitCostMinor: 98000, stock: 12 },
   { id: 'inv2', name: 'XP2 Used', unit: 'tube', unitCostMinor: 0, stock: 2 },
+  { id: 'inv3', name: 'RSL Used', unit: 'tube', unitCostMinor: 0, stock: 1 },
 ]
 export const longShuttlePlanItems = [
   { ...shuttlePlanItems[0]!, name: 'XP2 Tournament Feather Shuttlecocks, Tube of 12' },
@@ -119,7 +120,18 @@ export function createFinancialFixtures(roster: SessionPlayer[], now = Date.now(
     currency: 'PHP' as const,
   }
   const costEstimates: Record<string, SessionCostEstimate> = {
-    's-tonight': { ...base, sessionId: 's-tonight', customFeePerHead: 90000 },
+    's-tonight': {
+      ...base,
+      sessionId: 's-tonight',
+      customFeePerHead: 90000,
+      courtFeePerCourtHour: 45000,
+      entranceFeePerHead: 5000,
+      shuttles: [
+        { inventoryItemId: 'inv1', tubes: 2 },
+        { inventoryItemId: 'inv2', tubes: 2 },
+        { inventoryItemId: 'inv3', tubes: 0 },
+      ],
+    },
     h1: { ...base, sessionId: 'h1', courtFeePerCourtHour: 45000, entranceFeePerHead: 5000 },
     h2: {
       ...base,

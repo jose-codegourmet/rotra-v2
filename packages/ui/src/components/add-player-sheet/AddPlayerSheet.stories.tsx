@@ -77,7 +77,7 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-/** Saved players tab with 14 of the 20 saved players already in the session. */
+/** Saved players tab with 17 of the 23 saved players already in the session. */
 export const SavedPlayers: Story = {}
 
 export const AllInSession: Story = {

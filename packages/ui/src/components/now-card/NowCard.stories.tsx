@@ -7,7 +7,7 @@ const tonight = queueSessionFixtures.sessions[0]
 if (!tonight) throw new Error('Session fixture missing')
 const MINUTE = 60_000
 const HOUR = 60 * MINUTE
-// The fixtures are seeded at 6 PM today; a fixed "now" keeps each countdown form on screen.
+// The fixtures are seeded at 7:30 PM today; a fixed "now" keeps each countdown form on screen.
 const start = tonight.scheduledStartAt
 
 const live: NowCardLive & { now: number } = {
@@ -17,10 +17,10 @@ const live: NowCardLive & { now: number } = {
   startsAt: tonight.scheduledStartAt,
   endsAt: tonight.scheduledEndAt,
   courtsInUse: 1,
-  courts: 3,
+  courts: 4,
   gamesPlayed: 6,
-  presentCount: 14,
-  rosterCount: 14,
+  presentCount: 17,
+  rosterCount: 17,
   queuedCount: 3,
   now: start + HOUR,
   onContinue: fn(),
@@ -32,10 +32,10 @@ const upcoming: NowCardUpcoming & { now: number } = {
   venueName: tonight.venueName,
   startsAt: start,
   endsAt: tonight.scheduledEndAt,
-  rosterCount: 14,
-  capacity: 24,
+  rosterCount: 17,
+  capacity: 32,
   waitlistCount: 2,
-  courts: 3,
+  courts: 4,
   downloadedHere: false,
   now: start - 45 * MINUTE,
   onOpenPreparation: fn(),

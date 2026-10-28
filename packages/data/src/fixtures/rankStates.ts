@@ -3,9 +3,9 @@ export const joseRankStates = {
   onLeaderboard: {
     level: 4,
     levelLabel: 'Intermediate Low',
-    position: 30,
+    position: 39,
     status: 'On the leaderboard',
-    sentence: '30 of 38 players on the overall ROTRA leaderboard.',
+    sentence: '39 of 53 players on the overall ROTRA leaderboard.',
   },
   belowThreshold: {
     level: 4,

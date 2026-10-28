@@ -219,7 +219,14 @@
     "./player/useUpdateMyProfile": "./src/player/useUpdateMyProfile.ts",
     "./player-account/types": "./src/player-account/playerAccount.types.ts",
     "./player-account/useMyAccount": "./src/player-account/useMyAccount.ts",
-    "./fixtures/admin-accounts": "./src/fixtures/adminAccounts.ts"
+    "./fixtures/admin-accounts": "./src/fixtures/adminAccounts.ts",
+    "./admin-account": "./src/admin-account/fetchers.ts",
+    "./admin-account/types": "./src/admin-account/adminAccount.types.ts",
+    "./admin-account/cookie": "./src/admin-account/cookie.ts",
+    "./admin-account/query-keys": "./src/admin-account/queryKeys.ts",
+    "./admin-account/use-admin-session": "./src/admin-account/useAdminSession.ts",
+    "./admin-account/use-sign-in-admin": "./src/admin-account/useSignInAdmin.ts",
+    "./admin-account/use-sign-out-admin": "./src/admin-account/useSignOutAdmin.ts"
   },
   "scripts": {
     "lint": "biome check .",

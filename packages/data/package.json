@@ -202,7 +202,12 @@
     "./session-payment/useTogglePaid": "./src/session-payment/useTogglePaid.ts",
     "./session-payment/useMarkAllPaid": "./src/session-payment/useMarkAllPaid.ts",
     "./session-cost/rules": "./src/session-cost/sessionCost.rules.ts",
-    "./fixtures/sync-recovery": "./src/fixtures/syncRecovery.ts"
+    "./fixtures/sync-recovery": "./src/fixtures/syncRecovery.ts",
+    "./sync/useSyncStatus": "./src/sync/useSyncStatus.ts",
+    "./sync/useSyncLog": "./src/sync/useSyncLog.ts",
+    "./sync/useRetrySync": "./src/sync/useRetrySync.ts",
+    "./sync/useSessionIntegrity": "./src/sync/useSessionIntegrity.ts",
+    "./sync/useAnswerInterruption": "./src/sync/useAnswerInterruption.ts"
   },
   "scripts": {
     "lint": "biome check .",

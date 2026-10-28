@@ -39,7 +39,7 @@ import type {
   SessionPlayer,
   SessionWaitlistEntry,
 } from '../session-roster/sessionRoster.types'
-import type { SaveOutcome, SyncState } from '../sync/sync.types'
+import type { SaveOutcome, SyncState, SessionIntegrity } from '../sync/sync.types'
 export type MockState = {
   inventory: InventoryItem[]
   costEstimates: Record<string, SessionCostEstimate>
@@ -62,6 +62,7 @@ export type MockState = {
   licensePayments: ClubLicenseTerm[]
   downloads: Record<string, DownloadState>
   sync: SyncState
+  sessionIntegrity: Record<string, SessionIntegrity>
   matches: Match[]
   matchSequences: Record<string, number>
   finalizations: Record<string, SessionFinalization>
@@ -121,6 +122,7 @@ function seedState(): MockState {
     joinRequests: [],
     licensePayments,
     downloads: {},
+    sessionIntegrity: {},
     matches: history.matches,
     matchSequences: history.matchSequences,
     finalizations: history.finalizations,

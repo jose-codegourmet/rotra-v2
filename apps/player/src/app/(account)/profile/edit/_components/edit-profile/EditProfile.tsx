@@ -22,6 +22,7 @@ import {
   selectPendingLeave,
   setUnsavedDraft,
 } from '@/store/slices/uiSlice'
+import { useContactChangeSheet } from '../../../_components/contact-change-sheet/useContactChangeSheet'
 
 const SAVE_FAILED = "Couldn't save your profile. Your edits are still here. Try again."
 const SAVE_OFFLINE =
@@ -35,6 +36,8 @@ export function EditProfile() {
   const profile = usePlayerProfile(playerId)
   const myAccount = useMyAccount(account ? playerId : null)
   const update = useUpdateMyProfile()
+  // Opens over the edit page, so the profile draft stays.
+  const contactChange = useContactChangeSheet(account ? playerId : null)
   const router = useRouter()
   const dispatch = useAppDispatch()
   const pendingLeave = useAppSelector(selectPendingLeave)
@@ -151,7 +154,7 @@ export function EditProfile() {
         serverError={serverError}
         onDirtyChange={onDirtyChange}
         onCancel={() => leave(profilePath)}
-        onRequestContactChange={() => leave('/profile/privacy-and-contact')}
+        onRequestContactChange={contactChange.openSheet}
         onOpenPhonePrivacy={() => leave('/profile/privacy-and-contact')}
         onSubmit={(values) => {
           setServerError(undefined)
@@ -184,6 +187,7 @@ export function EditProfile() {
         destructive
         onConfirm={discard}
       />
+      {contactChange.sheet}
     </main>
   )
 }

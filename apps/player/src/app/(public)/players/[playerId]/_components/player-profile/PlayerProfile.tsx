@@ -1,5 +1,7 @@
 'use client'
 import { useSignOut } from '@rotra/data/auth/use-sign-out'
+import { OPEN_CONTACT_CHANGE_STATUSES } from '@rotra/data/contact-change-request/types'
+import { useMyContactChangeRequest } from '@rotra/data/contact-change-request/useMyContactChangeRequest'
 import { PLAYER_FIXTURE_NOW } from '@rotra/data/fixtures/player-games'
 import { useLeaderboard } from '@rotra/data/leaderboard/useLeaderboard'
 import { rankDisplayStatus } from '@rotra/data/player/rules'
@@ -11,6 +13,7 @@ import { useMyAccount } from '@rotra/data/player-account/useMyAccount'
 import { useRankingSettings } from '@rotra/data/ranking-settings'
 import { AccountPanel } from '@rotra/ui/account-panel'
 import { Button } from '@rotra/ui/button'
+import { ContactRequestStatus } from '@rotra/ui/contact-request-status'
 import { EligibilityCard } from '@rotra/ui/eligibility-card'
 import { ErrorState } from '@rotra/ui/error-state'
 import { Notice } from '@rotra/ui/notice'
@@ -22,6 +25,7 @@ import { RecentGamesCard } from '@rotra/ui/recent-games-card'
 import { SharedRankCard } from '@rotra/ui/shared-rank-card'
 import { toast } from '@rotra/ui/toaster'
 import { useRouter } from 'next/navigation'
+import { copyPlayerId } from '@/app/_components/copy-player-id/copyPlayerId'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { selectAccount, setAccount } from '@/store/slices/authSlice'
 import { selectDev } from '@/store/slices/devSlice'
@@ -49,6 +53,7 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
   const isOwn = account?.id === playerId
   // Ownership is checked first: a visitor's page never requests private contacts.
   const myAccount = useMyAccount(isOwn ? playerId : null),
+    contactRequest = useMyContactChangeRequest(isOwn ? playerId : null),
     signOut = useSignOut('player')
   const player = profile.data,
     current = rank.data
@@ -124,22 +129,6 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
         ? `${isOwn ? 'You meet' : 'Meets'} the requirement of ${requirement} completed singles or doubles matches in the last three months. Falling below it removes the leaderboard position, though the rank stays visible.`
         : `${remaining} more standard ${remaining === 1 ? 'match' : 'matches'} in the next few weeks would put ${subject} on the leaderboard. Older matches drop out of the count as they pass three months.`
   const idElementId = `profile-rtr-${playerId}`
-  const copyId = async () => {
-    try {
-      await navigator.clipboard.writeText(player.rtrId)
-      toast('Player ID copied')
-    } catch {
-      const element = document.getElementById(idElementId)
-      if (element) {
-        const range = document.createRange()
-        range.selectNodeContents(element)
-        const selection = window.getSelection()
-        selection?.removeAllRanges()
-        selection?.addRange(range)
-        toast('ID selected. Copy it from your device menu.')
-      }
-    }
-  }
   const leaveSignedOut = () =>
     signOut.mutate(undefined, {
       onSuccess: () => {
@@ -158,7 +147,7 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
             profile={player}
             isOwn={isOwn}
             idElementId={idElementId}
-            onCopyId={() => void copyId()}
+            onCopyId={() => void copyPlayerId(player.rtrId, idElementId)}
             onEdit={() => router.push('/profile/edit')}
             onOpenPlayerId={() => router.push('/profile/player-id')}
           />
@@ -167,6 +156,12 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
               phone={myAccount.data.phone}
               email={myAccount.data.email}
               phoneHidden={myAccount.data.phoneHidden}
+              requestSlot={
+                contactRequest.data &&
+                OPEN_CONTACT_CHANGE_STATUSES.includes(contactRequest.data.status) ? (
+                  <ContactRequestStatus request={contactRequest.data} variant="compact" />
+                ) : null
+              }
               onOpenPrivacy={() => router.push('/profile/privacy-and-contact')}
               onSignOut={leaveSignedOut}
             />

@@ -11,6 +11,8 @@ export type SwitchProps = {
   name?: string
   ref?: Ref<HTMLButtonElement>
   disabled?: boolean
+  /** Set while a change is saving */
+  'aria-busy'?: boolean
   /** Required: switches sit beside text, so the name must say what it turns on ("Present") */
   'aria-label': string
   id?: string

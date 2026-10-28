@@ -233,7 +233,15 @@
     "./player-account/useClaimLink": "./src/player-account/useClaimLink.ts",
     "./player-account/useCompleteClaim": "./src/player-account/useCompleteClaim.ts",
     "./player-account/useCheckClaimStatus": "./src/player-account/useCheckClaimStatus.ts",
-    "./player-account/query-keys": "./src/player-account/queryKeys.ts"
+    "./player-account/query-keys": "./src/player-account/queryKeys.ts",
+    "./contact-change-request/types": "./src/contact-change-request/contactChangeRequest.types.ts",
+    "./contact-change-request/query-keys": "./src/contact-change-request/queryKeys.ts",
+    "./contact-change-request/fetchers": "./src/contact-change-request/fetchers.ts",
+    "./contact-change-request/useMyContactChangeRequest": "./src/contact-change-request/useMyContactChangeRequest.ts",
+    "./contact-change-request/useSubmitContactChangeRequest": "./src/contact-change-request/useSubmitContactChangeRequest.ts",
+    "./contact-change-request/useAdvanceContactChangeRequest": "./src/contact-change-request/useAdvanceContactChangeRequest.ts",
+    "./fixtures/contact-change-requests": "./src/fixtures/contactChangeRequests.ts",
+    "./player-account/useSetPhonePrivacy": "./src/player-account/useSetPhonePrivacy.ts"
   },
   "scripts": {
     "lint": "biome check .",

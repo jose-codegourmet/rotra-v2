@@ -7,7 +7,7 @@ export const editProfileMeta = {
     'Signed-out visitors never reach it: proxy.ts sends /profile/* to sign-in with returnTo.',
     "Success toasts 'Profile saved' and returns to the profile; a failed or offline save keeps every typed value.",
     'D-DISCARD opens for Cancel, the back button, the top bar and browser Back, only when something changed.',
-    'Request a phone or email change and Phone privacy go to /profile/privacy-and-contact until P04.6.',
+    'Request a phone or email change opens the P-CONTACT-REQUEST sheet over the form (the draft stays); Phone privacy goes to /profile/privacy-and-contact.',
   ],
   prototype: {
     file: 'docs/frames/player-app/rotra-player.html',

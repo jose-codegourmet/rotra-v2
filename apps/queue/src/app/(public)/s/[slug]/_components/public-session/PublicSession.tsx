@@ -1,8 +1,10 @@
 'use client'
 
+import { MockError } from '@rotra/data/mock/errors'
 import type { MyJoinRequest, PublicSessionPage } from '@rotra/data/public-session/types'
 import { useMyJoinRequest } from '@rotra/data/public-session/useMyJoinRequest'
 import { usePublicSession } from '@rotra/data/public-session/usePublicSession'
+import { EmptyState } from '@rotra/ui/empty-state'
 import { JoinRequestCard, type JoinRequestCardProps } from '@rotra/ui/join-request-card'
 import { PublicParticipants } from '@rotra/ui/public-participants'
 import {
@@ -11,9 +13,13 @@ import {
 } from '@rotra/ui/public-results-section'
 import { PublicSessionDetails } from '@rotra/ui/public-session-details'
 import { PublicSessionHero } from '@rotra/ui/public-session-hero'
+import { Skeleton } from '@rotra/ui/skeleton'
 import { Tabs, TabsContent } from '@rotra/ui/tabs'
 import { useState } from 'react'
+import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import { JoinRequestSheet } from '@/app/(public)/s/[slug]/_components/join-request-sheet/JoinRequestSheet'
+import { useAppSelector } from '@/store/hooks'
+import { selectDev } from '@/store/slices/devSlice'
 
 export type PublicSessionProps = {
   slug: string
@@ -55,6 +61,7 @@ function joinCardProps(
   page: PublicSessionPage,
   mine: MyJoinRequest | null | undefined,
   onRequestToJoin: () => void,
+  offline: boolean,
 ): JoinRequestCardProps | null {
   if (page.status !== 'prepared' && page.status !== 'active') return null
   if (mine) {
@@ -66,8 +73,14 @@ function joinCardProps(
   }
   if (!page.acceptJoinRequests) return { variant: 'off' }
   return page.openSlots > 0
-    ? { variant: 'open', openSlots: page.openSlots, capacity: page.slotBudget, onRequestToJoin }
-    : { variant: 'full', onRequestToJoin }
+    ? {
+        variant: 'open',
+        openSlots: page.openSlots,
+        capacity: page.slotBudget,
+        onRequestToJoin,
+        disabled: offline,
+      }
+    : { variant: 'full', onRequestToJoin, disabled: offline }
 }
 
 /** The published slides as slide props; Off Day only when the publication included it. */
@@ -100,16 +113,50 @@ function publishedSlides(page: PublicSessionPage): PublicResultsSectionPublished
  * completed sessions only, the Results section with the published slides. No operator controls.
  */
 export function PublicSession({ slug, viewer }: PublicSessionProps) {
+  const dev = useAppSelector(selectDev)
   const page = usePublicSession(slug, { visitor: viewer === 'visitor' })
   const mine = useMyJoinRequest(slug)
   const [tab, setTab] = useState('details')
   const [joinOpen, setJoinOpen] = useState(false)
 
   const p = page.data
-  if (!p) return null
+  // A cached copy keeps showing when a refetch fails (an offline visitor); without one, explain.
+  if (!p && page.isError) {
+    const notFound = page.error instanceof MockError && page.error.kind === 'permission'
+    return (
+      <main className="mx-auto flex max-w-[760px] flex-col gap-5 px-[max(16px,env(safe-area-inset-left,0px))] pt-5 pb-[120px]">
+        {notFound ? (
+          <EmptyState title="This session page isn't available." />
+        ) : (
+          <QueryError query={page} title="Couldn't load this session page." />
+        )}
+      </main>
+    )
+  }
+  if (!p)
+    return (
+      <main
+        aria-busy
+        aria-label="Loading the session page"
+        className="mx-auto flex max-w-[760px] flex-col gap-5 px-[max(16px,env(safe-area-inset-left,0px))] pt-5 pb-[120px]"
+      >
+        <div className="flex flex-col gap-2.5">
+          <Skeleton className="w-48" />
+          <Skeleton className="h-8 w-64" />
+          <div className="flex items-center gap-3">
+            <Skeleton className="size-10 rounded-full" />
+            <Skeleton className="w-32" />
+          </div>
+        </div>
+        <Skeleton className="h-24 rounded-lg" />
+        <Skeleton className="h-10 w-64" />
+        <Skeleton className="h-64 rounded-lg" />
+      </main>
+    )
 
   const mode = MODES[p.mode]
-  const card = joinCardProps(p, mine.data, () => setJoinOpen(true))
+  // Sending a request needs internet; the guest's own connection is the DevMenu toggle here.
+  const card = joinCardProps(p, mine.data, () => setJoinOpen(true), dev.offline)
   const participants = p.participants.map((x, i) => ({
     id: String(i),
     name: x.name,

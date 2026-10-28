@@ -25,11 +25,15 @@ export type JoinRequestCardProps = CommonProps &
         openSlots: number
         capacity: number
         onRequestToJoin: () => void
+        /** Sending needs internet: an offline visitor sees the card with Request to join disabled */
+        disabled?: boolean
       }
     | {
         /** Every slot is taken: confirmed guests join the waitlist; Request to join stays */
         variant: 'full'
         onRequestToJoin: () => void
+        /** Sending needs internet: an offline visitor sees the card with Request to join disabled */
+        disabled?: boolean
       }
     | {
         /** The club turned Accept join requests off: contact the Queue Master instead */
@@ -128,7 +132,12 @@ export function JoinRequestCard(props: JoinRequestCardProps) {
                 {slots} Send a quick request and the Queue Master confirms it.
               </p>
             </div>
-            <Button variant="primary" onClick={props.onRequestToJoin} className="max-sm:w-full">
+            <Button
+              variant="primary"
+              onClick={props.onRequestToJoin}
+              disabled={props.disabled}
+              className="max-sm:w-full"
+            >
               Request to join
             </Button>
           </div>

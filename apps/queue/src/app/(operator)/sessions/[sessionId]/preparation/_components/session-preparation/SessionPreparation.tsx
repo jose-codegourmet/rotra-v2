@@ -6,6 +6,7 @@ import {
   sessionMinutes,
   startBlocker,
 } from '@rotra/data/queue-session/queueSession.rules'
+import { useDeleteSession } from '@rotra/data/queue-session/useDeleteSession'
 import { useDownloadSession } from '@rotra/data/queue-session/useDownloadSession'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useQueueSessions } from '@rotra/data/queue-session/useQueueSessions'
@@ -18,6 +19,7 @@ import { formatPeso } from '@rotra/schema/money'
 import { Breadcrumb } from '@rotra/ui/breadcrumb'
 import { Button } from '@rotra/ui/button'
 import { CostEstimateResult } from '@rotra/ui/cost-estimate-summary'
+import { DeleteSessionSheet } from '@rotra/ui/delete-session-sheet'
 import { DeviceDownloadCard } from '@rotra/ui/device-download-card'
 import { formatMinutes } from '@rotra/ui/forms/session-setup-form/helpers'
 import { PageHeader } from '@rotra/ui/page-header'
@@ -68,16 +70,25 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
   const roster = useSessionRoster(sessionId)
   const download = useDownloadSession()
   const start = useStartSession()
+  const remove = useDeleteSession()
   const setAcceptJoinRequests = useSetAcceptJoinRequests()
   const [tab, setTab] = useState('overview')
   const [startOpen, setStartOpen] = useState(false)
   const [postOpen, setPostOpen] = useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false)
   // The public link is origin + /s/<publicSlug>; the origin is only known in the browser.
   const [origin, setOrigin] = useState('')
   useEffect(() => setOrigin(window.location.origin), [])
 
   const s = session.data
-  if (session.isError && session.error instanceof MockError && session.error.kind === 'permission')
+  // Once deleted, the session query fails while we leave for Home; that is not a 404.
+  const deleted = remove.isSuccess
+  if (
+    !deleted &&
+    session.isError &&
+    session.error instanceof MockError &&
+    session.error.kind === 'permission'
+  )
     notFound()
   // A started session has no preparation: go to the console (or the record once it is done).
   const redirectTo = s && s.state !== 'prepared' ? sessionHref(s) : null
@@ -135,6 +146,14 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
       },
     })
 
+  const confirmDelete = () =>
+    remove.mutate(sessionId, {
+      onSuccess: (result) => {
+        toast(result.message)
+        router.replace('/')
+      },
+    })
+
   const publicHref = s ? `/s/${s.publicSlug}` : '/'
   const sessionLink = `${origin}${publicHref}`
   const pendingRequests = (roster.data?.joinRequests ?? []).filter(
@@ -149,6 +168,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
     toast('Session link copied')
   }
 
+  if (deleted) return null
   if (session.isError)
     return (
       <main className="mx-auto max-w-[1240px] px-4 pt-5">
@@ -178,6 +198,14 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
               </Button>
               <Button size="sm" onClick={() => setPostOpen(true)}>
                 Copy Facebook post
+              </Button>
+              <Button
+                size="sm"
+                variant="danger"
+                disabled={!roster.data}
+                onClick={() => setDeleteOpen(true)}
+              >
+                Delete session
               </Button>
             </>
           }
@@ -349,6 +377,29 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
           isPending={start.isPending}
           error={start.error ? errorMessage(start.error) : undefined}
           onConfirm={confirmStart}
+        />
+      ) : null}
+      {s ? (
+        <DeleteSessionSheet
+          open={deleteOpen}
+          onOpenChange={(open) => {
+            if (!open) remove.reset()
+            setDeleteOpen(open)
+          }}
+          title={s.title}
+          whenLabel={`${date(s.scheduledStartAt)} · ${time(s.scheduledStartAt)}–${time(s.scheduledEndAt)}`}
+          venueName={s.venueName}
+          confirmedCount={rosterList.length}
+          waitlistCount={waitlist.length}
+          pendingRequestCount={pendingRequests}
+          offline={dev.offline}
+          isPending={remove.isPending}
+          error={remove.error ? errorMessage(remove.error) : undefined}
+          onConfirm={confirmDelete}
+          onOpenRoster={() => {
+            setDeleteOpen(false)
+            setTab('roster')
+          }}
         />
       ) : null}
       <FacebookPost sessionId={sessionId} open={postOpen} onOpenChange={setPostOpen} />

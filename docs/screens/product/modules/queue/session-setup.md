@@ -75,7 +75,7 @@ New-session defaults: tomorrow, 19:00–22:00, Court 1 and Court 2, Doubles on, 
 
 ## Q-PREPARE — Session preparation overview
 
-Header: “Preparation”, title, date · time · venue. Actions: **Edit preparation**, **Preview public page**, **Copy Facebook post**.
+Header: “Preparation”, title, date · time · venue. Actions: **Edit preparation**, **Preview public page**, **Copy Facebook post**, **Delete session** (danger style; always opens [D-DELETE-SESSION](../../dialogs.md#d-delete-session--delete-session); on success it goes Home with the toast “Session deleted · <title>”).
 
 **Copy Facebook post** (also on the live console) opens a dialog with the club's post template filled in for this session (players numbered, courts and shuttle tubes listed, where/when, court rules) in a read-only text box, **Copy post** (“Facebook post copied”, or the text is selected if the browser blocks copying) and **Edit template** (Club settings). ROTRA never posts to Facebook itself; the operator pastes the text. The waitlist key lists waitlisted players in order, or “None yet. N slots left.”
 

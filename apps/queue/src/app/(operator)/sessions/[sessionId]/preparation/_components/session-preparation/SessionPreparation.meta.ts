@@ -3,7 +3,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const sessionPreparationMeta = {
   name: 'SessionPreparation',
   description:
-    "Q-PREPARE container: PageHeader with Edit preparation / Preview public page / Copy Facebook post, the JoinRequests card above the tabs while requests wait, the Overview tab (SessionSetupCard from estimateMinimum, DeviceDownloadCard on useDownloadSession, SessionLinkCard on useSetAcceptJoinRequests), StartSessionBar from startBlocker, StartSessionSheet on useStartSession, and the dock's Start session pill through useDockAction.",
+    "Q-PREPARE container: PageHeader with Edit preparation / Preview public page / Copy Facebook post / Delete session (DeleteSessionSheet on useDeleteSession), the JoinRequests card above the tabs while requests wait, the Overview tab (SessionSetupCard from estimateMinimum, DeviceDownloadCard on useDownloadSession, SessionLinkCard on useSetAcceptJoinRequests), StartSessionBar from startBlocker, StartSessionSheet on useStartSession, and the dock's Start session pill through useDockAction.",
   usage: [
     'Rendered by /sessions/[sessionId]/preparation; active sessions go to the console, finished ones to the record, unknown ids to notFound().',
     'The Roster and levels (chip N/capacity) and Waitlist (chip N) tabs render PreparationRoster; the start bar and dock pill follow the roster query, so a level set there clears the blocker live. Payments arrives with Queue › Financials.',
@@ -22,5 +22,6 @@ export const sessionPreparationMeta = {
     'StartSessionBar',
     'StartSessionSheet',
     'FacebookPost',
+    'DeleteSessionSheet',
   ],
 } satisfies ComponentMeta

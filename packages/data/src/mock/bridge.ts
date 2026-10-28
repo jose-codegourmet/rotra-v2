@@ -45,7 +45,9 @@ const listeners = new Set<() => void>()
 const saveFailureListeners = new Set<() => void>()
 export function subscribeMockSaveFailure(listener: () => void) {
   saveFailureListeners.add(listener)
-  return () => { saveFailureListeners.delete(listener) }
+  return () => {
+    saveFailureListeners.delete(listener)
+  }
 }
 
 /** App-owned Redux supplies the adapter; the data package never imports an app. */

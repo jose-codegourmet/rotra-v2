@@ -5,6 +5,7 @@ export const sessionSetupMeta = {
   description:
     'Q-SETUP container for /sessions/new and /sessions/[sessionId]/edit: SessionSetupForm with the occurrence and estimate rules from @rotra/data, ChooseDateSheet, VenuePickerSheet + VenueForm (useSaveClubVenue), SessionPeekSheet for clashes, and useCreateQueueSession / useUpdateQueueSession.',
   usage: [
+    'Financial fields use current inventory prices and venue rates; the inventory round trip preserves draft values and the wizard page in sessionStorage.',
     'Create pre-fills ?date=YYYY-MM-DD and ?venueId=; edit opens only prepared sessions (others redirect to their screen).',
     "Success goes to the preparation page with the mutation's toast; failures toast and keep every value; a clash conflict shows as the form's server error.",
   ],

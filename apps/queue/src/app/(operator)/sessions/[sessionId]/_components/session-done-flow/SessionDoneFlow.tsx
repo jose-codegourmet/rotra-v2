@@ -43,7 +43,8 @@ export function SessionDoneFlow({ sessionId, open, onOpenChange }: SessionDoneFl
   const review = useSessionDoneReview(sessionId, { enabled: open })
   const sync = useSyncState()
   const syncStatus = useSyncStatus()
-  const integrity = useSessionIntegrity(sessionId), answer = useAnswerInterruption()
+  const integrity = useSessionIntegrity(sessionId),
+    answer = useAnswerInterruption()
   const [interruptionOpen, setInterruptionOpen] = useState(false)
   const [invalidOpen, setInvalidOpen] = useState(false)
   const finalize = useFinalizeSession()
@@ -74,9 +75,14 @@ export function SessionDoneFlow({ sessionId, open, onOpenChange }: SessionDoneFl
     }
     setStep('confirm')
   }
-  const showInterruption = interruptionOpen || open && step === 'confirm' && !!integrity.data && integrity.data.state !== 'complete'
+  const showInterruption =
+    interruptionOpen ||
+    (open && step === 'confirm' && !!integrity.data && integrity.data.state !== 'complete')
   const onConfirm = () => {
-    if (!integrity.data || integrity.data.state !== 'complete') { continueToConfirm(); return }
+    if (!integrity.data || integrity.data.state !== 'complete') {
+      continueToConfirm()
+      return
+    }
     if (finalize.isPending) return
     const id = commandId.current ?? crypto.randomUUID()
     commandId.current = id
@@ -95,31 +101,58 @@ export function SessionDoneFlow({ sessionId, open, onOpenChange }: SessionDoneFl
 
   return (
     <>
-    <SessionDoneSheet
-      open={open && !showInterruption && !invalidOpen}
-      onOpenChange={onOpenChange}
-      step={step}
-      sessionTitle={s.title}
-      timeRange={`${formatTime(s.scheduledStartAt)}–${formatTime(s.scheduledEndAt)}`}
-      gamesRecorded={r.gamesRecorded}
-      participants={r.participants}
-      pendingChanges={r.pendingChanges}
-      recordsIncomplete={!!integrity.data && integrity.data.state !== 'complete'}
-      activeGames={r.activeGames.map((g) => ({ courtLabels: g.courtLabels.join(' + ') }))}
-      unplayedWaiting={r.unplayedWaiting}
-      belowMinimum={r.belowMinimum}
-      minimum={r.minimum}
-      online={online}
-      authorizationBlocked={syncStatus.data?.canFinishAndSync === false}
-      isPending={finalize.isPending}
-      onBackToSession={() => onOpenChange(false)}
-      onContinue={() => r.belowMinimum.length > 0 ? setStep('minimum') : continueToConfirm()}
-      onContinueToFinish={continueToConfirm}
-      onBack={() => setStep('review')}
-      onConfirm={onConfirm}
-    />
-    <InterruptionCheckSheet open={open && showInterruption && !invalidOpen} onOpenChange={(next) => { if (!next) onOpenChange(false) }} missingSummary={integrity.data?.missingSummary ?? []} isPending={answer.isPending} error={answer.error?.message} onBack={() => onOpenChange(false)} onNo={() => setInvalidOpen(true)} onYes={() => answer.mutate({ sessionId, answer: 'yes' }, { onSuccess: () => { onOpenChange(false); router.push(`/sessions/${sessionId}/recovery`) }, onError: (error) => toast.error(error.message) })} />
-    <InvalidSessionDialog sessionId={sessionId} open={open && invalidOpen} reason="Session records are inconsistent and the session was not interrupted." onBack={() => setInvalidOpen(false)} />
+      <SessionDoneSheet
+        open={open && !showInterruption && !invalidOpen}
+        onOpenChange={onOpenChange}
+        step={step}
+        sessionTitle={s.title}
+        timeRange={`${formatTime(s.scheduledStartAt)}–${formatTime(s.scheduledEndAt)}`}
+        gamesRecorded={r.gamesRecorded}
+        participants={r.participants}
+        pendingChanges={r.pendingChanges}
+        recordsIncomplete={!!integrity.data && integrity.data.state !== 'complete'}
+        activeGames={r.activeGames.map((g) => ({ courtLabels: g.courtLabels.join(' + ') }))}
+        unplayedWaiting={r.unplayedWaiting}
+        belowMinimum={r.belowMinimum}
+        minimum={r.minimum}
+        online={online}
+        authorizationBlocked={syncStatus.data?.canFinishAndSync === false}
+        isPending={finalize.isPending}
+        onBackToSession={() => onOpenChange(false)}
+        onContinue={() => (r.belowMinimum.length > 0 ? setStep('minimum') : continueToConfirm())}
+        onContinueToFinish={continueToConfirm}
+        onBack={() => setStep('review')}
+        onConfirm={onConfirm}
+      />
+      <InterruptionCheckSheet
+        open={open && showInterruption && !invalidOpen}
+        onOpenChange={(next) => {
+          if (!next) onOpenChange(false)
+        }}
+        missingSummary={integrity.data?.missingSummary ?? []}
+        isPending={answer.isPending}
+        error={answer.error?.message}
+        onBack={() => onOpenChange(false)}
+        onNo={() => setInvalidOpen(true)}
+        onYes={() =>
+          answer.mutate(
+            { sessionId, answer: 'yes' },
+            {
+              onSuccess: () => {
+                onOpenChange(false)
+                router.push(`/sessions/${sessionId}/recovery`)
+              },
+              onError: (error) => toast.error(error.message),
+            },
+          )
+        }
+      />
+      <InvalidSessionDialog
+        sessionId={sessionId}
+        open={open && invalidOpen}
+        reason="Session records are inconsistent and the session was not interrupted."
+        onBack={() => setInvalidOpen(false)}
+      />
     </>
   )
 }

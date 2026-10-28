@@ -1,5 +1,8 @@
 import { dateField, timeField } from '@rotra/schema/date'
-import { sessionFinancialsSchema, CUSTOM_FEE_ERROR } from '@rotra/ui/forms/session-financials-fields/schema'
+import {
+  sessionFinancialsSchema,
+  CUSTOM_FEE_ERROR,
+} from '@rotra/ui/forms/session-financials-fields/schema'
 import { z } from 'zod'
 
 export const SESSION_TITLE_ERROR = 'Give the session a title.'
@@ -86,5 +89,12 @@ export const PAGE_FIELDS: (keyof SessionSetupInput)[][] = [
     'minimumGames',
     'expectedPlayers',
   ],
-  ['courtFeePerCourtHour', 'entranceFeePerHead', 'shuttles', 'paymentMode', 'customFeePerHead', 'notes'],
+  [
+    'courtFeePerCourtHour',
+    'entranceFeePerHead',
+    'shuttles',
+    'paymentMode',
+    'customFeePerHead',
+    'notes',
+  ],
 ]

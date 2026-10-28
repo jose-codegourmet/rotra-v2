@@ -26,15 +26,18 @@ export const moneyField = z.union([
 ])
 
 /** Optional peso text → integer centavos or null; shared by venue and financial forms. */
-export const optionalMoneyField = z.string().trim().transform((value, ctx) => {
-  if (value === '') return null
-  const parsed = moneyField.safeParse(value)
-  if (!parsed.success) {
-    ctx.addIssue({ code: 'custom', message: 'Use 0 or more, or leave it empty.' })
-    return z.NEVER
-  }
-  return parsed.data
-})
+export const optionalMoneyField = z
+  .string()
+  .trim()
+  .transform((value, ctx) => {
+    if (value === '') return null
+    const parsed = moneyField.safeParse(value)
+    if (!parsed.success) {
+      ctx.addIssue({ code: 'custom', message: 'Use 0 or more, or leave it empty.' })
+      return z.NEVER
+    }
+    return parsed.data
+  })
 
 /**
  * Integer centavos → peso text the way the prototypes show money: thousands commas, no decimals for

@@ -204,7 +204,18 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
             badges: [{ text: `${rosterList.length}/${courts.length * (s?.playersPerCourt ?? 8)}` }],
           },
           { value: 'waitlist', label: 'Waitlist', badges: [{ text: String(waitlist.length) }] },
-          { value: 'payments', label: 'Payments', badges: payments.data ? [{ text: `${payments.data.totals.paid}/${payments.data.totals.total}`, longText: ' paid' }] : [] },
+          {
+            value: 'payments',
+            label: 'Payments',
+            badges: payments.data
+              ? [
+                  {
+                    text: `${payments.data.totals.paid}/${payments.data.totals.total}`,
+                    longText: ' paid',
+                  },
+                ]
+              : [],
+          },
         ]}
       >
         <TabsContent value="overview">
@@ -212,7 +223,25 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
             <div className="flex flex-col gap-4">
               <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,320px),1fr))] gap-4">
                 <SessionSetupCard
-                  extraRows={cost.data ? [{ label: 'Costs', value: <>{formatPeso(cost.data.estimate.total)} estimated · {formatPeso(cost.data.estimate.breakEven)} a player to break even<br />Players pay {formatPeso(cost.data.estimate.perHead)} ({cost.data.estimate.isCustom ? 'custom amount' : 'break-even'}) · <CostEstimateResult result={cost.data.estimate.result} /></> }] : undefined}
+                  extraRows={
+                    cost.data
+                      ? [
+                          {
+                            label: 'Costs',
+                            value: (
+                              <>
+                                {formatPeso(cost.data.estimate.total)} estimated ·{' '}
+                                {formatPeso(cost.data.estimate.breakEven)} a player to break even
+                                <br />
+                                Players pay {formatPeso(cost.data.estimate.perHead)} (
+                                {cost.data.estimate.isCustom ? 'custom amount' : 'break-even'}) ·{' '}
+                                <CostEstimateResult result={cost.data.estimate.result} />
+                              </>
+                            ),
+                          },
+                        ]
+                      : undefined
+                  }
                   courtLabels={courts.map((c) => c.label)}
                   formatsLabel={formats}
                   modeLabel={MODES[s.sessionMode].label}
@@ -238,7 +267,9 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
                   offline={dev.offline}
                   snapshotAge={
                     s.downloadError && s.downloadState === 'ready'
-                      ? s.downloadedAt ? `copy from ${new Date(s.downloadedAt).toLocaleString('en-PH', { timeZone: 'Asia/Manila', dateStyle: 'medium', timeStyle: 'short' })}` : 'the copy from before this update'
+                      ? s.downloadedAt
+                        ? `copy from ${new Date(s.downloadedAt).toLocaleString('en-PH', { timeZone: 'Asia/Manila', dateStyle: 'medium', timeStyle: 'short' })}`
+                        : 'the copy from before this update'
                       : undefined
                   }
                   error={s.downloadError ?? download.error?.message}
@@ -280,7 +311,9 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
         <TabsContent value="roster">
           <PreparationRoster sessionId={sessionId} tab="roster" />
         </TabsContent>
-        <TabsContent value="payments"><PaymentsPanel sessionId={sessionId} /></TabsContent>
+        <TabsContent value="payments">
+          <PaymentsPanel sessionId={sessionId} />
+        </TabsContent>
         <TabsContent value="waitlist">
           <PreparationRoster sessionId={sessionId} tab="waitlist" />
         </TabsContent>

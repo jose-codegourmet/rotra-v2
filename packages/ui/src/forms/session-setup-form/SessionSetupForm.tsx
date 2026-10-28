@@ -2,7 +2,10 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { formatPeso } from '@rotra/schema/money'
-import { SessionFinancialsFields, type SessionFinancialsFieldsProps } from '@rotra/ui/forms/session-financials-fields'
+import {
+  SessionFinancialsFields,
+  type SessionFinancialsFieldsProps,
+} from '@rotra/ui/forms/session-financials-fields'
 import { sessionFinancialsSchema } from '@rotra/ui/forms/session-financials-fields/schema'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
@@ -64,7 +67,10 @@ export type SessionSetupFormProps = {
   /** Adds a Costs row to the review (Queue › Financials) */
   costsReviewLine?: string
   initialPage?: number
-  financials?: Omit<SessionFinancialsFieldsProps, 'courts' | 'durationMinutes' | 'players' | 'venueRate'> & { venueRates: ({ id: string } & NonNullable<SessionFinancialsFieldsProps['venueRate']>)[] }
+  financials?: Omit<
+    SessionFinancialsFieldsProps,
+    'courts' | 'durationMinutes' | 'players' | 'venueRate'
+  > & { venueRates: ({ id: string } & NonNullable<SessionFinancialsFieldsProps['venueRate']>)[] }
   ref?: Ref<SessionSetupFormHandle>
 }
 
@@ -117,20 +123,43 @@ export function SessionSetupForm({
     setVenue: (venue) => {
       form.setValue('venue', venue, { shouldDirty: true, shouldValidate: true })
       const rate = financials?.venueRates.find((v) => v.id === venue.venueId)
-      form.setValue('courtFeePerCourtHour', rate?.courtFee == null ? '' : String(rate.courtFee / 100), { shouldDirty: true })
+      form.setValue(
+        'courtFeePerCourtHour',
+        rate?.courtFee == null ? '' : String(rate.courtFee / 100),
+        { shouldDirty: true },
+      )
       const entrance = rate?.entranceFee ?? financials?.clubDefaultEntranceFee
-      form.setValue('entranceFeePerHead', entrance == null ? '' : String(entrance / 100), { shouldDirty: true })
+      form.setValue('entranceFeePerHead', entrance == null ? '' : String(entrance / 100), {
+        shouldDirty: true,
+      })
     },
     getValues: () => form.getValues(),
     getPage: () => page,
   }))
 
   const values = form.watch()
-  const financialPlayers = Math.max(1, editContext?.rosterCount || Number(values.expectedPlayers) || 1)
+  const financialPlayers = Math.max(
+    1,
+    editContext?.rosterCount || Number(values.expectedPlayers) || 1,
+  )
   const financeParsed = sessionFinancialsSchema.safeParse(values)
-  const hasCosts = values.courtFeePerCourtHour !== '' || values.entranceFeePerHead !== '' || values.paymentMode === 'custom' || values.shuttles.some((line) => line.inventoryItemId && Number(line.tubes) > 0)
-  const financeEstimate = financials && hasCosts && financeParsed.success ? financials.computeEstimate(financeParsed.data, { courts: values.courtLabels.length, durationMinutes: durationMinutes(values), players: financialPlayers, inventory: financials.shuttleItems }) : null
-  const costsLine = financeEstimate ? `${formatPeso(financeEstimate.total)} total · players pay ${formatPeso(financeEstimate.perHead)} (${financeEstimate.isCustom ? 'custom' : 'break-even'}) · ${financeEstimate.result.kind === 'profit' || financeEstimate.result.kind === 'loss' ? `${formatPeso(financeEstimate.result.amount)} ${financeEstimate.result.kind}` : financeEstimate.result.kind === 'no_costs' ? 'No costs entered' : `Breaks even${financeEstimate.result.amount ? ` · ${formatPeso(financeEstimate.result.amount)} extra from rounding up` : ''}`}` : costsReviewLine
+  const hasCosts =
+    values.courtFeePerCourtHour !== '' ||
+    values.entranceFeePerHead !== '' ||
+    values.paymentMode === 'custom' ||
+    values.shuttles.some((line) => line.inventoryItemId && Number(line.tubes) > 0)
+  const financeEstimate =
+    financials && hasCosts && financeParsed.success
+      ? financials.computeEstimate(financeParsed.data, {
+          courts: values.courtLabels.length,
+          durationMinutes: durationMinutes(values),
+          players: financialPlayers,
+          inventory: financials.shuttleItems,
+        })
+      : null
+  const costsLine = financeEstimate
+    ? `${formatPeso(financeEstimate.total)} total · players pay ${formatPeso(financeEstimate.perHead)} (${financeEstimate.isCustom ? 'custom' : 'break-even'}) · ${financeEstimate.result.kind === 'profit' || financeEstimate.result.kind === 'loss' ? `${formatPeso(financeEstimate.result.amount)} ${financeEstimate.result.kind}` : financeEstimate.result.kind === 'no_costs' ? 'No costs entered' : `Breaks even${financeEstimate.result.amount ? ` · ${formatPeso(financeEstimate.result.amount)} extra from rounding up` : ''}`}`
+    : costsReviewLine
   const occurrences = getOccurrences(values)
   const repeating = mode === 'create' && values.repeat !== 'none'
   const clashBlocks = repeating ? occurrences.every((o) => o.clash) : Boolean(occurrences[0]?.clash)
@@ -219,7 +248,19 @@ export function SessionSetupForm({
       computeEstimate={computeEstimate}
       rosterCount={editContext?.rosterCount}
     />,
-    financials ? <SessionFinancialsFields key="financials" {...financials} disabled={isPending} courts={values.courtLabels.length} durationMinutes={durationMinutes(values)} players={financialPlayers} venueRate={financials.venueRates.find((v) => v.id === values.venue.venueId)} /> : financialsSection ?? null,
+    financials ? (
+      <SessionFinancialsFields
+        key="financials"
+        {...financials}
+        disabled={isPending}
+        courts={values.courtLabels.length}
+        durationMinutes={durationMinutes(values)}
+        players={financialPlayers}
+        venueRate={financials.venueRates.find((v) => v.id === values.venue.venueId)}
+      />
+    ) : (
+      (financialsSection ?? null)
+    ),
     <SetupNotesReviewSection
       key="review"
       mode={mode}

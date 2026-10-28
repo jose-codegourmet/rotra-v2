@@ -27,15 +27,54 @@ export function DevTools() {
     <DevMenu
       controlLabels={{ nextSaveConflict: 'Sync conflict' }}
       extraToggles={[
-        ['downloadFails', 'Download fails', 'A failed update keeps the previous ready copy and its age.'],
-        ['authorizationExpired', 'Authorization expired', 'Shows the bounded access notice without deleting local records.'],
-        ['activeFinishAllowed', 'Active session can finish and sync', 'Mock authorization scenario only; no real authorization policy is implemented.'],
-        ['syncFails', 'Sync fails (retryable)', 'Keeps local changes waiting until sync can retry.'],
-        ['recordsMissing', 'Records missing from another device', 'Session done requires original-device recovery.'],
-        ['originalDeviceLost', 'Original device lost', 'Shows the unrecoverable path without reconstructing scores.'],
-        ['originalDeviceReconnects', 'Original device reconnects', 'Original records arrive; conflicts remain a decision gate.'],
-        ['secondDevice', 'Continue as a second device', 'Recording continues while original records are missing.'],
-      ].map(([key, label, description]) => ({ key: key!, label: label!, description: description!, checked: !!toggles[key as keyof typeof toggles], onChange: (value: boolean) => dispatch(setDevToggle({ key: key as keyof typeof toggles, value })) }))}
+        [
+          'downloadFails',
+          'Download fails',
+          'A failed update keeps the previous ready copy and its age.',
+        ],
+        [
+          'authorizationExpired',
+          'Authorization expired',
+          'Shows the bounded access notice without deleting local records.',
+        ],
+        [
+          'activeFinishAllowed',
+          'Active session can finish and sync',
+          'Mock authorization scenario only; no real authorization policy is implemented.',
+        ],
+        [
+          'syncFails',
+          'Sync fails (retryable)',
+          'Keeps local changes waiting until sync can retry.',
+        ],
+        [
+          'recordsMissing',
+          'Records missing from another device',
+          'Session done requires original-device recovery.',
+        ],
+        [
+          'originalDeviceLost',
+          'Original device lost',
+          'Shows the unrecoverable path without reconstructing scores.',
+        ],
+        [
+          'originalDeviceReconnects',
+          'Original device reconnects',
+          'Original records arrive; conflicts remain a decision gate.',
+        ],
+        [
+          'secondDevice',
+          'Continue as a second device',
+          'Recording continues while original records are missing.',
+        ],
+      ].map(([key, label, description]) => ({
+        key: key!,
+        label: label!,
+        description: description!,
+        checked: !!toggles[key as keyof typeof toggles],
+        onChange: (value: boolean) =>
+          dispatch(setDevToggle({ key: key as keyof typeof toggles, value })),
+      }))}
       actions={[
         { label: 'Approve name change', onClick: () => approveName.mutate(undefined) },
         {

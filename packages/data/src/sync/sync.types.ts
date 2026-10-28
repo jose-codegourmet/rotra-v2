@@ -29,13 +29,29 @@ export type SyncConflict = {
   versions: {
     deviceLabel: string
     order: number
-    teamA: { id: string; name: string; shortName: string; level: import('../player/player.types').PlayingLevel | null }[]
-    teamB: { id: string; name: string; shortName: string; level: import('../player/player.types').PlayingLevel | null }[]
+    teamA: {
+      id: string
+      name: string
+      shortName: string
+      level: import('../player/player.types').PlayingLevel | null
+    }[]
+    teamB: {
+      id: string
+      name: string
+      shortName: string
+      level: import('../player/player.types').PlayingLevel | null
+    }[]
     winner?: 'A' | 'B'
     score?: { teamA: number; teamB: number }
   }[]
 }
-export type SyncChange = { id: string; at: number; text: string; area: SyncArea; syncedAt: number | null }
+export type SyncChange = {
+  id: string
+  at: number
+  text: string
+  area: SyncArea
+  syncedAt: number | null
+}
 export type SyncStatus = {
   connectivity: 'online' | 'offline'
   syncing: boolean

@@ -27,7 +27,14 @@ import { selectNavCollapsed, setNavCollapsed } from '@/store/slices/uiSlice'
 import { OperatorShellContext, type OperatorShellContextValue } from './DockAction.context'
 
 /** Screens the license gate replaces while the license has ended (the console stays reachable). */
-const GATED_PREFIXES = ['/', '/saved-players', '/venues', '/inventory', '/club-settings', '/sessions/new']
+const GATED_PREFIXES = [
+  '/',
+  '/saved-players',
+  '/venues',
+  '/inventory',
+  '/club-settings',
+  '/sessions/new',
+]
 
 /** Screens rendered without the top bar, left nav and dock: the finishing route (the prototype's hasShell). */
 const BARE_ROUTE = /^\/sessions\/[^/]+\/finishing$/
@@ -98,12 +105,19 @@ export function OperatorShell({ children }: { children: ReactNode }) {
   }, [sync.data])
 
   const live = nowCard.data?.live
-  const syncState: SyncState = !status.data ? 'syncing'
-    : status.data.problem === 'not_saved' ? 'failed'
-    : status.data.problem || status.data.incompleteRecords ? 'needs-attention'
-    : status.data.connectivity === 'offline' ? 'offline'
-    : status.data.syncing ? 'syncing'
-    : status.data.pendingCount > 0 ? 'saved-waiting' : 'synced'
+  const syncState: SyncState = !status.data
+    ? 'syncing'
+    : status.data.problem === 'not_saved'
+      ? 'failed'
+      : status.data.problem || status.data.incompleteRecords
+        ? 'needs-attention'
+        : status.data.connectivity === 'offline'
+          ? 'offline'
+          : status.data.syncing
+            ? 'syncing'
+            : status.data.pendingCount > 0
+              ? 'saved-waiting'
+              : 'synced'
 
   const current = (prefix: string) =>
     prefix === '/' ? pathname === '/' : pathname === prefix || pathname.startsWith(`${prefix}/`)

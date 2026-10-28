@@ -51,7 +51,10 @@ export function promoteWaiter(state: MockState, entry: SessionWaitlistEntry, now
   state.waitlist = state.waitlist.filter((w) => w.id !== entry.id)
 }
 function validate(state: MockState, input: QueueSessionInput) {
-  validateSessionCost(input.costEstimate, state.inventory.filter((i) => i.clubId === DEMO_CLUB_ID))
+  validateSessionCost(
+    input.costEstimate,
+    state.inventory.filter((i) => i.clubId === DEMO_CLUB_ID),
+  )
   const venue = state.venues.find((v) => v.id === input.venueId && v.clubId === DEMO_CLUB_ID)
   if (
     !venue ||
@@ -246,7 +249,12 @@ export async function downloadSession(sessionId: string) {
       throw new MockError('conflict', 'Demo data was reset. Download again.')
     requireOnline()
     if (getMockDevState().downloadFails)
-      throw new MockError('retryable', previous === 'ready' ? 'Download failed. Your previous copy is kept.' : 'Download failed. Try again when connected.')
+      throw new MockError(
+        'retryable',
+        previous === 'ready'
+          ? 'Download failed. Your previous copy is kept.'
+          : 'Download failed. Try again when connected.',
+      )
     mockStore.update((s) => {
       s.downloads[sessionId] = 'ready'
       s.downloadInfo[sessionId] = { downloadedAt: Date.now() }
@@ -256,7 +264,10 @@ export async function downloadSession(sessionId: string) {
     if (generation === mockStore.getGeneration())
       mockStore.update((s) => {
         s.downloads[sessionId] = previous
-        s.downloadInfo[sessionId] = { downloadedAt: s.downloadInfo[sessionId]?.downloadedAt ?? null, error: error instanceof Error ? error.message : 'Download failed.' }
+        s.downloadInfo[sessionId] = {
+          downloadedAt: s.downloadInfo[sessionId]?.downloadedAt ?? null,
+          error: error instanceof Error ? error.message : 'Download failed.',
+        }
       })
     throw error
   }

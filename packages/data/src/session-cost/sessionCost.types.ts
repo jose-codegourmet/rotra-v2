@@ -9,9 +9,22 @@ export type SessionCostInput = {
   customFeePerHead: number | null
 }
 export type SessionCostEstimate = SessionCostInput & { sessionId: string; currency: 'PHP' }
-export type SessionCostContext = { courts: number; durationMinutes: number; players: number; inventory: Pick<InventoryItem, 'id' | 'name' | 'unit' | 'unitCostMinor' | 'stock'>[] }
+export type SessionCostContext = {
+  courts: number
+  durationMinutes: number
+  players: number
+  inventory: Pick<InventoryItem, 'id' | 'name' | 'unit' | 'unitCostMinor' | 'stock'>[]
+}
 export type SessionCostResult = {
-  players: number; court: number; shuttle: number; entrance: number; entranceFeePerHead: number
-  total: number; breakEven: number; perHead: number; isCustom: boolean; collect: number
+  players: number
+  court: number
+  shuttle: number
+  entrance: number
+  entranceFeePerHead: number
+  total: number
+  breakEven: number
+  perHead: number
+  isCustom: boolean
+  collect: number
   result: { kind: 'profit' | 'loss' | 'breaks_even' | 'no_costs'; amount: number }
 }

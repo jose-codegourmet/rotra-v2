@@ -45,7 +45,13 @@ export type DevMenuProps = {
   /** The contact-change module supplies the active request and its Admin actions. */
   contactRequestSlot?: ReactNode
   actions?: { label: string; onClick: () => void; disabled?: boolean }[]
-  extraToggles?: { key: string; label: string; description: string; checked: boolean; onChange: (value: boolean) => void }[]
+  extraToggles?: {
+    key: string
+    label: string
+    description: string
+    checked: boolean
+    onChange: (value: boolean) => void
+  }[]
   controlLabels?: Partial<Record<keyof DevMenuProps['toggles'], string>>
 }
 const CONTROLS = [
@@ -334,7 +340,19 @@ export function DevMenu({
                 />
               </div>
             ))}
-            {extraToggles?.map((toggle) => <div key={toggle.key} className="flex items-center justify-between gap-3"><div className="min-w-0"><h3>{toggle.label}</h3><p className="text-sm text-fg2">{toggle.description}</p></div><Switch aria-label={toggle.label} checked={toggle.checked} onChange={toggle.onChange} /></div>)}
+            {extraToggles?.map((toggle) => (
+              <div key={toggle.key} className="flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <h3>{toggle.label}</h3>
+                  <p className="text-sm text-fg2">{toggle.description}</p>
+                </div>
+                <Switch
+                  aria-label={toggle.label}
+                  checked={toggle.checked}
+                  onChange={toggle.onChange}
+                />
+              </div>
+            ))}
             {rankingSettings ? (
               <section className={SECTION}>
                 <h3>Admin settings</h3>

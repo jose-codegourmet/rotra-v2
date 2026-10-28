@@ -57,7 +57,14 @@ import { selectDev } from '@/store/slices/devSlice'
 export type SessionConsoleProps = { sessionId: string; resumeSessionDone?: boolean }
 
 export type ConsoleView = 'session' | 'queue' | 'players' | 'leaderboard'
-export type ConsoleSheet = 'join-requests' | 'post' | 'adjust' | 'add-court' | 'session-done' | 'payments' | null
+export type ConsoleSheet =
+  | 'join-requests'
+  | 'post'
+  | 'adjust'
+  | 'add-court'
+  | 'session-done'
+  | 'payments'
+  | null
 /** The Queue › Match editing and generation sheets: Add match / Edit lineup, Suggested match, Auto queue, Regenerate */
 export type MatchSheet =
   | MatchLineupRequest
@@ -271,7 +278,9 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
               <Button size="sm" onClick={() => setSheet('post')}>
                 Copy Facebook post
               </Button>
-              <Button size="sm" onClick={() => setSheet('payments')}>Payments</Button>
+              <Button size="sm" onClick={() => setSheet('payments')}>
+                Payments
+              </Button>
               <Button size="sm" onClick={() => setSheet('adjust')}>
                 Extend time
               </Button>
@@ -344,7 +353,16 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
       >
         <JoinRequests sessionId={sessionId} variant="sheet" />
       </Sheet>
-      <Sheet open={sheet === 'payments'} onOpenChange={(open) => setSheet(open ? 'payments' : null)} title="Payments" footer={<Button variant="primary" onClick={() => setSheet(null)}>Done</Button>}>
+      <Sheet
+        open={sheet === 'payments'}
+        onOpenChange={(open) => setSheet(open ? 'payments' : null)}
+        title="Payments"
+        footer={
+          <Button variant="primary" onClick={() => setSheet(null)}>
+            Done
+          </Button>
+        }
+      >
         {sheet === 'payments' ? <PaymentsPanel sessionId={sessionId} asSheet /> : null}
       </Sheet>
       <FacebookPost

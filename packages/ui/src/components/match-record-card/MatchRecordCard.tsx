@@ -97,9 +97,11 @@ export function MatchRecordCard({
     >
       <div className="flex items-center gap-2">
         <span className="font-mono text-[13px]">#{number}</span>
-        {startedAt !== undefined && endedAt !== undefined ? <span className="text-[13px] text-fg2">
-          {formatTime(startedAt)}–{formatTime(endedAt)}
-        </span> : null}
+        {startedAt !== undefined && endedAt !== undefined ? (
+          <span className="text-[13px] text-fg2">
+            {formatTime(startedAt)}–{formatTime(endedAt)}
+          </span>
+        ) : null}
         {fun ? <Chip>Fun</Chip> : null}
       </div>
       {team(teamA, !invalid && winningTeam === 'A')}

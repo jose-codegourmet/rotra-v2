@@ -148,10 +148,15 @@ export async function listAdminClubs(
   }
 }
 
-export async function getAdminClub(id: string, signal?: AbortSignal): Promise<AdminClubDetail> {
+/** null when no club has this id (the detail shows Club not found, not an access denial). */
+export async function getAdminClub(
+  id: string,
+  signal?: AbortSignal,
+): Promise<AdminClubDetail | null> {
   await delay(400, signal)
   const state = readMockState()
-  const club = adminClubIn(state, id)
+  const club = state.clubs.find((entry) => entry.id === id)
+  if (!club) return null
   const item = listItemOf(state, club)
   const record = state.adminClubRecords.find((entry) => entry.clubId === id)
   const account = state.clubAccounts.find((entry) => entry.clubId === id)

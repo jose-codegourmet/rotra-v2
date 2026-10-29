@@ -8,7 +8,7 @@ export const clubNameRequestsMeta = {
     'Rendered by /requests/club-names (Admin nav › Requests › Club names). It has no A- screen ID: it is the prototype\'s placeholder placement ("The Club names list sits beside Contact changes under Requests", docs/frames/admin-app/README.md).',
     'Pending requests are newest first. Review opens /clubs/{id}?tab=overview#name-request, where NameChangeRequestCard and ClubNameSheets (D-CLUB-NAME) decide it.',
     'Recently decided shows the last six name-change audit events, and only when there are any.',
-    'The empty ("No name changes waiting."), loading and error states (A02.14) are not wired yet.',
+    'Loading shows skeleton rows in the card; no requests → EmptyState "No name changes waiting." / "Requests from clubs show up here."; a failed load shows ErrorState with Retry; a permission error replaces the workspace with the access denial.',
   ],
   prototype: {
     file: 'docs/frames/admin-app/rotra-admin.html',

@@ -4,6 +4,7 @@ import { useAdminSession } from '@rotra/data/admin-account/use-admin-session'
 import { useAdminClubs } from '@rotra/data/club/useAdminClubs'
 import { useClubNameRequests } from '@rotra/data/club/useClubNameRequests'
 import { useSignOutAdmin } from '@rotra/data/admin-account/use-sign-out-admin'
+import { MockError } from '@rotra/data/mock/errors'
 import { AccessDeniedCard } from '@rotra/ui/access-denied-card'
 import { AdminAccountBadge } from '@rotra/ui/admin-account-badge'
 import { AdminNav, type AdminNavKey } from '@rotra/ui/admin-nav'
@@ -15,11 +16,36 @@ import { ThemeToggle } from '@rotra/ui/theme-toggle'
 import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { createContext, type ReactNode, useCallback, useContext, useEffect, useState } from 'react'
+import {
+  createContext,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useState,
+} from 'react'
 
 const AdminWorkspaceAccess = createContext<(() => void) | null>(null)
 export function useAdminWorkspaceAccess() {
   return useContext(AdminWorkspaceAccess)
+}
+
+const isPermissionError = (error: unknown) =>
+  error instanceof MockError && error.kind === 'permission'
+
+/**
+ * A privileged read refused with a permission error replaces the whole workspace with the access
+ * denial (and clears the cache), so no partial data stays on screen. Returns true while denied, so
+ * the caller renders nothing meanwhile.
+ */
+export function useDenyOnPermissionError(...errors: unknown[]) {
+  const reportPermissionDenied = useAdminWorkspaceAccess()
+  const denied = errors.some(isPermissionError)
+  useLayoutEffect(() => {
+    if (denied) reportPermissionDenied?.()
+  }, [denied, reportPermissionDenied])
+  return denied
 }
 
 const HREFS: Record<AdminNavKey, string> = {
@@ -35,10 +61,13 @@ export function AdminWorkspaceShell({ children }: { children: ReactNode }) {
   const session = useAdminSession()
   const signOut = useSignOutAdmin()
   const { offline } = useAdminConnectivity()
-  const clubs = useAdminClubs()
-  const nameRequests = useClubNameRequests()
   const client = useQueryClient()
   const [permissionDenied, setPermissionDenied] = useState(false)
+  // Nav counts are privileged reads: they wait until the session is confirmed as the platform owner,
+  // and stop once access has been denied.
+  const isOwner = !session.isPending && session.data.kind === 'owner' && !permissionDenied
+  const clubs = useAdminClubs({}, { enabled: isOwner })
+  const nameRequests = useClubNameRequests({ enabled: isOwner })
   const reportPermissionDenied = useCallback(() => {
     void client.cancelQueries()
     client.clear()
@@ -60,6 +89,10 @@ export function AdminWorkspaceShell({ children }: { children: ReactNode }) {
       router.refresh()
     }
   }, [kind, session.isPending, router])
+  const countsDenied = isPermissionError(clubs.error) || isPermissionError(nameRequests.error)
+  useLayoutEffect(() => {
+    if (countsDenied) reportPermissionDenied()
+  }, [countsDenied, reportPermissionDenied])
   if (permissionDenied)
     return (
       <>

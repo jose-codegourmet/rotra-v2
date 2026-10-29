@@ -9,7 +9,9 @@ export const addClubSheetMeta = {
     'AddClubForm and AddClubReview render their own steps and buttons, so the Sheet has no footer. Back returns to the form with every value kept.',
     'The password lives only in this component state and the mutation call; the review shows its length. Closing clears it.',
     'Create club sends one sourceCommandId generated on entering review, so a double tap or retry creates one club. Success closes the sheet, toasts "{name} added. Activate a license so it can run sessions." and pushes /clubs/{id}?tab=license. Failure stays on review with serverError and an error toast.',
-    'While saving the sheet has no close button and ignores Escape and the scrim. The discard prompt, offline and pending-close rules (A02.14) are not wired yet.',
+    'While saving the sheet has no close button and ignores Escape and the scrim. A ref keeps repeated taps to one request.',
+    'Closing (Cancel, close button, Escape, scrim) with any field typed (AddClubForm onDirtyChange) or from the review opens a ConfirmSheet "Discard this club?" / "Nothing has been saved, and no club account was created." with Keep editing and Discard (danger).',
+    'Offline (useAdminConnectivity), Create club sends nothing and shows ADMIN_OFFLINE_ERROR on the review, keeping every value.',
   ],
   prototype: {
     file: 'docs/frames/admin-app/rotra-admin.html',

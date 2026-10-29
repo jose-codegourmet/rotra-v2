@@ -16,17 +16,21 @@ import { ClubPriceCard } from '@rotra/ui/club-price-card'
 import { DataTable } from '@rotra/ui/data-table'
 import { DetailHero } from '@rotra/ui/detail-hero'
 import { EmptyState } from '@rotra/ui/empty-state'
+import { ErrorState } from '@rotra/ui/error-state'
 import { LicenseAccessChip } from '@rotra/ui/license-access-chip'
 import { LicenseStatusCard } from '@rotra/ui/license-status-card'
 import { NameChangeRequestCard } from '@rotra/ui/name-change-request-card'
 import { RetentionCard } from '@rotra/ui/retention-card'
+import { Skeleton } from '@rotra/ui/skeleton'
 import { type TabBadge, Tabs, TabsContent } from '@rotra/ui/tabs'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { notFound, usePathname, useRouter } from 'next/navigation'
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
+import { useDenyOnPermissionError } from '../../../../_components/admin-workspace-shell/AdminWorkspaceShell'
 import { type ClubNameDecision, ClubNameSheets } from '../club-name-sheets/ClubNameSheets'
 import { ClubPriceSheet } from '../club-price-sheet/ClubPriceSheet'
 import { LicenseSheet } from '../license-sheet/LicenseSheet'
+import { ClubDetailSkeleton } from './ClubDetailSkeleton'
 import { CLUB_DETAIL_TABS, type ClubDetailTab } from './ClubDetail.tabs'
 import { licensePaymentColumns } from './LicensePayments.columns'
 
@@ -40,7 +44,9 @@ function pagesBadge(retention: RetentionState): TabBadge | null {
 /**
  * A-CLUB-DETAIL: club hero and the Overview, License, Public pages and Activity tabs. The tab lives
  * in ?tab (Overview when absent); `from` is the directory's query, so Back restores its search and
- * filter.
+ * filter. Skeleton while the club loads, Club not found (not-found.tsx) for an unknown id, Retry
+ * when the load fails; the payment history and Activity tab have their own loading and error states.
+ * A permission error from any of its reads denies the workspace.
  */
 export function ClubDetail({
   clubId,
@@ -56,9 +62,13 @@ export function ClubDetail({
   const [tab, setTab] = useState(initialTab)
   const [sheet, setSheet] = useState<'license' | 'price' | null>(null)
   const [nameDecision, setNameDecision] = useState<ClubNameDecision | null>(null)
-  const club = useAdminClub(clubId).data
-  const terms = useLicenseTerms(clubId).data
-  const audit = useAuditEvents({ targetType: 'club', targetId: clubId }).data
+  const clubQuery = useAdminClub(clubId)
+  const termsQuery = useLicenseTerms(clubId)
+  const auditQuery = useAuditEvents({ targetType: 'club', targetId: clubId })
+  const club = clubQuery.data
+  const terms = termsQuery.data
+  const audit = auditQuery.data
+  const denied = useDenyOnPermissionError(clubQuery.error, termsQuery.error, auditQuery.error)
   const paymentsHeadingId = useId()
   const activityHeadingId = useId()
 
@@ -97,8 +107,27 @@ export function ClubDetail({
   const back = (
     <Breadcrumb label="Clubs and licenses" href={from ? `/clubs?${from}` : '/clubs'} linkAs={Link} />
   )
-  // Loading, not found and error states are A02.14.
-  if (!club) return back
+  if (denied) return null
+  if (club === null) notFound()
+  if (!club) {
+    return (
+      <>
+        {back}
+        {clubQuery.isError ? (
+          <ErrorState
+            title="Couldn't load this club."
+            onRetry={() => void clubQuery.refetch()}
+            retrying={clubQuery.isFetching}
+            retryLabel="Retry"
+          >
+            Check your connection, then try again.
+          </ErrorState>
+        ) : (
+          <ClubDetailSkeleton />
+        )}
+      </>
+    )
+  }
 
   const pages = pagesBadge(club.retention)
   const request = club.pendingNameRequest
@@ -197,7 +226,16 @@ export function ClubDetail({
                   settings.
                 </p>
               </div>
-              {terms && terms.length === 0 ? (
+              {termsQuery.isError ? (
+                <ErrorState
+                  title="Couldn't load the payment history."
+                  onRetry={() => void termsQuery.refetch()}
+                  retrying={termsQuery.isFetching}
+                  retryLabel="Retry"
+                >
+                  Check your connection, then try again.
+                </ErrorState>
+              ) : terms && terms.length === 0 ? (
                 <EmptyState title="No payments recorded.">
                   Activate the license after the club pays to add the first one.
                 </EmptyState>
@@ -208,6 +246,7 @@ export function ClubDetail({
                     columns={licensePaymentColumns}
                     data={terms ?? []}
                     getRowId={(term) => term.id}
+                    loading={!terms}
                   />
                   <p className="m-0 text-[13px] text-fg2">What the club actually paid each time.</p>
                 </>
@@ -222,10 +261,27 @@ export function ClubDetail({
           <Card asChild>
             <section aria-labelledby={activityHeadingId} className="flex flex-col gap-3">
               <h2 id={activityHeadingId}>Record of actions</h2>
-              <ActivityLog
-                entries={activityEntries}
-                emptyText="No Admin actions recorded for this club yet."
-              />
+              {auditQuery.isError ? (
+                <ErrorState
+                  title="Couldn't load the record of actions."
+                  onRetry={() => void auditQuery.refetch()}
+                  retrying={auditQuery.isFetching}
+                  retryLabel="Retry"
+                >
+                  Check your connection, then try again.
+                </ErrorState>
+              ) : audit ? (
+                <ActivityLog
+                  entries={activityEntries}
+                  emptyText="No Admin actions recorded for this club yet."
+                />
+              ) : (
+                <div aria-busy className="flex flex-col gap-2.5">
+                  <Skeleton label="Loading the record of actions" className="w-3/4" />
+                  <Skeleton className="w-1/2" />
+                  <Skeleton className="w-2/3" />
+                </div>
+              )}
             </section>
           </Card>
         </TabsContent>

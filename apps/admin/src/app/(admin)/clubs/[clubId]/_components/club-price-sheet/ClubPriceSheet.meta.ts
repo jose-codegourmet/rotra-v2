@@ -9,7 +9,8 @@ export const clubPriceSheetMeta = {
     'ClubPriceForm renders its own Cancel and Save price buttons, so the Sheet has no footer. A free club starts from its last paid amounts (clubPriceInputFrom).',
     'Unchanged values close the sheet without saving. Success closes and toasts "Price saved: {price line}."; failure stays open with serverError and an error toast.',
     'A new price applies to licenses recorded from now on; recorded payments keep their amounts.',
-    'While saving the sheet has no close button and ignores Escape and the scrim. Offline blocking and pending-close rules (A02.14) are not wired yet.',
+    'While saving the sheet has no close button and ignores Escape and the scrim. A ref keeps repeated taps to one request.',
+    'Offline (useAdminConnectivity), Save price sends nothing and shows ADMIN_OFFLINE_ERROR in the form, keeping the typed price (an unchanged price still just closes).',
   ],
   prototype: {
     file: 'docs/frames/admin-app/rotra-admin.html',

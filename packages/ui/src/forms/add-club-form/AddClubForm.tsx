@@ -8,8 +8,8 @@ import { Notice } from '@rotra/ui/notice'
 import { Select } from '@rotra/ui/select'
 import { SheetSteps } from '@rotra/ui/sheet-steps'
 import { TextInput } from '@rotra/ui/text-input'
-import { useId, useMemo, useState } from 'react'
-import { Controller, FormProvider, useForm } from 'react-hook-form'
+import { useEffect, useId, useMemo, useState } from 'react'
+import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form'
 import { addClubDefaultValues } from './AddClubForm.defaultValues'
 import {
   type AddClubFormInput,
@@ -36,6 +36,11 @@ export type AddClubFormProps = {
   /** Accepted for symmetry with the review step; Review is disabled while it is true */
   isPending?: boolean
   serverError?: string
+  /**
+   * True while any field holds text (name, founding address, city, username, password, monthly or
+   * yearly price), so the container asks before discarding the entry (rotra-admin.html closeSheet)
+   */
+  onDirtyChange?: (dirty: boolean) => void
 }
 
 const SECTION_LABEL = 'text-xs font-semibold tracking-[0.5px] text-fg2 uppercase'
@@ -75,6 +80,7 @@ export function AddClubForm({
   onCancel,
   isPending = false,
   serverError,
+  onDirtyChange,
 }: AddClubFormProps) {
   const formId = useId()
   const passwordId = useId()
@@ -87,6 +93,19 @@ export function AddClubForm({
     defaultValues: { ...addClubDefaultValues, ...defaultValues },
   })
   const { errors, isSubmitted } = form.formState
+  const watched = useWatch({ control: form.control })
+  const dirty = [
+    watched.name,
+    watched.foundingAddress,
+    watched.cityCode,
+    watched.username,
+    watched.password,
+    watched.price?.monthly,
+    watched.price?.yearly,
+  ].some((value) => Boolean(value?.trim()))
+  useEffect(() => {
+    onDirtyChange?.(dirty)
+  }, [dirty, onDirtyChange])
   const [showPassword, setShowPassword] = useState(false)
   // The username follows the club name until it is edited by hand.
   const [usernameEdited, setUsernameEdited] = useState(

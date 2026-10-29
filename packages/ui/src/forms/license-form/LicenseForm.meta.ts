@@ -10,6 +10,7 @@ export const licenseFormMeta = {
     'Placeholder (open decision "License stacking/effective dates and refunds", docs/screens/product/open-decisions.md): the container suggests the start as the day after the current term ends, as the prototype does, and an active club sees a note saying the early-renewal rule is undecided. LicenseReview warns about overlaps. There is no refund control.',
     'Payment happened outside ROTRA: there is no checkout, card or gateway field. The amount is filled in from the plan\'s price and follows plan changes until it is typed by hand.',
     'The reference stays optional (up to 40 characters).',
+    'onDirtyChange reports whether any field differs from defaultValues; the container asks "Discard this entry?" before closing an edited form.',
   ],
   prototype: {
     file: 'docs/frames/admin-app/rotra-admin.html',

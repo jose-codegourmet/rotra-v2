@@ -5,11 +5,14 @@ import { useAdminClubs } from '@rotra/data/club/useAdminClubs'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { DataTable } from '@rotra/ui/data-table'
+import { EmptyState } from '@rotra/ui/empty-state'
+import { ErrorState } from '@rotra/ui/error-state'
 import { PageHeader } from '@rotra/ui/page-header'
 import { SegmentedControl } from '@rotra/ui/segmented-control'
 import { TextInput } from '@rotra/ui/text-input'
 import { usePathname, useRouter } from 'next/navigation'
 import { useMemo, useRef, useState } from 'react'
+import { useDenyOnPermissionError } from '../../../_components/admin-workspace-shell/AdminWorkspaceShell'
 import { AddClubSheet } from '../add-club-sheet/AddClubSheet'
 import { clubDirectoryColumns } from './ClubDirectory.columns'
 
@@ -26,7 +29,11 @@ function clubHref(id: string, query: string): string {
   return query ? `/clubs/${id}?from=${encodeURIComponent(query)}` : `/clubs/${id}`
 }
 
-/** A-CLUBS: searchable, filterable club directory; search and filter live in the URL. */
+/**
+ * A-CLUBS: searchable, filterable club directory; search and filter live in the URL. Skeleton rows
+ * until the first answer, then no clubs at all (Add club) or no match (Clear search and filter); a
+ * failed load shows Retry and keeps the search and filter; a permission error denies the workspace.
+ */
 export function ClubDirectory({
   q: initialQ,
   access: initialAccess,
@@ -40,6 +47,7 @@ export function ClubDirectory({
   const [access, setAccess] = useState(initialAccess)
   const [adding, setAdding] = useState(false)
   const list = useAdminClubs({ q: q.trim(), access })
+  const denied = useDenyOnPermissionError(list.error)
   // Each keystroke is a new query; keep the last rows on screen until its answer arrives.
   const lastData = useRef<AdminClubList | undefined>(undefined)
   if (list.data) lastData.current = list.data
@@ -54,6 +62,9 @@ export function ClubDirectory({
     router.replace(next ? `${pathname}?${next}` : pathname, { scroll: false })
   }
   const counts = data?.counts
+  const filtered = q.trim() !== '' || access !== 'all'
+
+  if (denied) return null
 
   return (
     <>
@@ -96,6 +107,46 @@ export function ClubDirectory({
             data={data?.clubs ?? []}
             getRowId={(club) => club.id}
             onRowClick={(club) => router.push(clubHref(club.id, query))}
+            loading={!data && !list.isError}
+            error={
+              list.isError ? (
+                <ErrorState
+                  title="Couldn't load the clubs."
+                  onRetry={() => void list.refetch()}
+                  retrying={list.isFetching}
+                  retryLabel="Retry"
+                >
+                  Check your connection, then try again.
+                </ErrorState>
+              ) : undefined
+            }
+            empty={
+              counts?.all === 0 ? (
+                <EmptyState
+                  title="No clubs yet."
+                  action={
+                    <Button size="sm" variant="primary" onClick={() => setAdding(true)}>
+                      Add club
+                    </Button>
+                  }
+                >
+                  Add a club to give it a Queue app sign-in.
+                </EmptyState>
+              ) : (
+                <EmptyState
+                  title="No clubs match."
+                  action={
+                    filtered ? (
+                      <Button size="sm" onClick={() => update('', 'all')}>
+                        Clear search and filter
+                      </Button>
+                    ) : undefined
+                  }
+                >
+                  Check the spelling, or search by the club's username.
+                </EmptyState>
+              )
+            }
           />
         </section>
       </Card>

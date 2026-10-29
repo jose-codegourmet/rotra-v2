@@ -14,7 +14,7 @@ import { formatYmd } from '@rotra/ui/license-access-chip/variants'
 import { Notice } from '@rotra/ui/notice'
 import { SheetSteps } from '@rotra/ui/sheet-steps'
 import { TextInput } from '@rotra/ui/text-input'
-import { useId, useMemo } from 'react'
+import { useEffect, useId, useMemo } from 'react'
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form'
 import { licenseDefaultValues } from './LicenseForm.defaultValues'
 import {
@@ -60,6 +60,8 @@ export type LicenseFormProps = {
   /** Accepted for symmetry with the review step; Review is disabled while it is true */
   isPending?: boolean
   serverError?: string
+  /** True while a field differs from defaultValues, so the container can ask before discarding */
+  onDirtyChange?: (dirty: boolean) => void
 }
 
 const STEPS = ['Details', 'Review']
@@ -89,6 +91,7 @@ export function LicenseForm({
   onCancel,
   isPending = false,
   serverError,
+  onDirtyChange,
 }: LicenseFormProps) {
   const formId = useId()
   const today = todayProp ?? manilaToday()
@@ -100,7 +103,10 @@ export function LicenseForm({
     resolver: zodResolver(schema),
     defaultValues: { ...licenseDefaultValues, ...defaultValues },
   })
-  const { errors, isSubmitted } = form.formState
+  const { errors, isSubmitted, isDirty } = form.formState
+  useEffect(() => {
+    onDirtyChange?.(isDirty)
+  }, [isDirty, onDirtyChange])
   const [plan, startsOn] = useWatch({ control: form.control, name: ['plan', 'startsOn'] })
   const termEnd =
     isPlan(plan) && dateField.safeParse(startsOn).success ? getTermEnd(startsOn, plan) : null

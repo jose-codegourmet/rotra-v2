@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { getAdminClub } from './fetchers'
 import { clubKeys } from './queryKeys'
 
-/** A-CLUB-DETAIL: identity, account, price, pending name change and Overview facts. */
+/** A-CLUB-DETAIL: identity, account, price, pending name change and Overview facts; null = not found. */
 export function useAdminClub(id: string) {
   return useQuery({
     queryKey: clubKeys.adminDetail(id),

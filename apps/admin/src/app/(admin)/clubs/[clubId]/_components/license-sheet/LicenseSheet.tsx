@@ -1,6 +1,9 @@
 'use client'
 
+import { ADMIN_OFFLINE_ERROR } from '@rotra/data/admin-account'
+import { useAdminConnectivity } from '@rotra/data/admin-account/use-admin-connectivity'
 import type { AdminClubDetail } from '@rotra/data/club/types'
+import { LICENSE_CHECK_OFFLINE_ERROR } from '@rotra/data/license/fetchers'
 import {
   defaultLicenseDraft,
   formatLicenseDate,
@@ -14,6 +17,7 @@ import type { ClubLicenseTerm, LicenseOperation } from '@rotra/data/license/type
 import { useActivateLicense } from '@rotra/data/license/useActivateLicense'
 import { useCheckLicenseOperation } from '@rotra/data/license/useCheckLicenseOperation'
 import { MockError } from '@rotra/data/mock/errors'
+import { ConfirmSheet } from '@rotra/ui/confirm-sheet'
 import { LicenseForm } from '@rotra/ui/forms/license-form'
 import { licenseStatusLine } from '@rotra/ui/forms/license-form/helpers'
 import type { LicenseFormInput, LicenseFormValues } from '@rotra/ui/forms/license-form/schema'
@@ -50,6 +54,17 @@ function formInputFrom(
   }
 }
 
+/** rotra-admin.html licFields(): the values that make an entry differ from where it started. */
+function sameEntry(a: Partial<LicenseFormInput>, b: Partial<LicenseFormInput>) {
+  return (
+    (a.plan ?? '') === (b.plan ?? '') &&
+    (a.startsOn ?? '') === (b.startsOn ?? '') &&
+    (a.paidOn ?? '') === (b.paidOn ?? '') &&
+    (a.amount ?? '') === (b.amount ?? '') &&
+    (a.reference ?? '').trim() === (b.reference ?? '').trim()
+  )
+}
+
 /** Checked values → what the fields start from when coming Back (amount back to peso text). */
 function formInputFromValues(values: LicenseFormValues, today: string): Partial<LicenseFormInput> {
   return {
@@ -68,11 +83,16 @@ function formInputFromValues(values: LicenseFormValues, today: string): Partial<
  * generated on entering review and reused by every save of that review, so a retry never records a
  * second term. A lost reply (MockError 'timeout') shows LicenseOperationNotice, with no way to close
  * the sheet, until Check status finds the term (close, toast) or reports it wasn't saved (back to
- * review with the error).
+ * review with the error). Closing an entry that differs from where it started asks "Discard this
+ * entry?" first. Offline, Save saves nothing and says so inline, and Check status asks to reconnect.
  */
 export function LicenseSheet({ club, terms, open, onOpenChange }: LicenseSheetProps) {
   const activate = useActivateLicense()
   const check = useCheckLicenseOperation()
+  const { offline } = useAdminConnectivity()
+  const [formDirty, setFormDirty] = useState(false)
+  const [leaving, setLeaving] = useState(false)
+  const [offlineError, setOfflineError] = useState<string | null>(null)
   const [values, setValues] = useState<LicenseFormValues | null>(null)
   const [draft, setDraft] = useState<Partial<LicenseFormInput> | undefined>(undefined)
   const [timedOut, setTimedOut] = useState(false)
@@ -82,6 +102,8 @@ export function LicenseSheet({ club, terms, open, onOpenChange }: LicenseSheetPr
   const [frozenVerb, setFrozenVerb] = useState<Verb | null>(null)
   // One command ID per review: the idempotency key activateLicense and Check status look up.
   const commandId = useRef<string | null>(null)
+  // A second tap can land before isPending re-renders; this keeps it to one request.
+  const sending = useRef(false)
   const { reset: resetActivate } = activate
   const { reset: resetCheck } = check
 
@@ -93,6 +115,9 @@ export function LicenseSheet({ club, terms, open, onOpenChange }: LicenseSheetPr
       setTimedOut(false)
       setNotSaved(false)
       setFrozenVerb(null)
+      setFormDirty(false)
+      setLeaving(false)
+      setOfflineError(null)
       commandId.current = null
       resetActivate()
       resetCheck()
@@ -105,13 +130,28 @@ export function LicenseSheet({ club, terms, open, onOpenChange }: LicenseSheetPr
   // While saving or after a lost reply the sheet can't be closed: the term may already be recorded.
   const locked = activate.isPending || check.isPending || timedOut
 
-  const close = () => {
+  const initial = formInputFrom(defaultLicenseDraft(club, terms, today), isFree)
+  // rotra-admin.html licDirty(): the entry (typed, kept from review, or under review) differs from
+  // the suggested start.
+  const dirty = values
+    ? !sameEntry(formInputFromValues(values, today), initial)
+    : formDirty || (draft !== undefined && !sameEntry(draft, initial))
+
+  const discard = () => {
     if (locked) return
     onOpenChange(false)
+    setLeaving(false)
     setValues(null)
     setDraft(undefined)
+    setOfflineError(null)
     activate.reset()
     check.reset()
+  }
+
+  const close = () => {
+    if (locked) return
+    if (dirty) setLeaving(true)
+    else discard()
   }
 
   const done = (operation: LicenseOperation, found: boolean) => {
@@ -132,6 +172,7 @@ export function LicenseSheet({ club, terms, open, onOpenChange }: LicenseSheetPr
     commandId.current = crypto.randomUUID()
     activate.reset()
     setNotSaved(false)
+    setOfflineError(null)
     setFrozenVerb(club.hasTerms ? 'Renew' : 'Activate')
     setValues(checked)
   }
@@ -141,14 +182,23 @@ export function LicenseSheet({ club, terms, open, onOpenChange }: LicenseSheetPr
     setDraft(formInputFromValues(values, today))
     setValues(null)
     setNotSaved(false)
+    setOfflineError(null)
     activate.reset()
   }
 
   const save = () => {
-    if (!values || activate.isPending) return
+    if (!values || activate.isPending || sending.current) return
+    setNotSaved(false)
+    // rotra-admin.html offlineBlock: nothing is sent, the review stays as it is.
+    if (offline) {
+      activate.reset()
+      setOfflineError(ADMIN_OFFLINE_ERROR)
+      return
+    }
+    setOfflineError(null)
     const sourceCommandId = commandId.current ?? crypto.randomUUID()
     commandId.current = sourceCommandId
-    setNotSaved(false)
+    sending.current = true
     activate.mutate(
       {
         clubId: club.id,
@@ -160,6 +210,9 @@ export function LicenseSheet({ club, terms, open, onOpenChange }: LicenseSheetPr
         sourceCommandId,
       },
       {
+        onSettled: () => {
+          sending.current = false
+        },
         onSuccess: (operation) => done(operation, false),
         onError: (error) => {
           if (error instanceof MockError && error.kind === 'timeout') setTimedOut(true)
@@ -171,8 +224,16 @@ export function LicenseSheet({ club, terms, open, onOpenChange }: LicenseSheetPr
 
   const checkStatus = () => {
     const sourceCommandId = commandId.current
-    if (!sourceCommandId || check.isPending) return
+    if (!sourceCommandId || check.isPending || sending.current) return
+    if (offline) {
+      toast(LICENSE_CHECK_OFFLINE_ERROR)
+      return
+    }
+    sending.current = true
     check.mutate(sourceCommandId, {
+      onSettled: () => {
+        sending.current = false
+      },
       onSuccess: (operation) => {
         if (operation) {
           done(operation, true)
@@ -214,7 +275,7 @@ export function LicenseSheet({ club, terms, open, onOpenChange }: LicenseSheetPr
         onBack={back}
         onConfirm={save}
         isPending={activate.isPending}
-        serverError={notSaved ? NOT_SAVED : activate.error?.message}
+        serverError={notSaved ? NOT_SAVED : (offlineError ?? activate.error?.message)}
       />
     )
   } else {
@@ -233,11 +294,12 @@ export function LicenseSheet({ club, terms, open, onOpenChange }: LicenseSheetPr
           yearlyMinor: club.licenseYearlyMinor,
           isFree,
         }}
-        defaultValues={draft ?? formInputFrom(defaultLicenseDraft(club, terms, today), isFree)}
+        defaultValues={draft ?? initial}
         getTermEnd={termEnd}
         today={today}
         onSubmit={review}
         onCancel={close}
+        onDirtyChange={setFormDirty}
       />
     )
   }
@@ -253,6 +315,19 @@ export function LicenseSheet({ club, terms, open, onOpenChange }: LicenseSheetPr
       dismissible={!locked}
     >
       {body}
+      <ConfirmSheet
+        open={open && leaving}
+        onOpenChange={(next) => {
+          if (!next) setLeaving(false)
+        }}
+        title="Discard this entry?"
+        consequence="Nothing has been saved, and the club's access hasn't changed."
+        backLabel="Keep editing"
+        onBack={() => setLeaving(false)}
+        confirmLabel="Discard"
+        onConfirm={discard}
+        destructive
+      />
     </Sheet>
   )
 }

@@ -1,9 +1,12 @@
 'use client'
 
+import { ADMIN_OFFLINE_ERROR } from '@rotra/data/admin-account'
+import { useAdminConnectivity } from '@rotra/data/admin-account/use-admin-connectivity'
 import { useAddClub } from '@rotra/data/club/useAddClub'
 import { useClubIdentityIndex } from '@rotra/data/club/useClubIdentityIndex'
 import { foundingCities } from '@rotra/data/fixtures/founding-cities'
 import { AddClubReview } from '@rotra/ui/add-club-review'
+import { ConfirmSheet } from '@rotra/ui/confirm-sheet'
 import { AddClubForm } from '@rotra/ui/forms/add-club-form'
 import type { AddClubFormInput, AddClubFormValues } from '@rotra/ui/forms/add-club-form/schema'
 import { clubPriceInputFrom } from '@rotra/ui/forms/club-price-fields/helpers'
@@ -35,16 +38,24 @@ function formInputFrom(values: AddClubFormValues): AddClubFormInput {
  * component's state, passed to the mutation and never shown or logged) and Back returns to the form
  * with every value kept. Create club sends a sourceCommandId generated once on entering review, so a
  * second tap or a retry replays the same command and never creates a second club. On success the
- * sheet closes, a toast confirms it and the new club opens on its License tab.
+ * sheet closes, a toast confirms it and the new club opens on its License tab. Closing (Cancel, the
+ * close button, Escape or the scrim) with anything typed asks "Discard this club?" first; while
+ * Create club is running nothing closes it. Offline, Create club saves nothing and says so inline.
  */
 export function AddClubSheet({ open, onOpenChange }: AddClubSheetProps) {
   const router = useRouter()
   const identity = useClubIdentityIndex()
   const add = useAddClub()
+  const { offline } = useAdminConnectivity()
   const [values, setValues] = useState<AddClubFormValues | null>(null)
   const [draft, setDraft] = useState<AddClubFormInput | undefined>(undefined)
+  const [formDirty, setFormDirty] = useState(false)
+  const [leaving, setLeaving] = useState(false)
+  const [offlineError, setOfflineError] = useState<string | null>(null)
   // One command ID per review: the idempotency key the mock addClub dedupes on.
   const commandId = useRef<string | null>(null)
+  // A second tap can land before isPending re-renders; this keeps it to one request.
+  const sending = useRef(false)
   const { reset } = add
 
   // Every opening starts a fresh form; nothing typed before (the password least of all) survives.
@@ -52,22 +63,35 @@ export function AddClubSheet({ open, onOpenChange }: AddClubSheetProps) {
     if (open) {
       setValues(null)
       setDraft(undefined)
+      setFormDirty(false)
+      setLeaving(false)
+      setOfflineError(null)
       commandId.current = null
       reset()
     }
   }, [open, reset])
 
-  const close = () => {
+  const discard = () => {
     if (add.isPending) return
     onOpenChange(false)
+    setLeaving(false)
     setValues(null)
     setDraft(undefined)
+    setOfflineError(null)
     add.reset()
+  }
+
+  // rotra-admin.html closeSheet: anything typed (or a review waiting) asks before it is thrown away.
+  const close = () => {
+    if (add.isPending) return
+    if (values || formDirty) setLeaving(true)
+    else discard()
   }
 
   const review = (checked: AddClubFormValues) => {
     commandId.current = crypto.randomUUID()
     add.reset()
+    setOfflineError(null)
     setValues(checked)
   }
 
@@ -75,16 +99,28 @@ export function AddClubSheet({ open, onOpenChange }: AddClubSheetProps) {
     if (!values || add.isPending) return
     setDraft(formInputFrom(values))
     setValues(null)
+    setOfflineError(null)
     add.reset()
   }
 
   const create = () => {
-    if (!values || add.isPending) return
+    if (!values || add.isPending || sending.current) return
+    // rotra-admin.html offlineBlock: nothing is sent, the review stays as it is.
+    if (offline) {
+      add.reset()
+      setOfflineError(ADMIN_OFFLINE_ERROR)
+      return
+    }
+    setOfflineError(null)
     const sourceCommandId = commandId.current ?? crypto.randomUUID()
     commandId.current = sourceCommandId
+    sending.current = true
     add.mutate(
       { input: values, sourceCommandId },
       {
+        onSettled: () => {
+          sending.current = false
+        },
         onSuccess: ({ clubId, name }) => {
           onOpenChange(false)
           setValues(null)
@@ -125,7 +161,7 @@ export function AddClubSheet({ open, onOpenChange }: AddClubSheetProps) {
           onBack={back}
           onCreate={create}
           isPending={add.isPending}
-          serverError={add.error?.message}
+          serverError={offlineError ?? add.error?.message}
         />
       ) : (
         <AddClubForm
@@ -135,8 +171,22 @@ export function AddClubSheet({ open, onOpenChange }: AddClubSheetProps) {
           takenUsernames={identity.data?.usernames}
           onSubmit={review}
           onCancel={close}
+          onDirtyChange={setFormDirty}
         />
       )}
+      <ConfirmSheet
+        open={open && leaving}
+        onOpenChange={(next) => {
+          if (!next) setLeaving(false)
+        }}
+        title="Discard this club?"
+        consequence="Nothing has been saved, and no club account was created."
+        backLabel="Keep editing"
+        onBack={() => setLeaving(false)}
+        confirmLabel="Discard"
+        onConfirm={discard}
+        destructive
+      />
     </Sheet>
   )
 }

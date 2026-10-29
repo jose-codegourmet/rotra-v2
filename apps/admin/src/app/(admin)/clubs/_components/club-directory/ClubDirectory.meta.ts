@@ -8,7 +8,9 @@ export const clubDirectoryMeta = {
     'Rendered by /clubs, which awaits searchParams q and access and passes them in. Typing or filtering router.replaces the query string.',
     'The club name and the whole row open /clubs/{id}?from={encoded q/access query}; the detail back link decodes from to restore the directory.',
     'Add club (primary, PageHeader actions) opens AddClubSheet (A-ADD-CLUB).',
-    'The empty, loading and error states (A02.14) are not wired yet.',
+    'Loading: DataTable skeleton rows and no filter counts until the first answer (clubs/loading.tsx covers the route itself). While a new search is fetching, the previous rows stay.',
+    'Empty: no clubs at all → "No clubs yet." with Add club; nothing matching → "No clubs match." with Clear search and filter when a search or filter is set.',
+    'A failed load shows ErrorState with Retry inside the table and keeps the search and filter; a permission error replaces the workspace with the access denial (useDenyOnPermissionError).',
   ],
   docs: ['docs/screens/product/modules/admin/clubs-licenses.md'],
   related: [

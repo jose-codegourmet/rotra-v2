@@ -10,6 +10,7 @@ export const addClubFormMeta = {
     'The username follows the club name (first two words, without club/the/of/and, joined by a dot) until it is edited by hand.',
     'Generate a password fills 12 characters without look-alikes and shows it, so the platform owner can copy it for the club.',
     'The Cancel and Review buttons are part of the step; put it in a Sheet without a footer.',
+    'onDirtyChange reports whether any field holds text (the price mode alone does not count); the container asks "Discard this club?" before closing.',
   ],
   prototype: {
     file: 'docs/frames/admin-app/rotra-admin.html',

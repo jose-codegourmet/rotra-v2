@@ -19,6 +19,8 @@ compose. One file per field family, one `exports` subpath per file, no barrels.
 | `@rotra/schema/money` | `moneyField` | Integer centavos (number) or peso text with up to two decimals and comma groups → integer centavos; never a float. Empty is invalid |
 | | `optionalMoneyField` | Empty peso text → null; otherwise nonnegative integer centavos |
 | | `formatPeso(minor)` | Centavos → `₱1,500` / `₱1,500.50`, as the prototypes show money |
+| `@rotra/schema/club-price` | `clubPriceField` | `{ pricing: 'paid' \| 'free', monthly, yearly }` peso text. Paid: whole pesos above zero → integer centavos, yearly < 12 × monthly. Free: the last paid amounts optional → centavos or null |
+| | `parseWholePesos(value)`, `yearlySavingPercent(m, y)` | Whole pesos above zero → centavos or null; the prototype's rounded yearly saving % |
 | `@rotra/schema/password` | `passwordField` | Any non-empty password, unchanged (**placeholder**: no minimum length until the auth spec) |
 | `@rotra/schema/name` | `nameField` | Trimmed, required, max 60 (**placeholder** limit until a product rule) |
 
@@ -30,5 +32,5 @@ compose. One file per field family, one `exports` subpath per file, no barrels.
 - `passwordField` and `nameField` limits are placeholders. Screens that document their own rule (club
   and new passwords need at least 8 characters; venue names allow 80) apply it in the form's schema.
 - Phone acceptance beyond PH mobile is an open decision.
-- Tests (`nvm use && pnpm --filter @rotra/schema test`) are allowed only for money, phone parsing,
+- Tests (`nvm use && pnpm --filter @rotra/schema test`) are allowed only for money (club prices included), phone parsing,
   ranking math and queue rules (ways-of-working §7).

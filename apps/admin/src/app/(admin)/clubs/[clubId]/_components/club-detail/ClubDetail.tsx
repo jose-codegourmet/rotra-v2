@@ -24,6 +24,8 @@ import { type TabBadge, Tabs, TabsContent } from '@rotra/ui/tabs'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
+import { ClubPriceSheet } from '../club-price-sheet/ClubPriceSheet'
+import { LicenseSheet } from '../license-sheet/LicenseSheet'
 import { CLUB_DETAIL_TABS, type ClubDetailTab } from './ClubDetail.tabs'
 import { licensePaymentColumns } from './LicensePayments.columns'
 
@@ -51,6 +53,7 @@ export function ClubDetail({
   const router = useRouter()
   const pathname = usePathname()
   const [tab, setTab] = useState(initialTab)
+  const [sheet, setSheet] = useState<'license' | 'price' | null>(null)
   const club = useAdminClub(clubId).data
   const terms = useLicenseTerms(clubId).data
   const audit = useAuditEvents({ targetType: 'club', targetId: clubId }).data
@@ -169,14 +172,18 @@ export function ClubDetail({
           </div>
         </TabsContent>
         <TabsContent value="license" className="flex flex-col gap-5">
-          {/* onOpenLicense (A-LICENSE sheet) is wired in A02.12. */}
-          <LicenseStatusCard access={club.access} hasTerms={club.hasTerms} />
-          {/* onChangePrice (A-CLUB-PRICE sheet) is wired in A02.12. */}
+          {/* The details step starts from the recorded terms, so the button waits for them. */}
+          <LicenseStatusCard
+            access={club.access}
+            hasTerms={club.hasTerms}
+            onOpenLicense={terms ? () => setSheet('license') : undefined}
+          />
           <ClubPriceCard
             pricing={club.licensePricing}
             monthlyMinor={club.licenseMonthlyMinor}
             yearlyMinor={club.licenseYearlyMinor}
             yearlySavingPercent={club.yearlySavingPercent}
+            onChangePrice={() => setSheet('price')}
           />
           <Card asChild>
             <section aria-labelledby={paymentsHeadingId} className="flex flex-col gap-3">
@@ -220,6 +227,19 @@ export function ClubDetail({
           </Card>
         </TabsContent>
       </Tabs>
+      {terms ? (
+        <LicenseSheet
+          club={club}
+          terms={terms}
+          open={sheet === 'license'}
+          onOpenChange={(open) => setSheet(open ? 'license' : null)}
+        />
+      ) : null}
+      <ClubPriceSheet
+        club={club}
+        open={sheet === 'price'}
+        onOpenChange={(open) => setSheet(open ? 'price' : null)}
+      />
     </>
   )
 }

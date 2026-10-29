@@ -2,6 +2,7 @@
 
 import type { AdminClubAccessFilter, AdminClubList } from '@rotra/data/club/types'
 import { useAdminClubs } from '@rotra/data/club/useAdminClubs'
+import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { DataTable } from '@rotra/ui/data-table'
 import { PageHeader } from '@rotra/ui/page-header'
@@ -9,6 +10,7 @@ import { SegmentedControl } from '@rotra/ui/segmented-control'
 import { TextInput } from '@rotra/ui/text-input'
 import { usePathname, useRouter } from 'next/navigation'
 import { useMemo, useRef, useState } from 'react'
+import { AddClubSheet } from '../add-club-sheet/AddClubSheet'
 import { clubDirectoryColumns } from './ClubDirectory.columns'
 
 /** The directory's search and filter as a query string ("q=PH-DVO&access=expired"); '' when unset. */
@@ -36,6 +38,7 @@ export function ClubDirectory({
   const pathname = usePathname()
   const [q, setQ] = useState(initialQ)
   const [access, setAccess] = useState(initialAccess)
+  const [adding, setAdding] = useState(false)
   const list = useAdminClubs({ q: q.trim(), access })
   // Each keystroke is a new query; keep the last rows on screen until its answer arrives.
   const lastData = useRef<AdminClubList | undefined>(undefined)
@@ -57,6 +60,11 @@ export function ClubDirectory({
       <PageHeader
         title="Clubs and licenses"
         description="Club accounts, their prices and license terms, and what happens to their public pages after a license ends. Clubs pay outside ROTRA; you record the payment here when you activate or renew."
+        actions={
+          <Button variant="primary" onClick={() => setAdding(true)}>
+            Add club
+          </Button>
+        }
       />
       <div className="flex flex-wrap items-center gap-2.5">
         <div className="min-w-0 flex-[1_1_260px]">
@@ -91,6 +99,7 @@ export function ClubDirectory({
           />
         </section>
       </Card>
+      <AddClubSheet open={adding} onOpenChange={setAdding} />
     </>
   )
 }

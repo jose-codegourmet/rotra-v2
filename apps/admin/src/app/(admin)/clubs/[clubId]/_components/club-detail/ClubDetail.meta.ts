@@ -9,7 +9,8 @@ export const clubDetailMeta = {
     'Back goes to /clubs plus from, restoring the directory search and filter.',
     '/clubs/{id}?tab=overview#name-request scrolls to the NameChangeRequestCard once the club has loaded.',
     'License tab: Activate/Renew license opens LicenseSheet (once the terms have loaded) and Change price opens ClubPriceSheet; both mount after the Tabs.',
-    'Name change Approve/Reject (A02.13) and the loading, not-found and error states (A02.14) are not wired yet.',
+    'Overview: Approve name change and Reject on NameChangeRequestCard open ClubNameSheets (D-CLUB-NAME), mounted after the Tabs.',
+    'The loading, not-found and error states (A02.14) are not wired yet.',
   ],
   docs: ['docs/screens/product/modules/admin/clubs-licenses.md'],
   related: [
@@ -24,6 +25,7 @@ export const clubDetailMeta = {
     'ClubPriceCard',
     'LicenseSheet',
     'ClubPriceSheet',
+    'ClubNameSheets',
     'DataTable',
     'RetentionCard',
     'ActivityLog',

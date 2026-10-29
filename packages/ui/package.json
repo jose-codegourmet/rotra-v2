@@ -263,6 +263,7 @@
     "./value-tiles": "./src/components/value-tiles/ValueTiles.tsx",
     "./activity-log": "./src/components/activity-log/ActivityLog.tsx",
     "./name-change-request-card": "./src/components/name-change-request-card/NameChangeRequestCard.tsx",
+    "./name-change-request-card/helpers": "./src/components/name-change-request-card/NameChangeRequestCard.helpers.ts",
     "./club-account-card": "./src/components/club-account-card/ClubAccountCard.tsx",
     "./club-identity-card": "./src/components/club-identity-card/ClubIdentityCard.tsx",
     "./active-session-card": "./src/components/active-session-card/ActiveSessionCard.tsx",

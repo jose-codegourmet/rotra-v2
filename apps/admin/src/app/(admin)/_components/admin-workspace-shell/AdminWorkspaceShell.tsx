@@ -2,6 +2,7 @@
 import { useAdminConnectivity } from '@rotra/data/admin-account/use-admin-connectivity'
 import { useAdminSession } from '@rotra/data/admin-account/use-admin-session'
 import { useAdminClubs } from '@rotra/data/club/useAdminClubs'
+import { useClubNameRequests } from '@rotra/data/club/useClubNameRequests'
 import { useSignOutAdmin } from '@rotra/data/admin-account/use-sign-out-admin'
 import { AccessDeniedCard } from '@rotra/ui/access-denied-card'
 import { AdminAccountBadge } from '@rotra/ui/admin-account-badge'
@@ -35,6 +36,7 @@ export function AdminWorkspaceShell({ children }: { children: ReactNode }) {
   const signOut = useSignOutAdmin()
   const { offline } = useAdminConnectivity()
   const clubs = useAdminClubs()
+  const nameRequests = useClubNameRequests()
   const client = useQueryClient()
   const [permissionDenied, setPermissionDenied] = useState(false)
   const reportPermissionDenied = useCallback(() => {
@@ -107,7 +109,10 @@ export function AdminWorkspaceShell({ children }: { children: ReactNode }) {
           current={current}
           hrefs={HREFS}
           linkComponent={Link}
-          counts={{ clubs: clubs.data?.counts.all }}
+          counts={{
+            clubs: clubs.data?.counts.all,
+            'club-names': nameRequests.data?.pending.length,
+          }}
           accountEmail={email}
           isSigningOut={signOut.isPending}
           onSignOut={handleSignOut}

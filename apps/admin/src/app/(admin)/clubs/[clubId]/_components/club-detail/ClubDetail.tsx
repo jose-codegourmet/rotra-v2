@@ -24,6 +24,7 @@ import { type TabBadge, Tabs, TabsContent } from '@rotra/ui/tabs'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
+import { type ClubNameDecision, ClubNameSheets } from '../club-name-sheets/ClubNameSheets'
 import { ClubPriceSheet } from '../club-price-sheet/ClubPriceSheet'
 import { LicenseSheet } from '../license-sheet/LicenseSheet'
 import { CLUB_DETAIL_TABS, type ClubDetailTab } from './ClubDetail.tabs'
@@ -54,6 +55,7 @@ export function ClubDetail({
   const pathname = usePathname()
   const [tab, setTab] = useState(initialTab)
   const [sheet, setSheet] = useState<'license' | 'price' | null>(null)
+  const [nameDecision, setNameDecision] = useState<ClubNameDecision | null>(null)
   const club = useAdminClub(clubId).data
   const terms = useLicenseTerms(clubId).data
   const audit = useAuditEvents({ targetType: 'club', targetId: clubId }).data
@@ -151,11 +153,12 @@ export function ClubDetail({
       >
         <TabsContent value="overview" className="flex flex-col gap-5">
           {request ? (
-            // Approve / Reject handlers (and their sheets) are wired in A02.13.
             <NameChangeRequestCard
               currentName={club.name}
               requestedName={request.requestedName}
               requestedAt={request.requestedAt}
+              onApprove={() => setNameDecision('approve')}
+              onReject={() => setNameDecision('reject')}
             />
           ) : null}
           <div className="grid items-start gap-4 [grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))]">
@@ -240,6 +243,7 @@ export function ClubDetail({
         open={sheet === 'price'}
         onOpenChange={(open) => setSheet(open ? 'price' : null)}
       />
+      <ClubNameSheets club={club} decision={nameDecision} onClose={() => setNameDecision(null)} />
     </>
   )
 }

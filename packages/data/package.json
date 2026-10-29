@@ -221,6 +221,7 @@
     "./player-account/types": "./src/player-account/playerAccount.types.ts",
     "./player-account/useMyAccount": "./src/player-account/useMyAccount.ts",
     "./fixtures/admin-accounts": "./src/fixtures/adminAccounts.ts",
+    "./fixtures/admin-clubs": "./src/fixtures/adminClubs.ts",
     "./admin-account": "./src/admin-account/fetchers.ts",
     "./admin-account/types": "./src/admin-account/adminAccount.types.ts",
     "./admin-account/cookie": "./src/admin-account/cookie.ts",

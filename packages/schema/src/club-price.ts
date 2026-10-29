@@ -23,6 +23,23 @@ export function yearlySavingPercent(monthlyMinor: number, yearlyMinor: number): 
   return Math.round((1 - yearlyMinor / (monthlyMinor * 12)) * 100)
 }
 
+/** A stored club price: integer centavos; a free club keeps its last paid amounts (or 0 if it never had one). */
+export type StoredClubPrice = {
+  pricing: 'paid' | 'free'
+  monthlyMinor: number
+  yearlyMinor: number
+}
+
+/**
+ * rotra-admin.html priceLine(): "₱1,500 a month · ₱15,000 a year (17% off)", or "Free (tester club)".
+ * The one implementation; @rotra/data club rules and the @rotra/ui price helpers both call it.
+ */
+export function formatClubPriceLine(price: StoredClubPrice): string {
+  if (price.pricing === 'free') return 'Free (tester club)'
+  const saving = yearlySavingPercent(price.monthlyMinor, price.yearlyMinor)
+  return `${formatPeso(price.monthlyMinor)} a month · ${formatPeso(price.yearlyMinor)} a year${saving > 0 ? ` (${saving}% off)` : ''}`
+}
+
 const wholePesoField = (message: string) =>
   z.string().transform((value, ctx) => {
     const minor = parseWholePesos(value)

@@ -1,4 +1,9 @@
 import type {
+  AdminClubRecord,
+  ClubAccount,
+  ClubNameChangeRequest,
+} from '../club/club.types'
+import type {
   ClubAccessState,
   ClubLicenseTerm,
   ClubRetentionRecord,
@@ -78,35 +83,43 @@ export const clubAccessExamples = {
   none: { state: 'none' },
 } satisfies Record<string, ClubAccessState>
 
-/** The fixed "now" the club detail fixtures are written against (Thursday evening, Manila). */
+/** The fixed "now" the club detail stories are written against (Thursday evening, Manila). */
 export const ADMIN_FIXTURE_NOW = new Date('2026-10-29T19:52:00+08:00')
+
+const MINUTE = 6e4,
+  HOUR = 36e5,
+  DAY = 864e5
 
 /**
  * Club detail › Overview extras from rotra-admin.html `seedClubs()`: when the account was set up,
- * when a name change was sent (19 hours before ADMIN_FIXTURE_NOW, as the prototype seeds it), the
- * running session (started 52 minutes before) and Talamban's expiry exception. Keyed by username.
+ * how long before "now" a name change was sent (Lahug 19 hours, Sampaloc 3 days 4 hours), the
+ * running session (started 52 minutes before) and Talamban's expiry exception. Relative times are
+ * offsets so the mock store can seed them from the real time, as the prototype does. Keyed by username.
  */
 const overviewExtras: Record<
   string,
   {
     setUpOn: string
-    nameRequestedAt?: string
-    runningSession?: { title: string; venueName: string; startedAt: string }
+    nameRequest?: { name: string; sentBefore: number }
+    runningSession?: { title: string; venueName: string; startedBefore: number }
     sessionException?: string
   }
 > = {
   'lahug.smash': {
     setUpOn: '2026-01-04',
-    nameRequestedAt: '2026-10-29T00:52:00+08:00',
+    nameRequest: { name: 'Lahug Smashers', sentBefore: 19 * HOUR },
     runningSession: {
       title: 'Tuesday Night Queue',
       venueName: 'Lahug Sports Hub',
-      startedAt: '2026-10-29T19:00:00+08:00',
+      startedBefore: 52 * MINUTE,
     },
   },
   'itpark.badminton': { setUpOn: '2026-04-28' },
   'matina.smash': { setUpOn: '2026-02-10' },
-  'sampaloc.shuttle': { setUpOn: '2026-07-01', nameRequestedAt: '2026-10-26T15:52:00+08:00' },
+  'sampaloc.shuttle': {
+    setUpOn: '2026-07-01',
+    nameRequest: { name: 'Sampaloc Shuttle Collective', sentBefore: 3 * DAY + 4 * HOUR },
+  },
   'talamban.racket': {
     setUpOn: '2026-05-25',
     sessionException:
@@ -115,6 +128,55 @@ const overviewExtras: Record<
   'bacolod.rally': { setUpOn: '2025-12-12' },
   'molo.shuttle': { setUpOn: '2025-11-03' },
   'tagbilaran.circle': { setUpOn: '2026-10-20' },
+}
+
+/**
+ * The Admin-side club records the mock store seeds: one account per club (set up at Manila midnight
+ * of its prototype set-up day), the two pending name change requests and the Overview extras.
+ */
+export function createAdminClubFixtures(now: number): {
+  clubAccounts: ClubAccount[]
+  clubNameChangeRequests: ClubNameChangeRequest[]
+  adminClubRecords: AdminClubRecord[]
+} {
+  const iso = (ms: number) => new Date(ms).toISOString()
+  return {
+    clubAccounts: clubs.map((club) => ({
+      clubId: club.id,
+      username: club.username,
+      provisionedAt: `${overviewExtras[club.username]?.setUpOn ?? '2026-01-01'}T00:00:00+08:00`,
+    })),
+    clubNameChangeRequests: clubs.flatMap((club) => {
+      const request = overviewExtras[club.username]?.nameRequest
+      return request
+        ? [
+            {
+              id: `name-request-${club.username}`,
+              clubId: club.id,
+              requestedName: request.name,
+              requestedAt: iso(now - request.sentBefore),
+              state: 'pending' as const,
+            },
+          ]
+        : []
+    }),
+    adminClubRecords: clubs.map((club) => {
+      const extra = overviewExtras[club.username]
+      return {
+        clubId: club.id,
+        accent: directoryExtras[club.username]?.accent ?? false,
+        earlierNames: [],
+        runningSession: extra?.runningSession
+          ? {
+              title: extra.runningSession.title,
+              venueName: extra.runningSession.venueName,
+              startedAt: iso(now - extra.runningSession.startedBefore),
+            }
+          : null,
+        expiryExceptionNote: extra?.sessionException ?? null,
+      }
+    }),
+  }
 }
 
 export type AdminClubOverview = {
@@ -130,15 +192,20 @@ export type AdminClubOverview = {
   sessionException: string | null
 }
 
+const storyFixtures = createAdminClubFixtures(ADMIN_FIXTURE_NOW.getTime())
+
+/** The Overview extras as they read at ADMIN_FIXTURE_NOW (stories). */
 export const adminClubOverviews: AdminClubOverview[] = clubs.map((club) => {
-  const extra = overviewExtras[club.username]
+  const record = storyFixtures.adminClubRecords.find((row) => row.clubId === club.id)
   return {
     id: club.id,
-    setUpOn: extra?.setUpOn ?? '',
-    nameRequestedAt: extra?.nameRequestedAt ?? null,
-    earlierNames: [],
-    runningSession: extra?.runningSession ?? null,
-    sessionException: extra?.sessionException ?? null,
+    setUpOn: overviewExtras[club.username]?.setUpOn ?? '',
+    nameRequestedAt:
+      storyFixtures.clubNameChangeRequests.find((row) => row.clubId === club.id)?.requestedAt ??
+      null,
+    earlierNames: record?.earlierNames ?? [],
+    runningSession: record?.runningSession ?? null,
+    sessionException: record?.expiryExceptionNote ?? null,
   }
 })
 

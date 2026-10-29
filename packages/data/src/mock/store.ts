@@ -1,7 +1,15 @@
-import type { Club } from '../club/club.types'
+import type { AdminAuditEvent } from '../admin-audit/adminAudit.types'
+import type {
+  AdminClubRecord,
+  Club,
+  ClubAccount,
+  ClubNameChangeRequest,
+} from '../club/club.types'
 import type { ClubPlayer } from '../club-player/clubPlayer.types'
 import type { ClubVenue } from '../club-venue/clubVenue.types'
 import type { ContactChangeRequest } from '../contact-change-request/contactChangeRequest.types'
+import { createAdminAuditEvents } from '../fixtures/adminAuditEvents'
+import { createAdminClubFixtures } from '../fixtures/adminClubs'
 import { clubs } from '../fixtures/clubs'
 import { contactChangeRequests } from '../fixtures/contactChangeRequests'
 import { createFinancialFixtures } from '../fixtures/financials'
@@ -56,6 +64,15 @@ export type MockState = {
   playerGames: Record<string, PlayerSessionRecord[]>
   rankingSettings: RankingSettings
   clubs: Club[]
+  /** Admin: one dedicated sign-in per club (no password is ever stored) */
+  clubAccounts: ClubAccount[]
+  /** Admin: name change requests in every state; Queue's own request stays on Club.pendingNameChange */
+  clubNameChangeRequests: ClubNameChangeRequest[]
+  adminClubRecords: AdminClubRecord[]
+  /** Admin "Record of actions", newest first; append-only */
+  adminAuditEvents: AdminAuditEvent[]
+  /** Admin Add club replays: source command ID → the club it created */
+  adminCommands: Record<string, { clubId: string }>
   venues: ClubVenue[]
   players: Player[]
   clubPlayers: ClubPlayer[]
@@ -120,6 +137,9 @@ function seedState(): MockState {
     contactChangeRequests,
     rankingSettings,
     clubs,
+    ...createAdminClubFixtures(now),
+    adminAuditEvents: createAdminAuditEvents(now),
+    adminCommands: {},
     venues,
     players,
     clubPlayers,

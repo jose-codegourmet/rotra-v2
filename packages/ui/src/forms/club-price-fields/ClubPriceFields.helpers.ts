@@ -1,15 +1,16 @@
 import {
   type ClubPriceInput,
   type ClubPriceValues,
-  yearlySavingPercent,
+  formatClubPriceLine,
 } from '@rotra/schema/club-price'
-import { formatPeso } from '@rotra/schema/money'
 
 /** rotra-admin.html priceLine(): "₱1,500 a month · ₱15,000 a year (17% off)", or "Free (tester club)". */
 export function clubPriceLine(price: ClubPriceValues) {
-  if (price.pricing === 'free') return 'Free (tester club)'
-  const saving = yearlySavingPercent(price.monthly, price.yearly)
-  return `${formatPeso(price.monthly)} a month · ${formatPeso(price.yearly)} a year${saving > 0 ? ` (${saving}% off)` : ''}`
+  return formatClubPriceLine(
+    price.pricing === 'free'
+      ? { pricing: 'free', monthlyMinor: price.monthly ?? 0, yearlyMinor: price.yearly ?? 0 }
+      : { pricing: 'paid', monthlyMinor: price.monthly, yearlyMinor: price.yearly },
+  )
 }
 
 /**

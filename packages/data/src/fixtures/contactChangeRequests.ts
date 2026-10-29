@@ -12,3 +12,13 @@ export const contactChangeExamples = {
   phone: { from: '+63 917 555 0142', to: '+63 917 555 0990' },
   notSet: { from: '', to: 'jose@example.com' },
 }
+
+/**
+ * IDs of rotra-admin.html's decided contact requests r7 (Rafa, failed), r8 (Bea, applied) and r9
+ * (Iya, rejected). The Admin audit fixture names them now; A03.6's request fixtures reuse them.
+ */
+export const contactRequestFixtureIds = {
+  r7: 'contact-request-r7',
+  r8: 'contact-request-r8',
+  r9: 'contact-request-r9',
+}

@@ -235,8 +235,10 @@ from the [database design](database_design/product/README.md). Add a row here **
 | Term | TS type / Prisma model | Table (proposed) | Notes |
 |---|---|---|---|
 | Admin account | `AdminAccount` | `admin_accounts` | Platform owner only |
+| Admin audit event | `AdminAuditEvent` | `admin_audit_events` | Append-only "Record of actions" line; the summary never carries passwords or tokens |
 | Club | `Club` | `clubs` | |
 | Club account | `ClubAccount` | `club_accounts` | |
+| Club name change | `ClubNameChangeRequest` | `club_name_change_requests` | `state`: `pending` · `approved` · `rejected` · `cancelled`; one pending per club; takes effect only when the platform owner approves |
 | Venue | `ClubVenue` | `club_venues` | |
 | License term | `ClubLicenseTerm` | `club_license_terms` | |
 | Saved club player | `ClubPlayer` | `club_players` | `playerId` null = guest |

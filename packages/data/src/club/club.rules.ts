@@ -1,3 +1,11 @@
+import {
+  formatClubPriceLine as formatStoredPriceLine,
+  yearlySavingPercent as savingPercent,
+} from '@rotra/schema/club-price'
+import { formatPeso } from '@rotra/schema/money'
+import type { ClubAccessState } from '../license/license.types'
+import type { AdminClubAccessFilter, Club } from './club.types'
+
 export const DEFAULT_POST_TEMPLATE = `@everyone
 
 {{ club_name }} {{ day }} queue
@@ -113,4 +121,71 @@ export function fillPostTemplate(template: string, values: Record<string, string
   return template.replace(/\{\{\s*(\w+)\s*\}\}/g, (match, key: string) =>
     Object.hasOwn(values, key) ? (values[key] ?? match) : match,
   )
+}
+
+/** A club's own license price as the club record stores it (integer centavos). */
+export type ClubPrice = Pick<Club, 'licensePricing' | 'licenseMonthlyMinor' | 'licenseYearlyMinor'>
+
+/**
+ * rotra-admin.html savePct() for a club record. The formula lives once in @rotra/schema/club-price,
+ * which the Admin price forms also use. A free club added without a paid price has none to save on.
+ */
+export function yearlySavingPercent(price: ClubPrice): number {
+  return price.licenseMonthlyMinor > 0
+    ? savingPercent(price.licenseMonthlyMinor, price.licenseYearlyMinor)
+    : 0
+}
+
+/** "₱1,500 a month · ₱15,000 a year (17% off)" or "Free (tester club)" (rotra-admin.html priceLine). */
+export function formatClubPriceLine(price: ClubPrice): string {
+  return formatStoredPriceLine({
+    pricing: price.licensePricing,
+    monthlyMinor: price.licenseMonthlyMinor,
+    yearlyMinor: price.licenseYearlyMinor,
+  })
+}
+
+/** A recorded license amount: ₱0 is a free club's term (rotra-admin.html amountText). */
+export function formatAmount(minor: number): string {
+  return minor === 0 ? 'Free' : formatPeso(minor)
+}
+
+/** First letters of the first two words (rotra-admin.html initials()); 'C' when there are none. */
+export function clubInitials(name: string): string {
+  return (
+    name
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((word) => word.charAt(0).toUpperCase())
+      .join('') || 'C'
+  )
+}
+
+/** rotra-admin.html plain(): trims, strips accents and lowercases, so "Lahúg" matches "lahug". */
+export function plainIdentity(value: string): string {
+  return value
+    .trim()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+}
+
+/** rotra-admin.html filterKey(): a scheduled license has no access yet, so it counts as 'none'. */
+export function adminClubAccessFilter(
+  access: ClubAccessState,
+): Exclude<AdminClubAccessFilter, 'all'> {
+  return access.state === 'scheduled' ? 'none' : access.state
+}
+
+/** Directory search: name, username, city, city code and earlier names, ignoring case and accents. */
+export function matchesClubSearch(
+  club: { name: string; username: string; city: string; cityCode: string; earlierNames: string[] },
+  q: string | undefined,
+): boolean {
+  const needle = plainIdentity(q ?? '')
+  if (!needle) return true
+  return plainIdentity(
+    [club.name, club.username, club.city, club.cityCode, ...club.earlierNames].join(' '),
+  ).includes(needle)
 }

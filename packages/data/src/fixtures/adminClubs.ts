@@ -1,5 +1,11 @@
-import type { ClubAccessState } from '../license/license.types'
+import type {
+  ClubAccessState,
+  ClubLicenseTerm,
+  ClubRetentionRecord,
+  RetentionState,
+} from '../license/license.types'
 import { clubs } from './clubs'
+import { licensePayments } from './licensePayments'
 
 /**
  * Admin directory extras from rotra-admin.html `seedClubs()` that the shared club fixture does not
@@ -135,3 +141,164 @@ export const adminClubOverviews: AdminClubOverview[] = clubs.map((club) => {
     sessionException: extra?.sessionException ?? null,
   }
 })
+
+/**
+ * The day the license and retention examples below are computed for: the date the A02 tickets'
+ * acceptance criteria are stated at (IT Park ends in 6 days). A02.8 computes the real values.
+ */
+export const ADMIN_LICENSE_TODAY = '2026-10-27'
+
+function clubIdOf(username: string): string {
+  const club = clubs.find((row) => row.username === username)
+  if (!club) throw new Error(`Club fixture missing: ${username}`)
+  return club.id
+}
+
+function term(
+  username: string,
+  ref: string,
+  paidOn: string,
+  plan: ClubLicenseTerm['plan'],
+  startsAt: string,
+  endsAt: string,
+  pesos: number,
+): ClubLicenseTerm {
+  return {
+    id: ref,
+    clubId: clubIdOf(username),
+    plan,
+    startsAt,
+    endsAt,
+    amountMinor: pesos * 100,
+    currency: 'PHP',
+    paidOn,
+    paymentReference: ref,
+  }
+}
+
+/**
+ * Every club's license terms from rotra-admin.html `seedClubs()`, newest first per club. Lahug's are
+ * the shared `licensePayments` (the Queue demo club). Tagbilaran has none. Sample amounts.
+ */
+export const adminClubTerms: ClubLicenseTerm[] = [
+  ...licensePayments,
+  term('itpark.badminton', 'LIC-0009', '2026-10-03', 'Monthly', '2026-10-03', '2026-11-02', 1500),
+  term('itpark.badminton', 'LIC-0008', '2026-09-03', 'Monthly', '2026-09-03', '2026-10-02', 1500),
+  term('itpark.badminton', 'LIC-0007', '2026-08-03', 'Monthly', '2026-08-03', '2026-09-02', 1500),
+  term('itpark.badminton', 'LIC-0006', '2026-06-01', 'Monthly', '2026-06-01', '2026-06-30', 1500),
+  term('itpark.badminton', 'LIC-0005', '2026-05-01', 'Monthly', '2026-05-01', '2026-05-31', 1500),
+  term('matina.smash', 'LIC-0010', '2026-02-14', 'Yearly', '2026-02-15', '2027-02-14', 15000),
+  term('sampaloc.shuttle', 'LIC-0014', '2026-10-10', 'Monthly', '2026-10-10', '2026-11-09', 1500),
+  term('sampaloc.shuttle', 'LIC-0013', '2026-09-10', 'Monthly', '2026-09-10', '2026-10-09', 1500),
+  term('sampaloc.shuttle', 'LIC-0012', '2026-08-08', 'Monthly', '2026-08-10', '2026-09-09', 1500),
+  term('sampaloc.shuttle', 'LIC-0011', '2026-07-10', 'Monthly', '2026-07-10', '2026-08-09', 1500),
+  term('talamban.racket', 'LIC-0017', '2026-09-01', 'Monthly', '2026-09-01', '2026-09-30', 1500),
+  term('talamban.racket', 'LIC-0016', '2026-08-01', 'Monthly', '2026-08-01', '2026-08-31', 1500),
+  term('talamban.racket', 'LIC-0015', '2026-06-01', 'Monthly', '2026-06-01', '2026-07-31', 3000),
+  term('bacolod.rally', 'LIC-0020', '2026-03-20', 'Monthly', '2026-03-20', '2026-04-19', 1500),
+  term('bacolod.rally', 'LIC-0019', '2026-01-20', 'Monthly', '2026-01-20', '2026-03-19', 3000),
+  term('molo.shuttle', 'LIC-0021', '2025-11-05', 'Monthly', '2025-11-05', '2026-03-31', 7500),
+]
+
+/** rotra-admin.html `c.ret` per club: IT Park's cancelled countdown, Bacolod's failed deletion, Molo's deleted pages. */
+const retentionSeeds: Record<string, Omit<ClubRetentionRecord, 'clubId'>> = {
+  'itpark.badminton': {
+    cycles: [{ expired: '2026-07-01', cancelled: '2026-08-03' }],
+    failedOn: null,
+    deletedOn: null,
+  },
+  'bacolod.rally': { cycles: [], failedOn: '2026-10-20', deletedOn: null },
+  'molo.shuttle': { cycles: [], failedOn: null, deletedOn: '2026-10-01' },
+}
+
+export const adminClubRetentionRecords: ClubRetentionRecord[] = clubs.map((club) => ({
+  clubId: club.id,
+  ...(retentionSeeds[club.username] ?? { cycles: [], failedOn: null, deletedOn: null }),
+}))
+
+/**
+ * Access and retention for every club at ADMIN_LICENSE_TODAY, worked out by hand from the terms and
+ * records above with the prototype's access() and retention() (stories only; A02.8 computes them).
+ */
+const licenseStates: Record<string, { access: ClubAccessState; retention: RetentionState }> = {
+  'lahug.smash': {
+    access: { state: 'active', plan: 'Yearly', until: '2027-03-31', days: 155 },
+    retention: { k: 'none' },
+  },
+  'itpark.badminton': {
+    access: { state: 'active', plan: 'Monthly', until: '2026-11-02', days: 6 },
+    retention: { k: 'restored', cycle: { expired: '2026-07-01', cancelled: '2026-08-03' } },
+  },
+  'matina.smash': {
+    access: { state: 'active', plan: 'Yearly', until: '2027-02-14', days: 110 },
+    retention: { k: 'none' },
+  },
+  'sampaloc.shuttle': {
+    access: { state: 'active', plan: 'Monthly', until: '2026-11-09', days: 13 },
+    retention: { k: 'none' },
+  },
+  'talamban.racket': {
+    access: {
+      state: 'expired',
+      plan: 'Monthly',
+      ended: '2026-09-30',
+      since: '2026-10-01',
+      next: null,
+    },
+    retention: {
+      k: 'stale',
+      deleteOn: '2027-04-01',
+      since: '2026-10-01',
+      left: 156,
+      elapsed: 26,
+      total: 182,
+    },
+  },
+  'bacolod.rally': {
+    access: {
+      state: 'expired',
+      plan: 'Monthly',
+      ended: '2026-04-19',
+      since: '2026-04-20',
+      next: null,
+    },
+    retention: { k: 'failed', deleteOn: '2026-10-20', failedOn: '2026-10-20', since: '2026-04-20' },
+  },
+  'molo.shuttle': {
+    access: {
+      state: 'expired',
+      plan: 'Monthly',
+      ended: '2026-03-31',
+      since: '2026-04-01',
+      next: null,
+    },
+    retention: { k: 'deleted', on: '2026-10-01' },
+  },
+  'tagbilaran.circle': { access: { state: 'none' }, retention: { k: 'none' } },
+}
+
+export type AdminClubLicenseState = {
+  id: string
+  /** Whether the club has any recorded term (Activate license vs Renew license) */
+  hasTerms: boolean
+  access: ClubAccessState
+  retention: RetentionState
+}
+
+export const adminClubLicenseStates: AdminClubLicenseState[] = clubs.map((club) => {
+  const state = licenseStates[club.username]
+  if (!state) throw new Error(`License state fixture missing: ${club.username}`)
+  return {
+    id: club.id,
+    hasTerms: adminClubTerms.some((row) => row.clubId === club.id),
+    ...state,
+  }
+})
+
+/**
+ * Retention examples no seeded club is in at ADMIN_LICENSE_TODAY (stories only): Bacolod's countdown
+ * as it would read with deletion still running and no failed attempt.
+ */
+export const retentionExamples = {
+  due: { k: 'due', deleteOn: '2026-10-20', since: '2026-04-20' },
+} satisfies Record<string, RetentionState>

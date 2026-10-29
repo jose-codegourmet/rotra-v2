@@ -222,6 +222,8 @@
     "./player-account/useMyAccount": "./src/player-account/useMyAccount.ts",
     "./fixtures/admin-accounts": "./src/fixtures/adminAccounts.ts",
     "./fixtures/admin-clubs": "./src/fixtures/adminClubs.ts",
+    "./fixtures/admin-audit-events": "./src/fixtures/adminAuditEvents.ts",
+    "./admin-audit/types": "./src/admin-audit/adminAudit.types.ts",
     "./admin-account": "./src/admin-account/fetchers.ts",
     "./admin-account/types": "./src/admin-account/adminAccount.types.ts",
     "./admin-account/cookie": "./src/admin-account/cookie.ts",

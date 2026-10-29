@@ -7,7 +7,7 @@ export const tabsMeta = {
   usage: [
     'Pass items with label, an optional shortLabel for phones, and badges; render one TabsContent per item as children.',
     'Badge longText (" courts in use") hides on phones so tabs fit 375 px without scrolling sideways.',
-    'Use tone="warn" for a badge that needs attention ("2 need attention").',
+    'Use tone="warn" for a badge that needs attention ("2 need attention") and tone="error" for one that failed ("Failed").',
     'For filters that do not switch whole views use SegmentedControl.',
   ],
   prototype: {

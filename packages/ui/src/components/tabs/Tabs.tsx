@@ -9,7 +9,8 @@ export type TabBadge = {
   text: string
   /** Appended on wide screens only, e.g. " courts in use" */
   longText?: string
-  tone?: 'neutral' | 'warn'
+  /** warn: needs attention ("1 request", "Countdown"); error: something failed ("Failed") */
+  tone?: 'neutral' | 'warn' | 'error'
 }
 
 export type TabItem = {
@@ -36,7 +37,11 @@ const badgeClass = (tone: TabBadge['tone']) =>
   cn(
     'inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold whitespace-nowrap',
     'max-[640px]:px-1.5 max-[640px]:py-0 max-[640px]:text-[10px]',
-    tone === 'warn' ? 'border-warn/45 bg-warn-subtle text-warn' : 'border-border-strong text-fg2',
+    tone === 'warn'
+      ? 'border-warn/45 bg-warn-subtle text-warn'
+      : tone === 'error'
+        ? 'border-error/45 bg-error-subtle text-error'
+        : 'border-border-strong text-fg2',
   )
 
 /**

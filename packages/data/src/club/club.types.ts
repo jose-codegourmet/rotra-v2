@@ -1,6 +1,6 @@
 import type { ClubPriceValues } from '@rotra/schema/club-price'
 import type { AdminAuditEvent } from '../admin-audit/adminAudit.types'
-import type { ClubAccessState } from '../license/license.types'
+import type { ClubAccessState, RetentionState } from '../license/license.types'
 
 /** Shared club identity and prototype license prices; all amounts are integer centavos. */
 export type Club = {
@@ -84,7 +84,12 @@ export type AdminClubListItem = {
   licensePricing: 'paid' | 'free'
   licenseMonthlyMinor: number
   licenseYearlyMinor: number
+  /** Whether any term was ever recorded (Renew license vs Activate license) */
+  hasTerms: boolean
+  /** Computed from the terms and today, never stored */
   access: ClubAccessState
+  /** Public pages and their deletion countdown (A-RETENTION), computed like access */
+  retention: RetentionState
   runningSessionTitle: string | null
   /** The requested new name while a request is pending */
   nameRequest: string | null

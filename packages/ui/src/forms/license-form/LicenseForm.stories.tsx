@@ -4,20 +4,11 @@ import {
   adminClubRows,
 } from '@rotra/data/fixtures/admin-clubs'
 import { clubs } from '@rotra/data/fixtures/clubs'
+import { termEnd } from '@rotra/data/license/rules'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import { LicenseForm, type LicenseFormProps } from './LicenseForm'
 import { licenseStatusLine } from './LicenseForm.helpers'
-import type { LicensePlan } from './LicenseForm.schema'
-
-/** rotra-admin.html termEnd(): one month or twelve on, less a day (stories only; A02.8 owns the rule). */
-function termEnd(from: string, plan: LicensePlan) {
-  const [y = 0, m = 1, d = 1] = from.split('-').map(Number)
-  const months = plan === 'Yearly' ? 12 : 1
-  const lastDay = new Date(Date.UTC(y, m - 1 + months + 1, 0)).getUTCDate()
-  const end = new Date(Date.UTC(y, m - 1 + months, Math.min(d, lastDay) - 1))
-  return end.toISOString().slice(0, 10)
-}
 
 function clubProps(username: string) {
   const club = clubs.find((row) => row.username === username)

@@ -9,12 +9,15 @@ import type { ClubPlayer } from '../club-player/clubPlayer.types'
 import type { ClubVenue } from '../club-venue/clubVenue.types'
 import type { ContactChangeRequest } from '../contact-change-request/contactChangeRequest.types'
 import { createAdminAuditEvents } from '../fixtures/adminAuditEvents'
-import { createAdminClubFixtures } from '../fixtures/adminClubs'
+import {
+  adminClubRetentionRecords,
+  adminClubTerms,
+  createAdminClubFixtures,
+} from '../fixtures/adminClubs'
 import { clubs } from '../fixtures/clubs'
 import { contactChangeRequests } from '../fixtures/contactChangeRequests'
 import { createFinancialFixtures } from '../fixtures/financials'
 import { inventoryItems } from '../fixtures/inventory'
-import { licensePayments } from '../fixtures/licensePayments'
 import { claimLinks, playerAccounts } from '../fixtures/playerAccounts'
 import { playerAwardHistory } from '../fixtures/playerAwardHistory'
 import { playerProfiles } from '../fixtures/playerProfiles'
@@ -25,7 +28,7 @@ import { rankingSettings } from '../fixtures/rankingSettings'
 import { createSessionPublicationFixtures } from '../fixtures/sessionPublications'
 import { venues } from '../fixtures/venues'
 import type { InventoryItem } from '../inventory/inventory.types'
-import type { ClubLicenseTerm } from '../license/license.types'
+import type { ClubLicenseTerm, ClubRetentionRecord } from '../license/license.types'
 import type { Match } from '../match/match.types'
 import type { Player, PlayerProfile, PlayerRank, PlayerSessionRecord } from '../player/player.types'
 import type { ClaimLinkRecord } from '../player-account/playerAccount.types'
@@ -81,7 +84,10 @@ export type MockState = {
   roster: SessionPlayer[]
   waitlist: SessionWaitlistEntry[]
   joinRequests: SessionJoinRequest[]
+  /** Every club's license terms (Admin A-LICENSE); Queue reads the demo club's as its payments */
   licensePayments: ClubLicenseTerm[]
+  /** Admin: public-page retention per club (cancelled countdowns, failed or finished deletion) */
+  clubRetentionRecords: ClubRetentionRecord[]
   downloads: Record<string, DownloadState>
   downloadInfo: Record<string, { downloadedAt: number | null; error?: string }>
   sync: SyncState
@@ -148,7 +154,8 @@ function seedState(): MockState {
     roster: [...roster, ...history.roster],
     waitlist: [],
     joinRequests: [],
-    licensePayments,
+    licensePayments: adminClubTerms,
+    clubRetentionRecords: adminClubRetentionRecords,
     downloads: {},
     downloadInfo: {},
     sessionIntegrity: {},

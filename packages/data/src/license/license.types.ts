@@ -1,13 +1,29 @@
+/** Monthly or yearly; the casing the Queue payment history and the Admin forms already show. */
+export type LicensePlan = 'Monthly' | 'Yearly'
+
+/**
+ * One license term the platform owner recorded (`club_license_terms`): the payment history the club
+ * sees and the source of access and retention. Dates are `YYYY-MM-DD`; `endsAt` is the last licensed
+ * day. A free club's term is recorded at 0 with `paidOn` null. Never edited once recorded.
+ */
 export type ClubLicenseTerm = {
   id: string
   clubId: string
-  plan: 'Monthly' | 'Yearly'
+  plan: LicensePlan
   startsAt: string
   endsAt: string
   amountMinor: number
   currency: 'PHP'
   paidOn: string | null
+  /** Short reference shown to the club, e.g. LIC-0004; may be empty */
   paymentReference: string
+  /** Optional operational note */
+  notes?: string
+  /** ISO time the term was recorded */
+  activatedAt: string
+  activatedByEmail: string
+  /** Idempotency key of the Activate/Renew command that recorded it */
+  sourceCommandId: string
 }
 
 export type ClubAccess = {
@@ -21,10 +37,10 @@ export type ClubAccess = {
  * components only format it. Named apart from `ClubAccess`, which is the Queue app's gate state.
  */
 export type ClubAccessState =
-  | { state: 'active'; plan: ClubLicenseTerm['plan']; until: string; days: number }
+  | { state: 'active'; plan: LicensePlan; until: string; days: number }
   | {
       state: 'expired'
-      plan: ClubLicenseTerm['plan']
+      plan: LicensePlan
       /** Last licensed day */
       ended: string
       /** First unlicensed day */
@@ -32,12 +48,14 @@ export type ClubAccessState =
       /** Start of a future term already recorded, if any */
       next: string | null
     }
-  | { state: 'scheduled'; plan: ClubLicenseTerm['plan']; starts: string }
+  | { state: 'scheduled'; plan: LicensePlan; starts: string }
   | { state: 'none' }
 
 /**
  * One expiry cycle: the six-month countdown that starts when a license ends (`club_expiry_cycles`).
- * `expired` is the first unlicensed day; `cancelled` is the renewal that stopped the countdown.
+ * `expired` is the first unlicensed day; `cancelled` is the renewal that stopped the countdown. The
+ * mock records only cancelled cycles: the running one is derived from the terms (its delete date is
+ * six months after `expired`), so a later expiry always starts a fresh countdown.
  */
 export type ClubExpiryCycle = {
   expired: string
@@ -79,3 +97,33 @@ export type RetentionState =
   | { k: 'due'; deleteOn: string; since: string }
   | { k: 'failed'; deleteOn: string; failedOn: string; since: string }
   | { k: 'deleted'; on: string }
+
+/** A-LICENSE's prefilled values (rotra-admin.html licStart()); amounts are integer centavos. */
+export type LicenseDraft = {
+  /** The club's latest plan; null when it never had one */
+  plan: LicensePlan | null
+  startsOn: string
+  paidOn: string
+  /** The club's price for the plan, 0 for a free club, null until a plan is chosen */
+  amountMinor: number | null
+  reference: string
+}
+
+/** What D-LICENSE › Activate/Renew license sends. One sourceCommandId per review, kept across retries. */
+export type ActivateLicenseInput = {
+  clubId: string
+  plan: LicensePlan
+  startsOn: string
+  /** Ignored for a free club (recorded as null) */
+  paidOn: string | null
+  /** Ignored for a free club (recorded as 0) */
+  amountMinor: number
+  reference: string
+  sourceCommandId: string
+}
+
+/** A recorded Activate/Renew command: the term it added and whether it was the club's first. */
+export type LicenseOperation = {
+  term: ClubLicenseTerm
+  verb: 'Activated' | 'Renewed'
+}

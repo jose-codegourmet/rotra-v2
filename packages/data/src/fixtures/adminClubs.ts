@@ -10,7 +10,7 @@ import type {
   RetentionState,
 } from '../license/license.types'
 import { clubs } from './clubs'
-import { licensePayments } from './licensePayments'
+import { licensePayments, seededActivation } from './licensePayments'
 
 /**
  * Admin directory extras from rotra-admin.html `seedClubs()` that the shared club fixture does not
@@ -240,6 +240,7 @@ function term(
     currency: 'PHP',
     paidOn,
     paymentReference: ref,
+    ...seededActivation(paidOn, ref),
   }
 }
 
@@ -285,7 +286,8 @@ export const adminClubRetentionRecords: ClubRetentionRecord[] = clubs.map((club)
 
 /**
  * Access and retention for every club at ADMIN_LICENSE_TODAY, worked out by hand from the terms and
- * records above with the prototype's access() and retention() (stories only; A02.8 computes them).
+ * records above with the prototype's access() and retention() (stories only). The app computes them
+ * with license.rules accessOf/retentionOf; license.rules.test checks they agree with these.
  */
 const licenseStates: Record<string, { access: ClubAccessState; retention: RetentionState }> = {
   'lahug.smash': {

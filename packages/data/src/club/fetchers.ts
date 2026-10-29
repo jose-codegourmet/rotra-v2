@@ -8,9 +8,8 @@ import { adminMutation } from '../admin-account/mutation'
 import type { AdminAuditAction } from '../admin-audit/adminAudit.types'
 import { appendAdminAudit } from '../admin-audit/fetchers'
 import { nonAdminAccounts } from '../fixtures/adminAccounts'
-import { adminClubLicenseStates } from '../fixtures/adminClubs'
 import { foundingCities } from '../fixtures/foundingCities'
-import type { ClubAccessState } from '../license/license.types'
+import { accessOf, manilaToday, retentionOf } from '../license/license.rules'
 import { requireOnline } from '../mock/bridge'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
@@ -63,12 +62,21 @@ const NAME_TAKEN = 'A club with this name already exists.'
 const USERNAME_TAKEN = 'That username is already taken.'
 
 /**
- * Placeholder until A02.8 computes access from license terms and today's date: the access A02.4
- * worked out for each seeded club at ADMIN_LICENSE_TODAY. A club added since has no license.
+ * The club's license access and public-page retention today, computed from its recorded terms and
+ * retention record (never stored). Today is the Manila calendar date.
  */
-function accessOf(clubId: string): ClubAccessState {
-  const access = adminClubLicenseStates.find((row) => row.id === clubId)?.access
-  return access ? structuredClone(access) : { state: 'none' }
+function licenseOf(
+  state: MockState,
+  clubId: string,
+): Pick<AdminClubListItem, 'hasTerms' | 'access' | 'retention'> {
+  const terms = state.licensePayments.filter((term) => term.clubId === clubId)
+  const record = state.clubRetentionRecords.find((entry) => entry.clubId === clubId)
+  const today = manilaToday()
+  return {
+    hasTerms: terms.length > 0,
+    access: accessOf(terms, today),
+    retention: retentionOf(terms, record, today),
+  }
 }
 
 const pendingRequestOf = (state: MockState, clubId: string) =>
@@ -112,7 +120,7 @@ function listItemOf(state: MockState, club: Club): AdminClubListItem {
     licensePricing: club.licensePricing,
     licenseMonthlyMinor: club.licenseMonthlyMinor,
     licenseYearlyMinor: club.licenseYearlyMinor,
-    access: accessOf(club.id),
+    ...licenseOf(state, club.id),
     runningSessionTitle: record?.runningSession?.title ?? null,
     nameRequest: pendingRequestOf(state, club.id)?.requestedName ?? null,
     earlierNames: record?.earlierNames ?? [],

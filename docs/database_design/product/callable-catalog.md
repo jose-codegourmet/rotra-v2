@@ -124,9 +124,12 @@ Every entry inherits its actor, business/screen issue mapping, lifecycle, error,
 
 | Callable / current input | Output | Hook module exports |
 |---|---|---|
-| [getClubAccess](../../../packages/data/src/license/fetchers.ts#L6)<br>`(no arguments)` | `Promise<ClubAccess>` | [useClubAccess](../../../packages/data/src/license/useClubAccess.ts) |
-| [getClubLicense](../../../packages/data/src/license/fetchers.ts#L21)<br>`(no arguments)` | `Promise<{ plan: "Monthly" \| "Yearly"; activeSince: string; activeUntil: string; daysLeft: number; status: "active" \| "expired" \| "unverified"; } \| null>` | [useClubLicense](../../../packages/data/src/license/useClubLicense.ts) |
-| [getLicensePayments](../../../packages/data/src/license/fetchers.ts#L14)<br>`(no arguments)` | `Promise<ClubLicenseTerm[]>` | [useLicensePayments](../../../packages/data/src/license/useLicensePayments.ts) |
+| [getClubAccess](../../../packages/data/src/license/fetchers.ts#L26)<br>`(no arguments)` | `Promise<ClubAccess>` | [useClubAccess](../../../packages/data/src/license/useClubAccess.ts) |
+| [getClubLicense](../../../packages/data/src/license/fetchers.ts#L41)<br>`(no arguments)` | `Promise<{ plan: "Monthly" \| "Yearly"; activeSince: string; activeUntil: string; daysLeft: number; status: "active" \| "expired" \| "unverified"; } \| null>` | [useClubLicense](../../../packages/data/src/license/useClubLicense.ts) |
+| [getLicensePayments](../../../packages/data/src/license/fetchers.ts#L34)<br>`(no arguments)` | `Promise<ClubLicenseTerm[]>` | [useLicensePayments](../../../packages/data/src/license/useLicensePayments.ts) |
+| [listLicenseTerms](../../../packages/data/src/license/fetchers.ts#L102)<br>`clubId: string, signal?: AbortSignal \| undefined` | `Promise<ClubLicenseTerm[]>` | [useLicenseTerms](../../../packages/data/src/license/useLicenseTerms.ts) |
+| [activateLicense](../../../packages/data/src/license/fetchers.ts#L134)<br>`input: ActivateLicenseInput` | `Promise<LicenseOperation>` | [useActivateLicense](../../../packages/data/src/license/useActivateLicense.ts) |
+| [getLicenseOperation](../../../packages/data/src/license/fetchers.ts#L195)<br>`sourceCommandId: string, signal?: AbortSignal \| undefined` | `Promise<LicenseOperation \| null>` | [useCheckLicenseOperation](../../../packages/data/src/license/useCheckLicenseOperation.ts) |
 
 ## match
 

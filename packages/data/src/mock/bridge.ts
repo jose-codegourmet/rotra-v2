@@ -3,6 +3,8 @@ import { MockError } from './errors'
 export type MockDevState = {
   adminDeniedNextSignIn?: boolean
   adminNextSignInRejected?: boolean
+  /** Admin: the next Activate/Renew license is saved but its reply is lost */
+  adminNextLicenseSaveNoReply?: boolean
   offline: boolean
   licenseExpired: boolean
   nextSaveFails: boolean
@@ -47,6 +49,7 @@ type ConsumableToggle =
   | 'nextSaveConflict'
   | 'adminDeniedNextSignIn'
   | 'adminNextSignInRejected'
+  | 'adminNextLicenseSaveNoReply'
 let consume = (_key: ConsumableToggle) => {}
 const listeners = new Set<() => void>()
 const saveFailureListeners = new Set<() => void>()

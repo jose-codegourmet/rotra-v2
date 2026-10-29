@@ -1,6 +1,6 @@
-import { type ClubPriceValues, yearlySavingPercent } from '@rotra/schema/club-price'
-import { formatPeso } from '@rotra/schema/money'
+import type { ClubPriceValues } from '@rotra/schema/club-price'
 import { Button } from '@rotra/ui/button'
+import { clubPriceLine } from '@rotra/ui/forms/club-price-fields/helpers'
 import { KeyValueList } from '@rotra/ui/key-value-list'
 import { SheetSteps } from '@rotra/ui/sheet-steps'
 
@@ -29,13 +29,6 @@ export type AddClubReviewProps = {
 
 const STEPS = ['Details', 'Review']
 
-/** rotra-admin.html priceLine(). */
-function priceLine(price: ClubPriceValues) {
-  if (price.pricing === 'free') return 'Free (tester club)'
-  const saving = yearlySavingPercent(price.monthly, price.yearly)
-  return `${formatPeso(price.monthly)} a month · ${formatPeso(price.yearly)} a year${saving > 0 ? ` (${saving}% off)` : ''}`
-}
-
 /** A-ADD-CLUB step 2: every value except the password, what happens next, and Create club. */
 export function AddClubReview({
   values,
@@ -63,7 +56,7 @@ export function AddClubReview({
           },
           { label: 'Username', value: <span className="font-mono">{values.username}</span> },
           { label: 'Password', value: `Set · ${values.passwordLength} characters` },
-          { label: 'Price', value: priceLine(values.price) },
+          { label: 'Price', value: clubPriceLine(values.price) },
         ]}
       />
       <div className="flex flex-col gap-1.5">

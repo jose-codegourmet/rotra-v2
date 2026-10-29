@@ -23,8 +23,8 @@ const PRICING_CHOICES: Choice[] = [
   { value: 'free', title: 'Free', description: 'For tester clubs. Licenses are recorded at ₱0.' },
 ]
 
-/** The prototypes' .affix: a ₱ block joined to the left of the input. */
-function PesoInput(props: TextInputProps) {
+/** The prototypes' .affix: a ₱ block joined to the left of the input (also used by LicenseForm). */
+export function PesoInput(props: TextInputProps) {
   return (
     <div className="flex items-stretch">
       <b

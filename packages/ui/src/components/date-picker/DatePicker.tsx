@@ -10,7 +10,7 @@ import { Popover } from 'radix-ui'
 import { type Ref, useState } from 'react'
 import { formatLongDate, todayYmd } from './date-calendar/DateCalendar.helpers'
 
-export type DatePickerProps = Pick<DateCalendarProps, 'min' | 'markedDates' | 'markedLabel'> & {
+export type DatePickerProps = Pick<DateCalendarProps, 'min' | 'max' | 'markedDates' | 'markedLabel'> & {
   /** "YYYY-MM-DD" or '' */
   value?: string
   onChange?: (ymd: string) => void
@@ -39,6 +39,7 @@ export function DatePicker({
   disabled,
   invalid,
   min,
+  max,
   markedDates,
   markedLabel,
   markedLegend,
@@ -96,6 +97,7 @@ export function DatePicker({
             value={value}
             onChange={pick}
             min={min}
+            max={max}
             markedDates={markedDates}
             markedLabel={markedLabel}
           />
@@ -108,7 +110,7 @@ export function DatePicker({
             ) : (
               <span>Use the arrow keys to move between days.</span>
             )}
-            <Button size="xs" disabled={min ? today < min : false} onClick={() => pick(today)}>
+            <Button size="xs" disabled={(min ? today < min : false) || (max ? today > max : false)} onClick={() => pick(today)}>
               Today
             </Button>
           </div>

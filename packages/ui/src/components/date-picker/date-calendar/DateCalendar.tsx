@@ -22,6 +22,8 @@ export type DateCalendarProps = {
   onChange: (ymd: string) => void
   /** Days before this "YYYY-MM-DD" are disabled (session setup passes today) */
   min?: string
+  /** Days after this "YYYY-MM-DD" are disabled (a payment date passes today) */
+  max?: string
   /** Days that get a dot, e.g. days the club already has a session */
   markedDates?: string[]
   /** Read after a marked day's name, e.g. "your club has a session" */
@@ -44,6 +46,7 @@ export function DateCalendar({
   value,
   onChange,
   min,
+  max,
   markedDates,
   markedLabel = 'marked',
   className,
@@ -60,7 +63,7 @@ export function DateCalendar({
     gridRef.current?.querySelector<HTMLButtonElement>(`[data-ymd="${focusYmd}"]`)?.focus()
   }, [focusYmd])
 
-  const isDisabled = (ymd: string) => (min ? ymd < min : false)
+  const isDisabled = (ymd: string) => (min ? ymd < min : false) || (max ? ymd > max : false)
   const lead = view.getDay()
   const daysInMonth = new Date(view.getFullYear(), view.getMonth() + 1, 0).getDate()
   const days = Array.from({ length: daysInMonth }, (_, i) =>
@@ -70,6 +73,7 @@ export function DateCalendar({
   const tabStop =
     (value && days.includes(value) ? value : undefined) ?? days.find((d) => !isDisabled(d))
   const prevDisabled = min ? toYmd(addDays(view, -1)) < min : false
+  const nextDisabled = max ? toYmd(addMonths(view, 1)) > max : false
 
   const onKeyDown = (event: KeyboardEvent<HTMLButtonElement>, ymd: string) => {
     const step = ARROW_STEP[event.key]
@@ -97,7 +101,12 @@ export function DateCalendar({
         <h3 aria-live="polite" className="text-base">
           {formatMonth(view)}
         </h3>
-        <IconButton size="sm" label="Next month" onClick={() => setView(addMonths(view, 1))}>
+        <IconButton
+          size="sm"
+          label="Next month"
+          disabled={nextDisabled}
+          onClick={() => setView(addMonths(view, 1))}
+        >
           <Icon name="back" className="rotate-180" />
         </IconButton>
       </div>

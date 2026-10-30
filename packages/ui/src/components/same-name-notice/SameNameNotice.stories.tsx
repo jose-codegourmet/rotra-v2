@@ -6,7 +6,9 @@ import { SameNameNotice } from './SameNameNotice'
 const [, twin] = adminPlayerScenarios.sameName
 if (!twin) throw new Error('Same-name fixture missing')
 
-const meta = {
+// Annotated, not `satisfies`: with union props, `satisfies` narrows every story's args to the
+// meta's 'list' variant, so the 'detail' stories couldn't type-check.
+const meta: Meta<typeof SameNameNotice> = {
   title: 'Admin/SameNameNotice',
   component: SameNameNotice,
   args: { variant: 'list', groups: sameNameGroupExamples.one },
@@ -17,10 +19,10 @@ const meta = {
       </div>
     ),
   ],
-} satisfies Meta<typeof SameNameNotice>
+}
 
 export default meta
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<typeof SameNameNotice>
 
 export const List: Story = {}
 export const ListSeveralNames: Story = {

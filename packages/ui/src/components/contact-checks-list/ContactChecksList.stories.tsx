@@ -12,6 +12,7 @@ import { ContactChecksList } from './ContactChecksList'
 const { now } = adminContactReviewExamples
 // Karl's two email requests (prototype r3/r4): the older one is blocked by the newer.
 const [newer] = adminContactRequestExamples.twoEmails
+if (!newer) throw new Error('Two-email request fixture missing')
 
 // Story-only conflict: Jose's requested phone (prototype r2's case) already belongs to Raymark.
 const raymark = players.find((player) => player.fullName === 'Raymark')

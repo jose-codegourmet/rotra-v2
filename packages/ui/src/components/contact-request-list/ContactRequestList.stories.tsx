@@ -1,6 +1,6 @@
 import type { ContactChangeRequest } from '@rotra/data/contact-change-request/types'
 import { adminContactRequestExamples } from '@rotra/data/fixtures/contact-change-requests'
-import { Chip, type ChipProps } from '@rotra/ui/chip'
+import { ContactRequestStatusChip } from '@rotra/ui/contact-request-status-chip'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import {
@@ -9,15 +9,6 @@ import {
   type ContactRequestNextAction,
 } from './ContactRequestList'
 
-// The Admin prototype's REQ chips; A03.3's ContactRequestStatusChip replaces this story-only map.
-const CHIP: Record<ContactChangeRequest['status'], { label: string; tone: ChipProps['tone'] }> = {
-  pending: { label: 'Waiting for review', tone: 'warn' },
-  approved: { label: 'Approved · applying', tone: 'warn' },
-  applying: { label: 'Approved · applying', tone: 'warn' },
-  applied: { label: 'Applied', tone: 'accent' },
-  failed: { label: 'Needs attention', tone: 'error' },
-  rejected: { label: 'Not approved', tone: 'neutral' },
-}
 // The prototype's nextAction() without the blocked checks; rows pass 'Review · blocked' themselves.
 const ACTION: Record<ContactChangeRequest['status'], ContactRequestNextAction> = {
   pending: 'Review',
@@ -32,14 +23,13 @@ function toItem(
   request: ContactChangeRequest,
   action = ACTION[request.status],
 ): ContactRequestListItem {
-  const chip = CHIP[request.status]
   return {
     id: request.requestId,
     field: request.field,
     from: request.fromValue,
     to: request.toValue,
     requestedAt: request.requestedAt,
-    status: <Chip tone={chip.tone}>{chip.label}</Chip>,
+    status: <ContactRequestStatusChip status={request.status} />,
     action,
   }
 }

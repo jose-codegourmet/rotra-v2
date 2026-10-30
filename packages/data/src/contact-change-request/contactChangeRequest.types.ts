@@ -30,3 +30,20 @@ export const OPEN_CONTACT_CHANGE_STATUSES: readonly ContactChangeStatus[] = [
   'applying',
   'failed',
 ]
+
+/** Where the request came from: the player's signed-in account, or the owner typed it in for them. */
+export type ContactChangeSource = 'app' | 'owner'
+
+/**
+ * The Admin review's view of a request (rotra-admin.html seedRequests): the player request plus its
+ * source and the decision/application times. All times are epoch ms.
+ */
+export type AdminContactChangeRequest = ContactChangeRequest & {
+  source: ContactChangeSource
+  approvedAt?: number
+  appliedAt?: number
+  /** When a rejected request was declined */
+  decidedAt?: number
+  /** Why an approved change couldn't be applied (status 'failed') */
+  error?: string
+}

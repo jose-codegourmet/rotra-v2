@@ -1,4 +1,7 @@
-import type { ContactChangeRequest } from '../contact-change-request/contactChangeRequest.types'
+import type {
+  AdminContactChangeRequest,
+  ContactChangeRequest,
+} from '../contact-change-request/contactChangeRequest.types'
 import { PLAYER_FIXTURE_NOW } from './playerGames'
 
 // Starts empty, as the prototype does: Jose sends a request from Privacy and contact.
@@ -24,9 +27,11 @@ export const contactRequestFixtureIds = {
   r9: 'contact-request-r9',
 }
 
-const HOUR = 60 * 60 * 1000
+const MINUTE = 60 * 1000
+const HOUR = 60 * MINUTE
 const KARL_ID = 'd720c601-da89-5474-9351-00e2fb966e56'
 const JOSE_ID = '2c7f6a7b-eed9-5051-9426-6dbce5133fbc'
+const RAYMARK_ID = 'bc4c3446-0131-591b-ab03-af19225dbe8a'
 const at = (hoursAgo: number) => PLAYER_FIXTURE_NOW.getTime() - hoursAgo * HOUR
 
 /**
@@ -75,3 +80,88 @@ export const adminContactRequestExamples = {
     requestedAt: at(hoursAgo),
   })),
 } satisfies { now: Date; twoEmails: ContactChangeRequest[]; oneOfEach: ContactChangeRequest[] }
+
+/**
+ * Story-only requests for the Admin contact review (rotra-admin.html seedRequests r1, r5–r9), one per
+ * status plus an owner-entered one, relative to `now`. Jose stands in for the prototype's Miguel
+ * Santos (r1's values are his real phone) and Raymark for the other players; current values match
+ * their accounts. Never in the mock store; A03.6 owns the Admin request fixtures.
+ */
+export const adminContactReviewExamples = {
+  now: PLAYER_FIXTURE_NOW,
+  /** r1 */
+  pending: {
+    requestId: 'story-contact-request-r1',
+    playerId: JOSE_ID,
+    field: 'phone',
+    fromValue: '+63 917 555 0142',
+    toValue: '+63 927 555 0198',
+    status: 'pending',
+    requestedAt: at(2),
+    source: 'app',
+  },
+  /** r5: the player contacted the owner, who entered the request */
+  fromOwner: {
+    requestId: 'story-contact-request-r5',
+    playerId: RAYMARK_ID,
+    field: 'email',
+    fromValue: 'raymark@example.com',
+    toValue: 'raymark.smash@example.com',
+    status: 'pending',
+    requestedAt: at(26),
+    source: 'owner',
+  },
+  /** r6 */
+  applying: {
+    requestId: 'story-contact-request-r6',
+    playerId: RAYMARK_ID,
+    field: 'phone',
+    fromValue: '+63 918 555 0377',
+    toValue: '+63 918 555 0415',
+    status: 'applying',
+    requestedAt: at(30),
+    source: 'app',
+    approvedAt: at(0) - 12 * MINUTE,
+  },
+  /** r7 */
+  failed: {
+    requestId: 'story-contact-request-r7',
+    playerId: JOSE_ID,
+    field: 'phone',
+    fromValue: '+63 917 555 0142',
+    toValue: '+63 917 555 0990',
+    status: 'failed',
+    requestedAt: at(48),
+    source: 'app',
+    approvedAt: at(24),
+    error: "The sign-in provider didn't accept the new number.",
+  },
+  /** r8 */
+  applied: {
+    requestId: 'story-contact-request-r8',
+    playerId: JOSE_ID,
+    field: 'email',
+    fromValue: contactChangeExamples.email.from,
+    toValue: contactChangeExamples.email.to,
+    status: 'applied',
+    requestedAt: at(96),
+    source: 'app',
+    approvedAt: at(72),
+    appliedAt: at(72) + 40 * 1000,
+  },
+  /** r9 */
+  rejected: {
+    requestId: 'story-contact-request-r9',
+    playerId: RAYMARK_ID,
+    field: 'email',
+    fromValue: 'raymark@example.com',
+    toValue: 'raymark.m@example.com',
+    status: 'rejected',
+    requestedAt: at(144),
+    source: 'app',
+    decidedAt: at(120),
+  },
+} satisfies { now: Date } & Record<
+  'pending' | 'fromOwner' | 'applying' | 'failed' | 'applied' | 'rejected',
+  AdminContactChangeRequest
+>

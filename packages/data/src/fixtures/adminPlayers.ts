@@ -1,7 +1,8 @@
 import type { PlayerRankStatus, SameNameGroup } from '../admin-player/adminPlayer.types'
-import type { Player } from '../player/player.types'
+import type { Player, PlayingLevel } from '../player/player.types'
+import { playerAccounts } from './playerAccounts'
 import { playerProfileScenarios } from './playerProfiles'
-import { clubPlayers, players } from './players'
+import { clubPlayers, leaderboardLevels, players } from './players'
 
 function playerById(id: string): Player {
   const player = players.find((entry) => entry.id === id)
@@ -48,3 +49,65 @@ export const rankStatusExamples = {
   below: { kind: 'below' },
   board: { kind: 'board' },
 } satisfies Record<PlayerRankStatus['kind'], PlayerRankStatus>
+
+const raymark = playerById('bc4c3446-0131-591b-ab03-af19225dbe8a')
+const joseAccount = playerAccounts.find((account) => account.playerId === jose.id)
+const raymarkAccount = playerAccounts.find((account) => account.playerId === raymark.id)
+const joseLevel = leaderboardLevels[jose.id]
+const raymarkLevel = leaderboardLevels[raymark.id]
+if (!joseAccount || !raymarkAccount || !joseLevel || !raymarkLevel) {
+  throw new Error('Missing Admin player detail fixtures.')
+}
+
+/**
+ * Story data for the Admin player detail cards (rotra-admin.html viewPlayer). Jose stands in for the
+ * prototype's Miguel Santos (same RTR ID, phone hidden) and Raymark for Jomar dela Cruz (same RTR ID).
+ * Every demo player is registered and on the leaderboard, so the unclaimed, below-requirement and
+ * no-rank values are story-only and never in the mock store. Recent-match counts are the prototype's.
+ */
+export const adminPlayerDetailExamples = {
+  identity: {
+    jose: {
+      fullName: jose.fullName,
+      nickname: jose.nickname,
+      rtrId: jose.rtrId,
+      createdOn: '2026-03-15',
+      createdBy: 'Lahug Smash Club',
+    },
+    nicknamed: {
+      fullName: mariaSteph.fullName,
+      nickname: mariaStephNickname,
+      rtrId: mariaSteph.rtrId,
+      createdOn: '2026-06-11',
+      createdBy: 'Lahug Smash Club',
+    },
+  },
+  contact: {
+    registered: {
+      phone: raymarkAccount.phone,
+      email: raymarkAccount.email,
+      claimed: true,
+      phoneHidden: false,
+    },
+    hidden: {
+      phone: joseAccount.phone,
+      email: joseAccount.email,
+      claimed: true,
+      phoneHidden: true,
+    },
+    /** The club typed the phone; there is no email ('' = not given) until the player registers. */
+    unclaimed: { phone: raymarkAccount.phone, email: '', claimed: false, phoneHidden: false },
+  },
+  account: {
+    registered: { claimed: true, registeredOn: '2026-03-18' },
+    unclaimed: { claimed: false },
+  },
+  rank: {
+    board: { status: { kind: 'board' }, level: joseLevel, recentMatches: 12 },
+    below: { status: { kind: 'below' }, level: raymarkLevel, recentMatches: 9 },
+    none: { status: { kind: 'none' }, level: null, recentMatches: 2 },
+  } satisfies Record<
+    PlayerRankStatus['kind'],
+    { status: PlayerRankStatus; level: PlayingLevel | null; recentMatches: number }
+  >,
+} as const

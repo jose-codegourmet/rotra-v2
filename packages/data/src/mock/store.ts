@@ -3,6 +3,7 @@ import type { AdminClubRecord, Club, ClubAccount, ClubNameChangeRequest } from '
 import type { ClubPlayer } from '../club-player/clubPlayer.types'
 import type { ClubVenue } from '../club-venue/clubVenue.types'
 import type { PlayerContactChangeRequest } from '../contact-change-request/contactChangeRequest.types'
+import type { FeatureFlag } from '../feature-flag/featureFlag.types'
 import { createAdminAuditEvents } from '../fixtures/adminAuditEvents'
 import {
   adminClubRetentionRecords,
@@ -11,6 +12,7 @@ import {
 } from '../fixtures/adminClubs'
 import { clubs } from '../fixtures/clubs'
 import { createContactChangeRequestFixtures } from '../fixtures/contactChangeRequests'
+import { featureFlags } from '../fixtures/featureFlags'
 import { createFinancialFixtures } from '../fixtures/financials'
 import { inventoryItems } from '../fixtures/inventory'
 import { claimLinks, playerAccounts } from '../fixtures/playerAccounts'
@@ -73,6 +75,8 @@ export type MockState = {
   adminAuditEvents: AdminAuditEvent[]
   /** Admin Add club replays: source command ID → the club it created */
   adminCommands: Record<string, { clubId: string }>
+  /** Admin feature flags in list order; the catalog starts empty */
+  featureFlags: FeatureFlag[]
   venues: ClubVenue[]
   players: Player[]
   clubPlayers: ClubPlayer[]
@@ -143,6 +147,7 @@ function seedState(): MockState {
     ...createAdminClubFixtures(now),
     adminAuditEvents: createAdminAuditEvents(now),
     adminCommands: {},
+    featureFlags,
     venues,
     players,
     clubPlayers,

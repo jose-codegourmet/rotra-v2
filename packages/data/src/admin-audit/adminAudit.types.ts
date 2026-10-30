@@ -21,6 +21,8 @@ export type AdminAuditAction =
   | 'contact_change_applied'
   | 'contact_change_application_failed'
   | 'contact_change_application_retried'
+  | 'feature_flag_created'
+  | 'feature_flag_value_changed'
 
 /**
  * One line of the Admin "Record of actions": who did what to which record, and when. Append-only;

@@ -282,7 +282,14 @@
     "./fixtures/contact-change-requests": "./src/fixtures/contactChangeRequests.ts",
     "./player-account/useSetPhonePrivacy": "./src/player-account/useSetPhonePrivacy.ts",
     "./feature-flag/types": "./src/feature-flag/featureFlag.types.ts",
-    "./fixtures/feature-flags": "./src/fixtures/featureFlags.ts"
+    "./fixtures/feature-flags": "./src/fixtures/featureFlags.ts",
+    "./feature-flag/rules": "./src/feature-flag/featureFlag.rules.ts",
+    "./feature-flag/query-keys": "./src/feature-flag/queryKeys.ts",
+    "./feature-flag/fetchers": "./src/feature-flag/fetchers.ts",
+    "./feature-flag/useFeatureFlags": "./src/feature-flag/useFeatureFlags.ts",
+    "./feature-flag/useAddFeatureFlag": "./src/feature-flag/useAddFeatureFlag.ts",
+    "./feature-flag/useSetFeatureFlagValue": "./src/feature-flag/useSetFeatureFlagValue.ts",
+    "./feature-flag/usePlaceholderFeatureFlag": "./src/feature-flag/usePlaceholderFeatureFlag.ts"
   },
   "scripts": {
     "lint": "biome check .",

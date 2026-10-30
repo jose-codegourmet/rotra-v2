@@ -12,7 +12,8 @@
     "./name": "./src/name.ts",
     "./personal-details": "./src/personal-details.ts",
     "./social-link": "./src/social-link.ts",
-    "./club-price": "./src/club-price.ts"
+    "./club-price": "./src/club-price.ts",
+    "./ranking-settings": "./src/ranking-settings.ts"
   },
   "scripts": {
     "lint": "biome check .",

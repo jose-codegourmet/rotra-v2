@@ -317,7 +317,12 @@
     "./sign-out-card": "./src/components/sign-out-card/SignOutCard.tsx",
     "./contact-change-request-form": "./src/forms/contact-change-request-form/ContactChangeRequestForm.tsx",
     "./contact-change-request-form/schema": "./src/forms/contact-change-request-form/ContactChangeRequestForm.schema.ts",
-    "./contact-change-request-form/default-values": "./src/forms/contact-change-request-form/ContactChangeRequestForm.defaultValues.ts"
+    "./contact-change-request-form/default-values": "./src/forms/contact-change-request-form/ContactChangeRequestForm.defaultValues.ts",
+    "./weight-split-bar": "./src/components/weight-split-bar/WeightSplitBar.tsx",
+    "./config-diff": "./src/components/config-diff/ConfigDiff.tsx",
+    "./ranking-settings-form": "./src/forms/ranking-settings-form/RankingSettingsForm.tsx",
+    "./ranking-settings-form/schema": "./src/forms/ranking-settings-form/RankingSettingsForm.schema.ts",
+    "./ranking-settings-form/default-values": "./src/forms/ranking-settings-form/RankingSettingsForm.defaultValues.ts"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

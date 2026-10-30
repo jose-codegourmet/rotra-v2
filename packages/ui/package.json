@@ -320,6 +320,9 @@
     "./contact-change-request-form/default-values": "./src/forms/contact-change-request-form/ContactChangeRequestForm.defaultValues.ts",
     "./weight-split-bar": "./src/components/weight-split-bar/WeightSplitBar.tsx",
     "./config-diff": "./src/components/config-diff/ConfigDiff.tsx",
+    "./ranking-in-effect-card": "./src/components/ranking-in-effect-card/RankingInEffectCard.tsx",
+    "./fixed-rules-card": "./src/components/fixed-rules-card/FixedRulesCard.tsx",
+    "./config-conflict-notice": "./src/components/config-conflict-notice/ConfigConflictNotice.tsx",
     "./ranking-settings-form": "./src/forms/ranking-settings-form/RankingSettingsForm.tsx",
     "./ranking-settings-form/schema": "./src/forms/ranking-settings-form/RankingSettingsForm.schema.ts",
     "./ranking-settings-form/default-values": "./src/forms/ranking-settings-form/RankingSettingsForm.defaultValues.ts"

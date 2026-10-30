@@ -21,3 +21,17 @@ export const rankingPolicyVersion1: RankingPolicyVersion = {
 
 /** Every saved version, oldest first. */
 export const rankingPolicyVersions: RankingPolicyVersion[] = [rankingPolicyVersion1]
+
+/**
+ * Story-only: the version the prototype's "Someone else saves settings first" toggle saves (same
+ * weights, threshold + 2, four minutes before ADMIN_FIXTURE_NOW, from another browser). Not part of
+ * rankingPolicyVersions.
+ */
+export const rankingPolicyConflictVersion2: RankingPolicyVersion = {
+  version: 2,
+  assessmentWeightBp: 7000,
+  performanceWeightBp: 3000,
+  recentStandardMatchThreshold: 12,
+  effectiveAt: '2026-10-29T19:48:00+08:00',
+  createdByEmail: `${adminAccount.email} (another browser)`,
+}

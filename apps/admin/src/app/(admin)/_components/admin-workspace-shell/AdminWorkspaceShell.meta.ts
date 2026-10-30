@@ -6,6 +6,7 @@ export const adminWorkspaceShellMeta = {
   usage: [
     'Wrap Admin routes; Clubs and licenses shows the number of clubs (useAdminClubs), Players the number of player identities (useAdminPlayers), Contact changes the requests waiting for review or needing attention (useContactRequestCounts attention, a warn pill above 0) and Club names the pending name changes (useClubNameRequests, a warn pill above 0) and Feature flags the number of flags (useFeatureFlags). Ranking has no count.',
     'The count reads run only once the session is confirmed as the platform owner (enabled option), never for a signed-out or denied session.',
+    'While a page has an unsaved draft (Redux ui.unsavedDraft, set by Ranking settings), the rail items and the ROTRA brand dispatch requestLeave(href) instead of navigating; the page asks "Discard your draft?" and continues the navigation on Discard draft.',
     'Containers call useDenyOnPermissionError(query errors…): a permission error from any privileged read replaces the workspace with AccessDeniedCard and clears the cache, so no partial data stays on screen.',
   ],
   docs: ['docs/screens/product/modules/admin/access-navigation.md'],

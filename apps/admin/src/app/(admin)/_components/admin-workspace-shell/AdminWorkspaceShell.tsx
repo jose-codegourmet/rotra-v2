@@ -28,6 +28,8 @@ import {
   useLayoutEffect,
   useState,
 } from 'react'
+import { useAppDispatch, useAppSelector } from '@/store/hooks'
+import { requestLeave, selectUnsavedDraft } from '@/store/slices/uiSlice'
 
 const AdminWorkspaceAccess = createContext<(() => void) | null>(null)
 export function useAdminWorkspaceAccess() {
@@ -81,6 +83,13 @@ export function AdminWorkspaceShell({ children }: { children: ReactNode }) {
   }, [client])
   const pathname = usePathname()
   const router = useRouter()
+  const dispatch = useAppDispatch()
+  const unsavedDraft = useAppSelector(selectUnsavedDraft)
+  // With an unsaved draft open, leaving goes through the page's "Discard your draft?" instead of
+  // navigating (rotra-admin.html go() with cfgDirty); the page continues the navigation on Discard.
+  const leave = (href: string) => {
+    if (href !== pathname) dispatch(requestLeave(href))
+  }
   const handleSignOut = () =>
     signOut.mutate(undefined, {
       onSuccess: () => {
@@ -135,7 +144,8 @@ export function AdminWorkspaceShell({ children }: { children: ReactNode }) {
             product="Admin"
             contained={false}
             menuOnNarrowOnly
-            brandHref="/clubs"
+            brandHref={unsavedDraft ? undefined : '/clubs'}
+            onBrandClick={unsavedDraft ? () => leave('/clubs') : undefined}
             linkAs={Link}
           >
             <AdminAccountBadge
@@ -153,6 +163,7 @@ export function AdminWorkspaceShell({ children }: { children: ReactNode }) {
           current={current}
           hrefs={HREFS}
           linkComponent={Link}
+          onNavigate={unsavedDraft ? leave : undefined}
           counts={{
             clubs: clubs.data?.counts.all,
             players: players.data?.counts.all,

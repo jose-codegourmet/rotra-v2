@@ -1,5 +1,7 @@
 'use client'
 
+import { ADMIN_OFFLINE_ERROR } from '@rotra/data/admin-account'
+import { useAdminConnectivity } from '@rotra/data/admin-account/use-admin-connectivity'
 import type { FeatureFlag } from '@rotra/data/feature-flag/types'
 import { useFeatureFlags } from '@rotra/data/feature-flag/useFeatureFlags'
 import { useSetFeatureFlagValue } from '@rotra/data/feature-flag/useSetFeatureFlagValue'
@@ -7,13 +9,16 @@ import { ConflictError } from '@rotra/data/mock/errors'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { ConfirmSheet } from '@rotra/ui/confirm-sheet'
+import { EmptyState } from '@rotra/ui/empty-state'
+import { ErrorState } from '@rotra/ui/error-state'
 import { FeatureFlagRow } from '@rotra/ui/feature-flag-row'
 import { KeyValueList } from '@rotra/ui/key-value-list'
 import { PageHeader } from '@rotra/ui/page-header'
 import { toast } from '@rotra/ui/toaster'
-import { Fragment, useRef, useState } from 'react'
+import { Fragment, type ReactNode, useRef, useState } from 'react'
 import { useDenyOnPermissionError } from '../../../../_components/admin-workspace-shell/AdminWorkspaceShell'
 import { AddFlagSheet } from '../add-flag-sheet/AddFlagSheet'
+import { FeatureFlagsSkeleton } from './FeatureFlagsSkeleton'
 
 const valueLabel = (on: boolean) => (on ? 'On' : 'Off')
 
@@ -21,15 +26,18 @@ const valueLabel = (on: boolean) => (on ? 'On' : 'Off')
  * A-FEATURE-FLAGS: the platform owner's flags, Add flag (A-ADD-FLAG) and the value confirmation.
  * A row's switch never changes the value itself: it opens the confirmation on the flag as it was
  * when pressed (its revision included), and only Turn on / Turn off saves. Back leaves it unchanged.
+ * Offline the list stays readable; Turn on / Turn off sends nothing and says so in the sheet.
  */
 export function FeatureFlags() {
   const flags = useFeatureFlags()
   const setValue = useSetFeatureFlagValue()
   const denied = useDenyOnPermissionError(flags.error)
+  const { offline } = useAdminConnectivity()
   const [adding, setAdding] = useState(false)
   // The flag as it was when its switch was pressed; the confirmation reads only this.
   const [confirming, setConfirming] = useState<FeatureFlag | null>(null)
-  const [confirmError, setConfirmError] = useState<string | null>(null)
+  // A fresh node per refused tap (offline), so the sheet's one-commit guard lets the next tap through.
+  const [confirmError, setConfirmError] = useState<ReactNode>(null)
   // A second tap can land before isPending re-renders; this keeps it to one request.
   const sending = useRef(false)
 
@@ -51,6 +59,12 @@ export function FeatureFlags() {
 
   const confirm = () => {
     if (!confirming || setValue.isPending || sending.current) return
+    // rotra-admin.html offlineBlock: nothing is sent; the sheet stays with the value unchanged.
+    if (offline) {
+      setValue.reset()
+      setConfirmError(<>{ADMIN_OFFLINE_ERROR}</>)
+      return
+    }
     sending.current = true
     setConfirmError(null)
     setValue.mutate(
@@ -90,8 +104,33 @@ export function FeatureFlags() {
           </Button>
         }
       />
-      {/* Loading, the empty catalog, a failed load and offline are A04.8. */}
-      {list.length > 0 ? (
+      {flags.isError && !flags.data ? (
+        <Card>
+          <ErrorState
+            title="Couldn't load the feature flags."
+            onRetry={() => void flags.refetch()}
+            retrying={flags.isFetching}
+            retryLabel="Retry"
+          >
+            Check your connection, then try again.
+          </ErrorState>
+        </Card>
+      ) : !flags.data ? (
+        <FeatureFlagsSkeleton />
+      ) : list.length === 0 ? (
+        <Card>
+          <EmptyState
+            title="No feature flags yet."
+            action={
+              <Button size="sm" variant="primary" onClick={() => setAdding(true)}>
+                Add flag
+              </Button>
+            }
+          >
+            Add a flag to describe a switch and what it does. New flags start off.
+          </EmptyState>
+        </Card>
+      ) : (
         <Card asChild className="flex flex-col gap-3">
           <section aria-label="Feature flags">
             {list.map((flag, index) => (
@@ -107,7 +146,7 @@ export function FeatureFlags() {
             ))}
           </section>
         </Card>
-      ) : null}
+      )}
       <p className="m-0 text-[13px] text-fg2">
         No flag can change confirmed winners or scores, or bring back lost offline records.
       </p>

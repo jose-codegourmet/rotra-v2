@@ -13,6 +13,11 @@ export type AdminNavProps = {
   current: AdminNavKey | null
   hrefs: Record<AdminNavKey, string>
   linkComponent?: ElementType
+  /**
+   * While set, items report the chosen href instead of following it, so the shell can ask before
+   * leaving an unsaved draft (rotra-admin.html go() with cfgDirty)
+   */
+  onNavigate?: (href: string) => void
   counts?: Partial<Record<AdminNavKey, number>>
   accountEmail: string
   onSignOut: () => void
@@ -24,6 +29,7 @@ export function AdminNav({
   current,
   hrefs,
   linkComponent,
+  onNavigate,
   counts,
   accountEmail,
   onSignOut,
@@ -33,7 +39,7 @@ export function AdminNav({
     id,
     label,
     icon,
-    href: hrefs[id],
+    ...(onNavigate ? { onSelect: () => onNavigate(hrefs[id]) } : { href: hrefs[id] }),
     current: current === id,
     count: id === 'ranking' ? undefined : counts?.[id],
     hot,

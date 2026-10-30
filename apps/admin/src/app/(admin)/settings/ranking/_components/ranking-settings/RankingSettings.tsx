@@ -1,6 +1,8 @@
 'use client'
 
-import { ConflictError } from '@rotra/data/mock/errors'
+import { ADMIN_OFFLINE_ERROR } from '@rotra/data/admin-account'
+import { useAdminConnectivity } from '@rotra/data/admin-account/use-admin-connectivity'
+import { ConflictError, MockError } from '@rotra/data/mock/errors'
 import {
   basisPointsToPercent,
   diffRows,
@@ -12,19 +14,27 @@ import { useSaveRankingSettings } from '@rotra/data/ranking-settings/useSaveRank
 import { ConfigConflictNotice } from '@rotra/ui/config-conflict-notice'
 import { ConfigDiff } from '@rotra/ui/config-diff'
 import { ConfirmSheet } from '@rotra/ui/confirm-sheet'
+import { ErrorState } from '@rotra/ui/error-state'
 import { FixedRulesCard } from '@rotra/ui/fixed-rules-card'
 import { Notice } from '@rotra/ui/notice'
 import { PageHeader } from '@rotra/ui/page-header'
 import { RankingInEffectCard } from '@rotra/ui/ranking-in-effect-card'
 import { RankingSettingsForm } from '@rotra/ui/ranking-settings-form'
-import { rankingSettingsDraftFrom } from '@rotra/ui/ranking-settings-form/default-values'
+import {
+  isRankingDraftDirty,
+  rankingSettingsDraftFrom,
+} from '@rotra/ui/ranking-settings-form/default-values'
 import type {
   RankingSettingsFormInput,
   RankingSettingsFormValues,
 } from '@rotra/ui/ranking-settings-form/schema'
 import { toast } from '@rotra/ui/toaster'
-import { useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useEffect, useRef, useState } from 'react'
+import { useAppDispatch, useAppSelector } from '@/store/hooks'
+import { clearLeave, selectPendingLeave, setUnsavedDraft } from '@/store/slices/uiSlice'
 import { useDenyOnPermissionError } from '../../../../_components/admin-workspace-shell/AdminWorkspaceShell'
+import { RankingSettingsSkeleton } from './RankingSettingsSkeleton'
 
 /** The draft as typed, with the version it was started from (rotra-admin.html S.ui.cfg). */
 type Draft = { values: RankingSettingsFormInput; baseVersion: number }
@@ -43,6 +53,15 @@ function formValuesOf(version: RankingPolicyVersion): RankingSettingsFormValues 
   }
 }
 
+/** The version a draft started from; after a conflict it is older than the one in effect. */
+function baseOf(
+  versions: RankingPolicyVersion[],
+  baseVersion: number,
+  effective: RankingPolicyVersion,
+) {
+  return versions.find((version) => version.version === baseVersion) ?? effective
+}
+
 function SaveFailedNotice({ message }: { message: string }) {
   if (!message.startsWith(SAVE_FAILED_LEAD)) return <Notice tone="error">{message}</Notice>
   return (
@@ -56,18 +75,49 @@ function SaveFailedNotice({ message }: { message: string }) {
  * A-RANK-CONFIG: the draft lives here with the version it was based on, apart from the version in
  * effect (useRankingPolicy), so public copy and In effect never show unsaved values. Review changes
  * opens D-CONFIG; Save configuration appends a new version. A conflict keeps the draft and offers to
- * rebase or start over; a failed save keeps the draft and the version in effect.
+ * rebase or start over; a failed save keeps the draft and the version in effect. Offline, Save
+ * configuration sends nothing and says so in the sheet. Leaving with an unsaved draft (the rail, the
+ * brand or the browser) asks "Discard your draft?" first.
  */
 export function RankingSettings() {
   const policy = useRankingPolicy()
   const save = useSaveRankingSettings()
   const denied = useDenyOnPermissionError(policy.error)
+  const { offline } = useAdminConnectivity()
+  const router = useRouter()
+  const dispatch = useAppDispatch()
+  const pendingLeave = useAppSelector(selectPendingLeave)
   const [draft, setDraft] = useState<Draft | null>(null)
   const [review, setReview] = useState<Review | null>(null)
   const [conflict, setConflict] = useState<RankingPolicyVersion | null>(null)
   const [saveError, setSaveError] = useState<string | null>(null)
+  // Each refused offline tap counts, so the sheet re-renders and its one-commit guard lets the next
+  // tap through.
+  const [offlineTaps, setOfflineTaps] = useState(0)
   // A second tap can land before isPending re-renders; this keeps it to one request.
   const sending = useRef(false)
+
+  // "Unsaved draft" (cfgDirty): typing back the base values is not a draft worth asking about.
+  const dirty =
+    draft !== null &&
+    policy.data !== undefined &&
+    isRankingDraftDirty(
+      draft.values,
+      formValuesOf(baseOf(policy.data.versions, draft.baseVersion, policy.data.effective)),
+    )
+
+  // The shell asks before in-app navigation while this is set; leaving the page clears it.
+  useEffect(() => {
+    dispatch(setUnsavedDraft(dirty))
+  }, [dirty, dispatch])
+  useEffect(() => () => void dispatch(setUnsavedDraft(false)), [dispatch])
+  // Reloading or closing the tab with a draft gets the browser's own leave prompt.
+  useEffect(() => {
+    if (!dirty) return
+    const warn = (event: BeforeUnloadEvent) => event.preventDefault()
+    window.addEventListener('beforeunload', warn)
+    return () => window.removeEventListener('beforeunload', warn)
+  }, [dirty])
 
   if (denied) return null
 
@@ -77,14 +127,33 @@ export function RankingSettings() {
       description="The agreed adjustable settings behind every player's shared rank. Changing them changes the algorithm's settings, never individual match results."
     />
   )
-  // Loading and a failed load are A04.8.
-  if (!policy.data) return header
+  // A failed refetch keeps the last accepted data (the query keeps it) and the draft lives here,
+  // apart from it, so only a first load that fails shows the error.
+  if (!policy.data) {
+    return (
+      <>
+        {header}
+        {policy.isError ? (
+          <ErrorState
+            title="Couldn't load the ranking settings."
+            onRetry={() => void policy.refetch()}
+            retrying={policy.isFetching}
+            retryLabel="Retry"
+          >
+            Check your connection, then try again.
+          </ErrorState>
+        ) : (
+          <RankingSettingsSkeleton />
+        )}
+      </>
+    )
+  }
 
   const { effective, versions } = policy.data
   const baseVersion = draft?.baseVersion ?? effective.version
   // The draft is compared with the version it started from (cfgDirty), which after a conflict is
   // older than the one in effect until they rebase.
-  const base = versions.find((version) => version.version === baseVersion) ?? effective
+  const base = baseOf(versions, baseVersion, effective)
   const values = draft?.values ?? rankingSettingsDraftFrom(formValuesOf(effective))
 
   const discard = () => {
@@ -93,9 +162,18 @@ export function RankingSettings() {
     setSaveError(null)
   }
 
+  // Discard draft continues the navigation the shell held back.
+  const discardAndLeave = () => {
+    const destination = pendingLeave
+    discard()
+    dispatch(setUnsavedDraft(false))
+    if (destination) router.push(destination)
+  }
+
   const openReview = (parsed: RankingSettingsFormValues) => {
     if (conflict) return
     setSaveError(null)
+    setOfflineTaps(0)
     setReview({
       draft: {
         assessmentWeightBp: percentToBasisPoints(parsed.assessmentPercent),
@@ -109,10 +187,19 @@ export function RankingSettings() {
   const closeReview = () => {
     if (save.isPending) return
     setReview(null)
+    setOfflineTaps(0)
   }
 
   const confirm = () => {
     if (!review || save.isPending || sending.current) return
+    // rotra-admin.html offlineBlock: nothing is sent; the sheet, the draft and the version in effect
+    // stay as they are.
+    if (offline) {
+      save.reset()
+      setOfflineTaps((taps) => taps + 1)
+      return
+    }
+    setOfflineTaps(0)
     sending.current = true
     save.mutate(review, {
       onSettled: () => {
@@ -124,6 +211,11 @@ export function RankingSettings() {
         toast(`Saved. Version ${saved.version} is in effect.`)
       },
       onError: (error) => {
+        // Connection lost while saving: the same inline reason as a refused tap.
+        if (error instanceof MockError && error.kind === 'offline') {
+          setOfflineTaps((taps) => taps + 1)
+          return
+        }
         setReview(null)
         if (error instanceof ConflictError) {
           setConflict(error.current as RankingPolicyVersion)
@@ -183,6 +275,19 @@ export function RankingSettings() {
         backLabel="Keep editing"
         onConfirm={confirm}
         isPending={save.isPending}
+        error={offlineTaps ? <>{ADMIN_OFFLINE_ERROR}</> : null}
+      />
+      <ConfirmSheet
+        open={pendingLeave !== null}
+        onOpenChange={(open) => {
+          if (!open) dispatch(clearLeave())
+        }}
+        title="Discard your draft?"
+        consequence="Your changes to the ranking settings haven't been saved. The values in effect stay the same."
+        backLabel="Keep editing"
+        confirmLabel="Discard draft"
+        onConfirm={discardAndLeave}
+        destructive
       />
     </>
   )

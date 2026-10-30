@@ -247,6 +247,7 @@
     "./admin-audit/query-keys": "./src/admin-audit/queryKeys.ts",
     "./admin-audit/fetchers": "./src/admin-audit/fetchers.ts",
     "./admin-audit/useAuditEvents": "./src/admin-audit/useAuditEvents.ts",
+    "./admin-audit/useAuditEventsForTargets": "./src/admin-audit/useAuditEventsForTargets.ts",
     "./admin-account": "./src/admin-account/fetchers.ts",
     "./admin-account/types": "./src/admin-account/adminAccount.types.ts",
     "./admin-account/cookie": "./src/admin-account/cookie.ts",

@@ -16,6 +16,8 @@ export type ConfirmSheetProps = {
   consequence: ReactNode
   /** A small muted line after the consequence, e.g. what does not change */
   note?: ReactNode
+  /** A Notice after the consequence and note, e.g. D-CONFIG's warning about an undecided policy */
+  notice?: ReactNode
   /** Names the action ("Confirm invalid match", "Start session"); never a neutral "Save" */
   confirmLabel: string
   onConfirm: () => void
@@ -45,6 +47,7 @@ export function ConfirmSheet({
   summary,
   consequence,
   note,
+  notice,
   confirmLabel,
   onConfirm,
   backLabel = 'Back',
@@ -94,6 +97,7 @@ export function ConfirmSheet({
       {summary}
       <p className="m-0">{consequence}</p>
       {note ? <p className="m-0 text-[13px] text-fg2">{note}</p> : null}
+      {notice}
       {error ? <Notice tone="error">{error}</Notice> : null}
     </Sheet>
   )

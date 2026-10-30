@@ -2,6 +2,7 @@
 import { useAdminConnectivity } from '@rotra/data/admin-account/use-admin-connectivity'
 import { useAdminSession } from '@rotra/data/admin-account/use-admin-session'
 import { useSignOutAdmin } from '@rotra/data/admin-account/use-sign-out-admin'
+import { useAdminPlayers } from '@rotra/data/admin-player/useAdminPlayers'
 import { useAdminClubs } from '@rotra/data/club/useAdminClubs'
 import { useClubNameRequests } from '@rotra/data/club/useClubNameRequests'
 import { MockError } from '@rotra/data/mock/errors'
@@ -67,6 +68,7 @@ export function AdminWorkspaceShell({ children }: { children: ReactNode }) {
   // and stop once access has been denied.
   const isOwner = !session.isPending && session.data.kind === 'owner' && !permissionDenied
   const clubs = useAdminClubs({}, { enabled: isOwner })
+  const players = useAdminPlayers({}, { enabled: isOwner })
   const nameRequests = useClubNameRequests({ enabled: isOwner })
   const reportPermissionDenied = useCallback(() => {
     void client.cancelQueries()
@@ -89,7 +91,10 @@ export function AdminWorkspaceShell({ children }: { children: ReactNode }) {
       router.refresh()
     }
   }, [kind, session.isPending, router])
-  const countsDenied = isPermissionError(clubs.error) || isPermissionError(nameRequests.error)
+  const countsDenied =
+    isPermissionError(clubs.error) ||
+    isPermissionError(players.error) ||
+    isPermissionError(nameRequests.error)
   useLayoutEffect(() => {
     if (countsDenied) reportPermissionDenied()
   }, [countsDenied, reportPermissionDenied])
@@ -144,6 +149,7 @@ export function AdminWorkspaceShell({ children }: { children: ReactNode }) {
           linkComponent={Link}
           counts={{
             clubs: clubs.data?.counts.all,
+            players: players.data?.counts.all,
             'club-names': nameRequests.data?.pending.length,
           }}
           accountEmail={email}

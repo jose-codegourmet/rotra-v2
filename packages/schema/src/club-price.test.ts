@@ -21,10 +21,18 @@ describe('whole-peso parsing', () => {
     ['1', 100],
   ])('reads %s as %i centavos', (value, expected) => expect(parseWholePesos(value)).toBe(expected))
 
-  it.each(['', ' ', '0', '0.00', '1500.50', '-1500', '1.5e3', 'abc', null, undefined])(
-    'refuses %s',
-    (value) => expect(parseWholePesos(value)).toBeNull(),
-  )
+  it.each([
+    '',
+    ' ',
+    '0',
+    '0.00',
+    '1500.50',
+    '-1500',
+    '1.5e3',
+    'abc',
+    null,
+    undefined,
+  ])('refuses %s', (value) => expect(parseWholePesos(value)).toBeNull())
 
   it('stores a paid price as integer centavos', () => {
     expect(clubPriceField.parse({ pricing: 'paid', monthly: '1,500', yearly: '15000' })).toEqual({
@@ -54,8 +62,7 @@ describe('yearly < 12 × monthly', () => {
         'yearly',
         'Make it less than 12 months at the monthly price (₱18,000). Yearly plans get a discount.',
       ],
-    ]),
-  )
+    ]))
 
   it('only compares once the monthly price is valid', () => {
     expect(messages(paid('', '18000'))).toEqual([['monthly', MONTHLY_PRICE_ERROR]])

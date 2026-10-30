@@ -61,7 +61,9 @@ export const UsernameTaken: Story = {
 }
 /** Switch to Paid to see the typed amounts kept. */
 export const Free: Story = {
-  args: { defaultValues: { ...filled, price: { pricing: 'free', monthly: '1500', yearly: '15000' } } },
+  args: {
+    defaultValues: { ...filled, price: { pricing: 'free', monthly: '1500', yearly: '15000' } },
+  },
 }
 export const PasswordShown: Story = {
   args: { defaultValues: { ...filled, password: '' } },
@@ -76,7 +78,10 @@ export const ServerError: Story = {
     serverError: "You're offline, so nothing was saved. Try again once you're connected.",
   },
 }
-export const Phone: Story = { args: { defaultValues: filled }, globals: { viewport: { value: 'phone' } } }
+export const Phone: Story = {
+  args: { defaultValues: filled },
+  globals: { viewport: { value: 'phone' } },
+}
 export const PhoneErrors: Story = { ...Errors, globals: { viewport: { value: 'phone' } } }
 export const Desktop: Story = {
   args: { defaultValues: filled },

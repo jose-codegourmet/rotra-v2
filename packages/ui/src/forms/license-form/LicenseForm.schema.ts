@@ -27,7 +27,10 @@ export function createLicenseSchema({ isFree, today }: LicenseSchemaOptions) {
     : z
         .string()
         .refine(isYmd, 'Enter the date the club paid.')
-        .refine((value) => !isYmd(value) || value <= today, "The payment date can't be in the future.")
+        .refine(
+          (value) => !isYmd(value) || value <= today,
+          "The payment date can't be in the future.",
+        )
   const amount = isFree
     ? z.string()
     : z

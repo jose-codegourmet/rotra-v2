@@ -105,7 +105,11 @@ export const InvalidValues: Story = {
   },
   play: review,
 }
-export const FreeErrors: Story = { ...Free, play: review, args: { ...Free.args, defaultValues: {} } }
+export const FreeErrors: Story = {
+  ...Free,
+  play: review,
+  args: { ...Free.args, defaultValues: {} },
+}
 export const Pending: Story = { args: { ...RenewActive.args, isPending: true } }
 export const ServerError: Story = {
   args: {

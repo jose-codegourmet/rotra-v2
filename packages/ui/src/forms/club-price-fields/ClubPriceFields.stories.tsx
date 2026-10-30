@@ -7,7 +7,11 @@ import { useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { fn } from 'storybook/test'
 import { z } from 'zod'
-import { ClubPriceFields, type ClubPriceFieldsProps, type ClubPriceFormShape } from './ClubPriceFields'
+import {
+  ClubPriceFields,
+  type ClubPriceFieldsProps,
+  type ClubPriceFormShape,
+} from './ClubPriceFields'
 
 const lahug = clubs.find((club) => club.username === 'lahug.smash')
 if (!lahug) throw new Error('Club price fixtures missing')
@@ -60,7 +64,10 @@ export const NoDiscountError: Story = {
   args: { price: { ...paidPrice, yearly: pesos(lahug.licenseMonthlyMinor * 12) }, validate: true },
 }
 export const Disabled: Story = { args: { price: paidPrice, disabled: true } }
-export const Phone: Story = { args: { price: paidPrice }, globals: { viewport: { value: 'phone' } } }
+export const Phone: Story = {
+  args: { price: paidPrice },
+  globals: { viewport: { value: 'phone' } },
+}
 export const Desktop: Story = {
   args: { price: paidPrice },
   globals: { viewport: { value: 'desktop' } },

@@ -24,7 +24,9 @@ const sampleLogo =
 
 export const Small: Story = {}
 export const Large: Story = { args: { size: 'lg' } }
-export const Accent: Story = { args: { initials: adminClubRows[0]?.initials ?? 'LS', tone: 'accent' } }
+export const Accent: Story = {
+  args: { initials: adminClubRows[0]?.initials ?? 'LS', tone: 'accent' },
+}
 export const WithImage: Story = { args: { size: 'lg', logoUrl: sampleLogo } }
 export const Light: Story = {
   render: (args) => (

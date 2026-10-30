@@ -71,8 +71,8 @@ export function AddClubReview({
           </li>
           <li>The founding address and city code can't be changed later.</li>
           <li>
-            The password isn't shown again. Give it to the club yourself; they can change it in
-            Club settings.
+            The password isn't shown again. Give it to the club yourself; they can change it in Club
+            settings.
           </li>
         </ul>
       </div>

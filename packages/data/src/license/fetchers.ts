@@ -73,8 +73,7 @@ const LICENSE_REFERENCE_MAX = 40
 /** The reply to an Activate/Renew license was lost; the term may have been saved. */
 export const LICENSE_NO_REPLY_ERROR =
   "We didn't hear back, so we can't tell yet whether the license was saved."
-export const LICENSE_CHECK_OFFLINE_ERROR =
-  "You're offline. Check the status once you're connected."
+export const LICENSE_CHECK_OFFLINE_ERROR = "You're offline. Check the status once you're connected."
 
 const newestFirst = (a: ClubLicenseTerm, b: ClubLicenseTerm) =>
   b.startsAt.localeCompare(a.startsAt) || Date.parse(b.activatedAt) - Date.parse(a.activatedAt)

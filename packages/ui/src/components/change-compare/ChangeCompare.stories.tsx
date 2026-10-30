@@ -25,7 +25,11 @@ export const NotSet: Story = {
   args: { from: 'Not set', to: contactChangeExamples.notSet.to, emphasis: 'mono' },
 }
 export const LongValues: Story = {
-  args: { from: contactChangeExamples.email.from, to: adminAccessExamples.longEmail, emphasis: 'mono' },
+  args: {
+    from: contactChangeExamples.email.from,
+    to: adminAccessExamples.longEmail,
+    emphasis: 'mono',
+  },
   globals: { viewport: { value: 'phone' } },
 }
 export const NamePhone: Story = { globals: { viewport: { value: 'phone' } } }

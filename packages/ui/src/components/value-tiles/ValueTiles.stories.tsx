@@ -8,9 +8,7 @@ const paid = clubs.find((club) => club.licensePricing === 'paid')
 if (!paid) throw new Error('Paid club fixture missing')
 
 // rotra-admin.html savePct(): story display only; the club detail screen owns the real number.
-const savePct = Math.round(
-  (1 - paid.licenseYearlyMinor / (paid.licenseMonthlyMinor * 12)) * 100,
-)
+const savePct = Math.round((1 - paid.licenseYearlyMinor / (paid.licenseMonthlyMinor * 12)) * 100)
 
 const priceTiles = [
   { id: 'monthly', label: 'Monthly', value: formatPeso(paid.licenseMonthlyMinor), mono: true },

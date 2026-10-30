@@ -1,10 +1,6 @@
 'use client'
 
-import {
-  type ClubPriceInput,
-  parseWholePesos,
-  yearlySavingPercent,
-} from '@rotra/schema/club-price'
+import { type ClubPriceInput, parseWholePesos, yearlySavingPercent } from '@rotra/schema/club-price'
 import { formatPeso } from '@rotra/schema/money'
 import { type Choice, ChoiceGroup } from '@rotra/ui/choice-group'
 import { Field } from '@rotra/ui/field'

@@ -334,9 +334,7 @@ export function changeClubPrice(
  * Approves the club's pending name change: the name changes everywhere, the old one is kept as an
  * earlier name and the initials follow. With no pending request (already decided) nothing changes.
  */
-export function approveClubNameChange(
-  clubId: string,
-): Promise<{ changed: boolean; name: string }> {
+export function approveClubNameChange(clubId: string): Promise<{ changed: boolean; name: string }> {
   return adminMutation(900, (draft) => {
     const club = adminClubIn(draft, clubId)
     const request = pendingRequestOf(draft, clubId)
@@ -362,9 +360,7 @@ export function approveClubNameChange(
 }
 
 /** Rejects the pending name change; the club keeps its name. Already decided → nothing changes. */
-export function rejectClubNameChange(
-  clubId: string,
-): Promise<{ changed: boolean; name: string }> {
+export function rejectClubNameChange(clubId: string): Promise<{ changed: boolean; name: string }> {
   return adminMutation(800, (draft) => {
     const club = adminClubIn(draft, clubId)
     const request = pendingRequestOf(draft, clubId)

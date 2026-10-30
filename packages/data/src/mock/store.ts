@@ -1,10 +1,5 @@
 import type { AdminAuditEvent } from '../admin-audit/adminAudit.types'
-import type {
-  AdminClubRecord,
-  Club,
-  ClubAccount,
-  ClubNameChangeRequest,
-} from '../club/club.types'
+import type { AdminClubRecord, Club, ClubAccount, ClubNameChangeRequest } from '../club/club.types'
 import type { ClubPlayer } from '../club-player/clubPlayer.types'
 import type { ClubVenue } from '../club-venue/clubVenue.types'
 import type { ContactChangeRequest } from '../contact-change-request/contactChangeRequest.types'

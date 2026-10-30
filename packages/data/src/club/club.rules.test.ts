@@ -25,7 +25,11 @@ describe('club price rules (rotra-admin.html savePct / priceLine / amountText)',
     expect(yearlySavingPercent(paid(1000, 6000))).toBe(50)
     expect(yearlySavingPercent(paid(1500, 18000))).toBe(0)
     expect(
-      yearlySavingPercent({ licensePricing: 'free', licenseMonthlyMinor: 0, licenseYearlyMinor: 0 }),
+      yearlySavingPercent({
+        licensePricing: 'free',
+        licenseMonthlyMinor: 0,
+        licenseYearlyMinor: 0,
+      }),
     ).toBe(0)
   })
 
@@ -47,7 +51,11 @@ describe('club price rules (rotra-admin.html savePct / priceLine / amountText)',
       }),
     ).toBe('Free (tester club)')
     expect(
-      formatClubPriceLine({ licensePricing: 'free', licenseMonthlyMinor: 0, licenseYearlyMinor: 0 }),
+      formatClubPriceLine({
+        licensePricing: 'free',
+        licenseMonthlyMinor: 0,
+        licenseYearlyMinor: 0,
+      }),
     ).toBe('Free (tester club)')
   })
 

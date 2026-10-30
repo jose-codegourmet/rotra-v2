@@ -3,7 +3,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const activeSessionCardMeta = {
   name: 'ActiveSessionCard',
   description:
-    "The club's active session on the club detail Overview tab: the running session with its venue and start time, an expiry exception, or \"No session running.\"",
+    'The club\'s active session on the club detail Overview tab: the running session with its venue and start time, an expiry exception, or "No session running."',
   usage: [
     'Pass session while one runs; it wins over exceptionNote.',
     'Pass exceptionNote when a session ran past the license end and was allowed to finish and sync.',

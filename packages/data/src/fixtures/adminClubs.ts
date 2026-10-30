@@ -1,8 +1,4 @@
-import type {
-  AdminClubRecord,
-  ClubAccount,
-  ClubNameChangeRequest,
-} from '../club/club.types'
+import type { AdminClubRecord, ClubAccount, ClubNameChangeRequest } from '../club/club.types'
 import type {
   ClubAccessState,
   ClubLicenseTerm,

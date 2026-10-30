@@ -3,7 +3,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const clubPriceTagMeta = {
   name: 'ClubPriceTag',
   description:
-    "A club's own monthly license price in the Admin club directory: \"₱1,500 /mo\", or a Free · tester chip for a free tester club.",
+    'A club\'s own monthly license price in the Admin club directory: "₱1,500 /mo", or a Free · tester chip for a free tester club.',
   usage: [
     'monthlyMinor is centavos; the tag shows whole pesos.',
     'Free clubs show the chip instead of a price.',

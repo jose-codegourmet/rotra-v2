@@ -30,8 +30,8 @@ import { useDenyOnPermissionError } from '../../../../_components/admin-workspac
 import { type ClubNameDecision, ClubNameSheets } from '../club-name-sheets/ClubNameSheets'
 import { ClubPriceSheet } from '../club-price-sheet/ClubPriceSheet'
 import { LicenseSheet } from '../license-sheet/LicenseSheet'
-import { ClubDetailSkeleton } from './ClubDetailSkeleton'
 import { CLUB_DETAIL_TABS, type ClubDetailTab } from './ClubDetail.tabs'
+import { ClubDetailSkeleton } from './ClubDetailSkeleton'
 import { licensePaymentColumns } from './LicensePayments.columns'
 
 /** The Public pages badge: a countdown or due deletion warns, a failed deletion is an error. */
@@ -105,7 +105,11 @@ export function ClubDetail({
   )
 
   const back = (
-    <Breadcrumb label="Clubs and licenses" href={from ? `/clubs?${from}` : '/clubs'} linkAs={Link} />
+    <Breadcrumb
+      label="Clubs and licenses"
+      href={from ? `/clubs?${from}` : '/clubs'}
+      linkAs={Link}
+    />
   )
   if (denied) return null
   if (club === null) notFound()

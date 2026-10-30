@@ -3,7 +3,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const addClubFormMeta = {
   name: 'AddClubForm',
   description:
-    'A-ADD-CLUB step 1: the club name, founding address and city, the Queue app username and password, and the club\'s Paid or Free price. Review checks everything before the review step.',
+    "A-ADD-CLUB step 1: the club name, founding address and city, the Queue app username and password, and the club's Paid or Free price. Review checks everything before the review step.",
   usage: [
     'Render it as the first step of the Add club sheet; on Review the container keeps the values and shows AddClubReview (pass passwordLength there, never the password).',
     'Pass every club name as takenNames and every account username as takenUsernames; both compare ignoring case and accents.',
@@ -20,6 +20,15 @@ export const addClubFormMeta = {
     'docs/screens/product/modules/admin/clubs-licenses.md',
     'docs/business_logic/product/admin/modules/clubs-licenses/README.md#adding-a-club',
   ],
-  variants: ['empty', 'filled', 'errors', 'username taken', 'free', 'password shown', 'pending', 'server error'],
+  variants: [
+    'empty',
+    'filled',
+    'errors',
+    'username taken',
+    'free',
+    'password shown',
+    'pending',
+    'server error',
+  ],
   related: ['ClubPriceFields', 'AddClubReview', 'SheetSteps', 'Sheet'],
 } satisfies ComponentMeta

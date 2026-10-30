@@ -9,14 +9,11 @@ export const USERNAME_MIN = 3
 export const USERNAME_MAX = 30
 /** Lowercase letters and numbers, optionally separated by single dots (rotra-admin.html addErrors). */
 export const USERNAME_PATTERN = /^[a-z0-9]+(\.[a-z0-9]+)*$/
-export const USERNAME_FORMAT_ERROR = 'Use 3 to 30 lowercase letters, numbers and dots, like lahug.smash.'
+export const USERNAME_FORMAT_ERROR =
+  'Use 3 to 30 lowercase letters, numbers and dots, like lahug.smash.'
 
 /** rotra-admin.html plain(): strips accents and lowercases, so "Lahúg" and "lahug" compare equal. */
-export const plainText = (value: string) =>
-  value
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .toLowerCase()
+export const plainText = (value: string) => value.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
 
 export type AddClubSchemaOptions = {
   /** Every existing club name; a match ignoring case and accents is refused */
@@ -26,7 +23,10 @@ export type AddClubSchemaOptions = {
 }
 
 /** A-ADD-CLUB step 1: club identity, the Queue app sign-in and the club's price. */
-export function createAddClubSchema({ takenNames = [], takenUsernames = [] }: AddClubSchemaOptions = {}) {
+export function createAddClubSchema({
+  takenNames = [],
+  takenUsernames = [],
+}: AddClubSchemaOptions = {}) {
   const names = new Set(takenNames.map((name) => plainText(name.trim())))
   const usernames = new Set(takenUsernames.map((username) => plainText(username.trim())))
   return z.object({
@@ -50,10 +50,7 @@ export function createAddClubSchema({ takenNames = [], takenUsernames = [] }: Ad
           username.length <= USERNAME_MAX,
         USERNAME_FORMAT_ERROR,
       )
-      .refine(
-        (username) => !usernames.has(plainText(username)),
-        'That username is already taken.',
-      ),
+      .refine((username) => !usernames.has(plainText(username)), 'That username is already taken.'),
     password: z.string().min(CLUB_PASSWORD_MIN, 'Use at least 8 characters.').pipe(passwordField),
     price: clubPriceField,
   })

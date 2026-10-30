@@ -100,6 +100,14 @@ export function DevTools() {
           onChange: (value) =>
             dispatch(setDevToggle({ key: 'adminNextLicenseSaveNoReply', value })),
         },
+        {
+          key: 'adminNextContactApplicationFails',
+          label: 'Next contact change fails to apply',
+          description: 'Approval saves; applying it to the account fails and needs a retry.',
+          checked: Boolean(toggles.adminNextContactApplicationFails),
+          onChange: (value) =>
+            dispatch(setDevToggle({ key: 'adminNextContactApplicationFails', value })),
+        },
       ]}
       controlLabels={{ offline: 'Offline' }}
       open={open}

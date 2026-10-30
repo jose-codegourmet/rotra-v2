@@ -2,7 +2,7 @@ import type { AdminAuditEvent } from '../admin-audit/adminAudit.types'
 import type { AdminClubRecord, Club, ClubAccount, ClubNameChangeRequest } from '../club/club.types'
 import type { ClubPlayer } from '../club-player/clubPlayer.types'
 import type { ClubVenue } from '../club-venue/clubVenue.types'
-import type { ContactChangeRequest } from '../contact-change-request/contactChangeRequest.types'
+import type { PlayerContactChangeRequest } from '../contact-change-request/contactChangeRequest.types'
 import { createAdminAuditEvents } from '../fixtures/adminAuditEvents'
 import {
   adminClubRetentionRecords,
@@ -10,7 +10,7 @@ import {
   createAdminClubFixtures,
 } from '../fixtures/adminClubs'
 import { clubs } from '../fixtures/clubs'
-import { contactChangeRequests } from '../fixtures/contactChangeRequests'
+import { createContactChangeRequestFixtures } from '../fixtures/contactChangeRequests'
 import { createFinancialFixtures } from '../fixtures/financials'
 import { inventoryItems } from '../fixtures/inventory'
 import { claimLinks, playerAccounts } from '../fixtures/playerAccounts'
@@ -56,7 +56,8 @@ export type MockState = {
   playerAccounts: typeof playerAccounts
   resetLinks: Record<string, 'valid' | 'used'>
   claimLinks: Record<string, ClaimLinkRecord>
-  contactChangeRequests: ContactChangeRequest[]
+  /** Player requests and their Admin review/application, in every state */
+  contactChangeRequests: PlayerContactChangeRequest[]
   playerProfiles: PlayerProfile[]
   playerRanks: Record<string, PlayerRank>
   playerGames: Record<string, PlayerSessionRecord[]>
@@ -135,7 +136,7 @@ function seedState(): MockState {
     playerAccounts,
     resetLinks: { 'reset-valid': 'valid' },
     claimLinks,
-    contactChangeRequests,
+    contactChangeRequests: createContactChangeRequestFixtures(now),
     rankingSettings,
     clubs,
     ...createAdminClubFixtures(now),

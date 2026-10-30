@@ -36,7 +36,9 @@ const event = (
 /**
  * All eight entries of rotra-admin.html `seedLog()`, newest first. The club entries are on fixed
  * dates; the three contact request decisions are 1, 3 and 5 days before `now`, as the prototype
- * seeds them. The mock store seeds with the real time; stories use ADMIN_FIXTURE_NOW.
+ * seeds them, and name the real players those requests belong to (Rafa → Dalton, Bea → Mikee
+ * Abellana, Iya → Raymark; fixtures/contactChangeRequests.ts). The mock store seeds with the real
+ * time; stories use ADMIN_FIXTURE_NOW.
  */
 export function createAdminAuditEvents(now: number): AdminAuditEvent[] {
   const ago = (days: number) => new Date(now - days * DAY).toISOString()
@@ -47,7 +49,7 @@ export function createAdminAuditEvents(now: number): AdminAuditEvent[] {
       'contact_change_request',
       contactRequestFixtureIds.r7,
       ago(1),
-      'Approved phone number change for Rafa Aquino. Applying failed at the sign-in provider.',
+      'Approved phone number change for Dalton. Applying failed at the sign-in provider.',
     ),
     event(
       'audit-0007',
@@ -55,7 +57,7 @@ export function createAdminAuditEvents(now: number): AdminAuditEvent[] {
       'contact_change_request',
       contactRequestFixtureIds.r8,
       ago(3),
-      'Approved email change for Bea Castillo. Applied.',
+      'Approved email change for Mikee Abellana. Applied.',
     ),
     event(
       'audit-0006',
@@ -63,7 +65,7 @@ export function createAdminAuditEvents(now: number): AdminAuditEvent[] {
       'contact_change_request',
       contactRequestFixtureIds.r9,
       ago(5),
-      'Declined email change for Iya Mercado.',
+      'Declined email change for Raymark.',
     ),
     event(
       'audit-0005',

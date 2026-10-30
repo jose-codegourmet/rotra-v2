@@ -19,6 +19,43 @@ export const playerAccounts = [
     phoneHidden: false,
     claimed: true,
   },
+  // Contacts for the players behind rotra-admin.html's contact-change requests (A03.6), on the real
+  // players who hold those prototype RTR IDs: phones from the prototype, emails from their names.
+  {
+    playerId: 'a22725ed-0ae7-5f29-9ca8-edf1c775b833', // Jasper (prototype Dani Rivera)
+    phone: '+639175550566',
+    email: 'jasper@example.com',
+    phoneHidden: false,
+    claimed: true,
+  },
+  {
+    playerId: 'd720c601-da89-5474-9351-00e2fb966e56', // Karl (prototype Paulo Garcia)
+    phone: '+639265550149',
+    email: 'karl@example.com',
+    phoneHidden: false,
+    claimed: true,
+  },
+  {
+    playerId: 'f5a63c91-34fd-53ec-948d-0ef644b5aeac', // Mikee Abellana (prototype Kat Lim)
+    phone: '+639205550458',
+    email: 'mikee.abellana@example.com',
+    phoneHidden: false,
+    claimed: true,
+  },
+  {
+    playerId: '9f83495f-9359-5f7f-82ad-4cf01b826471', // Emji (prototype Theo Ramos)
+    phone: '+639055550297',
+    email: 'emji@example.com',
+    phoneHidden: false,
+    claimed: true,
+  },
+  {
+    playerId: '80861dfd-99c7-57bb-a46c-d8c76e9a8dcc', // Dalton (prototype Rafa Aquino)
+    phone: '+639155550814',
+    email: 'dalton@example.com',
+    phoneHidden: false,
+    claimed: true,
+  },
 ]
 export const signInExamples = {
   phone: '09175550142',

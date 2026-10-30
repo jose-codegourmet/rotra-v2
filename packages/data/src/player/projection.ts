@@ -3,6 +3,7 @@ import { PLAYER_FIXTURE_NOW } from '../fixtures/playerGames'
 import { JOSE_PLAYER_ID } from '../fixtures/players'
 import { getMockDevState } from '../mock/bridge'
 import { readMockState } from '../mock/store'
+import { effectiveRankingVersion } from '../ranking-settings/rankingSettings.rules'
 import { countRecentStandardMatches, orderLeaderboard } from './player.rules'
 
 /** Public fixture projection; applies only the already-approved mock eligibility rules. */
@@ -60,9 +61,10 @@ export function playerProjection() {
   const entries =
     getMockDevState().leaderboardScenario === 'empty'
       ? []
-      : orderLeaderboard(candidates, store.rankingSettings.matchRequirement).map(
-          (entry, index) => ({ ...entry, position: index + 1 }),
-        )
+      : orderLeaderboard(
+          candidates,
+          effectiveRankingVersion(store.rankingPolicyVersions).recentStandardMatchThreshold,
+        ).map((entry, index) => ({ ...entry, position: index + 1 }))
   for (const entry of entries) {
     const rank = store.playerRanks[entry.id]
     if (rank) rank.position = entry.position

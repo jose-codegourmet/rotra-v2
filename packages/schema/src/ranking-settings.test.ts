@@ -86,7 +86,11 @@ describe('leaderboard requirement', () => {
     expect(rankingSettingsErrors(draft('70', '30', threshold))).toEqual({})
   })
 
-  it.each(['0', '-1', '2.5', '', 'ten'])('rejects "%s"', (threshold) => {
+  it('says the 1 to 40 range', () => {
+    expect(RANKING_THRESHOLD_ERROR).toBe('Use a whole number from 1 to 40.')
+  })
+
+  it.each(['0', '-1', '2.5', '', 'ten', '41', '100'])('rejects "%s"', (threshold) => {
     expect(issues(draft('70', '30', threshold))).toEqual([['threshold', RANKING_THRESHOLD_ERROR]])
   })
 })

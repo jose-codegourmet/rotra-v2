@@ -15,3 +15,26 @@ export type RankingPolicyVersion = {
   createdByEmail: string
   changeNote?: string
 }
+
+/** The values a save proposes, in the stored units (basis points and a match count). */
+export type RankingDraft = Pick<
+  RankingPolicyVersion,
+  'assessmentWeightBp' | 'performanceWeightBp' | 'recentStandardMatchThreshold'
+> & { changeNote?: string }
+
+/** Which draft value is wrong, and why; `total` is set only when both weights are valid. */
+export type RankingDraftErrors = Partial<
+  Record<
+    'assessmentWeightBp' | 'performanceWeightBp' | 'total' | 'recentStandardMatchThreshold',
+    string
+  >
+>
+
+/** saveRankingSettings input: `baseVersion` is the version the draft was edited from. */
+export type SaveRankingSettingsInput = { draft: RankingDraft; baseVersion: number }
+
+/** A-RANK-CONFIG read: the version in effect (the newest) and every version, oldest first. */
+export type RankingPolicy = { effective: RankingPolicyVersion; versions: RankingPolicyVersion[] }
+
+/** One D-CONFIG comparison row; same shape as @rotra/ui ConfigDiffRow. Weights are percentages. */
+export type RankingDiffRow = { label: string; from: number; to: number; unit: string }

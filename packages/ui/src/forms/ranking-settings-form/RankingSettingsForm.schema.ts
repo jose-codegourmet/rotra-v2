@@ -3,7 +3,7 @@ import type { z } from 'zod'
 
 /**
  * A-RANK-CONFIG: the two weights (whole percentages that total exactly 100) and the leaderboard
- * requirement (a whole number of at least 1). The rule lives in @rotra/schema/ranking-settings.
+ * requirement (a whole number from 1 to 40). The rule lives in @rotra/schema/ranking-settings.
  */
 export const rankingSettingsFormSchema = rankingSettingsField
 

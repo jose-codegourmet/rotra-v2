@@ -12,7 +12,7 @@ Show the currently effective configuration, its version/update time where availa
 |---|---|---|
 | Club assessment weight | 70% | Nonnegative percentage; complementary to performance |
 | Match performance weight | 30% | Nonnegative percentage; combined total must be 100% |
-| Recent completed standard matches for overall leaderboard | 10 | Positive whole number; applies to the preceding three-month window |
+| Recent completed standard matches for overall leaderboard | 10 | Whole number from 1 to 40 (product owner, October 30, 2026); applies to the preceding three-month window |
 
 A linked percentage control or clear total validation can prevent invalid weight sums. The exact precision is an implementation choice; do not permit a displayed total that rounds to 100 while the stored total differs.
 

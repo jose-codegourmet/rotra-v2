@@ -19,7 +19,7 @@ import { playerProfiles } from '../fixtures/playerProfiles'
 import { createPlayerRankFixtures } from '../fixtures/playerRanks'
 import { clubPlayers, players } from '../fixtures/players'
 import { createQueueFixtures } from '../fixtures/queueSessions'
-import { rankingSettings } from '../fixtures/rankingSettings'
+import { rankingPolicyVersions } from '../fixtures/rankingSettings'
 import { createSessionPublicationFixtures } from '../fixtures/sessionPublications'
 import { venues } from '../fixtures/venues'
 import type { InventoryItem } from '../inventory/inventory.types'
@@ -33,7 +33,7 @@ import type {
   SessionCourt,
   SessionFinalization,
 } from '../queue-session/queueSession.types'
-import type { RankingSettings } from '../ranking-settings/rankingSettings.types'
+import type { RankingPolicyVersion } from '../ranking-settings/rankingSettings.types'
 import type { SessionCostEstimate } from '../session-cost/sessionCost.types'
 import type { SessionPaymentMark } from '../session-payment/sessionPayment.types'
 import { createResultSnapshot } from '../session-result/sessionResult.rules'
@@ -61,7 +61,8 @@ export type MockState = {
   playerProfiles: PlayerProfile[]
   playerRanks: Record<string, PlayerRank>
   playerGames: Record<string, PlayerSessionRecord[]>
-  rankingSettings: RankingSettings
+  /** Ranking settings versions, oldest first; append-only. The newest is in effect. */
+  rankingPolicyVersions: RankingPolicyVersion[]
   clubs: Club[]
   /** Admin: one dedicated sign-in per club (no password is ever stored) */
   clubAccounts: ClubAccount[]
@@ -137,7 +138,7 @@ function seedState(): MockState {
     resetLinks: { 'reset-valid': 'valid' },
     claimLinks,
     contactChangeRequests: createContactChangeRequestFixtures(now),
-    rankingSettings,
+    rankingPolicyVersions,
     clubs,
     ...createAdminClubFixtures(now),
     adminAuditEvents: createAdminAuditEvents(now),

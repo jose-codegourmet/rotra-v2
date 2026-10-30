@@ -108,6 +108,22 @@ export function DevTools() {
           onChange: (value) =>
             dispatch(setDevToggle({ key: 'adminNextContactApplicationFails', value })),
         },
+        {
+          key: 'adminNextRankingSettingsSaveFails',
+          label: 'Next settings save fails',
+          description: 'The values in effect stay; the draft is kept.',
+          checked: Boolean(toggles.adminNextRankingSettingsSaveFails),
+          onChange: (value) =>
+            dispatch(setDevToggle({ key: 'adminNextRankingSettingsSaveFails', value })),
+        },
+        {
+          key: 'adminRankingSettingsSavedElsewhere',
+          label: 'Someone else saves settings first',
+          description: 'Your next settings save meets a newer version.',
+          checked: Boolean(toggles.adminRankingSettingsSavedElsewhere),
+          onChange: (value) =>
+            dispatch(setDevToggle({ key: 'adminRankingSettingsSavedElsewhere', value })),
+        },
       ]}
       controlLabels={{ offline: 'Offline' }}
       open={open}

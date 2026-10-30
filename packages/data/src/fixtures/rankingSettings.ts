@@ -4,6 +4,7 @@ import type {
 } from '../ranking-settings/rankingSettings.types'
 import { adminAccount } from './adminAccounts'
 
+/** Version 1 in the RankingSettings reader shape (stories and tests; the store keeps versions). */
 export const rankingSettings: RankingSettings = {
   assessmentWeightPercent: 70,
   matchRequirement: 10,

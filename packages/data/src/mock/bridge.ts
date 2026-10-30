@@ -7,6 +7,10 @@ export type MockDevState = {
   adminNextLicenseSaveNoReply?: boolean
   /** Admin: the next approved contact change fails at the sign-in provider and needs a retry */
   adminNextContactApplicationFails?: boolean
+  /** Admin: the next ranking settings save fails; the version in effect stays */
+  adminNextRankingSettingsSaveFails?: boolean
+  /** Admin: another browser saves a ranking settings version just before the next save */
+  adminRankingSettingsSavedElsewhere?: boolean
   offline: boolean
   licenseExpired: boolean
   nextSaveFails: boolean
@@ -53,6 +57,8 @@ type ConsumableToggle =
   | 'adminNextSignInRejected'
   | 'adminNextLicenseSaveNoReply'
   | 'adminNextContactApplicationFails'
+  | 'adminNextRankingSettingsSaveFails'
+  | 'adminRankingSettingsSavedElsewhere'
 let consume = (_key: ConsumableToggle) => {}
 const listeners = new Set<() => void>()
 const saveFailureListeners = new Set<() => void>()

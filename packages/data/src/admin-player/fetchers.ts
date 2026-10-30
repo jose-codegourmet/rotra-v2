@@ -1,6 +1,7 @@
 import { delay } from '../mock/latency'
 import { type MockState, readMockState } from '../mock/store'
 import type { Player } from '../player/player.types'
+import { effectiveRankingVersion } from '../ranking-settings/rankingSettings.rules'
 import {
   ADMIN_PLAYER_PAGE_SIZE,
   createdOnFromRtrId,
@@ -60,7 +61,7 @@ function adminPlayerOf(state: MockState, player: Player): AdminPlayer {
     rankStatus: rankStatusOf(
       levelIndex,
       recentStandardMatches,
-      state.rankingSettings.matchRequirement,
+      effectiveRankingVersion(state.rankingPolicyVersions).recentStandardMatchThreshold,
     ),
   }
 }

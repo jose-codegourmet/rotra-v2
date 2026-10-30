@@ -6,7 +6,7 @@
 
 Fields: UUID/version PK; effective time; assessment/performance weights in basis points; recent-standard-match threshold; algorithm-version reference; creator admin; creation time; change note.
 
-Checks: weights each between 0 and 10000, sum 10000; match threshold positive. Initial values 7000, 3000, and 10.
+Checks: weights each between 0 and 10000, sum 10000; match threshold a whole number from 1 to 40 (product owner, October 30, 2026). Initial values 7000, 3000, and 10.
 
 Versions are append-only so results explain which configuration produced them. Whether changes recompute past/current ranks immediately or apply prospectively remains open. Three months and the five-prior-club-session award requirement are not automatically additional editable controls.
 

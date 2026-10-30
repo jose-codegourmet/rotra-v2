@@ -1,7 +1,9 @@
 import { z } from 'zod'
 
 export const RANKING_WEIGHT_ERROR = 'Use a whole number from 0 to 100.'
-export const RANKING_THRESHOLD_ERROR = 'Use a whole number of at least 1.'
+/** Most recent standard matches the leaderboard can require (product owner, 2026-10-30). */
+export const RANKING_THRESHOLD_MAX = 40
+export const RANKING_THRESHOLD_ERROR = 'Use a whole number from 1 to 40.'
 
 /** The total message, naming what the two weights add up to. */
 export const rankingWeightTotalError = (total: number) =>
@@ -23,7 +25,8 @@ export function parseWholeNumber(value: string | null | undefined): number | nul
 
 /**
  * rotra-admin.html cfgCheck(): each weight a whole percentage 0–100, the two summing to exactly 100
- * (checked only once both weights are valid), and the leaderboard requirement a whole number ≥ 1.
+ * (checked only once both weights are valid), and the leaderboard requirement a whole number from 1
+ * to RANKING_THRESHOLD_MAX (the prototype caps at 100; the product owner set 40 on 2026-10-30).
  * Whole percentages only, so a displayed 100% is always a stored 100%.
  */
 export function rankingSettingsErrors(input: RankingSettingsInput): RankingSettingsErrors {
@@ -37,7 +40,8 @@ export function rankingSettingsErrors(input: RankingSettingsInput): RankingSetti
     const total = assessment + performance
     if (total !== 100) errors.total = rankingWeightTotalError(total)
   }
-  if (threshold === null || threshold < 1) errors.threshold = RANKING_THRESHOLD_ERROR
+  if (threshold === null || threshold < 1 || threshold > RANKING_THRESHOLD_MAX)
+    errors.threshold = RANKING_THRESHOLD_ERROR
   return errors
 }
 

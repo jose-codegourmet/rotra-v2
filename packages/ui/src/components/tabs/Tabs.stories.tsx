@@ -65,3 +65,17 @@ export const WithDisabled: Story = {
     ],
   },
 }
+
+// Admin club detail: the prototype's tab badges, including the .bad "Failed" chip.
+export const ClubSections: Story = {
+  args: {
+    'aria-label': 'Club sections',
+    value: 'overview',
+    items: [
+      { value: 'overview', label: 'Overview', badges: [{ text: '1 request', tone: 'warn' }] },
+      { value: 'license', label: 'License' },
+      { value: 'pages', label: 'Public pages', badges: [{ text: 'Failed', tone: 'error' }] },
+      { value: 'activity', label: 'Activity', badges: [{ text: '2' }] },
+    ],
+  },
+}

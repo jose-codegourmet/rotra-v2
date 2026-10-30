@@ -235,10 +235,16 @@ from the [database design](database_design/product/README.md). Add a row here **
 | Term | TS type / Prisma model | Table (proposed) | Notes |
 |---|---|---|---|
 | Admin account | `AdminAccount` | `admin_accounts` | Platform owner only |
+| Admin audit event | `AdminAuditEvent` | `admin_audit_events` | Append-only "Record of actions" line; the summary never carries passwords or tokens |
 | Club | `Club` | `clubs` | |
 | Club account | `ClubAccount` | `club_accounts` | |
+| Club name change | `ClubNameChangeRequest` | `club_name_change_requests` | `state`: `pending` · `approved` · `rejected` · `cancelled`; one pending per club; takes effect only when the platform owner approves |
 | Venue | `ClubVenue` | `club_venues` | |
-| License term | `ClubLicenseTerm` | `club_license_terms` | |
+| License term | `ClubLicenseTerm` | `club_license_terms` | `plan`: `Monthly` · `Yearly`; idempotent on `sourceCommandId`; a free club's term is ₱0 with `paidOn` null |
+| Club access | `ClubAccessState` | — | Admin projection from terms and today: `active` · `expired` · `scheduled` · `none` (Queue's gate state is `ClubAccess`) |
+| Club expiry cycle | `ClubExpiryCycle` | `club_expiry_cycles` | Six-month public-page countdown from the first unlicensed day; renewal cancels it, a later expiry starts a new one. The mock records cancelled cycles in `ClubRetentionRecord` and derives the running one |
+| Public-page retention | `RetentionState` | — | Projection: `none` · `restored` · `stale` · `due` · `failed` · `deleted` |
+| Club entitlement | `ClubEntitlement` | `club_entitlements` | Projection of effective access; not stored in the mock (computed with `accessOf`) |
 | Saved club player | `ClubPlayer` | `club_players` | `playerId` null = guest |
 | Queue Session | `QueueSession` | `queue_sessions` | `state`: `prepared` · `active` · `finalizing` · `completed` · `invalid` |
 | Join request | `SessionJoinRequest` | `session_join_requests` | `status`: `pending` · `confirmed` · `declined` |

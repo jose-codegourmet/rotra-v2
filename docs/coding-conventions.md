@@ -200,7 +200,8 @@ packages/schema/src/
 ├── name.ts       nameField    (trimmed; max length is a placeholder until decided)
 ├── personal-details.ts  personalDetailsShape, personalProfileSchema (player name, nickname,
 │                        playing style, experience; limits are prototype placeholders)
-└── social-link.ts       socialLinkField(provider), socialLinksShape, SOCIAL_PROVIDERS
+├── social-link.ts       socialLinkField(provider), socialLinksShape, SOCIAL_PROVIDERS
+└── club-price.ts        clubPriceField (Paid whole pesos → centavos, yearly < 12 × monthly; or Free)
 ```
 
 - A form's `.schema.ts` composes them: `z.object({ email: emailField, phone: phoneField.optional() })`.

@@ -14,6 +14,8 @@ export type ConfirmSheetProps = {
   summary?: ReactNode
   /** What happens and what cannot be undone, word for word from dialogs.md */
   consequence: ReactNode
+  /** A small muted line after the consequence, e.g. what does not change */
+  note?: ReactNode
   /** Names the action ("Confirm invalid match", "Start session"); never a neutral "Save" */
   confirmLabel: string
   onConfirm: () => void
@@ -42,6 +44,7 @@ export function ConfirmSheet({
   title,
   summary,
   consequence,
+  note,
   confirmLabel,
   onConfirm,
   backLabel = 'Back',
@@ -90,6 +93,7 @@ export function ConfirmSheet({
     >
       {summary}
       <p className="m-0">{consequence}</p>
+      {note ? <p className="m-0 text-[13px] text-fg2">{note}</p> : null}
       {error ? <Notice tone="error">{error}</Notice> : null}
     </Sheet>
   )

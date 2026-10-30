@@ -7,7 +7,12 @@ import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, readMockState } from '../mock/store'
 import { queueMutation, requireClubAccess } from '../mock/transaction'
-import { buildPostValues, DEFAULT_POST_TEMPLATE, fillPostTemplate } from './club.rules'
+import {
+  buildPostValues,
+  clubInitials,
+  DEFAULT_POST_TEMPLATE,
+  fillPostTemplate,
+} from './club.rules'
 
 function clubIn(state: MockState) {
   const club = state.clubs.find((c) => c.id === DEMO_CLUB_ID)
@@ -37,18 +42,13 @@ export const cancelClubNameChange = () =>
     clubIn(state).pendingNameChange = null
     return { data: null, text: 'Name-change request cancelled' }
   })
-export const approveClubNameChange = () =>
+/** Queue DevMenu only: acts as the platform owner approving the club's own pending request. */
+export const simulateClubNameApproval = () =>
   changeClub((state) => {
     const club = clubIn(state)
     if (!club.pendingNameChange) throw new MockError('conflict', 'No pending name change.')
     club.name = club.pendingNameChange.requestedName
-    club.initials =
-      club.name
-        .split(/\s+/)
-        .filter(Boolean)
-        .slice(0, 2)
-        .map((word) => word.charAt(0).toUpperCase())
-        .join('') || 'C'
+    club.initials = clubInitials(club.name)
     club.pendingNameChange = null
     return { data: null, text: `Approved: your club is now ${club.name}` }
   })

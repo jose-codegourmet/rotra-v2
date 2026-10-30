@@ -1,12 +1,18 @@
-import type { Club } from '../club/club.types'
+import type { AdminAuditEvent } from '../admin-audit/adminAudit.types'
+import type { AdminClubRecord, Club, ClubAccount, ClubNameChangeRequest } from '../club/club.types'
 import type { ClubPlayer } from '../club-player/clubPlayer.types'
 import type { ClubVenue } from '../club-venue/clubVenue.types'
 import type { ContactChangeRequest } from '../contact-change-request/contactChangeRequest.types'
+import { createAdminAuditEvents } from '../fixtures/adminAuditEvents'
+import {
+  adminClubRetentionRecords,
+  adminClubTerms,
+  createAdminClubFixtures,
+} from '../fixtures/adminClubs'
 import { clubs } from '../fixtures/clubs'
 import { contactChangeRequests } from '../fixtures/contactChangeRequests'
 import { createFinancialFixtures } from '../fixtures/financials'
 import { inventoryItems } from '../fixtures/inventory'
-import { licensePayments } from '../fixtures/licensePayments'
 import { claimLinks, playerAccounts } from '../fixtures/playerAccounts'
 import { playerAwardHistory } from '../fixtures/playerAwardHistory'
 import { playerProfiles } from '../fixtures/playerProfiles'
@@ -17,7 +23,7 @@ import { rankingSettings } from '../fixtures/rankingSettings'
 import { createSessionPublicationFixtures } from '../fixtures/sessionPublications'
 import { venues } from '../fixtures/venues'
 import type { InventoryItem } from '../inventory/inventory.types'
-import type { ClubLicenseTerm } from '../license/license.types'
+import type { ClubLicenseTerm, ClubRetentionRecord } from '../license/license.types'
 import type { Match } from '../match/match.types'
 import type { Player, PlayerProfile, PlayerRank, PlayerSessionRecord } from '../player/player.types'
 import type { ClaimLinkRecord } from '../player-account/playerAccount.types'
@@ -56,6 +62,15 @@ export type MockState = {
   playerGames: Record<string, PlayerSessionRecord[]>
   rankingSettings: RankingSettings
   clubs: Club[]
+  /** Admin: one dedicated sign-in per club (no password is ever stored) */
+  clubAccounts: ClubAccount[]
+  /** Admin: name change requests in every state; Queue's own request stays on Club.pendingNameChange */
+  clubNameChangeRequests: ClubNameChangeRequest[]
+  adminClubRecords: AdminClubRecord[]
+  /** Admin "Record of actions", newest first; append-only */
+  adminAuditEvents: AdminAuditEvent[]
+  /** Admin Add club replays: source command ID → the club it created */
+  adminCommands: Record<string, { clubId: string }>
   venues: ClubVenue[]
   players: Player[]
   clubPlayers: ClubPlayer[]
@@ -64,7 +79,10 @@ export type MockState = {
   roster: SessionPlayer[]
   waitlist: SessionWaitlistEntry[]
   joinRequests: SessionJoinRequest[]
+  /** Every club's license terms (Admin A-LICENSE); Queue reads the demo club's as its payments */
   licensePayments: ClubLicenseTerm[]
+  /** Admin: public-page retention per club (cancelled countdowns, failed or finished deletion) */
+  clubRetentionRecords: ClubRetentionRecord[]
   downloads: Record<string, DownloadState>
   downloadInfo: Record<string, { downloadedAt: number | null; error?: string }>
   sync: SyncState
@@ -120,6 +138,9 @@ function seedState(): MockState {
     contactChangeRequests,
     rankingSettings,
     clubs,
+    ...createAdminClubFixtures(now),
+    adminAuditEvents: createAdminAuditEvents(now),
+    adminCommands: {},
     venues,
     players,
     clubPlayers,
@@ -128,7 +149,8 @@ function seedState(): MockState {
     roster: [...roster, ...history.roster],
     waitlist: [],
     joinRequests: [],
-    licensePayments,
+    licensePayments: adminClubTerms,
+    clubRetentionRecords: adminClubRetentionRecords,
     downloads: {},
     downloadInfo: {},
     sessionIntegrity: {},

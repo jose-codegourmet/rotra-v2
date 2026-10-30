@@ -11,7 +11,8 @@
     "./password": "./src/password.ts",
     "./name": "./src/name.ts",
     "./personal-details": "./src/personal-details.ts",
-    "./social-link": "./src/social-link.ts"
+    "./social-link": "./src/social-link.ts",
+    "./club-price": "./src/club-price.ts"
   },
   "scripts": {
     "lint": "biome check .",

@@ -1,7 +1,7 @@
 'use client'
 import { useSignIn } from '@rotra/data/auth/use-sign-in'
 import { useSignOut } from '@rotra/data/auth/use-sign-out'
-import { useApproveClubNameChange } from '@rotra/data/club/useApproveClubNameChange'
+import { useSimulateClubNameApproval } from '@rotra/data/club/useSimulateClubNameApproval'
 import { resetDemoData } from '@rotra/data/mock/reset'
 import { useNowCard } from '@rotra/data/queue-session/useNowCard'
 import { useAddSampleJoinRequest } from '@rotra/data/session-roster/useAddSampleJoinRequest'
@@ -13,7 +13,7 @@ import { resetDev, selectDev, setDevToggle } from '@/store/slices/devSlice'
 
 /** The "Prototype" button and its controls; rendered in the top bars of development builds only. */
 export function DevTools() {
-  const approveName = useApproveClubNameChange(),
+  const approveName = useSimulateClubNameApproval(),
     sample = useAddSampleJoinRequest(),
     nowCard = useNowCard()
   const session = nowCard.data?.live ?? nowCard.data?.upcoming

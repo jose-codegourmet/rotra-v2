@@ -16,6 +16,14 @@ Every entry inherits its actor, business/screen issue mapping, lifecycle, error,
 | [signInAdmin](../../../packages/data/src/admin-account/fetchers.ts#L26)<br>`input: AdminSignInInput` | `Promise<AdminSession>` | [useSignInAdmin](../../../packages/data/src/admin-account/useSignInAdmin.ts) |
 | [signOutAdmin](../../../packages/data/src/admin-account/fetchers.ts#L41)<br>`input?: { sessionEnded?: boolean; } \| undefined` | `Promise<AdminSession>` | [useSignOutAdmin](../../../packages/data/src/admin-account/useSignOutAdmin.ts) |
 
+## admin-audit
+
+[Query keys](../../../packages/data/src/admin-audit/queryKeys.ts). Admin club mutations invalidate `adminAuditKeys.all`.
+
+| Callable / current input | Output | Hook module exports |
+|---|---|---|
+| [listAuditEvents](../../../packages/data/src/admin-audit/fetchers.ts#L23)<br>`params: { targetType: AdminAuditTargetType; targetId: string; }, signal?: AbortSignal \| undefined` | `Promise<AdminAuditEvent[]>` | [useAuditEvents](../../../packages/data/src/admin-audit/useAuditEvents.ts) |
+
 ## auth
 
 [Query keys](../../../packages/data/src/auth/queryKeys.ts). See each hook for `setQueryData`, removal, subscriptions and invalidation, including the broad non-auth invalidation used by `useMockMutation`.
@@ -32,12 +40,20 @@ Every entry inherits its actor, business/screen issue mapping, lifecycle, error,
 
 | Callable / current input | Output | Hook module exports |
 |---|---|---|
-| [approveClubNameChange](../../../packages/data/src/club/settings.ts#L40)<br>`(no arguments)` | `Promise<SaveOutcome & { data: null; }>` | [useApproveClubNameChange](../../../packages/data/src/club/useApproveClubNameChange.ts) |
+| [addClub](../../../packages/data/src/club/fetchers.ts#L209)<br>`input: AddClubInput, sourceCommandId: string` | `Promise<{ clubId: string; name: string; }>` | [useAddClub](../../../packages/data/src/club/useAddClub.ts) |
+| [approveClubNameChange](../../../packages/data/src/club/fetchers.ts#L324)<br>`clubId: string` | `Promise<{ changed: boolean; name: string; }>` | [useApproveClubNameChange](../../../packages/data/src/club/useApproveClubNameChange.ts) |
 | [cancelClubNameChange](../../../packages/data/src/club/settings.ts#L35)<br>`(no arguments)` | `Promise<SaveOutcome & { data: null; }>` | [useCancelClubNameChange](../../../packages/data/src/club/useCancelClubNameChange.ts) |
+| [changeClubPrice](../../../packages/data/src/club/fetchers.ts#L280)<br>`clubId: string, price: ClubPriceValues` | `Promise<{ changed: boolean; priceLine: string; }>` | [useChangeClubPrice](../../../packages/data/src/club/useChangeClubPrice.ts) |
 | [changeClubPassword](../../../packages/data/src/club/settings.ts#L93)<br>`input: { current: string; next: string; }` | `Promise<SaveOutcome & { data: null; }>` | [useChangeClubPassword](../../../packages/data/src/club/useChangeClubPassword.ts) |
+| [getAdminClub](../../../packages/data/src/club/fetchers.ts#L143)<br>`id: string, signal?: AbortSignal \| undefined` | `Promise<AdminClubDetail \| null>` | [useAdminClub](../../../packages/data/src/club/useAdminClub.ts) |
 | [getClub](../../../packages/data/src/club/fetchers.ts#L9)<br>`id: string, signal?: AbortSignal \| undefined` | `Promise<Club>` | [useClub](../../../packages/data/src/club/useClub.ts) |
+| [getClubIdentityIndex](../../../packages/data/src/club/fetchers.ts#L183)<br>`signal?: AbortSignal \| undefined` | `Promise<ClubIdentityIndex>` | [useClubIdentityIndex](../../../packages/data/src/club/useClubIdentityIndex.ts) |
 | [getFacebookPost](../../../packages/data/src/club/settings.ts#L137)<br>`sessionId: string` | `Promise<{ text: string; playerCount: number; sessionTitle: string; }>` | [useFacebookPost](../../../packages/data/src/club/useFacebookPost.ts) |
 | [getPostPreview](../../../packages/data/src/club/settings.ts#L141)<br>`draft: { template?: string; description?: string; courtRules?: string; }` | `Promise<{ text: string; playerCount: number; sessionTitle: string; } \| null>` | [usePostPreview](../../../packages/data/src/club/usePostPreview.ts) |
+| [listAdminClubs](../../../packages/data/src/club/fetchers.ts#L123)<br>`params?: AdminClubListParams, signal?: AbortSignal \| undefined` | `Promise<AdminClubList>` | [useAdminClubs](../../../packages/data/src/club/useAdminClubs.ts) |
+| [listClubNameRequests](../../../packages/data/src/club/fetchers.ts#L375)<br>`signal?: AbortSignal \| undefined` | `Promise<ClubNameRequestList>` | [useClubNameRequests](../../../packages/data/src/club/useClubNameRequests.ts) |
+| [rejectClubNameChange](../../../packages/data/src/club/fetchers.ts#L352)<br>`clubId: string` | `Promise<{ changed: boolean; name: string; }>` | [useRejectClubNameChange](../../../packages/data/src/club/useRejectClubNameChange.ts) |
+| [simulateClubNameApproval](../../../packages/data/src/club/settings.ts#L46)<br>`(no arguments)` | `Promise<SaveOutcome & { data: null; }>` | [useSimulateClubNameApproval](../../../packages/data/src/club/useSimulateClubNameApproval.ts) |
 | [requestClubNameChange](../../../packages/data/src/club/settings.ts#L29)<br>`input: { requestedName: string; }` | `Promise<SaveOutcome & { data: null; }>` | [useRequestClubNameChange](../../../packages/data/src/club/useRequestClubNameChange.ts) |
 | [resetFacebookPostTemplate](../../../packages/data/src/club/settings.ts#L88)<br>`(no arguments)` | `Promise<SaveOutcome & { data: null; }>` | [useResetFacebookPostTemplate](../../../packages/data/src/club/useResetFacebookPostTemplate.ts) |
 | [saveFacebookPost](../../../packages/data/src/club/settings.ts#L76)<br>`input: { template?: string; description?: string; courtRules?: string; }` | `Promise<SaveOutcome & { data: null; }>` | [useSaveFacebookPost](../../../packages/data/src/club/useSaveFacebookPost.ts) |
@@ -108,9 +124,12 @@ Every entry inherits its actor, business/screen issue mapping, lifecycle, error,
 
 | Callable / current input | Output | Hook module exports |
 |---|---|---|
-| [getClubAccess](../../../packages/data/src/license/fetchers.ts#L6)<br>`(no arguments)` | `Promise<ClubAccess>` | [useClubAccess](../../../packages/data/src/license/useClubAccess.ts) |
-| [getClubLicense](../../../packages/data/src/license/fetchers.ts#L21)<br>`(no arguments)` | `Promise<{ plan: "Monthly" \| "Yearly"; activeSince: string; activeUntil: string; daysLeft: number; status: "active" \| "expired" \| "unverified"; } \| null>` | [useClubLicense](../../../packages/data/src/license/useClubLicense.ts) |
-| [getLicensePayments](../../../packages/data/src/license/fetchers.ts#L14)<br>`(no arguments)` | `Promise<ClubLicenseTerm[]>` | [useLicensePayments](../../../packages/data/src/license/useLicensePayments.ts) |
+| [getClubAccess](../../../packages/data/src/license/fetchers.ts#L26)<br>`(no arguments)` | `Promise<ClubAccess>` | [useClubAccess](../../../packages/data/src/license/useClubAccess.ts) |
+| [getClubLicense](../../../packages/data/src/license/fetchers.ts#L41)<br>`(no arguments)` | `Promise<{ plan: "Monthly" \| "Yearly"; activeSince: string; activeUntil: string; daysLeft: number; status: "active" \| "expired" \| "unverified"; } \| null>` | [useClubLicense](../../../packages/data/src/license/useClubLicense.ts) |
+| [getLicensePayments](../../../packages/data/src/license/fetchers.ts#L34)<br>`(no arguments)` | `Promise<ClubLicenseTerm[]>` | [useLicensePayments](../../../packages/data/src/license/useLicensePayments.ts) |
+| [listLicenseTerms](../../../packages/data/src/license/fetchers.ts#L102)<br>`clubId: string, signal?: AbortSignal \| undefined` | `Promise<ClubLicenseTerm[]>` | [useLicenseTerms](../../../packages/data/src/license/useLicenseTerms.ts) |
+| [activateLicense](../../../packages/data/src/license/fetchers.ts#L134)<br>`input: ActivateLicenseInput` | `Promise<LicenseOperation>` | [useActivateLicense](../../../packages/data/src/license/useActivateLicense.ts) |
+| [getLicenseOperation](../../../packages/data/src/license/fetchers.ts#L195)<br>`sourceCommandId: string, signal?: AbortSignal \| undefined` | `Promise<LicenseOperation \| null>` | [useCheckLicenseOperation](../../../packages/data/src/license/useCheckLicenseOperation.ts) |
 
 ## match
 
@@ -273,7 +292,7 @@ Every entry inherits its actor, business/screen issue mapping, lifecycle, error,
 
 - `useAdminConnectivity` subscribes to browser connectivity, with no database command. `parseAdminSession` and `readAdminSessionMarker` are local cookie helpers, not authenticated server reads.
 - `addSampleJoinRequest` / `useAddSampleJoinRequest` and `advanceContactChangeRequest` / `useAdvanceContactChangeRequest` drive DevMenu scenarios. Their inclusion records existing code; they must not become unrestricted product endpoints.
-- `approveClubNameChange` is a mock approval action exposed beside club settings; real review requires Owner authority. `setRankingSettings` also lacks real Owner authorization/versioning.
+- `simulateClubNameApproval` is the Queue DevMenu's mock approval of the club's own request; real review is the Admin `approveClubNameChange` and requires Owner authority. `setRankingSettings` also lacks real Owner authorization/versioning.
 - `sessionSummary`, `clubPlayerView`, `registeredCity`, `venuePrefill`, `licensePaymentsCsv`, `applyPersonalProfile`, `sessionCostIn`, `recomputeMinimum`, `promoteWaiter`, `recordChange`, `saveToastText`, `connectMockSync`, projections and pure rules are internal/local helpers. The public operations that use them are cataloged above.
 - Admin clubs/licenses, privileged player review and flags are documented target work, not missing entries accidentally treated as implemented; see the [missing command boundaries](command-contracts.md#documented-actions-with-no-production-command-implementation).
 

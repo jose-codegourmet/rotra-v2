@@ -91,6 +91,15 @@ export function DevTools() {
           checked: Boolean(toggles.adminNextSignInRejected),
           onChange: (value) => dispatch(setDevToggle({ key: 'adminNextSignInRejected', value })),
         },
+        {
+          key: 'adminNextLicenseSaveNoReply',
+          label: 'Next license save gets no reply',
+          description:
+            'The term is saved, but the reply is lost. Check status finds it instead of adding a second one.',
+          checked: Boolean(toggles.adminNextLicenseSaveNoReply),
+          onChange: (value) =>
+            dispatch(setDevToggle({ key: 'adminNextLicenseSaveNoReply', value })),
+        },
       ]}
       controlLabels={{ offline: 'Offline' }}
       open={open}

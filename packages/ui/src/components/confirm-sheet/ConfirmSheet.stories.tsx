@@ -1,4 +1,5 @@
 import { Button } from '@rotra/ui/button'
+import { ChangeCompare } from '@rotra/ui/change-compare'
 import { KeyValueList } from '@rotra/ui/key-value-list'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
@@ -75,6 +76,21 @@ export const Primary: Story = {
       consequence="This result cannot be changed after confirmation. The court will become available."
       confirmLabel="Team A won"
       backLabel="Back to result"
+      destructive={false}
+    />
+  ),
+}
+
+// D-CLUB-NAME approve (rotra-admin.html SHEETS.nameApprove)
+export const WithNote: Story = {
+  render: () => (
+    <Demo
+      title="Approve name change?"
+      summary={<ChangeCompare from="Lahug Smash Club" to="Lahug Smashers" toLabel="New" />}
+      consequence="The new name shows on the club's dashboard, its public session pages and future result images."
+      note="RTR IDs and the founding address don't change."
+      confirmLabel="Approve name change"
+      backLabel="Back"
       destructive={false}
     />
   ),

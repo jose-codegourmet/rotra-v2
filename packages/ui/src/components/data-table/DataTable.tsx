@@ -12,7 +12,7 @@ import {
   type SortingState,
   useReactTable,
 } from '@tanstack/react-table'
-import { type KeyboardEvent, type ReactNode, useState } from 'react'
+import { type KeyboardEvent, type MouseEvent, type ReactNode, useState } from 'react'
 
 declare module '@tanstack/react-table' {
   interface ColumnMeta<TData extends RowData, TValue> {
@@ -34,7 +34,8 @@ export type DataTableProps<TData> = {
   /** Names the table, e.g. "Clubs" */
   'aria-label': string
   getRowId?: (row: TData) => string
-  /** Makes rows clickable (.tbl tr.click); Enter and Space work too */
+  /** Makes rows clickable (.tbl tr.click); Enter and Space work too. Links and buttons inside a row
+   * keep their own action instead of also firing this one. */
   onRowClick?: (row: TData) => void
   /** Extra classes for one row, e.g. the live leaderboard's highlighted top three (.lb tr.top) */
   rowClassName?: (row: TData, index: number) => string | undefined
@@ -93,7 +94,13 @@ export function DataTable<TData>({
     </tr>
   )
 
+  // A link or button inside the row (the club name in A-CLUBS) already acts; don't act twice.
+  const fromControl = (event: MouseEvent | KeyboardEvent) =>
+    event.target !== event.currentTarget &&
+    (event.target as Element).closest('a, button, input, select, textarea, label') !== null
+
   const onRowKey = (event: KeyboardEvent<HTMLTableRowElement>, row: TData) => {
+    if (fromControl(event)) return
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault()
       onRowClick?.(row)
@@ -177,7 +184,13 @@ export function DataTable<TData>({
                       <tr
                         key={row.id}
                         tabIndex={onRowClick ? 0 : undefined}
-                        onClick={onRowClick ? () => onRowClick(row.original) : undefined}
+                        onClick={
+                          onRowClick
+                            ? (event) => {
+                                if (!fromControl(event)) onRowClick(row.original)
+                              }
+                            : undefined
+                        }
                         onKeyDown={
                           onRowClick ? (event) => onRowKey(event, row.original) : undefined
                         }

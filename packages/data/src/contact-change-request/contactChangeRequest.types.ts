@@ -47,3 +47,20 @@ export type AdminContactChangeRequest = ContactChangeRequest & {
   /** Why an approved change couldn't be applied (status 'failed') */
   error?: string
 }
+
+/** Another player identity, named on screen by name and RTR ID only (never by its phone or email). */
+export type ContactCheckPlayer = { id: string; fullName: string; rtrId: string }
+
+/**
+ * One pre-approval check on a pending request (rotra-admin.html checks()). `ok: false` blocks Approve;
+ * the details say why. Computed upstream (A03.6), never in the component.
+ */
+export type ContactCheck =
+  /** The requested contact already belongs to another player */
+  | { kind: 'linked-elsewhere'; ok: boolean; otherPlayer?: ContactCheckPlayer }
+  /** The same player sent a newer open request for this field */
+  | { kind: 'newer-request'; ok: boolean; newerRequestId?: string; sentAt?: number }
+  /** The player's applied contact no longer matches the request's `fromValue` ('' = not set) */
+  | { kind: 'original-changed'; ok: boolean; currentValue?: string }
+  /** Another contact change for this player is still being applied */
+  | { kind: 'in-progress'; ok: boolean }

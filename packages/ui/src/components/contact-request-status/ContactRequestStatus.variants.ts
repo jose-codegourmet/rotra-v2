@@ -22,3 +22,9 @@ export const REQUEST_FIELD_LABEL: Record<ContactChangeField, string> = {
   phone: 'Phone number',
   email: 'Email',
 }
+
+/** The field inside a sentence (rotra-admin.html FIELD): "This phone number is already linked…" */
+export const REQUEST_FIELD_WORD: Record<ContactChangeField, string> = {
+  phone: 'phone number',
+  email: 'email',
+}

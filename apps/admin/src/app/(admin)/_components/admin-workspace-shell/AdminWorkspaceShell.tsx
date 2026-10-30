@@ -6,6 +6,7 @@ import { useAdminPlayers } from '@rotra/data/admin-player/useAdminPlayers'
 import { useAdminClubs } from '@rotra/data/club/useAdminClubs'
 import { useClubNameRequests } from '@rotra/data/club/useClubNameRequests'
 import { useContactRequestCounts } from '@rotra/data/contact-change-request/useContactRequestCounts'
+import { useFeatureFlags } from '@rotra/data/feature-flag/useFeatureFlags'
 import { MockError } from '@rotra/data/mock/errors'
 import { AccessDeniedCard } from '@rotra/ui/access-denied-card'
 import { AdminAccountBadge } from '@rotra/ui/admin-account-badge'
@@ -27,6 +28,8 @@ import {
   useLayoutEffect,
   useState,
 } from 'react'
+import { useAppDispatch, useAppSelector } from '@/store/hooks'
+import { requestLeave, selectUnsavedDraft } from '@/store/slices/uiSlice'
 
 const AdminWorkspaceAccess = createContext<(() => void) | null>(null)
 export function useAdminWorkspaceAccess() {
@@ -72,6 +75,7 @@ export function AdminWorkspaceShell({ children }: { children: ReactNode }) {
   const players = useAdminPlayers({}, { enabled: isOwner })
   const nameRequests = useClubNameRequests({ enabled: isOwner })
   const contactRequests = useContactRequestCounts({ enabled: isOwner })
+  const featureFlags = useFeatureFlags({ enabled: isOwner })
   const reportPermissionDenied = useCallback(() => {
     void client.cancelQueries()
     client.clear()
@@ -79,6 +83,13 @@ export function AdminWorkspaceShell({ children }: { children: ReactNode }) {
   }, [client])
   const pathname = usePathname()
   const router = useRouter()
+  const dispatch = useAppDispatch()
+  const unsavedDraft = useAppSelector(selectUnsavedDraft)
+  // With an unsaved draft open, leaving goes through the page's "Discard your draft?" instead of
+  // navigating (rotra-admin.html go() with cfgDirty); the page continues the navigation on Discard.
+  const leave = (href: string) => {
+    if (href !== pathname) dispatch(requestLeave(href))
+  }
   const handleSignOut = () =>
     signOut.mutate(undefined, {
       onSuccess: () => {
@@ -97,7 +108,8 @@ export function AdminWorkspaceShell({ children }: { children: ReactNode }) {
     isPermissionError(clubs.error) ||
     isPermissionError(players.error) ||
     isPermissionError(nameRequests.error) ||
-    isPermissionError(contactRequests.error)
+    isPermissionError(contactRequests.error) ||
+    isPermissionError(featureFlags.error)
   useLayoutEffect(() => {
     if (countsDenied) reportPermissionDenied()
   }, [countsDenied, reportPermissionDenied])
@@ -132,7 +144,8 @@ export function AdminWorkspaceShell({ children }: { children: ReactNode }) {
             product="Admin"
             contained={false}
             menuOnNarrowOnly
-            brandHref="/clubs"
+            brandHref={unsavedDraft ? undefined : '/clubs'}
+            onBrandClick={unsavedDraft ? () => leave('/clubs') : undefined}
             linkAs={Link}
           >
             <AdminAccountBadge
@@ -150,11 +163,13 @@ export function AdminWorkspaceShell({ children }: { children: ReactNode }) {
           current={current}
           hrefs={HREFS}
           linkComponent={Link}
+          onNavigate={unsavedDraft ? leave : undefined}
           counts={{
             clubs: clubs.data?.counts.all,
             players: players.data?.counts.all,
             'contact-changes': contactRequests.data?.attention,
             'club-names': nameRequests.data?.pending.length,
+            'feature-flags': featureFlags.data?.length,
           }}
           accountEmail={email}
           isSigningOut={signOut.isPending}

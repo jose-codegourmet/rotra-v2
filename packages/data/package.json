@@ -157,6 +157,9 @@
     "./ranking-settings/types": "./src/ranking-settings/rankingSettings.types.ts",
     "./ranking-settings/query-keys": "./src/ranking-settings/queryKeys.ts",
     "./ranking-settings/fetchers": "./src/ranking-settings/fetchers.ts",
+    "./ranking-settings/rules": "./src/ranking-settings/rankingSettings.rules.ts",
+    "./ranking-settings/useRankingPolicy": "./src/ranking-settings/useRankingPolicy.ts",
+    "./ranking-settings/useSaveRankingSettings": "./src/ranking-settings/useSaveRankingSettings.ts",
     "./player": "./src/player/player.rules.ts",
     "./player/rules": "./src/player/player.rules.ts",
     "./leaderboard/query-keys": "./src/leaderboard/queryKeys.ts",
@@ -277,7 +280,16 @@
     "./contact-change-request/useRetryContactApplication": "./src/contact-change-request/useRetryContactApplication.ts",
     "./contact-change-request/useCheckContactApplication": "./src/contact-change-request/useCheckContactApplication.ts",
     "./fixtures/contact-change-requests": "./src/fixtures/contactChangeRequests.ts",
-    "./player-account/useSetPhonePrivacy": "./src/player-account/useSetPhonePrivacy.ts"
+    "./player-account/useSetPhonePrivacy": "./src/player-account/useSetPhonePrivacy.ts",
+    "./feature-flag/types": "./src/feature-flag/featureFlag.types.ts",
+    "./fixtures/feature-flags": "./src/fixtures/featureFlags.ts",
+    "./feature-flag/rules": "./src/feature-flag/featureFlag.rules.ts",
+    "./feature-flag/query-keys": "./src/feature-flag/queryKeys.ts",
+    "./feature-flag/fetchers": "./src/feature-flag/fetchers.ts",
+    "./feature-flag/useFeatureFlags": "./src/feature-flag/useFeatureFlags.ts",
+    "./feature-flag/useAddFeatureFlag": "./src/feature-flag/useAddFeatureFlag.ts",
+    "./feature-flag/useSetFeatureFlagValue": "./src/feature-flag/useSetFeatureFlagValue.ts",
+    "./feature-flag/usePlaceholderFeatureFlag": "./src/feature-flag/usePlaceholderFeatureFlag.ts"
   },
   "scripts": {
     "lint": "biome check .",

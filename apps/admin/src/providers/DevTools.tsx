@@ -2,6 +2,7 @@
 import { useAdminSession } from '@rotra/data/admin-account/use-admin-session'
 import { useSignInAdmin } from '@rotra/data/admin-account/use-sign-in-admin'
 import { useSignOutAdmin } from '@rotra/data/admin-account/use-sign-out-admin'
+import { usePlaceholderFeatureFlag } from '@rotra/data/feature-flag/usePlaceholderFeatureFlag'
 import { adminAccount } from '@rotra/data/fixtures/admin-accounts'
 import { connectMockBridge, notifyMockBridge } from '@rotra/data/mock/bridge'
 import { resetDemoData } from '@rotra/data/mock/reset'
@@ -16,6 +17,7 @@ export function DevTools() {
   const signIn = useSignInAdmin()
   const signOut = useSignOutAdmin()
   const session = useAdminSession()
+  const placeholderFlag = usePlaceholderFeatureFlag()
   const store = useAppStore()
   const dispatch = useAppDispatch()
   const toggles = useAppSelector(selectDev)
@@ -107,6 +109,30 @@ export function DevTools() {
           checked: Boolean(toggles.adminNextContactApplicationFails),
           onChange: (value) =>
             dispatch(setDevToggle({ key: 'adminNextContactApplicationFails', value })),
+        },
+        {
+          key: 'adminNextRankingSettingsSaveFails',
+          label: 'Next settings save fails',
+          description: 'The values in effect stay; the draft is kept.',
+          checked: Boolean(toggles.adminNextRankingSettingsSaveFails),
+          onChange: (value) =>
+            dispatch(setDevToggle({ key: 'adminNextRankingSettingsSaveFails', value })),
+        },
+        {
+          key: 'adminRankingSettingsSavedElsewhere',
+          label: 'Someone else saves settings first',
+          description: 'Your next settings save meets a newer version.',
+          checked: Boolean(toggles.adminRankingSettingsSavedElsewhere),
+          onChange: (value) =>
+            dispatch(setDevToggle({ key: 'adminRankingSettingsSavedElsewhere', value })),
+        },
+        {
+          // Lives in the mock store, not Redux: the flag list reads it like any other flag.
+          key: 'adminPlaceholderFeatureFlag',
+          label: 'Show a placeholder flag',
+          description: "Shows how a defined flag looks. It isn't a real flag.",
+          checked: placeholderFlag.shown,
+          onChange: placeholderFlag.setShown,
         },
       ]}
       controlLabels={{ offline: 'Offline' }}

@@ -15,3 +15,16 @@ export class MockError extends Error {
     super(message)
   }
 }
+
+/**
+ * A write based on an outdated revision (kind 'conflict'). Carries what is current now so the screen
+ * can compare and let the person choose; never last-write-wins.
+ */
+export class ConflictError<T> extends MockError {
+  constructor(
+    readonly current: T,
+    message: string,
+  ) {
+    super('conflict', message)
+  }
+}

@@ -265,7 +265,7 @@ from the [database design](database_design/product/README.md). Add a row here **
 | Match format | `MatchFormat` | — | `singles` · `doubles` · `fun_1v2` · `fun_3v3` · `fun_4v4` · `fun_5v5` |
 | Session mode | `SessionMode` | — | `chill` · `fair` · `hard` |
 | Player | `Player` | `players` | Global identity across clubs |
-| Ranking settings | `RankingSettings` | `ranking_policy_versions` | Configured assessment weight and match requirement |
+| Ranking settings | `RankingPolicyVersion` | `ranking_policy_versions` | One append-only saved version: weights in basis points (sum 10000) and the recent-standard-match threshold (1–40); the newest is in effect. `RankingSettings` {assessmentWeightPercent, matchRequirement} is the effective version's reader shape |
 | Leaderboard entry | `LeaderboardEntry` | — | Public projection, no table; overall position comes from eligible fixture order |
 | Player session record / player game | `PlayerSessionRecord` / `PlayerGame` | `player_match_facts` | Public read projection of valid finalized games |
 | Player profile | `PlayerProfile` | — | Public identity, picture, and optional playing details; no contacts |

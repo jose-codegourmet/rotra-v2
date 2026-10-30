@@ -39,6 +39,8 @@ export const FeatureFlagsCurrent: Story = { args: { current: 'feature-flags' } }
 export const WithCounts: Story = { args: { counts: adminNavExamples.counts } }
 export const ZeroCounts: Story = { args: { counts: adminNavExamples.zeroCounts } }
 export const NoCounts: Story = {}
+/** An unsaved draft is open: items report the choice so the shell can ask first. */
+export const AskBeforeLeaving: Story = { args: { current: 'ranking', onNavigate: () => {} } }
 export const LongEmail: Story = { args: { accountEmail: adminAccessExamples.longEmail } }
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
 export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }

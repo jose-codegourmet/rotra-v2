@@ -3,6 +3,7 @@ import type { AdminClubRecord, Club, ClubAccount, ClubNameChangeRequest } from '
 import type { ClubPlayer } from '../club-player/clubPlayer.types'
 import type { ClubVenue } from '../club-venue/clubVenue.types'
 import type { PlayerContactChangeRequest } from '../contact-change-request/contactChangeRequest.types'
+import type { FeatureFlag } from '../feature-flag/featureFlag.types'
 import { createAdminAuditEvents } from '../fixtures/adminAuditEvents'
 import {
   adminClubRetentionRecords,
@@ -11,6 +12,7 @@ import {
 } from '../fixtures/adminClubs'
 import { clubs } from '../fixtures/clubs'
 import { createContactChangeRequestFixtures } from '../fixtures/contactChangeRequests'
+import { featureFlags } from '../fixtures/featureFlags'
 import { createFinancialFixtures } from '../fixtures/financials'
 import { inventoryItems } from '../fixtures/inventory'
 import { claimLinks, playerAccounts } from '../fixtures/playerAccounts'
@@ -19,7 +21,7 @@ import { playerProfiles } from '../fixtures/playerProfiles'
 import { createPlayerRankFixtures } from '../fixtures/playerRanks'
 import { clubPlayers, players } from '../fixtures/players'
 import { createQueueFixtures } from '../fixtures/queueSessions'
-import { rankingSettings } from '../fixtures/rankingSettings'
+import { rankingPolicyVersions } from '../fixtures/rankingSettings'
 import { createSessionPublicationFixtures } from '../fixtures/sessionPublications'
 import { venues } from '../fixtures/venues'
 import type { InventoryItem } from '../inventory/inventory.types'
@@ -33,7 +35,7 @@ import type {
   SessionCourt,
   SessionFinalization,
 } from '../queue-session/queueSession.types'
-import type { RankingSettings } from '../ranking-settings/rankingSettings.types'
+import type { RankingPolicyVersion } from '../ranking-settings/rankingSettings.types'
 import type { SessionCostEstimate } from '../session-cost/sessionCost.types'
 import type { SessionPaymentMark } from '../session-payment/sessionPayment.types'
 import { createResultSnapshot } from '../session-result/sessionResult.rules'
@@ -61,7 +63,8 @@ export type MockState = {
   playerProfiles: PlayerProfile[]
   playerRanks: Record<string, PlayerRank>
   playerGames: Record<string, PlayerSessionRecord[]>
-  rankingSettings: RankingSettings
+  /** Ranking settings versions, oldest first; append-only. The newest is in effect. */
+  rankingPolicyVersions: RankingPolicyVersion[]
   clubs: Club[]
   /** Admin: one dedicated sign-in per club (no password is ever stored) */
   clubAccounts: ClubAccount[]
@@ -72,6 +75,8 @@ export type MockState = {
   adminAuditEvents: AdminAuditEvent[]
   /** Admin Add club replays: source command ID → the club it created */
   adminCommands: Record<string, { clubId: string }>
+  /** Admin feature flags in list order; the catalog starts empty */
+  featureFlags: FeatureFlag[]
   venues: ClubVenue[]
   players: Player[]
   clubPlayers: ClubPlayer[]
@@ -137,11 +142,12 @@ function seedState(): MockState {
     resetLinks: { 'reset-valid': 'valid' },
     claimLinks,
     contactChangeRequests: createContactChangeRequestFixtures(now),
-    rankingSettings,
+    rankingPolicyVersions,
     clubs,
     ...createAdminClubFixtures(now),
     adminAuditEvents: createAdminAuditEvents(now),
     adminCommands: {},
+    featureFlags,
     venues,
     players,
     clubPlayers,

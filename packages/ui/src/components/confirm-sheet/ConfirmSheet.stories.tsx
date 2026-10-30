@@ -1,6 +1,8 @@
 import { Button } from '@rotra/ui/button'
 import { ChangeCompare } from '@rotra/ui/change-compare'
+import { ConfigDiff } from '@rotra/ui/config-diff'
 import { KeyValueList } from '@rotra/ui/key-value-list'
+import { Notice } from '@rotra/ui/notice'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 import { ConfirmSheet, type ConfirmSheetProps } from './ConfirmSheet'
@@ -91,6 +93,34 @@ export const WithNote: Story = {
       note="RTR IDs and the founding address don't change."
       confirmLabel="Approve name change"
       backLabel="Back"
+      destructive={false}
+    />
+  ),
+}
+
+// D-CONFIG (rotra-admin.html SHEETS.config)
+export const WithNotice: Story = {
+  render: () => (
+    <Demo
+      title="Save configuration?"
+      summary={
+        <ConfigDiff
+          rows={[
+            { label: 'Club assessment', from: 70, to: 60, unit: '%' },
+            { label: 'Match performance', from: 30, to: 40, unit: '%' },
+            { label: 'Leaderboard requirement', from: 10, to: 12, unit: ' matches' },
+          ]}
+        />
+      }
+      consequence="This saves version 2. It applies to every player's shared rank and to the overall leaderboard."
+      notice={
+        <Notice tone="warn">
+          Whether existing ranks are recalculated right away or only from now on hasn't been
+          decided. Don't tell players their rank changed until that's settled.
+        </Notice>
+      }
+      confirmLabel="Save configuration"
+      backLabel="Keep editing"
       destructive={false}
     />
   ),

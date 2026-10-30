@@ -11,7 +11,8 @@ export const contactReviewMeta = {
     'Checks: the other player opens /players/{id}; "Review that one instead" opens the newer request, keeping from. The player name in Current contacts opens /players/{id}.',
     'Offline, Check status toasts CONTACT_CHECK_OFFLINE_ERROR and Retry application toasts ADMIN_OFFLINE_ERROR without sending anything.',
     'Verification evidence is an open decision: ContactVerificationNote is the placeholder. Clarification requests and notifications are not built.',
-    'While the request loads, or when it is not found, only the back link shows. A permission error denies the workspace (useDenyOnPermissionError). Loading, not-found, offline and error states: A03.11.',
+    'While the request loads, the back link and ContactReviewSkeleton show (also used by [requestId]/loading.tsx). An unknown id calls notFound() → not-found.tsx "Request not found." under the back link. A failed read shows ErrorState with Retry. A permission error denies the workspace (useDenyOnPermissionError).',
+    'Offline the review stays readable under AdminOfflineBand: Approve and Decline show ADMIN_OFFLINE_ERROR inside the sheet, Retry application toasts it, Check status toasts CONTACT_CHECK_OFFLINE_ERROR; nothing is sent and no success toast shows. If the checks fail when an approval is committed, the approve sheet stays open with CONTACT_REVIEW_STALE_ERROR and the checks refetch.',
   ],
   prototype: {
     file: 'docs/frames/admin-app/rotra-admin.html',
@@ -33,5 +34,8 @@ export const contactReviewMeta = {
     'CurrentContactsCard',
     'ApprovalScopeCard',
     'ContactDecisionSheets',
+    'ErrorState',
+    'EmptyState',
+    'Skeleton',
   ],
 } satisfies ComponentMeta

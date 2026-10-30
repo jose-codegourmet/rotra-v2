@@ -4,6 +4,8 @@ import type { ContactRequestFilter } from '@rotra/data/contact-change-request/ty
 import { useContactRequests } from '@rotra/data/contact-change-request/useContactRequests'
 import { Card } from '@rotra/ui/card'
 import { DataTable } from '@rotra/ui/data-table'
+import { EmptyState } from '@rotra/ui/empty-state'
+import { ErrorState } from '@rotra/ui/error-state'
 import { PageHeader } from '@rotra/ui/page-header'
 import { SegmentedControl } from '@rotra/ui/segmented-control'
 import { usePathname, useRouter } from 'next/navigation'
@@ -26,7 +28,9 @@ function reviewHref(requestId: string, query: string): string {
 /**
  * A-CONTACT-REQUESTS: every contact-change request, filtered by status (kept in the URL), newest
  * first, each with its next permitted action. A row opens the review for that request's permanent
- * player ID, never a name match. Loading, empty and error states: A03.11.
+ * player ID, never a name match. Skeleton rows until the first answer, an empty filter suggests
+ * another status, a failed load shows Retry and keeps the filter; a permission error denies the
+ * workspace.
  */
 export function ContactRequestsPage({ status: initialStatus }: { status: ContactRequestFilter }) {
   const router = useRouter()
@@ -77,6 +81,26 @@ export function ContactRequestsPage({ status: initialStatus }: { status: Contact
             data={list.data?.rows ?? []}
             getRowId={(request) => request.requestId}
             onRowClick={(request) => router.push(reviewHref(request.requestId, query))}
+            loading={!list.data && !list.isError}
+            error={
+              list.isError ? (
+                <ErrorState
+                  title="Couldn't load the contact changes."
+                  onRetry={() => void list.refetch()}
+                  retrying={list.isFetching}
+                  retryLabel="Retry"
+                >
+                  Check your connection, then try again.
+                </ErrorState>
+              ) : undefined
+            }
+            empty={
+              <EmptyState
+                title={status === 'pending' ? 'Nothing waiting for review.' : 'No requests here.'}
+              >
+                {status === 'all' ? 'Requests from players show up here.' : 'Try another status.'}
+              </EmptyState>
+            }
           />
         </section>
       </Card>

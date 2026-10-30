@@ -17,17 +17,19 @@ import { ContactRequestStatusChip } from '@rotra/ui/contact-request-status-chip'
 import { ContactRequestStatusNotice } from '@rotra/ui/contact-request-status-notice'
 import { ContactVerificationNote } from '@rotra/ui/contact-verification-note'
 import { CurrentContactsCard } from '@rotra/ui/current-contacts-card'
+import { ErrorState } from '@rotra/ui/error-state'
 import { PageHeader } from '@rotra/ui/page-header'
 import { RequestedChangeCard } from '@rotra/ui/requested-change-card'
 import { toast } from '@rotra/ui/toaster'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { notFound, useRouter } from 'next/navigation'
 import { type ReactNode, useEffect, useRef, useState } from 'react'
 import { useDenyOnPermissionError } from '../../../../../_components/admin-workspace-shell/AdminWorkspaceShell'
 import {
   type ContactDecision,
   ContactDecisionSheets,
 } from '../contact-decision-sheets/ContactDecisionSheets'
+import { ContactReviewSkeleton } from './ContactReviewSkeleton'
 
 const isApplying = (status: ContactChangeStatus | undefined) =>
   status === 'applying' || status === 'approved'
@@ -39,7 +41,9 @@ const isApplying = (status: ContactChangeStatus | undefined) =>
  * Approve (off while any check fails). Applying: Check status. Needs attention: Retry application
  * (the same approved request). Applied / Not approved are toasted only when the application
  * actually settles, never because the approval was saved. `from` is the list's query, so Back
- * restores its status filter. Loading, not-found, offline and error states: A03.11.
+ * restores its status filter. Skeleton while the request loads, Request not found (not-found.tsx)
+ * for an unknown id, Retry when the load fails; a permission error denies the workspace. Offline the
+ * page stays readable under the workspace's offline band, and every action refuses without sending.
  */
 export function ContactReview({ requestId, from }: { requestId: string; from: string }) {
   const router = useRouter()
@@ -76,7 +80,26 @@ export function ContactReview({ requestId, from }: { requestId: string; from: st
   const listHref = from ? `/requests/contact-changes?${from}` : '/requests/contact-changes'
   const back = <Breadcrumb label="Contact changes" href={listHref} linkAs={Link} />
   if (denied) return null
-  if (!request || !player) return back
+  if (request === null) notFound()
+  if (!request || !player) {
+    return (
+      <>
+        {back}
+        {requestQuery.isError ? (
+          <ErrorState
+            title="Couldn't load this request."
+            onRetry={() => void requestQuery.refetch()}
+            retrying={requestQuery.isFetching}
+            retryLabel="Retry"
+          >
+            Check your connection, then try again.
+          </ErrorState>
+        ) : (
+          <ContactReviewSkeleton />
+        )}
+      </>
+    )
+  }
 
   const fromQuery = from ? `?from=${encodeURIComponent(from)}` : ''
 

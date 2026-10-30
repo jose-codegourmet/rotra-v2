@@ -11,7 +11,8 @@ export const playerDetailMeta = {
     'Same-name twins link to their own detail, keeping from. Admin never merges players.',
     'Created by is the club whose roster first lists the player (useAdminClubs); "—" when no club record exists in the mock data. The rank card waits for the ranking settings (leaderboard requirement).',
     'There is deliberately no Edit winner, Manually reconstruct session, rank override or contact overwrite action.',
-    'While the player loads only the back link shows; the requests and record of actions appear once their reads answer. A permission error from any read denies the workspace (useDenyOnPermissionError). Loading, not-found and error states: A03.11.',
+    'While the player loads, the back link and PlayerDetailSkeleton show (also used by [playerId]/loading.tsx). An unknown id calls notFound() → not-found.tsx "Player not found." under the back link. A failed player read shows ErrorState with Retry under the back link.',
+    'The contact-change requests and the record of actions each show grey bars until their reads answer and ErrorState with Retry when they fail (a failed requests read fails the record too). A permission error from any read denies the workspace (useDenyOnPermissionError).',
   ],
   docs: ['docs/screens/product/modules/admin/players-requests.md'],
   related: [
@@ -28,5 +29,8 @@ export const playerDetailMeta = {
     'PlayerAccountCard',
     'PlayerRankCard',
     'ActivityLog',
+    'ErrorState',
+    'EmptyState',
+    'Skeleton',
   ],
 } satisfies ComponentMeta

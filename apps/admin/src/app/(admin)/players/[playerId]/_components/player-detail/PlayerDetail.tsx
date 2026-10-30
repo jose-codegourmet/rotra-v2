@@ -14,22 +14,40 @@ import { Card } from '@rotra/ui/card'
 import { ContactRequestList } from '@rotra/ui/contact-request-list'
 import { ContactRequestStatusChip } from '@rotra/ui/contact-request-status-chip'
 import { DetailHero } from '@rotra/ui/detail-hero'
+import { ErrorState } from '@rotra/ui/error-state'
 import { PlayerAccountCard } from '@rotra/ui/player-account-card'
 import { PlayerAccountChip } from '@rotra/ui/player-account-chip'
 import { PlayerRankCard } from '@rotra/ui/player-rank-card'
 import { PrivateContactCard } from '@rotra/ui/private-contact-card'
 import { RankStatusChip } from '@rotra/ui/rank-status-chip'
 import { SameNameNotice } from '@rotra/ui/same-name-notice'
+import { Skeleton } from '@rotra/ui/skeleton'
 import Link from 'next/link'
+import { notFound } from 'next/navigation'
 import { useId, useMemo } from 'react'
 import { useDenyOnPermissionError } from '../../../../_components/admin-workspace-shell/AdminWorkspaceShell'
+import { PlayerDetailSkeleton } from './PlayerDetailSkeleton'
+
+/** Grey bars while a card's read is still out. */
+function LinesSkeleton({ label }: { label: string }) {
+  return (
+    <div aria-busy className="flex flex-col gap-2.5">
+      <Skeleton label={label} className="w-3/4" />
+      <Skeleton className="w-1/2" />
+      <Skeleton className="w-2/3" />
+    </div>
+  )
+}
 
 /**
  * A-PLAYER-DETAIL: one player identity as Admin sees it. Identity, private contacts (the applied
  * values, never a pending request's), account, read-only rank, this player's contact-change requests
  * and the record of actions on them. Deliberately no edit controls: Admin can't change ranks,
  * winners or scores, rebuild sessions, overwrite contacts or merge players. `from` is the directory's
- * query, so Back restores its search, filter and shown count. Loading, not-found and error: A03.11.
+ * query, so Back restores its search, filter and shown count. Skeleton while the player loads,
+ * Player not found (not-found.tsx) for an unknown id, Retry when the load fails; the requests and the
+ * record of actions have their own loading and error states. A permission error from any read denies
+ * the workspace.
  */
 export function PlayerDetail({ playerId, from }: { playerId: string; from: string }) {
   const playerQuery = useAdminPlayer(playerId)
@@ -49,6 +67,7 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
     clubsQuery.error,
     auditQuery.error,
   )
+  const requestsHeadingId = useId()
   const recordHeadingId = useId()
   const player = playerQuery.data
   // With no requests loaded yet there are no targets, which would read as an empty record.
@@ -69,7 +88,26 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
     <Breadcrumb label="Players" href={from ? `/players?${from}` : '/players'} linkAs={Link} />
   )
   if (denied) return null
-  if (!player) return back
+  if (player === null) notFound()
+  if (!player) {
+    return (
+      <>
+        {back}
+        {playerQuery.isError ? (
+          <ErrorState
+            title="Couldn't load this player."
+            onRetry={() => void playerQuery.refetch()}
+            retrying={playerQuery.isFetching}
+            retryLabel="Retry"
+          >
+            Check your connection, then try again.
+          </ErrorState>
+        ) : (
+          <PlayerDetailSkeleton />
+        )}
+      </>
+    )
+  }
 
   const fromQuery = from ? `?from=${encodeURIComponent(from)}` : ''
   const createdBy =
@@ -78,6 +116,8 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
       : clubsQuery.data?.clubs.find((club) => club.id === player.createdByClubId)?.name) ?? '—'
   const level = player.levelIndex === null ? null : (PLAYING_LEVELS[player.levelIndex] ?? null)
   const matchRequirement = settingsQuery.data?.matchRequirement
+  // The record is read per request, so a failed requests read fails it too; Retry asks again for both.
+  const recordError = requestsQuery.isError ? requestsQuery : auditQuery.isError ? auditQuery : null
 
   return (
     <>
@@ -118,7 +158,25 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
             claimed={player.claimed}
             phoneHidden={player.phoneHidden}
           />
-          {requests ? (
+          {requestsQuery.isError || !requests ? (
+            <Card asChild>
+              <section aria-labelledby={requestsHeadingId} className="flex flex-col gap-3">
+                <h2 id={requestsHeadingId}>Contact-change requests</h2>
+                {requestsQuery.isError ? (
+                  <ErrorState
+                    title="Couldn't load the contact-change requests."
+                    onRetry={() => void requestsQuery.refetch()}
+                    retrying={requestsQuery.isFetching}
+                    retryLabel="Retry"
+                  >
+                    Check your connection, then try again.
+                  </ErrorState>
+                ) : (
+                  <LinesSkeleton label="Loading the contact-change requests" />
+                )}
+              </section>
+            </Card>
+          ) : (
             <ContactRequestList
               requests={requests.map((request) => ({
                 id: request.requestId,
@@ -132,7 +190,7 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
               }))}
               linkComponent={Link}
             />
-          ) : null}
+          )}
         </div>
         <div className="flex min-w-0 flex-col gap-5">
           <PlayerAccountCard claimed={player.claimed} registeredOn={player.registeredOn} />
@@ -147,12 +205,23 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
           <Card asChild>
             <section aria-labelledby={recordHeadingId} className="flex flex-col gap-3">
               <h2 id={recordHeadingId}>Record of actions</h2>
-              {audit ? (
+              {recordError ? (
+                <ErrorState
+                  title="Couldn't load the record of actions."
+                  onRetry={() => void recordError.refetch()}
+                  retrying={recordError.isFetching}
+                  retryLabel="Retry"
+                >
+                  Check your connection, then try again.
+                </ErrorState>
+              ) : audit ? (
                 <ActivityLog
                   entries={activityEntries}
                   emptyText="No Admin actions recorded for this player."
                 />
-              ) : null}
+              ) : (
+                <LinesSkeleton label="Loading the record of actions" />
+              )}
             </section>
           </Card>
         </div>

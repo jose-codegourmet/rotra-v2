@@ -7,6 +7,8 @@ import { useAdminClubs } from '@rotra/data/club/useAdminClubs'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { DataTable } from '@rotra/ui/data-table'
+import { EmptyState } from '@rotra/ui/empty-state'
+import { ErrorState } from '@rotra/ui/error-state'
 import { PageHeader } from '@rotra/ui/page-header'
 import { SameNameNotice } from '@rotra/ui/same-name-notice'
 import { SegmentedControl } from '@rotra/ui/segmented-control'
@@ -35,7 +37,9 @@ const formatCount = (value: number) => value.toLocaleString('en-PH')
 /**
  * A-PLAYERS: every player identity, searchable by name, RTR ID, phone or email (Admin only) and
  * filterable by account, 25 at a time; search, filter and shown count live in the URL. Duplicate names
- * in the results get a notice and are never merged. Loading, no-match and error states: A03.11.
+ * in the results get a notice and are never merged. Skeleton rows until the first answer; no match
+ * offers Clear search (never to create a player); a failed load shows Retry and keeps the search,
+ * filter and shown count; a permission error denies the workspace.
  */
 export function PlayerDirectory({
   q: initialQ,
@@ -80,6 +84,7 @@ export function PlayerDirectory({
   }
   const counts = data?.counts
   const rows = data?.rows ?? []
+  const searched = q.trim()
 
   if (denied) return null
 
@@ -114,7 +119,7 @@ export function PlayerDirectory({
         Phone and email search is only available in Admin. Public search on Player Information never
         matches them.
       </p>
-      {q.trim() !== '' && data ? (
+      {searched !== '' && data ? (
         <SameNameNotice variant="list" groups={data.duplicateNames} />
       ) : null}
       <Card asChild>
@@ -125,8 +130,34 @@ export function PlayerDirectory({
             data={rows}
             getRowId={(player) => player.id}
             onRowClick={(player) => router.push(playerHref(player.id, query))}
+            loading={!data && !list.isError}
+            error={
+              list.isError ? (
+                <ErrorState
+                  title="Couldn't load the players."
+                  onRetry={() => void list.refetch()}
+                  retrying={list.isFetching}
+                  retryLabel="Retry"
+                >
+                  Check your connection, then try again.
+                </ErrorState>
+              ) : undefined
+            }
+            empty={
+              <EmptyState
+                title={searched ? `No players match “${searched}”.` : 'No players match.'}
+                action={
+                  <Button size="sm" onClick={() => update('', 'all', ADMIN_PLAYER_PAGE_SIZE)}>
+                    Clear search
+                  </Button>
+                }
+              >
+                Check the spelling, try the full RTR ID, or type at least four digits of a phone
+                number.
+              </EmptyState>
+            }
           />
-          {data && rows.length > 0 ? (
+          {data && rows.length > 0 && !list.isError ? (
             <div className="flex flex-wrap items-center justify-center gap-3 pt-3">
               <span className="text-[13px] text-fg2">
                 Showing {formatCount(rows.length)} of {formatCount(data.total)}

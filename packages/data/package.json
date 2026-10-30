@@ -235,6 +235,8 @@
     "./fixtures/admin-accounts": "./src/fixtures/adminAccounts.ts",
     "./fixtures/admin-clubs": "./src/fixtures/adminClubs.ts",
     "./fixtures/admin-audit-events": "./src/fixtures/adminAuditEvents.ts",
+    "./fixtures/admin-players": "./src/fixtures/adminPlayers.ts",
+    "./admin-player/types": "./src/admin-player/adminPlayer.types.ts",
     "./fixtures/founding-cities": "./src/fixtures/foundingCities.ts",
     "./admin-audit/types": "./src/admin-audit/adminAudit.types.ts",
     "./admin-audit/query-keys": "./src/admin-audit/queryKeys.ts",

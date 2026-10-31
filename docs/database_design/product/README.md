@@ -17,6 +17,7 @@
 | [Decisions before migrations](open-decisions.md) | Technical proposals and remaining blockers |
 | [Command contracts](command-contracts.md) | Current fetchers/hooks, actors, states, retries and decision gates |
 | [Schema dependencies](schema-dependencies.md) | Proposed FK graph, insertion cycles and migration ordering gates |
+| [Physical schema](physical-schema.md) | Drafted Prisma models and unapplied migration SQL: keys, checks, grants, delete behavior |
 
 Business source: [ecosystem v1](../../business_logic/product/README.md). World is v2; no World tables are proposed.
 

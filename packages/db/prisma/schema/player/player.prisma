@@ -1,0 +1,142 @@
+// Independent player identity, private contacts, account mapping, social links and claim links
+// (player-information/modules/identity.md). Player UUIDs never equal auth subjects, and there is no
+// FK to Supabase's auth schema, so deleting an auth user cannot cascade into player history.
+
+enum PlayerProfileState {
+  unclaimed
+  claimed
+
+  @@map("player_profile_state")
+}
+
+model Player {
+  id                   String             @id @default(uuid(7)) @db.Uuid
+  fullName             String             @map("full_name")
+  nickname             String?
+  avatarRef            String?            @map("avatar_ref")
+  profileState         PlayerProfileState @default(unclaimed) @map("profile_state")
+  hidePhoneFromClubs   Boolean            @default(false) @map("hide_phone_from_clubs")
+  /// Optional self-reported snapshot; not rating credit.
+  experienceMonths     Int?               @map("experience_months")
+  experienceRecordedAt DateTime?          @map("experience_recorded_at") @db.Timestamptz(6)
+  /// Validated playing-style fields (`@rotra/schema/personal-details`); final schema pending.
+  personalDetails      Json?              @map("personal_details")
+  detailsVersion       Int?               @map("details_version")
+  createdAt            DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt            DateTime           @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision             BigInt             @default(1)
+
+  privateContact PlayerPrivateContact?
+  account        PlayerAccount?
+  socialLinks    PlayerSocialLink[]
+  claimLinks     PlayerClaimLink[]
+  idAllocation   PlayerIdAllocation?
+  contactChanges PlayerContactChangeRequest[]
+
+  @@index([fullName])
+  @@map("players")
+}
+
+/// Private: never joined into a public projection, download package or log.
+model PlayerPrivateContact {
+  playerId        String    @id @map("player_id") @db.Uuid
+  /// E.164, unique across all global players.
+  phoneE164       String    @unique @map("phone_e164")
+  /// Trimmed + lowercased only (no provider-specific rewriting). Null until claiming.
+  email           String?   @unique
+  phoneVerifiedAt DateTime? @map("phone_verified_at") @db.Timestamptz(6)
+  emailVerifiedAt DateTime? @map("email_verified_at") @db.Timestamptz(6)
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision        BigInt    @default(1)
+
+  player Player @relation(fields: [playerId], references: [id], onDelete: Restrict)
+
+  @@map("player_private_contacts")
+}
+
+enum PlayerContactSyncStatus {
+  in_sync
+  applying
+  failed
+
+  @@map("player_contact_sync_status")
+}
+
+/// A claimed player's sign-in mapping. The provider owns passwords, sessions and reset tokens.
+model PlayerAccount {
+  playerId           String                  @id @map("player_id") @db.Uuid
+  authProvider       String                  @map("auth_provider")
+  authSubject        String                  @map("auth_subject") @db.Uuid
+  claimedAt          DateTime                @map("claimed_at") @db.Timestamptz(6)
+  /// The private-contact revision the provider login identifiers last matched.
+  contactSyncVersion BigInt                  @map("contact_sync_version")
+  contactSyncStatus  PlayerContactSyncStatus @default(in_sync) @map("contact_sync_status")
+  disabledAt         DateTime?               @map("disabled_at") @db.Timestamptz(6)
+  createdAt          DateTime                @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime                @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision           BigInt                  @default(1)
+
+  player Player @relation(fields: [playerId], references: [id], onDelete: Restrict)
+
+  @@unique([authProvider, authSubject])
+  @@map("player_accounts")
+}
+
+enum SocialProvider {
+  facebook
+  instagram
+  youtube
+  linkedin
+
+  @@map("social_provider")
+}
+
+/// A profile description link, never proof of identity or a sign-in method.
+model PlayerSocialLink {
+  id        String         @id @default(uuid(7)) @db.Uuid
+  playerId  String         @map("player_id") @db.Uuid
+  provider  SocialProvider
+  url       String
+  createdAt DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime       @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  player Player @relation(fields: [playerId], references: [id], onDelete: Restrict)
+
+  @@unique([playerId, provider])
+  @@map("player_social_links")
+}
+
+enum PlayerClaimLinkState {
+  active
+  consumed
+  revoked
+
+  @@map("player_claim_link_state")
+}
+
+/// Club-issued registration link for one existing profile. Stores only a token digest.
+/// Proposal (pending #244): one active link per player; reissuing revokes the previous one.
+model PlayerClaimLink {
+  id            String               @id @default(uuid(7)) @db.Uuid
+  playerId      String               @map("player_id") @db.Uuid
+  /// The issuing club; its club_accounts row is the issuing account.
+  issuingClubId String               @map("issuing_club_id") @db.Uuid
+  /// SHA-256 of the opaque token.
+  tokenDigest   Bytes                @unique @map("token_digest")
+  state         PlayerClaimLinkState @default(active)
+  issuedAt      DateTime             @map("issued_at") @db.Timestamptz(6)
+  expiresAt     DateTime             @map("expires_at") @db.Timestamptz(6)
+  consumedAt    DateTime?            @map("consumed_at") @db.Timestamptz(6)
+  revokedAt     DateTime?            @map("revoked_at") @db.Timestamptz(6)
+  createdAt     DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime             @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision      BigInt               @default(1)
+
+  player      Player @relation(fields: [playerId], references: [id], onDelete: Restrict)
+  issuingClub Club   @relation(fields: [issuingClubId], references: [id], onDelete: Restrict)
+
+  @@index([playerId, issuedAt(sort: Desc)])
+  @@index([issuingClubId, issuedAt(sort: Desc)])
+  @@map("player_claim_links")
+}

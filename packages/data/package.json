@@ -26,6 +26,7 @@
     "./auth/use-session": "./src/auth/useSession.ts",
     "./auth/use-sign-in": "./src/auth/useSignIn.ts",
     "./auth/use-sign-out": "./src/auth/useSignOut.ts",
+    "./auth/account-scope": "./src/auth/accountScope.ts",
     "./queue-session/types": "./src/queue-session/queueSession.types.ts",
     "./fixtures/session-history": "./src/fixtures/sessionHistory.ts",
     "./queue-session/finalization": "./src/queue-session/finalization.ts",

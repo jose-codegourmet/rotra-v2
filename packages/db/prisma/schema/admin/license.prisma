@@ -1,0 +1,93 @@
+// License terms, entitlement projection and expiry cycles (admin/modules/clubs-licenses.md).
+// Renewal dates, overlapping terms and refunds are pending #245; no automatic activation here.
+
+enum LicensePlan {
+  monthly
+  yearly
+
+  @@map("license_plan")
+}
+
+/// Append-only evidence of a manually activated term (UPDATE/DELETE rejected by trigger).
+model ClubLicenseTerm {
+  id                  String         @id @default(uuid(7)) @db.Uuid
+  clubId              String         @map("club_id") @db.Uuid
+  plan                LicensePlan
+  startsAt            DateTime       @map("starts_at") @db.Timestamptz(6)
+  endsAt              DateTime       @map("ends_at") @db.Timestamptz(6)
+  activatedByAdminId  String         @map("activated_by_admin_id") @db.Uuid
+  activatedAt         DateTime       @map("activated_at") @db.Timestamptz(6)
+  /// Idempotency key of the activation/renewal command.
+  sourceCommandId     String         @unique @map("source_command_id") @db.Uuid
+  /// The club's pricing when the term was recorded; free ⇒ amount 0 and no paid date (CHECK in SQL).
+  pricingAtActivation LicensePricing @map("pricing_at_activation")
+  /// Date the club paid outside ROTRA, as recorded by the platform owner.
+  paidOn              DateTime?      @map("paid_on") @db.Date
+  /// Amount recorded at activation, centavos ≥ 0. A later price change never rewrites it.
+  amountMinor         Int            @map("amount_minor")
+  currency            String         @default("PHP") @db.Char(3)
+  /// Short reference shown to the club, e.g. LIC-0004.
+  paymentReference    String         @unique @map("payment_reference")
+  notes               String?
+  createdAt           DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  club            Club              @relation(fields: [clubId], references: [id], onDelete: Restrict)
+  activatedBy     AdminAccount      @relation(fields: [activatedByAdminId], references: [id], onDelete: Restrict)
+  entitlements    ClubEntitlement[]
+  cancelledCycles ClubExpiryCycle[]
+
+  @@unique([clubId, id])
+  @@index([clubId, startsAt(sort: Desc)])
+  @@index([activatedByAdminId])
+  @@map("club_license_terms")
+}
+
+/// One row per club: a recomputable access projection from terms, never an `is_paid` switch.
+model ClubEntitlement {
+  clubId                String    @id @map("club_id") @db.Uuid
+  effectiveTermId       String?   @map("effective_term_id") @db.Uuid
+  effectiveAccessEndsAt DateTime? @map("effective_access_ends_at") @db.Timestamptz(6)
+  currentExpiryCycleId  String?   @map("current_expiry_cycle_id") @db.Uuid
+  refreshedAt           DateTime  @map("refreshed_at") @db.Timestamptz(6)
+  updatedAt             DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision              BigInt    @default(1)
+
+  club               Club             @relation(fields: [clubId], references: [id], onDelete: Restrict)
+  effectiveTerm      ClubLicenseTerm? @relation(fields: [clubId, effectiveTermId], references: [clubId, id], onDelete: Restrict)
+  currentExpiryCycle ClubExpiryCycle? @relation("CurrentExpiryCycle", fields: [clubId, currentExpiryCycleId], references: [clubId, id], onDelete: Restrict)
+
+  @@map("club_entitlements")
+}
+
+/// Proposal: running → cancelled (renewal) or completed (public pages deleted). A later expiry is a new cycle.
+enum ClubExpiryCycleState {
+  running
+  cancelled
+  completed
+
+  @@map("club_expiry_cycle_state")
+}
+
+/// Six-month public-page countdown. At most one running cycle per club (partial unique in SQL).
+model ClubExpiryCycle {
+  id                     String               @id @default(uuid(7)) @db.Uuid
+  clubId                 String               @map("club_id") @db.Uuid
+  expiredAt              DateTime             @map("expired_at") @db.Timestamptz(6)
+  deletePublicPagesAfter DateTime             @map("delete_public_pages_after") @db.Timestamptz(6)
+  cancelledAt            DateTime?            @map("cancelled_at") @db.Timestamptz(6)
+  /// The renewal term that cancelled this cycle, from the same club.
+  cancellationTermId     String?              @map("cancellation_term_id") @db.Uuid
+  state                  ClubExpiryCycleState @default(running)
+  createdAt              DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt              DateTime             @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision               BigInt               @default(1)
+
+  club             Club              @relation(fields: [clubId], references: [id], onDelete: Restrict)
+  cancellationTerm ClubLicenseTerm?  @relation(fields: [clubId, cancellationTermId], references: [clubId, id], onDelete: Restrict)
+  currentFor       ClubEntitlement[] @relation("CurrentExpiryCycle")
+
+  @@unique([clubId, id])
+  @@index([state, deletePublicPagesAfter, id])
+  @@index([clubId, expiredAt(sort: Desc)])
+  @@map("club_expiry_cycles")
+}

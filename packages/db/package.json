@@ -1,0 +1,44 @@
+{
+  "name": "@rotra/db",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./client": "./src/client/prisma.ts",
+    "./admin/club-identity": "./src/admin/club-identity.ts",
+    "./player/rtr-id": "./src/player/rtr-id.ts",
+    "./auth/data-mode": "./src/auth/data-mode.ts",
+    "./auth/supabase": "./src/auth/supabase.ts",
+    "./auth/proxy-session": "./src/auth/proxy-session.ts",
+    "./auth/account-context": "./src/auth/account-context.ts",
+    "./service/errors": "./src/service/errors.ts",
+    "./service/serialize": "./src/service/serialize.ts",
+    "./service/authorize": "./src/service/authorize.ts",
+    "./service/handler": "./src/service/handler.ts",
+    "./service/route-cookies": "./src/service/route-cookies.ts"
+  },
+  "scripts": {
+    "db:generate": "prisma generate",
+    "db:validate": "prisma validate",
+    "db:format": "prisma format",
+    "db:migrate:draft": "prisma migrate dev --create-only",
+    "db:migrate:status": "prisma migrate status",
+    "lint": "biome check .",
+    "type-check": "prisma generate && tsc --noEmit"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "7.10.1",
+    "@prisma/client": "7.10.1",
+    "@supabase/ssr": "0.12.7",
+    "@supabase/supabase-js": "2.118.0",
+    "pg": "8.23.1",
+    "server-only": "0.0.1"
+  },
+  "devDependencies": {
+    "@rotra/config": "workspace:*",
+    "@types/node": "^24",
+    "@types/pg": "8.23.1",
+    "prisma": "7.10.1",
+    "typescript": "^5.9.3"
+  }
+}

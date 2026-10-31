@@ -1,0 +1,79 @@
+// A player's login phone/email change: Admin approval is separate from successful application,
+// because the auth provider and PostgreSQL cannot change in one transaction
+// (admin/modules/configuration-requests.md, transactions.md §9). Private: contacts and review
+// evidence are readable only by the owning player (own request) and the platform owner.
+
+enum ContactChangeField {
+  phone
+  email
+
+  @@map("contact_change_field")
+}
+
+enum ContactChangeSource {
+  app
+  owner
+
+  @@map("contact_change_source")
+}
+
+/// pending → approved → applying → applied, or → failed (retryable, same providerOperationRef);
+/// pending → rejected. Only `applied` means the login contact changed.
+enum ContactChangeStatus {
+  pending
+  approved
+  applying
+  applied
+  rejected
+  failed
+
+  @@map("contact_change_status")
+}
+
+model PlayerContactChangeRequest {
+  id                      String              @id @default(uuid(7)) @db.Uuid
+  playerId                String              @map("player_id") @db.Uuid
+  field                   ContactChangeField
+  source                  ContactChangeSource
+  /// Normalized proposed value (E.164 phone or lowercase email). Private.
+  proposedValue           String              @map("proposed_value")
+  /// Normalized contact the request was made against; null when the field was not set. Private.
+  originalValue           String?             @map("original_value")
+  /// player_private_contacts.revision when requested; approval and application recheck it.
+  originalContactRevision BigInt              @map("original_contact_revision")
+  status                  ContactChangeStatus @default(pending)
+  requestedAt             DateTime            @map("requested_at") @db.Timestamptz(6)
+  /// The owner who typed the request in for the player (source = owner).
+  submittedByAdminId      String?             @map("submitted_by_admin_id") @db.Uuid
+  /// Idempotency key of the submit command.
+  sourceCommandId         String              @unique @map("source_command_id") @db.Uuid
+  reviewedByAdminId       String?             @map("reviewed_by_admin_id") @db.Uuid
+  reviewedAt              DateTime?           @map("reviewed_at") @db.Timestamptz(6)
+  approvedAt              DateTime?           @map("approved_at") @db.Timestamptz(6)
+  rejectedAt              DateTime?           @map("rejected_at") @db.Timestamptz(6)
+  /// Set on approval and kept by every retry, so a retry never creates a second provider change.
+  providerOperationRef    String?             @unique @map("provider_operation_ref") @db.Uuid
+  applicationAttempts     Int                 @default(0) @map("application_attempts")
+  lastAttemptAt           DateTime?           @map("last_attempt_at") @db.Timestamptz(6)
+  /// Stage 1: the provider login identifier was changed (or confirmed already changed).
+  providerAppliedAt       DateTime?           @map("provider_applied_at") @db.Timestamptz(6)
+  /// Stage 2: the private contact row matches the provider. Set together with status = applied.
+  appliedAt               DateTime?           @map("applied_at") @db.Timestamptz(6)
+  /// Short machine code for the last failure, e.g. provider_conflict. Never a contact value.
+  failureCode             String?             @map("failure_code")
+  resolutionNote          String?             @map("resolution_note")
+  createdAt               DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt               DateTime            @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision                BigInt              @default(1)
+
+  player      Player        @relation(fields: [playerId], references: [id], onDelete: Restrict)
+  submittedBy AdminAccount? @relation("ContactChangeSubmittedBy", fields: [submittedByAdminId], references: [id], onDelete: Restrict)
+  reviewedBy  AdminAccount? @relation("ContactChangeReviewedBy", fields: [reviewedByAdminId], references: [id], onDelete: Restrict)
+
+  @@index([playerId, requestedAt(sort: Desc)])
+  @@index([status, requestedAt])
+  @@index([field, proposedValue])
+  @@index([submittedByAdminId])
+  @@index([reviewedByAdminId])
+  @@map("player_contact_change_requests")
+}

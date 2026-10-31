@@ -17,7 +17,7 @@ where something belongs. For *how to write* the code, read [coding-conventions.m
 | `packages/ui` | Shared visual components and forms with stories and metadata, plus `cn`, `ComponentMeta` and the one Storybook |
 | `packages/schema` | Shared Zod field families, phone/money tests, Vitest (F05.1) |
 | `packages/data` | In-memory store, mock auth, club/session and Player fixtures, fetchers, query keys and hooks |
-| `packages/db` | **Not created** at the inspected `7d7029d` baseline. Database work is tracked in [F07 #241](https://github.com/jose-codegourmet/rotra-v2/issues/241) (§10) |
+| `packages/db` | Server-only Prisma 7 package (F07.8 scaffold); schema groups and services land through [F07 #241](https://github.com/jose-codegourmet/rotra-v2/issues/241) (§10) |
 | `openspec/` | Focused Player implementation records restored at the product owner’s request; see `openspec/README.md`. Product and prototype docs retain precedence |
 | `app/mocksups-app/*/*.html` | The three clickable prototypes: the design source of truth |
 | `Makefile`, root `package.json` scripts | Run the three apps through Turborepo (F01.1) |
@@ -219,6 +219,21 @@ Redux never holds server data and has no async thunks.
 In the mock phase, sign-in is mocked like the prototypes (anything signs in) and `proxy.ts` only checks a
 mock session. Real auth (Supabase Auth) is its own epic. **No Facebook or any social login.**
 
+**Server boundary (F07.20).** `ROTRA_DATA_MODE` (server-only, default `mock`) picks the path; there is
+no fallback from real to mock.
+
+| Layer | Real mode |
+|---|---|
+| `proxy.ts` | `@rotra/db/auth/proxy-session` verifies the Supabase JWT (`getClaims`), refreshes session cookies, deletes `rotra-mock-*` cookies, and redirects. Navigation only; it never loads Prisma |
+| Route Handler | `handleAccountRequest(audience, routeCookieAdapter(await cookies()), run)` from `@rotra/db/service/handler`: verifies the session again, maps the subject to the app's account type from current server state (provisioned/not disabled club account, not disabled player account, active admin), then `run` checks scope with `@rotra/db/service/authorize` (`requireOwnClub`, `requireOwnPlayer`, `requireAdmin`, `requireClubEntitlement`, `requireRevision`) |
+| Public reads | `handlePublicRead(id, run)`; only IDs in `PUBLIC_READS` are anonymous, each with an allowlisted projection |
+| Responses | Private: `Cache-Control: private, no-store`, `Vary: Cookie`. Bodies pass `toJson` (`@rotra/db/service/serialize`): UUIDs as strings, instants as ISO strings, bigint revisions as decimal strings, money as `{ amountMinor, currency }`, null kept; class instances such as Prisma models are refused. Errors are `{ error: { code, message, fields? } }` (`@rotra/db/service/errors`); another club's or player's ID answers `not_found` |
+| Client | `useAccountScope(accountId)` / `clearAccountQueries` (`@rotra/data/auth/account-scope`) drop the previous account's queries on account change or sign-out, keeping `auth`/`sync` queries and every mutation, so unsynced evidence survives |
+
+Wrong account types, forged mock cookies, and cross-club/player IDs are denied at the handler, not only
+in the proxy. Database credentials and Supabase keys are read only from server env. Application tables
+have no `anon`/`authenticated` grants, so the Data API exposes none of them.
+
 ---
 
 ## 9. Offline (Queue only)
@@ -253,8 +268,15 @@ packages/db/
 
 - Tables and fields follow the [database design](database_design/product/README.md) and its
   [conventions](database_design/product/conventions.md). Entity names match [product terms §12](product-terms.md#12-term--code-identifier).
-- **Open:** Prisma 7 (stable) or Prisma 8 (release candidate, a different "contract" model). Prisma 7
-  is the recommendation; confirm before the database epic starts.
+- **Scaffolded (F07.8):** `packages/db` pins Prisma **7.10.1** (latest stable 7.x; 8 is still a release
+  candidate) with the `prisma-client` generator, `@prisma/adapter-pg` and `pg`. The generated client
+  goes to `src/generated/prisma` (gitignored) and is exposed only through the server-only
+  `@rotra/db/client` subpath. Final approval of the version and migration ownership is still tracked in
+  [#243](https://github.com/jose-codegourmet/rotra-v2/issues/243).
+- **Connections:** `DATABASE_URL` (pooled, runtime role) for the apps; `DIRECT_URL` (migration role)
+  for the CLI through `prisma.config.ts`. Both are server-only; see `packages/db/.env.example`.
+- **No silent DDL:** `db:migrate:draft` writes SQL with `--create-only`; applying a migration needs the
+  §13 sign-off. Package commands are listed in `packages/db/AGENTS.md`.
 
 ---
 

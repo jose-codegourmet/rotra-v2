@@ -1,0 +1,22 @@
+// One dedicated credential per club in v1. Passwords live in the auth provider only;
+// no player identity is required for a club login.
+
+model ClubAccount {
+  clubId        String    @id @map("club_id") @db.Uuid
+  /// Normalized (trimmed, lowercased) sign-in username; unique.
+  username      String    @unique
+  /// Auth provider name, e.g. supabase.
+  authProvider  String    @map("auth_provider")
+  /// Provider user ID. Null until provisioning has succeeded.
+  authSubject   String?   @map("auth_subject") @db.Uuid
+  provisionedAt DateTime? @map("provisioned_at") @db.Timestamptz(6)
+  disabledAt    DateTime? @map("disabled_at") @db.Timestamptz(6)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision      BigInt    @default(1)
+
+  club Club @relation(fields: [clubId], references: [id], onDelete: Restrict)
+
+  @@unique([authProvider, authSubject])
+  @@map("club_accounts")
+}

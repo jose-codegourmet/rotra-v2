@@ -3,6 +3,7 @@
 import { registeredCity } from '@rotra/data/club-player/fetchers'
 import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import { useCreatePlayerInvite } from '@rotra/data/club-player/useCreatePlayerInvite'
+import { useSavedPlayerStats } from '@rotra/data/club-player/useSavedPlayerStats'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { useNowCard } from '@rotra/data/queue-session/useNowCard'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
@@ -16,6 +17,7 @@ import { LetterGroup, letterHeadingId } from '@rotra/ui/letter-group'
 import { PageHeader } from '@rotra/ui/page-header'
 import { PlayerProfileSheet } from '@rotra/ui/player-profile-sheet'
 import { SavedPlayerCard } from '@rotra/ui/saved-player-card'
+import { SavedPlayerStatsCarousel } from '@rotra/ui/saved-player-stats-carousel'
 import {
   DEFAULT_SAVED_PLAYERS_FILTERS,
   SavedPlayersFilterBar,
@@ -98,6 +100,7 @@ export function SavedPlayers() {
   const nowCard = useNowCard()
   const live = nowCard.data?.live ?? null
 
+  const stats = useSavedPlayerStats()
   const all = useClubPlayers()
   const list = useClubPlayers({
     search: filters.search || undefined,
@@ -162,6 +165,11 @@ export function SavedPlayers() {
           all.data ? `${all.data.players.length} players this club has played with` : undefined
         }
       />
+      {stats.isError ? (
+        <QueryError query={stats} title="Couldn't load saved player statistics." />
+      ) : (
+        <SavedPlayerStatsCarousel stats={stats.data} />
+      )}
       <SavedPlayersFilterBar
         value={filters}
         onChange={setFilters}

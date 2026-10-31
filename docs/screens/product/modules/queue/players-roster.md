@@ -10,6 +10,24 @@
 
 Header “Saved players”, “N players this club has played with”.
 
+**Statistics carousel** (issue #301, verified October 31, 2026): between the header and filters,
+show six cards in this order: **Total players**, **Total registered**, **Total beginners**,
+**Total intermediates**, **Total advanced**, **New players this week**. Counts use all saved players
+for this club, independent of search and filters. Registered means claimed; levels use the club's
+playing-level band. Unknown levels contribute to the total but not a band.
+
+“This week” starts Monday at 00:00 in **Asia/Manila** and runs through the current instant, inclusive.
+Missing, invalid and future added dates do not count. The caption reads “All saved players · This week
+starts Monday (Asia/Manila)”. Cards are 224 px wide, with 12 px gaps, 16 px padding, surface background,
+strong border, rounded corners, muted labels and 32 px counts. Horizontal overflow stays inside the
+carousel. Swipe/drag or use Previous/Next statistics buttons (44 px targets); the focused card viewport
+also supports Left/Right arrow keys. At each end its corresponding control is disabled. The region
+is named “Saved player statistics”; slides have their position and label. No automatic rotation;
+reduced motion makes control navigation instant. All six zero values remain visible for an empty club.
+Loading shows labelled placeholders; an error offers retry instead of misleading zero counts.
+
+The mockup uses native horizontal scrolling; the real app uses Embla Carousel.
+
 **Tools row:** Search (“Name or nickname”; RTR IDs also match) and four filters:
 
 | Control | Options |

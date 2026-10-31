@@ -11,3 +11,13 @@ export type ClubPlayer = {
   identity: 'registered' | 'unclaimed' | 'guest' | 'pending'
   playingLevel: PlayingLevel | null
 }
+
+/** Unfiltered Saved players overview for one club. */
+export type SavedPlayerStats = {
+  totalPlayers: number
+  totalRegistered: number
+  totalBeginners: number
+  totalIntermediates: number
+  totalAdvanced: number
+  newPlayersThisWeek: number
+}

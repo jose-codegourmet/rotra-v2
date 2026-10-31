@@ -36,8 +36,10 @@ export const JOSE_PLAYER_ID = '2c7f6a7b-eed9-5051-9426-6dbce5133fbc'
 /** Queue's four directory suggestions (not yet saved club players). */
 export const directoryPlayers = selectPlayers(seed.directoryPlayerIds)
 
+const savedPlayersSeededAt = Date.now()
+
 /** Queue's 23 saved players, all registered. Kenji, Kenjie and Atty Steph are appended last. */
-export const clubPlayers = [
+const savedClubPlayers = [
   {
     id: 'c3e0d1c0-f087-5514-8c94-7ce61c54ed3f',
     clubId: '6cd364d4-0e3a-5c3d-9e75-2116cc845714',
@@ -246,6 +248,12 @@ export const clubPlayers = [
     playingLevel: 'intermediate_low',
   },
 ] satisfies ClubPlayer[]
+
+export const clubPlayers = savedClubPlayers.map((player, index) => ({
+  ...player,
+  // The final three additions are recent on every fresh mock-store load, even just after Monday.
+  addedAt: index >= 20 ? savedPlayersSeededAt : savedPlayersSeededAt - (30 + index) * 86_400_000,
+}))
 
 /**
  * Story-only club players for the guest and unclaimed states. Every demo club player is registered,

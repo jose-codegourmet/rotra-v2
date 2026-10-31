@@ -20,6 +20,19 @@ A name match is a suggestion, not proof of identity. To link an **unclaimed** Pl
 
 Offline, Player Information search is unavailable. The operator adds the person as a new player; their profile can be linked after reconnecting.
 
+## Saved player statistics
+
+Owner decision, October 31, 2026 ([#301](https://github.com/jose-codegourmet/rotra-v2/issues/301)):
+the Saved players overview counts all saved records belonging to the current club, independently
+of its search and filters. It shows total players, registered (claimed) players, and counts by
+Beginner / Intermediate / Advanced club playing level. Unassigned levels only count toward total
+players. No identities are combined by name.
+
+“New players this week” counts the first time the club saved each player (`addedAt` in the mock;
+`added_at` in the proposed records), from Monday at 00:00 in Asia/Manila through now, inclusive.
+Missing, non-finite and future dates do not count. Counts are derived, never persisted separately.
+The mock seeds three recent additions when its fixtures load; a reload resets the in-memory store.
+
 ## Identity states
 
 | State | Meaning |

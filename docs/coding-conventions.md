@@ -34,11 +34,12 @@ in the same PR.
 | Forms | React Hook Form + Zod | §6 |
 | Tables | TanStack Table v8 | §12 |
 | Animation | Motion (`motion/react`) | §11 |
+| Carousels | embla-carousel-react 8.6 | Approved by #301 for Saved player statistics; no autoplay |
 | QR codes | qrcode-generator 1.4.4 | Only in `@rotra/ui/player-id-qr`; draws the module matrix as an SVG path |
 | Toasts | Sonner (shadcn's toast) | Only through `@rotra/ui/toaster`; restyled to the prototype toast |
 | Lint/format | Biome | `next lint` no longer exists in Next 16 |
 | Components | Storybook (one, in `@rotra/ui`) | §5 |
-| Tests | Vitest (`pnpm test`) | Only money, phone parsing, ranking/standings/awards math and queue rules (§14) |
+| Tests | Vitest (`pnpm test`) | Only money, phone parsing, ranking/standings/awards math, queue rules (§14), and saved-player statistics (#301) |
 
 **Adding any other dependency needs a decision.** Ask before adding one, say why, and add it to this table.
 
@@ -332,7 +333,7 @@ packages/data/src/
 - Never improvise a formula. If the business docs mark it open ([open decisions](business_logic/product/open-decisions.md)),
   copy the prototype's reference behavior, label it as such in a comment, and keep it in one function.
 - **Money and ranking math need unit tests** (the one place tests are required). Phone parsing and queue-rule tests are also allowed (F05.1). Ask before adding tests
-  elsewhere.
+  elsewhere. Saved-player statistics tests are explicitly authorized by #301.
 
 ---
 

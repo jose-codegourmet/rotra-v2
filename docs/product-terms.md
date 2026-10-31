@@ -246,6 +246,7 @@ from the [database design](database_design/product/README.md). Add a row here **
 | Public-page retention | `RetentionState` | — | Projection: `none` · `restored` · `stale` · `due` · `failed` · `deleted` |
 | Club entitlement | `ClubEntitlement` | `club_entitlements` | Projection of effective access; not stored in the mock (computed with `accessOf`) |
 | Saved club player | `ClubPlayer` | `club_players` | `playerId` null = guest |
+| Saved player statistics | `SavedPlayerStats` | — | Derived club-wide totals; `SavedPlayerStatsCarousel` renders them; `useSavedPlayerStats` reads them |
 | Queue Session | `QueueSession` | `queue_sessions` | `state`: `prepared` · `active` · `finalizing` · `completed` · `invalid` |
 | Join request | `SessionJoinRequest` | `session_join_requests` | `status`: `pending` · `confirmed` · `declined` |
 | Waitlist entry | `SessionWaitlistEntry` | `session_waitlist` | Ordered by `added_at` |

@@ -89,7 +89,6 @@ model SessionWaitlistEntry {
   skillLevel SkillLevel?  @relation(fields: [skillLevelId], references: [id], onDelete: Restrict)
 
   @@unique([sessionId, clubPlayerId])
-  @@index([sessionId, demotedAt(sort: Desc), demotedConfirmedAt, addedAt, id])
   @@map("session_waitlist")
 }
 

@@ -67,4 +67,4 @@ TanStack Table v8 · React Hook Form + Zod · Redux Toolkit · Motion · Storybo
 Biome · Supabase + Prisma (later). Details: [architecture](docs/architecture.md),
 [coding conventions §1](docs/coding-conventions.md#1-stack).
 
-The canonical editable prototypes live in [app/mocksups-app](app/mocksups-app/README.md). Run `nvm use && pnpm mockups` to serve them independently on port 3003.
+The canonical editable prototypes live in [app/mocksups-app](app/mocksups-app/README.md). Run `nvm use && pnpm mockups` to open the separate routed prototype app on port 3003: `/player`, `/queue`, and `/admin`, with nested routes, direct links, and browser history.

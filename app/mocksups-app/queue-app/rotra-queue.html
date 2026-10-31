@@ -2166,14 +2166,14 @@ function levelDiff(level, sugg, id) {
 }
 // Session link and guest join requests. The public session page doubles as the invite link: guests read the details
 // and can send a quick request; nothing is admitted until the Queue Master confirms it in preparation or the console.
-const sessionLink = (s) => `rotra.app/s/${s.id.replace(/[^a-z0-9]/gi, '').slice(-6).toLowerCase()}`;
+const sessionLink = (s) => window.mountPrototypeRouter ? `${location.origin}/queue/s/${encodeURIComponent(s.id)}` : `https://rotra.app/s/${s.id.replace(/[^a-z0-9]/gi, '').slice(-6).toLowerCase()}`;
 const pendingReqs = (s) => (s.requests || []).filter((r) => r.status === 'pending').sort((a, b) => a.at - b.at);
 const BAND_CHOICES = [['Beginner', 'Beginner'], ['Intermediate', 'Intermediate'], ['Advanced', 'Advanced'], ['unsure', 'Not sure']];
 const bandMid = (band) => { const ix = LEVELS.map((l, i) => [l, i]).filter(([l]) => l.band.startsWith(band)).map(([, i]) => i); return ix.length ? ix[Math.floor(ix.length / 2)] : null; };
 function linkCard(s) {
   const n = pendingReqs(s).length, on = s.acceptReq !== false;
   return `<section class="card stack" id="session-link"><div class="between"><div><h2>Session link</h2><p class="small muted">Share it in your Facebook post or group chat. Anyone with it sees the public page; guests can send a join request, and nobody gets a slot until you confirm them.</p></div>${n ? chip(`${n} join request${n > 1 ? 's' : ''}`, 'warn') : ''}</div>
-    <div class="invite-link"><input class="input" id="session-link-in" readonly value="https://${sessionLink(s)}" aria-label="Session link"><button class="btn sm primary" data-act="copyLink">Copy link</button></div>
+    <div class="invite-link"><input class="input" id="session-link-in" readonly value="${sessionLink(s)}" aria-label="Session link"><button class="btn sm primary" data-act="copyLink">Copy link</button></div>
     <div class="row acts"><button class="btn sm" data-act="openGuest">Open as a guest</button><button class="btn sm" data-act="go" data-to="public">Preview public page</button></div>
     <div class="li" style="padding:0"><div class="main"><b>Accept join requests</b><p class="small muted">${on ? 'Guests can request a slot from the public page.' : 'The public page says to contact the Queue Master instead.'}</p></div>${sw(on, 'toggleAcceptReq', '', 'Accept join requests')}</div>
   </section>`;
@@ -3238,7 +3238,7 @@ const ACT = {
   openSync: () => openSheet({ type: 'sync' }),
   openVenue: () => openSheet({ type: 'venue', mode: 'pick', q: '' }),
   openPost: () => openSheet({ type: 'post' }),
-  copyLink: () => { const v = `https://${sessionLink(cur())}`; try { navigator.clipboard.writeText(v); } catch (e) { /* clipboard unavailable */ } toast('Session link copied'); },
+  copyLink: () => { const v = sessionLink(cur()); try { navigator.clipboard.writeText(v); } catch (e) { /* clipboard unavailable */ } toast('Session link copied'); },
   openGuest: (d) => { go('public', d.id); S.ui.guest = true; render(); },
   toggleAcceptReq: () => { const s = cur(); s.acceptReq = s.acceptReq === false; save(); render(); toast(s.acceptReq ? 'Join requests are on' : 'Join requests are off'); },
   openJoin: () => openSheet({ type: 'join', band: null }),
@@ -3975,9 +3975,66 @@ window.addEventListener('resize', () => {
   resizeTimer = setTimeout(() => { if (S.screen === 'console' && S.ui.pane !== 'roster' && !drag && !pdrag && !S.ui.sheet) render(); }, 150);
 });
 
+// ---------- Prototype routes (same paths as apps/queue, under /queue) ----------
+let prototypeRouter;
+const queuePaths = { home: '', login: '/login', venues: '/venues', inventory: '/inventory', players: '/saved-players' };
+const settingsSlugs = { identity: 'club-identity', defaults: 'session-defaults', post: 'facebook-post', license: 'license', payments: 'license', device: 'this-device', account: 'account' };
+const sessionSuffixes = { prepare: '/preparation', console: '', history: '/record', finalizing: '/finishing', results: '/results' };
+function prototypePath() {
+  let path = queuePaths[S.screen];
+  let tab;
+  if (S.screen === 'club') path = `/club-settings/${settingsSlugs[S.ui.clubTab] || 'club-identity'}`;
+  if (S.screen === 'setup') path = S.ui.draft?.id ? `/sessions/${encodeURIComponent(S.ui.draft.id)}/edit` : '/sessions/new';
+  if (S.screen in sessionSuffixes) path = `/sessions/${encodeURIComponent(S.currentId)}${sessionSuffixes[S.screen]}`;
+  if (S.screen === 'prepare') tab = S.ui.prepTab && S.ui.prepTab !== 'overview' ? S.ui.prepTab : null;
+  if (S.screen === 'console') tab = ['queue', 'roster', 'board'].includes(S.ui.pane) ? S.ui.pane : null;
+  if (S.screen === 'history') tab = S.ui.histTab && S.ui.histTab !== 'results' ? S.ui.histTab : null;
+  if (S.screen === 'results') tab = S.ui.slide ? String(S.ui.slide) : null;
+  if (S.screen === 'public') { path = S.ui.guest ? `/s/${encodeURIComponent(S.currentId)}` : `/sessions/${encodeURIComponent(S.currentId)}/public-page`; tab = S.ui.pubTab === 'participants' ? 'participants' : null; }
+  return `/queue${path ?? ''}${tab ? `?tab=${encodeURIComponent(tab)}` : ''}`;
+}
+function applyPrototypeRoute(url) {
+  const path = url.pathname.slice('/queue'.length);
+  let screen = Object.entries(queuePaths).find(([, value]) => value === path)?.[0];
+  let session = null;
+  const setting = path.match(/^\/club-settings(?:\/([^/]+))?$/);
+  const match = path.match(/^\/sessions\/([^/]+)(?:\/(preparation|edit|record|finishing|results|public-page|recovery))?$/);
+  const guest = path.match(/^\/s\/([^/]+)$/);
+  const tab = url.searchParams.get('tab');
+  if (setting) {
+    const entry = Object.entries(settingsSlugs).find(([, slug]) => slug === (setting[1] || 'club-identity'));
+    if (!entry) return false;
+    screen = 'club'; S.ui.clubTab = entry[0];
+  }
+  if (path === '/sessions/new') { screen = 'setup'; if (S.screen !== 'setup' || !S.ui.draft || S.ui.draft.id) S.ui.draft = draftFrom(null); S.ui.errors = {}; }
+  else if (match || guest) {
+    const id = decodeURIComponent((match || guest)[1]);
+    session = S.sessions.find((s) => s.id === id);
+    if (!session) return false;
+    S.currentId = session.id;
+    if (guest || match[2] === 'public-page') { screen = 'public'; S.ui.guest = !!guest; }
+    else if (match[2] === 'edit') { screen = 'setup'; if (S.screen !== 'setup' || S.ui.draft?.id !== session.id) S.ui.draft = draftFrom(session); S.ui.errors = {}; }
+    else screen = Object.entries(sessionSuffixes).find(([, suffix]) => suffix === (match[2] ? `/${match[2]}` : ''))?.[0];
+    // Re-entry only selects an available view; it must never restart finalization.
+    if (match?.[2] === 'recovery' || screen === 'finalizing' || (screen === 'console' && session.status !== 'active')) screen = session.status === 'active' ? 'console' : session.status === 'prepared' ? 'prepare' : 'history';
+    if (['prepare', 'setup'].includes(screen) && session.status !== 'prepared') screen = session.status === 'active' ? 'console' : 'history';
+    if (screen === 'results' && session.status !== 'finalized') screen = session.status === 'prepared' ? 'prepare' : session.status === 'active' ? 'console' : 'history';
+  }
+  if (!screen) return false;
+  S.screen = screen; S.ui.sheet = null; S.ui.navOpen = false; S.ui.setOpen = false;
+  if (screen !== 'public') S.ui.guest = false;
+  S.ui.prepTab = ['roster', 'waitlist', 'payments'].includes(tab) ? tab : 'overview';
+  S.ui.pane = ['queue', 'roster', 'board'].includes(tab) ? tab : 'live';
+  S.ui.histTab = HIST_TABS.some(([key]) => key === tab) ? tab : 'results';
+  S.ui.slide = ['1', '2'].includes(tab) ? Number(tab) : 0;
+  S.ui.pubTab = tab === 'participants' ? tab : 'details';
+  return true;
+}
+
 // ---------- Render ----------
 let lastSheetKey = null;
 function render() {
+  if (prototypeRouter?.unavailable) return;
   const a = document.activeElement;
   const focusId = a && a.id && a !== document.body ? a.id : null;
   let selStart = null;
@@ -4008,6 +4065,7 @@ function render() {
   const rp = document.getElementById('rp-range');
   if (rp) replayTo(+rp.value);
   save();
+  prototypeRouter?.sync();
 }
 if (!S.inventory) { S.inventory = seedInventory(); save(); }
 if (!S.venues) { S.venues = seedVenues(); save(); }
@@ -4018,7 +4076,8 @@ window.addEventListener('resize', () => { const v = calView(); if (v !== lastCal
 // Sessions saved before the budget was enforced on edit may hold more slots than courts × players; settle them first come, first served.
 S.sessions.forEach((x) => { if (x.status === 'prepared' && x.roster.length > capacityOf(x)) rebalanceSlots(x); });
 setInterval(() => { if (S.screen === 'console' && !S.ui.sheet && !drag && !pdrag &&!(document.activeElement && /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName))) render(); }, 30000);
-render();
+prototypeRouter = window.mountPrototypeRouter?.({ read: prototypePath, apply: applyPrototypeRoute, render, home: '/queue' });
+if (!prototypeRouter) render();
 })();
 </script>
 

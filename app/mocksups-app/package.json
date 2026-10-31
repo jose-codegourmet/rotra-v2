@@ -3,6 +3,10 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "dev": "python3 -m http.server 3003 --bind 127.0.0.1"
+    "dev": "node --watch server.mjs",
+    "start": "node server.mjs",
+    "lint": "biome check router.js router.d.ts server.mjs build.mjs package.json tsconfig.json",
+    "type-check": "tsc --noEmit",
+    "build": "node build.mjs"
   }
 }

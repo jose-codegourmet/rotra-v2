@@ -54,6 +54,13 @@ rotra/
 
 Ports are set in each app's `dev` and `start` scripts.
 
+The separate prototype workspace `app/mocksups-app` runs on port 3003 (`pnpm mockups`). Its
+Node HTTP server and browser History API expose `/player`, `/queue`, and `/admin`, with the
+actual app paths beneath those prefixes. It serves the canonical HTML designs with optional
+routing adapters and keeps their fictional browser-local stores. It does not import the real
+apps or provide operational persistence/auth. See its [route map](../app/mocksups-app/README.md).
+
+
 ### Product → app
 
 | Product | App | Prototype (design reference) | Business rules |

@@ -87,6 +87,8 @@ model ClubExpiryCycle {
   cancellationTerm ClubLicenseTerm?  @relation(fields: [clubId, cancellationTermId], references: [clubId, id], onDelete: Restrict)
   currentFor       ClubEntitlement[] @relation("CurrentExpiryCycle")
 
+  publications SessionPublication[]
+
   @@unique([clubId, id])
   @@index([state, deletePublicPagesAfter, id])
   @@index([clubId, expiredAt(sort: Desc)])

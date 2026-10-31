@@ -1,0 +1,116 @@
+// Optional public output and private exports (queue/modules/results-publication.md).
+//
+// Boundary: public reads come only from session_publications' own allowlisted columns. The
+// published result copy holds exactly the selected slides, with Off Day only when that publish
+// included it (CHECK in SQL), so no public query needs to join the private snapshot.
+
+enum PublicationState {
+  /// Details/Participants page only; no results published.
+  details
+  published
+  /// Public page removed by retention; history untouched.
+  deleted
+
+  @@map("publication_state")
+}
+
+enum ResultSlide {
+  standings
+  awards
+
+  @@map("result_slide")
+}
+
+model SessionPublication {
+  id                     String           @id @default(uuid(7)) @db.Uuid
+  clubId                 String           @map("club_id") @db.Uuid
+  sessionId              String           @unique @map("session_id") @db.Uuid
+  /// Opaque public page key.
+  publicKey              String           @unique @map("public_key")
+  state                  PublicationState @default(details)
+  /// Allowlisted Details projection (title, times, venue, minimum games). No costs or contacts.
+  detailsProjection      Json             @map("details_projection")
+  /// Allowlisted Participants: name, permitted picture, has-a-profile flag. No level or presence.
+  participantsProjection Json             @map("participants_projection")
+  /// Snapshot the current published results were copied from (private; never joined publicly).
+  publishedSnapshotId    String?          @map("published_snapshot_id") @db.Uuid
+  publishedSlides        ResultSlide[]    @map("published_slides")
+  /// Explicit on every publish; never carried over.
+  includeOffDay          Boolean          @default(false) @map("include_off_day")
+  /// Public copy of only the selected slides: { standings?, awards?, offDay? }.
+  publicResults          Json?            @map("public_results")
+  publishedAt            DateTime?        @map("published_at") @db.Timestamptz(6)
+  /// Club expiry cycle this page is retained under; deletion must name this exact cycle.
+  expiryCycleId          String?          @map("expiry_cycle_id") @db.Uuid
+  lastSyncedAt           DateTime         @map("last_synced_at") @db.Timestamptz(6)
+  deletedAt              DateTime?        @map("deleted_at") @db.Timestamptz(6)
+  createdAt              DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt              DateTime         @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision               BigInt           @default(1)
+
+  session           QueueSession              @relation(fields: [clubId, sessionId], references: [clubId, id], onDelete: Restrict)
+  publishedSnapshot SessionResultSnapshot?    @relation("PublishedSnapshot", fields: [clubId, sessionId, publishedSnapshotId], references: [clubId, sessionId, id], onDelete: Restrict)
+  expiryCycle       ClubExpiryCycle?          @relation(fields: [clubId, expiryCycleId], references: [clubId, id], onDelete: Restrict)
+  events            SessionPublicationEvent[]
+
+  @@unique([clubId, sessionId])
+  @@unique([clubId, sessionId, id])
+  @@index([clubId, expiryCycleId])
+  @@map("session_publications")
+}
+
+/// Append-only log of every publish: selection, Off Day choice, who and when.
+model SessionPublicationEvent {
+  id              String        @id @default(uuid(7)) @db.Uuid
+  clubId          String        @map("club_id") @db.Uuid
+  sessionId       String        @map("session_id") @db.Uuid
+  publicationId   String        @map("publication_id") @db.Uuid
+  snapshotId      String        @map("snapshot_id") @db.Uuid
+  slides          ResultSlide[]
+  includeOffDay   Boolean       @map("include_off_day")
+  actorClubId     String        @map("actor_club_id") @db.Uuid
+  deviceId        String?       @map("device_id") @db.Uuid
+  sourceCommandId String        @unique @map("source_command_id") @db.Uuid
+  occurredAt      DateTime      @default(now()) @map("occurred_at") @db.Timestamptz(6)
+
+  publication SessionPublication    @relation(fields: [clubId, sessionId, publicationId], references: [clubId, sessionId, id], onDelete: Restrict)
+  snapshot    SessionResultSnapshot @relation("PublicationEventSnapshot", fields: [clubId, sessionId, snapshotId], references: [clubId, sessionId, id], onDelete: Restrict)
+  device      Device?               @relation(fields: [clubId, deviceId], references: [clubId, id], onDelete: Restrict)
+
+  @@index([publicationId, occurredAt])
+  @@map("session_publication_events")
+}
+
+enum ExportFormat {
+  story
+  feed
+
+  @@map("export_format")
+}
+
+/// Private Download images output. Never public; does not require publication.
+model ResultExport {
+  id                  String        @id @default(uuid(7)) @db.Uuid
+  clubId              String        @map("club_id") @db.Uuid
+  sessionId           String        @map("session_id") @db.Uuid
+  snapshotId          String        @map("snapshot_id") @db.Uuid
+  slides              ResultSlide[]
+  format              ExportFormat
+  includeOffDay       Boolean       @map("include_off_day")
+  clubNameSnapshot    String        @map("club_name_snapshot")
+  clubLogoRefSnapshot String?       @map("club_logo_ref_snapshot")
+  footer              String        @default("powered by rotra")
+  /// Standings paginate at 14 rows per story frame and 10 per feed frame.
+  frameCount          Int           @map("frame_count")
+  /// Private storage reference; storage and access are later work.
+  assetRef            String?       @map("asset_ref")
+  sourceCommandId     String        @unique @map("source_command_id") @db.Uuid
+  createdAt           DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  expiresAt           DateTime?     @map("expires_at") @db.Timestamptz(6)
+  deletedAt           DateTime?     @map("deleted_at") @db.Timestamptz(6)
+
+  snapshot SessionResultSnapshot @relation("ExportSnapshot", fields: [clubId, sessionId, snapshotId], references: [clubId, sessionId, id], onDelete: Restrict)
+
+  @@index([clubId, sessionId, createdAt(sort: Desc)])
+  @@map("result_exports")
+}

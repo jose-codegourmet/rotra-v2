@@ -92,6 +92,10 @@ model SessionResultSnapshot {
 
   finalization SessionFinalization @relation(fields: [clubId, sessionId], references: [clubId, sessionId], onDelete: Restrict)
 
+  publications      SessionPublication[]      @relation("PublishedSnapshot")
+  publicationEvents SessionPublicationEvent[] @relation("PublicationEventSnapshot")
+  exports           ResultExport[]            @relation("ExportSnapshot")
+
   @@unique([sessionId, version])
   @@unique([clubId, sessionId, id])
   @@map("session_result_snapshots")

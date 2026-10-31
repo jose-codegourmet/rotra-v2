@@ -262,3 +262,23 @@ close of a stream that never wrote, conflict categories and who may resolve one.
   Facts keep `player_id_at_finalization`, original dates and outcomes; history and rank projections
   pick the linked games up through `attribution` jobs. A mistaken link is revoked, never deleted.
 - Partial unique indexes with `NULLS NOT DISTINCT` need PostgreSQL 15 or later.
+
+## Group H (part) · publications, events, exports (F07.17 · `20261031001000`)
+
+| Table | Keys and uniques | Checks and triggers | Scoped FKs |
+|---|---|---|---|
+| `session_publications` | PK `id`; unique `session_id`, `public_key`, `(club_id, session_id, id)`; index `(club_id, expiry_cycle_id)` | published ⇔ snapshot + time + public copy; slide set 1–2 distinct, Off Day only with awards; public copy may hold only `standings`/`awards`/`offDay`, each only when selected (Off Day only when `include_off_day`); deleted ⇔ `deleted_at`, with no public copy; **guard**: never deleted, no restore after deletion, deletion only under its own **running** expiry cycle past the deadline | session; snapshot `(club_id, session_id, published_snapshot_id)`; cycle `(club_id, expiry_cycle_id)` |
+| `session_publication_events` | PK `id`; unique `source_command_id`; index `(publication_id, occurred_at)` | valid slide set; actor = club; **append-only** | publication, snapshot, device, all scoped |
+| `result_exports` | PK `id`; unique `source_command_id`; index `(club_id, session_id, created_at desc)` | valid slide set; footer `powered by rotra`; frames > 0; no delete (soft `deleted_at`) | snapshot `(club_id, session_id, snapshot_id)` |
+
+- **Public boundary.** Public reads use only `session_publications`' allowlisted columns
+  (`details_projection`, `participants_projection`, `public_results`). The public copy is written at
+  publish time with just the selected slides, so a public query never joins the private snapshot and
+  an omitted Off Day is not in any public column. Exports are private and never public.
+- **Re-publication** replaces `published_slides`, `include_off_day` (always supplied) and the public
+  copy, and appends an event. Facts and snapshots are untouched.
+- **Stale retention jobs.** Deleting a page requires the publication's own `expiry_cycle_id` to still
+  be `running` and past `delete_public_pages_after`. Renewal cancels that cycle, so a job queued
+  earlier fails instead of deleting a renewed page.
+- **No cascade into history.** Every FK is `RESTRICT`; publications and exports are soft-deleted;
+  nothing in facts, finalizations or identity references a publication.

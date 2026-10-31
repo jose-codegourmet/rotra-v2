@@ -78,6 +78,8 @@ model QueueSession {
 
   finalization SessionFinalization?
 
+  publication SessionPublication?
+
   @@unique([clubId, id])
   @@index([clubId, scheduledStartAt(sort: Desc), id])
   @@index([clubId, seriesId])

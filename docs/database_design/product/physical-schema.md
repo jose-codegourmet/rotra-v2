@@ -47,3 +47,26 @@ only through server Route Handlers and services, never through the Supabase Data
   `running · cancelled · completed` are a proposal pending #245/#248.
 - `ranking_policy_versions` has no status, job or result columns: saving settings records configuration,
   never a completed recalculation. `algorithm_version` is `unapproved` until #247.
+
+## Group C · player identity, contacts, claims, RTR IDs (F07.11 · `20261031000300`)
+
+| Table | Keys and uniques | Checks and triggers | Delete behavior |
+|---|---|---|---|
+| `players` | PK `id` (never an auth subject); index `full_name` | non-blank name; experience ≥ 0 and recorded together; details carry a version | Referenced with `RESTRICT` everywhere |
+| `player_private_contacts` | PK/FK `player_id`; unique `phone_e164`, unique non-null `email` | E.164 phone; email trimmed + lowercase | `RESTRICT` |
+| `player_accounts` | PK/FK `player_id`; unique `(auth_provider, auth_subject)` | deferred constraint trigger: a claimed account needs phone **and** email at commit | `RESTRICT`; no FK to `auth.users` |
+| `player_social_links` | PK `id`; unique `(player_id, provider)` | `https://` URL | `RESTRICT` |
+| `player_claim_links` | PK `id`; unique `token_digest` (32-byte SHA-256); partial unique `player_id WHERE state = 'active'`; index `(player_id, issued_at desc)`, `(issuing_club_id, issued_at desc)` | expiry > issue; `active · consumed · revoked` each match their timestamps | `RESTRICT` |
+| `player_id_counters` | PK `(location_code_id, sync_date)` | `last_sequence > 0`; advanced only by `rotra_next_player_sequence` (one atomic upsert) | `RESTRICT` |
+| `player_id_allocations` | PK/FK `player_id`; unique `rtr_id`, `(location_code_id, sync_date, sequence)`; FK to its counter | RTR format `RTR-CC-CCC-MMDDYY-NNNN+` with the frozen codes; **append-only** trigger | `RESTRICT` |
+
+- **No auth cascade.** Account mappings store the provider subject as data, not as an FK into Supabase's
+  managed `auth` schema, so disabling or deleting an auth user never removes a player or their history.
+- **One phone identity, one permanent ID.** The unique phone and the `player_id` PK on allocations make
+  a concurrent second allocation fail; the loser retries from identity resolution. Sequences come from
+  the counter upsert, never `MAX(sequence) + 1`. `@rotra/db/player/rtr-id` formats IDs and calls the
+  function; the sync-day timezone (`Asia/Manila`) is a proposal pending #244.
+- **Claims** store only a token digest. One active link per player (reissue revokes) is a proposal
+  pending #244. Unclaimed identities have no `player_accounts` row.
+- Private contacts and claim digests are never selected into public projections; public reads use
+  explicit allowlists (F07.20 service boundary).

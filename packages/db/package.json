@@ -5,7 +5,8 @@
   "type": "module",
   "exports": {
     "./client": "./src/client/prisma.ts",
-    "./admin/club-identity": "./src/admin/club-identity.ts"
+    "./admin/club-identity": "./src/admin/club-identity.ts",
+    "./player/rtr-id": "./src/player/rtr-id.ts"
   },
   "scripts": {
     "db:generate": "prisma generate",

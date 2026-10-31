@@ -1,0 +1,39 @@
+// Permanent RTR IDs: RTR-<country>-<city>-<MMDDYY sync day>-<sequence>, e.g. RTR-PH-CEB-102926-0001.
+// Allocated once per identity when the entry successfully syncs (owner decision 2026-10-28).
+// The sync-day timezone is pending #244 (proposal: Asia/Manila).
+
+/// One counter per founding location and sync day. Advanced only by `rotra_next_player_sequence`.
+model PlayerIdCounter {
+  locationCodeId String   @map("location_code_id") @db.Uuid
+  syncDate       DateTime @map("sync_date") @db.Date
+  lastSequence   Int      @map("last_sequence")
+
+  location    LocationCode         @relation(fields: [locationCodeId], references: [id], onDelete: Restrict)
+  allocations PlayerIdAllocation[]
+
+  @@id([locationCodeId, syncDate])
+  @@map("player_id_counters")
+}
+
+/// Immutable (UPDATE/DELETE rejected by trigger). Never a PK/FK elsewhere; internal joins use player_id.
+model PlayerIdAllocation {
+  playerId       String   @id @map("player_id") @db.Uuid
+  rtrId          String   @unique @map("rtr_id")
+  creatingClubId String   @map("creating_club_id") @db.Uuid
+  locationCodeId String   @map("location_code_id") @db.Uuid
+  /// Frozen copies of the codes at allocation time.
+  countryCode    String   @map("country_code")
+  cityCode       String   @map("city_code")
+  syncDate       DateTime @map("sync_date") @db.Date
+  sequence       Int
+  allocatedAt    DateTime @default(now()) @map("allocated_at") @db.Timestamptz(6)
+
+  player       Player          @relation(fields: [playerId], references: [id], onDelete: Restrict)
+  creatingClub Club            @relation(fields: [creatingClubId], references: [id], onDelete: Restrict)
+  location     LocationCode    @relation(fields: [locationCodeId], references: [id], onDelete: Restrict)
+  counter      PlayerIdCounter @relation(fields: [locationCodeId, syncDate], references: [locationCodeId, syncDate], onDelete: Restrict)
+
+  @@unique([locationCodeId, syncDate, sequence])
+  @@index([creatingClubId])
+  @@map("player_id_allocations")
+}

@@ -41,6 +41,8 @@ model Club {
   entitlement      ClubEntitlement?
   expiryCycles     ClubExpiryCycle[]
   nameChanges      ClubNameChangeRequest[]
+  claimLinks       PlayerClaimLink[]
+  idAllocations    PlayerIdAllocation[]
 
   @@index([foundingLocationCodeId])
   @@map("clubs")

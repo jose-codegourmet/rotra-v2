@@ -11,7 +11,9 @@ model LocationCode {
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  foundedClubs Club[]
+  foundedClubs  Club[]
+  idCounters    PlayerIdCounter[]
+  idAllocations PlayerIdAllocation[]
 
   @@unique([countryCode, cityCode])
   @@map("location_codes")

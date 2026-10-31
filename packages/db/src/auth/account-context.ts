@@ -38,7 +38,11 @@ export async function loadAccountContext<A extends AccountAudience>(
         select: { playerId: true, disabledAt: true },
       })
       if (!account || account.disabledAt) return null
-      return { kind: 'player', subject: verified.subject, playerId: account.playerId } as ContextFor<A>
+      return {
+        kind: 'player',
+        subject: verified.subject,
+        playerId: account.playerId,
+      } as ContextFor<A>
     }
     case 'admin': {
       const account = await prisma.adminAccount.findUnique({

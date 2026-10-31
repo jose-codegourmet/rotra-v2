@@ -20,7 +20,8 @@ export function useAccountScope(accountId: string | null) {
   const client = useQueryClient()
   const previous = useRef(accountId)
   useEffect(() => {
-    if (previous.current !== null && previous.current !== accountId) void clearAccountQueries(client)
+    if (previous.current !== null && previous.current !== accountId)
+      void clearAccountQueries(client)
     previous.current = accountId
   }, [accountId, client])
 }

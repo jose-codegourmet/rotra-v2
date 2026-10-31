@@ -1,5 +1,10 @@
 import 'server-only'
-import type { AccountContext, AdminContext, ClubContext, PlayerContext } from '../auth/account-context'
+import type {
+  AccountContext,
+  AdminContext,
+  ClubContext,
+  PlayerContext,
+} from '../auth/account-context'
 import { prisma } from '../client/prisma'
 import { denyScope, ServiceError } from './errors'
 

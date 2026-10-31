@@ -18,7 +18,12 @@ export function rtrSyncDate(at: Date): string {
  * RTR-PH-CEB-102926-0001: country, founding city, MMDDYY sync day, sequence padded to four digits.
  * Sequences above 9999 are not truncated (overflow presentation is open, #244).
  */
-export function formatRtrId(countryCode: string, cityCode: string, syncDate: string, sequence: number) {
+export function formatRtrId(
+  countryCode: string,
+  cityCode: string,
+  syncDate: string,
+  sequence: number,
+) {
   const [year, month, day] = syncDate.split('-')
   return `RTR-${countryCode}-${cityCode}-${month}${day}${year?.slice(2)}-${String(sequence).padStart(4, '0')}`
 }

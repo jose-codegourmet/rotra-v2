@@ -95,8 +95,7 @@ export async function handlePublicRead(
 /** Hides mock session markers from the Supabase client, so they can never become a session. */
 function withoutMockCookies(cookies: CookieAdapter): CookieAdapter {
   return {
-    getAll: () =>
-      cookies.getAll().filter((cookie) => !cookie.name.startsWith(MOCK_COOKIE_PREFIX)),
+    getAll: () => cookies.getAll().filter((cookie) => !cookie.name.startsWith(MOCK_COOKIE_PREFIX)),
     setAll: (values, headers) => cookies.setAll(values, headers),
   }
 }

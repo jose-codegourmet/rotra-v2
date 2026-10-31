@@ -16,7 +16,10 @@ export const toDecimalString = (value: bigint): string => value.toString()
 /** A `@db.Date` column as YYYY-MM-DD. */
 export const toDateOnly = (value: Date): string => value.toISOString().slice(0, 10)
 
-export function toMoney(amountMinor: number | null | undefined, currency: string): MoneyJson | null {
+export function toMoney(
+  amountMinor: number | null | undefined,
+  currency: string,
+): MoneyJson | null {
   if (amountMinor == null) return null
   if (!Number.isSafeInteger(amountMinor)) throw new Error('Money must be integer minor units')
   return { amountMinor, currency }

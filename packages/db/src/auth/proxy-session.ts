@@ -3,11 +3,17 @@ import { MOCK_COOKIE_PREFIX } from './data-mode'
 import { type CookieToSet, verifySubject } from './supabase'
 
 type ProxyRequest = {
-  cookies: { getAll(): { name: string; value: string }[]; set(name: string, value: string): unknown }
+  cookies: {
+    getAll(): { name: string; value: string }[]
+    set(name: string, value: string): unknown
+  }
 }
 
 type ProxyResponse = {
-  cookies: { set(name: string, value: string, options?: object): unknown; delete(name: string): unknown }
+  cookies: {
+    set(name: string, value: string, options?: object): unknown
+    delete(name: string): unknown
+  }
   headers: Headers
 }
 
@@ -19,7 +25,10 @@ type ProxyResponse = {
  * Navigation only: every Route Handler still authorizes through `@rotra/db/service/handler`, because
  * the proxy alone is not a security boundary. No database access, so the proxy never loads Prisma.
  */
-export async function refreshProxySession<R extends ProxyResponse>(request: ProxyRequest, next: () => R) {
+export async function refreshProxySession<R extends ProxyResponse>(
+  request: ProxyRequest,
+  next: () => R,
+) {
   let response = next()
   let refreshed: CookieToSet[] = []
   let refreshHeaders: Record<string, string> = {}

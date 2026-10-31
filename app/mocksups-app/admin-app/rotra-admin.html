@@ -1,3 +1,5 @@
+<!doctype html>
+<meta charset="utf-8">
 <title>ROTRA Admin</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -390,7 +392,7 @@ const CITY_CLUB = { CEB: ['Lahug Smash Club', 'IT Park Badminton Club', 'Talamba
 const CODES = ['CEB', 'CEB', 'CEB', 'CEB', 'MNL', 'DVO', 'ILO', 'BCD'];
 const DATES = ['011526', '020326', '031526', '040226', '041926', '050726', '052126', '061126', '070926', '081326', '090226', '091626', '100726'];
 function hashStr(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
-const plain = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+const plain = (s) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 
 // Players who also appear in the Queue and Player prototypes keep their names, IDs and contacts.
 const P = (id, name, nick, rtr, club, phone, email, level, recent, o = {}) => ({ id, name, nick, rtr, club, phone, email, claimed: !!email, phoneHidden: false, level, recent, registered: null, ...o });

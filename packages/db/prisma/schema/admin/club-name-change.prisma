@@ -1,0 +1,35 @@
+// A club's name changes only through an approved request; approval updates clubs.name in the
+// same transaction (decided 2026-10-26). One pending request per club (partial unique in SQL).
+
+enum ClubNameChangeState {
+  pending
+  approved
+  rejected
+  cancelled
+
+  @@map("club_name_change_state")
+}
+
+model ClubNameChangeRequest {
+  id                String              @id @default(uuid(7)) @db.Uuid
+  clubId            String              @map("club_id") @db.Uuid
+  requestedName     String              @map("requested_name")
+  /// Same comparison as clubs.name_key; rechecked against clubs on approval.
+  requestedNameKey  String              @map("requested_name_key")
+  requestedAt       DateTime            @map("requested_at") @db.Timestamptz(6)
+  state             ClubNameChangeState @default(pending)
+  reviewedByAdminId String?             @map("reviewed_by_admin_id") @db.Uuid
+  reviewedAt        DateTime?           @map("reviewed_at") @db.Timestamptz(6)
+  sourceCommandId   String              @unique @map("source_command_id") @db.Uuid
+  createdAt         DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime            @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision          BigInt              @default(1)
+
+  club       Club          @relation(fields: [clubId], references: [id], onDelete: Restrict)
+  reviewedBy AdminAccount? @relation(fields: [reviewedByAdminId], references: [id], onDelete: Restrict)
+
+  @@index([clubId, requestedAt(sort: Desc)])
+  @@index([state, requestedAt])
+  @@index([reviewedByAdminId])
+  @@map("club_name_change_requests")
+}

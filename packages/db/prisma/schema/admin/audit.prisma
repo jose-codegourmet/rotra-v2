@@ -1,0 +1,21 @@
+// Append-only record of platform-owner actions (UPDATE/DELETE rejected by trigger).
+// Never store passwords, raw claim/reset tokens or unnecessary contact values in metadata.
+
+model AdminAuditEvent {
+  id              String   @id @default(uuid(7)) @db.Uuid
+  actorAdminId    String   @map("actor_admin_id") @db.Uuid
+  /// Stable action code, e.g. club.price_changed.
+  action          String
+  targetType      String   @map("target_type")
+  targetId        String   @map("target_id")
+  sourceCommandId String?  @unique @map("source_command_id") @db.Uuid
+  occurredAt      DateTime @default(now()) @map("occurred_at") @db.Timestamptz(6)
+  /// Redacted before/after values.
+  metadata        Json?
+
+  actor AdminAccount @relation(fields: [actorAdminId], references: [id], onDelete: Restrict)
+
+  @@index([actorAdminId, occurredAt(sort: Desc)])
+  @@index([targetType, targetId, occurredAt(sort: Desc)])
+  @@map("admin_audit_events")
+}

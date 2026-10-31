@@ -35,8 +35,12 @@ model Club {
   updatedAt               DateTime       @updatedAt @map("updated_at") @db.Timestamptz(6)
   revision                BigInt         @default(1)
 
-  foundingLocation LocationCode @relation(fields: [foundingLocationCodeId], references: [id], onDelete: Restrict)
+  foundingLocation LocationCode            @relation(fields: [foundingLocationCodeId], references: [id], onDelete: Restrict)
   account          ClubAccount?
+  licenseTerms     ClubLicenseTerm[]
+  entitlement      ClubEntitlement?
+  expiryCycles     ClubExpiryCycle[]
+  nameChanges      ClubNameChangeRequest[]
 
   @@index([foundingLocationCodeId])
   @@map("clubs")

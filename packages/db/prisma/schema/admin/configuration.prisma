@@ -1,0 +1,50 @@
+// Feature flags and ranking policy versions (admin/modules/configuration-requests.md).
+// No flag consumers and no ranking calculation live here.
+
+/// Owner-created flag. The catalog starts empty; the key is immutable (trigger in SQL).
+model FeatureFlag {
+  /// ^[a-z][a-z0-9_]{2,39}$ (CHECK in SQL).
+  key              String   @id
+  /// Up to 50 characters, unique.
+  name             String   @unique @db.VarChar(50)
+  description      String
+  value            Boolean  @default(false)
+  createdByAdminId String   @map("created_by_admin_id") @db.Uuid
+  updatedByAdminId String   @map("updated_by_admin_id") @db.Uuid
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision         BigInt   @default(1)
+
+  createdBy AdminAccount @relation("FeatureFlagCreatedBy", fields: [createdByAdminId], references: [id], onDelete: Restrict)
+  updatedBy AdminAccount @relation("FeatureFlagUpdatedBy", fields: [updatedByAdminId], references: [id], onDelete: Restrict)
+
+  @@index([createdByAdminId])
+  @@index([updatedByAdminId])
+  @@map("feature_flags")
+}
+
+/// Append-only saved ranking settings (UPDATE/DELETE rejected by trigger). The newest effective
+/// version is in effect. A version records configuration only; it is never evidence that any rank
+/// was recalculated (retroactivity is pending #247).
+model RankingPolicyVersion {
+  id                           String   @id @default(uuid(7)) @db.Uuid
+  /// 1, 2, 3… in save order.
+  version                      Int      @unique
+  effectiveAt                  DateTime @map("effective_at") @db.Timestamptz(6)
+  /// Basis points 0–10000; the two sum to 10000 (CHECK in SQL).
+  assessmentWeightBp           Int      @map("assessment_weight_bp") @db.SmallInt
+  performanceWeightBp          Int      @map("performance_weight_bp") @db.SmallInt
+  /// Recent standard matches the leaderboard requires, 1–40.
+  recentStandardMatchThreshold Int      @map("recent_standard_match_threshold") @db.SmallInt
+  /// Reference to the approved algorithm version (#247); not a calculation result.
+  algorithmVersion             String   @map("algorithm_version")
+  createdByAdminId             String?  @map("created_by_admin_id") @db.Uuid
+  changeNote                   String?  @map("change_note")
+  createdAt                    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  createdBy AdminAccount? @relation(fields: [createdByAdminId], references: [id], onDelete: Restrict)
+
+  @@index([effectiveAt(sort: Desc)])
+  @@index([createdByAdminId])
+  @@map("ranking_policy_versions")
+}

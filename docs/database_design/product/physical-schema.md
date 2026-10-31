@@ -27,3 +27,23 @@ only through server Route Handlers and services, never through the Supabase Data
   pending #245. Price changes never touch `club_license_terms`.
 - Credentials stay in Supabase Auth. Club and admin accounts map to a provider subject, never to a
   `players` row. `club_accounts.auth_subject` is null until staged provisioning succeeds.
+
+## Group B · licenses, configuration, audit (F07.10 · `20261031000200`)
+
+| Table | Keys and uniques | Checks and triggers | Delete behavior |
+|---|---|---|---|
+| `club_license_terms` | PK `id`; unique `source_command_id`, `payment_reference`, `(club_id, id)`; index `(club_id, starts_at desc)`, `activated_by_admin_id` | start < end; amount ≥ 0; `pricing_at_activation = free` ⇒ amount 0 and no `paid_on`; paid ⇒ amount > 0 and `paid_on`; **append-only** trigger | `RESTRICT` to club and admin |
+| `club_entitlements` | PK/FK `club_id`; composite FKs `(club_id, effective_term_id)` → terms, `(club_id, current_expiry_cycle_id)` → cycles | term and access end both set or both null | `RESTRICT` |
+| `club_expiry_cycles` | PK `id`; unique `(club_id, id)`; partial unique `club_id WHERE state = 'running'`; index `(state, delete_public_pages_after, id)` for cleanup, `(club_id, expired_at desc)` | deadline > expiry; `cancelled` ⇔ `cancelled_at`; cancellation term only on cancelled; composite FK to the cancelling term | `RESTRICT` |
+| `club_name_change_requests` | PK `id`; unique `source_command_id`; partial unique `club_id WHERE state = 'pending'`; index `(club_id, requested_at desc)`, `(state, requested_at)` | non-blank name/key; approved/rejected ⇒ reviewer + time | `RESTRICT` |
+| `admin_audit_events` | PK `id`; unique `source_command_id`; index `(actor_admin_id, occurred_at desc)`, `(target_type, target_id, occurred_at desc)` | **append-only** trigger; metadata is redacted | `RESTRICT` to admin |
+| `feature_flags` | PK `key`; unique `name varchar(50)` | key `^[a-z][a-z0-9_]{2,39}$`; key-immutable trigger; catalog starts empty | `RESTRICT` to admins |
+| `ranking_policy_versions` | PK `id`; unique `version`; index `effective_at desc` | each weight 0–10000, sum 10000; threshold 1–40; **append-only** trigger; seeded 7000/3000/10 | `RESTRICT` to admin |
+
+- Changing a club's price never touches `club_license_terms`: each term keeps the amount and pricing it
+  was recorded with, and the table rejects updates.
+- Renewal cancels the exact running cycle (`cancellation_term_id`); a later expiry inserts a new
+  `running` cycle, so a stale deletion job can never act on a renewed club. Cycle states
+  `running · cancelled · completed` are a proposal pending #245/#248.
+- `ranking_policy_versions` has no status, job or result columns: saving settings records configuration,
+  never a completed recalculation. `algorithm_version` is `unapproved` until #247.

@@ -1,0 +1,110 @@
+// Club inventory, session cost estimates, shuttle plans and manual payment marks
+// (queue/modules/financials-inventory.md). ROTRA estimates and records; it never collects money.
+// Totals, break-even, collected and profit/loss are derived at read time, never stored.
+// Never part of public projections, result snapshots or exports.
+
+enum InventoryCategory {
+  shuttlecocks
+  equipment
+  other
+
+  @@map("inventory_category")
+}
+
+model InventoryItem {
+  id            String            @id @default(uuid(7)) @db.Uuid
+  clubId        String            @map("club_id") @db.Uuid
+  name          String
+  category      InventoryCategory
+  unit          String            @default("piece")
+  /// ≥ 0. Not decremented by sessions in v1.
+  stock         Int
+  /// Centavos ≥ 0; 0 means no cost. Plan lines read the live price (snapshotting is open).
+  unitCostMinor Int               @map("unit_cost_minor")
+  currency      String            @default("PHP") @db.Char(3)
+  /// Soft remove: past estimates may reference the item.
+  removedAt     DateTime?         @map("removed_at") @db.Timestamptz(6)
+  createdAt     DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime          @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision      BigInt            @default(1)
+
+  club      Club                     @relation(fields: [clubId], references: [id], onDelete: Restrict)
+  planLines SessionShuttlePlanLine[]
+
+  @@unique([clubId, id])
+  @@index([clubId, category, name])
+  @@map("inventory_items")
+}
+
+enum PaymentMode {
+  break_even
+  custom
+
+  @@map("payment_mode")
+}
+
+/// One optional estimate per session, saved with session setup (online only, never synced).
+model SessionCostEstimate {
+  sessionId                 String      @id @map("session_id") @db.Uuid
+  clubId                    String      @map("club_id") @db.Uuid
+  /// Null = not set; copied from the venue when chosen.
+  courtFeePerCourtHourMinor Int?        @map("court_fee_per_court_hour_minor")
+  /// Misc per-head cost included in the total; null = none.
+  entranceFeePerHeadMinor   Int?        @map("entrance_fee_per_head_minor")
+  paymentMode               PaymentMode @default(break_even) @map("payment_mode")
+  /// Required for custom, null for break_even.
+  customFeePerHeadMinor     Int?        @map("custom_fee_per_head_minor")
+  currency                  String      @default("PHP") @db.Char(3)
+  createdAt                 DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                 DateTime    @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision                  BigInt      @default(1)
+
+  session   QueueSession             @relation(fields: [clubId, sessionId], references: [clubId, id], onDelete: Restrict)
+  planLines SessionShuttlePlanLine[]
+
+  @@unique([clubId, sessionId])
+  @@map("session_cost_estimates")
+}
+
+/// Planned tubes from one inventory item of the same club. The same item may appear twice.
+model SessionShuttlePlanLine {
+  id              String @id @default(uuid(7)) @db.Uuid
+  clubId          String @map("club_id") @db.Uuid
+  sessionId       String @map("session_id") @db.Uuid
+  inventoryItemId String @map("inventory_item_id") @db.Uuid
+  /// > 0; zero-tube lines are not saved. May exceed stock (a warning only).
+  tubes           Int
+  position        Int    @db.SmallInt
+
+  estimate SessionCostEstimate @relation(fields: [clubId, sessionId], references: [clubId, sessionId], onDelete: Cascade)
+  item     InventoryItem       @relation(fields: [clubId, inventoryItemId], references: [clubId, id], onDelete: Restrict)
+
+  @@index([clubId, sessionId, position])
+  @@index([clubId, inventoryItemId])
+  @@map("session_shuttle_plan_lines")
+}
+
+/// Manual paid tick for a roster entry: the amount due when ticked is evidence, not a charge.
+/// Keyed on the roster entry, which is released rather than deleted, so a mark survives a budget
+/// demotion and shows again if the player regains a slot. Unticking deletes the row.
+model SessionPaymentMark {
+  sessionId         String   @map("session_id") @db.Uuid
+  sessionPlayerId   String   @map("session_player_id") @db.Uuid
+  clubId            String   @map("club_id") @db.Uuid
+  /// Centavos due when ticked; null when no fee was set (meaning of a no-fee tick is pending #245).
+  amountMinor       Int?     @map("amount_minor")
+  currency          String   @default("PHP") @db.Char(3)
+  markedAt          DateTime @map("marked_at") @db.Timestamptz(6)
+  /// Stable identity of the tick command or sync operation; a retry resolves to the same mark.
+  sourceOperationId String   @unique @map("source_operation_id") @db.Uuid
+  actorClubId       String   @map("actor_club_id") @db.Uuid
+  deviceId          String?  @map("device_id") @db.Uuid
+
+  entry  SessionPlayer @relation(fields: [clubId, sessionId, sessionPlayerId], references: [clubId, sessionId, id], onDelete: Restrict)
+  device Device?       @relation(fields: [clubId, deviceId], references: [clubId, id], onDelete: Restrict)
+
+  @@id([sessionId, sessionPlayerId])
+  @@unique([clubId, sessionId, sessionPlayerId])
+  @@index([clubId, sessionId])
+  @@map("session_payment_marks")
+}

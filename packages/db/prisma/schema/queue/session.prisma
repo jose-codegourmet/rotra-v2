@@ -74,6 +74,8 @@ model QueueSession {
   syncConflicts        SyncConflict[]
   matches              Match[]
 
+  costEstimate SessionCostEstimate?
+
   @@unique([clubId, id])
   @@index([clubId, scheduledStartAt(sort: Desc), id])
   @@index([clubId, seriesId])

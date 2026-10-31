@@ -51,6 +51,8 @@ model SessionPlayer {
   participations MatchParticipation[]
   activeHold     ActivePlayerHold?
 
+  paymentMark SessionPaymentMark?
+
   @@unique([clubId, sessionId, id])
   @@unique([sessionId, clubPlayerId])
   @@unique([sessionId, playerIdAtEntry])

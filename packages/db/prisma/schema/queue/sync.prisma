@@ -29,6 +29,8 @@ model Device {
   resolvedConflicts   SyncConflict[]
   matchDecisions      MatchDecision[]
 
+  paymentMarks SessionPaymentMark[]
+
   @@unique([clubId, id])
   @@map("devices")
 }

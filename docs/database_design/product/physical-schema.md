@@ -219,3 +219,22 @@ close of a stream that never wrote, conflict categories and who may resolve one.
 - Open (#246): offline `match_no` allocation, conflicting confirmations, and whether unplayed waiting
   matches are kept or marked removed at Session done. Canonical waiting positions are not unique in
   the database because reorders would need a deferrable constraint; commands keep them unique.
+
+## Group G · inventory, cost estimates, shuttle plans, payment marks (F07.15 · `20261031000800`)
+
+| Table | Keys and uniques | Checks and triggers | Scoped FKs |
+|---|---|---|---|
+| `inventory_items` | PK `id`; unique `(club_id, id)`; index `(club_id, category, name)` | non-blank name/unit; stock ≥ 0; unit cost ≥ 0 (0 = no cost); soft removal | club |
+| `session_cost_estimates` | PK `session_id`; unique `(club_id, session_id)` | fees null (not set) or ≥ 0; `custom` ⇔ custom fee set | `(club_id, session_id)` |
+| `session_shuttle_plan_lines` | PK `id`; index `(club_id, session_id, position)` | tubes > 0; same item may repeat | estimate `(club_id, session_id)` (lines cascade with their estimate); item `(club_id, inventory_item_id)`, so another club's item fails |
+| `session_payment_marks` | PK `(session_id, session_player_id)`; unique `source_operation_id` | amount null (no fee set) or ≥ 0; actor = club; **no update** (untick deletes, a new tick is a new operation) | roster entry `(club_id, session_id, session_player_id)` `RESTRICT`; device scoped |
+
+- **Derived, never stored:** court cost, entrance fees, shuttle cost, total, break-even, expected and
+  collected amounts, profit/loss, running-low and stock value. Collected sums the amounts recorded on
+  marks, not today's fee × paid count.
+- **Demotion and removal** release the roster entry instead of deleting it, so a paid mark stays
+  attached and shows again if the player regains a slot. Whether a mark on a released entry still
+  counts, and what a tick with no fee means, are open in #245.
+- **Retries:** a repeated tick resolves to the same row through `source_operation_id`.
+- Estimates are saved with session setup, online only, and never enter sync operations. Plan lines read
+  the live inventory price; snapshotting the unit cost is an open choice.

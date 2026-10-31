@@ -1,0 +1,117 @@
+// Session done and the repeat-safe downstream work it starts (queue/modules/offline-sync.md,
+// results-publication.md). No finalization command here.
+
+enum FinalizationState {
+  running
+  committed
+  done
+  failed
+
+  @@map("finalization_state")
+}
+
+enum FinalizationStage {
+  checking
+  finishing
+  player_records
+  slides
+
+  @@map("finalization_stage")
+}
+
+/// One per valid session (the PK), so a retry can never produce a second canonical finalization.
+/// `committed`: facts are final, later stages may still be running or retried.
+model SessionFinalization {
+  sessionId               String             @id @map("session_id") @db.Uuid
+  clubId                  String             @map("club_id") @db.Uuid
+  /// The Session done command; a retry with the same ID resumes this row.
+  commandId               String             @unique @map("command_id") @db.Uuid
+  state                   FinalizationState  @default(running)
+  stage                   FinalizationStage  @default(checking)
+  failedStage             FinalizationStage? @map("failed_stage")
+  failureCode             String?            @map("failure_code")
+  /// Verified stream seals: [{ streamId, finalSequence, digest }]. Evidence, not FKs.
+  streamManifest          Json               @map("stream_manifest")
+  manifestDigest          Bytes              @map("manifest_digest")
+  acceptedSessionRevision BigInt             @map("accepted_session_revision")
+  /// Ranking settings in effect for this finalization.
+  policyVersionId         String             @map("policy_version_id") @db.Uuid
+  startedAt               DateTime           @map("started_at") @db.Timestamptz(6)
+  committedAt             DateTime?          @map("committed_at") @db.Timestamptz(6)
+  completedAt             DateTime?          @map("completed_at") @db.Timestamptz(6)
+  /// Digest over the committed fact set; frozen at commit.
+  factsDigest             Bytes?             @map("facts_digest")
+  updatedAt               DateTime           @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision                BigInt             @default(1)
+
+  session        QueueSession               @relation(fields: [clubId, sessionId], references: [clubId, id], onDelete: Restrict)
+  policyVersion  RankingPolicyVersion       @relation(fields: [policyVersionId], references: [id], onDelete: Restrict)
+  facts          PlayerMatchFact[]
+  summaries      ClubSessionPlayerSummary[]
+  snapshots      SessionResultSnapshot[]
+  projectionJobs ProjectionJob[]
+
+  @@unique([clubId, sessionId])
+  @@map("session_finalizations")
+}
+
+enum ProjectionKind {
+  club_session_summaries
+  result_snapshot
+  player_history
+  player_rank
+
+  @@map("projection_kind")
+}
+
+/// Where a job's input comes from. Exactly one source column is set (CHECK in SQL).
+enum ProjectionSourceType {
+  finalization
+  assessment
+  attribution
+  ageing
+
+  @@map("projection_source_type")
+}
+
+enum ProjectionJobStatus {
+  pending
+  running
+  done
+  failed
+
+  @@map("projection_job_status")
+}
+
+/// Retryable projection work. Unique per source + kind + version, so a retried source never
+/// contributes twice. Worker hosting and scheduling are not decided here.
+model ProjectionJob {
+  id                   String               @id @default(uuid(7)) @db.Uuid
+  kind                 ProjectionKind
+  kindVersion          Int                  @map("kind_version")
+  sourceType           ProjectionSourceType @map("source_type")
+  sourceFinalizationId String?              @map("source_finalization_id") @db.Uuid
+  sourceAssessmentId   String?              @map("source_assessment_id") @db.Uuid
+  sourceAttributionId  String?              @map("source_attribution_id") @db.Uuid
+  /// Player whose projection is due (ageing jobs; optional otherwise).
+  targetPlayerId       String?              @map("target_player_id") @db.Uuid
+  /// Ageing boundary the job handles.
+  dueAt                DateTime?            @map("due_at") @db.Timestamptz(6)
+  status               ProjectionJobStatus  @default(pending)
+  attempts             Int                  @default(0)
+  nextAttemptAt        DateTime             @default(now()) @map("next_attempt_at") @db.Timestamptz(6)
+  lockedAt             DateTime?            @map("locked_at") @db.Timestamptz(6)
+  lastErrorCode        String?              @map("last_error_code")
+  completedAt          DateTime?            @map("completed_at") @db.Timestamptz(6)
+  createdAt            DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt            DateTime             @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  sourceFinalization SessionFinalization?      @relation(fields: [sourceFinalizationId], references: [sessionId], onDelete: Restrict)
+  sourceAssessment   ClubAssessment?           @relation(fields: [sourceAssessmentId], references: [id], onDelete: Restrict)
+  sourceAttribution  PlayerHistoryAttribution? @relation(fields: [sourceAttributionId], references: [id], onDelete: Restrict)
+  targetPlayer       Player?                   @relation("ProjectionJobTarget", fields: [targetPlayerId], references: [id], onDelete: Restrict)
+
+  @@index([status, nextAttemptAt, id])
+  @@index([targetPlayerId])
+  @@map("projection_jobs")
+}

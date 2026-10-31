@@ -20,6 +20,10 @@
   CHECKs, partial uniques and triggers Prisma cannot express. Keys, checks and grants are listed in
   [physical-schema.md](../../docs/database_design/product/physical-schema.md).
 
+- **Disposable verification.** `scripts/disposable-db.sh` only runs against a local database named
+  `rotra_disposable*` with `ROTRA_DISPOSABLE_CONFIRM` set; see
+  [verification.md](../../docs/database_design/product/verification.md).
+
 Commands (load nvm first):
 
 ```bash

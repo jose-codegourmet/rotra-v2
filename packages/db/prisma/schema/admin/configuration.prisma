@@ -44,6 +44,9 @@ model RankingPolicyVersion {
 
   createdBy AdminAccount? @relation(fields: [createdByAdminId], references: [id], onDelete: Restrict)
 
+  finalizations   SessionFinalization[]
+  rankProjections PlayerRankCurrent[]
+
   @@index([effectiveAt(sort: Desc)])
   @@index([createdByAdminId])
   @@map("ranking_policy_versions")

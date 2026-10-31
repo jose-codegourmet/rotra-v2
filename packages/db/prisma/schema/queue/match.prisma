@@ -1,0 +1,198 @@
+// Shared queue matches, participation segments, occupancy holds and permanent decisions
+// (queue/modules/matches-queue.md). Storage and constraints only; no match commands here.
+//
+// Permanence: once a match has a decision, the match row, its participation segments, its court
+// usage and the decision itself reject UPDATE/DELETE (triggers in SQL). No application role,
+// including Admin, has a correction path.
+
+enum MatchState {
+  waiting
+  active
+  completed
+  invalid
+
+  @@map("match_state")
+}
+
+enum MatchFormat {
+  singles
+  doubles
+  fun_1v2
+  fun_3v3
+  fun_4v4
+  fun_5v5
+
+  @@map("match_format")
+}
+
+enum MatchOrigin {
+  manual
+  suggested
+  auto
+
+  @@map("match_origin")
+}
+
+enum TeamSide {
+  A
+  B
+
+  @@map("team_side")
+}
+
+model Match {
+  id                String      @id @db.Uuid
+  clubId            String      @map("club_id") @db.Uuid
+  sessionId         String      @map("session_id") @db.Uuid
+  /// "Match 7": positive, per session, never reused. Offline allocation is pending #246.
+  matchNo           Int         @map("match_no")
+  state             MatchState  @default(waiting)
+  format            MatchFormat
+  /// Advisory order key while waiting.
+  queuePosition     BigInt?     @map("queue_position")
+  /// Discarded waiting draft; never a played-game outcome.
+  removedAt         DateTime?   @map("removed_at") @db.Timestamptz(6)
+  origin            MatchOrigin
+  manualProtected   Boolean     @default(false) @map("manual_protected")
+  /// Groups one generation/rebuild command.
+  generationId      String?     @map("generation_id") @db.Uuid
+  /// Idempotency key of the create command or sync operation.
+  sourceOperationId String      @unique @map("source_operation_id") @db.Uuid
+  startedAt         DateTime?   @map("started_at") @db.Timestamptz(6)
+  endedAt           DateTime?   @map("ended_at") @db.Timestamptz(6)
+  createdAt         DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime    @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision          BigInt      @default(1)
+
+  session        QueueSession         @relation(fields: [clubId, sessionId], references: [clubId, id], onDelete: Restrict)
+  participations MatchParticipation[]
+  courtUsage     MatchCourtUsage[]
+  courtHolds     ActiveCourtHold[]
+  playerHolds    ActivePlayerHold[]
+  decision       MatchDecision?
+
+  @@unique([clubId, sessionId, id])
+  @@unique([sessionId, matchNo])
+  @@index([sessionId, state, queuePosition, id])
+  @@map("matches")
+}
+
+/// One continuous stretch of a roster entry on a team. A player who leaves and returns has two
+/// segments; both sides of an in-game substitution keep their segments.
+model MatchParticipation {
+  id                String    @id @db.Uuid
+  clubId            String    @map("club_id") @db.Uuid
+  sessionId         String    @map("session_id") @db.Uuid
+  matchId           String    @map("match_id") @db.Uuid
+  sessionPlayerId   String    @map("session_player_id") @db.Uuid
+  team              TeamSide
+  segmentNo         Int       @map("segment_no")
+  /// Command or sync operation that put the player in (no FK: online commands have no operation row).
+  joinedOperationId String    @map("joined_operation_id") @db.Uuid
+  leftOperationId   String?   @map("left_operation_id") @db.Uuid
+  joinedAt          DateTime  @map("joined_at") @db.Timestamptz(6)
+  leftAt            DateTime? @map("left_at") @db.Timestamptz(6)
+  /// In the lineup when the match started (a pre-start swap is not a gap).
+  startedWithMatch  Boolean   @default(false) @map("started_with_match")
+  /// Still in when the match ended. Full participation = started and finished, one segment.
+  finishedWithMatch Boolean   @default(false) @map("finished_with_match")
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  match Match         @relation(fields: [clubId, sessionId, matchId], references: [clubId, sessionId, id], onDelete: Restrict)
+  entry SessionPlayer @relation(fields: [clubId, sessionId, sessionPlayerId], references: [clubId, sessionId, id], onDelete: Restrict)
+
+  @@unique([matchId, sessionPlayerId, segmentNo])
+  @@index([clubId, sessionId, sessionPlayerId])
+  @@map("match_participations")
+}
+
+/// Historical court assignment; 5v5 uses two courts for one match.
+model MatchCourtUsage {
+  id                 String    @id @db.Uuid
+  clubId             String    @map("club_id") @db.Uuid
+  sessionId          String    @map("session_id") @db.Uuid
+  matchId            String    @map("match_id") @db.Uuid
+  courtId            String    @map("court_id") @db.Uuid
+  acquiredAt         DateTime  @map("acquired_at") @db.Timestamptz(6)
+  releasedAt         DateTime? @map("released_at") @db.Timestamptz(6)
+  acquireOperationId String    @map("acquire_operation_id") @db.Uuid
+  releaseOperationId String?   @map("release_operation_id") @db.Uuid
+
+  match Match        @relation(fields: [clubId, sessionId, matchId], references: [clubId, sessionId, id], onDelete: Restrict)
+  court SessionCourt @relation(fields: [clubId, sessionId, courtId], references: [clubId, sessionId, id], onDelete: Restrict)
+
+  @@unique([matchId, courtId])
+  @@index([clubId, sessionId, courtId])
+  @@map("match_court_usage")
+}
+
+/// One row per occupied court: the PK makes a second hold on the same court impossible.
+model ActiveCourtHold {
+  courtId   String   @id @map("court_id") @db.Uuid
+  clubId    String   @map("club_id") @db.Uuid
+  sessionId String   @map("session_id") @db.Uuid
+  matchId   String   @map("match_id") @db.Uuid
+  heldAt    DateTime @map("held_at") @db.Timestamptz(6)
+
+  court SessionCourt @relation(fields: [clubId, sessionId, courtId], references: [clubId, sessionId, id], onDelete: Restrict)
+  match Match        @relation(fields: [clubId, sessionId, matchId], references: [clubId, sessionId, id], onDelete: Restrict)
+
+  @@unique([clubId, sessionId, courtId])
+  @@index([matchId])
+  @@map("active_court_holds")
+}
+
+/// One row per active roster player. A known global player can be held once across all sessions.
+model ActivePlayerHold {
+  sessionPlayerId String   @id @map("session_player_id") @db.Uuid
+  clubId          String   @map("club_id") @db.Uuid
+  sessionId       String   @map("session_id") @db.Uuid
+  matchId         String   @map("match_id") @db.Uuid
+  /// Canonical player when known; unique across all active holds.
+  playerId        String?  @unique @map("player_id") @db.Uuid
+  heldAt          DateTime @map("held_at") @db.Timestamptz(6)
+
+  entry  SessionPlayer @relation(fields: [clubId, sessionId, sessionPlayerId], references: [clubId, sessionId, id], onDelete: Restrict)
+  match  Match         @relation(fields: [clubId, sessionId, matchId], references: [clubId, sessionId, id], onDelete: Restrict)
+  player Player?       @relation("ActivePlayerHold", fields: [playerId], references: [id], onDelete: Restrict)
+
+  @@unique([clubId, sessionId, sessionPlayerId])
+  @@index([matchId])
+  @@map("active_player_holds")
+}
+
+enum MatchDecisionKind {
+  completed
+  invalid
+
+  @@map("match_decision_kind")
+}
+
+/// The one accepted terminal decision of a match. Append once; never updated or deleted.
+/// Conflicting confirmations stay in sync staging (sync_conflicts), never overwrite this row.
+model MatchDecision {
+  matchId           String            @id @map("match_id") @db.Uuid
+  clubId            String            @map("club_id") @db.Uuid
+  sessionId         String            @map("session_id") @db.Uuid
+  kind              MatchDecisionKind
+  /// Required for completed, null for invalid.
+  winningTeam       TeamSide?         @map("winning_team")
+  /// Both null (winner-only) or both nonnegative, and they must agree with the winner.
+  teamAScore        Int?              @map("team_a_score")
+  teamBScore        Int?              @map("team_b_score")
+  /// The accepted confirmation command or sync operation.
+  sourceOperationId String            @unique @map("source_operation_id") @db.Uuid
+  confirmedAt       DateTime          @map("confirmed_at") @db.Timestamptz(6)
+  acceptedAt        DateTime          @default(now()) @map("accepted_at") @db.Timestamptz(6)
+  actorClubId       String            @map("actor_club_id") @db.Uuid
+  deviceId          String?           @map("device_id") @db.Uuid
+
+  match  Match   @relation(fields: [clubId, sessionId, matchId], references: [clubId, sessionId, id], onDelete: Restrict)
+  device Device? @relation(fields: [clubId, deviceId], references: [clubId, id], onDelete: Restrict)
+
+  facts PlayerMatchFact[]
+
+  @@unique([clubId, sessionId, matchId])
+  @@map("match_decisions")
+}

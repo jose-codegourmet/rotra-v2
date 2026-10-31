@@ -48,6 +48,8 @@ model Club {
   queueSessions    QueueSession[]
   reservation      ClubSessionReservation?
 
+  inventoryItems InventoryItem[]
+
   @@index([foundingLocationCodeId])
   @@map("clubs")
 }

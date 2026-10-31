@@ -115,7 +115,7 @@ UUID from another club or session is rejected.
 | `club_session_reservations` | PK `club_id`; unique `session_id` | — | `(club_id, session_id)` |
 | `session_courts` | PK `id`; unique `(club_id, session_id, id)`; partial unique `(session_id, label) WHERE removed_at IS NULL` | non-blank label; soft removal | `(club_id, session_id)` |
 | `session_players` | PK `id`; unique `(club_id, session_id, id)`, `(session_id, club_player_id)`, `(session_id, player_id_at_entry)`; index `(session_id, present, id)` | release time ⇔ reason; locked ⇒ level + assessment, not released; **level-lock** trigger; **no delete** trigger | `(club_id, session_id)`, `(club_id, club_player_id)`, `(club_id, session_id, id, assessment_id)` → the entry's own assessment |
-| `session_waitlist` | PK `id`; unique `(session_id, club_player_id)`; order index `(session_id, demoted_at desc, demoted_confirmed_at, added_at, id)` | demotion time ⇔ demoted slot time | `(club_id, session_id)`, `(club_id, club_player_id)` |
+| `session_waitlist` | PK `id`; unique `(session_id, club_player_id)` (also serves the per-session read; the order index was dropped in `20261031001100`) | demotion time ⇔ demoted slot time | `(club_id, session_id)`, `(club_id, club_player_id)` |
 | `session_join_requests` | PK `id`; index `(session_id, status, requested_at)` | pending ⇔ no decision time; confirmed ⇒ club player | `(club_id, session_id)`, `(club_id, club_player_id)` |
 | `club_assessments` | PK `id`; unique `source_operation_id`, `(club_id, club_player_id, id)`, `(club_id, session_id, session_player_id, id)`; rank indexes per ranking.md | actor = owning club; **append-only** trigger | `(club_id, club_player_id)`, `(club_id, session_id)`, `(club_id, session_id, session_player_id)`, `(club_id, club_player_id, supersedes_id)` |
 
@@ -193,3 +193,92 @@ Typed command payloads are not generic FKs into other tables.
 
 Open (#246): enrollment and revocation, stream states (`open · sealed · revoked`), the zero-operation
 close of a stream that never wrote, conflict categories and who may resolve one.
+
+## Group F · matches, participation, occupancy, decisions (F07.14 · `20261031000700`)
+
+| Table | Keys and uniques | Checks and triggers | Scoped FKs |
+|---|---|---|---|
+| `matches` | PK `id`; unique `(club_id, session_id, id)`, `(session_id, match_no)`, `source_operation_id`; index `(session_id, state, queue_position, id)` | `match_no > 0`; removed only while waiting; started ⇔ not waiting; ended ⇔ completed/invalid; **frozen-after-decision** trigger (no delete; no change once completed/invalid; ending needs a matching decision) | `(club_id, session_id)` |
+| `match_participations` | PK `id`; unique `(match_id, session_player_id, segment_no)` | segment > 0; left time ⇔ left operation; finished ⇒ not left; **frozen** trigger (no change once decided; no delete once started) | `(club_id, session_id, match_id)`, `(club_id, session_id, session_player_id)` |
+| `match_court_usage` | PK `id`; unique `(match_id, court_id)` | release time ⇔ release operation; no delete | match and `(club_id, session_id, court_id)` |
+| `active_court_holds` | PK `court_id` (one hold per court) | hold needs an **active** match | court and match, scoped |
+| `active_player_holds` | PK `session_player_id`; unique `player_id` (a known player is held once across all sessions) | hold needs an **active** match | roster entry and match, scoped |
+| `match_decisions` | PK `match_id`; unique `source_operation_id`, `(club_id, session_id, match_id)` | completed ⇒ winner; invalid ⇒ no winner/scores; scores both null (winner-only) or both ≥ 0 and agreeing with the winner (no ties); actor = club; **append-only** | match, `(club_id, device_id)` |
+
+- **Occupancy.** A court or player can be held by one active match only (primary keys). A 5v5 match
+  holds two courts through two `active_court_holds` rows for the same match. Holds are released by
+  deleting them in the same transaction as the decision.
+- **Ending a match, in order:** close segments (`left_at`, `finished_with_match`), insert the decision,
+  set the match state, release holds and court usage. After the decision, the match, its segments and
+  the decision itself reject every update and delete, for every application role including Admin.
+- **Substitutions** close the outgoing segment and open a new one for the incoming player; both
+  segments survive. Full participation is derived (started and finished with the match, one
+  segment), never a client flag.
+- Operation references (`source_operation_id`, `joined_operation_id`, …) have no FK: online commands
+  have no `sync_operations` row.
+- Open (#246): offline `match_no` allocation, conflicting confirmations, and whether unplayed waiting
+  matches are kept or marked removed at Session done. Canonical waiting positions are not unique in
+  the database because reorders would need a deferrable constraint; commands keep them unique.
+
+## Group G · inventory, cost estimates, shuttle plans, payment marks (F07.15 · `20261031000800`)
+
+| Table | Keys and uniques | Checks and triggers | Scoped FKs |
+|---|---|---|---|
+| `inventory_items` | PK `id`; unique `(club_id, id)`; index `(club_id, category, name)` | non-blank name/unit; stock ≥ 0; unit cost ≥ 0 (0 = no cost); soft removal | club |
+| `session_cost_estimates` | PK `session_id`; unique `(club_id, session_id)` | fees null (not set) or ≥ 0; `custom` ⇔ custom fee set | `(club_id, session_id)` |
+| `session_shuttle_plan_lines` | PK `id`; index `(club_id, session_id, position)` | tubes > 0; same item may repeat | estimate `(club_id, session_id)` (lines cascade with their estimate); item `(club_id, inventory_item_id)`, so another club's item fails |
+| `session_payment_marks` | PK `(session_id, session_player_id)`; unique `source_operation_id` | amount null (no fee set) or ≥ 0; actor = club; **no update** (untick deletes, a new tick is a new operation) | roster entry `(club_id, session_id, session_player_id)` `RESTRICT`; device scoped |
+
+- **Derived, never stored:** court cost, entrance fees, shuttle cost, total, break-even, expected and
+  collected amounts, profit/loss, running-low and stock value. Collected sums the amounts recorded on
+  marks, not today's fee × paid count.
+- **Demotion and removal** release the roster entry instead of deleting it, so a paid mark stays
+  attached and shows again if the player regains a slot. Whether a mark on a released entry still
+  counts, and what a tick with no fee means, are open in #245.
+- **Retries:** a repeated tick resolves to the same row through `source_operation_id`.
+- Estimates are saved with session setup, online only, and never enter sync operations. Plan lines read
+  the live inventory price; snapshotting the unit cost is an open choice.
+
+## Group H · finalization, facts, projections, current rank (F07.16 · `20261031000900`)
+
+| Table | Keys and uniques | Checks and triggers | Scoped FKs |
+|---|---|---|---|
+| `session_finalizations` | PK `session_id` (one per session); unique `command_id`, `(club_id, session_id)` | 32-byte digests; committed ⇔ commit time + facts digest; done ⇔ completion time; failed ⇔ failed stage; **guard**: no finalization for an invalid session, never deleted, manifest/revision/policy/facts digest frozen once committed | session `(club_id, session_id)`; policy version |
+| `player_match_facts` | PK `id`; unique `(match_id, session_player_id)`; history indexes per results-publication.md | score pair both null or both ≥ 0; `standard_match` ⇔ singles/doubles; **guard**: only from a completed decision with the same winner, append-only | finalization `(club_id, session_id)`, decision `(club_id, session_id, match_id)`, roster entry, club player |
+| `club_session_player_summaries` | PK `id`; unique `(session_id, session_player_id)` | counts ≥ 0; wins + losses = full games = standard + fun | finalization, roster entry, club player |
+| `session_result_snapshots` | PK `id`; unique `(session_id, version)`, `(club_id, session_id, id)` | version > 0; **append-only**; Off Day in its own `off_day` column | finalization |
+| `projection_jobs` | PK `id`; partial uniques per source type: finalization/attribution `(source, kind, version, target_player_id)` (nulls not distinct), assessment `(source, kind, version)`, ageing `(target_player_id, kind, version, due_at)`; index `(status, next_attempt_at, id)` | exactly one source column for its `source_type`; ageing needs player + due time; done ⇔ completion time | finalization, assessment, attribution, target player |
+| `player_rank_current` | PK `player_id`; index `(leaderboard_eligible, numeric_rank desc, player_id)`, `next_recheck_at` | window end > start; counts ≥ 0; eligible ⇒ numeric rank; numeric `(12,6)` is a proposal (#247) | player, level, policy version |
+| `player_history_attributions` | PK `id`; unique `source_command_id`; partial unique live link per `(club_id, club_player_id)` | revoked ⇔ reason; never deleted | club player `(club_id, club_player_id)`, player |
+
+- **No duplicates on retry:** the finalization is keyed by session and its command ID; facts are unique
+  per (match, entry); every projection source is unique per kind and version.
+- **History survives deletion elsewhere:** facts, summaries and snapshots reference the finalization,
+  decision, roster entry and club player with `RESTRICT`, and none references a public page or an
+  auth account. Public-page and account deletion therefore cannot reach them.
+- **Projection sources stay explicit:** a job names exactly one of a finalization, an assessment, a
+  history attribution or an ageing boundary. Assessment jobs never pretend to be finalization work.
+- **Guest history:** a `player_history_attributions` row links a club guest to a player after review.
+  Facts keep `player_id_at_finalization`, original dates and outcomes; history and rank projections
+  pick the linked games up through `attribution` jobs. A mistaken link is revoked, never deleted.
+- Partial unique indexes with `NULLS NOT DISTINCT` need PostgreSQL 15 or later.
+
+## Group H (part) · publications, events, exports (F07.17 · `20261031001000`)
+
+| Table | Keys and uniques | Checks and triggers | Scoped FKs |
+|---|---|---|---|
+| `session_publications` | PK `id`; unique `session_id`, `public_key`, `(club_id, session_id, id)`; index `(club_id, expiry_cycle_id)` | published ⇔ snapshot + time + public copy; slide set 1–2 distinct, Off Day only with awards; public copy may hold only `standings`/`awards`/`offDay`, each only when selected (Off Day only when `include_off_day`); deleted ⇔ `deleted_at`, with no public copy; **guard**: never deleted, no restore after deletion, deletion only under its own **running** expiry cycle past the deadline | session; snapshot `(club_id, session_id, published_snapshot_id)`; cycle `(club_id, expiry_cycle_id)` |
+| `session_publication_events` | PK `id`; unique `source_command_id`; index `(publication_id, occurred_at)` | valid slide set; actor = club; **append-only** | publication, snapshot, device, all scoped |
+| `result_exports` | PK `id`; unique `source_command_id`; index `(club_id, session_id, created_at desc)` | valid slide set; footer `powered by rotra`; frames > 0; no delete (soft `deleted_at`) | snapshot `(club_id, session_id, snapshot_id)` |
+
+- **Public boundary.** Public reads use only `session_publications`' allowlisted columns
+  (`details_projection`, `participants_projection`, `public_results`). The public copy is written at
+  publish time with just the selected slides, so a public query never joins the private snapshot and
+  an omitted Off Day is not in any public column. Exports are private and never public.
+- **Re-publication** replaces `published_slides`, `include_off_day` (always supplied) and the public
+  copy, and appends an event. Facts and snapshots are untouched.
+- **Stale retention jobs.** Deleting a page requires the publication's own `expiry_cycle_id` to still
+  be `running` and past `delete_public_pages_after`. Renewal cancels that cycle, so a job queued
+  earlier fails instead of deleting a renewed page.
+- **No cascade into history.** Every FK is `RESTRICT`; publications and exports are soft-deleted;
+  nothing in facts, finalizations or identity references a publication.

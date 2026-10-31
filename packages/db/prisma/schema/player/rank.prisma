@@ -1,0 +1,72 @@
+// Current rank projection and reviewed guest-history attribution
+// (player-information/modules/ranking.md, identity.md). No rank formula here.
+
+enum RankState {
+  provisional
+  established
+  needs_reassessment
+
+  @@map("rank_state")
+}
+
+/// One replaceable projection per player. A null component is missing evidence, never zero.
+/// Numeric precision (12,6) is a proposal pending #247.
+model PlayerRankCurrent {
+  playerId                 String    @id @map("player_id") @db.Uuid
+  skillLevelId             Int?      @map("skill_level_id") @db.SmallInt
+  numericRank              Decimal?  @map("numeric_rank") @db.Decimal(12, 6)
+  state                    RankState
+  explanationCode          String?   @map("explanation_code")
+  assessmentComponent      Decimal?  @map("assessment_component") @db.Decimal(12, 6)
+  performanceComponent     Decimal?  @map("performance_component") @db.Decimal(12, 6)
+  /// Counts of assessments/matches used, per source.
+  inputCounts              Json      @map("input_counts")
+  evidenceDigest           Bytes?    @map("evidence_digest")
+  policyVersionId          String    @map("policy_version_id") @db.Uuid
+  algorithmVersion         String    @map("algorithm_version")
+  windowStart              DateTime  @map("window_start") @db.Timestamptz(6)
+  windowEnd                DateTime  @map("window_end") @db.Timestamptz(6)
+  calculatedAt             DateTime  @map("calculated_at") @db.Timestamptz(6)
+  /// Highest source revision included, so a stale job cannot overwrite a newer projection.
+  inputWatermark           BigInt    @map("input_watermark")
+  nextRecheckAt            DateTime  @map("next_recheck_at") @db.Timestamptz(6)
+  recentStandardMatchCount Int       @map("recent_standard_match_count")
+  lastValidPlayedAt        DateTime? @map("last_valid_played_at") @db.Timestamptz(6)
+  leaderboardEligible      Boolean   @map("leaderboard_eligible")
+  updatedAt                DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision                 BigInt    @default(1)
+
+  player        Player               @relation(fields: [playerId], references: [id], onDelete: Restrict)
+  skillLevel    SkillLevel?          @relation(fields: [skillLevelId], references: [id], onDelete: Restrict)
+  policyVersion RankingPolicyVersion @relation(fields: [policyVersionId], references: [id], onDelete: Restrict)
+
+  @@index([leaderboardEligible, numericRank(sort: Desc), playerId])
+  @@index([nextRecheckAt])
+  @@map("player_rank_current")
+}
+
+/// Reviewed link from a club's guest identity to a global player, so earlier valid games join that
+/// player's history and ranking through projection jobs. Facts keep their original
+/// player_id_at_finalization, dates and outcomes. Confirmation evidence is pending #244.
+model PlayerHistoryAttribution {
+  id                   String    @id @default(uuid(7)) @db.Uuid
+  clubId               String    @map("club_id") @db.Uuid
+  clubPlayerId         String    @map("club_player_id") @db.Uuid
+  playerId             String    @map("player_id") @db.Uuid
+  confirmedAt          DateTime  @map("confirmed_at") @db.Timestamptz(6)
+  /// What confirmed the identity (RTR ID / QR / phone check, reviewer). Never contact values.
+  confirmationEvidence Json      @map("confirmation_evidence")
+  sourceCommandId      String    @unique @map("source_command_id") @db.Uuid
+  /// A mistaken link is revoked (never deleted); its projections are rebuilt.
+  revokedAt            DateTime? @map("revoked_at") @db.Timestamptz(6)
+  revokeReason         String?   @map("revoke_reason")
+  createdAt            DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  clubPlayer     ClubPlayer      @relation(fields: [clubId, clubPlayerId], references: [clubId, id], onDelete: Restrict)
+  player         Player          @relation("AttributionPlayer", fields: [playerId], references: [id], onDelete: Restrict)
+  projectionJobs ProjectionJob[]
+
+  @@index([playerId])
+  @@index([clubId, clubPlayerId])
+  @@map("player_history_attributions")
+}

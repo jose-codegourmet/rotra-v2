@@ -31,6 +31,10 @@ model SkillLevel {
   waitlistEntries SessionWaitlistEntry[]
   assessments     ClubAssessment[]
 
+  facts           PlayerMatchFact[]
+  summaries       ClubSessionPlayerSummary[]
+  rankProjections PlayerRankCurrent[]
+
   @@unique([category, band])
   @@map("skill_levels")
 }

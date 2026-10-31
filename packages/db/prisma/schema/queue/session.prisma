@@ -72,6 +72,13 @@ model QueueSession {
   assessments          ClubAssessment[]
   deviceSessionStreams DeviceSessionStream[]
   syncConflicts        SyncConflict[]
+  matches              Match[]
+
+  costEstimate SessionCostEstimate?
+
+  finalization SessionFinalization?
+
+  publication SessionPublication?
 
   @@unique([clubId, id])
   @@index([clubId, scheduledStartAt(sort: Desc), id])
@@ -108,6 +115,9 @@ model SessionCourt {
   revision  BigInt    @default(1)
 
   session QueueSession @relation(fields: [clubId, sessionId], references: [clubId, id], onDelete: Restrict)
+
+  usage MatchCourtUsage[]
+  hold  ActiveCourtHold?
 
   @@unique([clubId, sessionId, id])
   @@index([sessionId])

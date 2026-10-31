@@ -1,6 +1,6 @@
 # Ways of working — ROTRA v1
 
-**Last verified:** 2026-10-27 · **Audience:** contributors and AI coding agents.
+**Last verified:** 2026-10-31 · **Audience:** contributors and AI coding agents.
 [AGENTS.md](../AGENTS.md) says where to look. This file says how work is planned, built, checked, and merged.
 
 **Read this when** you pick up a ticket, write tickets, open a PR, review a change, or find two docs
@@ -13,7 +13,8 @@ that disagree.
 1. **Docs first, then components, then screens.** Product, screen, and database docs are written
    before code. Code follows them; it doesn't decide product behavior.
 2. **The prototypes are the design.** `app/mocksups-app/*/*.html` are the agreed look and behavior. Build
-   to match them, not to improve them.
+   to match them, not to improve them. A UI change goes into the mockup first and reaches the apps
+   through a ticket made from its [mockup change log](mockup-changes/README.md).
 3. **Mock first.** Screens run on `@rotra/data` mocks until the database epic. A finished-looking
    screen still stores nothing; say so.
 4. **Almost no automated tests, by decision.** Lint and type-check are the only automatic gates.
@@ -236,7 +237,8 @@ Check in this order:
 | `docs/coding-conventions.md` | A convention is added or changed (including a new dependency) |
 | `docs/product-terms.md` | A term, state name, or code identifier is added or renamed |
 | `docs/business_logic/`, `docs/screens/`, `docs/database_design/` | The product owner decides a behavior. Move it from open to settled |
-| `app/mocksups-app/*` | The product owner saves a new prototype version |
+| `app/mocksups-app/*` | Any layout or UI change is requested (mockup first). Each change writes a log in [mockup-changes/](mockup-changes/README.md) and fixes business logic + database design docs it made untrue |
+| `docs/mockup-changes/*` | A mockup changes (new log, `Status: NEW`), or a log becomes a ticket (`Status: ALREADY A TICKET — #<n>`) |
 | `<Name>.meta.ts` | A component's purpose or variants change |
 
 Stamp `Last verified: YYYY-MM-DD` at the top of a doc when you confirm it, even if nothing changed.

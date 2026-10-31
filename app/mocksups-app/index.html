@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>Mockups · ROTRA</title>
+  <link rel="stylesheet" href="index.css">
+  <script>
+    try { document.documentElement.dataset.theme = localStorage.getItem('rotra-mockups-theme') || 'dark'; } catch (_) {}
+  </script>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <a class="brand" href="./" aria-label="ROTRA mockups home">ROTR<span>A</span><small>Mockups</small></a>
+      <button class="theme-toggle" type="button" aria-label="Switch to light theme">Light mode <span aria-hidden="true">◐</span></button>
+    </header>
+    <main>
+      <section class="intro" aria-labelledby="page-title">
+        <div class="intro-copy">
+          <p class="eyebrow">ROTRA · DESIGN REFERENCE</p>
+          <h1 id="page-title">Run the game<span>.</span></h1>
+          <p class="lead">Explore the mockups for every side of a ROTRA session.</p>
+        </div>
+        <div class="court" aria-hidden="true"><div class="court-inner"><div class="court-net"></div></div></div>
+      </section>
+      <section class="collection" aria-labelledby="collection-title">
+        <div class="section-heading"><div><p class="eyebrow">THE MOCKUPS</p><h2 id="collection-title">Choose a view</h2></div><p>Three perspectives. One game.</p></div>
+        <div class="links">
+          <a class="mockup-link" href="queue-app/rotra-queue.html"><span class="link-number">01</span><span class="link-main"><strong>Queue</strong><span>Run sessions, courts and the queue.</span></span><span class="link-action">Open mockup <span aria-hidden="true">↗</span></span></a>
+          <a class="mockup-link" href="player-app/rotra-player.html"><span class="link-number">02</span><span class="link-main"><strong>Player Information</strong><span>Explore player profiles and standings.</span></span><span class="link-action">Open mockup <span aria-hidden="true">↗</span></span></a>
+          <a class="mockup-link" href="admin-app/rotra-admin.html"><span class="link-number">03</span><span class="link-main"><strong>Admin</strong><span>Manage clubs, players and settings.</span></span><span class="link-action">Open mockup <span aria-hidden="true">↗</span></span></a>
+        </div>
+      </section>
+    </main>
+    <footer><span>ROTRA <span class="footer-accent">/</span> Run the game.</span><span>Fictional demo data · Saved in this browser</span></footer>
+  </div>
+  <script>
+    const button = document.querySelector('.theme-toggle');
+    function updateThemeButton() {
+      const light = document.documentElement.dataset.theme === 'light';
+      button.innerHTML = (light ? 'Dark mode' : 'Light mode') + ' <span aria-hidden="true">◐</span>';
+      button.setAttribute('aria-label', 'Switch to ' + (light ? 'dark' : 'light') + ' theme');
+    }
+    updateThemeButton();
+    button.addEventListener('click', () => {
+      const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.dataset.theme = theme;
+      try { localStorage.setItem('rotra-mockups-theme', theme); } catch (_) {}
+      updateThemeButton();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+// Queue Sessions, the online start reservation and session courts (queue/modules/sessions-roster.md).
+// Database: one active/finalizing session per club (partial unique) and no overlapping non-invalid
+// sessions per club (exclusion constraint). Commands: clash reporting (venue vs time clash), series
+// inserts, capacity, minimum recalculation and level locking.
+
+enum QueueSessionState {
+  prepared
+  active
+  finalizing
+  completed
+  invalid
+
+  @@map("queue_session_state")
+}
+
+enum SessionMode {
+  chill
+  fair
+  hard
+
+  @@map("session_mode")
+}
+
+model QueueSession {
+  id                  String            @id @db.Uuid
+  clubId              String            @map("club_id") @db.Uuid
+  title               String
+  notes               String?
+  scheduledStartAt    DateTime          @map("scheduled_start_at") @db.Timestamptz(6)
+  scheduledEndAt      DateTime          @map("scheduled_end_at") @db.Timestamptz(6)
+  /// Null for sessions made before the venue list existed.
+  venueId             String?           @map("venue_id") @db.Uuid
+  venueName           String?           @map("venue_name")
+  venueAddress        String?           @map("venue_address")
+  state               QueueSessionState @default(prepared)
+  /// Required when state = invalid.
+  invalidReason       String?           @map("invalid_reason")
+  sessionMode         SessionMode       @default(fair) @map("session_mode")
+  allowSingles        Boolean           @default(true) @map("allow_singles")
+  allowDoubles        Boolean           @default(true) @map("allow_doubles")
+  /// Target, not a closure constraint.
+  minimumGames        Int               @default(0) @map("minimum_games")
+  /// While true and prepared, the server recomputes minimum_games. Frozen at start.
+  minimumIsCalculated Boolean           @default(true) @map("minimum_is_calculated")
+  /// Slots = players_per_court × non-removed courts.
+  playersPerCourt     Int               @map("players_per_court") @db.SmallInt
+  /// Used before the roster has players.
+  expectedPlayers     Int?              @map("expected_players")
+  queueRevision       BigInt            @default(1) @map("queue_revision")
+  startedAt           DateTime?         @map("started_at") @db.Timestamptz(6)
+  finalizedAt         DateTime?         @map("finalized_at") @db.Timestamptz(6)
+  /// Shared by sessions created together as a repeating series; each stays independent.
+  seriesId            String?           @map("series_id") @db.Uuid
+  /// The license term that authorized start, from the same club.
+  startLicenseTermId  String?           @map("start_license_term_id") @db.Uuid
+  publicSlug          String            @unique @map("public_slug")
+  acceptJoinRequests  Boolean           @default(true) @map("accept_join_requests")
+  /// Idempotency key of the create command.
+  sourceCommandId     String            @unique @map("source_command_id") @db.Uuid
+  createdAt           DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime          @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision            BigInt            @default(1)
+
+  club             Club                    @relation(fields: [clubId], references: [id], onDelete: Restrict)
+  venue            ClubVenue?              @relation(fields: [clubId, venueId], references: [clubId, id], onDelete: Restrict)
+  startLicenseTerm ClubLicenseTerm?        @relation(fields: [clubId, startLicenseTermId], references: [clubId, id], onDelete: Restrict)
+  reservation      ClubSessionReservation?
+  courts           SessionCourt[]
+  rosterEntries    SessionPlayer[]
+  waitlistEntries  SessionWaitlistEntry[]
+  joinRequests     SessionJoinRequest[]
+  assessments      ClubAssessment[]
+
+  @@unique([clubId, id])
+  @@index([clubId, scheduledStartAt(sort: Desc), id])
+  @@index([clubId, seriesId])
+  @@map("queue_sessions")
+}
+
+/// Online reservation acquired before permitting a session to start offline. One per club.
+/// The offline reservation service is a later ticket.
+model ClubSessionReservation {
+  clubId     String   @id @map("club_id") @db.Uuid
+  sessionId  String   @unique @map("session_id") @db.Uuid
+  acquiredAt DateTime @map("acquired_at") @db.Timestamptz(6)
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  club    Club         @relation(fields: [clubId], references: [id], onDelete: Restrict)
+  session QueueSession @relation(fields: [clubId, sessionId], references: [clubId, id], onDelete: Restrict)
+
+  @@unique([clubId, sessionId])
+  @@map("club_session_reservations")
+}
+
+/// Soft-removed (removed_at) because historical court usage may reference it.
+model SessionCourt {
+  id        String    @id @db.Uuid
+  clubId    String    @map("club_id") @db.Uuid
+  sessionId String    @map("session_id") @db.Uuid
+  label     String
+  /// Null = until the session ends (follows scheduled_end_at). A reminder only.
+  openUntil DateTime? @map("open_until") @db.Timestamptz(6)
+  removedAt DateTime? @map("removed_at") @db.Timestamptz(6)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision  BigInt    @default(1)
+
+  session QueueSession @relation(fields: [clubId, sessionId], references: [clubId, id], onDelete: Restrict)
+
+  @@unique([clubId, sessionId, id])
+  @@index([sessionId])
+  @@map("session_courts")
+}

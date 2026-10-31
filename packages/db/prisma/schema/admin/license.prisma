@@ -35,6 +35,7 @@ model ClubLicenseTerm {
   activatedBy     AdminAccount      @relation(fields: [activatedByAdminId], references: [id], onDelete: Restrict)
   entitlements    ClubEntitlement[]
   cancelledCycles ClubExpiryCycle[]
+  startedSessions QueueSession[]
 
   @@unique([clubId, id])
   @@index([clubId, startsAt(sort: Desc)])

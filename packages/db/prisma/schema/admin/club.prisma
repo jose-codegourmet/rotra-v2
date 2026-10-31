@@ -43,6 +43,10 @@ model Club {
   nameChanges      ClubNameChangeRequest[]
   claimLinks       PlayerClaimLink[]
   idAllocations    PlayerIdAllocation[]
+  clubPlayers      ClubPlayer[]
+  venues           ClubVenue[]
+  queueSessions    QueueSession[]
+  reservation      ClubSessionReservation?
 
   @@index([foundingLocationCodeId])
   @@map("clubs")

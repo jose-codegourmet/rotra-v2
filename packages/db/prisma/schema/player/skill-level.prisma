@@ -27,6 +27,10 @@ model SkillLevel {
   displayOrder Int           @unique @map("display_order") @db.SmallInt
   label        String
 
+  rosterEntries   SessionPlayer[]
+  waitlistEntries SessionWaitlistEntry[]
+  assessments     ClubAssessment[]
+
   @@unique([category, band])
   @@map("skill_levels")
 }

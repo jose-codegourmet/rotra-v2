@@ -1,0 +1,67 @@
+// Club-local players (queue/modules/sessions-roster.md). A guest has a durable club identity and
+// session history with no global profile; player_id is the optional cross-club link, never a grant to
+// read private contacts. Names are not unique.
+
+model ClubPlayer {
+  id          String   @id @db.Uuid
+  clubId      String   @map("club_id") @db.Uuid
+  /// Null for guests. Unique per club when set.
+  playerId    String?  @map("player_id") @db.Uuid
+  displayName String   @map("display_name")
+  nickname    String?
+  /// When the club first saved this player (Saved players "Added" sort/filter).
+  addedAt     DateTime @map("added_at") @db.Timestamptz(6)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision    BigInt   @default(1)
+
+  club            Club                    @relation(fields: [clubId], references: [id], onDelete: Restrict)
+  player          Player?                 @relation(fields: [playerId], references: [id], onDelete: Restrict)
+  privateInput    ClubPlayerPrivateInput?
+  rosterEntries   SessionPlayer[]
+  waitlistEntries SessionWaitlistEntry[]
+  joinRequests    SessionJoinRequest[]
+  assessments     ClubAssessment[]
+
+  @@unique([clubId, id])
+  @@unique([clubId, playerId])
+  @@index([clubId, displayName, id])
+  @@index([playerId])
+  @@map("club_players")
+}
+
+enum ClubPlayerInputState {
+  pending
+  resolved
+  conflicted
+  discarded
+
+  @@map("club_player_input_state")
+}
+
+/// Private operator intake (phone/email/preset fields) awaiting identity resolution. Never in a public
+/// roster payload or download; known hidden contacts are not copied here. Purge policy is open.
+model ClubPlayerPrivateInput {
+  clubPlayerId     String               @id @map("club_player_id") @db.Uuid
+  clubId           String               @map("club_id") @db.Uuid
+  phoneE164        String?              @map("phone_e164")
+  email            String?
+  /// Preset identity fields typed by the operator (validated by the service).
+  presetFields     Json?                @map("preset_fields")
+  capturedAt       DateTime             @map("captured_at") @db.Timestamptz(6)
+  state            ClubPlayerInputState @default(pending)
+  resolvedPlayerId String?              @map("resolved_player_id") @db.Uuid
+  resolvedAt       DateTime?            @map("resolved_at") @db.Timestamptz(6)
+  createdAt        DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime             @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision         BigInt               @default(1)
+
+  clubPlayer     ClubPlayer @relation(fields: [clubId, clubPlayerId], references: [clubId, id], onDelete: Restrict)
+  resolvedPlayer Player?    @relation("ClubPlayerInputResolved", fields: [resolvedPlayerId], references: [id], onDelete: Restrict)
+
+  @@unique([clubId, clubPlayerId])
+  @@index([state, capturedAt])
+  @@index([phoneE164])
+  @@index([resolvedPlayerId])
+  @@map("club_player_private_inputs")
+}

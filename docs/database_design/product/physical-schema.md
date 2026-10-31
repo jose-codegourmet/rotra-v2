@@ -88,3 +88,13 @@ only through server Route Handlers and services, never through the Supabase Data
 
 Approval and application commands also write `admin_audit_events` with redacted metadata (no contact
 values). The player's UUID and RTR ID never change. Auth-provider mutation is not part of this ticket.
+
+## Runtime access (F07.20)
+
+- Apps reach these tables only through `@rotra/db` services behind `handleAccountRequest` /
+  `handlePublicRead` ([architecture §8](../../architecture.md#8-auth-target-not-built)). The Prisma
+  runtime connection is server-only and does not carry an end-user JWT, so RLS is **not** claimed to
+  scope it; authorization happens in the service layer on every request.
+- Every table above revokes `anon`/`authenticated`; nothing is reachable through the Supabase Data API.
+  The runtime role's own grants and the selected project's advisors must still be checked before any
+  migration is applied (#243).

@@ -212,6 +212,21 @@ Redux never holds server data and has no async thunks.
 In the mock phase, sign-in is mocked like the prototypes (anything signs in) and `proxy.ts` only checks a
 mock session. Real auth (Supabase Auth) is its own epic. **No Facebook or any social login.**
 
+**Server boundary (F07.20).** `ROTRA_DATA_MODE` (server-only, default `mock`) picks the path; there is
+no fallback from real to mock.
+
+| Layer | Real mode |
+|---|---|
+| `proxy.ts` | `@rotra/db/auth/proxy-session` verifies the Supabase JWT (`getClaims`), refreshes session cookies, deletes `rotra-mock-*` cookies, and redirects. Navigation only; it never loads Prisma |
+| Route Handler | `handleAccountRequest(audience, routeCookieAdapter(await cookies()), run)` from `@rotra/db/service/handler`: verifies the session again, maps the subject to the app's account type from current server state (provisioned/not disabled club account, not disabled player account, active admin), then `run` checks scope with `@rotra/db/service/authorize` (`requireOwnClub`, `requireOwnPlayer`, `requireAdmin`, `requireClubEntitlement`, `requireRevision`) |
+| Public reads | `handlePublicRead(id, run)`; only IDs in `PUBLIC_READS` are anonymous, each with an allowlisted projection |
+| Responses | Private: `Cache-Control: private, no-store`, `Vary: Cookie`. Bodies pass `toJson` (`@rotra/db/service/serialize`): UUIDs as strings, instants as ISO strings, bigint revisions as decimal strings, money as `{ amountMinor, currency }`, null kept; class instances such as Prisma models are refused. Errors are `{ error: { code, message, fields? } }` (`@rotra/db/service/errors`); another club's or player's ID answers `not_found` |
+| Client | `useAccountScope(accountId)` / `clearAccountQueries` (`@rotra/data/auth/account-scope`) drop the previous account's queries on account change or sign-out, keeping `auth`/`sync` queries and every mutation, so unsynced evidence survives |
+
+Wrong account types, forged mock cookies, and cross-club/player IDs are denied at the handler, not only
+in the proxy. Database credentials and Supabase keys are read only from server env. Application tables
+have no `anon`/`authenticated` grants, so the Data API exposes none of them.
+
 ---
 
 ## 9. Offline (Queue only)

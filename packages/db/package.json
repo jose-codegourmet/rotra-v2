@@ -6,7 +6,16 @@
   "exports": {
     "./client": "./src/client/prisma.ts",
     "./admin/club-identity": "./src/admin/club-identity.ts",
-    "./player/rtr-id": "./src/player/rtr-id.ts"
+    "./player/rtr-id": "./src/player/rtr-id.ts",
+    "./auth/data-mode": "./src/auth/data-mode.ts",
+    "./auth/supabase": "./src/auth/supabase.ts",
+    "./auth/proxy-session": "./src/auth/proxy-session.ts",
+    "./auth/account-context": "./src/auth/account-context.ts",
+    "./service/errors": "./src/service/errors.ts",
+    "./service/serialize": "./src/service/serialize.ts",
+    "./service/authorize": "./src/service/authorize.ts",
+    "./service/handler": "./src/service/handler.ts",
+    "./service/route-cookies": "./src/service/route-cookies.ts"
   },
   "scripts": {
     "db:generate": "prisma generate",
@@ -20,6 +29,8 @@
   "dependencies": {
     "@prisma/adapter-pg": "7.10.1",
     "@prisma/client": "7.10.1",
+    "@supabase/ssr": "0.12.7",
+    "@supabase/supabase-js": "2.118.0",
     "pg": "8.23.1",
     "server-only": "0.0.1"
   },

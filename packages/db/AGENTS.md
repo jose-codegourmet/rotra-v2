@@ -12,6 +12,14 @@
 - **Generated client** goes to `src/generated/prisma` (gitignored). Run `db:generate` after install
   or schema changes.
 
+- **Service boundary.** Route Handlers call `handleAccountRequest` / `handlePublicRead`
+  (`src/service/handler.ts`) and authorize scope with `src/service/authorize.ts`. Return bodies built
+  from allowlisted fields (`pick`, `toMoney`, `toIso`…); never a Prisma result object. See
+  architecture §8.
+- **Draft SQL.** Each ticket's migration folder holds `prisma migrate diff` output plus hand-written
+  CHECKs, partial uniques and triggers Prisma cannot express. Keys, checks and grants are listed in
+  [physical-schema.md](../../docs/database_design/product/physical-schema.md).
+
 Commands (load nvm first):
 
 ```bash

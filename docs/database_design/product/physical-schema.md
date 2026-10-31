@@ -143,3 +143,24 @@ composite FK only accepts an assessment for this exact club, session and entry.
 
 `decided_by_device_id`, `club_assessments.device_id` and `source_operation_id` gain FKs to `devices` /
 `sync_operations` with the sync schema (F07.14).
+
+## Queue preparation services (F07.23)
+
+`@rotra/db/queue/session-preparation` and `@rotra/db/queue/session-roster` implement the Q-SETUP,
+Q-PREPARE and Q-ROSTER commands for a verified `ClubContext`. No Route Handlers call them yet.
+
+| Rule | How |
+|---|---|
+| Serialization | Every command locks the session row (`SELECT … FOR UPDATE`) and bumps `revision`; edits and start take the expected revision (`conflict` on mismatch) |
+| Capacity | Admission counts live entries against `players_per_court × live courts` under the lock, so concurrent admissions cannot overfill; Give slot may go over budget and records `over_budget_at` |
+| Retries | Create/series: IDs derived from `commandId`. Admissions: `operationId` is the assessment's `source_operation_id`, and the waitlist/entry/club-player IDs derive from it. A retry returns the first result |
+| Budget change | Prepared save releases entries beyond the new capacity (`demoted`), adds them to the waitlist with demotion evidence (front, in slot order); a larger budget fills from waitlist order. Active sessions never rebalance |
+| Regaining a slot | Reactivates the player's released entry, so paid marks and assessments keyed on it stay attached |
+| Levels | Each admission or level change appends a `club_assessments` row and selects it; start refuses any entry without a level and locks all levels; a late entry locks on insert; the trigger rejects later changes |
+| Schedule | Clash messages come from the shared `sessionOccurrences` rule (`@rotra/data`); the exclusion constraint is the race backstop. Series insert only free dates |
+| License | Create, edit and start need a current entitlement; start records `start_license_term_id`. An active session started under a term keeps working after expiry (completion exception) |
+| Minimum | Recomputed with the shared `estimateMinimum` rule while prepared and calculated; frozen at start |
+
+Not covered yet, by dependency: cost estimates on create/edit (F07.15); assessment projection jobs and
+rank eligibility (F07.16, #247); directory/phone identity matching on add (F07.22); court-in-use checks
+on removal (match schema); the offline start reservation (#246); public join-request submission (#248).

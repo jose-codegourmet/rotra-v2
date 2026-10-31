@@ -15,7 +15,9 @@
     "./service/serialize": "./src/service/serialize.ts",
     "./service/authorize": "./src/service/authorize.ts",
     "./service/handler": "./src/service/handler.ts",
-    "./service/route-cookies": "./src/service/route-cookies.ts"
+    "./service/route-cookies": "./src/service/route-cookies.ts",
+    "./queue/session-preparation": "./src/queue/session-preparation.ts",
+    "./queue/session-roster": "./src/queue/session-roster.ts"
   },
   "scripts": {
     "db:generate": "prisma generate",
@@ -29,6 +31,7 @@
   "dependencies": {
     "@prisma/adapter-pg": "7.10.1",
     "@prisma/client": "7.10.1",
+    "@rotra/data": "workspace:*",
     "@supabase/ssr": "0.12.7",
     "@supabase/supabase-js": "2.118.0",
     "pg": "8.23.1",

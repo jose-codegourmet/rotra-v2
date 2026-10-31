@@ -3,7 +3,7 @@
 > **Entry point for AI coding agents.** Read this file completely; it is deliberately short. Everything
 > else is loaded **on demand** through the routing table in §3. Don't read the whole `docs/` tree.
 
-**Last verified:** 2026-10-28 · **Budget:** under 200 lines.
+**Last verified:** 2026-10-31 · **Budget:** under 200 lines.
 
 ---
 
@@ -29,6 +29,12 @@
     `source ~/.nvm/nvm.sh` first.
 14. **Ask before guessing** anything listed in an `open-decisions.md`, and anything about money,
     ranking math, permanent results, auth, contacts, or migrations.
+15. **UI changes start in the mockup.** Any layout or UI change request updates
+    `app/mocksups-app/*/*.html` first; the real app follows through a ticket. Every mockup change:
+    (a) writes one log file in [docs/mockup-changes/](docs/mockup-changes/README.md) with
+    `Status: NEW`; (b) updates the business logic and database design docs in the same change if the
+    mockup made them untrue. Turning a log into a ticket sets it to `Status: ALREADY A TICKET — #<n>`.
+    Never ticket a log that already says so.
 
 ---
 
@@ -71,6 +77,7 @@ docs/
   business_logic/product/ WHAT the product does: rules per product › module (+ flow/ journeys)
   screens/product/        WHAT each screen shows: layouts, controls, states, dialogs, by screen ID
   database_design/product/ proposed tables and fields per module
+  mockup-changes/         one log file per mockup change; NEW until it becomes a ticket
   branding/               brand identity, logo, characters (visuals: the prototypes win)
   email-templates.md      Supabase auth email coverage
 email-templates/          auth email HTML, pasted into the Supabase dashboard by hand
@@ -102,6 +109,8 @@ email-templates/          auth email HTML, pasted into the Supabase dashboard by
 | **Prisma / tables** (database epic) | [database_design/product/README.md](docs/database_design/product/README.md) → [conventions](docs/database_design/product/conventions.md) → [coding-conventions.md](docs/coding-conventions.md) §13 |
 | **Offline** (Queue) | [architecture.md](docs/architecture.md) §9 → [offline module](docs/business_logic/product/queue/modules/offline/README.md) |
 | An **auth email template** | [email-templates.md](docs/email-templates.md) |
+| A **layout / UI change** request | [mockup-changes/README.md](docs/mockup-changes/README.md) → the app's mockup → its business module + database design |
+| Turning **mockup changes into tickets** | [mockup-changes/README.md](docs/mockup-changes/README.md) → [ways-of-working.md](docs/ways-of-working.md) §3 |
 | **Two docs disagree** | [ways-of-working.md](docs/ways-of-working.md) §2 |
 
 **Rule:** if a file you loaded didn't change what you wrote, you didn't need it.
@@ -126,6 +135,7 @@ nvm use && pnpm install
 nvm use && pnpm dev                          # all apps
 nvm use && pnpm --filter @rotra/queue dev    # or @rotra/player, @rotra/admin
 nvm use && pnpm --filter @rotra/ui storybook   # or: pnpm storybook, make storybook
+nvm use && pnpm mockups                      # the HTML mockups on port 3003
 nvm use && pnpm lint                         # Biome
 nvm use && pnpm type-check
 nvm use && pnpm build
@@ -139,7 +149,9 @@ Tickets are GitHub issues labeled `ticket`, sub-issues of `epic` issues, titled
 `<seq> · <key> · <Type>: <what>`. Take the **lowest open `<seq>`** whose *Depends on* issues are closed.
 Open one PR per ticket with `Closes #<n>`, run lint/type-check/build locally, then
 `gh pr merge --squash --auto --delete-branch`. **CI never blocks; PRs auto-merge.** Can't do a ticket as
-written? Comment why, label it `blocked`, take the next. Full rules: [ways-of-working.md §3, §5](docs/ways-of-working.md#picking-up-the-next-ticket-agents).
+written? Comment why, label it `blocked`, take the next. **Given a ticket link?** Do that ticket; once
+it's done and merged, check the issue is closed and close it yourself (`gh issue close <n> --comment
+"Done in #<pr>."`) if it isn't. Never close an unfinished or `blocked` ticket. Full rules: [ways-of-working.md §3, §5](docs/ways-of-working.md#picking-up-the-next-ticket-agents).
 
 ---
 

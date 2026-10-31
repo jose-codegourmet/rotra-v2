@@ -50,6 +50,7 @@ docs/
                     modules/<product>/<module>.md
   database_design/product/  conventions · transactions · access-retention · open-decisions
                             <product>/modules/<module>.md
+  mockup-changes/   one log per mockup change (NEW → ALREADY A TICKET — #<n>)
   ../app/mocksups-app/   canonical prototype HTML + README per app
   branding/
 ```

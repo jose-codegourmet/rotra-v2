@@ -1,0 +1,24 @@
+// A club's saved venues. Name unique per club, case-insensitive (expression index in SQL).
+// Choosing a venue copies its name/address/fees into the session; editing a venue never rewrites
+// past sessions. Venue deletion is not specified, so sessions reference it with RESTRICT.
+
+model ClubVenue {
+  id                        String   @id @default(uuid(7)) @db.Uuid
+  clubId                    String   @map("club_id") @db.Uuid
+  name                      String
+  address                   String?
+  /// Nullable centavos ≥ 0; prefills the session cost estimate.
+  courtFeePerCourtHourMinor Int?     @map("court_fee_per_court_hour_minor")
+  /// Nullable centavos ≥ 0; prefills the misc entrance fee per head before the club default.
+  entranceFeeMinor          Int?     @map("entrance_fee_minor")
+  currency                  String   @default("PHP") @db.Char(3)
+  createdAt                 DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                 DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision                  BigInt   @default(1)
+
+  club     Club           @relation(fields: [clubId], references: [id], onDelete: Restrict)
+  sessions QueueSession[]
+
+  @@unique([clubId, id])
+  @@map("club_venues")
+}

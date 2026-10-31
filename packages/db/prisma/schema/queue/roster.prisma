@@ -1,0 +1,132 @@
+// Roster entries (slots), waitlist and guest join requests (queue/modules/sessions-roster.md).
+//
+// Roster identity (proposal pending #245): one session_players row per (session, club player) for
+// the session's lifetime. Demotion to the waitlist or removal in preparation releases the row
+// (released_at) instead of deleting it, so paid marks and assessments that key on the entry are never
+// cascaded or orphaned, and regaining a slot reactivates the same entry. Waitlist rows are deleted on
+// Give slot; they carry ordering evidence only.
+
+enum RosterReleaseReason {
+  demoted
+  removed
+
+  @@map("roster_release_reason")
+}
+
+model SessionPlayer {
+  id               String               @id @db.Uuid
+  clubId           String               @map("club_id") @db.Uuid
+  sessionId        String               @map("session_id") @db.Uuid
+  clubPlayerId     String               @map("club_player_id") @db.Uuid
+  /// Historical snapshot of the global link at entry; no forced profile for guests.
+  playerIdAtEntry  String?              @map("player_id_at_entry") @db.Uuid
+  nameSnapshot     String               @map("name_snapshot")
+  /// False when added in preparation, true when added to an active session.
+  present          Boolean              @default(false)
+  presentChangedAt DateTime             @map("present_changed_at") @db.Timestamptz(6)
+  /// Selected roster assessment for this exact entry (scoped FK). Null only during the insert
+  /// transaction that also writes the assessment, or for a prepared row without a level (#245).
+  assessmentId     String?              @map("assessment_id") @db.Uuid
+  skillLevelId     Int?                 @map("skill_level_id") @db.SmallInt
+  /// Set at start or late entry; level and assessment are immutable afterwards (trigger in SQL).
+  levelLockedAt    DateTime?            @map("level_locked_at") @db.Timestamptz(6)
+  /// Slot order is confirmed_at (first come, first served).
+  confirmedAt      DateTime             @map("confirmed_at") @db.Timestamptz(6)
+  joinedAt         DateTime             @map("joined_at") @db.Timestamptz(6)
+  /// When the slot exceeded the budget at Give slot time (over budget), else null.
+  overBudgetAt     DateTime?            @map("over_budget_at") @db.Timestamptz(6)
+  releasedAt       DateTime?            @map("released_at") @db.Timestamptz(6)
+  releaseReason    RosterReleaseReason? @map("release_reason")
+  createdAt        DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime             @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision         BigInt               @default(1)
+
+  session            QueueSession     @relation(fields: [clubId, sessionId], references: [clubId, id], onDelete: Restrict)
+  clubPlayer         ClubPlayer       @relation(fields: [clubId, clubPlayerId], references: [clubId, id], onDelete: Restrict)
+  playerAtEntry      Player?          @relation("SessionPlayerAtEntry", fields: [playerIdAtEntry], references: [id], onDelete: Restrict)
+  skillLevel         SkillLevel?      @relation(fields: [skillLevelId], references: [id], onDelete: Restrict)
+  selectedAssessment ClubAssessment?  @relation("SelectedAssessment", fields: [clubId, sessionId, id, assessmentId], references: [clubId, sessionId, sessionPlayerId, id], onDelete: Restrict)
+  assessments        ClubAssessment[] @relation("AssessmentEntry")
+
+  @@unique([clubId, sessionId, id])
+  @@unique([sessionId, clubPlayerId])
+  @@unique([sessionId, playerIdAtEntry])
+  @@index([sessionId, present, id])
+  @@index([clubId, clubPlayerId])
+  @@map("session_players")
+}
+
+/// Waitlist order (proposal pending #245): demoted entries first, latest demotion batch at the front,
+/// each batch in its original slot order (demoted_confirmed_at); then everyone else by added_at; id
+/// breaks ties. No position column and no timestamp rewriting.
+model SessionWaitlistEntry {
+  id                 String    @id @db.Uuid
+  clubId             String    @map("club_id") @db.Uuid
+  sessionId          String    @map("session_id") @db.Uuid
+  clubPlayerId       String    @map("club_player_id") @db.Uuid
+  /// Level chosen when added; becomes the roster level when given a slot.
+  skillLevelId       Int?      @map("skill_level_id") @db.SmallInt
+  /// Historical arrival/entry time (a confirmed join request uses its requested_at).
+  addedAt            DateTime  @map("added_at") @db.Timestamptz(6)
+  /// Set when a budget reduction moved this player off the roster.
+  demotedAt          DateTime? @map("demoted_at") @db.Timestamptz(6)
+  /// The released roster entry's confirmed_at, keeping relative joining order within a batch.
+  demotedConfirmedAt DateTime? @map("demoted_confirmed_at") @db.Timestamptz(6)
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision           BigInt    @default(1)
+
+  session    QueueSession @relation(fields: [clubId, sessionId], references: [clubId, id], onDelete: Restrict)
+  clubPlayer ClubPlayer   @relation(fields: [clubId, clubPlayerId], references: [clubId, id], onDelete: Restrict)
+  skillLevel SkillLevel?  @relation(fields: [skillLevelId], references: [id], onDelete: Restrict)
+
+  @@unique([sessionId, clubPlayerId])
+  @@index([sessionId, demotedAt(sort: Desc), demotedConfirmedAt, addedAt, id])
+  @@map("session_waitlist")
+}
+
+enum StatedBand {
+  beginner
+  intermediate
+  advanced
+  unsure
+
+  @@map("stated_band")
+}
+
+enum JoinRequestStatus {
+  pending
+  confirmed
+  declined
+
+  @@map("join_request_status")
+}
+
+/// Guest request from the public session link. Never inserts roster/waitlist rows by itself.
+/// The public write endpoint and visitor ownership (#248) are later tickets.
+model SessionJoinRequest {
+  id                String            @id @db.Uuid
+  clubId            String            @map("club_id") @db.Uuid
+  sessionId         String            @map("session_id") @db.Uuid
+  name              String
+  nickname          String?
+  /// Visible to the club only, never on the public page.
+  phoneE164         String?           @map("phone_e164")
+  statedBand        StatedBand        @map("stated_band")
+  status            JoinRequestStatus @default(pending)
+  requestedAt       DateTime          @map("requested_at") @db.Timestamptz(6)
+  decidedAt         DateTime?         @map("decided_at") @db.Timestamptz(6)
+  /// Device that confirmed/declined; FK to devices arrives with the sync schema (F07.14).
+  decidedByDeviceId String?           @map("decided_by_device_id") @db.Uuid
+  /// The club player created on confirm.
+  clubPlayerId      String?           @map("club_player_id") @db.Uuid
+  createdAt         DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime          @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision          BigInt            @default(1)
+
+  session    QueueSession @relation(fields: [clubId, sessionId], references: [clubId, id], onDelete: Restrict)
+  clubPlayer ClubPlayer?  @relation(fields: [clubId, clubPlayerId], references: [clubId, id], onDelete: Restrict)
+
+  @@index([sessionId, status, requestedAt])
+  @@map("session_join_requests")
+}

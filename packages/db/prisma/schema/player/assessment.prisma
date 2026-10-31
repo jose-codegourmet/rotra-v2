@@ -1,0 +1,41 @@
+// Club assessment evidence (player-information/modules/ranking.md). Appended, never rewritten: a new
+// level is a new row that supersedes the previous one for the same club player. Rank use (latest per
+// club in the window, one vote per club) is a later projection; eligibility for no-shows, removed
+// entries and invalid sessions is open (#247).
+
+model ClubAssessment {
+  id                   String   @id @db.Uuid
+  clubId               String   @map("club_id") @db.Uuid
+  clubPlayerId         String   @map("club_player_id") @db.Uuid
+  sessionId            String   @map("session_id") @db.Uuid
+  sessionPlayerId      String   @map("session_player_id") @db.Uuid
+  /// Nullable link for a guest/unresolved identity.
+  playerIdAtAssessment String?  @map("player_id_at_assessment") @db.Uuid
+  skillLevelId         Int      @map("skill_level_id") @db.SmallInt
+  /// Prior revision in the same club/player scope.
+  supersedesId         String?  @map("supersedes_id") @db.Uuid
+  /// Idempotency key of the command or sync operation (FK to sync_operations arrives in F07.14).
+  sourceOperationId    String   @unique @map("source_operation_id") @db.Uuid
+  assessedAt           DateTime @map("assessed_at") @db.Timestamptz(6)
+  receivedAt           DateTime @default(now()) @map("received_at") @db.Timestamptz(6)
+  acceptedRevision     BigInt   @map("accepted_revision")
+  /// Shared club credentials: the club account, not a person.
+  actorClubId          String   @map("actor_club_id") @db.Uuid
+  /// FK to devices arrives in F07.14.
+  deviceId             String?  @map("device_id") @db.Uuid
+
+  clubPlayer         ClubPlayer       @relation(fields: [clubId, clubPlayerId], references: [clubId, id], onDelete: Restrict)
+  session            QueueSession     @relation(fields: [clubId, sessionId], references: [clubId, id], onDelete: Restrict)
+  entry              SessionPlayer    @relation("AssessmentEntry", fields: [clubId, sessionId, sessionPlayerId], references: [clubId, sessionId, id], onDelete: Restrict)
+  playerAtAssessment Player?          @relation("AssessmentPlayer", fields: [playerIdAtAssessment], references: [id], onDelete: Restrict)
+  skillLevel         SkillLevel       @relation(fields: [skillLevelId], references: [id], onDelete: Restrict)
+  supersedes         ClubAssessment?  @relation("AssessmentSupersedes", fields: [clubId, clubPlayerId, supersedesId], references: [clubId, clubPlayerId, id], onDelete: Restrict)
+  supersededBy       ClubAssessment[] @relation("AssessmentSupersedes")
+  selectedBy         SessionPlayer[]  @relation("SelectedAssessment")
+
+  @@unique([clubId, clubPlayerId, id])
+  @@unique([clubId, sessionId, sessionPlayerId, id])
+  @@index([playerIdAtAssessment, clubId, assessedAt(sort: Desc), acceptedRevision(sort: Desc)])
+  @@index([clubId, clubPlayerId, assessedAt(sort: Desc)])
+  @@map("club_assessments")
+}

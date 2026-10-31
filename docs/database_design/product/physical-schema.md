@@ -98,3 +98,69 @@ values). The player's UUID and RTR ID never change. Auth-provider mutation is no
 - Every table above revokes `anon`/`authenticated`; nothing is reachable through the Supabase Data API.
   The runtime role's own grants and the selected project's advisors must still be checked before any
   migration is applied (#243).
+
+## Group D · venues, club players, Queue Sessions, roster, assessments (F07.13 · `20261031000500`)
+
+Offline-creatable records (`club_players`, `queue_sessions`, `session_courts`, `session_players`,
+`session_waitlist`, `session_join_requests`, `club_assessments`) take client-generated UUIDs (no
+default). Every child carries `club_id` and reaches its parent through a **composite FK**, so a valid
+UUID from another club or session is rejected.
+
+| Table | Keys and uniques | Checks and triggers | Scoped FKs |
+|---|---|---|---|
+| `club_players` | PK `id`; unique `(club_id, id)`, `(club_id, player_id)` (nulls distinct, so guests repeat); index `(club_id, display_name, id)` | non-blank name | club; optional player |
+| `club_player_private_inputs` | PK/FK `club_player_id`; unique `(club_id, club_player_id)`; index `(state, captured_at)`, `phone_e164` | E.164 / lowercase email; `resolved` ⇔ resolved player + time | `(club_id, club_player_id)` |
+| `club_venues` | PK `id`; unique `(club_id, id)`, expression unique `(club_id, lower(name))` | fees null or ≥ 0 | club |
+| `queue_sessions` | PK `id`; unique `(club_id, id)`, `public_slug`, `source_command_id`; partial unique `club_id WHERE state IN (active, finalizing)`; index `(club_id, scheduled_start_at desc, id)` | end > start; minimum ≥ 0; players per court 2–20; invalid ⇒ reason; completed ⇔ `finalized_at`; **exclusion** no overlapping non-invalid sessions per club (`btree_gist`) | `(club_id, venue_id)`, `(club_id, start_license_term_id)` |
+| `club_session_reservations` | PK `club_id`; unique `session_id` | — | `(club_id, session_id)` |
+| `session_courts` | PK `id`; unique `(club_id, session_id, id)`; partial unique `(session_id, label) WHERE removed_at IS NULL` | non-blank label; soft removal | `(club_id, session_id)` |
+| `session_players` | PK `id`; unique `(club_id, session_id, id)`, `(session_id, club_player_id)`, `(session_id, player_id_at_entry)`; index `(session_id, present, id)` | release time ⇔ reason; locked ⇒ level + assessment, not released; **level-lock** trigger; **no delete** trigger | `(club_id, session_id)`, `(club_id, club_player_id)`, `(club_id, session_id, id, assessment_id)` → the entry's own assessment |
+| `session_waitlist` | PK `id`; unique `(session_id, club_player_id)`; order index `(session_id, demoted_at desc, demoted_confirmed_at, added_at, id)` | demotion time ⇔ demoted slot time | `(club_id, session_id)`, `(club_id, club_player_id)` |
+| `session_join_requests` | PK `id`; index `(session_id, status, requested_at)` | pending ⇔ no decision time; confirmed ⇒ club player | `(club_id, session_id)`, `(club_id, club_player_id)` |
+| `club_assessments` | PK `id`; unique `source_operation_id`, `(club_id, club_player_id, id)`, `(club_id, session_id, session_player_id, id)`; rank indexes per ranking.md | actor = owning club; **append-only** trigger | `(club_id, club_player_id)`, `(club_id, session_id)`, `(club_id, session_id, session_player_id)`, `(club_id, club_player_id, supersedes_id)` |
+
+**Roster identity (proposal, #245).** One `session_players` row per (session, club player) for the
+session's lifetime. Demotion and preparation removal set `released_at` + `release_reason`; rows are
+never deleted (trigger) and all references are `RESTRICT`, so paid marks and assessments keyed on the
+entry are never cascaded. Regaining a slot reactivates the same row. Waitlist rows are deleted on Give
+slot.
+
+**Waitlist order (proposal, #245).** Demoted entries first (latest demotion batch at the front), each
+batch in original slot order (`demoted_confirmed_at`); then everyone else by `added_at`; `id` breaks
+ties. Historical timestamps are never rewritten and there is no position column.
+
+**Roster/assessment cycle.** No fake history: insert the roster row with `assessment_id` null, insert
+the assessment that references that entry, then point the entry at it, in one transaction. The
+composite FK only accepts an assessment for this exact club, session and entry.
+
+| Rule | Database | Transaction |
+|---|---|---|
+| Schedule clash | exclusion constraint | names the clashing session and whether it is a venue or time clash; series inserts only free dates |
+| Capacity | — (slots are derived) | lock the session row; count live entries against `players_per_court × live courts` |
+| One active session | partial unique on active/finalizing | offline-start reservation (later ticket) |
+| Locked levels | level-lock trigger + locked check | set at start / late entry |
+| Visitor ownership | — | pending #248; no public write here |
+
+`decided_by_device_id`, `club_assessments.device_id` and `source_operation_id` gain FKs to `devices` /
+`sync_operations` with the sync schema (F07.14).
+
+## Queue preparation services (F07.23)
+
+`@rotra/db/queue/session-preparation` and `@rotra/db/queue/session-roster` implement the Q-SETUP,
+Q-PREPARE and Q-ROSTER commands for a verified `ClubContext`. No Route Handlers call them yet.
+
+| Rule | How |
+|---|---|
+| Serialization | Every command locks the session row (`SELECT … FOR UPDATE`) and bumps `revision`; edits and start take the expected revision (`conflict` on mismatch) |
+| Capacity | Admission counts live entries against `players_per_court × live courts` under the lock, so concurrent admissions cannot overfill; Give slot may go over budget and records `over_budget_at` |
+| Retries | Create/series: IDs derived from `commandId`. Admissions: `operationId` is the assessment's `source_operation_id`, and the waitlist/entry/club-player IDs derive from it. A retry returns the first result |
+| Budget change | Prepared save releases entries beyond the new capacity (`demoted`), adds them to the waitlist with demotion evidence (front, in slot order); a larger budget fills from waitlist order. Active sessions never rebalance |
+| Regaining a slot | Reactivates the player's released entry, so paid marks and assessments keyed on it stay attached |
+| Levels | Each admission or level change appends a `club_assessments` row and selects it; start refuses any entry without a level and locks all levels; a late entry locks on insert; the trigger rejects later changes |
+| Schedule | Clash messages come from the shared `sessionOccurrences` rule (`@rotra/data`); the exclusion constraint is the race backstop. Series insert only free dates |
+| License | Create, edit and start need a current entitlement; start records `start_license_term_id`. An active session started under a term keeps working after expiry (completion exception) |
+| Minimum | Recomputed with the shared `estimateMinimum` rule while prepared and calculated; frozen at start |
+
+Not covered yet, by dependency: cost estimates on create/edit (F07.15); assessment projection jobs and
+rank eligibility (F07.16, #247); directory/phone identity matching on add (F07.22); court-in-use checks
+on removal (match schema); the offline start reservation (#246); public join-request submission (#248).

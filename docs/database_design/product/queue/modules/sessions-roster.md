@@ -151,4 +151,6 @@ Game/minimum counters derive from full participation and permanent decisions; op
 
 Indexes: sessions `(club_id, scheduled_start_at DESC, id)`; roster `(session_id, present, id)`; club player link/name indexes above. Existing composite indexes may cover FK lookup; avoid redundant single-column indexes.
 
+Drafted in Prisma by F07.13 with the roster-identity and waitlist-order proposals recorded in [physical schema](../../physical-schema.md#group-d--venues-club-players-queue-sessions-roster-assessments-f0713--20261031000500); both still need #245 approval.
+
 Business sources: [players](../../../../business_logic/product/queue/modules/players/README.md), [sessions](../../../../business_logic/product/queue/modules/sessions/README.md).

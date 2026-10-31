@@ -32,6 +32,10 @@ model Player {
   claimLinks     PlayerClaimLink[]
   idAllocation   PlayerIdAllocation?
   contactChanges PlayerContactChangeRequest[]
+  clubPlayers    ClubPlayer[]
+  resolvedInputs ClubPlayerPrivateInput[]     @relation("ClubPlayerInputResolved")
+  rosterEntries  SessionPlayer[]              @relation("SessionPlayerAtEntry")
+  assessments    ClubAssessment[]             @relation("AssessmentPlayer")
 
   @@index([fullName])
   @@map("players")

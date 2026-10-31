@@ -11,7 +11,7 @@ export const clubLoginFormMeta = {
     'No forgot-password link, no sign-up and no social login (club passwords are reset by the platform owner).',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-LOGIN › viewLogin() (.login card)',
   },
   docs: [

@@ -11,7 +11,7 @@ export const playerConfirmCardMeta = {
     'Pass onBack and onConfirm to draw Back and "Confirm player slot" / "Add to waitlist" under the card; AddPlayerSheet leaves them out and uses its own footer.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'SHEETS.add › pick state (Confirm player / Add player card)',
   },
   docs: [

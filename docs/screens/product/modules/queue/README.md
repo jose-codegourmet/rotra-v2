@@ -2,7 +2,7 @@
 
 **Audience:** dedicated club account / Queue Master, except the public session page.
 
-**Reference prototype:** [`docs/frames/queue-app/rotra-queue.html`](../../../../frames/queue-app/rotra-queue.html) — open it in a browser and sign in with any password. Updated specs below follow it.
+**Reference prototype:** [`app/mocksups-app/queue-app/rotra-queue.html`](../../../../../app/mocksups-app/queue-app/rotra-queue.html) — open it in a browser and sign in with any password. Updated specs below follow it.
 
 | Module | Surfaces |
 |---|---|

@@ -11,7 +11,7 @@ export const suggestedMatchSheetMeta = {
     'Never add win probabilities or fatigue scores to the Why this lineup card.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-SUGGEST › SHEETS.suggest',
   },
   docs: [

@@ -10,7 +10,7 @@ export const sessionSetupFormMeta = {
     'Only page 1 is required; Next validates the current page, saving validates every page and opens the first with an error.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-SETUP › viewSetup()',
   },
   docs: ['docs/screens/product/modules/queue/session-setup.md'],

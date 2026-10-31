@@ -7,6 +7,9 @@ export const spinnerMeta = {
     'Button shows it automatically while loading; use it directly only beside inline status text.',
     'For page or list loading use Skeleton, never a full-page spinner.',
   ],
-  prototype: { file: 'docs/frames/admin-app/rotra-admin.html', screen: 'Shared styles › .spin' },
+  prototype: {
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
+    screen: 'Shared styles › .spin',
+  },
   related: ['Button', 'Skeleton'],
 } satisfies ComponentMeta

@@ -11,7 +11,7 @@ export const queueGridMeta = {
     'Do not use for active matches: they have no dragging, and a lineup change is a substitution.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen:
       'Live console › Queue tab › queuePane() (.qgrid, queueCard() snake, moveTo()/endDrag())',
   },

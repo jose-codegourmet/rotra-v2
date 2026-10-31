@@ -8,7 +8,7 @@ It shares its tokens, type and base components with the [Queue prototype](../que
 
 ## How it relates to the docs
 
-Screen IDs follow [Admin screen modules](../../screens/product/modules/admin/README.md) (`A-LOGIN`, `A-WORKSPACE`, `A-CLUBS`, `A-ADD-CLUB`, `A-CLUB-DETAIL`, `A-CLUB-PRICE`, `A-LICENSE`, `A-RETENTION`, `A-PLAYERS`, `A-PLAYER-DETAIL`, `A-CONTACT-REQUESTS`, `A-CONTACT-REVIEW`, `A-RANK-CONFIG`, `A-FEATURE-FLAGS`, `A-ADD-FLAG`). Rules come from [Admin business logic](../../business_logic/product/admin/README.md). Nothing here is implemented in the apps.
+Screen IDs follow [Admin screen modules](../../../docs/screens/product/modules/admin/README.md) (`A-LOGIN`, `A-WORKSPACE`, `A-CLUBS`, `A-ADD-CLUB`, `A-CLUB-DETAIL`, `A-CLUB-PRICE`, `A-LICENSE`, `A-RETENTION`, `A-PLAYERS`, `A-PLAYER-DETAIL`, `A-CONTACT-REQUESTS`, `A-CONTACT-REVIEW`, `A-RANK-CONFIG`, `A-FEATURE-FLAGS`, `A-ADD-FLAG`). Rules come from [Admin business logic](../../../docs/business_logic/product/admin/README.md). Nothing here is implemented in the apps.
 
 Decisions the platform owner made with the prototype on October 27, 2026. They are recorded in the business, screen and database docs; the business and screen `open-decisions.md` files list them under "Settled by the Admin prototype":
 

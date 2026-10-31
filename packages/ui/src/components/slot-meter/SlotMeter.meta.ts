@@ -6,7 +6,7 @@ export const slotMeterMeta = {
     'The slots meter on the roster: "N/M slots · N left before the waitlist" (accent), amber when 2 or fewer are left, "Full · new players go on the waitlist", "N over budget …", plus the waitlist count.',
   usage: ['Use under the Roster and levels header in preparation; the bar is a role=meter.'],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-PREPARE › slotMeter() (.slot-meter)',
   },
   docs: ['docs/screens/product/modules/queue/players-roster.md'],

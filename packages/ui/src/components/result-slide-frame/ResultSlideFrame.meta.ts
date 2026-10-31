@@ -10,7 +10,7 @@ export const resultSlideFrameMeta = {
     'Read-only: no selection, edit or reorder controls. The footer string is always exactly "powered by rotra".',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-RESULTS › slideFrame() (.slide, .sh, .foot)',
   },
   docs: [

@@ -8,7 +8,7 @@ export const playerNavMeta = {
     'Place beside the Player Information brand in the top bar.',
     'Pass href targets with linkAs={Link}, or navigation callbacks when the host owns navigation.',
   ],
-  prototype: { file: 'docs/frames/player-app/rotra-player.html', screen: 'topBar() › .nav' },
+  prototype: { file: 'app/mocksups-app/player-app/rotra-player.html', screen: 'topBar() › .nav' },
   docs: ['docs/screens/product/navigation.md#product-navigation'],
   variants: ['signed-out', 'signed-in'],
   related: ['TopBar', 'OfflineBand'],

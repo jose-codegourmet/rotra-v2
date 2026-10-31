@@ -4,7 +4,7 @@ export const leaderboardRulesCardMeta = {
   description: 'Explains overall leaderboard eligibility and rank scope.',
   usage: ['Use below the leaderboard.'],
   prototype: {
-    file: 'docs/frames/player-app/rotra-player.html',
+    file: 'app/mocksups-app/player-app/rotra-player.html',
     screen: 'P-LEADERBOARD Who appears here',
   },
 } satisfies ComponentMeta

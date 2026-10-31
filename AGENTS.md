@@ -13,7 +13,7 @@
    or existing code, stop and ask.
 2. **Distinguish mocks from persistence.** `apps/` and `packages/data` contain substantial mock flows;
    database, real auth and durable offline support remain targets. Never say a feature works unless you ran it.
-3. **Match the prototypes.** `docs/frames/*/*.html` are the agreed design. Build to them; don't redesign.
+3. **Match the prototypes.** `app/mocksups-app/*/*.html` are the agreed design. Build to them; don't redesign.
 4. **Words from [product-terms.md](docs/product-terms.md) only.** Queue (never "Que"), Queue Session,
    Queue Master, Match done ≠ Session done, invalid (never "void"). **ROTRA** in all caps in UI copy.
 5. **Every epic starts with components + Storybook**, then mock data, then screens, then states.
@@ -39,9 +39,9 @@ social network. Three v1 products:
 
 | Product | App | Who | Prototype |
 |---|---|---|---|
-| **Queue** (main v1 focus) | `apps/queue` | The club account, run by the Queue Master | [rotra-queue.html](docs/frames/queue-app/rotra-queue.html) |
-| **Player Information** | `apps/player` | Public visitors + registered players | [rotra-player.html](docs/frames/player-app/rotra-player.html) |
-| **Admin** | `apps/admin` | The platform owner | [rotra-admin.html](docs/frames/admin-app/rotra-admin.html) |
+| **Queue** (main v1 focus) | `apps/queue` | The club account, run by the Queue Master | [rotra-queue.html](app/mocksups-app/queue-app/rotra-queue.html) |
+| **Player Information** | `apps/player` | Public visitors + registered players | [rotra-player.html](app/mocksups-app/player-app/rotra-player.html) |
+| **Admin** | `apps/admin` | The platform owner | [rotra-admin.html](app/mocksups-app/admin-app/rotra-admin.html) |
 
 World (nearby-club discovery) is v2. Build nothing for it. Old features (MMR, EXP, peer reviews,
 Umpire, tournaments, Facebook login) are **not** v1. See [product terms §14](docs/product-terms.md#14-words-that-mean-not-v1--stop-and-ask).
@@ -56,6 +56,7 @@ database services, real auth and durable offline storage/sync; replacing fetcher
 
 ```text
 apps/                     queue · player · admin (Next.js 16); each has its own AGENTS.md for Next 16 docs
+app/mocksups-app/         canonical editable HTML prototypes and notes
 packages/
   ui/                     every visual component and form + the one Storybook (see its AGENTS.md)
   data/                   types, fixtures, mock store, fetchers, query keys, hooks
@@ -70,7 +71,6 @@ docs/
   business_logic/product/ WHAT the product does: rules per product › module (+ flow/ journeys)
   screens/product/        WHAT each screen shows: layouts, controls, states, dialogs, by screen ID
   database_design/product/ proposed tables and fields per module
-  frames/                 the three clickable prototypes (+ README per app)
   branding/               brand identity, logo, characters (visuals: the prototypes win)
   email-templates.md      Supabase auth email coverage
 email-templates/          auth email HTML, pasted into the Supabase dashboard by hand
@@ -90,9 +90,9 @@ email-templates/          auth email HTML, pasted into the Supabase dashboard by
 | Adding a **page / route / container** | [architecture.md](docs/architecture.md) §4 → [coding-conventions.md](docs/coding-conventions.md) §9 → [navigation.md](docs/screens/product/navigation.md) |
 | **Mock data, hooks, Redux** | [architecture.md](docs/architecture.md) §5, §7 → [coding-conventions.md](docs/coding-conventions.md) §10 |
 | Adding a **package, app, or dependency** | [architecture.md](docs/architecture.md) §2–3 → ask first |
-| **A Queue screen** | [screens/…/queue/\<module\>.md](docs/screens/product/modules/queue/README.md) → [rotra-queue.html](docs/frames/queue-app/rotra-queue.html) → its business module |
-| **A Player Information screen** | [screens/…/player-information/\<module\>.md](docs/screens/product/modules/player-information/README.md) → [rotra-player.html](docs/frames/player-app/rotra-player.html) |
-| **An Admin screen** | [screens/…/admin/\<module\>.md](docs/screens/product/modules/admin/README.md) → [rotra-admin.html](docs/frames/admin-app/rotra-admin.html) |
+| **A Queue screen** | [screens/…/queue/\<module\>.md](docs/screens/product/modules/queue/README.md) → [rotra-queue.html](app/mocksups-app/queue-app/rotra-queue.html) → its business module |
+| **A Player Information screen** | [screens/…/player-information/\<module\>.md](docs/screens/product/modules/player-information/README.md) → [rotra-player.html](app/mocksups-app/player-app/rotra-player.html) |
+| **An Admin screen** | [screens/…/admin/\<module\>.md](docs/screens/product/modules/admin/README.md) → [rotra-admin.html](app/mocksups-app/admin-app/rotra-admin.html) |
 | Shared screen rules (sheets, toasts, touch sizes, a11y, sync labels) | [experience-contract.md](docs/screens/product/experience-contract.md) |
 | Loading / empty / error / offline / permission states | [state-matrix.md](docs/screens/product/state-matrix.md) |
 | A confirmation dialog (`D-…`) | [dialogs.md](docs/screens/product/dialogs.md) |

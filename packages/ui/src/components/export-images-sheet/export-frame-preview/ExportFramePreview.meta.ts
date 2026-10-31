@@ -9,7 +9,7 @@ export const exportFramePreviewMeta = {
     'A preview only: rows past the frame are clipped, like the prototype. The real slides are ResultSlideFrame / StandingsSlide / AwardsSlide / OffDaySlide, and the image files come from the export (Q08.5).',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'SHEETS.export › .frames .frame.story / .frame.feed',
   },
   docs: [

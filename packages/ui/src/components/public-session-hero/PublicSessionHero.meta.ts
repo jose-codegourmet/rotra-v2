@@ -10,7 +10,7 @@ export const publicSessionHeroMeta = {
     'The props carry public fields only: no cost, roster, notes or operator state. Use SessionRecordHeader for the operator-only session record.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Public page › viewPublic() › .pub-hero',
   },
   docs: [

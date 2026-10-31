@@ -9,7 +9,7 @@ export const clubAccountCardMeta = {
     'Club password recovery is an open decision, so there is no reset control; the copy says so.',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: 'A-CLUB-DETAIL › Overview › Club account',
   },
   docs: [

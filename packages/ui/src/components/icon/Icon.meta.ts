@@ -10,7 +10,7 @@ export const iconMeta = {
     'Need an icon the prototypes do not have? Ask first; do not add an icon library.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Script › const I (icon set); also rotra-player.html and rotra-admin.html',
   },
   related: ['IconButton', 'Button'],

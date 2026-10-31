@@ -10,7 +10,7 @@ export const progressBarMeta = {
     'Not for unknown waits; use Spinner or Skeleton.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Live console › player cards (.prog); rotra-admin.html › license (.prog)',
   },
   variants: ['accent', 'warn', 'sm', 'md'],

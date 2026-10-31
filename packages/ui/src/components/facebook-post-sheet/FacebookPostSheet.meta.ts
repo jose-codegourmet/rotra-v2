@@ -9,7 +9,7 @@ export const facebookPostSheetMeta = {
     'Edit template goes to Club settings › Facebook post.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-PREPARE / Q-CONSOLE › SHEETS.post',
   },
   docs: [

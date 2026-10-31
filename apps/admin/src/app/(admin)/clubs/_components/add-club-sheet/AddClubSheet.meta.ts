@@ -14,7 +14,7 @@ export const addClubSheetMeta = {
     'Offline (useAdminConnectivity), Create club sends nothing and shows ADMIN_OFFLINE_ERROR on the review, keeping every value.',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: 'SHEETS.addClub; ACT.openAddClub / addReview / addEdit / addCreate',
   },
   docs: ['docs/screens/product/modules/admin/clubs-licenses.md'],

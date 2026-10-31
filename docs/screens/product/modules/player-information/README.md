@@ -15,7 +15,7 @@ Business source: [Player Information](../../../../business_logic/product/player-
 
 ## Reference prototype
 
-[`docs/frames/player-app/rotra-player.html`](../../../../frames/player-app/rotra-player.html) (October 26, 2026) shows every surface above. Open it in a browser; sign in with `0917 555 0142` or `migs.santos@example.com` and any password. It uses the nine playing levels with no I–V steps.
+[`app/mocksups-app/player-app/rotra-player.html`](../../../../../app/mocksups-app/player-app/rotra-player.html) (October 26, 2026) shows every surface above. Open it in a browser; sign in with `0917 555 0142` or `migs.santos@example.com` and any password. It uses the nine playing levels with no I–V steps.
 
 Layout and copy choices it makes, recorded here as **proposals** (the business rules still decide behavior):
 

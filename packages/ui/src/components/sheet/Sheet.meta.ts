@@ -12,7 +12,7 @@ export const sheetMeta = {
     'Motion matches the prototype and is instant under reduced motion.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Shared styles › .scrim, .sheet (.wide), sheetShell()',
   },
   docs: [

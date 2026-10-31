@@ -5,7 +5,7 @@ export const adminAccountBadgeMeta = {
     'Platform account email chip and optional header sign-out action; compact icons at 560 px and narrower.',
   usage: ['Use in the Admin workspace shell.'],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: 'top bar account chip (topBar .acct)',
   },
   docs: ['docs/screens/product/modules/admin/access-navigation.md'],

@@ -8,7 +8,7 @@ export const contactChangeRequestFormMeta = {
     'Never add a document upload or identity-proof field.',
   ],
   prototype: {
-    file: 'docs/frames/player-app/rotra-player.html',
+    file: 'app/mocksups-app/player-app/rotra-player.html',
     screen: 'SHEETS.request, ACT.submitRequest',
   },
   docs: [

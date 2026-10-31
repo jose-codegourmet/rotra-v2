@@ -10,7 +10,7 @@ export const matchPlayerCardMeta = {
     'Do not use on queue cards or court drawings; those use PlayerFaceButton. Do not use for picking a player; that is PlayerPoolCard.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-SUGGEST › faceTeam() (.sg-p)',
   },
   docs: [

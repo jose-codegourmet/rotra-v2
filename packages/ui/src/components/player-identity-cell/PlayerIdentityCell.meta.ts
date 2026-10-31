@@ -11,7 +11,7 @@ export const playerIdentityCellMeta = {
     'Long names and RTR IDs wrap. Phones and emails are never passed to or shown by this cell.',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen:
       'A-PLAYERS › viewPlayers() › td[data-label="Player"] .who; contact requests › td[data-label="Player"] .who',
   },

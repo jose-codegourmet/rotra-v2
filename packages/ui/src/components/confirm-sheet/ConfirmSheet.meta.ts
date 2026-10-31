@@ -14,7 +14,7 @@ export const confirmSheetMeta = {
     'destructive for actions like Confirm invalid match. Focus starts on the title, so the primary is never preselected.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Mark match invalid? / Confirm match result / Start session? sheets',
   },
   docs: ['docs/screens/product/dialogs.md'],

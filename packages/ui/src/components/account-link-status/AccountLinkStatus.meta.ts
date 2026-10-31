@@ -9,7 +9,7 @@ export const accountLinkStatusMeta = {
     'Reset outcomes sit in AuthCard; registration outcomes use LinkPage, as in the prototype.',
   ],
   prototype: {
-    file: 'docs/frames/player-app/rotra-player.html',
+    file: 'app/mocksups-app/player-app/rotra-player.html',
     screen:
       'viewForgot (sent), viewReset (invalid), viewClaim (claimed, expired, wrong, processing), viewClaimDone',
   },

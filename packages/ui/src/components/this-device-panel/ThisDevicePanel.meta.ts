@@ -8,7 +8,7 @@ export const thisDevicePanelMeta = {
     'The container filters useDeviceDownloads to state "ready". Downloads are per device, never per club.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-CLUB › viewClub() #club-device',
   },
   docs: [

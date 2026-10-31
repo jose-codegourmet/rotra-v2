@@ -13,7 +13,7 @@ export const clubNameSheetsMeta = {
     'Not built: timeout recovery for a name decision (dialogs.md "Recover request status before retrying after a timeout"); the mock has no lost-reply path for it.',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: 'SHEETS.nameApprove / nameReject; ACT.doNameApprove / doNameReject',
   },
   docs: ['docs/screens/product/dialogs.md', 'docs/screens/product/modules/admin/clubs-licenses.md'],

@@ -10,7 +10,7 @@ export const configConflictNoticeMeta = {
     'While it shows, Review changes stays disabled (RankingSettingsForm locked).',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: 'A-RANK-CONFIG › viewConfig() cfgConflict notice',
   },
   docs: [

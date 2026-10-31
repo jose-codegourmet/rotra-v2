@@ -12,7 +12,7 @@ export const contactRequestsPageMeta = {
     'Empty: "Nothing waiting for review." on Waiting, else "No requests here."; "Requests from players show up here." on All, else "Try another status." (prototype). A failed load shows ErrorState with Retry and keeps the filter. A permission error denies the workspace (useDenyOnPermissionError).',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: 'viewContacts (Contact changes)',
   },
   docs: [

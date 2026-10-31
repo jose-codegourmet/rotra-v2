@@ -11,7 +11,7 @@ export const substitutionSheetMeta = {
     'Not for swapping players before Start match: that is lineup editing on the Match queue, not a substitution.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-SUBSTITUTE › SHEETS.sub (pick and confirm steps)',
   },
   docs: [

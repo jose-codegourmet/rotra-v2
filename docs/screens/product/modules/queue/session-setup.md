@@ -2,7 +2,7 @@
 
 **Surfaces:** `Q-SETUP`, `Q-PREPARE`, `Q-DOWNLOAD`, `Q-START`.
 
-**Sources:** [sessions](../../../../business_logic/product/queue/modules/sessions/README.md), [offline rules](../../../../business_logic/product/queue/modules/offline/README.md), [financials](../../../../business_logic/product/queue/modules/financials/README.md). **Reference:** [ROTRA Queue prototype](../../../../frames/queue-app/rotra-queue.html).
+**Sources:** [sessions](../../../../business_logic/product/queue/modules/sessions/README.md), [offline rules](../../../../business_logic/product/queue/modules/offline/README.md), [financials](../../../../business_logic/product/queue/modules/financials/README.md). **Reference:** [ROTRA Queue prototype](../../../../../app/mocksups-app/queue-app/rotra-queue.html).
 
 ## Q-SETUP — Create / edit preparation wizard
 

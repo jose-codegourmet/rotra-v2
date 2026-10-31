@@ -10,7 +10,7 @@ export const nowCardMeta = {
     'On phones (≤ 700 px) the action drops below the stats at full width.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-HOME › nowCard() (.now-card.live / .now-card.next)',
   },
   docs: [

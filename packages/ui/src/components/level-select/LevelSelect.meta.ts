@@ -9,7 +9,7 @@ export const levelSelectMeta = {
     "Never pre-select a level from a self-declared band except the middle level of a join request's stated band.",
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-ASSESS › selectLevel()',
   },
   docs: ['docs/screens/product/modules/queue/players-roster.md'],

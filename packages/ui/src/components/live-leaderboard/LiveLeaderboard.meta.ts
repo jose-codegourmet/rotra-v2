@@ -12,7 +12,7 @@ export const liveLeaderboardMeta = {
     'variant "record" is the official standings table on a session record\'s Results tab (Q-HISTORY): #, Player (picture button named "NAME. View profile"), W, L, Games, top three highlighted, no heading, level or win %. Its empty card reads "No counted games were recorded in this session." The container renders the "Standings" heading with Result slides and Download images.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen:
       'Q-LEADERBOARD › boardPane() (.lb, .lb-wrap, .rank); record: Q-HISTORY › histResultsPane() (table.lb)',
   },

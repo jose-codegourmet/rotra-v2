@@ -4,7 +4,7 @@ export const inventorySectionMeta = {
   description: 'Club inventory inventory section with manual stock control.',
   usage: ['Use for operator inventory; stock is never deducted automatically.'],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'viewInventory; SHEETS.invItem',
   },
   docs: ['docs/screens/product/modules/queue/financials-inventory.md'],

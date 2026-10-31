@@ -9,7 +9,7 @@ export const clubHeaderMeta = {
     'Create session is full width on phones (≤ 640 px).',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-HOME › viewHome() › .club-head',
   },
   docs: ['docs/screens/product/modules/queue/access-home.md'],

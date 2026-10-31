@@ -9,7 +9,7 @@ export const fixedRulesCardMeta = {
     'Keep the wording in step with the business docs; if a rule becomes adjustable it moves to RankingSettingsForm.',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: 'A-RANK-CONFIG › viewConfig() Fixed rules',
   },
   docs: [

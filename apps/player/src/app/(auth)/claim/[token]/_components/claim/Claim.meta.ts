@@ -9,7 +9,7 @@ export const claimMeta = {
     "'This isn't me' writes nothing; completing signs the player in.",
   ],
   prototype: {
-    file: 'docs/frames/player-app/rotra-player.html',
+    file: 'app/mocksups-app/player-app/rotra-player.html',
     screen: 'viewClaim, viewClaimDone, ACT.claimYes/claimNo/claimBack/claimCheck',
   },
   docs: [

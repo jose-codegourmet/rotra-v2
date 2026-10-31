@@ -1,6 +1,6 @@
 # ROTRA ecosystem v1
 
-**Status:** Target business behavior agreed October 25, 2026, updated October 26, 2026 from the [ROTRA Queue prototype](../../frames/queue-app/rotra-queue.html); not verified as implemented.
+**Status:** Target business behavior agreed October 25, 2026, updated October 26, 2026 from the [ROTRA Queue prototype](../../../app/mocksups-app/queue-app/rotra-queue.html); not verified as implemented.
 
 ROTRA helps clubs run badminton sessions and gives players a lasting identity and performance record. V1 focuses on operating a whole club session with little administrative work, including when the venue loses internet.
 

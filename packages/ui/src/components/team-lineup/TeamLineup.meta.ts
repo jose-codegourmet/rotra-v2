@@ -10,7 +10,7 @@ export const teamLineupMeta = {
     'Do not use on queue cards (MatchCard draws its own faces) or for picking players (Q-MANUAL slots).',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-SUGGEST › .qteams with faceTeam() (.sg-team, .vs)',
   },
   docs: [

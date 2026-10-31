@@ -9,7 +9,7 @@ export const chooseDateSheetMeta = {
     'allowedPastDate keeps a saved past date selectable when editing.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-SETUP › SHEETS.datePicker (.dp-*)',
   },
   docs: ['docs/screens/product/modules/queue/session-setup.md'],

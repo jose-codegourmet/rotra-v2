@@ -9,7 +9,7 @@ type IconDef = {
   body: ReactNode
 }
 
-// Copied from the prototypes' icon sets (`const I = { … }` in each docs/frames/*.html). Nav icons
+// Copied from the prototypes' icon sets (`const I = { … }` in each app/mocksups-app/*.html). Nav icons
 // (`nav-*`) are the 20 px rail and dock icons; the rest are inline 13–18 px icons.
 export const ICONS = {
   plus: { size: 20, strokeWidth: 2, body: <path d="M12 5v14M5 12h14" /> },

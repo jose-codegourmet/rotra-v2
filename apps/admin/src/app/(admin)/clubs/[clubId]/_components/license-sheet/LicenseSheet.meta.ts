@@ -15,7 +15,7 @@ export const licenseSheetMeta = {
     'While saving, after a lost reply and while checking, the sheet cannot be closed; a ref keeps repeated taps to one request.',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: 'SHEETS.license; licStart, licCommit, ACT.licReview / licEdit / licSave / licCheck',
   },
   docs: ['docs/screens/product/modules/admin/clubs-licenses.md', 'docs/screens/product/dialogs.md'],

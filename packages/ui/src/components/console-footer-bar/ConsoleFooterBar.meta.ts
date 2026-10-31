@@ -10,7 +10,7 @@ export const consoleFooterBarMeta = {
     'Inside the operator shell the bar starts at the rail edge through the --rail custom property. At 900 px and below it is hidden because the dock carries Session done.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-CONSOLE › viewConsole() .footer-bar.dock-dup',
   },
   docs: [

@@ -9,7 +9,7 @@ export const clubLogoMeta = {
     'sm in directory rows, lg in the club detail hero. accent is the prototype highlight Lahug Smash Club uses.',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: 'A-CLUBS › viewClubs() › logo(); .logo, .logo.lg, .logo.acc',
   },
   docs: ['docs/screens/product/modules/admin/clubs-licenses.md'],

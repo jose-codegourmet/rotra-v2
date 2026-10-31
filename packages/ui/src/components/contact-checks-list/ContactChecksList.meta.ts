@@ -11,7 +11,7 @@ export const contactChecksListMeta = {
     'Pass/fail is an icon plus the sentence itself, never colour alone.',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: "A-CONTACT-REVIEW › viewReview() › 'Checks before approving' (checks())",
   },
   docs: [

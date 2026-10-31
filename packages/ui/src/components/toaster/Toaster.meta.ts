@@ -10,7 +10,7 @@ export const toasterMeta = {
     'Keep copy short and from the prototype; toasts disappear after 3.6 s.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Shared styles › .toasts, .toast; toast()',
   },
   docs: ['docs/screens/product/experience-contract.md#accessibility-and-interaction'],

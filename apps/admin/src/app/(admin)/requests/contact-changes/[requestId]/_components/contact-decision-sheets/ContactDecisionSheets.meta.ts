@@ -12,7 +12,7 @@ export const contactDecisionSheetsMeta = {
     "Offline (useAdminConnectivity), the confirm sends nothing and shows ADMIN_OFFLINE_ERROR in the sheet; each refused tap re-arms ConfirmSheet's one-commit guard. While saving the sheet can't be closed.",
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: 'SHEETS.approve / decline; ACT.doApprove / doDecline',
   },
   docs: [

@@ -11,7 +11,7 @@ export const waitlistPanelMeta = {
     'Pass loading while the roster query runs: the panel shows Skeleton rows in place of the list.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-PREPARE › Waitlist tab (waitlistPanel())',
   },
   docs: [

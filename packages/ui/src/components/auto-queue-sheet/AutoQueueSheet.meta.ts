@@ -10,7 +10,7 @@ export const autoQueueSheetMeta = {
     'Do not use it to add one match; that is Add match, Make match or Suggest.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-AUTO › SHEETS.auto',
   },
   docs: [

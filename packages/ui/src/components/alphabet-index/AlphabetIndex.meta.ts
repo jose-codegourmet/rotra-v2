@@ -9,7 +9,7 @@ export const alphabetIndexMeta = {
     'onJump should move focus to that LetterGroup heading (letterHeadingId) so keyboard and screen-reader users land there.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-SAVED-PLAYERS › .az, .az-l',
   },
   docs: ['docs/screens/product/modules/queue/access-home.md'],

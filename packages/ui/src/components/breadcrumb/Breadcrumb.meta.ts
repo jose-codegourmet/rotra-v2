@@ -8,7 +8,7 @@ export const breadcrumbMeta = {
     'Pass href with linkAs={Link} in apps, or onClick.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Saved players / Venues › .crumb; rotra-admin.html › .back',
   },
   docs: ['docs/screens/product/navigation.md'],

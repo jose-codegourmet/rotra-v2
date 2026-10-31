@@ -8,9 +8,9 @@
 
 The prototype's agreed behavior is written up in:
 
-- [Business logic](../../business_logic/product/README.md): rules, with Queue under `queue/modules/`
-- [Screens](../../screens/product/README.md): screen contracts, with Queue under `modules/queue/`
-- [Database design](../../database_design/product/README.md): proposed tables
+- [Business logic](../../../docs/business_logic/product/README.md): rules, with Queue under `queue/modules/`
+- [Screens](../../../docs/screens/product/README.md): screen contracts, with Queue under `modules/queue/`
+- [Database design](../../../docs/database_design/product/README.md): proposed tables
 
 When the prototype and the docs disagree, the docs' `open-decisions.md` files say what is still undecided. Nothing here is implemented in the apps.
 

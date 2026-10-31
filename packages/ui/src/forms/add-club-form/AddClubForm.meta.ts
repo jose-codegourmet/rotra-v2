@@ -13,7 +13,7 @@ export const addClubFormMeta = {
     'onDirtyChange reports whether any field holds text (the price mode alone does not count); the container asks "Discard this club?" before closing.',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: 'A-ADD-CLUB › SHEETS.addClub (form step), addErrors(), slugOf(), genPass()',
   },
   docs: [

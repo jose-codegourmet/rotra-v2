@@ -11,7 +11,7 @@ export const tabsMeta = {
     'For filters that do not switch whole views use SegmentedControl.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Live console › Session / Queue / Players / Leaderboard tabs (.tabs)',
   },
   docs: ['docs/screens/product/experience-contract.md#layout-and-device-behavior'],

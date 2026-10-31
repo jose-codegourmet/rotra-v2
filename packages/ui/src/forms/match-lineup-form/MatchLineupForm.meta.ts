@@ -12,7 +12,7 @@ export const matchLineupFormMeta = {
     'The slot columns sit in a SwapSidesArea with allowEmptyTargets and each slot is a SwappablePlayer: drag a player onto a slot on the other team (an empty one too), or press left or right arrow on a filled slot, to switch sides. The change lives in the form until Save lineup.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen:
       'SHEETS.editor (.slots, .slot-col, .slot-btn; ACT.openEditor, ACT.editorFormat, ACT.saveEditor)',
   },

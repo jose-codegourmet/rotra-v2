@@ -11,7 +11,7 @@ export const invalidSessionNoticeMeta = {
     'Games in the record show "—" and players show "Not counted"; this notice explains why.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'viewHistory › histResultsPane / histNightPane for the invalid Tuesday Drills record',
   },
   docs: [

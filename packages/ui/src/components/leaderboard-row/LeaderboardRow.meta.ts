@@ -8,7 +8,10 @@ export const leaderboardRowMeta = {
     'Use inside LeaderboardList for the overall ROTRA leaderboard.',
     'Pass isMe for the signed-in player.',
   ],
-  prototype: { file: 'docs/frames/player-app/rotra-player.html', screen: 'P-LEADERBOARD › lbRow' },
+  prototype: {
+    file: 'app/mocksups-app/player-app/rotra-player.html',
+    screen: 'P-LEADERBOARD › lbRow',
+  },
   docs: ['docs/screens/product/modules/player-information/ranking-history.md'],
   variants: ['default', 'me', 'medal-1', 'medal-2', 'medal-3'],
   related: ['LeaderboardList', 'Avatar'],

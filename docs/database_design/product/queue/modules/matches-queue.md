@@ -1,6 +1,6 @@
 # Shared queue, matches, and substitutions
 
-**Status:** Proposed data model implementing confirmed business outcomes. Updated October 26, 2026 for the [ROTRA Queue prototype](../../../../frames/queue-app/rotra-queue.html).
+**Status:** Proposed data model implementing confirmed business outcomes. Updated October 26, 2026 for the [ROTRA Queue prototype](../../../../../app/mocksups-app/queue-app/rotra-queue.html).
 
 ## `matches`
 

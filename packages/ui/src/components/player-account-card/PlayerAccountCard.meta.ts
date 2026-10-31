@@ -10,7 +10,7 @@ export const playerAccountCardMeta = {
     'Never shows a password, token or registration (claim) link.',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: 'A-PLAYER-DETAIL › viewPlayer() › Account',
   },
   docs: [

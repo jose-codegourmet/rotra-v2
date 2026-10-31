@@ -123,7 +123,7 @@ export const matchCardMeta = {
     'Use for every match in the waiting queue and on a court.',
     'Do not use for finished matches. Use MatchRecordRow instead.',
   ],
-  prototype: { file: 'docs/frames/queue-app/rotra-queue.html', screen: 'Live console › Queue tab' },
+  prototype: { file: 'app/mocksups-app/queue-app/rotra-queue.html', screen: 'Live console › Queue tab' },
   docs: ['docs/screens/product/modules/queue/match-queue.md'],
   variants: ['waiting', 'ready', 'blocked', 'needs-attention', 'active'],
   related: ['PlayerChip', 'CourtCard'],

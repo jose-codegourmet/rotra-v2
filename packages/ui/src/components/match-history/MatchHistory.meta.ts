@@ -6,7 +6,7 @@ export const matchHistoryMeta = {
     'Prototype placeholder for open public history/social visibility: show partner and opponent names, with fun and partial games in a separate tab.',
   ],
   prototype: {
-    file: 'docs/frames/player-app/rotra-player.html',
+    file: 'app/mocksups-app/player-app/rotra-player.html',
     screen: 'Games and Profile › Recent games',
   },
   docs: ['docs/screens/product/modules/player-information/ranking-history.md'],

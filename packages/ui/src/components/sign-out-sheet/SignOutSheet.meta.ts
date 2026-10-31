@@ -9,7 +9,7 @@ export const signOutSheetMeta = {
     'Copy is fixed by dialogs.md; Stay signed in receives focus when it opens.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'SHEETS.signOut',
   },
   docs: ['docs/screens/product/dialogs.md'],

@@ -10,7 +10,7 @@ export const addClubReviewMeta = {
     'While isPending, Create club reads "Creating…" and both buttons are disabled; serverError shows above them and nothing was created.',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: 'A-ADD-CLUB › SHEETS.addClub (review step)',
   },
   docs: [

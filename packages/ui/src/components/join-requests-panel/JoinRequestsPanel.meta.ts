@@ -12,7 +12,7 @@ export const joinRequestsPanelMeta = {
     'Pass loading while the roster query runs (the live console sheet): Skeleton rows, never fake names.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen:
       'Q-PREPARE › requestsPanel() (#join-requests, .req-row) and Q-CONSOLE › SHEETS.requests',
   },

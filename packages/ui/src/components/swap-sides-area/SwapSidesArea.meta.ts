@@ -11,7 +11,7 @@ export const swapSidesAreaMeta = {
     'Do not use in active matches: they have no dragging; use the substitution sheet.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen:
       'Live console › Queue tab, Suggest, Edit lineup, Start match › swapSides()/pdLift()/pdMove()/pdEnd()',
   },

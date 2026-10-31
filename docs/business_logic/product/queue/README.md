@@ -4,7 +4,7 @@
 
 The club operator runs sessions from preparation to confirmed results. Players do not operate the queue, reserve their own slots, or need an account to participate.
 
-**Reference prototype:** [`docs/frames/queue-app/rotra-queue.html`](../../../frames/queue-app/rotra-queue.html), also published as the ROTRA Queue artifact. It is a clickable, single-file prototype with fictional data, and it is the agreed design reference for the Queue app. Where it says a detail is not decided yet, the module docs keep that detail open.
+**Reference prototype:** [`app/mocksups-app/queue-app/rotra-queue.html`](../../../../app/mocksups-app/queue-app/rotra-queue.html), also published as the ROTRA Queue artifact. It is a clickable, single-file prototype with fictional data, and it is the agreed design reference for the Queue app. Where it says a detail is not decided yet, the module docs keep that detail open.
 
 | Module | Owns |
 |---|---|

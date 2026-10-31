@@ -13,7 +13,7 @@ export const appShellMeta = {
     'Props only: no routing or data inside.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen:
       'Shell › .top, .shell, .rail (.rail-min), .dock, .nav-scrim; rotra-admin.html › .shell, .rail',
   },

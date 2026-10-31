@@ -11,7 +11,7 @@ export const replayCardMeta = {
     'Under reduced motion the court tiles switch state without a transition.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen:
       'Q-HISTORY › replayCard(), replayCourts(), replaySummary() (.replay, .rp-courts, .rp-court, .rp-bar, .rp-range)',
   },

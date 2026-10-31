@@ -10,7 +10,7 @@ export const sideRailMeta = {
     'Admin uses group labels ("Requests", "Settings"), hot counts for waiting requests, and a footer with "Signed in as" and Sign out.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen:
       'Shell › .rail, .rail-link (.on, .is-live, .count); rotra-admin.html › .rail-label, .rail-end',
   },

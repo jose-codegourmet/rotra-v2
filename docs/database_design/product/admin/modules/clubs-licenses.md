@@ -2,7 +2,7 @@
 
 **Last verified:** 2026-10-28 for club-name uniqueness and the free-club decision boundary.
 
-**Status:** Proposed schema. Updated October 27, 2026: owner-added clubs and per-club prices, from the [ROTRA Admin prototype](../../../../frames/admin-app/rotra-admin.html). Renewal and refund policies are still open.
+**Status:** Proposed schema. Updated October 27, 2026: owner-added clubs and per-club prices, from the [ROTRA Admin prototype](../../../../../app/mocksups-app/admin-app/rotra-admin.html). Renewal and refund policies are still open.
 
 ## Accounts and club identity
 

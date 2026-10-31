@@ -11,7 +11,7 @@ export const sessionRecordHeaderMeta = {
     'Do not use for the live console or the private results page (Session results · private).',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-HISTORY › viewHistory() (label, .row chips, .tiles4)',
   },
   docs: [

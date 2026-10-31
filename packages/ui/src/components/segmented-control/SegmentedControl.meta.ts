@@ -10,7 +10,7 @@ export const segmentedControlMeta = {
     'Put counts in option.count so they read as muted numbers, as the admin filters do.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Payments › Show filter; Session setup › Payment per player (.seg)',
   },
   docs: ['docs/screens/product/experience-contract.md#layout-and-device-behavior'],

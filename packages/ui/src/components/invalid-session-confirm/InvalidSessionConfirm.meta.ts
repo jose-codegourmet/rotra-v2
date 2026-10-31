@@ -11,7 +11,7 @@ export const invalidSessionConfirmMeta = {
     'Never add Reconstruct, Edit winners or a score entry here: a lost original device cannot be bypassed by typing remembered scores.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen:
       'viewHistory › Tuesday Drills (invalid session record); D-INVALID-SESSION has no prototype sheet',
   },

@@ -11,7 +11,7 @@ export const playerPoolCardMeta = {
     'For the preparation roster use RosterRow; for saved players use SavedPlayerCard.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Live console › Players › playersPane() (.pc3)',
   },
   docs: [

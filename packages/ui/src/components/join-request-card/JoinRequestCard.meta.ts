@@ -12,7 +12,7 @@ export const joinRequestCardMeta = {
     "A request is never a booking: never show a held slot. The Queue Master's review of requests is JoinRequestsPanel.",
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Public session (guest) › joinCard (.join-card)',
   },
   docs: [

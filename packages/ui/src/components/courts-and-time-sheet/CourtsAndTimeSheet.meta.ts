@@ -10,7 +10,7 @@ export const courtsAndTimeSheetMeta = {
     'Courts are not removed from here (that happens on the court tile), and mode, formats and the minimum are not offered during play: that is an open decision.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'SHEETS.adjust (ACT.openAdjust, ACT.quickAddCourt, ACT.extend)',
   },
   docs: [

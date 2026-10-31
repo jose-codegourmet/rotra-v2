@@ -8,7 +8,7 @@ export const setupMinimumSectionMeta = {
     "Rendered inside SessionSetupForm's FormProvider only. The estimate rule (estimateMinimum in @rotra/data) is passed in as computeEstimate.",
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-SETUP › viewSetup() part 3 (Minimum games), estimateGames()',
   },
   docs: ['docs/screens/product/modules/queue/session-setup.md'],

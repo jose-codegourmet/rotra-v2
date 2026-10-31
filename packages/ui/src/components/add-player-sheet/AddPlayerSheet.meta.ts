@@ -13,7 +13,7 @@ export const addPlayerSheetMeta = {
     'serverError keeps the card or form with what was typed (a failed save); with serverErrorReturnsToList (a duplicate, refused as a conflict) the sheet drops the card and shows the error above the list, so nobody is ever replaced.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen:
       'SHEETS.add (Saved players / Player Information / New player tabs, pick state), afterAdd()',
   },

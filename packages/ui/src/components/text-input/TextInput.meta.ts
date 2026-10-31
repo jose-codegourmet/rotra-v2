@@ -9,7 +9,10 @@ export const textInputMeta = {
     'Use inputMode and autoComplete as the screen doc says (e.g. inputMode="numeric" for money).',
     'For several lines use Textarea; for times use TimeField.',
   ],
-  prototype: { file: 'docs/frames/queue-app/rotra-queue.html', screen: 'Shared styles › .input' },
+  prototype: {
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
+    screen: 'Shared styles › .input',
+  },
   docs: ['docs/coding-conventions.md#6-forms'],
   related: ['Field', 'Textarea'],
 } satisfies ComponentMeta

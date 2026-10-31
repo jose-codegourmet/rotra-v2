@@ -10,7 +10,7 @@ export const requestedChangeCardMeta = {
     "Pass the player's nickname or first name for the Came from line.",
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: 'A-CONTACT-REVIEW › viewReview() › Requested change',
   },
   docs: [

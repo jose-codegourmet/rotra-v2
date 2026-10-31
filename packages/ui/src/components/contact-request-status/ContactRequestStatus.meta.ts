@@ -8,7 +8,7 @@ export const contactRequestStatusMeta = {
     "Only for the request's owner: it shows their current and new phone or email.",
   ],
   prototype: {
-    file: 'docs/frames/player-app/rotra-player.html',
+    file: 'app/mocksups-app/player-app/rotra-player.html',
     screen: 'Privacy and contact (requestCard, REQ), privatePanel() request chip',
   },
   docs: [

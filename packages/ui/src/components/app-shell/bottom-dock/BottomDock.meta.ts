@@ -9,7 +9,7 @@ export const bottomDockMeta = {
     "main is the screen's one session action: Create session, Continue session, Start session or Session done. When the dock shows it, hide the page's own bottom bar button on phones.",
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Phone dock (.dock, .dock-btn, .dock-main)',
   },
   docs: ['docs/screens/product/navigation.md#product-navigation'],

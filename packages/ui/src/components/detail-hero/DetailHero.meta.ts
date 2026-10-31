@@ -10,7 +10,7 @@ export const detailHeroMeta = {
     'The title is the page h1 and wraps anywhere, so long names never push the page sideways.',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: 'A-CLUB-DETAIL › viewClub() .hero; A-PLAYER-DETAIL › viewPlayer() .hero',
   },
   docs: [

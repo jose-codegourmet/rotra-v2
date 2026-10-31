@@ -9,7 +9,7 @@ export const publicPreviewBannerMeta = {
     'Never render it on the real public page. The prototype-only "Guest view (prototype)" copy is not part of the product.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Public page › viewPublic() › .proto-bar',
   },
   docs: ['docs/screens/product/modules/queue/public-session.md'],

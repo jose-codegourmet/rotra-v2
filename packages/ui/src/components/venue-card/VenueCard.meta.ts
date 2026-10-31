@@ -9,7 +9,7 @@ export const venueCardMeta = {
     'Lay cards out in a grid of repeat(auto-fill, minmax(min(100%, 280px), 1fr)) as the prototype does.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-VENUES › viewVenues() (.venue-card)',
   },
   docs: ['docs/screens/product/modules/queue/access-home.md'],

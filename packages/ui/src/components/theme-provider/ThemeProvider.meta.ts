@@ -10,7 +10,7 @@ export const themeProviderMeta = {
     'Read or change the theme with useTheme(); for the top-bar control use ThemeToggle.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Script › THEME_KEY, toggleTheme (same in rotra-player.html and rotra-admin.html)',
   },
   docs: ['docs/architecture.md#6-styling-theming-and-motion'],

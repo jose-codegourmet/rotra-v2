@@ -2,7 +2,7 @@
 
 **Surfaces:** `Q-DISPATCH`, `Q-CHOOSE-MATCH`, `Q-ACTIVE-MATCH`, `Q-SUBSTITUTE`, `Q-MATCH-DONE`, `Q-INVALID-MATCH`, `Q-MATCH-RECORD`.
 
-**Source:** [match rules](../../../../business_logic/product/queue/modules/matches/README.md). Dialog language: [shared confirmations](../../dialogs.md). **Reference:** [ROTRA Queue prototype](../../../../frames/queue-app/rotra-queue.html).
+**Source:** [match rules](../../../../business_logic/product/queue/modules/matches/README.md). Dialog language: [shared confirmations](../../dialogs.md). **Reference:** [ROTRA Queue prototype](../../../../../app/mocksups-app/queue-app/rotra-queue.html).
 
 ## Q-DISPATCH — Start a waiting match
 

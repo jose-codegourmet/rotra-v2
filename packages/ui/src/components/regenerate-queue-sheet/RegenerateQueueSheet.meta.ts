@@ -10,7 +10,7 @@ export const regenerateQueueSheetMeta = {
     'Pass the failure reason as error: the previous queue was restored and nothing is claimed as rebuilt.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-REGENERATE › SHEETS.regen',
   },
   docs: [

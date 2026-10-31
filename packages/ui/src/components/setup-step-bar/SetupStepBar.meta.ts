@@ -9,7 +9,7 @@ export const setupStepBarMeta = {
     'On phones (≤ 520 px) the labels hide; the card below names the step.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-SETUP › viewSetup() .wiz-steps',
   },
   docs: ['docs/screens/product/modules/queue/session-setup.md'],

@@ -10,7 +10,7 @@ export const publicSessionDetailsMeta = {
     'No fees, costs or payment states: the props have no such fields. The venue is the session venue, never the club founding location.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Public page › viewPublic() › Details tab (.card.stack > dl.kv)',
   },
   docs: [

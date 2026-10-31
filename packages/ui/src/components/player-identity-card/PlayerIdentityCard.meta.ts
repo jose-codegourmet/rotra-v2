@@ -9,7 +9,7 @@ export const playerIdentityCardMeta = {
     'Clipboard handling and toasts belong to the container.',
   ],
   prototype: {
-    file: 'docs/frames/player-app/rotra-player.html',
+    file: 'app/mocksups-app/player-app/rotra-player.html',
     screen: 'Profile › identity card (.hero, .rtr-line, .acts)',
   },
   docs: ['docs/screens/product/modules/player-information/profile.md'],

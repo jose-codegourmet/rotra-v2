@@ -4,7 +4,7 @@ export const findPlayerMeta = {
   description: 'Looks up an exact public RTR ID and replaces the route with the matching profile.',
   usage: ['Never fall back to matching another player by name.'],
   prototype: {
-    file: 'docs/frames/player-app/rotra-player.html',
+    file: 'app/mocksups-app/player-app/rotra-player.html',
     screen: 'FORM.find / Profile not found',
   },
   docs: ['docs/screens/product/modules/player-information/ranking-history.md'],

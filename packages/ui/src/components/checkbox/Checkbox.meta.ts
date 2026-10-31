@@ -9,7 +9,7 @@ export const checkboxMeta = {
     'With React Hook Form pass checked={field.value} and onChange={field.onChange}.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Publish results › Standings / Awards / Include Off Day (.check)',
   },
   docs: ['docs/screens/product/experience-contract.md#layout-and-device-behavior'],

@@ -1,6 +1,6 @@
 # Session financials and club inventory
 
-**Status:** Agreed v1 target rules, added October 26, 2026 from the [ROTRA Queue prototype](../../../../../frames/queue-app/rotra-queue.html). This replaces the earlier v1 exclusion of shuttle pricing, cost estimates, and paid/unpaid tracking. ROTRA still never collects or moves money.
+**Status:** Agreed v1 target rules, added October 26, 2026 from the [ROTRA Queue prototype](../../../../../../app/mocksups-app/queue-app/rotra-queue.html). This replaces the earlier v1 exclusion of shuttle pricing, cost estimates, and paid/unpaid tracking. ROTRA still never collects or moves money.
 
 ## Purpose
 

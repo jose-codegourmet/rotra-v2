@@ -9,7 +9,10 @@ export const accessGateMeta = {
     'status="unverified" when the license could not be checked; it never says Expired. Its body copy ("ROTRA couldn\'t check your club\'s license right now.") is a PLACEHOLDER: the offline entitlement mechanism is an open decision (business open-decisions › Licensing).',
     'Pass activeSession and onContinueActiveSession when the club has a live session; it may finish and sync it, not start another.',
   ],
-  prototype: { file: 'docs/frames/queue-app/rotra-queue.html', screen: 'Q-ACCESS › viewAccess()' },
+  prototype: {
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
+    screen: 'Q-ACCESS › viewAccess()',
+  },
   docs: [
     'docs/screens/product/modules/queue/access-home.md',
     'docs/business_logic/product/admin/modules/clubs-licenses/README.md#expiry',

@@ -10,7 +10,7 @@ export const clubCellMeta = {
     'The running-session dot stops pulsing under reduced motion.',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: 'A-CLUBS › viewClubs() › td[data-label="Club"] .who',
   },
   docs: ['docs/screens/product/modules/admin/clubs-licenses.md'],

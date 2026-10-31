@@ -2,7 +2,7 @@
 
 **Surfaces:** `Q-CONSOLE`, `Q-COURTS`, `Q-POOL`, `Q-LEADERBOARD`, `Q-SESSION-ADJUST`, `Q-ADD-COURT`.
 
-**Sources:** [session rules](../../../../business_logic/product/queue/modules/sessions/README.md), [queue rules](../../../../business_logic/product/queue/modules/queueing/README.md), [results](../../../../business_logic/product/queue/modules/results/README.md). **Reference:** [ROTRA Queue prototype](../../../../frames/queue-app/rotra-queue.html).
+**Sources:** [session rules](../../../../business_logic/product/queue/modules/sessions/README.md), [queue rules](../../../../business_logic/product/queue/modules/queueing/README.md), [results](../../../../business_logic/product/queue/modules/results/README.md). **Reference:** [ROTRA Queue prototype](../../../../../app/mocksups-app/queue-app/rotra-queue.html).
 
 ## Q-CONSOLE — Operator workspace
 

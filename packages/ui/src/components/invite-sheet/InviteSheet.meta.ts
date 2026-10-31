@@ -10,7 +10,7 @@ export const inviteSheetMeta = {
     'The container toasts after onCopy.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Invite sheet (invite(sh))',
   },
   docs: ['docs/screens/product/modules/queue/access-home.md'],

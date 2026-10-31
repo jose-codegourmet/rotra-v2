@@ -10,7 +10,7 @@ export const playerProfileSheetMeta = {
     'The phone number is never a prop: pass only phoneHidden. Invite shows for guests and unclaimed profiles.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Player profile sheet (profile(sh))',
   },
   docs: [

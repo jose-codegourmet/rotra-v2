@@ -7,9 +7,9 @@ are being rebuilt from scratch on mock data. The Foundation epic is scaffolding 
 
 | Product | App | Design reference |
 |---|---|---|
-| Queue: clubs run sessions, courts, and the shared queue | `apps/queue` | [rotra-queue.html](docs/frames/queue-app/rotra-queue.html) |
-| Player Information: profiles, shared rank, leaderboard | `apps/player` | [rotra-player.html](docs/frames/player-app/rotra-player.html) |
-| Admin: clubs, licenses, players, settings | `apps/admin` | [rotra-admin.html](docs/frames/admin-app/rotra-admin.html) |
+| Queue: clubs run sessions, courts, and the shared queue | `apps/queue` | [rotra-queue.html](app/mocksups-app/queue-app/rotra-queue.html) |
+| Player Information: profiles, shared rank, leaderboard | `apps/player` | [rotra-player.html](app/mocksups-app/player-app/rotra-player.html) |
+| Admin: clubs, licenses, players, settings | `apps/admin` | [rotra-admin.html](app/mocksups-app/admin-app/rotra-admin.html) |
 
 Shared packages: `@rotra/ui` (components + Storybook), `@rotra/data` (types, mocks, hooks),
 `@rotra/schema` (Zod fields), `@rotra/config` (tsconfig + tokens), `@rotra/db` (Prisma, later).
@@ -66,3 +66,5 @@ Next.js 16 (App Router) · React 19.2 · TypeScript 5 · Tailwind CSS 4 + shadcn
 TanStack Table v8 · React Hook Form + Zod · Redux Toolkit · Motion · Storybook · Turborepo + pnpm ·
 Biome · Supabase + Prisma (later). Details: [architecture](docs/architecture.md),
 [coding conventions §1](docs/coding-conventions.md#1-stack).
+
+The canonical editable prototypes live in [app/mocksups-app](app/mocksups-app/README.md). Run `nvm use && pnpm mockups` to serve them independently on port 3003.

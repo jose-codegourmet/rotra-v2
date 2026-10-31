@@ -11,7 +11,7 @@ export const exportImagesSheetMeta = {
     'Images are files for the operator to share. No automatic posting or social login.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'SHEETS.export (ACT.openExport)',
   },
   docs: [

@@ -10,7 +10,7 @@ export const iconButtonMeta = {
     'Usually variant="ghost" size="xs" in top bars and sheet headers, as in the prototypes.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Shared styles › .icon-btn (top bar menu, theme switch, sheet close)',
   },
   docs: ['docs/screens/product/experience-contract.md#accessibility-and-interaction'],

@@ -11,7 +11,7 @@ export const playerPickerSheetMeta = {
     'The filter and search live inside the sheet and reset when it unmounts; render it only while open.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'pickerSheet() (.pick-grid, .seg), opened from SHEETS.editor',
   },
   docs: [

@@ -9,7 +9,7 @@ export const cardMeta = {
     'padding="row" holds one ListRow; padding="none" for tables and edge-to-edge lists.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Shared styles › .card (.hl, .li); rotra-admin.html › .card.warnc',
   },
   variants: ['default', 'highlight', 'warn', 'padding:default', 'padding:row', 'padding:none'],

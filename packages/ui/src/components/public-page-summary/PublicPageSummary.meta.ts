@@ -10,7 +10,7 @@ export const publicPageSummaryMeta = {
     'Do not use on the public page itself: that page is built from PublicSessionHero, PublicSessionDetails, PublicParticipants and PublicResultsSection.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-HISTORY › histPublicPane() (.between, .grid2 .card.stack, .pgrid)',
   },
   docs: [

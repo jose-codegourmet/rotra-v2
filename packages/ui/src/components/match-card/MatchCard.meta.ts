@@ -12,7 +12,7 @@ export const matchCardMeta = {
     'With swappable inside a SwapSidesArea, each player can be dragged onto the other team or moved across with the arrow keys; the area reports the swap.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-QUEUE › queueCard() (.qtile, .qt-head, .qfaces, .status-line)',
   },
   docs: [

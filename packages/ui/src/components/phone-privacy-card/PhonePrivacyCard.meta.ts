@@ -7,7 +7,7 @@ export const phonePrivacyCardMeta = {
     'Use on P-PHONE-PRIVACY. Pass the saved value, never an optimistic one; the switch is disabled while saving.',
   ],
   prototype: {
-    file: 'docs/frames/player-app/rotra-player.html',
+    file: 'app/mocksups-app/player-app/rotra-player.html',
     screen: 'Privacy and contact (viewAccount)',
   },
   docs: [

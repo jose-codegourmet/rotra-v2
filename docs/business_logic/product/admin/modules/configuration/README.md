@@ -2,7 +2,7 @@
 
 **Status:** Confirmed v1 target scope.
 
-The platform owner manages feature flags in Admin. Updated October 27, 2026 from the [ROTRA Admin prototype](../../../../../frames/admin-app/rotra-admin.html):
+The platform owner manages feature flags in Admin. Updated October 27, 2026 from the [ROTRA Admin prototype](../../../../../../app/mocksups-app/admin-app/rotra-admin.html):
 
 - The catalog starts empty. The platform owner creates each flag with **Add flag**.
 - A flag has a **name** (unique, up to 50 characters), a **key** the apps' code checks (suggested from the name; lowercase letters, numbers and underscores, starting with a letter, 3–40 characters, unique, fixed once saved), a **description** of what it does, and an on/off value.

@@ -2,7 +2,7 @@
 
 **Last verified:** 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
-**Status:** Deliberately unresolved. These are not additional approved requirements and are not a new questionnaire. Updated October 26, 2026: items the [ROTRA Queue prototype](../../frames/queue-app/rotra-queue.html) settled are listed under [Settled by the prototype](#settled-by-the-prototype). Updated October 27, 2026: items the platform owner settled with the [ROTRA Admin prototype](../../frames/admin-app/rotra-admin.html) are listed under [Settled by the Admin prototype](#settled-by-the-admin-prototype).
+**Status:** Deliberately unresolved. These are not additional approved requirements and are not a new questionnaire. Updated October 26, 2026: items the [ROTRA Queue prototype](../../../app/mocksups-app/queue-app/rotra-queue.html) settled are listed under [Settled by the prototype](#settled-by-the-prototype). Updated October 27, 2026: items the platform owner settled with the [ROTRA Admin prototype](../../../app/mocksups-app/admin-app/rotra-admin.html) are listed under [Settled by the Admin prototype](#settled-by-the-admin-prototype).
 
 The product direction is sufficiently defined for documentation. Resolve the relevant items during focused design of each module, rather than reopening the whole business interview. Existing code or old docs must not silently supply answers where they conflict with v1.
 
@@ -82,7 +82,7 @@ These were open or unspecified before October 26, 2026.
 
 ## Settled by the Admin prototype
 
-Decided by the platform owner on October 27, 2026, while reviewing the [ROTRA Admin prototype](../../frames/admin-app/rotra-admin.html).
+Decided by the platform owner on October 27, 2026, while reviewing the [ROTRA Admin prototype](../../../app/mocksups-app/admin-app/rotra-admin.html).
 
 | Area | Decision |
 |---|---|

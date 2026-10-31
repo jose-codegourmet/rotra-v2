@@ -1,6 +1,6 @@
 # Dialog and confirmation contracts
 
-**Status:** Proposed copy and interaction for agreed irreversible/important actions. Exact visual styling is implementation work. Updated October 26, 2026: copy below matches the [ROTRA Queue prototype](../../frames/queue-app/rotra-queue.html), where every dialog is a sheet.
+**Status:** Proposed copy and interaction for agreed irreversible/important actions. Exact visual styling is implementation work. Updated October 26, 2026: copy below matches the [ROTRA Queue prototype](../../../app/mocksups-app/queue-app/rotra-queue.html), where every dialog is a sheet.
 
 Removing a waiting match, a roster player during preparation, a free court, or an inventory item takes effect immediately with a confirming toast and no dialog: none of them records or erases a played game.
 

@@ -9,7 +9,7 @@ export const recordCourtColumnsMeta = {
     'Invalid matches stay in their court column with the Invalid chip; substitutions read "N substitutions; partial games not counted" (MatchRecordCard).',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-HISTORY › histNightPane() (.hist-courts, .hist-col)',
   },
   docs: [

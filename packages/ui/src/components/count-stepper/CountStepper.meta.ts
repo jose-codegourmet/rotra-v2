@@ -9,7 +9,7 @@ export const countStepperMeta = {
     'The buttons disable at min and max. Inside React Hook Form pass field.value, field.onChange and field.ref.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen:
       'Club settings › Session defaults › Players per court; Session setup › Number of sessions',
   },

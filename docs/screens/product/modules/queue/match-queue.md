@@ -2,7 +2,7 @@
 
 **Surfaces:** `Q-QUEUE`, `Q-MANUAL`, `Q-PICK-PLAYER`, `Q-SUGGEST`, `Q-AUTO`, `Q-REGENERATE`.
 
-**Source:** [queueing business rules](../../../../business_logic/product/queue/modules/queueing/README.md). **Reference:** [ROTRA Queue prototype](../../../../frames/queue-app/rotra-queue.html).
+**Source:** [queueing business rules](../../../../business_logic/product/queue/modules/queueing/README.md). **Reference:** [ROTRA Queue prototype](../../../../../app/mocksups-app/queue-app/rotra-queue.html).
 
 ## Q-QUEUE — One waiting list
 

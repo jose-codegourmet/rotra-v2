@@ -2,7 +2,7 @@
 
 **Surfaces:** `Q-SESSION-DONE`, `Q-FINALIZE-PROGRESS`, `Q-INVALID-SESSION`.
 
-**Sources:** [session closure](../../../../business_logic/product/queue/modules/sessions/README.md), [results](../../../../business_logic/product/queue/modules/results/README.md), [offline integrity](../../../../business_logic/product/queue/modules/offline/README.md). **Reference:** [ROTRA Queue prototype](../../../../frames/queue-app/rotra-queue.html).
+**Sources:** [session closure](../../../../business_logic/product/queue/modules/sessions/README.md), [results](../../../../business_logic/product/queue/modules/results/README.md), [offline integrity](../../../../business_logic/product/queue/modules/offline/README.md). **Reference:** [ROTRA Queue prototype](../../../../../app/mocksups-app/queue-app/rotra-queue.html).
 
 ## Q-SESSION-DONE — Online closure review
 

@@ -10,9 +10,9 @@ It shares its tokens, type and base components with the [Queue prototype](../que
 
 ## How it relates to the docs
 
-Layout and copy choices the prototype makes are listed in [Player Information screen modules](../../screens/product/modules/player-information/README.md#reference-prototype).
+Layout and copy choices the prototype makes are listed in [Player Information screen modules](../../../docs/screens/product/modules/player-information/README.md#reference-prototype).
 
-Screen IDs follow [Player Information screens](../../screens/product/modules/player-information/README.md) (`P-LEADERBOARD`, `P-PUBLIC-PROFILE`, `P-OWN-PROFILE`, `P-EDIT-PROFILE`, `P-RANK-DETAIL`, `P-ELIGIBILITY`, `P-MATCH-HISTORY`, `P-ID-QR`, `P-PHONE-PRIVACY`, `P-CONTACT-REQUEST`, `P-LOGIN`, `P-FORGOT`, `P-RESET`, `P-CLAIM`, `P-CLAIM-STATUS`). Rules come from [Player Information business logic](../../business_logic/product/player-information/README.md). Where the docs leave something open (link visibility, playing-style options, whether fun games appear in public history, exact window boundaries), the prototype picks a placeholder and says so in its copy. Nothing here is implemented in the apps.
+Screen IDs follow [Player Information screens](../../../docs/screens/product/modules/player-information/README.md) (`P-LEADERBOARD`, `P-PUBLIC-PROFILE`, `P-OWN-PROFILE`, `P-EDIT-PROFILE`, `P-RANK-DETAIL`, `P-ELIGIBILITY`, `P-MATCH-HISTORY`, `P-ID-QR`, `P-PHONE-PRIVACY`, `P-CONTACT-REQUEST`, `P-LOGIN`, `P-FORGOT`, `P-RESET`, `P-CLAIM`, `P-CLAIM-STATUS`). Rules come from [Player Information business logic](../../../docs/business_logic/product/player-information/README.md). Where the docs leave something open (link visibility, playing-style options, whether fun games appear in public history, exact window boundaries), the prototype picks a placeholder and says so in its copy. Nothing here is implemented in the apps.
 
 ## Prototype-only parts
 

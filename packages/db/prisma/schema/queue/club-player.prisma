@@ -23,6 +23,10 @@ model ClubPlayer {
   joinRequests    SessionJoinRequest[]
   assessments     ClubAssessment[]
 
+  facts        PlayerMatchFact[]
+  summaries    ClubSessionPlayerSummary[]
+  attributions PlayerHistoryAttribution[]
+
   @@unique([clubId, id])
   @@unique([clubId, playerId])
   @@index([clubId, displayName, id])

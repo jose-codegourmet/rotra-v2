@@ -38,6 +38,11 @@ model Player {
   assessments    ClubAssessment[]             @relation("AssessmentPlayer")
   activeHold     ActivePlayerHold?            @relation("ActivePlayerHold")
 
+  facts          PlayerMatchFact[]          @relation("FactPlayer")
+  rankCurrent    PlayerRankCurrent?
+  attributions   PlayerHistoryAttribution[] @relation("AttributionPlayer")
+  projectionJobs ProjectionJob[]            @relation("ProjectionJobTarget")
+
   @@index([fullName])
   @@map("players")
 }

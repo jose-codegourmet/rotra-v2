@@ -35,6 +35,8 @@ model ClubAssessment {
   selectedBy         SessionPlayer[]  @relation("SelectedAssessment")
   device             Device?          @relation(fields: [clubId, deviceId], references: [clubId, id], onDelete: Restrict)
 
+  projectionJobs ProjectionJob[]
+
   @@unique([clubId, clubPlayerId, id])
   @@unique([clubId, sessionId, sessionPlayerId, id])
   @@index([playerIdAtAssessment, clubId, assessedAt(sort: Desc), acceptedRevision(sort: Desc)])

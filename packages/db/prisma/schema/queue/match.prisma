@@ -191,6 +191,8 @@ model MatchDecision {
   match  Match   @relation(fields: [clubId, sessionId, matchId], references: [clubId, sessionId, id], onDelete: Restrict)
   device Device? @relation(fields: [clubId, deviceId], references: [clubId, id], onDelete: Restrict)
 
+  facts PlayerMatchFact[]
+
   @@unique([clubId, sessionId, matchId])
   @@map("match_decisions")
 }

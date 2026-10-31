@@ -53,6 +53,9 @@ model SessionPlayer {
 
   paymentMark SessionPaymentMark?
 
+  facts   PlayerMatchFact[]
+  summary ClubSessionPlayerSummary?
+
   @@unique([clubId, sessionId, id])
   @@unique([sessionId, clubPlayerId])
   @@unique([sessionId, playerIdAtEntry])

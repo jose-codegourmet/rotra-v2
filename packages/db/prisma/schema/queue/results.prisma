@@ -1,0 +1,98 @@
+// Official facts and private result outputs of a valid finalization
+// (queue/modules/results-publication.md). Facts and snapshots are append-only; summaries are a
+// replaceable projection. Nothing here is public.
+
+/// One finalized match/participant record. Only a valid finalization creates facts, and only from a
+/// completed decision (trigger in SQL). Fun and partial games are kept as evidence with their flags.
+model PlayerMatchFact {
+  id                     String      @id @default(uuid(7)) @db.Uuid
+  clubId                 String      @map("club_id") @db.Uuid
+  sessionId              String      @map("session_id") @db.Uuid
+  matchId                String      @map("match_id") @db.Uuid
+  sessionPlayerId        String      @map("session_player_id") @db.Uuid
+  clubPlayerId           String      @map("club_player_id") @db.Uuid
+  /// Historical snapshot; never rewritten by later identity linkage.
+  playerIdAtFinalization String?     @map("player_id_at_finalization") @db.Uuid
+  playedAt               DateTime    @map("played_at") @db.Timestamptz(6)
+  format                 MatchFormat
+  team                   TeamSide
+  winningTeam            TeamSide    @map("winning_team")
+  /// Recomputed from segments at finalization, never a client flag.
+  fullParticipation      Boolean     @map("full_participation")
+  standardMatch          Boolean     @map("standard_match")
+  skillLevelSnapshotId   Int         @map("skill_level_snapshot_id") @db.SmallInt
+  /// Roster entry IDs of partners and opponents, as played.
+  partnerEntryIds        String[]    @map("partner_entry_ids") @db.Uuid
+  opponentEntryIds       String[]    @map("opponent_entry_ids") @db.Uuid
+  teamAScore             Int?        @map("team_a_score")
+  teamBScore             Int?        @map("team_b_score")
+  /// Reducer version; never permission to change a winner.
+  factVersion            Int         @map("fact_version")
+  createdAt              DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  finalization         SessionFinalization @relation(fields: [clubId, sessionId], references: [clubId, sessionId], onDelete: Restrict)
+  decision             MatchDecision       @relation(fields: [clubId, sessionId, matchId], references: [clubId, sessionId, matchId], onDelete: Restrict)
+  entry                SessionPlayer       @relation(fields: [clubId, sessionId, sessionPlayerId], references: [clubId, sessionId, id], onDelete: Restrict)
+  clubPlayer           ClubPlayer          @relation(fields: [clubId, clubPlayerId], references: [clubId, id], onDelete: Restrict)
+  playerAtFinalization Player?             @relation("FactPlayer", fields: [playerIdAtFinalization], references: [id], onDelete: Restrict)
+  skillLevelSnapshot   SkillLevel          @relation(fields: [skillLevelSnapshotId], references: [id], onDelete: Restrict)
+
+  @@unique([matchId, sessionPlayerId])
+  @@index([playerIdAtFinalization, playedAt(sort: Desc), matchId])
+  @@index([clubId, clubPlayerId, playedAt(sort: Desc)])
+  @@index([clubId, sessionId])
+  @@map("player_match_facts")
+}
+
+/// Per-entry session totals from the facts. Partial participants count nothing.
+model ClubSessionPlayerSummary {
+  id                   String   @id @default(uuid(7)) @db.Uuid
+  clubId               String   @map("club_id") @db.Uuid
+  sessionId            String   @map("session_id") @db.Uuid
+  sessionPlayerId      String   @map("session_player_id") @db.Uuid
+  clubPlayerId         String   @map("club_player_id") @db.Uuid
+  playerIdSnapshot     String?  @map("player_id_snapshot") @db.Uuid
+  fullGames            Int      @map("full_games")
+  standardGames        Int      @map("standard_games")
+  funGames             Int      @map("fun_games")
+  wins                 Int
+  losses               Int
+  skillLevelSnapshotId Int?     @map("skill_level_snapshot_id") @db.SmallInt
+  summaryVersion       Int      @map("summary_version")
+  projectedAt          DateTime @map("projected_at") @db.Timestamptz(6)
+
+  finalization SessionFinalization @relation(fields: [clubId, sessionId], references: [clubId, sessionId], onDelete: Restrict)
+  entry        SessionPlayer       @relation(fields: [clubId, sessionId, sessionPlayerId], references: [clubId, sessionId, id], onDelete: Restrict)
+  clubPlayer   ClubPlayer          @relation(fields: [clubId, clubPlayerId], references: [clubId, id], onDelete: Restrict)
+  skillLevel   SkillLevel?         @relation(fields: [skillLevelSnapshotId], references: [id], onDelete: Restrict)
+
+  @@unique([sessionId, sessionPlayerId])
+  @@unique([clubId, sessionId, sessionPlayerId])
+  @@index([clubId, clubPlayerId])
+  @@map("club_session_player_summaries")
+}
+
+/// Immutable private snapshot per session and version: standings, awards and their evidence.
+/// Off Day lives in its own column so publications can leave it out without parsing JSON.
+model SessionResultSnapshot {
+  id                 String   @id @default(uuid(7)) @db.Uuid
+  clubId             String   @map("club_id") @db.Uuid
+  sessionId          String   @map("session_id") @db.Uuid
+  version            Int
+  /// e.g. prototype-reference; final award math is pending #247.
+  calculationVersion String   @map("calculation_version")
+  standings          Json
+  /// MVP and Most Improved output with evidence.
+  awards             Json
+  /// Off Day output; private until a publish explicitly includes it.
+  offDay             Json?    @map("off_day")
+  /// Exact prior sessions used as the award baseline.
+  baselineSessionIds String[] @map("baseline_session_ids") @db.Uuid
+  generatedAt        DateTime @map("generated_at") @db.Timestamptz(6)
+
+  finalization SessionFinalization @relation(fields: [clubId, sessionId], references: [clubId, sessionId], onDelete: Restrict)
+
+  @@unique([sessionId, version])
+  @@unique([clubId, sessionId, id])
+  @@map("session_result_snapshots")
+}

@@ -278,6 +278,8 @@ from the [database design](database_design/product/README.md). Add a row here **
 | Player social link | `PlayerSocialLink` | `player_social_links` | Facebook, Instagram, YouTube or LinkedIn URL; a description, never a sign-in method |
 | Player claim link | `PlayerClaimLink` (`ClaimLink` in the mock) | `player_claim_links` | Club-issued registration link for one existing profile; shows a masked phone only |
 | Contact-change request | `PlayerContactChangeRequest` (stored record) / `ContactChangeRequest` (the player's view) | `player_contact_change_requests` | A player's request to change their login phone or email; takes effect only after Admin approval and applying. One open at a time from the Player app. `status`: `pending` · `approved` · `applying` · `applied` · `rejected` · `failed`; `source`: `app` · `owner`; a retry keeps the same `providerOperationRef`. Admin reads it as `AdminContactRequestItem` / `AdminContactRequestDetail` (player, checks, next action) |
+| History attribution | `PlayerHistoryAttribution` | `player_history_attributions` | Reviewed link from a club guest to a player so earlier valid games join their history; facts are never rewritten; revoked, never deleted |
+| Projection job | `ProjectionJob` | `projection_jobs` | Retryable work from one source (finalization, assessment, attribution or ageing), unique per source, kind and version |
 | Player rank | `PlayerRank` | `player_rank_current` | Public shared-rank projection; no numerical formula in the mock phase |
 | Club assessment | `ClubAssessment` | `club_assessments` | |
 | Inventory item | `InventoryItem` | `inventory_items` | |

@@ -76,6 +76,8 @@ model QueueSession {
 
   costEstimate SessionCostEstimate?
 
+  finalization SessionFinalization?
+
   @@unique([clubId, id])
   @@index([clubId, scheduledStartAt(sort: Desc), id])
   @@index([clubId, seriesId])

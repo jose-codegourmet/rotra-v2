@@ -238,3 +238,27 @@ close of a stream that never wrote, conflict categories and who may resolve one.
 - **Retries:** a repeated tick resolves to the same row through `source_operation_id`.
 - Estimates are saved with session setup, online only, and never enter sync operations. Plan lines read
   the live inventory price; snapshotting the unit cost is an open choice.
+
+## Group H · finalization, facts, projections, current rank (F07.16 · `20261031000900`)
+
+| Table | Keys and uniques | Checks and triggers | Scoped FKs |
+|---|---|---|---|
+| `session_finalizations` | PK `session_id` (one per session); unique `command_id`, `(club_id, session_id)` | 32-byte digests; committed ⇔ commit time + facts digest; done ⇔ completion time; failed ⇔ failed stage; **guard**: no finalization for an invalid session, never deleted, manifest/revision/policy/facts digest frozen once committed | session `(club_id, session_id)`; policy version |
+| `player_match_facts` | PK `id`; unique `(match_id, session_player_id)`; history indexes per results-publication.md | score pair both null or both ≥ 0; `standard_match` ⇔ singles/doubles; **guard**: only from a completed decision with the same winner, append-only | finalization `(club_id, session_id)`, decision `(club_id, session_id, match_id)`, roster entry, club player |
+| `club_session_player_summaries` | PK `id`; unique `(session_id, session_player_id)` | counts ≥ 0; wins + losses = full games = standard + fun | finalization, roster entry, club player |
+| `session_result_snapshots` | PK `id`; unique `(session_id, version)`, `(club_id, session_id, id)` | version > 0; **append-only**; Off Day in its own `off_day` column | finalization |
+| `projection_jobs` | PK `id`; partial uniques per source type: finalization/attribution `(source, kind, version, target_player_id)` (nulls not distinct), assessment `(source, kind, version)`, ageing `(target_player_id, kind, version, due_at)`; index `(status, next_attempt_at, id)` | exactly one source column for its `source_type`; ageing needs player + due time; done ⇔ completion time | finalization, assessment, attribution, target player |
+| `player_rank_current` | PK `player_id`; index `(leaderboard_eligible, numeric_rank desc, player_id)`, `next_recheck_at` | window end > start; counts ≥ 0; eligible ⇒ numeric rank; numeric `(12,6)` is a proposal (#247) | player, level, policy version |
+| `player_history_attributions` | PK `id`; unique `source_command_id`; partial unique live link per `(club_id, club_player_id)` | revoked ⇔ reason; never deleted | club player `(club_id, club_player_id)`, player |
+
+- **No duplicates on retry:** the finalization is keyed by session and its command ID; facts are unique
+  per (match, entry); every projection source is unique per kind and version.
+- **History survives deletion elsewhere:** facts, summaries and snapshots reference the finalization,
+  decision, roster entry and club player with `RESTRICT`, and none references a public page or an
+  auth account. Public-page and account deletion therefore cannot reach them.
+- **Projection sources stay explicit:** a job names exactly one of a finalization, an assessment, a
+  history attribution or an ageing boundary. Assessment jobs never pretend to be finalization work.
+- **Guest history:** a `player_history_attributions` row links a club guest to a player after review.
+  Facts keep `player_id_at_finalization`, original dates and outcomes; history and rank projections
+  pick the linked games up through `attribution` jobs. A mistaken link is revoked, never deleted.
+- Partial unique indexes with `NULLS NOT DISTINCT` need PostgreSQL 15 or later.

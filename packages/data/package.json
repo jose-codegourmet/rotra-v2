@@ -290,7 +290,9 @@
     "./feature-flag/useFeatureFlags": "./src/feature-flag/useFeatureFlags.ts",
     "./feature-flag/useAddFeatureFlag": "./src/feature-flag/useAddFeatureFlag.ts",
     "./feature-flag/useSetFeatureFlagValue": "./src/feature-flag/useSetFeatureFlagValue.ts",
-    "./feature-flag/usePlaceholderFeatureFlag": "./src/feature-flag/usePlaceholderFeatureFlag.ts"
+    "./feature-flag/usePlaceholderFeatureFlag": "./src/feature-flag/usePlaceholderFeatureFlag.ts",
+    "./club-player/useSavedPlayerStats": "./src/club-player/useSavedPlayerStats.ts",
+    "./fixtures/saved-player-stats": "./src/fixtures/savedPlayerStats.ts"
   },
   "scripts": {
     "lint": "biome check .",

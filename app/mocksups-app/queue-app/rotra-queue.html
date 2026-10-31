@@ -623,6 +623,16 @@ textarea.tpl { font-family: var(--mono); font-size: 13px; line-height: 1.55; min
 .logo-edit { display: flex; gap: 16px; align-items: center; }
 /* Saved players filters size to their own container (not the viewport), so they compact inside a narrow
    column, a collapsed-nav layout or a phone alike. */
+.sp-stats { min-width: 0; }
+.sp-stats-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.sp-stats-head p { margin: 0; }
+.sp-stats-controls { display: flex; gap: 8px; }
+.sp-stats-controls .btn { min-width: 44px; min-height: 44px; }
+.sp-stats-viewport { overflow-x: auto; scrollbar-width: none; scroll-snap-type: x mandatory; }
+.sp-stats-track { display: flex; gap: 12px; }
+.sp-stat { flex: 0 0 224px; min-width: 0; padding: 16px; border: 1px solid var(--border-strong); border-radius: 16px; background: var(--surface); scroll-snap-align: start; }
+.sp-stat-label { font-size: 13px; font-weight: 600; color: var(--fg2); }
+.sp-stat-value { display: block; margin-top: 8px; font-size: 32px; line-height: 1; font-weight: 800; font-variant-numeric: tabular-nums; }
 .sp-tools-wrap { container: sptools / inline-size; }
 .sp-tools { display: grid; grid-template-columns: minmax(0, 2fr) repeat(5, minmax(0, 1fr)); gap: 10px; align-items: end; }
 @container sptools (max-width: 1000px) { .sp-tools { grid-template-columns: repeat(3, minmax(0, 1fr)); } .sp-search { grid-column: 1 / -1; } }
@@ -826,7 +836,7 @@ const MODES = {
 // ---------- Seed data (fictional) ----------
 const IDENT = { registered: 'Registered', unclaimed: 'Unclaimed', guest: 'Guest', pending: 'Lookup pending' };
 function seedPlayers() {
-  const mk = (id, name, nick, identity, rtr, sugg, prior, base, phoneHidden) => ({ id, name, nick, identity, rtr, sugg, prior, base, phoneHidden: !!phoneHidden });
+  const mk = (id, name, nick, identity, rtr, sugg, prior, base, phoneHidden) => ({ id, name, nick, identity, rtr, sugg, prior, base, phoneHidden: !!phoneHidden, added: ['p18', 'p19', 'p20'].includes(id) ? Date.now() : Date.now() - (30 + Number(id.slice(1))) * 864e5 });
   return [
     mk('p1', 'Miguel Santos', 'Migs', 'registered', 'RTR-PH-CEB-031526-0001', 23, 6, 0.62, true),
     mk('p2', 'Bea Castillo', '', 'registered', 'RTR-PH-CEB-031526-0002', 19, 7, 0.55),
@@ -1903,7 +1913,7 @@ function viewAccess() {
 // Saved players: where a profile was first registered comes from the city code in its RTR ID.
 const CITY = { CEB: 'Cebu City', MNL: 'Manila', DVO: 'Davao City', ILO: 'Iloilo City' };
 const regCity = (p) => { const m = /^RTR-[A-Z]{2}-([A-Z]{3})-/.exec(p.rtr || ''); return m ? (CITY[m[1]] || m[1]) : null; };
-// Sample players have no saved "added" date, so one is derived from their id.
+// Legacy prototype records without an added date retain their display fallback.
 const addedAt = (p) => p.added || new Date().setHours(12, 0, 0, 0) - ((hashStr(p.id) % 300) + 2) * 864e5;
 const bandOf = (p) => (p.sugg == null ? 'none' : LEVELS[p.sugg].band.split(' ')[0].toLowerCase());
 const regStatus = (p) => (p.identity === 'registered' ? 'registered' : p.identity === 'unclaimed' ? 'unclaimed' : 'guest');
@@ -1924,6 +1934,45 @@ function liveState(pid) {
   const m = activeOf(s, pid);
   if (m) return { kind: 'playing', text: `Playing · ${m.courts.map((c) => courtLabel(s, c)).join(' + ')}` };
   return r.present ? { kind: 'waiting', text: 'At the session' } : { kind: 'away', text: 'Not here yet' };
+}
+function savedPlayerStats() {
+  const now = Date.now(), local = new Date(now + 8 * 3600e3);
+  const monday = Date.UTC(local.getUTCFullYear(), local.getUTCMonth(), local.getUTCDate() - (local.getUTCDay() + 6) % 7) - 8 * 3600e3;
+  const cards = [
+    ['Total players', S.players.length],
+    ['Total registered', S.players.filter((p) => p.identity === 'registered').length],
+    ['Total beginners', S.players.filter((p) => bandOf(p) === 'beginner').length],
+    ['Total intermediates', S.players.filter((p) => bandOf(p) === 'intermediate').length],
+    ['Total advanced', S.players.filter((p) => bandOf(p) === 'advanced').length],
+    ['New players this week', S.players.filter((p) => p.added >= monday && p.added <= now).length],
+  ];
+  return `<section class="sp-stats" aria-label="Saved player statistics" aria-roledescription="carousel">
+    <div class="sp-stats-head"><p class="small muted">All saved players · This week starts Monday (Asia/Manila)</p><div class="sp-stats-controls">
+      <button class="btn sm" data-act="spStatsScroll" data-d="-1" aria-label="Previous statistics" aria-controls="sp-stats-viewport">←</button>
+      <button class="btn sm" data-act="spStatsScroll" data-d="1" aria-label="Next statistics" aria-controls="sp-stats-viewport">→</button>
+    </div></div>
+    <div class="sp-stats-viewport" id="sp-stats-viewport" tabindex="0" role="group" aria-label="Statistics cards. Use left and right arrow keys."><div class="sp-stats-track">
+      ${cards.map(([label, value], i) => `<div class="sp-stat" role="group" aria-roledescription="slide" aria-label="${i + 1} of 6: ${label}"><span class="sp-stat-label">${label}</span><strong class="sp-stat-value">${value}</strong></div>`).join('')}
+    </div></div>
+  </section>`;
+}
+function setupSavedPlayerStats() {
+  const viewport = document.getElementById('sp-stats-viewport');
+  if (!viewport) return;
+  const update = () => {
+    document.querySelector('[data-act="spStatsScroll"][data-d="-1"]').disabled = viewport.scrollLeft <= 1;
+    document.querySelector('[data-act="spStatsScroll"][data-d="1"]').disabled = viewport.scrollLeft >= viewport.scrollWidth - viewport.clientWidth - 1;
+  };
+  viewport.addEventListener('scroll', update);
+  viewport.addEventListener('keydown', (event) => {
+    if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+    event.preventDefault();
+    scrollSavedPlayerStats(event.key === 'ArrowLeft' ? -1 : 1);
+  });
+  update();
+}
+function scrollSavedPlayerStats(direction) {
+  document.getElementById('sp-stats-viewport')?.scrollBy({ left: direction * 236, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
 }
 function viewPlayers() {
   if (S.licenseExpired) return viewAccess();
@@ -1952,6 +2001,7 @@ function viewPlayers() {
   return `<main class="wrap">
     <div class="crumb"><button class="btn sm ghost" data-act="go" data-to="home">${I.back} Home</button></div>
     <div><h1>Saved players</h1><p class="muted small">${S.players.length} players this club has played with</p></div>
+    ${savedPlayerStats()}
     <div class="sp-tools-wrap"><div class="sp-tools">
       <label class="field sp-search"><span>Search</span><input class="input" id="saved-search" data-bind="ui.search" data-rerender placeholder="Name or nickname" value="${esc(S.ui.search)}"></label>
       ${Object.entries(opts).map(([k, [label, choices]]) => `<label class="field"><span>${label}</span><select class="input" id="sp-${k}" data-act-change="spSet" data-k="${k}">${choices.map(([v, l]) => `<option value="${esc(v)}" ${String(f[k]) === v ? 'selected' : ''} ${k === 'live' && v !== 'all' && !live ? 'disabled' : ''}>${esc(l)}</option>`).join('')}</select></label>`).join('')}
@@ -3337,6 +3387,7 @@ const ACT = {
     save(); render(); toast(`Default entrance fee set to ${peso(S.club.entranceFee)} a person`);
   },
   useVenueFee: () => { const d = S.ui.draft; const v = S.venues.find((x) => x.id === d.venueId); if (v && v.courtFee != null) { d.courtFee = v.courtFee; render(); } },
+  spStatsScroll: (d) => scrollSavedPlayerStats(Number(d.d)),
   spClear: () => { S.ui.spf = {}; S.ui.search = ''; render(); },
   spJump: (d) => { const id = d.k === '#' ? 'num' : d.k; const sec = document.getElementById(`sp-${id}`); if (sec) { sec.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }); const h = document.getElementById(`sp-h-${id}`); if (h) h.focus({ preventScroll: true }); } },
   openProfile: (d) => openSheet({ type: 'profile', id: d.id, back: d.back ? S.ui.sheet : null }),
@@ -4044,6 +4095,7 @@ function render() {
   const page = (views[S.screen] || viewHome)();
   const html = topBar() + (hasShell() ? `<div class="shell ${navMin ? 'rail-min' : ''} ${S.ui.navOpen ? 'nav-open' : ''}">${navRail()}<div class="nav-scrim" data-act="toggleNav" aria-hidden="true"></div><div class="shell-main">${page}</div>${mobileDock()}</div>` : page) + (sh ? SHEETS[sh.type](sh) : '');
   document.getElementById('app').innerHTML = html;
+  setupSavedPlayerStats();
   document.body.style.overflow = sh ? 'hidden' : '';
   const key = sh ? `${sh.type}|${sh.step || ''}|${sh.pick ? 'p' : ''}|${sh.tab || ''}|${sh.picking ? 'k' : ''}` : null;
   if (sh && key !== lastSheetKey) {

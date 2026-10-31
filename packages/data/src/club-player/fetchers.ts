@@ -6,6 +6,7 @@ import { delay } from '../mock/latency'
 import { type MockState, readMockState } from '../mock/store'
 import { requireClubAccess } from '../mock/transaction'
 import type { ClubPlayer } from './clubPlayer.types'
+import { deriveSavedPlayerStats } from './savedPlayerStats.rules'
 export type ClubPlayerFilters = {
   search?: string
   band?: string
@@ -21,7 +22,7 @@ export function registeredCity(rtrId: string | null) {
     : null
 }
 function addedAt(player: ClubPlayer) {
-  if (player.addedAt) return player.addedAt
+  if (player.addedAt !== undefined) return player.addedAt
   const index = fixturePlayers.findIndex((p) => p.id === player.id)
   let h = 2166136261
   for (const letter of `p${index + 1}`) {
@@ -107,6 +108,13 @@ export async function getClubPlayer(id: string) {
     player = state.clubPlayers.find((p) => p.id === id && p.clubId === DEMO_CLUB_ID)
   if (!player) throw new MockError('permission', 'Player not available.')
   return clubPlayerView(state, player)
+}
+
+/** The entire club roster, never the page's filtered list. */
+export async function getSavedPlayerStats() {
+  await delay()
+  requireClubAccess()
+  return deriveSavedPlayerStats(readMockState().clubPlayers, DEMO_CLUB_ID, Date.now())
 }
 export async function createPlayerInvite(clubPlayerId: string) {
   requireOnline()

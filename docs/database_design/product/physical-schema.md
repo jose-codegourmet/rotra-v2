@@ -141,8 +141,8 @@ composite FK only accepts an assessment for this exact club, session and entry.
 | Locked levels | level-lock trigger + locked check | set at start / late entry |
 | Visitor ownership | — | pending #248; no public write here |
 
-`decided_by_device_id`, `club_assessments.device_id` and `source_operation_id` gain FKs to `devices` /
-`sync_operations` with the sync schema (F07.14).
+`decided_by_device_id` and `club_assessments.device_id` gain club-scoped FKs to `devices` in F07.12.
+`source_operation_id` stays without an FK: online commands have no `sync_operations` row.
 
 ## Queue preparation services (F07.23)
 
@@ -164,3 +164,32 @@ Q-PREPARE and Q-ROSTER commands for a verified `ClubContext`. No Route Handlers 
 Not covered yet, by dependency: cost estimates on create/edit (F07.15); assessment projection jobs and
 rank eligibility (F07.16, #247); directory/phone identity matching on add (F07.22); court-in-use checks
 on removal (match schema); the offline start reservation (#246); public join-request submission (#248).
+
+## Group E · devices, streams, operation receipts, conflicts (F07.12 · `20261031000600`)
+
+| Table | Keys and uniques | Checks and triggers | Scoped FKs |
+|---|---|---|---|
+| `devices` | PK `id`; unique `(club_id, id)` | non-blank label; revoke reason only when revoked | `club_id` → `club_accounts` |
+| `device_session_streams` | PK `id`; unique `(session_id, device_id, generation_no)`, `(club_id, session_id, id)` | generation > 0; `0 ≤ contiguous_sequence ≤ highest_received_sequence`; `sealed` ⇔ seal time, final sequence and 32-byte digest | `(club_id, session_id)`, `(club_id, device_id)` |
+| `sync_operations` | PK `id`; unique `(stream_id, sequence)`, `(club_id, session_id, id)`; index `(session_id, state, received_at)`, `(session_id, entity_type, entity_id)` | sequence > 0; 32-byte digest; processed ⇔ past `received`/`waiting`; accepted ⇔ result revision; rejected ⇔ code; **immutable envelope** trigger (no delete, no change to identity/order/payload, accepted/rejected final) | `(club_id, session_id, stream_id)` |
+| `sync_conflicts` | PK `id`; unique `(club_id, session_id, id)`; index `(session_id, state, detected_at)` | resolved ⇔ resolution time + evidence | `(club_id, session_id)`, `(club_id, resolved_by_device_id)` |
+| `sync_conflict_operations` | PK `(conflict_id, operation_id)` | **append-only** | `(club_id, session_id, conflict_id)`, `(club_id, session_id, operation_id)`: a conflict can only implicate operations from its own session |
+
+Also added: `club_assessments (club_id, device_id)` and `session_join_requests (club_id, decided_by_device_id)`
+→ `devices (club_id, id)`, so provenance from another club's device fails.
+
+**Receipts.** The client operation ID plus its payload digest is the retry key: the same ID and digest
+resolves to the stored receipt; the same ID with another digest is a `payload_mismatch` conflict and
+the trigger stops any overwrite; a different ID at a used `(stream_id, sequence)` fails the unique key.
+
+**Completeness is never asserted.** `contiguous_sequence` (all of 1..N validated) is kept apart from
+`highest_received_sequence`, so a gap stays visible; a missing or never-enrolled stream is simply
+absent, and a seal records what the device claims (final sequence + digest) without the server
+claiming it has those operations. Finalization compares seals to prefixes in a later ticket.
+
+**Ordering of FKs.** Session roots (F07.13) exist before streams. `club_assessments.source_operation_id`
+has no FK on purpose: online commands have no operation row, and no fake provenance rows are inserted.
+Typed command payloads are not generic FKs into other tables.
+
+Open (#246): enrollment and revocation, stream states (`open · sealed · revoked`), the zero-operation
+close of a stream that never wrote, conflict categories and who may resolve one.

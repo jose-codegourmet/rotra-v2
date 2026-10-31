@@ -15,7 +15,8 @@ model ClubAccount {
   updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
   revision      BigInt    @default(1)
 
-  club Club @relation(fields: [clubId], references: [id], onDelete: Restrict)
+  club    Club     @relation(fields: [clubId], references: [id], onDelete: Restrict)
+  devices Device[]
 
   @@unique([authProvider, authSubject])
   @@map("club_accounts")

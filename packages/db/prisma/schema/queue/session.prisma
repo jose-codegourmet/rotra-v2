@@ -61,15 +61,17 @@ model QueueSession {
   updatedAt           DateTime          @updatedAt @map("updated_at") @db.Timestamptz(6)
   revision            BigInt            @default(1)
 
-  club             Club                    @relation(fields: [clubId], references: [id], onDelete: Restrict)
-  venue            ClubVenue?              @relation(fields: [clubId, venueId], references: [clubId, id], onDelete: Restrict)
-  startLicenseTerm ClubLicenseTerm?        @relation(fields: [clubId, startLicenseTermId], references: [clubId, id], onDelete: Restrict)
-  reservation      ClubSessionReservation?
-  courts           SessionCourt[]
-  rosterEntries    SessionPlayer[]
-  waitlistEntries  SessionWaitlistEntry[]
-  joinRequests     SessionJoinRequest[]
-  assessments      ClubAssessment[]
+  club                 Club                    @relation(fields: [clubId], references: [id], onDelete: Restrict)
+  venue                ClubVenue?              @relation(fields: [clubId, venueId], references: [clubId, id], onDelete: Restrict)
+  startLicenseTerm     ClubLicenseTerm?        @relation(fields: [clubId, startLicenseTermId], references: [clubId, id], onDelete: Restrict)
+  reservation          ClubSessionReservation?
+  courts               SessionCourt[]
+  rosterEntries        SessionPlayer[]
+  waitlistEntries      SessionWaitlistEntry[]
+  joinRequests         SessionJoinRequest[]
+  assessments          ClubAssessment[]
+  deviceSessionStreams DeviceSessionStream[]
+  syncConflicts        SyncConflict[]
 
   @@unique([clubId, id])
   @@index([clubId, scheduledStartAt(sort: Desc), id])

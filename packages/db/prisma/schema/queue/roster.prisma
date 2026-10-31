@@ -116,7 +116,7 @@ model SessionJoinRequest {
   status            JoinRequestStatus @default(pending)
   requestedAt       DateTime          @map("requested_at") @db.Timestamptz(6)
   decidedAt         DateTime?         @map("decided_at") @db.Timestamptz(6)
-  /// Device that confirmed/declined; FK to devices arrives with the sync schema (F07.14).
+  /// Device that confirmed/declined, from the same club (scoped FK added by F07.12).
   decidedByDeviceId String?           @map("decided_by_device_id") @db.Uuid
   /// The club player created on confirm.
   clubPlayerId      String?           @map("club_player_id") @db.Uuid
@@ -126,6 +126,7 @@ model SessionJoinRequest {
 
   session    QueueSession @relation(fields: [clubId, sessionId], references: [clubId, id], onDelete: Restrict)
   clubPlayer ClubPlayer?  @relation(fields: [clubId, clubPlayerId], references: [clubId, id], onDelete: Restrict)
+  decidedBy  Device?      @relation(fields: [clubId, decidedByDeviceId], references: [clubId, id], onDelete: Restrict)
 
   @@index([sessionId, status, requestedAt])
   @@map("session_join_requests")

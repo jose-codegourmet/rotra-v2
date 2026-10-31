@@ -1,0 +1,15 @@
+// The platform owner's account. Not a multi-role admin product.
+
+model AdminAccount {
+  id           String   @id @default(uuid(7)) @db.Uuid
+  authProvider String   @map("auth_provider")
+  authSubject  String   @map("auth_subject") @db.Uuid
+  active       Boolean  @default(true)
+  displayName  String   @map("display_name")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision     BigInt   @default(1)
+
+  @@unique([authProvider, authSubject])
+  @@map("admin_accounts")
+}

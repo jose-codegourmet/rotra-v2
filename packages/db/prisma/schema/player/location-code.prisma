@@ -1,0 +1,18 @@
+// Governed founding-location registry for clubs and RTR IDs (player-information/modules/identity.md).
+// Display-name edits never change identifiers already allocated from a code.
+
+model LocationCode {
+  id          String   @id @default(uuid(7)) @db.Uuid
+  /// ISO 3166-1 alpha-2, uppercase (CHECK in SQL). Registry governance is pending #244.
+  countryCode String   @map("country_code")
+  /// Uppercase city code used in RTR IDs, e.g. CEB (CHECK in SQL).
+  cityCode    String   @map("city_code")
+  displayName String   @map("display_name")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  foundedClubs Club[]
+
+  @@unique([countryCode, cityCode])
+  @@map("location_codes")
+}

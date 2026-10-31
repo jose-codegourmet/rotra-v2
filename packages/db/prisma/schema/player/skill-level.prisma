@@ -1,0 +1,32 @@
+// The nine skill levels (decided 2026-10-26; player-information/modules/ranking.md).
+// displayOrder is an ordering only, never numerical spacing for rank math.
+
+enum SkillCategory {
+  beginner
+  intermediate
+  advanced
+
+  @@map("skill_category")
+}
+
+enum SkillBand {
+  low
+  mid
+  high
+
+  @@map("skill_band")
+}
+
+model SkillLevel {
+  id           Int           @id @db.SmallInt
+  /// Stable code, e.g. intermediate_mid.
+  code         String        @unique
+  category     SkillCategory
+  band         SkillBand
+  /// 0–8 (CHECK in SQL).
+  displayOrder Int           @unique @map("display_order") @db.SmallInt
+  label        String
+
+  @@unique([category, band])
+  @@map("skill_levels")
+}

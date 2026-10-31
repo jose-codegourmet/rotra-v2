@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./client": "./src/client/prisma.ts"
+    "./client": "./src/client/prisma.ts",
+    "./admin/club-identity": "./src/admin/club-identity.ts"
   },
   "scripts": {
     "db:generate": "prisma generate",

@@ -1,0 +1,43 @@
+// Clubs are created only by the platform owner (Add club); admin/modules/clubs-licenses.md.
+
+enum LicensePricing {
+  paid
+  free
+
+  @@map("license_pricing")
+}
+
+model Club {
+  id                      String         @id @default(uuid(7)) @db.Uuid
+  name                    String
+  /// Comparison key for the unique club name: NFKC, trimmed, collapsed whitespace, lowercased.
+  /// Written by the service (`clubNameKey`); the exact comparison is still pending #245.
+  nameKey                 String         @unique @map("name_key")
+  logoRef                 String?        @map("logo_ref")
+  foundingLocationCodeId  String         @map("founding_location_code_id") @db.Uuid
+  foundingAddress         String         @map("founding_address")
+  licensePricing          LicensePricing @map("license_pricing")
+  /// Positive centavos. Required for paid (CHECK in SQL); kept or null for free (#245).
+  licenseMonthlyMinor     Int?           @map("license_monthly_minor")
+  licenseYearlyMinor      Int?           @map("license_yearly_minor")
+  currency                String         @default("PHP") @db.Char(3)
+  /// 2–20 (CHECK in SQL).
+  defaultPlayersPerCourt  Int            @default(8) @map("default_players_per_court") @db.SmallInt
+  /// Nullable centavos ≥ 0; null means no default fee.
+  defaultEntranceFeeMinor Int?           @map("default_entrance_fee_minor")
+  description             String?
+  courtRules              String?        @map("court_rules")
+  /// null = built-in post template.
+  postTemplate            String?        @map("post_template")
+  /// Idempotency key of the Add club command.
+  sourceCommandId         String         @unique @map("source_command_id") @db.Uuid
+  createdAt               DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt               DateTime       @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision                BigInt         @default(1)
+
+  foundingLocation LocationCode @relation(fields: [foundingLocationCodeId], references: [id], onDelete: Restrict)
+  account          ClubAccount?
+
+  @@index([foundingLocationCodeId])
+  @@map("clubs")
+}

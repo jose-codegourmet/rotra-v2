@@ -1564,15 +1564,55 @@ document.addEventListener('keydown', (ev) => {
   if (ev.key === 'Escape') { if (S.ui.sheet) ACT.closeSheet(); else if (S.ui.nav) ACT.toggleNav(); }
 });
 
+// ---------- Prototype routes (same paths as apps/admin, under /admin) ----------
+let prototypeRouter;
+let prototypeReturn = null;
+let prototypeSignedIn = !!S.me;
+const adminPaths = { clubs: '/clubs', players: '/players', contacts: '/requests/contact-changes', names: '/requests/club-names', config: '/settings/ranking', flags: '/settings/feature-flags', login: '/login' };
+function prototypeBeforeRender() {
+  if (S.me && !prototypeSignedIn && prototypeReturn) { const target = prototypeReturn; prototypeReturn = null; applyPrototypeRoute(target); }
+  prototypeSignedIn = !!S.me;
+}
+function prototypePath() {
+  if (!S.me) return `/admin/login${prototypeReturn ? `?next=${encodeURIComponent(prototypeReturn.pathname + prototypeReturn.search)}` : ''}`;
+  let path = adminPaths[S.screen];
+  if (S.screen === 'club') path = `/clubs/${encodeURIComponent(S.viewId)}${S.ui.clubTab && S.ui.clubTab !== 'overview' ? `?tab=${encodeURIComponent(S.ui.clubTab)}` : ''}`;
+  if (S.screen === 'player') path = `/players/${encodeURIComponent(S.viewId)}`;
+  if (S.screen === 'review') path = `/requests/contact-changes/${encodeURIComponent(S.viewId)}`;
+  return `/admin${path || '/clubs'}`;
+}
+function applyPrototypeRoute(url) {
+  const path = url.pathname.slice('/admin'.length) || '/clubs';
+  const direct = Object.entries(adminPaths).find(([, value]) => value === path);
+  let screen = direct?.[0], id = null;
+  const detail = path.match(/^\/(clubs|players|requests\/contact-changes)\/([^/]+)$/);
+  if (detail) {
+    id = decodeURIComponent(detail[2]); screen = detail[1] === 'clubs' ? 'club' : detail[1] === 'players' ? 'player' : 'review';
+    if (!(screen === 'club' ? clubOf(id) : screen === 'player' ? playerOf(id) : reqOf(id))) return false;
+  }
+  if (!screen) return false;
+  if (!S.me && screen !== 'login') prototypeReturn = url;
+  if (screen === 'login') {
+    const next = url.searchParams.get('next');
+    if (next?.startsWith('/admin/')) prototypeReturn = new URL(next, location.origin);
+  }
+  S.screen = screen; S.viewId = id; S.ui.sheet = null; S.ui.nav = false; S.ui.pendingGo = null;
+  S.ui.clubTab = ['overview', 'license', 'pages', 'activity'].includes(url.searchParams.get('tab')) ? url.searchParams.get('tab') : 'overview';
+  if (screen !== 'config') { S.ui.cfg = null; S.ui.cfgErr = ''; S.ui.cfgConflict = false; }
+  return true;
+}
+
 // ---------- Render ----------
 let lastSheet = null;
 function render() {
+  if (prototypeRouter?.unavailable) return;
+  prototypeBeforeRender();
   const a = document.activeElement;
   const focusId = a && a.id && a !== document.body ? a.id : null;
   let sel = null;
   try { sel = a && typeof a.selectionStart === 'number' ? a.selectionStart : null; } catch (e) { sel = null; }
   let page;
-  if (!S.me) page = viewLogin();
+  if (!S.me || S.screen === 'login') page = viewLogin();
   else if (S.denied) page = viewDenied();
   else page = ({ clubs: viewClubs, club: viewClub, players: viewPlayers, player: viewPlayer, contacts: viewContacts, review: viewReview, names: viewNames, config: viewConfig, flags: viewFlags }[S.screen] || viewClubs)();
   const sh = S.ui.sheet;
@@ -1597,7 +1637,9 @@ function render() {
   }
   lastSheet = key;
   save();
+  prototypeRouter?.sync();
 }
-render();
+prototypeRouter = window.mountPrototypeRouter?.({ read: prototypePath, apply: applyPrototypeRoute, render, home: '/admin', dirty: () => S.screen === 'config' && cfgDirty(), });
+if (!prototypeRouter) render();
 })();
 </script>

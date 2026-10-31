@@ -1609,9 +1609,53 @@ document.addEventListener('keydown', (ev) => {
   if (ev.key === 'Escape' && S.ui.sheet) { ACT.closeSheet(); }
 });
 
+// ---------- Prototype routes (same paths as apps/player, under /player) ----------
+let prototypeRouter;
+let prototypeToken = 'demo';
+const playerPaths = { board: '', login: '/login', forgot: '/forgot-password', edit: '/profile/edit', id: '/profile/player-id', account: '/profile/privacy-and-contact' };
+function prototypePath() {
+  let path = playerPaths[S.screen];
+  if (['profile', 'history', 'rank'].includes(S.screen)) path = S.viewId ? `/players/${encodeURIComponent(S.viewId)}${S.screen === 'history' ? '/games' : S.screen === 'rank' ? '/rank' : ''}` : '/rank';
+  if (S.screen === 'notfound') path = `/find/${encodeURIComponent(S.ui.findId || S.viewId || 'unknown')}`;
+  if (['claim', 'claimDone', 'reset'].includes(S.screen)) path = `/${S.screen === 'reset' ? 'reset-password' : 'claim'}/${encodeURIComponent(prototypeToken)}${S.screen === 'claimDone' ? '?complete=1' : ''}`;
+  if (S.screen === 'history' && S.ui.hist === 'other') path += '?tab=other';
+  if (S.screen === 'edit' && S.ui.editTab && S.ui.editTab !== 'basics') path += `?tab=${encodeURIComponent(S.ui.editTab)}`;
+  if (S.screen === 'login' && S.ui.after && playerPaths[S.ui.after.to]) path += `?next=${encodeURIComponent('/player' + playerPaths[S.ui.after.to])}`;
+  return `/player${path ?? ''}`;
+}
+function applyPrototypeRoute(url) {
+  const path = url.pathname.slice('/player'.length);
+  const direct = Object.entries(playerPaths).find(([, value]) => value === path);
+  let screen = direct?.[0], id = null;
+  const profile = path.match(/^\/players\/([^/]+)(?:\/(rank|games))?$/);
+  const token = path.match(/^\/(claim|reset-password)\/([^/]+)$/);
+  const find = path.match(/^\/find\/([^/]+)$/);
+  if (profile) { screen = profile[2] === 'games' ? 'history' : profile[2] === 'rank' ? 'rank' : 'profile'; id = decodeURIComponent(profile[1]); if (!Object.hasOwn(S.accounts, id) && !BASE.some((p) => p.id === id)) return false; }
+  if (path === '/rank') screen = 'rank';
+  if (find) {
+    const rtr = decodeURIComponent(find[1]).toUpperCase();
+    const hit = Object.values(S.accounts).find((a) => a.rtr === rtr) || BASE.find((p) => p.rtr === rtr);
+    screen = hit ? 'profile' : 'notfound'; id = hit?.id || null; S.ui.findId = rtr;
+  }
+  if (token) { screen = token[1] === 'claim' ? (url.searchParams.get('complete') === '1' && S.accounts.u2.claimed ? 'claimDone' : 'claim') : 'reset'; prototypeToken = decodeURIComponent(token[2]); }
+  if (!screen) return false;
+  if (screen === 'login') {
+    const next = url.searchParams.get('next');
+    const target = Object.entries(playerPaths).find(([key, value]) => ['edit', 'id', 'account'].includes(key) && next === '/player' + value);
+    S.ui.after = target ? { to: target[0] } : null;
+  }
+  S.ui.hist = url.searchParams.get('tab') === 'other' ? 'other' : 'counted';
+  S.ui.editTab = EDIT_TABS.some((t) => t.id === url.searchParams.get('tab')) ? url.searchParams.get('tab') : 'basics';
+  if (['edit', 'id', 'account'].includes(screen) && !S.me) { S.ui.after = { to: screen }; screen = 'login'; }
+  S.screen = screen; S.viewId = id; S.ui.sheet = null; S.ui.pendingGo = null;
+  if (screen !== 'edit') { S.ui.edit = null; S.ui.editOrig = null; }
+  return true;
+}
+
 // ---------- Render ----------
 let lastSheet = null;
 function render() {
+  if (prototypeRouter?.unavailable) return;
   const a = document.activeElement;
   const focusId = a && a.id && a !== document.body ? a.id : null;
   let sel = null;
@@ -1633,7 +1677,9 @@ function render() {
   lastSheet = sh ? sh.type : null;
   startFire();
   save();
+  prototypeRouter?.sync();
 }
-render();
+prototypeRouter = window.mountPrototypeRouter?.({ read: prototypePath, apply: applyPrototypeRoute, render, home: '/player', dirty: () => S.screen === 'edit' && editDirty(), });
+if (!prototypeRouter) render();
 })();
 </script>

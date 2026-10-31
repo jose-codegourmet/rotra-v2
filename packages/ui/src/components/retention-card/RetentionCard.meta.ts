@@ -11,7 +11,7 @@ export const retentionCardMeta = {
     'Read-only: there is no Delete club, bulk delete or access bypass here. Deleted pages are not restored by renewing (open decision).',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: 'A-CLUB-DETAIL › Public pages › retentionCard()',
   },
   docs: [

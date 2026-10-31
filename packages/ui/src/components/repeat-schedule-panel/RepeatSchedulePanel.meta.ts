@@ -9,7 +9,7 @@ export const repeatSchedulePanelMeta = {
     'Pass `error` when every date clashes; a single non-repeating clash uses ClashNotice instead.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-SETUP › repeatPanel() (.occ-list)',
   },
   docs: ['docs/screens/product/modules/queue/session-setup.md'],

@@ -2,7 +2,7 @@
 
 **Last verified:** 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
-**Status:** Explicit unresolved details, not omitted screens and not a new interview questionnaire. Updated October 26, 2026: items settled by the [ROTRA Queue prototype](../../frames/queue-app/rotra-queue.html) are listed at the end, followed by those settled with the [ROTRA Admin prototype](../../frames/admin-app/rotra-admin.html) on October 27, 2026.
+**Status:** Explicit unresolved details, not omitted screens and not a new interview questionnaire. Updated October 26, 2026: items settled by the [ROTRA Queue prototype](../../../app/mocksups-app/queue-app/rotra-queue.html) are listed at the end, followed by those settled with the [ROTRA Admin prototype](../../../app/mocksups-app/admin-app/rotra-admin.html) on October 27, 2026.
 
 The screen tree specifies all agreed v1 workflows. Where behavior is undecided, the relevant screen includes its exact boundary and safe pending/error presentation. Do not fill these gaps from old code, placeholder data, or an invented default.
 

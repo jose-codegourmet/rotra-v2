@@ -10,7 +10,7 @@ export const chooseMatchSheetMeta = {
     'Queue order is a suggestion, not a rule: any ready match can go next. A match stays locked only while a player is still on court or is not present.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'SHEETS.chooseMatch (ACT.openChooseMatch, .opt rows with data-act="openDispatch")',
   },
   docs: [

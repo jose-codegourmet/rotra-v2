@@ -11,7 +11,7 @@ export const newPlayerFormMeta = {
     'The form never adds: the container owns the mutation, the success toast and serverError. A failed add keeps what was typed.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'SHEETS.add › New player tab, confirmNew()',
   },
   docs: [

@@ -1,6 +1,6 @@
 # Queue generation and dispatch
 
-**Status:** Confirmed v1 target rules. Updated October 26, 2026 to match the [ROTRA Queue prototype](../../../../../frames/queue-app/rotra-queue.html).
+**Status:** Confirmed v1 target rules. Updated October 26, 2026 to match the [ROTRA Queue prototype](../../../../../../app/mocksups-app/queue-app/rotra-queue.html).
 
 ## Ways to add waiting matches
 

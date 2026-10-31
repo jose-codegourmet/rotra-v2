@@ -11,7 +11,7 @@ export const courtCardMeta = {
     'The container formats times, labels and reasons (nextEligibleForCourt, matchStatus); the card never computes them.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Live console › Courts › courtsPane() (.court, .court.busy, .court.merged)',
   },
   docs: [

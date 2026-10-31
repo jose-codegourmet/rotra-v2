@@ -11,7 +11,7 @@ export const matchRecordCardMeta = {
     'Player pictures are buttons named "NAME. View profile" that call onSelectPlayer.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen:
       'Q-HISTORY › histNightPane() › historyMatch() (.hist-col, .hm, .hm-team.won, .hm-score, .hm.now)',
   },

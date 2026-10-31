@@ -10,7 +10,7 @@ export const playerPoolToolbarMeta = {
     'For the saved players directory use SavedPlayersFilterBar.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Live console › Players › playersPane() (.seg, #pl-sort)',
   },
   docs: ['docs/screens/product/modules/queue/session-console.md#q-pool--players-view'],

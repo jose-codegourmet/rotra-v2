@@ -11,7 +11,7 @@ export const recordPlayerCardMeta = {
     'The picture is a button named "NAME. View profile" that calls onSelectPlayer. Not for live sessions: the console roster uses PlayerPoolCard.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-HISTORY › histPlayersPane() (.pgrid2, .pcard2, .stats)',
   },
   docs: [

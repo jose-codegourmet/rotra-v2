@@ -11,7 +11,7 @@ export const joinRequestFormMeta = {
     "Sending needs internet. The Queue Master's level for the night is set when they confirm, in JoinRequestsPanel, never here.",
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Public session (guest) › SHEETS.join, ACT.sendJoin',
   },
   docs: [

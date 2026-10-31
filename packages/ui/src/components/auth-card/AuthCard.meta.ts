@@ -11,7 +11,7 @@ export const authCardMeta = {
     'No Facebook or social sign-in buttons, ever.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-LOGIN (.login, .mark); rotra-player.html P-LOGIN; rotra-admin.html A-LOGIN',
   },
   docs: [

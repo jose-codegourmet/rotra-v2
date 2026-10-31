@@ -15,7 +15,7 @@ export const contactReviewMeta = {
     'Offline the review stays readable under AdminOfflineBand: Approve and Decline show ADMIN_OFFLINE_ERROR inside the sheet, Retry application toasts it, Check status toasts CONTACT_CHECK_OFFLINE_ERROR; nothing is sent and no success toast shows. If the checks fail when an approval is committed, the approve sheet stays open with CONTACT_REVIEW_STALE_ERROR and the checks refetch.',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: 'viewReview (contact review); ACT.checkApply / retryApply; runApply',
   },
   docs: [

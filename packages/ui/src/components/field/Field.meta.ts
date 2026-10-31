@@ -11,7 +11,7 @@ export const fieldMeta = {
     'Checkbox and Switch carry their own label and do not need a Field.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Session setup › .field, .hint, .err (also rotra-admin.html form sheets)',
   },
   docs: [

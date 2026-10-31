@@ -10,7 +10,7 @@ export const rankStatusChipMeta = {
     'Always carries its text; On leaderboard is accent, the others neutral.',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: 'A-PLAYERS › viewPlayers() › td[data-label="Rank"] (rankOf().chip)',
   },
   docs: ['docs/screens/product/modules/admin/players-requests.md'],

@@ -11,7 +11,7 @@ export const changeCompareMeta = {
     'The screen passes "Not set" as from when there is no current value.',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen:
       'A-CLUB-DETAIL › Name change request .change; A-CONTACT-REVIEW › .change with .mono values',
   },

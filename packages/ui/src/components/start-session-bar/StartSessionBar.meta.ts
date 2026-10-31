@@ -9,7 +9,7 @@ export const startSessionBarMeta = {
     'Inside the operator shell the bar starts at the rail edge through the --rail custom property.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-PREPARE › viewPrepare() .footer-bar',
   },
   docs: ['docs/screens/product/modules/queue/session-setup.md'],

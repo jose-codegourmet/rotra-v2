@@ -10,7 +10,7 @@ export const offDaySlideMeta = {
     'Off Day is a session observation, not a profile label: never show it on a player profile.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-OFF-DAY-SLIDE › slideOffDay() (.slide, .private-band, .award)',
   },
   docs: [

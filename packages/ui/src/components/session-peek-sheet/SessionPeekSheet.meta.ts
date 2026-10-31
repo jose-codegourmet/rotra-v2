@@ -8,7 +8,7 @@ export const sessionPeekSheetMeta = {
     'Open from ClashNotice or a skipped RepeatSchedulePanel date; the container routes onOpen by state.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-SETUP › SHEETS.peek',
   },
   docs: ['docs/screens/product/modules/queue/session-setup.md'],

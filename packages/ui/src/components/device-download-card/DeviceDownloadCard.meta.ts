@@ -9,7 +9,7 @@ export const deviceDownloadCardMeta = {
     'After a failed update, pass snapshotAge to label the previous usable copy; a partial transfer is never Ready.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-PREPARE › prepOverview() This device card',
   },
   docs: [

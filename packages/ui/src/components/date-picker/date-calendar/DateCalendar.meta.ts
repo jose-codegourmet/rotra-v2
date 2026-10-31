@@ -10,7 +10,7 @@ export const dateCalendarMeta = {
     'Arrow keys move between days; only one day is in the tab order.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Session setup › Choose a date (.dp-head, .dp-grid, .dp-day)',
   },
   related: ['DatePicker'],

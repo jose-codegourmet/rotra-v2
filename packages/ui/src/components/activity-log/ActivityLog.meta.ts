@@ -11,7 +11,7 @@ export const activityLogMeta = {
     'Never put passwords, tokens or unneeded contact values in the text.',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen:
       'A-CLUB-DETAIL › Record of actions .log; A-PLAYER-DETAIL › Record of actions .log; A-RANK-CONFIG › Versions .log',
   },

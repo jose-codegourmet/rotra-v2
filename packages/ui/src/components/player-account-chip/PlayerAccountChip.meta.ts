@@ -9,7 +9,7 @@ export const playerAccountChipMeta = {
     'Wraps IdentityChip so Admin and Queue use the same words and tones. Queue screens that also show Guest or Lookup pending use IdentityChip directly.',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: 'A-PLAYERS › viewPlayers() › td[data-label="Account"]',
   },
   docs: ['docs/screens/product/modules/admin/players-requests.md', 'docs/product-terms.md'],

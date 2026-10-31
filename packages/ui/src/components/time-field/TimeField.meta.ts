@@ -8,7 +8,7 @@ export const timeFieldMeta = {
     'Validate with timeField from @rotra/schema/date.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Session setup › Details › Starts, Ends',
   },
   docs: ['docs/coding-conventions.md#6-forms'],

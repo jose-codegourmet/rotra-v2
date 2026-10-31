@@ -10,7 +10,7 @@ export const configDiffMeta = {
     'It only shows values. Validation and the total check stay in RankingSettingsForm, so a sheet never opens on an invalid draft.',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: 'D-CONFIG › SHEETS.config .diff',
   },
   docs: [

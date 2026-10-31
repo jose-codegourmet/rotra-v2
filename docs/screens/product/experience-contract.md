@@ -15,7 +15,7 @@ Check authorization before rendering sensitive content. A hidden button is not e
 
 Design the Queue app for use courtside on a phone and on a laptop. Keep the current session, connectivity, and primary action visible without forcing a full-page refresh. On narrow screens use one main content column with sheets for secondary controls; on wide screens courts and queue cards flow into more columns (the prototype's queue uses 1–5 columns by width).
 
-The [ROTRA Queue prototype](../../frames/queue-app/rotra-queue.html) sets the shared patterns: one top bar with sync status; bottom/side **sheets** for every task (with a scrim, a focused title, Escape to close, and a focus trap); short **toasts** confirming each saved action; chips for states; switches for presence and formats; and the court drawn to real proportions with players' pictures on each side of the net.
+The [ROTRA Queue prototype](../../../app/mocksups-app/queue-app/rotra-queue.html) sets the shared patterns: one top bar with sync status; bottom/side **sheets** for every task (with a scrim, a focused title, Escape to close, and a focus trap); short **toasts** confirming each saved action; chips for states; switches for presence and formats; and the court drawn to real proportions with players' pictures on each side of the net.
 
 Keep the main task action visible but avoid overlapping it with system keyboard, safe-area insets, error text, or match-confirmation content. Long names and RTR IDs wrap or truncate with an accessible full-text alternative; they cannot hide the identity needed to choose the correct player.
 

@@ -5,7 +5,7 @@
 Record the mock Player Information behavior implemented by P01.9–P01.15 (#151–#157)
 and the subsequent prototype corrections. This specification describes this branch's
 implementation; the business docs remain authoritative for product behavior and
-`docs/frames/player-app/rotra-player.html` for appearance and copy.
+`app/mocksups-app/player-app/rotra-player.html` for appearance and copy.
 
 ## Requirements
 
@@ -129,5 +129,5 @@ policy decisions remain governed by the business open decisions.
 - `docs/screens/product/modules/player-information/profile.md`
 - `docs/screens/product/modules/player-information/access-registration.md`
 - `docs/business_logic/product/player-information/modules/ranking/README.md`
-- `docs/frames/player-app/rotra-player.html`
+- `app/mocksups-app/player-app/rotra-player.html`
 - `apps/player/AGENTS.md`

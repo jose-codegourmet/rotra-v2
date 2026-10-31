@@ -10,7 +10,7 @@ export const currentContactsCardMeta = {
     "Missing phone or email shows 'Not given'. Phones are E.164 and shown grouped.",
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: 'A-CONTACT-REVIEW › viewReview() › player and current contacts card',
   },
   docs: [

@@ -10,7 +10,7 @@ export const sessionDefaultsPanelMeta = {
     'These only fill in new sessions; each session can still change them.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Club settings › Session defaults (#club-defaults)',
   },
   docs: ['docs/screens/product/modules/queue/access-home.md'],

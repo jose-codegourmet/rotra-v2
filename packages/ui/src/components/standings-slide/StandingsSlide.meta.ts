@@ -10,7 +10,7 @@ export const standingsSlideMeta = {
     'Use LiveLeaderboard for the in-session table with levels and the minimum-games meter, not this.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-STANDINGS-SLIDE › slideStandings() (.slide, .st-table)',
   },
   docs: [

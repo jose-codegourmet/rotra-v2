@@ -9,7 +9,7 @@ export const venuePickerSheetMeta = {
     'Picking fills the venue and address in SessionSetupForm; fees reach the cost estimate in Queue › Financials.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-SETUP › SHEETS.venue (pick mode)',
   },
   docs: ['docs/screens/product/modules/queue/session-setup.md'],

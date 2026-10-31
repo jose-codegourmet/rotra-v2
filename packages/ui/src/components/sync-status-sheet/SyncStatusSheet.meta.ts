@@ -7,7 +7,7 @@ export const syncStatusSheetMeta = {
     'Use for Q-SYNC; zero pending changes on this device does not prove session completeness.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Sync status sheet and shared notice patterns',
   },
   docs: ['docs/screens/product/modules/queue/offline-recovery.md'],

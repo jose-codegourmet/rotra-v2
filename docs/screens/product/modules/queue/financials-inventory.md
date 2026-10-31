@@ -2,7 +2,7 @@
 
 **Surfaces:** `Q-FINANCIALS`, `Q-INVENTORY`, `Q-INVENTORY-ITEM`.
 
-**Source:** [financials rules](../../../../business_logic/product/queue/modules/financials/README.md). **Reference:** [ROTRA Queue prototype](../../../../frames/queue-app/rotra-queue.html) — setup step 5 and Inventory.
+**Source:** [financials rules](../../../../business_logic/product/queue/modules/financials/README.md). **Reference:** [ROTRA Queue prototype](../../../../../app/mocksups-app/queue-app/rotra-queue.html) — setup step 5 and Inventory.
 
 ## Q-FINANCIALS — Setup step 5
 

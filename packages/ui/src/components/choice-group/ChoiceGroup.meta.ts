@@ -11,7 +11,7 @@ export const choiceGroupMeta = {
     'For short labels with no description use SegmentedControl.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Session setup › Formats and mode (.choices / .choice); Match result › winner',
   },
   docs: ['docs/screens/product/experience-contract.md#layout-and-device-behavior'],

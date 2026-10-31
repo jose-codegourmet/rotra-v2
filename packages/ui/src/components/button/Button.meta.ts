@@ -12,7 +12,7 @@ export const buttonMeta = {
     'For an icon-only action use IconButton, which requires a label.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Shared styles › .btn (.primary, .ghost, .danger, .sm, .xs, .block)',
   },
   docs: ['docs/screens/product/experience-contract.md#layout-and-device-behavior'],

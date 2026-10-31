@@ -9,7 +9,7 @@ export const editProfileFormMeta = {
     'Submitting with errors opens the first section with one and focuses its first invalid field.',
   ],
   prototype: {
-    file: 'docs/frames/player-app/rotra-player.html',
+    file: 'app/mocksups-app/player-app/rotra-player.html',
     screen: 'Edit profile (viewEdit, EDIT_TABS, .edit-grid, .edit-nav, .edit-save)',
   },
   docs: ['docs/screens/product/modules/player-information/profile.md'],

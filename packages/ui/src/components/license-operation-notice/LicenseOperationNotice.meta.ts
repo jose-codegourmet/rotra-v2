@@ -10,7 +10,7 @@ export const licenseOperationNoticeMeta = {
     'While isChecking, the button reads "Checking…" and is disabled.',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: 'A-LICENSE › SHEETS.license (timeout / checking step), licCheck',
   },
   docs: [

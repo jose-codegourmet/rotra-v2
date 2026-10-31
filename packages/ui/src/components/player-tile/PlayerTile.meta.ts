@@ -11,7 +11,7 @@ export const playerTileMeta = {
     'For the Players view use PlayerPoolCard; for a picture on a court or queue card use PlayerFaceButton.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'playerTile() (.ptile) in pickerSheet() and the substitute sheet',
   },
   docs: ['docs/screens/product/modules/queue/match-queue.md#q-pick-player--choose-a-slots-player'],

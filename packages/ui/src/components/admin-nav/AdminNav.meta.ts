@@ -7,7 +7,7 @@ export const adminNavMeta = {
     'Use in the Admin workspace shell.',
     'Pass onNavigate while a page has an unsaved draft: items become buttons that report the chosen href (no navigation), so the shell can ask "Discard your draft?" first.',
   ],
-  prototype: { file: 'docs/frames/admin-app/rotra-admin.html', screen: 'left rail (rail)' },
+  prototype: { file: 'app/mocksups-app/admin-app/rotra-admin.html', screen: 'left rail (rail)' },
   docs: ['docs/screens/product/modules/admin/access-navigation.md'],
   variants: [
     'clubs',

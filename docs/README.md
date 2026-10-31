@@ -27,9 +27,9 @@ Everything here describes the **v1 target**, agreed October 25–27, 2026. Nothi
 
 | Doc | What it is |
 |---|---|
-| [Queue prototype](frames/queue-app/rotra-queue.html) ([notes](frames/queue-app/README.md)) | Clickable design of the Queue app, the agreed design reference |
-| [Player Information prototype](frames/player-app/rotra-player.html) ([notes](frames/player-app/README.md)) | Clickable design of the Player Information app |
-| [Admin prototype](frames/admin-app/rotra-admin.html) ([notes](frames/admin-app/README.md)) | Clickable design of the Admin app |
+| [Queue prototype](../app/mocksups-app/queue-app/rotra-queue.html) ([notes](../app/mocksups-app/queue-app/README.md)) | Clickable design of the Queue app, the agreed design reference |
+| [Player Information prototype](../app/mocksups-app/player-app/rotra-player.html) ([notes](../app/mocksups-app/player-app/README.md)) | Clickable design of the Player Information app |
+| [Admin prototype](../app/mocksups-app/admin-app/rotra-admin.html) ([notes](../app/mocksups-app/admin-app/README.md)) | Clickable design of the Admin app |
 | [Branding](branding/branding.md) | Brand identity, voice, logo, characters. For colors, type, and components the prototypes win |
 
 Open a prototype in any browser; nothing is installed.
@@ -50,7 +50,7 @@ docs/
                     modules/<product>/<module>.md
   database_design/product/  conventions · transactions · access-retention · open-decisions
                             <product>/modules/<module>.md
-  frames/<app>/     prototype .html + README.md
+  ../app/mocksups-app/   canonical prototype HTML + README per app
   branding/
 ```
 

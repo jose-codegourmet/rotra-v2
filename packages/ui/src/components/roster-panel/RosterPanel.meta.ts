@@ -11,7 +11,7 @@ export const rosterPanelMeta = {
     'Pass loading while the roster query runs: the panel shows Skeleton rows, never a spinner or fake names. levelsLocked turns every level into locked text.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-PREPARE › viewPrepare() roster tab',
   },
   docs: [

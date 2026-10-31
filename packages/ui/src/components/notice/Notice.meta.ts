@@ -11,7 +11,7 @@ export const noticeMeta = {
     'Notices are announced without moving focus; do not focus them.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Shared styles › .notice (.ok, .warn, .bad); live console offline banner',
   },
   docs: [

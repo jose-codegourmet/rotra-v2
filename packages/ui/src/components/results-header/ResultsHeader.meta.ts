@@ -11,7 +11,7 @@ export const resultsHeaderMeta = {
     'Not for the session record: use SessionRecordHeader there ("Session record · read-only").',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'viewResults() › header, actions and chips',
   },
   docs: [

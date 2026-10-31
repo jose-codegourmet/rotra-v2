@@ -10,7 +10,7 @@ export const chipMeta = {
     'For a big top-bar sync state use SyncStatus, not a Chip.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Shared styles › .chip (.ok, .warn, .bad, .solid); rotra-admin.html › .live',
   },
   docs: ['docs/screens/product/experience-contract.md'],

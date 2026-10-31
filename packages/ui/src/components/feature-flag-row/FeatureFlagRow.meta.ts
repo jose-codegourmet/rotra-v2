@@ -11,7 +11,7 @@ export const featureFlagRowMeta = {
     "There is no key editor: a flag's key can't be changed after it is created.",
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: 'A-FEATURE-FLAGS › viewFlags() flag row',
   },
   docs: [

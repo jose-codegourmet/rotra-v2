@@ -10,7 +10,7 @@ export const nameChangeRequestCardMeta = {
     'Pass now in stories and tests so "19 hours ago" is stable.',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: 'A-CLUB-DETAIL › Overview › #name-request',
   },
   docs: [

@@ -1,6 +1,6 @@
 # Offline operation and recovery
 
-**Status:** Confirmed v1 target rules. This is a core requirement, not an optional later enhancement. Updated October 26, 2026 to match the [ROTRA Queue prototype](../../../../../frames/queue-app/rotra-queue.html).
+**Status:** Confirmed v1 target rules. This is a core requirement, not an optional later enhancement. Updated October 26, 2026 to match the [ROTRA Queue prototype](../../../../../../app/mocksups-app/queue-app/rotra-queue.html).
 
 ## Online boundaries
 

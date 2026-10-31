@@ -11,7 +11,7 @@ export const playerFaceButtonMeta = {
     'Do not use for a player row with a level and presence; use RosterRow or SavedPlayerCard.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Live console › Courts › courtSides() (.pf) and queue cards (.qf)',
   },
   docs: ['docs/screens/product/modules/queue/session-console.md'],

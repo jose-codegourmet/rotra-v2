@@ -10,7 +10,7 @@ export const pageHeaderMeta = {
     'Use eyebrow for the live console\'s "Live session" label and state chips.',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen:
       'Clubs and licenses › .page-head; rotra-queue.html › live console header (.between, .acts)',
   },

@@ -11,7 +11,7 @@ export const invalidMatchSheetMeta = {
     'Keep playing (onKeepPlaying) returns to the active match. Focus starts on the title, so the destructive primary is never preselected.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'SHEETS.invalid · ACT.confirmInvalid',
   },
   docs: [

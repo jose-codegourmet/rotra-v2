@@ -19,7 +19,7 @@ where something belongs. For *how to write* the code, read [coding-conventions.m
 | `packages/data` | In-memory store, mock auth, club/session and Player fixtures, fetchers, query keys and hooks |
 | `packages/db` | **Not created** at the inspected `7d7029d` baseline. Database work is tracked in [F07 #241](https://github.com/jose-codegourmet/rotra-v2/issues/241) (§10) |
 | `openspec/` | Focused Player implementation records restored at the product owner’s request; see `openspec/README.md`. Product and prototype docs retain precedence |
-| `docs/frames/*/*.html` | The three clickable prototypes: the design source of truth |
+| `app/mocksups-app/*/*.html` | The three clickable prototypes: the design source of truth |
 | `Makefile`, root `package.json` scripts | Run the three apps through Turborepo (F01.1) |
 | `.husky/`, `.github/` | Commitlint hook (pre-commit lint disabled) and advisory CI; see ways-of-working §5 |
 
@@ -58,9 +58,9 @@ Ports are set in each app's `dev` and `start` scripts.
 
 | Product | App | Prototype (design reference) | Business rules |
 |---|---|---|---|
-| Queue | `apps/queue` | [rotra-queue.html](frames/queue-app/rotra-queue.html) | [Queue](business_logic/product/queue/README.md) |
-| Player Information | `apps/player` | [rotra-player.html](frames/player-app/rotra-player.html) | [Player Information](business_logic/product/player-information/README.md) |
-| Admin | `apps/admin` | [rotra-admin.html](frames/admin-app/rotra-admin.html) | [Admin](business_logic/product/admin/README.md) |
+| Queue | `apps/queue` | [rotra-queue.html](../app/mocksups-app/queue-app/rotra-queue.html) | [Queue](business_logic/product/queue/README.md) |
+| Player Information | `apps/player` | [rotra-player.html](../app/mocksups-app/player-app/rotra-player.html) | [Player Information](business_logic/product/player-information/README.md) |
+| Admin | `apps/admin` | [rotra-admin.html](../app/mocksups-app/admin-app/rotra-admin.html) | [Admin](business_logic/product/admin/README.md) |
 
 The Queue app also serves the **public session page** (session link): no sign-in, separate audience,
 its own route group. World is v2: no app, no routes.

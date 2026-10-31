@@ -10,7 +10,7 @@ export const sessionCalendarMeta = {
     'Dates report through onOpenDay (the container opens CalendarDaySheet); Previous / Today / Next report through onMove and onToday.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-HOME › calendarCard() (month, week and day views)',
   },
   docs: ['docs/screens/product/modules/queue/access-home.md'],

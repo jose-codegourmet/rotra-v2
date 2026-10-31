@@ -10,7 +10,7 @@ export const valueTilesMeta = {
     'For label and value pairs in a list, use KeyValueList instead.',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: 'A-CLUB-DETAIL › Price .tiles; A-RANK-CONFIG › In effect .tiles',
   },
   docs: [

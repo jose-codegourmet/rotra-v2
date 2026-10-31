@@ -10,7 +10,7 @@ export const editProfileMeta = {
     'Request a phone or email change opens the P-CONTACT-REQUEST sheet over the form (the draft stays); Phone privacy goes to /profile/privacy-and-contact.',
   ],
   prototype: {
-    file: 'docs/frames/player-app/rotra-player.html',
+    file: 'app/mocksups-app/player-app/rotra-player.html',
     screen: 'Edit profile (viewEdit, FORM.edit, ACT.cancelEdit, SHEETS.discard)',
   },
   docs: [

@@ -10,7 +10,7 @@ export const publicResultsSectionMeta = {
     'Do not use for invalid sessions (they have no results section) or for the private result review, which uses the slides directly with ResultsHeader.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen:
       'Q-PUBLIC-RESULTS › viewPublic() results section (section.stack h2 Results · .card.empty)',
   },

@@ -9,7 +9,7 @@ export const levelPillMeta = {
     'The bars only reinforce the text; the name is always shown.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Saved players › card (.sp-level, .lvl-bars)',
   },
   docs: ['docs/product-terms.md'],

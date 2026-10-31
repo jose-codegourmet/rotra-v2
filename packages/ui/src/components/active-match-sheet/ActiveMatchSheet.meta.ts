@@ -11,7 +11,7 @@ export const activeMatchSheetMeta = {
     'Pre-start lineups use the Start match sheet, where sides can still be switched.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-ACTIVE-MATCH › SHEETS.match',
   },
   docs: [

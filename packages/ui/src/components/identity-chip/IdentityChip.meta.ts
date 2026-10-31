@@ -9,7 +9,7 @@ export const identityChipMeta = {
     'The words are fixed; colour only reinforces them (Registered accent, Lookup pending warn).',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Saved players › card footer (identChip)',
   },
   docs: ['docs/screens/product/modules/queue/access-home.md', 'docs/product-terms.md'],

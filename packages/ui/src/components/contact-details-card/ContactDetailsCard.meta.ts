@@ -7,7 +7,7 @@ export const contactDetailsCardMeta = {
     'Use on P-PHONE-PRIVACY only, for the signed-in owner. Pass ContactRequestStatus into statusSlot.',
   ],
   prototype: {
-    file: 'docs/frames/player-app/rotra-player.html',
+    file: 'app/mocksups-app/player-app/rotra-player.html',
     screen: 'Privacy and contact (viewAccount)',
   },
   docs: ['docs/screens/product/modules/player-information/identity-privacy.md'],

@@ -15,4 +15,4 @@ Business source: [Admin](../../../../business_logic/product/admin/README.md).
 
 ## Reference prototype
 
-[`docs/frames/admin-app/rotra-admin.html`](../../../../frames/admin-app/rotra-admin.html) (October 27, 2026) shows every surface above. Open it in a browser; sign-in is a mock, and any input signs in as the platform owner. Its **Prototype** menu (access denied, offline, failed saves, demo reset) is not a product feature. Notes in its [README](../../../../frames/admin-app/README.md).
+[`app/mocksups-app/admin-app/rotra-admin.html`](../../../../../app/mocksups-app/admin-app/rotra-admin.html) (October 27, 2026) shows every surface above. Open it in a browser; sign-in is a mock, and any input signs in as the platform owner. Its **Prototype** menu (access denied, offline, failed saves, demo reset) is not a product feature. Notes in its [README](../../../../../app/mocksups-app/admin-app/README.md).

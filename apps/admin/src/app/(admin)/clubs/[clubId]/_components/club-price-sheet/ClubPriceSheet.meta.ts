@@ -13,7 +13,7 @@ export const clubPriceSheetMeta = {
     'Offline (useAdminConnectivity), Save price sends nothing and shows ADMIN_OFFLINE_ERROR in the form, keeping the typed price (an unchanged price still just closes).',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: 'SHEETS.price; ACT.openPrice / doPrice',
   },
   docs: ['docs/screens/product/modules/admin/clubs-licenses.md'],

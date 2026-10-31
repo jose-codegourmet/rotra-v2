@@ -3,7 +3,7 @@
 **Decision baseline:** October 25, 2026.
 **Status:** Agreed product direction; not an implementation or deployment claim.
 
-**Last updated:** October 26, 2026, to match the [ROTRA Queue prototype](../frames/queue-app/rotra-queue.html). The prototype is the agreed design reference for the Queue app; where it says a detail is not decided, the docs keep it open.
+**Last updated:** October 26, 2026, to match the [ROTRA Queue prototype](../../app/mocksups-app/queue-app/rotra-queue.html). The prototype is the agreed design reference for the Queue app; where it says a detail is not decided, the docs keep it open.
 
 These documents capture the new ecosystem v1. The latest explicit correction in the business discussion takes precedence over earlier answers. In particular, reassessment is allowed **while preparing a roster**, not in an unrestricted post-session editor.
 

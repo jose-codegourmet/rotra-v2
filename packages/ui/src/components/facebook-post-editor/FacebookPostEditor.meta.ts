@@ -9,7 +9,7 @@ export const facebookPostEditorMeta = {
     'Preview opens PostPreviewSheet with the current draft; Reset asks the container to restore the default template.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-CLUB › viewClub() #club-post (.tpl-edit, .tpl-keys)',
   },
   docs: ['docs/screens/product/modules/queue/access-home.md'],

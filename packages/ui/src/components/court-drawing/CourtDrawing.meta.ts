@@ -10,7 +10,7 @@ export const courtDrawingMeta = {
     'Do not use for the queue card; it lists faces in a row, not on a court.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Live console › Courts › courtSVG(), courtSides() (.pitch, .sides, .pf)',
   },
   docs: [

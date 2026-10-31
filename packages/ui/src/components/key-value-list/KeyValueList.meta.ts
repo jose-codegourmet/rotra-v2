@@ -10,7 +10,7 @@ export const keyValueListMeta = {
     'For editable values use Field-based forms.',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: 'Shared styles › .kv (club detail, license); rotra-queue.html › .kv',
   },
   related: ['Card'],

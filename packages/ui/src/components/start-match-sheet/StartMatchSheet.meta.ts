@@ -11,7 +11,7 @@ export const startMatchSheetMeta = {
     'Starting is an explicit Queue Master action: never open or confirm this sheet automatically when a court frees up.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'SHEETS.dispatch (ACT.openDispatch, ACT.pickCourt, ACT.confirmDispatch)',
   },
   docs: [

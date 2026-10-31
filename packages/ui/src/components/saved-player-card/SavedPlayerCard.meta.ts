@@ -10,7 +10,7 @@ export const savedPlayerCardMeta = {
     'registeredCity comes from the RTR ID\'s city code; when unknown the card says "Not registered", or "Lookup after sync" for a pending lookup.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-SAVED-PLAYERS › playerCard() (.sp-card)',
   },
   docs: ['docs/screens/product/modules/queue/access-home.md'],

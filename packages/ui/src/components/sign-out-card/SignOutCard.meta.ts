@@ -7,7 +7,7 @@ export const signOutCardMeta = {
     'Use at the end of P-PHONE-PRIVACY. Use SignOutSheet for the Queue app sign-out confirmation.',
   ],
   prototype: {
-    file: 'docs/frames/player-app/rotra-player.html',
+    file: 'app/mocksups-app/player-app/rotra-player.html',
     screen: 'Privacy and contact (viewAccount)',
   },
   docs: ['docs/screens/product/modules/player-information/identity-privacy.md'],

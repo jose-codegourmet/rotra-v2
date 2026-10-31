@@ -10,7 +10,7 @@ export const sessionLinkCardMeta = {
     'Waiting requests themselves live in JoinRequestsPanel, not here.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-PREPARE › Overview › linkCard() (#session-link)',
   },
   docs: [

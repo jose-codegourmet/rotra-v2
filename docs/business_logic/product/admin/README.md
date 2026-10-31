@@ -17,6 +17,6 @@ Admin manages club access, user information, feature flags, and agreed business 
 - No Admin override for a confirmed winner, score, or invalid-match decision.
 - No manual reconstruction of permanently lost offline results.
 
-**Reference prototype:** [`docs/frames/admin-app/rotra-admin.html`](../../../frames/admin-app/rotra-admin.html), also published as the ROTRA Admin artifact. It is a clickable, single-file prototype with fictional data; notes in its [README](../../../frames/admin-app/README.md).
+**Reference prototype:** [`app/mocksups-app/admin-app/rotra-admin.html`](../../../../app/mocksups-app/admin-app/rotra-admin.html), also published as the ROTRA Admin artifact. It is a clickable, single-file prototype with fictional data; notes in its [README](../../../../app/mocksups-app/admin-app/README.md).
 
 Settled October 27, 2026: the platform owner adds clubs directly, each club has its own price (or is free as a tester), and the platform owner creates feature flags. Renewal dates, refunds, flag targeting and offline flag behavior remain open.

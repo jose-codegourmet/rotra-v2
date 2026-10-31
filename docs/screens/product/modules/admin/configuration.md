@@ -2,7 +2,7 @@
 
 **Surfaces:** `A-RANK-CONFIG`, `A-FEATURE-FLAGS`, `A-ADD-FLAG`.
 
-**Source:** [configuration rules](../../../../business_logic/product/admin/modules/configuration/README.md). **Reference:** [ROTRA Admin prototype](../../../../frames/admin-app/rotra-admin.html) (updated October 27, 2026).
+**Source:** [configuration rules](../../../../business_logic/product/admin/modules/configuration/README.md). **Reference:** [ROTRA Admin prototype](../../../../../app/mocksups-app/admin-app/rotra-admin.html) (updated October 27, 2026).
 
 ## A-RANK-CONFIG — Agreed adjustable business settings
 

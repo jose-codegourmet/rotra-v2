@@ -2,7 +2,7 @@
 
 **Last verified:** 2026-10-28 for the entity inventory and F07 planning links.
 
-**Status:** Proposed design, not an executable schema. **Baseline:** October 25, 2026; Queue records updated October 26, 2026 for the [ROTRA Queue prototype](../../frames/queue-app/rotra-queue.html) (cost estimates with misc entrance fees and a break-even or custom payment per player, payment marks, inventory, waitlist and first-come budget changes, court closing times, calculated minimum, match numbers, re-publication, club name-change requests). Admin records updated October 27, 2026 for the [ROTRA Admin prototype](../../frames/admin-app/rotra-admin.html) (owner-added clubs, per-club or free license prices, owner-created feature flags). Device-only preferences such as the light/dark theme are not stored.
+**Status:** Proposed design, not an executable schema. **Baseline:** October 25, 2026; Queue records updated October 26, 2026 for the [ROTRA Queue prototype](../../../app/mocksups-app/queue-app/rotra-queue.html) (cost estimates with misc entrance fees and a break-even or custom payment per player, payment marks, inventory, waitlist and first-come budget changes, court closing times, calculated minimum, match numbers, re-publication, club name-change requests). Admin records updated October 27, 2026 for the [ROTRA Admin prototype](../../../app/mocksups-app/admin-app/rotra-admin.html) (owner-added clubs, per-club or free license prices, owner-created feature flags). Device-only preferences such as the light/dark theme are not stored.
 
 ## Scope and reading order
 

@@ -11,7 +11,7 @@ export const swappablePlayerMeta = {
     'Outside a SwapSidesArea it is a plain wrapper with no behaviour.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Live console › Queue tab › [data-swap] players (.swap-ghost, .swap-src, .swap-over)',
   },
   docs: [

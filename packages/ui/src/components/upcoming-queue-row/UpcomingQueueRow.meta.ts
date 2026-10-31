@@ -10,7 +10,7 @@ export const upcomingQueueRowMeta = {
     'Do not use for the full queue grid; that is QueueGrid in Queue › Match queue.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-COURTS › upcomingPane() (.qgrid, .qtile.qmore)',
   },
   docs: [

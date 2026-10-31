@@ -13,7 +13,7 @@ export const addFlagSheetMeta = {
     'Offline: Add flag sends nothing and shows ADMIN_OFFLINE_ERROR as serverError, every typed value kept, no toast.',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen:
       'SHEETS.addFlag (leave step); ACT.openAddFlag / flagCreate / flagBack / flagDiscard; offlineBlock',
   },

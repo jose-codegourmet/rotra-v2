@@ -10,7 +10,7 @@ export const addCourtTileMeta = {
     'Do not use in Session setup or Courts and time; those list courts as rows.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Live console › Courts › courtsPane() (.court.add-court)',
   },
   docs: ['docs/screens/product/modules/queue/session-console.md'],

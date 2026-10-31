@@ -11,7 +11,7 @@ export const venueFormMeta = {
     'The form never saves: the container owns the mutation, the success toast and the failure message.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Venue sheet › New venue / Edit venue (venue(sh) form mode)',
   },
   docs: ['docs/screens/product/modules/queue/access-home.md', 'docs/coding-conventions.md#6-forms'],

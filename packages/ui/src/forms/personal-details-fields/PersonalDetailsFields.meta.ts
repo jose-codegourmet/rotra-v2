@@ -10,7 +10,7 @@ export const personalDetailsFieldsMeta = {
     'Open decisions: field limits, free-text playing style and link visibility use the prototype placeholders.',
   ],
   prototype: {
-    file: 'docs/frames/player-app/rotra-player.html',
+    file: 'app/mocksups-app/player-app/rotra-player.html',
     screen: 'fieldsBasics, fieldsGame, fieldsLinks, personalFields',
   },
   docs: [

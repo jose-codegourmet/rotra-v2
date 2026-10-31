@@ -10,7 +10,7 @@ export const skeletonMeta = {
     'The pulse stops under reduced motion.',
   ],
   prototype: {
-    file: 'docs/frames/player-app/rotra-player.html',
+    file: 'app/mocksups-app/player-app/rotra-player.html',
     screen: 'Leaderboard › loading (.skel)',
   },
   docs: ['docs/screens/product/experience-contract.md#standard-states'],

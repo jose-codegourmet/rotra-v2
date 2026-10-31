@@ -13,7 +13,7 @@ export const licenseFormMeta = {
     'onDirtyChange reports whether any field differs from defaultValues; the container asks "Discard this entry?" before closing an edited form.',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: 'A-LICENSE › SHEETS.license (form step), licErrors(), licPlan, licStart()',
   },
   docs: [

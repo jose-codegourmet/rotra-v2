@@ -8,7 +8,7 @@ export const textareaMeta = {
     'For one line use TextInput.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Club settings › Club description, Court rules (textarea.input)',
   },
   docs: ['docs/coding-conventions.md#6-forms'],

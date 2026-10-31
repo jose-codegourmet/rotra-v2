@@ -10,7 +10,7 @@ export const selectMeta = {
     'For two to five always-visible options use SegmentedControl or ChoiceGroup instead.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Roster › Choose a level (select.input with optgroups)',
   },
   docs: ['docs/coding-conventions.md#6-forms'],

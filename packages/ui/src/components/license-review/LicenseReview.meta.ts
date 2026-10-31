@@ -12,7 +12,7 @@ export const licenseReviewMeta = {
     'While isPending, the primary reads "Saving…" and both buttons are disabled. A lost reply shows LicenseOperationNotice instead of this step; Check status returning nothing comes back here with serverError.',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: 'A-LICENSE › SHEETS.license (review step), licEffects()',
   },
   docs: [

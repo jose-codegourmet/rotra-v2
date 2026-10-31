@@ -2,7 +2,7 @@
 
 **Surfaces:** `Q-LOGIN`, `Q-ACCESS`, `Q-HOME`, `Q-CLUB`.
 
-**Source:** [club account/licensing rules](../../../../business_logic/product/admin/modules/clubs-licenses/README.md), [Queue app](../../../../business_logic/product/queue/README.md). **Reference:** [ROTRA Queue prototype](../../../../frames/queue-app/rotra-queue.html).
+**Source:** [club account/licensing rules](../../../../business_logic/product/admin/modules/clubs-licenses/README.md), [Queue app](../../../../business_logic/product/queue/README.md). **Reference:** [ROTRA Queue prototype](../../../../../app/mocksups-app/queue-app/rotra-queue.html).
 
 ## Top bar (all operator screens)
 

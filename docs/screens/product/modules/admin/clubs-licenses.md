@@ -2,7 +2,7 @@
 
 **Surfaces:** `A-CLUBS`, `A-ADD-CLUB`, `A-CLUB-DETAIL`, `A-CLUB-PRICE`, `A-LICENSE`, `A-RETENTION`.
 
-**Source:** [club/license rules](../../../../business_logic/product/admin/modules/clubs-licenses/README.md). **Reference:** [ROTRA Admin prototype](../../../../frames/admin-app/rotra-admin.html) (updated October 27, 2026).
+**Source:** [club/license rules](../../../../business_logic/product/admin/modules/clubs-licenses/README.md). **Reference:** [ROTRA Admin prototype](../../../../../app/mocksups-app/admin-app/rotra-admin.html) (updated October 27, 2026).
 
 ## A-CLUBS — Directory
 

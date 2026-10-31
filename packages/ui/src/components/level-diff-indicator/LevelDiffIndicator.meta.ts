@@ -8,7 +8,7 @@ export const levelDiffIndicatorMeta = {
     'Place under a LevelSelect and link them with aria-describedby. It is a prompt, never a block.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-PREPARE › levelDiff() (.lv-diff)',
   },
   docs: ['docs/screens/product/modules/queue/players-roster.md'],

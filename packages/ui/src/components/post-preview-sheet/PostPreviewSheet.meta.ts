@@ -9,7 +9,7 @@ export const postPreviewSheetMeta = {
     'Not for copying: the read-only copy dialog is FacebookPostSheet.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-CLUB › SHEETS.postPreview',
   },
   docs: ['docs/screens/product/modules/queue/access-home.md'],

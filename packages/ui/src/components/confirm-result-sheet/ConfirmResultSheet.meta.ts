@@ -11,7 +11,7 @@ export const confirmResultSheetMeta = {
     'courtLabels with two courts (5v5) switches the copy to "Both courts will become available."',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'SHEETS.result (review step) · ACT.confirmResult',
   },
   docs: [

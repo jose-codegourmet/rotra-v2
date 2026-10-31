@@ -8,7 +8,7 @@ export const startSessionSheetMeta = {
     'Open from StartSessionBar or the phone dock; the container runs useStartSession and re-checks the blocker at confirm (error shows in the sheet).',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-PREPARE › SHEETS.start',
   },
   docs: ['docs/screens/product/dialogs.md', 'docs/screens/product/modules/queue/session-setup.md'],

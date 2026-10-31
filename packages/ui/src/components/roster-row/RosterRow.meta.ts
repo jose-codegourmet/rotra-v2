@@ -10,7 +10,7 @@ export const rosterRowMeta = {
     'The level select is highlighted while the level is missing; pass levelLocked once the session started: the level becomes text with a lock icon and "Level locked for this session", no edit path.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-PREPARE › Roster and levels tab (.prow)',
   },
   docs: [

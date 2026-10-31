@@ -86,7 +86,7 @@ flowchart TD
 - Public profile/session links do not become permission to edit the corresponding records.
 - Do not add route paths to this document until route architecture is chosen; old routes are not assumed to match the reset.
 
-Inventory total: **86 surfaces across 19 module specifications**, plus the shared confirmation-dialog contract. (Updated October 26, 2026: +8 Queue surfaces from the [ROTRA Queue prototype](../../frames/queue-app/rotra-queue.html). Updated October 27, 2026: +3 Admin surfaces from the [ROTRA Admin prototype](../../frames/admin-app/rotra-admin.html).)
+Inventory total: **86 surfaces across 19 module specifications**, plus the shared confirmation-dialog contract. (Updated October 26, 2026: +8 Queue surfaces from the [ROTRA Queue prototype](../../../app/mocksups-app/queue-app/rotra-queue.html). Updated October 27, 2026: +3 Admin surfaces from the [ROTRA Admin prototype](../../../app/mocksups-app/admin-app/rotra-admin.html).)
 
 ## Foundation route boundary (approved October 27, 2026)
 

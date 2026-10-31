@@ -12,7 +12,7 @@ export const dataTableMeta = {
     'At 760 px and below there is no sideways scroll. Server pagination is out of scope.',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: 'Clubs and licenses › .tbl.cards, .tbl-wrap, .toolbar; rotra-queue.html › .stack-table',
   },
   docs: [

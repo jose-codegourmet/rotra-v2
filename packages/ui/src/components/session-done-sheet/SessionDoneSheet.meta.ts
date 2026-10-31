@@ -12,7 +12,7 @@ export const sessionDoneSheetMeta = {
     'The missing-records check (D-INTERRUPTION) is a separate flow, not a step here.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen:
       'SHEETS.done (Session done / Some players are below the minimum / Finish this session?)',
   },

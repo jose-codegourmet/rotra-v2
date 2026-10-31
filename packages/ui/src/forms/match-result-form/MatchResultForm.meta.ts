@@ -12,7 +12,7 @@ export const matchResultFormMeta = {
     'No fixed target such as 21, no sets or deuce, no draw workflow.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'SHEETS.result (entry step) · ACT.reviewResult / clearScores',
   },
   docs: [

@@ -11,7 +11,7 @@ export const courtPickerMeta = {
     'Do not use for the Courts and time sheet or the courts grid: those use CourtCard and AddCourtTile.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'SHEETS.dispatch › .field with data-act="pickCourt" (ACT.pickCourt)',
   },
   docs: [

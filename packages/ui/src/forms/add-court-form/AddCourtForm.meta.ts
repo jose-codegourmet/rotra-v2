@@ -11,7 +11,7 @@ export const addCourtFormMeta = {
     'ROTRA does not stop a game at the closing time; the court card shows it as a reminder.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'SHEETS.addCourt (ACT.quickAddCourt, ACT.confirmAddCourt, timeOnSession())',
   },
   docs: [

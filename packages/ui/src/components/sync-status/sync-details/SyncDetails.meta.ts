@@ -10,7 +10,7 @@ export const syncDetailsMeta = {
     "Shows this device only; never imply another device's changes are included.",
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Sync status sheet (.sync-head, .sync-grp, .sync-list)',
   },
   docs: ['docs/screens/product/experience-contract.md#save-and-sync-language'],

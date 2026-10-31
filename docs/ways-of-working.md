@@ -12,7 +12,7 @@ that disagree.
 
 1. **Docs first, then components, then screens.** Product, screen, and database docs are written
    before code. Code follows them; it doesn't decide product behavior.
-2. **The prototypes are the design.** `docs/frames/*/*.html` are the agreed look and behavior. Build
+2. **The prototypes are the design.** `app/mocksups-app/*/*.html` are the agreed look and behavior. Build
    to match them, not to improve them.
 3. **Mock first.** Screens run on `@rotra/data` mocks until the database epic. A finished-looking
    screen still stores nothing; say so.
@@ -82,7 +82,7 @@ Always in this sequence, because each step depends on the one before:
 ## Context
 - Rule: docs/business_logic/product/queue/modules/<module>/README.md#<section>
 - Screen: <Q-/P-/A- ID> in docs/screens/product/modules/<product>/<file>.md
-- Prototype: docs/frames/<app>/<file>.html › <screen / tab>
+- Prototype: app/mocksups-app/<app>/<file>.html › <screen / tab>
 
 ## Scope
 - …
@@ -236,7 +236,7 @@ Check in this order:
 | `docs/coding-conventions.md` | A convention is added or changed (including a new dependency) |
 | `docs/product-terms.md` | A term, state name, or code identifier is added or renamed |
 | `docs/business_logic/`, `docs/screens/`, `docs/database_design/` | The product owner decides a behavior. Move it from open to settled |
-| `docs/frames/*` | The product owner saves a new prototype version |
+| `app/mocksups-app/*` | The product owner saves a new prototype version |
 | `<Name>.meta.ts` | A component's purpose or variants change |
 
 Stamp `Last verified: YYYY-MM-DD` at the top of a doc when you confirm it, even if nothing changed.

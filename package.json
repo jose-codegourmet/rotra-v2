@@ -8,6 +8,7 @@
     "lint": "turbo lint",
     "type-check": "turbo type-check",
     "test": "turbo test",
+    "mockups": "pnpm --filter @rotra/mockups dev",
     "storybook": "pnpm --filter @rotra/ui storybook",
     "format": "biome format --write .",
     "prepare": "husky"

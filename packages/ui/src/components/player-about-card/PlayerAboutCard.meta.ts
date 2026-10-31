@@ -7,6 +7,6 @@ export const playerAboutCardMeta = {
     'Use on P-PUBLIC-PROFILE and P-OWN-PROFILE; never pass private contact data.',
     'Open decision (Profile editing: social visibility): links are shown publicly, the prototype placeholder.',
   ],
-  prototype: { file: 'docs/frames/player-app/rotra-player.html', screen: 'P-PUBLIC-PROFILE' },
+  prototype: { file: 'app/mocksups-app/player-app/rotra-player.html', screen: 'P-PUBLIC-PROFILE' },
   docs: ['docs/screens/product/modules/player-information/profile.md'],
 } satisfies ComponentMeta

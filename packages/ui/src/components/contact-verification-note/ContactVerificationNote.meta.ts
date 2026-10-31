@@ -10,7 +10,7 @@ export const contactVerificationNoteMeta = {
     "The prototype's 'this prototype' reads 'ROTRA'; that is the only wording change.",
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: "A-CONTACT-REVIEW › viewReview() › 'Verification'",
   },
   docs: [

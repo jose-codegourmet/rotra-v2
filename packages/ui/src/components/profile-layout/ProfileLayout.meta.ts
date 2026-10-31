@@ -3,6 +3,6 @@ export const profileLayoutMeta = {
   name: 'ProfileLayout',
   description: 'Prototype profile columns with a sticky identity sidebar above 920 px.',
   usage: ['Use for public Player Information profiles; never pass private contact data.'],
-  prototype: { file: 'docs/frames/player-app/rotra-player.html', screen: 'P-PUBLIC-PROFILE' },
+  prototype: { file: 'app/mocksups-app/player-app/rotra-player.html', screen: 'P-PUBLIC-PROFILE' },
   docs: ['docs/screens/product/modules/player-information/profile.md'],
 } satisfies ComponentMeta

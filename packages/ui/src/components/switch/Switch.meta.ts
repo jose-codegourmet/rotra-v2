@@ -10,7 +10,7 @@ export const switchMeta = {
     'Touch screens get the 54 × 32 px Present size automatically.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Roster › Present switch; Session setup › formats (.switch)',
   },
   docs: ['docs/screens/product/experience-contract.md#layout-and-device-behavior'],

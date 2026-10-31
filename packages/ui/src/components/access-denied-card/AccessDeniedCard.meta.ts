@@ -7,7 +7,7 @@ export const accessDeniedCardMeta = {
     'Render instead of the workspace; accepts only an account description and sign-out callback.',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: 'Access denied (viewDenied)',
   },
   docs: ['docs/screens/product/modules/admin/access-navigation.md'],

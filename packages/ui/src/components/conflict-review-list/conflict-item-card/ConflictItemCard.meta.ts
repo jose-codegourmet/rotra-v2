@@ -5,7 +5,7 @@ export const conflictItemCardMeta = {
     'Read-only original-device evidence. Conflict resolution is an unresolved decision gate; new notice copy needs owner review.',
   usage: ['Never offer an outcome editor, override, or device enrollment flow.'],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'No recovery screen; console notice placement and MatchRecordCard patterns',
   },
   docs: ['docs/screens/product/modules/queue/offline-recovery.md'],

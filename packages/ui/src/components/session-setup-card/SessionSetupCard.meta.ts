@@ -8,7 +8,7 @@ export const sessionSetupCardMeta = {
     "The container builds the minimum line from estimateMinimum() in @rotra/data and the session's minimumIsCalculated flag.",
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-PREPARE › prepOverview() Setup card',
   },
   docs: ['docs/screens/product/modules/queue/session-setup.md'],

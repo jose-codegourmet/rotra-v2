@@ -4,7 +4,7 @@
 
 **Surfaces:** `Q-PUBLIC-DETAILS`, `Q-PUBLIC-PARTICIPANTS`, `Q-PUBLIC-RESULTS`, `Q-PUBLIC-STALE`, `Q-PUBLIC-JOIN`.
 
-**Audience:** anyone with the link; no sign-in required. **Sources:** [Queue page brief](../../../../business_logic/product/queue/README.md), [license retention](../../../../business_logic/product/admin/modules/clubs-licenses/README.md). **Reference:** [ROTRA Queue prototype](../../../../frames/queue-app/rotra-queue.html) — **Public page** / **Preview public page**.
+**Audience:** anyone with the link; no sign-in required. **Sources:** [Queue page brief](../../../../business_logic/product/queue/README.md), [license retention](../../../../business_logic/product/admin/modules/clubs-licenses/README.md). **Reference:** [ROTRA Queue prototype](../../../../../app/mocksups-app/queue-app/rotra-queue.html) — **Public page** / **Preview public page**.
 
 ## Shared composition
 

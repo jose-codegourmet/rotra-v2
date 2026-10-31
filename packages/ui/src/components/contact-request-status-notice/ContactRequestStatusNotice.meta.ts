@@ -11,7 +11,7 @@ export const contactRequestStatusNoticeMeta = {
     "Pass the player's nickname or first name; contact values render in mono.",
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: 'A-CONTACT-REVIEW › viewReview() status notices',
   },
   docs: [

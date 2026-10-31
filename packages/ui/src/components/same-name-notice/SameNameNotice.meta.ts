@@ -11,7 +11,7 @@ export const sameNameNoticeMeta = {
     'Shows names and RTR IDs only, never phones or emails.',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: 'A-PLAYERS › viewPlayers() dupes notice; A-PLAYER-DETAIL › viewPlayer() twin notice',
   },
   docs: [

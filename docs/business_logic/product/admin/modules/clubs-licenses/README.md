@@ -1,6 +1,6 @@
 # Clubs and licenses
 
-**Status:** Confirmed v1 target rules. Updated October 27, 2026: club provisioning and per-club prices, settled with the [ROTRA Admin prototype](../../../../../frames/admin-app/rotra-admin.html).
+**Status:** Confirmed v1 target rules. Updated October 27, 2026: club provisioning and per-club prices, settled with the [ROTRA Admin prototype](../../../../../../app/mocksups-app/admin-app/rotra-admin.html).
 
 ## Club identity
 

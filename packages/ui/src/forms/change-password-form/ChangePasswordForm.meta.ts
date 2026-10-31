@@ -10,7 +10,7 @@ export const changePasswordFormMeta = {
     'Sign out opens SignOutSheet (D-SIGN-OUT) through onSignOut.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Q-CLUB › viewClub() #club-account',
   },
   docs: ['docs/screens/product/modules/queue/access-home.md'],

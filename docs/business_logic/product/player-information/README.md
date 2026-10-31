@@ -4,7 +4,7 @@
 
 **Status:** Lean v1 target product.
 
-**Reference prototype:** [`docs/frames/player-app/rotra-player.html`](../../../frames/player-app/rotra-player.html), also published as the ROTRA Players artifact. It shows these rules on screen; it adds no rules of its own.
+**Reference prototype:** [`app/mocksups-app/player-app/rotra-player.html`](../../../../app/mocksups-app/player-app/rotra-player.html), also published as the ROTRA Players artifact. It shows these rules on screen; it adds no rules of its own.
 
 This product stores player identity and shared rank across clubs. Profiles and the overall ROTRA leaderboard are public. Registered players sign in to edit their personal information, but cannot edit games, results, or calculated ranks.
 

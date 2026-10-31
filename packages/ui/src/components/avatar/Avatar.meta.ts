@@ -10,7 +10,7 @@ export const avatarMeta = {
     'shape="square" tone="accent" is the club logo / big initials tile (.avatar.lg, .avatar.xxl).',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Shared styles › .avatar (.lg, .xl, .xxl, .photo); queue cards, match dialogs',
   },
   docs: ['docs/screens/product/experience-contract.md#layout-and-device-behavior'],

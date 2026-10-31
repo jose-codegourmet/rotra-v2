@@ -2,7 +2,7 @@
 
 **Surfaces:** `Q-SAVED-PLAYERS`, `Q-ADD-PLAYER`, `Q-IDENTIFY`, `Q-ASSESS`, `Q-ROSTER`.
 
-**Source:** [player entry rules](../../../../business_logic/product/queue/modules/players/README.md). **Reference:** [ROTRA Queue prototype](../../../../frames/queue-app/rotra-queue.html).
+**Source:** [player entry rules](../../../../business_logic/product/queue/modules/players/README.md). **Reference:** [ROTRA Queue prototype](../../../../../app/mocksups-app/queue-app/rotra-queue.html).
 
 ## Q-SAVED-PLAYERS — Club player list
 

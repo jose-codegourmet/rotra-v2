@@ -10,7 +10,7 @@ export const datePickerMeta = {
     'The full Choose a date dialog with a selected-date summary and Set date is a product component (Q02.4) built on DateCalendar.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Session setup › Details › Date (.input.date-btn) and Choose a date (.dp-*)',
   },
   docs: ['docs/coding-conventions.md#6-forms'],

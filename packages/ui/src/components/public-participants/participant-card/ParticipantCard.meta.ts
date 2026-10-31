@@ -9,7 +9,7 @@ export const participantCardMeta = {
     'Props carry only public fields: name, picture and whether a ROTRA profile exists. Use SavedPlayerCard or RosterRow for operator views that show level, presence or identity details.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Public page › viewPublic() › Participants tab (.pgrid > .pcard)',
   },
   docs: ['docs/screens/product/modules/queue/public-session.md'],

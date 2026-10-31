@@ -15,7 +15,7 @@ export const rankingSettingsMeta = {
     'Leaving with an unsaved draft: the container sets Redux ui.unsavedDraft, so the shell\'s rail and brand ask instead of navigating, and the browser shows its own prompt on reload or close (beforeunload). ConfirmSheet "Discard your draft?" (Keep editing / Discard draft, danger); Discard draft clears the draft and continues the navigation. The browser Back button is not guarded.',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen:
       'viewConfig (Ranking settings); SHEETS.config / SHEETS.discard; ACT.doConfig / cfgRebase / cfgDiscard / discardGo; go() with cfgDirty; offlineBlock',
   },

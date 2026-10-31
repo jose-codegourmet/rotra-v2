@@ -8,7 +8,10 @@ export const offlineBandMeta = {
     'Render directly below the Player Information and Admin top bar while the app is offline.',
     'Use Notice for content-level messages rather than this global connection state.',
   ],
-  prototype: { file: 'docs/frames/player-app/rotra-player.html', screen: 'topBar() › .band-off' },
+  prototype: {
+    file: 'app/mocksups-app/player-app/rotra-player.html',
+    screen: 'topBar() › .band-off',
+  },
   docs: ['docs/screens/product/experience-contract.md#standard-states'],
   related: ['PlayerNav', 'Notice'],
 } satisfies ComponentMeta

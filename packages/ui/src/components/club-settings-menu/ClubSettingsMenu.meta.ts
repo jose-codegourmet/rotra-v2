@@ -10,7 +10,7 @@ export const clubSettingsMenuMeta = {
     "Only one drawer at a time: pass open and onOpenChange, and close the shell's navigation drawer before opening this one.",
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Club settings › .settings-nav, .settings-trigger',
   },
   docs: [

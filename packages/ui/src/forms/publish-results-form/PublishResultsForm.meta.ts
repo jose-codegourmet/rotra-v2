@@ -11,7 +11,7 @@ export const publishResultsFormMeta = {
     'Withdrawing a publication entirely is an open decision and is not offered here.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'SHEETS.publish (ACT.openPublish, ACT.confirmPublish)',
   },
   docs: [

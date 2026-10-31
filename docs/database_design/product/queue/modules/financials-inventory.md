@@ -2,7 +2,7 @@
 
 **Last verified:** 2026-10-28 for calculation units; payment lifecycle remains proposed.
 
-**Status:** Proposed data model, added October 26, 2026 for the [financials rules](../../../../business_logic/product/queue/modules/financials/README.md) introduced by the [ROTRA Queue prototype](../../../../frames/queue-app/rotra-queue.html). Field names are new design names, not existing Prisma columns.
+**Status:** Proposed data model, added October 26, 2026 for the [financials rules](../../../../business_logic/product/queue/modules/financials/README.md) introduced by the [ROTRA Queue prototype](../../../../../app/mocksups-app/queue-app/rotra-queue.html). Field names are new design names, not existing Prisma columns.
 
 These records support an estimate and a manual paid / not-paid checklist. There is deliberately no receipt, gateway, or per-player charge table, and no money moves through ROTRA.
 

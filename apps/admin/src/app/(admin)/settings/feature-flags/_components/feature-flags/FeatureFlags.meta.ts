@@ -13,7 +13,7 @@ export const featureFlagsMeta = {
     'Offline (AdminOfflineBand from the shell): the list stays readable and switches still open the confirmation; Turn on / Turn off sends nothing and shows ADMIN_OFFLINE_ERROR in the sheet (a fresh node per tap so the one-commit guard re-arms); the value is unchanged and no toast shows.',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: 'viewFlags (Feature flags); SHEETS.flag; ACT.openFlag / doFlag',
   },
   docs: [

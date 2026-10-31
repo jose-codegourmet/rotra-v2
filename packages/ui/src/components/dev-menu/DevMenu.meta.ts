@@ -7,7 +7,7 @@ export const devMenuMeta = {
     'Mount only in development or with the explicit developer-menu build flag.',
     'Player link previews stay disabled until their callbacks are supplied. Account/private flows are not implemented by this component.',
   ],
-  prototype: { file: 'docs/frames/queue-app/rotra-queue.html', screen: 'Prototype controls' },
+  prototype: { file: 'app/mocksups-app/queue-app/rotra-queue.html', screen: 'Prototype controls' },
   variants: [
     'admin',
     'default',
@@ -18,5 +18,5 @@ export const devMenuMeta = {
     'player-scenarios',
   ],
   related: ['Sheet', 'Switch', 'SegmentedControl'],
-  docs: ['docs/frames/player-app/rotra-player.html'],
+  docs: ['app/mocksups-app/player-app/rotra-player.html'],
 } satisfies ComponentMeta

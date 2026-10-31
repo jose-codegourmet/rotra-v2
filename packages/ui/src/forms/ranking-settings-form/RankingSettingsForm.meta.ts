@@ -12,7 +12,7 @@ export const rankingSettingsFormMeta = {
     'The three-month lookback, the five-session award requirement and equal club weighting are not editable here.',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: 'A-RANK-CONFIG › viewConfig Edit card (cfgCheck, cfgDirty)',
   },
   docs: [

@@ -10,7 +10,7 @@ export const rankingInEffectCardMeta = {
     'Times read "Oct 29, 7:48 PM" in Asia/Manila, the same as ActivityLog.',
   ],
   prototype: {
-    file: 'docs/frames/admin-app/rotra-admin.html',
+    file: 'app/mocksups-app/admin-app/rotra-admin.html',
     screen: 'A-RANK-CONFIG › viewConfig() In effect and Versions',
   },
   docs: [

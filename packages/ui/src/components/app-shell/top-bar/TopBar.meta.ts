@@ -11,7 +11,7 @@ export const topBarMeta = {
     'Admin and Player pass onBrandClick to go home from the mark.',
   ],
   prototype: {
-    file: 'docs/frames/queue-app/rotra-queue.html',
+    file: 'app/mocksups-app/queue-app/rotra-queue.html',
     screen: 'Top bar (.top, .brand, .burger)',
   },
   docs: ['docs/screens/product/navigation.md#product-navigation'],

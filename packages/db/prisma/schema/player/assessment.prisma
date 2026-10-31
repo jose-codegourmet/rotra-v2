@@ -14,14 +14,15 @@ model ClubAssessment {
   skillLevelId         Int      @map("skill_level_id") @db.SmallInt
   /// Prior revision in the same club/player scope.
   supersedesId         String?  @map("supersedes_id") @db.Uuid
-  /// Idempotency key of the command or sync operation (FK to sync_operations arrives in F07.14).
+  /// Idempotency key: an online command ID or a sync operation ID. No FK, because online commands
+  /// have no sync_operations row; never fabricate one to satisfy a constraint.
   sourceOperationId    String   @unique @map("source_operation_id") @db.Uuid
   assessedAt           DateTime @map("assessed_at") @db.Timestamptz(6)
   receivedAt           DateTime @default(now()) @map("received_at") @db.Timestamptz(6)
   acceptedRevision     BigInt   @map("accepted_revision")
   /// Shared club credentials: the club account, not a person.
   actorClubId          String   @map("actor_club_id") @db.Uuid
-  /// FK to devices arrives in F07.14.
+  /// Recording device, from the same club (scoped FK added by F07.12).
   deviceId             String?  @map("device_id") @db.Uuid
 
   clubPlayer         ClubPlayer       @relation(fields: [clubId, clubPlayerId], references: [clubId, id], onDelete: Restrict)
@@ -32,6 +33,7 @@ model ClubAssessment {
   supersedes         ClubAssessment?  @relation("AssessmentSupersedes", fields: [clubId, clubPlayerId, supersedesId], references: [clubId, clubPlayerId, id], onDelete: Restrict)
   supersededBy       ClubAssessment[] @relation("AssessmentSupersedes")
   selectedBy         SessionPlayer[]  @relation("SelectedAssessment")
+  device             Device?          @relation(fields: [clubId, deviceId], references: [clubId, id], onDelete: Restrict)
 
   @@unique([clubId, clubPlayerId, id])
   @@unique([clubId, sessionId, sessionPlayerId, id])

@@ -1,0 +1,189 @@
+// Devices, per-session device streams, operation receipts and sync conflicts
+// (queue/modules/offline-sync.md). Storage only: no outbox, enrollment service or conflict authority.
+//
+// Retry contract: an operation is identified by its client ID and placed at (stream, sequence).
+// The same ID with the same payload digest returns the stored receipt; the same ID with a different
+// digest, or another ID at a used (stream, sequence), is a conflict. The envelope never changes after
+// insert (trigger in SQL); only its processing state moves.
+//
+// Completeness is never asserted: a stream records its contiguous validated prefix separately from the
+// highest sequence seen, so gaps stay visible, and a missing or never-enrolled stream is simply absent.
+
+/// A club device (a browser on a club account), not a separate human manager.
+/// Enrollment and revocation rules are pending #246.
+model Device {
+  id           String    @id @db.Uuid
+  clubId       String    @map("club_id") @db.Uuid
+  label        String
+  registeredAt DateTime  @map("registered_at") @db.Timestamptz(6)
+  revokedAt    DateTime? @map("revoked_at") @db.Timestamptz(6)
+  revokeReason String?   @map("revoke_reason")
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision     BigInt    @default(1)
+
+  clubAccount         ClubAccount           @relation(fields: [clubId], references: [clubId], onDelete: Restrict)
+  streams             DeviceSessionStream[]
+  assessments         ClubAssessment[]
+  decidedJoinRequests SessionJoinRequest[]
+  resolvedConflicts   SyncConflict[]
+
+  @@unique([clubId, id])
+  @@map("devices")
+}
+
+/// Proposal pending #246: open → sealed (final sequence and digest submitted), or revoked.
+enum DeviceStreamState {
+  open
+  sealed
+  revoked
+
+  @@map("device_stream_state")
+}
+
+/// One writable stream per (session, device, generation). A download alone is not write authorization.
+model DeviceSessionStream {
+  id                  String            @id @db.Uuid
+  clubId              String            @map("club_id") @db.Uuid
+  sessionId           String            @map("session_id") @db.Uuid
+  deviceId            String            @map("device_id") @db.Uuid
+  /// Positive; a re-enrolled device starts a new generation.
+  generationNo        Int               @map("generation_no")
+  /// Server session revision of the snapshot the device downloaded.
+  downloadedRevision  BigInt            @map("downloaded_revision")
+  /// Highest N such that operations 1..N have all been received and validated. 0 = none.
+  contiguousSequence  BigInt            @default(0) @map("contiguous_sequence")
+  /// Highest sequence received at all. Greater than contiguous_sequence means a gap.
+  highestReceivedSeq  BigInt            @default(0) @map("highest_received_sequence")
+  /// Final seal: the device's last durable operation sequence and the digest over 1..N.
+  sealedFinalSequence BigInt?           @map("sealed_final_sequence")
+  sealedDigest        Bytes?            @map("sealed_digest")
+  sealedAt            DateTime?         @map("sealed_at") @db.Timestamptz(6)
+  state               DeviceStreamState @default(open)
+  enrolledAt          DateTime          @map("enrolled_at") @db.Timestamptz(6)
+  createdAt           DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime          @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision            BigInt            @default(1)
+
+  session    QueueSession    @relation(fields: [clubId, sessionId], references: [clubId, id], onDelete: Restrict)
+  device     Device          @relation(fields: [clubId, deviceId], references: [clubId, id], onDelete: Restrict)
+  operations SyncOperation[]
+
+  @@unique([sessionId, deviceId, generationNo])
+  @@unique([clubId, sessionId, id])
+  @@index([clubId, deviceId])
+  @@map("device_session_streams")
+}
+
+/// Proposal pending #246. received: stored, not yet validated; waiting: causal prerequisites missing;
+/// accepted: applied with its canonical mutation; rejected: refused (rejection_code); conflicted:
+/// quarantined in sync_conflicts.
+enum SyncOperationState {
+  received
+  waiting
+  accepted
+  rejected
+  conflicted
+
+  @@map("sync_operation_state")
+}
+
+/// Immutable operation envelope plus its processing state. Payloads may hold private intake fields:
+/// never exported or logged.
+model SyncOperation {
+  id             String             @id @db.Uuid
+  clubId         String             @map("club_id") @db.Uuid
+  sessionId      String             @map("session_id") @db.Uuid
+  streamId       String             @map("stream_id") @db.Uuid
+  /// Positive, contiguous per stream. Transmitted as a decimal string.
+  sequence       BigInt
+  /// Target record type and ID, e.g. match / <uuid>. Not a generic FK.
+  entityType     String             @map("entity_type")
+  entityId       String             @map("entity_id") @db.Uuid
+  commandKind    String             @map("command_kind")
+  /// Revision the command was made against; null for creates.
+  baseRevision   BigInt?            @map("base_revision")
+  payloadVersion Int                @map("payload_version")
+  payload        Json
+  /// SHA-256 of the canonical payload; the retry comparison key.
+  payloadDigest  Bytes              @map("payload_digest")
+  /// Device time: evidence, never authoritative order or license proof.
+  occurredAt     DateTime           @map("occurred_at") @db.Timestamptz(6)
+  receivedAt     DateTime           @default(now()) @map("received_at") @db.Timestamptz(6)
+  state          SyncOperationState @default(received)
+  processedAt    DateTime?          @map("processed_at") @db.Timestamptz(6)
+  /// Session revision produced when accepted.
+  resultRevision BigInt?            @map("result_revision")
+  /// Short machine code when rejected.
+  rejectionCode  String?            @map("rejection_code")
+  updatedAt      DateTime           @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  stream    DeviceSessionStream     @relation(fields: [clubId, sessionId, streamId], references: [clubId, sessionId, id], onDelete: Restrict)
+  conflicts SyncConflictOperation[]
+
+  @@unique([streamId, sequence])
+  @@unique([clubId, sessionId, id])
+  @@index([sessionId, state, receivedAt])
+  @@index([sessionId, entityType, entityId])
+  @@map("sync_operations")
+}
+
+/// Proposal pending #246; who may resolve and what a resolution means is not decided here.
+enum SyncConflictCategory {
+  revision_mismatch
+  payload_mismatch
+  contradictory_decision
+  missing_prerequisite
+  identity_link
+
+  @@map("sync_conflict_category")
+}
+
+enum SyncConflictState {
+  open
+  resolved
+
+  @@map("sync_conflict_state")
+}
+
+/// Quarantined contradiction. Implicated operations are relational (sync_conflict_operations);
+/// resolution is evidence, never a free-text winner correction.
+model SyncConflict {
+  id                 String               @id @db.Uuid
+  clubId             String               @map("club_id") @db.Uuid
+  sessionId          String               @map("session_id") @db.Uuid
+  category           SyncConflictCategory
+  state              SyncConflictState    @default(open)
+  detectedAt         DateTime             @default(now()) @map("detected_at") @db.Timestamptz(6)
+  /// Diagnostic evidence (versioned). Private.
+  evidence           Json?
+  resolvedAt         DateTime?            @map("resolved_at") @db.Timestamptz(6)
+  resolutionEvidence Json?                @map("resolution_evidence")
+  resolvedByDeviceId String?              @map("resolved_by_device_id") @db.Uuid
+  createdAt          DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime             @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision           BigInt               @default(1)
+
+  session          QueueSession            @relation(fields: [clubId, sessionId], references: [clubId, id], onDelete: Restrict)
+  resolvedByDevice Device?                 @relation(fields: [clubId, resolvedByDeviceId], references: [clubId, id], onDelete: Restrict)
+  operations       SyncConflictOperation[]
+
+  @@unique([clubId, sessionId, id])
+  @@index([sessionId, state, detectedAt])
+  @@map("sync_conflicts")
+}
+
+/// An operation implicated in a conflict, from the same club and session.
+model SyncConflictOperation {
+  conflictId  String @map("conflict_id") @db.Uuid
+  operationId String @map("operation_id") @db.Uuid
+  clubId      String @map("club_id") @db.Uuid
+  sessionId   String @map("session_id") @db.Uuid
+
+  conflict  SyncConflict  @relation(fields: [clubId, sessionId, conflictId], references: [clubId, sessionId, id], onDelete: Restrict)
+  operation SyncOperation @relation(fields: [clubId, sessionId, operationId], references: [clubId, sessionId, id], onDelete: Restrict)
+
+  @@id([conflictId, operationId])
+  @@index([operationId])
+  @@map("sync_conflict_operations")
+}

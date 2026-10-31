@@ -114,6 +114,10 @@ Epics are titled `Epic <key> · <Product> › <Module>`.
 4. If the ticket can't be done as written (missing decision, wrong path, contradiction), comment what is
    wrong, add the `blocked` label, and move to the next ticket. Don't guess.
 5. One ticket = one PR. When the PR merges, `Closes #<n>` closes the ticket and the epic's progress updates.
+6. **Given a ticket link directly?** Do that ticket (skip steps 1–2). When the work is done and its PR is
+   merged, make sure the ticket is closed: `gh issue view <n> --json state`. If it is still open, close it
+   with a comment linking the PR: `gh issue close <n> --comment "Done in #<pr>."`. Never close a ticket
+   that is unfinished or `blocked`; step 4 applies instead.
 
 ---
 

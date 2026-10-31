@@ -149,7 +149,9 @@ Tickets are GitHub issues labeled `ticket`, sub-issues of `epic` issues, titled
 `<seq> · <key> · <Type>: <what>`. Take the **lowest open `<seq>`** whose *Depends on* issues are closed.
 Open one PR per ticket with `Closes #<n>`, run lint/type-check/build locally, then
 `gh pr merge --squash --auto --delete-branch`. **CI never blocks; PRs auto-merge.** Can't do a ticket as
-written? Comment why, label it `blocked`, take the next. Full rules: [ways-of-working.md §3, §5](docs/ways-of-working.md#picking-up-the-next-ticket-agents).
+written? Comment why, label it `blocked`, take the next. **Given a ticket link?** Do that ticket; once
+it's done and merged, check the issue is closed and close it yourself (`gh issue close <n> --comment
+"Done in #<pr>."`) if it isn't. Never close an unfinished or `blocked` ticket. Full rules: [ways-of-working.md §3, §5](docs/ways-of-working.md#picking-up-the-next-ticket-agents).
 
 ---
 

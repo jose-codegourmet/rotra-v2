@@ -30,7 +30,7 @@ Shared packages: `@rotra/ui` (components + Storybook), `@rotra/data` (types, moc
 
 ## Commands
 
-The root scripts and the `Makefile` (`make dev`, `make lint`, …) run these. Ports: queue 3000, player 3001, admin 3002.
+The root scripts and the `Makefile` (`make dev`, `make lint`, …) run these. Ports: queue 9000, player 9001, admin 9002.
 
 ```bash
 nvm use && pnpm install
@@ -67,4 +67,4 @@ TanStack Table v8 · React Hook Form + Zod · Redux Toolkit · Motion · Storybo
 Biome · Supabase + Prisma (later). Details: [architecture](docs/architecture.md),
 [coding conventions §1](docs/coding-conventions.md#1-stack).
 
-The canonical editable prototypes live in [app/mocksups-app](app/mocksups-app/README.md). Run `nvm use && pnpm mockups` to open the separate routed prototype app on port 3003: `/player`, `/queue`, and `/admin`, with nested routes, direct links, and browser history.
+The canonical editable prototypes live in [app/mocksups-app](app/mocksups-app/README.md). Run `nvm use && pnpm mockups` to open the separate routed prototype app on port 9003: `/player`, `/queue`, and `/admin`, with nested routes, direct links, and browser history.

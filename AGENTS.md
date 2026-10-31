@@ -127,15 +127,15 @@ Behavior: **business docs**. Look and copy: **the prototype**, then the screen d
 
 ## 5. Commands
 
-The root scripts and `Makefile` run these (every `make` target loads nvm first). Ports: queue 3000,
-player 3001, admin 3002.
+The root scripts and `Makefile` run these (every `make` target loads nvm first). Ports: queue 9000,
+player 9001, admin 9002.
 
 ```bash
 nvm use && pnpm install
 nvm use && pnpm dev                          # all apps
 nvm use && pnpm --filter @rotra/queue dev    # or @rotra/player, @rotra/admin
 nvm use && pnpm --filter @rotra/ui storybook   # or: pnpm storybook, make storybook
-nvm use && pnpm mockups                      # routed prototypes on port 3003
+nvm use && pnpm mockups                      # routed prototypes on port 9003
 nvm use && pnpm lint                         # Biome
 nvm use && pnpm type-check
 nvm use && pnpm build

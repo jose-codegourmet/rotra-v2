@@ -9,7 +9,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 export const WithLink: Story = {
   args: {
-    session: { ...joseSession(0), sessionPageUrl: 'http://localhost:3000/s/sunday-night-queue' },
+    session: { ...joseSession(0), sessionPageUrl: 'http://localhost:9000/s/sunday-night-queue' },
   },
 }
 export const PageGone: Story = { args: { session: joseSession(3) } }

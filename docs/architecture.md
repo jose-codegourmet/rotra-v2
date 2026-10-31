@@ -39,9 +39,9 @@ and adding the server and offline infrastructure described in §5.
 ```text
 rotra/
 ├── apps/
-│   ├── queue/        @rotra/queue    Club operator app (main v1 product)      :3000
-│   ├── player/       @rotra/player   Player Information: profiles, leaderboard :3001
-│   └── admin/        @rotra/admin    Platform owner tools                      :3002
+│   ├── queue/        @rotra/queue    Club operator app (main v1 product)      :9000
+│   ├── player/       @rotra/player   Player Information: profiles, leaderboard :9001
+│   └── admin/        @rotra/admin    Platform owner tools                      :9002
 ├── packages/
 │   ├── ui/           @rotra/ui       Every visual component and form + the one Storybook
 │   ├── data/         @rotra/data     Domain types, fixtures, mock store, fetchers, query keys, hooks
@@ -54,7 +54,7 @@ rotra/
 
 Ports are set in each app's `dev` and `start` scripts.
 
-The separate prototype workspace `app/mocksups-app` runs on port 3003 (`pnpm mockups`). Its
+The separate prototype workspace `app/mocksups-app` runs on port 9003 (`pnpm mockups`). Its
 Node HTTP server and browser History API expose `/player`, `/queue`, and `/admin`, with the
 actual app paths beneath those prefixes. It serves the canonical HTML designs with optional
 routing adapters and keeps their fictional browser-local stores. It does not import the real
@@ -296,5 +296,5 @@ editing one changes nothing until it is pasted. See [email-templates.md](email-t
 | Real auth details (Supabase Auth setup for club usernames) | Open; auth epic |
 | Mock store persistence across reloads | In-memory for now |
 | Hosting | Settled: one Vercel project with [services](https://vercel.com/docs/services) (`vercel.json`), routed by host: `queue.rotra.club`, `player.rotra.club`, `admin.rotra.club`. Automatic Git deployments are disabled with `git.deploymentEnabled: false`. Deploy manually from `main` through `.github/workflows/deploy.yml`; the GitHub `production` environment restricts deployments to `main` and holds the deployment credentials. See [deployment setup](../README.md#production-deployments). Storybook is not deployed. What the bare domain shows is open |
-| App ports | Settled: 3000 / 3001 / 3002 (F01.1) |
+| App ports | Settled: 9000 / 9001 / 9002 (F01.1) |
 | Test runner for money and ranking math | Vitest (F05.1); also allowed for phone parsing and queue rules |

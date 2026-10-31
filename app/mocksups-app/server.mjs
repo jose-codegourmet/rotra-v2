@@ -8,7 +8,7 @@ const assets = new Map([
   ['/index.css', ['index.css', 'text/css']],
   ['/router.js', ['router.js', 'text/javascript']],
 ])
-const port = Number(process.env.PORT || 3003)
+const port = Number(process.env.PORT || 9003)
 
 createServer(async (request, response) => {
   const send = (status, type, body) => {

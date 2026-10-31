@@ -6,8 +6,8 @@ Run this separate prototype app from the repository root:
 nvm use && pnpm mockups
 ```
 
-Open the [launcher](http://127.0.0.1:3003/), [Queue](http://127.0.0.1:3003/queue),
-[Player Information](http://127.0.0.1:3003/player), or [Admin](http://127.0.0.1:3003/admin).
+Open the [launcher](http://127.0.0.1:9003/), [Queue](http://127.0.0.1:9003/queue),
+[Player Information](http://127.0.0.1:9003/player), or [Admin](http://127.0.0.1:9003/admin).
 Stop the server with Ctrl+C. If that port is busy, use `nvm use && PORT=3103 pnpm mockups`.
 
 The app uses Node's built-in HTTP server and browser History API, with no additional dependencies.

@@ -1,6 +1,6 @@
 # AGENTS.md — `@rotra/player`
 
-> Nested entry for `apps/player` (ROTRA Player Information, port 3001). Root: [`/AGENTS.md`](../../AGENTS.md) ·
+> Nested entry for `apps/player` (ROTRA Player Information, port 9001). Root: [`/AGENTS.md`](../../AGENTS.md) ·
 > Structure: [architecture §4](../../docs/architecture.md#4-inside-an-app-nextjs-16-app-router) ·
 > Pages and routes: [coding conventions §9](../../docs/coding-conventions.md#9-nextjs-16).
 

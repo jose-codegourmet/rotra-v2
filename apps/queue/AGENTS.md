@@ -1,6 +1,6 @@
 # AGENTS.md — `@rotra/queue`
 
-> Nested entry for `apps/queue` (ROTRA Queue, port 3000). Root: [`/AGENTS.md`](../../AGENTS.md) ·
+> Nested entry for `apps/queue` (ROTRA Queue, port 9000). Root: [`/AGENTS.md`](../../AGENTS.md) ·
 > Structure: [architecture §4](../../docs/architecture.md#4-inside-an-app-nextjs-16-app-router) ·
 > Pages and routes: [coding conventions §9](../../docs/coding-conventions.md#9-nextjs-16).
 

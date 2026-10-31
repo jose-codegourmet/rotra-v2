@@ -6,7 +6,7 @@ NVM := . $(HOME)/.nvm/nvm.sh && nvm use
 install:
 	@$(NVM) && pnpm install
 
-# All three apps: queue :3000, player :3001, admin :3002
+# All three apps: queue :9000, player :9001, admin :9002
 dev:
 	@$(NVM) && pnpm dev
 

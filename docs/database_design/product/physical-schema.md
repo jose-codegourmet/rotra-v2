@@ -70,3 +70,21 @@ only through server Route Handlers and services, never through the Supabase Data
   pending #244. Unclaimed identities have no `player_accounts` row.
 - Private contacts and claim digests are never selected into public projections; public reads use
   explicit allowlists (F07.20 service boundary).
+
+## Group H (part) · contact-change requests (F07.18 · `20261031000400`)
+
+`player_contact_change_requests`: PK `id`; unique `source_command_id` (submit idempotency) and
+`provider_operation_ref` (set on approval, kept by every retry); indexes `(player_id, requested_at desc)`,
+`(status, requested_at)`, `(field, proposed_value)`. All admin and player FKs are `RESTRICT`.
+
+| Rule | Enforcement |
+|---|---|
+| Approved ≠ applied | Only `status = 'applied'` has `applied_at`, and it also needs `provider_applied_at` (stage 1: provider login changed; stage 2: private contact row matches). `approved`, `applying` and `failed` are all *not applied*. |
+| Approval evidence | Every state past `pending` except `rejected` needs reviewer, `reviewed_at`, `approved_at` and `provider_operation_ref`; `rejected` needs reviewer and `rejected_at` and no approval. |
+| No conflicting accepted updates | Partial uniques: one open `app` request per player; one in-flight (`approved · applying · failed`) request per player; one in-flight request per `(field, proposed_value)` across all players, which reserves the identifier before the provider call. |
+| Retries | `failed` keeps its `provider_operation_ref`; `application_attempts`/`last_attempt_at` record retries; `failure_code` is a short code, never a contact value. |
+| Finality | Trigger rejects any update or delete once `applied` or `rejected`. |
+| Privacy | Proposed/original values are private normalized contacts. The table has no grants for `anon`/`authenticated`; services expose a request only to its player and the platform owner. No password or contact-proof material is stored. |
+
+Approval and application commands also write `admin_audit_events` with redacted metadata (no contact
+values). The player's UUID and RTR ID never change. Auth-provider mutation is not part of this ticket.

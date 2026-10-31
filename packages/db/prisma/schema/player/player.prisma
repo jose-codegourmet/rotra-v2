@@ -31,6 +31,7 @@ model Player {
   socialLinks    PlayerSocialLink[]
   claimLinks     PlayerClaimLink[]
   idAllocation   PlayerIdAllocation?
+  contactChanges PlayerContactChangeRequest[]
 
   @@index([fullName])
   @@map("players")

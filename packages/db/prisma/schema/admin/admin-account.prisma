@@ -10,12 +10,14 @@ model AdminAccount {
   updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
   revision     BigInt   @default(1)
 
-  activatedTerms      ClubLicenseTerm[]
-  reviewedNameChanges ClubNameChangeRequest[]
-  createdFlags        FeatureFlag[]           @relation("FeatureFlagCreatedBy")
-  updatedFlags        FeatureFlag[]           @relation("FeatureFlagUpdatedBy")
-  rankingPolicies     RankingPolicyVersion[]
-  auditEvents         AdminAuditEvent[]
+  activatedTerms          ClubLicenseTerm[]
+  reviewedNameChanges     ClubNameChangeRequest[]
+  createdFlags            FeatureFlag[]                @relation("FeatureFlagCreatedBy")
+  updatedFlags            FeatureFlag[]                @relation("FeatureFlagUpdatedBy")
+  rankingPolicies         RankingPolicyVersion[]
+  auditEvents             AdminAuditEvent[]
+  submittedContactChanges PlayerContactChangeRequest[] @relation("ContactChangeSubmittedBy")
+  reviewedContactChanges  PlayerContactChangeRequest[] @relation("ContactChangeReviewedBy")
 
   @@unique([authProvider, authSubject])
   @@map("admin_accounts")

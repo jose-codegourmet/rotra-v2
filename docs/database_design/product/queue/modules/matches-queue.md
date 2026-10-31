@@ -72,4 +72,6 @@ Use explicit null-safe checks for each decision kind. Ordinary app roles cannot 
 
 Conflicting confirmations from different devices are retained in sync staging, not inserted by overwriting this row. Choosing an authoritative conflicting confirmation remains a blocking design decision.
 
+Drafted in Prisma by F07.14; keys, triggers and the end-of-match order are in [physical schema](../../physical-schema.md#group-f--matches-participation-occupancy-decisions-f0714--20261031000700).
+
 Business source: [matches](../../../../business_logic/product/queue/modules/matches/README.md), [queue rules](../../../../business_logic/product/queue/modules/queueing/README.md).

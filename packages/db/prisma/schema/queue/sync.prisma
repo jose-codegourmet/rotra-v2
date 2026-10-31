@@ -27,6 +27,7 @@ model Device {
   assessments         ClubAssessment[]
   decidedJoinRequests SessionJoinRequest[]
   resolvedConflicts   SyncConflict[]
+  matchDecisions      MatchDecision[]
 
   @@unique([clubId, id])
   @@map("devices")

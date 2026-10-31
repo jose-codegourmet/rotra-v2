@@ -48,6 +48,9 @@ model SessionPlayer {
   selectedAssessment ClubAssessment?  @relation("SelectedAssessment", fields: [clubId, sessionId, id, assessmentId], references: [clubId, sessionId, sessionPlayerId, id], onDelete: Restrict)
   assessments        ClubAssessment[] @relation("AssessmentEntry")
 
+  participations MatchParticipation[]
+  activeHold     ActivePlayerHold?
+
   @@unique([clubId, sessionId, id])
   @@unique([sessionId, clubPlayerId])
   @@unique([sessionId, playerIdAtEntry])

@@ -193,3 +193,29 @@ Typed command payloads are not generic FKs into other tables.
 
 Open (#246): enrollment and revocation, stream states (`open · sealed · revoked`), the zero-operation
 close of a stream that never wrote, conflict categories and who may resolve one.
+
+## Group F · matches, participation, occupancy, decisions (F07.14 · `20261031000700`)
+
+| Table | Keys and uniques | Checks and triggers | Scoped FKs |
+|---|---|---|---|
+| `matches` | PK `id`; unique `(club_id, session_id, id)`, `(session_id, match_no)`, `source_operation_id`; index `(session_id, state, queue_position, id)` | `match_no > 0`; removed only while waiting; started ⇔ not waiting; ended ⇔ completed/invalid; **frozen-after-decision** trigger (no delete; no change once completed/invalid; ending needs a matching decision) | `(club_id, session_id)` |
+| `match_participations` | PK `id`; unique `(match_id, session_player_id, segment_no)` | segment > 0; left time ⇔ left operation; finished ⇒ not left; **frozen** trigger (no change once decided; no delete once started) | `(club_id, session_id, match_id)`, `(club_id, session_id, session_player_id)` |
+| `match_court_usage` | PK `id`; unique `(match_id, court_id)` | release time ⇔ release operation; no delete | match and `(club_id, session_id, court_id)` |
+| `active_court_holds` | PK `court_id` (one hold per court) | hold needs an **active** match | court and match, scoped |
+| `active_player_holds` | PK `session_player_id`; unique `player_id` (a known player is held once across all sessions) | hold needs an **active** match | roster entry and match, scoped |
+| `match_decisions` | PK `match_id`; unique `source_operation_id`, `(club_id, session_id, match_id)` | completed ⇒ winner; invalid ⇒ no winner/scores; scores both null (winner-only) or both ≥ 0 and agreeing with the winner (no ties); actor = club; **append-only** | match, `(club_id, device_id)` |
+
+- **Occupancy.** A court or player can be held by one active match only (primary keys). A 5v5 match
+  holds two courts through two `active_court_holds` rows for the same match. Holds are released by
+  deleting them in the same transaction as the decision.
+- **Ending a match, in order:** close segments (`left_at`, `finished_with_match`), insert the decision,
+  set the match state, release holds and court usage. After the decision, the match, its segments and
+  the decision itself reject every update and delete, for every application role including Admin.
+- **Substitutions** close the outgoing segment and open a new one for the incoming player; both
+  segments survive. Full participation is derived (started and finished with the match, one
+  segment), never a client flag.
+- Operation references (`source_operation_id`, `joined_operation_id`, …) have no FK: online commands
+  have no `sync_operations` row.
+- Open (#246): offline `match_no` allocation, conflicting confirmations, and whether unplayed waiting
+  matches are kept or marked removed at Session done. Canonical waiting positions are not unique in
+  the database because reorders would need a deferrable constraint; commands keep them unique.

@@ -36,6 +36,7 @@ model Player {
   resolvedInputs ClubPlayerPrivateInput[]     @relation("ClubPlayerInputResolved")
   rosterEntries  SessionPlayer[]              @relation("SessionPlayerAtEntry")
   assessments    ClubAssessment[]             @relation("AssessmentPlayer")
+  activeHold     ActivePlayerHold?            @relation("ActivePlayerHold")
 
   @@index([fullName])
   @@map("players")

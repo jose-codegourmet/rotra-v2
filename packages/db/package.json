@@ -1,0 +1,31 @@
+{
+  "name": "@rotra/db",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./client": "./src/client/prisma.ts"
+  },
+  "scripts": {
+    "db:generate": "prisma generate",
+    "db:validate": "prisma validate",
+    "db:format": "prisma format",
+    "db:migrate:draft": "prisma migrate dev --create-only",
+    "db:migrate:status": "prisma migrate status",
+    "lint": "biome check .",
+    "type-check": "prisma generate && tsc --noEmit"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "7.10.1",
+    "@prisma/client": "7.10.1",
+    "pg": "8.23.1",
+    "server-only": "0.0.1"
+  },
+  "devDependencies": {
+    "@rotra/config": "workspace:*",
+    "@types/node": "^24",
+    "@types/pg": "8.23.1",
+    "prisma": "7.10.1",
+    "typescript": "^5.9.3"
+  }
+}

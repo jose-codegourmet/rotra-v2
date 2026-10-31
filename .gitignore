@@ -33,6 +33,7 @@ storybook-static
 
 # Prisma
 packages/db/node_modules/.prisma
+packages/db/src/generated
 
 # Type checking cache
 *.tsbuildinfo

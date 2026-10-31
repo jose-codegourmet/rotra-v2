@@ -1,0 +1,11 @@
+// Generator and datasource only. Models live in product folders (admin/, queue/, player/).
+// See docs/architecture.md §10 and docs/coding-conventions.md §13.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}

@@ -17,7 +17,7 @@ where something belongs. For *how to write* the code, read [coding-conventions.m
 | `packages/ui` | Shared visual components and forms with stories and metadata, plus `cn`, `ComponentMeta` and the one Storybook |
 | `packages/schema` | Shared Zod field families, phone/money tests, Vitest (F05.1) |
 | `packages/data` | In-memory store, mock auth, club/session and Player fixtures, fetchers, query keys and hooks |
-| `packages/db` | **Not created** at the inspected `7d7029d` baseline. Database work is tracked in [F07 #241](https://github.com/jose-codegourmet/rotra-v2/issues/241) (§10) |
+| `packages/db` | Server-only Prisma 7 package (F07.8 scaffold); schema groups and services land through [F07 #241](https://github.com/jose-codegourmet/rotra-v2/issues/241) (§10) |
 | `openspec/` | Focused Player implementation records restored at the product owner’s request; see `openspec/README.md`. Product and prototype docs retain precedence |
 | `app/mocksups-app/*/*.html` | The three clickable prototypes: the design source of truth |
 | `Makefile`, root `package.json` scripts | Run the three apps through Turborepo (F01.1) |
@@ -246,8 +246,15 @@ packages/db/
 
 - Tables and fields follow the [database design](database_design/product/README.md) and its
   [conventions](database_design/product/conventions.md). Entity names match [product terms §12](product-terms.md#12-term--code-identifier).
-- **Open:** Prisma 7 (stable) or Prisma 8 (release candidate, a different "contract" model). Prisma 7
-  is the recommendation; confirm before the database epic starts.
+- **Scaffolded (F07.8):** `packages/db` pins Prisma **7.10.1** (latest stable 7.x; 8 is still a release
+  candidate) with the `prisma-client` generator, `@prisma/adapter-pg` and `pg`. The generated client
+  goes to `src/generated/prisma` (gitignored) and is exposed only through the server-only
+  `@rotra/db/client` subpath. Final approval of the version and migration ownership is still tracked in
+  [#243](https://github.com/jose-codegourmet/rotra-v2/issues/243).
+- **Connections:** `DATABASE_URL` (pooled, runtime role) for the apps; `DIRECT_URL` (migration role)
+  for the CLI through `prisma.config.ts`. Both are server-only; see `packages/db/.env.example`.
+- **No silent DDL:** `db:migrate:draft` writes SQL with `--create-only`; applying a migration needs the
+  §13 sign-off. Package commands are listed in `packages/db/AGENTS.md`.
 
 ---
 

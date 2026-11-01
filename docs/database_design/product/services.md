@@ -33,3 +33,14 @@ screen loaded one, and returns an allowlisted DTO.
 - A phone already linked to a different club player in the same club is marked `conflicted` for review, never merged.
 - Unclaimed and claimed profiles differ: only a valid link plus the provider login claims; a name or RTR ID never does.
 - Historical guest attribution projections are F07.30.
+
+## F07.33 · Staged contact approval, Auth reconciliation
+
+| Module | Commands |
+|---|---|
+| `player/contact-change` | own `submitOwnContactChange`, `readOwnContactChanges`; owner `submitContactChangeForPlayer`, `readContactChangeQueue`, `reviewContactChange` (rechecks contact revision and collisions; reserves the value; changes no contact); `applyContactChange` (mark applying → provider update with the request's stable operation ref → reconcile); `reconcileContactChange` (marks `applied` only when provider and contacts agree); `detectContactDrift` |
+
+- This module is the only writer of a claimed player's phone or email. Profile edits never accept contact fields.
+- `approved`, `applying` and `failed` are all shown as "approved, not applied yet"; only `applied` is a change.
+- A provider value matching neither the original nor the proposal fails closed as `provider_mismatch`.
+- `detectContactDrift` compares both phone and email; whether the provider holds the phone as a login identifier depends on the adapter (#244).

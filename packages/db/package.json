@@ -25,7 +25,8 @@
     "./admin/configuration": "./src/admin/configuration.ts",
     "./player/identity": "./src/player/identity.ts",
     "./player/profile": "./src/player/profile.ts",
-    "./player/claim": "./src/player/claim.ts"
+    "./player/claim": "./src/player/claim.ts",
+    "./player/contact-change": "./src/player/contact-change.ts"
   },
   "scripts": {
     "db:generate": "prisma generate",

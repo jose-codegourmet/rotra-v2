@@ -31,6 +31,7 @@ import { useState } from 'react'
 import { longDateLabel, shortDateLabel } from '@/lib/dates'
 import { useAppSelector } from '@/store/hooks'
 import { selectDev } from '@/store/slices/devSlice'
+import { AddPlayer } from '../../../_components/add-player/AddPlayer'
 import { QueryError } from '../../../_components/query-error/QueryError'
 
 type LiveState = { kind: 'playing' | 'waiting'; text: string }
@@ -113,6 +114,7 @@ export function SavedPlayers() {
 
   const [profileId, setProfileId] = useState<string | null>(null)
   const [inviteId, setInviteId] = useState<string | null>(null)
+  const [adding, setAdding] = useState(false)
   const invite = useCreatePlayerInvite()
 
   const setFilters = (next: SavedPlayersFilters) =>
@@ -163,6 +165,11 @@ export function SavedPlayers() {
         title="Saved players"
         description={
           all.data ? `${all.data.players.length} players this club has played with` : undefined
+        }
+        actions={
+          <Button variant="primary" onClick={() => setAdding(true)}>
+            Add player
+          </Button>
         }
       />
       {stats.isError ? (
@@ -265,6 +272,7 @@ export function SavedPlayers() {
           onCopy={copyLink}
         />
       ) : null}
+      <AddPlayer open={adding} onOpenChange={setAdding} />
     </main>
   )
 

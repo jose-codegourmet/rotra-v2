@@ -8,7 +8,10 @@ import { cn } from '@rotra/ui/cn'
 import { EmptyState } from '@rotra/ui/empty-state'
 import { Field } from '@rotra/ui/field'
 import { addPlayerSubmitLabel, NewPlayerForm } from '@rotra/ui/forms/new-player-form'
-import type { NewPlayerFormValues } from '@rotra/ui/forms/new-player-form/schema'
+import type {
+  NewPlayerFormValues,
+  NewSavedPlayerFormValues,
+} from '@rotra/ui/forms/new-player-form/schema'
 import { IdentityChip } from '@rotra/ui/identity-chip'
 import type { Identity } from '@rotra/ui/identity-chip/variants'
 import { Notice } from '@rotra/ui/notice'
@@ -51,9 +54,15 @@ export type AddPlayerConfirmInput = {
   identityCheck: IdentityCheck | null
 }
 
-export type AddPlayerSheetProps = {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+/** Saving to the saved players with no session: the level may stay empty (no level yet). */
+export type AddPlayerClubConfirmInput = Omit<AddPlayerConfirmInput, 'level' | 'source'> & {
+  source: 'directory'
+  level: PlayingLevel | null
+}
+
+/** Adding to a session's roster (preparation Add player, console Add late player). */
+type AddPlayerSessionContext = {
+  context?: 'session'
   /** "Adding to TITLE." */
   sessionTitle: string
   /** The session is live: late players get a level now and it locks */
@@ -68,6 +77,23 @@ export type AddPlayerSheetProps = {
   savedPlayers: AddPlayerCandidate[]
   /** Club player ids already on the roster or waitlist */
   inSessionIds: string[]
+  onConfirm: (input: AddPlayerConfirmInput) => void
+  onSubmitNewPlayer: (values: NewPlayerFormValues) => void
+}
+
+/**
+ * Saved players › Add player: saves to the club's saved players only, never to a session. No slots,
+ * waitlist or Saved players tab (everyone there is already saved); the level is optional.
+ */
+type AddPlayerClubContext = {
+  context: 'club'
+  onConfirm: (input: AddPlayerClubConfirmInput) => void
+  onSubmitNewPlayer: (values: NewSavedPlayerFormValues) => void
+}
+
+export type AddPlayerSheetProps = (AddPlayerSessionContext | AddPlayerClubContext) & {
+  open: boolean
+  onOpenChange: (open: boolean) => void
   /** This device is offline: Player Information search is replaced by a notice */
   offline?: boolean
   /** Called with the Player Information query as it is typed ('' when cleared) */
@@ -81,8 +107,6 @@ export type AddPlayerSheetProps = {
    * pass the one-tap rule (registered profile with a level) so those are confirmed straight away.
    */
   needsConfirmStep?: (candidate: AddPlayerCandidate, source: AddPlayerSource) => boolean
-  onConfirm: (input: AddPlayerConfirmInput) => void
-  onSubmitNewPlayer: (values: NewPlayerFormValues) => void
   /** An add is running: primaries show a spinner and nothing fires twice */
   isPending?: boolean
   /** Why the last add was refused; shown on the card or the form, nothing is claimed as added */
@@ -97,7 +121,7 @@ export type AddPlayerSheetProps = {
   lastAdded?: string | null
   /** Adds so far while this sheet has been open; a change clears the tab and refocuses it */
   addedCount?: number
-  /** Tab shown when the sheet opens; Saved players unless a story or container says otherwise */
+  /** Tab shown when the sheet opens; Saved players (Player Information in the club context) unless a story or container says otherwise */
   initialTab?: AddPlayerTab
 }
 
@@ -154,30 +178,27 @@ function CandidateRow({
  * tab clears and focus returns to its first field. A refusal (serverError) stays on the card or the
  * form with what was typed; with serverErrorReturnsToList it drops the card and shows above the list.
  */
-export function AddPlayerSheet({
-  open,
-  onOpenChange,
-  sessionTitle,
-  live = false,
-  capacity,
-  openSlots,
-  waitlistCount,
-  savedPlayers,
-  inSessionIds,
-  offline = false,
-  onDirectorySearch,
-  directoryResults = [],
-  directoryLoading = false,
-  needsConfirmStep,
-  onConfirm,
-  onSubmitNewPlayer,
-  isPending = false,
-  serverError,
-  serverErrorReturnsToList = false,
-  lastAdded,
-  addedCount = 0,
-  initialTab = 'saved',
-}: AddPlayerSheetProps) {
+export function AddPlayerSheet(props: AddPlayerSheetProps) {
+  const {
+    open,
+    onOpenChange,
+    offline = false,
+    onDirectorySearch,
+    directoryResults = [],
+    directoryLoading = false,
+    needsConfirmStep,
+    isPending = false,
+    serverError,
+    serverErrorReturnsToList = false,
+    lastAdded,
+    addedCount = 0,
+  } = props
+  const club = props.context === 'club'
+  const session = props.context === 'club' ? null : props
+  const live = session?.live ?? false
+  const savedPlayers = session?.savedPlayers ?? []
+  const initialTab = props.initialTab ?? (club ? 'directory' : 'saved')
+  const tabs = club ? TABS.filter((t) => t.value !== 'saved') : TABS
   const formId = useId()
   const bodyRef = useRef<HTMLDivElement>(null)
   const [tab, setTab] = useState<AddPlayerTab>(initialTab)
@@ -245,10 +266,17 @@ export function AddPlayerSheet({
     if (tab === 'directory') onDirectorySearch?.(next)
   }
 
+  const confirm = (
+    input: Omit<AddPlayerConfirmInput, 'level'> & { level: PlayingLevel | null },
+  ) => {
+    if (props.context === 'club') props.onConfirm({ ...input, source: 'directory' })
+    else if (input.level) props.onConfirm({ ...input, level: input.level })
+  }
+
   const pickCandidate = (candidate: AddPlayerCandidate, source: AddPlayerSource) => {
     const confirmStep = needsConfirmStep?.(candidate, source) ?? true
     if (!confirmStep && candidate.suggestion) {
-      onConfirm({ candidate, source, level: candidate.suggestion, identityCheck: null })
+      confirm({ candidate, source, level: candidate.suggestion, identityCheck: null })
       return
     }
     setPick({ candidate, source })
@@ -259,20 +287,21 @@ export function AddPlayerSheet({
 
   const confirmPick = () => {
     if (!pick || isPending) return
-    if (!level) {
+    // Saving with no session may leave the level empty; adding to a session needs one.
+    if (!level && !club) {
       setLevelError(LEVEL_ERROR)
       return
     }
-    onConfirm({ candidate: pick.candidate, source: pick.source, level, identityCheck: check })
+    confirm({ candidate: pick.candidate, source: pick.source, level, identityCheck: check })
   }
 
-  const full = !live && openSlots <= 0
+  const full = session !== null && !live && session.openSlots <= 0
   const q = query.trim().toLowerCase()
-  const inSession = new Set(inSessionIds)
+  const inSession = new Set(session?.inSessionIds)
   const alreadyCount = savedPlayers.filter((p) => inSession.has(p.id)).length
   const savedList = savedPlayers.filter((p) => !inSession.has(p.id) && matches(p, q))
   const confirming = pick ? needsIdentityCheck(pick.candidate.identity) : false
-  const primaryLabel = addPlayerSubmitLabel(full)
+  const primaryLabel = addPlayerSubmitLabel(full, false, props.context)
 
   const closeLabel = addedCount > 0 ? 'Done' : 'Cancel'
   const closeButton = (
@@ -320,10 +349,14 @@ export function AddPlayerSheet({
       hideClose={isPending}
       footer={footer}
     >
-      <Notice tone="info">
-        Adding to <b>{sessionTitle}</b>.
-        {live ? ' Late players get a level now, and it locks for the rest of the session.' : null}
-      </Notice>
+      {session ? (
+        <Notice tone="info">
+          Adding to <b>{session.sessionTitle}</b>.
+          {live ? ' Late players get a level now, and it locks for the rest of the session.' : null}
+        </Notice>
+      ) : (
+        <Notice tone="info">Adding to your saved players. They won't be added to a session.</Notice>
+      )}
       {lastAdded && !pick ? (
         <Notice tone="success">
           {lastAdded}
@@ -332,9 +365,10 @@ export function AddPlayerSheet({
           ) : null}
         </Notice>
       ) : null}
-      {full ? (
-        <Notice tone="warn" title={`All ${capacity} slots are taken.`}>
-          New players go on the waitlist as #{waitlistCount + 1}. You can give them a slot later.
+      {full && session ? (
+        <Notice tone="warn" title={`All ${session.capacity} slots are taken.`}>
+          New players go on the waitlist as #{session.waitlistCount + 1}. You can give them a slot
+          later.
         </Notice>
       ) : null}
 
@@ -355,6 +389,7 @@ export function AddPlayerSheet({
           onCheckChange={setCheck}
           live={live}
           full={full}
+          context={props.context}
           error={levelError || serverError}
           isPending={isPending}
         />
@@ -362,13 +397,13 @@ export function AddPlayerSheet({
         <div ref={bodyRef} className="flex flex-col gap-3.5">
           <SegmentedControl
             aria-label="How to add"
-            options={TABS}
+            options={tabs}
             value={tab}
             onChange={(next) => changeTab(next as AddPlayerTab)}
           />
           {serverError && tab !== 'new' ? <Notice tone="error">{serverError}</Notice> : null}
 
-          {tab === 'saved' ? (
+          {tab === 'saved' && !club ? (
             <>
               <Field label="Search saved players">
                 <TextInput
@@ -477,16 +512,28 @@ export function AddPlayerSheet({
           ) : null}
 
           {tab === 'new' ? (
-            <NewPlayerForm
-              key={round}
-              id={formId}
-              hideSubmit
-              live={live}
-              full={full}
-              isPending={isPending}
-              serverError={serverError}
-              onSubmit={onSubmitNewPlayer}
-            />
+            props.context === 'club' ? (
+              <NewPlayerForm
+                key={round}
+                id={formId}
+                hideSubmit
+                context="club"
+                isPending={isPending}
+                serverError={serverError}
+                onSubmit={props.onSubmitNewPlayer}
+              />
+            ) : (
+              <NewPlayerForm
+                key={round}
+                id={formId}
+                hideSubmit
+                live={live}
+                full={full}
+                isPending={isPending}
+                serverError={serverError}
+                onSubmit={props.onSubmitNewPlayer}
+              />
+            )
           ) : null}
         </div>
       )}

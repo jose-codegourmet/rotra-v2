@@ -13,12 +13,13 @@ import { newPlayerFormDefaultValues } from './NewPlayerForm.defaultValues'
 import {
   type NewPlayerFormInput,
   type NewPlayerFormValues,
+  type NewSavedPlayerFormValues,
   NICKNAME_MAX,
   newPlayerSchema,
+  newSavedPlayerSchema,
 } from './NewPlayerForm.schema'
 
-export type NewPlayerFormProps = {
-  onSubmit: (values: NewPlayerFormValues) => void
+type NewPlayerFormBaseProps = {
   /** The add is running: submit is disabled so one tap cannot add twice */
   isPending?: boolean
   /** Why the add failed; what was typed stays in the fields */
@@ -36,11 +37,26 @@ export type NewPlayerFormProps = {
   defaultValues?: Partial<NewPlayerFormInput>
 }
 
+/**
+ * `session` (default) adds to a roster and needs a level. `club` saves to the saved players with no
+ * session (Saved players › Add player): the level is optional and the submit reads "Save player".
+ */
+export type NewPlayerFormProps = NewPlayerFormBaseProps &
+  (
+    | { context?: 'session'; onSubmit: (values: NewPlayerFormValues) => void }
+    | { context: 'club'; onSubmit: (values: NewSavedPlayerFormValues) => void }
+  )
+
 export const PHONE_HINT =
   "Without a phone they're saved as a guest. With one, ROTRA can match or create their profile when the session syncs."
 
-/** The submit label the prototype uses: a slot when one is open, otherwise the waitlist. */
-export function addPlayerSubmitLabel(full: boolean | undefined, live = false) {
+/** The submit label the prototype uses: a slot when one is open, otherwise the waitlist; Save player with no session. */
+export function addPlayerSubmitLabel(
+  full: boolean | undefined,
+  live = false,
+  context: 'session' | 'club' = 'session',
+) {
+  if (context === 'club') return 'Save player'
   return full && !live ? 'Add to waitlist' : 'Confirm player slot'
 }
 
@@ -48,21 +64,24 @@ export function addPlayerSubmitLabel(full: boolean | undefined, live = false) {
  * Q-ADD-PLAYER › New player tab: name, optional nickname and phone, and the level for this club.
  * Works offline; the container owns the add mutation and its toasts.
  */
-export function NewPlayerForm({
-  onSubmit,
-  isPending = false,
-  serverError,
-  live = false,
-  full = false,
-  autoFocus,
-  id,
-  hideSubmit = false,
-  defaultValues,
-}: NewPlayerFormProps) {
+export function NewPlayerForm(props: NewPlayerFormProps) {
+  const {
+    isPending = false,
+    serverError,
+    live = false,
+    full = false,
+    autoFocus,
+    id,
+    hideSubmit = false,
+    defaultValues,
+  } = props
+  const club = props.context === 'club'
+  // Both schemas share the fields; the club one only lets the level stay empty (null).
+  const onSubmit = props.onSubmit as (values: NewSavedPlayerFormValues) => void
   const autoId = useId()
   const formId = id ?? `new-player${autoId}`
-  const form = useForm<NewPlayerFormInput, unknown, NewPlayerFormValues>({
-    resolver: zodResolver(newPlayerSchema),
+  const form = useForm<NewPlayerFormInput, unknown, NewSavedPlayerFormValues>({
+    resolver: zodResolver(club ? newSavedPlayerSchema : newPlayerSchema),
     defaultValues: { ...newPlayerFormDefaultValues, ...defaultValues },
   })
   const { errors } = form.formState
@@ -111,7 +130,11 @@ export function NewPlayerForm({
           />
         </Field>
         <Field
-          label={`Level for this club${live ? ' (locks immediately)' : ''}`}
+          label={`Level for this club${!club && live ? ' (locks immediately)' : ''}`}
+          optional={club}
+          hint={
+            club && !errors.level ? 'Leave it empty if you have not seen them play yet.' : undefined
+          }
           error={errors.level?.message}
         >
           <Controller
@@ -132,7 +155,7 @@ export function NewPlayerForm({
         {hideSubmit ? null : (
           <div className="flex flex-wrap justify-end gap-2.5">
             <Button type="submit" variant="primary" loading={isPending}>
-              {addPlayerSubmitLabel(full, live)}
+              {addPlayerSubmitLabel(full, live, props.context)}
             </Button>
           </div>
         )}

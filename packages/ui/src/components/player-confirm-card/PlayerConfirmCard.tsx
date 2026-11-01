@@ -34,6 +34,11 @@ export type PlayerConfirmCardProps = {
   error?: string
   /** Every slot is taken: the primary reads "Add to waitlist" */
   full?: boolean
+  /**
+   * `club`: saving to the saved players with no session (Saved players › Add player). The level is
+   * optional and the primary reads "Save player".
+   */
+  context?: 'session' | 'club'
   /** With onConfirm, draws Back and the primary under the card (the sheet draws its own footer instead) */
   onBack?: () => void
   onConfirm?: () => void
@@ -76,11 +81,13 @@ export function PlayerConfirmCard({
   live = false,
   error,
   full = false,
+  context = 'session',
   onBack,
   onConfirm,
   isPending = false,
   className,
 }: PlayerConfirmCardProps) {
+  const club = context === 'club'
   const needsCheck = needsIdentityCheck(identity)
   const checks = CHECKS.filter((c) => c.value !== 'phone' || !phoneHidden)
   const levelMissing = Boolean(error) && level == null
@@ -146,7 +153,11 @@ export function PlayerConfirmCard({
           <span className="text-[13px]">{suggestion ? levelLabel(suggestion) : 'None yet'}</span>
         </div>
 
-        <Field label={`Level for this club${live ? ' (locks immediately)' : ''}`} error={error}>
+        <Field
+          label={`Level for this club${!club && live ? ' (locks immediately)' : ''}`}
+          optional={club}
+          error={error}
+        >
           <LevelSelect
             value={level}
             onChange={onLevelChange}
@@ -167,7 +178,7 @@ export function PlayerConfirmCard({
             disabled={!canConfirmPlayer(identity, check)}
             onClick={onConfirm}
           >
-            {full && !live ? 'Add to waitlist' : 'Confirm player slot'}
+            {club ? 'Save player' : full && !live ? 'Add to waitlist' : 'Confirm player slot'}
           </Button>
         </div>
       ) : null}

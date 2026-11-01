@@ -41,13 +41,37 @@ const directoryCandidates: AddPlayerCandidate[] = directoryPlayers.map((p) => ({
   rankLabel: `Rank ${leaderboardPlayers.findIndex((entry) => entry.id === p.id) + 1}`,
 }))
 
+type SessionSheetProps = Extract<AddPlayerSheetProps, { sessionTitle: string }>
+/** The session sheet's args, plus `club` to render the Saved players (no session) context. */
+type DemoProps = SessionSheetProps & { club?: boolean }
+
 /** Answers Player Information searches from the fixtures, like the mock store does. */
-function Demo(props: AddPlayerSheetProps) {
+function Demo({ club, ...props }: DemoProps) {
   const [query, setQuery] = useState('')
   const q = query.trim().toLowerCase()
   const results = directoryCandidates.filter(
     (p) => !q || [p.name, p.rtrId].some((v) => v?.toLowerCase().includes(q)),
   )
+  if (club)
+    return (
+      <AddPlayerSheet
+        context="club"
+        open={props.open}
+        onOpenChange={props.onOpenChange}
+        offline={props.offline}
+        isPending={props.isPending}
+        serverError={props.serverError}
+        serverErrorReturnsToList={props.serverErrorReturnsToList}
+        lastAdded={props.lastAdded}
+        addedCount={props.addedCount}
+        initialTab={props.initialTab}
+        // The story args are fn() spies; the club context only widens the level to allow null.
+        onConfirm={props.onConfirm as never}
+        onSubmitNewPlayer={props.onSubmitNewPlayer as never}
+        onDirectorySearch={setQuery}
+        directoryResults={props.directoryResults ?? results}
+      />
+    )
   return (
     <AddPlayerSheet
       {...props}
@@ -59,7 +83,7 @@ function Demo(props: AddPlayerSheetProps) {
 
 const meta = {
   title: 'Queue/AddPlayerSheet',
-  component: AddPlayerSheet,
+  component: Demo,
   args: {
     open: true,
     onOpenChange: fn(),
@@ -73,7 +97,7 @@ const meta = {
     onSubmitNewPlayer: fn(),
   },
   render: (args) => <Demo {...args} />,
-} satisfies Meta<typeof AddPlayerSheet>
+} satisfies Meta<typeof Demo>
 
 export default meta
 type Story = StoryObj<typeof meta>
@@ -145,4 +169,26 @@ export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }
 
 export const ActiveFull: Story = {
   args: { live: true, capacity: admission.capacity, openSlots: 0 },
+}
+
+/** Saved players › Add player: no session, opens on Player Information, the primary saves. */
+export const SavedPlayersClub: Story = { args: { club: true } }
+/** Club context, New player: the level is optional and the primary reads Save player. */
+export const SavedPlayersClubNewPlayer: Story = { args: { club: true, initialTab: 'new' } }
+/** Club context, after a save: the sheet stays open and counts what was saved. */
+export const SavedPlayersClubAfterSave: Story = {
+  args: { club: true, initialTab: 'new', lastAdded: 'Test Guest saved as a guest', addedCount: 2 },
+}
+/** Club context, a profile that is already saved is refused and the sheet returns to the list. */
+export const SavedPlayersClubDuplicate: Story = {
+  args: {
+    club: true,
+    serverError: 'Santino Reyes is already in your saved players.',
+    serverErrorReturnsToList: true,
+  },
+}
+export const SavedPlayersClubOffline: Story = { args: { club: true, offline: true } }
+export const SavedPlayersClubPhone: Story = {
+  args: { club: true, initialTab: 'new' },
+  globals: { viewport: { value: 'phone' } },
 }

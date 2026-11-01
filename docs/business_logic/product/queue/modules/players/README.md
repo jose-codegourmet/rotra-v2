@@ -6,7 +6,7 @@
 
 ## Entry and identity
 
-The operator adds and confirms every slot. Confirmed players are remembered in a **saved club player list**, including name-only guests. This does not imply formal club membership.
+The operator adds and confirms every slot. Confirmed players are remembered in a **saved club player list**, including name-only guests. This does not imply formal club membership. The operator can also add someone straight to the saved players from **Saved players › Add player**, with no session (Player Information or New player; the level is optional and becomes the saved level). A profile already saved, or a new player whose phone matches a saved player's private phone, is refused; same-name guests stay separate.
 
 Adding a player offers three sources, in this order:
 
@@ -14,7 +14,7 @@ Adding a player offers three sources, in this order:
 |---|---|
 | Saved players | Search by name, nickname, or RTR ID; exclude players already in the session. Unclaimed profiles always require identity confirmation. Otherwise add in one tap when a level exists; if no level exists, Confirm player requires choosing one |
 | Player Information | Online only. Search by name or RTR ID; shows RTR ID and shared rank. Already-saved players are not repeated. Unclaimed profiles require identity confirmation; registered profiles with a level are added in one tap |
-| New player | Name required; nickname and phone optional |
+| New player | Name required; nickname and phone optional. From Saved players (no session) the level is optional too |
 
 A name match is a suggestion, not proof of identity. To link an **unclaimed** Player Information profile, the operator confirms one of: **RTR ID matches**, **Scanned their QR**, or **Phone confirmed**. **Registered (claimed)** profiles need no identity check and no confirmation step: tapping one adds them at once at their Player Information level (decided October 26, 2026). The same one-tap add applies to saved club players who have a level; the level can still be changed in the roster before the session starts (in a live session it locks on entry). A **Confirm player** step appears for every unclaimed profile, whether picked from Player Information or from the club's saved players (identity check), and when the player has no level yet (the operator must choose one). Players hiding their phone show "Phone hidden by player"; an unclaimed one is confirmed by RTR ID or QR. The same phone number identifies the same profile across clubs. Lookup must respect hidden contact details.
 

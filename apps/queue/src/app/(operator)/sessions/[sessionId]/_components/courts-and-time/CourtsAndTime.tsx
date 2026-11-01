@@ -13,7 +13,7 @@ import { AddCourtForm } from '@rotra/ui/forms/add-court-form'
 import { nextCourtLabel } from '@rotra/ui/forms/add-court-form/default-values'
 import type { AddCourtFormValues } from '@rotra/ui/forms/add-court-form/schema'
 import { toast } from '@rotra/ui/toaster'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 
 /** The two sheets this container owns; the shell keeps them in its one `sheet` state */
 export type CourtsAndTimeSheetValue = 'adjust' | 'add-court'
@@ -41,6 +41,7 @@ const isSaveFailure = (error: unknown) =>
  * any other refusal shows inside the add sheet.
  */
 export function CourtsAndTime({ sessionId, open, onOpenChange }: CourtsAndTimeProps) {
+  const saving = useRef(false)
   const session = useQueueSession(sessionId)
   const extend = useExtendSession()
   const add = useAddCourt()
@@ -56,18 +57,22 @@ export function CourtsAndTime({ sessionId, open, onOpenChange }: CourtsAndTimePr
   const editing = courts.find((c) => c.id === editingId)
   const used = !!editing && (matches.data ?? []).some((m) => m.courtIds.includes(editing.id))
 
-  const onExtend = (minutes: ExtendMinutes) =>
-    extend.mutate(
-      { sessionId, minutes },
-      {
-        onSuccess: (result) => toast(result.message),
-        onError: (error) => toast.error(errorMessage(error)),
-      },
-    )
+  const onExtend = (minutes: ExtendMinutes) => {
+    if (saving.current) return
+    saving.current = true
+    extend.mutate({ sessionId, minutes }, {
+      onSuccess: (result) => { setServerError(undefined); toast(result.message) },
+      onError: (error) => setServerError(errorMessage(error)),
+      onSettled: () => { saving.current = false },
+    })
+  }
 
   const onAdd = (values: AddCourtFormValues) => {
+    if (saving.current) return
+    saving.current = true
     setServerError(undefined)
     const options = {
+      onSettled: () => { saving.current = false },
       onSuccess: (result: { message: string }) => { toast(result.message); setEditingId(null); onOpenChange(null) },
       onError: (error: unknown) => { setServerError(errorMessage(error)); if (isSaveFailure(error)) toast.error(errorMessage(error)) },
     }

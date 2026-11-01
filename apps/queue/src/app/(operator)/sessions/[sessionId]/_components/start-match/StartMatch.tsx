@@ -25,7 +25,8 @@ import { StartMatchSheet } from '@rotra/ui/start-match-sheet'
 import type { SwapSlot } from '@rotra/ui/swap-sides-area'
 import type { TeamLineupPlayer } from '@rotra/ui/team-lineup'
 import { toast } from '@rotra/ui/toaster'
-import { useRef, useState } from 'react'
+import { useRef, useState }
+import { useNow } from '@/lib/useNow' from 'react'
 import { PlayerProfile } from '@/app/(operator)/sessions/[sessionId]/_components/player-profile/PlayerProfile'
 
 /**
@@ -68,6 +69,7 @@ const isRecheckFailure = (error: unknown) => error instanceof MockError && error
  * No match ever starts without this confirmation.
  */
 export function StartMatch({ sessionId, request, onRequestChange, onClose }: StartMatchProps) {
+  const now = useNow(1000, false, true)
   const session = useQueueSession(sessionId)
   const roster = useSessionRoster(sessionId)
   const matches = useSessionMatches(sessionId)
@@ -75,7 +77,7 @@ export function StartMatch({ sessionId, request, onRequestChange, onClose }: Sta
   const s = session.data
   if (!request || !s || !roster.data || !matches.data) return null
 
-  const ctx: MatchContext = { roster: roster.data.roster, matches: matches.data, courts: s.courts }
+  const ctx: MatchContext = { roster: roster.data.roster, matches: matches.data, courts: s.courts, now }
   const refresh = () => {
     void session.refetch()
     void roster.refetch()
@@ -165,7 +167,7 @@ type OpenStartMatchProps = {
 
 /** Prototype openDispatch: the opening court first (or the first free one), plus one more for 5v5 */
 function preselect(match: Match, courtId: string | undefined, ctx: MatchContext) {
-  const free = freeCourts(ctx.courts, ctx.matches).map((c) => c.id)
+  const free = freeCourts(ctx.courts, ctx.matches, ctx.now).map((c) => c.id)
   const first = courtId && free.includes(courtId) ? courtId : free[0]
   if (!first) return []
   return courtsNeeded(match) === 2
@@ -204,7 +206,7 @@ function OpenStartMatch({
       games: countedGames(id, ctx.matches),
     }
   }
-  const free = freeCourts(ctx.courts, ctx.matches).map((c) => ({ id: c.id, label: c.label }))
+  const free = freeCourts(ctx.courts, ctx.matches, ctx.now).map((c) => ({ id: c.id, label: c.label }))
   const status = matchStatus(match, ctx)
 
   const onSwap = (from: SwapSlot, to: SwapSlot) => {

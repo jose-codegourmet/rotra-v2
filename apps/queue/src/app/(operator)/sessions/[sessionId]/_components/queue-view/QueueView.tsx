@@ -58,6 +58,7 @@ const errorMessage = (error: unknown) =>
  */
 export function QueueView({
   sessionId,
+  now,
   onOpenProfile,
   onAddMatch,
   onEditMatch,
@@ -106,7 +107,7 @@ export function QueueView({
       </div>
     )
 
-  const ctx: MatchContext = { roster: roster.data.roster, matches: matches.data, courts: s.courts }
+  const ctx: MatchContext = { roster: roster.data.roster, matches: matches.data, courts: s.courts, now }
   const waiting = waitingMatches(ctx.matches)
   const attention = waiting.filter((m) => matchStatus(m, ctx).kind === 'needs-attention').length
 

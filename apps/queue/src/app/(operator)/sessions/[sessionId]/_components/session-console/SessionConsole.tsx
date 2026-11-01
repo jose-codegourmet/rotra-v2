@@ -133,7 +133,8 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
   }, [redirectTo, router])
 
   // The 30-second refresh: the clock the views measure against, paused while a sheet is open here.
-  const now = useNow(undefined, sheet !== null || matchSheet !== null || profileId !== null)
+  const now = useNow(1000, false, true)
+  const lastSessionRefresh = useRef(0)
   const refetchSession = session.refetch
   const firstTick = useRef(true)
   // biome-ignore lint/correctness/useExhaustiveDependencies: `now` is the 30-second tick that triggers the refetch
@@ -142,6 +143,8 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
       firstTick.current = false
       return
     }
+    if (now - lastSessionRefresh.current < 30_000) return
+    lastSessionRefresh.current = now
     void refetchSession()
   }, [now, refetchSession])
 
@@ -165,7 +168,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
   const rosterList = roster.data?.roster ?? []
   const courts = s?.courts ?? []
   const all = matches.data ?? []
-  const ctx = { roster: rosterList, matches: all, courts }
+  const ctx = { roster: rosterList, matches: all, courts, now }
   const waiting = waitingMatches(all)
   const active = activeMatches(all)
   const recorded = all.filter((m) => m.state === 'completed').length

@@ -5,7 +5,7 @@ import {
   autoQueueDraftConflict,
   autoQueuePlayerCounts,
 } from '@rotra/data/match/auto-queue-rules'
-import { activeMatchFor, allPlayers, FORMAT_LABELS, shortName } from '@rotra/data/match/match.rules'
+import { activeMatchFor, allPlayers, shortName } from '@rotra/data/match/match.rules'
 import { useAutoQueueDrafts } from '@rotra/data/match/useAutoQueueDrafts'
 import { useEditAutoQueueDrafts } from '@rotra/data/match/useEditAutoQueueDrafts'
 import { useGenerateAutoQueueDrafts } from '@rotra/data/match/useGenerateAutoQueueDrafts'
@@ -62,7 +62,13 @@ export function AutoQueue({ sessionId, workspace, onWorkspaceChange, mainQueue }
     const lineups = batch?.drafts ?? []
     const player = (id: string) => {
       const p = ctx.roster.find((p) => p.id === id)
-      return { id, name: p ? shortName(p) : 'Player', ...autoQueuePlayerCounts(id, ctx, lineups) }
+      return {
+        id,
+        name: p ? shortName(p) : 'Player',
+        fullName: p?.nameSnapshot,
+        level: p?.level ?? null,
+        ...autoQueuePlayerCounts(id, ctx, lineups),
+      }
     }
     batches[current] = {
       stale: lineups.some((d) => d.fingerprint !== state.fingerprint),
@@ -70,7 +76,7 @@ export function AutoQueue({ sessionId, workspace, onWorkspaceChange, mainQueue }
       error: errors[current],
       drafts: lineups.map((draft) => ({
         id: draft.id,
-        format: FORMAT_LABELS[draft.format],
+        format: draft.format,
         reason: draft.reason,
         teamA: draft.teamA.map(player),
         teamB: draft.teamB.map(player),
@@ -169,6 +175,9 @@ export function AutoQueue({ sessionId, workspace, onWorkspaceChange, mainQueue }
       }
       onSelect={(draftId, selected) => {
         void onEdit({ sessionId, action: 'select', draftId, selected })
+      }}
+      onUnselectAll={() => {
+        void onEdit({ sessionId, action: 'unselect-all' })
       }}
       onGenerate={onGenerate}
       onRegenerate={onGenerate}

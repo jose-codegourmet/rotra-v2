@@ -51,6 +51,58 @@ export const ProtectedManual: Story = { args: propsFor(matchCardFixtures.protect
 export const Suggested: Story = { args: propsFor(matchCardFixtures.suggested) }
 export const Auto: Story = { args: propsFor(matchCardFixtures.auto) }
 export const LongNames: Story = { args: propsFor(matchCardFixtures.longNames) }
+const draftStatus = {
+  kind: 'blocked' as const,
+  reason: 'Available players with the lowest planned load',
+}
+const draftChips = (c: MatchCardFixture) =>
+  Object.fromEntries(
+    [...c.teamA, ...c.teamB].map((p, i) => [
+      p.id,
+      [{ text: `${i + 1} played` }, ...(i === 0 ? [{ text: '1 queued' }] : [])],
+    ]),
+  )
+/** An Auto Queue draft: the same tile, a Draft chip for #position, no handle or actions. */
+export const Draft: Story = {
+  args: {
+    ...propsFor(matchCardFixtures.ready),
+    status: draftStatus,
+    draft: { selected: false, onToggle: fn(), playerChips: draftChips(matchCardFixtures.ready) },
+  },
+}
+export const DraftSelected: Story = {
+  args: {
+    ...propsFor(matchCardFixtures.ready),
+    status: draftStatus,
+    draft: {
+      selected: true,
+      pickOrder: 2,
+      onToggle: fn(),
+      playerChips: draftChips(matchCardFixtures.ready),
+    },
+  },
+}
+/** Plan Ahead: a player is mid-game, so the draft waits; their chip reads Playing now. */
+export const DraftPlayingNow: Story = {
+  args: {
+    ...propsFor(matchCardFixtures.ready),
+    status: {
+      kind: 'blocked',
+      reason: 'A player is playing now; this match waits until they are free.',
+    },
+    draft: {
+      selected: false,
+      onToggle: fn(),
+      playerChips: {
+        ...draftChips(matchCardFixtures.ready),
+        [matchCardFixtures.ready.teamA[0]?.id ?? '']: [
+          { text: '2 played' },
+          { text: 'Playing now', tone: 'warn' },
+        ],
+      },
+    },
+  },
+}
 export const LastInQueue: Story = { args: { flow: null } }
 export const FlowDown: Story = { args: { flow: 'down' } }
 export const NoActions: Story = {

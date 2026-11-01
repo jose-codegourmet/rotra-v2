@@ -42,12 +42,14 @@ export async function getAutoQueueDrafts(sessionId: string) {
 export function editAutoQueueDrafts(
   input: { sessionId: string } & (
     | { action: 'select'; draftId: string; selected: boolean }
+    | { action: 'unselect-all' }
     | { action: 'clear'; mode: AutoQueueMode; unselectedOnly: boolean }
   ),
 ) {
   return changeAutoQueueDrafts(input.sessionId, (s) => {
     const state = draftState(s, input.sessionId)
     if (input.action === 'select') selectAutoQueueDraft(state, input.draftId, input.selected)
+    else if (input.action === 'unselect-all') state.selectedIds = []
     else clearAutoQueueDrafts(state, input.mode, input.unselectedOnly)
     return state
   })

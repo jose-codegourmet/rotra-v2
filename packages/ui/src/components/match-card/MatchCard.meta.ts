@@ -10,6 +10,7 @@ export const matchCardMeta = {
     'Start renders only with onStart and is enabled only when the status is ready, or with canOpenCourt while the match only waits for a court and a court is not open yet (the Start match sheet then offers Start anyway). Edit and Remove render only with their callbacks.',
     'The grid passes the flow arrow and the reorder behaviour passes handleProps; the card itself does not reorder.',
     'With swappable inside a SwapSidesArea, each player can be dragged onto the other team or moved across with the arrow keys; the area reports the swap.',
+    'With draft, the same tile is an Auto Queue draft: a Draft chip replaces #position, no handle or actions, plain faces with per-player chips, and the whole tile toggles selection (role="button", aria-pressed, Space / Enter) with a pick-order badge.',
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',

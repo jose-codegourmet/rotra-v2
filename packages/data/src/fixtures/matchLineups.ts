@@ -108,6 +108,8 @@ export function createMatchLineupFixtures(now = Date.now()) {
   const draftPlayer = (p: MatchLineupPlayerFixture, suggested: number, playingNow = false) => ({
     id: p.id,
     name: p.shortName,
+    fullName: p.name,
+    level: p.level,
     played: p.games,
     queued: 1,
     suggested,
@@ -115,21 +117,21 @@ export function createMatchLineupFixtures(now = Date.now()) {
   })
   const draftOne = {
     id: 'draft-available-1',
-    format: 'Doubles',
+    format: 'doubles' as const,
     teamA: belowMinimum.teamA.map((p) => draftPlayer(p, 2)),
     teamB: belowMinimum.teamB.map((p) => draftPlayer(p, 2)),
     reason: 'Available players with the lowest planned load',
   }
   const draftTwo = {
     id: 'draft-available-2',
-    format: 'Doubles',
+    format: 'doubles' as const,
     teamA: belowMinimum.teamA.map((p) => draftPlayer(p, 2)),
     teamB: belowMinimum.teamB.map((p) => draftPlayer(p, 2)),
     reason: 'The same players may appear in a later future match',
   }
   const draftAhead = {
     id: 'draft-ahead-1',
-    format: 'Doubles',
+    format: 'doubles' as const,
     teamA: belowMinimum.teamA.map((p) => draftPlayer(p, 1, true)),
     teamB: someBelow.teamB.map((p) => draftPlayer(p, 1)),
     reason: 'Plan ahead with present players',

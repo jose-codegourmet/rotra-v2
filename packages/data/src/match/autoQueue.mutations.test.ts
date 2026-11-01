@@ -47,6 +47,18 @@ async function generate(mode: 'available' | 'ahead' = 'available') {
   await generateAutoQueueDrafts({ sessionId, mode, count: 2 })
   return (await getAutoQueueDrafts(sessionId)).batches[mode]!.drafts
 }
+describe('draft selection', () => {
+  it('unselects every draft across tabs in one edit and keeps the drafts', async () => {
+    const available = await generate(),
+      ahead = await generate('ahead')
+    for (const draftId of [available[0]!.id, ahead[0]!.id])
+      await editAutoQueueDrafts({ sessionId, action: 'select', draftId, selected: true })
+    await editAutoQueueDrafts({ sessionId, action: 'unselect-all' })
+    const state = await getAutoQueueDrafts(sessionId)
+    expect(state.selectedIds).toEqual([])
+    expect(allAutoQueueDrafts(state)).toHaveLength(available.length + ahead.length)
+  })
+})
 describe('draft isolation and atomic transfer', () => {
   it('retains cross-tab selection order and transfers only the reviewed IDs', async () => {
     const available = await generate(),

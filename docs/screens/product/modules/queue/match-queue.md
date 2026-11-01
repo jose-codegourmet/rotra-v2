@@ -81,7 +81,11 @@ When no lineup is possible, the sheet shows the reason (both formats off, or “
 
 **UI component:** `AutoQueueWorkspace` in `@rotra/ui/auto-queue-workspace`. Its props carry draft batches, selection order, session minimum and eligible-player state; the `AutoQueue` container owns mock generation and transfer validation. Drafts are in memory, not durable persistence.
 
-The Queue view switches between Main Queue and Auto Queue. Auto Queue has Available Players, Plan Ahead, Longest Wait, Fewest Games and Catch Up tabs with retained draft batches. The Queue Master selects a match count (2 / 3 / 4 / 6; no default), explicitly generates, and chooses a Catch Up target when applicable. Cards show reason, lineup, played/queued counts and playing dependencies. No draft starts or enters Main Queue automatically.
+The Queue view switches between Main Queue and Auto Queue. Auto Queue has Available Players, Plan Ahead, Longest Wait, Fewest Games and Catch Up tabs with retained draft batches. The Queue Master selects a match count (2 / 3 / 4 / 6; no default), explicitly generates, and chooses a Catch Up target when applicable. No draft starts or enters Main Queue automatically.
+
+**Draft tiles.** Drafts use the Main Queue tile (`MatchCard` with `draft`) in the same grid: format chip, avatars, short names, VS, and the status line (the generation reason, “A player is playing now; this match waits until they are free.”, or a warn-tone attention reason). A **Draft** chip replaces #position; there is no handle and no Start / Edit / Remove. The border is dashed until picked. Drafts need wider tiles than queued matches (230 px or more) so a doubles team keeps its chips on one row. Under each name, small chips: “{n} played”, “{n} queued”, “{n} suggested” (only when another draft in the batch has them too) and “Playing now” (warn tone, Plan Ahead). Zero values are hidden and there is no mode prefix.
+
+**Picking works like Players.** The whole tile is a toggle (`role="button"`, `aria-pressed`; Space or Enter). Its accessible name is the match (“Draft Doubles: Migs and Dani vs Marco and Paolo, picked 2”), not “Select Doubles”. Picked tiles get the accent border, the inset ring and a pick-order badge, so the state does not rely on colour alone. Pick order across tabs is the order drafts are added in.
 
 Header hint: “Drafts are suggestions. Nothing joins the Main Queue until you add it.”
 
@@ -101,24 +105,19 @@ played 1 and is queued for 1 needs 1 more match. This is separate from the sessi
 (Min {minimum} games).” The minimum is the current session's value, not a preselected target.
 Invalid targets show “Enter a whole number of games, 1 or more.” beside the field.
 
-| Action | Copy and effect |
+One primary action at a time. The controls row has **Generate {n} matches** (“Generate matches” before a count is chosen), which becomes **Generate again** once the tab has drafts. The other draft actions sit in a ⋯ menu (“More draft actions”), each with what it does:
+
+| Menu item | Description |
 |---|---|
-| Generate | “Generate {n} matches”; “Generate matches” before a count is chosen |
-| Replace every draft in this tab | “Generate again” |
-| Keep selected drafts, replace others | “Replace unselected” |
-| Keep selected drafts, remove others | “Remove unselected” |
-| Remove all drafts in this tab | “Clear this tab” |
-| Review selected drafts across tabs | “Add {n} selected to Main Queue” |
-| Review this tab's batch | “Add all {n} to Main Queue” |
+| Replace unselected | “Keeps the drafts you picked and makes new ones for the rest.” |
+| Remove unselected | “Keeps only the drafts you picked.” |
+| Clear this tab (danger) | “Removes every draft in this tab.” |
 
-“Generate again replaces every draft in this tab. Replace unselected keeps the ones you picked.
-Remove unselected removes the others.” explains the actions next to their buttons. Disabled buttons
-have a title and accessible description pointing to a visible explanation: “Choose how many matches
-first.”; “Choose a game target first.” (or its validation error); “Generate matches in this tab first
-to replace or remove drafts, or add them to the Main Queue.”; “Select one or more drafts first to add
-a selection to the Main Queue.” Pending controls explain the current operation and “Please wait.”
+**Selection bar.** The Players tab's `SelectionBar` (“Selected drafts”), sticky above the console footer while the tab has drafts or anything is picked: the picked drafts' players' faces, “**{n} selected** · added in the order you picked” (or “tap drafts to pick them”), **Add all {n}** (this tab's batch, secondary), **Clear** (ghost; unpicks every draft in every tab) and the primary **Add {n} to Main Queue**. Both Add buttons open the review sheet.
 
-Batch results use normal status text, not an error for a full batch. Use singular “game” / “match” and “is” for a count of one:
+Disabled controls have a title and accessible description pointing to a visible explanation: “Choose how many matches first.”; “Choose a game target first.” (or its validation error); “Generate matches in this tab first to replace or remove drafts, or add them to the Main Queue.” A disabled menu item shows its reason in place of the description. Pending controls explain the current operation and “Please wait.”
+
+Batch results are never errors. A full batch shows as a neutral chip; a shortfall or Catch Up note is an info notice. Use singular “game” / “match” and “is” for a count of one:
 
 - Full batch: “Made {n} of {n} matches.”
 - Not enough players: “Made {k} of {n}: not enough free players for another match.” Plan Ahead says “present” in place of “free”.

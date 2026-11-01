@@ -23,27 +23,29 @@ export type UpcomingQueueRowProps = {
 // The prototype's queueCols(): queue tiles are at least 160 px wide with 10 px gaps (gap-2.5).
 const TILE_MIN = 160
 const GAP = 10
+/** Auto Queue drafts carry chips under each name, so a doubles team needs a wider tile to stay on one row. */
+export const DRAFT_TILE_MIN = 230
 
 /** How many queue tiles fit across a grid this wide; no upper limit. */
-export function queueColumnsFor(width: number) {
-  return Math.max(1, Math.floor((width + GAP) / (TILE_MIN + GAP)))
+export function queueColumnsFor(width: number, tileMin = TILE_MIN) {
+  return Math.max(1, Math.floor((width + GAP) / (tileMin + GAP)))
 }
 
 /**
  * The column count from the grid's own width (the page beside the rail), so wider screens show more
  * tiles. Attach the returned ref to the grid. One column before it is measured.
  */
-export function useQueueColumns<T extends HTMLElement>() {
+export function useQueueColumns<T extends HTMLElement>(tileMin = TILE_MIN) {
   const [el, setEl] = useState<T | null>(null)
   const [columns, setColumns] = useState(1)
   useLayoutEffect(() => {
     if (!el) return
-    const measure = () => setColumns(queueColumnsFor(el.clientWidth))
+    const measure = () => setColumns(queueColumnsFor(el.clientWidth, tileMin))
     measure()
     const observer = new ResizeObserver(measure)
     observer.observe(el)
     return () => observer.disconnect()
-  }, [el])
+  }, [el, tileMin])
   return [setEl, columns] as const
 }
 

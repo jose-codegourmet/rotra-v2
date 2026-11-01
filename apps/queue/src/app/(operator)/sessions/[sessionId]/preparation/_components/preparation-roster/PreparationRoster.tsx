@@ -17,8 +17,8 @@ import { RosterPanel, type RosterPanelPlayer } from '@rotra/ui/roster-panel'
 import { toast } from '@rotra/ui/toaster'
 import { WaitlistPanel, type WaitlistPanelEntry } from '@rotra/ui/waitlist-panel'
 import { useState } from 'react'
+import { AddPlayer } from '@/app/(operator)/_components/add-player/AddPlayer'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
-import { AddPlayer } from '@/app/(operator)/sessions/[sessionId]/_components/add-player/AddPlayer'
 import { longDateLabel } from '@/lib/dates'
 
 export type PreparationRosterProps = {

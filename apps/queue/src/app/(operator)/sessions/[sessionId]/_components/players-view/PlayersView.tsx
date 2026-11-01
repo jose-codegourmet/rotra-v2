@@ -38,8 +38,8 @@ import { SlotMeter } from '@rotra/ui/slot-meter'
 import { toast } from '@rotra/ui/toaster'
 import { WaitlistPanel, type WaitlistPanelEntry } from '@rotra/ui/waitlist-panel'
 import { useState } from 'react'
+import { AddPlayer } from '@/app/(operator)/_components/add-player/AddPlayer'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
-import { AddPlayer } from '@/app/(operator)/sessions/[sessionId]/_components/add-player/AddPlayer'
 import type { ConsoleViewProps } from '@/app/(operator)/sessions/[sessionId]/_components/session-console/SessionConsole'
 
 export type PlayersViewProps = ConsoleViewProps

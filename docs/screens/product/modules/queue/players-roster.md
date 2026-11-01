@@ -8,7 +8,7 @@
 
 **Entry:** home sidebar **Saved players** (with count). Blocked by the license gate when expired.
 
-Header “Saved players”, “N players this club has played with”.
+Header “Saved players”, “N players this club has played with”, and the primary **Add player** (PageHeader action; on phones it follows the header layout). It opens Q-ADD-PLAYER with no session (see “From Saved players” below).
 
 **Statistics carousel** (issue #301, verified October 31, 2026): between the header and filters,
 show six cards in this order: **Total players**, **Total registered**, **Total beginners**,
@@ -50,7 +50,7 @@ The mockup uses native horizontal scrolling; the real app uses Embla Carousel.
 - Footer: identity chip, and **Invite** for guests and unclaimed profiles.
 RTR IDs are not on the cards. Empty: “No saved players match these filters.” with Clear filters.
 
-**Full profile dialog:** picture, identity chip and a plain status line; Nickname, Level suggestion, Registered in, RTR ID (small monospace), Added to club, Sessions here, Phone (“Hidden by player”, “None on file”, or “Kept private; confirmed in person when adding them to a session” — the number itself is never shown). Note: levels are set per session while preparing a roster. Footer: Close, and Invite where it applies.
+**Full profile dialog:** picture, identity chip and a plain status line; Nickname, Level suggestion, Registered in, RTR ID (small monospace), Added to club, Sessions here, Phone (“Hidden by player”, “None on file”, or “Kept private; confirmed in person when adding them to a session” — the number itself is never shown). Note: levels are set per session while preparing a roster; Saved players › Add player can also set the saved level. Footer: Close, and Invite where it applies.
 
 **Invite dialog:** “Invite NAME to ROTRA” (guest) or “Invite NAME to claim their profile” (unclaimed). Explains the account uses their phone and email, and that the link doesn't book a session. Shows the invite link with **Copy link** (“Invite link copied”). Offline: “Making an invite link needs an internet connection.” No in-app sending; the operator shares the link themselves.
 
@@ -60,7 +60,9 @@ No phone/email columns in the normal list. Contact display, where permitted for 
 
 ## Q-ADD-PLAYER — Search/add to roster
 
-**Entry:** **Add player** in preparation or **Add late player** in the console's Players view. Sheet **Add player**, opening with “Adding to **TITLE**.” — in a live session adding “Late players get a level now, and it locks for the rest of the session.”
+**Entry:** **Add player** in preparation, **Add late player** in the console's Players view, or **Add player** on Saved players. Sheet **Add player**, opening with “Adding to **TITLE**.” — in a live session adding “Late players get a level now, and it locks for the rest of the session.” From Saved players it opens with “Adding to your saved players. They won't be added to a session.”
+
+**From Saved players (no session).** One `AddPlayerSheet` in its club context; it saves to the club's saved players only and never creates a roster or waitlist row. Tabs are **Player Information** (default) and **New player**; the Saved players tab is hidden because everyone there is already saved. There are no slots, waitlist or live notices. **Level for this club (optional)**: it becomes the saved player's level (the Beginner / Intermediate / Advanced statistics count it); left empty, they are saved with no level yet. The primary reads **Save player**. A Player Information profile the club already saved is refused with “NAME is already in your saved players.” and the sheet returns to the list; a new player whose phone matches a saved player's private phone is refused the same way. Same-name guests are never merged. Saving updates the header count and the statistics (Total players, Total registered for profiles, the level band when a level is set, New players this week). Toasts: “NAME saved as a guest”, “NAME saved · profile lookup after sync” (phone given), “NAME saved · Intermediate Mid” (Player Information). Offline, a new player saves on this device; the Player Information tab shows its offline notice. Saving without a session is mock-only for now (no club player endpoint yet).
 
 **Stays open while adding.** Adding a player never closes the sheet: it returns to the same tab, cleared (search or the new-player form emptied, focus back in the first field), with a success line such as “Marco Lopez added · Intermediate Mid” and, from the second add on, “· N added so far”. The footer button reads **Cancel** until someone is added, then **Done**. The slots meter and waitlist behind it update as players are added.
 

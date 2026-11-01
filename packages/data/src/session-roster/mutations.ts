@@ -2,8 +2,9 @@ import { phoneField } from '@rotra/schema/phone'
 import { flushSessionPresence } from '../batch/flushBatches'
 import type { ClubPlayer } from '../club-player/clubPlayer.types'
 import { clubPlayerView } from '../club-player/fetchers'
+import { clubPlayerForProfile, createClubPlayer, directoryLevel } from '../club-player/mutations'
 import { DEMO_CLUB_ID } from '../fixtures/clubs'
-import { directoryPlayers, leaderboardLevels, leaderboardPlayers } from '../fixtures/players'
+import { directoryPlayers, leaderboardPlayers } from '../fixtures/players'
 import { requireOnline } from '../mock/bridge'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
@@ -102,10 +103,6 @@ export function addSavedPlayerToSession(input: {
     }
   })
 }
-/** A directory suggestion's level is its leaderboard level. */
-function directoryLevel(playerId: string): PlayingLevel {
-  return leaderboardLevels[playerId] ?? 'beginner_low'
-}
 export async function playerDirectorySearch(q: string) {
   await delay()
   requireOnline()
@@ -135,22 +132,7 @@ export function addDirectoryPlayerToSession(input: {
   identityCheck?: IdentityCheck
 }) {
   return rosterMutation(input.sessionId, (s) => {
-    const profile = directoryPlayers.find((p) => p.id === input.playerId)
-    if (!profile || s.adminPlayerRecords[profile.id]?.archivedAt) fail('Player not available.')
-    let p = s.clubPlayers.find((p) => p.playerId === profile.id && p.clubId === DEMO_CLUB_ID)
-    if (!p) {
-      p = {
-        id: crypto.randomUUID(),
-        clubId: DEMO_CLUB_ID,
-        playerId: profile.id,
-        fullName: profile.fullName,
-        nickname: profile.nickname,
-        identity: 'registered',
-        playingLevel: directoryLevel(profile.id),
-        addedAt: Date.now(),
-      }
-      s.clubPlayers.push(p)
-    }
+    const p = clubPlayerForProfile(s, input.playerId).player
     identity(s, p, input.identityCheck)
     const data = place(s, input.sessionId, p, input.level)
     return {
@@ -158,24 +140,6 @@ export function addDirectoryPlayerToSession(input: {
       text: `${p.nickname || p.fullName.split(' ')[0]} added${data.waitlistPosition ? ` to the waitlist as #${data.waitlistPosition}` : ''} · ${levelLabel(input.level)}${!data.waitlistPosition && data.locked ? ' · level locked' : ''}`,
     }
   })
-}
-function newPlayer(s: MockState, input: { name: string; nickname?: string; phone?: string }) {
-  if (!input.name.trim()) fail('Enter your name.')
-  const parsed = input.phone?.trim() ? phoneField.safeParse(input.phone) : null
-  if (parsed && !parsed.success) fail('Enter a full mobile number, or leave it empty.')
-  const p: ClubPlayer = {
-    id: crypto.randomUUID(),
-    clubId: DEMO_CLUB_ID,
-    playerId: null,
-    fullName: input.name.trim(),
-    nickname: input.nickname?.trim() || null,
-    identity: parsed ? 'pending' : 'guest',
-    playingLevel: null,
-    addedAt: Date.now(),
-  }
-  s.clubPlayers.push(p)
-  if (parsed?.success) s.privatePhones[p.id] = parsed.data
-  return p
 }
 export async function addNewPlayerToSession(input: {
   sessionId: string
@@ -189,7 +153,7 @@ export async function addNewPlayerToSession(input: {
     return realAddNewPlayerToSession(input)
   }
   return rosterMutation(input.sessionId, (s) => {
-    const p = newPlayer(s, input),
+    const p = createClubPlayer(s, input),
       data = place(s, input.sessionId, p, input.level)
     return {
       data,
@@ -393,7 +357,7 @@ export function confirmJoinRequest(input: { requestId: string; level: PlayingLev
   const r = pending(readMockState(), input.requestId)
   return rosterMutation(r.sessionId, (s) => {
     const request = pending(s, input.requestId),
-      p = newPlayer(s, {
+      p = createClubPlayer(s, {
         name: request.name,
         nickname: request.nickname ?? undefined,
         phone: request.phoneE164 ?? undefined,

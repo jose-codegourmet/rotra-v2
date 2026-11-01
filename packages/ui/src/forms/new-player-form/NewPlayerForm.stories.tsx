@@ -1,14 +1,26 @@
 import { storyIdentityPlayers } from '@rotra/data/fixtures/players'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn, within } from 'storybook/test'
-import { NewPlayerForm } from './NewPlayerForm'
+import { NewPlayerForm, type NewPlayerFormProps } from './NewPlayerForm'
 
 // A walk-in guest, typed in as a new player.
 const guest = storyIdentityPlayers.guest
 
+/** The session form's args, plus `club` to render the Saved players (no session) context. */
+function Demo({
+  club,
+  ...props
+}: Extract<NewPlayerFormProps, { context?: 'session' }> & { club?: boolean }) {
+  return club ? (
+    <NewPlayerForm {...props} context="club" onSubmit={props.onSubmit as never} />
+  ) : (
+    <NewPlayerForm {...props} />
+  )
+}
+
 const meta = {
   title: 'Queue/NewPlayerForm',
-  component: NewPlayerForm,
+  component: Demo,
   decorators: [
     (Story) => (
       <div className="max-w-[520px]">
@@ -17,7 +29,7 @@ const meta = {
     ),
   ],
   args: { onSubmit: fn() },
-} satisfies Meta<typeof NewPlayerForm>
+} satisfies Meta<typeof Demo>
 
 export default meta
 type Story = StoryObj<typeof meta>
@@ -63,6 +75,17 @@ export const ServerError: Story = {
   args: {
     serverError: 'This player is already on the roster or waitlist.',
     defaultValues: { name: guest.fullName, level: 'intermediate_low' },
+  },
+}
+
+/** Saved players › Add player: no session, the level is optional and the submit reads Save player. */
+export const SavedPlayersClub: Story = { args: { club: true } }
+/** Club context with only a name: it saves with no level (no level error). */
+export const SavedPlayersClubNoLevel: Story = {
+  args: { club: true, defaultValues: { name: guest.fullName } },
+  play: async ({ canvasElement, userEvent }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(await canvas.findByRole('button', { name: 'Save player' }))
   },
 }
 

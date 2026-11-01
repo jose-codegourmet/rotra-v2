@@ -52,6 +52,24 @@ export const newPlayerSchema = z.object({
   level: requiredLevel,
 })
 
+/**
+ * Saved players › Add player (no session): the same fields with the level optional. An empty level
+ * saves the player with no level yet.
+ */
+export const newSavedPlayerSchema = newPlayerSchema.extend({
+  level: z.string().transform((value, ctx) => {
+    if (value === '') return null
+    if (!LEVEL_VALUES.has(value)) {
+      ctx.addIssue({ code: 'custom', message: LEVEL_ERROR })
+      return z.NEVER
+    }
+    return value as PlayingLevel
+  }),
+})
+
+/** What onSubmit receives in the club context: the level is null when left empty. */
+export type NewSavedPlayerFormValues = z.output<typeof newSavedPlayerSchema>
+
 /** What the fields hold while typing (phone as typed, level '' until chosen). */
 export type NewPlayerFormInput = z.input<typeof newPlayerSchema>
 /** What onSubmit receives (nickname and phone null when empty, phone in E.164, level required). */

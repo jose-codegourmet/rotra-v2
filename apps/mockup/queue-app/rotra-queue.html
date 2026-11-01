@@ -2093,7 +2093,7 @@ function viewPlayers() {
   const active = ['band', 'city', 'added', 'status', 'live'].filter((k) => f[k] !== { band: 'all', city: 'all', added: 'any', status: 'all', live: 'all' }[k]).length;
   return `<main class="wrap">
     <div class="crumb"><button class="btn sm ghost" data-act="go" data-to="home">${I.back} Home</button></div>
-    <div><h1>Saved players</h1><p class="muted small">${S.players.length} players this club has played with</p></div>
+    <div class="between"><div><h1>Saved players</h1><p class="muted small">${S.players.length} players this club has played with</p></div><button class="btn primary" data-act="openAddSaved">Add player</button></div>
     ${savedPlayerStats()}
     <div class="sp-tools-wrap"><div class="sp-tools">
       <label class="field sp-search"><span>Search</span><input class="input" id="saved-search" data-bind="ui.search" data-rerender placeholder="Name or nickname" value="${esc(S.ui.search)}"></label>
@@ -3122,13 +3122,16 @@ const SHEETS = {
       '<button class="btn" data-act="closeSheet">Close</button>');
   },
   add(sh) {
-    const s = cur();
-    const inRoster = new Set(s.roster.map((r) => r.pid).concat((s.waitlist || []).map((w) => w.pid)));
-    const live = s.status === 'active';
-    const full = !live && openSlots(s) === 0;
+    // sh.club: Saved players › Add player. Saves to the saved players only; no session, slots or waitlist.
+    const club = !!sh.club, s = club ? null : cur();
+    const inRoster = new Set(club ? [] : s.roster.map((r) => r.pid).concat((s.waitlist || []).map((w) => w.pid)));
+    const live = !club && s.status === 'active';
+    const full = !club && !live && openSlots(s) === 0;
     const q = (sh.q || '').toLowerCase();
-    const tab = sh.tab || 'saved';
-    let body = `${notice('', `Adding to <b>${esc(s.title)}</b>.${live ? ' Late players get a level now, and it locks for the rest of the session.' : ''}`)}${sh.last && !sh.pick ? `<div role="status">${notice('ok', `${esc(sh.last)}${sh.added > 1 ? ` <span class="small muted">· ${sh.added} added so far</span>` : ''}`)}</div>` : ''}${full ? notice('warn', `<b>All ${capacityOf(s)} slots are taken.</b> New players go on the waitlist as #${waitOf(s).length + 1}. You can give them a slot later.`) : ''}`;
+    const tab = sh.tab || (club ? 'global' : 'saved');
+    const primary = club ? 'Save player' : full ? 'Add to waitlist' : 'Confirm player slot';
+    const levelLabel = club ? 'Level for this club (optional)' : `Level for this club${live ? ' (locks immediately)' : ''}`;
+    let body = `${club ? notice('', "Adding to your saved players. They won't be added to a session.") : notice('', `Adding to <b>${esc(s.title)}</b>.${live ? ' Late players get a level now, and it locks for the rest of the session.' : ''}`)}${sh.last && !sh.pick ? `<div role="status">${notice('ok', `${esc(sh.last)}${sh.added > 1 ? ` <span class="small muted">· ${sh.added} added so far</span>` : ''}`)}</div>` : ''}${full ? notice('warn', `<b>All ${capacityOf(s)} slots are taken.</b> New players go on the waitlist as #${waitOf(s).length + 1}. You can give them a slot later.`) : ''}`;
     if (sh.pick) {
       const p = sh.pick.dir ? DIRECTORY.find((x) => x.id === sh.pick.id) : P(sh.pick.id);
       // Registered (claimed) profiles are tied to the player's own account, so only unclaimed ones need an in-person check,
@@ -3140,10 +3143,10 @@ const SHEETS = {
           ${sh.verify ? `<p class="small" style="color:var(--accent)">${I.check} Identity confirmed with the player</p>` : ''}</div>` : ''}
         ${p.phoneHidden ? '<p class="small muted">Phone hidden by player. Use their RTR ID or QR code instead.</p>' : ''}
         <div class="field"><span>Player Information suggestion</span><span class="small">${p.sugg != null ? esc(lvLabel(p.sugg)) : 'None yet'}</span></div>
-        <label class="field"><span>Level for this club${live ? ' (locks immediately)' : ''}</span>${selectLevel('add-level', sh.level, 'data-bind="ui.sheet.level" data-num', !!sh.err && sh.level == null)}${sh.err ? `<span class="err">${esc(sh.err)}</span>` : ''}</label></div>`;
-      return sheetShell(needsVerify ? 'Confirm player' : 'Add player', body, `<button class="btn" data-act="sheetSet" data-k="pick" data-v="">Back</button><button class="btn primary" data-act="confirmAdd" ${needsVerify && !sh.verify ? 'disabled' : ''}>${full ? 'Add to waitlist' : 'Confirm player slot'}</button>`);
+        <label class="field"><span>${levelLabel}</span>${selectLevel('add-level', sh.level, 'data-bind="ui.sheet.level" data-num', !!sh.err && sh.level == null)}${sh.err ? `<span class="err">${esc(sh.err)}</span>` : ''}</label></div>`;
+      return sheetShell(needsVerify ? 'Confirm player' : 'Add player', body, `<button class="btn" data-act="sheetSet" data-k="pick" data-v="">Back</button><button class="btn primary" data-act="confirmAdd" ${needsVerify && !sh.verify ? 'disabled' : ''}>${primary}</button>`);
     }
-    body += `<div class="seg" role="group" aria-label="How to add">${[['saved', 'Saved players'], ['global', 'Player Information'], ['new', 'New player']].map(([k, l]) => `<button aria-pressed="${tab === k}" data-act="sheetSet" data-k="tab" data-v="${k}">${l}</button>`).join('')}</div>`;
+    body += `<div class="seg" role="group" aria-label="How to add">${[['saved', 'Saved players'], ['global', 'Player Information'], ['new', 'New player']].filter(([k]) => !club || k !== 'saved').map(([k, l]) => `<button aria-pressed="${tab === k}" data-act="sheetSet" data-k="tab" data-v="${k}">${l}</button>`).join('')}</div>${club && sh.err && !sh.pick && tab === 'global' ? notice('bad', esc(sh.err)) : ''}`;
     if (tab === 'saved') {
       // Players already on the roster or waitlist are left out of the list rather than shown greyed out.
       const list = S.players.filter((p) => !inRoster.has(p.id) && (!q || p.name.toLowerCase().includes(q) || (p.nick || '').toLowerCase().includes(q) || (p.rtr || '').toLowerCase().includes(q)));
@@ -3161,9 +3164,9 @@ const SHEETS = {
       body += `<label class="field"><span>Full or display name</span><input class="input${sh.err && !(sh.name || '').trim() ? ' bad' : ''}" id="add-name" data-bind="ui.sheet.name" value="${esc(sh.name || '')}" data-autofocus></label>
         <label class="field"><span>Nickname (optional)</span><input class="input" id="add-nick" data-bind="ui.sheet.nick" value="${esc(sh.nick || '')}"></label>
         <label class="field"><span>Phone (optional)</span><input class="input" id="add-phone" type="tel" data-bind="ui.sheet.phone" value="${esc(sh.phone || '')}"><span class="hint">Without a phone they're saved as a guest. With one, ROTRA can match or create their profile when the session syncs.</span></label>
-        <label class="field"><span>Level for this club${live ? ' (locks immediately)' : ''}</span>${selectLevel('add-level-new', sh.level, 'data-bind="ui.sheet.level" data-num', !!sh.err && sh.level == null)}</label>
+        <label class="field"><span>${levelLabel}</span>${selectLevel('add-level-new', sh.level, 'data-bind="ui.sheet.level" data-num', !!sh.err && sh.level == null)}</label>
         ${sh.err ? `<span class="err">${esc(sh.err)}</span>` : ''}`;
-      return sheetShell('Add player', body, `<button class="btn" data-act="closeSheet">${sh.added ? 'Done' : 'Cancel'}</button><button class="btn primary" data-act="confirmNew">${full ? 'Add to waitlist' : 'Confirm player slot'}</button>`);
+      return sheetShell('Add player', body, `<button class="btn" data-act="closeSheet">${sh.added ? 'Done' : 'Cancel'}</button><button class="btn primary" data-act="confirmNew">${primary}</button>`);
     }
     return sheetShell('Add player', body, `<button class="btn" data-act="closeSheet">${sh.added ? 'Done' : 'Cancel'}</button>`);
   },
@@ -3457,7 +3460,7 @@ function openSheet(sh) { S.ui.sheet = sh; render(); }
 // Adding a player keeps the Add player dialog open on the same tab, cleared and ready for the next one.
 function afterAdd(sh, msg) {
   commit(msg);
-  S.ui.sheet = { type: 'add', tab: sh.tab || 'saved', last: msg, added: (sh.added || 0) + 1 };
+  S.ui.sheet = { type: 'add', tab: sh.tab || (sh.club ? 'global' : 'saved'), last: msg, added: (sh.added || 0) + 1, club: sh.club };
   render();
 }
 // Picking a venue fills the session's venue, address and (when the venue has one) court fee, which stays editable.
@@ -3831,6 +3834,7 @@ const ACT = {
   clubPerCourt: (x) => { S.club.perCourt = Math.max(2, Math.min(20, (S.club.perCourt || 8) + +x.d)); save(); render(); },
   removeRoster: (d) => { const s = cur(); s.roster = s.roster.filter((r) => r.pid !== d.pid); save(); render(); toast(`${nm(d.pid)} removed from the roster`); },
   openAdd: () => openSheet({ type: 'add', tab: 'saved', q: '' }),
+  openAddSaved: () => openSheet({ type: 'add', tab: 'global', q: '', club: true }),
   sheetSet: (d, el) => {
     const sh = S.ui.sheet;
     let v = d.v === '' ? null : d.v;
@@ -3849,7 +3853,17 @@ const ACT = {
     render();
   },
   confirmAdd: () => {
-    const sh = S.ui.sheet, s = cur();
+    const sh = S.ui.sheet;
+    if (sh.club) {
+      // Saved players › Add player: a Player Information profile joins the saved players; the level is optional.
+      const g = DIRECTORY.find((x) => x.id === sh.pick.id);
+      if (S.players.some((x) => x.rtr === g.rtr)) { sh.pick = null; sh.err = `${g.name} is already in your saved players.`; render(); return; }
+      const level = sh.level == null || sh.level === '' ? null : +sh.level;
+      S.players.push({ id: `p${Date.now()}`, name: g.name, nick: '', identity: g.identity, rtr: g.rtr, sugg: level, prior: 0, base: null, added: Date.now() });
+      afterAdd(sh, `${g.name.split(' ')[0]} saved${level != null ? ` · ${lvLabel(level)}` : ''}`);
+      return;
+    }
+    const s = cur();
     if (sh.level == null || sh.level === '') { sh.err = 'Choose a level for this club before adding.'; render(); return; }
     let pid = sh.pick.id;
     if (sh.pick.dir) { const g = DIRECTORY.find((x) => x.id === pid); pid = `p${Date.now()}`; S.players.push({ id: pid, name: g.name, nick: '', identity: g.identity, rtr: g.rtr, sugg: g.sugg, prior: 0, base: null, added: Date.now() }); }
@@ -3858,8 +3872,16 @@ const ACT = {
     afterAdd(sh, `${nm(pid)} added · ${lvLabel(+sh.level)}${s.status === 'active' ? ' · level locked' : ''}`);
   },
   confirmNew: () => {
-    const sh = S.ui.sheet, s = cur();
+    const sh = S.ui.sheet;
     if (!(sh.name || '').trim()) { sh.err = 'Enter a name.'; render(); return; }
+    if (sh.club) {
+      // Saved players › Add player: a guest (no phone) or pending player (phone), with a level only if one was chosen.
+      const hasPhone = !!(sh.phone || '').trim(), level = sh.level == null || sh.level === '' ? null : +sh.level;
+      S.players.push({ id: `p${Date.now()}`, name: sh.name.trim(), nick: (sh.nick || '').trim(), identity: hasPhone ? 'pending' : 'guest', rtr: null, sugg: level, prior: 0, base: null, added: Date.now() });
+      afterAdd(sh, `${sh.name.trim()} saved${hasPhone ? ' · profile lookup after sync' : ' as a guest'}`);
+      return;
+    }
+    const s = cur();
     if (sh.level == null || sh.level === '') { sh.err = 'Choose a level for this club.'; render(); return; }
     const pid = `p${Date.now()}`;
     const hasPhone = !!(sh.phone || '').trim();

@@ -10,7 +10,7 @@ Show name/nickname, permanent RTR ID, claimed/unclaimed identity state, shared-r
 
 No fake row for every name-only guest is required: guests may exist only in club records. If an identity search has duplicates/conflicts, surface that explicitly rather than merging by display name.
 
-Pagination/search errors retain context. An empty result offers a correction to the search, not automatic account creation.
+Pagination/search errors retain context. An empty result offers a correction to the search, not automatic account creation. The explicit header Add player action can create an unclaimed profile (#342).
 
 ## A-PLAYER-DETAIL — Internal identity view
 
@@ -22,7 +22,7 @@ Separate sections:
 4. Pending contact-change requests.
 5. Read-only rank/history context needed for support.
 
-Profile information oversight does not automatically authorize a rank editor, winner/score changes, hidden-contact sharing with clubs, account merging, or deleting retained game history. Broad non-contact personal-edit rights remain to be specified.
+Profile information oversight does not automatically authorize a rank editor, winner/score changes, hidden-contact sharing with clubs, account merging, or deleting retained game history. Admin may edit name and nickname for all players, plus photo for unclaimed players, with before/after review and a required reason (#343). Archive hides reversibly; Remove requires a typed RTR ID and reason and cannot remove a claimed account or any game history (#344).
 
 Current contacts should reflect actual usable account state, not a merely approved but unapplied request. Audit/support details must not contain passwords or reusable recovery/claim tokens.
 
@@ -54,3 +54,7 @@ Each completed Admin decision can show actor/time and a concise change summary f
 - A phone collision is not resolved by overwriting the other player.
 - Contact changes keep RTR ID and match history intact.
 - Even the player detail has no Edit winner or Manually reconstruct session action.
+
+## Management controls (#335)
+
+Six count cards follow filters. Search, duplicate groups, inclusive date range, city, archive state, page size (25/50/100), page and grid/list view survive URL reloads. Quick view uses `peek`, preserves list state and opens a right-side full-height panel. Detail and quick view link to `/players/[playerId]/games` with return context; the read-only history has counted, fun/partial and all tabs, club/date filters and ten sessions per page. Row actions and bulk selection follow the approved business rules.

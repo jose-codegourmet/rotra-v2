@@ -128,6 +128,8 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
       ) : (
         <WaitlistPanel
           loading={loading}
+          isPending={giveSlot.isPending || fillOpenSlots.isPending || removeFromWaitlist.isPending}
+          serverError={giveSlot.error || fillOpenSlots.error || removeFromWaitlist.error ? errorMessage(giveSlot.error ?? fillOpenSlots.error ?? removeFromWaitlist.error) : undefined}
           entries={entries}
           rosterCount={rosterList.length}
           courtCount={s?.courts.length ?? 0}

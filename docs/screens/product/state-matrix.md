@@ -93,3 +93,7 @@ A conflict is not permission to open a generic winner editor. Accepted unchanged
 | Court past planned end | Show Booking ended | Continue dispatch until manually removed while free |
 | Auto Queue draft stale | Keep cards and selections visible with a stale notice | Review and revalidate on transfer; conflicts need attention |
 | Catch Up cannot progress | Keep any generated drafts and show stopping reason | Change target or eligible players, then regenerate |
+
+### Flexible admission (mock)
+
+Prepared overflow waits by default; active arrivals enter directly and lock their level. Waitlist and join-request actions disable while pending. A failed or conflicting write retains list membership and chosen levels; new-player inputs stay in the sheet. Saved/directory duplicate identities are rejected atomically. Finalized and invalid sessions remain read-only. Offline writes still require the existing downloaded-copy mock guard; license expiry allows finishing an active session only. These are in-memory states, reset on reload.

@@ -8,6 +8,7 @@ import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { Chip } from '@rotra/ui/chip'
 import { cn } from '@rotra/ui/cn'
+import { Notice } from '@rotra/ui/notice'
 import { LevelSelect } from '@rotra/ui/level-select'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { useId, useState } from 'react'
@@ -25,6 +26,8 @@ export type JoinRequestsPanelProps = {
   variant?: 'card' | 'sheet'
   /** Requests are still loading: Skeleton rows in place of the list */
   loading?: boolean
+  isPending?: boolean
+  serverError?: string
   /** Confirm with the level the Queue Master chose for this club */
   onConfirm: (requestId: string, level: PlayingLevel) => void
   onDecline: (requestId: string) => void
@@ -65,6 +68,8 @@ export function JoinRequestsPanel({
   live = false,
   variant = 'card',
   loading = false,
+  isPending = false,
+  serverError,
   onConfirm,
   onDecline,
   className,
@@ -88,6 +93,7 @@ export function JoinRequestsPanel({
   }
 
   const confirm = (r: SessionJoinRequest) => {
+    if (isPending) return
     const level = levelOf(r)
     if (!level) {
       setErrors((prev) => ({ ...prev, [r.id]: LEVEL_ERROR }))
@@ -152,6 +158,7 @@ export function JoinRequestsPanel({
           )}
         </p>
       </div>
+      {serverError ? <Notice tone="error">{serverError}</Notice> : null}
       {pending.length ? (
         <div className="flex flex-col divide-y divide-border">
           {pending.map((r) => {
@@ -175,6 +182,7 @@ export function JoinRequestsPanel({
                 </div>
                 <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 max-sm:grid-cols-1">
                   <LevelSelect
+                    disabled={isPending}
                     value={level}
                     onChange={(next) => setLevel(r.id, next)}
                     aria-label={`Level for ${r.name}`}
@@ -183,6 +191,7 @@ export function JoinRequestsPanel({
                   <div className="flex flex-wrap items-center gap-2 max-sm:[&>*]:flex-1">
                     <Button
                       size="sm"
+                      disabled={isPending}
                       onClick={() => onDecline(r.id)}
                       aria-label={`Decline ${r.name}`}
                     >
@@ -190,6 +199,7 @@ export function JoinRequestsPanel({
                     </Button>
                     <Button
                       size="sm"
+                      disabled={isPending}
                       variant="primary"
                       onClick={() => confirm(r)}
                       aria-label={`${slotsFull && !live ? 'Confirm to waitlist' : 'Confirm guest'} ${r.name}`}

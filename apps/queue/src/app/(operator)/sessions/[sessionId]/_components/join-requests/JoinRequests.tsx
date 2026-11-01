@@ -6,6 +6,7 @@ import { useConfirmJoinRequest } from '@rotra/data/session-roster/useConfirmJoin
 import { useDeclineJoinRequest } from '@rotra/data/session-roster/useDeclineJoinRequest'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { JoinRequestsPanel } from '@rotra/ui/join-requests-panel'
+import { useRef } from 'react'
 import { toast } from '@rotra/ui/toaster'
 
 export type JoinRequestsProps = {
@@ -28,12 +29,14 @@ const errorMessage = (error: unknown) =>
  * Both mutations toast their result or error; a refused decision leaves the request pending.
  */
 export function JoinRequests({ sessionId, variant = 'card', className }: JoinRequestsProps) {
+  const submitting = useRef(false)
   const session = useQueueSession(sessionId)
   const roster = useSessionRoster(sessionId)
   const confirm = useConfirmJoinRequest()
   const decline = useDeclineJoinRequest()
 
   const options = {
+    onSettled: () => { submitting.current = false },
     onSuccess: (result: { message: string }) => toast(result.message),
     onError: (error: unknown) => toast.error(errorMessage(error)),
   }
@@ -43,7 +46,7 @@ export function JoinRequests({ sessionId, variant = 'card', className }: JoinReq
   const pending = requests.filter((r) => r.status === 'pending').length
   // The card only appears once a request is waiting, so it stays hidden while loading; the sheet
   // always has a body and shows Skeleton rows until the roster arrives.
-  const loading = !s || !roster.data
+  const loading = session.isPending || roster.isPending
   if (variant === 'card' && (loading || pending === 0)) return null
 
   const capacity = s ? slotCapacity(s.courts.length, s.playersPerCourt) : 0
@@ -52,13 +55,15 @@ export function JoinRequests({ sessionId, variant = 'card', className }: JoinReq
   return (
     <JoinRequestsPanel
       loading={loading}
+      isPending={confirm.isPending || decline.isPending}
+      serverError={confirm.error || decline.error || session.error || roster.error ? errorMessage(confirm.error ?? decline.error ?? session.error ?? roster.error) : undefined}
       requests={requests}
       live={s?.state === 'active'}
       slotsFull={slotsFull}
       variant={variant}
       className={className}
-      onConfirm={(requestId, level) => confirm.mutate({ requestId, level }, options)}
-      onDecline={(requestId) => decline.mutate(requestId, options)}
+      onConfirm={(requestId, level) => { if (submitting.current) return; submitting.current = true; confirm.mutate({ requestId, level }, options) }}
+      onDecline={(requestId) => { if (submitting.current) return; submitting.current = true; decline.mutate(requestId, options) }}
     />
   )
 }

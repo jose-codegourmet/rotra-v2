@@ -293,7 +293,12 @@
     "./feature-flag/usePlaceholderFeatureFlag": "./src/feature-flag/usePlaceholderFeatureFlag.ts",
     "./club-player/useSavedPlayerStats": "./src/club-player/useSavedPlayerStats.ts",
     "./fixtures/saved-player-stats": "./src/fixtures/savedPlayerStats.ts",
-    "./queue-session/useUpdateCourt": "./src/queue-session/useUpdateCourt.ts"
+    "./queue-session/useUpdateCourt": "./src/queue-session/useUpdateCourt.ts",
+    "./match/auto-queue-types": "./src/match/autoQueue.types.ts",
+    "./match/auto-queue-rules": "./src/match/autoQueue.rules.ts",
+    "./match/auto-queue-mutations": "./src/match/autoQueue.mutations.ts",
+    "./match/useAutoQueueDrafts": "./src/match/useAutoQueueDrafts.ts",
+    "./match/useEditAutoQueueDrafts": "./src/match/useEditAutoQueueDrafts.ts"
   },
   "scripts": {
     "lint": "biome check .",

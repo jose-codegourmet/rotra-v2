@@ -1,0 +1,130 @@
+'use client'
+import { useAdminConnectivity } from '@rotra/data/admin-account/use-admin-connectivity'
+import type { AdminPlayer } from '@rotra/data/admin-player/types'
+import { useAdminPlayerMutations } from '@rotra/data/admin-player/useAdminPlayerMutations'
+import { AdminEditPlayerForm } from '@rotra/ui/admin-edit-player-form'
+import { AdminPlayerActions } from '@rotra/ui/admin-player-actions'
+import { AdminPlayerChangeForm } from '@rotra/ui/admin-player-change-form'
+import { CopyPlayerValue } from '@rotra/ui/copy-player-value'
+import { toast } from '@rotra/ui/toaster'
+import { useQueryClient } from '@tanstack/react-query'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useState } from 'react'
+export function PlayerManagementActions({ player }: { player: AdminPlayer }) {
+  const pathname = usePathname(),
+    router = useRouter(),
+    search = useSearchParams(),
+    [copyValue, setCopyValue] = useState('')
+  const from = search.get('from') ?? search.toString()
+  const copy = async (value: string, message: string) => {
+    try {
+      await navigator.clipboard.writeText(value)
+      toast.success(message)
+    } catch {
+      setCopyValue(value)
+    }
+  }
+  const [action, setAction] = useState<'archive' | 'restore' | 'remove' | null>(null)
+  const [editing, setEditing] = useState(false),
+    { offline } = useAdminConnectivity(),
+    mutations = useAdminPlayerMutations(),
+    client = useQueryClient()
+  return (
+    <>
+      <AdminPlayerActions
+        player={player}
+        offline={offline}
+        pending={
+          mutations.link.isPending || mutations.update.isPending || mutations.change.isPending
+        }
+        onAction={(action) => {
+          if (action === 'edit') {
+            mutations.update.reset()
+            setEditing(true)
+          } else if (action === 'archive' || action === 'restore' || action === 'remove') {
+            mutations.change.reset()
+            setAction(action)
+          } else if (action === 'copy') void copy(player.rtrId, 'RTR ID copied')
+          else if (action === 'link')
+            mutations.link.mutate(player.id, {
+              onSuccess: (link) => {
+                const base =
+                  typeof location !== 'undefined' && location.hostname === 'localhost'
+                    ? 'http://localhost:9001'
+                    : 'https://player.rotra.club'
+                void copy(
+                  `${base}/claim/${link.token}`,
+                  `Registration link copied · expires ${new Date(link.expiresAt).toLocaleDateString('en-PH', { timeZone: 'Asia/Manila' })}`,
+                )
+              },
+              onError: (error) => toast.error(error.message),
+            })
+          else if (action === 'quick') {
+            const params = new URLSearchParams(from)
+            params.set('peek', player.id)
+            router.push(`/players?${params}`, { scroll: false })
+          } else if (action === 'profile')
+            router.push(`/players/${player.id}?from=${encodeURIComponent(from)}`)
+          else
+            router.push(
+              `/players/${player.id}/games?from=${encodeURIComponent(from)}${pathname === '/players' ? '&origin=list' : ''}`,
+            )
+        }}
+      />
+      <CopyPlayerValue value={copyValue} onClose={() => setCopyValue('')} />
+      {editing ? (
+        <AdminEditPlayerForm
+          key={player.revision}
+          player={player}
+          open
+          onClose={() => setEditing(false)}
+          offline={offline}
+          isPending={mutations.update.isPending}
+          serverError={mutations.update.error?.message}
+          onReload={() => {
+            void client.invalidateQueries()
+            setEditing(false)
+          }}
+          onSubmit={(values) =>
+            mutations.update.mutate(
+              { ...values, id: player.id, revision: player.revision },
+              {
+                onSuccess: () => {
+                  setEditing(false)
+                  toast.success('Profile updated')
+                },
+                onError: (error) => toast.error(error.message),
+              },
+            )
+          }
+        />
+      ) : null}
+      {action ? (
+        <AdminPlayerChangeForm
+          players={[player]}
+          action={action}
+          open
+          onClose={() => setAction(null)}
+          pending={mutations.change.isPending}
+          offline={offline}
+          error={mutations.change.error?.message}
+          results={mutations.change.data}
+          onSubmit={(reason, confirmations, ids) =>
+            mutations.change.mutate(
+              { action, ids, reason, confirmations },
+              {
+                onSuccess: (results) => {
+                  const success = results.filter((r) => r.success).length
+                  toast.success(
+                    `${success} ${action === 'archive' ? 'archived' : action === 'restore' ? 'restored' : 'removed'}`,
+                  )
+                },
+                onError: (error) => toast.error(error.message),
+              },
+            )
+          }
+        />
+      ) : null}
+    </>
+  )
+}

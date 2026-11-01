@@ -137,6 +137,7 @@ The roster's global link is a historical snapshot. Resolve later identity correc
 | `label` | Text; defaults to "Court N" |
 | `open_until` | Nullable timestamptz. Null means "until the session ends" and follows `scheduled_end_at` when time is extended. A set time must be later than the moment it is added and not after the session end |
 | `removed_at` | Nullable; set when a free court is removed |
+| `opened_early_at` | Proposed. Nullable timestamptz; set by **Start anyway** when the court is opened before its planned start, cleared by **Undo early open** while the court is free. The planned start is never rewritten. Counts as use, so the planned start is fixed while it is set |
 | `revision`, timestamps | Common metadata |
 
 Unique `(club_id, session_id, id)`. Unique `(session_id, label)` among non-removed courts (partial index on `removed_at IS NULL`).

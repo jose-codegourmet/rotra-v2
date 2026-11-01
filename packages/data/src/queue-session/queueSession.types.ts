@@ -31,6 +31,8 @@ export type SessionCourt = {
   label: string
   /** Older fixtures without a start are already open. New bookings always set it. */
   startsAt?: number
+  /** When the Queue Master opened the court before its planned start (Start anyway); missing or null when not. `startsAt` keeps the booking. */
+  openedEarlyAt?: number | null
   openUntil: number | null
   removedAt: number | null
 }

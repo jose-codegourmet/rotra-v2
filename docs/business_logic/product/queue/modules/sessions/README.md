@@ -91,7 +91,7 @@ Starting locks every roster level and starts no match. The console opens on the 
 ## Running
 
 - The operator can add players at any time, including offline; late players get a level that locks immediately.
-- **Add court:** label (defaults to the next "Court N") and **Open until** — either until the session ends (moves with extensions) or until a set time within the session; the planned start determines when the court becomes available.
+- **Add court:** label (defaults to the next "Court N") and **Open until** — either until the session ends (moves with extensions) or until a set time within the session; the planned start determines when the court becomes available, unless the operator opens it early with **Start anyway**.
 - **Remove court:** only a free court, and a session keeps at least one court.
 - Each court shows its closing time. After that time it shows **Booking ended**. ROTRA never stops a game at a closing time; it is a reminder for the operator.
 - **Extend time** by 30 or 60 minutes per action. The public page shows the new end after it syncs.
@@ -115,7 +115,7 @@ See [lifecycle](flow/session-lifecycle.md), [offline recovery](../offline/README
 
 ## Individual court windows (owner decision, October 31, 2026)
 
-Each court has a planned start and end within the Queue Session, including an explicitly indicated next-day end for an overnight session. Before its start the court is shown but excluded from dispatch. The end is advisory: it neither interrupts an active match nor prevents a new one; the Queue Master may extend it, even after it passes. A start can be edited until the court has hosted a match, then is fixed. Session-end courts follow session extensions; explicit ends do not. Manual closure removes only a free court, retaining at least one court. No abort or reopen lifecycle is implied. These windows do not change the approved cost or minimum-games formulas.
+Each court has a planned start and end within the Queue Session, including an explicitly indicated next-day end for an overnight session. Before its start the court is shown but excluded from dispatch, unless the Queue Master opens it early: **Start anyway** on the court (or **Open all courts now** for every court not open yet, or Start anyway in the Start match sheet) asks for confirmation, then makes the court available for matches and Auto Queue at once, with no time window. The planned start stays as booked; the early open is recorded separately, counts as use (so the start becomes fixed) and lasts for the rest of the session. **Undo early open** returns a free court to Not open yet (amended November 1, 2026, #325). The end is advisory: it neither interrupts an active match nor prevents a new one; the Queue Master may extend it, even after it passes. A start can be edited until the court has hosted a match, then is fixed. Session-end courts follow session extensions; explicit ends do not. Manual closure removes only a free court, retaining at least one court. No abort or reopen lifecycle is implied. These windows do not change the approved cost or minimum-games formulas.
 
 ## Actual start and court previews (owner decision, November 1, 2026, #320)
 

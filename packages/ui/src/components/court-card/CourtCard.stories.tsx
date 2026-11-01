@@ -16,7 +16,7 @@ import type { SessionCourt } from '@rotra/data/queue-session/types'
 import { AddCourtTile } from '@rotra/ui/add-court-tile'
 import type { CourtPlayer } from '@rotra/ui/court-drawing'
 import type { Decorator, Meta, StoryObj } from '@storybook/react-vite'
-import { fn } from 'storybook/test'
+import { expect, fn, userEvent, within } from 'storybook/test'
 import {
   CourtCard,
   type CourtCardFreeProps,
@@ -67,6 +67,8 @@ function inGame(m: Match, overrides: Partial<CourtCardInGameProps> = {}): CourtC
     minutes: Math.max(0, Math.round((Date.now() - (m.startedAt ?? Date.now())) / 60000)),
     substitutions: m.substitutions.length,
     onOpenMatch: fn(),
+    onEdit: fn(),
+    onRemove: fn(),
     ...overrides,
   }
 }
@@ -105,6 +107,7 @@ function free(
     label: court.label,
     untilLabel: untilOf(court),
     bookingEnded: Date.now() >= (court.openUntil ?? session.scheduledEndAt),
+    onEdit: fn(),
     onRemove: fn(),
     onReviewAndStart: fn(),
     onAddMatch: fn(),
@@ -200,7 +203,41 @@ export const BeforePlannedStart: Story = {
     startLabel: fmtTime(courtWindowFixture.courts[3]!.startsAt),
     untilLabel: fmtTime(courtWindowFixture.session.scheduledEndAt),
     notOpen: true,
+    onStartAnyway: fn(),
+    onEdit: fn(),
+    onRemove: fn(),
   },
+}
+const openMenu = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+  const canvas = within(canvasElement)
+  await userEvent.click(canvas.getByRole('button', { name: /^More for / }))
+  await expect(canvas.getByRole('menuitem', { name: 'Edit' })).toHaveFocus()
+}
+/** After Start anyway: Free, with "Opened early · planned …" and Undo early open in the ⋯ menu */
+export const OpenedEarly: Story = {
+  args: free(courtWindowFixture.courts[3]!, [ready], {
+    label: courtWindowFixture.courts[3]!.label,
+    startLabel: fmtTime(courtWindowFixture.courts[3]!.startsAt),
+    untilLabel: fmtTime(courtWindowFixture.session.scheduledEndAt),
+    bookingEnded: false,
+    openedEarly: true,
+    onUndoEarlyOpen: fn(),
+  }),
+  play: openMenu,
+}
+export const FreeMenuOpen: Story = { args: free(courtAt(2), [playing, ready]), play: openMenu }
+export const LastCourtMenuOpen: Story = {
+  args: free(courtAt(2), [ready], { isLastCourt: true }),
+  play: openMenu,
+}
+/** In game on an early-opened court: Undo early open and Remove wait until the court is free */
+export const InGameOpenedEarlyMenu: Story = {
+  args: inGame(playing, {
+    startLabel: fmtTime(courtWindowFixture.courts[3]!.startsAt),
+    openedEarly: true,
+    onUndoEarlyOpen: fn(),
+  }),
+  play: openMenu,
 }
 export const ManuallyRemoved: Story = {
   args: {

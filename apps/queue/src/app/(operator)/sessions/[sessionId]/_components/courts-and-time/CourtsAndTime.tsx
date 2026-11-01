@@ -22,6 +22,8 @@ export type CourtsAndTimeProps = {
   /** Which sheet is open: Courts and time (Extend time) or Add a court; null when neither */
   open: CourtsAndTimeSheetValue | null
   onOpenChange: (sheet: CourtsAndTimeSheetValue | null) => void
+  /** Edit in a court card's ⋯ menu: open the Add a court sheet on this court */
+  editCourtId?: string | null
 }
 
 const errorMessage = (error: unknown) =>
@@ -39,7 +41,12 @@ const isSaveFailure = (error: unknown) =>
  * A save failure is an error toast (the sheet stays open with what was typed, nothing is claimed);
  * any other refusal shows inside the add sheet.
  */
-export function CourtsAndTime({ sessionId, open, onOpenChange }: CourtsAndTimeProps) {
+export function CourtsAndTime({
+  sessionId,
+  open,
+  onOpenChange,
+  editCourtId = null,
+}: CourtsAndTimeProps) {
   const saving = useRef(false)
   const returnFocus = useRef<HTMLElement | null>(null)
   const previousOpen = useRef(open)
@@ -59,7 +66,7 @@ export function CourtsAndTime({ sessionId, open, onOpenChange }: CourtsAndTimePr
   if (!s) return null
   const sessionStart = s.startedAt ?? s.scheduledStartAt
   const courts = s.courts
-  const editing = courts.find((c) => c.id === editingId)
+  const editing = courts.find((c) => c.id === (editingId ?? editCourtId))
   const used = !!editing && (matches.data ?? []).some((m) => m.courtIds.includes(editing.id))
 
   const onExtend = (minutes: ExtendMinutes) => {
@@ -149,7 +156,7 @@ export function CourtsAndTime({ sessionId, open, onOpenChange }: CourtsAndTimePr
       />
       {/* Remounted on each open so the label and mode start fresh from the current court count */}
       <AddCourtForm
-        key={open === 'add-court' ? `open-${editingId ?? 'new'}` : 'closed'}
+        key={open === 'add-court' ? `open-${editing?.id ?? 'new'}` : 'closed'}
         open={open === 'add-court'}
         onOpenChange={openAddCourt}
         defaultLabel={editing?.label ?? nextCourtLabel(courts.length)}

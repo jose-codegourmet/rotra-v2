@@ -8,7 +8,11 @@ Prepared admission uses the slot budget (courts × players per court), not `expe
 
 ## G2 · Court boundaries
 
-Show courts before their planned start but exclude them from dispatch until that time. The planned end is advisory and does not interrupt a match or prevent another one. An overnight end is explicitly shown as the following day; the booking window must fall within the Queue Session. A start may be edited before the court has hosted a match; after use it is fixed. The Queue Master may extend the planned end, including after the original end. Manual closure uses free-court removal; occupied-court removal remains blocked and at least one court must remain. This does not introduce a reopen lifecycle or change cost or minimum-games formulas.
+Show courts before their planned start but exclude them from dispatch until that time, unless the Queue Master opens them early (amendment below). The planned end is advisory and does not interrupt a match or prevent another one. An overnight end is explicitly shown as the following day; the booking window must fall within the Queue Session. A start may be edited before the court has hosted a match; after use it is fixed. The Queue Master may extend the planned end, including after the original end. Manual closure uses free-court removal; occupied-court removal remains blocked and at least one court must remain. This does not introduce a reopen lifecycle or change cost or minimum-games formulas.
+
+### G2 amendment · Start anyway (Jose, November 1, 2026, #325)
+
+Being before the planned start no longer blocks the Queue Master. A court that is not open yet offers **Start anyway**; after a confirmation it is open for dispatch and Auto Queue from that moment. The courts section offers **Open all courts now** while at least one court is not open yet, and the Start match sheet lists not-yet-open courts with Start anyway. There is no time window: the planned start can be any distance away. The planned start (the booking) does not change; the early open is recorded separately and counts as use, so the start becomes fixed. **Undo early open** returns the court to Not open yet, only while it is free. Remove stays the only manual closure. Cost, capacity and minimum-games formulas are unchanged.
 
 ## G3 · Generation
 

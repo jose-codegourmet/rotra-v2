@@ -121,6 +121,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
   const [sheet, setSheet] = useState<ConsoleSheet>(resumeSessionDone ? 'session-done' : null)
   const [matchSheet, setMatchSheet] = useState<MatchSheet | null>(null)
   const [profileId, setProfileId] = useState<string | null>(null)
+  const [editCourtId, setEditCourtId] = useState<string | null>(null)
 
   const s = session.data
   if (session.isError && session.error instanceof MockError && session.error.kind === 'permission')
@@ -317,6 +318,10 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
           <SessionView
             {...viewProps}
             onAddCourt={() => setSheet('add-court')}
+            onEditCourt={(courtId) => {
+              setEditCourtId(courtId)
+              setSheet('add-court')
+            }}
             {...matchEditing}
             onOpenMatch={(matchId) => setMatchSheet({ mode: 'active', matchId })}
             onStartMatch={onStartMatch}
@@ -369,7 +374,11 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
       <CourtsAndTime
         sessionId={sessionId}
         open={sheet === 'adjust' || sheet === 'add-court' ? sheet : null}
-        onOpenChange={setSheet}
+        onOpenChange={(next) => {
+          if (!next) setEditCourtId(null)
+          setSheet(next)
+        }}
+        editCourtId={editCourtId}
       />
       <MatchLineup
         sessionId={sessionId}

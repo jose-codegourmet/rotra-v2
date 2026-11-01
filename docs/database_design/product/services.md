@@ -139,3 +139,22 @@ screen loaded one, and returns an allowlisted DTO.
 - The public copy holds names and counts only (standings: position, name, W/L, games; awards: names and prior-session counts). No IDs, scores evidence, levels, contacts, financials or raw evidence; the public page never joins the private snapshot.
 - Exports are private; their ID comes from the command and the storage key from the ID, so a re-render overwrites the same object. Rendering and storage are later work; a render failure leaves the finalization and snapshot untouched.
 - Unpublish, bucket policy and public asset access are not built.
+
+## F07.32 · Expiry-cycle retention, recoverable jobs
+
+| Module | Commands |
+|---|---|
+| `admin/retention` | `retainPublicationsUnderCycle` (called when `refreshEntitlement` starts a cycle); `runRetentionSweep`; `retryCachePurge`; `readRetentionSchedule` |
+| `admin/licenses` | renewal cancels the exact running cycle (F07.21), so retained pages stay |
+| `queue/public-session` | a deleted page reads as `not_found` (stale-page state) |
+
+- Scope: only `session_publications` rows go to `deleted` (public copy and slide selection cleared) plus their public cache entries. Players, sessions, facts, finalizations, snapshots, exports and earned history are never touched. No private-data purge is inferred.
+- Each due cycle is swept in its own transaction under the club lock, rechecking that the cycle is still `running`, past its deadline, and the club still has no access; the SQL guard checks the cycle again. A sweep queued before renewal finds the cycle cancelled and exits.
+- Cache purge runs after commit with bounded retries (`MAX_SWEEP_ATTEMPTS`); a failure is reported in the diagnostics and `retryCachePurge` repeats it safely. Diagnostics carry IDs, counts and codes only.
+
+### Worker runbook (proposal; runtime pending #243)
+
+1. Every 15 minutes: `refreshLapsedEntitlements()` → `scheduleAgeingJobs()` → `releaseStaleJobs()` → `runProjectionJobs()` until it returns nothing.
+2. Daily: `runRetentionSweep(cache)`. Alert on any `failed` diagnostic or `cachePurged: false`.
+3. A projection job that reached `MAX_JOB_ATTEMPTS` stays `failed` and the finalization shows `failed` with the stage; fix the cause, then `retryProjectionJob(id)`. Canonical facts are never re-run.
+4. Restore rehearsal: restore a nonproduction dump, run `scripts/disposable-db.sh` checks, then run step 1 once; jobs are idempotent, so a restored backlog replays safely. Never run the sweep against a restored copy that points at production storage or caches.

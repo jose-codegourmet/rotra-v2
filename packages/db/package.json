@@ -35,7 +35,8 @@
     "./queue/sync": "./src/queue/sync.ts",
     "./queue/finalization": "./src/queue/finalization.ts",
     "./player/projections": "./src/player/projections.ts",
-    "./queue/results": "./src/queue/results.ts"
+    "./queue/results": "./src/queue/results.ts",
+    "./admin/retention": "./src/admin/retention.ts"
   },
   "scripts": {
     "db:generate": "prisma generate",

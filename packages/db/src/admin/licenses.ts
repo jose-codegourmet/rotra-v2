@@ -6,6 +6,7 @@ import { ServiceError } from '../service/errors'
 import { toDateOnly, toIso, toIsoOrNull, toMoney } from '../service/serialize'
 import { recordAudit } from './audit'
 import { lockClub } from './clubs'
+import { retainPublicationsUnderCycle } from './retention'
 
 type Tx = Prisma.TransactionClient
 
@@ -60,6 +61,8 @@ export async function refreshEntitlement(tx: Tx, clubId: string, now = new Date(
       },
     })
     cycleId = cycle.id
+    // Each later expiry is a new cycle; pages are retained under it, never an old deadline.
+    await retainPublicationsUnderCycle(tx, clubId, cycle.id)
   }
   return tx.clubEntitlement.upsert({
     where: { clubId },

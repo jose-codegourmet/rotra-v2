@@ -54,9 +54,10 @@ function publicStatus(session: QueueSession): 'prepared' | 'active' | 'completed
 export async function readPublicSession(slug: string) {
   const session = await prisma.queueSession.findUnique({
     where: { publicSlug: slug },
-    include: { club: { select: { name: true, logoRef: true } } },
+    include: { club: { select: { name: true, logoRef: true } }, publication: { select: { state: true } } },
   })
-  if (!session) throw new ServiceError('not_found')
+  // A page removed by retention is gone for the public; the session and its history are not.
+  if (!session || session.publication?.state === 'deleted') throw new ServiceError('not_found')
   return prisma.$transaction(async (tx) => {
     const courts = await liveCourts(tx, session.id)
     const roster = await liveRoster(tx, session.id)

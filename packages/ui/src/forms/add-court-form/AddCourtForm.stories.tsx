@@ -49,8 +49,8 @@ export const NoClosingTime: Story = {
   play: submit,
 }
 
-/** A set time half an hour ago: "Choose a time later than now." */
-export const TimeNotAfterNow: Story = {
+/** An already-ended booking is advisory and can be edited. */
+export const AdvisoryPastEnd: Story = {
   args: { defaultValues: { mode: 'time', time: toTimeInput(NOW - 30 * MINUTE) } },
   play: submit,
 }
@@ -71,3 +71,6 @@ export const ServerError: Story = {
 
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
 export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }
+
+export const EditingUsedCourt: Story = { args: { editing: true, lockedStartsAt: startedAt, defaultValues: { startTime: toTimeInput(startedAt) } } }
+export const FutureOpening: Story = { args: { defaultValues: { startTime: toTimeInput(NOW + 30 * MINUTE) } } }

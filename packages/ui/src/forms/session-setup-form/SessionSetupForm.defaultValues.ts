@@ -21,6 +21,8 @@ export function sessionSetupDefaultValues(playersPerCourt = 8): SessionSetupInpu
     repeat: 'none',
     repeatCount: 4,
     courtLabels: ['Court 1', 'Court 2'],
+    courtStarts: ['', ''],
+    courtEnds: ['', ''],
     playersPerCourt,
     allowSingles: false,
     allowDoubles: true,

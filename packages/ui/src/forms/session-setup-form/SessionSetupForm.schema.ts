@@ -1,3 +1,5 @@
+import { courtTimeOnSession, courtWindowError } from '@rotra/schema/court-window'
+import { sessionTimes } from './SessionSetupForm.helpers'
 import { dateField, timeField } from '@rotra/schema/date'
 import {
   CUSTOM_FEE_ERROR,
@@ -52,6 +54,8 @@ export const sessionSetupSchema = z
     repeat: z.enum(['none', 'weekly', 'biweekly', 'monthly']),
     repeatCount: z.number().int().min(2).max(12),
     courtLabels: z.array(z.string().trim().min(1, 'Give the court a label.')).min(1),
+    courtStarts: z.array(z.string()).default([]),
+    courtEnds: z.array(z.string()).default([]),
     playersPerCourt: z.number().int().min(2).max(20),
     allowSingles: z.boolean(),
     allowDoubles: z.boolean(),
@@ -64,6 +68,18 @@ export const sessionSetupSchema = z
   })
   .extend(sessionFinancialsSchema.shape)
   .superRefine((values, ctx) => {
+    const { start, end } = sessionTimes(values)
+    values.courtLabels.forEach((_, i) => {
+      const from = values.courtStarts[i] || values.startTime
+      const until = values.courtEnds[i]
+      if (!timeField.safeParse(from).success || (until && !timeField.safeParse(until).success)) {
+        ctx.addIssue({ code: 'custom', message: 'Enter a valid booking time.', path: [!timeField.safeParse(from).success ? 'courtStarts' : 'courtEnds', i] })
+        return
+      }
+      const startsAt = courtTimeOnSession(start, from)
+      const error = courtWindowError(startsAt, until ? courtTimeOnSession(start, until) : null, start, end)
+      if (error) ctx.addIssue({ code: 'custom', message: error, path: [startsAt >= end ? 'courtStarts' : 'courtEnds', i] })
+    })
     if (values.paymentMode === 'custom' && values.customFeePerHead === null)
       ctx.addIssue({ code: 'custom', message: CUSTOM_FEE_ERROR, path: ['customFeePerHead'] })
     if (!values.minimumIsCalculated) {
@@ -80,7 +96,7 @@ export type SessionSetupValues = z.output<typeof sessionSetupSchema>
 
 /** The wizard's three pages and the fields each one validates */
 export const PAGE_FIELDS: (keyof SessionSetupInput)[][] = [
-  ['title', 'date', 'startTime', 'endTime', 'venue', 'courtLabels', 'playersPerCourt'],
+  ['title', 'date', 'startTime', 'endTime', 'venue', 'courtLabels', 'courtStarts', 'courtEnds', 'playersPerCourt'],
   [
     'allowSingles',
     'allowDoubles',

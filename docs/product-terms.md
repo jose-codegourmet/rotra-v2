@@ -258,7 +258,7 @@ from the [database design](database_design/product/README.md). Add a row here **
 | Join request | `SessionJoinRequest` | `session_join_requests` | `status`: `pending` · `confirmed` · `declined` |
 | Waitlist entry | `SessionWaitlistEntry` | `session_waitlist` | Ordered by `added_at` |
 | Roster entry (slot) | `SessionPlayer` | `session_players` | Slot order is `confirmed_at` |
-| Court in a session | `SessionCourt` | `session_courts` | |
+| Court in a session | `SessionCourt` | `session_courts` | Mock `startsAt` is the planned start; `openUntil: null` follows session end. `useUpdateCourt` edits booking windows; a used start is fixed |
 | Session finalization | `SessionFinalization` | `session_finalizations` | `state`: `running` · `committed` · `done` · `failed`; `stage`: `checking` · `finishing` · `player_records` · `slides` (`FinalizationStage`) |
 | Session done review | `SessionDoneReview` | — | Read model for Q-SESSION-DONE: games recorded, participants, pending changes, games in play, unplayed waiting, below minimum |
 | Session record | `SessionRecordSummary` | — | Read model for Q-HISTORY totals; an invalid session counts no games or players |

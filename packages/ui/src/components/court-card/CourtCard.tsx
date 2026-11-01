@@ -10,6 +10,7 @@ type CourtCardBase = {
   label: string
   /** The court's closing time, already formatted: "9:00 PM" */
   untilLabel: string
+  startLabel?: string
   className?: string
 }
 
@@ -46,6 +47,8 @@ export type CourtCardFreeProps = CourtCardBase & {
   variant: 'free'
   /** Past its closing time: "Booking ended HH:MM" in warn; the game continues */
   bookingEnded?: boolean
+  notOpen?: boolean
+  removed?: boolean
   /** The session's last court: Remove is disabled with "A session needs at least one court" */
   isLastCourt?: boolean
   /** Renders "Remove" when given */
@@ -83,6 +86,7 @@ export function CourtCard(props: CourtCardProps) {
 function InGameCourtCard({
   label,
   untilLabel,
+  startLabel,
   merged = false,
   teamA,
   teamB,
@@ -102,7 +106,7 @@ function InGameCourtCard({
       <div className="flex items-center justify-between gap-2">
         <div>
           <h3 className="text-base">{label}</h3>
-          <span className="text-[13px] text-fg2">Until {untilLabel}</span>
+          <span className="text-[13px] text-fg2">{startLabel ? `${startLabel} – ` : 'Until '}{untilLabel}</span>
         </div>
         <Chip tone="accent">{merged ? 'Merged · in game' : 'In game'}</Chip>
       </div>
@@ -132,7 +136,10 @@ function InGameCourtCard({
 function FreeCourtCard({
   label,
   untilLabel,
+  startLabel,
   bookingEnded = false,
+  notOpen = false,
+  removed = false,
   isLastCourt = false,
   onRemove,
   next,
@@ -148,11 +155,11 @@ function FreeCourtCard({
         <div>
           <h3 className="text-base">{label}</h3>
           <span className={cn('text-[13px]', bookingEnded ? 'text-warn' : 'text-fg2')}>
-            {bookingEnded ? 'Booking ended' : 'Until'} {untilLabel}
+            {startLabel ? `${startLabel} – ` : ''}{bookingEnded ? 'Booking ended' : 'Until'} {untilLabel}
           </span>
         </div>
         <div className="flex flex-nowrap items-center gap-1.5">
-          <Chip>Free</Chip>
+          <Chip>{removed ? 'Removed' : notOpen ? 'Not open yet' : 'Free'}</Chip>
           {onRemove ? (
             <Button
               size="xs"
@@ -169,7 +176,9 @@ function FreeCourtCard({
         </div>
       </div>
       <CourtDrawing free />
-      {next ? (
+      {notOpen || removed ? (
+        <p className="text-[13px] text-fg2">{removed ? 'Manually removed from this session.' : `Opens at ${startLabel}. The court is unavailable before this time.`}</p>
+      ) : next ? (
         <>
           {next.skippedReason ? (
             <p className="text-[13px] text-fg2">{next.skippedReason}.</p>

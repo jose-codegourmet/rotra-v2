@@ -1,5 +1,7 @@
 'use client'
 
+import { courtNextDay } from '@rotra/schema/court-window'
+import { Notice } from '@rotra/ui/notice'
 import type { SessionCourt } from '@rotra/data/queue-session/types'
 import { Button } from '@rotra/ui/button'
 import { formatTime } from '@rotra/ui/now-card/helpers'
@@ -11,7 +13,11 @@ export type CourtsAndTimeSheetProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   /** The session's courts (not removed), in order; only their labels are shown */
-  courts: Pick<SessionCourt, 'id' | 'label'>[]
+  courts: (Pick<SessionCourt, 'id' | 'label'> & { startsAt?: number; openUntil?: number | null; occupied?: boolean; used?: boolean })[]
+  startsAt?: number
+  onEditCourt?: (courtId: string) => void
+  onRemoveCourt?: (courtId: string) => void
+  serverError?: string
   /** The session's scheduled end, shown as "Ends at HH:MM" */
   endsAt: number
   /** "Add a court…": the container opens the Add court sheet (Q-ADD-COURT) */
@@ -32,6 +38,10 @@ export function CourtsAndTimeSheet({
   open,
   onOpenChange,
   courts,
+  startsAt,
+  onEditCourt,
+  onRemoveCourt,
+  serverError,
   endsAt,
   onAddCourt,
   onExtend,
@@ -44,9 +54,20 @@ export function CourtsAndTimeSheet({
       title="Courts and time"
       footer={<Button onClick={() => onOpenChange(false)}>Done</Button>}
     >
+      {serverError ? <Notice tone="error">{serverError}</Notice> : null}
       <div className="flex min-w-0 flex-col gap-1.5">
         <span className="text-[13px] font-semibold text-fg2">Courts</span>
-        <p className="m-0 text-[13px]">{courts.map((c) => c.label).join(', ')}</p>
+        {courts.map((court) => <div key={court.id} className="flex flex-wrap items-center justify-between gap-2 border-b border-border py-2">
+          <div><b>{court.label}</b><p className="text-[13px] text-fg2">
+            {court.startsAt !== undefined ? `${formatTime(court.startsAt)}${startsAt !== undefined && courtNextDay(court.startsAt, startsAt) ? ' · next day' : ''} – ` : ''}
+            {formatTime(court.openUntil ?? endsAt)}{startsAt !== undefined && courtNextDay(court.openUntil ?? endsAt, startsAt) ? ' · next day' : ''}
+            {court.used ? ' · start fixed after use' : ''}
+          </p></div>
+          <div className="flex gap-2">
+            {onEditCourt ? <Button size="sm" disabled={isPending} onClick={() => onEditCourt(court.id)}>Edit {court.label}</Button> : null}
+            {onRemoveCourt ? <Button size="sm" disabled={isPending || court.occupied || courts.length === 1} title={court.occupied ? 'Only a free court can be removed' : courts.length === 1 ? 'A session needs at least one court' : undefined} onClick={() => onRemoveCourt(court.id)}>Remove {court.label}</Button> : null}
+          </div>
+        </div>)}
       </div>
       <div className="flex flex-wrap items-center gap-2">
         <Button size="sm" onClick={onAddCourt}>

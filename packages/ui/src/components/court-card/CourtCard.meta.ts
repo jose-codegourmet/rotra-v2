@@ -20,5 +20,6 @@ export const courtCardMeta = {
     'docs/business_logic/product/queue/modules/queueing/README.md',
   ],
   variants: ['in-game', 'free'],
+  // Individual booking starts control dispatch; ends remain advisory.
   related: ['CourtDrawing', 'PlayerFaceButton', 'AddCourtTile', 'Chip'],
 } satisfies ComponentMeta

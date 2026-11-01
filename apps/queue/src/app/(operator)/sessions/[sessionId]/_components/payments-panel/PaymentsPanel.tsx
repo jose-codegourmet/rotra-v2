@@ -1,8 +1,7 @@
 'use client'
 
-import { useMarkAllPaid } from '@rotra/data/session-payment/useMarkAllPaid'
 import { useSessionPayments } from '@rotra/data/session-payment/useSessionPayments'
-import { useTogglePaid } from '@rotra/data/session-payment/useTogglePaid'
+import { useSetPaymentMarks } from '@rotra/data/session-payment/useSetPaymentMarks'
 import { type PaymentFilter, PaymentsChecklist } from '@rotra/ui/payments-checklist'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { toast } from '@rotra/ui/toaster'
@@ -12,15 +11,13 @@ import { PlayerProfile } from '../player-profile/PlayerProfile'
 
 export type PaymentsPanelProps = { sessionId: string; asSheet?: boolean; className?: string }
 export function PaymentsPanel({ sessionId, asSheet, className }: PaymentsPanelProps) {
-  const payments = useSessionPayments(sessionId),
-    toggle = useTogglePaid(),
-    markAll = useMarkAllPaid()
+  const payments = useSessionPayments(sessionId)
+  const marks = useSetPaymentMarks(sessionId, {
+    onSuccess: (outcome) => toast(outcome.message),
+    onError: (error) => toast.error(error.message),
+  })
   const [filter, setFilter] = useState<PaymentFilter>('all')
   const [profile, setProfile] = useState<string | null>(null)
-  const callbacks = {
-    onSuccess: (outcome: { message: string }) => toast(outcome.message),
-    onError: (error: Error) => toast.error(error.message),
-  }
   if (payments.isError) return <QueryError query={payments} title="Couldn't load payments." />
   if (payments.isPending) return <Skeleton className="h-60 rounded-lg" />
   if (!payments.data) return null
@@ -29,20 +26,16 @@ export function PaymentsPanel({ sessionId, asSheet, className }: PaymentsPanelPr
       <PaymentsChecklist
         {...payments.data}
         className={className}
-        saveError={toggle.error?.message ?? markAll.error?.message}
+        saveError={marks.error?.message}
         filter={filter}
         onFilterChange={setFilter}
         onTogglePaid={(clubPlayerId) => {
-          markAll.reset()
-          toggle.mutate({ sessionId, clubPlayerId }, callbacks)
+          const player = payments.data?.players.find((p) => p.clubPlayerId === clubPlayerId)
+          if (player) marks.set(clubPlayerId, !player.paid)
         }}
-        onMarkAllPaid={() => {
-          toggle.reset()
-          markAll.mutate(sessionId, callbacks)
-        }}
+        onMarkAllPaid={marks.markAll}
         onSelectPlayer={setProfile}
         asSheet={asSheet}
-        disabled={toggle.isPending || markAll.isPending}
       />
       <PlayerProfile
         clubPlayerId={profile}

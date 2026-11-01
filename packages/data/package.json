@@ -230,6 +230,7 @@
     "./session-payment/query-keys": "./src/session-payment/queryKeys.ts",
     "./session-payment/fetchers": "./src/session-payment/fetchers.ts",
     "./session-payment/useSessionPayments": "./src/session-payment/useSessionPayments.ts",
+    "./session-payment/useSetPaymentMarks": "./src/session-payment/useSetPaymentMarks.ts",
     "./session-payment/useTogglePaid": "./src/session-payment/useTogglePaid.ts",
     "./session-payment/useMarkAllPaid": "./src/session-payment/useMarkAllPaid.ts",
     "./session-cost/rules": "./src/session-cost/sessionCost.rules.ts",

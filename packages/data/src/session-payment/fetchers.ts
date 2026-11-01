@@ -8,6 +8,7 @@ import { queueMutation, requireClubAccess, sessionIn } from '../mock/transaction
 import { sessionCostIn } from '../session-cost/fetchers'
 import { amountDuePerHead, paymentTotals } from '../session-cost/sessionCost.rules'
 import type { SessionCostInput } from '../session-cost/sessionCost.types'
+import type { SetPaymentMarksInput } from './sessionPayment.types'
 
 /** Uploaded pictures by global player id (registered and unclaimed players only). */
 const pictures: Record<string, string> = portraits
@@ -58,6 +59,39 @@ function requirePaymentsWrite(state: MockState, sessionId: string) {
   if (getMockDevState().licenseExpired && session.state !== 'active') requireClubAccess()
   if (getMockDevState().offline && state.downloads[sessionId] !== 'ready')
     throw new MockError('offline', 'No downloaded copy on this device. Connect, or download first.')
+}
+/** One atomic desired-state write; existing paid amounts/timestamps are never rewritten. */
+export function setPaymentMarks({ sessionId, marks }: SetPaymentMarksInput) {
+  if (!marks.length)
+    return Promise.resolve({ data: { count: 0 }, savedOffline: false, message: '' })
+  return queueMutation({ area: 'Payments' }, (state) => {
+    requirePaymentsWrite(state, sessionId)
+    const wanted = new Map(marks.map((mark) => [mark.clubPlayerId, mark.paid]))
+    const amount = sessionCostIn(state, sessionId)?.estimate.perHead ?? 0
+    for (const [clubPlayerId, paid] of wanted) {
+      const player = state.roster.find(
+        (p) => p.sessionId === sessionId && p.clubPlayerId === clubPlayerId,
+      )
+      if (!player) throw new MockError('permission', 'Player not in this session.')
+      const mark = state.paymentMarks.find(
+        (m) => m.sessionId === sessionId && m.sessionPlayerId === player.id,
+      )
+      if (!paid && mark) state.paymentMarks = state.paymentMarks.filter((m) => m !== mark)
+      if (paid && !mark)
+        state.paymentMarks.push({
+          sessionId,
+          sessionPlayerId: player.id,
+          amountMinor: amount,
+          currency: 'PHP',
+          markedAt: Date.now(),
+        })
+    }
+    const count = wanted.size
+    return {
+      data: { count },
+      text: `${count} payment mark${count === 1 ? '' : 's'} saved`,
+    }
+  })
 }
 export function togglePaid({
   sessionId,

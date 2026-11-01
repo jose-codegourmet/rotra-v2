@@ -161,7 +161,7 @@ describe('generation failure boundaries', () => {
     const before = readMockState()
     await expect(
       generateAutoQueueDrafts({ sessionId, mode: 'available', count: 4, preserveSelected: true }),
-    ).rejects.toThrow('needs 4')
+    ).rejects.toThrow('Made 0 of 3: not enough free players for another match.')
     expect(readMockState()).toEqual(before)
   })
 })

@@ -150,6 +150,10 @@ export function AutoQueue({ sessionId, workspace, onWorkspaceChange, mainQueue }
       onModeChange={setMode}
       count={count}
       onCountChange={setCount}
+      minimumGames={s.minimumGames}
+      hasEligiblePlayers={ctx.roster.some(
+        (p) => p.present && (mode === 'ahead' || !activeMatchFor(p.id, ctx.matches)),
+      )}
       catchUpTarget={target}
       onCatchUpTargetChange={setTarget}
       batches={batches}

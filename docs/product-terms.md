@@ -119,7 +119,8 @@ Rules: [Queueing](business_logic/product/queue/modules/queueing/README.md)
 | Suggest | ROTRA proposes one lineup with a reason, for approval |
 | Main Queue | Accepted shared waiting list used for dispatch |
 | Auto Queue | Five alternative generation tabs holding drafts until explicitly transferred to the Main Queue |
-| Available Players / Plan Ahead / Longest Wait / Fewest Games / Catch Up | Auto Queue generation strategies; Catch Up uses an explicitly chosen completed-game target |
+| Available Players / Plan Ahead / Longest Wait / Fewest Games | Auto Queue generation strategies |
+| Catch Up | Auto Queue strategy with an explicitly chosen game target, separate from the session minimum. “Games each player should reach” prioritizes eligible players below that number; completed games, Main Queue waiting assignments and earlier drafts in this batch count toward reaching it in the plan. Planned games are not completed results |
 | Draft | A suggested future lineup held outside the Main Queue; neither queued nor played |
 | Regenerate | Rebuilds unprotected waiting matches; keeps protected manual ones |
 | Protected manual match | Created or edited by the operator; survives regeneration unless it needs attention |

@@ -1,5 +1,7 @@
 # Cross-product states and permissions
 
+**Last verified:** 2026-11-01.
+
 **Status:** Screen behavior contract. A proposed screen cannot weaken these agreed access/result boundaries.
 
 ## Connectivity and persistence
@@ -91,8 +93,14 @@ A conflict is not permission to open a generic winner editor. Accepted unchanged
 | Active session above slot budget | Show attendance and budget; additional admission remains available | Admit chosen player, present and level locked |
 | Court before planned start | Show planned window and not-started status | No dispatch to that court |
 | Court past planned end | Show Booking ended | Continue dispatch until manually removed while free |
-| Auto Queue draft stale | Keep cards and selections visible with a stale notice | Review and revalidate on transfer; conflicts need attention |
-| Catch Up cannot progress | Keep any generated drafts and show stopping reason | Change target or eligible players, then regenerate |
+| Auto Queue draft stale | “The Main Queue changed since these were made. Check them before adding, or generate again.” Keep cards and selections visible | Review and revalidate on transfer; conflicts need attention |
+| Auto Queue count missing | “Choose how many matches, then Generate.” Disabled actions explain “Choose how many matches first.” | Choose 2 / 3 / 4 / 6 explicitly |
+| Catch Up target missing / invalid | “Choose a game target, then Generate.”; “Enter a whole number of games, 1 or more.” for invalid input | Enter a target explicitly; the session minimum is only a placeholder and comparison |
+| Auto Queue has no eligible players | “No one is free to play right now. Try Plan Ahead to include players who are mid-game.” Plan Ahead with nobody present: “No present players. Mark arrivals present in Players.” | Change player presence or strategy |
+| Auto Queue full batch | “Made {n} of {n} matches.” Normal status text | Review before adding |
+| Auto Queue short batch | “Made {k} of {n}: not enough free players for another match.” Plan Ahead says “present” | Change eligible players or strategy |
+| Catch Up target met in plan | “Everyone available reaches {target} games with these matches.” | Review any drafts; no automatic transfer |
+| Catch Up cannot progress | Keep drafts and show “Made {k} of {n}: no other match helps anyone reach {target} games.” Append “{s} more games are still needed to reach {target}.” when positive | Change target or eligible players, then Generate again |
 
 ### Flexible admission (mock)
 

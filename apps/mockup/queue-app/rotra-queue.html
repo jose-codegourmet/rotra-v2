@@ -2510,41 +2510,66 @@ function autoState(s) {
   return S.ui.autoDraft;
 }
 function queueFingerprint(s) { return JSON.stringify([s.status, s.singles, s.doubles, s.roster, s.courts, s.matches]); }
+const AUTO_DESCRIPTIONS = {
+  available: 'Matches from players who are here and not on a court right now.',
+  ahead: 'Also uses players who are mid-game. Their matches wait until their current game ends.',
+  wait: 'Puts the players who have waited longest since their last game first.',
+  fewest: 'Puts the players with the fewest games (played + already queued) first.',
+  catchup: 'Helps players who are behind reach a number of games you choose.'
+};
 function autoWorkspace(s) {
   const a = autoState(s), tab = a.tab, batch = a.batches[tab] || { cards: [] };
   const stale = batch.fingerprint && batch.fingerprint !== queueFingerprint(s);
+  const validTarget = Number.isSafeInteger(+a.target) && +a.target > 0;
+  const generationHint = !a.count ? 'Choose how many matches first.' : tab === 'catchup' && !validTarget ? (a.target === '' ? 'Choose a game target first.' : 'Enter a whole number of games, 1 or more.') : '';
+  const draftsHint = !batch.cards.length ? 'Generate matches in this tab first to replace or remove drafts, or add them to the Main Queue.' : '';
+  const selectionHint = !a.selected.length ? 'Select one or more drafts first to add a selection to the Main Queue.' : '';
+  const disabled = (reason, id) => reason ? `disabled title="${esc(reason)}" aria-describedby="${id}"` : '';
+  const eligible = s.roster.some((r) => r.present && (tab === 'ahead' || !activeOf(s, r.pid)));
+  const empty = !eligible ? (tab === 'ahead' ? 'No present players. Mark arrivals present in Players.' : 'No one is free to play right now. Try Plan Ahead to include players who are mid-game.') : tab === 'catchup' && !validTarget ? 'Choose a game target, then Generate.' : !a.count ? 'Choose how many matches, then Generate.' : 'Generate matches to see suggestions here.';
   return `<div class="seg" role="group" aria-label="Queue workspace"><button data-act="queueWorkspace" data-k="main">Main Queue</button><button aria-pressed="true">Auto Queue</button></div>
-    <div class="between"><h2>Auto Queue</h2><span class="small muted">Drafts are not waiting matches</span></div>
+    <div class="between"><h2>Auto Queue</h2><span class="small muted">Drafts are suggestions. Nothing joins the Main Queue until you add it.</span></div>
     <div class="seg" role="group" aria-label="Generation strategy">${Object.entries(AUTO_MODES).map(([k, label]) => `<button id="auto-tab-${k}" data-act="autoTab" data-k="${k}" aria-pressed="${tab === k}">${label}</button>`).join('')}</div>
-    <p class="small muted">${tab === 'ahead' ? 'Includes present players who are still playing; those lineups wait until they are free.' : tab === 'catchup' ? 'Choose a target for completed games. Planned games do not count as played.' : 'Uses present players who are not currently playing.'}</p>
-    <div class="field"><span>Number of matches</span><div class="row">${[2,3,4,6].map((n) => `<button id="auto-count-${n}" class="btn sm" data-act="autoCount" data-n="${n}" aria-pressed="${a.count === n}">${n}</button>`).join('')}</div></div>
-    ${tab === 'catchup' ? `<label class="field"><span>Catch Up target</span><input id="auto-target" class="input" type="number" min="1" step="1" data-bind="ui.autoDraft.target" value="${esc(String(a.target))}" aria-label="Catch Up target"></label>` : ''}
-    <div class="row"><button class="btn primary" data-act="autoGenerate" ${a.count ? '' : 'disabled'}>Generate</button><button class="btn" data-act="autoRegenerate" ${batch.cards.length && a.count ? '' : 'disabled'}>Regenerate</button><button class="btn" data-act="autoRegenerateUnselected" ${batch.cards.length && a.count ? '' : 'disabled'}>Regenerate unselected</button><button class="btn" data-act="autoClearUnselected" ${batch.cards.length ? '' : 'disabled'}>Clear unselected</button><button class="btn" data-act="autoClear" ${batch.cards.length ? '' : 'disabled'}>Clear</button></div>
-    ${a.error ? notice('warn', esc(a.error)) : ''}${stale ? notice('warn', 'Main Queue changed since generation. Drafts are stale; review and revalidate before adding.') : ''}${batch.stop ? `<p class="small muted">${esc(batch.stop)}</p>` : ''}
-    ${batch.cards.length ? `<div class="stack">${batch.cards.map((m) => `<article class="card stack"><label><input id="auto-select-${m.draftId}" type="checkbox" data-act-change="autoSelect" data-id="${m.draftId}" ${a.selected.includes(m.draftId) ? 'checked' : ''}> Select ${esc(FORMAT_LABEL[m.format])}</label><p>${esc(listNames(m.teamA))} vs ${esc(listNames(m.teamB))}</p><p class="small muted">${esc(AUTO_MODES[tab])} · ${all(m).map((pid) => `${esc(short(pid))}: ${gamesOf(s,pid)} played, ${queuedCount(s,pid)} queued, ${batch.cards.filter((draft) => all(draft).includes(pid)).length} suggested${activeOf(s,pid) ? ', playing now' : ''}`).join(' · ')}</p></article>`).join('')}</div>` : '<div class="card empty">No drafts in this tab. Choose a count and generate.</div>'}
-    <div class="row"><button class="btn primary" data-act="autoReview" ${a.selected.length ? '' : 'disabled'}>Add selected to Main Queue (${a.selected.length})</button><button class="btn" data-act="autoAddTab" ${batch.cards.length ? '' : 'disabled'}>Add all from this tab</button></div>`;
+    <p class="small muted">${AUTO_DESCRIPTIONS[tab]}</p>
+    <div class="field"><span>How many matches?</span><div class="row">${[2,3,4,6].map((n) => `<button id="auto-count-${n}" class="btn sm" data-act="autoCount" data-n="${n}" aria-pressed="${a.count === n}">${n}</button>`).join('')}</div></div>
+    ${tab === 'catchup' ? `<label class="field"><span>Games each player should reach</span><input id="auto-target" aria-label="Games each player should reach" class="input${a.target !== '' && !validTarget ? ' bad' : ''}" style="max-width:320px" type="number" min="1" step="1" placeholder="e.g. ${s.minimum}" data-bind="ui.autoDraft.target" data-rerender value="${esc(String(a.target))}" aria-describedby="auto-target-hint${a.target !== '' && !validTarget ? ' auto-target-error' : ''}" ${a.target !== '' && !validTarget ? 'aria-invalid="true"' : ''}><span class="hint" id="auto-target-hint">Players below this number get matches first. Games already played and games already planned in the Main Queue both count. Earlier drafts in this batch count too. Example: with 3, a player who has played 1 and is queued for 1 needs 1 more match. This is separate from the session minimum (Min ${s.minimum} game${s.minimum === 1 ? '' : 's'}).</span>${a.target !== '' && !validTarget ? '<span class="err" id="auto-target-error" aria-live="polite">Enter a whole number of games, 1 or more.</span>' : ''}</label>` : ''}
+    ${generationHint ? `<p class="small muted" id="auto-generate-hint">${generationHint}</p>` : ''}
+    ${draftsHint ? `<p class="small muted" id="auto-drafts-hint">${draftsHint}</p>` : ''}
+    <div class="row"><button class="btn primary" data-act="autoGenerate" ${disabled(generationHint, 'auto-generate-hint')}>${a.count ? `Generate ${a.count} matches` : 'Generate matches'}</button><button class="btn" data-act="autoRegenerate" ${disabled(draftsHint || generationHint, draftsHint ? 'auto-drafts-hint' : 'auto-generate-hint')}>Generate again</button><button class="btn" data-act="autoRegenerateUnselected" ${disabled(draftsHint || generationHint, draftsHint ? 'auto-drafts-hint' : 'auto-generate-hint')}>Replace unselected</button><button class="btn" data-act="autoClearUnselected" ${disabled(draftsHint, 'auto-drafts-hint')}>Remove unselected</button><button class="btn" data-act="autoClear" ${disabled(draftsHint, 'auto-drafts-hint')}>Clear this tab</button></div>
+    <p class="small muted">Generate again replaces every draft in this tab. Replace unselected keeps the ones you picked. Remove unselected removes the others.</p>
+    ${a.error ? notice('warn', esc(a.error)) : ''}${stale ? notice('warn', 'The Main Queue changed since these were made. Check them before adding, or generate again.') : ''}${batch.stop ? `<p class="small muted">${esc(batch.stop)}</p>` : ''}
+    ${batch.cards.length ? `<div class="stack">${batch.cards.map((m) => `<article class="card stack"><label><input id="auto-select-${m.draftId}" type="checkbox" data-act-change="autoSelect" data-id="${m.draftId}" ${a.selected.includes(m.draftId) ? 'checked' : ''}> Select ${esc(FORMAT_LABEL[m.format])}</label><p>${esc(listNames(m.teamA))} vs ${esc(listNames(m.teamB))}</p><p class="small muted">${esc(AUTO_MODES[tab])} · ${all(m).map((pid) => `${esc(short(pid))}: ${gamesOf(s,pid)} played, ${queuedCount(s,pid)} queued, ${batch.cards.filter((draft) => all(draft).includes(pid)).length} suggested${activeOf(s,pid) ? ', playing now' : ''}`).join(' · ')}</p></article>`).join('')}</div>` : eligible && (batch.stop || a.error) ? '' : `<div class="card empty">${empty}</div>`}
+    <div class="row"><button class="btn primary" data-act="autoReview" ${disabled(selectionHint, 'auto-selection-hint')}>Add ${a.selected.length} selected to Main Queue</button><button class="btn" data-act="autoAddTab" ${disabled(draftsHint, 'auto-drafts-hint')}>Add all ${batch.cards.length} to Main Queue</button></div>
+    ${selectionHint ? `<p class="small muted" id="auto-selection-hint">${selectionHint}</p>` : ''}`;
 }
+
 function generateDrafts(s, tab, count, target, fixed) {
   const players = s.roster.filter((r) => r.present && (tab === 'ahead' || !activeOf(s, r.pid))).map((r) => r.pid);
   const formats = [...(s.doubles ? ['doubles'] : []), ...(s.singles ? ['singles'] : [])];
   if (!formats.length) return { error: 'Enable Singles or Doubles before generating.' };
-  if (tab === 'catchup' && (!Number.isInteger(+target) || +target < 1 || target === '')) return { error: 'Choose a whole-number Catch Up target of at least 1.' };
+  if (tab === 'catchup' && (!Number.isInteger(+target) || +target < 1 || target === '')) return { error: 'Enter a whole number of games, 1 or more.' };
   const load = Object.fromEntries(players.map((p) => [p, gamesOf(s,p) + queuedCount(s,p)]));
   fixed.forEach((m) => all(m).forEach((p) => { if (p in load) load[p]++; }));
-  const out = []; let stop = 'Selected batch limit reached.';
+  const out = []; let stop = '';
   for (let i=0; i<count; i++) {
-    if (tab === 'catchup' && players.every((p) => load[p] >= +target)) { stop = 'Target met in the plan.'; break; }
+    if (tab === 'catchup' && players.every((p) => load[p] >= +target)) { stop = players.length ? `Everyone available reaches ${target} game${+target === 1 ? '' : 's'} with these matches.` : `Made 0 of ${count}: not enough free players for another match.`; break; }
     const fmt = formats.length === 2 ? (players.length >= 4 && i % 3 !== 2 ? 'doubles' : 'singles') : formats[0];
     const size = fmt === 'doubles' ? 4 : 2;
-    if (players.length < size) { stop = 'No valid match can make progress with the available players.'; break; }
+    if (players.length < size) { stop = `Made ${out.length} of ${count}: not enough ${tab === 'ahead' ? 'present' : 'free'} players for another match.`; break; }
     const sorted = players.slice().sort((x,y) => {
       const wait = restInfo(s,y).mins - restInfo(s,x).mins;
       const priority = tab === 'catchup' ? ((load[x] < +target ? 0 : 1) - (load[y] < +target ? 0 : 1)) || load[x]-load[y] : tab === 'wait' ? (load[x]-gamesOf(s,x))-(load[y]-gamesOf(s,y)) || wait : tab === 'ahead' ? Number(!!activeOf(s,x))-Number(!!activeOf(s,y)) || load[x]-load[y] : load[x]-load[y];
       return priority || wait || players.indexOf(x)-players.indexOf(y);
     });
     const pick = sorted.slice(0,size);
-    if (tab === 'catchup' && !pick.some((p) => load[p] < +target)) { stop = 'No valid match can make progress toward the target.'; break; }
+    if (tab === 'catchup' && !pick.some((p) => load[p] < +target)) { stop = `Made ${out.length} of ${count}: no other match helps anyone reach ${target} game${+target === 1 ? '' : 's'}.`; break; }
     out.push({ format: fmt, ...splitTeams(s,pick,fmt) }); pick.forEach((p) => load[p]++);
+  }
+  stop ||= `Made ${out.length} of ${count} match${count === 1 ? '' : 'es'}.`;
+  if (tab === 'catchup') {
+    const remaining = players.reduce((sum, p) => sum + Math.max(0, +target - load[p]), 0);
+    if (players.length && remaining === 0) stop = `Everyone available reaches ${target} game${+target === 1 ? '' : 's'} with these matches.`;
+    else if (remaining > 0) stop += ` ${remaining} more game${remaining === 1 ? ' is' : 's are'} still needed to reach ${target}.`;
   }
   return { matches: out, stop };
 }
@@ -3180,7 +3205,7 @@ const SHEETS = {
   },
   autoReview(sh) {
     const s = cur(), a = autoState(s), cards = Object.values(a.batches).flatMap((b) => b.cards), selected = sh.ids.map((id) => cards.find((m) => m.draftId === id)).filter(Boolean);
-    return sheetShell('Add selected to Main Queue?', `<p class="small muted">Transfer order follows your selection. Drafts are revalidated when added.</p>${sh.error ? notice('bad', esc(sh.error)) : ''}<ol>${selected.map((m) => `<li>${esc(listNames(m.teamA))} vs ${esc(listNames(m.teamB))}</li>`).join('')}</ol>`, '<button class="btn" data-act="closeSheet">Back</button><button class="btn primary" data-act="autoCommit">Add to Main Queue</button>');
+    return sheetShell('Add selected to Main Queue?', `<p class="small muted">Matches are added in the order you picked them. We check them again before adding.</p>${sh.error ? notice('bad', esc(sh.error)) : ''}<ol>${selected.map((m) => `<li>${esc(listNames(m.teamA))} vs ${esc(listNames(m.teamB))}</li>`).join('')}</ol>`, '<button class="btn" data-act="closeSheet">Back</button><button class="btn primary" data-act="autoCommit">Add to Main Queue</button>');
   },
   regen() {
     const s = cur();
@@ -3859,7 +3884,7 @@ const ACT = {
   autoCount: (d) => { autoState(cur()).count = +d.n; render(); },
   autoSelect: (d, el) => { const a = autoState(cur()); a.selected = a.selected.filter((id) => id !== d.id); if (el.checked) a.selected.push(d.id); render(); },
   autoClear: () => { const a = autoState(cur()), b = a.batches[a.tab]; if (!b) return; const ids = b.cards.map((m) => m.draftId); a.selected = a.selected.filter((id) => !ids.includes(id)); delete a.batches[a.tab]; render(); },
-  autoClearUnselected: () => { const a = autoState(cur()), b = a.batches[a.tab]; if (b) b.cards = b.cards.filter((m) => a.selected.includes(m.draftId)); render(); },
+  autoClearUnselected: () => { const a = autoState(cur()), b = a.batches[a.tab]; if (b) { b.cards = b.cards.filter((m) => a.selected.includes(m.draftId)); delete b.stop; } render(); },
   autoGenerate: () => ACT.autoBuild(false),
   autoRegenerate: () => ACT.autoBuild(false),
   autoRegenerateUnselected: () => ACT.autoBuild(true),

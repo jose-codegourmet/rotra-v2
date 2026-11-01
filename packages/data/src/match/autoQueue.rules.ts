@@ -108,7 +108,7 @@ export function generateAutoQueueMatches({
     return {
       matches: [],
       stopReason: '',
-      error: 'Choose a whole-number Catch Up target of at least 1.',
+      error: 'Enter a whole number of games, 1 or more.',
     }
   const target = catchUpTarget ?? 0
   const played = new Map(players.map((p) => [p.id, countedGames(p.id, ctx.matches)]))
@@ -123,11 +123,11 @@ export function generateAutoQueueMatches({
   const order = new Map(players.map((p, i) => [p.id, i]))
   const shortfall = () =>
     players.reduce((sum, p) => sum + Math.max(0, target - (load.get(p.id) ?? 0)), 0)
-  let stopReason = 'Selected batch limit reached.'
+  let stopReason = ''
   const matches: MatchLineup[] = []
   for (let i = 0; i < limit; i++) {
     if (mode === 'catchup' && players.length && shortfall() === 0) {
-      stopReason = 'Target met in the plan.'
+      stopReason = `Everyone available reaches ${target} game${target === 1 ? '' : 's'} with these matches.`
       break
     }
     const format =
@@ -140,14 +140,14 @@ export function generateAutoQueueMatches({
           : 'singles'
     const size = format === 'doubles' ? 4 : 2
     if (players.length < size && mode === 'catchup') {
-      stopReason = 'No valid match can make progress with the available players.'
+      stopReason = `Made ${matches.length} of ${limit}: not enough free players for another match.`
       break
     }
     if (players.length < size)
       return {
         matches: [],
         stopReason: '',
-        error: `Only ${players.length} available player${players.length === 1 ? '' : 's'}. ${format === 'doubles' ? 'Doubles' : 'Singles'} needs ${size}. Mark arrivals present in Players.`,
+        error: `Made 0 of ${limit}: not enough ${mode === 'ahead' ? 'present' : 'free'} players for another match.`,
       }
     const sorted = [...players].sort((a, b) => {
       const wait =
@@ -168,18 +168,20 @@ export function generateAutoQueueMatches({
     })
     const pick = sorted.slice(0, size)
     if (mode === 'catchup' && !pick.some((p) => (load.get(p.id) ?? 0) < target)) {
-      stopReason = 'No valid match can make progress toward the target.'
+      stopReason = `Made ${matches.length} of ${limit}: no other match helps anyone reach ${target} game${target === 1 ? '' : 's'}.`
       break
     }
     matches.push(splitTeams(session, pick, format, rng))
     for (const p of pick) load.set(p.id, (load.get(p.id) ?? 0) + 1)
   }
+  stopReason ||= `Made ${matches.length} of ${limit} match${limit === 1 ? '' : 'es'}.`
   if (mode === 'catchup') {
     const remainingShortfall = shortfall()
-    if (players.length && remainingShortfall === 0) stopReason = 'Target met in the plan.'
+    if (players.length && remainingShortfall === 0)
+      stopReason = `Everyone available reaches ${target} game${target === 1 ? '' : 's'} with these matches.`
     return {
       matches,
-      stopReason: `Catch Up target ${target}. ${stopReason} Remaining planned shortfall: ${remainingShortfall}.`,
+      stopReason: `${stopReason}${remainingShortfall > 0 ? ` ${remainingShortfall} more game${remainingShortfall === 1 ? ' is' : 's are'} still needed to reach ${target}.` : ''}`,
       remainingShortfall,
       error: null,
     }

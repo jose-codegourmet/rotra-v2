@@ -41,6 +41,19 @@ export type AdminPlayer = {
   phoneHidden: boolean
   /** Index into PLAYING_LEVELS; null = no rank yet */
   levelIndex: number | null
+  picture: string | null
+  levelBand: 'beginner' | 'intermediate' | 'advanced' | null
+  addedOn: string
+  registeredPlace: { code: string; name: string }
+  clubs: {
+    clubId: string
+    name: string
+    addedAt: number | null
+    identity: import('../club-player/clubPlayer.types').ClubPlayer['identity']
+  }[]
+  archivedAt: string | null
+  revision: number
+  removalReason: string | null
   recentStandardMatches: number
   rankStatus: RankStatus
 }
@@ -52,10 +65,27 @@ export type AdminPlayerListParams = {
   account?: AdminPlayerAccountFilter
   /** Rows to return; the screen asks for 25 more each time */
   limit?: number
+  level?: 'beginner' | 'intermediate' | 'advanced' | 'none'
+  duplicates?: boolean
+  addedFrom?: string
+  addedTo?: string
+  place?: string[]
+  archived?: 'active' | 'archived' | 'all'
+  page?: number
+  pageSize?: number
 }
 
 export type AdminPlayerList = {
   rows: AdminPlayer[]
+  page: number
+  pageSize: number
+  pageCount: number
+  start: number
+  end: number
+  stats: AdminPlayerStats
+  matchingIds: string[]
+  duplicateGroups: { ids: string[]; reasons: string[] }[]
+  places: { code: string; name: string }[]
   /** Matches for the search and filter, before the limit */
   total: number
   /** Whole directory, independent of the search */
@@ -68,3 +98,19 @@ export type AdminPlayerList = {
 export type AdminPlayerDetail = AdminPlayer & {
   samePlayers: Pick<AdminPlayer, 'id' | 'name' | 'rtrId'>[]
 }
+
+export type AdminPlayerStats = {
+  advanced: number
+  intermediate: number
+  beginner: number
+  noRank: number
+  registered: number
+  unclaimed: number
+}
+export type AdminPlayerRecord = {
+  archivedAt: string | null
+  revision: number
+  createdByClubId: string | null
+  adminCreated: boolean
+}
+export type AdminPlayerBulkResult = { id: string; name: string; success: boolean; error?: string }

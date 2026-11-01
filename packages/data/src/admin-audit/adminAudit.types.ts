@@ -1,5 +1,6 @@
 /** What an Admin action was taken on (rotra-admin.html log entries' `t`: 'club', 'req', 'flag', config). */
 export type AdminAuditTargetType =
+  | 'player'
   | 'club'
   | 'contact_change_request'
   | 'feature_flag'
@@ -10,6 +11,12 @@ export type AdminAuditTargetType =
  * add theirs (license, contact change, ranking and feature flag actions) here.
  */
 export type AdminAuditAction =
+  | 'player_created'
+  | 'player_updated'
+  | 'player_archived'
+  | 'player_restored'
+  | 'player_removed'
+  | 'player_link_issued'
   | 'club_created'
   | 'club_price_changed'
   | 'club_name_change_approved'

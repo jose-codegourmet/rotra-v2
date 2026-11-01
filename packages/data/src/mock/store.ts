@@ -1,4 +1,5 @@
 import type { AdminAuditEvent } from '../admin-audit/adminAudit.types'
+import type { AdminPlayerRecord } from '../admin-player/adminPlayer.types'
 import type { AdminClubRecord, Club, ClubAccount, ClubNameChangeRequest } from '../club/club.types'
 import type { ClubPlayer } from '../club-player/clubPlayer.types'
 import type { ClubVenue } from '../club-venue/clubVenue.types'
@@ -10,6 +11,7 @@ import {
   adminClubTerms,
   createAdminClubFixtures,
 } from '../fixtures/adminClubs'
+import { seedAdminPlayerManagement } from '../fixtures/adminPlayerManagement'
 import { clubs } from '../fixtures/clubs'
 import { createContactChangeRequestFixtures } from '../fixtures/contactChangeRequests'
 import { featureFlags } from '../fixtures/featureFlags'
@@ -55,6 +57,7 @@ import type {
 import type { SaveOutcome, SessionIntegrity, SyncState } from '../sync/sync.types'
 import { MockError } from './errors'
 export type MockState = {
+  adminPlayerRecords: Record<string, AdminPlayerRecord>
   inventory: InventoryItem[]
   costEstimates: Record<string, SessionCostEstimate>
   paymentMarks: SessionPaymentMark[]
@@ -137,7 +140,8 @@ function seedState(): MockState {
         }),
       ]),
   )
-  return structuredClone({
+  const state: MockState = structuredClone({
+    adminPlayerRecords: {},
     ...createPlayerRankFixtures(),
     ...createFinancialFixtures([...roster, ...history.roster], now),
     inventory: inventoryItems,
@@ -185,6 +189,8 @@ function seedState(): MockState {
       log: [],
     },
   })
+  seedAdminPlayerManagement(state)
+  return state
 }
 /** Reset is in-memory only; neither fixture objects nor snapshots can be mutated through a reader. */
 export function createMockStore() {

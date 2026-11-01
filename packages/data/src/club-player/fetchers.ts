@@ -54,7 +54,11 @@ export async function getClubPlayers(filters: ClubPlayerFilters = {}) {
     live = state.sessions.find((s) => s.clubId === DEMO_CLUB_ID && s.state === 'active'),
     q = filters.search?.trim().toLocaleLowerCase() ?? ''
   const rows = state.clubPlayers
-    .filter((p) => p.clubId === DEMO_CLUB_ID)
+    .filter(
+      (p) =>
+        p.clubId === DEMO_CLUB_ID &&
+        (!p.playerId || !state.adminPlayerRecords[p.playerId]?.archivedAt),
+    )
     .map((p) => clubPlayerView(state, p))
     .filter((p) => {
       const roster = state.roster.find((r) => r.sessionId === live?.id && r.clubPlayerId === p.id)
@@ -106,7 +110,8 @@ export async function getClubPlayer(id: string) {
   requireClubAccess()
   const state = readMockState(),
     player = state.clubPlayers.find((p) => p.id === id && p.clubId === DEMO_CLUB_ID)
-  if (!player) throw new MockError('permission', 'Player not available.')
+  if (!player || (player.playerId && state.adminPlayerRecords[player.playerId]?.archivedAt))
+    throw new MockError('permission', 'Player not available.')
   return clubPlayerView(state, player)
 }
 
@@ -114,7 +119,14 @@ export async function getClubPlayer(id: string) {
 export async function getSavedPlayerStats() {
   await delay()
   requireClubAccess()
-  return deriveSavedPlayerStats(readMockState().clubPlayers, DEMO_CLUB_ID, Date.now())
+  const state = readMockState()
+  return deriveSavedPlayerStats(
+    state.clubPlayers.filter(
+      (p) => !p.playerId || !state.adminPlayerRecords[p.playerId]?.archivedAt,
+    ),
+    DEMO_CLUB_ID,
+    Date.now(),
+  )
 }
 export async function createPlayerInvite(clubPlayerId: string) {
   requireOnline()
@@ -128,7 +140,7 @@ export async function createPlayerInvite(clubPlayerId: string) {
   }
   const code = (hash >>> 0).toString(36).toUpperCase().padStart(7, 'X').slice(0, 7)
   return {
-    url: `https://rotra.example/join/${code}`,
+    url: `https://player.rotra.club/claim/${code}`,
     message: 'Invite link ready',
   }
 }

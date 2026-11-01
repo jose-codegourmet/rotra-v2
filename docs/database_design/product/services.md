@@ -103,3 +103,14 @@ screen loaded one, and returns an allowlisted DTO.
 - A seal needs the full prefix and a matching digest (SHA-256 over the concatenated payload digests 1..N). The server never seals a stream itself.
 - Completeness is proven only when every enrolled stream is sealed and fully settled, no conflict is open and nothing is unprocessed. An unused open stream keeps it unproven.
 - Conflict authority (club account, online, unfinalized session) and the seal digest format are proposals pending #246. The browser outbox is Q11.
+
+## F07.29 · One-time Session done, canonical result facts
+
+| Module | Commands |
+|---|---|
+| `queue/finalization` | `reviewSessionDone` (blockers + minimum shortfall warning); `finalizeSession`; `readFinalizationStatus`; `settleFinalization` (moves `committed` → `done`/`failed` from job status); `invalidateSession` |
+
+- Online only. Under the session lock: active state, no active match, completeness proven by `sessionCompleteness` (F07.28), and an effective ranking policy. Anything missing blocks with `conflict` and the blocker codes; nothing is fabricated.
+- One transaction commits the `session_finalizations` row (its PK is the session, so a second commit is impossible), every fact, the per-entry summaries, `completed`, the released offline reservation and the downstream jobs (`result_snapshot`, `player_history`, `player_rank`). A retry, a concurrent duplicate or a lost response returns the committed status.
+- Facts: one per (completed match, participant); full participation is recomputed from segments; invalid matches have no completed decision and produce nothing. Minimum shortfall is a warning only.
+- Projection and slide failures retry their own jobs (F07.30/F07.31) and never repeat the commit. An invalid session gets no finalization and no contribution.

@@ -1,5 +1,7 @@
 # Active session console
 
+**Last verified:** 2026-11-01.
+
 **Surfaces:** `Q-CONSOLE`, `Q-COURTS`, `Q-POOL`, `Q-LEADERBOARD`, `Q-SESSION-ADJUST`, `Q-ADD-COURT`.
 
 **Sources:** [session rules](../../../../business_logic/product/queue/modules/sessions/README.md), [queue rules](../../../../business_logic/product/queue/modules/queueing/README.md), [results](../../../../business_logic/product/queue/modules/results/README.md). **Reference:** [ROTRA Queue prototype](../../../../../apps/mockup/queue-app/rotra-queue.html).
@@ -91,9 +93,19 @@ Sheet titled “Add LABEL?” or “Edit LABEL?”.
 | Planned start | The court is unavailable before this time; fixed after the court has hosted a match |
 | Open until | **Until the session ends** (“HH:MM · moves if you extend time”) or **Until a set time** (“For a court booked for less time”) with a time field |
 
-Errors: “Choose a closing time.”; “Choose a planned start within the session.”; “Choose an end after the planned start.”; “Extend the session before choosing a later court end.” Overnight values indicate the next day. A passed end may still be edited.
+Errors: “Choose a closing time.”; “Choose a planned start within the session.”; “Choose an end after the planned start.”; “That's after the session ends at HH:MM. Pick an earlier time, or extend the session first.” Overnight values indicate the next day. A passed end may still be edited.
 
-Preview: “LABEL is planned to open until HH:MM.” Note: “Courts show their closing time on the card. ROTRA doesn't stop a game at that time; it's a reminder for you.” Primary **Add LABEL** or **Save court**. Toast: “LABEL added · open until HH:MM”.
+Preview updates immediately when Planned start, Open until, or the label changes. It validates the same window as submit and marks the offending field with the same inline error; an invalid window never shows the green success notice.
+
+- Future fixed booking: “LABEL opens 9:30 PM and closes 10:30 PM (1 h booking). Opens in 9 h 18 min.” Booking length measures **planned start → close**; the countdown measures **now → planned start**.
+- Already open: “LABEL is open now until 10:30 PM (about 2 h 15 min left).”
+- Future session-end booking: “LABEL opens 6:00 PM and stays open until the session ends at 9:00 PM (3 h). Moves if you extend time. Opens in ….” An already-open session-end booking also says it follows extensions.
+- Overnight: append “· next day” to each time on the next day.
+- Passed end: a neutral “LABEL booking ended at HH:MM (… booking).” notice; the advisory booking remains editable.
+
+**Early start (owner decision, November 1, 2026, #320):** once live, new court windows use the actual session start as their lower bound. Courts using the default session start open at the actual start; deliberately staggered starts keep their times. The scheduled session time is retained. Existing earlier bookings retain their original starts when edited, including a used court's locked start.
+
+Note: “Courts show their closing time on the card. ROTRA doesn't stop a game at that time; it's a reminder for you.” Primary **Add LABEL** or **Save court**. Toast: “LABEL added · open until HH:MM”.
 
 ## State behavior
 

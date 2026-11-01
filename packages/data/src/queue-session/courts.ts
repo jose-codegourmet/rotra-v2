@@ -12,11 +12,11 @@ export function addCourt(input: {
 }) {
   return queueMutation({ area: 'Courts and time', sessionId: input.sessionId }, (s) => {
     const session = sessionIn(s, input.sessionId)
-    const startsAt = input.startsAt ?? session.scheduledStartAt
+    const startsAt = input.startsAt ?? session.startedAt ?? session.scheduledStartAt
     const error = courtWindowError(
       startsAt,
       input.openUntil,
-      session.scheduledStartAt,
+      session.startedAt ?? session.scheduledStartAt,
       session.scheduledEndAt,
     )
     if (!input.label.trim() || input.label.trim().length > 40 || error)
@@ -52,13 +52,13 @@ export function updateCourt(input: {
     if (!court) throw new MockError('conflict', 'Court no longer available.')
     if (
       s.matches.some((m) => m.sessionId === session.id && m.courtIds.includes(court.id)) &&
-      input.startsAt !== (court.startsAt ?? session.scheduledStartAt)
+      input.startsAt !== (court.startsAt ?? session.startedAt ?? session.scheduledStartAt)
     )
       throw new MockError('permission', 'Start is fixed after use.')
     const error = courtWindowError(
       input.startsAt,
       input.openUntil,
-      session.scheduledStartAt,
+      Math.min(session.startedAt ?? session.scheduledStartAt, court.startsAt ?? Infinity),
       session.scheduledEndAt,
     )
     if (!input.label.trim() || input.label.trim().length > 40 || error)

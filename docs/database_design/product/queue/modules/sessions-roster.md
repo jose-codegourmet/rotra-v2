@@ -1,6 +1,6 @@
 # Sessions, club players, and roster
 
-**Last verified:** 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-01 for court-window boundaries; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Proposed records; field names are new design names, not existing Prisma columns.
 
@@ -158,3 +158,11 @@ Business sources: [players](../../../../business_logic/product/queue/modules/pla
 ## Queue flexibility handoff (October 31, 2026)
 
 The approved product contract uses the prepared slot budget with an explicit override and permits direct active-session admission above it. Court windows have individual planned starts and advisory ends, with starts fixed after use and session-end-following ends distinguished from fixed ends. Reconcile the proposed storage and command validation with these rules in the database epic; this note does not authorize schema or migration changes.
+
+### Court-window actual-start boundary (#320, owner decision November 1, 2026)
+
+For live sessions, new court-window commands validate against `queue_sessions.started_at` rather
+than `scheduled_start_at`. At Start session, default court starts follow the actual start;
+deliberately staggered starts keep their times. Preserve the scheduled session timestamp and
+existing earlier starts on edit; used starts remain fixed. This clarifies command behavior using
+existing proposed fields and adds no table, column, or migration.

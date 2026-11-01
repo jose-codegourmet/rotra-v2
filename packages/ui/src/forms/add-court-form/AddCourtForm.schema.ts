@@ -1,12 +1,14 @@
-import { courtTimeOnSession, courtWindowError } from '@rotra/schema/court-window'
+import {
+  courtAfterSessionEndError,
+  courtTimeOnSession,
+  courtWindowError,
+} from '@rotra/schema/court-window'
 import { timeField } from '@rotra/schema/date'
-import { formatTime } from '@rotra/ui/now-card/helpers'
 import { z } from 'zod'
 
 export const COURT_LABEL_MAX = 40
 export const CLOSING_TIME_ERROR = 'Choose a closing time.'
-export const afterSessionEndError = (sessionEndsAt: number) =>
-  `That's after the session ends at ${formatTime(sessionEndsAt)}. Pick an earlier time, or extend the session first.`
+export const afterSessionEndError = courtAfterSessionEndError
 
 export type OpenUntilMode = 'end' | 'time'
 
@@ -76,7 +78,12 @@ export function makeAddCourtSchema({
         ctx.addIssue({
           code: 'custom',
           message: error,
-          path: [startsAt < sessionStartsAt || startsAt >= sessionEndsAt ? 'startTime' : 'time'],
+          path: [
+            (openUntil ?? sessionEndsAt) <= sessionEndsAt &&
+            (startsAt < sessionStartsAt || startsAt >= sessionEndsAt)
+              ? 'startTime'
+              : 'time',
+          ],
         })
         return z.NEVER
       }

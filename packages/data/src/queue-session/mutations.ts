@@ -306,6 +306,10 @@ export function startSession(sessionId: string) {
     const now = Date.now()
     s.state = 'active'
     s.startedAt = now
+    for (const court of state.courts.filter((c) => c.sessionId === sessionId)) {
+      if (court.startsAt === undefined || court.startsAt === s.scheduledStartAt)
+        court.startsAt = now
+    }
     for (const p of roster) {
       p.levelLockedAt = now
       if (p.present) p.presentChangedAt = now

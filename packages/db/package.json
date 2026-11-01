@@ -30,7 +30,8 @@
     "./queue/public-session": "./src/queue/public-session.ts",
     "./queue/match-store": "./src/queue/match-store.ts",
     "./queue/match-queue": "./src/queue/match-queue.ts",
-    "./queue/match-control": "./src/queue/match-control.ts"
+    "./queue/match-control": "./src/queue/match-control.ts",
+    "./queue/financials": "./src/queue/financials.ts"
   },
   "scripts": {
     "db:generate": "prisma generate",

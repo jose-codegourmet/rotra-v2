@@ -79,3 +79,14 @@ screen loaded one, and returns an allowlisted DTO.
 - Winner-only results keep both scores null; scores must agree with the winner (`validateResult`).
 - A retried terminal command returns the original outcome; an agreeing one from another operation returns it too; a contradicting one is stored as a `contradictory_decision` conflict and reported as `conflict`. Nothing ever updates a decision, and the SQL triggers freeze the match after it.
 - Substituted players keep their segments; the shared counting rule gives neither credit. Invalid decisions produce no facts at finalization.
+
+## F07.27 · Inventory, cost estimate, manual payments
+
+| Module | Commands |
+|---|---|
+| `queue/financials` | `readInventory`, `saveInventoryItem` (client ID; expected revision on edit), `stepInventoryStock` (never below zero), `removeInventoryItem` (soft); `readSessionCost`, `saveSessionCost` (online only, prepared/active, expected estimate revision, this club's items only, empty = delete); `readSessionPayments`, `setPaid`, `markAllPaid` |
+
+- All arithmetic is the pure `@rotra/data/session-cost/rules` (centavos; court fee to the nearest centavo; break-even up to a whole peso). Totals are derived at read time.
+- A paid tick stores the amount due at that moment (null when no fee is set) under its operation ID; a duplicate applies once and later fee changes never rewrite it. Marks key on the released-not-deleted roster entry, so they survive demotion and show again on restoration. No-fee tick meaning is still #245.
+- Payments stay open after Session done (`completed`), never for `invalid` or `finalizing`; they are separate from immutable results.
+- No new money unit tests were added; the reused rules keep their existing tests.

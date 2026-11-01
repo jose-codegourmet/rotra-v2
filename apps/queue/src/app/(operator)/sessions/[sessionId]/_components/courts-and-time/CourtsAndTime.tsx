@@ -1,5 +1,9 @@
 'use client'
 
+import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
+import { useUpdateCourt } from '@rotra/data/queue-session/useUpdateCourt'
+import { useRemoveCourt } from '@rotra/data/queue-session/useRemoveCourt'
+import { toTimeInput } from '@rotra/ui/forms/add-court-form/default-values'
 import { MockError } from '@rotra/data/mock/errors'
 import { useAddCourt } from '@rotra/data/queue-session/useAddCourt'
 import { useExtendSession } from '@rotra/data/queue-session/useExtendSession'
@@ -40,11 +44,17 @@ export function CourtsAndTime({ sessionId, open, onOpenChange }: CourtsAndTimePr
   const session = useQueueSession(sessionId)
   const extend = useExtendSession()
   const add = useAddCourt()
+  const update = useUpdateCourt()
+  const remove = useRemoveCourt()
+  const matches = useSessionMatches(sessionId)
+  const [editingId, setEditingId] = useState<string | null>(null)
   const [serverError, setServerError] = useState<string | undefined>()
 
   const s = session.data
   if (!s) return null
   const courts = s.courts
+  const editing = courts.find((c) => c.id === editingId)
+  const used = !!editing && (matches.data ?? []).some((m) => m.courtIds.includes(editing.id))
 
   const onExtend = (minutes: ExtendMinutes) =>
     extend.mutate(
@@ -57,23 +67,16 @@ export function CourtsAndTime({ sessionId, open, onOpenChange }: CourtsAndTimePr
 
   const onAdd = (values: AddCourtFormValues) => {
     setServerError(undefined)
-    add.mutate(
-      { sessionId, label: values.label, openUntil: values.openUntil },
-      {
-        onSuccess: (result) => {
-          toast(result.message)
-          onOpenChange(null)
-        },
-        onError: (error) => {
-          if (isSaveFailure(error)) toast.error(errorMessage(error))
-          else setServerError(errorMessage(error))
-        },
-      },
-    )
+    const options = {
+      onSuccess: (result: { message: string }) => { toast(result.message); setEditingId(null); onOpenChange(null) },
+      onError: (error: unknown) => { setServerError(errorMessage(error)); if (isSaveFailure(error)) toast.error(errorMessage(error)) },
+    }
+    if (editing) update.mutate({ sessionId, courtId: editing.id, ...values }, options)
+    else add.mutate({ sessionId, ...values }, options)
   }
 
   const openAddCourt = (next: boolean) => {
-    if (!next) setServerError(undefined)
+    if (!next) { setServerError(undefined); setEditingId(null) }
     onOpenChange(next ? 'add-court' : null)
   }
 
@@ -82,22 +85,29 @@ export function CourtsAndTime({ sessionId, open, onOpenChange }: CourtsAndTimePr
       <CourtsAndTimeSheet
         open={open === 'adjust'}
         onOpenChange={(next) => onOpenChange(next ? 'adjust' : null)}
-        courts={courts}
+        courts={courts.map((c) => ({ ...c, startsAt: c.startsAt ?? s.scheduledStartAt, occupied: (matches.data ?? []).some((m) => m.state === 'active' && m.courtIds.includes(c.id)), used: (matches.data ?? []).some((m) => m.courtIds.includes(c.id)) }))}
+        startsAt={s.scheduledStartAt}
+        serverError={serverError ?? (extend.error ? errorMessage(extend.error) : undefined)}
+        onEditCourt={(id) => { setServerError(undefined); setEditingId(id); onOpenChange('add-court') }}
+        onRemoveCourt={(courtId) => remove.mutate({ sessionId, courtId }, { onSuccess: (result) => { setServerError(undefined); toast(result.message) }, onError: (error) => setServerError(errorMessage(error)) })}
         endsAt={s.scheduledEndAt}
         onAddCourt={() => openAddCourt(true)}
         onExtend={onExtend}
-        isPending={extend.isPending}
+        isPending={extend.isPending || remove.isPending || matches.isPending}
       />
       {/* Remounted on each open so the label and mode start fresh from the current court count */}
       <AddCourtForm
-        key={open === 'add-court' ? 'open' : 'closed'}
+        key={open === 'add-court' ? `open-${editingId ?? 'new'}` : 'closed'}
         open={open === 'add-court'}
         onOpenChange={openAddCourt}
-        defaultLabel={nextCourtLabel(courts.length)}
-        sessionStartsAt={s.startedAt ?? s.scheduledStartAt}
+        defaultLabel={editing?.label ?? nextCourtLabel(courts.length)}
+        editing={!!editing}
+        lockedStartsAt={editing && used ? editing.startsAt ?? s.scheduledStartAt : undefined}
+        defaultValues={editing ? { label: editing.label, startTime: toTimeInput(editing.startsAt ?? s.scheduledStartAt), mode: editing.openUntil === null ? 'end' : 'time', time: toTimeInput(editing.openUntil ?? s.scheduledEndAt) } : undefined}
+        sessionStartsAt={s.scheduledStartAt}
         sessionEndsAt={s.scheduledEndAt}
         onSubmit={onAdd}
-        isPending={add.isPending}
+        isPending={add.isPending || update.isPending || matches.isPending}
         serverError={serverError}
         onCancel={() => openAddCourt(false)}
       />

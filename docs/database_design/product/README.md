@@ -19,6 +19,7 @@
 | [Schema dependencies](schema-dependencies.md) | Proposed FK graph, insertion cycles and migration ordering gates |
 | [Verification](verification.md) | Disposable rebuild, fictional fixtures, integrity checks, runtime-role and query-plan evidence |
 | [Physical schema](physical-schema.md) | Drafted Prisma models and unapplied migration SQL: keys, checks, grants, delete behavior |
+| [Database services](services.md) | `@rotra/db` service modules per F07 ticket: what each command locks, repeats and refuses |
 
 Business source: [ecosystem v1](../../business_logic/product/README.md). World is v2; no World tables are proposed.
 

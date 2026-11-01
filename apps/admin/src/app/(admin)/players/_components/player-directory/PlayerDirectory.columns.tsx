@@ -1,9 +1,10 @@
 import type { AdminPlayer } from '@rotra/data/admin-player/types'
+import { AdminPlayerClubs } from '@rotra/ui/admin-player-clubs'
+import { Checkbox } from '@rotra/ui/checkbox'
 import type { DataTableProps } from '@rotra/ui/data-table'
 import { PlayerAccountChip } from '@rotra/ui/player-account-chip'
-import { PlayerIdentityCell } from '@rotra/ui/player-identity-cell'
 import { RankStatusChip } from '@rotra/ui/rank-status-chip'
-import Link from 'next/link'
+import type { ReactNode } from 'react'
 
 /**
  * A-PLAYERS columns; `hrefOf` gives each player's detail URL (carrying the directory's search, filter
@@ -13,21 +14,48 @@ import Link from 'next/link'
 export function playerDirectoryColumns(
   hrefOf: (player: AdminPlayer) => string,
   clubNameOf: (clubId: string | null) => string,
+  onOpen?: (id: string) => void,
+  actions?: (player: AdminPlayer) => ReactNode,
+  selected: string[] = [],
+  onSelect?: (id: string, checked: boolean) => void,
 ): DataTableProps<AdminPlayer>['columns'] {
   return [
+    {
+      id: 'select',
+      header: 'Select',
+      enableSorting: false,
+      cell: ({ row }) => (
+        <Checkbox
+          label={`Select ${row.original.name}`}
+          checked={selected.includes(row.original.id)}
+          onChange={(checked) => onSelect?.(row.original.id, checked)}
+        />
+      ),
+    },
+    {
+      id: 'actions',
+      header: 'Actions',
+      enableSorting: false,
+      cell: ({ row }) => actions?.(row.original),
+    },
     {
       id: 'player',
       enableSorting: false,
       header: 'Player',
       meta: { lead: true },
       cell: ({ row }) => (
-        <PlayerIdentityCell
-          variant="directory"
-          fullName={row.original.name}
-          nickname={row.original.nickname}
+        <a
           href={hrefOf(row.original)}
-          linkComponent={Link}
-        />
+          onClick={(e) => {
+            if (onOpen && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey && e.button === 0) {
+              e.preventDefault()
+              onOpen(row.original.id)
+            }
+          }}
+        >
+          {row.original.name}
+          {row.original.nickname ? ` “${row.original.nickname}”` : ''}
+        </a>
       ),
     },
     {
@@ -49,6 +77,13 @@ export function playerDirectoryColumns(
       header: 'Rank',
       cell: ({ row }) => <RankStatusChip status={row.original.rankStatus} />,
     },
+    {
+      id: 'clubs',
+      header: 'Clubs',
+      enableSorting: false,
+      cell: ({ row }) => <AdminPlayerClubs clubs={row.original.clubs} />,
+    },
+    { id: 'added', header: 'Added', enableSorting: false, cell: ({ row }) => row.original.addedOn },
     {
       id: 'created-by',
       enableSorting: false,

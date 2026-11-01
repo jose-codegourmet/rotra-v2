@@ -1,6 +1,7 @@
 import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
 import { cn } from '@rotra/ui/cn'
+import type { ReactNode } from 'react'
 
 export type SelectionBarPlayer = {
   id: string
@@ -21,6 +22,7 @@ export type SelectionBarProps = {
   onClear: () => void
   /** Make match is hidden when missing */
   onMakeMatch?: () => void
+  actions?: ReactNode
   className?: string
 }
 
@@ -35,6 +37,7 @@ export function SelectionBar({
   onClear,
   onMakeMatch,
   className,
+  actions,
 }: SelectionBarProps) {
   return (
     <section
@@ -43,11 +46,12 @@ export function SelectionBar({
         'sticky bottom-[calc(72px+env(safe-area-inset-bottom,0px))] z-10 flex flex-wrap items-center justify-between gap-2.5',
         'rounded-lg border border-accent bg-elev px-3.5 py-2.5 shadow-pop',
         className,
+        actions,
       )}
     >
       <div className="flex min-w-0 flex-nowrap items-center gap-1.5">
         <span className="flex flex-none">
-          {players.map((p, i) => (
+          {players.slice(0, 5).map((p, i) => (
             <Avatar
               key={p.id}
               name={p.name}
@@ -58,10 +62,11 @@ export function SelectionBar({
           ))}
         </span>
         <span className="min-w-0 text-[13px]">
-          <b>{players.length} selected</b> · {label}
+          <b aria-live="polite">{players.length} selected</b> · {label}
         </span>
       </div>
-      <div className="flex flex-nowrap items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
+        {actions}
         <Button size="sm" variant="ghost" onClick={onClear}>
           Clear
         </Button>

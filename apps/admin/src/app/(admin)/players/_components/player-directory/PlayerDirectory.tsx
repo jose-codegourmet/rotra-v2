@@ -1,180 +1,268 @@
 'use client'
-
-import { ADMIN_PLAYER_PAGE_SIZE } from '@rotra/data/admin-player/rules'
-import type { AdminPlayerAccountFilter } from '@rotra/data/admin-player/types'
+import type { AdminPlayerListParams } from '@rotra/data/admin-player/types'
+import { useAdminPlayer } from '@rotra/data/admin-player/useAdminPlayer'
+import { useAdminPlayerGames } from '@rotra/data/admin-player/useAdminPlayerGames'
 import { useAdminPlayers } from '@rotra/data/admin-player/useAdminPlayers'
 import { useAdminClubs } from '@rotra/data/club/useAdminClubs'
+import { useContactRequests } from '@rotra/data/contact-change-request/useContactRequests'
+import { AdminPlayerCard } from '@rotra/ui/admin-player-card'
+import { AdminPlayerFilters } from '@rotra/ui/admin-player-filters'
+import { AdminPlayerQuickView } from '@rotra/ui/admin-player-quick-view'
+import { AdminPlayerStats } from '@rotra/ui/admin-player-stats'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
+import { Checkbox } from '@rotra/ui/checkbox'
+import { CopyPlayerValue } from '@rotra/ui/copy-player-value'
 import { DataTable } from '@rotra/ui/data-table'
 import { EmptyState } from '@rotra/ui/empty-state'
 import { ErrorState } from '@rotra/ui/error-state'
 import { PageHeader } from '@rotra/ui/page-header'
+import { PlayerPagination } from '@rotra/ui/player-pagination'
 import { SameNameNotice } from '@rotra/ui/same-name-notice'
 import { SegmentedControl } from '@rotra/ui/segmented-control'
-import { TextInput } from '@rotra/ui/text-input'
-import { usePathname, useRouter } from 'next/navigation'
-import { useMemo, useState } from 'react'
+import { toast } from '@rotra/ui/toaster'
+import Link from 'next/link'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useDenyOnPermissionError } from '../../../_components/admin-workspace-shell/AdminWorkspaceShell'
+import { AddAdminPlayer } from '../add-admin-player/AddAdminPlayer'
+import { PlayerBulkActions } from '../player-bulk-actions/PlayerBulkActions'
+import { PlayerManagementActions } from '../player-management-actions/PlayerManagementActions'
 import { playerDirectoryColumns } from './PlayerDirectory.columns'
-
-/** The directory's search, filter and shown count as a query string ("q=Jose&shown=50"); '' when unset. */
-function directoryQuery(q: string, account: AdminPlayerAccountFilter, shown: number): string {
-  const params = new URLSearchParams()
-  if (q) params.set('q', q)
-  if (account !== 'all') params.set('account', account)
-  if (shown !== ADMIN_PLAYER_PAGE_SIZE) params.set('shown', String(shown))
-  return params.toString()
-}
-
-/** The player's detail URL; `from` brings the back link to the same search, filter and shown count. */
-function playerHref(id: string, query: string): string {
-  return query ? `/players/${id}?from=${encodeURIComponent(query)}` : `/players/${id}`
-}
-
-const formatCount = (value: number) => value.toLocaleString('en-PH')
-
-/**
- * A-PLAYERS: every player identity, searchable by name, RTR ID, phone or email (Admin only) and
- * filterable by account, 25 at a time; search, filter and shown count live in the URL. Duplicate names
- * in the results get a notice and are never merged. Skeleton rows until the first answer; no match
- * offers Clear search (never to create a player); a failed load shows Retry and keeps the search,
- * filter and shown count; a permission error denies the workspace.
- */
-export function PlayerDirectory({
-  q: initialQ,
-  account: initialAccount,
-  shown: initialShown,
-}: {
-  q: string
-  account: AdminPlayerAccountFilter
-  shown: number
-}) {
-  const router = useRouter()
-  const pathname = usePathname()
-  const [q, setQ] = useState(initialQ)
-  const [account, setAccount] = useState(initialAccount)
-  const [shown, setShown] = useState(initialShown)
-  // keepPreviousData: the last rows stay on screen while a new search or 25 more load.
-  const list = useAdminPlayers({ q: q.trim(), account, limit: shown })
-  // Same cache as the workspace nav count; names the club that created each identity.
-  const clubs = useAdminClubs()
-  const denied = useDenyOnPermissionError(list.error, clubs.error)
-  const data = list.data
-  const query = directoryQuery(q, account, shown)
-  const clubNames = useMemo(
-    () => new Map((clubs.data?.clubs ?? []).map((club) => [club.id, club.name])),
-    [clubs.data],
+import { directoryFilters, writeDirectoryFilters } from './PlayerDirectory.url'
+export function PlayerDirectory() {
+  const router = useRouter(),
+    search = useSearchParams(),
+    filters = directoryFilters(new URLSearchParams(search.toString()))
+  const [selected, setSelected] = useState<string[]>([])
+  const [copyValue, setCopyValue] = useState('')
+  const filterKey = JSON.stringify({ ...filters, page: undefined, pageSize: undefined })
+  const [selectionFilter, setSelectionFilter] = useState(filterKey)
+  useEffect(() => {
+    if (selectionFilter !== filterKey) {
+      setSelectionFilter(filterKey)
+      if (selected.length) toast('Selection cleared because filters changed')
+      setSelected([])
+    }
+  }, [filterKey, selectionFilter, selected.length])
+  const select = useCallback(
+    (id: string, checked: boolean) =>
+      setSelected((current) =>
+        checked ? [...new Set([...current, id])] : current.filter((value) => value !== id),
+      ),
+    [],
   )
+  const [rememberedView, setRememberedView] = useState('list')
+  useEffect(() => {
+    try {
+      setRememberedView(localStorage.getItem('rotra-admin-players-view') ?? 'list')
+    } catch {}
+  }, [])
+  const view = search.get('view') ?? rememberedView
+  const list = useAdminPlayers(filters),
+    clubs = useAdminClubs()
+  const peek = search.get('peek') ?? '',
+    playerQuery = useAdminPlayer(peek, { enabled: !!peek }),
+    games = useAdminPlayerGames(peek),
+    requests = useContactRequests({ playerId: peek })
+  const denied = useDenyOnPermissionError(list.error, clubs.error, playerQuery.error, games.error)
+  const data = list.data,
+    query = search.toString()
+  const openPeek = useCallback(
+    (id: string) => {
+      const params = new URLSearchParams(search.toString())
+      params.set('peek', id)
+      router.push(`/players?${params}`, { scroll: false })
+    },
+    [search, router],
+  )
+  const href = (id: string) => `/players/${id}?from=${encodeURIComponent(query)}`
   const columns = useMemo(
     () =>
       playerDirectoryColumns(
-        (player) => playerHref(player.id, query),
-        (clubId) => (clubId === null ? undefined : clubNames.get(clubId)) ?? '—',
+        (p) => `/players/${p.id}?from=${encodeURIComponent(query)}`,
+        (id) => clubs.data?.clubs.find((c) => c.id === id)?.name ?? 'Created by Admin',
+        (id) => openPeek(id),
+        (p) => <PlayerManagementActions player={p} />,
+        selected,
+        select,
       ),
-    [query, clubNames],
+    [query, clubs.data, selected, select, openPeek],
   )
-
-  const update = (nextQ: string, nextAccount: AdminPlayerAccountFilter, nextShown: number) => {
-    setQ(nextQ)
-    setAccount(nextAccount)
-    setShown(nextShown)
-    const next = directoryQuery(nextQ, nextAccount, nextShown)
-    router.replace(next ? `${pathname}?${next}` : pathname, { scroll: false })
-  }
-  const counts = data?.counts
-  const rows = data?.rows ?? []
-  const searched = q.trim()
-
+  const navigate = (params: URLSearchParams) =>
+    router.push(`/players${params.size ? `?${params.toString()}` : ''}`, { scroll: false })
+  const update = (patch: Partial<AdminPlayerListParams>) =>
+    navigate(writeDirectoryFilters(new URLSearchParams(query), { ...patch, page: patch.page ?? 1 }))
+  const clear = () => navigate(new URLSearchParams())
   if (denied) return null
-
   return (
     <>
+      <CopyPlayerValue value={copyValue} onClose={() => setCopyValue('')} />
       <PageHeader
         title="Players"
-        description="Every player identity with a permanent RTR ID. Guests a club only typed a name for stay in that club's records and aren't listed."
+        actions={<AddAdminPlayer onCreated={clear} />}
+        description="Every player identity with a permanent RTR ID."
       />
-      <div className="flex flex-wrap items-center gap-2.5">
-        <div className="min-w-0 flex-[1_1_260px]">
-          <TextInput
-            type="search"
-            aria-label="Search players"
-            placeholder="Search by name, RTR ID, phone or email"
-            value={q}
-            onChange={(event) => update(event.target.value, account, ADMIN_PLAYER_PAGE_SIZE)}
-          />
-        </div>
-        <SegmentedControl
-          aria-label="Filter by account"
-          value={account}
-          onChange={(value) => update(q, value as AdminPlayerAccountFilter, ADMIN_PLAYER_PAGE_SIZE)}
-          options={[
-            { value: 'all', label: 'All', count: counts?.all },
-            { value: 'registered', label: 'Registered', count: counts?.registered },
-            { value: 'unclaimed', label: 'Unclaimed', count: counts?.unclaimed },
-          ]}
-        />
-      </div>
-      <p className="m-0 text-xs text-fg2">
-        Phone and email search is only available in Admin. Public search on Player Information never
-        matches them.
-      </p>
-      {searched !== '' && data ? (
-        <SameNameNotice variant="list" groups={data.duplicateNames} />
+      {!list.isError ? (
+        <AdminPlayerStats stats={data?.stats} filters={filters} onChange={update} />
       ) : null}
-      <Card asChild>
-        <section>
-          <DataTable
-            aria-label="Players"
-            columns={columns}
-            data={rows}
-            getRowId={(player) => player.id}
-            onRowClick={(player) => router.push(playerHref(player.id, query))}
-            loading={!data && !list.isError}
-            error={
-              list.isError ? (
-                <ErrorState
-                  title="Couldn't load the players."
-                  onRetry={() => void list.refetch()}
-                  retrying={list.isFetching}
-                  retryLabel="Retry"
-                >
-                  Check your connection, then try again.
-                </ErrorState>
-              ) : undefined
-            }
-            empty={
-              <EmptyState
-                title={searched ? `No players match “${searched}”.` : 'No players match.'}
-                action={
-                  <Button size="sm" onClick={() => update('', 'all', ADMIN_PLAYER_PAGE_SIZE)}>
-                    Clear search
-                  </Button>
-                }
-              >
-                Check the spelling, try the full RTR ID, or type at least four digits of a phone
-                number.
-              </EmptyState>
+      <AdminPlayerFilters
+        filters={filters}
+        places={data?.places ?? []}
+        onChange={update}
+        onClear={clear}
+      />
+      {filters.duplicates
+        ? data?.duplicateGroups.map((group) => (
+            <SameNameNotice
+              key={group.ids.join(',')}
+              variant="list"
+              matchReasons
+              groups={[{ name: group.reasons.join(' / '), count: group.ids.length }]}
+            />
+          ))
+        : null}
+      {data && !list.isError ? (
+        <div className="flex flex-wrap gap-2">
+          <Checkbox
+            label="Select all on this page"
+            disabled={list.isPlaceholderData || !data.rows.length}
+            checked={!!data.rows.length && data.rows.every((p) => selected.includes(p.id))}
+            onChange={(checked) =>
+              setSelected((current) =>
+                checked
+                  ? [...new Set([...current, ...data.rows.map((p) => p.id)])]
+                  : current.filter((id) => !data.rows.some((p) => p.id === id)),
+              )
             }
           />
-          {data && rows.length > 0 && !list.isError ? (
-            <div className="flex flex-wrap items-center justify-center gap-3 pt-3">
-              <span className="text-[13px] text-fg2">
-                Showing {formatCount(rows.length)} of {formatCount(data.total)}
-              </span>
-              {data.total > rows.length ? (
-                <Button
-                  size="sm"
-                  disabled={list.isPlaceholderData}
-                  onClick={() => update(q, account, shown + ADMIN_PLAYER_PAGE_SIZE)}
-                >
-                  Show 25 more
-                </Button>
-              ) : null}
-            </div>
-          ) : null}
-        </section>
+          <Button disabled={list.isPlaceholderData} onClick={() => setSelected(data.matchingIds)}>
+            Select all {data.total} matching
+          </Button>
+        </div>
+      ) : null}
+      <SegmentedControl
+        aria-label="Player view"
+        value={view}
+        options={[
+          { value: 'list', label: 'List' },
+          { value: 'grid', label: 'Grid' },
+        ]}
+        onChange={(view) => {
+          try {
+            localStorage.setItem('rotra-admin-players-view', view)
+          } catch {}
+          setRememberedView(view)
+          const params = new URLSearchParams(query)
+          params.set('view', view)
+          navigate(params)
+        }}
+      />
+      {!list.isError && data?.rows.length ? (
+        <div
+          className={
+            view === 'grid'
+              ? 'grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3'
+              : 'grid grid-cols-1 gap-3 min-[761px]:hidden'
+          }
+        >
+          {data.rows.map((p) => (
+            <AdminPlayerCard
+              selected={selected.includes(p.id)}
+              onSelect={(checked) => select(p.id, checked)}
+              actions={<PlayerManagementActions player={p} />}
+              key={p.id}
+              player={p}
+              createdBy={
+                clubs.data?.clubs.find((c) => c.id === p.createdByClubId)?.name ??
+                'Created by Admin'
+              }
+              href={href(p.id)}
+              onOpen={() => openPeek(p.id)}
+            />
+          ))}
+        </div>
+      ) : null}
+      <Card
+        className={
+          data?.rows.length && !list.isError
+            ? view === 'grid'
+              ? 'hidden'
+              : 'max-[760px]:hidden'
+            : undefined
+        }
+      >
+        <DataTable
+          aria-label="Players"
+          columns={columns}
+          data={data?.rows ?? []}
+          getRowId={(p) => p.id}
+          onRowClick={(p) => openPeek(p.id)}
+          loading={!data && !list.isError}
+          error={
+            list.isError ? (
+              <ErrorState title="Couldn't load the players." onRetry={() => void list.refetch()} />
+            ) : undefined
+          }
+          empty={
+            <EmptyState
+              title="No players match."
+              action={<Button onClick={clear}>Clear filters</Button>}
+            >
+              Check the spelling or try the full RTR ID.
+            </EmptyState>
+          }
+        />
       </Card>
+      {data && !list.isError ? (
+        <PlayerPagination
+          start={data.start}
+          end={data.end}
+          page={data.page}
+          pageCount={data.pageCount}
+          pageSize={data.pageSize}
+          total={data.total}
+          pending={list.isPlaceholderData}
+          onPage={(page) => update({ page })}
+          onPageSize={(pageSize) => update({ pageSize })}
+        />
+      ) : null}
+      {selected.length ? (
+        <PlayerBulkActions ids={selected} onClear={() => setSelected([])} />
+      ) : null}
+      <AdminPlayerQuickView
+        linkComponent={Link}
+        actions={
+          playerQuery.data ? <PlayerManagementActions player={playerQuery.data} /> : undefined
+        }
+        open={!!peek}
+        onClose={() => {
+          const params = new URLSearchParams(query)
+          params.delete('peek')
+          router.replace(`/players?${params}`, { scroll: false })
+        }}
+        player={playerQuery.data}
+        error={playerQuery.isError}
+        onRetry={() => void playerQuery.refetch()}
+        createdBy={
+          clubs.data?.clubs.find((c) => c.id === playerQuery.data?.createdByClubId)?.name ??
+          'Created by Admin'
+        }
+        pendingRequests={requests.data?.rows.filter((r) => r.status === 'pending').length}
+        sessions={games.data}
+        gamesError={games.isError}
+        onRetryGames={() => void games.refetch()}
+        profileHref={href(peek)}
+        historyHref={`/players/${peek}/games?from=${encodeURIComponent(query)}&origin=list`}
+        onCopyId={() => {
+          void Promise.resolve()
+            .then(() => navigator.clipboard.writeText(playerQuery.data?.rtrId ?? ''))
+            .then(
+              () => toast.success('RTR ID copied'),
+              () => setCopyValue(playerQuery.data?.rtrId ?? ''),
+            )
+        }}
+      />
     </>
   )
 }

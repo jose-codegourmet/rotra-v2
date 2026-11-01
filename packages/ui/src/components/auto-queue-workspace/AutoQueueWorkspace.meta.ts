@@ -10,6 +10,7 @@ export const autoQueueWorkspaceMeta = {
     'Pass minimumGames for the Catch Up example and placeholder, and hasEligiblePlayers for the current strategy. The target is always an explicit choice; its placeholder never supplies a default.',
     'Disabled actions have visible, accessible explanations; generation results distinguish full batches, short batches, target met and remaining games in the plan.',
     'Main Queue regeneration stays in the supplied Main Queue content; the Auto Queue controls only affect drafts.',
+    'Drafts render as MatchCard draft tiles in the queue grid; picking a tile calls onSelect, and the SelectionBar Clear calls onUnselectAll. One primary at a time: Generate (then Generate again) in the controls, Add N to Main Queue in the bar; the other draft actions are in an OverflowMenu.',
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',

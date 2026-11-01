@@ -13,8 +13,15 @@ export const matchCardVariants = cva(
         blocked: 'border-border-strong',
         'waiting-for-courts': 'border-border-strong',
       },
+      // An Auto Queue draft: dashed until picked, then the Players tiles' picked look (.pc3[aria-pressed]).
+      draft: {
+        none: '',
+        idle: 'cursor-pointer border-dashed select-none hover:border-accent/60',
+        selected:
+          'cursor-pointer border-solid border-accent bg-accent-subtle inset-ring-2 inset-ring-accent select-none',
+      },
     },
-    defaultVariants: { status: 'ready' },
+    defaultVariants: { status: 'ready', draft: 'none' },
   },
 )
 

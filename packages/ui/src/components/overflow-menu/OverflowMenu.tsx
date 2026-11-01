@@ -10,6 +10,8 @@ export type OverflowMenuItem = {
   onSelect: () => void
   /** Disables the item and shows this short reason under its label */
   disabledReason?: string
+  /** What the item does, under its label while it is enabled */
+  description?: string
   /** Error colour for a removal */
   destructive?: boolean
 }
@@ -18,6 +20,8 @@ export type OverflowMenuProps = {
   /** The trigger's accessible name, e.g. "More for Court 4" */
   label: string
   items: OverflowMenuItem[]
+  /** Which edge of the trigger the list lines up with: `end` (default) for a menu at a card's right, `start` beside a left-aligned button */
+  align?: 'start' | 'end'
   className?: string
 }
 
@@ -26,7 +30,7 @@ export type OverflowMenuProps = {
  * it. Opening focuses the first enabled item; ↑ / ↓ move between items; Escape or a click outside
  * closes it and returns focus to the trigger. Choosing an item closes the menu first.
  */
-export function OverflowMenu({ label, items, className }: OverflowMenuProps) {
+export function OverflowMenu({ label, items, align = 'end', className }: OverflowMenuProps) {
   const [open, setOpen] = useState(false)
   const menuId = useId()
   const rootRef = useRef<HTMLDivElement>(null)
@@ -87,7 +91,10 @@ export function OverflowMenu({ label, items, className }: OverflowMenuProps) {
           aria-label={label}
           tabIndex={-1}
           onKeyDown={onKeyDown}
-          className="absolute top-[calc(100%+4px)] right-0 z-20 flex min-w-[200px] flex-col gap-0.5 rounded-sm border border-border-strong bg-elev p-1.5 shadow-pop"
+          className={cn(
+            'absolute top-[calc(100%+4px)] z-20 flex min-w-[200px] flex-col gap-0.5 rounded-sm border border-border-strong bg-elev p-1.5 shadow-pop',
+            align === 'end' ? 'right-0' : 'left-0 max-w-[min(320px,calc(100vw-32px))]',
+          )}
         >
           {items.map((item) => (
             <button
@@ -107,8 +114,8 @@ export function OverflowMenu({ label, items, className }: OverflowMenuProps) {
               )}
             >
               <span>{item.label}</span>
-              {item.disabledReason ? (
-                <span className="text-xs text-fg2">{item.disabledReason}</span>
+              {item.disabledReason || item.description ? (
+                <span className="text-xs text-fg2">{item.disabledReason || item.description}</span>
               ) : null}
             </button>
           ))}

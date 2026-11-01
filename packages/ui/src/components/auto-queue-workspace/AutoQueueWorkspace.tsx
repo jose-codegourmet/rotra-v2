@@ -1,14 +1,20 @@
 'use client'
 
+import type { MatchFormat } from '@rotra/data/match/types'
+import type { PlayingLevel } from '@rotra/data/player/types'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
-import { Checkbox } from '@rotra/ui/checkbox'
+import { Chip } from '@rotra/ui/chip'
 import { Field } from '@rotra/ui/field'
+import { MatchCard, type MatchCardPlayer, type MatchCardPlayerChip } from '@rotra/ui/match-card'
 import { Notice } from '@rotra/ui/notice'
+import { OverflowMenu } from '@rotra/ui/overflow-menu'
 import { SegmentedControl } from '@rotra/ui/segmented-control'
+import { SelectionBar } from '@rotra/ui/selection-bar'
 import { Sheet } from '@rotra/ui/sheet'
 import { Tabs, TabsContent } from '@rotra/ui/tabs'
 import { TextInput } from '@rotra/ui/text-input'
+import { DRAFT_TILE_MIN, useQueueColumns } from '@rotra/ui/upcoming-queue-row'
 import { type ReactNode, useEffect, useId, useRef, useState } from 'react'
 
 export type AutoQueueMode = 'available' | 'ahead' | 'wait' | 'fewest' | 'catchup'
@@ -17,7 +23,12 @@ export type QueueWorkspace = 'main' | 'auto'
 
 export type AutoQueueDraftPlayer = {
   id: string
+  /** Nickname or first name, under the picture */
   name: string
+  /** Full name for the picture's title; falls back to name */
+  fullName?: string
+  level?: PlayingLevel | null
+  photoUrl?: string
   played: number
   queued: number
   suggested: number
@@ -27,7 +38,7 @@ export type AutoQueueDraftPlayer = {
 
 export type AutoQueueDraft = {
   id: string
-  format: string
+  format: MatchFormat
   teamA: AutoQueueDraftPlayer[]
   teamB: AutoQueueDraftPlayer[]
   reason: string
@@ -61,6 +72,8 @@ export type AutoQueueWorkspaceProps = {
   /** Draft IDs in the order selected across all five tabs. */
   selectedIds: string[]
   onSelect: (draftId: string, selected: boolean) => void
+  /** The selection bar's Clear: unselects every draft in every tab */
+  onUnselectAll: () => void
   onGenerate: (mode: AutoQueueMode, count: AutoQueueCount, target: string) => void
   onRegenerate: (mode: AutoQueueMode, count: AutoQueueCount, target: string) => void
   onRegenerateUnselected: (mode: AutoQueueMode, count: AutoQueueCount, target: string) => void
@@ -95,6 +108,30 @@ function allDrafts(batches: AutoQueueWorkspaceProps['batches']) {
   return MODE_ITEMS.flatMap(({ value }) => batches[value]?.drafts ?? [])
 }
 
+const cardPlayer = (p: AutoQueueDraftPlayer): MatchCardPlayer => ({
+  id: p.id,
+  name: p.fullName ?? p.name,
+  shortName: p.name,
+  level: p.level ?? null,
+  photoUrl: p.photoUrl,
+})
+
+/** Chips under a draft player's name. Zeros are left out; "suggested" only when another draft has them too. */
+export function draftPlayerChips(p: AutoQueueDraftPlayer): MatchCardPlayerChip[] {
+  return [
+    p.played > 0 && { text: `${p.played} played` },
+    p.queued > 0 && { text: `${p.queued} queued` },
+    p.suggested > 1 && { text: `${p.suggested} suggested` },
+    p.playingNow && { text: 'Playing now', tone: 'warn' as const },
+  ].filter((chip): chip is MatchCardPlayerChip => Boolean(chip))
+}
+
+// "Made 4 of 4 matches." is the normal result: a neutral chip. A shortfall or target note is a notice.
+const isFullBatch = (stopReason: string) => {
+  const made = /^Made (\d+) of (\d+) matches\.$/.exec(stopReason)
+  return Boolean(made && made[1] === made[2])
+}
+
 /** The Q-QUEUE / Q-AUTO switch and five independent draft-review tabs. All edits are callbacks. */
 export function AutoQueueWorkspace({
   workspace,
@@ -111,6 +148,7 @@ export function AutoQueueWorkspace({
   batches,
   selectedIds,
   onSelect,
+  onUnselectAll,
   onGenerate,
   onRegenerate,
   onRegenerateUnselected,
@@ -122,6 +160,7 @@ export function AutoQueueWorkspace({
   pendingMessage,
 }: AutoQueueWorkspaceProps) {
   const hintId = useId()
+  const [gridRef, columns] = useQueueColumns<HTMLDivElement>(DRAFT_TILE_MIN)
   const [reviewIds, setReviewIds] = useState<string[] | null>(null)
   const reviewErrorRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
@@ -144,17 +183,12 @@ export function AutoQueueWorkspace({
   const draftsHint = !batch.drafts.length
     ? 'Generate matches in this tab first to replace or remove drafts, or add them to the Main Queue.'
     : ''
-  const selectionHint = !selectedIds.length
-    ? 'Select one or more drafts first to add a selection to the Main Queue.'
-    : ''
   const generationReason = isPending ? busyHint : generationHint
   const replaceReason = isPending ? busyHint : draftsHint || generationHint
   const clearReason = isPending ? busyHint : draftsHint
-  const selectionReason = isPending ? busyHint : selectionHint
   const generationHintId = `${hintId}-${isPending ? 'pending' : 'generation'}`
   const draftsHintId = `${hintId}-${isPending ? 'pending' : 'drafts'}`
   const replaceHintId = draftsHint ? draftsHintId : generationHintId
-  const selectionHintId = `${hintId}-${isPending ? 'pending' : 'selection'}`
   const emptyMessage = !hasEligiblePlayers
     ? mode === 'ahead'
       ? 'No present players. Mark arrivals present in Players.'
@@ -164,8 +198,19 @@ export function AutoQueueWorkspace({
       : count === null
         ? 'Choose how many matches, then Generate.'
         : 'Generate matches to see suggestions here.'
-  const selectedDrafts =
-    reviewIds?.map((id) => allDrafts(batches).find((draft) => draft.id === id)) ?? []
+  const drafts = allDrafts(batches)
+  // The selection bar's faces: each picked draft's players, in pick order, once each.
+  const selectedPlayers = [
+    ...new Map(
+      selectedIds
+        .flatMap((id) => {
+          const draft = drafts.find((d) => d.id === id)
+          return draft ? [...draft.teamA, ...draft.teamB] : []
+        })
+        .map((p) => [p.id, { id: p.id, name: p.fullName ?? p.name, photoUrl: p.photoUrl }]),
+    ).values(),
+  ]
+  const selectedDrafts = reviewIds?.map((id) => drafts.find((draft) => draft.id === id)) ?? []
   const reviewChanged =
     reviewIds !== null &&
     (selectedDrafts.some((draft) => !draft) || selectedDrafts.length !== reviewIds.length)
@@ -275,65 +320,72 @@ export function AutoQueueWorkspace({
                     {draftsHint}
                   </p>
                 ) : null}
-                <div className="grid grid-cols-2 gap-2 min-[640px]:flex min-[640px]:flex-wrap [&>button]:min-w-0 [&>button]:whitespace-normal [&>button]:py-2">
-                  <Button
-                    variant="primary"
-                    disabled={!canGenerate || isPending}
-                    title={generationReason || undefined}
-                    aria-describedby={generationReason ? generationHintId : undefined}
-                    onClick={() => {
-                      if (count !== null) onGenerate(mode, count, catchUpTarget)
-                    }}
-                  >
-                    {count === null ? 'Generate matches' : `Generate ${count} matches`}
-                  </Button>
-                  <Button
-                    disabled={!batch.drafts.length || !canGenerate || isPending}
-                    title={replaceReason || undefined}
-                    aria-describedby={replaceReason ? replaceHintId : undefined}
-                    onClick={() => {
-                      if (count !== null) onRegenerate(mode, count, catchUpTarget)
-                    }}
-                  >
-                    Generate again
-                  </Button>
-                  <Button
-                    disabled={!batch.drafts.length || !canGenerate || isPending}
-                    title={replaceReason || undefined}
-                    aria-describedby={replaceReason ? replaceHintId : undefined}
-                    onClick={() => {
-                      if (count !== null) onRegenerateUnselected(mode, count, catchUpTarget)
-                    }}
-                  >
-                    Replace unselected
-                  </Button>
-                  <Button
-                    disabled={!batch.drafts.length || isPending}
-                    title={clearReason || undefined}
-                    aria-describedby={clearReason ? draftsHintId : undefined}
-                    onClick={() => {
-                      onClearUnselected(mode)
-                      headingRef.current?.focus()
-                    }}
-                  >
-                    Remove unselected
-                  </Button>
-                  <Button
-                    disabled={!batch.drafts.length || isPending}
-                    title={clearReason || undefined}
-                    aria-describedby={clearReason ? draftsHintId : undefined}
-                    onClick={() => {
-                      onClear(mode)
-                      headingRef.current?.focus()
-                    }}
-                  >
-                    Clear this tab
-                  </Button>
+                {/* One primary: Generate, or Generate again once this tab has drafts. The rest is in ⋯. */}
+                <div className="flex flex-wrap items-center gap-2">
+                  {batch.drafts.length ? (
+                    <Button
+                      key="again"
+                      variant="primary"
+                      disabled={!canGenerate || isPending}
+                      title={replaceReason || undefined}
+                      aria-describedby={replaceReason ? replaceHintId : undefined}
+                      onClick={() => {
+                        if (count !== null) onRegenerate(mode, count, catchUpTarget)
+                      }}
+                    >
+                      Generate again
+                    </Button>
+                  ) : (
+                    <Button
+                      key="generate"
+                      variant="primary"
+                      disabled={!canGenerate || isPending}
+                      title={generationReason || undefined}
+                      aria-describedby={generationReason ? generationHintId : undefined}
+                      onClick={() => {
+                        if (count !== null) onGenerate(mode, count, catchUpTarget)
+                      }}
+                    >
+                      {count === null ? 'Generate matches' : `Generate ${count} matches`}
+                    </Button>
+                  )}
+                  {batch.drafts.length ? (
+                    <OverflowMenu
+                      label="More draft actions"
+                      align="start"
+                      items={[
+                        {
+                          label: 'Replace unselected',
+                          description:
+                            'Keeps the drafts you picked and makes new ones for the rest.',
+                          disabledReason: replaceReason || undefined,
+                          onSelect: () => {
+                            if (count !== null) onRegenerateUnselected(mode, count, catchUpTarget)
+                          },
+                        },
+                        {
+                          label: 'Remove unselected',
+                          description: 'Keeps only the drafts you picked.',
+                          disabledReason: clearReason || undefined,
+                          onSelect: () => {
+                            onClearUnselected(mode)
+                            headingRef.current?.focus()
+                          },
+                        },
+                        {
+                          label: 'Clear this tab',
+                          description: 'Removes every draft in this tab.',
+                          disabledReason: clearReason || undefined,
+                          destructive: true,
+                          onSelect: () => {
+                            onClear(mode)
+                            headingRef.current?.focus()
+                          },
+                        },
+                      ]}
+                    />
+                  ) : null}
                 </div>
-                <p className="m-0 text-[13px] text-fg2">
-                  Generate again replaces every draft in this tab. Replace unselected keeps the ones
-                  you picked. Remove unselected removes the others.
-                </p>
                 {isPending ? (
                   <div id={`${hintId}-pending`}>
                     <Notice tone="info">{busyHint}</Notice>
@@ -347,74 +399,84 @@ export function AutoQueueWorkspace({
                   </Notice>
                 ) : null}
                 {batch.stopReason ? (
-                  <p className="m-0 text-[13px] text-fg2">{batch.stopReason}</p>
+                  isFullBatch(batch.stopReason) ? (
+                    <div>
+                      <Chip>{batch.stopReason}</Chip>
+                    </div>
+                  ) : (
+                    <Notice tone="info">{batch.stopReason}</Notice>
+                  )
                 ) : null}
                 {batch.drafts.length ? (
-                  <div className="grid min-w-0 gap-3 lg:grid-cols-2">
-                    {batch.drafts.map((draft) => (
-                      <Card key={draft.id} asChild>
-                        <article className="flex min-w-0 flex-col gap-3">
-                          <Checkbox
-                            label={`Select ${draft.format}`}
-                            checked={selectedIds.includes(draft.id)}
-                            disabled={isPending}
-                            aria-describedby={isPending ? `${hintId}-pending` : undefined}
-                            onChange={(selected) => onSelect(draft.id, selected)}
-                          />
-                          <p className="m-0 font-semibold text-fg">
-                            {draft.teamA.map((player) => player.name).join(' and ')} vs{' '}
-                            {draft.teamB.map((player) => player.name).join(' and ')}
-                          </p>
-                          <p className="m-0 text-[13px] text-fg2">
-                            {MODE_ITEMS.find((item) => item.value === value)?.label} ·{' '}
-                            {draft.reason}
-                          </p>
-                          <ul className="m-0 list-none space-y-1 p-0 text-[13px] text-fg2">
-                            {[...draft.teamA, ...draft.teamB].map((player) => (
-                              <li key={player.id}>
-                                {player.name}: {player.played} played, {player.queued} queued,{' '}
-                                {player.suggested} suggested
-                                {player.playingNow ? ', playing now' : ''}
-                              </li>
-                            ))}
-                          </ul>
-                          {draft.blockedReason ? (
-                            <Notice tone="info">{draft.blockedReason}</Notice>
-                          ) : null}
-                          {draft.attentionReason ? (
-                            <Notice tone="warn">{draft.attentionReason}</Notice>
-                          ) : null}
-                        </article>
-                      </Card>
-                    ))}
+                  <div
+                    ref={gridRef}
+                    className="grid min-w-0 gap-2.5"
+                    style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
+                  >
+                    {batch.drafts.map((draft, i) => {
+                      const pick = selectedIds.indexOf(draft.id) + 1
+                      return (
+                        <MatchCard
+                          key={draft.id}
+                          position={i + 1}
+                          matchNo={i + 1}
+                          format={draft.format}
+                          origin="auto"
+                          manualProtected={false}
+                          status={
+                            draft.attentionReason
+                              ? { kind: 'needs-attention', reason: draft.attentionReason }
+                              : { kind: 'blocked', reason: draft.blockedReason ?? draft.reason }
+                          }
+                          teamA={draft.teamA.map(cardPlayer)}
+                          teamB={draft.teamB.map(cardPlayer)}
+                          draft={{
+                            selected: pick > 0,
+                            pickOrder: pick || undefined,
+                            disabled: isPending,
+                            onToggle: () => onSelect(draft.id, pick === 0),
+                            playerChips: Object.fromEntries(
+                              [...draft.teamA, ...draft.teamB].map((p) => [
+                                p.id,
+                                draftPlayerChips(p),
+                              ]),
+                            ),
+                          }}
+                        />
+                      )
+                    })}
                   </div>
                 ) : isPending ||
                   (hasEligiblePlayers && (batch.stopReason || batch.error)) ? null : (
                   <Card className="text-center text-fg2">{emptyMessage}</Card>
                 )}
-                <div className="grid grid-cols-1 gap-2 min-[640px]:flex min-[640px]:flex-wrap">
-                  <Button
-                    variant="primary"
-                    disabled={!selectedIds.length || isPending}
-                    title={selectionReason || undefined}
-                    aria-describedby={selectionReason ? selectionHintId : undefined}
-                    onClick={() => setReviewIds([...selectedIds])}
-                  >
-                    Add {selectedIds.length} selected to Main Queue
-                  </Button>
-                  <Button
-                    disabled={!batch.drafts.length || isPending}
-                    title={clearReason || undefined}
-                    aria-describedby={clearReason ? draftsHintId : undefined}
-                    onClick={() => setReviewIds(batch.drafts.map((draft) => draft.id))}
-                  >
-                    Add all {batch.drafts.length} to Main Queue
-                  </Button>
-                </div>
-                {!isPending && selectionHint ? (
-                  <p id={`${hintId}-selection`} className="m-0 text-[13px] text-fg2">
-                    {selectionHint}
-                  </p>
+                {selectedIds.length || batch.drafts.length ? (
+                  <SelectionBar
+                    ariaLabel="Selected drafts"
+                    players={selectedPlayers}
+                    count={selectedIds.length}
+                    label={
+                      selectedIds.length
+                        ? 'added in the order you picked'
+                        : 'tap drafts to pick them'
+                    }
+                    valid={selectedIds.length > 0 && !isPending}
+                    onClear={onUnselectAll}
+                    primaryLabel={`Add ${selectedIds.length} to Main Queue`}
+                    onMakeMatch={() => setReviewIds([...selectedIds])}
+                    actions={
+                      batch.drafts.length ? (
+                        <Button
+                          size="sm"
+                          disabled={isPending}
+                          title={isPending ? busyHint : undefined}
+                          onClick={() => setReviewIds(batch.drafts.map((draft) => draft.id))}
+                        >
+                          Add all {batch.drafts.length}
+                        </Button>
+                      ) : null
+                    }
+                  />
                 ) : null}
               </TabsContent>
             ))}

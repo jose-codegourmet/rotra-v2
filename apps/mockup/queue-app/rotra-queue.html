@@ -317,6 +317,14 @@ button.qf:hover .avatar { box-shadow: 0 0 0 2px var(--accent); }
 .qtile.qmore { border-style: dashed; background: transparent; align-items: center; justify-content: center; text-align: center; cursor: pointer; color: var(--fg); min-height: 150px; }
 .qtile.qmore:hover { border-color: var(--accent); background: var(--accent-subtle); }
 .qtile.qmore .plus { font-size: 26px; line-height: 1; color: var(--accent); }
+/* Auto Queue drafts: the queue tile, dashed until picked; picking works like the Players tiles (.pc3). */
+.qtile.draft { border-style: dashed; cursor: pointer; user-select: none; }
+.qtile.draft:hover { border-color: color-mix(in srgb, var(--accent) 60%, var(--border-strong)); }
+.qtile.draft[aria-pressed="true"] { border-style: solid; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent) inset; background: var(--accent-subtle); }
+.qtile .sel-badge { position: absolute; top: -6px; left: -6px; width: 22px; height: 22px; border-radius: 50%; background: var(--accent); color: var(--on-accent); display: grid; place-items: center; font-size: 11px; font-weight: 800; }
+.qchips { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px; max-width: 96px; }
+.qchip { font-size: 10px; line-height: 1.4; background: var(--bg); border-radius: 6px; padding: 0 5px; color: var(--fg2); white-space: nowrap; }
+.qchip.warn { color: var(--warn); background: var(--warn-subtle); }
 .status-line { font-size: 13px; display: flex; gap: 6px; align-items: flex-start; }
 .status-line svg { flex: none; margin-top: 2px; }
 .status-line.ok { color: var(--accent); } .status-line.warn { color: var(--warn); } .status-line.muted { color: var(--fg2); }
@@ -2574,12 +2582,48 @@ function autoWorkspace(s) {
     ${tab === 'catchup' ? `<label class="field"><span>Games each player should reach</span><input id="auto-target" aria-label="Games each player should reach" class="input${a.target !== '' && !validTarget ? ' bad' : ''}" style="max-width:320px" type="number" min="1" step="1" placeholder="e.g. ${s.minimum}" data-bind="ui.autoDraft.target" data-rerender value="${esc(String(a.target))}" aria-describedby="auto-target-hint${a.target !== '' && !validTarget ? ' auto-target-error' : ''}" ${a.target !== '' && !validTarget ? 'aria-invalid="true"' : ''}><span class="hint" id="auto-target-hint">Players below this number get matches first. Games already played and games already planned in the Main Queue both count. Earlier drafts in this batch count too. Example: with 3, a player who has played 1 and is queued for 1 needs 1 more match. This is separate from the session minimum (Min ${s.minimum} game${s.minimum === 1 ? '' : 's'}).</span>${a.target !== '' && !validTarget ? '<span class="err" id="auto-target-error" aria-live="polite">Enter a whole number of games, 1 or more.</span>' : ''}</label>` : ''}
     ${generationHint ? `<p class="small muted" id="auto-generate-hint">${generationHint}</p>` : ''}
     ${draftsHint ? `<p class="small muted" id="auto-drafts-hint">${draftsHint}</p>` : ''}
-    <div class="row"><button class="btn primary" data-act="autoGenerate" ${disabled(generationHint, 'auto-generate-hint')}>${a.count ? `Generate ${a.count} matches` : 'Generate matches'}</button><button class="btn" data-act="autoRegenerate" ${disabled(draftsHint || generationHint, draftsHint ? 'auto-drafts-hint' : 'auto-generate-hint')}>Generate again</button><button class="btn" data-act="autoRegenerateUnselected" ${disabled(draftsHint || generationHint, draftsHint ? 'auto-drafts-hint' : 'auto-generate-hint')}>Replace unselected</button><button class="btn" data-act="autoClearUnselected" ${disabled(draftsHint, 'auto-drafts-hint')}>Remove unselected</button><button class="btn" data-act="autoClear" ${disabled(draftsHint, 'auto-drafts-hint')}>Clear this tab</button></div>
-    <p class="small muted">Generate again replaces every draft in this tab. Replace unselected keeps the ones you picked. Remove unselected removes the others.</p>
-    ${a.error ? notice('warn', esc(a.error)) : ''}${stale ? notice('warn', 'The Main Queue changed since these were made. Check them before adding, or generate again.') : ''}${batch.stop ? `<p class="small muted">${esc(batch.stop)}</p>` : ''}
-    ${batch.cards.length ? `<div class="stack">${batch.cards.map((m) => `<article class="card stack"><label><input id="auto-select-${m.draftId}" type="checkbox" data-act-change="autoSelect" data-id="${m.draftId}" ${a.selected.includes(m.draftId) ? 'checked' : ''}> Select ${esc(FORMAT_LABEL[m.format])}</label><p>${esc(listNames(m.teamA))} vs ${esc(listNames(m.teamB))}</p><p class="small muted">${esc(AUTO_MODES[tab])} · ${all(m).map((pid) => `${esc(short(pid))}: ${gamesOf(s,pid)} played, ${queuedCount(s,pid)} queued, ${batch.cards.filter((draft) => all(draft).includes(pid)).length} suggested${activeOf(s,pid) ? ', playing now' : ''}`).join(' · ')}</p></article>`).join('')}</div>` : eligible && (batch.stop || a.error) ? '' : `<div class="card empty">${empty}</div>`}
-    <div class="row"><button class="btn primary" data-act="autoReview" ${disabled(selectionHint, 'auto-selection-hint')}>Add ${a.selected.length} selected to Main Queue</button><button class="btn" data-act="autoAddTab" ${disabled(draftsHint, 'auto-drafts-hint')}>Add all ${batch.cards.length} to Main Queue</button></div>
-    ${selectionHint ? `<p class="small muted" id="auto-selection-hint">${selectionHint}</p>` : ''}`;
+    <div class="row"><button class="btn primary" data-act="${batch.cards.length ? 'autoRegenerate' : 'autoGenerate'}" ${disabled(generationHint, 'auto-generate-hint')}>${batch.cards.length ? 'Generate again' : a.count ? `Generate ${a.count} matches` : 'Generate matches'}</button>${autoMoreMenu(batch, draftsHint || generationHint, draftsHint)}</div>
+    ${a.error ? notice('warn', esc(a.error)) : ''}${stale ? notice('warn', 'The Main Queue changed since these were made. Check them before adding, or generate again.') : ''}${batch.stop ? (/^Made (\d+) of \1 matches\.$/.test(batch.stop) ? `<div><span class="chip">${esc(batch.stop)}</span></div>` : notice('', esc(batch.stop))) : ''}
+    ${batch.cards.length ? `<div class="qgrid" style="grid-template-columns:repeat(${queueCols(DRAFT_TILE_MIN)}, minmax(0, 1fr))">${batch.cards.map((m) => draftTile(s, m, batch, a.selected)).join('')}</div>` : eligible && (batch.stop || a.error) ? '' : `<div class="card empty">${empty}</div>`}
+    ${a.selected.length || batch.cards.length ? autoSelectionBar(s, a, batch) : ''}`;
+}
+// The ⋯ menu beside Generate: the secondary draft actions, each with what it does.
+function autoMoreMenu(batch, replaceWhy, draftsWhy) {
+  const open = S.ui.courtMenu === 'auto-more';
+  const item = (act, label, text, why, cls = '') => `<button role="menuitem" class="${cls}" data-act="${act}" ${why ? 'disabled' : ''}><span>${label}</span><span class="why">${why || text}</span></button>`;
+  return `<div class="cmenu"><button class="btn sm ghost icon-btn" data-act="toggleCourtMenu" data-id="auto-more" aria-haspopup="menu" aria-expanded="${open}" aria-label="More draft actions" ${batch.cards.length ? '' : 'disabled'}>${I.more}</button>${open ? `<div class="cmenu-list" role="menu" aria-label="More draft actions">
+    ${item('autoRegenerateUnselected', 'Replace unselected', 'Keeps the drafts you picked and makes new ones for the rest.', replaceWhy)}
+    ${item('autoClearUnselected', 'Remove unselected', 'Keeps only the drafts you picked.', draftsWhy)}
+    ${item('autoClear', 'Clear this tab', 'Removes every draft in this tab.', draftsWhy, 'danger')}
+  </div>` : ''}</div>`;
+}
+// A draft as a queue tile: same head, faces, VS and status line; tap anywhere to pick it.
+function draftTile(s, m, batch, selected) {
+  const pick = selected.indexOf(m.draftId) + 1;
+  const attention = all(m).some((p) => !R(s, p) || !R(s, p).present);
+  const playing = all(m).some((p) => activeOf(s, p));
+  const status = attention ? `<span class="status-line warn">${I.alert} A player is no longer present. Generate again.</span>`
+    : playing ? `<span class="status-line muted">${I.info} A player is playing now; this match waits until they are free.</span>`
+    : `<span class="status-line muted">${I.info} ${esc(m.reason || 'Suggested by Auto Queue')}</span>`;
+  const chips = (p) => {
+    const played = gamesOf(s, p), queued = queuedCount(s, p), suggested = batch.cards.filter((d) => all(d).includes(p)).length;
+    return [played ? `<span class="qchip">${played} played</span>` : '', queued ? `<span class="qchip">${queued} queued</span>` : '', suggested > 1 ? `<span class="qchip">${suggested} suggested</span>` : '', activeOf(s, p) ? '<span class="qchip warn">Playing now</span>' : ''].join('');
+  };
+  const faces = (ids) => `<div class="qfaces">${ids.map((p) => `<div class="qf">${avatar(P(p))}<span class="qf-n">${esc(short(p))}</span><span class="qchips">${chips(p)}</span></div>`).join('')}</div>`;
+  return `<article class="qtile draft ${attention ? 'attn' : ''}" role="button" tabindex="0" aria-pressed="${pick > 0}" data-act="autoToggle" data-id="${m.draftId}" aria-label="Draft ${esc(FORMAT_LABEL[m.format])}: ${esc(listNames(m.teamA))} vs ${esc(listNames(m.teamB))}${pick ? `, picked ${pick}` : ''}">
+    ${pick ? `<span class="sel-badge" aria-hidden="true">${pick}</span>` : ''}
+    <div class="qt-head">${chip('Draft')}${chip(FORMAT_LABEL[m.format], 'solid')}</div>
+    ${faces(m.teamA)}<div class="vs">VS</div>${faces(m.teamB)}
+    ${status}
+  </article>`;
+}
+// The Players tab's selection bar, reused for drafts: faces, "N selected", Clear and one primary.
+function autoSelectionBar(s, a, batch) {
+  const cards = Object.values(a.batches).flatMap((b) => b.cards);
+  const faces = [...new Set(a.selected.flatMap((id) => { const m = cards.find((c) => c.draftId === id); return m ? all(m) : []; }))];
+  return `<div class="selbar" role="region" aria-label="Selected drafts">
+    <div class="row" style="gap:6px;flex-wrap:nowrap;min-width:0"><span class="sel-faces">${faces.slice(0, 5).map((pid) => avatar(P(pid))).join('')}</span><span class="small"><b aria-live="polite">${a.selected.length} selected</b> · ${a.selected.length ? 'added in the order you picked' : 'tap drafts to pick them'}</span></div>
+    <div class="row" style="flex-wrap:wrap"><button class="btn sm ghost" data-act="autoUnselect" ${a.selected.length ? '' : 'disabled'}>Clear</button><button class="btn sm" data-act="autoAddTab" ${batch.cards.length ? '' : 'disabled'}>Add all ${batch.cards.length}</button><button class="btn sm primary" data-act="autoReview" ${a.selected.length ? '' : 'disabled'}>Add ${a.selected.length} to Main Queue</button></div></div>`;
 }
 
 function generateDrafts(s, tab, count, target, fixed) {
@@ -2627,11 +2671,12 @@ function upcomingPane(s) {
     </div>`;
 }
 // Queue grid columns from the content width (window − rail − side padding): tiles of 160 px or more, 10 px gaps, no upper limit.
-const QUEUE_TILE_MIN = 160, QUEUE_GAP = 10;
-function queueCols() {
+// Drafts carry chips under each name, so they need wider tiles to keep a doubles team on one row.
+const QUEUE_TILE_MIN = 160, QUEUE_GAP = 10, DRAFT_TILE_MIN = 230;
+function queueCols(tileMin = QUEUE_TILE_MIN) {
   const vw = window.innerWidth, pad = Math.min(40, Math.max(16, vw * 0.03));
   const rail = !hasShell() || narrowScreen() ? 0 : navMin ? 68 : 232;
-  return Math.max(1, Math.floor((vw - rail - 2 * pad + QUEUE_GAP) / (QUEUE_TILE_MIN + QUEUE_GAP)));
+  return Math.max(1, Math.floor((vw - rail - 2 * pad + QUEUE_GAP) / (tileMin + QUEUE_GAP)));
 }
 function queueCard(s, m, i, n, cols) {
   const b = blockOf(s, m);
@@ -3931,11 +3976,13 @@ const ACT = {
   autoTab: (d) => { autoState(cur()).tab = d.k; autoState(cur()).error = ''; render(); },
   autoCount: (d) => { autoState(cur()).count = +d.n; render(); },
   autoSelect: (d, el) => { const a = autoState(cur()); a.selected = a.selected.filter((id) => id !== d.id); if (el.checked) a.selected.push(d.id); render(); },
-  autoClear: () => { const a = autoState(cur()), b = a.batches[a.tab]; if (!b) return; const ids = b.cards.map((m) => m.draftId); a.selected = a.selected.filter((id) => !ids.includes(id)); delete a.batches[a.tab]; render(); },
-  autoClearUnselected: () => { const a = autoState(cur()), b = a.batches[a.tab]; if (b) { b.cards = b.cards.filter((m) => a.selected.includes(m.draftId)); delete b.stop; } render(); },
+  autoToggle: (d) => { const a = autoState(cur()); a.selected = a.selected.includes(d.id) ? a.selected.filter((id) => id !== d.id) : [...a.selected, d.id]; render(); const t = document.querySelector(`[data-act="autoToggle"][data-id="${d.id}"]`); if (t) t.focus(); },
+  autoUnselect: () => { autoState(cur()).selected = []; render(); },
+  autoClear: () => { S.ui.courtMenu = null; const a = autoState(cur()), b = a.batches[a.tab]; if (!b) { render(); return; } const ids = b.cards.map((m) => m.draftId); a.selected = a.selected.filter((id) => !ids.includes(id)); delete a.batches[a.tab]; render(); },
+  autoClearUnselected: () => { S.ui.courtMenu = null; const a = autoState(cur()), b = a.batches[a.tab]; if (b) { b.cards = b.cards.filter((m) => a.selected.includes(m.draftId)); delete b.stop; } render(); },
   autoGenerate: () => ACT.autoBuild(false),
   autoRegenerate: () => ACT.autoBuild(false),
-  autoRegenerateUnselected: () => ACT.autoBuild(true),
+  autoRegenerateUnselected: () => { S.ui.courtMenu = null; ACT.autoBuild(true); },
   autoBuild: (keep) => { const s = cur(), a = autoState(s), old = a.batches[a.tab] || { cards: [] }; const fixed = keep ? old.cards.filter((m) => a.selected.includes(m.draftId)) : []; const r = generateDrafts(s, a.tab, Math.max(0, a.count-fixed.length), a.target, fixed); if (r.error) { a.error = r.error; render(); return; } const removed = old.cards.filter((m) => !fixed.includes(m)).map((m) => m.draftId); a.selected = a.selected.filter((id) => !removed.includes(id)); a.batches[a.tab] = { cards: [...fixed, ...r.matches.map((m) => ({ ...m, draftId: `d${a.next++}`, strategy: a.tab }))], fingerprint: fixed.length && old.fingerprint !== queueFingerprint(s) ? old.fingerprint : queueFingerprint(s), stop: r.stop }; a.error = ''; render(); },
   autoAddTab: () => { const a = autoState(cur()); openSheet({ type: 'autoReview', ids: (a.batches[a.tab]?.cards || []).map((m) => m.draftId) }); },
   autoReview: () => openSheet({ type: 'autoReview', ids: autoState(cur()).selected.slice() }),

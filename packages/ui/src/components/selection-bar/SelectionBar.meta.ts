@@ -8,6 +8,7 @@ export const selectionBarMeta = {
     'Render it under the PlayerPoolCard grid only while at least one player is picked (Q-POOL).',
     'The parent decides the label and validity from the pick count and the session formats (2 singles, 3 1v2, 4 doubles, 6 3v3, 8 4v4, 10 5v5; singles or doubles may be off). Fun formats add ", counts toward session games only".',
     'Make match stays disabled until the pick is valid and is hidden when onMakeMatch is not given.',
+    'Auto Queue reuses it for drafts: count gives "N selected", primaryLabel "Add N to Main Queue", actions holds "Add all N", and ariaLabel "Selected drafts".',
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',

@@ -12,6 +12,8 @@ export type SelectionBarPlayer = {
 export type SelectionBarProps = {
   /** The picked players, in pick order */
   players: SelectionBarPlayer[]
+  /** "N selected" when the picks are not players (Auto Queue drafts); defaults to players.length */
+  count?: number
   /**
    * What the pick makes, or why it cannot: the format ("Doubles", "3v3 fun, counts toward session
    * games only") or the reason ("pick 2, 3, 4, 6, 8 or 10 players", "singles is off for this session")
@@ -22,7 +24,12 @@ export type SelectionBarProps = {
   onClear: () => void
   /** Make match is hidden when missing */
   onMakeMatch?: () => void
+  /** The primary's text; Auto Queue uses "Add N to Main Queue" */
+  primaryLabel?: string
+  /** Extra buttons before Clear, e.g. Auto Queue's secondary "Add all N" */
   actions?: ReactNode
+  /** The region's name: "Selected players", or "Selected drafts" in Auto Queue */
+  ariaLabel?: string
   className?: string
 }
 
@@ -32,21 +39,23 @@ export type SelectionBarProps = {
  */
 export function SelectionBar({
   players,
+  count = players.length,
   label,
   valid,
   onClear,
   onMakeMatch,
-  className,
+  primaryLabel = 'Make match',
   actions,
+  ariaLabel = 'Selected players',
+  className,
 }: SelectionBarProps) {
   return (
     <section
-      aria-label="Selected players"
+      aria-label={ariaLabel}
       className={cn(
         'sticky bottom-[calc(72px+env(safe-area-inset-bottom,0px))] z-10 flex flex-wrap items-center justify-between gap-2.5',
         'rounded-lg border border-accent bg-elev px-3.5 py-2.5 shadow-pop',
         className,
-        actions,
       )}
     >
       <div className="flex min-w-0 flex-nowrap items-center gap-1.5">
@@ -62,7 +71,7 @@ export function SelectionBar({
           ))}
         </span>
         <span className="min-w-0 text-[13px]">
-          <b aria-live="polite">{players.length} selected</b> · {label}
+          <b aria-live="polite">{count} selected</b> · {label}
         </span>
       </div>
       <div className="flex flex-wrap items-center gap-2">
@@ -72,7 +81,7 @@ export function SelectionBar({
         </Button>
         {onMakeMatch ? (
           <Button size="sm" variant="primary" onClick={onMakeMatch} disabled={!valid}>
-            Make match
+            {primaryLabel}
           </Button>
         ) : null}
       </div>

@@ -9,6 +9,7 @@ export const overflowMenuMeta = {
     'Name the trigger after its target ("More for Court 4").',
     'Pass disabledReason instead of hiding an action that is not allowed right now ("A match is on this court").',
     'Items run without their own dialog; an item that needs one opens it from onSelect.',
+    'Give description when the label alone does not say what happens (Auto Queue: "Keeps only the drafts you picked."). Use align="start" when the trigger sits beside a left-aligned button.',
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',

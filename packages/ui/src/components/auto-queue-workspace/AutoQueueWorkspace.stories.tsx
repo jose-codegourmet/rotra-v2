@@ -1,7 +1,7 @@
 import { matchLineupFixtures } from '@rotra/data/fixtures/match-lineups'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
-import { fn } from 'storybook/test'
+import { expect, fn } from 'storybook/test'
 import {
   type AutoQueueCount,
   type AutoQueueMode,
@@ -37,6 +37,7 @@ function Demo(args: AutoQueueWorkspaceProps) {
           checked ? [...current, id] : current.filter((item) => item !== id),
         )
       }
+      onUnselectAll={() => setSelected([])}
       onClear={(tab) => {
         setSelected((current) =>
           current.filter((id) => !(batches[tab]?.drafts ?? []).some((draft) => draft.id === id)),
@@ -92,6 +93,7 @@ const meta = {
     batches: fixture,
     selectedIds: [],
     onSelect: fn(),
+    onUnselectAll: fn(),
     onGenerate: fn(),
     onRegenerate: fn(),
     onRegenerateUnselected: fn(),
@@ -115,6 +117,27 @@ export const Stale: Story = {
   args: { batches: { ...fixture, available: { ...fixture.available, stale: true } } },
 }
 export const BlockedPlayer: Story = { args: { mode: 'ahead' } }
+/** Drafts picked across tabs: badges show pick order, the selection bar shows their players. */
+export const SelectedDrafts: Story = {
+  args: { count: 2, selectedIds: ['draft-available-2', 'draft-available-1'] },
+}
+/** Tap a tile to pick it, Space to pick the next, then Clear in the bar. */
+export const PickByTapAndKeyboard: Story = {
+  args: { count: 2 },
+  play: async ({ canvas, userEvent }) => {
+    const tiles = canvas.getAllByRole('button', { name: /^Draft Doubles/ })
+    await userEvent.click(tiles[0] as HTMLElement)
+    ;(canvas.getAllByRole('button', { name: /^Draft Doubles/ })[1] as HTMLElement).focus()
+    await userEvent.keyboard(' ')
+    await expect(canvas.getByRole('button', { name: /picked 2$/ })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    await expect(canvas.getByRole('button', { name: 'Add 2 to Main Queue' })).toBeEnabled()
+    await userEvent.click(canvas.getByRole('button', { name: 'Clear' }))
+    await expect(canvas.getByRole('button', { name: 'Add 0 to Main Queue' })).toBeDisabled()
+  },
+}
 export const PendingTransfer: Story = {
   args: { selectedIds: ['draft-available-1'], isPending: true },
 }

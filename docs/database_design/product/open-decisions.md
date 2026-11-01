@@ -1,6 +1,6 @@
 # Design decisions before migrations
 
-**Last verified:** 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-01 for the F07.34 wiring gaps (#317).
 
 **Status:** Review register, not a questionnaire or approval request for writing these docs.
 
@@ -51,6 +51,27 @@ and [schema dependencies](schema-dependencies.md) identify their consumers.
 - Match/create phone-linked profiles and allocate new permanent RTR IDs as soon as the entry successfully syncs, without waiting for Session done. Valid finalization still gates match-performance contribution.
 - After identity confirmation, include earlier valid guest games in personal history and ranking under existing eligibility and rolling-window rules. Preserve original facts and club history; apply attribution repeat-safely without duplicate contribution. Confirmation evidence and physical linkage/projection design remain to be specified.
 - Private online testing may precede offline recovery work. Full offline support is required before live club use; this is sequencing approval, not approval to run migrations or release an online-only product.
+
+## Gaps from the F07.34 wiring
+
+Found while wiring the first persisted preparation journey (#275, PR #318) and split out of #317 on
+November 1, 2026. Nothing here was decided by the split. The decision tickets wait for the product owner;
+the chore tickets wait for their own pickup.
+
+| Gap | Ticket | Kind |
+|---|---|---|
+| A-LICENSE *Starts on* is ignored; the typed *Reference* is kept as the note while the database generates `LIC-####` | #377 | Decision (#245) |
+| Payment history has no "activated by" (only the admin account ID is stored) | #378 | Chore |
+| A-CLUBS / A-CLUB-DETAIL miss the running session title, pending name request, earlier names and accent | #379 | Chore |
+| The six founding cities are a seeded proposal; no approved location registry | #380 | Decision (#244) |
+| Club username sign-in maps to `<username>@clubs.rotra.invalid` | #381 | Decision (#243, #244) |
+| Q-LOGIN invalid-credential copy; A-ADD-CLUB has no copy for a provider-rejected password | #382 | Decision, mockup-first |
+| Editing a saved venue: `ClubVenue` has no `revision`, so real mode refuses edits | #383 | Chore |
+| Q-CLUB / dashboard miss the founding city, username and license pricing | #384 | Chore |
+| Courts in use, games played, queued matches and "downloaded here" stay 0/false | #385 | Chore |
+| Every other domain shows "isn't connected to saved data yet" in real mode | #386 (inventory: #375) | Tracking |
+| RLS disabled on 55 public tables; `anon` can execute `rotra_next_player_sequence()` | #387 | Chore (#243), migration sign-off |
+| Club logo has no storage adapter | #374 (closed) | Done |
 
 ## Design limits
 

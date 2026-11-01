@@ -1,3 +1,5 @@
+import { NOT_CONNECTED_MESSAGE } from '../real/mode'
+
 /**
  * Mock transport failures, suitable for mapping to retry, permission, conflict or offline UI.
  * 'timeout' means no reply came back: the write may have been applied, so check before retrying.
@@ -26,5 +28,15 @@ export class ConflictError<T> extends MockError {
     message: string,
   ) {
     super('conflict', message)
+  }
+}
+
+/**
+ * Real data mode reached a domain with no Route Handler yet. Kind 'permission' so the screen refuses
+ * truthfully instead of showing mock data, but it is not an access denial: the account is allowed.
+ */
+export class NotConnectedError extends MockError {
+  constructor() {
+    super('permission', NOT_CONNECTED_MESSAGE)
   }
 }

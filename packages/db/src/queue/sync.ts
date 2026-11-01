@@ -85,7 +85,7 @@ function canonical(value: unknown): string {
 }
 
 async function sha256(text: string | Uint8Array) {
-  const bytes = typeof text === 'string' ? new TextEncoder().encode(text) : text
+  const bytes = typeof text === 'string' ? new TextEncoder().encode(text) : new Uint8Array(text)
   return new Uint8Array(await crypto.subtle.digest('SHA-256', bytes))
 }
 

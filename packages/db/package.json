@@ -22,6 +22,7 @@
     "./auth/provider-admin": "./src/auth/provider-admin.ts",
     "./admin/audit": "./src/admin/audit.ts",
     "./admin/club-logo": "./src/admin/club-logo.ts",
+    "./admin/players": "./src/admin/players.ts",
     "./admin/clubs": "./src/admin/clubs.ts",
     "./admin/licenses": "./src/admin/licenses.ts",
     "./admin/configuration": "./src/admin/configuration.ts",

@@ -8,6 +8,7 @@ import { Card } from '@rotra/ui/card'
 import { ConfirmSheet } from '@rotra/ui/confirm-sheet'
 import { EditProfileForm } from '@rotra/ui/edit-profile-form'
 import { ErrorState } from '@rotra/ui/error-state'
+import { Notice } from '@rotra/ui/notice'
 import { PageHeader } from '@rotra/ui/page-header'
 import { personalDetailsFromProfile } from '@rotra/ui/personal-details-fields/default-values'
 import { Skeleton } from '@rotra/ui/skeleton'
@@ -143,6 +144,9 @@ export function EditProfile() {
           description="Fields marked public appear on your profile for anyone to see."
         />
       </div>
+      {profile.data?.adminChangeNote ? (
+        <Notice>Changed by ROTRA Admin: {profile.data.adminChangeNote}</Notice>
+      ) : null}
       <EditProfileForm
         defaultValues={defaultValues}
         account={{

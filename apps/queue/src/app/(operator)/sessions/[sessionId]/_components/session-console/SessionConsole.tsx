@@ -28,7 +28,6 @@ import { type ComponentType, useCallback, useEffect, useMemo, useRef, useState }
 import { useDockAction } from '@/app/(operator)/_components/operator-shell/DockAction.context'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import { ActiveMatch } from '@/app/(operator)/sessions/[sessionId]/_components/active-match/ActiveMatch'
-import { AutoQueue } from '@/app/(operator)/sessions/[sessionId]/_components/auto-queue/AutoQueue'
 import { CourtsAndTime } from '@/app/(operator)/sessions/[sessionId]/_components/courts-and-time/CourtsAndTime'
 import { FacebookPost } from '@/app/(operator)/sessions/[sessionId]/_components/facebook-post/FacebookPost'
 import { JoinRequests } from '@/app/(operator)/sessions/[sessionId]/_components/join-requests/JoinRequests'
@@ -63,7 +62,6 @@ export type ConsoleSheet = 'join-requests' | 'post' | 'adjust' | 'add-court' | '
 export type MatchSheet =
   | MatchLineupRequest
   | { mode: 'suggest' }
-  | { mode: 'auto' }
   | { mode: 'regenerate' }
   /** Open match on an in-game court card: the active match sheet (Queue › Match control) */
   | { mode: 'active'; matchId: string }
@@ -333,7 +331,6 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
               {...matchEditing}
               onStartMatch={onStartMatch}
               onSuggest={() => setMatchSheet({ mode: 'suggest' })}
-              onAutoQueue={() => setMatchSheet({ mode: 'auto' })}
               onRegenerate={() => setMatchSheet({ mode: 'regenerate' })}
             />
           ) : (
@@ -391,12 +388,6 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
         open={matchSheet?.mode === 'suggest'}
         onOpenChange={(open) => setMatchSheet(open ? { mode: 'suggest' } : null)}
         onEditThenAdd={(lineup) => setMatchSheet({ mode: 'add', lineup })}
-        onAdded={showQueue}
-      />
-      <AutoQueue
-        sessionId={sessionId}
-        open={matchSheet?.mode === 'auto'}
-        onOpenChange={(open) => setMatchSheet(open ? { mode: 'auto' } : null)}
         onAdded={showQueue}
       />
       <RegenerateQueue

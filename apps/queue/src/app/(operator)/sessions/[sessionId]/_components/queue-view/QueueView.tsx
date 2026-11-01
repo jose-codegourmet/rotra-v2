@@ -13,6 +13,9 @@ import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { useSwapPlayers } from '@rotra/data/match/useSwapPlayers'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
+import { AutoQueue } from '@/app/(operator)/sessions/[sessionId]/_components/auto-queue/AutoQueue'
+import { useState } from 'react'
+import type { QueueWorkspace } from '@rotra/ui/auto-queue-workspace'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { EmptyState } from '@rotra/ui/empty-state'
@@ -32,8 +35,6 @@ export type QueueViewProps = ConsoleViewProps & {
   onEditMatch?: (matchId: string) => void
   /** Suggest: opens the Suggested match sheet (Q-SUGGEST). Disabled until given. */
   onSuggest?: () => void
-  /** Auto queue: opens the Auto queue sheet (Q-AUTO). Disabled until given. */
-  onAutoQueue?: () => void
   /** Regenerate: opens the Regenerate waiting queue? sheet (Q-REGENERATE). Disabled until given, and when the queue is empty. */
   onRegenerate?: () => void
   /** Start on a card: opens the Start match sheet for that waiting match (Q-DISPATCH, Queue › Match control). Start is hidden until given. */
@@ -63,10 +64,10 @@ export function QueueView({
   onAddMatch,
   onEditMatch,
   onSuggest,
-  onAutoQueue,
   onRegenerate,
   onStartMatch,
 }: QueueViewProps) {
+  const [workspace, setWorkspace] = useState<QueueWorkspace>('main')
   const session = useQueueSession(sessionId)
   const roster = useSessionRoster(sessionId)
   const matches = useSessionMatches(sessionId)
@@ -159,6 +160,7 @@ export function QueueView({
   }))
 
   return (
+    <AutoQueue sessionId={sessionId} workspace={workspace} onWorkspaceChange={setWorkspace} mainQueue={
     <section aria-label="Queued matches" className="flex flex-col gap-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-bold">Queued matches</h2>
@@ -169,8 +171,8 @@ export function QueueView({
           <Button size="sm" disabled={!onSuggest} onClick={onSuggest} className="sm:w-auto">
             Suggest
           </Button>
-          <Button size="sm" disabled={!onAutoQueue} onClick={onAutoQueue} className="sm:w-auto">
-            Auto queue
+          <Button size="sm" onClick={() => setWorkspace('auto')} className="sm:w-auto">
+            Auto Queue
           </Button>
           <Button
             size="sm"
@@ -203,5 +205,6 @@ export function QueueView({
         </Card>
       )}
     </section>
+    } />
   )
 }

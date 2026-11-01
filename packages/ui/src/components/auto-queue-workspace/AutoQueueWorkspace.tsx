@@ -64,7 +64,8 @@ export type AutoQueueWorkspaceProps = {
   onClear: (mode: AutoQueueMode) => void
   onClearUnselected: (mode: AutoQueueMode) => void
   /** Called after the Queue Master reviews the final selection order. */
-  onAddToMainQueue: (draftIds: string[]) => void
+  onAddToMainQueue: (draftIds: string[]) => boolean | void | Promise<boolean | void>
+  transferError?: string
   isPending?: boolean
 }
 
@@ -102,6 +103,7 @@ export function AutoQueueWorkspace({
   onClear,
   onClearUnselected,
   onAddToMainQueue,
+  transferError,
   isPending = false,
 }: AutoQueueWorkspaceProps) {
   const [reviewIds, setReviewIds] = useState<string[] | null>(null)
@@ -323,11 +325,8 @@ export function AutoQueueWorkspace({
             <Button
               variant="primary"
               disabled={!reviewIds?.length || reviewChanged || isPending}
-              onClick={() => {
-                if (reviewIds) {
-                  onAddToMainQueue(reviewIds)
-                  setReviewIds(null)
-                }
+              onClick={async () => {
+                if (reviewIds && await onAddToMainQueue(reviewIds) !== false) setReviewIds(null)
               }}
             >
               Add to Main Queue
@@ -338,6 +337,7 @@ export function AutoQueueWorkspace({
         <p className="m-0 text-[13px] text-fg2">
           Transfer order follows your selection. Drafts are revalidated when added.
         </p>
+        {transferError ? <Notice tone="error">{transferError}</Notice> : null}
         {reviewChanged ? <Notice tone="warn">Drafts changed. Review them again.</Notice> : null}
         <ol className="space-y-2 pl-5 text-fg">
           {selectedDrafts.map((draft) =>

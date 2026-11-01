@@ -86,3 +86,5 @@ Checkbox selections persist across tabs in selection order. **Add selected to Ma
 ## Q-REGENERATE — Main Queue rebuild
 
 This separate existing control reviews automatic matches rebuilt, healthy manual matches kept, manual matches needing attention rebuilt and games in play untouched. The Queue Master confirms before changes; failure restores the previous queue. Draft regeneration never silently changes Main Queue.
+
+The Queue mock app now uses `AutoQueueWorkspace` through the `AutoQueue` container. Draft batches and ordered selection live in the in-memory mock store and survive console-view switches. Generation and clearing do not write accepted matches or sync entries. Transfers are atomic: any invalid selection keeps all lineups and the review open; retry uses the same confirmation ID. A valid stale selection can be accepted after revalidation. Non-Plan-Ahead players who began playing need attention. Reload and Reset mock data discard draft state; no durable storage or API is implied.

@@ -44,3 +44,14 @@ screen loaded one, and returns an allowlisted DTO.
 - `approved`, `applying` and `failed` are all shown as "approved, not applied yet"; only `applied` is a change.
 - A provider value matching neither the original nor the proposal fails closed as `provider_mismatch`.
 - `detectContactDrift` compares both phone and email; whether the provider holds the phone as a login identifier depends on the adapter (#244).
+
+## F07.24 · Public session reads, visitor-owned join requests
+
+| Module | Commands |
+|---|---|
+| `queue/public-session` | `readPublicSession` (`public-session.page`: allowlisted `PublicSessionPage`, accepted state only; `finalizing` shows as active); `sendJoinRequest` (client `requestId`, same fields → same request; prepared + accepting only; per-session pending cap; duplicate pending phone refused); `readMyJoinRequest` (needs the receipt) |
+| `service/handler` | `handleVisitorRequest` for account-less visitor calls with private, no-store headers |
+
+- Ownership (proposal, #248): the receipt is an HMAC of the request ID under `ROTRA_VISITOR_RECEIPT_SECRET`, kept in an httpOnly cookie. Nothing about it is stored; a wrong receipt, another slug or an unknown ID are all `not_found`.
+- A request never reserves a slot. Confirmation and decline stay in `queue/session-roster`, where the session lock serializes capacity and the waitlist.
+- Request phones are returned only to the club (`joinRequestDto`), never by these reads.

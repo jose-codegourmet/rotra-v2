@@ -92,6 +92,29 @@ export async function handlePublicRead(
   }
 }
 
+/**
+ * Visitor commands and reads with no account: Request to join and My request. The visitor's
+ * receipt rides in an httpOnly cookie the Route Handler sets; responses are private and never
+ * cached, unlike `handlePublicRead`.
+ */
+export const VISITOR_COMMANDS = ['public-session.join-request', 'public-session.my-request'] as const
+
+export type VisitorCommandId = (typeof VISITOR_COMMANDS)[number]
+
+export async function handleVisitorRequest(
+  commandId: VisitorCommandId,
+  run: () => Promise<ServiceResult>,
+): Promise<Response> {
+  try {
+    if (dataMode() !== 'real') throw new ServiceError('unavailable')
+    if (!VISITOR_COMMANDS.includes(commandId)) throw new ServiceError('forbidden')
+    const result = await run()
+    return respond(result.status ?? 200, result.body, PRIVATE_HEADERS)
+  } catch (error) {
+    return failure(error, PRIVATE_HEADERS)
+  }
+}
+
 /** Hides mock session markers from the Supabase client, so they can never become a session. */
 function withoutMockCookies(cookies: CookieAdapter): CookieAdapter {
   return {

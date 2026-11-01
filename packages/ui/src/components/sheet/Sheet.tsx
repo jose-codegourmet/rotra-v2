@@ -19,6 +19,7 @@ export type SheetProps = {
   footer?: ReactNode
   /** 820 px instead of 560 px on wide screens */
   wide?: boolean
+  side?: boolean
   /** Hides the header close button (e.g. while a permanent save is pending) */
   hideClose?: boolean
   /** Stops Escape and the scrim from closing it (e.g. while a permanent save is pending) */
@@ -44,6 +45,7 @@ export function Sheet({
   children,
   footer,
   wide,
+  side,
   hideClose,
   dismissible = true,
   returnFocusRef,
@@ -62,8 +64,16 @@ export function Sheet({
   }
   wasOpen.current = open
 
-  const from = phone ? { opacity: 0, x: 0, y: 30 } : { opacity: 0, x: '-50%', y: '-48%' }
-  const to = phone ? { opacity: 1, x: 0, y: 0 } : { opacity: 1, x: '-50%', y: '-50%' }
+  const from = side
+    ? { opacity: 0, x: 30, y: 0 }
+    : phone
+      ? { opacity: 0, x: 0, y: 30 }
+      : { opacity: 0, x: '-50%', y: '-48%' }
+  const to = side
+    ? { opacity: 1, x: 0, y: 0 }
+    : phone
+      ? { opacity: 1, x: 0, y: 0 }
+      : { opacity: 1, x: '-50%', y: '-50%' }
 
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -115,14 +125,16 @@ export function Sheet({
                 transition={{ duration: reduced ? 0 : phone ? 0.18 : 0.16, ease: EASE_OUT }}
                 className={cn(
                   'fixed z-41 flex flex-col border border-border-strong bg-surface text-fg shadow-sheet',
-                  phone
-                    ? 'inset-x-0 bottom-0 max-h-[92dvh] w-full rounded-t-2xl pb-[env(safe-area-inset-bottom,0px)]'
-                    : cn(
-                        'top-1/2 left-1/2 max-h-[calc(100dvh-40px)] rounded-2xl',
-                        wide
-                          ? 'w-[min(820px,calc(100vw-24px))]'
-                          : 'w-[min(560px,calc(100vw-24px))]',
-                      ),
+                  side
+                    ? 'inset-y-0 right-0 h-dvh w-full max-w-[560px] rounded-none'
+                    : phone
+                      ? 'inset-x-0 bottom-0 max-h-[92dvh] w-full rounded-t-2xl pb-[env(safe-area-inset-bottom,0px)]'
+                      : cn(
+                          'top-1/2 left-1/2 max-h-[calc(100dvh-40px)] rounded-2xl',
+                          wide
+                            ? 'w-[min(820px,calc(100vw-24px))]'
+                            : 'w-[min(560px,calc(100vw-24px))]',
+                        ),
                   className,
                 )}
               >

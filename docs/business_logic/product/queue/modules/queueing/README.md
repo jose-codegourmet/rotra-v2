@@ -9,9 +9,9 @@
 | Add match (manual) | Operator picks format and fills every Team A / Team B slot | Manual | Yes |
 | Make match | Operator taps players in the Players view; ROTRA picks the format from the count and balances teams by level | Manual | Yes |
 | Suggest | ROTRA proposes **one** lineup with a reason; operator adds it, edits it, or skips to the next suggestion | Suggested | No, unless edited |
-| Auto queue | ROTRA adds several matches at once; operator picks 2, 3, 4, or 6 | Auto | No |
+| Auto Queue | Generates alternative drafts; the Queue Master selects and explicitly adds them to the Main Queue | Auto | No |
 
-Editing any waiting match makes it **Manual and protected**, and that includes switching two players between teams. Accepting a suggestion without edits keeps it unprotected, like Auto queue output. A suggestion whose players were switched before it was added goes in protected.
+Editing any waiting match makes it **Manual and protected**, and that includes switching two players between teams. Accepting a suggestion without edits keeps it unprotected, like transferred Auto Queue output. A suggestion whose players were switched before it was added goes in protected.
 
 **Switching sides.** Before a match starts, the operator can move a player to the other team by swapping them with a player there. Team sizes stay the same, so a 1v2 stays 1v2. Swapping two teammates changes nothing. Once a match is on court its teams are fixed. A change during play goes through a substitution.
 
@@ -65,11 +65,11 @@ The club selects one preset for the session and displays it for transparency. Th
 
 An easy game means the player's **team is favored to win**, whether because of partner strength or weaker opponents. Percentages are flexible goals, not guaranteed quotas.
 
-Balanced teams matter, but reaching the minimum-game target takes priority over mode preferences. Automatic generation uses only present players and the enabled singles/doubles formats. Fun formats are never generated.
+Balanced teams matter, but reaching the minimum-game target takes priority over mode preferences. Automatic generation uses present players and the enabled singles/doubles formats; only Plan Ahead initially includes players currently playing. Fun formats are never generated.
 
-### Reference heuristic
+### Previous prototype reference heuristic
 
-The prototype uses this heuristic. It shows the intent; the exact strength model and pairing weights remain [open](../../../open-decisions.md).
+The earlier single-batch prototype used this heuristic; it is not the approved Auto Queue load or tie rule. It shows the intent; the exact strength model and pairing weights remain [open](../../../open-decisions.md).
 
 1. Each present player has a load: games completed, plus 0.9 × waiting matches they are already in (not counted in Hard mode, which allows back-to-back games), plus a small random tie-breaker.
 2. With both formats on, each run of three matches is two doubles then one singles (doubles only when at least 4 players are present).
@@ -83,9 +83,13 @@ Errors are explained, not hidden: "Singles and doubles are both off for this ses
 
 The suggestion explains why: who is below the minimum (with games/target), or that everyone has met it and these players have the fewest games. Teams are split by assigned level to suit the mode. No win probabilities are shown.
 
-### Auto queue
+### Auto Queue workspace
 
-Shows mode, formats, present count, and priority ("players furthest below the minimum first"). The operator picks 2, 3, 4, or 6 matches. The prototype preselects 3; the default is not decided.
+The Main Queue is the shared accepted waiting list. Auto Queue holds separate alternative drafts in five tabs: Available Players, Plan Ahead, Longest Wait, Fewest Games and Catch Up. Generate on request after choosing 2, 3, 4 or 6 matches; no count is preselected. Available means present and not in play at generation; only Plan Ahead initially includes players in play, identified as dependencies. Repeated appearances in future matches are allowed; a player cannot play two active matches at once.
+
+Generation accounts for current Main Queue assignments and earlier drafts within its batch as planned load. Longest Wait and Fewest Games use that load with longest wait and stable player order for ties. Catch Up uses an explicitly chosen target for completed games, prioritizes players below it, and fills from eligible players with the lowest planned load. It stops when the target is met in the plan, the chosen batch limit is reached, or no valid match can make progress; show the reason. This target is not the session minimum. Played counts only follow existing completed-match rules; queued counts derive from current Main Queue waiting matches. A draft is not a completed result and alternative tabs do not increase the Main Queue count. Existing team-balancing heuristics are prototype references, not newly approved pairing weights.
+
+Selections persist across tabs in selection order. Review that order before adding selected drafts to the Main Queue. Add all applies to the current tab. Clear and regeneration act on drafts; Regenerate unselected preserves selected drafts. A Main Queue change makes existing drafts stale without hiding them; revalidate on transfer and show conflicts for attention. A draft cannot be transferred twice; a distinct intentional rematch is allowed. Main Queue regeneration remains a separate control and retains its existing protected-manual rules.
 
 ## Attention and regeneration
 

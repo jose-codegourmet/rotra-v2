@@ -106,3 +106,7 @@ Decided by the platform owner on October 27, 2026, while reviewing the [ROTRA Ad
 - Off Day is private unless explicitly shared.
 - Expiry deletion affects public pages, not player match history/earned rankings.
 - Do not import old MMR, EXP, six-dimension peer-rating, cost-splitting, or umpire rules as defaults.
+
+## Settled by the product owner (October 31, 2026)
+
+Queue prepared capacity, individual court windows, Auto Queue generation and draft transfer are recorded in [the owner review](../../decisions/2026-10-30-queue-flexibility/05-owner-review.md). Pairing weights, money and ranking formulas remain open where previously recorded.

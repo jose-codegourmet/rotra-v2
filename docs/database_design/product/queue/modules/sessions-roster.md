@@ -154,3 +154,7 @@ Indexes: sessions `(club_id, scheduled_start_at DESC, id)`; roster `(session_id,
 Drafted in Prisma by F07.13 with the roster-identity and waitlist-order proposals recorded in [physical schema](../../physical-schema.md#group-d--venues-club-players-queue-sessions-roster-assessments-f0713--20261031000500); both still need #245 approval.
 
 Business sources: [players](../../../../business_logic/product/queue/modules/players/README.md), [sessions](../../../../business_logic/product/queue/modules/sessions/README.md).
+
+## Queue flexibility handoff (October 31, 2026)
+
+The approved product contract uses the prepared slot budget with an explicit override and permits direct active-session admission above it. Court windows have individual planned starts and advisory ends, with starts fixed after use and session-end-following ends distinguished from fixed ends. Reconcile the proposed storage and command validation with these rules in the database epic; this note does not authorize schema or migration changes.

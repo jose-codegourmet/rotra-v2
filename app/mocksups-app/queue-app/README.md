@@ -21,3 +21,7 @@ When the prototype and the docs disagree, the docs' `open-decisions.md` files sa
 - Data is kept in this browser's `localStorage` (`rotra-queue-prototype-v3`), and the theme choice is kept in `rotra-queue-theme`.
 - Download, sync and finalization use short timers instead of real work.
 - Sample players, venues, inventory, license payments and past sessions are fixtures, not real data.
+
+## Queue flexibility review
+
+The Queue prototype is the review surface for active admission, individual court windows and the Main Queue / Auto Queue workspace. The [owner decision record](../../../docs/decisions/2026-10-30-queue-flexibility/05-owner-review.md) distinguishes the approved mock contract from later app and database implementation. The Prototype menu offers separate **36 to 37** and **Five courts** sample sessions. Data remains local prototype data.

@@ -1022,7 +1022,7 @@ const counted = (m, pid) => m.status === 'done' && all(m).includes(pid) && !part
 const gamesOf = (s, pid) => s.matches.filter((m) => counted(m, pid)).length;
 const queuedCount = (s, pid) => waiting(s).filter((m) => all(m).includes(pid)).length;
 const courtLabel = (s, id) => (s.courts.find((c) => c.id === id) || {}).label || 'Court';
-const freeCourts = (s) => s.courts.filter((c) => !active(s).some((m) => m.courts.includes(c.id)));
+const freeCourts = (s) => s.courts.filter((c) => (c.startsAt || s.start) <= Date.now() && !active(s).some((m) => m.courts.includes(c.id)));
 const courtsNeeded = (m) => (m.format === '5v5' ? 2 : 1);
 const courtsOf = (s, m) => m.courts.map((c) => courtLabel(s, c)).join(' + ');
 const courtUntil = (s, c) => c.until || s.end;
@@ -1058,7 +1058,7 @@ const AREA = {
   confirmReq: 'Roster', declineReq: 'Roster',
   togglePaid: 'Payments', markAllPaid: 'Payments', togglePresent: 'Roster', allPresent: 'Roster', allAbsent: 'Roster', giveSlot: 'Roster', fillSlots: 'Roster', removeWait: 'Roster', confirmAdd: 'Roster', confirmNew: 'Roster', setLevel: 'Roster',
   confirmStart: 'Session', saveSetup: 'Session setup', confirmDone: 'Session done', confirmPublish: 'Published results',
-  makeMatch: 'Queue', saveEditor: 'Queue', addSuggest: 'Queue', runAuto: 'Queue', confirmRegen: 'Queue', move: 'Queue', moveTo: 'Queue', swapSides: 'Queue', removeWaiting: 'Queue',
+  makeMatch: 'Queue', saveEditor: 'Queue', addSuggest: 'Queue', autoCommit: 'Queue', confirmRegen: 'Queue', move: 'Queue', moveTo: 'Queue', swapSides: 'Queue', removeWaiting: 'Queue',
   confirmDispatch: 'Matches and results', confirmResult: 'Matches and results', confirmSub: 'Matches and results', confirmInvalid: 'Matches and results',
   confirmAddCourt: 'Courts and time', removeCourt: 'Courts and time', addCourt: 'Courts and time', extend: 'Courts and time',
 };
@@ -1850,7 +1850,7 @@ function replayBounds(s) {
 function replayCourts(s, t) {
   return s.courts.map((c) => {
     const m = s.matches.find((x) => x.courts.includes(c.id) && x.startedAt <= t && t < (x.endedAt || Infinity));
-    if (!m) return `<div class="rp-court"><div class="between"><b>${esc(c.label)}</b>${chip('Free')}</div><div class="pitch empty">${courtSVG(1)}<span class="free-lbl">Free</span></div></div>`;
+    if (!m) return `<div class="rp-court"><div class="between"><b>${esc(c.label)}</b>${chip('Free')}</div><div class="pitch empty">${courtSVG(1)}<span class="free-lbl">${notStarted ? 'Not started' : 'Free'}</span></div></div>`;
     const mins = Math.floor((t - m.startedAt) / 6e4);
     return `<div class="rp-court busy"><div class="between"><b>${esc(c.label)}</b>${chip(`#${m.seq} · ${mins} min`, 'ok')}</div><div class="pitch">${courtSVG(1)}${courtSides(s, m)}</div></div>`;
   }).join('');
@@ -2045,8 +2045,8 @@ function draftFrom(s, day) {
   const d = new Date(s ? s.start : day || todayAt(19, 0) + 864e5);
   const dstr = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
   const t = (x) => { const z = new Date(x); return `${pad(z.getHours())}:${pad(z.getMinutes())}`; };
-  return s ? { id: s.id, title: s.title, date: dstr, start: t(s.start), end: t(s.end), venue: s.venue, address: s.address, venueId: ((S.venues || []).find((v) => v.name === s.venue) || {}).id || null, courts: s.courts.map((c) => c.label), singles: s.singles, doubles: s.doubles, mode: s.mode, minimum: s.minimum, minAuto: s.minAuto !== false, expected: s.expected || s.roster.length || 12, perCourt: perCourtOf(s), notes: s.notes, ...financeDraft(s) }
-    : { id: null, title: '', date: dstr, start: '19:00', end: '22:00', venue: '', address: '', venueId: null, courts: ['Court 1', 'Court 2'], singles: false, doubles: true, mode: 'fair', minimum: 4, minAuto: true, expected: 12, perCourt: S.club.perCourt || 8, notes: '', ...financeDraft(null) };
+  return s ? { id: s.id, title: s.title, date: dstr, start: t(s.start), end: t(s.end), venue: s.venue, address: s.address, venueId: ((S.venues || []).find((v) => v.name === s.venue) || {}).id || null, courts: s.courts.map((c) => c.label), courtStarts: s.courts.map((c) => c.startsAt ? t(c.startsAt) : ''), courtEnds: s.courts.map((c) => c.until ? t(c.until) : ''), singles: s.singles, doubles: s.doubles, mode: s.mode, minimum: s.minimum, minAuto: s.minAuto !== false, expected: s.expected || s.roster.length || 12, perCourt: perCourtOf(s), notes: s.notes, ...financeDraft(s) }
+    : { id: null, title: '', date: dstr, start: '19:00', end: '22:00', venue: '', address: '', venueId: null, courts: ['Court 1', 'Court 2'], courtStarts: ['', ''], courtEnds: ['', ''], singles: false, doubles: true, mode: 'fair', minimum: 4, minAuto: true, expected: 12, perCourt: S.club.perCourt || 8, notes: '', ...financeDraft(null) };
 }
 // Three pages, each holding two sections, so a session can be set up quickly. Only page 1 has required fields;
 // "Create session" works from any page and fills the rest with defaults.
@@ -2124,6 +2124,7 @@ function viewSetup() {
   if (d.step == null) d.step = 0;
   if (!d.wiz3) { const m = [0, 0, 1, 1, 2, 2]; d.step = m[d.step] ?? 0; d.visited = [...new Set((d.visited || []).map((i) => m[i] ?? 0))]; d.wiz3 = true; }
   if (d.maxStep == null) d.maxStep = d.id ? WIZ_STEPS.length - 1 : 0;
+  d.courtStarts ||= d.courts.map(() => ''); d.courtEnds ||= d.courts.map(() => '');
   if (!Array.isArray(d.shuttles)) Object.assign(d, financeDraft(d.id ? S.sessions.find((x) => x.id === d.id) : null));
   const mins = (t) => { const [h, m] = (t || '0:0').split(':').map(Number); return h * 60 + m; };
   const overnight = mins(d.end) <= mins(d.start);
@@ -2146,7 +2147,7 @@ function viewSetup() {
       <div class="field"><span>Venue</span><button type="button" class="input date-btn${e.venue ? ' bad' : ''}" id="f-venue" data-act="openVenue" aria-haspopup="dialog" aria-label="Venue: ${esc(d.venue || 'none chosen')}. Choose venue">${I.pin}<span class="stack tight" style="gap:0;min-width:0">${d.venue ? `<b>${esc(d.venue)}</b>${d.address ? `<span class="small muted">${esc(d.address)}</span>` : ''}` : '<span class="muted">Choose or add a venue</span>'}</span></button>${e.venue ? `<span class="err">${e.venue}</span>` : ''}</div>
       <p class="hint">The venue can differ from where your club was founded. It doesn't change your club's founding address.</p>`,
     `<div class="between"><span>How many courts did you book?</span><div class="row"><button class="btn sm icon-btn" data-act="courtCount" data-d="-1" aria-label="Remove a court" ${d.courts.length <= 1 ? 'disabled' : ''}>−</button><b class="tnum" style="font-size:22px;min-width:28px;text-align:center" aria-live="polite">${d.courts.length}</b><button class="btn sm icon-btn" data-act="courtCount" data-d="1" aria-label="Add a court">+</button></div></div>
-      <div class="fgrid">${d.courts.map((c, i) => `<label class="field"><span>Court ${i + 1} label</span><input class="input" id="f-court-${i}" data-bind="ui.draft.courts.${i}" value="${esc(c)}"></label>`).join('')}</div>
+      <div class="stack">${d.courts.map((c, i) => `<div class="fgrid"><label class="field"><span>Court ${i + 1} label</span><input class="input" id="f-court-${i}" data-bind="ui.draft.courts.${i}" value="${esc(c)}"></label><label class="field"><span>Planned start</span><input class="input" type="time" data-bind="ui.draft.courtStarts.${i}" value="${esc(d.courtStarts[i] || '')}"><span class="hint">Empty means session start</span></label><label class="field"><span>Planned end</span><input class="input" type="time" data-bind="ui.draft.courtEnds.${i}" value="${esc(d.courtEnds[i] || '')}"><span class="hint">Empty follows session end; next day when after midnight</span></label></div>`).join('')}</div>${e.courts ? `<span class="err">${esc(e.courts)}</span>` : ''}
       <div class="between"><div><span>Players per court</span><p class="hint">How many players you budget for each court you reserve.</p></div><div class="row"><button class="btn sm icon-btn" data-act="perCourt" data-d="-1" aria-label="Fewer players per court" ${(+d.perCourt || 8) <= 2 ? 'disabled' : ''}>−</button><b class="tnum" style="font-size:22px;min-width:28px;text-align:center" aria-live="polite">${+d.perCourt || 8}</b><button class="btn sm icon-btn" data-act="perCourt" data-d="1" aria-label="More players per court" ${(+d.perCourt || 8) >= 20 ? 'disabled' : ''}>+</button></div></div>
       ${notice('ok', `<b>${d.courts.length * (+d.perCourt || 8)} slots</b>: ${d.courts.length} court${d.courts.length > 1 ? 's' : ''} × ${+d.perCourt || 8} players. Anyone added after that goes on the waitlist.`)}
       ${(() => {
@@ -2159,7 +2160,7 @@ function viewSetup() {
       <p class="hint">You can still add or remove free courts during the session; slots follow the court count.</p>`,
     `<div class="li" style="padding:0"><div class="main"><h3>Singles</h3><p class="small muted">Include standard singles when generating matches.</p></div>${sw(d.singles, 'toggleDraft', 'data-k="singles"', 'Singles')}</div>
       <div class="li" style="padding:0"><div class="main"><h3>Doubles</h3><p class="small muted">Include standard doubles when generating matches.</p></div>${sw(d.doubles, 'toggleDraft', 'data-k="doubles"', 'Doubles')}</div>
-      ${!d.singles && !d.doubles ? notice('warn', 'With both formats off, Auto queue has nothing to generate. Only manual fun games would be possible.') : ''}
+      ${!d.singles && !d.doubles ? notice('warn', 'With both formats off, Auto Queue has nothing to generate. Only manual fun games would be possible.') : ''}
       <div class="field"><span>Mode</span><div class="choices">${Object.entries(MODES).map(([k, m]) => `<button class="choice" data-act="setDraft" data-k="mode" data-v="${k}" aria-pressed="${d.mode === k}"><b>${m.label}</b><span class="small muted">${m.text}</span></button>`).join('')}</div>
       <span class="hint">An easy game means that player's team is favored to win. Modes are flexible pairing presets. You can always change a match yourself.</span></div>`,
     `<div class="between"><span>Minimum completed games per player</span>${d.minAuto ? chip('Calculated', 'ok') : chip('Set by you')}</div>
@@ -2230,7 +2231,7 @@ function linkCard(s) {
 }
 function requestsPanel(s, inSheet) {
   const list = pendingReqs(s), done = (s.requests || []).filter((r) => r.status !== 'pending');
-  const full = openSlots(s) === 0;
+  const full = s.status !== 'active' && openSlots(s) === 0;
   if (!list.length) return `<section class="${inSheet ? '' : 'card '}stack" id="join-requests"><h2>Join requests</h2><p class="small muted">No requests waiting.${done.length ? ` ${done.filter((r) => r.status === 'confirmed').length} confirmed, ${done.filter((r) => r.status === 'declined').length} declined so far.` : ' Guests who open the session link can ask for a slot; they show up here.'}</p></section>`;
   return `<section class="${inSheet ? '' : 'card '}stack" id="join-requests"><div><h2>Join requests · ${list.length}</h2><p class="small muted">Check each one is a real person you expect (ask at the door, or match their name and phone) before confirming. Oldest first.${full ? ' Slots are full, so confirmed guests go on the waitlist.' : ''}</p></div>
     <div class="list">${list.map((r) => { const lv = r.level ?? (r.band !== 'unsure' ? bandMid(r.band) : null); return `<div class="req-row">
@@ -2247,29 +2248,29 @@ function joinCard(s) {
     const wl = mine.pid ? waitOf(s).findIndex((w) => w.pid === mine.pid) : -1;
     const [cls, title, text] = mine.status === 'pending' ? ['warn', 'Request sent', `Thanks, ${esc(mine.name)}. The Queue Master confirms every guest, usually at the venue. Your slot isn't held until they do.`]
       : mine.status === 'declined' ? ['bad', 'Request not accepted', 'The Queue Master didn\'t confirm this request. Contact them if you think it\'s a mistake.']
-      : wl >= 0 ? ['ok', `Confirmed · waitlist #${wl + 1}`, 'You\'re on the waitlist. The Queue Master gives slots in order as they open.']
+      : wl >= 0 ? ['ok', `Confirmed · waitlist #${wl + 1}`, 'You\'re on the waitlist. Ask the Queue Master about a slot.']
       : ['ok', 'Confirmed · you have a slot', 'See you on court. Your name is now in Participants.'];
     return `<section class="card stack join-card">${notice(cls, `<b>${title}</b><br>${text}`)}</section>`;
   }
   const open = openSlots(s);
   if (s.acceptReq === false) return '<section class="card join-card"><p class="small muted">This session isn\'t taking requests online. Contact the Queue Master to play.</p></section>';
-  return `<section class="card stack join-card"><div class="between"><div><h2>Want to play?</h2><p class="small muted">${open ? `${open} of ${capacityOf(s)} slots open.` : 'All slots are taken; confirmed guests join the waitlist.'} Send a quick request and the Queue Master confirms it.</p></div>
+  return `<section class="card stack join-card"><div class="between"><div><h2>Want to play?</h2><p class="small muted">${s.status === 'active' ? 'The Queue Master can admit additional players.' : open ? `${open} of ${capacityOf(s)} slots open.` : 'All slots are taken; confirmed guests join the waitlist.'} Send a quick request and the Queue Master confirms it.</p></div>
     <button class="btn primary" data-act="openJoin">Request to join</button></div></section>`;
 }
 function slotMeter(s) {
   const n = s.roster.length, cap = capacityOf(s), open = cap - n, wl = (s.waitlist || []).length;
   const state = open <= 0 ? 'full' : open <= 2 ? 'near' : 'ok';
-  const text = open > 0 ? `${open} left before the waitlist` : open === 0 ? 'Full · new players go on the waitlist' : `${-open} over budget · new players go on the waitlist`;
+  const text = s.status === 'active' ? `${open < 0 ? `${-open} over budget` : open === 0 ? 'Budget full' : `${open} within budget`} · additional players can be admitted` : open > 0 ? `${open} left before the waitlist` : open === 0 ? 'Full · new players go on the waitlist' : `${-open} over budget · new players go on the waitlist`;
   return `<div class="slot-meter ${state}"><div class="sm-top"><b class="tnum">${n}/${cap}</b><span>slots · ${text}${wl ? ` · ${wl} on the waitlist` : ''}</span></div>
-    <div class="sm-bar" role="meter" aria-valuemin="0" aria-valuemax="${cap}" aria-valuenow="${n}" aria-label="Slots used: ${n} of ${cap}"><i style="width:${Math.min(100, cap ? (n / cap) * 100 : 100)}%"></i></div></div>`;
+    <div class="sm-bar" role="meter" aria-valuemin="0" aria-valuemax="${cap}" aria-valuenow="${Math.min(n, cap)}" aria-label="Slots used: ${n} of ${cap}"><i style="width:${Math.min(100, cap ? (n / cap) * 100 : 100)}%"></i></div></div>`;
 }
 function waitlistPanel(s) {
   const wl = waitOf(s), open = openSlots(s), cap = capacityOf(s);
-  return `<section class="card stack" id="waitlist"><div class="between"><div><h2>Waitlist${wl.length ? ` · ${wl.length}` : ''}</h2><p class="small muted">Slots: <b>${s.roster.length} of ${cap}</b> used (${s.courts.length} court${s.courts.length > 1 ? 's' : ''} × ${perCourtOf(s)} players)${open ? ` · ${open} open` : ' · full'}. First come, first served.</p></div>
+  return `<section class="card stack" id="waitlist"><div class="between"><div><h2>Waitlist${wl.length ? ` · ${wl.length}` : ''}</h2><p class="small muted">Slots: <b>${s.roster.length} of ${cap}</b> used (${s.courts.length} court${s.courts.length > 1 ? 's' : ''} × ${perCourtOf(s)} players)${open ? ` · ${open} open` : ' · full'}. ${s.status === 'active' ? 'Choose any player to admit.' : 'First come, first served.'}</p></div>
       ${wl.length && open ? `<button class="btn sm primary" data-act="fillSlots">Fill ${Math.min(open, wl.length)} open slot${Math.min(open, wl.length) > 1 ? 's' : ''}</button>` : ''}</div>
     ${wl.length ? `<div class="list">${wl.map((w, i) => { const p = P(w.pid); return `<div class="li"><span class="qt-pos">#${i + 1}</span>${faceBtn(p)}<div class="main"><b>${esc(p.name)}</b><p class="small muted">${esc(lvLabel(w.level))} · waiting since ${fmtTime(w.at)}</p></div>
-      <button class="btn xs ${open ? 'primary' : ''}" data-act="giveSlot" data-pid="${w.pid}" ${open ? '' : 'title="Over your slot budget"'}>${open ? 'Give slot' : 'Give slot anyway'}</button><button class="btn xs ghost icon-btn" data-act="removeWait" data-pid="${w.pid}" aria-label="Remove ${esc(p.name)} from the waitlist">${I.x}</button></div>`; }).join('')}</div>`
-      : `<p class="small muted">${open ? 'Nobody is waiting.' : 'Nobody is waiting. Players added from now on join the waitlist.'}</p>`}
+      <button class="btn xs ${open ? 'primary' : ''}" data-act="giveSlot" data-pid="${w.pid}" ${open ? '' : 'title="Over your slot budget"'}>${s.status === 'active' ? 'Admit player' : open ? 'Give slot' : 'Give slot anyway'}</button><button class="btn xs ghost icon-btn" data-act="removeWait" data-pid="${w.pid}" aria-label="Remove ${esc(p.name)} from the waitlist">${I.x}</button></div>`; }).join('')}</div>`
+      : `<p class="small muted">${s.status === 'active' || open ? 'Nobody is waiting.' : 'Nobody is waiting. Players added from now on join the waitlist.'}</p>`}
   </section>`;
 }
 
@@ -2396,15 +2397,16 @@ function courtsPane(s) {
       const merged = m.courts.length > 1;
       m.courts.forEach((x) => { if (x !== c.id) skip.add(x); });
       const subs = (m.subs || []).length;
-      return `<div class="court busy ${merged ? 'merged' : ''}"><div class="ct"><div><h3>${esc(merged ? courtsOf(s, m) : c.label)}</h3><span class="small muted">Until ${fmtTime(courtUntil(s, c))}</span></div>${chip(merged ? 'Merged · in game' : 'In game', 'ok')}</div>
+      return `<div class="court busy ${merged ? 'merged' : ''}"><div class="ct"><div><h3>${esc(merged ? courtsOf(s, m) : c.label)}</h3><span class="small muted">Until ${fmtTime(courtUntil(s, c))}</span><button class="btn xs" data-act="editCourt" data-id="${c.id}">Edit</button></div>${chip(merged ? 'Merged · in game' : 'In game', 'ok')}</div>
         <div class="pitch ${merged ? 'tall' : ''}" role="img" aria-label="${esc(`Team A ${listNames(m.teamA)} versus Team B ${listNames(m.teamB)}`)}">${courtSVG(merged ? 2 : 1)}${courtSides(s, m)}</div>
         <p class="small muted">${FORMAT_LABEL[m.format]} · Match ${m.seq} · ${mins} min${subs ? ` · ${subs} substitution${subs > 1 ? 's' : ''}` : ''}</p>
         <div class="row" style="margin-top:auto"><button class="btn sm primary" data-act="openMatch" data-id="${m.id}">Open match</button></div></div>`;
     }
-    const eligible = list.find((x) => !blockOf(s, x));
+    const notStarted = (c.startsAt || s.start) > Date.now();
+    const eligible = notStarted ? null : list.find((x) => !blockOf(s, x));
     const first = list[0];
     let body;
-    if (eligible) {
+    if (notStarted) { body = `<p class="small muted">Available from ${fmtTime(c.startsAt)}. Matches do not start automatically.</p>`; } else if (eligible) {
       body = `${first && first.id !== eligible.id ? `<p class="small muted">Skipped #1: ${esc(blockOf(s, first).text)}.</p>` : ''}
         <p class="small"><span class="muted">Next eligible:</span> #${list.indexOf(eligible) + 1} · ${FORMAT_LABEL[eligible.format]}</p>
         <p class="small">${esc(listNames(eligible.teamA))} <span class="muted">vs</span> ${esc(listNames(eligible.teamB))}</p>
@@ -2413,24 +2415,71 @@ function courtsPane(s) {
       body = `<p class="small muted">${list.length ? `No waiting match can start: ${esc(blockOf(s, first).text)}.` : 'The queue is empty.'}</p>
         <div class="row" style="margin-top:auto"><button class="btn sm" data-act="openEditor">Add match</button></div>`;
     }
-    const over = Date.now() > courtUntil(s, c);
-    return `<div class="court"><div class="ct"><div><h3>${esc(c.label)}</h3><span class="small ${over ? '' : 'muted'}" style="${over ? 'color:var(--warn)' : ''}">${over ? 'Booking ended' : 'Until'} ${fmtTime(courtUntil(s, c))}</span></div><div class="row" style="gap:6px;flex-wrap:nowrap">${chip('Free')}<button class="btn xs ghost" data-act="removeCourt" data-id="${c.id}" aria-label="Remove ${esc(c.label)}" ${s.courts.length <= 1 ? 'disabled title="A session needs at least one court"' : ''}>${I.x} Remove</button></div></div><div class="pitch empty">${courtSVG(1)}<span class="free-lbl">Free</span></div>${body}</div>`;
+    const over = Date.now() > courtUntil(s, c); const nextDay = new Date(courtUntil(s,c)).getDate() !== new Date(s.start).getDate();
+    return `<div class="court"><div class="ct"><div><h3>${esc(c.label)}</h3><span class="small ${over ? '' : 'muted'}" style="${over ? 'color:var(--warn)' : ''}">${over ? 'Booking ended' : 'Until'} ${fmtTime(courtUntil(s, c))}${nextDay ? ' · next day' : ''}</span></div><div class="row" style="gap:6px;flex-wrap:nowrap">${chip(notStarted ? 'Not started' : 'Free')}<button class="btn xs" data-act="editCourt" data-id="${c.id}">Edit</button><button class="btn xs ghost" data-act="removeCourt" data-id="${c.id}" aria-label="Remove ${esc(c.label)}" ${s.courts.length <= 1 ? 'disabled title="A session needs at least one court"' : ''}>${I.x} Remove</button></div></div><div class="pitch empty">${courtSVG(1)}<span class="free-lbl">${notStarted ? 'Not started' : 'Free'}</span></div>${body}</div>`;
   }).join('');
   return `<div class="between"><h2>Courts</h2><span class="small muted">${freeCourts(s).length} of ${s.courts.length} free</span></div>
-    <div class="courts">${cards}<button class="court add-court" data-act="quickAddCourt" aria-label="Add Court ${s.courts.length + 1}"><span class="plus" aria-hidden="true">+</span><span>Add court</span><span class="small muted" style="font-weight:500">Becomes Court ${s.courts.length + 1}, free right away</span></button></div>
+    <div class="courts">${cards}<button class="court add-court" data-act="quickAddCourt" aria-label="Add Court ${s.courts.length + 1}"><span class="plus" aria-hidden="true">+</span><span>Add court</span><span class="small muted" style="font-weight:500">Set a planned court window</span></button></div>
     <p class="small muted">A match never starts by itself when a court frees up. You start each one.</p>`;
 }
 
 function queuePane(s) {
   const list = waiting(s);
   const att = attention(s).length;
-  return `<div class="between"><h2>Queued matches</h2><div class="row acts"><button class="btn sm" data-act="openEditor">Add match</button><button class="btn sm" data-act="openSuggest">Suggest</button><button class="btn sm" data-act="openAuto">Auto queue</button><button class="btn sm ${att ? 'primary' : ''}" data-act="openRegen" ${list.length ? '' : 'disabled'}>Regenerate</button></div></div>
+  if (S.ui.queueWorkspace === 'auto') return autoWorkspace(s);
+  return `<div class="seg" role="group" aria-label="Queue workspace"><button aria-pressed="true">Main Queue</button><button data-act="queueWorkspace" data-k="auto">Auto Queue</button></div><div class="between"><h2>Queued matches</h2><div class="row acts"><button class="btn sm" data-act="openEditor">Add match</button><button class="btn sm" data-act="openSuggest">Suggest</button><button class="btn sm" data-act="queueWorkspace" data-k="auto">Auto Queue</button><button class="btn sm ${att ? 'primary' : ''}" data-act="openRegen" ${list.length ? '' : 'disabled'}>Regenerate</button></div></div>
     ${att ? notice('warn', `${att} waiting match${att > 1 ? 'es need' : ' needs'} attention. Edit the lineup to swap the player, or regenerate.`) : ''}
     <p class="small muted">One waiting list for every court. ${MODES[s.mode].label} mode guides suggestions; you can override any of it.</p>
     ${list.length ? `<p class="small muted">Order runs in a snake: left to right, then back right to left on the next row. Drag a card by ⠿ to reorder (arrow keys work on the handle too). Drag a player onto someone on the other team to switch sides. Any card marked ready can start now, whatever its place.</p>
     <div class="qgrid" style="grid-template-columns:repeat(${queueCols()}, minmax(0, 1fr))">${list.map((m, i) => queueCard(s, m, i, list.length, queueCols())).join('')}</div>`
-      : `<div class="card empty">No waiting matches. Use Auto queue to generate a few, or add one yourself.</div>`}`;
+      : `<div class="card empty">No waiting matches. Use Auto Queue to generate a few, or add one yourself.</div>`}`;
 }
+
+const AUTO_MODES = { available: 'Available Players', ahead: 'Plan Ahead', wait: 'Longest Wait', fewest: 'Fewest Games', catchup: 'Catch Up' };
+function autoState(s) {
+  if (!S.ui.autoDraft || S.ui.autoDraft.sid !== s.id) S.ui.autoDraft = { sid: s.id, tab: 'available', batches: {}, selected: [], count: null, target: '', next: 1 };
+  return S.ui.autoDraft;
+}
+function queueFingerprint(s) { return JSON.stringify(waiting(s).map((m) => [m.id, m.pos, m.format, m.teamA, m.teamB])); }
+function autoWorkspace(s) {
+  const a = autoState(s), tab = a.tab, batch = a.batches[tab] || { cards: [] };
+  const stale = batch.fingerprint && batch.fingerprint !== queueFingerprint(s);
+  return `<div class="seg" role="group" aria-label="Queue workspace"><button data-act="queueWorkspace" data-k="main">Main Queue</button><button aria-pressed="true">Auto Queue</button></div>
+    <div class="between"><h2>Auto Queue</h2><span class="small muted">Drafts are not waiting matches</span></div>
+    <div class="seg" role="group" aria-label="Generation strategy">${Object.entries(AUTO_MODES).map(([k, label]) => `<button id="auto-tab-${k}" data-act="autoTab" data-k="${k}" aria-pressed="${tab === k}">${label}</button>`).join('')}</div>
+    <p class="small muted">${tab === 'ahead' ? 'Includes present players who are still playing; those lineups wait until they are free.' : tab === 'catchup' ? 'Choose a target for completed games. Planned games do not count as played.' : 'Uses present players who are not currently playing.'}</p>
+    <div class="field"><span>Number of matches</span><div class="row">${[2,3,4,6].map((n) => `<button id="auto-count-${n}" class="btn sm" data-act="autoCount" data-n="${n}" aria-pressed="${a.count === n}">${n}</button>`).join('')}</div></div>
+    ${tab === 'catchup' ? `<label class="field"><span>Catch Up target</span><input id="auto-target" class="input" type="number" min="1" step="1" data-bind="ui.autoDraft.target" value="${esc(String(a.target))}" aria-label="Catch Up target"></label>` : ''}
+    <div class="row"><button class="btn primary" data-act="autoGenerate" ${a.count ? '' : 'disabled'}>Generate</button><button class="btn" data-act="autoRegenerate" ${batch.cards.length && a.count ? '' : 'disabled'}>Regenerate</button><button class="btn" data-act="autoRegenerateUnselected" ${batch.cards.length && a.count ? '' : 'disabled'}>Regenerate unselected</button><button class="btn" data-act="autoClearUnselected" ${batch.cards.length ? '' : 'disabled'}>Clear unselected</button><button class="btn" data-act="autoClear" ${batch.cards.length ? '' : 'disabled'}>Clear</button></div>
+    ${a.error ? notice('warn', esc(a.error)) : ''}${stale ? notice('warn', 'Main Queue changed since generation. Drafts are stale; review and revalidate before adding.') : ''}${batch.stop ? `<p class="small muted">${esc(batch.stop)}</p>` : ''}
+    ${batch.cards.length ? `<div class="stack">${batch.cards.map((m) => `<article class="card stack"><label><input id="auto-select-${m.draftId}" type="checkbox" data-act-change="autoSelect" data-id="${m.draftId}" ${a.selected.includes(m.draftId) ? 'checked' : ''}> Select ${esc(FORMAT_LABEL[m.format])}</label><p>${esc(listNames(m.teamA))} vs ${esc(listNames(m.teamB))}</p><p class="small muted">${esc(AUTO_MODES[tab])} · ${all(m).map((pid) => `${esc(short(pid))}: ${gamesOf(s,pid)} played, ${queuedCount(s,pid)} queued, ${batch.cards.filter((draft) => all(draft).includes(pid)).length} suggested${activeOf(s,pid) ? ', playing now' : ''}`).join(' · ')}</p></article>`).join('')}</div>` : '<div class="card empty">No drafts in this tab. Choose a count and generate.</div>'}
+    <div class="row"><button class="btn primary" data-act="autoReview" ${a.selected.length ? '' : 'disabled'}>Add selected to Main Queue (${a.selected.length})</button><button class="btn" data-act="autoAddTab" ${batch.cards.length ? '' : 'disabled'}>Add all from this tab</button></div>`;
+}
+function generateDrafts(s, tab, count, target, fixed) {
+  const players = s.roster.filter((r) => r.present && (tab === 'ahead' || !activeOf(s, r.pid))).map((r) => r.pid);
+  const formats = [...(s.doubles ? ['doubles'] : []), ...(s.singles ? ['singles'] : [])];
+  if (!formats.length) return { error: 'Enable Singles or Doubles before generating.' };
+  if (tab === 'catchup' && (!Number.isInteger(+target) || +target < 1 || target === '')) return { error: 'Choose a whole-number Catch Up target of at least 1.' };
+  const load = Object.fromEntries(players.map((p) => [p, gamesOf(s,p) + queuedCount(s,p)]));
+  fixed.forEach((m) => all(m).forEach((p) => { if (p in load) load[p]++; }));
+  const out = []; let stop = 'Selected batch limit reached.';
+  for (let i=0; i<count; i++) {
+    if (tab === 'catchup' && players.every((p) => load[p] >= +target)) { stop = 'Target met in the plan.'; break; }
+    const fmt = formats.length === 2 ? (players.length >= 4 && i % 3 !== 2 ? 'doubles' : 'singles') : formats[0];
+    const size = fmt === 'doubles' ? 4 : 2;
+    if (players.length < size) { stop = 'No valid match can make progress with the available players.'; break; }
+    const sorted = players.slice().sort((x,y) => {
+      const wait = restInfo(s,y).mins - restInfo(s,x).mins;
+      const priority = tab === 'catchup' ? ((load[x] < +target ? 0 : 1) - (load[y] < +target ? 0 : 1)) || load[x]-load[y] : tab === 'wait' ? (load[x]-gamesOf(s,x))-(load[y]-gamesOf(s,y)) || wait : tab === 'ahead' ? Number(!!activeOf(s,x))-Number(!!activeOf(s,y)) || load[x]-load[y] : load[x]-load[y];
+      return priority || wait || players.indexOf(x)-players.indexOf(y);
+    });
+    const pick = sorted.slice(0,size);
+    if (tab === 'catchup' && !pick.some((p) => load[p] < +target)) { stop = 'No valid match can make progress toward the target.'; break; }
+    out.push({ format: fmt, ...splitTeams(s,pick,fmt) }); pick.forEach((p) => load[p]++);
+  }
+  return { matches: out, stop };
+}
+
 // One row of the next queued matches on the Session tab; the last tile opens the full Queue tab.
 function upcomingPane(s) {
   const list = waiting(s);
@@ -2485,6 +2534,8 @@ function playersPane(s) {
   rows.sort(sorters[f.sort] || sorters.wait);
   const counts = { avail: s.roster.filter((r) => r.present && !activeOf(s, r.pid)).length, present: s.roster.filter((r) => r.present).length, all: s.roster.length };
   const plan = matchPlan(s, sel);
+  const draftState = S.ui.autoDraft && S.ui.autoDraft.sid === s.id ? S.ui.autoDraft : null;
+  const currentDrafts = draftState?.batches[draftState.tab]?.cards || [];
   return `<div class="between"><div><h2>Players</h2><p class="small muted">Tap players to pick them, then make a match. ${counts.present} present of ${counts.all}.</p></div><button class="btn sm" data-act="openAdd">Add late player</button></div>
     <div class="row" style="gap:10px">
       <div class="seg" role="group" aria-label="Show">${[['avail', `Available · ${counts.avail}`], ['present', `Present · ${counts.present}`], ['all', `Everyone · ${counts.all}`]].map(([k, l]) => `<button aria-pressed="${f.show === k}" data-act="plSet" data-k="show" data-v="${k}">${l}</button>`).join('')}</div>
@@ -2496,7 +2547,7 @@ function playersPane(s) {
       return `<article class="pc3 ${x.a ? 'playing' : ''} ${x.r.present ? '' : 'away'}" role="button" tabindex="0" data-act="selPlayer" data-pid="${x.r.pid}" aria-pressed="${i >= 0}" aria-label="${esc(x.p.name)}, ${esc(lvLabel(x.r.level))}, ${x.g} games">
         ${i >= 0 ? `<span class="sel-badge" aria-hidden="true">${i + 1}</span>` : ''}
         <div class="pc3-top">${avatar(x.p)}<div style="min-width:0"><div class="pc3-name">${esc(x.p.name)}</div><div class="pc3-lv">${esc(lvLabel(x.r.level))}</div></div></div>
-        <div class="pc3-stats"><span class="tnum">${x.g}/${s.minimum} games</span>${x.a || !x.r.present ? '' : `<span class="tnum">${x.mins} min wait</span>`}</div>
+        <div class="pc3-stats"><span class="tnum">${x.g} played · ${queuedCount(s, x.r.pid)} queued · ${currentDrafts.filter((m) => all(m).includes(x.r.pid)).length} suggested (${esc(draftState ? AUTO_MODES[draftState.tab] : 'current tab')})</span>${x.a || !x.r.present ? '' : `<span class="tnum">${x.mins} min wait</span>`}</div>
         <div class="between" style="flex-wrap:nowrap"><span class="pc3-st small">${st}</span>${sw(x.r.present, 'togglePresent', `data-pid="${x.r.pid}"`, `${x.p.name} present`)}</div>
       </article>`;
     }).join('')}</div>` : `<div class="card empty">${f.show === 'avail' ? 'No one is free right now. Try Present or Everyone.' : 'No players yet.'}</div>`}
@@ -2716,6 +2767,7 @@ const SHEETS = {
       <div class="li" style="padding:0"><div class="main"><h3>Simulate expired license</h3><p class="small muted">Shows the license gate on the home screen.</p></div>${sw(S.licenseExpired, 'toggleLicense', '', 'Simulate expired license')}</div>
       ${S.club.nameRequest ? `<div class="li" style="padding:0"><div class="main"><h3>Approve name change</h3><p class="small muted">Act as the platform owner approving “${esc(S.club.nameRequest.name)}” in Admin.</p></div><button class="btn sm" data-act="approveNameRequest">Approve</button></div>` : ''}
       ${(() => { const s = S.sessions.find((x) => x.status === 'active') || S.sessions.filter((x) => x.status === 'prepared').sort((a, b) => a.start - b.start)[0]; return s ? `<div class="li" style="padding:0"><div class="main"><h3>Guest join request</h3><p class="small muted">Open ${esc(s.title)}'s link as a guest, or drop in a sample request.</p></div><div class="row"><button class="btn sm" data-act="openGuest" data-id="${s.id}">Open as guest</button><button class="btn sm" data-act="fakeReq" data-id="${s.id}">Add sample</button></div></div>` : ''; })()}
+      <div class="li" style="padding:0"><div class="main"><h3>Queue flexibility examples</h3><p class="small muted">Load a separate sample session to review admission or court windows.</p></div><div class="row"><button class="btn sm" data-act="flexExample" data-k="admission">36 to 37</button><button class="btn sm" data-act="flexExample" data-k="courts">Five courts</button></div></div>
       ${S.screen !== 'login' ? '<button class="btn" data-act="openSignOut">Sign out</button>' : ''}
       <button class="btn danger" data-act="reset">Reset demo data</button>`, '<button class="btn" data-act="closeSheet">Close</button>');
   },
@@ -2886,9 +2938,9 @@ const SHEETS = {
   add(sh) {
     const s = cur();
     const inRoster = new Set(s.roster.map((r) => r.pid).concat((s.waitlist || []).map((w) => w.pid)));
-    const full = openSlots(s) === 0;
-    const q = (sh.q || '').toLowerCase();
     const live = s.status === 'active';
+    const full = !live && openSlots(s) === 0;
+    const q = (sh.q || '').toLowerCase();
     const tab = sh.tab || 'saved';
     let body = `${notice('', `Adding to <b>${esc(s.title)}</b>.${live ? ' Late players get a level now, and it locks for the rest of the session.' : ''}`)}${sh.last && !sh.pick ? `<div role="status">${notice('ok', `${esc(sh.last)}${sh.added > 1 ? ` <span class="small muted">· ${sh.added} added so far</span>` : ''}`)}</div>` : ''}${full ? notice('warn', `<b>All ${capacityOf(s)} slots are taken.</b> New players go on the waitlist as #${waitOf(s).length + 1}. You can give them a slot later.`) : ''}`;
     if (sh.pick) {
@@ -3046,14 +3098,9 @@ const SHEETS = {
         <p class="small muted">Teams are split by assigned levels to suit ${MODES[s.mode].label} mode.</p></div>`,
       '<button class="btn" data-act="skipSuggest">Skip suggestion</button><button class="btn" data-act="editSuggest">Edit then add</button><button class="btn primary" data-act="addSuggest">Add to queue</button>');
   },
-  auto(sh) {
-    const s = cur();
-    const present = s.roster.filter((r) => r.present).length;
-    return sheetShell('Auto queue', `<dl class="kv"><dt>Mode</dt><dd>${MODES[s.mode].label}</dd><dt>Formats</dt><dd>${fmtFormats(s)}</dd><dt>Present</dt><dd>${present} players</dd><dt>Priority</dt><dd>Players furthest below ${s.minimum} games first</dd></dl>
-      <div class="field"><span>Matches to add</span><div class="row">${[2, 3, 4, 6].map((n) => `<button class="btn sm" aria-pressed="${sh.n === n}" data-act="sheetSet" data-k="n" data-v="${n}" data-num>${n}</button>`).join('')}</div><span class="hint">Prototype control. ROTRA hasn't decided the default number of rounds.</span></div>
-      <p class="small muted">Only present players are used. Nothing starts by itself, and fun formats are never generated.</p>
-      ${sh.error ? notice('warn', esc(sh.error)) : ''}`,
-      `<button class="btn" data-act="closeSheet">Cancel</button><button class="btn primary" data-act="runAuto">Generate ${sh.n} matches</button>`);
+  autoReview(sh) {
+    const s = cur(), a = autoState(s), cards = Object.values(a.batches).flatMap((b) => b.cards), selected = sh.ids.map((id) => cards.find((m) => m.draftId === id)).filter(Boolean);
+    return sheetShell('Add selected to Main Queue?', `<p class="small muted">Transfer order follows your selection. Drafts are revalidated when added.</p><ol>${selected.map((m) => `<li>${esc(listNames(m.teamA))} vs ${esc(listNames(m.teamB))}</li>`).join('')}</ol>`, '<button class="btn" data-act="closeSheet">Back</button><button class="btn primary" data-act="autoCommit">Add to Main Queue</button>');
   },
   regen() {
     const s = cur();
@@ -3098,12 +3145,12 @@ const SHEETS = {
       </div>`, `<button class="btn" data-act="closeSheet">Cancel</button><button class="btn primary" data-act="saveInvItem">${sh.id ? 'Save item' : 'Add item'}</button>`);
   },
   addCourt(sh) {
-    const s = cur();
+    const s = cur(); const existing = sh.id && s.courts.find((c) => c.id === sh.id); const used = existing && s.matches.some((m) => (m.courts || []).includes(existing.id));
     const until = sh.mode === 'end' ? s.end : (sh.time ? timeOnSession(s, sh.time) : null);
     const mins = until ? Math.round((until - Date.now()) / 60000) : null;
-    return sheetShell(`Add ${esc((sh.label || '').trim() || `Court ${s.courts.length + 1}`)}?`, `
+    return sheetShell(`${existing ? 'Edit' : 'Add'} ${esc((sh.label || '').trim() || `Court ${s.courts.length + 1}`)}?`, `
       <label class="field"><span>Court label</span><input class="input" id="ac-label" data-bind="ui.sheet.label" data-rerender value="${esc(sh.label || '')}" data-autofocus></label>
-      <div class="field"><span>Open until</span>
+      <label class="field"><span>Planned start</span><input class="input" type="time" data-bind="ui.sheet.startTime" value="${esc(sh.startTime || '')}" ${used ? 'disabled' : ''}><span class="hint">${used ? 'Start is fixed after use.' : 'The court is unavailable before this time.'}</span></label><div class="field"><span>Open until</span>
         <div class="choices">
           <button class="choice" aria-pressed="${sh.mode === 'end'}" data-act="sheetSet" data-k="mode" data-v="end"><b>Until the session ends</b><span class="small muted">${fmtTime(s.end)} · moves if you extend time</span></button>
           <button class="choice" aria-pressed="${sh.mode === 'time'}" data-act="sheetSet" data-k="mode" data-v="time"><b>Until a set time</b><span class="small muted">For a court booked for less time</span></button>
@@ -3111,9 +3158,9 @@ const SHEETS = {
         ${sh.mode === 'time' ? `<input class="input${sh.err ? ' bad' : ''}" id="ac-time" type="time" style="max-width:180px" data-bind="ui.sheet.time" data-rerender value="${esc(sh.time || '')}" aria-label="Open until">` : ''}
         ${sh.err ? `<span class="err">${esc(sh.err)}</span>` : ''}
       </div>
-      ${until && mins > 0 ? notice('ok', `<b>${esc((sh.label || '').trim() || `Court ${s.courts.length + 1}`)}</b> will be free right away and open until <b>${fmtTime(until)}</b>, about ${fmtDur(0, mins * 60000)} from now.`) : ''}
+      ${!existing && until && mins > 0 ? notice('ok', `<b>${esc((sh.label || '').trim() || `Court ${s.courts.length + 1}`)}</b> is planned to open until <b>${fmtTime(until)}</b>, about ${fmtDur(0, mins * 60000)} from now.`) : ''}
       <p class="small muted">Courts show their closing time on the card. ROTRA doesn't stop a game at that time; it's a reminder for you.</p>`,
-      `<button class="btn" data-act="closeSheet">Cancel</button><button class="btn primary" data-act="confirmAddCourt">Add ${esc((sh.label || '').trim() || `Court ${s.courts.length + 1}`)}</button>`);
+      `<button class="btn" data-act="closeSheet">Cancel</button><button class="btn primary" data-act="confirmAddCourt">${existing ? 'Save court' : `Add ${esc((sh.label || '').trim() || `Court ${s.courts.length + 1}`)}`}</button>`);
   },
   done(sh) {
     const s = cur();
@@ -3309,6 +3356,13 @@ const ACT = {
     s.requests = [...(s.requests || []), { id: `q${Date.now()}`, name, nick, phone, band, at: Date.now(), status: 'pending' }];
     save(); render(); toast(`${name} sent a join request to ${s.title}`);
   },
+  flexExample: (d) => {
+    const base = S.sessions.find((x) => x.status === 'active') || S.sessions[0]; const day = new Date(); day.setHours(19,30,0,0); const start = day.getTime(); const end = start + 3 * 3600000;
+    const players = Array.from({length: 37}, (_,i) => { const id = `flex-${i+1}`; if (!S.players.some((p) => p.id === id)) S.players.push({ id, name: `Sample Player ${i+1}`, identity: 'guest', sugg: 4, added: Date.now() }); return id; });
+    const id = `flex-${d.k}-${Date.now()}`; const admission = d.k === 'admission'; const courts = Array.from({length: admission ? 4 : 5}, (_,i) => ({ id: `fc${i+1}`, label: `Court ${i+1}`, startsAt: start + (i >= 3 ? 3600000 : 0), until: i === 4 ? start + 2 * 3600000 : end }));
+    S.sessions.push({ ...JSON.parse(JSON.stringify(base)), id, title: admission ? '36 to 37 · admission example' : 'Five-court booking example', start, end, startedAt: start, status: 'active', courts, perCourt: 9, roster: players.slice(0,36).map((pid) => ({pid, level: 4, present: true, locked: true, presentAt: start})), waitlist: admission ? [{pid: players[36], level: 4, at: start}] : [], matches: [], seq: 0, requests: [], payments: {} });
+    S.currentId = id; S.screen = 'console'; S.ui.sheet = null; S.ui.pane = admission ? 'roster' : 'live'; save(); render();
+  },
   openRequests: () => openSheet({ type: 'requests' }),
   peekSession: (d) => openSheet({ type: 'peek', id: d.id }),
   confirmReq: (d) => {
@@ -3318,7 +3372,7 @@ const ACT = {
     const pid = `p${Date.now()}`;
     S.players.push({ id: pid, name: r.name, nick: r.nick, identity: r.phone ? 'pending' : 'guest', rtr: null, sugg: null, prior: 0, base: null, added: Date.now() });
     r.status = 'confirmed'; r.pid = pid; r.err = '';
-    if (!openSlots(s)) { s.waitlist = [...(s.waitlist || []), { pid, level: +lv, at: r.at }]; commit(`${r.name} confirmed from a join request · waitlist #${waitOf(s).findIndex((w) => w.pid === pid) + 1}`); }
+    if (s.status !== 'active' && !openSlots(s)) { s.waitlist = [...(s.waitlist || []), { pid, level: +lv, at: r.at }]; commit(`${r.name} confirmed from a join request · waitlist #${waitOf(s).findIndex((w) => w.pid === pid) + 1}`); }
     else { s.roster.push({ pid, level: +lv, present: s.status === 'active', locked: s.status === 'active', presentAt: Date.now() }); commit(`${r.name} confirmed from a join request · ${lvLabel(+lv)}`); }
     render();
   },
@@ -3489,7 +3543,7 @@ const ACT = {
     d.minAuto = false; render(); const el = document.getElementById('f-min'); if (el) el.focus();
   },
   useEstimate: () => { S.ui.draft.minAuto = true; render(); },
-  courtCount: (d) => { const c = S.ui.draft.courts; if (+d.d > 0) c.push(`Court ${c.length + 1}`); else if (c.length > 1) c.pop(); render(); },
+  courtCount: (d) => { const x = S.ui.draft, c = x.courts; if (+d.d > 0) { c.push(`Court ${c.length + 1}`); x.courtStarts.push(''); x.courtEnds.push(''); } else if (c.length > 1) { c.pop(); x.courtStarts.pop(); x.courtEnds.pop(); } render(); },
   saveSetup: () => {
     const d = S.ui.draft, e = {};
     if (!d.title.trim()) e.title = 'Give the session a title.';
@@ -3503,6 +3557,8 @@ const ACT = {
     if (d.courtFee !== '' && !(+d.courtFee >= 0)) e.courtFee = 'Use 0 or more, or leave it empty.';
     if (d.entryFee !== '' && !(+d.entryFee >= 0)) e.entryFee = 'Use 0 or more, or leave it empty.';
       if (d.custom && (d.payFee === '' || !(+d.payFee >= 0))) e.payFee = 'Enter the amount per player, or switch to break-even.';
+    const span = draftTimes(d); const when = (v) => v ? timeOnSession(span, v) : null;
+    if (d.courts.some((_,i) => { const a = when(d.courtStarts[i]) || span.start, b = when(d.courtEnds[i]) || span.end; return a < span.start || b > span.end || a >= b; })) e.courts = 'Each court window must start and end within the session, with its end after its start.';
     S.ui.errors = e;
     if (Object.keys(e).length) { d.step = Math.min(...Object.keys(e).map((k) => WIZ_FIELD_STEP[k] ?? 0)); render(); return; }
     const [y, mo, da] = d.date.split('-').map(Number);
@@ -3510,7 +3566,7 @@ const ACT = {
     const start = at(d.start);
     let end = at(d.end);
     if (end <= start) end += 864e5;
-    const courts = d.courts.map((label, i) => ({ id: `c${i + 1}`, label: label.trim() || `Court ${i + 1}` }));
+    const courts = d.courts.map((label, i) => ({ id: `c${i + 1}`, label: label.trim() || `Court ${i + 1}`, startsAt: d.courtStarts[i] ? timeOnSession({start}, d.courtStarts[i]) : null, until: d.courtEnds[i] ? timeOnSession({start}, d.courtEnds[i]) : null }));
     const finance = { courtFee: d.courtFee === '' ? null : +d.courtFee, entryFee: d.entryFee === '' ? null : +d.entryFee, custom: !!d.custom, payFee: d.custom ? +d.payFee : null, shuttles: (d.shuttles || []).filter((x) => x.itemId && +x.tubes > 0).map((x) => ({ itemId: x.itemId, tubes: +x.tubes })) };
     const est = estimateGames(courts.length, Math.round((end - start) / 60000), (existing && existing.roster.length) || +d.expected, perGameOf(d));
     const fields = { title: d.title.trim(), start, end, venue: d.venue.trim(), address: d.address.trim(), courts, singles: d.singles, doubles: d.doubles, mode: d.mode, minimum: d.minAuto ? est.low : +d.minimum, minAuto: d.minAuto, expected: +d.expected || null, perCourt: +d.perCourt || 8, notes: d.notes.trim(), finance };
@@ -3523,7 +3579,7 @@ const ACT = {
       const seriesId = free.length > 1 ? `r${Date.now()}` : null;
       free.forEach((o, i) => {
         const id = `s${Date.now()}${i}`;
-        S.sessions.push({ id, ...JSON.parse(JSON.stringify(fields)), start: o.start, end: o.end, seriesId, status: 'prepared', download: 'none', roster: [], matches: [], seq: 0, published: null });
+        S.sessions.push({ id, ...JSON.parse(JSON.stringify(fields)), courts: courts.map((c) => ({...c, startsAt: c.startsAt ? c.startsAt + o.start - start : null, until: c.until ? c.until + o.start - start : null})), start: o.start, end: o.end, seriesId, status: 'prepared', download: 'none', roster: [], matches: [], seq: 0, published: null });
         if (i === 0) S.currentId = id;
       });
       made = free.length; skipped = occ.length - free.length;
@@ -3598,7 +3654,7 @@ const ACT = {
     if (sh.level == null || sh.level === '') { sh.err = 'Choose a level for this club before adding.'; render(); return; }
     let pid = sh.pick.id;
     if (sh.pick.dir) { const g = DIRECTORY.find((x) => x.id === pid); pid = `p${Date.now()}`; S.players.push({ id: pid, name: g.name, nick: '', identity: g.identity, rtr: g.rtr, sugg: g.sugg, prior: 0, base: null, added: Date.now() }); }
-    if (!openSlots(s)) { s.waitlist = [...(s.waitlist || []), { pid, level: +sh.level, at: Date.now() }]; afterAdd(sh, `${nm(pid)} added to the waitlist as #${s.waitlist.length} · ${lvLabel(+sh.level)}`); return; }
+    if (s.status !== 'active' && !openSlots(s)) { s.waitlist = [...(s.waitlist || []), { pid, level: +sh.level, at: Date.now() }]; afterAdd(sh, `${nm(pid)} added to the waitlist as #${s.waitlist.length} · ${lvLabel(+sh.level)}`); return; }
     s.roster.push({ pid, level: +sh.level, present: s.status === 'active', locked: s.status === 'active', presentAt: Date.now() });
     afterAdd(sh, `${nm(pid)} added · ${lvLabel(+sh.level)}${s.status === 'active' ? ' · level locked' : ''}`);
   },
@@ -3609,7 +3665,7 @@ const ACT = {
     const pid = `p${Date.now()}`;
     const hasPhone = !!(sh.phone || '').trim();
     S.players.push({ id: pid, name: sh.name.trim(), nick: (sh.nick || '').trim(), identity: hasPhone ? 'pending' : 'guest', rtr: null, sugg: null, prior: 0, base: null, added: Date.now() });
-    if (!openSlots(s)) { s.waitlist = [...(s.waitlist || []), { pid, level: +sh.level, at: Date.now() }]; afterAdd(sh, `${sh.name.trim()} added to the waitlist as #${s.waitlist.length}`); return; }
+    if (s.status !== 'active' && !openSlots(s)) { s.waitlist = [...(s.waitlist || []), { pid, level: +sh.level, at: Date.now() }]; afterAdd(sh, `${sh.name.trim()} added to the waitlist as #${s.waitlist.length}`); return; }
     s.roster.push({ pid, level: +sh.level, present: s.status === 'active', locked: s.status === 'active', presentAt: Date.now() });
     afterAdd(sh, `${sh.name.trim()} added${hasPhone ? ' · profile lookup after sync' : ' as a guest'}`);
   },
@@ -3715,14 +3771,20 @@ const ACT = {
   skipSuggest: () => { const r = generate(cur(), 1); S.ui.sheet.lineup = r.matches ? r.matches[0] : null; S.ui.sheet.error = r.error; render(); },
   editSuggest: () => { const m = S.ui.sheet.lineup; openSheet({ type: 'editor', id: null, format: m.format, teamA: m.teamA.slice(), teamB: m.teamB.slice() }); },
   addSuggest: () => { addMatch(cur(), S.ui.sheet.lineup, 'suggested', !!S.ui.sheet.edited); S.ui.sheet = null; S.ui.pane = 'queue'; commit('Suggestion added to the queue'); render(); },
-  openAuto: () => openSheet({ type: 'auto', n: 3 }),
-  runAuto: () => {
-    const s = cur(), sh = S.ui.sheet;
-    const r = generate(s, sh.n);
-    if (r.error) { sh.error = r.error; render(); return; }
-    r.matches.forEach((m) => addMatch(s, m, 'auto', false));
-    S.ui.sheet = null; S.ui.pane = 'queue'; commit(`${r.matches.length} matches added to the queue`); render();
-  },
+  queueWorkspace: (d) => { S.ui.queueWorkspace = d.k; S.ui.pane = 'queue'; render(); },
+  autoTab: (d) => { autoState(cur()).tab = d.k; autoState(cur()).error = ''; render(); },
+  autoCount: (d) => { autoState(cur()).count = +d.n; render(); },
+  autoSelect: (d, el) => { const a = autoState(cur()); a.selected = a.selected.filter((id) => id !== d.id); if (el.checked) a.selected.push(d.id); render(); },
+  autoClear: () => { const a = autoState(cur()), b = a.batches[a.tab]; if (!b) return; const ids = b.cards.map((m) => m.draftId); a.selected = a.selected.filter((id) => !ids.includes(id)); delete a.batches[a.tab]; render(); },
+  autoClearUnselected: () => { const a = autoState(cur()), b = a.batches[a.tab]; if (b) b.cards = b.cards.filter((m) => a.selected.includes(m.draftId)); render(); },
+  autoGenerate: () => ACT.autoBuild(false),
+  autoRegenerate: () => ACT.autoBuild(false),
+  autoRegenerateUnselected: () => ACT.autoBuild(true),
+  autoBuild: (keep) => { const s = cur(), a = autoState(s), old = a.batches[a.tab] || { cards: [] }; const fixed = keep ? old.cards.filter((m) => a.selected.includes(m.draftId)) : []; const r = generateDrafts(s, a.tab, Math.max(0, a.count-fixed.length), a.target, fixed); if (r.error) { a.error = r.error; render(); return; } const removed = old.cards.filter((m) => !fixed.includes(m)).map((m) => m.draftId); a.selected = a.selected.filter((id) => !removed.includes(id)); a.batches[a.tab] = { cards: [...fixed, ...r.matches.map((m) => ({ ...m, draftId: `d${a.next++}` }))], fingerprint: fixed.length && old.fingerprint !== queueFingerprint(s) ? old.fingerprint : queueFingerprint(s), stop: r.stop }; a.error = ''; render(); },
+  autoAddTab: () => { const a = autoState(cur()); openSheet({ type: 'autoReview', ids: (a.batches[a.tab]?.cards || []).map((m) => m.draftId) }); },
+  autoReview: () => openSheet({ type: 'autoReview', ids: autoState(cur()).selected.slice() }),
+  autoCommit: () => { const s = cur(), a = autoState(s), cards = Object.values(a.batches).flatMap((b) => b.cards); const ids = S.ui.sheet.ids, selected = ids.map((id) => cards.find((m) => m.draftId === id)).filter(Boolean); if (!selected.length || selected.length !== ids.length) { S.ui.sheet = null; a.error = 'Drafts changed. Review them again.'; render(); return; } const invalid = selected.find((m) => !FORMATS[m.format] || (m.format === 'singles' && !s.singles) || (m.format === 'doubles' && !s.doubles) || m.teamA.length !== FORMATS[m.format][0] || m.teamB.length !== FORMATS[m.format][1] || all(m).some((p) => !R(s,p) || !R(s,p).present) || new Set(all(m)).size !== all(m).length); if (invalid) { S.ui.sheet = null; a.error = 'A selected draft needs attention: check player presence and lineups, then regenerate.'; render(); return; } selected.forEach((m) => addMatch(s,m,'auto',false)); Object.values(a.batches).forEach((b) => { b.cards = b.cards.filter((m) => !ids.includes(m.draftId)); }); a.selected = a.selected.filter((id) => !ids.includes(id)); S.ui.sheet = null; S.ui.queueWorkspace = 'main'; commit(`${selected.length} drafts added to Main Queue`); render(); },
+  openAuto: () => { S.ui.queueWorkspace = 'auto'; S.ui.pane = 'queue'; render(); },
   openRegen: () => openSheet({ type: 'regen' }),
   confirmRegen: () => {
     const s = cur();
@@ -3749,19 +3811,23 @@ const ACT = {
     if (!c || s.courts.length <= 1 || active(s).some((m) => m.courts.includes(d.id))) { toast('Only a free court can be removed'); return; }
     s.courts = s.courts.filter((x) => x.id !== d.id); commit(`${c.label} removed`); render();
   },
-  quickAddCourt: () => { const s = cur(); openSheet({ type: 'addCourt', label: `Court ${s.courts.length + 1}`, mode: 'end', time: hhmm(s.end), err: '' }); },
+  editCourt: (d) => { const s = cur(), c = s.courts.find((x) => x.id === d.id); openSheet({ type: 'addCourt', id: c.id, label: c.label, startTime: hhmm(c.startsAt || s.start), mode: c.until ? 'time' : 'end', time: hhmm(c.until || s.end), err: '' }); },
+  quickAddCourt: () => { const s = cur(); openSheet({ type: 'addCourt', label: `Court ${s.courts.length + 1}`, startTime: hhmm(s.start), mode: 'end', time: hhmm(s.end), err: '' }); },
   confirmAddCourt: () => {
     const s = cur(), sh = S.ui.sheet;
     const label = (sh.label || '').trim() || `Court ${s.courts.length + 1}`;
+    const existing = sh.id && s.courts.find((c) => c.id === sh.id); const used = existing && s.matches.some((m) => (m.courts || []).includes(existing.id));
+    const startsAt = used ? (existing.startsAt || s.start) : sh.startTime ? timeOnSession(s, sh.startTime) : s.start;
     let until = null;
     if (sh.mode === 'time') {
       if (!sh.time) { sh.err = 'Choose a closing time.'; render(); return; }
       until = timeOnSession(s, sh.time);
-      if (until <= Date.now()) { sh.err = 'Choose a time later than now.'; render(); return; }
+      if (until <= startsAt) { sh.err = 'Choose an end after the planned start.'; render(); return; }
       if (until > s.end) { sh.err = `That's after the session ends at ${fmtTime(s.end)}. Pick an earlier time, or extend the session first.`; render(); return; }
     }
-    s.courts.push({ id: `c${Date.now()}`, label, until });
-    S.ui.sheet = null; commit(`${label} added · open until ${fmtTime(until || s.end)}`); render();
+    if (startsAt >= (until || s.end) || startsAt < s.start) { sh.err = 'Choose a court window within the session.'; render(); return; }
+    if (existing) Object.assign(existing, { label, startsAt, until }); else s.courts.push({ id: `c${Date.now()}`, label, startsAt, until });
+    S.ui.sheet = null; commit(`${label} ${existing ? 'updated' : 'added'} · open until ${fmtTime(until || s.end)}`); render();
   },
   extend: (d) => { const s = cur(); s.end += +d.m * 60000; commit(`Session now ends ${fmtTime(s.end)}`); render(); },
   openSessionDone: () => openSheet({ type: 'done', step: '' }),
@@ -3786,6 +3852,7 @@ const ACT = {
   pubTab: (d) => { S.ui.pubTab = d.k; render(); },
 };
 const CHANGE = {
+  autoSelect: (el) => ACT.autoSelect(el.dataset, el),
   draftShuttleItem: (el) => { S.ui.draft.shuttles[+el.dataset.i].itemId = el.value; render(); },
   plSet: (el) => { S.ui.pl = { ...(S.ui.pl || {}), [el.dataset.k]: el.value }; render(); },
   reqLevel: (el) => { const r = (cur().requests || []).find((x) => x.id === el.dataset.id); r.level = el.value === '' ? null : +el.value; r.err = ''; render(); },

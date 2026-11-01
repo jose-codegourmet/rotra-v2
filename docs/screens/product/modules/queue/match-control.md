@@ -87,3 +87,5 @@ In the [session record](results-sharing.md#q-history--session-record), each matc
 - Invalidating a 5v5 game frees both courts and adds zero games to everyone.
 - Once confirmed, even the Admin product offers no result correction.
 - A ready match at #4 can start while #1 is blocked.
+
+A court before its planned start is visible but is not eligible for dispatch. The planned end is advisory and does not prevent a new match. A player already in play remains a temporary dependency for any future lineup.

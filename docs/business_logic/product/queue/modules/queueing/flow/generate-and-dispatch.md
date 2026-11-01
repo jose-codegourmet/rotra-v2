@@ -1,8 +1,8 @@
 # Flow: generate, dispatch, and regenerate
 
 1. The operator marks roster players present.
-2. Add waiting matches by Add match, Make match (select players), Suggest, or Auto queue.
-3. Automatic generation considers enabled standard formats, locked session levels, game counts, waiting load, and the chosen mode.
+2. Add waiting matches by Add match, Make match (select players), Suggest, or selecting Auto Queue drafts and reviewing their transfer to the Main Queue.
+3. Auto Queue generates in the selected strategy tab using enabled formats, presence, played and queued counts and planned load; its drafts remain separate until transfer.
 4. The operator reorders, edits, or removes waiting matches. Edited matches become protected manual matches.
 5. When a court is free, it proposes the first ready match in queue order and explains any skipped ones. The operator can pick any other ready match instead.
 6. The operator reviews the match, chooses the court (two courts for 5v5), and confirms **Start match**.

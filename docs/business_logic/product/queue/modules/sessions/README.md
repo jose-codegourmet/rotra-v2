@@ -49,7 +49,7 @@ The club keeps a list of venues it books: name (required, unique within the club
 ### Formats
 
 - Singles, Doubles, or both can be on. Automatic generation uses only the formats that are on.
-- With both off, the session can still be saved. The operator is warned that Auto queue has nothing to generate and only manual fun games are possible.
+- With both off, the session can still be saved. The operator is warned that Auto Queue has nothing to generate and only manual fun games are possible.
 - A standard format that is off **cannot** be added manually either. Fun formats (1v2, 3v3, 4v4, 5v5) are always available for manual matches.
 
 ### Minimum games
@@ -89,7 +89,7 @@ Starting locks every roster level and starts no match. The console opens on the 
 ## Running
 
 - The operator can add players at any time, including offline; late players get a level that locks immediately.
-- **Add court:** label (defaults to the next "Court N") and **Open until** — either until the session ends (moves with extensions) or until a set time that is later than now and not after the session end. A new court is free immediately.
+- **Add court:** label (defaults to the next "Court N") and **Open until** — either until the session ends (moves with extensions) or until a set time within the session; the planned start determines when the court becomes available.
 - **Remove court:** only a free court, and a session keeps at least one court.
 - Each court shows its closing time. After that time it shows **Booking ended**. ROTRA never stops a game at a closing time; it is a reminder for the operator.
 - **Extend time** by 30 or 60 minutes per action. The public page shows the new end after it syncs.
@@ -110,3 +110,7 @@ Session done requires internet and records that are fully synced and reconciled.
 - **Pending sync:** confirmation stays disabled until all changes on this device have synced.
 
 See [lifecycle](flow/session-lifecycle.md), [offline recovery](../offline/README.md), and [results](../results/README.md).
+
+## Individual court windows (owner decision, October 31, 2026)
+
+Each court has a planned start and end within the Queue Session, including an explicitly indicated next-day end for an overnight session. Before its start the court is shown but excluded from dispatch. The end is advisory: it neither interrupts an active match nor prevents a new one; the Queue Master may extend it, even after it passes. A start can be edited until the court has hosted a match, then is fixed. Session-end courts follow session extensions; explicit ends do not. Manual closure removes only a free court, retaining at least one court. No abort or reopen lifecycle is implied. These windows do not change the approved cost or minimum-games formulas.

@@ -83,3 +83,13 @@
 Local durability failure is different from network failure. If the local confirmation was saved, show its permanent result with pending sync. If not saved, keep the original unresolved state. Repeated taps/retries recover the same action result.
 
 A conflict is not permission to open a generic winner editor. Accepted unchanged records stay locked. Missing original-device records cannot be reconstructed through Admin or another device.
+
+## Queue flexibility states
+
+| State | Presentation | Action |
+|---|---|---|
+| Active session above slot budget | Show attendance and budget; additional admission remains available | Admit chosen player, present and level locked |
+| Court before planned start | Show planned window and not-started status | No dispatch to that court |
+| Court past planned end | Show Booking ended | Continue dispatch until manually removed while free |
+| Auto Queue draft stale | Keep cards and selections visible with a stale notice | Review and revalidate on transfer; conflicts need attention |
+| Catch Up cannot progress | Keep any generated drafts and show stopping reason | Change target or eligible players, then regenerate |

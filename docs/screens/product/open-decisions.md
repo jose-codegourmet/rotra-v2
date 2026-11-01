@@ -29,7 +29,7 @@ The screen tree specifies all agreed v1 workflows. Where behavior is undecided, 
 
 - Exact routes beyond the approved mock auth boundary (`/login` in all apps, public Queue `/s/[slug]`, public Player `/players/[playerId]`, protected Player `/me`; approved October 27, 2026), component names, page-versus-sheet boundaries, field-length limits, design tokens, and export pixel dimensions.
 - Changing mode/formats/minimum during an active session. They stay visible and fixed until decided.
-- Default number of matches per Auto queue run (the operator picks 2, 3, 4, or 6; the prototype preselects 3).
+- The Auto Queue match count is explicitly selected from 2, 3, 4 or 6, with no preselected default (owner decision October 31, 2026).
 - Fully withdrawing a publication (re-publishing a new selection is settled).
 - Access to five-session history for award calculations when a returning guest was duplicated rather than recognized.
 - Whether individual club assessments are itemized publicly. Equal-weight aggregation is agreed; public assessment disclosure is not.
@@ -84,3 +84,7 @@ The screen tree specifies all agreed v1 workflows. Where behavior is undecided, 
 [Business open decisions](../../business_logic/product/open-decisions.md) and [database design decisions](../../database_design/product/open-decisions.md).
 
 No unresolved item grants permission to edit permanent game outcomes, reconstruct lost originals, let anyone self-admit into a session slot (guests may only send a join request the Queue Master confirms), force Facebook login, collect payments in-app, or introduce World v1.
+
+## Settled by the product owner (October 31, 2026)
+
+See [Queue flexibility owner review](../../decisions/2026-10-30-queue-flexibility/05-owner-review.md) for capacity, court windows, Auto Queue strategy and transfer decisions. The reviewed choices do not settle pairing weights or unrelated open items.

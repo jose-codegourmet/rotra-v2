@@ -6,7 +6,7 @@
 
 ## Q-QUEUE — One waiting list
 
-Header “Queued matches” with **Add match**, **Suggest**, **Auto queue**, and **Regenerate** (primary when something needs attention; disabled when the queue is empty).
+Header “Queued matches” with **Add match**, **Suggest**, **Auto Queue**, and **Regenerate** (primary when something needs attention; disabled when the queue is empty).
 
 Attention notice: “N waiting matches need attention. Edit the lineup to swap the player, or regenerate.” Context: “One waiting list for every court. MODE mode guides suggestions; you can override any of it.”
 
@@ -19,7 +19,7 @@ Attention notice: “N waiting matches need attention. Edit the lineup to swap t
 - Status line: **✓ Ready to start**; **⚠ reason** for needs attention (warning style, card highlighted); **ⓘ reason** for blocked or waiting for courts.
 - Actions: **Start** (primary, enabled only when ready), **Edit**, Remove ×. No Earlier / Later buttons; reordering is on the drag handle.
 
-Empty: “No waiting matches. Use Auto queue to generate a few, or add one yourself.”
+Empty: “No waiting matches. Use Auto Queue to generate a few, or add one yourself.”
 
 **Switch sides by dragging (decided October 27, 2026).** A player's picture on a queue card, in Q-SUGGEST, in Q-MANUAL and in Q-DISPATCH can be dragged onto a player on the **other** team to swap the two. This works the same in all four places:
 - **Mouse or pen:** the drag starts after a few pixels of movement, so a plain click still opens the profile (or, in Q-MANUAL, the slot picker).
@@ -75,28 +75,12 @@ Actions: **Skip suggestion** (shows a new one), **Edit then add** (opens Q-MANUA
 
 When no lineup is possible, the sheet shows the reason (both formats off, or “Only N players are present. Doubles needs 4. Mark arrivals present in Players.”) with **Close**.
 
-## Q-AUTO — Generate several waiting matches
+## Q-AUTO — Auto Queue workspace
 
-Sheet **Auto queue**: Mode, Formats, Present “N players”, Priority “Players furthest below N games first”. **Matches to add**: 2, 3, 4, or 6 (3 preselected), with hint “Prototype control. ROTRA hasn't decided the default number of rounds.” Copy: “Only present players are used. Nothing starts by itself, and fun formats are never generated.”
+The Queue view switches between Main Queue and Auto Queue. Auto Queue has Available Players, Plan Ahead, Longest Wait, Fewest Games and Catch Up tabs with retained draft batches. The Queue Master selects a match count (2 / 3 / 4 / 6; no default), explicitly generates, and chooses a Catch Up target when applicable. Cards show reason, lineup, played/queued counts and playing dependencies. No draft starts or enters Main Queue automatically.
 
-Primary **Generate N matches**. On success the console shows the Queue tab: “N matches added to the queue”. On failure the reason appears in the sheet and the queue is unchanged.
+Checkbox selections persist across tabs in selection order. **Add selected to Main Queue** opens a review of that order; **Add all from this tab** uses only the current batch. **Regenerate**, **Clear**, **Clear unselected**, and **Regenerate unselected** affect drafts only; selected drafts survive the last action. Main Queue changes leave drafts visible with a stale notice. Revalidation before transfer blocks conflicts and retains the drafts for correction. Distinct rematches are allowed, but the same draft cannot be submitted twice. Counts update from the Main Queue immediately when a waiting match is removed or started; played changes only after eligible Match done.
 
-## Q-REGENERATE — Review rebuild scope
+## Q-REGENERATE — Main Queue rebuild
 
-Sheet **Regenerate waiting queue?** with counts:
-
-- Automatic waiting matches — N rebuilt
-- Healthy manual matches — N kept
-- Manual matches needing attention — N rebuilt
-- Games in play — N untouched
-
-Actions **Keep current queue** and **Regenerate waiting queue** (disabled when nothing would be rebuilt). Rebuilt matches take the queue slots of the ones they replace. Toast: “Queue regenerated · N rebuilt”. If generation fails, the previous queue is restored and the reason is shown.
-
-## Acceptance examples
-
-- Turning off a participant flags their future lineups; Regenerate rebuilds even a manual flagged lineup.
-- Editing an automatic lineup protects it on the next regeneration if healthy.
-- Accepting a suggestion without editing leaves it unprotected.
-- A blocked first match stays first; a later ready match can start on the free court.
-- Regeneration cannot change an active 5v5 match on two courts.
-- Singles does not appear in the editor when Singles is off.
+This separate existing control reviews automatic matches rebuilt, healthy manual matches kept, manual matches needing attention rebuilt and games in play untouched. The Queue Master confirms before changes; failure restores the previous queue. Draft regeneration never silently changes Main Queue.

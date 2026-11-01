@@ -24,9 +24,9 @@ export const allPlayers = (m: MatchLineup) => [...m.teamA, ...m.teamB]
 export const courtsNeeded = (m: Pick<Match, 'format'>) => (m.format === 'fun_5v5' ? 2 : 1)
 export const activeMatchFor = (id: string, matches: Match[]) =>
   matches.find((m) => m.state === 'active' && allPlayers(m).includes(id))
-export const freeCourts = (courts: SessionCourt[], matches: Match[]) =>
+export const freeCourts = (courts: SessionCourt[], matches: Match[], now = Date.now()) =>
   courts.filter(
-    (c) => !c.removedAt && !matches.some((m) => m.state === 'active' && m.courtIds.includes(c.id)),
+    (c) => !c.removedAt && (c.startsAt ?? 0) <= now && !matches.some((m) => m.state === 'active' && m.courtIds.includes(c.id)),
   )
 export const queuedCount = (id: string, matches: Match[]) =>
   matches.filter((m) => m.state === 'waiting' && allPlayers(m).includes(id)).length
@@ -36,7 +36,7 @@ export const listNames = (names: string[]) =>
   names.length < 3 ? names.join(' and ') : `${names.slice(0, -1).join(', ')} and ${names.at(-1)}`
 export const courtNames = (m: Pick<Match, 'courtIds'>, courts: SessionCourt[]) =>
   m.courtIds.map((id) => courts.find((c) => c.id === id)?.label ?? 'Court').join(' + ')
-export type MatchContext = { roster: SessionPlayer[]; matches: Match[]; courts: SessionCourt[] }
+export type MatchContext = { roster: SessionPlayer[]; matches: Match[]; courts: SessionCourt[]; now?: number }
 export function completeLineup(m: MatchLineup) {
   const sizes = FORMAT_TEAM_SIZES[m.format]
   return (
@@ -68,7 +68,7 @@ export function matchStatus(m: MatchLineup, ctx: MatchContext): MatchStatus {
       kind: 'blocked',
       reason: `${names(playing)} ${playing.length === 1 ? 'is' : 'are'} playing on ${courtNames(game, ctx.courts)}`,
     }
-  if (freeCourts(ctx.courts, ctx.matches).length < courtsNeeded(m))
+  if (freeCourts(ctx.courts, ctx.matches, ctx.now).length < courtsNeeded(m))
     return {
       kind: 'waiting-for-courts',
       reason: courtsNeeded(m) === 2 ? 'Needs two free courts' : 'Waiting for a free court',
@@ -76,7 +76,7 @@ export function matchStatus(m: MatchLineup, ctx: MatchContext): MatchStatus {
   return { kind: 'ready', reason: 'Ready to start' }
 }
 export function nextEligibleForCourt(courtId: string, ctx: MatchContext) {
-  if (!freeCourts(ctx.courts, ctx.matches).some((c) => c.id === courtId))
+  if (!freeCourts(ctx.courts, ctx.matches, ctx.now).some((c) => c.id === courtId))
     return { match: null, skipped: null }
   const waiting = ctx.matches
       .filter((m) => m.state === 'waiting')
@@ -159,7 +159,7 @@ export function canStart(m: Match, courtIds: string[], ctx: MatchContext) {
     matchStatus(m, ctx).kind === 'ready' &&
     courtIds.length === courtsNeeded(m) &&
     new Set(courtIds).size === courtIds.length &&
-    courtIds.every((id) => freeCourts(ctx.courts, ctx.matches).some((c) => c.id === id))
+    courtIds.every((id) => freeCourts(ctx.courts, ctx.matches, ctx.now).some((c) => c.id === id))
   )
 }
 export type ResultInput = {

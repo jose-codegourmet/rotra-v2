@@ -1,3 +1,4 @@
+import { courtWindowError } from '@rotra/schema/court-window'
 import { DEMO_CLUB_ID } from '../fixtures/clubs'
 import { checkMockSave, getMockDevState, requireOnline } from '../mock/bridge'
 import { MockError } from '../mock/errors'
@@ -73,6 +74,10 @@ function validate(state: MockState, input: QueueSessionInput) {
     throw new MockError('permission', 'Enter a whole number of players.')
   if (!Number.isInteger(input.minimumGames) || input.minimumGames < 0)
     throw new MockError('permission', 'Enter a whole number of games.')
+  for (const court of input.courts) {
+    const error = courtWindowError(court.startsAt ?? input.scheduledStartAt, court.openUntil ?? null, input.scheduledStartAt, input.scheduledEndAt)
+    if (error) throw new MockError('permission', error)
+  }
   const budget =
     input.playersPerCourt ??
     state.clubs.find((c) => c.id === DEMO_CLUB_ID)?.defaultPlayersPerCourt ??
@@ -135,7 +140,8 @@ export function createQueueSession(input: QueueSessionInput) {
           id: crypto.randomUUID(),
           sessionId: id,
           label: c.label.trim(),
-          openUntil: c.openUntil ?? null,
+          startsAt: date.start + ((c.startsAt ?? input.scheduledStartAt) - input.scheduledStartAt),
+          openUntil: c.openUntil == null ? null : date.start + (c.openUntil - input.scheduledStartAt),
           removedAt: null,
         })),
       )
@@ -198,6 +204,7 @@ export function updateQueueSession({
           id: crypto.randomUUID(),
           sessionId,
           label: c.label.trim(),
+          startsAt: c.startsAt ?? date.start,
           openUntil: c.openUntil ?? null,
           removedAt: null,
         })),

@@ -69,3 +69,60 @@ describe('Auto Queue generation', () => {
     expect(generateAutoQueueMatches({ ...input, mode: 'available', limit: 2 }).error).toContain('both off')
   })
 })
+
+describe('Catch Up', () => {
+  function catchUp() {
+    const input = scenario()
+    input.ctx.roster = input.ctx.roster.slice(0, 4).map((p) => ({ ...p, present: true }))
+    const template = input.ctx.matches.find((m) => m.state === 'completed')!
+    const ids = input.ctx.roster.map((p) => p.id)
+    input.ctx.matches = [
+      { ...template, id: 'catch-1', format: 'doubles', teamA: ids.slice(0, 2), teamB: ids.slice(2), substitutions: [] },
+      { ...template, id: 'catch-2', format: 'singles', teamA: [ids[2]!], teamB: [ids[3]!], substitutions: [] },
+    ]
+    return { ...input, mode: 'catchup' as const, catchUpTarget: 2, limit: 6 }
+  }
+  it('prioritizes lagging players and allows above-target fillers without changing played games', () => {
+    const input = catchUp(), before = structuredClone(input.ctx.matches)
+    const result = generateAutoQueueMatches(input)
+    expect(result.matches).toHaveLength(1)
+    expect(result.remainingShortfall).toBe(0)
+    expect(result.stopReason).toContain('Target met')
+    expect(input.ctx.matches).toEqual(before)
+  })
+  it('stops without a match when everyone is already at the target', () => {
+    const input = catchUp()
+    input.catchUpTarget = 1
+    expect(generateAutoQueueMatches(input).matches).toHaveLength(0)
+    expect(generateAutoQueueMatches(input).stopReason).toContain('Target met')
+  })
+  it('takes current queued assignments into account and updates after deletion', () => {
+    const input = catchUp()
+    const queued = { ...input.ctx.matches[0]!, id: 'waiting', state: 'waiting' as const, decision: null }
+    input.ctx.matches.push(queued)
+    expect(generateAutoQueueMatches(input).matches).toHaveLength(0)
+    input.ctx.matches.pop()
+    expect(generateAutoQueueMatches(input).matches).toHaveLength(1)
+  })
+  it('reuses players who are further behind and stops at the explicit cap', () => {
+    const input = catchUp()
+    input.catchUpTarget = 10
+    input.limit = 2
+    const result = generateAutoQueueMatches(input)
+    expect(result.matches).toHaveLength(2)
+    expect(result.stopReason).toContain('limit reached')
+    expect(result.remainingShortfall).toBeGreaterThan(0)
+  })
+  it('explains inability to progress and never uses in-play fillers', () => {
+    const input = catchUp()
+    input.ctx.roster = input.ctx.roster.slice(0, 3)
+    const result = generateAutoQueueMatches(input)
+    expect(result.matches).toHaveLength(0)
+    expect(result.stopReason).toContain('No valid match')
+  })
+  it('requires an explicit positive whole-number target', () => {
+    for (const target of [undefined, 0, 1.5, NaN]) {
+      expect(generateAutoQueueMatches({ ...catchUp(), catchUpTarget: target }).error).toContain('whole-number')
+    }
+  })
+})

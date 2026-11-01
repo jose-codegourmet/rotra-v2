@@ -44,33 +44,43 @@ export function clearAutoQueueDrafts(state: AutoQueueDraftState, mode: AutoQueue
 /** Owner-reviewed load/order rules from generateDrafts in the canonical prototype.
  * Only splitTeams retains the earlier, explicitly labelled team-balancing reference heuristic.
  */
-export function generateAutoQueueMatches({ session, ctx, mode, limit, retained = [], now = Date.now(), rng = Math.random }: {
+export function generateAutoQueueMatches({ session, ctx, mode, limit, retained = [], now = Date.now(), rng = Math.random, catchUpTarget }: {
   session: QueueSession
   ctx: MatchContext
-  mode: Exclude<AutoQueueMode, 'catchup'>
+  mode: AutoQueueMode
+  catchUpTarget?: number
   limit: number
   retained?: MatchLineup[]
   now?: number
   rng?: () => number
-}): { matches: MatchLineup[]; stopReason: string; error: string | null } {
+}): { matches: MatchLineup[]; stopReason: string; error: string | null; remainingShortfall?: number } {
   const players = ctx.roster.filter((p) => p.sessionId === session.id && p.present && (mode === 'ahead' || !activeMatchFor(p.id, ctx.matches)))
   if (!session.allowSingles && !session.allowDoubles)
     return { matches: [], stopReason: '', error: 'Singles and doubles are both off for this session. Add a fun game manually instead.' }
+  if (mode === 'catchup' && (!Number.isSafeInteger(catchUpTarget) || (catchUpTarget ?? 0) < 1))
+    return { matches: [], stopReason: '', error: 'Choose a whole-number Catch Up target of at least 1.' }
+  const target = catchUpTarget ?? 0
   const played = new Map(players.map((p) => [p.id, countedGames(p.id, ctx.matches)]))
   const load = new Map(players.map((p) => [p.id, (played.get(p.id) ?? 0) + queuedCount(p.id, ctx.matches) + retained.filter((m) => allPlayers(m).includes(p.id)).length]))
   const order = new Map(players.map((p, i) => [p.id, i]))
+  const shortfall = () => players.reduce((sum, p) => sum + Math.max(0, target - (load.get(p.id) ?? 0)), 0)
+  let stopReason = 'Selected batch limit reached.'
   const matches: MatchLineup[] = []
   for (let i = 0; i < limit; i++) {
+    if (mode === 'catchup' && players.length && shortfall() === 0) { stopReason = 'Target met in the plan.'; break }
     const format = session.allowSingles && session.allowDoubles
       ? players.length >= 4 && i % 3 !== 2 ? 'doubles' : 'singles'
       : session.allowDoubles ? 'doubles' : 'singles'
     const size = format === 'doubles' ? 4 : 2
+    if (players.length < size && mode === 'catchup') { stopReason = 'No valid match can make progress with the available players.'; break }
     if (players.length < size)
       return { matches: [], stopReason: '', error: `Only ${players.length} available player${players.length === 1 ? '' : 's'}. ${format === 'doubles' ? 'Doubles' : 'Singles'} needs ${size}. Mark arrivals present in Players.` }
     const sorted = [...players].sort((a, b) => {
       const wait = waitMinutes(b, ctx.matches, session.startedAt, now) - waitMinutes(a, ctx.matches, session.startedAt, now)
       const left = load.get(a.id) ?? 0, right = load.get(b.id) ?? 0
-      const priority = mode === 'wait'
+      const priority = mode === 'catchup'
+        ? Number(left >= target) - Number(right >= target) || left - right
+        : mode === 'wait'
         ? (left - (played.get(a.id) ?? 0)) - (right - (played.get(b.id) ?? 0)) || wait
         : mode === 'ahead'
           ? Number(!!activeMatchFor(a.id, ctx.matches)) - Number(!!activeMatchFor(b.id, ctx.matches)) || left - right
@@ -78,8 +88,14 @@ export function generateAutoQueueMatches({ session, ctx, mode, limit, retained =
       return priority || wait || (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0)
     })
     const pick = sorted.slice(0, size)
+    if (mode === 'catchup' && !pick.some((p) => (load.get(p.id) ?? 0) < target)) { stopReason = 'No valid match can make progress toward the target.'; break }
     matches.push(splitTeams(session, pick, format, rng))
     for (const p of pick) load.set(p.id, (load.get(p.id) ?? 0) + 1)
   }
-  return { matches, stopReason: 'Selected batch limit reached.', error: null }
+  if (mode === 'catchup') {
+    const remainingShortfall = shortfall()
+    if (players.length && remainingShortfall === 0) stopReason = 'Target met in the plan.'
+    return { matches, stopReason: `Catch Up target ${target}. ${stopReason} Remaining planned shortfall: ${remainingShortfall}.`, remainingShortfall, error: null }
+  }
+  return { matches, stopReason, error: null }
 }

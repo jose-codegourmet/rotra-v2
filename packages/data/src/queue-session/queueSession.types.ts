@@ -29,6 +29,8 @@ export type SessionCourt = {
   id: string
   sessionId: string
   label: string
+  /** Older fixtures without a start are already open. New bookings always set it. */
+  startsAt?: number
   openUntil: number | null
   removedAt: number | null
 }
@@ -59,7 +61,7 @@ export type QueueSessionInput = Pick<
 > & {
   costEstimate?: import('../session-cost/sessionCost.types').SessionCostInput | null
   playersPerCourt?: number
-  courts: { label: string; openUntil?: number | null }[]
+  courts: { label: string; startsAt?: number; openUntil?: number | null }[]
   repeat?: 'none' | 'weekly' | 'biweekly' | 'monthly'
   occurrences?: number
 }

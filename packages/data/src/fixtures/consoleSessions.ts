@@ -20,7 +20,7 @@ export function createConsoleFixtures(now = Date.now()) {
     })),
     courts = base.courts
       .filter((c) => c.sessionId === session.id)
-      .map((c, i) => ({ ...c, openUntil: i === 2 ? now - 60000 : null }))
+      .map((c, i) => ({ ...c, startsAt: session.startedAt, openUntil: i === 2 ? now - 60000 : null }))
   const pid = (i: number) => {
     const p = roster[i]
     if (!p) throw new Error('Missing roster fixture.')

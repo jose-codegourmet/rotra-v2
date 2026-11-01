@@ -1,4 +1,3 @@
-import { admissionCapacityFixture as admission } from '@rotra/data/fixtures/session-waitlist'
 import type { ClubPlayer } from '@rotra/data/club-player/types'
 import {
   clubPlayers,
@@ -8,6 +7,7 @@ import {
   players,
 } from '@rotra/data/fixtures/players'
 import { queueSessionFixtures } from '@rotra/data/fixtures/queueSessions'
+import { admissionCapacityFixture as admission } from '@rotra/data/fixtures/session-waitlist'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 import { fn } from 'storybook/test'

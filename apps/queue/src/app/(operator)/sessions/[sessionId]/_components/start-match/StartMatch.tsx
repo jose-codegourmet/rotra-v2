@@ -26,8 +26,8 @@ import type { SwapSlot } from '@rotra/ui/swap-sides-area'
 import type { TeamLineupPlayer } from '@rotra/ui/team-lineup'
 import { toast } from '@rotra/ui/toaster'
 import { useRef, useState } from 'react'
-import { useNow } from '@/lib/useNow'
 import { PlayerProfile } from '@/app/(operator)/sessions/[sessionId]/_components/player-profile/PlayerProfile'
+import { useNow } from '@/lib/useNow'
 
 /**
  * What opened the sheets: Start match for a waiting match (Review and start names its court, Start

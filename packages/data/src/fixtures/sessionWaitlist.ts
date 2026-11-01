@@ -1,6 +1,6 @@
 import type { SessionWaitlistEntry } from '../session-roster/sessionRoster.types'
 import { createConsoleFixtures } from './consoleSessions'
-import { clubPlayers, players, leaderboardLevels } from './players'
+import { clubPlayers, leaderboardLevels, players } from './players'
 
 /**
  * Story-only waitlist for the tonight fixture: the three saved players after the 14 on the roster,

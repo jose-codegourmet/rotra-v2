@@ -1,5 +1,5 @@
-import type { AutoQueueDraftState } from '../match/autoQueue.types'
 import { autoQueueFingerprint } from '../match/autoQueue.rules'
+import type { AutoQueueDraftState } from '../match/autoQueue.types'
 import { countedGames, type MatchContext } from '../match/match.rules'
 import type { MatchFormat } from '../match/match.types'
 import { generateMatches, regenerateScope } from '../match/queue.rules'

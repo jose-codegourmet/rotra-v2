@@ -12,7 +12,7 @@ import { queueMutation, sessionIn } from '../mock/transaction'
 import { PLAYING_LEVELS, type PlayingLevel } from '../player/player.types'
 import { promoteWaiter, recomputeMinimum } from '../queue-session/mutations'
 import { slotCapacity } from '../queue-session/queueSession.rules'
-import { levelLabel, shortName, ROSTER_DUPLICATE_ERROR } from './sessionRoster.rules'
+import { levelLabel, ROSTER_DUPLICATE_ERROR, shortName } from './sessionRoster.rules'
 import type { IdentityCheck, SessionJoinRequest } from './sessionRoster.types'
 
 function fail(text: string): never {

@@ -5,18 +5,19 @@ import { type MockState, mockStore, readMockState } from '../mock/store'
 import { queueMutation, requireSessionWrite, sessionIn } from '../mock/transaction'
 import {
   allAutoQueueDrafts,
+  autoQueueDraftConflict,
   autoQueueFingerprint,
   clearAutoQueueDrafts,
   emptyAutoQueueDraftState,
-  selectAutoQueueDraft,
   generateAutoQueueMatches,
-  autoQueueDraftConflict,
+  selectAutoQueueDraft,
 } from './autoQueue.rules'
 import type { AutoQueueCount, AutoQueueMode } from './autoQueue.types'
 import { append, matchContext, requireLive } from './queue.mutations'
 
 export function draftState(s: MockState, sessionId: string) {
-  return (s.autoQueueDrafts[sessionId] ??= emptyAutoQueueDraftState())
+  s.autoQueueDrafts[sessionId] ??= emptyAutoQueueDraftState()
+  return s.autoQueueDrafts[sessionId]
 }
 /** Draft edits never create match numbers, accepted assignments, or sync-log entries. */
 export async function changeAutoQueueDrafts<T>(sessionId: string, change: (s: MockState) => T) {

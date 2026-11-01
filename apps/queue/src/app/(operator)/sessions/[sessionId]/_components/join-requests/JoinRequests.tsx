@@ -6,8 +6,8 @@ import { useConfirmJoinRequest } from '@rotra/data/session-roster/useConfirmJoin
 import { useDeclineJoinRequest } from '@rotra/data/session-roster/useDeclineJoinRequest'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { JoinRequestsPanel } from '@rotra/ui/join-requests-panel'
-import { useRef } from 'react'
 import { toast } from '@rotra/ui/toaster'
+import { useRef } from 'react'
 
 export type JoinRequestsProps = {
   sessionId: string

@@ -1,7 +1,22 @@
+import { courtTimeOnSession, courtWindowError } from '@rotra/schema/court-window'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { createConsoleFixtures } from '../fixtures/consoleSessions'
+import { createConsoleFixtures, createCourtWindowFixtures } from '../fixtures/consoleSessions'
+import { directoryPlayers } from '../fixtures/players'
+import { connectMockBridge, DEFAULT_DEV_STATE } from '../mock/bridge'
 import { setMockLatencyEnabled } from '../mock/latency'
+import { loadQueueFlexibilityExample } from '../mock/queueExamples'
 import { mockStore, readMockState } from '../mock/store'
+import { getPublicSession } from '../public-session/fetchers'
+import { extendSession, removeCourt, updateCourt } from '../queue-session/courts'
+import { startSession } from '../queue-session/mutations'
+import {
+  addDirectoryPlayerToSession,
+  addNewPlayerToSession,
+  addSavedPlayerToSession,
+  confirmJoinRequest,
+  giveSlot,
+  submitJoinRequest,
+} from '../session-roster/mutations'
 import {
   editAutoQueueDrafts,
   generateAutoQueueDrafts,
@@ -9,26 +24,9 @@ import {
   transferAutoQueueDrafts,
 } from './autoQueue.mutations'
 import { allAutoQueueDrafts, autoQueuePlayerCounts } from './autoQueue.rules'
-import { allPlayers } from './match.rules'
+import { completeMatch, startMatch } from './control'
+import { allPlayers, canStart, freeCourts, type MatchContext } from './match.rules'
 import { matchContext, removeWaitingMatch } from './queue.mutations'
-import { startMatch, completeMatch } from './control'
-import { loadQueueFlexibilityExample } from '../mock/queueExamples'
-import { createCourtWindowFixtures } from '../fixtures/consoleSessions'
-import {
-  addSavedPlayerToSession,
-  addDirectoryPlayerToSession,
-  addNewPlayerToSession,
-  giveSlot,
-  confirmJoinRequest,
-  submitJoinRequest,
-} from '../session-roster/mutations'
-import { startSession } from '../queue-session/mutations'
-import { addCourt, updateCourt, removeCourt, extendSession } from '../queue-session/courts'
-import { connectMockBridge, DEFAULT_DEV_STATE } from '../mock/bridge'
-import { directoryPlayers } from '../fixtures/players'
-import { getPublicSession } from '../public-session/fetchers'
-import { freeCourts, canStart } from './match.rules'
-import { courtTimeOnSession, courtWindowError } from '@rotra/schema/court-window'
 
 const now = Date.now(),
   fixture = createConsoleFixtures(now),
@@ -434,7 +432,12 @@ describe('complete flexible Queue Session rules', () => {
       teamA: ids.slice(0, 5),
       teamB: ids.slice(5),
     }
-    const ctx = { roster: sample.roster, matches: [], courts: sample.courts, now: start }
+    const ctx: MatchContext = {
+      roster: sample.roster,
+      matches: [],
+      courts: sample.courts,
+      now: start,
+    }
     const chosenCourts = sample.courts.slice(3).map((c) => c.id)
     expect(canStart(futureMatch, chosenCourts, ctx)).toBe(false)
     ctx.now = start + 3600000

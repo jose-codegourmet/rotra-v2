@@ -260,7 +260,7 @@ export function ClubSettings({ section }: ClubSettingsProps) {
       onError={(message) => toast.error(message)}
       onLogoChange={(dataUrl) =>
         logo.mutate(
-          { logoUrl: dataUrl },
+          { logoUrl: dataUrl, expectedRevision: data.revision },
           {
             onSuccess: () => toast('Logo updated'),
             onError: (error) => toast.error(errorMessage(error)),
@@ -269,7 +269,7 @@ export function ClubSettings({ section }: ClubSettingsProps) {
       }
       onLogoRemove={() =>
         logo.mutate(
-          { logoUrl: null },
+          { logoUrl: null, expectedRevision: data.revision },
           {
             onSuccess: () => toast('Logo removed'),
             onError: (error) => toast.error(errorMessage(error)),

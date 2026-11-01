@@ -4,6 +4,8 @@ import type { ClubAccessState, RetentionState } from '../license/license.types'
 
 /** Shared club identity and prototype license prices; all amounts are integer centavos. */
 export type Club = {
+  /** Real settings revision; absent in prototype fixtures. */
+  revision?: string
   logoUrl: string | null
   description: string
   courtRules: string | null

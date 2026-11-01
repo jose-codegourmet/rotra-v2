@@ -38,6 +38,7 @@ export type WireTerm = {
 }
 
 type WireAdminClub = {
+  logoRef: string | null
   id: string
   name: string
   foundingAddress: string
@@ -78,7 +79,7 @@ function listItemOf(club: WireAdminClub): AdminClubListItem {
     id: club.id,
     name: club.name,
     initials: clubInitials(club.name),
-    logoUrl: null,
+    logoUrl: club.logoRef,
     accent: false,
     username: club.username ?? '',
     city: club.city,

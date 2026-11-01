@@ -244,6 +244,12 @@ to `real` in each app's own `.env.local` (Next reads env files from the app fold
 | Responses | Private: `Cache-Control: private, no-store`, `Vary: Cookie`. Bodies pass `toJson` (`@rotra/db/service/serialize`): UUIDs as strings, instants as ISO strings, bigint revisions as decimal strings, money as `{ amountMinor, currency }`, null kept; class instances such as Prisma models are refused. Errors are `{ error: { code, message, fields? } }` (`@rotra/db/service/errors`); another club's or player's ID answers `not_found` |
 | Client | `useAccountScope(accountId)` / `clearAccountQueries` (`@rotra/data/auth/account-scope`) drop the previous account's queries on account change or sign-out, keeping `auth`/`sync` queries and every mutation, so unsynced evidence survives |
 
+**Club logos (#374).** In real mode, the existing logo picker writes through `PATCH /api/club`.
+The authorized service uploads a normalized PNG to the public `club-logos` Supabase Storage bucket
+and persists its immutable URL in `clubs.logo_ref` under the displayed settings revision. Removing
+it saves null. Queue and Admin readers expose the saved reference instead of returning no logo.
+Bucket setup and snapshot retention are documented in [clubs/licenses](database_design/product/admin/modules/clubs-licenses.md#club-logo-persistence-374).
+
 Wrong account types, forged mock cookies, and cross-club/player IDs are denied at the handler, not only
 in the proxy. Database credentials and Supabase keys are read only from server env. Application tables
 have no `anon`/`authenticated` grants, so the Data API exposes none of them.

@@ -82,7 +82,12 @@ export async function getClaimLink(token: string, signal?: AbortSignal): Promise
   if (!record || !profile || !account) return null
   return {
     token,
-    status: record.status === 'valid' && account.claimed ? 'claimed' : record.status,
+    status:
+      record.expiresAt && Date.parse(record.expiresAt) <= Date.now()
+        ? 'expired'
+        : record.status === 'valid' && account.claimed
+          ? 'claimed'
+          : record.status,
     clubName: record.clubName,
     preview: {
       playerId: profile.playerId,
@@ -114,7 +119,13 @@ function finishClaim(token: string, changes?: { email: string; personal: Persona
     const record = draft.claimLinks[token]
     const account = record && draft.playerAccounts.find((a) => a.playerId === record.playerId)
     const profile = record && draft.playerProfiles.find((p) => p.playerId === record.playerId)
-    if (!record || !account || !profile)
+    if (
+      !record ||
+      !account ||
+      !profile ||
+      record.status === 'expired' ||
+      (record.expiresAt && Date.parse(record.expiresAt) <= Date.now())
+    )
       throw new MockError('permission', 'The registration link has expired or was replaced.')
     if (changes) {
       applyPersonalProfile(profile, changes.personal)
@@ -146,7 +157,12 @@ export async function completeClaim({ token, values }: CompleteClaimInput) {
   const state = readMockState()
   const record = state.claimLinks[token]
   const account = record && state.playerAccounts.find((a) => a.playerId === record.playerId)
-  if (!record || !account || record.status === 'expired')
+  if (
+    !record ||
+    !account ||
+    record.status === 'expired' ||
+    (record.expiresAt && Date.parse(record.expiresAt) <= Date.now())
+  )
     throw new MockError('permission', 'The registration link has expired or was replaced.')
   const conflict = state.playerAccounts.some(
     (other) =>

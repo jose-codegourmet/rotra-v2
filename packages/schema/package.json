@@ -14,7 +14,8 @@
     "./social-link": "./src/social-link.ts",
     "./club-price": "./src/club-price.ts",
     "./ranking-settings": "./src/ranking-settings.ts",
-    "./court-window": "./src/court-window.ts"
+    "./court-window": "./src/court-window.ts",
+    "./admin-player": "./src/admin-player.ts"
   },
   "scripts": {
     "lint": "biome check .",

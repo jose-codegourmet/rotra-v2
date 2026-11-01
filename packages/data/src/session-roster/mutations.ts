@@ -89,7 +89,8 @@ export function addSavedPlayerToSession(input: {
 }) {
   return rosterMutation(input.sessionId, (s) => {
     const p = s.clubPlayers.find((p) => p.id === input.clubPlayerId && p.clubId === DEMO_CLUB_ID)
-    if (!p) fail('Player not available.')
+    if (!p || (p.playerId && s.adminPlayerRecords[p.playerId]?.archivedAt))
+      fail('Player not available.')
     identity(s, p, input.identityCheck)
     const data = place(s, input.sessionId, p, input.level),
       name = p.nickname || p.fullName.split(' ')[0]
@@ -111,6 +112,7 @@ export async function playerDirectorySearch(q: string) {
   const s = readMockState(),
     query = q.trim().toLowerCase()
   return directoryPlayers
+    .filter((p) => !s.adminPlayerRecords[p.id]?.archivedAt)
     .map((p, _i) => ({
       ...p,
       identity: 'registered' as const,
@@ -134,7 +136,7 @@ export function addDirectoryPlayerToSession(input: {
 }) {
   return rosterMutation(input.sessionId, (s) => {
     const profile = directoryPlayers.find((p) => p.id === input.playerId)
-    if (!profile) fail('Player not available.')
+    if (!profile || s.adminPlayerRecords[profile.id]?.archivedAt) fail('Player not available.')
     let p = s.clubPlayers.find((p) => p.playerId === profile.id && p.clubId === DEMO_CLUB_ID)
     if (!p) {
       p = {

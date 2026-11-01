@@ -55,6 +55,8 @@ export type PlayerRank = {
 
 /** Public profile only; private account and contact fields are deliberately excluded. */
 export type PlayerProfile = {
+  /** Shown only on the signed-in player account, not public profile cards. */
+  adminChangeNote?: string
   playerId: string
   rtrId: string
   fullName: string

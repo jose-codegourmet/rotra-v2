@@ -1,4 +1,5 @@
 import { getSession } from '../auth/fetchers'
+import { readMockState } from '../mock/store'
 import { playerProjection } from '../player/projection'
 import { playerRequest } from './request'
 
@@ -14,7 +15,9 @@ export async function searchLeaderboard(query: string, signal?: AbortSignal) {
   await playerRequest(signal)
   const q = query.trim().toLowerCase()
   const hits = playerProjection().entries.filter(
-    (e) => e.fullName.toLowerCase().includes(q) || e.nickname?.toLowerCase().includes(q),
+    (e) =>
+      !readMockState().adminPlayerRecords[e.playerId]?.archivedAt &&
+      (e.fullName.toLowerCase().includes(q) || e.nickname?.toLowerCase().includes(q)),
   )
   return { hits: hits.slice(0, 50), total: hits.length }
 }

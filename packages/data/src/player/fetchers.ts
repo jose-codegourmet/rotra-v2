@@ -28,7 +28,9 @@ export async function findPlayerByRtrId(
 ): Promise<{ playerId: string } | null> {
   await playerRequest(signal)
   const player = playerProjection().players.find((p) => p.rtrId === rtrId.trim().toUpperCase())
-  return player ? { playerId: player.id } : null
+  return player && !readMockState().adminPlayerRecords[player.id]?.archivedAt
+    ? { playerId: player.id }
+    : null
 }
 
 export async function getPlayerProfile(
@@ -36,7 +38,11 @@ export async function getPlayerProfile(
   signal?: AbortSignal,
 ): Promise<PlayerProfile | null> {
   await playerRequest(signal)
-  return readMockState().playerProfiles.find((player) => player.playerId === playerId) ?? null
+  const profile = readMockState().playerProfiles.find((player) => player.playerId === playerId)
+  if (!profile) return null
+  if (profile.adminChangeNote && (await getSession('player'))?.account.id !== playerId)
+    delete profile.adminChangeNote
+  return profile
 }
 
 /** Writes validated personal fields onto a store profile; blank experience is stored as null. */

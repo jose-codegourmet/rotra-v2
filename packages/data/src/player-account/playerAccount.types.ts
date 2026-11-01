@@ -33,6 +33,7 @@ export type ClaimLinkRecord = {
   clubName: string
   status: Exclude<ClaimLinkStatus, 'claimed'>
   /** Status checks while processing; the prototype completes on the second */
+  expiresAt?: string
   checks: number
 }
 export type CompleteClaimResult = {

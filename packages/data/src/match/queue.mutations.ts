@@ -38,7 +38,7 @@ function validate(s: MockState, id: string, lineup: MatchLineup, manual: boolean
   if (!manual && lineup.format.startsWith('fun_'))
     throw new MockError('permission', 'Add a fun game manually instead.')
 }
-function append(
+export function append(
   s: MockState,
   id: string,
   lineup: MatchLineup,

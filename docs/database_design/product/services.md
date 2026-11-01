@@ -55,3 +55,16 @@ screen loaded one, and returns an allowlisted DTO.
 - Ownership (proposal, #248): the receipt is an HMAC of the request ID under `ROTRA_VISITOR_RECEIPT_SECRET`, kept in an httpOnly cookie. Nothing about it is stored; a wrong receipt, another slug or an unknown ID are all `not_found`.
 - A request never reserves a slot. Confirmation and decline stay in `queue/session-roster`, where the session lock serializes capacity and the waitlist.
 - Request phones are returned only to the club (`joinRequestDto`), never by these reads.
+
+## F07.25 · Revision-safe waiting queue commands
+
+| Module | Commands |
+|---|---|
+| `queue/match-store` | `matchCommand` (session lock, active state, optional expected queue/session revision, bumps `queue_revision`); `matchView`/`matchDto` (stored segments → the shared `@rotra/data/match` shape); `nextMatchNo`, `nextQueuePosition` |
+| `queue/match-queue` | `readSessionMatches`; `addManualMatch`, `makeMatch` (manual, protected); `suggestMatch` (no write; returns the revisions) → `addSuggestedMatch` (both revisions required); `autoQueue` (2, 3, 4 or 6); `regenerateQueue`; `moveMatch`; `updateWaitingLineup`; `removeWaitingMatch` |
+
+- Match numbers come from the locked session's highest number + 1 and are never reused: removed and regenerated drafts keep theirs (`removed_at`, no queue position).
+- Queue position is separate and only reorder/regenerate rewrite it.
+- Each match is keyed on its operation ID (`source_operation_id`); a batch is keyed on the command as `generation_id`, so a retried Auto queue or Regenerate returns the same matches.
+- Regenerate rebuilds only waiting non-protected drafts and protected entries that need attention; healthy manual entries and active matches are untouched. A stale queue revision is `conflict`.
+- Generation reuses the prototype reference heuristic from `@rotra/data/match/queue.rules` with a seed from the operation; the final heuristic is still open.

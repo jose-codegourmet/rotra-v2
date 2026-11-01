@@ -77,6 +77,8 @@ When no lineup is possible, the sheet shows the reason (both formats off, or “
 
 ## Q-AUTO — Auto Queue workspace
 
+**UI component:** `AutoQueueWorkspace` in `@rotra/ui/auto-queue-workspace`. Its props carry draft batches and selection order; the later mock-data and screen tickets own generation, transfer validation and persistence.
+
 The Queue view switches between Main Queue and Auto Queue. Auto Queue has Available Players, Plan Ahead, Longest Wait, Fewest Games and Catch Up tabs with retained draft batches. The Queue Master selects a match count (2 / 3 / 4 / 6; no default), explicitly generates, and chooses a Catch Up target when applicable. Cards show reason, lineup, played/queued counts and playing dependencies. No draft starts or enters Main Queue automatically.
 
 Checkbox selections persist across tabs in selection order. **Add selected to Main Queue** opens a review of that order; **Add all from this tab** uses only the current batch. **Regenerate**, **Clear**, **Clear unselected**, and **Regenerate unselected** affect drafts only; selected drafts survive the last action. Main Queue changes leave drafts visible with a stale notice. Revalidation before transfer blocks conflicts and retains the drafts for correction. Distinct rematches are allowed, but the same draft cannot be submitted twice. Counts update from the Main Queue immediately when a waiting match is removed or started; played changes only after eligible Match done.

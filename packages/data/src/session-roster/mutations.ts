@@ -51,7 +51,7 @@ function place(
   )
     // A duplicate is a conflict: the Add player sheet drops the pick and returns to the list.
     throw new MockError('conflict', 'This player is already on the roster or waitlist.')
-  const full = s.roster.filter((r) => r.sessionId === sessionId).length >= capacity(s, sessionId),
+  const full = session.state !== 'active' && s.roster.filter((r) => r.sessionId === sessionId).length >= capacity(s, sessionId),
     id = crypto.randomUUID()
   s.waitlist.push({ id, sessionId, clubPlayerId: p.id, level, addedAt })
   if (!full) promoteWaiter(s, required(s.waitlist.find((w) => w.id === id)), addedAt)

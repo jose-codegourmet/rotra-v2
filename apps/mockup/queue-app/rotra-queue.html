@@ -2274,15 +2274,14 @@ function viewSetup() {
       const here = i === d.step, st = here ? '' : wizStepState(d, i);
       return `<li><button class="${st}" ${here ? 'aria-current="step"' : ''} data-act="wizGo" data-k="${i}" aria-label="Step ${i + 1}, ${t}${here ? ', current step' : st === 'done' ? ', complete' : st === 'warn' ? ', needs details' : ''}"><span class="num">${st === 'done' ? '✓' : st === 'warn' ? '!' : i + 1}</span><span class="lbl">${t}</span></button></li>`;
     }).join('')}</ol>
-    <p class="hint">${d.id ? 'Tap any step to jump to it.' : 'Only page 1 is required. Create session works from any page; the rest uses sensible defaults you can change later.'} Finished steps glow green.</p></div>
+    <p class="hint">${d.id ? 'Tap any step to jump to it.' : 'Only page 1 is required; the rest uses sensible defaults you can change later. Create session is on page 3.'} Finished steps glow green.</p></div>
     ${!S.online ? notice('warn', "You're offline. You can fill this in, but it isn't saved until you reconnect. A draft can't be run offline.") : ''}
     ${stepErr ? notice('bad', 'Fix the highlighted fields to continue.') : ''}
     <section class="card stack" aria-labelledby="wiz-title"><div><span class="label">Step ${d.step + 1} of ${WIZ_STEPS.length}</span><h2 id="wiz-title">${WIZ_STEPS[d.step]}</h2></div>
       ${[d.step * 2, d.step * 2 + 1].map((k, n) => `<div class="wiz-part${n ? ' next' : ''}"><h3>${WIZ_PARTS[k]}</h3>${parts[k]}</div>`).join('')}</section>
     <div class="between">
       <button class="btn" data-act="${d.step === 0 ? 'cancelSetup' : 'wizBack'}">${d.step === 0 ? 'Cancel' : 'Back'}</button>
-      <div class="row">${d.step !== last ? `<button class="btn" data-act="saveSetup" ${!S.online ? 'disabled' : ''}>${d.id ? 'Save changes' : 'Create session'}</button>` : ''}
-      ${d.step === last ? `<button class="btn primary" data-act="saveSetup" ${!S.online ? 'disabled' : ''}>${d.id ? 'Save changes' : 'Create session'}</button>` : '<button class="btn primary" data-act="wizNext">Next</button>'}</div>
+      <div class="row">${d.step === last ? `<button class="btn primary" data-act="saveSetup" ${!S.online ? 'disabled' : ''}>${d.id ? 'Save changes' : 'Create session'}</button>` : '<button class="btn primary" data-act="wizNext">Next</button>'}</div>
     </div>
   </main>`;
 }
@@ -4084,6 +4083,10 @@ document.addEventListener('keydown', (e) => {
     swapSides(scope, a, b);
     const f = document.querySelector(`[data-swap="${scope}"][data-team="${b.team}"][data-i="${b.i}"]`); if (f) f.focus();
     return;
+  }
+  // Session setup: Enter in a field acts as Next on pages 1–2 and saves only on page 3.
+  if (e.key === 'Enter' && !e.isComposing && S.ui.draft && !S.ui.sheet && el.tagName === 'INPUT' && !['button', 'checkbox', 'radio', 'submit'].includes(el.type) && document.getElementById('wiz-title')) {
+    e.preventDefault(); curAct = S.ui.draft.step < WIZ_STEPS.length - 1 ? 'wizNext' : 'saveSetup'; ACT[curAct](); return;
   }
   if ((e.key === 'Enter' || e.key === ' ') && el.getAttribute && el.getAttribute('role') === 'button' && el.dataset.act) { e.preventDefault(); el.click(); }
   if (el.dataset && el.dataset.act === 'dpPick' && ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {

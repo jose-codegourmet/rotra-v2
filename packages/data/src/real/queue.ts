@@ -66,6 +66,7 @@ export async function realGetLicensePayments() {
 }
 
 type WireClubSettings = {
+  revision: string
   id: string
   name: string
   logoRef: string | null
@@ -83,7 +84,8 @@ export async function realGetClub(signal?: AbortSignal): Promise<Club> {
     id: club.id,
     name: club.name,
     initials: clubInitials(club.name),
-    logoUrl: null,
+    logoUrl: club.logoRef,
+    revision: club.revision,
     description: club.description,
     courtRules: club.courtRules || null,
     postTemplate: club.postTemplate,
@@ -100,6 +102,15 @@ export async function realGetClub(signal?: AbortSignal): Promise<Club> {
     licenseYearlyMinor: 0,
     currency: 'PHP',
   }
+}
+
+/** Q-CLUB: success means both the image upload and the database update completed. */
+export async function realUpdateClubLogo(input: {
+  logoUrl: string | null
+  expectedRevision?: string
+}) {
+  await realRequest('/api/club', { method: 'PATCH', body: input })
+  return accepted(null, input.logoUrl === null ? 'Club logo removed' : 'Club logo updated')
 }
 
 // ---------- Venues (Q-VENUES) ----------

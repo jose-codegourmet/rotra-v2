@@ -7,6 +7,8 @@ import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, readMockState } from '../mock/store'
 import { queueMutation, requireClubAccess } from '../mock/transaction'
+import { isRealDataMode } from '../real/mode'
+import { realUpdateClubLogo } from '../real/queue'
 import {
   buildPostValues,
   clubInitials,
@@ -21,16 +23,18 @@ function clubIn(state: MockState) {
 }
 const changeClub = <T>(change: (state: MockState) => { data: T; text: string }) =>
   queueMutation({ area: 'Club settings', onlineOnly: true, clubAccess: true }, change)
-export const updateClubLogo = (input: { logoUrl: string | null }) =>
-  changeClub((state) => {
-    if (
-      input.logoUrl !== null &&
-      !/^(https?:|data:image\/(png|jpeg|webp);base64,)/.test(input.logoUrl)
-    )
-      throw new MockError('permission', 'Choose an image.', { logoUrl: 'Choose an image.' })
-    clubIn(state).logoUrl = input.logoUrl
-    return { data: null, text: 'Club logo updated' }
-  })
+export const updateClubLogo = (input: { logoUrl: string | null; expectedRevision?: string }) =>
+  isRealDataMode()
+    ? realUpdateClubLogo(input)
+    : changeClub((state) => {
+        if (
+          input.logoUrl !== null &&
+          !/^(https?:|data:image\/(png|jpeg|webp);base64,)/.test(input.logoUrl)
+        )
+          throw new MockError('permission', 'Choose an image.', { logoUrl: 'Choose an image.' })
+        clubIn(state).logoUrl = input.logoUrl
+        return { data: null, text: 'Club logo updated' }
+      })
 export const requestClubNameChange = (input: { requestedName: string }) =>
   changeClub((state) => {
     const name = nameField.parse(input.requestedName)

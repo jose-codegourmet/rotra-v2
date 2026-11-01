@@ -64,3 +64,22 @@ Retention jobs refer to the cycle ID and recheck entitlement under the club lock
 Deleting a publication is not deleting a club, session, match fact, or player rank. Internal retention remains undecided.
 
 Business source: [license rules](../../../../business_logic/product/admin/modules/clubs-licenses/README.md).
+
+## Club logo persistence (#374)
+
+Q-CLUB sends the existing picker's centre-cropped 256 px PNG to `PATCH /api/club` with the
+settings revision. The Route Handler derives the club from its verified account; the service
+checks active entitlement, the revision, and the bounded PNG before uploading. It then updates
+`clubs.logo_ref` and increments the revision in the existing settings transaction. Removal saves
+null. The stored reference is an immutable public image URL, also consumed by the dashboard,
+Admin club projection, public-session projection and result snapshots. Mock mode remains in memory.
+
+Provision a Supabase Storage bucket named `club-logos` with public reads, `image/png` only and a
+524288-byte file limit. Writes use the existing server-only `SUPABASE_SECRET_KEY` after the normal
+club authorization; do not grant browser insert/update/delete policies. Paths are generated on the
+server as `<club UUID>/<random UUID>.png`. No application schema migration is required.
+
+Replacements use new paths, preventing stale CDN images. Previous objects are retained because
+historical result snapshots can reference them. A known rejected database write removes only its
+new upload; an ambiguous database failure retains it to avoid deleting an image that may have
+committed. General orphan cleanup and historical asset retention remain separate work.

@@ -1,3 +1,4 @@
+import { admissionCapacityFixture as admission } from '@rotra/data/fixtures/session-waitlist'
 import { clubPlayers } from '@rotra/data/fixtures/players'
 import { queueSessionFixtures } from '@rotra/data/fixtures/queueSessions'
 import { sessionWaitlistFixture } from '@rotra/data/fixtures/session-waitlist'
@@ -73,3 +74,8 @@ export const Phone: Story = {
   globals: { viewport: { value: 'phone' } },
 }
 export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }
+
+export const ActiveFull: Story = { args: { live: true, rosterCount: admission.full, courtCount: admission.courtCount, playersPerCourt: admission.playersPerCourt } }
+export const ActiveOverPlan: Story = { args: { live: true, rosterCount: admission.over, courtCount: admission.courtCount, playersPerCourt: admission.playersPerCourt } }
+export const AdmissionPending: Story = { args: { live: true, isPending: true } }
+export const AdmissionError: Story = { args: { live: true, serverError: 'Changes could not be saved' } }

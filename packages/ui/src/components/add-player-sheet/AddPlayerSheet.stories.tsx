@@ -1,3 +1,4 @@
+import { admissionCapacityFixture as admission } from '@rotra/data/fixtures/session-waitlist'
 import type { ClubPlayer } from '@rotra/data/club-player/types'
 import {
   clubPlayers,
@@ -141,3 +142,5 @@ export const Offline: Story = { args: { initialTab: 'directory', offline: true }
 
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
 export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }
+
+export const ActiveFull: Story = { args: { live: true, capacity: admission.capacity, openSlots: 0 } }

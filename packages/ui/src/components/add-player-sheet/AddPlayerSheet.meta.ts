@@ -23,5 +23,7 @@ export const addPlayerSheetMeta = {
     'docs/business_logic/product/queue/modules/players/README.md#entry-and-identity',
     'docs/business_logic/product/queue/modules/players/README.md#slots-and-waitlist',
   ],
+  // Active sessions admit directly; the planning budget stays advisory.
+  variants: ['prepared', 'active', 'full', 'over-plan', 'pending', 'error'],
   related: ['PlayerConfirmCard', 'NewPlayerForm', 'SegmentedControl', 'Sheet', 'SlotMeter'],
 } satisfies ComponentMeta

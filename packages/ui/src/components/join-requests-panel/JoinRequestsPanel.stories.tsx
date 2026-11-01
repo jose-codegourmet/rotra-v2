@@ -72,3 +72,5 @@ export const InSheetPhone: Story = {
   render: () => <SheetDemo slotsFull />,
   globals: { viewport: { value: 'phone' } },
 }
+
+export const ActiveFull: Story = { args: { live: true, slotsFull: true } }

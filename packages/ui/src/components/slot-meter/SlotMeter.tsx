@@ -2,6 +2,7 @@ import { cn } from '@rotra/ui/cn'
 import { slotMeterBarVariants } from './SlotMeter.variants'
 
 export type SlotMeterProps = {
+  live?: boolean
   rosterCount: number
   capacity: number
   waitlistCount?: number
@@ -9,11 +10,12 @@ export type SlotMeterProps = {
 }
 
 /** "14/24 slots · 10 left before the waitlist" with a bar; amber near or at the budget. */
-export function SlotMeter({ rosterCount, capacity, waitlistCount = 0, className }: SlotMeterProps) {
+export function SlotMeter({ rosterCount, capacity, waitlistCount = 0, live = false, className }: SlotMeterProps) {
   const open = capacity - rosterCount
   const state = open < 0 ? 'over' : open === 0 ? 'full' : open <= 2 ? 'near' : 'ok'
-  const text =
-    open > 0
+  const text = live
+    ? `${Math.max(0, -open)} over plan · additional players can be admitted directly`
+    : open > 0
       ? `${open} left before the waitlist`
       : open === 0
         ? 'Full · new players go on the waitlist'

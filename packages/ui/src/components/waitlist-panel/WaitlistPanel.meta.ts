@@ -3,7 +3,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const waitlistPanelMeta = {
   name: 'WaitlistPanel',
   description:
-    'The first-come waitlist of a Queue Session: slots used against the budget, Fill N open slots, and one row per waiting player with Give slot (or Give slot anyway over budget) and remove.',
+    'Prepared first-come waitlisting and active admission of any chosen waiter: slots used against the budget, Fill N open slots, and one row per waiting player with Give slot (or Give slot anyway over budget), Admit player during play, and remove.',
   usage: [
     'Use for the Waitlist tab in preparation (Q-PREPARE) and in the live Players view when someone waits or the slots are full.',
     'Rows keep the order players joined; the panel never reorders them.',
@@ -19,5 +19,7 @@ export const waitlistPanelMeta = {
     'docs/screens/product/modules/queue/players-roster.md',
     'docs/business_logic/product/queue/modules/players/README.md',
   ],
+  // Active sessions admit directly; the planning budget stays advisory.
+  variants: ['prepared', 'active', 'full', 'over-plan', 'pending', 'error'],
   related: ['RosterPanel', 'SlotMeter', 'Avatar', 'IconButton'],
 } satisfies ComponentMeta

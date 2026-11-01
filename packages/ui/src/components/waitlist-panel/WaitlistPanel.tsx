@@ -6,6 +6,7 @@ import { cn } from '@rotra/ui/cn'
 import { Icon } from '@rotra/ui/icon'
 import { IconButton } from '@rotra/ui/icon-button'
 import { levelLabel } from '@rotra/ui/level-pill'
+import { Notice } from '@rotra/ui/notice'
 import { Skeleton } from '@rotra/ui/skeleton'
 
 /** One person on the first-come waitlist, in the order they joined */
@@ -26,6 +27,9 @@ export type WaitlistPanelProps = {
   playersPerCourt: number
   /** The waitlist is still loading: Skeleton rows in place of the list and the slots line */
   loading?: boolean
+  live?: boolean
+  isPending?: boolean
+  serverError?: string
   onFillOpenSlots: () => void
   onGiveSlot: (entryId: string) => void
   onRemove: (entryId: string) => void
@@ -44,6 +48,9 @@ export function WaitlistPanel({
   courtCount,
   playersPerCourt,
   loading = false,
+  live = false,
+  isPending = false,
+  serverError,
   onFillOpenSlots,
   onGiveSlot,
   onRemove,
@@ -91,15 +98,17 @@ export function WaitlistPanel({
                 {rosterCount} of {capacity}
               </b>{' '}
               used ({courtCount} court{courtCount === 1 ? '' : 's'} × {playersPerCourt} players)
-              {open ? ` · ${open} open` : ' · full'}. First come, first served.
+              {open ? ` · ${open} open` : ' · full'}.{' '}
+              {live ? 'Admit any chosen waitlisted player, including above the plan. Waitlisted players are not present until admitted.' : 'First come, first served.'}
             </p>
           </div>
-          {fill ? (
-            <Button size="sm" variant="primary" onClick={onFillOpenSlots}>
+          {fill && !live ? (
+            <Button size="sm" variant="primary" disabled={isPending} onClick={onFillOpenSlots}>
               Fill {fill} open slot{fill > 1 ? 's' : ''}
             </Button>
           ) : null}
         </div>
+        {serverError ? <Notice tone="error">{serverError}</Notice> : null}
         {entries.length ? (
           <div className="flex flex-col divide-y divide-border">
             {entries.map((w, i) => (
@@ -114,15 +123,17 @@ export function WaitlistPanel({
                 </div>
                 <Button
                   size="xs"
-                  variant={open ? 'primary' : 'secondary'}
-                  title={open ? undefined : 'Over your slot budget'}
+                  disabled={isPending}
+                  variant={live || open ? 'primary' : 'secondary'}
+                  title={live || open ? undefined : 'Over your slot budget'}
                   onClick={() => onGiveSlot(w.id)}
                 >
-                  {open ? 'Give slot' : 'Give slot anyway'}
+                  {live ? 'Admit player' : open ? 'Give slot' : 'Give slot anyway'}
                 </Button>
                 <IconButton
                   size="xs"
                   variant="ghost"
+                  disabled={isPending}
                   label={`Remove ${w.name} from the waitlist`}
                   onClick={() => onRemove(w.id)}
                 >
@@ -133,7 +144,7 @@ export function WaitlistPanel({
           </div>
         ) : (
           <p className="text-[13px] text-fg2">
-            {open
+            {live || open
               ? 'Nobody is waiting.'
               : 'Nobody is waiting. Players added from now on join the waitlist.'}
           </p>

@@ -31,7 +31,8 @@
     "./queue/match-store": "./src/queue/match-store.ts",
     "./queue/match-queue": "./src/queue/match-queue.ts",
     "./queue/match-control": "./src/queue/match-control.ts",
-    "./queue/financials": "./src/queue/financials.ts"
+    "./queue/financials": "./src/queue/financials.ts",
+    "./queue/sync": "./src/queue/sync.ts"
   },
   "scripts": {
     "db:generate": "prisma generate",

@@ -90,3 +90,16 @@ screen loaded one, and returns an allowlisted DTO.
 - A paid tick stores the amount due at that moment (null when no fee is set) under its operation ID; a duplicate applies once and later fee changes never rewrite it. Marks key on the released-not-deleted roster entry, so they survive demotion and show again on restoration. No-fee tick meaning is still #245.
 - Payments stay open after Session done (`completed`), never for `invalid` or `finalizing`; they are separate from immutable results.
 - No new money unit tests were added; the reused rules keep their existing tests.
+
+## F07.28 · Server sync acceptance, stream closure, conflict evidence
+
+| Module | Commands |
+|---|---|
+| `queue/sync` | `registerDevice`; `enrollStream` (online; takes the one-offline-session reservation; a second device or recovery must revoke the open stream, which records a `missing_prerequisite` conflict); `uploadOperations` (store envelopes → process the contiguous prefix); `sealStream`; `readSyncStatus`; `sessionCompleteness`; `resolveConflict`; `resumeSessionStreams` |
+
+- Same operation ID + same canonical payload digest returns the stored receipt; a changed payload or another ID at a used sequence is a `payload_mismatch` conflict and the original envelope is kept.
+- Uploads run the same domain services as online commands, with the operation ID as the command ID (`DISPATCH`). Unknown kinds are rejected; after Session done only payment marks are accepted (finalized payment boundary); service `conflict` → `conflicted` with evidence, other service errors → `rejected` with the code.
+- Processing stops at the first gap; `contiguous_sequence` only moves over settled operations; a quarantined one holds it until resolved. Acceptance is recorded after the domain commit, and reprocessing is safe because every command is repeat-safe.
+- A seal needs the full prefix and a matching digest (SHA-256 over the concatenated payload digests 1..N). The server never seals a stream itself.
+- Completeness is proven only when every enrolled stream is sealed and fully settled, no conflict is open and nothing is unprocessed. An unused open stream keeps it unproven.
+- Conflict authority (club account, online, unfinalized session) and the seal digest format are proposals pending #246. The browser outbox is Q11.

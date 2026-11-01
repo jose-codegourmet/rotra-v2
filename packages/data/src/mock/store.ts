@@ -128,8 +128,7 @@ function seedState(): MockState {
         createResultSnapshot({
           sessionId: s.id,
           roster: history.roster,
-          autoQueueDrafts: {},
-    matches: history.matches,
+          matches: history.matches,
           history: playerAwardHistory,
           players: clubPlayers,
           generatedAt: s.finalizedAt ?? now,
@@ -164,6 +163,7 @@ function seedState(): MockState {
     downloads: {},
     downloadInfo: {},
     sessionIntegrity: {},
+    autoQueueDrafts: {},
     matches: history.matches,
     matchSequences: history.matchSequences,
     finalizations: history.finalizations,

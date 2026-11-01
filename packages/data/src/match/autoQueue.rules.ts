@@ -2,7 +2,7 @@ import type { QueueSession } from '../queue-session/queueSession.types'
 import type { MatchLineup } from './match.types'
 import { splitTeams } from './queue.rules'
 import type { AutoQueueDraftLineup, AutoQueueDraftState, AutoQueueMode } from './autoQueue.types'
-import { activeMatchFor, allPlayers, countedGames, queuedCount, waitMinutes, type MatchContext } from './match.rules'
+import { activeMatchFor, allPlayers, countedGames, queuedCount, waitMinutes, completeLineup, shortName, type MatchContext } from './match.rules'
 
 export const AUTO_QUEUE_MODES: AutoQueueMode[] = ['available', 'ahead', 'wait', 'fewest', 'catchup']
 export function emptyAutoQueueDraftState(): AutoQueueDraftState {
@@ -98,4 +98,19 @@ export function generateAutoQueueMatches({ session, ctx, mode, limit, retained =
     return { matches, stopReason: `Catch Up target ${target}. ${stopReason} Remaining planned shortfall: ${remainingShortfall}.`, remainingShortfall, error: null }
   }
   return { matches, stopReason, error: null }
+}
+
+/** Revalidate source facts without silently replacing a selected lineup. Courts are claimed only by Start match. */
+export function autoQueueDraftConflict(draft: AutoQueueDraftLineup, session: QueueSession, ctx: MatchContext) {
+  if (!completeLineup(draft)) return 'Lineup is incomplete or repeats a player. Regenerate this draft.'
+  if (draft.format !== 'singles' && draft.format !== 'doubles') return 'Add a fun game manually instead.'
+  if ((draft.format === 'singles' && !session.allowSingles) || (draft.format === 'doubles' && !session.allowDoubles))
+    return `${draft.format === 'singles' ? 'Singles' : 'Doubles'} is off for this session.`
+  for (const id of allPlayers(draft)) {
+    const player = ctx.roster.find((p) => p.id === id && p.sessionId === session.id)
+    if (!player || !player.present) return `${player ? shortName(player) : 'A player'} is not present. Restore presence or regenerate the draft.`
+    if (draft.mode !== 'ahead' && activeMatchFor(id, ctx.matches))
+      return `${shortName(player)} is now playing. This draft needs attention; use Plan Ahead or regenerate when they are free.`
+  }
+  return null
 }

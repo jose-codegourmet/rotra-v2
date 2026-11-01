@@ -2,10 +2,10 @@ import { checkMockSave } from '../mock/bridge'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, mockStore, readMockState } from '../mock/store'
-import { requireSessionWrite, sessionIn } from '../mock/transaction'
-import { allAutoQueueDrafts, autoQueueFingerprint, clearAutoQueueDrafts, emptyAutoQueueDraftState, selectAutoQueueDraft, generateAutoQueueMatches } from './autoQueue.rules'
+import { queueMutation, requireSessionWrite, sessionIn } from '../mock/transaction'
+import { allAutoQueueDrafts, autoQueueFingerprint, clearAutoQueueDrafts, emptyAutoQueueDraftState, selectAutoQueueDraft, generateAutoQueueMatches, autoQueueDraftConflict } from './autoQueue.rules'
 import type { AutoQueueCount, AutoQueueMode } from './autoQueue.types'
-import { matchContext, requireLive } from './queue.mutations'
+import { append, matchContext, requireLive } from './queue.mutations'
 
 export function draftState(s: MockState, sessionId: string) {
   return s.autoQueueDrafts[sessionId] ??= emptyAutoQueueDraftState()
@@ -57,5 +57,32 @@ export function generateAutoQueueDrafts(input: { sessionId: string; mode: AutoQu
     state.selectedIds = state.selectedIds.filter((id) => remaining.has(id))
     checkMockSave()
     return state
+  })
+}
+
+export function transferAutoQueueDrafts(input: { sessionId: string; draftIds: string[]; operationId: string }) {
+  if (!input.operationId.trim()) throw new MockError('permission', 'A confirmation ID is required.')
+  return queueMutation({
+    area: 'Queue', sessionId: input.sessionId,
+    operationId: `auto-queue:${input.operationId}`,
+    fingerprint: JSON.stringify([input.sessionId, input.draftIds]),
+  }, (s) => {
+    const session = requireLive(s, input.sessionId), state = draftState(s, session.id)
+    if (!input.draftIds.length || new Set(input.draftIds).size !== input.draftIds.length)
+      throw new MockError('conflict', 'Review a non-empty selection of different drafts.')
+    const all = allAutoQueueDrafts(state), ctx = matchContext(s, session.id)
+    const drafts = input.draftIds.map((id) => {
+      if (state.committedIds.includes(id)) throw new MockError('conflict', 'This draft was already added to Main Queue.')
+      const draft = all.find((d) => d.id === id)
+      if (!draft) throw new MockError('conflict', 'Drafts changed. Review them again.')
+      const conflict = autoQueueDraftConflict(draft, session, ctx)
+      if (conflict) throw new MockError('conflict', conflict)
+      return draft
+    })
+    const matches = drafts.map((d) => append(s, session.id, { format: d.format, teamA: d.teamA, teamB: d.teamB }, 'auto', false))
+    for (const batch of Object.values(state.batches)) batch.drafts = batch.drafts.filter((d) => !input.draftIds.includes(d.id))
+    state.selectedIds = state.selectedIds.filter((id) => !input.draftIds.includes(id))
+    state.committedIds.push(...input.draftIds)
+    return { data: matches, text: `${matches.length} draft${matches.length === 1 ? '' : 's'} added to Main Queue` }
   })
 }

@@ -174,6 +174,8 @@ Wired end to end in real data mode (see [architecture.md](../../architecture.md)
 | Q-HOME, Q-SETUP | Queue `GET`/`POST /api/sessions`, `GET /api/sessions/[sessionId]` | `readQueueSessions`, `readQueueSession`, `createQueueSession`, `saveSessionCost` |
 | Q-ROSTER | Queue `GET`/`POST /api/sessions/[sessionId]/roster`, `POST …/roster/[rosterId]/level` | `readSessionRoster`, `addNewPlayerToSession`, `setRosterLevel` |
 
-Proposals used (each listed in #317): club username → `<username>@clubs.rotra.invalid` provider login
-(#243/#244); the six prototype founding cities seeded by `20261101000100_seed_founding_locations`
-(#244); license start decided by the server and the typed reference kept as the note (#245).
+Proposals used, each now its own ticket (split from #317): club username →
+`<username>@clubs.rotra.invalid` provider login (#381); the six prototype founding cities seeded by
+`20261101000100_seed_founding_locations` (#380); license start decided by the server and the typed
+reference kept as the note (#377). The remaining gaps are listed in the
+[database open-decisions register](open-decisions.md#gaps-from-the-f0734-wiring).

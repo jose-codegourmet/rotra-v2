@@ -146,6 +146,8 @@ Route paths above illustrate the pattern; the real route list comes from the scr
 
 ### Mock phase (now)
 
+Individual presence uses a transient QueryClient/session-scoped DebouncedBatch overlay, observed by useSessionRoster. Accepted query data remains separate so background refetches cannot overwrite newer intent. useDebouncedBatch handles lifecycle flushes; setPresenceMany makes one guarded atomic mock write. Other roster mutations await pending presence first. This is not durable offline storage, and payment ticket #300 can reuse the generic helper.
+
 ```text
 @rotra/ui component (props)
   ◄── _components container ('use client')

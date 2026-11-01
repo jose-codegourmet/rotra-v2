@@ -22,7 +22,7 @@ import { useFillOpenSlots } from '@rotra/data/session-roster/useFillOpenSlots'
 import { useGiveSlot } from '@rotra/data/session-roster/useGiveSlot'
 import { useRemoveFromWaitlist } from '@rotra/data/session-roster/useRemoveFromWaitlist'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
-import { useSetPresence } from '@rotra/data/session-roster/useSetPresence'
+import { useSetPresenceMany } from '@rotra/data/session-roster/useSetPresenceMany'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { EmptyState } from '@rotra/ui/empty-state'
@@ -80,21 +80,25 @@ const errorMessage = (error: unknown) =>
  * PlayerPoolCard grid built from the match rules (games, wait minutes, On Court X / Away /
  * Queued · #P / Free), the pick order in local state with the SelectionBar while anyone is picked,
  * the Waitlist panel when anyone waits or the session is full, and the footer line. Pictures on
- * waitlist rows open profiles through onOpenProfile; the Present switch calls useSetPresence and
- * toasts its message, which counts the waiting matches that now need attention.
+ * waitlist rows open profiles through onOpenProfile; the Present switch uses a shared optimistic 800 ms presence batch, retaining pending cards in their
+ * filter and reporting one summary with the unique waiting-match attention count.
  */
 export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps) {
   const session = useQueueSession(sessionId)
   const roster = useSessionRoster(sessionId)
   const matches = useSessionMatches(sessionId)
   const clubPlayers = useClubPlayers()
-  const setPresence = useSetPresence()
+  const setPresence = useSetPresenceMany(sessionId, {
+    onSuccess: (result) => toast(result.message),
+    onError: (error) => toast.error(errorMessage(error)),
+  })
   const makeMatch = useMakeMatch()
   const giveSlot = useGiveSlot()
   const fillOpenSlots = useFillOpenSlots()
   const removeFromWaitlist = useRemoveFromWaitlist()
   const [show, setShow] = useState<PlayerPoolShow>('available')
   const [sort, setSort] = useState<PlayerPoolSort>('wait')
+  const [held, setHeld] = useState<{ filter: PlayerPoolShow; ids: string[] } | null>(null)
   /** Roster ids in pick order */
   const [picked, setPicked] = useState<string[]>([])
   const [addOpen, setAddOpen] = useState(false)
@@ -161,15 +165,24 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
     present: rows.filter((r) => r.player.present).length,
     everyone: rows.length,
   }
+  const retained = (id: string) =>
+    held?.filter === show && held.ids.includes(id) && setPresence.pending.has(id)
   const shown = rows
     .filter((r) =>
       show === 'available'
-        ? r.player.present && !r.playing
+        ? (r.player.present && !r.playing) || retained(r.player.id)
         : show === 'present'
-          ? r.player.present
+          ? r.player.present || retained(r.player.id)
           : true,
     )
     .sort(SORTERS[sort])
+  if (held?.filter === show && setPresence.pending.size) {
+    const rank = (id: string) => {
+      const index = held.ids.indexOf(id)
+      return index < 0 ? Infinity : index
+    }
+    shown.sort((a, b) => rank(a.player.id) - rank(b.player.id))
+  }
 
   // A pick survives only while that player is still on the roster.
   const selection = picked.filter((id) => rosterList.some((p) => p.id === id))
@@ -211,7 +224,12 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
             {counts.everyone}.
           </p>
         </div>
-        <Button size="sm" onClick={() => setAddOpen(true)}>
+        <Button
+          size="sm"
+          onClick={() => {
+            void setPresence.flush().then(() => setAddOpen(true))
+          }}
+        >
           Add late player
         </Button>
       </div>
@@ -223,10 +241,16 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
       />
       <PlayerPoolToolbar
         show={show}
-        onShowChange={setShow}
+        onShowChange={(value) => {
+          setHeld(null)
+          setShow(value)
+        }}
         counts={counts}
         sort={sort}
-        onSortChange={setSort}
+        onSortChange={(value) => {
+          setHeld(null)
+          setSort(value)
+        }}
       />
       {shown.length ? (
         <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,156px),1fr))] gap-2">
@@ -242,12 +266,15 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
                 waitMinutes={row.minutes}
                 status={row.status}
                 present={row.player.present}
+                presencePending={setPresence.pending.has(row.player.id)}
                 selected={order >= 0}
                 pickOrder={order >= 0 ? order + 1 : undefined}
                 onToggleSelect={() => toggle(row.player.id)}
-                onPresentChange={(present) =>
-                  setPresence.mutate({ sessionId, rosterId: row.player.id, present }, options)
-                }
+                onPresentChange={(present) => {
+                  if (!setPresence.pending.size || held?.filter !== show)
+                    setHeld({ filter: show, ids: shown.map((r) => r.player.id) })
+                  setPresence.set(row.player.id, present)
+                }}
               />
             )
           })}
@@ -267,7 +294,8 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
           label={planLabel}
           valid={!!plan.format}
           onClear={() => setPicked([])}
-          onMakeMatch={() =>
+          onMakeMatch={async () => {
+            await setPresence.flush()
             makeMatch.mutate(
               { sessionId, selection },
               {
@@ -278,7 +306,7 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
                 onError: (error) => toast.error(errorMessage(error)),
               },
             )
-          }
+          }}
         />
       ) : null}
       {waitlist.length || full ? (

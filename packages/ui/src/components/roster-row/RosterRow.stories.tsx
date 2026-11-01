@@ -78,3 +78,5 @@ export const Desktop: Story = {
 }
 
 export const ReadOnly: Story = { args: { ...rowAt(0), levelLocked: true, readOnly: true } }
+
+export const SavingPresence: Story = { args: { ...rowAt(0), presencePending: true } }

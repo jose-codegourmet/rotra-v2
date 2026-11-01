@@ -31,6 +31,8 @@ export type PlayerPoolCardProps = {
   waitMinutes?: number
   status: PlayerPoolCardStatus
   present: boolean
+  /** Transient intent has not been accepted yet; the switch stays interactive. */
+  presencePending?: boolean
   /** Picked for the next match; `pickOrder` is 1-based and shows as the badge */
   selected?: boolean
   pickOrder?: number
@@ -68,6 +70,7 @@ export function PlayerPoolCard({
   waitMinutes,
   status,
   present,
+  presencePending = false,
   selected = false,
   pickOrder,
   onToggleSelect,
@@ -145,6 +148,7 @@ export function PlayerPoolCard({
           />
         </span>
       </div>
+      {presencePending ? <span className="text-[11px] text-fg2">Saving presence…</span> : null}
     </div>
   )
 }

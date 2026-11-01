@@ -22,6 +22,7 @@ export type RosterRowProps = {
   /** The club's level for this session; null until the Queue Master sets it */
   level: PlayingLevel | null
   present: boolean
+  presencePending?: boolean
   /** Levels lock when the session starts: the level shows as text with a lock, no select */
   levelLocked?: boolean
   /** Settings summary: presence is text and removal is unavailable. */
@@ -46,6 +47,7 @@ export function RosterRow({
   suggestion,
   level,
   present,
+  presencePending = false,
   levelLocked,
   readOnly = false,
   onOpenProfile,
@@ -100,7 +102,13 @@ export function RosterRow({
       </div>
       <div className="order-3 flex flex-nowrap items-center justify-between gap-2 sm:order-none sm:justify-start">
         <span className="text-[13px] text-fg2">
-          {readOnly ? (present ? 'Present' : 'Away') : 'Present'}
+          {presencePending
+            ? 'Saving presence…'
+            : readOnly
+              ? present
+                ? 'Present'
+                : 'Away'
+              : 'Present'}
         </span>
         {!readOnly ? (
           <>

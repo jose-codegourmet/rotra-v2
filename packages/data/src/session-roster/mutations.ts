@@ -1,4 +1,5 @@
 import { phoneField } from '@rotra/schema/phone'
+import { flushSessionPresence } from '../batch/flushBatches'
 import type { ClubPlayer } from '../club-player/clubPlayer.types'
 import { clubPlayerView } from '../club-player/fetchers'
 import { DEMO_CLUB_ID } from '../fixtures/clubs'
@@ -28,7 +29,11 @@ const capacity = (s: MockState, id: string) =>
     s.courts.filter((c) => c.sessionId === id && !c.removedAt).length,
     sessionIn(s, id).playersPerCourt,
   )
-function rosterMutation<T>(sessionId: string, change: (s: MockState) => { data: T; text: string }) {
+async function rosterMutation<T>(
+  sessionId: string,
+  change: (s: MockState) => { data: T; text: string },
+) {
+  await flushSessionPresence(sessionId)
   return queueMutation({ area: 'Roster', sessionId }, (s) => {
     const result = change(s)
     recomputeMinimum(s, sessionId)
@@ -170,14 +175,17 @@ function newPlayer(s: MockState, input: { name: string; nickname?: string; phone
   if (parsed?.success) s.privatePhones[p.id] = parsed.data
   return p
 }
-export function addNewPlayerToSession(input: {
+export async function addNewPlayerToSession(input: {
   sessionId: string
   name: string
   nickname?: string
   phone?: string
   level: PlayingLevel
 }) {
-  if (isRealDataMode()) return realAddNewPlayerToSession(input)
+  if (isRealDataMode()) {
+    await flushSessionPresence(input.sessionId)
+    return realAddNewPlayerToSession(input)
+  }
   return rosterMutation(input.sessionId, (s) => {
     const p = newPlayer(s, input),
       data = place(s, input.sessionId, p, input.level)
@@ -196,12 +204,15 @@ function row(s: MockState, id: string, sessionId: string) {
   if (!p) fail('Player not available.')
   return p
 }
-export function setRosterLevel(input: {
+export async function setRosterLevel(input: {
   sessionId: string
   rosterId: string
   level: PlayingLevel
 }) {
-  if (isRealDataMode()) return realSetRosterLevel(input)
+  if (isRealDataMode()) {
+    await flushSessionPresence(input.sessionId)
+    return realSetRosterLevel(input)
+  }
   return rosterMutation(input.sessionId, (s) => {
     const p = row(s, input.rosterId, input.sessionId)
     if (sessionIn(s, input.sessionId).state !== 'prepared' || p.levelLockedAt)
@@ -236,6 +247,43 @@ export function setPresence(input: { sessionId: string; rosterId: string; presen
     return {
       data: null,
       text: `${shortName(p)} is ${input.present ? '' : 'not '}present${n ? ` · ${n} waiting match${n === 1 ? ' needs' : 'es need'} attention` : ''}`,
+    }
+  })
+}
+/** One atomic Roster command: wanted end states, unique attention count, one sync entry. */
+export function setPresenceMany(input: {
+  sessionId: string
+  changes: { rosterId: string; present: boolean }[]
+}) {
+  if (!input.changes.length)
+    return Promise.resolve({ data: null, savedOffline: false, message: 'No presence changes' })
+  // Do not call rosterMutation here: its preflight flush would wait for this same batch.
+  return queueMutation({ area: 'Roster', sessionId: input.sessionId }, (s) => {
+    const changes = new Map(input.changes.map((change) => [change.rosterId, change.present]))
+    const away = new Set<string>()
+    let present = 0
+    for (const [id, wanted] of changes) {
+      if (typeof wanted !== 'boolean') fail('Choose a presence state.')
+      const player = row(s, id, input.sessionId)
+      player.present = wanted
+      player.presentChangedAt = Date.now()
+      if (wanted) present++
+      else away.add(id)
+    }
+    const n = s.matches.filter(
+      (m) =>
+        m.sessionId === input.sessionId &&
+        m.state === 'waiting' &&
+        [...m.teamA, ...m.teamB].some((id) => away.has(id)),
+    ).length
+    const absent = changes.size - present
+    const text =
+      present && absent
+        ? `${present} player${present === 1 ? '' : 's'} marked present, ${absent} away`
+        : `${changes.size} player${changes.size === 1 ? '' : 's'} marked ${present ? 'present' : 'away'}`
+    return {
+      data: null,
+      text: text + (n ? ` · ${n} waiting match${n === 1 ? ' needs' : 'es need'} attention` : ''),
     }
   })
 }
@@ -327,7 +375,8 @@ function request(s: MockState, input: JoinRequestInput) {
   s.joinRequests.push(r)
   return r
 }
-export function submitJoinRequest(input: JoinRequestInput) {
+export async function submitJoinRequest(input: JoinRequestInput) {
+  await flushSessionPresence(input.sessionId)
   return queueMutation({ area: 'Roster', onlineOnly: true }, (s) => {
     const r = request(s, input)
     return { data: { requestId: r.id }, text: 'Request sent' }

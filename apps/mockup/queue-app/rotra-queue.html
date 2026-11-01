@@ -1137,6 +1137,29 @@ function toast(text) {
   setTimeout(() => el.remove(), 3600);
 }
 
+// Presence is optimistic immediately; the prototype commits one summary after the last tap.
+const presencePending = new Map();
+let presenceTimer = null;
+let heldPresence = null;
+function flushPresence() {
+  clearTimeout(presenceTimer); presenceTimer = null;
+  const changes = [...presencePending.values()]; presencePending.clear(); heldPresence = null;
+  if (!changes.length) return;
+  const session = S.sessions.find((s) => s.id === changes[0].sid);
+  if (!session) return;
+  if (!['prepared', 'active'].includes(session.status) || (!S.online && session.download !== 'ready') || (S.licenseExpired && session.status !== 'active')) {
+    for (const item of changes) { const row = R(session, item.pid); if (row) { row.present = item.before; row.presentAt = item.beforeAt; } }
+    toast(!S.online ? 'No downloaded copy on this device. Connect, or download first.' : 'This session is read-only.'); render(); return;
+  }
+  const on = changes.filter((x) => R(session, x.pid)?.present).length, off = changes.length - on;
+  const away = new Set(changes.filter((x) => !R(session, x.pid)?.present).map((x) => x.pid));
+  const affected = waiting(session).filter((m) => all(m).some((pid) => away.has(pid))).length;
+  const msg = on && off ? `${on} player${on === 1 ? '' : 's'} marked present, ${off} away` : `${changes.length} player${changes.length === 1 ? '' : 's'} marked ${on ? 'present' : 'away'}`;
+  const previousAct = curAct; curAct = 'togglePresent'; commit(msg + (affected ? ` · ${affected} waiting match${affected === 1 ? ' needs' : 'es need'} attention` : '')); curAct = previousAct; render();
+}
+window.addEventListener('pagehide', flushPresence);
+document.addEventListener('visibilitychange', () => { if (document.hidden) flushPresence(); });
+
 // ---------- Icons ----------
 const I = {
   n_plus: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
@@ -2387,7 +2410,7 @@ function viewPrepare() {
       ${s.roster.length ? `<div class="list">${s.roster.map((r) => { const p = P(r.pid); return `<div class="prow">
         <div class="li" style="padding:0">${faceBtn(p)}<div class="main"><div class="pn"><b>${esc(p.name)}</b></div><div class="row" style="gap:6px">${identChip(p)}<span class="small muted">${p.sugg != null ? `Suggestion: ${esc(lvLabel(p.sugg))}` : 'No suggestion'}</span></div></div></div>
         <div class="lvcol">${live ? `<b>${esc(lvLabel(r.level))} · Fixed after start</b>` : selectLevel(`lv-${r.pid}`, r.level, `data-act-change="setLevel" data-pid="${r.pid}" aria-label="Level for ${esc(p.name)} at this club" aria-describedby="lvd-${r.pid}"`, r.level == null)}${levelDiff(r.level, p.sugg, `lvd-${r.pid}`)}</div>
-        ${live ? `<span class="small muted">${r.present ? 'Present' : 'Away'}</span>` : `<div class="row" style="flex-wrap:nowrap"><span class="small muted">Present</span>${sw(r.present, 'togglePresent', `data-pid="${r.pid}"`, `${p.name} present`)}<button class="btn xs ghost icon-btn" data-act="removeRoster" data-pid="${r.pid}" aria-label="Remove ${esc(p.name)} from roster">${I.x}</button></div>`}
+        ${live ? `<span class="small muted">${r.present ? 'Present' : 'Away'}</span>` : `<div class="row" style="flex-wrap:nowrap"><span class="small muted">${presencePending.has(r.pid) ? 'Saving presence…' : 'Present'}</span>${sw(r.present, 'togglePresent', `data-pid="${r.pid}"`, `${p.name} present`)}<button class="btn xs ghost icon-btn" data-act="removeRoster" data-pid="${r.pid}" aria-label="Remove ${esc(p.name)} from roster">${I.x}</button></div>`}
       </div>`; }).join('')}</div>` : '<div class="empty">No players yet. Add players from your saved list or as new guests.</div>'}
     </section>`}</div>`;
     })()}
@@ -2628,8 +2651,9 @@ function playersPane(s) {
     const qi = w.findIndex((m) => all(m).includes(r.pid));
     return { r, p: P(r.pid), a, g: gamesOf(s, r.pid), ...restInfo(s, r.pid), qpos: qi < 0 ? null : qi + 1 };
   });
-  if (f.show === 'avail') rows = rows.filter((x) => x.r.present && !x.a);
-  if (f.show === 'present') rows = rows.filter((x) => x.r.present);
+  const held = (pid) => heldPresence?.filter === f.show && heldPresence.ids.includes(pid) && presencePending.has(pid);
+  if (f.show === 'avail') rows = rows.filter((x) => (x.r.present && !x.a) || held(x.r.pid));
+  if (f.show === 'present') rows = rows.filter((x) => x.r.present || held(x.r.pid));
   const sorters = {
     wait: (a, b) => (a.a ? 1 : 0) - (b.a ? 1 : 0) || (b.r.present ? 1 : 0) - (a.r.present ? 1 : 0) || b.mins - a.mins,
     least: (a, b) => a.g - b.g || b.mins - a.mins,
@@ -2637,6 +2661,7 @@ function playersPane(s) {
     level: (a, b) => (b.r.level ?? -1) - (a.r.level ?? -1) || a.p.name.localeCompare(b.p.name),
   };
   rows.sort(sorters[f.sort] || sorters.wait);
+  if (heldPresence?.filter === f.show && presencePending.size) rows.sort((a,b) => { const rank = (pid) => { const i = heldPresence.ids.indexOf(pid); return i < 0 ? Infinity : i; }; return rank(a.r.pid) - rank(b.r.pid); });
   const counts = { avail: s.roster.filter((r) => r.present && !activeOf(s, r.pid)).length, present: s.roster.filter((r) => r.present).length, all: s.roster.length };
   const plan = matchPlan(s, sel);
   const draftState = S.ui.autoDraft && S.ui.autoDraft.sid === s.id ? S.ui.autoDraft : null;
@@ -2653,7 +2678,7 @@ function playersPane(s) {
         ${i >= 0 ? `<span class="sel-badge" aria-hidden="true">${i + 1}</span>` : ''}
         <div class="pc3-top">${avatar(x.p)}<div style="min-width:0"><div class="pc3-name">${esc(x.p.name)}</div><div class="pc3-lv">${esc(lvLabel(x.r.level))}</div></div></div>
         <div class="pc3-stats"><span class="tnum">${x.g} played · ${queuedCount(s, x.r.pid)} queued · ${currentDrafts.filter((m) => all(m).includes(x.r.pid)).length} suggested (${esc(draftState ? AUTO_MODES[draftState.tab] : 'current tab')})</span>${x.a || !x.r.present ? '' : `<span class="tnum">${x.mins} min wait</span>`}</div>
-        <div class="between" style="flex-wrap:nowrap"><span class="pc3-st small">${st}</span>${sw(x.r.present, 'togglePresent', `data-pid="${x.r.pid}"`, `${x.p.name} present`)}</div>
+        <div class="between" style="flex-wrap:nowrap"><span class="pc3-st small">${st}</span>${sw(x.r.present, 'togglePresent', `data-pid="${x.r.pid}"`, `${x.p.name} present`)}</div>${presencePending.has(x.r.pid) ? '<span class="small muted">Saving presence…</span>' : ''}
       </article>`;
     }).join('')}</div>` : `<div class="card empty">${f.show === 'avail' ? 'No one is free right now. Try Present or Everyone.' : 'No players yet.'}</div>`}
     ${sel.length ? `<div class="selbar" role="region" aria-label="Selected players">
@@ -3713,11 +3738,13 @@ const ACT = {
   allPresent: () => { cur().roster.forEach((r) => { r.present = true; }); commit('Everyone marked present'); render(); },
   allAbsent: () => { cur().roster.forEach((r) => { r.present = false; }); commit('Everyone marked absent'); render(); },
   togglePresent: (d) => {
-    const s = cur(); const r = R(s, d.pid); r.present = !r.present;
-    if (r.present) r.presentAt = Date.now();
-    const affected = waiting(s).filter((m) => all(m).includes(d.pid)).length;
-    commit(`${short(d.pid)} ${r.present ? 'is present' : 'is not present'}${!r.present && affected ? ` · ${affected} waiting match${affected > 1 ? 'es need' : ' needs'} attention` : ''}`);
-    render();
+    const s = cur(), r = R(s, d.pid);
+    if (presencePending.size && [...presencePending.values()][0].sid !== s.id) flushPresence();
+    const before = presencePending.get(d.pid) || { sid: s.id, pid: d.pid, before: r.present, beforeAt: r.presentAt };
+    if (!heldPresence) heldPresence = { filter: S.ui.pl?.show || 'avail', ids: [...document.querySelectorAll('.pc3[data-pid]')].map((el) => el.dataset.pid) };
+    r.present = !r.present; if (r.present) r.presentAt = Date.now();
+    if (r.present === before.before) { presencePending.delete(d.pid); r.presentAt = before.beforeAt; } else presencePending.set(d.pid, before);
+    clearTimeout(presenceTimer); presenceTimer = setTimeout(flushPresence, 800); render();
   },
   openPayments: () => openSheet({ type: 'payments' }),
   payFilter: (d) => { S.ui.payF = d.k; render(); },
@@ -4000,7 +4027,7 @@ const CHANGE = {
   reqLevel: (el) => { const r = (cur().requests || []).find((x) => x.id === el.dataset.id); r.level = el.value === '' ? null : +el.value; r.err = ''; render(); },
   spSet: (el) => { S.ui.spf = { ...(S.ui.spf || {}), [el.dataset.k]: el.value }; render(); },
   draftSel: (el) => { S.ui.draft[el.dataset.k] = el.value; if (el.dataset.k === 'repeat' && !S.ui.draft.repeatCount) S.ui.draft.repeatCount = 4; delete S.ui.errors.when; render(); },
-  setLevel: (el) => { const s = cur(); const r = R(s, el.dataset.pid); r.level = el.value === '' ? null : +el.value; commit(`${short(el.dataset.pid)}: ${lvLabel(r.level)}`); render(); },
+  setLevel: (el) => { flushPresence(); const s = cur(); const r = R(s, el.dataset.pid); r.level = el.value === '' ? null : +el.value; commit(`${short(el.dataset.pid)}: ${lvLabel(r.level)}`); render(); },
   slot: (el) => { const sh = S.ui.sheet; sh[el.dataset.team][+el.dataset.i] = el.value || null; sh.err = ''; render(); },
   pubSlide: (el) => { const sh = S.ui.sheet; const k = +el.dataset.k; sh.slides = el.checked ? [...new Set([...sh.slides, k])] : sh.slides.filter((x) => x !== k); render(); },
 };
@@ -4036,6 +4063,8 @@ document.addEventListener('click', (e) => {
   const fn = ACT[el.dataset.act];
   if (!fn) return;
   e.preventDefault();
+  if (el.dataset.act !== 'togglePresent' && (AREA[el.dataset.act] === 'Roster' || ['pane', 'prepTab', 'go', 'openAdd', 'makeMatch', 'openEditor', 'openSessionDone'].includes(el.dataset.act))) flushPresence();
+  if (el.dataset.act === 'plSet') heldPresence = null;
   curAct = el.dataset.act;
   if (!el.closest('.sheet') && !el.classList.contains('scrim')) lastTrigger = { act: el.dataset.act, id: el.dataset.id || el.dataset.pid || '' };
   fn(el.dataset, el, e);
@@ -4257,6 +4286,7 @@ function prototypePath() {
   return `/queue${path ?? ''}${tab ? `?tab=${encodeURIComponent(tab)}` : ''}`;
 }
 function applyPrototypeRoute(url) {
+  flushPresence();
   const path = url.pathname.slice('/queue'.length);
   let screen = Object.entries(queuePaths).find(([, value]) => value === path)?.[0];
   let session = null;

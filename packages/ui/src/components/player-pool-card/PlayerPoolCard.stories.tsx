@@ -134,3 +134,5 @@ export const GridDesktop: Story = {
   ),
   globals: { viewport: { value: 'desktop' } },
 }
+
+export const SavingPresence: Story = { args: { ...away, presencePending: true } }

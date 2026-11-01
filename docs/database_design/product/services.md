@@ -174,6 +174,15 @@ Wired end to end in real data mode (see [architecture.md](../../architecture.md)
 | Q-HOME, Q-SETUP | Queue `GET`/`POST /api/sessions`, `GET /api/sessions/[sessionId]` | `readQueueSessions`, `readQueueSession`, `createQueueSession`, `saveSessionCost` |
 | Q-ROSTER | Queue `GET`/`POST /api/sessions/[sessionId]/roster`, `POST …/roster/[rosterId]/level` | `readSessionRoster`, `addNewPlayerToSession`, `setRosterLevel` |
 
+Verification (#275, closed November 1, 2026 by the product owner):
+
+- **Verified** against hosted Supabase over HTTP (PR #318): signed-out session reads, 401 with safe copy for
+  wrong credentials, 422 for empty forms, 401 on every protected `/api` route, login redirects, a forged
+  mock cookie refused and cleared, and `Cache-Control: private, no-store` with `Vary: Cookie`.
+- **Not verified:** the signed-in journey (add/activate club → club sign-in → venue → Queue Session → guest →
+  level → fresh-browser reload), direct cross-club requests, the screens at 375/1280 in both themes, and the
+  `@clubs.rotra.invalid` login with Supabase `createUser`. Tracked in #389.
+
 Proposals used, each now its own ticket (split from #317): club username →
 `<username>@clubs.rotra.invalid` provider login (#381); the six prototype founding cities seeded by
 `20261101000100_seed_founding_locations` (#380); license start decided by the server and the typed

@@ -23,7 +23,9 @@ export async function proxy(request: NextRequest) {
           : '/login'
 
   if (dataMode() === 'real') {
-    const session = await refreshProxySession(request, () => NextResponse.next({ request }))
+    const session = await refreshProxySession('admin', request, () =>
+      NextResponse.next({ request }),
+    )
     const destination = route(session.signedIn)
     const response = destination
       ? NextResponse.redirect(new URL(destination, request.url))

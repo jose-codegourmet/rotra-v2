@@ -13,7 +13,7 @@ export async function proxy(request: NextRequest) {
   const protectedPath =
     path !== '/login' && path !== '/s' && !path.startsWith('/s/') && !path.startsWith('/api/')
   if (dataMode() === 'real') {
-    const session = await refreshProxySession(request, () => NextResponse.next({ request }))
+    const session = await refreshProxySession('club', request, () => NextResponse.next({ request }))
     if (protectedPath && !session.signedIn) {
       const redirect = NextResponse.redirect(new URL('/login', request.url))
       session.carryTo(redirect)

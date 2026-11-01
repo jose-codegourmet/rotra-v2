@@ -1237,7 +1237,9 @@ function estimateGames(courts, minutes, players, perGame) {
   const at = (len) => Math.floor((usable * Math.floor(minutes / len) * perGame) / n);
   return { low: at(20), high: at(15), usable };
 }
-const sessionEstimate = (s) => estimateGames(s.courts.length, Math.round((s.end - s.start) / 60000), s.roster.length || s.expected || 12, perGameOf(s));
+// Players for estimates and costs: the roster, else expected players, else the slot budget.
+const playerCountOf = (s) => s.roster.length || s.expected || s.courts.length * perCourtOf(s);
+const sessionEstimate = (s) => estimateGames(s.courts.length, Math.round((s.end - s.start) / 60000), playerCountOf(s), perGameOf(s));
 
 // ---------- Top bar ----------
 const hasShell = () => !['login', 'public', 'finalizing'].includes(S.screen) && !(S.screen === 'home' && S.licenseExpired);
@@ -1875,7 +1877,7 @@ function histPublicPane(s, { invalid }) {
 function duePerHead(s) {
   if (!s.finance) return null;
   if (s.finance.custom) return +s.finance.payFee || 0;
-  return financeCalc(s.finance, s.courts.length, Math.round((s.end - s.start) / 60000), s.roster.length || s.expected || 1).share;
+  return financeCalc(s.finance, s.courts.length, Math.round((s.end - s.start) / 60000), playerCountOf(s)).share;
 }
 function paymentsPanel(s) {
   const due = duePerHead(s), pay = s.payments || {};
@@ -1904,7 +1906,7 @@ function paymentsPanel(s) {
 }
 function histFinancePane(s) {
   if (!s.finance) return `<div><h2>Financials</h2></div><div class="card empty">No cost estimate was saved for this session.</div>${s.status === 'invalid' ? '' : paymentsPanel(s)}`;
-  const n = s.roster.length || s.expected || 1;
+  const n = playerCountOf(s);
   const c = financeCalc(s.finance, s.courts.length, Math.round((s.end - s.start) / 60000), n);
   return `<div><h2>Financials</h2><p class="small muted">The estimate saved for this session, for ${n} players. ROTRA doesn't collect money; tick who has paid in Payments below.</p></div>
     <div class="grid2">
@@ -2126,8 +2128,8 @@ function draftFrom(s, day) {
   const d = new Date(s ? s.start : day || todayAt(19, 0) + 864e5);
   const dstr = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
   const t = (x) => { const z = new Date(x); return `${pad(z.getHours())}:${pad(z.getMinutes())}`; };
-  return s ? { id: s.id, title: s.title, date: dstr, start: t(s.start), end: t(s.end), venue: s.venue, address: s.address, venueId: ((S.venues || []).find((v) => v.name === s.venue) || {}).id || null, courts: s.courts.map((c) => c.label), courtStarts: s.courts.map((c) => c.startsAt ? t(c.startsAt) : ''), courtEnds: s.courts.map((c) => c.until ? t(c.until) : ''), singles: s.singles, doubles: s.doubles, mode: s.mode, minimum: s.minimum, minAuto: s.minAuto !== false, expected: s.expected || s.roster.length || 12, perCourt: perCourtOf(s), notes: s.notes, ...financeDraft(s) }
-    : { id: null, title: '', date: dstr, start: '19:00', end: '22:00', venue: '', address: '', venueId: null, courts: ['Court 1', 'Court 2'], courtStarts: ['', ''], courtEnds: ['', ''], singles: false, doubles: true, mode: 'fair', minimum: 4, minAuto: true, expected: 12, perCourt: S.club.perCourt || 8, notes: '', ...financeDraft(null) };
+  return s ? { id: s.id, title: s.title, date: dstr, start: t(s.start), end: t(s.end), venue: s.venue, address: s.address, venueId: ((S.venues || []).find((v) => v.name === s.venue) || {}).id || null, courts: s.courts.map((c) => c.label), courtStarts: s.courts.map((c) => c.startsAt ? t(c.startsAt) : ''), courtEnds: s.courts.map((c) => c.until ? t(c.until) : ''), singles: s.singles, doubles: s.doubles, mode: s.mode, minimum: s.minimum, minAuto: s.minAuto !== false, expected: s.expected || '', expectedAuto: !s.expected, perCourt: perCourtOf(s), notes: s.notes, ...financeDraft(s) }
+    : { id: null, title: '', date: dstr, start: '19:00', end: '22:00', venue: '', address: '', venueId: null, courts: ['Court 1', 'Court 2'], courtStarts: ['', ''], courtEnds: ['', ''], singles: false, doubles: true, mode: 'fair', minimum: 4, minAuto: true, expected: 2 * (S.club.perCourt || 8), expectedAuto: true, perCourt: S.club.perCourt || 8, notes: '', ...financeDraft(null) };
 }
 // Three pages, each holding two sections, so a session can be set up quickly. Only page 1 has required fields;
 // "Create session" works from any page and fills the rest with defaults.
@@ -2212,6 +2214,8 @@ function viewSetup() {
   const durMins = (mins(d.end) - mins(d.start) + 1440) % 1440 || 1440;
   const rosterN = d.id ? (S.sessions.find((x) => x.id === d.id) || { roster: [] }).roster.length : 0;
   const slots = d.courts.length * (+d.perCourt || 8);
+  // Untouched Expected players follows the slot budget; a typed number sticks.
+  if (d.expectedAuto) d.expected = slots;
   const nPlayers = rosterN || +d.expected || slots;
   const per = perGameOf(d);
   const est = estimateGames(d.courts.length, durMins, nPlayers, per);
@@ -2247,7 +2251,7 @@ function viewSetup() {
     `<div class="between"><span>Minimum completed games per player</span>${d.minAuto ? chip('Calculated', 'ok') : chip('Set by you')}</div>
       <div class="fgrid">
         ${rosterN ? `<div class="field"><span>Players</span><span>${rosterN} on the roster</span><span class="hint">Updates as you add or remove players.</span></div>`
-          : `<label class="field"><span>Expected players</span><input class="input${e.expected ? ' bad' : ''}" id="f-expected" type="number" min="1" step="1" inputmode="numeric" data-bind="ui.draft.expected" data-num data-rerender value="${esc(d.expected)}" placeholder="${slots}">${e.expected ? `<span class="err">${e.expected}</span>` : `<span class="hint">Your best guess. Leave empty to use your ${slots} slots. The roster replaces it once you add players.</span>`}</label>`}
+          : `<label class="field"><span>Expected players</span><input class="input${e.expected ? ' bad' : ''}" id="f-expected" type="number" min="1" step="1" inputmode="numeric" data-bind="ui.draft.expected" data-num data-rerender value="${esc(d.expected)}" placeholder="${slots}">${e.expected ? `<span class="err">${e.expected}</span>` : `<span class="hint">${d.expectedAuto ? `Follows your ${slots} slots until you change it.` : `Your best guess. Clear it to follow your ${slots} slots again.`} The roster replaces it once you add players.</span>`}</label>`}
         <div class="field"><span>Estimate</span><span><b class="tnum" style="font-size:20px">${nPlayers ? `${est.low}–${est.high}` : '—'}</b> games each</span><span class="hint">${est.usable} of ${d.courts.length} court${d.courts.length > 1 ? 's' : ''} × ${fmtDur(0, durMins * 60000)} of ${formatMixLabel(d)} at 15–20 min a game. About ${Math.min(nPlayers, Math.round(est.usable * per))} of ${nPlayers || '?'} players are on court at once${per < 4 ? ', so each player gets fewer turns than in doubles' : ''}.</span></div>
         <label class="field"><span>Minimum</span><input class="input${e.minimum ? ' bad' : ''}" id="f-min" type="number" min="0" step="1" inputmode="numeric" data-bind="ui.draft.minimum" data-num value="${esc(d.minAuto ? est.low : d.minimum)}" ${d.minAuto ? 'disabled' : ''}>${e.minimum ? `<span class="err">${e.minimum}</span>` : `<span class="hint">${d.minAuto ? 'Uses the 20-minute end so everyone can reach it.' : `Estimate suggests ${est.low}.`}</span>`}</label>
       </div>
@@ -2369,7 +2373,7 @@ function prepOverview(s) {
         <dt>Courts</dt><dd>${s.courts.map((c) => live ? `${esc(c.label)} · ${courtWindowText(c)}` : esc(c.label)).join(live ? '<br>' : ', ')}</dd>
         <dt>Formats</dt><dd>${fmtFormats(s)}${live ? ' · <span class="small muted">Fixed after start</span>' : ''}</dd>
         <dt>Mode</dt><dd>${MODES[s.mode].label} · <span class="muted">${MODES[s.mode].text}</span>${live ? ' · <span class="small muted">Fixed after start</span>' : ''}</dd>
-        <dt>Minimum</dt><dd>${s.minimum} completed games per player<br><span class="small muted">${live ? `Fixed after start · ${s.minAuto !== false ? 'Calculated before start' : 'Set by you'}.` : s.minAuto !== false ? `Calculated: ${s.roster.length || s.expected || 12} players on ${est.usable} court${est.usable > 1 ? 's' : ''} for ${fmtDur(s.start, s.end)} gives about ${est.low}–${est.high} games each. Updates as the roster changes.` : `Set by you. The estimate suggests ${est.low}–${est.high}.`}</span></dd>
+        <dt>Minimum</dt><dd>${s.minimum} completed games per player<br><span class="small muted">${live ? `Fixed after start · ${s.minAuto !== false ? 'Calculated before start' : 'Set by you'}.` : s.minAuto !== false ? `Calculated: ${playerCountOf(s)} players on ${est.usable} court${est.usable > 1 ? 's' : ''} for ${fmtDur(s.start, s.end)} gives about ${est.low}–${est.high} games each. Updates as the roster changes.` : `Set by you. The estimate suggests ${est.low}–${est.high}.`}</span></dd>
         <dt>Roster</dt><dd>${s.roster.length} confirmed · ${present} present</dd>
         ${s.finance ? (() => { const c = financeCalc(s.finance, s.courts.length, Math.round((s.end - s.start) / 60000), s.roster.length || s.expected); return `<dt>Costs</dt><dd>${peso(c.total)} estimated · ${peso(c.share)} a player to break even<br><span class="small muted">Players pay ${peso(c.perHead)}${c.custom ? ' (custom amount)' : ' (break-even)'}</span> · ${resultText(c)}</dd>`; })() : ''}${live && s.notes ? `<dt>Notes</dt><dd>${esc(s.notes)}</dd>` : ''}</dl>
       ${live ? `<div class="row acts"><button class="btn sm" data-act="openAdjust">Courts and time</button><button class="btn sm" data-act="openAdd">Add player</button><button class="btn sm" data-act="openRequests">Join requests · ${pendingReqs(s).length}</button><button class="btn sm" data-act="openPayments">Payments</button></div>` : ''}</section>
@@ -3694,8 +3698,6 @@ const ACT = {
     if (!d.minAuto && (d.minimum === '' || !Number.isInteger(+d.minimum) || +d.minimum < 0)) e.minimum = 'Use a whole number, 0 or more.';
     const existing = d.id ? S.sessions.find((x) => x.id === d.id) : null;
     if (!(existing && existing.roster.length) && d.expected !== '' && (!Number.isInteger(+d.expected) || +d.expected < 1)) e.expected = 'Use a whole number, 1 or more, or leave it empty.';
-    // Expected players defaults to the slot budget when left empty.
-    if (d.expected === '' || d.expected == null) d.expected = d.courts.length * (+d.perCourt || 8);
     if (d.courtFee !== '' && !(+d.courtFee >= 0)) e.courtFee = 'Use 0 or more, or leave it empty.';
     if (d.entryFee !== '' && !(+d.entryFee >= 0)) e.entryFee = 'Use 0 or more, or leave it empty.';
       if (d.custom && (d.payFee === '' || !(+d.payFee >= 0))) e.payFee = 'Enter the amount per player, or switch to break-even.';
@@ -3710,8 +3712,8 @@ const ACT = {
     if (end <= start) end += 864e5;
     const courts = d.courts.map((label, i) => ({ id: `c${i + 1}`, label: label.trim() || `Court ${i + 1}`, startsAt: d.courtStarts[i] ? timeOnSession({start}, d.courtStarts[i]) : null, until: d.courtEnds[i] ? timeOnSession({start}, d.courtEnds[i]) : null }));
     const finance = { courtFee: d.courtFee === '' ? null : +d.courtFee, entryFee: d.entryFee === '' ? null : +d.entryFee, custom: !!d.custom, payFee: d.custom ? +d.payFee : null, shuttles: (d.shuttles || []).filter((x) => x.itemId && +x.tubes > 0).map((x) => ({ itemId: x.itemId, tubes: +x.tubes })) };
-    const est = estimateGames(courts.length, Math.round((end - start) / 60000), (existing && existing.roster.length) || +d.expected, perGameOf(d));
-    const fields = { title: d.title.trim(), start, end, venue: d.venue.trim(), address: d.address.trim(), courts, singles: d.singles, doubles: d.doubles, mode: d.mode, minimum: d.minAuto ? est.low : +d.minimum, minAuto: d.minAuto, expected: +d.expected || null, perCourt: +d.perCourt || 8, notes: d.notes.trim(), finance };
+    const est = estimateGames(courts.length, Math.round((end - start) / 60000), (existing && existing.roster.length) || +d.expected || courts.length * (+d.perCourt || 8), perGameOf(d));
+    const fields = { title: d.title.trim(), start, end, venue: d.venue.trim(), address: d.address.trim(), courts, singles: d.singles, doubles: d.doubles, mode: d.mode, minimum: d.minAuto ? est.low : +d.minimum, minAuto: d.minAuto, expected: d.expectedAuto ? null : +d.expected || null, perCourt: +d.perCourt || 8, notes: d.notes.trim(), finance };
     let bal = { moved: 0, filled: 0 };
     if (d.id) { const s = S.sessions.find((x) => x.id === d.id); Object.assign(s, fields); if (s.status === 'prepared') bal = rebalanceSlots(s); }
     let made = 1, skipped = 0;
@@ -4118,6 +4120,11 @@ function onBind(e) {
   let v = el.type === 'checkbox' ? el.checked : el.value;
   if (el.hasAttribute('data-num') && el.type !== 'checkbox') v = v === '' ? (el.tagName === 'SELECT' ? null : '') : +v;
   setPath(el.dataset.bind, v);
+  // Session setup: typing Expected players pins it; leaving it empty follows the slots again.
+  if (el.dataset.bind === 'ui.draft.expected') {
+    if (e.type === 'input') S.ui.draft.expectedAuto = false;
+    else if (v === '') { S.ui.draft.expectedAuto = true; render(); return; }
+  }
   if (el.hasAttribute('data-rerender')) {
     const textish = el.tagName === 'TEXTAREA' || (el.tagName === 'INPUT' && !['checkbox', 'time', 'date'].includes(el.type));
     if ((e.type === 'input' && textish) || (e.type === 'change' && !textish)) render();

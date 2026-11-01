@@ -270,6 +270,7 @@ export function SessionSetup(props: SessionSetupProps) {
         minimumIsCalculated: s.minimumIsCalculated,
         minimumGames: String(s.minimumGames),
         expectedPlayers: s.expectedPlayers === null ? '' : String(s.expectedPlayers),
+        expectedIsAuto: s.expectedPlayers === null,
         notes: s.notes,
       }
     }

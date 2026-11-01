@@ -62,7 +62,9 @@ export function SetupMinimumSection({
             hint={
               errors.expectedPlayers
                 ? undefined
-                : `Your best guess. Leave empty to use your ${slots} slots. The roster replaces it once you add players.`
+                : values.expectedIsAuto
+                  ? `Follows your ${slots} slots until you change it. The roster replaces it once you add players.`
+                  : `Your best guess. Clear it to follow your ${slots} slots again. The roster replaces it once you add players.`
             }
           >
             <Controller
@@ -71,6 +73,19 @@ export function SetupMinimumSection({
               render={({ field }) => (
                 <TextInput
                   {...field}
+                  onChange={(event) => {
+                    // A typed number sticks; it no longer follows court changes.
+                    form.setValue('expectedIsAuto', false, { shouldDirty: true })
+                    field.onChange(event)
+                  }}
+                  onBlur={() => {
+                    // Cleared: follow the slot budget again.
+                    if (!form.getValues('expectedPlayers').trim()) {
+                      form.setValue('expectedIsAuto', true, { shouldDirty: true })
+                      form.clearErrors('expectedPlayers')
+                    }
+                    field.onBlur()
+                  }}
                   inputMode="numeric"
                   placeholder={String(slots)}
                   invalid={Boolean(errors.expectedPlayers)}

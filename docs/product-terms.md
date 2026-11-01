@@ -269,6 +269,10 @@ from the [database design](database_design/product/README.md). Add a row here **
 | Publication event | `SessionPublicationEvent` | `session_publication_events` | Append-only log of each publish (selection, Off Day choice, time) |
 | Export frame | `ExportFrame` | `result_exports` | One Download images frame; `ExportFormat`: `story` (14 rows) · `feed` (10 rows) |
 | Public session page | `PublicSessionPage` | `session_publications` public projection | Public-safe read model of a session by its slug, from the last synced state: details, participants (no contacts, level or presence), waitlist names, open slots, and only the published slides (Off Day only when included). `MyJoinRequest` is the visitor's own request status |
+| Auto Queue strategy | `AutoQueueMode` | — | `available` · `ahead` · `wait` · `fewest` · `catchup`; `AutoQueueCount` is an explicit 2/3/4/6 choice |
+| Draft lineup | `AutoQueueDraftLineup` | — | Stable draft ID, strategy, lineup, reason and input fingerprint; never a match number |
+| Draft batch | `AutoQueueDraftBatch` | — | One alternative tab; its stopping reason and optional Catch Up target |
+| Draft workspace state | `AutoQueueDraftState` | — | Per-session in-memory batches, selection order and committed draft IDs; `useAutoQueueDrafts` reads it |
 | Match | `Match` | `matches` | `state`: `waiting` · `active` · `completed` · `invalid`; `origin`: `manual` · `suggested` · `auto` |
 | Match format | `MatchFormat` | — | `singles` · `doubles` · `fun_1v2` · `fun_3v3` · `fun_4v4` · `fun_5v5` |
 | Session mode | `SessionMode` | — | `chill` · `fair` · `hard` |

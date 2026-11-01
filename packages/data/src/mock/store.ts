@@ -26,6 +26,7 @@ import { createSessionPublicationFixtures } from '../fixtures/sessionPublication
 import { venues } from '../fixtures/venues'
 import type { InventoryItem } from '../inventory/inventory.types'
 import type { ClubLicenseTerm, ClubRetentionRecord } from '../license/license.types'
+import type { AutoQueueDraftState } from '../match/autoQueue.types'
 import type { Match } from '../match/match.types'
 import type { Player, PlayerProfile, PlayerRank, PlayerSessionRecord } from '../player/player.types'
 import type { ClaimLinkRecord } from '../player-account/playerAccount.types'
@@ -93,6 +94,7 @@ export type MockState = {
   downloadInfo: Record<string, { downloadedAt: number | null; error?: string }>
   sync: SyncState
   sessionIntegrity: Record<string, SessionIntegrity>
+  autoQueueDrafts: Record<string, AutoQueueDraftState>
   matches: Match[]
   matchSequences: Record<string, number>
   finalizations: Record<string, SessionFinalization>
@@ -126,7 +128,8 @@ function seedState(): MockState {
         createResultSnapshot({
           sessionId: s.id,
           roster: history.roster,
-          matches: history.matches,
+          autoQueueDrafts: {},
+    matches: history.matches,
           history: playerAwardHistory,
           players: clubPlayers,
           generatedAt: s.finalizedAt ?? now,

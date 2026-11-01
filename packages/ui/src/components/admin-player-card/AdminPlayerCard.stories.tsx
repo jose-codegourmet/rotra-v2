@@ -1,5 +1,7 @@
 import { managementPlayer } from '@rotra/data/fixtures/admin-player-management'
+import { AdminPlayerActions } from '@rotra/ui/admin-player-actions'
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { useState } from 'react'
 import { AdminPlayerCard } from './AdminPlayerCard'
 
 const meta = {
@@ -36,3 +38,13 @@ export const FiveClubs: Story = {
     },
   },
 }
+
+export const Selectable: Story = {
+  args: { actions: <AdminPlayerActions player={managementPlayer} onAction={() => {}} /> },
+  render: (args) => {
+    const [selected, setSelected] = useState(false)
+    return <AdminPlayerCard {...args} selected={selected} onSelect={setSelected} />
+  },
+}
+export const SelectableLight: Story = { ...Selectable, globals: { theme: 'light' } }
+export const Selected: Story = { args: { selected: true, onSelect: () => {} } }

@@ -26,6 +26,7 @@ export function playerDirectoryColumns(
       enableSorting: false,
       cell: ({ row }) => (
         <Checkbox
+          variant="compact"
           label={`Select ${row.original.name}`}
           checked={selected.includes(row.original.id)}
           onChange={(checked) => onSelect?.(row.original.id, checked)}

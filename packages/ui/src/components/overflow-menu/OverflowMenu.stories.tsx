@@ -30,7 +30,9 @@ export const Open: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole('button', { name: 'More for Court 4' }))
-    await expect(canvas.getByRole('menuitem', { name: 'Edit' })).toHaveFocus()
+    await expect(
+      within(canvasElement.ownerDocument.body).getByRole('menuitem', { name: 'Edit' }),
+    ).toHaveFocus()
   },
 }
 export const WithDisabledItem: Story = {
@@ -47,4 +49,19 @@ export const WithDisabledItem: Story = {
     ],
   },
   play: Open.play,
+}
+
+export const InsideClippedContainer: Story = {
+  decorators: [
+    (Story) => (
+      <div className="h-14 w-72 overflow-hidden border border-border p-2">
+        <Story />
+      </div>
+    ),
+  ],
+  play: Open.play,
+}
+export const ClippedContainerLight: Story = {
+  ...InsideClippedContainer,
+  globals: { theme: 'light' },
 }

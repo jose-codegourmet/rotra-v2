@@ -3,7 +3,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const overflowMenuMeta = {
   name: 'OverflowMenu',
   description:
-    'A ⋯ icon button that opens a short list of secondary actions. A disabled item shows its reason under its label.',
+    'A ⋯ icon button that opens a short list of secondary actions. A disabled item shows its reason under its label. The portaled menu avoids scroll-container clipping and viewport edges.',
   usage: [
     'Use for actions that would crowd a card: keep the one action that matters for the current state on the card and move the rest here (the court card: Edit, Undo early open, Remove).',
     'Name the trigger after its target ("More for Court 4").',
@@ -16,6 +16,6 @@ export const overflowMenuMeta = {
     screen: 'Live console › Courts › courtMenu() (.cmenu)',
   },
   docs: ['docs/screens/product/modules/queue/session-console.md'],
-  variants: ['closed', 'open', 'with a disabled item'],
+  variants: ['closed', 'open', 'with a disabled item', 'inside a clipped container'],
   related: ['CourtCard', 'IconButton'],
 } satisfies ComponentMeta

@@ -297,7 +297,17 @@ button.brand { display: flex; align-items: baseline; gap: 8px; background: none;
 .mark span { font-size: 36px; font-weight: 800; letter-spacing: 6px; line-height: 1; }
 .mark b { color: var(--accent); }
 .mark em { font-style: normal; font-weight: 700; color: var(--fg2); font-size: 15px; letter-spacing: .5px; text-transform: uppercase; }
-.player-stats{display:flex;gap:12px;overflow:auto;margin-bottom:20px}.player-stats>.card{min-width:150px;flex:1;text-align:left}.player-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}.player-side-panel{left:auto!important;right:0!important;top:0!important;bottom:0!important;transform:none!important;max-height:100dvh!important;border-radius:0!important;width:min(560px,100vw)!important}</style>
+.player-stats{display:flex;gap:12px;overflow:auto;margin-bottom:20px}.player-stats>.card{min-width:150px;flex:1;text-align:left}.player-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}.player-side-panel{left:auto!important;right:0!important;top:0!important;bottom:0!important;transform:none!important;max-height:100dvh!important;border-radius:0!important;width:min(560px,100vw)!important}
+.player-actions-popover{position:fixed;inset:auto;margin:0;z-index:50;min-width:200px;max-width:min(320px,calc(100vw - 32px));max-height:calc(100dvh - 32px);overflow:auto;padding:6px;border:1px solid var(--border-strong);border-radius:6px;background:var(--elev);color:var(--fg);box-shadow:var(--shadow)}
+.player-actions-popover button{display:block;width:100%;min-height:44px;text-align:left;padding:8px 12px;border:0;border-radius:4px;background:transparent;color:inherit;cursor:pointer}
+.player-actions-popover button:hover,.player-actions-popover button:focus-visible{background:var(--accent-subtle)}
+/* A-PLAYERS selection: compact visual, generous touch target, no repeated visible name. */
+.player-selection{display:inline-flex;flex:none;width:32px;height:32px;align-items:center;justify-content:center;border-radius:6px;cursor:pointer}
+.player-selection:hover{background:var(--elev)}
+.player-selection:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+.player-selection input{width:18px;height:18px;margin:0;accent-color:var(--accent);cursor:inherit}
+@media (pointer:coarse),(max-width:1024px){.player-selection{width:44px;height:44px}.player-selection input{width:22px;height:22px}}
+</style>
 
 <div id="app"></div>
 <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
@@ -866,9 +876,30 @@ function viewPlayers() {
     <div class="toolbar"><label><input type="checkbox"> Duplicates only</label><label>Added from <input class="input" type="date"></label><label>Added to <input class="input" type="date"></label><label>Place registered <select class="input"><option>All places</option><option>Cebu City</option><option>Manila</option><option>Davao City</option></select></label><select class="input" aria-label="Archive status"><option>Active</option><option>Archived</option><option>All</option></select><button class="btn" data-act="clearPlayers">Clear filters</button></div>
     <p class="hint">Duplicate matches share a normalized name, phone or email. Flag only; never merge.</p>
     <div class="toolbar"><label><input type="checkbox" onchange="document.querySelectorAll('.player-select').forEach(x=>x.checked=this.checked)"> Select all on this page</label><button class="btn">Select all ${all.length} matching</button></div>
-    <section class="${S.ui.playerGrid?'player-grid':'stack'}">${shown.map(p=>`<article class="card row"><input class="player-select" type="checkbox" aria-label="Select ${esc(p.name)}">${avatar(p)}<div class="main"><button class="link" onclick="playerManagementSheet('Quick view','${p.id}')">${esc(p.name)}</button><p class="mono small">${esc(p.rtr)}</p><div class="row">${p.claimed?chip('Registered','ok'):chip('Unclaimed')}${rankOf(p).chip}</div><p class="small muted">${esc(p.club || 'Created by Admin')} · Added ${esc(p.rtr.split('-')[3])}</p></div><button class="btn" onclick="playerManagementSheet('Actions','${p.id}')">⋯</button></article>`).join('') || '<div class="card empty">No players match. Clear filters.</div>'}</section>
+    <section class="${S.ui.playerGrid?'player-grid':'stack'}">${shown.map(p=>`<article class="card row"><label class="player-selection"><input class="player-select" type="checkbox" aria-label="Select ${esc(p.name)}"></label>${avatar(p)}<div class="main"><button class="link" onclick="playerManagementSheet('Quick view','${p.id}')">${esc(p.name)}</button><p class="mono small">${esc(p.rtr)}</p><div class="row">${p.claimed?chip('Registered','ok'):chip('Unclaimed')}${rankOf(p).chip}</div><p class="small muted">${esc(p.club || 'Created by Admin')} · Added ${esc(p.rtr.split('-')[3])}</p></div><button class="btn" aria-label="Actions for ${esc(p.name)}" aria-haspopup="menu" onclick="showPlayerActions(this,'${p.id}')">⋯</button></article>`).join('') || '<div class="card empty">No players match. Clear filters.</div>'}</section>
     <div class="more"><button class="btn" ${page===1?'disabled':''} onclick="S.ui.playerPage=${page-1};render()">Previous</button> Showing ${all.length?(page-1)*size+1:0}–${Math.min(page*size,all.length)} of ${all.length} <button class="btn" ${page*size>=all.length?'disabled':''} onclick="S.ui.playerPage=${page+1};render()">Next</button><select aria-label="Page size" onchange="S.ui.playerSize=+this.value;S.ui.playerPage=1;render()">${[25,50,100].map(n=>`<option ${n===size?'selected':''}>${n}</option>`).join('')}</select></div>
     <section class="card toolbar"><span>N selected</span>${['Clear','Archive','Restore','Remove','Export CSV','Copy RTR IDs'].map(x=>`<button class="btn" onclick="playerManagementSheet('${x}')">${x}</button>`).join('')}</section>`);
+}
+function showPlayerActions(trigger,id) {
+  document.querySelector('.player-actions-popover')?.remove();
+  const menu=document.createElement('div');
+  menu.className='player-actions-popover'; menu.setAttribute('popover','auto'); menu.setAttribute('role','menu');
+  menu.setAttribute('aria-label',trigger.getAttribute('aria-label'));
+  for(const action of ['Quick view','View full profile','View full history','Copy RTR ID','Copy registration link','Edit profile','Archive','Remove']) {
+    const button=document.createElement('button'); button.type='button'; button.setAttribute('role','menuitem'); button.textContent=action;
+    button.onclick=()=>{menu.hidePopover();playerManagementSheet(action,id)};
+    menu.append(button);
+  }
+  document.body.append(menu); menu.showPopover();
+  const rect=trigger.getBoundingClientRect(),box=menu.getBoundingClientRect();
+  menu.style.left=Math.max(16,Math.min(rect.left,innerWidth-box.width-16))+'px';
+  menu.style.top=Math.max(16,Math.min(rect.bottom+4,innerHeight-box.height-16))+'px';
+  menu.querySelector('button').focus();
+  menu.addEventListener('keydown',e=>{
+    const buttons=[...menu.querySelectorAll('button')],at=buttons.indexOf(document.activeElement);
+    if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();buttons[(at+(e.key==='ArrowDown'?1:-1)+buttons.length)%buttons.length].focus()}
+    if(e.key==='Escape')trigger.focus();
+  });
 }
 function playerManagementSheet(action,id) {
   const p=playerOf(id), name=p?esc(p.name):'players';

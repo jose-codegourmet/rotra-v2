@@ -15,9 +15,15 @@ import { PLAYING_LEVELS, type PlayingLevel } from '../player/player.types'
 import { promoteWaiter, recomputeMinimum } from '../queue-session/mutations'
 import { slotCapacity } from '../queue-session/queueSession.rules'
 import { isRealDataMode } from '../real/mode'
-import { realAddNewPlayerToSession, realSetRosterLevel } from '../real/queue'
+import {
+  realAddDirectoryPlayerToSession,
+  realAddNewPlayerToSession,
+  realAddSavedPlayerToSession,
+  realPlayerDirectorySearch,
+  realSetRosterLevel,
+} from '../real/queue'
 import { levelLabel, ROSTER_DUPLICATE_ERROR, shortName } from './sessionRoster.rules'
-import type { IdentityCheck, SessionJoinRequest } from './sessionRoster.types'
+import type { DirectoryPlayer, IdentityCheck, SessionJoinRequest } from './sessionRoster.types'
 
 function fail(text: string): never {
   throw new MockError('permission', text)
@@ -82,12 +88,16 @@ function identity(s: MockState, p: ClubPlayer, check?: IdentityCheck) {
   )
     fail('Confirm this player’s identity before adding them.')
 }
-export function addSavedPlayerToSession(input: {
+export async function addSavedPlayerToSession(input: {
   sessionId: string
   clubPlayerId: string
   level: PlayingLevel
   identityCheck?: IdentityCheck
 }) {
+  if (isRealDataMode()) {
+    await flushSessionPresence(input.sessionId)
+    return realAddSavedPlayerToSession(input)
+  }
   return rosterMutation(input.sessionId, (s) => {
     const p = s.clubPlayers.find((p) => p.id === input.clubPlayerId && p.clubId === DEMO_CLUB_ID)
     if (!p || (p.playerId && s.adminPlayerRecords[p.playerId]?.archivedAt))
@@ -103,7 +113,8 @@ export function addSavedPlayerToSession(input: {
     }
   })
 }
-export async function playerDirectorySearch(q: string) {
+export async function playerDirectorySearch(q: string): Promise<DirectoryPlayer[]> {
+  if (isRealDataMode()) return realPlayerDirectorySearch(q)
   await delay()
   requireOnline()
   const s = readMockState(),
@@ -125,12 +136,16 @@ export async function playerDirectorySearch(q: string) {
         ) && [p.fullName, p.nickname, p.rtrId].some((v) => v?.toLowerCase().includes(query)),
     )
 }
-export function addDirectoryPlayerToSession(input: {
+export async function addDirectoryPlayerToSession(input: {
   sessionId: string
   playerId: string
   level: PlayingLevel
   identityCheck?: IdentityCheck
 }) {
+  if (isRealDataMode()) {
+    await flushSessionPresence(input.sessionId)
+    return realAddDirectoryPlayerToSession(input)
+  }
   return rosterMutation(input.sessionId, (s) => {
     const p = clubPlayerForProfile(s, input.playerId).player
     identity(s, p, input.identityCheck)

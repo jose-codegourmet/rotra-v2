@@ -31,3 +31,17 @@ export type SessionJoinRequest = {
   clubPlayerId: string | null
 }
 export type IdentityCheck = 'rtr-id' | 'qr' | 'phone'
+
+/** A Player Information result the Add player sheet can save or add. Never carries a phone. */
+export type DirectoryPlayer = {
+  id: string
+  fullName: string
+  nickname: string | null
+  rtrId: string
+  identity: 'registered' | 'unclaimed'
+  /** Their Player Information level, or null when they have none yet */
+  suggestion: PlayingLevel | null
+  /** "#214", or "Not ranked" */
+  rankLabel: string
+  phoneHidden?: boolean
+}

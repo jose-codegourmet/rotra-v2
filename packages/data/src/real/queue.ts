@@ -1,6 +1,7 @@
 import type { MockSession, SignInInput } from '../auth/auth.types'
 import { clubInitials } from '../club/club.rules'
 import type { Club } from '../club/club.types'
+import type { ClubPlayerView } from '../club-player/fetchers'
 import type { ClubVenue } from '../club-venue/clubVenue.types'
 import type { ClubAccess } from '../license/license.types'
 import { MockError } from '../mock/errors'
@@ -13,6 +14,7 @@ import type {
 } from '../queue-session/queueSession.types'
 import { levelLabel, shortName } from '../session-roster/sessionRoster.rules'
 import type {
+  DirectoryPlayer,
   SessionJoinRequest,
   SessionPlayer,
   SessionWaitlistEntry,
@@ -358,4 +360,97 @@ export async function realSetRosterLevel(input: {
     { method: 'POST', body: { level: input.level, operationId: crypto.randomUUID() } },
   )
   return accepted(null, `${shortName(entry)}: ${levelLabel(input.level)}`)
+}
+
+// ---------- Saved players and Player Information (Q-SAVED-PLAYERS, Q-ADD-PLAYER) ----------
+
+type WireClubPlayer = Omit<ClubPlayerView, 'addedAt' | 'displayName' | 'suggestion'> & {
+  addedAt: string
+}
+
+/** The club's saved players in the Saved players view shape (`clubPlayerView`). */
+export async function realGetClubPlayers(): Promise<ClubPlayerView[]> {
+  const wire = await realRequest<{ players: WireClubPlayer[] }>('/api/club/players')
+  return wire.players.map((p) => ({
+    ...p,
+    displayName: p.fullName,
+    suggestion: p.playingLevel,
+    addedAt: msOf(p.addedAt),
+  }))
+}
+
+/** Player Information results: profiles with an RTR ID the club has not saved yet. */
+export async function realPlayerDirectorySearch(q: string): Promise<DirectoryPlayer[]> {
+  const wire = await realRequest<{ players: Omit<DirectoryPlayer, 'rankLabel'>[] }>(
+    `/api/players?q=${encodeURIComponent(q)}`,
+  )
+  return wire.players.map((p) => ({ ...p, rankLabel: 'Not ranked' }))
+}
+
+type RosterAdd = { rosterEntry: WireRosterEntry | null; waitlist: WireWaitlistEntry | null }
+
+/** The add's outcome and toast, worded like the mock adds ("Mikee added · Intermediate Mid"). */
+function rosterAdded(result: RosterAdd, level: PlayingLevel) {
+  const waitlistPosition = result.waitlist?.position ?? null
+  const clubPlayerId = result.rosterEntry?.clubPlayerId ?? result.waitlist?.clubPlayerId ?? ''
+  const name = result.rosterEntry ? shortName(result.rosterEntry) : 'Player'
+  return accepted(
+    { waitlistPosition, locked: false, clubPlayerId },
+    waitlistPosition
+      ? `${name} added to the waitlist as #${waitlistPosition} · ${levelLabel(level)}`
+      : `${name} added · ${levelLabel(level)}`,
+  )
+}
+
+export async function realAddSavedPlayerToSession(input: {
+  sessionId: string
+  clubPlayerId: string
+  level: PlayingLevel
+  identityCheck?: string
+}) {
+  const result = await realRequest<RosterAdd>(
+    `/api/sessions/${encodeURIComponent(input.sessionId)}/roster`,
+    { method: 'POST', body: { ...input, source: 'saved', operationId: crypto.randomUUID() } },
+  )
+  return rosterAdded(result, input.level)
+}
+
+export async function realAddDirectoryPlayerToSession(input: {
+  sessionId: string
+  playerId: string
+  level: PlayingLevel
+  identityCheck?: string
+}) {
+  const result = await realRequest<RosterAdd>(
+    `/api/sessions/${encodeURIComponent(input.sessionId)}/roster`,
+    { method: 'POST', body: { ...input, source: 'directory', operationId: crypto.randomUUID() } },
+  )
+  return rosterAdded(result, input.level)
+}
+
+/** Saved players › Add player › New player: saved to the club only. */
+export async function realAddNewSavedPlayer(input: {
+  name: string
+  nickname?: string | null
+  phone?: string | null
+}) {
+  const saved = await realRequest<{ clubPlayerId: string; name: string }>('/api/club/players', {
+    method: 'POST',
+    body: { ...input, operationId: crypto.randomUUID() },
+  })
+  return accepted(
+    { clubPlayerId: saved.clubPlayerId },
+    input.phone?.trim()
+      ? `${saved.name} saved · profile lookup after sync`
+      : `${saved.name} saved as a guest`,
+  )
+}
+
+/** Saved players › Add player › Player Information: saved to the club only, with no level yet. */
+export async function realAddDirectoryPlayerToClub(input: { playerId: string }) {
+  const saved = await realRequest<{ clubPlayerId: string; name: string }>('/api/club/players', {
+    method: 'POST',
+    body: { ...input, source: 'directory', operationId: crypto.randomUUID() },
+  })
+  return accepted({ clubPlayerId: saved.clubPlayerId }, `${saved.name} saved`)
 }

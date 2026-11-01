@@ -76,7 +76,7 @@ function QueueShell() {
     <ThemeProvider storageKey="storybook-theme">
       <AppShell
         topBar={
-          <TopBar product="Queue">
+          <TopBar product="Queue" width="page">
             <SyncStatus state="synced" lastSyncedAt="7:42 PM" onOpen={() => {}} />
             <ThemeToggle />
           </TopBar>
@@ -101,7 +101,7 @@ function AdminShell() {
       <AppShell
         railWidth={236}
         topBar={
-          <TopBar product="Admin" onBrandClick={() => {}} contained={false}>
+          <TopBar product="Admin" onBrandClick={() => {}} width="window">
             <ThemeToggle />
           </TopBar>
         }

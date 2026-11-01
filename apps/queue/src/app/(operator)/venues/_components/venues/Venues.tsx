@@ -32,7 +32,7 @@ export function Venues() {
   const fieldError = save.error instanceof MockError ? save.error.fieldErrors?.name : undefined
 
   return (
-    <main className="mx-auto flex max-w-[1240px] flex-col gap-5 px-[max(16px,env(safe-area-inset-left,0px))] pt-5 pb-[120px]">
+    <main className="flex flex-col gap-5 px-page pt-5 pb-[120px]">
       <Breadcrumb label="Home" href="/" linkAs={Link} />
       <PageHeader
         title="Venues"

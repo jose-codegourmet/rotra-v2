@@ -40,12 +40,12 @@ export function snakePlacement(i: number, count: number, cols: number) {
 type Drag = { id: string; x: number; y: number; dx: number; dy: number; targetId: string | null }
 
 /**
- * The Queue tab's grid (.qgrid): MatchCards in 1–5 columns by width, ordered in a snake with flow
+ * The Queue tab's grid (.qgrid): MatchCards in as many columns as fit its width, in a snake with flow
  * arrows. Drag a card by its ⠿ handle (mouse or touch) onto another card to take its place, or
  * press ← / ↑ and → / ↓ on the focused handle to move one place; focus stays on the handle.
  */
 export function QueueGrid({ matches, onMove, onSwapSides, columns, className }: QueueGridProps) {
-  const measured = useQueueColumns()
+  const [gridRef, measured] = useQueueColumns<HTMLDivElement>()
   const cols = Math.max(1, columns ?? measured)
   const [drag, setDrag] = useState<Drag | null>(null)
   const dragRef = useRef<Drag | null>(null)
@@ -107,6 +107,7 @@ export function QueueGrid({ matches, onMove, onSwapSides, columns, className }: 
     <div className={cn('flex flex-col gap-3', className)}>
       <p className="text-[13px] text-fg2">{QUEUE_GRID_HELP}</p>
       <div
+        ref={gridRef}
         className="grid gap-2.5"
         style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
       >

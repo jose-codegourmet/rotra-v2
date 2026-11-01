@@ -76,7 +76,7 @@ export function ClubDashboard() {
   const upcoming = nowCard.data?.upcoming
 
   return (
-    <main className="mx-auto flex max-w-[1240px] flex-col gap-5 px-[max(16px,env(safe-area-inset-left,0px))] pt-5 pb-[120px]">
+    <main className="flex flex-col gap-5 px-page pt-5 pb-[120px]">
       {club.isError ? (
         <QueryError query={club} title="Couldn't load the club." />
       ) : club.data ? (

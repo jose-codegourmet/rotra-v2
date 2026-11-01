@@ -6,7 +6,7 @@ export const upcomingQueueRowMeta = {
     'The Session view\'s "Upcoming queued matches": header with "N waiting · N need attention", one grid row of the first queue cards, then a More queues tile that opens the Queue tab.',
   usage: [
     'Use once on the Session view (Q-COURTS), under the courts. Pass the whole waiting queue; the row shows the first (columns − 1) cards.',
-    'Columns follow the window width (5 ≥ 1200 px, 4 ≥ 960, 3 ≥ 700, 2 ≥ 460, else 1); pass columns to fix them.',
+    'Columns follow the grid width: as many 160 px+ tiles as fit, with no upper limit, so wider pages show more queued matches before More queues; pass columns to fix them.',
     'Do not use for the full queue grid; that is QueueGrid in Queue › Match queue.',
   ],
   prototype: {

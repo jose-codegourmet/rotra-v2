@@ -34,7 +34,7 @@ export function StartSessionBar({
         className,
       )}
     >
-      <div className="mx-auto flex max-w-[1240px] flex-wrap items-center justify-between gap-x-3 gap-y-2 px-[max(16px,env(safe-area-inset-left,0px))] py-2.5">
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 px-page py-2.5">
         <span
           className={cn(
             'flex flex-wrap items-center gap-2 text-[13px]',

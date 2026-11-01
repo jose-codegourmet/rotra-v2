@@ -260,13 +260,13 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
 
   if (session.isError)
     return (
-      <main className="mx-auto max-w-[1240px] px-4 pt-5">
+      <main className="px-page pt-5">
         <QueryError query={session} title="Couldn't load this session." />
       </main>
     )
 
   return (
-    <main className="mx-auto flex max-w-[1240px] flex-col gap-5 px-[max(16px,env(safe-area-inset-left,0px))] pt-5 pb-[170px]">
+    <main className="flex flex-col gap-5 px-page pt-5 pb-[170px]">
       {s ? (
         <PageHeader
           eyebrow={

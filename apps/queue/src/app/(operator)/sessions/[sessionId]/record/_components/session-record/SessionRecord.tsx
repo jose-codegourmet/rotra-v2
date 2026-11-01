@@ -75,14 +75,14 @@ export function SessionRecord({ sessionId }: SessionRecordProps) {
 
   if (record.isError && s && !redirectTo)
     return (
-      <main className="mx-auto max-w-[1240px] px-4 pt-5">
+      <main className="px-page pt-5">
         <Breadcrumb label="Home" href="/" linkAs={Link} />
         <QueryError query={record} title="Couldn't load this session record." />
       </main>
     )
 
   return (
-    <main className="mx-auto flex max-w-[1240px] flex-col gap-5 px-[max(16px,env(safe-area-inset-left,0px))] pt-5 pb-[170px]">
+    <main className="flex flex-col gap-5 px-page pt-5 pb-[170px]">
       <Breadcrumb label="Home" href="/" linkAs={Link} />
       {r ? (
         <SessionRecordHeader

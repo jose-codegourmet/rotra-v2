@@ -23,6 +23,15 @@
   }
 }
 
+/*
+ * Page side padding for full-width pages (Queue): 16–40 px with the window, never under the
+ * safe-area insets. Page content, the top bar and the footer bars share it so they line up.
+ */
+@utility px-page {
+  padding-left: max(clamp(16px, 3vw, 40px), env(safe-area-inset-left, 0px));
+  padding-right: max(clamp(16px, 3vw, 40px), env(safe-area-inset-right, 0px));
+}
+
 @theme inline {
   /* Tokens only: drop Tailwind's default palette so bg-red-500 and friends cannot be used. */
   --color-*: initial;

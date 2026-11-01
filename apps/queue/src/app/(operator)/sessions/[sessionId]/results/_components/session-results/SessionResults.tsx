@@ -98,7 +98,7 @@ export function SessionResults({ sessionId }: SessionResultsProps) {
 
   if (processing)
     return (
-      <main className="mx-auto flex max-w-[1240px] flex-col gap-5 px-[max(16px,env(safe-area-inset-left,0px))] pt-5 pb-[170px]">
+      <main className="flex flex-col gap-5 px-page pt-5 pb-[170px]">
         <Breadcrumb label="Home" href="/" linkAs={Link} />
         <ErrorState
           title={PREPARING}
@@ -112,7 +112,7 @@ export function SessionResults({ sessionId }: SessionResultsProps) {
 
   if (session.isError || (s && !redirectTo && (results.isError || record.isError)))
     return (
-      <main className="mx-auto max-w-[1240px] px-4 pt-5">
+      <main className="px-page pt-5">
         <Breadcrumb label="Home" href="/" linkAs={Link} />
         <QueryError
           query={session.isError ? session : results.isError ? results : record}
@@ -132,7 +132,7 @@ export function SessionResults({ sessionId }: SessionResultsProps) {
   const pub = publication.data ?? null
 
   return (
-    <main className="mx-auto flex max-w-[1240px] flex-col gap-5 px-[max(16px,env(safe-area-inset-left,0px))] pt-5 pb-[170px]">
+    <main className="flex flex-col gap-5 px-page pt-5 pb-[170px]">
       <Breadcrumb label="Home" href="/" linkAs={Link} />
       {ready && frame ? (
         <>

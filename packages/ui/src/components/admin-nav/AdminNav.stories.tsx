@@ -21,7 +21,7 @@ const meta = {
   render: (args) => (
     <AppShell
       railWidth={236}
-      topBar={<TopBar product="Admin" contained={false} menuOnNarrowOnly />}
+      topBar={<TopBar product="Admin" width="window" menuOnNarrowOnly />}
       rail={<AdminNav {...args} />}
     >
       <div />

@@ -17,8 +17,11 @@ export type TopBarProps = {
   menuOnNarrowOnly?: boolean
   /** Navigation and actions: PlayerNav, SyncStatus, ThemeToggle, account */
   children?: ReactNode
-  /** Center the content at 1240 px like Queue; Admin's top bar spans the window */
-  contained?: boolean
+  /**
+   * `contained` centers the content at 1240 px (Player); `window` spans it with 16 px padding
+   * (Admin); `page` spans it with the page side padding so it lines up with full-width pages (Queue).
+   */
+  width?: 'contained' | 'window' | 'page'
 }
 
 /** The prototypes' .top: sticky, blurred top bar with the menu button, the ROTRA mark and actions. */
@@ -29,7 +32,7 @@ export function TopBar({
   linkAs: Link = 'a',
   menuOnNarrowOnly = false,
   children,
-  contained = true,
+  width = 'contained',
 }: TopBarProps) {
   const shell = useOptionalAppShell()
   const showMenu = shell && !(shell.narrow && shell.hasDock) && (!menuOnNarrowOnly || shell.narrow)
@@ -62,8 +65,11 @@ export function TopBar({
     <header className="sticky top-[env(safe-area-inset-top,0px)] z-20 border-b border-border bg-bg/92 backdrop-blur-[8px]">
       <div
         className={cn(
-          'flex flex-wrap items-center gap-3 py-2.5 pr-[max(16px,env(safe-area-inset-right,0px))] pl-[max(16px,env(safe-area-inset-left,0px))] max-[480px]:gap-2',
-          contained && 'mx-auto max-w-[1240px]',
+          'flex flex-wrap items-center gap-3 py-2.5 max-[480px]:gap-2',
+          width === 'page'
+            ? 'px-page'
+            : 'pr-[max(16px,env(safe-area-inset-right,0px))] pl-[max(16px,env(safe-area-inset-left,0px))]',
+          width === 'contained' && 'mx-auto max-w-[1240px]',
         )}
       >
         {showMenu ? (

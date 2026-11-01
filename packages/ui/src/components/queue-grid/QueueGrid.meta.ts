@@ -3,7 +3,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const queueGridMeta = {
   name: 'QueueGrid',
   description:
-    "The Queue tab's waiting list: MatchCards in 1–5 columns by width, ordered in a snake (left to right, then back right to left) with flow arrows, reordered by dragging the ⠿ handle or with the arrow keys on it, and with switch-sides dragging on every card.",
+    "The Queue tab's waiting list: MatchCards in as many columns as fit the grid's width (tiles of 160 px or more, no upper limit), ordered in a snake (left to right, then back right to left) with flow arrows, reordered by dragging the ⠿ handle or with the arrow keys on it, and with switch-sides dragging on every card.",
   usage: [
     "Use for the whole waiting queue on the Queue tab (Q-QUEUE). The Session view's first row is UpcomingQueueRow.",
     'Give it the queue in order; it numbers positions from 1 and passes each card its flow arrow.',

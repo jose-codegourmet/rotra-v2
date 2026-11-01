@@ -5,7 +5,7 @@ import type { ReactNode } from 'react'
 export default function AdminAuthLayout({ children }: { children: ReactNode }) {
   return (
     <>
-      <TopBar product="Admin" contained={false}>
+      <TopBar product="Admin" width="window">
         <ThemeToggle />
       </TopBar>
       {children}

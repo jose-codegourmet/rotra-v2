@@ -1,8 +1,10 @@
+import { checkMockSave } from '../mock/bridge'
+import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, mockStore, readMockState } from '../mock/store'
 import { requireSessionWrite, sessionIn } from '../mock/transaction'
-import { autoQueueFingerprint, clearAutoQueueDrafts, emptyAutoQueueDraftState, selectAutoQueueDraft } from './autoQueue.rules'
-import type { AutoQueueMode } from './autoQueue.types'
+import { allAutoQueueDrafts, autoQueueFingerprint, clearAutoQueueDrafts, emptyAutoQueueDraftState, selectAutoQueueDraft, generateAutoQueueMatches } from './autoQueue.rules'
+import type { AutoQueueCount, AutoQueueMode } from './autoQueue.types'
 import { matchContext, requireLive } from './queue.mutations'
 
 export function draftState(s: MockState, sessionId: string) {
@@ -36,6 +38,24 @@ export function editAutoQueueDrafts(input: { sessionId: string } & (
     const state = draftState(s, input.sessionId)
     if (input.action === 'select') selectAutoQueueDraft(state, input.draftId, input.selected)
     else clearAutoQueueDrafts(state, input.mode, input.unselectedOnly)
+    return state
+  })
+}
+
+export function generateAutoQueueDrafts(input: { sessionId: string; mode: Exclude<AutoQueueMode, 'catchup'>; count: AutoQueueCount; preserveSelected?: boolean }) {
+  return changeAutoQueueDrafts(input.sessionId, (s) => {
+    if (![2, 3, 4, 6].includes(input.count)) throw new MockError('permission', 'Choose 2, 3, 4 or 6 matches.')
+    const session = sessionIn(s, input.sessionId), ctx = matchContext(s, session.id)
+    const state = draftState(s, session.id), old = state.batches[input.mode]?.drafts ?? []
+    const retained = input.preserveSelected ? old.filter((d) => state.selectedIds.includes(d.id)) : []
+    const result = generateAutoQueueMatches({ session, ctx, mode: input.mode, limit: Math.max(0, input.count - retained.length), retained })
+    if (result.error) throw new MockError('permission', result.error)
+    const fingerprint = autoQueueFingerprint(session, ctx)
+    const reason = { available: 'Available players with the lowest planned load', ahead: 'Available players first, then present players still playing', wait: 'Longest wait after planned assignments', fewest: 'Fewest games after planned assignments' }[input.mode]
+    state.batches[input.mode] = { drafts: [...retained, ...result.matches.map((m) => ({ ...m, id: crypto.randomUUID(), mode: input.mode, reason, fingerprint }))], stopReason: result.stopReason }
+    const remaining = new Set(allAutoQueueDrafts(state).map((d) => d.id))
+    state.selectedIds = state.selectedIds.filter((id) => remaining.has(id))
+    checkMockSave()
     return state
   })
 }

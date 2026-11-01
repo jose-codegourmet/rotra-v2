@@ -1,4 +1,4 @@
-import { consoleSessionFixture } from '@rotra/data/fixtures/consoleSessions'
+import { consoleSessionFixture, courtWindowFixture } from '@rotra/data/fixtures/consoleSessions'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import { CourtsAndTimeSheet } from './CourtsAndTimeSheet'
@@ -32,3 +32,5 @@ export const Extended: Story = { args: { endsAt: session.scheduledEndAt + 360000
 
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
 export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }
+
+export const FiveBookingWindows: Story = { args: { courts: courtWindowFixture.courts, startsAt: courtWindowFixture.session.scheduledStartAt, endsAt: courtWindowFixture.session.scheduledEndAt, onEditCourt: fn(), onRemoveCourt: fn() } }

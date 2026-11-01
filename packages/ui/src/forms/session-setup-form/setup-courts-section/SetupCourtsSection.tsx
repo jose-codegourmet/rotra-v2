@@ -3,6 +3,7 @@
 import { CountStepper } from '@rotra/ui/count-stepper'
 import { Field } from '@rotra/ui/field'
 import { Notice } from '@rotra/ui/notice'
+import { TimeField } from '@rotra/ui/time-field'
 import { TextInput } from '@rotra/ui/text-input'
 import { Controller, useFormContext, useWatch } from 'react-hook-form'
 import type { SessionSetupInput } from '../SessionSetupForm.schema'
@@ -22,6 +23,11 @@ export function SetupCourtsSection({ editContext }: SetupCourtsSectionProps) {
   const setCount = (n: number) => {
     const next = labels.slice(0, n)
     while (next.length < n) next.push(`Court ${next.length + 1}`)
+    for (const key of ['courtStarts', 'courtEnds'] as const) {
+      const times = (form.getValues(key) ?? []).slice(0, n)
+      while (times.length < n) times.push('')
+      form.setValue(key, times, { shouldDirty: true })
+    }
     form.setValue('courtLabels', next, {
       shouldDirty: true,
       shouldValidate: form.formState.isSubmitted,
@@ -43,7 +49,8 @@ export function SetupCourtsSection({ editContext }: SetupCourtsSectionProps) {
       </div>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,200px),1fr))] gap-3.5">
         {labels.map((_, i) => (
-          <Field key={i} label={`Court ${i + 1} label`} error={errors.courtLabels?.[i]?.message}>
+          <div key={i} className="flex flex-col gap-2">
+          <Field label={`Court ${i + 1} label`} error={errors.courtLabels?.[i]?.message}>
             <Controller
               control={form.control}
               name={`courtLabels.${i}`}
@@ -52,6 +59,13 @@ export function SetupCourtsSection({ editContext }: SetupCourtsSectionProps) {
               )}
             />
           </Field>
+          <Field label="Planned start" error={errors.courtStarts?.[i]?.message} hint="Blank follows the session start.">
+            <Controller control={form.control} name={`courtStarts.${i}`} render={({ field }) => <TimeField {...field} value={field.value ?? ''} aria-label={`Court ${i + 1} planned start`} invalid={!!errors.courtStarts?.[i]} />} />
+          </Field>
+          <Field label="Open until" error={errors.courtEnds?.[i]?.message} hint="Blank follows the session end. An overnight time is on the next day.">
+            <Controller control={form.control} name={`courtEnds.${i}`} render={({ field }) => <TimeField {...field} value={field.value ?? ''} aria-label={`Court ${i + 1} open until`} invalid={!!errors.courtEnds?.[i]} />} />
+          </Field>
+          </div>
         ))}
       </div>
       <div className="flex flex-wrap items-center justify-between gap-3">

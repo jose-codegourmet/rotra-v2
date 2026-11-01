@@ -13,7 +13,8 @@
     "./personal-details": "./src/personal-details.ts",
     "./social-link": "./src/social-link.ts",
     "./club-price": "./src/club-price.ts",
-    "./ranking-settings": "./src/ranking-settings.ts"
+    "./ranking-settings": "./src/ranking-settings.ts",
+    "./court-window": "./src/court-window.ts"
   },
   "scripts": {
     "lint": "biome check .",

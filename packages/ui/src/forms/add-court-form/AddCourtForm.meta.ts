@@ -19,5 +19,6 @@ export const addCourtFormMeta = {
     'docs/business_logic/product/queue/modules/sessions/README.md#running',
     'docs/coding-conventions.md#6-forms',
   ],
+  // Individual booking starts control dispatch; ends remain advisory.
   related: ['CourtsAndTimeSheet', 'ChoiceGroup', 'TimeField', 'Sheet', 'Field'],
 } satisfies ComponentMeta

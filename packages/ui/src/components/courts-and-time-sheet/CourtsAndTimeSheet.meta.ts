@@ -17,5 +17,6 @@ export const courtsAndTimeSheetMeta = {
     'docs/screens/product/modules/queue/session-console.md#q-session-adjust--courts-and-time',
     'docs/business_logic/product/queue/modules/sessions/README.md#running',
   ],
+  // Individual booking starts control dispatch; ends remain advisory.
   related: ['AddCourtForm', 'Sheet', 'Button'],
 } satisfies ComponentMeta

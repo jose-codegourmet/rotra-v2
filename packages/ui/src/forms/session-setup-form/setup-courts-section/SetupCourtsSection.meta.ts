@@ -10,5 +10,6 @@ export const setupCourtsSectionMeta = {
     screen: 'Q-SETUP › viewSetup() part 1 (Courts)',
   },
   docs: ['docs/screens/product/modules/queue/session-setup.md'],
+  // Individual booking starts control dispatch; ends remain advisory.
   related: ['SessionSetupForm', 'SetupDetailsSection', 'CountStepper'],
 } satisfies ComponentMeta

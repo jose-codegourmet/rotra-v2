@@ -14,6 +14,7 @@ export const sessionSetupFormMeta = {
     screen: 'Q-SETUP › viewSetup()',
   },
   docs: ['docs/screens/product/modules/queue/session-setup.md'],
+  // Individual booking starts control dispatch; ends remain advisory.
   related: [
     'SessionFinancialsFields',
     'SetupStepBar',

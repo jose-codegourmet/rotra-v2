@@ -1,5 +1,6 @@
 'use client'
 
+import { courtNextDay } from '@rotra/schema/court-window'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@rotra/ui/button'
 import { ChoiceGroup } from '@rotra/ui/choice-group'
@@ -27,6 +28,8 @@ export type AddCourtFormProps = {
   onOpenChange: (open: boolean) => void
   /** The next "Court N": the label field's default, and the label used when it is left empty */
   defaultLabel: string
+  editing?: boolean
+  lockedStartsAt?: number
   /** The session's start: set times are placed on this day (the next when earlier, overnight) */
   sessionStartsAt: number
   /** The session's scheduled end: "Until the session ends" and the latest set time */
@@ -53,6 +56,8 @@ export function AddCourtForm({
   open,
   onOpenChange,
   defaultLabel,
+  editing = false,
+  lockedStartsAt,
   sessionStartsAt,
   sessionEndsAt,
   now,
@@ -72,13 +77,14 @@ export function AddCourtForm({
         sessionStartsAt,
         sessionEndsAt,
         fallbackLabel: defaultLabel,
+        lockedStartsAt,
       }),
-    [current, sessionStartsAt, sessionEndsAt, defaultLabel],
+    [current, sessionStartsAt, sessionEndsAt, defaultLabel, lockedStartsAt],
   )
   const form = useForm<AddCourtFormInput, unknown, AddCourtFormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      ...addCourtFormDefaultValues(sessionEndsAt),
+      ...addCourtFormDefaultValues(sessionEndsAt, sessionStartsAt),
       label: defaultLabel,
       ...defaultValues,
     },
@@ -98,7 +104,7 @@ export function AddCourtForm({
       onOpenChange={(next) => {
         if (!isPending) onOpenChange(next)
       }}
-      title={`Add ${label}?`}
+      title={`${editing ? 'Edit' : 'Add'} ${label}?`}
       dismissible={!isPending}
       footer={
         <>
@@ -106,7 +112,7 @@ export function AddCourtForm({
             Cancel
           </Button>
           <Button type="submit" form={formId} variant="primary" loading={isPending}>
-            Add {label}
+            {editing ? 'Save court' : `Add ${label}`}
           </Button>
         </>
       }
@@ -126,9 +132,12 @@ export function AddCourtForm({
               control={form.control}
               name="label"
               render={({ field }) => (
-                <TextInput {...field} maxLength={COURT_LABEL_MAX} autoComplete="off" autoFocus />
+                <TextInput {...field} disabled={isPending} maxLength={COURT_LABEL_MAX} autoComplete="off" autoFocus />
               )}
             />
+          </Field>
+          <Field label="Planned start" error={errors.startTime?.message} hint={lockedStartsAt === undefined ? 'The court is unavailable before this time.' : 'Start is fixed after use.'}>
+            <Controller control={form.control} name="startTime" render={({ field }) => <TimeField {...field} disabled={isPending || lockedStartsAt !== undefined} invalid={!!errors.startTime} aria-label="Planned start" />} />
           </Field>
           <div className="flex min-w-0 flex-col gap-1.5">
             <span className="text-[13px] font-semibold text-fg2">Open until</span>
@@ -140,6 +149,7 @@ export function AddCourtForm({
                   type="single"
                   aria-label="Open until"
                   value={field.value}
+                  disabled={isPending}
                   onChange={(value) => field.onChange(value as OpenUntilMode)}
                   choices={[
                     {
@@ -163,6 +173,7 @@ export function AddCourtForm({
                 render={({ field }) => (
                   <TimeField
                     {...field}
+                    disabled={isPending}
                     aria-label="Open until"
                     aria-invalid={timeError ? true : undefined}
                     aria-describedby={timeError ? timeErrorId : undefined}
@@ -182,7 +193,7 @@ export function AddCourtForm({
           </div>
           {until !== null && minutes !== null && minutes > 0 ? (
             <Notice tone="success">
-              <b>{label}</b> will be free right away and open until <b>{formatTime(until)}</b>,
+              <b>{label}</b> is planned to open until <b>{formatTime(until)}{courtNextDay(until, sessionStartsAt) ? ' · next day' : ''}</b>,
               about {formatDuration(current, until)} from now.
             </Notice>
           ) : null}

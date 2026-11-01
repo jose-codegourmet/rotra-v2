@@ -1,3 +1,4 @@
+import { courtTimeOnSession, courtWindowError } from '@rotra/schema/court-window'
 import { timeField } from '@rotra/schema/date'
 import { formatTime } from '@rotra/ui/now-card/helpers'
 import { z } from 'zod'
@@ -15,12 +16,7 @@ export type OpenUntilMode = 'end' | 'time'
  * (overnight sessions), as the prototype's timeOnSession() does.
  */
 export function timeOnSession(sessionStartsAt: number, hhmm: string): number {
-  const [h = 0, m = 0] = hhmm.split(':').map(Number)
-  const date = new Date(sessionStartsAt)
-  date.setHours(h, m, 0, 0)
-  let at = date.getTime()
-  if (at < sessionStartsAt) at += 864e5
-  return at
+  return courtTimeOnSession(sessionStartsAt, hhmm)
 }
 
 export type AddCourtSchemaOptions = {
@@ -32,6 +28,7 @@ export type AddCourtSchemaOptions = {
   sessionEndsAt: number
   /** The next "Court N", used when the label is left empty (as the prototype does) */
   fallbackLabel: string
+  lockedStartsAt?: number
 }
 
 /**
@@ -40,10 +37,10 @@ export type AddCourtSchemaOptions = {
  * session end.
  */
 export function makeAddCourtSchema({
-  now,
   sessionStartsAt,
   sessionEndsAt,
   fallbackLabel,
+  lockedStartsAt,
 }: AddCourtSchemaOptions) {
   return z
     .object({
@@ -52,34 +49,34 @@ export function makeAddCourtSchema({
         .trim()
         .max(COURT_LABEL_MAX)
         .transform((value) => value || fallbackLabel),
+      startTime: z.string().default(''),
       mode: z.enum(['end', 'time']),
       /** "HH:mm"; only read when mode is "time" */
       time: z.string(),
     })
     .transform((values, ctx) => {
-      if (values.mode === 'end') return { label: values.label, openUntil: null }
-      if (!values.time || !timeField.safeParse(values.time).success) {
+      if (values.startTime && !timeField.safeParse(values.startTime).success) {
+        ctx.addIssue({ code: 'custom', message: 'Choose a planned start.', path: ['startTime'] })
+        return z.NEVER
+      }
+      if (values.mode === 'time' && !timeField.safeParse(values.time).success) {
         ctx.addIssue({ code: 'custom', message: CLOSING_TIME_ERROR, path: ['time'] })
         return z.NEVER
       }
-      const openUntil = timeOnSession(sessionStartsAt, values.time)
-      if (openUntil <= now) {
-        ctx.addIssue({ code: 'custom', message: AFTER_NOW_ERROR, path: ['time'] })
+      const startsAt = values.startTime ? timeOnSession(sessionStartsAt, values.startTime) : sessionStartsAt
+      const openUntil = values.mode === 'end' ? null : timeOnSession(sessionStartsAt, values.time)
+      if (lockedStartsAt !== undefined && startsAt !== lockedStartsAt) {
+        ctx.addIssue({ code: 'custom', message: 'Start is fixed after use.', path: ['startTime'] })
         return z.NEVER
       }
-      if (openUntil > sessionEndsAt) {
-        ctx.addIssue({
-          code: 'custom',
-          message: afterSessionEndError(sessionEndsAt),
-          path: ['time'],
-        })
+      const error = courtWindowError(startsAt, openUntil, sessionStartsAt, sessionEndsAt)
+      if (error) {
+        ctx.addIssue({ code: 'custom', message: error, path: [startsAt < sessionStartsAt || startsAt >= sessionEndsAt ? 'startTime' : 'time'] })
         return z.NEVER
       }
-      return { label: values.label, openUntil }
+      return { label: values.label, startsAt, openUntil }
     })
 }
 
-/** What the fields hold while typing */
 export type AddCourtFormInput = z.input<ReturnType<typeof makeAddCourtSchema>>
-/** What onSubmit receives: the label and openUntil (null = until the session ends), as useAddCourt takes */
 export type AddCourtFormValues = z.output<ReturnType<typeof makeAddCourtSchema>>

@@ -191,3 +191,6 @@ export const CourtsGridMerged: Story = {
 }
 export const Phone: Story = { ...CourtsGrid, globals: { viewport: { value: 'phone' } } }
 export const Desktop: Story = { ...CourtsGrid, globals: { viewport: { value: 'desktop' } } }
+
+export const BeforePlannedStart: Story = { args: { variant: 'free', label: 'Court 4', startLabel: '8:30 PM', untilLabel: '10:30 PM', notOpen: true } }
+export const ManuallyRemoved: Story = { args: { variant: 'free', label: 'Court 5', startLabel: '8:30 PM', untilLabel: '9:30 PM', removed: true } }

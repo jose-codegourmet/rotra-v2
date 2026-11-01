@@ -18,7 +18,19 @@ function createClient() {
 }
 
 const globalForPrisma = globalThis as unknown as { rotraPrisma?: PrismaClient }
+let instance: PrismaClient | undefined
 
-export const prisma = globalForPrisma.rotraPrisma ?? createClient()
+/** Created on first use, so `next build` can import Route Handlers without a database URL. */
+function client(): PrismaClient {
+  instance ??= globalForPrisma.rotraPrisma ?? createClient()
+  if (process.env.NODE_ENV !== 'production') globalForPrisma.rotraPrisma = instance
+  return instance
+}
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.rotraPrisma = prisma
+export const prisma = new Proxy({} as PrismaClient, {
+  get(_target, property) {
+    const target = client()
+    const value = Reflect.get(target, property, target)
+    return typeof value === 'function' ? value.bind(target) : value
+  },
+})

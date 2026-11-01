@@ -97,3 +97,7 @@ A conflict is not permission to open a generic winner editor. Accepted unchanged
 ### Flexible admission (mock)
 
 Prepared overflow waits by default; active arrivals enter directly and lock their level. Waitlist and join-request actions disable while pending. A failed or conflicting write retains list membership and chosen levels; new-player inputs stay in the sheet. Saved/directory duplicate identities are rejected atomically. Finalized and invalid sessions remain read-only. Offline writes still require the existing downloaded-copy mock guard; license expiry allows finishing an active session only. These are in-memory states, reset on reload.
+
+### Court booking windows (mock)
+
+The live clock refreshes eligibility every second, including while Start match is open. Start confirms against the current clock again. Future courts show Not open yet; passed ends stay advisory. Booking edits and extensions preserve fields on save failure/conflict and block repeat submission. A used start is fixed. Occupied removal and last-court removal remain guarded. Overnight times explicitly show next day. This browser clock is not a durable scheduler or an offline clock guarantee.

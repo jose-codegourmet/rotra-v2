@@ -5,6 +5,13 @@ import { delay } from '../mock/latency'
 import { type MockState, readMockState } from '../mock/store'
 import type { Player } from '../player/player.types'
 import { effectiveRankingVersion } from '../ranking-settings/rankingSettings.rules'
+import {
+  realGetAdminPlayer,
+  realGetAdminPlayerGames,
+  realGetAdminPlayersByIds,
+  realListAdminPlayers,
+} from '../real/admin-players'
+import { isRealDataMode } from '../real/mode'
 import { createdOnFromRtrId, rankStatusOf } from './adminPlayer.rules'
 import type {
   AdminPlayer,
@@ -79,6 +86,7 @@ export async function listAdminPlayers(
   params: AdminPlayerListParams = {},
   signal?: AbortSignal,
 ): Promise<AdminPlayerList> {
+  if (isRealDataMode()) return realListAdminPlayers(params, signal)
   if ((await getAdminSession()).kind !== 'owner')
     throw new MockError('permission', 'Only ROTRA Admin can view player management.')
   await delay(400, signal)
@@ -92,6 +100,7 @@ export async function getAdminPlayer(
   id: string,
   signal?: AbortSignal,
 ): Promise<AdminPlayerDetail | null> {
+  if (isRealDataMode()) return realGetAdminPlayer(id, signal)
   if ((await getAdminSession()).kind !== 'owner')
     throw new MockError('permission', 'Only ROTRA Admin can view player management.')
   await delay(400, signal)
@@ -124,6 +133,7 @@ export function hasPlayerReferences(state: MockState, id: string) {
 
 /** Admin history is independent of Player Information dev scenarios. */
 export async function getAdminPlayerGames(id: string, signal?: AbortSignal) {
+  if (isRealDataMode()) return realGetAdminPlayerGames(id, signal)
   if ((await getAdminSession()).kind !== 'owner')
     throw new MockError('permission', 'Only ROTRA Admin can view player management.')
   await delay(300, signal)
@@ -134,6 +144,7 @@ export async function getAdminPlayerGames(id: string, signal?: AbortSignal) {
 }
 
 export async function getAdminPlayersByIds(ids: string[], signal?: AbortSignal) {
+  if (isRealDataMode()) return realGetAdminPlayersByIds(ids, signal)
   if ((await getAdminSession()).kind !== 'owner')
     throw new MockError('permission', 'Only ROTRA Admin can view player management.')
   await delay(200, signal)

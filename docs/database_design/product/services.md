@@ -188,3 +188,24 @@ Proposals used, each now its own ticket (split from #317): club username →
 `20261101000100_seed_founding_locations` (#380); license start decided by the server and the typed
 reference kept as the note (#377). The remaining gaps are listed in the
 [database open-decisions register](open-decisions.md#gaps-from-the-f0734-wiring).
+
+## Admin player directory reads (2026-11-01)
+
+Admin `GET /api/players` calls `admin/players.readAdminPlayerDirectory` behind
+`handleAccountRequest('admin', …)`. It returns an allowlisted private projection of identities with
+allocated RTR IDs: current contacts, account state, memberships, allocation city/date, and the stored
+shared-rank projection. No rank is synthesized from club levels or fixture data. Responses are
+private/no-store; public and Queue player searches do not use this endpoint.
+
+`@rotra/data` branches to this transport in real mode for list, detail, and selected-ID reads.
+The existing directory selector preserves search, duplicate groups, counts, URL filters, pagination,
+and contact-free CSV export. Like the first Admin club directory, it loads the directory then filters
+in the client; server-side filtering/pagination remains a scaling follow-up.
+
+Admin `GET /api/players/[playerId]/games` authorizes the owner, checks the allocated identity, and
+uses the canonical read-only match-history projection for quick view and full history.
+
+Player mutations (Add, Edit, Archive, Restore, Remove and registration links), contact-request reads,
+audit reads, and ranking-settings reads remain unwired in real mode. The player schema has no archive
+column yet, so persisted directory rows are active and removal is explicitly unavailable. These reads
+do not apply migrations, create players, or change contacts, permissions or retained results.

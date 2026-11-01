@@ -128,3 +128,14 @@ screen loaded one, and returns an allowlisted DTO.
 - Awards in the private snapshot use the prototype reference formula from `@rotra/data` and are labeled `prototype-reference`; Off Day is stored in its own column.
 - Confirmed guest history needs the club player already linked to that profile plus an identity method (RTR ID, QR or phone); facts keep their original snapshot. Revocation is not built here.
 - Worker hosting and schedule are open (#243); these are plain functions to call from it.
+
+## F07.31 · Private results, explicit publication
+
+| Module | Commands |
+|---|---|
+| `queue/results` | `readSessionResults` (club-only snapshot, publication and exports); `publishResults` (Publish and Publish again); `readPublishedResults` (used by `readPublicSession`); `requestResultExport`, `exportAssetKey`, `markExportRendered` |
+
+- Off Day is excluded unless the publish call sends `includeOffDay: true`; it is never carried over from the previous publish. Every publish appends a `session_publication_events` row and is repeat-safe on its command.
+- The public copy holds names and counts only (standings: position, name, W/L, games; awards: names and prior-session counts). No IDs, scores evidence, levels, contacts, financials or raw evidence; the public page never joins the private snapshot.
+- Exports are private; their ID comes from the command and the storage key from the ID, so a re-render overwrites the same object. Rendering and storage are later work; a render failure leaves the finalization and snapshot untouched.
+- Unpublish, bucket policy and public asset access are not built.

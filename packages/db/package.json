@@ -34,7 +34,8 @@
     "./queue/financials": "./src/queue/financials.ts",
     "./queue/sync": "./src/queue/sync.ts",
     "./queue/finalization": "./src/queue/finalization.ts",
-    "./player/projections": "./src/player/projections.ts"
+    "./player/projections": "./src/player/projections.ts",
+    "./queue/results": "./src/queue/results.ts"
   },
   "scripts": {
     "db:generate": "prisma generate",

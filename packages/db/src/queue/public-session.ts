@@ -3,6 +3,7 @@ import { createHmac, timingSafeEqual } from 'node:crypto'
 import { prisma } from '../client/prisma'
 import type { QueueSession, StatedBand } from '../generated/prisma/client'
 import { ServiceError } from '../service/errors'
+import { readPublishedResults } from './results'
 import { capacityOf, liveCourts, liveRoster, orderedWaitlist } from './session-store'
 
 const E164 = /^\+[1-9][0-9]{7,14}$/
@@ -48,7 +49,7 @@ function publicStatus(session: QueueSession): 'prepared' | 'active' | 'completed
 /**
  * Q-PUBLIC-* (`public-session.page`): the allowlisted `PublicSessionPage` from accepted server
  * state. No phone, level, presence, games, notes beyond the session notes, costs, Off Day or raw
- * sync data. `results` stays null here; published slides are added by the publication read.
+ * sync data. `results` is the stored public copy of the published slides, or null.
  */
 export async function readPublicSession(slug: string) {
   const session = await prisma.queueSession.findUnique({
@@ -100,7 +101,7 @@ export async function readPublicSession(slug: string) {
       acceptJoinRequests: session.acceptJoinRequests && session.state === 'prepared',
       lastSyncedAt: session.updatedAt.getTime(),
       hasPendingChanges: streams.some((s) => s.highestReceivedSeq > s.contiguousSequence),
-      results: null,
+      results: session.state === 'completed' ? await readPublishedResults(session.id) : null,
     }
   })
 }

@@ -10,6 +10,9 @@ import { useEffect, useId, useState } from 'react'
 export type SavedPlayerStatsCarouselProps = {
   /** Omit while loading. Zero counts are real data, never a loading fallback. */
   stats?: SavedPlayerStats
+  cards?: { key: string; label: string; value?: number; active?: boolean; onSelect?: () => void }[]
+  label?: string
+  caption?: string
 }
 
 const CARDS = [
@@ -22,7 +25,21 @@ const CARDS = [
 ] as const satisfies ReadonlyArray<readonly [keyof SavedPlayerStats, string]>
 
 /** Club-wide statistics above the Saved players filters; never rotates automatically. */
-export function SavedPlayerStatsCarousel({ stats }: SavedPlayerStatsCarouselProps) {
+export function SavedPlayerStatsCarousel({
+  stats,
+  cards,
+  label = 'Saved player statistics',
+  caption = 'All saved players · This week starts Monday (Asia/Manila)',
+}: SavedPlayerStatsCarouselProps) {
+  const items =
+    cards ??
+    CARDS.map(([key, label]) => ({
+      key,
+      label,
+      value: stats?.[key],
+      active: false,
+      onSelect: undefined,
+    }))
   const viewportId = useId()
   const reducedMotion = useReducedMotion()
   const [viewportRef, api] = useEmblaCarousel({ align: 'start', loop: false })
@@ -43,15 +60,13 @@ export function SavedPlayerStatsCarousel({ stats }: SavedPlayerStatsCarouselProp
 
   return (
     <section
-      aria-label="Saved player statistics"
+      aria-label={label}
       aria-roledescription="carousel"
-      aria-busy={!stats}
+      aria-busy={items.some((item) => item.value === undefined)}
       className="min-w-0"
     >
       <div className="mb-3 flex items-center justify-between gap-3">
-        <p className="text-[13px] text-fg2">
-          All saved players · This week starts Monday (Asia/Manila)
-        </p>
+        <p className="text-[13px] text-fg2">{caption}</p>
         <div className="flex shrink-0 gap-2">
           <Button
             size="sm"
@@ -93,25 +108,49 @@ export function SavedPlayerStatsCarousel({ stats }: SavedPlayerStatsCarouselProp
         }}
       >
         <div className="flex touch-pan-y touch-pinch-zoom gap-3">
-          {CARDS.map(([key, label], index) => (
-            // biome-ignore lint/a11y/useSemanticElements: ARIA carousel slides use the group role.
-            <div
-              key={key}
-              role="group"
-              aria-roledescription="slide"
-              aria-label={`${index + 1} of ${CARDS.length}: ${label}`}
-              className="min-w-0 flex-[0_0_224px] rounded-2xl border border-border-strong bg-surface p-4"
-            >
-              <span className="text-[13px] font-semibold text-fg2">{label}</span>
-              {stats ? (
-                <strong className="mt-2 block text-[32px] leading-none font-extrabold tabular-nums">
-                  {stats[key].toLocaleString('en-US')}
-                </strong>
-              ) : (
-                <Skeleton className="mt-2 h-8 w-16" label={`Loading ${label.toLowerCase()}`} />
-              )}
-            </div>
-          ))}
+          {items.map(({ key, label, value, active, onSelect }, index) => {
+            const content = (
+              <>
+                <span className="text-[13px] font-semibold text-fg2">{label}</span>
+                {value !== undefined ? (
+                  <strong className="mt-2 block text-[32px] leading-none font-extrabold tabular-nums">
+                    {value.toLocaleString('en-US')}
+                  </strong>
+                ) : (
+                  <Skeleton className="mt-2 h-8 w-16" label={`Loading ${label.toLowerCase()}`} />
+                )}
+              </>
+            )
+            return (
+              // biome-ignore lint/a11y/useSemanticElements: ARIA carousel slides use group roles.
+              <div
+                key={key}
+                role="group"
+                aria-roledescription="slide"
+                aria-label={`${index + 1} of ${items.length}: ${label}`}
+                className={
+                  cards
+                    ? 'min-w-0 flex-[0_0_160px] min-[1280px]:flex-[1_0_0]'
+                    : 'min-w-0 flex-[0_0_224px]'
+                }
+              >
+                {onSelect ? (
+                  <button
+                    type="button"
+                    aria-pressed={active}
+                    onClick={onSelect}
+                    className="h-full w-full rounded-2xl border border-border-strong bg-surface p-4 text-left aria-pressed:border-accent aria-pressed:bg-accent-subtle"
+                  >
+                    {content}
+                  </button>
+                ) : (
+                  <div className="rounded-2xl border border-border-strong bg-surface p-4">
+                    {content}
+                  </div>
+                )}
+              </div>
+            )
+          })}
         </div>
       </div>
     </section>

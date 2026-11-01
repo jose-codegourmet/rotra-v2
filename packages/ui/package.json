@@ -332,7 +332,20 @@
     "./add-flag-form": "./src/forms/add-flag-form/AddFlagForm.tsx",
     "./add-flag-form/schema": "./src/forms/add-flag-form/AddFlagForm.schema.ts",
     "./add-flag-form/default-values": "./src/forms/add-flag-form/AddFlagForm.defaultValues.ts",
-    "./saved-player-stats-carousel": "./src/components/saved-player-stats-carousel/SavedPlayerStatsCarousel.tsx"
+    "./saved-player-stats-carousel": "./src/components/saved-player-stats-carousel/SavedPlayerStatsCarousel.tsx",
+    "./admin-player-stats": "./src/components/admin-player-stats/AdminPlayerStats.tsx",
+    "./admin-player-filters": "./src/components/admin-player-filters/AdminPlayerFilters.tsx",
+    "./player-pagination": "./src/components/player-pagination/PlayerPagination.tsx",
+    "./admin-player-clubs": "./src/components/admin-player-clubs/AdminPlayerClubs.tsx",
+    "./admin-player-card": "./src/components/admin-player-card/AdminPlayerCard.tsx",
+    "./admin-player-quick-view": "./src/components/admin-player-quick-view/AdminPlayerQuickView.tsx",
+    "./admin-player-history": "./src/components/admin-player-history/AdminPlayerHistory.tsx",
+    "./admin-add-player-form": "./src/forms/admin-add-player-form/AdminAddPlayerForm.tsx",
+    "./admin-edit-player-form": "./src/forms/admin-edit-player-form/AdminEditPlayerForm.tsx",
+    "./admin-player-change-form": "./src/forms/admin-player-change-form/AdminPlayerChangeForm.tsx",
+    "./admin-player-actions": "./src/components/admin-player-actions/AdminPlayerActions.tsx",
+    "./copy-player-value": "./src/components/copy-player-value/CopyPlayerValue.tsx",
+    "./admin-player-bulk-bar": "./src/components/admin-player-bulk-bar/AdminPlayerBulkBar.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

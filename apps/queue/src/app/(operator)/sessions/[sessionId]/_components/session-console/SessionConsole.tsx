@@ -8,7 +8,7 @@ import {
 } from '@rotra/data/match/match.rules'
 import { useLiveStandings } from '@rotra/data/match/useLiveStandings'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
-import { MockError } from '@rotra/data/mock/errors'
+import { isPermissionRefusal } from '@rotra/data/mock/errors'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionPayments } from '@rotra/data/session-payment/useSessionPayments'
 import { flushSessionPresence } from '@rotra/data/session-roster/flushSessionPresence'
@@ -125,8 +125,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
   const [editCourtId, setEditCourtId] = useState<string | null>(null)
 
   const s = session.data
-  if (session.isError && session.error instanceof MockError && session.error.kind === 'permission')
-    notFound()
+  if (session.isError && isPermissionRefusal(session.error)) notFound()
   const redirectTo = s && s.state !== 'active' ? sessionHref(s) : null
   useEffect(() => {
     if (redirectTo) router.replace(redirectTo)

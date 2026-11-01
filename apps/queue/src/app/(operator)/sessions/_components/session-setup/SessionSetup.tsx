@@ -5,7 +5,7 @@ import { useClubVenues } from '@rotra/data/club-venue/useClubVenues'
 import { useSaveClubVenue } from '@rotra/data/club-venue/useSaveClubVenue'
 import { DEMO_CLUB_ID } from '@rotra/data/fixtures/clubs'
 import { useInventory } from '@rotra/data/inventory/useInventory'
-import { MockError } from '@rotra/data/mock/errors'
+import { isPermissionRefusal, MockError } from '@rotra/data/mock/errors'
 import { estimateMinimum, sessionOccurrences } from '@rotra/data/queue-session/queueSession.rules'
 import type { QueueSessionInput } from '@rotra/data/queue-session/types'
 import { useCreateQueueSession } from '@rotra/data/queue-session/useCreateQueueSession'
@@ -143,7 +143,7 @@ export function SessionSetup(props: SessionSetupProps) {
 
   if (isEdit) {
     if (existing.isError) {
-      if (existing.error instanceof MockError && existing.error.kind === 'permission') notFound()
+      if (isPermissionRefusal(existing.error)) notFound()
     } else if (existing.data && existing.data.state !== 'prepared') {
       router.replace(sessionHref(existing.data))
     }

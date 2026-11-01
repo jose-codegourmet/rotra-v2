@@ -2,7 +2,7 @@
 
 import { useClub } from '@rotra/data/club'
 import { DEMO_CLUB_ID } from '@rotra/data/fixtures/clubs'
-import { MockError } from '@rotra/data/mock/errors'
+import { isPermissionRefusal } from '@rotra/data/mock/errors'
 import { useFinalizationStatus } from '@rotra/data/queue-session/useFinalizationStatus'
 import { useFinalizeSession } from '@rotra/data/queue-session/useFinalizeSession'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
@@ -44,7 +44,7 @@ const errorMessage = (error: unknown) =>
   error instanceof Error ? error.message : 'Something went wrong. Try again.'
 
 const isPermission = (q: { isError: boolean; error: unknown }) =>
-  q.isError && q.error instanceof MockError && q.error.kind === 'permission'
+  q.isError && isPermissionRefusal(q.error)
 
 /**
  * Q-RESULTS: the private results view after Session done or from a record's Result slides. Back

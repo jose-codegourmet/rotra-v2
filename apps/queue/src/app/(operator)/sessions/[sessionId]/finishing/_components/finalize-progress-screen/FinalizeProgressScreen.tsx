@@ -1,6 +1,6 @@
 'use client'
 
-import { MockError } from '@rotra/data/mock/errors'
+import { isPermissionRefusal } from '@rotra/data/mock/errors'
 import { queueSessionKeys } from '@rotra/data/queue-session/query-keys'
 import {
   FINALIZATION_STAGES,
@@ -76,8 +76,7 @@ export function FinalizeProgressScreen({ sessionId }: FinalizeProgressScreenProp
   const watched = useRef(false)
   const left = useRef(false)
 
-  if (session.isError && session.error instanceof MockError && session.error.kind === 'permission')
-    notFound()
+  if (session.isError && isPermissionRefusal(session.error)) notFound()
 
   const s = session.data
   const finalization = status.data ?? null

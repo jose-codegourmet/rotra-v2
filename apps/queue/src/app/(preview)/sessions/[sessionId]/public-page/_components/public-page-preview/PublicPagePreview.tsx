@@ -1,6 +1,6 @@
 'use client'
 
-import { MockError } from '@rotra/data/mock/errors'
+import { isPermissionRefusal } from '@rotra/data/mock/errors'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { PublicPreviewBanner } from '@rotra/ui/public-preview-banner'
 import { notFound, useRouter } from 'next/navigation'
@@ -19,8 +19,7 @@ export function PublicPagePreview({ sessionId }: PublicPagePreviewProps) {
   const router = useRouter()
   const session = useQueueSession(sessionId)
 
-  if (session.isError && session.error instanceof MockError && session.error.kind === 'permission')
-    notFound()
+  if (session.isError && isPermissionRefusal(session.error)) notFound()
 
   const s = session.data
   return (

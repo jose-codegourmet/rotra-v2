@@ -4,6 +4,7 @@ import { prisma } from '../client/prisma'
 import type { DeviceSessionStream, Prisma, SyncOperation } from '../generated/prisma/client'
 import { ServiceError } from '../service/errors'
 import { toDecimalString, toIso, toIsoOrNull } from '../service/serialize'
+import { setPaid } from './financials'
 import { completeMatch, invalidateMatch, startMatch, substitutePlayer } from './match-control'
 import {
   addManualMatch,
@@ -15,7 +16,6 @@ import {
   removeWaitingMatch,
   updateWaitingLineup,
 } from './match-queue'
-import { setPaid } from './financials'
 import {
   addNewPlayerToSession,
   addSavedPlayerToSession,
@@ -39,27 +39,36 @@ import { lockSession, requireSessionAccess, type Tx } from './session-store'
 /** Uploadable command kinds → the online service they run. Anything else is rejected. */
 const DISPATCH: Record<
   string,
-  (context: ClubContext, sessionId: string, operationId: string, payload: Record<string, unknown>) => Promise<unknown>
+  (
+    context: ClubContext,
+    sessionId: string,
+    operationId: string,
+    payload: Record<string, unknown>,
+  ) => Promise<unknown>
 > = {
-  'roster.add_saved': (c, s, id, p) => addSavedPlayerToSession(c, s, { ...(p as never), operationId: id }),
-  'roster.add_new': (c, s, id, p) => addNewPlayerToSession(c, s, { ...(p as never), operationId: id }),
+  'roster.add_saved': (c, s, id, p) =>
+    addSavedPlayerToSession(c, s, { ...p, operationId: id } as never),
+  'roster.add_new': (c, s, id, p) =>
+    addNewPlayerToSession(c, s, { ...p, operationId: id } as never),
   'roster.presence': (c, s, _id, p) => setPresence(c, s, p as never),
-  'roster.give_slot': (c, s, id, p) => giveSlot(c, s, { ...(p as never), operationId: id }),
-  'join_request.confirm': (c, _s, id, p) => confirmJoinRequest(c, { ...(p as never), operationId: id }),
+  'roster.give_slot': (c, s, id, p) => giveSlot(c, s, { ...p, operationId: id } as never),
+  'join_request.confirm': (c, _s, id, p) =>
+    confirmJoinRequest(c, { ...p, operationId: id } as never),
   'join_request.decline': (c, _s, _id, p) => declineJoinRequest(c, p as never),
-  'queue.add': (c, s, id, p) => addManualMatch(c, s, { ...(p as never), operationId: id }),
-  'queue.make': (c, s, id, p) => makeMatch(c, s, { ...(p as never), operationId: id }),
-  'queue.add_suggested': (c, s, id, p) => addSuggestedMatch(c, s, { ...(p as never), operationId: id }),
-  'queue.auto': (c, s, id, p) => autoQueue(c, s, { ...(p as never), operationId: id }),
-  'queue.regenerate': (c, s, id, p) => regenerateQueue(c, s, { ...(p as never), operationId: id }),
+  'queue.add': (c, s, id, p) => addManualMatch(c, s, { ...p, operationId: id } as never),
+  'queue.make': (c, s, id, p) => makeMatch(c, s, { ...p, operationId: id } as never),
+  'queue.add_suggested': (c, s, id, p) =>
+    addSuggestedMatch(c, s, { ...p, operationId: id } as never),
+  'queue.auto': (c, s, id, p) => autoQueue(c, s, { ...p, operationId: id } as never),
+  'queue.regenerate': (c, s, id, p) => regenerateQueue(c, s, { ...p, operationId: id } as never),
   'queue.move': (c, s, _id, p) => moveMatch(c, s, p as never),
-  'queue.lineup': (c, s, id, p) => updateWaitingLineup(c, s, { ...(p as never), operationId: id }),
+  'queue.lineup': (c, s, id, p) => updateWaitingLineup(c, s, { ...p, operationId: id } as never),
   'queue.remove': (c, s, _id, p) => removeWaitingMatch(c, s, p as never),
-  'match.start': (c, s, id, p) => startMatch(c, s, { ...(p as never), operationId: id }),
-  'match.substitute': (c, s, id, p) => substitutePlayer(c, s, { ...(p as never), operationId: id }),
-  'match.complete': (c, s, id, p) => completeMatch(c, s, { ...(p as never), operationId: id }),
-  'match.invalidate': (c, s, id, p) => invalidateMatch(c, s, { ...(p as never), operationId: id }),
-  'payment.set': (c, s, id, p) => setPaid(c, s, { ...(p as never), operationId: id }),
+  'match.start': (c, s, id, p) => startMatch(c, s, { ...p, operationId: id } as never),
+  'match.substitute': (c, s, id, p) => substitutePlayer(c, s, { ...p, operationId: id } as never),
+  'match.complete': (c, s, id, p) => completeMatch(c, s, { ...p, operationId: id } as never),
+  'match.invalidate': (c, s, id, p) => invalidateMatch(c, s, { ...p, operationId: id } as never),
+  'payment.set': (c, s, id, p) => setPaid(c, s, { ...p, operationId: id } as never),
 }
 
 /** Commands that may arrive after Session done: only payment marks (the finalized payment boundary). */
@@ -80,7 +89,8 @@ async function sha256(text: string | Uint8Array) {
   return new Uint8Array(await crypto.subtle.digest('SHA-256', bytes))
 }
 
-const sameBytes = (a: Uint8Array, b: Uint8Array) => a.length === b.length && a.every((x, i) => x === b[i])
+const sameBytes = (a: Uint8Array, b: Uint8Array) =>
+  a.length === b.length && a.every((x, i) => x === b[i])
 
 function streamDto(stream: DeviceSessionStream) {
   return {
@@ -91,7 +101,8 @@ function streamDto(stream: DeviceSessionStream) {
     downloadedRevision: toDecimalString(stream.downloadedRevision),
     contiguousSequence: toDecimalString(stream.contiguousSequence),
     highestReceivedSequence: toDecimalString(stream.highestReceivedSeq),
-    sealedFinalSequence: stream.sealedFinalSequence == null ? null : toDecimalString(stream.sealedFinalSequence),
+    sealedFinalSequence:
+      stream.sealedFinalSequence == null ? null : toDecimalString(stream.sealedFinalSequence),
     sealedAt: toIsoOrNull(stream.sealedAt),
     state: stream.state,
   }
@@ -111,12 +122,16 @@ function receiptDto(op: SyncOperation) {
 }
 
 /** Registers a browser on the club account. The client chooses a stable device ID. */
-export async function registerDevice(context: ClubContext, input: { deviceId: string; label: string }) {
+export async function registerDevice(
+  context: ClubContext,
+  input: { deviceId: string; label: string },
+) {
   const label = input.label.trim() || 'This device'
   const existing = await prisma.device.findUnique({ where: { id: input.deviceId } })
   if (existing) {
     if (existing.clubId !== context.clubId) throw new ServiceError('not_found')
-    if (existing.revokedAt) throw new ServiceError('forbidden', { device: 'This device was removed.' })
+    if (existing.revokedAt)
+      throw new ServiceError('forbidden', { device: 'This device was removed.' })
     return { deviceId: existing.id, label: existing.label }
   }
   const device = await prisma.device.create({
@@ -126,8 +141,11 @@ export async function registerDevice(context: ClubContext, input: { deviceId: st
 }
 
 async function requireDevice(tx: Tx, context: ClubContext, deviceId: string) {
-  const device = await tx.device.findUnique({ where: { clubId_id: { clubId: context.clubId, id: deviceId } } })
-  if (!device || device.revokedAt) throw new ServiceError('forbidden', { device: 'Register this device first.' })
+  const device = await tx.device.findUnique({
+    where: { clubId_id: { clubId: context.clubId, id: deviceId } },
+  })
+  if (!device || device.revokedAt)
+    throw new ServiceError('forbidden', { device: 'Register this device first.' })
   return device
 }
 
@@ -152,19 +170,28 @@ export async function enrollStream(
     await requireDevice(tx, context, input.deviceId)
     const repeated = await tx.deviceSessionStream.findUnique({ where: { id: input.streamId } })
     if (repeated) {
-      if (repeated.sessionId !== session.id || repeated.deviceId !== input.deviceId) throw new ServiceError('conflict')
+      if (repeated.sessionId !== session.id || repeated.deviceId !== input.deviceId)
+        throw new ServiceError('conflict')
       return streamDto(repeated)
     }
-    const reservation = await tx.clubSessionReservation.findUnique({ where: { clubId: context.clubId } })
+    const reservation = await tx.clubSessionReservation.findUnique({
+      where: { clubId: context.clubId },
+    })
     if (reservation && reservation.sessionId !== session.id)
-      throw new ServiceError('conflict', { session: 'Another session is downloaded for offline use.' })
+      throw new ServiceError('conflict', {
+        session: 'Another session is downloaded for offline use.',
+      })
     if (!reservation)
       await tx.clubSessionReservation.create({
         data: { clubId: context.clubId, sessionId: session.id, acquiredAt: new Date() },
       })
-    const open = await tx.deviceSessionStream.findMany({ where: { sessionId: session.id, state: 'open' } })
+    const open = await tx.deviceSessionStream.findMany({
+      where: { sessionId: session.id, state: 'open' },
+    })
     if (open.length && !input.recovery)
-      throw new ServiceError('conflict', { stream: 'Another device holds this session. Use recovery to take over.' })
+      throw new ServiceError('conflict', {
+        stream: 'Another device holds this session. Use recovery to take over.',
+      })
     for (const stream of open) {
       await tx.deviceSessionStream.update({
         where: { id: stream.id },
@@ -236,7 +263,8 @@ async function lockStream(tx: Tx, context: ClubContext, streamId: string) {
 async function receive(context: ClubContext, streamId: string, operations: UploadedOperation[]) {
   return prisma.$transaction(async (tx) => {
     const stream = await lockStream(tx, context, streamId)
-    if (stream.state !== 'open') throw new ServiceError('forbidden', { stream: 'This stream is closed.' })
+    if (stream.state !== 'open')
+      throw new ServiceError('forbidden', { stream: 'This stream is closed.' })
     const receipts: ReturnType<typeof receiptDto>[] = []
     const rejected: { operationId: string; code: string }[] = []
     let highest = stream.highestReceivedSeq
@@ -259,7 +287,12 @@ async function receive(context: ClubContext, streamId: string, operations: Uploa
       })
       if (existing || atSequence) {
         const original = existing ?? (atSequence as SyncOperation)
-        if (existing && existing.streamId === streamId && existing.sequence === sequence && sameBytes(existing.payloadDigest, digest)) {
+        if (
+          existing &&
+          existing.streamId === streamId &&
+          existing.sequence === sequence &&
+          sameBytes(existing.payloadDigest, digest)
+        ) {
           receipts.push(receiptDto(existing))
           continue
         }
@@ -277,7 +310,7 @@ async function receive(context: ClubContext, streamId: string, operations: Uploa
               storedOperationId: original.id,
             },
             operations: {
-              create: [{ operationId: original.id, clubId: context.clubId, sessionId: stream.sessionId }],
+              create: [{ operationId: original.id }],
             },
           },
         })
@@ -316,10 +349,16 @@ async function receive(context: ClubContext, streamId: string, operations: Uploa
 async function settle(
   op: SyncOperation,
   state: 'accepted' | 'rejected' | 'conflicted',
-  extra: { rejectionCode?: string; conflictCategory?: 'revision_mismatch' | 'contradictory_decision' } = {},
+  extra: {
+    rejectionCode?: string
+    conflictCategory?: 'revision_mismatch' | 'contradictory_decision'
+  } = {},
 ) {
   return prisma.$transaction(async (tx) => {
-    const session = await tx.queueSession.findUniqueOrThrow({ where: { id: op.sessionId }, select: { revision: true, queueRevision: true } })
+    const session = await tx.queueSession.findUniqueOrThrow({
+      where: { id: op.sessionId },
+      select: { revision: true, queueRevision: true },
+    })
     const updated = await tx.syncOperation.update({
       where: { id: op.id },
       data: {
@@ -336,8 +375,15 @@ async function settle(
           clubId: op.clubId,
           sessionId: op.sessionId,
           category: extra.conflictCategory ?? 'revision_mismatch',
-          evidence: { version: 1, commandKind: op.commandKind, entityType: op.entityType, entityId: op.entityId },
-          operations: { create: [{ operationId: op.id, clubId: op.clubId, sessionId: op.sessionId }] },
+          evidence: {
+            version: 1,
+            commandKind: op.commandKind,
+            entityType: op.entityType,
+            entityId: op.entityId,
+          },
+          operations: {
+            create: [{ operationId: op.id }],
+          },
         },
       })
     return updated
@@ -374,7 +420,9 @@ async function processStream(context: ClubContext, streamId: string) {
           if (!(error instanceof ServiceError)) throw error
           if (error.code === 'conflict')
             settled = await settle(next, 'conflicted', {
-              conflictCategory: next.commandKind.startsWith('match.') ? 'contradictory_decision' : 'revision_mismatch',
+              conflictCategory: next.commandKind.startsWith('match.')
+                ? 'contradictory_decision'
+                : 'revision_mismatch',
             })
           else settled = await settle(next, 'rejected', { rejectionCode: error.code })
         }
@@ -401,7 +449,9 @@ export async function uploadOperations(
   const { rejected } = await receive(context, input.streamId, input.operations)
   const stream = await processStream(context, input.streamId)
   const ids = input.operations.map((op) => op.operationId)
-  const stored = await prisma.syncOperation.findMany({ where: { id: { in: ids }, streamId: input.streamId } })
+  const stored = await prisma.syncOperation.findMany({
+    where: { id: { in: ids }, streamId: input.streamId },
+  })
   return { stream: streamDto(stream), receipts: stored.map(receiptDto), rejected }
 }
 
@@ -421,7 +471,8 @@ export async function sealStream(
       if (stream.sealedFinalSequence !== finalSequence) throw new ServiceError('conflict')
       return streamDto(stream)
     }
-    if (stream.state !== 'open') throw new ServiceError('forbidden', { stream: 'This stream is closed.' })
+    if (stream.state !== 'open')
+      throw new ServiceError('forbidden', { stream: 'This stream is closed.' })
     if (stream.contiguousSequence !== finalSequence || stream.highestReceivedSeq !== finalSequence)
       throw new ServiceError('conflict', { stream: 'Some changes have not arrived yet.' })
     const ops = await tx.syncOperation.findMany({
@@ -430,10 +481,11 @@ export async function sealStream(
       select: { payloadDigest: true },
     })
     const joined = new Uint8Array(ops.length * 32)
-    ops.forEach((op, i) => joined.set(op.payloadDigest, i * 32))
+    for (const [i, op] of ops.entries()) joined.set(op.payloadDigest, i * 32)
     const digest = await sha256(joined)
     const given = Uint8Array.from(Buffer.from(input.digestHex, 'hex'))
-    if (!sameBytes(digest, given)) throw new ServiceError('conflict', { stream: 'The change log does not match.' })
+    if (!sameBytes(digest, given))
+      throw new ServiceError('conflict', { stream: 'The change log does not match.' })
     const sealed = await tx.deviceSessionStream.update({
       where: { id: stream.id },
       data: {
@@ -461,7 +513,9 @@ export async function sessionCompleteness(tx: Tx, sessionId: string) {
     tx.syncOperation.count({ where: { sessionId, state: { in: ['received', 'waiting'] } } }),
   ])
   const unsealed = streams.filter(
-    (s) => s.state === 'open' || (s.state === 'sealed' && s.contiguousSequence !== s.sealedFinalSequence),
+    (s) =>
+      s.state === 'open' ||
+      (s.state === 'sealed' && s.contiguousSequence !== s.sealedFinalSequence),
   )
   return {
     proven: !unsealed.length && !openConflicts && !pending,
@@ -478,7 +532,10 @@ export async function readSyncStatus(context: ClubContext, sessionId: string) {
   })
   if (!session) throw new ServiceError('not_found')
   return prisma.$transaction(async (tx) => {
-    const streams = await tx.deviceSessionStream.findMany({ where: { sessionId }, orderBy: { enrolledAt: 'asc' } })
+    const streams = await tx.deviceSessionStream.findMany({
+      where: { sessionId },
+      orderBy: { enrolledAt: 'asc' },
+    })
     const conflicts = await tx.syncConflict.findMany({
       where: { sessionId, state: 'open' },
       orderBy: { detectedAt: 'asc' },
@@ -486,7 +543,11 @@ export async function readSyncStatus(context: ClubContext, sessionId: string) {
     })
     return {
       streams: streams.map(streamDto),
-      conflicts: conflicts.map((c) => ({ id: c.id, category: c.category, detectedAt: toIso(c.detectedAt) })),
+      conflicts: conflicts.map((c) => ({
+        id: c.id,
+        category: c.category,
+        detectedAt: toIso(c.detectedAt),
+      })),
       completeness: await sessionCompleteness(tx, sessionId),
     }
   })

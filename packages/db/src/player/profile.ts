@@ -51,7 +51,10 @@ function publicProfileDto(row: PublicPlayerRow) {
 
 /** P-PROFILE public read (`player.public-profile`). Safe for shared caches. */
 export async function readPublicProfile(playerId: string) {
-  const row = await prisma.player.findUnique({ where: { id: playerId }, select: PUBLIC_PLAYER_SELECT })
+  const row = await prisma.player.findUnique({
+    where: { id: playerId },
+    select: PUBLIC_PLAYER_SELECT,
+  })
   const dto = row && publicProfileDto(row)
   if (!dto) throw new ServiceError('not_found')
   return dto
@@ -107,7 +110,13 @@ export async function updateMyProfile(
   if (!fullName) throw new ServiceError('invalid', { fullName: 'Enter your full name.' })
   const years = input.experienceYears ?? 0
   const months = input.experienceMonths ?? 0
-  if (!Number.isInteger(years) || !Number.isInteger(months) || years < 0 || months < 0 || months > 11)
+  if (
+    !Number.isInteger(years) ||
+    !Number.isInteger(months) ||
+    years < 0 ||
+    months < 0 ||
+    months > 11
+  )
     throw new ServiceError('invalid', { experience: 'Enter years and months of experience.' })
   const experience =
     input.experienceYears == null && input.experienceMonths == null ? null : years * 12 + months
@@ -141,7 +150,10 @@ export async function updateMyProfile(
           update: { url },
         })
     }
-    const row = await tx.player.findUniqueOrThrow({ where: { id: player.id }, select: PUBLIC_PLAYER_SELECT })
+    const row = await tx.player.findUniqueOrThrow({
+      where: { id: player.id },
+      select: PUBLIC_PLAYER_SELECT,
+    })
     return publicProfileDto(row)
   })
 }
@@ -172,7 +184,9 @@ export async function readClubVisiblePhone(context: ClubContext, clubPlayerId: s
   const clubPlayer = await prisma.clubPlayer.findUnique({
     where: { clubId_id: { clubId: context.clubId, id: clubPlayerId } },
     select: {
-      player: { select: { hidePhoneFromClubs: true, privateContact: { select: { phoneE164: true } } } },
+      player: {
+        select: { hidePhoneFromClubs: true, privateContact: { select: { phoneE164: true } } },
+      },
     },
   })
   if (!clubPlayer) throw new ServiceError('not_found')

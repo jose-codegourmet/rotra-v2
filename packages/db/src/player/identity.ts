@@ -90,7 +90,12 @@ async function resolveOnce(
       where: { playerId: clubPlayer.playerId },
     })
     if (allocation)
-      return { state: 'resolved', playerId: clubPlayer.playerId, rtrId: allocation.rtrId, created: false }
+      return {
+        state: 'resolved',
+        playerId: clubPlayer.playerId,
+        rtrId: allocation.rtrId,
+        created: false,
+      }
   }
   const intake = clubPlayer.privateInput
   if (!intake?.phoneE164) return { state: 'guest' }

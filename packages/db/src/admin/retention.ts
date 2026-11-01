@@ -51,20 +51,31 @@ async function deletedPaths(cycleId: string) {
 }
 
 /** One cycle, one transaction: recheck, then delete only this cycle's due public pages. */
-async function sweepCycle(cycleId: string, now: Date): Promise<Omit<RetentionDiagnostic, 'cachePurged'>> {
+async function sweepCycle(
+  cycleId: string,
+  now: Date,
+): Promise<Omit<RetentionDiagnostic, 'cachePurged'>> {
   return prisma.$transaction(async (tx) => {
     const cycle = await tx.clubExpiryCycle.findUniqueOrThrow({ where: { id: cycleId } })
     await lockClub(tx, cycle.clubId)
     const current = await tx.clubExpiryCycle.findUniqueOrThrow({ where: { id: cycleId } })
     const base = { cycleId, clubId: cycle.clubId, pagesDeleted: 0 }
     if (current.state !== 'running') return { ...base, outcome: 'skipped_renewed' as const }
-    if (current.deletePublicPagesAfter > now) return { ...base, outcome: 'skipped_not_due' as const }
+    if (current.deletePublicPagesAfter > now)
+      return { ...base, outcome: 'skipped_not_due' as const }
     const entitlement = await tx.clubEntitlement.findUnique({ where: { clubId: cycle.clubId } })
     if (entitlement?.effectiveAccessEndsAt && entitlement.effectiveAccessEndsAt > now)
       return { ...base, outcome: 'skipped_access' as const }
     const { count } = await tx.sessionPublication.updateMany({
       where: { clubId: cycle.clubId, expiryCycleId: cycleId, state: { not: 'deleted' } },
-      data: { state: 'deleted', deletedAt: now, publicResults: Prisma.DbNull, publishedSlides: [], includeOffDay: false, revision: { increment: 1 } },
+      data: {
+        state: 'deleted',
+        deletedAt: now,
+        publicResults: Prisma.DbNull,
+        publishedSlides: [],
+        includeOffDay: false,
+        revision: { increment: 1 },
+      },
     })
     await tx.clubExpiryCycle.update({
       where: { id: cycleId },
@@ -75,7 +86,8 @@ async function sweepCycle(cycleId: string, now: Date): Promise<Omit<RetentionDia
 }
 
 const errorCode = (error: unknown) =>
-  (error as { code?: string })?.code ?? (error instanceof Error ? error.name : 'unknown').slice(0, 40)
+  (error as { code?: string })?.code ??
+  (error instanceof Error ? error.name : 'unknown').slice(0, 40)
 
 /**
  * The scheduled sweep (worker runtime pending #243). Each due cycle is swept in its own
@@ -95,11 +107,23 @@ export async function runRetentionSweep(cache: PublicCachePort, now = new Date()
     try {
       result = await sweepCycle(cycle.id, now)
     } catch (error) {
-      diagnostics.push({ cycleId: cycle.id, clubId: cycle.clubId, outcome: 'failed', pagesDeleted: 0, cachePurged: false, errorCode: errorCode(error) })
+      diagnostics.push({
+        cycleId: cycle.id,
+        clubId: cycle.clubId,
+        outcome: 'failed',
+        pagesDeleted: 0,
+        cachePurged: false,
+        errorCode: errorCode(error),
+      })
       continue
     }
-    const purge = result.outcome === 'deleted' ? await retryCachePurge(cache, cycle.id) : { purged: false }
-    diagnostics.push({ ...result, cachePurged: purge.purged, ...('errorCode' in purge ? { errorCode: purge.errorCode } : {}) })
+    const purge =
+      result.outcome === 'deleted' ? await retryCachePurge(cache, cycle.id) : { purged: false }
+    diagnostics.push({
+      ...result,
+      cachePurged: purge.purged,
+      ...('errorCode' in purge ? { errorCode: purge.errorCode } : {}),
+    })
   }
   return diagnostics
 }

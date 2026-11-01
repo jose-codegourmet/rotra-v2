@@ -97,7 +97,10 @@ export async function handlePublicRead(
  * receipt rides in an httpOnly cookie the Route Handler sets; responses are private and never
  * cached, unlike `handlePublicRead`.
  */
-export const VISITOR_COMMANDS = ['public-session.join-request', 'public-session.my-request'] as const
+export const VISITOR_COMMANDS = [
+  'public-session.join-request',
+  'public-session.my-request',
+] as const
 
 export type VisitorCommandId = (typeof VISITOR_COMMANDS)[number]
 

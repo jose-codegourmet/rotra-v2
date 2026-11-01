@@ -54,7 +54,10 @@ function publicStatus(session: QueueSession): 'prepared' | 'active' | 'completed
 export async function readPublicSession(slug: string) {
   const session = await prisma.queueSession.findUnique({
     where: { publicSlug: slug },
-    include: { club: { select: { name: true, logoRef: true } }, publication: { select: { state: true } } },
+    include: {
+      club: { select: { name: true, logoRef: true } },
+      publication: { select: { state: true } },
+    },
   })
   // A page removed by retention is gone for the public; the session and its history are not.
   if (!session || session.publication?.state === 'deleted') throw new ServiceError('not_found')
@@ -81,7 +84,11 @@ export async function readPublicSession(slug: string) {
       title: session.title,
       start: session.scheduledStartAt.getTime(),
       end: session.scheduledEndAt.getTime(),
-      club: { name: session.club.name, initials: initials(session.club.name), logoUrl: session.club.logoRef },
+      club: {
+        name: session.club.name,
+        initials: initials(session.club.name),
+        logoUrl: session.club.logoRef,
+      },
       venue: { name: session.venueName ?? '', address: session.venueAddress },
       courts: courts.map((c) => c.label),
       formats: { singles: session.allowSingles, doubles: session.allowDoubles },
@@ -133,14 +140,21 @@ async function myRequestDto(request: {
  */
 export async function sendJoinRequest(
   slug: string,
-  input: { requestId: string; name: string; nickname?: string | null; phone?: string | null; statedBand: StatedBand },
+  input: {
+    requestId: string
+    name: string
+    nickname?: string | null
+    phone?: string | null
+    statedBand: StatedBand
+  },
 ) {
   const name = input.name.trim()
   if (!name) throw new ServiceError('invalid', { name: 'Enter your name.' })
   const phone = input.phone?.trim() || null
   if (phone && !E164.test(phone))
     throw new ServiceError('invalid', { phone: 'Enter a full mobile number, or leave it empty.' })
-  if (!BANDS.includes(input.statedBand)) throw new ServiceError('invalid', { statedBand: 'Choose a level.' })
+  if (!BANDS.includes(input.statedBand))
+    throw new ServiceError('invalid', { statedBand: 'Choose a level.' })
   const session = await prisma.queueSession.findUnique({ where: { publicSlug: slug } })
   if (!session) throw new ServiceError('not_found')
   const receipt = receiptFor(input.requestId)
@@ -148,7 +162,11 @@ export async function sendJoinRequest(
     const request = await prisma.$transaction(async (tx) => {
       const existing = await tx.sessionJoinRequest.findUnique({ where: { id: input.requestId } })
       if (existing) {
-        if (existing.sessionId !== session.id || existing.name !== name || existing.phoneE164 !== phone)
+        if (
+          existing.sessionId !== session.id ||
+          existing.name !== name ||
+          existing.phoneE164 !== phone
+        )
           throw new ServiceError('conflict')
         return existing
       }
@@ -162,13 +180,18 @@ export async function sendJoinRequest(
         where: { sessionId: session.id, status: 'pending' },
       })
       if (pending >= MAX_PENDING_REQUESTS_PER_SESSION)
-        throw new ServiceError('unavailable', { request: 'Too many requests are waiting. Try again later.' })
+        throw new ServiceError('unavailable', {
+          request: 'Too many requests are waiting. Try again later.',
+        })
       if (phone) {
         const duplicate = await tx.sessionJoinRequest.findFirst({
           where: { sessionId: session.id, status: 'pending', phoneE164: phone },
           select: { id: true },
         })
-        if (duplicate) throw new ServiceError('conflict', { request: 'A request with this number is already waiting.' })
+        if (duplicate)
+          throw new ServiceError('conflict', {
+            request: 'A request with this number is already waiting.',
+          })
       }
       return tx.sessionJoinRequest.create({
         data: {
@@ -194,7 +217,11 @@ export async function sendJoinRequest(
  * Q-PUBLIC · My request. Needs the request's receipt; a missing or wrong receipt, another
  * session's slug, or an unknown ID all look the same (`not_found`).
  */
-export async function readMyJoinRequest(slug: string, requestId: string, receipt: string | null | undefined) {
+export async function readMyJoinRequest(
+  slug: string,
+  requestId: string,
+  receipt: string | null | undefined,
+) {
   if (!receiptMatches(requestId, receipt)) throw new ServiceError('not_found')
   const request = await prisma.sessionJoinRequest.findUnique({
     where: { id: requestId },

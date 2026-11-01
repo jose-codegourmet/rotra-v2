@@ -1,12 +1,12 @@
 import 'server-only'
 import { allPlayers, completeLineup, matchStatus } from '@rotra/data/match/match.rules'
-import type { MatchLineup, MatchOrigin } from '@rotra/data/match/match.types'
 import {
   balanceTeams,
   formatForSelection,
   generateMatches,
   suggestionReason,
 } from '@rotra/data/match/queue.rules'
+import type { MatchLineup, MatchOrigin } from '@rotra/data/match/types'
 import type { QueueSession as SessionView } from '@rotra/data/queue-session/types'
 import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
@@ -72,7 +72,13 @@ function validateLineup(
     throw new ServiceError('invalid', { format: 'Add a fun game manually instead.' })
 }
 
-async function writeLineup(tx: Tx, match: { id: string; clubId: string; sessionId: string }, lineup: MatchLineup, operationId: string, now: Date) {
+async function writeLineup(
+  tx: Tx,
+  match: { id: string; clubId: string; sessionId: string },
+  lineup: MatchLineup,
+  operationId: string,
+  now: Date,
+) {
   const rows = [
     ...lineup.teamA.map((id) => ({ id, team: 'A' as const })),
     ...lineup.teamB.map((id) => ({ id, team: 'B' as const })),
@@ -102,7 +108,13 @@ async function appendMatch(
   session: QueueSession,
   rosterIds: Set<string>,
   lineup: MatchLineup,
-  input: { operationId: string; origin: MatchOrigin; manualProtected: boolean; generationId?: string; position?: bigint },
+  input: {
+    operationId: string
+    origin: MatchOrigin
+    manualProtected: boolean
+    generationId?: string
+    position?: bigint
+  },
 ) {
   const existing = await tx.match.findUnique({ where: { sourceOperationId: input.operationId } })
   if (existing) {
@@ -176,8 +188,12 @@ export async function makeMatch(
     const plan = formatForSelection(input.selection.length, session)
     if (!plan.format) throw new ServiceError('invalid', { selection: plan.reason })
     const selected = input.selection.map((id) => ctx.roster.find((p) => p.id === id))
-    if (selected.some((p) => !p)) throw new ServiceError('invalid', { selection: 'Player not available.' })
-    const lineup = balanceTeams(selected.filter((p): p is NonNullable<typeof p> => !!p), plan.format)
+    if (selected.some((p) => !p))
+      throw new ServiceError('invalid', { selection: 'Player not available.' })
+    const lineup = balanceTeams(
+      selected.filter((p): p is NonNullable<typeof p> => !!p),
+      plan.format,
+    )
     const row = await appendMatch(tx, session, new Set(roster.map((r) => r.id)), lineup, {
       operationId: input.operationId,
       origin: 'manual',
@@ -197,10 +213,17 @@ export async function suggestMatch(context: ClubContext, sessionId: string, seed
   })
   if (!session) throw new ServiceError('not_found')
   await requireSessionAccess(context, session)
-  if (session.state !== 'active') throw new ServiceError('invalid', { state: 'Start the session first.' })
+  if (session.state !== 'active')
+    throw new ServiceError('invalid', { state: 'Start the session first.' })
   return prisma.$transaction(async (tx) => {
     const { ctx } = await matchContext(tx, session)
-    const result = generateMatches(sessionView(session), ctx.roster, ctx.matches, 1, seededRng(seed))
+    const result = generateMatches(
+      sessionView(session),
+      ctx.roster,
+      ctx.matches,
+      1,
+      seededRng(seed),
+    )
     if (result.error) throw new ServiceError('invalid', { suggest: result.error })
     const lineup = result.matches[0] as MatchLineup
     return {
@@ -216,12 +239,21 @@ export async function suggestMatch(context: ClubContext, sessionId: string, seed
 export async function addSuggestedMatch(
   context: ClubContext,
   sessionId: string,
-  input: { operationId: string; lineup: MatchLineup; switched: boolean; expectedQueueRevision: string; expectedRevision: string },
+  input: {
+    operationId: string
+    lineup: MatchLineup
+    switched: boolean
+    expectedQueueRevision: string
+    expectedRevision: string
+  },
 ) {
   return matchCommand(
     context,
     sessionId,
-    { expectedQueueRevision: input.expectedQueueRevision, expectedRevision: input.expectedRevision },
+    {
+      expectedQueueRevision: input.expectedQueueRevision,
+      expectedRevision: input.expectedRevision,
+    },
     async (tx, session) => {
       const { roster } = await matchContext(tx, session)
       const row = await appendMatch(tx, session, new Set(roster.map((r) => r.id)), input.lineup, {
@@ -253,9 +285,16 @@ export async function autoQueue(
   return matchCommand(context, sessionId, {}, async (tx, session) => {
     const done = await generationRows(tx, session.id, input.operationId)
     if (done.length) return done.map((row) => matchDto(row as MatchRow))
-    if (session.queueRevision.toString() !== input.expectedQueueRevision) throw new ServiceError('conflict')
+    if (session.queueRevision.toString() !== input.expectedQueueRevision)
+      throw new ServiceError('conflict')
     const { ctx, roster } = await matchContext(tx, session)
-    const result = generateMatches(sessionView(session), ctx.roster, ctx.matches, input.n, seededRng(input.operationId))
+    const result = generateMatches(
+      sessionView(session),
+      ctx.roster,
+      ctx.matches,
+      input.n,
+      seededRng(input.operationId),
+    )
     if (result.error) throw new ServiceError('invalid', { queue: result.error })
     const ids = new Set(roster.map((r) => r.id))
     const out = []
@@ -287,11 +326,14 @@ export async function regenerateQueue(
   return matchCommand(context, sessionId, {}, async (tx, session) => {
     const done = await generationRows(tx, session.id, input.operationId)
     if (done.length) return done.map((row) => matchDto(row as MatchRow))
-    if (session.queueRevision.toString() !== input.expectedQueueRevision) throw new ServiceError('conflict')
+    if (session.queueRevision.toString() !== input.expectedQueueRevision)
+      throw new ServiceError('conflict')
     const { ctx, roster } = await matchContext(tx, session)
     const replace = ctx.matches
       .filter(
-        (m) => m.state === 'waiting' && (!m.manualProtected || matchStatus(m, ctx).kind === 'needs-attention'),
+        (m) =>
+          m.state === 'waiting' &&
+          (!m.manualProtected || matchStatus(m, ctx).kind === 'needs-attention'),
       )
       .sort((a, b) => a.queuePosition - b.queuePosition)
     if (!replace.length)
@@ -302,7 +344,13 @@ export async function regenerateQueue(
       data: { removedAt: now, queuePosition: null, revision: { increment: 1 } },
     })
     const kept = ctx.matches.filter((m) => !replace.some((r) => r.id === m.id))
-    const result = generateMatches(sessionView(session), ctx.roster, kept, replace.length, seededRng(input.operationId))
+    const result = generateMatches(
+      sessionView(session),
+      ctx.roster,
+      kept,
+      replace.length,
+      seededRng(input.operationId),
+    )
     if (result.error) throw new ServiceError('invalid', { queue: result.error })
     const ids = new Set(roster.map((r) => r.id))
     const out = []
@@ -328,42 +376,63 @@ export async function moveMatch(
   sessionId: string,
   input: { matchId: string; toIndex: number; expectedQueueRevision: string },
 ) {
-  if (!Number.isInteger(input.toIndex)) throw new ServiceError('invalid', { position: 'Choose a queue position.' })
-  return matchCommand(context, sessionId, { expectedQueueRevision: input.expectedQueueRevision }, async (tx, session) => {
-    const match = await waitingMatch(tx, session.id, input.matchId)
-    const list = await tx.match.findMany({
-      where: { sessionId: session.id, state: 'waiting', removedAt: null },
-      orderBy: [{ queuePosition: 'asc' }, { matchNo: 'asc' }],
-      select: { id: true },
-    })
-    const from = list.findIndex((m) => m.id === match.id)
-    const to = Math.max(0, Math.min(list.length - 1, input.toIndex))
-    const [moved] = list.splice(from, 1)
-    if (moved) list.splice(to, 0, moved)
-    for (const [i, m] of list.entries())
-      await tx.match.update({ where: { id: m.id }, data: { queuePosition: BigInt(i + 1) } })
-    return { matchId: match.id, position: to + 1 }
-  })
+  if (!Number.isInteger(input.toIndex))
+    throw new ServiceError('invalid', { position: 'Choose a queue position.' })
+  return matchCommand(
+    context,
+    sessionId,
+    { expectedQueueRevision: input.expectedQueueRevision },
+    async (tx, session) => {
+      const match = await waitingMatch(tx, session.id, input.matchId)
+      const list = await tx.match.findMany({
+        where: { sessionId: session.id, state: 'waiting', removedAt: null },
+        orderBy: [{ queuePosition: 'asc' }, { matchNo: 'asc' }],
+        select: { id: true },
+      })
+      const from = list.findIndex((m) => m.id === match.id)
+      const to = Math.max(0, Math.min(list.length - 1, input.toIndex))
+      const [moved] = list.splice(from, 1)
+      if (moved) list.splice(to, 0, moved)
+      for (const [i, m] of list.entries())
+        await tx.match.update({ where: { id: m.id }, data: { queuePosition: BigInt(i + 1) } })
+      return { matchId: match.id, position: to + 1 }
+    },
+  )
 }
 
 /** Q-QUEUE · edit lineup or switch sides. The edited entry becomes manual and protected. */
 export async function updateWaitingLineup(
   context: ClubContext,
   sessionId: string,
-  input: { operationId: string; matchId: string; lineup: MatchLineup; expectedQueueRevision: string },
+  input: {
+    operationId: string
+    matchId: string
+    lineup: MatchLineup
+    expectedQueueRevision: string
+  },
 ) {
-  return matchCommand(context, sessionId, { expectedQueueRevision: input.expectedQueueRevision }, async (tx, session) => {
-    const match = await waitingMatch(tx, session.id, input.matchId)
-    const { roster } = await matchContext(tx, session)
-    validateLineup(session, new Set(roster.map((r) => r.id)), input.lineup, true)
-    await tx.matchParticipation.deleteMany({ where: { matchId: match.id } })
-    await writeLineup(tx, match, input.lineup, input.operationId, new Date())
-    await tx.match.update({
-      where: { id: match.id },
-      data: { format: input.lineup.format, origin: 'manual', manualProtected: true, revision: { increment: 1 } },
-    })
-    return matchDto((await loadMatch(tx, session.id, match.id)) as MatchRow)
-  })
+  return matchCommand(
+    context,
+    sessionId,
+    { expectedQueueRevision: input.expectedQueueRevision },
+    async (tx, session) => {
+      const match = await waitingMatch(tx, session.id, input.matchId)
+      const { roster } = await matchContext(tx, session)
+      validateLineup(session, new Set(roster.map((r) => r.id)), input.lineup, true)
+      await tx.matchParticipation.deleteMany({ where: { matchId: match.id } })
+      await writeLineup(tx, match, input.lineup, input.operationId, new Date())
+      await tx.match.update({
+        where: { id: match.id },
+        data: {
+          format: input.lineup.format,
+          origin: 'manual',
+          manualProtected: true,
+          revision: { increment: 1 },
+        },
+      })
+      return matchDto((await loadMatch(tx, session.id, match.id)) as MatchRow)
+    },
+  )
 }
 
 /** Q-QUEUE · Remove waiting match. Kept as a removed draft so its number is never reused. */
@@ -372,16 +441,21 @@ export async function removeWaitingMatch(
   sessionId: string,
   input: { matchId: string; expectedQueueRevision?: string },
 ) {
-  return matchCommand(context, sessionId, { expectedQueueRevision: input.expectedQueueRevision }, async (tx, session) => {
-    const match = await loadMatch(tx, session.id, input.matchId)
-    if (!match) throw new ServiceError('not_found')
-    if (match.removedAt) return null
-    if (match.state !== 'waiting')
-      throw new ServiceError('invalid', { match: 'Only a waiting match can be changed.' })
-    await tx.match.update({
-      where: { id: match.id },
-      data: { removedAt: new Date(), queuePosition: null, revision: { increment: 1 } },
-    })
-    return null
-  })
+  return matchCommand(
+    context,
+    sessionId,
+    { expectedQueueRevision: input.expectedQueueRevision },
+    async (tx, session) => {
+      const match = await loadMatch(tx, session.id, input.matchId)
+      if (!match) throw new ServiceError('not_found')
+      if (match.removedAt) return null
+      if (match.state !== 'waiting')
+        throw new ServiceError('invalid', { match: 'Only a waiting match can be changed.' })
+      await tx.match.update({
+        where: { id: match.id },
+        data: { removedAt: new Date(), queuePosition: null, revision: { increment: 1 } },
+      })
+      return null
+    },
+  )
 }

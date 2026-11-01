@@ -8,7 +8,12 @@ import {
 import type { SessionCostInput } from '@rotra/data/session-cost/types'
 import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
-import type { InventoryCategory, InventoryItem, Prisma, QueueSession } from '../generated/prisma/client'
+import type {
+  InventoryCategory,
+  InventoryItem,
+  Prisma,
+  QueueSession,
+} from '../generated/prisma/client'
 import { requireClubEntitlement, requireRevision } from '../service/authorize'
 import { ServiceError } from '../service/errors'
 import { toDecimalString, toIso, toIsoOrNull, toMoney } from '../service/serialize'
@@ -79,27 +84,42 @@ export async function saveInventoryItem(
   await requireClubEntitlement(context)
   const name = input.name.trim()
   if (!name) throw new ServiceError('invalid', { name: 'Enter a name.' })
-  if (!CATEGORIES.includes(input.category)) throw new ServiceError('invalid', { category: 'Choose a category.' })
+  if (!CATEGORIES.includes(input.category))
+    throw new ServiceError('invalid', { category: 'Choose a category.' })
   if (!Number.isInteger(input.stock) || input.stock < 0)
     throw new ServiceError('invalid', { stock: 'Enter a stock of zero or more.' })
   const unitCostMinor = centavos(input.unitCostMinor, 'unitCost', { allowNull: false }) as number
   return prisma.$transaction(async (tx) => {
     const existing = await tx.inventoryItem.findUnique({ where: { id: input.id } })
     if (existing && existing.clubId !== context.clubId) throw new ServiceError('not_found')
-    const data = { name, category: input.category, unit: input.unit?.trim() || 'piece', stock: input.stock, unitCostMinor }
+    const data = {
+      name,
+      category: input.category,
+      unit: input.unit?.trim() || 'piece',
+      stock: input.stock,
+      unitCostMinor,
+    }
     if (!existing)
-      return inventoryDto(await tx.inventoryItem.create({ data: { id: input.id, clubId: context.clubId, ...data } }))
+      return inventoryDto(
+        await tx.inventoryItem.create({ data: { id: input.id, clubId: context.clubId, ...data } }),
+      )
     if (existing.removedAt) throw new ServiceError('not_found')
     if (input.expectedRevision === undefined) return inventoryDto(existing)
     requireRevision(existing.revision, input.expectedRevision)
     return inventoryDto(
-      await tx.inventoryItem.update({ where: { id: existing.id }, data: { ...data, revision: { increment: 1 } } }),
+      await tx.inventoryItem.update({
+        where: { id: existing.id },
+        data: { ...data, revision: { increment: 1 } },
+      }),
     )
   })
 }
 
 /** Stock steps by one; it is never decremented by sessions in v1. */
-export async function stepInventoryStock(context: ClubContext, input: { id: string; delta: -1 | 1 }) {
+export async function stepInventoryStock(
+  context: ClubContext,
+  input: { id: string; delta: -1 | 1 },
+) {
   await requireClubEntitlement(context)
   if (input.delta !== 1 && input.delta !== -1) throw new ServiceError('invalid')
   const rows = await prisma.$executeRaw`
@@ -121,7 +141,10 @@ export async function removeInventoryItem(context: ClubContext, id: string) {
 }
 
 const minutes = (session: QueueSession) =>
-  Math.max(0, Math.round((session.scheduledEndAt.getTime() - session.scheduledStartAt.getTime()) / 60_000))
+  Math.max(
+    0,
+    Math.round((session.scheduledEndAt.getTime() - session.scheduledStartAt.getTime()) / 60_000),
+  )
 
 async function costInput(tx: Tx, sessionId: string): Promise<SessionCostInput | null> {
   const estimate = await tx.sessionCostEstimate.findUnique({
@@ -134,7 +157,10 @@ async function costInput(tx: Tx, sessionId: string): Promise<SessionCostInput | 
     entranceFeePerHead: estimate.entranceFeePerHeadMinor,
     paymentMode: estimate.paymentMode,
     customFeePerHead: estimate.customFeePerHeadMinor,
-    shuttles: estimate.planLines.map((l) => ({ inventoryItemId: l.inventoryItemId, tubes: l.tubes })),
+    shuttles: estimate.planLines.map((l) => ({
+      inventoryItemId: l.inventoryItemId,
+      tubes: l.tubes,
+    })),
   }
 }
 
@@ -146,7 +172,10 @@ async function estimateFor(tx: Tx, session: QueueSession) {
     liveCourts(tx, session.id),
     liveRoster(tx, session.id),
     tx.inventoryItem.findMany({ where: { clubId: session.clubId } }),
-    tx.sessionCostEstimate.findUniqueOrThrow({ where: { sessionId: session.id }, select: { revision: true } }),
+    tx.sessionCostEstimate.findUniqueOrThrow({
+      where: { sessionId: session.id },
+      select: { revision: true },
+    }),
   ])
   const estimate = estimateSessionCost(input, {
     courts: courts.length,
@@ -181,7 +210,8 @@ export async function saveSessionCost(
   if (values) {
     centavos(values.courtFeePerCourtHour, 'courtFee')
     centavos(values.entranceFeePerHead, 'entranceFee')
-    if (values.paymentMode === 'custom') centavos(values.customFeePerHead, 'customFee', { allowNull: false })
+    if (values.paymentMode === 'custom')
+      centavos(values.customFeePerHead, 'customFee', { allowNull: false })
     for (const line of values.shuttles)
       if (!Number.isInteger(line.tubes) || line.tubes <= 0)
         throw new ServiceError('invalid', { shuttles: 'Enter a whole number of tubes.' })
@@ -189,7 +219,9 @@ export async function saveSessionCost(
   return prisma.$transaction(async (tx) => {
     const session = await lockSession(tx, context, sessionId)
     if (!['prepared', 'active'].includes(session.state))
-      throw new ServiceError('invalid', { state: 'The estimate can’t change after the session closes.' })
+      throw new ServiceError('invalid', {
+        state: 'The estimate can’t change after the session closes.',
+      })
     const existing = await tx.sessionCostEstimate.findUnique({ where: { sessionId } })
     if ((existing ? toDecimalString(existing.revision) : null) !== input.expectedRevision)
       throw new ServiceError('conflict')
@@ -198,8 +230,11 @@ export async function saveSessionCost(
       return estimateFor(tx, session)
     }
     const ids = [...new Set(values.shuttles.map((l) => l.inventoryItemId))]
-    const owned = await tx.inventoryItem.count({ where: { clubId: context.clubId, id: { in: ids }, removedAt: null } })
-    if (owned !== ids.length) throw new ServiceError('invalid', { shuttles: 'Choose items from this club’s inventory.' })
+    const owned = await tx.inventoryItem.count({
+      where: { clubId: context.clubId, id: { in: ids }, removedAt: null },
+    })
+    if (owned !== ids.length)
+      throw new ServiceError('invalid', { shuttles: 'Choose items from this club’s inventory.' })
     const data: Prisma.SessionCostEstimateUncheckedUpdateInput = {
       courtFeePerCourtHourMinor: values.courtFeePerCourtHour,
       entranceFeePerHeadMinor: values.entranceFeePerHead,
@@ -208,14 +243,27 @@ export async function saveSessionCost(
     }
     if (existing) {
       await tx.sessionShuttlePlanLine.deleteMany({ where: { sessionId } })
-      await tx.sessionCostEstimate.update({ where: { sessionId }, data: { ...data, revision: { increment: 1 } } })
+      await tx.sessionCostEstimate.update({
+        where: { sessionId },
+        data: { ...data, revision: { increment: 1 } },
+      })
     } else
       await tx.sessionCostEstimate.create({
-        data: { ...(data as Prisma.SessionCostEstimateUncheckedCreateInput), sessionId, clubId: context.clubId },
+        data: {
+          ...(data as Prisma.SessionCostEstimateUncheckedCreateInput),
+          sessionId,
+          clubId: context.clubId,
+        },
       })
     for (const [position, line] of values.shuttles.entries())
       await tx.sessionShuttlePlanLine.create({
-        data: { clubId: context.clubId, sessionId, inventoryItemId: line.inventoryItemId, tubes: line.tubes, position },
+        data: {
+          clubId: context.clubId,
+          sessionId,
+          inventoryItemId: line.inventoryItemId,
+          tubes: line.tubes,
+          position,
+        },
       })
     await tx.queueSession.update({ where: { id: sessionId }, data: { revision: { increment: 1 } } })
     return estimateFor(tx, session)
@@ -251,7 +299,9 @@ export async function readSessionPayments(context: ClubContext, sessionId: strin
           sessionPlayerId: p.id,
           clubPlayerId: p.clubPlayerId,
           name: p.nameSnapshot,
-          paid: mark ? { amount: toMoney(mark.amountMinor, mark.currency), at: toIso(mark.markedAt) } : null,
+          paid: mark
+            ? { amount: toMoney(mark.amountMinor, mark.currency), at: toIso(mark.markedAt) }
+            : null,
         }
       })
       .sort((a, b) => Number(!!a.paid) - Number(!!b.paid) || a.name.localeCompare(b.name))
@@ -293,7 +343,8 @@ export async function setPaid(
     })
     if (input.paid) {
       if (mark) return { paid: true, amount: toMoney(mark.amountMinor, mark.currency) }
-      if (entry.releasedAt) throw new ServiceError('invalid', { player: 'Player not in this session.' })
+      if (entry.releasedAt)
+        throw new ServiceError('invalid', { player: 'Player not in this session.' })
       const { estimate } = await estimateFor(tx, session)
       const amountMinor = amountDuePerHead(estimate)
       const created = await tx.sessionPaymentMark.create({
@@ -310,13 +361,20 @@ export async function setPaid(
       })
       return { paid: true, amount: toMoney(created.amountMinor, created.currency) }
     }
-    if (mark) await tx.sessionPaymentMark.delete({ where: { sessionId_sessionPlayerId: { sessionId, sessionPlayerId: entry.id } } })
+    if (mark)
+      await tx.sessionPaymentMark.delete({
+        where: { sessionId_sessionPlayerId: { sessionId, sessionPlayerId: entry.id } },
+      })
     return { paid: false, amount: null }
   })
 }
 
 /** Q-MONEY · Mark all paid: ticks every live unpaid entry at the current amount, once. */
-export async function markAllPaid(context: ClubContext, sessionId: string, input: { operationId: string; deviceId?: string | null }) {
+export async function markAllPaid(
+  context: ClubContext,
+  sessionId: string,
+  input: { operationId: string; deviceId?: string | null },
+) {
   return prisma.$transaction(async (tx) => {
     const session = await lockSession(tx, context, sessionId)
     await requireSessionAccess(context, session)

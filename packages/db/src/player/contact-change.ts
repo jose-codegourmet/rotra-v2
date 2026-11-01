@@ -1,9 +1,13 @@
 import 'server-only'
-import type { AdminContext, PlayerContext } from '../auth/account-context'
-import { ProviderError, type ProviderAdmin } from '../auth/provider-admin'
-import { prisma } from '../client/prisma'
-import type { ContactChangeField, PlayerContactChangeRequest, Prisma } from '../generated/prisma/client'
 import { recordAudit } from '../admin/audit'
+import type { AdminContext, PlayerContext } from '../auth/account-context'
+import { type ProviderAdmin, ProviderError } from '../auth/provider-admin'
+import { prisma } from '../client/prisma'
+import type {
+  ContactChangeField,
+  PlayerContactChangeRequest,
+  Prisma,
+} from '../generated/prisma/client'
 import { ServiceError } from '../service/errors'
 import { toIso, toIsoOrNull } from '../service/serialize'
 
@@ -33,7 +37,8 @@ function normalize(field: ContactChangeField, value: string) {
  * not applied yet": only `applied` means the login contact changed.
  */
 function statusLabel(status: PlayerContactChangeRequest['status']) {
-  if (status === 'approved' || status === 'applying' || status === 'failed') return 'approved_pending'
+  if (status === 'approved' || status === 'applying' || status === 'failed')
+    return 'approved_pending'
   return status
 }
 
@@ -67,8 +72,14 @@ function adminRequestDto(request: PlayerContactChangeRequest) {
 async function collides(tx: Tx, playerId: string, field: ContactChangeField, value: string) {
   const owner =
     field === 'phone'
-      ? await tx.playerPrivateContact.findUnique({ where: { phoneE164: value }, select: { playerId: true } })
-      : await tx.playerPrivateContact.findUnique({ where: { email: value }, select: { playerId: true } })
+      ? await tx.playerPrivateContact.findUnique({
+          where: { phoneE164: value },
+          select: { playerId: true },
+        })
+      : await tx.playerPrivateContact.findUnique({
+          where: { email: value },
+          select: { playerId: true },
+        })
   return !!owner && owner.playerId !== playerId
 }
 
@@ -211,7 +222,9 @@ export async function reviewContactChange(
         where: { playerId: request.playerId },
       })
       if (contact.revision !== request.originalContactRevision)
-        throw new ServiceError('conflict', { request: 'The player’s contacts changed since this request.' })
+        throw new ServiceError('conflict', {
+          request: 'The player’s contacts changed since this request.',
+        })
       if (await collides(tx, request.playerId, request.field, request.proposedValue))
         throw new ServiceError('conflict', { value: 'This contact is used by another player.' })
       const approved = await tx.playerContactChangeRequest.update({
@@ -355,7 +368,11 @@ export async function reconcileContactChange(
         data:
           current.field === 'email'
             ? { email: current.proposedValue, emailVerifiedAt: null, revision: { increment: 1 } }
-            : { phoneE164: current.proposedValue, phoneVerifiedAt: null, revision: { increment: 1 } },
+            : {
+                phoneE164: current.proposedValue,
+                phoneVerifiedAt: null,
+                revision: { increment: 1 },
+              },
       })
       if (account)
         await tx.playerAccount.update({
@@ -385,7 +402,8 @@ export async function reconcileContactChange(
       return adminRequestDto(applied)
     })
   } catch (error) {
-    if ((error as { code?: string })?.code === 'P2002') return markFailed(requestId, 'contact_collision')
+    if ((error as { code?: string })?.code === 'P2002')
+      return markFailed(requestId, 'contact_collision')
     throw error
   }
 }

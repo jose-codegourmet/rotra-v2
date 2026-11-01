@@ -3,7 +3,12 @@ import { ROWS_PER_FRAME } from '@rotra/data/session-result/sessionResult.rules'
 import type { SessionAwards, StandingRow } from '@rotra/data/session-result/types'
 import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
-import type { ExportFormat, Prisma, ResultSlide, SessionResultSnapshot } from '../generated/prisma/client'
+import type {
+  ExportFormat,
+  Prisma,
+  ResultSlide,
+  SessionResultSnapshot,
+} from '../generated/prisma/client'
 import { ServiceError } from '../service/errors'
 import { toIso, toIsoOrNull } from '../service/serialize'
 import { derivedId, lockSession, requireSessionAccess, type Tx } from './session-store'
@@ -31,7 +36,11 @@ async function latestSnapshot(tx: Tx | typeof prisma, sessionId: string) {
 }
 
 /** The public copy: names and counts only. */
-function publicCopy(snapshot: SessionResultSnapshot, slides: ResultSlide[], includeOffDay: boolean) {
+function publicCopy(
+  snapshot: SessionResultSnapshot,
+  slides: ResultSlide[],
+  includeOffDay: boolean,
+) {
   const out: Record<string, Prisma.InputJsonValue> = {}
   if (slides.includes('standings'))
     out.standings = (snapshot.standings as unknown as StandingRow[]).map((r) => ({
@@ -64,7 +73,11 @@ async function pageProjections(tx: Tx, sessionId: string) {
   const roster = await tx.sessionPlayer.findMany({
     where: { sessionId, releasedAt: null },
     orderBy: [{ confirmedAt: 'asc' }, { id: 'asc' }],
-    select: { nameSnapshot: true, playerIdAtEntry: true, clubPlayer: { select: { player: { select: { avatarRef: true } } } } },
+    select: {
+      nameSnapshot: true,
+      playerIdAtEntry: true,
+      clubPlayer: { select: { player: { select: { avatarRef: true } } } },
+    },
   })
   return {
     detailsProjection: {
@@ -139,22 +152,34 @@ export async function readSessionResults(context: ClubContext, sessionId: string
 export async function publishResults(
   context: ClubContext,
   sessionId: string,
-  input: { commandId: string; slides: ResultSlide[]; includeOffDay?: boolean; deviceId?: string | null },
+  input: {
+    commandId: string
+    slides: ResultSlide[]
+    includeOffDay?: boolean
+    deviceId?: string | null
+  },
 ) {
   const includeOffDay = input.includeOffDay === true
   const slides = validSlides(input.slides, includeOffDay)
   return prisma.$transaction(async (tx) => {
     const session = await lockSession(tx, context, sessionId)
     await requireSessionAccess(context, session)
-    const done = await tx.sessionPublicationEvent.findUnique({ where: { sourceCommandId: input.commandId } })
+    const done = await tx.sessionPublicationEvent.findUnique({
+      where: { sourceCommandId: input.commandId },
+    })
     if (done) {
       if (done.sessionId !== sessionId) throw new ServiceError('conflict')
-      return { slides: done.slides, includeOffDay: done.includeOffDay, publishedAt: toIso(done.occurredAt) }
+      return {
+        slides: done.slides,
+        includeOffDay: done.includeOffDay,
+        publishedAt: toIso(done.occurredAt),
+      }
     }
     if (session.state !== 'completed')
       throw new ServiceError('invalid', { state: 'Finish the session before publishing results.' })
     const snapshot = await latestSnapshot(tx, sessionId)
-    if (!snapshot) throw new ServiceError('unavailable', { results: 'Results are still being prepared.' })
+    if (!snapshot)
+      throw new ServiceError('unavailable', { results: 'Results are still being prepared.' })
     const now = new Date()
     let publication = await tx.sessionPublication.findUnique({ where: { sessionId } })
     if (publication?.state === 'deleted')
@@ -223,22 +248,35 @@ export async function readPublishedResults(sessionId: string) {
 export async function requestResultExport(
   context: ClubContext,
   sessionId: string,
-  input: { commandId: string; slides: ResultSlide[]; format: ExportFormat; includeOffDay?: boolean },
+  input: {
+    commandId: string
+    slides: ResultSlide[]
+    format: ExportFormat
+    includeOffDay?: boolean
+  },
 ) {
   const includeOffDay = input.includeOffDay === true
   const slides = validSlides(input.slides, includeOffDay)
-  if (input.format !== 'story' && input.format !== 'feed') throw new ServiceError('invalid', { format: 'Choose story or feed.' })
+  if (input.format !== 'story' && input.format !== 'feed')
+    throw new ServiceError('invalid', { format: 'Choose story or feed.' })
   return prisma.$transaction(async (tx) => {
     const session = await lockSession(tx, context, sessionId)
     await requireSessionAccess(context, session)
     const done = await tx.resultExport.findUnique({ where: { sourceCommandId: input.commandId } })
     if (done) return { id: done.id, frameCount: done.frameCount, ready: !!done.assetRef }
-    if (session.state !== 'completed') throw new ServiceError('invalid', { state: 'Finish the session first.' })
+    if (session.state !== 'completed')
+      throw new ServiceError('invalid', { state: 'Finish the session first.' })
     const snapshot = await latestSnapshot(tx, sessionId)
-    if (!snapshot) throw new ServiceError('unavailable', { results: 'Results are still being prepared.' })
-    const club = await tx.club.findUniqueOrThrow({ where: { id: context.clubId }, select: { name: true, logoRef: true } })
+    if (!snapshot)
+      throw new ServiceError('unavailable', { results: 'Results are still being prepared.' })
+    const club = await tx.club.findUniqueOrThrow({
+      where: { id: context.clubId },
+      select: { name: true, logoRef: true },
+    })
     const rows = (snapshot.standings as unknown as StandingRow[]).length
-    const standingFrames = slides.includes('standings') ? Math.max(1, Math.ceil(rows / ROWS_PER_FRAME[input.format])) : 0
+    const standingFrames = slides.includes('standings')
+      ? Math.max(1, Math.ceil(rows / ROWS_PER_FRAME[input.format]))
+      : 0
     const created = await tx.resultExport.create({
       data: {
         id: await derivedId(input.commandId, 'export'),

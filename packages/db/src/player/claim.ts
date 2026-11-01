@@ -1,6 +1,6 @@
 import 'server-only'
 import type { ClubContext } from '../auth/account-context'
-import { ProviderError, type ProviderAdmin } from '../auth/provider-admin'
+import { type ProviderAdmin, ProviderError } from '../auth/provider-admin'
 import { AUTH_PROVIDER } from '../auth/supabase'
 import { prisma } from '../client/prisma'
 import { requireClubEntitlement } from '../service/authorize'
@@ -90,7 +90,8 @@ async function findLink(token: string) {
 /** P-CLAIM read (`ClaimLink`): public identity and a masked phone only. */
 export async function readClaimLink(token: string) {
   const link = await findLink(token)
-  if (!link || link.state === 'revoked' || !link.player.idAllocation) throw new ServiceError('not_found')
+  if (!link || link.state === 'revoked' || !link.player.idAllocation)
+    throw new ServiceError('not_found')
   const status =
     link.state === 'consumed' || link.player.profileState === 'claimed'
       ? 'claimed'
@@ -106,7 +107,9 @@ export async function readClaimLink(token: string) {
       nickname: link.player.nickname,
       rtrId: link.player.idAllocation.rtrId,
       picture: link.player.avatarRef,
-      maskedPhone: link.player.privateContact ? maskPhone(link.player.privateContact.phoneE164) : '',
+      maskedPhone: link.player.privateContact
+        ? maskPhone(link.player.privateContact.phoneE164)
+        : '',
     },
   }
 }
@@ -137,7 +140,10 @@ export async function completeClaim(
   if (link.expiresAt <= new Date()) throw new ServiceError('forbidden', { link: EXPIRED })
   if (!player.privateContact || !player.idAllocation)
     throw new ServiceError('invalid', { link: EXPIRED })
-  const taken = await prisma.playerPrivateContact.findUnique({ where: { email }, select: { playerId: true } })
+  const taken = await prisma.playerPrivateContact.findUnique({
+    where: { email },
+    select: { playerId: true },
+  })
   if (taken && taken.playerId !== player.id)
     throw new ServiceError('conflict', { email: 'This email is already used by another player.' })
 

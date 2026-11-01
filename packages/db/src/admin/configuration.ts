@@ -54,11 +54,15 @@ export async function createFeatureFlag(
   const name = input.name.trim()
   if (!FLAG_KEY.test(key))
     throw new ServiceError('invalid', { key: 'Use 3–40 lowercase letters, digits or underscores.' })
-  if (!name || name.length > 50) throw new ServiceError('invalid', { name: 'Enter a name up to 50 characters.' })
+  if (!name || name.length > 50)
+    throw new ServiceError('invalid', { name: 'Enter a name up to 50 characters.' })
   try {
     return await prisma.$transaction(async (tx) => {
-      const done = await tx.adminAuditEvent.findUnique({ where: { sourceCommandId: input.commandId } })
-      if (done) return flagDto(await tx.featureFlag.findUniqueOrThrow({ where: { key: done.targetId } }))
+      const done = await tx.adminAuditEvent.findUnique({
+        where: { sourceCommandId: input.commandId },
+      })
+      if (done)
+        return flagDto(await tx.featureFlag.findUniqueOrThrow({ where: { key: done.targetId } }))
       const flag = await tx.featureFlag.create({
         data: {
           key,
@@ -135,9 +139,13 @@ export async function saveRankingPolicy(
   if (!input.algorithmVersion.trim())
     throw new ServiceError('invalid', { algorithm: 'Choose an approved algorithm version.' })
   return prisma.$transaction(async (tx) => {
-    const done = await tx.adminAuditEvent.findUnique({ where: { sourceCommandId: input.commandId } })
+    const done = await tx.adminAuditEvent.findUnique({
+      where: { sourceCommandId: input.commandId },
+    })
     if (done)
-      return policyDto(await tx.rankingPolicyVersion.findUniqueOrThrow({ where: { id: done.targetId } }))
+      return policyDto(
+        await tx.rankingPolicyVersion.findUniqueOrThrow({ where: { id: done.targetId } }),
+      )
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext('ranking_policy_versions'))`
     const latest = await tx.rankingPolicyVersion.findFirst({ orderBy: { version: 'desc' } })
     if ((latest?.version ?? null) !== input.expectedVersion) throw new ServiceError('conflict')

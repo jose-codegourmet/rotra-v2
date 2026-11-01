@@ -1,6 +1,6 @@
 import 'server-only'
 import type { AdminContext, ClubContext } from '../auth/account-context'
-import { ProviderError, type ProviderAdmin } from '../auth/provider-admin'
+import { type ProviderAdmin, ProviderError } from '../auth/provider-admin'
 import { AUTH_PROVIDER } from '../auth/supabase'
 import { prisma } from '../client/prisma'
 import type { Club, ClubVenue, LicensePricing, Prisma } from '../generated/prisma/client'
@@ -46,7 +46,13 @@ function adminClubDto(
     licenseMonthly: toMoney(club.licenseMonthlyMinor, club.currency),
     licenseYearly: toMoney(club.licenseYearlyMinor, club.currency),
     username: account?.username ?? null,
-    accountState: !account ? 'missing' : account.disabledAt ? 'disabled' : account.provisionedAt ? 'ready' : 'provisioning',
+    accountState: !account
+      ? 'missing'
+      : account.disabledAt
+        ? 'disabled'
+        : account.provisionedAt
+          ? 'ready'
+          : 'provisioning',
     createdAt: toIso(club.createdAt),
     revision: toDecimalString(club.revision),
   }
@@ -207,9 +213,12 @@ export async function setClubPricing(
 ) {
   validatePricing(input.pricing)
   return prisma.$transaction(async (tx) => {
-    const done = await tx.adminAuditEvent.findUnique({ where: { sourceCommandId: input.commandId } })
+    const done = await tx.adminAuditEvent.findUnique({
+      where: { sourceCommandId: input.commandId },
+    })
     const club = await lockClub(tx, input.clubId)
-    if (done) return adminClubDto(club, await tx.clubAccount.findUnique({ where: { clubId: club.id } }))
+    if (done)
+      return adminClubDto(club, await tx.clubAccount.findUnique({ where: { clubId: club.id } }))
     requireRevision(club.revision, input.expectedRevision)
     const before = {
       pricing: club.licensePricing,
@@ -282,7 +291,9 @@ export async function updateClubSettings(
       input.defaultPlayersPerCourt < 2 ||
       input.defaultPlayersPerCourt > 20)
   )
-    throw new ServiceError('invalid', { playersPerCourt: 'Players per court must be between 2 and 20.' })
+    throw new ServiceError('invalid', {
+      playersPerCourt: 'Players per court must be between 2 and 20.',
+    })
   if (
     input.defaultEntranceFeeMinor != null &&
     (!Number.isSafeInteger(input.defaultEntranceFeeMinor) || input.defaultEntranceFeeMinor < 0)
@@ -406,7 +417,10 @@ export async function reviewClubNameChange(
         action: `club.name_change_${input.decision}`,
         targetType: 'club',
         targetId: club.id,
-        metadata: { before: club.name, after: input.decision === 'approved' ? request.requestedName : club.name },
+        metadata: {
+          before: club.name,
+          after: input.decision === 'approved' ? request.requestedName : club.name,
+        },
       })
       return nameChangeDto(decided)
     })
@@ -459,7 +473,9 @@ export async function saveVenue(
         entranceFeeMinor: input.entranceFeeMinor ?? null,
       }
       if (!existing)
-        return venueDto(await tx.clubVenue.create({ data: { id: input.id, clubId: context.clubId, ...data } }))
+        return venueDto(
+          await tx.clubVenue.create({ data: { id: input.id, clubId: context.clubId, ...data } }),
+        )
       if (input.expectedRevision === undefined) return venueDto(existing)
       requireRevision(existing.revision, input.expectedRevision)
       return venueDto(

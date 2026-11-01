@@ -4,8 +4,8 @@ import { createResultSnapshot } from '@rotra/data/session-result/sessionResult.r
 import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
 import type { PlayerMatchFact, Prisma, ProjectionJob } from '../generated/prisma/client'
-import { matchContext } from '../queue/match-store'
 import { settleFinalization } from '../queue/finalization'
+import { matchContext } from '../queue/match-store'
 import { ServiceError } from '../service/errors'
 import { toIso, toIsoOrNull } from '../service/serialize'
 
@@ -73,8 +73,13 @@ export async function recomputeRank(tx: Tx, playerId: string, now = new Date()) 
   const assessments = await tx.clubAssessment.count({
     where: { playerIdAtAssessment: playerId, assessedAt: { gte: windowStart, lte: now } },
   })
-  const oldest = inWindow.reduce<Date | null>((min, f) => (!min || f.playedAt < min ? f.playedAt : min), null)
-  const nextRecheckAt = oldest ? new Date(oldest.getTime() + WINDOW_DAYS * DAY) : new Date(now.getTime() + WINDOW_DAYS * DAY)
+  const oldest = inWindow.reduce<Date | null>(
+    (min, f) => (!min || f.playedAt < min ? f.playedAt : min),
+    null,
+  )
+  const nextRecheckAt = oldest
+    ? new Date(oldest.getTime() + WINDOW_DAYS * DAY)
+    : new Date(now.getTime() + WINDOW_DAYS * DAY)
   const watermark = BigInt(facts.reduce((max, f) => Math.max(max, f.createdAt.getTime()), 0))
   const approved = APPROVED_RANK_ALGORITHMS.has(policy.algorithmVersion)
   const state = lastValid && lastValid < windowStart ? 'needs_reassessment' : 'provisional'
@@ -100,13 +105,18 @@ export async function recomputeRank(tx: Tx, playerId: string, now = new Date()) 
   const current = await tx.playerRankCurrent.findUnique({ where: { playerId } })
   if (current && current.inputWatermark > watermark) return current
   return current
-    ? tx.playerRankCurrent.update({ where: { playerId }, data: { ...data, revision: { increment: 1 } } })
+    ? tx.playerRankCurrent.update({
+        where: { playerId },
+        data: { ...data, revision: { increment: 1 } },
+      })
     : tx.playerRankCurrent.create({ data: { playerId, ...data } })
 }
 
 /** The private snapshot for a finalized session: standings, awards and Off Day in its own column. */
 async function writeResultSnapshot(tx: Tx, sessionId: string) {
-  const existing = await tx.sessionResultSnapshot.findUnique({ where: { sessionId_version: { sessionId, version: 1 } } })
+  const existing = await tx.sessionResultSnapshot.findUnique({
+    where: { sessionId_version: { sessionId, version: 1 } },
+  })
   if (existing) return existing
   const session = await tx.queueSession.findUniqueOrThrow({ where: { id: sessionId } })
   const { ctx } = await matchContext(tx, session)
@@ -167,7 +177,12 @@ async function playersOfFinalization(tx: Tx, sessionId: string) {
     where: { revokedAt: null, clubPlayer: { facts: { some: { sessionId } } } },
     select: { playerId: true },
   })
-  return [...new Set([...facts.map((f) => f.playerIdAtFinalization as string), ...attributed.map((a) => a.playerId)])]
+  return [
+    ...new Set([
+      ...facts.map((f) => f.playerIdAtFinalization as string),
+      ...attributed.map((a) => a.playerId),
+    ]),
+  ]
 }
 
 /** Runs one claimed job's work in its own transaction. */
@@ -181,16 +196,27 @@ async function runJob(job: ProjectionJob, now: Date) {
         case 'player_history':
           // History is read straight from facts; this stage only confirms they are committed.
           if (job.sourceFinalizationId)
-            await tx.sessionFinalization.findUniqueOrThrow({ where: { sessionId: job.sourceFinalizationId } })
+            await tx.sessionFinalization.findUniqueOrThrow({
+              where: { sessionId: job.sourceFinalizationId },
+            })
           break
         case 'player_rank': {
           let targets: string[] = []
           if (job.targetPlayerId) targets = [job.targetPlayerId]
-          else if (job.sourceFinalizationId) targets = await playersOfFinalization(tx, job.sourceFinalizationId)
+          else if (job.sourceFinalizationId)
+            targets = await playersOfFinalization(tx, job.sourceFinalizationId)
           else if (job.sourceAttributionId)
-            targets = [(await tx.playerHistoryAttribution.findUniqueOrThrow({ where: { id: job.sourceAttributionId } })).playerId]
+            targets = [
+              (
+                await tx.playerHistoryAttribution.findUniqueOrThrow({
+                  where: { id: job.sourceAttributionId },
+                })
+              ).playerId,
+            ]
           else if (job.sourceAssessmentId) {
-            const a = await tx.clubAssessment.findUniqueOrThrow({ where: { id: job.sourceAssessmentId } })
+            const a = await tx.clubAssessment.findUniqueOrThrow({
+              where: { id: job.sourceAssessmentId },
+            })
             if (a.playerIdAtAssessment) targets = [a.playerIdAtAssessment]
           }
           for (const playerId of targets) await recomputeRank(tx, playerId, now)
@@ -236,7 +262,11 @@ export async function runProjectionJobs(limit = 10, now = new Date()) {
       results.push({ id: job.id, kind: job.kind, status: 'done' })
     } catch (error) {
       const errorCode =
-        error instanceof ServiceError ? error.code : error instanceof Error ? error.name.slice(0, 40) : 'unknown'
+        error instanceof ServiceError
+          ? error.code
+          : error instanceof Error
+            ? error.name.slice(0, 40)
+            : 'unknown'
       await prisma.$transaction(async (tx) => {
         await tx.projectionJob.update({
           where: { id: job.id },
@@ -287,7 +317,13 @@ export async function scheduleAgeingJobs(now = new Date(), limit = 500) {
   for (const row of due)
     try {
       await prisma.projectionJob.create({
-        data: { kind: 'player_rank', kindVersion: 1, sourceType: 'ageing', targetPlayerId: row.playerId, dueAt: row.nextRecheckAt },
+        data: {
+          kind: 'player_rank',
+          kindVersion: 1,
+          sourceType: 'ageing',
+          targetPlayerId: row.playerId,
+          dueAt: row.nextRecheckAt,
+        },
       })
       created++
     } catch (error) {
@@ -309,12 +345,19 @@ export async function schedulePolicyRecalculation(now = new Date()) {
  */
 export async function confirmHistoryAttribution(
   context: ClubContext,
-  input: { commandId: string; clubPlayerId: string; playerId: string; method: 'rtr-id' | 'qr' | 'phone' },
+  input: {
+    commandId: string
+    clubPlayerId: string
+    playerId: string
+    method: 'rtr-id' | 'qr' | 'phone'
+  },
 ) {
   if (!['rtr-id', 'qr', 'phone'].includes(input.method))
     throw new ServiceError('invalid', { identity: 'Confirm this player’s identity first.' })
   return prisma.$transaction(async (tx) => {
-    const done = await tx.playerHistoryAttribution.findUnique({ where: { sourceCommandId: input.commandId } })
+    const done = await tx.playerHistoryAttribution.findUnique({
+      where: { sourceCommandId: input.commandId },
+    })
     if (done) {
       if (done.clubId !== context.clubId) throw new ServiceError('not_found')
       return { attributionId: done.id, confirmedAt: toIso(done.confirmedAt) }
@@ -324,7 +367,9 @@ export async function confirmHistoryAttribution(
     })
     if (!clubPlayer) throw new ServiceError('not_found')
     if (clubPlayer.playerId !== input.playerId)
-      throw new ServiceError('conflict', { identity: 'Link this player’s profile before moving their history.' })
+      throw new ServiceError('conflict', {
+        identity: 'Link this player’s profile before moving their history.',
+      })
     const active = await tx.playerHistoryAttribution.findFirst({
       where: { clubId: context.clubId, clubPlayerId: clubPlayer.id, revokedAt: null },
     })
@@ -341,7 +386,12 @@ export async function confirmHistoryAttribution(
       },
     })
     await tx.projectionJob.create({
-      data: { kind: 'player_rank', kindVersion: 1, sourceType: 'attribution', sourceAttributionId: attribution.id },
+      data: {
+        kind: 'player_rank',
+        kindVersion: 1,
+        sourceType: 'attribution',
+        sourceAttributionId: attribution.id,
+      },
     })
     return { attributionId: attribution.id, confirmedAt: toIso(now) }
   })
@@ -358,7 +408,14 @@ export async function readPlayerMatchHistory(playerId: string) {
     const [sessions, entries] = await Promise.all([
       tx.queueSession.findMany({
         where: { id: { in: sessionIds }, state: 'completed' },
-        select: { id: true, title: true, finalizedAt: true, publicSlug: true, club: { select: { name: true } }, publication: { select: { publishedAt: true } } },
+        select: {
+          id: true,
+          title: true,
+          finalizedAt: true,
+          publicSlug: true,
+          club: { select: { name: true } },
+          publication: { select: { publishedAt: true } },
+        },
       }),
       tx.sessionPlayer.findMany({
         where: { sessionId: { in: sessionIds } },
@@ -416,7 +473,11 @@ export async function readPlayerRank(playerId: string) {
     // Truthful pending output: a rank job aimed at this player has not finished yet.
     updatePending:
       (await prisma.projectionJob.count({
-        where: { kind: 'player_rank', status: { in: ['pending', 'running', 'failed'] }, targetPlayerId: playerId },
+        where: {
+          kind: 'player_rank',
+          status: { in: ['pending', 'running', 'failed'] },
+          targetPlayerId: playerId,
+        },
       })) > 0,
   }
 }

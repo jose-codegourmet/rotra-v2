@@ -1,8 +1,8 @@
 import 'server-only'
 import type { MatchContext } from '@rotra/data/match/match.rules'
-import type { Match as MatchView } from '@rotra/data/match/match.types'
-import type { SessionCourt as CourtView } from '@rotra/data/queue-session/queueSession.types'
-import type { SessionPlayer as RosterView } from '@rotra/data/session-roster/sessionRoster.types'
+import type { Match as MatchView } from '@rotra/data/match/types'
+import type { SessionCourt as CourtView } from '@rotra/data/queue-session/types'
+import type { SessionPlayer as RosterView } from '@rotra/data/session-roster/types'
 import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
 import type { Prisma, QueueSession } from '../generated/prisma/client'
@@ -41,10 +41,20 @@ export function matchView(row: MatchRow): MatchView {
       (p) => p.joinedOperationId === out.leftOperationId && p.id !== out.id,
     )
     return incoming
-      ? [{ outId: out.sessionPlayerId, inId: incoming.sessionPlayerId, team: out.team, at: out.leftAt?.getTime() ?? 0 }]
+      ? [
+          {
+            outId: out.sessionPlayerId,
+            inId: incoming.sessionPlayerId,
+            team: out.team,
+            at: out.leftAt?.getTime() ?? 0,
+          },
+        ]
       : []
   })
-  const members = row.state === 'waiting' || row.state === 'active' ? open : row.participations.filter((p) => p.finishedWithMatch)
+  const members =
+    row.state === 'waiting' || row.state === 'active'
+      ? open
+      : row.participations.filter((p) => p.finishedWithMatch)
   return {
     id: row.id,
     sessionId: row.sessionId,
@@ -155,7 +165,11 @@ export async function matchContext(tx: Tx, session: QueueSession) {
 export async function matchCommand<T>(
   context: ClubContext,
   sessionId: string,
-  options: { expectedQueueRevision?: string; expectedRevision?: string; states?: QueueSession['state'][] },
+  options: {
+    expectedQueueRevision?: string
+    expectedRevision?: string
+    states?: QueueSession['state'][]
+  },
   change: (tx: Tx, session: QueueSession) => Promise<T>,
 ) {
   try {
@@ -165,7 +179,8 @@ export async function matchCommand<T>(
       requireState(session, options.states ?? ['active'], 'Start the session first.')
       if (options.expectedQueueRevision !== undefined)
         requireRevision(session.queueRevision, options.expectedQueueRevision)
-      if (options.expectedRevision !== undefined) requireRevision(session.revision, options.expectedRevision)
+      if (options.expectedRevision !== undefined)
+        requireRevision(session.revision, options.expectedRevision)
       const result = await change(tx, session)
       const bumped = await tx.queueSession.update({
         where: { id: session.id },

@@ -53,7 +53,13 @@ export async function startMatch(
     })
     for (const courtId of input.courtIds) {
       await tx.activeCourtHold.create({
-        data: { courtId, clubId: session.clubId, sessionId: session.id, matchId: match.id, heldAt: now },
+        data: {
+          courtId,
+          clubId: session.clubId,
+          sessionId: session.id,
+          matchId: match.id,
+          heldAt: now,
+        },
       })
       await tx.matchCourtUsage.create({
         data: {
@@ -95,14 +101,23 @@ export async function substitutePlayer(
 ) {
   return matchCommand(context, sessionId, {}, async (tx, session) => {
     const match = await activeMatch(tx, session.id, input.matchId)
-    if (match.participations.some((p) => p.joinedOperationId === input.operationId && p.sessionPlayerId === input.inId))
+    if (
+      match.participations.some(
+        (p) => p.joinedOperationId === input.operationId && p.sessionPlayerId === input.inId,
+      )
+    )
       return matchDto(match)
     if (match.state !== 'active' || match.decision)
-      throw new ServiceError('conflict', { match: 'This match already has a confirmed outcome or is not active.' })
+      throw new ServiceError('conflict', {
+        match: 'This match already has a confirmed outcome or is not active.',
+      })
     const { ctx, roster } = await matchContext(tx, session)
     const view = ctx.matches.find((m) => m.id === match.id)
-    const outgoing = match.participations.find((p) => p.sessionPlayerId === input.outId && !p.leftAt)
-    const incoming = view && substitutionCandidates(view, ctx.roster, ctx.matches).find((p) => p.id === input.inId)
+    const outgoing = match.participations.find(
+      (p) => p.sessionPlayerId === input.outId && !p.leftAt,
+    )
+    const incoming =
+      view && substitutionCandidates(view, ctx.roster, ctx.matches).find((p) => p.id === input.inId)
     if (!outgoing || !incoming)
       throw new ServiceError('conflict', { match: 'Something changed. Review the match again.' })
     const now = new Date()
@@ -141,16 +156,28 @@ export async function substitutePlayer(
 }
 
 type Outcome =
-  | { kind: 'completed'; winningTeam: 'A' | 'B'; teamAScore: number | null; teamBScore: number | null }
+  | {
+      kind: 'completed'
+      winningTeam: 'A' | 'B'
+      teamAScore: number | null
+      teamBScore: number | null
+    }
   | { kind: 'invalid' }
 
 /**
  * A second terminal command for a decided match. The same operation returns the original outcome;
  * a different, contradicting one is quarantined as conflict evidence and never overwrites it.
  */
-async function decidedAlready(tx: Tx, session: QueueSession, match: MatchRow, operationId: string, outcome: Outcome) {
+async function decidedAlready(
+  tx: Tx,
+  session: QueueSession,
+  match: MatchRow,
+  operationId: string,
+  outcome: Outcome,
+) {
   const decision = match.decision as MatchDecision
-  if (decision.sourceOperationId === operationId) return { match: matchDto(match), decision: decisionDto(decision) }
+  if (decision.sourceOperationId === operationId)
+    return { match: matchDto(match), decision: decisionDto(decision) }
   const same =
     decision.kind === outcome.kind &&
     (outcome.kind === 'invalid' ||
@@ -160,14 +187,14 @@ async function decidedAlready(tx: Tx, session: QueueSession, match: MatchRow, op
   // An agreeing confirmation from another device changes nothing and returns the original.
   if (same) return { match: matchDto(match), decision: decisionDto(decision) }
   await tx.syncConflict.create({
-      data: {
-        id: await derivedId(operationId, 'conflict'),
-        clubId: session.clubId,
-        sessionId: session.id,
-        category: 'contradictory_decision',
-        evidence: { version: 1, matchId: match.id, operationId, attempted: outcome },
-      },
-    })
+    data: {
+      id: await derivedId(operationId, 'conflict'),
+      clubId: session.clubId,
+      sessionId: session.id,
+      category: 'contradictory_decision',
+      evidence: { version: 1, matchId: match.id, operationId, attempted: outcome },
+    },
+  })
   // Returned, not thrown, so the quarantine row commits; the caller then reports the conflict.
   return { quarantined: true as const }
 }
@@ -177,7 +204,13 @@ async function decidedAlready(tx: Tx, session: QueueSession, match: MatchRow, op
  * usage, frees all holds and appends the one permanent decision (after which triggers freeze the
  * match). If any step fails nothing commits, so no court is freed by a failed write.
  */
-async function decide(context: ClubContext, sessionId: string, matchId: string, operationId: string, outcome: Outcome) {
+async function decide(
+  context: ClubContext,
+  sessionId: string,
+  matchId: string,
+  operationId: string,
+  outcome: Outcome,
+) {
   const done = await matchCommand(context, sessionId, {}, async (tx, session) => {
     const match = await activeMatch(tx, session.id, matchId)
     if (match.decision) return decidedAlready(tx, session, match, operationId, outcome)
@@ -226,10 +259,20 @@ async function decide(context: ClubContext, sessionId: string, matchId: string, 
 export async function completeMatch(
   context: ClubContext,
   sessionId: string,
-  input: { operationId: string; matchId: string; winningTeam?: 'A' | 'B' | null; teamAScore?: number | null; teamBScore?: number | null },
+  input: {
+    operationId: string
+    matchId: string
+    winningTeam?: 'A' | 'B' | null
+    teamAScore?: number | null
+    teamBScore?: number | null
+  },
 ) {
-  const result = validateResult({ winner: input.winningTeam, scoreA: input.teamAScore, scoreB: input.teamBScore })
-  if (result.error) throw new ServiceError('invalid', { result: result.error })
+  const result = validateResult({
+    winner: input.winningTeam,
+    scoreA: input.teamAScore,
+    scoreB: input.teamBScore,
+  })
+  if (result.winner === null) throw new ServiceError('invalid', { result: result.error })
   return decide(context, sessionId, input.matchId, input.operationId, {
     kind: 'completed',
     winningTeam: result.winner,

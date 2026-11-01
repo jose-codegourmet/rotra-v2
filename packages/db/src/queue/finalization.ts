@@ -38,7 +38,12 @@ async function statusDto(tx: Tx | typeof prisma, finalization: SessionFinalizati
     completedAt: toIsoOrNull(finalization.completedAt),
     failedStage: finalization.failedStage,
     failureCode: finalization.failureCode,
-    jobs: jobs.map((j) => ({ kind: j.kind, status: j.status, attempts: j.attempts, lastErrorCode: j.lastErrorCode })),
+    jobs: jobs.map((j) => ({
+      kind: j.kind,
+      status: j.status,
+      attempts: j.attempts,
+      lastErrorCode: j.lastErrorCode,
+    })),
   }
 }
 
@@ -89,13 +94,26 @@ async function belowMinimum(tx: Tx, sessionId: string, minimumGames: number) {
   const roster = await tx.sessionPlayer.findMany({ where: { sessionId, releasedAt: null } })
   const parts = await tx.matchParticipation.findMany({
     where: { sessionId, match: { state: 'completed' } },
-    select: { sessionPlayerId: true, matchId: true, startedWithMatch: true, finishedWithMatch: true },
+    select: {
+      sessionPlayerId: true,
+      matchId: true,
+      startedWithMatch: true,
+      finishedWithMatch: true,
+    },
   })
   const segments = new Map<string, number>()
-  for (const p of parts) segments.set(`${p.matchId}:${p.sessionPlayerId}`, (segments.get(`${p.matchId}:${p.sessionPlayerId}`) ?? 0) + 1)
+  for (const p of parts)
+    segments.set(
+      `${p.matchId}:${p.sessionPlayerId}`,
+      (segments.get(`${p.matchId}:${p.sessionPlayerId}`) ?? 0) + 1,
+    )
   const games = new Map<string, number>()
   for (const p of parts)
-    if (p.startedWithMatch && p.finishedWithMatch && segments.get(`${p.matchId}:${p.sessionPlayerId}`) === 1)
+    if (
+      p.startedWithMatch &&
+      p.finishedWithMatch &&
+      segments.get(`${p.matchId}:${p.sessionPlayerId}`) === 1
+    )
       games.set(p.sessionPlayerId, (games.get(p.sessionPlayerId) ?? 0) + 1)
   return roster
     .map((r) => ({ sessionPlayerId: r.id, name: r.nameSnapshot, games: games.get(r.id) ?? 0 }))
@@ -145,7 +163,9 @@ async function buildFacts(tx: Tx, sessionId: string) {
         fullParticipation: segments.length === 1 && last.startedWithMatch && last.finishedWithMatch,
         standardMatch: match.format === 'singles' || match.format === 'doubles',
         skillLevelSnapshotId: entry.skillLevelId,
-        partnerEntryIds: finishers.filter((p) => p.team === team && p.sessionPlayerId !== entryId).map((p) => p.sessionPlayerId),
+        partnerEntryIds: finishers
+          .filter((p) => p.team === team && p.sessionPlayerId !== entryId)
+          .map((p) => p.sessionPlayerId),
         opponentEntryIds: finishers.filter((p) => p.team !== team).map((p) => p.sessionPlayerId),
         teamAScore: decision.teamAScore,
         teamBScore: decision.teamBScore,
@@ -156,7 +176,18 @@ async function buildFacts(tx: Tx, sessionId: string) {
   return facts
 }
 
-function summaries(sessionId: string, facts: Prisma.PlayerMatchFactCreateManyInput[], roster: { id: string; clubId: string; clubPlayerId: string; playerIdAtEntry: string | null; skillLevelId: number | null }[], now: Date) {
+function summaries(
+  sessionId: string,
+  facts: Prisma.PlayerMatchFactCreateManyInput[],
+  roster: {
+    id: string
+    clubId: string
+    clubPlayerId: string
+    playerIdAtEntry: string | null
+    skillLevelId: number | null
+  }[],
+  now: Date,
+) {
   return roster.map((entry) => {
     const full = facts.filter((f) => f.sessionPlayerId === entry.id && f.fullParticipation)
     const wins = full.filter((f) => f.team === f.winningTeam).length
@@ -186,13 +217,18 @@ function summaries(sessionId: string, facts: Prisma.PlayerMatchFactCreateManyInp
  * already-finalized session gets the same status and never double-counts. Projection or slide
  * failures retry their jobs without repeating this.
  */
-export async function finalizeSession(context: ClubContext, sessionId: string, input: { commandId: string }) {
+export async function finalizeSession(
+  context: ClubContext,
+  sessionId: string,
+  input: { commandId: string },
+) {
   try {
     return await prisma.$transaction(
       async (tx) => {
         const session = await lockSession(tx, context, sessionId)
         const existing = await tx.sessionFinalization.findUnique({ where: { sessionId } })
-        if (existing) return { status: await statusDto(tx, existing), warnings: { belowMinimum: [] } }
+        if (existing)
+          return { status: await statusDto(tx, existing), warnings: { belowMinimum: [] } }
         await requireSessionAccess(context, session)
         if (session.state !== 'active')
           throw new ServiceError('invalid', { state: 'Only a running session can be finished.' })
@@ -214,7 +250,15 @@ export async function finalizeSession(context: ClubContext, sessionId: string, i
         const factsDigest = await sha256(
           JSON.stringify(
             facts
-              .map((f) => [f.matchId, f.sessionPlayerId, f.team, f.winningTeam, f.fullParticipation, f.teamAScore, f.teamBScore])
+              .map((f) => [
+                f.matchId,
+                f.sessionPlayerId,
+                f.team,
+                f.winningTeam,
+                f.fullParticipation,
+                f.teamAScore,
+                f.teamBScore,
+              ])
               .sort((a, b) => `${a[0]}${a[1]}`.localeCompare(`${b[0]}${b[1]}`)),
           ),
         )
@@ -236,7 +280,9 @@ export async function finalizeSession(context: ClubContext, sessionId: string, i
         })
         if (facts.length) await tx.playerMatchFact.createMany({ data: facts })
         const roster = await tx.sessionPlayer.findMany({ where: { sessionId, releasedAt: null } })
-        await tx.clubSessionPlayerSummary.createMany({ data: summaries(sessionId, facts, roster, now) })
+        await tx.clubSessionPlayerSummary.createMany({
+          data: summaries(sessionId, facts, roster, now),
+        })
         await tx.match.updateMany({
           where: { sessionId, state: 'waiting', removedAt: null },
           data: { removedAt: now, queuePosition: null },
@@ -247,11 +293,23 @@ export async function finalizeSession(context: ClubContext, sessionId: string, i
         })
         await tx.clubSessionReservation.deleteMany({ where: { clubId: context.clubId, sessionId } })
         await tx.projectionJob.create({
-          data: { kind: 'club_session_summaries', kindVersion: SUMMARY_VERSION, sourceType: 'finalization', sourceFinalizationId: sessionId, status: 'done', completedAt: now },
+          data: {
+            kind: 'club_session_summaries',
+            kindVersion: SUMMARY_VERSION,
+            sourceType: 'finalization',
+            sourceFinalizationId: sessionId,
+            status: 'done',
+            completedAt: now,
+          },
         })
         for (const job of FINALIZATION_JOBS)
           await tx.projectionJob.create({
-            data: { kind: job.kind, kindVersion: job.kindVersion, sourceType: 'finalization', sourceFinalizationId: sessionId },
+            data: {
+              kind: job.kind,
+              kindVersion: job.kindVersion,
+              sourceType: 'finalization',
+              sourceFinalizationId: sessionId,
+            },
           })
         return { status: await statusDto(tx, finalization), warnings }
       },
@@ -260,7 +318,11 @@ export async function finalizeSession(context: ClubContext, sessionId: string, i
   } catch (error) {
     if (error instanceof ServiceError) throw error
     // A concurrent Session done lost the PK race: return the winner's committed status.
-    if ((error as { code?: string })?.code === 'P2002') return { status: await readFinalizationStatus(context, sessionId), warnings: { belowMinimum: [] } }
+    if ((error as { code?: string })?.code === 'P2002')
+      return {
+        status: await readFinalizationStatus(context, sessionId),
+        warnings: { belowMinimum: [] },
+      }
     mapDatabaseError(error)
   }
 }
@@ -294,7 +356,14 @@ export async function settleFinalization(tx: Tx, sessionId: string) {
   if (jobs.every((j) => j.status === 'done'))
     return tx.sessionFinalization.update({
       where: { sessionId },
-      data: { state: 'done', stage: 'slides', failedStage: null, failureCode: null, completedAt: new Date(), revision: { increment: 1 } },
+      data: {
+        state: 'done',
+        stage: 'slides',
+        failedStage: null,
+        failureCode: null,
+        completedAt: new Date(),
+        revision: { increment: 1 },
+      },
     })
   const snapshotDone = jobs.some((j) => j.kind === 'result_snapshot' && j.status === 'done')
   return tx.sessionFinalization.update({
@@ -313,17 +382,24 @@ export async function settleFinalization(tx: Tx, sessionId: string) {
  * Q-DONE · Mark session invalid. No finalization, facts or official contribution; the reservation
  * is released. Refused while a match is active or after Session done.
  */
-export async function invalidateSession(context: ClubContext, sessionId: string, input: { reason: string }) {
+export async function invalidateSession(
+  context: ClubContext,
+  sessionId: string,
+  input: { reason: string },
+) {
   const reason = input.reason.trim()
   if (!reason) throw new ServiceError('invalid', { reason: 'Say why this session is invalid.' })
   return prisma.$transaction(async (tx) => {
     const session = await lockSession(tx, context, sessionId)
-    if (session.state === 'invalid') return { state: 'invalid' as const, invalidReason: session.invalidReason }
+    if (session.state === 'invalid')
+      return { state: 'invalid' as const, invalidReason: session.invalidReason }
     if (session.state === 'completed' || session.state === 'finalizing')
       throw new ServiceError('invalid', { state: 'A finished session can’t be marked invalid.' })
     await requireSessionAccess(context, session)
     if (await tx.match.count({ where: { sessionId, state: 'active' } }))
-      throw new ServiceError('conflict', { matches: 'Finish or mark invalid every active match first.' })
+      throw new ServiceError('conflict', {
+        matches: 'Finish or mark invalid every active match first.',
+      })
     await tx.match.updateMany({
       where: { sessionId, state: 'waiting', removedAt: null },
       data: { removedAt: new Date(), queuePosition: null },

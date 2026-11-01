@@ -1,5 +1,6 @@
 # Session financials and club inventory
 
+**Last verified:** 2026-11-01.
 **Surfaces:** `Q-FINANCIALS`, `Q-INVENTORY`, `Q-INVENTORY-ITEM`.
 
 **Source:** [financials rules](../../../../business_logic/product/queue/modules/financials/README.md). **Reference:** [ROTRA Queue prototype](../../../../../apps/mockup/queue-app/rotra-queue.html) — setup step 5 and Inventory.
@@ -35,7 +36,10 @@ No financial value appears on the public page, result slides, or image exports.
 - Intro: “₱700 per player (custom amount, includes the ₱60 entrance fee).” or “₱594 per player (break-even share).” or “No fee set for this session.”, then “Tick players as they pay. ROTRA only records it; money is collected outside the app.”
 - Tiles: **Paid** “15/18”, **Collected**, **Still due**, **Against costs** (“+₱10” in green or “−₱7,500” in amber, “of ₱11,250 cost”).
 - Filter: Everyone · N, Not paid · N, Paid · N. **Mark all paid** while anyone is unpaid.
-- A **grid of player cards** (unpaid first; as many columns as fit, at least 150 px each, two on phones): clickable picture and the paid switch on top, then name and “₱250 due” or “✓ Paid ₱250 · 7:42 PM”. Paid cards get an accent border, tint and picture ring. Toasts: “NAME paid ₱250”, “NAME marked not paid”.
+- A **grid of player cards** (unpaid first; as many columns as fit, at least 150 px each, two on phones): clickable picture and the paid switch on top, then name and “₱250 due” or “✓ Paid ₱250 · 7:42 PM”. Paid cards get an accent border, tint and picture ring. One toast per accepted batch: “N payment marks saved” (singular: “1 payment mark saved”), with the existing “ · Saved on this device, waiting to sync” suffix offline.
+- **Owner decision, November 1, 2026 (#300):** switches, totals, filter counts and paid tab counts update immediately; the grid stays interactive during saves. After 800 ms without another switch, send the desired paid state of every changed player in one atomic batch. Switching back to the accepted state before saving drops that player from the batch.
+- **Mark all paid** starts a flush of pending switches first, then queues the remaining paid marks behind that save. Tab changes, sheet close and route changes flush on panel exit. Page hide/exit initiates a flush; an outstanding save warns before browser exit. Mock data still resets on reload.
+- A failed batch rolls back its switches while preserving later changes, and shows the existing save error and error toast. The summary toast appears only after acceptance.
 - Empty states: “Everyone has paid.” / “Nobody has paid yet.” / “No players yet.” Invalid sessions show no checklist.
 
 ## Q-INVENTORY — Club inventory

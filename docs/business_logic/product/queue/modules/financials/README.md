@@ -1,5 +1,6 @@
 # Session financials and club inventory
 
+**Last verified:** 2026-11-01.
 **Status:** Agreed v1 target rules, added October 26, 2026 from the [ROTRA Queue prototype](../../../../../../apps/mockup/queue-app/rotra-queue.html). This replaces the earlier v1 exclusion of shuttle pricing, cost estimates, and paid/unpaid tracking. ROTRA still never collects or moves money.
 
 ## Purpose
@@ -40,6 +41,7 @@ Each session has a **Payments** list of its roster players (waitlisted players a
 
 - **Amount due per player:** the full payment per head: the session's custom amount when one is set, otherwise the break-even share. Never the entrance fee alone; the intro notes when the amount includes it. With no estimate saved, there is no amount ("No fee set").
 - The operator ticks a player as **paid** (one switch per player) or uses **Mark all paid**; unticking marks them not paid again. Each tick records the time and the amount due then.
+- **Owner decision, November 1, 2026 (#300):** payment switches update optimistically, then save desired end states together after 800 ms without another switch. A switch returned to its accepted state in the window needs no write. Flush before Mark all paid and on tab/sheet/page exit. A failed batch rolls back only its changes, preserving newer intent. Show one summary toast per accepted batch; recorded amounts and storage stay unchanged.
 - Totals: paid count (e.g. 15/18), **collected**, **still due** (unpaid players × amount), and collected **against costs** (over or short of the estimated total cost).
 - Filter: Everyone, Not paid, Paid. Unpaid players are listed first.
 - It is available before, during and after the session: on the preparation page, from **Payments** in the live console, and in the session record's Financials tab. Ticks are ordinary changes that work offline and sync.

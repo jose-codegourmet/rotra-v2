@@ -1170,6 +1170,30 @@ function flushPresence() {
 window.addEventListener('pagehide', flushPresence);
 document.addEventListener('visibilitychange', () => { if (document.hidden) flushPresence(); });
 
+// Payments keep one end state per player and one summary per accepted batch (#300).
+const paymentPending = new Map();
+let paymentTimer = null;
+function flushPayments() {
+  clearTimeout(paymentTimer); paymentTimer = null;
+  const changes = [...paymentPending.values()]; paymentPending.clear();
+  if (!changes.length) return;
+  const session = S.sessions.find((s) => s.id === changes[0].sid);
+  if (!session) return;
+  const error = ['invalid', 'finalizing'].includes(session.status) ? 'Payments are not available for this session.'
+    : S.licenseExpired && session.status !== 'active' ? 'Your license has ended.'
+    : !S.online && session.download !== 'ready' ? 'No downloaded copy on this device. Connect, or download first.' : null;
+  if (error) {
+    for (const item of changes) { if (item.before) session.payments[item.pid] = item.before; else delete session.payments[item.pid]; }
+    S.ui.paymentError = error; toast(error); render(); return;
+  }
+  const previousAct = curAct; curAct = 'togglePaid';
+  commit(`${changes.length} payment mark${changes.length === 1 ? '' : 's'} saved`);
+  curAct = previousAct; render();
+}
+window.addEventListener('pagehide', flushPayments);
+window.addEventListener('beforeunload', flushPayments);
+document.addEventListener('visibilitychange', () => { if (document.hidden) flushPayments(); });
+
 // ---------- Icons ----------
 const I = {
   n_plus: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
@@ -1900,6 +1924,7 @@ function paymentsPanel(s) {
   const rows = all.filter((x) => f === 'all' || (f === 'paid' ? x.paid : !x.paid));
   return `<section class="card stack" id="payments"><div class="between"><div><h2>Payments</h2><p class="small muted">${due != null ? `${peso(due)} per player (${s.finance.custom ? 'custom amount' : 'break-even share'}${s.finance.entryFee ? `, includes the ${peso(s.finance.entryFee)} entrance fee` : ''}).` : 'No fee set for this session.'} Tick players as they pay. ROTRA only records it; money is collected outside the app.</p></div>
       ${all.length && paidN < all.length ? '<button class="btn sm" data-act="markAllPaid">Mark all paid</button>' : ''}</div>
+    ${S.ui.paymentError ? notice('bad', esc(S.ui.paymentError)) : ''}
     <div class="tiles4">
       <div class="card"><span class="label">Paid</span><b class="big tnum">${paidN}<span class="small muted">/${all.length}</span></b></div>
       <div class="card"><span class="label">Collected</span><b class="big tnum">${peso(collected)}</b></div>
@@ -3475,7 +3500,7 @@ function applyVenue(v, msg) {
   S.ui.sheet = null; render();
   toast(msg || (fee || entry ? `${v.name} · ${[fee && `court fee ${peso(v.courtFee)}/h`, entry && `entrance ${peso(v.entranceFee)}`].filter(Boolean).join(' and ')} filled in` : `${v.name} selected`));
 }
-function closeSheet() { S.ui.sheet = null; render(); }
+function closeSheet() { flushPayments(); S.ui.sheet = null; render(); }
 function go(to, id) {
   if (id) S.currentId = id;
   S.ui.sheet = null; S.ui.guest = false; S.ui.navOpen = false; S.ui.setOpen = false;
@@ -3807,14 +3832,22 @@ const ACT = {
   payFilter: (d) => { S.ui.payF = d.k; render(); },
   togglePaid: (d) => {
     const s = cur(); s.payments = s.payments || {};
-    if (s.payments[d.pid]) { delete s.payments[d.pid]; commit(`${nm(d.pid)} marked not paid`); }
-    else { const due = duePerHead(s) || 0; s.payments[d.pid] = { at: Date.now(), amount: due }; commit(`${nm(d.pid)} paid ${peso(due)}`); }
-    render();
+    if (paymentPending.size && [...paymentPending.values()][0].sid !== s.id) flushPayments();
+    S.ui.paymentError = null;
+    const before = paymentPending.get(d.pid) || { sid: s.id, pid: d.pid, before: s.payments[d.pid] };
+    if (s.payments[d.pid]) delete s.payments[d.pid];
+    else s.payments[d.pid] = { at: Date.now(), amount: duePerHead(s) || 0 };
+    if (!!s.payments[d.pid] === !!before.before) {
+      if (before.before) s.payments[d.pid] = before.before;
+      paymentPending.delete(d.pid);
+    } else paymentPending.set(d.pid, before);
+    clearTimeout(paymentTimer); paymentTimer = setTimeout(flushPayments, 800); render();
   },
   markAllPaid: () => {
-    const s = cur(); s.payments = s.payments || {}; const due = duePerHead(s) || 0; let n = 0;
-    s.roster.forEach((r) => { if (!s.payments[r.pid]) { s.payments[r.pid] = { at: Date.now(), amount: due }; n++; } });
-    commit(`${n} player${n === 1 ? '' : 's'} marked paid`); render();
+    flushPayments();
+    const s = cur(); s.payments = s.payments || {};
+    s.roster.filter((r) => !s.payments[r.pid]).forEach((r) => ACT.togglePaid({ pid: r.pid }));
+    flushPayments();
   },
   giveSlot: (d) => {
     const s = cur(); const w = (s.waitlist || []).find((x) => x.pid === d.pid); if (!w) return;
@@ -4142,6 +4175,7 @@ document.addEventListener('click', (e) => {
   if (!fn) return;
   e.preventDefault();
   if (el.dataset.act !== 'togglePresent' && (AREA[el.dataset.act] === 'Roster' || ['pane', 'prepTab', 'go', 'openAdd', 'makeMatch', 'openEditor', 'openSessionDone'].includes(el.dataset.act))) flushPresence();
+  if (['markAllPaid', 'pane', 'prepTab', 'histTab', 'go', 'goClub', 'openSessionDone', 'closeSheet'].includes(el.dataset.act)) flushPayments();
   if (el.dataset.act === 'plSet') heldPresence = null;
   curAct = el.dataset.act;
   if (!el.closest('.sheet') && !el.classList.contains('scrim')) lastTrigger = { act: el.dataset.act, id: el.dataset.id || el.dataset.pid || '' };
@@ -4374,6 +4408,7 @@ function prototypePath() {
 }
 function applyPrototypeRoute(url) {
   flushPresence();
+  flushPayments();
   const path = url.pathname.slice('/queue'.length);
   let screen = Object.entries(queuePaths).find(([, value]) => value === path)?.[0];
   let session = null;

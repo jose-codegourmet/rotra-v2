@@ -5,3 +5,8 @@ export type SessionPaymentMark = {
   currency: 'PHP'
   markedAt: number
 }
+
+export type SetPaymentMarksInput = {
+  sessionId: string
+  marks: { clubPlayerId: string; paid: boolean }[]
+}

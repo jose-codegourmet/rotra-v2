@@ -1,6 +1,7 @@
 # Cross-product states and permissions
 
 **Last verified:** 2026-11-01.
+**Last verified:** 2026-11-01.
 
 **Status:** Screen behavior contract. A proposed screen cannot weaken these agreed access/result boundaries.
 
@@ -114,3 +115,9 @@ The live clock refreshes eligibility every second, including while Start match i
 ### Presence batches (mock, #324)
 
 Presence switches remain interactive while saving. A pending optimistic overlay survives query refetches and shows “Saving presence…”; no saved claim appears before acceptance. A failed batch removes only its unchanged revisions, leaving later taps intact, with one existing error toast. Offline without a downloaded copy, an expired prepared session, and finalizing/completed/invalid sessions reject the whole batch atomically. Active sessions keep the existing license-continuation exception. Before browser exit, initiate a flush and warn while it remains outstanding; destruction/reload still resets in-memory mock data.
+
+### Payment batches (mock, #300)
+
+The Payments grid stays interactive during saves. A QueryClient/session-scoped optimistic overlay drives cards, totals, filter counts and paid tab counts across preparation, the console and session records. After 800 ms without a switch, one desired-state write creates one Payments sync entry. A return to the accepted state before sending creates none. Mark all paid flushes pending switches before its batch; panel unmount, page hide and page exit also initiate a flush. Browser exit warns while work remains outstanding; mock data is in memory and resets on reload.
+
+Failed batches discard only their own unchanged revisions and preserve newer intent. The existing saveError and error toast show offline-without-download, invalid/finalizing-session, license and local-save failures. Existing accepted amounts/timestamps survive a paid-to-unpaid-to-paid cancellation. Active-session license continuation remains allowed. Success shows “N payment marks saved” / “1 payment mark saved”, including the existing offline suffix.

@@ -33,6 +33,9 @@ for (const file of ['index.html', 'index.css', 'router.js']) {
 for (const product of ['player', 'queue', 'admin']) {
   const file = `${product}-app/rotra-${product}.html`
   const html = await readFile(new URL(file, root), 'utf8')
+  if (!/<meta\s+name=["']?viewport/i.test(html)) {
+    throw new Error(`${file} has no viewport meta; phones would render the desktop layout`)
+  }
   await mkdir(new URL(`${product}-app/`, publicOutput), { recursive: true })
   await writeFile(
     new URL(file, publicOutput),

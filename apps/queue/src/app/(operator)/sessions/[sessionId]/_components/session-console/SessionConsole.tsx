@@ -97,7 +97,7 @@ const MODE_LABELS = { chill: 'Chill', fair: 'Fair', hard: 'Hard' } as const
 
 /**
  * Q-CONSOLE: the live session shell. Header with the mode, formats and minimum chips and the
- * Home / Public page / Copy Facebook post / Extend time / Join requests · N actions, the view tabs
+ * Home / Session settings / Public page / Copy Facebook post / Extend time / Join requests · N actions, the view tabs
  * with live counts, the view panels (Session here; the others arrive in their own containers), the
  * ConsoleFooterBar and the dock's Session done pill. Sessions that are not live go to their own
  * screen: prepared to /preparation, finalizing to /finishing, finished or invalid to /record,
@@ -281,6 +281,9 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
             <>
               <Button size="sm" asChild>
                 <Link href="/">Home</Link>
+              </Button>
+              <Button size="sm" asChild>
+                <Link href={`/sessions/${sessionId}/preparation`}>Session settings</Link>
               </Button>
               <Button size="sm" asChild>
                 <Link href={`/sessions/${sessionId}/public-page`}>Public page</Link>

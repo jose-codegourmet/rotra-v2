@@ -10,7 +10,7 @@
 
 **Entry:** Start session, **Continue session** from home or the calendar, or the license gate's **Continue active session**. Private operator UI, not the public page.
 
-**Header:** “Live session” with chips for mode, formats, and “Min N games”; title; “VENUE · Started HH:MM · Ends HH:MM”. Actions: **Home**, **Public page**, **Copy Facebook post**, **Extend time**, and **Join requests · N** (primary) while guest requests are waiting; it opens the same request list as preparation in a sheet, where confirmed guests are added present with their level locked.
+**Header:** “Live session” with chips for mode, formats, and “Min N games”; title; “VENUE · Started HH:MM · Ends HH:MM”. Actions: **Home**, **Session settings** (opens the read-only Q-PREPARE summary during play), **Public page**, **Copy Facebook post**, **Extend time**, and **Join requests · N** (primary) while guest requests are waiting; it opens the same request list as preparation in a sheet, where confirmed guests are added present with their level locked.
 
 Offline notice: “Working offline on this device. Matches, results and roster changes save here and sync when you reconnect. Session done needs internet.”
 

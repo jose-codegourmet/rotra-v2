@@ -24,6 +24,8 @@ export type RosterRowProps = {
   present: boolean
   /** Levels lock when the session starts: the level shows as text with a lock, no select */
   levelLocked?: boolean
+  /** Settings summary: presence is text and removal is unavailable. */
+  readOnly?: boolean
   onOpenProfile: () => void
   onLevelChange: (level: PlayingLevel) => void
   onPresentChange: (present: boolean) => void
@@ -45,6 +47,7 @@ export function RosterRow({
   level,
   present,
   levelLocked,
+  readOnly = false,
   onOpenProfile,
   onLevelChange,
   onPresentChange,
@@ -73,7 +76,7 @@ export function RosterRow({
         </div>
       </div>
       <div className="order-2 flex min-w-0 flex-col gap-1 sm:order-none">
-        {levelLocked ? (
+        {levelLocked || readOnly ? (
           <>
             <span className="inline-flex min-w-0 items-center gap-1.5 font-semibold">
               <Icon name="lock" size={13} className="shrink-0 text-fg2" />
@@ -81,7 +84,7 @@ export function RosterRow({
               <span className="sr-only"> (locked)</span>
             </span>
             <span className="text-[13px] text-fg2">
-              Level locked for this session. Levels can't change after the session starts.
+              Fixed after start. Levels can't change after the session starts.
             </span>
           </>
         ) : (
@@ -96,16 +99,24 @@ export function RosterRow({
         <LevelDiffIndicator id={diffId} level={level} suggestion={suggestion} />
       </div>
       <div className="order-3 flex flex-nowrap items-center justify-between gap-2 sm:order-none sm:justify-start">
-        <span className="text-[13px] text-fg2">Present</span>
-        <Switch checked={present} onChange={onPresentChange} aria-label={`${name} present`} />
-        <IconButton
-          size="xs"
-          variant="ghost"
-          label={`Remove ${name} from roster`}
-          onClick={onRemove}
-        >
-          <Icon name="x" />
-        </IconButton>
+        <span className="text-[13px] text-fg2">
+          {readOnly ? (present ? 'Present' : 'Away') : 'Present'}
+        </span>
+        {!readOnly ? (
+          <>
+            <Switch checked={present} onChange={onPresentChange} aria-label={`${name} present`} />
+            {!levelLocked ? (
+              <IconButton
+                size="xs"
+                variant="ghost"
+                label={`Remove ${name} from roster`}
+                onClick={onRemove}
+              >
+                <Icon name="x" />
+              </IconButton>
+            ) : null}
+          </>
+        ) : null}
       </div>
     </div>
   )

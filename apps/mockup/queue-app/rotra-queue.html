@@ -155,6 +155,10 @@ button.conn:hover { border-color: var(--accent); background: var(--surface); }
 .kv { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 16px; font-size: 14px; margin: 0; }
 .kv dt { color: var(--fg2); }
 .kv dd { margin: 0; min-width: 0; }
+@media (max-width: 420px) {
+  .live-settings .kv { grid-template-columns: minmax(0, 1fr); row-gap: 0; }
+  .live-settings .kv dd { margin-bottom: 8px; }
+}
 .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 16px; }
 .empty { padding: 24px 12px; text-align: center; color: var(--fg2); font-size: 14px; }
 
@@ -2331,26 +2335,33 @@ function waitlistPanel(s) {
 // Preparation Overview tab: setup summary, this device, and the session link.
 function prepOverview(s) {
   const est = sessionEstimate(s);
+  const live = s.status === 'active';
+  const courtWindowText = (c) => {
+    const t = (at) => `${fmtTime(at)}${new Date(at).toDateString() !== new Date(s.start).toDateString() ? ' · next day' : ''}`;
+    return `${t(courtStart(s, c))}–${t(courtUntil(s, c))}${c.until ? ' · set time' : ' · follows session end'}`;
+  };
   const present = s.roster.filter((r) => r.present).length;
   const dl = { none: ['Not downloaded on this device', ''], downloading: ['Downloading…', 'warn'], ready: ['Ready on this device', 'ok'] }[s.download];
-  return `    <div class="grid2">
-      <section class="card stack"><h2>Setup</h2><dl class="kv">
-        <dt>Courts</dt><dd>${s.courts.map((c) => esc(c.label)).join(', ')}</dd>
-        <dt>Formats</dt><dd>${fmtFormats(s)}</dd>
-        <dt>Mode</dt><dd>${MODES[s.mode].label} · <span class="muted">${MODES[s.mode].text}</span></dd>
-        <dt>Minimum</dt><dd>${s.minimum} completed games per player<br><span class="small muted">${s.minAuto !== false ? `Calculated: ${s.roster.length || s.expected || 12} players on ${est.usable} court${est.usable > 1 ? 's' : ''} for ${fmtDur(s.start, s.end)} gives about ${est.low}–${est.high} games each. Updates as the roster changes.` : `Set by you. The estimate suggests ${est.low}–${est.high}.`}</span></dd>
+  return `    <div class="${live ? 'stack' : 'grid2'}">
+      <section class="card stack${live ? ' live-settings' : ''}"><h2>Setup</h2><dl class="kv">
+        <dt>Courts</dt><dd>${s.courts.map((c) => live ? `${esc(c.label)} · ${courtWindowText(c)}` : esc(c.label)).join(live ? '<br>' : ', ')}</dd>
+        <dt>Formats</dt><dd>${fmtFormats(s)}${live ? ' · <span class="small muted">Fixed after start</span>' : ''}</dd>
+        <dt>Mode</dt><dd>${MODES[s.mode].label} · <span class="muted">${MODES[s.mode].text}</span>${live ? ' · <span class="small muted">Fixed after start</span>' : ''}</dd>
+        <dt>Minimum</dt><dd>${s.minimum} completed games per player<br><span class="small muted">${live ? `Fixed after start · ${s.minAuto !== false ? 'Calculated before start' : 'Set by you'}.` : s.minAuto !== false ? `Calculated: ${s.roster.length || s.expected || 12} players on ${est.usable} court${est.usable > 1 ? 's' : ''} for ${fmtDur(s.start, s.end)} gives about ${est.low}–${est.high} games each. Updates as the roster changes.` : `Set by you. The estimate suggests ${est.low}–${est.high}.`}</span></dd>
         <dt>Roster</dt><dd>${s.roster.length} confirmed · ${present} present</dd>
-        ${s.finance ? (() => { const c = financeCalc(s.finance, s.courts.length, Math.round((s.end - s.start) / 60000), s.roster.length || s.expected); return `<dt>Costs</dt><dd>${peso(c.total)} estimated · ${peso(c.share)} a player to break even<br><span class="small muted">Players pay ${peso(c.perHead)}${c.custom ? ' (custom amount)' : ' (break-even)'}</span> · ${resultText(c)}</dd>`; })() : ''}</dl></section>
-      <section class="card stack"><div class="between"><h2>This device</h2>${chip(dl[0], dl[1])}</div>
+        ${s.finance ? (() => { const c = financeCalc(s.finance, s.courts.length, Math.round((s.end - s.start) / 60000), s.roster.length || s.expected); return `<dt>Costs</dt><dd>${peso(c.total)} estimated · ${peso(c.share)} a player to break even<br><span class="small muted">Players pay ${peso(c.perHead)}${c.custom ? ' (custom amount)' : ' (break-even)'}</span> · ${resultText(c)}</dd>`; })() : ''}${live && s.notes ? `<dt>Notes</dt><dd>${esc(s.notes)}</dd>` : ''}</dl>
+      ${live ? `<div class="row acts"><button class="btn sm" data-act="openAdjust">Courts and time</button><button class="btn sm" data-act="openAdd">Add player</button><button class="btn sm" data-act="openRequests">Join requests · ${pendingReqs(s).length}</button><button class="btn sm" data-act="openPayments">Payments</button></div>` : ''}</section>
+      ${!live ? `<section class="card stack"><div class="between"><h2>This device</h2>${chip(dl[0], dl[1])}</div>
         <p class="small muted">Download the session so this device can keep running it if the venue's internet drops. A download on one device doesn't prepare any other device.</p>
         <div class="row"><button class="btn sm" data-act="download" ${!S.online || s.download === 'downloading' ? 'disabled' : ''}>${s.download === 'ready' ? 'Update download' : 'Download for offline use'}</button></div>
-        ${!S.online ? '<p class="small muted">Downloading needs an internet connection.</p>' : ''}</section>
+        ${!S.online ? '<p class="small muted">Downloading needs an internet connection.</p>' : ''}</section>` : ''}
     </div>
     ${linkCard(s)}`;
 }
 // ---------- Q-PREPARE ----------
 function viewPrepare() {
   const s = cur();
+  const live = s.status === 'active';
   const est = sessionEstimate(s);
   if (s.minAuto !== false && s.status === 'prepared') s.minimum = est.low;
   const missing = s.roster.filter((r) => r.level == null).length;
@@ -2360,35 +2371,35 @@ function viewPrepare() {
   const cantStart = missing || other || (!S.online && s.download !== 'ready') || S.licenseExpired;
   return `<main class="wrap">
     <div class="crumb"><button class="btn sm ghost" data-act="go" data-to="home">${I.back} Home</button></div>
-    <div class="between"><div class="stack tight"><span class="label">Preparation</span><h1>${esc(s.title)}</h1><p class="muted">${fmtDate(s.start)} · ${fmtTime(s.start)}–${fmtTime(s.end)} · ${esc(s.venue)}</p></div>
-      <div class="row acts"><button class="btn sm" data-act="editSetup">Edit preparation</button><button class="btn sm" data-act="go" data-to="public">Preview public page</button><button class="btn sm" data-act="openPost">Copy Facebook post</button></div></div>
-    ${pendingReqs(s).length ? requestsPanel(s) : ''}
+    <div class="between"><div class="stack tight"><span class="label">${live ? 'Session settings' : 'Preparation'}</span><h1>${esc(s.title)}</h1><p class="muted">${fmtDate(s.start)} · ${fmtTime(s.start)}–${fmtTime(s.end)} · ${esc(s.venue)}</p></div>
+      <div class="row acts">${live ? '<button class="btn sm" data-act="go" data-to="console">Back to live session</button>' : '<button class="btn sm" data-act="editSetup">Edit preparation</button>'}<button class="btn sm" data-act="go" data-to="public">Preview public page</button><button class="btn sm" data-act="openPost">Copy Facebook post</button></div></div>
+    ${live ? notice('', 'Preparation values are read-only during play. Mode, formats, minimum and playing levels are fixed after start. Use the live controls in Overview to manage courts, time, arrivals, requests and payments.') : pendingReqs(s).length ? requestsPanel(s) : ''}
     ${(() => {
       const tab = ['overview', 'roster', 'waitlist', 'payments'].includes(S.ui.prepTab) ? S.ui.prepTab : 'overview';
       const paidN = Object.keys(s.payments || {}).filter((pid) => R(s, pid)).length;
       const tabs = [['overview', 'Overview', null], ['roster', 'Roster and levels', `${s.roster.length}/${capacityOf(s)}`], ['waitlist', 'Waitlist', (s.waitlist || []).length], ['payments', 'Payments', `${paidN}/${s.roster.length} paid`]];
-      return `<div class="tabs" role="tablist" aria-label="Preparation">${tabs.map(([k, l, n]) => `<button role="tab" id="ptb-${k}" aria-selected="${tab === k}" aria-controls="prep-panel" data-act="prepTab" data-k="${k}">${l}${n != null ? ` <span class="chip">${n}</span>` : ''}</button>`).join('')}</div>
+      return `<div class="tabs" role="tablist" aria-label="${live ? 'Session settings' : 'Preparation'}">${tabs.map(([k, l, n]) => `<button role="tab" id="ptb-${k}" aria-selected="${tab === k}" aria-controls="prep-panel" data-act="prepTab" data-k="${k}">${l}${n != null ? ` <span class="chip">${n}</span>` : ''}</button>`).join('')}</div>
       <div id="prep-panel" role="tabpanel" aria-labelledby="ptb-${tab}" class="stack">${tab === 'overview' ? prepOverview(s) : tab === 'waitlist' ? waitlistPanel(s) : tab === 'payments' ? paymentsPanel(s) : `<section class="card stack">
-      <div class="between"><div><h2>Roster and levels</h2><p class="small muted">Confirm each player's slot and set their level for this club. Levels lock when the session starts.</p></div>
-        <div class="row acts">${s.roster.some((r) => !r.present) ? '<button class="btn sm" data-act="allPresent">Mark all present</button>' : ''}${s.roster.some((r) => r.present) ? '<button class="btn sm" data-act="allAbsent">Mark all absent</button>' : ''}<button class="btn sm primary" data-act="openAdd">Add player</button></div></div>
+      <div class="between"><div><h2>Roster and levels</h2><p class="small muted">${live ? 'Fixed after start: playing levels. Manage presence in the live Players view.' : "Confirm each player's slot and set their level for this club. Levels lock when the session starts."}</p></div>
+        <div class="row acts">${!live && s.roster.some((r) => !r.present) ? '<button class="btn sm" data-act="allPresent">Mark all present</button>' : ''}${!live && s.roster.some((r) => r.present) ? '<button class="btn sm" data-act="allAbsent">Mark all absent</button>' : ''}<button class="btn sm primary" data-act="openAdd">Add player</button></div></div>
       ${slotMeter(s)}
       ${missing ? notice('warn', `${missing} player${missing > 1 ? 's need' : ' needs'} a level before the session can start.`) : ''}
       ${s.roster.length ? `<div class="list">${s.roster.map((r) => { const p = P(r.pid); return `<div class="prow">
         <div class="li" style="padding:0">${faceBtn(p)}<div class="main"><div class="pn"><b>${esc(p.name)}</b></div><div class="row" style="gap:6px">${identChip(p)}<span class="small muted">${p.sugg != null ? `Suggestion: ${esc(lvLabel(p.sugg))}` : 'No suggestion'}</span></div></div></div>
-        <div class="lvcol">${selectLevel(`lv-${r.pid}`, r.level, `data-act-change="setLevel" data-pid="${r.pid}" aria-label="Level for ${esc(p.name)} at this club" aria-describedby="lvd-${r.pid}"`, r.level == null)}${levelDiff(r.level, p.sugg, `lvd-${r.pid}`)}</div>
-        <div class="row" style="flex-wrap:nowrap"><span class="small muted">Present</span>${sw(r.present, 'togglePresent', `data-pid="${r.pid}"`, `${p.name} present`)}<button class="btn xs ghost icon-btn" data-act="removeRoster" data-pid="${r.pid}" aria-label="Remove ${esc(p.name)} from roster">${I.x}</button></div>
+        <div class="lvcol">${live ? `<b>${esc(lvLabel(r.level))} · Fixed after start</b>` : selectLevel(`lv-${r.pid}`, r.level, `data-act-change="setLevel" data-pid="${r.pid}" aria-label="Level for ${esc(p.name)} at this club" aria-describedby="lvd-${r.pid}"`, r.level == null)}${levelDiff(r.level, p.sugg, `lvd-${r.pid}`)}</div>
+        ${live ? `<span class="small muted">${r.present ? 'Present' : 'Away'}</span>` : `<div class="row" style="flex-wrap:nowrap"><span class="small muted">Present</span>${sw(r.present, 'togglePresent', `data-pid="${r.pid}"`, `${p.name} present`)}<button class="btn xs ghost icon-btn" data-act="removeRoster" data-pid="${r.pid}" aria-label="Remove ${esc(p.name)} from roster">${I.x}</button></div>`}
       </div>`; }).join('')}</div>` : '<div class="empty">No players yet. Add players from your saved list or as new guests.</div>'}
     </section>`}</div>`;
     })()}
   </main>
-  <div class="footer-bar ${cantStart ? 'dock-note' : 'dock-dup'}"><div class="in">
+  ${!live ? `<div class="footer-bar ${cantStart ? 'dock-note' : 'dock-dup'}"><div class="in">
     <span class="small ${cantStart ? 'start-why' : 'muted'}">${other ? `${esc(other.title)} is already running. One session at a time. <button class="btn xs" data-act="go" data-to="console" data-id="${other.id}">Open ${esc(other.title)}</button>`
       : S.licenseExpired ? 'Your license has ended, so new sessions can’t start.'
       : !S.online && s.download !== 'ready' ? 'No downloaded copy on this device. Connect, or download first.'
       : missing ? `${missing} player${missing > 1 ? 's need' : ' needs'} a level before you can start.`
       : `${s.roster.length} players · ${present} present. Starting locks levels; no match starts by itself.`}</span>
     <button class="btn primary" data-act="openStart" ${cantStart ? 'disabled' : ''}>Start session</button>
-  </div></div>`;
+  </div></div>` : ''}`;
 }
 
 // ---------- Q-CONSOLE ----------
@@ -2401,7 +2412,7 @@ function viewConsole() {
     <div class="between">
       <div class="stack tight"><div class="row"><span class="label">Live session</span>${chip(MODES[s.mode].label)}${chip(fmtFormats(s))}${chip(`Min ${s.minimum} games`)}</div>
         <h1>${esc(s.title)}</h1><p class="muted small">${esc(s.venue)} · Started ${fmtTime(s.startedAt)} · Ends ${fmtTime(s.end)}</p></div>
-      <div class="row acts"><button class="btn sm" data-act="go" data-to="home">Home</button><button class="btn sm" data-act="go" data-to="public">Public page</button><button class="btn sm" data-act="openPost">Copy Facebook post</button><button class="btn sm" data-act="openPayments">Payments</button><button class="btn sm" data-act="openAdjust">Extend time</button>${pendingReqs(s).length ? `<button class="btn sm primary" data-act="openRequests">Join requests · ${pendingReqs(s).length}</button>` : ''}</div>
+      <div class="row acts"><button class="btn sm" data-act="go" data-to="home">Home</button><button class="btn sm" data-act="go" data-to="prepare">Session settings</button><button class="btn sm" data-act="go" data-to="public">Public page</button><button class="btn sm" data-act="openPost">Copy Facebook post</button><button class="btn sm" data-act="openPayments">Payments</button><button class="btn sm" data-act="openAdjust">Extend time</button>${pendingReqs(s).length ? `<button class="btn sm primary" data-act="openRequests">Join requests · ${pendingReqs(s).length}</button>` : ''}</div>
     </div>
     ${!S.online ? notice('warn', 'Working offline on this device. Matches, results and roster changes save here and sync when you reconnect. Session done needs internet.') : ''}
     <div class="tabs" role="tablist" aria-label="Console views">
@@ -3385,6 +3396,7 @@ function go(to, id) {
   if (id) S.currentId = id;
   S.ui.sheet = null; S.ui.guest = false; S.ui.navOpen = false; S.ui.setOpen = false;
   if (to === 'results') S.ui.slide = 0;
+  if (to === 'prepare' && cur()?.status === 'active') S.ui.prepTab = 'overview';
   if (to === 'public') S.ui.pubTab = 'details';
   S.screen = to;
   render();
@@ -4268,7 +4280,8 @@ function applyPrototypeRoute(url) {
     else screen = Object.entries(sessionSuffixes).find(([, suffix]) => suffix === (match[2] ? `/${match[2]}` : ''))?.[0];
     // Re-entry only selects an available view; it must never restart finalization.
     if (match?.[2] === 'recovery' || screen === 'finalizing' || (screen === 'console' && session.status !== 'active')) screen = session.status === 'active' ? 'console' : session.status === 'prepared' ? 'prepare' : 'history';
-    if (['prepare', 'setup'].includes(screen) && session.status !== 'prepared') screen = session.status === 'active' ? 'console' : 'history';
+    if (screen === 'setup' && session.status !== 'prepared') screen = session.status === 'active' ? 'console' : 'history';
+    if (screen === 'prepare' && !['prepared', 'active'].includes(session.status)) screen = 'history';
     if (screen === 'results' && session.status !== 'finalized') screen = session.status === 'prepared' ? 'prepare' : session.status === 'active' ? 'console' : 'history';
   }
   if (!screen) return false;

@@ -5,6 +5,7 @@ export const rosterRowMeta = {
   description:
     'One confirmed slot on the preparation roster: picture, name, identity chip, the Player Information suggestion, the level select with its diff indicator, the Present switch and remove.',
   usage: [
+    'Read-only Session settings passes readOnly for locked level and presence text without removal or presence controls.',
     'Use inside RosterPanel for every player with a slot in a prepared session.',
     'Do not use in the live console: Queue › Players shows locked levels and no remove action (PlayerPoolCard).',
     'The level select is highlighted while the level is missing; pass levelLocked once the session started: the level becomes text with a lock icon and "Level locked for this session", no edit path.',

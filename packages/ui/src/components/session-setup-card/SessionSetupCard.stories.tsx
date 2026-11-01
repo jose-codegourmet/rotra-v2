@@ -1,3 +1,6 @@
+import { queueSessionFixtures } from '@rotra/data/fixtures/queueSessions'
+import { Button } from '@rotra/ui/button'
+import { formatTime } from '@rotra/ui/now-card/helpers'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { SessionSetupCard } from './SessionSetupCard'
 
@@ -43,3 +46,24 @@ export const WithCosts: Story = {
   },
 }
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
+
+export const LiveSettings: Story = {
+  args: {
+    fixedAfterStart: true,
+    courtLabels: queueSessionFixtures.courts
+      .filter((court) => court.sessionId === queueSessionFixtures.sessions[0]?.id)
+      .map((court) => {
+        const session = queueSessionFixtures.sessions[0]
+        if (!session) throw new Error('Session fixture missing')
+        return `${court.label} · ${formatTime(court.startsAt ?? session.scheduledStartAt)}–${formatTime(court.openUntil ?? session.scheduledEndAt)} · ${court.openUntil === null ? 'follows session end' : 'set time'}`
+      }),
+    actions: (
+      <>
+        <Button size="sm">Courts and time</Button>
+        <Button size="sm">Add player</Button>
+        <Button size="sm">Join requests · 0</Button>
+        <Button size="sm">Payments</Button>
+      </>
+    ),
+  },
+}

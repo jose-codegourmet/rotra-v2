@@ -5,6 +5,7 @@ export const preparationRosterMeta = {
   description:
     'Q-ROSTER in preparation: the Roster and levels tab (RosterPanel) and the Waitlist tab (WaitlistPanel) on useSessionRoster, with useSetRosterLevel, useSetPresence, useSetAllPresence, useRemoveRosterPlayer, useGiveSlot, useFillOpenSlots and useRemoveFromWaitlist; player pictures open PlayerProfileSheet and Add player opens the shared AddPlayer container.',
   usage: [
+    'Active Session settings reuses this container with a read-only roster: locked levels, presence text, no removal, and the existing Add player sheet. The Waitlist keeps its existing live admission controls.',
     'Rendered by SessionPreparation inside the Roster and levels and Waitlist tab panels with tab="roster" or tab="waitlist".',
     'Level changes save immediately with their toast; removing a roster player is immediate with its toast and no dialog. Each mutation toasts the mutation message and toast.error on failure.',
     'Saved-player details (identity, suggestion, profile fields) come from useClubPlayers by clubPlayerId; the roster entries carry the name snapshot, level and presence.',

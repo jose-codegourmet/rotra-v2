@@ -18,7 +18,9 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(login)
   }
   if (dataMode() === 'real') {
-    const session = await refreshProxySession(request, () => NextResponse.next({ request }))
+    const session = await refreshProxySession('player', request, () =>
+      NextResponse.next({ request }),
+    )
     if (protectedPath && !session.signedIn) {
       const redirect = toLogin()
       session.carryTo(redirect)

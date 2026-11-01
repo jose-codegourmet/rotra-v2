@@ -1,4 +1,5 @@
 import 'server-only'
+import type { AccountAudience } from './account-context'
 import { MOCK_COOKIE_PREFIX } from './data-mode'
 import { type CookieToSet, verifySubject } from './supabase'
 
@@ -20,12 +21,13 @@ type ProxyResponse = {
 /**
  * Real-mode session check for `proxy.ts`. Refreshes the Supabase session cookies (on the request,
  * so the route sees them, and on the response), deletes mock session cookies, and reports whether a
- * verified session exists. `next` builds the pass-through response (`() => NextResponse.next({ request })`).
+ * verified session exists. `audience` picks the app's own sign-in cookie (see `authCookieName`). `next` builds the pass-through response (`() => NextResponse.next({ request })`).
  *
  * Navigation only: every Route Handler still authorizes through `@rotra/db/service/handler`, because
  * the proxy alone is not a security boundary. No database access, so the proxy never loads Prisma.
  */
 export async function refreshProxySession<R extends ProxyResponse>(
+  audience: AccountAudience,
   request: ProxyRequest,
   next: () => R,
 ) {
@@ -37,16 +39,19 @@ export async function refreshProxySession<R extends ProxyResponse>(
     .map((cookie) => cookie.name)
     .filter((name) => name.startsWith(MOCK_COOKIE_PREFIX))
 
-  const verified = await verifySubject({
-    getAll: () =>
-      request.cookies.getAll().filter((cookie) => !cookie.name.startsWith(MOCK_COOKIE_PREFIX)),
-    setAll: (values, headers) => {
-      for (const { name, value } of values) request.cookies.set(name, value)
-      response = next()
-      refreshed = values
-      refreshHeaders = headers
+  const verified = await verifySubject(
+    {
+      getAll: () =>
+        request.cookies.getAll().filter((cookie) => !cookie.name.startsWith(MOCK_COOKIE_PREFIX)),
+      setAll: (values, headers) => {
+        for (const { name, value } of values) request.cookies.set(name, value)
+        response = next()
+        refreshed = values
+        refreshHeaders = headers
+      },
     },
-  })
+    audience,
+  )
 
   /** Applies the refreshed cookies, no-store headers and mock-cookie deletion to a response. */
   const carryTo = (target: ProxyResponse) => {

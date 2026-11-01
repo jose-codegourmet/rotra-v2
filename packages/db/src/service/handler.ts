@@ -48,7 +48,7 @@ export async function handleAccountRequest<A extends AccountAudience>(
 ): Promise<Response> {
   try {
     if (dataMode() !== 'real') throw new ServiceError('unavailable')
-    const verified = await verifySubject(withoutMockCookies(cookies))
+    const verified = await verifySubject(withoutMockCookies(cookies), audience)
     if (!verified) throw new ServiceError('unauthenticated')
     const context = await loadAccountContext(verified, audience)
     if (!context) throw new ServiceError('wrong_account')

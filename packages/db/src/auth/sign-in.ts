@@ -70,7 +70,7 @@ export async function handleSignIn(
         ? 'Enter your club username and password.'
         : 'Enter your sign-in details.',
     )
-  const supabase = createSupabaseServer(withoutMockCookies(cookies))
+  const supabase = createSupabaseServer(withoutMockCookies(cookies), audience)
   const email = audience === 'club' ? clubLoginEmail(identifier) : identifier.toLowerCase()
   const { data, error } = await supabase.auth.signInWithPassword({ email, password })
   if (error || !data.user) {
@@ -93,7 +93,7 @@ export async function handleSessionRead(
 ): Promise<Response> {
   const signedOut = audience === 'admin' ? { kind: 'signed-out', sessionEnded: false } : null
   if (dataMode() !== 'real') return json(200, signedOut)
-  const supabase = createSupabaseServer(withoutMockCookies(cookies))
+  const supabase = createSupabaseServer(withoutMockCookies(cookies), audience)
   const { data, error } = await supabase.auth.getClaims()
   const subject = data?.claims?.sub
   if (error || typeof subject !== 'string' || !subject) return json(200, signedOut)
@@ -108,6 +108,8 @@ export async function handleSignOut(
   ended = false,
 ): Promise<Response> {
   if (dataMode() === 'real')
-    await createSupabaseServer(withoutMockCookies(cookies)).auth.signOut({ scope: 'local' })
+    await createSupabaseServer(withoutMockCookies(cookies), audience).auth.signOut({
+      scope: 'local',
+    })
   return json(200, audience === 'admin' ? { kind: 'signed-out', sessionEnded: ended } : null)
 }

@@ -1,5 +1,6 @@
 'use client'
 
+import { courtNextDay } from '@rotra/schema/court-window'
 import {
   activeMatches,
   FORMAT_LABELS,
@@ -105,7 +106,7 @@ export function SessionView({
     )
 
   const courts = s.courts
-  const ctx: MatchContext = { roster: roster.data.roster, matches: matches.data, courts }
+  const ctx: MatchContext = { roster: roster.data.roster, matches: matches.data, courts, now }
   const byId = (id: string) => ctx.roster.find((p) => p.id === id)
   const clubPlayerOf = (rosterId: string) => byId(rosterId)?.clubPlayerId
   const openProfile = (rosterId: string) => {
@@ -125,8 +126,9 @@ export function SessionView({
 
   const waiting = waitingMatches(ctx.matches)
   const active = activeMatches(ctx.matches)
-  const free = freeCourts(courts, ctx.matches)
-  const untilLabel = (c: SessionCourt) => formatTime(c.openUntil ?? s.scheduledEndAt)
+  const free = freeCourts(courts, ctx.matches, now)
+  const untilLabel = (c: SessionCourt) => `${formatTime(c.openUntil ?? s.scheduledEndAt)}${courtNextDay(c.openUntil ?? s.scheduledEndAt, s.scheduledStartAt) ? ' · next day' : ''}`
+  const startLabel = (c: SessionCourt) => `${formatTime(c.startsAt ?? s.scheduledStartAt)}${courtNextDay(c.startsAt ?? s.scheduledStartAt, s.scheduledStartAt) ? ' · next day' : ''}`
   const options = {
     onSuccess: (result: { message: string }) => toast(result.message),
     onError: (error: unknown) =>
@@ -156,6 +158,7 @@ export function SessionView({
           ? m.courtIds.map((id) => courts.find((x) => x.id === id)?.label ?? 'Court').join(' + ')
           : c.label,
         untilLabel: untilLabel(c),
+      startLabel: startLabel(c),
         merged,
         teamA: m.teamA.map(player),
         teamB: m.teamB.map(player),
@@ -175,6 +178,8 @@ export function SessionView({
       variant: 'free',
       label: c.label,
       untilLabel: untilLabel(c),
+      startLabel: startLabel(c),
+      notOpen: (c.startsAt ?? s.scheduledStartAt) > now,
       bookingEnded: isBookingEnded(c, s.scheduledEndAt, now),
       isLastCourt: courts.length <= 1,
       onRemove: () => onRemoveCourt(c),

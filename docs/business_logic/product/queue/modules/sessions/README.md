@@ -90,6 +90,8 @@ Starting locks every roster level and starts no match. The console opens on the 
 
 ## Running
 
+**Owner decision, November 1, 2026 (#323):** active sessions expose **Session settings**, the read-only preparation summary. Mode, formats, minimum, saved fee/costs, notes and roster levels can be inspected; fixed fields explain that they lock after start. Existing live controls remain available through their current sheets (courts/time, adding players, join requests, payments). This does not authorize editing preparation during play.
+
 - The operator can add players at any time, including offline; late players get a level that locks immediately.
 - **Add court:** label (defaults to the next "Court N") and **Open until** — either until the session ends (moves with extensions) or until a set time within the session; the planned start determines when the court becomes available, unless the operator opens it early with **Start anyway**.
 - **Remove court:** only a free court, and a session keeps at least one court.

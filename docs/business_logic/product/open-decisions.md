@@ -38,6 +38,12 @@ The product direction is sufficiently defined for documentation. Resolve the rel
 | Expired-page behavior | Meaning/presentation of stale public pages; restoration after deletion; retention of internal club data beyond public pages |
 | Admin configuration | Effect of changing weights/eligibility on existing ranks; which flags exist, targeting, and when offline devices pick up a flag change |
 
+## Settled by the product owner on November 1, 2026
+
+| Area | Decision |
+|---|---|
+| Live preparation access (#323) | Option 1: read-only Session settings with links to existing live controls. Mode, formats, minimum and levels remain fixed after start. Mid-session editing remains unresolved above. |
+
 ## Settled by the product owner on October 28, 2026
 
 | Area | Decision |

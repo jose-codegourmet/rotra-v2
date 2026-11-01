@@ -5,6 +5,7 @@ export const rosterPanelMeta = {
   description:
     'The preparation "Roster and levels" panel: Mark all present / absent and Add player, the SlotMeter, the missing-level warning, and one RosterRow per confirmed slot.',
   usage: [
+    'Active Session settings passes readOnly to show locked levels and presence text; only Add player remains available.',
     'Use for the Roster and levels tab of a prepared Queue Session (Q-PREPARE).',
     'Mark all present shows only while someone is not present; Mark all absent only while someone is present.',
     'Do not use in the live console: Queue › Players shows locked levels and no remove action.',

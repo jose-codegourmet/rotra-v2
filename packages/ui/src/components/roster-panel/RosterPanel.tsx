@@ -30,6 +30,8 @@ export type RosterPanelProps = {
   levelsLocked?: boolean
   /** The roster is still loading: Skeleton rows in place of the list, meter and actions */
   loading?: boolean
+  /** Active settings summary: locked levels and presence text, with Add player only. */
+  readOnly?: boolean
   onMarkAllPresent: () => void
   onMarkAllAbsent: () => void
   onAddPlayer: () => void
@@ -75,6 +77,7 @@ export function RosterPanel({
   waitlistCount,
   levelsLocked,
   loading = false,
+  readOnly = false,
   onMarkAllPresent,
   onMarkAllAbsent,
   onAddPlayer,
@@ -94,8 +97,9 @@ export function RosterPanel({
           <div>
             <h2 className="text-lg font-bold">Roster and levels</h2>
             <p className="text-[13px] text-fg2">
-              Confirm each player's slot and set their level for this club. Levels lock when the
-              session starts.
+              {readOnly
+                ? 'Fixed after start: playing levels. Manage presence in the live Players view.'
+                : "Confirm each player's slot and set their level for this club. Levels lock when the session starts."}
             </p>
           </div>
           <Skeleton className="h-2 w-full rounded-full" />
@@ -110,17 +114,18 @@ export function RosterPanel({
           <div>
             <h2 className="text-lg font-bold">Roster and levels</h2>
             <p className="text-[13px] text-fg2">
-              Confirm each player's slot and set their level for this club. Levels lock when the
-              session starts.
+              {readOnly
+                ? 'Fixed after start: playing levels. Manage presence in the live Players view.'
+                : "Confirm each player's slot and set their level for this club. Levels lock when the session starts."}
             </p>
           </div>
           <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:items-center">
-            {someoneAbsent ? (
+            {!readOnly && someoneAbsent ? (
               <Button size="sm" onClick={onMarkAllPresent} className="w-full sm:w-auto">
                 Mark all present
               </Button>
             ) : null}
-            {someonePresent ? (
+            {!readOnly && someonePresent ? (
               <Button size="sm" onClick={onMarkAllAbsent} className="w-full sm:w-auto">
                 Mark all absent
               </Button>
@@ -130,14 +135,22 @@ export function RosterPanel({
               variant="primary"
               onClick={onAddPlayer}
               // The prototype's .acts: an odd last button spans both phone columns
-              className={cn('w-full sm:w-auto', someoneAbsent === someonePresent && 'col-span-2')}
+              className={cn(
+                'w-full sm:w-auto',
+                (readOnly || someoneAbsent === someonePresent) && 'col-span-2',
+              )}
             >
               Add player
             </Button>
           </div>
         </div>
-        <SlotMeter rosterCount={players.length} capacity={capacity} waitlistCount={waitlistCount} />
-        {missing ? (
+        <SlotMeter
+          live={Boolean(levelsLocked || readOnly)}
+          rosterCount={players.length}
+          capacity={capacity}
+          waitlistCount={waitlistCount}
+        />
+        {!readOnly && missing ? (
           <Notice tone="warn">
             {missing} player{missing > 1 ? 's need' : ' needs'} a level before the session can
             start.
@@ -155,6 +168,7 @@ export function RosterPanel({
                 level={p.level}
                 present={p.present}
                 levelLocked={levelsLocked}
+                readOnly={readOnly}
                 onOpenProfile={() => onOpenProfile(p.id)}
                 onLevelChange={(level) => onLevelChange(p.id, level)}
                 onPresentChange={(present) => onPresentChange(p.id, present)}

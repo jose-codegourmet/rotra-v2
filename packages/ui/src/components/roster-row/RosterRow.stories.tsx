@@ -76,3 +76,5 @@ export const Desktop: Story = {
   args: { ...rowAt(1), level: 'intermediate_low' },
   globals: { viewport: { value: 'desktop' } },
 }
+
+export const ReadOnly: Story = { args: { ...rowAt(0), levelLocked: true, readOnly: true } }

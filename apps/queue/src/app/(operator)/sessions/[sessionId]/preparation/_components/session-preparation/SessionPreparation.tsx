@@ -15,6 +15,7 @@ import { useSessionCostEstimate } from '@rotra/data/session-cost/useSessionCostE
 import { useSessionPayments } from '@rotra/data/session-payment/useSessionPayments'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { useSetAcceptJoinRequests } from '@rotra/data/session-roster/useSetAcceptJoinRequests'
+import { courtNextDay } from '@rotra/schema/court-window'
 import { formatPeso } from '@rotra/schema/money'
 import { Breadcrumb } from '@rotra/ui/breadcrumb'
 import { Button } from '@rotra/ui/button'
@@ -22,9 +23,11 @@ import { CostEstimateResult } from '@rotra/ui/cost-estimate-summary'
 import { DeleteSessionSheet } from '@rotra/ui/delete-session-sheet'
 import { DeviceDownloadCard } from '@rotra/ui/device-download-card'
 import { formatMinutes } from '@rotra/ui/forms/session-setup-form/helpers'
+import { Notice } from '@rotra/ui/notice'
 import { PageHeader } from '@rotra/ui/page-header'
 import { SessionLinkCard } from '@rotra/ui/session-link-card'
 import { SessionSetupCard } from '@rotra/ui/session-setup-card'
+import { Sheet } from '@rotra/ui/sheet'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { StartSessionBar } from '@rotra/ui/start-session-bar'
 import { StartSessionSheet } from '@rotra/ui/start-session-sheet'
@@ -35,6 +38,8 @@ import { notFound, useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import { useDockAction } from '@/app/(operator)/_components/operator-shell/DockAction.context'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
+import { AddPlayer } from '@/app/(operator)/sessions/[sessionId]/_components/add-player/AddPlayer'
+import { CourtsAndTime } from '@/app/(operator)/sessions/[sessionId]/_components/courts-and-time/CourtsAndTime'
 import { FacebookPost } from '@/app/(operator)/sessions/[sessionId]/_components/facebook-post/FacebookPost'
 import { JoinRequests } from '@/app/(operator)/sessions/[sessionId]/_components/join-requests/JoinRequests'
 import { PaymentsPanel } from '@/app/(operator)/sessions/[sessionId]/_components/payments-panel/PaymentsPanel'
@@ -58,7 +63,8 @@ const errorMessage = (error: unknown) =>
 
 /**
  * Q-PREPARE: header, the Join requests card while requests wait, tabs (Overview, Roster and levels,
- * Waitlist), Setup / This device / Session link cards, the Start bar and dialog.
+ * Waitlist), Setup / This device / Session link cards, the Start bar and dialog. Active sessions
+ * retain the read-only summary with the existing live sheets and a Continue session dock action.
  */
 export function SessionPreparation({ sessionId }: { sessionId: string }) {
   const router = useRouter()
@@ -73,6 +79,9 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
   const remove = useDeleteSession()
   const setAcceptJoinRequests = useSetAcceptJoinRequests()
   const [tab, setTab] = useState('overview')
+  const [liveSheet, setLiveSheet] = useState<
+    'adjust' | 'add-court' | 'add-player' | 'requests' | 'payments' | null
+  >(null)
   const [startOpen, setStartOpen] = useState(false)
   const [postOpen, setPostOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
@@ -81,6 +90,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
   useEffect(() => setOrigin(window.location.origin), [])
 
   const s = session.data
+  const live = s?.state === 'active'
   // Once deleted, the session query fails while we leave for Home; that is not a 404.
   const deleted = remove.isSuccess
   if (
@@ -90,8 +100,8 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
     session.error.kind === 'permission'
   )
     notFound()
-  // A started session has no preparation: go to the console (or the record once it is done).
-  const redirectTo = s && s.state !== 'prepared' ? sessionHref(s) : null
+  // Active sessions keep this summary; terminal/finalizing sessions use their existing landing page.
+  const redirectTo = s && s.state !== 'prepared' && s.state !== 'active' ? sessionHref(s) : null
   useEffect(() => {
     if (redirectTo) router.replace(redirectTo)
   }, [redirectTo, router])
@@ -136,7 +146,15 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
     }),
     [blocker, s],
   )
-  useDockAction(openStart)
+  const continueSession = useMemo(
+    () => ({
+      label: 'Continue session',
+      icon: 'nav-live' as const,
+      onClick: () => router.push(`/sessions/${sessionId}`),
+    }),
+    [router, sessionId],
+  )
+  useDockAction(live ? continueSession : s?.state === 'prepared' ? openStart : null)
 
   const confirmStart = () =>
     start.mutate(sessionId, {
@@ -168,7 +186,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
     toast('Session link copied')
   }
 
-  if (deleted) return null
+  if (deleted || redirectTo) return null
   if (session.isError)
     return (
       <main className="mx-auto max-w-[1240px] px-4 pt-5">
@@ -183,7 +201,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
         <PageHeader
           eyebrow={
             <span className="text-xs font-semibold tracking-[0.5px] text-fg2 uppercase">
-              Preparation
+              {live ? 'Session settings' : 'Preparation'}
             </span>
           }
           title={s.title}
@@ -191,7 +209,11 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
           actions={
             <>
               <Button size="sm" asChild>
-                <Link href={`/sessions/${sessionId}/edit`}>Edit preparation</Link>
+                {live ? (
+                  <Link href={`/sessions/${sessionId}`}>Back to live session</Link>
+                ) : (
+                  <Link href={`/sessions/${sessionId}/edit`}>Edit preparation</Link>
+                )}
               </Button>
               <Button size="sm" asChild>
                 <Link href={`/sessions/${sessionId}/public-page`}>Preview public page</Link>
@@ -199,14 +221,16 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
               <Button size="sm" onClick={() => setPostOpen(true)}>
                 Copy Facebook post
               </Button>
-              <Button
-                size="sm"
-                variant="danger"
-                disabled={!roster.data}
-                onClick={() => setDeleteOpen(true)}
-              >
-                Delete session
-              </Button>
+              {!live ? (
+                <Button
+                  size="sm"
+                  variant="danger"
+                  disabled={!roster.data}
+                  onClick={() => setDeleteOpen(true)}
+                >
+                  Delete session
+                </Button>
+              ) : null}
             </>
           }
         />
@@ -217,9 +241,17 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
           <Skeleton className="w-72" />
         </div>
       )}
-      <JoinRequests sessionId={sessionId} />
+      {live ? (
+        <Notice>
+          Preparation values are read-only during play. Mode, formats, minimum and playing levels
+          are fixed after start. Use the live controls in Overview to manage courts, time, arrivals,
+          requests and payments.
+        </Notice>
+      ) : (
+        <JoinRequests sessionId={sessionId} />
+      )}
       <Tabs
-        aria-label="Preparation"
+        aria-label={live ? 'Session settings' : 'Preparation'}
         value={tab}
         onChange={setTab}
         items={[
@@ -250,8 +282,8 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
             <div className="flex flex-col gap-4">
               <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,320px),1fr))] gap-4">
                 <SessionSetupCard
-                  extraRows={
-                    cost.data
+                  extraRows={[
+                    ...(cost.data
                       ? [
                           {
                             label: 'Costs',
@@ -267,9 +299,34 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
                             ),
                           },
                         ]
-                      : undefined
+                      : []),
+                    ...(live && s.notes ? [{ label: 'Notes', value: s.notes }] : []),
+                  ]}
+                  fixedAfterStart={live}
+                  actions={
+                    live ? (
+                      <>
+                        <Button size="sm" onClick={() => setLiveSheet('adjust')}>
+                          Courts and time
+                        </Button>
+                        <Button size="sm" onClick={() => setLiveSheet('add-player')}>
+                          Add player
+                        </Button>
+                        <Button size="sm" onClick={() => setLiveSheet('requests')}>
+                          Join requests · {pendingRequests}
+                        </Button>
+                        <Button size="sm" onClick={() => setLiveSheet('payments')}>
+                          Payments
+                        </Button>
+                      </>
+                    ) : undefined
                   }
-                  courtLabels={courts.map((c) => c.label)}
+                  courtLabels={courts.map((c) => {
+                    if (!live) return c.label
+                    const windowTime = (at: number) =>
+                      `${time(at)}${courtNextDay(at, s.scheduledStartAt) ? ' · next day' : ''}`
+                    return `${c.label} · ${windowTime(c.startsAt ?? s.startedAt ?? s.scheduledStartAt)}–${windowTime(c.openUntil ?? s.scheduledEndAt)} · ${c.openUntil === null ? 'follows session end' : 'set time'}`
+                  })}
                   formatsLabel={formats}
                   modeLabel={MODES[s.sessionMode].label}
                   modeDescription={MODES[s.sessionMode].text}
@@ -289,25 +346,30 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
                   rosterCount={rosterList.length}
                   presentCount={present}
                 />
-                <DeviceDownloadCard
-                  state={download.isPending ? 'downloading' : s.downloadState}
-                  offline={dev.offline}
-                  snapshotAge={
-                    s.downloadError && s.downloadState === 'ready'
-                      ? s.downloadedAt
-                        ? `copy from ${new Date(s.downloadedAt).toLocaleString('en-PH', { timeZone: 'Asia/Manila', dateStyle: 'medium', timeStyle: 'short' })}`
-                        : 'the copy from before this update'
-                      : undefined
-                  }
-                  error={s.downloadError ?? download.error?.message}
-                  onDownload={() =>
-                    download.mutate(sessionId, {
-                      onSuccess: (result) => toast(result.message),
-                      onError: (error) => toast.error(errorMessage(error)),
-                    })
-                  }
-                />
+                {!live ? (
+                  <DeviceDownloadCard
+                    state={download.isPending ? 'downloading' : s.downloadState}
+                    offline={dev.offline}
+                    snapshotAge={
+                      s.downloadError && s.downloadState === 'ready'
+                        ? s.downloadedAt
+                          ? `copy from ${new Date(s.downloadedAt).toLocaleString('en-PH', { timeZone: 'Asia/Manila', dateStyle: 'medium', timeStyle: 'short' })}`
+                          : 'the copy from before this update'
+                        : undefined
+                    }
+                    error={s.downloadError ?? download.error?.message}
+                    onDownload={() =>
+                      download.mutate(sessionId, {
+                        onSuccess: (result) => toast(result.message),
+                        onError: (error) => toast.error(errorMessage(error)),
+                      })
+                    }
+                  />
+                ) : null}
               </div>
+              {cost.isError ? (
+                <QueryError query={cost} title="Couldn't load the cost estimate." />
+              ) : null}
               <SessionLinkCard
                 link={sessionLink}
                 pendingCount={pendingRequests}
@@ -345,7 +407,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
           <PreparationRoster sessionId={sessionId} tab="waitlist" />
         </TabsContent>
       </Tabs>
-      {s ? (
+      {s?.state === 'prepared' ? (
         <StartSessionBar
           blocker={blocker}
           otherLive={
@@ -358,7 +420,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
           onStart={() => setStartOpen(true)}
         />
       ) : null}
-      {s ? (
+      {s?.state === 'prepared' ? (
         <StartSessionSheet
           open={startOpen}
           onOpenChange={(open) => {
@@ -379,7 +441,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
           onConfirm={confirmStart}
         />
       ) : null}
-      {s ? (
+      {s?.state === 'prepared' ? (
         <DeleteSessionSheet
           open={deleteOpen}
           onOpenChange={(open) => {
@@ -401,6 +463,38 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
             setTab('roster')
           }}
         />
+      ) : null}
+      {live ? (
+        <>
+          <CourtsAndTime
+            sessionId={sessionId}
+            open={liveSheet === 'adjust' || liveSheet === 'add-court' ? liveSheet : null}
+            onOpenChange={setLiveSheet}
+          />
+          <AddPlayer
+            sessionId={sessionId}
+            open={liveSheet === 'add-player'}
+            onOpenChange={(open) => setLiveSheet(open ? 'add-player' : null)}
+          />
+          <Sheet
+            open={liveSheet === 'requests' || liveSheet === 'payments'}
+            onOpenChange={(open) => {
+              if (!open) setLiveSheet(null)
+            }}
+            title={liveSheet === 'payments' ? 'Payments' : 'Join requests'}
+            footer={
+              <Button variant="primary" onClick={() => setLiveSheet(null)}>
+                Done
+              </Button>
+            }
+          >
+            {liveSheet === 'payments' ? (
+              <PaymentsPanel sessionId={sessionId} />
+            ) : (
+              <JoinRequests sessionId={sessionId} variant="sheet" />
+            )}
+          </Sheet>
+        </>
       ) : null}
       <FacebookPost sessionId={sessionId} open={postOpen} onOpenChange={setPostOpen} />
     </main>

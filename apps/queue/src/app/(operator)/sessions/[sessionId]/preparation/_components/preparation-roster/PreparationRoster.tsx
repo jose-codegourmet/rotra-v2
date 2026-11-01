@@ -113,6 +113,7 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
           capacity={capacity}
           waitlistCount={waitlist.length}
           levelsLocked={s ? s.state !== 'prepared' : false}
+          readOnly={s?.state === 'active'}
           onMarkAllPresent={() => setAllPresence.mutate({ sessionId, present: true }, options)}
           onMarkAllAbsent={() => setAllPresence.mutate({ sessionId, present: false }, options)}
           onAddPlayer={() => setAddOpen(true)}

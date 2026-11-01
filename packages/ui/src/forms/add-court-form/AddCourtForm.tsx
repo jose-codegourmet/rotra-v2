@@ -1,17 +1,17 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { courtNextDay } from '@rotra/schema/court-window'
+import { courtNextDay, courtWindowPreview } from '@rotra/schema/court-window'
 import { Button } from '@rotra/ui/button'
 import { ChoiceGroup } from '@rotra/ui/choice-group'
 import { cn } from '@rotra/ui/cn'
 import { Field } from '@rotra/ui/field'
 import { Notice } from '@rotra/ui/notice'
-import { formatDuration, formatTime } from '@rotra/ui/now-card/helpers'
+import { formatTime } from '@rotra/ui/now-card/helpers'
 import { Sheet } from '@rotra/ui/sheet'
 import { TextInput } from '@rotra/ui/text-input'
 import { TimeField } from '@rotra/ui/time-field'
-import { type RefObject, useId, useMemo } from 'react'
+import { type ReactNode, type RefObject, useId, useMemo } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
 import { addCourtFormDefaultValues } from './AddCourtForm.defaultValues'
 import {
@@ -20,7 +20,6 @@ import {
   COURT_LABEL_MAX,
   makeAddCourtSchema,
   type OpenUntilMode,
-  timeOnSession,
 } from './AddCourtForm.schema'
 
 export type AddCourtFormProps = {
@@ -48,9 +47,15 @@ export type AddCourtFormProps = {
 
 const MINUTE = 60_000
 
+const duration = (minutes: number) => {
+  const hours = Math.floor(minutes / 60),
+    rest = minutes % 60
+  return [hours ? `${hours} h` : '', rest ? `${rest} min` : ''].filter(Boolean).join(' ') || '0 min'
+}
+
 /**
  * Q-ADD-COURT: the Add court sheet. Court label, Open until (with the session or at a set time on the
- * session's day), the preview of when it closes, and the reminder that ROTRA doesn't stop games.
+ * session's day), the validated booking-window preview, and the reminder that ROTRA doesn't stop games.
  * The container owns the add mutation and its "LABEL added · open until HH:MM" toast.
  */
 export function AddCourtForm({
@@ -91,13 +96,67 @@ export function AddCourtForm({
     },
   })
   const { errors } = form.formState
-  const [typedLabel, mode, time] = form.watch(['label', 'mode', 'time'])
+  const [typedLabel, mode, time, startTime] = form.watch(['label', 'mode', 'time', 'startTime'])
   const label = (typedLabel ?? '').trim() || defaultLabel
-
-  // The preview: when the court closes and how long that is from now (prototype's addCourt(sh)).
-  const until = mode === 'end' ? sessionEndsAt : time ? timeOnSession(sessionStartsAt, time) : null
-  const minutes = until === null ? null : Math.round((until - current) / MINUTE)
-  const timeError = errors.time?.message
+  // Parse the watched values through submit's schema, so errors and offending fields agree.
+  const parsed = schema.safeParse({ label: typedLabel ?? '', mode, time, startTime })
+  const issues = parsed.success ? [] : parsed.error.issues
+  const startError = issues.find((issue) => issue.path[0] === 'startTime')?.message
+  const timeError = issues.find((issue) => issue.path[0] === 'time')?.message
+  const preview = parsed.success
+    ? courtWindowPreview({
+        start: parsed.data.startsAt,
+        end: parsed.data.openUntil,
+        sessionStart: sessionStartsAt,
+        sessionEnd: sessionEndsAt,
+        now: current,
+      })
+    : null
+  const timeLabel = (at: number) => (
+    <b>
+      {formatTime(at)}
+      {courtNextDay(at, sessionStartsAt) ? ' · next day' : ''}
+    </b>
+  )
+  const validPreview = preview && !('error' in preview) ? preview : null
+  const ended = validPreview !== null && validPreview.closesAt <= current
+  const follows = mode === 'end' ? ' Moves if you extend time.' : ''
+  let previewCopy: ReactNode = null
+  if (validPreview) {
+    const { opensAt, closesAt, lengthMin, opensInMin } = validPreview
+    if (ended)
+      previewCopy = (
+        <>
+          {' '}
+          booking ended at {timeLabel(closesAt)} ({duration(lengthMin)} booking).{follows}
+        </>
+      )
+    else if (opensInMin === null)
+      previewCopy = (
+        <>
+          {' '}
+          is open now until {mode === 'end' ? 'the session ends at ' : ''}
+          {timeLabel(closesAt)} (about{' '}
+          {duration(Math.max(1, Math.round((closesAt - current) / MINUTE)))} left).{follows}
+        </>
+      )
+    else if (mode === 'end')
+      previewCopy = (
+        <>
+          {' '}
+          opens {timeLabel(opensAt)} and stays open until the session ends at {timeLabel(closesAt)}{' '}
+          ({duration(lengthMin)}). Moves if you extend time. Opens in {duration(opensInMin)}.
+        </>
+      )
+    else
+      previewCopy = (
+        <>
+          {' '}
+          opens {timeLabel(opensAt)} and closes {timeLabel(closesAt)} ({duration(lengthMin)}{' '}
+          booking). Opens in {duration(opensInMin)}.
+        </>
+      )
+  }
 
   return (
     <Sheet
@@ -146,7 +205,7 @@ export function AddCourtForm({
           </Field>
           <Field
             label="Planned start"
-            error={errors.startTime?.message}
+            error={startError}
             hint={
               lockedStartsAt === undefined
                 ? 'The court is unavailable before this time.'
@@ -160,7 +219,7 @@ export function AddCourtForm({
                 <TimeField
                   {...field}
                   disabled={isPending || lockedStartsAt !== undefined}
-                  invalid={!!errors.startTime}
+                  invalid={!!startError}
                   aria-label="Planned start"
                 />
               )}
@@ -218,14 +277,10 @@ export function AddCourtForm({
               {timeError}
             </span>
           </div>
-          {until !== null && minutes !== null && minutes > 0 ? (
-            <Notice tone="success">
-              <b>{label}</b> is planned to open until{' '}
-              <b>
-                {formatTime(until)}
-                {courtNextDay(until, sessionStartsAt) ? ' · next day' : ''}
-              </b>
-              , about {formatDuration(current, until)} from now.
+          {validPreview ? (
+            <Notice tone={ended ? 'info' : 'success'}>
+              <b>{label}</b>
+              {previewCopy}
             </Notice>
           ) : null}
           <p className="m-0 text-[13px] text-fg2">

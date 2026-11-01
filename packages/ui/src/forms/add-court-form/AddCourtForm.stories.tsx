@@ -1,4 +1,4 @@
-import { consoleSessionFixture } from '@rotra/data/fixtures/consoleSessions'
+import { consoleSessionFixture, courtPreviewFixture } from '@rotra/data/fixtures/consoleSessions'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn, within } from 'storybook/test'
 import { AddCourtForm } from './AddCourtForm'
@@ -55,12 +55,11 @@ export const AdvisoryPastEnd: Story = {
   play: submit,
 }
 
-/** A set time an hour past the session end: "That's after the session ends at HH:MM…" */
+/** Invalid immediately, before submit, with the same message as submit. */
 export const TimeAfterSessionEnd: Story = {
   args: {
     defaultValues: { mode: 'time', time: toTimeInput(session.scheduledEndAt + 60 * MINUTE) },
   },
-  play: submit,
 }
 
 export const Pending: Story = { args: { isPending: true } }
@@ -81,4 +80,49 @@ export const EditingUsedCourt: Story = {
 }
 export const FutureOpening: Story = {
   args: { defaultValues: { startTime: toTimeInput(NOW + 30 * MINUTE) } },
+}
+
+export const FutureTimedBooking: Story = {
+  args: {
+    now: courtPreviewFixture.now,
+    sessionStartsAt: courtPreviewFixture.scheduledStart,
+    sessionEndsAt: courtPreviewFixture.laterSessionEnd,
+    defaultValues: {
+      mode: 'time',
+      startTime: courtPreviewFixture.startTime,
+      time: courtPreviewFixture.time,
+    },
+  },
+}
+export const ReportedInvalidWindow: Story = {
+  args: {
+    ...FutureTimedBooking.args,
+    sessionStartsAt: courtPreviewFixture.actualStart,
+    sessionEndsAt: courtPreviewFixture.sessionEnd,
+  },
+}
+export const EndBeforeStart: Story = {
+  args: {
+    ...FutureTimedBooking.args,
+    defaultValues: {
+      mode: 'time',
+      startTime: courtPreviewFixture.time,
+      time: courtPreviewFixture.startTime,
+    },
+  },
+}
+export const EarlyStartedSession: Story = {
+  args: {
+    now: courtPreviewFixture.now,
+    sessionStartsAt: courtPreviewFixture.actualStart,
+    sessionEndsAt: courtPreviewFixture.sessionEnd,
+  },
+}
+export const OvernightBooking: Story = {
+  args: {
+    now: courtPreviewFixture.overnightStart,
+    sessionStartsAt: courtPreviewFixture.overnightStart,
+    sessionEndsAt: courtPreviewFixture.overnightEnd,
+    defaultValues: { mode: 'time', startTime: '23:30', time: '00:30' },
+  },
 }

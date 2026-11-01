@@ -7,7 +7,7 @@ import { setMockLatencyEnabled } from '../mock/latency'
 import { loadQueueFlexibilityExample } from '../mock/queueExamples'
 import { mockStore, readMockState } from '../mock/store'
 import { getPublicSession } from '../public-session/fetchers'
-import { extendSession, removeCourt, updateCourt } from '../queue-session/courts'
+import { addCourt, extendSession, removeCourt, updateCourt } from '../queue-session/courts'
 import { startSession } from '../queue-session/mutations'
 import {
   addDirectoryPlayerToSession,
@@ -498,6 +498,45 @@ describe('complete flexible Queue Session rules', () => {
       clock.mockRestore()
     }
   })
+  it('opens default courts at an early actual start and allows an earlier live booking', async () => {
+    const actualStart = new Date(2026, 10, 1, 12, 6).getTime()
+    const scheduledStart = new Date(2026, 10, 1, 18).getTime()
+    mockStore.update((s) => {
+      s.sessions[0]!.state = 'prepared'
+      s.sessions[0]!.startedAt = null
+      s.sessions[0]!.scheduledStartAt = scheduledStart
+      s.sessions[0]!.scheduledEndAt = new Date(2026, 10, 1, 23).getTime()
+      s.matches = []
+      s.courts.forEach((c, i) => {
+        c.startsAt = i === 2 ? scheduledStart + 3600000 : scheduledStart
+      })
+    })
+    const clock = vi.spyOn(Date, 'now').mockReturnValue(actualStart)
+    try {
+      await startSession(sessionId)
+      const courts = readMockState().courts
+      expect(freeCourts(courts, [], actualStart)).toHaveLength(courts.length - 1)
+      expect(courts[2]!.startsAt).toBe(scheduledStart + 3600000)
+      const added = await addCourt({
+        sessionId,
+        label: 'Early court',
+        startsAt: actualStart + 60000,
+        openUntil: scheduledStart,
+      })
+      expect(added.data.startsAt).toBe(actualStart + 60000)
+      await expect(
+        addCourt({
+          sessionId,
+          label: 'Too early',
+          startsAt: actualStart - 60000,
+          openUntil: scheduledStart,
+        }),
+      ).rejects.toThrow('within the session')
+      expect(readMockState().sessions[0]!.scheduledStartAt).toBe(scheduledStart)
+    } finally {
+      clock.mockRestore()
+    }
+  })
   it('validates overnight booking windows against session boundaries', () => {
     const start = new Date(2026, 10, 1, 22).getTime(),
       end = new Date(2026, 10, 2, 2).getTime()
@@ -506,6 +545,6 @@ describe('complete flexible Queue Session rules', () => {
     expect(new Date(nextDay).getDate()).toBe(2)
     expect(courtWindowError(nextDay, null, start, end)).toBeNull()
     expect(courtWindowError(nextDay, start, start, end)).toContain('after the planned start')
-    expect(courtWindowError(nextDay, end + 60000, start, end)).toContain('Extend the session')
+    expect(courtWindowError(nextDay, end + 60000, start, end)).toContain('extend the session first')
   })
 })

@@ -136,3 +136,16 @@ export function createCourtWindowFixtures(now = Date.now()) {
   return { ...base, session, courts, matches: [] }
 }
 export const courtWindowFixture = createCourtWindowFixtures()
+
+/** Fixed local clock scenarios for Q-ADD-COURT preview verification (#320). */
+export const courtPreviewFixture = {
+  now: new Date(2026, 10, 1, 12, 12).getTime(),
+  actualStart: new Date(2026, 10, 1, 12, 6).getTime(),
+  scheduledStart: new Date(2026, 10, 1, 18).getTime(),
+  sessionEnd: new Date(2026, 10, 1, 21).getTime(),
+  laterSessionEnd: new Date(2026, 10, 1, 23).getTime(),
+  startTime: '21:30',
+  time: '22:30',
+  overnightStart: new Date(2026, 10, 1, 22).getTime(),
+  overnightEnd: new Date(2026, 10, 2, 2).getTime(),
+}

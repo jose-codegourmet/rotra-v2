@@ -1,5 +1,7 @@
 # Sessions
 
+**Last verified:** 2026-11-01.
+
 **Status:** Confirmed v1 target rules. Updated October 26, 2026 to match the [ROTRA Queue prototype](../../../../../../apps/mockup/queue-app/rotra-queue.html).
 
 ## Session states
@@ -114,3 +116,17 @@ See [lifecycle](flow/session-lifecycle.md), [offline recovery](../offline/README
 ## Individual court windows (owner decision, October 31, 2026)
 
 Each court has a planned start and end within the Queue Session, including an explicitly indicated next-day end for an overnight session. Before its start the court is shown but excluded from dispatch. The end is advisory: it neither interrupts an active match nor prevents a new one; the Queue Master may extend it, even after it passes. A start can be edited until the court has hosted a match, then is fixed. Session-end courts follow session extensions; explicit ends do not. Manual closure removes only a free court, retaining at least one court. No abort or reopen lifecycle is implied. These windows do not change the approved cost or minimum-games formulas.
+
+## Actual start and court previews (owner decision, November 1, 2026, #320)
+
+Once the Queue Session is live, new court windows are bounded by the actual start (`startedAt`),
+not the scheduled start. Courts using the default session start open at Start session; deliberately
+staggered court starts keep their times. Retain the scheduled session time and existing earlier
+court starts when editing a booking (used starts remain fixed). This does not change cost or
+minimum-games calculations. Closing times remain advisory.
+
+The Add / Edit court preview validates the same window as submit, immediately marks the offending
+field, and never shows success for a rejected window. Booking duration is planned start to close;
+“opens in” counts down to the planned start. An already-open booking shows time left; a passed
+booking shows Booking ended. Session-end bookings explain that they follow extensions, and times
+crossing midnight explicitly indicate the next day.

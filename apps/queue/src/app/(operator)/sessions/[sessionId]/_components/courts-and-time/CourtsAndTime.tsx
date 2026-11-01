@@ -57,6 +57,7 @@ export function CourtsAndTime({ sessionId, open, onOpenChange }: CourtsAndTimePr
 
   const s = session.data
   if (!s) return null
+  const sessionStart = s.startedAt ?? s.scheduledStartAt
   const courts = s.courts
   const editing = courts.find((c) => c.id === editingId)
   const used = !!editing && (matches.data ?? []).some((m) => m.courtIds.includes(editing.id))
@@ -116,13 +117,13 @@ export function CourtsAndTime({ sessionId, open, onOpenChange }: CourtsAndTimePr
         onOpenChange={(next) => onOpenChange(next ? 'adjust' : null)}
         courts={courts.map((c) => ({
           ...c,
-          startsAt: c.startsAt ?? s.scheduledStartAt,
+          startsAt: c.startsAt ?? sessionStart,
           occupied: (matches.data ?? []).some(
             (m) => m.state === 'active' && m.courtIds.includes(c.id),
           ),
           used: (matches.data ?? []).some((m) => m.courtIds.includes(c.id)),
         }))}
-        startsAt={s.scheduledStartAt}
+        startsAt={sessionStart}
         serverError={serverError ?? (extend.error ? errorMessage(extend.error) : undefined)}
         onEditCourt={(id) => {
           setServerError(undefined)
@@ -154,18 +155,20 @@ export function CourtsAndTime({ sessionId, open, onOpenChange }: CourtsAndTimePr
         defaultLabel={editing?.label ?? nextCourtLabel(courts.length)}
         editing={!!editing}
         returnFocusRef={returnFocus}
-        lockedStartsAt={editing && used ? (editing.startsAt ?? s.scheduledStartAt) : undefined}
+        lockedStartsAt={editing && used ? (editing.startsAt ?? sessionStart) : undefined}
         defaultValues={
           editing
             ? {
                 label: editing.label,
-                startTime: toTimeInput(editing.startsAt ?? s.scheduledStartAt),
+                startTime: toTimeInput(editing.startsAt ?? sessionStart),
                 mode: editing.openUntil === null ? 'end' : 'time',
                 time: toTimeInput(editing.openUntil ?? s.scheduledEndAt),
               }
             : undefined
         }
-        sessionStartsAt={s.scheduledStartAt}
+        sessionStartsAt={
+          editing ? Math.min(sessionStart, editing.startsAt ?? sessionStart) : sessionStart
+        }
         sessionEndsAt={s.scheduledEndAt}
         onSubmit={onAdd}
         isPending={add.isPending || update.isPending || matches.isPending}

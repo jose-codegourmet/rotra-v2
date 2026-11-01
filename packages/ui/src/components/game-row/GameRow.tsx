@@ -28,6 +28,14 @@ export function GameRow({ game, dateLine }: GameRowProps) {
       </span>
       <div className="min-w-0">
         <b>{FORMATS[game.format]}</b>
+        <p className="text-xs text-fg2">
+          {game.result === 'won' ? 'Won' : 'Lost'} ·{' '}
+          {game.counting === 'counted'
+            ? 'Counted for rank'
+            : game.counting === 'fun'
+              ? 'Fun · not counted for rank'
+              : 'Partial · not counted for rank'}
+        </p>
         {game.partners.length > 0 && (
           <span className="text-fg2"> with {people(game.partners)}</span>
         )}

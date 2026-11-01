@@ -48,7 +48,7 @@
     "db:migrate:draft": "prisma migrate dev --create-only",
     "db:migrate:status": "prisma migrate status",
     "lint": "biome check .",
-    "type-check": "prisma generate && tsc --noEmit",
+    "type-check": "tsc --noEmit",
     "db:disposable": "scripts/disposable-db.sh"
   },
   "dependencies": {

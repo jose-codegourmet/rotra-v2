@@ -15,7 +15,7 @@ export type PrivateContactCardProps = {
 }
 
 function phoneShownToClubs({ claimed, phoneHidden }: PrivateContactCardProps) {
-  if (!claimed) return 'Entered by the club'
+  if (!claimed) return 'Yes, if provided'
   return phoneHidden ? 'No, hidden by the player' : 'Yes'
 }
 

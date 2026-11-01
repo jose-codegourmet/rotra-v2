@@ -3,7 +3,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const joinRequestsMeta = {
   name: 'JoinRequests',
   description:
-    'The join requests container: JoinRequestsPanel on useSessionRoster, confirming a guest with the level the Queue Master chose through useConfirmJoinRequest and declining through useDeclineJoinRequest; slotsFull comes from the roster count against slotCapacity.',
+    'The join requests container: JoinRequestsPanel on useSessionRoster, confirming a guest with the level the Queue Master chose through useConfirmJoinRequest and declining through useDeclineJoinRequest; prepared full sessions waitlist, while active sessions admit directly above the planning budget.',
   usage: [
     'Card variant on Preparation (Q-PREPARE) between the header and the tabs: it renders nothing while no request is pending, so the page shows no empty card.',
     'Sheet variant inside the live console\'s "Join requests · N" Sheet (Queue › Session console): always renders the panel body, including the "No requests waiting." text.',

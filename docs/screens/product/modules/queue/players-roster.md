@@ -145,3 +145,5 @@ Returning incomplete profile: offer the registration link path online and option
 - A hidden phone is never exposed by ID search or QR preview.
 - A late entrant cannot change their level after being added to the running session.
 - Presence changes flag future lineups without terminating an active game.
+
+The mock Queue app now wires active admission through the same saved, directory, new-player and join-request paths as preparation. The live slot meter is advisory; any selected waitlisted player can be admitted. Counts and public participant projections refetch after changes. The in-memory working copy resets on reload; it is not durable offline storage.

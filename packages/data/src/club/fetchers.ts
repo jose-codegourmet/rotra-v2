@@ -16,6 +16,14 @@ import { delay } from '../mock/latency'
 import { type MockState, mockStore, readMockState } from '../mock/store'
 import { requireClubAccess } from '../mock/transaction'
 import {
+  realAddClub,
+  realGetAdminClub,
+  realGetClubIdentityIndex,
+  realListAdminClubs,
+} from '../real/admin'
+import { isRealDataMode } from '../real/mode'
+import { realGetClub } from '../real/queue'
+import {
   adminClubAccessFilter,
   type ClubPrice,
   clubInitials,
@@ -38,6 +46,7 @@ import type {
 
 /** Swap this implementation for the real transport when the database epic lands. */
 export async function getClub(id: string, signal?: AbortSignal): Promise<Club> {
+  if (isRealDataMode()) return realGetClub(signal)
   await delay(400, signal)
   requireOnline()
   requireClubAccess()
@@ -132,6 +141,7 @@ export async function listAdminClubs(
   params: AdminClubListParams = {},
   signal?: AbortSignal,
 ): Promise<AdminClubList> {
+  if (isRealDataMode()) return realListAdminClubs(params, signal)
   await delay(400, signal)
   const state = readMockState()
   const all = state.clubs.map((club) => listItemOf(state, club))
@@ -153,6 +163,7 @@ export async function getAdminClub(
   id: string,
   signal?: AbortSignal,
 ): Promise<AdminClubDetail | null> {
+  if (isRealDataMode()) return realGetAdminClub(id, signal)
   await delay(400, signal)
   const state = readMockState()
   const club = state.clubs.find((entry) => entry.id === id)
@@ -194,6 +205,7 @@ function identityIndexOf(state: MockState): ClubIdentityIndex {
 
 /** Taken club names and usernames, including accounts that are not clubs (A01.3). */
 export async function getClubIdentityIndex(signal?: AbortSignal): Promise<ClubIdentityIndex> {
+  if (isRealDataMode()) return realGetClubIdentityIndex(signal)
   await delay(300, signal)
   return identityIndexOf(readMockState())
 }
@@ -223,6 +235,7 @@ export function addClub(
   input: AddClubInput,
   sourceCommandId: string,
 ): Promise<{ clubId: string; name: string }> {
+  if (isRealDataMode()) return realAddClub(input, sourceCommandId)
   return adminMutation(1000, (draft) => {
     const replay = draft.adminCommands[sourceCommandId]
     if (replay) return { clubId: replay.clubId, name: adminClubIn(draft, replay.clubId).name }

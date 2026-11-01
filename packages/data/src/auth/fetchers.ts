@@ -5,6 +5,8 @@ import { getMockDevState, requireOnline } from '../mock/bridge'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { readMockState } from '../mock/store'
+import { isRealDataMode } from '../real/mode'
+import { realGetClubSession, realSignInClub, realSignOutClub } from '../real/queue'
 import type { AuthAudience, MockSession, SignInInput } from './auth.types'
 import { mockCookieName, parseMockSession } from './cookie'
 
@@ -21,10 +23,12 @@ function readSession(audience: AuthAudience) {
   )
 }
 export async function getSession(audience: AuthAudience): Promise<MockSession | null> {
+  if (isRealDataMode() && audience === 'club') return realGetClubSession()
   return readSession(audience)
 }
 /** Mock players match a claimed fixture; club/Admin use nonempty demo credentials. No network auth. */
 export async function signIn(audience: AuthAudience, input: SignInInput): Promise<MockSession> {
+  if (isRealDataMode() && audience === 'club') return realSignInClub(input)
   await delay()
   if (audience === 'player' && getMockDevState().offline)
     throw new MockError('offline', "You're offline. Signing in needs an internet connection.")
@@ -65,6 +69,7 @@ export async function signIn(audience: AuthAudience, input: SignInInput): Promis
   return session
 }
 export async function signOut(audience: AuthAudience) {
+  if (isRealDataMode() && audience === 'club') return realSignOutClub()
   if (typeof document !== 'undefined') {
     // biome-ignore lint/suspicious/noDocumentCookie: remove the F06.4 mock session marker
     document.cookie = `${mockCookieName(audience)}=; Path=/; Max-Age=0; SameSite=Lax`

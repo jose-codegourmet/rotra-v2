@@ -14,7 +14,9 @@ BEGIN;
 -- Reference data ------------------------------------------------------------------------------
 INSERT INTO location_codes (id, country_code, city_code, display_name, updated_at) VALUES
   ('10c00000-0000-4000-8000-000000000001', 'PH', 'CEB', 'Cebu City', now()),
-  ('10c00000-0000-4000-8000-000000000002', 'PH', 'MNL', 'Manila', now());
+  ('10c00000-0000-4000-8000-000000000002', 'PH', 'MNL', 'Manila', now())
+-- The founding-city migration already seeds these on a migrated database.
+ON CONFLICT (country_code, city_code) DO NOTHING;
 
 INSERT INTO admin_accounts (id, auth_provider, auth_subject, display_name, updated_at) VALUES
   ('ad000000-0000-4000-8000-000000000001', 'supabase', 'a0000000-0000-4000-8000-0000000000a1', 'Fictional Owner', now());

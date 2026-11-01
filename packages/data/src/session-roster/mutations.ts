@@ -12,6 +12,8 @@ import { queueMutation, sessionIn } from '../mock/transaction'
 import { PLAYING_LEVELS, type PlayingLevel } from '../player/player.types'
 import { promoteWaiter, recomputeMinimum } from '../queue-session/mutations'
 import { slotCapacity } from '../queue-session/queueSession.rules'
+import { isRealDataMode } from '../real/mode'
+import { realAddNewPlayerToSession, realSetRosterLevel } from '../real/queue'
 import { levelLabel, ROSTER_DUPLICATE_ERROR, shortName } from './sessionRoster.rules'
 import type { IdentityCheck, SessionJoinRequest } from './sessionRoster.types'
 
@@ -104,7 +106,7 @@ export async function playerDirectorySearch(q: string) {
   const s = readMockState(),
     query = q.trim().toLowerCase()
   return directoryPlayers
-    .map((p, i) => ({
+    .map((p, _i) => ({
       ...p,
       identity: 'registered' as const,
       suggestion: directoryLevel(p.id),
@@ -175,6 +177,7 @@ export function addNewPlayerToSession(input: {
   phone?: string
   level: PlayingLevel
 }) {
+  if (isRealDataMode()) return realAddNewPlayerToSession(input)
   return rosterMutation(input.sessionId, (s) => {
     const p = newPlayer(s, input),
       data = place(s, input.sessionId, p, input.level)
@@ -198,6 +201,7 @@ export function setRosterLevel(input: {
   rosterId: string
   level: PlayingLevel
 }) {
+  if (isRealDataMode()) return realSetRosterLevel(input)
   return rosterMutation(input.sessionId, (s) => {
     const p = row(s, input.rosterId, input.sessionId)
     if (sessionIn(s, input.sessionId).state !== 'prepared' || p.levelLockedAt)

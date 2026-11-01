@@ -4,6 +4,8 @@ import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, readMockState } from '../mock/store'
 import { sessionIn } from '../mock/transaction'
+import { isRealDataMode } from '../real/mode'
+import { realGetQueueSession, realGetQueueSessions } from '../real/queue'
 import { sessionMinutes } from './queueSession.rules'
 import type {
   QueueSession,
@@ -32,6 +34,7 @@ export function sessionSummary(state: MockState, session: QueueSession): QueueSe
   }
 }
 export async function getQueueSessions(clubId = DEMO_CLUB_ID) {
+  if (isRealDataMode()) return realGetQueueSessions()
   await delay()
   const state = readMockState()
   return state.sessions.filter((s) => s.clubId === clubId).map((s) => sessionSummary(state, s))
@@ -49,6 +52,7 @@ export async function getNowCard(clubId = DEMO_CLUB_ID) {
   }
 }
 export async function getQueueSession(id: string) {
+  if (isRealDataMode()) return realGetQueueSession(id)
   await delay()
   const state = readMockState(),
     session = sessionIn(state, id)

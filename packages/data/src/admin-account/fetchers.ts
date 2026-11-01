@@ -3,6 +3,8 @@ import { consumeMockDevToggle } from '../mock/bridge'
 import { isProductionBuild } from '../mock/env'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
+import { realGetAdminSession, realSignInAdmin, realSignOutAdmin } from '../real/admin'
+import { isRealDataMode } from '../real/mode'
 import type { AdminSession, AdminSignInInput } from './adminAccount.types'
 import { isAdminOffline } from './connectivity'
 import { ADMIN_COOKIE_NAME, parseAdminSession, readAdminSessionMarker } from './cookie'
@@ -20,10 +22,12 @@ function writeSession(session: AdminSession) {
   document.cookie = `${ADMIN_COOKIE_NAME}=${encodeURIComponent(JSON.stringify(session))}; Path=/; SameSite=Lax${location.protocol === 'https:' ? '; Secure' : ''}`
 }
 export async function getAdminSession(): Promise<AdminSession> {
+  if (isRealDataMode()) return realGetAdminSession()
   return parseAdminSession(readAdminSessionMarker())
 }
 /** Prototype reference: nonempty credentials accept the fixture owner; passwords are never stored. */
 export async function signInAdmin(input: AdminSignInInput): Promise<AdminSession> {
+  if (isRealDataMode()) return realSignInAdmin(input)
   if (isAdminOffline()) throw new MockError('offline', 'Signing in needs an internet connection.')
   await delay(400)
   if (isAdminOffline()) throw new MockError('offline', 'Signing in needs an internet connection.')
@@ -39,6 +43,7 @@ export async function signInAdmin(input: AdminSignInInput): Promise<AdminSession
   return session
 }
 export async function signOutAdmin(input?: { sessionEnded?: boolean }): Promise<AdminSession> {
+  if (isRealDataMode()) return realSignOutAdmin(input)
   const session: AdminSession = { kind: 'signed-out', sessionEnded: input?.sessionEnded === true }
   // Local sign-out and simulated expiry must work even while offline.
   writeSession(session)

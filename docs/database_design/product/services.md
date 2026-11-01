@@ -158,3 +158,22 @@ screen loaded one, and returns an allowlisted DTO.
 2. Daily: `runRetentionSweep(cache)`. Alert on any `failed` diagnostic or `cachePurged: false`.
 3. A projection job that reached `MAX_JOB_ATTEMPTS` stays `failed` and the finalization shows `failed` with the stage; fix the cause, then `retryProjectionJob(id)`. Canonical facts are never re-run.
 4. Restore rehearsal: restore a nonproduction dump, run `scripts/disposable-db.sh` checks, then run step 1 once; jobs are idempotent, so a restored backlog replays safely. Never run the sweep against a restored copy that points at production storage or caches.
+
+## F07.34 · First persisted preparation journey
+
+Wired end to end in real data mode (see [architecture.md](../../architecture.md) › Server boundary):
+
+| Step | Route Handler | Service |
+|---|---|---|
+| Owner and club sign-in | `POST /api/auth/sign-in`, `GET /api/auth/session`, `POST /api/auth/sign-out` (both apps) | `auth/sign-in` |
+| A-CLUBS, A-CLUB-DETAIL | Admin `GET /api/clubs`, `GET /api/clubs/[clubId]`, `GET /api/clubs/identity` | `readAdminClubDirectory`, `readClubIdentityIndex` |
+| A-ADD-CLUB | Admin `POST /api/clubs` | `findLocationCode` → `stageClub` → `provisionClubAccount` with `auth/supabase-provider-admin` |
+| A-LICENSE | Admin `POST /api/clubs/[clubId]/licenses`, `GET /api/license-operations/[commandId]` | `activateLicense`, `readLicenseOperation` |
+| Q-ACCESS, Q-CLUB | Queue `GET /api/license`, `GET /api/club` | `readOwnLicense`, `readClubSettings` |
+| Q-VENUES | Queue `GET`/`POST /api/venues` (create only) | `readVenues`, `saveVenue` |
+| Q-HOME, Q-SETUP | Queue `GET`/`POST /api/sessions`, `GET /api/sessions/[sessionId]` | `readQueueSessions`, `readQueueSession`, `createQueueSession`, `saveSessionCost` |
+| Q-ROSTER | Queue `GET`/`POST /api/sessions/[sessionId]/roster`, `POST …/roster/[rosterId]/level` | `readSessionRoster`, `addNewPlayerToSession`, `setRosterLevel` |
+
+Proposals used (each listed in #317): club username → `<username>@clubs.rotra.invalid` provider login
+(#243/#244); the six prototype founding cities seeded by `20261101000100_seed_founding_locations`
+(#244); license start decided by the server and the typed reference kept as the note (#245).

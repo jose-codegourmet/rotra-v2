@@ -9,7 +9,9 @@ import { type NextRequest, NextResponse } from 'next/server'
  */
 export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname
-  const protectedPath = path !== '/login' && path !== '/s' && !path.startsWith('/s/')
+  // Route Handlers authorize themselves at the service boundary and answer in JSON, never a redirect.
+  const protectedPath =
+    path !== '/login' && path !== '/s' && !path.startsWith('/s/') && !path.startsWith('/api/')
   if (dataMode() === 'real') {
     const session = await refreshProxySession(request, () => NextResponse.next({ request }))
     if (protectedPath && !session.signedIn) {

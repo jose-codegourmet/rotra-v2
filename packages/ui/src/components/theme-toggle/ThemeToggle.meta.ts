@@ -9,7 +9,7 @@ export const themeToggleMeta = {
     'To toast "Light mode" / "Dark mode" as the prototypes do, pass onThemeChange to ThemeProvider.',
   ],
   prototype: {
-    file: 'app/mocksups-app/queue-app/rotra-queue.html',
+    file: 'apps/mockup/queue-app/rotra-queue.html',
     screen: 'Top bar › light/dark button (.theme-btn)',
   },
   docs: ['docs/screens/product/experience-contract.md#layout-and-device-behavior'],

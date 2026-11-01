@@ -53,9 +53,19 @@ retain their existing in-app discard sheets; browser Back and page exit also war
 nvm use && pnpm --filter @rotra/mockups lint
 nvm use && pnpm --filter @rotra/mockups type-check
 nvm use && pnpm --filter @rotra/mockups build
-nvm use && node app/mocksups-app/dist/server.mjs
+nvm use && node apps/mockup/dist/dev-server.mjs
 ```
 
-Build checks the inline prototype JavaScript syntax and copies a runnable server bundle into `dist/`.
+Build checks the inline prototype JavaScript syntax and copies a runnable local server bundle into `dist/`.
 Type-check covers the shared history driver; the legacy inline prototype scripts remain JavaScript.
 The server binds to loopback and serves only the launcher, routing asset, and prototype documents.
+
+## Vercel
+
+The root `vercel.json` includes this app as the `mockup` service at `mockup.rotra.club` in the same
+Services project as Queue, Player Information and Admin. Build also emits `dist/public/`: a static
+launcher, shared router/CSS and each prototype with the router enabled. Service-local rewrites send
+`/queue`, `/player`, `/admin` and their nested routes to the corresponding document, so refresh and
+direct links work without the development HTTP server. Legacy HTML links redirect to routed paths.
+The generated Vercel deployment URL also opens this launcher. Browser-local demo state remains
+separate from the real apps and from other origins.

@@ -10,7 +10,7 @@ export const clubPriceFieldsMeta = {
     'Yearly must be less than 12 × monthly; the message names the twelve-month total.',
   ],
   prototype: {
-    file: 'app/mocksups-app/admin-app/rotra-admin.html',
+    file: 'apps/mockup/admin-app/rotra-admin.html',
     screen: 'A-ADD-CLUB / A-CLUB-PRICE › priceFields()',
   },
   docs: [

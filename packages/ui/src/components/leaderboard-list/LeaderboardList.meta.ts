@@ -9,7 +9,7 @@ export const leaderboardListMeta = {
     'Use loading while the leaderboard query is pending.',
   ],
   prototype: {
-    file: 'app/mocksups-app/player-app/rotra-player.html',
+    file: 'apps/mockup/player-app/rotra-player.html',
     screen: 'P-LEADERBOARD › lbHead and list footer',
   },
   docs: ['docs/screens/product/modules/player-information/ranking-history.md'],

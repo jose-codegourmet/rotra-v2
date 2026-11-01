@@ -10,7 +10,7 @@ export const weightSplitBarMeta = {
     'It is role=img with the label "Assessment {a} percent, performance {p} percent", so the split is never shown by colour alone.',
   ],
   prototype: {
-    file: 'app/mocksups-app/admin-app/rotra-admin.html',
+    file: 'apps/mockup/admin-app/rotra-admin.html',
     screen: 'A-RANK-CONFIG › viewConfig .split',
   },
   docs: [

@@ -8,7 +8,7 @@ export const accountPanelMeta = {
     'Contact changes are requested in P04; requestSlot shows an open request chip.',
   ],
   prototype: {
-    file: 'app/mocksups-app/player-app/rotra-player.html',
+    file: 'apps/mockup/player-app/rotra-player.html',
     screen: 'Profile › privatePanel()',
   },
   docs: [

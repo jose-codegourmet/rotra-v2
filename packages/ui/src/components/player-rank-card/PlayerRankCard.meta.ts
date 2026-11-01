@@ -10,7 +10,7 @@ export const playerRankCardMeta = {
     'The row chip for the same status is RankStatusChip.',
   ],
   prototype: {
-    file: 'app/mocksups-app/admin-app/rotra-admin.html',
+    file: 'apps/mockup/admin-app/rotra-admin.html',
     screen: 'A-PLAYER-DETAIL › viewPlayer() › Rank and games (rankOf().text)',
   },
   docs: [

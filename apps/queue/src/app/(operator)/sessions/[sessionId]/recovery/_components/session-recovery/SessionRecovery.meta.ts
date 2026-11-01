@@ -5,7 +5,7 @@ export const sessionRecoveryMeta = {
     'The incomplete-records recovery flow with a separate explicit invalidation confirmation.',
   usage: ['Recovery only; never reopen invalid sessions or reconstruct original scores.'],
   prototype: {
-    file: 'app/mocksups-app/queue-app/rotra-queue.html',
+    file: 'apps/mockup/queue-app/rotra-queue.html',
     screen: 'No recovery screen; sheet and notice patterns',
   },
   docs: [

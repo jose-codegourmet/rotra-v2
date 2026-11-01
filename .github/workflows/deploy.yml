@@ -45,6 +45,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Verify service layout
+        run: node scripts/verify-vercel-services.mjs
+
       - name: Lint
         run: pnpm lint
 
@@ -55,6 +58,9 @@ jobs:
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: pnpm dlx "vercel@${VERCEL_CLI_VERSION}" pull --yes --environment=production --scope "$VERCEL_ORG_ID"
+
+      - name: Verify linked Services project
+        run: node scripts/verify-vercel-services.mjs --linked
 
       - name: Build production services
         run: pnpm dlx "vercel@${VERCEL_CLI_VERSION}" build --prod
@@ -75,4 +81,12 @@ jobs:
             echo '## Production deployment'
             echo "Commit: $GITHUB_SHA"
             echo "URL: $deployment_url"
+            echo ''
+            echo '| App | Production host |'
+            echo '| --- | --- |'
+            for app in mockup queue player admin; do
+              echo "| apps/$app | https://$app.rotra.club |"
+            done
+            echo ''
+            echo 'Custom hosts require domain attachment and valid DNS on the same Vercel project.'
           } >> "$GITHUB_STEP_SUMMARY"

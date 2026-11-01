@@ -4,7 +4,7 @@ export const weightSplitBarMeta = {
   description: 'Shared rank method and nine-level ladder.',
   usage: ['Explain configured inputs without numeric ratings or itemized club assessments.'],
   prototype: {
-    file: 'app/mocksups-app/player-app/rotra-player.html',
+    file: 'apps/mockup/player-app/rotra-player.html',
     screen: 'Games and Profile › Recent games',
   },
   docs: ['docs/screens/product/modules/player-information/ranking-history.md'],

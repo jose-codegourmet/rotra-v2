@@ -10,7 +10,7 @@ export const selectionBarMeta = {
     'Make match stays disabled until the pick is valid and is hidden when onMakeMatch is not given.',
   ],
   prototype: {
-    file: 'app/mocksups-app/queue-app/rotra-queue.html',
+    file: 'apps/mockup/queue-app/rotra-queue.html',
     screen: 'Live console › Players › playersPane() (.selbar), matchPlan()',
   },
   docs: [

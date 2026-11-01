@@ -10,7 +10,7 @@ export const autoQueueWorkspaceMeta = {
     'Main Queue regeneration stays in the supplied Main Queue content; the Auto Queue controls only affect drafts.',
   ],
   prototype: {
-    file: 'app/mocksups-app/queue-app/rotra-queue.html',
+    file: 'apps/mockup/queue-app/rotra-queue.html',
     screen: 'Q-QUEUE / Q-AUTO › Auto Queue workspace',
   },
   docs: [

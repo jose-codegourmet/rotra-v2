@@ -2,7 +2,7 @@
 
 **Last verified:** 2026-10-31 · **Audience:** contributors and AI coding agents.
 
-Every change to a mockup in [app/mocksups-app](../../app/mocksups-app/README.md) gets **one log file
+Every change to a mockup in [apps/mockup](../../apps/mockup/README.md) gets **one log file
 here**. The log is what turns a design change into work on the real apps: an agent reads the `NEW` logs
 and writes tickets from them.
 
@@ -11,7 +11,7 @@ and writes tickets from them.
 ## 1. The flow
 
 1. **A layout or UI change is requested.** Change the mockup first
-   (`app/mocksups-app/<app>/<file>.html`), not the real app. The real app changes later, through a ticket.
+   (`apps/mockup/<app>/<file>.html`), not the real app. The real app changes later, through a ticket.
 2. **Write the log.** One new file in this folder, from the template in §3, with `Status: NEW`.
 3. **Fix the docs the mockup made untrue, in the same change:**
    - business logic: `docs/business_logic/product/<product>/modules/<module>/`
@@ -44,7 +44,7 @@ Example: `2026-10-31-queue-court-card-timer.md`. Two changes on the same day get
 Status: NEW
 Date: YYYY-MM-DD
 App: queue | player | admin
-Mockup: app/mocksups-app/<app>/<file>.html › <screen / tab>
+Mockup: apps/mockup/<app>/<file>.html › <screen / tab>
 Screen ID: <from docs/screens, if it has one>
 
 ## What changed

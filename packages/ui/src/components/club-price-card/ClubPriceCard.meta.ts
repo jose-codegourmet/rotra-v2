@@ -10,7 +10,7 @@ export const clubPriceCardMeta = {
     'Changing the price never changes payments already recorded.',
   ],
   prototype: {
-    file: 'app/mocksups-app/admin-app/rotra-admin.html',
+    file: 'apps/mockup/admin-app/rotra-admin.html',
     screen: 'A-CLUB-DETAIL › License › panels.license (Price card)',
   },
   docs: [

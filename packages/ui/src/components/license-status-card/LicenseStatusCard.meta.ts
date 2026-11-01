@@ -11,7 +11,7 @@ export const licenseStatusCardMeta = {
     'There is no access bypass here: access changes only by recording a term.',
   ],
   prototype: {
-    file: 'app/mocksups-app/admin-app/rotra-admin.html',
+    file: 'apps/mockup/admin-app/rotra-admin.html',
     screen: 'A-CLUB-DETAIL › License › panels.license (first card)',
   },
   docs: [

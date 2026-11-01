@@ -12,14 +12,14 @@ where something belongs. For *how to write* the code, read [coding-conventions.m
 
 | Path | State |
 |---|---|
-| `apps/` | Three Next.js 16 apps with mock route/container code. Queue includes preparation, console, results and public sessions; Player includes profiles, ranking/history and account flows; Admin includes sign-in and workspace navigation. File presence is not end-to-end verification |
+| `apps/` | Three Next.js 16 apps with mock route/container code, plus the separate static prototype app in `apps/mockup`. Queue includes preparation, console, results and public sessions; Player includes profiles, ranking/history and account flows; Admin includes sign-in and workspace navigation. File presence is not end-to-end verification |
 | `packages/config` | Shared tsconfig and `theme.css`: Tailwind 4 tokens copied from the prototypes (F02.1) |
 | `packages/ui` | Shared visual components and forms with stories and metadata, plus `cn`, `ComponentMeta` and the one Storybook |
 | `packages/schema` | Shared Zod field families, phone/money tests, Vitest (F05.1) |
 | `packages/data` | In-memory store, mock auth, club/session and Player fixtures, fetchers, query keys and hooks |
 | `packages/db` | Server-only Prisma 7 package (F07.8 scaffold); schema groups and services land through [F07 #241](https://github.com/jose-codegourmet/rotra-v2/issues/241) (§10) |
 | `openspec/` | Focused Player implementation records restored at the product owner’s request; see `openspec/README.md`. Product and prototype docs retain precedence |
-| `app/mocksups-app/*/*.html` | The three clickable prototypes: the design source of truth |
+| `apps/mockup/*/*.html` | The three clickable prototypes: the design source of truth |
 | `Makefile`, root `package.json` scripts | Run the three apps through Turborepo (F01.1) |
 | `.husky/`, `.github/` | Commitlint hook (pre-commit lint disabled) and advisory CI; see ways-of-working §5 |
 
@@ -41,7 +41,8 @@ rotra/
 ├── apps/
 │   ├── queue/        @rotra/queue    Club operator app (main v1 product)      :9000
 │   ├── player/       @rotra/player   Player Information: profiles, leaderboard :9001
-│   └── admin/        @rotra/admin    Platform owner tools                      :9002
+│   ├── admin/        @rotra/admin    Platform owner tools                      :9002
+│   └── mockup/       @rotra/mockups  Canonical routed HTML prototypes          :9003
 ├── packages/
 │   ├── ui/           @rotra/ui       Every visual component and form + the one Storybook
 │   ├── data/         @rotra/data     Domain types, fixtures, mock store, fetchers, query keys, hooks
@@ -54,20 +55,26 @@ rotra/
 
 Ports are set in each app's `dev` and `start` scripts.
 
-The separate prototype workspace `app/mocksups-app` runs on port 9003 (`pnpm mockups`). Its
+The separate prototype workspace `apps/mockup` runs on port 9003 (`pnpm mockups`). Its
 Node HTTP server and browser History API expose `/player`, `/queue`, and `/admin`, with the
 actual app paths beneath those prefixes. It serves the canonical HTML designs with optional
 routing adapters and keeps their fictional browser-local stores. It does not import the real
-apps or provide operational persistence/auth. See its [route map](../app/mocksups-app/README.md).
+apps or provide operational persistence/auth. See its [route map](../apps/mockup/README.md).
+
+Production uses one Vercel Services project rooted at `./`. Host rewrites map `mockup.rotra.club`,
+`queue.rotra.club`, `player.rotra.club` and `admin.rotra.club` to their matching `apps/` directories.
+The mockup service publishes `dist/public` as static files; the other services use Next.js. The manual
+Deploy production workflow builds and publishes all four services together. Domain attachment/DNS
+is configured outside the repository; see the [deployment setup](../README.md#production-deployments).
 
 
 ### Product → app
 
 | Product | App | Prototype (design reference) | Business rules |
 |---|---|---|---|
-| Queue | `apps/queue` | [rotra-queue.html](../app/mocksups-app/queue-app/rotra-queue.html) | [Queue](business_logic/product/queue/README.md) |
-| Player Information | `apps/player` | [rotra-player.html](../app/mocksups-app/player-app/rotra-player.html) | [Player Information](business_logic/product/player-information/README.md) |
-| Admin | `apps/admin` | [rotra-admin.html](../app/mocksups-app/admin-app/rotra-admin.html) | [Admin](business_logic/product/admin/README.md) |
+| Queue | `apps/queue` | [rotra-queue.html](../apps/mockup/queue-app/rotra-queue.html) | [Queue](business_logic/product/queue/README.md) |
+| Player Information | `apps/player` | [rotra-player.html](../apps/mockup/player-app/rotra-player.html) | [Player Information](business_logic/product/player-information/README.md) |
+| Admin | `apps/admin` | [rotra-admin.html](../apps/mockup/admin-app/rotra-admin.html) | [Admin](business_logic/product/admin/README.md) |
 
 The Queue app also serves the **public session page** (session link): no sign-in, separate audience,
 its own route group. World is v2: no app, no routes.
@@ -89,7 +96,7 @@ apps/*  ──►  @rotra/ui  ──►  @rotra/schema
 |---|---|
 | `@rotra/ui` never imports hooks, fetchers, or the mock store, only `import type` from `@rotra/data` | Components stay pure and Storybook-able; data wiring lives in apps |
 | `@rotra/data` never imports `@rotra/ui` or an app | Swapping mocks for real fetchers touches one package |
-| Apps never import each other | Each app deploys alone |
+| Apps never import each other | Each app builds independently; the Services deployment releases them together |
 | A package never imports from an app | No cycles |
 | `@rotra/db` is imported only by server code (route handlers) | Prisma never reaches a client bundle |
 

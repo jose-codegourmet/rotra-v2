@@ -8,7 +8,7 @@ export const slotMeterMeta = {
     'Use in preparation and live Players; pass live for advisory counts and direct admission copy. The bar is a role=meter.',
   ],
   prototype: {
-    file: 'app/mocksups-app/queue-app/rotra-queue.html',
+    file: 'apps/mockup/queue-app/rotra-queue.html',
     screen: 'Q-PREPARE › slotMeter() (.slot-meter)',
   },
   docs: ['docs/screens/product/modules/queue/players-roster.md'],

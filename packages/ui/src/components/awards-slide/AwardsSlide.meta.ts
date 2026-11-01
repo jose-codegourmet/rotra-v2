@@ -10,7 +10,7 @@ export const awardsSlideMeta = {
     'showFormulaNote stays true until the award maths is decided (business open decision).',
   ],
   prototype: {
-    file: 'app/mocksups-app/queue-app/rotra-queue.html',
+    file: 'apps/mockup/queue-app/rotra-queue.html',
     screen: 'Q-AWARDS-SLIDE › slideAwards() (.slide, .award)',
   },
   docs: [

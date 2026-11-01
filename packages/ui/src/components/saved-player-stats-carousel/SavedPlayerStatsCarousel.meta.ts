@@ -7,7 +7,7 @@ export const savedPlayerStatsCarouselMeta = {
     'Place between the Saved players header and filters; pass unfiltered counts from @rotra/data.',
     'Omit stats for loading; render an error and retry in the container when the query fails.',
   ],
-  prototype: { file: 'app/mocksups-app/queue-app/rotra-queue.html', screen: 'Saved players' },
+  prototype: { file: 'apps/mockup/queue-app/rotra-queue.html', screen: 'Saved players' },
   docs: ['docs/screens/product/modules/queue/players-roster.md'],
   variants: ['default', 'zero', 'loading'],
   related: ['SavedPlayersFilterBar', 'SavedPlayerCard'],

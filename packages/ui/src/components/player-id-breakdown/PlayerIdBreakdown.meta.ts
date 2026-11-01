@@ -8,7 +8,7 @@ export const playerIdBreakdownMeta = {
     'Pass the offline notice through offlineNotice when the ID is a saved copy.',
   ],
   prototype: {
-    file: 'app/mocksups-app/player-app/rotra-player.html',
+    file: 'apps/mockup/player-app/rotra-player.html',
     screen: 'My player ID (.rtr-parts)',
   },
   docs: [

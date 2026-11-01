@@ -10,7 +10,7 @@ export const emptyStateMeta = {
     'For a failed load use ErrorState; for a search with no hits say what was searched.',
   ],
   prototype: {
-    file: 'app/mocksups-app/admin-app/rotra-admin.html',
+    file: 'apps/mockup/admin-app/rotra-admin.html',
     screen: 'Clubs › "No clubs match." (.empty); rotra-player.html › leaderboard empty',
   },
   docs: [

@@ -11,7 +11,7 @@ export const finalizeProgressMeta = {
     'The live region is aria-live="polite" and never takes focus. When everything is done the container opens the results view.',
   ],
   prototype: {
-    file: 'app/mocksups-app/queue-app/rotra-queue.html',
+    file: 'apps/mockup/queue-app/rotra-queue.html',
     screen: 'viewFinalizing › Finishing TITLE',
   },
   docs: [

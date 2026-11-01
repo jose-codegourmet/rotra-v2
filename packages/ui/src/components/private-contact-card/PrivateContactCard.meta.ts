@@ -12,7 +12,7 @@ export const privateContactCardMeta = {
     "The player's own Privacy and contact view is ContactDetailsCard.",
   ],
   prototype: {
-    file: 'app/mocksups-app/admin-app/rotra-admin.html',
+    file: 'apps/mockup/admin-app/rotra-admin.html',
     screen: 'A-PLAYER-DETAIL › viewPlayer() › Private contact',
   },
   docs: [

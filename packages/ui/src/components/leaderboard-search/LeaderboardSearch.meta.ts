@@ -4,7 +4,7 @@ export const leaderboardSearchMeta = {
   description: 'Leaderboard name, nickname and RTR ID search control.',
   usage: ['Use above the overall leaderboard.'],
   prototype: {
-    file: 'app/mocksups-app/player-app/rotra-player.html',
+    file: 'apps/mockup/player-app/rotra-player.html',
     screen: 'P-LEADERBOARD search',
   },
 } satisfies ComponentMeta

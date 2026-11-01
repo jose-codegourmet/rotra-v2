@@ -5,7 +5,7 @@ export const myPositionCardMeta = {
     'The signed-in player’s avatar and position on a neutral card with an accent border, or their eligibility status.',
   usage: ['Use on the leaderboard only for a signed-in player.'],
   prototype: {
-    file: 'app/mocksups-app/player-app/rotra-player.html',
+    file: 'apps/mockup/player-app/rotra-player.html',
     screen: 'P-LEADERBOARD meCard()',
   },
   variants: ['listed', 'not-listed'],

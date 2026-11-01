@@ -10,7 +10,7 @@ export const adminPlayerIdentityCardMeta = {
     'Pass the creation date as YYYY-MM-DD; it formats like the prototype (Mar 15, 2026).',
   ],
   prototype: {
-    file: 'app/mocksups-app/admin-app/rotra-admin.html',
+    file: 'apps/mockup/admin-app/rotra-admin.html',
     screen: 'A-PLAYER-DETAIL › viewPlayer() › Identity',
   },
   docs: [

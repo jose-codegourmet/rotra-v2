@@ -8,7 +8,7 @@ export const claimIdentityCheckMeta = {
     'The phone is passed already masked by the data layer; never pass the full number.',
   ],
   prototype: {
-    file: 'app/mocksups-app/player-app/rotra-player.html',
+    file: 'apps/mockup/player-app/rotra-player.html',
     screen: 'viewClaim › Is this you?',
   },
   docs: ['docs/screens/product/modules/player-information/access-registration.md'],

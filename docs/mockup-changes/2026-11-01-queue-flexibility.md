@@ -3,7 +3,7 @@
 Status: ALREADY A TICKET — #283
 Date: 2026-11-01
 App: queue
-Mockup: app/mocksups-app/queue-app/rotra-queue.html › preparation, Courts, Players, Queue
+Mockup: apps/mockup/queue-app/rotra-queue.html › preparation, Courts, Players, Queue
 Screen ID: Q-SETUP, Q-ADD-PLAYER, Q-POOL, Q-COURTS, Q-ADD-COURT, Q-QUEUE, Q-AUTO
 
 ## What changed

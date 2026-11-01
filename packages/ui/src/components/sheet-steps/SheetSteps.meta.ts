@@ -9,7 +9,7 @@ export const sheetStepsMeta = {
     'It only shows where you are; Back and Review buttons move between steps. For the clickable Queue session setup steps use SetupStepBar.',
   ],
   prototype: {
-    file: 'app/mocksups-app/admin-app/rotra-admin.html',
+    file: 'apps/mockup/admin-app/rotra-admin.html',
     screen: 'SHEETS.addClub / SHEETS.license › .steps',
   },
   docs: ['docs/screens/product/modules/admin/clubs-licenses.md'],

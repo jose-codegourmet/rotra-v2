@@ -10,7 +10,7 @@ export const courtsAndTimeSheetMeta = {
     'Remove is available for unoccupied courts while at least one court remains. A used start is fixed; mode, formats and the minimum stay unchanged during play.',
   ],
   prototype: {
-    file: 'app/mocksups-app/queue-app/rotra-queue.html',
+    file: 'apps/mockup/queue-app/rotra-queue.html',
     screen: 'SHEETS.adjust (ACT.openAdjust, ACT.quickAddCourt, ACT.extend)',
   },
   docs: [

@@ -10,7 +10,7 @@ export const errorStateMeta = {
     'Keep whatever the user typed; an error state never clears a form.',
   ],
   prototype: {
-    file: 'app/mocksups-app/player-app/rotra-player.html',
+    file: 'apps/mockup/player-app/rotra-player.html',
     screen: 'Leaderboard › "Couldn\'t load the leaderboard." + Try again',
   },
   docs: [

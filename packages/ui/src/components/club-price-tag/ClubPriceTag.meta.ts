@@ -9,7 +9,7 @@ export const clubPriceTagMeta = {
     'Free clubs show the chip instead of a price.',
   ],
   prototype: {
-    file: 'app/mocksups-app/admin-app/rotra-admin.html',
+    file: 'apps/mockup/admin-app/rotra-admin.html',
     screen: 'A-CLUBS › viewClubs() › td[data-label="Price"]',
   },
   docs: [

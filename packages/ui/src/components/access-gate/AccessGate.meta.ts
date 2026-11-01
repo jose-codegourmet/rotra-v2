@@ -10,7 +10,7 @@ export const accessGateMeta = {
     'Pass activeSession and onContinueActiveSession when the club has a live session; it may finish and sync it, not start another.',
   ],
   prototype: {
-    file: 'app/mocksups-app/queue-app/rotra-queue.html',
+    file: 'apps/mockup/queue-app/rotra-queue.html',
     screen: 'Q-ACCESS › viewAccess()',
   },
   docs: [

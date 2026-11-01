@@ -3,7 +3,7 @@
 Status: NEW
 Date: 2026-10-31
 App: queue, player, admin (shared prototype infrastructure)
-Mockup: app/mocksups-app/{queue,player,admin}-app/rotra-{queue,player,admin}.html
+Mockup: apps/mockup/{queue,player,admin}-app/rotra-{queue,player,admin}.html
 Screen ID: existing prototype surfaces; no new product screens
 
 ## What changed

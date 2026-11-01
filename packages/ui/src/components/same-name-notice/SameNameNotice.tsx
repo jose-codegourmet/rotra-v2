@@ -16,6 +16,7 @@ export type SameNameNoticeProps =
       /** Players list search results: one line per name shared by more than one player */
       variant: 'list'
       groups: SameNameGroup[]
+      matchReasons?: boolean
     }
   | {
       /** Player detail: the other players with this player's name */
@@ -44,9 +45,14 @@ export function SameNameNotice(props: SameNameNoticeProps) {
           <Fragment key={name}>
             {index > 0 ? <br /> : null}
             <b className="[overflow-wrap:anywhere]">
-              {count} players are named {name}.
+              {props.matchReasons
+                ? `${count} players · ${name}.`
+                : `${count} players are named ${name}.`}
             </b>{' '}
-            They're separate people with separate histories. Check the RTR ID before acting.
+            {props.matchReasons
+              ? 'These records have separate histories.'
+              : "They're separate people with separate histories."}{' '}
+            Check the RTR ID before acting.
           </Fragment>
         ))}
       </Notice>

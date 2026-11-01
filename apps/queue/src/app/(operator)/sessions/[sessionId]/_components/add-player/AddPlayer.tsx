@@ -17,7 +17,7 @@ import {
 } from '@rotra/ui/add-player-sheet'
 import type { NewPlayerFormValues } from '@rotra/ui/forms/new-player-form/schema'
 import { toast } from '@rotra/ui/toaster'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useAppSelector } from '@/store/hooks'
 import { selectDev } from '@/store/slices/devSlice'
 
@@ -42,6 +42,7 @@ const rankLabel = (label: string) =>
  * Information tab shows its offline notice; the lookup never runs, so nothing spins.
  */
 export function AddPlayer({ sessionId, open, onOpenChange }: AddPlayerProps) {
+  const submitting = useRef(false)
   const offline = useAppSelector(selectDev).offline
   const session = useQueueSession(sessionId)
   const roster = useSessionRoster(sessionId)
@@ -97,6 +98,7 @@ export function AddPlayer({ sessionId, open, onOpenChange }: AddPlayerProps) {
 
   const isPending = addSaved.isPending || addDirectory.isPending || addNew.isPending
   const options = {
+    onSettled: () => { submitting.current = false },
     onSuccess: (result: { message: string }) => {
       setServerError(undefined)
       setLastAdded(result.message)
@@ -112,6 +114,8 @@ export function AddPlayer({ sessionId, open, onOpenChange }: AddPlayerProps) {
   }
 
   const confirm = ({ candidate, source, level, identityCheck }: AddPlayerConfirmInput) => {
+    if (submitting.current || !s || !roster.data || !clubPlayers.data) return
+    submitting.current = true
     setServerError(undefined)
     const identityCheckInput = identityCheck ?? undefined
     if (source === 'saved')
@@ -127,6 +131,8 @@ export function AddPlayer({ sessionId, open, onOpenChange }: AddPlayerProps) {
   }
 
   const submitNewPlayer = (values: NewPlayerFormValues) => {
+    if (submitting.current || !s || !roster.data) return
+    submitting.current = true
     setServerError(undefined)
     addNew.mutate(
       {
@@ -158,8 +164,8 @@ export function AddPlayer({ sessionId, open, onOpenChange }: AddPlayerProps) {
       needsConfirmStep={(candidate) => needsConfirmStep(candidate)}
       onConfirm={confirm}
       onSubmitNewPlayer={submitNewPlayer}
-      isPending={isPending}
-      serverError={serverError}
+      isPending={isPending || session.isPending || roster.isPending || clubPlayers.isPending}
+      serverError={serverError ?? (session.error || roster.error || clubPlayers.error ? 'Could not load players. Close and reopen to retry.' : undefined)}
       serverErrorReturnsToList={errorReturnsToList}
       lastAdded={lastAdded}
       addedCount={addedCount}

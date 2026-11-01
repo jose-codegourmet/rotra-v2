@@ -279,6 +279,8 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
       {waitlist.length || full ? (
         <WaitlistPanel
           live
+          isPending={giveSlot.isPending || fillOpenSlots.isPending || removeFromWaitlist.isPending}
+          serverError={giveSlot.error || fillOpenSlots.error || removeFromWaitlist.error ? errorMessage(giveSlot.error ?? fillOpenSlots.error ?? removeFromWaitlist.error) : undefined}
           entries={entries}
           rosterCount={rosterList.length}
           courtCount={s.courts.length}

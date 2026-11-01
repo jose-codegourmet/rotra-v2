@@ -5,6 +5,8 @@ import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, readMockState } from '../mock/store'
 import { requireClubAccess } from '../mock/transaction'
+import { isRealDataMode } from '../real/mode'
+import { realGetClubPlayers } from '../real/queue'
 import type { ClubPlayer } from './clubPlayer.types'
 import { deriveSavedPlayerStats } from './savedPlayerStats.rules'
 export type ClubPlayerFilters = {
@@ -47,29 +49,20 @@ export function clubPlayerView(state: MockState, player: ClubPlayer) {
     addedAt: addedAt(player),
   }
 }
-export async function getClubPlayers(filters: ClubPlayerFilters = {}) {
-  await delay()
-  requireClubAccess()
-  const state = readMockState(),
-    live = state.sessions.find((s) => s.clubId === DEMO_CLUB_ID && s.state === 'active'),
-    q = filters.search?.trim().toLocaleLowerCase() ?? ''
-  const rows = state.clubPlayers
-    .filter(
-      (p) =>
-        p.clubId === DEMO_CLUB_ID &&
-        (!p.playerId || !state.adminPlayerRecords[p.playerId]?.archivedAt),
-    )
-    .map((p) => clubPlayerView(state, p))
+export type ClubPlayerView = ReturnType<typeof clubPlayerView>
+/** Where a saved player is in the live session, for the "Right now" filter; null when not in it. */
+type RightNow = { present: boolean; playing: boolean } | null
+
+/** Applies the Saved players filters and groups by first letter (A–Z, then #). */
+function filterAndGroup(
+  views: ClubPlayerView[],
+  filters: ClubPlayerFilters,
+  rightNowOf: (p: ClubPlayerView) => RightNow,
+) {
+  const q = filters.search?.trim().toLocaleLowerCase() ?? ''
+  const rows = views
     .filter((p) => {
-      const roster = state.roster.find((r) => r.sessionId === live?.id && r.clubPlayerId === p.id)
-      const playing =
-        roster &&
-        state.matches.some(
-          (m) =>
-            m.state === 'active' &&
-            m.sessionId === live?.id &&
-            [...m.teamA, ...m.teamB].includes(roster.id),
-        )
+      const now = rightNowOf(p)
       const age = Date.now() - p.addedAt
       return (
         (!q || [p.fullName, p.nickname, p.rtrId].some((v) => v?.toLocaleLowerCase().includes(q))) &&
@@ -89,10 +82,10 @@ export async function getClubPlayers(filters: ClubPlayerFilters = {}) {
             : age <= Number(filters.added) * 86400000)) &&
         (!filters.rightNow ||
           filters.rightNow === 'all' ||
-          (!!roster &&
+          (!!now &&
             (filters.rightNow === 'session' ||
-              (filters.rightNow === 'playing' && !!playing) ||
-              (filters.rightNow === 'waiting' && roster.present && !playing))))
+              (filters.rightNow === 'playing' && now.playing) ||
+              (filters.rightNow === 'waiting' && now.present && !now.playing))))
       )
     })
     .sort((a, b) => a.fullName.localeCompare(b.fullName))
@@ -105,7 +98,38 @@ export async function getClubPlayers(filters: ClubPlayerFilters = {}) {
   }
   return { players: rows, groups }
 }
+export async function getClubPlayers(filters: ClubPlayerFilters = {}) {
+  // Real data has no live-session view here yet, so "Right now" matches nobody but "All".
+  if (isRealDataMode()) return filterAndGroup(await realGetClubPlayers(), filters, () => null)
+  await delay()
+  requireClubAccess()
+  const state = readMockState(),
+    live = state.sessions.find((s) => s.clubId === DEMO_CLUB_ID && s.state === 'active')
+  const views = state.clubPlayers
+    .filter(
+      (p) =>
+        p.clubId === DEMO_CLUB_ID &&
+        (!p.playerId || !state.adminPlayerRecords[p.playerId]?.archivedAt),
+    )
+    .map((p) => clubPlayerView(state, p))
+  return filterAndGroup(views, filters, (p) => {
+    const roster = state.roster.find((r) => r.sessionId === live?.id && r.clubPlayerId === p.id)
+    if (!roster) return null
+    const playing = state.matches.some(
+      (m) =>
+        m.state === 'active' &&
+        m.sessionId === live?.id &&
+        [...m.teamA, ...m.teamB].includes(roster.id),
+    )
+    return { present: roster.present, playing }
+  })
+}
 export async function getClubPlayer(id: string) {
+  if (isRealDataMode()) {
+    const player = (await realGetClubPlayers()).find((p) => p.id === id)
+    if (!player) throw new MockError('permission', 'Player not available.')
+    return player
+  }
   await delay()
   requireClubAccess()
   const state = readMockState(),
@@ -117,6 +141,10 @@ export async function getClubPlayer(id: string) {
 
 /** The entire club roster, never the page's filtered list. */
 export async function getSavedPlayerStats() {
+  if (isRealDataMode()) {
+    const players = await realGetClubPlayers()
+    return deriveSavedPlayerStats(players, players[0]?.clubId ?? '', Date.now())
+  }
   await delay()
   requireClubAccess()
   const state = readMockState()

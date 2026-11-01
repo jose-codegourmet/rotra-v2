@@ -6,6 +6,7 @@ import type { MockState } from '../mock/store'
 import { queueMutation } from '../mock/transaction'
 import { PLAYING_LEVELS, type PlayingLevel } from '../player/player.types'
 import { isRealDataMode } from '../real/mode'
+import { realAddDirectoryPlayerToClub, realAddNewSavedPlayer } from '../real/queue'
 import { levelLabel } from '../session-roster/sessionRoster.rules'
 import type { ClubPlayer } from './clubPlayer.types'
 
@@ -77,12 +78,6 @@ function savedLevel(level: PlayingLevel | null | undefined) {
   return level ?? null
 }
 
-// Saved players › Add player writes only to the mock store; there is no club player endpoint yet.
-function requireMockData() {
-  if (isRealDataMode())
-    fail('Saving a player without a session is not available yet. Add them from a session.')
-}
-
 /**
  * Saved players › Add player › New player: saves a guest (no phone) or pending player (phone) to the
  * club's saved players with the level, if one was chosen. Never touches a session. A phone that
@@ -94,7 +89,8 @@ export function addNewSavedPlayer(input: {
   phone?: string | null
   level?: PlayingLevel | null
 }) {
-  requireMockData()
+  // Real data: a level is only recorded with a session, so the player is saved without one.
+  if (isRealDataMode()) return realAddNewSavedPlayer(input)
   return queueMutation({ area: 'Roster', clubAccess: true }, (s) => {
     const level = savedLevel(input.level)
     const phone = input.phone?.trim() ? phoneField.safeParse(input.phone) : null
@@ -121,7 +117,7 @@ export function addNewSavedPlayer(input: {
  * suggestion; null saves no level yet.
  */
 export function addDirectoryPlayerToClub(input: { playerId: string; level?: PlayingLevel | null }) {
-  requireMockData()
+  if (isRealDataMode()) return realAddDirectoryPlayerToClub(input)
   return queueMutation({ area: 'Roster', onlineOnly: true, clubAccess: true }, (s) => {
     const level =
       input.level === undefined ? directoryLevel(input.playerId) : savedLevel(input.level)

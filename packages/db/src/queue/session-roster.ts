@@ -156,7 +156,7 @@ export async function addSavedPlayerToSession(
  * New guest or phone-entered player (Q-ROSTER · New player). A phone is kept only as private intake
  * awaiting identity resolution after sync (F07.22); it never reaches roster payloads.
  */
-async function createClubPlayer(
+export async function createClubPlayer(
   tx: Tx,
   context: ClubContext,
   operationId: string,
@@ -187,6 +187,59 @@ async function createClubPlayer(
       data: { clubPlayerId: id, clubId: context.clubId, phoneE164: phone, capturedAt: now },
     })
   return clubPlayer
+}
+
+/**
+ * The club's saved player for a Player Information profile, created when the club has not saved
+ * them yet (`club_players` is unique per club and player). Archived or unknown profiles are refused.
+ */
+export async function clubPlayerForProfile(
+  tx: Tx,
+  context: ClubContext,
+  operationId: string,
+  playerId: string,
+  now: Date,
+) {
+  const saved = await tx.clubPlayer.findFirst({ where: { clubId: context.clubId, playerId } })
+  if (saved) return { clubPlayer: saved, created: false }
+  const player = await tx.player.findUnique({
+    where: { id: playerId },
+    select: { fullName: true, nickname: true, idAllocation: { select: { rtrId: true } } },
+  })
+  if (!player?.idAllocation)
+    throw new ServiceError('not_found', { player: 'Player not available.' })
+  const clubPlayer = await tx.clubPlayer.create({
+    data: {
+      id: await derivedId(operationId, 'club-player'),
+      clubId: context.clubId,
+      playerId,
+      displayName: player.fullName,
+      nickname: player.nickname,
+      addedAt: now,
+    },
+  })
+  return { clubPlayer, created: true }
+}
+
+/** Adds a Player Information profile to the session, saving them to the club on the way (Q-ROSTER). */
+export async function addDirectoryPlayerToSession(
+  context: ClubContext,
+  sessionId: string,
+  input: { operationId: string; playerId: string; level: string; identityCheck?: IdentityCheck },
+) {
+  const skillLevelId = levelIdFor(input.level)
+  return rosterCommand(context, sessionId, async (tx, session) => {
+    const now = new Date()
+    const { clubPlayer } = await clubPlayerForProfile(
+      tx,
+      context,
+      input.operationId,
+      input.playerId,
+      now,
+    )
+    await requireIdentity(tx, clubPlayer, input.identityCheck)
+    return place(tx, context, session, clubPlayer, skillLevelId, input.operationId, now)
+  })
 }
 
 /** `phone` is already normalized to E.164 by `@rotra/schema/phone` at the Route Handler. */

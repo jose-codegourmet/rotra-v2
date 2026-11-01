@@ -50,21 +50,51 @@ export function SetupCourtsSection({ editContext }: SetupCourtsSectionProps) {
       <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,200px),1fr))] gap-3.5">
         {labels.map((_, i) => (
           <div key={i} className="flex flex-col gap-2">
-          <Field label={`Court ${i + 1} label`} error={errors.courtLabels?.[i]?.message}>
-            <Controller
-              control={form.control}
-              name={`courtLabels.${i}`}
-              render={({ field }) => (
-                <TextInput {...field} invalid={Boolean(errors.courtLabels?.[i])} />
-              )}
-            />
-          </Field>
-          <Field label="Planned start" error={errors.courtStarts?.[i]?.message} hint="Blank follows the session start.">
-            <Controller control={form.control} name={`courtStarts.${i}`} render={({ field }) => <TimeField {...field} value={field.value ?? ''} aria-label={`Court ${i + 1} planned start`} invalid={!!errors.courtStarts?.[i]} />} />
-          </Field>
-          <Field label="Open until" error={errors.courtEnds?.[i]?.message} hint="Blank follows the session end. An overnight time is on the next day.">
-            <Controller control={form.control} name={`courtEnds.${i}`} render={({ field }) => <TimeField {...field} value={field.value ?? ''} aria-label={`Court ${i + 1} open until`} invalid={!!errors.courtEnds?.[i]} />} />
-          </Field>
+            <Field label={`Court ${i + 1} label`} error={errors.courtLabels?.[i]?.message}>
+              <Controller
+                control={form.control}
+                name={`courtLabels.${i}`}
+                render={({ field }) => (
+                  <TextInput {...field} invalid={Boolean(errors.courtLabels?.[i])} />
+                )}
+              />
+            </Field>
+            <Field
+              label="Planned start"
+              error={errors.courtStarts?.[i]?.message}
+              hint="Blank follows the session start."
+            >
+              <Controller
+                control={form.control}
+                name={`courtStarts.${i}`}
+                render={({ field }) => (
+                  <TimeField
+                    {...field}
+                    value={field.value ?? ''}
+                    aria-label={`Court ${i + 1} planned start`}
+                    invalid={!!errors.courtStarts?.[i]}
+                  />
+                )}
+              />
+            </Field>
+            <Field
+              label="Open until"
+              error={errors.courtEnds?.[i]?.message}
+              hint="Blank follows the session end. An overnight time is on the next day."
+            >
+              <Controller
+                control={form.control}
+                name={`courtEnds.${i}`}
+                render={({ field }) => (
+                  <TimeField
+                    {...field}
+                    value={field.value ?? ''}
+                    aria-label={`Court ${i + 1} open until`}
+                    invalid={!!errors.courtEnds?.[i]}
+                  />
+                )}
+              />
+            </Field>
           </div>
         ))}
       </div>

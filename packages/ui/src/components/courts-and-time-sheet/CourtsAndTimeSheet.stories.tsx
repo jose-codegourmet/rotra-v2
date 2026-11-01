@@ -33,4 +33,12 @@ export const Extended: Story = { args: { endsAt: session.scheduledEndAt + 360000
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
 export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }
 
-export const FiveBookingWindows: Story = { args: { courts: courtWindowFixture.courts, startsAt: courtWindowFixture.session.scheduledStartAt, endsAt: courtWindowFixture.session.scheduledEndAt, onEditCourt: fn(), onRemoveCourt: fn() } }
+export const FiveBookingWindows: Story = {
+  args: {
+    courts: courtWindowFixture.courts,
+    startsAt: courtWindowFixture.session.scheduledStartAt,
+    endsAt: courtWindowFixture.session.scheduledEndAt,
+    onEditCourt: fn(),
+    onRemoveCourt: fn(),
+  },
+}

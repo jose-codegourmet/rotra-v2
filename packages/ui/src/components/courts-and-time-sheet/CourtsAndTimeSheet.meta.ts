@@ -3,11 +3,11 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const courtsAndTimeSheetMeta = {
   name: 'CourtsAndTimeSheet',
   description:
-    'The Courts and time sheet (Q-SESSION-ADJUST), opened by Extend time on the live console: the court labels with "Add a court…", "Ends at HH:MM" with Extend 30 min and Extend 60 min, and the note that occupied courts and running matches are not changed here.',
+    'The Courts and time sheet (Q-SESSION-ADJUST), opened by Extend time on the live console: the individual court windows with Edit and guarded Remove, plus "Add a court…", "Ends at HH:MM" with Extend 30 min and Extend 60 min, and the note that occupied courts and running matches are not changed here.',
   usage: [
     'Pass the session\'s courts (not removed) and scheduledEndAt. onAddCourt opens AddCourtForm; onExtend(30 | 60) runs useExtendSession in the container, which shows the "Session now ends HH:MM" toast.',
     'Pass isPending while the extension runs so one tap cannot extend twice; the sheet stays open and Done closes it.',
-    'Courts are not removed from here (that happens on the court tile), and mode, formats and the minimum are not offered during play: that is an open decision.',
+    'Remove is available for unoccupied courts while at least one court remains. A used start is fixed; mode, formats and the minimum stay unchanged during play.',
   ],
   prototype: {
     file: 'app/mocksups-app/queue-app/rotra-queue.html',

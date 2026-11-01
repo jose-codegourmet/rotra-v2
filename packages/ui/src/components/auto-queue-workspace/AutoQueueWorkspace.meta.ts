@@ -17,5 +17,6 @@ export const autoQueueWorkspaceMeta = {
     'docs/screens/product/modules/queue/match-queue.md',
     'docs/business_logic/product/queue/modules/queueing/README.md',
   ],
+  variants: ['empty', 'generated', 'loading', 'pending', 'stale', 'conflict', 'catch-up'],
   related: ['AutoQueueSheet', 'RegenerateQueueSheet', 'Tabs', 'Checkbox'],
 } satisfies ComponentMeta

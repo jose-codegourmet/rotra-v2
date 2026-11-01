@@ -26,7 +26,10 @@ export const activeMatchFor = (id: string, matches: Match[]) =>
   matches.find((m) => m.state === 'active' && allPlayers(m).includes(id))
 export const freeCourts = (courts: SessionCourt[], matches: Match[], now = Date.now()) =>
   courts.filter(
-    (c) => !c.removedAt && (c.startsAt ?? 0) <= now && !matches.some((m) => m.state === 'active' && m.courtIds.includes(c.id)),
+    (c) =>
+      !c.removedAt &&
+      (c.startsAt ?? 0) <= now &&
+      !matches.some((m) => m.state === 'active' && m.courtIds.includes(c.id)),
   )
 export const queuedCount = (id: string, matches: Match[]) =>
   matches.filter((m) => m.state === 'waiting' && allPlayers(m).includes(id)).length
@@ -36,7 +39,12 @@ export const listNames = (names: string[]) =>
   names.length < 3 ? names.join(' and ') : `${names.slice(0, -1).join(', ')} and ${names.at(-1)}`
 export const courtNames = (m: Pick<Match, 'courtIds'>, courts: SessionCourt[]) =>
   m.courtIds.map((id) => courts.find((c) => c.id === id)?.label ?? 'Court').join(' + ')
-export type MatchContext = { roster: SessionPlayer[]; matches: Match[]; courts: SessionCourt[]; now?: number }
+export type MatchContext = {
+  roster: SessionPlayer[]
+  matches: Match[]
+  courts: SessionCourt[]
+  now?: number
+}
 export function completeLineup(m: MatchLineup) {
   const sizes = FORMAT_TEAM_SIZES[m.format]
   return (

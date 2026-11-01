@@ -5,7 +5,6 @@ import { z } from 'zod'
 
 export const COURT_LABEL_MAX = 40
 export const CLOSING_TIME_ERROR = 'Choose a closing time.'
-export const AFTER_NOW_ERROR = 'Choose a time later than now.'
 export const afterSessionEndError = (sessionEndsAt: number) =>
   `That's after the session ends at ${formatTime(sessionEndsAt)}. Pick an earlier time, or extend the session first.`
 
@@ -20,8 +19,6 @@ export function timeOnSession(sessionStartsAt: number, hhmm: string): number {
 }
 
 export type AddCourtSchemaOptions = {
-  /** The current time; a set time must be later than this */
-  now: number
   /** The session's start: set times are placed on this day (or the next, overnight) */
   sessionStartsAt: number
   /** The session's scheduled end: a set time may not be after it */
@@ -33,8 +30,7 @@ export type AddCourtSchemaOptions = {
 
 /**
  * Q-ADD-COURT: a court label (the next "Court N" when empty) and when the court closes: with the
- * session (openUntil null) or at a set time on the session's day, later than now and not after the
- * session end.
+ * session (openUntil null) or at a set time on the session's day, after the planned start and within the session. A passed planned end remains advisory.
  */
 export function makeAddCourtSchema({
   sessionStartsAt,
@@ -63,15 +59,25 @@ export function makeAddCourtSchema({
         ctx.addIssue({ code: 'custom', message: CLOSING_TIME_ERROR, path: ['time'] })
         return z.NEVER
       }
-      const startsAt = values.startTime ? timeOnSession(sessionStartsAt, values.startTime) : sessionStartsAt
+      const typedStart = values.startTime
+        ? timeOnSession(sessionStartsAt, values.startTime)
+        : sessionStartsAt
       const openUntil = values.mode === 'end' ? null : timeOnSession(sessionStartsAt, values.time)
-      if (lockedStartsAt !== undefined && startsAt !== lockedStartsAt) {
+      if (
+        lockedStartsAt !== undefined &&
+        Math.floor(typedStart / 60000) !== Math.floor(lockedStartsAt / 60000)
+      ) {
         ctx.addIssue({ code: 'custom', message: 'Start is fixed after use.', path: ['startTime'] })
         return z.NEVER
       }
+      const startsAt = lockedStartsAt ?? typedStart
       const error = courtWindowError(startsAt, openUntil, sessionStartsAt, sessionEndsAt)
       if (error) {
-        ctx.addIssue({ code: 'custom', message: error, path: [startsAt < sessionStartsAt || startsAt >= sessionEndsAt ? 'startTime' : 'time'] })
+        ctx.addIssue({
+          code: 'custom',
+          message: error,
+          path: [startsAt < sessionStartsAt || startsAt >= sessionEndsAt ? 'startTime' : 'time'],
+        })
         return z.NEVER
       }
       return { label: values.label, startsAt, openUntil }

@@ -17,6 +17,7 @@ export type CourtDrawingProps = {
   courts?: 1 | 2
   /** A free court: neutral colours and a "Free" label, no players */
   free?: boolean
+  freeLabel?: string
   teamA?: CourtPlayer[]
   teamB?: CourtPlayer[]
   /** Opens a player's profile */
@@ -45,6 +46,7 @@ const sizeFor = (n: number): 34 | 28 | 24 => (n <= 1 ? 34 : n <= 3 ? 28 : 24)
 export function CourtDrawing({
   courts = 1,
   free = false,
+  freeLabel = 'Free',
   teamA = [],
   teamB = [],
   onOpenProfile,
@@ -132,7 +134,7 @@ export function CourtDrawing({
       </svg>
       {free ? (
         <span className="absolute inset-0 grid place-items-center text-xs font-extrabold tracking-[2px] text-fg2 uppercase">
-          Free
+          {freeLabel}
         </span>
       ) : (
         <div className="absolute inset-0 grid grid-cols-2">

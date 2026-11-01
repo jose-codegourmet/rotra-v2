@@ -1,4 +1,6 @@
 import { PLAYING_LEVELS, type PlayingLevel } from '../player/player.types'
+export const ROSTER_DUPLICATE_ERROR = 'This player is already on the roster or waitlist.'
+
 export function levelLabel(level: PlayingLevel) {
   return level
     .split('_')

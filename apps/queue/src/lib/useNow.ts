@@ -24,7 +24,11 @@ function sheetIsOpen() {
  * while a sheet is open, a field has focus, or a pointer is held down (a queue card being dragged);
  * the next tick after the work ends catches up. Pass `paused` for work the DOM cannot show.
  */
-export function useNow(intervalMs = CONSOLE_REFRESH_MS, paused = false, duringInteraction = false): number {
+export function useNow(
+  intervalMs = CONSOLE_REFRESH_MS,
+  paused = false,
+  duringInteraction = false,
+): number {
   const [now, setNow] = useState(() => Date.now())
   useEffect(() => {
     let pointerDown = false
@@ -38,7 +42,8 @@ export function useNow(intervalMs = CONSOLE_REFRESH_MS, paused = false, duringIn
     document.addEventListener('pointerup', up)
     document.addEventListener('pointercancel', up)
     const timer = window.setInterval(() => {
-      if (paused || (!duringInteraction && (pointerDown || sheetIsOpen() || fieldHasFocus()))) return
+      if (paused || (!duringInteraction && (pointerDown || sheetIsOpen() || fieldHasFocus())))
+        return
       setNow(Date.now())
     }, intervalMs)
     return () => {

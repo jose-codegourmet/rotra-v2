@@ -75,7 +75,7 @@ Table: rank (top three highlighted), player picture, name and level, W, L, Games
 
 Sheet **Courts and time**, opened by **Extend time**:
 
-- Courts: current labels and **Add a court…** (opens Q-ADD-COURT).
+- Courts: current booking windows with **Edit**, guarded **Remove**, and **Add a court…** (opens Q-ADD-COURT).
 - “Ends at HH:MM” with **Extend 30 min** and **Extend 60 min**. Hint: “The public page shows the new end time after it syncs.” Toast: “Session now ends HH:MM”.
 - Copy: “Occupied courts can't be removed, and running matches aren't changed here. Changing mode, formats or the minimum during play hasn't been decided.”
 
@@ -83,16 +83,17 @@ Add player uses [Q-ADD-PLAYER](players-roster.md); the late player's level locks
 
 ## Q-ADD-COURT — Add a court
 
-Sheet titled “Add LABEL?”.
+Sheet titled “Add LABEL?” or “Edit LABEL?”.
 
 | Control | Behavior |
 |---|---|
 | Court label | Defaults to the next “Court N” |
+| Planned start | The court is unavailable before this time; fixed after the court has hosted a match |
 | Open until | **Until the session ends** (“HH:MM · moves if you extend time”) or **Until a set time** (“For a court booked for less time”) with a time field |
 
-Errors: “Choose a closing time.”; “Choose a time later than now.”; “That's after the session ends at HH:MM. Pick an earlier time, or extend the session first.”
+Errors: “Choose a closing time.”; “Choose a planned start within the session.”; “Choose an end after the planned start.”; “Extend the session before choosing a later court end.” Overnight values indicate the next day. A passed end may still be edited.
 
-Preview: “LABEL is planned to open until HH:MM.” Note: “Courts show their closing time on the card. ROTRA doesn't stop a game at that time; it's a reminder for you.” Primary **Add LABEL**. Toast: “LABEL added · open until HH:MM”.
+Preview: “LABEL is planned to open until HH:MM.” Note: “Courts show their closing time on the card. ROTRA doesn't stop a game at that time; it's a reminder for you.” Primary **Add LABEL** or **Save court**. Toast: “LABEL added · open until HH:MM”.
 
 ## State behavior
 

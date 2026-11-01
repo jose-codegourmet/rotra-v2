@@ -99,10 +99,12 @@ export function WaitlistPanel({
               </b>{' '}
               used ({courtCount} court{courtCount === 1 ? '' : 's'} × {playersPerCourt} players)
               {open ? ` · ${open} open` : ' · full'}.{' '}
-              {live ? 'Admit any chosen waitlisted player, including above the plan. Waitlisted players are not present until admitted.' : 'First come, first served.'}
+              {live
+                ? 'Admit any chosen waitlisted player, including above the plan. Waitlisted players are not present until admitted.'
+                : 'First come, first served.'}
             </p>
           </div>
-          {fill && !live ? (
+          {fill ? (
             <Button size="sm" variant="primary" disabled={isPending} onClick={onFillOpenSlots}>
               Fill {fill} open slot{fill > 1 ? 's' : ''}
             </Button>
@@ -112,7 +114,10 @@ export function WaitlistPanel({
         {entries.length ? (
           <div className="flex flex-col divide-y divide-border">
             {entries.map((w, i) => (
-              <div key={w.id} className="flex min-w-0 items-center gap-3 py-3">
+              <div
+                key={w.id}
+                className="grid min-w-0 grid-cols-[auto_auto_minmax(0,1fr)_auto] items-center gap-3 py-3 sm:flex"
+              >
                 <span className="font-mono font-bold">#{i + 1}</span>
                 <Avatar name={w.name} src={w.photoUrl} onClick={() => onOpenProfile(w.id)} />
                 <div className="flex min-w-0 flex-1 flex-col">
@@ -123,6 +128,7 @@ export function WaitlistPanel({
                 </div>
                 <Button
                   size="xs"
+                  className="col-start-3 row-start-2 justify-self-start"
                   disabled={isPending}
                   variant={live || open ? 'primary' : 'secondary'}
                   title={live || open ? undefined : 'Over your slot budget'}
@@ -133,6 +139,7 @@ export function WaitlistPanel({
                 <IconButton
                   size="xs"
                   variant="ghost"
+                  className="col-start-4 row-start-1"
                   disabled={isPending}
                   label={`Remove ${w.name} from the waitlist`}
                   onClick={() => onRemove(w.id)}

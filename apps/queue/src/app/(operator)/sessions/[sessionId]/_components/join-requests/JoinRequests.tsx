@@ -36,7 +36,9 @@ export function JoinRequests({ sessionId, variant = 'card', className }: JoinReq
   const decline = useDeclineJoinRequest()
 
   const options = {
-    onSettled: () => { submitting.current = false },
+    onSettled: () => {
+      submitting.current = false
+    },
     onSuccess: (result: { message: string }) => toast(result.message),
     onError: (error: unknown) => toast.error(errorMessage(error)),
   }
@@ -56,14 +58,26 @@ export function JoinRequests({ sessionId, variant = 'card', className }: JoinReq
     <JoinRequestsPanel
       loading={loading}
       isPending={confirm.isPending || decline.isPending}
-      serverError={confirm.error || decline.error || session.error || roster.error ? errorMessage(confirm.error ?? decline.error ?? session.error ?? roster.error) : undefined}
+      serverError={
+        confirm.error || decline.error || session.error || roster.error
+          ? errorMessage(confirm.error ?? decline.error ?? session.error ?? roster.error)
+          : undefined
+      }
       requests={requests}
       live={s?.state === 'active'}
       slotsFull={slotsFull}
       variant={variant}
       className={className}
-      onConfirm={(requestId, level) => { if (submitting.current) return; submitting.current = true; confirm.mutate({ requestId, level }, options) }}
-      onDecline={(requestId) => { if (submitting.current) return; submitting.current = true; decline.mutate(requestId, options) }}
+      onConfirm={(requestId, level) => {
+        if (submitting.current) return
+        submitting.current = true
+        confirm.mutate({ requestId, level }, options)
+      }}
+      onDecline={(requestId) => {
+        if (submitting.current) return
+        submitting.current = true
+        decline.mutate(requestId, options)
+      }}
     />
   )
 }

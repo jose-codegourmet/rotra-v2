@@ -75,7 +75,23 @@ export const Phone: Story = {
 }
 export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }
 
-export const ActiveFull: Story = { args: { live: true, rosterCount: admission.full, courtCount: admission.courtCount, playersPerCourt: admission.playersPerCourt } }
-export const ActiveOverPlan: Story = { args: { live: true, rosterCount: admission.over, courtCount: admission.courtCount, playersPerCourt: admission.playersPerCourt } }
+export const ActiveFull: Story = {
+  args: {
+    live: true,
+    rosterCount: admission.full,
+    courtCount: admission.courtCount,
+    playersPerCourt: admission.playersPerCourt,
+  },
+}
+export const ActiveOverPlan: Story = {
+  args: {
+    live: true,
+    rosterCount: admission.over,
+    courtCount: admission.courtCount,
+    playersPerCourt: admission.playersPerCourt,
+  },
+}
 export const AdmissionPending: Story = { args: { live: true, isPending: true } }
-export const AdmissionError: Story = { args: { live: true, serverError: 'Changes could not be saved' } }
+export const AdmissionError: Story = {
+  args: { live: true, serverError: 'Changes could not be saved' },
+}

@@ -2,6 +2,8 @@
 import { useSignIn } from '@rotra/data/auth/use-sign-in'
 import { useSignOut } from '@rotra/data/auth/use-sign-out'
 import { useSimulateClubNameApproval } from '@rotra/data/club/useSimulateClubNameApproval'
+import { loadQueueFlexibilityExample } from '@rotra/data/mock/queue-examples'
+import { useRouter } from 'next/navigation'
 import { resetDemoData } from '@rotra/data/mock/reset'
 import { useNowCard } from '@rotra/data/queue-session/useNowCard'
 import { useAddSampleJoinRequest } from '@rotra/data/session-roster/useAddSampleJoinRequest'
@@ -13,6 +15,14 @@ import { resetDev, selectDev, setDevToggle } from '@/store/slices/devSlice'
 
 /** The "Prototype" button and its controls; rendered in the top bars of development builds only. */
 export function DevTools() {
+  const router = useRouter()
+  const loadExample = (kind: 'admission' | 'courts') => {
+    const id = loadQueueFlexibilityExample(kind)
+    dispatch(resetDev())
+    void client.invalidateQueries()
+    setOpen(false)
+    router.push(`/sessions/${id}`)
+  }
   const approveName = useSimulateClubNameApproval(),
     sample = useAddSampleJoinRequest(),
     nowCard = useNowCard()
@@ -76,6 +86,14 @@ export function DevTools() {
           dispatch(setDevToggle({ key: key as keyof typeof toggles, value })),
       }))}
       actions={[
+        {
+          label: 'Load 36 to 37 example (resets mock data)',
+          onClick: () => loadExample('admission'),
+        },
+        {
+          label: 'Load five-court example (resets mock data)',
+          onClick: () => loadExample('courts'),
+        },
         { label: 'Approve name change', onClick: () => approveName.mutate(undefined) },
         {
           label: 'Add sample join request',

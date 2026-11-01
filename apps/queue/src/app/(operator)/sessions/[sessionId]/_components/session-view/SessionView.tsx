@@ -127,8 +127,10 @@ export function SessionView({
   const waiting = waitingMatches(ctx.matches)
   const active = activeMatches(ctx.matches)
   const free = freeCourts(courts, ctx.matches, now)
-  const untilLabel = (c: SessionCourt) => `${formatTime(c.openUntil ?? s.scheduledEndAt)}${courtNextDay(c.openUntil ?? s.scheduledEndAt, s.scheduledStartAt) ? ' · next day' : ''}`
-  const startLabel = (c: SessionCourt) => `${formatTime(c.startsAt ?? s.scheduledStartAt)}${courtNextDay(c.startsAt ?? s.scheduledStartAt, s.scheduledStartAt) ? ' · next day' : ''}`
+  const untilLabel = (c: SessionCourt) =>
+    `${formatTime(c.openUntil ?? s.scheduledEndAt)}${courtNextDay(c.openUntil ?? s.scheduledEndAt, s.scheduledStartAt) ? ' · next day' : ''}`
+  const startLabel = (c: SessionCourt) =>
+    `${formatTime(c.startsAt ?? s.scheduledStartAt)}${courtNextDay(c.startsAt ?? s.scheduledStartAt, s.scheduledStartAt) ? ' · next day' : ''}`
   const options = {
     onSuccess: (result: { message: string }) => toast(result.message),
     onError: (error: unknown) =>
@@ -158,8 +160,9 @@ export function SessionView({
           ? m.courtIds.map((id) => courts.find((x) => x.id === id)?.label ?? 'Court').join(' + ')
           : c.label,
         untilLabel: untilLabel(c),
-      startLabel: startLabel(c),
+        startLabel: startLabel(c),
         merged,
+        bookingEnded: isBookingEnded(c, s.scheduledEndAt, now),
         teamA: m.teamA.map(player),
         teamB: m.teamB.map(player),
         onOpenProfile: openProfile,

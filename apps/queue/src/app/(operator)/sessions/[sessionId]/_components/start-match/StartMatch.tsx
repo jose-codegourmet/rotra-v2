@@ -25,8 +25,8 @@ import { StartMatchSheet } from '@rotra/ui/start-match-sheet'
 import type { SwapSlot } from '@rotra/ui/swap-sides-area'
 import type { TeamLineupPlayer } from '@rotra/ui/team-lineup'
 import { toast } from '@rotra/ui/toaster'
-import { useRef, useState }
-import { useNow } from '@/lib/useNow' from 'react'
+import { useRef, useState } from 'react'
+import { useNow } from '@/lib/useNow'
 import { PlayerProfile } from '@/app/(operator)/sessions/[sessionId]/_components/player-profile/PlayerProfile'
 
 /**
@@ -77,7 +77,12 @@ export function StartMatch({ sessionId, request, onRequestChange, onClose }: Sta
   const s = session.data
   if (!request || !s || !roster.data || !matches.data) return null
 
-  const ctx: MatchContext = { roster: roster.data.roster, matches: matches.data, courts: s.courts, now }
+  const ctx: MatchContext = {
+    roster: roster.data.roster,
+    matches: matches.data,
+    courts: s.courts,
+    now,
+  }
   const refresh = () => {
     void session.refetch()
     void roster.refetch()
@@ -206,7 +211,10 @@ function OpenStartMatch({
       games: countedGames(id, ctx.matches),
     }
   }
-  const free = freeCourts(ctx.courts, ctx.matches, ctx.now).map((c) => ({ id: c.id, label: c.label }))
+  const free = freeCourts(ctx.courts, ctx.matches, ctx.now).map((c) => ({
+    id: c.id,
+    label: c.label,
+  }))
   const status = matchStatus(match, ctx)
 
   const onSwap = (from: SwapSlot, to: SwapSlot) => {

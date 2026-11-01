@@ -4,31 +4,74 @@ import { queueMutation, sessionIn } from '../mock/transaction'
 
 const hhmm = (n: number) =>
   new Date(n).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
-export function addCourt(input: { sessionId: string; label: string; startsAt?: number; openUntil: number | null }) {
+export function addCourt(input: {
+  sessionId: string
+  label: string
+  startsAt?: number
+  openUntil: number | null
+}) {
   return queueMutation({ area: 'Courts and time', sessionId: input.sessionId }, (s) => {
     const session = sessionIn(s, input.sessionId)
     const startsAt = input.startsAt ?? session.scheduledStartAt
-    const error = courtWindowError(startsAt, input.openUntil, session.scheduledStartAt, session.scheduledEndAt)
+    const error = courtWindowError(
+      startsAt,
+      input.openUntil,
+      session.scheduledStartAt,
+      session.scheduledEndAt,
+    )
     if (!input.label.trim() || input.label.trim().length > 40 || error)
       throw new MockError('permission', error ?? 'Enter a court label of at most 40 characters.')
-    const court = { id: crypto.randomUUID(), sessionId: session.id, label: input.label.trim(), startsAt, openUntil: input.openUntil, removedAt: null }
+    const court = {
+      id: crypto.randomUUID(),
+      sessionId: session.id,
+      label: input.label.trim(),
+      startsAt,
+      openUntil: input.openUntil,
+      removedAt: null,
+    }
     s.courts.push(court)
-    return { data: court, text: `${court.label} added · opens ${hhmm(startsAt)} · open until ${hhmm(court.openUntil ?? session.scheduledEndAt)}` }
+    return {
+      data: court,
+      text: `${court.label} added · opens ${hhmm(startsAt)} · open until ${hhmm(court.openUntil ?? session.scheduledEndAt)}`,
+    }
   })
 }
 
-export function updateCourt(input: { sessionId: string; courtId: string; label: string; startsAt: number; openUntil: number | null }) {
+export function updateCourt(input: {
+  sessionId: string
+  courtId: string
+  label: string
+  startsAt: number
+  openUntil: number | null
+}) {
   return queueMutation({ area: 'Courts and time', sessionId: input.sessionId }, (s) => {
     const session = sessionIn(s, input.sessionId)
-    const court = s.courts.find((c) => c.id === input.courtId && c.sessionId === session.id && !c.removedAt)
+    const court = s.courts.find(
+      (c) => c.id === input.courtId && c.sessionId === session.id && !c.removedAt,
+    )
     if (!court) throw new MockError('conflict', 'Court no longer available.')
-    if (s.matches.some((m) => m.sessionId === session.id && m.courtIds.includes(court.id)) && input.startsAt !== (court.startsAt ?? session.scheduledStartAt))
+    if (
+      s.matches.some((m) => m.sessionId === session.id && m.courtIds.includes(court.id)) &&
+      input.startsAt !== (court.startsAt ?? session.scheduledStartAt)
+    )
       throw new MockError('permission', 'Start is fixed after use.')
-    const error = courtWindowError(input.startsAt, input.openUntil, session.scheduledStartAt, session.scheduledEndAt)
+    const error = courtWindowError(
+      input.startsAt,
+      input.openUntil,
+      session.scheduledStartAt,
+      session.scheduledEndAt,
+    )
     if (!input.label.trim() || input.label.trim().length > 40 || error)
       throw new MockError('permission', error ?? 'Enter a court label of at most 40 characters.')
-    Object.assign(court, { label: input.label.trim(), startsAt: input.startsAt, openUntil: input.openUntil })
-    return { data: court, text: `${court.label} saved · open until ${hhmm(court.openUntil ?? session.scheduledEndAt)}` }
+    Object.assign(court, {
+      label: input.label.trim(),
+      startsAt: input.startsAt,
+      openUntil: input.openUntil,
+    })
+    return {
+      data: court,
+      text: `${court.label} saved · open until ${hhmm(court.openUntil ?? session.scheduledEndAt)}`,
+    }
   })
 }
 export function removeCourt(input: { sessionId: string; courtId: string }) {

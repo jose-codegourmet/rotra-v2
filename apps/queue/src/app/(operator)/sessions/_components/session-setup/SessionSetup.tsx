@@ -197,7 +197,11 @@ export function SessionSetup(props: SessionSetupProps) {
       minimumIsCalculated: values.minimumIsCalculated,
       expectedPlayers: values.expectedPlayers,
       playersPerCourt: values.playersPerCourt,
-      courts: values.courtLabels.map((label, i) => ({ label, startsAt: courtTimeOnSession(start, values.courtStarts[i] || values.startTime), openUntil: values.courtEnds[i] ? courtTimeOnSession(start, values.courtEnds[i]) : null })),
+      courts: values.courtLabels.map((label, i) => ({
+        label,
+        startsAt: courtTimeOnSession(start, values.courtStarts[i] || values.startTime),
+        openUntil: values.courtEnds[i] ? courtTimeOnSession(start, values.courtEnds[i]) : null,
+      })),
       repeat: isEdit ? 'none' : values.repeat,
       occurrences: values.repeatCount,
     }
@@ -256,8 +260,10 @@ export function SessionSetup(props: SessionSetupProps) {
         endTime: hhmm(s.scheduledEndAt),
         venue: { venueId: s.venueId, name: s.venueName, address: s.venueAddress },
         courtLabels: s.courts.map((c) => c.label),
-        courtStarts: s.courts.map((c) => c.startsAt === undefined || c.startsAt === s.scheduledStartAt ? '' : hhmm(c.startsAt)),
-        courtEnds: s.courts.map((c) => c.openUntil === null ? '' : hhmm(c.openUntil)),
+        courtStarts: s.courts.map((c) =>
+          c.startsAt === undefined || c.startsAt === s.scheduledStartAt ? '' : hhmm(c.startsAt),
+        ),
+        courtEnds: s.courts.map((c) => (c.openUntil === null ? '' : hhmm(c.openUntil))),
         playersPerCourt: s.playersPerCourt,
         allowSingles: s.allowSingles,
         allowDoubles: s.allowDoubles,

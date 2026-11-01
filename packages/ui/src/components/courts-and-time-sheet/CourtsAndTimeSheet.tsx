@@ -12,8 +12,13 @@ export type ExtendMinutes = 30 | 60
 export type CourtsAndTimeSheetProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
-  /** The session's courts (not removed), in order; only their labels are shown */
-  courts: (Pick<SessionCourt, 'id' | 'label'> & { startsAt?: number; openUntil?: number | null; occupied?: boolean; used?: boolean })[]
+  /** The session's courts (not removed), in order, with booking windows and edit/removal guards. */
+  courts: (Pick<SessionCourt, 'id' | 'label'> & {
+    startsAt?: number
+    openUntil?: number | null
+    occupied?: boolean
+    used?: boolean
+  })[]
   startsAt?: number
   onEditCourt?: (courtId: string) => void
   onRemoveCourt?: (courtId: string) => void
@@ -50,27 +55,66 @@ export function CourtsAndTimeSheet({
   return (
     <Sheet
       open={open}
-      onOpenChange={onOpenChange}
+      onOpenChange={(next) => {
+        if (!isPending) onOpenChange(next)
+      }}
+      dismissible={!isPending}
       title="Courts and time"
-      footer={<Button onClick={() => onOpenChange(false)}>Done</Button>}
+      footer={
+        <Button disabled={isPending} onClick={() => onOpenChange(false)}>
+          Done
+        </Button>
+      }
     >
       {serverError ? <Notice tone="error">{serverError}</Notice> : null}
       <div className="flex min-w-0 flex-col gap-1.5">
         <span className="text-[13px] font-semibold text-fg2">Courts</span>
-        {courts.map((court) => <div key={court.id} className="flex flex-wrap items-center justify-between gap-2 border-b border-border py-2">
-          <div><b>{court.label}</b><p className="text-[13px] text-fg2">
-            {court.startsAt !== undefined ? `${formatTime(court.startsAt)}${startsAt !== undefined && courtNextDay(court.startsAt, startsAt) ? ' · next day' : ''} – ` : ''}
-            {formatTime(court.openUntil ?? endsAt)}{startsAt !== undefined && courtNextDay(court.openUntil ?? endsAt, startsAt) ? ' · next day' : ''}
-            {court.used ? ' · start fixed after use' : ''}
-          </p></div>
-          <div className="flex gap-2">
-            {onEditCourt ? <Button size="sm" disabled={isPending} onClick={() => onEditCourt(court.id)}>Edit {court.label}</Button> : null}
-            {onRemoveCourt ? <Button size="sm" disabled={isPending || court.occupied || courts.length === 1} title={court.occupied ? 'Only a free court can be removed' : courts.length === 1 ? 'A session needs at least one court' : undefined} onClick={() => onRemoveCourt(court.id)}>Remove {court.label}</Button> : null}
+        {courts.map((court) => (
+          <div
+            key={court.id}
+            className="flex flex-wrap items-center justify-between gap-2 border-b border-border py-2"
+          >
+            <div>
+              <b>{court.label}</b>
+              <p className="text-[13px] text-fg2">
+                {court.startsAt !== undefined
+                  ? `${formatTime(court.startsAt)}${startsAt !== undefined && courtNextDay(court.startsAt, startsAt) ? ' · next day' : ''} – `
+                  : ''}
+                {formatTime(court.openUntil ?? endsAt)}
+                {startsAt !== undefined && courtNextDay(court.openUntil ?? endsAt, startsAt)
+                  ? ' · next day'
+                  : ''}
+                {court.used ? ' · start fixed after use' : ''}
+              </p>
+            </div>
+            <div className="flex gap-2">
+              {onEditCourt ? (
+                <Button size="sm" disabled={isPending} onClick={() => onEditCourt(court.id)}>
+                  Edit {court.label}
+                </Button>
+              ) : null}
+              {onRemoveCourt ? (
+                <Button
+                  size="sm"
+                  disabled={isPending || court.occupied || courts.length === 1}
+                  title={
+                    court.occupied
+                      ? 'Only a free court can be removed'
+                      : courts.length === 1
+                        ? 'A session needs at least one court'
+                        : undefined
+                  }
+                  onClick={() => onRemoveCourt(court.id)}
+                >
+                  Remove {court.label}
+                </Button>
+              ) : null}
+            </div>
           </div>
-        </div>)}
+        ))}
       </div>
       <div className="flex flex-wrap items-center gap-2">
-        <Button size="sm" onClick={onAddCourt}>
+        <Button size="sm" disabled={isPending} onClick={onAddCourt}>
           Add a court…
         </Button>
       </div>

@@ -1,4 +1,5 @@
 import {
+  courtWindowFixture,
   consoleSessionFixture,
   mergedConsoleSessionFixture,
 } from '@rotra/data/fixtures/consoleSessions'
@@ -192,5 +193,23 @@ export const CourtsGridMerged: Story = {
 export const Phone: Story = { ...CourtsGrid, globals: { viewport: { value: 'phone' } } }
 export const Desktop: Story = { ...CourtsGrid, globals: { viewport: { value: 'desktop' } } }
 
-export const BeforePlannedStart: Story = { args: { variant: 'free', label: 'Court 4', startLabel: '8:30 PM', untilLabel: '10:30 PM', notOpen: true } }
-export const ManuallyRemoved: Story = { args: { variant: 'free', label: 'Court 5', startLabel: '8:30 PM', untilLabel: '9:30 PM', removed: true } }
+export const BeforePlannedStart: Story = {
+  args: {
+    variant: 'free',
+    label: courtWindowFixture.courts[3]!.label,
+    startLabel: fmtTime(courtWindowFixture.courts[3]!.startsAt),
+    untilLabel: fmtTime(courtWindowFixture.session.scheduledEndAt),
+    notOpen: true,
+  },
+}
+export const ManuallyRemoved: Story = {
+  args: {
+    variant: 'free',
+    label: courtWindowFixture.courts[4]!.label,
+    startLabel: fmtTime(courtWindowFixture.courts[4]!.startsAt),
+    untilLabel: fmtTime(courtWindowFixture.courts[4]!.openUntil!),
+    removed: true,
+  },
+}
+
+export const InGameBookingEnded: Story = { args: { ...inGame(playing), bookingEnded: true } }

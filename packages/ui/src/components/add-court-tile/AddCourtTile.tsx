@@ -1,7 +1,7 @@
 import { cn } from '@rotra/ui/cn'
 
 export type AddCourtTileProps = {
-  /** The number the new court gets: "Becomes Court N, free right away" */
+  /** The number the new court gets: "Add Court N" */
   nextNumber: number
   /** Opens Q-ADD-COURT */
   onAdd: () => void
@@ -25,9 +25,7 @@ export function AddCourtTile({ nextNumber, onAdd, className }: AddCourtTileProps
         +
       </span>
       <span>Add court</span>
-      <span className="text-[13px] font-medium text-fg2">
-        Becomes Court {nextNumber}, free right away
-      </span>
+      <span className="text-[13px] font-medium text-fg2">Set a planned court window</span>
     </button>
   )
 }

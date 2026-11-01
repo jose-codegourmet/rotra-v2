@@ -17,5 +17,6 @@ export const courtDrawingMeta = {
     'docs/screens/product/modules/queue/session-console.md',
     'docs/business_logic/product/queue/modules/matches/README.md',
   ],
+  // freeLabel distinguishes unavailable future/removed courts from free courts.
   related: ['PlayerFaceButton', 'CourtCard'],
 } satisfies ComponentMeta

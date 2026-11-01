@@ -126,3 +126,15 @@ export const Failure: Story = {
 export const CatchUp: Story = { args: { mode: 'catchup', count: 2, catchUpTarget: '3' } }
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
 export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }
+
+export const InvalidCatchUpTarget: Story = {
+  args: { mode: 'catchup', count: 2, catchUpTarget: '1.5' },
+}
+export const Generating: Story = { args: { isPending: true, pendingMessage: 'Generating drafts…' } }
+export const TransferConflict: Story = {
+  args: {
+    selectedIds: ['draft-available-1'],
+    transferError: 'A selected player is no longer present.',
+    onAddToMainQueue: async () => false,
+  },
+}

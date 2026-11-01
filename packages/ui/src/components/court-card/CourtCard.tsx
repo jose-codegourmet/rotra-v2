@@ -11,6 +11,7 @@ type CourtCardBase = {
   /** The court's closing time, already formatted: "9:00 PM" */
   untilLabel: string
   startLabel?: string
+  bookingEnded?: boolean
   className?: string
 }
 
@@ -87,6 +88,7 @@ function InGameCourtCard({
   label,
   untilLabel,
   startLabel,
+  bookingEnded = false,
   merged = false,
   teamA,
   teamB,
@@ -106,7 +108,10 @@ function InGameCourtCard({
       <div className="flex items-center justify-between gap-2">
         <div>
           <h3 className="text-base">{label}</h3>
-          <span className="text-[13px] text-fg2">{startLabel ? `${startLabel} – ` : 'Until '}{untilLabel}</span>
+          <span className={cn('text-[13px]', bookingEnded ? 'text-warn' : 'text-fg2')}>
+            {bookingEnded ? 'Booking ended ' : startLabel ? `${startLabel} – ` : 'Until '}
+            {untilLabel}
+          </span>
         </div>
         <Chip tone="accent">{merged ? 'Merged · in game' : 'In game'}</Chip>
       </div>
@@ -155,7 +160,8 @@ function FreeCourtCard({
         <div>
           <h3 className="text-base">{label}</h3>
           <span className={cn('text-[13px]', bookingEnded ? 'text-warn' : 'text-fg2')}>
-            {startLabel ? `${startLabel} – ` : ''}{bookingEnded ? 'Booking ended' : 'Until'} {untilLabel}
+            {bookingEnded ? 'Booking ended ' : startLabel ? `${startLabel} – ` : 'Until '}
+            {untilLabel}
           </span>
         </div>
         <div className="flex flex-nowrap items-center gap-1.5">
@@ -175,9 +181,13 @@ function FreeCourtCard({
           ) : null}
         </div>
       </div>
-      <CourtDrawing free />
+      <CourtDrawing free freeLabel={removed ? 'Removed' : notOpen ? 'Not open yet' : 'Free'} />
       {notOpen || removed ? (
-        <p className="text-[13px] text-fg2">{removed ? 'Manually removed from this session.' : `Opens at ${startLabel}. The court is unavailable before this time.`}</p>
+        <p className="text-[13px] text-fg2">
+          {removed
+            ? 'Manually removed from this session.'
+            : `Opens at ${startLabel}. The court is unavailable before this time.`}
+        </p>
       ) : next ? (
         <>
           {next.skippedReason ? (

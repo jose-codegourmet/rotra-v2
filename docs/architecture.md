@@ -1,6 +1,6 @@
 # Architecture — ROTRA v1
 
-**Last verified:** 2026-10-28 · **Status:** target architecture for the v1 rebuild, with mock
+**Last verified:** 2026-11-01 · **Status:** target architecture for the v1 rebuild, with mock
 implementations in progress. Section 1 distinguishes implemented flows from future work.
 
 **Read this when** you add an app, package, route, provider, data hook, or dependency, or need to know
@@ -147,6 +147,7 @@ Route paths above illustrate the pattern; the real route list comes from the scr
                   └─ fetchers.ts  ──►  mock store (in memory, seeded from fixtures, fake latency)
 ```
 
+- **Auto Queue drafts** are per-session in-memory batches outside accepted matches. Selection and clearing write no sync log; only explicit atomic transfer allocates match numbers. Drafts and confirmations reset with the mock store.
 - **Fixtures** in `@rotra/data/fixtures/` copy the prototypes' sample clubs, players, sessions, and
   results. Storybook and the mock store use the same fixtures.
 - **The mock store** keeps state in memory for the page visit and resets on reload. Mutations change

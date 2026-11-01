@@ -300,7 +300,8 @@
     "./match/useAutoQueueDrafts": "./src/match/useAutoQueueDrafts.ts",
     "./match/useEditAutoQueueDrafts": "./src/match/useEditAutoQueueDrafts.ts",
     "./match/useGenerateAutoQueueDrafts": "./src/match/useGenerateAutoQueueDrafts.ts",
-    "./match/useTransferAutoQueueDrafts": "./src/match/useTransferAutoQueueDrafts.ts"
+    "./match/useTransferAutoQueueDrafts": "./src/match/useTransferAutoQueueDrafts.ts",
+    "./mock/queue-examples": "./src/mock/queueExamples.ts"
   },
   "scripts": {
     "lint": "biome check .",

@@ -143,4 +143,6 @@ export const Offline: Story = { args: { initialTab: 'directory', offline: true }
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
 export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }
 
-export const ActiveFull: Story = { args: { live: true, capacity: admission.capacity, openSlots: 0 } }
+export const ActiveFull: Story = {
+  args: { live: true, capacity: admission.capacity, openSlots: 0 },
+}

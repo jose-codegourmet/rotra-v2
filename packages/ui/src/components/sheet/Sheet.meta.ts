@@ -20,5 +20,6 @@ export const sheetMeta = {
     'docs/screens/product/experience-contract.md#accessibility-and-interaction',
   ],
   variants: ['default', 'wide'],
+  // returnFocusRef supplies a connected fallback when success removes the opening control.
   related: ['ConfirmSheet', 'Button'],
 } satisfies ComponentMeta

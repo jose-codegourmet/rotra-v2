@@ -114,3 +114,17 @@ screen loaded one, and returns an allowlisted DTO.
 - One transaction commits the `session_finalizations` row (its PK is the session, so a second commit is impossible), every fact, the per-entry summaries, `completed`, the released offline reservation and the downstream jobs (`result_snapshot`, `player_history`, `player_rank`). A retry, a concurrent duplicate or a lost response returns the committed status.
 - Facts: one per (completed match, participant); full participation is recomputed from segments; invalid matches have no completed decision and produce nothing. Minimum shortfall is a warning only.
 - Projection and slide failures retry their own jobs (F07.30/F07.31) and never repeat the commit. An invalid session gets no finalization and no contribution.
+
+## F07.30 · History, ranking and award projections
+
+| Module | Commands |
+|---|---|
+| `player/projections` | worker: `runProjectionJobs` (SKIP LOCKED claim, bounded attempts with backoff, redacted error codes, then `settleFinalization`), `releaseStaleJobs`, `retryProjectionJob`, `scheduleAgeingJobs`, `schedulePolicyRecalculation`; `recomputeRank`; club `confirmHistoryAttribution`; public `readPlayerMatchHistory`, `readPlayerRank`, `readLeaderboard` |
+
+- Jobs are unique per source + kind + version, so a retried finalization, assessment or attribution contributes once; contributions are also de-duplicated per (match, entry).
+- Only full participation in singles/doubles counts. Invalid sessions have no facts; partial and fun games appear in history with their status but never count.
+- The window uses each game's original played date, so ageing changes eligibility with no new games; `next_recheck_at` is when the oldest counted game leaves the window.
+- **No rank formula is approved (#247).** `APPROVED_RANK_ALGORITHMS` is empty, so rank rows hold evidence counts and window only: numeric rank, level and components stay null (`formula_pending`), and the leaderboard is empty. Missing evidence is never a zero rank.
+- Awards in the private snapshot use the prototype reference formula from `@rotra/data` and are labeled `prototype-reference`; Off Day is stored in its own column.
+- Confirmed guest history needs the club player already linked to that profile plus an identity method (RTR ID, QR or phone); facts keep their original snapshot. Revocation is not built here.
+- Worker hosting and schedule are open (#243); these are plain functions to call from it.

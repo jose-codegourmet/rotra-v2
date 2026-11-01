@@ -33,7 +33,8 @@
     "./queue/match-control": "./src/queue/match-control.ts",
     "./queue/financials": "./src/queue/financials.ts",
     "./queue/sync": "./src/queue/sync.ts",
-    "./queue/finalization": "./src/queue/finalization.ts"
+    "./queue/finalization": "./src/queue/finalization.ts",
+    "./player/projections": "./src/player/projections.ts"
   },
   "scripts": {
     "db:generate": "prisma generate",

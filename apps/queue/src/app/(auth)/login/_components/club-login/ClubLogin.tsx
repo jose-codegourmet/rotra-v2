@@ -25,7 +25,7 @@ export function ClubLogin() {
 
   return (
     <>
-      <TopBar product="Queue">
+      <TopBar product="Queue" width="page">
         <ThemeToggle />
         {DEV_TOOLS_ENABLED ? <DevTools /> : null}
       </TopBar>

@@ -3,7 +3,7 @@
 import { Card } from '@rotra/ui/card'
 import { cn } from '@rotra/ui/cn'
 import { MatchCard, type MatchCardProps } from '@rotra/ui/match-card'
-import { useSyncExternalStore } from 'react'
+import { useLayoutEffect, useState } from 'react'
 
 /** A waiting match as the row shows it; the row supplies the flow arrow. */
 export type UpcomingQueueMatch = Omit<MatchCardProps, 'flow' | 'className'>
@@ -20,31 +20,31 @@ export type UpcomingQueueRowProps = {
   className?: string
 }
 
-// The prototype's queueCols(): the queue grid's column count from the window width.
-const COLUMN_QUERIES = [
-  { min: 1200, columns: 5 },
-  { min: 960, columns: 4 },
-  { min: 700, columns: 3 },
-  { min: 460, columns: 2 },
-] as const
+// The prototype's queueCols(): queue tiles are at least 160 px wide with 10 px gaps (gap-2.5).
+const TILE_MIN = 160
+const GAP = 10
 
-function subscribe(onChange: () => void) {
-  const lists = COLUMN_QUERIES.map((q) => window.matchMedia(`(min-width: ${q.min}px)`))
-  for (const l of lists) l.addEventListener('change', onChange)
-  return () => {
-    for (const l of lists) l.removeEventListener('change', onChange)
-  }
+/** How many queue tiles fit across a grid this wide; no upper limit. */
+export function queueColumnsFor(width: number) {
+  return Math.max(1, Math.floor((width + GAP) / (TILE_MIN + GAP)))
 }
 
-function readColumns() {
-  return (
-    COLUMN_QUERIES.find((q) => window.matchMedia(`(min-width: ${q.min}px)`).matches)?.columns ?? 1
-  )
-}
-
-/** 5 columns from 1200 px, 4 from 960, 3 from 700, 2 from 460, else 1. One column before hydration. */
-export function useQueueColumns() {
-  return useSyncExternalStore(subscribe, readColumns, () => 1)
+/**
+ * The column count from the grid's own width (the page beside the rail), so wider screens show more
+ * tiles. Attach the returned ref to the grid. One column before it is measured.
+ */
+export function useQueueColumns<T extends HTMLElement>() {
+  const [el, setEl] = useState<T | null>(null)
+  const [columns, setColumns] = useState(1)
+  useLayoutEffect(() => {
+    if (!el) return
+    const measure = () => setColumns(queueColumnsFor(el.clientWidth))
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [el])
+  return [setEl, columns] as const
 }
 
 /**
@@ -58,7 +58,7 @@ export function UpcomingQueueRow({
   columns,
   className,
 }: UpcomingQueueRowProps) {
-  const measured = useQueueColumns()
+  const [gridRef, measured] = useQueueColumns<HTMLDivElement>()
   const cols = Math.max(1, columns ?? measured)
   const shown = matches.slice(0, Math.max(1, cols - 1))
   const rest = matches.length - shown.length
@@ -83,6 +83,7 @@ export function UpcomingQueueRow({
         </span>
       </div>
       <div
+        ref={gridRef}
         className="grid gap-2.5"
         style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
       >

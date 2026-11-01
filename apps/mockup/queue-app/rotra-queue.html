@@ -63,7 +63,7 @@ p { margin: 0; }
 
 /* Top bar */
 .top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); }
-.top-in { max-width: 1240px; margin: 0 auto; display: flex; align-items: center; gap: 12px; padding: 10px max(16px, env(safe-area-inset-right, 0px)) 10px max(16px, env(safe-area-inset-left, 0px)); }
+.top-in { display: flex; align-items: center; gap: 12px; padding: 10px var(--page-r) 10px var(--page-l); }
 .brand { display: flex; align-items: baseline; gap: 8px; font-weight: 800; letter-spacing: 1.5px; font-size: 17px; }
 .brand b { color: var(--accent); }
 .brand span { font-weight: 600; letter-spacing: 0; color: var(--fg2); font-size: 14px; }
@@ -88,8 +88,10 @@ button.conn:hover { border-color: var(--accent); background: var(--surface); }
 @keyframes pulse { 50% { opacity: .3; } }
 @media (prefers-reduced-motion: reduce) { .conn.sync i { animation: none; } }
 
-.wrap { max-width: 1240px; margin: 0 auto; padding-block: 20px 120px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 20px; }
-.narrow { max-width: 760px; }
+/* Pages fill the width beside the rail; only the side padding stays. Forms keep a readable width. */
+:root { --page-x: clamp(16px, 3vw, 40px); --page-l: max(var(--page-x), env(safe-area-inset-left, 0px)); --page-r: max(var(--page-x), env(safe-area-inset-right, 0px)); }
+.wrap { padding-block: 20px 120px; padding-left: var(--page-l); padding-right: var(--page-r); display: flex; flex-direction: column; gap: 20px; }
+.narrow { max-width: calc(760px + var(--page-l) + var(--page-r)); margin-inline: auto; width: 100%; }
 .crumb { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
 /* Buttons */
@@ -325,7 +327,7 @@ button.qf:hover .avatar { box-shadow: 0 0 0 2px var(--accent); }
 @media (max-width: 640px) { .prow { grid-template-columns: minmax(0, 1fr); gap: 8px; } .prow .lvcol { order: 2; } .prow > .row { order: 3; justify-content: space-between; } }
 .footer-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 15; background: color-mix(in srgb, var(--bg) 94%, transparent); backdrop-filter: blur(8px); border-top: 1px solid var(--border); padding-bottom: env(safe-area-inset-bottom, 0px); }
 .start-why { color: var(--warn); font-weight: 600; }
-.footer-bar .in { max-width: 1240px; margin: 0 auto; display: flex; gap: 8px 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; padding: 10px max(16px, env(safe-area-inset-right, 0px)) 10px max(16px, env(safe-area-inset-left, 0px)); }
+.footer-bar .in { display: flex; gap: 8px 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; padding: 10px var(--page-r) 10px var(--page-l); }
 
 /* Sheets */
 .scrim { position: fixed; inset: 0; background: var(--scrim); z-index: 40; animation: fade .15s; }
@@ -788,7 +790,7 @@ textarea.tpl { font-family: var(--mono); font-size: 13px; line-height: 1.55; min
 .pcard { display: flex; gap: 10px; align-items: center; padding: 10px; border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); min-width: 0; }
 .pcard b { overflow-wrap: anywhere; font-weight: 600; font-size: 14px; }
 .proto-bar { background: var(--warn-subtle); border-bottom: 1px solid var(--warn); font-size: 13px; }
-.proto-bar .in { max-width: 1240px; margin: 0 auto; display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; padding: 8px max(16px, env(safe-area-inset-right, 0px)) 8px max(16px, env(safe-area-inset-left, 0px)); }
+.proto-bar .in { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; padding: 8px var(--page-r) 8px var(--page-l); }
 /* Touch sizing: phones and tablets (or any touch screen) get bigger targets, at least 44 px and mostly 48 px. */
 @media (pointer: coarse), (max-width: 1024px) {
   .btn { min-height: 48px; padding: 0 18px; font-size: 16px; }
@@ -2624,7 +2626,13 @@ function upcomingPane(s) {
       <button class="qtile qmore" data-act="pane" data-k="queue" aria-label="More queues: open the Queue tab"><span class="plus" aria-hidden="true">→</span><b>More queues</b><span class="small muted">${rest > 0 ? `+${rest} more waiting` : list.length ? 'Reorder, add or regenerate' : 'Add or generate matches'}</span></button>
     </div>`;
 }
-function queueCols() { const w = window.innerWidth; return w >= 1200 ? 5 : w >= 960 ? 4 : w >= 700 ? 3 : w >= 460 ? 2 : 1; }
+// Queue grid columns from the content width (window − rail − side padding): tiles of 160 px or more, 10 px gaps, no upper limit.
+const QUEUE_TILE_MIN = 160, QUEUE_GAP = 10;
+function queueCols() {
+  const vw = window.innerWidth, pad = Math.min(40, Math.max(16, vw * 0.03));
+  const rail = !hasShell() || narrowScreen() ? 0 : navMin ? 68 : 232;
+  return Math.max(1, Math.floor((vw - rail - 2 * pad + QUEUE_GAP) / (QUEUE_TILE_MIN + QUEUE_GAP)));
+}
 function queueCard(s, m, i, n, cols) {
   const b = blockOf(s, m);
   const row = Math.floor(i / cols), k = i % cols, col = row % 2 === 0 ? k : cols - 1 - k;

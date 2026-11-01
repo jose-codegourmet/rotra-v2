@@ -31,6 +31,7 @@ per app with `next/font` and set `--font`, `--mono` (and `--pixel` in `apps/play
 | `shadow-card`, `shadow-sheet`, `shadow-pop`, `shadow-drawer` | Card lift (light only), sheet, toast, phone drawer |
 | `font-sans`, `font-mono`, `font-pixel` | Manrope, JetBrains Mono, Silkscreen |
 | `touch:` | `(pointer: coarse), (max-width: 1024px)`: touch sizing from the experience contract |
+| `px-page` | Full-width page side padding, `clamp(16px, 3vw, 40px)` and never under the safe-area insets (Queue pages, top bar and footer bars) |
 
 Tailwind's default palette is removed (`--color-*: initial`), so `bg-red-500` does not exist.
 

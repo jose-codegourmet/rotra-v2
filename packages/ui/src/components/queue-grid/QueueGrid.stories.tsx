@@ -95,8 +95,19 @@ export const FourColumns: Story = { args: { columns: 4 } }
 export const FiveColumns: Story = { args: { columns: 5 } }
 
 export const ByWindowWidth: Story = {
-  name: 'Columns from the window width',
+  name: 'Columns from the grid width',
   args: { columns: undefined },
+}
+/** A wide page (about 1220 px, 1366 px window with the rail collapsed): seven columns, no cap at five. */
+export const WidePage: Story = {
+  args: { columns: undefined },
+  decorators: [
+    (Story) => (
+      <div className="w-[1218px]">
+        <Story />
+      </div>
+    ),
+  ],
 }
 
 export const ReorderByKeyboard: Story = {

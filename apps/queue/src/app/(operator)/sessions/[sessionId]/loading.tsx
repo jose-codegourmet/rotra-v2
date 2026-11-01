@@ -10,7 +10,7 @@ export default function SessionLoading() {
     <main
       aria-busy
       aria-label="Loading the session"
-      className="mx-auto flex max-w-[1240px] flex-col gap-5 px-[max(16px,env(safe-area-inset-left,0px))] pt-5 pb-[170px]"
+      className="flex flex-col gap-5 px-page pt-5 pb-[170px]"
     >
       <div className="flex flex-col gap-2">
         <Skeleton className="w-24" />

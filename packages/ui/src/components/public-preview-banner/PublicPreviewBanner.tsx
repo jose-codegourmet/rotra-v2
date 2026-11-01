@@ -16,7 +16,7 @@ export type PublicPreviewBannerProps = {
 export function PublicPreviewBanner({ onBack, className }: PublicPreviewBannerProps) {
   return (
     <div role="status" className={cn('border-b border-warn bg-warn-subtle text-[13px]', className)}>
-      <div className="mx-auto flex max-w-[1240px] flex-wrap items-center justify-between gap-3 px-4 py-2">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-page py-2">
         <span className="min-w-0">
           <b>Public page preview.</b> What anyone with the session link sees, no sign-in needed.
         </span>

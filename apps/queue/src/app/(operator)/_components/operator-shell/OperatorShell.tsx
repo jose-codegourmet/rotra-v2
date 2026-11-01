@@ -250,7 +250,7 @@ export function OperatorShell({ children }: { children: ReactNode }) {
         collapsed={collapsed}
         onCollapsedChange={onCollapsedChange}
         topBar={
-          <TopBar product="Queue">
+          <TopBar product="Queue" width="page">
             <SyncStatus
               state={syncState}
               onOpen={() => setSyncOpen(true)}

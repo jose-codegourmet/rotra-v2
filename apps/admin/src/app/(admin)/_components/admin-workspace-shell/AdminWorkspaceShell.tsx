@@ -116,7 +116,7 @@ export function AdminWorkspaceShell({ children }: { children: ReactNode }) {
   if (permissionDenied)
     return (
       <>
-        <TopBar product="Admin" contained={false}>
+        <TopBar product="Admin" width="window">
           <ThemeToggle />
         </TopBar>
         <AccessDeniedCard
@@ -142,7 +142,7 @@ export function AdminWorkspaceShell({ children }: { children: ReactNode }) {
         <>
           <TopBar
             product="Admin"
-            contained={false}
+            width="window"
             menuOnNarrowOnly
             brandHref={unsavedDraft ? undefined : '/clubs'}
             onBrandClick={unsavedDraft ? () => leave('/clubs') : undefined}

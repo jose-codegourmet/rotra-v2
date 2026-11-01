@@ -49,7 +49,7 @@ Footer copy: “A match never starts by itself when a court frees up. You start 
 
 Removing an occupied court is refused with “Only a free court can be removed”.
 
-**Upcoming queued matches (Session tab):** header with “N waiting” and attention count; the first few queue cards (one row, sized to the screen); a last tile **More queues** (“+N more waiting”, or “Reorder, add or regenerate”) that opens the Queue tab. Empty: “No matches queued yet.”
+**Upcoming queued matches (Session tab):** header with “N waiting” and attention count; the first few queue cards (one row: as many 160 px+ tiles as fit the content width, minus one for More queues, so wider screens show more); a last tile **More queues** (“+N more waiting”, or “Reorder, add or regenerate”) that opens the Queue tab. Empty: “No matches queued yet.”
 
 ## Q-POOL — Players view
 

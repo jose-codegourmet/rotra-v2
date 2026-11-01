@@ -35,6 +35,15 @@ export function termDto(term: ClubLicenseTerm) {
   }
 }
 
+/** Admin view of a term: adds the command that recorded it and who did, for Check status. */
+export function adminTermDto(term: ClubLicenseTerm) {
+  return {
+    ...termDto(term),
+    sourceCommandId: term.sourceCommandId,
+    activatedByAdminId: term.activatedByAdminId,
+  }
+}
+
 /**
  * Recomputes `club_entitlements` from the club's terms at `now`: the term covering now with the
  * latest end wins. Starts an expiry cycle when access has just lapsed and none is running.
@@ -167,6 +176,20 @@ export async function activateLicense(
     })
     return termDto(term)
   })
+}
+
+/**
+ * D-LICENSE › Check status after a lost reply: the term a command recorded and whether it was the
+ * club's first, or null when nothing was saved.
+ */
+export async function readLicenseOperation(context: AdminContext, commandId: string) {
+  void context
+  const term = await prisma.clubLicenseTerm.findUnique({ where: { sourceCommandId: commandId } })
+  if (!term) return null
+  const earlier = await prisma.clubLicenseTerm.count({
+    where: { clubId: term.clubId, activatedAt: { lt: term.activatedAt } },
+  })
+  return { term: adminTermDto(term), first: earlier === 0 }
 }
 
 /** License payments table (A-CLUB and Q-CLUB), newest first. */

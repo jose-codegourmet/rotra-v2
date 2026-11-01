@@ -9,6 +9,7 @@ import { ServiceError } from '../service/errors'
 import { toDecimalString, toIso, toIsoOrNull, toMoney } from '../service/serialize'
 import { recordAudit } from './audit'
 import { clubNameKey, normalizeClubUsername } from './club-identity'
+import { adminTermDto } from './licenses'
 
 type Tx = Prisma.TransactionClient
 
@@ -263,6 +264,51 @@ export async function readClubsForAdmin(context: AdminContext) {
     orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
   })
   return clubs.map((club) => adminClubDto(club, club.account))
+}
+
+/**
+ * A-CLUBS / A-CLUB-DETAIL read (F07.34): each club with its account state, founding city and
+ * recorded license terms, so the Admin app derives access and retention with its existing rules.
+ * `clubId` narrows to one club; an unknown ID returns an empty list.
+ */
+export async function readAdminClubDirectory(context: AdminContext, clubId?: string) {
+  void context
+  const clubs = await prisma.club.findMany({
+    where: clubId ? { id: clubId } : undefined,
+    include: {
+      account: { select: { username: true, provisionedAt: true, disabledAt: true } },
+      foundingLocation: { select: { countryCode: true, cityCode: true, displayName: true } },
+      licenseTerms: { orderBy: [{ startsAt: 'desc' }, { id: 'asc' }] },
+    },
+    orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+  })
+  return clubs.map((club) => ({
+    ...adminClubDto(club, club.account),
+    provisionedAt: toIsoOrNull(club.account?.provisionedAt),
+    city: club.foundingLocation.displayName,
+    cityCode: `${club.foundingLocation.countryCode}-${club.foundingLocation.cityCode}`,
+    terms: club.licenseTerms.map(adminTermDto),
+  }))
+}
+
+/** A-ADD-CLUB duplicate check before review: taken club names and account usernames. */
+export async function readClubIdentityIndex(context: AdminContext) {
+  void context
+  const [clubs, accounts] = await Promise.all([
+    prisma.club.findMany({ select: { name: true } }),
+    prisma.clubAccount.findMany({ select: { username: true } }),
+  ])
+  return { names: clubs.map((c) => c.name), usernames: accounts.map((a) => a.username) }
+}
+
+/** The founding city for an A-ADD-CLUB city code such as `PH-CEB`; null when not offered. */
+export async function findLocationCode(code: string) {
+  const [countryCode, cityCode] = code.split('-')
+  if (!countryCode || !cityCode) return null
+  return prisma.locationCode.findUnique({
+    where: { countryCode_cityCode: { countryCode, cityCode } },
+    select: { id: true },
+  })
 }
 
 /** Q-CLUB settings read. Allowed after expiry so the club can see its own details. */

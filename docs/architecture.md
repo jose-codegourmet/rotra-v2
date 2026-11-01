@@ -221,12 +221,15 @@ In the mock phase, sign-in is mocked like the prototypes (anything signs in) and
 mock session. Real auth (Supabase Auth) is its own epic. **No Facebook or any social login.**
 
 **Server boundary (F07.20).** `ROTRA_DATA_MODE` (server-only, default `mock`) picks the path; there is
-no fallback from real to mock.
+no fallback from real to mock. `NEXT_PUBLIC_ROTRA_DATA_MODE` (F07.34) is its client mirror: set both
+to `real` in each app's own `.env.local` (Next reads env files from the app folder, not the repo root).
 
 | Layer | Real mode |
 |---|---|
 | `proxy.ts` | `@rotra/db/auth/proxy-session` verifies the Supabase JWT (`getClaims`), refreshes session cookies, deletes `rotra-mock-*` cookies, and redirects. Navigation only; it never loads Prisma |
 | Route Handler | `handleAccountRequest(audience, routeCookieAdapter(await cookies()), run)` from `@rotra/db/service/handler`: verifies the session again, maps the subject to the app's account type from current server state (provisioned/not disabled club account, not disabled player account, active admin), then `run` checks scope with `@rotra/db/service/authorize` (`requireOwnClub`, `requireOwnPlayer`, `requireAdmin`, `requireClubEntitlement`, `requireRevision`) |
+| Sign-in | `@rotra/db/auth/sign-in` (`handleSignIn`, `handleSessionRead`, `handleSignOut`) behind `/api/auth/{sign-in,session,sign-out}` in Queue and Admin. Bodies are the shapes the existing hooks read (`MockSession`, `AdminSession`) |
+| `@rotra/data` fetchers | Journey fetchers branch on `isRealDataMode()` (`@rotra/data/real/mode`) to `real/*` clients that call the app's own `/api/*` and map DTOs back to the hook types; errors become the same `MockError` kinds. Every other fetcher, and any mock store read or write, fails with "This part of ROTRA isn't connected to saved data yet." in real mode |
 | Public reads | `handlePublicRead(id, run)`; only IDs in `PUBLIC_READS` are anonymous, each with an allowlisted projection |
 | Responses | Private: `Cache-Control: private, no-store`, `Vary: Cookie`. Bodies pass `toJson` (`@rotra/db/service/serialize`): UUIDs as strings, instants as ISO strings, bigint revisions as decimal strings, money as `{ amountMinor, currency }`, null kept; class instances such as Prisma models are refused. Errors are `{ error: { code, message, fields? } }` (`@rotra/db/service/errors`); another club's or player's ID answers `not_found` |
 | Client | `useAccountScope(accountId)` / `clearAccountQueries` (`@rotra/data/auth/account-scope`) drop the previous account's queries on account change or sign-out, keeping `auth`/`sync` queries and every mutation, so unsynced evidence survives |

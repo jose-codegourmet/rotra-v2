@@ -533,3 +533,41 @@ export async function setAcceptJoinRequests(
     return sessionDto(updated)
   })
 }
+
+/** Q-HOME / Q-SESSION counts. Courts in use, games and queued matches stay 0 until matches are wired. */
+async function sessionSummaryDto(tx: Tx, session: QueueSession) {
+  const [courts, roster, waitlistCount] = await Promise.all([
+    liveCourts(tx, session.id),
+    liveRoster(tx, session.id),
+    tx.sessionWaitlistEntry.count({ where: { sessionId: session.id } }),
+  ])
+  return {
+    session: sessionDto(session),
+    courts: courts.map(courtDto),
+    rosterCount: roster.length,
+    presentCount: roster.filter((entry) => entry.present).length,
+    capacity: slotCapacity(courts.length, session.playersPerCourt),
+    waitlistCount,
+  }
+}
+
+/** The club's Queue Sessions with their preparation counts (F07.34 read). */
+export async function readQueueSessions(context: ClubContext) {
+  return prisma.$transaction(async (tx) => {
+    const sessions = await tx.queueSession.findMany({
+      where: { clubId: context.clubId },
+      orderBy: [{ scheduledStartAt: 'asc' }, { id: 'asc' }],
+    })
+    return Promise.all(sessions.map((session) => sessionSummaryDto(tx, session)))
+  })
+}
+
+/** One Queue Session with courts and counts; another club's ID is not found. */
+export async function readQueueSession(context: ClubContext, sessionId: string) {
+  const session = await prisma.queueSession.findUnique({
+    where: { clubId_id: { clubId: context.clubId, id: sessionId } },
+  })
+  if (!session) throw new ServiceError('not_found')
+  await requireSessionAccess(context, session)
+  return prisma.$transaction((tx) => sessionSummaryDto(tx, session))
+}

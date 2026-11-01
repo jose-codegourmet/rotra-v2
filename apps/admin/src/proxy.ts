@@ -10,8 +10,17 @@ import { type NextRequest, NextResponse } from 'next/server'
  */
 export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname
+  // Route Handlers authorize themselves at the service boundary and answer in JSON, never a redirect.
   const route = (signedIn: boolean) =>
-    path === '/login' ? (signedIn ? '/clubs' : null) : signedIn ? null : '/login'
+    path.startsWith('/api/')
+      ? null
+      : path === '/login'
+        ? signedIn
+          ? '/clubs'
+          : null
+        : signedIn
+          ? null
+          : '/login'
 
   if (dataMode() === 'real') {
     const session = await refreshProxySession(request, () => NextResponse.next({ request }))

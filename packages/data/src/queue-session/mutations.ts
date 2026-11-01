@@ -6,6 +6,8 @@ import { delay } from '../mock/latency'
 import { required } from '../mock/required'
 import { type MockState, mockStore } from '../mock/store'
 import { queueMutation, sessionIn } from '../mock/transaction'
+import { isRealDataMode } from '../real/mode'
+import { realCreateQueueSession } from '../real/queue'
 import { normalizeSessionCost } from '../session-cost/sessionCost.rules'
 import { validateSessionCost } from '../session-cost/validation'
 import type { SessionWaitlistEntry } from '../session-roster/sessionRoster.types'
@@ -92,6 +94,7 @@ function validate(state: MockState, input: QueueSessionInput) {
   return { venue, budget }
 }
 export function createQueueSession(input: QueueSessionInput) {
+  if (isRealDataMode()) return realCreateQueueSession(input)
   return queueMutation({ area: 'Session', onlineOnly: true, clubAccess: true }, (state) => {
     const { venue, budget } = validate(state, input),
       occurrences = sessionOccurrences(

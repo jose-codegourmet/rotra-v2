@@ -8,6 +8,9 @@ import { isProductionBuild } from '../mock/env'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, readMockState } from '../mock/store'
+import { realActivateLicense, realGetLicenseOperation, realListLicenseTerms } from '../real/admin'
+import { isRealDataMode } from '../real/mode'
+import { realGetClubAccess, realGetLicensePayments } from '../real/queue'
 import {
   accessOf,
   formatLicenseDate,
@@ -24,6 +27,7 @@ import type {
   LicenseOperation,
 } from './license.types'
 export async function getClubAccess(): Promise<ClubAccess> {
+  if (isRealDataMode()) return realGetClubAccess()
   const state = readMockState()
   return {
     status: getMockDevState().licenseExpired ? ('expired' as const) : ('active' as const),
@@ -32,6 +36,7 @@ export async function getClubAccess(): Promise<ClubAccess> {
   }
 }
 export async function getLicensePayments() {
+  if (isRealDataMode()) return realGetLicensePayments()
   await delay()
   requireOnline()
   return readMockState()
@@ -102,6 +107,7 @@ export async function listLicenseTerms(
   clubId: string,
   signal?: AbortSignal,
 ): Promise<ClubLicenseTerm[]> {
+  if (isRealDataMode()) return realListLicenseTerms(clubId, signal)
   await delay(400, signal)
   return readMockState()
     .licensePayments.filter((term) => term.clubId === clubId)
@@ -131,6 +137,7 @@ function licenseErrors(input: ActivateLicenseInput, free: boolean, today: string
  * pages restored, unless they were already deleted. A later expiry starts a new countdown.
  */
 export async function activateLicense(input: ActivateLicenseInput): Promise<LicenseOperation> {
+  if (isRealDataMode()) return realActivateLicense(input)
   const operation = await adminMutation(1200, (draft) => {
     const replay = draft.licensePayments.find(
       (term) => term.sourceCommandId === input.sourceCommandId,
@@ -195,6 +202,7 @@ export async function getLicenseOperation(
   sourceCommandId: string,
   signal?: AbortSignal,
 ): Promise<LicenseOperation | null> {
+  if (isRealDataMode()) return realGetLicenseOperation(sourceCommandId, signal)
   if (isAdminOffline()) throw new MockError('offline', LICENSE_CHECK_OFFLINE_ERROR)
   await delay(900, signal)
   if (isAdminOffline()) throw new MockError('offline', LICENSE_CHECK_OFFLINE_ERROR)

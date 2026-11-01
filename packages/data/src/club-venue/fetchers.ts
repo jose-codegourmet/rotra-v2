@@ -5,8 +5,11 @@ import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { readMockState } from '../mock/store'
 import { queueMutation, requireClubAccess } from '../mock/transaction'
+import { isRealDataMode } from '../real/mode'
+import { realGetClubVenues, realSaveClubVenue } from '../real/queue'
 import type { ClubVenue } from './clubVenue.types'
 export async function getClubVenues() {
+  if (isRealDataMode()) return realGetClubVenues()
   await delay()
   requireClubAccess()
   const state = readMockState()
@@ -27,6 +30,7 @@ export async function getClubVenues() {
 export function saveClubVenue(
   input: Omit<ClubVenue, 'id' | 'clubId' | 'currency'> & { id?: string },
 ) {
+  if (isRealDataMode()) return realSaveClubVenue(input)
   return queueMutation({ area: 'Session setup', onlineOnly: true, clubAccess: true }, (state) => {
     const name = nameField.parse(input.name)
     if (

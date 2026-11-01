@@ -33,6 +33,7 @@ import {
   PlayerPoolToolbar,
 } from '@rotra/ui/player-pool-toolbar'
 import { SelectionBar } from '@rotra/ui/selection-bar'
+import { SlotMeter } from '@rotra/ui/slot-meter'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { toast } from '@rotra/ui/toaster'
 import { WaitlistPanel, type WaitlistPanelEntry } from '@rotra/ui/waitlist-panel'
@@ -214,6 +215,7 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
           Add late player
         </Button>
       </div>
+      <SlotMeter live rosterCount={rosterList.length} capacity={capacity} waitlistCount={waitlist.length} />
       <PlayerPoolToolbar
         show={show}
         onShowChange={setShow}
@@ -276,6 +278,7 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
       ) : null}
       {waitlist.length || full ? (
         <WaitlistPanel
+          live
           entries={entries}
           rosterCount={rosterList.length}
           courtCount={s.courts.length}

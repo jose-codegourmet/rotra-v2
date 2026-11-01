@@ -53,6 +53,7 @@ export function JoinRequests({ sessionId, variant = 'card', className }: JoinReq
     <JoinRequestsPanel
       loading={loading}
       requests={requests}
+      live={s?.state === 'active'}
       slotsFull={slotsFull}
       variant={variant}
       className={className}

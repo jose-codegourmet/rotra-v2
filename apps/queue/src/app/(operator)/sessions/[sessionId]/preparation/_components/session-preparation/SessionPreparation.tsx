@@ -1,6 +1,6 @@
 'use client'
 
-import { MockError } from '@rotra/data/mock/errors'
+import { isPermissionRefusal } from '@rotra/data/mock/errors'
 import {
   estimateMinimum,
   sessionMinutes,
@@ -94,13 +94,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
   const live = s?.state === 'active'
   // Once deleted, the session query fails while we leave for Home; that is not a 404.
   const deleted = remove.isSuccess
-  if (
-    !deleted &&
-    session.isError &&
-    session.error instanceof MockError &&
-    session.error.kind === 'permission'
-  )
-    notFound()
+  if (!deleted && session.isError && isPermissionRefusal(session.error)) notFound()
   // Active sessions keep this summary; terminal/finalizing sessions use their existing landing page.
   const redirectTo = s && s.state !== 'prepared' && s.state !== 'active' ? sessionHref(s) : null
   useEffect(() => {

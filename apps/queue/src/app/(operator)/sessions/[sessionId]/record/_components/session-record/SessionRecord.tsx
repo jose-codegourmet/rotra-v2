@@ -1,6 +1,6 @@
 'use client'
 
-import { MockError } from '@rotra/data/mock/errors'
+import { isPermissionRefusal } from '@rotra/data/mock/errors'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionRecord } from '@rotra/data/queue-session/useSessionRecord'
 import { useSessionPublication } from '@rotra/data/session-result/useSessionPublication'
@@ -46,7 +46,7 @@ export function SessionRecord({ sessionId }: SessionRecordProps) {
 
   const s = session.data
   const permissionError = (q: { isError: boolean; error: unknown }) =>
-    q.isError && q.error instanceof MockError && q.error.kind === 'permission'
+    q.isError && isPermissionRefusal(q.error)
   if (permissionError(session)) notFound()
   // A session that is not finished has no record: send it to the console or its preparation.
   const redirectTo = s && s.state !== 'completed' && s.state !== 'invalid' ? sessionHref(s) : null

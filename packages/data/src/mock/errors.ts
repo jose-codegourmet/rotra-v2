@@ -40,3 +40,7 @@ export class NotConnectedError extends MockError {
     super('permission', NOT_CONNECTED_MESSAGE)
   }
 }
+
+/** A real refusal (not found or not allowed). A domain that is only not connected yet is not one. */
+export const isPermissionRefusal = (error: unknown) =>
+  error instanceof MockError && error.kind === 'permission' && !(error instanceof NotConnectedError)

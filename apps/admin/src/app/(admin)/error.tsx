@@ -1,5 +1,5 @@
 'use client'
-import { NotConnectedError } from '@rotra/data/mock/errors'
+import { isPermissionRefusal, NotConnectedError } from '@rotra/data/mock/errors'
 import { ErrorState } from '@rotra/ui/error-state'
 import { useLayoutEffect } from 'react'
 import { useAdminWorkspaceAccess } from './_components/admin-workspace-shell/AdminWorkspaceShell'
@@ -13,7 +13,7 @@ export default function AdminError({
 }) {
   const reportPermissionDenied = useAdminWorkspaceAccess()
   const notConnected = error instanceof NotConnectedError
-  const permission = error.kind === 'permission' && !notConnected
+  const permission = isPermissionRefusal(error)
   useLayoutEffect(() => {
     if (permission) reportPermissionDenied?.()
   }, [permission, reportPermissionDenied])

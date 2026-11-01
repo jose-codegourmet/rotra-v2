@@ -1,6 +1,6 @@
 'use client'
 
-import { MockError } from '@rotra/data/mock/errors'
+import { isPermissionRefusal } from '@rotra/data/mock/errors'
 import type { MyJoinRequest, PublicSessionPage } from '@rotra/data/public-session/types'
 import { useMyJoinRequest } from '@rotra/data/public-session/useMyJoinRequest'
 import { usePublicSession } from '@rotra/data/public-session/usePublicSession'
@@ -122,7 +122,7 @@ export function PublicSession({ slug, viewer }: PublicSessionProps) {
   const p = page.data
   // A cached copy keeps showing when a refetch fails (an offline visitor); without one, explain.
   if (!p && page.isError) {
-    const notFound = page.error instanceof MockError && page.error.kind === 'permission'
+    const notFound = isPermissionRefusal(page.error)
     return (
       <main className="mx-auto flex max-w-[760px] flex-col gap-5 px-[max(16px,env(safe-area-inset-left,0px))] pt-5 pb-[120px]">
         {notFound ? (

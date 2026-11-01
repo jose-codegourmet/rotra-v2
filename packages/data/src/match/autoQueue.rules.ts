@@ -1,17 +1,17 @@
 import type { QueueSession } from '../queue-session/queueSession.types'
-import type { MatchLineup } from './match.types'
-import { splitTeams } from './queue.rules'
 import type { AutoQueueDraftLineup, AutoQueueDraftState, AutoQueueMode } from './autoQueue.types'
 import {
   activeMatchFor,
   allPlayers,
-  countedGames,
-  queuedCount,
-  waitMinutes,
   completeLineup,
-  shortName,
+  countedGames,
   type MatchContext,
+  queuedCount,
+  shortName,
+  waitMinutes,
 } from './match.rules'
+import type { MatchLineup } from './match.types'
+import { splitTeams } from './queue.rules'
 
 export const AUTO_QUEUE_MODES: AutoQueueMode[] = ['available', 'ahead', 'wait', 'fewest', 'catchup']
 export function emptyAutoQueueDraftState(): AutoQueueDraftState {

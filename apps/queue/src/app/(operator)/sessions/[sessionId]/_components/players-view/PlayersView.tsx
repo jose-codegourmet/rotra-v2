@@ -33,8 +33,8 @@ import {
   PlayerPoolToolbar,
 } from '@rotra/ui/player-pool-toolbar'
 import { SelectionBar } from '@rotra/ui/selection-bar'
-import { SlotMeter } from '@rotra/ui/slot-meter'
 import { Skeleton } from '@rotra/ui/skeleton'
+import { SlotMeter } from '@rotra/ui/slot-meter'
 import { toast } from '@rotra/ui/toaster'
 import { WaitlistPanel, type WaitlistPanelEntry } from '@rotra/ui/waitlist-panel'
 import { useState } from 'react'

@@ -135,7 +135,6 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
   const lastSessionRefresh = useRef(Date.now())
   const refetchSession = session.refetch
   const firstTick = useRef(true)
-  // biome-ignore lint/correctness/useExhaustiveDependencies: `now` is the clock that triggers the throttled session refetch
   useEffect(() => {
     if (firstTick.current) {
       firstTick.current = false

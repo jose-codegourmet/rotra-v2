@@ -1,11 +1,11 @@
 import { courtTimeOnSession, courtWindowError } from '@rotra/schema/court-window'
-import { sessionTimes } from './SessionSetupForm.helpers'
 import { dateField, timeField } from '@rotra/schema/date'
 import {
   CUSTOM_FEE_ERROR,
   sessionFinancialsSchema,
 } from '@rotra/ui/forms/session-financials-fields/schema'
 import { z } from 'zod'
+import { sessionTimes } from './SessionSetupForm.helpers'
 
 export const SESSION_TITLE_ERROR = 'Give the session a title.'
 export const VENUE_ERROR = 'Choose where you are playing.'

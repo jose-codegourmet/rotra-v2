@@ -135,6 +135,6 @@ export const TransferConflict: Story = {
   args: {
     selectedIds: ['draft-available-1'],
     transferError: 'A selected player is no longer present.',
-    onAddToMainQueue: async () => false,
+    onAddToMainQueue: fn(async () => false),
   },
 }

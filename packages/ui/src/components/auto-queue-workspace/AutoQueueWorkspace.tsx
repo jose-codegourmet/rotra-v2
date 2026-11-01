@@ -111,7 +111,7 @@ export function AutoQueueWorkspace({
   const [reviewIds, setReviewIds] = useState<string[] | null>(null)
   const reviewErrorRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
-    if (transferError) reviewErrorRef.current?.focus()
+    if (transferError && reviewIds !== null) reviewErrorRef.current?.focus()
   }, [transferError, reviewIds])
   const mainQueueRef = useRef<HTMLDivElement>(null)
   const headingRef = useRef<HTMLHeadingElement>(null)

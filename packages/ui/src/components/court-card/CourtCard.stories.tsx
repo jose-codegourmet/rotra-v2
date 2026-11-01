@@ -1,6 +1,6 @@
 import {
-  courtWindowFixture,
   consoleSessionFixture,
+  courtWindowFixture,
   mergedConsoleSessionFixture,
 } from '@rotra/data/fixtures/consoleSessions'
 import {

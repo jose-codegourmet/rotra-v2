@@ -1,6 +1,5 @@
 'use client'
 
-import { courtNextDay } from '@rotra/schema/court-window'
 import {
   activeMatches,
   FORMAT_LABELS,
@@ -20,6 +19,7 @@ import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useRemoveCourt } from '@rotra/data/queue-session/useRemoveCourt'
 import type { SessionPlayer } from '@rotra/data/session-roster/types'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
+import { courtNextDay } from '@rotra/schema/court-window'
 import { AddCourtTile } from '@rotra/ui/add-court-tile'
 import { CourtCard, type CourtCardProps } from '@rotra/ui/court-card'
 import type { CourtPlayer } from '@rotra/ui/court-drawing'

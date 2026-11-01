@@ -3,8 +3,8 @@
 import { CountStepper } from '@rotra/ui/count-stepper'
 import { Field } from '@rotra/ui/field'
 import { Notice } from '@rotra/ui/notice'
-import { TimeField } from '@rotra/ui/time-field'
 import { TextInput } from '@rotra/ui/text-input'
+import { TimeField } from '@rotra/ui/time-field'
 import { Controller, useFormContext, useWatch } from 'react-hook-form'
 import type { SessionSetupInput } from '../SessionSetupForm.schema'
 

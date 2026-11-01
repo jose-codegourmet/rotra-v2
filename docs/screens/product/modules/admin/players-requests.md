@@ -58,3 +58,12 @@ Each completed Admin decision can show actor/time and a concise change summary f
 ## Management controls (#335)
 
 Six count cards follow filters. Search, duplicate groups, inclusive date range, city, archive state, page size (25/50/100), page and grid/list view survive URL reloads. Quick view uses `peek`, preserves list state and opens a right-side full-height panel. Detail and quick view link to `/players/[playerId]/games` with return context; the read-only history has counted, fun/partial and all tabs, club/date filters and ten sessions per page. Row actions and bulk selection follow the approved business rules.
+
+Player selection uses compact standalone checkboxes: a narrow selection column in list view and a
+checkbox in each card header beside the identity in grid/phone view. Do not repeat “Select <name>”
+as visible text or add a full-width selection footer. Keep that player-specific accessible name,
+visible keyboard focus, and a 44 px touch target (32 px desktop target). Selection must not open
+quick view; existing selection and bulk-action behavior is unchanged (#392).
+
+Player action menus render above the table/card scroll containers, stay inside the viewport, and
+scroll internally when needed. Escape closes the menu and restores focus to its trigger.

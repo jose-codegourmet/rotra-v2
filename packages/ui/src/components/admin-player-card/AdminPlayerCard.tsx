@@ -27,7 +27,16 @@ export function AdminPlayerCard({
 }: AdminPlayerCardProps) {
   return (
     <Card className="relative flex min-w-0 flex-col gap-3">
-      <div className="flex items-start gap-3">
+      <div className="flex items-center gap-3">
+        {onSelect ? (
+          <Checkbox
+            variant="compact"
+            className="relative z-10"
+            label={`Select ${p.name}`}
+            checked={selected}
+            onChange={onSelect}
+          />
+        ) : null}
         <Avatar name={p.name} src={p.picture ?? undefined} />
         <div className="min-w-0 flex-1">
           <a
@@ -56,11 +65,6 @@ export function AdminPlayerCard({
       <p className="text-sm text-fg2">
         {createdBy} · Added {p.addedOn}
       </p>
-      {onSelect ? (
-        <div className="relative z-10">
-          <Checkbox label={`Select ${p.name}`} checked={selected} onChange={onSelect} />
-        </div>
-      ) : null}
     </Card>
   )
 }

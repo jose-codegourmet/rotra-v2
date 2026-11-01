@@ -37,3 +37,24 @@ export const LongLabel: Story = {
   },
   globals: { viewport: { value: 'phone' } },
 }
+
+export const Compact: Story = {
+  args: { variant: 'compact', label: 'Select Kenjie', description: undefined },
+  render: (args) => {
+    const [checked, setChecked] = useState(false)
+    return <Checkbox {...args} checked={checked} onChange={setChecked} />
+  },
+}
+export const CompactLight: Story = { ...Compact, globals: { theme: 'light' } }
+export const CompactChecked: Story = {
+  args: { variant: 'compact', label: 'Select Kenjie', description: undefined, checked: true },
+}
+export const CompactDisabled: Story = {
+  args: {
+    variant: 'compact',
+    label: 'Select Kenjie',
+    description: undefined,
+    disabled: true,
+    checked: true,
+  },
+}

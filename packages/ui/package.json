@@ -18,6 +18,7 @@
     "./app-shell/top-bar": "./src/components/app-shell/top-bar/TopBar.tsx",
     "./auth-card": "./src/components/auth-card/AuthCard.tsx",
     "./auto-queue-sheet": "./src/components/auto-queue-sheet/AutoQueueSheet.tsx",
+    "./auto-queue-workspace": "./src/components/auto-queue-workspace/AutoQueueWorkspace.tsx",
     "./avatar": "./src/components/avatar/Avatar.tsx",
     "./breadcrumb": "./src/components/breadcrumb/Breadcrumb.tsx",
     "./button": "./src/components/button/Button.tsx",

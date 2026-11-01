@@ -103,6 +103,57 @@ export function createMatchLineupFixtures(now = Date.now()) {
     minimumGames: session.minimumGames,
   }
 
+  const draftPlayer = (p: MatchLineupPlayerFixture, suggested: number, playingNow = false) => ({
+    id: p.id,
+    name: p.shortName,
+    played: p.games,
+    queued: 1,
+    suggested,
+    playingNow,
+  })
+  const draftOne = {
+    id: 'draft-available-1',
+    format: 'Doubles',
+    teamA: belowMinimum.teamA.map((p) => draftPlayer(p, 2)),
+    teamB: belowMinimum.teamB.map((p) => draftPlayer(p, 2)),
+    reason: 'Available players with the lowest planned load',
+  }
+  const draftTwo = {
+    id: 'draft-available-2',
+    format: 'Doubles',
+    teamA: belowMinimum.teamA.map((p) => draftPlayer(p, 2)),
+    teamB: belowMinimum.teamB.map((p) => draftPlayer(p, 2)),
+    reason: 'The same players may appear in a later future match',
+  }
+  const draftAhead = {
+    id: 'draft-ahead-1',
+    format: 'Doubles',
+    teamA: belowMinimum.teamA.map((p) => draftPlayer(p, 1, true)),
+    teamB: someBelow.teamB.map((p) => draftPlayer(p, 1)),
+    reason: 'Plan ahead with present players',
+    blockedReason: 'A player is playing now; this match waits until they are free.',
+  }
+  const autoQueueWorkspace = {
+    available: { drafts: [draftOne, draftTwo] },
+    ahead: { drafts: [draftAhead] },
+    wait: {
+      drafts: [
+        { ...draftOne, id: 'draft-wait-1', reason: 'Longest wait after planned assignments' },
+      ],
+    },
+    fewest: {
+      drafts: [
+        { ...draftOne, id: 'draft-fewest-1', reason: 'Fewest games after planned assignments' },
+      ],
+    },
+    catchup: {
+      drafts: [
+        { ...draftOne, id: 'draft-catchup-1', reason: 'Below the chosen completed-game target' },
+      ],
+      stopReason: 'Batch limit reached.',
+    },
+  }
+
   // Waiting matches 2, 3 and 4 are manual; 4 has an absent player, 1 is on court.
   const regenerate = {
     withCounts: regenerateScope(matches, ctx),
@@ -126,6 +177,7 @@ export function createMatchLineupFixtures(now = Date.now()) {
     noLineupReason,
     bothFormatsOff,
     autoQueue,
+    autoQueueWorkspace,
     regenerate,
   }
 }

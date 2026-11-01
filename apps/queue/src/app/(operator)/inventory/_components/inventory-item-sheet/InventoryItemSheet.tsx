@@ -5,10 +5,13 @@ import { useSaveInventoryItem } from '@rotra/data/inventory/useSaveInventoryItem
 import { InventoryItemForm } from '@rotra/ui/forms/inventory-item-form'
 import { Sheet } from '@rotra/ui/sheet'
 import { toast } from '@rotra/ui/toaster'
+import { useState } from 'react'
 
 export type InventoryItemSheetProps = { item?: InventoryItem; onClose: () => void }
 export function InventoryItemSheet({ item, onClose }: InventoryItemSheetProps) {
   const save = useSaveInventoryItem()
+  // One ID per open sheet, so retrying an add whose reply never came back saves one item.
+  const [commandId] = useState(() => crypto.randomUUID())
   return (
     <Sheet
       open
@@ -36,7 +39,7 @@ export function InventoryItemSheet({ item, onClose }: InventoryItemSheetProps) {
         onCancel={onClose}
         onSubmit={(values) =>
           save.mutate(
-            { ...values, id: item?.id },
+            { ...values, id: item?.id, revision: item?.revision, commandId },
             {
               onSuccess: (result) => {
                 toast(result.message)

@@ -103,10 +103,10 @@ Every entry inherits its actor, business/screen issue mapping, lifecycle, error,
 
 | Callable / current input | Output | Hook module exports |
 |---|---|---|
-| [getInventory](../../../packages/data/src/inventory/fetchers.ts#L9)<br>`(no arguments)` | `Promise<{ items, stockValue } (fields)>` | [useInventory](../../../packages/data/src/inventory/useInventory.ts) |
-| [removeInventoryItem](../../../packages/data/src/inventory/fetchers.ts#L67)<br>`id: string` | `Promise<{ data: InventoryItem; message: string; }>` | [useRemoveInventoryItem](../../../packages/data/src/inventory/useRemoveInventoryItem.ts) |
-| [saveInventoryItem](../../../packages/data/src/inventory/fetchers.ts#L38)<br>`input: SaveInventoryItemInput` | `Promise<{ data: InventoryItem; message: string; }>` | [useSaveInventoryItem](../../../packages/data/src/inventory/useSaveInventoryItem.ts) |
-| [stepInventoryStock](../../../packages/data/src/inventory/fetchers.ts#L75)<br>`{ id, delta }: { id: string; delta: -1 \| 1; }` | `Promise<{ data: InventoryItem; message: string; }>` | [useStepInventoryStock](../../../packages/data/src/inventory/useStepInventoryStock.ts) |
+| [getInventory](../../../packages/data/src/inventory/fetchers.ts#L16)<br>`(no arguments)` | `Promise<{ items, stockValue } (fields)>` | [useInventory](../../../packages/data/src/inventory/useInventory.ts) |
+| [removeInventoryItem](../../../packages/data/src/inventory/fetchers.ts#L78)<br>`id: string` | `Promise<{ data: InventoryItem; message: string; }>` | [useRemoveInventoryItem](../../../packages/data/src/inventory/useRemoveInventoryItem.ts) |
+| [saveInventoryItem](../../../packages/data/src/inventory/fetchers.ts#L47)<br>`input: SaveInventoryItemInput` | `Promise<{ data: InventoryItem; message: string; }>` | [useSaveInventoryItem](../../../packages/data/src/inventory/useSaveInventoryItem.ts) |
+| [stepInventoryStock](../../../packages/data/src/inventory/fetchers.ts#L87)<br>`{ id, delta }: { id: string; delta: -1 \| 1; }` | `Promise<{ data: InventoryItem; message: string; }>` | [useStepInventoryStock](../../../packages/data/src/inventory/useStepInventoryStock.ts) |
 
 ## leaderboard
 

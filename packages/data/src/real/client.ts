@@ -34,7 +34,7 @@ function offline() {
 export async function realRequest<T>(
   path: string,
   options: {
-    method?: 'GET' | 'POST' | 'PATCH'
+    method?: 'GET' | 'POST' | 'PATCH' | 'DELETE'
     body?: unknown
     signal?: AbortSignal
     fields?: Record<string, string>

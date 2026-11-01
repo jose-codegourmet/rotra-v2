@@ -26,7 +26,7 @@
 | Confirm winner/invalid match | Permanent after confirmation | Permanent locally, pending sync | No ordinary edit/undo path |
 | Session done | Only after complete reconciliation, no pending changes, and no game in play | Unavailable | Blocked until required originals and conflicts are resolved |
 | Cost estimate (setup step) | Saved with the session | Editable in the unsaved draft only | — |
-| Inventory edits | Allowed | Not specified (open decision) | — |
+| Inventory edits | Allowed | Not specified (open decision). Real mode (#375) is online only: nothing is sent and the error says you're offline | — |
 | Payments checklist (tick paid / not paid) | Allowed | Allowed locally | Sync as pending changes |
 | Guest sends a join request (public page) | Allowed while requests are on and the session is prepared or live | Not possible offline for the guest; the request goes straight to the server | — |
 | Confirm or decline a join request | Allowed | Allowed locally on a downloaded session (requests received before going offline) | Sync as pending roster changes |

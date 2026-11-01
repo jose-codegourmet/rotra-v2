@@ -2,12 +2,14 @@
 
 import {
   activeMatches,
+  courtOpen,
   FORMAT_LABELS,
   freeCourts,
   isBookingEnded,
   type MatchContext,
   matchStatus,
   nextEligibleForCourt,
+  openedEarly,
   shortName,
   waitingMatches,
 } from '@rotra/data/match/match.rules'
@@ -15,18 +17,24 @@ import type { Match } from '@rotra/data/match/types'
 import { useRemoveWaitingMatch } from '@rotra/data/match/useRemoveWaitingMatch'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import type { SessionCourt } from '@rotra/data/queue-session/types'
+import { useOpenAllCourtsEarly } from '@rotra/data/queue-session/useOpenAllCourtsEarly'
+import { useOpenCourtEarly } from '@rotra/data/queue-session/useOpenCourtEarly'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useRemoveCourt } from '@rotra/data/queue-session/useRemoveCourt'
+import { useUndoCourtEarlyOpen } from '@rotra/data/queue-session/useUndoCourtEarlyOpen'
 import type { SessionPlayer } from '@rotra/data/session-roster/types'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { courtNextDay } from '@rotra/schema/court-window'
 import { AddCourtTile } from '@rotra/ui/add-court-tile'
+import { Button } from '@rotra/ui/button'
+import { ConfirmSheet } from '@rotra/ui/confirm-sheet'
 import { CourtCard, type CourtCardProps } from '@rotra/ui/court-card'
 import type { CourtPlayer } from '@rotra/ui/court-drawing'
 import { formatTime } from '@rotra/ui/now-card/helpers'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { toast } from '@rotra/ui/toaster'
 import { type UpcomingQueueMatch, UpcomingQueueRow } from '@rotra/ui/upcoming-queue-row'
+import { useState } from 'react'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 
 export type SessionViewProps = {
@@ -39,6 +47,8 @@ export type SessionViewProps = {
   onOpenQueue: () => void
   /** The + Add court tile: open the Add a court sheet (Queue › Courts and time) */
   onAddCourt: () => void
+  /** Edit in a court's ⋯ menu: open the Edit court sheet (Queue › Courts and time). Hidden until given. */
+  onEditCourt?: (courtId: string) => void
   /** Edit on an upcoming queue card: open the Edit lineup sheet (Queue › Match editing). Edit is hidden until given. */
   onEditMatch?: (matchId: string) => void
   /** Add match on a free court card with nothing to start: open the Add match sheet (Queue › Match editing). Hidden until given. */
@@ -62,6 +72,10 @@ export type SessionViewProps = {
  * removes go straight to their mutation with a toast and no dialog (per dialogs.md): a court with
  * "LABEL removed" (an occupied court is refused with "Only a free court can be removed"), a waiting
  * match with "Waiting match N removed".
+ * A court before its planned start shows Start anyway, and the header shows Open all courts now while
+ * any court is not open yet; both confirm first ("Open Court 4 now?") and then open the court early
+ * (useOpenCourtEarly / useOpenAllCourtsEarly). Undo early open in the ⋯ menu goes straight back to
+ * Not open yet (useUndoCourtEarlyOpen), only while the court is free.
  */
 export function SessionView({
   sessionId,
@@ -69,6 +83,7 @@ export function SessionView({
   onOpenProfile,
   onOpenQueue,
   onAddCourt,
+  onEditCourt,
   onEditMatch,
   onAddMatch,
   onStartMatch,
@@ -80,6 +95,12 @@ export function SessionView({
   const matches = useSessionMatches(sessionId)
   const removeCourt = useRemoveCourt()
   const removeWaitingMatch = useRemoveWaitingMatch()
+  const openCourtEarly = useOpenCourtEarly()
+  const openAllCourtsEarly = useOpenAllCourtsEarly()
+  const undoEarlyOpen = useUndoCourtEarlyOpen()
+  /** The Start anyway confirmation: one court, or every not-open court (Open all courts now) */
+  const [opening, setOpening] = useState<{ courtId: string | null } | null>(null)
+  const [openError, setOpenError] = useState<string | undefined>()
 
   if (session.isError || roster.isError || matches.isError)
     return (
@@ -140,6 +161,39 @@ export function SessionView({
     if (removeCourt.isPending) return
     removeCourt.mutate({ sessionId, courtId: c.id }, options)
   }
+  const live = s.state === 'active'
+  const notOpenCourts = courts.filter((c) => !courtOpen(c, now))
+  const canOpenCourt = live && notOpenCourts.length > 0
+  const startAnyway = (courtId: string | null) => {
+    setOpenError(undefined)
+    setOpening({ courtId })
+  }
+  const onConfirmOpen = () => {
+    if (!opening || openCourtEarly.isPending || openAllCourtsEarly.isPending) return
+    const confirm = {
+      onSuccess: (result: { message: string }) => {
+        toast(result.message)
+        setOpening(null)
+      },
+      onError: (error: unknown) => {
+        const message = error instanceof Error ? error.message : 'Something went wrong. Try again.'
+        setOpenError(message)
+        toast.error(message)
+      },
+    }
+    if (opening.courtId) openCourtEarly.mutate({ sessionId, courtId: opening.courtId }, confirm)
+    else openAllCourtsEarly.mutate({ sessionId }, confirm)
+  }
+  const onUndoEarlyOpen = (c: SessionCourt) => {
+    if (undoEarlyOpen.isPending) return
+    undoEarlyOpen.mutate({ sessionId, courtId: c.id }, options)
+  }
+  const menuFor = (c: SessionCourt) => ({
+    openedEarly: openedEarly(c, now),
+    onEdit: onEditCourt ? () => onEditCourt(c.id) : undefined,
+    onUndoEarlyOpen: live && openedEarly(c, now) ? () => onUndoEarlyOpen(c) : undefined,
+    onRemove: () => onRemoveCourt(c),
+  })
   const onRemoveMatch = (m: Match) => {
     if (removeWaitingMatch.isPending) return
     removeWaitingMatch.mutate({ sessionId, matchId: m.id }, options)
@@ -171,6 +225,7 @@ export function SessionView({
         minutes: Math.max(0, Math.round((now - (m.startedAt ?? now)) / 60000)),
         substitutions: m.substitutions.length,
         onOpenMatch: onOpenMatch ? () => onOpenMatch(m.id) : undefined,
+        ...menuFor(c),
       })
       continue
     }
@@ -182,10 +237,11 @@ export function SessionView({
       label: c.label,
       untilLabel: untilLabel(c),
       startLabel: startLabel(c),
-      notOpen: (c.startsAt ?? s.scheduledStartAt) > now,
+      notOpen: !courtOpen(c, now),
+      onStartAnyway: live && !courtOpen(c, now) ? () => startAnyway(c.id) : undefined,
       bookingEnded: isBookingEnded(c, s.scheduledEndAt, now),
       isLastCourt: courts.length <= 1,
-      onRemove: () => onRemoveCourt(c),
+      ...menuFor(c),
       next: next.match
         ? {
             skippedReason: next.skipped ?? undefined,
@@ -215,6 +271,7 @@ export function SessionView({
     teamB: m.teamB.map(player),
     onSelectPlayer: openProfile,
     onStart: onStartMatch ? () => onStartMatch(m.id) : undefined,
+    canOpenCourt,
     onEdit: onEditMatch ? () => onEditMatch(m.id) : undefined,
     onRemove: () => onRemoveMatch(m),
   }))
@@ -225,9 +282,16 @@ export function SessionView({
       <section aria-label="Courts" className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-lg font-bold">Courts</h2>
-          <span className="text-[13px] text-fg2">
-            {free.length} of {courts.length} free
-          </span>
+          <div className="flex flex-wrap items-center gap-2.5">
+            {live && notOpenCourts.length ? (
+              <Button size="xs" onClick={() => startAnyway(null)}>
+                Open all courts now
+              </Button>
+            ) : null}
+            <span className="text-[13px] text-fg2">
+              {free.length} of {courts.length} free
+            </span>
+          </div>
         </div>
         <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,250px),1fr))] gap-3">
           {cards.map((card) => (
@@ -245,6 +309,71 @@ export function SessionView({
         onOpenQueue={onOpenQueue}
         className="border-t border-border pt-5"
       />
+      <OpenEarlySheet
+        courts={
+          opening?.courtId
+            ? courts.filter((c) => c.id === opening.courtId)
+            : opening
+              ? notOpenCourts
+              : []
+        }
+        startLabel={startLabel}
+        open={!!opening}
+        onOpenChange={(next) => {
+          if (!next) setOpening(null)
+        }}
+        onConfirm={onConfirmOpen}
+        isPending={openCourtEarly.isPending || openAllCourtsEarly.isPending}
+        error={openError}
+      />
     </>
+  )
+}
+
+/** "Open Court 4 now?" / "Open all courts now?": the Start anyway confirmation */
+function OpenEarlySheet({
+  courts,
+  startLabel,
+  open,
+  onOpenChange,
+  onConfirm,
+  isPending,
+  error,
+}: {
+  courts: SessionCourt[]
+  startLabel: (c: SessionCourt) => string
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  onConfirm: () => void
+  isPending: boolean
+  error?: string
+}) {
+  const one = courts.length === 1 ? courts[0] : undefined
+  return (
+    <ConfirmSheet
+      open={open}
+      onOpenChange={onOpenChange}
+      title={one ? `Open ${one.label} now?` : 'Open all courts now?'}
+      summary={
+        one ? (
+          <p className="m-0">It's booked from {startLabel(one)}.</p>
+        ) : (
+          <ul className="m-0 flex list-none flex-col gap-1 p-0 text-[13px]">
+            {courts.map((c) => (
+              <li key={c.id}>
+                {c.label} <span className="text-fg2">· booked from {startLabel(c)}</span>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+      consequence={`Opening early makes ${one ? 'it' : 'them'} available for matches and Auto Queue now.`}
+      note="The booking time and costs don't change."
+      confirmLabel="Open now"
+      backLabel="Cancel"
+      onConfirm={onConfirm}
+      isPending={isPending}
+      error={error}
+    />
   )
 }

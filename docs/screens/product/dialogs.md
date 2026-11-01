@@ -21,7 +21,11 @@ The save re-checks: if a player was confirmed meanwhile, the error shows in the 
 
 ## D-START-MATCH — Start match
 
-Title **Start match N**. Show teams with levels, format (and Fun game), and free-court buttons — two for 5v5. Primary **Start match** (disabled until courts are chosen and the match is ready); secondary Back. Recheck player/court availability before accepting. It is an explicit operator action, not automatic dispatch on free court.
+Title **Start match N**. Show teams with levels, format (and Fun game), and free-court buttons — two for 5v5. Primary **Start match** (disabled until courts are chosen and the match is ready); secondary Back. Recheck player/court availability before accepting. It is an explicit operator action, not automatic dispatch on free court. Courts before their planned start are listed under **Not open yet** with **Start anyway** (“Start anyway opens the court now. The booking time and costs don't change.”); this sheet is the confirmation, so it opens the court and chooses it without a second dialog.
+
+## D-OPEN-EARLY — Open a court early
+
+Title **Open LABEL now?** (or **Open all courts now?**, listing each court with “booked from HH:MM”). Copy: **“It's booked from HH:MM.”** · **“Opening early makes it available for matches and Auto Queue now.”** · note **“The booking time and costs don't change.”** Primary **Open now**; secondary **Cancel**. The save rechecks that the court is still not open; **Undo early open** in the court's ⋯ menu reverses it without a dialog while the court is free.
 
 ## D-WINNER — Permanent winner
 

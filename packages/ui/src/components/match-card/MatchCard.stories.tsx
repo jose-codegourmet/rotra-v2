@@ -43,6 +43,10 @@ export const WaitingForCourts: Story = {
   name: '5v5 needs two free courts',
   args: propsFor(matchCardFixtures.waitingForCourts),
 }
+/** A court is not open yet: Start stays enabled and the Start match sheet offers Start anyway */
+export const WaitingForCourtsCanOpenCourt: Story = {
+  args: { ...propsFor(matchCardFixtures.waitingForCourts), canOpenCourt: true },
+}
 export const ProtectedManual: Story = { args: propsFor(matchCardFixtures.protectedManual) }
 export const Suggested: Story = { args: propsFor(matchCardFixtures.suggested) }
 export const Auto: Story = { args: propsFor(matchCardFixtures.auto) }

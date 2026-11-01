@@ -1,5 +1,8 @@
 import { courtWindowError } from '@rotra/schema/court-window'
+import { courtOpen, openedEarly } from '../match/match.rules'
+import { requireLive } from '../match/queue.mutations'
 import { MockError } from '../mock/errors'
+import type { MockState } from '../mock/store'
 import { queueMutation, sessionIn } from '../mock/transaction'
 
 const hhmm = (n: number) =>
@@ -51,7 +54,8 @@ export function updateCourt(input: {
     )
     if (!court) throw new MockError('conflict', 'Court no longer available.')
     if (
-      s.matches.some((m) => m.sessionId === session.id && m.courtIds.includes(court.id)) &&
+      (court.openedEarlyAt != null ||
+        s.matches.some((m) => m.sessionId === session.id && m.courtIds.includes(court.id))) &&
       input.startsAt !== (court.startsAt ?? session.startedAt ?? session.scheduledStartAt)
     )
       throw new MockError('permission', 'Start is fixed after use.')
@@ -71,6 +75,59 @@ export function updateCourt(input: {
     return {
       data: court,
       text: `${court.label} saved · open until ${hhmm(court.openUntil ?? session.scheduledEndAt)}`,
+    }
+  })
+}
+/** Start anyway: opens not-yet-open courts now. The planned start, costs and minimum games stay as they are. */
+function openEarly(s: MockState, sessionId: string, courtIds: string[] | null) {
+  const session = requireLive(s, sessionId),
+    now = Date.now()
+  const live = s.courts.filter((c) => c.sessionId === session.id && !c.removedAt)
+  const courts = courtIds
+    ? courtIds.map((id) => live.find((c) => c.id === id))
+    : live.filter((c) => !courtOpen(c, now))
+  if (!courts.length || courts.some((c) => !c || courtOpen(c, now)))
+    throw new MockError('conflict', 'Something changed. Review the courts again.')
+  for (const c of courts) if (c) c.openedEarlyAt = now
+  return courts.flatMap((c) => (c ? [c] : []))
+}
+export function openCourtEarly(input: { sessionId: string; courtId: string }) {
+  return queueMutation({ area: 'Courts and time', sessionId: input.sessionId }, (s) => {
+    const [court] = openEarly(s, input.sessionId, [input.courtId])
+    if (!court) throw new MockError('conflict', 'Something changed. Review the courts again.')
+    return {
+      data: court,
+      text: `${court.label} opened early · planned ${hhmm(court.startsAt ?? 0)}`,
+    }
+  })
+}
+export function openAllCourtsEarly(input: { sessionId: string }) {
+  return queueMutation({ area: 'Courts and time', sessionId: input.sessionId }, (s) => {
+    const courts = openEarly(s, input.sessionId, null)
+    return {
+      data: courts,
+      text:
+        courts.length === 1
+          ? `${courts[0]?.label} opened early · planned ${hhmm(courts[0]?.startsAt ?? 0)}`
+          : `${courts.length} courts opened early`,
+    }
+  })
+}
+/** Undo early open: back to Not open yet, only while the court is free. */
+export function undoCourtEarlyOpen(input: { sessionId: string; courtId: string }) {
+  return queueMutation({ area: 'Courts and time', sessionId: input.sessionId }, (s) => {
+    const session = requireLive(s, input.sessionId)
+    const court = s.courts.find(
+      (c) => c.id === input.courtId && c.sessionId === session.id && !c.removedAt,
+    )
+    if (!court || !openedEarly(court))
+      throw new MockError('conflict', 'Something changed. Review the courts again.')
+    if (s.matches.some((m) => m.state === 'active' && m.courtIds.includes(court.id)))
+      throw new MockError('permission', 'Only a free court can go back to Not open yet.')
+    court.openedEarlyAt = null
+    return {
+      data: court,
+      text: `${court.label} back to Not open yet · opens ${hhmm(court.startsAt ?? 0)}`,
     }
   })
 }

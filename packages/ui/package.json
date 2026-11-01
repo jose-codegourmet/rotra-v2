@@ -114,6 +114,7 @@
     "./now-card": "./src/components/now-card/NowCard.tsx",
     "./now-card/helpers": "./src/components/now-card/NowCard.helpers.ts",
     "./offline-band": "./src/components/offline-band/OfflineBand.tsx",
+    "./overflow-menu": "./src/components/overflow-menu/OverflowMenu.tsx",
     "./page-header": "./src/components/page-header/PageHeader.tsx",
     "./player-confirm-card": "./src/components/player-confirm-card/PlayerConfirmCard.tsx",
     "./player-face-button": "./src/components/player-face-button/PlayerFaceButton.tsx",

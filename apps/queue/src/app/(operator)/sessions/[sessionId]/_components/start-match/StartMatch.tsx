@@ -2,6 +2,7 @@
 
 import {
   countedGames,
+  courtOpen,
   courtsNeeded,
   FORMAT_LABELS,
   freeCourts,
@@ -17,10 +18,12 @@ import { useStartMatch } from '@rotra/data/match/useStartMatch'
 import { useSwapPlayers } from '@rotra/data/match/useSwapPlayers'
 import { MockError } from '@rotra/data/mock/errors'
 import type { QueueSession } from '@rotra/data/queue-session/types'
+import { useOpenCourtEarly } from '@rotra/data/queue-session/useOpenCourtEarly'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import type { SessionPlayer } from '@rotra/data/session-roster/types'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { type ChooseMatchRow, ChooseMatchSheet } from '@rotra/ui/choose-match-sheet'
+import { formatTime } from '@rotra/ui/now-card/helpers'
 import { StartMatchSheet } from '@rotra/ui/start-match-sheet'
 import type { SwapSlot } from '@rotra/ui/swap-sides-area'
 import type { TeamLineupPlayer } from '@rotra/ui/team-lineup'
@@ -64,6 +67,8 @@ const isRecheckFailure = (error: unknown) => error instanceof MockError && error
  * and matches so the sheet shows what changed. A local save failure ("Changes could not be saved")
  * is an error toast and an error inside the sheet: the match stays waiting, the chosen courts stay
  * chosen and Start match retries the same operationId.
+ * Courts before their planned start are listed under "Not open yet": Start anyway calls
+ * useOpenCourtEarly ("Court 4 opened early · planned HH:MM") and chooses that court.
  * Switching sides calls useSwapPlayers (the waiting match becomes protected, toast as in the Queue
  * view); a player card opens PlayerProfile with Back to match, which returns to the same sheet.
  * No match ever starts without this confirmation.
@@ -192,6 +197,7 @@ function OpenStartMatch({
 }: OpenStartMatchProps) {
   const startMatch = useStartMatch()
   const swapPlayers = useSwapPlayers()
+  const openCourtEarly = useOpenCourtEarly()
   const [operationId] = useState(() => crypto.randomUUID())
   const [courtIds, setCourtIds] = useState(() => preselect(match, courtId, ctx))
   const [message, setMessage] = useState<string | undefined>()
@@ -216,6 +222,32 @@ function OpenStartMatch({
     label: c.label,
   }))
   const status = matchStatus(match, ctx)
+  const notOpen = ctx.courts
+    .filter((c) => !c.removedAt && !courtOpen(c, ctx.now))
+    .map((c) => ({
+      id: c.id,
+      label: c.label,
+      opensLabel: formatTime(c.startsAt ?? session.scheduledStartAt),
+    }))
+
+  const onStartAnyway = (courtId: string) => {
+    if (openCourtEarly.isPending || startMatch.isPending) return
+    openCourtEarly.mutate(
+      { sessionId, courtId },
+      {
+        onSuccess: (result) => {
+          toast(result.message)
+          setCourtIds((ids) =>
+            courtsNeeded(match) === 1
+              ? [courtId]
+              : [...ids.filter((id) => id !== courtId), courtId].slice(-2),
+          )
+          onRefresh()
+        },
+        onError: (failure) => toast.error(errorMessage(failure)),
+      },
+    )
+  }
 
   const onSwap = (from: SwapSlot, to: SwapSlot) => {
     if (from.team === to.team || swapPlayers.isPending || startMatch.isPending) return
@@ -282,6 +314,9 @@ function OpenStartMatch({
         minimumGames={session.minimumGames}
         status={status}
         freeCourts={free}
+        notOpenCourts={notOpen}
+        onStartAnyway={onStartAnyway}
+        isOpeningCourt={openCourtEarly.isPending}
         courtIds={courtIds}
         onCourtIdsChange={setCourtIds}
         onSelectPlayer={openProfile}

@@ -76,6 +76,17 @@ export const Blocked: Story = { args: propsFor(startMatchFixtures.blocked) }
 /** Opened from a queue card with no court chosen yet. */
 export const NoCourtChosen: Story = { args: { courtIds: [] } }
 
+/** Courts 4 and 5 are not open yet: Start anyway opens one now and chooses it. */
+export const NotOpenCourts: Story = {
+  args: {
+    notOpenCourts: [
+      { id: 'window-court-4', label: 'Court 4', opensLabel: '8:30 PM' },
+      { id: 'window-court-5', label: 'Court 5', opensLabel: '8:30 PM' },
+    ],
+    onStartAnyway: fn(),
+  },
+}
+
 /** The start is running: Start match cannot fire twice and the sheet cannot be dismissed. */
 export const Pending: Story = { args: { isPending: true } }
 

@@ -2,7 +2,7 @@ import { Button } from '@rotra/ui/button'
 import { Chip } from '@rotra/ui/chip'
 import { cn } from '@rotra/ui/cn'
 import { CourtDrawing, type CourtPlayer } from '@rotra/ui/court-drawing'
-import { Icon } from '@rotra/ui/icon'
+import { OverflowMenu, type OverflowMenuItem } from '@rotra/ui/overflow-menu'
 import { courtCardVariants } from './CourtCard.variants'
 
 type CourtCardBase = {
@@ -12,6 +12,12 @@ type CourtCardBase = {
   untilLabel: string
   startLabel?: string
   bookingEnded?: boolean
+  /** Opened before its planned start (Start anyway): the time line reads "Opened early · planned START – UNTIL" */
+  openedEarly?: boolean
+  /** ⋯ menu: Edit the court's label and window */
+  onEdit?: () => void
+  /** ⋯ menu: Undo early open, back to Not open yet; disabled on an in-game card */
+  onUndoEarlyOpen?: () => void
   className?: string
 }
 
@@ -30,6 +36,8 @@ export type CourtCardInGameProps = CourtCardBase & {
   substitutions?: number
   /** Renders "Open match" when given */
   onOpenMatch?: () => void
+  /** ⋯ menu: Remove, disabled here with "Only a free court can be removed" */
+  onRemove?: () => void
 }
 
 /** The waiting match this court can start next */
@@ -52,8 +60,10 @@ export type CourtCardFreeProps = CourtCardBase & {
   removed?: boolean
   /** The session's last court: Remove is disabled with "A session needs at least one court" */
   isLastCourt?: boolean
-  /** Renders "Remove" when given */
+  /** ⋯ menu: Remove */
   onRemove?: () => void
+  /** Not open yet: renders "Start anyway" (the owner confirms, then opens the court early) */
+  onStartAnyway?: () => void
   /** A ready match; when missing the body says why none can start, or that the queue is empty */
   next?: CourtCardNextMatch | null
   /** Why no waiting match can start (the first match's reason); omit when the queue is empty */
@@ -67,6 +77,64 @@ export type CourtCardFreeProps = CourtCardBase & {
 }
 
 export type CourtCardProps = CourtCardInGameProps | CourtCardFreeProps
+
+function TimeLine({
+  startLabel,
+  untilLabel,
+  bookingEnded,
+  openedEarly,
+}: Pick<CourtCardBase, 'startLabel' | 'untilLabel' | 'bookingEnded' | 'openedEarly'>) {
+  return (
+    <span className={cn('text-[13px]', bookingEnded ? 'text-warn' : 'text-fg2')}>
+      {bookingEnded
+        ? 'Booking ended '
+        : openedEarly && startLabel
+          ? `Opened early · planned ${startLabel} – `
+          : startLabel
+            ? `${startLabel} – `
+            : 'Until '}
+      {untilLabel}
+    </span>
+  )
+}
+
+/** Edit, Undo early open and Remove; the card itself keeps only the action for its state. */
+function CourtMenu({
+  label,
+  busy,
+  isLastCourt = false,
+  onEdit,
+  onUndoEarlyOpen,
+  onRemove,
+}: {
+  label: string
+  busy: boolean
+  isLastCourt?: boolean
+  onEdit?: () => void
+  onUndoEarlyOpen?: () => void
+  onRemove?: () => void
+}) {
+  const items: OverflowMenuItem[] = []
+  if (onEdit) items.push({ label: 'Edit', onSelect: onEdit })
+  if (onUndoEarlyOpen)
+    items.push({
+      label: 'Undo early open',
+      onSelect: onUndoEarlyOpen,
+      disabledReason: busy ? 'A match is on this court' : undefined,
+    })
+  if (onRemove)
+    items.push({
+      label: 'Remove',
+      onSelect: onRemove,
+      destructive: true,
+      disabledReason: busy
+        ? 'Only a free court can be removed'
+        : isLastCourt
+          ? 'A session needs at least one court'
+          : undefined,
+    })
+  return items.length ? <OverflowMenu label={`More for ${label}`} items={items} /> : null
+}
 
 /** Prototype listNames(): "Mikee and Dexter", "Mikee, Dexter and Jose" */
 function listNames(names: string[]) {
@@ -98,6 +166,10 @@ function InGameCourtCard({
   minutes,
   substitutions = 0,
   onOpenMatch,
+  openedEarly = false,
+  onEdit,
+  onUndoEarlyOpen,
+  onRemove,
   className,
 }: CourtCardInGameProps) {
   return (
@@ -108,12 +180,12 @@ function InGameCourtCard({
       <div className="flex items-center justify-between gap-2">
         <div>
           <h3 className="text-base">{label}</h3>
-          <span className={cn('text-[13px]', bookingEnded ? 'text-warn' : 'text-fg2')}>
-            {bookingEnded ? 'Booking ended ' : startLabel ? `${startLabel} – ` : 'Until '}
-            {untilLabel}
-          </span>
+          <TimeLine {...{ startLabel, untilLabel, bookingEnded, openedEarly }} />
         </div>
-        <Chip tone="accent">{merged ? 'Merged · in game' : 'In game'}</Chip>
+        <div className="flex flex-nowrap items-center gap-1.5">
+          <Chip tone="accent">{merged ? 'Merged · in game' : 'In game'}</Chip>
+          <CourtMenu busy {...{ label, onEdit, onUndoEarlyOpen, onRemove }} />
+        </div>
       </div>
       <CourtDrawing
         courts={merged ? 2 : 1}
@@ -147,6 +219,10 @@ function FreeCourtCard({
   removed = false,
   isLastCourt = false,
   onRemove,
+  onStartAnyway,
+  openedEarly = false,
+  onEdit,
+  onUndoEarlyOpen,
   next,
   blockedReason,
   onReviewAndStart,
@@ -159,35 +235,34 @@ function FreeCourtCard({
       <div className="flex items-center justify-between gap-2">
         <div>
           <h3 className="text-base">{label}</h3>
-          <span className={cn('text-[13px]', bookingEnded ? 'text-warn' : 'text-fg2')}>
-            {bookingEnded ? 'Booking ended ' : startLabel ? `${startLabel} – ` : 'Until '}
-            {untilLabel}
-          </span>
+          <TimeLine {...{ startLabel, untilLabel, bookingEnded, openedEarly }} />
         </div>
         <div className="flex flex-nowrap items-center gap-1.5">
           <Chip>{removed ? 'Removed' : notOpen ? 'Not open yet' : 'Free'}</Chip>
-          {onRemove ? (
-            <Button
-              size="xs"
-              variant="ghost"
-              onClick={onRemove}
-              aria-label={`Remove ${label}`}
-              disabled={isLastCourt}
-              title={isLastCourt ? 'A session needs at least one court' : undefined}
-            >
-              <Icon name="x" />
-              Remove
-            </Button>
-          ) : null}
+          {removed ? null : (
+            <CourtMenu
+              busy={false}
+              {...{ label, isLastCourt, onEdit, onUndoEarlyOpen, onRemove }}
+            />
+          )}
         </div>
       </div>
       <CourtDrawing free freeLabel={removed ? 'Removed' : notOpen ? 'Not open yet' : 'Free'} />
-      {notOpen || removed ? (
-        <p className="text-[13px] text-fg2">
-          {removed
-            ? 'Manually removed from this session.'
-            : `Opens at ${startLabel}. The court is unavailable before this time.`}
-        </p>
+      {removed ? (
+        <p className="text-[13px] text-fg2">Manually removed from this session.</p>
+      ) : notOpen ? (
+        <>
+          <p className="text-[13px] text-fg2">
+            Opens at {startLabel}. The court is unavailable before this time.
+          </p>
+          {onStartAnyway ? (
+            <div className="mt-auto flex flex-wrap items-center gap-2">
+              <Button size="sm" variant="primary" onClick={onStartAnyway}>
+                Start anyway
+              </Button>
+            </div>
+          ) : null}
+        </>
       ) : next ? (
         <>
           {next.skippedReason ? (

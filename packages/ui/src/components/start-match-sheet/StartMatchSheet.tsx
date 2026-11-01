@@ -18,6 +18,13 @@ export type StartMatchLineup = {
   teamB: TeamLineupPlayer[]
 }
 
+export type StartMatchNotOpenCourt = {
+  id: string
+  label: string
+  /** The planned start, already formatted: "8:30 PM" */
+  opensLabel: string
+}
+
 export type StartMatchSheetProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -28,6 +35,12 @@ export type StartMatchSheetProps = {
   status: MatchStatus
   /** Every free court; the owner preselects the one that opened the sheet (plus a second for 5v5) */
   freeCourts: CourtPickerCourt[]
+  /** Courts before their planned start; listed under "Not open yet" with Start anyway */
+  notOpenCourts?: StartMatchNotOpenCourt[]
+  /** Start anyway on a not-yet-open court: the owner opens it early and adds it to the chosen courts */
+  onStartAnyway?: (courtId: string) => void
+  /** Start anyway is saving */
+  isOpeningCourt?: boolean
   /** The chosen court ids, oldest first */
   courtIds: string[]
   onCourtIdsChange: (courtIds: string[]) => void
@@ -60,8 +73,8 @@ const isFun = (format: MatchFormat) => format.startsWith('fun_')
 
 /**
  * D-START-MATCH (Q-DISPATCH): "Start match N" with the format chip (plus Fun game), Team A VS Team B
- * with switch sides, the free-court buttons (two for 5v5), and the block reason when the match is
- * not ready. Start match stays disabled until the required courts are chosen and the match is ready.
+ * with switch sides, the free-court buttons (two for 5v5), the not-yet-open courts with Start
+ * anyway, and the block reason when the match is not ready. Start match stays disabled until the required courts are chosen and the match is ready.
  * Starting is an explicit Queue Master action, never automatic dispatch.
  */
 export function StartMatchSheet({
@@ -71,6 +84,9 @@ export function StartMatchSheet({
   minimumGames,
   status,
   freeCourts,
+  notOpenCourts = [],
+  onStartAnyway,
+  isOpeningCourt = false,
   courtIds,
   onCourtIdsChange,
   onSelectPlayer,
@@ -128,6 +144,29 @@ export function StartMatchSheet({
         onChange={onCourtIdsChange}
         disabled={isPending}
       />
+      {notOpenCourts.length && onStartAnyway ? (
+        <section aria-label="Not open yet" className="flex flex-col gap-1.5">
+          <span className="text-[13px] font-semibold text-fg2">Not open yet</span>
+          {notOpenCourts.map((court) => (
+            <div key={court.id} className="flex items-center justify-between gap-2">
+              <span className="text-[13px]">
+                {court.label} <span className="text-fg2">· Opens {court.opensLabel}</span>
+              </span>
+              <Button
+                size="xs"
+                disabled={isPending || isOpeningCourt}
+                onClick={() => onStartAnyway(court.id)}
+                aria-label={`Start anyway on ${court.label}`}
+              >
+                Start anyway
+              </Button>
+            </div>
+          ))}
+          <span className="text-xs text-fg2">
+            Start anyway opens the court now. The booking time and costs don't change.
+          </span>
+        </section>
+      ) : null}
       {ready ? null : <Notice tone="error">{status.reason}</Notice>}
       {message ? <Notice tone="warn">{message}</Notice> : null}
       {error ? <Notice tone="error">{error}</Notice> : null}

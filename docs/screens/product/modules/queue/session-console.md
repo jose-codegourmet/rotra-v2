@@ -90,7 +90,7 @@ Sheet titled “Add LABEL?” or “Edit LABEL?”.
 | Control | Behavior |
 |---|---|
 | Court label | Defaults to the next “Court N” |
-| Planned start | The court is unavailable before this time; fixed after the court has hosted a match |
+| Planned start | The court is unavailable before this time unless opened early (Start anyway); fixed after the court has hosted a match or been opened early |
 | Open until | **Until the session ends** (“HH:MM · moves if you extend time”) or **Until a set time** (“For a court booked for less time”) with a time field |
 
 Errors: “Choose a closing time.”; “Choose a planned start within the session.”; “Choose an end after the planned start.”; “That's after the session ends at HH:MM. Pick an earlier time, or extend the session first.” Overnight values indicate the next day. A passed end may still be edited.
@@ -128,7 +128,7 @@ Note: “Courts show their closing time on the card. ROTRA doesn't stop a game a
 
 ### Court windows and live admission
 
-Q-COURTS shows each booking window, including courts not yet available. Before planned start, no dispatch action is offered. The end is advisory: show Booking ended but continue to allow dispatch until the Queue Master removes the free court. Q-ADD-COURT and editing expose planned start and an end that follows session end or a fixed time. Start becomes fixed after the court has hosted a match; the planned end may be extended. Reject windows outside the session, indicate next-day times, and retain the free-court and at-least-one-court restrictions.
+Q-COURTS shows each booking window, including courts not yet available. Before planned start the card says “Opens at HH:MM. The court is unavailable before this time.” and offers **Start anyway**, which confirms (“Open Court 4 now?” · “It's booked from 8:30 PM.” · “Opening early makes it available for matches and Auto Queue now.” · “The booking time and costs don't change.” · **Cancel** / **Open now**) and then shows the court as Free with “Opened early · planned HH:MM – HH:MM”. The Courts header shows **Open all courts now** (same confirmation, listing every court) while any court is not open yet. Each court card keeps one visible action for its state; **Edit**, **Undo early open** (only before planned start; disabled “A match is on this court” while in game) and **Remove** sit in its ⋯ menu. The Start match sheet lists not-yet-open courts under “Not open yet” with Start anyway, and a match that only waits for a court keeps Start enabled while such a court exists. The end is advisory: show Booking ended but continue to allow dispatch until the Queue Master removes the free court. Q-ADD-COURT and editing expose planned start and an end that follows session end or a fixed time. Start becomes fixed after the court has hosted a match; the planned end may be extended. Reject windows outside the session, indicate next-day times, and retain the free-court and at-least-one-court restrictions.
 
 Q-POOL allows adding a late player or admitting any selected waitlisted player directly above budget. The admitted player is present with a locked level; waiting players are not automatically admitted at session start. Display played, queued and suggested counts separately; only Main Queue waiting matches contribute queued counts.
 

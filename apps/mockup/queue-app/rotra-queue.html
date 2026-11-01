@@ -228,6 +228,14 @@ select.input.inline { width: auto; min-height: 42px; }
 .court .ct { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
 .court .ct h3 { font-size: 16px; }
 .court.merged { grid-row: span 2; }
+/* The court card's ⋯ menu: Edit, Undo early open, Remove. */
+.cmenu { position: relative; }
+.cmenu-list { position: absolute; right: 0; top: calc(100% + 4px); z-index: 20; display: flex; flex-direction: column; gap: 2px; min-width: 200px; padding: 6px; background: var(--elev); border: 1px solid var(--border-strong); border-radius: var(--r-sm); box-shadow: var(--shadow); }
+.cmenu-list button { min-height: 44px; padding: 8px 12px; border: 0; border-radius: var(--r-sm); background: none; color: var(--fg); font: inherit; font-size: 14px; text-align: left; cursor: pointer; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.cmenu-list button:hover:not(:disabled), .cmenu-list button:focus-visible { background: var(--accent-subtle); }
+.cmenu-list button:disabled { color: var(--fg3); cursor: not-allowed; }
+.cmenu-list button.danger:not(:disabled) { color: var(--error); }
+.cmenu-list .why { font-size: 12px; color: var(--fg2); }
 .court.add-court { border-style: dashed; background: transparent; align-items: center; justify-content: center; gap: 6px; cursor: pointer; color: var(--fg2); font-weight: 700; text-align: center; }
 .court.add-court:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-subtle); }
 .court.add-court .plus { font-size: 30px; line-height: 1; font-weight: 400; }
@@ -924,7 +932,7 @@ const KEY = 'rotra-queue-prototype-v3';
 let S;
 try { S = JSON.parse(localStorage.getItem(KEY)); } catch (e) { S = null; }
 if (!S || S.v !== 3) S = freshState();
-S.ui.sheet = null; S.syncing = false; S.ui.login.pending = false;
+S.ui.sheet = null; S.ui.courtMenu = null; S.syncing = false; S.ui.login.pending = false;
 if (S.screen === 'finalizing') S.screen = 'console';
 migrateLevels();
 // Older saves used entranceOn/entranceFee for the custom payment; the entrance fee is now a separate misc cost.
@@ -1027,7 +1035,10 @@ const counted = (m, pid) => m.status === 'done' && all(m).includes(pid) && !part
 const gamesOf = (s, pid) => s.matches.filter((m) => counted(m, pid)).length;
 const queuedCount = (s, pid) => waiting(s).filter((m) => all(m).includes(pid)).length;
 const courtLabel = (s, id) => (s.courts.find((c) => c.id === id) || {}).label || 'Court';
-const freeCourts = (s) => s.courts.filter((c) => courtStart(s, c) <= Date.now() && !active(s).some((m) => m.courts.includes(c.id)));
+// A court is open from its planned start, or from when the Queue Master opened it early (Start anyway).
+const courtOpen = (s, c) => !!c.openedEarlyAt || courtStart(s, c) <= Date.now();
+const openedEarly = (s, c) => !!c.openedEarlyAt && courtStart(s, c) > Date.now();
+const freeCourts = (s) => s.courts.filter((c) => courtOpen(s, c) && !active(s).some((m) => m.courts.includes(c.id)));
 const courtsNeeded = (m) => (m.format === '5v5' ? 2 : 1);
 const courtsOf = (s, m) => m.courts.map((c) => courtLabel(s, c)).join(' + ');
 const courtUntil = (s, c) => c.until || s.end;
@@ -1102,7 +1113,7 @@ const AREA = {
   confirmStart: 'Session', saveSetup: 'Session setup', confirmDone: 'Session done', confirmPublish: 'Published results',
   makeMatch: 'Queue', saveEditor: 'Queue', addSuggest: 'Queue', autoCommit: 'Queue', confirmRegen: 'Queue', move: 'Queue', moveTo: 'Queue', swapSides: 'Queue', removeWaiting: 'Queue',
   confirmDispatch: 'Matches and results', confirmResult: 'Matches and results', confirmSub: 'Matches and results', confirmInvalid: 'Matches and results',
-  confirmAddCourt: 'Courts and time', removeCourt: 'Courts and time', addCourt: 'Courts and time', extend: 'Courts and time',
+  confirmAddCourt: 'Courts and time', removeCourt: 'Courts and time', confirmOpenEarly: 'Courts and time', dispatchOpenEarly: 'Courts and time', undoEarly: 'Courts and time', addCourt: 'Courts and time', extend: 'Courts and time',
 };
 let curAct = null;
 function logSync(text) {
@@ -1144,6 +1155,7 @@ const I = {
   check: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4 10-10"/></svg>',
   up: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg>',
   down: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>',
+  more: '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>',
   x: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>',
   back: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg>',
   play: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>',
@@ -2428,6 +2440,17 @@ function courtSides(s, m) {
   }).join('')}</div>`;
   return `<div class="sides">${side(m.teamA, 'A')}${side(m.teamB, 'B')}</div>`;
 }
+// The court card's ⋯ menu. The card itself shows only the action for its state (Start anyway, or the match action).
+function courtMenu(s, c, busy) {
+  const open = S.ui.courtMenu === c.id;
+  const last = s.courts.length <= 1;
+  const item = (act, label, why, cls = '') => `<button role="menuitem" class="${cls}" data-act="${act}" data-id="${c.id}" ${why ? 'disabled' : ''}><span>${label}</span>${why ? `<span class="why">${why}</span>` : ''}</button>`;
+  return `<div class="cmenu"><button class="btn xs ghost icon-btn" data-act="toggleCourtMenu" data-id="${c.id}" aria-haspopup="menu" aria-expanded="${open}" aria-label="More for ${esc(c.label)}">${I.more}</button>${open ? `<div class="cmenu-list" role="menu" aria-label="${esc(c.label)}">
+    ${item('editCourt', 'Edit', '')}
+    ${openedEarly(s, c) ? item('undoEarly', 'Undo early open', busy ? 'A match is on this court' : '') : ''}
+    ${item('removeCourt', 'Remove', busy ? 'Only a free court can be removed' : last ? 'A session needs at least one court' : '', 'danger')}
+  </div>` : ''}</div>`;
+}
 function courtsPane(s) {
   const list = waiting(s);
   const skip = new Set();
@@ -2439,16 +2462,19 @@ function courtsPane(s) {
       const merged = m.courts.length > 1;
       m.courts.forEach((x) => { if (x !== c.id) skip.add(x); });
       const subs = (m.subs || []).length;
-      return `<div class="court busy ${merged ? 'merged' : ''}"><div class="ct"><div><h3>${esc(merged ? courtsOf(s, m) : c.label)}</h3><span class="small muted">Until ${fmtTime(courtUntil(s, c))}</span><button class="btn xs" data-act="editCourt" data-id="${c.id}">Edit</button></div>${chip(merged ? 'Merged · in game' : 'In game', 'ok')}</div>
+      return `<div class="court busy ${merged ? 'merged' : ''}"><div class="ct"><div><h3>${esc(merged ? courtsOf(s, m) : c.label)}</h3><span class="small muted">${openedEarly(s, c) ? `Opened early · planned ${fmtTime(courtStart(s, c))} –` : 'Until'} ${fmtTime(courtUntil(s, c))}</span></div><div class="row" style="gap:6px;flex-wrap:nowrap">${chip(merged ? 'Merged · in game' : 'In game', 'ok')}${courtMenu(s, c, true)}</div></div>
         <div class="pitch ${merged ? 'tall' : ''}" role="img" aria-label="${esc(`Team A ${listNames(m.teamA)} versus Team B ${listNames(m.teamB)}`)}">${courtSVG(merged ? 2 : 1)}${courtSides(s, m)}</div>
         <p class="small muted">${FORMAT_LABEL[m.format]} · Match ${m.seq} · ${mins} min${subs ? ` · ${subs} substitution${subs > 1 ? 's' : ''}` : ''}</p>
         <div class="row" style="margin-top:auto"><button class="btn sm primary" data-act="openMatch" data-id="${m.id}">Open match</button></div></div>`;
     }
-    const notStarted = courtStart(s, c) > Date.now();
+    const notStarted = !courtOpen(s, c);
     const eligible = notStarted ? null : list.find((x) => !blockOf(s, x));
     const first = list[0];
     let body;
-    if (notStarted) { body = `<p class="small muted">Available from ${fmtTime(courtStart(s, c))}. Matches do not start automatically.</p>`; } else if (eligible) {
+    if (notStarted) {
+      body = `<p class="small muted">Opens at ${fmtTime(courtStart(s, c))}. The court is unavailable before this time.</p>
+        <div class="row" style="margin-top:auto"><button class="btn sm primary" data-act="openEarly" data-id="${c.id}">Start anyway</button></div>`;
+    } else if (eligible) {
       body = `${first && first.id !== eligible.id ? `<p class="small muted">Skipped #1: ${esc(blockOf(s, first).text)}.</p>` : ''}
         <p class="small"><span class="muted">Next eligible:</span> #${list.indexOf(eligible) + 1} · ${FORMAT_LABEL[eligible.format]}</p>
         <p class="small">${esc(listNames(eligible.teamA))} <span class="muted">vs</span> ${esc(listNames(eligible.teamB))}</p>
@@ -2458,9 +2484,10 @@ function courtsPane(s) {
         <div class="row" style="margin-top:auto"><button class="btn sm" data-act="openEditor">Add match</button></div>`;
     }
     const over = Date.now() > courtUntil(s, c); const nextDay = new Date(courtUntil(s,c)).getDate() !== new Date(s.start).getDate();
-    return `<div class="court"><div class="ct"><div><h3>${esc(c.label)}</h3><span class="small ${over ? '' : 'muted'}" style="${over ? 'color:var(--warn)' : ''}">${over ? 'Booking ended' : 'Until'} ${fmtTime(courtUntil(s, c))}${nextDay ? ' · next day' : ''}</span></div><div class="row" style="gap:6px;flex-wrap:nowrap">${chip(notStarted ? 'Not started' : 'Free')}<button class="btn xs" data-act="editCourt" data-id="${c.id}">Edit</button><button class="btn xs ghost" data-act="removeCourt" data-id="${c.id}" aria-label="Remove ${esc(c.label)}" ${s.courts.length <= 1 ? 'disabled title="A session needs at least one court"' : ''}>${I.x} Remove</button></div></div><div class="pitch empty">${courtSVG(1)}<span class="free-lbl">${notStarted ? 'Not started' : 'Free'}</span></div>${body}</div>`;
+    return `<div class="court"><div class="ct"><div><h3>${esc(c.label)}</h3><span class="small ${over ? '' : 'muted'}" style="${over ? 'color:var(--warn)' : ''}">${over ? 'Booking ended' : openedEarly(s, c) ? `Opened early · planned ${fmtTime(courtStart(s, c))} –` : 'Until'} ${fmtTime(courtUntil(s, c))}${nextDay ? ' · next day' : ''}</span></div><div class="row" style="gap:6px;flex-wrap:nowrap">${chip(notStarted ? 'Not open yet' : 'Free')}${courtMenu(s, c, false)}</div></div><div class="pitch empty">${courtSVG(1)}<span class="free-lbl">${notStarted ? 'Not open yet' : 'Free'}</span></div>${body}</div>`;
   }).join('');
-  return `<div class="between"><h2>Courts</h2><span class="small muted">${freeCourts(s).length} of ${s.courts.length} free</span></div>
+  const closed = s.courts.filter((c) => !courtOpen(s, c));
+  return `<div class="between"><h2>Courts</h2><div class="row" style="gap:10px">${closed.length ? '<button class="btn xs" data-act="openAllEarly">Open all courts now</button>' : ''}<span class="small muted">${freeCourts(s).length} of ${s.courts.length} free</span></div></div>
     <div class="courts">${cards}<button class="court add-court" data-act="quickAddCourt" aria-label="Add Court ${s.courts.length + 1}"><span class="plus" aria-hidden="true">+</span><span>Add court</span><span class="small muted" style="font-weight:500">Set a planned court window</span></button></div>
     <p class="small muted">A match never starts by itself when a court frees up. You start each one.</p>`;
 }
@@ -2549,7 +2576,7 @@ function queueCard(s, m, i, n, cols) {
     ${faces(m.teamA, 'teamA')}<div class="vs">VS</div>${faces(m.teamB, 'teamB')}
     ${status}
     <div class="row qt-actions">
-      <button class="btn xs ${!b ? 'primary' : ''}" data-act="openDispatch" data-id="${m.id}" ${b ? 'disabled' : ''}>Start</button>
+      <button class="btn xs ${!b ? 'primary' : ''}" data-act="openDispatch" data-id="${m.id}" ${b && !(b.kind === 'courts' && s.status === 'active' && s.courts.some((c) => !courtOpen(s, c))) ? 'disabled' : ''}>Start</button>
       <button class="btn xs" data-act="openEditor" data-id="${m.id}">Edit</button>
       <span class="grow"></span>
       <button class="btn xs ghost icon-btn" data-act="removeWaiting" data-id="${m.id}" aria-label="Remove waiting match ${i + 1}" title="Remove">${I.x}</button>
@@ -3030,6 +3057,16 @@ const SHEETS = {
       ${!S.online ? notice('warn', 'Starting on this device while offline. It syncs when you reconnect.') : ''}`,
       '<button class="btn" data-act="closeSheet">Back</button><button class="btn primary" data-act="confirmStart">Start session</button>');
   },
+  openEarly(sh) {
+    const s = cur();
+    const list = sh.ids.map((id) => s.courts.find((c) => c.id === id)).filter(Boolean);
+    const one = list.length === 1 ? list[0] : null;
+    return sheetShell(one ? `Open ${esc(one.label)} now?` : 'Open all courts now?',
+      `${one ? `<p>It's booked from ${fmtTime(courtStart(s, one))}.</p>` : `<dl class="kv">${list.map((c) => `<dt>${esc(c.label)}</dt><dd>Booked from ${fmtTime(courtStart(s, c))}</dd>`).join('')}</dl>`}
+      <p>Opening early makes ${one ? 'it' : 'them'} available for matches and Auto Queue now.</p>
+      <p class="small muted">The booking time and costs don't change.</p>`,
+      '<button class="btn" data-act="closeSheet">Cancel</button><button class="btn primary" data-act="confirmOpenEarly">Open now</button>');
+  },
   dispatch(sh) {
     const s = cur();
     const m = s.matches.find((x) => x.id === sh.id);
@@ -3039,7 +3076,8 @@ const SHEETS = {
     return sheetShell(`Start match ${m.seq}`, `<div class="row">${chip(FORMAT_LABEL[m.format], 'solid')}${FUN.includes(m.format) ? chip('Fun game') : ''}</div>
       <div class="qteams">${faceTeam(s, m.teamA, 'Team A', `m:${m.id}`)}<span class="vs">VS</span>${faceTeam(s, m.teamB, 'Team B', `m:${m.id}`)}</div>
       <p class="small muted">Drag a player onto someone on the other team to switch sides.</p>
-      <div class="field"><span>${need === 2 ? 'Choose two free courts' : 'Court'}</span><div class="row">${freeCourts(s).map((c) => `<button class="btn sm" aria-pressed="${sel.includes(c.id)}" data-act="pickCourt" data-id="${c.id}">${esc(c.label)}</button>`).join('')}</div>${need === 2 ? '<span class="hint">5v5 uses two courts as one match.</span>' : ''}</div>
+      <div class="field"><span>${need === 2 ? 'Choose two free courts' : 'Court'}</span><div class="row">${freeCourts(s).map((c) => `<button class="btn sm" aria-pressed="${sel.includes(c.id)}" data-act="pickCourt" data-id="${c.id}">${esc(c.label)}</button>`).join('') || '<span class="small muted">No court is free.</span>'}</div>${need === 2 ? '<span class="hint">5v5 uses two courts as one match.</span>' : ''}</div>
+      ${s.courts.some((c) => !courtOpen(s, c)) ? `<div class="field"><span>Not open yet</span>${s.courts.filter((c) => !courtOpen(s, c)).map((c) => `<div class="between"><span class="small">${esc(c.label)} <span class="muted">· Opens ${fmtTime(courtStart(s, c))}</span></span><button class="btn xs" data-act="dispatchOpenEarly" data-id="${c.id}">Start anyway</button></div>`).join('')}<span class="hint">Start anyway opens the court now. The booking time and costs don't change.</span></div>` : ''}
       ${b ? notice('bad', esc(b.text)) : ''}`,
       `<button class="btn" data-act="closeSheet">Back</button><button class="btn primary" data-act="confirmDispatch" ${sel.length !== need || b ? 'disabled' : ''}>Start match</button>`);
   },
@@ -3852,11 +3890,39 @@ const ACT = {
   openAdjust: () => openSheet({ type: 'adjust', court: '' }),
   addCourt: () => { const s = cur(), sh = S.ui.sheet; const label = (sh.court || '').trim() || `Court ${s.courts.length + 1}`; s.courts.push({ id: `c${Date.now()}`, label }); sh.court = ''; commit(`${label} added`); render(); },
   removeCourt: (d) => {
+    S.ui.courtMenu = null;
     const s = cur(); const c = s.courts.find((x) => x.id === d.id);
     if (!c || s.courts.length <= 1 || active(s).some((m) => m.courts.includes(d.id))) { toast('Only a free court can be removed'); return; }
     s.courts = s.courts.filter((x) => x.id !== d.id); commit(`${c.label} removed`); render();
   },
-  editCourt: (d) => { const s = cur(), c = s.courts.find((x) => x.id === d.id); openSheet({ type: 'addCourt', id: c.id, label: c.label, startTime: hhmm(courtStart(s, c)), mode: c.until ? 'time' : 'end', time: hhmm(c.until || s.end), err: '' }); },
+  toggleCourtMenu: (d) => { S.ui.courtMenu = S.ui.courtMenu === d.id ? null : d.id; render(); const b = document.querySelector(`[data-act="toggleCourtMenu"][data-id="${d.id}"]`); if (b) b.focus(); },
+  openEarly: (d) => openSheet({ type: 'openEarly', ids: [d.id] }),
+  openAllEarly: () => { const s = cur(); openSheet({ type: 'openEarly', ids: s.courts.filter((c) => !courtOpen(s, c)).map((c) => c.id) }); },
+  // Start anyway: records when the court actually opened; the planned start (the booking) stays as it is.
+  confirmOpenEarly: () => {
+    const s = cur(), sh = S.ui.sheet;
+    const list = sh.ids.map((id) => s.courts.find((c) => c.id === id)).filter((c) => c && !courtOpen(s, c));
+    if (s.status !== 'active' || !list.length) { S.ui.sheet = null; toast('Something changed. Review the courts again.'); render(); return; }
+    list.forEach((c) => { c.openedEarlyAt = Date.now(); });
+    S.ui.sheet = null;
+    commit(list.length === 1 ? `${list[0].label} opened early · planned ${fmtTime(courtStart(s, list[0]))}` : `${list.length} courts opened early`);
+    render();
+  },
+  dispatchOpenEarly: (d) => {
+    const s = cur(), sh = S.ui.sheet, c = s.courts.find((x) => x.id === d.id), m = s.matches.find((x) => x.id === sh.id);
+    if (s.status !== 'active' || !c || courtOpen(s, c)) { toast('Something changed. Review the courts again.'); render(); return; }
+    c.openedEarlyAt = Date.now();
+    sh.courts = courtsNeeded(m) === 1 ? [c.id] : [...sh.courts.filter((x) => x !== c.id), c.id].slice(-2);
+    commit(`${c.label} opened early · planned ${fmtTime(courtStart(s, c))}`); render();
+  },
+  undoEarly: (d) => {
+    const s = cur(), c = s.courts.find((x) => x.id === d.id);
+    S.ui.courtMenu = null;
+    if (!c || !openedEarly(s, c) || active(s).some((m) => m.courts.includes(c.id))) { toast('Only a free court can go back to Not open yet'); render(); return; }
+    delete c.openedEarlyAt;
+    commit(`${c.label} back to Not open yet · opens ${fmtTime(courtStart(s, c))}`); render();
+  },
+  editCourt: (d) => { S.ui.courtMenu = null; const s = cur(), c = s.courts.find((x) => x.id === d.id); openSheet({ type: 'addCourt', id: c.id, label: c.label, startTime: hhmm(courtStart(s, c)), mode: c.until ? 'time' : 'end', time: hhmm(c.until || s.end), err: '' }); },
   quickAddCourt: () => { const s = cur(); openSheet({ type: 'addCourt', label: `Court ${s.courts.length + 1}`, startTime: hhmm(sessionCourtStart(s)), mode: 'end', time: hhmm(s.end), err: '' }); },
   confirmAddCourt: () => {
     const s = cur(), sh = S.ui.sheet;
@@ -3926,6 +3992,8 @@ function loadLogo(file) {
 }
 let lastTrigger = null;
 document.addEventListener('click', (e) => {
+  // Any click outside an open court menu closes it.
+  if (S.ui.courtMenu && !e.target.closest('.cmenu')) { S.ui.courtMenu = null; if (!e.target.closest('[data-act]')) { render(); return; } }
   const el = e.target.closest('[data-act]');
   if (!el || el.disabled || el.tagName === 'INPUT' || el.tagName === 'SELECT') return;
   const fn = ACT[el.dataset.act];
@@ -3961,7 +4029,8 @@ document.addEventListener('keydown', (e) => {
     const b = document.getElementById(`dp-${t}`); if (b) b.focus();
     return;
   }
-  if (e.key === 'Escape' && S.ui.sheet) { e.preventDefault(); closeSheet(); }
+  if (e.key === 'Escape' && S.ui.courtMenu) { e.preventDefault(); const id = S.ui.courtMenu; S.ui.courtMenu = null; render(); const b = document.querySelector(`[data-act="toggleCourtMenu"][data-id="${id}"]`); if (b) b.focus(); }
+  else if (e.key === 'Escape' && S.ui.sheet) { e.preventDefault(); closeSheet(); }
   else if (e.key === 'Escape' && S.ui.setOpen) { e.preventDefault(); ACT.closeSettingsMenu(); }
   else if (e.key === 'Escape' && S.ui.navOpen) { e.preventDefault(); S.ui.navOpen = false; render(); const b = document.querySelector('.burger'); if (b) b.focus(); }
   if (e.key === 'Tab' && S.ui.sheet) {

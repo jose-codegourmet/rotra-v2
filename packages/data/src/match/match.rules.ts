@@ -24,11 +24,17 @@ export const allPlayers = (m: MatchLineup) => [...m.teamA, ...m.teamB]
 export const courtsNeeded = (m: Pick<Match, 'format'>) => (m.format === 'fun_5v5' ? 2 : 1)
 export const activeMatchFor = (id: string, matches: Match[]) =>
   matches.find((m) => m.state === 'active' && allPlayers(m).includes(id))
+/** Open from its planned start, or from when it was opened early. A court without a start is open. */
+export const courtOpen = (c: SessionCourt, now = Date.now()) =>
+  (c.openedEarlyAt ?? c.startsAt ?? 0) <= now
+/** Opened early and still before its planned start; afterwards the early open is just history. */
+export const openedEarly = (c: SessionCourt, now = Date.now()) =>
+  c.openedEarlyAt != null && (c.startsAt ?? 0) > now
 export const freeCourts = (courts: SessionCourt[], matches: Match[], now = Date.now()) =>
   courts.filter(
     (c) =>
       !c.removedAt &&
-      (c.startsAt ?? 0) <= now &&
+      courtOpen(c, now) &&
       !matches.some((m) => m.state === 'active' && m.courtIds.includes(c.id)),
   )
 export const queuedCount = (id: string, matches: Match[]) =>

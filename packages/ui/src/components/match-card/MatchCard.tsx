@@ -50,6 +50,11 @@ export type MatchCardProps = {
   onSelectPlayer?: (playerId: string, team: MatchCardTeam) => void
   /** Start: rendered only when given, enabled only when the match is ready */
   onStart?: () => void
+  /**
+   * The match only waits for a court and a court is not open yet: Start stays enabled, and the
+   * Start match sheet offers Start anyway on that court.
+   */
+  canOpenCourt?: boolean
   /** Edit the lineup: rendered only when given */
   onEdit?: () => void
   /** Remove the waiting match: rendered only when given */
@@ -126,11 +131,13 @@ export function MatchCard({
   swappable = false,
   onSelectPlayer,
   onStart,
+  canOpenCourt = false,
   onEdit,
   onRemove,
   className,
 }: MatchCardProps) {
   const ready = status.kind === 'ready'
+  const startable = ready || (canOpenCourt && status.kind === 'waiting-for-courts')
   const attention = status.kind === 'needs-attention'
   const { className: handleClassName, ...handleRest } = handleProps ?? {}
   return (
@@ -195,7 +202,7 @@ export function MatchCard({
             <Button
               size="xs"
               variant={ready ? 'primary' : 'secondary'}
-              disabled={!ready}
+              disabled={!startable}
               onClick={onStart}
               className="touch:flex-1"
             >

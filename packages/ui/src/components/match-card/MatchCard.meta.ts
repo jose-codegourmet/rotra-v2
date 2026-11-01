@@ -7,7 +7,7 @@ export const matchCardMeta = {
   usage: [
     "Use for every waiting match in the Queue tab grid and in the Session view's upcoming row.",
     'Do not use for finished matches; the session record has its own row component in Queue › Results.',
-    'Start renders only with onStart and is enabled only when the status is ready. Edit and Remove render only with their callbacks.',
+    'Start renders only with onStart and is enabled only when the status is ready, or with canOpenCourt while the match only waits for a court and a court is not open yet (the Start match sheet then offers Start anyway). Edit and Remove render only with their callbacks.',
     'The grid passes the flow arrow and the reorder behaviour passes handleProps; the card itself does not reorder.',
     'With swappable inside a SwapSidesArea, each player can be dragged onto the other team or moved across with the arrow keys; the area reports the swap.',
   ],

@@ -212,6 +212,18 @@ export const ICONS = {
   up: { size: 16, strokeWidth: 2.4, body: <path d="m6 15 6-6 6 6" /> },
   down: { size: 16, strokeWidth: 2.4, body: <path d="m6 9 6 6 6-6" /> },
   x: { size: 18, strokeWidth: 2.4, body: <path d="M6 6l12 12M18 6 6 18" /> },
+  more: {
+    size: 18,
+    strokeWidth: 0,
+    filled: true,
+    body: (
+      <>
+        <circle cx="5" cy="12" r="2" />
+        <circle cx="12" cy="12" r="2" />
+        <circle cx="19" cy="12" r="2" />
+      </>
+    ),
+  },
   'x-small': { size: 16, strokeWidth: 2.6, body: <path d="M7 7l10 10M17 7 7 17" /> },
   back: { size: 16, strokeWidth: 2.4, body: <path d="m15 6-6 6 6 6" /> },
   arrow: { size: 18, strokeWidth: 2.2, body: <path d="M5 12h14M13 6l6 6-6 6" /> },

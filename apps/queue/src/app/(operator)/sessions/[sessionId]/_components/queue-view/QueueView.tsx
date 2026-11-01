@@ -1,6 +1,7 @@
 'use client'
 
 import {
+  courtOpen,
   type MatchContext,
   matchStatus,
   shortName,
@@ -115,6 +116,8 @@ export function QueueView({
     now,
   }
   const waiting = waitingMatches(ctx.matches)
+  // Start anyway in the Start match sheet can open one of these courts early.
+  const canOpenCourt = s.state === 'active' && s.courts.some((c) => !courtOpen(c, now))
   const attention = waiting.filter((m) => matchStatus(m, ctx).kind === 'needs-attention').length
 
   const byId = (id: string) => ctx.roster.find((p) => p.id === id)
@@ -160,6 +163,7 @@ export function QueueView({
     teamB: m.teamB.map(player),
     onSelectPlayer: openProfile,
     onStart: onStartMatch ? () => onStartMatch(m.id) : undefined,
+    canOpenCourt,
     onEdit: onEditMatch ? () => onEditMatch(m.id) : undefined,
     onRemove: () => onRemove(m),
   }))

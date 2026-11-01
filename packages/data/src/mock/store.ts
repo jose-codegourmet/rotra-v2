@@ -39,7 +39,7 @@ import type {
   SessionFinalization,
 } from '../queue-session/queueSession.types'
 import type { RankingPolicyVersion } from '../ranking-settings/rankingSettings.types'
-import { isRealDataMode, NOT_CONNECTED_MESSAGE } from '../real/mode'
+import { isRealDataMode } from '../real/mode'
 import type { SessionCostEstimate } from '../session-cost/sessionCost.types'
 import type { SessionPaymentMark } from '../session-payment/sessionPayment.types'
 import { createResultSnapshot } from '../session-result/sessionResult.rules'
@@ -55,7 +55,7 @@ import type {
   SessionWaitlistEntry,
 } from '../session-roster/sessionRoster.types'
 import type { SaveOutcome, SessionIntegrity, SyncState } from '../sync/sync.types'
-import { MockError } from './errors'
+import { NotConnectedError } from './errors'
 export type MockState = {
   adminPlayerRecords: Record<string, AdminPlayerRecord>
   inventory: InventoryItem[]
@@ -204,7 +204,7 @@ export function createMockStore() {
     getSnapshot: () => snapshot,
     getGeneration: () => generation,
     update(change: (draft: MockState) => void) {
-      if (isRealDataMode()) throw new MockError('permission', NOT_CONNECTED_MESSAGE)
+      if (isRealDataMode()) throw new NotConnectedError()
       const draft = structuredClone(snapshot) as MockState
       change(draft)
       snapshot = freeze(structuredClone(draft))
@@ -226,6 +226,6 @@ export function createMockStore() {
 export const mockStore = createMockStore()
 /** Mock reads and writes refuse in real data mode, so nothing falls back to in-memory data. */
 export const readMockState = (): MockState => {
-  if (isRealDataMode()) throw new MockError('permission', NOT_CONNECTED_MESSAGE)
+  if (isRealDataMode()) throw new NotConnectedError()
   return structuredClone(mockStore.getSnapshot()) as MockState
 }

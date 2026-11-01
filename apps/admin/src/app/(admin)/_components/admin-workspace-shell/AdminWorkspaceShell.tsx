@@ -7,7 +7,7 @@ import { useAdminClubs } from '@rotra/data/club/useAdminClubs'
 import { useClubNameRequests } from '@rotra/data/club/useClubNameRequests'
 import { useContactRequestCounts } from '@rotra/data/contact-change-request/useContactRequestCounts'
 import { useFeatureFlags } from '@rotra/data/feature-flag/useFeatureFlags'
-import { MockError } from '@rotra/data/mock/errors'
+import { MockError, NotConnectedError } from '@rotra/data/mock/errors'
 import { AccessDeniedCard } from '@rotra/ui/access-denied-card'
 import { AdminAccountBadge } from '@rotra/ui/admin-account-badge'
 import { AdminNav, type AdminNavKey } from '@rotra/ui/admin-nav'
@@ -36,8 +36,9 @@ export function useAdminWorkspaceAccess() {
   return useContext(AdminWorkspaceAccess)
 }
 
+// A domain not connected to saved data yet refuses with kind 'permission' but is not a denial.
 const isPermissionError = (error: unknown) =>
-  error instanceof MockError && error.kind === 'permission'
+  error instanceof MockError && error.kind === 'permission' && !(error instanceof NotConnectedError)
 
 /**
  * A privileged read refused with a permission error replaces the whole workspace with the access

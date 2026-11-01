@@ -108,7 +108,12 @@ export function QueueView({
       </div>
     )
 
-  const ctx: MatchContext = { roster: roster.data.roster, matches: matches.data, courts: s.courts, now }
+  const ctx: MatchContext = {
+    roster: roster.data.roster,
+    matches: matches.data,
+    courts: s.courts,
+    now,
+  }
   const waiting = waitingMatches(ctx.matches)
   const attention = waiting.filter((m) => matchStatus(m, ctx).kind === 'needs-attention').length
 
@@ -160,51 +165,56 @@ export function QueueView({
   }))
 
   return (
-    <AutoQueue sessionId={sessionId} workspace={workspace} onWorkspaceChange={setWorkspace} mainQueue={
-    <section aria-label="Queued matches" className="flex flex-col gap-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-lg font-bold">Queued matches</h2>
-        <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap">
-          <Button size="sm" disabled={!onAddMatch} onClick={onAddMatch} className="sm:w-auto">
-            Add match
-          </Button>
-          <Button size="sm" disabled={!onSuggest} onClick={onSuggest} className="sm:w-auto">
-            Suggest
-          </Button>
-          <Button size="sm" onClick={() => setWorkspace('auto')} className="sm:w-auto">
-            Auto Queue
-          </Button>
-          <Button
-            size="sm"
-            variant={attention ? 'primary' : 'secondary'}
-            disabled={!onRegenerate || waiting.length === 0}
-            onClick={onRegenerate}
-            className="sm:w-auto"
-          >
-            Regenerate
-          </Button>
-        </div>
-      </div>
-      {attention ? (
-        <Notice tone="warn">
-          {attention} waiting {attention > 1 ? 'matches need' : 'match needs'} attention. Edit the
-          lineup to swap the player, or regenerate.
-        </Notice>
-      ) : null}
-      <p className="text-[13px] text-fg2">
-        One waiting list for every court. {MODE_LABELS[s.sessionMode]} mode guides suggestions; you
-        can override any of it.
-      </p>
-      {waiting.length ? (
-        <QueueGrid matches={cards} onMove={onMove} onSwapSides={onSwapSides} />
-      ) : (
-        <Card padding="none">
-          <EmptyState>
-            No waiting matches. Use Auto queue to generate a few, or add one yourself.
-          </EmptyState>
-        </Card>
-      )}
-    </section>
-    } />
+    <AutoQueue
+      sessionId={sessionId}
+      workspace={workspace}
+      onWorkspaceChange={setWorkspace}
+      mainQueue={
+        <section aria-label="Queued matches" className="flex flex-col gap-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-lg font-bold">Queued matches</h2>
+            <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap">
+              <Button size="sm" disabled={!onAddMatch} onClick={onAddMatch} className="sm:w-auto">
+                Add match
+              </Button>
+              <Button size="sm" disabled={!onSuggest} onClick={onSuggest} className="sm:w-auto">
+                Suggest
+              </Button>
+              <Button size="sm" onClick={() => setWorkspace('auto')} className="sm:w-auto">
+                Auto Queue
+              </Button>
+              <Button
+                size="sm"
+                variant={attention ? 'primary' : 'secondary'}
+                disabled={!onRegenerate || waiting.length === 0}
+                onClick={onRegenerate}
+                className="sm:w-auto"
+              >
+                Regenerate
+              </Button>
+            </div>
+          </div>
+          {attention ? (
+            <Notice tone="warn">
+              {attention} waiting {attention > 1 ? 'matches need' : 'match needs'} attention. Edit
+              the lineup to swap the player, or regenerate.
+            </Notice>
+          ) : null}
+          <p className="text-[13px] text-fg2">
+            One waiting list for every court. {MODE_LABELS[s.sessionMode]} mode guides suggestions;
+            you can override any of it.
+          </p>
+          {waiting.length ? (
+            <QueueGrid matches={cards} onMove={onMove} onSwapSides={onSwapSides} />
+          ) : (
+            <Card padding="none">
+              <EmptyState>
+                No waiting matches. Use Auto queue to generate a few, or add one yourself.
+              </EmptyState>
+            </Card>
+          )}
+        </section>
+      }
+    />
   )
 }

@@ -12,6 +12,14 @@ export function nextCourtLabel(courtCount: number): string {
 }
 
 /** Until the session ends, with the time field pre-filled with the end time, as the prototype opens it. */
-export function addCourtFormDefaultValues(sessionEndsAt: number, sessionStartsAt?: number): AddCourtFormInput {
-  return { label: '', startTime: sessionStartsAt === undefined ? '' : toTimeInput(sessionStartsAt), mode: 'end', time: toTimeInput(sessionEndsAt) }
+export function addCourtFormDefaultValues(
+  sessionEndsAt: number,
+  sessionStartsAt?: number,
+): AddCourtFormInput {
+  return {
+    label: '',
+    startTime: sessionStartsAt === undefined ? '' : toTimeInput(sessionStartsAt),
+    mode: 'end',
+    time: toTimeInput(sessionEndsAt),
+  }
 }

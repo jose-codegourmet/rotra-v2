@@ -24,5 +24,9 @@ export const Full: Story = { args: { rosterCount: 8, capacity: 8 } }
 export const Over: Story = { args: { rosterCount: 10, capacity: 8, waitlistCount: 1 } }
 export const WithWaitlist: Story = { args: { waitlistCount: 3 } }
 
-export const ActiveFull: Story = { args: { live: true, rosterCount: admission.full, capacity: admission.capacity } }
-export const ActiveOverPlan: Story = { args: { live: true, rosterCount: admission.over, capacity: admission.capacity } }
+export const ActiveFull: Story = {
+  args: { live: true, rosterCount: admission.full, capacity: admission.capacity },
+}
+export const ActiveOverPlan: Story = {
+  args: { live: true, rosterCount: admission.over, capacity: admission.capacity },
+}

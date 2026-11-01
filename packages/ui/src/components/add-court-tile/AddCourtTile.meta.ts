@@ -3,7 +3,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const addCourtTileMeta = {
   name: 'AddCourtTile',
   description:
-    'The dashed "+ Add court" tile at the end of the Courts grid: "Becomes Court N, free right away". Opens the Add a court sheet.',
+    'The dashed "+ Add court" tile at the end of the Courts grid: "Becomes Court N, with a planned booking window". Opens the Add a court sheet.',
   usage: [
     'Use as the last tile in Q-COURTS, after every CourtCard. Pass the next court number.',
     'It only opens Q-ADD-COURT; it never adds the court itself.',

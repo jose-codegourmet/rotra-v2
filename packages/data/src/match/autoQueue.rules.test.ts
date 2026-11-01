@@ -10,7 +10,8 @@ function scenario() {
 }
 describe('Auto Queue generation', () => {
   it('excludes in-play players outside Plan Ahead and never mutates source records', () => {
-    const input = scenario(), before = structuredClone(input.ctx)
+    const input = scenario(),
+      before = structuredClone(input.ctx)
     const playing = input.ctx.matches.filter((m) => m.state === 'active').flatMap(allPlayers)
     for (const mode of ['available', 'wait', 'fewest'] as const) {
       const result = generateAutoQueueMatches({ ...input, mode, limit: 6 })
@@ -39,10 +40,21 @@ describe('Auto Queue generation', () => {
   })
   it('distinguishes longest wait from fewest completed games with stable ties', () => {
     const input = scenario()
-    const players = input.ctx.roster.slice(0, 4).map((p) => ({ ...p, present: true, presentChangedAt: now - 3600000 }))
+    const players = input.ctx.roster
+      .slice(0, 4)
+      .map((p) => ({ ...p, present: true, presentChangedAt: now - 3600000 }))
     input.ctx.roster = players
     const completed = input.ctx.matches.find((m) => m.state === 'completed')!
-    input.ctx.matches = [{ ...completed, format: 'singles', teamA: [players[0]!.id], teamB: [players[1]!.id], substitutions: [], endedAt: now - 1200000 }]
+    input.ctx.matches = [
+      {
+        ...completed,
+        format: 'singles',
+        teamA: [players[0]!.id],
+        teamB: [players[1]!.id],
+        substitutions: [],
+        endedAt: now - 1200000,
+      },
+    ]
     input.ctx.roster[2]!.presentChangedAt = now - 600000
     input.ctx.roster[3]!.presentChangedAt = now - 600000
     input.session.allowSingles = true
@@ -60,13 +72,20 @@ describe('Auto Queue generation', () => {
     input.session.allowSingles = true
     input.session.allowDoubles = false
     const first = generateAutoQueueMatches({ ...input, mode: 'fewest', limit: 1 })
-    const next = generateAutoQueueMatches({ ...input, mode: 'fewest', limit: 1, retained: first.matches })
+    const next = generateAutoQueueMatches({
+      ...input,
+      mode: 'fewest',
+      limit: 1,
+      retained: first.matches,
+    })
     expect(allPlayers(next.matches[0]!)).not.toEqual(allPlayers(first.matches[0]!))
   })
   it('fails clearly when both formats are disabled', () => {
     const input = scenario()
     input.session.allowSingles = input.session.allowDoubles = false
-    expect(generateAutoQueueMatches({ ...input, mode: 'available', limit: 2 }).error).toContain('both off')
+    expect(generateAutoQueueMatches({ ...input, mode: 'available', limit: 2 }).error).toContain(
+      'both off',
+    )
   })
 })
 
@@ -77,13 +96,28 @@ describe('Catch Up', () => {
     const template = input.ctx.matches.find((m) => m.state === 'completed')!
     const ids = input.ctx.roster.map((p) => p.id)
     input.ctx.matches = [
-      { ...template, id: 'catch-1', format: 'doubles', teamA: ids.slice(0, 2), teamB: ids.slice(2), substitutions: [] },
-      { ...template, id: 'catch-2', format: 'singles', teamA: [ids[2]!], teamB: [ids[3]!], substitutions: [] },
+      {
+        ...template,
+        id: 'catch-1',
+        format: 'doubles',
+        teamA: ids.slice(0, 2),
+        teamB: ids.slice(2),
+        substitutions: [],
+      },
+      {
+        ...template,
+        id: 'catch-2',
+        format: 'singles',
+        teamA: [ids[2]!],
+        teamB: [ids[3]!],
+        substitutions: [],
+      },
     ]
     return { ...input, mode: 'catchup' as const, catchUpTarget: 2, limit: 6 }
   }
   it('prioritizes lagging players and allows above-target fillers without changing played games', () => {
-    const input = catchUp(), before = structuredClone(input.ctx.matches)
+    const input = catchUp(),
+      before = structuredClone(input.ctx.matches)
     const result = generateAutoQueueMatches(input)
     expect(result.matches).toHaveLength(1)
     expect(result.remainingShortfall).toBe(0)
@@ -98,7 +132,12 @@ describe('Catch Up', () => {
   })
   it('takes current queued assignments into account and updates after deletion', () => {
     const input = catchUp()
-    const queued = { ...input.ctx.matches[0]!, id: 'waiting', state: 'waiting' as const, decision: null }
+    const queued = {
+      ...input.ctx.matches[0]!,
+      id: 'waiting',
+      state: 'waiting' as const,
+      decision: null,
+    }
     input.ctx.matches.push(queued)
     expect(generateAutoQueueMatches(input).matches).toHaveLength(0)
     input.ctx.matches.pop()
@@ -122,7 +161,9 @@ describe('Catch Up', () => {
   })
   it('requires an explicit positive whole-number target', () => {
     for (const target of [undefined, 0, 1.5, NaN]) {
-      expect(generateAutoQueueMatches({ ...catchUp(), catchUpTarget: target }).error).toContain('whole-number')
+      expect(generateAutoQueueMatches({ ...catchUp(), catchUpTarget: target }).error).toContain(
+        'whole-number',
+      )
     }
   })
 })

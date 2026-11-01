@@ -1,3 +1,5 @@
+import { courtWindowFixture } from '@rotra/data/fixtures/consoleSessions'
+import { toTimeInput } from '@rotra/ui/forms/add-court-form/default-values'
 import { clubs } from '@rotra/data/fixtures/clubs'
 import { inventoryItems } from '@rotra/data/fixtures/inventory'
 import { queueSessionFixtures } from '@rotra/data/fixtures/queueSessions'
@@ -185,5 +187,20 @@ export const FinancialsOffline: Story = {
     ...FinancialsValidation.args,
     initialValues: { ...withVenue, courtFeePerCourtHour: '350' },
     offline: true,
+  },
+}
+
+export const FiveCourtBookingWindows: Story = {
+  args: {
+    initialValues: {
+      ...withVenue,
+      startTime: toTimeInput(courtWindowFixture.session.scheduledStartAt),
+      endTime: toTimeInput(courtWindowFixture.session.scheduledEndAt),
+      courtLabels: courtWindowFixture.courts.map((c) => c.label),
+      courtStarts: courtWindowFixture.courts.map((c) => toTimeInput(c.startsAt)),
+      courtEnds: courtWindowFixture.courts.map((c) =>
+        c.openUntil === null ? '' : toTimeInput(c.openUntil),
+      ),
+    },
   },
 }

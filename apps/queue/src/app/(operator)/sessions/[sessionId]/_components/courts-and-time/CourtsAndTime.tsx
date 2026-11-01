@@ -42,6 +42,11 @@ const isSaveFailure = (error: unknown) =>
  */
 export function CourtsAndTime({ sessionId, open, onOpenChange }: CourtsAndTimeProps) {
   const saving = useRef(false)
+  const returnFocus = useRef<HTMLElement | null>(null)
+  const previousOpen = useRef(open)
+  if (open === 'adjust' && previousOpen.current !== open && typeof document !== 'undefined')
+    returnFocus.current = document.activeElement as HTMLElement
+  previousOpen.current = open
   const session = useQueueSession(sessionId)
   const extend = useExtendSession()
   const add = useAddCourt()
@@ -60,11 +65,19 @@ export function CourtsAndTime({ sessionId, open, onOpenChange }: CourtsAndTimePr
   const onExtend = (minutes: ExtendMinutes) => {
     if (saving.current) return
     saving.current = true
-    extend.mutate({ sessionId, minutes }, {
-      onSuccess: (result) => { setServerError(undefined); toast(result.message) },
-      onError: (error) => setServerError(errorMessage(error)),
-      onSettled: () => { saving.current = false },
-    })
+    extend.mutate(
+      { sessionId, minutes },
+      {
+        onSuccess: (result) => {
+          setServerError(undefined)
+          toast(result.message)
+        },
+        onError: (error) => setServerError(errorMessage(error)),
+        onSettled: () => {
+          saving.current = false
+        },
+      },
+    )
   }
 
   const onAdd = (values: AddCourtFormValues) => {
@@ -72,16 +85,28 @@ export function CourtsAndTime({ sessionId, open, onOpenChange }: CourtsAndTimePr
     saving.current = true
     setServerError(undefined)
     const options = {
-      onSettled: () => { saving.current = false },
-      onSuccess: (result: { message: string }) => { toast(result.message); setEditingId(null); onOpenChange(null) },
-      onError: (error: unknown) => { setServerError(errorMessage(error)); if (isSaveFailure(error)) toast.error(errorMessage(error)) },
+      onSettled: () => {
+        saving.current = false
+      },
+      onSuccess: (result: { message: string }) => {
+        toast(result.message)
+        setEditingId(null)
+        onOpenChange(null)
+      },
+      onError: (error: unknown) => {
+        setServerError(errorMessage(error))
+        if (isSaveFailure(error)) toast.error(errorMessage(error))
+      },
     }
     if (editing) update.mutate({ sessionId, courtId: editing.id, ...values }, options)
     else add.mutate({ sessionId, ...values }, options)
   }
 
   const openAddCourt = (next: boolean) => {
-    if (!next) { setServerError(undefined); setEditingId(null) }
+    if (!next) {
+      setServerError(undefined)
+      setEditingId(null)
+    }
     onOpenChange(next ? 'add-court' : null)
   }
 
@@ -90,11 +115,33 @@ export function CourtsAndTime({ sessionId, open, onOpenChange }: CourtsAndTimePr
       <CourtsAndTimeSheet
         open={open === 'adjust'}
         onOpenChange={(next) => onOpenChange(next ? 'adjust' : null)}
-        courts={courts.map((c) => ({ ...c, startsAt: c.startsAt ?? s.scheduledStartAt, occupied: (matches.data ?? []).some((m) => m.state === 'active' && m.courtIds.includes(c.id)), used: (matches.data ?? []).some((m) => m.courtIds.includes(c.id)) }))}
+        courts={courts.map((c) => ({
+          ...c,
+          startsAt: c.startsAt ?? s.scheduledStartAt,
+          occupied: (matches.data ?? []).some(
+            (m) => m.state === 'active' && m.courtIds.includes(c.id),
+          ),
+          used: (matches.data ?? []).some((m) => m.courtIds.includes(c.id)),
+        }))}
         startsAt={s.scheduledStartAt}
         serverError={serverError ?? (extend.error ? errorMessage(extend.error) : undefined)}
-        onEditCourt={(id) => { setServerError(undefined); setEditingId(id); onOpenChange('add-court') }}
-        onRemoveCourt={(courtId) => remove.mutate({ sessionId, courtId }, { onSuccess: (result) => { setServerError(undefined); toast(result.message) }, onError: (error) => setServerError(errorMessage(error)) })}
+        onEditCourt={(id) => {
+          setServerError(undefined)
+          setEditingId(id)
+          onOpenChange('add-court')
+        }}
+        onRemoveCourt={(courtId) =>
+          remove.mutate(
+            { sessionId, courtId },
+            {
+              onSuccess: (result) => {
+                setServerError(undefined)
+                toast(result.message)
+              },
+              onError: (error) => setServerError(errorMessage(error)),
+            },
+          )
+        }
         endsAt={s.scheduledEndAt}
         onAddCourt={() => openAddCourt(true)}
         onExtend={onExtend}
@@ -107,8 +154,18 @@ export function CourtsAndTime({ sessionId, open, onOpenChange }: CourtsAndTimePr
         onOpenChange={openAddCourt}
         defaultLabel={editing?.label ?? nextCourtLabel(courts.length)}
         editing={!!editing}
-        lockedStartsAt={editing && used ? editing.startsAt ?? s.scheduledStartAt : undefined}
-        defaultValues={editing ? { label: editing.label, startTime: toTimeInput(editing.startsAt ?? s.scheduledStartAt), mode: editing.openUntil === null ? 'end' : 'time', time: toTimeInput(editing.openUntil ?? s.scheduledEndAt) } : undefined}
+        returnFocusRef={returnFocus}
+        lockedStartsAt={editing && used ? (editing.startsAt ?? s.scheduledStartAt) : undefined}
+        defaultValues={
+          editing
+            ? {
+                label: editing.label,
+                startTime: toTimeInput(editing.startsAt ?? s.scheduledStartAt),
+                mode: editing.openUntil === null ? 'end' : 'time',
+                time: toTimeInput(editing.openUntil ?? s.scheduledEndAt),
+              }
+            : undefined
+        }
         sessionStartsAt={s.scheduledStartAt}
         sessionEndsAt={s.scheduledEndAt}
         onSubmit={onAdd}

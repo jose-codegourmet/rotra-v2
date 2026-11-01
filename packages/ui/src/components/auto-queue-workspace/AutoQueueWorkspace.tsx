@@ -8,7 +8,7 @@ import { SegmentedControl } from '@rotra/ui/segmented-control'
 import { Sheet } from '@rotra/ui/sheet'
 import { Tabs, TabsContent } from '@rotra/ui/tabs'
 import { TextInput } from '@rotra/ui/text-input'
-import { type ReactNode, useRef, useState } from 'react'
+import { type ReactNode, useEffect, useRef, useState } from 'react'
 
 export type AutoQueueMode = 'available' | 'ahead' | 'wait' | 'fewest' | 'catchup'
 export type AutoQueueCount = 2 | 3 | 4 | 6
@@ -67,6 +67,7 @@ export type AutoQueueWorkspaceProps = {
   onAddToMainQueue: (draftIds: string[]) => boolean | void | Promise<boolean | void>
   transferError?: string
   isPending?: boolean
+  pendingMessage?: string
 }
 
 const MODE_ITEMS: { value: AutoQueueMode; label: string; shortLabel: string }[] = [
@@ -105,18 +106,32 @@ export function AutoQueueWorkspace({
   onAddToMainQueue,
   transferError,
   isPending = false,
+  pendingMessage,
 }: AutoQueueWorkspaceProps) {
   const [reviewIds, setReviewIds] = useState<string[] | null>(null)
+  const reviewErrorRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (transferError) reviewErrorRef.current?.focus()
+  }, [transferError, reviewIds])
+  const mainQueueRef = useRef<HTMLDivElement>(null)
   const headingRef = useRef<HTMLHeadingElement>(null)
   const batch = batches[mode] ?? { drafts: [] }
-  const canGenerate = count !== null && (mode !== 'catchup' || Number(catchUpTarget) > 0)
+  const canGenerate =
+    count !== null &&
+    (mode !== 'catchup' ||
+      (Number.isSafeInteger(Number(catchUpTarget)) && Number(catchUpTarget) > 0))
   const selectedDrafts =
     reviewIds?.map((id) => allDrafts(batches).find((draft) => draft.id === id)) ?? []
   const reviewChanged =
-    selectedDrafts.some((draft) => !draft) || selectedDrafts.length !== reviewIds?.length
+    reviewIds !== null &&
+    (selectedDrafts.some((draft) => !draft) || selectedDrafts.length !== reviewIds.length)
 
   return (
-    <section className="flex min-w-0 flex-col gap-5" aria-label="Queue workspace">
+    <section
+      className="flex min-w-0 flex-col gap-5"
+      aria-label="Queue workspace"
+      aria-busy={isPending}
+    >
       <SegmentedControl
         aria-label="Queue workspace"
         options={[
@@ -127,7 +142,9 @@ export function AutoQueueWorkspace({
         onChange={(next) => onWorkspaceChange(next as QueueWorkspace)}
       />
       {workspace === 'main' ? (
-        mainQueue
+        <div ref={mainQueueRef} tabIndex={-1} className="min-w-0 focus:outline-none">
+          {mainQueue}
+        </div>
       ) : (
         <div className="flex min-w-0 flex-col gap-5">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -237,6 +254,7 @@ export function AutoQueueWorkspace({
                     Clear tab
                   </Button>
                 </div>
+                {isPending && pendingMessage ? <Notice tone="info">{pendingMessage}</Notice> : null}
                 {batch.error ? <Notice tone="error">{batch.error}</Notice> : null}
                 {batch.stale ? (
                   <Notice tone="warn">
@@ -317,6 +335,7 @@ export function AutoQueueWorkspace({
         }}
         title="Add selected to Main Queue?"
         dismissible={!isPending}
+        returnFocusRef={mainQueueRef}
         footer={
           <>
             <Button disabled={isPending} onClick={() => setReviewIds(null)}>
@@ -326,7 +345,7 @@ export function AutoQueueWorkspace({
               variant="primary"
               disabled={!reviewIds?.length || reviewChanged || isPending}
               onClick={async () => {
-                if (reviewIds && await onAddToMainQueue(reviewIds) !== false) setReviewIds(null)
+                if (reviewIds && (await onAddToMainQueue(reviewIds)) !== false) setReviewIds(null)
               }}
             >
               Add to Main Queue
@@ -337,7 +356,11 @@ export function AutoQueueWorkspace({
         <p className="m-0 text-[13px] text-fg2">
           Transfer order follows your selection. Drafts are revalidated when added.
         </p>
-        {transferError ? <Notice tone="error">{transferError}</Notice> : null}
+        {transferError ? (
+          <div ref={reviewErrorRef} tabIndex={-1} className="focus:outline-none">
+            <Notice tone="error">{transferError}</Notice>
+          </div>
+        ) : null}
         {reviewChanged ? <Notice tone="warn">Drafts changed. Review them again.</Notice> : null}
         <ol className="space-y-2 pl-5 text-fg">
           {selectedDrafts.map((draft) =>

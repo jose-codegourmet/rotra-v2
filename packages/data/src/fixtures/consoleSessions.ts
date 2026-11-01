@@ -8,6 +8,7 @@ export function createConsoleFixtures(now = Date.now()) {
   const session = {
       ...seed,
       state: 'active' as const,
+      scheduledStartAt: now - 3600000,
       startedAt: now - 3600000,
       scheduledEndAt: now + 7200000,
     },
@@ -20,7 +21,11 @@ export function createConsoleFixtures(now = Date.now()) {
     })),
     courts = base.courts
       .filter((c) => c.sessionId === session.id)
-      .map((c, i) => ({ ...c, startsAt: session.startedAt, openUntil: i === 2 ? now - 60000 : null }))
+      .map((c, i) => ({
+        ...c,
+        startsAt: session.startedAt,
+        openUntil: i === 2 ? now - 60000 : null,
+      }))
   const pid = (i: number) => {
     const p = roster[i]
     if (!p) throw new Error('Missing roster fixture.')
@@ -114,11 +119,19 @@ export function createCourtWindowFixtures(now = Date.now()) {
   const day = new Date(now)
   day.setHours(19, 30, 0, 0)
   const start = day.getTime()
-  const session = { ...base.session, scheduledStartAt: start, scheduledEndAt: start + 3 * 3600000, startedAt: start }
+  const session = {
+    ...base.session,
+    scheduledStartAt: start,
+    scheduledEndAt: start + 3 * 3600000,
+    startedAt: start,
+  }
   const courts = Array.from({ length: 5 }, (_, i) => ({
-    id: `window-court-${i + 1}`, sessionId: session.id, label: `Court ${i + 1}`,
+    id: `window-court-${i + 1}`,
+    sessionId: session.id,
+    label: `Court ${i + 1}`,
     startsAt: start + (i >= 3 ? 3600000 : 0),
-    openUntil: i === 4 ? start + 2 * 3600000 : null, removedAt: null,
+    openUntil: i === 4 ? start + 2 * 3600000 : null,
+    removedAt: null,
   }))
   return { ...base, session, courts, matches: [] }
 }

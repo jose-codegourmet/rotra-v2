@@ -215,7 +215,12 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
           Add late player
         </Button>
       </div>
-      <SlotMeter live rosterCount={rosterList.length} capacity={capacity} waitlistCount={waitlist.length} />
+      <SlotMeter
+        live
+        rosterCount={rosterList.length}
+        capacity={capacity}
+        waitlistCount={waitlist.length}
+      />
       <PlayerPoolToolbar
         show={show}
         onShowChange={setShow}
@@ -280,7 +285,11 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
         <WaitlistPanel
           live
           isPending={giveSlot.isPending || fillOpenSlots.isPending || removeFromWaitlist.isPending}
-          serverError={giveSlot.error || fillOpenSlots.error || removeFromWaitlist.error ? errorMessage(giveSlot.error ?? fillOpenSlots.error ?? removeFromWaitlist.error) : undefined}
+          serverError={
+            giveSlot.error || fillOpenSlots.error || removeFromWaitlist.error
+              ? errorMessage(giveSlot.error ?? fillOpenSlots.error ?? removeFromWaitlist.error)
+              : undefined
+          }
           entries={entries}
           rosterCount={rosterList.length}
           courtCount={s.courts.length}

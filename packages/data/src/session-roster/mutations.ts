@@ -12,7 +12,7 @@ import { queueMutation, sessionIn } from '../mock/transaction'
 import { PLAYING_LEVELS, type PlayingLevel } from '../player/player.types'
 import { promoteWaiter, recomputeMinimum } from '../queue-session/mutations'
 import { slotCapacity } from '../queue-session/queueSession.rules'
-import { levelLabel, shortName } from './sessionRoster.rules'
+import { levelLabel, shortName, ROSTER_DUPLICATE_ERROR } from './sessionRoster.rules'
 import type { IdentityCheck, SessionJoinRequest } from './sessionRoster.types'
 
 function fail(text: string): never {
@@ -50,8 +50,10 @@ function place(
     s.waitlist.some((w) => w.sessionId === sessionId && linked.includes(w.clubPlayerId))
   )
     // A duplicate is a conflict: the Add player sheet drops the pick and returns to the list.
-    throw new MockError('conflict', 'This player is already on the roster or waitlist.')
-  const full = session.state !== 'active' && s.roster.filter((r) => r.sessionId === sessionId).length >= capacity(s, sessionId),
+    throw new MockError('conflict', ROSTER_DUPLICATE_ERROR)
+  const full =
+      session.state !== 'active' &&
+      s.roster.filter((r) => r.sessionId === sessionId).length >= capacity(s, sessionId),
     id = crypto.randomUUID()
   s.waitlist.push({ id, sessionId, clubPlayerId: p.id, level, addedAt })
   if (!full) promoteWaiter(s, required(s.waitlist.find((w) => w.id === id)), addedAt)

@@ -1,6 +1,6 @@
 # Coding conventions — ROTRA v1
 
-**Last verified:** 2026-10-27 · **Applies to:** every app and package. Where this file and older notes
+**Last verified:** 2026-11-01 · **Applies to:** every app and package. Where this file and older notes
 disagree, this file wins. Where this file and the [architecture](architecture.md) disagree, fix one of them
 in the same PR.
 
@@ -211,6 +211,8 @@ packages/schema/src/
 - `@rotra/data` uses the same schemas to validate mock inputs, and route handlers will use them later.
 
 ---
+
+Court booking time placement and session-boundary validation are shared through `@rotra/schema/court-window`; preparation and live editing use the same rules.
 
 ## 8. Styling
 

@@ -130,12 +130,12 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
     if (redirectTo) router.replace(redirectTo)
   }, [redirectTo, router])
 
-  // The 30-second refresh: the clock the views measure against, paused while a sheet is open here.
+  // Court boundaries update during sheets; session data still refetches every 30 seconds.
   const now = useNow(1000, false, true)
-  const lastSessionRefresh = useRef(0)
+  const lastSessionRefresh = useRef(Date.now())
   const refetchSession = session.refetch
   const firstTick = useRef(true)
-  // biome-ignore lint/correctness/useExhaustiveDependencies: `now` is the 30-second tick that triggers the refetch
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `now` is the clock that triggers the throttled session refetch
   useEffect(() => {
     if (firstTick.current) {
       firstTick.current = false

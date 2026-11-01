@@ -6,7 +6,7 @@ import { Icon } from '@rotra/ui/icon'
 import { IconButton } from '@rotra/ui/icon-button'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { Dialog } from 'radix-ui'
-import { type ReactNode, useRef } from 'react'
+import { type ReactNode, type RefObject, useRef } from 'react'
 
 export type SheetProps = {
   open: boolean
@@ -23,6 +23,8 @@ export type SheetProps = {
   hideClose?: boolean
   /** Stops Escape and the scrim from closing it (e.g. while a permanent save is pending) */
   dismissible?: boolean
+  /** Fallback when a successful action removes the button that opened this sheet. */
+  returnFocusRef?: RefObject<HTMLElement | null>
   className?: string
 }
 
@@ -44,6 +46,7 @@ export function Sheet({
   wide,
   hideClose,
   dismissible = true,
+  returnFocusRef,
   className,
 }: SheetProps) {
   const phone = useMediaQuery(PHONE_QUERY)
@@ -86,7 +89,17 @@ export function Sheet({
               }}
               onCloseAutoFocus={(event) => {
                 event.preventDefault()
-                returnFocus.current?.focus()
+                const ownDialog = titleRef.current?.closest('[role="dialog"]')
+                if (
+                  [...document.querySelectorAll('[role="dialog"]')].some(
+                    (dialog) => dialog !== ownDialog,
+                  )
+                )
+                  return
+                const target = returnFocus.current?.isConnected
+                  ? returnFocus.current
+                  : returnFocusRef?.current
+                target?.focus()
               }}
               onEscapeKeyDown={(event) => {
                 if (!dismissible) event.preventDefault()

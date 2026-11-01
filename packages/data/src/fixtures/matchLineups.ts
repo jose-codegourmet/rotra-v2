@@ -189,8 +189,20 @@ export const matchLineupFixtures = createMatchLineupFixtures()
 /** Domain drafts remain separate from the UI's formatted story cards and from Match records. */
 export function createAutoQueueDraftFixtures(now = Date.now()): AutoQueueDraftState {
   const { session, roster, courts, matches } = createConsoleFixtures(now)
-  const eligible = roster.filter((p) => p.present && !matches.some((m) => m.state === 'active' && [...m.teamA, ...m.teamB].includes(p.id)))
+  const eligible = roster.filter(
+    (p) =>
+      p.present &&
+      !matches.some((m) => m.state === 'active' && [...m.teamA, ...m.teamB].includes(p.id)),
+  )
   const first = eligible.slice(0, 4).map((p) => p.id)
-  const draft = { id: 'draft-fixture-available', mode: 'available' as const, format: 'doubles' as const, teamA: first.slice(0, 2), teamB: first.slice(2), reason: 'Available players with the lowest planned load', fingerprint: autoQueueFingerprint(session, { roster, courts, matches }) }
+  const draft = {
+    id: 'draft-fixture-available',
+    mode: 'available' as const,
+    format: 'doubles' as const,
+    teamA: first.slice(0, 2),
+    teamB: first.slice(2),
+    reason: 'Available players with the lowest planned load',
+    fingerprint: autoQueueFingerprint(session, { roster, courts, matches }),
+  }
   return { batches: { available: { drafts: [draft] } }, selectedIds: [draft.id], committedIds: [] }
 }

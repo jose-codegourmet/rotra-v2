@@ -73,12 +73,26 @@ export const sessionSetupSchema = z
       const from = values.courtStarts[i] || values.startTime
       const until = values.courtEnds[i]
       if (!timeField.safeParse(from).success || (until && !timeField.safeParse(until).success)) {
-        ctx.addIssue({ code: 'custom', message: 'Enter a valid booking time.', path: [!timeField.safeParse(from).success ? 'courtStarts' : 'courtEnds', i] })
+        ctx.addIssue({
+          code: 'custom',
+          message: 'Enter a valid booking time.',
+          path: [!timeField.safeParse(from).success ? 'courtStarts' : 'courtEnds', i],
+        })
         return
       }
       const startsAt = courtTimeOnSession(start, from)
-      const error = courtWindowError(startsAt, until ? courtTimeOnSession(start, until) : null, start, end)
-      if (error) ctx.addIssue({ code: 'custom', message: error, path: [startsAt >= end ? 'courtStarts' : 'courtEnds', i] })
+      const error = courtWindowError(
+        startsAt,
+        until ? courtTimeOnSession(start, until) : null,
+        start,
+        end,
+      )
+      if (error)
+        ctx.addIssue({
+          code: 'custom',
+          message: error,
+          path: [startsAt >= end ? 'courtStarts' : 'courtEnds', i],
+        })
     })
     if (values.paymentMode === 'custom' && values.customFeePerHead === null)
       ctx.addIssue({ code: 'custom', message: CUSTOM_FEE_ERROR, path: ['customFeePerHead'] })
@@ -96,7 +110,17 @@ export type SessionSetupValues = z.output<typeof sessionSetupSchema>
 
 /** The wizard's three pages and the fields each one validates */
 export const PAGE_FIELDS: (keyof SessionSetupInput)[][] = [
-  ['title', 'date', 'startTime', 'endTime', 'venue', 'courtLabels', 'courtStarts', 'courtEnds', 'playersPerCourt'],
+  [
+    'title',
+    'date',
+    'startTime',
+    'endTime',
+    'venue',
+    'courtLabels',
+    'courtStarts',
+    'courtEnds',
+    'playersPerCourt',
+  ],
   [
     'allowSingles',
     'allowDoubles',

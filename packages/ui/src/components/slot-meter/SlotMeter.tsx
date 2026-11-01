@@ -10,7 +10,13 @@ export type SlotMeterProps = {
 }
 
 /** "14/24 slots · 10 left before the waitlist" with a bar; amber near or at the budget. */
-export function SlotMeter({ rosterCount, capacity, waitlistCount = 0, live = false, className }: SlotMeterProps) {
+export function SlotMeter({
+  rosterCount,
+  capacity,
+  waitlistCount = 0,
+  live = false,
+  className,
+}: SlotMeterProps) {
   const open = capacity - rosterCount
   const state = open < 0 ? 'over' : open === 0 ? 'full' : open <= 2 ? 'near' : 'ok'
   const text = live

@@ -1,4 +1,9 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}@media (max-width: 640px) {
+  #waitlist .wait-row { display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto; }
+  #waitlist .wait-row > [data-act="giveSlot"] { grid-column: 3; grid-row: 2; justify-self: start; }
+  #waitlist .wait-row > [data-act="removeWait"] { grid-column: 4; grid-row: 1; }
+}
+</style></head><body>
 <title>ROTRA Queue</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2268,8 +2273,8 @@ function waitlistPanel(s) {
   const wl = waitOf(s), open = openSlots(s), cap = capacityOf(s);
   return `<section class="card stack" id="waitlist"><div class="between"><div><h2>Waitlist${wl.length ? ` · ${wl.length}` : ''}</h2><p class="small muted">Slots: <b>${s.roster.length} of ${cap}</b> used (${s.courts.length} court${s.courts.length > 1 ? 's' : ''} × ${perCourtOf(s)} players)${open ? ` · ${open} open` : ' · full'}. ${s.status === 'active' ? 'Choose any player to admit.' : 'First come, first served.'}</p></div>
       ${wl.length && open ? `<button class="btn sm primary" data-act="fillSlots">Fill ${Math.min(open, wl.length)} open slot${Math.min(open, wl.length) > 1 ? 's' : ''}</button>` : ''}</div>
-    ${wl.length ? `<div class="list">${wl.map((w, i) => { const p = P(w.pid); return `<div class="li"><span class="qt-pos">#${i + 1}</span>${faceBtn(p)}<div class="main"><b>${esc(p.name)}</b><p class="small muted">${esc(lvLabel(w.level))} · waiting since ${fmtTime(w.at)}</p></div>
-      <button class="btn xs ${open ? 'primary' : ''}" data-act="giveSlot" data-pid="${w.pid}" ${open ? '' : 'title="Over your slot budget"'}>${s.status === 'active' ? 'Admit player' : open ? 'Give slot' : 'Give slot anyway'}</button><button class="btn xs ghost icon-btn" data-act="removeWait" data-pid="${w.pid}" aria-label="Remove ${esc(p.name)} from the waitlist">${I.x}</button></div>`; }).join('')}</div>`
+    ${wl.length ? `<div class="list">${wl.map((w, i) => { const p = P(w.pid); return `<div class="li wait-row"><span class="qt-pos">#${i + 1}</span>${faceBtn(p)}<div class="main"><b>${esc(p.name)}</b><p class="small muted">${esc(lvLabel(w.level))} · waiting since ${fmtTime(w.at)}</p></div>
+      <button class="btn xs ${s.status === 'active' || open ? 'primary' : ''}" data-act="giveSlot" data-pid="${w.pid}" ${s.status === 'active' || open ? '' : 'title="Over your slot budget"'}>${s.status === 'active' ? 'Admit player' : open ? 'Give slot' : 'Give slot anyway'}</button><button class="btn xs ghost icon-btn" data-act="removeWait" data-pid="${w.pid}" aria-label="Remove ${esc(p.name)} from the waitlist">${I.x}</button></div>`; }).join('')}</div>`
       : `<p class="small muted">${s.status === 'active' || open ? 'Nobody is waiting.' : 'Nobody is waiting. Players added from now on join the waitlist.'}</p>`}
   </section>`;
 }
@@ -2440,7 +2445,7 @@ function autoState(s) {
   if (!S.ui.autoDraft || S.ui.autoDraft.sid !== s.id) S.ui.autoDraft = { sid: s.id, tab: 'available', batches: {}, selected: [], count: null, target: '', next: 1 };
   return S.ui.autoDraft;
 }
-function queueFingerprint(s) { return JSON.stringify(waiting(s).map((m) => [m.id, m.pos, m.format, m.teamA, m.teamB])); }
+function queueFingerprint(s) { return JSON.stringify([s.status, s.singles, s.doubles, s.roster, s.courts, s.matches]); }
 function autoWorkspace(s) {
   const a = autoState(s), tab = a.tab, batch = a.batches[tab] || { cards: [] };
   const stale = batch.fingerprint && batch.fingerprint !== queueFingerprint(s);
@@ -3100,7 +3105,7 @@ const SHEETS = {
   },
   autoReview(sh) {
     const s = cur(), a = autoState(s), cards = Object.values(a.batches).flatMap((b) => b.cards), selected = sh.ids.map((id) => cards.find((m) => m.draftId === id)).filter(Boolean);
-    return sheetShell('Add selected to Main Queue?', `<p class="small muted">Transfer order follows your selection. Drafts are revalidated when added.</p><ol>${selected.map((m) => `<li>${esc(listNames(m.teamA))} vs ${esc(listNames(m.teamB))}</li>`).join('')}</ol>`, '<button class="btn" data-act="closeSheet">Back</button><button class="btn primary" data-act="autoCommit">Add to Main Queue</button>');
+    return sheetShell('Add selected to Main Queue?', `<p class="small muted">Transfer order follows your selection. Drafts are revalidated when added.</p>${sh.error ? notice('bad', esc(sh.error)) : ''}<ol>${selected.map((m) => `<li>${esc(listNames(m.teamA))} vs ${esc(listNames(m.teamB))}</li>`).join('')}</ol>`, '<button class="btn" data-act="closeSheet">Back</button><button class="btn primary" data-act="autoCommit">Add to Main Queue</button>');
   },
   regen() {
     const s = cur();
@@ -3780,10 +3785,10 @@ const ACT = {
   autoGenerate: () => ACT.autoBuild(false),
   autoRegenerate: () => ACT.autoBuild(false),
   autoRegenerateUnselected: () => ACT.autoBuild(true),
-  autoBuild: (keep) => { const s = cur(), a = autoState(s), old = a.batches[a.tab] || { cards: [] }; const fixed = keep ? old.cards.filter((m) => a.selected.includes(m.draftId)) : []; const r = generateDrafts(s, a.tab, Math.max(0, a.count-fixed.length), a.target, fixed); if (r.error) { a.error = r.error; render(); return; } const removed = old.cards.filter((m) => !fixed.includes(m)).map((m) => m.draftId); a.selected = a.selected.filter((id) => !removed.includes(id)); a.batches[a.tab] = { cards: [...fixed, ...r.matches.map((m) => ({ ...m, draftId: `d${a.next++}` }))], fingerprint: fixed.length && old.fingerprint !== queueFingerprint(s) ? old.fingerprint : queueFingerprint(s), stop: r.stop }; a.error = ''; render(); },
+  autoBuild: (keep) => { const s = cur(), a = autoState(s), old = a.batches[a.tab] || { cards: [] }; const fixed = keep ? old.cards.filter((m) => a.selected.includes(m.draftId)) : []; const r = generateDrafts(s, a.tab, Math.max(0, a.count-fixed.length), a.target, fixed); if (r.error) { a.error = r.error; render(); return; } const removed = old.cards.filter((m) => !fixed.includes(m)).map((m) => m.draftId); a.selected = a.selected.filter((id) => !removed.includes(id)); a.batches[a.tab] = { cards: [...fixed, ...r.matches.map((m) => ({ ...m, draftId: `d${a.next++}`, strategy: a.tab }))], fingerprint: fixed.length && old.fingerprint !== queueFingerprint(s) ? old.fingerprint : queueFingerprint(s), stop: r.stop }; a.error = ''; render(); },
   autoAddTab: () => { const a = autoState(cur()); openSheet({ type: 'autoReview', ids: (a.batches[a.tab]?.cards || []).map((m) => m.draftId) }); },
   autoReview: () => openSheet({ type: 'autoReview', ids: autoState(cur()).selected.slice() }),
-  autoCommit: () => { const s = cur(), a = autoState(s), cards = Object.values(a.batches).flatMap((b) => b.cards); const ids = S.ui.sheet.ids, selected = ids.map((id) => cards.find((m) => m.draftId === id)).filter(Boolean); if (!selected.length || selected.length !== ids.length) { S.ui.sheet = null; a.error = 'Drafts changed. Review them again.'; render(); return; } const invalid = selected.find((m) => !FORMATS[m.format] || (m.format === 'singles' && !s.singles) || (m.format === 'doubles' && !s.doubles) || m.teamA.length !== FORMATS[m.format][0] || m.teamB.length !== FORMATS[m.format][1] || all(m).some((p) => !R(s,p) || !R(s,p).present) || new Set(all(m)).size !== all(m).length); if (invalid) { S.ui.sheet = null; a.error = 'A selected draft needs attention: check player presence and lineups, then regenerate.'; render(); return; } selected.forEach((m) => addMatch(s,m,'auto',false)); Object.values(a.batches).forEach((b) => { b.cards = b.cards.filter((m) => !ids.includes(m.draftId)); }); a.selected = a.selected.filter((id) => !ids.includes(id)); S.ui.sheet = null; S.ui.queueWorkspace = 'main'; commit(`${selected.length} drafts added to Main Queue`); render(); },
+  autoCommit: () => { const s = cur(), a = autoState(s), cards = Object.values(a.batches).flatMap((b) => b.cards); const ids = S.ui.sheet.ids, selected = ids.map((id) => cards.find((m) => m.draftId === id)).filter(Boolean); if (!selected.length || selected.length !== ids.length || new Set(ids).size !== ids.length) { S.ui.sheet.error = 'Drafts changed. Review them again.'; render(); return; } const invalid = selected.find((m) => !FORMATS[m.format] || (m.format === 'singles' && !s.singles) || (m.format === 'doubles' && !s.doubles) || m.teamA.length !== FORMATS[m.format][0] || m.teamB.length !== FORMATS[m.format][1] || all(m).some((p) => !R(s,p) || !R(s,p).present || (m.strategy !== 'ahead' && activeOf(s,p))) || new Set(all(m)).size !== all(m).length); if (invalid) { S.ui.sheet.error = 'A selected draft needs attention: check player presence, playing dependencies and lineups, then regenerate.'; render(); return; } selected.forEach((m) => addMatch(s,m,'auto',false)); Object.values(a.batches).forEach((b) => { b.cards = b.cards.filter((m) => !ids.includes(m.draftId)); }); a.selected = a.selected.filter((id) => !ids.includes(id)); S.ui.sheet = null; S.ui.queueWorkspace = 'main'; commit(`${selected.length} drafts added to Main Queue`); render(); },
   openAuto: () => { S.ui.queueWorkspace = 'auto'; S.ui.pane = 'queue'; render(); },
   openRegen: () => openSheet({ type: 'regen' }),
   confirmRegen: () => {

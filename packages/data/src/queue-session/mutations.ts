@@ -75,7 +75,12 @@ function validate(state: MockState, input: QueueSessionInput) {
   if (!Number.isInteger(input.minimumGames) || input.minimumGames < 0)
     throw new MockError('permission', 'Enter a whole number of games.')
   for (const court of input.courts) {
-    const error = courtWindowError(court.startsAt ?? input.scheduledStartAt, court.openUntil ?? null, input.scheduledStartAt, input.scheduledEndAt)
+    const error = courtWindowError(
+      court.startsAt ?? input.scheduledStartAt,
+      court.openUntil ?? null,
+      input.scheduledStartAt,
+      input.scheduledEndAt,
+    )
     if (error) throw new MockError('permission', error)
   }
   const budget =
@@ -141,7 +146,8 @@ export function createQueueSession(input: QueueSessionInput) {
           sessionId: id,
           label: c.label.trim(),
           startsAt: date.start + ((c.startsAt ?? input.scheduledStartAt) - input.scheduledStartAt),
-          openUntil: c.openUntil == null ? null : date.start + (c.openUntil - input.scheduledStartAt),
+          openUntil:
+            c.openUntil == null ? null : date.start + (c.openUntil - input.scheduledStartAt),
           removedAt: null,
         })),
       )

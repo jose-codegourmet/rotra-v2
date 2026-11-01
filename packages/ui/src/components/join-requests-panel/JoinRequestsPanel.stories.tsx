@@ -76,4 +76,6 @@ export const InSheetPhone: Story = {
 export const ActiveFull: Story = { args: { live: true, slotsFull: true } }
 
 export const AdmissionPending: Story = { args: { live: true, isPending: true } }
-export const AdmissionError: Story = { args: { live: true, serverError: 'Changes could not be saved' } }
+export const AdmissionError: Story = {
+  args: { live: true, serverError: 'Changes could not be saved' },
+}

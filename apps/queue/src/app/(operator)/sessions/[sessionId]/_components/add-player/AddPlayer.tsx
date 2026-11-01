@@ -4,7 +4,10 @@ import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import { MockError } from '@rotra/data/mock/errors'
 import { slotCapacity } from '@rotra/data/queue-session/queueSession.rules'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
-import { needsConfirmStep } from '@rotra/data/session-roster/sessionRoster.rules'
+import {
+  needsConfirmStep,
+  ROSTER_DUPLICATE_ERROR,
+} from '@rotra/data/session-roster/sessionRoster.rules'
 import { useAddDirectoryPlayerToSession } from '@rotra/data/session-roster/useAddDirectoryPlayerToSession'
 import { useAddNewPlayerToSession } from '@rotra/data/session-roster/useAddNewPlayerToSession'
 import { useAddSavedPlayerToSession } from '@rotra/data/session-roster/useAddSavedPlayerToSession'
@@ -98,7 +101,9 @@ export function AddPlayer({ sessionId, open, onOpenChange }: AddPlayerProps) {
 
   const isPending = addSaved.isPending || addDirectory.isPending || addNew.isPending
   const options = {
-    onSettled: () => { submitting.current = false },
+    onSettled: () => {
+      submitting.current = false
+    },
     onSuccess: (result: { message: string }) => {
       setServerError(undefined)
       setLastAdded(result.message)
@@ -107,7 +112,11 @@ export function AddPlayer({ sessionId, open, onOpenChange }: AddPlayerProps) {
     },
     onError: (error: unknown) => {
       const message = errorMessage(error)
-      setErrorReturnsToList(error instanceof MockError && error.kind === 'conflict')
+      setErrorReturnsToList(
+        error instanceof MockError &&
+          error.kind === 'conflict' &&
+          error.message === ROSTER_DUPLICATE_ERROR,
+      )
       setServerError(message)
       toast.error(message)
     },
@@ -165,7 +174,12 @@ export function AddPlayer({ sessionId, open, onOpenChange }: AddPlayerProps) {
       onConfirm={confirm}
       onSubmitNewPlayer={submitNewPlayer}
       isPending={isPending || session.isPending || roster.isPending || clubPlayers.isPending}
-      serverError={serverError ?? (session.error || roster.error || clubPlayers.error ? 'Could not load players. Close and reopen to retry.' : undefined)}
+      serverError={
+        serverError ??
+        (session.error || roster.error || clubPlayers.error
+          ? 'Could not load players. Close and reopen to retry.'
+          : undefined)
+      }
       serverErrorReturnsToList={errorReturnsToList}
       lastAdded={lastAdded}
       addedCount={addedCount}

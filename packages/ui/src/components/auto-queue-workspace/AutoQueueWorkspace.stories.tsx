@@ -48,6 +48,7 @@ function Demo(args: AutoQueueWorkspaceProps) {
           ...current,
           [tab]: {
             ...current[tab],
+            stopReason: undefined,
             drafts: (current[tab]?.drafts ?? []).filter((draft) => selected.includes(draft.id)),
           },
         }))
@@ -84,6 +85,8 @@ const meta = {
     onModeChange: fn(),
     count: null,
     onCountChange: fn(),
+    minimumGames: matchLineupFixtures.session.minimumGames,
+    hasEligiblePlayers: true,
     catchUpTarget: '',
     onCatchUpTargetChange: fn(),
     batches: fixture,
@@ -102,7 +105,7 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Generated: Story = {}
+export const Generated: Story = { args: { count: 2 } }
 export const Empty: Story = { args: { batches: {} } }
 export const MainQueue: Story = { args: { workspace: 'main' } }
 export const CrossTabSelected: Story = {
@@ -136,5 +139,42 @@ export const TransferConflict: Story = {
     selectedIds: ['draft-available-1'],
     transferError: 'A selected player is no longer present.',
     onAddToMainQueue: fn(async () => false),
+  },
+}
+
+export const CatchUpWithoutTarget: Story = {
+  args: { mode: 'catchup', count: 2, batches: {} },
+}
+export const NoEligiblePlayers: Story = {
+  args: { count: 2, batches: {}, hasEligiblePlayers: false },
+}
+export const NoPresentPlayers: Story = {
+  args: { mode: 'ahead', count: 2, batches: {}, hasEligiblePlayers: false },
+}
+export const ShortBatch: Story = {
+  args: { count: 2, batches: { available: matchLineupFixtures.autoQueueCopyStates.shortBatch } },
+}
+export const CatchUpTargetMet: Story = {
+  args: {
+    mode: 'catchup',
+    count: 2,
+    catchUpTarget: '3',
+    batches: { catchup: matchLineupFixtures.autoQueueCopyStates.targetMet },
+  },
+}
+export const CatchUpShortfall: Story = {
+  args: {
+    mode: 'catchup',
+    count: 2,
+    catchUpTarget: '5',
+    batches: { catchup: matchLineupFixtures.autoQueueCopyStates.shortfall },
+  },
+}
+
+export const NoEligiblePlayersAfterGeneration: Story = {
+  args: {
+    count: 2,
+    hasEligiblePlayers: false,
+    batches: { available: matchLineupFixtures.autoQueueCopyStates.shortBatch },
   },
 }

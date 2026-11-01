@@ -1,5 +1,7 @@
 # Shared match queue and generation
 
+**Last verified:** 2026-11-01.
+
 **Surfaces:** `Q-QUEUE`, `Q-MANUAL`, `Q-PICK-PLAYER`, `Q-SUGGEST`, `Q-AUTO`, `Q-REGENERATE`.
 
 **Source:** [queueing business rules](../../../../business_logic/product/queue/modules/queueing/README.md). **Reference:** [ROTRA Queue prototype](../../../../../apps/mockup/queue-app/rotra-queue.html).
@@ -77,11 +79,67 @@ When no lineup is possible, the sheet shows the reason (both formats off, or “
 
 ## Q-AUTO — Auto Queue workspace
 
-**UI component:** `AutoQueueWorkspace` in `@rotra/ui/auto-queue-workspace`. Its props carry draft batches and selection order; the later mock-data and screen tickets own generation, transfer validation and persistence.
+**UI component:** `AutoQueueWorkspace` in `@rotra/ui/auto-queue-workspace`. Its props carry draft batches, selection order, session minimum and eligible-player state; the `AutoQueue` container owns mock generation and transfer validation. Drafts are in memory, not durable persistence.
 
 The Queue view switches between Main Queue and Auto Queue. Auto Queue has Available Players, Plan Ahead, Longest Wait, Fewest Games and Catch Up tabs with retained draft batches. The Queue Master selects a match count (2 / 3 / 4 / 6; no default), explicitly generates, and chooses a Catch Up target when applicable. Cards show reason, lineup, played/queued counts and playing dependencies. No draft starts or enters Main Queue automatically.
 
-Checkbox selections persist across tabs in selection order. **Add selected to Main Queue** opens a review of that order; **Add all from this tab** uses only the current batch. **Regenerate**, **Clear**, **Clear unselected**, and **Regenerate unselected** affect drafts only; selected drafts survive the last action. Main Queue changes leave drafts visible with a stale notice. Revalidation before transfer blocks conflicts and retains the drafts for correction. Distinct rematches are allowed, but the same draft cannot be submitted twice. Counts update from the Main Queue immediately when a waiting match is removed or started; played changes only after eligible Match done.
+Header hint: “Drafts are suggestions. Nothing joins the Main Queue until you add it.”
+
+| Tab | Description |
+|---|---|
+| Available Players | Matches from players who are here and not on a court right now. |
+| Plan Ahead | Also uses players who are mid-game. Their matches wait until their current game ends. |
+| Longest Wait | Puts the players who have waited longest since their last game first. |
+| Fewest Games | Puts the players with the fewest games (played + already queued) first. |
+| Catch Up | Helps players who are behind reach a number of games you choose. |
+
+**How many matches?** offers 2 / 3 / 4 / 6 with no default. Catch Up additionally shows
+**Games each player should reach**, with an empty value and “e.g. {minimum}” placeholder. Its hint is:
+“Players below this number get matches first. Games already played and games already planned in the
+Main Queue both count. Earlier drafts in this batch count too. Example: with 3, a player who has
+played 1 and is queued for 1 needs 1 more match. This is separate from the session minimum
+(Min {minimum} games).” The minimum is the current session's value, not a preselected target.
+Invalid targets show “Enter a whole number of games, 1 or more.” beside the field.
+
+| Action | Copy and effect |
+|---|---|
+| Generate | “Generate {n} matches”; “Generate matches” before a count is chosen |
+| Replace every draft in this tab | “Generate again” |
+| Keep selected drafts, replace others | “Replace unselected” |
+| Keep selected drafts, remove others | “Remove unselected” |
+| Remove all drafts in this tab | “Clear this tab” |
+| Review selected drafts across tabs | “Add {n} selected to Main Queue” |
+| Review this tab's batch | “Add all {n} to Main Queue” |
+
+“Generate again replaces every draft in this tab. Replace unselected keeps the ones you picked.
+Remove unselected removes the others.” explains the actions next to their buttons. Disabled buttons
+have a title and accessible description pointing to a visible explanation: “Choose how many matches
+first.”; “Choose a game target first.” (or its validation error); “Generate matches in this tab first
+to replace or remove drafts, or add them to the Main Queue.”; “Select one or more drafts first to add
+a selection to the Main Queue.” Pending controls explain the current operation and “Please wait.”
+
+Batch results use normal status text, not an error for a full batch. Use singular “game” / “match” and “is” for a count of one:
+
+- Full batch: “Made {n} of {n} matches.”
+- Not enough players: “Made {k} of {n}: not enough free players for another match.” Plan Ahead says “present” in place of “free”.
+- Catch Up met in the plan: “Everyone available reaches {target} games with these matches.” Only eligible players are counted; currently playing players are excluded from Catch Up.
+- Catch Up unable to progress: “Made {k} of {n}: no other match helps anyone reach {target} games.”
+- Catch Up still short: append “{s} more games are still needed to reach {target}.”
+
+Before generating, empty copy is “Choose how many matches, then Generate.”; Catch Up without a valid
+target says “Choose a game target, then Generate.” After choosing inputs, “Generate matches to see
+suggestions here.” No eligible players: “No one is free to play right now. Try Plan Ahead to include
+players who are mid-game.” In Plan Ahead with nobody present: “No present players. Mark arrivals
+present in Players.” A completed generation with no drafts shows its result without a contradictory
+prompt to generate.
+
+Checkbox selections persist across tabs in selection order. The review says “Matches are added in
+the order you picked them. We check them again before adding.” Drafts that changed must be reviewed
+again. Main Queue changes keep cards and selections visible with: “The Main Queue changed since
+these were made. Check them before adding, or generate again.” Revalidation before transfer blocks
+conflicts and retains the drafts for correction. Distinct rematches are allowed, but the same draft
+cannot be submitted twice. Counts update from the Main Queue immediately when a waiting match is
+removed or started; played changes only after eligible Match done.
 
 ## Q-REGENERATE — Main Queue rebuild
 

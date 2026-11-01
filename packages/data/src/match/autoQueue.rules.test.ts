@@ -24,7 +24,7 @@ describe('Auto Queue generation', () => {
     const input = scenario()
     input.ctx.roster = input.ctx.roster.map((p, i) => ({ ...p, present: i < 5 }))
     const available = generateAutoQueueMatches({ ...input, mode: 'available', limit: 2 })
-    expect(available.error).toContain('needs 4')
+    expect(available.error).toBe('Made 0 of 2: not enough free players for another match.')
     const ahead = generateAutoQueueMatches({ ...input, mode: 'ahead', limit: 2 })
     expect(ahead.error).toBeNull()
     expect(ahead.matches.flatMap(allPlayers)).toContain(input.ctx.roster[4]?.id)
@@ -35,6 +35,7 @@ describe('Auto Queue generation', () => {
     input.ctx.matches = []
     const result = generateAutoQueueMatches({ ...input, mode: 'available', limit: 6 })
     expect(result.matches).toHaveLength(6)
+    expect(result.stopReason).toBe('Made 6 of 6 matches.')
     expect(new Set(result.matches.flatMap(allPlayers)).size).toBe(4)
     expect(result.matches.every((m) => m.format === 'doubles')).toBe(true)
   })
@@ -121,14 +122,18 @@ describe('Catch Up', () => {
     const result = generateAutoQueueMatches(input)
     expect(result.matches).toHaveLength(1)
     expect(result.remainingShortfall).toBe(0)
-    expect(result.stopReason).toContain('Target met')
+    expect(result.stopReason).toBe(
+      `Everyone available reaches ${input.catchUpTarget} game${input.catchUpTarget === 1 ? '' : 's'} with these matches.`,
+    )
     expect(input.ctx.matches).toEqual(before)
   })
   it('stops without a match when everyone is already at the target', () => {
     const input = catchUp()
     input.catchUpTarget = 1
     expect(generateAutoQueueMatches(input).matches).toHaveLength(0)
-    expect(generateAutoQueueMatches(input).stopReason).toContain('Target met')
+    expect(generateAutoQueueMatches(input).stopReason).toBe(
+      `Everyone available reaches ${input.catchUpTarget} game${input.catchUpTarget === 1 ? '' : 's'} with these matches.`,
+    )
   })
   it('takes current queued assignments into account and updates after deletion', () => {
     const input = catchUp()
@@ -149,7 +154,9 @@ describe('Catch Up', () => {
     input.limit = 2
     const result = generateAutoQueueMatches(input)
     expect(result.matches).toHaveLength(2)
-    expect(result.stopReason).toContain('limit reached')
+    expect(result.stopReason).toBe(
+      'Made 2 of 2 matches. 26 more games are still needed to reach 10.',
+    )
     expect(result.remainingShortfall).toBeGreaterThan(0)
   })
   it('explains inability to progress and never uses in-play fillers', () => {
@@ -157,12 +164,14 @@ describe('Catch Up', () => {
     input.ctx.roster = input.ctx.roster.slice(0, 3)
     const result = generateAutoQueueMatches(input)
     expect(result.matches).toHaveLength(0)
-    expect(result.stopReason).toContain('No valid match')
+    expect(result.stopReason).toBe(
+      'Made 0 of 6: not enough free players for another match. 2 more games are still needed to reach 2.',
+    )
   })
   it('requires an explicit positive whole-number target', () => {
     for (const target of [undefined, 0, 1.5, NaN]) {
       expect(generateAutoQueueMatches({ ...catchUp(), catchUpTarget: target }).error).toContain(
-        'whole-number',
+        'Enter a whole number of games, 1 or more.',
       )
     }
   })

@@ -3,12 +3,13 @@
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { Checkbox } from '@rotra/ui/checkbox'
+import { Field } from '@rotra/ui/field'
 import { Notice } from '@rotra/ui/notice'
 import { SegmentedControl } from '@rotra/ui/segmented-control'
 import { Sheet } from '@rotra/ui/sheet'
 import { Tabs, TabsContent } from '@rotra/ui/tabs'
 import { TextInput } from '@rotra/ui/text-input'
-import { type ReactNode, useEffect, useRef, useState } from 'react'
+import { type ReactNode, useEffect, useId, useRef, useState } from 'react'
 
 export type AutoQueueMode = 'available' | 'ahead' | 'wait' | 'fewest' | 'catchup'
 export type AutoQueueCount = 2 | 3 | 4 | 6
@@ -52,6 +53,8 @@ export type AutoQueueWorkspaceProps = {
   onModeChange: (mode: AutoQueueMode) => void
   count: AutoQueueCount | null
   onCountChange: (count: AutoQueueCount) => void
+  minimumGames: number
+  hasEligiblePlayers: boolean
   catchUpTarget: string
   onCatchUpTargetChange: (target: string) => void
   batches: Partial<Record<AutoQueueMode, AutoQueueBatch>>
@@ -78,6 +81,14 @@ const MODE_ITEMS: { value: AutoQueueMode; label: string; shortLabel: string }[] 
   { value: 'catchup', label: 'Catch Up', shortLabel: 'Catch Up' },
 ]
 
+const MODE_DESCRIPTIONS: Record<AutoQueueMode, string> = {
+  available: 'Matches from players who are here and not on a court right now.',
+  ahead: 'Also uses players who are mid-game. Their matches wait until their current game ends.',
+  wait: 'Puts the players who have waited longest since their last game first.',
+  fewest: 'Puts the players with the fewest games (played + already queued) first.',
+  catchup: 'Helps players who are behind reach a number of games you choose.',
+}
+
 const COUNTS: AutoQueueCount[] = [2, 3, 4, 6]
 
 function allDrafts(batches: AutoQueueWorkspaceProps['batches']) {
@@ -93,6 +104,8 @@ export function AutoQueueWorkspace({
   onModeChange,
   count,
   onCountChange,
+  minimumGames,
+  hasEligiblePlayers,
   catchUpTarget,
   onCatchUpTargetChange,
   batches,
@@ -108,6 +121,7 @@ export function AutoQueueWorkspace({
   isPending = false,
   pendingMessage,
 }: AutoQueueWorkspaceProps) {
+  const hintId = useId()
   const [reviewIds, setReviewIds] = useState<string[] | null>(null)
   const reviewErrorRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
@@ -116,15 +130,53 @@ export function AutoQueueWorkspace({
   const mainQueueRef = useRef<HTMLDivElement>(null)
   const headingRef = useRef<HTMLHeadingElement>(null)
   const batch = batches[mode] ?? { drafts: [] }
-  const canGenerate =
-    count !== null &&
-    (mode !== 'catchup' ||
-      (Number.isSafeInteger(Number(catchUpTarget)) && Number(catchUpTarget) > 0))
+  const validTarget = Number.isSafeInteger(Number(catchUpTarget)) && Number(catchUpTarget) > 0
+  const canGenerate = count !== null && (mode !== 'catchup' || validTarget)
+  const busyHint = `${pendingMessage ?? 'Updating drafts…'} Please wait.`
+  const generationHint =
+    count === null
+      ? 'Choose how many matches first.'
+      : mode === 'catchup' && !validTarget
+        ? catchUpTarget === ''
+          ? 'Choose a game target first.'
+          : 'Enter a whole number of games, 1 or more.'
+        : ''
+  const draftsHint = !batch.drafts.length
+    ? 'Generate matches in this tab first to replace or remove drafts, or add them to the Main Queue.'
+    : ''
+  const selectionHint = !selectedIds.length
+    ? 'Select one or more drafts first to add a selection to the Main Queue.'
+    : ''
+  const generationReason = isPending ? busyHint : generationHint
+  const replaceReason = isPending ? busyHint : draftsHint || generationHint
+  const clearReason = isPending ? busyHint : draftsHint
+  const selectionReason = isPending ? busyHint : selectionHint
+  const generationHintId = `${hintId}-${isPending ? 'pending' : 'generation'}`
+  const draftsHintId = `${hintId}-${isPending ? 'pending' : 'drafts'}`
+  const replaceHintId = draftsHint ? draftsHintId : generationHintId
+  const selectionHintId = `${hintId}-${isPending ? 'pending' : 'selection'}`
+  const emptyMessage = !hasEligiblePlayers
+    ? mode === 'ahead'
+      ? 'No present players. Mark arrivals present in Players.'
+      : 'No one is free to play right now. Try Plan Ahead to include players who are mid-game.'
+    : mode === 'catchup' && !validTarget
+      ? 'Choose a game target, then Generate.'
+      : count === null
+        ? 'Choose how many matches, then Generate.'
+        : 'Generate matches to see suggestions here.'
   const selectedDrafts =
     reviewIds?.map((id) => allDrafts(batches).find((draft) => draft.id === id)) ?? []
   const reviewChanged =
     reviewIds !== null &&
     (selectedDrafts.some((draft) => !draft) || selectedDrafts.length !== reviewIds.length)
+
+  const reviewHint = isPending
+    ? busyHint
+    : reviewChanged
+      ? 'Drafts changed. Review them again.'
+      : !reviewIds?.length
+        ? 'Select one or more drafts first to add a selection to the Main Queue.'
+        : ''
 
   return (
     <section
@@ -151,7 +203,9 @@ export function AutoQueueWorkspace({
             <h2 ref={headingRef} tabIndex={-1} className="m-0 text-xl font-bold text-fg">
               Auto Queue
             </h2>
-            <span className="text-[13px] text-fg2">Drafts are not waiting matches</span>
+            <span className="text-[13px] text-fg2">
+              Drafts are suggestions. Nothing joins the Main Queue until you add it.
+            </span>
           </div>
           <Tabs
             aria-label="Generation strategy"
@@ -166,16 +220,10 @@ export function AutoQueueWorkspace({
           >
             {MODE_ITEMS.map(({ value }) => (
               <TabsContent key={value} value={value} className="flex min-w-0 flex-col gap-4">
-                <p className="m-0 text-[13px] text-fg2">
-                  {value === 'ahead'
-                    ? 'Includes present players who are still playing; those lineups wait until they are free.'
-                    : value === 'catchup'
-                      ? 'Choose a target for completed games. Planned games do not count as played.'
-                      : 'Uses present players who are not currently playing.'}
-                </p>
+                <p className="m-0 text-[13px] text-fg2">{MODE_DESCRIPTIONS[value]}</p>
                 <fieldset className="m-0 flex min-w-0 flex-col gap-2 border-0 p-0">
                   <legend className="mb-2 text-[13px] font-semibold text-fg2">
-                    Number of matches
+                    How many matches?
                   </legend>
                   <div className="flex flex-wrap gap-2">
                     {COUNTS.map((n) => (
@@ -184,6 +232,8 @@ export function AutoQueueWorkspace({
                         size="sm"
                         aria-pressed={count === n}
                         disabled={isPending}
+                        title={isPending ? busyHint : undefined}
+                        aria-describedby={isPending ? `${hintId}-pending` : undefined}
                         onClick={() => onCountChange(n)}
                         className="min-w-11 tabular-nums"
                       >
@@ -193,73 +243,107 @@ export function AutoQueueWorkspace({
                   </div>
                 </fieldset>
                 {value === 'catchup' ? (
-                  <label
-                    htmlFor="auto-queue-catch-up-target"
-                    className="flex max-w-xs flex-col gap-1.5 text-[13px] font-semibold text-fg2"
+                  <Field
+                    label="Games each player should reach"
+                    hint={`Players below this number get matches first. Games already played and games already planned in the Main Queue both count. Earlier drafts in this batch count too. Example: with 3, a player who has played 1 and is queued for 1 needs 1 more match. This is separate from the session minimum (Min ${minimumGames} game${minimumGames === 1 ? '' : 's'}).`}
+                    error={
+                      catchUpTarget !== '' && !validTarget
+                        ? 'Enter a whole number of games, 1 or more.'
+                        : undefined
+                    }
                   >
-                    Catch Up target
                     <TextInput
-                      id="auto-queue-catch-up-target"
                       type="number"
                       min={1}
                       step={1}
+                      placeholder={`e.g. ${minimumGames}`}
                       value={catchUpTarget}
                       disabled={isPending}
+                      invalid={catchUpTarget !== '' && !validTarget}
+                      className="max-w-xs"
                       onChange={(event) => onCatchUpTargetChange(event.target.value)}
                     />
-                  </label>
+                  </Field>
                 ) : null}
-                <div className="grid grid-cols-2 gap-2 min-[640px]:flex min-[640px]:flex-wrap">
+                {!isPending && generationHint ? (
+                  <p id={`${hintId}-generation`} className="m-0 text-[13px] text-fg2">
+                    {generationHint}
+                  </p>
+                ) : null}
+                {!isPending && draftsHint ? (
+                  <p id={`${hintId}-drafts`} className="m-0 text-[13px] text-fg2">
+                    {draftsHint}
+                  </p>
+                ) : null}
+                <div className="grid grid-cols-2 gap-2 min-[640px]:flex min-[640px]:flex-wrap [&>button]:min-w-0 [&>button]:whitespace-normal [&>button]:py-2">
                   <Button
                     variant="primary"
                     disabled={!canGenerate || isPending}
+                    title={generationReason || undefined}
+                    aria-describedby={generationReason ? generationHintId : undefined}
                     onClick={() => {
                       if (count !== null) onGenerate(mode, count, catchUpTarget)
                     }}
                   >
-                    Generate
+                    {count === null ? 'Generate matches' : `Generate ${count} matches`}
                   </Button>
                   <Button
                     disabled={!batch.drafts.length || !canGenerate || isPending}
+                    title={replaceReason || undefined}
+                    aria-describedby={replaceReason ? replaceHintId : undefined}
                     onClick={() => {
                       if (count !== null) onRegenerate(mode, count, catchUpTarget)
                     }}
                   >
-                    Regenerate
+                    Generate again
                   </Button>
                   <Button
                     disabled={!batch.drafts.length || !canGenerate || isPending}
+                    title={replaceReason || undefined}
+                    aria-describedby={replaceReason ? replaceHintId : undefined}
                     onClick={() => {
                       if (count !== null) onRegenerateUnselected(mode, count, catchUpTarget)
                     }}
                   >
-                    Regenerate unselected
+                    Replace unselected
                   </Button>
                   <Button
                     disabled={!batch.drafts.length || isPending}
+                    title={clearReason || undefined}
+                    aria-describedby={clearReason ? draftsHintId : undefined}
                     onClick={() => {
                       onClearUnselected(mode)
                       headingRef.current?.focus()
                     }}
                   >
-                    Clear unselected
+                    Remove unselected
                   </Button>
                   <Button
                     disabled={!batch.drafts.length || isPending}
+                    title={clearReason || undefined}
+                    aria-describedby={clearReason ? draftsHintId : undefined}
                     onClick={() => {
                       onClear(mode)
                       headingRef.current?.focus()
                     }}
                   >
-                    Clear tab
+                    Clear this tab
                   </Button>
                 </div>
-                {isPending && pendingMessage ? <Notice tone="info">{pendingMessage}</Notice> : null}
+                <p className="m-0 text-[13px] text-fg2">
+                  Generate again replaces every draft in this tab. Replace unselected keeps the ones
+                  you picked. Remove unselected removes the others.
+                </p>
+                {isPending ? (
+                  <div id={`${hintId}-pending`}>
+                    <Notice tone="info">{busyHint}</Notice>
+                  </div>
+                ) : null}
                 {batch.error ? <Notice tone="error">{batch.error}</Notice> : null}
                 {batch.stale ? (
                   <Notice tone="warn">
-                    Main Queue changed since generation. Drafts are stale; review and revalidate
-                    before adding.
+                    The Main Queue changed since these were made. Check them before adding, or
+                    generate again.
                   </Notice>
                 ) : null}
                 {batch.stopReason ? (
@@ -274,6 +358,7 @@ export function AutoQueueWorkspace({
                             label={`Select ${draft.format}`}
                             checked={selectedIds.includes(draft.id)}
                             disabled={isPending}
+                            aria-describedby={isPending ? `${hintId}-pending` : undefined}
                             onChange={(selected) => onSelect(draft.id, selected)}
                           />
                           <p className="m-0 font-semibold text-fg">
@@ -303,26 +388,34 @@ export function AutoQueueWorkspace({
                       </Card>
                     ))}
                   </div>
-                ) : (
-                  <Card className="text-center text-fg2">
-                    No drafts in this tab. Choose a count and generate.
-                  </Card>
+                ) : isPending ||
+                  (hasEligiblePlayers && (batch.stopReason || batch.error)) ? null : (
+                  <Card className="text-center text-fg2">{emptyMessage}</Card>
                 )}
                 <div className="grid grid-cols-1 gap-2 min-[640px]:flex min-[640px]:flex-wrap">
                   <Button
                     variant="primary"
                     disabled={!selectedIds.length || isPending}
+                    title={selectionReason || undefined}
+                    aria-describedby={selectionReason ? selectionHintId : undefined}
                     onClick={() => setReviewIds([...selectedIds])}
                   >
-                    Add selected to Main Queue ({selectedIds.length})
+                    Add {selectedIds.length} selected to Main Queue
                   </Button>
                   <Button
                     disabled={!batch.drafts.length || isPending}
+                    title={clearReason || undefined}
+                    aria-describedby={clearReason ? draftsHintId : undefined}
                     onClick={() => setReviewIds(batch.drafts.map((draft) => draft.id))}
                   >
-                    Add all from this tab
+                    Add all {batch.drafts.length} to Main Queue
                   </Button>
                 </div>
+                {!isPending && selectionHint ? (
+                  <p id={`${hintId}-selection`} className="m-0 text-[13px] text-fg2">
+                    {selectionHint}
+                  </p>
+                ) : null}
               </TabsContent>
             ))}
           </Tabs>
@@ -338,12 +431,19 @@ export function AutoQueueWorkspace({
         returnFocusRef={mainQueueRef}
         footer={
           <>
-            <Button disabled={isPending} onClick={() => setReviewIds(null)}>
+            <Button
+              disabled={isPending}
+              title={isPending ? busyHint : undefined}
+              aria-describedby={isPending ? `${hintId}-review` : undefined}
+              onClick={() => setReviewIds(null)}
+            >
               Back
             </Button>
             <Button
               variant="primary"
               disabled={!reviewIds?.length || reviewChanged || isPending}
+              title={reviewHint || undefined}
+              aria-describedby={reviewHint ? `${hintId}-review` : undefined}
               onClick={async () => {
                 if (reviewIds && (await onAddToMainQueue(reviewIds)) !== false) setReviewIds(null)
               }}
@@ -353,8 +453,13 @@ export function AutoQueueWorkspace({
           </>
         }
       >
+        {reviewHint ? (
+          <p id={`${hintId}-review`} className="m-0 text-[13px] text-fg2">
+            {reviewHint}
+          </p>
+        ) : null}
         <p className="m-0 text-[13px] text-fg2">
-          Transfer order follows your selection. Drafts are revalidated when added.
+          Matches are added in the order you picked them. We check them again before adding.
         </p>
         {transferError ? (
           <div ref={reviewErrorRef} tabIndex={-1} className="focus:outline-none">

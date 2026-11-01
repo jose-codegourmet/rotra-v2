@@ -136,7 +136,7 @@ export function createMatchLineupFixtures(now = Date.now()) {
     blockedReason: 'A player is playing now; this match waits until they are free.',
   }
   const autoQueueWorkspace = {
-    available: { drafts: [draftOne, draftTwo] },
+    available: { drafts: [draftOne, draftTwo], stopReason: 'Made 2 of 2 matches.' },
     ahead: { drafts: [draftAhead] },
     wait: {
       drafts: [
@@ -150,9 +150,15 @@ export function createMatchLineupFixtures(now = Date.now()) {
     },
     catchup: {
       drafts: [
-        { ...draftOne, id: 'draft-catchup-1', reason: 'Below the chosen completed-game target' },
+        {
+          ...draftOne,
+          id: 'draft-catchup-1',
+          teamA: draftOne.teamA.map((p) => ({ ...p, suggested: 1 })),
+          teamB: draftOne.teamB.map((p) => ({ ...p, suggested: 1 })),
+          reason: 'Below the chosen completed-game target',
+        },
       ],
-      stopReason: 'Batch limit reached.',
+      stopReason: 'Everyone available reaches 3 games with these matches.',
     },
   }
 
@@ -180,6 +186,20 @@ export function createMatchLineupFixtures(now = Date.now()) {
     bothFormatsOff,
     autoQueue,
     autoQueueWorkspace,
+    autoQueueCopyStates: {
+      shortBatch: {
+        drafts: [],
+        stopReason: 'Made 0 of 2: not enough free players for another match.',
+      },
+      targetMet: {
+        drafts: [],
+        stopReason: 'Everyone available reaches 3 games with these matches.',
+      },
+      shortfall: {
+        drafts: [draftOne, draftTwo],
+        stopReason: 'Made 2 of 2 matches. 4 more games are still needed to reach 5.',
+      },
+    },
     regenerate,
   }
 }

@@ -1,5 +1,7 @@
 # Queue generation and dispatch
 
+**Last verified:** 2026-11-01.
+
 **Status:** Confirmed v1 target rules. Updated October 26, 2026 to match the [ROTRA Queue prototype](../../../../../../apps/mockup/queue-app/rotra-queue.html).
 
 ## Ways to add waiting matches
@@ -89,7 +91,7 @@ The Main Queue is the shared accepted waiting list. Auto Queue holds separate al
 
 Generation accounts for current Main Queue assignments and earlier drafts within its batch as planned load. Longest Wait and Fewest Games use that load with longest wait and stable player order for ties. Catch Up uses an explicitly chosen target for completed games, prioritizes players below it, and fills from eligible players with the lowest planned load. It stops when the target is met in the plan, the chosen batch limit is reached, or no valid match can make progress; show the reason. This target is not the session minimum. Played counts only follow existing completed-match rules; queued counts derive from current Main Queue waiting matches. A draft is not a completed result and alternative tabs do not increase the Main Queue count. Existing team-balancing heuristics are prototype references, not newly approved pairing weights.
 
-Selections persist across tabs in selection order. Review that order before adding selected drafts to the Main Queue. Add all applies to the current tab. Clear and regeneration act on drafts; Regenerate unselected preserves selected drafts. A Main Queue change makes existing drafts stale without hiding them; revalidate on transfer and show conflicts for attention. A draft cannot be transferred twice; a distinct intentional rematch is allowed. Main Queue regeneration remains a separate control and retains its existing protected-manual rules.
+Selections persist across tabs in selection order. Review that order before adding selected drafts to the Main Queue. Add all applies to the current tab. Clear this tab and Generate again act on drafts; Replace unselected preserves selected drafts, and Remove unselected removes the others. A Main Queue change makes existing drafts stale without hiding them; revalidate on transfer and show conflicts for attention. A draft cannot be transferred twice; a distinct intentional rematch is allowed. Main Queue regeneration remains a separate control and retains its existing protected-manual rules.
 
 ## Attention and regeneration
 

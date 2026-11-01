@@ -64,6 +64,8 @@ export const sessionSetupSchema = z
     /** Only read when minimumIsCalculated is false */
     minimumGames: z.string(),
     expectedPlayers: optionalWhole(1, EXPECTED_ERROR),
+    /** True until the QM types a number: Expected players follows the slot budget and saves as null */
+    expectedIsAuto: z.boolean(),
     notes: z.string(),
   })
   .extend(sessionFinancialsSchema.shape)
@@ -128,6 +130,7 @@ export const PAGE_FIELDS: (keyof SessionSetupInput)[][] = [
     'minimumIsCalculated',
     'minimumGames',
     'expectedPlayers',
+    'expectedIsAuto',
   ],
   [
     'courtFeePerCourtHour',

@@ -1,4 +1,5 @@
 import { sessionFinancialsDefaultValues } from '@rotra/ui/forms/session-financials-fields/default-values'
+import { slotBudget } from './SessionSetupForm.helpers'
 import type { SessionSetupInput } from './SessionSetupForm.schema'
 
 const pad = (n: number) => String(n).padStart(2, '0')
@@ -9,8 +10,12 @@ export function tomorrowYmd(now = new Date()): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
 }
 
-/** New-session defaults from the prototype's draftFrom(): tomorrow 19:00–22:00, two courts, Doubles, Fair. */
+/**
+ * New-session defaults from the prototype's draftFrom(): tomorrow 19:00–22:00, two courts, Doubles,
+ * Fair. Expected players starts at the slot budget and follows it until the QM types a number.
+ */
 export function sessionSetupDefaultValues(playersPerCourt = 8): SessionSetupInput {
+  const courtLabels = ['Court 1', 'Court 2']
   return {
     ...sessionFinancialsDefaultValues,
     title: '',
@@ -20,7 +25,7 @@ export function sessionSetupDefaultValues(playersPerCourt = 8): SessionSetupInpu
     venue: { venueId: '', name: '', address: '' },
     repeat: 'none',
     repeatCount: 4,
-    courtLabels: ['Court 1', 'Court 2'],
+    courtLabels,
     courtStarts: ['', ''],
     courtEnds: ['', ''],
     playersPerCourt,
@@ -29,7 +34,8 @@ export function sessionSetupDefaultValues(playersPerCourt = 8): SessionSetupInpu
     sessionMode: 'fair',
     minimumIsCalculated: true,
     minimumGames: '4',
-    expectedPlayers: '12',
+    expectedPlayers: String(slotBudget({ courtLabels, playersPerCourt })),
+    expectedIsAuto: true,
     notes: '',
   }
 }

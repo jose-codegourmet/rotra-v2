@@ -26,11 +26,11 @@ Setup is **three pages** (decided October 26, 2026, to make setting up a queue f
 | 1 · Details | **Title** (required), date, start time, end time, **venue** (required, one field chosen from the club's saved venues). An end time at or before the start time means the session ends the next day. The duration is shown |
 | 1 · Courts | Number of courts booked (at least 1) and a label for each, defaulting to "Court 1", "Court 2", … |
 | 2 · Formats and mode | Singles and Doubles switches for automatic generation; one session-wide mode: Chill, Fair, or Hard |
-| 2 · Minimum games | Minimum completed games per player: calculated by default, or set by the operator. Expected players is optional; left empty it uses the slot budget (courts × players per court) |
+| 2 · Minimum games | Minimum completed games per player: calculated by default, or set by the operator. Expected players defaults to the slot budget (courts × players per court) and follows it until the operator types a number; clearing it follows the slot budget again. An untouched value is saved empty, so the session keeps following its slots |
 | 3 · Financials | Optional cost estimate; see [Financials](../financials/README.md) |
 | 3 · Notes and review | Optional notes shown on the public page, plus a summary with an Edit link per section |
 
-A new session defaults to tomorrow, 7:00–10:00 PM, two courts, Doubles on, Singles off, Fair mode, and 12 expected players.
+A new session defaults to tomorrow, 7:00–10:00 PM, two courts, Doubles on, Singles off, Fair mode, and expected players = the slot budget (courts × players per court) until the operator changes it.
 
 The venue may differ from the club's fixed founding address and never changes it.
 

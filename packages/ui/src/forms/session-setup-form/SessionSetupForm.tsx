@@ -18,6 +18,7 @@ import {
   type KeyboardEvent,
   type ReactNode,
   type Ref,
+  useEffect,
   useImperativeHandle,
   useState,
 } from 'react'
@@ -121,7 +122,12 @@ export function SessionSetupForm({
 }: SessionSetupFormProps) {
   const form = useForm<SessionSetupInput, unknown, SessionSetupValues>({
     resolver: zodResolver(sessionSetupSchema),
-    defaultValues: { ...sessionSetupDefaultValues(playersPerCourtDefault), ...initialValues },
+    defaultValues: {
+      ...sessionSetupDefaultValues(playersPerCourtDefault),
+      ...initialValues,
+      // A stored or restored number is the QM's own; empty follows the slot budget.
+      expectedIsAuto: initialValues?.expectedIsAuto ?? !initialValues?.expectedPlayers?.trim(),
+    },
     mode: 'onSubmit',
   })
   const [page, setPage] = useState(Math.max(0, Math.min(2, initialPage)))
@@ -150,10 +156,16 @@ export function SessionSetupForm({
   }))
 
   const values = form.watch()
-  const financialPlayers = Math.max(
-    1,
-    editContext?.rosterCount || Number(values.expectedPlayers) || 1,
-  )
+  const slots = slotBudget(values)
+  // Untouched Expected players follows courts × players per court, on every page.
+  useEffect(() => {
+    if (values.expectedIsAuto && form.getValues('expectedPlayers') !== String(slots))
+      form.setValue('expectedPlayers', String(slots))
+  }, [form, slots, values.expectedIsAuto])
+  const expected = Number(values.expectedPlayers)
+  const players =
+    editContext?.rosterCount || (Number.isInteger(expected) && expected > 0 ? expected : slots)
+  const financialPlayers = Math.max(1, players)
   const financeParsed = sessionFinancialsSchema.safeParse(values)
   const hasCosts =
     values.courtFeePerCourtHour !== '' ||
@@ -224,6 +236,8 @@ export function SessionSetupForm({
       if (!isPending && !offline)
         onSubmit({
           ...parsedValues,
+          // Still following the slots: save null so the session keeps following them.
+          expectedPlayers: parsedValues.expectedIsAuto ? null : parsedValues.expectedPlayers,
           minimumGames: parsedValues.minimumIsCalculated
             ? String(estimatedMinimum)
             : parsedValues.minimumGames,
@@ -236,12 +250,7 @@ export function SessionSetupForm({
     },
   )
 
-  const expected = Number(values.expectedPlayers)
-  const estimatedMinimum = computeEstimate(
-    values,
-    editContext?.rosterCount ||
-      (Number.isInteger(expected) && expected > 0 ? expected : slotBudget(values)),
-  ).low
+  const estimatedMinimum = computeEstimate(values, players).low
   const last = STEPS.length - 1
   // Only page 3 saves. Before it, a submit (Enter in a field) acts as Next and never saves.
   const onFormSubmit = (event: FormEvent<HTMLFormElement>) => {

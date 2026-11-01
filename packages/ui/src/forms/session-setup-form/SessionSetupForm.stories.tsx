@@ -133,6 +133,34 @@ export const EnterActsAsNext: Story = {
     await waitFor(() => expect(args.onSubmit).toHaveBeenCalledTimes(1))
   },
 }
+/** 1 court × 10: Expected players is 10 and follows court changes while untouched. */
+export const ExpectedFollowsSlots: Story = {
+  args: { initialValues: { ...withVenue, courtLabels: ['Court 1'], playersPerCourt: 10 } },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: 'Next' }))
+    await expect(await canvas.findByLabelText('Expected players')).toHaveValue('10')
+    await userEvent.click(canvas.getByRole('button', { name: 'Back' }))
+    await userEvent.click(await canvas.findByRole('button', { name: 'Add a court' }))
+    await userEvent.click(canvas.getByRole('button', { name: 'Next' }))
+    await expect(await canvas.findByLabelText('Expected players')).toHaveValue('20')
+  },
+}
+/** A saved number is the QM's own: court changes keep it. */
+export const ExpectedSetByYou: Story = {
+  args: {
+    initialValues: {
+      ...withVenue,
+      courtLabels: ['Court 1'],
+      playersPerCourt: 10,
+      expectedPlayers: '12',
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: 'Add a court' }))
+    await userEvent.click(canvas.getByRole('button', { name: 'Next' }))
+    await expect(await canvas.findByLabelText('Expected players')).toHaveValue('12')
+  },
+}
 export const SingleClash: Story = {
   args: {
     initialValues: withVenue,

@@ -62,6 +62,19 @@ export function playersPerGame(values: Pick<SessionSetupInput, 'allowSingles' | 
   return values.allowDoubles && values.allowSingles ? 10 / 3 : values.allowSingles ? 2 : 4
 }
 
+/** What a form submit does on a page: the last page saves, every earlier page acts as Next. */
+export function setupSubmitAction(page: number, last: number): 'next' | 'save' {
+  return page >= last ? 'save' : 'next'
+}
+
+const NON_TEXT_INPUTS = new Set(['button', 'checkbox', 'radio', 'submit', 'reset', 'file', 'image'])
+
+/** Whether Enter in this element is a browser implicit submission (text-like inputs only). */
+export function isEnterSubmitTarget(el: { tagName: string; type?: string } | null): boolean {
+  if (!el || el.tagName !== 'INPUT') return false
+  return !NON_TEXT_INPUTS.has((el.type || 'text').toLowerCase())
+}
+
 export const MODE_OPTIONS = [
   { value: 'chill', label: 'Chill', text: 'Aims for roughly 30% easy games per player.' },
   { value: 'fair', label: 'Fair', text: 'Mainly level-matched games, roughly 10% easy games.' },

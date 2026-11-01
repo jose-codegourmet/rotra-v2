@@ -338,6 +338,7 @@
     "storybook": "storybook dev --port 6006",
     "build-storybook": "storybook build",
     "lint": "biome check .",
+    "test": "vitest run",
     "type-check": "tsc --noEmit"
   },
   "peerDependencies": {
@@ -372,6 +373,7 @@
     "storybook": "^10.6.4",
     "tailwindcss": "^4.3.3",
     "typescript": "^5.9.3",
-    "vite": "^8.3.5"
+    "vite": "^8.3.5",
+    "vitest": "^5.0.5"
   }
 }

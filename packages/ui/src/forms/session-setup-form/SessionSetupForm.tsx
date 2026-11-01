@@ -13,10 +13,22 @@ import { sessionFinancialsSchema } from '@rotra/ui/forms/session-financials-fiel
 import { Notice } from '@rotra/ui/notice'
 import type { RepeatOccurrence } from '@rotra/ui/repeat-schedule-panel'
 import { type SetupStep, SetupStepBar } from '@rotra/ui/setup-step-bar'
-import { type ReactNode, type Ref, useImperativeHandle, useState } from 'react'
+import {
+  type FormEvent,
+  type KeyboardEvent,
+  type ReactNode,
+  type Ref,
+  useImperativeHandle,
+  useState,
+} from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { sessionSetupDefaultValues } from './SessionSetupForm.defaultValues'
-import { durationMinutes, slotBudget } from './SessionSetupForm.helpers'
+import {
+  durationMinutes,
+  isEnterSubmitTarget,
+  setupSubmitAction,
+  slotBudget,
+} from './SessionSetupForm.helpers'
 import {
   PAGE_FIELDS,
   type SessionSetupInput,
@@ -81,8 +93,9 @@ const PARTS = [
 ]
 
 /**
- * Q-SETUP: the three-page session setup wizard. Only page 1 is required; Create session works from
- * any page and the rest uses defaults. Pickers and clash summaries are the container's dialogs.
+ * Q-SETUP: the three-page session setup wizard. Only page 1 is required and the rest uses defaults;
+ * only page 3 saves, and Enter on pages 1–2 acts as Next. Pickers and clash summaries are the
+ * container's dialogs.
  */
 export function SessionSetupForm({
   mode,
@@ -193,7 +206,7 @@ export function SessionSetupForm({
     setPage(next)
   }
   const validatePage = async (index: number) => {
-    const ok = await form.trigger(PAGE_FIELDS[index] ?? [])
+    const ok = await form.trigger(PAGE_FIELDS[index] ?? [], { shouldFocus: true })
     const blocked = index === 0 && clashBlocks
     setStepError(!ok || blocked)
     return ok && !blocked
@@ -230,6 +243,23 @@ export function SessionSetupForm({
       (Number.isInteger(expected) && expected > 0 ? expected : slotBudget(values)),
   ).low
   const last = STEPS.length - 1
+  // Only page 3 saves. Before it, a submit (Enter in a field) acts as Next and never saves.
+  const onFormSubmit = (event: FormEvent<HTMLFormElement>) => {
+    if (setupSubmitAction(page, last) === 'save') {
+      void submit(event)
+      return
+    }
+    event.preventDefault()
+    void next()
+  }
+  // Pages 1–2 have no submit button, so browsers skip implicit submission: Enter calls Next itself.
+  const onFormKeyDown = (event: KeyboardEvent<HTMLFormElement>) => {
+    if (event.key !== 'Enter' || event.nativeEvent.isComposing) return
+    if (setupSubmitAction(page, last) === 'save') return
+    if (!isEnterSubmitTarget(event.target as HTMLInputElement)) return
+    event.preventDefault()
+    void next()
+  }
   const saveLabel = mode === 'edit' ? 'Save changes' : 'Create session'
   const sections: ReactNode[] = [
     <SetupDetailsSection
@@ -272,7 +302,12 @@ export function SessionSetupForm({
 
   return (
     <FormProvider {...form}>
-      <form noValidate onSubmit={submit} className="flex flex-col gap-5">
+      <form
+        noValidate
+        onSubmit={onFormSubmit}
+        onKeyDown={onFormKeyDown}
+        className="flex flex-col gap-5"
+      >
         <div className="flex flex-col gap-1.5">
           <h1>{mode === 'edit' ? 'Edit preparation' : 'Create session'}</h1>
           <p className="m-0 text-[13px] text-fg2">
@@ -284,7 +319,7 @@ export function SessionSetupForm({
           <p className="m-0 text-xs text-fg2">
             {mode === 'edit'
               ? 'Tap any step to jump to it.'
-              : 'Only page 1 is required. Create session works from any page; the rest uses sensible defaults you can change later.'}{' '}
+              : 'Only page 1 is required; the rest uses sensible defaults you can change later. Create session is on page 3.'}{' '}
             Finished steps glow green.
           </p>
         </div>
@@ -329,13 +364,10 @@ export function SessionSetupForm({
             {page === 0 ? 'Cancel' : 'Back'}
           </Button>
           <div className="flex flex-wrap items-center gap-2">
-            {page !== last ? (
-              <Button type="submit" disabled={offline || isPending} loading={isPending}>
-                {saveLabel}
-              </Button>
-            ) : null}
+            {/* Distinct keys: React must never morph Next into the submit button mid-click. */}
             {page === last ? (
               <Button
+                key="save"
                 type="submit"
                 variant="primary"
                 disabled={offline || isPending}
@@ -344,7 +376,7 @@ export function SessionSetupForm({
                 {saveLabel}
               </Button>
             ) : (
-              <Button variant="primary" onClick={next}>
+              <Button key="next" variant="primary" onClick={next}>
                 Next
               </Button>
             )}

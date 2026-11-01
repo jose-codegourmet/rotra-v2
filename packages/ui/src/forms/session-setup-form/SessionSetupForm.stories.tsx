@@ -7,7 +7,7 @@ import { estimateSessionCost } from '@rotra/data/session-cost/rules'
 import { toTimeInput } from '@rotra/ui/forms/add-court-form/default-values'
 import type { RepeatOccurrence } from '@rotra/ui/repeat-schedule-panel'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { fn } from 'storybook/test'
+import { expect, fn, waitFor } from 'storybook/test'
 import { SessionSetupForm, type SessionSetupFormProps } from './SessionSetupForm'
 import { durationMinutes, playersPerGame, sessionTimes } from './SessionSetupForm.helpers'
 import type { SessionSetupInput } from './SessionSetupForm.schema'
@@ -98,6 +98,39 @@ export const NewSession: Story = {}
 export const PageOneErrors: Story = {
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole('button', { name: 'Next' }))
+  },
+}
+/** Next → Next lands on Costs and review without saving; only page 3's Create session saves. */
+export const NextReachesReviewWithoutSaving: Story = {
+  args: { initialValues: withVenue },
+  play: async ({ args, canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: 'Next' }))
+    await userEvent.click(await canvas.findByRole('button', { name: 'Next' }))
+    await expect(
+      await canvas.findByRole('heading', { name: 'Costs and review' }),
+    ).toBeInTheDocument()
+    await expect(args.onSubmit).not.toHaveBeenCalled()
+    await userEvent.click(canvas.getByRole('button', { name: 'Create session' }))
+    await waitFor(() => expect(args.onSubmit).toHaveBeenCalledTimes(1))
+  },
+}
+/** Enter acts as Next on pages 1–2 and saves once on page 3. */
+export const EnterActsAsNext: Story = {
+  args: { initialValues: withVenue },
+  play: async ({ args, canvas, userEvent }) => {
+    await userEvent.type(canvas.getByLabelText('Session title'), '{Enter}')
+    await expect(
+      await canvas.findByRole('heading', { name: 'Formats, mode and minimum' }),
+    ).toBeInTheDocument()
+    await expect(canvas.queryByRole('button', { name: 'Create session' })).toBeNull()
+    await userEvent.type(canvas.getByLabelText('Expected players'), '{Enter}')
+    await expect(
+      await canvas.findByRole('heading', { name: 'Costs and review' }),
+    ).toBeInTheDocument()
+    await expect(args.onSubmit).not.toHaveBeenCalled()
+    canvas.getByRole('button', { name: 'Create session' }).focus()
+    await userEvent.keyboard('{Enter}')
+    await waitFor(() => expect(args.onSubmit).toHaveBeenCalledTimes(1))
   },
 }
 export const SingleClash: Story = {

@@ -21,7 +21,7 @@ A numbered step bar shows **three pages** (Date, venue and courts · Formats, mo
 
 Each step button's accessible name says its state (“Step 1, Date, venue and courts, complete”). Skipping never bypasses validation: **Next** still checks the current step, and saving checks every step and opens the first one with an error.
 
-Footer: **Cancel**/**Back**, then **Create session** (or **Save changes** when editing) on pages 1–2 beside **Next**, and the primary **Create session** on page 3. Hint on new sessions: “Only page 1 is required. Create session works from any page; the rest uses sensible defaults you can change later.” Older six-step drafts open on the matching page.
+Footer: **Cancel**/**Back** and **Next** on pages 1–2; on page 3, the primary **Create session** (or **Save changes** when editing). Only page 3 saves. Enter in a field on pages 1–2 acts as **Next** (it checks that page and focuses the first error); Enter on page 3 saves once. Hint on new sessions: “Only page 1 is required; the rest uses sensible defaults you can change later. Create session is on page 3.” Older six-step drafts open on the matching page.
 
 | Page · section | Contents |
 |---|---|
@@ -51,7 +51,7 @@ A single session that clashes shows the message on step 1 and cannot continue or
 
 On phones the dialog is a bottom sheet. Start and end stay time fields.
 
-Footer actions: **Cancel** on step 1, otherwise **Back**; **Next**; on the last step **Create session** / **Save changes**. When editing, **Save changes** is also available on every step. Save buttons are disabled offline.
+Footer actions: **Cancel** on step 1, otherwise **Back**; **Next**; on the last step **Create session** / **Save changes**, the only save (creating and editing alike). Save buttons are disabled offline.
 
 Validation on Next and on save:
 

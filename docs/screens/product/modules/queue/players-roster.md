@@ -74,7 +74,7 @@ Segmented tabs:
 
 Picking a saved or Player Information player shows a confirmation card: picture, name, RTR ID or “Guest · no RTR ID”, identity chip, “Phone hidden by player. Use their RTR ID or QR code instead.” when hidden, “Player Information suggestion: LEVEL” or “None yet”, and **Level for this club** (“(locks immediately)” when live), preset to the suggestion. Player Information picks also require Q-IDENTIFY. Actions **Back** and **Confirm player slot**.
 
-When every slot is taken, the sheet warns “All 24 slots are taken. New players go on the waitlist as #N. You can give them a slot later.” and the button reads **Add to waitlist**; the player is added to the waitlist with their level instead of the roster.
+During preparation, when every slot is taken, the sheet warns “All 24 slots are taken. New players go on the waitlist as #N. You can give them a slot later.” and the button reads **Add to waitlist**; the player is added to the waitlist with their level instead of the roster. During an active Queue Session the Queue Master can admit a player directly even when the budget is full; they join present and with their level locked.
 
 Errors: “Choose a level for this club before adding.”; “Enter a name.”; “Choose a level for this club.”
 

@@ -41,7 +41,7 @@ Header “Courts” with “F of C free”. Cards flow in a responsive grid.
 - With a ready match: “Skipped #1: REASON.” when earlier matches are blocked; “Next eligible: #P · FORMAT”; the two teams; **Review and start**; **Pick another** when more than one match is waiting.
 - With none ready: “No waiting match can start: REASON.” or “The queue is empty.” and **Add match**.
 
-A last tile **+ Add court** (“Becomes Court N, free right away”) opens Q-ADD-COURT.
+A last tile **+ Add court** (“Set a planned court window”) opens Q-ADD-COURT.
 
 Footer copy: “A match never starts by itself when a court frees up. You start each one.”
 
@@ -92,7 +92,7 @@ Sheet titled “Add LABEL?”.
 
 Errors: “Choose a closing time.”; “Choose a time later than now.”; “That's after the session ends at HH:MM. Pick an earlier time, or extend the session first.”
 
-Preview: “LABEL will be free right away and open until HH:MM, about DURATION from now.” Note: “Courts show their closing time on the card. ROTRA doesn't stop a game at that time; it's a reminder for you.” Primary **Add LABEL**. Toast: “LABEL added · open until HH:MM”.
+Preview: “LABEL is planned to open until HH:MM.” Note: “Courts show their closing time on the card. ROTRA doesn't stop a game at that time; it's a reminder for you.” Primary **Add LABEL**. Toast: “LABEL added · open until HH:MM”.
 
 ## State behavior
 
@@ -112,3 +112,9 @@ Preview: “LABEL will be free right away and open until HH:MM, about DURATION f
 - Extending time moves the closing time of courts set to “until the session ends”, not of courts with a set time.
 - An occupied court has no Remove action.
 - A court past its closing time shows Booking ended but its game continues.
+
+### Court windows and live admission
+
+Q-COURTS shows each booking window, including courts not yet available. Before planned start, no dispatch action is offered. The end is advisory: show Booking ended but continue to allow dispatch until the Queue Master removes the free court. Q-ADD-COURT and editing expose planned start and an end that follows session end or a fixed time. Start becomes fixed after the court has hosted a match; the planned end may be extended. Reject windows outside the session, indicate next-day times, and retain the free-court and at-least-one-court restrictions.
+
+Q-POOL allows adding a late player or admitting any selected waitlisted player directly above budget. The admitted player is present with a locked level; waiting players are not automatically admitted at session start. Display played, queued and suggested counts separately; only Main Queue waiting matches contribute queued counts.

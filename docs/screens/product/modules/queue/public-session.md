@@ -16,7 +16,7 @@ Do not copy the reference's ads, Can't go, Matches, Chat, or multiple-organizer 
 
 ## Q-PUBLIC-JOIN — Guest join request
 
-Shown under the hero on prepared and live sessions. Card **Want to play?**: “N of M slots open.” (or “All slots are taken; confirmed guests join the waitlist.”) “Send a quick request and the Queue Master confirms it.” with **Request to join**. When the club turned requests off: “This session isn't taking requests online. Contact the Queue Master to play.”
+Shown under the hero on prepared and live sessions. Card **Want to play?**: “N of M slots open.” (or, during preparation, “All slots are taken; confirmed guests join the waitlist.” During an active session the card says the Queue Master can admit additional players.) “Send a quick request and the Queue Master confirms it.” with **Request to join**. When the club turned requests off: “This session isn't taking requests online. Contact the Queue Master to play.”
 
 Sheet **Request to join**: session line (title · date, time · venue); **Your name** (required, “Enter your name.”); **Nickname (optional)**; **Phone (optional)** with “Helps the club recognise you and link your ROTRA profile. Only the club sees it.” (“Enter a full mobile number, or leave it empty.”); **Your level**: Beginner / Intermediate / Advanced / Not sure (“Pick your level, or Not sure.”; hint “Your best guess. The Queue Master sets your level for the night.”); note “This is a request, not a booking. The Queue Master confirms each guest before giving a slot.” **Cancel** / **Send request** (toast “Request sent”).
 

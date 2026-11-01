@@ -92,3 +92,7 @@ Show previous/new weights or threshold, validate the complementary total, and ex
 ## D-DISCARD — Unsubmitted form edits
 
 For session/profile/lineup drafts, show **Discard unsaved changes?** only when needed. Discard affects unsubmitted form edits, not durable offline match operations or pending sync records. Never reuse this dialog as permission to clear a device's unsynced session data.
+
+## D-AUTO-TRANSFER — Add selected drafts
+
+Show the selected drafts in selection order before adding to Main Queue. Confirm revalidates lineups and player presence; a conflict leaves drafts available for attention. Repeating the action cannot add the same draft twice. A separate intentional rematch is allowed. Add all is scoped to the current tab.

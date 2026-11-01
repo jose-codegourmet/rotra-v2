@@ -75,3 +75,7 @@ Conflicting confirmations from different devices are retained in sync staging, n
 Drafted in Prisma by F07.14; keys, triggers and the end-of-match order are in [physical schema](../../physical-schema.md#group-f--matches-participation-occupancy-decisions-f0714--20261031000700).
 
 Business source: [matches](../../../../business_logic/product/queue/modules/matches/README.md), [queue rules](../../../../business_logic/product/queue/modules/queueing/README.md).
+
+## Auto Queue handoff (October 31, 2026)
+
+Auto Queue suggestions are alternative drafts outside the accepted Main Queue. Planned load, ordered cross-tab selection, transfer revalidation and idempotency need reconciliation before backend implementation. Drafts do not create played results; distinct intentional rematches remain valid. Storage and synchronization details are not decided by this handoff.

@@ -54,13 +54,14 @@ Rules: [Sessions](business_logic/product/queue/modules/sessions/README.md) ·
 | Session states | **Prepared** (set up, not started) → **Active** (running) → **Finalized** (validly finished) or **Invalid** (untrusted records). DB proposal adds a transient `finalizing` and names finalized `completed` |
 | Slot | An operator-confirmed place in a session |
 | Slot budget | Players per court (club default 8) × courts = number of slots |
-| Waitlist | First-come list of players added after slots filled; the operator gives them slots |
+| Waitlist | Players awaiting admission; prepared placement is first-come, while during an active session the Queue Master may choose anyone |
 | Session link | The session's public page URL. Guests can send a join request from it |
 | Join request | A guest's request for a slot. Holds nothing until the QM confirms or declines |
 | Session mode | Pairing preset: **Chill** (≈30% easy games), **Fair** (mostly level-matched, ≈10% easy), **Hard** (allows 2–3 games in a row) |
 | Formats | Standard: singles, doubles. Fun: 1v2, 3v3, 4v4, 5v5 (5v5 uses two courts) |
 | Calculated minimum | Minimum-games target estimated from courts, length, players, formats; operator can override |
-| Open until | A court's closing time (session end or earlier). A reminder, never a hard stop |
+| Planned start | A court booking start; the court is unavailable for dispatch until then |
+| Open until | A court's planned end, fixed or following session end; a reminder, never a hard stop |
 | Booking ended | A court past its closing time |
 | Venue | A place the club plays; the club's founding location is separate and fixed |
 | Session record | Read-only view of a finalized or invalid session |
@@ -116,7 +117,10 @@ Rules: [Queueing](business_logic/product/queue/modules/queueing/README.md)
 | Manual | Operator builds a lineup slot by slot |
 | Make match | Operator picks players; ROTRA picks the format from the count and balances teams |
 | Suggest | ROTRA proposes one lineup with a reason, for approval |
-| Auto queue | Generates several waiting matches at once (operator picks 2/3/4/6); starts still need confirmation |
+| Main Queue | Accepted shared waiting list used for dispatch |
+| Auto Queue | Five alternative generation tabs holding drafts until explicitly transferred to the Main Queue |
+| Available Players / Plan Ahead / Longest Wait / Fewest Games / Catch Up | Auto Queue generation strategies; Catch Up uses an explicitly chosen completed-game target |
+| Draft | A suggested future lineup held outside the Main Queue; neither queued nor played |
 | Regenerate | Rebuilds unprotected waiting matches; keeps protected manual ones |
 | Protected manual match | Created or edited by the operator; survives regeneration unless it needs attention |
 | Match number | Fixed creation-order number: Match 1, 2, … Never reused |

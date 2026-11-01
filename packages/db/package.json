@@ -22,7 +22,10 @@
     "./admin/audit": "./src/admin/audit.ts",
     "./admin/clubs": "./src/admin/clubs.ts",
     "./admin/licenses": "./src/admin/licenses.ts",
-    "./admin/configuration": "./src/admin/configuration.ts"
+    "./admin/configuration": "./src/admin/configuration.ts",
+    "./player/identity": "./src/player/identity.ts",
+    "./player/profile": "./src/player/profile.ts",
+    "./player/claim": "./src/player/claim.ts"
   },
   "scripts": {
     "db:generate": "prisma generate",

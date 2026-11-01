@@ -21,3 +21,15 @@ screen loaded one, and returns an allowlisted DTO.
 - A new Free club stores no paid prices and gets no fake license history.
 - A renewal starts when current access ends, or now when lapsed (stacking is a proposal, #245).
 - Saving a ranking policy records configuration only; it never claims ranks were refreshed.
+
+## F07.22 · Identity matching, RTR ID allocation, profile reads
+
+| Module | Commands |
+|---|---|
+| `player/identity` | `resolveClubPlayerIdentity` (after the entry syncs: phone advisory lock → reuse the player and allocation, or create player + private contact + RTR ID in one transaction; unique races retry from resolution); `resolveSessionIdentities` |
+| `player/profile` | public `readPublicProfile`, `findPublicProfileByRtrId` (allowlisted `PlayerProfile`, only for allocated IDs); own `readMyAccount`, `readMyProfile`, `updateMyProfile` (expected revision, no contact fields), `setPhonePrivacy`; club `readClubVisiblePhone` (phone only, and only when not hidden) |
+| `player/claim` | `issueClaimLink` (club's linked unclaimed player; token digest only; reissue revokes), `readClaimLink` (masked phone), `completeClaim` (provider login keyed on the link ID, then one transaction: email, account mapping, claimed, link consumed) |
+
+- A phone already linked to a different club player in the same club is marked `conflicted` for review, never merged.
+- Unclaimed and claimed profiles differ: only a valid link plus the provider login claims; a name or RTR ID never does.
+- Historical guest attribution projections are F07.30.

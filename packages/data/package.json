@@ -304,7 +304,11 @@
     "./match/useEditAutoQueueDrafts": "./src/match/useEditAutoQueueDrafts.ts",
     "./match/useGenerateAutoQueueDrafts": "./src/match/useGenerateAutoQueueDrafts.ts",
     "./match/useTransferAutoQueueDrafts": "./src/match/useTransferAutoQueueDrafts.ts",
-    "./mock/queue-examples": "./src/mock/queueExamples.ts"
+    "./mock/queue-examples": "./src/mock/queueExamples.ts",
+    "./batch/debouncedBatch": "./src/batch/debouncedBatch.ts",
+    "./batch/useDebouncedBatch": "./src/batch/useDebouncedBatch.ts",
+    "./session-roster/flushSessionPresence": "./src/batch/flushBatches.ts",
+    "./session-roster/useSetPresenceMany": "./src/session-roster/useSetPresenceMany.ts"
   },
   "scripts": {
     "lint": "biome check .",

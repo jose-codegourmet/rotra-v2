@@ -5,6 +5,7 @@ export const rosterRowMeta = {
   description:
     'One confirmed slot on the preparation roster: picture, name, identity chip, the Player Information suggestion, the level select with its diff indicator, the Present switch and remove.',
   usage: [
+    'presencePending shows Saving presence… without disabling the switch; the data batch owns optimistic values and rollback.',
     'Read-only Session settings passes readOnly for locked level and presence text without removal or presence controls.',
     'Use inside RosterPanel for every player with a slot in a prepared session.',
     'Do not use in the live console: Queue › Players shows locked levels and no remove action (PlayerPoolCard).',

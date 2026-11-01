@@ -19,6 +19,7 @@ export type RosterPanelPlayer = {
   suggestion: PlayingLevel | null
   level: PlayingLevel | null
   present: boolean
+  presencePending?: boolean
 }
 
 export type RosterPanelProps = {
@@ -167,6 +168,7 @@ export function RosterPanel({
                 suggestion={p.suggestion}
                 level={p.level}
                 present={p.present}
+                presencePending={p.presencePending}
                 levelLocked={levelsLocked}
                 readOnly={readOnly}
                 onOpenProfile={() => onOpenProfile(p.id)}

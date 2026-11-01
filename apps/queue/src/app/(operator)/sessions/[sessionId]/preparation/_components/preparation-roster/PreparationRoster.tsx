@@ -10,7 +10,7 @@ import { useRemoveFromWaitlist } from '@rotra/data/session-roster/useRemoveFromW
 import { useRemoveRosterPlayer } from '@rotra/data/session-roster/useRemoveRosterPlayer'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { useSetAllPresence } from '@rotra/data/session-roster/useSetAllPresence'
-import { useSetPresence } from '@rotra/data/session-roster/useSetPresence'
+import { useSetPresenceMany } from '@rotra/data/session-roster/useSetPresenceMany'
 import { useSetRosterLevel } from '@rotra/data/session-roster/useSetRosterLevel'
 import { PlayerProfileSheet } from '@rotra/ui/player-profile-sheet'
 import { RosterPanel, type RosterPanelPlayer } from '@rotra/ui/roster-panel'
@@ -45,7 +45,10 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
   const roster = useSessionRoster(sessionId)
   const clubPlayers = useClubPlayers()
   const setLevel = useSetRosterLevel()
-  const setPresence = useSetPresence()
+  const setPresence = useSetPresenceMany(sessionId, {
+    onSuccess: (result) => toast(result.message),
+    onError: (error) => toast.error(errorMessage(error)),
+  })
   const setAllPresence = useSetAllPresence()
   const remove = useRemoveRosterPlayer()
   const giveSlot = useGiveSlot()
@@ -74,6 +77,7 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
       suggestion: p?.suggestion ?? null,
       level: r.level,
       present: r.present,
+      presencePending: setPresence.pending.has(r.id),
     }
   })
   const entries: WaitlistPanelEntry[] = waitlist.map((w) => {
@@ -116,14 +120,14 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
           readOnly={s?.state === 'active'}
           onMarkAllPresent={() => setAllPresence.mutate({ sessionId, present: true }, options)}
           onMarkAllAbsent={() => setAllPresence.mutate({ sessionId, present: false }, options)}
-          onAddPlayer={() => setAddOpen(true)}
+          onAddPlayer={() => {
+            void setPresence.flush().then(() => setAddOpen(true))
+          }}
           onOpenProfile={openProfileFromRoster}
           onLevelChange={(rosterId, level) =>
             setLevel.mutate({ sessionId, rosterId, level }, options)
           }
-          onPresentChange={(rosterId, present) =>
-            setPresence.mutate({ sessionId, rosterId, present }, options)
-          }
+          onPresentChange={setPresence.set}
           onRemove={(rosterId) => remove.mutate({ sessionId, rosterId }, options)}
         />
       ) : (

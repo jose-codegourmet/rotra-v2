@@ -147,3 +147,9 @@ Returning incomplete profile: offer the registration link path online and option
 - Presence changes flag future lineups without terminating an active game.
 
 The mock Queue app now wires active admission through the same saved, directory, new-player and join-request paths as preparation. The live slot meter is advisory; any selected waitlisted player can be admitted. Counts and public participant projections refetch after changes. The in-memory working copy resets on reload; it is not durable offline storage.
+
+### Instant presence switches (#324, owner decision November 1, 2026)
+
+Preparation and live Players use the same optimistic presence overlay and 800 ms background batch. Switches, status and counts update together, without disabling the grid. On/off reversals within a window produce no write. The batch carries wanted end states, uses one Roster sync entry and one summary toast (“N players marked present, M away”, omitting zero groups; singular “1 player marked present” / “1 player marked away”), with a unique waiting-match attention count when turning players away. A failure shows the existing error once and rolls back only failed revisions, preserving later taps. Pending cards say “Saving presence…”. In live filters, cards leaving the filter retain their position until settlement or a filter/sort change.
+
+Flush before tab changes, adding players, Make match, and every other roster write (including level, removal, admission and bulk presence operations), as well as hiding/leaving the page. Mark everyone present/absent itself retains its current behavior. The shared DebouncedBatch/useDebouncedBatch helper is reusable by payment ticket #300; payment switches are outside #324. Pending UI state is transient, not durable offline storage.

@@ -65,7 +65,9 @@ When anyone is waiting or the session is full, the same **Waitlist** panel as pr
 
 Footer copy: “Make match splits the players into teams balanced by level and adds it to the end of the queue. Present controls who can be paired automatically; turning someone off never ends their current game.”
 
-Turning presence off confirms how many waiting matches now need attention.
+**Presence saving (Jose, November 1, 2026, #324).** Switches, status and Available/Present/Everyone counts change immediately. The grid stays interactive. Save wanted end states in one batch 800 ms after the last tap; returning a player to their accepted state within that window produces no write. Show “Saving presence…” on pending cards. A card leaving its current filter stays in place, greyed when away, until its batch settles or the operator changes filter/sort. Counts already reflect the new state.
+
+One success toast per batch: “N player(s) marked present, M away” (omit a zero group); append “ · K waiting match(es) need(s) attention”, counting each affected waiting match once. Existing offline-save wording still applies. One existing error toast per failed batch; roll back only that batch's unchanged revisions and preserve newer taps. Pending presence is flushed before console/preparation tab changes, Make match, Add late player/Add player, and other roster writes, and on unmount, pagehide or hiding the page. A browser leave warns while a flush is outstanding; this in-memory mock cannot promise durable saves after the browser is destroyed. No per-player toast and no optimistic “saved” claim.
 
 ## Q-LEADERBOARD — Tonight's standings
 

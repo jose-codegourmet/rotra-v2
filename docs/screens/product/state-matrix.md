@@ -110,3 +110,7 @@ Prepared overflow waits by default; active arrivals enter directly and lock thei
 ### Court booking windows (mock)
 
 The live clock refreshes eligibility every second, including while Start match is open. Start confirms against the current clock again. Future courts show Not open yet with Start anyway (and Open all courts now in the header); an early-opened court shows Free with “Opened early · planned …”; passed ends stay advisory. Booking edits and extensions preserve fields on save failure/conflict and block repeat submission. A used start is fixed. Occupied removal and last-court removal remain guarded. Overnight times explicitly show next day. This browser clock is not a durable scheduler or an offline clock guarantee.
+
+### Presence batches (mock, #324)
+
+Presence switches remain interactive while saving. A pending optimistic overlay survives query refetches and shows “Saving presence…”; no saved claim appears before acceptance. A failed batch removes only its unchanged revisions, leaving later taps intact, with one existing error toast. Offline without a downloaded copy, an expired prepared session, and finalizing/completed/invalid sessions reject the whole batch atomically. Active sessions keep the existing license-continuation exception. Before browser exit, initiate a flush and warn while it remains outstanding; destruction/reload still resets in-memory mock data.

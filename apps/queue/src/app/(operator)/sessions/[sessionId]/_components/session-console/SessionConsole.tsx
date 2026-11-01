@@ -11,6 +11,7 @@ import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { MockError } from '@rotra/data/mock/errors'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionPayments } from '@rotra/data/session-payment/useSessionPayments'
+import { flushSessionPresence } from '@rotra/data/session-roster/flushSessionPresence'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { useSyncState } from '@rotra/data/sync/useSyncState'
 import { Button } from '@rotra/ui/button'
@@ -151,7 +152,10 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
 
   // Session done opens the three-step sheet from the footer button and the dock pill alike; offline
   // both are disabled.
-  const onSessionDone = useCallback(() => setSheet('session-done'), [])
+  const onSessionDone = useCallback(async () => {
+    await flushSessionPresence(sessionId)
+    setSheet('session-done')
+  }, [sessionId])
   const sessionDone = useMemo(
     () => ({
       label: 'Session done',
@@ -314,7 +318,10 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
       <Tabs
         aria-label="Console views"
         value={view}
-        onChange={(value) => setView(value as ConsoleView)}
+        onChange={async (value) => {
+          await flushSessionPresence(sessionId)
+          setView(value as ConsoleView)
+        }}
         items={tabs}
       >
         <TabsContent value="session" className="flex flex-col gap-5">

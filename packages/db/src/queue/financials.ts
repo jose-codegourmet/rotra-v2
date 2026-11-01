@@ -34,6 +34,7 @@ import {
  */
 
 const CATEGORIES: InventoryCategory[] = ['shuttlecocks', 'equipment', 'other']
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 function centavos(value: number | null | undefined, field: string, { allowNull = true } = {}) {
   if (value == null) {
@@ -83,12 +84,15 @@ export async function saveInventoryItem(
 ) {
   await requireClubEntitlement(context)
   const name = input.name.trim()
+  if (!UUID.test(input.id)) throw new ServiceError('invalid', { id: 'Expected a UUID.' })
   if (!name) throw new ServiceError('invalid', { name: 'Enter a name.' })
   if (!CATEGORIES.includes(input.category))
     throw new ServiceError('invalid', { category: 'Choose a category.' })
   if (!Number.isInteger(input.stock) || input.stock < 0)
     throw new ServiceError('invalid', { stock: 'Enter a stock of zero or more.' })
   const unitCostMinor = centavos(input.unitCostMinor, 'unitCost', { allowNull: false }) as number
+  if (unitCostMinor % 100 !== 0)
+    throw new ServiceError('invalid', { unitCost: 'Enter a whole-peso amount.' })
   return prisma.$transaction(async (tx) => {
     const existing = await tx.inventoryItem.findUnique({ where: { id: input.id } })
     if (existing && existing.clubId !== context.clubId) throw new ServiceError('not_found')
@@ -122,22 +126,36 @@ export async function stepInventoryStock(
 ) {
   await requireClubEntitlement(context)
   if (input.delta !== 1 && input.delta !== -1) throw new ServiceError('invalid')
+  if (!UUID.test(input.id)) throw new ServiceError('not_found')
   const rows = await prisma.$executeRaw`
     UPDATE "inventory_items" SET "stock" = "stock" + ${input.delta}, "revision" = "revision" + 1, "updated_at" = now()
     WHERE "id" = ${input.id}::uuid AND "club_id" = ${context.clubId}::uuid AND "removed_at" IS NULL
       AND "stock" + ${input.delta} >= 0`
+  const item = await ownItem(context, input.id)
+  if (!item || item.removedAt) throw new ServiceError('not_found')
   if (!rows) throw new ServiceError('invalid', { stock: 'Stock can’t go below zero.' })
-  return inventoryDto(await prisma.inventoryItem.findUniqueOrThrow({ where: { id: input.id } }))
+  return inventoryDto(item)
 }
 
-/** Soft remove: past estimates may still reference the item. */
+/** This club's item by ID; another club's ID reads as missing. */
+async function ownItem(context: ClubContext, id: string) {
+  return prisma.inventoryItem.findFirst({ where: { id, clubId: context.clubId } })
+}
+
+/**
+ * Soft remove: past estimates may still reference the item. A retried remove returns the removed
+ * item again; an ID this club doesn't own is `not_found`.
+ */
 export async function removeInventoryItem(context: ClubContext, id: string) {
   await requireClubEntitlement(context)
+  if (!UUID.test(id)) throw new ServiceError('not_found')
   await prisma.inventoryItem.updateMany({
     where: { id, clubId: context.clubId, removedAt: null },
     data: { removedAt: new Date(), revision: { increment: 1 } },
   })
-  return null
+  const item = await ownItem(context, id)
+  if (!item) throw new ServiceError('not_found')
+  return inventoryDto(item)
 }
 
 const minutes = (session: QueueSession) =>

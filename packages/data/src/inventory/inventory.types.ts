@@ -8,4 +8,6 @@ export type InventoryItem = {
   unitCostMinor: number
   currency: 'PHP'
   removedAt?: number
+  /** Saved data only: the revision an edit must match (real mode). */
+  revision?: string
 }

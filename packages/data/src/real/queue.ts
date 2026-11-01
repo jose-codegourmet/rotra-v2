@@ -3,6 +3,8 @@ import { clubInitials } from '../club/club.rules'
 import type { Club } from '../club/club.types'
 import type { ClubPlayerView } from '../club-player/fetchers'
 import type { ClubVenue } from '../club-venue/clubVenue.types'
+import type { SaveInventoryItemInput } from '../inventory/fetchers'
+import type { InventoryItem } from '../inventory/inventory.types'
 import type { ClubAccess } from '../license/license.types'
 import { MockError } from '../mock/errors'
 import type { PlayingLevel } from '../player/player.types'
@@ -165,6 +167,75 @@ export async function realSaveClubVenue(
     fields: { courtFee: 'courtFeeMinor', entranceFee: 'entranceFeeMinor' },
   })
   return accepted(venueOf(venue), `${venue.name} added to your venues`)
+}
+
+// ---------- Inventory (Q-INVENTORY) ----------
+
+type WireInventoryItem = Omit<InventoryItem, 'removedAt' | 'revision'> & {
+  removedAt: string | null
+  revision: string
+}
+
+const inventoryItemOf = (item: WireInventoryItem): InventoryItem => ({
+  id: item.id,
+  clubId: item.clubId,
+  name: item.name,
+  category: item.category,
+  unit: item.unit,
+  stock: item.stock,
+  unitCostMinor: item.unitCostMinor,
+  currency: item.currency,
+  removedAt: msOrNull(item.removedAt) ?? undefined,
+  revision: item.revision,
+})
+
+/** Online only: inventory edits are not part of the offline sync change log. */
+export async function realGetInventory() {
+  const { items, stockValueMinor } = await realRequest<{
+    items: WireInventoryItem[]
+    stockValueMinor: number
+  }>('/api/inventory')
+  return {
+    items: items.map((item) => ({ ...inventoryItemOf(item), runningLow: item.stock <= 2 })),
+    stockValue: stockValueMinor,
+  }
+}
+
+/** An add sends the sheet's `commandId` as the item ID, so a retried add saves one item. */
+export async function realSaveInventoryItem(input: SaveInventoryItemInput) {
+  const { item } = await realRequest<{ item: WireInventoryItem }>('/api/inventory', {
+    method: 'POST',
+    body: {
+      id: input.id ?? input.commandId ?? crypto.randomUUID(),
+      expectedRevision: input.id ? input.revision : undefined,
+      name: input.name,
+      category: input.category,
+      unit: input.unit,
+      stock: input.stock,
+      unitCostMinor: input.unitCostMinor,
+    },
+    fields: { unitCost: 'unitCostMinor' },
+  })
+  return accepted(
+    inventoryItemOf(item),
+    input.id ? 'Item saved' : `${item.name} added to inventory`,
+  )
+}
+
+export async function realStepInventoryStock(input: { id: string; delta: -1 | 1 }) {
+  const { item } = await realRequest<{ item: WireInventoryItem }>(
+    `/api/inventory/${encodeURIComponent(input.id)}/stock`,
+    { method: 'POST', body: { delta: input.delta } },
+  )
+  return accepted(inventoryItemOf(item), 'Stock updated')
+}
+
+export async function realRemoveInventoryItem(id: string) {
+  const { item } = await realRequest<{ item: WireInventoryItem }>(
+    `/api/inventory/${encodeURIComponent(id)}`,
+    { method: 'DELETE' },
+  )
+  return accepted(inventoryItemOf(item), `${item.name} removed from inventory`)
 }
 
 // ---------- Queue Sessions (Q-HOME, Q-SETUP, Q-PREPARE) ----------

@@ -4,9 +4,17 @@ import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { mockStore, readMockState } from '../mock/store'
 import { requireClubAccess } from '../mock/transaction'
+import { isRealDataMode } from '../real/mode'
+import {
+  realGetInventory,
+  realRemoveInventoryItem,
+  realSaveInventoryItem,
+  realStepInventoryStock,
+} from '../real/queue'
 import type { InventoryItem } from './inventory.types'
 
 export async function getInventory() {
+  if (isRealDataMode()) return realGetInventory()
   await delay()
   requireClubAccess()
   const items = readMockState().inventory.filter((i) => i.clubId === DEMO_CLUB_ID && !i.removedAt)
@@ -31,11 +39,13 @@ async function changeInventory<T>(
   if (!outcome) throw new Error('Inventory mutation produced no result.')
   return outcome
 }
+/** `commandId` is generated once per open sheet; an add uses it as the new item's ID. */
 export type SaveInventoryItemInput = Omit<
   InventoryItem,
   'id' | 'clubId' | 'currency' | 'removedAt'
-> & { id?: string }
+> & { id?: string; commandId?: string }
 export function saveInventoryItem(input: SaveInventoryItemInput) {
+  if (isRealDataMode()) return realSaveInventoryItem(input)
   return changeInventory((items) => {
     if (!input.name.trim()) throw new MockError('permission', 'Give the item a name.')
     if (
@@ -51,9 +61,10 @@ export function saveInventoryItem(input: SaveInventoryItemInput) {
       ? items.find((i) => i.id === input.id && i.clubId === DEMO_CLUB_ID && !i.removedAt)
       : undefined
     if (input.id && !existing) throw new MockError('permission', 'Item not available.')
+    const { commandId, revision: _revision, ...fields } = input
     const item: InventoryItem = {
-      ...input,
-      id: existing?.id ?? crypto.randomUUID(),
+      ...fields,
+      id: existing?.id ?? commandId ?? crypto.randomUUID(),
       clubId: DEMO_CLUB_ID,
       currency: 'PHP',
       name: input.name.trim(),
@@ -65,6 +76,7 @@ export function saveInventoryItem(input: SaveInventoryItemInput) {
   })
 }
 export function removeInventoryItem(id: string) {
+  if (isRealDataMode()) return realRemoveInventoryItem(id)
   return changeInventory((items) => {
     const item = items.find((i) => i.id === id && i.clubId === DEMO_CLUB_ID && !i.removedAt)
     if (!item) throw new MockError('permission', 'Item not available.')
@@ -73,6 +85,7 @@ export function removeInventoryItem(id: string) {
   })
 }
 export function stepInventoryStock({ id, delta }: { id: string; delta: -1 | 1 }) {
+  if (isRealDataMode()) return realStepInventoryStock({ id, delta })
   return changeInventory((items) => {
     const item = items.find((i) => i.id === id && i.clubId === DEMO_CLUB_ID && !i.removedAt)
     if (!item) throw new MockError('permission', 'Item not available.')

@@ -250,6 +250,15 @@ and persists its immutable URL in `clubs.logo_ref` under the displayed settings 
 it saves null. Queue and Admin readers expose the saved reference instead of returning no logo.
 Bucket setup and snapshot retention are documented in [clubs/licenses](database_design/product/admin/modules/clubs-licenses.md#club-logo-persistence-374).
 
+**Inventory (#375).** In real mode the `@rotra/data/inventory` fetchers call Queue's
+`GET`/`POST /api/inventory`, `POST /api/inventory/[itemId]/stock` and `DELETE /api/inventory/[itemId]`,
+backed by `@rotra/db/queue/financials`. The hooks, `inventoryKeys.list` and the DTO (`items[].runningLow`,
+`stockValue` in centavos) are unchanged, so Q-INVENTORY, the session-setup cost estimate and the
+operator shell read saved items. An add uses an ID generated once per open sheet (a retry saves one
+item); an edit sends the displayed `revision` and a stale one is a conflict; − / + are atomic ±1 with
+no revision check, so quick taps never conflict. Inventory is online only in real mode (#245): offline,
+nothing is sent and the screen says so.
+
 Wrong account types, forged mock cookies, and cross-club/player IDs are denied at the handler, not only
 in the proxy. Database credentials and Supabase keys are read only from server env. Application tables
 have no `anon`/`authenticated` grants, so the Data API exposes none of them.

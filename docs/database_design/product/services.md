@@ -84,12 +84,13 @@ screen loaded one, and returns an allowlisted DTO.
 
 | Module | Commands |
 |---|---|
-| `queue/financials` | `readInventory`, `saveInventoryItem` (client ID; expected revision on edit), `stepInventoryStock` (never below zero), `removeInventoryItem` (soft); `readSessionCost`, `saveSessionCost` (online only, prepared/active, expected estimate revision, this club's items only, empty = delete); `readSessionPayments`, `setPaid`, `markAllPaid` |
+| `queue/financials` | `readInventory`, `saveInventoryItem` (client ID; expected revision on edit; whole-peso cost), `stepInventoryStock` (never below zero; another club's or a removed ID is `not_found`), `removeInventoryItem` (soft; returns the removed item, a retry returns it again, another club's ID is `not_found`); `readSessionCost`, `saveSessionCost` (online only, prepared/active, expected estimate revision, this club's items only, empty = delete); `readSessionPayments`, `setPaid`, `markAllPaid` |
 
 - All arithmetic is the pure `@rotra/data/session-cost/rules` (centavos; court fee to the nearest centavo; break-even up to a whole peso). Totals are derived at read time.
 - A paid tick stores the amount due at that moment (null when no fee is set) under its operation ID; a duplicate applies once and later fee changes never rewrite it. Marks key on the released-not-deleted roster entry, so they survive demotion and show again on restoration. No-fee tick meaning is still #245.
 - Payments stay open after Session done (`completed`), never for `invalid` or `finalizing`; they are separate from immutable results.
 - No new money unit tests were added; the reused rules keep their existing tests.
+- Queue Route Handlers (#375): `GET`/`POST /api/inventory` (list plus `stockValueMinor`; add/edit), `POST /api/inventory/[itemId]/stock` (`{ delta }`), `DELETE /api/inventory/[itemId]`.
 
 ## F07.28 · Server sync acceptance, stream closure, conflict evidence
 

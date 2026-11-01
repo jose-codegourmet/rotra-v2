@@ -16,3 +16,6 @@ export function createWaitlistFixtures(now = Date.now()): SessionWaitlistEntry[]
 }
 
 export const sessionWaitlistFixture = createWaitlistFixtures()
+
+/** Owner scenario: four courts, nine planned places each, with a late 37th arrival. */
+export const admissionCapacityFixture = { capacity: 36, courtCount: 4, playersPerCourt: 9, full: 36, over: 37 }

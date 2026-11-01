@@ -20,6 +20,7 @@ export type JoinRequestsPanelProps = {
   requests: SessionJoinRequest[]
   /** No open slot left: confirmed guests go on the waitlist and the primary button says so */
   slotsFull?: boolean
+  live?: boolean
   /** `card` on Preparation; `sheet` drops the card chrome and heading for the live console's sheet */
   variant?: 'card' | 'sheet'
   /** Requests are still loading: Skeleton rows in place of the list */
@@ -61,6 +62,7 @@ const LEVEL_ERROR = 'Choose a level for this club before confirming.'
 export function JoinRequestsPanel({
   requests,
   slotsFull = false,
+  live = false,
   variant = 'card',
   loading = false,
   onConfirm,
@@ -138,7 +140,7 @@ export function JoinRequestsPanel({
             <>
               Check each one is a real person you expect (ask at the door, or match their name and
               phone) before confirming. Oldest first.
-              {slotsFull ? ' Slots are full, so confirmed guests go on the waitlist.' : ''}
+              {slotsFull && !live ? ' Slots are full, so confirmed guests go on the waitlist.' : ''}
             </>
           ) : (
             <>
@@ -190,9 +192,9 @@ export function JoinRequestsPanel({
                       size="sm"
                       variant="primary"
                       onClick={() => confirm(r)}
-                      aria-label={`${slotsFull ? 'Confirm to waitlist' : 'Confirm guest'} ${r.name}`}
+                      aria-label={`${slotsFull && !live ? 'Confirm to waitlist' : 'Confirm guest'} ${r.name}`}
                     >
-                      {slotsFull ? 'Confirm to waitlist' : 'Confirm guest'}
+                      {slotsFull && !live ? 'Confirm to waitlist' : 'Confirm guest'}
                     </Button>
                   </div>
                 </div>

@@ -21,6 +21,6 @@ export const joinRequestsPanelMeta = {
     'docs/screens/product/modules/queue/session-console.md',
     'docs/business_logic/product/queue/modules/players/README.md',
   ],
-  variants: ['card', 'sheet'],
+  variants: ['card', 'sheet', 'prepared-full', 'active-full'],
   related: ['SessionLinkCard', 'LevelSelect', 'Chip', 'Avatar', 'Sheet'],
 } satisfies ComponentMeta

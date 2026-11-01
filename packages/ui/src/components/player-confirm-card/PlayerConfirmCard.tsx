@@ -167,7 +167,7 @@ export function PlayerConfirmCard({
             disabled={!canConfirmPlayer(identity, check)}
             onClick={onConfirm}
           >
-            {full ? 'Add to waitlist' : 'Confirm player slot'}
+            {full && !live ? 'Add to waitlist' : 'Confirm player slot'}
           </Button>
         </div>
       ) : null}

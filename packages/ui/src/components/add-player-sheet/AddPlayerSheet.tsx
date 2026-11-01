@@ -60,7 +60,7 @@ export type AddPlayerSheetProps = {
   live?: boolean
   /** Slots in the session (courts × players per court) */
   capacity: number
-  /** Open slots; 0 means new players go on the waitlist */
+  /** Open slots; 0 means prepared additions go on the waitlist */
   openSlots: number
   /** Players already on the waitlist, so the warning can say "#N" */
   waitlistCount: number
@@ -266,7 +266,7 @@ export function AddPlayerSheet({
     onConfirm({ candidate: pick.candidate, source: pick.source, level, identityCheck: check })
   }
 
-  const full = openSlots <= 0
+  const full = !live && openSlots <= 0
   const q = query.trim().toLowerCase()
   const inSession = new Set(inSessionIds)
   const alreadyCount = savedPlayers.filter((p) => inSession.has(p.id)).length

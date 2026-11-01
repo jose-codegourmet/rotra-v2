@@ -40,8 +40,8 @@ export const PHONE_HINT =
   "Without a phone they're saved as a guest. With one, ROTRA can match or create their profile when the session syncs."
 
 /** The submit label the prototype uses: a slot when one is open, otherwise the waitlist. */
-export function addPlayerSubmitLabel(full: boolean | undefined) {
-  return full ? 'Add to waitlist' : 'Confirm player slot'
+export function addPlayerSubmitLabel(full: boolean | undefined, live = false) {
+  return full && !live ? 'Add to waitlist' : 'Confirm player slot'
 }
 
 /**
@@ -132,7 +132,7 @@ export function NewPlayerForm({
         {hideSubmit ? null : (
           <div className="flex flex-wrap justify-end gap-2.5">
             <Button type="submit" variant="primary" loading={isPending}>
-              {addPlayerSubmitLabel(full)}
+              {addPlayerSubmitLabel(full, live)}
             </Button>
           </div>
         )}

@@ -29,7 +29,8 @@
     "./player/contact-change": "./src/player/contact-change.ts",
     "./queue/public-session": "./src/queue/public-session.ts",
     "./queue/match-store": "./src/queue/match-store.ts",
-    "./queue/match-queue": "./src/queue/match-queue.ts"
+    "./queue/match-queue": "./src/queue/match-queue.ts",
+    "./queue/match-control": "./src/queue/match-control.ts"
   },
   "scripts": {
     "db:generate": "prisma generate",

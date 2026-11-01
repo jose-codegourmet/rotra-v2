@@ -68,3 +68,14 @@ screen loaded one, and returns an allowlisted DTO.
 - Each match is keyed on its operation ID (`source_operation_id`); a batch is keyed on the command as `generation_id`, so a retried Auto queue or Regenerate returns the same matches.
 - Regenerate rebuilds only waiting non-protected drafts and protected entries that need attention; healthy manual entries and active matches are untouched. A stale queue revision is `conflict`.
 - Generation reuses the prototype reference heuristic from `@rotra/data/match/queue.rules` with a seed from the operation; the final heuristic is still open.
+
+## F07.26 · Atomic match start, substitution, permanent results
+
+| Module | Commands |
+|---|---|
+| `queue/match-control` | `startMatch` (revalidates with the shared `canStart`, then one court hold per court — two for 5v5 — court usage rows and one player hold per player, all in one transaction); `substitutePlayer` (closes the outgoing segment and opens the incoming one under the same operation, moves the hold); `completeMatch` / `invalidateMatch` (close segments, release usage, free every hold, append the one decision) |
+
+- Simultaneous starts lose on the hold primary keys (court, roster entry, known global player), so nothing is half-held.
+- Winner-only results keep both scores null; scores must agree with the winner (`validateResult`).
+- A retried terminal command returns the original outcome; an agreeing one from another operation returns it too; a contradicting one is stored as a `contradictory_decision` conflict and reported as `conflict`. Nothing ever updates a decision, and the SQL triggers freeze the match after it.
+- Substituted players keep their segments; the shared counting rule gives neither credit. Invalid decisions produce no facts at finalization.

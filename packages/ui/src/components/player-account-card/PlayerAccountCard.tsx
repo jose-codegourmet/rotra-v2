@@ -16,7 +16,7 @@ export type PlayerAccountCardProps = {
  */
 export function PlayerAccountCard({ claimed, registeredOn }: PlayerAccountCardProps) {
   const headingId = useId()
-  let status = "Unclaimed. The club created this profile; the player hasn't finished registering."
+  let status = "Unclaimed. The player hasn't finished registering."
   if (claimed) status = registeredOn ? `Registered ${formatYmd(registeredOn)}` : 'Registered'
   return (
     <Card asChild>

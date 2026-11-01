@@ -32,7 +32,8 @@ export function Toaster() {
  * failure (with an alert icon and longer on screen). Copy comes from the prototype.
  */
 export const toast = Object.assign((message: string) => sonnerToast(message), {
-  success: (message: string) => sonnerToast(message),
+  success: (message: string, options?: { action: { label: string; onClick: () => void } }) =>
+    sonnerToast(message, options),
   error: (message: string) =>
     sonnerToast(message, {
       duration: TOAST_MS * 1.5,

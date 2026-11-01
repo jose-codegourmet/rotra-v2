@@ -7,7 +7,7 @@ export const privateContactCardMeta = {
   usage: [
     'Admin only. Pass the applied contacts; a pending or approved-but-unapplied request never changes what this card shows.',
     "Missing phone or email shows 'Not given'. Phones are E.164 and shown grouped.",
-    "Phone shown to clubs: 'Entered by the club' while unclaimed, otherwise the player's privacy choice.",
+    "Phone shown to clubs: 'Yes, if provided' while unclaimed, otherwise the player's privacy choice.",
     'There is deliberately no password, token or claim-link prop, and no edit control: players change contacts by request.',
     "The player's own Privacy and contact view is ContactDetailsCard.",
   ],

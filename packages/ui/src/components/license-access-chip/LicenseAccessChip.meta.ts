@@ -10,7 +10,7 @@ export const licenseAccessChipMeta = {
     'Always carries its text; colour only reinforces it.',
   ],
   prototype: {
-    file: 'app/mocksups-app/admin-app/rotra-admin.html',
+    file: 'apps/mockup/admin-app/rotra-admin.html',
     screen: 'A-CLUBS › viewClubs() › accessChip()',
   },
   docs: [

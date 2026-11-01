@@ -5,7 +5,7 @@ export const sharedRankCardMeta = {
   description: 'Shows the public shared rank, global position, status and visible skill ladder.',
   usage: ['Use on public and own Player Information profiles.'],
   prototype: {
-    file: 'app/mocksups-app/player-app/rotra-player.html',
+    file: 'apps/mockup/player-app/rotra-player.html',
     screen: 'Profile › Shared rank',
   },
   related: ['SkillLadder', 'EligibilityCard'],

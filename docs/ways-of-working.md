@@ -12,7 +12,7 @@ that disagree.
 
 1. **Docs first, then components, then screens.** Product, screen, and database docs are written
    before code. Code follows them; it doesn't decide product behavior.
-2. **The prototypes are the design.** `app/mocksups-app/*/*.html` are the agreed look and behavior. Build
+2. **The prototypes are the design.** `apps/mockup/*/*.html` are the agreed look and behavior. Build
    to match them, not to improve them. A UI change goes into the mockup first and reaches the apps
    through a ticket made from its [mockup change log](mockup-changes/README.md).
 3. **Mock first.** Screens run on `@rotra/data` mocks until the database epic. A finished-looking
@@ -83,7 +83,7 @@ Always in this sequence, because each step depends on the one before:
 ## Context
 - Rule: docs/business_logic/product/queue/modules/<module>/README.md#<section>
 - Screen: <Q-/P-/A- ID> in docs/screens/product/modules/<product>/<file>.md
-- Prototype: app/mocksups-app/<app>/<file>.html › <screen / tab>
+- Prototype: apps/mockup/<app>/<file>.html › <screen / tab>
 
 ## Scope
 - …
@@ -241,7 +241,7 @@ Check in this order:
 | `docs/coding-conventions.md` | A convention is added or changed (including a new dependency) |
 | `docs/product-terms.md` | A term, state name, or code identifier is added or renamed |
 | `docs/business_logic/`, `docs/screens/`, `docs/database_design/` | The product owner decides a behavior. Move it from open to settled |
-| `app/mocksups-app/*` | Any layout or UI change is requested (mockup first). Each change writes a log in [mockup-changes/](mockup-changes/README.md) and fixes business logic + database design docs it made untrue |
+| `apps/mockup/*` | Any layout or UI change is requested (mockup first). Each change writes a log in [mockup-changes/](mockup-changes/README.md) and fixes business logic + database design docs it made untrue |
 | `docs/mockup-changes/*` | A mockup changes (new log, `Status: NEW`), or a log becomes a ticket (`Status: ALREADY A TICKET — #<n>`) |
 | `<Name>.meta.ts` | A component's purpose or variants change |
 

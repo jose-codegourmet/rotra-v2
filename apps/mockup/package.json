@@ -1,0 +1,12 @@
+{
+  "name": "@rotra/mockups",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "node --watch dev-server.mjs",
+    "start": "node dev-server.mjs",
+    "lint": "biome check router.js router.d.ts dev-server.mjs build.mjs package.json tsconfig.json",
+    "type-check": "tsc --noEmit",
+    "build": "node build.mjs"
+  }
+}

@@ -10,7 +10,7 @@ export const syncStatusMeta = {
     'A connection dot alone never proves sync; the label always says the state.',
   ],
   prototype: {
-    file: 'app/mocksups-app/queue-app/rotra-queue.html',
+    file: 'apps/mockup/queue-app/rotra-queue.html',
     screen: 'Top bar › .conn (.off, .sync); Sync status sheet',
   },
   docs: [

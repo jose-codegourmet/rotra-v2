@@ -4,7 +4,7 @@
 
 > **Status (2026-10-27): partly superseded.** For colors, tokens, typography (the prototypes use Manrope +
 > JetBrains Mono, not Satoshi), both themes (dark default + light), and component looks, the prototypes
-> in [`app/mocksups-app/`](../../app/mocksups-app) win. Keep using this file for brand identity, personality, logo,
+> in [`apps/mockup/`](../../apps/mockup) win. Keep using this file for brand identity, personality, logo,
 > iconography intent, and the characters in `materials/`.
 
 ---

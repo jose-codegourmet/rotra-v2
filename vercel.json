@@ -4,6 +4,21 @@
     "deploymentEnabled": false
   },
   "services": {
+    "mockup": {
+      "root": "apps/mockup",
+      "buildCommand": "pnpm run build",
+      "outputDirectory": "dist/public",
+      "redirects": [
+        { "source": "/queue-app/rotra-queue.html", "destination": "/queue", "permanent": false },
+        { "source": "/player-app/rotra-player.html", "destination": "/player", "permanent": false },
+        { "source": "/admin-app/rotra-admin.html", "destination": "/admin", "permanent": false }
+      ],
+      "rewrites": [
+        { "source": "/queue/:path*", "destination": "/queue-app/rotra-queue.html" },
+        { "source": "/player/:path*", "destination": "/player-app/rotra-player.html" },
+        { "source": "/admin/:path*", "destination": "/admin-app/rotra-admin.html" }
+      ]
+    },
     "queue": {
       "root": "apps/queue",
       "framework": "nextjs"
@@ -20,6 +35,11 @@
   "rewrites": [
     {
       "source": "/(.*)",
+      "has": [{ "type": "host", "value": "mockup.rotra.club" }],
+      "destination": { "service": "mockup" }
+    },
+    {
+      "source": "/(.*)",
       "has": [{ "type": "host", "value": "queue.rotra.club" }],
       "destination": { "service": "queue" }
     },
@@ -32,6 +52,10 @@
       "source": "/(.*)",
       "has": [{ "type": "host", "value": "admin.rotra.club" }],
       "destination": { "service": "admin" }
+    },
+    {
+      "source": "/(.*)",
+      "destination": { "service": "mockup" }
     }
   ]
 }

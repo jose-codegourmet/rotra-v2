@@ -22,4 +22,4 @@ Keep selections across tabs in selection order and show that order for review be
 
 ## Handoff
 
-These decisions are reconciled into the business and screen specifications, terminology, states, dialogs, flows and canonical Queue prototype under `app/mocksups-app/queue-app/`. The dependent mock implementation and its verification limits are recorded in [mock implementation evidence](06-mock-implementation.md). Database design needs a later reconciliation; no backend work is authorized here.
+These decisions are reconciled into the business and screen specifications, terminology, states, dialogs, flows and canonical Queue prototype under `apps/mockup/queue-app/`. The dependent mock implementation and its verification limits are recorded in [mock implementation evidence](06-mock-implementation.md). Database design needs a later reconciliation; no backend work is authorized here.

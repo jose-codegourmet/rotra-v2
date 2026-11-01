@@ -9,7 +9,7 @@ export const leaderboardRowMeta = {
     'Pass isMe for the signed-in player.',
   ],
   prototype: {
-    file: 'app/mocksups-app/player-app/rotra-player.html',
+    file: 'apps/mockup/player-app/rotra-player.html',
     screen: 'P-LEADERBOARD › lbRow',
   },
   docs: ['docs/screens/product/modules/player-information/ranking-history.md'],

@@ -8,7 +8,7 @@ export const spinnerMeta = {
     'For page or list loading use Skeleton, never a full-page spinner.',
   ],
   prototype: {
-    file: 'app/mocksups-app/admin-app/rotra-admin.html',
+    file: 'apps/mockup/admin-app/rotra-admin.html',
     screen: 'Shared styles › .spin',
   },
   related: ['Button', 'Skeleton'],

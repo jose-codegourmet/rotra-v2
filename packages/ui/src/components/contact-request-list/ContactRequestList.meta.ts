@@ -11,7 +11,7 @@ export const contactRequestListMeta = {
     "Empty: 'No requests.'",
   ],
   prototype: {
-    file: 'app/mocksups-app/admin-app/rotra-admin.html',
+    file: 'apps/mockup/admin-app/rotra-admin.html',
     screen: 'A-PLAYER-DETAIL › viewPlayer() › Contact-change requests',
   },
   docs: [

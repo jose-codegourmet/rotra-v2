@@ -10,7 +10,7 @@ export const clubIdentityPanelMeta = {
     'Founding address and city code never change here.',
   ],
   prototype: {
-    file: 'app/mocksups-app/queue-app/rotra-queue.html',
+    file: 'apps/mockup/queue-app/rotra-queue.html',
     screen: 'Club settings › Club identity (#club-identity)',
   },
   docs: ['docs/screens/product/modules/queue/access-home.md'],

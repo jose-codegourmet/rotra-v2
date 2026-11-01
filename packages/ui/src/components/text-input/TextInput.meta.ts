@@ -10,7 +10,7 @@ export const textInputMeta = {
     'For several lines use Textarea; for times use TimeField.',
   ],
   prototype: {
-    file: 'app/mocksups-app/queue-app/rotra-queue.html',
+    file: 'apps/mockup/queue-app/rotra-queue.html',
     screen: 'Shared styles › .input',
   },
   docs: ['docs/coding-conventions.md#6-forms'],

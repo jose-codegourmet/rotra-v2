@@ -10,7 +10,7 @@ export const clubIdentityCardMeta = {
     'The founding address is never a session venue; the running session venue lives in ActiveSessionCard.',
   ],
   prototype: {
-    file: 'app/mocksups-app/admin-app/rotra-admin.html',
+    file: 'apps/mockup/admin-app/rotra-admin.html',
     screen: 'A-CLUB-DETAIL › Overview › Identity',
   },
   docs: [

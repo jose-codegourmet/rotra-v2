@@ -8,7 +8,7 @@ export const myPlayerIdMeta = {
     "Copy ID toasts 'Player ID copied', or selects the ID when the clipboard is blocked.",
   ],
   prototype: {
-    file: 'app/mocksups-app/player-app/rotra-player.html',
+    file: 'apps/mockup/player-app/rotra-player.html',
     screen: 'My player ID (viewId)',
   },
   docs: ['docs/screens/product/modules/player-information/identity-privacy.md'],

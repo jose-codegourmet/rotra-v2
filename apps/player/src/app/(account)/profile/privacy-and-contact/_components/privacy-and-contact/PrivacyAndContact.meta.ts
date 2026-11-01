@@ -9,7 +9,7 @@ export const privacyAndContactMeta = {
     'Request a change opens P-CONTACT-REQUEST through useContactChangeSheet, shared with Edit profile.',
   ],
   prototype: {
-    file: 'app/mocksups-app/player-app/rotra-player.html',
+    file: 'apps/mockup/player-app/rotra-player.html',
     screen: 'Privacy and contact (viewAccount), SHEETS.request',
   },
   docs: [

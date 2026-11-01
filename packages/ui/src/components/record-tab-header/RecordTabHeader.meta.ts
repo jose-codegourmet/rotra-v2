@@ -9,7 +9,7 @@ export const recordTabHeaderMeta = {
     'The record tabs sit under the page h1 in SessionRecordHeader, so the title is an h2.',
   ],
   prototype: {
-    file: 'app/mocksups-app/queue-app/rotra-queue.html',
+    file: 'apps/mockup/queue-app/rotra-queue.html',
     screen: 'Q-HISTORY › histResultsPane(), histNightPane(), histPlayersPane() (.between h2)',
   },
   docs: ['docs/screens/product/modules/queue/results-sharing.md#q-history--session-record'],

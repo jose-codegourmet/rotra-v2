@@ -11,7 +11,7 @@ export const clubPriceFormMeta = {
     'While isPending, Save price reads "Saving…" and nothing can be pressed; serverError shows above the buttons and the typed values stay.',
   ],
   prototype: {
-    file: 'app/mocksups-app/admin-app/rotra-admin.html',
+    file: 'apps/mockup/admin-app/rotra-admin.html',
     screen: 'A-CLUB-PRICE › SHEETS.price',
   },
   docs: [

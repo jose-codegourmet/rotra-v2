@@ -10,7 +10,7 @@ export const claimFormMeta = {
     'Password has no minimum length until the auth specification sets one.',
   ],
   prototype: {
-    file: 'app/mocksups-app/player-app/rotra-player.html',
+    file: 'apps/mockup/player-app/rotra-player.html',
     screen: 'viewClaim › Finish registering (FORM.claim)',
   },
   docs: ['docs/screens/product/modules/player-information/access-registration.md'],

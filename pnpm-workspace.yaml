@@ -1,6 +1,5 @@
 packages:
   - "apps/*"
-  - "app/mocksups-app"
   - "packages/*"
 allowBuilds:
   "@prisma/engines": true

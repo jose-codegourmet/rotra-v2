@@ -3,7 +3,7 @@
 Status: ALREADY A TICKET — #301
 Date: 2026-10-31
 App: queue
-Mockup: app/mocksups-app/queue-app/rotra-queue.html › Saved players
+Mockup: apps/mockup/queue-app/rotra-queue.html › Saved players
 Screen ID: Q-SAVED-PLAYERS
 
 ## What changed

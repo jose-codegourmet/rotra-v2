@@ -11,7 +11,7 @@ export const contactRequestStatusChipMeta = {
     "The player's own view uses ContactRequestStatus, whose words are written for the player.",
   ],
   prototype: {
-    file: 'app/mocksups-app/admin-app/rotra-admin.html',
+    file: 'apps/mockup/admin-app/rotra-admin.html',
     screen: 'REQ / reqChip(), viewContacts() Status column, viewReview() page head',
   },
   docs: [

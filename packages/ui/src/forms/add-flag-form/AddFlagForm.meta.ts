@@ -14,7 +14,7 @@ export const addFlagFormMeta = {
     'No field for which apps or behaviors a flag affects, and no targeting, schedule or audience (open decisions).',
   ],
   prototype: {
-    file: 'app/mocksups-app/admin-app/rotra-admin.html',
+    file: 'apps/mockup/admin-app/rotra-admin.html',
     screen: 'A-ADD-FLAG › SHEETS.addFlag (form step), flagErrors(), flagKeyOf()',
   },
   docs: [

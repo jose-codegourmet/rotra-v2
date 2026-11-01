@@ -9,7 +9,7 @@ export const offlineBandMeta = {
     'Use Notice for content-level messages rather than this global connection state.',
   ],
   prototype: {
-    file: 'app/mocksups-app/player-app/rotra-player.html',
+    file: 'apps/mockup/player-app/rotra-player.html',
     screen: 'topBar() › .band-off',
   },
   docs: ['docs/screens/product/experience-contract.md#standard-states'],

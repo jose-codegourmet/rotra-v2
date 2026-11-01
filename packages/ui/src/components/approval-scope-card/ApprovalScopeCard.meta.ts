@@ -9,7 +9,7 @@ export const approvalScopeCardMeta = {
     "Pass the request's field and the player's nickname or first name.",
   ],
   prototype: {
-    file: 'app/mocksups-app/admin-app/rotra-admin.html',
+    file: 'apps/mockup/admin-app/rotra-admin.html',
     screen: "A-CONTACT-REVIEW › viewReview() › 'What approval changes'",
   },
   docs: [

@@ -10,7 +10,7 @@ export const activeSessionCardMeta = {
     'The venue is the session venue, kept apart from the founding address in ClubIdentityCard.',
   ],
   prototype: {
-    file: 'app/mocksups-app/admin-app/rotra-admin.html',
+    file: 'apps/mockup/admin-app/rotra-admin.html',
     screen: 'A-CLUB-DETAIL › Overview › Active session',
   },
   docs: [

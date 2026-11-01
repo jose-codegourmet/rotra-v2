@@ -11,7 +11,7 @@ export const listRowMeta = {
     'For tables with several columns use DataTable.',
   ],
   prototype: {
-    file: 'app/mocksups-app/queue-app/rotra-queue.html',
+    file: 'apps/mockup/queue-app/rotra-queue.html',
     screen: 'Shared styles › .list, .li (.click, .main); rotra-admin.html › .who',
   },
   related: ['Card', 'Avatar', 'DataTable'],

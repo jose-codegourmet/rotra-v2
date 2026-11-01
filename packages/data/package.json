@@ -298,7 +298,8 @@
     "./match/auto-queue-rules": "./src/match/autoQueue.rules.ts",
     "./match/auto-queue-mutations": "./src/match/autoQueue.mutations.ts",
     "./match/useAutoQueueDrafts": "./src/match/useAutoQueueDrafts.ts",
-    "./match/useEditAutoQueueDrafts": "./src/match/useEditAutoQueueDrafts.ts"
+    "./match/useEditAutoQueueDrafts": "./src/match/useEditAutoQueueDrafts.ts",
+    "./match/useGenerateAutoQueueDrafts": "./src/match/useGenerateAutoQueueDrafts.ts"
   },
   "scripts": {
     "lint": "biome check .",

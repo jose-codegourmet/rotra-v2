@@ -14,6 +14,7 @@ import { AdminNav, type AdminNavKey } from '@rotra/ui/admin-nav'
 import { AdminOfflineBand } from '@rotra/ui/admin-offline-band'
 import { AppShell } from '@rotra/ui/app-shell'
 import { TopBar } from '@rotra/ui/app-shell/top-bar'
+import { ErrorState } from '@rotra/ui/error-state'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { ThemeToggle } from '@rotra/ui/theme-toggle'
 import { useQueryClient } from '@tanstack/react-query'
@@ -97,12 +98,15 @@ export function AdminWorkspaceShell({ children }: { children: ReactNode }) {
       },
     })
   const kind = session.data.kind
+  // Only a signed-out session goes to sign-in. A denied account (signed in, but not an active admin,
+  // e.g. a club signed in on another localhost port) and a failed session read stay here: the proxy
+  // sees a provider session and would send /login straight back, leaving a blank page.
   useEffect(() => {
-    if (!session.isPending && kind !== 'owner') {
+    if (!session.isPending && !session.isError && kind === 'signed-out') {
       router.replace('/login')
       router.refresh()
     }
-  }, [kind, session.isPending, router])
+  }, [kind, session.isPending, session.isError, router])
   const countsDenied =
     isPermissionError(clubs.error) ||
     isPermissionError(players.error) ||
@@ -112,21 +116,43 @@ export function AdminWorkspaceShell({ children }: { children: ReactNode }) {
   useLayoutEffect(() => {
     if (countsDenied) reportPermissionDenied()
   }, [countsDenied, reportPermissionDenied])
-  if (permissionDenied)
+  const topBar = (
+    <TopBar product="Admin" width="window">
+      <ThemeToggle />
+    </TopBar>
+  )
+  if (permissionDenied || session.data.kind === 'denied')
     return (
       <>
-        <TopBar product="Admin" width="window">
-          <ThemeToggle />
-        </TopBar>
+        {topBar}
         <AccessDeniedCard
-          accountDescription="the signed-in account"
+          accountDescription={
+            session.data.kind === 'denied'
+              ? session.data.accountDescription
+              : 'the signed-in account'
+          }
           isSigningOut={signOut.isPending}
           onSignOut={handleSignOut}
         />
       </>
     )
   if (session.isPending) return <Skeleton label="Loading Admin" />
-  if (session.data.kind !== 'owner') return null
+  if (session.isError)
+    return (
+      <>
+        {topBar}
+        <main className="mx-auto max-w-[560px] px-4 pt-10">
+          <ErrorState
+            title="Couldn't check your sign-in."
+            onRetry={() => void session.refetch()}
+            retryLabel="Retry"
+          >
+            Check your connection, then try again.
+          </ErrorState>
+        </main>
+      </>
+    )
+  if (session.data.kind !== 'owner') return <Skeleton label="Loading Admin" />
   const email = session.data.account.email
   const current =
     (Object.keys(HREFS) as AdminNavKey[]).find(

@@ -1,5 +1,6 @@
 import type { PlayerRankStatus } from '@rotra/data/admin-player/types'
 import type { PlayingLevel } from '@rotra/data/player/types'
+import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { KeyValueList } from '@rotra/ui/key-value-list'
 import { levelLabel } from '@rotra/ui/level-pill'
@@ -14,6 +15,8 @@ export type PlayerRankCardProps = {
   recentMatches: number
   /** Recent matches the leaderboard needs, from the configuration in effect (never a draft) */
   matchRequirement: number
+  historyHref?: string
+  linkComponent?: import('react').ElementType
 }
 
 function rankText({ status, level, recentMatches, matchRequirement }: PlayerRankCardProps) {
@@ -29,11 +32,17 @@ function rankText({ status, level, recentMatches, matchRequirement }: PlayerRank
  * controls; Admin can't change ranks, winners or scores.
  */
 export function PlayerRankCard(props: PlayerRankCardProps) {
+  const Link = props.linkComponent ?? 'a'
   const headingId = useId()
   return (
     <Card asChild>
       <section aria-labelledby={headingId} className="flex flex-col gap-3">
         <h2 id={headingId}>Rank and games</h2>
+        {props.historyHref ? (
+          <Button asChild>
+            <Link href={props.historyHref}>View full history</Link>
+          </Button>
+        ) : null}
         <KeyValueList
           items={[
             { label: 'Rank', value: rankText(props) },

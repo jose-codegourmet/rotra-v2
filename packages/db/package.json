@@ -17,7 +17,12 @@
     "./service/handler": "./src/service/handler.ts",
     "./service/route-cookies": "./src/service/route-cookies.ts",
     "./queue/session-preparation": "./src/queue/session-preparation.ts",
-    "./queue/session-roster": "./src/queue/session-roster.ts"
+    "./queue/session-roster": "./src/queue/session-roster.ts",
+    "./auth/provider-admin": "./src/auth/provider-admin.ts",
+    "./admin/audit": "./src/admin/audit.ts",
+    "./admin/clubs": "./src/admin/clubs.ts",
+    "./admin/licenses": "./src/admin/licenses.ts",
+    "./admin/configuration": "./src/admin/configuration.ts"
   },
   "scripts": {
     "db:generate": "prisma generate",

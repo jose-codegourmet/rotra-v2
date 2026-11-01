@@ -1,5 +1,6 @@
 'use client'
 
+import { useAuditEvents } from '@rotra/data/admin-audit/useAuditEvents'
 import { useAuditEventsForTargets } from '@rotra/data/admin-audit/useAuditEventsForTargets'
 import { useAdminPlayer } from '@rotra/data/admin-player/useAdminPlayer'
 import { useAdminClubs } from '@rotra/data/club/useAdminClubs'
@@ -26,6 +27,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { useId, useMemo } from 'react'
 import { useDenyOnPermissionError } from '../../../../_components/admin-workspace-shell/AdminWorkspaceShell'
+import { PlayerManagementActions } from '../../../_components/player-management-actions/PlayerManagementActions'
 import { PlayerDetailSkeleton } from './PlayerDetailSkeleton'
 
 /** Grey bars while a card's read is still out. */
@@ -42,7 +44,7 @@ function LinesSkeleton({ label }: { label: string }) {
 /**
  * A-PLAYER-DETAIL: one player identity as Admin sees it. Identity, private contacts (the applied
  * values, never a pending request's), account, read-only rank, this player's contact-change requests
- * and the record of actions on them. Deliberately no edit controls: Admin can't change ranks,
+ * and the record of actions on them. Approved profile edits require review and a reason. Admin cannot change ranks,
  * winners or scores, rebuild sessions, overwrite contacts or merge players. `from` is the directory's
  * query, so Back restores its search, filter and shown count. Skeleton while the player loads,
  * Player not found (not-found.tsx) for an unknown id, Retry when the load fails; the requests and the
@@ -61,6 +63,7 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
     targetType: 'contact_change_request',
     targetIds: requestIds,
   })
+  const playerAuditQuery = useAuditEvents({ targetType: 'player', targetId: playerId })
   const denied = useDenyOnPermissionError(
     playerQuery.error,
     requestsQuery.error,
@@ -75,13 +78,15 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
 
   const activityEntries = useMemo(
     () =>
-      (audit ?? []).map((event) => ({
-        id: event.id,
-        text: event.summary,
-        at: event.at,
-        actor: event.actorEmail,
-      })),
-    [audit],
+      [...(audit ?? []), ...(playerAuditQuery.data ?? [])]
+        .sort((a, b) => b.at.localeCompare(a.at))
+        .map((event) => ({
+          id: event.id,
+          text: event.summary,
+          at: event.at,
+          actor: event.actorEmail,
+        })),
+    [audit, playerAuditQuery.data],
   )
 
   const back = (
@@ -113,7 +118,7 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
   const createdBy =
     (player.createdByClubId === null
       ? undefined
-      : clubsQuery.data?.clubs.find((club) => club.id === player.createdByClubId)?.name) ?? '—'
+      : clubsQuery.data?.clubs.find((club) => club.id === player.createdByClubId)?.name) ?? 'Admin'
   const level = player.levelIndex === null ? null : (PLAYING_LEVELS[player.levelIndex] ?? null)
   const matchRequirement = settingsQuery.data?.matchRequirement
   // The record is read per request, so a failed requests read fails it too; Retry asks again for both.
@@ -123,7 +128,7 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
     <>
       {back}
       <DetailHero
-        media={<Avatar name={player.name} size={52} />}
+        media={<Avatar name={player.name} src={player.picture ?? undefined} size={52} />}
         title={player.name}
         meta={
           <>
@@ -133,6 +138,7 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
           </>
         }
       />
+      <PlayerManagementActions player={player} />
       <SameNameNotice
         variant="detail"
         twins={player.samePlayers.map((twin) => ({
@@ -196,6 +202,8 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
           <PlayerAccountCard claimed={player.claimed} registeredOn={player.registeredOn} />
           {matchRequirement !== undefined ? (
             <PlayerRankCard
+              linkComponent={Link}
+              historyHref={`/players/${playerId}/games?from=${encodeURIComponent(from)}`}
               status={player.rankStatus}
               level={level}
               recentMatches={player.recentStandardMatches}

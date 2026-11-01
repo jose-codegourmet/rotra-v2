@@ -39,3 +39,7 @@ UUID PK; actor admin FK; action; target type/ID; source command ID; timestamp; r
 Do not log passwords, raw claim/reset tokens, or unnecessary contact values. Club actions identify club account/device elsewhere; shared credentials cannot prove the human operator's identity.
 
 Business sources: [configuration](../../../../business_logic/product/admin/modules/configuration/README.md), [player management](../../../../business_logic/product/admin/modules/player-management/README.md).
+
+## F07 follow-up: player management (#335)
+
+The mock UI now supports player archive and eligibility-checked removal. Operational persistence must add archive timestamp and revision, retain audit identity/RTR ID after eligible removal, enforce all history/reference guards transactionally, and allow an Admin claim-link issuer with seven-day expiry and revocation. No schema or migration is introduced by #335. Claims across app origins require a shared server transport, not client storage.

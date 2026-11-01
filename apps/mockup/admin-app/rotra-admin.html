@@ -297,7 +297,7 @@ button.brand { display: flex; align-items: baseline; gap: 8px; background: none;
 .mark span { font-size: 36px; font-weight: 800; letter-spacing: 6px; line-height: 1; }
 .mark b { color: var(--accent); }
 .mark em { font-style: normal; font-weight: 700; color: var(--fg2); font-size: 15px; letter-spacing: .5px; text-transform: uppercase; }
-</style>
+.player-stats{display:flex;gap:12px;overflow:auto;margin-bottom:20px}.player-stats>.card{min-width:150px;flex:1;text-align:left}.player-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}.player-side-panel{left:auto!important;right:0!important;top:0!important;bottom:0!important;transform:none!important;max-height:100dvh!important;border-radius:0!important;width:min(560px,100vw)!important}</style>
 
 <div id="app"></div>
 <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
@@ -856,27 +856,27 @@ function playerMatches() {
     && (!q || plain(`${p.name} ${p.nick} ${p.rtr} ${p.email}`).includes(qp) || (qd.length >= 4 && (p.phone.replace(/\D/g, '').includes(qd) || p.phone.replace(/\D/g, '').includes(qd.replace(/^0/, '63'))))));
 }
 function viewPlayers() {
-  const all = playerMatches(), shown = all.slice(0, S.ui.shown);
-  const F = S.ui.playersF;
-  const reg = S.players.filter((p) => p.claimed).length;
-  const byName = {};
-  all.forEach((p) => { byName[p.name] = (byName[p.name] || 0) + 1; });
-  const dupes = Object.entries(byName).filter(([, n]) => n > 1);
-  return shell(`<div class="page-head"><h1>Players</h1><p class="muted">Every player identity with a permanent RTR ID. Guests a club only typed a name for stay in that club's records and aren't listed.</p></div>
-    <div class="toolbar"><div class="search">${I.search}<input class="input" id="players-q" type="search" placeholder="Search by name, RTR ID, phone or email" aria-label="Search players" data-bind="ui.playersQ" data-live value="${esc(S.ui.playersQ)}"></div>
-      ${seg('playersF', F, [['all', 'All', S.players.length], ['registered', 'Registered', reg], ['unclaimed', 'Unclaimed', S.players.length - reg]], 'Filter by account')}</div>
-    <p class="hint">Phone and email search is only available in Admin. Public search on Player Information never matches them.</p>
-    ${dupes.length && S.ui.playersQ.trim() ? notice('warn', dupes.map(([name, n]) => `<b>${n} players are named ${esc(name)}.</b> They're separate people with separate histories. Check the RTR ID before acting.`).join('<br>')) : ''}
-    <section class="card">${all.length ? `<div class="tbl-wrap"><table class="tbl cards"><thead><tr><th>Player</th><th>RTR ID</th><th>Account</th><th>Rank</th><th>Created by</th></tr></thead><tbody>
-      ${shown.map((p) => { const rk = rankOf(p); return `<tr class="click" data-act="openPlayer" data-id="${p.id}">
-        <td class="lead" data-label="Player"><div class="who">${avatar(p)}<div class="main"><button class="link" data-act="openPlayer" data-id="${p.id}">${esc(p.name)}</button>${p.nick ? `<span class="small muted">“${esc(p.nick)}”</span>` : ''}</div></div></td>
-        <td data-label="RTR ID" class="mono small nw">${esc(p.rtr)}</td>
-        <td data-label="Account">${p.claimed ? chip('Registered', 'ok') : chip('Unclaimed')}</td>
-        <td data-label="Rank">${rk.chip}</td>
-        <td data-label="Created by" class="small">${esc(p.club)}</td></tr>`; }).join('')}
-      </tbody></table></div>
-      <div class="more"><span class="small muted">Showing ${num(shown.length)} of ${num(all.length)}</span>${all.length > shown.length ? `<button class="btn sm" data-act="morePlayers" style="margin-left:12px">Show 25 more</button>` : ''}</div>`
-      : `<div class="empty"><b>No players match “${esc(S.ui.playersQ.trim())}”.</b><span>Check the spelling, try the full RTR ID, or type at least four digits of a phone number.</span><button class="btn sm" data-act="clearPlayers">Clear search</button></div>`}</section>`);
+  const all = playerMatches(), size = S.ui.playerSize || 25, page = Math.min(S.ui.playerPage || 1, Math.max(1, Math.ceil(all.length / size)));
+  const shown = all.slice((page-1)*size,page*size);
+  const labels = ['Advanced','Intermediate','Beginner','No rank','Registered','Unclaimed'];
+  const counts = [all.filter(p=>p.level>=6).length, all.filter(p=>p.level>=3&&p.level<6).length, all.filter(p=>p.level!==null&&p.level<3).length, all.filter(p=>p.level===null).length, all.filter(p=>p.claimed).length, all.filter(p=>!p.claimed).length];
+  return shell(`<div class="page-head"><div class="row between"><h1>Players</h1><button class="btn primary" onclick="playerManagementSheet('Add player')">Add player</button></div><p class="muted">Every player identity with a permanent RTR ID.</p></div>
+    <div class="player-stats">${labels.map((label,i)=>`<button class="card" onclick="S.ui.playersF=${i===4?"'registered'":i===5?"'unclaimed'":"'all'"};render()"><span class="muted">${label}</span><h2>${counts[i]}</h2></button>`).join('')}</div>
+    <div class="toolbar"><div class="search"><input class="input" type="search" aria-label="Search players" placeholder="Search by name, RTR ID, phone or email" data-bind="ui.playersQ" data-live value="${esc(S.ui.playersQ)}"></div>${seg('playersF',S.ui.playersF,[['all','All'],['registered','Registered'],['unclaimed','Unclaimed']],'Filter by account')}<button class="btn" onclick="S.ui.playerGrid=!S.ui.playerGrid;render()">${S.ui.playerGrid?'List':'Grid'}</button></div>
+    <div class="toolbar"><label><input type="checkbox"> Duplicates only</label><label>Added from <input class="input" type="date"></label><label>Added to <input class="input" type="date"></label><label>Place registered <select class="input"><option>All places</option><option>Cebu City</option><option>Manila</option><option>Davao City</option></select></label><select class="input" aria-label="Archive status"><option>Active</option><option>Archived</option><option>All</option></select><button class="btn" data-act="clearPlayers">Clear filters</button></div>
+    <p class="hint">Duplicate matches share a normalized name, phone or email. Flag only; never merge.</p>
+    <div class="toolbar"><label><input type="checkbox" onchange="document.querySelectorAll('.player-select').forEach(x=>x.checked=this.checked)"> Select all on this page</label><button class="btn">Select all ${all.length} matching</button></div>
+    <section class="${S.ui.playerGrid?'player-grid':'stack'}">${shown.map(p=>`<article class="card row"><input class="player-select" type="checkbox" aria-label="Select ${esc(p.name)}">${avatar(p)}<div class="main"><button class="link" onclick="playerManagementSheet('Quick view','${p.id}')">${esc(p.name)}</button><p class="mono small">${esc(p.rtr)}</p><div class="row">${p.claimed?chip('Registered','ok'):chip('Unclaimed')}${rankOf(p).chip}</div><p class="small muted">${esc(p.club || 'Created by Admin')} · Added ${esc(p.rtr.split('-')[3])}</p></div><button class="btn" onclick="playerManagementSheet('Actions','${p.id}')">⋯</button></article>`).join('') || '<div class="card empty">No players match. Clear filters.</div>'}</section>
+    <div class="more"><button class="btn" ${page===1?'disabled':''} onclick="S.ui.playerPage=${page-1};render()">Previous</button> Showing ${all.length?(page-1)*size+1:0}–${Math.min(page*size,all.length)} of ${all.length} <button class="btn" ${page*size>=all.length?'disabled':''} onclick="S.ui.playerPage=${page+1};render()">Next</button><select aria-label="Page size" onchange="S.ui.playerSize=+this.value;S.ui.playerPage=1;render()">${[25,50,100].map(n=>`<option ${n===size?'selected':''}>${n}</option>`).join('')}</select></div>
+    <section class="card toolbar"><span>N selected</span>${['Clear','Archive','Restore','Remove','Export CSV','Copy RTR IDs'].map(x=>`<button class="btn" onclick="playerManagementSheet('${x}')">${x}</button>`).join('')}</section>`);
+}
+function playerManagementSheet(action,id) {
+  const p=playerOf(id), name=p?esc(p.name):'players';
+  const body= action==='Quick view' ? `<div class="stack">${avatar(p,'lg')}<h2>${name}</h2><p class="mono">${esc(p.rtr)}</p>${rankOf(p).chip}<p>${esc(p.club)} · ${p.claimed?'Registered':'Unclaimed'}</p><h3>Private contact</h3><p>${esc(p.phone||'Not given')} · ${esc(p.email||'Not given')}</p><h3>Recent games</h3><p>No games yet</p><button class="btn" data-act="openPlayer" data-id="${p.id}">View full profile</button><button class="btn" onclick="playerManagementSheet('Games','${id}')">View full history</button></div>` : action==='Games' ? '<p>Read-only. Admin cannot change ranks, winners or scores.</p><div class="toolbar"><button class="btn">Counted</button><button class="btn">Fun and partial</button><button class="btn">All</button></div><p>Date · Club · Session · Partner · Opponents · Score · Result · Counted for rank</p>' : action==='Actions' ? ['Quick view','View full profile','View full history','Copy RTR ID','Copy registration link','Edit profile','Archive','Restore','Remove'].map(x=>`<button class="btn" onclick="playerManagementSheet('${x}','${id}')">${x}</button>`).join('') : action==='Add player' || action==='Edit profile' ? `<div class="stack"><label>Full name<input class="input" value="${p?esc(p.name):''}"></label><label>Nickname<input class="input" value="${p?esc(p.nick||''):''}"></label>${action==='Add player'?'<label>Phone (optional)<input class="input"></label><label>Email (optional)<input class="input"></label><label>Place<select class="input"><option>Cebu City</option><option>Manila</option><option>Davao City</option></select></label><label>Club (optional)<select class="input"><option>Created by Admin</option></select></label>':`${!p?.claimed?'<label>Profile photo<input class="input" type="url"></label>':''}<label>Reason<textarea class="input"></textarea></label><p>Review before and after values before saving. Contacts, rank and RTR ID cannot be edited.</p>`}<button class="btn primary">${action==='Add player'?'Add player':'Review changes'}</button></div>` : `<p>${action} ${name}. ${action==='Remove'?'Permanent. Only records with no games and no claimed account.':'History is kept.'}</p><label>Reason<textarea class="input"></textarea></label>${action==='Remove'?'<label>Type the RTR ID<input class="input"></label>':''}<button class="btn primary">Confirm ${action}</button>`;
+  document.querySelectorAll('.scrim,.sheet').forEach(x=>x.remove());
+  document.body.insertAdjacentHTML('beforeend',sheetWrap(action,body,''));
+  if(action==='Quick view') document.querySelector('.sheet').classList.add('player-side-panel');
+  document.getElementById('sheet-title')?.focus();
 }
 
 // ---------- A-PLAYER-DETAIL ----------

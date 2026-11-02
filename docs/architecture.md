@@ -307,6 +307,20 @@ transaction keyed by club player; a refused mark rolls the whole batch back. Not
 paid tick with no fee set is refused (what it means is open in #245), payments are online only until
 sync is wired (#399), and editing a saved estimate waits on the session edit command.
 
+**Feature flags and ranking settings (#402).** In real mode the `@rotra/data/feature-flag` fetchers call
+Admin's `GET`/`POST /api/feature-flags` and `PATCH /api/feature-flags/[key]`, and the
+`@rotra/data/ranking-settings` fetchers call `GET`/`POST /api/ranking-settings`, backed by
+`@rotra/db/admin/configuration`. Hooks, query keys and the DTOs are unchanged. A switch sends the
+displayed `revision` and a settings save sends the `baseVersion`; a stale one comes back as a
+`ConflictError` carrying the flag or the version in effect (re-read), never last-write-wins. Each add
+and save carries a command ID. Saving appends a version with the algorithm reference carried forward
+(`unapproved` until #247); it records configuration only and no rank is recalculated. Admin accounts
+store a display name, not an email, so the `…ByEmail` fields show that name (empty for the seeded
+version 1). Not connected: Player Information's ranking-settings reads (only Admin serves the route;
+a public read is the leaderboard/player adapters' concern), the Player dev settings control and the
+Admin "Show a placeholder flag" dev toggle, which is client-only mock UI state and never adds a row
+over saved flags.
+
 Wrong account types, forged mock cookies, and cross-club/player IDs are denied at the handler, not only
 in the proxy. Database credentials and Supabase keys are read only from server env. Application tables
 have no `anon`/`authenticated` grants, so the Data API exposes none of them.

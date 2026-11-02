@@ -8,6 +8,12 @@ import { delay } from '../mock/latency'
 import { mockStore, readMockState } from '../mock/store'
 import { manilaIsoString } from '../ranking-settings/rankingSettings.rules'
 import {
+  realAddFeatureFlag,
+  realListFeatureFlags,
+  realSetFeatureFlagValue,
+} from '../real/configuration'
+import { isRealDataMode } from '../real/mode'
+import {
   addFeatureFlagErrors,
   featureFlagAddedSummary,
   featureFlagConflictError,
@@ -25,10 +31,10 @@ import type {
 
 /**
  * A-FEATURE-FLAGS: every flag, in list order (oldest added first; the dev placeholder on top).
- * Read-only, no online check (same as listAdminClubs). Swap this implementation for the real
- * transport when the database epic lands.
+ * Read-only, no online check (same as listAdminClubs). Real mode reads Admin's `/api/feature-flags`.
  */
 export async function listFeatureFlags(signal?: AbortSignal): Promise<FeatureFlag[]> {
+  if (isRealDataMode()) return realListFeatureFlags(signal)
   await delay(400, signal)
   return readMockState().featureFlags
 }
@@ -42,6 +48,7 @@ export async function listFeatureFlags(signal?: AbortSignal): Promise<FeatureFla
  */
 export function addFeatureFlag(input: AddFeatureFlagInput): Promise<FeatureFlag> {
   const values = trimFeatureFlagInput(input)
+  if (isRealDataMode()) return realAddFeatureFlag(values)
   return adminMutation(800, (draft) => {
     const formatErrors = addFeatureFlagErrors(values, [])
     const firstFormatError = Object.values(formatErrors)[0]
@@ -75,6 +82,7 @@ export function setFeatureFlagValue({
   on,
   revision,
 }: SetFeatureFlagValueInput): Promise<FeatureFlag> {
+  if (isRealDataMode()) return realSetFeatureFlagValue({ key, on, revision })
   return adminMutation(800, (draft) => {
     const index = draft.featureFlags.findIndex((flag) => flag.key === key)
     const current = draft.featureFlags[index]
@@ -97,8 +105,12 @@ export function setFeatureFlagValue({
   })
 }
 
-/** Dev toggle 'Show a placeholder flag': whether the placeholder is in the list. */
+/**
+ * Dev toggle 'Show a placeholder flag': whether the placeholder is in the list. Client-only mock UI
+ * state (it adds a row, never a flag); real mode lists saved flags only, so it is never shown there.
+ */
 export function isPlaceholderFeatureFlagShown(): boolean {
+  if (isRealDataMode()) return false
   return mockStore
     .getSnapshot()
     .featureFlags.some((flag) => flag.key === placeholderFeatureFlag.key)
@@ -109,7 +121,7 @@ export function isPlaceholderFeatureFlagShown(): boolean {
  * removes it. No audit line: it isn't an Admin action. Mounted queries re-read through the store.
  */
 export function setPlaceholderFeatureFlagShown(shown: boolean) {
-  if (isProductionBuild()) return
+  if (isProductionBuild() || isRealDataMode()) return
   mockStore.update((draft) => {
     draft.featureFlags = withPlaceholderFlag(draft.featureFlags, placeholderFeatureFlag, shown)
   })

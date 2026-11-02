@@ -3,9 +3,15 @@ import { adminMutation } from '../admin-account/mutation'
 import { adminAccount } from '../fixtures/adminAccounts'
 import { consumeMockDevToggle, requireOnline } from '../mock/bridge'
 import { isProductionBuild } from '../mock/env'
-import { ConflictError, MockError } from '../mock/errors'
+import { ConflictError, MockError, NotConnectedError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { mockStore, readMockState } from '../mock/store'
+import {
+  realGetRankingPolicy,
+  realGetRankingSettings,
+  realSaveRankingSettings,
+} from '../real/configuration'
+import { isRealDataMode } from '../real/mode'
 import {
   BASIS_POINTS_TOTAL,
   effectiveRankingVersion,
@@ -29,8 +35,12 @@ export const rankingSettingsSaveError = (effectiveVersion: number) =>
 export const rankingSettingsConflictError = (effectiveVersion: number) =>
   `Version ${effectiveVersion} was saved by someone else while you were editing.`
 
-/** The effective version in the shape Player Information, Queue and Admin players read. */
+/**
+ * The effective version in the shape Player Information, Queue and Admin players read. Real mode
+ * reads Admin's `/api/ranking-settings`; apps without that route are not connected yet.
+ */
 export async function getRankingSettings(signal?: AbortSignal): Promise<RankingSettings> {
+  if (isRealDataMode()) return realGetRankingSettings(signal)
   await delay(200, signal)
   requireOnline()
   return rankingSettingsOf(effectiveRankingVersion(readMockState().rankingPolicyVersions))
@@ -38,10 +48,10 @@ export async function getRankingSettings(signal?: AbortSignal): Promise<RankingS
 
 /**
  * A-RANK-CONFIG: the version in effect and every saved version, oldest first. Read-only, no online
- * check (same as listAdminClubs). Swap this implementation for the real transport when the database
- * epic lands.
+ * check (same as listAdminClubs). Real mode reads Admin's `/api/ranking-settings`.
  */
 export async function getRankingPolicy(signal?: AbortSignal): Promise<RankingPolicy> {
+  if (isRealDataMode()) return realGetRankingPolicy(signal)
   await delay(400, signal)
   const versions = readMockState().rankingPolicyVersions
   return { effective: effectiveRankingVersion(versions), versions }
@@ -62,6 +72,11 @@ export async function saveRankingSettings({
   const errors = validateRankingDraft(draft)
   const firstError = Object.values(errors)[0]
   if (firstError) throw new MockError('permission', firstError, errors)
+  if (isRealDataMode())
+    return realSaveRankingSettings(
+      { draft, baseVersion },
+      { saveError: rankingSettingsSaveError, conflictError: rankingSettingsConflictError },
+    )
   const outcome = await adminMutation(1000, (state) => {
     const effective = effectiveRankingVersion(state.rankingPolicyVersions)
     // Dev toggle (prototype conflictConfig): another browser saves the same weights with the
@@ -106,9 +121,11 @@ export async function saveRankingSettings({
 
 /**
  * Development-only configuration edit, mirroring the prototype's Admin settings controls. Appends a
- * version like an Admin save (never edits an old one); an unchanged value appends nothing.
+ * version like an Admin save (never edits an old one); an unchanged value appends nothing. Not
+ * connected in real mode: saved settings change only through Admin's D-CONFIG save.
  */
 export async function setRankingSettings(settings: RankingSettings): Promise<RankingSettings> {
+  if (isRealDataMode()) throw new NotConnectedError()
   const assessmentWeightBp = percentToBasisPoints(settings.assessmentWeightPercent)
   const draft = {
     assessmentWeightBp,

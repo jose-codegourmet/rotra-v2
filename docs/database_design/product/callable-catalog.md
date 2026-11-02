@@ -220,8 +220,8 @@ Every entry inherits its actor, business/screen issue mapping, lifecycle, error,
 
 | Callable / current input | Output | Hook module exports |
 |---|---|---|
-| [getRankingSettings](../../../packages/data/src/ranking-settings/fetchers.ts#L5)<br>`signal?: AbortSignal \| undefined` | `Promise<RankingSettings>` | [useRankingSettings, useSetRankingSettings](../../../packages/data/src/ranking-settings/useRankingSettings.ts) |
-| [setRankingSettings](../../../packages/data/src/ranking-settings/fetchers.ts#L11)<br>`settings: RankingSettings` | `Promise<RankingSettings>` | [useRankingSettings, useSetRankingSettings](../../../packages/data/src/ranking-settings/useRankingSettings.ts) |
+| [getRankingSettings](../../../packages/data/src/ranking-settings/fetchers.ts#L42)<br>`signal?: AbortSignal \| undefined` | `Promise<RankingSettings>` | [useRankingSettings, useSetRankingSettings](../../../packages/data/src/ranking-settings/useRankingSettings.ts) |
+| [setRankingSettings](../../../packages/data/src/ranking-settings/fetchers.ts#L127)<br>`settings: RankingSettings` | `Promise<RankingSettings>` | [useRankingSettings, useSetRankingSettings](../../../packages/data/src/ranking-settings/useRankingSettings.ts) |
 
 ## session-cost
 

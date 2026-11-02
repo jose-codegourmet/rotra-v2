@@ -14,13 +14,14 @@ screen loaded one, and returns an allowlisted DTO.
 |---|---|
 | `admin/clubs` | `stageClub` → `provisionClubAccount` (staged: database first, provider second, resumable on the club ID); `setClubPricing`; `readClubsForAdmin`; club-side `readClubSettings`, `updateClubSettings`, `requestClubNameChange`; owner `reviewClubNameChange`; `readVenues`, `saveVenue` |
 | `admin/licenses` | `activateLicense` (club lock → one term per command → cancel the running expiry cycle → refresh entitlement); `refreshEntitlement`; `refreshLapsedEntitlements` (starts a new expiry cycle); `readLicenseTerms`, `readOwnLicense` |
-| `admin/configuration` | `createFeatureFlag`, `setFeatureFlag` (expected revision), `saveRankingPolicy` (appends the next version under the expected current version) |
+| `admin/configuration` | `readFeatureFlags` (oldest added first), `createFeatureFlag` (command ID; starting value; the form's rules from `@rotra/data/feature-flag/rules`, a taken name or key is `conflict`), `setFeatureFlag` (expected revision, checked before the same-value no-op), `readRankingPolicies` (oldest first), `saveRankingPolicy` (appends the next version under the expected current version; the form's rules; algorithm reference carried forward, never client-chosen) |
 | `admin/audit` | `recordAudit`: redacted before/after metadata, repeat-safe on the command |
 | `auth/provider-admin` | `ProviderAdmin` port for external Auth calls; the adapter is chosen under #243/#244 |
 
 - A new Free club stores no paid prices and gets no fake license history.
 - A renewal starts when current access ends, or now when lapsed (stacking is a proposal, #245).
 - Saving a ranking policy records configuration only; it never claims ranks were refreshed.
+- Admin Route Handlers (#402): `GET`/`POST /api/feature-flags` (list; add with `{ commandId, key, name, description, on }`), `PATCH /api/feature-flags/[key]` (`{ on, expectedRevision }`), `GET`/`POST /api/ranking-settings` (every version; save with `{ commandId, expectedVersion, assessmentWeightBp, performanceWeightBp, recentStandardMatchThreshold, changeNote }`). Actors travel as display names (admin accounts store no email).
 
 ## F07.22 · Identity matching, RTR ID allocation, profile reads
 

@@ -41,7 +41,7 @@ export function realSignOutClub() {
 }
 
 /** A save the server accepted: never "saved offline" in this journey (offline sync is not wired). */
-function accepted<T>(data: T, text: string): SaveOutcome & { data: T } {
+export function accepted<T>(data: T, text: string): SaveOutcome & { data: T } {
   return { savedOffline: false, message: saveToastText(text, { savedOffline: false }), data }
 }
 

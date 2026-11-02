@@ -5,6 +5,13 @@ import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, readMockState } from '../mock/store'
 import { queueMutation, requireClubAccess, sessionIn } from '../mock/transaction'
+import {
+  realGetSessionPayments,
+  realMarkAllPaid,
+  realSetPaymentMarks,
+  realTogglePaid,
+} from '../real/financials'
+import { isRealDataMode } from '../real/mode'
 import { sessionCostIn } from '../session-cost/fetchers'
 import { amountDuePerHead, paymentTotals } from '../session-cost/sessionCost.rules'
 import type { SessionCostInput } from '../session-cost/sessionCost.types'
@@ -14,6 +21,7 @@ import type { SetPaymentMarksInput } from './sessionPayment.types'
 const pictures: Record<string, string> = portraits
 
 export async function getSessionPayments(sessionId: string) {
+  if (isRealDataMode()) return realGetSessionPayments(sessionId)
   await delay()
   const state = readMockState(),
     session = sessionIn(state, sessionId)
@@ -64,6 +72,7 @@ function requirePaymentsWrite(state: MockState, sessionId: string) {
 export function setPaymentMarks({ sessionId, marks }: SetPaymentMarksInput) {
   if (!marks.length)
     return Promise.resolve({ data: { count: 0 }, savedOffline: false, message: '' })
+  if (isRealDataMode()) return realSetPaymentMarks({ sessionId, marks })
   return queueMutation({ area: 'Payments' }, (state) => {
     requirePaymentsWrite(state, sessionId)
     const wanted = new Map(marks.map((mark) => [mark.clubPlayerId, mark.paid]))
@@ -100,6 +109,7 @@ export function togglePaid({
   sessionId: string
   clubPlayerId: string
 }) {
+  if (isRealDataMode()) return realTogglePaid({ sessionId, clubPlayerId })
   return queueMutation({ area: 'Payments' }, (state) => {
     requirePaymentsWrite(state, sessionId)
     const player = state.roster.find(
@@ -125,6 +135,7 @@ export function togglePaid({
   })
 }
 export function markAllPaid(sessionId: string) {
+  if (isRealDataMode()) return realMarkAllPaid(sessionId)
   return queueMutation({ area: 'Payments' }, (state) => {
     requirePaymentsWrite(state, sessionId)
     const amount = sessionCostIn(state, sessionId)?.estimate.perHead ?? 0

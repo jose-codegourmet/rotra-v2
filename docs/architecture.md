@@ -297,6 +297,16 @@ calls `registerDevice`, `enrollStream`, `uploadOperations`, `sealStream` or `res
 marks), so it needs no adapter. Known gap: the console's offline notice still says changes save on
 this device, which is untrue in real mode until Q11.
 
+**Session cost and payments (#397).** In real mode `getSessionCostEstimate` calls Queue's
+`GET /api/sessions/[sessionId]/cost`, and the `@rotra/data/session-payment` fetchers call
+`GET`/`POST /api/sessions/[sessionId]/payments` and `POST …/payments/mark-all`, backed by
+`@rotra/db/queue/financials` (adapters in `packages/data/src/real/financials.ts`). Hooks, query keys
+and DTOs are unchanged, so the preparation overview, the session record's Financials tab, the setup
+estimate and the Payments checklist read saved data. The 800 ms switch batch (#300) is one
+transaction keyed by club player; a refused mark rolls the whole batch back. Not connected: a new
+paid tick with no fee set is refused (what it means is open in #245), payments are online only until
+sync is wired (#399), and editing a saved estimate waits on the session edit command.
+
 Wrong account types, forged mock cookies, and cross-club/player IDs are denied at the handler, not only
 in the proxy. Database credentials and Supabase keys are read only from server env. Application tables
 have no `anon`/`authenticated` grants, so the Data API exposes none of them.

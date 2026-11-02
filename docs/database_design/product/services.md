@@ -85,13 +85,14 @@ screen loaded one, and returns an allowlisted DTO.
 
 | Module | Commands |
 |---|---|
-| `queue/financials` | `readInventory`, `saveInventoryItem` (client ID; expected revision on edit; whole-peso cost), `stepInventoryStock` (never below zero; another club's or a removed ID is `not_found`), `removeInventoryItem` (soft; returns the removed item, a retry returns it again, another club's ID is `not_found`); `readSessionCost`, `saveSessionCost` (online only, prepared/active, expected estimate revision, this club's items only, empty = delete); `readSessionPayments`, `setPaid`, `markAllPaid` |
+| `queue/financials` | `readInventory`, `saveInventoryItem` (client ID; expected revision on edit; whole-peso cost), `stepInventoryStock` (never below zero; another club's or a removed ID is `not_found`), `removeInventoryItem` (soft; returns the removed item, a retry returns it again, another club's ID is `not_found`); `readSessionCost`, `saveSessionCost` (online only, prepared/active, expected estimate revision, this club's items only, empty = delete); `readSessionPayments`, `setPaid`, `setPaymentMarks` (one batch of desired end states keyed by club player, one transaction), `markAllPaid` |
 
 - All arithmetic is the pure `@rotra/data/session-cost/rules` (centavos; court fee to the nearest centavo; break-even up to a whole peso). Totals are derived at read time.
-- A paid tick stores the amount due at that moment (null when no fee is set) under its operation ID; a duplicate applies once and later fee changes never rewrite it. Marks key on the released-not-deleted roster entry, so they survive demotion and show again on restoration. No-fee tick meaning is still #245.
+- A paid tick stores the amount due at that moment under its operation ID; a duplicate applies once and later fee changes never rewrite it. Marks key on the released-not-deleted roster entry, so they survive demotion and show again on restoration. No-fee tick meaning is still #245, so `setPaid`, `setPaymentMarks` and `markAllPaid` refuse a new tick with no fee set (`invalid`, field `fee`) instead of storing a null or zero amount (#397).
 - Payments stay open after Session done (`completed`), never for `invalid` or `finalizing`; they are separate from immutable results.
 - No new money unit tests were added; the reused rules keep their existing tests.
 - Queue Route Handlers (#375): `GET`/`POST /api/inventory` (list plus `stockValueMinor`; add/edit), `POST /api/inventory/[itemId]/stock` (`{ delta }`), `DELETE /api/inventory/[itemId]`.
+- Queue Route Handlers (#397): `GET /api/sessions/[sessionId]/cost` (`readSessionCost`, plus live court count, scheduled minutes and plan line names), `GET`/`POST /api/sessions/[sessionId]/payments` (`readSessionPayments`; `setPaymentMarks` with `{ operationId, marks: [{ clubPlayerId, paid }] }`), `POST /api/sessions/[sessionId]/payments/mark-all` (`{ operationId }`). Saving the estimate outside session creation is part of the session edit command, which is not wired yet.
 
 ## F07.28 · Server sync acceptance, stream closure, conflict evidence
 
@@ -178,6 +179,7 @@ Wired end to end in real data mode (see [architecture.md](../../architecture.md)
 | Q-VENUES | Queue `GET`/`POST /api/venues` (create only) | `readVenues`, `saveVenue` |
 | Q-HOME, Q-SETUP | Queue `GET`/`POST /api/sessions`, `GET /api/sessions/[sessionId]` | `readQueueSessions`, `readQueueSession`, `createQueueSession`, `saveSessionCost` |
 | Q-ROSTER | Queue `GET`/`POST /api/sessions/[sessionId]/roster`, `POST …/roster/[rosterId]/level` | `readSessionRoster`, `addNewPlayerToSession`, `setRosterLevel` |
+| Q-PREPARE, Q-MONEY, Q-RECORD (#397) | Queue `GET /api/sessions/[sessionId]/cost`, `GET`/`POST …/payments`, `POST …/payments/mark-all` | `readSessionCost`, `readSessionPayments`, `setPaymentMarks`, `markAllPaid` |
 
 Admin directory and detail reads additionally expose an active Queue Session, a pending club-name request,
 approved former names from the audit history, and the activating admin's allowlisted display name. Club

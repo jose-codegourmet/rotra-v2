@@ -229,7 +229,7 @@ Every entry inherits its actor, business/screen issue mapping, lifecycle, error,
 
 | Callable / current input | Output | Hook module exports |
 |---|---|---|
-| [getSessionCostEstimate](../../../packages/data/src/session-cost/fetchers.ts#L31)<br>`id: string` | `Promise<{ saved, estimate, courts, durationMinutes, shuttleLines } (fields) \| null>` | [useSessionCostEstimate](../../../packages/data/src/session-cost/useSessionCostEstimate.ts) |
+| [getSessionCostEstimate](../../../packages/data/src/session-cost/fetchers.ts#L33)<br>`id: string` | `Promise<{ saved, estimate, courts, durationMinutes, shuttleLines } (fields) \| null>` | [useSessionCostEstimate](../../../packages/data/src/session-cost/useSessionCostEstimate.ts) |
 
 ## session-payment
 
@@ -237,9 +237,9 @@ Every entry inherits its actor, business/screen issue mapping, lifecycle, error,
 
 | Callable / current input | Output | Hook module exports |
 |---|---|---|
-| [markAllPaid](../../../packages/data/src/session-payment/fetchers.ts#L93)<br>`sessionId: string` | `Promise<SaveOutcome & { data: { count: number; }; }>` | [useMarkAllPaid](../../../packages/data/src/session-payment/useMarkAllPaid.ts) |
-| [getSessionPayments](../../../packages/data/src/session-payment/fetchers.ts#L15)<br>`sessionId: string` | `Promise<{ players, amountDue, dueBasis, entranceFeeIncluded, totals } (fields) \| null>` | [useSessionPayments](../../../packages/data/src/session-payment/useSessionPayments.ts) |
-| [togglePaid](../../../packages/data/src/session-payment/fetchers.ts#L62)<br>`{ sessionId, clubPlayerId, }: { sessionId: string; clubPlayerId: string; }` | `Promise<SaveOutcome & { data: { paid: boolean; }; }>` | [useTogglePaid](../../../packages/data/src/session-payment/useTogglePaid.ts) |
+| [markAllPaid](../../../packages/data/src/session-payment/fetchers.ts#L137)<br>`sessionId: string` | `Promise<SaveOutcome & { data: { count: number; }; }>` | [useMarkAllPaid](../../../packages/data/src/session-payment/useMarkAllPaid.ts) |
+| [getSessionPayments](../../../packages/data/src/session-payment/fetchers.ts#L23)<br>`sessionId: string` | `Promise<{ players, amountDue, dueBasis, entranceFeeIncluded, totals } (fields) \| null>` | [useSessionPayments](../../../packages/data/src/session-payment/useSessionPayments.ts) |
+| [togglePaid](../../../packages/data/src/session-payment/fetchers.ts#L105)<br>`{ sessionId, clubPlayerId, }: { sessionId: string; clubPlayerId: string; }` | `Promise<SaveOutcome & { data: { paid: boolean; }; }>` | [useTogglePaid](../../../packages/data/src/session-payment/useTogglePaid.ts) |
 
 ## session-result
 

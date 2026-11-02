@@ -13,6 +13,7 @@ import type {
   InventoryItem,
   Prisma,
   QueueSession,
+  SessionPlayer,
 } from '../generated/prisma/client'
 import { requireClubEntitlement, requireRevision } from '../service/authorize'
 import { ServiceError } from '../service/errors'
@@ -182,10 +183,22 @@ async function costInput(tx: Tx, sessionId: string): Promise<SessionCostInput | 
   }
 }
 
-/** The derived estimate for a session: totals are computed at read time, never stored. */
+/**
+ * The derived estimate for a session: totals are computed at read time, never stored. Also returns
+ * what the estimate used (live court count, scheduled minutes) and each plan line's item name.
+ */
 async function estimateFor(tx: Tx, session: QueueSession) {
   const input = await costInput(tx, session.id)
-  if (!input) return { input: null, estimate: null, revision: null }
+  const durationMinutes = minutes(session)
+  if (!input)
+    return {
+      input: null,
+      estimate: null,
+      revision: null,
+      courts: 0,
+      durationMinutes,
+      shuttleLines: [],
+    }
   const [courts, roster, inventory, row] = await Promise.all([
     liveCourts(tx, session.id),
     liveRoster(tx, session.id),
@@ -197,11 +210,21 @@ async function estimateFor(tx: Tx, session: QueueSession) {
   ])
   const estimate = estimateSessionCost(input, {
     courts: courts.length,
-    durationMinutes: minutes(session),
+    durationMinutes,
     players: roster.length || session.expectedPlayers || 0,
     inventory,
   })
-  return { input, estimate, revision: toDecimalString(row.revision) }
+  return {
+    input,
+    estimate,
+    revision: toDecimalString(row.revision),
+    courts: courts.length,
+    durationMinutes,
+    shuttleLines: input.shuttles.map((line) => ({
+      ...line,
+      name: inventory.find((i) => i.id === line.inventoryItemId)?.name ?? '',
+    })),
+  }
 }
 
 export async function readSessionCost(context: ClubContext, sessionId: string) {
@@ -340,10 +363,58 @@ export async function readSessionPayments(context: ClubContext, sessionId: strin
 }
 
 /**
- * Q-MONEY · tick paid / untick. A tick records the amount due at that moment (null when no fee is
- * set) under its operation ID: a duplicate applies once and a later fee change never rewrites it.
- * The mark keys on the roster entry, which is released (not deleted), so it survives demotion and
- * shows again on restoration. Unticking deletes the mark.
+ * What a paid tick means when no fee is set (amount due null) is still open (#245), so no such tick
+ * is recorded: the command is refused rather than storing a null or zero amount.
+ */
+const NO_FEE_TICK = 'Paid ticks with no fee set aren’t connected to saved data yet.'
+
+/**
+ * One tick or untick inside the caller's transaction. A tick records `amountMinor` (the amount due
+ * now) under `operationId`; an existing mark is returned unchanged, so a duplicate applies once
+ * and a later fee change never rewrites it. Unticking deletes the mark.
+ */
+async function applyMark(
+  tx: Tx,
+  context: ClubContext,
+  entry: SessionPlayer,
+  input: {
+    operationId: string
+    paid: boolean
+    amountMinor: number | null
+    deviceId?: string | null
+  },
+) {
+  const key = {
+    sessionId_sessionPlayerId: { sessionId: entry.sessionId, sessionPlayerId: entry.id },
+  }
+  const mark = await tx.sessionPaymentMark.findUnique({ where: key })
+  if (input.paid) {
+    if (mark) return { paid: true, amount: toMoney(mark.amountMinor, mark.currency) }
+    if (entry.releasedAt)
+      throw new ServiceError('invalid', { player: 'Player not in this session.' })
+    if (input.amountMinor === null) throw new ServiceError('invalid', { fee: NO_FEE_TICK })
+    const created = await tx.sessionPaymentMark.create({
+      data: {
+        sessionId: entry.sessionId,
+        sessionPlayerId: entry.id,
+        clubId: context.clubId,
+        amountMinor: input.amountMinor,
+        markedAt: new Date(),
+        sourceOperationId: input.operationId,
+        actorClubId: context.clubId,
+        deviceId: input.deviceId ?? null,
+      },
+    })
+    return { paid: true, amount: toMoney(created.amountMinor, created.currency) }
+  }
+  if (mark) await tx.sessionPaymentMark.delete({ where: key })
+  return { paid: false, amount: null }
+}
+
+/**
+ * Q-MONEY · tick paid / untick one roster entry, recording the amount due at that moment. The mark
+ * keys on the roster entry, which is released (not deleted), so it survives demotion and shows
+ * again on restoration. A tick with no fee set is refused until #245 defines it.
  */
 export async function setPaid(
   context: ClubContext,
@@ -356,43 +427,58 @@ export async function setPaid(
     requirePaymentsOpen(session)
     const entry = await tx.sessionPlayer.findUnique({ where: { id: input.sessionPlayerId } })
     if (!entry || entry.sessionId !== sessionId) throw new ServiceError('not_found')
-    const mark = await tx.sessionPaymentMark.findUnique({
-      where: { sessionId_sessionPlayerId: { sessionId, sessionPlayerId: entry.id } },
-    })
-    if (input.paid) {
-      if (mark) return { paid: true, amount: toMoney(mark.amountMinor, mark.currency) }
-      if (entry.releasedAt)
-        throw new ServiceError('invalid', { player: 'Player not in this session.' })
-      const { estimate } = await estimateFor(tx, session)
-      const amountMinor = amountDuePerHead(estimate)
-      const created = await tx.sessionPaymentMark.create({
-        data: {
-          sessionId,
-          sessionPlayerId: entry.id,
-          clubId: context.clubId,
-          amountMinor,
-          markedAt: new Date(),
-          sourceOperationId: input.operationId,
-          actorClubId: context.clubId,
-          deviceId: input.deviceId ?? null,
-        },
-      })
-      return { paid: true, amount: toMoney(created.amountMinor, created.currency) }
-    }
-    if (mark)
-      await tx.sessionPaymentMark.delete({
-        where: { sessionId_sessionPlayerId: { sessionId, sessionPlayerId: entry.id } },
-      })
-    return { paid: false, amount: null }
+    const { estimate } = await estimateFor(tx, session)
+    return applyMark(tx, context, entry, { ...input, amountMinor: amountDuePerHead(estimate) })
   })
 }
 
-/** Q-MONEY · Mark all paid: ticks every live unpaid entry at the current amount, once. */
+/**
+ * Q-MONEY · the payment switches' desired end states (#300), keyed by club player, in one
+ * transaction: a refused mark rolls the whole batch back. Each mark's operation ID is derived from
+ * the batch's command ID. Another club's or an unknown player is `not_found`.
+ */
+export async function setPaymentMarks(
+  context: ClubContext,
+  sessionId: string,
+  input: { operationId: string; marks: { clubPlayerId: string; paid: boolean }[] },
+) {
+  if (!UUID.test(input.operationId)) throw new ServiceError('invalid')
+  const wanted = new Map<string, boolean>()
+  for (const mark of input.marks) {
+    if (!UUID.test(mark.clubPlayerId)) throw new ServiceError('not_found')
+    if (typeof mark.paid !== 'boolean') throw new ServiceError('invalid')
+    wanted.set(mark.clubPlayerId, mark.paid)
+  }
+  return prisma.$transaction(async (tx) => {
+    const session = await lockSession(tx, context, sessionId)
+    await requireSessionAccess(context, session)
+    requirePaymentsOpen(session)
+    const { estimate } = await estimateFor(tx, session)
+    const amountMinor = amountDuePerHead(estimate)
+    const marks = []
+    for (const [clubPlayerId, paid] of wanted) {
+      const entry = await tx.sessionPlayer.findUnique({
+        where: { sessionId_clubPlayerId: { sessionId, clubPlayerId } },
+      })
+      if (!entry || entry.clubId !== context.clubId) throw new ServiceError('not_found')
+      const operationId = await derivedId(input.operationId, clubPlayerId)
+      const result = await applyMark(tx, context, entry, { operationId, paid, amountMinor })
+      marks.push({ clubPlayerId, ...result })
+    }
+    return { count: wanted.size, marks }
+  })
+}
+
+/**
+ * Q-MONEY · Mark all paid: ticks every live unpaid entry at the current amount, once. Refused with
+ * no fee set while any entry is unpaid (#245).
+ */
 export async function markAllPaid(
   context: ClubContext,
   sessionId: string,
   input: { operationId: string; deviceId?: string | null },
 ) {
+  if (!UUID.test(input.operationId)) throw new ServiceError('invalid')
   return prisma.$transaction(async (tx) => {
     const session = await lockSession(tx, context, sessionId)
     await requireSessionAccess(context, session)
@@ -400,25 +486,17 @@ export async function markAllPaid(
     const roster = await liveRoster(tx, sessionId)
     const { estimate } = await estimateFor(tx, session)
     const amountMinor = amountDuePerHead(estimate)
-    const now = new Date()
     let count = 0
     for (const entry of roster) {
-      const operationId = await derivedId(input.operationId, entry.id)
       const exists = await tx.sessionPaymentMark.findUnique({
         where: { sessionId_sessionPlayerId: { sessionId, sessionPlayerId: entry.id } },
       })
       if (exists) continue
-      await tx.sessionPaymentMark.create({
-        data: {
-          sessionId,
-          sessionPlayerId: entry.id,
-          clubId: context.clubId,
-          amountMinor,
-          markedAt: now,
-          sourceOperationId: operationId,
-          actorClubId: context.clubId,
-          deviceId: input.deviceId ?? null,
-        },
+      await applyMark(tx, context, entry, {
+        operationId: await derivedId(input.operationId, entry.id),
+        paid: true,
+        amountMinor,
+        deviceId: input.deviceId,
       })
       count++
     }

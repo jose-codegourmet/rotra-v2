@@ -2,6 +2,8 @@ import { delay } from '../mock/latency'
 import type { MockState } from '../mock/store'
 import { readMockState } from '../mock/store'
 import { sessionIn } from '../mock/transaction'
+import { realGetSessionCostEstimate } from '../real/financials'
+import { isRealDataMode } from '../real/mode'
 import { estimateSessionCost } from './sessionCost.rules'
 
 export function sessionCostIn(state: MockState, id: string) {
@@ -29,6 +31,7 @@ export function sessionCostIn(state: MockState, id: string) {
   }
 }
 export async function getSessionCostEstimate(id: string) {
+  if (isRealDataMode()) return realGetSessionCostEstimate(id)
   await delay()
   return sessionCostIn(readMockState(), id)
 }

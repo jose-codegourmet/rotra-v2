@@ -4,6 +4,8 @@ import { requireLive } from '../match/queue.mutations'
 import { MockError } from '../mock/errors'
 import type { MockState } from '../mock/store'
 import { queueMutation, sessionIn } from '../mock/transaction'
+import { isRealDataMode } from '../real/mode'
+import { realAddCourt, realExtendSession, realRemoveCourt } from '../real/session-live'
 
 const hhmm = (n: number) =>
   new Date(n).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
@@ -13,6 +15,7 @@ export function addCourt(input: {
   startsAt?: number
   openUntil: number | null
 }) {
+  if (isRealDataMode()) return realAddCourt(input)
   return queueMutation({ area: 'Courts and time', sessionId: input.sessionId }, (s) => {
     const session = sessionIn(s, input.sessionId)
     const startsAt = input.startsAt ?? session.startedAt ?? session.scheduledStartAt
@@ -132,6 +135,7 @@ export function undoCourtEarlyOpen(input: { sessionId: string; courtId: string }
   })
 }
 export function removeCourt(input: { sessionId: string; courtId: string }) {
+  if (isRealDataMode()) return realRemoveCourt(input)
   return queueMutation({ area: 'Courts and time', sessionId: input.sessionId }, (s) => {
     const courts = s.courts.filter((c) => c.sessionId === input.sessionId && !c.removedAt),
       court = courts.find((c) => c.id === input.courtId)
@@ -143,6 +147,7 @@ export function removeCourt(input: { sessionId: string; courtId: string }) {
   })
 }
 export function extendSession(input: { sessionId: string; minutes: 30 | 60 }) {
+  if (isRealDataMode()) return realExtendSession(input)
   return queueMutation({ area: 'Courts and time', sessionId: input.sessionId }, (s) => {
     if (input.minutes !== 30 && input.minutes !== 60)
       throw new MockError('permission', 'Choose 30 or 60 minutes.')

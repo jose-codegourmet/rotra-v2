@@ -22,6 +22,18 @@ import {
   realPlayerDirectorySearch,
   realSetRosterLevel,
 } from '../real/queue'
+import {
+  realConfirmJoinRequest,
+  realDeclineJoinRequest,
+  realFillOpenSlots,
+  realGiveSlot,
+  realRemoveFromWaitlist,
+  realRemoveRosterPlayer,
+  realSetAcceptJoinRequests,
+  realSetAllPresence,
+  realSetPresence,
+  realSetPresenceMany,
+} from '../real/session-live'
 import { levelLabel, ROSTER_DUPLICATE_ERROR, shortName } from './sessionRoster.rules'
 import type { DirectoryPlayer, IdentityCheck, SessionJoinRequest } from './sessionRoster.types'
 
@@ -204,6 +216,7 @@ export async function setRosterLevel(input: {
   })
 }
 export function removeRosterPlayer(input: { sessionId: string; rosterId: string }) {
+  if (isRealDataMode()) return realRemoveRosterPlayer(input)
   return rosterMutation(input.sessionId, (s) => {
     if (sessionIn(s, input.sessionId).state !== 'prepared')
       fail('Only a prepared roster can remove players.')
@@ -213,6 +226,7 @@ export function removeRosterPlayer(input: { sessionId: string; rosterId: string 
   })
 }
 export function setPresence(input: { sessionId: string; rosterId: string; present: boolean }) {
+  if (isRealDataMode()) return realSetPresence(input)
   return rosterMutation(input.sessionId, (s) => {
     const p = row(s, input.rosterId, input.sessionId)
     p.present = input.present
@@ -236,6 +250,7 @@ export function setPresenceMany(input: {
   sessionId: string
   changes: { rosterId: string; present: boolean }[]
 }) {
+  if (isRealDataMode() && input.changes.length) return realSetPresenceMany(input)
   if (!input.changes.length)
     return Promise.resolve({ data: null, savedOffline: false, message: 'No presence changes' })
   // Do not call rosterMutation here: its preflight flush would wait for this same batch.
@@ -269,6 +284,7 @@ export function setPresenceMany(input: {
   })
 }
 export function setAllPresence(input: { sessionId: string; present: boolean }) {
+  if (isRealDataMode()) return realSetAllPresence(input)
   return rosterMutation(input.sessionId, (s) => {
     if (sessionIn(s, input.sessionId).state !== 'prepared')
       fail('Mark players individually after the session starts.')
@@ -285,6 +301,7 @@ function waiter(s: MockState, id: string, sessionId: string) {
   return w
 }
 export function giveSlot(input: { sessionId: string; waitlistId: string }) {
+  if (isRealDataMode()) return realGiveSlot(input)
   return rosterMutation(input.sessionId, (s) => {
     const w = waiter(s, input.waitlistId, input.sessionId),
       p = required(s.clubPlayers.find((p) => p.id === w.clubPlayerId))
@@ -298,6 +315,7 @@ export function giveSlot(input: { sessionId: string; waitlistId: string }) {
   })
 }
 export function fillOpenSlots(sessionId: string) {
+  if (isRealDataMode()) return realFillOpenSlots(sessionId)
   return rosterMutation(sessionId, (s) => {
     const open = Math.max(
         0,
@@ -312,6 +330,7 @@ export function fillOpenSlots(sessionId: string) {
   })
 }
 export function removeFromWaitlist(input: { sessionId: string; waitlistId: string }) {
+  if (isRealDataMode()) return realRemoveFromWaitlist(input)
   return rosterMutation(input.sessionId, (s) => {
     const w = waiter(s, input.waitlistId, input.sessionId),
       p = required(s.clubPlayers.find((p) => p.id === w.clubPlayerId))
@@ -369,6 +388,7 @@ function pending(s: MockState, id: string) {
   return r
 }
 export function confirmJoinRequest(input: { requestId: string; level: PlayingLevel }) {
+  if (isRealDataMode()) return realConfirmJoinRequest(input)
   const r = pending(readMockState(), input.requestId)
   return rosterMutation(r.sessionId, (s) => {
     const request = pending(s, input.requestId),
@@ -388,6 +408,7 @@ export function confirmJoinRequest(input: { requestId: string; level: PlayingLev
   })
 }
 export function declineJoinRequest(requestId: string) {
+  if (isRealDataMode()) return realDeclineJoinRequest(requestId)
   const r = pending(readMockState(), requestId)
   return rosterMutation(r.sessionId, (s) => {
     const r = pending(s, requestId)
@@ -397,6 +418,7 @@ export function declineJoinRequest(requestId: string) {
   })
 }
 export function setAcceptJoinRequests(input: { sessionId: string; accept: boolean }) {
+  if (isRealDataMode()) return realSetAcceptJoinRequests(input)
   return rosterMutation(input.sessionId, (s) => {
     sessionIn(s, input.sessionId).acceptJoinRequests = input.accept
     return { data: null, text: `Join requests are ${input.accept ? 'on' : 'off'}` }

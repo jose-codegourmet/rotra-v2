@@ -4,8 +4,9 @@ import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, readMockState } from '../mock/store'
 import { sessionIn } from '../mock/transaction'
+import { realGetSessionMatches } from '../real/match'
 import { isRealDataMode } from '../real/mode'
-import { realGetQueueSession, realGetQueueSessions } from '../real/queue'
+import { realGetQueueSession, realGetQueueSessions, realGetSessionRoster } from '../real/queue'
 import { sessionMinutes } from './queueSession.rules'
 import type {
   QueueSession,
@@ -101,15 +102,32 @@ export async function getFinalizationStatus(id: string): Promise<SessionFinaliza
   return state.finalizations[id] ?? null
 }
 /** Q-HISTORY totals; an invalid session keeps its partial records out of every count. */
-export async function getSessionRecord(id: string): Promise<SessionRecordSummary> {
+/** A finished session's saved facts: the session, its roster, courts and matches. */
+async function recordInputs(id: string) {
+  if (isRealDataMode()) {
+    const [session, { roster }, matches] = await Promise.all([
+      realGetQueueSession(id),
+      realGetSessionRoster(id),
+      realGetSessionMatches(id),
+    ])
+    return { session, roster, matches, courts: session.courts }
+  }
   await delay()
   const state = readMockState(),
     session = sessionIn(state, id)
+  return {
+    session,
+    roster: state.roster.filter((r) => r.sessionId === id),
+    matches: state.matches.filter((m) => m.sessionId === id),
+    courts: state.courts.filter((c) => c.sessionId === id),
+  }
+}
+export async function getSessionRecord(id: string): Promise<SessionRecordSummary> {
+  const { session, roster, courts, ...facts } = await recordInputs(id)
   if (session.state !== 'completed' && session.state !== 'invalid')
     throw new MockError('permission', 'This session has no record yet.')
   const invalid = session.state === 'invalid',
-    roster = state.roster.filter((r) => r.sessionId === id),
-    matches = invalid ? [] : state.matches.filter((m) => m.sessionId === id),
+    matches = invalid ? [] : facts.matches,
     standings = computeStandings(roster, matches),
     playerSummaries = roster
       .map((p) => {
@@ -140,7 +158,7 @@ export async function getSessionRecord(id: string): Promise<SessionRecordSummary
     games: matches.filter((m) => m.state === 'completed').length,
     invalidGames: matches.filter((m) => m.state === 'invalid').length,
     players: roster.length,
-    courts: state.courts.filter((c) => c.sessionId === id && !c.removedAt).length,
+    courts: courts.filter((c) => !c.removedAt).length,
     lengthMinutes: sessionMinutes(session.scheduledStartAt, session.scheduledEndAt),
     minimumGames: session.minimumGames,
     belowMinimumCount: invalid
@@ -154,15 +172,13 @@ export async function getSessionRecord(id: string): Promise<SessionRecordSummary
  * session has no match history (its partial records are not shown), so it returns no matches.
  */
 export async function getSessionRecordHistory(id: string): Promise<SessionRecordHistory> {
-  await delay()
-  const state = readMockState(),
-    session = sessionIn(state, id)
+  const { session, roster, courts, matches } = await recordInputs(id)
   if (session.state !== 'completed' && session.state !== 'invalid')
     throw new MockError('permission', 'This session has no record yet.')
   return sessionRecordHistory({
     fallbackStart: session.startedAt ?? session.scheduledStartAt,
-    courts: state.courts.filter((c) => c.sessionId === id),
-    roster: state.roster.filter((r) => r.sessionId === id),
-    matches: session.state === 'invalid' ? [] : state.matches.filter((m) => m.sessionId === id),
+    courts,
+    roster,
+    matches: session.state === 'invalid' ? [] : matches,
   })
 }

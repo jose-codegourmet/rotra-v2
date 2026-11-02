@@ -8,6 +8,7 @@ import { type MockState, mockStore } from '../mock/store'
 import { queueMutation, sessionIn } from '../mock/transaction'
 import { isRealDataMode } from '../real/mode'
 import { realCreateQueueSession } from '../real/queue'
+import { realStartSession, realUpdateQueueSession } from '../real/session-live'
 import { normalizeSessionCost } from '../session-cost/sessionCost.rules'
 import { validateSessionCost } from '../session-cost/validation'
 import type { SessionWaitlistEntry } from '../session-roster/sessionRoster.types'
@@ -174,6 +175,7 @@ export function updateQueueSession({
   sessionId: string
   values: QueueSessionInput
 }) {
+  if (isRealDataMode()) return realUpdateQueueSession({ sessionId, values })
   return queueMutation(
     { area: 'Session', onlineOnly: true, clubAccess: true, sessionId },
     (state) => {
@@ -290,6 +292,7 @@ export async function downloadSession(sessionId: string) {
   }
 }
 export function startSession(sessionId: string) {
+  if (isRealDataMode()) return realStartSession(sessionId)
   return queueMutation({ area: 'Session' }, (state) => {
     const s = sessionIn(state, sessionId)
     if (s.state !== 'prepared')

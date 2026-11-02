@@ -341,6 +341,19 @@ Hooks, query keys and DTOs are unchanged; list filters and counts reuse the mock
 rows. Approve, Retry application and Check status stay not connected: they change the provider login,
 which waits on #196/#244. See [services.md](database_design/product/services.md#admin-audit-and-contact-change-reads-401).
 
+**Session lifecycle (2026-11-02).** In real mode the rest of a Queue Session's life also reads and
+writes saved data through `packages/data/src/real/session-live.ts`: Start session
+(`POST /api/sessions/[sessionId]/start`, sending the session revision it just read; a retry returns the
+active session), Edit preparation (`PATCH /api/sessions/[sessionId]` with `commandId`, `expectedRevision`
+and the input, then the cost estimate), the join-requests switch (`PATCH` with `acceptJoinRequests`),
+Add/Remove court (`POST …/courts`, `DELETE …/courts/[courtId]`), Extend (`POST …/extend`), presence
+(`POST …/presence`, `{ all }` or `{ changes }`), Remove from roster (`DELETE …/roster/[rosterId]`), the
+waitlist (`POST …/waitlist/[waitlistId]/slot`, `POST …/waitlist/fill`, `DELETE …/waitlist/[waitlistId]`)
+and join requests (`POST /api/join-requests/[requestId]/confirm` and `…/decline`). The session Record
+and its history are built from the saved session, roster and matches. Still not connected: editing a
+court's label or start, opening courts early (no service yet), deleting a session, and the device
+download.
+
 **Matches and results (#396).** In real mode the `@rotra/data/match` queue and control commands,
 `getSessionMatches`, `getLiveStandings`, the `@rotra/data/session-result` fetchers and
 `invalidateSession` call Queue's `/api/sessions/[sessionId]/matches…`, `…/results…` and `…/invalid`

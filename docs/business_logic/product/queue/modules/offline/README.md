@@ -26,6 +26,11 @@ Until a data mode has a device-download adapter, an upcoming Queue Session shows
 offline-copy status. This is not a claim that no download exists; it avoids turning unavailable device-local
 evidence into a false “No”.
 
+Real data mode (#399) has no device-download adapter yet: device enrollment waits on
+[#246](https://github.com/jose-codegourmet/rotra-v2/issues/246) and durable browser storage on Q11. Real
+mode is online only, so nothing is ever "Saved on this device"; the sync status reports the server's
+check time and whether a session's records are proven complete.
+
 The top bar always shows sync status:
 
 | Status | Meaning |

@@ -95,7 +95,7 @@ Every entry inherits its actor, business/screen issue mapping, lifecycle, error,
 
 | Callable / current input | Output | Hook module exports |
 |---|---|---|
-| [getDeviceDownloads](../../../packages/data/src/device/fetchers.ts#L3)<br>`(no arguments)` | `Promise<{ sessionId: string; title: string; startsAt: number; state: DownloadState; }[]>` | [useDeviceDownloads](../../../packages/data/src/device/useDeviceDownloads.ts) |
+| [getDeviceDownloads](../../../packages/data/src/device/fetchers.ts#L7)<br>`(no arguments)` | `Promise<{ sessionId: string; title: string; startsAt: number; state: DownloadState; }[]>` | [useDeviceDownloads](../../../packages/data/src/device/useDeviceDownloads.ts) |
 
 ## inventory
 
@@ -281,12 +281,12 @@ Every entry inherits its actor, business/screen issue mapping, lifecycle, error,
 
 | Callable / current input | Output | Hook module exports |
 |---|---|---|
-| [answerInterruption](../../../packages/data/src/sync/fetchers.ts#L161)<br>`{ sessionId, answer, }: { sessionId: string; answer: "yes" \| "no"; }` | `Promise<SessionIntegrity>` | [useAnswerInterruption](../../../packages/data/src/sync/useAnswerInterruption.ts) |
-| [retrySync](../../../packages/data/src/sync/fetchers.ts#L146)<br>`(no arguments)` | `Promise<{ message: string; }>` | [useRetrySync](../../../packages/data/src/sync/useRetrySync.ts) |
-| [getSessionIntegrity](../../../packages/data/src/sync/fetchers.ts#L156)<br>`sessionId: string` | `Promise<SessionIntegrity>` | [useSessionIntegrity](../../../packages/data/src/sync/useSessionIntegrity.ts) |
-| [getSyncLog](../../../packages/data/src/sync/fetchers.ts#L139)<br>`(no arguments)` | `Promise<{ pendingChanges: SyncChange[]; syncedChanges: SyncChange[]; }>` | [useSyncLog](../../../packages/data/src/sync/useSyncLog.ts) |
-| [getSyncState](../../../packages/data/src/sync/fetchers.ts#L110)<br>`(no arguments)` | `Promise<SyncState>` | [useSyncState](../../../packages/data/src/sync/useSyncState.ts) |
-| [getSyncStatus](../../../packages/data/src/sync/fetchers.ts#L113)<br>`(no arguments)` | `Promise<SyncStatus>` | [useSyncStatus](../../../packages/data/src/sync/useSyncStatus.ts) |
+| [answerInterruption](../../../packages/data/src/sync/fetchers.ts#L175)<br>`{ sessionId, answer, }: { sessionId: string; answer: "yes" \| "no"; }` | `Promise<SessionIntegrity>` | [useAnswerInterruption](../../../packages/data/src/sync/useAnswerInterruption.ts) |
+| [retrySync](../../../packages/data/src/sync/fetchers.ts#L158)<br>`(no arguments)` | `Promise<{ message: string; }>` | [useRetrySync](../../../packages/data/src/sync/useRetrySync.ts) |
+| [getSessionIntegrity](../../../packages/data/src/sync/fetchers.ts#L169)<br>`sessionId: string` | `Promise<SessionIntegrity>` | [useSessionIntegrity](../../../packages/data/src/sync/useSessionIntegrity.ts) |
+| [getSyncLog](../../../packages/data/src/sync/fetchers.ts#L150)<br>`(no arguments)` | `Promise<{ pendingChanges: SyncChange[]; syncedChanges: SyncChange[]; }>` | [useSyncLog](../../../packages/data/src/sync/useSyncLog.ts) |
+| [getSyncState](../../../packages/data/src/sync/fetchers.ts#L119)<br>`(no arguments)` | `Promise<SyncState>` | [useSyncState](../../../packages/data/src/sync/useSyncState.ts) |
+| [getSyncStatus](../../../packages/data/src/sync/fetchers.ts#L123)<br>`(no arguments)` | `Promise<SyncStatus>` | [useSyncStatus](../../../packages/data/src/sync/useSyncStatus.ts) |
 
 ## Local-only and missing surfaces
 

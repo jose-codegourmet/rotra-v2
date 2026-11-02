@@ -97,7 +97,7 @@ screen loaded one, and returns an allowlisted DTO.
 
 | Module | Commands |
 |---|---|
-| `queue/sync` | `registerDevice`; `enrollStream` (online; takes the one-offline-session reservation; a second device or recovery must revoke the open stream, which records a `missing_prerequisite` conflict); `uploadOperations` (store envelopes → process the contiguous prefix); `sealStream`; `readSyncStatus`; `sessionCompleteness`; `resolveConflict`; `resumeSessionStreams` |
+| `queue/sync` | `registerDevice`; `readClubSyncSummary`; `enrollStream` (online; takes the one-offline-session reservation; a second device or recovery must revoke the open stream, which records a `missing_prerequisite` conflict); `uploadOperations` (store envelopes → process the contiguous prefix); `sealStream`; `readSyncStatus`; `sessionCompleteness`; `resolveConflict`; `resumeSessionStreams` |
 
 - Same operation ID + same canonical payload digest returns the stored receipt; a changed payload or another ID at a used sequence is a `payload_mismatch` conflict and the original envelope is kept.
 - Uploads run the same domain services as online commands, with the operation ID as the command ID (`DISPATCH`). Unknown kinds are rejected; after Session done only payment marks are accepted (finalized payment boundary); service `conflict` → `conflicted` with evidence, other service errors → `rejected` with the code.
@@ -105,6 +105,8 @@ screen loaded one, and returns an allowlisted DTO.
 - A seal needs the full prefix and a matching digest (SHA-256 over the concatenated payload digests 1..N). The server never seals a stream itself.
 - Completeness is proven only when every enrolled stream is sealed and fully settled, no conflict is open and nothing is unprocessed. An unused open stream keeps it unproven.
 - Conflict authority (club account, online, unfinalized session) and the seal digest format are proposals pending #246. The browser outbox is Q11.
+- `readClubSyncSummary` (#399): the club's prepared/active sessions whose completeness is unproven, plus `checkedAt`. Read-only.
+- Queue Route Handlers (#399): `GET /api/sync` (`readClubSyncSummary`) and `GET /api/sessions/[sessionId]/sync` (`readSyncStatus`; another club's session is `not_found`). No route yet for `registerDevice`, `enrollStream`, `uploadOperations`, `sealStream`, `resolveConflict` or `resumeSessionStreams`: enrollment, numbering, seals and conflict authority wait on #246, and there is no browser outbox to call them (Q11).
 
 ## F07.29 · One-time Session done, canonical result facts
 

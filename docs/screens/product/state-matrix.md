@@ -14,7 +14,7 @@
 | View active Session settings | Read-only preparation summary with existing live controls | Same summary from the downloaded session; existing offline guards still apply | Reconcile status; completed/invalid sessions go to their record, finalizing sessions to finishing |
 | Start session | Allowed with levels set, license, no other active session | Allowed only with a downloaded copy | Sync start as a pending change |
 | Add/remove free court, extend time | Allowed | Allowed locally | Sync; public end time changes after sync |
-| Download session to this device | Allowed | Unavailable | Refresh from server while preserving local pending work |
+| Download session to this device | Allowed. Real mode (#399): not connected until #246 and Q11 | Unavailable | Refresh from server while preserving local pending work |
 | Search club saved players | Server/current data | Downloaded subset | Reconcile local additions/links |
 | Search uncached global profile | Allowed | Unavailable; pending local entry permitted | Resolve without duplicate creation |
 | Add player/assign late-entry level | Allowed | Allowed locally in downloaded session | Sync/reconcile; no mid-session reassessment |

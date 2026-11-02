@@ -279,6 +279,24 @@ httpOnly, same-site browser-session cookie scoped to `/api/public-sessions/[slug
 the visitor's status and a missing or non-matching receipt reads as null. Receipt expiry and
 lost-receipt recovery stay open in #248. Sending needs internet; offline nothing is sent.
 
+**Device, sync and batch (#399).** Real mode has no browser outbox or device copy (Q11), so every real
+write is online and saved only when its Route Handler accepted it; nothing ever waits on the device.
+`@rotra/data/sync` reports exactly that: `getSyncStatus`/`getSyncState` call Queue's `GET /api/sync`
+(`readClubSyncSummary`: prepared/active sessions whose F07.28 completeness is unproven, plus the
+server's `checkedAt`, shown as "Synced HH:MM"), with zero pending changes and connectivity from the
+browser; offline they skip the server and keep the last checked time, and `connectRealSync` marks the
+cached status offline on the browser's `offline` event. `getSessionIntegrity` reads
+`GET /api/sessions/[sessionId]/sync` (`readSyncStatus`); unproven completeness shows as missing
+records with the server's counts, never invented conflict evidence. `getSyncLog` is empty (no device
+change log yet) and `retrySync` re-reads the status. **Not connected** (`NotConnectedError`):
+`getDeviceDownloads` and `answerInterruption`, because enrollment, numbering, seals, conflict
+authority and the interruption recovery path wait on
+[#246](https://github.com/jose-codegourmet/rotra-v2/issues/246) and durable storage on Q11; no route
+calls `registerDevice`, `enrollStream`, `uploadOperations`, `sealStream` or `resolveConflict` yet.
+`@rotra/data/batch` is a client-side debounce over each domain's own fetcher (presence, payment
+marks), so it needs no adapter. Known gap: the console's offline notice still says changes save on
+this device, which is untrue in real mode until Q11.
+
 Wrong account types, forged mock cookies, and cross-club/player IDs are denied at the handler, not only
 in the proxy. Database credentials and Supabase keys are read only from server env. Application tables
 have no `anon`/`authenticated` grants, so the Data API exposes none of them.
@@ -295,6 +313,8 @@ The Queue app must keep running a downloaded session without internet. Rules:
   screens), driven by a dev toggle in the mock store.
 - **Later epic:** IndexedDB persistence, a durable operation queue, sync and conflict handling. Built
   after the database exists.
+- **Real mode today (#399):** online only. The sync status and session integrity read the server;
+  downloads and offline writes are not connected (see "Device, sync and batch (#399)" above).
 
 ---
 

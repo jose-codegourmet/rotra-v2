@@ -595,3 +595,21 @@ export async function resumeSessionStreams(context: ClubContext, sessionId: stri
   for (const { id } of streams) out.push(streamDto(await processStream(context, id)))
   return out
 }
+
+/**
+ * Q-OFFLINE club status for the top bar (#399): whether any prepared or active session of the club
+ * lacks proven completeness (`sessionCompleteness`), plus when the server answered. Read-only; it
+ * reports only what the server has received and never claims anything about a device's unsent work.
+ */
+export async function readClubSyncSummary(context: ClubContext) {
+  const sessions = await prisma.queueSession.findMany({
+    where: { clubId: context.clubId, state: { in: ['prepared', 'active'] } },
+    select: { id: true },
+  })
+  const incomplete = await prisma.$transaction(async (tx) => {
+    const out: string[] = []
+    for (const { id } of sessions) if (!(await sessionCompleteness(tx, id)).proven) out.push(id)
+    return out
+  })
+  return { incompleteSessionIds: incomplete, checkedAt: new Date().toISOString() }
+}

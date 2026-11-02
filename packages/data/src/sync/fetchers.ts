@@ -2,6 +2,15 @@ import { getMockDevState, subscribeMockBridge, subscribeMockSaveFailure } from '
 import { delay } from '../mock/latency'
 import { type MockState, mockStore, readMockState } from '../mock/store'
 import { sessionIn } from '../mock/transaction'
+import { isRealDataMode } from '../real/mode'
+import {
+  realAnswerInterruption,
+  realGetSessionIntegrity,
+  realGetSyncLog,
+  realGetSyncState,
+  realGetSyncStatus,
+  realRetrySync,
+} from '../real/sync'
 import { applyRecoveryDevState, integrityIn } from './integrity'
 import type { SaveOutcome, SyncArea, SyncStatus } from './sync.types'
 
@@ -108,9 +117,11 @@ export function connectMockSync() {
   }
 }
 export async function getSyncState() {
+  if (isRealDataMode()) return realGetSyncState()
   return readMockState().sync
 }
 export async function getSyncStatus(): Promise<SyncStatus> {
+  if (isRealDataMode()) return realGetSyncStatus()
   const state = readMockState(),
     dev = getMockDevState()
   return {
@@ -137,6 +148,7 @@ export async function getSyncStatus(): Promise<SyncStatus> {
   }
 }
 export async function getSyncLog() {
+  if (isRealDataMode()) return realGetSyncLog()
   const log = readMockState().sync.log
   return {
     pendingChanges: log.filter((entry) => entry.syncedAt === null),
@@ -144,6 +156,7 @@ export async function getSyncLog() {
   }
 }
 export async function retrySync() {
+  if (isRealDataMode()) return realRetrySync()
   await reconcile()
   return {
     message: getMockDevState().offline
@@ -154,6 +167,7 @@ export async function retrySync() {
   }
 }
 export async function getSessionIntegrity(sessionId: string) {
+  if (isRealDataMode()) return realGetSessionIntegrity(sessionId)
   const state = readMockState()
   sessionIn(state, sessionId)
   return integrityIn(state, sessionId)
@@ -165,6 +179,7 @@ export async function answerInterruption({
   sessionId: string
   answer: 'yes' | 'no'
 }) {
+  if (isRealDataMode()) return realAnswerInterruption()
   await delay()
   mockStore.update((state) => {
     sessionIn(state, sessionId)

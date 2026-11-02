@@ -19,7 +19,7 @@ const sessionPath = (sessionId: string) => `/api/sessions/${encodeURIComponent(s
 
 // ---------- Matches (Q-QUEUE, Q-MATCH) ----------
 
-type WireMatch = Omit<Match, 'startedAt' | 'endedAt' | 'substitutions' | 'decision'> & {
+export type WireMatch = Omit<Match, 'startedAt' | 'endedAt' | 'substitutions' | 'decision'> & {
   startedAt: string | null
   endedAt: string | null
   substitutions: { outId: string; inId: string; team: 'A' | 'B'; at: string }[]
@@ -27,7 +27,7 @@ type WireMatch = Omit<Match, 'startedAt' | 'endedAt' | 'substitutions' | 'decisi
   revision: string
 }
 
-const matchOf = (m: WireMatch): Match => ({
+export const matchOf = (m: WireMatch): Match => ({
   id: m.id,
   sessionId: m.sessionId,
   matchNo: m.matchNo,
@@ -53,7 +53,7 @@ const matchOf = (m: WireMatch): Match => ({
 type QueueRead = { queueRevision: string; revision: string; matches: Match[] }
 const reads = new Map<string, QueueRead>()
 
-async function readQueue(sessionId: string) {
+export async function readQueue(sessionId: string) {
   const wire = await realRequest<{
     matches: WireMatch[]
     queueRevision: string
@@ -90,7 +90,7 @@ function sessionOf(matchId: string) {
  * One queue command. The shown queue revision moves forward only when the reply proves this was
  * the only change since the read; otherwise the next refetch brings the screen up to date first.
  */
-async function queueCommand<T>(
+export async function queueCommand<T>(
   sessionId: string,
   path: string,
   options: { method?: 'POST' | 'PATCH' | 'DELETE'; body: unknown },

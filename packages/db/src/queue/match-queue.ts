@@ -1,4 +1,6 @@
 import 'server-only'
+import { AUTO_QUEUE_MODES, autoQueueDraftConflict } from '@rotra/data/match/auto-queue-rules'
+import type { AutoQueueMode } from '@rotra/data/match/auto-queue-types'
 import { allPlayers, completeLineup, matchStatus } from '@rotra/data/match/match.rules'
 import {
   balanceTeams,
@@ -11,6 +13,7 @@ import type { QueueSession as SessionView } from '@rotra/data/queue-session/type
 import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
 import type { QueueSession } from '../generated/prisma/client'
+import { requireRevision } from '../service/authorize'
 import { ServiceError } from '../service/errors'
 import { toDecimalString } from '../service/serialize'
 import {
@@ -333,6 +336,90 @@ export async function autoQueue(
             origin: 'auto',
             manualProtected: false,
             generationId: input.operationId,
+          }),
+        ),
+      )
+    return out
+  })
+}
+
+/** At most one full batch (6) from each of the five Auto queue alternatives. */
+const MAX_AUTO_QUEUE_DRAFTS = AUTO_QUEUE_MODES.length * 6
+
+type AutoQueueDraftInput = { operationId: string; mode: AutoQueueMode; lineup: MatchLineup }
+
+/** The reviewed drafts from a request body; anything malformed is `invalid` before any lock. */
+export function autoQueueDraftsOf(value: unknown): AutoQueueDraftInput[] {
+  const drafts = Array.isArray(value) ? value : []
+  if (!drafts.length || drafts.length > MAX_AUTO_QUEUE_DRAFTS)
+    throw new ServiceError('invalid', { drafts: 'Review a non-empty selection of drafts.' })
+  const out = drafts.map((draft): AutoQueueDraftInput => {
+    const body = (draft && typeof draft === 'object' ? draft : {}) as Record<string, unknown>
+    const mode = body.mode as AutoQueueMode
+    if (typeof body.operationId !== 'string' || !body.operationId.trim())
+      throw new ServiceError('invalid', { drafts: 'A confirmation ID is required.' })
+    if (!AUTO_QUEUE_MODES.includes(mode))
+      throw new ServiceError('invalid', { drafts: 'Review a non-empty selection of drafts.' })
+    return { operationId: body.operationId, mode, lineup: lineupOf(body.lineup) }
+  })
+  if (new Set(out.map((d) => d.operationId)).size !== out.length)
+    throw new ServiceError('invalid', {
+      drafts: 'Review a non-empty selection of different drafts.',
+    })
+  return out
+}
+
+/**
+ * Q-QUEUE · Auto queue › Add to Main Queue: appends the club's reviewed draft lineups, in the
+ * order given, as unprotected `auto` matches (like a generated batch). The draft working set stays
+ * on the client; this is its only write. Each draft is keyed on its own operation ID, so a retried
+ * transfer returns the stored matches. Both revisions the drafts were checked against are
+ * required, and every draft is checked again against the locked inputs, so a changed queue or
+ * roster is a conflict.
+ */
+export async function addAutoQueueDrafts(
+  context: ClubContext,
+  sessionId: string,
+  input: { drafts: AutoQueueDraftInput[]; expectedQueueRevision: string; expectedRevision: string },
+) {
+  return matchCommand(context, sessionId, {}, async (tx, session) => {
+    const keys = await Promise.all(
+      input.drafts.map((d) => derivedId(d.operationId, 'auto-queue-draft')),
+    )
+    const done = await tx.match.findMany({
+      where: { sourceOperationId: { in: keys } },
+      select: { id: true, sessionId: true, sourceOperationId: true },
+    })
+    if (done.length) {
+      if (done.length !== keys.length || done.some((m) => m.sessionId !== session.id))
+        throw new ServiceError('conflict')
+      const byKey = new Map(done.map((m) => [m.sourceOperationId, m.id]))
+      const rows = []
+      for (const key of keys)
+        rows.push(matchDto((await loadMatch(tx, session.id, byKey.get(key) as string)) as MatchRow))
+      return rows
+    }
+    requireRevision(session.queueRevision, input.expectedQueueRevision)
+    requireRevision(session.revision, input.expectedRevision)
+    const { ctx, roster } = await matchContext(tx, session)
+    const view = sessionView(session)
+    for (const draft of input.drafts) {
+      const reason = autoQueueDraftConflict(
+        { ...draft.lineup, id: draft.operationId, mode: draft.mode, reason: '', fingerprint: '' },
+        view,
+        ctx,
+      )
+      if (reason) throw new ServiceError('conflict', { drafts: reason })
+    }
+    const ids = new Set(roster.map((r) => r.id))
+    const out = []
+    for (const [i, draft] of input.drafts.entries())
+      out.push(
+        matchDto(
+          await appendMatch(tx, session, ids, draft.lineup, {
+            operationId: keys[i] as string,
+            origin: 'auto',
+            manualProtected: false,
           }),
         ),
       )

@@ -19,7 +19,7 @@
 | Search uncached global profile | Allowed | Unavailable; pending local entry permitted | Resolve without duplicate creation |
 | Add player/assign late-entry level | Allowed | Allowed locally in downloaded session | Sync/reconcile; no mid-session reassessment |
 | Toggle presence | Allowed | Allowed locally | Flag conflicts/affected waiting lineups |
-| Manual/Suggest/Auto generation | Allowed | Supported using available downloaded inputs. Real mode (#396) is online only: nothing is sent and the error says you're offline; Auto queue drafts are not connected | Revalidate before accepting conflicting work |
+| Manual/Suggest/Auto generation | Allowed | Supported using available downloaded inputs. Real mode (#396) is online only: nothing is sent and the error says you're offline; Auto queue drafts are kept on the device (lost on reload) and Add to Main Queue is online only | Revalidate before accepting conflicting work |
 | Edit/reorder/regenerate waiting queue | Allowed | Allowed locally. Real mode (#396) is online only | Preserve healthy protected manual edits; no silent overwrite. Real mode sends the shown queue revision; a stale one is a conflict |
 | Start match | Operator confirmation plus eligibility | Local confirmation plus downloaded authorization; cannot prove unseen remote state. Real mode (#396) is online only | Conflicting occupancy requires review |
 | Substitute | Allowed with available replacement | Allowed and durable locally | Retain outgoing/incoming evidence |

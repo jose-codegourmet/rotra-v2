@@ -6,7 +6,6 @@ import {
   getSessionResults,
   publishResults,
 } from '../session-result/fetchers'
-import { generateAutoQueueDrafts, getAutoQueueDrafts } from './autoQueue.mutations'
 import { completeMatch, startMatch } from './control'
 import { getSessionMatches } from './fetchers'
 import { addMatch, moveMatch, removeWaitingMatch, swapPlayers } from './queue.mutations'
@@ -299,14 +298,8 @@ describe('Matches and results › real mode', () => {
     expect(outcome.data).toMatchObject({ state: 'invalid', invalidReason: 'Power cut' })
   })
 
-  it('keeps Auto queue drafts and Session done not connected, never the mock store', async () => {
+  it('keeps Session done not connected, never the mock store', async () => {
     const before = mockStore.getSnapshot()
-    await expect(getAutoQueueDrafts('s')).rejects.toMatchObject({
-      message: "This part of ROTRA isn't connected to saved data yet.",
-    })
-    await expect(
-      generateAutoQueueDrafts({ sessionId: 's', mode: 'available', count: 2 }),
-    ).rejects.toMatchObject({ message: "This part of ROTRA isn't connected to saved data yet." })
     await expect(
       finalizeSession({ sessionId: 's', commandId: crypto.randomUUID() }),
     ).rejects.toMatchObject({ message: "This part of ROTRA isn't connected to saved data yet." })

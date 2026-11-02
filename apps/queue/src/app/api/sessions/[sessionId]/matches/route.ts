@@ -1,6 +1,8 @@
 import {
+  addAutoQueueDrafts,
   addManualMatch,
   addSuggestedMatch,
+  autoQueueDraftsOf,
   lineupOf,
   makeMatch,
   readSessionMatches,
@@ -24,7 +26,9 @@ export async function GET(
 /**
  * Q-QUEUE › add one waiting match, keyed on the client's `operationId`. `source` picks the
  * command: `selection` (Make match), `suggested` (an accepted suggestion; both revisions it was
- * computed against are required), or a manual lineup (the default).
+ * computed against are required), `auto` (reviewed Auto queue drafts, each keyed on its own
+ * `operationId`; both revisions they were checked against are required), or a manual lineup (the
+ * default).
  */
 export async function POST(
   request: Request,
@@ -40,6 +44,15 @@ export async function POST(
         : []
       return { status: 201, body: await makeMatch(club, sessionId, { operationId, selection }) }
     }
+    if (body.source === 'auto')
+      return {
+        status: 201,
+        body: await addAutoQueueDrafts(club, sessionId, {
+          drafts: autoQueueDraftsOf(body.drafts),
+          expectedQueueRevision: text(body.expectedQueueRevision),
+          expectedRevision: text(body.expectedRevision),
+        }),
+      }
     if (body.source === 'suggested')
       return {
         status: 201,

@@ -8,6 +8,10 @@ import { capacityOf, liveCourts, liveRoster, orderedWaitlist } from './session-s
 
 const E164 = /^\+[1-9][0-9]{7,14}$/
 const BANDS: StatedBand[] = ['beginner', 'intermediate', 'advanced', 'unsure']
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+/** Every prepared or live session takes requests while the club has them on (players module). */
+const TAKES_REQUESTS = ['prepared', 'active']
 
 /** Rate/abuse guard (proposal pending #248): pending requests one session will hold at once. */
 export const MAX_PENDING_REQUESTS_PER_SESSION = 60
@@ -106,7 +110,7 @@ export async function readPublicSession(slug: string) {
       waitlist: waitlist.map((w) => byId.get(w.clubPlayerId)?.displayName ?? ''),
       openSlots: Math.max(0, capacity - roster.length),
       slotBudget: capacity,
-      acceptJoinRequests: session.acceptJoinRequests && session.state === 'prepared',
+      acceptJoinRequests: session.acceptJoinRequests && TAKES_REQUESTS.includes(session.state),
       lastSyncedAt: session.updatedAt.getTime(),
       hasPendingChanges: streams.some((s) => s.highestReceivedSeq > s.contiguousSequence),
       results: session.state === 'completed' ? await readPublishedResults(session.id) : null,
@@ -133,7 +137,7 @@ async function myRequestDto(request: {
 }
 
 /**
- * Q-PUBLIC · Request to join. Never reserves a slot: only the Queue Master's confirmation places
+ * Q-PUBLIC · Request to join. Prepared or active sessions with requests on. Never reserves a slot: only the Queue Master's confirmation places
  * the player (`confirmJoinRequest`). The client sends a stable `requestId`; a lost response or
  * retry with the same fields returns the same request and receipt. Returns the receipt for the
  * Route Handler's httpOnly cookie; it never goes in the JSON body.
@@ -148,6 +152,7 @@ export async function sendJoinRequest(
     statedBand: StatedBand
   },
 ) {
+  if (!UUID.test(input.requestId)) throw new ServiceError('invalid')
   const name = input.name.trim()
   if (!name) throw new ServiceError('invalid', { name: 'Enter your name.' })
   const phone = input.phone?.trim() || null
@@ -174,7 +179,7 @@ export async function sendJoinRequest(
         SELECT "state"::text AS state, "accept_join_requests" AS accept FROM "queue_sessions"
         WHERE "id" = ${session.id}::uuid FOR UPDATE`
       const current = rows[0]
-      if (!current || current.state !== 'prepared' || !current.accept)
+      if (!current || !TAKES_REQUESTS.includes(current.state) || !current.accept)
         throw new ServiceError('forbidden', { request: 'This session is not taking requests.' })
       const pending = await tx.sessionJoinRequest.count({
         where: { sessionId: session.id, status: 'pending' },

@@ -69,7 +69,8 @@ the chore tickets wait for their own pickup.
 | Editing a saved venue: `ClubVenue` has no `revision`, so real mode refuses edits | #383 | Chore |
 | Q-CLUB / dashboard miss the founding city, username and license pricing | #384 | Chore |
 | Courts in use, games played, queued matches and "downloaded here" stay 0/false | #385 | Chore |
-| Every other domain shows "isn't connected to saved data yet" in real mode | #386 (inventory: #375) | Tracking |
+| Every other domain shows "isn't connected to saved data yet" in real mode | #386 (inventory: #375; public session: #398) | Tracking |
+| Public join-request receipt is a browser-session cookie (proposal): no expiry, a lost receipt cannot be recovered, and the visitor sees no status again | #398 | Decision (#248) |
 | RLS disabled on 55 public tables; `anon` can execute `rotra_next_player_sequence()` | #387 | Chore (#243), migration sign-off |
 | Club logo has no storage adapter | #374 (closed) | Done |
 

@@ -268,6 +268,17 @@ produced by an algorithm in `APPROVED_RANK_ALGORITHMS`. No rank formula is appro
 is empty and every read is the empty state ("No players qualify for the leaderboard yet"; my position
 `null`); no fixture or computed position is ever shown. Tie precedence is also still #247.
 
+**Public session (#398).** In real mode the `@rotra/data/public-session` fetchers call Queue's
+`GET /api/public-sessions/[slug]` (`handlePublicRead('public-session.page')`), `POST …/join-request`
+and `GET …/my-request` (`handleVisitorRequest`), backed by `@rotra/db/queue/public-session`. Hooks,
+`publicSessionKeys` and the `PublicSessionPage` / `MyJoinRequest` DTOs are unchanged, so Q-PUBLIC-*,
+the operator's public-page preview and the Record › Public tab read the allowlisted page. A 404 stays
+`PublicSessionNotFoundError`. Request to join sends a `requestId` generated once per open sheet (a
+retry with the same fields saves one request); the receipt (proposal pending #248) is set only as an
+httpOnly, same-site browser-session cookie scoped to `/api/public-sessions/[slug]`, so a reload keeps
+the visitor's status and a missing or non-matching receipt reads as null. Receipt expiry and
+lost-receipt recovery stay open in #248. Sending needs internet; offline nothing is sent.
+
 Wrong account types, forged mock cookies, and cross-club/player IDs are denied at the handler, not only
 in the proxy. Database credentials and Supabase keys are read only from server env. Application tables
 have no `anon`/`authenticated` grants, so the Data API exposes none of them.

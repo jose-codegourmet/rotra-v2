@@ -4,6 +4,13 @@ import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, mockStore } from '../mock/store'
 import { slotCapacity } from '../queue-session/queueSession.rules'
+import { RealRequestError } from '../real/client'
+import { isRealDataMode } from '../real/mode'
+import {
+  realGetMyJoinRequest,
+  realGetPublicSession,
+  realSendJoinRequest,
+} from '../real/public-session'
 import { submitJoinRequest } from '../session-roster/mutations'
 import type {
   MyJoinRequest,
@@ -141,6 +148,12 @@ export async function getPublicSession(
   slug: string,
   options?: { visitor?: boolean },
 ): Promise<PublicSessionPage> {
+  if (isRealDataMode())
+    return realGetPublicSession(slug).catch((error: unknown) => {
+      if (error instanceof RealRequestError && error.status === 404)
+        throw new PublicSessionNotFoundError()
+      throw error
+    })
   await delay()
   if (options?.visitor) requireOnline()
   const { state, ...sync } = serverState()
@@ -150,9 +163,11 @@ export async function getPublicSession(
 /**
  * Q-PUBLIC-JOIN: a pending SessionJoinRequest in the Q03 join-request domain. Rejected when
  * requests are off, the session is finished or invalid, or the guest is offline (sending needs
- * internet). The request id is remembered for this page visit.
+ * internet). The mock remembers the request id for this page visit; real mode keeps the
+ * visitor's receipt in an httpOnly cookie, so a reload keeps it.
  */
 export async function sendJoinRequest(slug: string, input: SendJoinRequestInput) {
+  if (isRealDataMode()) return realSendJoinRequest(slug, input)
   const session = sessionBySlug(mockStore.getSnapshot() as MockState, slug)
   const outcome = await submitJoinRequest({
     sessionId: session.id,
@@ -170,6 +185,7 @@ export async function sendJoinRequest(slug: string, input: SendJoinRequestInput)
 
 /** This visitor's request status: pending, confirmed (slot or waitlist #N) or declined. */
 export async function getMyJoinRequest(slug: string): Promise<MyJoinRequest | null> {
+  if (isRealDataMode()) return realGetMyJoinRequest(slug)
   await delay()
   const mine = myRequests.get(slug)
   if (!mine || mine.generation !== mockStore.getGeneration()) return null

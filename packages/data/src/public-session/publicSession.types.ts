@@ -64,6 +64,8 @@ export type SendJoinRequestInput = {
   nickname?: string | null
   phone?: string | null
   statedBand: SessionJoinRequest['statedBand']
+  /** Generated once per open sheet; real mode sends it so a retry saves one request */
+  requestId?: string
 }
 /** This visitor's own request on a session page, remembered for the page visit. */
 export type MyJoinRequest = {

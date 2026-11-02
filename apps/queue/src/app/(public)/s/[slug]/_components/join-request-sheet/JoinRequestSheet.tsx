@@ -20,7 +20,7 @@ const errorMessage = (error: unknown) =>
 
 /**
  * Q-PUBLIC-JOIN › Request to join: Foundation Sheet + JoinRequestForm, sent with
- * useSendJoinRequest. Success closes the sheet and toasts "Request sent"; the page's card then
+ * useSendJoinRequest with one requestId per open sheet. Success closes the sheet and toasts "Request sent"; the page's card then
  * shows the sent status. A failure keeps the sheet open with serverError and what was typed.
  */
 export function JoinRequestSheet({ slug, sessionLine, open, onOpenChange }: JoinRequestSheetProps) {
@@ -28,10 +28,13 @@ export function JoinRequestSheet({ slug, sessionLine, open, onOpenChange }: Join
   const [serverError, setServerError] = useState<string>()
   // Bumped on every open: a fresh, empty form.
   const [opened, setOpened] = useState(0)
+  // One request ID per open sheet: a retry after a lost reply sends the same request.
+  const [requestId, setRequestId] = useState(() => crypto.randomUUID())
 
   useEffect(() => {
     if (open) {
       setOpened((n) => n + 1)
+      setRequestId(crypto.randomUUID())
       setServerError(undefined)
     }
   }, [open])
@@ -44,6 +47,7 @@ export function JoinRequestSheet({ slug, sessionLine, open, onOpenChange }: Join
         nickname: values.nickname,
         phone: values.phone,
         statedBand: values.statedBand,
+        requestId,
       },
       {
         onSuccess: () => {

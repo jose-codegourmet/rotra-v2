@@ -186,9 +186,9 @@ Every entry inherits its actor, business/screen issue mapping, lifecycle, error,
 
 | Callable / current input | Output | Hook module exports |
 |---|---|---|
-| [getMyJoinRequest](../../../packages/data/src/public-session/fetchers.ts#L172)<br>`slug: string` | `Promise<MyJoinRequest \| null>` | [useMyJoinRequest](../../../packages/data/src/public-session/useMyJoinRequest.ts) |
-| [getPublicSession](../../../packages/data/src/public-session/fetchers.ts#L140)<br>`slug: string, options?: { visitor?: boolean; } \| undefined` | `Promise<PublicSessionPage>` | [usePublicSession](../../../packages/data/src/public-session/usePublicSession.ts) |
-| [sendJoinRequest](../../../packages/data/src/public-session/fetchers.ts#L155)<br>`slug: string, input: SendJoinRequestInput` | `Promise<SaveOutcome & { data: { requestId: string; }; }>` | [useSendJoinRequest](../../../packages/data/src/public-session/useSendJoinRequest.ts) |
+| [getMyJoinRequest](../../../packages/data/src/public-session/fetchers.ts#L187)<br>`slug: string` | `Promise<MyJoinRequest \| null>` | [useMyJoinRequest](../../../packages/data/src/public-session/useMyJoinRequest.ts) |
+| [getPublicSession](../../../packages/data/src/public-session/fetchers.ts#L147)<br>`slug: string, options?: { visitor?: boolean; } \| undefined` | `Promise<PublicSessionPage>` | [usePublicSession](../../../packages/data/src/public-session/usePublicSession.ts) |
+| [sendJoinRequest](../../../packages/data/src/public-session/fetchers.ts#L169)<br>`slug: string, input: SendJoinRequestInput` | `Promise<SaveOutcome & { data: { requestId: string; }; }>` | [useSendJoinRequest](../../../packages/data/src/public-session/useSendJoinRequest.ts) |
 
 ## queue-session
 

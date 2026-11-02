@@ -49,12 +49,13 @@ screen loaded one, and returns an allowlisted DTO.
 
 | Module | Commands |
 |---|---|
-| `queue/public-session` | `readPublicSession` (`public-session.page`: allowlisted `PublicSessionPage`, accepted state only; `finalizing` shows as active); `sendJoinRequest` (client `requestId`, same fields → same request; prepared + accepting only; per-session pending cap; duplicate pending phone refused); `readMyJoinRequest` (needs the receipt) |
+| `queue/public-session` | `readPublicSession` (`public-session.page`: allowlisted `PublicSessionPage`, accepted state only; `finalizing` shows as active); `sendJoinRequest` (client UUID `requestId`, same fields → same request; prepared or active + accepting only; per-session pending cap; duplicate pending phone refused); `readMyJoinRequest` (needs the receipt) |
 | `service/handler` | `handleVisitorRequest` for account-less visitor calls with private, no-store headers |
 
 - Ownership (proposal, #248): the receipt is an HMAC of the request ID under `ROTRA_VISITOR_RECEIPT_SECRET`, kept in an httpOnly cookie. Nothing about it is stored; a wrong receipt, another slug or an unknown ID are all `not_found`.
 - A request never reserves a slot. Confirmation and decline stay in `queue/session-roster`, where the session lock serializes capacity and the waitlist.
 - Request phones are returned only to the club (`joinRequestDto`), never by these reads.
+- Queue Route Handlers (#398): `GET /api/public-sessions/[slug]` (public read), `POST /api/public-sessions/[slug]/join-request` (sets the receipt cookie `rotra_join_request`, httpOnly, same-site, browser session, path `/api/public-sessions/[slug]`; the body never carries it), `GET /api/public-sessions/[slug]/my-request` (null without a matching receipt).
 
 ## F07.25 · Revision-safe waiting queue commands
 

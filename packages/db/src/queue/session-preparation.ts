@@ -534,12 +534,19 @@ export async function setAcceptJoinRequests(
   })
 }
 
-/** Q-HOME / Q-SESSION counts. Courts in use, games and queued matches stay 0 until matches are wired. */
+/** Q-HOME / Q-SESSION counts read the club-scoped persisted match and court-hold rows. */
 async function sessionSummaryDto(tx: Tx, session: QueueSession) {
-  const [courts, roster, waitlistCount] = await Promise.all([
+  const [courts, roster, waitlistCount, courtsInUse, gamesPlayed, queuedCount] = await Promise.all([
     liveCourts(tx, session.id),
     liveRoster(tx, session.id),
     tx.sessionWaitlistEntry.count({ where: { sessionId: session.id } }),
+    tx.activeCourtHold.count({ where: { clubId: session.clubId, sessionId: session.id } }),
+    tx.match.count({
+      where: { clubId: session.clubId, sessionId: session.id, state: 'completed' },
+    }),
+    tx.match.count({
+      where: { clubId: session.clubId, sessionId: session.id, state: 'waiting', removedAt: null },
+    }),
   ])
   return {
     session: sessionDto(session),
@@ -548,6 +555,9 @@ async function sessionSummaryDto(tx: Tx, session: QueueSession) {
     presentCount: roster.filter((entry) => entry.present).length,
     capacity: slotCapacity(courts.length, session.playersPerCourt),
     waitlistCount,
+    courtsInUse,
+    gamesPlayed,
+    queuedCount,
   }
 }
 

@@ -66,6 +66,7 @@ export const UpcomingInDays: Story = { args: { ...upcoming, now: start - 3 * 24 
 export const UpcomingStartingNow: Story = { args: { ...upcoming, now: start + 5 * MINUTE } }
 export const UpcomingWasDue: Story = { args: { ...upcoming, now: start + 40 * MINUTE } }
 export const UpcomingDownloaded: Story = { args: { ...upcoming, downloadedHere: true } }
+export const UpcomingDownloadNotConnected: Story = { args: { ...upcoming, downloadedHere: null } }
 export const NothingPlanned: Story = { args: { variant: 'nothing', onCreateSession: fn() } }
 const longTitle: NowCardLive = {
   ...live,

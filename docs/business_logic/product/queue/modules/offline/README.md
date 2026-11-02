@@ -22,6 +22,10 @@
 
 Each device downloads a session for itself: **Not downloaded on this device**, **Downloading…**, or **Ready on this device** (with **Update download**). A download on one device does not prepare another.
 
+Until a data mode has a device-download adapter, an upcoming Queue Session shows **Not connected** for its
+offline-copy status. This is not a claim that no download exists; it avoids turning unavailable device-local
+evidence into a false “No”.
+
 The top bar always shows sync status:
 
 | Status | Meaning |

@@ -280,6 +280,9 @@ type WireSessionSummary = {
   presentCount: number
   capacity: number
   waitlistCount: number
+  courtsInUse: number
+  gamesPlayed: number
+  queuedCount: number
 }
 
 const courtOf = (court: WireCourt): SessionCourt => ({
@@ -290,7 +293,6 @@ const courtOf = (court: WireCourt): SessionCourt => ({
   removedAt: msOrNull(court.removedAt),
 })
 
-/** Matches are not wired yet, so courts in use, games and queued matches are 0 (truthful here). */
 function summaryOf(wire: WireSessionSummary): QueueSessionSummary {
   const { session } = wire
   return {
@@ -301,14 +303,15 @@ function summaryOf(wire: WireSessionSummary): QueueSessionSummary {
     startedAt: msOrNull(session.startedAt),
     finalizedAt: msOrNull(session.finalizedAt),
     playerRecordsUpdatedAt: null,
-    courtsInUse: 0,
-    gamesPlayed: 0,
+    courtsInUse: wire.courtsInUse,
+    gamesPlayed: wire.gamesPlayed,
     presentCount: wire.presentCount,
     rosterCount: wire.rosterCount,
     capacity: wire.capacity,
     waitlistCount: wire.waitlistCount,
-    queuedCount: 0,
-    downloadedHere: false,
+    queuedCount: wire.queuedCount,
+    // Device-local downloads are intentionally not inferred from server data (#399).
+    downloadedHere: null,
   }
 }
 

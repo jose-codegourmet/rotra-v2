@@ -1356,7 +1356,7 @@ function nowCard(act, prepared) {
       <div class="stack tight" style="min-width:0"><span class="now-badge next">${I.clock}Upcoming · ${esc(untilText(next.start))}</span>
         <h2 class="now-title">${esc(next.title)}</h2>
         <p class="small muted">${fmtDate(next.start)} · ${fmtTime(next.start)}–${fmtTime(next.end)} · ${esc(next.venue)}</p>
-        <div class="now-stats">${stat(`${next.roster.length}/${capacityOf(next)}`, 'slots filled')}${stat((next.waitlist || []).length, 'on the waitlist')}${stat(next.courts.length, `court${next.courts.length === 1 ? '' : 's'}`)}${stat(next.download === 'ready' ? 'Ready' : 'No', 'offline copy')}</div></div>
+        <div class="now-stats">${stat(`${next.roster.length}/${capacityOf(next)}`, 'slots filled')}${stat((next.waitlist || []).length, 'on the waitlist')}${stat(next.courts.length, `court${next.courts.length === 1 ? '' : 's'}`)}${stat(next.download == null ? 'Not connected' : next.download === 'ready' ? 'Ready' : 'No', 'offline copy')}</div></div>
       <div class="now-actions"><button class="btn primary" data-act="go" data-to="prepare" data-id="${next.id}">Open preparation</button><span class="small muted">Not started yet</span></div>
     </section>`;
 }

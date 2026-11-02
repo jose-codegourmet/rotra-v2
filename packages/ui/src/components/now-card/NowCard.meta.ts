@@ -7,6 +7,7 @@ export const nowCardMeta = {
   usage: [
     'Use once on Q-HOME. Live and upcoming differ by edge, tint and a filled versus outlined badge, never by colour alone.',
     'Pass `now` for a fixed time in stories; countdown and "time left" text come from NowCard.helpers.',
+    'Pass `downloadedHere: null` only when the active data mode has no device-download adapter; it renders “Not connected”, never a false “No”.',
     'On phones (≤ 700 px) the action drops below the stats at full width.',
   ],
   prototype: {

@@ -45,7 +45,8 @@ export type QueueSessionSummary = QueueSession & {
   capacity: number
   waitlistCount: number
   queuedCount: number
-  downloadedHere: boolean
+  /** `null` means this data mode has no device-download adapter yet. */
+  downloadedHere: boolean | null
 }
 export type QueueSessionInput = Pick<
   QueueSession,

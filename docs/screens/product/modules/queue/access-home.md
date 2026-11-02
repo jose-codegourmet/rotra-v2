@@ -48,7 +48,7 @@ If status cannot be verified, show “Unable to verify access” separately from
 **Now card** (full width under the header) shows exactly one state, styled so live and upcoming can't be confused:
 
 - **Live:** accent edge and tint, a filled pulsing **LIVE NOW** badge, title, “venue · start–end · N h M min left” (or “past its end time”), live numbers (courts in use “1/3”, games played, players present “14/14”, queued), **Continue session**, and “Up next: TITLE · DATE” when another session is prepared.
-- **Upcoming** (earliest prepared session, nothing live): neutral edge, an outlined **UPCOMING · …** badge with a clock and a countdown (“Starts in 45 min”, “Starts in 2 h 15 min”, “Tomorrow, 6:00 PM”, “In 3 days · DATE”, “Starting now”, or “Was due 6:00 PM · not started”), title, date · time · venue, preparation numbers (slots filled “14/24”, on the waitlist, courts, offline copy Ready/No), **Open preparation** and “Not started yet”.
+- **Upcoming** (earliest prepared session, nothing live): neutral edge, an outlined **UPCOMING · …** badge with a clock and a countdown (“Starts in 45 min”, “Starts in 2 h 15 min”, “Tomorrow, 6:00 PM”, “In 3 days · DATE”, “Starting now”, or “Was due 6:00 PM · not started”), title, date · time · venue, preparation numbers (slots filled “14/24”, on the waitlist, courts, offline copy Ready/No/**Not connected** when the data mode has no device-download adapter), **Open preparation** and “Not started yet”.
 - **Nothing planned:** outlined badge, “Plan your next club night”, **Create session**.
 
 On phones the action button drops below the numbers at full width.

@@ -32,7 +32,8 @@ export type NowCardUpcoming = {
   capacity: number
   waitlistCount: number
   courts: number
-  downloadedHere: boolean
+  /** Null means this data mode does not have a device-download adapter. */
+  downloadedHere: boolean | null
   onOpenPreparation: () => void
 }
 
@@ -124,7 +125,16 @@ export function NowCard(props: NowCardProps) {
             <Stat value={`${props.rosterCount}/${props.capacity}`} label="slots filled" />
             <Stat value={props.waitlistCount} label="on the waitlist" />
             <Stat value={props.courts} label={`court${props.courts === 1 ? '' : 's'}`} />
-            <Stat value={props.downloadedHere ? 'Ready' : 'No'} label="offline copy" />
+            <Stat
+              value={
+                props.downloadedHere === null
+                  ? 'Not connected'
+                  : props.downloadedHere
+                    ? 'Ready'
+                    : 'No'
+              }
+              label="offline copy"
+            />
           </div>
         </div>
         <div className={actionsClass}>

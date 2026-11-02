@@ -76,6 +76,18 @@ the chore tickets wait for their own pickup.
 | Player sign-in (phone or email + password), password reset and registration (claim) links have no real-mode route, so the wired own-account routes (#400) have no player session to serve yet | #244 | Decision |
 | Contact-change Approve / Retry application / Check status change the provider login; not connected in real mode (#401) | #196, #244 | Decision |
 
+### Gaps from the match and results wiring (#396)
+
+Found on November 2, 2026. Nothing here was decided by the wiring.
+
+| Gap | Waits on | Kind |
+|---|---|---|
+| Session done (`finalizeSession`, Session done review and status) stays not connected in real mode | #246 (finalization barriers) and a running projection worker (hosting #243) | Decision + chore |
+| Auto queue drafts stay not connected: no service stores the draft working set or adds a reviewed draft lineup as an `auto` match | #247 (queue generation), then a chore | Decision |
+| Real-mode queue commands are online only; offline match numbering and the outbox are not built | #246 | Decision |
+| A retried add, Make match, Auto queue or Regenerate whose reply never came back sends a new operation ID (the screens supply none), so the operator checks the queue before retrying | Mockup-first if a stable per-sheet ID is wanted | Chore |
+| The mock publishes an Off-Day-only selection; `publishResults` refuses it (Off Day goes with the awards slide) | Results publication rules (#248) | Decision |
+
 ## Design limits
 
 A database can enforce uniqueness and atomicity for records it has received. It cannot know about arbitrary never-enrolled offline devices, prove a device's unsent work is absent, remotely revoke already-cached data, or infer the true winner from contradictory signed/confirmed inputs. Enrollment, seals, review, and explicit unresolved states are necessary rather than claims of perfect automatic merging.

@@ -1,8 +1,9 @@
 import { checkMockSave } from '../mock/bridge'
-import { MockError } from '../mock/errors'
+import { MockError, NotConnectedError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, mockStore, readMockState } from '../mock/store'
 import { queueMutation, requireSessionWrite, sessionIn } from '../mock/transaction'
+import { isRealDataMode } from '../real/mode'
 import {
   allAutoQueueDrafts,
   autoQueueDraftConflict,
@@ -19,6 +20,13 @@ export function draftState(s: MockState, sessionId: string) {
   s.autoQueueDrafts[sessionId] ??= emptyAutoQueueDraftState()
   return s.autoQueueDrafts[sessionId]
 }
+/**
+ * Real mode (#396): Auto queue drafts stay not connected. No service stores a draft working set
+ * or accepts a reviewed draft lineup as an `auto` match (the server's Auto queue generates its own
+ * batch), and the draft modes' weights are part of the open queue-generation decision (#247).
+ */
+const notConnected = () => Promise.reject(new NotConnectedError())
+
 /** Draft edits never create match numbers, accepted assignments, or sync-log entries. */
 export async function changeAutoQueueDrafts<T>(sessionId: string, change: (s: MockState) => T) {
   await delay()
@@ -31,6 +39,7 @@ export async function changeAutoQueueDrafts<T>(sessionId: string, change: (s: Mo
   return data as T
 }
 export async function getAutoQueueDrafts(sessionId: string) {
+  if (isRealDataMode()) return notConnected()
   await delay()
   const s = readMockState()
   const session = sessionIn(s, sessionId)
@@ -46,6 +55,7 @@ export function editAutoQueueDrafts(
     | { action: 'clear'; mode: AutoQueueMode; unselectedOnly: boolean }
   ),
 ) {
+  if (isRealDataMode()) return notConnected()
   return changeAutoQueueDrafts(input.sessionId, (s) => {
     const state = draftState(s, input.sessionId)
     if (input.action === 'select') selectAutoQueueDraft(state, input.draftId, input.selected)
@@ -62,6 +72,7 @@ export function generateAutoQueueDrafts(input: {
   count: AutoQueueCount
   preserveSelected?: boolean
 }) {
+  if (isRealDataMode()) return notConnected()
   return changeAutoQueueDrafts(input.sessionId, (s) => {
     if (![2, 3, 4, 6].includes(input.count))
       throw new MockError('permission', 'Choose 2, 3, 4 or 6 matches.')
@@ -115,6 +126,7 @@ export function transferAutoQueueDrafts(input: {
   draftIds: string[]
   operationId: string
 }) {
+  if (isRealDataMode()) return notConnected()
   if (!input.operationId.trim()) throw new MockError('permission', 'A confirmation ID is required.')
   return queueMutation(
     {

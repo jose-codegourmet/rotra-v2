@@ -1,6 +1,18 @@
 import { MockError } from '../mock/errors'
 import type { MockState } from '../mock/store'
 import { queueMutation, sessionIn } from '../mock/transaction'
+import {
+  realAddMatch,
+  realAddSuggestedMatch,
+  realAutoQueue,
+  realMakeMatch,
+  realMoveMatch,
+  realRegenerateQueue,
+  realRemoveWaitingMatch,
+  realSwapPlayers,
+  realUpdateMatchLineup,
+} from '../real/match'
+import { isRealDataMode } from '../real/mode'
 import { allPlayers, completeLineup, FORMAT_LABELS, matchStatus, shortName } from './match.rules'
 import type { Match, MatchLineup, MatchOrigin } from './match.types'
 import { balanceTeams, formatForSelection, generateMatches } from './queue.rules'
@@ -81,6 +93,7 @@ function waiting(s: MockState, id: string, sessionId: string) {
   return match
 }
 export function addMatch(input: MatchLineup & { sessionId: string }) {
+  if (isRealDataMode()) return realAddMatch(input)
   return change(input.sessionId, (s) => ({
     data: append(
       s,
@@ -93,6 +106,7 @@ export function addMatch(input: MatchLineup & { sessionId: string }) {
   }))
 }
 export function makeMatch(input: { sessionId: string; selection: string[] }) {
+  if (isRealDataMode()) return realMakeMatch(input)
   return change(input.sessionId, (s) => {
     const plan = formatForSelection(input.selection.length, sessionIn(s, input.sessionId))
     if (!plan.format) throw new MockError('permission', plan.reason)
@@ -116,6 +130,7 @@ export function updateMatchLineup(input: {
   matchId: string
   lineup: MatchLineup
 }) {
+  if (isRealDataMode()) return realUpdateMatchLineup(input)
   return change(input.sessionId, (s) => {
     const m = waiting(s, input.matchId, input.sessionId)
     validate(s, input.sessionId, input.lineup, true)
@@ -132,12 +147,14 @@ export function addSuggestedMatch(input: {
   lineup: MatchLineup
   switched: boolean
 }) {
+  if (isRealDataMode()) return realAddSuggestedMatch(input)
   return change(input.sessionId, (s) => ({
     data: append(s, input.sessionId, input.lineup, 'suggested', input.switched),
     text: 'Suggestion added to the queue',
   }))
 }
 export function autoQueue(input: { sessionId: string; n: 2 | 3 | 4 | 6 }) {
+  if (isRealDataMode()) return realAutoQueue(input)
   return change(input.sessionId, (s) => {
     if (![2, 3, 4, 6].includes(input.n))
       throw new MockError('permission', 'Choose 2, 3, 4 or 6 matches.')
@@ -154,6 +171,7 @@ export function autoQueue(input: { sessionId: string; n: 2 | 3 | 4 | 6 }) {
   })
 }
 export function regenerateQueue(sessionId: string) {
+  if (isRealDataMode()) return realRegenerateQueue(sessionId)
   return change(sessionId, (s) => {
     const ctx = matchContext(s, sessionId),
       replace = ctx.matches
@@ -186,6 +204,7 @@ export function moveMatch(input: {
   toIndex: number
   method?: 'arrow' | 'drop'
 }) {
+  if (isRealDataMode()) return realMoveMatch(input)
   return change(input.sessionId, (s) => {
     const m = waiting(s, input.matchId, input.sessionId),
       list = s.matches
@@ -209,6 +228,7 @@ export function moveMatch(input: {
   })
 }
 export function removeWaitingMatch(input: { sessionId: string; matchId: string }) {
+  if (isRealDataMode()) return realRemoveWaitingMatch(input)
   return change(input.sessionId, (s) => {
     const m = waiting(s, input.matchId, input.sessionId)
     s.matches = s.matches.filter((x) => x.id !== m.id)
@@ -216,6 +236,7 @@ export function removeWaitingMatch(input: { sessionId: string; matchId: string }
   })
 }
 export function swapPlayers(input: { sessionId: string; matchId: string; a: string; b: string }) {
+  if (isRealDataMode()) return realSwapPlayers(input)
   return change(input.sessionId, (s) => {
     const m = waiting(s, input.matchId, input.sessionId),
       a = m.teamA.includes(input.a) ? input.a : input.b,

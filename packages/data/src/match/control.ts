@@ -2,6 +2,13 @@ import { MockError } from '../mock/errors'
 import { type MockState, readMockState } from '../mock/store'
 import { queueMutation } from '../mock/transaction'
 import {
+  realCompleteMatch,
+  realInvalidateMatch,
+  realStartMatch,
+  realSubstitutePlayer,
+} from '../real/match'
+import { isRealDataMode } from '../real/mode'
+import {
   canStart,
   courtNames,
   shortName,
@@ -42,6 +49,7 @@ function requireActive(m: Match) {
     throw new MockError('conflict', 'This match already has a confirmed outcome or is not active.')
 }
 export function startMatch(input: { matchId: string; courtIds: string[]; operationId: string }) {
+  if (isRealDataMode()) return realStartMatch(input)
   return control(input, 'start', (s, m) => {
     if (!canStart(m, input.courtIds, matchContext(s, m.sessionId)))
       throw new MockError('conflict', 'Something changed. Review the match again.')
@@ -58,6 +66,7 @@ export function completeMatch(input: {
   teamBScore?: number | null
   operationId: string
 }) {
+  if (isRealDataMode()) return realCompleteMatch(input)
   return control(input, 'complete', (s, m) => {
     requireActive(m)
     const result = validateResult({
@@ -79,6 +88,7 @@ export function completeMatch(input: {
   })
 }
 export function invalidateMatch(input: { matchId: string; operationId: string }) {
+  if (isRealDataMode()) return realInvalidateMatch(input)
   return control(input, 'invalidate', (s, m) => {
     requireActive(m)
     m.state = 'invalid'
@@ -99,6 +109,7 @@ export function substitutePlayer(input: {
   inId: string
   operationId: string
 }) {
+  if (isRealDataMode()) return realSubstitutePlayer(input)
   return control(input, 'substitute', (s, m) => {
     requireActive(m)
     const incoming = substitutionCandidates(m, s.roster, s.matches).find(

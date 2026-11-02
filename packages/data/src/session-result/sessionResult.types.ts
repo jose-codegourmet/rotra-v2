@@ -46,8 +46,11 @@ export type SessionResultSnapshot = {
   standings: StandingRow[]
   awards: SessionAwards
   calculationVersion: 'prototype-reference'
-  /** Prior club sessions per roster club player at generation time (clubPlayerId → count). */
-  priorSessionCounts: Record<string, number>
+  /**
+   * Prior club sessions per roster club player at generation time (clubPlayerId → count). Mock
+   * snapshots only: the saved snapshot keeps the baseline session IDs instead (real mode, #396).
+   */
+  priorSessionCounts?: Record<string, number>
   generatedAt: number
 }
 export type PublishedSlide = 'standings' | 'awards'

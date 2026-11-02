@@ -2,6 +2,8 @@ import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { readMockState } from '../mock/store'
 import { queueMutation, sessionIn } from '../mock/transaction'
+import { realGetSessionPublication, realGetSessionResults, realPublishResults } from '../real/match'
+import { isRealDataMode } from '../real/mode'
 import type {
   PublishResultsInput,
   SessionPublication,
@@ -10,6 +12,7 @@ import type {
 
 /** Q-RESULTS: the private snapshot; null until a valid finalization reached its `slides` stage. */
 export async function getSessionResults(id: string): Promise<SessionResultSnapshot | null> {
+  if (isRealDataMode()) return realGetSessionResults(id)
   await delay()
   const state = readMockState()
   sessionIn(state, id)
@@ -17,6 +20,7 @@ export async function getSessionResults(id: string): Promise<SessionResultSnapsh
 }
 /** Q-PUBLISH / public page: the current publication, or null while results are private. */
 export async function getSessionPublication(id: string): Promise<SessionPublication | null> {
+  if (isRealDataMode()) return realGetSessionPublication(id)
   await delay()
   const state = readMockState()
   sessionIn(state, id)
@@ -28,6 +32,7 @@ const SLIDE_LABELS = { standings: 'Standings', awards: 'Awards' } as const
  * (never the previous row) and appends a publication event. A failed save keeps the previous publication.
  */
 export function publishResults(input: PublishResultsInput) {
+  if (isRealDataMode()) return realPublishResults(input)
   const slides = [...new Set(input.publishedSlides)].sort()
   return queueMutation({ area: 'Published results', onlineOnly: true }, (state) => {
     const session = sessionIn(state, input.sessionId)

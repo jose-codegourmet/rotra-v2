@@ -19,12 +19,12 @@
 | Search uncached global profile | Allowed | Unavailable; pending local entry permitted | Resolve without duplicate creation |
 | Add player/assign late-entry level | Allowed | Allowed locally in downloaded session | Sync/reconcile; no mid-session reassessment |
 | Toggle presence | Allowed | Allowed locally | Flag conflicts/affected waiting lineups |
-| Manual/Suggest/Auto generation | Allowed | Supported using available downloaded inputs | Revalidate before accepting conflicting work |
-| Edit/reorder/regenerate waiting queue | Allowed | Allowed locally | Preserve healthy protected manual edits; no silent overwrite |
-| Start match | Operator confirmation plus eligibility | Local confirmation plus downloaded authorization; cannot prove unseen remote state | Conflicting occupancy requires review |
+| Manual/Suggest/Auto generation | Allowed | Supported using available downloaded inputs. Real mode (#396) is online only: nothing is sent and the error says you're offline; Auto queue drafts are not connected | Revalidate before accepting conflicting work |
+| Edit/reorder/regenerate waiting queue | Allowed | Allowed locally. Real mode (#396) is online only | Preserve healthy protected manual edits; no silent overwrite. Real mode sends the shown queue revision; a stale one is a conflict |
+| Start match | Operator confirmation plus eligibility | Local confirmation plus downloaded authorization; cannot prove unseen remote state. Real mode (#396) is online only | Conflicting occupancy requires review |
 | Substitute | Allowed with available replacement | Allowed and durable locally | Retain outgoing/incoming evidence |
-| Confirm winner/invalid match | Permanent after confirmation | Permanent locally, pending sync | No ordinary edit/undo path |
-| Session done | Only after complete reconciliation, no pending changes, and no game in play | Unavailable | Blocked until required originals and conflicts are resolved |
+| Confirm winner/invalid match | Permanent after confirmation | Permanent locally, pending sync. Real mode (#396) is online only: nothing is sent offline | No ordinary edit/undo path |
+| Session done | Only after complete reconciliation, no pending changes, and no game in play. Real mode (#396): not connected yet (#246 barriers, projection worker #243); Mark session invalid is connected | Unavailable | Blocked until required originals and conflicts are resolved |
 | Cost estimate (setup step) | Saved with the session | Editable in the unsaved draft only | — |
 | Inventory edits | Allowed | Not specified (open decision). Real mode (#375) is online only: nothing is sent and the error says you're offline | — |
 | Payments checklist (tick paid / not paid) | Allowed. Real mode (#397): a tick with no fee set is refused (#245) | Allowed locally. Real mode (#397) is online only until sync is wired (#399): nothing is sent and the error says you're offline | Sync as pending changes |

@@ -1,9 +1,11 @@
 import { activeMatches } from '../match/match.rules'
 import { checkMockSave, getMockDevState } from '../mock/bridge'
-import { MockError } from '../mock/errors'
+import { MockError, NotConnectedError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, mockStore, readMockState } from '../mock/store'
 import { queueMutation, sessionIn } from '../mock/transaction'
+import { realInvalidateSession } from '../real/match'
+import { isRealDataMode } from '../real/mode'
 import { createResultSnapshot } from '../session-result/sessionResult.rules'
 import { recordChange } from '../sync/fetchers'
 import { integrityIn } from '../sync/integrity'
@@ -72,6 +74,10 @@ function setFinalization(sessionId: string, patch: Partial<SessionFinalization>)
 export async function finalizeSession(
   input: FinalizeSessionInput,
 ): Promise<SaveOutcome & { data: SessionFinalization }> {
+  // Real mode (#396): Session done stays not connected. Its barriers (sealed streams, completeness,
+  // ranking policy) wait on #246, and no projection worker runs yet (hosting is open, #243), so a
+  // committed finalization could never reach its slides stage. The service has no route yet.
+  if (isRealDataMode()) throw new NotConnectedError()
   const { sessionId, commandId } = input
   if (!commandId.trim()) throw new MockError('permission', 'A confirmation ID is required.')
   await delay()
@@ -176,6 +182,7 @@ async function run(
  * only the state changes here; the one-active-session check already counts only active sessions.
  */
 export function invalidateSession(input: { sessionId: string; reason: string }) {
+  if (isRealDataMode()) return realInvalidateSession(input)
   return queueMutation({ area: 'Session done', sessionId: input.sessionId }, (state) => {
     const s = sessionIn(state, input.sessionId)
     if (s.state !== 'active')

@@ -341,6 +341,21 @@ Hooks, query keys and DTOs are unchanged; list filters and counts reuse the mock
 rows. Approve, Retry application and Check status stay not connected: they change the provider login,
 which waits on #196/#244. See [services.md](database_design/product/services.md#admin-audit-and-contact-change-reads-401).
 
+**Matches and results (#396).** In real mode the `@rotra/data/match` queue and control commands,
+`getSessionMatches`, `getLiveStandings`, the `@rotra/data/session-result` fetchers and
+`invalidateSession` call Queue's `/api/sessions/[sessionId]/matches…`, `…/results…` and `…/invalid`
+Route Handlers (list in [services](database_design/product/services.md)), backed by
+`@rotra/db/queue/match-queue`, `match-control`, `results` and `finalization`. Hooks and query keys are
+unchanged. `real/match.ts` keeps the last read of each session's queue: reorder, lineup edits,
+switch sides, remove, Auto queue, Regenerate and an accepted suggestion send its queue revision (a
+suggestion also its session revision), so a change made elsewhere is a conflict; match control
+sends the screen's `operationId`, other commands a fresh one. Live standings use the shared
+counting rule over the saved roster and matches. Everything is online only: the outbox and offline
+match numbering wait on #246. **Not connected:** Auto queue drafts (no service stores drafts or
+accepts a reviewed draft lineup; generation weights are #247) and Session done (`finalizeSession`;
+its barriers wait on #246 and no projection worker runs yet, #243, so a committed finalization
+could never reach its slides stage).
+
 Wrong account types, forged mock cookies, and cross-club/player IDs are denied at the handler, not only
 in the proxy. Database credentials and Supabase keys are read only from server env. Application tables
 have no `anon`/`authenticated` grants, so the Data API exposes none of them.

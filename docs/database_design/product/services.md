@@ -71,6 +71,8 @@ screen loaded one, and returns an allowlisted DTO.
 - Each match is keyed on its operation ID (`source_operation_id`); a batch is keyed on the command as `generation_id`, so a retried Auto queue or Regenerate returns the same matches.
 - Regenerate rebuilds only waiting non-protected drafts and protected entries that need attention; healthy manual entries and active matches are untouched. A stale queue revision is `conflict`.
 - Generation reuses the prototype reference heuristic from `@rotra/data/match/queue.rules` with a seed from the operation; the final heuristic is still open.
+- `readSessionMatches` also returns the session `revision` it read, which an accepted suggestion sends back with the queue revision (#396).
+- Queue Route Handlers (#396): `GET`/`POST /api/sessions/[sessionId]/matches` (read; add with `source` `manual` (default), `selection` or `suggested`), `POST …/matches/auto` (`{ operationId, n, expectedQueueRevision }`), `POST …/matches/regenerate`, `PATCH`/`DELETE …/matches/[matchId]` (lineup edit, remove), `POST …/matches/[matchId]/position` (`{ toIndex, expectedQueueRevision }`). Command replies are `{ result, queueRevision }`.
 
 ## F07.26 · Atomic match start, substitution, permanent results
 
@@ -82,6 +84,7 @@ screen loaded one, and returns an allowlisted DTO.
 - Winner-only results keep both scores null; scores must agree with the winner (`validateResult`).
 - A retried terminal command returns the original outcome; an agreeing one from another operation returns it too; a contradicting one is stored as a `contradictory_decision` conflict and reported as `conflict`. Nothing ever updates a decision, and the SQL triggers freeze the match after it.
 - Substituted players keep their segments; the shared counting rule gives neither credit. Invalid decisions produce no facts at finalization.
+- Queue Route Handlers (#396): `POST /api/sessions/[sessionId]/matches/[matchId]/start` (`{ operationId, courtIds }`), `…/result` (`{ operationId, winningTeam, teamAScore, teamBScore }`), `…/invalid` (`{ operationId }`), `…/substitution` (`{ operationId, outId, inId }`).
 
 ## F07.27 · Inventory, cost estimate, manual payments
 
@@ -121,6 +124,7 @@ screen loaded one, and returns an allowlisted DTO.
 - One transaction commits the `session_finalizations` row (its PK is the session, so a second commit is impossible), every fact, the per-entry summaries, `completed`, the released offline reservation and the downstream jobs (`result_snapshot`, `player_history`, `player_rank`). A retry, a concurrent duplicate or a lost response returns the committed status.
 - Facts: one per (completed match, participant); full participation is recomputed from segments; invalid matches have no completed decision and produce nothing. Minimum shortfall is a warning only.
 - Projection and slide failures retry their own jobs (F07.30/F07.31) and never repeat the commit. An invalid session gets no finalization and no contribution.
+- Queue Route Handler (#396): `POST /api/sessions/[sessionId]/invalid` (`{ reason }`) → `invalidateSession`. `finalizeSession`, `reviewSessionDone` and `readFinalizationStatus` have no route yet: Session done waits on the barrier decision (#246) and on a running projection worker (hosting #243), without which a committed finalization never reaches its slides stage.
 
 ## F07.30 · History, ranking and award projections
 
@@ -148,6 +152,7 @@ screen loaded one, and returns an allowlisted DTO.
 - The public copy holds names and counts only (standings: position, name, W/L, games; awards: names and prior-session counts). No IDs, scores evidence, levels, contacts, financials or raw evidence; the public page never joins the private snapshot.
 - Exports are private; their ID comes from the command and the storage key from the ID, so a re-render overwrites the same object. Rendering and storage are later work; a render failure leaves the finalization and snapshot untouched.
 - Unpublish, bucket policy and public asset access are not built.
+- Queue Route Handlers (#396): `GET /api/sessions/[sessionId]/results` (`readSessionResults`; null for an invalid session), `POST …/results/publication` (`{ commandId, slides, includeOffDay }`). Exports have no route.
 
 ## F07.32 · Expiry-cycle retention, recoverable jobs
 

@@ -157,7 +157,34 @@ export async function readSessionMatches(context: ClubContext, sessionId: string
   if (!session) throw new ServiceError('not_found')
   await requireSessionAccess(context, session)
   const rows = await prisma.$transaction((tx) => sessionMatches(tx, sessionId))
-  return { matches: rows.map(matchDto), queueRevision: toDecimalString(session.queueRevision) }
+  return {
+    matches: rows.map(matchDto),
+    queueRevision: toDecimalString(session.queueRevision),
+    // The session revision the same read saw; an accepted suggestion sends both back.
+    revision: toDecimalString(session.revision),
+  }
+}
+
+const FORMATS: MatchLineup['format'][] = [
+  'singles',
+  'doubles',
+  'fun_1v2',
+  'fun_3v3',
+  'fun_4v4',
+  'fun_5v5',
+]
+
+/** A lineup from a request body; anything malformed is `invalid` before the session is locked. */
+export function lineupOf(value: unknown): MatchLineup {
+  const body = (value && typeof value === 'object' ? value : {}) as Record<string, unknown>
+  const ids = (team: unknown) =>
+    Array.isArray(team) && team.every((id) => typeof id === 'string') ? (team as string[]) : null
+  const format = body.format as MatchLineup['format']
+  const teamA = ids(body.teamA)
+  const teamB = ids(body.teamB)
+  if (!FORMATS.includes(format) || !teamA || !teamB)
+    throw new ServiceError('invalid', { lineup: 'Fill every slot with a different roster player.' })
+  return { format, teamA, teamB }
 }
 
 /** Q-QUEUE · Add match (manual lineup). Manual entries are protected from regeneration. */

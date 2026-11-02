@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { mockStore } from '../mock/store'
-import { finalizeSession, invalidateSession } from '../queue-session/finalization'
+import { invalidateSession } from '../queue-session/finalization'
 import {
   getSessionPublication,
   getSessionResults,
@@ -296,15 +296,6 @@ describe('Matches and results › real mode', () => {
       body: { reason: 'Power cut' },
     })
     expect(outcome.data).toMatchObject({ state: 'invalid', invalidReason: 'Power cut' })
-  })
-
-  it('keeps Session done not connected, never the mock store', async () => {
-    const before = mockStore.getSnapshot()
-    await expect(
-      finalizeSession({ sessionId: 's', commandId: crypto.randomUUID() }),
-    ).rejects.toMatchObject({ message: "This part of ROTRA isn't connected to saved data yet." })
-    expect(fetchMock).not.toHaveBeenCalled()
-    expect(mockStore.getSnapshot()).toBe(before)
   })
 
   it('refuses offline without calling the server', async () => {

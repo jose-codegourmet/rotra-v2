@@ -3,7 +3,7 @@ import { WINDOW_DAYS } from '@rotra/data/player/rules'
 import { createResultSnapshot } from '@rotra/data/session-result/sessionResult.rules'
 import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
-import type { PlayerMatchFact, Prisma, ProjectionJob } from '../generated/prisma/client'
+import { type PlayerMatchFact, Prisma, type ProjectionJob } from '../generated/prisma/client'
 import { settleFinalization } from '../queue/finalization'
 import { matchContext } from '../queue/match-store'
 import { ServiceError } from '../service/errors'
@@ -242,11 +242,19 @@ async function runJob(job: ProjectionJob, now: Date) {
  * failure records a redacted error code and a backoff. After `MAX_JOB_ATTEMPTS` the job stays
  * `failed` for the owner to see; its source facts are untouched and a manual retry resumes it.
  */
-export async function runProjectionJobs(limit = 10, now = new Date()) {
+export async function runProjectionJobs(
+  limit = 10,
+  now = new Date(),
+  scope: { sessionId?: string } = {},
+) {
   const claimed = await prisma.$transaction(async (tx) => {
+    const session = scope.sessionId
+      ? Prisma.sql`AND "source_finalization_id" = ${scope.sessionId}::uuid`
+      : Prisma.empty
     const rows = await tx.$queryRaw<{ id: string }[]>`
       SELECT "id" FROM "projection_jobs"
       WHERE "status" IN ('pending', 'failed') AND "next_attempt_at" <= ${now} AND "attempts" < ${MAX_JOB_ATTEMPTS}
+      ${session}
       ORDER BY "next_attempt_at", "id"
       LIMIT ${limit}
       FOR UPDATE SKIP LOCKED`
@@ -288,12 +296,60 @@ export async function runProjectionJobs(limit = 10, now = new Date()) {
 }
 
 /** Releases jobs a crashed worker left `running` past the lease, so they retry. */
-export async function releaseStaleJobs(leaseMs = 10 * 60_000, now = new Date()) {
+export async function releaseStaleJobs(
+  leaseMs = 10 * 60_000,
+  now = new Date(),
+  scope: { sessionId?: string } = {},
+) {
   const { count } = await prisma.projectionJob.updateMany({
-    where: { status: 'running', lockedAt: { lt: new Date(now.getTime() - leaseMs) } },
+    where: {
+      status: 'running',
+      lockedAt: { lt: new Date(now.getTime() - leaseMs) },
+      ...(scope.sessionId ? { sourceFinalizationId: scope.sessionId } : {}),
+    },
     data: { status: 'pending', lockedAt: null },
   })
   return { released: count }
+}
+
+/** How many claim rounds one request may run; each round claims only this session's due jobs. */
+const IN_REQUEST_ROUNDS = 3
+
+/**
+ * Interim in-request worker (worker hosting is open, #243). Drives one committed finalization's
+ * own jobs (`result_snapshot`, `player_history`, `player_rank`) as far as they go now, so Session
+ * done reaches `done` without a hosted worker. Bounded: a few claim rounds, only this session's
+ * jobs, only due ones. Idempotent: jobs are unique per source + kind + version and claimed with
+ * SKIP LOCKED, so concurrent or repeated calls never double-run a job. `retryFailed` (an explicit
+ * Try again) makes this session's failed jobs due now; one that used up `MAX_JOB_ATTEMPTS` stays
+ * failed for the owner's `retryProjectionJob`. A job left `running` by a lost request is released
+ * after the usual lease. No finalization, another club's, or one already done is a no-op.
+ */
+export async function driveFinalizationJobs(
+  context: ClubContext,
+  sessionId: string,
+  options: { retryFailed?: boolean } = {},
+) {
+  const finalization = await prisma.sessionFinalization.findUnique({ where: { sessionId } })
+  if (!finalization?.committedAt || finalization.clubId !== context.clubId) return []
+  if (finalization.state === 'done') return []
+  if (options.retryFailed)
+    await prisma.projectionJob.updateMany({
+      where: {
+        sourceFinalizationId: sessionId,
+        status: 'failed',
+        attempts: { lt: MAX_JOB_ATTEMPTS },
+      },
+      data: { nextAttemptAt: new Date() },
+    })
+  await releaseStaleJobs(undefined, new Date(), { sessionId })
+  const ran: Awaited<ReturnType<typeof runProjectionJobs>> = []
+  for (let round = 0; round < IN_REQUEST_ROUNDS; round++) {
+    const results = await runProjectionJobs(10, new Date(), { sessionId })
+    ran.push(...results)
+    if (!results.length || results.every((r) => r.status === 'failed')) break
+  }
+  return ran
 }
 
 /** Manual retry of a job that ran out of attempts (owner action). */

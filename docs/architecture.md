@@ -370,10 +370,18 @@ matches and generated with the shared `autoQueue.rules` (the prototype's draft w
 #247), never the mock store. Add to Main Queue rechecks each draft against a fresh read, then sends
 the reviewed lineups as `POST …/matches` `source: 'auto'` (`addAutoQueueDrafts`) with that read's
 queue and session revisions and each draft's ID as its operation ID: a stale revision or a draft
-that needs attention is a conflict, and a retry returns the matches already saved. **Not
-connected:** Session done (`finalizeSession`;
-its barriers wait on #246 and no projection worker runs yet, #243, so a committed finalization
-could never reach its slides stage).
+that needs attention is a conflict, and a retry returns the matches already saved.
+
+**Session done (#396, owner request).** In real mode `getSessionDoneReview`, `finalizeSession` and
+`getFinalizationStatus` call `…/done-review` and `…/finalization` (`real/finalization.ts`), backed by
+`@rotra/db/queue/finalization` as proposed: the barriers (no active match, completeness proven, an
+effective ranking policy) are the **proposed #246 barriers, pending that decision**. The server's
+blocker codes become the sheet's `SessionDoneError` blockers. No projection worker is hosted yet
+(#243), so the Route Handler is the interim in-request worker: after the commit the same request
+runs the session's own result-snapshot, history and rank jobs (`driveFinalizationJobs`, bounded,
+idempotent), and every status read runs whatever is still outstanding, so a lost request still
+finishes and the results view reads the generated snapshot. Online only; the dev stage toggle is
+mock-only.
 
 Wrong account types, forged mock cookies, and cross-club/player IDs are denied at the handler, not only
 in the proxy. Database credentials and Supabase keys are read only from server env. Application tables

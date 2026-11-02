@@ -4,6 +4,7 @@ import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, readMockState } from '../mock/store'
 import { sessionIn } from '../mock/transaction'
+import { realGetFinalizationStatus, realGetSessionDoneReview } from '../real/finalization'
 import { realGetSessionMatches } from '../real/match'
 import { isRealDataMode } from '../real/mode'
 import { realGetQueueSession, realGetQueueSessions, realGetSessionRoster } from '../real/queue'
@@ -67,6 +68,7 @@ export async function getQueueSession(id: string) {
 }
 /** Q-SESSION-DONE: derived from roster, matches and the pending count behind the SyncStatus pill. */
 export async function getSessionDoneReview(id: string): Promise<SessionDoneReview> {
+  if (isRealDataMode()) return realGetSessionDoneReview(id)
   await delay()
   const state = readMockState(),
     session = sessionIn(state, id),
@@ -96,6 +98,8 @@ export async function getSessionDoneReview(id: string): Promise<SessionDoneRevie
 }
 /** Status recovery after a lost response; null until a finalization was ever started. */
 export async function getFinalizationStatus(id: string): Promise<SessionFinalization | null> {
+  // Real mode: each read also runs the committed finalization's outstanding jobs (#243 interim).
+  if (isRealDataMode()) return realGetFinalizationStatus(id)
   await delay(150)
   const state = readMockState()
   sessionIn(state, id)

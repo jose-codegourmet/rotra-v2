@@ -78,7 +78,7 @@ screen loaded one, and returns an allowlisted DTO.
 
 | Module | Commands |
 |---|---|
-| `queue/match-control` | `startMatch` (revalidates with the shared `canStart`, then one court hold per court — two for 5v5 — court usage rows and one player hold per player, all in one transaction); `substitutePlayer` (closes the outgoing segment and opens the incoming one under the same operation, moves the hold); `completeMatch` / `invalidateMatch` (close segments, release usage, free every hold, append the one decision) |
+| `queue/match-control` | `startMatch` (revalidates with the shared `canStart`, then one court hold per court — two for 5v5 — court usage rows and one player hold per player, all in one transaction); `substitutePlayer` (closes the outgoing segment and opens the incoming one under the same operation, moves the hold); `completeMatch` / `invalidateMatch` (mark the open segments `finished_with_match` — they stay open, as the schema requires — release usage, free every hold, append the one decision, then end the match, which the schema allows only once a matching decision exists) |
 
 - Simultaneous starts lose on the hold primary keys (court, roster entry, known global player), so nothing is half-held.
 - Winner-only results keep both scores null; scores must agree with the winner (`validateResult`).
@@ -124,13 +124,14 @@ screen loaded one, and returns an allowlisted DTO.
 - One transaction commits the `session_finalizations` row (its PK is the session, so a second commit is impossible), every fact, the per-entry summaries, `completed`, the released offline reservation and the downstream jobs (`result_snapshot`, `player_history`, `player_rank`). A retry, a concurrent duplicate or a lost response returns the committed status.
 - Facts: one per (completed match, participant); full participation is recomputed from segments; invalid matches have no completed decision and produce nothing. Minimum shortfall is a warning only.
 - Projection and slide failures retry their own jobs (F07.30/F07.31) and never repeat the commit. An invalid session gets no finalization and no contribution.
-- Queue Route Handler (#396): `POST /api/sessions/[sessionId]/invalid` (`{ reason }`) → `invalidateSession`. `finalizeSession`, `reviewSessionDone` and `readFinalizationStatus` have no route yet: Session done waits on the barrier decision (#246) and on a running projection worker (hosting #243), without which a committed finalization never reaches its slides stage.
+- Queue Route Handlers (#396): `POST /api/sessions/[sessionId]/invalid` (`{ reason }`) → `invalidateSession`; `GET …/done-review` → `reviewSessionDone`; `POST …/finalization` (`{ commandId }`, a UUID) → `finalizeSession`, then the in-request worker, replying `{ status, warnings }`; `GET …/finalization` → the in-request worker, then `readFinalizationStatus` (404 until one committed). The barriers are the proposed #246 ones, used as they are pending that decision.
+- **Interim in-request worker (worker hosting is still open, #243).** `driveFinalizationJobs` (`player/projections`) runs one committed finalization's own jobs in the request: it releases this session's stale `running` jobs (usual lease), and on `POST` makes its failed jobs due again (a job that used `MAX_JOB_ATTEMPTS` stays failed for the owner), then runs at most three `runProjectionJobs` rounds scoped to the session. It is bounded, a no-op once the finalization is `done` or for another club, and idempotent (jobs are unique per source + kind + version, claimed with SKIP LOCKED). A job failure never fails the reply; the status shows the failed stage and Try again re-runs only the jobs. When a hosted worker exists it replaces this; the jobs are the same.
 
 ## F07.30 · History, ranking and award projections
 
 | Module | Commands |
 |---|---|
-| `player/projections` | worker: `runProjectionJobs` (SKIP LOCKED claim, bounded attempts with backoff, redacted error codes, then `settleFinalization`), `releaseStaleJobs`, `retryProjectionJob`, `scheduleAgeingJobs`, `schedulePolicyRecalculation`; `recomputeRank`; club `confirmHistoryAttribution`; public `readPlayerMatchHistory`, `readPlayerRank`, `readLeaderboard` |
+| `player/projections` | worker: `runProjectionJobs` (SKIP LOCKED claim, bounded attempts with backoff, redacted error codes, then `settleFinalization`; optional session scope), `releaseStaleJobs` (optional session scope), `retryProjectionJob`, interim in-request `driveFinalizationJobs`, `scheduleAgeingJobs`, `schedulePolicyRecalculation`; `recomputeRank`; club `confirmHistoryAttribution`; public `readPlayerMatchHistory`, `readPlayerRank`, `readLeaderboard` |
 
 - Jobs are unique per source + kind + version, so a retried finalization, assessment or attribution contributes once; contributions are also de-duplicated per (match, entry).
 - Only full participation in singles/doubles counts. Invalid sessions have no facts; partial and fun games appear in history with their status but never count.

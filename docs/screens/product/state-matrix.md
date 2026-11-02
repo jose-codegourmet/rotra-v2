@@ -24,7 +24,7 @@
 | Start match | Operator confirmation plus eligibility | Local confirmation plus downloaded authorization; cannot prove unseen remote state. Real mode (#396) is online only | Conflicting occupancy requires review |
 | Substitute | Allowed with available replacement | Allowed and durable locally | Retain outgoing/incoming evidence |
 | Confirm winner/invalid match | Permanent after confirmation | Permanent locally, pending sync. Real mode (#396) is online only: nothing is sent offline | No ordinary edit/undo path |
-| Session done | Only after complete reconciliation, no pending changes, and no game in play. Real mode (#396): not connected yet (#246 barriers, projection worker #243); Mark session invalid is connected | Unavailable | Blocked until required originals and conflicts are resolved |
+| Session done | Only after complete reconciliation, no pending changes, and no game in play. Real mode (#396): connected online with the proposed #246 barriers (no active game, completeness proven, ranking policy in effect); result slides are prepared in the same request or on the next status read (interim, #243); Mark session invalid is connected | Unavailable | Blocked until required originals and conflicts are resolved |
 | Cost estimate (setup step) | Saved with the session | Editable in the unsaved draft only | — |
 | Inventory edits | Allowed | Not specified (open decision). Real mode (#375) is online only: nothing is sent and the error says you're offline | — |
 | Payments checklist (tick paid / not paid) | Allowed. Real mode (#397): a tick with no fee set is refused (#245) | Allowed locally. Real mode (#397) is online only until sync is wired (#399): nothing is sent and the error says you're offline | Sync as pending changes |

@@ -1,9 +1,11 @@
 import { activeMatches } from '../match/match.rules'
 import { checkMockSave, getMockDevState } from '../mock/bridge'
-import { MockError, NotConnectedError } from '../mock/errors'
+import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, mockStore, readMockState } from '../mock/store'
 import { queueMutation, sessionIn } from '../mock/transaction'
+import { RealRequestError } from '../real/client'
+import { realFinalizeSession } from '../real/finalization'
 import { realInvalidateSession } from '../real/match'
 import { isRealDataMode } from '../real/mode'
 import { createResultSnapshot } from '../session-result/sessionResult.rules'
@@ -53,6 +55,38 @@ function sessionDoneBlocker(state: MockState, sessionId: string): SessionDoneErr
     )
   return null
 }
+/** The server's barrier codes (409 fields) as the sheet's blockers, in the order the sheet checks. */
+const SERVER_BLOCKERS: [code: string, blocker: SessionDoneBlocker, message: string][] = [
+  [
+    'unsealed_streams',
+    'incomplete_records',
+    'Original session records are incomplete. Review recovery before Session done.',
+  ],
+  [
+    'open_conflicts',
+    'incomplete_records',
+    'Original session records are incomplete. Review recovery before Session done.',
+  ],
+  ['pending_operations', 'pending_changes', 'Some changes are still syncing.'],
+  [
+    'active_matches',
+    'games_in_play',
+    'Some games are still in play. Finish or invalidate them first.',
+  ],
+]
+function sessionDoneRefusal(error: unknown) {
+  if (!(error instanceof RealRequestError) || error.status !== 409 || !error.fieldErrors)
+    return error
+  const codes = Object.keys(error.fieldErrors)
+  for (const [code, blocker, message] of SERVER_BLOCKERS)
+    if (codes.includes(code)) return new SessionDoneError(blocker, message)
+  if (codes.includes('no_ranking_policy'))
+    return new MockError(
+      'conflict',
+      'Session done is unavailable: no ranking settings are in effect.',
+    )
+  return error
+}
 export type FinalizeSessionInput = {
   sessionId: string
   commandId: string
@@ -74,12 +108,15 @@ function setFinalization(sessionId: string, patch: Partial<SessionFinalization>)
 export async function finalizeSession(
   input: FinalizeSessionInput,
 ): Promise<SaveOutcome & { data: SessionFinalization }> {
-  // Real mode (#396): Session done stays not connected. Its barriers (sealed streams, completeness,
-  // ranking policy) wait on #246, and no projection worker runs yet (hosting is open, #243), so a
-  // committed finalization could never reach its slides stage. The service has no route yet.
-  if (isRealDataMode()) throw new NotConnectedError()
   const { sessionId, commandId } = input
   if (!commandId.trim()) throw new MockError('permission', 'A confirmation ID is required.')
+  // Real mode: the server checks the proposed #246 barriers and commits once; the same request
+  // runs the projection and slide jobs (interim in-request worker, #243). The dev stage toggle is
+  // mock-only.
+  if (isRealDataMode())
+    return realFinalizeSession({ sessionId, commandId }).catch((error: unknown) => {
+      throw sessionDoneRefusal(error)
+    })
   await delay()
   const snapshot = readMockState(),
     session = sessionIn(snapshot, sessionId),

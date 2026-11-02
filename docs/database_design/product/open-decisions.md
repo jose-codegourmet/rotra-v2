@@ -82,7 +82,7 @@ Found on November 2, 2026. Nothing here was decided by the wiring.
 
 | Gap | Waits on | Kind |
 |---|---|---|
-| Session done (`finalizeSession`, Session done review and status) stays not connected in real mode | #246 (finalization barriers) and a running projection worker (hosting #243) | Decision + chore |
+| Session done (`finalizeSession`, review and status) is wired at the owner's request with the proposed barriers (no active match, completeness proven, ranking policy in effect); its projection and slide jobs run in the request and on each status read (interim in-request worker), not on a hosted worker | #246 (finalization barriers), #243 (worker hosting) | Decision + chore |
 | Auto queue drafts are wired at the owner's request with the prototype's draft weights; the working set lives only on the device (lost on reload, not shared between devices) and only Add to Main Queue is saved (`source: 'auto'`) | #247 (queue generation weights); a stored working set only if wanted | Decision |
 | Real-mode queue commands are online only; offline match numbering and the outbox are not built | #246 | Decision |
 | A retried add, Make match, Auto queue or Regenerate whose reply never came back sends a new operation ID (the screens supply none), so the operator checks the queue before retrying | Mockup-first if a stable per-sheet ID is wanted | Chore |

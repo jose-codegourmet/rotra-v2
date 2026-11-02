@@ -7,9 +7,18 @@ import { getSession } from '../auth/fetchers'
 import { playerRequest } from '../leaderboard/request'
 import { consumeMockDevToggle, getMockDevState } from '../mock/bridge'
 import { isProductionBuild } from '../mock/env'
-import { MockError } from '../mock/errors'
+import { MockError, NotConnectedError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, mockStore, readMockState } from '../mock/store'
+import {
+  realDeclineContactChange,
+  realGetContactRequest,
+  realGetContactRequestCounts,
+  realGetMyContactChangeRequest,
+  realListContactRequests,
+  realSubmitContactChangeRequest,
+} from '../real/contact-change'
+import { isRealDataMode } from '../real/mode'
 import {
   CONTACT_FIELD_WORD,
   type ContactHolder,
@@ -38,6 +47,7 @@ import {
 export async function getMyContactChangeRequest(
   signal?: AbortSignal,
 ): Promise<ContactChangeRequest | null> {
+  if (isRealDataMode()) return realGetMyContactChangeRequest(signal)
   await playerRequest(signal)
   const session = await getSession('player')
   if (!session) return null
@@ -60,6 +70,7 @@ export async function submitContactChangeRequest(input: {
   field: ContactChangeField
   toValue: string
 }): Promise<ContactChangeRequest> {
+  if (isRealDataMode()) return realSubmitContactChangeRequest(input)
   await delay(800)
   if (getMockDevState().offline)
     throw new MockError(
@@ -134,6 +145,8 @@ export async function advanceContactChangeRequest(input: {
   requestId: string
   to: ContactChangeStatus
 }): Promise<ContactChangeRequest> {
+  // A DevMenu helper, not an Admin API (command-contracts.md): never sent to saved data.
+  if (isRealDataMode()) throw new NotConnectedError()
   await delay(200)
   let advanced: ContactChangeRequest | undefined
   mockStore.update((draft) => {
@@ -252,6 +265,7 @@ export async function listContactRequests(
   params: ContactRequestListParams = {},
   signal?: AbortSignal,
 ): Promise<AdminContactRequestList> {
+  if (isRealDataMode()) return realListContactRequests(params, signal)
   await delay(400, signal)
   const state = readMockState()
   const scoped = state.contactChangeRequests.filter(
@@ -266,6 +280,7 @@ export async function listContactRequests(
 
 /** Whole-queue counts for the Admin nav (`attention`) and the status filter. */
 export async function getContactRequestCounts(signal?: AbortSignal): Promise<ContactRequestCounts> {
+  if (isRealDataMode()) return realGetContactRequestCounts(signal)
   await delay(400, signal)
   return contactRequestCounts(readMockState().contactChangeRequests)
 }
@@ -275,6 +290,7 @@ export async function getContactRequest(
   requestId: string,
   signal?: AbortSignal,
 ): Promise<AdminContactRequestDetail | null> {
+  if (isRealDataMode()) return realGetContactRequest(requestId, signal)
   await delay(400, signal)
   const state = readMockState()
   const request = state.contactChangeRequests.find((entry) => entry.requestId === requestId)
@@ -364,6 +380,8 @@ function scheduleApplication(requestId: string) {
  * and the player's contact changes when the provider accepts it ~1.8 s later.
  */
 export async function approveContactChange(requestId: string): Promise<PlayerContactChangeRequest> {
+  // Approval starts the provider application, which waits on #196/#244 (player login mapping).
+  if (isRealDataMode()) throw new NotConnectedError()
   const approved = await adminMutation(900, (draft) => {
     const request = findRequest(draft, requestId)
     if (request.status !== 'pending' || isBlocked(request.status, checksIn(draft, request)))
@@ -385,6 +403,7 @@ export async function approveContactChange(requestId: string): Promise<PlayerCon
 
 /** Decline: the player keeps the current contact and can send a new request. */
 export async function declineContactChange(requestId: string): Promise<PlayerContactChangeRequest> {
+  if (isRealDataMode()) return realDeclineContactChange(requestId)
   return adminMutation(800, (draft) => {
     const request = findRequest(draft, requestId)
     if (request.status !== 'pending') throw new MockError('conflict', CONTACT_REVIEW_STALE_ERROR)
@@ -407,6 +426,8 @@ export async function declineContactChange(requestId: string): Promise<PlayerCon
 export async function retryContactApplication(
   requestId: string,
 ): Promise<PlayerContactChangeRequest> {
+  // Retrying applies at the sign-in provider: not connected until #196/#244 settle.
+  if (isRealDataMode()) throw new NotConnectedError()
   const retried = await adminMutation(400, (draft) => {
     const request = findRequest(draft, requestId)
     if (request.status !== 'failed') throw new MockError('conflict', CONTACT_REVIEW_STALE_ERROR)
@@ -432,6 +453,8 @@ export async function retryContactApplication(
 export async function checkContactApplication(
   requestId: string,
 ): Promise<AdminContactRequestDetail | null> {
+  // Check status reads the provider back: not connected until #196/#244 settle.
+  if (isRealDataMode()) throw new NotConnectedError()
   if (isAdminOffline()) throw new MockError('offline', CONTACT_CHECK_OFFLINE_ERROR)
   await delay(CHECK_MS)
   if (isAdminOffline()) throw new MockError('offline', CONTACT_CHECK_OFFLINE_ERROR)

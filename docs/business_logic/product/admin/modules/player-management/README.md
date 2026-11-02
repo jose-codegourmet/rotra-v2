@@ -26,4 +26,4 @@ Registration links open `/claim/{token}`, expire after seven days, and are issue
 
 Bulk actions: Archive, Restore, Remove (only when all selected records qualify), Export CSV and Copy RTR IDs. CSV includes name, nickname, RTR ID, account, rank, clubs, added and place, never contacts. Selection survives pages and view changes; filters clear it. Mutations report each record and retry only failures.
 
-Management mutations remain an in-memory mock. In real mode, the directory, identity detail, selected-ID reads and read-only history load persisted players through Admin-only endpoints (2026-11-01). Contact-request/audit/settings reads and durable player mutations, including claim-link transport, remain F07 work.
+Management mutations remain an in-memory mock. In real mode, the directory, identity detail, selected-ID reads and read-only history load persisted players through Admin-only endpoints (2026-11-01). Contact-request reads, Decline and the Record of actions also load saved data (#401). Approving and applying a contact change, ranking-settings reads and durable player mutations, including claim-link transport, remain F07 work.

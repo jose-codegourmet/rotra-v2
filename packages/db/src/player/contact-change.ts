@@ -1,4 +1,6 @@
 import 'server-only'
+import { CONTACT_FIELD_WORD, checksFor } from '@rotra/data/contact-change-request/rules'
+import type { ContactCheck } from '@rotra/data/contact-change-request/types'
 import { recordAudit } from '../admin/audit'
 import type { AdminContext, PlayerContext } from '../auth/account-context'
 import { type ProviderAdmin, ProviderError } from '../auth/provider-admin'
@@ -8,6 +10,7 @@ import type {
   PlayerContactChangeRequest,
   Prisma,
 } from '../generated/prisma/client'
+import { requireAdmin } from '../service/authorize'
 import { ServiceError } from '../service/errors'
 import { toIso, toIsoOrNull } from '../service/serialize'
 
@@ -15,6 +18,7 @@ type Tx = Prisma.TransactionClient
 
 const E164 = /^\+[1-9][0-9]{7,14}$/
 const EMAIL = /^[^@\s]+@[^@\s]+$/
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 /**
  * Contact changes are the ONLY way a phone or login email changes after claiming. No other service
@@ -24,11 +28,15 @@ const EMAIL = /^[^@\s]+@[^@\s]+$/
 function normalize(field: ContactChangeField, value: string) {
   const v = value.trim()
   if (field === 'phone') {
-    if (!E164.test(v)) throw new ServiceError('invalid', { value: 'Enter a full mobile number.' })
+    if (!E164.test(v))
+      throw new ServiceError('invalid', {
+        value: 'Enter a Philippine mobile number, like 0917 555 0142.',
+      })
     return v
   }
   const email = v.toLowerCase()
-  if (!EMAIL.test(email)) throw new ServiceError('invalid', { value: 'Enter an email address.' })
+  if (!EMAIL.test(email))
+    throw new ServiceError('invalid', { value: 'Enter an email address, like name@example.com.' })
   return email
 }
 
@@ -42,11 +50,16 @@ function statusLabel(status: PlayerContactChangeRequest['status']) {
   return status
 }
 
-/** Own-player view: the proposed value is theirs to see; review evidence is not. */
+/**
+ * Own-player view: the proposed and original values are their own contacts; review evidence
+ * (source, attempts, failure code, reviewer) is not theirs to see.
+ */
 function ownRequestDto(request: PlayerContactChangeRequest) {
   return {
     id: request.id,
+    playerId: request.playerId,
     field: request.field,
+    originalValue: request.originalValue,
     proposedValue: request.proposedValue,
     status: statusLabel(request.status),
     requestedAt: toIso(request.requestedAt),
@@ -100,10 +113,13 @@ async function submit(
   const contact = await tx.playerPrivateContact.findUnique({ where: { playerId } })
   if (!contact) throw new ServiceError('not_found')
   const original = input.field === 'phone' ? contact.phoneE164 : contact.email
+  const word = CONTACT_FIELD_WORD[input.field]
   if (original === proposed)
-    throw new ServiceError('invalid', { value: 'This is already your current contact.' })
+    throw new ServiceError('invalid', { value: `That's already your ${word}.` })
   if (await collides(tx, playerId, input.field, proposed))
-    throw new ServiceError('conflict', { value: 'This contact is used by another player.' })
+    throw new ServiceError('conflict', {
+      value: `That ${word} belongs to another ROTRA profile. Contact ROTRA for help.`,
+    })
   return tx.playerContactChangeRequest.create({
     data: {
       playerId,
@@ -173,7 +189,156 @@ export async function readContactChangeQueue(context: AdminContext) {
   return rows.map(adminRequestDto)
 }
 
+const playerSelect = {
+  id: true,
+  fullName: true,
+  nickname: true,
+  idAllocation: { select: { rtrId: true } },
+  account: { select: { playerId: true } },
+  privateContact: { select: { phoneE164: true, email: true } },
+  clubPlayers: {
+    orderBy: [{ addedAt: 'asc' }, { id: 'asc' }],
+    select: { nickname: true },
+  },
+} satisfies Prisma.PlayerSelect
+
+type SelectedPlayer = Prisma.PlayerGetPayload<{ select: typeof playerSelect }>
+type HeldContact = { phoneE164: string | null; email: string | null } | null
+
+function holderOf(player: SelectedPlayer, contact: HeldContact) {
+  return {
+    id: player.id,
+    fullName: player.fullName,
+    rtrId: player.idAllocation?.rtrId ?? '',
+    phone: contact?.phoneE164 ?? undefined,
+    email: contact?.email ?? undefined,
+  }
+}
+
+function checkedOf(entry: {
+  id: string
+  playerId: string
+  field: ContactChangeField
+  originalValue: string | null
+  proposedValue: string
+  status: PlayerContactChangeRequest['status']
+  requestedAt: Date
+}) {
+  return {
+    requestId: entry.id,
+    playerId: entry.playerId,
+    field: entry.field,
+    fromValue: entry.originalValue ?? '',
+    toValue: entry.proposedValue,
+    status: entry.status,
+    requestedAt: entry.requestedAt.getTime(),
+  }
+}
+
+/**
+ * A-CONTACT-REQUESTS, A-CONTACT-REVIEW and a player's requests on A-PLAYER-DETAIL (#401): every
+ * request (or one), newest first, each with its player and current contacts. Pre-approval checks
+ * exist only while a request waits for review and use the same `checksFor` as the mock. Another
+ * player is named by name and RTR ID only, never by a contact. Owner-only; the provider operation
+ * ref, attempt counts, reviewer IDs and notes are not sent.
+ */
+export async function readAdminContactChangeRequests(
+  context: AdminContext,
+  filter: { requestId?: string } = {},
+) {
+  requireAdmin(context)
+  if (filter.requestId !== undefined && !UUID.test(filter.requestId)) return []
+  const rows = await prisma.playerContactChangeRequest.findMany({
+    where: filter.requestId ? { id: filter.requestId } : {},
+    orderBy: [{ requestedAt: 'desc' }, { id: 'asc' }],
+    include: { player: { select: playerSelect } },
+  })
+  const pending = rows.filter((row) => row.status === 'pending')
+  const proposed = (field: ContactChangeField) =>
+    pending.filter((row) => row.field === field).map((row) => row.proposedValue)
+  // Only what the checks need: the request players' other requests and whoever holds a proposal.
+  const [siblings, holders] = pending.length
+    ? await Promise.all([
+        prisma.playerContactChangeRequest.findMany({
+          where: { playerId: { in: [...new Set(pending.map((row) => row.playerId))] } },
+          select: {
+            id: true,
+            playerId: true,
+            field: true,
+            originalValue: true,
+            proposedValue: true,
+            status: true,
+            requestedAt: true,
+          },
+        }),
+        prisma.playerPrivateContact.findMany({
+          where: {
+            OR: [{ phoneE164: { in: proposed('phone') } }, { email: { in: proposed('email') } }],
+          },
+          select: {
+            playerId: true,
+            phoneE164: true,
+            email: true,
+            player: { select: playerSelect },
+          },
+        }),
+      ])
+    : [[], []]
+  return rows.map((row) => {
+    const checks: ContactCheck[] | null =
+      row.status === 'pending'
+        ? checksFor(
+            checkedOf(row),
+            [
+              holderOf(row.player, row.player.privateContact),
+              ...holders
+                .filter((holder) => holder.playerId !== row.playerId)
+                .map((holder) => holderOf(holder.player, holder)),
+            ],
+            siblings.map(checkedOf),
+          )
+        : null
+    return {
+      requestId: row.id,
+      playerId: row.playerId,
+      field: row.field,
+      fromValue: row.originalValue ?? '',
+      toValue: row.proposedValue,
+      status: row.status,
+      source: row.source,
+      requestedAt: toIso(row.requestedAt),
+      approvedAt: toIsoOrNull(row.approvedAt),
+      appliedAt: toIsoOrNull(row.appliedAt),
+      decidedAt: toIsoOrNull(row.rejectedAt),
+      failureCode: row.failureCode,
+      player: {
+        id: row.player.id,
+        fullName: row.player.fullName,
+        rtrId: row.player.idAllocation?.rtrId ?? '',
+        nickname:
+          row.player.nickname ??
+          row.player.clubPlayers.find((entry) => entry.nickname)?.nickname ??
+          null,
+        claimed: Boolean(row.player.account),
+        phone: row.player.privateContact?.phoneE164 ?? undefined,
+        email: row.player.privateContact?.email ?? undefined,
+      },
+      checks,
+    }
+  })
+}
+
+/** D-CONTACT › Decline. Changes no contact; repeat-safe; the review audit line is appended once. */
+export async function declineContactChange(context: AdminContext, requestId: string) {
+  requireAdmin(context)
+  await reviewContactChange(context, { requestId, decision: 'reject' })
+  const [request] = await readAdminContactChangeRequests(context, { requestId })
+  if (!request) throw new ServiceError('not_found')
+  return request
+}
+
 async function lockRequest(tx: Tx, requestId: string) {
+  if (!UUID.test(requestId)) throw new ServiceError('not_found')
   const rows = await tx.$queryRaw<{ id: string }[]>`
     SELECT "id" FROM "player_contact_change_requests" WHERE "id" = ${requestId}::uuid FOR UPDATE`
   if (!rows.length) throw new ServiceError('not_found')

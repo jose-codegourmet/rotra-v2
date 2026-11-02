@@ -18,11 +18,11 @@ Every entry inherits its actor, business/screen issue mapping, lifecycle, error,
 
 ## admin-audit
 
-[Query keys](../../../packages/data/src/admin-audit/queryKeys.ts). Admin club mutations invalidate `adminAuditKeys.all`.
+[Query keys](../../../packages/data/src/admin-audit/queryKeys.ts). Admin club mutations invalidate `adminAuditKeys.all`. Real mode (#401): Admin `GET /api/audit-events` for club, player and contact-change-request targets; flag and ranking-settings logs stay not connected.
 
 | Callable / current input | Output | Hook module exports |
 |---|---|---|
-| [listAuditEvents](../../../packages/data/src/admin-audit/fetchers.ts#L23)<br>`params: { targetType: AdminAuditTargetType; targetId: string; }, signal?: AbortSignal \| undefined` | `Promise<AdminAuditEvent[]>` | [useAuditEvents](../../../packages/data/src/admin-audit/useAuditEvents.ts) |
+| [listAuditEvents](../../../packages/data/src/admin-audit/fetchers.ts#L25)<br>`params: { targetType: AdminAuditTargetType; targetId: string; }, signal?: AbortSignal \| undefined` | `Promise<AdminAuditEvent[]>` | [useAuditEvents](../../../packages/data/src/admin-audit/useAuditEvents.ts) |
 
 ## auth
 
@@ -81,13 +81,13 @@ Every entry inherits its actor, business/screen issue mapping, lifecycle, error,
 
 ## contact-change-request
 
-[Query keys](../../../packages/data/src/contact-change-request/queryKeys.ts). See each hook for `setQueryData`, removal, subscriptions and invalidation, including the broad non-auth invalidation used by `useMockMutation`.
+[Query keys](../../../packages/data/src/contact-change-request/queryKeys.ts). See each hook for `setQueryData`, removal, subscriptions and invalidation, including the broad non-auth invalidation used by `useMockMutation`. Real mode (#401): own read/submit, Admin list/counts/detail and decline are connected; approve, retry, check status and the DevMenu advance are not (see [services.md](services.md#admin-audit-and-contact-change-reads-401)).
 
 | Callable / current input | Output | Hook module exports |
 |---|---|---|
-| [advanceContactChangeRequest](../../../packages/data/src/contact-change-request/fetchers.ts#L106)<br>`input: { requestId: string; to: ContactChangeStatus; }` | `Promise<ContactChangeRequest>` | [useAdvanceContactChangeRequest](../../../packages/data/src/contact-change-request/useAdvanceContactChangeRequest.ts) |
-| [getMyContactChangeRequest](../../../packages/data/src/contact-change-request/fetchers.ts#L19)<br>`signal?: AbortSignal \| undefined` | `Promise<ContactChangeRequest \| null>` | [useMyContactChangeRequest](../../../packages/data/src/contact-change-request/useMyContactChangeRequest.ts) |
-| [submitContactChangeRequest](../../../packages/data/src/contact-change-request/fetchers.ts#L35)<br>`input: { field: ContactChangeField; toValue: string; }` | `Promise<ContactChangeRequest>` | [useSubmitContactChangeRequest](../../../packages/data/src/contact-change-request/useSubmitContactChangeRequest.ts) |
+| [advanceContactChangeRequest](../../../packages/data/src/contact-change-request/fetchers.ts#L144)<br>`input: { requestId: string; to: ContactChangeStatus; }` | `Promise<ContactChangeRequest>` | [useAdvanceContactChangeRequest](../../../packages/data/src/contact-change-request/useAdvanceContactChangeRequest.ts) |
+| [getMyContactChangeRequest](../../../packages/data/src/contact-change-request/fetchers.ts#L47)<br>`signal?: AbortSignal \| undefined` | `Promise<ContactChangeRequest \| null>` | [useMyContactChangeRequest](../../../packages/data/src/contact-change-request/useMyContactChangeRequest.ts) |
+| [submitContactChangeRequest](../../../packages/data/src/contact-change-request/fetchers.ts#L69)<br>`input: { field: ContactChangeField; toValue: string; }` | `Promise<ContactChangeRequest>` | [useSubmitContactChangeRequest](../../../packages/data/src/contact-change-request/useSubmitContactChangeRequest.ts) |
 
 ## device
 

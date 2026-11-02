@@ -1,6 +1,8 @@
 import { adminAccount } from '../fixtures/adminAccounts'
 import { delay } from '../mock/latency'
 import { type MockState, readMockState } from '../mock/store'
+import { realListAuditEvents } from '../real/admin-audit'
+import { isRealDataMode } from '../real/mode'
 import type { AdminAuditEvent, AdminAuditTargetType } from './adminAudit.types'
 
 /**
@@ -19,11 +21,12 @@ export function appendAdminAudit(
   })
 }
 
-/** Swap this implementation for the real transport when the database epic lands. */
+/** A record's log, newest first. Real mode reads Admin `GET /api/audit-events` (#401). */
 export async function listAuditEvents(
   params: { targetType: AdminAuditTargetType; targetId: string },
   signal?: AbortSignal,
 ): Promise<AdminAuditEvent[]> {
+  if (isRealDataMode()) return realListAuditEvents(params, signal)
   await delay(400, signal)
   return readMockState()
     .adminAuditEvents.filter(

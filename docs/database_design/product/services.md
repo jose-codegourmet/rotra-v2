@@ -15,7 +15,7 @@ screen loaded one, and returns an allowlisted DTO.
 | `admin/clubs` | `stageClub` → `provisionClubAccount` (staged: database first, provider second, resumable on the club ID); `setClubPricing`; `readClubsForAdmin`; club-side `readClubSettings`, `updateClubSettings`, `requestClubNameChange`; owner `reviewClubNameChange`; `readVenues`, `saveVenue` |
 | `admin/licenses` | `activateLicense` (club lock → one term per command → cancel the running expiry cycle → refresh entitlement); `refreshEntitlement`; `refreshLapsedEntitlements` (starts a new expiry cycle); `readLicenseTerms`, `readOwnLicense` |
 | `admin/configuration` | `readFeatureFlags` (oldest added first), `createFeatureFlag` (command ID; starting value; the form's rules from `@rotra/data/feature-flag/rules`, a taken name or key is `conflict`), `setFeatureFlag` (expected revision, checked before the same-value no-op), `readRankingPolicies` (oldest first), `saveRankingPolicy` (appends the next version under the expected current version; the form's rules; algorithm reference carried forward, never client-chosen) |
-| `admin/audit` | `recordAudit`: redacted before/after metadata, repeat-safe on the command |
+| `admin/audit` | `recordAudit`: redacted before/after metadata, repeat-safe on the command; `readAuditEvents` (read-only, allowlisted log lines) |
 | `auth/provider-admin` | `ProviderAdmin` port for external Auth calls; the adapter is chosen under #243/#244 |
 
 - A new Free club stores no paid prices and gets no fake license history.
@@ -219,7 +219,36 @@ in the client; server-side filtering/pagination remains a scaling follow-up.
 Admin `GET /api/players/[playerId]/games` authorizes the owner, checks the allocated identity, and
 uses the canonical read-only match-history projection for quick view and full history.
 
-Player mutations (Add, Edit, Archive, Restore, Remove and registration links), contact-request reads,
-audit reads, and ranking-settings reads remain unwired in real mode. The player schema has no archive
+Player mutations (Add, Edit, Archive, Restore, Remove and registration links) and ranking-settings
+reads remain unwired in real mode; contact-request and audit reads are wired by #401 (below). The player schema has no archive
 column yet, so persisted directory rows are active and removal is explicitly unavailable. These reads
 do not apply migrations, create players, or change contacts, permissions or retained results.
+
+## Admin audit and contact-change reads (#401)
+
+| Screen | Route Handler | Service |
+|---|---|---|
+| A-CLUB-DETAIL Activity, A-PLAYER-DETAIL Record of actions | Admin `GET /api/audit-events?targetType=&targetId=` | `admin/audit.readAuditEvents` |
+| A-CONTACT-REQUESTS, nav count, A-PLAYER-DETAIL requests | Admin `GET /api/contact-change-requests` | `player/contact-change.readAdminContactChangeRequests` |
+| A-CONTACT-REVIEW | Admin `GET /api/contact-change-requests/[requestId]` | same, one request |
+| D-CONTACT › Decline | Admin `POST /api/contact-change-requests/[requestId]/decline` | `declineContactChange` → `reviewContactChange(reject)` |
+| P-ACCOUNT request status, P-CONTACT-REQUEST | Player `GET`/`POST /api/account/contact-change` | `readOwnContactChanges`, `submitOwnContactChange` |
+
+- All behind `handleAccountRequest`: Admin routes need the platform owner; the player route reads and
+  creates only the signed-in player's own requests. Responses are private/no-store.
+- Admin rows carry the request, its player with current contacts, and the four pre-approval checks
+  (pending only, computed with the same `checksFor` as the mock). Another player is named by name and
+  RTR ID only. The provider operation ref, attempt count, reviewer IDs and notes are never sent.
+- The player's own row adds their original value; approved, applying and failed still read as
+  approved, not applied. Submit sends a fresh `commandId`; one open request per player stays a conflict.
+- The audit log is append-only and only read here. Each line is rebuilt from redacted metadata with the
+  mock's copy, and the actor is the owner's display name. Events whose summary cannot be rebuilt from
+  saved data (account provisioning, ranking policy, the license retention note) are left out, never
+  guessed. Contact-change events are stored on the player with `metadata.requestId` and read per request.
+- **Not connected:** Approve, Retry application and Check status, which change the login identifier at
+  the sign-in provider (`applyContactChange` / `reconcileContactChange`). Which provider identifiers a
+  player signs in with, and contact-approval enforcement, are open in #196 and #244, and player sign-in
+  itself is not wired in real mode yet. They answer "isn't connected to saved data yet"; the DevMenu
+  advance helper is never sent. Flag and ranking-settings logs wait on #402.
+- Not verified against a database: only the `@rotra/data` adapters are unit-tested
+  (`packages/data/src/contact-change-request/fetchers.test.ts`).

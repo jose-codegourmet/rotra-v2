@@ -333,6 +333,14 @@ unchanged. Player sign-in, password reset and registration (claim) links stay no
 phone-or-email login, recovery email and claim provisioning are open in #244, so without a player
 session the own-account routes are not reachable from the screens yet.
 
+**Admin audit and contact changes (#401).** In real mode `@rotra/data/admin-audit` reads Admin's
+`GET /api/audit-events`, and `@rotra/data/contact-change-request` reads Admin's
+`GET /api/contact-change-requests[/[requestId]]`, declines through `POST …/[requestId]/decline`, and
+reads and submits the player's own request through Player's `GET`/`POST /api/account/contact-change`.
+Hooks, query keys and DTOs are unchanged; list filters and counts reuse the mock rules over the loaded
+rows. Approve, Retry application and Check status stay not connected: they change the provider login,
+which waits on #196/#244. See [services.md](database_design/product/services.md#admin-audit-and-contact-change-reads-401).
+
 Wrong account types, forged mock cookies, and cross-club/player IDs are denied at the handler, not only
 in the proxy. Database credentials and Supabase keys are read only from server env. Application tables
 have no `anon`/`authenticated` grants, so the Data API exposes none of them.

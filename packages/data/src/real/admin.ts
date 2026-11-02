@@ -52,6 +52,9 @@ type WireAdminClub = {
   city: string
   cityCode: string
   terms: WireTerm[]
+  pendingNameRequest: { id: string; requestedName: string; requestedAt: string } | null
+  runningSession: { title: string; venueName: string; startedAt: string } | null
+  earlierNames: string[]
 }
 
 /** Manila calendar day; a term's last licensed day is the day before access ends. */
@@ -82,6 +85,7 @@ function listItemOf(club: WireAdminClub): AdminClubListItem {
     name: club.name,
     initials: clubInitials(club.name),
     logoUrl: club.logoRef,
+    // Per-club accent selection has no persisted source; the UI uses its neutral treatment.
     accent: false,
     username: club.username ?? '',
     city: club.city,
@@ -92,10 +96,9 @@ function listItemOf(club: WireAdminClub): AdminClubListItem {
     hasTerms: terms.length > 0,
     access: accessOf(terms, today),
     retention: retentionOf(terms, undefined, today),
-    // Not wired yet: running session, name requests and earlier names (gap logged).
-    runningSessionTitle: null,
-    nameRequest: null,
-    earlierNames: [],
+    runningSessionTitle: club.runningSession?.title ?? null,
+    nameRequest: club.pendingNameRequest?.requestedName ?? null,
+    earlierNames: club.earlierNames,
   }
 }
 
@@ -151,8 +154,8 @@ export async function realGetAdminClub(
     },
     yearlySavingPercent: yearlySavingPercent(item),
     priceLine: formatClubPriceLine(item),
-    pendingNameRequest: null,
-    runningSession: null,
+    pendingNameRequest: club.pendingNameRequest,
+    runningSession: club.runningSession,
     expiryExceptionNote: null,
   }
 }

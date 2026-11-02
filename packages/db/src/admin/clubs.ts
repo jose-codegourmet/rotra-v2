@@ -282,15 +282,61 @@ export async function readAdminClubDirectory(context: AdminContext, clubId?: str
         orderBy: [{ startsAt: 'desc' }, { id: 'asc' }],
         include: { activatedBy: { select: { displayName: true } } },
       },
+      nameChanges: {
+        where: { state: 'pending' },
+        orderBy: [{ requestedAt: 'desc' }, { id: 'asc' }],
+        take: 1,
+        select: { id: true, requestedName: true, requestedAt: true },
+      },
+      queueSessions: {
+        where: { state: { in: ['active', 'finalizing'] } },
+        orderBy: [{ startedAt: 'desc' }, { id: 'asc' }],
+        take: 1,
+        select: { title: true, venueName: true, startedAt: true },
+      },
     },
     orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
   })
+  const auditEvents = await prisma.adminAuditEvent.findMany({
+    where: {
+      targetType: 'club',
+      targetId: { in: clubs.map((club) => club.id) },
+      action: 'club.name_change_approved',
+    },
+    orderBy: [{ occurredAt: 'asc' }, { id: 'asc' }],
+    select: { targetId: true, metadata: true },
+  })
+  const earlierNames = new Map<string, string[]>()
+  for (const event of auditEvents) {
+    const metadata = event.metadata as unknown
+    const candidate =
+      metadata && typeof metadata === 'object' && !Array.isArray(metadata)
+        ? (metadata as Record<string, unknown>).before
+        : null
+    const name = typeof candidate === 'string' ? candidate : null
+    if (name) earlierNames.set(event.targetId, [...(earlierNames.get(event.targetId) ?? []), name])
+  }
   return clubs.map((club) => ({
     ...adminClubDto(club, club.account),
     provisionedAt: toIsoOrNull(club.account?.provisionedAt),
     city: club.foundingLocation.displayName,
     cityCode: `${club.foundingLocation.countryCode}-${club.foundingLocation.cityCode}`,
     terms: club.licenseTerms.map(adminTermDto),
+    pendingNameRequest: club.nameChanges[0]
+      ? {
+          id: club.nameChanges[0].id,
+          requestedName: club.nameChanges[0].requestedName,
+          requestedAt: toIso(club.nameChanges[0].requestedAt),
+        }
+      : null,
+    runningSession: club.queueSessions[0]
+      ? {
+          title: club.queueSessions[0].title,
+          venueName: club.queueSessions[0].venueName ?? '',
+          startedAt: toIsoOrNull(club.queueSessions[0].startedAt) ?? '',
+        }
+      : null,
+    earlierNames: earlierNames.get(club.id) ?? [],
   }))
 }
 

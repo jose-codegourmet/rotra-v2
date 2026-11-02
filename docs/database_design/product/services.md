@@ -175,6 +175,10 @@ Wired end to end in real data mode (see [architecture.md](../../architecture.md)
 | Q-HOME, Q-SETUP | Queue `GET`/`POST /api/sessions`, `GET /api/sessions/[sessionId]` | `readQueueSessions`, `readQueueSession`, `createQueueSession`, `saveSessionCost` |
 | Q-ROSTER | Queue `GET`/`POST /api/sessions/[sessionId]/roster`, `POST …/roster/[rosterId]/level` | `readSessionRoster`, `addNewPlayerToSession`, `setRosterLevel` |
 
+Admin directory and detail reads additionally expose an active Queue Session, a pending club-name request,
+approved former names from the audit history, and the activating admin's allowlisted display name. Club
+accent remains neutral in real mode: it has no persisted source and is tracked by [#395](https://github.com/jose-codegourmet/rotra-v2/issues/395).
+
 Verification (#275, closed November 1, 2026 by the product owner):
 
 - **Verified** against hosted Supabase over HTTP (PR #318): signed-out session reads, 401 with safe copy for

@@ -1,6 +1,6 @@
 # Disposable database verification
 
-**Last verified:** 2026-10-31 on a local, throwaway PostgreSQL 15.14 cluster (no Supabase project, no
+**Last verified:** 2026-11-02 on a local, throwaway PostgreSQL 15.14 cluster (no Supabase project, no
 shared database).
 
 **Status:** F07.19 evidence for the drafted schema. It proves the single migration history rebuilds
@@ -40,10 +40,11 @@ touched, and no migration references them.
 
 | Check | Result |
 |---|---|
-| Rebuild from the single history (`prisma migrate deploy`, 11 migrations) | Applied cleanly |
+| Rebuild from the single history (`prisma migrate deploy`, 13 migrations) | Applied cleanly |
 | Drift: `prisma migrate diff --from-config-datasource --to-schema prisma/schema --exit-code` | No difference, so regeneration from the Prisma schema keeps the hand-written SQL |
 | SQL-only objects after rebuild | 152 check constraints, 1 exclusion constraint, 26 triggers, 15 partial/expression indexes |
 | Grants to `anon` / `authenticated` on public tables | 0 |
+| Public tables without RLS / `anon` execute on `rotra_next_player_sequence` | 0 / false |
 | Integrity checks | 59 passed, 0 failed |
 | Determinism | Two full `rebuild → seed → check` runs: same IDs and relationships (identical digest over roster, facts, RTR IDs, club players, publications) |
 | Restore rehearsal | `pg_dump -Fc` → `pg_restore` into a new database → 59 passed, 0 failed |

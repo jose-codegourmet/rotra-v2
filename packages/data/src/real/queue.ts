@@ -6,7 +6,6 @@ import type { ClubVenue } from '../club-venue/clubVenue.types'
 import type { SaveInventoryItemInput } from '../inventory/fetchers'
 import type { InventoryItem } from '../inventory/inventory.types'
 import type { ClubAccess } from '../license/license.types'
-import { MockError } from '../mock/errors'
 import type { PlayingLevel } from '../player/player.types'
 import type {
   QueueSession,
@@ -118,6 +117,7 @@ export async function realUpdateClubLogo(input: {
 // ---------- Venues (Q-VENUES) ----------
 
 type WireVenue = {
+  revision: string
   id: string
   clubId: string
   name: string
@@ -134,6 +134,7 @@ const venueOf = (venue: WireVenue): ClubVenue => ({
   courtFeeMinor: minorOf(venue.courtFeePerCourtHour),
   entranceFeeMinor: minorOf(venue.entranceFee),
   currency: 'PHP',
+  revision: venue.revision,
 })
 
 export async function realGetClubVenues() {
@@ -155,18 +156,22 @@ export async function realGetClubVenues() {
   })
 }
 
-/** Create only: editing a venue needs its revision on `ClubVenue` first (gap logged). */
 export async function realSaveClubVenue(
-  input: Omit<ClubVenue, 'id' | 'clubId' | 'currency'> & { id?: string },
+  input: Omit<ClubVenue, 'id' | 'clubId' | 'currency' | 'revision'> & {
+    id?: string
+    revision?: string
+  },
 ) {
-  if (input.id)
-    throw new MockError('permission', "Editing a saved venue isn't connected to saved data yet.")
   const { venue } = await realRequest<{ venue: WireVenue }>('/api/venues', {
     method: 'POST',
-    body: { ...input, id: crypto.randomUUID() },
+    body: {
+      ...input,
+      id: input.id ?? crypto.randomUUID(),
+      expectedRevision: input.id ? input.revision : undefined,
+    },
     fields: { courtFee: 'courtFeeMinor', entranceFee: 'entranceFeeMinor' },
   })
-  return accepted(venueOf(venue), `${venue.name} added to your venues`)
+  return accepted(venueOf(venue), input.id ? 'Venue updated' : `${venue.name} added to your venues`)
 }
 
 // ---------- Inventory (Q-INVENTORY) ----------

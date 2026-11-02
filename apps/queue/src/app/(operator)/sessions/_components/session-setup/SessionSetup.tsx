@@ -436,6 +436,7 @@ export function SessionSetup(props: SessionSetupProps) {
             saveVenue.mutate(
               {
                 id: currentVenueEdit?.id,
+                revision: currentVenueEdit?.revision,
                 name: values.name,
                 address: values.address ?? '',
                 courtFeeMinor: values.courtFee,

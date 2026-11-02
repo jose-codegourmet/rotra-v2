@@ -112,6 +112,7 @@ export function Venues() {
             save.mutate(
               {
                 id: current?.id,
+                revision: current?.revision,
                 name: values.name,
                 address: values.address ?? '',
                 courtFeeMinor: values.courtFee,

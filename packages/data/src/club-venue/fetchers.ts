@@ -28,7 +28,10 @@ export async function getClubVenues() {
     })
 }
 export function saveClubVenue(
-  input: Omit<ClubVenue, 'id' | 'clubId' | 'currency'> & { id?: string },
+  input: Omit<ClubVenue, 'id' | 'clubId' | 'currency' | 'revision'> & {
+    id?: string
+    revision?: string
+  },
 ) {
   if (isRealDataMode()) return realSaveClubVenue(input)
   return queueMutation({ area: 'Session setup', onlineOnly: true, clubAccess: true }, (state) => {
@@ -57,6 +60,7 @@ export function saveClubVenue(
       entranceFeeMinor:
         input.entranceFeeMinor === null ? null : moneyField.parse(input.entranceFeeMinor),
       currency: 'PHP',
+      revision: existing ? String(Number(existing.revision) + 1) : '1',
     }
     if (existing) Object.assign(existing, venue)
     else state.venues.push(venue)

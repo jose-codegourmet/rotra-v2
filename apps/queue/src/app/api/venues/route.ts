@@ -16,6 +16,7 @@ export async function POST(request: Request) {
     const body = await readJsonBody(request)
     const venue = await saveVenue(club, {
       id: text(body.id),
+      expectedRevision: typeof body.expectedRevision === 'string' ? body.expectedRevision : undefined,
       name: text(body.name),
       address: text(body.address),
       courtFeePerCourtHourMinor: intOrNull(body.courtFeeMinor),

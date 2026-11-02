@@ -9,11 +9,14 @@ import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { mockStore, readMockState } from '../mock/store'
 import { applyPersonalProfile } from '../player/fetchers'
+import { isRealDataMode } from '../real/mode'
+import { realGetMyAccount, realSetPhonePrivacy } from '../real/player'
 import { maskPhone } from './playerAccount.rules'
 import type { ClaimLink, CompleteClaimResult, MyAccount } from './playerAccount.types'
 
 /** The signed-in player's own contacts; null when signed out. Never a public fetcher. */
 export async function getMyAccount(signal?: AbortSignal): Promise<MyAccount | null> {
+  if (isRealDataMode()) return realGetMyAccount(signal)
   await playerRequest(signal)
   const session = await getSession('player')
   const account = session
@@ -28,6 +31,9 @@ export async function getMyAccount(signal?: AbortSignal): Promise<MyAccount | nu
       }
     : null
 }
+
+// Reset and registration (claim) stay not connected in real mode: `delay` refuses with the
+// not-connected message. Player sign-in, provider recovery email and claim provisioning wait on #244.
 
 /** Same acknowledgement for known and unknown emails. No email is delivered in the mock. */
 export async function requestPasswordReset(email: string) {
@@ -224,6 +230,7 @@ function personalDetailsFromPreset(preset: ClaimLink['preset']): PersonalProfile
 
 /** Sets phoneHidden for the signed-in player. Offline leaves the stored value as it was. */
 export async function setPhonePrivacy(input: { phoneHidden: boolean }): Promise<MyAccount> {
+  if (isRealDataMode()) return realSetPhonePrivacy(input)
   await delay(900)
   const session = await getSession('player')
   if (!session) throw new MockError('permission', 'Sign in to change your phone privacy.')

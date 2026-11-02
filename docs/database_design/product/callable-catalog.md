@@ -159,11 +159,11 @@ Every entry inherits its actor, business/screen issue mapping, lifecycle, error,
 
 | Callable / current input | Output | Hook module exports |
 |---|---|---|
-| [findPlayerByRtrId](../../../packages/data/src/player/fetchers.ts#L25)<br>`rtrId: string, signal?: AbortSignal \| undefined` | `Promise<{ playerId: string; } \| null>` | [useFindPlayerByRtrId](../../../packages/data/src/player/useFindPlayerByRtrId.ts) |
-| [getPlayerGames](../../../packages/data/src/player/fetchers.ts#L18)<br>`playerId: string, signal?: AbortSignal \| undefined` | `Promise<PlayerSessionRecord[]>` | [usePlayerGames](../../../packages/data/src/player/usePlayerGames.ts) |
-| [getPlayerProfile](../../../packages/data/src/player/fetchers.ts#L34)<br>`playerId: string, signal?: AbortSignal \| undefined` | `Promise<PlayerProfile \| null>` | [usePlayerProfile](../../../packages/data/src/player/usePlayerProfile.ts) |
-| [getPlayerRank](../../../packages/data/src/player/fetchers.ts#L11)<br>`playerId: string, signal?: AbortSignal \| undefined` | `Promise<PlayerRank \| null>` | [usePlayerRank](../../../packages/data/src/player/usePlayerRank.ts) |
-| [updateMyProfile](../../../packages/data/src/player/fetchers.ts#L59)<br>`input: { facebook: string; instagram: string; youtube: string; linkedin: string; fullName: string; nickname: string; playingStyle: string; experienceYears: string; experienceMonths: string; }` | `Promise<PlayerProfile>` | [useUpdateMyProfile](../../../packages/data/src/player/useUpdateMyProfile.ts) |
+| [findPlayerByRtrId](../../../packages/data/src/player/fetchers.ts#L35)<br>`rtrId: string, signal?: AbortSignal \| undefined` | `Promise<{ playerId: string; } \| null>` | [useFindPlayerByRtrId](../../../packages/data/src/player/useFindPlayerByRtrId.ts) |
+| [getPlayerGames](../../../packages/data/src/player/fetchers.ts#L27)<br>`playerId: string, signal?: AbortSignal \| undefined` | `Promise<PlayerSessionRecord[]>` | [usePlayerGames](../../../packages/data/src/player/usePlayerGames.ts) |
+| [getPlayerProfile](../../../packages/data/src/player/fetchers.ts#L47)<br>`playerId: string, signal?: AbortSignal \| undefined` | `Promise<PlayerProfile \| null>` | [usePlayerProfile](../../../packages/data/src/player/usePlayerProfile.ts) |
+| [getPlayerRank](../../../packages/data/src/player/fetchers.ts#L19)<br>`playerId: string, signal?: AbortSignal \| undefined` | `Promise<PlayerRank \| null>` | [usePlayerRank](../../../packages/data/src/player/usePlayerRank.ts) |
+| [updateMyProfile](../../../packages/data/src/player/fetchers.ts#L77)<br>`input: { facebook: string; instagram: string; youtube: string; linkedin: string; fullName: string; nickname: string; playingStyle: string; experienceYears: string; experienceMonths: string; }` | `Promise<PlayerProfile>` | [useUpdateMyProfile](../../../packages/data/src/player/useUpdateMyProfile.ts) |
 
 ## player-account
 
@@ -171,14 +171,14 @@ Every entry inherits its actor, business/screen issue mapping, lifecycle, error,
 
 | Callable / current input | Output | Hook module exports |
 |---|---|---|
-| [checkClaimStatus](../../../packages/data/src/player-account/fetchers.ts#L171)<br>`token: string` | `Promise<{ status: "processing"; } \| { session: MockSession; playerId: string; rtrId: string; firstName: string; status: "done"; }>` | [useCheckClaimStatus](../../../packages/data/src/player-account/useCheckClaimStatus.ts) |
-| [getClaimLink](../../../packages/data/src/player-account/fetchers.ts#L74)<br>`token: string, signal?: AbortSignal \| undefined` | `Promise<ClaimLink \| null>` | [useClaimLink](../../../packages/data/src/player-account/useClaimLink.ts) |
-| [completeClaim](../../../packages/data/src/player-account/fetchers.ts#L139)<br>`{ token, values }: CompleteClaimInput` | `Promise<{ session: MockSession; playerId: string; rtrId: string; firstName: string; }>` | [useCompleteClaim](../../../packages/data/src/player-account/useCompleteClaim.ts) |
-| [getMyAccount](../../../packages/data/src/player-account/fetchers.ts#L16)<br>`signal?: AbortSignal \| undefined` | `Promise<MyAccount \| null>` | [useMyAccount](../../../packages/data/src/player-account/useMyAccount.ts) |
-| [requestPasswordReset](../../../packages/data/src/player-account/fetchers.ts#L33)<br>`email: string` | `Promise<{ acknowledged: boolean; }>` | [useRequestPasswordReset](../../../packages/data/src/player-account/useRequestPasswordReset.ts) |
-| [getResetLink](../../../packages/data/src/player-account/fetchers.ts#L43)<br>`token: string, signal?: AbortSignal \| undefined` | `Promise<{ token: string; status: "invalid" \| "valid"; }>` | [useResetLink](../../../packages/data/src/player-account/useResetLink.ts) |
-| [resetPassword](../../../packages/data/src/player-account/fetchers.ts#L51)<br>`{ token, password }: { token: string; password: string; }` | `Promise<{ saved: boolean; }>` | [useResetPassword](../../../packages/data/src/player-account/useResetPassword.ts) |
-| [setPhonePrivacy](../../../packages/data/src/player-account/fetchers.ts#L210)<br>`input: { phoneHidden: boolean; }` | `Promise<MyAccount>` | [useSetPhonePrivacy](../../../packages/data/src/player-account/useSetPhonePrivacy.ts) |
+| [checkClaimStatus](../../../packages/data/src/player-account/fetchers.ts#L193)<br>`token: string` | `Promise<{ status: "processing"; } \| { session: MockSession; playerId: string; rtrId: string; firstName: string; status: "done"; }>` | [useCheckClaimStatus](../../../packages/data/src/player-account/useCheckClaimStatus.ts) |
+| [getClaimLink](../../../packages/data/src/player-account/fetchers.ts#L80)<br>`token: string, signal?: AbortSignal \| undefined` | `Promise<ClaimLink \| null>` | [useClaimLink](../../../packages/data/src/player-account/useClaimLink.ts) |
+| [completeClaim](../../../packages/data/src/player-account/fetchers.ts#L156)<br>`{ token, values }: CompleteClaimInput` | `Promise<{ session: MockSession; playerId: string; rtrId: string; firstName: string; }>` | [useCompleteClaim](../../../packages/data/src/player-account/useCompleteClaim.ts) |
+| [getMyAccount](../../../packages/data/src/player-account/fetchers.ts#L18)<br>`signal?: AbortSignal \| undefined` | `Promise<MyAccount \| null>` | [useMyAccount](../../../packages/data/src/player-account/useMyAccount.ts) |
+| [requestPasswordReset](../../../packages/data/src/player-account/fetchers.ts#L39)<br>`email: string` | `Promise<{ acknowledged: boolean; }>` | [useRequestPasswordReset](../../../packages/data/src/player-account/useRequestPasswordReset.ts) |
+| [getResetLink](../../../packages/data/src/player-account/fetchers.ts#L49)<br>`token: string, signal?: AbortSignal \| undefined` | `Promise<{ token: string; status: "invalid" \| "valid"; }>` | [useResetLink](../../../packages/data/src/player-account/useResetLink.ts) |
+| [resetPassword](../../../packages/data/src/player-account/fetchers.ts#L57)<br>`{ token, password }: { token: string; password: string; }` | `Promise<{ saved: boolean; }>` | [useResetPassword](../../../packages/data/src/player-account/useResetPassword.ts) |
+| [setPhonePrivacy](../../../packages/data/src/player-account/fetchers.ts#L232)<br>`input: { phoneHidden: boolean; }` | `Promise<MyAccount>` | [useSetPhonePrivacy](../../../packages/data/src/player-account/useSetPhonePrivacy.ts) |
 
 ## public-session
 

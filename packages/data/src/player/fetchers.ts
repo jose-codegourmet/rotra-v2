@@ -5,6 +5,14 @@ import { checkMockSave, getMockDevState } from '../mock/bridge'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { mockStore, readMockState } from '../mock/store'
+import { isRealDataMode } from '../real/mode'
+import {
+  realFindPlayerByRtrId,
+  realGetPlayerGames,
+  realGetPlayerProfile,
+  realGetPlayerRank,
+  realUpdateMyProfile,
+} from '../real/player'
 import type { PlayerProfile, PlayerRank, PlayerSessionRecord } from './player.types'
 import { playerProjection } from './projection'
 
@@ -12,6 +20,7 @@ export async function getPlayerRank(
   playerId: string,
   signal?: AbortSignal,
 ): Promise<PlayerRank | null> {
+  if (isRealDataMode()) return realGetPlayerRank(playerId, signal)
   await playerRequest(signal)
   return playerProjection().ranks[playerId] ?? null
 }
@@ -19,6 +28,7 @@ export async function getPlayerGames(
   playerId: string,
   signal?: AbortSignal,
 ): Promise<PlayerSessionRecord[]> {
+  if (isRealDataMode()) return realGetPlayerGames(playerId, signal)
   await playerRequest(signal)
   return playerProjection().games[playerId] ?? []
 }
@@ -26,6 +36,7 @@ export async function findPlayerByRtrId(
   rtrId: string,
   signal?: AbortSignal,
 ): Promise<{ playerId: string } | null> {
+  if (isRealDataMode()) return realFindPlayerByRtrId(rtrId, signal)
   await playerRequest(signal)
   const player = playerProjection().players.find((p) => p.rtrId === rtrId.trim().toUpperCase())
   return player && !readMockState().adminPlayerRecords[player.id]?.archivedAt
@@ -37,6 +48,7 @@ export async function getPlayerProfile(
   playerId: string,
   signal?: AbortSignal,
 ): Promise<PlayerProfile | null> {
+  if (isRealDataMode()) return realGetPlayerProfile(playerId, signal)
   await playerRequest(signal)
   const profile = readMockState().playerProfiles.find((player) => player.playerId === playerId)
   if (!profile) return null
@@ -63,6 +75,7 @@ export function applyPersonalProfile(profile: PlayerProfile, values: PersonalPro
 
 /** Saves the signed-in player's personal fields. Offline and failed saves leave the store unchanged. */
 export async function updateMyProfile(input: PersonalProfileValues): Promise<PlayerProfile> {
+  if (isRealDataMode()) return realUpdateMyProfile(input)
   await delay(900)
   if (getMockDevState().offline)
     throw new MockError(

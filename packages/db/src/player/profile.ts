@@ -51,6 +51,9 @@ function publicProfileDto(row: PublicPlayerRow) {
 
 /** P-PROFILE public read (`player.public-profile`). Safe for shared caches. */
 export async function readPublicProfile(playerId: string) {
+  // A URL segment that is not a UUID can name no player.
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(playerId))
+    throw new ServiceError('not_found')
   const row = await prisma.player.findUnique({
     where: { id: playerId },
     select: PUBLIC_PLAYER_SELECT,

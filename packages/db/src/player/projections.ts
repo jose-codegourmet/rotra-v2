@@ -25,6 +25,8 @@ export const APPROVED_RANK_ALGORITHMS: ReadonlySet<string> = new Set()
 
 export const MAX_JOB_ATTEMPTS = 8
 const DAY = 86_400_000
+/** Public reads take a player ID from the URL; anything that is not a UUID is simply not found. */
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 const backoff = (attempts: number) => Math.min(60 * 60_000, 30_000 * 2 ** attempts)
 
 /** Facts that belong to a player: their own snapshots plus confirmed, unrevoked guest history. */
@@ -402,6 +404,7 @@ export async function confirmHistoryAttribution(
  * session, with each game's counting status. No costs, levels, Off Day or private identity.
  */
 export async function readPlayerMatchHistory(playerId: string) {
+  if (!UUID.test(playerId)) return []
   return prisma.$transaction(async (tx) => {
     const facts = await playerFacts(tx, playerId)
     const sessionIds = [...new Set(facts.map((f) => f.sessionId))]
@@ -451,35 +454,63 @@ export async function readPlayerMatchHistory(playerId: string) {
   })
 }
 
-/** P-RANK public read: the projection as stored, with the effective version that explains it. */
+/**
+ * P-RANK public read (`player.public-profile`), shaped as `PlayerRank`: the projection exactly as
+ * stored. `levelIndex` is the stored level's display order and stays null until an approved
+ * algorithm writes one (#247); nothing is synthesized from counts or club levels. `position` is
+ * null (ordering belongs to the leaderboard read). `olderCount` is the player's counted standard
+ * matches outside the stored window. `updatePending` names the latest finalized session of theirs
+ * whose rank job has not finished; a job with no session behind it (ageing, attribution,
+ * assessment) has no session to name and is not reported. No RTR ID or no stored projection is
+ * null (no rank yet).
+ */
 export async function readPlayerRank(playerId: string) {
-  const rank = await prisma.playerRankCurrent.findUnique({
-    where: { playerId },
-    include: { policyVersion: { select: { version: true, recentStandardMatchThreshold: true } } },
-  })
-  if (!rank) return null
-  return {
-    playerId,
-    state: rank.state,
-    level: rank.skillLevelId,
-    numericRank: rank.numericRank?.toString() ?? null,
-    explanationCode: rank.explanationCode,
-    recentCount: rank.recentStandardMatchCount,
-    matchRequirement: rank.policyVersion.recentStandardMatchThreshold,
-    policyVersion: rank.policyVersion.version,
-    algorithmVersion: rank.algorithmVersion,
-    leaderboardEligible: rank.leaderboardEligible,
-    calculatedAt: toIso(rank.calculatedAt),
-    // Truthful pending output: a rank job aimed at this player has not finished yet.
-    updatePending:
-      (await prisma.projectionJob.count({
-        where: {
-          kind: 'player_rank',
-          status: { in: ['pending', 'running', 'failed'] },
-          targetPlayerId: playerId,
+  if (!UUID.test(playerId)) return null
+  return prisma.$transaction(async (tx) => {
+    const rank = await tx.playerRankCurrent.findUnique({
+      where: { playerId },
+      include: {
+        skillLevel: { select: { displayOrder: true } },
+        player: {
+          select: { fullName: true, nickname: true, idAllocation: { select: { rtrId: true } } },
         },
-      })) > 0,
-  }
+      },
+    })
+    if (!rank || !rank.player.idAllocation) return null
+    const facts = await playerFacts(tx, playerId)
+    const jobs = await tx.projectionJob.findMany({
+      where: {
+        kind: 'player_rank',
+        status: { in: ['pending', 'running', 'failed'] },
+        sourceFinalizationId: { in: [...new Set(facts.map((f) => f.sessionId))] },
+      },
+      select: { sourceFinalizationId: true },
+    })
+    const pending = jobs.length
+      ? await tx.queueSession.findFirst({
+          where: { id: { in: jobs.map((j) => j.sourceFinalizationId as string) } },
+          orderBy: [{ finalizedAt: 'desc' }, { id: 'asc' }],
+          select: { title: true, finalizedAt: true, club: { select: { name: true } } },
+        })
+      : null
+    return {
+      playerId,
+      fullName: rank.player.fullName,
+      nickname: rank.player.nickname,
+      levelIndex: rank.skillLevel?.displayOrder ?? null,
+      state: rank.state,
+      updatePending: pending
+        ? {
+            sessionTitle: pending.title,
+            clubName: pending.club.name,
+            finishedAt: toIsoOrNull(pending.finalizedAt) ?? '',
+          }
+        : null,
+      position: null,
+      recentCount: rank.recentStandardMatchCount,
+      olderCount: Math.max(0, facts.filter(counts).length - rank.recentStandardMatchCount),
+    }
+  })
 }
 
 /** `leaderboard.list`: only eligible rows, highest rank first. Empty until a formula is approved. */

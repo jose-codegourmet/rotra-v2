@@ -73,6 +73,7 @@ the chore tickets wait for their own pickup.
 | Public join-request receipt is a browser-session cookie (proposal): no expiry, a lost receipt cannot be recovered, and the visitor sees no status again | #398 | Decision (#248) |
 | RLS disabled on 55 public tables; `anon` can execute `rotra_next_player_sequence()` | #387 | Chore (#243), migration sign-off |
 | Club logo has no storage adapter | #374 (closed) | Done |
+| Player sign-in (phone or email + password), password reset and registration (claim) links have no real-mode route, so the wired own-account routes (#400) have no player session to serve yet | #244 | Decision |
 
 ## Design limits
 

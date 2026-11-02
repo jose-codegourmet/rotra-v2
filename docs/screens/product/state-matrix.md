@@ -34,8 +34,8 @@
 | Reduce or add courts / players per court in a prepared session | Saved with setup; roster over budget moves to the front of the waitlist, new slots fill from it | Save disabled | — |
 | Generate final result slides | After valid finalization | Unavailable for an unfinished session | Wait for valid finalization |
 | Publish/download new results | From available valid finalized output and allowed access | No offline finalization workaround | Do not publish unverified provisional results |
-| Claim player/login/reset | Requires server-backed flow | Not a Queue offline feature | Resume the same account flow safely |
-| Change player personal fields | Requires accepted server save | Do not claim a local draft is saved remotely | Validate current account revision |
+| Claim player/login/reset | Requires server-backed flow. Real mode (#400): not connected yet; player login, recovery and claim provisioning wait on #244 | Not a Queue offline feature | Resume the same account flow safely |
+| Change player personal fields | Requires accepted server save. Real mode (#400): saved under the last-read account revision, online only | Do not claim a local draft is saved remotely | Validate current account revision |
 | Admin activation/approval/configuration | Online | Unavailable | Recover request status before retrying |
 
 ## Club entitlement

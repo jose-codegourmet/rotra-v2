@@ -321,6 +321,18 @@ a public read is the leaderboard/player adapters' concern), the Player dev setti
 Admin "Show a placeholder flag" dev toggle, which is client-only mock UI state and never adds a row
 over saved flags.
 
+**Player Information player and account (#400).** In real mode the `@rotra/data/player` public reads
+call Player Information's `GET /api/players/[playerId]`, `…/rank`, `…/games` and `GET /api/rtr-ids/[rtrId]`
+(`handlePublicRead`, `player.public-profile` / `player.match-history`), backed by `@rotra/db/player/profile`
+and `player/projections`. Rank is the stored projection only: with no approved formula (#247) the level
+is null and the screens show their truthful no-rank state. The own-account reads and saves
+(`getMyAccount`, `updateMyProfile`, `setPhonePrivacy`) call `GET /api/me/account`, `PATCH /api/me/profile`
+and `POST /api/me/phone-privacy` behind `handleAccountRequest('player', …)`; saves send the player
+revision of the last account read, and a stale one is a conflict. Hooks, query keys and DTOs are
+unchanged. Player sign-in, password reset and registration (claim) links stay not connected: player
+phone-or-email login, recovery email and claim provisioning are open in #244, so without a player
+session the own-account routes are not reachable from the screens yet.
+
 Wrong account types, forged mock cookies, and cross-club/player IDs are denied at the handler, not only
 in the proxy. Database credentials and Supabase keys are read only from server env. Application tables
 have no `anon`/`authenticated` grants, so the Data API exposes none of them.

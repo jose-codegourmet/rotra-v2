@@ -32,6 +32,7 @@ screen loaded one, and returns an allowlisted DTO.
 | `player/claim` | `issueClaimLink` (club's linked unclaimed player; token digest only; reissue revokes), `readClaimLink` (masked phone), `completeClaim` (provider login keyed on the link ID, then one transaction: email, account mapping, claimed, link consumed) |
 
 - A phone already linked to a different club player in the same club is marked `conflicted` for review, never merged.
+- Player Information Route Handlers (#400): public `GET /api/players/[playerId]` (`readPublicProfile`), `GET /api/players/[playerId]/rank` (`readPlayerRank`), `GET /api/players/[playerId]/games` (`readPlayerMatchHistory`), `GET /api/rtr-ids/[rtrId]` (`findPublicProfileByRtrId`, returns the player ID only); own `GET /api/me/account` (`readMyAccount`), `PATCH /api/me/profile` (`updateMyProfile`; keeps the saved picture; returns the new revision), `POST /api/me/phone-privacy` (`setPhonePrivacy`, then `readMyAccount`). A non-UUID player ID is not found. `issueClaimLink`, `readClaimLink` and `completeClaim` have no route yet: player sign-in, recovery and claim provisioning wait on #244.
 - Unclaimed and claimed profiles differ: only a valid link plus the provider login claims; a name or RTR ID never does.
 - Historical guest attribution projections are F07.30.
 
@@ -135,6 +136,7 @@ screen loaded one, and returns an allowlisted DTO.
 - Confirmed guest history needs the club player already linked to that profile plus an identity method (RTR ID, QR or phone); facts keep their original snapshot. Revocation is not built here.
 - Worker hosting and schedule are open (#243); these are plain functions to call from it.
 - `player/leaderboard` (#403): public `readLeaderboardPage` (offset/limit, total), `searchLeaderboard` (name or nickname, first 50 plus total) and the signed-in `readMyLeaderboardPosition`. They list only eligible rows with a stored rank and level from an algorithm in `APPROVED_RANK_ALGORITHMS`; with none approved (#247) they return the empty state without querying. Player Route Handlers: `GET /api/leaderboard`, `GET /api/leaderboard/search` (`leaderboard.list`), `GET /api/leaderboard/me` (player account).
+- `readPlayerRank` returns the `PlayerRank` shape (#400): `levelIndex` is the stored level's display order (null until an approved algorithm writes one), `position` is null, `olderCount` is counted matches outside the stored window, and `updatePending` names the latest finalized session of the player's whose rank job is still pending, running or failed. Ageing, attribution and assessment jobs have no session to name and are not reported.
 
 ## F07.31 · Private results, explicit publication
 

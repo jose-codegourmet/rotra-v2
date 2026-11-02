@@ -36,11 +36,14 @@ export function termDto(term: ClubLicenseTerm) {
 }
 
 /** Admin view of a term: adds the command that recorded it and who did, for Check status. */
-export function adminTermDto(term: ClubLicenseTerm) {
+export function adminTermDto(
+  term: ClubLicenseTerm & { activatedBy?: { displayName: string } | null },
+) {
   return {
     ...termDto(term),
     sourceCommandId: term.sourceCommandId,
     activatedByAdminId: term.activatedByAdminId,
+    activatedByDisplayName: term.activatedBy?.displayName ?? '',
   }
 }
 

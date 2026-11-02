@@ -35,6 +35,8 @@ export type WireTerm = {
   paymentReference: string
   notes: string
   sourceCommandId?: string
+  /** Admin-only label, allowlisted by the Admin club-detail route. */
+  activatedByDisplayName?: string
 }
 
 type WireAdminClub = {
@@ -66,8 +68,8 @@ export function termOf(term: WireTerm): ClubLicenseTerm {
     paymentReference: term.paymentReference,
     notes: term.notes || undefined,
     activatedAt: term.activatedAt,
-    // Not on the wire: the term records the admin ID, not an email (gap logged).
-    activatedByEmail: '',
+    // The UI contract retains its existing field name; Admin receives a display label, never an ID.
+    activatedByEmail: term.activatedByDisplayName ?? '',
     sourceCommandId: term.sourceCommandId ?? '',
   }
 }

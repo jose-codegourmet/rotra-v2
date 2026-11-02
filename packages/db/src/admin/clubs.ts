@@ -278,7 +278,10 @@ export async function readAdminClubDirectory(context: AdminContext, clubId?: str
     include: {
       account: { select: { username: true, provisionedAt: true, disabledAt: true } },
       foundingLocation: { select: { countryCode: true, cityCode: true, displayName: true } },
-      licenseTerms: { orderBy: [{ startsAt: 'desc' }, { id: 'asc' }] },
+      licenseTerms: {
+        orderBy: [{ startsAt: 'desc' }, { id: 'asc' }],
+        include: { activatedBy: { select: { displayName: true } } },
+      },
     },
     orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
   })

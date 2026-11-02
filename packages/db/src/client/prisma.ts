@@ -14,7 +14,15 @@ function createClient() {
     max: Number(process.env.DATABASE_POOL_MAX ?? 5),
     statement_timeout: Number(process.env.DATABASE_STATEMENT_TIMEOUT_MS ?? 10_000),
   })
-  return new PrismaClient({ adapter })
+  return new PrismaClient({
+    adapter,
+    // A command is several round trips under one lock; from a dev machine to the hosted region each
+    // trip is slow enough that Prisma's 5 s default expires mid-commit. Statements keep their own limit.
+    transactionOptions: {
+      maxWait: Number(process.env.DATABASE_TX_MAX_WAIT_MS ?? 10_000),
+      timeout: Number(process.env.DATABASE_TX_TIMEOUT_MS ?? 30_000),
+    },
+  })
 }
 
 const globalForPrisma = globalThis as unknown as { rotraPrisma?: PrismaClient }

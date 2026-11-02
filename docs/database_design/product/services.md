@@ -198,9 +198,27 @@ Verification (#275, closed November 1, 2026 by the product owner):
 - **Verified** against hosted Supabase over HTTP (PR #318): signed-out session reads, 401 with safe copy for
   wrong credentials, 422 for empty forms, 401 on every protected `/api` route, login redirects, a forged
   mock cookie refused and cleared, and `Cache-Control: private, no-store` with `Vary: Cookie`.
-- **Not verified:** the signed-in journey (add/activate club → club sign-in → venue → Queue Session → guest →
-  level → fresh-browser reload), direct cross-club requests, the screens at 375/1280 in both themes, and the
-  `@clubs.rotra.invalid` login with Supabase `createUser`. Tracked in #389.
+- **Not verified (#275):** the signed-in journey, direct cross-club requests, the screens at 375/1280 in
+  both themes, and the `@clubs.rotra.invalid` login with Supabase `createUser`. Moved to #389.
+
+Signed-in journey (#389, November 2, 2026). Run with `ROTRA_DATA_MODE=real` and
+`NEXT_PUBLIC_ROTRA_DATA_MODE=real` against a **local Supabase stack** (`supabase start`, Postgres 15,
+the single migration history applied with `prisma migrate deploy`, RLS migration included) with
+fictional accounts only. The agent may not create logins on the hosted project, so every step below is
+**Not verified on hosted**; repeat it there with fictional accounts before live club use.
+
+| # | Step | Local Supabase stack | Hosted |
+|---|---|---|---|
+| 1 | Platform owner signs in, adds a fictional club, activates its license | **Verified** (Admin UI: club created on the Free price, monthly license active) | Not verified |
+| 2 | Club signs in, saves a venue, creates a Queue Session, adds a guest, sets the level | **Verified** (Queue UI; level changed again from the roster control) | Not verified |
+| 3 | A fresh browser reload shows the same preparation | **Verified** (page reload, and a new cookie jar signing in again reads the venue, session and guest level; `private, no-store`, `Vary: Cookie`) | Not verified |
+| 4 | A second club's direct requests to the first club's session, roster and level routes are refused | **Verified**: `GET` session, roster, cost, payments and `POST` roster add and level all answer 404 `not_found`; nothing was written; the second club's own list is empty | Not verified |
+| 5 | Screens at 375 and 1280, dark and light, truthful states | **Partly verified**: Q-PREPARE renders with saved data at 375 and 1280 in both themes; the Admin screens were only seen at the pane's desktop width in dark. Not a side-by-side prototype comparison; loading, error and permission states were not forced | Not verified |
+| 6 | `<username>@clubs.rotra.invalid` accepted by Supabase `createUser` | **Verified** on the local GoTrue (the login is created as `fictionala@clubs.rotra.invalid`) | Not verified |
+
+Observed, not yet reproduced or ticketed: at 375 px the side-rail drawer showed open over the page right
+after load in the preview browser, and A-LICENSE review says the term covers "Nov 2 – Dec 1" while the
+license card then says "Active until Dec 2".
 
 Proposals used, each now its own ticket (split from #317): club username →
 `<username>@clubs.rotra.invalid` provider login (#381); the six prototype founding cities seeded by

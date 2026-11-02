@@ -362,8 +362,35 @@ export async function findLocationCode(code: string) {
 
 /** Q-CLUB settings read. Allowed after expiry so the club can see its own details. */
 export async function readClubSettings(context: ClubContext) {
-  const club = await prisma.club.findUniqueOrThrow({ where: { id: context.clubId } })
-  return clubSettingsDto(club)
+  const club = await prisma.club.findUniqueOrThrow({
+    where: { id: context.clubId },
+    include: {
+      account: { select: { username: true } },
+      foundingLocation: { select: { countryCode: true, cityCode: true, displayName: true } },
+      nameChanges: {
+        where: { state: 'pending' },
+        orderBy: [{ requestedAt: 'desc' }, { id: 'asc' }],
+        take: 1,
+        select: { requestedName: true, requestedAt: true },
+      },
+    },
+  })
+  return {
+    ...clubSettingsDto(club),
+    foundingAddress: club.foundingAddress,
+    city: club.foundingLocation.displayName,
+    cityCode: `${club.foundingLocation.countryCode}-${club.foundingLocation.cityCode}`,
+    username: club.account?.username ?? '',
+    licensePricing: club.licensePricing,
+    licenseMonthly: toMoney(club.licenseMonthlyMinor, club.currency),
+    licenseYearly: toMoney(club.licenseYearlyMinor, club.currency),
+    pendingNameChange: club.nameChanges[0]
+      ? {
+          requestedName: club.nameChanges[0].requestedName,
+          requestedAt: toIso(club.nameChanges[0].requestedAt),
+        }
+      : null,
+  }
 }
 
 /** Q-CLUB settings the club may edit itself. The name changes only through a request. */

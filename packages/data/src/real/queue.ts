@@ -76,9 +76,16 @@ type WireClubSettings = {
   description: string
   courtRules: string
   postTemplate: string | null
+  foundingAddress: string
+  city: string
+  cityCode: string
+  username: string
+  licensePricing: 'paid' | 'free'
+  licenseMonthly: WireMoney
+  licenseYearly: WireMoney
+  pendingNameChange: { requestedName: string; requestedAt: string } | null
 }
 
-/** Q-CLUB / dashboard header. Founding city, username and name requests are not on the wire yet. */
 export async function realGetClub(signal?: AbortSignal): Promise<Club> {
   const { club } = await realRequest<{ club: WireClubSettings }>('/api/club', { signal })
   return {
@@ -92,15 +99,20 @@ export async function realGetClub(signal?: AbortSignal): Promise<Club> {
     postTemplate: club.postTemplate,
     defaultPlayersPerCourt: club.defaultPlayersPerCourt,
     defaultEntranceFeeMinor: minorOf(club.defaultEntranceFee),
-    foundingAddress: '',
-    city: '',
-    cityCode: '',
-    locationCode: '',
-    username: '',
-    pendingNameChange: null,
-    licensePricing: 'paid',
-    licenseMonthlyMinor: 0,
-    licenseYearlyMinor: 0,
+    foundingAddress: club.foundingAddress,
+    city: club.city,
+    cityCode: club.cityCode,
+    locationCode: club.cityCode,
+    username: club.username,
+    pendingNameChange: club.pendingNameChange
+      ? {
+          requestedName: club.pendingNameChange.requestedName,
+          requestedAt: msOf(club.pendingNameChange.requestedAt),
+        }
+      : null,
+    licensePricing: club.licensePricing,
+    licenseMonthlyMinor: minorOf(club.licenseMonthly) ?? 0,
+    licenseYearlyMinor: minorOf(club.licenseYearly) ?? 0,
     currency: 'PHP',
   }
 }

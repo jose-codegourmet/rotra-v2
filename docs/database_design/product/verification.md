@@ -72,6 +72,18 @@ app's runtime connection, #243) was checked:
 So the migration owner must differ from the runtime role, and the runtime role must not be the table
 owner or a superuser. The real Supabase roles, pooler and advisors were **not** checked.
 
+## RLS and anon execute (#387)
+
+`20261102000100_enable_public_rls` was also applied, with the whole history, to a **local Supabase
+stack** (`supabase start`, real `anon`/`authenticated` roles) on November 2, 2026: 0 of 56 public tables
+without RLS, `anon` and `authenticated` cannot execute `rotra_next_player_sequence`, and the F07.34
+journey still works through the Route Handlers (see [services.md](services.md#f0734--first-persisted-preparation-journey)).
+
+**Hosted: not applied.** A read-only check the same day found the hosted project's last migration is
+`20261101000100_seed_founding_locations`, with 55 of 56 public tables without RLS and `anon` execute on
+the sequence function still granted. Applying it with `prisma migrate deploy` needs human sign-off
+(coding conventions §13); re-run the Supabase advisors afterwards.
+
 ## Query plans
 
 With `enable_seqscan = off` (the fixtures are too small for the planner to prefer indexes otherwise),

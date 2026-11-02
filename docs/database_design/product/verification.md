@@ -79,10 +79,12 @@ stack** (`supabase start`, real `anon`/`authenticated` roles) on November 2, 202
 without RLS, `anon` and `authenticated` cannot execute `rotra_next_player_sequence`, and the F07.34
 journey still works through the Route Handlers (see [services.md](services.md#f0734--first-persisted-preparation-journey)).
 
-**Hosted: not applied.** A read-only check the same day found the hosted project's last migration is
-`20261101000100_seed_founding_locations`, with 55 of 56 public tables without RLS and `anon` execute on
-the sequence function still granted. Applying it with `prisma migrate deploy` needs human sign-off
-(coding conventions §13); re-run the Supabase advisors afterwards.
+**Hosted: applied November 2, 2026** with `prisma migrate deploy` after owner sign-off (before it, the
+last hosted migration was `20261101000100_seed_founding_locations` with 55 of 56 public tables without
+RLS). Checked afterwards over SQL: 0 of 56 public tables without RLS, `anon` and `authenticated` cannot
+execute `rotra_next_player_sequence`, 0 table grants to either role, and the server connection still
+reads application tables. **Not checked:** the Supabase advisors themselves (the Supabase MCP connector
+was not authorized in that session) and the signed-in journey on hosted (#389 ran it locally only).
 
 ## Query plans
 

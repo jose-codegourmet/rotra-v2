@@ -217,9 +217,11 @@ async function decide(
     if (match.state !== 'active')
       throw new ServiceError('conflict', { match: 'This match is not active.' })
     const now = new Date()
+    // Players still on court finish with the match. `left_at` stays empty: it marks leaving
+    // mid-match (substitution), and a finisher's segment ends at the match's `ended_at`.
     await tx.matchParticipation.updateMany({
       where: { matchId: match.id, leftAt: null },
-      data: { finishedWithMatch: true, leftAt: now, leftOperationId: operationId },
+      data: { finishedWithMatch: true },
     })
     await tx.matchCourtUsage.updateMany({
       where: { matchId: match.id, releasedAt: null },
@@ -227,10 +229,7 @@ async function decide(
     })
     await tx.activeCourtHold.deleteMany({ where: { matchId: match.id } })
     await tx.activePlayerHold.deleteMany({ where: { matchId: match.id } })
-    await tx.match.update({
-      where: { id: match.id },
-      data: { state: outcome.kind, endedAt: now, revision: { increment: 1 } },
-    })
+    // The decision goes in before the state change: the match trigger refuses an end without one.
     const decision = await tx.matchDecision.create({
       data: {
         matchId: match.id,
@@ -244,6 +243,10 @@ async function decide(
         confirmedAt: now,
         actorClubId: context.clubId,
       },
+    })
+    await tx.match.update({
+      where: { id: match.id },
+      data: { state: outcome.kind, endedAt: now, revision: { increment: 1 } },
     })
     return {
       match: matchDto((await loadMatch(tx, session.id, match.id)) as MatchRow),

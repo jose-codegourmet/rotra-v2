@@ -208,7 +208,9 @@ close of a stream that never wrote, conflict categories and who may resolve one.
 - **Occupancy.** A court or player can be held by one active match only (primary keys). A 5v5 match
   holds two courts through two `active_court_holds` rows for the same match. Holds are released by
   deleting them in the same transaction as the decision.
-- **Ending a match, in order:** close segments (`left_at`, `finished_with_match`), insert the decision,
+- **Ending a match, in order:** mark the segments still on court `finished_with_match` (their `left_at`
+  stays null: it records leaving mid-match, and a finisher's segment ends at the match's `ended_at`; the
+  `match_participations_finished_check` constraint enforces this), insert the decision,
   set the match state, release holds and court usage. After the decision, the match, its segments and
   the decision itself reject every update and delete, for every application role including Admin.
 - **Substitutions** close the outgoing segment and open a new one for the incoming player; both

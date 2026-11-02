@@ -129,6 +129,7 @@ screen loaded one, and returns an allowlisted DTO.
 - Awards in the private snapshot use the prototype reference formula from `@rotra/data` and are labeled `prototype-reference`; Off Day is stored in its own column.
 - Confirmed guest history needs the club player already linked to that profile plus an identity method (RTR ID, QR or phone); facts keep their original snapshot. Revocation is not built here.
 - Worker hosting and schedule are open (#243); these are plain functions to call from it.
+- `player/leaderboard` (#403): public `readLeaderboardPage` (offset/limit, total), `searchLeaderboard` (name or nickname, first 50 plus total) and the signed-in `readMyLeaderboardPosition`. They list only eligible rows with a stored rank and level from an algorithm in `APPROVED_RANK_ALGORITHMS`; with none approved (#247) they return the empty state without querying. Player Route Handlers: `GET /api/leaderboard`, `GET /api/leaderboard/search` (`leaderboard.list`), `GET /api/leaderboard/me` (player account).
 
 ## F07.31 · Private results, explicit publication
 

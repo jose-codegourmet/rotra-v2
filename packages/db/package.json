@@ -38,6 +38,7 @@
     "./queue/sync": "./src/queue/sync.ts",
     "./queue/finalization": "./src/queue/finalization.ts",
     "./player/projections": "./src/player/projections.ts",
+    "./player/leaderboard": "./src/player/leaderboard.ts",
     "./queue/results": "./src/queue/results.ts",
     "./admin/retention": "./src/admin/retention.ts",
     "./auth/sign-in": "./src/auth/sign-in.ts",

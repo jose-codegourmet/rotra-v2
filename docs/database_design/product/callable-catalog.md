@@ -114,9 +114,9 @@ Every entry inherits its actor, business/screen issue mapping, lifecycle, error,
 
 | Callable / current input | Output | Hook module exports |
 |---|---|---|
-| [getLeaderboardPage](../../../packages/data/src/leaderboard/fetchers.ts#L5)<br>`{ offset, limit = 25 }: { offset: number; limit?: 25; }, signal?: AbortSignal \| undefined` | `Promise<{ entries, total } (fields)>` | [useLeaderboard](../../../packages/data/src/leaderboard/useLeaderboard.ts) |
-| [searchLeaderboard](../../../packages/data/src/leaderboard/fetchers.ts#L13)<br>`query: string, signal?: AbortSignal \| undefined` | `Promise<{ hits, total } (fields)>` | [useLeaderboardSearch](../../../packages/data/src/leaderboard/useLeaderboardSearch.ts) |
-| [getMyLeaderboardPosition](../../../packages/data/src/leaderboard/fetchers.ts#L21)<br>`signal?: AbortSignal \| undefined` | `Promise<number \| null>` | [useMyLeaderboardPosition](../../../packages/data/src/leaderboard/useMyLeaderboardPosition.ts) |
+| [getLeaderboardPage](../../../packages/data/src/leaderboard/fetchers.ts#L12)<br>`{ offset, limit = 25 }: { offset: number; limit?: 25; }, signal?: AbortSignal \| undefined` | `Promise<{ entries, total } (fields)>` | [useLeaderboard](../../../packages/data/src/leaderboard/useLeaderboard.ts) |
+| [searchLeaderboard](../../../packages/data/src/leaderboard/fetchers.ts#L21)<br>`query: string, signal?: AbortSignal \| undefined` | `Promise<{ hits, total } (fields)>` | [useLeaderboardSearch](../../../packages/data/src/leaderboard/useLeaderboardSearch.ts) |
+| [getMyLeaderboardPosition](../../../packages/data/src/leaderboard/fetchers.ts#L32)<br>`signal?: AbortSignal \| undefined` | `Promise<number \| null>` | [useMyLeaderboardPosition](../../../packages/data/src/leaderboard/useMyLeaderboardPosition.ts) |
 
 ## license
 

@@ -77,6 +77,7 @@
 ## Rank and award gates
 
 - Overall leaderboard: configured number of completed full standard games in the last three months, initially ten.
+- Real mode (#403): with no approved rank formula (#247) P-LEADERBOARD always shows its empty state and no own position; it never falls back to fixture positions.
 - Needs reassessment after three months without play: old label visible, no overall position. Return requires a fresh assessment/new completed session and the rolling count.
 - Most Improved/Off Day: five **previous sessions at the same club** within three months, current session excluded. Returning guests can qualify.
 - MVP: no five-session history requirement; relative performance rather than just wins. Exact formula still pending.

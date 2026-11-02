@@ -259,6 +259,15 @@ item); an edit sends the displayed `revision` and a stale one is a conflict; −
 no revision check, so quick taps never conflict. Inventory is online only in real mode (#245): offline,
 nothing is sent and the screen says so.
 
+**Leaderboard (#403).** In real mode the `@rotra/data/leaderboard` fetchers call the Player app's
+public `GET /api/leaderboard?offset=&limit=` and `GET /api/leaderboard/search?q=` (both
+`handlePublicRead('leaderboard.list')`) and the signed-in `GET /api/leaderboard/me`, backed by
+`@rotra/db/player/leaderboard`. Hooks, `leaderboardKeys` and the entry DTO are unchanged, and there is no
+mock fallback. The reads list only stored `player_rank_current` rows that are leaderboard-eligible and
+produced by an algorithm in `APPROVED_RANK_ALGORITHMS`. No rank formula is approved (#247), so the set
+is empty and every read is the empty state ("No players qualify for the leaderboard yet"; my position
+`null`); no fixture or computed position is ever shown. Tie precedence is also still #247.
+
 Wrong account types, forged mock cookies, and cross-club/player IDs are denied at the handler, not only
 in the proxy. Database credentials and Supabase keys are read only from server env. Application tables
 have no `anon`/`authenticated` grants, so the Data API exposes none of them.

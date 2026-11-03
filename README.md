@@ -81,6 +81,14 @@ service. The initial dashboard **Deploy** button builds the selected repository 
 include changes that have not yet been merged. Keep Git-triggered deployments disabled so subsequent
 production releases continue through the manual GitHub Action.
 
+### Environment variables
+
+The Vercel project's env vars are shared by all four services. `pnpm env:vercel` pushes the Supabase and
+database keys from the root `.env` to it (`--target` defaults to production and preview). Without flags it
+is a dry run: it links `.vercel/` if needed and lists each key as add or overwrite, changing nothing. Pass
+`--apply` to write the values (`--scope <team>` if you belong to several Vercel teams), then run
+**Actions → Deploy production** so the new values take effect.
+
 ## Tech stack
 
 Next.js 16 (App Router) · React 19.2 · TypeScript 5 · Tailwind CSS 4 + shadcn/ui · TanStack Query v5 ·

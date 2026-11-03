@@ -11,6 +11,7 @@
     "mockups": "pnpm --filter @rotra/mockups dev",
     "storybook": "pnpm --filter @rotra/ui storybook",
     "format": "biome format --write .",
+    "env:vercel": "node scripts/sync-vercel-env.mjs",
     "prepare": "husky"
   },
   "devDependencies": {

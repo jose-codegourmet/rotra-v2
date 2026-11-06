@@ -87,6 +87,8 @@ const DISPATCH: Record<
   // From On court the payload carries no courts; the older one-step start still sends them.
   'match.start': (c, s, id, p) =>
     startMatch(c, s, { courtIds: [], ...p, operationId: id } as never),
+  // The payload may carry `creditTo` (who gets this game); missing means none, as for an older
+  // client. The service validates it and keeps one choice per team slot on replay too.
   'match.substitute': (c, s, id, p) => substitutePlayer(c, s, { ...p, operationId: id } as never),
   'match.complete': (c, s, id, p) => completeMatch(c, s, { ...p, operationId: id } as never),
   'match.invalidate': (c, s, id, p) => invalidateMatch(c, s, { ...p, operationId: id } as never),

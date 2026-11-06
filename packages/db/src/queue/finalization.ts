@@ -88,33 +88,79 @@ export async function reviewSessionDone(context: ClubContext, sessionId: string)
   })
 }
 
-/** Entries with fewer full games than the target. A warning only (Match done ≠ Session done). */
-async function belowMinimum(tx: Tx, sessionId: string, minimumGames: number) {
-  if (minimumGames <= 0) return []
-  const roster = await tx.sessionPlayer.findMany({ where: { sessionId, releasedAt: null } })
-  const parts = await tx.matchParticipation.findMany({
-    where: { sessionId, match: { state: 'completed' } },
+/**
+ * Session game credit after in-game substitutions (QM choice), as `match:entry` keys. `credit_to`
+ * sits on the incoming segment: `incoming` gives the game to that entry, `outgoing` to the entry
+ * whose segment the same operation closed. The substitute command keeps one choice per team slot.
+ * Session counting only (minimum, session summaries); facts keep `fullParticipation` strict, so
+ * long-term performance and rank never see it.
+ */
+function creditedKeys(
+  parts: {
+    id: string
+    matchId: string
+    sessionPlayerId: string
+    joinedOperationId: string
+    leftOperationId: string | null
+    creditTo: 'none' | 'incoming' | 'outgoing'
+  }[],
+) {
+  const keys = new Set<string>()
+  for (const p of parts) {
+    if (p.creditTo === 'incoming') keys.add(`${p.matchId}:${p.sessionPlayerId}`)
+    if (p.creditTo !== 'outgoing') continue
+    const out = parts.find(
+      (o) => o.matchId === p.matchId && o.id !== p.id && o.leftOperationId === p.joinedOperationId,
+    )
+    if (out) keys.add(`${p.matchId}:${out.sessionPlayerId}`)
+  }
+  return keys
+}
+
+/** Participations of the session's completed matches, with what session credit needs. */
+async function completedParticipations(tx: Tx, sessionId: string) {
+  return tx.matchParticipation.findMany({
+    where: { sessionId, match: { state: 'completed', decision: { kind: 'completed' } } },
     select: {
+      id: true,
       sessionPlayerId: true,
       matchId: true,
       startedWithMatch: true,
       finishedWithMatch: true,
+      joinedOperationId: true,
+      leftOperationId: true,
+      creditTo: true,
     },
   })
+}
+
+/**
+ * Entries with fewer counted games than the target: full games plus games the operator gave them
+ * after a substitution. A warning only (Match done ≠ Session done). Invalid matches give nothing.
+ */
+async function belowMinimum(tx: Tx, sessionId: string, minimumGames: number) {
+  if (minimumGames <= 0) return []
+  const roster = await tx.sessionPlayer.findMany({ where: { sessionId, releasedAt: null } })
+  const parts = await completedParticipations(tx, sessionId)
   const segments = new Map<string, number>()
   for (const p of parts)
     segments.set(
       `${p.matchId}:${p.sessionPlayerId}`,
       (segments.get(`${p.matchId}:${p.sessionPlayerId}`) ?? 0) + 1,
     )
-  const games = new Map<string, number>()
+  const counted = creditedKeys(parts)
   for (const p of parts)
     if (
       p.startedWithMatch &&
       p.finishedWithMatch &&
       segments.get(`${p.matchId}:${p.sessionPlayerId}`) === 1
     )
-      games.set(p.sessionPlayerId, (games.get(p.sessionPlayerId) ?? 0) + 1)
+      counted.add(`${p.matchId}:${p.sessionPlayerId}`)
+  const games = new Map<string, number>()
+  for (const key of counted) {
+    const entryId = key.slice(key.indexOf(':') + 1)
+    games.set(entryId, (games.get(entryId) ?? 0) + 1)
+  }
   return roster
     .map((r) => ({ sessionPlayerId: r.id, name: r.nameSnapshot, games: games.get(r.id) ?? 0 }))
     .filter((r) => r.games < minimumGames)
@@ -176,9 +222,15 @@ async function buildFacts(tx: Tx, sessionId: string) {
   return facts
 }
 
+/**
+ * Per-entry session totals from the facts: full games plus credited substitute games (`credited`,
+ * `match:entry` keys), so they agree with the session standings. Partial games nobody was given
+ * count nothing.
+ */
 function summaries(
   sessionId: string,
   facts: Prisma.PlayerMatchFactCreateManyInput[],
+  credited: Set<string>,
   roster: {
     id: string
     clubId: string
@@ -189,7 +241,11 @@ function summaries(
   now: Date,
 ) {
   return roster.map((entry) => {
-    const full = facts.filter((f) => f.sessionPlayerId === entry.id && f.fullParticipation)
+    const full = facts.filter(
+      (f) =>
+        f.sessionPlayerId === entry.id &&
+        (f.fullParticipation || credited.has(`${f.matchId}:${f.sessionPlayerId}`)),
+    )
     const wins = full.filter((f) => f.team === f.winningTeam).length
     return {
       clubId: entry.clubId,
@@ -281,7 +337,13 @@ export async function finalizeSession(
         if (facts.length) await tx.playerMatchFact.createMany({ data: facts })
         const roster = await tx.sessionPlayer.findMany({ where: { sessionId, releasedAt: null } })
         await tx.clubSessionPlayerSummary.createMany({
-          data: summaries(sessionId, facts, roster, now),
+          data: summaries(
+            sessionId,
+            facts,
+            creditedKeys(await completedParticipations(tx, sessionId)),
+            roster,
+            now,
+          ),
         })
         await tx.match.updateMany({
           where: { sessionId, state: 'waiting', removedAt: null },

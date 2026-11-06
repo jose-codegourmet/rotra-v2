@@ -4,7 +4,10 @@ import { readJsonBody, text } from '@rotra/db/service/request'
 import { routeCookieAdapter } from '@rotra/db/service/route-cookies'
 import { cookies } from 'next/headers'
 
-/** Q-MATCH › Substitute: closes the outgoing segment and opens the incoming one together. */
+/**
+ * Q-MATCH › Substitute: closes the outgoing segment and opens the incoming one together, with who
+ * gets this game (`creditTo`: none, incoming or outgoing; missing means none).
+ */
 export async function POST(
   request: Request,
   ctx: RouteContext<'/api/sessions/[sessionId]/matches/[matchId]/substitution'>,
@@ -18,6 +21,7 @@ export async function POST(
         matchId,
         outId: text(body.outId),
         inId: text(body.inId),
+        creditTo: body.creditTo == null ? undefined : text(body.creditTo),
       }),
     }
   })

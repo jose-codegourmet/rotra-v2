@@ -1,7 +1,13 @@
 import type { SessionCourt } from '../queue-session/queueSession.types'
 import { shortName } from '../session-roster/sessionRoster.rules'
 import type { SessionPlayer } from '../session-roster/sessionRoster.types'
-import type { Match, MatchFormat, MatchLineup, MatchStatus } from './match.types'
+import type {
+  Match,
+  MatchFormat,
+  MatchLineup,
+  MatchStatus,
+  SubstitutionCredit,
+} from './match.types'
 
 export { shortName } from '../session-roster/sessionRoster.rules'
 export const FORMAT_TEAM_SIZES: Record<MatchFormat, readonly [number, number]> = {
@@ -115,12 +121,56 @@ export function nextEligibleForCourt(courtId: string, ctx: MatchContext) {
         : null,
   }
 }
+/** Who gets this game after a substitution: Nobody (default), the incoming or the outgoing player. */
+export const SUBSTITUTION_CREDITS: readonly SubstitutionCredit[] = ['none', 'incoming', 'outgoing']
+/**
+ * The team slot of each substitution, by index: a substitution whose outgoing player came in
+ * through an earlier one in the same team shares that one's slot (the slot is the lineup position).
+ */
+export function substitutionSlots(subs: Match['substitutions']): number[] {
+  const slotOf = new Map<string, number>()
+  return subs.map((s, i) => {
+    const key = `${s.team}:${s.outId}`,
+      slot = slotOf.get(key) ?? i
+    slotOf.delete(key)
+    slotOf.set(`${s.team}:${s.inId}`, slot)
+    return slot
+  })
+}
+/**
+ * Who gets the game after in-game substitutions (QM choice), with their team. One person per team
+ * slot at most: a later substitution in the same slot that names a person replaces the earlier
+ * choice; Nobody leaves it alone. Session counting only; long-term performance never reads this.
+ */
+export function creditedPlayers(m: Pick<Match, 'substitutions'>): Map<string, 'A' | 'B'> {
+  const slots = substitutionSlots(m.substitutions),
+    bySlot = new Map<number, { id: string; team: 'A' | 'B' }>()
+  m.substitutions.forEach((s, i) => {
+    const slot = slots[i] as number
+    if (s.creditTo === 'incoming') bySlot.set(slot, { id: s.inId, team: s.team })
+    else if (s.creditTo === 'outgoing') bySlot.set(slot, { id: s.outId, team: s.team })
+  })
+  return new Map([...bySlot.values()].map((c) => [c.id, c.team]))
+}
+/** Both sides of an in-game substitution: neither is a full participant of the match. */
+export const isPartial = (m: Pick<Match, 'substitutions'>, id: string) =>
+  m.substitutions.some((s) => s.outId === id || s.inId === id)
+/**
+ * The side a counted player played on: their team as the match finished, or, for a credited
+ * substitute who went off, the team of their slot. Null when the match does not count for them.
+ */
+export function countedTeam(m: Match, id: string): 'A' | 'B' | null {
+  if (m.state !== 'completed') return null
+  if (!isPartial(m, id)) return m.teamA.includes(id) ? 'A' : m.teamB.includes(id) ? 'B' : null
+  return creditedPlayers(m).get(id) ?? null
+}
+/**
+ * A counted game for the session (game count, minimum, win/loss, standings, awards): a completed
+ * match the player played in full, or one the operator gave them after a substitution. Invalid
+ * matches count for no one.
+ */
 export function countsFor(m: Match, id: string) {
-  return (
-    m.state === 'completed' &&
-    allPlayers(m).includes(id) &&
-    !m.substitutions.some((s) => s.outId === id || s.inId === id)
-  )
+  return countedTeam(m, id) !== null
 }
 export function countedGames(id: string, matches: Match[]) {
   return matches.filter((m) => countsFor(m, id)).length
@@ -148,26 +198,20 @@ export function computeStandings(roster: SessionPlayer[], matches: Match[]) {
     .map((p) => {
       const games = matches.filter((m) => countsFor(m, p.id)),
         wins = games.filter(
-          (m) =>
-            m.decision?.winningTeam && (m.decision.winningTeam === 'A') === m.teamA.includes(p.id),
+          (m) => m.decision?.winningTeam && m.decision.winningTeam === countedTeam(m, p.id),
         ).length,
         losses = games.filter(
-          (m) =>
-            m.decision?.winningTeam && (m.decision.winningTeam === 'A') !== m.teamA.includes(p.id),
+          (m) => m.decision?.winningTeam && m.decision.winningTeam !== countedTeam(m, p.id),
         ).length
       return { playerId: p.id, name: p.nameSnapshot, wins, losses, games: games.length }
     })
     .filter((r) => r.games > 0)
   const headToHead = (a: string, b: string) =>
     matches.reduce((n, m) => {
-      if (
-        !countsFor(m, a) ||
-        !countsFor(m, b) ||
-        !m.decision?.winningTeam ||
-        m.teamA.includes(a) === m.teamA.includes(b)
-      )
-        return n
-      return n + ((m.decision.winningTeam === 'A') === m.teamA.includes(a) ? -1 : 1)
+      const teamA = countedTeam(m, a),
+        teamB = countedTeam(m, b)
+      if (!teamA || !teamB || !m.decision?.winningTeam || teamA === teamB) return n
+      return n + (m.decision.winningTeam === teamA ? -1 : 1)
     }, 0)
   return rows.sort(
     (a, b) =>

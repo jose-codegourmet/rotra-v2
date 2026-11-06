@@ -1,5 +1,5 @@
 import type { ClubPlayer } from '../club-player/clubPlayer.types'
-import { allPlayers, computeStandings, countsFor } from '../match/match.rules'
+import { computeStandings, countedTeam, isPartial } from '../match/match.rules'
 import type { Match } from '../match/match.types'
 import { PLAYING_LEVELS } from '../player/player.types'
 import type { SessionPlayer } from '../session-roster/sessionRoster.types'
@@ -47,7 +47,9 @@ export const OFF_DAY_MAX_DELTA = -0.3
  * - performance score = Σ (1 if won else 0) − expected; MVP is the highest score over ≥ 2 counted games
  * - players with ≥ 5 prior club sessions and a baseline win rate compare tonight's rate against it:
  *   Most Improved is the largest rise ≥ +0.15; Off Day lists every drop ≤ −0.30 (biggest drop first)
- * Partial (substituted) and invalid games count for no one. No baseline means no Most Improved or Off
+ * Invalid games count for no one. A partial (substituted) game counts only for the player the
+ * operator gave it to, as a counted game for MVP and Most Improved; Off Day (open decision) keeps
+ * using full games only, so a credited game never feeds it. No baseline means no Most Improved or Off
  * Day entry for that player; the weakest player is never listed just to fill Off Day.
  */
 export function computeAwards(
@@ -60,56 +62,101 @@ export function computeAwards(
   const level = (id: string) => levelIndex(roster.find((p) => p.id === id)?.level ?? null)
   const avg = (ids: string[]) =>
     ids.length ? ids.reduce((t, id) => t + level(id), 0) / ids.length : DEFAULT_LEVEL_INDEX
-  const perf: { row: AwardRow; wins: number }[] = roster
-    .map((p) => {
-      let score = 0,
-        games = 0,
-        wins = 0
-      for (const m of done) {
-        if (!countsFor(m, p.id) || !m.decision?.winningTeam || !allPlayers(m).includes(p.id))
-          continue
-        const onA = m.teamA.includes(p.id),
-          mine = avg(onA ? m.teamA : m.teamB),
-          opp = avg(onA ? m.teamB : m.teamA),
-          expected = 1 / (1 + 10 ** ((opp - mine) / 2)),
-          won = (m.decision.winningTeam === 'A') === onA
-        score += (won ? 1 : 0) - expected
-        games += 1
-        if (won) wins += 1
-      }
-      return {
-        row: {
-          sessionPlayerId: p.id,
-          clubPlayerId: p.clubPlayerId,
-          playerId: players.find((c) => c.id === p.clubPlayerId)?.playerId ?? null,
-          name: p.nameSnapshot,
-          games,
-          score,
-        },
-        wins,
-      }
-    })
-    .filter((x) => x.row.games >= MVP_MIN_GAMES)
-  const mvp = [...perf].sort((a, b) => b.row.score - a.row.score)[0]?.row ?? null
-  const hist: ImprovementRow[] = perf.flatMap(({ row, wins }) => {
-    const h = history.find((x) => x.clubPlayerId === row.clubPlayerId)
-    if (!h || h.priorSessions < AWARD_MIN_PRIOR_SESSIONS || h.baselineWinRate == null) return []
-    const winRate = wins / row.games
-    return [
-      {
-        ...row,
-        priorSessions: h.priorSessions,
-        baselineWinRate: h.baselineWinRate,
-        winRate,
-        delta: winRate - h.baselineWinRate,
+  /** Score, games and wins over counted games; `withCredit` false keeps full games only. */
+  const tally = (p: SessionPlayer, withCredit: boolean) => {
+    let score = 0,
+      games = 0,
+      wins = 0
+    for (const m of done) {
+      const side = countedTeam(m, p.id)
+      if (!side || !m.decision?.winningTeam || (!withCredit && isPartial(m, p.id))) continue
+      // The teams as the match finished; a credited player who went off is rated with their slot's team.
+      const onA = side === 'A',
+        mine = avg(onA ? m.teamA : m.teamB),
+        opp = avg(onA ? m.teamB : m.teamA),
+        expected = 1 / (1 + 10 ** ((opp - mine) / 2)),
+        won = m.decision.winningTeam === side
+      score += (won ? 1 : 0) - expected
+      games += 1
+      if (won) wins += 1
+    }
+    return {
+      row: {
+        sessionPlayerId: p.id,
+        clubPlayerId: p.clubPlayerId,
+        playerId: players.find((c) => c.id === p.clubPlayerId)?.playerId ?? null,
+        name: p.nameSnapshot,
+        games,
+        score,
       },
-    ]
-  })
+      wins,
+    }
+  }
+  const qualified = (x: { row: AwardRow }) => x.row.games >= MVP_MIN_GAMES
+  const perf: { row: AwardRow; wins: number }[] = roster
+    .map((p) => tally(p, true))
+    .filter(qualified)
+  const fullOnly: { row: AwardRow; wins: number }[] = roster
+    .map((p) => tally(p, false))
+    .filter(qualified)
+  const mvp = [...perf].sort((a, b) => b.row.score - a.row.score)[0]?.row ?? null
+  const improvement = (rows: { row: AwardRow; wins: number }[]): ImprovementRow[] =>
+    rows.flatMap(({ row, wins }) => {
+      const h = history.find((x) => x.clubPlayerId === row.clubPlayerId)
+      if (!h || h.priorSessions < AWARD_MIN_PRIOR_SESSIONS || h.baselineWinRate == null) return []
+      const winRate = wins / row.games
+      return [
+        {
+          ...row,
+          priorSessions: h.priorSessions,
+          baselineWinRate: h.baselineWinRate,
+          winRate,
+          delta: winRate - h.baselineWinRate,
+        },
+      ]
+    })
   const mostImproved =
-    hist.filter((x) => x.delta >= MOST_IMPROVED_MIN_DELTA).sort((a, b) => b.delta - a.delta)[0] ??
-    null
-  const offDay = hist.filter((x) => x.delta <= OFF_DAY_MAX_DELTA).sort((a, b) => a.delta - b.delta)
+    improvement(perf)
+      .filter((x) => x.delta >= MOST_IMPROVED_MIN_DELTA)
+      .sort((a, b) => b.delta - a.delta)[0] ?? null
+  const offDay = improvement(fullOnly)
+    .filter((x) => x.delta <= OFF_DAY_MAX_DELTA)
+    .sort((a, b) => a.delta - b.delta)
   return { mvp, mostImproved, offDay }
+}
+
+/**
+ * Most Improved / Off Day baseline from a club's earlier finalized sessions (owner decision,
+ * November 6, 2026): sessions are the player's earlier session summaries; the win rate uses FULL
+ * games only, read from the facts' `fullParticipation`, so a game the operator gave a substitute
+ * never enters a baseline (session summaries count those games, the facts never do).
+ */
+export function awardBaseline(
+  clubPlayerIds: string[],
+  priorSessions: { clubPlayerId: string; sessionId: string }[],
+  priorFacts: {
+    clubPlayerId: string
+    sessionId: string
+    fullParticipation: boolean
+    team: 'A' | 'B'
+    winningTeam: 'A' | 'B'
+  }[],
+): PlayerAwardHistory[] {
+  return clubPlayerIds.map((clubPlayerId) => {
+    const sessions = new Set(
+        priorSessions.filter((r) => r.clubPlayerId === clubPlayerId).map((r) => r.sessionId),
+      ),
+      full = priorFacts.filter(
+        (f) => f.clubPlayerId === clubPlayerId && f.fullParticipation && sessions.has(f.sessionId),
+      )
+    return {
+      clubPlayerId,
+      priorSessions: sessions.size,
+      baselineWinRate: full.length
+        ? full.filter((f) => f.team === f.winningTeam).length / full.length
+        : null,
+    }
+  })
 }
 
 /** Builds the private snapshot the finalization `slides` stage stores. */

@@ -10,13 +10,18 @@ import {
   canSendBack,
   canStart,
   computeStandings,
+  countedGames,
+  countedTeam,
+  countsFor,
   courtMatches,
+  creditedPlayers,
   freeCourts,
   type MatchContext,
   matchStatus,
   onCourtMatches,
   replacedLineup,
   substitutionCandidates,
+  substitutionSlots,
   swapTarget,
 } from './match.rules'
 import type { Match } from './match.types'
@@ -106,6 +111,83 @@ describe('live standings', () => {
     const rows = computeStandings(roster, [partial, invalid])
     expect(rows.map((r) => r.playerId)).toEqual(['Amy', 'Ben', 'Dan'])
     expect(rows.find((r) => r.playerId === 'Amy')).toMatchObject({ wins: 1, losses: 0, games: 1 })
+  })
+})
+
+describe('substitution game credit', () => {
+  // Eve started on Team A and went off; Zoe came in and finished. Team A won.
+  const subbed = (creditTo?: 'none' | 'incoming' | 'outgoing') => {
+    const m = game(['Zoe', 'Amy'], ['Ben', 'Dan'])
+    m.substitutions = [{ outId: 'Eve', inId: 'Zoe', team: 'A', at: 0, creditTo }]
+    return m
+  }
+  it('gives nobody the game by default', () => {
+    for (const m of [subbed(), subbed('none')]) {
+      expect(countsFor(m, 'Zoe')).toBe(false)
+      expect(countsFor(m, 'Eve')).toBe(false)
+      expect(countsFor(m, 'Amy')).toBe(true)
+    }
+  })
+  it('gives the incoming player the game, the win and minimum credit', () => {
+    const m = subbed('incoming')
+    expect(countsFor(m, 'Zoe')).toBe(true)
+    expect(countsFor(m, 'Eve')).toBe(false)
+    expect(countedGames('Zoe', [m])).toBe(1)
+    expect(computeStandings(roster, [m]).find((r) => r.playerId === 'Zoe')).toMatchObject({
+      wins: 1,
+      losses: 0,
+      games: 1,
+    })
+  })
+  it('gives the outgoing player the game with the side they played on', () => {
+    const m = subbed('outgoing')
+    expect(countsFor(m, 'Eve')).toBe(true)
+    expect(countsFor(m, 'Zoe')).toBe(false)
+    expect(countedTeam(m, 'Eve')).toBe('A')
+    const lost = { ...m, decision: { ...m.decision!, winningTeam: 'B' as const } }
+    expect(computeStandings(roster, [lost]).find((r) => r.playerId === 'Eve')).toMatchObject({
+      wins: 0,
+      losses: 1,
+      games: 1,
+    })
+  })
+  it('keeps one person per team slot: a later choice replaces the earlier one', () => {
+    const m = game(['Ben', 'Amy'], ['Dan', 'Hal'])
+    m.substitutions = [
+      { outId: 'Eve', inId: 'Zoe', team: 'A', at: 0, creditTo: 'incoming' },
+      { outId: 'Zoe', inId: 'Ben', team: 'A', at: 1, creditTo: 'outgoing' },
+    ]
+    expect(substitutionSlots(m.substitutions)).toEqual([0, 0])
+    expect([...creditedPlayers(m).keys()]).toEqual(['Zoe'])
+    m.substitutions[1]!.creditTo = 'incoming'
+    expect([...creditedPlayers(m).keys()]).toEqual(['Ben'])
+    // Nobody in a later substitution leaves the earlier choice alone.
+    m.substitutions[1]!.creditTo = 'none'
+    expect([...creditedPlayers(m).keys()]).toEqual(['Zoe'])
+  })
+  it('keeps the choices of different slots apart', () => {
+    const m = game(['Zoe', 'Amy'], ['Ben', 'Hal'])
+    m.substitutions = [
+      { outId: 'Eve', inId: 'Zoe', team: 'A', at: 0, creditTo: 'incoming' },
+      { outId: 'Dan', inId: 'Hal', team: 'B', at: 1, creditTo: 'outgoing' },
+    ]
+    expect(new Set(creditedPlayers(m).keys())).toEqual(new Set(['Zoe', 'Dan']))
+  })
+  it('gives nobody anything from an invalid match', () => {
+    const m = {
+      ...subbed('incoming'),
+      state: 'invalid' as const,
+      decision: {
+        kind: 'invalid' as const,
+        winningTeam: null,
+        teamAScore: null,
+        teamBScore: null,
+        confirmedAt: 1,
+      },
+    }
+    expect(countsFor(m, 'Zoe')).toBe(false)
+    expect(countsFor(m, 'Amy')).toBe(false)
+    expect(computeStandings(roster, [m])).toEqual([])
   })
 })
 
@@ -284,8 +366,8 @@ describe('On court actions', () => {
 
   it('swap target counts this match’s players as free and skips matches not ready', () => {
     const busy = queued('busy', 1, ['Eve', 'Migs'], ['Gus', 'Amy'])
-    const shares = queued('shares', 2, ['Migs', 'Amy'], ['Ben', 'Hal'])
-    // Eve is Playing on Court 2, so `busy` is skipped; `shares` only needs Migs and Amy freed.
+    const shares = queued('shares', 2, ['Migs', 'Amy'], ['Ben', 'Dan'])
+    // Eve is Playing on Court 2, so `busy` is skipped; `shares` only needs this match's players freed.
     const ctx = ctxOf([placed, playing, busy, shares])
     expect(swapTarget(placed, ctx)).toEqual({ match: shares, position: 2 })
   })

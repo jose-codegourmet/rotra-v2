@@ -4,14 +4,16 @@ import { setMockLatencyEnabled } from '../mock/latency'
 import { mockStore, readMockState } from '../mock/store'
 import {
   completeMatch,
+  invalidateMatch,
   moveCourt,
   placeOnCourt,
   replacePlayer,
   sendBackToQueue,
   startMatch,
+  substitutePlayer,
   swapWithQueue,
 } from './control'
-import { freeCourts, matchStatus, waitingMatches } from './match.rules'
+import { countedGames, freeCourts, matchStatus, waitingMatches } from './match.rules'
 import { matchContext, regenerateQueue } from './queue.mutations'
 
 // Match 1 is Playing on Court 1 (players 0–3); match 2 (players 0, 4, 6, 7) waits on it;
@@ -246,5 +248,115 @@ describe('Swap with the queue', () => {
     ).rejects.toThrow('Something changed. Review the match again.')
     expect(matchIn(playing!.id).state).toBe('on_court')
     expect(matchIn(ready!.id).state).toBe('waiting')
+  })
+})
+
+describe('Substitute with who gets this game', () => {
+  // Match 1 is Playing; player 9 and player 8 are present and free.
+  const goingOff = () => matchIn(playing!.id).teamA[0]!
+  const games = (id: string) => countedGames(id, readMockState().matches)
+  // Counted games this test added (the fixture already has completed matches).
+  let before: Record<string, number> = {}
+  beforeEach(() => {
+    before = Object.fromEntries(fixture.roster.map((p) => [p.id, games(p.id)]))
+  })
+  const gained = (id: string) => games(id) - (before[id] ?? 0)
+
+  it('gives nobody the game by default', async () => {
+    const out = goingOff()
+    const done = await substitutePlayer({
+      matchId: playing!.id,
+      outId: out,
+      inId: player(9),
+      operationId: 'sub-none',
+    })
+    expect(done.message).not.toContain('gets the game')
+    expect(matchIn(playing!.id).substitutions).toMatchObject([
+      { outId: out, inId: player(9), team: 'A', creditTo: 'none' },
+    ])
+    await completeMatch({ matchId: playing!.id, winningTeam: 'A', operationId: 'done-none' })
+    expect(gained(player(9))).toBe(0)
+    expect(gained(out)).toBe(0)
+  })
+
+  it('gives the incoming player the game, for the session', async () => {
+    const out = goingOff()
+    const done = await substitutePlayer({
+      matchId: playing!.id,
+      outId: out,
+      inId: player(9),
+      creditTo: 'incoming',
+      operationId: 'sub-in',
+    })
+    expect(done.message).toContain('gets the game')
+    await completeMatch({ matchId: playing!.id, winningTeam: 'A', operationId: 'done-in' })
+    expect(gained(player(9))).toBe(1)
+    expect(gained(out)).toBe(0)
+  })
+
+  it('gives the outgoing player the game, for the session', async () => {
+    const out = goingOff()
+    await substitutePlayer({
+      matchId: playing!.id,
+      outId: out,
+      inId: player(9),
+      creditTo: 'outgoing',
+      operationId: 'sub-out',
+    })
+    await completeMatch({ matchId: playing!.id, winningTeam: 'B', operationId: 'done-out' })
+    expect(gained(out)).toBe(1)
+    expect(gained(player(9))).toBe(0)
+  })
+
+  it('replaces an earlier choice for the same slot when a later one names a person', async () => {
+    const out = goingOff()
+    await substitutePlayer({
+      matchId: playing!.id,
+      outId: out,
+      inId: player(9),
+      creditTo: 'incoming',
+      operationId: 'sub-1',
+    })
+    await substitutePlayer({
+      matchId: playing!.id,
+      outId: player(9),
+      inId: player(8),
+      creditTo: 'outgoing',
+      operationId: 'sub-2',
+    })
+    expect(matchIn(playing!.id).substitutions.map((x) => x.creditTo)).toEqual(['none', 'outgoing'])
+    await completeMatch({ matchId: playing!.id, winningTeam: 'A', operationId: 'done-2' })
+    expect(gained(player(9))).toBe(1)
+    expect(gained(player(8))).toBe(0)
+    expect(gained(out)).toBe(0)
+  })
+
+  it('freezes the choice at Match done', async () => {
+    await completeMatch({ matchId: playing!.id, winningTeam: 'A', operationId: 'done-first' })
+    await expect(
+      substitutePlayer({
+        matchId: playing!.id,
+        outId: goingOff(),
+        inId: player(9),
+        creditTo: 'incoming',
+        operationId: 'sub-late',
+      }),
+    ).rejects.toThrow('This match already has a confirmed outcome or is not active.')
+  })
+
+  it('gives nobody anything from an invalid match', async () => {
+    const out = goingOff(),
+      partner = matchIn(playing!.id).teamA[1]!
+    await substitutePlayer({
+      matchId: playing!.id,
+      outId: out,
+      inId: player(9),
+      creditTo: 'incoming',
+      operationId: 'sub-inv',
+    })
+    await invalidateMatch({ matchId: playing!.id, operationId: 'invalid-1' })
+    expect(gained(player(9))).toBe(0)
+    expect(gained(out)).toBe(0)
+    expect(gained(partner)).toBe(0)
   })
 })

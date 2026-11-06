@@ -52,6 +52,7 @@ Recorded in the [mockup change log](../../mockup-changes/2026-11-06-queue-on-cou
 | D6 · Court card look | Free: plain card, chip **Free** (or "Not open yet"). On court: normal border, chip **Getting ready**, **Start match** primary. Playing: steady accent border glow (no pulse), chip **Playing**, minutes. Never color alone; tokens only |
 | D7 · Session done | Still blocked while any match is Playing. On court matches that never started are dropped like waiting matches, with "N matches on court weren't started and will be dropped." |
 | D8 · Court switch offline | The **Manual Queue \| Auto Queue** switch needs internet. While the device is offline, auto filling pauses: no automatic placements, so two offline devices can't collide through Auto Queue. Manual **Put on court** keeps today's offline behaviour (Jose, November 6, 2026) |
+| D9 · Credit and award baselines | Most Improved and Off Day baselines from earlier sessions use **full games only**: a credited substitute's game never enters them, like rank (Jose, November 6, 2026). Whether it counts toward the current session's Off Day stays open below; until then it doesn't |
 
 Still open after this decision:
 

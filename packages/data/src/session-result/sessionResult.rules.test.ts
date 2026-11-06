@@ -3,6 +3,7 @@ import type { Match } from '../match/match.types'
 import type { PlayingLevel } from '../player/player.types'
 import type { SessionPlayer } from '../session-roster/sessionRoster.types'
 import {
+  awardBaseline,
   buildExportFrames,
   computeAwards,
   paginateStandings,
@@ -152,6 +153,80 @@ describe('prototype reference awards', () => {
   })
 })
 
+describe('substitution game credit in results', () => {
+  // Eve started Team A and went off; Zoe came in and Team A beat Amy.
+  const subbed = (creditTo: 'none' | 'incoming' | 'outgoing') => {
+    const m = game(['Zoe'], ['Amy'])
+    m.format = 'singles'
+    m.substitutions = [{ outId: 'Eve', inId: 'Zoe', team: 'A', at: 0, creditTo }]
+    return m
+  }
+  it('counts nobody when nobody got the game', () => {
+    const rows = sessionStandings(roster, [game(['Zoe'], ['Amy']), subbed('none')])
+    expect(rows.find((r) => r.name === 'Zoe')).toMatchObject({ wins: 1, games: 1 })
+    expect(rows.find((r) => r.name === 'Eve')).toBeUndefined()
+    // Zoe has one counted game, so Amy (two losses) is the only MVP candidate.
+    expect(computeAwards([game(['Zoe'], ['Amy']), subbed('none')], roster, []).mvp?.name).toBe(
+      'Amy',
+    )
+  })
+  it('gives the incoming player the game in standings and MVP', () => {
+    const games = [game(['Zoe'], ['Amy']), subbed('incoming')]
+    expect(sessionStandings(roster, games).find((r) => r.name === 'Zoe')).toMatchObject({
+      wins: 2,
+      losses: 0,
+      games: 2,
+    })
+    expect(computeAwards(games, roster, []).mvp).toMatchObject({ name: 'Zoe', games: 2 })
+  })
+  it('gives the outgoing player the game and the result of their side', () => {
+    const rows = sessionStandings(roster, [subbed('outgoing')])
+    expect(rows.find((r) => r.name === 'Eve')).toMatchObject({ wins: 1, losses: 0, games: 1 })
+    expect(rows.find((r) => r.name === 'Zoe')).toBeUndefined()
+  })
+  it('keeps the latest choice for a slot', () => {
+    const m = subbed('incoming')
+    m.teamA = ['Ben']
+    m.substitutions[0]!.creditTo = 'none'
+    m.substitutions.push({ outId: 'Zoe', inId: 'Ben', team: 'A', at: 1, creditTo: 'outgoing' })
+    const rows = sessionStandings(roster, [m])
+    expect(rows.find((r) => r.name === 'Zoe')).toMatchObject({ games: 1, wins: 1 })
+    expect(rows.find((r) => r.name === 'Ben')).toBeUndefined()
+    expect(rows.find((r) => r.name === 'Eve')).toBeUndefined()
+  })
+  it('never feeds Off Day with a credited game', () => {
+    const creditedLoss = () => {
+      const m = game(['Eve'], ['Dan'], 'B')
+      m.format = 'singles'
+      m.substitutions = [{ outId: 'Amy', inId: 'Eve', team: 'A', at: 0, creditTo: 'outgoing' }]
+      return m
+    }
+    const games = [game(['Amy'], ['Ben']), game(['Amy'], ['Ben']), creditedLoss(), creditedLoss()]
+    expect(sessionStandings(roster, games).find((r) => r.name === 'Amy')).toMatchObject({
+      wins: 2,
+      losses: 2,
+      games: 4,
+    })
+    // With the credited losses Amy's rate would be 0.5 against 0.9; on full games it is 1.0.
+    expect(computeAwards(games, roster, history(['Amy', 5, 0.9])).offDay).toEqual([])
+  })
+  it('gives nobody anything from an invalid match', () => {
+    const invalid: Match = {
+      ...subbed('incoming'),
+      state: 'invalid',
+      decision: {
+        kind: 'invalid',
+        winningTeam: null,
+        teamAScore: null,
+        teamBScore: null,
+        confirmedAt: 1,
+      },
+    }
+    expect(sessionStandings(roster, [invalid])).toEqual([])
+    expect(computeAwards([invalid, invalid], roster, []).mvp).toBeNull()
+  })
+})
+
 describe('export frames', () => {
   const names = (n: number) => Array.from({ length: n }, (_, i) => `Player ${i + 1}`)
   it('splits 30 rows into three Story frames of 14, 14 and 2', () => {
@@ -224,5 +299,33 @@ describe('export frames', () => {
         'feed',
       ),
     ).toEqual([{ title: 'Awards', rows: ['MVP · none'] }])
+  })
+})
+
+describe('Most Improved and Off Day baseline', () => {
+  const sessions = ['s1', 's2', 's3', 's4', 's5'].map((sessionId) => ({
+    clubPlayerId: 'club-Amy',
+    sessionId,
+  }))
+  const fact = (sessionId: string, won: boolean, fullParticipation = true) => ({
+    clubPlayerId: 'club-Amy',
+    sessionId,
+    fullParticipation,
+    team: 'A' as const,
+    winningTeam: won ? ('A' as const) : ('B' as const),
+  })
+  it('uses full games only: a credited substitute game never changes it', () => {
+    const full = [fact('s1', true), fact('s2', true), fact('s3', false), fact('s4', true)]
+    // The game the operator gave Amy in s5 (a partial fact) is left out of the rate.
+    const withCredited = [...full, fact('s5', false, false), fact('s5', false, false)]
+    const [plain] = awardBaseline(['club-Amy'], sessions, full)
+    const [credited] = awardBaseline(['club-Amy'], sessions, withCredited)
+    expect(plain).toEqual({ clubPlayerId: 'club-Amy', priorSessions: 5, baselineWinRate: 0.75 })
+    expect(credited).toEqual(plain)
+  })
+  it('has no rate without a full game and ignores sessions not in the player history', () => {
+    expect(awardBaseline(['club-Amy'], sessions, [fact('s9', true)])).toEqual([
+      { clubPlayerId: 'club-Amy', priorSessions: 5, baselineWinRate: null },
+    ])
   })
 })

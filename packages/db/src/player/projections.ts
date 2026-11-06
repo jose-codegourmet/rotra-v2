@@ -1,6 +1,6 @@
 import 'server-only'
 import { WINDOW_DAYS } from '@rotra/data/player/rules'
-import { createResultSnapshot } from '@rotra/data/session-result/sessionResult.rules'
+import { awardBaseline, createResultSnapshot } from '@rotra/data/session-result/sessionResult.rules'
 import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
 import { type PlayerMatchFact, Prisma, type ProjectionJob } from '../generated/prisma/client'
@@ -126,7 +126,9 @@ async function writeResultSnapshot(tx: Tx, sessionId: string) {
     where: { clubId: session.clubId, id: { in: ctx.roster.map((r) => r.clubPlayerId) } },
     select: { id: true, playerId: true },
   })
-  // Baseline: each club player's earlier finalized sessions at this club, by full-game win rate.
+  // Baseline: each club player's earlier finalized sessions at this club, by FULL-game win rate.
+  // Session summaries count credited substitute games, so the rate is read from the facts, whose
+  // `fullParticipation` never includes them (owner decision, November 6, 2026).
   const prior = await tx.clubSessionPlayerSummary.findMany({
     where: {
       clubId: session.clubId,
@@ -134,22 +136,35 @@ async function writeResultSnapshot(tx: Tx, sessionId: string) {
       sessionId: { not: sessionId },
       finalization: { committedAt: { lt: session.finalizedAt ?? new Date() } },
     },
-    select: { clubPlayerId: true, sessionId: true, wins: true, fullGames: true },
+    select: { clubPlayerId: true, sessionId: true },
   })
-  const history = clubPlayers.map((c) => {
-    const rows = prior.filter((p) => p.clubPlayerId === c.id)
-    const games = rows.reduce((n, r) => n + r.fullGames, 0)
-    return {
-      clubPlayerId: c.id,
-      priorSessions: rows.length,
-      baselineWinRate: games ? rows.reduce((n, r) => n + r.wins, 0) / games : null,
-    }
-  })
+  const priorFacts = prior.length
+    ? await tx.playerMatchFact.findMany({
+        where: {
+          clubId: session.clubId,
+          clubPlayerId: { in: clubPlayers.map((c) => c.id) },
+          sessionId: { in: [...new Set(prior.map((p) => p.sessionId))] },
+          fullParticipation: true,
+        },
+        select: {
+          clubPlayerId: true,
+          sessionId: true,
+          fullParticipation: true,
+          team: true,
+          winningTeam: true,
+        },
+      })
+    : []
+  const history = awardBaseline(
+    clubPlayers.map((c) => c.id),
+    prior,
+    priorFacts,
+  )
   const snapshot = createResultSnapshot({
     sessionId,
     roster: ctx.roster,
     matches: ctx.matches,
-    history: history as never,
+    history,
     players: clubPlayers,
     generatedAt: Date.now(),
   })

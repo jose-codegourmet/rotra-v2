@@ -1275,7 +1275,7 @@ function syncLabel() {
 const AREA = {
   confirmReq: 'Roster', declineReq: 'Roster',
   togglePaid: 'Payments', markAllPaid: 'Payments', togglePresent: 'Roster', allPresent: 'Roster', allAbsent: 'Roster', giveSlot: 'Roster', fillSlots: 'Roster', removeWait: 'Roster', confirmAdd: 'Roster', confirmNew: 'Roster', setLevel: 'Roster',
-  confirmStart: 'Session', confirmCancelSession: 'Session', saveSetup: 'Session setup', confirmDone: 'Session done', confirmPublish: 'Published results',
+  confirmStart: 'Session', confirmCancelSession: 'Session', confirmDeleteSession: 'Session', saveSetup: 'Session setup', confirmDone: 'Session done', confirmPublish: 'Published results',
   makeMatch: 'Queue', saveEditor: 'Queue', addSuggest: 'Queue', autoCommit: 'Queue', confirmRegen: 'Queue', move: 'Queue', moveTo: 'Queue', swapSides: 'Queue', removeWaiting: 'Queue',
   confirmDispatch: 'Matches and results', placeOnCourt: 'Matches and results', startOnCourt: 'Matches and results', sendBack: 'Queue', confirmSwap: 'Queue', confirmReplace: 'Matches and results', confirmMove: 'Matches and results', setCourtFill: 'Courts and time', confirmResult: 'Matches and results', confirmSub: 'Matches and results', confirmInvalid: 'Matches and results',
   confirmAddCourt: 'Courts and time', removeCourt: 'Courts and time', confirmOpenEarly: 'Courts and time', dispatchOpenEarly: 'Courts and time', undoEarly: 'Courts and time', addCourt: 'Courts and time', extend: 'Courts and time',
@@ -2807,7 +2807,7 @@ function viewPrepare() {
   return `<main class="wrap">
     <div class="crumb"><button class="btn sm ghost" data-act="go" data-to="home">${I.back} Home</button></div>
     <div class="between"><div class="stack tight"><span class="label">${live ? 'Session settings' : 'Preparation'}</span><h1>${esc(s.title)}</h1><p class="muted">${live ? `${fmtDate(s.startedAt)} · Started ${fmtTime(s.startedAt)} · Ends ${fmtTime(s.end)}${laterDay(s.startedAt, s.end)}` : `${fmtDate(s.start)} · ${fmtRange(s.start, s.end)}`} · ${esc(s.venue)}</p></div>
-      <div class="row acts">${live ? '<button class="btn sm" data-act="go" data-to="console">Back to live session</button>' : '<button class="btn sm" data-act="editSetup">Edit preparation</button>'}<button class="btn sm" data-act="go" data-to="public">Preview public page</button><button class="btn sm" data-act="openPost">Copy Facebook post</button>${live ? '' : '<button class="btn sm danger" data-act="openCancelSession">Cancel session</button>'}</div></div>
+      <div class="row acts">${live ? '<button class="btn sm" data-act="go" data-to="console">Back to live session</button>' : '<button class="btn sm" data-act="editSetup">Edit preparation</button>'}<button class="btn sm" data-act="go" data-to="public">Preview public page</button><button class="btn sm" data-act="openPost">Copy Facebook post</button>${live ? '' : '<button class="btn sm danger" data-act="openDeleteSession">Delete session</button><button class="btn sm danger" data-act="openCancelSession">Cancel session</button>'}</div></div>
     ${live ? notice('', 'Preparation values are read-only during play. Mode, formats, minimum and playing levels are fixed after start. Use the live controls in Overview to manage courts, time, arrivals, requests and payments.') : pendingReqs(s).length ? requestsPanel(s) : ''}
     ${(() => {
       const tab = ['overview', 'roster', 'waitlist', 'payments'].includes(S.ui.prepTab) ? S.ui.prepTab : 'overview';
@@ -3761,6 +3761,19 @@ const SHEETS = {
         <span class="hint">Started ${mins} min ago. At most one person gets this game; it never counts toward long-term rank.</span></div>`,
       `<button class="btn" data-act="openMatch" data-id="${m.id}">Back</button><button class="btn primary" data-act="sheetSet" data-k="step" data-v="confirm" ${sh.out && sh.in ? '' : 'disabled'}>Review substitution</button>`);
   },
+  // Delete a planned session nobody is confirmed in. Needs internet; confirmed players block it (Open roster instead).
+  deleteSession(sh) {
+    const s = cur(), conf = s.roster.length, wl = (s.waitlist || []).length, rq = pendingReqs(s).length;
+    const roster = `${conf} confirmed${wl ? ` · ${wl} on the waitlist` : ''}${rq ? ` · ${rq} join request${rq === 1 ? '' : 's'}` : ''}`;
+    const kv = `<dl class="kv"><dt>Session</dt><dd>${esc(s.title)}</dd><dt>When</dt><dd>${fmtDate(s.start)} · ${fmtRange(s.start, s.end)}</dd><dt>Venue</dt><dd>${esc(s.venue)}</dd><dt>Roster</dt><dd>${roster}</dd></dl>`;
+    if (conf) return sheetShell("Can't delete this session", `${kv}
+      <p>${conf} player${conf === 1 ? ' is' : 's are'} confirmed for this session. Remove every confirmed player from the roster first, then delete the session.</p>`,
+      '<button class="btn" data-act="closeSheet" data-autofocus>Back</button><button class="btn primary" data-act="deleteOpenRoster">Open roster</button>');
+    return sheetShell('Delete session?', `${kv}
+      ${!S.online ? notice('warn', "You're offline. Connect to delete this session.") : ''}
+      <p>The session, its public link, its waitlist and any join requests are removed. This cannot be undone.</p>`,
+      `<button class="btn" data-act="closeSheet" data-autofocus>Keep session</button><button class="btn danger" data-act="confirmDeleteSession" ${!S.online ? 'disabled' : ''}>Delete session</button>`);
+  },
   // Cancel a planned session (before Start session only). Final: the record keeps its roster, waitlist and payment marks.
   cancelSession(sh) {
     const s = cur(), pay = s.payments || {};
@@ -4098,6 +4111,16 @@ const ACT = {
     go('console', s.id); toast(`Demo scenario: ${LIVE_SCENARIOS[d.k].label}`);
   },
   openRequests: () => openSheet({ type: 'requests' }),
+  openDeleteSession: () => { if (cur()?.status === 'prepared') openSheet({ type: 'deleteSession' }); },
+  deleteOpenRoster: () => { S.ui.sheet = null; S.ui.prepTab = 'roster'; render(); const b = document.getElementById('ptb-roster'); if (b) b.focus(); },
+  confirmDeleteSession: () => {
+    const s = cur();
+    if (!s || s.status !== 'prepared' || !S.online) { closeSheet(); return; }
+    // Re-check at save: someone confirmed meanwhile turns the sheet into its blocked form.
+    if (s.roster.length) { render(); return; }
+    S.sessions = S.sessions.filter((x) => x.id !== s.id);
+    S.ui.sheet = null; S.currentId = null; commit(`Session deleted · ${s.title}`); go('home');
+  },
   openCancelSession: () => { if (cur()?.status === 'prepared') openSheet({ type: 'cancelSession', reason: '' }); },
   confirmCancelSession: () => {
     const s = cur(), reason = ((S.ui.sheet || {}).reason || '').trim();

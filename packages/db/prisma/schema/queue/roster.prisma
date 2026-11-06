@@ -105,6 +105,8 @@ enum JoinRequestStatus {
   pending
   confirmed
   declined
+  /// Pending requests closed by Cancel session (not a decline).
+  closed
 
   @@map("join_request_status")
 }

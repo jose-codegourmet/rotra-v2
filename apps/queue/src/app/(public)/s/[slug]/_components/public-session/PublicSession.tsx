@@ -54,6 +54,8 @@ const HERO_STATE = {
   completed: 'finished',
   // An invalid session's hero carries no status chip.
   invalid: 'upcoming',
+  // No chip yet: the Cancelled chip and notice come with the cancelled public page (epic #408).
+  cancelled: 'upcoming',
 } as const
 
 /** The join card variant: this visitor's own request first, then requests off, open or full. */

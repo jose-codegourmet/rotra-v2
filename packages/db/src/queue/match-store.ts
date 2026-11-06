@@ -31,7 +31,8 @@ export type MatchRow = Prisma.MatchGetPayload<{ include: typeof MATCH_INCLUDE }>
 
 /**
  * The shared rule shape (`@rotra/data/match`) from stored rows: current team members are open
- * segments; a substitution is a closed segment and the segment opened by the same operation.
+ * segments; a substitution is a closed segment and the segment opened by the same operation, whose
+ * `credit_to` says who gets the game. An on_court match holds its court(s) like an active one.
  */
 export function matchView(row: MatchRow): MatchView {
   const open = row.participations.filter((p) => !p.leftAt)
@@ -47,14 +48,13 @@ export function matchView(row: MatchRow): MatchView {
             inId: incoming.sessionPlayerId,
             team: out.team,
             at: out.leftAt?.getTime() ?? 0,
+            creditTo: incoming.creditTo,
           },
         ]
       : []
   })
-  const members =
-    row.state === 'waiting' || row.state === 'active'
-      ? open
-      : row.participations.filter((p) => p.finishedWithMatch)
+  const live = row.state === 'waiting' || row.state === 'on_court' || row.state === 'active'
+  const members = live ? open : row.participations.filter((p) => p.finishedWithMatch)
   return {
     id: row.id,
     sessionId: row.sessionId,
@@ -67,9 +67,10 @@ export function matchView(row: MatchRow): MatchView {
     teamA: members.filter((p) => p.team === 'A').map((p) => p.sessionPlayerId),
     teamB: members.filter((p) => p.team === 'B').map((p) => p.sessionPlayerId),
     courtIds:
-      row.state === 'active'
+      row.state === 'on_court' || row.state === 'active'
         ? row.courtHolds.map((h) => h.courtId)
         : row.courtUsage.map((u) => u.courtId),
+    placedAt: row.placedAt?.getTime() ?? null,
     startedAt: row.startedAt?.getTime() ?? null,
     endedAt: row.endedAt?.getTime() ?? null,
     substitutions,
@@ -90,6 +91,7 @@ export function matchDto(row: MatchRow) {
   const view = matchView(row)
   return {
     ...view,
+    placedAt: toIsoOrNull(row.placedAt),
     startedAt: toIsoOrNull(row.startedAt),
     endedAt: toIsoOrNull(row.endedAt),
     substitutions: view.substitutions.map((s) => ({ ...s, at: new Date(s.at).toISOString() })),
@@ -149,6 +151,8 @@ export async function matchContext(tx: Tx, session: QueueSession) {
         id: c.id,
         sessionId: c.sessionId,
         label: c.label,
+        startsAt: c.startsAt?.getTime(),
+        openedEarlyAt: c.openedEarlyAt?.getTime() ?? null,
         openUntil: c.openUntil?.getTime() ?? null,
         removedAt: null,
       }),

@@ -5,8 +5,11 @@
 // usage and the decision itself reject UPDATE/DELETE (triggers in SQL). No application role,
 // including Admin, has a correction path.
 
+/// waiting → on_court (placed on a court, not started; holds taken) → active (Playing, after Start
+/// match) → completed | invalid.
 enum MatchState {
   waiting
+  on_court
   active
   completed
   invalid
@@ -58,6 +61,9 @@ model Match {
   generationId      String?     @map("generation_id") @db.Uuid
   /// Idempotency key of the create command or sync operation.
   sourceOperationId String      @unique @map("source_operation_id") @db.Uuid
+  /// Set when the match goes on_court (by hand or by Auto Queue); cleared when sent back to the queue.
+  placedAt          DateTime?   @map("placed_at") @db.Timestamptz(6)
+  /// Set only at Start match, never at placement.
   startedAt         DateTime?   @map("started_at") @db.Timestamptz(6)
   endedAt           DateTime?   @map("ended_at") @db.Timestamptz(6)
   createdAt         DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
@@ -77,27 +83,40 @@ model Match {
   @@map("matches")
 }
 
+/// Who gets the game after an in-game substitution (session counting only; long-term performance
+/// and rank ignore it).
+enum SubstitutionCredit {
+  none
+  incoming
+  outgoing
+
+  @@map("substitution_credit")
+}
+
 /// One continuous stretch of a roster entry on a team. A player who leaves and returns has two
 /// segments; both sides of an in-game substitution keep their segments.
 model MatchParticipation {
-  id                String    @id @db.Uuid
-  clubId            String    @map("club_id") @db.Uuid
-  sessionId         String    @map("session_id") @db.Uuid
-  matchId           String    @map("match_id") @db.Uuid
-  sessionPlayerId   String    @map("session_player_id") @db.Uuid
+  id                String             @id @db.Uuid
+  clubId            String             @map("club_id") @db.Uuid
+  sessionId         String             @map("session_id") @db.Uuid
+  matchId           String             @map("match_id") @db.Uuid
+  sessionPlayerId   String             @map("session_player_id") @db.Uuid
   team              TeamSide
-  segmentNo         Int       @map("segment_no")
+  segmentNo         Int                @map("segment_no")
   /// Command or sync operation that put the player in (no FK: online commands have no operation row).
-  joinedOperationId String    @map("joined_operation_id") @db.Uuid
-  leftOperationId   String?   @map("left_operation_id") @db.Uuid
-  joinedAt          DateTime  @map("joined_at") @db.Timestamptz(6)
-  leftAt            DateTime? @map("left_at") @db.Timestamptz(6)
+  joinedOperationId String             @map("joined_operation_id") @db.Uuid
+  leftOperationId   String?            @map("left_operation_id") @db.Uuid
+  joinedAt          DateTime           @map("joined_at") @db.Timestamptz(6)
+  leftAt            DateTime?          @map("left_at") @db.Timestamptz(6)
   /// In the lineup when the match started (a pre-start swap is not a gap).
-  startedWithMatch  Boolean   @default(false) @map("started_with_match")
+  startedWithMatch  Boolean            @default(false) @map("started_with_match")
   /// Still in when the match ended. Full participation = started and finished, one segment.
-  finishedWithMatch Boolean   @default(false) @map("finished_with_match")
-  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt         DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  finishedWithMatch Boolean            @default(false) @map("finished_with_match")
+  /// Set on the INCOMING segment of an in-game substitution: incoming = this player gets the game,
+  /// outgoing = the player this segment replaced does. Frozen with the decision.
+  creditTo          SubstitutionCredit @default(none) @map("credit_to")
+  createdAt         DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime           @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   match Match         @relation(fields: [clubId, sessionId, matchId], references: [clubId, sessionId, id], onDelete: Restrict)
   entry SessionPlayer @relation(fields: [clubId, sessionId, sessionPlayerId], references: [clubId, sessionId, id], onDelete: Restrict)

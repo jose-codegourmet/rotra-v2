@@ -34,7 +34,9 @@ export type PublicSessionResults = {
  */
 export type PublicSessionPage = {
   slug: string
-  status: 'prepared' | 'active' | 'completed' | 'invalid'
+  status: 'prepared' | 'active' | 'completed' | 'invalid' | 'cancelled'
+  /** The cancel reason shown on a cancelled page; null or missing when none was given. */
+  cancelReason?: string | null
   title: string
   start: number
   end: number

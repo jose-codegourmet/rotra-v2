@@ -459,7 +459,8 @@ export function SessionSetup(props: SessionSetupProps) {
           }
         />
       ) : null}
-      {peek ? (
+      {/* Cancelled sessions never clash, so a clash never opens one. */}
+      {peek && peek.state !== 'cancelled' ? (
         <SessionPeekSheet
           open
           onOpenChange={(open) => {

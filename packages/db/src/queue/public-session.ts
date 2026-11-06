@@ -45,7 +45,9 @@ function initials(name: string) {
 }
 
 /** Accepted states only. `finalizing` reads as active until Session done commits. */
-function publicStatus(session: QueueSession): 'prepared' | 'active' | 'completed' | 'invalid' {
+function publicStatus(
+  session: QueueSession,
+): 'prepared' | 'active' | 'completed' | 'invalid' | 'cancelled' {
   if (session.state === 'finalizing') return 'active'
   return session.state
 }
@@ -121,7 +123,7 @@ export async function readPublicSession(slug: string) {
 async function myRequestDto(request: {
   id: string
   name: string
-  status: 'pending' | 'confirmed' | 'declined'
+  status: 'pending' | 'confirmed' | 'declined' | 'closed'
   sessionId: string
   clubPlayerId: string | null
 }) {

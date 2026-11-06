@@ -1,6 +1,6 @@
 # Open decisions before implementation
 
-**Last verified:** 2026-11-06 for the On court step, court filling, substitution game credit, and times and days; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-06 for the On court step, court filling, substitution game credit, times and days, and the connection rules for Cancel session and the court switch; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Deliberately unresolved. These are not additional approved requirements and are not a new questionnaire. Updated October 26, 2026: items the [ROTRA Queue prototype](../../../apps/mockup/queue-app/rotra-queue.html) settled are listed under [Settled by the prototype](#settled-by-the-prototype). Updated October 27, 2026: items the platform owner settled with the [ROTRA Admin prototype](../../../apps/mockup/admin-app/rotra-admin.html) are listed under [Settled by the Admin prototype](#settled-by-the-admin-prototype).
 
@@ -51,10 +51,11 @@ Recorded in the [mockup change log](../../mockup-changes/2026-11-06-queue-on-cou
 | D5 · Substitution game credit | For a Playing match only, **Who gets this game?**: Nobody (default) · the incoming player · the outgoing player; never both, at most one person per slot. The credited player gets game count, minimum credit and win/loss in the live leaderboard, standings and session awards; **never long-term performance or rank**. Locks at Match done or invalid; an invalid match gives nobody anything |
 | D6 · Court card look | Free: plain card, chip **Free** (or "Not open yet"). On court: normal border, chip **Getting ready**, **Start match** primary. Playing: steady accent border glow (no pulse), chip **Playing**, minutes. Never color alone; tokens only |
 | D7 · Session done | Still blocked while any match is Playing. On court matches that never started are dropped like waiting matches, with "N matches on court weren't started and will be dropped." |
+| D8 · Court switch offline | The **Manual Queue \| Auto Queue** switch needs internet. While the device is offline, auto filling pauses: no automatic placements, so two offline devices can't collide through Auto Queue. Manual **Put on court** keeps today's offline behaviour (Jose, November 6, 2026) |
 
 Still open after this decision:
 
-- Offline: two devices placing the same match or using the same court while disconnected. Collision-free assignment across offline devices stays part of [offline completeness](#implementation-blockers).
+- Offline: two devices placing the same match by hand or using the same court while disconnected. Collision-free assignment across offline devices stays part of [offline completeness](#implementation-blockers).
 - Whether Generate matches' **Available Players** strategy treats players in an On court match as "in play" (D3 makes them busy; the generator rule was written before On court existed).
 - Whether a credited substitute's game feeds **Off Day** (D5 names standings and session awards).
 
@@ -87,6 +88,7 @@ owner asked for example sessions on the Queue dashboard; the cancelled example n
 | C5 · Public page and requests | Public page: **Cancelled** + the reason, no join card. Pending join requests close |
 | C6 · Counts | Counts nowhere: no games, standings, slides, minimum, player records or rank. Ignored for venue and time clashes |
 | C7 · Short on players (live) | Banner + honest courts: "7 players present: enough for 1 doubles court. 3 sit out each game." and "Not enough free players." on a free court that can't get a match |
+| C8 · Connection | **Cancel session needs internet**, like Delete session. It is never saved offline to sync later (Jose, November 6, 2026). Pending join requests move to their own **closed** status, distinct from declined |
 
 ## Settled by the product owner on November 1, 2026
 

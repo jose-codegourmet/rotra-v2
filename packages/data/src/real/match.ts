@@ -19,10 +19,14 @@ const sessionPath = (sessionId: string) => `/api/sessions/${encodeURIComponent(s
 
 // ---------- Matches (Q-QUEUE, Q-MATCH) ----------
 
-export type WireMatch = Omit<Match, 'startedAt' | 'endedAt' | 'substitutions' | 'decision'> & {
+export type WireMatch = Omit<
+  Match,
+  'placedAt' | 'startedAt' | 'endedAt' | 'substitutions' | 'decision'
+> & {
+  placedAt?: string | null
   startedAt: string | null
   endedAt: string | null
-  substitutions: { outId: string; inId: string; team: 'A' | 'B'; at: string }[]
+  substitutions: (Omit<Match['substitutions'][number], 'at'> & { at: string })[]
   decision: (Omit<NonNullable<Match['decision']>, 'confirmedAt'> & { confirmedAt: string }) | null
   revision: string
 }
@@ -39,6 +43,7 @@ export const matchOf = (m: WireMatch): Match => ({
   teamA: m.teamA,
   teamB: m.teamB,
   courtIds: m.courtIds,
+  placedAt: msOrNull(m.placedAt ?? null),
   startedAt: msOrNull(m.startedAt),
   endedAt: msOrNull(m.endedAt),
   substitutions: m.substitutions.map((s) => ({ ...s, at: msOf(s.at) })),

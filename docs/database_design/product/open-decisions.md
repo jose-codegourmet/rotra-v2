@@ -1,6 +1,6 @@
 # Design decisions before migrations
 
-**Last verified:** 2026-11-06 for the On court, substitution-credit and times-and-days proposals; 2026-11-01 for the F07.34 wiring gaps (#317).
+**Last verified:** 2026-11-06 for the On court, substitution-credit, court-fill, cancelled-session and times-and-days decisions (column names settled; drafted in `20261106000100`); 2026-11-01 for the F07.34 wiring gaps (#317).
 
 **Status:** Review register, not a questionnaire or approval request for writing these docs.
 
@@ -48,26 +48,29 @@ and [schema dependencies](schema-dependencies.md) identify their consumers.
 
 ## Owner decisions recorded November 6, 2026
 
-Source: [mockup change log](../../mockup-changes/2026-11-06-queue-on-court-and-sub-credit.md) and the [business decision summary](../../business_logic/product/open-decisions.md#settled-by-the-product-owner-on-november-6-2026). These are **proposals** for the database epic; nothing is migrated.
+Source: [mockup change log](../../mockup-changes/2026-11-06-queue-on-court-and-sub-credit.md) and the [business decision summary](../../business_logic/product/open-decisions.md#settled-by-the-product-owner-on-november-6-2026). **Column names settled by Jose on November 6, 2026** ("use the names the database docs propose"); drafted, unapplied, in migration `20261106000100_on_court_credit_cancel_court_fill` ([physical schema](physical-schema.md)). The commands that use them are later tickets.
 
-- `matches.state` gains `on_court` (placed, not started) between `waiting` and `active`, with `placed_at` and the court assignment before start. `started_at` is set only at Start match. Holds are proposed to start at placement, so On court players are busy.
-- Substitutions gain `credit_to`: `none` (default) · `incoming` · `outgoing`; frozen when the match is decided. Where the field lives is open.
-- `queue_sessions` gains `court_fill_mode`: `manual` (default) · `auto`.
+- `matches.state` gains `on_court` (placed, not started) between `waiting` and `active`, with `placed_at` (nullable `timestamptz`) and the court assignment before start. `started_at` is set only at Start match. Holds start at placement, so On court players are busy.
+- Substitutions gain `credit_to`: `none` (default) · `incoming` · `outgoing` (enum `substitution_credit`); frozen when the match is decided. **Settled:** it is a column on the **incoming** player's `match_participations` row (the segment the substitution opened); `outgoing` names the player whose segment that substitution closed.
+- `queue_sessions` gains `court_fill_mode`: `manual` (default) · `auto` (enum `court_fill_mode`).
+- **Settled (offline):** the Manual Queue | Auto Queue switch needs internet. While the device is offline, auto filling pauses (no automatic placements), so two offline devices can't collide through Auto Queue. Manual **Put on court** keeps today's offline behaviour; two offline devices placing the same match or court by hand stays open (above).
 - Session standings, awards, game counts and minimum progress include a credited substitute as a full participant; long-term performance and rank exclude both partial players regardless of `credit_to`.
 - At Session done, `on_court` matches that never started are dropped like waiting matches. Whether either kind is kept frozen or marked removed stays open (above).
 - New commands are proposed (place on court, send back to queue, move to another court, set court fill mode); see [command contracts](command-contracts.md).
 
-Times and days ([change log](../../mockup-changes/2026-11-06-queue-time-and-day.md)), also proposals:
+Times and days ([change log](../../mockup-changes/2026-11-06-queue-time-and-day.md)), proposals except the court columns:
 
 - Club time zone for **display and entry** is settled: Asia/Manila for v1. Storage stays `timestamptz` instants ([conventions](conventions.md)). The canonical timezone for ID dates and rank-window cutoffs stays open (above).
 - `scheduled_end_at` becomes editable after start (any instant after now, up to 24 h after `started_at`); `started_at` stays fixed. A late or other-day `startSession` carries a new end. Court planned starts and `open_until` are full instants; see [sessions and roster](queue/modules/sessions-roster.md).
+- **Settled November 6, 2026:** `session_courts` gains `starts_at` (planned start; null = the session start) and `opened_early_at` (Start anyway), both nullable `timestamptz`; drafted in `20261106000100`.
 
-Cancelled sessions ([change log](../../mockup-changes/2026-11-06-queue-example-sessions-and-cancel.md)), also proposals:
+Cancelled sessions ([change log](../../mockup-changes/2026-11-06-queue-example-sessions-and-cancel.md)), settled by Jose on November 6, 2026 and drafted in `20261106000100`:
 
-- `queue_sessions.state` gains `cancelled`, only from `prepared`, final; `cancelled_at` and nullable `cancel_reason`. Cancelled sessions leave the overlap exclusion. See [sessions and roster](queue/modules/sessions-roster.md).
+- `queue_sessions.state` gains `cancelled`, only from `prepared`, final; `cancelled_at` (nullable `timestamptz`, set ⇔ cancelled) and nullable `cancel_reason` (text, ≤ 120 characters). Cancelled sessions leave the overlap exclusion and are never finalized. See [sessions and roster](queue/modules/sessions-roster.md).
 - A proposed `cancelSession` command, idempotent on its command ID; see [command contracts](command-contracts.md).
 - Roster, waitlist and payment marks are retained; payment marks become read-only; no refund records.
-- Pending join requests close (`closed` status proposed). Open: whether cancelling may run offline on a downloaded copy.
+- Pending join requests close: `join_request_status` gains `closed` (settled), distinct from `declined`, with the cancel time as `decided_at`.
+- **Settled (offline):** Cancel session needs internet, like Delete session. It is never queued offline and has no sync replay.
 
 ## Owner decisions recorded October 28, 2026
 

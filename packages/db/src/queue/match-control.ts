@@ -1,5 +1,10 @@
 import 'server-only'
-import { canStart, substitutionCandidates, validateResult } from '@rotra/data/match/match.rules'
+import {
+  canPlace,
+  canStart,
+  substitutionCandidates,
+  validateResult,
+} from '@rotra/data/match/match.rules'
 import type { ClubContext } from '../auth/account-context'
 import type { MatchDecision, QueueSession } from '../generated/prisma/client'
 import { ServiceError } from '../service/errors'
@@ -8,8 +13,9 @@ import { derivedId, type Tx } from './session-store'
 
 /**
  * Match control (Q-MATCH). Each command is keyed on its operation ID. Holds are one row per court
- * and per roster player (and per known global player), so a race to start two matches with the
- * same player or court loses on the primary key inside the transaction and nothing is half-held.
+ * and per roster player (and per known global player), taken when the match is put on court, so a
+ * race to place two matches with the same player or court loses on the primary key inside the
+ * transaction and nothing is half-held.
  */
 
 function decisionDto(decision: MatchDecision) {
@@ -28,7 +34,127 @@ async function activeMatch(tx: Tx, sessionId: string, matchId: string) {
   return match
 }
 
-/** Q-MATCH · Start. Revalidates presence, lineup, session and courts, then takes every hold at once. */
+type Roster = Awaited<ReturnType<typeof matchContext>>['roster']
+
+/**
+ * Takes the court holds (with their court usage rows, keyed on the operation) and one hold per
+ * current lineup player. The match must already be on_court or active (the hold trigger checks).
+ * A court or player already held elsewhere loses on the primary key and nothing commits.
+ */
+async function takeHolds(
+  tx: Tx,
+  session: QueueSession,
+  match: MatchRow,
+  roster: Roster,
+  courtIds: string[],
+  operationId: string,
+  now: Date,
+) {
+  for (const courtId of courtIds) {
+    await tx.activeCourtHold.create({
+      data: {
+        courtId,
+        clubId: session.clubId,
+        sessionId: session.id,
+        matchId: match.id,
+        heldAt: now,
+      },
+    })
+    await tx.matchCourtUsage.create({
+      data: {
+        id: await derivedId(operationId, `court:${courtId}`),
+        clubId: session.clubId,
+        sessionId: session.id,
+        matchId: match.id,
+        courtId,
+        acquiredAt: now,
+        acquireOperationId: operationId,
+      },
+    })
+  }
+  await holdPlayers(tx, session, match, roster, now)
+}
+
+/**
+ * Makes the player holds match the current lineup: a hold for every open segment, none for anyone
+ * who left the lineup. At placement this takes them all; at Start match it reuses them.
+ */
+async function holdPlayers(
+  tx: Tx,
+  session: QueueSession,
+  match: MatchRow,
+  roster: Roster,
+  now: Date,
+) {
+  const lineup = new Set(
+    match.participations.filter((p) => !p.leftAt).map((p) => p.sessionPlayerId),
+  )
+  const held = await tx.activePlayerHold.findMany({
+    where: { matchId: match.id },
+    select: { sessionPlayerId: true },
+  })
+  const stale = held.map((h) => h.sessionPlayerId).filter((id) => !lineup.has(id))
+  if (stale.length)
+    await tx.activePlayerHold.deleteMany({
+      where: { matchId: match.id, sessionPlayerId: { in: stale } },
+    })
+  const have = new Set(held.map((h) => h.sessionPlayerId))
+  const byId = new Map(roster.map((r) => [r.id, r]))
+  for (const sessionPlayerId of lineup)
+    if (!have.has(sessionPlayerId))
+      await tx.activePlayerHold.create({
+        data: {
+          sessionPlayerId,
+          clubId: session.clubId,
+          sessionId: session.id,
+          matchId: match.id,
+          playerId: byId.get(sessionPlayerId)?.playerIdAtEntry ?? null,
+          heldAt: now,
+        },
+      })
+}
+
+const conflict = () =>
+  new ServiceError('conflict', { match: 'Something changed. Review the match again.' })
+
+/**
+ * Q-DISPATCH · Put on court. Revalidates presence, lineup, session and courts, then takes every
+ * court and player hold at once: the match is on_court with `placed_at`, and `started_at` stays
+ * null until Start match. Keyed on the operation ID through its court usage rows, so a retry (or a
+ * replayed offline upload) returns the placed match.
+ */
+export async function placeOnCourt(
+  context: ClubContext,
+  sessionId: string,
+  input: { operationId: string; matchId: string; courtIds: string[] },
+) {
+  return matchCommand(context, sessionId, {}, async (tx, session) => {
+    const match = await activeMatch(tx, session.id, input.matchId)
+    if (match.courtUsage.some((u) => u.acquireOperationId === input.operationId))
+      return matchDto(match)
+    const { ctx, roster } = await matchContext(tx, session)
+    const view = ctx.matches.find((m) => m.id === match.id)
+    if (!view || !canPlace(view, input.courtIds, ctx)) throw conflict()
+    const now = new Date()
+    await tx.match.update({
+      where: { id: match.id },
+      data: { state: 'on_court', placedAt: now, queuePosition: null, revision: { increment: 1 } },
+    })
+    await takeHolds(tx, session, match, roster, input.courtIds, input.operationId, now)
+    return matchDto((await loadMatch(tx, session.id, match.id)) as MatchRow)
+  })
+}
+
+/**
+ * Q-ON-COURT · Start match. From on_court: no court choice; rechecks presence, busy players and
+ * the held courts, reuses the holds taken at placement (bringing player holds in line with the
+ * lineup), and starts the timer. From waiting: the older one-step start, which places and starts
+ * at once on the chosen courts, kept for callers not yet moved to Put on court.
+ *
+ * Repeats: the one-step start is keyed on its court usage rows. A start from on_court has no row of
+ * its own, so an already started match with the same (or no) courts returns as it is; a start
+ * naming other courts is a conflict.
+ */
 export async function startMatch(
   context: ClubContext,
   sessionId: string,
@@ -36,55 +162,39 @@ export async function startMatch(
 ) {
   return matchCommand(context, sessionId, {}, async (tx, session) => {
     const match = await activeMatch(tx, session.id, input.matchId)
-    const repeated = match.courtUsage.find((u) => u.acquireOperationId === input.operationId)
-    if (repeated) return matchDto(match)
+    if (match.courtUsage.some((u) => u.acquireOperationId === input.operationId))
+      return matchDto(match)
+    if (match.state === 'active' && match.placedAt && !match.decision) {
+      const held = new Set(match.courtHolds.map((h) => h.courtId))
+      if (
+        !input.courtIds.length ||
+        (input.courtIds.length === held.size && input.courtIds.every((id) => held.has(id)))
+      )
+        return matchDto(match)
+    }
     const { ctx, roster } = await matchContext(tx, session)
     const view = ctx.matches.find((m) => m.id === match.id)
-    if (!view || !canStart(view, input.courtIds, ctx))
-      throw new ServiceError('conflict', { match: 'Something changed. Review the match again.' })
+    if (!view || !canStart(view, input.courtIds, ctx)) throw conflict()
     const now = new Date()
+    const placed = match.state === 'on_court'
     await tx.match.update({
       where: { id: match.id },
-      data: { state: 'active', startedAt: now, queuePosition: null, revision: { increment: 1 } },
+      data: placed
+        ? { state: 'active', startedAt: now, revision: { increment: 1 } }
+        : {
+            state: 'active',
+            placedAt: now,
+            startedAt: now,
+            queuePosition: null,
+            revision: { increment: 1 },
+          },
     })
     await tx.matchParticipation.updateMany({
       where: { matchId: match.id, leftAt: null },
       data: { startedWithMatch: true },
     })
-    for (const courtId of input.courtIds) {
-      await tx.activeCourtHold.create({
-        data: {
-          courtId,
-          clubId: session.clubId,
-          sessionId: session.id,
-          matchId: match.id,
-          heldAt: now,
-        },
-      })
-      await tx.matchCourtUsage.create({
-        data: {
-          id: await derivedId(input.operationId, `court:${courtId}`),
-          clubId: session.clubId,
-          sessionId: session.id,
-          matchId: match.id,
-          courtId,
-          acquiredAt: now,
-          acquireOperationId: input.operationId,
-        },
-      })
-    }
-    const byId = new Map(roster.map((r) => [r.id, r]))
-    for (const p of match.participations.filter((p) => !p.leftAt))
-      await tx.activePlayerHold.create({
-        data: {
-          sessionPlayerId: p.sessionPlayerId,
-          clubId: session.clubId,
-          sessionId: session.id,
-          matchId: match.id,
-          playerId: byId.get(p.sessionPlayerId)?.playerIdAtEntry ?? null,
-          heldAt: now,
-        },
-      })
+    if (placed) await holdPlayers(tx, session, match, roster, now)
+    else await takeHolds(tx, session, match, roster, input.courtIds, input.operationId, now)
     return matchDto((await loadMatch(tx, session.id, match.id)) as MatchRow)
   })
 }

@@ -22,8 +22,15 @@ export const FORMAT_LABELS: Record<MatchFormat, string> = {
 }
 export const allPlayers = (m: MatchLineup) => [...m.teamA, ...m.teamB]
 export const courtsNeeded = (m: Pick<Match, 'format'>) => (m.format === 'fun_5v5' ? 2 : 1)
-export const activeMatchFor = (id: string, matches: Match[]) =>
-  matches.find((m) => m.state === 'active' && allPlayers(m).includes(id))
+/** On court (placed, not started) and Playing matches hold their courts; their players are busy. */
+export const holdsCourt = (m: Pick<Match, 'state'>) =>
+  m.state === 'on_court' || m.state === 'active'
+/**
+ * The On court or Playing match a player is busy in ("Migs is on Court 1"), ignoring `exceptId`
+ * (an On court match rechecking its own players before Start match).
+ */
+export const activeMatchFor = (id: string, matches: Match[], exceptId?: string) =>
+  matches.find((m) => m.id !== exceptId && holdsCourt(m) && allPlayers(m).includes(id))
 /** Open from its planned start, or from when it was opened early. A court without a start is open. */
 export const courtOpen = (c: SessionCourt, now = Date.now()) =>
   (c.openedEarlyAt ?? c.startsAt ?? 0) <= now
@@ -35,7 +42,7 @@ export const freeCourts = (courts: SessionCourt[], matches: Match[], now = Date.
     (c) =>
       !c.removedAt &&
       courtOpen(c, now) &&
-      !matches.some((m) => m.state === 'active' && m.courtIds.includes(c.id)),
+      !matches.some((m) => holdsCourt(m) && m.courtIds.includes(c.id)),
   )
 export const queuedCount = (id: string, matches: Match[]) =>
   matches.filter((m) => m.state === 'waiting' && allPlayers(m).includes(id)).length
@@ -75,13 +82,16 @@ export function matchStatus(m: MatchLineup, ctx: MatchContext): MatchStatus {
       kind: 'needs-attention',
       reason: `${names(absent)} ${absent.length === 1 ? 'is' : 'are'} not present`,
     }
-  const playing = allPlayers(m).filter((id) => activeMatchFor(id, ctx.matches))
-  const game = playing[0] ? activeMatchFor(playing[0], ctx.matches) : undefined
+  // An On court match already holds its court(s): only its players' presence and busy state count.
+  const placed = 'state' in m && (m as Match).state === 'on_court' ? (m as Match) : undefined
+  const busy = allPlayers(m).filter((id) => activeMatchFor(id, ctx.matches, placed?.id))
+  const game = busy[0] ? activeMatchFor(busy[0], ctx.matches, placed?.id) : undefined
   if (game)
     return {
       kind: 'blocked',
-      reason: `${names(playing)} ${playing.length === 1 ? 'is' : 'are'} playing on ${courtNames(game, ctx.courts)}`,
+      reason: `${names(busy)} ${busy.length === 1 ? 'is' : 'are'} ${game.state === 'on_court' ? 'on' : 'playing on'} ${courtNames(game, ctx.courts)}`,
     }
+  if (placed) return { kind: 'ready', reason: 'Ready to start' }
   if (freeCourts(ctx.courts, ctx.matches, ctx.now).length < courtsNeeded(m))
     return {
       kind: 'waiting-for-courts',
@@ -167,13 +177,41 @@ export function computeStandings(roster: SessionPlayer[], matches: Match[]) {
       a.name.localeCompare(b.name),
   )
 }
-export function canStart(m: Match, courtIds: string[], ctx: MatchContext) {
+/** Put on court: a ready waiting match on the right number of distinct, free, open courts. */
+export function canPlace(m: Match, courtIds: string[], ctx: MatchContext) {
   return (
     m.state === 'waiting' &&
     matchStatus(m, ctx).kind === 'ready' &&
     courtIds.length === courtsNeeded(m) &&
     new Set(courtIds).size === courtIds.length &&
     courtIds.every((id) => freeCourts(ctx.courts, ctx.matches, ctx.now).some((c) => c.id === id))
+  )
+}
+/**
+ * Start match. From On court: no court choice (an empty `courtIds`, or exactly the held courts);
+ * rechecks lineup, presence and busy players, and that each held court is still open and held by
+ * no other match. From waiting: the older one-step start (place and start at once), kept for
+ * callers not yet moved to Put on court; same checks as `canPlace`.
+ */
+export function canStart(m: Match, courtIds: string[], ctx: MatchContext) {
+  if (m.state === 'waiting') return canPlace(m, courtIds, ctx)
+  if (m.state !== 'on_court') return false
+  const held = new Set(m.courtIds)
+  if (courtIds.length && (courtIds.length !== held.size || !courtIds.every((id) => held.has(id))))
+    return false
+  return (
+    matchStatus(m, ctx).kind === 'ready' &&
+    held.size === m.courtIds.length &&
+    m.courtIds.length === courtsNeeded(m) &&
+    m.courtIds.every((id) => {
+      const court = ctx.courts.find((c) => c.id === id)
+      return (
+        !!court &&
+        !court.removedAt &&
+        courtOpen(court, ctx.now) &&
+        !ctx.matches.some((o) => o.id !== m.id && holdsCourt(o) && o.courtIds.includes(id))
+      )
+    })
   )
 }
 export type ResultInput = {
@@ -226,4 +264,9 @@ export const FORMAT_LABEL = FORMAT_LABELS
 export const isFunFormat = (format: MatchFormat) => format.startsWith('fun_')
 export const waitingMatches = (matches: Match[]) =>
   matches.filter((m) => m.state === 'waiting').sort((a, b) => a.queuePosition - b.queuePosition)
+/** Playing matches only (what blocks Session done). On court matches are listed separately. */
 export const activeMatches = (matches: Match[]) => matches.filter((m) => m.state === 'active')
+/** Placed, not started (court card: Getting ready). */
+export const onCourtMatches = (matches: Match[]) => matches.filter((m) => m.state === 'on_court')
+/** Every match holding a court: On court and Playing. */
+export const courtMatches = (matches: Match[]) => matches.filter(holdsCourt)

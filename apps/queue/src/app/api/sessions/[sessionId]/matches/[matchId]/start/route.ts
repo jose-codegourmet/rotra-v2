@@ -4,7 +4,10 @@ import { readJsonBody, text } from '@rotra/db/service/request'
 import { routeCookieAdapter } from '@rotra/db/service/route-cookies'
 import { cookies } from 'next/headers'
 
-/** Q-MATCH › Start: revalidates, then takes every court and player hold at once. */
+/**
+ * Q-ON-COURT › Start match: an On court match keeps the holds it took at placement (send no
+ * courts); a waiting match is placed and started at once on the courts sent (older one-step start).
+ */
 export async function POST(
   request: Request,
   ctx: RouteContext<'/api/sessions/[sessionId]/matches/[matchId]/start'>,

@@ -4,11 +4,13 @@ import { queueMutation } from '../mock/transaction'
 import {
   realCompleteMatch,
   realInvalidateMatch,
+  realPlaceOnCourt,
   realStartMatch,
   realSubstitutePlayer,
 } from '../real/match'
 import { isRealDataMode } from '../real/mode'
 import {
+  canPlace,
   canStart,
   courtNames,
   shortName,
@@ -48,14 +50,40 @@ function requireActive(m: Match) {
   if (m.state !== 'active' || m.decision)
     throw new MockError('conflict', 'This match already has a confirmed outcome or is not active.')
 }
-export function startMatch(input: { matchId: string; courtIds: string[]; operationId: string }) {
+/**
+ * Put on court (Q-DISPATCH): the match takes its court(s) and its players become busy, but nothing
+ * starts: `placedAt` is set, `startedAt` stays null. Allowed offline like any queue mutation.
+ */
+export function placeOnCourt(input: { matchId: string; courtIds: string[]; operationId: string }) {
+  if (isRealDataMode()) return realPlaceOnCourt(input)
+  return control(input, 'place', (s, m) => {
+    if (!canPlace(m, input.courtIds, matchContext(s, m.sessionId)))
+      throw new MockError('conflict', 'Something changed. Review the match again.')
+    m.state = 'on_court'
+    m.courtIds = [...input.courtIds]
+    m.placedAt = Date.now()
+    m.startedAt = null
+    return `Match ${m.matchNo} on ${courtNames(m, s.courts)} · getting ready`
+  })
+}
+/**
+ * Start match. From On court (Q-ON-COURT, court card): one tap on the held court(s), so
+ * `courtIds` may be empty; rechecks presence and busy players and starts the timer. From waiting:
+ * the older one-step start (places and starts at once), kept for callers not yet moved to
+ * Put on court.
+ */
+export function startMatch(input: { matchId: string; courtIds?: string[]; operationId: string }) {
   if (isRealDataMode()) return realStartMatch(input)
   return control(input, 'start', (s, m) => {
-    if (!canStart(m, input.courtIds, matchContext(s, m.sessionId)))
+    if (!canStart(m, input.courtIds ?? [], matchContext(s, m.sessionId)))
       throw new MockError('conflict', 'Something changed. Review the match again.')
+    const now = Date.now()
+    if (m.state === 'waiting') {
+      m.courtIds = [...(input.courtIds ?? [])]
+      m.placedAt = now
+    }
     m.state = 'active'
-    m.courtIds = [...input.courtIds]
-    m.startedAt = Date.now()
+    m.startedAt = now
     return `Match ${m.matchNo} started on ${courtNames(m, s.courts)}`
   })
 }

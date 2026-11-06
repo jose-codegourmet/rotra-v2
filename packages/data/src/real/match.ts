@@ -279,7 +279,8 @@ async function controlContext(matchId: string) {
   return { sessionId, courts }
 }
 
-export async function realStartMatch(input: {
+/** Put on court: takes the court(s) and the player holds; the timer does not start. */
+export async function realPlaceOnCourt(input: {
   matchId: string
   courtIds: string[]
   operationId: string
@@ -289,9 +290,30 @@ export async function realStartMatch(input: {
   const match = matchOf(
     await queueCommand<WireMatch>(
       sessionId,
+      `/matches/${encodeURIComponent(input.matchId)}/place`,
+      { body: { operationId: input.operationId, courtIds: input.courtIds } },
+    ),
+  )
+  return accepted(null, `Match ${match.matchNo} on ${courtNames(match, courts)} · getting ready`)
+}
+
+/**
+ * Start match. An On court match sends no courts (it keeps the ones it holds); a waiting match
+ * still sends its chosen courts for the older one-step start.
+ */
+export async function realStartMatch(input: {
+  matchId: string
+  courtIds?: string[]
+  operationId: string
+}) {
+  requireOperationId(input.operationId)
+  const { sessionId, courts } = await controlContext(input.matchId)
+  const match = matchOf(
+    await queueCommand<WireMatch>(
+      sessionId,
       `/matches/${encodeURIComponent(input.matchId)}/start`,
       {
-        body: { operationId: input.operationId, courtIds: input.courtIds },
+        body: { operationId: input.operationId, courtIds: input.courtIds ?? [] },
       },
     ),
   )

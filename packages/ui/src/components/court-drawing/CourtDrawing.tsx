@@ -1,6 +1,7 @@
 import type { PlayingLevel } from '@rotra/data/player/types'
 import { cn } from '@rotra/ui/cn'
 import { PlayerFaceButton } from '@rotra/ui/player-face-button'
+import { courtFaceClass, courtFaceFrameClass, courtGameBadgeClass } from './CourtDrawing.sizes'
 
 /** One player drawn on a court side */
 export type CourtPlayer = {
@@ -10,6 +11,8 @@ export type CourtPlayer = {
   shortName: string
   level: PlayingLevel | null
   photoUrl?: string
+  /** Completed games this session (the same count as “G/MIN games”) */
+  games?: number
 }
 
 export type CourtDrawingProps = {
@@ -20,6 +23,8 @@ export type CourtDrawingProps = {
   freeLabel?: string
   teamA?: CourtPlayer[]
   teamB?: CourtPlayer[]
+  /** Session minimum games; used in each picture's accessible name with `games` */
+  minimumGames?: number
   /** Opens a player's profile */
   onOpenProfile?: (playerId: string) => void
   className?: string
@@ -39,6 +44,13 @@ function listNames(names: string[]) {
 const rowsFor = (n: number) => (n <= 2 ? n : n <= 4 ? 2 : 3)
 const sizeFor = (n: number): 34 | 28 | 24 => (n <= 1 ? 34 : n <= 3 ? 28 : 24)
 
+function profileLabel(player: CourtPlayer, team: 'A' | 'B', minimumGames: number | undefined) {
+  if (player.games === undefined || minimumGames === undefined) {
+    return `${player.name}, Team ${team}. View profile`
+  }
+  return `${player.name}, Team ${team}, ${player.games} of ${minimumGames} games. View profile`
+}
+
 /**
  * A badminton court drawn to real proportions (13.4 m × 6.1 m, viewBox 134 × 61) with the net
  * dashed down the middle and each team's pictures on its side. The prototypes' .pitch + courtSVG().
@@ -49,6 +61,7 @@ export function CourtDrawing({
   freeLabel = 'Free',
   teamA = [],
   teamB = [],
+  minimumGames,
   onOpenProfile,
   className,
 }: CourtDrawingProps) {
@@ -63,20 +76,33 @@ export function CourtDrawing({
       <fieldset
         aria-label={`Team ${team}`}
         style={{ gridTemplateRows: `repeat(${rowsFor(players.length)}, auto)` }}
-        className="m-0 grid min-w-0 grid-flow-col content-center justify-center gap-x-2.5 gap-y-0.5 border-0 p-1.5"
+        className="m-0 grid min-w-0 grid-flow-col content-center justify-center gap-x-2.5 gap-y-0.5 border-0 px-1.5 py-1"
       >
         {players.map((p) => (
-          <PlayerFaceButton
-            key={p.id}
-            name={p.name}
-            shortName={p.shortName}
-            level={p.level}
-            photoUrl={p.photoUrl}
-            size={sizeFor(n)}
-            compact={n >= 4}
-            label={`${p.name}, Team ${team}. View profile`}
-            onClick={() => onOpenProfile?.(p.id)}
-          />
+          <div key={p.id} className="group/slot relative flex min-w-0 flex-col items-center">
+            <PlayerFaceButton
+              name={p.name}
+              shortName={p.shortName}
+              level={p.level}
+              photoUrl={p.photoUrl}
+              size={sizeFor(n)}
+              compact={n >= 4}
+              label={profileLabel(p, team, minimumGames)}
+              onClick={() => onOpenProfile?.(p.id)}
+              className={courtFaceClass(n)}
+            />
+            {p.games !== undefined ? (
+              <span
+                aria-hidden
+                className={cn(
+                  'pointer-events-none absolute top-0 left-1/2 -translate-x-1/2',
+                  courtFaceFrameClass(n),
+                )}
+              >
+                <span className={courtGameBadgeClass(n)}>{p.games}</span>
+              </span>
+            ) : null}
+          </div>
         ))}
       </fieldset>
     )
@@ -85,7 +111,7 @@ export function CourtDrawing({
   return (
     <div
       className={cn(
-        'relative overflow-hidden rounded-md',
+        '@container relative overflow-hidden rounded-md',
         courts === 2 ? 'aspect-[134/122]' : 'aspect-[134/61]',
         free
           ? '[--court-c:var(--color-court-free)] [--court-l:var(--color-court-free-line)]'

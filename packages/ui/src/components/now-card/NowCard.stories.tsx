@@ -51,8 +51,17 @@ export default meta
 type Story = StoryObj<typeof NowCard>
 
 export const Live: Story = { args: live }
-export const LivePastEndTime: Story = {
-  args: { ...live, now: tonight.scheduledEndAt + 10 * MINUTE },
+/** Time left: "… · 1 h 20 min left". */
+export const LiveTimeLeft: Story = {
+  args: { ...live, now: tonight.scheduledEndAt - (HOUR + 20 * MINUTE) },
+}
+/** After the planned end: "… · Planned end passed 15 min ago" in the warning color. */
+export const LiveOverdue: Story = {
+  args: { ...live, now: tonight.scheduledEndAt + 15 * MINUTE },
+}
+/** Long past the planned end: "Planned end passed 1 h 5 min ago". */
+export const LiveLongOverdue: Story = {
+  args: { ...live, now: tonight.scheduledEndAt + HOUR + 5 * MINUTE },
 }
 export const LiveWithUpNext: Story = {
   args: { ...live, upNext: { title: 'Thursday Open Play', startsAt: start + 4 * 24 * HOUR } },

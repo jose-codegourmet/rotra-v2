@@ -54,6 +54,8 @@ export function createQueueFixtures(now = Date.now()) {
     })),
     ...history.courts,
   ]
+  // Kenji, Kenjie and Atty Steph are not on any completed history roster (h1/h2), so the
+  // roster fetch flags them First time here; slice(0, 14) are Returning.
   const registeredTonight = clubPlayers.filter(
     (p) => p.fullName === 'Kenji' || p.fullName === 'Kenjie' || p.nickname === 'Atty Steph',
   )

@@ -377,6 +377,8 @@ type WireRosterEntry = {
   level: PlayingLevel | null
   levelLockedAt: string | null
   confirmedAt: string
+  /** Present on the roster GET; mutations still use the stored entry DTO. */
+  hasPlayedAtClubBefore?: boolean
 }
 type WireWaitlistEntry = {
   id: string

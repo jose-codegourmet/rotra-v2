@@ -46,6 +46,7 @@
     "./courts-and-time-sheet": "./src/components/courts-and-time-sheet/CourtsAndTimeSheet.tsx",
     "./data-table": "./src/components/data-table/DataTable.tsx",
     "./date-picker": "./src/components/date-picker/DatePicker.tsx",
+    "./date-time-picker": "./src/components/date-time-picker/DateTimePicker.tsx",
     "./date-picker/date-calendar": "./src/components/date-picker/date-calendar/DateCalendar.tsx",
     "./date-picker/date-calendar/helpers": "./src/components/date-picker/date-calendar/DateCalendar.helpers.ts",
     "./dev-menu": "./src/components/dev-menu/DevMenu.tsx",

@@ -1,5 +1,5 @@
 import type { PlayingLevel } from '../player/player.types'
-import type { QueueSessionInput } from '../queue-session/queueSession.types'
+import type { QueueSessionInput, SessionCourt } from '../queue-session/queueSession.types'
 import { levelLabel } from '../session-roster/sessionRoster.rules'
 import { realRequest } from './client'
 import { accepted, realGetQueueSession } from './queue'
@@ -51,6 +51,7 @@ export async function realUpdateQueueSession(input: {
         scheduledEndAt: iso(values.scheduledEndAt),
         courts: values.courts.map((court) => ({
           label: court.label,
+          startsAt: court.startsAt == null ? null : iso(court.startsAt),
           openUntil: court.openUntil == null ? null : iso(court.openUntil),
         })),
       },
@@ -88,39 +89,111 @@ export async function realSetAcceptJoinRequests(input: { sessionId: string; acce
 
 // ---------- Courts and time ----------
 
+type WireCourt = {
+  id: string
+  sessionId: string
+  label: string
+  /** Null for older courts: the session start applies. */
+  startsAt: string | null
+  openedEarlyAt: string | null
+  openUntil: string | null
+  removedAt: string | null
+}
+
+const courtPath = (sessionId: string, courtId: string) =>
+  `${sessionPath(sessionId)}/courts/${encodeURIComponent(courtId)}`
+
+const courtOf = (court: WireCourt): SessionCourt => ({
+  id: court.id,
+  sessionId: court.sessionId,
+  label: court.label,
+  startsAt: court.startsAt ? Date.parse(court.startsAt) : undefined,
+  openedEarlyAt: court.openedEarlyAt ? Date.parse(court.openedEarlyAt) : null,
+  openUntil: court.openUntil ? Date.parse(court.openUntil) : null,
+  removedAt: court.removedAt ? Date.parse(court.removedAt) : null,
+})
+
+/** The planned start as the service saves it: the session start applies when none is set. */
+const planned = (court: WireCourt) => (court.startsAt ? hhmm(court.startsAt) : 'at session start')
+
 export async function realAddCourt(input: {
   sessionId: string
   label: string
   startsAt?: number
   openUntil: number | null
 }) {
-  const { court } = await realRequest<{
-    court: { id: string; sessionId: string; label: string; openUntil: string | null }
-  }>(`${sessionPath(input.sessionId)}/courts`, {
+  const path = `${sessionPath(input.sessionId)}/courts`
+  const { court } = await realRequest<{ court: WireCourt }>(path, {
     method: 'POST',
     body: {
       courtId: crypto.randomUUID(),
       label: input.label,
+      startsAt: input.startsAt == null ? null : iso(input.startsAt),
       openUntil: input.openUntil == null ? null : iso(input.openUntil),
     },
-    fields: { court: 'label' },
+    fields: { court: 'label', startsAt: 'startTime', openUntil: 'time' },
   })
-  const data = {
-    id: court.id,
-    sessionId: court.sessionId,
-    label: court.label,
-    // Saved courts have no own start yet; the session start applies.
-    startsAt: input.startsAt,
-    openUntil: court.openUntil ? Date.parse(court.openUntil) : null,
-    removedAt: null,
-  }
-  return accepted(data, `${court.label} added`)
+  return accepted(courtOf(court), `${court.label} added`)
+}
+
+/** Add / Edit court on a saved court: label, planned start (fixed after use) and advisory end. */
+export async function realUpdateCourt(input: {
+  sessionId: string
+  courtId: string
+  label: string
+  startsAt: number
+  openUntil: number | null
+}) {
+  const { court } = await realRequest<{ court: WireCourt }>(
+    courtPath(input.sessionId, input.courtId),
+    {
+      method: 'PATCH',
+      body: {
+        label: input.label,
+        startsAt: iso(input.startsAt),
+        openUntil: input.openUntil == null ? null : iso(input.openUntil),
+      },
+      fields: { court: 'label', startsAt: 'startTime', openUntil: 'time' },
+    },
+  )
+  return accepted(courtOf(court), `${court.label} saved`)
+}
+
+/** Start anyway on one court; the booking, costs and minimum games stay as they are. */
+export async function realOpenCourtEarly(input: { sessionId: string; courtId: string }) {
+  const { court } = await realRequest<{ court: WireCourt }>(
+    `${courtPath(input.sessionId, input.courtId)}/open-early`,
+    { method: 'POST', body: {} },
+  )
+  return accepted(courtOf(court), `${court.label} opened early · planned ${planned(court)}`)
+}
+
+/** Open all courts now: every court not open yet opens early. */
+export async function realOpenAllCourtsEarly(input: { sessionId: string }) {
+  const { courts } = await realRequest<{ courts: WireCourt[] }>(
+    `${sessionPath(input.sessionId)}/courts/open-early`,
+    { method: 'POST', body: {} },
+  )
+  const [first] = courts
+  return accepted(
+    courts.map(courtOf),
+    courts.length === 1 && first
+      ? `${first.label} opened early · planned ${planned(first)}`
+      : `${courts.length} courts opened early`,
+  )
+}
+
+/** Undo early open: back to Not open yet, only while no match holds the court. */
+export async function realUndoCourtEarlyOpen(input: { sessionId: string; courtId: string }) {
+  const { court } = await realRequest<{ court: WireCourt }>(
+    `${courtPath(input.sessionId, input.courtId)}/open-early`,
+    { method: 'DELETE' },
+  )
+  return accepted(courtOf(court), `${court.label} back to Not open yet · opens ${planned(court)}`)
 }
 
 export async function realRemoveCourt(input: { sessionId: string; courtId: string }) {
-  await realRequest(`${sessionPath(input.sessionId)}/courts/${encodeURIComponent(input.courtId)}`, {
-    method: 'DELETE',
-  })
+  await realRequest(courtPath(input.sessionId, input.courtId), { method: 'DELETE' })
   return accepted(null, 'Court removed')
 }
 

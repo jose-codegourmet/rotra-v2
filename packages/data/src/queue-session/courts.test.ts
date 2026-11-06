@@ -162,4 +162,35 @@ describe('Start anyway', () => {
       'Something changed',
     )
   })
+
+  it('treats an On court match as holding its court for Undo early open and Remove', async () => {
+    await openCourtEarly({ sessionId, courtId: court4.id })
+    mockStore.update((s) => {
+      s.matches.push({
+        id: 'placed-4',
+        sessionId,
+        matchNo: 1,
+        state: 'on_court',
+        format: 'doubles',
+        queuePosition: 1,
+        origin: 'manual',
+        manualProtected: true,
+        teamA: [],
+        teamB: [],
+        courtIds: [court4.id],
+        placedAt: start,
+        startedAt: null,
+        endedAt: null,
+        substitutions: [],
+        decision: null,
+      })
+    })
+    await expect(undoCourtEarlyOpen({ sessionId, courtId: court4.id })).rejects.toThrow(
+      'Only a free court',
+    )
+    await expect(removeCourt({ sessionId, courtId: court4.id })).rejects.toThrow(
+      'Only a free court',
+    )
+    expect(courtIn(court4.id)).toMatchObject({ openedEarlyAt: start, removedAt: null })
+  })
 })

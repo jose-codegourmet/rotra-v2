@@ -30,7 +30,7 @@ export type AddCourtFormProps = {
   editing?: boolean
   returnFocusRef?: RefObject<HTMLElement | null>
   lockedStartsAt?: number
-  /** The session's start: set times are placed on this day (the next when earlier, overnight) */
+  /** The session's start (actual once live): set times are the first such clock time from it */
   sessionStartsAt: number
   /** The session's scheduled end: "Until the session ends" and the latest set time */
   sessionEndsAt: number

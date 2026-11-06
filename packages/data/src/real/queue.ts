@@ -276,6 +276,9 @@ type WireCourt = {
   id: string
   sessionId: string
   label: string
+  /** Null for older courts: the session start applies. */
+  startsAt?: string | null
+  openedEarlyAt?: string | null
   openUntil: string | null
   removedAt: string | null
 }
@@ -295,6 +298,8 @@ const courtOf = (court: WireCourt): SessionCourt => ({
   id: court.id,
   sessionId: court.sessionId,
   label: court.label,
+  startsAt: msOrNull(court.startsAt ?? null) ?? undefined,
+  openedEarlyAt: msOrNull(court.openedEarlyAt ?? null),
   openUntil: msOrNull(court.openUntil),
   removedAt: msOrNull(court.removedAt),
 })
@@ -355,6 +360,7 @@ export async function realCreateQueueSession(input: QueueSessionInput) {
         scheduledEndAt: iso(input.scheduledEndAt),
         courts: input.courts.map((court) => ({
           label: court.label,
+          startsAt: court.startsAt == null ? null : iso(court.startsAt),
           openUntil: court.openUntil == null ? null : iso(court.openUntil),
         })),
       },

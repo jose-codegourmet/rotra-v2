@@ -133,6 +133,7 @@
     "./queue-session/useOpenAllCourtsEarly": "./src/queue-session/useOpenAllCourtsEarly.ts",
     "./queue-session/useUndoCourtEarlyOpen": "./src/queue-session/useUndoCourtEarlyOpen.ts",
     "./queue-session/useExtendSession": "./src/queue-session/useExtendSession.ts",
+    "./queue-session/useSetSessionEnd": "./src/queue-session/useSetSessionEnd.ts",
     "./match/useSessionMatches": "./src/match/useSessionMatches.ts",
     "./match/useLiveStandings": "./src/match/useLiveStandings.ts",
     "./match/match.rules": "./src/match/match.rules.ts",

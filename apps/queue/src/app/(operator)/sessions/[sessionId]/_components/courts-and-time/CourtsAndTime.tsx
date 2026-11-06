@@ -34,8 +34,8 @@ const isSaveFailure = (error: unknown) =>
   error instanceof MockError && (error.kind === 'retryable' || error.kind === 'offline')
 
 /**
- * Q-SESSION-ADJUST and Q-ADD-COURT: the Courts and time sheet on useExtendSession ("Session now ends
- * HH:MM") and the Add a court sheet on useAddCourt ("LABEL added · open until HH:MM"). "Add a court…"
+ * Q-SESSION-ADJUST and Q-ADD-COURT: the Courts and time sheet on useExtendSession ("Session ends at
+ * HH:MM · public page updates after sync") and the Add a court sheet on useAddCourt ("LABEL added · open until HH:MM"). "Add a court…"
  * in the first opens the second; the shell's + Add court tile opens it directly. Courts set to
  * "until the session ends" follow an extension (their openUntil is null); set-time courts keep theirs.
  * A save failure is an error toast (the sheet stays open with what was typed, nothing is claimed);

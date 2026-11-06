@@ -5,12 +5,15 @@ import { MockError } from '../mock/errors'
 import type { MockState } from '../mock/store'
 import { queueMutation, sessionIn } from '../mock/transaction'
 import { isRealDataMode } from '../real/mode'
+import { recomputeMinimum } from './mutations'
+import { atWhenLabel, sessionEndError } from './queueSession.rules'
 import {
   realAddCourt,
   realExtendSession,
   realOpenAllCourtsEarly,
   realOpenCourtEarly,
   realRemoveCourt,
+  realSetSessionEnd,
   realUndoCourtEarlyOpen,
   realUpdateCourt,
 } from '../real/session-live'
@@ -158,13 +161,47 @@ export function removeCourt(input: { sessionId: string; courtId: string }) {
     return { data: null, text: `${court.label} removed` }
   })
 }
+/**
+ * Set end time (T2): live, any time after now (later or earlier), at most 24 hours after the actual
+ * start, which never moves. Courts that follow the session end (`openUntil` null) move with it; a
+ * court that opens at or after the new end, or is booked past it, blocks it. Setting the end it
+ * already has is a no-op, so a replay is repeat-safe.
+ */
+function applySessionEnd(s: MockState, sessionId: string, endAt: number) {
+  const session = sessionIn(s, sessionId)
+  if (session.state !== 'prepared' && session.state !== 'active')
+    throw new MockError('permission', 'Only a prepared or running session can change its end.')
+  const now = Date.now()
+  if (endAt !== session.scheduledEndAt) {
+    const error = sessionEndError({
+      startedAt: session.startedAt ?? null,
+      scheduledStartAt: session.scheduledStartAt,
+      endAt,
+      now,
+      courts: s.courts.filter((c) => c.sessionId === session.id),
+    })
+    if (error) throw new MockError('permission', error)
+    session.scheduledEndAt = endAt
+    recomputeMinimum(s, sessionId)
+  }
+  return {
+    data: session,
+    text: `Session ends ${atWhenLabel(session.scheduledEndAt, now)} · public page updates after sync`,
+  }
+}
+export function setSessionEnd(input: { sessionId: string; endAt: number }) {
+  if (isRealDataMode()) return realSetSessionEnd(input)
+  return queueMutation({ area: 'Courts and time', sessionId: input.sessionId }, (s) =>
+    applySessionEnd(s, input.sessionId, input.endAt),
+  )
+}
+/** Extend 30 / 60 min: shortcuts for Set end time on the current end plus the minutes. */
 export function extendSession(input: { sessionId: string; minutes: 30 | 60 }) {
   if (isRealDataMode()) return realExtendSession(input)
   return queueMutation({ area: 'Courts and time', sessionId: input.sessionId }, (s) => {
     if (input.minutes !== 30 && input.minutes !== 60)
       throw new MockError('permission', 'Choose 30 or 60 minutes.')
     const session = sessionIn(s, input.sessionId)
-    session.scheduledEndAt += input.minutes * 60000
-    return { data: null, text: `Session now ends ${hhmm(session.scheduledEndAt)}` }
+    return applySessionEnd(s, input.sessionId, session.scheduledEndAt + input.minutes * 60000)
   })
 }

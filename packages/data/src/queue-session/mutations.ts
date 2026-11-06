@@ -4,7 +4,7 @@ import { checkMockSave, getMockDevState, requireOnline } from '../mock/bridge'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { required } from '../mock/required'
-import { type MockState, mockStore } from '../mock/store'
+import { type MockState, mockStore, readMockState } from '../mock/store'
 import { queueMutation, sessionIn } from '../mock/transaction'
 import { isRealDataMode } from '../real/mode'
 import { realCreateQueueSession } from '../real/queue'
@@ -19,16 +19,19 @@ import { validateSessionCost } from '../session-cost/validation'
 import type { SessionWaitlistEntry } from '../session-roster/sessionRoster.types'
 import { saveToastText } from '../sync/fetchers'
 import {
+  atWhenLabel,
   cancelBlocker,
   cancelReasonError,
   cancelReasonOf,
   estimateMinimum,
   publicSlugFor,
   rebalanceSlots,
+  sessionEndCourtConflict,
   sessionMinutes,
   sessionOccurrences,
   slotCapacity,
   startBlocker,
+  startNeedsNewEnd,
 } from './queueSession.rules'
 import type { QueueSession, QueueSessionInput } from './queueSession.types'
 export function recomputeMinimum(state: MockState, id: string) {
@@ -300,33 +303,52 @@ export async function downloadSession(sessionId: string) {
     throw error
   }
 }
-export function startSession(sessionId: string) {
-  if (isRealDataMode()) return realStartSession(sessionId)
+/**
+ * Start session: prepared → active, levels lock. A late or other-day start (T3) needs `newEndAt`
+ * (after now, at most 24 hours later); it becomes the end and courts that follow the session end
+ * move with it. The actual start (`startedAt`) is fixed from here on.
+ */
+export function startSession(input: string | { sessionId: string; newEndAt?: number | null }) {
+  const { sessionId, newEndAt = null } = typeof input === 'string' ? { sessionId: input } : input
+  if (isRealDataMode()) return realStartSession({ sessionId, newEndAt })
   return queueMutation({ area: 'Session' }, (state) => {
     const s = sessionIn(state, sessionId)
     if (s.state !== 'prepared')
       throw new MockError('permission', 'Only a prepared session can start.')
+    const now = Date.now()
     const roster = state.roster.filter((p) => p.sessionId === sessionId),
+      late = startNeedsNewEnd(s.scheduledStartAt, s.scheduledEndAt, now),
       reason = startBlocker(s, {
         sessions: state.sessions,
         roster,
         ...getMockDevState(),
         downloaded: state.downloads[sessionId] === 'ready',
+        now,
+        newEndAt,
       })
     if (reason) throw new MockError('permission', reason)
+    // The minimum freezes from the planned window, before a late start moves the end.
     recomputeMinimum(state, sessionId)
-    const now = Date.now()
-    s.state = 'active'
-    s.startedAt = now
-    for (const court of state.courts.filter((c) => c.sessionId === sessionId)) {
+    const courts = state.courts.filter((c) => c.sessionId === sessionId)
+    for (const court of courts) {
       if (court.startsAt === undefined || court.startsAt === s.scheduledStartAt)
         court.startsAt = now
     }
+    if (late && newEndAt != null) {
+      const conflict = sessionEndCourtConflict(courts, newEndAt, now, now)
+      if (conflict) throw new MockError('permission', conflict)
+      s.scheduledEndAt = newEndAt
+    }
+    s.state = 'active'
+    s.startedAt = now
     for (const p of roster) {
       p.levelLockedAt = now
       if (p.present) p.presentChangedAt = now
     }
-    return { data: s, text: 'Session started · levels locked' }
+    return {
+      data: s,
+      text: `Session started · levels locked${late ? ` · ends ${atWhenLabel(s.scheduledEndAt, now)}` : ''}`,
+    }
   })
 }
 /** Deletes a prepared session that nobody holds a slot in; confirmed players block it. */
@@ -367,7 +389,7 @@ export async function cancelSession(input: { sessionId: string; reason?: string 
   if (saved?.state === 'cancelled') {
     await delay()
     requireOnline()
-    const data = structuredClone(sessionIn(mockStore.getSnapshot(), input.sessionId))
+    const data = sessionIn(readMockState(), input.sessionId)
     return {
       savedOffline: false,
       message: saveToastText(`${data.title} cancelled`, { savedOffline: false }),

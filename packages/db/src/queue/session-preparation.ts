@@ -1,8 +1,12 @@
 import 'server-only'
 import {
   publicSlugFor,
+  sessionEndCourtConflict,
+  sessionEndError,
   sessionOccurrences,
   slotCapacity,
+  startNeedsNewEnd,
+  startNewEndError,
 } from '@rotra/data/queue-session/queueSession.rules'
 import type { QueueSession as SessionView } from '@rotra/data/queue-session/types'
 import type { ClubContext } from '../auth/account-context'
@@ -415,8 +419,11 @@ export async function startSession(
   context: ClubContext,
   sessionId: string,
   expectedRevision: string,
+  /** ISO end of a late or other-day start (T3): required then, ignored otherwise. */
+  newEndAt: string | null = null,
 ) {
   const entitlement = await requireClubEntitlement(context)
+  const newEnd = newEndAt ? ms(newEndAt) : null
   try {
     return await prisma.$transaction(async (tx) => {
       let session = await lockSession(tx, context, sessionId)
@@ -443,8 +450,28 @@ export async function startSession(
         throw new ServiceError('invalid', {
           roster: `${missing} player${missing === 1 ? ' needs' : 's need'} a level before you can start.`,
         })
-      session = await recomputeMinimum(tx, session)
       const now = new Date()
+      const plannedStartAt = session.scheduledStartAt.getTime()
+      const plannedEndAt = session.scheduledEndAt.getTime()
+      const late = startNeedsNewEnd(plannedStartAt, plannedEndAt, now.getTime())
+      const endError =
+        startNewEndError({
+          scheduledStartAt: plannedStartAt,
+          scheduledEndAt: plannedEndAt,
+          newEndAt: newEnd,
+          now: now.getTime(),
+        }) ??
+        (late && newEnd != null
+          ? sessionEndCourtConflict(
+              (await liveCourts(tx, sessionId)).map(endCourt),
+              newEnd,
+              now.getTime(),
+              now.getTime(),
+            )
+          : null)
+      if (endError) throw new ServiceError('invalid', { endAt: endError })
+      // The minimum freezes from the planned window, before a late start moves the end.
+      session = await recomputeMinimum(tx, session)
       for (const entry of roster)
         await tx.sessionPlayer.update({
           where: { id: entry.id },
@@ -459,6 +486,7 @@ export async function startSession(
         data: {
           state: 'active',
           startedAt: now,
+          ...(late && newEnd != null ? { scheduledEndAt: new Date(newEnd) } : {}),
           startLicenseTermId: entitlement.effectiveTermId,
           revision: { increment: 1 },
         },
@@ -681,7 +709,70 @@ export async function removeCourt(context: ClubContext, sessionId: string, court
   })
 }
 
-/** Extends the end by 30 or 60 minutes at the expected revision; the no-overlap rule still applies. */
+/** A court as the end-time rule reads it; a null planned start follows the session start. */
+const endCourt = (court: SessionCourt) => ({
+  label: court.label,
+  startsAt: court.startsAt?.getTime(),
+  openUntil: court.openUntil?.getTime() ?? null,
+  removedAt: null,
+})
+
+/**
+ * Set end time (T2) under the session lock, the rule `sessionEndError` in `@rotra/data` (live: after
+ * now, at most 24 hours after the actual start, which never moves; prepared: the setup window; then
+ * the court conflicts). Courts that follow the session end (`openUntil` null) move with it. The end
+ * it already has is returned unchanged, so a replay or a retry after a lost reply is repeat-safe.
+ * `expectedRevision` is the displayed session online; offline replay sends none.
+ */
+async function applySessionEnd(
+  context: ClubContext,
+  sessionId: string,
+  expectedRevision: string | null,
+  endOf: (session: QueueSession) => number,
+) {
+  try {
+    return await prisma.$transaction(async (tx) => {
+      let session: QueueSession = await lockSession(tx, context, sessionId)
+      await requireSessionAccess(context, session)
+      requireState(
+        session,
+        ['prepared', 'active'],
+        'Only a prepared or running session can change its end.',
+      )
+      const endAt = endOf(session)
+      if (endAt === session.scheduledEndAt.getTime()) return sessionDto(session)
+      if (expectedRevision !== null) requireRevision(session.revision, expectedRevision)
+      const error = sessionEndError({
+        startedAt: session.startedAt?.getTime() ?? null,
+        scheduledStartAt: session.scheduledStartAt.getTime(),
+        endAt,
+        now: Date.now(),
+        courts: (await liveCourts(tx, sessionId)).map(endCourt),
+      })
+      if (error) throw new ServiceError('invalid', { endAt: error })
+      session = await tx.queueSession.update({
+        where: { id: sessionId },
+        data: { scheduledEndAt: new Date(endAt), revision: { increment: 1 } },
+      })
+      session = await recomputeMinimum(tx, session)
+      return sessionDto(session)
+    })
+  } catch (error) {
+    mapDatabaseError(error)
+  }
+}
+
+/** Courts and time › Set end time to an ISO instant; the no-overlap rule still applies. */
+export function setSessionEnd(
+  context: ClubContext,
+  sessionId: string,
+  input: { endAt: string; expectedRevision?: string | null },
+) {
+  const endAt = ms(input.endAt)
+  return applySessionEnd(context, sessionId, input.expectedRevision ?? null, () => endAt)
+}
+
+/** Extend 30 / 60 min: Set end time on the saved end plus the minutes, at the expected revision. */
 export async function extendSession(
   context: ClubContext,
   sessionId: string,
@@ -690,29 +781,13 @@ export async function extendSession(
 ) {
   if (minutes !== 30 && minutes !== 60)
     throw new ServiceError('invalid', { minutes: 'Choose 30 or 60 minutes.' })
-  try {
-    return await prisma.$transaction(async (tx) => {
-      let session: QueueSession = await lockSession(tx, context, sessionId)
-      await requireSessionAccess(context, session)
-      requireState(
-        session,
-        ['prepared', 'active'],
-        'Only a prepared or running session can be extended.',
-      )
-      requireRevision(session.revision, expectedRevision)
-      session = await tx.queueSession.update({
-        where: { id: sessionId },
-        data: {
-          scheduledEndAt: new Date(session.scheduledEndAt.getTime() + minutes * 60_000),
-          revision: { increment: 1 },
-        },
-      })
-      session = await recomputeMinimum(tx, session)
-      return sessionDto(session)
-    })
-  } catch (error) {
-    mapDatabaseError(error)
-  }
+  // A retry after a lost reply would add the minutes again, so the revision stays required here.
+  return applySessionEnd(
+    context,
+    sessionId,
+    expectedRevision,
+    (session) => session.scheduledEndAt.getTime() + minutes * 60_000,
+  )
 }
 
 export async function setAcceptJoinRequests(

@@ -2,7 +2,9 @@ import { Button } from '@rotra/ui/button'
 import { Chip } from '@rotra/ui/chip'
 import { cn } from '@rotra/ui/cn'
 import { CourtDrawing, type CourtPlayer } from '@rotra/ui/court-drawing'
+import { Icon } from '@rotra/ui/icon'
 import { OverflowMenu, type OverflowMenuItem } from '@rotra/ui/overflow-menu'
+import type { ReactNode } from 'react'
 import { courtCardVariants } from './CourtCard.variants'
 
 type CourtCardBase = {
@@ -11,19 +13,20 @@ type CourtCardBase = {
   /** The court's closing time, already formatted: "9:00 PM" */
   untilLabel: string
   startLabel?: string
+  /** Past its closing time: "Booking ended HH:MM" in warn on every state; the game continues */
   bookingEnded?: boolean
   /** Opened before its planned start (Start anyway): the time line reads "Opened early · planned START – UNTIL" */
   openedEarly?: boolean
-  /** ⋯ menu: Edit the court's label and window */
+  /** ⋯ menu: Edit the court's label and window; disabled "A match is on this court" while a match is on it */
   onEdit?: () => void
-  /** ⋯ menu: Undo early open, back to Not open yet; disabled on an in-game card */
+  /** ⋯ menu: Undo early open, back to Not open yet; disabled while a match is on the court */
   onUndoEarlyOpen?: () => void
   className?: string
 }
 
-export type CourtCardInGameProps = CourtCardBase & {
-  variant: 'in-game'
-  /** A 5v5 on two courts: two stacked courts, "Merged · in game" */
+/** A match on the court: Getting ready (On court) or Playing */
+type CourtCardMatchBase = CourtCardBase & {
+  /** A 5v5 on two courts: two stacked courts, "Merged · Getting ready" / "Merged · Playing" */
   merged?: boolean
   teamA: CourtPlayer[]
   teamB: CourtPlayer[]
@@ -31,13 +34,38 @@ export type CourtCardInGameProps = CourtCardBase & {
   /** "Doubles", "5v5 fun" */
   formatLabel: string
   matchNo: number
-  /** Minutes since the match started */
-  minutes: number
-  substitutions?: number
-  /** Renders "Open match" when given */
+  /** Renders "Open match" when given (primary on Playing, secondary on Getting ready) */
   onOpenMatch?: () => void
   /** ⋯ menu: Remove, disabled here with "Only a free court can be removed" */
   onRemove?: () => void
+}
+
+/** Playing: a started match. Steady accent glow, chip "Playing", the minutes in the match line. */
+export type CourtCardInGameProps = CourtCardMatchBase & {
+  variant: 'in-game'
+  /** Minutes since Start match */
+  minutes: number
+  substitutions?: number
+}
+
+/** The next ready waiting match the ⋯ menu's Swap would put on this court */
+export type CourtCardSwapMatch = {
+  /** Position in the queue, 1-based */
+  position: number
+  matchNo: number
+}
+
+/** Getting ready: a match On court, placed but not started. Normal border, no minutes. */
+export type CourtCardOnCourtProps = CourtCardMatchBase & {
+  variant: 'on-court'
+  /** Why it can't start yet ("Mikee is not present"): shown in warn and disables Start match */
+  blockedReason?: string
+  /** Renders "Start match" (primary) when given */
+  onStartMatch?: () => void
+  /** ⋯ menu: "Swap with #P · Match N"; the item shows only when this is given */
+  onSwap?: () => void
+  /** The match Swap would bring on; null or missing disables the item with "No other waiting match is ready" */
+  swapWith?: CourtCardSwapMatch | null
 }
 
 /** The waiting match this court can start next */
@@ -54,8 +82,6 @@ export type CourtCardNextMatch = {
 
 export type CourtCardFreeProps = CourtCardBase & {
   variant: 'free'
-  /** Past its closing time: "Booking ended HH:MM" in warn; the game continues */
-  bookingEnded?: boolean
   notOpen?: boolean
   removed?: boolean
   /** The session's last court: Remove is disabled with "A session needs at least one court" */
@@ -64,11 +90,15 @@ export type CourtCardFreeProps = CourtCardBase & {
   onRemove?: () => void
   /** Not open yet: renders "Start anyway" (the owner confirms, then opens the court early) */
   onStartAnyway?: () => void
-  /** A ready match; when missing the body says why none can start, or that the queue is empty */
+  /** A ready match; when missing the body says why none can go on, or that the queue is empty */
   next?: CourtCardNextMatch | null
-  /** Why no waiting match can start (the first match's reason); omit when the queue is empty */
+  /** Fewer free players than the smallest standard match needs: "Not enough free players." (wins over blockedReason and the empty queue) */
+  notEnoughFreePlayers?: boolean
+  /** Why no waiting match can go on (the first match's reason); omit when the queue is empty */
   blockedReason?: string
-  /** Renders "Review and start" when given */
+  /** Renders "Put on court" when given: places the next eligible match, nothing starts */
+  onPutOnCourt?: () => void
+  /** @deprecated From before the On court step: renders "Review and start" when onPutOnCourt is missing. Use onPutOnCourt. */
   onReviewAndStart?: () => void
   /** Renders "Pick another"; pass it only when more than one match waits */
   onPickAnother?: () => void
@@ -76,7 +106,7 @@ export type CourtCardFreeProps = CourtCardBase & {
   onAddMatch?: () => void
 }
 
-export type CourtCardProps = CourtCardInGameProps | CourtCardFreeProps
+export type CourtCardProps = CourtCardInGameProps | CourtCardOnCourtProps | CourtCardFreeProps
 
 function TimeLine({
   startLabel,
@@ -98,11 +128,13 @@ function TimeLine({
   )
 }
 
-/** Edit, Undo early open and Remove; the card itself keeps only the action for its state. */
+/** Swap (Getting ready only), Edit, Undo early open and Remove; the card keeps only the actions for its state. */
 function CourtMenu({
   label,
   busy,
   isLastCourt = false,
+  onSwap,
+  swapWith,
   onEdit,
   onUndoEarlyOpen,
   onRemove,
@@ -110,12 +142,29 @@ function CourtMenu({
   label: string
   busy: boolean
   isLastCourt?: boolean
+  onSwap?: () => void
+  swapWith?: CourtCardSwapMatch | null
   onEdit?: () => void
   onUndoEarlyOpen?: () => void
   onRemove?: () => void
 }) {
   const items: OverflowMenuItem[] = []
-  if (onEdit) items.push({ label: 'Edit', onSelect: onEdit })
+  if (onSwap)
+    items.push(
+      swapWith
+        ? { label: `Swap with #${swapWith.position} · Match ${swapWith.matchNo}`, onSelect: onSwap }
+        : {
+            label: 'Swap with the queue',
+            onSelect: onSwap,
+            disabledReason: 'No other waiting match is ready',
+          },
+    )
+  if (onEdit)
+    items.push({
+      label: 'Edit',
+      onSelect: onEdit,
+      disabledReason: busy ? 'A match is on this court' : undefined,
+    })
   if (onUndoEarlyOpen)
     items.push({
       label: 'Undo early open',
@@ -144,15 +193,65 @@ function listNames(names: string[]) {
 }
 
 /**
- * One court in the live console: in game (teams on a court drawing, match line, Open match) or free
- * (empty drawing, the next eligible match or why none can start, Remove). The prototypes' .court.
+ * One court in the live console, in one of three states, always written as a chip: Free (empty
+ * drawing, the next eligible match or why none can go on), Getting ready (a match On court: Start
+ * match, Open match) or Playing (steady accent glow, Open match). The prototypes' .court,
+ * .court.oncourt and .court.busy.
  */
 export function CourtCard(props: CourtCardProps) {
-  if (props.variant === 'in-game') return <InGameCourtCard {...props} />
+  if (props.variant === 'in-game') return <PlayingCourtCard {...props} />
+  if (props.variant === 'on-court') return <GettingReadyCourtCard {...props} />
   return <FreeCourtCard {...props} />
 }
 
-function InGameCourtCard({
+/** Label, time line, state chip and ⋯ menu, then the court drawing with both teams. */
+function MatchCourtHead({
+  label,
+  untilLabel,
+  startLabel,
+  bookingEnded,
+  openedEarly,
+  merged,
+  teamA,
+  teamB,
+  onOpenProfile,
+  chip,
+  menu,
+}: Pick<
+  CourtCardMatchBase,
+  | 'label'
+  | 'untilLabel'
+  | 'startLabel'
+  | 'bookingEnded'
+  | 'openedEarly'
+  | 'merged'
+  | 'teamA'
+  | 'teamB'
+  | 'onOpenProfile'
+> & { chip: ReactNode; menu: ReactNode }) {
+  return (
+    <>
+      <div className="flex items-center justify-between gap-2">
+        <div>
+          <h3 className="text-base">{label}</h3>
+          <TimeLine {...{ startLabel, untilLabel, bookingEnded, openedEarly }} />
+        </div>
+        <div className="flex flex-nowrap items-center gap-1.5">
+          {chip}
+          {menu}
+        </div>
+      </div>
+      <CourtDrawing
+        courts={merged ? 2 : 1}
+        teamA={teamA}
+        teamB={teamB}
+        onOpenProfile={onOpenProfile}
+      />
+    </>
+  )
+}
+
+function PlayingCourtCard({
   label,
   untilLabel,
   startLabel,
@@ -177,21 +276,11 @@ function InGameCourtCard({
       aria-label={label}
       className={cn(courtCardVariants({ variant: 'in-game', merged }), className)}
     >
-      <div className="flex items-center justify-between gap-2">
-        <div>
-          <h3 className="text-base">{label}</h3>
-          <TimeLine {...{ startLabel, untilLabel, bookingEnded, openedEarly }} />
-        </div>
-        <div className="flex flex-nowrap items-center gap-1.5">
-          <Chip tone="accent">{merged ? 'Merged · in game' : 'In game'}</Chip>
-          <CourtMenu busy {...{ label, onEdit, onUndoEarlyOpen, onRemove }} />
-        </div>
-      </div>
-      <CourtDrawing
-        courts={merged ? 2 : 1}
-        teamA={teamA}
-        teamB={teamB}
-        onOpenProfile={onOpenProfile}
+      <MatchCourtHead
+        {...{ label, untilLabel, startLabel, bookingEnded, openedEarly, merged }}
+        {...{ teamA, teamB, onOpenProfile }}
+        chip={<Chip tone="accent">{merged ? 'Merged · Playing' : 'Playing'}</Chip>}
+        menu={<CourtMenu busy {...{ label, onEdit, onUndoEarlyOpen, onRemove }} />}
       />
       <p className="text-[13px] text-fg2">
         {formatLabel} · Match {matchNo} · {minutes} min
@@ -204,6 +293,74 @@ function InGameCourtCard({
           <Button size="sm" variant="primary" onClick={onOpenMatch}>
             Open match
           </Button>
+        </div>
+      ) : null}
+    </article>
+  )
+}
+
+function GettingReadyCourtCard({
+  label,
+  untilLabel,
+  startLabel,
+  bookingEnded = false,
+  merged = false,
+  teamA,
+  teamB,
+  onOpenProfile,
+  formatLabel,
+  matchNo,
+  blockedReason,
+  onStartMatch,
+  onOpenMatch,
+  onSwap,
+  swapWith,
+  openedEarly = false,
+  onEdit,
+  onUndoEarlyOpen,
+  onRemove,
+  className,
+}: CourtCardOnCourtProps) {
+  return (
+    <article
+      aria-label={label}
+      className={cn(courtCardVariants({ variant: 'on-court', merged }), className)}
+    >
+      <MatchCourtHead
+        {...{ label, untilLabel, startLabel, bookingEnded, openedEarly, merged }}
+        {...{ teamA, teamB, onOpenProfile }}
+        chip={<Chip>{merged ? 'Merged · Getting ready' : 'Getting ready'}</Chip>}
+        menu={
+          <CourtMenu busy {...{ label, onSwap, swapWith, onEdit, onUndoEarlyOpen, onRemove }} />
+        }
+      />
+      <p className="text-[13px] text-fg2">
+        {formatLabel} · Match {matchNo} · waiting to start
+      </p>
+      {blockedReason ? (
+        <span className="flex items-start gap-1.5 text-[13px] text-warn">
+          <Icon name="alert" className="mt-0.5 flex-none" />
+          {blockedReason}
+        </span>
+      ) : null}
+      {onStartMatch || onOpenMatch ? (
+        <div className="mt-auto flex flex-wrap items-center gap-2">
+          {onStartMatch ? (
+            <Button
+              size="sm"
+              variant="primary"
+              onClick={onStartMatch}
+              disabled={!!blockedReason}
+              title={blockedReason}
+            >
+              Start match
+            </Button>
+          ) : null}
+          {onOpenMatch ? (
+            <Button size="sm" onClick={onOpenMatch}>
+              Open match
+            </Button>
+          ) : null}
         </div>
       ) : null}
     </article>
@@ -224,12 +381,15 @@ function FreeCourtCard({
   onEdit,
   onUndoEarlyOpen,
   next,
+  notEnoughFreePlayers = false,
   blockedReason,
+  onPutOnCourt,
   onReviewAndStart,
   onPickAnother,
   onAddMatch,
   className,
 }: CourtCardFreeProps) {
+  const onPlace = onPutOnCourt ?? onReviewAndStart
   return (
     <article aria-label={label} className={cn(courtCardVariants({ variant: 'free' }), className)}>
       <div className="flex items-center justify-between gap-2">
@@ -274,11 +434,11 @@ function FreeCourtCard({
           <p className="text-[13px]">
             {listNames(next.teamA)} <span className="text-fg2">vs</span> {listNames(next.teamB)}
           </p>
-          {onReviewAndStart || onPickAnother ? (
+          {onPlace || onPickAnother ? (
             <div className="mt-auto flex flex-wrap items-center gap-2">
-              {onReviewAndStart ? (
-                <Button size="sm" variant="primary" onClick={onReviewAndStart}>
-                  Review and start
+              {onPlace ? (
+                <Button size="sm" variant="primary" onClick={onPlace}>
+                  {onPutOnCourt ? 'Put on court' : 'Review and start'}
                 </Button>
               ) : null}
               {onPickAnother ? (
@@ -292,9 +452,11 @@ function FreeCourtCard({
       ) : (
         <>
           <p className="text-[13px] text-fg2">
-            {blockedReason
-              ? `No waiting match can start: ${blockedReason}.`
-              : 'The queue is empty.'}
+            {notEnoughFreePlayers
+              ? 'Not enough free players.'
+              : blockedReason
+                ? `No waiting match can go on: ${blockedReason}.`
+                : 'The queue is empty.'}
           </p>
           {onAddMatch ? (
             <div className="mt-auto flex flex-wrap items-center gap-2">

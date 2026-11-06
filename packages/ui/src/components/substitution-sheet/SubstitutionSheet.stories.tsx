@@ -4,10 +4,13 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 import { fn } from 'storybook/test'
 import {
+  type SubstitutionCredit,
   SubstitutionSheet,
   type SubstitutionSheetProps,
   type SubstitutionStep,
 } from './SubstitutionSheet'
+
+const { chosen, doubles } = activeMatchFixtures
 
 const propsFor = (f: SubstitutionFixture): SubstitutionSheetProps => ({
   open: true,
@@ -16,18 +19,22 @@ const propsFor = (f: SubstitutionFixture): SubstitutionSheetProps => ({
   inMatch: f.inMatch,
   candidates: f.candidates,
   minimumGames: f.minimumGames,
+  startedAt: doubles.startedAt,
+  now: doubles.now,
   step: 'pick',
   outId: null,
   inId: null,
+  creditTo: 'nobody',
   onPickOut: fn(),
   onPickIn: fn(),
+  onPickCredit: fn(),
   onReview: fn(),
   onBack: fn(),
   onBackToPick: fn(),
   onConfirm: fn(),
 })
 
-const { chosen } = activeMatchFixtures
+const bothChosen = { outId: chosen.outId, inId: chosen.inId }
 
 const meta = {
   title: 'Queue/SubstitutionSheet',
@@ -38,22 +45,39 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-/** Pick step, nothing chosen yet: Review substitution is disabled */
+/** Pick step, nothing chosen yet: person credit cards are disabled; Review substitution is disabled */
 export const PickNoneChosen: Story = {}
-/** Pick step with both the outgoing player and the replacement chosen */
-export const PickBothChosen: Story = { args: { outId: chosen.outId, inId: chosen.inId } }
+/** Pick step with both players chosen; Nobody remains the default credit */
+export const PickBothChosen: Story = { args: bothChosen }
+/** Who gets this game?: the incoming player */
+export const PickCreditIncoming: Story = {
+  args: { ...bothChosen, creditTo: 'incoming' },
+}
+/** Who gets this game?: the outgoing player */
+export const PickCreditOutgoing: Story = {
+  args: { ...bothChosen, creditTo: 'outgoing' },
+}
 /** Pick step when no present player is free: the Replacement grid gives way to the message */
 export const PickNoReplacement: Story = { args: propsFor(activeMatchFixtures.noReplacement) }
-/** D-SUBSTITUTE: Out, In with level, Team and the partial-game warning */
-export const Confirm: Story = { args: { step: 'confirm', outId: chosen.outId, inId: chosen.inId } }
+/** D-SUBSTITUTE with Nobody: Gets this game Nobody, neither-partial warning */
+export const ConfirmNobody: Story = {
+  args: { step: 'confirm', ...bothChosen, creditTo: 'nobody' },
+}
+/** D-SUBSTITUTE with the incoming player credited */
+export const ConfirmIncoming: Story = {
+  args: { step: 'confirm', ...bothChosen, creditTo: 'incoming' },
+}
+/** D-SUBSTITUTE with the outgoing player credited */
+export const ConfirmOutgoing: Story = {
+  args: { step: 'confirm', ...bothChosen, creditTo: 'outgoing' },
+}
 export const ConfirmPending: Story = {
-  args: { step: 'confirm', outId: chosen.outId, inId: chosen.inId, isPending: true },
+  args: { step: 'confirm', ...bothChosen, isPending: true },
 }
 export const ConfirmError: Story = {
   args: {
     step: 'confirm',
-    outId: chosen.outId,
-    inId: chosen.inId,
+    ...bothChosen,
     error: 'Something changed. Review the match again.',
   },
 }
@@ -61,8 +85,7 @@ export const ConfirmError: Story = {
 export const ConfirmSaveFailed: Story = {
   args: {
     step: 'confirm',
-    outId: chosen.outId,
-    inId: chosen.inId,
+    ...bothChosen,
     error: 'Changes could not be saved',
   },
 }
@@ -71,12 +94,14 @@ function Flow(args: SubstitutionSheetProps) {
   const [step, setStep] = useState<SubstitutionStep>('pick')
   const [outId, setOutId] = useState<string | null>(null)
   const [inId, setInId] = useState<string | null>(null)
+  const [creditTo, setCreditTo] = useState<SubstitutionCredit>('nobody')
   return (
     <SubstitutionSheet
       {...args}
       step={step}
       outId={outId}
       inId={inId}
+      creditTo={creditTo}
       onPickOut={(id) => {
         args.onPickOut(id)
         setOutId(id)
@@ -84,6 +109,10 @@ function Flow(args: SubstitutionSheetProps) {
       onPickIn={(id) => {
         args.onPickIn(id)
         setInId(id)
+      }}
+      onPickCredit={(credit) => {
+        args.onPickCredit?.(credit)
+        setCreditTo(credit)
       }}
       onReview={() => {
         args.onReview()
@@ -97,11 +126,11 @@ function Flow(args: SubstitutionSheetProps) {
   )
 }
 
-/** Pick both tiles, Review substitution, then Back: the choice is kept */
+/** Pick both tiles, a credit choice, Review substitution, then Back: the choice is kept */
 export const Interactive: Story = { render: (args) => <Flow {...args} /> }
 
 export const Phone: Story = {
-  args: { outId: chosen.outId, inId: chosen.inId },
+  args: { ...bothChosen, creditTo: 'incoming' },
   globals: { viewport: { value: 'phone' } },
 }
 export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }

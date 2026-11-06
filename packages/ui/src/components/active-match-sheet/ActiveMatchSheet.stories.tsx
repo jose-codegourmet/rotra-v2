@@ -35,9 +35,28 @@ type Story = StoryObj<typeof meta>
 export const ActiveDoubles: Story = {}
 /** A 5v5 fun game on both courts: "Court 1 + Court 2" */
 export const MergedFiveVsFive: Story = { args: propsFor(activeMatchFixtures.merged) }
-/** Two substitutions so far, one line each */
+const { withSubstitutions } = activeMatchFixtures
+const [firstSub, secondSub] = withSubstitutions.substitutions
+
+/** Two substitutions so far, neither credited (the usual case) */
 export const WithTwoSubstitutions: Story = {
-  args: propsFor(activeMatchFixtures.withSubstitutions),
+  args: propsFor(withSubstitutions),
+}
+/** Incoming player credited: "NAME replaced NAME · NAME got the game (QM choice)" */
+export const WithCreditedIncoming: Story = {
+  args: {
+    ...propsFor(withSubstitutions),
+    substitutions:
+      firstSub && secondSub ? [{ ...firstSub, creditTo: 'incoming' as const }, secondSub] : [],
+  },
+}
+/** Outgoing player credited on the second substitution */
+export const WithCreditedOutgoing: Story = {
+  args: {
+    ...propsFor(withSubstitutions),
+    substitutions:
+      firstSub && secondSub ? [firstSub, { ...secondSub, creditTo: 'outgoing' as const }] : [],
+  },
 }
 export const Phone: Story = {
   args: propsFor(activeMatchFixtures.withSubstitutions),

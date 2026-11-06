@@ -5,12 +5,17 @@ import { Button } from '@rotra/ui/button'
 import { Sheet } from '@rotra/ui/sheet'
 import { type MatchLineupTeam, TeamLineup, type TeamLineupPlayer } from '@rotra/ui/team-lineup'
 
-/** One mid-game replacement, as the sheet reports it: "Substitution: IN replaced OUT." */
+/** Who was credited for the game; Nobody is the default. */
+export type ActiveMatchSubstitutionCredit = 'nobody' | 'incoming' | 'outgoing'
+
+/** One mid-game replacement, as the sheet reports it. */
 export type ActiveMatchSubstitution = {
   /** The player who came off, full name */
   outName: string
   /** The player who came on, full name */
   inName: string
+  /** Who gets this game; omitted or nobody → "Neither gets credit for this game." */
+  creditTo?: ActiveMatchSubstitutionCredit
 }
 
 export type ActiveMatchSheetProps = {
@@ -54,12 +59,19 @@ function formatTime(at: number) {
   return new Date(at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
 }
 
+function substitutionLine(s: ActiveMatchSubstitution) {
+  const who = s.creditTo === 'incoming' ? s.inName : s.creditTo === 'outgoing' ? s.outName : null
+  return who
+    ? `${s.inName} replaced ${s.outName} · ${who} got the game (QM choice)`
+    : `${s.inName} replaced ${s.outName} · Neither gets credit for this game`
+}
+
 /**
  * Q-ACTIVE-MATCH: the in-game control sheet for a match on court. "Match N · Court X", the format
  * with the start time and minutes in, Team A VS Team B (no swapping once started), one line per
- * substitution, and the reminder that closing the sheet does not end the game. Footer: Mark invalid
- * (destructive), Substitute player, and the primary Match done. No level edits, past-result changes,
- * reset or point-by-point scoring.
+ * substitution (credit or neither), and the reminder that closing the sheet does not end the game.
+ * Footer: Mark invalid (destructive), Substitute player, and the primary Match done. No level
+ * edits, past-result changes, reset or point-by-point scoring.
  */
 export function ActiveMatchSheet({
   open,
@@ -107,7 +119,7 @@ export function ActiveMatchSheet({
       />
       {substitutions.map((s, index) => (
         <p key={`${s.outName}-${s.inName}-${index}`} className="m-0 text-[13px] text-fg2">
-          Substitution: {s.inName} replaced {s.outName}. Neither gets credit for this game.
+          Substitution: {substitutionLine(s)}.
         </p>
       ))}
       <p className="m-0 text-[13px] text-fg2">

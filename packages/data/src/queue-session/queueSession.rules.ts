@@ -1,5 +1,6 @@
+import { MAX_SESSION_MS, sessionWindowError } from '@rotra/schema/court-window'
 import type { SessionPlayer, SessionWaitlistEntry } from '../session-roster/sessionRoster.types'
-import type { QueueSession, QueueSessionInput } from './queueSession.types'
+import type { QueueSession, QueueSessionInput, SessionCourt } from './queueSession.types'
 /** The prototype's sessionLink(): the id stripped of non-alphanumerics, last 6 characters, lowercase. */
 export function publicSlugFor(sessionId: string) {
   return sessionId
@@ -106,6 +107,137 @@ export function sessionOccurrences(
     }
   })
 }
+// ---------- Times and days: Set end time (T2) and a late or other-day start (T3) ----------
+
+/** Club display and entry zone for v1 (T6); `@rotra/ui`'s now-card helpers use the same zone. */
+const CLUB_TIME_ZONE = 'Asia/Manila'
+const CLUB_DAY = new Intl.DateTimeFormat('en-CA', {
+  timeZone: CLUB_TIME_ZONE,
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+})
+const CLUB_TIME = new Intl.DateTimeFormat('en-US', {
+  timeZone: CLUB_TIME_ZONE,
+  hour: 'numeric',
+  minute: '2-digit',
+  hour12: true,
+})
+const CLUB_DATE = new Intl.DateTimeFormat('en-US', {
+  timeZone: CLUB_TIME_ZONE,
+  weekday: 'short',
+  month: 'short',
+  day: 'numeric',
+})
+const part = (parts: Intl.DateTimeFormatPart[], type: Intl.DateTimeFormatPartTypes) =>
+  parts.find((entry) => entry.type === type)?.value ?? ''
+const clubDayUtc = (at: number) => Date.parse(`${CLUB_DAY.format(new Date(at))}T00:00:00Z`)
+
+/** Whole club-zone days from `from` to `to` (yesterday −1, today 0, tomorrow 1). */
+export function clubDayDiff(from: number, to: number) {
+  return Math.round((clubDayUtc(to) - clubDayUtc(from)) / 864e5)
+}
+/** "9:30 PM" in the club zone. */
+export function clubTimeLabel(at: number) {
+  const parts = CLUB_TIME.formatToParts(new Date(at))
+  return `${part(parts, 'hour')}:${part(parts, 'minute')} ${part(parts, 'dayPeriod')}`
+}
+/** Mid-sentence time with its day (T4): "9:30 PM", "tomorrow 1:00 AM", "Sat, Nov 1 · 9:00 PM". */
+export function whenLabel(at: number, now: number) {
+  const days = clubDayDiff(now, at)
+  if (days === 0) return clubTimeLabel(at)
+  if (days === 1 || days === -1)
+    return `${days < 0 ? 'yesterday' : 'tomorrow'} ${clubTimeLabel(at)}`
+  const parts = CLUB_DATE.formatToParts(new Date(at))
+  return `${part(parts, 'weekday')}, ${part(parts, 'month')} ${part(parts, 'day')} · ${clubTimeLabel(at)}`
+}
+/** The prototype's atWhen(): "at 9:30 PM" today, otherwise `whenLabel`. */
+export function atWhenLabel(at: number, now: number) {
+  return clubDayDiff(now, at) === 0 ? `at ${clubTimeLabel(at)}` : whenLabel(at, now)
+}
+
+export const END_AFTER_NOW_ERROR = 'Choose an end time after now.'
+export const END_WITHIN_DAY_ERROR = 'Choose an end at most 24 hours after play began.'
+export const START_NEEDS_NEW_END = 'Set a new end time after now to start.'
+
+/**
+ * T3: starting after the planned end, or on another club day than the planned start, needs a new
+ * end first (the prototype's startNeedsEnd(); the same rule as StartSessionSheet's startNeedsNewEnd).
+ */
+export function startNeedsNewEnd(plannedStartAt: number, plannedEndAt: number, now: number) {
+  return now > plannedEndAt || clubDayDiff(plannedStartAt, now) !== 0
+}
+
+type EndCourt = Pick<SessionCourt, 'label' | 'startsAt' | 'openUntil' | 'removedAt'>
+
+/**
+ * Courts that follow the session end (`openUntil` null) move with it. A court that opens at or
+ * after the new end, or has its own booking past it, blocks the change until that court is edited.
+ * `courtBase` is the start courts without their own planned start count from.
+ */
+export function sessionEndCourtConflict(
+  courts: EndCourt[],
+  endAt: number,
+  courtBase: number,
+  now: number,
+) {
+  const live = courts.filter((c) => !c.removedAt)
+  const opens = live.find((c) => (c.startsAt ?? courtBase) >= endAt)
+  if (opens)
+    return `${opens.label} opens ${atWhenLabel(opens.startsAt ?? courtBase, now)}. Pick a later end, or edit that court first.`
+  const booked = live.find((c) => c.openUntil != null && c.openUntil > endAt)
+  if (booked?.openUntil != null)
+    return `${booked.label} is booked until ${whenLabel(booked.openUntil, now)}. Pick a later end, or edit that court first.`
+  return null
+}
+
+/**
+ * Set end time (T2). Live: any time after now, later or earlier, at most 24 hours after the actual
+ * start (which never moves). Prepared: the setup window (after the start, at most 24 hours later).
+ * Then the court conflicts. Extend 30 / 60 run the same rule on end + minutes.
+ */
+export function sessionEndError(input: {
+  startedAt: number | null
+  scheduledStartAt: number
+  endAt: number
+  now: number
+  courts: EndCourt[]
+}) {
+  const { startedAt, scheduledStartAt, endAt, now } = input
+  if (!Number.isFinite(endAt)) return 'Enter a date and time.'
+  if (startedAt != null) {
+    if (endAt <= now) return END_AFTER_NOW_ERROR
+    if (endAt - startedAt > MAX_SESSION_MS) return END_WITHIN_DAY_ERROR
+  } else {
+    const error = sessionWindowError(scheduledStartAt, endAt)
+    if (error) return error
+  }
+  return sessionEndCourtConflict(input.courts, endAt, startedAt ?? scheduledStartAt, now)
+}
+
+/**
+ * Start session's new end (T3): required when `startNeedsNewEnd`, then after now and at most 24
+ * hours later (play begins now). Null when no new end is needed or the given one is valid.
+ */
+export function startNewEndError(input: {
+  scheduledStartAt: number
+  scheduledEndAt: number
+  newEndAt: number | null | undefined
+  now: number
+}) {
+  const { newEndAt, now } = input
+  if (!startNeedsNewEnd(input.scheduledStartAt, input.scheduledEndAt, now)) return null
+  if (newEndAt == null || !Number.isFinite(newEndAt)) return START_NEEDS_NEW_END
+  if (newEndAt <= now) return END_AFTER_NOW_ERROR
+  if (newEndAt - now > MAX_SESSION_MS) return END_WITHIN_DAY_ERROR
+  return null
+}
+
+/**
+ * Why Start session is refused, or null. With `now` (the command, not the Start bar) it also
+ * requires a valid new end for a late or other-day start (T3); the bar leaves it out because
+ * Start session's sheet asks for that end.
+ */
 export function startBlocker(
   session: QueueSession,
   ctx: {
@@ -114,6 +246,8 @@ export function startBlocker(
     licenseExpired: boolean
     offline: boolean
     downloaded: boolean
+    now?: number
+    newEndAt?: number | null
   },
 ) {
   const active = ctx.sessions.find(
@@ -124,9 +258,16 @@ export function startBlocker(
   if (ctx.offline && !ctx.downloaded)
     return 'No downloaded copy on this device. Connect, or download first.'
   const missing = ctx.roster.filter((p) => !p.level).length
-  return missing
-    ? `${missing} player${missing === 1 ? ' needs' : 's need'} a level before you can start.`
-    : null
+  if (missing)
+    return `${missing} player${missing === 1 ? ' needs' : 's need'} a level before you can start.`
+  return ctx.now === undefined
+    ? null
+    : startNewEndError({
+        scheduledStartAt: session.scheduledStartAt,
+        scheduledEndAt: session.scheduledEndAt,
+        newEndAt: ctx.newEndAt,
+        now: ctx.now,
+      })
 }
 /** Returns the FCFS partition; callers materialize promoted roster snapshots. */
 export function rebalanceSlots(

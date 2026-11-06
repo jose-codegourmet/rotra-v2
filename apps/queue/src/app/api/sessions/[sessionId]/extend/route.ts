@@ -4,7 +4,7 @@ import { int, readJsonBody, text } from '@rotra/db/service/request'
 import { routeCookieAdapter } from '@rotra/db/service/route-cookies'
 import { cookies } from 'next/headers'
 
-/** Courts and time › Extend by 30 or 60 minutes at the displayed revision. */
+/** Courts and time › Extend 30 / 60 min at the displayed revision: Set end time on end + minutes. */
 export async function POST(
   request: Request,
   ctx: RouteContext<'/api/sessions/[sessionId]/extend'>,

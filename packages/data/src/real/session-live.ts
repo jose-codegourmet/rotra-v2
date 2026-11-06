@@ -1,4 +1,5 @@
 import type { PlayingLevel } from '../player/player.types'
+import { atWhenLabel } from '../queue-session/queueSession.rules'
 import type { QueueSessionInput, SessionCourt } from '../queue-session/queueSession.types'
 import { levelLabel } from '../session-roster/sessionRoster.rules'
 import { realRequest } from './client'
@@ -24,14 +25,20 @@ const readSession = async (sessionId: string) =>
 
 // ---------- Session (Q-PREPARE) ----------
 
-export async function realStartSession(sessionId: string) {
+/** Start session; `newEndAt` is the required new end of a late or other-day start (T3). */
+export async function realStartSession(input: { sessionId: string; newEndAt?: number | null }) {
+  const { sessionId, newEndAt = null } = input
   const { revision } = await readSession(sessionId)
-  await realRequest<WireSession>(`${sessionPath(sessionId)}/start`, {
+  const session = await realRequest<WireSession>(`${sessionPath(sessionId)}/start`, {
     method: 'POST',
-    body: { expectedRevision: revision },
+    body: { expectedRevision: revision, newEndAt: newEndAt == null ? null : iso(newEndAt) },
     fields: { roster: 'roster', session: 'session' },
   })
-  return accepted(await realGetQueueSession(sessionId), 'Session started · levels locked')
+  // The service saves the new end only on a late or other-day start.
+  const endAt = Date.parse(session.scheduledEndAt)
+  const ends =
+    newEndAt != null && endAt === newEndAt ? ` · ends ${atWhenLabel(endAt, Date.now())}` : ''
+  return accepted(await realGetQueueSession(sessionId), `Session started · levels locked${ends}`)
 }
 
 export async function realUpdateQueueSession(input: {
@@ -197,13 +204,27 @@ export async function realRemoveCourt(input: { sessionId: string; courtId: strin
   return accepted(null, 'Court removed')
 }
 
+const endToast = (session: WireSession) =>
+  `Session ends ${atWhenLabel(Date.parse(session.scheduledEndAt), Date.now())} · public page updates after sync`
+
+/** Set end time (T2) at the displayed revision; the service applies the same rule as the mock. */
+export async function realSetSessionEnd(input: { sessionId: string; endAt: number }) {
+  const { revision } = await readSession(input.sessionId)
+  const session = await realRequest<WireSession>(`${sessionPath(input.sessionId)}/end`, {
+    method: 'POST',
+    body: { expectedRevision: revision, endAt: iso(input.endAt) },
+  })
+  return accepted(await realGetQueueSession(input.sessionId), endToast(session))
+}
+
+/** Extend 30 / 60: the service adds the minutes to the saved end and runs Set end time's rule. */
 export async function realExtendSession(input: { sessionId: string; minutes: 30 | 60 }) {
   const { revision } = await readSession(input.sessionId)
   const session = await realRequest<WireSession>(`${sessionPath(input.sessionId)}/extend`, {
     method: 'POST',
     body: { expectedRevision: revision, minutes: input.minutes },
   })
-  return accepted(null, `Session now ends ${hhmm(session.scheduledEndAt)}`)
+  return accepted(await realGetQueueSession(input.sessionId), endToast(session))
 }
 
 // ---------- Roster, presence and waitlist (Q-ROSTER, Q-WAITLIST) ----------

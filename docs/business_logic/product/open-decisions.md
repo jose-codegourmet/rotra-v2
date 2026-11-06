@@ -73,6 +73,7 @@ had read "Started 10:42 PM · Ends 9:00 PM" for a session planned 6–9 PM and s
 | T4 · Every time shows its day | Today: "9:00 PM". Yesterday / tomorrow: "Yesterday 10:42 PM" (lower-case mid-sentence). Further: "Sat, Nov 1 · 9:00 PM". A range ending the next day: "7:00 PM–1:00 AM · next day". Plain times are fine next to a shown date |
 | T5 · Overdue reminder | Live header shows "N left", then "Planned end passed N ago" (warning color, never color alone), with a console banner offering **Set end time** and **Session done**; the dashboard live card says the same. The session never closes by itself |
 | T6 · Whose clock | Times are shown and entered in the club's time zone (Asia/Manila for v1), not the device's. Docs rule only; the prototype assumes device time is club time. The rank-window and ID-date timezone above stays open |
+| T7 · Minimum games | The minimum games stay fixed from the planned window: a new end at Start session or Set end time doesn't change them (Jose, November 6, 2026) |
 | Booking ended on busy courts | A court with a match on it shows **Booking ended** in the warning style once its end passes, like a free court (was always "Until …") |
 
 ### Cancelled sessions

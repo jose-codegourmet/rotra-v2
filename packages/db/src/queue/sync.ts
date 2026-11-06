@@ -26,6 +26,7 @@ import {
   removeWaitingMatch,
   updateWaitingLineup,
 } from './match-queue'
+import { setSessionEnd } from './session-preparation'
 import {
   addNewPlayerToSession,
   addSavedPlayerToSession,
@@ -56,6 +57,10 @@ const DISPATCH: Record<
     payload: Record<string, unknown>,
   ) => Promise<unknown>
 > = {
+  // Set end time works on a downloaded session offline (offline module: "extend time"). It carries
+  // the absolute end, so Extend 30 / 60 upload as this too and a replay never adds the minutes
+  // twice; the end is rechecked on replay (after now, within 24 h of the start, court conflicts).
+  'session.set_end': (c, s, _id, p) => setSessionEnd(c, s, { endAt: String(p.endAt ?? '') }),
   'roster.add_saved': (c, s, id, p) =>
     addSavedPlayerToSession(c, s, { ...p, operationId: id } as never),
   'roster.add_new': (c, s, id, p) =>

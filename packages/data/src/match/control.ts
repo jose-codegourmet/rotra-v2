@@ -23,12 +23,14 @@ import {
   courtNames,
   replacedLineup,
   shortName,
+  SUBSTITUTION_CREDITS,
   substitutionCandidates,
+  substitutionSlots,
   swapTarget,
   validateResult,
   waitingMatches,
 } from './match.rules'
-import type { Match } from './match.types'
+import type { Match, SubstitutionCredit } from './match.types'
 import { matchContext, requireLive } from './queue.mutations'
 
 function control(
@@ -246,15 +248,25 @@ export function invalidateMatch(input: { matchId: string; operationId: string })
     return `Match ${m.matchNo} marked invalid · ${courtNames(m, s.courts)} free`
   })
 }
+/**
+ * Substitute (Q-SUBSTITUTE) in a Playing match, with who gets this game (QM choice): Nobody
+ * (default), the incoming or the outgoing player. One person per team slot: naming a person clears
+ * any earlier choice for the same slot. Only while Playing, so the choice is frozen at Match done or
+ * invalid.
+ */
 export function substitutePlayer(input: {
   matchId: string
   outId: string
   inId: string
+  creditTo?: SubstitutionCredit
   operationId: string
 }) {
   if (isRealDataMode()) return realSubstitutePlayer(input)
   return control(input, 'substitute', (s, m) => {
     requireActive(m)
+    const creditTo = input.creditTo ?? 'none'
+    if (!SUBSTITUTION_CREDITS.includes(creditTo))
+      throw new MockError('permission', 'Choose who gets this game.')
     const incoming = substitutionCandidates(m, s.roster, s.matches).find(
         (p) => p.id === input.inId,
       ),
@@ -264,7 +276,17 @@ export function substitutePlayer(input: {
       throw new MockError('conflict', 'Something changed. Review the match again.')
     const key = team === 'A' ? 'teamA' : 'teamB'
     m[key] = m[key].map((id) => (id === input.outId ? input.inId : id))
-    m.substitutions.push({ outId: input.outId, inId: input.inId, team, at: Date.now() })
-    return `${shortName(incoming)} in for ${shortName(out)}`
+    m.substitutions.push({ outId: input.outId, inId: input.inId, team, at: Date.now(), creditTo })
+    if (creditTo !== 'none') {
+      const slots = substitutionSlots(m.substitutions),
+        mine = slots[slots.length - 1]
+      m.substitutions.forEach((sub, i) => {
+        if (i < slots.length - 1 && slots[i] === mine && (sub.creditTo ?? 'none') !== 'none')
+          sub.creditTo = 'none'
+      })
+    }
+    const who = creditTo === 'incoming' ? incoming : creditTo === 'outgoing' ? out : null,
+      gets = who ? ` · ${shortName(who)} gets the game` : ''
+    return `${shortName(incoming)} in for ${shortName(out)}${gets}`
   })
 }

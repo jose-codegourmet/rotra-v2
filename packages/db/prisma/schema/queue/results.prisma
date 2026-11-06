@@ -44,7 +44,9 @@ model PlayerMatchFact {
   @@map("player_match_facts")
 }
 
-/// Per-entry session totals from the facts. Partial participants count nothing.
+/// Per-entry session totals from the facts, matching the session standings: full games plus a
+/// substitute game the operator gave that entry (`credit_to`); other partial games count nothing.
+/// Long-term rank and the Most Improved / Off Day baselines read full games from the facts instead.
 model ClubSessionPlayerSummary {
   id                   String   @id @default(uuid(7)) @db.Uuid
   clubId               String   @map("club_id") @db.Uuid

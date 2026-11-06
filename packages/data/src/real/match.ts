@@ -1,5 +1,11 @@
-import { computeStandings, courtNames, FORMAT_LABELS, shortName } from '../match/match.rules'
-import type { Match, MatchLineup } from '../match/match.types'
+import {
+  computeStandings,
+  courtNames,
+  FORMAT_LABELS,
+  SUBSTITUTION_CREDITS,
+  shortName,
+} from '../match/match.rules'
+import type { Match, MatchLineup, SubstitutionCredit } from '../match/match.types'
 import { MockError } from '../mock/errors'
 import type {
   PublishResultsInput,
@@ -456,13 +462,18 @@ export async function realInvalidateMatch(input: { matchId: string; operationId:
   return accepted(null, `Match ${m.matchNo} marked invalid · ${courtNames(m, courts)} free`)
 }
 
+/** Substitute with who gets this game (Nobody by default); the server keeps one choice per slot. */
 export async function realSubstitutePlayer(input: {
   matchId: string
   outId: string
   inId: string
+  creditTo?: SubstitutionCredit
   operationId: string
 }) {
   requireOperationId(input.operationId)
+  const creditTo = input.creditTo ?? 'none'
+  if (!SUBSTITUTION_CREDITS.includes(creditTo))
+    throw new MockError('permission', 'Choose who gets this game.')
   const sessionId = sessionOf(input.matchId)
   const { roster } = await realGetSessionRoster(sessionId)
   const incoming = roster.find((p) => p.id === input.inId),
@@ -472,9 +483,11 @@ export async function realSubstitutePlayer(input: {
   await queueCommand<WireMatch>(
     sessionId,
     `/matches/${encodeURIComponent(input.matchId)}/substitution`,
-    { body: { operationId: input.operationId, outId: input.outId, inId: input.inId } },
+    { body: { operationId: input.operationId, outId: input.outId, inId: input.inId, creditTo } },
   )
-  return accepted(null, `${shortName(incoming)} in for ${shortName(out)}`)
+  const who = creditTo === 'incoming' ? incoming : creditTo === 'outgoing' ? out : null,
+    gets = who ? ` · ${shortName(who)} gets the game` : ''
+  return accepted(null, `${shortName(incoming)} in for ${shortName(out)}${gets}`)
 }
 
 // ---------- Results and publication (Q-RESULTS, Q-PUBLISH) ----------

@@ -5,10 +5,12 @@ import {
   canReplacePlayer,
   canSendBack,
   canStart,
+  SUBSTITUTION_CREDITS,
   substitutionCandidates,
   swapTarget,
   validateResult,
 } from '@rotra/data/match/match.rules'
+import type { SubstitutionCredit } from '@rotra/data/match/types'
 import type { ClubContext } from '../auth/account-context'
 import type { MatchDecision, QueueSession } from '../generated/prisma/client'
 import { ServiceError } from '../service/errors'
@@ -438,15 +440,48 @@ export async function swapWithQueue(
 }
 
 /**
+ * The earlier substitution segments of a team slot: walking back from `segment`, each segment a
+ * substitution opened (its operation closed another segment), until one that started the match.
+ */
+function slotSegments(
+  participations: MatchRow['participations'],
+  segment: MatchRow['participations'][number],
+) {
+  const found: MatchRow['participations'] = []
+  let current = segment
+  for (;;) {
+    const opened = current,
+      replaced = participations.find(
+        (p) => p.id !== opened.id && p.leftOperationId === opened.joinedOperationId,
+      )
+    if (!replaced || found.includes(opened)) return found
+    found.push(opened)
+    current = replaced
+  }
+}
+
+/**
  * Q-MATCH · Substitute. Closes the outgoing segment and opens the incoming one with the same
- * operation, and moves the player hold, in one transaction. Both players keep their segments; the
- * shared rule gives neither of them game credit for this match.
+ * operation, and moves the player hold, in one transaction. Both players keep their segments.
+ * `creditTo` (who gets this game, QM choice: none by default, incoming or outgoing) is written on
+ * the incoming segment; naming a person clears an earlier choice in the same team slot, so at most
+ * one person per slot gets the game. Only while active, so the choice is frozen at the decision.
+ * Session counting reads it; long-term performance never does.
  */
 export async function substitutePlayer(
   context: ClubContext,
   sessionId: string,
-  input: { operationId: string; matchId: string; outId: string; inId: string },
+  input: {
+    operationId: string
+    matchId: string
+    outId: string
+    inId: string
+    creditTo?: string
+  },
 ) {
+  const creditTo = (input.creditTo ?? 'none') as SubstitutionCredit
+  if (!SUBSTITUTION_CREDITS.includes(creditTo))
+    throw new ServiceError('invalid', { creditTo: 'Choose who gets this game.' })
   return matchCommand(context, sessionId, {}, async (tx, session) => {
     const match = await activeMatch(tx, session.id, input.matchId)
     if (
@@ -485,8 +520,19 @@ export async function substitutePlayer(
         segmentNo: segments + 1,
         joinedOperationId: input.operationId,
         joinedAt: now,
+        creditTo,
       },
     })
+    if (creditTo !== 'none') {
+      const earlier = slotSegments(match.participations, outgoing).filter(
+        (p) => p.creditTo !== 'none',
+      )
+      if (earlier.length)
+        await tx.matchParticipation.updateMany({
+          where: { id: { in: earlier.map((p) => p.id) } },
+          data: { creditTo: 'none' },
+        })
+    }
     await tx.activePlayerHold.delete({ where: { sessionPlayerId: input.outId } })
     await tx.activePlayerHold.create({
       data: {

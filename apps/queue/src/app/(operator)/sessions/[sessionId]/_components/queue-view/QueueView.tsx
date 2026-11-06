@@ -48,14 +48,14 @@ const errorMessage = (error: unknown) =>
   error instanceof Error ? error.message : 'Something went wrong. Try again.'
 
 /**
- * Q-QUEUE, the console's Queue view: "Queued matches" with Add match, Suggest, Auto queue and
+ * Q-QUEUE, the console's Queue view: "Queued matches" with Add match, Suggest, Generate matches and
  * Regenerate (primary while anything needs attention, disabled when the queue is empty), the warn
  * notice "N waiting matches need attention…", the "One waiting list for every court. MODE mode
  * guides suggestions…" line, and the snake QueueGrid of MatchCards with status from matchStatus.
  * Reorder (drag or arrow keys on ⠿) calls useMoveMatch; Remove × calls useRemoveWaitingMatch at
  * once with its toast (no dialog, per dialogs.md); switching sides on a card calls useSwapPlayers,
  * after which the card shows the lock; pictures open the profile. The sheets behind Add match,
- * Edit, Suggest, Auto queue and Regenerate are Queue › Match editing and Queue generation: they
+ * Edit, Suggest, Generate matches and Regenerate are Queue › Match editing and Queue generation: they
  * arrive through the optional callbacks.
  */
 export function QueueView({
@@ -185,7 +185,7 @@ export function QueueView({
                 Suggest
               </Button>
               <Button size="sm" onClick={() => setWorkspace('auto')} className="sm:w-auto">
-                Auto Queue
+                Generate matches
               </Button>
               <Button
                 size="sm"
@@ -213,7 +213,7 @@ export function QueueView({
           ) : (
             <Card padding="none">
               <EmptyState>
-                No waiting matches. Use Auto queue to generate a few, or add one yourself.
+                No waiting matches. Use Generate matches to create a few, or add one yourself.
               </EmptyState>
             </Card>
           )}

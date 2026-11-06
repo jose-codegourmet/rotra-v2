@@ -367,7 +367,7 @@ function OpenEarlySheet({
           </ul>
         )
       }
-      consequence={`Opening early makes ${one ? 'it' : 'them'} available for matches and Auto Queue now.`}
+      consequence={`Opening early makes ${one ? 'it' : 'them'} available for matches now.`}
       note="The booking time and costs don't change."
       confirmLabel="Open now"
       backLabel="Cancel"

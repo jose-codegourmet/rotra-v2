@@ -233,7 +233,7 @@ export function AutoQueueWorkspace({
         aria-label="Queue workspace"
         options={[
           { value: 'main', label: 'Main Queue' },
-          { value: 'auto', label: 'Auto Queue' },
+          { value: 'auto', label: 'Generate matches' },
         ]}
         value={workspace}
         onChange={(next) => onWorkspaceChange(next as QueueWorkspace)}
@@ -246,7 +246,7 @@ export function AutoQueueWorkspace({
         <div className="flex min-w-0 flex-col gap-5">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <h2 ref={headingRef} tabIndex={-1} className="m-0 text-xl font-bold text-fg">
-              Auto Queue
+              Generate matches
             </h2>
             <span className="text-[13px] text-fg2">
               Drafts are suggestions. Nothing joins the Main Queue until you add it.

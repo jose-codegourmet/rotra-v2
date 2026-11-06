@@ -1,8 +1,9 @@
 import { Button } from '@rotra/ui/button'
 import { cn } from '@rotra/ui/cn'
 import { Icon } from '@rotra/ui/icon'
+import { sessionEndStatus } from '@rotra/ui/overdue-banner'
 import type { ReactNode } from 'react'
-import { formatCountdown, formatDuration, formatShortDate, formatTime } from './NowCard.helpers'
+import { formatCountdown, formatShortDate, formatTime, formatWhenRange } from './NowCard.helpers'
 import { nowCardVariants } from './NowCard.variants'
 
 export type NowCardLive = {
@@ -71,7 +72,7 @@ export function NowCard(props: NowCardProps) {
     'flex flex-col items-end gap-2 text-right max-[700px]:items-stretch max-[700px]:text-left'
 
   if (props.variant === 'live') {
-    const left = props.endsAt - now
+    const end = sessionEndStatus(props.endsAt, now)
     return (
       <section aria-label="Live session" className={sectionClass}>
         <div className="flex min-w-0 flex-col gap-1.5">
@@ -84,8 +85,8 @@ export function NowCard(props: NowCardProps) {
           </span>
           <h2 className="text-[26px] tracking-[-0.5px] [overflow-wrap:anywhere]">{props.title}</h2>
           <p className="m-0 text-[13px] text-fg2">
-            {props.venueName} · {formatTime(props.startsAt)}–{formatTime(props.endsAt)} ·{' '}
-            {left > 0 ? `${formatDuration(now, props.endsAt)} left` : 'past its end time'}
+            {props.venueName} · {formatWhenRange(props.startsAt, props.endsAt, now)} ·{' '}
+            {end.over ? <span className="text-warn">{end.text}</span> : end.text}
           </p>
           <div className="mt-2 flex flex-wrap gap-x-7 gap-y-2.5">
             <Stat value={`${props.courtsInUse}/${props.courts}`} label="courts in use" />

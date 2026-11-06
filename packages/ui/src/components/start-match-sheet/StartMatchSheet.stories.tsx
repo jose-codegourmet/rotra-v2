@@ -70,7 +70,7 @@ export const FunOneVTwo: Story = { args: propsFor(startMatchFixtures.funOneVTwo)
 /** 5v5 takes two courts: both free courts are preselected. */
 export const FiveVFiveTwoCourts: Story = { args: propsFor(startMatchFixtures.fiveVFive) }
 
-/** A player is still on court: the reason shows and Start match stays disabled. */
+/** A player is still on court: the reason shows and Put on court stays disabled. */
 export const Blocked: Story = { args: propsFor(startMatchFixtures.blocked) }
 
 /** Opened from a queue card with no court chosen yet. */
@@ -87,7 +87,7 @@ export const NotOpenCourts: Story = {
   },
 }
 
-/** The start is running: Start match cannot fire twice and the sheet cannot be dismissed. */
+/** Placing is running: Put on court cannot fire twice and the sheet cannot be dismissed. */
 export const Pending: Story = { args: { isPending: true } }
 
 /** The recheck found a change: the sheet stays open with the message. */
@@ -95,8 +95,17 @@ export const SomethingChanged: Story = {
   args: { message: 'Something changed. Review the match again.' },
 }
 
-/** The local save failed: the sheet stays open with its courts, the match is still waiting */
+/** The local save failed: the sheet stays open with its courts, the match is still waiting. */
 export const SaveFailed: Story = { args: { error: 'Changes could not be saved' } }
+
+/** Light theme: a ready doubles. */
+export const DoublesReadyLight: Story = { globals: { theme: 'light' } }
+
+/** Light theme: the block reason. */
+export const BlockedLight: Story = {
+  args: propsFor(startMatchFixtures.blocked),
+  globals: { theme: 'light' },
+}
 
 export const Phone: Story = {
   args: propsFor(startMatchFixtures.fiveVFive),

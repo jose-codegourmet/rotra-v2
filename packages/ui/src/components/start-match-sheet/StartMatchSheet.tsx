@@ -10,7 +10,7 @@ import type { SwapSlot } from '@rotra/ui/swap-sides-area'
 import { type MatchLineupTeam, TeamLineup, type TeamLineupPlayer } from '@rotra/ui/team-lineup'
 import type { ReactNode } from 'react'
 
-/** The waiting match the sheet starts: its number, format and the two teams. */
+/** The waiting match the sheet puts on court: its number, format and the two teams. */
 export type StartMatchLineup = {
   matchNo: number
   format: MatchFormat
@@ -46,17 +46,20 @@ export type StartMatchSheetProps = {
   onCourtIdsChange: (courtIds: string[]) => void
   /** Opens the player's profile; its footer is Back to match */
   onSelectPlayer: (playerId: string, team: MatchLineupTeam) => void
-  /** Switch the players at the two slots (drag or ← / →) before starting */
+  /** Switch the players at the two slots (drag or ← / →) before putting it on court */
   onSwap: (from: SwapSlot, to: SwapSlot) => void
-  /** Back: closes the sheet without starting */
+  /** Back: closes the sheet without putting the match on court */
   onBack: () => void
-  /** Start match with the chosen courts; the owner rechecks players and courts */
+  /**
+   * Put on court with the chosen courts; the owner rechecks players and courts. The match goes On
+   * court (Getting ready); its timer starts later, at Start match on the court.
+   */
   onStart: () => void
-  /** The start is running: Start match cannot fire twice and the sheet cannot be dismissed */
+  /** Placing is running: Put on court cannot fire twice and the sheet cannot be dismissed */
   isPending?: boolean
   /** Shown above the footer, e.g. "Something changed. Review the match again." after a failed recheck */
   message?: ReactNode
-  /** Why the start could not be saved ("Changes could not be saved"); the sheet stays open with its courts and nothing is claimed as started */
+  /** Why the placement could not be saved ("Changes could not be saved"); the sheet stays open with its courts and nothing is claimed as placed */
   error?: ReactNode
 }
 
@@ -72,10 +75,11 @@ const FORMAT_LABEL: Record<MatchFormat, string> = {
 const isFun = (format: MatchFormat) => format.startsWith('fun_')
 
 /**
- * D-START-MATCH (Q-DISPATCH): "Start match N" with the format chip (plus Fun game), Team A VS Team B
- * with switch sides, the free-court buttons (two for 5v5), the not-yet-open courts with Start
- * anyway, and the block reason when the match is not ready. Start match stays disabled until the required courts are chosen and the match is ready.
- * Starting is an explicit Queue Master action, never automatic dispatch.
+ * D-START-MATCH step 1 (Q-DISPATCH): "Put match N on court" with the format chip (plus Fun game),
+ * Team A VS Team B with switch sides, the free-court buttons (two for 5v5), the not-yet-open courts
+ * with Start anyway, and the block reason when the match is not ready. Put on court stays disabled
+ * until the required courts are chosen and the match is ready. Placing does not start the timer:
+ * the match goes On court (Getting ready) and starts at Start match (OnCourtSheet or the court card).
  */
 export function StartMatchSheet({
   open,
@@ -109,7 +113,7 @@ export function StartMatchSheet({
       onOpenChange={(next) => {
         if (!isPending) onOpenChange(next)
       }}
-      title={`Start match ${match.matchNo}`}
+      title={`Put match ${match.matchNo} on court`}
       dismissible={!isPending}
       hideClose={isPending}
       footer={
@@ -118,7 +122,7 @@ export function StartMatchSheet({
             Back
           </Button>
           <Button variant="primary" disabled={!canStart} loading={isPending} onClick={onStart}>
-            Start match
+            Put on court
           </Button>
         </>
       }
@@ -168,6 +172,9 @@ export function StartMatchSheet({
         </section>
       ) : null}
       {ready ? null : <Notice tone="error">{status.reason}</Notice>}
+      <p className="m-0 text-[13px] text-fg2">
+        The match goes on court getting ready. Its time starts when you tap Start match.
+      </p>
       {message ? <Notice tone="warn">{message}</Notice> : null}
       {error ? <Notice tone="error">{error}</Notice> : null}
     </Sheet>

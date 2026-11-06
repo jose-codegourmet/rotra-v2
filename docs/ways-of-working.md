@@ -17,8 +17,9 @@ that disagree.
    through a ticket made from its [mockup change log](mockup-changes/README.md).
 3. **Mock first.** Screens run on `@rotra/data` mocks until the database epic. A finished-looking
    screen still stores nothing; say so.
-4. **Almost no automated tests, by decision.** Lint and type-check are the only automatic gates.
-   Manual verification (§7) is what keeps quality up, so state honestly what you checked.
+4. **Almost no automated tests, by decision.** `make check` (lint, type-check, build and the
+   decided-math tests) is the only gate, run once at the end of a branch (§7). Manual verification
+   (§7) is what keeps quality up, so state honestly what you checked.
 
 ---
 
@@ -139,11 +140,11 @@ Epics are titled `Epic <key> · <Product> › <Module>`.
 - AI-authored commits end with a `Co-Authored-By:` trailer naming the agent.
 - Hooks (husky, in `.husky/`): `commit-msg` runs commitlint with the Conventional Commits config.
   The `pre-commit` lint hook is **disabled for now** (since October 27, 2026) because two agents commit
-  to one working tree and a workspace-wide lint fails on the other agent's unfinished files. Until it is
-  re-enabled, lint and type-check the package you changed before committing
-  (`nvm use && pnpm --filter <package> lint type-check`). There is **no pre-push hook**: build and
-  type-check run locally before a PR (below), not on every push, to keep the loop fast. Do not bypass
-  hooks with `--no-verify`.
+  to one working tree and a workspace-wide lint fails on the other agent's unfinished files. There is
+  **no pre-push hook**: all checks run once, through `make check`, at the end of the branch (§7), not
+  on every commit or push, to keep the loop fast. Do not bypass hooks with `--no-verify`.
+- Fixes that `make check` turns up are folded into the ticket commit they belong to, so one commit =
+  one ticket survives: `git commit --fixup <sha>`, then `GIT_SEQUENCE_EDITOR=: git rebase -i --autosquash <base>`.
 
 ### Auto-merge: pipelines never block
 
@@ -156,8 +157,8 @@ gh pr create --base main --title "<conventional title>" --body-file <body.md>   
 gh pr merge --squash --auto --delete-branch
 ```
 
-- Run `nvm use && pnpm lint && pnpm type-check && pnpm build` **locally before** opening the PR. Auto-merge
-  trusts you; it doesn't check for you.
+- **Never merge or enable auto-merge until `make check` passed on the last commit.** CI is advisory, so
+  this rule is the only gate. Auto-merge trusts you; it doesn't check for you.
 - Then switch back to `main` and `git pull` before starting the next ticket.
 - If `main` is broken after a merge (build or CI red), fixing it comes before the next ticket: open a
   `fix:` PR that references the ticket that broke it.
@@ -167,8 +168,7 @@ gh pr merge --squash --auto --delete-branch
 
 ## 6. Definition of Done
 
-- [ ] `nvm use && pnpm lint` and `nvm use && pnpm type-check` pass
-- [ ] `nvm use && pnpm build` passes for every app or package touched
+- [ ] `make check` passed on the last commit (lint, type-check, build, decided-math tests)
 - [ ] Components: folder layout, `.meta.ts`, and stories in both themes ([coding conventions §3–5](coding-conventions.md#3-components))
 - [ ] Forms: five files, shared fields from `@rotra/schema`, no mutation inside the form
 - [ ] Matches the prototype side by side, dark and light, at 375 px and 1280 px
@@ -181,7 +181,17 @@ gh pr merge --squash --auto --delete-branch
 
 ## 7. Verification
 
-With only a narrowly scoped unit suite, "it builds" proves very little. Every PR has:
+With only a narrowly scoped unit suite, "it builds" proves very little.
+
+**When checks run.** During work, agents run no lint, type-check, build, tests or browser checks. At the
+end of the branch or PR, `make check` runs once, by a light-tier worker following
+[agents/checker.md](agents/checker.md) (or directly, since it is one command; don't spawn an agent for
+one command). It prints `check: OK` or `check: FAILED at <step>` with the tail of that step.
+Browser click-throughs, screenshots and Storybook visual checks (the table below) happen at the end of
+a batch of tickets, or when the owner asks. Agent tiers: medium by default, light for checks and
+mechanical edits, careful/heavy only when the owner asks; no automatic reviewer agent at the end.
+
+Every PR has:
 
 ```md
 ## Verified
@@ -208,10 +218,16 @@ With only a narrowly scoped unit suite, "it builds" proves very little. Every PR
 
 | Layer | Policy |
 |---|---|
-| Lint + type-check + build | Run locally before every PR; CI repeats them as an advisory report |
+| Lint + type-check + build | `make check`, once before merging; CI repeats them as an advisory report |
+| Decided math (session cost, minimum games, substitution game credit, rank and award baselines) | Existing Vitest files run in `make check` (list in `scripts/check.mjs`) |
 | Money and ranking math (break-even, rank, awards) | Unit tests required |
 | Phone parsing, standings/awards math, queue rules | Unit tests allowed with Vitest (F05.1) |
+| Screens, components, Storybook | **Temporarily no new tests** |
 | Everything else | Deferred. Ask before adding tests |
+
+**Temporary test policy.** No new screen, component or Storybook tests for now; the decided-math tests
+keep running in `make check`. Testing switches back on when Supabase/Prisma is connected or real clubs
+start using the app.
 
 ---
 

@@ -42,7 +42,8 @@ add the export before you import it.
 nvm use && pnpm --filter @rotra/ui storybook   # :6006
 ```
 
-- The **Theme** toolbar sets `data-theme` on `<html>`, like the apps. Check every story in both.
+- The **Theme** toolbar sets `data-theme` on `<html>`, like the apps. Visual checks (every story, both
+  themes) happen at the end of a batch or when the owner asks ([ways-of-working §7](../../docs/ways-of-working.md#7-verification)).
 - Viewports: **Phone 375** and **Desktop 1280**.
 - Fonts come from Google Fonts here (`preview-head.html`); the apps use `next/font`.
 - Story titles by product area: `Shared/Button`, `Queue/MatchCard`, `Admin/LicenseForm`.

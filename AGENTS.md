@@ -3,7 +3,7 @@
 > **Entry point for AI coding agents.** Read this file completely; it is deliberately short. Everything
 > else is loaded **on demand** through the routing table in §3. Don't read the whole `docs/` tree.
 
-**Last verified:** 2026-10-31 · **Budget:** under 200 lines.
+**Last verified:** 2026-11-07 · **Budget:** under 200 lines.
 
 ---
 
@@ -139,6 +139,7 @@ nvm use && pnpm mockups                      # routed prototypes on port 9003
 nvm use && pnpm lint                         # Biome
 nvm use && pnpm type-check
 nvm use && pnpm build
+make check                                   # lint, type-check, build, decided-math tests; errors only
 ```
 
 ---
@@ -147,7 +148,7 @@ nvm use && pnpm build
 
 Tickets are GitHub issues labeled `ticket`, sub-issues of `epic` issues, titled
 `<seq> · <key> · <Type>: <what>`. Take the **lowest open `<seq>`** whose *Depends on* issues are closed.
-Open one PR per ticket with `Closes #<n>`, run lint/type-check/build locally, then
+Open one PR per ticket with `Closes #<n>`, pass `make check` on the last commit (§7), then
 `gh pr merge --squash --auto --delete-branch`. **CI never blocks; PRs auto-merge.** Can't do a ticket as
 written? Comment why, label it `blocked`, take the next. **Given a ticket link?** Do that ticket; once
 it's done and merged, check the issue is closed and close it yourself (`gh issue close <n> --comment
@@ -155,8 +156,22 @@ it's done and merged, check the issue is closed and close it yourself (`gh issue
 
 ---
 
-## 7. Definition of Done (short version)
+## 7. Checks and Definition of Done (short version)
 
-Lint, type-check, and build pass. Components have stories (both themes) and a `.meta.ts`. It matches the
+- **Check once, at the end.** During work, don't run lint, type-check, build, tests or browser checks.
+  Run `make check` once at the end of the branch or PR, before merging. A light-tier worker (Haiku) runs
+  it using [docs/agents/checker.md](docs/agents/checker.md); one quick command you may run yourself.
+- **Hard rule:** never merge or enable auto-merge until `make check` passed on the last commit. CI is
+  advisory, so this is the only gate.
+- **Fixes fold into their ticket commit:** `git commit --fixup <sha>`, then
+  `GIT_SEQUENCE_EDITOR=: git rebase -i --autosquash <base>`. One commit = one ticket.
+- **Tests, for now:** no new screen, component or Storybook tests. The decided-math tests stay in
+  `make check`. Testing switches back on when Supabase/Prisma is connected or real clubs use the app.
+- **Browser click-throughs, screenshots, Storybook visual checks:** only at the end of a batch, or when
+  the owner asks.
+- **Agent tiers:** medium by default; light for checks and mechanical edits; careful/heavy only when
+  the owner asks. No automatic reviewer agent at the end.
+
+`make check` passes. Components have stories (both themes) and a `.meta.ts`. It matches the
 prototype at 375 px and 1280 px in dark and light. Docs updated in the same PR if anything became untrue.
 The PR says exactly what was verified and what wasn't. Full list: [ways-of-working.md §6–7](docs/ways-of-working.md#6-definition-of-done).

@@ -3,6 +3,7 @@ import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, mockStore, readMockState } from '../mock/store'
 import { queueMutation, requireSessionWrite, sessionIn } from '../mock/transaction'
+import { autoFillCourts, autoFillNote } from '../queue-session/courtFill'
 import {
   realEditAutoQueueDrafts,
   realGenerateAutoQueueDrafts,
@@ -168,7 +169,7 @@ export function transferAutoQueueDrafts(input: {
       state.committedIds.push(...input.draftIds)
       return {
         data: matches,
-        text: `${matches.length} draft${matches.length === 1 ? '' : 's'} added to Main Queue`,
+        text: `${matches.length} draft${matches.length === 1 ? '' : 's'} added to Main Queue${autoFillNote(s, autoFillCourts(s, session.id))}`,
       }
     },
   )

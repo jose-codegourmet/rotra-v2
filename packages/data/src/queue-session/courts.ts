@@ -5,8 +5,6 @@ import { MockError } from '../mock/errors'
 import type { MockState } from '../mock/store'
 import { queueMutation, sessionIn } from '../mock/transaction'
 import { isRealDataMode } from '../real/mode'
-import { recomputeMinimum } from './mutations'
-import { atWhenLabel, sessionEndError } from './queueSession.rules'
 import {
   realAddCourt,
   realExtendSession,
@@ -17,6 +15,9 @@ import {
   realUndoCourtEarlyOpen,
   realUpdateCourt,
 } from '../real/session-live'
+import { autoFillCourts, autoFillNote } from './courtFill'
+import { recomputeMinimum } from './mutations'
+import { atWhenLabel, sessionEndError } from './queueSession.rules'
 
 const hhmm = (n: number) =>
   new Date(n).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
@@ -47,9 +48,10 @@ export function addCourt(input: {
       removedAt: null,
     }
     s.courts.push(court)
+    const placed = autoFillCourts(s, session.id, { onlyCourtIds: [court.id] })
     return {
       data: court,
-      text: `${court.label} added · opens ${hhmm(startsAt)} · open until ${hhmm(court.openUntil ?? session.scheduledEndAt)}`,
+      text: `${court.label} added · opens ${hhmm(startsAt)} · open until ${hhmm(court.openUntil ?? session.scheduledEndAt)}${autoFillNote(s, placed)}`,
     }
   })
 }
@@ -111,9 +113,10 @@ export function openCourtEarly(input: { sessionId: string; courtId: string }) {
   return queueMutation({ area: 'Courts and time', sessionId: input.sessionId }, (s) => {
     const [court] = openEarly(s, input.sessionId, [input.courtId])
     if (!court) throw new MockError('conflict', 'Something changed. Review the courts again.')
+    const placed = autoFillCourts(s, input.sessionId, { onlyCourtIds: [court.id] })
     return {
       data: court,
-      text: `${court.label} opened early · planned ${hhmm(court.startsAt ?? 0)}`,
+      text: `${court.label} opened early · planned ${hhmm(court.startsAt ?? 0)}${autoFillNote(s, placed)}`,
     }
   })
 }
@@ -121,12 +124,14 @@ export function openAllCourtsEarly(input: { sessionId: string }) {
   if (isRealDataMode()) return realOpenAllCourtsEarly(input)
   return queueMutation({ area: 'Courts and time', sessionId: input.sessionId }, (s) => {
     const courts = openEarly(s, input.sessionId, null)
+    const placed = autoFillCourts(s, input.sessionId, { onlyCourtIds: courts.map((c) => c.id) })
     return {
       data: courts,
-      text:
+      text: `${
         courts.length === 1
           ? `${courts[0]?.label} opened early · planned ${hhmm(courts[0]?.startsAt ?? 0)}`
-          : `${courts.length} courts opened early`,
+          : `${courts.length} courts opened early`
+      }${autoFillNote(s, placed)}`,
     }
   })
 }

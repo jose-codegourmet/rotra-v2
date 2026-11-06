@@ -1,6 +1,7 @@
 import { MockError } from '../mock/errors'
 import type { MockState } from '../mock/store'
 import { queueMutation, sessionIn } from '../mock/transaction'
+import { autoFillCourts, autoFillNote } from '../queue-session/courtFill'
 import {
   realAddMatch,
   realAddSuggestedMatch,
@@ -33,6 +34,10 @@ function change<T>(sessionId: string, fn: (s: MockState) => { data: T; text: str
     requireLive(s, sessionId)
     return fn(s)
   })
+}
+/** A match was added: in Auto Queue a free open court gets the next eligible match, same write. */
+function withAutoFill<T>(s: MockState, sessionId: string, out: { data: T; text: string }) {
+  return { data: out.data, text: `${out.text}${autoFillNote(s, autoFillCourts(s, sessionId))}` }
 }
 function validate(s: MockState, id: string, lineup: MatchLineup, manual: boolean) {
   const session = sessionIn(s, id)
@@ -94,16 +99,18 @@ function waiting(s: MockState, id: string, sessionId: string) {
 }
 export function addMatch(input: MatchLineup & { sessionId: string }) {
   if (isRealDataMode()) return realAddMatch(input)
-  return change(input.sessionId, (s) => ({
-    data: append(
-      s,
-      input.sessionId,
-      { format: input.format, teamA: input.teamA, teamB: input.teamB },
-      'manual',
-      true,
-    ),
-    text: 'Match added to the queue',
-  }))
+  return change(input.sessionId, (s) =>
+    withAutoFill(s, input.sessionId, {
+      data: append(
+        s,
+        input.sessionId,
+        { format: input.format, teamA: input.teamA, teamB: input.teamB },
+        'manual',
+        true,
+      ),
+      text: 'Match added to the queue',
+    }),
+  )
 }
 export function makeMatch(input: { sessionId: string; selection: string[] }) {
   if (isRealDataMode()) return realMakeMatch(input)
@@ -122,7 +129,10 @@ export function makeMatch(input: { sessionId: string; selection: string[] }) {
       position = s.matches.filter(
         (m) => m.sessionId === input.sessionId && m.state === 'waiting',
       ).length
-    return { data, text: `${FORMAT_LABELS[plan.format]} added to the queue at #${position}` }
+    return withAutoFill(s, input.sessionId, {
+      data,
+      text: `${FORMAT_LABELS[plan.format]} added to the queue at #${position}`,
+    })
   })
 }
 export function updateMatchLineup(input: {
@@ -148,10 +158,12 @@ export function addSuggestedMatch(input: {
   switched: boolean
 }) {
   if (isRealDataMode()) return realAddSuggestedMatch(input)
-  return change(input.sessionId, (s) => ({
-    data: append(s, input.sessionId, input.lineup, 'suggested', input.switched),
-    text: 'Suggestion added to the queue',
-  }))
+  return change(input.sessionId, (s) =>
+    withAutoFill(s, input.sessionId, {
+      data: append(s, input.sessionId, input.lineup, 'suggested', input.switched),
+      text: 'Suggestion added to the queue',
+    }),
+  )
 }
 export function autoQueue(input: { sessionId: string; n: 2 | 3 | 4 | 6 }) {
   if (isRealDataMode()) return realAutoQueue(input)
@@ -167,7 +179,10 @@ export function autoQueue(input: { sessionId: string; n: 2 | 3 | 4 | 6 }) {
     )
     if (result.error) throw new MockError('permission', result.error)
     const matches = result.matches.map((m) => append(s, input.sessionId, m, 'auto', false))
-    return { data: matches, text: `${matches.length} matches added to the queue` }
+    return withAutoFill(s, input.sessionId, {
+      data: matches,
+      text: `${matches.length} matches added to the queue`,
+    })
   })
 }
 export function regenerateQueue(sessionId: string) {
@@ -195,7 +210,10 @@ export function regenerateQueue(sessionId: string) {
     const matches = result.matches.map((lineup, i) =>
       append(s, sessionId, lineup, 'auto', false, replace[i]?.queuePosition),
     )
-    return { data: matches, text: `Queue regenerated · ${matches.length} rebuilt` }
+    return withAutoFill(s, sessionId, {
+      data: matches,
+      text: `Queue regenerated · ${matches.length} rebuilt`,
+    })
   })
 }
 export function moveMatch(input: {

@@ -1,6 +1,7 @@
 import { MockError } from '../mock/errors'
 import { type MockState, readMockState } from '../mock/store'
 import { queueMutation } from '../mock/transaction'
+import { autoFillCourts, autoFillNote, putOnCourt } from '../queue-session/courtFill'
 import {
   realCompleteMatch,
   realInvalidateMatch,
@@ -22,8 +23,8 @@ import {
   canStart,
   courtNames,
   replacedLineup,
-  shortName,
   SUBSTITUTION_CREDITS,
+  shortName,
   substitutionCandidates,
   substitutionSlots,
   swapTarget,
@@ -73,10 +74,7 @@ export function placeOnCourt(input: { matchId: string; courtIds: string[]; opera
   return control(input, 'place', (s, m) => {
     if (!canPlace(m, input.courtIds, matchContext(s, m.sessionId)))
       throw new MockError('conflict', 'Something changed. Review the match again.')
-    m.state = 'on_court'
-    m.courtIds = [...input.courtIds]
-    m.placedAt = Date.now()
-    m.startedAt = null
+    putOnCourt(m, input.courtIds)
     return `Match ${m.matchNo} on ${courtNames(m, s.courts)} · getting ready`
   })
 }
@@ -112,7 +110,8 @@ function unplace(m: Match) {
 /**
  * Send back to queue (Q-ON-COURT): the On court match goes to the **top** of the queue and its
  * court(s) free up. It keeps `manualProtected`, so a match edited while On court (Replace player)
- * goes back protected. Auto Queue refilling the freed court is Q12.25. Allowed offline.
+ * goes back protected. In Auto Queue the freed court is refilled, in the same write, with the next
+ * eligible match other than this one. Allowed offline (auto filling pauses offline).
  */
 export function sendBackToQueue(input: { matchId: string; operationId: string }) {
   if (isRealDataMode()) return realSendBackToQueue(input)
@@ -125,14 +124,16 @@ export function sendBackToQueue(input: { matchId: string; operationId: string })
       const rest = waitingMatches(s.matches.filter((x) => x.sessionId === m.sessionId))
       unplace(m)
       for (const [i, x] of [m, ...rest].entries()) x.queuePosition = i + 1
-      return `Match ${m.matchNo} back to #1 in the queue · ${where} free`
+      const placed = autoFillCourts(s, m.sessionId, { exceptMatchId: m.id })
+      return `Match ${m.matchNo} back to #1 in the queue · ${where} free${autoFillNote(s, placed)}`
     },
     'Queue',
   )
 }
 /**
  * Move to another court (Q-ON-COURT): the On court match takes free open court(s) (two for 5v5)
- * and releases the ones it held. Still On court, nothing starts. Allowed offline.
+ * and releases the ones it held. Still On court, nothing starts. In Auto Queue the court it left
+ * is refilled in the same write. Allowed offline (auto filling pauses offline).
  */
 export function moveCourt(input: { matchId: string; courtIds: string[]; operationId: string }) {
   if (isRealDataMode()) return realMoveCourt(input)
@@ -140,7 +141,8 @@ export function moveCourt(input: { matchId: string; courtIds: string[]; operatio
     if (!canMoveCourt(m, input.courtIds, matchContext(s, m.sessionId))) throw changed()
     const from = courtNames(m, s.courts)
     m.courtIds = [...input.courtIds]
-    return `Match ${m.matchNo} moved from ${from} to ${courtNames(m, s.courts)} · getting ready`
+    const placed = autoFillCourts(s, m.sessionId)
+    return `Match ${m.matchNo} moved from ${from} to ${courtNames(m, s.courts)} · getting ready${autoFillNote(s, placed)}`
   })
 }
 /**
@@ -156,8 +158,7 @@ export function replacePlayer(input: {
 }) {
   if (isRealDataMode()) return realReplacePlayer(input)
   return control(input, 'replace', (s, m) => {
-    if (!canReplacePlayer(m, input.outId, input.inId, matchContext(s, m.sessionId)))
-      throw changed()
+    if (!canReplacePlayer(m, input.outId, input.inId, matchContext(s, m.sessionId))) throw changed()
     const incoming = s.roster.find((p) => p.id === input.inId),
       out = s.roster.find((p) => p.id === input.outId)
     if (!incoming || !out) throw changed()
@@ -193,17 +194,14 @@ export function swapWithQueue(input: {
         position = n.queuePosition
       unplace(m)
       m.queuePosition = position
-      n.state = 'on_court'
-      n.courtIds = courtIds
-      n.placedAt = Date.now()
-      n.startedAt = null
-      const at =
-        waitingMatches(s.matches.filter((x) => x.sessionId === m.sessionId)).indexOf(m) + 1
+      putOnCourt(n, courtIds)
+      const at = waitingMatches(s.matches.filter((x) => x.sessionId === m.sessionId)).indexOf(m) + 1
       return `Match ${n.matchNo} swapped onto ${where} · getting ready · Match ${m.matchNo} back to #${at} in the queue`
     },
     'Queue',
   )
 }
+/** Match done. In Auto Queue the freed court(s) get the next eligible match in the same write. */
 export function completeMatch(input: {
   matchId: string
   winningTeam?: 'A' | 'B' | null
@@ -229,9 +227,11 @@ export function completeMatch(input: {
       teamBScore: input.teamBScore ?? null,
       confirmedAt: m.endedAt,
     }
-    return `Team ${result.winner} wins match ${m.matchNo} · ${courtNames(m, s.courts)} free`
+    const placed = autoFillCourts(s, m.sessionId)
+    return `Team ${result.winner} wins match ${m.matchNo} · ${courtNames(m, s.courts)} free${autoFillNote(s, placed)}`
   })
 }
+/** Invalid. In Auto Queue the freed court(s) get the next eligible match in the same write. */
 export function invalidateMatch(input: { matchId: string; operationId: string }) {
   if (isRealDataMode()) return realInvalidateMatch(input)
   return control(input, 'invalidate', (s, m) => {
@@ -245,7 +245,8 @@ export function invalidateMatch(input: { matchId: string; operationId: string })
       teamBScore: null,
       confirmedAt: m.endedAt,
     }
-    return `Match ${m.matchNo} marked invalid · ${courtNames(m, s.courts)} free`
+    const placed = autoFillCourts(s, m.sessionId)
+    return `Match ${m.matchNo} marked invalid · ${courtNames(m, s.courts)} free${autoFillNote(s, placed)}`
   })
 }
 /**

@@ -47,6 +47,13 @@ import { lockSession, requireSessionAccess, type Tx } from './session-store'
  * and reprocessing re-runs the idempotent command, which returns the stored effect.
  */
 
+/**
+ * Offline replay never auto-places (owner decision, November 6, 2026): while a device is offline
+ * Auto Queue pauses, so the services that can trigger it run with `replay` and fill no court.
+ * The Manual Queue | Auto Queue switch needs internet and has no command kind here.
+ */
+const REPLAY = { replay: true } as const
+
 /** Uploadable command kinds → the online service they run. Anything else is rejected. */
 const DISPATCH: Record<
   string,
@@ -70,12 +77,13 @@ const DISPATCH: Record<
   'join_request.confirm': (c, _s, id, p) =>
     confirmJoinRequest(c, { ...p, operationId: id } as never),
   'join_request.decline': (c, _s, _id, p) => declineJoinRequest(c, p as never),
-  'queue.add': (c, s, id, p) => addManualMatch(c, s, { ...p, operationId: id } as never),
-  'queue.make': (c, s, id, p) => makeMatch(c, s, { ...p, operationId: id } as never),
+  'queue.add': (c, s, id, p) => addManualMatch(c, s, { ...p, operationId: id } as never, REPLAY),
+  'queue.make': (c, s, id, p) => makeMatch(c, s, { ...p, operationId: id } as never, REPLAY),
   'queue.add_suggested': (c, s, id, p) =>
-    addSuggestedMatch(c, s, { ...p, operationId: id } as never),
-  'queue.auto': (c, s, id, p) => autoQueue(c, s, { ...p, operationId: id } as never),
-  'queue.regenerate': (c, s, id, p) => regenerateQueue(c, s, { ...p, operationId: id } as never),
+    addSuggestedMatch(c, s, { ...p, operationId: id } as never, REPLAY),
+  'queue.auto': (c, s, id, p) => autoQueue(c, s, { ...p, operationId: id } as never, REPLAY),
+  'queue.regenerate': (c, s, id, p) =>
+    regenerateQueue(c, s, { ...p, operationId: id } as never, REPLAY),
   'queue.move': (c, s, _id, p) => moveMatch(c, s, p as never),
   'queue.lineup': (c, s, id, p) => updateWaitingLineup(c, s, { ...p, operationId: id } as never),
   'queue.remove': (c, s, _id, p) => removeWaitingMatch(c, s, p as never),
@@ -85,8 +93,9 @@ const DISPATCH: Record<
   // The On court actions are match edits, which work on a downloaded session offline (offline
   // module); each rechecks on replay, so a court, player or swap target that changed since is a
   // quarantined conflict, never a double hold.
-  'match.send_back': (c, s, id, p) => sendBackToQueue(c, s, { ...p, operationId: id } as never),
-  'match.move_court': (c, s, id, p) => moveCourt(c, s, { ...p, operationId: id } as never),
+  'match.send_back': (c, s, id, p) =>
+    sendBackToQueue(c, s, { ...p, operationId: id } as never, REPLAY),
+  'match.move_court': (c, s, id, p) => moveCourt(c, s, { ...p, operationId: id } as never, REPLAY),
   'match.replace': (c, s, id, p) => replacePlayer(c, s, { ...p, operationId: id } as never),
   'match.swap': (c, s, id, p) => swapWithQueue(c, s, { ...p, operationId: id } as never),
   // From On court the payload carries no courts; the older one-step start still sends them.
@@ -95,8 +104,10 @@ const DISPATCH: Record<
   // The payload may carry `creditTo` (who gets this game); missing means none, as for an older
   // client. The service validates it and keeps one choice per team slot on replay too.
   'match.substitute': (c, s, id, p) => substitutePlayer(c, s, { ...p, operationId: id } as never),
-  'match.complete': (c, s, id, p) => completeMatch(c, s, { ...p, operationId: id } as never),
-  'match.invalidate': (c, s, id, p) => invalidateMatch(c, s, { ...p, operationId: id } as never),
+  'match.complete': (c, s, id, p) =>
+    completeMatch(c, s, { ...p, operationId: id } as never, REPLAY),
+  'match.invalidate': (c, s, id, p) =>
+    invalidateMatch(c, s, { ...p, operationId: id } as never, REPLAY),
   'payment.set': (c, s, id, p) => setPaid(c, s, { ...p, operationId: id } as never),
 }
 

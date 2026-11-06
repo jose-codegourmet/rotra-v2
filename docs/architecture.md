@@ -1,6 +1,6 @@
 # Architecture — ROTRA v1
 
-**Last verified:** 2026-11-01 · **Status:** target architecture for the v1 rebuild, with mock
+**Last verified:** 2026-11-06 · **Status:** target architecture for the v1 rebuild, with mock
 implementations in progress. Section 1 distinguishes implemented flows from future work.
 
 **Read this when** you add an app, package, route, provider, data hook, or dependency, or need to know
@@ -156,7 +156,7 @@ Individual presence uses a transient QueryClient/session-scoped DebouncedBatch o
                   └─ fetchers.ts  ──►  mock store (in memory, seeded from fixtures, fake latency)
 ```
 
-- **Auto Queue drafts** are per-session in-memory batches outside accepted matches. Selection and clearing write no sync log; only explicit atomic transfer allocates match numbers. Drafts and confirmations reset with the mock store (in real mode they live in `real/autoQueue.ts` and reset on reload).
+- **Generate matches drafts** (formerly called Auto Queue; renamed 2026-11-06; code names unchanged) are per-session in-memory batches outside accepted matches. Selection and clearing write no sync log; only explicit atomic transfer allocates match numbers. Drafts and confirmations reset with the mock store (in real mode they live in `real/autoQueue.ts` and reset on reload).
 - **Fixtures** in `@rotra/data/fixtures/` copy the prototypes' sample clubs, players, sessions, and
   results. Storybook and the mock store use the same fixtures.
 - **The mock store** keeps state in memory for the page visit and resets on reload. Mutations change
@@ -360,11 +360,11 @@ download.
 Route Handlers (list in [services](database_design/product/services.md)), backed by
 `@rotra/db/queue/match-queue`, `match-control`, `results` and `finalization`. Hooks and query keys are
 unchanged. `real/match.ts` keeps the last read of each session's queue: reorder, lineup edits,
-switch sides, remove, Auto queue, Regenerate and an accepted suggestion send its queue revision (a
+switch sides, remove, Generate matches, Regenerate and an accepted suggestion send its queue revision (a
 suggestion also its session revision), so a change made elsewhere is a conflict; match control
 sends the screen's `operationId`, other commands a fresh one. Live standings use the shared
 counting rule over the saved roster and matches. Everything is online only: the outbox and offline
-match numbering wait on #246. **Auto queue drafts** stay a working set on the device
+match numbering wait on #246. **Generate matches drafts** (formerly called Auto Queue) stay a working set on the device
 (`real/autoQueue.ts`, one per session, lost on reload): built from the saved session, roster and
 matches and generated with the shared `autoQueue.rules` (the prototype's draft weights, pending
 #247), never the mock store. Add to Main Queue rechecks each draft against a fresh read, then sends

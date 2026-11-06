@@ -1,6 +1,6 @@
 # Design decisions before migrations
 
-**Last verified:** 2026-11-01 for the F07.34 wiring gaps (#317).
+**Last verified:** 2026-11-06 for the On court, substitution-credit and times-and-days proposals; 2026-11-01 for the F07.34 wiring gaps (#317).
 
 **Status:** Review register, not a questionnaire or approval request for writing these docs.
 
@@ -35,16 +35,39 @@ and [schema dependencies](schema-dependencies.md) identify their consumers.
 - Authentication provider support/configuration for club username login and player phone-or-email password login; email claim/recovery verification.
 - Historical guest-link confirmation evidence, mistaken-link handling, and the auditable attribution mechanism; including earlier games after confirmed identity is settled below.
 - Whether assessments for no-shows, roster entries removed during preparation, or invalid sessions remain eligible; assessment changes already sync immediately, independently of match performance.
-- Exact award evidence calculations (partial substitutes are now excluded from local standings and awards).
+- Exact award evidence calculations (partial substitutes are excluded from local standings and awards unless the Queue Master gave one the game; see below).
 - Interrupted-device conflict resolution versus irreversible winners. Never implement last-write-wins as an accidental answer.
 - Long-term policy for finalization with active games (v1 refuses it); whether unused waiting matches are kept frozen or marked removed; recovery of a session already marked invalid.
-- Collision-free `match_no` allocation across offline devices.
+- Collision-free `match_no` allocation across offline devices, and collision-free court placement (two devices putting the same match or court On court while disconnected).
 - Whether shuttle plan lines snapshot the inventory unit cost at save time (the prototype uses the live price).
 - What happens to a paid mark when a budget reduction moves that player to the waitlist (the prototype keeps it and shows it again if they regain a slot; `session_payment_marks` keys on the roster entry).
 - Offline inventory edits, automatic stock deduction, and non-peso currencies.
 - Phone/contact conflict handling and aliasing duplicate offline club-player IDs without rewriting confirmed history.
 - City/country code registry, sequence formatting above 9999, and founding-location corrections.
 - Renewal dates and overlapping terms, refunds, offline expiry enforcement, flag targeting, and when offline devices pick up flag changes. (Per-club prices, free tester clubs, owner-added clubs and owner-created flags were settled October 27, 2026.)
+
+## Owner decisions recorded November 6, 2026
+
+Source: [mockup change log](../../mockup-changes/2026-11-06-queue-on-court-and-sub-credit.md) and the [business decision summary](../../business_logic/product/open-decisions.md#settled-by-the-product-owner-on-november-6-2026). These are **proposals** for the database epic; nothing is migrated.
+
+- `matches.state` gains `on_court` (placed, not started) between `waiting` and `active`, with `placed_at` and the court assignment before start. `started_at` is set only at Start match. Holds are proposed to start at placement, so On court players are busy.
+- Substitutions gain `credit_to`: `none` (default) · `incoming` · `outgoing`; frozen when the match is decided. Where the field lives is open.
+- `queue_sessions` gains `court_fill_mode`: `manual` (default) · `auto`.
+- Session standings, awards, game counts and minimum progress include a credited substitute as a full participant; long-term performance and rank exclude both partial players regardless of `credit_to`.
+- At Session done, `on_court` matches that never started are dropped like waiting matches. Whether either kind is kept frozen or marked removed stays open (above).
+- New commands are proposed (place on court, send back to queue, move to another court, set court fill mode); see [command contracts](command-contracts.md).
+
+Times and days ([change log](../../mockup-changes/2026-11-06-queue-time-and-day.md)), also proposals:
+
+- Club time zone for **display and entry** is settled: Asia/Manila for v1. Storage stays `timestamptz` instants ([conventions](conventions.md)). The canonical timezone for ID dates and rank-window cutoffs stays open (above).
+- `scheduled_end_at` becomes editable after start (any instant after now, up to 24 h after `started_at`); `started_at` stays fixed. A late or other-day `startSession` carries a new end. Court planned starts and `open_until` are full instants; see [sessions and roster](queue/modules/sessions-roster.md).
+
+Cancelled sessions ([change log](../../mockup-changes/2026-11-06-queue-example-sessions-and-cancel.md)), also proposals:
+
+- `queue_sessions.state` gains `cancelled`, only from `prepared`, final; `cancelled_at` and nullable `cancel_reason`. Cancelled sessions leave the overlap exclusion. See [sessions and roster](queue/modules/sessions-roster.md).
+- A proposed `cancelSession` command, idempotent on its command ID; see [command contracts](command-contracts.md).
+- Roster, waitlist and payment marks are retained; payment marks become read-only; no refund records.
+- Pending join requests close (`closed` status proposed). Open: whether cancelling may run offline on a downloaded copy.
 
 ## Owner decisions recorded October 28, 2026
 
@@ -83,9 +106,9 @@ Found on November 2, 2026. Nothing here was decided by the wiring.
 | Gap | Waits on | Kind |
 |---|---|---|
 | Session done (`finalizeSession`, review and status) is wired at the owner's request with the proposed barriers (no active match, completeness proven, ranking policy in effect); its projection and slide jobs run in the request and on each status read (interim in-request worker), not on a hosted worker | #246 (finalization barriers), #243 (worker hosting) | Decision + chore |
-| Auto queue drafts are wired at the owner's request with the prototype's draft weights; the working set lives only on the device (lost on reload, not shared between devices) and only Add to Main Queue is saved (`source: 'auto'`) | #247 (queue generation weights); a stored working set only if wanted | Decision |
+| Generate matches drafts (formerly called Auto Queue) are wired at the owner's request with the prototype's draft weights; the working set lives only on the device (lost on reload, not shared between devices) and only Add to Main Queue is saved (`source: 'auto'`) | #247 (queue generation weights); a stored working set only if wanted | Decision |
 | Real-mode queue commands are online only; offline match numbering and the outbox are not built | #246 | Decision |
-| A retried add, Make match, Auto queue or Regenerate whose reply never came back sends a new operation ID (the screens supply none), so the operator checks the queue before retrying | Mockup-first if a stable per-sheet ID is wanted | Chore |
+| A retried add, Make match, Generate matches or Regenerate whose reply never came back sends a new operation ID (the screens supply none), so the operator checks the queue before retrying | Mockup-first if a stable per-sheet ID is wanted | Chore |
 | The mock publishes an Off-Day-only selection; `publishResults` refuses it (Off Day goes with the awards slide) | Results publication rules (#248) | Decision |
 
 ## Design limits

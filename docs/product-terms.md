@@ -1,6 +1,6 @@
 # Product terms — ROTRA v1
 
-**Last verified:** 2026-11-01 · **Owner:** product owner · **Single source of vocabulary.** If a word here
+**Last verified:** 2026-11-06 · **Owner:** product owner · **Single source of vocabulary.** If a word here
 disagrees with a business, screen, or database doc, this file is wrong and must be fixed in the same PR.
 
 **Read this when** a task uses a domain word, or names a type, component, route, query key, enum value,
@@ -17,7 +17,7 @@ or piece of UI copy. Rules behind each term live in the business docs linked per
 | Queue, never the legacy "Que" (code, copy, docs) | Queue, Queue Session, Queue Master | Que, Que Session, Que Master |
 | The player app's product name | Player Information | Players app, Profile app |
 | Match done and Session done are different actions | Match done · Session done | Finish, Complete, End (ambiguous) |
-| An invalid game is "invalid", never "void" or "unscored" | Invalid match | Voided, Unscored, Cancelled |
+| An invalid game is "invalid", never "void" or "unscored" ("Cancelled" is only a session status, never a match's) | Invalid match | Voided, Unscored, Cancelled |
 
 The prototypes call the Player Information app "ROTRA Players"; that is a prototype title, not the product name.
 
@@ -51,7 +51,7 @@ Rules: [Sessions](business_logic/product/queue/modules/sessions/README.md) ·
 | Term | Meaning |
 |---|---|
 | Queue Session | A whole club event, e.g. 8–11 PM. One club has at most one active session |
-| Session states | **Prepared** (set up, not started) → **Active** (running) → **Finalized** (validly finished) or **Invalid** (untrusted records). DB proposal adds a transient `finalizing` and names finalized `completed` |
+| Session states | **Prepared** (set up, not started) → **Active** (running) → **Finalized** (validly finished) or **Invalid** (untrusted records). A prepared session can instead become **Cancelled** (called off before Start session; final). DB proposal adds a transient `finalizing` and names finalized `completed` |
 | Slot | An operator-confirmed place in a session |
 | Slot budget | Players per court (club default 8) × courts = number of slots |
 | Waitlist | Players awaiting admission; prepared placement is first-come, while during an active session the Queue Master may choose anyone |
@@ -62,9 +62,13 @@ Rules: [Sessions](business_logic/product/queue/modules/sessions/README.md) ·
 | Calculated minimum | Minimum-games target estimated from courts, length, players, formats; operator can override |
 | Planned start | A court booking start; the court is unavailable for dispatch until then |
 | Open until | A court's planned end, fixed or following session end; a reminder, never a hard stop |
-| Booking ended | A court past its closing time |
+| Booking ended | A court past its closing time, free or with a match on it (warning style) |
+| Short on players | Live console banner when the present players can't fill every open court: "7 players present: enough for 1 doubles court. 3 sit out each game." A free court that can't get a match says "Not enough free players." |
+| Planned end | The session's scheduled end (in setup, also a court's). A reminder: the session never closes at it. Past it the console says "Planned end passed N ago" |
+| Set end time | Live action in **Courts and time** (header button, formerly **Extend time**): move the session end to any time after now; **Extend 30 min / 60 min** are shortcuts. The start time is fixed after Start session |
 | Venue | A place the club plays; the club's founding location is separate and fixed |
-| Session record | Read-only view of a finalized or invalid session |
+| Session record | Read-only view of a finalized, invalid or cancelled session |
+| Cancel session | Preparation action that calls off a prepared session before Start session. Final; optional reason. Not "Delete session" (a session nobody is confirmed in) |
 
 ---
 
@@ -118,9 +122,13 @@ Rules: [Queueing](business_logic/product/queue/modules/queueing/README.md)
 | Make match | Operator picks players; ROTRA picks the format from the count and balances teams |
 | Suggest | ROTRA proposes one lineup with a reason, for approval |
 | Main Queue | Accepted shared waiting list used for dispatch |
-| Auto Queue | Five alternative generation tabs holding drafts until explicitly transferred to the Main Queue |
-| Available Players / Plan Ahead / Longest Wait / Fewest Games | Auto Queue generation strategies |
-| Catch Up | Auto Queue strategy with an explicitly chosen game target, separate from the session minimum. “Games each player should reach” prioritizes eligible players below that number; completed games, Main Queue waiting assignments and earlier drafts in this batch count toward reaching it in the plan. Planned games are not completed results |
+| Generate matches | Five alternative generation tabs holding drafts until explicitly transferred to the Main Queue. Formerly called Auto Queue; renamed 2026-11-06. Never "Generate Queues" (a session has one queue) |
+| Auto Queue · Manual Queue | The per-session court-fill switch on the Courts section (owner decision, November 6, 2026). **Manual Queue** (default): a free court proposes the next ready match and the operator taps **Put on court**. **Auto Queue**: ROTRA puts the next ready match On court by itself. Neither mode ever starts a match |
+| Put on court | Places a waiting match on a free court (two for 5v5). The match becomes On court; nothing starts |
+| Send back to queue | Returns an On court match to the **top** of the queue and frees its court |
+| Swap with the queue | Puts the next ready waiting match on an On court match's court and moves the On court match into that match's queue place |
+| Available Players / Plan Ahead / Longest Wait / Fewest Games | Generate matches strategies |
+| Catch Up | Generate matches strategy with an explicitly chosen game target, separate from the session minimum. “Games each player should reach” prioritizes eligible players below that number; completed games, Main Queue waiting assignments and earlier drafts in this batch count toward reaching it in the plan. Planned games are not completed results |
 | Draft | A suggested future lineup held outside the Main Queue; neither queued nor played |
 | Regenerate | Rebuilds unprotected waiting matches; keeps protected manual ones |
 | Protected manual match | Created or edited by the operator; survives regeneration unless it needs attention |
@@ -128,7 +136,7 @@ Rules: [Queueing](business_logic/product/queue/modules/queueing/README.md)
 | Queue position | Current place in the waiting queue: #1, #2, … Changes as matches move |
 | Ready to start | Waiting match whose players are present and free, with enough free courts |
 | Next eligible | First ready match in queue order, proposed to a free court |
-| Blocked | Waiting match held only because a player is playing or courts are busy |
+| Blocked | Waiting match held only because a player is busy (On court or Playing) or courts are busy |
 | Needs attention | Waiting match with a broken lineup (incomplete, or a player not present) |
 
 ---
@@ -142,13 +150,17 @@ Rules: [Matches](business_logic/product/queue/modules/matches/README.md) ·
 |---|---|
 | Standard match | Singles or doubles; can count toward long-term performance |
 | Fun match | 1v2, 3v3, 4v4, 5v5; counted locally only |
-| Start match | Explicit operator confirmation that puts a match on a court. Never automatic |
-| Substitution | Swapping a player mid-match. Neither the outgoing nor incoming player gets credit for that game |
+| On court | Match status between Waiting and Playing: placed on a court, not started. Lineup can still change; players are busy. Court chip **Getting ready** |
+| Getting ready · Playing | Court card chips for an On court match and a started match. Playing also has a steady accent glow |
+| Start match | Explicit operator tap that starts an On court match; the timer starts here. Never automatic, in Manual Queue or Auto Queue. Not "Start game" |
+| Substitution | Swapping a player in a **Playing** match. By default neither the outgoing nor incoming player gets credit for that game. A replacement while On court is a lineup change, not a substitution |
+| Game credit (Who gets this game?) | The substitution choice: Nobody (default), the incoming player, or the outgoing player, never both. The credited player gets the game, minimum credit and win/loss for the session only, never long-term performance or rank |
 | Match done | Confirmed winner (+ optional score). **Permanent**; frees the court(s) |
 | Invalid match | No game, win, loss, or minimum-game credit. **Permanent**; frees the court(s) |
 | Live leaderboard | Operator's running standings during the session; not official history |
 | Session done | Online finalization after sync and reconciliation, with no game in play |
 | Invalid session | Unrecoverable or untrusted records; no performance contribution, no slides |
+| Cancelled session | A prepared session called off before Start session (owner decision, November 6, 2026). Final, optional reason; roster, waitlist and payment marks kept read-only; refunds happen outside ROTRA; join requests close; counts nowhere. Code value `cancelled`. Not an Invalid session, and not an invalid match |
 | Result slides | Three private slides made at valid Session done: Standings, Awards (MVP, Most Improved), Off Day |
 | Off Day | Below-baseline session performance. Private unless explicitly included when sharing |
 | Publish | Optional sharing of chosen slides on the public page. Separate from profile/rank sync |
@@ -255,8 +267,8 @@ from the [database design](database_design/product/README.md). Add a row here **
 | Club entitlement | `ClubEntitlement` | `club_entitlements` | Projection of effective access; not stored in the mock (computed with `accessOf`) |
 | Saved club player | `ClubPlayer` | `club_players` | `playerId` null = guest |
 | Saved player statistics | `SavedPlayerStats` | — | Derived club-wide totals; `SavedPlayerStatsCarousel` renders them; `useSavedPlayerStats` reads them |
-| Queue Session | `QueueSession` | `queue_sessions` | `state`: `prepared` · `active` · `finalizing` · `completed` · `invalid` |
-| Join request | `SessionJoinRequest` | `session_join_requests` | `status`: `pending` · `confirmed` · `declined` |
+| Queue Session | `QueueSession` | `queue_sessions` | `state`: `prepared` · `active` · `finalizing` · `completed` · `invalid`. **Proposed (November 6, 2026):** add `cancelled` (from `prepared` only), with `cancelled_at` and a nullable `cancel_reason` (prototype: `cancelledAt`, `cancelReason`) |
+| Join request | `SessionJoinRequest` | `session_join_requests` | `status`: `pending` · `confirmed` · `declined`. **Proposed (November 6, 2026):** `closed`, for pending requests closed when the session is cancelled |
 | Waitlist entry | `SessionWaitlistEntry` | `session_waitlist` | Ordered by `added_at` |
 | Roster entry (slot) | `SessionPlayer` | `session_players` | Slot order is `confirmed_at` |
 | Court in a session | `SessionCourt` | `session_courts` | Mock `startsAt` is the planned start; `openUntil: null` follows session end. `useUpdateCourt` edits booking windows; a used start is fixed |
@@ -270,11 +282,13 @@ from the [database design](database_design/product/README.md). Add a row here **
 | Publication event | `SessionPublicationEvent` | `session_publication_events` | Append-only log of each publish (selection, Off Day choice, time) |
 | Export frame | `ExportFrame` | `result_exports` | One Download images frame; `ExportFormat`: `story` (14 rows) · `feed` (10 rows) |
 | Public session page | `PublicSessionPage` | `session_publications` public projection | Public-safe read model of a session by its slug, from the last synced state: details, participants (no contacts, level or presence), waitlist names, open slots, and only the published slides (Off Day only when included). `MyJoinRequest` is the visitor's own request status |
-| Auto Queue strategy | `AutoQueueMode` | — | `available` · `ahead` · `wait` · `fewest` · `catchup`; `AutoQueueCount` is an explicit 2/3/4/6 choice |
+| Generate matches strategy | `AutoQueueMode` | — | `available` · `ahead` · `wait` · `fewest` · `catchup`; `AutoQueueCount` is an explicit 2/3/4/6 choice. Code names keep "AutoQueue" until the real-app ticket renames them; in copy this is **Generate matches**, not Auto Queue |
 | Draft lineup | `AutoQueueDraftLineup` | — | Stable draft ID, strategy, lineup, reason and input fingerprint; never a match number |
 | Draft batch | `AutoQueueDraftBatch` | — | One alternative tab; its stopping reason and optional Catch Up target |
 | Draft workspace state | `AutoQueueDraftState` | — | Per-session in-memory batches, selection order and committed draft IDs; `useAutoQueueDrafts` reads it |
-| Match | `Match` | `matches` | `state`: `waiting` · `active` · `completed` · `invalid`; `origin`: `manual` · `suggested` · `auto` |
+| Match | `Match` | `matches` | `state`: `waiting` · `active` · `completed` · `invalid`; `origin`: `manual` · `suggested` · `auto`. **Proposed (November 6, 2026):** add `on_court` between `waiting` and `active` (On court; `active` = Playing), with a placed-at time; `startedAt` set only at Start match |
+| Court fill mode | `CourtFillMode` (proposed) | `queue_sessions.court_fill_mode` (proposed) | `'manual'` (default) · `'auto'`: the Manual Queue \| Auto Queue switch |
+| Substitution game credit | `creditTo` (proposed) | `credit_to` on the substitution record (proposed) | `none` (default) · `incoming` · `outgoing`; locks when the match is done or invalid |
 | Match format | `MatchFormat` | — | `singles` · `doubles` · `fun_1v2` · `fun_3v3` · `fun_4v4` · `fun_5v5` |
 | Session mode | `SessionMode` | — | `chill` · `fair` · `hard` |
 | Player | `Player` | `players` | Global identity across clubs |
@@ -319,7 +333,10 @@ URL segments, component names, and query keys use the same words: `sessions/[ses
 | Present ↔ Available ↔ Wait time | Operator switch vs. present and not playing vs. derived minutes |
 | Playing level ↔ Club assessment ↔ Session playing level ↔ Shared rank | The nine-level scale vs. one club's latest level vs. the level locked for one session vs. cross-club rank |
 | Blocked ↔ Needs attention | Temporarily busy players/courts vs. a broken lineup |
+| Generate matches ↔ Auto Queue | The draft generator vs. the court-fill switch (before November 6, 2026, "Auto Queue" meant the generator) |
+| Put on court ↔ Start match | Places a match on a court (On court, Getting ready) vs. starts it (Playing, timer runs) |
 | Invalid match ↔ Invalid session | One game with no credit vs. a whole session with untrusted records |
+| Invalid session ↔ Cancelled session | A session that ran but whose records can't be trusted vs. one called off before it started |
 | Publish ↔ sync | Optional public sharing vs. automatic profile and rank updates |
 | Guest ↔ Unclaimed profile ↔ Registered player | Name only vs. phone-linked but unclaimed vs. claimed with a password |
 | Cost estimate ↔ Payments checklist | Planning numbers vs. a manual paid tick. Neither collects money |

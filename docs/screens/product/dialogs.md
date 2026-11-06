@@ -1,6 +1,6 @@
 # Dialog and confirmation contracts
 
-**Status:** Proposed copy and interaction for agreed irreversible/important actions. Exact visual styling is implementation work. Updated October 26, 2026: copy below matches the [ROTRA Queue prototype](../../../apps/mockup/queue-app/rotra-queue.html), where every dialog is a sheet.
+**Status:** Proposed copy and interaction for agreed irreversible/important actions. Exact visual styling is implementation work. Updated October 26, 2026: copy below matches the [ROTRA Queue prototype](../../../apps/mockup/queue-app/rotra-queue.html), where every dialog is a sheet. Updated November 6, 2026 for the On court step and substitution game credit ([log](../../mockup-changes/2026-11-06-queue-on-court-and-sub-credit.md)).
 
 Removing a waiting match, a roster player during preparation, a free court, or an inventory item takes effect immediately with a confirming toast and no dialog: none of them records or erases a played game.
 
@@ -8,7 +8,7 @@ Every dialog names the target session/player/match, shows the actual selected va
 
 ## D-START-SESSION — Start session
 
-Title **Start session?** Show session, court count, formats, mode, minimum, roster “N confirmed · M present”. Copy: **“Every player's level locks now. Players you add later get a level when you add them, and it locks too.”** Offline adds “Starting on this device while offline. It syncs when you reconnect.” Primary **Start session**; secondary Back. Eligibility/license/other-active-session checks still apply; a dialog does not bypass them.
+Title **Start session?** Show session, court count, formats, mode, minimum, roster “N confirmed · M present”. Copy: **“Every player's level locks now. Players you add later get a level when you add them, and it locks too.”** Offline adds “Starting on this device while offline. It syncs when you reconnect.” Primary **Start session**; secondary Back. Eligibility/license/other-active-session checks still apply; a dialog does not bypass them. Started late or on another day than planned (November 6, 2026): first “This session was planned for 6:00–9:00 PM yesterday. Set a new end time to start.” and a required **New end**, pre-filled with now + the planned length rounded up to 15 minutes; Start session is disabled until it is after now ([Q-START](modules/queue/session-setup.md#q-start--start-review)).
 
 ## D-DELETE-SESSION — Delete session
 
@@ -19,9 +19,21 @@ Always shown before a delete; it has two forms. Both show session, when, venue, 
 
 The save re-checks: if a player was confirmed meanwhile, the error shows in the dialog and nothing is deleted.
 
-## D-START-MATCH — Start match
+## D-CANCEL-SESSION — Cancel session
 
-Title **Start match N**. Show teams with levels, format (and Fun game), and free-court buttons — two for 5v5. Primary **Start match** (disabled until courts are chosen and the match is ready); secondary Back. Recheck player/court availability before accepting. It is an explicit operator action, not automatic dispatch on free court. Courts before their planned start are listed under **Not open yet** with **Start anyway** (“Start anyway opens the court now. The booking time and costs don't change.”); this sheet is the confirmation, so it opens the court and chooses it without a second dialog.
+Owner decision, November 6, 2026 ([log](../../mockup-changes/2026-11-06-queue-example-sessions-and-cancel.md)). Opened by **Cancel session** in a prepared session's Preparation header; never offered once the session has started.
+
+Title **Cancel TITLE?** Lines: “Sat, Nov 7 · 6:00–9:00 PM” (date · time range) and “N players joined · M on the waitlist”. When any roster player is marked paid, a warning: **“P players are marked paid. Refunds happen outside ROTRA.”** (“1 player is marked paid. …”). Field **Reason (optional)**, up to 120 characters. Notice (danger): **“This can't be undone. To play anyway, create a new session.”** Secondary **Keep session** (focused first); primary **Cancel session** (danger).
+
+On confirm the session becomes Cancelled with the cancelled time and the reason (empty reason saves none), pending join requests close, the toast reads **“TITLE cancelled”** and the cancelled [session record](modules/queue/results-sharing.md#q-history--session-record) opens. The save re-checks that the session is still prepared; if it started meanwhile, nothing is cancelled.
+
+## D-START-MATCH — Put on court, then Start match
+
+Two steps since November 6, 2026.
+
+**Put on court.** Title **Put match N on court**. Show teams with levels, format (and Fun game), and free-court buttons — two for 5v5. Primary **Put on court** (disabled until courts are chosen and the match is ready); secondary Back. Recheck player/court availability before accepting. Placing makes the match **On court** (court chip **Getting ready**); it does not start the match or its timer. Courts before their planned start are listed under **Not open yet** with **Start anyway** (“Start anyway opens the court now. The booking time and costs don't change.”); this sheet is the confirmation, so it opens the court and chooses it without a second dialog. With the Auto Queue switch on, ROTRA places matches without this sheet (never 5v5).
+
+**Start match.** One tap on the Getting ready court card or in Q-ON-COURT, with no dialog: the court is already chosen. ROTRA rechecks presence and busy players; on a problem, toast “Something changed. Review the match again.” Success: “Match N started on Court X”. It is always an explicit operator action, never automatic, in Manual Queue and Auto Queue alike.
 
 ## D-OPEN-EARLY — Open a court early
 
@@ -39,11 +51,11 @@ Title **Mark match invalid?** Show game/participants. Copy: **“No game, win, l
 
 ## D-SUBSTITUTE — Partial-game consequences
 
-Title **Confirm substitution**. Show Out, In (with level), and Team. Copy: **“Neither player's partial game will count toward their minimum or long-term performance.”** Primary **Confirm substitution**; secondary Back. (Partial players also get no session W/L or award credit; the match sheet notes “Neither gets credit for this game.”)
+Title **Confirm substitution**. Show Out, In (with level), Team, and the **Who gets this game?** choice: **Nobody** (default) · **NAME (coming in)** · **NAME (going off)**, never both. With Nobody, copy: **“Neither player's partial game will count toward their minimum or long-term performance.”** With a person chosen, the copy says that person gets this game's count, minimum credit and win or loss for tonight, and that neither partial game counts toward long-term performance. Primary **Confirm substitution**; secondary Back. (With Nobody, partial players also get no session W/L or award credit; the match sheet notes “Neither gets credit for this game.” With a choice it notes “Kiko replaced Jom · Kiko got the game (QM choice)”.) Only for a Playing match; a replacement while On court is a lineup change with no dialog question.
 
 ## D-REGENERATE — Rebuild waiting queue
 
-Title **Regenerate waiting queue?** Show counts: “Automatic waiting matches — N rebuilt”, “Healthy manual matches — N kept”, “Manual matches needing attention — N rebuilt”, “Games in play — N untouched”. Primary **Regenerate waiting queue** (disabled when nothing would be rebuilt); secondary **Keep current queue**. Failure leaves the previous durable queue intact.
+Title **Regenerate waiting queue?** Show counts: “Automatic waiting matches — N rebuilt”, “Healthy manual matches — N kept”, “Manual matches needing attention — N rebuilt”, “Games in play — N untouched” (On court matches are counted here too; Regenerate never changes them). Primary **Regenerate waiting queue** (disabled when nothing would be rebuilt); secondary **Keep current queue**. Failure leaves the previous durable queue intact.
 
 ## D-MINIMUM — Shortfall acknowledgement
 
@@ -51,9 +63,9 @@ Title **Some players are below the minimum**. Show each name with “g of M”. 
 
 ## D-SESSION-DONE — Whole session
 
-Preceded by a **Session done** review (games recorded, participants, sync, games in play, unplayed waiting matches, shortfalls). Title **Finish this session?** Show event title/time and “All records on this device are synced.” or “N changes are still syncing.” Copy: “Valid results sync to Player Information automatically, and ranks update. Result slides become available to you privately. Nothing is published until you choose to.” Primary **Confirm Session done**; secondary Back. Disabled while offline, while changes are pending, or while integrity is incomplete.
+Preceded by a **Session done** review (games recorded, participants, sync, games in play, On court matches never started, unplayed waiting matches, shortfalls). Title **Finish this session?** Show event title/time and “All records on this device are synced.” or “N changes are still syncing.” Copy: “Valid results sync to Player Information automatically, and ranks update. Result slides become available to you privately. Nothing is published until you choose to.” Primary **Confirm Session done**; secondary Back. Disabled while offline, while changes are pending, or while integrity is incomplete.
 
-Games still in play block the flow at the review step until finished or invalidated. Unplayed waiting matches are dropped from results. The longer-term closure policy remains open; this dialog must not secretly finish or invalidate games.
+Games still in play (Playing) block the flow at the review step until finished or invalidated. On court matches that never started are dropped like waiting matches, and the review says “N matches on court weren't started and will be dropped.” Unplayed waiting matches are dropped from results. The longer-term closure policy remains open; this dialog must not secretly finish or invalidate games.
 
 ## D-INTERRUPTION — Missing record check
 

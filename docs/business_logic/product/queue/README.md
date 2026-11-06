@@ -10,8 +10,8 @@ The club operator runs sessions from preparation to confirmed results. Players d
 |---|---|
 | [Sessions](modules/sessions/README.md) | Three-page setup, formats, calculated minimum, courts and time, lifecycle |
 | [Players](modules/players/README.md) | Saved players, lookup, identity states, presence, roster levels |
-| [Queueing](modules/queueing/README.md) | Modes, Make match, Suggest, Auto queue, shared queue, dispatch, regeneration |
-| [Matches](modules/matches/README.md) | Starts, results, substitutions, invalid games |
+| [Queueing](modules/queueing/README.md) | Modes, Make match, Suggest, Generate matches, shared queue, Auto Queue / Manual Queue court filling, regeneration |
+| [Matches](modules/matches/README.md) | On court and Start match, results, substitutions and game credit, invalid games |
 | [Offline](modules/offline/README.md) | Download, sync status, continuity, recovery, sync integrity |
 | [Results](modules/results/README.md) | Live leaderboard, finalization, standings, awards, publishing, downloads, session record |
 | [Financials](modules/financials/README.md) | Optional session cost estimate and club inventory |
@@ -20,7 +20,7 @@ Licensing belongs to [Admin](../admin/modules/clubs-licenses/README.md); shared 
 
 ## Club home
 
-After sign-in, the club sees its dashboard: club name, logo, founding address, license status and a **Create session** button; the live or next session with **Continue session** or **Open preparation** (or **Create session** when nothing is planned); and a month **calendar** marking live, prepared, completed, and invalid sessions, which is how prepared and past sessions are opened (there are no separate lists). A collapsible left navigation on every operator screen covers Live session (while one is live), Dashboard, Saved players, Venues, Inventory, Club settings, License and This device; on phones a bottom dock gives Menu, Create/Continue session and Settings. Sign out is in Club settings. Every operator screen's top bar has the sync status and a light/dark mode switch (dark by default, remembered per device).
+After sign-in, the club sees its dashboard: club name, logo, founding address, license status and a **Create session** button; the live or next session with **Continue session** or **Open preparation** (or **Create session** when nothing is planned); and a month **calendar** marking live, prepared, completed, invalid and cancelled sessions, which is how prepared and past sessions are opened (there are no separate lists). A collapsible left navigation on every operator screen covers Live session (while one is live), Dashboard, Saved players, Venues, Inventory, Club settings, License and This device; on phones a bottom dock gives Menu, Create/Continue session and Settings. Sign out is in Club settings. Every operator screen's top bar has the sync status and a light/dark mode switch (dark by default, remembered per device).
 
 Club settings are online only (offline, the page says so and shows nothing else) and use a left-hand menu: **Club** (Club identity, Session defaults, Facebook post), **License** (License and payments), **This device** (Downloads), **Account**. The club uploads or removes its logo directly (used on the dashboard, public page and result images); a **club name change is a request** the platform owner approves in Admin, and the old name stays until then. Settings also show the fixed founding address and city code, session defaults (players per court, default entrance fee), license details (plan, active since/until, days left) with the license payment history and CSV export on the same page, sessions downloaded on this device, and the account username. The club can **change its password** by entering the current one; a forgotten password is reset by the platform owner.
 

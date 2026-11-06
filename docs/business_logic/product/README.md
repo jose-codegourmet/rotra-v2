@@ -27,8 +27,8 @@ ROTRA helps clubs run badminton sessions and gives players a lasting identity an
 
 1. The platform owner activates a monthly or discounted yearly club license.
 2. The operator creates a session online — optionally estimating its costs to set a fair fee — prepares players/settings, and downloads it.
-3. The operator marks presence and prepares a shared waiting queue using Manual, Make match, Suggest, or Auto queue.
-4. The operator confirms match starts, handles substitutions, and confirms a winner or invalid match, watching the live leaderboard.
+3. The operator marks presence and prepares a shared waiting queue using Manual, Make match, Suggest, or Generate matches.
+4. The operator puts matches on court (by hand, or with the Auto Queue switch), confirms each Start match, handles substitutions, and confirms a winner or invalid match, watching the live leaderboard.
 5. Online, with no game still in play, the operator reconciles any missing/conflicting device records and presses **Session done**.
 6. Valid finalization updates eligible player profiles and rankings and creates private result slides.
 7. The operator separately decides which slides to publish or download.

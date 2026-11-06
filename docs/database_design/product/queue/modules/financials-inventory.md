@@ -67,6 +67,8 @@ Unique `(session_id, inventory_item_id)` is **not** required: the prototype allo
 
 Unticking deletes the row (keep an audit event if history matters). Marks are ordinary sync operations and work offline. Totals (paid count, collected, still due, against costs) are derived.
 
+**Cancelled sessions (proposed, November 6, 2026).** Marks on a `cancelled` session are kept as they were and become read-only: ticks and unticks are refused like on an invalid session. ROTRA stores no refund rows; refunds happen outside ROTRA ([log](../../../../mockup-changes/2026-11-06-queue-example-sessions-and-cancel.md)).
+
 ## Calculation
 
 Totals are derived, never stored as authoritative values. For PHP, every monetary value below is in **centavos**, including the returned break-even amount:

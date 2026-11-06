@@ -16,7 +16,8 @@ When the prototype and the docs disagree, the docs' `open-decisions.md` files sa
 
 ## Prototype-only parts
 
-- **Prototype** button (top bar): simulate offline, an expired license, approving a club name change, and resetting the demo data.
+- **Prototype** button (top bar): simulate offline, an expired license, approving a club name change, a guest join request, **Demo scenarios** (load one live example at a time: Full house, Short on players, Players over the minimum, the five-court and 36-to-37 examples, or none), and resetting the demo data.
+- **Example sessions** on the dashboard calendar (finished, full house, over the slot budget, few players, one cancelled, two upcoming) are demo data, dated relative to today. Demo scenarios and example sessions are not product features.
 - Any password signs in. The password typed at sign-in counts as the current one for **Change password**.
 - Data is kept in this browser's `localStorage` (`rotra-queue-prototype-v3`), and the theme choice is kept in `rotra-queue-theme`.
 - Download, sync and finalization use short timers instead of real work.

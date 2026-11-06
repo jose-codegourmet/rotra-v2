@@ -1,6 +1,6 @@
 # Database services (`@rotra/db`)
 
-**Last verified:** 2026-11-01. **Status:** Server-only service code over the drafted, **unapplied**
+**Last verified:** 2026-11-06 (Generate matches rename only); 2026-11-01. **Status:** Server-only service code over the drafted, **unapplied**
 schema. Not run against a database; lint, type-check and build were not run for these modules.
 Every proposal below that depends on an open decision (#243–#248) is marked as such in the code.
 
@@ -68,11 +68,11 @@ screen loaded one, and returns an allowlisted DTO.
 
 - Match numbers come from the locked session's highest number + 1 and are never reused: removed and regenerated drafts keep theirs (`removed_at`, no queue position).
 - Queue position is separate and only reorder/regenerate rewrite it.
-- Each match is keyed on its operation ID (`source_operation_id`); a batch is keyed on the command as `generation_id`, so a retried Auto queue or Regenerate returns the same matches.
+- Each match is keyed on its operation ID (`source_operation_id`); a batch is keyed on the command as `generation_id`, so a retried Generate matches or Regenerate returns the same matches.
 - Regenerate rebuilds only waiting non-protected drafts and protected entries that need attention; healthy manual entries and active matches are untouched. A stale queue revision is `conflict`.
 - Generation reuses the prototype reference heuristic from `@rotra/data/match/queue.rules` with a seed from the operation; the final heuristic is still open.
 - `readSessionMatches` also returns the session `revision` it read, which an accepted suggestion sends back with the queue revision (#396).
-- Queue Route Handlers (#396): `GET`/`POST /api/sessions/[sessionId]/matches` (read; add with `source` `manual` (default), `selection`, `suggested` or `auto` (`{ drafts: [{ operationId, mode, lineup }], expectedQueueRevision, expectedRevision }`: reviewed Auto queue drafts, saved together as unprotected `auto` matches; each draft's operation ID makes a retry return the saved matches)), `POST …/matches/auto` (`{ operationId, n, expectedQueueRevision }`), `POST …/matches/regenerate`, `PATCH`/`DELETE …/matches/[matchId]` (lineup edit, remove), `POST …/matches/[matchId]/position` (`{ toIndex, expectedQueueRevision }`). Command replies are `{ result, queueRevision }`.
+- Queue Route Handlers (#396): `GET`/`POST /api/sessions/[sessionId]/matches` (read; add with `source` `manual` (default), `selection`, `suggested` or `auto` (`{ drafts: [{ operationId, mode, lineup }], expectedQueueRevision, expectedRevision }`: reviewed Generate matches drafts, saved together as unprotected `auto` matches; each draft's operation ID makes a retry return the saved matches)), `POST …/matches/auto` (`{ operationId, n, expectedQueueRevision }`), `POST …/matches/regenerate`, `PATCH`/`DELETE …/matches/[matchId]` (lineup edit, remove), `POST …/matches/[matchId]/position` (`{ toIndex, expectedQueueRevision }`). Command replies are `{ result, queueRevision }`.
 
 ## F07.26 · Atomic match start, substitution, permanent results
 

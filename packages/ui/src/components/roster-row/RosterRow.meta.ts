@@ -9,6 +9,7 @@ export const rosterRowMeta = {
     'Read-only Session settings passes readOnly for locked level and presence text without removal or presence controls.',
     'Use inside RosterPanel for every player with a slot in a prepared session.',
     'Do not use in the live console: Queue › Players shows locked levels and no remove action (PlayerPoolCard).',
+    'Do not use for the Grid view: that is RosterCard.',
     'The level select is highlighted while the level is missing; pass levelLocked once the session started: the level becomes text with a lock icon and "Level locked for this session", no edit path.',
   ],
   prototype: {
@@ -19,5 +20,12 @@ export const rosterRowMeta = {
     'docs/screens/product/modules/queue/players-roster.md',
     'docs/business_logic/product/queue/modules/players/README.md',
   ],
-  related: ['RosterPanel', 'LevelSelect', 'LevelDiffIndicator', 'IdentityChip', 'Switch'],
+  related: [
+    'RosterPanel',
+    'RosterCard',
+    'LevelSelect',
+    'LevelDiffIndicator',
+    'IdentityChip',
+    'Switch',
+  ],
 } satisfies ComponentMeta

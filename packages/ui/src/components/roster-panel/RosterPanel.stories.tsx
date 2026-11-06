@@ -1,5 +1,7 @@
+import { paymentPlayers } from '@rotra/data/fixtures/financials'
 import { clubPlayers } from '@rotra/data/fixtures/players'
 import { queueSessionFixtures } from '@rotra/data/fixtures/queueSessions'
+import { sessionHistorySpecs } from '@rotra/data/fixtures/session-history'
 import { sessionWaitlistFixture } from '@rotra/data/fixtures/session-waitlist'
 import type { PlayingLevel } from '@rotra/data/player/types'
 import type { Meta, StoryObj } from '@storybook/react-vite'
@@ -13,6 +15,13 @@ if (!tonight) throw new Error('Session fixture missing')
 const courtCount = queueSessionFixtures.courts.filter((c) => c.sessionId === tonight.id).length
 const CAPACITY = courtCount * tonight.playersPerCourt
 
+const paidByClubPlayer = new Map(paymentPlayers.map((p) => [p.clubPlayerId, Boolean(p.paid)]))
+const playedHere = new Set(
+  sessionHistorySpecs.flatMap((spec) =>
+    spec.players.map((n) => clubPlayers[n - 1]?.id).filter((id): id is string => Boolean(id)),
+  ),
+)
+
 const rosterPlayers: RosterPanelPlayer[] = queueSessionFixtures.roster.map((r) => {
   const p = clubPlayers.find((x) => x.id === r.clubPlayerId)
   if (!p) throw new Error('Club player fixture missing')
@@ -23,17 +32,47 @@ const rosterPlayers: RosterPanelPlayer[] = queueSessionFixtures.roster.map((r) =
     suggestion: p.playingLevel,
     level: r.level,
     present: r.present,
+    paid: paidByClubPlayer.get(p.id) ?? false,
+    returning: playedHere.has(p.id),
   }
 })
 
+const mixedIdentityPlayers: RosterPanelPlayer[] = rosterPlayers.map((p, i) => ({
+  ...p,
+  identity: i % 5 === 0 ? 'guest' : i % 7 === 0 ? 'pending' : p.identity,
+}))
+
+const noBeginnerPlayers: RosterPanelPlayer[] = rosterPlayers.map((p) => ({
+  ...p,
+  level: p.level?.startsWith('beginner') ? 'intermediate_mid' : p.level,
+}))
+
 function Demo(props: RosterPanelProps) {
   const [players, setPlayers] = useState(props.players)
+  const [levelTab, setLevelTab] = useState(props.levelTab ?? 'all')
+  const [groupBy, setGroupBy] = useState(props.groupBy ?? 'none')
+  const [view, setView] = useState(props.view ?? 'list')
   const patch = (id: string, change: Partial<RosterPanelPlayer>) =>
     setPlayers((list) => list.map((p) => (p.id === id ? { ...p, ...change } : p)))
   return (
     <RosterPanel
       {...props}
       players={players}
+      levelTab={levelTab}
+      groupBy={groupBy}
+      view={view}
+      onLevelTabChange={(tab) => {
+        setLevelTab(tab)
+        props.onLevelTabChange?.(tab)
+      }}
+      onGroupByChange={(next) => {
+        setGroupBy(next)
+        props.onGroupByChange?.(next)
+      }}
+      onViewChange={(next) => {
+        setView(next)
+        props.onViewChange?.(next)
+      }}
       onMarkAllPresent={() => {
         setPlayers((list) => list.map((p) => ({ ...p, present: true })))
         props.onMarkAllPresent()
@@ -114,3 +153,25 @@ export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
 export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }
 
 export const ReadOnly: Story = { args: { ...Locked.args, readOnly: true } }
+
+export const Grid: Story = { args: { view: 'grid' } }
+export const GridPhone: Story = {
+  args: { view: 'grid' },
+  globals: { viewport: { value: 'phone' } },
+}
+export const TabAdvanced: Story = { args: { levelTab: 'advanced' } }
+export const TabIntermediate: Story = { args: { levelTab: 'intermediate' } }
+export const TabBeginner: Story = { args: { levelTab: 'beginner' } }
+export const TabNoLevel: Story = { args: { levelTab: 'none' } }
+export const EmptyLevelTab: Story = {
+  args: { players: noBeginnerPlayers, levelTab: 'beginner' },
+}
+export const GroupBySkill: Story = { args: { groupBy: 'skill' } }
+export const GroupByAvailability: Story = { args: { groupBy: 'avail' } }
+export const GroupByReturning: Story = { args: { groupBy: 'prior' } }
+export const GroupByProfile: Story = {
+  args: { players: mixedIdentityPlayers, groupBy: 'profile' },
+}
+export const GroupByPayment: Story = { args: { groupBy: 'paid' } }
+export const GroupBySkillGrid: Story = { args: { groupBy: 'skill', view: 'grid' } }
+export const LockedGrid: Story = { args: { ...Locked.args, view: 'grid' } }

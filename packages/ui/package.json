@@ -138,6 +138,7 @@
     "./recent-games-card": "./src/components/recent-games-card/RecentGamesCard.tsx",
     "./regenerate-queue-sheet": "./src/components/regenerate-queue-sheet/RegenerateQueueSheet.tsx",
     "./repeat-schedule-panel": "./src/components/repeat-schedule-panel/RepeatSchedulePanel.tsx",
+    "./roster-card": "./src/components/roster-card/RosterCard.tsx",
     "./roster-panel": "./src/components/roster-panel/RosterPanel.tsx",
     "./roster-row": "./src/components/roster-row/RosterRow.tsx",
     "./saved-player-card": "./src/components/saved-player-card/SavedPlayerCard.tsx",

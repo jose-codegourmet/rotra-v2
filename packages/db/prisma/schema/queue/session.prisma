@@ -9,8 +9,18 @@ enum QueueSessionState {
   finalizing
   completed
   invalid
+  /// Only from prepared, before start; final.
+  cancelled
 
   @@map("queue_session_state")
+}
+
+/// The Manual Queue | Auto Queue switch. Not the same as a match's origin.
+enum CourtFillMode {
+  manual
+  auto
+
+  @@map("court_fill_mode")
 }
 
 enum SessionMode {
@@ -35,6 +45,10 @@ model QueueSession {
   state               QueueSessionState @default(prepared)
   /// Required when state = invalid.
   invalidReason       String?           @map("invalid_reason")
+  /// Set ⇔ state = cancelled.
+  cancelledAt         DateTime?         @map("cancelled_at") @db.Timestamptz(6)
+  /// Optional, up to 120 characters; only when cancelled.
+  cancelReason        String?           @map("cancel_reason")
   sessionMode         SessionMode       @default(fair) @map("session_mode")
   allowSingles        Boolean           @default(true) @map("allow_singles")
   allowDoubles        Boolean           @default(true) @map("allow_doubles")
@@ -55,6 +69,8 @@ model QueueSession {
   startLicenseTermId  String?           @map("start_license_term_id") @db.Uuid
   publicSlug          String            @unique @map("public_slug")
   acceptJoinRequests  Boolean           @default(true) @map("accept_join_requests")
+  /// auto places the next eligible match on_court; it never starts a match.
+  courtFillMode       CourtFillMode     @default(manual) @map("court_fill_mode")
   /// Idempotency key of the create command.
   sourceCommandId     String            @unique @map("source_command_id") @db.Uuid
   createdAt           DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
@@ -103,16 +119,20 @@ model ClubSessionReservation {
 
 /// Soft-removed (removed_at) because historical court usage may reference it.
 model SessionCourt {
-  id        String    @id @db.Uuid
-  clubId    String    @map("club_id") @db.Uuid
-  sessionId String    @map("session_id") @db.Uuid
-  label     String
+  id            String    @id @db.Uuid
+  clubId        String    @map("club_id") @db.Uuid
+  sessionId     String    @map("session_id") @db.Uuid
+  label         String
+  /// Planned start. Null = the session start.
+  startsAt      DateTime? @map("starts_at") @db.Timestamptz(6)
+  /// Start anyway: opened before the planned start; cleared by Undo early open while free.
+  openedEarlyAt DateTime? @map("opened_early_at") @db.Timestamptz(6)
   /// Null = until the session ends (follows scheduled_end_at). A reminder only.
-  openUntil DateTime? @map("open_until") @db.Timestamptz(6)
-  removedAt DateTime? @map("removed_at") @db.Timestamptz(6)
-  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
-  revision  BigInt    @default(1)
+  openUntil     DateTime? @map("open_until") @db.Timestamptz(6)
+  removedAt     DateTime? @map("removed_at") @db.Timestamptz(6)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision      BigInt    @default(1)
 
   session QueueSession @relation(fields: [clubId, sessionId], references: [clubId, id], onDelete: Restrict)
 

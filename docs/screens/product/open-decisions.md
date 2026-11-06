@@ -1,6 +1,6 @@
 # Screen decisions still requiring a focused specification
 
-**Last verified:** 2026-11-06 for the On court step, court filling and substitution game credit; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-06 for the On court step, court filling, substitution game credit, and the connection rules for Cancel session and the court switch; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Explicit unresolved details, not omitted screens and not a new interview questionnaire. Updated October 26, 2026: items settled by the [ROTRA Queue prototype](../../../apps/mockup/queue-app/rotra-queue.html) are listed at the end, followed by those settled with the [ROTRA Admin prototype](../../../apps/mockup/admin-app/rotra-admin.html) on October 27, 2026.
 
@@ -38,8 +38,8 @@ The screen tree specifies all agreed v1 workflows. Where behavior is undecided, 
 - Showing player contact details (Facebook, phone, email) next to payments. The paid / not-paid checklist itself is settled; contacts stay private.
 - New Admin auth policy: email/password is a proposed carry-forward from the existing specification, not a newly confirmed product decision.
 - Copy the November 6, 2026 decision did not give, to be taken from the mockup when it lands: the Q-CHOOSE-MATCH sheet title (was “Start a match on Court X”); the Confirm substitution warning when a person gets the game; the 5v5 Playing chip wording (was **Merged · in game**); the Manual Queue helper copy, if any; and any toast after **Put on court**, **Send back to queue** or **Move to another court**.
-- The Manual Queue | Auto Queue switch while offline, and two offline devices placing the same match or court (collision-free assignment stays open).
-- Whether **Cancel session** needs internet (the prototype doesn't check the connection; Delete session does). Settled November 6, 2026: the Preparation header keeps **both** Delete session (nobody confirmed) and Cancel session (players joined); the prototype now shows both ([log](../../mockup-changes/2026-11-06-queue-delete-session.md)).
+- Two offline devices placing the same match or court by hand with **Put on court** (collision-free assignment stays open). The Manual Queue | Auto Queue switch offline is settled below.
+- The offline notice copy for Cancel session and the Manual Queue | Auto Queue switch (both need internet, settled below), to be taken from the mockup. Also settled November 6, 2026: the Preparation header keeps **both** Delete session (nobody confirmed) and Cancel session (players joined); the prototype now shows both ([log](../../mockup-changes/2026-11-06-queue-delete-session.md)).
 - What Q-POOL shows for a player in a Getting ready match (the status list has **On Court X**, **Away**, **Queued · #P**, **Free**).
 
 ## Settled by the product owner on November 6, 2026
@@ -56,6 +56,8 @@ Recorded in the [mockup change log](../../mockup-changes/2026-11-06-queue-on-cou
 | Substitution game credit | Step **Who gets this game?**: Nobody (default) · NAME (coming in) · NAME (going off); “Started M min ago”; session credit only, never long-term performance; record line “Kiko replaced Jom · Kiko got the game (QM choice)” | Q-SUBSTITUTE, Q-ACTIVE-MATCH, Q-MATCH-RECORD, Q-LEADERBOARD |
 | Session done | Blocked only by Playing matches; “N matches on court weren't started and will be dropped.” | Q-SESSION-DONE |
 | Cancelled sessions | **Cancel session** on Preparation (prepared only) → D-CANCEL-SESSION (optional reason, paid warning, “This can't be undone.”) → read-only cancelled record; calendar hollow dot and struck-through title; public page “This session is cancelled. REASON.” with no join card. [Change log](../../mockup-changes/2026-11-06-queue-example-sessions-and-cancel.md) | Q-PREPARE, Q-HOME, Q-HISTORY, Q-PUBLIC-JOIN |
+| Cancel session connection | **Needs internet**, like Delete session. Never queued offline and never replayed by sync (Jose, November 6, 2026) | Q-PREPARE, D-CANCEL-SESSION |
+| Court switch offline | The **Manual Queue \| Auto Queue** switch **needs internet**. While the device is offline, auto filling pauses (no automatic placements), so two offline devices can't collide through it; manual **Put on court** keeps today's offline behaviour (Jose, November 6, 2026) | Q-COURTS |
 | Short on players | Live banner “7 players present: enough for 1 doubles court. 3 sit out each game.”; free court “Not enough free players.” | Q-CONSOLE, Q-COURTS |
 | Times and days (T1–T6) | Every time shows its day; one date-and-time picker (day buttons + valid times in 15-minute steps); live **Set end time** with Extend 30/60 as shortcuts; start time fixed; late or other-day start needs a **New end**; overdue reminder “Planned end passed N ago”; club time zone (docs only). [Change log](../../mockup-changes/2026-11-06-queue-time-and-day.md) | Q-SETUP, Q-START, Q-CONSOLE, Q-SESSION-ADJUST, Q-ADD-COURT, Q-COURTS, Q-HOME |
 

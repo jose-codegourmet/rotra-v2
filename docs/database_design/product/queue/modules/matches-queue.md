@@ -1,6 +1,6 @@
 # Shared queue, matches, and substitutions
 
-**Status:** Proposed data model implementing confirmed business outcomes. Updated October 26, 2026 for the [ROTRA Queue prototype](../../../../../apps/mockup/queue-app/rotra-queue.html). Updated November 6, 2026 with **proposals** for the On court step and substitution game credit ([log](../../../../mockup-changes/2026-11-06-queue-on-court-and-sub-credit.md)); nothing here is migrated.
+**Status:** Proposed data model implementing confirmed business outcomes. Updated October 26, 2026 for the [ROTRA Queue prototype](../../../../../apps/mockup/queue-app/rotra-queue.html). Updated November 6, 2026 for the On court step and substitution game credit ([log](../../../../mockup-changes/2026-11-06-queue-on-court-and-sub-credit.md)): column names settled by Jose the same day and drafted, unapplied, in migration `20261106000100`; the commands that use them are later tickets.
 
 ## `matches`
 
@@ -8,7 +8,7 @@
 |---|---|
 | `id`, `club_id`, `session_id` | UUID keys with scoped FKs |
 | `match_no` | Positive integer assigned in creation order per session ("Match 7"); unique `(session_id, match_no)`; never reused or renumbered. Offline devices need a collision-free allocation (for example a device-scoped block) or a server-assigned number on sync — open |
-| `state` | Proposed waiting/**on_court**/active/completed/invalid. `on_court` (proposed November 6, 2026) = placed on a court, not started; `active` = Playing. Removed waiting drafts are excluded from dispatch without becoming played games |
+| `state` | Waiting/**on_court**/active/completed/invalid. `on_court` (settled November 6, 2026) = placed on a court, not started; `active` = Playing. Removed waiting drafts are excluded from dispatch without becoming played games |
 | `format` | Singles, doubles, fun_1v2, fun_3v3, fun_4v4, fun_5v5 |
 | `queue_position` | Nullable bigint order key; meaningful while waiting |
 | `removed_at` | Nullable timestamp for discarded waiting drafts; never a played-game outcome |
@@ -16,7 +16,7 @@
 | `manual_protected` | True for manually created matches and for any waiting match the operator edited, including a lineup edit while `on_court` (it stays protected if sent back). False for accepted unedited suggestions and auto output |
 | `generation_id` | Optional UUID grouping a generation/rebuild command, not a new product feature |
 | `attention_reasons` | Derived projection/cache of validated lineup problems |
-| `placed_at` | **Proposed.** Set when the match goes `on_court` (by hand or by Auto Queue); cleared if it is sent back to the queue |
+| `placed_at` | Nullable timestamptz (settled November 6, 2026). Set when the match goes `on_court` (by hand or by Auto Queue); cleared if it is sent back to the queue. Required while `on_court`, null while waiting; matches started before the On court step have none |
 | `started_at`, `ended_at`, `revision` | Transition metadata. `started_at` is set **only at Start match**, never at placement; the minutes-played timer reads it |
 
 Do not add a mandatory court FK to a waiting match. An `on_court` match **has** its court assignment (two for 5v5) before it starts; see occupancy below. Index `(session_id, state, queue_position, id)` for non-removed rows to scan the shared queue. Reorder/regenerate under a locked session queue revision; use a deterministic tie key during draft ordering and establish unique canonical waiting positions at commit.
@@ -31,7 +31,7 @@ At Session done, waiting matches and `on_court` matches that never started are e
 
 ## `match_participations`
 
-Fields: UUID `id`; `club_id`, `session_id`, `match_id`, `session_player_id`; `team` A/B; positive `segment_no`; `joined_operation_id`, nullable `left_operation_id`; corresponding local sequence/time evidence; `started_with_match`; `finished_with_match`.
+Fields: UUID `id`; `club_id`, `session_id`, `match_id`, `session_player_id`; `team` A/B; positive `segment_no`; `joined_operation_id`, nullable `left_operation_id`; corresponding local sequence/time evidence; `started_with_match`; `finished_with_match`; `credit_to` (below).
 
 Use scoped FKs to the match and roster entry, and unique `(match_id, session_player_id, segment_no)`. Keep successive segments for a player who leaves and returns. Store/reconstruct the lineup before start without falsely claiming they played.
 
@@ -43,7 +43,7 @@ Team-size validation is transactional at start: singles 1/1, doubles 2/2, 1v2 1/
 
 Partial participants (both sides of an in-game substitution) are excluded from session W/L, games, and award inputs, as well as from minimum credit and global performance.
 
-**Substitution game credit (proposed, November 6, 2026).** Each in-game substitution records `credit_to`: `none` (default) · `incoming` · `outgoing`, set at substitution confirmation. Where it lives (on the substitution operation, the incoming segment, or a separate substitution row) is open. At most one person per team slot gets the game: a later substitution in the same slot that names a person replaces the earlier choice. The value is frozen when the match is completed or invalid. Session-scoped derivations (live standings, session standings, awards, minimum progress, game counts) treat the credited player as a full participant of that completed match. Long-term performance and rank derivations **ignore** `credit_to` and keep excluding both partial players. An invalid match produces nothing for anyone.
+**Substitution game credit (settled November 6, 2026).** Each in-game substitution records `credit_to`: `none` (default) · `incoming` · `outgoing` (enum `substitution_credit`), set at substitution confirmation. It is a column on the **incoming** player's `match_participations` row, the segment the substitution opened (owner decision, November 6, 2026): `incoming` gives the game to that player, `outgoing` to the player whose segment the same operation closed. Every other segment keeps `none`, and a segment that started with the match never carries credit (check). At most one person per team slot gets the game: a later substitution in the same slot that names a person replaces the earlier choice. The value is frozen when the match is completed or invalid. Session-scoped derivations (live standings, session standings, awards, minimum progress, game counts) treat the credited player as a full participant of that completed match. Long-term performance and rank derivations **ignore** `credit_to` and keep excluding both partial players. An invalid match produces nothing for anyone.
 
 ## Court and player occupancy
 
@@ -53,7 +53,7 @@ Partial participants (both sides of an in-game substitution) are excluded from s
 
 `active_player_holds`: one row per active roster player; unique `session_player_id`, scoped match FK, and nullable canonical `player_id` with a partial unique index when known. The global-player hold catches known overlapping active use across sessions; unknown duplicate guests cannot be identified automatically.
 
-Acquire all required holds in a single transaction when **placing** a match on court (proposed: holds start at `on_court`, so its players are busy and its court is occupied), in stable key order. Start match then only rechecks presence and holds and sets `started_at`. **Send back to queue** releases the holds; **Move to another court** swaps the court hold atomically. **Swap with the queue** releases the outgoing match's holds and acquires the incoming match's holds on the same court(s) in one transaction, and gives the outgoing match the incoming match's queue position. A court with an `on_court` or active match cannot be removed or edited. Substitution releases the outgoing hold and acquires the incoming hold atomically. Completion/invalidation releases all match holds in the same transaction as the terminal decision.
+Acquire all required holds in a single transaction when **placing** a match on court (holds start at `on_court`, so its players are busy and its court is occupied; the hold triggers accept an `on_court` or active match), in stable key order. Start match then only rechecks presence and holds and sets `started_at`. **Send back to queue** releases the holds; **Move to another court** swaps the court hold atomically. **Swap with the queue** releases the outgoing match's holds and acquires the incoming match's holds on the same court(s) in one transaction, and gives the outgoing match the incoming match's queue position. A court with an `on_court` or active match cannot be removed or edited. Substitution releases the outgoing hold and acquires the incoming hold atomically. Completion/invalidation releases all match holds in the same transaction as the terminal decision.
 
 Offline devices enforce the same checks locally. Concurrent disconnected starts cannot be globally prevented with server constraints alone; conflicting uploads stay pending reconciliation. Replayed historical completed games must be validated as history, not naively treated as current active holds. Clock-only interval ordering is insufficient across devices.
 

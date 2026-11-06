@@ -267,11 +267,11 @@ from the [database design](database_design/product/README.md). Add a row here **
 | Club entitlement | `ClubEntitlement` | `club_entitlements` | Projection of effective access; not stored in the mock (computed with `accessOf`) |
 | Saved club player | `ClubPlayer` | `club_players` | `playerId` null = guest |
 | Saved player statistics | `SavedPlayerStats` | — | Derived club-wide totals; `SavedPlayerStatsCarousel` renders them; `useSavedPlayerStats` reads them |
-| Queue Session | `QueueSession` | `queue_sessions` | `state`: `prepared` · `active` · `finalizing` · `completed` · `invalid`. **Proposed (November 6, 2026):** add `cancelled` (from `prepared` only), with `cancelled_at` and a nullable `cancel_reason` (prototype: `cancelledAt`, `cancelReason`) |
-| Join request | `SessionJoinRequest` | `session_join_requests` | `status`: `pending` · `confirmed` · `declined`. **Proposed (November 6, 2026):** `closed`, for pending requests closed when the session is cancelled |
+| Queue Session | `QueueSession` | `queue_sessions` | `state`: `prepared` · `active` · `finalizing` · `completed` · `invalid` · `cancelled` (November 6, 2026; from `prepared` only), with `cancelled_at` and a nullable `cancel_reason` (code: `cancelledAt`, `cancelReason`) |
+| Join request | `SessionJoinRequest` | `session_join_requests` | `status`: `pending` · `confirmed` · `declined` · `closed` (November 6, 2026: pending requests closed when the session is cancelled; not a decline) |
 | Waitlist entry | `SessionWaitlistEntry` | `session_waitlist` | Ordered by `added_at` |
 | Roster entry (slot) | `SessionPlayer` | `session_players` | Slot order is `confirmed_at` |
-| Court in a session | `SessionCourt` | `session_courts` | Mock `startsAt` is the planned start; `openUntil: null` follows session end. `useUpdateCourt` edits booking windows; a used start is fixed |
+| Court in a session | `SessionCourt` | `session_courts` | `startsAt` (`starts_at`) is the planned start, `openedEarlyAt` (`opened_early_at`) the Start anyway time; `openUntil: null` follows session end. `useUpdateCourt` edits booking windows; a used start is fixed |
 | Session finalization | `SessionFinalization` | `session_finalizations` | `state`: `running` · `committed` · `done` · `failed`; `stage`: `checking` · `finishing` · `player_records` · `slides` (`FinalizationStage`) |
 | Session done review | `SessionDoneReview` | — | Read model for Q-SESSION-DONE: games recorded, participants, pending changes, games in play, unplayed waiting, below minimum |
 | Session record | `SessionRecordSummary` | — | Read model for Q-HISTORY totals; an invalid session counts no games or players |
@@ -286,9 +286,9 @@ from the [database design](database_design/product/README.md). Add a row here **
 | Draft lineup | `AutoQueueDraftLineup` | — | Stable draft ID, strategy, lineup, reason and input fingerprint; never a match number |
 | Draft batch | `AutoQueueDraftBatch` | — | One alternative tab; its stopping reason and optional Catch Up target |
 | Draft workspace state | `AutoQueueDraftState` | — | Per-session in-memory batches, selection order and committed draft IDs; `useAutoQueueDrafts` reads it |
-| Match | `Match` | `matches` | `state`: `waiting` · `active` · `completed` · `invalid`; `origin`: `manual` · `suggested` · `auto`. **Proposed (November 6, 2026):** add `on_court` between `waiting` and `active` (On court; `active` = Playing), with a placed-at time; `startedAt` set only at Start match |
-| Court fill mode | `CourtFillMode` (proposed) | `queue_sessions.court_fill_mode` (proposed) | `'manual'` (default) · `'auto'`: the Manual Queue \| Auto Queue switch |
-| Substitution game credit | `creditTo` (proposed) | `credit_to` on the substitution record (proposed) | `none` (default) · `incoming` · `outgoing`; locks when the match is done or invalid |
+| Match | `Match` | `matches` | `state`: `waiting` · `on_court` · `active` · `completed` · `invalid` (`on_court` = On court, November 6, 2026; `active` = Playing); `origin`: `manual` · `suggested` · `auto`. `placedAt` (`placed_at`) when put on court; `startedAt` set only at Start match |
+| Court fill mode | `CourtFillMode` (`courtFillMode`) | `queue_sessions.court_fill_mode` | `'manual'` (default) · `'auto'`: the Manual Queue \| Auto Queue switch |
+| Substitution game credit | `SubstitutionCredit` (`creditTo` on a substitution) | `match_participations.credit_to`, on the incoming player's row | `none` (default) · `incoming` · `outgoing`; locks when the match is done or invalid |
 | Match format | `MatchFormat` | — | `singles` · `doubles` · `fun_1v2` · `fun_3v3` · `fun_4v4` · `fun_5v5` |
 | Session mode | `SessionMode` | — | `chill` · `fair` · `hard` |
 | Player | `Player` | `players` | Global identity across clubs |

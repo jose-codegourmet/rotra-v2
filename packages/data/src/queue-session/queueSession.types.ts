@@ -1,4 +1,6 @@
 export type SessionMode = 'chill' | 'fair' | 'hard'
+/** The Manual Queue | Auto Queue switch. Auto places the next ready match On court; it never starts one. */
+export type CourtFillMode = 'manual' | 'auto'
 export type QueueSession = {
   id: string
   clubId: string
@@ -9,8 +11,13 @@ export type QueueSession = {
   venueId: string
   venueName: string
   venueAddress: string
-  state: 'prepared' | 'active' | 'finalizing' | 'completed' | 'invalid'
+  /** `cancelled`: only from prepared, before start; final. */
+  state: 'prepared' | 'active' | 'finalizing' | 'completed' | 'invalid' | 'cancelled'
   invalidReason: string | null
+  /** Set exactly when cancelled. Missing on sessions made before Cancel session existed. */
+  cancelledAt?: number | null
+  /** Optional reason, up to 120 characters; only when cancelled. */
+  cancelReason?: string | null
   sessionMode: SessionMode
   allowSingles: boolean
   allowDoubles: boolean
@@ -24,6 +31,8 @@ export type QueueSession = {
   seriesId: string | null
   publicSlug: string
   acceptJoinRequests: boolean
+  /** Missing means `manual` (the default). */
+  courtFillMode?: CourtFillMode
 }
 export type SessionCourt = {
   id: string

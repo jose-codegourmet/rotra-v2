@@ -111,20 +111,23 @@ UUID from another club or session is rejected.
 | `club_players` | PK `id`; unique `(club_id, id)`, `(club_id, player_id)` (nulls distinct, so guests repeat); index `(club_id, display_name, id)` | non-blank name | club; optional player |
 | `club_player_private_inputs` | PK/FK `club_player_id`; unique `(club_id, club_player_id)`; index `(state, captured_at)`, `phone_e164` | E.164 / lowercase email; `resolved` ⇔ resolved player + time | `(club_id, club_player_id)` |
 | `club_venues` | PK `id`; unique `(club_id, id)`, expression unique `(club_id, lower(name))` | fees null or ≥ 0 | club |
-| `queue_sessions` | PK `id`; unique `(club_id, id)`, `public_slug`, `source_command_id`; partial unique `club_id WHERE state IN (active, finalizing)`; index `(club_id, scheduled_start_at desc, id)` | end > start; minimum ≥ 0; players per court 2–20; invalid ⇒ reason; completed ⇔ `finalized_at`; **exclusion** no overlapping non-invalid sessions per club (`btree_gist`) | `(club_id, venue_id)`, `(club_id, start_license_term_id)` |
+| `queue_sessions` | PK `id`; unique `(club_id, id)`, `public_slug`, `source_command_id`; partial unique `club_id WHERE state IN (active, finalizing)`; index `(club_id, scheduled_start_at desc, id)` | end > start; minimum ≥ 0; players per court 2–20; invalid ⇒ reason; completed ⇔ `finalized_at`; started unless prepared/invalid/cancelled; cancelled ⇔ `cancelled_at`, never started; reason null or 1–120 characters, only when cancelled; **exclusion** no overlapping sessions per club among prepared/active/finalizing/completed, so invalid and cancelled never clash (`btree_gist`; cancelled since `20261106000100`) | `(club_id, venue_id)`, `(club_id, start_license_term_id)` |
 | `club_session_reservations` | PK `club_id`; unique `session_id` | — | `(club_id, session_id)` |
-| `session_courts` | PK `id`; unique `(club_id, session_id, id)`; partial unique `(session_id, label) WHERE removed_at IS NULL` | non-blank label; soft removal | `(club_id, session_id)` |
+| `session_courts` | PK `id`; unique `(club_id, session_id, id)`; partial unique `(session_id, label) WHERE removed_at IS NULL` | non-blank label; soft removal; `opened_early_at` ⇒ `starts_at`; set `open_until` > set `starts_at` | `(club_id, session_id)` |
 | `session_players` | PK `id`; unique `(club_id, session_id, id)`, `(session_id, club_player_id)`, `(session_id, player_id_at_entry)`; index `(session_id, present, id)` | release time ⇔ reason; locked ⇒ level + assessment, not released; **level-lock** trigger; **no delete** trigger | `(club_id, session_id)`, `(club_id, club_player_id)`, `(club_id, session_id, id, assessment_id)` → the entry's own assessment |
 | `session_waitlist` | PK `id`; unique `(session_id, club_player_id)` (also serves the per-session read; the order index was dropped in `20261031001100`) | demotion time ⇔ demoted slot time | `(club_id, session_id)`, `(club_id, club_player_id)` |
-| `session_join_requests` | PK `id`; index `(session_id, status, requested_at)` | pending ⇔ no decision time; confirmed ⇒ club player | `(club_id, session_id)`, `(club_id, club_player_id)` |
+| `session_join_requests` | PK `id`; index `(session_id, status, requested_at)` | pending ⇔ no decision time (so `closed` carries one); confirmed ⇒ club player | `(club_id, session_id)`, `(club_id, club_player_id)` |
 | `club_assessments` | PK `id`; unique `source_operation_id`, `(club_id, club_player_id, id)`, `(club_id, session_id, session_player_id, id)`; rank indexes per ranking.md | actor = owning club; **append-only** trigger | `(club_id, club_player_id)`, `(club_id, session_id)`, `(club_id, session_id, session_player_id)`, `(club_id, club_player_id, supersedes_id)` |
 
-**Cancelled sessions (proposed, not drafted; owner decision, November 6, 2026; [log](../../mockup-changes/2026-11-06-queue-example-sessions-and-cancel.md)).**
+**Cancelled sessions, court fill mode, court planned start (drafted in `20261106000100`; owner decision, November 6, 2026; [log](../../mockup-changes/2026-11-06-queue-example-sessions-and-cancel.md)).**
 `queue_sessions.state` gains `cancelled` (allowed only from `prepared`, final) with `cancelled_at`
-(set ⇔ cancelled) and a nullable `cancel_reason` (≤ 120 characters, only when cancelled). The overlap
-exclusion becomes `WHERE state NOT IN ('invalid', 'cancelled')`. `session_join_requests` gains a
-`closed` status for pending requests closed by the cancel. Roster, waitlist and payment-mark rows are kept;
-payment marks refuse writes on a cancelled session. Needs a migration ticket.
+(set ⇔ cancelled) and a nullable `cancel_reason` (≤ 120 characters, only when cancelled); the
+finalization guard refuses a cancelled session as it does an invalid one. `queue_sessions` gains
+`court_fill_mode` (`manual` default · `auto`). `session_courts` gains `starts_at` (null = session start) and
+`opened_early_at`. `session_join_requests` gains a `closed` status for pending requests closed by the
+cancel. Roster, waitlist and payment-mark rows are kept; payment marks refuse writes on a cancelled
+session (command, later ticket). The new enum values can't be used in the transaction that adds
+them, so the rewritten checks and the exclusion predicate list the old values instead.
 
 **Roster identity (proposal, #245).** One `session_players` row per (session, club player) for the
 session's lifetime. Demotion and preparation removal set `released_at` + `release_reason`; rows are
@@ -205,14 +208,14 @@ close of a stream that never wrote, conflict categories and who may resolve one.
 
 | Table | Keys and uniques | Checks and triggers | Scoped FKs |
 |---|---|---|---|
-| `matches` | PK `id`; unique `(club_id, session_id, id)`, `(session_id, match_no)`, `source_operation_id`; index `(session_id, state, queue_position, id)` | `match_no > 0`; removed only while waiting; started ⇔ not waiting; ended ⇔ completed/invalid; **frozen-after-decision** trigger (no delete; no change once completed/invalid; ending needs a matching decision) | `(club_id, session_id)` |
-| `match_participations` | PK `id`; unique `(match_id, session_player_id, segment_no)` | segment > 0; left time ⇔ left operation; finished ⇒ not left; **frozen** trigger (no change once decided; no delete once started) | `(club_id, session_id, match_id)`, `(club_id, session_id, session_player_id)` |
+| `matches` | PK `id`; unique `(club_id, session_id, id)`, `(session_id, match_no)`, `source_operation_id`; index `(session_id, state, queue_position, id)` | `match_no > 0`; removed only while waiting; started ⇔ active/completed/invalid; waiting ⇒ no `placed_at`, on_court ⇒ `placed_at`; started ≥ placed; ended ⇔ completed/invalid; **frozen-after-decision** trigger (no delete; no change once completed/invalid; ending needs a matching decision) | `(club_id, session_id)` |
+| `match_participations` | PK `id`; unique `(match_id, session_player_id, segment_no)` | segment > 0; left time ⇔ left operation; finished ⇒ not left; `credit_to` ≠ none ⇒ not started with the match; **frozen** trigger (no change once decided, so `credit_to` freezes too; no delete once started, i.e. after waiting/on_court) | `(club_id, session_id, match_id)`, `(club_id, session_id, session_player_id)` |
 | `match_court_usage` | PK `id`; unique `(match_id, court_id)` | release time ⇔ release operation; no delete | match and `(club_id, session_id, court_id)` |
-| `active_court_holds` | PK `court_id` (one hold per court) | hold needs an **active** match | court and match, scoped |
-| `active_player_holds` | PK `session_player_id`; unique `player_id` (a known player is held once across all sessions) | hold needs an **active** match | roster entry and match, scoped |
+| `active_court_holds` | PK `court_id` (one hold per court) | hold needs an **on_court or active** match | court and match, scoped |
+| `active_player_holds` | PK `session_player_id`; unique `player_id` (a known player is held once across all sessions) | hold needs an **on_court or active** match | roster entry and match, scoped |
 | `match_decisions` | PK `match_id`; unique `source_operation_id`, `(club_id, session_id, match_id)` | completed ⇒ winner; invalid ⇒ no winner/scores; scores both null (winner-only) or both ≥ 0 and agreeing with the winner (no ties); actor = club; **append-only** | match, `(club_id, device_id)` |
 
-- **Occupancy.** A court or player can be held by one active match only (primary keys). A 5v5 match
+- **Occupancy.** A court or player can be held by one on_court or active match only (primary keys). A 5v5 match
   holds two courts through two `active_court_holds` rows for the same match. Holds are released by
   deleting them in the same transaction as the decision.
 - **Ending a match, in order:** mark the segments still on court `finished_with_match` (their `left_at`
@@ -225,13 +228,12 @@ close of a stream that never wrote, conflict categories and who may resolve one.
   segment), never a client flag.
 - Operation references (`source_operation_id`, `joined_operation_id`, …) have no FK: online commands
   have no `sync_operations` row.
-- **Proposed, not drafted (owner decision, November 6, 2026; [log](../../mockup-changes/2026-11-06-queue-on-court-and-sub-credit.md)):**
-  a `matches.state` value `on_court` between `waiting` and `active`, a nullable `placed_at`, and
-  court/player holds taken at placement, so the hold checks become "needs an `on_court` or `active`
-  match" and "started ⇔ not waiting" becomes "started ⇔ active/completed/invalid" (`started_at` only at
-  Start match). Substitutions gain `credit_to` (`none` · `incoming` · `outgoing`, default `none`,
-  frozen with the decision); `queue_sessions` gains `court_fill_mode` (`manual` · `auto`, default
-  `manual`). Needs a migration ticket; the frozen-after-decision triggers must also freeze `credit_to`.
+- **On court and game credit (drafted in `20261106000100`; owner decision, November 6, 2026; [log](../../mockup-changes/2026-11-06-queue-on-court-and-sub-credit.md)):**
+  `matches.state` gains `on_court` (appended to the enum), a nullable `placed_at`, and court/player
+  holds taken at placement (the checks above). `started_at` is set only at Start match. Substitutions
+  record `credit_to` (enum `substitution_credit`: `none` default · `incoming` · `outgoing`) on the
+  **incoming** player's `match_participations` row; the existing frozen trigger freezes it with the
+  decision. Commands are later tickets.
 - Open (#246): offline `match_no` allocation, conflicting confirmations, collision-free placement across
   offline devices, and whether unplayed waiting matches are kept or marked removed at Session done
   (`on_court` matches are dropped like waiting ones). Canonical waiting positions are not unique in
@@ -260,7 +262,7 @@ close of a stream that never wrote, conflict categories and who may resolve one.
 
 | Table | Keys and uniques | Checks and triggers | Scoped FKs |
 |---|---|---|---|
-| `session_finalizations` | PK `session_id` (one per session); unique `command_id`, `(club_id, session_id)` | 32-byte digests; committed ⇔ commit time + facts digest; done ⇔ completion time; failed ⇔ failed stage; **guard**: no finalization for an invalid session, never deleted, manifest/revision/policy/facts digest frozen once committed | session `(club_id, session_id)`; policy version |
+| `session_finalizations` | PK `session_id` (one per session); unique `command_id`, `(club_id, session_id)` | 32-byte digests; committed ⇔ commit time + facts digest; done ⇔ completion time; failed ⇔ failed stage; **guard**: no finalization for an invalid or cancelled session (cancelled since `20261106000100`), never deleted, manifest/revision/policy/facts digest frozen once committed | session `(club_id, session_id)`; policy version |
 | `player_match_facts` | PK `id`; unique `(match_id, session_player_id)`; history indexes per results-publication.md | score pair both null or both ≥ 0; `standard_match` ⇔ singles/doubles; **guard**: only from a completed decision with the same winner, append-only | finalization `(club_id, session_id)`, decision `(club_id, session_id, match_id)`, roster entry, club player |
 | `club_session_player_summaries` | PK `id`; unique `(session_id, session_player_id)` | counts ≥ 0; wins + losses = full games = standard + fun | finalization, roster entry, club player |
 | `session_result_snapshots` | PK `id`; unique `(session_id, version)`, `(club_id, session_id, id)` | version > 0; **append-only**; Off Day in its own `off_day` column | finalization |

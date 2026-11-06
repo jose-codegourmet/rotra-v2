@@ -30,7 +30,8 @@ export type SessionJoinRequest = {
   nickname: string | null
   phoneE164: string | null
   statedBand: 'beginner' | 'intermediate' | 'advanced' | 'unsure'
-  status: 'pending' | 'confirmed' | 'declined'
+  /** `closed`: a pending request closed by Cancel session (not a decline); `decidedAt` is the cancel time. */
+  status: 'pending' | 'confirmed' | 'declined' | 'closed'
   requestedAt: number
   decidedAt: number | null
   clubPlayerId: string | null

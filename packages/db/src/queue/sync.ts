@@ -8,9 +8,13 @@ import { setPaid } from './financials'
 import {
   completeMatch,
   invalidateMatch,
+  moveCourt,
   placeOnCourt,
+  replacePlayer,
+  sendBackToQueue,
   startMatch,
   substitutePlayer,
+  swapWithQueue,
 } from './match-control'
 import {
   addManualMatch,
@@ -73,6 +77,13 @@ const DISPATCH: Record<
   // Put on court is allowed offline (owner decision, November 6, 2026): replayed like Start match,
   // so a court or player another device took first is a quarantined conflict, never a double hold.
   'match.place': (c, s, id, p) => placeOnCourt(c, s, { ...p, operationId: id } as never),
+  // The On court actions are match edits, which work on a downloaded session offline (offline
+  // module); each rechecks on replay, so a court, player or swap target that changed since is a
+  // quarantined conflict, never a double hold.
+  'match.send_back': (c, s, id, p) => sendBackToQueue(c, s, { ...p, operationId: id } as never),
+  'match.move_court': (c, s, id, p) => moveCourt(c, s, { ...p, operationId: id } as never),
+  'match.replace': (c, s, id, p) => replacePlayer(c, s, { ...p, operationId: id } as never),
+  'match.swap': (c, s, id, p) => swapWithQueue(c, s, { ...p, operationId: id } as never),
   // From On court the payload carries no courts; the older one-step start still sends them.
   'match.start': (c, s, id, p) =>
     startMatch(c, s, { courtIds: [], ...p, operationId: id } as never),

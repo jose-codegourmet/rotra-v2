@@ -4,18 +4,29 @@ import { queueMutation } from '../mock/transaction'
 import {
   realCompleteMatch,
   realInvalidateMatch,
+  realMoveCourt,
   realPlaceOnCourt,
+  realReplacePlayer,
+  realSendBackToQueue,
   realStartMatch,
   realSubstitutePlayer,
+  realSwapWithQueue,
 } from '../real/match'
 import { isRealDataMode } from '../real/mode'
+import type { SyncArea } from '../sync/sync.types'
 import {
+  canMoveCourt,
   canPlace,
+  canReplacePlayer,
+  canSendBack,
   canStart,
   courtNames,
+  replacedLineup,
   shortName,
   substitutionCandidates,
+  swapTarget,
   validateResult,
+  waitingMatches,
 } from './match.rules'
 import type { Match } from './match.types'
 import { matchContext, requireLive } from './queue.mutations'
@@ -24,13 +35,14 @@ function control(
   input: { matchId: string; operationId: string },
   kind: string,
   fn: (s: MockState, m: Match) => string,
+  area: SyncArea = 'Matches and results',
 ) {
   const current = readMockState().matches.find((m) => m.id === input.matchId)
   if (!current) throw new MockError('permission', 'Match not available.')
   if (!input.operationId.trim()) throw new MockError('permission', 'A confirmation ID is required.')
   return queueMutation(
     {
-      area: 'Matches and results',
+      area,
       sessionId: current.sessionId,
       operationId: input.operationId,
       fingerprint: JSON.stringify([
@@ -86,6 +98,109 @@ export function startMatch(input: { matchId: string; courtIds?: string[]; operat
     m.startedAt = now
     return `Match ${m.matchNo} started on ${courtNames(m, s.courts)}`
   })
+}
+const changed = () => new MockError('conflict', 'Something changed. Review the match again.')
+/** Off the court and back into the queue: holds released, no placement time. */
+function unplace(m: Match) {
+  m.state = 'waiting'
+  m.courtIds = []
+  m.placedAt = null
+  m.startedAt = null
+}
+/**
+ * Send back to queue (Q-ON-COURT): the On court match goes to the **top** of the queue and its
+ * court(s) free up. It keeps `manualProtected`, so a match edited while On court (Replace player)
+ * goes back protected. Auto Queue refilling the freed court is Q12.25. Allowed offline.
+ */
+export function sendBackToQueue(input: { matchId: string; operationId: string }) {
+  if (isRealDataMode()) return realSendBackToQueue(input)
+  return control(
+    input,
+    'send-back',
+    (s, m) => {
+      if (!canSendBack(m)) throw changed()
+      const where = courtNames(m, s.courts)
+      const rest = waitingMatches(s.matches.filter((x) => x.sessionId === m.sessionId))
+      unplace(m)
+      for (const [i, x] of [m, ...rest].entries()) x.queuePosition = i + 1
+      return `Match ${m.matchNo} back to #1 in the queue · ${where} free`
+    },
+    'Queue',
+  )
+}
+/**
+ * Move to another court (Q-ON-COURT): the On court match takes free open court(s) (two for 5v5)
+ * and releases the ones it held. Still On court, nothing starts. Allowed offline.
+ */
+export function moveCourt(input: { matchId: string; courtIds: string[]; operationId: string }) {
+  if (isRealDataMode()) return realMoveCourt(input)
+  return control(input, 'move-court', (s, m) => {
+    if (!canMoveCourt(m, input.courtIds, matchContext(s, m.sessionId))) throw changed()
+    const from = courtNames(m, s.courts)
+    m.courtIds = [...input.courtIds]
+    return `Match ${m.matchNo} moved from ${from} to ${courtNames(m, s.courts)} · getting ready`
+  })
+}
+/**
+ * Replace player (Q-ON-COURT): a plain lineup change on an On court match. The incoming player
+ * takes the slot and is a full participant; no substitution is recorded and no game credit is
+ * asked. The match becomes manual and protected, so it goes back protected if sent back.
+ */
+export function replacePlayer(input: {
+  matchId: string
+  outId: string
+  inId: string
+  operationId: string
+}) {
+  if (isRealDataMode()) return realReplacePlayer(input)
+  return control(input, 'replace', (s, m) => {
+    if (!canReplacePlayer(m, input.outId, input.inId, matchContext(s, m.sessionId)))
+      throw changed()
+    const incoming = s.roster.find((p) => p.id === input.inId),
+      out = s.roster.find((p) => p.id === input.outId)
+    if (!incoming || !out) throw changed()
+    const lineup = replacedLineup(m, input.outId, input.inId)
+    m.teamA = lineup.teamA
+    m.teamB = lineup.teamB
+    m.origin = 'manual'
+    m.manualProtected = true
+    return `Match ${m.matchNo}: ${shortName(incoming)} in for ${shortName(out)} · lineup changed`
+  })
+}
+/**
+ * Swap with the queue (Q-ON-COURT): `withMatchId` is the match the screen showed as the swap target
+ * (`swapTarget`). It is rechecked here; if the target is no longer the same match the swap is
+ * refused. The target goes on this match's court(s) as On court, and this match takes the target's
+ * queue position (not the top), keeping `manualProtected`. Allowed offline.
+ */
+export function swapWithQueue(input: {
+  matchId: string
+  withMatchId: string
+  operationId: string
+}) {
+  if (isRealDataMode()) return realSwapWithQueue(input)
+  return control(
+    input,
+    'swap',
+    (s, m) => {
+      const target = swapTarget(m, matchContext(s, m.sessionId))
+      const n = target && s.matches.find((x) => x.id === target.match.id)
+      if (!target || !n || n.id !== input.withMatchId) throw changed()
+      const where = courtNames(m, s.courts),
+        courtIds = [...m.courtIds],
+        position = n.queuePosition
+      unplace(m)
+      m.queuePosition = position
+      n.state = 'on_court'
+      n.courtIds = courtIds
+      n.placedAt = Date.now()
+      n.startedAt = null
+      const at =
+        waitingMatches(s.matches.filter((x) => x.sessionId === m.sessionId)).indexOf(m) + 1
+      return `Match ${n.matchNo} swapped onto ${where} · getting ready · Match ${m.matchNo} back to #${at} in the queue`
+    },
+    'Queue',
+  )
 }
 export function completeMatch(input: {
   matchId: string

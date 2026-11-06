@@ -320,6 +320,100 @@ export async function realStartMatch(input: {
   return accepted(null, `Match ${match.matchNo} started on ${courtNames(match, courts)}`)
 }
 
+/** One On court command on the shown match; the reply is the changed match (or matches). */
+function onCourtCommand<T>(sessionId: string, matchId: string, action: string, body: unknown) {
+  return queueCommand<T>(sessionId, `/matches/${encodeURIComponent(matchId)}/${action}`, { body })
+}
+
+/** Send back to queue: the top of the queue; the court(s) free up. */
+export async function realSendBackToQueue(input: { matchId: string; operationId: string }) {
+  requireOperationId(input.operationId)
+  const { sessionId, courts } = await controlContext(input.matchId)
+  const shown = shownMatch(await lastRead(sessionId), input.matchId)
+  const match = matchOf(
+    await onCourtCommand<WireMatch>(sessionId, input.matchId, 'send-back', {
+      operationId: input.operationId,
+    }),
+  )
+  return accepted(
+    null,
+    `Match ${match.matchNo} back to #1 in the queue · ${courtNames(shown, courts)} free`,
+  )
+}
+
+/** Move to another court: free open court(s), two for 5v5; still On court. */
+export async function realMoveCourt(input: {
+  matchId: string
+  courtIds: string[]
+  operationId: string
+}) {
+  requireOperationId(input.operationId)
+  const { sessionId, courts } = await controlContext(input.matchId)
+  const shown = shownMatch(await lastRead(sessionId), input.matchId)
+  const match = matchOf(
+    await onCourtCommand<WireMatch>(sessionId, input.matchId, 'move', {
+      operationId: input.operationId,
+      courtIds: input.courtIds,
+    }),
+  )
+  return accepted(
+    null,
+    `Match ${match.matchNo} moved from ${courtNames(shown, courts)} to ${courtNames(match, courts)} · getting ready`,
+  )
+}
+
+/** Replace player: a plain lineup change on an On court match, never a substitution. */
+export async function realReplacePlayer(input: {
+  matchId: string
+  outId: string
+  inId: string
+  operationId: string
+}) {
+  requireOperationId(input.operationId)
+  const sessionId = sessionOf(input.matchId)
+  const { roster } = await realGetSessionRoster(sessionId)
+  const incoming = roster.find((p) => p.id === input.inId),
+    out = roster.find((p) => p.id === input.outId)
+  if (!incoming || !out)
+    throw new MockError('conflict', 'Something changed. Review the match again.')
+  const match = matchOf(
+    await onCourtCommand<WireMatch>(sessionId, input.matchId, 'replace', {
+      operationId: input.operationId,
+      outId: input.outId,
+      inId: input.inId,
+    }),
+  )
+  return accepted(
+    null,
+    `Match ${match.matchNo}: ${shortName(incoming)} in for ${shortName(out)} · lineup changed`,
+  )
+}
+
+/**
+ * Swap with the queue: sends the target the screen showed; the server rechecks it is still the
+ * next ready match and refuses the swap otherwise.
+ */
+export async function realSwapWithQueue(input: {
+  matchId: string
+  withMatchId: string
+  operationId: string
+}) {
+  requireOperationId(input.operationId)
+  const { sessionId, courts } = await controlContext(input.matchId)
+  const done = await onCourtCommand<{ match: WireMatch; placed: WireMatch; position: number }>(
+    sessionId,
+    input.matchId,
+    'swap',
+    { operationId: input.operationId, withMatchId: input.withMatchId },
+  )
+  const match = matchOf(done.match),
+    placed = matchOf(done.placed)
+  return accepted(
+    null,
+    `Match ${placed.matchNo} swapped onto ${courtNames(placed, courts)} · getting ready · Match ${match.matchNo} back to #${done.position} in the queue`,
+  )
+}
+
 type Decided = { match: WireMatch; decision: { winningTeam: 'A' | 'B' | null } }
 
 export async function realCompleteMatch(input: {

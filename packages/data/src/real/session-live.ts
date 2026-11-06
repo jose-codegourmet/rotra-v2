@@ -68,6 +68,16 @@ export async function realDeleteSession(sessionId: string) {
   return accepted({ id }, `Session deleted · ${title}`)
 }
 
+/** D-CANCEL-SESSION: online only, like Delete session; a retry returns the cancelled session. */
+export async function realCancelSession(input: { sessionId: string; reason?: string | null }) {
+  const { title } = await realRequest<WireSession>(`${sessionPath(input.sessionId)}/cancel`, {
+    method: 'POST',
+    body: { reason: input.reason?.trim() || null },
+    fields: { reason: 'reason', state: 'state' },
+  })
+  return accepted(await realGetQueueSession(input.sessionId), `${title} cancelled`)
+}
+
 export async function realSetAcceptJoinRequests(input: { sessionId: string; accept: boolean }) {
   await realRequest<WireSession>(sessionPath(input.sessionId), {
     method: 'PATCH',

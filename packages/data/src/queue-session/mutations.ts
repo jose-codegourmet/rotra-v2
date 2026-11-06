@@ -8,11 +8,20 @@ import { type MockState, mockStore } from '../mock/store'
 import { queueMutation, sessionIn } from '../mock/transaction'
 import { isRealDataMode } from '../real/mode'
 import { realCreateQueueSession } from '../real/queue'
-import { realDeleteSession, realStartSession, realUpdateQueueSession } from '../real/session-live'
+import {
+  realCancelSession,
+  realDeleteSession,
+  realStartSession,
+  realUpdateQueueSession,
+} from '../real/session-live'
 import { normalizeSessionCost } from '../session-cost/sessionCost.rules'
 import { validateSessionCost } from '../session-cost/validation'
 import type { SessionWaitlistEntry } from '../session-roster/sessionRoster.types'
+import { saveToastText } from '../sync/fetchers'
 import {
+  cancelBlocker,
+  cancelReasonError,
+  cancelReasonOf,
   estimateMinimum,
   publicSlugFor,
   rebalanceSlots,
@@ -343,5 +352,42 @@ export function deleteSession(sessionId: string) {
     delete state.downloads[sessionId]
     delete state.downloadInfo[sessionId]
     return { data: { id: sessionId }, text: `Session deleted · ${s.title}` }
+  })
+}
+/**
+ * D-CANCEL-SESSION: calls off a prepared session. Final; needs internet (never saved offline or
+ * replayed by sync). Pending join requests close in the same write; roster, waitlist and payment
+ * marks stay, read-only. A retry on a session already cancelled returns it unchanged.
+ */
+export async function cancelSession(input: { sessionId: string; reason?: string | null }) {
+  if (isRealDataMode()) return realCancelSession(input)
+  const reasonError = cancelReasonError(input.reason)
+  if (reasonError) throw new MockError('permission', reasonError, { reason: reasonError })
+  const saved = mockStore.getSnapshot().sessions.find((s) => s.id === input.sessionId)
+  if (saved?.state === 'cancelled') {
+    await delay()
+    requireOnline()
+    const data = structuredClone(sessionIn(mockStore.getSnapshot(), input.sessionId))
+    return {
+      savedOffline: false,
+      message: saveToastText(`${data.title} cancelled`, { savedOffline: false }),
+      data,
+    }
+  }
+  return queueMutation({ area: 'Session', onlineOnly: true, clubAccess: true }, (state) => {
+    const s = sessionIn(state, input.sessionId)
+    // A session started (or cancelled) since the sheet opened is a conflict; nothing changes.
+    if (s.state !== 'prepared')
+      throw new MockError('conflict', cancelBlocker(s) ?? 'This session is already cancelled.')
+    const now = Date.now()
+    s.state = 'cancelled'
+    s.cancelledAt = now
+    s.cancelReason = cancelReasonOf(input.reason)
+    for (const request of state.joinRequests) {
+      if (request.sessionId !== s.id || request.status !== 'pending') continue
+      request.status = 'closed'
+      request.decidedAt = now
+    }
+    return { data: structuredClone(s), text: `${s.title} cancelled` }
   })
 }

@@ -311,9 +311,12 @@ export async function saveSessionCost(
   })
 }
 
-/** Payments are open in prepared, active and completed sessions; never invalid or mid-finalization. */
+/**
+ * Payments are open in prepared, active and completed sessions; never invalid, mid-finalization or
+ * cancelled (a cancelled session keeps its marks, read-only; refunds happen outside ROTRA).
+ */
 function requirePaymentsOpen(session: QueueSession) {
-  if (session.state === 'invalid' || session.state === 'finalizing')
+  if (['invalid', 'finalizing', 'cancelled'].includes(session.state))
     throw new ServiceError('invalid', { state: 'Payments are not available for this session.' })
 }
 

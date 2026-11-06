@@ -259,12 +259,18 @@ export async function realRemoveInventoryItem(id: string) {
 
 type WireSession = Omit<
   QueueSession,
-  'scheduledStartAt' | 'scheduledEndAt' | 'startedAt' | 'finalizedAt' | 'playerRecordsUpdatedAt'
+  | 'scheduledStartAt'
+  | 'scheduledEndAt'
+  | 'startedAt'
+  | 'finalizedAt'
+  | 'playerRecordsUpdatedAt'
+  | 'cancelledAt'
 > & {
   scheduledStartAt: string
   scheduledEndAt: string
   startedAt: string | null
   finalizedAt: string | null
+  cancelledAt?: string | null
 }
 type WireCourt = {
   id: string
@@ -302,6 +308,7 @@ function summaryOf(wire: WireSessionSummary): QueueSessionSummary {
     scheduledEndAt: msOf(session.scheduledEndAt),
     startedAt: msOrNull(session.startedAt),
     finalizedAt: msOrNull(session.finalizedAt),
+    cancelledAt: msOrNull(session.cancelledAt ?? null),
     playerRecordsUpdatedAt: null,
     courtsInUse: wire.courtsInUse,
     gamesPlayed: wire.gamesPlayed,

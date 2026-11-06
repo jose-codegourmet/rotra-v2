@@ -94,10 +94,10 @@ async function validate(tx: Tx, context: ClubContext, input: QueueSessionInput) 
   return { venue, start, end, playersPerCourt }
 }
 
-/** The club's non-invalid sessions, in the shape the shared clash rule reads. */
+/** The club's sessions that can clash (not invalid, not cancelled), in the shared rule's shape. */
 async function clashCandidates(tx: Tx, context: ClubContext) {
   const rows = await tx.queueSession.findMany({
-    where: { clubId: context.clubId, state: { not: 'invalid' } },
+    where: { clubId: context.clubId, state: { notIn: ['invalid', 'cancelled'] } },
     select: {
       id: true,
       title: true,

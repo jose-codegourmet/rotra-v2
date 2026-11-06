@@ -62,7 +62,8 @@ export async function getSessionPayments(sessionId: string) {
 }
 function requirePaymentsWrite(state: MockState, sessionId: string) {
   const session = sessionIn(state, sessionId)
-  if (session.state === 'invalid' || session.state === 'finalizing')
+  // A cancelled session keeps its marks, read-only; refunds happen outside ROTRA.
+  if (['invalid', 'finalizing', 'cancelled'].includes(session.state))
     throw new MockError('permission', 'Payments are not available for this session.')
   if (getMockDevState().licenseExpired && session.state !== 'active') requireClubAccess()
   if (getMockDevState().offline && state.downloads[sessionId] !== 'ready')

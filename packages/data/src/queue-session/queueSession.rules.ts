@@ -35,6 +35,29 @@ export function estimateMinimum(input: {
     usable,
   }
 }
+/** Invalid and cancelled sessions never take part in venue or time clashes. */
+export function countsForClash(session: Pick<QueueSession, 'state'>) {
+  return session.state !== 'invalid' && session.state !== 'cancelled'
+}
+/** Cancel session's optional reason: trimmed, empty means none, at most this many characters. */
+export const CANCEL_REASON_MAX = 120
+export function cancelReasonOf(reason: string | null | undefined) {
+  return reason?.trim() || null
+}
+export function cancelReasonError(reason: string | null | undefined) {
+  return (cancelReasonOf(reason)?.length ?? 0) > CANCEL_REASON_MAX
+    ? `Keep the reason to ${CANCEL_REASON_MAX} characters.`
+    : null
+}
+/**
+ * Cancel session runs only on a prepared session (before Start session). An already-cancelled
+ * session is not a blocker: a retried cancel returns it unchanged.
+ */
+export function cancelBlocker(session: Pick<QueueSession, 'state'>) {
+  return session.state === 'prepared' || session.state === 'cancelled'
+    ? null
+    : 'Only a session that has not started can be cancelled.'
+}
 export const timeLabel = (at: number) =>
   new Date(at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
 export function sessionOccurrences(
@@ -62,7 +85,7 @@ export function sessionOccurrences(
       .filter(
         (s) =>
           s.id !== draft.id &&
-          s.state !== 'invalid' &&
+          countsForClash(s) &&
           s.scheduledStartAt < end &&
           start < s.scheduledEndAt,
       )

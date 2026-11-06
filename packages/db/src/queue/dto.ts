@@ -23,6 +23,8 @@ export function sessionDto(session: QueueSession) {
     venueAddress: session.venueAddress ?? '',
     state: session.state,
     invalidReason: session.invalidReason,
+    cancelledAt: toIsoOrNull(session.cancelledAt),
+    cancelReason: session.cancelReason,
     sessionMode: session.sessionMode,
     allowSingles: session.allowSingles,
     allowDoubles: session.allowDoubles,

@@ -37,6 +37,8 @@ export function sessionDto(session: QueueSession) {
     seriesId: session.seriesId,
     publicSlug: session.publicSlug,
     acceptJoinRequests: session.acceptJoinRequests,
+    /** Manual Queue | Auto Queue (default manual). */
+    courtFillMode: session.courtFillMode,
     revision: toDecimalString(session.revision),
   }
 }

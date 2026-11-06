@@ -17,6 +17,12 @@ import { requireRevision } from '../service/authorize'
 import { ServiceError } from '../service/errors'
 import { toDecimalString } from '../service/serialize'
 import {
+  type AutoFillOptions,
+  type AutoPlaced,
+  autoFillCourts,
+  withAutoPlaced,
+} from './match-control'
+import {
   loadMatch,
   type MatchRow,
   matchCommand,
@@ -190,21 +196,44 @@ export function lineupOf(value: unknown): MatchLineup {
   return { format, teamA, teamB }
 }
 
+/** A retried add (its operation already made the match): returns as it was, no Auto Queue. */
+const addedAlready = async (tx: Tx, operationId: string) =>
+  !!(await tx.match.findUnique({ where: { sourceOperationId: operationId }, select: { id: true } }))
+
+/**
+ * Auto Queue after a match is added (Queueing › Auto Queue and Manual Queue): a free open court
+ * gets the next eligible match in the same transaction. Never on a repeat or an offline replay.
+ */
+function fillAfterAdd(
+  tx: Tx,
+  session: QueueSession,
+  operationId: string,
+  options: AutoFillOptions,
+) {
+  return autoFillCourts(tx, session, { ...options, operationId })
+}
+
 /** Q-QUEUE · Add match (manual lineup). Manual entries are protected from regeneration. */
 export async function addManualMatch(
   context: ClubContext,
   sessionId: string,
   input: { operationId: string; lineup: MatchLineup },
+  options: AutoFillOptions = {},
 ) {
-  return matchCommand(context, sessionId, {}, async (tx, session) => {
+  let autoPlaced: AutoPlaced = []
+  const done = await matchCommand(context, sessionId, {}, async (tx, session) => {
+    const repeat = await addedAlready(tx, input.operationId)
     const { roster } = await matchContext(tx, session)
     const row = await appendMatch(tx, session, new Set(roster.map((r) => r.id)), input.lineup, {
       operationId: input.operationId,
       origin: 'manual',
       manualProtected: true,
     })
-    return matchDto(row)
+    const result = matchDto(row)
+    if (!repeat) autoPlaced = await fillAfterAdd(tx, session, input.operationId, options)
+    return result
   })
+  return withAutoPlaced(done, autoPlaced)
 }
 
 /** Q-QUEUE · Make match from a selection of 2, 3, 4, 6, 8 or 10 players. */
@@ -212,8 +241,11 @@ export async function makeMatch(
   context: ClubContext,
   sessionId: string,
   input: { operationId: string; selection: string[] },
+  options: AutoFillOptions = {},
 ) {
-  return matchCommand(context, sessionId, {}, async (tx, session) => {
+  let autoPlaced: AutoPlaced = []
+  const done = await matchCommand(context, sessionId, {}, async (tx, session) => {
+    const repeat = await addedAlready(tx, input.operationId)
     const { ctx, roster } = await matchContext(tx, session)
     const plan = formatForSelection(input.selection.length, session)
     if (!plan.format) throw new ServiceError('invalid', { selection: plan.reason })
@@ -229,8 +261,11 @@ export async function makeMatch(
       origin: 'manual',
       manualProtected: true,
     })
-    return matchDto(row)
+    const result = matchDto(row)
+    if (!repeat) autoPlaced = await fillAfterAdd(tx, session, input.operationId, options)
+    return result
   })
+  return withAutoPlaced(done, autoPlaced)
 }
 
 /**
@@ -276,8 +311,10 @@ export async function addSuggestedMatch(
     expectedQueueRevision: string
     expectedRevision: string
   },
+  options: AutoFillOptions = {},
 ) {
-  return matchCommand(
+  let autoPlaced: AutoPlaced = []
+  const done = await matchCommand(
     context,
     sessionId,
     {
@@ -285,15 +322,19 @@ export async function addSuggestedMatch(
       expectedRevision: input.expectedRevision,
     },
     async (tx, session) => {
+      const repeat = await addedAlready(tx, input.operationId)
       const { roster } = await matchContext(tx, session)
       const row = await appendMatch(tx, session, new Set(roster.map((r) => r.id)), input.lineup, {
         operationId: input.operationId,
         origin: 'suggested',
         manualProtected: input.switched,
       })
-      return matchDto(row)
+      const result = matchDto(row)
+      if (!repeat) autoPlaced = await fillAfterAdd(tx, session, input.operationId, options)
+      return result
     },
   )
+  return withAutoPlaced(done, autoPlaced)
 }
 
 async function generationRows(tx: Tx, sessionId: string, generationId: string) {
@@ -309,10 +350,12 @@ export async function autoQueue(
   context: ClubContext,
   sessionId: string,
   input: { operationId: string; n: number; expectedQueueRevision: string },
+  options: AutoFillOptions = {},
 ) {
   if (!(AUTO_QUEUE_SIZES as readonly number[]).includes(input.n))
     throw new ServiceError('invalid', { n: 'Choose 2, 3, 4 or 6 matches.' })
-  return matchCommand(context, sessionId, {}, async (tx, session) => {
+  let autoPlaced: AutoPlaced = []
+  const reply = await matchCommand(context, sessionId, {}, async (tx, session) => {
     const done = await generationRows(tx, session.id, input.operationId)
     if (done.length) return done.map((row) => matchDto(row as MatchRow))
     if (session.queueRevision.toString() !== input.expectedQueueRevision)
@@ -339,8 +382,10 @@ export async function autoQueue(
           }),
         ),
       )
+    autoPlaced = await fillAfterAdd(tx, session, input.operationId, options)
     return out
   })
+  return withAutoPlaced(reply, autoPlaced)
 }
 
 /** At most one full batch (6) from each of the five Auto queue alternatives. */
@@ -381,8 +426,10 @@ export async function addAutoQueueDrafts(
   context: ClubContext,
   sessionId: string,
   input: { drafts: AutoQueueDraftInput[]; expectedQueueRevision: string; expectedRevision: string },
+  options: AutoFillOptions = {},
 ) {
-  return matchCommand(context, sessionId, {}, async (tx, session) => {
+  let autoPlaced: AutoPlaced = []
+  const reply = await matchCommand(context, sessionId, {}, async (tx, session) => {
     const keys = await Promise.all(
       input.drafts.map((d) => derivedId(d.operationId, 'auto-queue-draft')),
     )
@@ -423,8 +470,10 @@ export async function addAutoQueueDrafts(
           }),
         ),
       )
+    autoPlaced = await fillAfterAdd(tx, session, keys[0] as string, options)
     return out
   })
+  return withAutoPlaced(reply, autoPlaced)
 }
 
 /**
@@ -436,8 +485,10 @@ export async function regenerateQueue(
   context: ClubContext,
   sessionId: string,
   input: { operationId: string; expectedQueueRevision: string },
+  options: AutoFillOptions = {},
 ) {
-  return matchCommand(context, sessionId, {}, async (tx, session) => {
+  let autoPlaced: AutoPlaced = []
+  const reply = await matchCommand(context, sessionId, {}, async (tx, session) => {
     const done = await generationRows(tx, session.id, input.operationId)
     if (done.length) return done.map((row) => matchDto(row as MatchRow))
     if (session.queueRevision.toString() !== input.expectedQueueRevision)
@@ -480,8 +531,10 @@ export async function regenerateQueue(
           }),
         ),
       )
+    autoPlaced = await fillAfterAdd(tx, session, input.operationId, options)
     return out
   })
+  return withAutoPlaced(reply, autoPlaced)
 }
 
 /** Q-QUEUE · reorder. Renumbers queue positions only; match numbers never change. */

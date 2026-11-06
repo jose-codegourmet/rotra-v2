@@ -7,6 +7,7 @@ import {
 } from '../match/match.rules'
 import type { Match, MatchLineup, SubstitutionCredit } from '../match/match.types'
 import { MockError } from '../mock/errors'
+import type { CourtFillMode } from '../queue-session/queueSession.types'
 import type {
   PublishResultsInput,
   SessionPublication,
@@ -106,14 +107,44 @@ export async function queueCommand<T>(
   path: string,
   options: { method?: 'POST' | 'PATCH' | 'DELETE'; body: unknown },
 ) {
-  const done = await realRequest<{ result: T; queueRevision: string }>(
-    `${sessionPath(sessionId)}${path}`,
-    { method: options.method ?? 'POST', body: options.body },
-  )
+  return (await fillCommand<T>(sessionId, path, options)).result
+}
+
+/**
+ * A queue command that may trigger Auto Queue on the server: the reply also lists the matches the
+ * server put On court in the same transaction (`autoPlaced`, empty in Manual Queue). Automatic
+ * placements bump the queue revision again, so the next refetch brings the screen up to date.
+ */
+async function fillCommand<T>(
+  sessionId: string,
+  path: string,
+  options: { method?: 'POST' | 'PATCH' | 'DELETE'; body: unknown },
+) {
+  const done = await realRequest<{
+    result: T
+    queueRevision: string
+    autoPlaced?: WireMatch[]
+  }>(`${sessionPath(sessionId)}${path}`, {
+    method: options.method ?? 'POST',
+    body: options.body,
+  })
   const read = reads.get(sessionId)
   if (read && BigInt(read.queueRevision) + 1n === BigInt(done.queueRevision))
     read.queueRevision = done.queueRevision
-  return done.result
+  return { result: done.result, autoPlaced: (done.autoPlaced ?? []).map(matchOf) }
+}
+
+/** The toast tail for Auto Queue placements: " · Match 5 on Court 2 · getting ready". */
+async function autoNote(
+  sessionId: string,
+  placed: Match[],
+  courts?: Awaited<ReturnType<typeof realGetQueueSession>>['courts'],
+) {
+  if (!placed.length) return ''
+  const labels = courts ?? (await realGetQueueSession(sessionId)).courts
+  return placed
+    .map((m) => ` · Match ${m.matchNo} on ${courtNames(m, labels)} · getting ready`)
+    .join('')
 }
 
 export async function realGetSessionMatches(sessionId: string) {
@@ -131,25 +162,31 @@ export async function realGetLiveStandings(sessionId: string) {
 }
 
 export async function realAddMatch(input: MatchLineup & { sessionId: string }) {
-  const match = await queueCommand<WireMatch>(input.sessionId, '/matches', {
+  const done = await fillCommand<WireMatch>(input.sessionId, '/matches', {
     body: {
       source: 'manual',
       operationId: crypto.randomUUID(),
       lineup: { format: input.format, teamA: input.teamA, teamB: input.teamB },
     },
   })
-  return accepted(matchOf(match), 'Match added to the queue')
+  const { result: match, autoPlaced } = done
+  return accepted(
+    matchOf(match),
+    `Match added to the queue${await autoNote(input.sessionId, autoPlaced)}`,
+  )
 }
 
 export async function realMakeMatch(input: { sessionId: string; selection: string[] }) {
   const read = await lastRead(input.sessionId)
-  const match = matchOf(
-    await queueCommand<WireMatch>(input.sessionId, '/matches', {
-      body: { source: 'selection', operationId: crypto.randomUUID(), selection: input.selection },
-    }),
-  )
+  const done = await fillCommand<WireMatch>(input.sessionId, '/matches', {
+    body: { source: 'selection', operationId: crypto.randomUUID(), selection: input.selection },
+  })
+  const match = matchOf(done.result)
   const position = shownWaiting(read).filter((m) => m.id !== match.id).length + 1
-  return accepted(match, `${FORMAT_LABELS[match.format]} added to the queue at #${position}`)
+  return accepted(
+    match,
+    `${FORMAT_LABELS[match.format]} added to the queue at #${position}${await autoNote(input.sessionId, done.autoPlaced)}`,
+  )
 }
 
 /** Sent with both revisions of the read the suggestion was drawn from. */
@@ -159,7 +196,7 @@ export async function realAddSuggestedMatch(input: {
   switched: boolean
 }) {
   const read = await lastRead(input.sessionId)
-  const match = await queueCommand<WireMatch>(input.sessionId, '/matches', {
+  const done = await fillCommand<WireMatch>(input.sessionId, '/matches', {
     body: {
       source: 'suggested',
       operationId: crypto.randomUUID(),
@@ -169,27 +206,42 @@ export async function realAddSuggestedMatch(input: {
       expectedRevision: read.revision,
     },
   })
-  return accepted(matchOf(match), 'Suggestion added to the queue')
+  return accepted(
+    matchOf(done.result),
+    `Suggestion added to the queue${await autoNote(input.sessionId, done.autoPlaced)}`,
+  )
 }
 
 export async function realAutoQueue(input: { sessionId: string; n: 2 | 3 | 4 | 6 }) {
   const read = await lastRead(input.sessionId)
-  const matches = await queueCommand<WireMatch[]>(input.sessionId, '/matches/auto', {
-    body: {
-      operationId: crypto.randomUUID(),
-      n: input.n,
-      expectedQueueRevision: read.queueRevision,
+  const { result: matches, autoPlaced } = await fillCommand<WireMatch[]>(
+    input.sessionId,
+    '/matches/auto',
+    {
+      body: {
+        operationId: crypto.randomUUID(),
+        n: input.n,
+        expectedQueueRevision: read.queueRevision,
+      },
     },
-  })
-  return accepted(matches.map(matchOf), `${matches.length} matches added to the queue`)
+  )
+  return accepted(
+    matches.map(matchOf),
+    `${matches.length} matches added to the queue${await autoNote(input.sessionId, autoPlaced)}`,
+  )
 }
 
 export async function realRegenerateQueue(sessionId: string) {
   const read = await lastRead(sessionId)
-  const matches = await queueCommand<WireMatch[]>(sessionId, '/matches/regenerate', {
-    body: { operationId: crypto.randomUUID(), expectedQueueRevision: read.queueRevision },
-  })
-  return accepted(matches.map(matchOf), `Queue regenerated · ${matches.length} rebuilt`)
+  const { result: matches, autoPlaced } = await fillCommand<WireMatch[]>(
+    sessionId,
+    '/matches/regenerate',
+    { body: { operationId: crypto.randomUUID(), expectedQueueRevision: read.queueRevision } },
+  )
+  return accepted(
+    matches.map(matchOf),
+    `Queue regenerated · ${matches.length} rebuilt${await autoNote(sessionId, autoPlaced)}`,
+  )
 }
 
 export async function realMoveMatch(input: {
@@ -330,20 +382,23 @@ export async function realStartMatch(input: {
 function onCourtCommand<T>(sessionId: string, matchId: string, action: string, body: unknown) {
   return queueCommand<T>(sessionId, `/matches/${encodeURIComponent(matchId)}/${action}`, { body })
 }
+/** An On court command that frees a court, so Auto Queue may refill it on the server. */
+function freeingCommand<T>(sessionId: string, matchId: string, action: string, body: unknown) {
+  return fillCommand<T>(sessionId, `/matches/${encodeURIComponent(matchId)}/${action}`, { body })
+}
 
 /** Send back to queue: the top of the queue; the court(s) free up. */
 export async function realSendBackToQueue(input: { matchId: string; operationId: string }) {
   requireOperationId(input.operationId)
   const { sessionId, courts } = await controlContext(input.matchId)
   const shown = shownMatch(await lastRead(sessionId), input.matchId)
-  const match = matchOf(
-    await onCourtCommand<WireMatch>(sessionId, input.matchId, 'send-back', {
-      operationId: input.operationId,
-    }),
-  )
+  const done = await freeingCommand<WireMatch>(sessionId, input.matchId, 'send-back', {
+    operationId: input.operationId,
+  })
+  const match = matchOf(done.result)
   return accepted(
     null,
-    `Match ${match.matchNo} back to #1 in the queue · ${courtNames(shown, courts)} free`,
+    `Match ${match.matchNo} back to #1 in the queue · ${courtNames(shown, courts)} free${await autoNote(sessionId, done.autoPlaced, courts)}`,
   )
 }
 
@@ -356,15 +411,14 @@ export async function realMoveCourt(input: {
   requireOperationId(input.operationId)
   const { sessionId, courts } = await controlContext(input.matchId)
   const shown = shownMatch(await lastRead(sessionId), input.matchId)
-  const match = matchOf(
-    await onCourtCommand<WireMatch>(sessionId, input.matchId, 'move', {
-      operationId: input.operationId,
-      courtIds: input.courtIds,
-    }),
-  )
+  const done = await freeingCommand<WireMatch>(sessionId, input.matchId, 'move', {
+    operationId: input.operationId,
+    courtIds: input.courtIds,
+  })
+  const match = matchOf(done.result)
   return accepted(
     null,
-    `Match ${match.matchNo} moved from ${courtNames(shown, courts)} to ${courtNames(match, courts)} · getting ready`,
+    `Match ${match.matchNo} moved from ${courtNames(shown, courts)} to ${courtNames(match, courts)} · getting ready${await autoNote(sessionId, done.autoPlaced, courts)}`,
   )
 }
 
@@ -431,7 +485,7 @@ export async function realCompleteMatch(input: {
 }) {
   requireOperationId(input.operationId)
   const { sessionId, courts } = await controlContext(input.matchId)
-  const { match, decision } = await queueCommand<Decided>(
+  const done = await fillCommand<Decided>(
     sessionId,
     `/matches/${encodeURIComponent(input.matchId)}/result`,
     {
@@ -443,23 +497,26 @@ export async function realCompleteMatch(input: {
       },
     },
   )
-  const m = matchOf(match)
+  const m = matchOf(done.result.match)
   return accepted(
     null,
-    `Team ${decision.winningTeam} wins match ${m.matchNo} · ${courtNames(m, courts)} free`,
+    `Team ${done.result.decision.winningTeam} wins match ${m.matchNo} · ${courtNames(m, courts)} free${await autoNote(sessionId, done.autoPlaced, courts)}`,
   )
 }
 
 export async function realInvalidateMatch(input: { matchId: string; operationId: string }) {
   requireOperationId(input.operationId)
   const { sessionId, courts } = await controlContext(input.matchId)
-  const { match } = await queueCommand<Decided>(
+  const done = await fillCommand<Decided>(
     sessionId,
     `/matches/${encodeURIComponent(input.matchId)}/invalid`,
     { body: { operationId: input.operationId } },
   )
-  const m = matchOf(match)
-  return accepted(null, `Match ${m.matchNo} marked invalid · ${courtNames(m, courts)} free`)
+  const m = matchOf(done.result.match)
+  return accepted(
+    null,
+    `Match ${m.matchNo} marked invalid · ${courtNames(m, courts)} free${await autoNote(sessionId, done.autoPlaced, courts)}`,
+  )
 }
 
 /** Substitute with who gets this game (Nobody by default); the server keeps one choice per slot. */
@@ -584,4 +641,44 @@ export async function realInvalidateSession(input: { sessionId: string; reason: 
     { ...session, state: done.state, invalidReason: done.invalidReason },
     `${session.title} marked invalid · no official result`,
   )
+}
+
+// ---------- Court filling (Q-COURTS) ----------
+
+type CourtFillReply = {
+  result: { mode: CourtFillMode; placed: WireMatch[] }
+  queueRevision: string
+}
+
+/**
+ * Manual Queue | Auto Queue. Needs internet (`realRequest` refuses offline; nothing is queued).
+ * Turning Auto on fills every free open court on the server in the same transaction.
+ */
+export async function realSetCourtFillMode(input: { sessionId: string; mode: CourtFillMode }) {
+  const path = `${sessionPath(input.sessionId)}/court-fill`
+  const { result } = await realRequest<CourtFillReply>(path, {
+    method: 'PATCH',
+    body: { mode: input.mode },
+    fields: { mode: 'mode', state: 'state' },
+  })
+  const placed = result.placed.map(matchOf)
+  return accepted(
+    null,
+    result.mode === 'auto'
+      ? `Auto Queue on${await autoNote(input.sessionId, placed)}`
+      : 'Manual Queue on · matches already on court stay where they are',
+  )
+}
+
+/** Auto Queue for courts that reached their planned opening time; `data` is how many were placed. */
+export async function realFillOpenedCourts(input: { sessionId: string; courtIds: string[] }) {
+  if (!input.courtIds.length) return { savedOffline: false, message: '', data: 0 }
+  const path = `${sessionPath(input.sessionId)}/court-fill`
+  const { result } = await realRequest<CourtFillReply>(path, {
+    method: 'POST',
+    body: { courtIds: input.courtIds },
+  })
+  const placed = result.placed.map(matchOf)
+  if (!placed.length) return { savedOffline: false, message: '', data: 0 }
+  return accepted(placed.length, `Court open${await autoNote(input.sessionId, placed)}`)
 }

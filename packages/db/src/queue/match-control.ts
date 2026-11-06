@@ -1,5 +1,6 @@
 import 'server-only'
 import {
+  autoFillPlacements,
   canMoveCourt,
   canPlace,
   canReplacePlayer,
@@ -168,6 +169,81 @@ const conflict = () =>
   new ServiceError('conflict', { match: 'Something changed. Review the match again.' })
 
 /**
+ * Puts a waiting match on court(s): on_court with `placed_at`, out of the queue, then every court
+ * and player hold (the hold trigger needs the state first). Shared by Put on court, Swap with the
+ * queue and Auto Queue, so there is one way to place a match.
+ */
+async function putOnCourt(
+  tx: Tx,
+  session: QueueSession,
+  match: MatchRow,
+  roster: Roster,
+  courtIds: string[],
+  operationId: string,
+  now: Date,
+) {
+  await tx.match.update({
+    where: { id: match.id },
+    data: { state: 'on_court', placedAt: now, queuePosition: null, revision: { increment: 1 } },
+  })
+  await takeHolds(tx, session, match, roster, courtIds, operationId, now)
+}
+
+/** Options every command that can trigger Auto Queue takes. */
+export type AutoFillOptions = {
+  /**
+   * Offline sync replay (`sync.ts`): never auto-place. While a device is offline auto filling
+   * pauses (owner decision, November 6, 2026), so an uploaded change never carries a placement.
+   */
+  replay?: boolean
+}
+
+/**
+ * Auto Queue (Queueing › Auto Queue and Manual Queue), inside the triggering command's
+ * transaction: when the locked session runs in Auto, each free open court (or only
+ * `onlyCourtIds`), in court order, gets the next eligible waiting match On court. Never starts a
+ * match; skips 5v5, courts not open yet and `exceptMatchId` (Send back); a court whose booking
+ * ended still fills. Each placement is keyed on an operation derived from the trigger's, so it is
+ * as repeat-safe as the trigger, and bumps the queue revision. Returns the placed matches.
+ */
+export async function autoFillCourts(
+  tx: Tx,
+  session: QueueSession,
+  input: {
+    operationId: string
+    exceptMatchId?: string
+    onlyCourtIds?: string[]
+  } & AutoFillOptions,
+) {
+  if (input.replay || session.state !== 'active' || session.courtFillMode !== 'auto') return []
+  const { ctx, rows, roster } = await matchContext(tx, session)
+  const placements = autoFillPlacements(ctx, {
+    exceptMatchId: input.exceptMatchId,
+    onlyCourtIds: input.onlyCourtIds,
+  })
+  if (!placements.length) return []
+  const now = new Date()
+  const placed = []
+  for (const { matchId, courtId } of placements) {
+    const row = rows.find((r) => r.id === matchId)
+    if (!row) continue
+    const operationId = await derivedId(input.operationId, `auto-fill:${matchId}`)
+    await putOnCourt(tx, session, row, roster, [courtId], operationId, now)
+    placed.push(matchDto((await loadMatch(tx, session.id, matchId)) as MatchRow))
+  }
+  await tx.queueSession.update({
+    where: { id: session.id },
+    data: { queueRevision: { increment: 1 } },
+  })
+  return placed
+}
+
+/** A command reply with the Auto Queue placements it made (empty in Manual Queue or on replay). */
+export type AutoPlaced = ReturnType<typeof matchDto>[]
+export const withAutoPlaced = <T extends object>(done: T | undefined, autoPlaced: AutoPlaced) =>
+  done ? { ...done, autoPlaced } : done
+
+/**
  * Q-DISPATCH · Put on court. Revalidates presence, lineup, session and courts, then takes every
  * court and player hold at once: the match is on_court with `placed_at`, and `started_at` stays
  * null until Start match. Keyed on the operation ID through its court usage rows, so a retry (or a
@@ -185,12 +261,7 @@ export async function placeOnCourt(
     const { ctx, roster } = await matchContext(tx, session)
     const view = ctx.matches.find((m) => m.id === match.id)
     if (!view || !canPlace(view, input.courtIds, ctx)) throw conflict()
-    const now = new Date()
-    await tx.match.update({
-      where: { id: match.id },
-      data: { state: 'on_court', placedAt: now, queuePosition: null, revision: { increment: 1 } },
-    })
-    await takeHolds(tx, session, match, roster, input.courtIds, input.operationId, now)
+    await putOnCourt(tx, session, match, roster, input.courtIds, input.operationId, new Date())
     return matchDto((await loadMatch(tx, session.id, match.id)) as MatchRow)
   })
 }
@@ -300,35 +371,48 @@ async function unplace(tx: Tx, match: MatchRow, operationId: string, now: Date) 
  * Q-ON-COURT · Send back to queue. The on_court match goes to the **top** of the queue (positions
  * renumbered) and its court(s) and players free up, in one transaction. Keyed on the operation ID
  * through its court usage release, so a retry (or a replayed offline upload) returns the match.
- * Auto Queue refilling the freed court is Q12.25.
+ * In Auto Queue the freed court is refilled in the same transaction with the next eligible match
+ * other than this one (never on replay).
  */
 export async function sendBackToQueue(
   context: ClubContext,
   sessionId: string,
   input: { operationId: string; matchId: string },
+  options: AutoFillOptions = {},
 ) {
-  return matchCommand(context, sessionId, {}, async (tx, session) => {
+  let autoPlaced: AutoPlaced = []
+  const done = await matchCommand(context, sessionId, {}, async (tx, session) => {
     const match = await activeMatch(tx, session.id, input.matchId)
     if (match.courtUsage.some((u) => u.releaseOperationId === input.operationId))
       return matchDto(match)
     requireOnCourt(match)
     await unplace(tx, match, input.operationId, new Date())
     await queueAt(tx, session.id, match.id, 0)
-    return matchDto((await loadMatch(tx, session.id, match.id)) as MatchRow)
+    const result = matchDto((await loadMatch(tx, session.id, match.id)) as MatchRow)
+    autoPlaced = await autoFillCourts(tx, session, {
+      ...options,
+      operationId: input.operationId,
+      exceptMatchId: match.id,
+    })
+    return result
   })
+  return withAutoPlaced(done, autoPlaced)
 }
 
 /**
  * Q-ON-COURT · Move to another court. The on_court match releases the court(s) it holds and takes
  * the chosen free open court(s) (two for 5v5) in one transaction; player holds stay. A court
  * another match took first loses on the hold's primary key. Keyed on the new court usage rows.
+ * In Auto Queue the court(s) it left are refilled in the same transaction (never on replay).
  */
 export async function moveCourt(
   context: ClubContext,
   sessionId: string,
   input: { operationId: string; matchId: string; courtIds: string[] },
+  options: AutoFillOptions = {},
 ) {
-  return matchCommand(context, sessionId, {}, async (tx, session) => {
+  let autoPlaced: AutoPlaced = []
+  const done = await matchCommand(context, sessionId, {}, async (tx, session) => {
     const match = await activeMatch(tx, session.id, input.matchId)
     if (match.courtUsage.some((u) => u.acquireOperationId === input.operationId))
       return matchDto(match)
@@ -340,8 +424,11 @@ export async function moveCourt(
     await releaseCourts(tx, match, input.operationId, now)
     await acquireCourts(tx, session, match, input.courtIds, input.operationId, now)
     await tx.match.update({ where: { id: match.id }, data: { revision: { increment: 1 } } })
-    return matchDto((await loadMatch(tx, session.id, match.id)) as MatchRow)
+    const result = matchDto((await loadMatch(tx, session.id, match.id)) as MatchRow)
+    autoPlaced = await autoFillCourts(tx, session, { ...options, operationId: input.operationId })
+    return result
   })
+  return withAutoPlaced(done, autoPlaced)
 }
 
 /**
@@ -430,11 +517,7 @@ export async function swapWithQueue(
       where: { id: match.id },
       data: { queuePosition: incoming.queuePosition },
     })
-    await tx.match.update({
-      where: { id: incoming.id },
-      data: { state: 'on_court', placedAt: now, queuePosition: null, revision: { increment: 1 } },
-    })
-    await takeHolds(tx, session, incoming, roster, courtIds, input.operationId, now)
+    await putOnCourt(tx, session, incoming, roster, courtIds, input.operationId, now)
     return reply()
   })
 }
@@ -596,7 +679,8 @@ async function decidedAlready(
 /**
  * Q-MATCH · Team A/B wins or Invalid. One transaction closes every open segment, releases court
  * usage, frees all holds and appends the one permanent decision (after which triggers freeze the
- * match). If any step fails nothing commits, so no court is freed by a failed write.
+ * match). If any step fails nothing commits, so no court is freed by a failed write. In Auto Queue
+ * the freed court(s) get the next eligible match in the same transaction (never on replay).
  */
 async function decide(
   context: ClubContext,
@@ -604,7 +688,9 @@ async function decide(
   matchId: string,
   operationId: string,
   outcome: Outcome,
+  options: AutoFillOptions,
 ) {
+  let autoPlaced: AutoPlaced = []
   const done = await matchCommand(context, sessionId, {}, async (tx, session) => {
     const match = await activeMatch(tx, session.id, matchId)
     if (match.decision) return decidedAlready(tx, session, match, operationId, outcome)
@@ -642,14 +728,16 @@ async function decide(
       where: { id: match.id },
       data: { state: outcome.kind, endedAt: now, revision: { increment: 1 } },
     })
-    return {
+    const result = {
       match: matchDto((await loadMatch(tx, session.id, match.id)) as MatchRow),
       decision: decisionDto(decision),
     }
+    autoPlaced = await autoFillCourts(tx, session, { ...options, operationId })
+    return result
   })
   if (done && 'quarantined' in done.result)
     throw new ServiceError('conflict', { match: 'This match already has a confirmed outcome.' })
-  return done
+  return withAutoPlaced(done, autoPlaced)
 }
 
 /** Winner-only results keep both scores null; scores must agree with the winner. */
@@ -663,6 +751,7 @@ export async function completeMatch(
     teamAScore?: number | null
     teamBScore?: number | null
   },
+  options: AutoFillOptions = {},
 ) {
   const result = validateResult({
     winner: input.winningTeam,
@@ -670,12 +759,19 @@ export async function completeMatch(
     scoreB: input.teamBScore,
   })
   if (result.winner === null) throw new ServiceError('invalid', { result: result.error })
-  return decide(context, sessionId, input.matchId, input.operationId, {
-    kind: 'completed',
-    winningTeam: result.winner,
-    teamAScore: input.teamAScore ?? null,
-    teamBScore: input.teamBScore ?? null,
-  })
+  return decide(
+    context,
+    sessionId,
+    input.matchId,
+    input.operationId,
+    {
+      kind: 'completed',
+      winningTeam: result.winner,
+      teamAScore: input.teamAScore ?? null,
+      teamBScore: input.teamBScore ?? null,
+    },
+    options,
+  )
 }
 
 /** An invalid decision contributes no game credit to anyone (facts are written only from completed). */
@@ -683,6 +779,54 @@ export async function invalidateMatch(
   context: ClubContext,
   sessionId: string,
   input: { operationId: string; matchId: string },
+  options: AutoFillOptions = {},
 ) {
-  return decide(context, sessionId, input.matchId, input.operationId, { kind: 'invalid' })
+  return decide(context, sessionId, input.matchId, input.operationId, { kind: 'invalid' }, options)
+}
+
+const COURT_FILL_MODES = ['manual', 'auto'] as const
+type CourtFillMode = (typeof COURT_FILL_MODES)[number]
+
+/**
+ * Q-COURTS · Manual Queue | Auto Queue, any time while the session runs. Online only: there is no
+ * sync replay for it (owner decision, November 6, 2026). Turning Auto on fills every free open
+ * court now, in court order, in the same transaction; turning it off leaves On court matches where
+ * they are. Setting the mode it already has changes nothing (and places nothing).
+ */
+export async function setCourtFillMode(
+  context: ClubContext,
+  sessionId: string,
+  input: { mode: string },
+) {
+  const mode = input.mode as CourtFillMode
+  if (!COURT_FILL_MODES.includes(mode))
+    throw new ServiceError('invalid', { mode: 'Choose Manual Queue or Auto Queue.' })
+  return matchCommand(context, sessionId, {}, async (tx, session) => {
+    if (session.courtFillMode === mode) return { mode, placed: [] as AutoPlaced }
+    const updated = await tx.queueSession.update({
+      where: { id: session.id },
+      data: { courtFillMode: mode, revision: { increment: 1 } },
+    })
+    const placed = await autoFillCourts(tx, updated, { operationId: crypto.randomUUID() })
+    return { mode, placed }
+  })
+}
+
+/**
+ * Q-COURTS · Auto Queue when courts reach their planned opening time (the console notices on its
+ * refresh). Fills only the named courts, only in Auto Queue; with nothing to place it changes no
+ * match. Online only, like the switch.
+ */
+export async function fillOpenedCourts(
+  context: ClubContext,
+  sessionId: string,
+  input: { courtIds: string[] },
+) {
+  return matchCommand(context, sessionId, {}, async (tx, session) => ({
+    mode: session.courtFillMode,
+    placed: await autoFillCourts(tx, session, {
+      operationId: crypto.randomUUID(),
+      onlyCourtIds: input.courtIds,
+    }),
+  }))
 }

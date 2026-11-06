@@ -1,4 +1,4 @@
-import type { SessionCourt } from '../queue-session/queueSession.types'
+import type { QueueSession, SessionCourt } from '../queue-session/queueSession.types'
 import { shortName } from '../session-roster/sessionRoster.rules'
 import type { SessionPlayer } from '../session-roster/sessionRoster.types'
 import type {
@@ -105,9 +105,19 @@ export function matchStatus(m: MatchLineup, ctx: MatchContext): MatchStatus {
     }
   return { kind: 'ready', reason: 'Ready to start' }
 }
-export function nextEligibleForCourt(courtId: string, ctx: MatchContext) {
+/**
+ * The next eligible match for a free open court, with the skip explanation. Given the session,
+ * `notEnoughFreePlayers` says why the court gets no match when too few players are free
+ * (Queueing › Short on players: "Not enough free players.", which wins over the blocked reason and
+ * the empty queue). Without the session it is always false.
+ */
+export function nextEligibleForCourt(
+  courtId: string,
+  ctx: MatchContext,
+  session?: Pick<QueueSession, 'allowSingles' | 'allowDoubles'>,
+) {
   if (!freeCourts(ctx.courts, ctx.matches, ctx.now).some((c) => c.id === courtId))
-    return { match: null, skipped: null }
+    return { match: null, skipped: null, notEnoughFreePlayers: false }
   const waiting = ctx.matches
       .filter((m) => m.state === 'waiting')
       .sort((a, b) => a.queuePosition - b.queuePosition),
@@ -119,6 +129,98 @@ export function nextEligibleForCourt(courtId: string, ctx: MatchContext) {
       match && first && match.id !== first.id
         ? `Skipped #1: ${matchStatus(first, ctx).reason}`
         : null,
+    notEnoughFreePlayers: !match && !!session && notEnoughFreePlayers(session, ctx),
+  }
+}
+/** One placement Auto Queue makes: a waiting match onto one court, On court (never started). */
+export type AutoPlacement = { matchId: string; courtId: string }
+/**
+ * Auto Queue (Queueing › Auto Queue and Manual Queue): each free open court, in court order (the
+ * order of `ctx.courts`), gets the next eligible waiting match in queue order. Skips 5v5 (always
+ * placed by hand, on two courts) and courts not open yet; a court whose booking ended still fills.
+ * `exceptMatchId` never goes on (Send back refills with a different match); `onlyCourtIds` limits
+ * the fill to courts that just opened or were added. Pure: the caller applies the placements, and
+ * decides whether Auto Queue is on and the device online. Each placement counts for the next one,
+ * so a player is never placed twice.
+ */
+export function autoFillPlacements(
+  ctx: MatchContext,
+  options: { exceptMatchId?: string; onlyCourtIds?: readonly string[] } = {},
+): AutoPlacement[] {
+  const placements: AutoPlacement[] = []
+  let matches = ctx.matches
+  for (const court of freeCourts(ctx.courts, ctx.matches, ctx.now)) {
+    if (options.onlyCourtIds && !options.onlyCourtIds.includes(court.id)) continue
+    const now: MatchContext = { ...ctx, matches }
+    const next = waitingMatches(matches).find(
+      (m) =>
+        m.id !== options.exceptMatchId && courtsNeeded(m) === 1 && canPlace(m, [court.id], now),
+    )
+    if (!next) continue
+    placements.push({ matchId: next.id, courtId: court.id })
+    matches = matches.map((m) =>
+      m.id === next.id ? { ...m, state: 'on_court' as const, courtIds: [court.id] } : m,
+    )
+  }
+  return placements
+}
+/** Players a standard match needs: doubles 4, else singles 2 (doubles first when both are on). */
+export const standardMatchSize = (session: Pick<QueueSession, 'allowSingles' | 'allowDoubles'>) =>
+  session.allowDoubles ? 4 : session.allowSingles ? 2 : 0
+/** The smallest standard match: singles 2 when singles is on, else doubles 4; 0 with neither. */
+export const smallestStandardMatchSize = (
+  session: Pick<QueueSession, 'allowSingles' | 'allowDoubles'>,
+) => (session.allowSingles ? 2 : standardMatchSize(session))
+/** Present players who are not busy (On court or Playing). */
+export const freePresentCount = (ctx: Pick<MatchContext, 'roster' | 'matches'>) =>
+  ctx.roster.filter((p) => p.present && !activeMatchFor(p.id, ctx.matches)).length
+/**
+ * A free open court with no match to put on says "Not enough free players." when fewer players
+ * are free than the smallest standard match needs (Queueing › Short on players).
+ */
+export const notEnoughFreePlayers = (
+  session: Pick<QueueSession, 'allowSingles' | 'allowDoubles'>,
+  ctx: Pick<MatchContext, 'roster' | 'matches'>,
+) => {
+  const need = smallestStandardMatchSize(session)
+  return need > 0 && freePresentCount(ctx) < need
+}
+/** What the ShortOnPlayersBanner words: courts the present players can run, and who sits out. */
+export type ShortOnPlayers = {
+  /** All present players, busy or not */
+  present: number
+  doublesCourts: number
+  singlesCourts: number
+  sitOut: number
+  standardFormat: 'doubles' | 'singles'
+}
+/**
+ * Queueing › Short on players: the banner above Courts when the present players who aren't busy
+ * can't fill every free open court with the session's standard format. It counts all present
+ * players against the open courts (doubles first, 4 a court; then singles, 2 a court). Null (no
+ * banner) when the free players can fill every free open court, no court is free, nobody is
+ * present, or neither standard format is on. Never changes queue order, pairing or the minimum.
+ */
+export function shortOnPlayers(
+  session: Pick<QueueSession, 'allowSingles' | 'allowDoubles'>,
+  ctx: MatchContext,
+): ShortOnPlayers | null {
+  const per = standardMatchSize(session),
+    open = ctx.courts.filter((c) => !c.removedAt && courtOpen(c, ctx.now)).length,
+    present = ctx.roster.filter((p) => p.present).length,
+    freeOpen = freeCourts(ctx.courts, ctx.matches, ctx.now).length
+  if (!per || !present || present >= open * per || !freeOpen) return null
+  if (freePresentCount(ctx) >= freeOpen * per) return null
+  const doublesCourts = session.allowDoubles ? Math.min(open, Math.floor(present / 4)) : 0
+  const singlesCourts = session.allowSingles
+    ? Math.min(open - doublesCourts, Math.floor((present - 4 * doublesCourts) / 2))
+    : 0
+  return {
+    present,
+    doublesCourts,
+    singlesCourts,
+    sitOut: present - 4 * doublesCourts - 2 * singlesCourts,
+    standardFormat: session.allowDoubles ? 'doubles' : 'singles',
   }
 }
 /** Who gets this game after a substitution: Nobody (default), the incoming or the outgoing player. */
@@ -307,8 +409,7 @@ export function swapTarget(m: Match, ctx: MatchContext): SwapTarget | null {
   }
   const waiting = waitingMatches(ctx.matches)
   const index = waiting.findIndex(
-    (x) =>
-      x.id !== m.id && courtsNeeded(x) === courtsNeeded(m) && canPlace(x, m.courtIds, freed),
+    (x) => x.id !== m.id && courtsNeeded(x) === courtsNeeded(m) && canPlace(x, m.courtIds, freed),
   )
   const match = waiting[index]
   return match ? { match, position: index + 1 } : null

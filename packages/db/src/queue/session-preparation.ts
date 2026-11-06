@@ -15,6 +15,7 @@ import type { QueueSession, SessionCourt, SessionMode } from '../generated/prism
 import { requireClubEntitlement, requireRevision } from '../service/authorize'
 import { ServiceError } from '../service/errors'
 import { courtDto, sessionDto } from './dto'
+import { autoFillCourts } from './match-control'
 import {
   derivedId,
   liveCourts,
@@ -544,6 +545,8 @@ export async function addCourt(
       .catch(mapDatabaseError)
     session = await touchSession(tx, session)
     await recomputeMinimum(tx, session)
+    // Auto Queue: a court added to a running session fills now if it is open (never while prepared).
+    await autoFillCourts(tx, session, { operationId: court.id, onlyCourtIds: [court.id] })
     return courtDto(court)
   })
 }
@@ -646,6 +649,11 @@ export async function openCourtsEarly(
         }),
       )
     await touchSession(tx, session)
+    // Auto Queue: the courts that just opened get the next eligible matches, same transaction.
+    await autoFillCourts(tx, session, {
+      operationId: crypto.randomUUID(),
+      onlyCourtIds: opened.map((c) => c.id),
+    })
     return opened.map(courtDto)
   })
 }

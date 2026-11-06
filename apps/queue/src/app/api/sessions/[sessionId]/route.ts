@@ -1,5 +1,6 @@
 import type { SessionCostInput } from '@rotra/data/session-cost/types'
 import { readSessionCost, saveSessionCost } from '@rotra/db/queue/financials'
+import { deleteSession } from '@rotra/db/queue/session-delete'
 import {
   type QueueSessionInput,
   readQueueSession,
@@ -50,4 +51,12 @@ export async function PATCH(request: Request, ctx: RouteContext<'/api/sessions/[
     }
     return { body: session }
   })
+}
+
+/** Q-PREPARE / D-DELETE-SESSION: prepared only, zero confirmed players. */
+export async function DELETE(_request: Request, ctx: RouteContext<'/api/sessions/[sessionId]'>) {
+  const { sessionId } = await ctx.params
+  return handleAccountRequest('club', routeCookieAdapter(await cookies()), async (club) => ({
+    body: await deleteSession(club, sessionId),
+  }))
 }

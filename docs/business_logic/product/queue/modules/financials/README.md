@@ -45,6 +45,7 @@ Each session has a **Payments** list of its roster players (waitlisted players a
 - Totals: paid count (e.g. 15/18), **collected**, **still due** (unpaid players × amount), and collected **against costs** (over or short of the estimated total cost).
 - Filter: Everyone, Not paid, Paid. Unpaid players are listed first.
 - It is available before, during and after the session: on the preparation page, from **Payments** in the live console, and in the session record's Financials tab. Ticks are ordinary changes that work offline and sync.
+- **Cancelled session** (owner decision, November 6, 2026): payment marks are kept on the read-only record and can no longer change ("Payments are not available for this session.", as for an invalid session). ROTRA records no refunds; the cancel confirmation warns how many players are marked paid and that refunds happen outside ROTRA. See [Cancelling a session](../sessions/README.md#cancelling-a-session-owner-decision-november-6-2026).
 
 This is a record kept by the operator, not proof of payment. ROTRA doesn't show players' contact details here; private phone and email rules still apply.
 

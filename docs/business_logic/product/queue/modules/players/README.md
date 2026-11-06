@@ -1,6 +1,6 @@
 # Players and roster
 
-**Last verified:** 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-06 for busy On court players; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Confirmed v1 target rules. Updated October 26, 2026 to match the [ROTRA Queue prototype](../../../../../../apps/mockup/queue-app/rotra-queue.html).
 
@@ -88,6 +88,7 @@ Decided October 26, 2026.
 - A guest's own page then shows: **Request sent**, **Confirmed · you have a slot**, **Confirmed · waitlist #N**, or **Request not accepted**.
 - The club can turn requests off per session (**Accept join requests**). The public page then says to contact the Queue Master instead.
 - Sending a request needs internet (it goes straight to the server). Confirming or declining is an ordinary roster change that works offline on a downloaded session and syncs.
+- **Cancelled session** (owner decision, November 6, 2026): cancelling closes every pending request (kept on the record as closed), and the public page shows **Cancelled** with the reason instead of **Want to play?**, so no new requests can be sent. See [Cancelling a session](../sessions/README.md#cancelling-a-session-owner-decision-november-6-2026).
 
 
 ## Roster changes
@@ -97,11 +98,13 @@ Decided October 26, 2026.
 
 ## Presence
 
-The operator toggles present / not present, one at a time or with **Mark all present** / **Mark all absent** during preparation. Auto queue and Suggest use present players only.
+The operator toggles present / not present, one at a time or with **Mark all present** / **Mark all absent** during preparation. Generate matches and Suggest use present players only.
 
 **Owner decision, November 1, 2026 (#324):** individual presence switches update immediately and save wanted end states together after 800 ms without another tap. One batch produces one summary confirmation and one Roster sync entry; reversals before saving are omitted. A failed batch preserves newer intent while rolling back its failed revisions. Pending writes flush before other roster operations.
 
-Turning someone off never ends their current game. Waiting matches that include them **need attention**, and the confirmation says how many. The operator edits the lineup or regenerates.
+Turning someone off never ends their current game. Waiting matches that include them **need attention**, and the confirmation says how many. The operator edits the lineup or regenerates. An **On court** match (placed, not started) that includes them shows the reason on its court, and Start match stays disabled until the operator replaces the player or sends the match back to the queue (owner decision, November 6, 2026).
+
+Players in an On court match are **busy**, like players in a Playing match: they cannot be put on another court or start elsewhere ("Migs is on Court 1").
 
 There is no rest-status workflow. The console derives a **wait time** for each available player: minutes since their last game ended, or since they were marked present (or the session started) if they have not played. A substituted-out player's wait starts when their match ends.
 

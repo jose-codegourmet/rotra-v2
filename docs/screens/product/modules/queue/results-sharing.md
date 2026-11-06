@@ -66,7 +66,7 @@ Images are files for the operator to share through Instagram/Facebook. No automa
 
 **Entry:** a past session in home or the calendar, or **Match history** from results. Back link **Home**.
 
-Header: “Session record · read-only”, title, date · time · venue. Chips: **Completed** with **Results published** / **Results private**, or **Invalid session**. Totals: Games (with “N invalid” when any), Players, Courts, Length.
+Header: “Session record · read-only”, title, date · time · venue. Chips: **Completed** with **Results published** / **Results private**, or **Invalid session** (cancelled sessions: see below). Totals: Games (with “N invalid” when any), Players, Courts, Length.
 
 Below the totals, tabs: **Public page**, **Results** (default, “N games”), **How the night ran**, **Players** (“N”), **Financials**.
 
@@ -79,6 +79,8 @@ Below the totals, tabs: **Public page**, **Results** (default, “N games”), *
 | Financials | The saved cost estimate: court cost with the calculation, shuttle lines, entrance fees (₱fee × players · misc) when set, total, break-even per player, what players paid (custom amount or break-even), and expected collection with profit / loss / breaks even. “No cost estimate was saved for this session.” when none. Includes the manual paid / not-paid checklist; ROTRA does not collect money. Payment updates never edit permanent match results |
 
 **Replay (How the night ran tab).** A card showing every court as it looked at one moment: each busy court drawn with its players stacked on each side of the net (tap a player for their profile) and “#match · N min”, free courts greyed. Under it a play/pause button, the current time, a timeline slider from the first match start to the last match end, and the end time; a summary reads “7:55 PM · 2 games on court · 7 finished so far”. Dragging the slider moves through the night; **Play** advances one session minute every 120 ms (a three-hour night in about 20 seconds) and stops at the end. Matches on court at that moment are highlighted in the court columns below. The slider has an accessible name and reports the time as its value.
+
+**Cancelled session record** (owner decision, November 6, 2026). A cancelled session opens a simpler record, with no tabs. Header as above; chip **Cancelled** and “Cancelled WHEN” with its day (“Cancelled yesterday 9:00 PM”, “Cancelled Mon, Nov 2 · 6:00 PM”). Notice: “**Reason: REASON**” (or “**No reason given.**”) then “This session was cancelled before it started. It has no games, standings or result slides, and it doesn't count toward player records or rankings.”, adding “N players were marked paid; refunds happen outside ROTRA.” when any were. Totals: **Joined** (“of N slots”), **Waitlist**, **Marked paid**, **Courts**. **Open public page**. **Roster · N**: a card per player with picture, name, level and “Paid ₱AMOUNT” or “Not paid” (read-only); empty “Nobody had joined.” **Waitlist · N**, a numbered list, only when anyone is on it. Opening a cancelled session's preparation URL shows this record instead.
 
 Payment tracking lives in the **Financials** tab: below the estimate, the [payments checklist](financials-inventory.md#q-payments--payments-checklist) shows who has paid, collected, still due and collected against costs. Contact details are not shown there.
 

@@ -1,6 +1,6 @@
 # Sessions, club players, and roster
 
-**Last verified:** 2026-11-01 for court-window boundaries; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-06 for the court-fill mode; 2026-11-01 for court-window boundaries; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Proposed records; field names are new design names, not existing Prisma columns.
 
@@ -32,8 +32,9 @@ Duplicate offline entries can conflict on linking. Quarantine the link operation
 | `scheduled_start_at`, `scheduled_end_at` | Timestamptz; end after start |
 | `venue_id` | Nullable FK to `club_venues` (scoped by club); null for sessions made before the list existed |
 | `venue_name`, `venue_address` | Session venue snapshot taken from the venue when chosen, separate from founding address; later venue edits don't rewrite past sessions |
-| `state` | Proposed `prepared`, `active`, `finalizing`, `completed`, `invalid` (the prototype shows completed as "finalized") |
+| `state` | Proposed `prepared`, `active`, `finalizing`, `completed`, `invalid`, and (November 6, 2026) `cancelled` (the prototype shows completed as "finalized") |
 | `invalid_reason` | Nullable text shown on the session record; required when `state = invalid` |
+| `cancelled_at`, `cancel_reason` | **Proposed (November 6, 2026):** state `cancelled`, reachable **only from `prepared`** (before start) and final. `cancelled_at` timestamptz, set ⇔ `state = cancelled`; `cancel_reason` nullable text up to 120 characters, only when cancelled. Roster, waitlist and payment-mark rows are kept unchanged; no refund records ([log](../../../../mockup-changes/2026-11-06-queue-example-sessions-and-cancel.md)) |
 | `session_mode` | Chill/Fair/Hard |
 | `allow_singles`, `allow_doubles` | Booleans; both may be false (manual fun games only) |
 | `minimum_games` | Nonnegative integer; target, not closure constraint |
@@ -47,12 +48,13 @@ Duplicate offline entries can conflict on linking. Quarantine the link operation
 | `revision`, timestamps | Common metadata |
 | `public_slug` | Unique short slug for the session link (public page URL) |
 | `accept_join_requests` | Boolean, default true; when false the public page offers no Request to join |
+| `court_fill_mode` | **Proposed (November 6, 2026):** `manual` (default) · `auto`. The Manual Queue \| Auto Queue switch; changeable any time while active. `auto` lets commands place the next eligible match On court; it never starts a match. Changing it never moves On court matches ([log](../../../../mockup-changes/2026-11-06-queue-on-court-and-sub-credit.md)) |
 
 Proposed unique `(club_id, id)` and partial unique `(club_id)` for state in active/finalizing. This protects server-known active state but cannot alone prevent two disconnected sessions from starting.
 
 **Additional proposal:** `club_session_reservations` has `club_id` as PK, unique `session_id`, and a scoped FK to the session. Acquire it online before issuing permission to start that session offline. Different devices may operate the same reserved session for recovery. Downloading a read-only/preparation copy need not acquire a reservation; the exact activation UX is open. No second distinct session receives offline-start permission while the reservation exists.
 
-**No overlapping sessions.** A club's non-invalid sessions must not overlap in time. Enforce it with an exclusion constraint, e.g. `EXCLUDE USING gist (club_id WITH =, tstzrange(scheduled_start_at, scheduled_end_at) WITH &&) WHERE (state <> 'invalid')` (needs `btree_gist`), plus a command-level check that reports which session clashes and whether it is the same venue (venue clash) or another venue (time clash). Creating a series inserts only the free dates, in one transaction. Extending a running session's end time must pass the same check.
+**No overlapping sessions.** A club's non-invalid, non-cancelled sessions must not overlap in time. Enforce it with an exclusion constraint, e.g. `EXCLUDE USING gist (club_id WITH =, tstzrange(scheduled_start_at, scheduled_end_at) WITH &&) WHERE (state NOT IN ('invalid', 'cancelled'))` (needs `btree_gist`; today's draft excludes only `invalid`), plus a command-level check that reports which session clashes and whether it is the same venue (venue clash) or another venue (time clash). Creating a series inserts only the free dates, in one transaction. Extending a running session's end time must pass the same check.
 
 Session timestamps from a device are evidence, not automatic proof of an unexpired license. Offline start/expiry rules need a trusted authorization design.
 
@@ -85,7 +87,7 @@ Guest requests sent from the session link (decided October 26, 2026).
 | `decided_at`, `decided_by_device` | Set on confirm/decline |
 | `club_player_id` | Set on confirm: the club player created for the guest |
 
-A request never inserts `session_players` or `session_waitlist` by itself. **Confirm** creates the club player (guest, or lookup pending with a phone), then a `session_players` row with the chosen level, or a `session_waitlist` row with `added_at = requested_at` when slots are full, in one transaction. Creating requests is an unauthenticated public write: rate-limit per IP/device and session, cap pending requests per session, and reject when `accept_join_requests` is false or the session is finalized/invalid. Confirm/decline are ordinary club sync operations (work offline on a downloaded session).
+A request never inserts `session_players` or `session_waitlist` by itself. **Confirm** creates the club player (guest, or lookup pending with a phone), then a `session_players` row with the chosen level, or a `session_waitlist` row with `added_at = requested_at` when slots are full, in one transaction. Creating requests is an unauthenticated public write: rate-limit per IP/device and session, cap pending requests per session, and reject when `accept_join_requests` is false or the session is finalized/invalid/cancelled. **Proposed (November 6, 2026):** cancelling a session closes its pending requests in the same transaction (a `closed` status with a decision time, alongside `pending` · `confirmed` · `declined`). Confirm/decline are ordinary club sync operations (work offline on a downloaded session).
 
 ## `club_venues`
 
@@ -135,7 +137,7 @@ The roster's global link is a historical snapshot. Resolve later identity correc
 |---|---|
 | `id`, `club_id`, `session_id` | UUID keys |
 | `label` | Text; defaults to "Court N" |
-| `open_until` | Nullable timestamptz. Null means "until the session ends" and follows `scheduled_end_at` when time is extended. A set time must be later than the moment it is added and not after the session end |
+| `open_until` | Nullable timestamptz. Null means "until the session ends" and follows `scheduled_end_at` whenever the end changes. A set time must be later than the moment it is added and not after the session end |
 | `removed_at` | Nullable; set when a free court is removed |
 | `opened_early_at` | Proposed. Nullable timestamptz; set by **Start anyway** when the court is opened before its planned start, cleared by **Undo early open** while the court is free. The planned start is never rewritten. Counts as use, so the planned start is fixed while it is set |
 | `revision`, timestamps | Common metadata |
@@ -144,7 +146,9 @@ Unique `(club_id, session_id, id)`. Unique `(session_id, label)` among non-remov
 
 Add courts during the session without changing club founding location. Remove only a court with no active hold, and keep at least one non-removed court; soft-remove because historical `match_court_usage` may reference it. `open_until` is a reminder: no command or constraint ends a match when it passes. "Booking ended" is derived.
 
-Extending time updates `scheduled_end_at` (30 or 60 minutes per command in the prototype); keep the change as an ordinary revisioned update or sync operation.
+Setting the end time updates `scheduled_end_at` (owner decision, November 6, 2026): after start it may move to any instant after now, later or earlier, up to 24 hours after `started_at`; **Extend 30 min / 60 min** are shortcuts for the same update. Reject a new end before a non-removed court's set `open_until` or at/before a court's planned start. Courts with null `open_until` follow it; set ones do not. Keep the change as an ordinary revisioned update or sync operation. A late or other-day Start session may carry a new `scheduled_end_at` in the same transition. `started_at` is fixed once set: it records when play began and no live command edits it.
+
+**Times carry their day (November 6, 2026).** `scheduled_start_at`, `scheduled_end_at`, `open_until` and a court's planned start are full instants (`timestamptz`), never clock-only values with an inferred "next day". The court's planned start exists in the mock (`startsAt`) but has no proposed column in this table yet; add it as a nullable timestamptz (null = session start) in the database epic. Display and entry use the club's time zone (Asia/Manila for v1); storage stays instants per the [conventions](../../conventions.md).
 
 ## Counters and access paths
 

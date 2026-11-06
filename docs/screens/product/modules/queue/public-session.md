@@ -8,7 +8,7 @@
 
 ## Shared composition
 
-No operator top bar. Hero: “Date · start–end”, session title, club logo/initials and name labeled **Organizer**, and a chip **Happening now** (active) or **Finished** (finalized). Tabs: **Details** and **Participants · N**.
+No operator top bar. Hero: “Date · start–end”, session title, club logo/initials and name labeled **Organizer**, and a chip **Happening now** (active), **Finished** (finalized) or **Cancelled** (cancelled). Tabs: **Details** and **Participants · N**.
 
 The operator reaches it from preparation (**Preview public page**), the console, and the session record. In the operator app a banner reads “Public page preview. What anyone with the session link sees, no sign-in needed.” with **Back to Queue app**; the real public page has no banner.
 
@@ -21,6 +21,8 @@ Shown under the hero on prepared and live sessions. Card **Want to play?**: “N
 Sheet **Request to join**: session line (title · date, time · venue); **Your name** (required, “Enter your name.”); **Nickname (optional)**; **Phone (optional)** with “Helps the club recognise you and link your ROTRA profile. Only the club sees it.” (“Enter a full mobile number, or leave it empty.”); **Your level**: Beginner / Intermediate / Advanced / Not sure (“Pick your level, or Not sure.”; hint “Your best guess. The Queue Master sets your level for the night.”); note “This is a request, not a booking. The Queue Master confirms each guest before giving a slot.” **Cancel** / **Send request** (toast “Request sent”).
 
 Afterwards the same visitor sees a status card instead: **Request sent** (“…Your slot isn't held until they do.”), **Confirmed · you have a slot**, **Confirmed · waitlist #N**, or **Request not accepted**. In the prototype, **Open as a guest** (preparation, Prototype panel) shows this view with the banner “Guest view (prototype)…”.
+
+**Cancelled session** (owner decision, November 6, 2026): in place of the join card, a warning notice “**This session is cancelled.** REASON.” (the reason without its trailing period, then one period; just the first sentence when no reason was given). No **Request to join** and no status card. Details and Participants (with the waitlist) stay visible.
 
 ## Q-PUBLIC-DETAILS — Session description
 
@@ -62,6 +64,7 @@ A previously cached copy may show with its last-update time. With no cache, expl
 ## Acceptance examples
 
 - A public visitor sees Details/Participants without signing in and can use Request to join when requests are enabled. A request never reserves a slot; only the Queue Master confirms or declines it.
+- A cancelled session's page says Cancelled with the reason and offers no Request to join.
 - A confirmed guest has no broken fake profile link.
 - Private Off Day never appears in public data or image previews.
 - The session's cost estimate never appears publicly.

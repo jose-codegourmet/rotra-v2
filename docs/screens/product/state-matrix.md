@@ -1,7 +1,6 @@
 # Cross-product states and permissions
 
-**Last verified:** 2026-11-01.
-**Last verified:** 2026-11-01.
+**Last verified:** 2026-11-06.
 
 **Status:** Screen behavior contract. A proposed screen cannot weaken these agreed access/result boundaries.
 
@@ -11,26 +10,35 @@
 |---|---|---|---|
 | Club sign-in | Allowed | Unavailable (“Signing in needs an internet connection.”) | — |
 | Create new session / save setup edits | Allowed with license | Form can be filled; Save disabled; draft cannot run | Requires online creation, not a reconstructed local event |
-| View active Session settings | Read-only preparation summary with existing live controls | Same summary from the downloaded session; existing offline guards still apply | Reconcile status; completed/invalid sessions go to their record, finalizing sessions to finishing |
-| Start session | Allowed with levels set, license, no other active session | Allowed only with a downloaded copy | Sync start as a pending change |
-| Add/remove free court, extend time | Allowed | Allowed locally | Sync; public end time changes after sync |
+| View active Session settings | Read-only preparation summary with existing live controls | Same summary from the downloaded session; existing offline guards still apply | Reconcile status; completed/invalid/cancelled sessions go to their record, finalizing sessions to finishing |
+| Start session | Allowed with levels set, license, no other active session; after the planned end or on another day, a new end after now is required first | Allowed only with a downloaded copy (same new-end rule) | Sync start as a pending change |
+| Add/remove free court, set end time (any time after now; Extend 30/60 min shortcuts) | Allowed | Allowed locally | Sync; public end time changes after sync |
+| Planned end passed (overdue) | Header “Planned end passed N ago” in warning; banner with **Set end time** and **Session done**; dashboard live card says the same; never closes by itself | Same reminder; Session done disabled | Same reminder |
 | Download session to this device | Allowed. Real mode (#399): not connected until #246 and Q11 | Unavailable | Refresh from server while preserving local pending work |
 | Search club saved players | Server/current data | Downloaded subset | Reconcile local additions/links |
 | Search uncached global profile | Allowed | Unavailable; pending local entry permitted | Resolve without duplicate creation |
 | Add player/assign late-entry level | Allowed | Allowed locally in downloaded session | Sync/reconcile; no mid-session reassessment |
 | Toggle presence | Allowed | Allowed locally | Flag conflicts/affected waiting lineups |
-| Manual/Suggest/Auto generation | Allowed | Supported using available downloaded inputs. Real mode (#396) is online only: nothing is sent and the error says you're offline; Auto queue drafts are kept on the device (lost on reload) and Add to Main Queue is online only | Revalidate before accepting conflicting work |
+| Manual/Suggest/Generate matches (formerly called Auto Queue) | Allowed | Supported using available downloaded inputs. Real mode (#396) is online only: nothing is sent and the error says you're offline; Generate matches drafts are kept on the device (lost on reload) and Add to Main Queue is online only | Revalidate before accepting conflicting work |
 | Edit/reorder/regenerate waiting queue | Allowed | Allowed locally. Real mode (#396) is online only | Preserve healthy protected manual edits; no silent overwrite. Real mode sends the shown queue revision; a stale one is a conflict |
-| Start match | Operator confirmation plus eligibility | Local confirmation plus downloaded authorization; cannot prove unseen remote state. Real mode (#396) is online only | Conflicting occupancy requires review |
-| Substitute | Allowed with available replacement | Allowed and durable locally | Retain outgoing/incoming evidence |
+| Put on court (by hand, or by the Auto Queue switch) | Allowed for a ready match on a free court (two for 5v5); players become busy; nothing starts | Same as Start match: local placement on downloaded state; cannot prove unseen remote state. Collision-free placement across offline devices is open | Conflicting occupancy requires review |
+| Send back to queue / Move to another court / Swap with the queue | Allowed for an On court match; send back goes to the top of the queue; swap puts the next ready match on the court and this match in its queue place | Same as Put on court | Conflicting occupancy requires review |
+| Manual Queue \| Auto Queue switch | Per session, starts Manual, change any time | Not specified (open) | — |
+| Start match | Operator one tap on an On court match plus a presence/busy recheck | Local confirmation plus downloaded authorization; cannot prove unseen remote state. Real mode (#396) is online only | Conflicting occupancy requires review |
+| Substitute | Playing match only, with an available replacement and the game-credit choice | Allowed and durable locally | Retain outgoing/incoming evidence and the credit choice |
 | Confirm winner/invalid match | Permanent after confirmation | Permanent locally, pending sync. Real mode (#396) is online only: nothing is sent offline | No ordinary edit/undo path |
-| Session done | Only after complete reconciliation, no pending changes, and no game in play. Real mode (#396): connected online with the proposed #246 barriers (no active game, completeness proven, ranking policy in effect); result slides are prepared in the same request or on the next status read (interim, #243); Mark session invalid is connected | Unavailable | Blocked until required originals and conflicts are resolved |
+| Session done | Only after complete reconciliation, no pending changes, and no Playing match; On court matches never started are dropped like waiting matches. Real mode (#396): connected online with the proposed #246 barriers (no active game, completeness proven, ranking policy in effect); result slides are prepared in the same request or on the next status read (interim, #243); Mark session invalid is connected | Unavailable | Blocked until required originals and conflicts are resolved |
 | Cost estimate (setup step) | Saved with the session | Editable in the unsaved draft only | — |
 | Inventory edits | Allowed | Not specified (open decision). Real mode (#375) is online only: nothing is sent and the error says you're offline | — |
 | Payments checklist (tick paid / not paid) | Allowed. Real mode (#397): a tick with no fee set is refused (#245) | Allowed locally. Real mode (#397) is online only until sync is wired (#399): nothing is sent and the error says you're offline | Sync as pending changes |
 | Guest sends a join request (public page) | Allowed while requests are on and the session is prepared or live | Not possible offline for the guest; the request goes straight to the server | — |
 | Confirm or decline a join request | Allowed | Allowed locally on a downloaded session (requests received before going offline) | Sync as pending roster changes |
 | Club settings (club details, name-change request, password, license page) | Allowed | Unavailable (“Club settings need an internet connection.”) | — |
+| Cancel session (prepared only, before Start session) | Allowed after [D-CANCEL-SESSION](dialogs.md#d-cancel-session--cancel-session); final; pending join requests close; opens the cancelled record | Not specified (open); the prototype doesn't check the connection | Re-check the session is still prepared; if it started elsewhere, nothing is cancelled |
+| Open a cancelled session (calendar, day dialog, preparation URL) | Read-only cancelled session record: chip, reason, joined / waitlist / marked paid, roster, waitlist | Same, from what this device has | — |
+| Payments on a cancelled session | Marks shown read-only; changes refused: “Payments are not available for this session.” | Same | — |
+| Public page of a cancelled session | **Cancelled** chip and “This session is cancelled. REASON.”; no Request to join | Last synced copy | — |
+| Short on players (live) | Banner “N players present: enough for … X sit out each game.”; a free court that can't get a match says “Not enough free players.” | Same (derived from local state) | Same |
 | Reduce or add courts / players per court in a prepared session | Saved with setup; roster over budget moves to the front of the waitlist, new slots fill from it | Save disabled | — |
 | Generate final result slides | After valid finalization | Unavailable for an unfinished session | Wait for valid finalization |
 | Publish/download new results | From available valid finalized output and allowed access | No offline finalization workaround | Do not publish unverified provisional results |
@@ -69,10 +77,13 @@
 | Waiting lineup removed | No court was occupied | None | None | None |
 | Completed standard match, full participant | On permanent result | Counts | Counts, subject to award rules | Eligible after valid Session done |
 | Completed fun match, full participant | On permanent result; one court, two for 5v5 | Counts | W/L count; may contribute to local MVP | Excluded |
-| Pre-start replacement, completes full match | Normal completion | Counts | Normal full-participant rules | Standard game can qualify |
-| Mid-game outgoing/incoming substitute | Only game completion/invalidation releases court | Does not count for either partial player | No W/L, game, or award credit for either | Excluded for both partial players |
+| Pre-start replacement (Waiting or On court), completes full match | Normal completion | Counts | Normal full-participant rules | Standard game can qualify |
+| On court match never started at Session done | Dropped; court freed | None | None | None |
+| Mid-game outgoing/incoming substitute, game given to **Nobody** (or the partial player not chosen) | Only game completion/invalidation releases court | Does not count | No W/L, game, or award credit | Excluded |
+| Mid-game substitute the Queue Master gave the game to | Only game completion/invalidation releases court | Counts | Counts as a full participant of that match for the session | Excluded |
 | Invalid match | On confirmed invalidation | None | No recorded game/win/loss | None |
 | Invalid session | Session-slot release policy unresolved | No official finalized credit | No official results/slides | None |
+| Cancelled session (never started) | No court was occupied | None | None; no games, standings or slides | None |
 
 ## Rank and award gates
 
@@ -94,24 +105,24 @@ A conflict is not permission to open a generic winner editor. Accepted unchanged
 | State | Presentation | Action |
 |---|---|---|
 | Active session above slot budget | Show attendance and budget; additional admission remains available | Admit chosen player, present and level locked |
-| Court before planned start | Show planned window and not-started status | No dispatch to that court |
-| Court past planned end | Show Booking ended | Continue dispatch until manually removed while free |
-| Auto Queue draft stale | “The Main Queue changed since these were made. Check them before adding, or generate again.” Keep cards and selections visible | Review and revalidate on transfer; conflicts need attention |
-| Auto Queue count missing | “Choose how many matches, then Generate.” Disabled actions explain “Choose how many matches first.” | Choose 2 / 3 / 4 / 6 explicitly |
+| Court before planned start | Show planned window and not-started status | No placement on that court; Auto Queue skips it |
+| Court past planned end | Show Booking ended | Placing continues (by hand, or by Auto Queue) until manually removed while free |
+| Generate matches draft stale | “The Main Queue changed since these were made. Check them before adding, or generate again.” Keep cards and selections visible | Review and revalidate on transfer; conflicts need attention |
+| Generate matches count missing | “Choose how many matches, then Generate.” Disabled actions explain “Choose how many matches first.” | Choose 2 / 3 / 4 / 6 explicitly |
 | Catch Up target missing / invalid | “Choose a game target, then Generate.”; “Enter a whole number of games, 1 or more.” for invalid input | Enter a target explicitly; the session minimum is only a placeholder and comparison |
-| Auto Queue has no eligible players | “No one is free to play right now. Try Plan Ahead to include players who are mid-game.” Plan Ahead with nobody present: “No present players. Mark arrivals present in Players.” | Change player presence or strategy |
-| Auto Queue full batch | “Made {n} of {n} matches.” Normal status text | Review before adding |
-| Auto Queue short batch | “Made {k} of {n}: not enough free players for another match.” Plan Ahead says “present” | Change eligible players or strategy |
+| Generate matches has no eligible players | “No one is free to play right now. Try Plan Ahead to include players who are mid-game.” Plan Ahead with nobody present: “No present players. Mark arrivals present in Players.” | Change player presence or strategy |
+| Generate matches full batch | “Made {n} of {n} matches.” Normal status text | Review before adding |
+| Generate matches short batch | “Made {k} of {n}: not enough free players for another match.” Plan Ahead says “present” | Change eligible players or strategy |
 | Catch Up target met in plan | “Everyone available reaches {target} games with these matches.” | Review any drafts; no automatic transfer |
 | Catch Up cannot progress | Keep drafts and show “Made {k} of {n}: no other match helps anyone reach {target} games.” Append “{s} more games are still needed to reach {target}.” when positive | Change target or eligible players, then Generate again |
 
 ### Flexible admission (mock)
 
-Prepared overflow waits by default; active arrivals enter directly and lock their level. Waitlist and join-request actions disable while pending. A failed or conflicting write retains list membership and chosen levels; new-player inputs stay in the sheet. Saved/directory duplicate identities are rejected atomically. Finalized and invalid sessions remain read-only. Offline writes still require the existing downloaded-copy mock guard; license expiry allows finishing an active session only. These are in-memory states, reset on reload.
+Prepared overflow waits by default; active arrivals enter directly and lock their level. Waitlist and join-request actions disable while pending. A failed or conflicting write retains list membership and chosen levels; new-player inputs stay in the sheet. Saved/directory duplicate identities are rejected atomically. Finalized, invalid and cancelled sessions remain read-only. Offline writes still require the existing downloaded-copy mock guard; license expiry allows finishing an active session only. These are in-memory states, reset on reload.
 
 ### Court booking windows (mock)
 
-The live clock refreshes eligibility every second, including while Start match is open. Start confirms against the current clock again. Future courts show Not open yet with Start anyway (and Open all courts now in the header); an early-opened court shows Free with “Opened early · planned …”; passed ends stay advisory. Booking edits and extensions preserve fields on save failure/conflict and block repeat submission. A used start is fixed. Occupied removal and last-court removal remain guarded. Overnight times explicitly show next day. This browser clock is not a durable scheduler or an offline clock guarantee.
+The live clock refreshes eligibility every second, including while the Put on court sheet is open. Placing confirms against the current clock again. Future courts show Not open yet with Start anyway (and Open all courts now in the header); an early-opened court shows Free with “Opened early · planned …”; passed ends stay advisory. Booking edits and extensions preserve fields on save failure/conflict and block repeat submission. A used start is fixed. Occupied removal and last-court removal remain guarded. Overnight times explicitly show next day. This browser clock is not a durable scheduler or an offline clock guarantee.
 
 ### Presence batches (mock, #324)
 

@@ -1,6 +1,6 @@
 # Transaction boundaries and replay behavior
 
-**Last verified:** 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-06 for the proposed On court step; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Proposed command-level contracts, not implemented endpoints.
 
@@ -26,7 +26,9 @@ Starting the session checks reservation/authorization, refuses if any roster ent
 
 Start: lock session queue revision, verify the selected match is waiting and its participants are eligible, validate team sizes, acquire all player/court holds, record court usage, and mark active atomically. A conflicting hold rolls back the whole start.
 
-Substitute: record outgoing/incoming participation boundaries, release/acquire the corresponding hold, and update the active lineup in one transaction. Preserve both partial histories; do not replace one participant ID with another.
+**Proposed (November 6, 2026; [log](../../mockup-changes/2026-11-06-queue-on-court-and-sub-credit.md)):** split this into two transactions. *Place on court* does everything above except set `started_at`, and marks the match `on_court` with `placed_at` (by hand, or under `court_fill_mode = auto`). *Start match* locks the `on_court` match, rechecks presence and holds, and marks it active with `started_at`. *Send back to queue*, *Move to another court* and *Swap with the queue* release or swap the holds atomically. Lineup changes while `on_court` swap holds without a substitution record.
+
+Substitute: record outgoing/incoming participation boundaries, release/acquire the corresponding hold, and update the active lineup in one transaction. Preserve both partial histories; do not replace one participant ID with another. Proposed: record the credit choice (`credit_to`) in the same transaction; it freezes with the terminal decision.
 
 Finish/invalid: validate the confirmed command, insert the unique immutable decision, close participation/court evidence, release holds, and update canonical state atomically. A repeated identical operation returns the accepted decision; a different terminal command becomes a conflict, never an overwrite.
 
@@ -52,7 +54,7 @@ After confirmed historical guest linkage, include earlier valid games in persona
 
 1. Verify online authorization, including any expiry exception.
 2. Lock the session and validate current revision, all enrolled writable stream seals, contiguous accepted/resolved operations, and absence of unresolved terminal conflicts.
-3. Refuse finalization while any match is active (v1 behavior until a closure policy is decided). Unused waiting drafts produce no facts. Do not silently manufacture winners or invalidate active games.
+3. Refuse finalization while any match is active (Playing) (v1 behavior until a closure policy is decided). Unused waiting drafts and `on_court` matches never started produce no facts and release their holds. Do not silently manufacture winners or invalidate active games.
 4. Insert one `session_finalizations` record and all authoritative finalized participation facts in the same canonical commit; use unique session/command and match/participant keys.
 5. Transition the session to completed and enqueue projection work atomically. Invalid sessions instead produce no official facts or result jobs.
 6. Worker projects rank eligibility, local summaries, and slides idempotently from that finalization. Each job has exactly one concrete source FK (assessment or finalization), a projection version, and a uniqueness key.

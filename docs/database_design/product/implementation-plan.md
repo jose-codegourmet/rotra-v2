@@ -115,7 +115,7 @@ Then add club settings/name requests, saved-player lookup, request confirmation/
 **Depends on:** Phase 4, match/provenance schema, approved queue rules. **Produces:** durable online play suitable for private testing.
 
 1. Start a session with locked levels and correct authorization. Allow future preparation while enforcing one active session.
-2. Connect manual lineups, Make match, Suggest, Auto queue, reorder, and regenerate with the existing query contracts. Keep reference heuristics explicitly identified until approved for production.
+2. Connect manual lineups, Make match, Suggest, Generate matches, reorder, and regenerate with the existing query contracts. Keep reference heuristics explicitly identified until approved for production.
 3. Revalidate participants and acquire all courts/players atomically at Start match. Handle 5v5 as two courts for one game.
 4. Record substitutions without losing outgoing/incoming segments. Finish/invalid commands append the permanent decision and free occupancy together.
 5. Use stable operation IDs and revision checks from the beginning, including online commands, so offline sync later reuses the same domain semantics.

@@ -1,6 +1,6 @@
 # Session results and sharing
 
-**Last verified:** 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-06 for substitution game credit; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Confirmed v1 target rules. Updated October 26, 2026 to match the [ROTRA Queue prototype](../../../../../../apps/mockup/queue-app/rotra-queue.html).
 
@@ -8,7 +8,7 @@
 
 During an active session the console has a **Leaderboard** view of tonight's standings. It updates each time a result is confirmed and uses the same order as the standings slide. It lists players with at least one counted game: rank, name and level, wins, losses, games against the minimum, and win %. The top three are highlighted, and the view's tab names the current leader.
 
-Partial (substituted) games and invalid matches do not count. The live leaderboard is a working view for the operator, not official history; official results exist only after a valid Session done.
+Partial (substituted) games and invalid matches do not count, except that a partial player the operator gave the game to counts as a full participant of that match (owner decision, November 6, 2026; see [substitutions](../matches/README.md#substitutions)). The live leaderboard is a working view for the operator, not official history; official results exist only after a valid Session done.
 
 ## Finalization versus publishing
 
@@ -41,13 +41,15 @@ Order by:
 
 Only players with at least one counted game are listed; players who never completed a counted game are left out. Positions are unique (no shared ranks). Games do not provide an independent tiebreaker. Do not substitute opposition strength as a tiebreaker. Head-to-head is applied pairwise while sorting; exact handling of three-or-more-way ties remains open.
 
-Guests participate in standings. Fun-game wins/losses count. Partial games count for neither substituted player, and invalid matches count for no one.
+Guests participate in standings. Fun-game wins/losses count. A partial game counts for neither substituted player unless the operator gave the game to one of them; that player gets the game, the win or loss, and minimum credit for the session. Invalid matches count for no one.
+
+**Credited substitutes (owner decision, November 6, 2026).** A credited partial player's game is a counted game for the session: live leaderboard, standings, minimum progress and session awards. It is **never** part of long-term performance or rank.
 
 If no counted games were recorded, the slide says so instead of showing an empty table.
 
 ### MVP
 
-MVP rewards performance relative to the player's assigned level, partners, and opponents, rather than simply the most wins. Newcomers and guests may qualify. Fun games count locally but not toward long-term performance. A player needs **at least two counted games** to be considered. If no one qualifies, the slide says there were not enough counted games.
+MVP rewards performance relative to the player's assigned level, partners, and opponents, rather than simply the most wins. Newcomers and guests may qualify. Fun games count locally but not toward long-term performance. A credited substitute's game counts here as a counted game. A player needs **at least two counted games** to be considered. If no one qualifies, the slide says there were not enough counted games.
 
 ### Most Improved and Off Day
 
@@ -93,10 +95,11 @@ Downloads do not require publishing first.
 
 ## Session record
 
-Any completed or invalid session opens as a **read-only session record** from the home screen or calendar.
+Any completed, invalid or cancelled session opens as a **read-only session record** from the home screen or calendar.
 
 - Tabs: Public page, Results, How the night ran (replay timeline and matches by court), Players, Financials (estimate and payments checklist).
 - Valid session: status chips (Completed; results published or private), totals (games, with the invalid count; players; courts; length), **How the night ran** — every match by court in the order played, with time range, winners highlighted, score or "no score", Fun and Invalid markers, and substitution notes — and each player's rank, level, W–L, and games against the minimum. Links to the result slides and public page.
 - Invalid session: the reason, a statement that it has no official result and counts toward nothing, no match history, standings, or slides, and players marked "Not counted".
+- Cancelled session (owner decision, November 6, 2026): a **Cancelled** chip with when it was cancelled; the reason (or "No reason given."); a statement that it was cancelled before it started, has no games, standings or result slides, and doesn't count toward player records or rankings; when any were marked paid, how many, with "refunds happen outside ROTRA". Totals: Joined (of slots), Waitlist, Marked paid, Courts. The roster with each player's level and Paid amount or Not paid, the waitlist in order, and **Open public page**. No tabs.
 
 See [finalization and publication flow](flow/finalize-and-publish.md).

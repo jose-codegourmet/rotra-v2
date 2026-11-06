@@ -1,6 +1,6 @@
 # Screen decisions still requiring a focused specification
 
-**Last verified:** 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-06 for the On court step, court filling and substitution game credit; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Explicit unresolved details, not omitted screens and not a new interview questionnaire. Updated October 26, 2026: items settled by the [ROTRA Queue prototype](../../../apps/mockup/queue-app/rotra-queue.html) are listed at the end, followed by those settled with the [ROTRA Admin prototype](../../../apps/mockup/admin-app/rotra-admin.html) on October 27, 2026.
 
@@ -14,7 +14,7 @@ The screen tree specifies all agreed v1 workflows. Where behavior is undecided, 
 | License stacking/effective dates and refunds | Q-ACCESS, A-LICENSE | A renewal is proposed to start the day after the current term ends; overlaps show a warning. No refund flow |
 | Offline start authorization and device enrollment | Q-DOWNLOAD, Q-START, Q-DEVICE-CONTINUE | A downloaded screen is not automatically proof of write/start authorization |
 | Conflicting permanent outcomes | Q-CONFLICT | No last-write-wins or generic winner edit |
-| Final policy for games still in play / unused waiting queue | Q-SESSION-DONE | V1 blocks Session done until games are finished or invalidated; unplayed waiting matches are dropped from results; never manufacture winners or silently invalidate |
+| Final policy for games still in play / unused waiting queue | Q-SESSION-DONE | V1 blocks Session done while any match is Playing, until it is finished or invalidated; unplayed waiting matches and On court matches never started are dropped from results (the latter settled November 6, 2026); never manufacture winners or silently invalidate |
 | Releasing the active-session slot after invalidation | Q-INVALID-SESSION | Invalidity is permanent, as explicitly agreed; slot-release mechanics still need definition |
 | Historical guest identity confirmation and link conflicts | Q-ADD-PLAYER, P-ID-QR, P-MATCH-HISTORY | Profile/ID creation on successful entry sync and inclusion of earlier guest games after identity confirmation are settled below. No name-only transfer or invented offline permanent ID; confirmation evidence and conflict resolution remain open |
 | Post-claim operator edits and contact verification | Q-ADD-PLAYER, P-CLAIM, A-PLAYER-DETAIL | No unrestricted personal/contact overwrite |
@@ -29,7 +29,7 @@ The screen tree specifies all agreed v1 workflows. Where behavior is undecided, 
 
 - Exact routes beyond the approved mock auth boundary (`/login` in all apps, public Queue `/s/[slug]`, public Player `/players/[playerId]`, protected Player `/me`; approved October 27, 2026), component names, page-versus-sheet boundaries, field-length limits, design tokens, and export pixel dimensions.
 - Changing mode/formats/minimum during an active session. They stay visible and fixed until decided.
-- The Auto Queue match count is explicitly selected from 2, 3, 4 or 6, with no preselected default (owner decision October 31, 2026).
+- The Generate matches (formerly called Auto Queue) match count is explicitly selected from 2, 3, 4 or 6, with no preselected default (owner decision October 31, 2026).
 - Fully withdrawing a publication (re-publishing a new selection is settled).
 - Access to five-session history for award calculations when a returning guest was duplicated rather than recognized.
 - Whether individual club assessments are itemized publicly. Equal-weight aggregation is agreed; public assessment disclosure is not.
@@ -37,6 +37,27 @@ The screen tree specifies all agreed v1 workflows. Where behavior is undecided, 
 - Whether inventory edits work offline; currencies other than pesos.
 - Showing player contact details (Facebook, phone, email) next to payments. The paid / not-paid checklist itself is settled; contacts stay private.
 - New Admin auth policy: email/password is a proposed carry-forward from the existing specification, not a newly confirmed product decision.
+- Copy the November 6, 2026 decision did not give, to be taken from the mockup when it lands: the Q-CHOOSE-MATCH sheet title (was “Start a match on Court X”); the Confirm substitution warning when a person gets the game; the 5v5 Playing chip wording (was **Merged · in game**); the Manual Queue helper copy, if any; and any toast after **Put on court**, **Send back to queue** or **Move to another court**.
+- The Manual Queue | Auto Queue switch while offline, and two offline devices placing the same match or court (collision-free assignment stays open).
+- Whether **Cancel session** needs internet (the prototype doesn't check the connection; Delete session does), and whether the Preparation header keeps **Delete session** next to **Cancel session** (the prototype shows only Cancel session).
+- What Q-POOL shows for a player in a Getting ready match (the status list has **On Court X**, **Away**, **Queued · #P**, **Free**).
+
+## Settled by the product owner on November 6, 2026
+
+Recorded in the [mockup change log](../../mockup-changes/2026-11-06-queue-on-court-and-sub-credit.md) and the [business decision summary](../../business_logic/product/open-decisions.md#settled-by-the-product-owner-on-november-6-2026).
+
+| Area | Decision | Screens |
+|---|---|---|
+| Generator name | Shown as **Generate matches** everywhere; formerly called Auto Queue. `Q-AUTO` keeps its ID | Q-QUEUE, Q-AUTO, Q-SETUP |
+| On court step | **Put on court** places a match (chip **Getting ready**); **Start match** starts it in one tap (chip **Playing**). The timer starts at Start match | Q-DISPATCH, Q-ON-COURT, Q-COURTS |
+| On court actions | Switch sides, **Replace player** (lineup change, not a substitution), **Move to another court**, **Send back to queue** (to the top), **Swap with the queue** (decided November 6, 2026), **Start match** with a recheck | Q-ON-COURT |
+| Court filling | **Manual Queue \| Auto Queue** switch on the Courts section, Manual by default. Auto places, never starts: “Free courts get the next ready match. You still start each one.” | Q-COURTS |
+| Court card look | Free: plain, chip **Free** / Not open yet. Getting ready: normal border. Playing: steady accent glow, no pulse, chip **Playing**. Always with a text label; tokens only | Q-COURTS |
+| Substitution game credit | Step **Who gets this game?**: Nobody (default) · NAME (coming in) · NAME (going off); “Started M min ago”; session credit only, never long-term performance; record line “Kiko replaced Jom · Kiko got the game (QM choice)” | Q-SUBSTITUTE, Q-ACTIVE-MATCH, Q-MATCH-RECORD, Q-LEADERBOARD |
+| Session done | Blocked only by Playing matches; “N matches on court weren't started and will be dropped.” | Q-SESSION-DONE |
+| Cancelled sessions | **Cancel session** on Preparation (prepared only) → D-CANCEL-SESSION (optional reason, paid warning, “This can't be undone.”) → read-only cancelled record; calendar hollow dot and struck-through title; public page “This session is cancelled. REASON.” with no join card. [Change log](../../mockup-changes/2026-11-06-queue-example-sessions-and-cancel.md) | Q-PREPARE, Q-HOME, Q-HISTORY, Q-PUBLIC-JOIN |
+| Short on players | Live banner “7 players present: enough for 1 doubles court. 3 sit out each game.”; free court “Not enough free players.” | Q-CONSOLE, Q-COURTS |
+| Times and days (T1–T6) | Every time shows its day; one date-and-time picker (day buttons + valid times in 15-minute steps); live **Set end time** with Extend 30/60 as shortcuts; start time fixed; late or other-day start needs a **New end**; overdue reminder “Planned end passed N ago”; club time zone (docs only). [Change log](../../mockup-changes/2026-11-06-queue-time-and-day.md) | Q-SETUP, Q-START, Q-CONSOLE, Q-SESSION-ADJUST, Q-ADD-COURT, Q-COURTS, Q-HOME |
 
 ## Settled by the product owner (October 28, 2026)
 
@@ -50,7 +71,7 @@ The screen tree specifies all agreed v1 workflows. Where behavior is undecided, 
 | Former open item | Decision | Screens |
 |---|---|---|
 | Non-5v5 fun court allocation | One court; 5v5 two | Q-MANUAL, Q-DISPATCH |
-| Partial-player local W/L/MVP | No credit for either partial player anywhere | Q-MATCH-RECORD, Q-STANDINGS-SLIDE, Q-LEADERBOARD |
+| Partial-player local W/L/MVP | No credit for either partial player anywhere. Amended November 6, 2026: unless the Queue Master gives one of them the game (session credit only) | Q-MATCH-RECORD, Q-STANDINGS-SLIDE, Q-LEADERBOARD |
 | Manual-only sessions | Allowed with both standard formats off, with a warning | Q-SETUP |
 | Disabled standard formats in manual queueing | Not offered | Q-MANUAL, Q-POOL |
 | Accepted unedited suggestion | Not protected | Q-SUGGEST |
@@ -64,7 +85,7 @@ The screen tree specifies all agreed v1 workflows. Where behavior is undecided, 
 | Reducing the slot budget | Latest-added players move to the front of the waitlist on save | Q-SETUP, Q-PREPARE |
 | Identity confirmation | Unclaimed profiles only | Q-ADD-PLAYER, Q-IDENTIFY |
 | Queue reordering controls | Drag handle (arrow keys on the handle); no Earlier / Later buttons | Q-QUEUE |
-| Switching players between teams | Drag a player onto the other team (press and hold on touch; ← / → on keyboard); swaps, protects the waiting match | Q-QUEUE, Q-SUGGEST, Q-MANUAL, Q-DISPATCH |
+| Switching players between teams | Drag a player onto the other team (press and hold on touch; ← / → on keyboard); swaps, protects the waiting match. Since November 6, 2026 also allowed while On court, until Start match | Q-QUEUE, Q-SUGGEST, Q-MANUAL, Q-DISPATCH, Q-ON-COURT |
 | Theme | Dark default with a light/dark switch in the top bar | All Queue screens |
 | Level selector | Nine levels grouped Beginner / Intermediate / Advanced | Q-ASSESS, Q-ADD-PLAYER, Q-PREPARE |
 | Setup flow | Three pages with Create session available from page 1 | Q-SETUP |
@@ -87,4 +108,4 @@ No unresolved item grants permission to edit permanent game outcomes, reconstruc
 
 ## Settled by the product owner (October 31, 2026)
 
-See [Queue flexibility owner review](../../decisions/2026-10-30-queue-flexibility/05-owner-review.md) for capacity, court windows, Auto Queue strategy and transfer decisions. The reviewed choices do not settle pairing weights or unrelated open items.
+See [Queue flexibility owner review](../../decisions/2026-10-30-queue-flexibility/05-owner-review.md) for capacity, court windows, Auto Queue (now Generate matches) strategy and transfer decisions. The reviewed choices do not settle pairing weights or unrelated open items.

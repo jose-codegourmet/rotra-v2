@@ -10,7 +10,8 @@
 
 **Step 1 — Session done:** Session, Games recorded, Participants, Sync (“Complete” or “N changes waiting”). Notices:
 
-- Games in play (error style): “N games are still in play (Court 1, Court 3). Finish or invalidate them first.” **The continue button is disabled** while any game is active. (The prototype's copy also says the final policy is undecided; that note is for reviewers, not product copy.)
+- Games in play (error style): “N games are still in play (Court 1, Court 3). Finish or invalidate them first.” **The continue button is disabled** while any match is **Playing**. (The prototype's copy also says the final policy is undecided; that note is for reviewers, not product copy.)
+- On court matches never started (info; owner decision, November 6, 2026): “N matches on court weren't started and will be dropped.” They do not block Session done; they are dropped like waiting matches.
 - Unplayed waiting matches (info): “N waiting matches were never played and won't appear in results. What happens to unplayed matches is still undecided.”
 - Shortfall (warning): “N players are below the minimum of M games.”
 
@@ -44,7 +45,8 @@ Do not offer Result slides, Publish, Download, Edit winners, or Reconstruct resu
 ## Acceptance examples
 
 - Complete records plus low game counts can still finalize after acknowledgement.
-- A game still in play blocks Session done until it is finished or invalidated.
+- A game still in play (Playing) blocks Session done until it is finished or invalidated.
+- A Getting ready (On court) match that never started does not block Session done; the review says it will be dropped.
 - Pending sync changes keep Confirm Session done disabled.
 - A finalization processing retry cannot create another finalization.
 - Profile/rank updates happen whether or not the operator later shares slides.

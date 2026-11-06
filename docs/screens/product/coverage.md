@@ -38,7 +38,9 @@ Every agreed business module has a corresponding screen contract. The checks bel
 
 | Requirement | Screen contract | Acceptance evidence to obtain later |
 |---|---|---|
-| Manual, Suggest, Auto Queue | [Queue](modules/queue/match-queue.md) | Each works without automatic court start |
+| Manual, Suggest, Generate matches (formerly called Auto Queue) | [Queue](modules/queue/match-queue.md) | Each works without automatic court start |
+| Manual Queue \| Auto Queue court filling | [Console](modules/queue/session-console.md), [Match control](modules/queue/match-control.md) | Auto places the next ready match On court and never starts it; skips 5v5, not-open and booking-ended courts |
+| On court step | [Match control](modules/queue/match-control.md) | Put on court, then one-tap Start match; switch sides, replace, move court, send back to the top of the queue |
 | Chill/Fair/Hard are overridable session-wide presets | [Setup](modules/queue/session-setup.md), [generation](modules/queue/match-queue.md) | Flexible 30%/10% goals; Hard allows consecutive play; no individual-mode choice |
 | Easy means favored team; balanced pairings matter | [Generation](modules/queue/match-queue.md) | No unsupported probabilities or guaranteed easy-game quota |
 | Minimum-game priority; above-minimum indicator | [Pool](modules/queue/session-console.md) | Equal-to-minimum differs from above-minimum; QM can override lineup |
@@ -49,7 +51,7 @@ Every agreed business module has a corresponding screen contract. The checks bel
 | Fun games count local W/L/MVP/minimum, not global performance | [Results](modules/queue/results-sharing.md), [state matrix](state-matrix.md) | Local results can include fun; global eligibility excludes it |
 | Needs attention, swap available, Regenerate | [Queue](modules/queue/match-queue.md) | Text/icon identifies affected lineup; accessible non-pulse alternative |
 | Regenerate preserves active and healthy manual matches | [Regeneration](modules/queue/match-queue.md) | Flagged manual rebuilt; edited auto becomes protected |
-| Pre-start and mid-game substitutions | [Match control](modules/queue/match-control.md) | Pre-start full player eligible; incoming/outgoing partials get no minimum/global credit |
+| Pre-start and mid-game substitutions | [Match control](modules/queue/match-control.md) | Pre-start (Waiting or On court) full player eligible; incoming/outgoing partials get no minimum/global credit unless the Queue Master gives one of them the game (session credit only, never global) |
 | Winner-only or optional final scores | [Completion](modules/queue/match-control.md) | Winner-only succeeds; absent scores never become 0–0 |
 | Confirmation, permanent winner/score | [Dialogs](dialogs.md) | No undo/edit/add-score-later in Queue or Admin |
 | Invalid match irreversible, frees courts, counts nothing | [Invalid game](modules/queue/match-control.md) | Cancel keeps game active; confirmation frees courts and records no counted game |
@@ -112,7 +114,7 @@ Every agreed business module has a corresponding screen contract. The checks bel
 | Make match from selected players | [Players view](modules/queue/session-console.md) | Count picks format; disabled standard formats refused; added to queue end as protected |
 | Queue order is a suggestion | [Queue](modules/queue/match-queue.md), [pick another](modules/queue/match-control.md) | Any ready match starts on any free court; blocked matches keep their place |
 | Unedited suggestions stay unprotected | [Suggest](modules/queue/match-queue.md) | Regenerate rebuilds them; edited ones are kept |
-| Drag players to switch sides | [Queue](modules/queue/match-queue.md), [Start match](modules/queue/match-control.md) | Queue cards, Suggest, Edit lineup, Start match; touch press-and-hold; ← / → on keyboard; protects the match; not during play |
+| Drag players to switch sides | [Queue](modules/queue/match-queue.md), [Start match](modules/queue/match-control.md) | Queue cards, Suggest, Edit lineup, Put on court, Getting ready; touch press-and-hold; ← / → on keyboard; protects the match; not once Playing |
 | Live leaderboard | [Leaderboard](modules/queue/session-console.md) | Same order as slide 1; partial/invalid excluded |
 | Session done blocked by games in play | [Finalization](modules/queue/session-finalization.md) | Continue disabled until every game is finished or invalidated |
 | Re-publication with Off Day reset | [Publish](modules/queue/results-sharing.md) | Off Day unchecked on every open |

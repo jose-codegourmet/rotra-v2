@@ -1,13 +1,13 @@
 # Matches and result integrity
 
-**Status:** Confirmed v1 target rules. Updated October 26, 2026 to match the [ROTRA Queue prototype](../../../../../../apps/mockup/queue-app/rotra-queue.html).
+**Status:** Confirmed v1 target rules. Updated October 26, 2026 to match the [ROTRA Queue prototype](../../../../../../apps/mockup/queue-app/rotra-queue.html). Updated November 6, 2026 for the owner's On court step and substitution game credit ([log](../../../../../mockup-changes/2026-11-06-queue-on-court-and-sub-credit.md)).
 
 ## Formats
 
 | Format | Team sizes | Created by | Court requirement | Long-term performance |
 |---|---|---|---|---|
-| Singles | 1 v 1 | Manual, Make match, Suggest, Auto queue — only when Singles is on | One | Eligible |
-| Doubles | 2 v 2 | Manual, Make match, Suggest, Auto queue — only when Doubles is on | One | Eligible |
+| Singles | 1 v 1 | Manual, Make match, Suggest, Generate matches — only when Singles is on | One | Eligible |
+| Doubles | 2 v 2 | Manual, Make match, Suggest, Generate matches — only when Doubles is on | One | Eligible |
 | 1v2, 3v3, 4v4 | 1 v 2, 3 v 3, 4 v 4 | Operator only (Manual, Make match) | One | Excluded |
 | 5v5 | 5 v 5 | Operator only (Manual, Make match) | Two courts, shown as one merged playing area | Excluded |
 
@@ -17,11 +17,40 @@ Every match gets a **match number** in the order it was created in the session (
 
 Fun-game wins/losses count in session standings and may contribute to local MVP. Completing the whole fun game counts toward the minimum. Fun games never contribute to long-term player-performance rating or standard-match leaderboard eligibility.
 
+## Lifecycle
+
+A match moves through these steps (owner decision, November 6, 2026):
+
+| Step | Meaning | Switch sides / partners | Replace a player | Court card |
+|---|---|---|---|---|
+| Waiting | In the queue, no court | Yes (edit lineup) | Yes (edit lineup) | — |
+| On court | Placed on a court, not started yet | Yes | Yes: a plain lineup change (see [Substitutions](#substitutions)) | **Getting ready** |
+| Playing | Started with **Start match** | No | Only through **Substitute**, with the game-credit choice | **Playing** |
+| Done / Invalid | Permanent outcome | No | No | — |
+
+The buttons stay **Start match** and **Match done**.
+
 ## Start and completion
 
-The operator always confirms Start match, choosing the free court (or two free courts for 5v5). No participant can be in two active matches at once. Eligibility is checked again at confirmation; if something changed, the start is refused with "Something changed. Review the match again."
+Getting a match going takes two operator steps:
 
-An active match shows its court(s), format, start time, minutes played, teams, and any substitutions. Closing that view does not end the game; the court stays in use until a winner or an invalid decision is confirmed.
+1. **Put on court.** The operator places a waiting match on a free court (two free courts for 5v5). The court is chosen here. The match is now **On court**. With [Auto Queue](../queueing/README.md#auto-queue-and-manual-queue-court-filling) on, ROTRA places the next ready match itself, but never starts it.
+2. **Start match.** One tap on the On court match, because the court is already chosen. ROTRA rechecks presence and busy players first; if something changed, the start is refused with "Something changed. Review the match again." Success: "Match N started on Court X". The minutes-played timer starts here, not at placement.
+
+No participant can be in two On court or Playing matches at once. Players in an On court match count as **busy**: they cannot be put on another court or start elsewhere, and the reason names the court ("Migs is on Court 1").
+
+While a match is On court the operator can:
+
+- switch sides or partners, and replace a player (a lineup change);
+- **Send back to queue:** the match goes to the **top** of the queue and the court frees. A match that was edited while On court goes back as a protected manual match;
+- **Move to another court:** needs a free open court (two for 5v5).
+- **Swap with the queue:** the next waiting match that is ready for this court (first in queue order, same number of courts, counting this match's players as free) goes on the court as Getting ready, and this match takes **that match's place** in the queue (not the top). Example: Match 1 on Court 1, queue Match 3, Match 4 → after the swap Match 3 is on Court 1 and the queue is Match 1, Match 4. Disabled when no other waiting match is ready. Like Send back, a match edited while On court goes back protected. The court never frees, so Auto Queue does nothing.
+
+If a player in an On court match is marked not present, the court shows the reason and Start match is disabled until the lineup is fixed (Replace player) or the match is sent back.
+
+A Playing match shows its court(s), format, start time, minutes played, teams, and any substitutions. Closing that view does not end the game; the court stays in use until a winner or an invalid decision is confirmed.
+
+Removing or editing a court is blocked while any match (On court or Playing) is on it.
 
 There are two ways to complete a valid game:
 
@@ -44,15 +73,29 @@ Completion frees the occupied court(s). The permanent result can remain locally 
 
 ## Substitutions
 
-The operator may change lineups before a start (by editing the waiting match) or substitute players during a game.
+The operator may change lineups before a start (by editing the waiting match, or by replacing a player while the match is On court) or substitute players during a game.
 
-A mid-game substitution picks the player coming off, then a replacement who is present, not in this match, and not playing elsewhere. The replacement joins the same team. A match can have more than one substitution, and each is recorded and shown on the match.
+**Before Start match.** Replacing a player in a Waiting or On court match is a plain lineup change. The replacement is a full participant if they play the whole match. It is not recorded as a substitution and never asks who gets the game.
 
-- A pre-start replacement who plays the whole match is a full participant.
-- For a mid-game substitution, **both the outgoing player and incoming substitute** are excluded from that match's performance-based rank update.
-- Neither receives minimum-game credit for the partial game.
-- Only full-match participants can receive performance credit from that match.
-- Both partial participants also get no win, loss, or game from that match in the live leaderboard, session standings, or awards. The match's other full participants count normally.
+**During play.** A substitution in a Playing match picks the player coming off, then a replacement who is present, not in this match, and not busy elsewhere. The replacement joins the same team. A match can have more than one substitution, and each is recorded and shown on the match.
+
+**Who gets this game? (owner decision, November 6, 2026).** At confirmation the operator chooses one of:
+
+| Choice | Effect |
+|---|---|
+| **Nobody** (default, the usual case) | Neither partial player gets anything from this match |
+| **The incoming player** (coming in) | The incoming player counts as a full participant of this match **for the session** |
+| **The outgoing player** (going off) | The outgoing player counts as a full participant of this match **for the session** |
+
+- Never both. Choosing a person for a team slot replaces any earlier credit choice for that same slot, so at most one person per slot gets the game.
+- The sheet shows "Started M min ago" to help decide. There is no automatic minute threshold; giving the game is the operator's courtesy.
+- What the credited player gets: the **game count, minimum-game credit, and the win or loss** in the live leaderboard, session standings and session awards.
+- What the credited player never gets: **long-term performance or rank** from that match. Both partial players stay excluded from the performance-based rank update.
+- The uncredited partial player gets nothing: no game, win, loss, or minimum-game credit from that match in the live leaderboard, session standings, or awards.
+- The choice is made at substitution confirmation and **locks** when the match is done or invalid. An invalid match still gives nobody anything.
+- The match's other full participants count normally. Only full-match participants can receive long-term performance credit from that match.
+
+The match record shows the choice, for example "Kiko replaced Jom · Kiko got the game (QM choice)".
 
 ## Invalid match
 

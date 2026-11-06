@@ -1,6 +1,6 @@
 # Physical schema (drafted)
 
-**Last verified:** 2026-10-31.
+**Last verified:** 2026-11-06.
 
 **Status:** Draft Prisma models and **unapplied** migration SQL in `packages/db/prisma/`. Each migration
 needs human sign-off before it touches any database ([coding conventions §13](../../coding-conventions.md#13-database-later-epic)).
@@ -119,6 +119,13 @@ UUID from another club or session is rejected.
 | `session_join_requests` | PK `id`; index `(session_id, status, requested_at)` | pending ⇔ no decision time; confirmed ⇒ club player | `(club_id, session_id)`, `(club_id, club_player_id)` |
 | `club_assessments` | PK `id`; unique `source_operation_id`, `(club_id, club_player_id, id)`, `(club_id, session_id, session_player_id, id)`; rank indexes per ranking.md | actor = owning club; **append-only** trigger | `(club_id, club_player_id)`, `(club_id, session_id)`, `(club_id, session_id, session_player_id)`, `(club_id, club_player_id, supersedes_id)` |
 
+**Cancelled sessions (proposed, not drafted; owner decision, November 6, 2026; [log](../../mockup-changes/2026-11-06-queue-example-sessions-and-cancel.md)).**
+`queue_sessions.state` gains `cancelled` (allowed only from `prepared`, final) with `cancelled_at`
+(set ⇔ cancelled) and a nullable `cancel_reason` (≤ 120 characters, only when cancelled). The overlap
+exclusion becomes `WHERE state NOT IN ('invalid', 'cancelled')`. `session_join_requests` gains a
+`closed` status for pending requests closed by the cancel. Roster, waitlist and payment-mark rows are kept;
+payment marks refuse writes on a cancelled session. Needs a migration ticket.
+
 **Roster identity (proposal, #245).** One `session_players` row per (session, club player) for the
 session's lifetime. Demotion and preparation removal set `released_at` + `release_reason`; rows are
 never deleted (trigger) and all references are `RESTRICT`, so paid marks and assessments keyed on the
@@ -218,8 +225,16 @@ close of a stream that never wrote, conflict categories and who may resolve one.
   segment), never a client flag.
 - Operation references (`source_operation_id`, `joined_operation_id`, …) have no FK: online commands
   have no `sync_operations` row.
-- Open (#246): offline `match_no` allocation, conflicting confirmations, and whether unplayed waiting
-  matches are kept or marked removed at Session done. Canonical waiting positions are not unique in
+- **Proposed, not drafted (owner decision, November 6, 2026; [log](../../mockup-changes/2026-11-06-queue-on-court-and-sub-credit.md)):**
+  a `matches.state` value `on_court` between `waiting` and `active`, a nullable `placed_at`, and
+  court/player holds taken at placement, so the hold checks become "needs an `on_court` or `active`
+  match" and "started ⇔ not waiting" becomes "started ⇔ active/completed/invalid" (`started_at` only at
+  Start match). Substitutions gain `credit_to` (`none` · `incoming` · `outgoing`, default `none`,
+  frozen with the decision); `queue_sessions` gains `court_fill_mode` (`manual` · `auto`, default
+  `manual`). Needs a migration ticket; the frozen-after-decision triggers must also freeze `credit_to`.
+- Open (#246): offline `match_no` allocation, conflicting confirmations, collision-free placement across
+  offline devices, and whether unplayed waiting matches are kept or marked removed at Session done
+  (`on_court` matches are dropped like waiting ones). Canonical waiting positions are not unique in
   the database because reorders would need a deferrable constraint; commands keep them unique.
 
 ## Group G · inventory, cost estimates, shuttle plans, payment marks (F07.15 · `20261031000800`)

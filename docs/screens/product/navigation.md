@@ -16,7 +16,9 @@ flowchart TD
   ROSTER --> DL[Download to operating device]
   DL --> RUN[Start session / operator console]
   RUN --> QUEUE[One shared waiting queue]
-  QUEUE --> GAME[Confirm Start match]
+  QUEUE --> ONCOURT[Put on court: by hand or Auto Queue]
+  ONCOURT --> GAME[Confirm Start match]
+  ONCOURT --> QUEUE
   GAME --> END[Confirm winner or invalid match]
   END --> QUEUE
   END --> LB[Live leaderboard]
@@ -49,7 +51,7 @@ flowchart TD
 |---|---|
 | [Queue access and session home](modules/queue/access-home.md) | `Q-LOGIN`, `Q-ACCESS`, `Q-HOME`, `Q-VENUES`, `Q-CLUB` |
 | [Session financials and club inventory](modules/queue/financials-inventory.md) | `Q-FINANCIALS`, `Q-PAYMENTS`, `Q-INVENTORY`, `Q-INVENTORY-ITEM` |
-| [Match start, substitutions, and permanent outcomes](modules/queue/match-control.md) | `Q-DISPATCH`, `Q-CHOOSE-MATCH`, `Q-ACTIVE-MATCH`, `Q-SUBSTITUTE`, `Q-MATCH-DONE`, `Q-INVALID-MATCH`, `Q-MATCH-RECORD` |
+| [Match start, substitutions, and permanent outcomes](modules/queue/match-control.md) | `Q-DISPATCH`, `Q-CHOOSE-MATCH`, `Q-ON-COURT`, `Q-ACTIVE-MATCH`, `Q-SUBSTITUTE`, `Q-MATCH-DONE`, `Q-INVALID-MATCH`, `Q-MATCH-RECORD` |
 | [Shared match queue and generation](modules/queue/match-queue.md) | `Q-QUEUE`, `Q-MANUAL`, `Q-PICK-PLAYER`, `Q-SUGGEST`, `Q-AUTO`, `Q-REGENERATE` |
 | [Offline readiness, sync, and interrupted-device recovery](modules/queue/offline-recovery.md) | `Q-SYNC`, `Q-DEVICE-CONTINUE`, `Q-INTERRUPTION`, `Q-CONFLICT`, `Q-UNRECOVERABLE` |
 | [Saved players, identity entry, roster, and presence](modules/queue/players-roster.md) | `Q-SAVED-PLAYERS`, `Q-ADD-PLAYER`, `Q-IDENTIFY`, `Q-ASSESS`, `Q-ROSTER` |
@@ -84,6 +86,7 @@ flowchart TD
 - Session done failure returns to a meaningful processing/recovery state; do not reopen a finalized session because of a lost response.
 - Reauthentication/licensing transitions preserve unsynced evidence but do not reveal blocked club reports.
 - Public profile/session links do not become permission to edit the corresponding records.
+- A cancelled session (owner decision, November 6, 2026) opens only as its read-only session record (`Q-HISTORY`, cancelled form). Opening its preparation (or its edit) leads to that record; its public link stays and says Cancelled.
 - Do not add route paths to this document until route architecture is chosen; old routes are not assumed to match the reset.
 
 Inventory total: **86 surfaces across 19 module specifications**, plus the shared confirmation-dialog contract. (Updated October 26, 2026: +8 Queue surfaces from the [ROTRA Queue prototype](../../../apps/mockup/queue-app/rotra-queue.html). Updated October 27, 2026: +3 Admin surfaces from the [ROTRA Admin prototype](../../../apps/mockup/admin-app/rotra-admin.html).)

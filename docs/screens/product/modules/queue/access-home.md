@@ -47,7 +47,7 @@ If status cannot be verified, show “Unable to verify access” separately from
 
 **Now card** (full width under the header) shows exactly one state, styled so live and upcoming can't be confused:
 
-- **Live:** accent edge and tint, a filled pulsing **LIVE NOW** badge, title, “venue · start–end · N h M min left” (or “past its end time”), live numbers (courts in use “1/3”, games played, players present “14/14”, queued), **Continue session**, and “Up next: TITLE · DATE” when another session is prepared.
+- **Live:** accent edge and tint, a filled pulsing **LIVE NOW** badge, title, “venue · start–end · N h M min left” (or “Planned end passed N ago” in warning, as in the console header; times carry their day), live numbers (courts in use “1/3”, games played, players present “14/14”, queued), **Continue session**, and “Up next: TITLE · DATE” when another session is prepared.
 - **Upcoming** (earliest prepared session, nothing live): neutral edge, an outlined **UPCOMING · …** badge with a clock and a countdown (“Starts in 45 min”, “Starts in 2 h 15 min”, “Tomorrow, 6:00 PM”, “In 3 days · DATE”, “Starting now”, or “Was due 6:00 PM · not started”), title, date · time · venue, preparation numbers (slots filled “14/24”, on the waitlist, courts, offline copy Ready/No/**Not connected** when the data mode has no device-download adapter), **Open preparation** and “Not started yet”.
 - **Nothing planned:** outlined badge, “Plan your next club night”, **Create session**.
 
@@ -55,11 +55,11 @@ On phones the action button drops below the numbers at full width.
 
 **Calendar card:** the view follows the screen (decided October 27, 2026), and **Previous / Today / Next** move by that view's unit:
 
-- **Desktop (over 1024 px): month.** Month and year title; a full-width, seven-column month grid; today highlighted; the last opened day tinted. Each day lists up to two sessions (“7:00 PM Sunday Night Queue”) colored by state, then “+N more”. Tapping a date opens its day dialog; tapping a session label opens it directly: the console (live), preparation (prepared), or session record (completed/invalid). Day buttons have full accessible names (“Monday, October 26, today, 1 session”).
+- **Desktop (over 1024 px): month.** Month and year title; a full-width, seven-column month grid; today highlighted; the last opened day tinted. Each day lists up to two sessions (“7:00 PM Sunday Night Queue”) colored by state, then “+N more”. Tapping a date opens its day dialog; tapping a session label opens it directly: the console (live), preparation (prepared), or session record (completed/invalid/cancelled). Day buttons have full accessible names (“Monday, October 26, today, 1 session”).
 - **Tablet (641–1024 px): week.** Title “Oct 25 – 31, 2026”; seven day columns (Sun–Sat), today outlined in the accent; each column header (weekday + date) opens that day's dialog; each session is a card with time range, title (up to two lines) and venue, edged by state; empty days show “—”.
 - **Phone (640 px and narrower): day.** Title “Tuesday, October 27”; a seven-day strip for the current week (selected day filled, today in accent, a dot on days with sessions) to jump between days; then that day's sessions as cards with time range, title, venue and a state chip. An empty day reads “No sessions this day.” with **Create session on this day** (today or later).
 
-Legend under every view: Live, Prepared, Completed, Invalid. Crossing a breakpoint (rotating or resizing) redraws the calendar in the matching view.
+Legend under every view: Live, Prepared, Completed, Invalid, Cancelled. A **Cancelled** session (owner decision, November 6, 2026) has a hollow (outlined) dot or key and a struck-through title in muted text, so it reads apart from Invalid (red) and Completed (filled grey); its chip and day-dialog entry read **Cancelled**, and it opens its session record. Crossing a breakpoint (rotating or resizing) redraws the calendar in the matching view.
 
 **Day dialog (`Q-HOME` calendar):** tapping a date or “+N more” opens a dialog (a bottom sheet on phones) titled with the full date, plus “· Today” when relevant. It lists that day's sessions — state color, title, time · venue, and state chip — each opening the same screen as above, or “No sessions this day.” Footer: **Close**, and for today or a future date **Create session today** / **Create session on this day**, which opens setup with that date filled in. Past dates have no create action. Escape or Close returns focus to the date.
 
@@ -74,6 +74,7 @@ Each download badge is device-specific. One active session per club: preparing a
 | No sessions | Next-session card offers Create session; calendar empty |
 | History empty | Past sessions empty; no demo standings |
 | Invalid historical session | Invalid chip; record shows the reason; no slides |
+| Cancelled session | Cancelled dot (hollow) and struck-through title; opens the read-only cancelled record; no slides |
 | Offline with downloaded active session | Continue that session; creation unavailable |
 | Offline without a local copy | Explain that the session must be downloaded online |
 | License expired while viewing | Show Q-ACCESS |

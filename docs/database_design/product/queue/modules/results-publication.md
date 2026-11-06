@@ -1,6 +1,6 @@
 # Finalized facts, awards, and publication
 
-**Last verified:** 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-06 for substitution game credit; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Proposed data structures, not proposed new award formulas.
 
@@ -19,7 +19,7 @@
 | `team_a_score`, `team_b_score` | Optional score pair |
 | `fact_version` | Reducer version; not permission to change winner |
 
-Only a valid session finalization can create official facts. Invalid matches produce none. Fun matches can produce club-local facts but are excluded from global performance/standard-match counts. Partial participation can be retained as source evidence, but both outgoing and incoming substitutes receive no game, win, loss, minimum-game or award credit anywhere (settled October 26, 2026).
+Only a valid session finalization can create official facts. Invalid matches produce none. Fun matches can produce club-local facts but are excluded from global performance/standard-match counts. Partial participation can be retained as source evidence, but both outgoing and incoming substitutes receive no game, win, loss, minimum-game or award credit anywhere (settled October 26, 2026), **except** the one the Queue Master gave the game to (`credit_to`, proposed November 6, 2026): that player counts as a full participant for club-local session facts (standings, awards, games, minimum) and is still excluded from global performance and standard-match counts.
 
 Guest facts stay linked to the club player even without a profile. **Owner decision, October 28, 2026:** after identity confirmation, include earlier valid guest games in personal history and ranking under the existing eligibility/window rules. Preserve `player_id_at_finalization` as the historical snapshot rather than rewriting it. Implement an auditable, repeat-safe attribution/projection step using original played dates; its physical design and identity-confirmation evidence remain open. Linking does not duplicate facts, change a winner, or make fun/partial games eligible for global performance.
 
@@ -31,7 +31,7 @@ Index `(player_id_at_finalization, played_at DESC, match_id)` for player history
 
 `session_result_snapshots`: one immutable generated snapshot per session/version, containing standings, MVP evidence, improvement/off-day eligibility and output, calculation version, exact prior-session IDs/baseline window, and generated time. It is private by default. Versioning supports reviewed algorithm changes, not result correction.
 
-Compute local standings from wins, losses, head-to-head when applicable, then name. Include total games. No global rank score replaces this ordering. List only players with at least one counted game; partial participants and invalid matches contribute nothing.
+Compute local standings from wins, losses, head-to-head when applicable, then name. Include total games. No global rank score replaces this ordering. List only players with at least one counted game; partial participants and invalid matches contribute nothing, except a credited substitute (`credit_to`), whose game counts as a counted game for the session.
 
 The live console leaderboard uses the same ordering over the provisional projection and adds win % (wins ÷ games). It is a read model only.
 

@@ -42,7 +42,7 @@ Performance considers wins/losses and the strength context of partners and oppos
 
 Partner strength comes from the recorded lineup and assigned levels rather than an extra manual checkbox. Years/months of experience is optional context, not direct ranking points.
 
-Only full participation in valid singles/doubles matches from valid finalized sessions is eligible for long-term performance. Fun matches, invalid matches/sessions, and both outgoing/incoming participants in a mid-game substitution are excluded from that performance contribution.
+Only full participation in valid singles/doubles matches from valid finalized sessions is eligible for long-term performance. Fun matches, invalid matches/sessions, and both outgoing/incoming participants in a mid-game substitution are excluded from that performance contribution, even when the Queue Master gave one of them the game for the session (owner decision, November 6, 2026).
 
 ## Inactivity
 

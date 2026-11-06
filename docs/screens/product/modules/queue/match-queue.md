@@ -1,6 +1,8 @@
 # Shared match queue and generation
 
-**Last verified:** 2026-11-01.
+**Last verified:** 2026-11-06.
+
+> **Name change, November 6, 2026.** The draft generator was formerly called Auto Queue; renamed **Generate matches** on 2026-11-06 ([log](../../../../mockup-changes/2026-11-06-queue-on-court-and-sub-credit.md)). **Auto Queue** now names the court-fill switch on [Q-COURTS](session-console.md#q-courts--court-cards). The screen ID `Q-AUTO` and code names (`AutoQueueWorkspace`, `AutoQueueMode`, `AutoQueueCount`) are unchanged until the real-app ticket.
 
 **Surfaces:** `Q-QUEUE`, `Q-MANUAL`, `Q-PICK-PLAYER`, `Q-SUGGEST`, `Q-AUTO`, `Q-REGENERATE`.
 
@@ -8,31 +10,33 @@
 
 ## Q-QUEUE — One waiting list
 
-Header “Queued matches” with **Add match**, **Suggest**, **Auto Queue**, and **Regenerate** (primary when something needs attention; disabled when the queue is empty).
+Header “Queued matches” with **Add match**, **Suggest**, **Generate matches**, and **Regenerate** (primary when something needs attention; disabled when the queue is empty).
 
 Attention notice: “N waiting matches need attention. Edit the lineup to swap the player, or regenerate.” Context: “One waiting list for every court. MODE mode guides suggestions; you can override any of it.”
 
-**Layout:** cards in a grid with as many columns as fit the content width (tiles of 160 px or more, 10 px gaps, no upper limit). Order runs in a **snake**: left to right, then right to left on the next row, with small flow arrows between cards. Copy: “Drag a card by ⠿ to reorder (arrow keys work on the handle too). Drag a player onto someone on the other team to switch sides. Any card marked ready can start now, whatever its place.”
+**Layout:** cards in a grid with as many columns as fit the content width (tiles of 220 px or more, 10 px gaps, no upper limit). Order runs in a **snake**: left to right, then right to left on the next row, with small flow arrows between cards. Copy: “Drag a card by ⠿ to reorder (arrow keys work on the handle too). Drag a player onto someone on the other team to switch sides. Any card marked ready can go on court now, whatever its place.”
 
 **Queue card:**
 
-- Head: position “#P”, format chip, origin (**Auto**, **Suggested**, or a lock icon for Manual · protected), flow arrow, drag handle ⠿.
-- Team A pictures and short names, “VS”, Team B. Tapping a picture opens the profile.
+- Head: position “#P”, format chip, origin (**Generated**, **Suggested**, or a lock icon for Manual · protected), flow arrow, drag handle ⠿.
+- Team A pictures and short names, “VS”, Team B. Tapping a picture opens the profile. Pictures are 44 px with 15 px names (46 px on touch screens).
+- **Wait timer** under each name during a live session: “M min” since the player's last game ended, or since they were marked present if they haven't played (the same “M min wait” as the Players view). Under 10 min plain, **10–15 min** warning color, **16 min or more** error color; the number is always shown, so color is never the only signal. A player who is on court or playing shows **On court** or **Playing**, and an absent player shows **Not here**, instead of a timer. It refreshes with the console (every 30 seconds). The player's accessible name adds “waiting M min”.
 - Status line: **✓ Ready to start**; **⚠ reason** for needs attention (warning style, card highlighted); **ⓘ reason** for blocked or waiting for courts.
-- Actions: **Start** (primary, enabled only when ready), **Edit**, Remove ×. No Earlier / Later buttons; reordering is on the drag handle.
+- Actions: **Put on court** (primary, enabled only when ready; opens [Q-DISPATCH](match-control.md#q-dispatch--put-a-waiting-match-on-court)), **Edit**, Remove ×. No Earlier / Later buttons; reordering is on the drag handle.
 
-Empty: “No waiting matches. Use Auto Queue to generate a few, or add one yourself.”
+Empty: “No waiting matches. Use Generate matches to make a few, or add one yourself.”
 
-**Switch sides by dragging (decided October 27, 2026).** A player's picture on a queue card, in Q-SUGGEST, in Q-MANUAL and in Q-DISPATCH can be dragged onto a player on the **other** team to swap the two. This works the same in all four places:
+**Switch sides by dragging (decided October 27, 2026).** A player's picture on a queue card, in Q-SUGGEST, in Q-MANUAL, in Q-DISPATCH and in Q-ON-COURT can be dragged onto a player on the **other** team to swap the two. Switching sides is allowed until **Start match**, including while the match is On court (decided November 6, 2026). This works the same in all five places:
 - **Mouse or pen:** the drag starts after a few pixels of movement, so a plain click still opens the profile (or, in Q-MANUAL, the slot picker).
 - **Touch:** press and hold briefly to lift the player. A quick swipe still scrolls the page.
 - **During the drag:** a copy of the card follows the pointer and the source dims. Only players on the other team are highlighted as targets (dashed accent outline). Dropping anywhere else, or on a teammate, changes nothing.
 - **Keyboard:** with a player focused, ← or → swaps them with the player opposite (same position on the other team, or its last player when that team is smaller). Focus follows the moved player.
 - **Results by place:**
   - On a queue card or in Q-DISPATCH, the waiting match changes and becomes protected (“Match N: Kat and Jo switched sides · protected from regeneration”).
+  - In Q-ON-COURT, the On court match's lineup changes. It is not a substitution. If the match is later sent back to the queue, it goes back protected.
   - In Q-SUGGEST, only the shown lineup changes (toast “Kat and Jo switched sides”). Adding it then puts it in protected.
   - In Q-MANUAL, the slots change until **Save lineup**. Dropping onto an empty slot on the other team moves the player there.
-- **Not available:** active matches (Q-ACTIVE-MATCH, Q-INVALID-MATCH) have no dragging. Use Q-SUBSTITUTE.
+- **Not available:** Playing matches (Q-ACTIVE-MATCH, Q-INVALID-MATCH) have no dragging. Use Q-SUBSTITUTE.
 
 | Card condition | Status line |
 |---|---|
@@ -40,6 +44,7 @@ Empty: “No waiting matches. Use Auto Queue to generate a few, or add one yours
 | Lineup incomplete | Needs attention: “Lineup is incomplete” |
 | Player not present | Needs attention: “Kat and Jo are not present” |
 | Player still playing | Blocked: “Migs is playing on Court 1” |
+| Player in an On court match | Blocked: “Migs is on Court 1” |
 | No free court | “Waiting for a free court” / “Needs two free courts” |
 
 Reordering works by pointer drag (mouse and touch) on the ⠿ handle, or from the keyboard: with the handle focused, ←/↑ move the match one place earlier and →/↓ one place later, keeping focus on the handle (label “Reorder match N: drag, or use the arrow keys”). Toasts: “Queue order changed”, “Match N moved to #P”. Removing: “Waiting match N removed” — no game is recorded.
@@ -77,13 +82,15 @@ Actions: **Skip suggestion** (shows a new one), **Edit then add** (opens Q-MANUA
 
 When no lineup is possible, the sheet shows the reason (both formats off, or “Only N players are present. Doubles needs 4. Mark arrivals present in Players.”) with **Close**.
 
-## Q-AUTO — Auto Queue workspace
+## Q-AUTO — Generate matches workspace
+
+Formerly called Auto Queue; renamed 2026-11-06.
 
 **UI component:** `AutoQueueWorkspace` in `@rotra/ui/auto-queue-workspace`. Its props carry draft batches, selection order, session minimum and eligible-player state; the `AutoQueue` container owns mock generation and transfer validation. Drafts are in memory, not durable persistence.
 
-The Queue view switches between Main Queue and Auto Queue. Auto Queue has Available Players, Plan Ahead, Longest Wait, Fewest Games and Catch Up tabs with retained draft batches. The Queue Master selects a match count (2 / 3 / 4 / 6; no default), explicitly generates, and chooses a Catch Up target when applicable. No draft starts or enters Main Queue automatically.
+The Queue view switches between Main Queue and Generate matches. Generate matches has Available Players, Plan Ahead, Longest Wait, Fewest Games and Catch Up tabs with retained draft batches. The Queue Master selects a match count (2 / 3 / 4 / 6; no default), explicitly generates, and chooses a Catch Up target when applicable. No draft starts or enters Main Queue automatically.
 
-**Draft tiles.** Drafts use the Main Queue tile (`MatchCard` with `draft`) in the same grid: format chip, avatars, short names, VS, and the status line (the generation reason, “A player is playing now; this match waits until they are free.”, or a warn-tone attention reason). A **Draft** chip replaces #position; there is no handle and no Start / Edit / Remove. The border is dashed until picked. Drafts need wider tiles than queued matches (230 px or more) so a doubles team keeps its chips on one row. Under each name, small chips: “{n} played”, “{n} queued”, “{n} suggested” (only when another draft in the batch has them too) and “Playing now” (warn tone, Plan Ahead). Zero values are hidden and there is no mode prefix.
+**Draft tiles.** Drafts use the Main Queue tile (`MatchCard` with `draft`) in the same grid: format chip, avatars, short names, VS, and the status line (the generation reason, “A player is playing now; this match waits until they are free.”, or a warn-tone attention reason). A **Draft** chip replaces #position; there is no handle and no Put on court / Edit / Remove. The border is dashed until picked. Drafts need wider tiles than queued matches (230 px or more) so a doubles team keeps its chips on one row. Under each name, small chips: “{n} played”, “{n} queued”, “{n} suggested” (only when another draft in the batch has them too) and “Playing now” (warn tone, Plan Ahead). Zero values are hidden and there is no mode prefix.
 
 **Picking works like Players.** The whole tile is a toggle (`role="button"`, `aria-pressed`; Space or Enter). Its accessible name is the match (“Draft Doubles: Migs and Dani vs Marco and Paolo, picked 2”), not “Select Doubles”. Picked tiles get the accent border, the inset ring and a pick-order badge, so the state does not rely on colour alone. Pick order across tabs is the order drafts are added in.
 
@@ -142,6 +149,6 @@ removed or started; played changes only after eligible Match done.
 
 ## Q-REGENERATE — Main Queue rebuild
 
-This separate existing control reviews automatic matches rebuilt, healthy manual matches kept, manual matches needing attention rebuilt and games in play untouched. The Queue Master confirms before changes; failure restores the previous queue. Draft regeneration never silently changes Main Queue.
+This separate existing control reviews automatic matches rebuilt, healthy manual matches kept, manual matches needing attention rebuilt and games in play untouched. On court (Getting ready) matches are never changed and count as untouched. The Queue Master confirms before changes; failure restores the previous queue. Draft regeneration never silently changes Main Queue.
 
 The Queue mock app now uses `AutoQueueWorkspace` through the `AutoQueue` container. Draft batches and ordered selection live in the in-memory mock store and survive console-view switches. Generation and clearing do not write accepted matches or sync entries. Transfers are atomic: any invalid selection keeps all lineups and the review open; retry uses the same confirmation ID. A valid stale selection can be accepted after revalidation. Non-Plan-Ahead players who began playing need attention. Reload and Reset mock data discard draft state; no durable storage or API is implied.

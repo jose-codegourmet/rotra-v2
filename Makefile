@@ -1,4 +1,4 @@
-.PHONY: install dev dev-queue dev-player dev-admin storybook lint check-fix type-check build
+.PHONY: install dev dev-queue dev-player dev-admin storybook lint check-fix type-check build check
 
 # Every target loads nvm first so the Node version always matches .nvmrc
 NVM := . $(HOME)/.nvm/nvm.sh && nvm use
@@ -35,3 +35,7 @@ type-check:
 
 build:
 	@$(NVM) && pnpm build
+
+# The one gate before merging: lint, type-check, build, decided-math tests. Errors only.
+check:
+	@$(NVM) >/dev/null && node scripts/check.mjs

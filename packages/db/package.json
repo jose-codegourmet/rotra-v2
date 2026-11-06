@@ -18,6 +18,7 @@
     "./service/route-cookies": "./src/service/route-cookies.ts",
     "./queue/session-preparation": "./src/queue/session-preparation.ts",
     "./queue/session-delete": "./src/queue/session-delete.ts",
+    "./queue/session-cancel": "./src/queue/session-cancel.ts",
     "./queue/session-roster": "./src/queue/session-roster.ts",
     "./queue/club-players": "./src/queue/club-players.ts",
     "./auth/provider-admin": "./src/auth/provider-admin.ts",

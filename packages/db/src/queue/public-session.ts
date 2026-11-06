@@ -181,6 +181,9 @@ export async function sendJoinRequest(
         SELECT "state"::text AS state, "accept_join_requests" AS accept FROM "queue_sessions"
         WHERE "id" = ${session.id}::uuid FOR UPDATE`
       const current = rows[0]
+      // A cancelled session's page shows Cancelled and takes no requests.
+      if (current?.state === 'cancelled')
+        throw new ServiceError('forbidden', { request: 'This session is cancelled.' })
       if (!current || !TAKES_REQUESTS.includes(current.state) || !current.accept)
         throw new ServiceError('forbidden', { request: 'This session is not taking requests.' })
       const pending = await tx.sessionJoinRequest.count({

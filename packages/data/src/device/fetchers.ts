@@ -8,12 +8,15 @@ export async function getDeviceDownloads() {
   if (isRealDataMode()) return realGetDeviceDownloads()
   await delay()
   const state = readMockState()
-  return state.sessions
-    .filter((s) => s.state === 'prepared' || s.state === 'active')
-    .map((s) => ({
-      sessionId: s.id,
-      title: s.title,
-      startsAt: s.scheduledStartAt,
-      state: state.downloads[s.id] ?? 'none',
-    }))
+  return (
+    state.sessions
+      // Only prepared and live sessions are offered; cancelled, finished and invalid ones never are.
+      .filter((s) => s.state === 'prepared' || s.state === 'active')
+      .map((s) => ({
+        sessionId: s.id,
+        title: s.title,
+        startsAt: s.scheduledStartAt,
+        state: state.downloads[s.id] ?? 'none',
+      }))
+  )
 }

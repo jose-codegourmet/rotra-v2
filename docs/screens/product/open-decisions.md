@@ -39,7 +39,7 @@ The screen tree specifies all agreed v1 workflows. Where behavior is undecided, 
 - New Admin auth policy: email/password is a proposed carry-forward from the existing specification, not a newly confirmed product decision.
 - Copy the November 6, 2026 decision did not give, to be taken from the mockup when it lands: the Q-CHOOSE-MATCH sheet title (was “Start a match on Court X”); the Confirm substitution warning when a person gets the game; the 5v5 Playing chip wording (was **Merged · in game**); the Manual Queue helper copy, if any; and any toast after **Put on court**, **Send back to queue** or **Move to another court**.
 - The Manual Queue | Auto Queue switch while offline, and two offline devices placing the same match or court (collision-free assignment stays open).
-- Whether **Cancel session** needs internet (the prototype doesn't check the connection; Delete session does), and whether the Preparation header keeps **Delete session** next to **Cancel session** (the prototype shows only Cancel session).
+- Whether **Cancel session** needs internet (the prototype doesn't check the connection; Delete session does). Settled November 6, 2026: the Preparation header keeps **both** Delete session (nobody confirmed) and Cancel session (players joined); the prototype now shows both ([log](../../mockup-changes/2026-11-06-queue-delete-session.md)).
 - What Q-POOL shows for a player in a Getting ready match (the status list has **On Court X**, **Away**, **Queued · #P**, **Free**).
 
 ## Settled by the product owner on November 6, 2026

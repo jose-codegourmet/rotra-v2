@@ -214,6 +214,61 @@ export function canStart(m: Match, courtIds: string[], ctx: MatchContext) {
     })
   )
 }
+/** Send back to queue (Q-ON-COURT): any On court match; it goes to the top of the queue. */
+export const canSendBack = (m: Pick<Match, 'state'>) => m.state === 'on_court'
+/**
+ * Move to another court (Q-ON-COURT): an On court match onto the right number of distinct, free,
+ * open courts (two for 5v5). Its own courts are held by itself, so they never count as free.
+ */
+export function canMoveCourt(m: Match, courtIds: string[], ctx: MatchContext) {
+  const free = freeCourts(ctx.courts, ctx.matches, ctx.now)
+  return (
+    m.state === 'on_court' &&
+    courtIds.length === courtsNeeded(m) &&
+    new Set(courtIds).size === courtIds.length &&
+    courtIds.every((id) => free.some((c) => c.id === id))
+  )
+}
+/**
+ * Replace player (Q-ON-COURT): a plain lineup change on an On court match, never a substitution.
+ * The incoming player is present, not in this match and not busy elsewhere (On court or Playing).
+ */
+export function canReplacePlayer(m: Match, outId: string, inId: string, ctx: MatchContext) {
+  return (
+    m.state === 'on_court' &&
+    allPlayers(m).includes(outId) &&
+    substitutionCandidates(m, ctx.roster, ctx.matches).some((p) => p.id === inId)
+  )
+}
+/** The lineup after Replace player: the incoming player takes the outgoing player's slot. */
+export function replacedLineup(m: MatchLineup, outId: string, inId: string): MatchLineup {
+  const swap = (ids: string[]) => ids.map((id) => (id === outId ? inId : id))
+  return { format: m.format, teamA: swap(m.teamA), teamB: swap(m.teamB) }
+}
+/**
+ * Swap with the queue (Q-ON-COURT, court card ⋯ menu): the first waiting match in queue order
+ * that needs the same number of courts and could be put on this match's court(s) once this
+ * match's players count as free. `position` is its 1-based place in the queue ("Swap with #P"), which this
+ * match takes. Null when the match is not On court or no other waiting match is ready.
+ */
+export type SwapTarget = { match: Match; position: number }
+export function swapTarget(m: Match, ctx: MatchContext): SwapTarget | null {
+  if (m.state !== 'on_court') return null
+  // This match off the court: its court(s) free up and its players are no longer busy.
+  const freed: MatchContext = {
+    ...ctx,
+    matches: ctx.matches.map((x) =>
+      x.id === m.id ? { ...x, state: 'waiting' as const, courtIds: [] } : x,
+    ),
+  }
+  const waiting = waitingMatches(ctx.matches)
+  const index = waiting.findIndex(
+    (x) =>
+      x.id !== m.id && courtsNeeded(x) === courtsNeeded(m) && canPlace(x, m.courtIds, freed),
+  )
+  const match = waiting[index]
+  return match ? { match, position: index + 1 } : null
+}
 export type ResultInput = {
   winner?: 'A' | 'B' | null
   scoreA?: number | null

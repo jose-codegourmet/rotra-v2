@@ -4,7 +4,10 @@ import type { SessionPlayer } from '../session-roster/sessionRoster.types'
 import {
   activeMatches,
   activeMatchFor,
+  canMoveCourt,
   canPlace,
+  canReplacePlayer,
+  canSendBack,
   canStart,
   computeStandings,
   courtMatches,
@@ -12,7 +15,9 @@ import {
   type MatchContext,
   matchStatus,
   onCourtMatches,
+  replacedLineup,
   substitutionCandidates,
+  swapTarget,
 } from './match.rules'
 import type { Match } from './match.types'
 
@@ -224,5 +229,75 @@ describe('Put on court and Start match', () => {
     expect(canStart(free, ['c1'], ctxOf([placed, free]))).toBe(false)
     const playing = { ...placed, state: 'active' as const, startedAt: 0 }
     expect(canStart(playing, [], ctxOf([playing]))).toBe(false)
+  })
+})
+
+describe('On court actions', () => {
+  const placed = lineup('placed', 'on_court', ['Migs', 'Amy'], ['Ben', 'Dan'], ['c1'])
+  const playing = lineup('playing', 'active', ['Eve', 'Fay'], ['Gus', 'Hal'], ['c2'])
+  const queued = (
+    id: string,
+    position: number,
+    a: string[],
+    b: string[],
+    format: Match['format'] = 'doubles',
+  ): Match => ({ ...lineup(id, 'waiting', a, b), queuePosition: position, format })
+
+  it('sends back only an On court match', () => {
+    expect(canSendBack(placed)).toBe(true)
+    expect(canSendBack(playing)).toBe(false)
+    expect(canSendBack(queued('w', 1, ['Eve'], ['Fay']))).toBe(false)
+  })
+
+  it('moves only onto a free open court, never its own or a held one', () => {
+    const three = [...courts, { ...courts[0]!, id: 'c3', label: 'Court 3' }]
+    const ctx = { ...ctxOf([placed, playing]), courts: three }
+    expect(canMoveCourt(placed, ['c3'], ctx)).toBe(true)
+    expect(canMoveCourt(placed, ['c1'], ctx)).toBe(false)
+    expect(canMoveCourt(placed, ['c2'], ctx)).toBe(false)
+    expect(canMoveCourt(placed, ['c3', 'c3'], ctx)).toBe(false)
+    expect(canMoveCourt(playing, ['c3'], ctx)).toBe(false)
+    const later = { ...ctx, courts: three.map((c) => (c.id === 'c3' ? { ...c, startsAt: 5 } : c)) }
+    expect(canMoveCourt(placed, ['c3'], later)).toBe(false)
+  })
+
+  it('replaces a player with a present player who is not busy', () => {
+    const away = people.map((p) => (p.id === 'Hal' ? { ...p, present: false } : p))
+    const ctx = ctxOf([placed, lineup('other', 'on_court', ['Eve'], ['Fay'], ['c2'])], away)
+    expect(canReplacePlayer(placed, 'Amy', 'Gus', ctx)).toBe(true)
+    expect(canReplacePlayer(placed, 'Amy', 'Eve', ctx)).toBe(false)
+    expect(canReplacePlayer(placed, 'Amy', 'Hal', ctx)).toBe(false)
+    expect(canReplacePlayer(placed, 'Amy', 'Ben', ctx)).toBe(false)
+    expect(canReplacePlayer(placed, 'Gus', 'Hal', ctx)).toBe(false)
+    expect(replacedLineup(placed, 'Amy', 'Gus')).toEqual({
+      format: 'doubles',
+      teamA: ['Migs', 'Gus'],
+      teamB: ['Ben', 'Dan'],
+    })
+  })
+
+  it('swap target: Match 1 on Court 1, queue Match 3, Match 4 → Match 3 is next', () => {
+    const m3 = queued('m3', 3, ['Eve', 'Fay'], ['Gus', 'Hal'])
+    const m4 = queued('m4', 4, ['Eve', 'Gus'], ['Fay', 'Hal'])
+    expect(swapTarget(placed, ctxOf([placed, m3, m4]))).toEqual({ match: m3, position: 1 })
+  })
+
+  it('swap target counts this match’s players as free and skips matches not ready', () => {
+    const busy = queued('busy', 1, ['Eve', 'Migs'], ['Gus', 'Amy'])
+    const shares = queued('shares', 2, ['Migs', 'Amy'], ['Ben', 'Hal'])
+    // Eve is Playing on Court 2, so `busy` is skipped; `shares` only needs Migs and Amy freed.
+    const ctx = ctxOf([placed, playing, busy, shares])
+    expect(swapTarget(placed, ctx)).toEqual({ match: shares, position: 2 })
+  })
+
+  it('swap target needs the same number of courts, and is null when none is ready', () => {
+    const five = ['Eve', 'Fay', 'Gus', 'Hal', 'Migs']
+    const big = queued('big', 1, five, ['Amy', 'Ben', 'Dan', 'x', 'y'], 'fun_5v5')
+    expect(swapTarget(placed, ctxOf([placed, big]))).toBeNull()
+    expect(swapTarget(playing, ctxOf([playing]))).toBeNull()
+    const away = people.map((p) => (p.id === 'Eve' ? { ...p, present: false } : p))
+    expect(
+      swapTarget(placed, ctxOf([placed, queued('m3', 1, ['Eve', 'Fay'], ['Gus', 'Hal'])], away)),
+    ).toBeNull()
   })
 })

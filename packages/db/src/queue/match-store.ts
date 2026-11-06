@@ -66,10 +66,18 @@ export function matchView(row: MatchRow): MatchView {
     manualProtected: row.manualProtected,
     teamA: members.filter((p) => p.team === 'A').map((p) => p.sessionPlayerId),
     teamB: members.filter((p) => p.team === 'B').map((p) => p.sessionPlayerId),
+    // Waiting: no court, even after Send back or Swap left released usage behind. Ended: only the
+    // court(s) the match finished on (released by its decision), not ones it moved off before.
     courtIds:
       row.state === 'on_court' || row.state === 'active'
         ? row.courtHolds.map((h) => h.courtId)
-        : row.courtUsage.map((u) => u.courtId),
+        : row.state === 'waiting'
+          ? []
+          : row.courtUsage
+              .filter(
+                (u) => !u.releasedAt || u.releaseOperationId === row.decision?.sourceOperationId,
+              )
+              .map((u) => u.courtId),
     placedAt: row.placedAt?.getTime() ?? null,
     startedAt: row.startedAt?.getTime() ?? null,
     endedAt: row.endedAt?.getTime() ?? null,

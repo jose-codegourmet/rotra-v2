@@ -1,8 +1,12 @@
 import 'server-only'
 import {
+  canMoveCourt,
   canPlace,
+  canReplacePlayer,
+  canSendBack,
   canStart,
   substitutionCandidates,
+  swapTarget,
   validateResult,
 } from '@rotra/data/match/match.rules'
 import type { ClubContext } from '../auth/account-context'
@@ -50,6 +54,23 @@ async function takeHolds(
   operationId: string,
   now: Date,
 ) {
+  await acquireCourts(tx, session, match, courtIds, operationId, now)
+  await holdPlayers(tx, session, match, roster, now)
+}
+
+/**
+ * Takes one court hold per court and records the court usage, keyed on the operation. Usage is
+ * unique per match and court and never deleted, so a match coming back to a court it used before
+ * (sent back or moved, then placed there again) takes its released row up again.
+ */
+async function acquireCourts(
+  tx: Tx,
+  session: QueueSession,
+  match: MatchRow,
+  courtIds: string[],
+  operationId: string,
+  now: Date,
+) {
   for (const courtId of courtIds) {
     await tx.activeCourtHold.create({
       data: {
@@ -60,19 +81,46 @@ async function takeHolds(
         heldAt: now,
       },
     })
-    await tx.matchCourtUsage.create({
-      data: {
-        id: await derivedId(operationId, `court:${courtId}`),
-        clubId: session.clubId,
-        sessionId: session.id,
-        matchId: match.id,
-        courtId,
-        acquiredAt: now,
-        acquireOperationId: operationId,
-      },
-    })
+    const used = match.courtUsage.find((u) => u.courtId === courtId)
+    if (used)
+      await tx.matchCourtUsage.update({
+        where: { id: used.id },
+        data: {
+          acquiredAt: now,
+          acquireOperationId: operationId,
+          releasedAt: null,
+          releaseOperationId: null,
+        },
+      })
+    else
+      await tx.matchCourtUsage.create({
+        data: {
+          id: await derivedId(operationId, `court:${courtId}`),
+          clubId: session.clubId,
+          sessionId: session.id,
+          matchId: match.id,
+          courtId,
+          acquiredAt: now,
+          acquireOperationId: operationId,
+        },
+      })
   }
-  await holdPlayers(tx, session, match, roster, now)
+}
+
+/** Gives up court holds (all, or only `courtIds`) and closes their usage with this operation. */
+async function releaseCourts(
+  tx: Tx,
+  match: MatchRow,
+  operationId: string,
+  now: Date,
+  courtIds?: string[],
+) {
+  const courts = courtIds ? { courtId: { in: courtIds } } : {}
+  await tx.matchCourtUsage.updateMany({
+    where: { matchId: match.id, releasedAt: null, ...courts },
+    data: { releasedAt: now, releaseOperationId: operationId },
+  })
+  await tx.activeCourtHold.deleteMany({ where: { matchId: match.id, ...courts } })
 }
 
 /**
@@ -196,6 +244,196 @@ export async function startMatch(
     if (placed) await holdPlayers(tx, session, match, roster, now)
     else await takeHolds(tx, session, match, roster, input.courtIds, input.operationId, now)
     return matchDto((await loadMatch(tx, session.id, match.id)) as MatchRow)
+  })
+}
+
+/** An on_court match, or a conflict ("Something changed") for anything else. */
+function requireOnCourt(match: MatchRow) {
+  if (!canSendBack(match) || match.decision) throw conflict()
+}
+
+/**
+ * Waiting matches in queue order with `match` placed at `index` (0-based); renumbers positions 1..n
+ * so the order is exact. Returns the match's 1-based queue position.
+ */
+async function queueAt(tx: Tx, sessionId: string, matchId: string, index: number) {
+  const list = (
+    await tx.match.findMany({
+      where: { sessionId, state: 'waiting', removedAt: null, id: { not: matchId } },
+      orderBy: [{ queuePosition: 'asc' }, { matchNo: 'asc' }],
+      select: { id: true },
+    })
+  ).map((m) => m.id)
+  list.splice(Math.max(0, Math.min(list.length, index)), 0, matchId)
+  for (const [i, id] of list.entries())
+    await tx.match.update({ where: { id }, data: { queuePosition: BigInt(i + 1) } })
+  return list.indexOf(matchId) + 1
+}
+
+/** The 1-based place of a waiting match in the queue (for the swap reply). */
+async function queuePlace(tx: Tx, sessionId: string, matchId: string) {
+  const list = await tx.match.findMany({
+    where: { sessionId, state: 'waiting', removedAt: null },
+    orderBy: [{ queuePosition: 'asc' }, { matchNo: 'asc' }],
+    select: { id: true },
+  })
+  return list.findIndex((m) => m.id === matchId) + 1
+}
+
+/**
+ * Takes an on_court match off its court(s): releases court and player holds, closes court usage
+ * with this operation, clears `placed_at`. `manual_protected` is kept, so a match edited while On
+ * court (Replace player) goes back protected. The caller sets the queue position.
+ */
+async function unplace(tx: Tx, match: MatchRow, operationId: string, now: Date) {
+  await releaseCourts(tx, match, operationId, now)
+  await tx.activePlayerHold.deleteMany({ where: { matchId: match.id } })
+  await tx.match.update({
+    where: { id: match.id },
+    data: { state: 'waiting', placedAt: null, revision: { increment: 1 } },
+  })
+}
+
+/**
+ * Q-ON-COURT · Send back to queue. The on_court match goes to the **top** of the queue (positions
+ * renumbered) and its court(s) and players free up, in one transaction. Keyed on the operation ID
+ * through its court usage release, so a retry (or a replayed offline upload) returns the match.
+ * Auto Queue refilling the freed court is Q12.25.
+ */
+export async function sendBackToQueue(
+  context: ClubContext,
+  sessionId: string,
+  input: { operationId: string; matchId: string },
+) {
+  return matchCommand(context, sessionId, {}, async (tx, session) => {
+    const match = await activeMatch(tx, session.id, input.matchId)
+    if (match.courtUsage.some((u) => u.releaseOperationId === input.operationId))
+      return matchDto(match)
+    requireOnCourt(match)
+    await unplace(tx, match, input.operationId, new Date())
+    await queueAt(tx, session.id, match.id, 0)
+    return matchDto((await loadMatch(tx, session.id, match.id)) as MatchRow)
+  })
+}
+
+/**
+ * Q-ON-COURT · Move to another court. The on_court match releases the court(s) it holds and takes
+ * the chosen free open court(s) (two for 5v5) in one transaction; player holds stay. A court
+ * another match took first loses on the hold's primary key. Keyed on the new court usage rows.
+ */
+export async function moveCourt(
+  context: ClubContext,
+  sessionId: string,
+  input: { operationId: string; matchId: string; courtIds: string[] },
+) {
+  return matchCommand(context, sessionId, {}, async (tx, session) => {
+    const match = await activeMatch(tx, session.id, input.matchId)
+    if (match.courtUsage.some((u) => u.acquireOperationId === input.operationId))
+      return matchDto(match)
+    requireOnCourt(match)
+    const { ctx } = await matchContext(tx, session)
+    const view = ctx.matches.find((m) => m.id === match.id)
+    if (!view || !canMoveCourt(view, input.courtIds, ctx)) throw conflict()
+    const now = new Date()
+    await releaseCourts(tx, match, input.operationId, now)
+    await acquireCourts(tx, session, match, input.courtIds, input.operationId, now)
+    await tx.match.update({ where: { id: match.id }, data: { revision: { increment: 1 } } })
+    return matchDto((await loadMatch(tx, session.id, match.id)) as MatchRow)
+  })
+}
+
+/**
+ * Q-ON-COURT · Replace player. A plain lineup change on an on_court match: the outgoing player's
+ * segment is removed (never closed, so no substitution is derived and no credit is asked), the
+ * incoming player gets a full segment on the same team, and the player holds follow the lineup.
+ * Rechecks that the incoming player is present and not busy. The match becomes manual and
+ * protected. Keyed on the incoming segment's operation.
+ */
+export async function replacePlayer(
+  context: ClubContext,
+  sessionId: string,
+  input: { operationId: string; matchId: string; outId: string; inId: string },
+) {
+  return matchCommand(context, sessionId, {}, async (tx, session) => {
+    const match = await activeMatch(tx, session.id, input.matchId)
+    if (
+      match.participations.some(
+        (p) => p.joinedOperationId === input.operationId && p.sessionPlayerId === input.inId,
+      )
+    )
+      return matchDto(match)
+    requireOnCourt(match)
+    const { ctx, roster } = await matchContext(tx, session)
+    const view = ctx.matches.find((m) => m.id === match.id)
+    const outgoing = match.participations.find(
+      (p) => p.sessionPlayerId === input.outId && !p.leftAt,
+    )
+    if (!view || !outgoing || !canReplacePlayer(view, input.outId, input.inId, ctx))
+      throw conflict()
+    const now = new Date()
+    await tx.matchParticipation.delete({ where: { id: outgoing.id } })
+    await tx.matchParticipation.create({
+      data: {
+        id: await derivedId(input.operationId, `${match.id}:${input.inId}`),
+        clubId: session.clubId,
+        sessionId: session.id,
+        matchId: match.id,
+        sessionPlayerId: input.inId,
+        team: outgoing.team,
+        segmentNo: 1,
+        joinedOperationId: input.operationId,
+        joinedAt: now,
+      },
+    })
+    await tx.match.update({
+      where: { id: match.id },
+      data: { origin: 'manual', manualProtected: true, revision: { increment: 1 } },
+    })
+    const changed = (await loadMatch(tx, session.id, match.id)) as MatchRow
+    await holdPlayers(tx, session, changed, roster, now)
+    return matchDto(changed)
+  })
+}
+
+/**
+ * Q-ON-COURT · Swap with the queue. Rechecks that `withMatchId` is still the swap target (the next
+ * ready waiting match needing the same courts, this match's players counted free); otherwise a
+ * conflict. In one transaction: this match releases its holds and takes the target's queue
+ * position; the target goes on_court on the same court(s) and takes the holds. Keyed on this
+ * match's court usage release.
+ */
+export async function swapWithQueue(
+  context: ClubContext,
+  sessionId: string,
+  input: { operationId: string; matchId: string; withMatchId: string },
+) {
+  return matchCommand(context, sessionId, {}, async (tx, session) => {
+    const match = await activeMatch(tx, session.id, input.matchId)
+    const reply = async () => ({
+      match: matchDto((await loadMatch(tx, session.id, match.id)) as MatchRow),
+      placed: matchDto((await loadMatch(tx, session.id, input.withMatchId)) as MatchRow),
+      position: await queuePlace(tx, session.id, match.id),
+    })
+    if (match.courtUsage.some((u) => u.releaseOperationId === input.operationId)) return reply()
+    requireOnCourt(match)
+    const { ctx, roster } = await matchContext(tx, session)
+    const view = ctx.matches.find((m) => m.id === match.id)
+    const target = view && swapTarget(view, ctx)
+    if (!target || target.match.id !== input.withMatchId) throw conflict()
+    const incoming = await activeMatch(tx, session.id, input.withMatchId)
+    const courtIds = match.courtHolds.map((h) => h.courtId)
+    const now = new Date()
+    await unplace(tx, match, input.operationId, now)
+    await tx.match.update({
+      where: { id: match.id },
+      data: { queuePosition: incoming.queuePosition },
+    })
+    await tx.match.update({
+      where: { id: incoming.id },
+      data: { state: 'on_court', placedAt: now, queuePosition: null, revision: { increment: 1 } },
+    })
+    await takeHolds(tx, session, incoming, roster, courtIds, input.operationId, now)
+    return reply()
   })
 }
 

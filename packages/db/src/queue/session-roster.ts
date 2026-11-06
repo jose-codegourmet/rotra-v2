@@ -511,15 +511,30 @@ export async function readSessionRoster(context: ClubContext, sessionId: string)
         })
       ).map((p) => [p.id, p.nickname]),
     )
+    const clubPlayerIds = [...new Set(roster.map((entry) => entry.clubPlayerId))]
+    const prior = clubPlayerIds.length
+      ? await tx.clubSessionPlayerSummary.findMany({
+          where: {
+            clubId: context.clubId,
+            clubPlayerId: { in: clubPlayerIds },
+            sessionId: { not: sessionId },
+            finalization: { committedAt: { lt: session.finalizedAt ?? new Date() } },
+          },
+          select: { clubPlayerId: true },
+          distinct: ['clubPlayerId'],
+        })
+      : []
+    const returning = new Set(prior.map((row) => row.clubPlayerId))
     const requests = await tx.sessionJoinRequest.findMany({
       where: { sessionId, status: 'pending' },
       orderBy: [{ requestedAt: 'asc' }, { id: 'asc' }],
     })
     return {
       capacity: await capacityOf(tx, session),
-      roster: roster.map((entry) =>
-        rosterEntryDto(entry, nicknames.get(entry.clubPlayerId) ?? null),
-      ),
+      roster: roster.map((entry) => ({
+        ...rosterEntryDto(entry, nicknames.get(entry.clubPlayerId) ?? null),
+        hasPlayedAtClubBefore: returning.has(entry.clubPlayerId),
+      })),
       waitlist: waitlist.map((entry, index) => waitlistDto(entry, index + 1)),
       joinRequests: requests.map(joinRequestDto),
     }

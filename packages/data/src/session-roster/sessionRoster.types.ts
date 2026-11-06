@@ -10,6 +10,11 @@ export type SessionPlayer = {
   level: PlayingLevel | null
   levelLockedAt: number | null
   confirmedAt: number
+  /**
+   * Has played a finalized session at this club before this one (Returning vs First time here).
+   * Derived from session history; not a stored roster column. Set by the roster fetch.
+   */
+  hasPlayedAtClubBefore?: boolean
 }
 export type SessionWaitlistEntry = {
   id: string

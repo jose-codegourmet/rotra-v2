@@ -1,6 +1,6 @@
 # Times always carry their day, one date-and-time picker, and live end-time changes
 
-Status: NEW
+Status: ALREADY A TICKET — #408
 Date: 2026-11-06
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Session setup, Start session, Live console (header, Courts, Courts and time, Add / Edit court), Session settings, Dashboard

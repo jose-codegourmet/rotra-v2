@@ -73,3 +73,20 @@ export const Phone: Story = {
   render: () => <Demo />,
   globals: { viewport: { value: 'phone' } },
 }
+export const WithCancelled: Story = {
+  render: () => (
+    <Demo
+      events={[
+        {
+          sessionId: 'x-cancel',
+          title: 'Morning Doubles',
+          venueName: tonight.venueName,
+          startsAt: today - 5 * 3_600_000,
+          endsAt: today - 3 * 3_600_000,
+          kind: 'cancelled',
+        },
+        ...events,
+      ]}
+    />
+  ),
+}

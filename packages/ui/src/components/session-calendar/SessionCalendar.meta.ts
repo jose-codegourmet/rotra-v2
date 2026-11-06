@@ -3,7 +3,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const sessionCalendarMeta = {
   name: 'SessionCalendar',
   description:
-    'The club dashboard calendar: a month grid on desktops, a week of day columns on tablets and a single day with a week strip on phones. Every prepared, live and past session opens from it.',
+    'The club dashboard calendar: a month grid on desktops, a week of day columns on tablets and a single day with a week strip on phones. Every prepared, live, past and cancelled session opens from it. A Cancelled session has a hollow legend key and a struck-through title.',
   usage: [
     'Use once on Q-HOME under the now card. The container maps each session to an event kind and decides which screen a session opens (console, preparation or record).',
     'Pass `view` only to force a layout (stories); otherwise it follows the window and redraws on resize.',

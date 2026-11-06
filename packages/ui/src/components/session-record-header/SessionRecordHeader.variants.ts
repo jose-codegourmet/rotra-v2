@@ -8,6 +8,7 @@ export const sessionRecordHeaderVariants = cva('flex min-w-0 flex-col gap-5', {
     state: {
       completed: '',
       invalid: '',
+      cancelled: '',
     },
   },
   defaultVariants: { state: 'completed' },

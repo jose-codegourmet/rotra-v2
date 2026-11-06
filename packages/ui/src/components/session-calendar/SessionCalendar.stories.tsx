@@ -23,6 +23,14 @@ const toEvent = (
 const [tonight, h1, h2, h3] = queueSessionFixtures.sessions
 if (!tonight || !h1 || !h2 || !h3) throw new Error('Session fixtures missing')
 
+const cancelled: CalendarEvent = {
+  ...toEvent(tonight, 'cancelled'),
+  sessionId: 'x-cancel',
+  title: 'Morning Doubles',
+  startsAt: today - 5 * 3_600_000,
+  endsAt: today - 3 * 3_600_000,
+}
+
 const events: CalendarEvent[] = [
   toEvent(tonight, 'live'),
   {
@@ -34,6 +42,7 @@ const events: CalendarEvent[] = [
   toEvent(h1, 'completed'),
   toEvent(h2, 'completed'),
   toEvent(h3, 'invalid'),
+  cancelled,
 ]
 
 const manyToday: CalendarEvent[] = [
@@ -126,6 +135,15 @@ export const DayEmptyFuture: Story = {
 }
 export const DayEmptyPast: Story = {
   render: () => <Demo view="day" referenceDate={today - 2 * DAY} />,
+  globals: { viewport: { value: 'phone' } },
+}
+/** Cancelled: hollow legend key and a struck-through title, distinct from Invalid and Completed. */
+export const MonthWithCancelled: Story = {
+  render: () => <Demo view="month" />,
+  globals: { viewport: { value: 'desktop' } },
+}
+export const DayWithCancelled: Story = {
+  render: () => <Demo view="day" />,
   globals: { viewport: { value: 'phone' } },
 }
 /** No `view`: follows the viewport (month over 1024 px, week to 641 px, day on phones). */

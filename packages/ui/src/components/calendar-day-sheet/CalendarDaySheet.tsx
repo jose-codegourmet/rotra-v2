@@ -5,6 +5,7 @@ import { Chip } from '@rotra/ui/chip'
 import { cn } from '@rotra/ui/cn'
 import {
   type CalendarEvent,
+  cancelledTitleClass,
   formatDayTitle,
   formatTime,
   isTodayOrLater,
@@ -79,7 +80,9 @@ export function CalendarDaySheet({
                   className={cn('size-1.5 flex-none rounded-full', KIND_SWATCH[event.kind])}
                 />
                 <span className="flex min-w-0 flex-1 flex-col">
-                  <b className="[overflow-wrap:anywhere]">{event.title}</b>
+                  <b className={cn('[overflow-wrap:anywhere]', cancelledTitleClass(event.kind))}>
+                    {event.title}
+                  </b>
                   <span className="text-[13px] text-fg2">
                     {formatTime(event.startsAt)} · {event.venueName}
                   </span>

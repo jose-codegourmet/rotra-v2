@@ -1,7 +1,11 @@
 import { queueSessionFixtures } from '@rotra/data/fixtures/queueSessions'
 import type { QueueSession } from '@rotra/data/queue-session/types'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { SessionRecordHeader, type SessionRecordHeaderProps } from './SessionRecordHeader'
+import {
+  SessionRecordHeader,
+  type SessionRecordHeaderProps,
+  type SessionRecordTotals,
+} from './SessionRecordHeader'
 
 // The prototype's fmtDate · fmtTime–fmtTime and fmtDur.
 const fmtTime = (t: number) =>
@@ -26,8 +30,8 @@ const courtsOf = (id: string) =>
 // for Thursday Open Play (h1), Sunday Night Queue (h2) and Tuesday Drills (h3).
 const propsFor = (
   id: string,
-  totals: Pick<SessionRecordHeaderProps['totals'], 'games' | 'invalidGames' | 'players'>,
-): SessionRecordHeaderProps => {
+  totals: Pick<SessionRecordTotals, 'games' | 'invalidGames' | 'players'>,
+): Extract<SessionRecordHeaderProps, { state: 'completed' | 'invalid' }> => {
   const s = sessionById(id)
   return {
     title: s.title,
@@ -40,6 +44,19 @@ const propsFor = (
       length: fmtDur(s.scheduledStartAt, s.scheduledEndAt),
     },
   }
+}
+
+const tonight = queueSessionFixtures.sessions[0]
+if (!tonight) throw new Error('Session fixture missing')
+
+const cancelledArgs = {
+  title: tonight.title,
+  when: `${fmtDate(tonight.scheduledStartAt)} · ${fmtTime(tonight.scheduledStartAt)}–${fmtTime(tonight.scheduledEndAt)}`,
+  venue: tonight.venueName,
+  state: 'cancelled' as const,
+  cancelledWhen: 'yesterday 9:00 PM',
+  cancelReason: 'Not enough players',
+  totals: { joined: 6, slots: 16, waitlist: 1, markedPaid: 1, courts: 2 },
 }
 
 const meta = {
@@ -70,6 +87,27 @@ export const LongTitle: Story = {
     title: 'Thursday Open Play · RK regulars and guests · doubles only · bring your own racket',
   },
   globals: { viewport: { value: 'phone' } },
+}
+
+/** Cancelled chip, when, reason notice, and Joined / Waitlist / Marked paid / Courts */
+export const Cancelled: Story = { args: cancelledArgs }
+
+/** Paid warning omitted when nobody was marked paid */
+export const CancelledUnpaid: Story = {
+  args: {
+    ...cancelledArgs,
+    cancelReason: 'Not enough players',
+    totals: { joined: 4, slots: 16, waitlist: 0, markedPaid: 0, courts: 2 },
+  },
+}
+
+/** No reason given. */
+export const CancelledNoReason: Story = {
+  args: {
+    ...cancelledArgs,
+    cancelReason: null,
+    totals: { ...cancelledArgs.totals, markedPaid: 0 },
+  },
 }
 
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }

@@ -11,6 +11,7 @@ import {
   type CalendarEvent,
   type CalendarEventKind,
   type CalendarView,
+  cancelledTitleClass,
   dayKey,
   formatDayTitle,
   formatMonthTitle,
@@ -91,6 +92,7 @@ function EventCard({
         className={cn(
           'max-w-full',
           compact ? 'line-clamp-2 leading-[1.25]' : 'truncate whitespace-nowrap',
+          cancelledTitleClass(event.kind),
         )}
       >
         {event.title}
@@ -352,6 +354,7 @@ export function SessionCalendar({
                 'relative z-10 max-w-full truncate rounded-[4px] border-0 border-l-[3px] bg-elev px-1.5 py-0.5 text-left text-[11px] font-semibold whitespace-nowrap text-fg',
                 KIND_EDGE[event.kind],
                 event.kind === 'live' && 'bg-accent-subtle',
+                cancelledTitleClass(event.kind),
               )}
             >
               {formatTime(event.startsAt)} {event.title}

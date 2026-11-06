@@ -1,4 +1,4 @@
-export type CalendarEventKind = 'live' | 'prepared' | 'completed' | 'invalid'
+export type CalendarEventKind = 'live' | 'prepared' | 'completed' | 'invalid' | 'cancelled'
 
 export type CalendarEvent = {
   sessionId: string
@@ -85,6 +85,7 @@ export const KIND_LABEL: Record<CalendarEventKind, string> = {
   prepared: 'Prepared',
   completed: 'Completed',
   invalid: 'Invalid',
+  cancelled: 'Cancelled',
 }
 
 /** Legend entries in prototype order. */
@@ -93,14 +94,16 @@ export const LEGEND: [CalendarEventKind, string][] = [
   ['prepared', 'Prepared'],
   ['completed', 'Completed'],
   ['invalid', 'Invalid'],
+  ['cancelled', 'Cancelled'],
 ]
 
-/** The 6 px swatch (.cal-key) colour per state; always shown beside text. */
+/** The 6 px swatch (.cal-key) colour per state; always shown beside text. Cancelled is a hollow ring. */
 export const KIND_SWATCH: Record<CalendarEventKind, string> = {
   live: 'bg-accent',
   prepared: 'bg-warn',
   completed: 'bg-fg2',
   invalid: 'bg-error',
+  cancelled: 'bg-transparent shadow-[inset_0_0_0_1.5px_var(--fg2)]',
 }
 
 export const KIND_EDGE: Record<CalendarEventKind, string> = {
@@ -108,6 +111,7 @@ export const KIND_EDGE: Record<CalendarEventKind, string> = {
   prepared: 'border-l-warn',
   completed: 'border-l-fg2',
   invalid: 'border-l-error',
+  cancelled: 'border-l-fg3',
 }
 
 export const KIND_CHIP: Record<CalendarEventKind, 'accent' | 'warn' | 'neutral' | 'error'> = {
@@ -115,6 +119,12 @@ export const KIND_CHIP: Record<CalendarEventKind, 'accent' | 'warn' | 'neutral' 
   prepared: 'warn',
   completed: 'neutral',
   invalid: 'error',
+  cancelled: 'neutral',
+}
+
+/** Struck-through muted title for a Cancelled session, as in every calendar view and the day sheet. */
+export function cancelledTitleClass(kind: CalendarEventKind): string {
+  return kind === 'cancelled' ? 'text-fg2 line-through' : ''
 }
 
 /** "N sessions" / "1 session" */

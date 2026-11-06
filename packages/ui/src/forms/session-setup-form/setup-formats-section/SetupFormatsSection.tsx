@@ -36,8 +36,8 @@ export function SetupFormatsSection() {
       ))}
       {!singles && !doubles ? (
         <Notice tone="warn">
-          With both formats off, Auto queue has nothing to generate. Only manual fun games would be
-          possible.
+          With both formats off, Generate matches has nothing to make. Only manual fun games would
+          be possible.
         </Notice>
       ) : null}
       <div className="flex flex-col gap-1.5">

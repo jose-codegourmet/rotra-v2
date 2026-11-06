@@ -51,7 +51,7 @@ export function AutoQueue({ sessionId, workspace, onWorkspaceChange, mainQueue }
   const busy = useRef(false)
   const confirmation = useRef<{ key: string; id: string } | null>(null)
   const failed = [session, roster, matches, drafts].find((query) => query.isError)
-  if (failed) return <QueryError query={failed} title="Couldn't load Auto Queue." />
+  if (failed) return <QueryError query={failed} title="Couldn't load Generate matches." />
   const s = session.data,
     state = drafts.data
   if (!s || !state || !roster.data || !matches.data) return <Skeleton className="h-56 rounded-lg" />

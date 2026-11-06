@@ -20,8 +20,8 @@ export type UpcomingQueueRowProps = {
   className?: string
 }
 
-// The prototype's queueCols(): queue tiles are at least 160 px wide with 10 px gaps (gap-2.5).
-const TILE_MIN = 160
+// The prototype's queueCols(): queue tiles are at least 220 px wide with 10 px gaps (gap-2.5).
+const TILE_MIN = 220
 const GAP = 10
 /** Auto Queue drafts carry chips under each name, so a doubles team needs a wider tile to stay on one row. */
 export const DRAFT_TILE_MIN = 230

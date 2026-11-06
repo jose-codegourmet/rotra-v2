@@ -1,5 +1,6 @@
 import type { MatchCardFixture } from '@rotra/data/fixtures/match-cards'
 import { queueGridFixtures } from '@rotra/data/fixtures/queue-grid'
+import type { PlayerWait } from '@rotra/ui/player-face-button'
 import type { SwapSlot } from '@rotra/ui/swap-sides-area'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
@@ -98,7 +99,7 @@ export const ByWindowWidth: Story = {
   name: 'Columns from the grid width',
   args: { columns: undefined },
 }
-/** A wide page (about 1220 px, 1366 px window with the rail collapsed): seven columns, no cap at five. */
+/** A wide page (about 1220 px, 1366 px window with the rail collapsed): five 220 px columns, no cap. */
 export const WidePage: Story = {
   args: { columns: undefined },
   decorators: [
@@ -126,6 +127,29 @@ export const SwitchSides: Story = {
 }
 
 export const WithoutSwitchSides: Story = { args: { onSwapSides: undefined } }
+
+const WAIT_CYCLE: PlayerWait[] = [
+  { kind: 'minutes', minutes: 3 },
+  { kind: 'minutes', minutes: 12 },
+  { kind: 'minutes', minutes: 17 },
+  { kind: 'on-court' },
+  { kind: 'playing' },
+  { kind: 'not-here' },
+]
+
+const waitingWithWaits = waiting.map((m, mi) => {
+  const stamp = (players: QueueGridMatch['teamA'], offset: number) =>
+    players.map((p, i) => ({
+      ...p,
+      wait: WAIT_CYCLE[(mi + offset + i) % WAIT_CYCLE.length] ?? { kind: 'minutes', minutes: 3 },
+    }))
+  return { ...m, teamA: stamp(m.teamA, 0), teamB: stamp(m.teamB, m.teamA.length) }
+})
+
+/** 3 / 12 / 17 min waits plus On court, Playing, and Not here on the same grid. */
+export const WaitTimers: Story = {
+  args: { matches: waitingWithWaits, columns: 3 },
+}
 
 export const Phone: Story = {
   args: { columns: 1, matches: waiting.slice(0, 4) },

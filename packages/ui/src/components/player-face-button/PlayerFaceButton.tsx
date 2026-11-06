@@ -3,6 +3,9 @@ import { Avatar } from '@rotra/ui/avatar'
 import { cn } from '@rotra/ui/cn'
 import { levelLabel } from '@rotra/ui/level-pill'
 import type { KeyboardEvent } from 'react'
+import { labelWithWait, type PlayerWait, waitClassName, waitCopy } from './PlayerFaceButton.helpers'
+
+export type { PlayerWait }
 
 export type PlayerFaceButtonProps = {
   /** Full name, for the title and the picture's description */
@@ -15,11 +18,16 @@ export type PlayerFaceButtonProps = {
   label: string
   /**
    * Picture size. Courts shrink with the team size (34 → 28 → 24, the prototype's .pf / .side.nN);
-   * queue cards use 28, 40 on touch (.qf).
+   * queue cards use 44, 46 on touch (.qf). History rows do not use size "queue".
    */
   size?: 34 | 28 | 24 | 'queue'
   /** Narrower name pill for 4v4 and 5v5 sides (.side.n4 .pf-n) */
   compact?: boolean
+  /**
+   * Queue cards in a live session: "M min" under the name, or On court / Playing / Not here.
+   * The accessible name adds "waiting M min" when the timer is shown.
+   */
+  wait?: PlayerWait
   /** Opens the player's profile */
   onClick: () => void
   /**
@@ -34,7 +42,7 @@ const PICTURE = {
   34: { size: 36, className: 'size-[34px] text-xs' },
   28: { size: 28, className: '' },
   24: { size: 24, className: '' },
-  queue: { size: 28, className: 'touch:size-10 touch:text-sm' },
+  queue: { size: 44, className: 'touch:size-[46px] touch:text-[15px]' },
 } as const
 
 /**
@@ -49,6 +57,7 @@ export function PlayerFaceButton({
   label,
   size = 34,
   compact = false,
+  wait,
   onClick,
   swap,
   className,
@@ -69,7 +78,7 @@ export function PlayerFaceButton({
       onClick={onClick}
       onKeyDown={onKeyDown}
       title={`${name} · ${levelLabel(level)}${swap ? ' · drag onto the other team to switch sides' : ''}`}
-      aria-label={`${label}${swap ? '. Left or right arrow switches sides' : ''}`}
+      aria-label={`${labelWithWait(label, wait)}${swap ? '. Left or right arrow switches sides' : ''}`}
       data-team={swap?.team}
       data-i={swap?.index}
       className={cn(
@@ -93,11 +102,21 @@ export function PlayerFaceButton({
           'max-w-16 truncate rounded-full bg-photo-label px-[5px] text-[10px] leading-[1.3] font-bold text-on-photo',
           compact && 'max-w-[46px]',
           size === 'queue' &&
-            'bg-transparent px-0 text-[11px] leading-normal text-fg touch:text-xs',
+            'max-w-[88px] bg-transparent px-0 text-[15px] leading-normal font-semibold text-fg',
         )}
       >
         {shortName}
       </span>
+      {wait ? (
+        <span
+          className={cn(
+            'text-xs font-semibold leading-[1.2] whitespace-nowrap tabular-nums',
+            waitClassName(wait),
+          )}
+        >
+          {waitCopy(wait)}
+        </span>
+      ) : null}
     </button>
   )
 }

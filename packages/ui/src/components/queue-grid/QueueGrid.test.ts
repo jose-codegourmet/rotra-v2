@@ -3,12 +3,13 @@ import { describe, expect, it } from 'vitest'
 import { snakePlacement } from './QueueGrid'
 
 describe('queueColumnsFor', () => {
-  it('fits 160 px tiles with 10 px gaps and has no upper limit', () => {
+  it('fits 220 px tiles with 10 px gaps and has no upper limit', () => {
     expect(queueColumnsFor(0)).toBe(1)
-    expect(queueColumnsFor(343)).toBe(2)
-    expect(queueColumnsFor(894)).toBe(5)
-    expect(queueColumnsFor(1218)).toBe(7)
-    expect(queueColumnsFor(1800)).toBe(10)
+    expect(queueColumnsFor(343)).toBe(1)
+    expect(queueColumnsFor(470)).toBe(2)
+    expect(queueColumnsFor(894)).toBe(3)
+    expect(queueColumnsFor(1218)).toBe(5)
+    expect(queueColumnsFor(1800)).toBe(7)
   })
 })
 

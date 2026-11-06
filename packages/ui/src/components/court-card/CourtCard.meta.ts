@@ -3,25 +3,39 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const courtCardMeta = {
   name: 'CourtCard',
   description:
-    'One court in the live console. In game: label, closing time, "In game" or "Merged · in game", the teams on a court drawing, "FORMAT · Match N · M min · S substitutions" and Open match. Free: label, closing time or "Booking ended HH:MM", Free, an empty drawing, then the next eligible match (Review and start, Pick another) or why none can start (Add match). Not open yet: "Opens at …" and Start anyway. Edit, Undo early open and Remove sit in the ⋯ menu.',
+    'One court in the live console, in one of three states written as a chip. Free: label, closing time or "Booking ended HH:MM", chip Free (or Not open yet), an empty drawing, then the next eligible match (Put on court, Pick another) or why none can go on ("Not enough free players.", "No waiting match can go on: …", "The queue is empty.", then Add match). Getting ready (variant on-court): normal border, chip Getting ready, the teams on a court drawing, "FORMAT · Match N · waiting to start", primary Start match and secondary Open match. Playing (variant in-game): steady accent border glow, no pulse, chip Playing, "FORMAT · Match N · M min · S substitutions" and Open match. Swap with #P · Match N, Edit, Undo early open and Remove sit in the ⋯ menu.',
   usage: [
-    'Use for every court in Q-COURTS (Live console › Session tab) and the Courts grid. A 5v5 passes merged with both labels ("Court 1 + Court 2") and spans two grid rows.',
-    'Pass only the callbacks whose buttons should show: Pick another only when more than one match waits.',
-    'The card shows one action for its state (Start anyway, Review and start, Add match, Open match); Edit, Undo early open and Remove go in the ⋯ menu. On an in-game card Undo early open and Remove are disabled with their reason.',
+    'Use for every court in Q-COURTS (Live console › Session tab) and the Courts grid. A 5v5 passes merged with both labels ("Court 1 + Court 2") and spans two grid rows ("Merged · Getting ready", "Merged · Playing").',
+    'variant "on-court" is a match On court (placed, not started): no minutes, because the timer starts at Start match. Pass blockedReason when a player is not present; it shows in warn and disables Start match.',
+    'variant "in-game" is Playing (Match state active). The glow is steady; never animate it.',
+    'Pass only the callbacks whose buttons should show: Pick another only when more than one match waits. On a free card pass onPutOnCourt ("Put on court"); onReviewAndStart is the deprecated pre-On-court label.',
+    'On a Getting ready card the ⋯ menu starts with Swap: pass onSwap and swapWith ({ position, matchNo }) for "Swap with #P · Match N", or swapWith null to show "Swap with the queue" disabled with "No other waiting match is ready".',
+    'The card shows only the actions for its state (Start anyway, Put on court, Add match, Start match, Open match); Edit, Undo early open and Remove go in the ⋯ menu. While a match is on the court (Getting ready or Playing) Edit and Undo early open are disabled with "A match is on this court" and Remove with "Only a free court can be removed".',
     'Start anyway opens the court before its planned start; the owner confirms first ("Open Court 4 now?"). Pass openedEarly afterwards so the time line reads "Opened early · planned START – UNTIL", and onUndoEarlyOpen while it is still before the planned start.',
-    'Booking ended is text in warn colour on a free card; the game on an in-game card keeps going past its closing time.',
+    'Booking ended is text in warn colour on every state; the game keeps going past its closing time and a free court can still be filled.',
+    'Pass notEnoughFreePlayers when fewer players are free than the smallest standard match needs; it replaces the blocked reason and the empty-queue copy. The Courts header uses CourtFillSwitch and ShortOnPlayersBanner sits above Courts.',
     'The container formats times, labels and reasons (nextEligibleForCourt, matchStatus); the card never computes them.',
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',
-    screen: 'Live console › Courts › courtsPane() (.court, .court.busy, .court.merged)',
+    screen:
+      'Live console › Courts › courtsPane() (.court, .court.oncourt, .court.busy, .court.merged), courtMenu(), courtTimeLine()',
   },
   docs: [
     'docs/screens/product/modules/queue/session-console.md',
     'docs/business_logic/product/queue/modules/sessions/README.md',
     'docs/business_logic/product/queue/modules/queueing/README.md',
+    'docs/business_logic/product/queue/modules/matches/README.md',
   ],
-  variants: ['in-game', 'free'],
+  variants: ['in-game', 'on-court', 'free'],
   // Individual booking starts control dispatch; ends remain advisory.
-  related: ['CourtDrawing', 'PlayerFaceButton', 'AddCourtTile', 'Chip', 'OverflowMenu'],
+  related: [
+    'CourtDrawing',
+    'PlayerFaceButton',
+    'AddCourtTile',
+    'Chip',
+    'OverflowMenu',
+    'CourtFillSwitch',
+    'ShortOnPlayersBanner',
+  ],
 } satisfies ComponentMeta

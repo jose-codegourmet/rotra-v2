@@ -22,6 +22,7 @@ import {
   type CourtCardFreeProps,
   type CourtCardInGameProps,
   type CourtCardNextMatch,
+  type CourtCardOnCourtProps,
   type CourtCardProps,
 } from './CourtCard'
 
@@ -73,6 +74,29 @@ function inGame(m: Match, overrides: Partial<CourtCardInGameProps> = {}): CourtC
   }
 }
 
+/** Getting ready: the match is On court, placed but not started (no minutes until Start match). */
+function onCourt(m: Match, overrides: Partial<CourtCardOnCourtProps> = {}): CourtCardOnCourtProps {
+  const isMerged = m.courtIds.length > 1
+  return {
+    variant: 'on-court',
+    label: isMerged ? courtNames(m, courts) : courtAt(1).label,
+    untilLabel: untilOf(courtAt(1)),
+    merged: isMerged,
+    teamA: m.teamA.map(playerOf),
+    teamB: m.teamB.map(playerOf),
+    onOpenProfile: fn(),
+    formatLabel: FORMAT_LABELS[m.format],
+    matchNo: m.matchNo,
+    onStartMatch: fn(),
+    onOpenMatch: fn(),
+    onSwap: fn(),
+    swapWith: { position: 1, matchNo: absent.matchNo },
+    onEdit: fn(),
+    onRemove: fn(),
+    ...overrides,
+  }
+}
+
 /** The free-card body the container derives from nextEligibleForCourt() and matchStatus(). */
 function nextFor(court: SessionCourt, list: Match[]) {
   const ctx: MatchContext = { roster, matches: list, courts }
@@ -109,7 +133,7 @@ function free(
     bookingEnded: Date.now() >= (court.openUntil ?? session.scheduledEndAt),
     onEdit: fn(),
     onRemove: fn(),
-    onReviewAndStart: fn(),
+    onPutOnCourt: fn(),
     onAddMatch: fn(),
     ...nextFor(court, list),
     ...overrides,
@@ -132,6 +156,7 @@ const meta = {
 export default meta
 type Story = StoryObj<CourtCardProps>
 
+/** Playing: steady accent glow (no pulse), chip Playing, the minutes in the match line */
 export const DoublesInGame: Story = {}
 export const OneVersusTwoInGame: Story = {
   args: inGame({
@@ -148,6 +173,23 @@ export const FreeWithNextEligible: Story = { args: free(courtAt(1), [ready, abse
 export const FreeWithSkippedFirst: Story = { args: free(courtAt(1), [playing, blocked, ready]) }
 export const FreeNoneReady: Story = { args: free(courtAt(1), [playing, blocked]) }
 export const QueueEmpty: Story = { args: free(courtAt(1), [playing]) }
+/** Short on players: too few free players for the smallest standard match */
+export const NotEnoughFreePlayers: Story = {
+  args: free(courtAt(1), [playing, blocked], { notEnoughFreePlayers: true }),
+}
+
+/** Getting ready: On court, not started. Normal border, chip Getting ready, Start match + Open match */
+export const GettingReady: Story = { args: onCourt(ready) }
+/** A player in the On court match is not present: the reason in warn, Start match disabled */
+export const GettingReadyPlayerAway: Story = {
+  args: onCourt(absent, {
+    blockedReason: matchStatus(absent, { roster, matches, courts }).reason,
+  }),
+}
+export const GettingReadyMerged: Story = { args: onCourt(merged) }
+export const GettingReadyBookingEnded: Story = {
+  args: onCourt(ready, { untilLabel: untilOf(courtAt(2)), bookingEnded: true }),
+}
 export const BookingEnded: Story = { args: free(courtAt(2), [playing, blocked, ready]) }
 export const LastCourt: Story = { args: free(courtAt(0), [], { isLastCourt: true }) }
 export const LongNames: Story = {
@@ -177,8 +219,8 @@ export const CourtsGrid: Story = {
   render: () => (
     <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,250px),1fr))] gap-3">
       <CourtCard {...inGame(playing)} />
-      <CourtCard {...free(courtAt(1), [playing, blocked, ready])} />
-      <CourtCard {...free(courtAt(2), [playing, blocked, ready])} />
+      <CourtCard {...onCourt(ready, { swapWith: null })} />
+      <CourtCard {...free(courtAt(2), [playing, blocked])} />
       <AddCourtTile nextNumber={courts.length + 1} onAdd={fn()} />
     </div>
   ),
@@ -208,10 +250,18 @@ export const BeforePlannedStart: Story = {
     onRemove: fn(),
   },
 }
+// The ⋯ list renders in a portal, outside the story's canvas.
 const openMenu = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
-  const canvas = within(canvasElement)
-  await userEvent.click(canvas.getByRole('button', { name: /^More for / }))
-  await expect(canvas.getByRole('menuitem', { name: 'Edit' })).toHaveFocus()
+  await userEvent.click(within(canvasElement).getByRole('button', { name: /^More for / }))
+  const body = within(canvasElement.ownerDocument.body)
+  await expect(body.getByRole('menuitem', { name: 'Edit' })).toHaveFocus()
+}
+/** A match is on the court: Edit, Undo early open and Remove are disabled with their reasons */
+const openBusyMenu = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+  await userEvent.click(within(canvasElement).getByRole('button', { name: /^More for / }))
+  const body = within(canvasElement.ownerDocument.body)
+  await expect(body.getByRole('menuitem', { name: /^Edit/ })).toHaveAttribute('data-disabled')
+  await expect(body.getByRole('menuitem', { name: /^Remove/ })).toHaveAttribute('data-disabled')
 }
 /** After Start anyway: Free, with "Opened early · planned …" and Undo early open in the ⋯ menu */
 export const OpenedEarly: Story = {
@@ -230,14 +280,36 @@ export const LastCourtMenuOpen: Story = {
   args: free(courtAt(2), [ready], { isLastCourt: true }),
   play: openMenu,
 }
-/** In game on an early-opened court: Undo early open and Remove wait until the court is free */
+/** Playing on an early-opened court: Edit, Undo early open and Remove wait until the court is free */
 export const InGameOpenedEarlyMenu: Story = {
   args: inGame(playing, {
     startLabel: fmtTime(courtWindowFixture.courts[3]!.startsAt),
     openedEarly: true,
     onUndoEarlyOpen: fn(),
   }),
-  play: openMenu,
+  play: openBusyMenu,
+}
+/** Getting ready: the ⋯ menu starts with "Swap with #P · Match N" */
+export const GettingReadySwapMenu: Story = {
+  args: onCourt(ready),
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    await openBusyMenu({ canvasElement })
+    const body = within(canvasElement.ownerDocument.body)
+    await expect(body.getByRole('menuitem', { name: /^Swap with #1 · Match / })).toHaveFocus()
+  },
+}
+/** No other waiting match is ready: Swap is disabled with its reason */
+export const GettingReadyNoSwapMenu: Story = {
+  args: onCourt(ready, { swapWith: null }),
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    await openBusyMenu({ canvasElement })
+    const body = within(canvasElement.ownerDocument.body)
+    await expect(
+      body.getByRole('menuitem', {
+        name: /^Swap with the queue\s*No other waiting match is ready/,
+      }),
+    ).toHaveAttribute('data-disabled')
+  },
 }
 export const ManuallyRemoved: Story = {
   args: {
@@ -250,3 +322,38 @@ export const ManuallyRemoved: Story = {
 }
 
 export const InGameBookingEnded: Story = { args: { ...inGame(playing), bookingEnded: true } }
+
+// Light theme: every state (the Theme toolbar covers the rest; dark is the default).
+export const PlayingLight: Story = { ...DoublesInGame, globals: { theme: 'light' } }
+export const PlayingMergedLight: Story = { ...MergedFiveVersusFive, globals: { theme: 'light' } }
+export const PlayingBookingEndedLight: Story = {
+  ...InGameBookingEnded,
+  globals: { theme: 'light' },
+}
+export const GettingReadyLight: Story = { ...GettingReady, globals: { theme: 'light' } }
+export const GettingReadyPlayerAwayLight: Story = {
+  ...GettingReadyPlayerAway,
+  globals: { theme: 'light' },
+}
+export const GettingReadyMergedLight: Story = { ...GettingReadyMerged, globals: { theme: 'light' } }
+export const GettingReadyBookingEndedLight: Story = {
+  ...GettingReadyBookingEnded,
+  globals: { theme: 'light' },
+}
+export const FreeWithNextEligibleLight: Story = {
+  ...FreeWithNextEligible,
+  globals: { theme: 'light' },
+}
+export const FreeNoneReadyLight: Story = { ...FreeNoneReady, globals: { theme: 'light' } }
+export const QueueEmptyLight: Story = { ...QueueEmpty, globals: { theme: 'light' } }
+export const NotEnoughFreePlayersLight: Story = {
+  ...NotEnoughFreePlayers,
+  globals: { theme: 'light' },
+}
+export const BookingEndedLight: Story = { ...BookingEnded, globals: { theme: 'light' } }
+export const BeforePlannedStartLight: Story = {
+  ...BeforePlannedStart,
+  globals: { theme: 'light' },
+}
+export const ManuallyRemovedLight: Story = { ...ManuallyRemoved, globals: { theme: 'light' } }
+export const CourtsGridLight: Story = { ...CourtsGrid, globals: { theme: 'light' } }

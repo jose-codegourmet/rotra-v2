@@ -1,4 +1,5 @@
 import {
+  clockTimeFrom,
   courtAfterSessionEndError,
   courtTimeOnSession,
   courtWindowError,
@@ -13,15 +14,16 @@ export const afterSessionEndError = courtAfterSessionEndError
 export type OpenUntilMode = 'end' | 'time'
 
 /**
- * A "HH:mm" time placed on the session's day. Earlier than the session start means the next day
- * (overnight sessions), as the prototype's timeOnSession() does.
+ * The time field's "HH:mm" as a full instant: the first such clock time from the session start
+ * (a time in the start's own minute is the start itself). The clock-only bridge until the
+ * date-and-time picker (Q12.24) sends the day; validation below works on instants only.
  */
 export function timeOnSession(sessionStartsAt: number, hhmm: string): number {
-  return courtTimeOnSession(sessionStartsAt, hhmm)
+  return courtTimeOnSession(sessionStartsAt, clockTimeFrom(sessionStartsAt, hhmm))
 }
 
 export type AddCourtSchemaOptions = {
-  /** The session's start: set times are placed on this day (or the next, overnight) */
+  /** The session's start (actual once live): the earliest planned start; set times count from it */
   sessionStartsAt: number
   /** The session's scheduled end: a set time may not be after it */
   sessionEndsAt: number

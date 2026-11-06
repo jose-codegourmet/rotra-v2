@@ -1,3 +1,4 @@
+import { clockTimeFrom, courtTimeOnSession, instantOnDate } from '@rotra/schema/court-window'
 import type { SessionSetupInput } from './SessionSetupForm.schema'
 
 const minutesOf = (hhmm: string) => {
@@ -22,17 +23,28 @@ export function formatMinutes(minutes: number): string {
   return `${h} h${m ? ` ${m} min` : ''}`
 }
 
-/** Local start and end timestamps for the date and times */
-export function sessionTimes(values: Pick<SessionSetupInput, 'date' | 'startTime' | 'endTime'>) {
-  const [y = 0, mo = 1, d = 1] = values.date.split('-').map(Number)
-  const at = (hhmm: string) => {
-    const [h = 0, mi = 0] = hhmm.split(':').map(Number)
-    return new Date(y, mo - 1, d, h, mi).getTime()
-  }
-  const start = at(values.startTime)
-  let end = at(values.endTime)
-  if (end <= start) end += 864e5
-  return { start, end }
+/**
+ * Setup values as full instants: the one place the clock-only time fields become instants until
+ * the date-and-time picker (Q12.24) sends each day. The start is on the session date; the end and
+ * each court time are the first such clock time from the start (the end strictly after it, so at
+ * most 24 h later). An empty court start is the session start; an empty court end (null) follows
+ * the session end. Validation then works on these instants only.
+ */
+export function sessionTimes(
+  values: Pick<SessionSetupInput, 'date' | 'startTime' | 'endTime'> &
+    Partial<Pick<SessionSetupInput, 'courtLabels' | 'courtStarts' | 'courtEnds'>>,
+) {
+  const start = instantOnDate(values.date, values.startTime)
+  const end = clockTimeFrom(start + 60_000, values.endTime)
+  const courts = (values.courtLabels ?? []).map((_, i) => {
+    const from = values.courtStarts?.[i]
+    const until = values.courtEnds?.[i]
+    return {
+      startsAt: from ? courtTimeOnSession(start, clockTimeFrom(start, from)) : start,
+      openUntil: until ? clockTimeFrom(start, until) : null,
+    }
+  })
+  return { start, end, courts }
 }
 
 export function slotBudget(values: Pick<SessionSetupInput, 'courtLabels' | 'playersPerCourt'>) {

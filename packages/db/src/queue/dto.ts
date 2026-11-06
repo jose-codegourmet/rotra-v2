@@ -46,6 +46,9 @@ export function courtDto(court: SessionCourt) {
     id: court.id,
     sessionId: court.sessionId,
     label: court.label,
+    /** Planned start; null means the session start. */
+    startsAt: toIsoOrNull(court.startsAt),
+    openedEarlyAt: toIsoOrNull(court.openedEarlyAt),
     openUntil: toIsoOrNull(court.openUntil),
     removedAt: toIsoOrNull(court.removedAt),
   }

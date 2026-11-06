@@ -1,11 +1,19 @@
 import { courtWindowError } from '@rotra/schema/court-window'
-import { courtOpen, openedEarly } from '../match/match.rules'
+import { courtOpen, holdsCourt, openedEarly } from '../match/match.rules'
 import { requireLive } from '../match/queue.mutations'
 import { MockError } from '../mock/errors'
 import type { MockState } from '../mock/store'
 import { queueMutation, sessionIn } from '../mock/transaction'
 import { isRealDataMode } from '../real/mode'
-import { realAddCourt, realExtendSession, realRemoveCourt } from '../real/session-live'
+import {
+  realAddCourt,
+  realExtendSession,
+  realOpenAllCourtsEarly,
+  realOpenCourtEarly,
+  realRemoveCourt,
+  realUndoCourtEarlyOpen,
+  realUpdateCourt,
+} from '../real/session-live'
 
 const hhmm = (n: number) =>
   new Date(n).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
@@ -50,6 +58,7 @@ export function updateCourt(input: {
   startsAt: number
   openUntil: number | null
 }) {
+  if (isRealDataMode()) return realUpdateCourt(input)
   return queueMutation({ area: 'Courts and time', sessionId: input.sessionId }, (s) => {
     const session = sessionIn(s, input.sessionId)
     const court = s.courts.find(
@@ -95,6 +104,7 @@ function openEarly(s: MockState, sessionId: string, courtIds: string[] | null) {
   return courts.flatMap((c) => (c ? [c] : []))
 }
 export function openCourtEarly(input: { sessionId: string; courtId: string }) {
+  if (isRealDataMode()) return realOpenCourtEarly(input)
   return queueMutation({ area: 'Courts and time', sessionId: input.sessionId }, (s) => {
     const [court] = openEarly(s, input.sessionId, [input.courtId])
     if (!court) throw new MockError('conflict', 'Something changed. Review the courts again.')
@@ -105,6 +115,7 @@ export function openCourtEarly(input: { sessionId: string; courtId: string }) {
   })
 }
 export function openAllCourtsEarly(input: { sessionId: string }) {
+  if (isRealDataMode()) return realOpenAllCourtsEarly(input)
   return queueMutation({ area: 'Courts and time', sessionId: input.sessionId }, (s) => {
     const courts = openEarly(s, input.sessionId, null)
     return {
@@ -116,8 +127,9 @@ export function openAllCourtsEarly(input: { sessionId: string }) {
     }
   })
 }
-/** Undo early open: back to Not open yet, only while the court is free. */
+/** Undo early open: back to Not open yet, only while no On court or Playing match holds it. */
 export function undoCourtEarlyOpen(input: { sessionId: string; courtId: string }) {
+  if (isRealDataMode()) return realUndoCourtEarlyOpen(input)
   return queueMutation({ area: 'Courts and time', sessionId: input.sessionId }, (s) => {
     const session = requireLive(s, input.sessionId)
     const court = s.courts.find(
@@ -125,7 +137,7 @@ export function undoCourtEarlyOpen(input: { sessionId: string; courtId: string }
     )
     if (!court || !openedEarly(court))
       throw new MockError('conflict', 'Something changed. Review the courts again.')
-    if (s.matches.some((m) => m.state === 'active' && m.courtIds.includes(court.id)))
+    if (s.matches.some((m) => holdsCourt(m) && m.courtIds.includes(court.id)))
       throw new MockError('permission', 'Only a free court can go back to Not open yet.')
     court.openedEarlyAt = null
     return {
@@ -139,7 +151,7 @@ export function removeCourt(input: { sessionId: string; courtId: string }) {
   return queueMutation({ area: 'Courts and time', sessionId: input.sessionId }, (s) => {
     const courts = s.courts.filter((c) => c.sessionId === input.sessionId && !c.removedAt),
       court = courts.find((c) => c.id === input.courtId)
-    if (!court || s.matches.some((m) => m.state === 'active' && m.courtIds.includes(court.id)))
+    if (!court || s.matches.some((m) => holdsCourt(m) && m.courtIds.includes(court.id)))
       throw new MockError('permission', 'Only a free court can be removed')
     if (courts.length <= 1) throw new MockError('permission', 'At least one court must remain.')
     court.removedAt = Date.now()

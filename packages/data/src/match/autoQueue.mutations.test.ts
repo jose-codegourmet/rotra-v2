@@ -552,8 +552,8 @@ describe('complete flexible Queue Session rules', () => {
   it('validates overnight booking windows against session boundaries', () => {
     const start = new Date(2026, 10, 1, 22).getTime(),
       end = new Date(2026, 10, 2, 2).getTime()
-    expect(courtTimeOnSession(start + 34567, '22:00')).toBe(start + 34567)
-    const nextDay = courtTimeOnSession(start, '00:30')
+    expect(courtTimeOnSession(start + 34567, start)).toBe(start + 34567)
+    const nextDay = courtTimeOnSession(start, new Date(2026, 10, 2, 0, 30).getTime())
     expect(new Date(nextDay).getDate()).toBe(2)
     expect(courtWindowError(nextDay, null, start, end)).toBeNull()
     expect(courtWindowError(nextDay, start, start, end)).toContain('after the planned start')

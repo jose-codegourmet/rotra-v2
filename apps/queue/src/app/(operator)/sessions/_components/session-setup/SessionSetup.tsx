@@ -23,7 +23,6 @@ import {
 } from '@rotra/data/session-cost/rules'
 import { useSessionCostEstimate } from '@rotra/data/session-cost/useSessionCostEstimate'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
-import { courtTimeOnSession } from '@rotra/schema/court-window'
 import { Breadcrumb } from '@rotra/ui/breadcrumb'
 import { ChooseDateSheet } from '@rotra/ui/choose-date-sheet'
 import { toYmd } from '@rotra/ui/date-picker/date-calendar/helpers'
@@ -185,7 +184,7 @@ export function SessionSetup(props: SessionSetupProps) {
   void playersPerGame
 
   const toInput = (values: SessionSetupValues): QueueSessionInput => {
-    const { start, end } = sessionTimes(values)
+    const { start, end, courts } = sessionTimes(values)
     return {
       costEstimate: normalizeSessionCost(values),
       title: values.title,
@@ -202,8 +201,8 @@ export function SessionSetup(props: SessionSetupProps) {
       playersPerCourt: values.playersPerCourt,
       courts: values.courtLabels.map((label, i) => ({
         label,
-        startsAt: courtTimeOnSession(start, values.courtStarts[i] || values.startTime),
-        openUntil: values.courtEnds[i] ? courtTimeOnSession(start, values.courtEnds[i]) : null,
+        startsAt: courts[i]?.startsAt ?? start,
+        openUntil: courts[i]?.openUntil ?? null,
       })),
       repeat: isEdit ? 'none' : values.repeat,
       occurrences: values.repeatCount,

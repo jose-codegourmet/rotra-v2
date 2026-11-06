@@ -1,4 +1,4 @@
-import { courtTimeOnSession, courtWindowError } from '@rotra/schema/court-window'
+import { courtWindowError, sessionWindowError } from '@rotra/schema/court-window'
 import { dateField, timeField } from '@rotra/schema/date'
 import {
   CUSTOM_FEE_ERROR,
@@ -70,30 +70,32 @@ export const sessionSetupSchema = z
   })
   .extend(sessionFinancialsSchema.shape)
   .superRefine((values, ctx) => {
-    const { start, end } = sessionTimes(values)
+    const { start, end, courts } = sessionTimes(values)
+    const isTime = (value: string | undefined) => timeField.safeParse(value).success
+    // Only once the date and both times parse: their own fields carry those errors.
+    if (Number.isFinite(start) && Number.isFinite(end)) {
+      const sessionError = sessionWindowError(start, end)
+      if (sessionError) ctx.addIssue({ code: 'custom', message: sessionError, path: ['endTime'] })
+    }
     values.courtLabels.forEach((_, i) => {
-      const from = values.courtStarts[i] || values.startTime
+      const from = values.courtStarts[i]
       const until = values.courtEnds[i]
-      if (!timeField.safeParse(from).success || (until && !timeField.safeParse(until).success)) {
+      if ((from && !isTime(from)) || (until && !isTime(until))) {
         ctx.addIssue({
           code: 'custom',
           message: 'Enter a valid booking time.',
-          path: [!timeField.safeParse(from).success ? 'courtStarts' : 'courtEnds', i],
+          path: [from && !isTime(from) ? 'courtStarts' : 'courtEnds', i],
         })
         return
       }
-      const startsAt = courtTimeOnSession(start, from)
-      const error = courtWindowError(
-        startsAt,
-        until ? courtTimeOnSession(start, until) : null,
-        start,
-        end,
-      )
+      const court = courts[i]
+      if (!court || !Number.isFinite(start) || !Number.isFinite(end)) return
+      const error = courtWindowError(court.startsAt, court.openUntil, start, end)
       if (error)
         ctx.addIssue({
           code: 'custom',
           message: error,
-          path: [startsAt >= end ? 'courtStarts' : 'courtEnds', i],
+          path: [court.startsAt >= end ? 'courtStarts' : 'courtEnds', i],
         })
     })
     if (values.paymentMode === 'custom' && values.customFeePerHead === null)

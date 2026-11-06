@@ -7,7 +7,7 @@ import {
 import type { QueueSession as SessionView } from '@rotra/data/queue-session/types'
 import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
-import type { QueueSession, SessionMode } from '../generated/prisma/client'
+import type { QueueSession, SessionCourt, SessionMode } from '../generated/prisma/client'
 import { requireClubEntitlement, requireRevision } from '../service/authorize'
 import { ServiceError } from '../service/errors'
 import { courtDto, sessionDto } from './dto'
@@ -40,8 +40,11 @@ export type QueueSessionInput = {
   minimumIsCalculated: boolean
   expectedPlayers: number | null
   playersPerCourt?: number
-  /** `id` keeps an existing court on edit; courts left out are removed. */
-  courts: { id?: string; label: string; openUntil?: string | null }[]
+  /**
+   * `id` keeps an existing court on edit; courts left out are removed. `startsAt` is the planned
+   * start (null or the session start = follows the session start).
+   */
+  courts: { id?: string; label: string; startsAt?: string | null; openUntil?: string | null }[]
   repeat?: 'none' | 'weekly' | 'biweekly' | 'monthly'
   occurrences?: number
 }
@@ -51,6 +54,48 @@ const ms = (iso: string) => {
   if (!Number.isFinite(value))
     throw new ServiceError('invalid', { schedule: 'Enter a date and time.' })
   return value
+}
+
+const COURT_LABEL_MAX = 40
+const CLUB_TIME_ZONE = 'Asia/Manila'
+const clubTime = (at: number) =>
+  new Date(at).toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZone: CLUB_TIME_ZONE,
+  })
+
+/**
+ * The court window on full instants, mirroring `courtWindowError` in `@rotra/schema/court-window`
+ * (this package does not depend on it): the planned start is not before the session start and is
+ * before the session end; the end (null = session end) is after the start and not after the
+ * session end. Planned endings are advisory, so a passed end is allowed.
+ */
+function courtWindowError(
+  start: number,
+  end: number | null,
+  sessionStart: number,
+  sessionEnd: number,
+): Record<string, string> | null {
+  const until = end ?? sessionEnd
+  if (until > sessionEnd)
+    return {
+      openUntil: `That's after the session ends at ${clubTime(sessionEnd)}. Pick an earlier time, or extend the session first.`,
+    }
+  if (start < sessionStart || start >= sessionEnd)
+    return { startsAt: 'Choose a planned start within the session.' }
+  if (until <= start) return { openUntil: 'Choose an end after the planned start.' }
+  return null
+}
+
+/** The session start courts count from: the actual start once live. */
+const sessionBase = (session: QueueSession) =>
+  (session.startedAt ?? session.scheduledStartAt).getTime()
+
+/** A planned start equal to the session start is stored as null: it follows the session start. */
+const plannedStart = (startsAt: string | null | undefined, sessionStart: number) => {
+  const at = startsAt ? ms(startsAt) : sessionStart
+  return at === sessionStart ? null : at
 }
 
 async function validate(tx: Tx, context: ClubContext, input: QueueSessionInput) {
@@ -86,11 +131,20 @@ async function validate(tx: Tx, context: ClubContext, input: QueueSessionInput) 
     throw new ServiceError('invalid', {
       playersPerCourt: 'Players per court must be between 2 and 20.',
     })
-  for (const court of input.courts)
+  for (const court of input.courts) {
     if (court.openUntil != null && (ms(court.openUntil) <= Date.now() || ms(court.openUntil) > end))
       throw new ServiceError('invalid', {
         courts: 'Enter a court label and a booking end within the session.',
       })
+    const startsAt = plannedStart(court.startsAt, start) ?? start
+    const error = courtWindowError(
+      startsAt,
+      court.openUntil == null ? null : ms(court.openUntil),
+      start,
+      end,
+    )
+    if (error) throw new ServiceError('invalid', { courts: Object.values(error)[0] as string })
+  }
   return { venue, start, end, playersPerCourt }
 }
 
@@ -193,18 +247,22 @@ export async function createQueueSession(
             sourceCommandId: await derivedId(commandId, `session:${index}`),
           },
         })
-        for (const [n, court] of input.courts.entries())
+        for (const [n, court] of input.courts.entries()) {
+          const startsAt = plannedStart(court.startsAt, start)
+          // Each date keeps the court's offset from the session start, as openUntil does.
           await tx.sessionCourt.create({
             data: {
               id: await derivedId(commandId, `court:${index}:${n}`),
               clubId: context.clubId,
               sessionId: id,
               label: court.label.trim(),
+              startsAt: startsAt === null ? null : new Date(date.start + (startsAt - start)),
               openUntil: court.openUntil
                 ? new Date(date.start + (ms(court.openUntil) - start))
                 : null,
             },
           })
+        }
         session = await recomputeMinimum(tx, session)
       }
       return {
@@ -278,8 +336,10 @@ export async function updateQueueSession(
         if (!kept.has(court.id))
           await tx.sessionCourt.update({ where: { id: court.id }, data: { removedAt: now } })
       for (const [n, court] of input.courts.entries()) {
+        const startsAt = plannedStart(court.startsAt, start)
         const data = {
           label: court.label.trim(),
+          startsAt: startsAt === null ? null : new Date(startsAt),
           openUntil: court.openUntil ? new Date(court.openUntil) : null,
         }
         if (court.id)
@@ -414,7 +474,7 @@ export async function startSession(
 export async function addCourt(
   context: ClubContext,
   sessionId: string,
-  input: { courtId: string; label: string; openUntil: string | null },
+  input: { courtId: string; label: string; startsAt: string | null; openUntil: string | null },
 ) {
   return prisma.$transaction(async (tx) => {
     let session = await lockSession(tx, context, sessionId)
@@ -429,22 +489,27 @@ export async function addCourt(
       if (existing.sessionId !== sessionId) throw new ServiceError('conflict')
       return courtDto(existing)
     }
+    const label = input.label.trim()
+    if (!label || label.length > COURT_LABEL_MAX)
+      throw new ServiceError('invalid', { court: 'Enter a court label of at most 40 characters.' })
+    const base = sessionBase(session)
+    const startsAt = plannedStart(input.startsAt, base)
     const openUntil = input.openUntil ? ms(input.openUntil) : null
-    if (
-      !input.label.trim() ||
-      (openUntil !== null &&
-        (openUntil <= Date.now() || openUntil > session.scheduledEndAt.getTime()))
+    const error = courtWindowError(
+      startsAt ?? base,
+      openUntil,
+      base,
+      session.scheduledEndAt.getTime(),
     )
-      throw new ServiceError('invalid', {
-        court: 'Enter a court label and a booking end within the session.',
-      })
+    if (error) throw new ServiceError('invalid', error)
     const court = await tx.sessionCourt
       .create({
         data: {
           id: input.courtId,
           clubId: context.clubId,
           sessionId,
-          label: input.label.trim(),
+          label,
+          startsAt: startsAt === null ? null : new Date(startsAt),
           openUntil: openUntil === null ? null : new Date(openUntil),
         },
       })
@@ -455,10 +520,139 @@ export async function addCourt(
   })
 }
 
+/** The live court of a locked session, or a conflict when it was removed meanwhile. */
+async function requireLiveCourt(tx: Tx, sessionId: string, courtId: string) {
+  const court = (await liveCourts(tx, sessionId)).find((c) => c.id === courtId)
+  if (!court) throw new ServiceError('conflict', { court: 'Court no longer available.' })
+  return court
+}
+
+const COURTS_CHANGED = { court: 'Something changed. Review the courts again.' }
+
 /**
- * Soft-removes a court, keeping at least one. Courts in use by an active match cannot be removed;
- * that check joins the match holds when the match schema lands. No rebalance: an active session
- * never unseats players, and a prepared one rebalances on its next save.
+ * Add / Edit court on a saved court: label, planned start and advisory end. The start is fixed once
+ * the court has hosted a match or been opened early; a passed end may still be edited.
+ */
+export async function updateCourt(
+  context: ClubContext,
+  sessionId: string,
+  courtId: string,
+  input: { label: string; startsAt: string | null; openUntil: string | null },
+) {
+  return prisma.$transaction(async (tx) => {
+    let session = await lockSession(tx, context, sessionId)
+    await requireSessionAccess(context, session)
+    requireState(
+      session,
+      ['prepared', 'active'],
+      'Courts can change only before or during the session.',
+    )
+    const court = await requireLiveCourt(tx, sessionId, courtId)
+    const label = input.label.trim()
+    if (!label || label.length > COURT_LABEL_MAX)
+      throw new ServiceError('invalid', { court: 'Enter a court label of at most 40 characters.' })
+    const base = sessionBase(session)
+    const current = court.startsAt?.getTime() ?? base
+    const startsAt = input.startsAt ? ms(input.startsAt) : base
+    const used =
+      court.openedEarlyAt !== null ||
+      (await tx.matchCourtUsage.count({ where: { clubId: context.clubId, courtId } })) > 0
+    if (used && startsAt !== current)
+      throw new ServiceError('invalid', { startsAt: 'Start is fixed after use.' })
+    const openUntil = input.openUntil ? ms(input.openUntil) : null
+    // A court opened before an early actual start keeps its own start as the earliest bound.
+    const error = courtWindowError(
+      startsAt,
+      openUntil,
+      Math.min(base, court.startsAt?.getTime() ?? Infinity),
+      session.scheduledEndAt.getTime(),
+    )
+    if (error) throw new ServiceError('invalid', error)
+    const updated = await tx.sessionCourt.update({
+      where: { id: courtId },
+      data: {
+        label,
+        startsAt: startsAt === base ? null : new Date(startsAt),
+        openUntil: openUntil === null ? null : new Date(openUntil),
+        revision: { increment: 1 },
+      },
+    })
+    session = await touchSession(tx, session)
+    return courtDto(updated)
+  })
+}
+
+/** Not open yet: a planned start still ahead and not opened early. */
+const notOpenYet = (court: { startsAt: Date | null; openedEarlyAt: Date | null }, now: number) =>
+  court.openedEarlyAt === null && (court.startsAt?.getTime() ?? 0) > now
+
+/**
+ * Start anyway on running courts: each court not open yet opens now (`courtId` null = all of them).
+ * The planned start, costs and minimum games stay as they are. Repeat-safe for one court: a court
+ * already opened early is returned as it is.
+ */
+export async function openCourtsEarly(
+  context: ClubContext,
+  sessionId: string,
+  courtId: string | null,
+) {
+  return prisma.$transaction(async (tx) => {
+    const session = await lockSession(tx, context, sessionId)
+    await requireSessionAccess(context, session)
+    requireState(session, ['active'], 'Courts open early only during the session.')
+    const now = Date.now()
+    let courts = (await liveCourts(tx, sessionId)).filter((c) => notOpenYet(c, now))
+    if (courtId !== null) {
+      const court = await requireLiveCourt(tx, sessionId, courtId)
+      if (court.openedEarlyAt !== null) return [courtDto(court)]
+      if (!notOpenYet(court, now)) throw new ServiceError('conflict', COURTS_CHANGED)
+      courts = [court]
+    }
+    if (!courts.length) throw new ServiceError('conflict', COURTS_CHANGED)
+    const opened: SessionCourt[] = []
+    for (const court of courts)
+      opened.push(
+        await tx.sessionCourt.update({
+          where: { id: court.id },
+          data: { openedEarlyAt: new Date(now), revision: { increment: 1 } },
+        }),
+      )
+    await touchSession(tx, session)
+    return opened.map(courtDto)
+  })
+}
+
+/**
+ * Undo early open: back to Not open yet, only before the planned start and while no On court or
+ * Playing match holds the court. Repeat-safe: a court already not open yet is returned as it is.
+ */
+export async function undoCourtEarlyOpen(context: ClubContext, sessionId: string, courtId: string) {
+  return prisma.$transaction(async (tx) => {
+    const session = await lockSession(tx, context, sessionId)
+    await requireSessionAccess(context, session)
+    requireState(session, ['active'], 'Courts open early only during the session.')
+    const now = Date.now()
+    const court = await requireLiveCourt(tx, sessionId, courtId)
+    if (notOpenYet(court, now)) return courtDto(court)
+    if (court.openedEarlyAt === null || (court.startsAt?.getTime() ?? 0) <= now)
+      throw new ServiceError('conflict', COURTS_CHANGED)
+    if (await tx.activeCourtHold.findUnique({ where: { courtId } }))
+      throw new ServiceError('invalid', {
+        court: 'Only a free court can go back to Not open yet.',
+      })
+    const updated = await tx.sessionCourt.update({
+      where: { id: courtId },
+      data: { openedEarlyAt: null, revision: { increment: 1 } },
+    })
+    await touchSession(tx, session)
+    return courtDto(updated)
+  })
+}
+
+/**
+ * Soft-removes a court, keeping at least one. A court held by an On court or Playing match cannot
+ * be removed. No rebalance: an active session never unseats players, and a prepared one
+ * rebalances on its next save.
  */
 export async function removeCourt(context: ClubContext, sessionId: string, courtId: string) {
   return prisma.$transaction(async (tx) => {
@@ -472,6 +666,9 @@ export async function removeCourt(context: ClubContext, sessionId: string, court
     const courts = await liveCourts(tx, sessionId)
     const court = courts.find((c) => c.id === courtId)
     if (!court) return null
+    // An On court or Playing match holds its court (active_court_holds).
+    if (await tx.activeCourtHold.findUnique({ where: { courtId } }))
+      throw new ServiceError('invalid', { court: 'Only a free court can be removed' })
     if (courts.length <= 1)
       throw new ServiceError('invalid', { court: 'At least one court must remain.' })
     await tx.sessionCourt.update({

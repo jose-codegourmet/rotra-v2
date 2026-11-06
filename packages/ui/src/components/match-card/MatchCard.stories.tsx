@@ -1,5 +1,6 @@
 import type { MatchCardFixture } from '@rotra/data/fixtures/match-cards'
 import { matchCardFixtures } from '@rotra/data/fixtures/match-cards'
+import type { PlayerWait } from '@rotra/ui/player-face-button'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import { MatchCard, type MatchCardProps } from './MatchCard'
@@ -25,7 +26,7 @@ const meta = {
   component: MatchCard,
   decorators: [
     (Story) => (
-      <div className="w-[236px]">
+      <div className="w-[220px]">
         <Story />
       </div>
     ),
@@ -51,6 +52,52 @@ export const ProtectedManual: Story = { args: propsFor(matchCardFixtures.protect
 export const Suggested: Story = { args: propsFor(matchCardFixtures.suggested) }
 export const Auto: Story = { args: propsFor(matchCardFixtures.auto) }
 export const LongNames: Story = { args: propsFor(matchCardFixtures.longNames) }
+
+const withWait = (c: MatchCardFixture, wait: PlayerWait): MatchCardProps => {
+  const base = propsFor(c)
+  return {
+    ...base,
+    teamA: base.teamA.map((p) => ({ ...p, wait })),
+    teamB: base.teamB.map((p) => ({ ...p, wait })),
+  }
+}
+
+export const Wait3Min: Story = {
+  name: '3 min wait',
+  args: withWait(matchCardFixtures.ready, { kind: 'minutes', minutes: 3 }),
+}
+export const Wait12Min: Story = {
+  name: '12 min wait',
+  args: withWait(matchCardFixtures.ready, { kind: 'minutes', minutes: 12 }),
+}
+export const Wait17Min: Story = {
+  name: '17 min wait',
+  args: withWait(matchCardFixtures.ready, { kind: 'minutes', minutes: 17 }),
+}
+export const WaitOnCourt: Story = {
+  args: withWait(matchCardFixtures.ready, { kind: 'on-court' }),
+}
+export const WaitPlaying: Story = {
+  args: withWait(matchCardFixtures.blocked, { kind: 'playing' }),
+}
+export const WaitNotHere: Story = {
+  args: withWait(matchCardFixtures.needsAttention, { kind: 'not-here' }),
+}
+export const MixedWaits: Story = {
+  args: (() => {
+    const base = propsFor(matchCardFixtures.ready)
+    const waitsA: PlayerWait[] = [
+      { kind: 'minutes', minutes: 3 },
+      { kind: 'minutes', minutes: 12 },
+    ]
+    const waitsB: PlayerWait[] = [{ kind: 'minutes', minutes: 17 }, { kind: 'playing' }]
+    return {
+      ...base,
+      teamA: base.teamA.map((p, i) => ({ ...p, wait: waitsA[i] ?? p.wait })),
+      teamB: base.teamB.map((p, i) => ({ ...p, wait: waitsB[i] ?? p.wait })),
+    }
+  })(),
+}
 const draftStatus = {
   kind: 'blocked' as const,
   reason: 'Available players with the lowest planned load',

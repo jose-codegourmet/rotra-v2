@@ -43,15 +43,44 @@ export const LongName: Story = {
     name: 'Maria Consolacion Dela Cruz Villareal',
   },
 }
+const queueDecorators: Story['decorators'] = [
+  (Story) => (
+    <div className="inline-grid place-items-center rounded-md bg-surface p-4">
+      <Story />
+    </div>
+  ),
+]
+
 export const OnQueueCard: Story = {
   args: { ...faceAt(0), size: 'queue' },
-  decorators: [
-    (Story) => (
-      <div className="inline-grid place-items-center rounded-md bg-surface p-4">
-        <Story />
-      </div>
-    ),
-  ],
+  decorators: queueDecorators,
+}
+export const Wait3Min: Story = {
+  name: '3 min wait',
+  args: { ...faceAt(0), size: 'queue', wait: { kind: 'minutes', minutes: 3 } },
+  decorators: queueDecorators,
+}
+export const Wait12Min: Story = {
+  name: '12 min wait',
+  args: { ...faceAt(1), size: 'queue', wait: { kind: 'minutes', minutes: 12 } },
+  decorators: queueDecorators,
+}
+export const Wait17Min: Story = {
+  name: '17 min wait',
+  args: { ...faceAt(2), size: 'queue', wait: { kind: 'minutes', minutes: 17 } },
+  decorators: queueDecorators,
+}
+export const WaitOnCourt: Story = {
+  args: { ...faceAt(0), size: 'queue', wait: { kind: 'on-court' } },
+  decorators: queueDecorators,
+}
+export const WaitPlaying: Story = {
+  args: { ...faceAt(1), size: 'queue', wait: { kind: 'playing' } },
+  decorators: queueDecorators,
+}
+export const WaitNotHere: Story = {
+  args: { ...faceAt(2), size: 'queue', wait: { kind: 'not-here' } },
+  decorators: queueDecorators,
 }
 export const WithSwap: Story = {
   args: {
@@ -59,11 +88,11 @@ export const WithSwap: Story = {
     size: 'queue',
     swap: { team: 'A', index: 0, onSwap: fn() },
   },
-  decorators: OnQueueCard.decorators,
+  decorators: queueDecorators,
 }
 export const Phone: Story = {
   args: { ...faceAt(0), size: 'queue' },
-  decorators: OnQueueCard.decorators,
+  decorators: queueDecorators,
   globals: { viewport: { value: 'phone' } },
 }
 export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }

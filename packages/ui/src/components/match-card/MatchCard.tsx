@@ -6,7 +6,7 @@ import { Chip } from '@rotra/ui/chip'
 import { cn } from '@rotra/ui/cn'
 import { Icon } from '@rotra/ui/icon'
 import { IconButton } from '@rotra/ui/icon-button'
-import { PlayerFaceButton } from '@rotra/ui/player-face-button'
+import { PlayerFaceButton, type PlayerWait } from '@rotra/ui/player-face-button'
 import { SwappablePlayer } from '@rotra/ui/swap-sides-area/swappable-player'
 import type { ComponentProps } from 'react'
 import { matchCardVariants } from './MatchCard.variants'
@@ -19,6 +19,11 @@ export type MatchCardPlayer = {
   shortName: string
   level: PlayingLevel | null
   photoUrl?: string
+  /**
+   * Live session wait under the name ("M min", On court, Playing, Not here). Omit when the session
+   * is not live; the console computes the minutes (Q12.22).
+   */
+  wait?: PlayerWait
 }
 
 export type MatchCardTeam = 'A' | 'B'
@@ -116,6 +121,7 @@ function Faces({
             photoUrl={p.photoUrl}
             label={`${p.name}, Team ${team}. View profile`}
             size="queue"
+            wait={p.wait}
             swap={swappable ? { team, index: i } : undefined}
             onClick={() => onSelectPlayer?.(p.id, team)}
           />
@@ -147,10 +153,12 @@ function DraftFaces({
           <Avatar
             name={p.name}
             src={p.photoUrl}
-            size={28}
-            className="touch:size-10 touch:text-sm"
+            size={44}
+            className="touch:size-[46px] touch:text-[15px]"
           />
-          <span className="max-w-16 truncate text-[11px] text-fg touch:text-xs">{p.shortName}</span>
+          <span className="max-w-[88px] truncate text-[15px] font-semibold text-fg">
+            {p.shortName}
+          </span>
           {chips?.[p.id]?.length ? (
             <span className="flex max-w-24 flex-wrap justify-center gap-0.5">
               {chips[p.id]?.map((chip) => (

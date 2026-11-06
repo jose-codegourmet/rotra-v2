@@ -6,7 +6,7 @@ import {
   getSessionResults,
   publishResults,
 } from '../session-result/fetchers'
-import { completeMatch, startMatch } from './control'
+import { completeMatch, placeOnCourt, startMatch } from './control'
 import { getSessionMatches } from './fetchers'
 import { addMatch, moveMatch, removeWaitingMatch, swapPlayers } from './queue.mutations'
 
@@ -202,6 +202,50 @@ describe('Matches and results › real mode', () => {
       body: { operationId, courtIds: ['ct-1'] },
     })
     expect(started.message).toContain('Match 9 started on Court 1')
+  })
+
+  it('puts a shown match on court, then starts it with no court choice', async () => {
+    await show('s-place', [wireMatch({ id: 'pl', sessionId: 's-place', matchNo: 4 })])
+    reply(200, wireSession('s-place'))
+    reply(200, {
+      result: wireMatch({
+        id: 'pl',
+        sessionId: 's-place',
+        matchNo: 4,
+        state: 'on_court',
+        courtIds: ['ct-1'],
+        placedAt: '2026-11-01T10:20:00.000Z',
+      }),
+      queueRevision: '8',
+    })
+    const placeId = crypto.randomUUID()
+    const placed = await placeOnCourt({ matchId: 'pl', courtIds: ['ct-1'], operationId: placeId })
+    expect(sent(2)).toMatchObject({
+      path: '/api/sessions/s-place/matches/pl/place',
+      method: 'POST',
+      body: { operationId: placeId, courtIds: ['ct-1'] },
+    })
+    expect(placed.message).toContain('Match 4 on Court 1 · getting ready')
+    reply(200, wireSession('s-place'))
+    reply(200, {
+      result: wireMatch({
+        id: 'pl',
+        sessionId: 's-place',
+        matchNo: 4,
+        state: 'active',
+        courtIds: ['ct-1'],
+        placedAt: '2026-11-01T10:20:00.000Z',
+        startedAt: '2026-11-01T10:22:00.000Z',
+      }),
+      queueRevision: '9',
+    })
+    const startId = crypto.randomUUID()
+    const started = await startMatch({ matchId: 'pl', operationId: startId })
+    expect(sent(4)).toMatchObject({
+      path: '/api/sessions/s-place/matches/pl/start',
+      body: { operationId: startId, courtIds: [] },
+    })
+    expect(started.message).toContain('Match 4 started on Court 1')
   })
 
   it('maps a refused result to the field message and refuses a match it never showed', async () => {

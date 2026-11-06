@@ -5,7 +5,13 @@ import type { DeviceSessionStream, Prisma, SyncOperation } from '../generated/pr
 import { ServiceError } from '../service/errors'
 import { toDecimalString, toIso, toIsoOrNull } from '../service/serialize'
 import { setPaid } from './financials'
-import { completeMatch, invalidateMatch, startMatch, substitutePlayer } from './match-control'
+import {
+  completeMatch,
+  invalidateMatch,
+  placeOnCourt,
+  startMatch,
+  substitutePlayer,
+} from './match-control'
 import {
   addManualMatch,
   addSuggestedMatch,
@@ -64,7 +70,12 @@ const DISPATCH: Record<
   'queue.move': (c, s, _id, p) => moveMatch(c, s, p as never),
   'queue.lineup': (c, s, id, p) => updateWaitingLineup(c, s, { ...p, operationId: id } as never),
   'queue.remove': (c, s, _id, p) => removeWaitingMatch(c, s, p as never),
-  'match.start': (c, s, id, p) => startMatch(c, s, { ...p, operationId: id } as never),
+  // Put on court is allowed offline (owner decision, November 6, 2026): replayed like Start match,
+  // so a court or player another device took first is a quarantined conflict, never a double hold.
+  'match.place': (c, s, id, p) => placeOnCourt(c, s, { ...p, operationId: id } as never),
+  // From On court the payload carries no courts; the older one-step start still sends them.
+  'match.start': (c, s, id, p) =>
+    startMatch(c, s, { courtIds: [], ...p, operationId: id } as never),
   'match.substitute': (c, s, id, p) => substitutePlayer(c, s, { ...p, operationId: id } as never),
   'match.complete': (c, s, id, p) => completeMatch(c, s, { ...p, operationId: id } as never),
   'match.invalidate': (c, s, id, p) => invalidateMatch(c, s, { ...p, operationId: id } as never),

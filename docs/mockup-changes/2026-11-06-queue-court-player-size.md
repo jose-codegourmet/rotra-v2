@@ -1,6 +1,6 @@
 # Bigger players, names, game counts and wait timers on court and queue cards
 
-Status: NEW
+Status: ALREADY A TICKET — #408
 Date: 2026-11-06
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Live console (Courts, Upcoming queued matches)

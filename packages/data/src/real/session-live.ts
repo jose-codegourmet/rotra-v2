@@ -60,6 +60,14 @@ export async function realUpdateQueueSession(input: {
   return accepted(await realGetQueueSession(input.sessionId), 'Preparation saved')
 }
 
+export async function realDeleteSession(sessionId: string) {
+  const { id, title } = await realRequest<{ id: string; title: string }>(sessionPath(sessionId), {
+    method: 'DELETE',
+    fields: { roster: 'roster', state: 'state' },
+  })
+  return accepted({ id }, `Session deleted · ${title}`)
+}
+
 export async function realSetAcceptJoinRequests(input: { sessionId: string; accept: boolean }) {
   await realRequest<WireSession>(sessionPath(input.sessionId), {
     method: 'PATCH',

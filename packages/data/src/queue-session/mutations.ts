@@ -8,7 +8,7 @@ import { type MockState, mockStore } from '../mock/store'
 import { queueMutation, sessionIn } from '../mock/transaction'
 import { isRealDataMode } from '../real/mode'
 import { realCreateQueueSession } from '../real/queue'
-import { realStartSession, realUpdateQueueSession } from '../real/session-live'
+import { realDeleteSession, realStartSession, realUpdateQueueSession } from '../real/session-live'
 import { normalizeSessionCost } from '../session-cost/sessionCost.rules'
 import { validateSessionCost } from '../session-cost/validation'
 import type { SessionWaitlistEntry } from '../session-roster/sessionRoster.types'
@@ -322,6 +322,7 @@ export function startSession(sessionId: string) {
 }
 /** Deletes a prepared session that nobody holds a slot in; confirmed players block it. */
 export function deleteSession(sessionId: string) {
+  if (isRealDataMode()) return realDeleteSession(sessionId)
   return queueMutation({ area: 'Session', onlineOnly: true, clubAccess: true }, (state) => {
     const s = sessionIn(state, sessionId)
     if (s.state !== 'prepared')

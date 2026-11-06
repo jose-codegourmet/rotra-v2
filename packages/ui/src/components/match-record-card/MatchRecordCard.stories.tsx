@@ -1,3 +1,4 @@
+import { activeMatchFixtures } from '@rotra/data/fixtures/active-matches'
 import { type SessionRecordMatch, sessionRecordFixture } from '@rotra/data/fixtures/session-record'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
@@ -66,6 +67,30 @@ export const Highlighted: Story = { args: { highlighted: true } }
 export const Fun: Story = { args: { fun: true } }
 
 export const WithSubstitutions: Story = { args: { substitutions: 2 } }
+
+const creditedSub = activeMatchFixtures.withSubstitutions.substitutions[0]
+
+/** One credited substitution line under the count */
+export const WithCreditedSubstitution: Story = {
+  args: propsFor(
+    matchWhere((m) => !m.invalid && m.teamAScore != null),
+    {
+      substitutions: 1,
+      substitutionCredits: creditedSub ? [{ ...creditedSub, creditTo: 'incoming' }] : [],
+    },
+  ),
+}
+
+/** Invalid match: a credit choice still reads as neither gets credit */
+export const InvalidWithSubstitution: Story = {
+  args: propsFor(
+    matchWhere((m) => m.invalid),
+    {
+      substitutions: 1,
+      substitutionCredits: creditedSub ? [{ ...creditedSub, creditTo: 'incoming' }] : [],
+    },
+  ),
+}
 
 export const LongNames: Story = {
   args: propsFor(

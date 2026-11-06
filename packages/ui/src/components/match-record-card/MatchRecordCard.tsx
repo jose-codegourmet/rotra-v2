@@ -26,6 +26,12 @@ export type MatchRecordCardProps = {
   invalid?: boolean
   /** Substitutions made during the match; partial games are not counted */
   substitutions?: number
+  /** One line per substitution with the credit choice (Q-MATCH-RECORD) */
+  substitutionCredits?: {
+    outName: string
+    inName: string
+    creditTo?: 'nobody' | 'incoming' | 'outgoing'
+  }[]
   /** The "now" state: the match on court at the replay's current moment */
   highlighted?: boolean
   /** A player's picture opens their profile */
@@ -33,10 +39,27 @@ export type MatchRecordCardProps = {
   className?: string
 }
 
+function substitutionCreditLine(
+  s: { outName: string; inName: string; creditTo?: 'nobody' | 'incoming' | 'outgoing' },
+  invalid: boolean,
+) {
+  const who = invalid
+    ? null
+    : s.creditTo === 'incoming'
+      ? s.inName
+      : s.creditTo === 'outgoing'
+        ? s.outName
+        : null
+  return who
+    ? `${s.inName} replaced ${s.outName} · ${who} got the game (QM choice)`
+    : `${s.inName} replaced ${s.outName} · Neither gets credit for this game`
+}
+
 /**
  * One recorded match in a session record's court column (Q-MATCH-RECORD): "#N", its time range,
  * a Fun chip when relevant, both teams with the winning side highlighted "Won", the score, "no
- * score" or an Invalid chip, and the substitution note. The prototype's historyMatch() (.hm).
+ * score" or an Invalid chip, the substitution note, and one credit line per substitution. The
+ * prototype's historyMatch() (.hm).
  */
 export function MatchRecordCard({
   number,
@@ -50,6 +73,7 @@ export function MatchRecordCard({
   score = null,
   invalid = false,
   substitutions = 0,
+  substitutionCredits = [],
   highlighted = false,
   onSelectPlayer,
   className,
@@ -122,6 +146,11 @@ export function MatchRecordCard({
           {substitutions} substitution{substitutions > 1 ? 's' : ''}; partial games not counted
         </p>
       ) : null}
+      {substitutionCredits.map((s, index) => (
+        <p key={`${s.outName}-${s.inName}-${index}`} className="text-[13px] text-fg2">
+          {substitutionCreditLine(s, invalid)}
+        </p>
+      ))}
     </article>
   )
 }

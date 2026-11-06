@@ -3,7 +3,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const matchRecordCardMeta = {
   name: 'MatchRecordCard',
   description:
-    'One recorded match in a session record: "#N", its time range, a Fun chip when relevant, both teams with the winning side highlighted "Won", the score, "no score" or an Invalid chip, and "S substitutions; partial games not counted".',
+    'One recorded match in a session record: "#N", its time range, a Fun chip when relevant, both teams with the winning side highlighted "Won", the score, "no score" or an Invalid chip, "S substitutions; partial games not counted", and one credit line per substitution ("NAME replaced NAME · NAME got the game (QM choice)" or neither).',
   usage: [
     'Use in the How the night ran tab of a Queue Session record (Q-HISTORY), one column per court listing matches in play order. Never for live or waiting matches: those are MatchCard and CourtCard.',
     'Results are permanent: the card has no edit controls. An invalid match is dimmed with a dashed border and an Invalid chip.',

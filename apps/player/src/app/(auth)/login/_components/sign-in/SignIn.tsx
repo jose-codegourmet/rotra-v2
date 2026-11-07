@@ -1,5 +1,6 @@
 'use client'
 import { useSignIn } from '@rotra/data/auth/use-sign-in'
+import { isRealDataMode } from '@rotra/data/real/mode'
 import { SignInForm } from '@rotra/ui/sign-in-form'
 import { toast } from '@rotra/ui/toaster'
 import { useRouter } from 'next/navigation'
@@ -50,19 +51,23 @@ export function SignIn({
       isPending={mutation.isPending}
       serverError={mutation.error?.message}
       offline={offline}
+      prototypeHints={!isRealDataMode()}
       successNote={passwordSaved ? 'Password saved. Sign in with your new password.' : undefined}
       onForgotPassword={() => router.push('/forgot-password')}
       onSubmit={(values) =>
-        mutation.mutate(values, {
-          onSuccess: (session) => {
-            dispatch(setAccount(session.account))
-            const queueUrl = queueSessionUrl(returnTo)
-            if (queueUrl) window.location.assign(queueUrl)
-            else router.replace(destination(returnTo, `/players/${session.account.id}`))
-            toast('Signed in')
+        mutation.mutate(
+          { identifier: values.email, password: values.password },
+          {
+            onSuccess: (session) => {
+              dispatch(setAccount(session.account))
+              const queueUrl = queueSessionUrl(returnTo)
+              if (queueUrl) window.location.assign(queueUrl)
+              else router.replace(destination(returnTo, `/players/${session.account.id}`))
+              toast('Signed in')
+            },
+            onError: (error) => toast.error(error.message),
           },
-          onError: (error) => toast.error(error.message),
-        })
+        )
       }
     />
   )

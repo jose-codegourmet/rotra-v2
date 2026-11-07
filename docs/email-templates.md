@@ -8,7 +8,7 @@
 > **Status (2026-10-27): needs a rewrite in the auth epic.** The per-app sections below describe the
 > removed `apps/client` and `apps/admin`. v1 audiences are Player Information (registered players:
 > verification, password reset) and Admin. A club account's forgotten password is reset by the platform
-> owner; the method is still open ([open decisions](business_logic/product/open-decisions.md)). Only `email-templates/supabase/magic-link-otp.html` exists in the repo today.
+> owner; the method is still open ([open decisions](business_logic/product/open-decisions.md)). In the repo today: `email-templates/supabase/magic-link-otp.html` and the Player password reset `email-templates/supabase/reset-password.html` (November 8, 2026; see its README for the redirect URL setup).
 
 ## Legend
 

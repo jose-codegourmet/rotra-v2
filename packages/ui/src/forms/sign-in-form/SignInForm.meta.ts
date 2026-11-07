@@ -2,7 +2,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const signInFormMeta = {
   name: 'SignInForm',
   description:
-    'Prototype Player Information sign-in with phone/email, password visibility and recovery.',
+    'Player Information sign-in with email, password visibility and recovery. Prototype hints only with prototypeHints (mock data).',
   usage: ['Presentational only; containers own mutations and navigation.'],
   prototype: {
     file: 'apps/mockup/player-app/rotra-player.html',

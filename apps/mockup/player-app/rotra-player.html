@@ -1174,7 +1174,7 @@ function viewLogin() {
     <h1 style="font-size:22px">Sign in</h1>
     ${L.note ? notice('ok', esc(L.note)) : ''}
     ${L.err ? notice('bad', esc(L.err)) : ''}
-    ${field('login-id', 'Phone number or email', 'ui.login.id', L.id, '', { ac: 'username', hint: 'Phone numbers are spaced out as you type. Prototype: try 09175550142 or migs.santos@example.com' })}
+    ${field('login-id', 'Email', 'ui.login.id', L.id, '', { type: 'email', inputmode: 'email', ac: 'email', hint: 'The email you registered with. Prototype: try migs.santos@example.com' })}
     <div class="field"><label for="login-pass" style="font-size:13px;font-weight:600;color:var(--fg2)">Password</label>
       <div class="row nowrap"><input class="input" id="login-pass" type="${L.show ? 'text' : 'password'}" autocomplete="current-password" data-bind="ui.login.pass" value="${esc(L.pass)}" placeholder="Any password works in this prototype">
       <button type="button" class="btn sm" data-act="toggleShow" data-k="login" aria-pressed="${!!L.show}" aria-label="${L.show ? 'Hide password' : 'Show password'}">${L.show ? 'Hide' : 'Show'}</button></div></div>
@@ -1256,7 +1256,7 @@ function viewClaim() {
 function viewClaimDone() {
   const p = profileOf('u2');
   return `<main class="wrap slim"><div class="page-head"><span class="label">Registration complete</span><h1>Welcome, ${esc(firstName(p))}</h1></div>
-    ${notice('ok', 'Your profile is registered. Sign in from now on with your phone number or email and your password.')}
+    ${notice('ok', 'Your profile is registered. Sign in from now on with your email and your password.')}
     <section class="card stack tight"><p>Your player ID stays <span class="mono">${esc(p.rtr)}</span>. Your games and rank carry over.</p>
       <div class="row"><button class="btn primary" data-act="openProfile" data-id="u2">Go to my profile</button></div></section></main>`;
 }
@@ -1329,10 +1329,9 @@ const digits = (v) => String(v).replace(/\D/g, '');
 const normPhone = (v) => { const d = digits(v); if (/^09\d{9}$/.test(d)) return `63${d.slice(1)}`; if (/^639\d{9}$/.test(d)) return d; return null; };
 const fmtPhone = (n) => `+63 ${n.slice(2, 5)} ${n.slice(5, 8)} ${n.slice(8)}`;
 const validEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-function accountFor(idv) {
-  const v = idv.trim().toLowerCase();
-  const ph = normPhone(v);
-  return Object.values(S.accounts).find((a) => a.claimed && ((ph && digits(a.phone) === ph) || (a.email && a.email.toLowerCase() === v)));
+function accountFor(email) {
+  const v = email.trim().toLowerCase();
+  return Object.values(S.accounts).find((a) => a.claimed && a.email && a.email.toLowerCase() === v);
 }
 function validatePersonal(d) {
   const e = {};
@@ -1480,7 +1479,8 @@ const FORM = {
   login: () => {
     const L = S.ui.login;
     L.err = ''; L.note = '';
-    if (!L.id.trim()) L.err = 'Enter your phone number or email.';
+    if (!L.id.trim()) L.err = 'Enter your email.';
+    else if (!validEmail(L.id.trim())) L.err = 'Enter an email address, like name@example.com.';
     else if (!L.pass) L.err = 'Enter your password.';
     if (L.err) { render(); return; }
     L.pending = true; render();
@@ -1488,7 +1488,7 @@ const FORM = {
       L.pending = false;
       if (!S.online) { L.err = 'You\'re offline. Signing in needs an internet connection.'; return; }
       const a = accountFor(L.id);
-      if (!a) { L.err = 'That phone number or email and password don\'t match. Check them and try again.'; return; }
+      if (!a) { L.err = 'That email and password don\'t match. Check them and try again.'; return; }
       signIn(a.id);
     });
   },
@@ -1590,7 +1590,7 @@ function applyPhoneMask(el, ev) {
 }
 document.addEventListener('input', (ev) => {
   const el = ev.target;
-  if (el.id === 'login-id' || (el.id === 'req-to' && el.type === 'tel')) applyPhoneMask(el, ev);
+  if (el.id === 'req-to' && el.type === 'tel') applyPhoneMask(el, ev);
   if (el.dataset.bind) {
     setPath(el.dataset.bind, el.value);
     if (el.dataset.live !== undefined) { S.shown = 25; S.ui.findErr = ''; render(); } else save();

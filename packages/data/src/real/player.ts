@@ -1,6 +1,11 @@
 import { type PersonalProfileValues, personalProfileSchema } from '@rotra/schema/personal-details'
+import type { MockSession, SignInInput } from '../auth/auth.types'
 import type { PlayerProfile, PlayerRank, PlayerSessionRecord } from '../player/player.types'
-import type { MyAccount } from '../player-account/playerAccount.types'
+import type {
+  ClaimLink,
+  CompleteClaimResult,
+  MyAccount,
+} from '../player-account/playerAccount.types'
 import { RealRequestError, realRequest } from './client'
 
 /** A public read that answers 404 is a missing player (null), never an error state. */
@@ -11,6 +16,78 @@ async function orNull<T>(read: Promise<T>, statuses = [404]): Promise<T | null> 
     if (error instanceof RealRequestError && statuses.includes(error.status)) return null
     throw error
   }
+}
+
+// ---------- Auth (P-LOGIN): email + password only ----------
+
+export function realGetPlayerSession() {
+  return realRequest<MockSession | null>('/api/auth/session')
+}
+export function realSignInPlayer(input: SignInInput) {
+  return realRequest<MockSession>('/api/auth/sign-in', {
+    method: 'POST',
+    body: { identifier: input.identifier, password: input.password },
+  })
+}
+export function realSignOutPlayer() {
+  return realRequest<null>('/api/auth/sign-out', { method: 'POST', body: {} })
+}
+
+// ---------- Registration link and password reset (P-CLAIM, P-FORGOT, P-RESET) ----------
+
+/** Unknown or revoked links are null, which the page shows as expired. */
+export async function realGetClaimLink(token: string, signal?: AbortSignal) {
+  const body = await orNull(
+    realRequest<{ link: Omit<ClaimLink, 'token'> }>(`/api/claim/${encodeURIComponent(token)}`, {
+      signal,
+    }),
+  )
+  return body ? { ...body.link, token } : null
+}
+export function realCompleteClaim({
+  token,
+  values,
+}: {
+  token: string
+  values: PersonalProfileValues & { email: string; password: string }
+}) {
+  const { email, password, ...rest } = values
+  const personal = personalProfileSchema.parse(rest)
+  const number = (typed: string) => (typed ? Number(typed) : null)
+  return realRequest<CompleteClaimResult & { session: MockSession }>(
+    `/api/claim/${encodeURIComponent(token)}`,
+    {
+      method: 'POST',
+      body: {
+        email,
+        password,
+        fullName: personal.fullName,
+        nickname: personal.nickname,
+        playingStyle: personal.playingStyle,
+        experienceYears: number(personal.experienceYears),
+        experienceMonths: number(personal.experienceMonths),
+        socialLinks: {
+          facebook: personal.facebook,
+          instagram: personal.instagram,
+          youtube: personal.youtube,
+          linkedin: personal.linkedin,
+        },
+      },
+      fields: { experience: 'experienceYears' },
+    },
+  )
+}
+export function realRequestPasswordReset(email: string) {
+  return realRequest<{ acknowledged: boolean }>('/api/auth/password-reset', {
+    method: 'POST',
+    body: { email },
+  })
+}
+export function realResetPassword(input: { token: string; password: string }) {
+  return realRequest<{ saved: boolean }>('/api/auth/reset-password', {
+    method: 'POST',
+    body: input,
+  })
 }
 
 // ---------- Public reads (P-PUBLIC-PROFILE, P-RANK-DETAIL, P-MATCH-HISTORY, /find) ----------

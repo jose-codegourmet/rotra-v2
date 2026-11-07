@@ -222,7 +222,7 @@ Redux never holds server data and has no async thunks.
 | App | Who signs in | How |
 |---|---|---|
 | Queue | Club account | Username + password. Forgotten password is reset by the platform owner |
-| Player Information | Registered player | Phone or email + password; recovery by email |
+| Player Information | Registered player | Email + password; recovery by email |
 | Admin | Platform owner | Admin sign-in |
 | Public pages | Nobody | No auth |
 

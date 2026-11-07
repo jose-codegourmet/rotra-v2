@@ -5,7 +5,6 @@ import { Button } from '@rotra/ui/button'
 import { Field } from '@rotra/ui/field'
 import { useSubmitOnce } from '@rotra/ui/hooks/use-submit-once'
 import { Notice } from '@rotra/ui/notice'
-import { PhoneOrEmailInput } from '@rotra/ui/phone-or-email-input'
 import { TextInput } from '@rotra/ui/text-input'
 import { useState } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
@@ -19,8 +18,10 @@ export type SignInFormProps = {
   serverError?: string
   successNote?: string
   defaultValues?: Partial<SignInValues>
+  /** Mock data only: the sample-account hint and "Any password works" placeholder. */
+  prototypeHints?: boolean
 }
-/** P-LOGIN, including the requested prototype-only sample hint and password placeholder. */
+/** P-LOGIN: email + password. The sample hint and password placeholder show only with `prototypeHints`. */
 export function SignInForm({
   onSubmit,
   onForgotPassword,
@@ -29,6 +30,7 @@ export function SignInForm({
   serverError,
   successNote,
   defaultValues,
+  prototypeHints = false,
 }: SignInFormProps) {
   const [showPassword, setShowPassword] = useState(false)
   const form = useForm<SignInValues>({
@@ -57,21 +59,27 @@ export function SignInForm({
               {offline ? "You're offline. Signing in needs an internet connection." : serverError}
             </Notice>
           ) : null}
-          {errors.identifier && errors.password ? (
+          {errors.email && errors.password ? (
             <Notice tone="error">Check the fields below and try again.</Notice>
           ) : null}
           <Field
-            label="Phone number or email"
-            error={errors.identifier?.message}
-            hint="Phone numbers are spaced out as you type. Prototype: try 09175550142 or jose@example.com"
+            label="Email"
+            error={errors.email?.message}
+            hint={
+              prototypeHints
+                ? 'The email you registered with. Prototype: try jose@example.com'
+                : 'The email you registered with.'
+            }
           >
             <Controller
               control={form.control}
-              name="identifier"
+              name="email"
               render={({ field }) => (
-                <PhoneOrEmailInput
+                <TextInput
                   {...field}
-                  autoComplete="username"
+                  type="email"
+                  inputMode="email"
+                  autoComplete="email"
                   autoCapitalize="none"
                   spellCheck={false}
                   disabled={isPending}
@@ -89,7 +97,9 @@ export function SignInForm({
                     {...field}
                     type={showPassword ? 'text' : 'password'}
                     autoComplete="current-password"
-                    placeholder="Any password works in this prototype"
+                    placeholder={
+                      prototypeHints ? 'Any password works in this prototype' : undefined
+                    }
                     disabled={isPending}
                   />
                 )}

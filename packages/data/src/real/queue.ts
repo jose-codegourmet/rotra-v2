@@ -534,6 +534,27 @@ export async function realGetClubPlayers(): Promise<ClubPlayerView[]> {
   }))
 }
 
+/** The ROTRA Player app's origin, as seen from the Queue app (localhost in local work). */
+export function playerAppOrigin() {
+  return typeof location !== 'undefined' && location.hostname === 'localhost'
+    ? 'http://localhost:9001'
+    : 'https://player.rotra.club'
+}
+
+/** Invite: a registration link for an unclaimed profile; a guest gets the ROTRA Player login. */
+export async function realCreatePlayerInvite(player: ClubPlayerView) {
+  if (player.identity !== 'unclaimed')
+    return { url: `${playerAppOrigin()}/login`, message: 'Invite link ready' }
+  const { token } = await realRequest<{ token: string; expiresAt: string }>(
+    `/api/club/players/${encodeURIComponent(player.id)}/registration-link`,
+    { method: 'POST' },
+  )
+  return {
+    url: `${playerAppOrigin()}/claim/${encodeURIComponent(token)}`,
+    message: 'Invite link ready',
+  }
+}
+
 /** Player Information results: profiles with an RTR ID the club has not saved yet. */
 export async function realPlayerDirectorySearch(q: string): Promise<DirectoryPlayer[]> {
   const wire = await realRequest<{ players: Omit<DirectoryPlayer, 'rankLabel'>[] }>(

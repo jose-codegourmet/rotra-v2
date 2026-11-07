@@ -32,7 +32,7 @@ and [schema dependencies](schema-dependencies.md) identify their consumers.
 
 - Exact numerical ranking/performance model, label thresholds, global tie behavior, and policy-change retroactivity.
 - Three calendar months versus a day count, and canonical timezone for ID dates/window cutoffs.
-- Authentication provider support/configuration for club username login; email verification on claim; password policy. (Player phone-or-email login mapping was decided November 7, 2026, below.)
+- Authentication provider support/configuration for club username login; email verification on claim; password policy. (Player login mapping was decided November 7, 2026 and changed to email only on November 8, below.)
 - Historical guest-link confirmation evidence, mistaken-link handling, and the auditable attribution mechanism; including earlier games after confirmed identity is settled below.
 - Whether assessments for no-shows, roster entries removed during preparation, or invalid sessions remain eligible; assessment changes already sync immediately, independently of match performance.
 - Exact award evidence calculations (partial substitutes are excluded from local standings and awards unless the Queue Master gave one the game; see below).
@@ -50,7 +50,7 @@ and [schema dependencies](schema-dependencies.md) identify their consumers.
 
 Source: [#244](https://github.com/jose-codegourmet/rotra-v2/issues/244) (F07.3) and the [business decision summary](../../business_logic/product/open-decisions.md#settled-by-the-product-owner-on-november-7-2026). Prose rules only; no DDL or migration is approved by this. Details and worked examples: [identity](player-information/modules/identity.md).
 
-- Player auth accounts are email + password. Phone is a login identifier resolved on the server (unique normalized phone → `player_accounts` → email); the provider holds no phone and sends no SMS. Email is required on every player account; recovery is email-only.
+- Player auth accounts are email + password, and players sign in with email only (phone-lookup sign-in withdrawn 2026-11-08); the provider sends no SMS. Email is required on every player account; recovery is email-only.
 - Sign-in failure is one generic credential error. `hide_phone_from_clubs` does not block phone sign-in.
 - `players.id` stays independent of the auth subject; `player_accounts` links them.
 - `player_claim_links`: expiry = issued + 7 days; single use (consumed once); club reissue revokes the previous active link.
@@ -112,7 +112,7 @@ the chore tickets wait for their own pickup.
 | Public join-request receipt is a browser-session cookie (proposal): no expiry, a lost receipt cannot be recovered, and the visitor sees no status again | #398 | Decision (#248) |
 | RLS disabled on 55 public tables; `anon` can execute `rotra_next_player_sequence()` | #387 | Chore (#243), migration sign-off |
 | Club logo has no storage adapter | #374 (closed) | Done |
-| Player sign-in (phone or email + password), password reset and registration (claim) links have no real-mode route, so the wired own-account routes (#400) have no player session to serve yet. Mapping and claim-link rules decided November 7, 2026 (above); the routes are not built | #244 | Decision recorded; implementation pending |
+| Player sign-in, registration (claim) and password reset have real-mode routes in the Player app since November 8, 2026 (`/api/auth/sign-in`, `session`, `sign-out`, `password-reset`, `reset-password`; `/api/claim/[token]`). The Queue Master issues registration links from Saved players › Invite (owner decision, November 8, 2026; Queue `/api/club/players/[clubPlayerId]/registration-link`). Admin's Copy registration link is still mock only: `player_claim_links.issuing_club_id` is required and an Admin-issued link has no club. Claims also confirm the email at once (`email_confirm: true`); email verification is still open | #244 | Done for Queue-issued links; Admin issuing and email verification open |
 | Contact-change Approve / Retry application / Check status change the provider login; not connected in real mode (#401) | #196, #244 | Decision |
 
 ### Gaps from the match and results wiring (#396)

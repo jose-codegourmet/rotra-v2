@@ -66,7 +66,7 @@
 | Name-only guest | Operator confirms slot and full level | No automatic profile/account | Saved club entry; no invented RTR ID |
 | Phone supplied, pending resolution | Can participate; link pending when offline | Eligible creation/linking on allowed sync | Confirm phone in person; resolve conflicts online |
 | Unclaimed linked profile | Can participate | Public identity may exist; login not yet established | Phone when permitted, existing RTR ID |
-| Registered, phone visible to club | Can participate | Phone/email + password login | Confirm phone or ID/QR |
+| Registered, phone visible to club | Can participate | Email + password login | Confirm phone or ID/QR |
 | Registered, phone hidden | Can participate | Same account; contacts absent publicly | ID/QR, no forced reveal |
 | Contact-change requested | Participation unchanged | Existing contact remains until applied | Same permanent RTR ID |
 

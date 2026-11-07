@@ -93,13 +93,16 @@ export async function handlePublicRead(
 }
 
 /**
- * Visitor commands and reads with no account: Request to join and My request. The visitor's
- * receipt rides in an httpOnly cookie the Route Handler sets; responses are private and never
- * cached, unlike `handlePublicRead`.
+ * Visitor commands and reads with no account: Request to join and My request (the visitor's
+ * receipt rides in an httpOnly cookie the Route Handler sets), and the Player app's registration
+ * link and password reset. Responses are private and never cached, unlike `handlePublicRead`.
  */
 export const VISITOR_COMMANDS = [
   'public-session.join-request',
   'public-session.my-request',
+  'player.claim-link',
+  'player.claim',
+  'player.password-reset',
 ] as const
 
 export type VisitorCommandId = (typeof VISITOR_COMMANDS)[number]

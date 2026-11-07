@@ -5,8 +5,8 @@ import { loadAccountContext } from './account-context'
 import { dataMode, MOCK_COOKIE_PREFIX } from './data-mode'
 import { AUTH_PROVIDER, type CookieAdapter, createSupabaseServer } from './supabase'
 
-/** The apps with a password sign-in in this journey: Queue (club) and Admin (platform owner). */
-export type SignInAudience = 'club' | 'admin'
+/** The apps with a password sign-in: Queue (club), Player Information (player, email only) and Admin. */
+export type SignInAudience = 'club' | 'player' | 'admin'
 
 const HEADERS = {
   'Cache-Control': 'private, no-store',
@@ -24,6 +24,7 @@ const fail = (status: number, code: string, message: string) =>
 const INVALID: Record<SignInAudience, string> = {
   admin: 'Email or password is incorrect.',
   club: 'Username or password is incorrect.',
+  player: "That email and password don't match. Check them and try again.",
 }
 
 function withoutMockCookies(cookies: CookieAdapter): CookieAdapter {
@@ -33,13 +34,21 @@ function withoutMockCookies(cookies: CookieAdapter): CookieAdapter {
   }
 }
 
-/** The session body each app's existing hooks read: Queue `MockSession`, Admin `AdminSession`. */
+/** The session body each app's existing hooks read: Queue/Player `MockSession`, Admin `AdminSession`. */
 async function sessionBody(audience: SignInAudience, subject: string, email: string | null) {
   const context = await loadAccountContext({ provider: AUTH_PROVIDER, subject }, audience)
   if (audience === 'admin') {
     if (!context || context.kind !== 'admin')
       return { kind: 'denied', accountDescription: email ?? 'This account' }
     return { kind: 'owner', account: { id: context.adminId, email: email ?? '' } }
+  }
+  if (audience === 'player') {
+    if (!context || context.kind !== 'player') return null
+    const player = await prisma.player.findUniqueOrThrow({
+      where: { id: context.playerId },
+      select: { id: true, fullName: true },
+    })
+    return { account: { id: player.id, name: player.fullName, audience: 'player' } }
   }
   if (!context || context.kind !== 'club') return null
   const club = await prisma.club.findUniqueOrThrow({
@@ -50,9 +59,11 @@ async function sessionBody(audience: SignInAudience, subject: string, email: str
 }
 
 /**
- * POST sign-in. Real data mode only. Club usernames map to their provider login email; the
- * Supabase session cookies are set through `cookies`. A club credential that maps to no provisioned
- * club is signed out again and refused; an Admin one without platform authority gets `denied`.
+ * POST sign-in. Real data mode only. Club usernames map to their provider login email; players
+ * sign in with their email only (a phone number is never looked up). The Supabase session cookies
+ * are set through `cookies`. A club or player credential that maps to no usable account is signed
+ * out again and refused with the same generic error; an Admin one without platform authority gets
+ * `denied`.
  */
 export async function handleSignIn(
   audience: SignInAudience,
@@ -68,7 +79,9 @@ export async function handleSignIn(
       'invalid',
       audience === 'club'
         ? 'Enter your club username and password.'
-        : 'Enter your sign-in details.',
+        : audience === 'player'
+          ? 'Enter your email and password.'
+          : 'Enter your sign-in details.',
     )
   const supabase = createSupabaseServer(withoutMockCookies(cookies), audience)
   const email = audience === 'club' ? clubLoginEmail(identifier) : identifier.toLowerCase()

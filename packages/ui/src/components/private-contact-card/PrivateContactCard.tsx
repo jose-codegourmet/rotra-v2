@@ -48,9 +48,7 @@ export function PrivateContactCard(props: PrivateContactCardProps) {
             { label: 'Email', value: <span className="font-mono">{email || 'Not given'}</span> },
             {
               label: 'Sign in with',
-              value: claimed
-                ? 'Phone number or email'
-                : "Nothing yet. The player hasn't registered.",
+              value: claimed ? 'Email' : "Nothing yet. The player hasn't registered.",
             },
             { label: 'Phone shown to clubs', value: phoneShownToClubs(props) },
           ]}

@@ -4,7 +4,7 @@
 
 | Module | Surfaces |
 |---|---|
-| [Access and registration](access-registration.md) | Phone/email login, operator-issued profile claim, email password recovery |
+| [Access and registration](access-registration.md) | Email login, operator-issued profile claim, email password recovery |
 | [Profile](profile.md) | Public identity, own profile, permitted personal editing |
 | [Identity and privacy](identity-privacy.md) | Permanent ID/QR, hidden phone, approved contact-change request |
 | [Ranking and history](ranking-history.md) | Overall leaderboard, rank explanation, eligibility/reassessment, match history |
@@ -30,7 +30,7 @@ Layout and copy choices it makes, recorded here as **proposals** (the business r
 | P-ID-QR | Large QR holding only the ID text, the ID in large mono type, **Copy ID**, and a breakdown of each part of the ID. |
 | P-PHONE-PRIVACY + P-CONTACT-REQUEST | One **Privacy and contact** page: the phone switch with a separate saved-state line, then contact details and **Request a change** (a sheet with Phone/Email, current value, new value and the Admin-approval notice). One open request at a time; its status shows as Waiting for review, Approved · being applied, Applied, Needs attention or Not approved. |
 | P-EDIT-PROFILE | Sections in a left-hand menu (tabs across the top on phones): **Name**, **Playing style** (style and experience), **Links**, and **Account** (read-only phone, email and player ID, with **Request a phone or email change**). One draft and one **Save changes** cover all sections. A section shows a dot for unsaved edits and a count of fields to fix; saving with errors opens the first section that has them. |
-| P-LOGIN, P-CONTACT-REQUEST | Phone input mask: once the field holds only phone characters, digits are grouped as typed (`0917 555 0142`, `+63 917 555 0142`). Email text is left as typed. The mask is display only; normalization still follows the identity rules. |
+| P-CONTACT-REQUEST | Phone input mask: once the field holds only phone characters, digits are grouped as typed (`0917 555 0142`, `+63 917 555 0142`). Email text is left as typed. The mask is display only; normalization still follows the identity rules. |
 | P-CLAIM | Two steps: **Is this you?** (name, nickname, RTR ID, phone partly hidden as `+63 918 ••• ••77`) with **Yes, this is me** / **This isn't me**, then the registration form. The preset phone is read-only with a help hint. No password minimum is set; the confirmation must match. |
 
 Placeholders for decisions that remain open (see [open decisions](../../open-decisions.md)): links are shown publicly; playing style is free text; fun and partial games appear in a separate history tab; the eligibility window is described only as "the last three months". The prototype's **Prototype** button, timers and fictional data are not product features.

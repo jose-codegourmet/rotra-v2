@@ -6,7 +6,7 @@ import { delay } from '../mock/latency'
 import { type MockState, readMockState } from '../mock/store'
 import { requireClubAccess } from '../mock/transaction'
 import { isRealDataMode } from '../real/mode'
-import { realGetClubPlayers } from '../real/queue'
+import { realCreatePlayerInvite, realGetClubPlayers } from '../real/queue'
 import type { ClubPlayer } from './clubPlayer.types'
 import { deriveSavedPlayerStats } from './savedPlayerStats.rules'
 export type ClubPlayerFilters = {
@@ -161,6 +161,7 @@ export async function createPlayerInvite(clubPlayerId: string) {
   const player = await getClubPlayer(clubPlayerId)
   if (!['guest', 'unclaimed'].includes(player.identity))
     throw new MockError('permission', 'This player does not need an invite.')
+  if (isRealDataMode()) return realCreatePlayerInvite(player)
   let hash = 2166136261
   for (const letter of `${player.id}${player.fullName}`) {
     hash ^= letter.charCodeAt(0)

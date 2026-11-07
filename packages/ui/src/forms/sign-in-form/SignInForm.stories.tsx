@@ -10,9 +10,10 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 export const Empty: Story = {}
-export const Phone: Story = {
-  args: { defaultValues: { identifier: signInExamples.international } },
+export const Email: Story = {
+  args: { defaultValues: { email: signInExamples.email } },
 }
+export const PrototypeHints: Story = { args: { prototypeHints: true } }
 export const RequiredErrors: Story = {
   play: async ({ canvasElement }) => {
     canvasElement.querySelector<HTMLButtonElement>('button[type="submit"]')?.click()
@@ -21,7 +22,7 @@ export const RequiredErrors: Story = {
 export const ServerError: Story = {
   args: {
     serverError: playerAccessScenarios.credentialError,
-    defaultValues: { identifier: signInExamples.unknownEmail },
+    defaultValues: { email: signInExamples.unknownEmail },
   },
 }
 export const SuccessNote: Story = { args: { successNote: playerAccessScenarios.successNote } }

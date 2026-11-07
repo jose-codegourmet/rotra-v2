@@ -42,3 +42,16 @@ Every decision entry must include:
 - **Guest review:** Queue master owns every identity decision. Suggest only lightweight, limited candidate matches: search the club's saved players first, then the global player directory when online. Never scan or fetch every similarly named player, and never auto-link based on a name. The queue master explicitly confirms a match or creates a new unclaimed player; preserve session history for later claiming. No mandatory region filter.
 - **Out of scope:** expensive fuzzy matching, exhaustive same-name searches, automatic identity linking.
 - **References:** [Queue offline rules](business_logic/product/queue/modules/offline/README.md), [MVP roadmap](MVP-ROADMAP.md), [#246](https://github.com/jose-codegourmet/rotra-v2/issues/246). Existing offline docs still allow offline session start and must be reconciled in the implementation ticket.
+
+## Admin implementation gap index (2026-11-07)
+
+This is an inventory, **not** a claim that each gap has a dedicated implementation ticket.
+
+| Gap | Decision / implementation state | Ticket coverage | MVP relevance |
+| --- | --- | --- | --- |
+| Contact-change approve, retry, status | Partially connected; decline and reads exist | [#244](https://github.com/jose-codegourmet/rotra-v2/issues/244) and [Admin requests epic #25](https://github.com/jose-codegourmet/rotra-v2/issues/25); confirm dedicated implementation ticket | MVP |
+| Manual player reset link from Admin | Approved; not started | **Ticket needed**; see D-2026-11-07-01 | MVP |
+| Ranking calculations from saved settings | Settings persist; calculations incomplete | [#247](https://github.com/jose-codegourmet/rotra-v2/issues/247) and [Admin configuration epic #26](https://github.com/jose-codegourmet/rotra-v2/issues/26) | MVP scope under ranking decision |
+| Club accent persistence | Open product/data-model decision; not completed | [#395](https://github.com/jose-codegourmet/rotra-v2/issues/395) | Lower priority / defer candidate |
+
+Before agents implement, verify current `main` and the relevant ticket's actual scope. Do not create duplicate issues merely because a related epic is open.

@@ -2,5 +2,5 @@
 import { useMockMutation } from '../mock/query'
 import { addDirectoryPlayerToSession } from './mutations'
 export function useAddDirectoryPlayerToSession() {
-  return useMockMutation(addDirectoryPlayerToSession)
+  return useMockMutation(addDirectoryPlayerToSession, { backgroundRefresh: true })
 }

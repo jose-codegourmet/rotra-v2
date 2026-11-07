@@ -1,8 +1,11 @@
 'use client'
 
 import {
-  activeMatches,
+  activeMatchFor,
+  countedGames,
+  courtMatches,
   courtOpen,
+  courtsNeeded,
   FORMAT_LABELS,
   freeCourts,
   isBookingEnded,
@@ -12,10 +15,13 @@ import {
   openedEarly,
   shortName,
   waitingMatches,
+  waitMinutes,
 } from '@rotra/data/match/match.rules'
 import type { Match } from '@rotra/data/match/types'
+import { usePlaceOnCourt } from '@rotra/data/match/usePlaceOnCourt'
 import { useRemoveWaitingMatch } from '@rotra/data/match/useRemoveWaitingMatch'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
+import { useStartMatch } from '@rotra/data/match/useStartMatch'
 import type { SessionCourt } from '@rotra/data/queue-session/types'
 import { useOpenAllCourtsEarly } from '@rotra/data/queue-session/useOpenAllCourtsEarly'
 import { useOpenCourtEarly } from '@rotra/data/queue-session/useOpenCourtEarly'
@@ -30,12 +36,14 @@ import { Button } from '@rotra/ui/button'
 import { ConfirmSheet } from '@rotra/ui/confirm-sheet'
 import { CourtCard, type CourtCardProps } from '@rotra/ui/court-card'
 import type { CourtPlayer } from '@rotra/ui/court-drawing'
+import type { MatchCardPlayer } from '@rotra/ui/match-card'
 import { formatTime } from '@rotra/ui/now-card/helpers'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { toast } from '@rotra/ui/toaster'
 import { type UpcomingQueueMatch, UpcomingQueueRow } from '@rotra/ui/upcoming-queue-row'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
+import { OnCourt } from '@/app/(operator)/sessions/[sessionId]/_components/on-court/OnCourt'
 
 export type SessionViewProps = {
   sessionId: string
@@ -53,20 +61,30 @@ export type SessionViewProps = {
   onEditMatch?: (matchId: string) => void
   /** Add match on a free court card with nothing to start: open the Add match sheet (Queue › Match editing). Hidden until given. */
   onAddMatch?: () => void
-  /** Review and start on a free court (with that court) or Start on an upcoming queue card (no court): open the Start match sheet (Queue › Match control). Hidden until given. */
+  /**
+   * Put on court for a 5v5 on a free court (with that court) or Put on court on an upcoming queue
+   * card (no court): open the Put on court sheet (Queue › Match control). A one-court match's Put on
+   * court on a free court places it straight away. Hidden until given.
+   */
   onStartMatch?: (matchId: string, courtId?: string) => void
   /** Pick another on a free court: open the Start a match on Court X sheet (Queue › Match control). Hidden until given. */
   onPickAnother?: (courtId: string) => void
-  /** Open match on an in-game court card: open the active match sheet (Queue › Match control). Hidden until given. */
+  /** Open match on a Playing court card: open the active match sheet (Queue › Match control). Hidden until given. A Getting ready card's Open match opens the On court sheet here. */
   onOpenMatch?: (matchId: string) => void
 }
 
 /**
  * Q-COURTS, the console's Session view: "Courts" with "F of C free", one CourtCard per court from
- * the match rules (in game, or free with the next eligible match or why none can start), the
- * + Add court tile, the footer line, then UpcomingQueueRow with the whole waiting queue. The court
- * actions (Review and start, Pick another, Open match, Add match) and Start on a queue card are
- * wired by Queue › Match control; here the pictures, More queues, Remove on a free court and Remove
+ * the match rules in one of three states (Free with the next eligible match or why none can go on,
+ * Getting ready for a match On court, Playing), each court face with its game badge, the
+ * + Add court tile, the footer line, then UpcomingQueueRow with the whole waiting queue, each name
+ * with its wait timer (minutes since the last game, or On court / Playing / Not here) while the
+ * session is live.
+ * Put on court on a free court places a one-court match straight away (usePlaceOnCourt, "Match N on
+ * Court X · getting ready"); a 5v5 opens the Put on court sheet for its second court. Start match on
+ * a Getting ready card is one tap (useStartMatch, "Match N started on Court X"); its Open match
+ * opens the On court sheet (OnCourt). Pick another, Open match on a Playing court, Add match and
+ * Put on court on a queue card are wired by the shell; here the pictures, More queues, Remove on a free court and Remove
  * on a queue card act, Edit appears once onEditMatch is given and a free court's Add match once
  * onAddMatch is given (both Queue › Match editing). Both
  * removes go straight to their mutation with a toast and no dialog (per dialogs.md): a court with
@@ -98,6 +116,12 @@ export function SessionView({
   const openCourtEarly = useOpenCourtEarly()
   const openAllCourtsEarly = useOpenAllCourtsEarly()
   const undoEarlyOpen = useUndoCourtEarlyOpen()
+  const placeOnCourt = usePlaceOnCourt()
+  const startMatch = useStartMatch()
+  // One placement or start per tap: a second tap can land before isPending reaches this render.
+  const committing = useRef(false)
+  /** The On court match whose sheet is open (Open match on a Getting ready card) */
+  const [onCourtId, setOnCourtId] = useState<string | null>(null)
   /** The Start anyway confirmation: one court, or every not-open court (Open all courts now) */
   const [opening, setOpening] = useState<{ courtId: string | null } | null>(null)
   const [openError, setOpenError] = useState<string | undefined>()
@@ -143,10 +167,30 @@ export function SessionView({
       level: p?.level ?? null,
     }
   }
+  /** A court face: the game badge shows the player's counted games this session */
+  const courtPlayer = (id: string): CourtPlayer => ({
+    ...player(id),
+    games: countedGames(id, ctx.matches),
+  })
   const names = (ids: string[]) => ids.map((id) => player(id).shortName)
+  const live = s.state === 'active'
+  /** A queue face: the wait timer while the session is live (prototype queueCard wait()) */
+  const queuePlayer = (id: string): MatchCardPlayer => {
+    if (!live) return player(id)
+    const p = byId(id)
+    const busy = activeMatchFor(id, ctx.matches)
+    return {
+      ...player(id),
+      wait: busy
+        ? { kind: busy.state === 'on_court' ? 'on-court' : 'playing' }
+        : !p || !p.present
+          ? { kind: 'not-here' }
+          : { kind: 'minutes', minutes: waitMinutes(p, ctx.matches, s.startedAt, now) },
+    }
+  }
 
   const waiting = waitingMatches(ctx.matches)
-  const active = activeMatches(ctx.matches)
+  const onCourts = courtMatches(ctx.matches)
   const free = freeCourts(courts, ctx.matches, now)
   const untilLabel = (c: SessionCourt) =>
     `${formatTime(c.openUntil ?? s.scheduledEndAt)}${courtNextDay(c.openUntil ?? s.scheduledEndAt, s.scheduledStartAt) ? ' · next day' : ''}`
@@ -161,7 +205,6 @@ export function SessionView({
     if (removeCourt.isPending) return
     removeCourt.mutate({ sessionId, courtId: c.id }, options)
   }
-  const live = s.state === 'active'
   const notOpenCourts = courts.filter((c) => !courtOpen(c, now))
   const canOpenCourt = live && notOpenCourts.length > 0
   const startAnyway = (courtId: string | null) => {
@@ -198,18 +241,39 @@ export function SessionView({
     if (removeWaitingMatch.isPending) return
     removeWaitingMatch.mutate({ sessionId, matchId: m.id }, options)
   }
+  const commit = {
+    ...options,
+    onSettled: () => {
+      committing.current = false
+    },
+  }
+  /** Put on court on a free court: one court places straight away; a 5v5 needs the sheet for its second court */
+  const putOnCourt = (m: Match, courtId: string) => {
+    if (courtsNeeded(m) === 2) return onStartMatch?.(m.id, courtId)
+    if (committing.current || placeOnCourt.isPending) return
+    committing.current = true
+    placeOnCourt.mutate(
+      { matchId: m.id, courtIds: [courtId], operationId: crypto.randomUUID() },
+      commit,
+    )
+  }
+  /** Start match on a Getting ready card: one tap; the owner rechecks presence and busy players */
+  const startOnCourt = (m: Match) => {
+    if (committing.current || startMatch.isPending) return
+    committing.current = true
+    startMatch.mutate({ matchId: m.id, courtIds: [], operationId: crypto.randomUUID() }, commit)
+  }
 
   // A 5v5 on two courts draws once, as one merged card, under its first court.
   const covered = new Set<string>()
   const cards: CourtCardProps[] = []
   for (const c of courts) {
     if (covered.has(c.id)) continue
-    const m: Match | undefined = active.find((x) => x.courtIds.includes(c.id))
+    const m: Match | undefined = onCourts.find((x) => x.courtIds.includes(c.id))
     if (m) {
       const merged = m.courtIds.length > 1
       for (const id of m.courtIds) covered.add(id)
-      cards.push({
-        variant: 'in-game',
+      const base = {
         label: merged
           ? m.courtIds.map((id) => courts.find((x) => x.id === id)?.label ?? 'Court').join(' + ')
           : c.label,
@@ -217,19 +281,34 @@ export function SessionView({
         startLabel: startLabel(c),
         merged,
         bookingEnded: isBookingEnded(c, s.scheduledEndAt, now),
-        teamA: m.teamA.map(player),
-        teamB: m.teamB.map(player),
+        teamA: m.teamA.map(courtPlayer),
+        teamB: m.teamB.map(courtPlayer),
         onOpenProfile: openProfile,
         formatLabel: FORMAT_LABELS[m.format],
         matchNo: m.matchNo,
+        ...menuFor(c),
+      }
+      if (m.state === 'on_court') {
+        const status = matchStatus(m, ctx)
+        cards.push({
+          ...base,
+          variant: 'on-court',
+          blockedReason: status.kind === 'ready' ? undefined : status.reason,
+          onStartMatch: () => startOnCourt(m),
+          onOpenMatch: () => setOnCourtId(m.id),
+        })
+        continue
+      }
+      cards.push({
+        ...base,
+        variant: 'in-game',
         minutes: Math.max(0, Math.round((now - (m.startedAt ?? now)) / 60000)),
         substitutions: m.substitutions.length,
         onOpenMatch: onOpenMatch ? () => onOpenMatch(m.id) : undefined,
-        ...menuFor(c),
       })
       continue
     }
-    const next = nextEligibleForCourt(c.id, ctx)
+    const next = nextEligibleForCourt(c.id, ctx, s)
     const eligible = next.match
     const first = waiting[0]
     cards.push({
@@ -251,9 +330,12 @@ export function SessionView({
             teamB: names(next.match.teamB),
           }
         : null,
+      notEnoughFreePlayers: next.notEnoughFreePlayers,
       blockedReason: !next.match && first ? matchStatus(first, ctx).reason : undefined,
-      onReviewAndStart:
-        eligible && onStartMatch ? () => onStartMatch(eligible.id, c.id) : undefined,
+      onPutOnCourt:
+        eligible && (courtsNeeded(eligible) === 1 || onStartMatch)
+          ? () => putOnCourt(eligible, c.id)
+          : undefined,
       onPickAnother:
         eligible && waiting.length > 1 && onPickAnother ? () => onPickAnother(c.id) : undefined,
       onAddMatch,
@@ -267,8 +349,8 @@ export function SessionView({
     origin: m.origin,
     manualProtected: m.manualProtected,
     status: matchStatus(m, ctx),
-    teamA: m.teamA.map(player),
-    teamB: m.teamB.map(player),
+    teamA: m.teamA.map(queuePlayer),
+    teamB: m.teamB.map(queuePlayer),
     onSelectPlayer: openProfile,
     onStart: onStartMatch ? () => onStartMatch(m.id) : undefined,
     canOpenCourt,
@@ -325,6 +407,12 @@ export function SessionView({
         onConfirm={onConfirmOpen}
         isPending={openCourtEarly.isPending || openAllCourtsEarly.isPending}
         error={openError}
+      />
+      <OnCourt
+        sessionId={sessionId}
+        now={now}
+        matchId={onCourtId}
+        onClose={() => setOnCourtId(null)}
       />
     </>
   )

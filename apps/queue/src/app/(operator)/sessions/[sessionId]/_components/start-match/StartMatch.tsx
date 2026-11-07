@@ -13,8 +13,8 @@ import {
   waitingMatches,
 } from '@rotra/data/match/match.rules'
 import type { Match } from '@rotra/data/match/types'
+import { usePlaceOnCourt } from '@rotra/data/match/usePlaceOnCourt'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
-import { useStartMatch } from '@rotra/data/match/useStartMatch'
 import { useSwapPlayers } from '@rotra/data/match/useSwapPlayers'
 import { MockError } from '@rotra/data/mock/errors'
 import type { QueueSession } from '@rotra/data/queue-session/types'
@@ -33,9 +33,9 @@ import { PlayerProfile } from '@/app/(operator)/sessions/[sessionId]/_components
 import { useNow } from '@/lib/useNow'
 
 /**
- * What opened the sheets: Start match for a waiting match (Review and start names its court, Start
- * on a queue card leaves it to the first free court, Start here names the court picked another
- * for), or Pick another on a free court.
+ * What opened the sheets: Put on court for a waiting match (a 5v5's Put on court on a free court
+ * names that court, Put on court on a queue card leaves it to the first free court, a 5v5's Start
+ * here names the court picked another for), or Pick another on a free court.
  */
 export type StartMatchRequest =
   | { mode: 'start'; matchId: string; courtId?: string }
@@ -45,7 +45,7 @@ export type StartMatchProps = {
   sessionId: string
   /** The open request; null keeps both sheets closed */
   request: StartMatchRequest | null
-  /** Start here in Pick another: the shell replaces the request with the Start match one */
+  /** Start here on a 5v5 in Pick another: the shell replaces the request with the Put on court one */
   onRequestChange: (request: StartMatchRequest) => void
   onClose: () => void
 }
@@ -58,20 +58,23 @@ const errorMessage = (error: unknown) =>
 /** The recheck at confirmation refused the start: the sheet stays open with refreshed data */
 const isRecheckFailure = (error: unknown) => error instanceof MockError && error.kind === 'conflict'
 /**
- * Q-DISPATCH / D-START-MATCH and Q-CHOOSE-MATCH: StartMatchSheet on useStartMatch for a waiting
- * match, opened from Review and start (that court preselected), Start on a queue card (the first
- * free court) or Start here in ChooseMatchSheet (that court); a 5v5 preselects a second free court.
- * Each open gets a fresh operationId, so repeated taps cannot start twice. Success toasts
- * "Match N started on Court X" (offline: " · Saved on this device, waiting to sync") and closes;
- * "Something changed. Review the match again." toasts, stays open and refetches the session, roster
- * and matches so the sheet shows what changed. A local save failure ("Changes could not be saved")
- * is an error toast and an error inside the sheet: the match stays waiting, the chosen courts stay
- * chosen and Start match retries the same operationId.
+ * Q-DISPATCH / D-START-MATCH (Put match N on court) and Q-CHOOSE-MATCH: StartMatchSheet on
+ * usePlaceOnCourt for a waiting match, opened from Put on court on a queue card (the first free
+ * court), or for a 5v5 from Put on court on a free court or Start here in ChooseMatchSheet (that
+ * court, plus a second free court). A one-court match's Start here puts it on that court straight
+ * away, as the prototype's placeOnCourt does. Nothing starts here: the match goes On court
+ * (getting ready) and is started from its court card or the On court sheet.
+ * Each open gets a fresh operationId, so repeated taps cannot place twice. Success toasts
+ * "Match N on Court X · getting ready" (offline: " · Saved on this device, waiting to sync") and
+ * closes; "Something changed. Review the match again." toasts, stays open and refetches the session,
+ * roster and matches so the sheet shows what changed. A local save failure ("Changes could not be
+ * saved") is an error toast and an error inside the sheet: the match stays waiting, the chosen
+ * courts stay chosen and Put on court retries the same operationId.
  * Courts before their planned start are listed under "Not open yet": Start anyway calls
  * useOpenCourtEarly ("Court 4 opened early · planned HH:MM") and chooses that court.
  * Switching sides calls useSwapPlayers (the waiting match becomes protected, toast as in the Queue
  * view); a player card opens PlayerProfile with Back to match, which returns to the same sheet.
- * No match ever starts without this confirmation.
+ * No match is ever put on court without this confirmation or an explicit Put on court tap.
  */
 export function StartMatch({ sessionId, request, onRequestChange, onClose }: StartMatchProps) {
   const now = useNow(1000, false, true)
@@ -100,7 +103,7 @@ export function StartMatch({ sessionId, request, onRequestChange, onClose }: Sta
         courtId={request.courtId}
         ctx={ctx}
         onClose={onClose}
-        onStartHere={(matchId) =>
+        onOpenPutOnCourt={(matchId) =>
           onRequestChange({ mode: 'start', matchId, courtId: request.courtId })
         }
       />
@@ -129,12 +132,40 @@ type ChooseMatchProps = {
   courtId: string
   ctx: MatchContext
   onClose: () => void
-  onStartHere: (matchId: string) => void
+  /** A 5v5 needs a second court, so it goes through the Put on court sheet */
+  onOpenPutOnCourt: (matchId: string) => void
 }
 
-/** Q-CHOOSE-MATCH: every waiting match in queue order, Start here on the ready ones */
-function ChooseMatch({ courtId, ctx, onClose, onStartHere }: ChooseMatchProps) {
+/**
+ * Q-CHOOSE-MATCH: every waiting match in queue order, Start here on the ready ones. A one-court
+ * match goes straight on this court (usePlaceOnCourt, "Match N on Court X · getting ready"); a 5v5
+ * opens the Put on court sheet for its second court.
+ */
+function ChooseMatch({ courtId, ctx, onClose, onOpenPutOnCourt }: ChooseMatchProps) {
+  const placeOnCourt = usePlaceOnCourt()
+  // One placement per tap: a second tap can land before isPending reaches this render.
+  const placing = useRef(false)
   const court = ctx.courts.find((c) => c.id === courtId)
+  const onStartHere = (matchId: string) => {
+    const match = ctx.matches.find((m) => m.id === matchId)
+    if (!match) return
+    if (courtsNeeded(match) === 2) return onOpenPutOnCourt(matchId)
+    if (placing.current || placeOnCourt.isPending) return
+    placing.current = true
+    placeOnCourt.mutate(
+      { matchId, courtIds: [courtId], operationId: crypto.randomUUID() },
+      {
+        onSuccess: (result) => {
+          toast(result.message)
+          onClose()
+        },
+        onError: (failure) => toast.error(errorMessage(failure)),
+        onSettled: () => {
+          placing.current = false
+        },
+      },
+    )
+  }
   const names = (ids: string[]) =>
     listNames(
       ids.map((id) => {
@@ -195,7 +226,7 @@ function OpenStartMatch({
   onClose,
   onRefresh,
 }: OpenStartMatchProps) {
-  const startMatch = useStartMatch()
+  const placeOnCourt = usePlaceOnCourt()
   const swapPlayers = useSwapPlayers()
   const openCourtEarly = useOpenCourtEarly()
   const [operationId] = useState(() => crypto.randomUUID())
@@ -203,8 +234,8 @@ function OpenStartMatch({
   const [message, setMessage] = useState<string | undefined>()
   const [error, setError] = useState<string | undefined>()
   const [profileId, setProfileId] = useState<string | null>(null)
-  // One start per attempt: a second tap can land before isPending reaches this render.
-  const starting = useRef(false)
+  // One placement per attempt: a second tap can land before isPending reaches this render.
+  const placing = useRef(false)
 
   const byId = (id: string) => ctx.roster.find((p) => p.id === id)
   const player = (id: string): TeamLineupPlayer => {
@@ -231,7 +262,7 @@ function OpenStartMatch({
     }))
 
   const onStartAnyway = (courtId: string) => {
-    if (openCourtEarly.isPending || startMatch.isPending) return
+    if (openCourtEarly.isPending || placeOnCourt.isPending) return
     openCourtEarly.mutate(
       { sessionId, courtId },
       {
@@ -250,7 +281,7 @@ function OpenStartMatch({
   }
 
   const onSwap = (from: SwapSlot, to: SwapSlot) => {
-    if (from.team === to.team || swapPlayers.isPending || startMatch.isPending) return
+    if (from.team === to.team || swapPlayers.isPending || placeOnCourt.isPending) return
     const a = (from.team === 'A' ? match.teamA : match.teamB)[from.index]
     const b = (to.team === 'A' ? match.teamA : match.teamB)[to.index]
     if (!a || !b) return
@@ -264,11 +295,11 @@ function OpenStartMatch({
   }
 
   const onStart = () => {
-    if (starting.current || startMatch.isPending) return
-    starting.current = true
+    if (placing.current || placeOnCourt.isPending) return
+    placing.current = true
     setMessage(undefined)
     setError(undefined)
-    startMatch.mutate(
+    placeOnCourt.mutate(
       { matchId: match.id, courtIds, operationId },
       {
         onSuccess: (result) => {
@@ -282,12 +313,12 @@ function OpenStartMatch({
             onRefresh()
           } else {
             // A save failure wrote nothing: the match is still waiting and the courts stay chosen,
-            // so Start match retries the same operationId.
+            // so Put on court retries the same operationId.
             setError(errorMessage(failure))
           }
         },
         onSettled: () => {
-          starting.current = false
+          placing.current = false
         },
       },
     )
@@ -323,7 +354,7 @@ function OpenStartMatch({
         onSwap={onSwap}
         onBack={onClose}
         onStart={onStart}
-        isPending={startMatch.isPending}
+        isPending={placeOnCourt.isPending}
         message={message}
         error={error}
       />

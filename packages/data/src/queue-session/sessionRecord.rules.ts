@@ -30,6 +30,12 @@ export type RecordMatch = {
   teamBScore: number | null
   invalid: boolean
   substitutions: number
+  /** One entry per substitution, oldest first, with who got the game (QM choice) */
+  substitutionCredits: {
+    outName: string
+    inName: string
+    creditTo: 'nobody' | 'incoming' | 'outgoing'
+  }[]
 }
 /** Q-HISTORY › How the night ran: the courts, every match that ran, and the replay's time bounds. */
 export type SessionRecordHistory = {
@@ -83,6 +89,11 @@ export function sessionRecordHistory(input: {
     teamBScore: m.decision?.teamBScore ?? null,
     invalid: m.state === 'invalid',
     substitutions: m.substitutions.length,
+    substitutionCredits: m.substitutions.map((sub) => ({
+      outName: playerOf(sub.outId).name,
+      inName: playerOf(sub.inId).name,
+      creditTo: !sub.creditTo || sub.creditTo === 'none' ? 'nobody' : sub.creditTo,
+    })),
   }))
   const from = matches.length ? Math.min(...matches.map((m) => m.startedAt)) : input.fallbackStart
   const to = Math.max(from + MINUTE, ...matches.map((m) => m.endedAt))

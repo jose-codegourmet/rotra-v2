@@ -10,5 +10,11 @@ export const setupDetailsSectionMeta = {
     screen: 'Q-SETUP › viewSetup() part 0 (Details)',
   },
   docs: ['docs/screens/product/modules/queue/session-setup.md'],
-  related: ['SessionSetupForm', 'SetupCourtsSection', 'RepeatSchedulePanel', 'ClashNotice', 'DateTimePicker'],
+  related: [
+    'SessionSetupForm',
+    'SetupCourtsSection',
+    'RepeatSchedulePanel',
+    'ClashNotice',
+    'DateTimePicker',
+  ],
 } satisfies ComponentMeta

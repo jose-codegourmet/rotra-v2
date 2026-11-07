@@ -4,20 +4,20 @@ import { registeredCity } from '@rotra/data/club-player/fetchers'
 import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import { slotCapacity } from '@rotra/data/queue-session/queueSession.rules'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
+import { useSessionPayments } from '@rotra/data/session-payment/useSessionPayments'
 import { useFillOpenSlots } from '@rotra/data/session-roster/useFillOpenSlots'
 import { useGiveSlot } from '@rotra/data/session-roster/useGiveSlot'
 import { useRemoveFromWaitlist } from '@rotra/data/session-roster/useRemoveFromWaitlist'
 import { useRemoveRosterPlayer } from '@rotra/data/session-roster/useRemoveRosterPlayer'
-import { useSessionPayments } from '@rotra/data/session-payment/useSessionPayments'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { useSetAllPresence } from '@rotra/data/session-roster/useSetAllPresence'
 import { useSetPresenceMany } from '@rotra/data/session-roster/useSetPresenceMany'
 import { useSetRosterLevel } from '@rotra/data/session-roster/useSetRosterLevel'
 import { PlayerProfileSheet } from '@rotra/ui/player-profile-sheet'
 import {
-  RosterPanel,
   type RosterGroupBy,
   type RosterLevelTab,
+  RosterPanel,
   type RosterPanelPlayer,
   type RosterView,
 } from '@rotra/ui/roster-panel'
@@ -108,7 +108,7 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
   const capacity = s ? slotCapacity(s.courts.length, s.playersPerCourt) : 0
 
   const paidByClubPlayer = new Map(
-    (payments.data?.players ?? []).map((p) => [p.clubPlayerId, p.paid] as const),
+    (payments.data?.players ?? []).map((p) => [p.clubPlayerId, p.paid != null] as const),
   )
   const players: RosterPanelPlayer[] = rosterList.map((r) => {
     const p = byClubPlayer(r.clubPlayerId)

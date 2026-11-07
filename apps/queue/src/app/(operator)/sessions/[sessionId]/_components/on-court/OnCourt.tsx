@@ -68,7 +68,12 @@ export function OnCourt({ sessionId, now, matchId, onClose }: OnCourtProps) {
   const s = session.data
   if (!match || match.state !== 'on_court' || !s || !roster.data || !matches.data) return null
 
-  const ctx: MatchContext = { roster: roster.data.roster, matches: matches.data, courts: s.courts, now }
+  const ctx: MatchContext = {
+    roster: roster.data.roster,
+    matches: matches.data,
+    courts: s.courts,
+    now,
+  }
   const refresh = () => {
     void session.refetch()
     void roster.refetch()

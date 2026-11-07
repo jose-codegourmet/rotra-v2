@@ -5,21 +5,22 @@ import { courtNextDay, courtWindowPreview } from '@rotra/schema/court-window'
 import { Button } from '@rotra/ui/button'
 import { ChoiceGroup } from '@rotra/ui/choice-group'
 import { cn } from '@rotra/ui/cn'
+import { DateTimePicker } from '@rotra/ui/date-time-picker'
 import { Field } from '@rotra/ui/field'
 import { Notice } from '@rotra/ui/notice'
 import { formatTime } from '@rotra/ui/now-card/helpers'
 import { Sheet } from '@rotra/ui/sheet'
 import { TextInput } from '@rotra/ui/text-input'
-import { TimeField } from '@rotra/ui/time-field'
 import { type ReactNode, type RefObject, useId, useMemo } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
-import { addCourtFormDefaultValues } from './AddCourtForm.defaultValues'
+import { addCourtFormDefaultValues, toTimeInput } from './AddCourtForm.defaultValues'
 import {
   type AddCourtFormInput,
   type AddCourtFormValues,
   COURT_LABEL_MAX,
   makeAddCourtSchema,
   type OpenUntilMode,
+  timeOnSession,
 } from './AddCourtForm.schema'
 
 export type AddCourtFormProps = {
@@ -97,6 +98,9 @@ export function AddCourtForm({
   })
   const { errors } = form.formState
   const [typedLabel, mode, time, startTime] = form.watch(['label', 'mode', 'time', 'startTime'])
+  const plannedStart = startTime ? timeOnSession(sessionStartsAt, startTime) : sessionStartsAt
+  const closesAtPicked = time ? timeOnSession(sessionStartsAt, time) : null
+  const days = [sessionStartsAt, sessionEndsAt]
   const label = (typedLabel ?? '').trim() || defaultLabel
   // Parse the watched values through submit's schema, so errors and offending fields agree.
   const parsed = schema.safeParse({ label: typedLabel ?? '', mode, time, startTime })
@@ -216,11 +220,19 @@ export function AddCourtForm({
               control={form.control}
               name="startTime"
               render={({ field }) => (
-                <TimeField
-                  {...field}
+                <DateTimePicker
+                  ref={field.ref}
+                  name={field.name}
+                  onBlur={field.onBlur}
+                  label="Planned start"
+                  value={plannedStart}
+                  onChange={(next) => next != null && field.onChange(toTimeInput(next))}
+                  days={days}
+                  base={sessionStartsAt}
+                  min={sessionStartsAt}
+                  max={sessionEndsAt - 1}
                   disabled={isPending || lockedStartsAt !== undefined}
                   invalid={!!startError}
-                  aria-label="Planned start"
                 />
               )}
             />
@@ -257,14 +269,20 @@ export function AddCourtForm({
                 control={form.control}
                 name="time"
                 render={({ field }) => (
-                  <TimeField
-                    {...field}
+                  <DateTimePicker
+                    ref={field.ref}
+                    name={field.name}
+                    onBlur={field.onBlur}
+                    label="Open until"
+                    value={closesAtPicked}
+                    onChange={(next) => field.onChange(next == null ? '' : toTimeInput(next))}
+                    days={days}
+                    base={sessionStartsAt}
+                    min={plannedStart + MINUTE}
+                    max={sessionEndsAt}
+                    fallback={sessionEndsAt}
                     disabled={isPending}
-                    aria-label="Open until"
-                    aria-invalid={timeError ? true : undefined}
-                    aria-describedby={timeError ? timeErrorId : undefined}
                     invalid={Boolean(timeError)}
-                    className="max-w-[180px]"
                   />
                 )}
               />

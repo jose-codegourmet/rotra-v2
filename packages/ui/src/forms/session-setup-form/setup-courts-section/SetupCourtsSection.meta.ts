@@ -3,7 +3,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const setupCourtsSectionMeta = {
   name: 'SetupCourtsSection',
   description:
-    'SessionSetupForm page 1 › Courts: the court count stepper with one label field per court, players per court, the slot budget notice and the edit-time waitlist warnings.',
+    'SessionSetupForm page 1 › Courts: the court count stepper with one label field per court with Planned start and Open until date-and-time pickers ("Session start" / "Session end" when empty; a start is never before the session start), players per court, the slot budget notice and the edit-time waitlist warnings.',
   usage: ["Rendered inside SessionSetupForm's FormProvider only."],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',
@@ -11,5 +11,5 @@ export const setupCourtsSectionMeta = {
   },
   docs: ['docs/screens/product/modules/queue/session-setup.md'],
   // Individual booking starts control dispatch; ends remain advisory.
-  related: ['SessionSetupForm', 'SetupDetailsSection', 'CountStepper'],
+  related: ['SessionSetupForm', 'SetupDetailsSection', 'CountStepper', 'DateTimePicker'],
 } satisfies ComponentMeta

@@ -126,3 +126,12 @@ export const OvernightBooking: Story = {
     defaultValues: { mode: 'time', startTime: '23:30', time: '00:30' },
   },
 }
+
+/** A court opening after midnight in an overnight session, edited: the day buttons carry "· next day". */
+export const EditingOvernightCourt: Story = {
+  args: {
+    ...OvernightBooking.args,
+    editing: true,
+    defaultValues: { mode: 'time', startTime: '00:00', time: '00:30' },
+  },
+}

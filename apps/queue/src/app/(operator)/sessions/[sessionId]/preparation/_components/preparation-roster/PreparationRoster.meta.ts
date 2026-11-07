@@ -9,6 +9,7 @@ export const preparationRosterMeta = {
     'Active Session settings reuses this container with a read-only roster: locked levels, presence text, no removal, and the existing Add player sheet. The Waitlist keeps its existing live admission controls.',
     'Rendered by SessionPreparation inside the Roster and levels and Waitlist tab panels with tab="roster" or tab="waitlist".',
     'Level changes save immediately with their toast; removing a roster player is immediate with its toast and no dialog. Each mutation toasts the mutation message and toast.error on failure.',
+    'Roster views: level tabs, Group by and List | Grid are controlled here and remembered on this device (localStorage "rotra-queue-roster-views"). Paid comes from useSessionPayments and Returning or first time from the roster flag hasPlayedAtClubBefore; both work before and after start, including the read-only Session settings roster.',
     'Saved-player details (identity, suggestion, profile fields) come from useClubPlayers by clubPlayerId; the roster entries carry the name snapshot, level and presence.',
   ],
   docs: [

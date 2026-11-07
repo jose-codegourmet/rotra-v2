@@ -15,6 +15,7 @@ import { Skeleton } from '@rotra/ui/skeleton'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { longDayLabel, sessionHref, toDateParam } from '@/lib/dates'
+import { useNow } from '@/lib/useNow'
 import { useAppSelector } from '@/store/hooks'
 import { selectAccount } from '@/store/slices/authSlice'
 import { QueryError } from '../query-error/QueryError'
@@ -38,6 +39,8 @@ export function ClubDashboard() {
   const sessions = useQueueSessions(clubId)
 
   const [now] = useState(() => Date.now())
+  // The live card's "N left" / "Planned end passed N ago" moves with the clock
+  const clock = useNow()
   const [reference, setReference] = useState(() => new Date().setHours(0, 0, 0, 0))
   const [selected, setSelected] = useState<number>()
   const [openDay, setOpenDay] = useState<number | null>(null)
@@ -111,6 +114,7 @@ export function ClubDashboard() {
       ) : live ? (
         <NowCard
           variant="live"
+          now={clock}
           title={live.title}
           venueName={live.venueName}
           startsAt={live.scheduledStartAt}

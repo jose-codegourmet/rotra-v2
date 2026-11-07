@@ -155,8 +155,8 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
   )
   useDockAction(live ? continueSession : s?.state === 'prepared' ? openStart : null)
 
-  const confirmStart = () =>
-    start.mutate(sessionId, {
+  const confirmStart = (newEndAt?: number) =>
+    start.mutate(newEndAt === undefined ? sessionId : { sessionId, newEndAt }, {
       onSuccess: (result) => {
         toast(result.message)
         router.push(`/sessions/${sessionId}`)
@@ -462,6 +462,8 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
           offline={dev.offline}
           isPending={start.isPending}
           error={start.error ? errorMessage(start.error) : undefined}
+          plannedStartAt={s.scheduledStartAt}
+          plannedEndAt={s.scheduledEndAt}
           onConfirm={confirmStart}
         />
       ) : null}

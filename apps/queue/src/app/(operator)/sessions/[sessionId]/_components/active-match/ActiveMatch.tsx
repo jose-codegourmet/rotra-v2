@@ -25,7 +25,11 @@ import type {
   MatchResultFormValues,
 } from '@rotra/ui/forms/match-result-form/schema'
 import { InvalidMatchSheet } from '@rotra/ui/invalid-match-sheet'
-import { type SubstitutionPlayer, SubstitutionSheet } from '@rotra/ui/substitution-sheet'
+import {
+  type SubstitutionCredit,
+  type SubstitutionPlayer,
+  SubstitutionSheet,
+} from '@rotra/ui/substitution-sheet'
 import type { TeamLineupPlayer } from '@rotra/ui/team-lineup'
 import { toast } from '@rotra/ui/toaster'
 import { useEffect, useRef, useState } from 'react'
@@ -45,8 +49,14 @@ type Step =
   | { kind: 'active' }
   | { kind: 'result'; input: Partial<MatchResultFormInput> }
   | { kind: 'review'; values: MatchResultFormValues; operationId: string }
-  | { kind: 'substitute'; outId: string | null; inId: string | null }
-  | { kind: 'confirm-sub'; outId: string; inId: string; operationId: string }
+  | { kind: 'substitute'; outId: string | null; inId: string | null; creditTo: SubstitutionCredit }
+  | {
+      kind: 'confirm-sub'
+      outId: string
+      inId: string
+      creditTo: SubstitutionCredit
+      operationId: string
+    }
   | { kind: 'invalid'; operationId: string }
 
 const errorMessage = (error: unknown) =>
@@ -168,6 +178,7 @@ function OpenActiveMatch({
   const substitutions = match.substitutions.map((sub) => ({
     outName: byId(sub.outId)?.nameSnapshot ?? 'Player',
     inName: byId(sub.inId)?.nameSnapshot ?? 'Player',
+    creditTo: !sub.creditTo || sub.creditTo === 'none' ? ('nobody' as const) : sub.creditTo,
   }))
 
   const go = (next: Step) => {
@@ -247,9 +258,15 @@ function OpenActiveMatch({
 
   const onConfirmSubstitution = () => {
     if (step.kind !== 'confirm-sub' || !begin()) return
-    const { outId, inId, operationId } = step
+    const { outId, inId, creditTo, operationId } = step
     substitutePlayer.mutate(
-      { matchId: match.id, outId, inId, operationId },
+      {
+        matchId: match.id,
+        outId,
+        inId,
+        creditTo: creditTo === 'nobody' ? 'none' : creditTo,
+        operationId,
+      },
       {
         onSuccess: (result) => {
           toast(result.message)
@@ -329,7 +346,10 @@ function OpenActiveMatch({
         : { id, name: 'Player', level: null, games: countedGames(id, matches), team }
     })
     const candidates = substitutionCandidates(match, roster, matches).map(substitutionPlayer)
-    const picked = step.kind === 'substitute' ? step : { outId: step.outId, inId: step.inId }
+    const picked =
+      step.kind === 'substitute'
+        ? step
+        : { outId: step.outId, inId: step.inId, creditTo: step.creditTo }
     return (
       <>
         <SubstitutionSheet
@@ -342,21 +362,35 @@ function OpenActiveMatch({
           step={step.kind === 'confirm-sub' ? 'confirm' : 'pick'}
           outId={picked.outId}
           inId={picked.inId}
-          onPickOut={(outId) => go({ kind: 'substitute', outId, inId: picked.inId })}
-          onPickIn={(inId) => go({ kind: 'substitute', outId: picked.outId, inId })}
+          creditTo={picked.creditTo}
+          onPickCredit={(creditTo) =>
+            go({ kind: 'substitute', outId: picked.outId, inId: picked.inId, creditTo })
+          }
+          onPickOut={(outId) =>
+            go({ kind: 'substitute', outId, inId: picked.inId, creditTo: picked.creditTo })
+          }
+          onPickIn={(inId) =>
+            go({ kind: 'substitute', outId: picked.outId, inId, creditTo: picked.creditTo })
+          }
           onReview={() => {
             if (picked.outId && picked.inId)
               go({
                 kind: 'confirm-sub',
                 outId: picked.outId,
                 inId: picked.inId,
+                creditTo: picked.creditTo,
                 operationId: newOperationId(),
               })
           }}
           onBack={() => go({ kind: 'active' })}
           onBackToPick={() => {
             if (!committing.current)
-              go({ kind: 'substitute', outId: picked.outId, inId: picked.inId })
+              go({
+                kind: 'substitute',
+                outId: picked.outId,
+                inId: picked.inId,
+                creditTo: picked.creditTo,
+              })
           }}
           onConfirm={onConfirmSubstitution}
           isPending={substitutePlayer.isPending}
@@ -406,7 +440,7 @@ function OpenActiveMatch({
         substitutions={substitutions}
         onSelectPlayer={openProfile}
         onMarkInvalid={() => go({ kind: 'invalid', operationId: newOperationId() })}
-        onSubstitute={() => go({ kind: 'substitute', outId: null, inId: null })}
+        onSubstitute={() => go({ kind: 'substitute', outId: null, inId: null, creditTo: 'nobody' })}
         onMatchDone={() => go({ kind: 'result', input: {} })}
       />
       {profile}

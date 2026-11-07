@@ -107,6 +107,7 @@ export function RecordNightTab({ sessionId, record }: RecordNightTabProps) {
             : null,
         invalid: m.invalid,
         substitutions: m.substitutions,
+        substitutionCredits: m.substitutionCredits,
         highlighted: onCourtAt(m, t),
       })),
   }))

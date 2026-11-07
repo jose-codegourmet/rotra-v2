@@ -9,6 +9,7 @@ import {
   realGetInventory,
   realRemoveInventoryItem,
   realSaveInventoryItem,
+  realSetInventoryStock,
   realStepInventoryStock,
 } from '../real/queue'
 import type { InventoryItem } from './inventory.types'
@@ -82,6 +83,18 @@ export function removeInventoryItem(id: string) {
     if (!item) throw new MockError('permission', 'Item not available.')
     item.removedAt = Date.now()
     return { data: item, message: `${item.name} removed from inventory` }
+  })
+}
+/** The debounced − / + save: the intended end stock (never a delta), 0 or more. */
+export function setInventoryStock({ item, stock }: { item: InventoryItem; stock: number }) {
+  if (isRealDataMode()) return realSetInventoryStock(item, stock)
+  return changeInventory((items) => {
+    const saved = items.find((i) => i.id === item.id && i.clubId === DEMO_CLUB_ID && !i.removedAt)
+    if (!saved) throw new MockError('permission', 'Item not available.')
+    if (!Number.isSafeInteger(stock) || stock < 0)
+      throw new MockError('permission', 'Stock can’t go below zero.')
+    saved.stock = stock
+    return { data: saved, message: 'Stock updated' }
   })
 }
 export function stepInventoryStock({ id, delta }: { id: string; delta: -1 | 1 }) {

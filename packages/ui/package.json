@@ -163,6 +163,8 @@
     "./short-on-players-banner": "./src/components/short-on-players-banner/ShortOnPlayersBanner.tsx",
     "./setup-step-bar": "./src/components/setup-step-bar/SetupStepBar.tsx",
     "./shared-rank-card": "./src/components/shared-rank-card/SharedRankCard.tsx",
+    "./move-match-sheet": "./src/components/move-match-sheet/MoveMatchSheet.tsx",
+    "./replace-player-sheet": "./src/components/replace-player-sheet/ReplacePlayerSheet.tsx",
     "./sheet": "./src/components/sheet/Sheet.tsx",
     "./sign-out-sheet": "./src/components/sign-out-sheet/SignOutSheet.tsx",
     "./skeleton": "./src/components/skeleton/Skeleton.tsx",

@@ -50,6 +50,15 @@ export const ValidationErrors: Story = {
   },
 }
 
+const playerLoginHref =
+  'https://player.rotra.club/login?next=https%3A%2F%2Fqueue.rotra.club%2Fs%2Ftonight%3Fjoin%3D1'
+
+/** Two choices above the form: guest (this form) or ROTRA Player login. Logging in never grants a slot. */
+export const WithPlayerLogin: Story = { args: { playerLoginHref } }
+
+/** After the ROTRA Player login: the guest form again, with the "You're back" line. */
+export const ReturnedFromLogin: Story = { args: { playerLoginHref, returned: true } }
+
 export const Filled: Story = { args: { defaultValues: filled } }
 
 export const Pending: Story = { args: { isPending: true, defaultValues: filled } }

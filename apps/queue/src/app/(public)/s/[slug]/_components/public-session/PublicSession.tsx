@@ -29,6 +29,8 @@ export type PublicSessionProps = {
    * Only the visitor's reads depend on the visitor's connection.
    */
   viewer: 'visitor' | 'operator'
+  /** ?join=1 on the visitor's link: open Request to join (back from the ROTRA Player login) */
+  openJoin?: boolean
 }
 
 const MODES = {
@@ -114,12 +116,12 @@ function publishedSlides(page: PublicSessionPage): PublicResultsSectionPublished
  * variant from the page and useMyJoinRequest); Details and "Participants · N" tabs; and, for
  * completed sessions only, the Results section with the published slides. No operator controls.
  */
-export function PublicSession({ slug, viewer }: PublicSessionProps) {
+export function PublicSession({ slug, viewer, openJoin = false }: PublicSessionProps) {
   const dev = useAppSelector(selectDev)
   const page = usePublicSession(slug, { visitor: viewer === 'visitor' })
   const mine = useMyJoinRequest(slug)
   const [tab, setTab] = useState('details')
-  const [joinOpen, setJoinOpen] = useState(false)
+  const [joinOpen, setJoinOpen] = useState(openJoin && viewer === 'visitor')
 
   const p = page.data
   // A cached copy keeps showing when a refetch fails (an offline visitor); without one, explain.
@@ -222,6 +224,8 @@ export function PublicSession({ slug, viewer }: PublicSessionProps) {
         sessionLine={`${p.title} · ${date(p.start)}, ${time(p.start)} · ${p.venue.name}`}
         open={joinOpen}
         onOpenChange={setJoinOpen}
+        returned={openJoin && viewer === 'visitor'}
+        showPlayerLogin={viewer === 'visitor'}
       />
     </main>
   )

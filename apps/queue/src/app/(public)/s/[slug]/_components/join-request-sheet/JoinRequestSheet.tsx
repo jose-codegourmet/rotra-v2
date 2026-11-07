@@ -13,6 +13,21 @@ export type JoinRequestSheetProps = {
   sessionLine: string
   open: boolean
   onOpenChange: (open: boolean) => void
+  /** Back from the ROTRA Player login: shows "You're back" above the guest form */
+  returned?: boolean
+  /** Offer Log in with ROTRA Player (the visitor's own page only, not the operator preview) */
+  showPlayerLogin?: boolean
+}
+
+/** ROTRA Player login that returns to this session's Request to join (/login?next=...&join=1). */
+function playerLoginHref() {
+  if (typeof location === 'undefined') return undefined
+  const local = location.hostname === 'localhost'
+  const back = new URL(location.pathname, location.origin)
+  back.searchParams.set('join', '1')
+  const login = new URL('/login', local ? 'http://localhost:9001' : 'https://player.rotra.club')
+  login.searchParams.set('next', back.href)
+  return login.href
 }
 
 const errorMessage = (error: unknown) =>
@@ -23,7 +38,14 @@ const errorMessage = (error: unknown) =>
  * useSendJoinRequest with one requestId per open sheet. Success closes the sheet and toasts "Request sent"; the page's card then
  * shows the sent status. A failure keeps the sheet open with serverError and what was typed.
  */
-export function JoinRequestSheet({ slug, sessionLine, open, onOpenChange }: JoinRequestSheetProps) {
+export function JoinRequestSheet({
+  slug,
+  sessionLine,
+  open,
+  onOpenChange,
+  returned = false,
+  showPlayerLogin = false,
+}: JoinRequestSheetProps) {
   const send = useSendJoinRequest(slug)
   const [serverError, setServerError] = useState<string>()
   // Bumped on every open: a fresh, empty form.
@@ -76,6 +98,8 @@ export function JoinRequestSheet({ slug, sessionLine, open, onOpenChange }: Join
         serverError={serverError}
         onCancel={() => onOpenChange(false)}
         autoFocus
+        playerLoginHref={showPlayerLogin && open ? playerLoginHref() : undefined}
+        returned={returned}
       />
     </Sheet>
   )

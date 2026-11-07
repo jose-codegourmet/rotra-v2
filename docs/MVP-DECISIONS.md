@@ -32,3 +32,13 @@ Every decision entry must include:
 - **Roadmap:** MVP — tracking convention, not a product feature
 - **Decision:** Maintain decision status, implementation status, ticket link/need, roadmap scope and references for each new decision. Keep statuses updated as work progresses, is canceled or deferred.
 - **References:** [Ways of working](ways-of-working.md), [MVP roadmap](MVP-ROADMAP.md).
+
+### D-2026-11-07-03 — Offline session boundaries and guest reconciliation
+- **Decision status:** approved
+- **Implementation status:** not started (offline working copy and guest reconciliation are not connected in real mode)
+- **Ticket:** needed; related design issue [#246](https://github.com/jose-codegourmet/rotra-v2/issues/246)
+- **Roadmap:** MVP — Offline Queue and Player identity
+- **Decision:** Session setup and start require internet. During an active session, downloaded club players and newly entered guests may be added offline, alongside offline match and score operations. Global ROTRA player search is online only. Session end/finalization requires reconnection, complete sync, and queue-master review of every unresolved guest.
+- **Guest review:** Queue master owns every identity decision. Suggest only lightweight, limited candidate matches: search the club's saved players first, then the global player directory when online. Never scan or fetch every similarly named player, and never auto-link based on a name. The queue master explicitly confirms a match or creates a new unclaimed player; preserve session history for later claiming. No mandatory region filter.
+- **Out of scope:** expensive fuzzy matching, exhaustive same-name searches, automatic identity linking.
+- **References:** [Queue offline rules](business_logic/product/queue/modules/offline/README.md), [MVP roadmap](MVP-ROADMAP.md), [#246](https://github.com/jose-codegourmet/rotra-v2/issues/246). Existing offline docs still allow offline session start and must be reconciled in the implementation ticket.

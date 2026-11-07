@@ -3,14 +3,20 @@
 import { ClashNotice } from '@rotra/ui/clash-notice'
 import { cn } from '@rotra/ui/cn'
 import { formatLongDate } from '@rotra/ui/date-picker/date-calendar/helpers'
+import { DateTimePicker } from '@rotra/ui/date-time-picker'
 import { Field } from '@rotra/ui/field'
 import { inputVariants } from '@rotra/ui/field/variants'
 import { Icon } from '@rotra/ui/icon'
 import { type RepeatOccurrence, RepeatSchedulePanel } from '@rotra/ui/repeat-schedule-panel'
 import { TextInput } from '@rotra/ui/text-input'
-import { TimeField } from '@rotra/ui/time-field'
 import { Controller, useFormContext, useWatch } from 'react-hook-form'
-import { durationMinutes, formatMinutes, isOvernight } from '../SessionSetupForm.helpers'
+import {
+  clockOf,
+  durationMinutes,
+  formatMinutes,
+  sessionDays,
+  sessionTimes,
+} from '../SessionSetupForm.helpers'
 import type { SessionSetupInput } from '../SessionSetupForm.schema'
 
 export type SetupDetailsSectionProps = {
@@ -21,6 +27,9 @@ export type SetupDetailsSectionProps = {
   onOpenVenuePicker: () => void
   onViewClash: (sessionId: string) => void
 }
+
+const MINUTE = 60_000
+const DAY = 864e5
 
 /** Page 1 › Details: title, date, times, repeats (new sessions), and the venue. */
 export function SetupDetailsSection({
@@ -36,6 +45,11 @@ export function SetupDetailsSection({
   const times = { startTime: values.startTime ?? '19:00', endTime: values.endTime ?? '22:00' }
   const repeating = mode === 'create' && values.repeat && values.repeat !== 'none'
   const single = occurrences[0]
+  const { start, end } = sessionTimes({
+    date: values.date ?? '',
+    startTime: times.startTime,
+    endTime: times.endTime,
+  })
   const everyClash = occurrences.length > 0 && occurrences.every((o) => o.clash)
   const venueError = errors.venue?.message ?? errors.venue?.venueId?.message
 
@@ -77,18 +91,43 @@ export function SetupDetailsSection({
           <Controller
             control={form.control}
             name="startTime"
-            render={({ field }) => <TimeField {...field} invalid={Boolean(errors.startTime)} />}
+            render={({ field }) => (
+              <DateTimePicker
+                ref={field.ref}
+                name={field.name}
+                onBlur={field.onBlur}
+                label="Starts"
+                value={Number.isFinite(start) ? start : null}
+                onChange={(next) => next != null && field.onChange(clockOf(next))}
+                days={Number.isFinite(start) ? [start] : []}
+                invalid={Boolean(errors.startTime)}
+              />
+            )}
           />
         </Field>
         <Field
           label="Ends"
           error={errors.endTime?.message}
-          hint={`${isOvernight(times) ? 'Ends the next day · ' : ''}${formatMinutes(durationMinutes(times))}`}
+          hint={formatMinutes(durationMinutes(times))}
         >
           <Controller
             control={form.control}
             name="endTime"
-            render={({ field }) => <TimeField {...field} invalid={Boolean(errors.endTime)} />}
+            render={({ field }) => (
+              <DateTimePicker
+                ref={field.ref}
+                name={field.name}
+                onBlur={field.onBlur}
+                label="Ends"
+                value={Number.isFinite(end) ? end : null}
+                onChange={(next) => next != null && field.onChange(clockOf(next))}
+                days={sessionDays(start, start + DAY)}
+                base={start}
+                min={start + MINUTE}
+                max={start + DAY}
+                invalid={Boolean(errors.endTime)}
+              />
+            )}
           />
         </Field>
       </div>

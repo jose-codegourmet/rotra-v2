@@ -265,3 +265,23 @@ export const FiveCourtBookingWindows: Story = {
     },
   },
 }
+
+/** An end earlier than the start: the Ends picker lists "· next day" times, no guessed hint. */
+export const OvernightSession: Story = {
+  args: {
+    initialValues: {
+      ...withVenue,
+      startTime: '22:00',
+      endTime: '00:30',
+      courtLabels: ['Court 1', 'Court 2'],
+      courtStarts: ['', '23:30'],
+      courtEnds: ['', '00:15'],
+    },
+  },
+}
+
+/** The same overnight session at phone width: court pickers with "Session start" / "Session end". */
+export const OvernightCourtWindows: Story = {
+  args: OvernightSession.args,
+  globals: { viewport: { value: 'phone' } },
+}

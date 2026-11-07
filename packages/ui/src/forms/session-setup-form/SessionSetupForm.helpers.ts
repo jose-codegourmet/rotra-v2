@@ -47,6 +47,17 @@ export function sessionTimes(
   return { start, end, courts }
 }
 
+/** The "HH:mm" a clock-only setup field holds for a picked instant. */
+export function clockOf(instant: number): string {
+  const date = new Date(instant)
+  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
+}
+
+/** The calendar days a time field can fall on (the day of each bound), for the pickers. */
+export function sessionDays(from: number, to: number): number[] {
+  return Number.isFinite(from) && Number.isFinite(to) ? [from, to] : []
+}
+
 export function slotBudget(values: Pick<SessionSetupInput, 'courtLabels' | 'playersPerCourt'>) {
   return values.courtLabels.length * values.playersPerCourt
 }

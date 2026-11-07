@@ -7,7 +7,7 @@ export const addCourtFormMeta = {
   usage: [
     'Open it from "Add a court…" (CourtsAndTimeSheet) or the + Add court tile. Pass defaultLabel = nextCourtLabel(courts.length), the actual start once live (scheduled start in preparation) and scheduledEndAt, and optionally now (Date.now() otherwise).',
     'onSubmit receives { label, startsAt, openUntil } with openUntil null for "Until the session ends", ready for useAddCourt. The container owns the mutation, the "LABEL added · open until HH:MM" toast and serverError; a failed add keeps what was typed.',
-    'Until the date-and-time picker (Q12.24) lands, the clock-only time fields become full instants in one place, timeOnSession() (the first such clock time from the session start, via clockTimeFrom() in @rotra/schema/court-window). makeAddCourtSchema() then validates instants only: it rejects an empty time, a start before the session start or not before its end, an end not after the planned start, and an end after the session end (extend the session first).',
+    'Planned start and a set closing time use the DateTimePicker: day buttons (the session\'s day, and "· next day" for an overnight session) and only the valid 15-minute times. Planned start never offers a time before the session start; the closing time is after the planned start and not after the session end. The form still holds each as an "HH:mm", turned into a full instant by timeOnSession() (the first such clock time from the session start); makeAddCourtSchema() validates instants only: it rejects an empty time, a start before the session start or not before its end, an end not after the planned start, and an end after the session end (extend the session first).',
     'Pass editing and defaultValues to edit a booking; lockedStartsAt fixes a used start while its advisory end stays editable.',
     'The preview uses planned start to close for booking length, counts down to a future start, and shows the submit error beside its field immediately for invalid windows. Past endings remain advisory.',
     'ROTRA does not stop a game at the closing time; the court card shows it as a reminder.',
@@ -22,5 +22,5 @@ export const addCourtFormMeta = {
     'docs/coding-conventions.md#6-forms',
   ],
   // Individual booking starts control dispatch; ends remain advisory.
-  related: ['CourtsAndTimeSheet', 'ChoiceGroup', 'TimeField', 'Sheet', 'Field'],
+  related: ['CourtsAndTimeSheet', 'ChoiceGroup', 'DateTimePicker', 'Sheet', 'Field'],
 } satisfies ComponentMeta

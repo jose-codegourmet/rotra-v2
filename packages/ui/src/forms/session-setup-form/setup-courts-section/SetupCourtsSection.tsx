@@ -1,12 +1,15 @@
 'use client'
 
 import { CountStepper } from '@rotra/ui/count-stepper'
+import { DateTimePicker } from '@rotra/ui/date-time-picker'
 import { Field } from '@rotra/ui/field'
 import { Notice } from '@rotra/ui/notice'
 import { TextInput } from '@rotra/ui/text-input'
-import { TimeField } from '@rotra/ui/time-field'
 import { Controller, useFormContext, useWatch } from 'react-hook-form'
+import { clockOf, sessionDays, sessionTimes } from '../SessionSetupForm.helpers'
 import type { SessionSetupInput } from '../SessionSetupForm.schema'
+
+const MINUTE = 60_000
 
 export type SetupCourtsSectionProps = {
   /** Editing a prepared session: the roster and waitlist sizes for the budget warnings */
@@ -19,6 +22,16 @@ export function SetupCourtsSection({ editContext }: SetupCourtsSectionProps) {
   const { errors } = form.formState
   const labels = useWatch({ control: form.control, name: 'courtLabels' })
   const perCourt = useWatch({ control: form.control, name: 'playersPerCourt' })
+  const session = useWatch({ control: form.control })
+  const { start, end, courts } = sessionTimes({
+    date: session.date ?? '',
+    startTime: session.startTime ?? '',
+    endTime: session.endTime ?? '',
+    courtLabels: labels,
+    courtStarts: session.courtStarts,
+    courtEnds: session.courtEnds,
+  })
+  const days = sessionDays(start, end)
   const capacity = labels.length * perCourt
   const setCount = (n: number) => {
     const next = labels.slice(0, n)
@@ -62,16 +75,25 @@ export function SetupCourtsSection({ editContext }: SetupCourtsSectionProps) {
             <Field
               label="Planned start"
               error={errors.courtStarts?.[i]?.message}
-              hint="Blank follows the session start."
+              hint="Empty means session start."
             >
               <Controller
                 control={form.control}
                 name={`courtStarts.${i}`}
                 render={({ field }) => (
-                  <TimeField
-                    {...field}
-                    value={field.value ?? ''}
-                    aria-label={`Court ${i + 1} planned start`}
+                  <DateTimePicker
+                    ref={field.ref}
+                    name={field.name}
+                    onBlur={field.onBlur}
+                    label={`Court ${i + 1} planned start`}
+                    value={field.value ? (courts[i]?.startsAt ?? null) : null}
+                    onChange={(next) => field.onChange(next == null ? '' : clockOf(next))}
+                    days={days}
+                    base={start}
+                    min={start}
+                    max={end - 1}
+                    fallback={start}
+                    emptyLabel="Session start"
                     invalid={!!errors.courtStarts?.[i]}
                   />
                 )}
@@ -80,16 +102,25 @@ export function SetupCourtsSection({ editContext }: SetupCourtsSectionProps) {
             <Field
               label="Open until"
               error={errors.courtEnds?.[i]?.message}
-              hint="Blank follows the session end. An overnight time is on the next day."
+              hint="Empty follows the session end."
             >
               <Controller
                 control={form.control}
                 name={`courtEnds.${i}`}
                 render={({ field }) => (
-                  <TimeField
-                    {...field}
-                    value={field.value ?? ''}
-                    aria-label={`Court ${i + 1} open until`}
+                  <DateTimePicker
+                    ref={field.ref}
+                    name={field.name}
+                    onBlur={field.onBlur}
+                    label={`Court ${i + 1} open until`}
+                    value={field.value ? (courts[i]?.openUntil ?? null) : null}
+                    onChange={(next) => field.onChange(next == null ? '' : clockOf(next))}
+                    days={days}
+                    base={start}
+                    min={(courts[i]?.startsAt ?? start) + MINUTE}
+                    max={end}
+                    fallback={end}
+                    emptyLabel="Session end"
                     invalid={!!errors.courtEnds?.[i]}
                   />
                 )}

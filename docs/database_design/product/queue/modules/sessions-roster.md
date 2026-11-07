@@ -1,6 +1,6 @@
 # Sessions, club players, and roster
 
-**Last verified:** 2026-11-06 for the court-fill mode, cancelled sessions, the `closed` join-request status and the court planned start (column names settled by Jose; drafted in migration `20261106000100`); 2026-11-01 for court-window boundaries; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-07 for the MVP offline-start note (D-2026-11-07-03); 2026-11-06 for the court-fill mode, cancelled sessions, the `closed` join-request status and the court planned start (column names settled by Jose; drafted in migration `20261106000100`); 2026-11-01 for court-window boundaries; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Proposed records; field names are new design names, not existing Prisma columns.
 
@@ -53,6 +53,8 @@ Duplicate offline entries can conflict on linking. Quarantine the link operation
 Proposed unique `(club_id, id)` and partial unique `(club_id)` for state in active/finalizing. This protects server-known active state but cannot alone prevent two disconnected sessions from starting.
 
 **Additional proposal:** `club_session_reservations` has `club_id` as PK, unique `session_id`, and a scoped FK to the session. Acquire it online before issuing permission to start that session offline. Different devices may operate the same reserved session for recovery. Downloading a read-only/preparation copy need not acquire a reservation; the exact activation UX is open. No second distinct session receives offline-start permission while the reservation exists.
+
+> MVP: offline start is out of MVP under [D-2026-11-07-03](../../../../mvp/decisions.md#d-2026-11-07-03), so this reservation is moot for MVP.
 
 **No overlapping sessions.** A club's non-invalid, non-cancelled sessions must not overlap in time. Enforce it with an exclusion constraint, `EXCLUDE USING gist (club_id WITH =, tstzrange(scheduled_start_at, scheduled_end_at) WITH &&) WHERE (state IN ('prepared', 'active', 'finalizing', 'completed'))` (needs `btree_gist`; drafted in `20261106000100`, listing the counted states because a new enum value can't be used in the migration that adds it), plus a command-level check that reports which session clashes and whether it is the same venue (venue clash) or another venue (time clash). Creating a series inserts only the free dates, in one transaction. Extending a running session's end time must pass the same check.
 

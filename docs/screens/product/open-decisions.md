@@ -1,6 +1,6 @@
 # Screen decisions still requiring a focused specification
 
-**Last verified:** 2026-11-07 for player login mapping and claim-link rules (#244); 2026-11-06 for the On court step, court filling, substitution game credit, and the connection rules for Cancel session and the court switch; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-07 for player login mapping and claim-link rules (#244) and the MVP offline-start note (D-2026-11-07-03); 2026-11-06 for the On court step, court filling, substitution game credit, and the connection rules for Cancel session and the court switch; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Explicit unresolved details, not omitted screens and not a new interview questionnaire. Updated October 26, 2026: items settled by the [ROTRA Queue prototype](../../../apps/mockup/queue-app/rotra-queue.html) are listed at the end, followed by those settled with the [ROTRA Admin prototype](../../../apps/mockup/admin-app/rotra-admin.html) on October 27, 2026.
 
@@ -12,7 +12,7 @@ The screen tree specifies all agreed v1 workflows. Where behavior is undecided, 
 |---|---|---|
 | Club password recovery | Q-LOGIN, Q-CLUB, A-CLUB-DETAIL | No fabricated manager or password-export flow. The club can change its own password with the current one; forgotten-password reset stays with the platform owner, but how is not specified, so Admin shows no reset control yet. (The club edits its logo and requests name changes.) |
 | License stacking/effective dates and refunds | Q-ACCESS, A-LICENSE | A renewal is proposed to start the day after the current term ends; overlaps show a warning. No refund flow |
-| Offline start authorization and device enrollment | Q-DOWNLOAD, Q-START, Q-DEVICE-CONTINUE | A downloaded screen is not automatically proof of write/start authorization |
+| Offline start authorization and device enrollment | Q-DOWNLOAD, Q-START, Q-DEVICE-CONTINUE | A downloaded screen is not automatically proof of write/start authorization (MVP: offline start is out of MVP under [D-2026-11-07-03](../../mvp/decisions.md#d-2026-11-07-03), so start authorization is moot for MVP; device enrollment for continuation stays open) |
 | Conflicting permanent outcomes | Q-CONFLICT | No last-write-wins or generic winner edit |
 | Final policy for games still in play / unused waiting queue | Q-SESSION-DONE | V1 blocks Session done while any match is Playing, until it is finished or invalidated; unplayed waiting matches and On court matches never started are dropped from results (the latter settled November 6, 2026); never manufacture winners or silently invalidate |
 | Releasing the active-session slot after invalidation | Q-INVALID-SESSION | Invalidity is permanent, as explicitly agreed; slot-release mechanics still need definition |

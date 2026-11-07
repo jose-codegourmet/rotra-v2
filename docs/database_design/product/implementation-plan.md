@@ -132,7 +132,7 @@ Then add club settings/name requests, saved-player lookup, request confirmation/
 3. Upload automatically on reconnect; distinguish received, accepted, rejected, and conflicted operations. Keep contiguous acknowledgement and causal prerequisites. Retry with the original operation ID.
 4. Reconcile accepted server state with local pending work without dropping either. Query hooks read the appropriate working copy and show the documented save/sync labels.
 5. Implement second-device continuation, match numbering, original-device recovery, conflict handling, stream closure, and session completion barrier exactly as approved.
-6. Preserve the active-session license-expiry exception; prohibit unrelated expired-club access and new unauthorized offline starts.
+6. Preserve the active-session license-expiry exception; prohibit unrelated expired-club access and new unauthorized offline starts. (MVP: offline start is out of MVP under [D-2026-11-07-03](../../mvp/decisions.md#d-2026-11-07-03), so start authorization is moot for MVP.)
 7. Handle allowed payment updates separately from sealed match evidence according to R1. No reopening of completed game decisions.
 
 **Acceptance:** demonstrate the complete two-device scenario, including missing original operations, gaps/out-of-order delivery, changed retry payloads, lost responses, concurrent conflicting outcomes, a never-used download, and permanently missing originals. Finalization stays blocked when required evidence is absent. A storage-write failure never shows a permanent winner as successfully saved.

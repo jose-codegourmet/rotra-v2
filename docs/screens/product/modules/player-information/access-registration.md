@@ -65,6 +65,8 @@ Explain that reset instructions are sent to the account's email. Proposed reques
 
 States: empty/invalid input, sending, generic sent acknowledgement, retryable service failure with safe wording. Resend limits/cooldowns come from actual service policy, not hardcoded screen assumptions. Do not route routine resets to a club operator.
 
+> MVP: email recovery replaced by manual Admin-issued reset links under [D-2026-11-07-01](../../../../mvp/decisions.md#d-2026-11-07-01); P-FORGOT directs players to support. Prototype update pending a mockup change.
+
 ## P-RESET — New password from recovery link
 
 Validate the recovery link/session before showing a usable form. Inputs: new password and proposed confirmation, password visibility controls, Save password. Successful completion directs to sign-in with a clear confirmation. Exact session-signout/provider behavior is implementation-dependent.

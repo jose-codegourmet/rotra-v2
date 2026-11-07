@@ -1,6 +1,6 @@
 # Flow: create, claim, and recover a player account
 
-**Last verified:** 2026-11-07 for player login mapping and claim-link rules (#244); 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-07 for player login mapping, claim-link rules (#244) and MVP manual recovery ([D-2026-11-07-01](../../../../../../mvp/decisions.md#d-2026-11-07-01)); 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 ## Club entry to profile
 
@@ -22,7 +22,7 @@ Profile creation does not bypass the valid-session performance gate. After a ret
 
 ## Recover or change contact information
 
-- Forgotten password: send recovery email; the operator does not issue replacement credentials.
+- Forgotten password (MVP, [D-2026-11-07-01](../../../../../../mvp/decisions.md#d-2026-11-07-01)): manual. The player contacts ROTRA support; the platform Admin verifies ownership and issues a short-lived, single-use reset link from the player's Admin profile, shared by support. No automated recovery email in MVP (email recovery is post-MVP). The club operator does not issue replacement credentials.
 - Phone/email change: request help from the platform owner; Admin must manually approve.
 - Public rank and match history are not player-editable account fields.
 

@@ -36,6 +36,8 @@ When privacy changes, future downloads and refreshed caches must redact the valu
 
 Server access can be blocked immediately at expiry. A disconnected device cannot be remotely locked with certainty. Use scoped cached entitlement/start authorization and define clock/reconnection rules before implementing offline starts.
 
+> MVP: offline start is out of MVP under [D-2026-11-07-03](../../mvp/decisions.md#d-2026-11-07-03), so offline start authorization is moot for MVP.
+
 ## Public-page deletion
 
 `club_expiry_cycles` records an expiry start, deletion deadline, and cancellation. Publications point at the applicable cycle. On renewal, cancel that cycle and restore retained pages. A later expiry creates a new cycle.

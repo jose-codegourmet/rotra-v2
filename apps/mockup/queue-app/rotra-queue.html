@@ -3523,6 +3523,7 @@ const SHEETS = {
         <dt>Sessions here</dt><dd>${p.prior}</dd>
         <dt>Phone</dt><dd>${p.phoneHidden ? 'Hidden by player' : p.identity === 'guest' ? 'None on file' : 'Kept private; confirmed in person when adding them to a session'}</dd>
       </dl>
+      ${p.identity === 'guest' ? `<section class="stack tight" aria-labelledby="guest-invite-h"><h3 id="guest-invite-h" style="margin:0;font-size:14px">Invite to ROTRA</h3><p class="small muted">Send this link so they can sign in to ROTRA Player. Their guest record isn't linked automatically.</p><div class="row"><button class="btn" data-act="copyGuestInvite">Copy invite link</button>${navigator.share ? '<button class="btn" data-act="shareGuestInvite">Share</button>' : ''}</div></section>` : ''}
       <p class="small muted">Levels are set per session while preparing a roster, not here.</p>`,
       `${sh.back ? `<button class="btn" data-act="profileBack">Back to ${{ suggest: 'suggestion', payments: 'payments', dispatch: 'match', match: 'match', onCourt: 'match', invalid: 'match' }[sh.back.type] || 'previous'}</button>` : '<button class="btn" data-act="closeSheet">Close</button>'}${canInvite(p) ? `<button class="btn primary" data-act="openInvite" data-id="${p.id}">Invite</button>` : ''}`);
   },
@@ -4255,6 +4256,12 @@ const ACT = {
     const id = S.ui.sheet.id; S.ui.sheet = S.ui.sheet.back; render();
     const b = document.querySelector(`.sheet [data-act="openProfile"][data-id="${id}"]`); if (b) b.focus();
   },
+  copyGuestInvite: () => {
+    const url = 'https://player.rotra.club/login'; // targets player login until self-registration ships
+    const fail = () => toast(`Copy this link: ${url}`);
+    try { navigator.clipboard.writeText(url).then(() => toast('Invite link copied'), fail); } catch (e) { fail(); }
+  },
+  shareGuestInvite: () => { try { navigator.share({ title: 'Sign in to ROTRA Player', url: 'https://player.rotra.club/login' }).catch(() => {}); } catch (e) { /* share unavailable */ } },
   openInvite: (d) => openSheet({ type: 'invite', id: d.id }),
   copyInvite: (d) => {
     const done = () => toast('Invite link copied');

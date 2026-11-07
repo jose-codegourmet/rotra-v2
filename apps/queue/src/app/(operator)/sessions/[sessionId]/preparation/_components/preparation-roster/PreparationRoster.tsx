@@ -61,6 +61,15 @@ const time = (at: number) =>
 const errorMessage = (error: unknown) =>
   error instanceof Error ? error.message : 'Something went wrong. Try again.'
 
+/** ROTRA Player sign-in link for the guest invite; player self-registration does not exist yet */
+function playerLoginUrl() {
+  const base =
+    typeof location !== 'undefined' && location.hostname === 'localhost'
+      ? 'http://localhost:9001'
+      : 'https://player.rotra.club'
+  return `${base}/login`
+}
+
 /**
  * Q-ROSTER in preparation: the Roster and levels tab (RosterPanel) or the Waitlist tab
  * (WaitlistPanel) on useSessionRoster and the roster mutations. Level changes save immediately;
@@ -223,6 +232,7 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
           addedLabel={longDateLabel(profile.addedAt)}
           sessionsHere={profile.sessionsHere}
           phoneHidden={profile.phoneHidden}
+          inviteUrl={playerLoginUrl()}
         />
       ) : null}
     </>

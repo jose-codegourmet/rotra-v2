@@ -31,7 +31,8 @@ Registration includes:
 - Optional Facebook identity/link, potentially preset by the operator.
 - Optional Instagram, YouTube, and LinkedIn links.
 - Getting-to-know information such as playing style.
-- Optional years/months of playing experience.
+- Optional playing experience, entered as years + months or as **playing since** (month, year); either fills the other, and it is kept as playing since so it stays current (owner, November 8, 2026).
+- **Registration prefill (owner, November 8, 2026):** the registration form starts from what the club entered (name, nickname, email, playing style, experience, links); the player can change any of it and sets a password. A profile with no phone on file asks the player for one at registration; a number already on another profile is refused.
 
 Experience can inform the initial operator assessment but is not automatic ranking credit. The exact playing-style field list and social-link visibility are open.
 

@@ -48,7 +48,7 @@ Player login mapping and claim links ([#244](https://github.com/jose-codegourmet
 | L2 · Email required | Every player account has an email (already required at claim). Password recovery stays email-only |
 | L3 · Generic failure | A failed sign-in never reveals whether an email exists or whether the profile is registered |
 | L4 · Identity ≠ auth | The global player identity stays independent of the auth identity. The player profile links to the auth user; the auth user is not the player identity |
-| L5 · Claim links | Valid **7 days**, **single use**. The club (Queue Master) can **reissue**; reissuing invalidates the previous link. Expired or used links show the existing expired/used state |
+| L5 · Claim links | Valid **7 days**, **single use**. Expired or used links show the existing expired/used state. **TBD (owner, November 8, 2026):** for now a new link does **not** invalidate earlier ones; each simply expires after 7 days, and once the profile is registered every other link shows as used. Whether reissuing should revoke is to be decided again |
 | L6 · Contact collisions at claim | If the phone or email already belongs to another account, **block** and show the contact-support route. Never merge silently |
 | L7 · No claim by ID or name | An RTR ID or a name alone can never claim an account |
 

@@ -204,9 +204,15 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
     try {
       await navigator.clipboard.writeText(sessionLink)
     } catch {
-      // Clipboard unavailable (insecure context or denied); the link stays selectable in its field.
+      // Clipboard unavailable (insecure context or denied): show the link so it can be copied by hand.
+      toast.error(`Couldn't copy automatically. Copy this link: ${sessionLink}`)
+      return
     }
-    toast('Session link copied')
+    toast(
+      s?.acceptJoinRequests === false
+        ? 'Session link copied · joining is not open yet, guests are told to contact the Queue Master'
+        : 'Session link copied',
+    )
   }
 
   if (deleted || redirectTo) return null
@@ -240,6 +246,9 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
               </Button>
               <Button size="sm" asChild>
                 <Link href={`/sessions/${sessionId}/public-page`}>Preview public page</Link>
+              </Button>
+              <Button size="sm" onClick={() => void copyLink()}>
+                Copy invite link
               </Button>
               <Button size="sm" onClick={() => setPostOpen(true)}>
                 Copy Facebook post

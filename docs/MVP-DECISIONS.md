@@ -65,3 +65,27 @@ Before agents implement, verify current `main` and the relevant ticket's actual 
 - **Delivery note:** A private regression handoff during November 9–13 was discussed as a *tentative target*, not a committed launch date. Offline is mandatory for MVP; an online-only public launch is not approved. Reassess dates based on actual remaining work.
 - **Follow-up:** Reconcile approved MVP decisions against GitHub tickets, avoid duplicates, and mark uncovered implementation work `Ticket: needed`. Keep deferred or canceled items visible.
 - **References:** [MVP roadmap](MVP-ROADMAP.md), [Ways of working](ways-of-working.md), D-2026-11-07-01 and D-2026-11-07-03.
+
+### D-2026-11-07-05 — Payment amounts reuse the existing paid mark
+- **Decision status:** approved
+- **Implementation status:** implemented (fix/466-obvious-queue-bugs)
+- **Ticket:** [#479](https://github.com/jose-codegourmet/rotra-v2/issues/479)
+- **Roadmap:** MVP — item 5 in [MVP roadmap](MVP-ROADMAP.md)
+- **Decision:** `SessionPaymentMark.amountMinor` means the amount received; a quick tick records the current due. Status compares received with the current due: Paid, Partial, Reimburse (tracking only) or Unpaid. Pricing changes never rewrite received amounts. No migration.
+- **References:** [Financials](business_logic/product/queue/modules/financials/README.md).
+
+### D-2026-11-07-06 — Public participant names are masked
+- **Decision status:** approved
+- **Implementation status:** implemented (fix/466-obvious-queue-bugs)
+- **Ticket:** [#475](https://github.com/jose-codegourmet/rotra-v2/issues/475), [#474](https://github.com/jose-codegourmet/rotra-v2/issues/474)
+- **Roadmap:** MVP — item 5 in [MVP roadmap](MVP-ROADMAP.md)
+- **Decision:** On the public session page each name word shows as its first letter plus `***` (`J*** A***`), masked on the server. The public skill mix shows aggregate counts only, never who is which level. Not covered yet: published results and profile pictures.
+- **References:** `packages/data/src/public-session/publicSession.rules.ts`, `packages/db/src/queue/public-session.ts`.
+
+### D-2026-11-07-07 — Player invite links use player login until sign-up exists
+- **Decision status:** approved
+- **Implementation status:** implemented (fix/466-obvious-queue-bugs)
+- **Ticket:** [#476](https://github.com/jose-codegourmet/rotra-v2/issues/476), [#478](https://github.com/jose-codegourmet/rotra-v2/issues/478); Downloads page [#477](https://github.com/jose-codegourmet/rotra-v2/issues/477) blocked on #246
+- **Roadmap:** MVP — items 1 and 5 in [MVP roadmap](MVP-ROADMAP.md)
+- **Decision:** Request to join offers the guest form or "Log in with ROTRA Player" (returns to `/s/<slug>?join=1`); sign-up shows as not open yet. Guest "Invite to ROTRA" copies the player login link. A login never grants a slot, and a join request does not yet carry the signed-in player.
+- **References:** [Public session screens](screens/product/modules/queue/public-session.md).

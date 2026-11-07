@@ -62,6 +62,7 @@ The club keeps one inventory list shared by all its sessions.
 | Cost per unit | Whole amount, 0 or more; 0 shows as "No cost" |
 
 - The operator can add, edit, and remove items, and step stock up or down by one.
+- **Owner decision, November 7, 2026 (#467):** stock − / + updates the shown stock at once, then saves each item's desired end stock (an absolute value, never a delta) after 800 ms without another tap, as payments do (#300). Returning to the saved stock in the window needs no write; taps during a save are kept and saved next, and an older response never overwrites newer intent. Stock never goes below zero. Flush on edit, unmount and page exit. A failed save shows an error toast and rolls back only to the saved stock, keeping newer intent.
 - An item with **2 or fewer** in stock shows **Running low**.
 - The inventory screen shows the total stock value (sum of stock × cost per unit).
 - Only **Shuttlecocks** items can be chosen in a session's shuttle plan. Their cost per unit fills the estimate.

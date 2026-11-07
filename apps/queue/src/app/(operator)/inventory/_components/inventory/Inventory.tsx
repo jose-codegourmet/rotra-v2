@@ -2,7 +2,7 @@
 
 import { useInventory } from '@rotra/data/inventory/useInventory'
 import { useRemoveInventoryItem } from '@rotra/data/inventory/useRemoveInventoryItem'
-import { useStepInventoryStock } from '@rotra/data/inventory/useStepInventoryStock'
+import { useSetInventoryStock } from '@rotra/data/inventory/useSetInventoryStock'
 import { InventoryScreen } from '@rotra/ui/inventory-screen'
 import { InventorySection } from '@rotra/ui/inventory-section'
 import { Skeleton } from '@rotra/ui/skeleton'
@@ -15,8 +15,12 @@ import { InventoryItemSheet } from '../inventory-item-sheet/InventoryItemSheet'
 export function Inventory({ fromSetup }: { fromSetup: boolean }) {
   const router = useRouter()
   const inventory = useInventory(),
-    remove = useRemoveInventoryItem(),
-    step = useStepInventoryStock()
+    remove = useRemoveInventoryItem()
+  // #467: − / + never waits for a save; failures toast and roll back to the saved stock.
+  const stock = useSetInventoryStock({
+    onSuccess: (result) => toast(result.message),
+    onError: (error) => toast.error(error.message),
+  })
   const [editing, setEditing] = useState<string | 'new' | null>(null)
   const items = inventory.data?.items ?? []
   const callbacks = {
@@ -50,10 +54,14 @@ export function Inventory({ fromSetup }: { fromSetup: boolean }) {
             key={category}
             category={category}
             items={items.filter((i) => i.category === category)}
-            disabled={remove.isPending || step.isPending}
-            onEdit={setEditing}
+            disabled={remove.isPending}
+            onEdit={(id) => {
+              // Save pending stock first, so the sheet edits the latest revision.
+              void stock.flush()
+              setEditing(id)
+            }}
             onRemove={(id) => remove.mutate(id, callbacks)}
-            onStep={(id, delta) => step.mutate({ id, delta }, callbacks)}
+            onStep={stock.step}
           />
         ))
       )}

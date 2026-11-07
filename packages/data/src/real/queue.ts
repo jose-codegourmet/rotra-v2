@@ -239,6 +239,27 @@ export async function realSaveInventoryItem(input: SaveInventoryItemInput) {
   )
 }
 
+/**
+ * Sets an absolute stock through the item edit (`POST /api/inventory` with `expectedRevision`),
+ * so a debounced burst is one idempotent write and a stale revision is a conflict, not a drift.
+ */
+export async function realSetInventoryStock(item: InventoryItem, stock: number) {
+  const { item: saved } = await realRequest<{ item: WireInventoryItem }>('/api/inventory', {
+    method: 'POST',
+    body: {
+      id: item.id,
+      expectedRevision: item.revision,
+      name: item.name,
+      category: item.category,
+      unit: item.unit,
+      stock,
+      unitCostMinor: item.unitCostMinor,
+    },
+    fields: { unitCost: 'unitCostMinor' },
+  })
+  return accepted(inventoryItemOf(saved), 'Stock updated')
+}
+
 export async function realStepInventoryStock(input: { id: string; delta: -1 | 1 }) {
   const { item } = await realRequest<{ item: WireInventoryItem }>(
     `/api/inventory/${encodeURIComponent(input.id)}/stock`,

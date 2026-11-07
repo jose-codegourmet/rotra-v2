@@ -12,6 +12,7 @@ import Link from 'next/link'
 import { notFound, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
+import { CancelledSessionRecord } from '@/app/(operator)/sessions/[sessionId]/record/_components/cancelled-session-record/CancelledSessionRecord'
 import { RecordFinancialsTab } from '@/app/(operator)/sessions/[sessionId]/record/_components/record-financials-tab/RecordFinancialsTab'
 import { RecordNightTab } from '@/app/(operator)/sessions/[sessionId]/record/_components/record-night-tab/RecordNightTab'
 import { RecordPlayersTab } from '@/app/(operator)/sessions/[sessionId]/record/_components/record-players-tab/RecordPlayersTab'
@@ -38,6 +39,13 @@ export type SessionRecordProps = { sessionId: string }
  * is its own container under record/_components/, so the later tickets fill one file each.
  */
 export function SessionRecord({ sessionId }: SessionRecordProps) {
+  const session = useQueueSession(sessionId)
+  // A cancelled session has its own no-tabs record: it never has a result record to load.
+  if (session.data?.state === 'cancelled') return <CancelledSessionRecord sessionId={sessionId} />
+  return <FinishedSessionRecord sessionId={sessionId} />
+}
+
+function FinishedSessionRecord({ sessionId }: SessionRecordProps) {
   const router = useRouter()
   const session = useQueueSession(sessionId)
   const record = useSessionRecord(sessionId)

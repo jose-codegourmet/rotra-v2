@@ -24,6 +24,7 @@
     "./button": "./src/components/button/Button.tsx",
     "./calendar-day-sheet": "./src/components/calendar-day-sheet/CalendarDaySheet.tsx",
     "./cancel-session-sheet": "./src/components/cancel-session-sheet/CancelSessionSheet.tsx",
+    "./cancelled-record-roster": "./src/components/cancelled-record-roster/CancelledRecordRoster.tsx",
     "./card": "./src/components/card/Card.tsx",
     "./checkbox": "./src/components/checkbox/Checkbox.tsx",
     "./chip": "./src/components/chip/Chip.tsx",

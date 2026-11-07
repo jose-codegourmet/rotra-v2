@@ -25,6 +25,7 @@ const KIND: Record<string, CalendarEvent['kind']> = {
   prepared: 'prepared',
   completed: 'completed',
   invalid: 'invalid',
+  cancelled: 'cancelled',
 }
 
 /** Q-HOME: club header, the now card and the calendar; every session opens from here. */

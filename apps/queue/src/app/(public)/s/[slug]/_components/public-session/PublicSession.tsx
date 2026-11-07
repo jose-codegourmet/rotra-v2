@@ -6,6 +6,7 @@ import { useMyJoinRequest } from '@rotra/data/public-session/useMyJoinRequest'
 import { usePublicSession } from '@rotra/data/public-session/usePublicSession'
 import { EmptyState } from '@rotra/ui/empty-state'
 import { JoinRequestCard, type JoinRequestCardProps } from '@rotra/ui/join-request-card'
+import { Notice } from '@rotra/ui/notice'
 import { PublicParticipants } from '@rotra/ui/public-participants'
 import {
   PublicResultsSection,
@@ -54,8 +55,7 @@ const HERO_STATE = {
   completed: 'finished',
   // An invalid session's hero carries no status chip.
   invalid: 'upcoming',
-  // No chip yet: the Cancelled chip and notice come with the cancelled public page (epic #408).
-  cancelled: 'upcoming',
+  cancelled: 'cancelled',
 } as const
 
 /** The join card variant: this visitor's own request first, then requests off, open or full. */
@@ -157,6 +157,7 @@ export function PublicSession({ slug, viewer }: PublicSessionProps) {
     )
 
   const mode = MODES[p.mode]
+  const cancelWhy = (p.cancelReason ?? '').replace(/[.\s]+$/, '')
   // Sending a request needs internet; the guest's own connection is the DevMenu toggle here.
   const card = joinCardProps(p, mine.data, () => setJoinOpen(true), dev.offline)
   const participants = p.participants.map((x, i) => ({
@@ -176,7 +177,13 @@ export function PublicSession({ slug, viewer }: PublicSessionProps) {
         clubLogoUrl={p.club.logoUrl}
         state={HERO_STATE[p.status]}
       />
-      {card ? <JoinRequestCard {...card} /> : null}
+      {p.status === 'cancelled' ? (
+        <Notice tone="warn" title="This session is cancelled.">
+          {cancelWhy ? `${cancelWhy}.` : null}
+        </Notice>
+      ) : card ? (
+        <JoinRequestCard {...card} />
+      ) : null}
       <Tabs
         aria-label="Session page"
         value={tab}

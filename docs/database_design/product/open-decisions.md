@@ -1,6 +1,6 @@
 # Design decisions before migrations
 
-**Last verified:** 2026-11-06 for the On court, substitution-credit, court-fill, cancelled-session and times-and-days decisions (column names settled; drafted in `20261106000100`); 2026-11-01 for the F07.34 wiring gaps (#317).
+**Last verified:** 2026-11-07 for player login mapping and claim-link rules (#244); 2026-11-06 for the On court, substitution-credit, court-fill, cancelled-session and times-and-days decisions (column names settled; drafted in `20261106000100`); 2026-11-01 for the F07.34 wiring gaps (#317).
 
 **Status:** Review register, not a questionnaire or approval request for writing these docs.
 
@@ -32,7 +32,7 @@ and [schema dependencies](schema-dependencies.md) identify their consumers.
 
 - Exact numerical ranking/performance model, label thresholds, global tie behavior, and policy-change retroactivity.
 - Three calendar months versus a day count, and canonical timezone for ID dates/window cutoffs.
-- Authentication provider support/configuration for club username login and player phone-or-email password login; email claim/recovery verification.
+- Authentication provider support/configuration for club username login; email verification on claim; password policy. (Player phone-or-email login mapping was decided November 7, 2026, below.)
 - Historical guest-link confirmation evidence, mistaken-link handling, and the auditable attribution mechanism; including earlier games after confirmed identity is settled below.
 - Whether assessments for no-shows, roster entries removed during preparation, or invalid sessions remain eligible; assessment changes already sync immediately, independently of match performance.
 - Exact award evidence calculations (partial substitutes are excluded from local standings and awards unless the Queue Master gave one the game; see below).
@@ -45,6 +45,19 @@ and [schema dependencies](schema-dependencies.md) identify their consumers.
 - Phone/contact conflict handling and aliasing duplicate offline club-player IDs without rewriting confirmed history.
 - City/country code registry, sequence formatting above 9999, and founding-location corrections.
 - Renewal dates and overlapping terms, refunds, offline expiry enforcement, flag targeting, and when offline devices pick up flag changes. (Per-club prices, free tester clubs, owner-added clubs and owner-created flags were settled October 27, 2026.)
+
+## Owner decisions recorded November 7, 2026
+
+Source: [#244](https://github.com/jose-codegourmet/rotra-v2/issues/244) (F07.3) and the [business decision summary](../../business_logic/product/open-decisions.md#settled-by-the-product-owner-on-november-7-2026). Prose rules only; no DDL or migration is approved by this. Details and worked examples: [identity](player-information/modules/identity.md).
+
+- Player auth accounts are email + password. Phone is a login identifier resolved on the server (unique normalized phone → `player_accounts` → email); the provider holds no phone and sends no SMS. Email is required on every player account; recovery is email-only.
+- Sign-in failure is one generic credential error. `hide_phone_from_clubs` does not block phone sign-in.
+- `players.id` stays independent of the auth subject; `player_accounts` links them.
+- `player_claim_links`: expiry = issued + 7 days; single use (consumed once); club reissue revokes the previous active link.
+- A phone or email at claim that already belongs to another account blocks the claim; never merge.
+- An RTR ID or name alone never claims.
+
+Still open: email verification on claim; password policy; contact-change enforcement across direct provider APIs and its approval evidence; RTR location/date/sequence rules and simultaneous allocation; mistaken/duplicate guest links and permanent relink; name-only guest invitation; failed provider application handling. Club username (#381) and platform-owner sign-in are unchanged.
 
 ## Owner decisions recorded November 6, 2026
 
@@ -99,7 +112,7 @@ the chore tickets wait for their own pickup.
 | Public join-request receipt is a browser-session cookie (proposal): no expiry, a lost receipt cannot be recovered, and the visitor sees no status again | #398 | Decision (#248) |
 | RLS disabled on 55 public tables; `anon` can execute `rotra_next_player_sequence()` | #387 | Chore (#243), migration sign-off |
 | Club logo has no storage adapter | #374 (closed) | Done |
-| Player sign-in (phone or email + password), password reset and registration (claim) links have no real-mode route, so the wired own-account routes (#400) have no player session to serve yet | #244 | Decision |
+| Player sign-in (phone or email + password), password reset and registration (claim) links have no real-mode route, so the wired own-account routes (#400) have no player session to serve yet. Mapping and claim-link rules decided November 7, 2026 (above); the routes are not built | #244 | Decision recorded; implementation pending |
 | Contact-change Approve / Retry application / Check status change the provider login; not connected in real mode (#401) | #196, #244 | Decision |
 
 ### Gaps from the match and results wiring (#396)

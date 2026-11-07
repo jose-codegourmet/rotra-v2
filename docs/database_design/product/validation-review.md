@@ -177,7 +177,7 @@ These resolve product direction, not the remaining proof/linkage mechanism or ra
 
 | Before this work | Plain-language decisions still needed |
 |---|---|
-| Identity and registration | How does a name-only guest's invitation work? Who confirms historical guest identity, and with what evidence? How are wrong/duplicate identities and contacts resolved? How long do claim links last? |
+| Identity and registration | How does a name-only guest's invitation work? Who confirms historical guest identity, and with what evidence? How are wrong/duplicate identities and contacts resolved? (Claim links: 7 days, single use, reissue revokes; contact collision at claim blocks; decided November 7, 2026, #244.) |
 | Roster and payments | What happens to paid marks and assessments when someone loses/removes a slot? What does paid mean when no fee was entered? Which saved fee applies while a device is offline? |
 | Clubs and access | How do early renewals extend a license? How does the owner sign in and reset a club password? How are offline starts authorized and reservations released? |
 | Offline completion | How does a second device take over? How are conflicting confirmed records selected? How are match numbers displayed consistently? What closes a device download that was never used? |

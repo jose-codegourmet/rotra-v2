@@ -1,6 +1,6 @@
 # Player identity and accounts
 
-**Last verified:** 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-07 for player login mapping and claim-link rules (#244); 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Confirmed v1 target rules.
 
@@ -38,10 +38,14 @@ Experience can inform the initial operator assessment but is not automatic ranki
 ## Login and recovery
 
 - Sign in with **phone or email + password**.
+- **Owner decisions, November 7, 2026 (#244):** the auth account is keyed by **email + password**; email is required for every player account. Phone is a login identifier only: the server normalizes it through the approved identity rules, finds the linked account's email, and signs in with email + password. No phone provider and no SMS; phone and email reach the same account.
+- A failed sign-in never reveals whether a phone or email exists. A hidden phone still signs in: privacy hides the phone from clubs, not from login.
+- The player profile links to the auth user; the auth user is not the player identity.
 - No Facebook/social login.
-- Forgotten passwords are recovered by email.
+- Forgotten passwords are recovered by email only.
 - The club operator's role is initial player entry/registration-link delivery, not routine password recovery.
-- Link lifetime, verification, and recovery details still need a focused account-flow specification.
+- Claim links are valid **7 days** and **single use**; the club (Queue Master) can reissue, and reissuing invalidates the previous link (decided 2026-11-07, #244). If the phone or email at claim already belongs to another account, the claim is blocked with a contact-support route; never merge silently. An RTR ID or name alone never claims an account.
+- Still open: email verification on claim, password policy/complexity, guest invitation for a name-only guest, mistaken/duplicate guest links and permanent relink, and failed provider application handling.
 
 ## Personal editing and privacy
 

@@ -329,9 +329,9 @@ is null and the screens show their truthful no-rank state. The own-account reads
 (`getMyAccount`, `updateMyProfile`, `setPhonePrivacy`) call `GET /api/me/account`, `PATCH /api/me/profile`
 and `POST /api/me/phone-privacy` behind `handleAccountRequest('player', …)`; saves send the player
 revision of the last account read, and a stale one is a conflict. Hooks, query keys and DTOs are
-unchanged. Player sign-in, password reset and registration (claim) links stay not connected: player
-phone-or-email login, recovery email and claim provisioning are open in #244, so without a player
-session the own-account routes are not reachable from the screens yet.
+unchanged. Player sign-in, password reset and registration (claim) links stay not connected: the login mapping
+and claim-link rules were decided in #244 (November 7, 2026) but the routes and claim provisioning are
+not built, so without a player session the own-account routes are not reachable from the screens yet.
 
 **Admin audit and contact changes (#401).** In real mode `@rotra/data/admin-audit` reads Admin's
 `GET /api/audit-events`, and `@rotra/data/contact-change-request` reads Admin's

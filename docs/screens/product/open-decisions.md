@@ -1,6 +1,6 @@
 # Screen decisions still requiring a focused specification
 
-**Last verified:** 2026-11-06 for the On court step, court filling, substitution game credit, and the connection rules for Cancel session and the court switch; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-07 for player login mapping and claim-link rules (#244); 2026-11-06 for the On court step, court filling, substitution game credit, and the connection rules for Cancel session and the court switch; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Explicit unresolved details, not omitted screens and not a new interview questionnaire. Updated October 26, 2026: items settled by the [ROTRA Queue prototype](../../../apps/mockup/queue-app/rotra-queue.html) are listed at the end, followed by those settled with the [ROTRA Admin prototype](../../../apps/mockup/admin-app/rotra-admin.html) on October 27, 2026.
 
@@ -18,7 +18,7 @@ The screen tree specifies all agreed v1 workflows. Where behavior is undecided, 
 | Releasing the active-session slot after invalidation | Q-INVALID-SESSION | Invalidity is permanent, as explicitly agreed; slot-release mechanics still need definition |
 | Historical guest identity confirmation and link conflicts | Q-ADD-PLAYER, P-ID-QR, P-MATCH-HISTORY | Profile/ID creation on successful entry sync and inclusion of earlier guest games after identity confirmation are settled below. No name-only transfer or invented offline permanent ID; confirmation evidence and conflict resolution remain open |
 | Post-claim operator edits and contact verification | Q-ADD-PLAYER, P-CLAIM, A-PLAYER-DETAIL | No unrestricted personal/contact overwrite |
-| Claim/reset verification, link lifetime, loss of contacts | P-CLAIM-STATUS, P-FORGOT, P-RESET, P-CONTACT-REQUEST | Defined flow boundaries, no invented SMS/social-login/evidence requirement |
+| Claim email verification, password policy, loss of contacts | P-CLAIM, P-CLAIM-STATUS, P-FORGOT, P-RESET, P-CONTACT-REQUEST | Defined flow boundaries, no invented SMS/social-login/evidence requirement. Link lifetime is settled below (November 7, 2026) |
 | Final rank/pairing/award formulas and window boundary | Q-SUGGEST, Q-AUTO, Q-AWARDS-SLIDE, P-RANK-DETAIL | The prototype heuristic and award formula are references; no win probabilities shown to operators |
 | Three-or-more-way head-to-head and identical-name ties | Q-STANDINGS-SLIDE, Q-LEADERBOARD | Preserve wins/losses/head-to-head/name order; no substitute strength tiebreak |
 | Public history/social visibility | P-PUBLIC-PROFILE, P-MATCH-HISTORY | Expose only approved fields; no contact/private-Off-Day leak |
@@ -41,6 +41,18 @@ The screen tree specifies all agreed v1 workflows. Where behavior is undecided, 
 - Two offline devices placing the same match or court by hand with **Put on court** (collision-free assignment stays open). The Manual Queue | Auto Queue switch offline is settled below.
 - The offline notice copy for Cancel session and the Manual Queue | Auto Queue switch (both need internet, settled below), to be taken from the mockup. Also settled November 6, 2026: the Preparation header keeps **both** Delete session (nobody confirmed) and Cancel session (players joined); the prototype now shows both ([log](../../mockup-changes/2026-11-06-queue-delete-session.md)).
 - What Q-POOL shows for a player in a Getting ready match (the status list has **On Court X**, **Away**, **Queued · #P**, **Free**).
+
+## Settled by the product owner on November 7, 2026
+
+Recorded in the [business decision summary](../../business_logic/product/open-decisions.md#settled-by-the-product-owner-on-november-7-2026) (#244). Club username and platform-owner sign-in are unchanged.
+
+| Area | Decision | Screens |
+|---|---|---|
+| Player sign-in mapping | Account keyed by email + password; a phone is a login identifier the server looks up to the account's email. No SMS. Phone and email reach the same account | P-LOGIN |
+| Credential failure | One generic error; never reveals whether a phone or email exists. A hidden phone still signs in | P-LOGIN |
+| Recovery | Email-only; email is required for every account | P-FORGOT, P-RESET |
+| Claim links | Valid 7 days, single use; the club reissues, which invalidates the previous link; expired/used links show the existing state | P-CLAIM-STATUS |
+| Contact collision at claim | Block and show the contact-support route; never merge. An RTR ID or name alone never claims | P-CLAIM, P-CLAIM-STATUS |
 
 ## Settled by the product owner on November 6, 2026
 

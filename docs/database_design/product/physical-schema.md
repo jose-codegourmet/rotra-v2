@@ -66,8 +66,8 @@ only through server Route Handlers and services, never through the Supabase Data
   a concurrent second allocation fail; the loser retries from identity resolution. Sequences come from
   the counter upsert, never `MAX(sequence) + 1`. `@rotra/db/player/rtr-id` formats IDs and calls the
   function; the sync-day timezone (`Asia/Manila`) is a proposal pending #244.
-- **Claims** store only a token digest. One active link per player (reissue revokes) is a proposal
-  pending #244. Unclaimed identities have no `player_accounts` row.
+- **Claims** store only a token digest. One active link per player (reissue revokes), 7-day expiry and single use
+  were decided November 7, 2026 (#244). Unclaimed identities have no `player_accounts` row.
 - Private contacts and claim digests are never selected into public projections; public reads use
   explicit allowlists (F07.20 service boundary).
 

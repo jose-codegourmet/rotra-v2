@@ -7,6 +7,7 @@ import { Field } from '@rotra/ui/field'
 import { useSubmitOnce } from '@rotra/ui/hooks/use-submit-once'
 import { Notice } from '@rotra/ui/notice'
 import { PersonalDetailsFields } from '@rotra/ui/personal-details-fields'
+import { PhoneOrEmailInput } from '@rotra/ui/phone-or-email-input'
 import { TextInput } from '@rotra/ui/text-input'
 import { useEffect, useState } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
@@ -15,13 +16,13 @@ import { type ClaimValues, claimSchema } from './ClaimForm.schema'
 
 export type ClaimFormProps = {
   clubName: string
-  /** Shown read-only, exactly as received; never a form value */
+  /** Shown read-only, exactly as received. Empty when the profile has no phone: the player types one. */
   maskedPhone: string
   defaultValues?: Partial<ClaimValues>
   onSubmit: (values: ClaimValues) => void
   isPending?: boolean
-  /** An email conflict shows under Email; anything else as a notice at the top */
-  serverError?: { message: string; field?: 'email' }
+  /** An email or phone problem shows under that field; anything else as a notice at the top */
+  serverError?: { message: string; field?: 'email' | 'phone' }
 }
 const sectionLabel = 'text-xs font-semibold tracking-[0.5px] text-fg2 uppercase'
 function Required({ children }: { children: string }) {
@@ -49,10 +50,11 @@ export function ClaimForm({
     defaultValues: { ...claimDefaultValues, ...defaultValues },
   })
   const errors = form.formState.errors
+  const needsPhone = !maskedPhone
   const submitOnce = useSubmitOnce(isPending)
   useEffect(() => {
-    if (serverError?.field === 'email')
-      form.setError('email', { type: 'server', message: serverError.message })
+    if (serverError?.field)
+      form.setError(serverError.field, { type: 'server', message: serverError.message })
   }, [serverError, form])
   const passwordInput = (name: 'password' | 'confirmPassword') => (
     <Controller
@@ -72,26 +74,58 @@ export function ClaimForm({
     <LinkPage
       label={`Registration link from ${clubName}`}
       title="Finish registering"
-      description="Add your email and a password. Everything else is optional and you can change it later."
+      description="Your club filled in what it knows. Check it, change anything that's wrong, and choose a password."
     >
       <FormProvider {...form}>
         <Card asChild>
           <form
             noValidate
             className="flex flex-col gap-4"
-            onSubmit={form.handleSubmit((values) => submitOnce(() => onSubmit(values)))}
+            onSubmit={form.handleSubmit((values) => {
+              if (needsPhone && !values.phone.trim()) {
+                form.setError('phone', { type: 'required', message: 'Enter your mobile number.' })
+                return
+              }
+              submitOnce(() => onSubmit(needsPhone ? values : { ...values, phone: '' }))
+            })}
           >
-            {serverError && serverError.field !== 'email' ? (
+            {serverError && !serverError.field ? (
               <Notice tone="error">{serverError.message}</Notice>
             ) : null}
             <div className="flex flex-col gap-3.5">
               <span className={sectionLabel}>Contact · private</span>
-              <Field
-                label="Phone number"
-                hint="Linked to this profile and can't be changed here. Not your number? Ask the club or ROTRA for help."
-              >
-                <TextInput value={maskedPhone} readOnly className="font-mono" />
-              </Field>
+              {needsPhone ? (
+                <Field
+                  label={<Required>Phone number</Required>}
+                  hint={
+                    errors.phone
+                      ? undefined
+                      : 'This profile has no phone yet. Add your mobile number; it identifies your ROTRA profile.'
+                  }
+                  error={errors.phone?.message}
+                >
+                  <Controller
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <PhoneOrEmailInput
+                        {...field}
+                        mode="phone"
+                        autoComplete="tel"
+                        placeholder="0917 555 0142"
+                        disabled={isPending}
+                      />
+                    )}
+                  />
+                </Field>
+              ) : (
+                <Field
+                  label="Phone number"
+                  hint="Linked to this profile and can't be changed here. Not your number? Ask the club or ROTRA for help."
+                >
+                  <TextInput value={maskedPhone} readOnly className="font-mono" />
+                </Field>
+              )}
               <Field
                 label={<Required>Email</Required>}
                 hint={errors.email ? undefined : 'Used for password resets. Never shown publicly.'}

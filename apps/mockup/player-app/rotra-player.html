@@ -538,7 +538,7 @@ function seedAccounts() {
     u1: { id: 'u1', name: 'Miguel Santos', nick: 'Migs', rtr: 'RTR-PH-CEB-031526-0001', phone: '+63 917 555 0142', email: 'migs.santos@example.com', phoneHidden: true, claimed: true, photo: true,
       style: 'Doubles, mostly at the front. I like fast drives and net kills, and I am working on my clears.', expY: '4', expM: '6',
       social: { facebook: 'https://facebook.com/migs.santos.badminton', instagram: 'https://instagram.com/migs.smash', youtube: '', linkedin: '' }, level: 5 },
-    u2: { id: 'u2', name: 'Jomar dela Cruz', nick: 'Jom', rtr: 'RTR-PH-CEB-040226-0007', phone: '+63 918 555 0377', email: '', phoneHidden: false, claimed: false, photo: false,
+    u2: { id: 'u2', name: 'Jomar dela Cruz', nick: 'Jom', rtr: 'RTR-PH-CEB-040226-0007', phone: '+63 918 555 0377', email: 'jomar.dc@example.com', phoneHidden: false, claimed: false, photo: false,
       style: '', expY: '', expM: '', social: { facebook: 'https://facebook.com/jomar.dc', instagram: '', youtube: '', linkedin: '' }, level: 3 },
   };
 }
@@ -952,8 +952,32 @@ function viewProfile() {
     </div>
   </div></main>`;
 }
+// Experience: Years + months and Playing since are two views of one value; typing either fills the other.
+// Saved as Playing since, so the years and months stay right as time passes.
+const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+function linkExperience(el) {
+  const pre = el.dataset.exp, key = el.id.slice(pre.length + 1);
+  const box = (k) => document.getElementById(`${pre}-${k}`);
+  const put = (k, v) => { const i = box(k); if (i) { i.value = v; setPath(i.dataset.bind, v); } };
+  const now = new Date(), nowM = now.getFullYear() * 12 + now.getMonth();
+  if (key === 'expY' || key === 'expM') {
+    const y = box('expY').value.trim(), m = box('expM').value.trim();
+    if (!y && !m) { put('sinceM', ''); put('sinceY', ''); return; }
+    if (!/^\d*$/.test(y) || !/^\d*$/.test(m) || +m > 11) return;
+    const t = nowM - ((+y || 0) * 12 + (+m || 0));
+    put('sinceM', String((t % 12) + 1)); put('sinceY', String(Math.floor(t / 12)));
+  } else {
+    const mo = box('sinceM').value, yr = box('sinceY').value.trim();
+    if (!mo || !/^\d{4}$/.test(yr)) return;
+    const diff = nowM - (+yr * 12 + (+mo - 1));
+    if (diff < 0) return;
+    put('expY', String(Math.floor(diff / 12))); put('expM', String(diff % 12));
+  }
+}
 const expText = (p) => {
-  const y = +p.expY || 0, m = +p.expM || 0;
+  // Playing since wins when set: the years and months keep counting from it.
+  const since = p.sinceM && p.sinceY ? new Date().getFullYear() * 12 + new Date().getMonth() - (+p.sinceY * 12 + (+p.sinceM - 1)) : null;
+  const y = since != null ? Math.floor(since / 12) : +p.expY || 0, m = since != null ? since % 12 : +p.expM || 0;
   if (!y && !m) return '';
   return [y && `${y} ${y === 1 ? 'year' : 'years'}`, m && `${m} ${m === 1 ? 'month' : 'months'}`].filter(Boolean).join(', ') + ' playing';
 };
@@ -1107,19 +1131,21 @@ function viewAccount() {
 }
 
 // ---------- P-EDIT-PROFILE ----------
-const editFields = (p) => ({ name: p.name, nick: p.nick || '', style: p.style || '', expY: p.expY ?? '', expM: p.expM ?? '', facebook: p.social.facebook || '', instagram: p.social.instagram || '', youtube: p.social.youtube || '', linkedin: p.social.linkedin || '' });
+const editFields = (p) => ({ name: p.name, nick: p.nick || '', style: p.style || '', expY: p.expY ?? '', expM: p.expM ?? '', sinceM: p.sinceM ?? '', sinceY: p.sinceY ?? '', facebook: p.social.facebook || '', instagram: p.social.instagram || '', youtube: p.social.youtube || '', linkedin: p.social.linkedin || '' });
 const editDirty = () => S.ui.edit && JSON.stringify(S.ui.edit) !== JSON.stringify(S.ui.editOrig);
 function field(id, label, path, value, err, o = {}) {
   const tag = o.area ? `<textarea class="input${err ? ' bad' : ''}" id="${id}" data-bind="${path}" maxlength="${o.max || 280}" ${err ? `aria-invalid="true" aria-describedby="${id}-err"` : ''}>${esc(value)}</textarea>`
-    : `<input class="input${err ? ' bad' : ''}" id="${id}" data-bind="${path}" value="${esc(value)}" ${o.type ? `type="${o.type}"` : ''} ${o.inputmode ? `inputmode="${o.inputmode}"` : ''} ${o.ac ? `autocomplete="${o.ac}"` : ''} ${o.ph ? `placeholder="${esc(o.ph)}"` : ''} ${err ? `aria-invalid="true" aria-describedby="${id}-err"` : ''}>`;
+    : `<input class="input${err ? ' bad' : ''}" id="${id}" data-bind="${path}" value="${esc(value)}" ${o.type ? `type="${o.type}"` : ''} ${o.inputmode ? `inputmode="${o.inputmode}"` : ''} ${o.ac ? `autocomplete="${o.ac}"` : ''} ${o.ph ? `placeholder="${esc(o.ph)}"` : ''} ${o.exp ? `data-exp="${o.exp}"` : ''} ${err ? `aria-invalid="true" aria-describedby="${id}-err"` : ''}>`;
   return `<label class="field" for="${id}"><span>${label}${o.req ? ' <span style="color:var(--error)" aria-hidden="true">*</span>' : ''}${o.pub ? ' · <span class="hint">public</span>' : ''}</span>${tag}${err ? `<span class="err" id="${id}-err">${esc(err)}</span>` : o.hint ? `<span class="hint">${o.hint}</span>` : ''}</label>`;
 }
 // Personal fields in three groups. Edit profile shows one group per section; the claim form shows all three.
 const fieldsBasics = (base, d, e, pre) => `<div class="fgrid">${field(`${pre}-name`, 'Full name', `${base}.name`, d.name, e.name, { req: true, pub: true, ac: 'name' })}${field(`${pre}-nick`, 'Nickname', `${base}.nick`, d.nick, e.nick, { pub: true, hint: 'Optional' })}</div>`;
 const fieldsGame = (base, d, e, pre) => `${field(`${pre}-style`, 'Playing style', `${base}.style`, d.style, e.style, { area: true, pub: true, hint: 'Optional. How you play, in a sentence or two.' })}
     <div class="field"><span>Experience · <span class="hint">public</span></span><div class="fgrid" style="grid-template-columns:repeat(2,minmax(0,1fr))">
-      ${field(`${pre}-expY`, 'Years', `${base}.expY`, d.expY, e.expY, { inputmode: 'numeric', ph: '0' })}${field(`${pre}-expM`, 'Months', `${base}.expM`, d.expM, e.expM, { inputmode: 'numeric', ph: '0' })}</div>
-      <span class="hint">Optional. Clubs may use it for a first assessment; it doesn't add rank points.</span></div>`;
+      ${field(`${pre}-expY`, 'Years', `${base}.expY`, d.expY, e.expY, { inputmode: 'numeric', ph: '0', exp: pre })}${field(`${pre}-expM`, 'Months', `${base}.expM`, d.expM, e.expM, { inputmode: 'numeric', ph: '0', exp: pre })}</div>
+      <div class="fgrid" style="grid-template-columns:repeat(2,minmax(0,1fr))"><label class="field" for="${pre}-sinceM"><span>Playing since</span><select class="input" id="${pre}-sinceM" data-bind="${base}.sinceM" data-exp="${pre}"><option value="">Month</option>${MONTH_NAMES.map((n, i) => `<option value="${i + 1}" ${String(d.sinceM) === String(i + 1) ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
+      ${field(`${pre}-sinceY`, 'Year', `${base}.sinceY`, d.sinceY, e.since, { inputmode: 'numeric', ph: String(new Date().getFullYear() - 2), exp: pre })}</div>
+      <span class="hint">Optional. Fill in either one; the other follows. Clubs may use it for a first assessment; it doesn't add rank points.</span></div>`;
 const fieldsLinks = (base, d, e, pre) => `<p class="hint">Optional. Links describe you to others; you can't sign in with them. Whether links are public is still being decided.</p>
     <div class="fgrid">${Object.entries(SOCIAL).map(([k, s]) => field(`${pre}-${k}`, s.label, `${base}.${k}`, d[k], e[k], { type: 'url', ph: s.eg, inputmode: 'url' })).join('')}</div>`;
 function personalFields(base, d, e, pre) {
@@ -1130,7 +1156,7 @@ function personalFields(base, d, e, pre) {
 // one draft and one Save, so switching sections never loses edits.
 const EDIT_TABS = [
   { id: 'basics', label: 'Name', intro: 'How you appear on the leaderboard and your profile.', keys: ['name', 'nick'], body: fieldsBasics },
-  { id: 'game', label: 'Playing style', intro: 'Help clubs and other players know your game.', keys: ['style', 'expY', 'expM'], body: fieldsGame },
+  { id: 'game', label: 'Playing style', intro: 'Help clubs and other players know your game.', keys: ['style', 'expY', 'expM', 'sinceM', 'sinceY'], body: fieldsGame },
   { id: 'links', label: 'Links', intro: 'Social pages shown on your profile.', keys: Object.keys(SOCIAL), body: fieldsLinks },
   { id: 'account', label: 'Account', intro: 'Private details you sign in with, and your permanent player ID.', keys: [] },
 ];
@@ -1230,7 +1256,8 @@ function viewClaim() {
     <p class="muted">Tell Lahug Smash Club or ROTRA that the link opened someone else's profile, so they can send you the right one.</p><div class="row"><button class="btn" data-act="claimBack">This is me after all</button></div>`);
   if (st === 'processing') return wrap(`<h1>Setting up your account</h1>${notice('warn', 'Your registration was received and is still being set up. You don\'t need to send it again.')}
     <div class="row"><button class="btn primary" data-act="claimCheck">Check again</button></div>`);
-  const C = S.ui.claim || (S.ui.claim = { name: a.name, nick: a.nick, email: '', pass: '', pass2: '', show: false, style: '', expY: '', expM: '', facebook: a.social.facebook, instagram: '', youtube: '', linkedin: '' });
+  // Everything the club filled in (Queue › Saved players › Edit details) starts the form; the player can change it.
+  const C = S.ui.claim || (S.ui.claim = { ...editFields(a), email: a.email || '', phone: '', pass: '', pass2: '', show: false });
   const e = S.ui.claimErr;
   if (!S.ui.claimConfirmed) {
     return wrap(`<h1>Is this you?</h1><p class="muted">Lahug Smash Club added this profile for you. Check it's yours before you set a password.</p>
@@ -1239,11 +1266,12 @@ function viewClaim() {
         <div class="row"><button class="btn primary" data-act="claimYes">Yes, this is me</button><button class="btn" data-act="claimNo">This isn't me</button></div></section>`);
   }
   return `<main class="wrap slim"><div class="page-head"><span class="label">Registration link from Lahug Smash Club</span><h1>Finish registering</h1>
-    <p class="muted">Add your email and a password. Everything else is optional and you can change it later.</p></div>
+    <p class="muted">Your club filled in what it knows. Check it, change anything that's wrong, and choose a password.</p></div>
     <form class="card stack" data-form="claim" novalidate style="gap:16px">
       ${S.ui.claimFail ? notice('bad', esc(S.ui.claimFail)) : ''}
       <div class="stack tight"><span class="label">Contact · private</span>
-        <div class="field"><span>Phone number</span><input class="input mono" id="cl-phone" value="${esc(maskPhone(a.phone))}" readonly aria-describedby="cl-phone-h"><span class="hint" id="cl-phone-h">Linked to this profile and can't be changed here. Not your number? Ask the club or ROTRA for help.</span></div>
+        ${a.phone ? `<div class="field"><span>Phone number</span><input class="input mono" id="cl-phone" value="${esc(maskPhone(a.phone))}" readonly aria-describedby="cl-phone-h"><span class="hint" id="cl-phone-h">Linked to this profile and can't be changed here. Not your number? Ask the club or ROTRA for help.</span></div>`
+          : field('cl-phone', 'Phone number', 'ui.claim.phone', C.phone, e.phone, { req: true, type: 'tel', inputmode: 'tel', ac: 'tel', ph: '0917 555 0142', hint: 'This profile has no phone yet. Add your mobile number; it identifies your ROTRA profile.' })}
         ${field('cl-email', 'Email', 'ui.claim.email', C.email, e.email, { req: true, type: 'email', ac: 'email', inputmode: 'email', hint: 'Used for password resets. Never shown publicly.' })}
         <div class="field"><label for="cl-pass" style="font-size:13px;font-weight:600;color:var(--fg2)">Password <span style="color:var(--error)" aria-hidden="true">*</span></label>
           <div class="row nowrap"><input class="input${e.pass ? ' bad' : ''}" id="cl-pass" type="${C.show ? 'text' : 'password'}" autocomplete="new-password" data-bind="ui.claim.pass" value="${esc(C.pass)}">
@@ -1341,6 +1369,7 @@ function validatePersonal(d) {
   const y = String(d.expY).trim(), m = String(d.expM).trim();
   if (y && (!/^\d+$/.test(y) || +y > 80)) e.expY = 'Enter whole years from 0 to 80.';
   if (m && (!/^\d+$/.test(m) || +m > 11)) e.expM = 'Enter months from 0 to 11.';
+  if (d.sinceM && d.sinceY && (+d.sinceY * 12 + (+d.sinceM - 1)) > new Date().getFullYear() * 12 + new Date().getMonth()) e.since = "Playing since can't be in the future.";
   Object.entries(SOCIAL).forEach(([k, s]) => {
     const v = String(d[k] || '').trim();
     if (!v) return;
@@ -1350,7 +1379,7 @@ function validatePersonal(d) {
   });
   return e;
 }
-const applyPersonal = (a, d) => Object.assign(a, { name: d.name.trim(), nick: d.nick.trim(), style: d.style.trim(), expY: String(d.expY).trim(), expM: String(d.expM).trim(), social: { facebook: d.facebook.trim(), instagram: d.instagram.trim(), youtube: d.youtube.trim(), linkedin: d.linkedin.trim() } });
+const applyPersonal = (a, d) => Object.assign(a, { name: d.name.trim(), nick: d.nick.trim(), style: d.style.trim(), expY: String(d.expY).trim(), expM: String(d.expM).trim(), sinceM: d.sinceM || '', sinceY: String(d.sinceY || '').trim(), social: { facebook: d.facebook.trim(), instagram: d.instagram.trim(), youtube: d.youtube.trim(), linkedin: d.linkedin.trim() } });
 
 function copyText(text, el) {
   const fallback = () => {
@@ -1450,7 +1479,7 @@ const ACT = {
     S.ui.claimChecks += 1;
     if (S.ui.claimChecks < 2) { toast('Still setting up. Check again in a moment.'); return; }
     const a = S.accounts.u2;
-    const C = { name: a.name, nick: a.nick, style: '', expY: '', expM: '', facebook: a.social.facebook, instagram: '', youtube: '', linkedin: '', email: '', ...(S.ui.claim || {}) };
+    const C = { ...editFields(a), email: a.email || '', ...(S.ui.claim || {}) };
     if (!C.email) C.email = 'jomar.delacruz@example.com';
     finishClaim(C);
   },
@@ -1464,6 +1493,7 @@ function finishClaim(C) {
   const a = S.accounts.u2;
   applyPersonal(a, C);
   a.email = C.email.trim(); a.claimed = true;
+  if (!a.phone) a.phone = fmtPhone(normPhone(C.phone));
   S.claim = 'valid'; S.ui.claim = null; S.ui.claimConfirmed = false; S.me = 'u2';
   go('claimDone');
 }
@@ -1537,6 +1567,12 @@ const FORM = {
   claim: () => {
     const C = S.ui.claim;
     const e = validatePersonal(C);
+    const a = S.accounts.u2;
+    if (!a.phone) {
+      const n = normPhone(C.phone || '');
+      if (!n) e.phone = 'Enter a Philippine mobile number, like 0917 555 0142.';
+      else if (Object.values(S.accounts).some((x) => x.id !== 'u2' && x.phone && digits(x.phone) === n)) e.phone = 'This number belongs to another ROTRA profile. Ask the club or ROTRA for help.';
+    }
     if (!C.email.trim()) e.email = 'Enter your email.';
     else if (!validEmail(C.email.trim())) e.email = 'Enter an email address, like name@example.com.';
     else if (Object.values(S.accounts).some((a) => a.id !== 'u2' && a.email.toLowerCase() === C.email.trim().toLowerCase())) e.email = 'This email belongs to another ROTRA account. Use a different email, or ask ROTRA for help.';
@@ -1590,9 +1626,10 @@ function applyPhoneMask(el, ev) {
 }
 document.addEventListener('input', (ev) => {
   const el = ev.target;
-  if (el.id === 'req-to' && el.type === 'tel') applyPhoneMask(el, ev);
+  if ((el.id === 'req-to' || el.id === 'cl-phone') && el.type === 'tel') applyPhoneMask(el, ev);
   if (el.dataset.bind) {
     setPath(el.dataset.bind, el.value);
+    if (el.dataset.exp) linkExperience(el);
     if (el.dataset.live !== undefined) { S.shown = 25; S.ui.findErr = ''; render(); } else save();
   }
   if (el.dataset.cfg) {

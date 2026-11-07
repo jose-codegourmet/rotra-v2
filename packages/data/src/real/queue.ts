@@ -1,6 +1,7 @@
 import type { MockSession, SignInInput } from '../auth/auth.types'
 import { clubInitials } from '../club/club.rules'
 import type { Club } from '../club/club.types'
+import type { ClubPlayerDetails, ClubPlayerDetailsInput } from '../club-player/clubPlayer.types'
 import type { ClubPlayerView } from '../club-player/fetchers'
 import type { ClubVenue } from '../club-venue/clubVenue.types'
 import type { SaveInventoryItemInput } from '../inventory/fetchers'
@@ -553,6 +554,36 @@ export async function realCreatePlayerInvite(player: ClubPlayerView) {
     url: `${playerAppOrigin()}/claim/${encodeURIComponent(token)}`,
     message: 'Invite link ready',
   }
+}
+
+/** Edit details: what the club entered for its own guest or unclaimed player. */
+export async function realGetClubPlayerDetails(id: string) {
+  const { details } = await realRequest<{ details: ClubPlayerDetails }>(
+    `/api/club/players/${encodeURIComponent(id)}`,
+  )
+  return details
+}
+export function realUpdateClubPlayerDetails(id: string, values: ClubPlayerDetailsInput) {
+  const number = (typed: string) => (typed.trim() ? Number(typed) : null)
+  return realRequest<{ clubPlayerId: string }>(`/api/club/players/${encodeURIComponent(id)}`, {
+    method: 'PATCH',
+    body: {
+      fullName: values.fullName,
+      nickname: values.nickname,
+      phone: values.phone,
+      email: values.email,
+      playingStyle: values.playingStyle,
+      experienceYears: number(values.experienceYears),
+      experienceMonths: number(values.experienceMonths),
+      socialLinks: {
+        facebook: values.facebook,
+        instagram: values.instagram,
+        youtube: values.youtube,
+        linkedin: values.linkedin,
+      },
+    },
+    fields: { experience: 'experienceYears' },
+  })
 }
 
 /** Player Information results: profiles with an RTR ID the club has not saved yet. */

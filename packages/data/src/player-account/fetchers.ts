@@ -115,14 +115,22 @@ export async function getClaimLink(token: string, signal?: AbortSignal): Promise
     preset: {
       fullName: profile.fullName,
       nickname: profile.nickname ?? '',
+      email: account.email,
+      playingStyle: profile.playingStyle,
+      experienceYears: profile.experienceYears == null ? '' : String(profile.experienceYears),
+      experienceMonths: profile.experienceMonths == null ? '' : String(profile.experienceMonths),
       facebook: profile.socialLinks.facebook,
+      instagram: profile.socialLinks.instagram,
+      youtube: profile.socialLinks.youtube,
+      linkedin: profile.socialLinks.linkedin,
     },
   }
 }
 
 export type CompleteClaimInput = {
   token: string
-  values: PersonalProfileValues & { email: string; password: string }
+  /** `phone` only when the profile has none on file (real mode); the mock profiles all have one. */
+  values: PersonalProfileValues & { email: string; password: string; phone?: string }
 }
 /**
  * Registers the linked profile: sets email and personal details and marks it claimed. Without
@@ -166,7 +174,7 @@ export async function completeClaim({ token, values }: CompleteClaimInput) {
   if (isRealDataMode()) return realCompleteClaim({ token, values })
   await delay(1100)
   if (getMockDevState().offline) throw new MockError('offline', CLAIM_OFFLINE)
-  const { email: rawEmail, password, ...rest } = values
+  const { email: rawEmail, password, phone: _phone, ...rest } = values
   const personal = personalProfileSchema.parse(rest)
   const email = emailField.parse(rawEmail)
   passwordField.parse(password)
@@ -228,13 +236,13 @@ function personalDetailsFromPreset(preset: ClaimLink['preset']): PersonalProfile
   return {
     fullName: preset.fullName,
     nickname: preset.nickname,
-    playingStyle: '',
-    experienceYears: '',
-    experienceMonths: '',
+    playingStyle: preset.playingStyle,
+    experienceYears: preset.experienceYears,
+    experienceMonths: preset.experienceMonths,
     facebook: preset.facebook,
-    instagram: '',
-    youtube: '',
-    linkedin: '',
+    instagram: preset.instagram,
+    youtube: preset.youtube,
+    linkedin: preset.linkedin,
   }
 }
 

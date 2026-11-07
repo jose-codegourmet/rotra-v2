@@ -33,6 +33,7 @@ import { useAppSelector } from '@/store/hooks'
 import { selectDev } from '@/store/slices/devSlice'
 import { AddPlayer } from '../../../_components/add-player/AddPlayer'
 import { QueryError } from '../../../_components/query-error/QueryError'
+import { EditPlayerDetails } from '../edit-player-details/EditPlayerDetails'
 
 type LiveState = { kind: 'playing' | 'waiting'; text: string }
 type LiveStates = Record<string, LiveState>
@@ -114,6 +115,7 @@ export function SavedPlayers() {
 
   const [profileId, setProfileId] = useState<string | null>(null)
   const [inviteId, setInviteId] = useState<string | null>(null)
+  const [editId, setEditId] = useState<string | null>(null)
   const [adding, setAdding] = useState(false)
   const invite = useCreatePlayerInvite()
 
@@ -263,6 +265,24 @@ export function SavedPlayers() {
               ? () => openInvite(profile.id)
               : undefined
           }
+          onEdit={
+            profile.identity === 'guest' || profile.identity === 'unclaimed'
+              ? () => {
+                  setProfileId(null)
+                  setEditId(profile.id)
+                }
+              : undefined
+          }
+        />
+      ) : null}
+      {editId ? (
+        <EditPlayerDetails
+          key={editId}
+          clubPlayerId={editId}
+          onClose={() => {
+            setProfileId(editId)
+            setEditId(null)
+          }}
         />
       ) : null}
       {invitee && (invitee.identity === 'guest' || invitee.identity === 'unclaimed') ? (

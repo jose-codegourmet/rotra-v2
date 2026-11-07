@@ -21,3 +21,34 @@ export type SavedPlayerStats = {
   totalAdvanced: number
   newPlayersThisWeek: number
 }
+
+/** Queue › Saved players › Edit details: what the club entered for a guest or unclaimed player. */
+export type ClubPlayerDetails = {
+  clubPlayerId: string
+  identity: 'guest' | 'pending' | 'unclaimed'
+  fullName: string
+  nickname: string | null
+  phoneOnFile: boolean
+  /** Unclaimed profiles only */
+  profile: {
+    email: string
+    playingStyle: string
+    experienceYears: number | null
+    experienceMonths: number | null
+    socialLinks: { facebook: string; instagram: string; youtube: string; linkedin: string }
+  } | null
+}
+/** Edit details as typed; experience stays text like the profile forms */
+export type ClubPlayerDetailsInput = {
+  fullName: string
+  nickname: string
+  phone: string
+  email: string
+  playingStyle: string
+  experienceYears: string
+  experienceMonths: string
+  facebook: string
+  instagram: string
+  youtube: string
+  linkedin: string
+}

@@ -28,8 +28,8 @@ Entry: operator-issued registration link tied to a specific existing identity. S
 |---|---|
 | Full name | Operator may preset; player completes/reviews personal identity |
 | Nickname | Operator may preset; optional until a stronger rule is agreed |
-| Phone number | Required; preset from linked identity where available; not freely replaceable through this form |
-| Email | Required; collect if missing; existing identity conflicts require resolution |
+| Phone number | Required; preset from linked identity where available and then read-only; when the profile has none, a required typable field (not on another profile) |
+| Email | Required; prefilled from what the club entered, editable; existing identity conflicts require resolution |
 | Password | Required to establish login; complexity policy is still open (#244) |
 | Confirm password | Proposed typo-prevention field; match the chosen password |
 | Facebook link/identity | Optional social field, may be preset; not login |
@@ -57,7 +57,7 @@ No SMS step or Facebook authorization is part of the agreed flow. Link lifetime 
 | Provisioning still processing | Show pending state/retry status check; avoid duplicate submission |
 | Offline | Require connectivity; preserve unsent form values appropriately without claiming success |
 
-The club (Queue Master) can reissue the link, which invalidates the previous one (decided 2026-11-07, #244). Exact wording and the replacement-link delivery method are still open. Operator role remains initial entry; normal forgotten-password recovery is by email.
+The club (Queue Master) can issue another link; for now that does not invalidate earlier ones, each expires after 7 days (TBD, November 8, 2026). Every field the club entered is prefilled and stays editable. Experience is Years + months and Playing since (month, year), linked. Exact wording and the replacement-link delivery method are still open. Operator role remains initial entry; normal forgotten-password recovery is by email.
 
 ## P-FORGOT — Email recovery request
 

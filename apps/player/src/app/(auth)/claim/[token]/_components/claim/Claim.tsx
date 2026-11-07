@@ -128,7 +128,12 @@ export function Claim({ token }: { token: string }) {
         error
           ? {
               message: error.message,
-              field: error instanceof MockError && error.fieldErrors?.email ? 'email' : undefined,
+              field:
+                error instanceof MockError && error.fieldErrors?.email
+                  ? 'email'
+                  : error instanceof MockError && error.fieldErrors?.phone
+                    ? 'phone'
+                    : undefined,
             }
           : undefined
       }

@@ -31,6 +31,8 @@ export const EmailConflict: Story = {
     serverError: { message: claimLinkScenarios.emailConflict, field: 'email' },
   },
 }
+/** The profile has no phone on file, so the player types one. */
+export const NoPhoneOnFile: Story = { args: { maskedPhone: '' } }
 export const Pending: Story = { args: { isPending: true } }
 export const OfflineServerError: Story = {
   args: { serverError: { message: claimLinkScenarios.offline } },

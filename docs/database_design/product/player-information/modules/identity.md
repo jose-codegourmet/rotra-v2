@@ -12,7 +12,7 @@
 | `full_name`, `nickname`, `avatar_ref` | Public/permitted display data; nickname/avatar optional |
 | `profile_state` | Unclaimed/claimed; no login is required for unclaimed identity |
 | `hide_phone_from_clubs` | Privacy preference |
-| `experience_months`, `experience_recorded_at` | Optional nonnegative self-reported experience snapshot; not rating credit |
+| `experience_months`, `experience_recorded_at` | Optional nonnegative self-reported experience snapshot; not rating credit. Playing since = `experience_recorded_at` minus `experience_months` (month precision); screens show years and months counted from it (November 8, 2026). Set by the player, or by the club for an unclaimed profile |
 | `personal_details`, `details_version` | Optional validated JSONB for agreed playing-style fields; final schema pending |
 | `created_at`, `updated_at`, `revision` | Common metadata |
 

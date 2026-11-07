@@ -49,9 +49,9 @@ export function realCompleteClaim({
   values,
 }: {
   token: string
-  values: PersonalProfileValues & { email: string; password: string }
+  values: PersonalProfileValues & { email: string; password: string; phone?: string }
 }) {
-  const { email, password, ...rest } = values
+  const { email, password, phone, ...rest } = values
   const personal = personalProfileSchema.parse(rest)
   const number = (typed: string) => (typed ? Number(typed) : null)
   return realRequest<CompleteClaimResult & { session: MockSession }>(
@@ -61,6 +61,7 @@ export function realCompleteClaim({
       body: {
         email,
         password,
+        phone,
         fullName: personal.fullName,
         nickname: personal.nickname,
         playingStyle: personal.playingStyle,

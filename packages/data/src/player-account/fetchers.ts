@@ -122,7 +122,8 @@ export async function getClaimLink(token: string, signal?: AbortSignal): Promise
 
 export type CompleteClaimInput = {
   token: string
-  values: PersonalProfileValues & { email: string; password: string }
+  /** `phone` only when the profile has none on file (real mode); the mock profiles all have one. */
+  values: PersonalProfileValues & { email: string; password: string; phone?: string }
 }
 /**
  * Registers the linked profile: sets email and personal details and marks it claimed. Without
@@ -166,7 +167,7 @@ export async function completeClaim({ token, values }: CompleteClaimInput) {
   if (isRealDataMode()) return realCompleteClaim({ token, values })
   await delay(1100)
   if (getMockDevState().offline) throw new MockError('offline', CLAIM_OFFLINE)
-  const { email: rawEmail, password, ...rest } = values
+  const { email: rawEmail, password, phone: _phone, ...rest } = values
   const personal = personalProfileSchema.parse(rest)
   const email = emailField.parse(rawEmail)
   passwordField.parse(password)

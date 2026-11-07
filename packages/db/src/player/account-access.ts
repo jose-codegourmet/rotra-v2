@@ -37,7 +37,7 @@ export type ClaimDetails = {
 export async function registerFromClaim(
   cookies: CookieAdapter,
   token: string,
-  input: { email: string; password: string; details: ClaimDetails },
+  input: { email: string; password: string; phoneE164?: string; details: ClaimDetails },
 ) {
   const email = input.email.trim().toLowerCase()
   if (!email.includes('@'))
@@ -47,6 +47,7 @@ export async function registerFromClaim(
     token,
     email,
     password: input.password,
+    phoneE164: input.phoneE164,
   })
   const supabase = createSupabaseServer(withoutMockCookies(cookies), 'player')
   const { data, error } = await supabase.auth.signInWithPassword({

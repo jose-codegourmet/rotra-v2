@@ -7,10 +7,15 @@ import { requireClubEntitlement } from '../service/authorize'
 import { ServiceError } from '../service/errors'
 import { toIso } from '../service/serialize'
 
-/** Decided 2026-11-07 (#244): links last 7 days, single use; one active link per player, reissue revokes. */
+/**
+ * Links last 7 days and work once (#244). TBD (owner, 2026-11-08): a new link no longer revokes
+ * earlier ones; each simply expires, and once the profile is registered the others read as used.
+ */
 export const CLAIM_LINK_DAYS = 7
 
 const EXPIRED = 'The registration link has expired or was replaced.'
+const NEEDS_PHONE = 'Add your mobile number to finish registering.'
+const PHONE_TAKEN = 'This number belongs to another ROTRA profile. Ask the club or ROTRA for help.'
 
 async function digest(token: string) {
   return new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(token)))
@@ -30,8 +35,8 @@ export function maskPhone(e164: string) {
 }
 
 /**
- * Q-PLAYER · Invite to register. Issues a link for this club's linked, unclaimed player and returns
- * the plaintext token once; only its digest is stored. Names or RTR IDs alone never issue a link.
+ * Q-SAVED-PLAYERS · Invite. Issues a link for this club's linked, unclaimed player and returns the
+ * plaintext token once; only its digest is stored. Names or RTR IDs alone never issue a link.
  */
 export async function issueClaimLink(context: ClubContext, clubPlayerId: string) {
   await requireClubEntitlement(context)
@@ -48,10 +53,6 @@ export async function issueClaimLink(context: ClubContext, clubPlayerId: string)
     if (player.profileState === 'claimed')
       throw new ServiceError('conflict', { player: 'This player has already registered.' })
     const now = new Date()
-    await tx.playerClaimLink.updateMany({
-      where: { playerId: player.id, state: 'active' },
-      data: { state: 'revoked', revokedAt: now, revision: { increment: 1 } },
-    })
     const expiresAt = new Date(now.getTime() + CLAIM_LINK_DAYS * 86_400_000)
     await tx.playerClaimLink.create({
       data: {
@@ -128,7 +129,7 @@ export async function readClaimLink(token: string) {
  */
 export async function completeClaim(
   provider: ProviderAdmin,
-  input: { token: string; email: string; password: string },
+  input: { token: string; email: string; password: string; phoneE164?: string },
 ) {
   const email = input.email.trim().toLowerCase()
   const link = await findLink(input.token)
@@ -144,8 +145,18 @@ export async function completeClaim(
     throw new ServiceError('forbidden', { link: 'This profile is already registered.' })
   }
   if (link.expiresAt <= new Date()) throw new ServiceError('forbidden', { link: EXPIRED })
-  if (!player.privateContact || !player.idAllocation)
-    throw new ServiceError('invalid', { link: EXPIRED })
+  if (!player.idAllocation) throw new ServiceError('invalid', { link: EXPIRED })
+  // A profile with no phone on file takes the player's own number here; one on file never changes.
+  const phoneE164 = player.privateContact?.phoneE164 ?? input.phoneE164
+  if (!phoneE164) throw new ServiceError('invalid', { phone: NEEDS_PHONE })
+  if (!player.privateContact) {
+    const owner = await prisma.playerPrivateContact.findUnique({
+      where: { phoneE164 },
+      select: { playerId: true },
+    })
+    if (owner && owner.playerId !== player.id)
+      throw new ServiceError('conflict', { phone: PHONE_TAKEN })
+  }
   const taken = await prisma.playerPrivateContact.findUnique({
     where: { email },
     select: { playerId: true },
@@ -159,7 +170,7 @@ export async function completeClaim(
       await provider.createLogin({
         operationRef: link.id,
         email,
-        phoneE164: player.privateContact.phoneE164,
+        phoneE164,
         initialPassword: input.password,
       })
     ).subject
@@ -178,9 +189,10 @@ export async function completeClaim(
     }
     if (current.state !== 'active') throw new ServiceError('forbidden', { link: EXPIRED })
     const now = new Date()
-    const contact = await tx.playerPrivateContact.update({
+    const contact = await tx.playerPrivateContact.upsert({
       where: { playerId: player.id },
-      data: { email, emailVerifiedAt: null, revision: { increment: 1 } },
+      update: { email, emailVerifiedAt: null, revision: { increment: 1 } },
+      create: { playerId: player.id, phoneE164, email },
     })
     await tx.playerAccount.create({
       data: {

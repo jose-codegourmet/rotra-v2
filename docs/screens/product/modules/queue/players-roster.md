@@ -131,6 +131,8 @@ The roster appears in two places:
 - **Preparation** ([Q-PREPARE](session-setup.md#q-prepare--session-preparation-overview)): picture, name, identity chip, suggestion, level indicator (may be too high / too low / matches suggestion), level select, Present switch, remove ×; **Mark all present**. New players start not present. Removing hides the player at once (counts update with it), ignores repeat taps for that player, and puts them back with an error toast if the removal is refused.
 - **Live console** ([Q-POOL](session-console.md#q-pool--players-view)): picture, name, locked level, games against minimum, wait time, status, Present switch. Late players start present. There is no remove action during a live session.
 
+**Group by Skill group** (All tab only) shows a **Skill mix** bar above the groups: label left, player total right ("11 players", or "No players yet" with an empty track), then one 8 px stacked bar with a segment per skill group sized by head count (Beginner, Intermediate, Advanced, and No level only while someone has none; empty groups are left out), and a wrapping legend of dot + name + count. Counts come from the same players the groups show, so it follows level edits, adds and removals. The bar is `role="img"` with a spoken summary; the legend carries the numbers so color is never the only signal.
+
 Separate slot confirmation from presence; being listed is not proof of arrival.
 
 The Present switch controls automatic pairing eligibility. It is not a menu of Resting/Eating/Prepared statuses. Turning someone unavailable marks affected future matches Needs attention. It must not cancel an active game, free their court, or remove their ongoing participation silently.

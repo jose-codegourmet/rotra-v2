@@ -167,6 +167,7 @@
     "./replace-player-sheet": "./src/components/replace-player-sheet/ReplacePlayerSheet.tsx",
     "./sheet": "./src/components/sheet/Sheet.tsx",
     "./sign-out-sheet": "./src/components/sign-out-sheet/SignOutSheet.tsx",
+    "./skill-distribution-bar": "./src/components/skill-distribution-bar/SkillDistributionBar.tsx",
     "./skeleton": "./src/components/skeleton/Skeleton.tsx",
     "./skill-ladder": "./src/components/skill-ladder/SkillLadder.tsx",
     "./slot-meter": "./src/components/slot-meter/SlotMeter.tsx",

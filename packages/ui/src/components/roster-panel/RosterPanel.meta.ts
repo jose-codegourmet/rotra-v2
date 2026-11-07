@@ -9,7 +9,7 @@ export const rosterPanelMeta = {
     'Active Session settings passes readOnly to show locked levels and presence text; only Add player remains available.',
     'Use for the Roster and levels tab of a prepared Queue Session (Q-PREPARE).',
     'Mark all present shows only while someone is not present; Mark all absent only while someone is present.',
-    'Level tabs are All, Advanced, Intermediate, Beginner, and No level only while someone has none. Group by Skill group is offered on All only.',
+    'Level tabs are All, Advanced, Intermediate, Beginner, and No level only while someone has none. Group by Skill group is offered on All only and shows the SkillDistributionBar above the groups.',
     'List is RosterRow; Grid is RosterCard. Tab, Group by and view can be controlled, or they stay on this component until the screen remembers them on the device.',
     'paid and returning are optional player flags for Group by Payment and Returning or first time; omit them until those are wired.',
     'Do not use in the live console: Queue › Players shows locked levels and no remove action.',

@@ -362,6 +362,20 @@ button.qf:hover .avatar { box-shadow: 0 0 0 2px var(--accent); }
 @media (max-width: 640px) { .prow { grid-template-columns: minmax(0, 1fr); gap: 8px; } .prow .lvcol { order: 2; } .prow > .row { order: 3; justify-content: space-between; } }
 /* Roster and levels: level tabs, Group by and List | Grid. Grid cards hold the same controls as a row. */
 .rv-bar { gap: 10px; }
+.skill-mix { display: flex; flex-direction: column; gap: 8px; }
+.skill-mix .sm-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-size: 13px; }
+.skill-mix .sm-head b { color: var(--fg); }
+.skill-mix .sm-head span { color: var(--fg2); }
+.skill-mix .sm-bar { display: flex; gap: 2px; height: 8px; border-radius: 999px; overflow: hidden; }
+.skill-mix .sm-bar i { display: block; flex-basis: 0; min-width: 0; }
+.skill-mix .sm-bar.empty { background: var(--border); }
+.skill-mix .sm-legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12px; color: var(--fg2); list-style: none; margin: 0; padding: 0; }
+.skill-mix .sm-legend li { display: inline-flex; align-items: center; gap: 6px; }
+.skill-mix .sm-legend i { width: 8px; height: 8px; border-radius: 50%; }
+.skill-mix .sm-beginner { background: color-mix(in srgb, var(--accent) 30%, transparent); }
+.skill-mix .sm-intermediate { background: color-mix(in srgb, var(--accent) 60%, transparent); }
+.skill-mix .sm-advanced { background: var(--accent); }
+.skill-mix .sm-none { background: var(--border-strong); }
 .rv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: 10px; }
 .rv-card { display: flex; flex-direction: column; gap: 8px; min-width: 0; padding: 12px; border-radius: var(--r); border: 1px solid var(--border); background: var(--surface); box-shadow: var(--shadow); }
 .rv-top { display: flex; align-items: flex-start; gap: 10px; min-width: 0; }
@@ -2765,6 +2779,16 @@ function rvCard(s, r, live) {
         <div class="rv-st">${live ? rvAway(r) : rvPresence(r, p)}<span class="rv-paid ${paid ? 'ok' : ''}">${paid ? `${I.check} Paid` : 'Not paid'}</span></div>
       </article>`;
 }
+function skillMix(rows) {
+  const n = (g) => rows.filter((r) => (r.level == null ? 'No level' : LEVELS[r.level].band) === g).length;
+  const items = [['advanced', 'Advanced'], ['intermediate', 'Intermediate'], ['beginner', 'Beginner'], ['none', 'No level']].map(([k, l]) => [k, l, n(l)]).filter(([, , c]) => c > 0);
+  const total = items.reduce((t, [, , c]) => t + c, 0);
+  if (!total) return '<div class="skill-mix"><div class="sm-head"><b>Skill mix</b><span>No players yet</span></div><div class="sm-bar empty"></div></div>';
+  const say = items.map(([k, l, c]) => (k === 'none' ? `${c} with no level` : `${c} ${l}`)).join(', ');
+  return `<div class="skill-mix"><div class="sm-head"><b>Skill mix</b><span>${total} player${total === 1 ? '' : 's'}</span></div>
+    <div class="sm-bar" role="img" aria-label="Skill mix: ${say}">${items.map(([k, , c]) => `<i class="sm-${k}" style="flex-grow:${c}"></i>`).join('')}</div>
+    <ul class="sm-legend">${items.map(([k, l, c]) => `<li><i class="sm-${k}"></i>${l} ${c}</li>`).join('')}</ul></div>`;
+}
 function rosterPanel(s, live, missing) {
   const bandN = (b) => s.roster.filter((r) => rvBand(r) === b).length;
   const tabs = [['all', 'All', s.roster.length], ...[...LEVEL_GROUPS].reverse().map((b) => [b.toLowerCase(), b, bandN(b.toLowerCase())])];
@@ -2789,7 +2813,7 @@ function rosterPanel(s, live, missing) {
         <div class="seg" role="group" aria-label="Roster view">${[['list', 'List'], ['grid', 'Grid']].map(([k, l]) => `<button id="rvv-${k}" aria-pressed="${view === k}" data-act="rvSet" data-k="view" data-v="${k}">${l}</button>`).join('')}</div>
       </div>
       <div id="rv-panel" role="tabpanel" aria-labelledby="rvt-${tab}" class="stack">${!rows.length ? `<div class="empty">No ${esc(tabs.find(([k]) => k === tab)[1])} players on the roster.</div>`
-        : sections ? sections.map(([g, list], i) => `<section class="stack tight" aria-labelledby="rvg-${i}"><h3 id="rvg-${i}">${esc(g)} · ${list.length}</h3>${body(list)}</section>`).join('') : body(rows)}</div>`
+        : sections ? (by[0] === 'skill' ? skillMix(rows) : '') + sections.map(([g, list], i) => `<section class="stack tight" aria-labelledby="rvg-${i}"><h3 id="rvg-${i}">${esc(g)} · ${list.length}</h3>${body(list)}</section>`).join('') : body(rows)}</div>`
         : '<div class="empty">No players yet. Add players from your saved list or as new guests.</div>'}
     </section>`;
 }

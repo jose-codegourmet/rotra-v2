@@ -13,6 +13,7 @@ import { RosterRow } from '@rotra/ui/roster-row'
 import { SegmentedControl } from '@rotra/ui/segmented-control'
 import { Select } from '@rotra/ui/select'
 import { Skeleton } from '@rotra/ui/skeleton'
+import { SkillDistributionBar } from '@rotra/ui/skill-distribution-bar'
 import { SlotMeter } from '@rotra/ui/slot-meter'
 import { Tabs as TabsPrimitive } from 'radix-ui'
 import { useId, useState } from 'react'
@@ -226,6 +227,8 @@ export function RosterPanel({
   const groupOptions = rosterGroupByOptions(tab)
   const rows = filterRosterByLevelTab(players, tab)
   const sections = groupRosterPlayers(rows, groupBy)
+  const skillCount = (heading: string) =>
+    sections?.find((section) => section.heading === heading)?.players.length ?? 0
   const tabLabel = tabs.find((item) => item.value === tab)?.label ?? 'All'
 
   if (loading)
@@ -341,27 +344,40 @@ export function RosterPanel({
               {!rows.length ? (
                 <EmptyState>No {tabLabel} players on the roster.</EmptyState>
               ) : sections ? (
-                sections.map((section, index) => (
-                  <section
-                    key={section.heading}
-                    className="flex flex-col gap-2"
-                    aria-labelledby={`${headingId}-${index}`}
-                  >
-                    <h3 id={`${headingId}-${index}`} className="text-[15px] font-bold">
-                      {section.heading} · {section.players.length}
-                    </h3>
-                    <PlayerList
-                      players={section.players}
-                      view={view}
-                      levelsLocked={levelsLocked}
-                      readOnly={readOnly}
-                      onOpenProfile={onOpenProfile}
-                      onLevelChange={onLevelChange}
-                      onPresentChange={onPresentChange}
-                      onRemove={onRemove}
+                [
+                  groupBy === 'skill' ? (
+                    <SkillDistributionBar
+                      key="skill-mix"
+                      counts={{
+                        beginner: skillCount('Beginner'),
+                        intermediate: skillCount('Intermediate'),
+                        advanced: skillCount('Advanced'),
+                        unrated: skillCount('No level'),
+                      }}
                     />
-                  </section>
-                ))
+                  ) : null,
+                  ...sections.map((section, index) => (
+                    <section
+                      key={section.heading}
+                      className="flex flex-col gap-2"
+                      aria-labelledby={`${headingId}-${index}`}
+                    >
+                      <h3 id={`${headingId}-${index}`} className="text-[15px] font-bold">
+                        {section.heading} · {section.players.length}
+                      </h3>
+                      <PlayerList
+                        players={section.players}
+                        view={view}
+                        levelsLocked={levelsLocked}
+                        readOnly={readOnly}
+                        onOpenProfile={onOpenProfile}
+                        onLevelChange={onLevelChange}
+                        onPresentChange={onPresentChange}
+                        onRemove={onRemove}
+                      />
+                    </section>
+                  )),
+                ]
               ) : (
                 <PlayerList
                   players={rows}

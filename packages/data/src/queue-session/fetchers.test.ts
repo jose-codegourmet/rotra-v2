@@ -146,6 +146,7 @@ describe('Session done › real mode', () => {
       participants: 2,
       pendingChanges: 0,
       activeGames: [{ matchId: 'm-2', courtLabels: ['Court 2'] }],
+      onCourtDropped: 0,
       unplayedWaiting: 1,
       belowMinimum: [{ clubPlayerId: 'c-r2', name: 'Test Bea', completedGames: 1 }],
       minimum: 3,

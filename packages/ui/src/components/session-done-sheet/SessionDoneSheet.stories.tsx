@@ -44,6 +44,16 @@ export const ReviewWithUnplayedAndShortfalls: Story = {
   args: scenario(sessionDoneFixtures.shortfalls),
 }
 
+/** On court matches never started: an info notice says they will be dropped; they do not block. */
+export const ReviewWithOnCourtDropped: Story = {
+  args: scenario(sessionDoneFixtures.onCourt),
+}
+
+/** The same notice on the confirmation step. */
+export const ConfirmWithOnCourtDropped: Story = {
+  args: { ...scenario(sessionDoneFixtures.onCourt), step: 'confirm' },
+}
+
 /** Offline: the review still shows, but Continue is disabled until the device reconnects. */
 export const ReviewOffline: Story = {
   args: { ...scenario(sessionDoneFixtures.shortfalls), online: false, pendingChanges: 3 },

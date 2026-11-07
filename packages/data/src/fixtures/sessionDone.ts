@@ -21,6 +21,8 @@ export type SessionDoneScenario = {
   participants: number
   pendingChanges: number
   activeGames: SessionDoneActiveGame[]
+  /** On court matches never started; dropped at Session done */
+  onCourtDropped?: number
   unplayedWaiting: number
   belowMinimum: SessionDoneShortfall[]
   minimum: number
@@ -109,7 +111,10 @@ export function createSessionDoneFixtures(now = Date.now()) {
     ),
   }
 
-  return { clean, inPlay, shortfalls: shortfallsOnly, longNames }
+  /** Two On court matches that never started plus the waiting ones: the info notice shows. */
+  const onCourt: SessionDoneScenario = { ...shortfallsOnly, onCourtDropped: 2 }
+
+  return { clean, inPlay, shortfalls: shortfallsOnly, longNames, onCourt }
 }
 
 export const sessionDoneFixtures = createSessionDoneFixtures()

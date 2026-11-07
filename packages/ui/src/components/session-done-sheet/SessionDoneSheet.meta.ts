@@ -9,6 +9,7 @@ export const sessionDoneSheetMeta = {
     'Pass the counts and the court labels of games still in play; the sheet only blocks (Continue is disabled while any game is active or offline) and never finishes or invalidates games itself.',
     'Confirm Session done is disabled while pendingChanges > 0, offline, or isPending; isPending also hides Close and blocks Back and Escape.',
     'Copy is fixed by dialogs.md (D-MINIMUM, D-SESSION-DONE) and session-finalization.md; counts pluralise like the prototype (1 game is / 2 games are). The prototype reviewer note about unfinished games is not product copy and is not rendered.',
+    'On court matches that never started show an info notice ("N matches on court weren't started and will be dropped.") on the review and confirm steps; they never block Session done, only Playing games do.',
     'The missing-records check (D-INTERRUPTION) is a separate flow, not a step here.',
   ],
   prototype: {

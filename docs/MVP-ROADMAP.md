@@ -1,5 +1,7 @@
 # ROTRA MVP roadmap
 
+**Decision tracking:** [MVP decisions](MVP-DECISIONS.md) records approval, ticket, implementation and roadmap status for new decisions.
+
 **Purpose:** Quick orientation for contributors and AI agents. GitHub issues are the implementation tracker; this file summarizes scope, not a replacement for tickets. Check `main` and linked issues before assuming a feature is missing. Updated 2026-11-07.
 
 ## MVP goal

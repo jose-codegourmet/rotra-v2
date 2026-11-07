@@ -66,7 +66,7 @@ export const signInExamples = {
 }
 
 export const playerAccessScenarios = {
-  credentialError: "That phone number or email and password don't match. Check them and try again.",
+  credentialError: "That email and password don't match. Check them and try again.",
   successNote: 'Password saved. Sign in with your new password.',
   invalidEmail: 'not-an-email',
   requestError: "Couldn't send because you're offline. Try again when you're connected.",

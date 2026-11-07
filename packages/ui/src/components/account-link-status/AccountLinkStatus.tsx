@@ -132,8 +132,7 @@ export function AccountLinkStatus({
       return (
         <LinkPage label="Registration complete" title={`Welcome, ${firstName ?? ''}`}>
           <Notice tone="success">
-            Your profile is registered. Sign in from now on with your phone number or email and your
-            password.
+            Your profile is registered. Sign in from now on with your email and your password.
           </Notice>
           <Card asChild>
             <section className="flex flex-col gap-1.5">

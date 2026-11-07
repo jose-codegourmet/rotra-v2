@@ -930,7 +930,7 @@ function viewPlayer() {
         <p class="small muted">The RTR ID never changes, including after a contact change.</p></section>
       <section class="card stack"><div class="sec-head"><div><h2>Private contact</h2><p class="small muted">Only Admin sees these. Players can't change them themselves; they send a request.</p></div></div>
         <dl class="kv"><dt>Phone</dt><dd class="mono">${esc(p.phone || 'Not given')}</dd><dt>Email</dt><dd class="mono">${esc(p.email || 'Not given')}</dd>
-        <dt>Sign in with</dt><dd>${p.claimed ? 'Phone number or email' : 'Nothing yet. The player hasn\'t registered.'}</dd>
+        <dt>Sign in with</dt><dd>${p.claimed ? 'Email' : 'Nothing yet. The player hasn\'t registered.'}</dd>
         <dt>Phone shown to clubs</dt><dd>${p.claimed ? (p.phoneHidden ? 'No, hidden by the player' : 'Yes') : 'Entered by the club'}</dd></dl></section>
       <section class="card stack"><h2>Contact-change requests</h2>
         ${reqs.length ? `<div class="list">${reqs.map((r) => `<div class="between" style="padding:10px 0;border-bottom:1px solid var(--border)"><div class="stack tight" style="min-width:0"><div class="row">${reqChip(r)}<span class="small muted">${FIELD[r.field][0].toUpperCase() + FIELD[r.field].slice(1)} · sent ${ago(r.at)}</span></div><span class="mono small wrapw">${esc(r.from || '—')} → ${esc(r.to)}</span></div><button class="btn sm" data-act="openReview" data-id="${r.id}">${nextAction(r)}</button></div>`).join('')}</div>`

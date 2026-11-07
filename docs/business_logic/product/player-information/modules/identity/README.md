@@ -37,9 +37,10 @@ Experience can inform the initial operator assessment but is not automatic ranki
 
 ## Login and recovery
 
-- Sign in with **phone or email + password**.
-- **Owner decisions, November 7, 2026 (#244):** the auth account is keyed by **email + password**; email is required for every player account. Phone is a login identifier only: the server normalizes it through the approved identity rules, finds the linked account's email, and signs in with email + password. No phone provider and no SMS; phone and email reach the same account.
-- A failed sign-in never reveals whether a phone or email exists. A hidden phone still signs in: privacy hides the phone from clubs, not from login.
+- Sign in with **email + password**. Phone is not a sign-in identifier.
+- **Owner decisions, November 7, 2026 (#244):** the auth account is keyed by **email + password**; email is required for every player account. No phone provider and no SMS.
+- **Changed November 8, 2026 (owner):** the phone-lookup sign-in decided on November 7 is withdrawn. Email is the only login; phone stays a contact and the profile-matching key for clubs.
+- A failed sign-in never reveals whether an email exists or whether the profile is registered.
 - The player profile links to the auth user; the auth user is not the player identity.
 - No Facebook/social login.
 - Forgotten passwords are recovered by email only.

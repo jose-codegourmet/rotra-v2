@@ -126,7 +126,7 @@ Every agreed business module has a corresponding screen contract. The checks bel
 | Requirement | Screen contract | Acceptance evidence to obtain later |
 |---|---|---|
 | Public profiles and global leaderboard | [Profile](modules/player-information/profile.md), [ranking](modules/player-information/ranking-history.md) | No city/club filter or stage-category expansion |
-| Required phone/email; phone-or-email + password | [Registration/access](modules/player-information/access-registration.md) | No social login; claim tied to existing identity |
+| Required phone/email; email + password sign-in | [Registration/access](modules/player-information/access-registration.md) | No social login; claim tied to existing identity |
 | Optional preset socials/experience/style | [Registration/profile](modules/player-information/access-registration.md) | Optional fields not revived old mandatory onboarding |
 | Forgot password sends email | [Recovery](modules/player-information/access-registration.md) | Operator not routine password-reset authority |
 | Player edits personal info, never games | [Own profile](modules/player-information/profile.md) | Contacts read-only; rank/history non-editable |

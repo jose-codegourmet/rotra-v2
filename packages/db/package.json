@@ -31,6 +31,7 @@
     "./player/identity": "./src/player/identity.ts",
     "./player/profile": "./src/player/profile.ts",
     "./player/claim": "./src/player/claim.ts",
+    "./player/account-access": "./src/player/account-access.ts",
     "./player/contact-change": "./src/player/contact-change.ts",
     "./queue/public-session": "./src/queue/public-session.ts",
     "./queue/match-store": "./src/queue/match-store.ts",

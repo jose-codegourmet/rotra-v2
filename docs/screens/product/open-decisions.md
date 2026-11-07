@@ -48,8 +48,8 @@ Recorded in the [business decision summary](../../business_logic/product/open-de
 
 | Area | Decision | Screens |
 |---|---|---|
-| Player sign-in mapping | Account keyed by email + password; a phone is a login identifier the server looks up to the account's email. No SMS. Phone and email reach the same account | P-LOGIN |
-| Credential failure | One generic error; never reveals whether a phone or email exists. A hidden phone still signs in | P-LOGIN |
+| Player sign-in mapping | Account keyed by email + password; players sign in with email only (phone login withdrawn 2026-11-08). No SMS | P-LOGIN |
+| Credential failure | One generic error; never reveals whether an email exists | P-LOGIN |
 | Recovery | Email-only; email is required for every account | P-FORGOT, P-RESET |
 | Claim links | Valid 7 days, single use; the club reissues, which invalidates the previous link; expired/used links show the existing state | P-CLAIM-STATUS |
 | Contact collision at claim | Block and show the contact-support route; never merge. An RTR ID or name alone never claims | P-CLAIM, P-CLAIM-STATUS |

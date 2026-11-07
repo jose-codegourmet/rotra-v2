@@ -7,8 +7,8 @@ import { requireClubEntitlement } from '../service/authorize'
 import { ServiceError } from '../service/errors'
 import { toIso } from '../service/serialize'
 
-/** Proposal pending #244: links last 14 days; one active link per player, reissue revokes. */
-export const CLAIM_LINK_DAYS = 14
+/** Decided 2026-11-07 (#244): links last 7 days, single use; one active link per player, reissue revokes. */
+export const CLAIM_LINK_DAYS = 7
 
 const EXPIRED = 'The registration link has expired or was replaced.'
 
@@ -78,6 +78,7 @@ async function findLink(token: string) {
           nickname: true,
           avatarRef: true,
           profileState: true,
+          socialLinks: { where: { provider: 'facebook' }, select: { url: true } },
           idAllocation: { select: { rtrId: true } },
           privateContact: { select: { phoneE164: true } },
           account: { select: { authSubject: true } },
@@ -87,7 +88,7 @@ async function findLink(token: string) {
   })
 }
 
-/** P-CLAIM read (`ClaimLink`): public identity and a masked phone only. */
+/** P-CLAIM read (`ClaimLink`): public identity, a masked phone and the form's preset details only. */
 export async function readClaimLink(token: string) {
   const link = await findLink(token)
   if (!link || link.state === 'revoked' || !link.player.idAllocation)
@@ -110,6 +111,11 @@ export async function readClaimLink(token: string) {
       maskedPhone: link.player.privateContact
         ? maskPhone(link.player.privateContact.phoneE164)
         : '',
+    },
+    preset: {
+      fullName: link.player.fullName,
+      nickname: link.player.nickname ?? '',
+      facebook: link.player.socialLinks[0]?.url ?? '',
     },
   }
 }

@@ -22,6 +22,11 @@ at paste time — see the branch-compose section in the matrix doc.
 
 - `supabase/magic-link-otp.html` — OTP-first Magic link draft (`{{ .Token }}` prominent;
   `{{ .ConfirmationURL }}` as fallback). Suggested subject: `Your ROTRA Admin one-time code`.
+- `supabase/reset-password.html` — Player password reset (`recovery` slot). Suggested subject:
+  `Reset your ROTRA password`. The link is `{{ .RedirectTo }}/{{ .TokenHash }}`, which opens the
+  Player app's `/reset-password/<token>`; the app verifies it server-side. Add
+  `https://player.rotra.club/reset-password` (and `http://localhost:9001/reset-password` for local
+  work) to **Authentication → URL Configuration → Redirect URLs**, or Supabase drops the redirect.
 - Admin also keeps `apps/admin/src/email-templates/magic-link.html` for the same slot; which
   body is pasted in the dashboard is not recorded in-repo (known gap in the OpenSpec).
 

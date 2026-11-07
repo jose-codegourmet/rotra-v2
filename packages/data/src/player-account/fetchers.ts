@@ -10,7 +10,14 @@ import { delay } from '../mock/latency'
 import { mockStore, readMockState } from '../mock/store'
 import { applyPersonalProfile } from '../player/fetchers'
 import { isRealDataMode } from '../real/mode'
-import { realGetMyAccount, realSetPhonePrivacy } from '../real/player'
+import {
+  realCompleteClaim,
+  realGetClaimLink,
+  realGetMyAccount,
+  realRequestPasswordReset,
+  realResetPassword,
+  realSetPhonePrivacy,
+} from '../real/player'
 import { maskPhone } from './playerAccount.rules'
 import type { ClaimLink, CompleteClaimResult, MyAccount } from './playerAccount.types'
 
@@ -32,11 +39,9 @@ export async function getMyAccount(signal?: AbortSignal): Promise<MyAccount | nu
     : null
 }
 
-// Reset and registration (claim) stay not connected in real mode: `delay` refuses with the
-// not-connected message. Player sign-in, provider recovery email and claim provisioning wait on #244.
-
 /** Same acknowledgement for known and unknown emails. No email is delivered in the mock. */
 export async function requestPasswordReset(email: string) {
+  if (isRealDataMode()) return realRequestPasswordReset(emailField.parse(email))
   await delay(400)
   if (getMockDevState().offline)
     throw new MockError(
@@ -46,7 +51,9 @@ export async function requestPasswordReset(email: string) {
   emailField.parse(email)
   return { acknowledged: true }
 }
+/** Real mode can't check a recovery token without using it up, so the form opens and submit decides. */
 export async function getResetLink(token: string, signal?: AbortSignal) {
+  if (isRealDataMode()) return { token, status: 'valid' as const }
   await delay(200, signal)
   if (getMockDevState().offline)
     throw new MockError('offline', "You're offline. Reconnect to check this reset link.")
@@ -55,6 +62,7 @@ export async function getResetLink(token: string, signal?: AbortSignal) {
 }
 /** Simulate consuming a reset link. Passwords are validated but never retained or returned. */
 export async function resetPassword({ token, password }: { token: string; password: string }) {
+  if (isRealDataMode()) return realResetPassword({ token, password: passwordField.parse(password) })
   await delay(400)
   if (getMockDevState().offline)
     throw new MockError(
@@ -78,6 +86,7 @@ const EMAIL_CONFLICT =
 
 /** A registration link as its recipient may see it; unknown tokens are null (shown as expired). */
 export async function getClaimLink(token: string, signal?: AbortSignal): Promise<ClaimLink | null> {
+  if (isRealDataMode()) return realGetClaimLink(token, signal)
   await delay(300, signal)
   if (getMockDevState().offline)
     throw new MockError('offline', "You're offline. Reconnect to open this registration link.")
@@ -154,6 +163,7 @@ function finishClaim(token: string, changes?: { email: string; personal: Persona
  * creating anything new; the password is checked and then discarded, never stored.
  */
 export async function completeClaim({ token, values }: CompleteClaimInput) {
+  if (isRealDataMode()) return realCompleteClaim({ token, values })
   await delay(1100)
   if (getMockDevState().offline) throw new MockError('offline', CLAIM_OFFLINE)
   const { email: rawEmail, password, ...rest } = values

@@ -4,13 +4,13 @@
 
 **Source:** [identity rules](../../../../business_logic/product/player-information/modules/identity/README.md).
 
-## P-LOGIN — Phone/email plus password
+## P-LOGIN — Email plus password
 
 Public profiles/leaderboard do not require login. Sign-in is needed for own-profile editing/privacy and account requests.
 
-Controls (prototype layout in the [module README](README.md#reference-prototype); the field groups phone digits as they're typed, display only): one **Phone number or email** input, Password, show/hide password, Sign in, Forgot password. Required-field errors identify missing input; credential failures avoid exposing private account data. Normalize through the approved identity rules rather than guessing a country from a partial number.
+Controls (prototype layout in the [module README](README.md#reference-prototype)): one **Email** input (email keyboard, hint "The email you registered with."), Password, show/hide password, Sign in, Forgot password. Required-field errors identify missing input; a non-email value gets "Enter an email address, like name@example.com."; credential failures avoid exposing private account data. The prototype-only sample hint and "Any password works" placeholder never show against real accounts.
 
-**Decided 2026-11-07 (#244):** the account is keyed by email + password. A phone entered here is a login identifier only: the server normalizes it, looks up the linked account's email and signs in with email + password (no SMS). A failed sign-in shows one generic credential error that never reveals whether the phone or email exists. A player who hides their phone from clubs can still sign in with it.
+**Decided 2026-11-07 (#244), changed 2026-11-08:** the account is keyed by email + password and players sign in with their email only; a phone number is not accepted here (no SMS). A failed sign-in shows one generic credential error ("That email and password don't match. Check them and try again.") that never reveals whether the email exists.
 
 The development mock matches the approved sign-in reference, including the sample phone/email hint
 and any-password placeholder. A claimed fictional account must match; this is not real authentication
@@ -61,7 +61,7 @@ The club (Queue Master) can reissue the link, which invalidates the previous one
 
 ## P-FORGOT — Email recovery request
 
-Explain that reset instructions are sent to the account's email. Proposed request input is email, with a generic acknowledgement regardless of account existence. Recovery stays email-only (decided 2026-11-07, #244); if a phone-based lookup is ever offered, the destination remains email and private-email disclosure must still be avoided.
+Explain that reset instructions are sent to the account's email. Real mode (November 8, 2026): the Player app asks Supabase to send its recovery email only when the email belongs to a registered, enabled player, and answers the same way either way; the email opens `/reset-password/<token>`, and the token is checked only when the new password is submitted (checking it uses it up). Proposed request input is email, with a generic acknowledgement regardless of account existence. Recovery stays email-only (decided 2026-11-07, #244); if a phone-based lookup is ever offered, the destination remains email and private-email disclosure must still be avoided.
 
 States: empty/invalid input, sending, generic sent acknowledgement, retryable service failure with safe wording. Resend limits/cooldowns come from actual service policy, not hardcoded screen assumptions. Do not route routine resets to a club operator.
 
@@ -73,7 +73,7 @@ Expired/invalid/used link shows Request another reset. Failure preserves unsaved
 
 ## Acceptance examples
 
-- Both phone and email can identify the same account at login; the account itself is keyed by email.
+- Only the account's email signs in; entering the player's phone number is rejected as not an email.
 - Registration cannot complete without phone and email, but social links remain optional.
 - A claim link cannot silently create a second profile for a phone already linked.
 - Password recovery uses email and does not require the original club operator.

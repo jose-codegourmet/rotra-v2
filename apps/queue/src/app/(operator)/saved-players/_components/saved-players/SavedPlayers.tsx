@@ -147,7 +147,13 @@ export function SavedPlayers() {
   const openInvite = (id: string) => {
     setProfileId(null)
     setInviteId(id)
-    if (!offline) invite.mutate(id)
+    if (!offline)
+      invite.mutate(id, {
+        onError: (error) => {
+          setInviteId(null)
+          toast.error(error.message)
+        },
+      })
   }
   const copyLink = async (link: string) => {
     try {

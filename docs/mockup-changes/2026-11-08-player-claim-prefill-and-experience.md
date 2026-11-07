@@ -1,6 +1,6 @@
 # Registration form is prefilled by the club; experience has linked Playing since
 
-Status: NEW
+Status: ALREADY A TICKET — #484
 Date: 2026-11-08
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › Registration link › Finish registering; Edit profile › Playing style

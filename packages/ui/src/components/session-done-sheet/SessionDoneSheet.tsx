@@ -36,6 +36,8 @@ export type SessionDoneSheetProps = {
   authorizationBlocked?: boolean
   /** Games still in play; any one of them blocks the review step */
   activeGames: SessionDoneActiveGame[]
+  /** On court matches that were never started; they are dropped like waiting ones */
+  onCourtDropped?: number
   /** Waiting matches that were never played */
   unplayedWaiting: number
   /** Present players under the session minimum */
@@ -85,6 +87,7 @@ export function SessionDoneSheet({
   recordsIncomplete = false,
   authorizationBlocked = false,
   activeGames,
+  onCourtDropped = 0,
   unplayedWaiting,
   belowMinimum,
   minimum,
@@ -135,6 +138,12 @@ export function SessionDoneSheet({
         ) : (
           <Notice tone="success">All records on this device are synced.</Notice>
         )}
+        {onCourtDropped > 0 ? (
+          <Notice tone="info">
+            {count(onCourtDropped, 'match', 'matches')} on court{' '}
+            {onCourtDropped === 1 ? "wasn't" : "weren't"} started and will be dropped.
+          </Notice>
+        ) : null}
         <p className="m-0 text-[13px]">
           Valid results sync to Player Information automatically, and ranks update. Result slides
           become available to you privately. Nothing is published until you choose to.
@@ -169,6 +178,12 @@ export function SessionDoneSheet({
             title={`${count(inPlay, 'game')} ${inPlay === 1 ? 'is' : 'are'} still in play`}
           >
             ({activeGames.map((g) => g.courtLabels).join(', ')}). Finish or invalidate them first.
+          </Notice>
+        ) : null}
+        {onCourtDropped > 0 ? (
+          <Notice tone="info">
+            {count(onCourtDropped, 'match', 'matches')} on court{' '}
+            {onCourtDropped === 1 ? "wasn't" : "weren't"} started and will be dropped.
           </Notice>
         ) : null}
         {unplayedWaiting > 0 ? (

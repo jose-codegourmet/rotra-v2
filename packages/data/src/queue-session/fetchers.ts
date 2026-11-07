@@ -1,5 +1,11 @@
 import { DEMO_CLUB_ID } from '../fixtures/clubs'
-import { activeMatches, computeStandings, countedGames, courtNames } from '../match/match.rules'
+import {
+  activeMatches,
+  computeStandings,
+  countedGames,
+  courtNames,
+  onCourtMatches,
+} from '../match/match.rules'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, readMockState } from '../mock/store'
@@ -91,6 +97,7 @@ export async function getSessionDoneReview(id: string): Promise<SessionDoneRevie
       matchId: m.id,
       courtLabels: courtNames(m, courts).split(' + '),
     })),
+    onCourtDropped: onCourtMatches(matches).length,
     unplayedWaiting: matches.filter((m) => m.state === 'waiting').length,
     belowMinimum: below,
     minimum: session.minimumGames,

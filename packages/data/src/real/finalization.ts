@@ -1,4 +1,4 @@
-import { activeMatches, courtNames } from '../match/match.rules'
+import { activeMatches, courtNames, onCourtMatches } from '../match/match.rules'
 import type {
   FinalizationStage,
   SessionDoneReview,
@@ -51,6 +51,7 @@ export async function realGetSessionDoneReview(sessionId: string): Promise<Sessi
       matchId: m.id,
       courtLabels: courtNames(m, session.courts).split(' + '),
     })),
+    onCourtDropped: onCourtMatches(matches).length,
     unplayedWaiting: matches.filter((m) => m.state === 'waiting').length,
     belowMinimum: review.belowMinimum.map((p) => ({
       clubPlayerId: clubPlayerOf.get(p.sessionPlayerId) ?? p.sessionPlayerId,

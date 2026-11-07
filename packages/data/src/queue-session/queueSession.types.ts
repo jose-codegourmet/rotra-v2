@@ -84,6 +84,8 @@ export type SessionDoneReview = {
   participants: number
   pendingChanges: number
   activeGames: { matchId: string; courtLabels: string[] }[]
+  /** On court matches that were never started: dropped at Session done like waiting ones */
+  onCourtDropped: number
   unplayedWaiting: number
   belowMinimum: { clubPlayerId: string; name: string; completedGames: number }[]
   minimum: number

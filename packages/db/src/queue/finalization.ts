@@ -70,6 +70,36 @@ async function barriers(tx: Tx, sessionId: string, now: Date) {
   return { blocking, completeness, activeMatches: active, policy }
 }
 
+/**
+ * Drops every match that never started. Waiting ones leave the queue; On court ones (placed, never
+ * started, so not results) first give up their court and player holds, then go back to waiting and
+ * are removed the same way. Court usage is closed with no release operation. Runs inside the
+ * Session done transaction, so the courts are free the moment it commits.
+ */
+async function dropUnstarted(tx: Tx, sessionId: string, now: Date) {
+  const placed = await tx.match.findMany({
+    where: { sessionId, state: 'on_court', removedAt: null },
+    select: { id: true },
+  })
+  const ids = placed.map((m) => m.id)
+  if (ids.length) {
+    await tx.matchCourtUsage.updateMany({
+      where: { matchId: { in: ids }, releasedAt: null },
+      data: { releasedAt: now },
+    })
+    await tx.activeCourtHold.deleteMany({ where: { matchId: { in: ids } } })
+    await tx.activePlayerHold.deleteMany({ where: { matchId: { in: ids } } })
+    await tx.match.updateMany({
+      where: { id: { in: ids } },
+      data: { state: 'waiting', placedAt: null },
+    })
+  }
+  await tx.match.updateMany({
+    where: { sessionId, state: 'waiting', removedAt: null },
+    data: { removedAt: now, queuePosition: null },
+  })
+}
+
 /** Q-DONE review: what would block, plus the minimum-games shortfall warning (never a blocker). */
 export async function reviewSessionDone(context: ClubContext, sessionId: string) {
   const session = await prisma.queueSession.findUnique({
@@ -345,10 +375,7 @@ export async function finalizeSession(
             now,
           ),
         })
-        await tx.match.updateMany({
-          where: { sessionId, state: 'waiting', removedAt: null },
-          data: { removedAt: now, queuePosition: null },
-        })
+        await dropUnstarted(tx, sessionId, now)
         await tx.queueSession.update({
           where: { id: sessionId },
           data: { state: 'completed', finalizedAt: now, revision: { increment: 1 } },

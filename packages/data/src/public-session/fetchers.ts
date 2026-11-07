@@ -18,6 +18,7 @@ import type {
   PublicSessionResults,
   SendJoinRequestInput,
 } from './publicSession.types'
+import { maskPublicName } from './publicSession.rules'
 
 /** Unknown or removed slug: the page reveals nothing about any club, roster or retained data. */
 export class PublicSessionNotFoundError extends MockError {
@@ -121,7 +122,7 @@ function project(
       const p = clubPlayer(r.clubPlayerId)
       const hasRotraProfile = p?.identity === 'registered' || p?.identity === 'unclaimed'
       return {
-        name: r.nameSnapshot,
+        name: maskPublicName(r.nameSnapshot),
         pictureUrl: hasRotraProfile && p?.playerId ? (pictures[p.playerId] ?? null) : null,
         hasRotraProfile,
       }
@@ -129,7 +130,7 @@ function project(
     waitlist: state.waitlist
       .filter((w) => w.sessionId === s.id)
       .sort((a, b) => a.addedAt - b.addedAt)
-      .map((w) => clubPlayer(w.clubPlayerId)?.fullName ?? ''),
+      .map((w) => maskPublicName(clubPlayer(w.clubPlayerId)?.fullName ?? '')),
     openSlots: Math.max(0, capacity - roster.length),
     slotBudget: capacity,
     acceptJoinRequests: s.acceptJoinRequests,

@@ -1040,6 +1040,8 @@ matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => { i
 
 // ---------- Helpers ----------
 const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+// Public participant names (owner decision, Nov 7 2026; #475): each word → first letter + fixed "***"; blank → "Player".
+const maskName = (n) => { const w = String(n ?? '').trim().split(/\s+/).filter(Boolean); return w.length ? w.map((x) => `${Array.from(x)[0]}***`).join(' ') : 'Player'; };
 const P = (id) => S.players.find((p) => p.id === id);
 const nm = (id) => { const p = P(id); return p ? p.name : 'Unknown'; };
 const short = (id) => { const p = P(id); return p ? (p.nick || p.name.split(' ')[0]) : '?'; };
@@ -1083,6 +1085,10 @@ function faceSVG(p) {
 const avatar = (p, cls = '') => (hasPhoto(p)
   ? `<span class="avatar photo ${cls}" role="img" aria-label="Profile picture of ${esc(p.name)}">${faceSVG(p)}</span>`
   : `<span class="avatar ${cls}" aria-hidden="true">${esc(initials(p.name))}</span>`);
+// Public page avatar: same face, but its label and initials use the masked name (#475).
+const pubAvatar = (p) => (hasPhoto(p)
+  ? `<span class="avatar photo" role="img" aria-label="Profile picture of ${esc(maskName(p.name))}">${faceSVG(p)}</span>`
+  : `<span class="avatar" aria-hidden="true">${esc(initials(maskName(p.name)))}</span>`);
 const cur = () => S.sessions.find((s) => s.id === S.currentId);
 // Slot budget: players per reserved court × courts. Players added past it wait in a first-come waitlist
 // (kept apart from the roster) until the operator gives them a slot.
@@ -2213,7 +2219,7 @@ function histPublicPane(s, { invalid }) {
           : pub ? `<dl class="kv"><dt>Shared</dt><dd>${[pub.slides.includes(0) && 'Standings', pub.slides.includes(1) && 'Awards'].filter(Boolean).join(' and ') || 'Nothing'}</dd><dt>Off Day</dt><dd>${pub.offDay ? 'Shared' : 'Private'}</dd><dt>Published</dt><dd>${fmtDate(pub.at)} · ${fmtTime(pub.at)}</dd></dl>`
           : '<p class="small muted">Not shared yet. The page says results haven\'t been shared. Player records and ranks are already updated either way.</p>'}</section>
     </div>
-    <section class="stack"><h3>Participants · ${s.roster.length}</h3><div class="pgrid">${s.roster.map((r) => { const p = P(r.pid); return `<div class="pcard">${avatar(p)}<div style="min-width:0"><b>${esc(p.name)}</b>${p.identity === 'registered' || p.identity === 'unclaimed' ? '<p class="small muted">Has a ROTRA profile</p>' : ''}</div></div>`; }).join('')}</div></section>`;
+    <section class="stack"><h3>Participants · ${s.roster.length}</h3><div class="pgrid">${s.roster.map((r) => { const p = P(r.pid), m = maskName(p.name); return `<div class="pcard">${pubAvatar(p)}<div style="min-width:0"><b>${esc(m)}</b>${p.identity === 'registered' || p.identity === 'unclaimed' ? '<p class="small muted">Has a ROTRA profile</p>' : ''}</div></div>`; }).join('')}</div></section>`;
 }
 // Payments: a manual paid / not-paid checklist. ROTRA records who has paid; money changes hands outside the app.
 function duePerHead(s) {
@@ -3363,7 +3369,7 @@ function viewPublic() {
       <dt>Minimum</dt><dd>${s.minimum} games per player</dd></dl>
       ${s.notes ? `<p>${esc(s.notes)}</p>` : ''}
       <p class="small muted">Slots are confirmed by the Queue Master. Last updated ${fmtWhen(S.lastSync, { lower: true })}${S.pending ? '. Recent changes from the venue haven’t synced yet.' : '.'}</p></section>`
-    : `<section class="stack">${s.roster.length ? `<div class="pgrid">${s.roster.map((r) => { const p = P(r.pid); return `<div class="pcard">${avatar(p)}<div style="min-width:0"><b>${esc(p.name)}</b>${p.identity === 'registered' || p.identity === 'unclaimed' ? '<p class="small muted">Has a ROTRA profile</p>' : ''}</div></div>`; }).join('')}</div>` : '<div class="card empty">Players have not been added yet.</div>'}${(s.waitlist || []).length ? `<h3>Waitlist · ${s.waitlist.length}</h3><ol class="pub-wait">${waitOf(s).map((w) => `<li>${esc(P(w.pid).name)}</li>`).join('')}</ol><p class="small muted">Waitlisted players get a slot if one opens. Ask the Queue Master.</p>` : ''}</section>`}
+    : `<section class="stack">${s.roster.length ? `<div class="pgrid">${s.roster.map((r) => { const p = P(r.pid), m = maskName(p.name); return `<div class="pcard">${pubAvatar(p)}<div style="min-width:0"><b>${esc(m)}</b>${p.identity === 'registered' || p.identity === 'unclaimed' ? '<p class="small muted">Has a ROTRA profile</p>' : ''}</div></div>`; }).join('')}</div>` : '<div class="card empty">Players have not been added yet.</div>'}${(s.waitlist || []).length ? `<h3>Waitlist · ${s.waitlist.length}</h3><ol class="pub-wait">${waitOf(s).map((w) => `<li>${esc(maskName(P(w.pid).name))}</li>`).join('')}</ol><p class="small muted">Waitlisted players get a slot if one opens. Ask the Queue Master.</p>` : ''}</section>`}
     ${s.status === 'finalized' ? (pub ? `<section class="stack"><h2>Results</h2>${pub.slides.includes(0) ? slideStandings(s) : ''}${pub.slides.includes(1) ? slideAwards(s) : ''}${pub.offDay ? slideOffDay(s, true) : ''}</section>`
       : '<section class="card empty">Results for this session have not been shared.</section>') : ''}
   </main>`;

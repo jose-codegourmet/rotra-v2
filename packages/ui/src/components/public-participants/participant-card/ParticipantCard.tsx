@@ -2,6 +2,7 @@ import { Avatar } from '@rotra/ui/avatar'
 import { cn } from '@rotra/ui/cn'
 
 export type ParticipantCardProps = {
+  /** The masked public name ("J*** A***"), as the public read returns it; never the full name */
   name: string
   /** Uploaded profile picture; initials show when missing. Guests never have one. */
   pictureUrl?: string | null

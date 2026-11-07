@@ -26,7 +26,8 @@ export type PublicParticipantsProps = {
 /**
  * The public page's Participants tab (Q-PUBLIC-PARTICIPANTS): a grid of ParticipantCards, then
  * "Waitlist · N" as a numbered list of names when anyone is waiting. Empty: "Players have not been
- * added yet." Shows no phone, email, level, presence, games, notes or Off Day.
+ * added yet." Shows no phone, email, level, presence, games, notes or Off Day. Names arrive masked
+ * ("J*** A***", #475), so the card text and avatar label never carry a full name.
  */
 export function PublicParticipants({
   participants,

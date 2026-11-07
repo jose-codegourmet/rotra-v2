@@ -72,7 +72,7 @@ Each session has a **slot budget**: players per reserved court (club default 8, 
 - The operator gives a waitlisted player a slot (**Give slot**), or fills every open slot from the front of the line (**Fill N open slots**). Giving a slot past the budget is allowed (**Give slot anyway**) and the confirmation says how far over budget the session is.
 - Slots follow the court count, so adding courts or raising players per court opens slots. A player given a slot during a live session becomes present with their level locked.
 - **First come, first served when a prepared session's budget changes** (decided October 26, 2026). Saving setup with fewer slots than confirmed players moves the most recently added players, beyond the budget, to the **front** of the waitlist in the order they joined (ahead of anyone already waiting). Saving with more slots fills them from the front of the waitlist. Roster order is the order players were added. This applies to prepared sessions; in a live session, removing courts does not unseat anyone.
-- The waitlist is shown on the public Participants tab and in the `{{ waitlist }}` key of the Facebook post.
+- The waitlist is shown on the public Participants tab (names masked, below) and in the `{{ waitlist }}` key of the Facebook post.
 
 This is the operator's planning budget, not player self-admission: players never take a slot themselves. Guests can only **ask** for one through the session link (below).
 
@@ -89,6 +89,24 @@ Decided October 26, 2026.
 - The club can turn requests off per session (**Accept join requests**). The public page then says to contact the Queue Master instead.
 - Sending a request needs internet (it goes straight to the server). Confirming or declining is an ordinary roster change that works offline on a downloaded session and syncs.
 - **Cancelled session** (owner decision, November 6, 2026): cancelling closes every pending request (kept on the record as closed), and the public page shows **Cancelled** with the reason instead of **Want to play?**, so no new requests can be sent. See [Cancelling a session](../sessions/README.md#cancelling-a-session-owner-decision-november-6-2026).
+
+## Public participant names
+
+Owner decision, November 7, 2026 (#475).
+
+- The public page (and the operator's preview of it, and the record's **Public page** tab, which show
+  what visitors see) never shows a participant's full name. Each whitespace-separated word becomes
+  its first letter plus a fixed `***`: “Jose Adrian” → “J*** A***”, “Mika” → “M***”. The fixed
+  suffix never reveals how long a name is. A missing or blank name reads “Player”.
+- This applies to confirmed participants and the waitlist. A nickname, if it is ever shown
+  publicly, is masked the same way.
+- Masking happens on the server: the full name never enters the public page payload, tooltips or
+  accessibility labels. The avatar's initials come from the masked name.
+- The public page never ties a participant (named or masked) to a skill level.
+- **Has a ROTRA profile** stays as a label and is never a link to the profile.
+- A visitor's own request status (**Request sent**, …) may still show the name they typed.
+- Operator screens (roster, live console, join requests) keep full names. Published result slides
+  are not covered by this rule.
 
 
 ## Roster changes

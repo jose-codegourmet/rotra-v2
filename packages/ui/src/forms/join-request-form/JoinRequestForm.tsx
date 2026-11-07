@@ -29,6 +29,10 @@ export type JoinRequestFormProps = {
   onCancel: () => void
   /** Puts the cursor in the name field on mount, as the Request to join sheet does */
   autoFocus?: boolean
+  /** ROTRA Player login link; when set, the form opens with the guest / Log in choice above it */
+  playerLoginHref?: string
+  /** The visitor came back from the ROTRA Player login: "You're back" line above the form */
+  returned?: boolean
   defaultValues?: Partial<JoinRequestFormInput>
   className?: string
 }
@@ -36,6 +40,8 @@ export type JoinRequestFormProps = {
 export const PHONE_HINT =
   'Helps the club recognise you and link your ROTRA profile. Only the club sees it.'
 export const LEVEL_HINT = 'Your best guess. The Queue Master sets your level for the night.'
+export const SIGN_UP_NOTE = "New to ROTRA? Sign-up isn't open yet — continue as a guest for now."
+export const RETURNED_NOTE = "You're back — finish your request below."
 export const REQUEST_NOTE =
   'This is a request, not a booking. The Queue Master confirms each guest before giving a slot.'
 
@@ -51,6 +57,8 @@ export function JoinRequestForm({
   serverError,
   onCancel,
   autoFocus,
+  playerLoginHref,
+  returned = false,
   defaultValues,
   className,
 }: JoinRequestFormProps) {
@@ -72,6 +80,20 @@ export function JoinRequestForm({
         })}
       >
         <p className="m-0 text-[13px] text-fg2">{sessionLine}</p>
+        {playerLoginHref ? (
+          <div className="flex flex-col gap-2">
+            <div className="grid grid-cols-2 gap-2 max-sm:grid-cols-1">
+              <Button variant="primary" aria-pressed disabled={isPending}>
+                Continue as guest
+              </Button>
+              <Button asChild>
+                <a href={playerLoginHref}>Log in with ROTRA Player</a>
+              </Button>
+            </div>
+            <span className="text-xs font-normal text-fg2">{SIGN_UP_NOTE}</span>
+          </div>
+        ) : null}
+        {returned ? <Notice tone="info">{RETURNED_NOTE}</Notice> : null}
         {serverError ? <Notice tone="error">{serverError}</Notice> : null}
         <Field label="Your name" error={errors.name?.message}>
           <Controller

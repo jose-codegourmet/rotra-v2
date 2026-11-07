@@ -3450,6 +3450,7 @@ const SHEETS = {
   join(sh) {
     const s = cur(), e = sh.err || {};
     return sheetShell('Request to join', `<p class="small muted">${esc(s.title)} · ${fmtDate(s.start)}, ${fmtTime(s.start)} · ${esc(s.venue)}</p>
+      <div class="field"><div class="seg" role="group" aria-label="How to request"><button aria-pressed="true">Continue as guest</button><a class="btn" href="../player-app/rotra-player.html" target="_blank" rel="noopener">Log in with ROTRA Player</a></div><span class="hint">New to ROTRA? Sign-up isn't open yet — continue as a guest for now.</span></div>
       <label class="field"><span>Your name</span><input class="input${e.name ? ' bad' : ''}" id="join-name" data-bind="ui.sheet.name" value="${esc(sh.name || '')}" autocomplete="name" data-autofocus>${e.name ? `<span class="err">${e.name}</span>` : ''}</label>
       <label class="field"><span>Nickname (optional)</span><input class="input" id="join-nick" data-bind="ui.sheet.nick" value="${esc(sh.nick || '')}"></label>
       <label class="field"><span>Phone (optional)</span><input class="input${e.phone ? ' bad' : ''}" id="join-phone" type="tel" inputmode="tel" data-bind="ui.sheet.phone" value="${esc(sh.phone || '')}" autocomplete="tel">${e.phone ? `<span class="err">${e.phone}</span>` : '<span class="hint">Helps the club recognise you and link your ROTRA profile. Only the club sees it.</span>'}</label>

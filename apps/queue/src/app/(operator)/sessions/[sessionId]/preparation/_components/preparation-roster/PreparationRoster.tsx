@@ -23,7 +23,7 @@ import {
 } from '@rotra/ui/roster-panel'
 import { toast } from '@rotra/ui/toaster'
 import { WaitlistPanel, type WaitlistPanelEntry } from '@rotra/ui/waitlist-panel'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AddPlayer } from '@/app/(operator)/_components/add-player/AddPlayer'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import { longDateLabel } from '@/lib/dates'
@@ -80,6 +80,7 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
   })
   const setAllPresence = useSetAllPresence()
   const remove = useRemoveRosterPlayer()
+  const removing = useRef(new Set<string>())
   const giveSlot = useGiveSlot()
   const fillOpenSlots = useFillOpenSlots()
   const removeFromWaitlist = useRemoveFromWaitlist()
@@ -178,7 +179,14 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
             setLevel.mutate({ sessionId, rosterId, level }, options)
           }
           onPresentChange={setPresence.set}
-          onRemove={(rosterId) => remove.mutate({ sessionId, rosterId }, options)}
+          onRemove={(rosterId) => {
+            if (removing.current.has(rosterId)) return
+            removing.current.add(rosterId)
+            remove.mutate(
+              { sessionId, rosterId },
+              { ...options, onSettled: () => removing.current.delete(rosterId) },
+            )
+          }}
         />
       ) : (
         <WaitlistPanel

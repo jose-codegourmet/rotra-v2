@@ -1,9 +1,10 @@
 # ROTRA documentation
 
-**Last verified:** 2026-10-27. Agents start at [AGENTS.md](../AGENTS.md), whose routing table says which
+**Last verified:** 2026-11-07. Agents start at [AGENTS.md](../AGENTS.md), whose routing table says which
 file to read for each task. This page is the map for people.
 
-Everything here describes the **v1 target**, agreed October 25–27, 2026. Nothing is built yet.
+Everything here describes the **v1 target**, agreed October 25–27, 2026. The apps run on mock data by
+default, with an opt-in real mode for parts of each app; current build status is in the [MVP hub](mvp/README.md).
 
 ## Engineering
 

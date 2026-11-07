@@ -317,7 +317,7 @@ packages/data/src/
 ## 13. Database (later epic)
 
 - One `.prisma` file per entity group, in product folders (`admin/`, `queue/`, `player/`), with only the
-  generator and datasource in `base.prisma`. **Never one big `schema.prisma`.** See [architecture §10](architecture.md#10-database-later-epic).
+  generator and datasource in `base.prisma`. **Never one big `schema.prisma`.** See [architecture §10](architecture.md#10-database).
 - Models are singular PascalCase mapped to plural snake_case tables (`model QueueSession` +
   `@@map("queue_sessions")`); fields are camelCase mapped to snake_case (`@map("club_id")`).
 - Enums live in the file of the entity that owns them.

@@ -179,7 +179,7 @@ These resolve product direction, not the remaining proof/linkage mechanism or ra
 |---|---|
 | Identity and registration | How does a name-only guest's invitation work? Who confirms historical guest identity, and with what evidence? How are wrong/duplicate identities and contacts resolved? (Claim links: 7 days, single use, reissue revokes; contact collision at claim blocks; decided November 7, 2026, #244.) |
 | Roster and payments | What happens to paid marks and assessments when someone loses/removes a slot? What does paid mean when no fee was entered? Which saved fee applies while a device is offline? |
-| Clubs and access | How do early renewals extend a license? How does the owner sign in and reset a club password? How are offline starts authorized and reservations released? |
+| Clubs and access | How do early renewals extend a license? How does the owner sign in and reset a club password? How are offline starts authorized and reservations released? (MVP: offline start is out of MVP under [D-2026-11-07-03](../../mvp/decisions.md#d-2026-11-07-03), so this is moot for MVP.) |
 | Offline completion | How does a second device take over? How are conflicting confirmed records selected? How are match numbers displayed consistently? What closes a device download that was never used? |
 | Rankings and results | Approve worked ranking/award examples, tied standings, three-month/timezone boundaries, no-show assessments, and how setting changes take effect. |
 | Public release and retention | Which social/history fields are public? What remains visible on an expired club's stale page? What can be restored after actual deletion? How long are private intake, device caches, diagnostic logs, and private exports kept? |

@@ -1,6 +1,6 @@
 # Physical schema (drafted)
 
-**Last verified:** 2026-11-06.
+**Last verified:** 2026-11-07.
 
 **Status:** Draft Prisma models and **unapplied** migration SQL in `packages/db/prisma/`. Each migration
 needs human sign-off before it touches any database ([coding conventions §13](../../coding-conventions.md#13-database-later-epic)).
@@ -92,7 +92,7 @@ values). The player's UUID and RTR ID never change. Auth-provider mutation is no
 ## Runtime access (F07.20)
 
 - Apps reach these tables only through `@rotra/db` services behind `handleAccountRequest` /
-  `handlePublicRead` ([architecture §8](../../architecture.md#8-auth-target-not-built)). The Prisma
+  `handlePublicRead` ([architecture §8](../../architecture.md#8-auth-real-for-queue-admin-and-player)). The Prisma
   runtime connection is server-only and does not carry an end-user JWT, so RLS is **not** claimed to
   scope it; authorization happens in the service layer on every request.
 - Every table above revokes `anon`/`authenticated`; nothing is reachable through the Supabase Data API.
@@ -147,7 +147,7 @@ composite FK only accepts an assessment for this exact club, session and entry.
 |---|---|---|
 | Schedule clash | exclusion constraint | names the clashing session and whether it is a venue or time clash; series inserts only free dates |
 | Capacity | — (slots are derived) | lock the session row; count live entries against `players_per_court × live courts` |
-| One active session | partial unique on active/finalizing | offline-start reservation (later ticket) |
+| One active session | partial unique on active/finalizing | offline-start reservation (later ticket) (moot for MVP: offline start is out of MVP under [D-2026-11-07-03](../../mvp/decisions.md#d-2026-11-07-03)) |
 | Locked levels | level-lock trigger + locked check | set at start / late entry |
 | Visitor ownership | — | pending #248; no public write here |
 
@@ -173,7 +173,7 @@ Q-PREPARE and Q-ROSTER commands for a verified `ClubContext`. No Route Handlers 
 
 Not covered yet, by dependency: cost estimates on create/edit (F07.15); assessment projection jobs and
 rank eligibility (F07.16, #247); directory/phone identity matching on add (F07.22); court-in-use checks
-on removal (match schema); the offline start reservation (#246); public join-request submission (#248).
+on removal (match schema); the offline start reservation (#246; moot for MVP, offline start is out of MVP under [D-2026-11-07-03](../../mvp/decisions.md#d-2026-11-07-03)); public join-request submission (#248).
 
 ## Group E · devices, streams, operation receipts, conflicts (F07.12 · `20261031000600`)
 

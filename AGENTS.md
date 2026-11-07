@@ -3,7 +3,7 @@
 > **Entry point for AI coding agents.** Read this file completely; it is deliberately short. Everything
 > else is loaded **on demand** through the routing table in §3. Don't read the whole `docs/` tree.
 
-**Last verified:** 2026-11-07 · **Budget:** under 200 lines.
+**Last verified:** 2026-11-08 · **Budget:** under 200 lines.
 
 ---
 
@@ -11,8 +11,8 @@
 
 1. **Never invent** a screen, route, field, API, component, or domain term. If it isn't in the docs
    or existing code, stop and ask.
-2. **Distinguish mocks from persistence.** `apps/` and `packages/data` contain substantial mock flows;
-   database, real auth and durable offline support remain targets. Never say a feature works unless you ran it.
+2. **Distinguish mocks from persistence.** Mock mode is the default; opt-in real mode is partial (no durable
+   offline or rank math yet; see [MVP status](docs/mvp/README.md)). Never say a feature works unless you ran it.
 3. **Match the prototypes.** `apps/mockup/*/*.html` are the agreed design. Build to them; don't redesign.
 4. **Words from [product-terms.md](docs/product-terms.md) only.** Queue (never "Que"), Queue Session,
    Queue Master, Match done ≠ Session done, invalid (never "void"). **ROTRA** in all caps in UI copy.
@@ -52,9 +52,12 @@ social network. Three v1 products:
 World (nearby-club discovery) is v2. Build nothing for it. Old features (MMR, EXP, peer reviews,
 Umpire, tournaments, Facebook login) are **not** v1. See [product terms §14](docs/product-terms.md#14-words-that-mean-not-v1--stop-and-ask).
 
-**Current phase:** building the apps on **mock data** (TanStack Query hooks over an in-memory mock store).
-Supabase + Prisma come later. Keep UI/hook contracts stable while adding authorized Route Handlers,
-database services, real auth and durable offline storage/sync; replacing fetchers alone is insufficient.
+**Current phase:** **mock data** by default (TanStack Query hooks over an in-memory mock store). Opt-in
+real mode (`NEXT_PUBLIC_ROTRA_DATA_MODE=real` + `ROTRA_DATA_MODE=real`) runs Route Handlers over
+`packages/db` Prisma services: Supabase sign-in for Queue, Admin and Player, Queue core, Admin, Player
+registration and email password reset, and Player Information reads. Not real yet: durable offline
+sync, rank calculation.
+Status: [docs/mvp/README.md](docs/mvp/README.md). Keep UI/hook contracts stable.
 
 ---
 
@@ -68,7 +71,7 @@ packages/
   data/                   types, fixtures, mock store, fetchers, query keys, hooks
   schema/                 shared Zod fields (email, phone, date, money, password)
   config/                 tsconfig + Tailwind 4 tokens (theme.css; see its AGENTS.md)
-  db/                     Prisma + services (database epic, later)
+  db/                     Prisma schema + server services (real mode)
 docs/
   architecture.md         apps, packages, dependency rules, data flow, offline, auth, database
   coding-conventions.md   how to write components, forms, pages, hooks, styles, Prisma

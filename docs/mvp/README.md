@@ -115,31 +115,14 @@ Merged from both audits, deduped.
 
 ## 7. Docs that are now untrue
 
-Follow-up list from the audit. **Not fixed in this folder**; each needs its own change.
+Remaining follow-ups from the audit (fixed rows removed 2026-11-07). **Not fixed in this folder**; each needs its own change.
 
 | File:line | Says | Reality / conflict |
 |---|---|---|
-| `AGENTS.md:14-15` | Database, real auth … remain targets | Real auth and DB services exist for Queue, Admin, Player reads (real mode) |
-| `AGENTS.md:55-56` | Building on mock data; Supabase + Prisma come later | Real-mode adapters, Route Handlers and Prisma services exist |
-| `AGENTS.md:71` | `db/ … (database epic, later)` | `packages/db/src` is populated and used |
 | `AGENTS.md:171` | Testing switches back on when Supabase/Prisma is connected | Connected in real mode; trigger is ambiguous |
-| `docs/README.md:6` | "Nothing is built yet." | Apps and real-mode paths exist |
-| `docs/architecture.md:3`, `:35` | Status lines (target, mock in progress) | Real mode exists |
-| `docs/architecture.md:51` | `db` … (database epic, later) | Populated |
-| `docs/architecture.md:167` | "Real phase (later)" | Real mode exists |
-| `docs/architecture.md:220`, `:229` | "Auth (target, not built)"; sign-in is mocked | Club and Admin sign-in are real |
 | `docs/architecture.md:297` | Console offline notice says changes save on this device | Untrue in real mode (doc already flags it) |
-| `docs/architecture.md:407` | "Database (later epic)" | Database services exist |
-| `docs/business_logic/product/queue/modules/offline/README.md:12`, `:14`, `:16`, `:43` | Offline start with a downloaded copy; only new players offline; no guest review at Session done | Conflicts with [D-03](decisions.md#d-2026-11-07-03) |
-| `docs/screens/product/state-matrix.md:14` | Start allowed offline with a downloaded copy | Conflicts with D-03 |
-| `docs/screens/product/dialogs.md:11`; `docs/screens/product/modules/queue/session-setup.md:102`, `:116`, `:120` | Offline start copy | Conflicts with D-03 |
-| `docs/screens/product/modules/queue/offline-recovery.md:24` | "Start the session" offline-supported | Conflicts with D-03 |
-| `docs/database_design/product/queue/modules/sessions-roster.md:55`; `docs/database_design/product/open-decisions.md:25`; `docs/screens/product/open-decisions.md:15`; `docs/database_design/product/access-retention.md:37`; `docs/database_design/product/physical-schema.md:150`, `:176`; `docs/database_design/product/implementation-plan.md:135`; `docs/database_design/product/validation-review.md:182` | Offline-start reservation design | Moot under D-03 |
+| `docs/screens/product/dialogs.md` (Start session), `docs/screens/product/modules/queue/session-setup.md` (Q-PREPARE, Q-START), `docs/screens/product/modules/player-information/access-registration.md` (P-FORGOT) | Offline-start and email-recovery UI copy, now marked with an MVP note | Matches the prototypes; needs a mockup change for D-03 / D-01 (rule 15) |
 | `docs/screens/product/modules/queue/players-roster.md:85`; `docs/business_logic/product/queue/modules/players/flow/add-player.md:6` | Phone makes identity matching eligible on sync; "Lookup pending" | Possible conflict with D-03 "never auto-link" (open question 5) |
-| `docs/screens/product/modules/queue/players-roster.md:65` | Saving without a session is mock-only | `api/club/players` POST exists |
-| `docs/business_logic/product/player-information/modules/identity/flow/claim-and-recover.md:25` | Send recovery email | Conflicts with [D-01](decisions.md#d-2026-11-07-01) |
-| `docs/screens/product/modules/player-information/access-registration.md:62-64` | P-FORGOT "Email recovery request"; recovery stays email-only | Conflicts with D-01 |
-| `docs/business_logic/product/open-decisions.md:18`, `:48` | Recovery by email only (#244) | Conflicts with D-01 (open question 8) |
 | `packages/db/src/player/claim.ts:11` (code) | `CLAIM_LINK_DAYS = 14` | Decided 7 days (#244 L5) |
 | `packages/data/src/real/admin-audit.ts:12` (code comment) | Flags and ranking settings "wait on #402" | #402 is closed |
 | `docs/mockup-changes/2026-11-01-queue-auto-queue-copy.md`, `…-queue-presence-batches.md`, `…-queue-live-session-settings.md`, `2026-10-31-queue-routed-prototypes.md` | `Status: NEW` | Work looks shipped (unverified) |

@@ -1,10 +1,10 @@
 'use client'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useSyncExternalStore } from 'react'
-import { paymentTotals } from '../session-cost/sessionCost.rules'
 import { getSessionPayments } from './fetchers'
 import { getPaymentBatch } from './paymentBatch'
 import { sessionPaymentKeys } from './queryKeys'
+import { paymentStatus, paymentTotals } from './sessionPayment.rules'
 export function useSessionPayments(sessionId: string) {
   const client = useQueryClient()
   const { batch } = getPaymentBatch(client, sessionId)
@@ -17,15 +17,17 @@ export function useSessionPayments(sessionId: string) {
   if (!query.data) return query
   const accepted = query.data
   const players = accepted.players
-    .map((player) => ({
-      ...player,
-      paid: batch.value(player.clubPlayerId, !!player.paid)
+    .map((player) => {
+      const paid = batch.value(player.clubPlayerId, !!player.paid)
         ? (player.paid ?? {
             amount: accepted.amountDue ?? 0,
             at: batch.changedAt(player.clubPlayerId) ?? 0,
           })
-        : undefined,
-    }))
+        : undefined
+      // #479: status compares the amount received with today's amount due.
+      const status = paymentStatus(paid ? { amountMinor: paid.amount } : null, accepted.amountDue)
+      return { ...player, paid, status }
+    })
     .sort((a, b) => Number(!!a.paid) - Number(!!b.paid) || a.name.localeCompare(b.name))
   return {
     ...query,

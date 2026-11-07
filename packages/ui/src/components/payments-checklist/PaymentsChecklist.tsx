@@ -14,10 +14,15 @@ export type PaymentsChecklistProps = {
   dueBasis: 'custom' | 'break_even'
   entranceFeeIncluded?: number
   totals: {
+    /** Fully covered: Paid + Reimburse */
     paid: number
+    partial: number
     total: number
+    /** Σ amount received */
     collected: number
     stillDue: number | null
+    /** Σ overpayments to return outside ROTRA; shown only when above 0 */
+    toReimburse: number
     againstCosts: number | null
     cost: number | null
   }
@@ -27,6 +32,8 @@ export type PaymentsChecklistProps = {
   onTogglePaid: (id: string) => void
   onMarkAllPaid: () => void
   onSelectPlayer: (id: string) => void
+  /** Card body tap: opens "Payment from <name>" (#479) */
+  onEditAmount: (id: string) => void
   asSheet?: boolean
   disabled?: boolean
   saveError?: string
@@ -43,12 +50,17 @@ export function PaymentsChecklist({
   onTogglePaid,
   onMarkAllPaid,
   onSelectPlayer,
+  onEditAmount,
   asSheet,
   disabled,
   saveError,
   className,
 }: PaymentsChecklistProps) {
-  const rows = players.filter((p) => filter === 'all' || (filter === 'paid' ? !!p.paid : !p.paid))
+  // Paid = fully covered (Paid, Reimburse); Not paid = Unpaid or Partial (#479).
+  const covered = (p: PaymentPlayer) => p.status.kind === 'paid' || p.status.kind === 'reimburse'
+  const rows = players.filter(
+    (p) => filter === 'all' || (filter === 'paid' ? covered(p) : !covered(p)),
+  )
   return (
     <section
       className={cn(
@@ -64,10 +76,11 @@ export function PaymentsChecklist({
             {amountDue === null
               ? 'No fee set for this session.'
               : `${formatPeso(amountDue)} per player (${dueBasis === 'custom' ? 'custom amount' : 'break-even share'}${entranceFeeIncluded ? `, includes the ${formatPeso(entranceFeeIncluded)} entrance fee` : ''}).`}{' '}
-            Tick players as they pay. ROTRA only records it; money is collected outside the app.
+            Tick players as they pay, or tap a card to record a partial amount. ROTRA only records
+            it; money is collected outside the app.
           </p>
         </div>
-        {totals.paid < totals.total ? (
+        {players.some((p) => !p.paid) ? (
           <Button size="sm" disabled={disabled} onClick={onMarkAllPaid}>
             Mark all paid
           </Button>
@@ -76,8 +89,16 @@ export function PaymentsChecklist({
       {saveError ? <Notice tone="error">{saveError}</Notice> : null}
       <div className="grid grid-cols-2 gap-3 min-[800px]:grid-cols-4">
         {[
-          { label: 'Paid', value: `${totals.paid}/${totals.total}` },
-          { label: 'Collected', value: formatPeso(totals.collected) },
+          {
+            label: 'Paid',
+            value: `${totals.paid}/${totals.total}`,
+            hint: totals.partial ? `${totals.partial} partial` : undefined,
+          },
+          {
+            label: 'Collected',
+            value: formatPeso(totals.collected),
+            hint: totals.toReimburse ? `${formatPeso(totals.toReimburse)} to reimburse` : undefined,
+          },
           {
             label: 'Still due',
             value: totals.stillDue === null ? '—' : formatPeso(totals.stillDue),
@@ -125,6 +146,7 @@ export function PaymentsChecklist({
               amountDue={amountDue}
               onTogglePaid={() => onTogglePaid(p.clubPlayerId)}
               onSelectPlayer={() => onSelectPlayer(p.clubPlayerId)}
+              onEditAmount={() => onEditAmount(p.clubPlayerId)}
               disabled={disabled}
             />
           ))}

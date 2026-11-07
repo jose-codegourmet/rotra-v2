@@ -246,7 +246,7 @@ close of a stream that never wrote, conflict categories and who may resolve one.
 | `inventory_items` | PK `id`; unique `(club_id, id)`; index `(club_id, category, name)` | non-blank name/unit; stock ≥ 0; unit cost ≥ 0 (0 = no cost); soft removal | club |
 | `session_cost_estimates` | PK `session_id`; unique `(club_id, session_id)` | fees null (not set) or ≥ 0; `custom` ⇔ custom fee set | `(club_id, session_id)` |
 | `session_shuttle_plan_lines` | PK `id`; index `(club_id, session_id, position)` | tubes > 0; same item may repeat | estimate `(club_id, session_id)` (lines cascade with their estimate); item `(club_id, inventory_item_id)`, so another club's item fails |
-| `session_payment_marks` | PK `(session_id, session_player_id)`; unique `source_operation_id` | amount null (no fee set) or ≥ 0; actor = club; **no update** (untick deletes, a new tick is a new operation) | roster entry `(club_id, session_id, session_player_id)` `RESTRICT`; device scoped |
+| `session_payment_marks` | PK `(session_id, session_player_id)`; unique `source_operation_id` | amount received (#479): null (legacy, counts as today's due) or ≥ 0; actor = club; **no update** (untick deletes, a new tick or recorded amount is a new operation that replaces the row) | roster entry `(club_id, session_id, session_player_id)` `RESTRICT`; device scoped |
 
 - **Derived, never stored:** court cost, entrance fees, shuttle cost, total, break-even, expected and
   collected amounts, profit/loss, running-low and stock value. Collected sums the amounts recorded on

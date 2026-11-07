@@ -1,12 +1,15 @@
 import { formatPeso } from '@rotra/schema/money'
-import type { paymentTotals } from '../session-cost/sessionCost.rules'
 import type {
   SessionCostEstimate,
   SessionCostInput,
   SessionCostResult,
   SessionShuttlePlanLine,
 } from '../session-cost/sessionCost.types'
-import type { SetPaymentMarksInput } from '../session-payment/sessionPayment.types'
+import { type PaymentTotals, paymentStatus } from '../session-payment/sessionPayment.rules'
+import type {
+  SetPaymentAmountInput,
+  SetPaymentMarksInput,
+} from '../session-payment/sessionPayment.types'
 import { minorOf, msOf, realRequest, type WireMoney } from './client'
 import { accepted } from './queue'
 
@@ -58,7 +61,7 @@ type WirePayments = {
   amountDue: number | null
   dueBasis: SessionCostInput['paymentMode']
   entranceFeeIncluded: number | null
-  totals: ReturnType<typeof paymentTotals>
+  totals: PaymentTotals
 }
 
 export async function realGetSessionPayments(sessionId: string) {
@@ -67,17 +70,24 @@ export async function realGetSessionPayments(sessionId: string) {
   )
   if (!payments) return null
   return {
-    players: payments.players.map((player) => ({
-      sessionPlayerId: player.sessionPlayerId,
-      clubPlayerId: player.clubPlayerId,
-      name: player.name,
-      // Saved data has no player pictures on this read yet.
-      picture: undefined as string | undefined,
-      paid: player.paid
-        ? // The server refuses no-fee ticks (#245), so a recorded amount is always set.
-          { amount: minorOf(player.paid.amount) ?? 0, at: msOf(player.paid.at) }
-        : undefined,
-    })),
+    players: payments.players.map((player) => {
+      // A legacy mark with no amount counts as paid in full at today's amount due (#479).
+      const mark = player.paid ? { amountMinor: minorOf(player.paid.amount) } : null
+      return {
+        sessionPlayerId: player.sessionPlayerId,
+        clubPlayerId: player.clubPlayerId,
+        name: player.name,
+        // Saved data has no player pictures on this read yet.
+        picture: undefined as string | undefined,
+        paid: player.paid
+          ? {
+              amount: mark?.amountMinor ?? payments.amountDue ?? 0,
+              at: msOf(player.paid.at),
+            }
+          : undefined,
+        status: paymentStatus(mark, payments.amountDue),
+      }
+    }),
     amountDue: payments.amountDue,
     dueBasis: payments.dueBasis,
     entranceFeeIncluded: payments.entranceFeeIncluded ?? undefined,
@@ -113,6 +123,23 @@ export async function realTogglePaid(input: { sessionId: string; clubPlayerId: s
   const name = player?.name ?? 'Player'
   return mark?.paid
     ? accepted({ paid: true }, `${name} paid ${formatPeso(minorOf(mark.amount) ?? 0)}`)
+    : accepted({ paid: false }, `${name} marked not paid`)
+}
+
+/** #479 · one player's amount received; 0 removes the mark (not paid). */
+export async function realSetPaymentAmount({
+  sessionId,
+  clubPlayerId,
+  amountMinor,
+}: SetPaymentAmountInput) {
+  const current = await realGetSessionPayments(sessionId)
+  const name = current?.players.find((p) => p.clubPlayerId === clubPlayerId)?.name ?? 'Player'
+  const { paid } = await realRequest<{ paid: boolean; amount: WireMoney }>(
+    sessionPath(sessionId, 'payments/amount'),
+    { method: 'POST', body: { operationId: crypto.randomUUID(), clubPlayerId, amountMinor } },
+  )
+  return paid
+    ? accepted({ paid: true }, `${name} paid ${formatPeso(amountMinor)}`)
     : accepted({ paid: false }, `${name} marked not paid`)
 }
 

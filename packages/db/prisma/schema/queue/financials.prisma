@@ -91,7 +91,9 @@ model SessionPaymentMark {
   sessionId         String   @map("session_id") @db.Uuid
   sessionPlayerId   String   @map("session_player_id") @db.Uuid
   clubId            String   @map("club_id") @db.Uuid
-  /// Centavos due when ticked; null when no fee was set (meaning of a no-fee tick is pending #245).
+  /// Centavos received (#479): a quick tick records the amount due then; the amount editor records
+  /// what was entered. Status compares it with today's amount due; pricing changes never rewrite it.
+  /// Null (legacy) counts as paid in full at today's amount due.
   amountMinor       Int?     @map("amount_minor")
   currency          String   @default("PHP") @db.Char(3)
   markedAt          DateTime @map("marked_at") @db.Timestamptz(6)

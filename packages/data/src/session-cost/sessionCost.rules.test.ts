@@ -5,7 +5,6 @@ import {
   defaultShuttlePlan,
   estimateSessionCost,
   normalizeSessionCost,
-  paymentTotals,
 } from './sessionCost.rules'
 import type { SessionCostInput } from './sessionCost.types'
 
@@ -172,39 +171,5 @@ describe('session cost estimates in centavos', () => {
     expect(
       normalizeSessionCost({ ...input, paymentMode: 'break_even' })?.customFeePerHead,
     ).toBeNull()
-  })
-})
-describe('payment totals', () => {
-  it('uses the ticked amounts while calculating remaining dues at the current fee', () => {
-    expect(
-      paymentTotals({
-        marks: [{ amountMinor: 70000 }, { amountMinor: 65000 }],
-        total: 3,
-        amountDue: 70000,
-        cost: 200000,
-      }),
-    ).toEqual({
-      paid: 2,
-      total: 3,
-      collected: 135000,
-      stillDue: 70000,
-      againstCosts: -65000,
-      cost: 200000,
-    })
-  })
-  it('keeps no-fee and no-estimate totals unknown', () => {
-    expect(paymentTotals({ marks: [], total: 3, amountDue: null, cost: null })).toEqual({
-      paid: 0,
-      total: 3,
-      collected: 0,
-      stillDue: null,
-      againstCosts: null,
-      cost: null,
-    })
-  })
-  it('handles all paid and a collection surplus', () => {
-    expect(
-      paymentTotals({ marks: [{ amountMinor: 70000 }], total: 1, amountDue: 70000, cost: 65000 }),
-    ).toMatchObject({ stillDue: 0, againstCosts: 5000 })
   })
 })

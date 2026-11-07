@@ -196,7 +196,8 @@ Rules: [Financials](business_logic/product/queue/modules/financials/README.md)
 | Break-even | Total estimated cost ÷ players, rounded up. The default payment per player |
 | Payment per player | What each player pays: break-even, or a custom amount (showing profit or loss) |
 | Entrance fee | Per-head venue cost, listed for transparency, covered by the payment per player |
-| Payments checklist | Manual paid / not-paid tick per player per session. **ROTRA never collects money** |
+| Payments checklist | Manual record per player per session: a quick paid tick or the amount received (#479). **ROTRA never collects money** |
+| Payment status | Amount received vs. today's payment per player (#479): **Paid** (equal), **Partial** (less; “₱X left”), **Reimburse** (more; “₱X to return”, a reminder only, never a refund), **Unpaid** (nothing). Code `PaymentStatus` kinds `paid` · `partial` · `reimburse` · `unpaid` |
 | Inventory | Club's list of shuttlecocks, equipment, and items with stock and cost per unit |
 | Running low | Inventory item with 2 or fewer left |
 
@@ -307,7 +308,7 @@ from the [database design](database_design/product/README.md). Add a row here **
 | Club assessment | `ClubAssessment` | `club_assessments` | |
 | Inventory item | `InventoryItem` | `inventory_items` | |
 | Shuttle plan line | `SessionShuttlePlanLine` | `session_shuttle_plan_lines` | Planned tubes from one inventory item |
-| Payment mark | `SessionPaymentMark` | `session_payment_marks` | Amount and time when paid was ticked |
+| Payment mark | `SessionPaymentMark` | `session_payment_marks` | Amount received (`amountMinor`, #479) and when it was ticked or recorded |
 | Cost estimate | `SessionCostEstimate` | `session_cost_estimates` | |
 | Device | `Device` | `devices` | A browser on a club account; not a person. Enrollment rules pending #246 |
 | Device stream | `DeviceSessionStream` | `device_session_streams` | One device's numbered operations for one session (`generation_no` per re-enrollment) |

@@ -238,6 +238,8 @@
     "./session-cost/fetchers": "./src/session-cost/fetchers.ts",
     "./session-cost/useSessionCostEstimate": "./src/session-cost/useSessionCostEstimate.ts",
     "./session-payment/types": "./src/session-payment/sessionPayment.types.ts",
+    "./session-payment/rules": "./src/session-payment/sessionPayment.rules.ts",
+    "./session-payment/useSetPaymentAmount": "./src/session-payment/useSetPaymentAmount.ts",
     "./session-payment/query-keys": "./src/session-payment/queryKeys.ts",
     "./session-payment/fetchers": "./src/session-payment/fetchers.ts",
     "./session-payment/useSessionPayments": "./src/session-payment/useSessionPayments.ts",

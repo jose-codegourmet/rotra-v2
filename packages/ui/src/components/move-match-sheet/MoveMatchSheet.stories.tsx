@@ -54,9 +54,14 @@ export const SomethingChanged: Story = {
   args: { message: 'Something changed. Review the match again.' },
 }
 
-export const SaveFailed: Story = { args: { value: ['court-3'], error: 'Changes could not be saved' } }
+export const SaveFailed: Story = {
+  args: { value: ['court-3'], error: 'Changes could not be saved' },
+}
 
 export const CourtChosenLight: Story = { args: { value: ['court-3'] }, globals: { theme: 'light' } }
 
-export const Phone: Story = { args: { value: ['court-3'] }, globals: { viewport: { value: 'phone' } } }
+export const Phone: Story = {
+  args: { value: ['court-3'] },
+  globals: { viewport: { value: 'phone' } },
+}
 export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }

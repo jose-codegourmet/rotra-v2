@@ -16,6 +16,11 @@ export type FacebookPostSheetProps = {
   /** Copies the text; when the browser blocks it, select everything in the textarea through the ref */
   onCopy: (text: string) => void
   textareaRef?: Ref<HTMLTextAreaElement>
+  /** The post is being filled in; Copy post waits for it */
+  loading?: boolean
+  /** Why the post could not be filled in; shown instead of the post, and Copy post is disabled */
+  error?: string
+  onRetry?: () => void
 }
 
 /**
@@ -31,7 +36,12 @@ export function FacebookPostSheet({
   onEditTemplate,
   onCopy,
   textareaRef,
+  loading = false,
+  error,
+  onRetry,
 }: FacebookPostSheetProps) {
+  const empty = !text.trim()
+  const canCopy = !loading && !error && !empty
   return (
     <Sheet
       open={open}
@@ -41,7 +51,7 @@ export function FacebookPostSheet({
       footer={
         <>
           <Button onClick={() => onOpenChange(false)}>Close</Button>
-          <Button variant="primary" onClick={() => onCopy(text)}>
+          <Button variant="primary" disabled={!canCopy} onClick={() => onCopy(text)}>
             Copy post
           </Button>
         </>
@@ -56,13 +66,28 @@ export function FacebookPostSheet({
         aria-label="Facebook post text"
         rows={18}
         readOnly
-        value={text}
+        value={loading ? 'Filling in the post…' : text}
         className="font-mono"
       />
+      {error ? (
+        <p role="alert" className="m-0 flex flex-wrap items-center gap-2 text-[13px] text-error">
+          <span>{error}</span>
+          {onRetry ? (
+            <Button size="xs" variant="ghost" onClick={onRetry}>
+              Try again
+            </Button>
+          ) : null}
+        </p>
+      ) : !loading && empty ? (
+        <p role="alert" className="m-0 text-[13px] text-fg2">
+          The post is empty, so there is nothing to copy. Check your template in Edit template.
+        </p>
+      ) : null}
       <p className="m-0 flex flex-wrap items-center gap-2 text-[13px] text-fg2">
         <span>
-          {playerCount} player{playerCount === 1 ? '' : 's'} listed. Copy it again after you add
-          players to get the latest list.
+          {loading || error
+            ? 'Player count shows once the post is filled in.'
+            : `${playerCount} player${playerCount === 1 ? '' : 's'} listed. Copy it again after you add players to get the latest list.`}
         </span>
         <Button size="xs" variant="ghost" onClick={onEditTemplate}>
           Edit template

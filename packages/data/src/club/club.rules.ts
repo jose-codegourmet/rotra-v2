@@ -123,6 +123,40 @@ export function fillPostTemplate(template: string, values: Record<string, string
   )
 }
 
+/**
+ * The Copy Facebook post text and its player count from a club, a session, its courts and roster.
+ * Unknown placeholders stay as written. Mock and real mode both build the post here.
+ */
+export function composeFacebookPost(input: {
+  club: PostInput['club'] & { postTemplate: string | null }
+  draft?: { template?: string; description?: string; courtRules?: string }
+  session: PostInput['session'] & {
+    playersPerCourt: number
+    sessionMode: PostInput['mode']
+    minimumGames: number
+  }
+  courts: PostInput['courts']
+  roster: PostInput['roster']
+  waitlist: PostInput['waitlist']
+}) {
+  const { club, draft, session, courts, roster, waitlist } = input
+  const values = buildPostValues({
+    club: { ...club, ...draft },
+    session,
+    courts,
+    roster,
+    waitlist,
+    openSlots: Math.max(0, courts.length * session.playersPerCourt - roster.length),
+    mode: session.sessionMode,
+    minimum: session.minimumGames,
+  })
+  return {
+    text: fillPostTemplate(draft?.template ?? club.postTemplate ?? DEFAULT_POST_TEMPLATE, values),
+    playerCount: roster.length,
+    sessionTitle: session.title,
+  }
+}
+
 /** A club's own license price as the club record stores it (integer centavos). */
 export type ClubPrice = Pick<Club, 'licensePricing' | 'licenseMonthlyMinor' | 'licenseYearlyMinor'>
 

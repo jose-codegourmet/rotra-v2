@@ -126,6 +126,23 @@ export async function realUpdateClubLogo(input: {
   return accepted(null, input.logoUrl === null ? 'Club logo removed' : 'Club logo updated')
 }
 
+/** Q-CLUB Facebook post: saves the given fields; `template: null` restores the default template. */
+export async function realSaveFacebookPost(input: {
+  template?: string | null
+  description?: string
+  courtRules?: string
+}) {
+  const { revision } = await realGetClub()
+  await realRequest('/api/club', {
+    method: 'PATCH',
+    body: { ...input, expectedRevision: revision },
+  })
+  return accepted(
+    null,
+    input.template === null ? 'Default template restored' : 'Facebook post saved',
+  )
+}
+
 // ---------- Venues (Q-VENUES) ----------
 
 type WireVenue = {

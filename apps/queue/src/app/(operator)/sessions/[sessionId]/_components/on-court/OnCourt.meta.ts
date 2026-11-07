@@ -15,5 +15,12 @@ export const onCourtMeta = {
     'docs/business_logic/product/queue/modules/matches/README.md#lifecycle',
     'docs/mockup-changes/2026-11-06-queue-on-court-and-sub-credit.md',
   ],
-  related: ['OnCourtSheet', 'CourtCard', 'SessionView', 'StartMatch', 'ActiveMatch', 'PlayerProfile'],
+  related: [
+    'OnCourtSheet',
+    'CourtCard',
+    'SessionView',
+    'StartMatch',
+    'ActiveMatch',
+    'PlayerProfile',
+  ],
 } satisfies ComponentMeta

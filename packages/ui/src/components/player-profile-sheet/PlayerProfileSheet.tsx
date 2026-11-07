@@ -32,6 +32,8 @@ export type PlayerProfileSheetProps = {
   onBack?: () => void
   /** Shown for guests and unclaimed profiles */
   onInvite?: () => void
+  /** Edit details, shown for guests and unclaimed profiles (a registered player owns their details) */
+  onEdit?: () => void
   /** Absolute ROTRA Player sign-in link. Guests get an Invite to ROTRA section with it; hidden when absent */
   inviteUrl?: string
 }
@@ -60,6 +62,7 @@ export function PlayerProfileSheet({
   backLabel,
   onBack,
   onInvite,
+  onEdit,
   inviteUrl,
 }: PlayerProfileSheetProps) {
   const canInvite = identity === 'guest' || identity === 'unclaimed'
@@ -96,6 +99,7 @@ export function PlayerProfileSheet({
           ) : (
             <Button onClick={() => onOpenChange(false)}>Close</Button>
           )}
+          {canInvite && onEdit ? <Button onClick={onEdit}>Edit details</Button> : null}
           {canInvite && onInvite ? (
             <Button variant="primary" onClick={onInvite}>
               Invite

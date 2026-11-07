@@ -24,8 +24,19 @@ export type ClaimLink = {
   status: ClaimLinkStatus
   clubName: string
   preview: ClaimLinkPreview
-  /** Operator-preset details the form starts from */
-  preset: { fullName: string; nickname: string; facebook: string }
+  /** What the club entered (Queue › Edit details); the form starts from it and the player can change it */
+  preset: {
+    fullName: string
+    nickname: string
+    email: string
+    playingStyle: string
+    experienceYears: string
+    experienceMonths: string
+    facebook: string
+    instagram: string
+    youtube: string
+    linkedin: string
+  }
 }
 /** Mock store record; 'claimed' is derived from the account, not stored. */
 export type ClaimLinkRecord = {

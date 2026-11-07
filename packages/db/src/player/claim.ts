@@ -6,6 +6,7 @@ import { prisma } from '../client/prisma'
 import { requireClubEntitlement } from '../service/authorize'
 import { ServiceError } from '../service/errors'
 import { toIso } from '../service/serialize'
+import { currentExperienceMonths, playingStyle } from './profile'
 
 /**
  * Links last 7 days and work once (#244). TBD (owner, 2026-11-08): a new link no longer revokes
@@ -67,6 +68,27 @@ export async function issueClaimLink(context: ClubContext, clubPlayerId: string)
   })
 }
 
+type LinkPlayer = NonNullable<Awaited<ReturnType<typeof findLink>>>['player']
+
+/** The registration form's starting values, as text the way the form holds them. */
+function presetOf(player: LinkPlayer) {
+  const link = (provider: string) =>
+    player.socialLinks.find((entry) => entry.provider === provider)?.url ?? ''
+  const months = currentExperienceMonths(player.experienceMonths, player.experienceRecordedAt)
+  return {
+    fullName: player.fullName,
+    nickname: player.nickname ?? '',
+    email: player.privateContact?.email ?? '',
+    playingStyle: playingStyle(player.personalDetails),
+    experienceYears: months == null ? '' : String(Math.floor(months / 12)),
+    experienceMonths: months == null ? '' : String(months % 12),
+    facebook: link('facebook'),
+    instagram: link('instagram'),
+    youtube: link('youtube'),
+    linkedin: link('linkedin'),
+  }
+}
+
 async function findLink(token: string) {
   return prisma.playerClaimLink.findUnique({
     where: { tokenDigest: await digest(token) },
@@ -79,9 +101,12 @@ async function findLink(token: string) {
           nickname: true,
           avatarRef: true,
           profileState: true,
-          socialLinks: { where: { provider: 'facebook' }, select: { url: true } },
+          personalDetails: true,
+          experienceMonths: true,
+          experienceRecordedAt: true,
+          socialLinks: { select: { provider: true, url: true } },
           idAllocation: { select: { rtrId: true } },
-          privateContact: { select: { phoneE164: true } },
+          privateContact: { select: { phoneE164: true, email: true } },
           account: { select: { authSubject: true } },
         },
       },
@@ -89,7 +114,11 @@ async function findLink(token: string) {
   })
 }
 
-/** P-CLAIM read (`ClaimLink`): public identity, a masked phone and the form's preset details only. */
+/**
+ * P-CLAIM read (`ClaimLink`): public identity, a masked phone and what the club entered for the form
+ * (Queue › Edit details), including the email it typed. Nothing the player set is ever here: the
+ * profile is unclaimed.
+ */
 export async function readClaimLink(token: string) {
   const link = await findLink(token)
   if (!link || link.state === 'revoked' || !link.player.idAllocation)
@@ -113,11 +142,7 @@ export async function readClaimLink(token: string) {
         ? maskPhone(link.player.privateContact.phoneE164)
         : '',
     },
-    preset: {
-      fullName: link.player.fullName,
-      nickname: link.player.nickname ?? '',
-      facebook: link.player.socialLinks[0]?.url ?? '',
-    },
+    preset: presetOf(link.player),
   }
 }
 

@@ -32,3 +32,6 @@ Screen ID: Q-SAVED-PLAYERS
 ## Real app work
 - Edit details sheet and form in `@rotra/ui`, a Queue route that saves club and profile fields for the
   club's own guest/unclaimed players, and issuing links without revoking earlier ones.
+- **Not built yet: Level for this club.** A club level is stored as a session assessment (it needs a
+  session and feeds shared rank), so saving it from Saved players needs a decision on where a
+  saved, session-less level lives. The real app's Edit details leaves it out for now.

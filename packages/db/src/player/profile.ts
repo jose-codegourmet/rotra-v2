@@ -23,7 +23,7 @@ const PUBLIC_PLAYER_SELECT = {
 
 type PublicPlayerRow = Prisma.PlayerGetPayload<{ select: typeof PUBLIC_PLAYER_SELECT }>
 
-function playingStyle(details: Prisma.JsonValue | null): string {
+export function playingStyle(details: Prisma.JsonValue | null): string {
   if (details && typeof details === 'object' && !Array.isArray(details)) {
     const style = (details as Record<string, unknown>).playingStyle
     if (typeof style === 'string') return style
@@ -35,7 +35,11 @@ function playingStyle(details: Prisma.JsonValue | null): string {
  * Experience as of today. The stored months are a snapshot taken at `recordedAt`, so playing since is
  * fixed and the count keeps going (owner, 2026-11-08). Whole months only.
  */
-function currentExperienceMonths(months: number | null, recordedAt: Date | null, now = new Date()) {
+export function currentExperienceMonths(
+  months: number | null,
+  recordedAt: Date | null,
+  now = new Date(),
+) {
   if (months == null) return null
   if (!recordedAt) return months
   const elapsed =

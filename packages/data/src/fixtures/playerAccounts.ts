@@ -100,7 +100,14 @@ export const claimLinkScenarios = {
   preset: {
     fullName: raymark.fullName,
     nickname: raymark.nickname ?? '',
+    email: 'raymark.club@example.com',
+    playingStyle: '',
+    experienceYears: '2',
+    experienceMonths: '6',
     facebook: raymark.socialLinks.facebook,
+    instagram: '',
+    youtube: '',
+    linkedin: '',
   },
   /** Used by Jose's account, so a claim with it is an email conflict */
   takenEmail: 'jose@example.com',

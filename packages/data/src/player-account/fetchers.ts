@@ -115,7 +115,14 @@ export async function getClaimLink(token: string, signal?: AbortSignal): Promise
     preset: {
       fullName: profile.fullName,
       nickname: profile.nickname ?? '',
+      email: account.email,
+      playingStyle: profile.playingStyle,
+      experienceYears: profile.experienceYears == null ? '' : String(profile.experienceYears),
+      experienceMonths: profile.experienceMonths == null ? '' : String(profile.experienceMonths),
       facebook: profile.socialLinks.facebook,
+      instagram: profile.socialLinks.instagram,
+      youtube: profile.socialLinks.youtube,
+      linkedin: profile.socialLinks.linkedin,
     },
   }
 }
@@ -229,13 +236,13 @@ function personalDetailsFromPreset(preset: ClaimLink['preset']): PersonalProfile
   return {
     fullName: preset.fullName,
     nickname: preset.nickname,
-    playingStyle: '',
-    experienceYears: '',
-    experienceMonths: '',
+    playingStyle: preset.playingStyle,
+    experienceYears: preset.experienceYears,
+    experienceMonths: preset.experienceMonths,
     facebook: preset.facebook,
-    instagram: '',
-    youtube: '',
-    linkedin: '',
+    instagram: preset.instagram,
+    youtube: preset.youtube,
+    linkedin: preset.linkedin,
   }
 }
 

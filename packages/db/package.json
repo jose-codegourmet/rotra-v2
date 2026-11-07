@@ -21,6 +21,7 @@
     "./queue/session-cancel": "./src/queue/session-cancel.ts",
     "./queue/session-roster": "./src/queue/session-roster.ts",
     "./queue/club-players": "./src/queue/club-players.ts",
+    "./queue/club-player-details": "./src/queue/club-player-details.ts",
     "./auth/provider-admin": "./src/auth/provider-admin.ts",
     "./admin/audit": "./src/admin/audit.ts",
     "./admin/club-logo": "./src/admin/club-logo.ts",

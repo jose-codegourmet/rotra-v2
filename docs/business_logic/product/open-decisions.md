@@ -1,6 +1,6 @@
 # Open decisions before implementation
 
-**Last verified:** 2026-11-07 for player login mapping and claim-link rules (#244); 2026-11-06 for the On court step, court filling, substitution game credit, times and days, and the connection rules for Cancel session and the court switch; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-07 for player login mapping and claim-link rules (#244) and MVP manual recovery (D-2026-11-07-01); 2026-11-06 for the On court step, court filling, substitution game credit, times and days, and the connection rules for Cancel session and the court switch; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Deliberately unresolved. These are not additional approved requirements and are not a new questionnaire. Updated October 26, 2026: items the [ROTRA Queue prototype](../../../apps/mockup/queue-app/rotra-queue.html) settled are listed under [Settled by the prototype](#settled-by-the-prototype). Updated October 27, 2026: items the platform owner settled with the [ROTRA Admin prototype](../../../apps/mockup/admin-app/rotra-admin.html) are listed under [Settled by the Admin prototype](#settled-by-the-admin-prototype).
 
@@ -15,7 +15,7 @@ The product direction is sufficiently defined for documentation. Resolve the rel
 | Offline completeness | How devices know required records exist; detection of gaps; second-device prerequisites; duplicate prevention; device handoff | Original records must be recovered; second device may continue; no offline finalization or manual reconstruction |
 | Conflicting confirmed results | How operator clarification chooses authoritative records without providing general edits to locked winners | Confirmation is permanent; sync conflicts require review |
 | Identity matching | Canonical phone representation, concurrent new-profile creation, duplicate resolution, mistaken links, hidden-phone lookup by clubs | Phone uniquely identifies profiles; name alone does not; ID/QR supports private numbers; a hidden phone still signs in (decided 2026-11-07, #244) |
-| Claim and recovery links | Link delivery method, email verification on claim, password policy/complexity, unclaimed-account behavior, lost access to contacts, failed provider application handling | Club supplies registration link; phone and email required; phone/email + password login; recovery by email only. Decided 2026-11-07 (#244): links last 7 days, single use, club reissue invalidates the previous link; contact collision at claim blocks (see [below](#settled-by-the-product-owner-on-november-7-2026)) |
+| Claim and recovery links | Link delivery method, email verification on claim, password policy/complexity, unclaimed-account behavior, lost access to contacts, failed provider application handling | Club supplies registration link; phone and email required; phone/email + password login; recovery by email only (post-MVP; for MVP recovery is manual per [D-2026-11-07-01](../../mvp/decisions.md#d-2026-11-07-01)). Decided 2026-11-07 (#244): links last 7 days, single use, club reissue invalidates the previous link; contact collision at claim blocks (see [below](#settled-by-the-product-owner-on-november-7-2026)) |
 | Contact-change approval | Evidence needed, enforcement across direct provider APIs, request UX, notifications, contact conflicts | Owner manually approves; player cannot directly edit phone/email; RTR ID permanent |
 | Window boundaries | Calendar months versus fixed day count; timezone for rank windows and ID date | Three-month observations; RTR date is the first sync day |
 
@@ -45,7 +45,7 @@ Player login mapping and claim links ([#244](https://github.com/jose-codegourmet
 | Area | Decision |
 |---|---|
 | L1 · Account mapping | A player's auth account is keyed by **email + password**. Phone is a **login identifier only**: on sign-in the server normalizes the phone through the approved identity rules, looks up the linked account's email, and signs in with email + password. No phone provider, no SMS. Phone and email reach the same account |
-| L2 · Email required | Every player account has an email (already required at claim). Password recovery stays email-only |
+| L2 · Email required | Every player account has an email (already required at claim). Password recovery stays email-only. For MVP this is superseded by [D-2026-11-07-01](../../mvp/decisions.md#d-2026-11-07-01): manual, Admin-issued short-lived single-use link shared by support; no automated email |
 | L3 · Generic failure | A failed sign-in never reveals whether a phone or email exists. A player with a hidden phone can still sign in with it: privacy hides the phone from clubs, not from login |
 | L4 · Identity ≠ auth | The global player identity stays independent of the auth identity. The player profile links to the auth user; the auth user is not the player identity |
 | L5 · Claim links | Valid **7 days**, **single use**. The club (Queue Master) can **reissue**; reissuing invalidates the previous link. Expired or used links show the existing expired/used state |

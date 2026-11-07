@@ -55,3 +55,13 @@ This is an inventory, **not** a claim that each gap has a dedicated implementati
 | Club accent persistence | Open product/data-model decision; not completed | [#395](https://github.com/jose-codegourmet/rotra-v2/issues/395) | Lower priority / defer candidate |
 
 Before agents implement, verify current `main` and the relevant ticket's actual scope. Do not create duplicate issues merely because a related epic is open.
+
+### D-2026-11-07-04 — Freeze the current MVP scope
+- **Decision status:** approved
+- **Implementation status:** not applicable (scope decision)
+- **Ticket:** none (tracking only; missing implementation tickets still need reconciliation)
+- **Roadmap:** MVP — all current roadmap items
+- **Decision:** The currently agreed Queue, Player, Admin, offline operation, guest reconciliation and ranking work is sufficient MVP scope for now. Prioritize completing and linking existing tickets, not adding unrelated features. A completed ticket backlog is the working feature-completion milestone, **not** proof that no undiscovered gaps exist.
+- **Delivery note:** A private regression handoff during November 9–13 was discussed as a *tentative target*, not a committed launch date. Offline is mandatory for MVP; an online-only public launch is not approved. Reassess dates based on actual remaining work.
+- **Follow-up:** Reconcile approved MVP decisions against GitHub tickets, avoid duplicates, and mark uncovered implementation work `Ticket: needed`. Keep deferred or canceled items visible.
+- **References:** [MVP roadmap](MVP-ROADMAP.md), [Ways of working](ways-of-working.md), D-2026-11-07-01 and D-2026-11-07-03.

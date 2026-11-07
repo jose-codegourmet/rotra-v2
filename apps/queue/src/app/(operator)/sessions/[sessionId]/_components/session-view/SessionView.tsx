@@ -14,6 +14,7 @@ import {
   nextEligibleForCourt,
   openedEarly,
   shortName,
+  shortOnPlayers,
   swapTarget,
   waitingMatches,
   waitMinutes,
@@ -23,11 +24,14 @@ import { usePlaceOnCourt } from '@rotra/data/match/usePlaceOnCourt'
 import { useRemoveWaitingMatch } from '@rotra/data/match/useRemoveWaitingMatch'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { useStartMatch } from '@rotra/data/match/useStartMatch'
+import { courtFillModeOf } from '@rotra/data/queue-session/courtFill'
 import type { SessionCourt } from '@rotra/data/queue-session/types'
+import { useFillOpenedCourts } from '@rotra/data/queue-session/useFillOpenedCourts'
 import { useOpenAllCourtsEarly } from '@rotra/data/queue-session/useOpenAllCourtsEarly'
 import { useOpenCourtEarly } from '@rotra/data/queue-session/useOpenCourtEarly'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useRemoveCourt } from '@rotra/data/queue-session/useRemoveCourt'
+import { useSetCourtFillMode } from '@rotra/data/queue-session/useSetCourtFillMode'
 import { useUndoCourtEarlyOpen } from '@rotra/data/queue-session/useUndoCourtEarlyOpen'
 import type { SessionPlayer } from '@rotra/data/session-roster/types'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
@@ -37,12 +41,14 @@ import { Button } from '@rotra/ui/button'
 import { ConfirmSheet } from '@rotra/ui/confirm-sheet'
 import { CourtCard, type CourtCardProps } from '@rotra/ui/court-card'
 import type { CourtPlayer } from '@rotra/ui/court-drawing'
+import { CourtFillSwitch } from '@rotra/ui/court-fill-switch'
 import type { MatchCardPlayer } from '@rotra/ui/match-card'
 import { formatTime } from '@rotra/ui/now-card/helpers'
+import { ShortOnPlayersBanner } from '@rotra/ui/short-on-players-banner'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { toast } from '@rotra/ui/toaster'
 import { type UpcomingQueueMatch, UpcomingQueueRow } from '@rotra/ui/upcoming-queue-row'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import { OnCourt } from '@/app/(operator)/sessions/[sessionId]/_components/on-court/OnCourt'
 
@@ -92,6 +98,10 @@ export type SessionViewProps = {
  * removes go straight to their mutation with a toast and no dialog (per dialogs.md): a court with
  * "LABEL removed" (an occupied court is refused with "Only a free court can be removed"), a waiting
  * match with "Waiting match N removed".
+ * Live sessions show the Manual Queue | Auto Queue switch under the Courts header (useSetCourtFillMode,
+ * needs internet) and the ShortOnPlayersBanner above Courts (shortOnPlayers); a court newly open in
+ * Auto Queue is filled on the console refresh (useFillOpenedCourts). A busy court past its booked end
+ * shows Booking ended on its card.
  * A court before its planned start shows Start anyway, and the header shows Open all courts now while
  * any court is not open yet; both confirm first ("Open Court 4 now?") and then open the court early
  * (useOpenCourtEarly / useOpenAllCourtsEarly). Undo early open in the ⋯ menu goes straight back to
@@ -120,6 +130,8 @@ export function SessionView({
   const undoEarlyOpen = useUndoCourtEarlyOpen()
   const placeOnCourt = usePlaceOnCourt()
   const startMatch = useStartMatch()
+  const setCourtFill = useSetCourtFillMode()
+  const fillOpened = useFillOpenedCourts()
   // One placement or start per tap: a second tap can land before isPending reaches this render.
   const committing = useRef(false)
   /** The On court match whose sheet is open (Open match on a Getting ready card) */
@@ -129,6 +141,28 @@ export function SessionView({
   /** The Start anyway confirmation: one court, or every not-open court (Open all courts now) */
   const [opening, setOpening] = useState<{ courtId: string | null } | null>(null)
   const [openError, setOpenError] = useState<string | undefined>()
+  /** Courts seen open on the last refresh: a court newly open gets Auto Queue's fill (console refresh) */
+  const seenOpen = useRef<Set<string> | null>(null)
+  const sessionData = session.data
+  const openIds = sessionData?.courts
+    .filter((c) => !c.removedAt && courtOpen(c, now))
+    .map((c) => c.id)
+    .join(',')
+  const isLive = sessionData?.state === 'active'
+  const autoOn = sessionData ? courtFillModeOf(sessionData) === 'auto' : false
+  // biome-ignore lint/correctness/useExhaustiveDependencies: runs when the set of open courts changes
+  useEffect(() => {
+    const ids = new Set(openIds ? openIds.split(',') : [])
+    const before = seenOpen.current
+    seenOpen.current = ids
+    if (!before || !isLive || !autoOn) return
+    const opened = [...ids].filter((id) => !before.has(id))
+    if (opened.length)
+      fillOpened.mutate(
+        { sessionId, courtIds: opened },
+        { onSuccess: (result) => result.message && toast(result.message) },
+      )
+  }, [openIds, isLive, autoOn, sessionId])
 
   if (session.isError || roster.isError || matches.isError)
     return (
@@ -194,6 +228,12 @@ export function SessionView({
   }
 
   const waiting = waitingMatches(ctx.matches)
+  const fillMode = courtFillModeOf(s)
+  const short = live ? shortOnPlayers(s, ctx) : null
+  const onChangeFill = (mode: 'manual' | 'auto') => {
+    if (mode === fillMode || setCourtFill.isPending) return
+    setCourtFill.mutate({ sessionId, mode }, options)
+  }
   const onCourts = courtMatches(ctx.matches)
   const free = freeCourts(courts, ctx.matches, now)
   const untilLabel = (c: SessionCourt) =>
@@ -376,6 +416,7 @@ export function SessionView({
 
   return (
     <>
+      {short ? <ShortOnPlayersBanner {...short} /> : null}
       <section aria-label="Courts" className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-lg font-bold">Courts</h2>
@@ -390,6 +431,7 @@ export function SessionView({
             </span>
           </div>
         </div>
+        {live ? <CourtFillSwitch value={fillMode} onChange={onChangeFill} /> : null}
         <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,250px),1fr))] gap-3">
           {cards.map((card) => (
             <CourtCard key={card.label} {...card} />

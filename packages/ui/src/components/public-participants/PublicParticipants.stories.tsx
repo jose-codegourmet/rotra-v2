@@ -25,6 +25,7 @@ const meta = {
   args: {
     participants: clubPlayers.slice(0, 18).map(toParticipant),
     waitlist: clubPlayers.slice(18, 20).map(toWaitlisted),
+    skillMix: { beginner: 5, intermediate: 8, advanced: 4, unrated: 1 },
   },
 } satisfies Meta<typeof PublicParticipants>
 
@@ -36,8 +37,17 @@ export const EighteenWithWaitlist: Story = {}
 
 export const NoWaitlist: Story = { args: { waitlist: [] } }
 
-/** Nobody has been added to the session yet. */
-export const Empty: Story = { args: { participants: [], waitlist: [] } }
+/** Nobody has been added to the session yet; the skill mix bar is hidden. */
+export const Empty: Story = {
+  args: {
+    participants: [],
+    waitlist: [],
+    skillMix: { beginner: 0, intermediate: 0, advanced: 0, unrated: 0 },
+  },
+}
+
+/** No skill mix passed: the grid alone. */
+export const WithoutSkillMix: Story = { args: { skillMix: undefined } }
 
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
 export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }

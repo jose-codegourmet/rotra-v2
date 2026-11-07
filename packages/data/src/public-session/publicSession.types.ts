@@ -10,6 +10,16 @@ export type PublicSessionParticipant = {
   /** Registered and unclaimed players; a guest has no profile */
   hasRotraProfile: boolean
 }
+/**
+ * #474: how many public participants sit in each skill group, counts only. Never carries a name,
+ * position or anything that maps a (masked) participant to a level. Missing level → unrated.
+ */
+export type PublicSkillMix = {
+  beginner: number
+  intermediate: number
+  advanced: number
+  unrated: number
+}
 /** A published standings row: position and counts only, no internal ids. */
 export type PublicStandingRow = {
   position: number
@@ -50,6 +60,8 @@ export type PublicSessionPage = {
   minimum: number
   notes?: string | null
   participants: PublicSessionParticipant[]
+  /** Aggregate skill-group counts over exactly `participants` (never the waitlist), #474 */
+  skillMix: PublicSkillMix
   /** Waitlisted names, masked like participant names, in the order they joined */
   waitlist: string[]
   openSlots: number

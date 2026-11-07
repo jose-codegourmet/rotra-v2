@@ -1,6 +1,6 @@
 import 'server-only'
 import { createHmac, timingSafeEqual } from 'node:crypto'
-import { maskPublicName } from '@rotra/data/public-session/rules'
+import { maskPublicName, publicSkillMix } from '@rotra/data/public-session/rules'
 import { loadAccountContext } from '../auth/account-context'
 import { MOCK_COOKIE_PREFIX } from '../auth/data-mode'
 import { type CookieAdapter, verifySubject } from '../auth/supabase'
@@ -8,7 +8,7 @@ import { prisma } from '../client/prisma'
 import type { QueueSession, StatedBand } from '../generated/prisma/client'
 import { ServiceError } from '../service/errors'
 import { readPublishedResults } from './results'
-import { capacityOf, liveCourts, liveRoster, orderedWaitlist } from './session-store'
+import { capacityOf, levelCodeFor, liveCourts, liveRoster, orderedWaitlist } from './session-store'
 
 const E164 = /^\+[1-9][0-9]{7,14}$/
 const BANDS: StatedBand[] = ['beginner', 'intermediate', 'advanced', 'unsure']
@@ -84,9 +84,9 @@ export async function readPreviewAudience(cookies: CookieAdapter, sessionId: str
 
 /**
  * Q-PUBLIC-* (`public-session.page`): the allowlisted `PublicSessionPage` from accepted server
- * state. No phone, level, presence, games, notes beyond the session notes, costs, Off Day or raw
+ * state. No phone, per-person level, presence, games, notes beyond the session notes, costs, Off Day or raw
  * sync data. Participant and waitlist names are masked here (`maskPublicName`, #475), so a full
- * name never leaves the server. `results` is the stored public copy of the published slides, or null.
+ * name never leaves the server. `skillMix` is aggregate counts only (#474). `results` is the stored public copy of the published slides, or null.
  */
 export async function readPublicSession(slug: string) {
   const session = await prisma.queueSession.findUnique({
@@ -140,6 +140,8 @@ export async function readPublicSession(slug: string) {
           hasRotraProfile: !!entry.playerIdAtEntry,
         }
       }),
+      // #474: counts only, over the same roster as `participants`; no per-entry level leaves here.
+      skillMix: publicSkillMix(roster.map((entry) => levelCodeFor(entry.skillLevelId))),
       waitlist: waitlist.map((w) => maskPublicName(byId.get(w.clubPlayerId)?.displayName ?? '')),
       openSlots: Math.max(0, capacity - roster.length),
       slotBudget: capacity,

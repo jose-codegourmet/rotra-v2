@@ -32,7 +32,7 @@ screen loaded one, and returns an allowlisted DTO.
 | `player/claim` | `issueClaimLink` (club's linked unclaimed player; token digest only; reissue revokes), `readClaimLink` (masked phone), `completeClaim` (provider login keyed on the link ID, then one transaction: email, account mapping, claimed, link consumed) |
 
 - A phone already linked to a different club player in the same club is marked `conflicted` for review, never merged.
-- Player Information Route Handlers (#400): public `GET /api/players/[playerId]` (`readPublicProfile`), `GET /api/players/[playerId]/rank` (`readPlayerRank`), `GET /api/players/[playerId]/games` (`readPlayerMatchHistory`), `GET /api/rtr-ids/[rtrId]` (`findPublicProfileByRtrId`, returns the player ID only); own `GET /api/me/account` (`readMyAccount`), `PATCH /api/me/profile` (`updateMyProfile`; keeps the saved picture; returns the new revision), `POST /api/me/phone-privacy` (`setPhonePrivacy`, then `readMyAccount`). A non-UUID player ID is not found. `issueClaimLink`, `readClaimLink` and `completeClaim` have no route yet: player sign-in, recovery and claim provisioning wait on #244.
+- Player Information Route Handlers (#400): public `GET /api/players/[playerId]` (`readPublicProfile`), `GET /api/players/[playerId]/rank` (`readPlayerRank`), `GET /api/players/[playerId]/games` (`readPlayerMatchHistory`), `GET /api/rtr-ids/[rtrId]` (`findPublicProfileByRtrId`, returns the player ID only); own `GET /api/me/account` (`readMyAccount`), `PATCH /api/me/profile` (`updateMyProfile`; keeps the saved picture; returns the new revision), `POST /api/me/phone-privacy` (`setPhonePrivacy`, then `readMyAccount`). A non-UUID player ID is not found. `issueClaimLink`, `readClaimLink` and `completeClaim` have no route yet. Their rules were decided November 7, 2026 (#244: email-keyed account, 7-day single-use links, collision blocks); the routes and staged provisioning are not built.
 - Unclaimed and claimed profiles differ: only a valid link plus the provider login claims; a name or RTR ID never does.
 - Historical guest attribution projections are F07.30.
 
@@ -45,7 +45,7 @@ screen loaded one, and returns an allowlisted DTO.
 - This module is the only writer of a claimed player's phone or email. Profile edits never accept contact fields.
 - `approved`, `applying` and `failed` are all shown as "approved, not applied yet"; only `applied` is a change.
 - A provider value matching neither the original nor the proposal fails closed as `provider_mismatch`.
-- `detectContactDrift` compares both phone and email; whether the provider holds the phone as a login identifier depends on the adapter (#244).
+- `detectContactDrift` compares both phone and email. The provider holds only the email; phone sign-in is a server lookup to that email (decided 2026-11-07, #244).
 
 ## F07.24 · Public session reads, visitor-owned join requests
 
@@ -270,8 +270,9 @@ do not apply migrations, create players, or change contacts, permissions or reta
   saved data (account provisioning, ranking policy, the license retention note) are left out, never
   guessed. Contact-change events are stored on the player with `metadata.requestId` and read per request.
 - **Not connected:** Approve, Retry application and Check status, which change the login identifier at
-  the sign-in provider (`applyContactChange` / `reconcileContactChange`). Which provider identifiers a
-  player signs in with, and contact-approval enforcement, are open in #196 and #244, and player sign-in
+  the sign-in provider (`applyContactChange` / `reconcileContactChange`). The provider holds only the
+  player's email (phone sign-in is a server lookup, decided November 7, 2026 in #244); contact-approval
+  enforcement is open in #196 and #244, and player sign-in
   itself is not wired in real mode yet. They answer "isn't connected to saved data yet"; the DevMenu
   advance helper is never sent. Flag and ranking-settings logs wait on #402.
 - Not verified against a database: only the `@rotra/data` adapters are unit-tested

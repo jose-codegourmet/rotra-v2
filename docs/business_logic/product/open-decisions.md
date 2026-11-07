@@ -1,6 +1,6 @@
 # Open decisions before implementation
 
-**Last verified:** 2026-11-06 for the On court step, court filling, substitution game credit, times and days, and the connection rules for Cancel session and the court switch; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-07 for player login mapping and claim-link rules (#244); 2026-11-06 for the On court step, court filling, substitution game credit, times and days, and the connection rules for Cancel session and the court switch; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Deliberately unresolved. These are not additional approved requirements and are not a new questionnaire. Updated October 26, 2026: items the [ROTRA Queue prototype](../../../apps/mockup/queue-app/rotra-queue.html) settled are listed under [Settled by the prototype](#settled-by-the-prototype). Updated October 27, 2026: items the platform owner settled with the [ROTRA Admin prototype](../../../apps/mockup/admin-app/rotra-admin.html) are listed under [Settled by the Admin prototype](#settled-by-the-admin-prototype).
 
@@ -14,9 +14,9 @@ The product direction is sufficiently defined for documentation. Resolve the rel
 | Queue generation | Final team-strength/probability model; meaning of level-matched/easy in numbers; mode and fairness weights; default number of matches per Generate matches run (formerly called Auto Queue) | Shared queue, operator starts, minimum-game priority, flexible Chill/Fair targets, manual overrides; operator picks 2/3/4/6 per run; the prototype heuristic is the reference |
 | Offline completeness | How devices know required records exist; detection of gaps; second-device prerequisites; duplicate prevention; device handoff | Original records must be recovered; second device may continue; no offline finalization or manual reconstruction |
 | Conflicting confirmed results | How operator clarification chooses authoritative records without providing general edits to locked winners | Confirmation is permanent; sync conflicts require review |
-| Identity matching | Canonical phone representation, concurrent new-profile creation, duplicate resolution, mistaken links, hidden-phone lookup | Phone uniquely identifies profiles; name alone does not; ID/QR supports private numbers |
-| Claim and recovery links | Issuance/delivery, expiration, one-time use, email verification, unclaimed-account behavior, lost access to contacts | Club supplies registration link; phone and email required; phone/email + password login; recovery by email |
-| Contact-change approval | Evidence needed, request UX, notifications, contact conflicts | Owner manually approves; player cannot directly edit phone/email; RTR ID permanent |
+| Identity matching | Canonical phone representation, concurrent new-profile creation, duplicate resolution, mistaken links, hidden-phone lookup by clubs | Phone uniquely identifies profiles; name alone does not; ID/QR supports private numbers; a hidden phone still signs in (decided 2026-11-07, #244) |
+| Claim and recovery links | Link delivery method, email verification on claim, password policy/complexity, unclaimed-account behavior, lost access to contacts, failed provider application handling | Club supplies registration link; phone and email required; phone/email + password login; recovery by email only. Decided 2026-11-07 (#244): links last 7 days, single use, club reissue invalidates the previous link; contact collision at claim blocks (see [below](#settled-by-the-product-owner-on-november-7-2026)) |
+| Contact-change approval | Evidence needed, enforcement across direct provider APIs, request UX, notifications, contact conflicts | Owner manually approves; player cannot directly edit phone/email; RTR ID permanent |
 | Window boundaries | Calendar months versus fixed day count; timezone for rank windows and ID date | Three-month observations; RTR date is the first sync day |
 
 ## Remaining product details
@@ -37,6 +37,22 @@ The product direction is sufficiently defined for documentation. Resolve the rel
 | Profile editing | Exact personal fields and social visibility; whether operator edits of personal information continue after a profile is claimed |
 | Expired-page behavior | Meaning/presentation of stale public pages; restoration after deletion; retention of internal club data beyond public pages |
 | Admin configuration | Effect of changing weights/eligibility on existing ranks; which flags exist, targeting, and when offline devices pick up a flag change |
+
+## Settled by the product owner on November 7, 2026
+
+Player login mapping and claim links ([#244](https://github.com/jose-codegourmet/rotra-v2/issues/244), F07.3). Club username sign-in and platform-owner sign-in are unchanged by this decision.
+
+| Area | Decision |
+|---|---|
+| L1 · Account mapping | A player's auth account is keyed by **email + password**. Phone is a **login identifier only**: on sign-in the server normalizes the phone through the approved identity rules, looks up the linked account's email, and signs in with email + password. No phone provider, no SMS. Phone and email reach the same account |
+| L2 · Email required | Every player account has an email (already required at claim). Password recovery stays email-only |
+| L3 · Generic failure | A failed sign-in never reveals whether a phone or email exists. A player with a hidden phone can still sign in with it: privacy hides the phone from clubs, not from login |
+| L4 · Identity ≠ auth | The global player identity stays independent of the auth identity. The player profile links to the auth user; the auth user is not the player identity |
+| L5 · Claim links | Valid **7 days**, **single use**. The club (Queue Master) can **reissue**; reissuing invalidates the previous link. Expired or used links show the existing expired/used state |
+| L6 · Contact collisions at claim | If the phone or email already belongs to another account, **block** and show the contact-support route. Never merge silently |
+| L7 · No claim by ID or name | An RTR ID or a name alone can never claim an account |
+
+Still open after this decision: email verification on claim; password policy and complexity; contact-change enforcement across direct provider APIs and its approval evidence; RTR ID location/date/sequence rules and simultaneous allocation; mistaken or duplicate guest links and permanent relink; failed provider application handling; guest invitation for a name-only guest.
 
 ## Settled by the product owner on November 6, 2026
 

@@ -10,6 +10,8 @@ Public profiles/leaderboard do not require login. Sign-in is needed for own-prof
 
 Controls (prototype layout in the [module README](README.md#reference-prototype); the field groups phone digits as they're typed, display only): one **Phone number or email** input, Password, show/hide password, Sign in, Forgot password. Required-field errors identify missing input; credential failures avoid exposing private account data. Normalize through the approved identity rules rather than guessing a country from a partial number.
 
+**Decided 2026-11-07 (#244):** the account is keyed by email + password. A phone entered here is a login identifier only: the server normalizes it, looks up the linked account's email and signs in with email + password (no SMS). A failed sign-in shows one generic credential error that never reveals whether the phone or email exists. A player who hides their phone from clubs can still sign in with it.
+
 The development mock matches the approved sign-in reference, including the sample phone/email hint
 and any-password placeholder. A claimed fictional account must match; this is not real authentication
 or email delivery.
@@ -28,7 +30,7 @@ Entry: operator-issued registration link tied to a specific existing identity. S
 | Nickname | Operator may preset; optional until a stronger rule is agreed |
 | Phone number | Required; preset from linked identity where available; not freely replaceable through this form |
 | Email | Required; collect if missing; existing identity conflicts require resolution |
-| Password | Required to establish login; complexity policy must come from the actual account specification |
+| Password | Required to establish login; complexity policy is still open (#244) |
 | Confirm password | Proposed typo-prevention field; match the chosen password |
 | Facebook link/identity | Optional social field, may be preset; not login |
 | Instagram, YouTube, LinkedIn | Optional links |
@@ -37,11 +39,11 @@ Entry: operator-issued registration link tied to a specific existing identity. S
 
 Do not invent age, tournament wins, gear, six-dimension self-rating, or other old onboarding requirements. A proposed password visibility/match control does not set a new minimum password length without the auth specification.
 
-A wrong preset phone cannot be changed to claim a different person through this link. Show a route to seek identity/contact assistance; exact pre-claim correction process is open. Same for an email belonging to a different account.
+A wrong preset phone cannot be changed to claim a different person through this link. **Decided 2026-11-07 (#244):** if the phone or email already belongs to another account, block the claim and show the contact-support route; never merge silently. What support then does (mistaken/duplicate links, permanent relink) is open. An RTR ID or name alone never claims an account.
 
 CTA **Complete registration**. Pending prevents duplicates. Do not say complete until profile and authentication account are consistently ready. If account creation partially succeeds, resume/recover the same claim rather than create another identity.
 
-No SMS step or Facebook authorization is part of the agreed flow. Email verification and token-lifetime policy are explicitly pending.
+No SMS step or Facebook authorization is part of the agreed flow. Link lifetime is decided (2026-11-07, #244): valid 7 days, single use. Email verification on claim is explicitly pending.
 
 ## P-CLAIM-STATUS — Link and provisioning outcomes
 
@@ -49,16 +51,17 @@ No SMS step or Facebook authorization is part of the agreed flow. Email verifica
 |---|---|
 | Valid, unclaimed | Show P-CLAIM with correct preset data |
 | Already claimed/consumed | Offer sign-in/recovery for the existing identity; do not issue another account |
-| Invalid/expired/revoked | Explain the link cannot be used; direct to operator/platform assistance without exposing private contact data |
+| Invalid/expired/revoked | Explain the link cannot be used; direct to operator/platform assistance without exposing private contact data. Links expire after 7 days; a reissued link revokes the previous one |
 | Wrong profile recognized by recipient | Stop claiming and direct to assistance; no merge-by-name |
+| Phone or email belongs to another account | Block the claim and show the contact-support route; never merge (decided 2026-11-07, #244) |
 | Provisioning still processing | Show pending state/retry status check; avoid duplicate submission |
 | Offline | Require connectivity; preserve unsent form values appropriately without claiming success |
 
-Exact wording and replacement-link delivery depend on the account policy. Operator role remains initial entry; normal forgotten-password recovery is by email.
+The club (Queue Master) can reissue the link, which invalidates the previous one (decided 2026-11-07, #244). Exact wording and the replacement-link delivery method are still open. Operator role remains initial entry; normal forgotten-password recovery is by email.
 
 ## P-FORGOT — Email recovery request
 
-Explain that reset instructions are sent to the account's email. Proposed request input is email, with a generic acknowledgement regardless of account existence. If the final account design allows phone-based lookup for recovery, the destination remains email and private-email disclosure must still be avoided.
+Explain that reset instructions are sent to the account's email. Proposed request input is email, with a generic acknowledgement regardless of account existence. Recovery stays email-only (decided 2026-11-07, #244); if a phone-based lookup is ever offered, the destination remains email and private-email disclosure must still be avoided.
 
 States: empty/invalid input, sending, generic sent acknowledgement, retryable service failure with safe wording. Resend limits/cooldowns come from actual service policy, not hardcoded screen assumptions. Do not route routine resets to a club operator.
 
@@ -70,7 +73,7 @@ Expired/invalid/used link shows Request another reset. Failure preserves unsaved
 
 ## Acceptance examples
 
-- Both phone and email can identify the same account at login.
+- Both phone and email can identify the same account at login; the account itself is keyed by email.
 - Registration cannot complete without phone and email, but social links remain optional.
 - A claim link cannot silently create a second profile for a phone already linked.
 - Password recovery uses email and does not require the original club operator.

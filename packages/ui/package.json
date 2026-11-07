@@ -324,6 +324,7 @@
     "./claim-form": "./src/forms/claim-form/ClaimForm.tsx",
     "./hooks/use-submit-once": "./src/hooks/useSubmitOnce.ts",
     "./player-id-qr": "./src/components/player-id-qr/PlayerIdQr.tsx",
+    "./session-join-qr": "./src/components/session-join-qr/SessionJoinQr.tsx",
     "./player-id-breakdown": "./src/components/player-id-breakdown/PlayerIdBreakdown.tsx",
     "./phone-privacy-card": "./src/components/phone-privacy-card/PhonePrivacyCard.tsx",
     "./contact-details-card": "./src/components/contact-details-card/ContactDetailsCard.tsx",

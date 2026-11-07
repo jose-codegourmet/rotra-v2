@@ -1,5 +1,7 @@
 'use client'
 
+import { useClub } from '@rotra/data/club'
+import { DEMO_CLUB_ID } from '@rotra/data/fixtures/clubs'
 import { isPermissionRefusal } from '@rotra/data/mock/errors'
 import {
   estimateMinimum,
@@ -28,6 +30,7 @@ import { DeviceDownloadCard } from '@rotra/ui/device-download-card'
 import { formatMinutes } from '@rotra/ui/forms/session-setup-form/helpers'
 import { Notice } from '@rotra/ui/notice'
 import { PageHeader } from '@rotra/ui/page-header'
+import { SessionJoinQr } from '@rotra/ui/session-join-qr'
 import { SessionLinkCard } from '@rotra/ui/session-link-card'
 import { SessionSetupCard } from '@rotra/ui/session-setup-card'
 import { Sheet } from '@rotra/ui/sheet'
@@ -49,6 +52,7 @@ import { PaymentsPanel } from '@/app/(operator)/sessions/[sessionId]/_components
 import { PreparationRoster } from '@/app/(operator)/sessions/[sessionId]/preparation/_components/preparation-roster/PreparationRoster'
 import { sessionHref } from '@/lib/dates'
 import { useAppSelector } from '@/store/hooks'
+import { selectAccount } from '@/store/slices/authSlice'
 import { selectDev } from '@/store/slices/devSlice'
 
 const MODES = {
@@ -78,6 +82,8 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
   const payments = useSessionPayments(sessionId)
   const dev = useAppSelector(selectDev)
   const session = useQueueSession(sessionId)
+  const clubId = useAppSelector(selectAccount)?.id ?? DEMO_CLUB_ID
+  const club = useClub(clubId)
   const sessions = useQueueSessions()
   const roster = useSessionRoster(sessionId)
   const download = useDownloadSession()
@@ -100,6 +106,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
   >(null)
   const [startOpen, setStartOpen] = useState(false)
   const [postOpen, setPostOpen] = useState(false)
+  const [qrOpen, setQrOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [cancelOpen, setCancelOpen] = useState(false)
   // The public link is origin + /s/<publicSlug>; the origin is only known in the browser.
@@ -249,6 +256,9 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
               </Button>
               <Button size="sm" onClick={() => void copyLink()}>
                 Copy invite link
+              </Button>
+              <Button size="sm" onClick={() => setQrOpen(true)}>
+                Session QR
               </Button>
               <Button size="sm" onClick={() => setPostOpen(true)}>
                 Copy Facebook post
@@ -464,6 +474,20 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
           presentCount={present}
           onStart={() => setStartOpen(true)}
         />
+      ) : null}
+      {s ? (
+        <Sheet open={qrOpen} onOpenChange={setQrOpen} title="Session QR">
+          {/* The QR holds the visitor link (/s/<slug>), never the public-page preview URL. */}
+          <SessionJoinQr
+            link={sessionLink}
+            slug={s.publicSlug}
+            clubName={club.data?.name ?? 'ROTRA session'}
+            whenLabel={`${date(s.scheduledStartAt)} · ${time(s.scheduledStartAt)}–${time(s.scheduledEndAt)}`}
+            venueName={s.venueName}
+            onDownloaded={() => toast('QR image downloaded')}
+            onError={(message) => toast.error(message)}
+          />
+        </Sheet>
       ) : null}
       {s?.state === 'prepared' ? (
         <StartSessionSheet

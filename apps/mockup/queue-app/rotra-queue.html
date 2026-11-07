@@ -2807,7 +2807,7 @@ function viewPrepare() {
   return `<main class="wrap">
     <div class="crumb"><button class="btn sm ghost" data-act="go" data-to="home">${I.back} Home</button></div>
     <div class="between"><div class="stack tight"><span class="label">${live ? 'Session settings' : 'Preparation'}</span><h1>${esc(s.title)}</h1><p class="muted">${live ? `${fmtDate(s.startedAt)} · Started ${fmtTime(s.startedAt)} · Ends ${fmtTime(s.end)}${laterDay(s.startedAt, s.end)}` : `${fmtDate(s.start)} · ${fmtRange(s.start, s.end)}`} · ${esc(s.venue)}</p></div>
-      <div class="row acts">${live ? '<button class="btn sm" data-act="go" data-to="console">Back to live session</button>' : '<button class="btn sm" data-act="editSetup">Edit preparation</button>'}<button class="btn sm" data-act="go" data-to="public">Preview public page</button><button class="btn sm" data-act="copyLink">Copy invite link</button><button class="btn sm" data-act="openPost">Copy Facebook post</button>${live ? '' : '<button class="btn sm danger" data-act="openDeleteSession">Delete session</button><button class="btn sm danger" data-act="openCancelSession">Cancel session</button>'}</div></div>
+      <div class="row acts">${live ? '<button class="btn sm" data-act="go" data-to="console">Back to live session</button>' : '<button class="btn sm" data-act="editSetup">Edit preparation</button>'}<button class="btn sm" data-act="go" data-to="public">Preview public page</button><button class="btn sm" data-act="copyLink">Copy invite link</button><button class="btn sm" data-act="openSessionQr">Session QR</button><button class="btn sm" data-act="openPost">Copy Facebook post</button>${live ? '' : '<button class="btn sm danger" data-act="openDeleteSession">Delete session</button><button class="btn sm danger" data-act="openCancelSession">Cancel session</button>'}</div></div>
     ${live ? notice('', 'Preparation values are read-only during play. Mode, formats, minimum and playing levels are fixed after start. Use the live controls in Overview to manage courts, time, arrivals, requests and payments.') : pendingReqs(s).length ? requestsPanel(s) : ''}
     ${(() => {
       const tab = ['overview', 'roster', 'waitlist', 'payments'].includes(S.ui.prepTab) ? S.ui.prepTab : 'overview';
@@ -3446,6 +3446,18 @@ const SHEETS = {
       <p class="small muted">${s.roster.length} player${s.roster.length === 1 ? '' : 's'} listed. Copy it again after you add players to get the latest list. <button class="btn xs ghost" data-act="goClub" data-k="post">Edit template</button></p>`,
       '<button class="btn" data-act="closeSheet">Close</button><button class="btn primary" data-act="copyPost">Copy post</button>', true);
   },
+  sessionQr() {
+    const s = cur();
+    // Static placeholder QR (finder squares + sample modules); the real app encodes the public session link.
+    const sq = (x, y) => `<rect x="${x}" y="${y}" width="7" height="7" fill="#000"/><rect x="${x + 1}" y="${y + 1}" width="5" height="5" fill="#fff"/><rect x="${x + 2}" y="${y + 2}" width="3" height="3" fill="#000"/>`;
+    const dots = [[9,1],[11,2],[13,1],[10,4],[12,5],[9,7],[14,8],[1,9],[3,10],[5,9],[8,10],[10,9],[12,11],[15,10],[2,12],[4,13],[7,12],[9,14],[11,13],[14,14],[16,12],[18,9],[19,11],[17,15],[20,13],[18,18],[12,17],[14,19],[10,19],[8,16],[16,19],[20,17]];
+    const svg = `<svg viewBox="0 0 21 21" width="200" height="200" shape-rendering="crispEdges" role="img" aria-label="QR code for the session link" style="background:#fff;padding:12px;border-radius:12px">${sq(0, 0)}${sq(14, 0)}${sq(0, 14)}${dots.map(([x, y]) => `<rect x="${x}" y="${y}" width="1" height="1" fill="#000"/>`).join('')}</svg>`;
+    return sheetShell('Session QR', `<div class="stack" style="align-items:center;text-align:center">${svg}
+      <p><b>${esc(S.club.name)}</b><br><span class="small muted">${fmtDate(s.start)}, ${fmtRange(s.start, s.end)} · ${esc(s.venue)}</span></p>
+      <p class="small muted mono">${esc(sessionLink(s))}</p>
+      <p class="small muted">Scanning opens the public session page. Download the image to use it in a Facebook post or print it.</p></div>`,
+      '<button class="btn" data-act="closeSheet">Close</button><button class="btn" data-act="downloadSessionQr">Share</button><button class="btn primary" data-act="downloadSessionQr">Download QR image</button>');
+  },
   venue(sh) {
     const d = S.ui.draft || {};
     if (sh.mode === 'form') {
@@ -4077,6 +4089,8 @@ const ACT = {
   openSync: () => openSheet({ type: 'sync' }),
   openVenue: () => openSheet({ type: 'venue', mode: 'pick', q: '' }),
   openPost: () => openSheet({ type: 'post' }),
+  openSessionQr: () => openSheet({ type: 'sessionQr' }),
+  downloadSessionQr: () => toast('QR image downloaded (sample in this prototype)'),
   copyLink: () => { const v = sessionLink(cur()); try { navigator.clipboard.writeText(v); } catch (e) { /* clipboard unavailable */ } toast('Session link copied'); },
   openGuest: (d) => { go('public', d.id); S.ui.guest = true; render(); },
   toggleAcceptReq: () => { const s = cur(); s.acceptReq = s.acceptReq === false; save(); render(); toast(s.acceptReq ? 'Join requests are on' : 'Join requests are off'); },

@@ -1,6 +1,6 @@
 # Public session page
 
-**Last verified:** 2026-11-07 for the operator-only preview route (#469) and masked participant names (#475).
+**Last verified:** 2026-11-07 for the operator-only preview route (#469), masked participant names (#475) and the aggregate skill mix (#474).
 
 **Surfaces:** `Q-PUBLIC-DETAILS`, `Q-PUBLIC-PARTICIPANTS`, `Q-PUBLIC-RESULTS`, `Q-PUBLIC-STALE`, `Q-PUBLIC-JOIN`.
 
@@ -46,6 +46,8 @@ No fees, costs, or payment states. The club founding location never replaces the
 A grid of cards: profile picture (registered or unclaimed players with an uploaded picture) or initials, masked name, and “Has a ROTRA profile” (a label, not a link) for registered and unclaimed players. Guests get initials and no profile label.
 
 **Masked names** (owner decision, November 7, 2026; #475): each word of the name shows as its first letter plus a fixed `***` (“Jose Adrian” → “J*** A***”, “Mika” → “M***”; a blank name reads “Player”). The server masks them, so the full name is not in the page data, avatar label or tooltips. The operator preview and the record's **Public page** tab show the same masked names. A visitor's own request status card may still show the name they typed. See [Players › Public participant names](../../../../business_logic/product/queue/modules/players/README.md#public-participant-names).
+
+**Skill mix** (#474): above the grid, when anyone is confirmed, a `SkillDistributionBar` labeled “Skill mix” with the total (“N players”), a stacked bar and a legend with Beginner, Intermediate, Advanced and No level counts (zero groups are left out). Its accessibility label reads “Skill mix: 4 Advanced, 8 Intermediate, …”. Counts only, computed on the server over the same confirmed participants as the grid (not the waitlist): never who is which level. The grid keeps roster order and is never grouped or sorted by level. Hidden when nobody is confirmed. See [Players › Public skill mix](../../../../business_logic/product/queue/modules/players/README.md#public-skill-mix).
 
 No phone, email, identity-verification state, level, presence, games, operator notes, or Off Day; no participant is tied to a level. Below the grid, when anyone is waiting: “Waitlist · N” as a numbered list of masked names and “Waitlisted players get a slot if one opens. Ask the Queue Master.” Empty: “Players have not been added yet.”
 

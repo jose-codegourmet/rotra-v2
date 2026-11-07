@@ -211,6 +211,7 @@ export function PublicSession({ slug, viewer }: PublicSessionProps) {
         <TabsContent value="participants">
           <PublicParticipants
             participants={participants}
+            skillMix={p.skillMix}
             waitlist={p.waitlist.map((name, i) => ({ id: String(i), name }))}
           />
         </TabsContent>

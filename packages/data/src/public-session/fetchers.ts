@@ -12,13 +12,13 @@ import {
   realSendJoinRequest,
 } from '../real/public-session'
 import { submitJoinRequest } from '../session-roster/mutations'
+import { maskPublicName, publicSkillMix } from './publicSession.rules'
 import type {
   MyJoinRequest,
   PublicSessionPage,
   PublicSessionResults,
   SendJoinRequestInput,
 } from './publicSession.types'
-import { maskPublicName } from './publicSession.rules'
 
 /** Unknown or removed slug: the page reveals nothing about any club, roster or retained data. */
 export class PublicSessionNotFoundError extends MockError {
@@ -127,6 +127,7 @@ function project(
         hasRotraProfile,
       }
     }),
+    skillMix: publicSkillMix(roster.map((r) => r.level)),
     waitlist: state.waitlist
       .filter((w) => w.sessionId === s.id)
       .sort((a, b) => a.addedAt - b.addedAt)

@@ -1,5 +1,9 @@
 import { cn } from '@rotra/ui/cn'
 import { ParticipantCard } from '@rotra/ui/public-participants/participant-card'
+import {
+  SkillDistributionBar,
+  type SkillDistributionCounts,
+} from '@rotra/ui/skill-distribution-bar'
 
 export type PublicParticipant = {
   id: string
@@ -20,6 +24,11 @@ export type PublicParticipantsProps = {
   participants: PublicParticipant[]
   /** People waiting for a slot, in the order they joined; the list is hidden when empty */
   waitlist?: PublicWaitlistEntry[]
+  /**
+   * Aggregate skill-group counts over `participants` (#474), computed on the server. Counts only:
+   * never pass anything that maps a participant to a level. The bar is hidden with no participants.
+   */
+  skillMix?: SkillDistributionCounts
   className?: string
 }
 
@@ -27,15 +36,21 @@ export type PublicParticipantsProps = {
  * The public page's Participants tab (Q-PUBLIC-PARTICIPANTS): a grid of ParticipantCards, then
  * "Waitlist · N" as a numbered list of names when anyone is waiting. Empty: "Players have not been
  * added yet." Shows no phone, email, level, presence, games, notes or Off Day. Names arrive masked
- * ("J*** A***", #475), so the card text and avatar label never carry a full name.
+ * ("J*** A***", #475), so the card text and avatar label never carry a full name. With at least one
+ * participant, a "Skill mix" bar of aggregate counts sits above the grid (#474); it never says who
+ * is which level, and the grid keeps roster order (never sorted or grouped by level).
  */
 export function PublicParticipants({
   participants,
   waitlist = [],
+  skillMix,
   className,
 }: PublicParticipantsProps) {
   return (
     <section aria-label="Participants" className={cn('flex min-w-0 flex-col gap-3', className)}>
+      {participants.length > 0 && skillMix ? (
+        <SkillDistributionBar counts={skillMix} label="Skill mix" />
+      ) : null}
       {participants.length ? (
         <ul className="m-0 grid list-none grid-cols-[repeat(auto-fill,minmax(min(100%,150px),1fr))] gap-2.5 p-0">
           {participants.map((p) => (

@@ -1,5 +1,8 @@
 import 'server-only'
 import { createHmac, timingSafeEqual } from 'node:crypto'
+import { loadAccountContext } from '../auth/account-context'
+import { MOCK_COOKIE_PREFIX } from '../auth/data-mode'
+import { type CookieAdapter, verifySubject } from '../auth/supabase'
 import { prisma } from '../client/prisma'
 import type { QueueSession, StatedBand } from '../generated/prisma/client'
 import { ServiceError } from '../service/errors'
@@ -50,6 +53,32 @@ function publicStatus(
 ): 'prepared' | 'active' | 'completed' | 'invalid' | 'cancelled' {
   if (session.state === 'finalizing') return 'active'
   return session.state
+}
+
+/**
+ * Who opened the operator preview `/sessions/[sessionId]/public-page` (#469): the session's public
+ * slug and whether the signed-in club account owns the session. Null for an unknown session.
+ * Anyone else (signed out, another club, a non-club account) is a visitor and is sent to
+ * `/s/<slug>`, where `readPublicSession` alone decides what is visible; the slug is the public
+ * address, so returning it reveals nothing the session link does not. Read-only: refreshed
+ * cookies are the proxy's job, so `cookies.setAll` may be a no-op.
+ */
+export async function readPreviewAudience(cookies: CookieAdapter, sessionId: string) {
+  if (!UUID.test(sessionId)) return null
+  const session = await prisma.queueSession.findUnique({
+    where: { id: sessionId },
+    select: { publicSlug: true, clubId: true },
+  })
+  if (!session) return null
+  const verified = await verifySubject(
+    {
+      getAll: () => cookies.getAll().filter((c) => !c.name.startsWith(MOCK_COOKIE_PREFIX)),
+      setAll: (values, headers) => cookies.setAll(values, headers),
+    },
+    'club',
+  )
+  const club = verified ? await loadAccountContext(verified, 'club') : null
+  return { slug: session.publicSlug, operator: club?.clubId === session.clubId }
 }
 
 /**

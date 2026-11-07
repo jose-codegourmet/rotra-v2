@@ -857,6 +857,8 @@ textarea.tpl { font-family: var(--mono); font-size: 13px; line-height: 1.55; min
 .pcard b { overflow-wrap: anywhere; font-weight: 600; font-size: 14px; }
 .proto-bar { background: var(--warn-subtle); border-bottom: 1px solid var(--warn); font-size: 13px; }
 .proto-bar .in { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; padding: 8px var(--page-r) 8px var(--page-l); }
+.proto-bar .in.share { justify-content: flex-start; gap: 4px 12px; padding-top: 0; }
+.proto-bar .share .mono { min-width: 0; overflow-wrap: anywhere; }
 /* Touch sizing: phones and tablets (or any touch screen) get bigger targets, at least 44 px and mostly 48 px. */
 @media (pointer: coarse), (max-width: 1024px) {
   .btn { min-height: 48px; padding: 0 18px; font-size: 16px; }
@@ -3343,7 +3345,7 @@ function viewPublic() {
   const back = s.status === 'active' ? 'console' : s.status === 'prepared' ? 'prepare' : 'history';
   const pub = s.published;
   const why = (s.cancelReason || '').replace(/[.\s]+$/, '');
-  return `<div class="proto-bar"><div class="in"><span>${S.ui.guest ? '<b>Guest view (prototype).</b> What a guest sees after opening your session link. Try Request to join.' : '<b>Public page preview.</b> What anyone with the session link sees, no sign-in needed.'}</span><button class="btn xs" data-act="go" data-to="${back}">${I.back} Back to Queue app</button></div></div>
+  return `<div class="proto-bar"><div class="in"><span>${S.ui.guest ? '<b>Guest view (prototype).</b> What a guest sees after opening your session link. Try Request to join.' : '<b>Public page preview.</b> What anyone with the session link sees, no sign-in needed.'}</span><button class="btn xs" data-act="go" data-to="${back}">${I.back} Back to Queue app</button></div>${S.ui.guest ? '' : `<div class="in share"><span>Share this link, not this page's address:</span><span class="mono">${esc(sessionLink(s))}</span><button class="btn xs" data-act="copyLink">Copy link</button></div>`}</div>
   <main class="wrap narrow">
     <section class="pub-hero">
       <span class="pub-date">${fmtDate(s.start)} · ${fmtRange(s.start, s.end)}</span>

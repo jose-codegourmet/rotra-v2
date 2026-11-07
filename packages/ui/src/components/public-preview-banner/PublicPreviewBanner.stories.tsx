@@ -13,5 +13,8 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Banner: Story = {}
+export const WithSessionLink: Story = {
+  args: { sessionLink: 'https://queue.rotra.club/s/tonight', onCopyLink: fn() },
+}
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
 export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }

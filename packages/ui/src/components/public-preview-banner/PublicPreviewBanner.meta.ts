@@ -3,9 +3,10 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const publicPreviewBannerMeta = {
   name: 'PublicPreviewBanner',
   description:
-    'The strip the operator sees above the public page preview: "Public page preview. What anyone with the session link sees, no sign-in needed." with a Back to Queue app button.',
+    'The strip the operator sees above the public page preview: "Public page preview. What anyone with the session link sees, no sign-in needed." with a Back to Queue app button. With sessionLink it adds "Share this link, not this page\'s address:", the visitor link (origin + /s/<slug>) and Copy link, so the preview address is never the one shared (#469).',
   usage: [
     'Use only in the operator app, above PublicSessionHero, when the Queue Master previews the public page from preparation, the console or the session record.',
+    'Pass sessionLink and onCopyLink in the operator preview; the caller toasts "Session link copied" (or shows the link in an error toast when the clipboard is unavailable).',
     'Never render it on the real public page. The prototype-only "Guest view (prototype)" copy is not part of the product.',
   ],
   prototype: {

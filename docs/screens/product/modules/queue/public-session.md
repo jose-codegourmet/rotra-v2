@@ -1,6 +1,6 @@
 # Public session page
 
-**Last verified:** 2026-10-28 for settled documentation reconciliation.
+**Last verified:** 2026-11-07 for the operator-only preview route (#469).
 
 **Surfaces:** `Q-PUBLIC-DETAILS`, `Q-PUBLIC-PARTICIPANTS`, `Q-PUBLIC-RESULTS`, `Q-PUBLIC-STALE`, `Q-PUBLIC-JOIN`.
 
@@ -10,7 +10,9 @@
 
 No operator top bar. Hero: “Date · start–end”, session title, club logo/initials and name labeled **Organizer**, and a chip **Happening now** (active), **Finished** (finalized) or **Cancelled** (cancelled). Tabs: **Details** and **Participants · N**.
 
-The operator reaches it from preparation (**Preview public page**), the console, and the session record. In the operator app a banner reads “Public page preview. What anyone with the session link sees, no sign-in needed.” with **Back to Queue app**; the real public page has no banner.
+The operator reaches it from preparation (**Preview public page**), the console, and the session record. In the operator app a banner reads “Public page preview. What anyone with the session link sees, no sign-in needed.” with **Back to Queue app**, and a second line “Share this link, not this page's address:” with the session link (origin + `/s/<slug>`) and **Copy link** (toast “Session link copied”; if the clipboard is unavailable the link is shown in an error toast). The real public page has no banner.
+
+**Two addresses.** The session link `/s/<slug>` is the only address to share; it is what Copy link, Copy invite link and the Session QR hold. The preview `/sessions/<sessionId>/public-page` is operator-only: only a signed-in account of the club that owns the session sees the preview. Anyone else who opens it (signed out, private window, another club) is redirected to `/s/<slug>` and gets the visitor page with its normal join state and visibility rules (an unavailable page stays unavailable); an unknown session id is not found.
 
 Do not copy the reference's ads, Can't go, Matches, Chat, or multiple-organizer controls. **Request to join** is now in scope as a request only (Q-PUBLIC-JOIN). A contact route can be added only when the club-contact presentation is decided.
 

@@ -37,7 +37,7 @@ import { StartSessionSheet } from '@rotra/ui/start-session-sheet'
 import { Tabs, TabsContent } from '@rotra/ui/tabs'
 import { toast } from '@rotra/ui/toaster'
 import Link from 'next/link'
-import { notFound, useRouter } from 'next/navigation'
+import { notFound, usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import { AddPlayer } from '@/app/(operator)/_components/add-player/AddPlayer'
 import { useDockAction } from '@/app/(operator)/_components/operator-shell/DockAction.context'
@@ -56,6 +56,9 @@ const MODES = {
   fair: { label: 'Fair', text: 'Mainly level-matched games, roughly 10% easy games.' },
   hard: { label: 'Hard', text: 'Demanding runs, including 2–3 consecutive games.' },
 } as const
+
+const TABS = ['overview', 'roster', 'waitlist', 'payments'] as const
+type PreparationTab = (typeof TABS)[number]
 
 const time = (at: number) =>
   new Date(at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
@@ -82,7 +85,16 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
   const remove = useDeleteSession()
   const cancel = useCancelSession()
   const setAcceptJoinRequests = useSetAcceptJoinRequests()
-  const [tab, setTab] = useState('overview')
+  // The selected tab lives in the URL (?tab=); missing or unknown values fall back to Overview.
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const tabParam = searchParams.get('tab')
+  const tab: PreparationTab = TABS.find((t) => t === tabParam) ?? 'overview'
+  const setTab = (next: string) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('tab', next)
+    router.push(`${pathname}?${params.toString()}`, { scroll: false })
+  }
   const [liveSheet, setLiveSheet] = useState<
     'adjust' | 'add-court' | 'add-player' | 'requests' | 'payments' | null
   >(null)

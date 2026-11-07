@@ -15,9 +15,10 @@ export type FacebookPostProps = {
 /** The Copy Facebook post dialog, shared by preparation and the live console. */
 export function FacebookPost({ sessionId, open, onOpenChange }: FacebookPostProps) {
   const router = useRouter()
-  const post = useFacebookPost(sessionId)
+  const post = useFacebookPost(sessionId, open)
   const textarea = useRef<HTMLTextAreaElement>(null)
   const copy = async (text: string) => {
+    if (!text.trim()) return
     try {
       await navigator.clipboard.writeText(text)
       toast('Facebook post copied')
@@ -32,8 +33,15 @@ export function FacebookPost({ sessionId, open, onOpenChange }: FacebookPostProp
       open={open}
       onOpenChange={onOpenChange}
       sessionTitle={post.data?.sessionTitle ?? '…'}
-      text={post.isPending ? 'Filling in the post…' : (post.data?.text ?? '')}
+      text={post.data?.text ?? ''}
       playerCount={post.data?.playerCount ?? 0}
+      loading={open && (post.isPending || post.isFetching)}
+      error={
+        post.isError
+          ? `Couldn't fill in the post. ${post.error instanceof Error ? post.error.message : 'Try again.'}`
+          : undefined
+      }
+      onRetry={() => void post.refetch()}
       textareaRef={textarea}
       onCopy={copy}
       onEditTemplate={() => router.push('/club-settings/facebook-post')}

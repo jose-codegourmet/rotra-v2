@@ -7,14 +7,10 @@ import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, readMockState } from '../mock/store'
 import { queueMutation, requireClubAccess } from '../mock/transaction'
+import { realGetFacebookPost, realGetPostPreview } from '../real/facebook-post'
 import { isRealDataMode } from '../real/mode'
-import { realUpdateClubLogo } from '../real/queue'
-import {
-  buildPostValues,
-  clubInitials,
-  DEFAULT_POST_TEMPLATE,
-  fillPostTemplate,
-} from './club.rules'
+import { realSaveFacebookPost, realUpdateClubLogo } from '../real/queue'
+import { clubInitials, composeFacebookPost } from './club.rules'
 
 function clubIn(state: MockState) {
   const club = state.clubs.find((c) => c.id === DEMO_CLUB_ID)
@@ -82,18 +78,22 @@ export const saveFacebookPost = (input: {
   description?: string
   courtRules?: string
 }) =>
-  changeClub((state) => {
-    const club = clubIn(state)
-    if (input.template !== undefined) club.postTemplate = input.template
-    if (input.description !== undefined) club.description = input.description
-    if (input.courtRules !== undefined) club.courtRules = input.courtRules
-    return { data: null, text: 'Facebook post saved' }
-  })
+  isRealDataMode()
+    ? realSaveFacebookPost(input)
+    : changeClub((state) => {
+        const club = clubIn(state)
+        if (input.template !== undefined) club.postTemplate = input.template
+        if (input.description !== undefined) club.description = input.description
+        if (input.courtRules !== undefined) club.courtRules = input.courtRules
+        return { data: null, text: 'Facebook post saved' }
+      })
 export const resetFacebookPostTemplate = () =>
-  changeClub((state) => {
-    clubIn(state).postTemplate = null
-    return { data: null, text: 'Default template restored' }
-  })
+  isRealDataMode()
+    ? realSaveFacebookPost({ template: null })
+    : changeClub((state) => {
+        clubIn(state).postTemplate = null
+        return { data: null, text: 'Default template restored' }
+      })
 export async function changeClubPassword(input: { current: string; next: string }) {
   const result = await queueMutation(
     { area: 'Club settings', onlineOnly: true, clubAccess: true },
@@ -117,8 +117,9 @@ function postFor(
     .filter((r) => r.sessionId === sessionId)
     .sort((a, b) => a.confirmedAt - b.confirmedAt)
   const courts = state.courts.filter((c) => c.sessionId === sessionId && !c.removedAt)
-  const values = buildPostValues({
-    club: { ...club, ...draft },
+  return composeFacebookPost({
+    club,
+    draft,
     session,
     courts,
     roster: roster.map((r) => ({ name: r.nameSnapshot, nickname: r.nicknameSnapshot })),
@@ -128,17 +129,10 @@ function postFor(
       .map((w) => ({
         name: state.clubPlayers.find((p) => p.id === w.clubPlayerId)?.fullName ?? '',
       })),
-    openSlots: Math.max(0, courts.length * session.playersPerCourt - roster.length),
-    mode: session.sessionMode,
-    minimum: session.minimumGames,
   })
-  return {
-    text: fillPostTemplate(draft?.template ?? club.postTemplate ?? DEFAULT_POST_TEMPLATE, values),
-    playerCount: roster.length,
-    sessionTitle: session.title,
-  }
 }
 export async function getFacebookPost(sessionId: string) {
+  if (isRealDataMode()) return realGetFacebookPost(sessionId)
   await delay()
   return postFor(readMockState(), sessionId)
 }
@@ -147,6 +141,7 @@ export async function getPostPreview(draft: {
   description?: string
   courtRules?: string
 }) {
+  if (isRealDataMode()) return realGetPostPreview(draft)
   await delay()
   requireOnline()
   requireClubAccess()

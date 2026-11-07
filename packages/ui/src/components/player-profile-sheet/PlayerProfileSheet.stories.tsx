@@ -57,6 +57,12 @@ export const Unclaimed: Story = {
   args: propsFor(storyIdentityPlayers.unclaimed, { sessionsHere: 5 }),
 }
 export const Guest: Story = { args: propsFor(storyIdentityPlayers.guest, { sessionsHere: 1 }) }
+export const GuestWithInvite: Story = {
+  args: propsFor(storyIdentityPlayers.guest, {
+    sessionsHere: 1,
+    inviteUrl: 'https://player.rotra.club/login',
+  }),
+}
 export const LookupPending: Story = {
   args: propsFor(storyIdentityPlayers.guest, { identity: 'pending', sessionsHere: 0 }),
 }

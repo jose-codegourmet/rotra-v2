@@ -8,6 +8,7 @@ import type { Identity } from '@rotra/ui/identity-chip/variants'
 import { KeyValueList } from '@rotra/ui/key-value-list'
 import { levelLabel } from '@rotra/ui/level-pill'
 import { Sheet } from '@rotra/ui/sheet'
+import { toast } from '@rotra/ui/toaster'
 
 export type PlayerProfileSheetProps = {
   open: boolean
@@ -31,6 +32,8 @@ export type PlayerProfileSheetProps = {
   onBack?: () => void
   /** Shown for guests and unclaimed profiles */
   onInvite?: () => void
+  /** Absolute ROTRA Player sign-in link. Guests get an Invite to ROTRA section with it; hidden when absent */
+  inviteUrl?: string
 }
 
 const STATUS: Record<Identity, string> = {
@@ -57,6 +60,7 @@ export function PlayerProfileSheet({
   backLabel,
   onBack,
   onInvite,
+  inviteUrl,
 }: PlayerProfileSheetProps) {
   const canInvite = identity === 'guest' || identity === 'unclaimed'
   const phone = phoneHidden
@@ -64,6 +68,22 @@ export function PlayerProfileSheet({
     : identity === 'guest'
       ? 'None on file'
       : 'Kept private; confirmed in person when adding them to a session'
+  const canShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function'
+  const copyInvite = async (url: string) => {
+    try {
+      await navigator.clipboard.writeText(url)
+      toast('Invite link copied')
+    } catch {
+      toast(`Copy this link: ${url}`)
+    }
+  }
+  const shareInvite = async (url: string) => {
+    try {
+      await navigator.share({ title: 'Sign in to ROTRA Player', url })
+    } catch {
+      // Dismissing the share sheet is not an error
+    }
+  }
   return (
     <Sheet
       open={open}
@@ -116,6 +136,21 @@ export function PlayerProfileSheet({
           { label: 'Phone', value: phone },
         ]}
       />
+      {identity === 'guest' && inviteUrl ? (
+        <section className="flex flex-col gap-2" aria-labelledby="invite-to-rotra">
+          <h3 id="invite-to-rotra" className="m-0 text-[14px] font-semibold">
+            Invite to ROTRA
+          </h3>
+          <p className="m-0 text-[13px] text-fg2">
+            Send this link so they can sign in to ROTRA Player. Their guest record isn't linked
+            automatically.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Button onClick={() => void copyInvite(inviteUrl)}>Copy invite link</Button>
+            {canShare ? <Button onClick={() => void shareInvite(inviteUrl)}>Share</Button> : null}
+          </div>
+        </section>
+      ) : null}
       <p className="m-0 text-[13px] text-fg2">
         Levels are set per session while preparing a roster, not here.
       </p>

@@ -128,7 +128,7 @@ Years/months of experience, if present, is optional context, not a ranking multi
 
 The roster appears in two places:
 
-- **Preparation** ([Q-PREPARE](session-setup.md#q-prepare--session-preparation-overview)): picture, name, identity chip, suggestion, level indicator (may be too high / too low / matches suggestion), level select, Present switch, remove ×; **Mark all present**. New players start not present.
+- **Preparation** ([Q-PREPARE](session-setup.md#q-prepare--session-preparation-overview)): picture, name, identity chip, suggestion, level indicator (may be too high / too low / matches suggestion), level select, Present switch, remove ×; **Mark all present**. New players start not present. Removing hides the player at once (counts update with it), ignores repeat taps for that player, and puts them back with an error toast if the removal is refused.
 - **Live console** ([Q-POOL](session-console.md#q-pool--players-view)): picture, name, locked level, games against minimum, wait time, status, Present switch. Late players start present. There is no remove action during a live session.
 
 Separate slot confirmation from presence; being listed is not proof of arrival.

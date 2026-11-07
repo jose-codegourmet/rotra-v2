@@ -1,6 +1,6 @@
 # Public session page
 
-**Last verified:** 2026-11-07 for the operator-only preview route (#469).
+**Last verified:** 2026-11-07 for the operator-only preview route (#469) and masked participant names (#475).
 
 **Surfaces:** `Q-PUBLIC-DETAILS`, `Q-PUBLIC-PARTICIPANTS`, `Q-PUBLIC-RESULTS`, `Q-PUBLIC-STALE`, `Q-PUBLIC-JOIN`.
 
@@ -43,9 +43,11 @@ No fees, costs, or payment states. The club founding location never replaces the
 
 ## Q-PUBLIC-PARTICIPANTS — Confirmed people
 
-A grid of cards: profile picture (registered or unclaimed players with an uploaded picture) or initials, name, and “Has a ROTRA profile” for registered and unclaimed players. Guests get initials and no profile label.
+A grid of cards: profile picture (registered or unclaimed players with an uploaded picture) or initials, masked name, and “Has a ROTRA profile” (a label, not a link) for registered and unclaimed players. Guests get initials and no profile label.
 
-No phone, email, identity-verification state, level, presence, games, operator notes, or Off Day. Below the grid, when anyone is waiting: “Waitlist · N” as a numbered list of names and “Waitlisted players get a slot if one opens. Ask the Queue Master.” Empty: “Players have not been added yet.”
+**Masked names** (owner decision, November 7, 2026; #475): each word of the name shows as its first letter plus a fixed `***` (“Jose Adrian” → “J*** A***”, “Mika” → “M***”; a blank name reads “Player”). The server masks them, so the full name is not in the page data, avatar label or tooltips. The operator preview and the record's **Public page** tab show the same masked names. A visitor's own request status card may still show the name they typed. See [Players › Public participant names](../../../../business_logic/product/queue/modules/players/README.md#public-participant-names).
+
+No phone, email, identity-verification state, level, presence, games, operator notes, or Off Day; no participant is tied to a level. Below the grid, when anyone is waiting: “Waitlist · N” as a numbered list of masked names and “Waitlisted players get a slot if one opens. Ask the Queue Master.” Empty: “Players have not been added yet.”
 
 ## Q-PUBLIC-RESULTS — Published results only
 

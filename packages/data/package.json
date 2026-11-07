@@ -218,6 +218,7 @@
     "./player-account/useResetLink": "./src/player-account/useResetLink.ts",
     "./player-account/useResetPassword": "./src/player-account/useResetPassword.ts",
     "./public-session/types": "./src/public-session/publicSession.types.ts",
+    "./public-session/rules": "./src/public-session/publicSession.rules.ts",
     "./public-session/query-keys": "./src/public-session/queryKeys.ts",
     "./public-session/fetchers": "./src/public-session/fetchers.ts",
     "./public-session/usePublicSession": "./src/public-session/usePublicSession.ts",

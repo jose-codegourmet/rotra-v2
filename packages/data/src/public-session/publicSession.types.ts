@@ -3,6 +3,7 @@ import type { SessionJoinRequest } from '../session-roster/sessionRoster.types'
 
 /** A confirmed person on the public page: no phone, level, presence, games or notes. */
 export type PublicSessionParticipant = {
+  /** Masked on the server (`maskPublicName`): "J*** A***". The full name never enters the page. */
   name: string
   /** Uploaded picture of a registered or unclaimed player; guests never have one */
   pictureUrl?: string | null
@@ -49,7 +50,7 @@ export type PublicSessionPage = {
   minimum: number
   notes?: string | null
   participants: PublicSessionParticipant[]
-  /** Waitlisted names, in the order they joined */
+  /** Waitlisted names, masked like participant names, in the order they joined */
   waitlist: string[]
   openSlots: number
   slotBudget: number

@@ -18,7 +18,8 @@ import { Button } from '@rotra/ui/button'
 import { Chip } from '@rotra/ui/chip'
 import { ConsoleFooterBar } from '@rotra/ui/console-footer-bar'
 import { Notice } from '@rotra/ui/notice'
-import { formatTime } from '@rotra/ui/now-card/helpers'
+import { formatWhen } from '@rotra/ui/now-card/helpers'
+import { OverdueBanner, sessionEndStatus } from '@rotra/ui/overdue-banner'
 import { PageHeader } from '@rotra/ui/page-header'
 import { Sheet } from '@rotra/ui/sheet'
 import { Skeleton } from '@rotra/ui/skeleton'
@@ -98,7 +99,7 @@ const MODE_LABELS = { chill: 'Chill', fair: 'Fair', hard: 'Hard' } as const
 
 /**
  * Q-CONSOLE: the live session shell. Header with the mode, formats and minimum chips and the
- * Home / Session settings / Public page / Copy Facebook post / Extend time / Join requests · N actions, the view tabs
+ * Home / Session settings / Public page / Copy Facebook post / Courts and time / Join requests · N actions, the view tabs
  * with live counts, the view panels (Session here; the others arrive in their own containers), the
  * ConsoleFooterBar and the dock's Session done pill. Sessions that are not live go to their own
  * screen: prepared to /preparation, finalizing to /finishing, finished or invalid to /record,
@@ -123,6 +124,8 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
   const [matchSheet, setMatchSheet] = useState<MatchSheet | null>(null)
   const [profileId, setProfileId] = useState<string | null>(null)
   const [editCourtId, setEditCourtId] = useState<string | null>(null)
+  // Courts and time opened from the overdue banner focuses the New end picker
+  const [focusEnd, setFocusEnd] = useState(false)
 
   const s = session.data
   if (session.isError && isPermissionRefusal(session.error)) notFound()
@@ -166,6 +169,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
   )
   useDockAction(sessionDone)
 
+  const endStatus = s ? sessionEndStatus(s.scheduledEndAt, now) : null
   const rosterList = roster.data?.roster ?? []
   const courts = s?.courts ?? []
   const all = matches.data ?? []
@@ -279,7 +283,17 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
             </span>
           }
           title={s.title}
-          description={`${s.venueName} · Started ${formatTime(s.startedAt ?? s.scheduledStartAt)} · Ends ${formatTime(s.scheduledEndAt)}`}
+          description={
+            <>
+              {s.venueName} · Started {formatWhen(s.startedAt ?? s.scheduledStartAt, now)} · Ends{' '}
+              {formatWhen(s.scheduledEndAt, now)} ·{' '}
+              {endStatus?.over ? (
+                <span className="text-warn">{endStatus.text}</span>
+              ) : (
+                endStatus?.text
+              )}
+            </>
+          }
           actions={
             <>
               <Button size="sm" asChild>
@@ -294,8 +308,14 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
               <Button size="sm" onClick={() => setSheet('post')}>
                 Copy Facebook post
               </Button>
-              <Button size="sm" onClick={() => setSheet('adjust')}>
-                Extend time
+              <Button
+                size="sm"
+                onClick={() => {
+                  setFocusEnd(false)
+                  setSheet('adjust')
+                }}
+              >
+                Courts and time
               </Button>
               {pendingRequests > 0 ? (
                 <Button size="sm" variant="primary" onClick={() => setSheet('join-requests')}>
@@ -313,6 +333,18 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
         </div>
       )}
       <ConsoleDeviceNotice sessionId={sessionId} />
+      {s ? (
+        <OverdueBanner
+          endsAt={s.scheduledEndAt}
+          now={now}
+          offline={!online}
+          onSetEndTime={() => {
+            setFocusEnd(true)
+            setSheet('adjust')
+          }}
+          onSessionDone={onSessionDone}
+        />
+      ) : null}
       {online ? null : <Notice tone="offline">{OFFLINE_NOTICE}</Notice>}
       <Tabs
         aria-label="Console views"
@@ -388,6 +420,8 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
           setSheet(next)
         }}
         editCourtId={editCourtId}
+        focusEnd={focusEnd}
+        now={now}
       />
       <MatchLineup
         sessionId={sessionId}

@@ -6,6 +6,7 @@ import { useAddCourt } from '@rotra/data/queue-session/useAddCourt'
 import { useExtendSession } from '@rotra/data/queue-session/useExtendSession'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useRemoveCourt } from '@rotra/data/queue-session/useRemoveCourt'
+import { useSetSessionEnd } from '@rotra/data/queue-session/useSetSessionEnd'
 import { useUpdateCourt } from '@rotra/data/queue-session/useUpdateCourt'
 import { CourtsAndTimeSheet, type ExtendMinutes } from '@rotra/ui/courts-and-time-sheet'
 import { AddCourtForm } from '@rotra/ui/forms/add-court-form'
@@ -19,11 +20,15 @@ export type CourtsAndTimeSheetValue = 'adjust' | 'add-court'
 
 export type CourtsAndTimeProps = {
   sessionId: string
-  /** Which sheet is open: Courts and time (Extend time) or Add a court; null when neither */
+  /** Which sheet is open: Courts and time (Courts and time) or Add a court; null when neither */
   open: CourtsAndTimeSheetValue | null
   onOpenChange: (sheet: CourtsAndTimeSheetValue | null) => void
   /** Edit in a court card's ⋯ menu: open the Add a court sheet on this court */
   editCourtId?: string | null
+  /** Opened from the overdue banner's Set end time: focus the New end picker */
+  focusEnd?: boolean
+  /** The console clock, so "Ends …" and the overdue text stay in step with the header */
+  now?: number
 }
 
 const errorMessage = (error: unknown) =>
@@ -34,7 +39,7 @@ const isSaveFailure = (error: unknown) =>
   error instanceof MockError && (error.kind === 'retryable' || error.kind === 'offline')
 
 /**
- * Q-SESSION-ADJUST and Q-ADD-COURT: the Courts and time sheet on useExtendSession ("Session ends at
+ * Q-SESSION-ADJUST and Q-ADD-COURT: the Courts and time sheet on useSetSessionEnd and useExtendSession ("Session ends at
  * HH:MM · public page updates after sync") and the Add a court sheet on useAddCourt ("LABEL added · open until HH:MM"). "Add a court…"
  * in the first opens the second; the shell's + Add court tile opens it directly. Courts set to
  * "until the session ends" follow an extension (their openUntil is null); set-time courts keep theirs.
@@ -46,6 +51,8 @@ export function CourtsAndTime({
   open,
   onOpenChange,
   editCourtId = null,
+  focusEnd = false,
+  now,
 }: CourtsAndTimeProps) {
   const saving = useRef(false)
   const returnFocus = useRef<HTMLElement | null>(null)
@@ -55,6 +62,7 @@ export function CourtsAndTime({
   previousOpen.current = open
   const session = useQueueSession(sessionId)
   const extend = useExtendSession()
+  const setEnd = useSetSessionEnd()
   const add = useAddCourt()
   const update = useUpdateCourt()
   const remove = useRemoveCourt()
@@ -74,6 +82,24 @@ export function CourtsAndTime({
     saving.current = true
     extend.mutate(
       { sessionId, minutes },
+      {
+        onSuccess: (result) => {
+          setServerError(undefined)
+          toast(result.message)
+        },
+        onError: (error) => setServerError(errorMessage(error)),
+        onSettled: () => {
+          saving.current = false
+        },
+      },
+    )
+  }
+
+  const onSetEndTime = (endAt: number) => {
+    if (saving.current) return
+    saving.current = true
+    setEnd.mutate(
+      { sessionId, endAt },
       {
         onSuccess: (result) => {
           setServerError(undefined)
@@ -131,6 +157,14 @@ export function CourtsAndTime({
           used: (matches.data ?? []).some((m) => m.courtIds.includes(c.id)),
         }))}
         startsAt={sessionStart}
+        now={now}
+        focusEnd={focusEnd}
+        onSetEndTime={onSetEndTime}
+        onNewEndChange={() => {
+          setServerError(undefined)
+          setEnd.reset()
+        }}
+        endTimeError={setEnd.error ? errorMessage(setEnd.error) : undefined}
         serverError={serverError ?? (extend.error ? errorMessage(extend.error) : undefined)}
         onEditCourt={(id) => {
           setServerError(undefined)
@@ -152,7 +186,7 @@ export function CourtsAndTime({
         endsAt={s.scheduledEndAt}
         onAddCourt={() => openAddCourt(true)}
         onExtend={onExtend}
-        isPending={extend.isPending || remove.isPending || matches.isPending}
+        isPending={extend.isPending || setEnd.isPending || remove.isPending || matches.isPending}
       />
       {/* Remounted on each open so the label and mode start fresh from the current court count */}
       <AddCourtForm

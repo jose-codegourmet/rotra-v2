@@ -8,15 +8,22 @@ import { useFillOpenSlots } from '@rotra/data/session-roster/useFillOpenSlots'
 import { useGiveSlot } from '@rotra/data/session-roster/useGiveSlot'
 import { useRemoveFromWaitlist } from '@rotra/data/session-roster/useRemoveFromWaitlist'
 import { useRemoveRosterPlayer } from '@rotra/data/session-roster/useRemoveRosterPlayer'
+import { useSessionPayments } from '@rotra/data/session-payment/useSessionPayments'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { useSetAllPresence } from '@rotra/data/session-roster/useSetAllPresence'
 import { useSetPresenceMany } from '@rotra/data/session-roster/useSetPresenceMany'
 import { useSetRosterLevel } from '@rotra/data/session-roster/useSetRosterLevel'
 import { PlayerProfileSheet } from '@rotra/ui/player-profile-sheet'
-import { RosterPanel, type RosterPanelPlayer } from '@rotra/ui/roster-panel'
+import {
+  RosterPanel,
+  type RosterGroupBy,
+  type RosterLevelTab,
+  type RosterPanelPlayer,
+  type RosterView,
+} from '@rotra/ui/roster-panel'
 import { toast } from '@rotra/ui/toaster'
 import { WaitlistPanel, type WaitlistPanelEntry } from '@rotra/ui/waitlist-panel'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { AddPlayer } from '@/app/(operator)/_components/add-player/AddPlayer'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import { longDateLabel } from '@/lib/dates'
@@ -25,6 +32,28 @@ export type PreparationRosterProps = {
   sessionId: string
   /** Which preparation tab this instance fills */
   tab: 'roster' | 'waitlist'
+}
+
+const VIEWS_STORAGE_KEY = 'rotra-queue-roster-views'
+const LEVEL_TABS: RosterLevelTab[] = ['all', 'advanced', 'intermediate', 'beginner', 'none']
+const GROUP_BYS: RosterGroupBy[] = ['none', 'skill', 'avail', 'prior', 'profile', 'paid']
+const VIEWS: RosterView[] = ['list', 'grid']
+
+type RosterViews = { tab: RosterLevelTab; groupBy: RosterGroupBy; view: RosterView }
+const DEFAULT_VIEWS: RosterViews = { tab: 'all', groupBy: 'none', view: 'list' }
+
+/** Level tab, Group by and List | Grid are remembered on this device; storage may be unavailable. */
+function readViews(): RosterViews {
+  try {
+    const saved = JSON.parse(localStorage.getItem(VIEWS_STORAGE_KEY) ?? 'null')
+    return {
+      tab: LEVEL_TABS.includes(saved?.tab) ? saved.tab : DEFAULT_VIEWS.tab,
+      groupBy: GROUP_BYS.includes(saved?.groupBy) ? saved.groupBy : DEFAULT_VIEWS.groupBy,
+      view: VIEWS.includes(saved?.view) ? saved.view : DEFAULT_VIEWS.view,
+    }
+  } catch {
+    return DEFAULT_VIEWS
+  }
 }
 
 const time = (at: number) =>
@@ -54,6 +83,16 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
   const giveSlot = useGiveSlot()
   const fillOpenSlots = useFillOpenSlots()
   const removeFromWaitlist = useRemoveFromWaitlist()
+  const payments = useSessionPayments(sessionId)
+  const [views, setViews] = useState<RosterViews>(DEFAULT_VIEWS)
+  useEffect(() => setViews(readViews()), [])
+  const updateViews = (patch: Partial<RosterViews>) => {
+    const next = { ...views, ...patch }
+    setViews(next)
+    try {
+      localStorage.setItem(VIEWS_STORAGE_KEY, JSON.stringify(next))
+    } catch {}
+  }
   const [addOpen, setAddOpen] = useState(false)
   const [profileId, setProfileId] = useState<string | null>(null)
 
@@ -68,6 +107,9 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
   const waitlist = roster.data?.waitlist ?? []
   const capacity = s ? slotCapacity(s.courts.length, s.playersPerCourt) : 0
 
+  const paidByClubPlayer = new Map(
+    (payments.data?.players ?? []).map((p) => [p.clubPlayerId, p.paid] as const),
+  )
   const players: RosterPanelPlayer[] = rosterList.map((r) => {
     const p = byClubPlayer(r.clubPlayerId)
     return {
@@ -78,6 +120,8 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
       level: r.level,
       present: r.present,
       presencePending: setPresence.pending.has(r.id),
+      paid: paidByClubPlayer.get(r.clubPlayerId),
+      returning: r.hasPlayedAtClubBefore,
     }
   })
   const entries: WaitlistPanelEntry[] = waitlist.map((w) => {
@@ -116,6 +160,12 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
           players={players}
           capacity={capacity}
           waitlistCount={waitlist.length}
+          levelTab={views.tab}
+          onLevelTabChange={(tab) => updateViews({ tab })}
+          groupBy={views.groupBy}
+          onGroupByChange={(groupBy) => updateViews({ groupBy })}
+          view={views.view}
+          onViewChange={(view) => updateViews({ view })}
           levelsLocked={s ? s.state !== 'prepared' : false}
           readOnly={s?.state === 'active'}
           onMarkAllPresent={() => setAllPresence.mutate({ sessionId, present: true }, options)}

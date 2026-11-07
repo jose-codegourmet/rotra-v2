@@ -15,6 +15,7 @@ const PUBLIC_PLAYER_SELECT = {
   nickname: true,
   avatarRef: true,
   experienceMonths: true,
+  experienceRecordedAt: true,
   personalDetails: true,
   idAllocation: { select: { rtrId: true } },
   socialLinks: { select: { provider: true, url: true } },
@@ -30,12 +31,25 @@ function playingStyle(details: Prisma.JsonValue | null): string {
   return ''
 }
 
+/**
+ * Experience as of today. The stored months are a snapshot taken at `recordedAt`, so playing since is
+ * fixed and the count keeps going (owner, 2026-11-08). Whole months only.
+ */
+function currentExperienceMonths(months: number | null, recordedAt: Date | null, now = new Date()) {
+  if (months == null) return null
+  if (!recordedAt) return months
+  const elapsed =
+    (now.getUTCFullYear() - recordedAt.getUTCFullYear()) * 12 +
+    (now.getUTCMonth() - recordedAt.getUTCMonth())
+  return months + Math.max(0, elapsed)
+}
+
 /** Shapes `PlayerProfile`. Only profiles with a permanent RTR ID are public. */
 function publicProfileDto(row: PublicPlayerRow) {
   if (!row.idAllocation) return null
   const links = Object.fromEntries(SOCIAL.map((p) => [p, ''])) as Record<SocialProvider, string>
   for (const link of row.socialLinks) links[link.provider] = link.url
-  const months = row.experienceMonths
+  const months = currentExperienceMonths(row.experienceMonths, row.experienceRecordedAt)
   return {
     playerId: row.id,
     rtrId: row.idAllocation.rtrId,

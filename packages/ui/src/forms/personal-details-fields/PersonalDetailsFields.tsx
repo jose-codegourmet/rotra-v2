@@ -1,5 +1,6 @@
 'use client'
 import { SOCIAL_PROVIDERS } from '@rotra/schema/social-link'
+import { ExperienceFields } from '@rotra/ui/experience-fields'
 import { Field } from '@rotra/ui/field'
 import { TextInput } from '@rotra/ui/text-input'
 import { Textarea } from '@rotra/ui/textarea'
@@ -26,6 +27,8 @@ const gridClass = 'grid grid-cols-[repeat(auto-fit,minmax(min(100%,200px),1fr))]
 export function PersonalDetailsFields({ sections, disabled = false }: PersonalDetailsFieldsProps) {
   const {
     control,
+    watch,
+    setValue,
     formState: { errors },
   } = useFormContext<PersonalDetailsValues>()
   const linksId = useId()
@@ -82,16 +85,19 @@ export function PersonalDetailsFields({ sections, disabled = false }: PersonalDe
             <legend className="mb-1.5 p-0 text-[13px] font-semibold text-fg2">
               <Public>Experience</Public>
             </legend>
-            <div className="grid grid-cols-2 gap-3.5">
-              <Field label="Years" error={error('experienceYears')}>
-                {text('experienceYears', { inputMode: 'numeric', placeholder: '0' })}
-              </Field>
-              <Field label="Months" error={error('experienceMonths')}>
-                {text('experienceMonths', { inputMode: 'numeric', placeholder: '0' })}
-              </Field>
-            </div>
+            <ExperienceFields
+              value={{ years: watch('experienceYears'), months: watch('experienceMonths') }}
+              onChange={({ years, months }) => {
+                setValue('experienceYears', years, { shouldDirty: true })
+                setValue('experienceMonths', months, { shouldDirty: true })
+              }}
+              yearsError={error('experienceYears')}
+              monthsError={error('experienceMonths')}
+              disabled={disabled}
+            />
             <span className="text-xs text-fg2">
-              Optional. Clubs may use it for a first assessment; it doesn't add rank points.
+              Optional. Fill in either one; the other follows. Clubs may use it for a first
+              assessment; it doesn't add rank points.
             </span>
           </fieldset>
         </>

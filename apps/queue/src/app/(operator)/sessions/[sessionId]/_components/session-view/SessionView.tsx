@@ -14,6 +14,7 @@ import {
   nextEligibleForCourt,
   openedEarly,
   shortName,
+  swapTarget,
   waitingMatches,
   waitMinutes,
 } from '@rotra/data/match/match.rules'
@@ -83,7 +84,8 @@ export type SessionViewProps = {
  * Put on court on a free court places a one-court match straight away (usePlaceOnCourt, "Match N on
  * Court X · getting ready"); a 5v5 opens the Put on court sheet for its second court. Start match on
  * a Getting ready card is one tap (useStartMatch, "Match N started on Court X"); its Open match
- * opens the On court sheet (OnCourt). Pick another, Open match on a Playing court, Add match and
+ * opens the On court sheet (OnCourt); its ⋯ menu "Swap with #P · Match N" opens the swap sheet
+ * directly (OnCourt swapFirst). Pick another, Open match on a Playing court, Add match and
  * Put on court on a queue card are wired by the shell; here the pictures, More queues, Remove on a free court and Remove
  * on a queue card act, Edit appears once onEditMatch is given and a free court's Add match once
  * onAddMatch is given (both Queue › Match editing). Both
@@ -122,6 +124,8 @@ export function SessionView({
   const committing = useRef(false)
   /** The On court match whose sheet is open (Open match on a Getting ready card) */
   const [onCourtId, setOnCourtId] = useState<string | null>(null)
+  /** The court card's ⋯ menu Swap with #P opened the swap sheet directly (Cancel closes it) */
+  const [swapFirst, setSwapFirst] = useState(false)
   /** The Start anyway confirmation: one court, or every not-open court (Open all courts now) */
   const [opening, setOpening] = useState<{ courtId: string | null } | null>(null)
   const [openError, setOpenError] = useState<string | undefined>()
@@ -290,12 +294,23 @@ export function SessionView({
       }
       if (m.state === 'on_court') {
         const status = matchStatus(m, ctx)
+        const swapWith = swapTarget(m, ctx)
         cards.push({
           ...base,
           variant: 'on-court',
           blockedReason: status.kind === 'ready' ? undefined : status.reason,
           onStartMatch: () => startOnCourt(m),
-          onOpenMatch: () => setOnCourtId(m.id),
+          onOpenMatch: () => {
+            setSwapFirst(false)
+            setOnCourtId(m.id)
+          },
+          onSwap: () => {
+            setSwapFirst(true)
+            setOnCourtId(m.id)
+          },
+          swapWith: swapWith
+            ? { position: swapWith.position, matchNo: swapWith.match.matchNo }
+            : null,
         })
         continue
       }
@@ -412,7 +427,11 @@ export function SessionView({
         sessionId={sessionId}
         now={now}
         matchId={onCourtId}
-        onClose={() => setOnCourtId(null)}
+        swapFirst={swapFirst}
+        onClose={() => {
+          setOnCourtId(null)
+          setSwapFirst(false)
+        }}
       />
     </>
   )

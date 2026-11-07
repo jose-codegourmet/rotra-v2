@@ -599,6 +599,9 @@ button.qf:hover .avatar { box-shadow: 0 0 0 2px var(--accent); }
 .pay-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pay-st { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--fg2); }
 .pay-card.paid .pay-st { color: var(--accent); font-weight: 600; }
+.pay-card.partial { border-color: var(--warn); }
+.pay-body { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; min-width: 0; flex: 1; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; border-radius: var(--r-sm); }
+.pay-body:disabled { cursor: not-allowed; }
 .pay-st svg { width: 13px; height: 13px; }
 @media (max-width: 400px) { .pay-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .settings { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 20px; align-items: start; }
@@ -1296,7 +1299,7 @@ function syncLabel() {
 // status pill can show what has synced and what is still waiting on this device.
 const AREA = {
   confirmReq: 'Roster', declineReq: 'Roster',
-  togglePaid: 'Payments', markAllPaid: 'Payments', togglePresent: 'Roster', allPresent: 'Roster', allAbsent: 'Roster', giveSlot: 'Roster', fillSlots: 'Roster', removeWait: 'Roster', confirmAdd: 'Roster', confirmNew: 'Roster', setLevel: 'Roster',
+  togglePaid: 'Payments', markAllPaid: 'Payments', savePayAmount: 'Payments', togglePresent: 'Roster', allPresent: 'Roster', allAbsent: 'Roster', giveSlot: 'Roster', fillSlots: 'Roster', removeWait: 'Roster', confirmAdd: 'Roster', confirmNew: 'Roster', setLevel: 'Roster',
   confirmStart: 'Session', confirmCancelSession: 'Session', confirmDeleteSession: 'Session', saveSetup: 'Session setup', confirmDone: 'Session done', confirmPublish: 'Published results',
   makeMatch: 'Queue', saveEditor: 'Queue', addSuggest: 'Queue', autoCommit: 'Queue', confirmRegen: 'Queue', move: 'Queue', moveTo: 'Queue', swapSides: 'Queue', removeWaiting: 'Queue',
   confirmDispatch: 'Matches and results', placeOnCourt: 'Matches and results', startOnCourt: 'Matches and results', sendBack: 'Queue', confirmSwap: 'Queue', confirmReplace: 'Matches and results', confirmMove: 'Matches and results', setCourtFill: 'Courts and time', confirmResult: 'Matches and results', confirmSub: 'Matches and results', confirmInvalid: 'Matches and results',
@@ -2227,29 +2230,45 @@ function duePerHead(s) {
   if (s.finance.custom) return +s.finance.payFee || 0;
   return financeCalc(s.finance, s.courts.length, Math.round((s.end - s.start) / 60000), playerCountOf(s)).share;
 }
+// #479: a payment keeps the amount received; status compares it with today's amount due.
+function payStatus(paid, due) {
+  if (!paid) return { kind: 'unpaid' };
+  if (due == null) return { kind: 'paid' };
+  const got = paid.amount == null ? due : paid.amount;
+  if (got === due) return { kind: 'paid' };
+  if (got <= 0) return { kind: 'unpaid' };
+  return got < due ? { kind: 'partial', left: due - got } : { kind: 'reimburse', back: got - due };
+}
+const payCovered = (st) => st.kind === 'paid' || st.kind === 'reimburse';
+const payChip = (st) => st.kind === 'paid' ? '<span class="chip ok">Paid</span>'
+  : st.kind === 'partial' ? `<span class="chip warn">Partial · ${peso(st.left)} left</span>`
+  : st.kind === 'reimburse' ? `<span class="chip ok">Reimburse · ${peso(st.back)} to return</span>`
+  : '<span class="chip">Unpaid</span>';
 function paymentsPanel(s) {
   const due = duePerHead(s), pay = s.payments || {};
-  const all = s.roster.map((r) => ({ r, p: P(r.pid), paid: pay[r.pid] })).sort((a, b) => (!!a.paid - !!b.paid) || a.p.name.localeCompare(b.p.name));
-  const paidN = all.filter((x) => x.paid).length;
-  const collected = all.reduce((t, x) => t + (x.paid ? x.paid.amount : 0), 0);
-  const stillDue = due != null ? (all.length - paidN) * due : null;
+  const all = s.roster.map((r) => ({ r, p: P(r.pid), paid: pay[r.pid], st: payStatus(pay[r.pid], due) })).sort((a, b) => (!!a.paid - !!b.paid) || a.p.name.localeCompare(b.p.name));
+  const got = (x) => (x.paid ? (x.paid.amount == null ? due || 0 : x.paid.amount) : 0);
+  const paidN = all.filter((x) => payCovered(x.st)).length, partialN = all.filter((x) => x.st.kind === 'partial').length;
+  const collected = all.reduce((t, x) => t + got(x), 0);
+  const stillDue = due != null ? all.reduce((t, x) => t + Math.max(due - got(x), 0), 0) : null;
+  const toReturn = due != null ? all.reduce((t, x) => t + (x.paid ? Math.max(got(x) - due, 0) : 0), 0) : 0;
   const cost = s.finance ? financeCalc(s.finance, s.courts.length, Math.round((s.end - s.start) / 60000), s.roster.length || 1).total : null;
   const f = S.ui.payF || 'all';
-  const rows = all.filter((x) => f === 'all' || (f === 'paid' ? x.paid : !x.paid));
-  return `<section class="card stack" id="payments"><div class="between"><div><h2>Payments</h2><p class="small muted">${due != null ? `${peso(due)} per player (${s.finance.custom ? 'custom amount' : 'break-even share'}${s.finance.entryFee ? `, includes the ${peso(s.finance.entryFee)} entrance fee` : ''}).` : 'No fee set for this session.'} Tick players as they pay. ROTRA only records it; money is collected outside the app.</p></div>
-      ${all.length && paidN < all.length ? '<button class="btn sm" data-act="markAllPaid">Mark all paid</button>' : ''}</div>
+  const rows = all.filter((x) => f === 'all' || (f === 'paid' ? payCovered(x.st) : !payCovered(x.st)));
+  return `<section class="card stack" id="payments"><div class="between"><div><h2>Payments</h2><p class="small muted">${due != null ? `${peso(due)} per player (${s.finance.custom ? 'custom amount' : 'break-even share'}${s.finance.entryFee ? `, includes the ${peso(s.finance.entryFee)} entrance fee` : ''}).` : 'No fee set for this session.'} Tick players as they pay, or tap a card to record a partial amount. ROTRA only records it; money is collected outside the app.</p></div>
+      ${all.some((x) => !x.paid) ? '<button class="btn sm" data-act="markAllPaid">Mark all paid</button>' : ''}</div>
     ${S.ui.paymentError ? notice('bad', esc(S.ui.paymentError)) : ''}
     <div class="tiles4">
-      <div class="card"><span class="label">Paid</span><b class="big tnum">${paidN}<span class="small muted">/${all.length}</span></b></div>
-      <div class="card"><span class="label">Collected</span><b class="big tnum">${peso(collected)}</b></div>
+      <div class="card"><span class="label">Paid</span><b class="big tnum">${paidN}<span class="small muted">/${all.length}</span></b>${partialN ? `<span class="small muted">${partialN} partial</span>` : ''}</div>
+      <div class="card"><span class="label">Collected</span><b class="big tnum">${peso(collected)}</b>${toReturn ? `<span class="small muted">${peso(toReturn)} to reimburse</span>` : ''}</div>
       <div class="card"><span class="label">Still due</span><b class="big tnum">${stillDue != null ? peso(stillDue) : '—'}</b></div>
       <div class="card"><span class="label">Against costs</span><b class="big tnum" style="color:${cost == null ? 'inherit' : collected >= cost ? 'var(--accent)' : 'var(--warn)'}">${cost == null ? '—' : collected >= cost ? `+${peso(collected - cost)}` : `−${peso(cost - collected)}`}</b>${cost != null ? `<span class="small muted">of ${peso(cost)} cost</span>` : ''}</div>
     </div>
     <div class="seg" role="group" aria-label="Show">${[['all', `Everyone · ${all.length}`], ['unpaid', `Not paid · ${all.length - paidN}`], ['paid', `Paid · ${paidN}`]].map(([k, l]) => `<button aria-pressed="${f === k}" data-act="payFilter" data-k="${k}">${l}</button>`).join('')}</div>
-    ${rows.length ? `<div class="pay-grid">${rows.map(({ r, p, paid }) => `<div class="pay-card ${paid ? 'paid' : ''}">
+    ${rows.length ? `<div class="pay-grid">${rows.map(({ r, p, paid, st }) => `<div class="pay-card ${payCovered(st) ? 'paid' : st.kind === 'partial' ? 'partial' : ''}">
       <div class="pay-top">${faceBtn(p)}${sw(!!paid, 'togglePaid', `data-pid="${r.pid}"`, `${p.name} paid`)}</div>
-      <b class="pay-name">${esc(p.name)}</b>
-      <span class="pay-st">${paid ? `${I.check} Paid ${peso(paid.amount)} · ${fmtWhen(paid.at, { lower: true })}` : due != null ? `${peso(due)} due` : 'Not paid'}</span></div>`).join('')}</div>`
+      <button class="pay-body" data-act="payAmount" data-sid="${s.id}" data-pid="${r.pid}" aria-label="${esc(`Payment from ${p.name}`)}"><b class="pay-name">${esc(p.name)}</b>${payChip(st)}
+      <span class="pay-st">${paid ? `${peso(got({ paid }))} received · ${fmtWhen(paid.at, { lower: true })}` : due != null ? `${peso(due)} due` : ''}</span></button></div>`).join('')}</div>`
       : `<p class="small muted">${f === 'unpaid' ? 'Everyone has paid.' : f === 'paid' ? 'Nobody has paid yet.' : 'No players yet.'}</p>`}
   </section>`;
 }
@@ -3458,6 +3477,19 @@ const SHEETS = {
       ${notice('', 'This is a request, not a booking. The Queue Master confirms each guest before giving a slot.')}`,
       '<button class="btn" data-act="closeSheet">Cancel</button><button class="btn primary" data-act="sendJoin">Send request</button>');
   },
+  // #479: the amount received from one player; the switch stays the quick paid toggle.
+  payAmount() {
+    const sh = S.ui.sheet, s = S.sessions.find((x) => x.id === sh.sid), due = duePerHead(s);
+    const raw = String(S.ui.payAmt ?? '').trim(), ok = /^\d+$/.test(raw), v = ok ? +raw : null;
+    const preview = ok ? payChip(payStatus(v > 0 ? { amount: v } : null, due)) : '';
+    return sheetShell(`Payment from ${esc(nm(sh.pid))}`, `<p class="small muted">${due != null ? `Amount due: ${peso(due)}` : 'No fee set for this session.'}</p>
+      <label class="field"><span>Amount received</span><div class="row" style="max-width:240px"><b aria-hidden="true">₱</b><input id="pay-amt" class="input" inputmode="numeric" placeholder="0" data-bind="ui.payAmt" data-rerender value="${esc(raw)}"></div>
+      ${raw && !ok ? '<span class="err">Enter the amount received, 0 or more.</span>' : ''}</label>
+      <div class="row" style="gap:8px">${due != null ? `<button class="btn sm" data-act="payFull">Full ${peso(due)}</button>` : ''}<button class="btn sm" data-act="payClear">Clear</button></div>
+      ${preview ? `<p class="small muted">Status: ${preview}</p>` : ''}
+      <p class="small muted">ROTRA only records it; money is collected outside the app.</p>`,
+      '<button class="btn" data-act="payAmountCancel">Cancel</button><button class="btn primary" data-act="savePayAmount">Save</button>');
+  },
   payments() { return sheetShell('Payments', paymentsPanel(cur()).replace(/^<section class="card stack" id="payments">/, '<section class="stack" id="payments">'), '<button class="btn" data-act="closeSheet">Done</button>', true); },
   postPreview() {
     const smp = postSample();
@@ -4432,6 +4464,27 @@ const ACT = {
       paymentPending.delete(d.pid);
     } else paymentPending.set(d.pid, before);
     clearTimeout(paymentTimer); paymentTimer = setTimeout(flushPayments, 800); render();
+  },
+  payAmount: (d) => {
+    const s = S.sessions.find((x) => x.id === d.sid) || cur(), paid = (s.payments || {})[d.pid], due = duePerHead(s);
+    S.ui.payAmt = String(paid ? (paid.amount == null ? due ?? '' : paid.amount) : due ?? '');
+    openSheet({ type: 'payAmount', sid: s.id, pid: d.pid, back: S.ui.sheet && S.ui.sheet.type === 'payments' ? S.ui.sheet : null });
+  },
+  payFull: () => { const sh = S.ui.sheet; S.ui.payAmt = String(duePerHead(S.sessions.find((x) => x.id === sh.sid)) ?? ''); render(); },
+  payClear: () => { S.ui.payAmt = '0'; render(); },
+  payAmountCancel: () => { S.ui.sheet = S.ui.sheet && S.ui.sheet.back; render(); },
+  savePayAmount: () => {
+    const sh = S.ui.sheet, s = S.sessions.find((x) => x.id === sh.sid);
+    const raw = String(S.ui.payAmt ?? '').trim();
+    if (!/^\d+$/.test(raw)) { toast('Enter the amount received, 0 or more.'); return; }
+    flushPayments();
+    if (['invalid', 'finalizing', 'cancelled'].includes(s.status)) { toast('Payments are not available for this session.'); return; }
+    s.payments = s.payments || {};
+    const v = +raw;
+    if (v > 0) s.payments[sh.pid] = { at: Date.now(), amount: v };
+    else delete s.payments[sh.pid];
+    S.ui.sheet = sh.back;
+    commit(v > 0 ? `${nm(sh.pid)} paid ${peso(v)}` : `${nm(sh.pid)} marked not paid`); render();
   },
   markAllPaid: () => {
     flushPayments();

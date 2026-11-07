@@ -3,9 +3,9 @@ import {
   amountDuePerHead,
   estimateSessionCost,
   normalizeSessionCost,
-  paymentTotals,
 } from '@rotra/data/session-cost/rules'
 import type { SessionCostInput } from '@rotra/data/session-cost/types'
+import { paymentTotals } from '@rotra/data/session-payment/rules'
 import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
 import type {
@@ -320,7 +320,10 @@ function requirePaymentsOpen(session: QueueSession) {
     throw new ServiceError('invalid', { state: 'Payments are not available for this session.' })
 }
 
-/** Q-MONEY read. Recorded amounts come from the marks, never recomputed from today's fee. */
+/**
+ * Q-MONEY read. Recorded amounts received come from the marks, never recomputed from today's fee;
+ * status and totals compare them with today's amount due (#479).
+ */
 export async function readSessionPayments(context: ClubContext, sessionId: string) {
   const session = await prisma.queueSession.findUnique({
     where: { clubId_id: { clubId: context.clubId, id: sessionId } },
@@ -355,8 +358,8 @@ export async function readSessionPayments(context: ClubContext, sessionId: strin
       dueBasis: input?.paymentMode ?? 'break_even',
       entranceFeeIncluded: estimate?.entranceFeePerHead ?? null,
       totals: paymentTotals({
-        // A no-fee tick (null amount) adds nothing collected; its meaning is pending #245.
-        marks: marks.map((m) => ({ amountMinor: m.amountMinor ?? 0 })),
+        // `amountMinor` is the amount received (#479); a legacy null counts as today's amount due.
+        marks: marks.map((m) => ({ amountMinor: m.amountMinor })),
         total: roster.length,
         amountDue,
         cost: estimate?.total ?? null,
@@ -373,8 +376,8 @@ const NO_FEE_TICK = 'Paid ticks with no fee set aren’t connected to saved data
 
 /**
  * One tick or untick inside the caller's transaction. A tick records `amountMinor` (the amount due
- * now) under `operationId`; an existing mark is returned unchanged, so a duplicate applies once
- * and a later fee change never rewrites it. Unticking deletes the mark.
+ * now, kept as the amount received, #479) under `operationId`; an existing mark is returned
+ * unchanged, so a duplicate applies once and a later fee change never rewrites it. Unticking deletes the mark.
  */
 async function applyMark(
   tx: Tx,
@@ -469,6 +472,53 @@ export async function setPaymentMarks(
       marks.push({ clubPlayerId, ...result })
     }
     return { count: wanted.size, marks }
+  })
+}
+
+/**
+ * Q-MONEY · #479 the amount received from one roster entry, keyed by club player. A positive amount
+ * replaces the mark (amount, time, operation ID); 0 removes it (not paid). A retry of the same
+ * operation returns the saved mark unchanged. Pricing changes never rewrite it. Unlike a quick tick,
+ * an explicit amount is accepted with no fee set: the amount itself is known.
+ */
+export async function setPaymentAmount(
+  context: ClubContext,
+  sessionId: string,
+  input: { operationId: string; clubPlayerId: string; amountMinor: number },
+) {
+  if (!UUID.test(input.operationId)) throw new ServiceError('invalid')
+  if (!UUID.test(input.clubPlayerId)) throw new ServiceError('not_found')
+  const amountMinor = centavos(input.amountMinor, 'amount', { allowNull: false }) ?? 0
+  return prisma.$transaction(async (tx) => {
+    const session = await lockSession(tx, context, sessionId)
+    await requireSessionAccess(context, session)
+    requirePaymentsOpen(session)
+    const entry = await tx.sessionPlayer.findUnique({
+      where: { sessionId_clubPlayerId: { sessionId, clubPlayerId: input.clubPlayerId } },
+    })
+    if (!entry || entry.clubId !== context.clubId) throw new ServiceError('not_found')
+    const key = {
+      sessionId_sessionPlayerId: { sessionId: entry.sessionId, sessionPlayerId: entry.id },
+    }
+    const mark = await tx.sessionPaymentMark.findUnique({ where: key })
+    if (mark && mark.sourceOperationId === input.operationId)
+      return { paid: true, amount: toMoney(mark.amountMinor, mark.currency) }
+    if (entry.releasedAt)
+      throw new ServiceError('invalid', { player: 'Player not in this session.' })
+    if (mark) await tx.sessionPaymentMark.delete({ where: key })
+    if (!amountMinor) return { paid: false, amount: null }
+    const created = await tx.sessionPaymentMark.create({
+      data: {
+        sessionId: entry.sessionId,
+        sessionPlayerId: entry.id,
+        clubId: context.clubId,
+        amountMinor,
+        markedAt: new Date(),
+        sourceOperationId: input.operationId,
+        actorClubId: context.clubId,
+      },
+    })
+    return { paid: true, amount: toMoney(created.amountMinor, created.currency) }
   })
 }
 

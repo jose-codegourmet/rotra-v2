@@ -1,5 +1,7 @@
 import {
   allPaymentPlayers,
+  mixedPaymentPlayers,
+  mixedPaymentTotalsFixture,
   paymentPlayers,
   paymentTotalsFixture,
   unpaidPaymentPlayers,
@@ -32,6 +34,7 @@ const meta = {
     onTogglePaid: fn(),
     onMarkAllPaid: fn(),
     onSelectPlayer: fn(),
+    onEditAmount: fn(),
   },
 } satisfies Meta<typeof PaymentsChecklist>
 export default meta
@@ -66,15 +69,37 @@ export const NoFeeSet: Story = {
     amountDue: null,
     entranceFeeIncluded: undefined,
     players: unpaidPaymentPlayers,
-    totals: { paid: 0, total: 18, collected: 0, stillDue: null, againstCosts: null, cost: null },
+    totals: {
+      paid: 0,
+      partial: 0,
+      total: 18,
+      collected: 0,
+      stillDue: null,
+      toReimburse: 0,
+      againstCosts: null,
+      cost: null,
+    },
   },
 }
 export const FilterUnpaidEmpty: Story = { args: { ...AllPaid.args, filter: 'unpaid' } }
 export const NoPlayers: Story = {
   args: {
     players: [],
-    totals: { paid: 0, total: 0, collected: 0, stillDue: null, againstCosts: null, cost: null },
+    totals: {
+      paid: 0,
+      partial: 0,
+      total: 0,
+      collected: 0,
+      stillDue: null,
+      toReimburse: 0,
+      againstCosts: null,
+      cost: null,
+    },
   },
+}
+/** #479: one partial (₱200 left) and one overpayment (₱100 to reimburse). */
+export const PartialAndReimburse: Story = {
+  args: { players: mixedPaymentPlayers, totals: mixedPaymentTotalsFixture },
 }
 export const AsSheet: Story = { args: { asSheet: true } }
 export const SaveFailure: Story = { args: { saveError: 'Changes could not be saved' } }

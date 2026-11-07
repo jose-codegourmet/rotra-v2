@@ -5,7 +5,7 @@
 
 ## Purpose
 
-Help the operator set a fair session fee before the night and keep track of who has paid. ROTRA estimates what the session costs to run and records a paid / not-paid tick per player. It does **not** collect money, issue receipts, split bills between named players, or connect to a payment gateway. Fees are still collected outside ROTRA.
+Help the operator set a fair session fee before the night and keep track of who has paid. ROTRA estimates what the session costs to run and records what each player paid: a quick paid tick, or the amount received when it isn't the full amount. It does **not** collect money, issue receipts, split bills between named players, or connect to a payment gateway. Fees are still collected outside ROTRA.
 
 ## Session cost estimate
 
@@ -40,10 +40,15 @@ Money is shown in Philippine pesos (₱) as whole amounts. Other currencies are 
 Each session has a **Payments** list of its roster players (waitlisted players aren't on it).
 
 - **Amount due per player:** the full payment per head: the session's custom amount when one is set, otherwise the break-even share. Never the entrance fee alone; the intro notes when the amount includes it. With no estimate saved, there is no amount ("No fee set").
-- The operator ticks a player as **paid** (one switch per player) or uses **Mark all paid**; unticking marks them not paid again. Each tick records the time and the amount due then.
+- The operator ticks a player as **paid** (one switch per player) or uses **Mark all paid**; unticking marks them not paid again. Each tick records the time and the amount due then, as the amount received.
+- **Owner decision, November 7, 2026 (#479): full or partial amounts.** Payment is no longer a tick only. Tapping a player's card (not the switch) opens **Payment from <name>** to record the actual **amount received** (pesos, 0 or more), with **Full ₱X** and **Clear** shortcuts. The quick switch stays and works as before. Saving an amount first saves any pending switch changes. Entering 0 marks the player not paid. Cancelled and invalid sessions stay read-only.
+  - Status always compares the amount received with the **current** amount due: equal → **Paid**; above 0 but below → **Partial**, "₱X left"; above → **Reimburse**, "₱X to return"; nothing recorded or 0 → **Unpaid**. With no fee set, any recorded payment is Paid.
+  - Changing the session's pricing never rewrites amounts received; statuses and totals refresh against the new amount due.
+  - **Reimburse** only tracks money to return. ROTRA records no refunds and moves no money; money is still collected (and returned) outside ROTRA.
+  - A payment recorded before this change with no amount counts as paid in full at the current amount due.
 - **Owner decision, November 1, 2026 (#300):** payment switches update optimistically, then save desired end states together after 800 ms without another switch. A switch returned to its accepted state in the window needs no write. Flush before Mark all paid and on tab/sheet/page exit. A failed batch rolls back only its changes, preserving newer intent. Show one summary toast per accepted batch; recorded amounts and storage stay unchanged.
-- Totals: paid count (e.g. 15/18), **collected**, **still due** (unpaid players × amount), and collected **against costs** (over or short of the estimated total cost).
-- Filter: Everyone, Not paid, Paid. Unpaid players are listed first.
+- Totals (#479): **paid** count (e.g. 15/18) counts Paid and Reimburse players (fully covered), with "N partial" when any are partial; **collected** = sum of amounts received; **still due** = sum over the roster of what each player still owes (amount due − received, never below 0); **to reimburse** = sum of overpayments, shown only when above 0; and collected **against costs** (collected − estimated total cost).
+- Filter: Everyone, Not paid (Unpaid and Partial), Paid (Paid and Reimburse). Players with no payment recorded are listed first.
 - It is available before, during and after the session: on the preparation page, from **Payments** in the live console, and in the session record's Financials tab. Ticks are ordinary changes that work offline and sync.
 - **Cancelled session** (owner decision, November 6, 2026): payment marks are kept on the read-only record and can no longer change ("Payments are not available for this session.", as for an invalid session). ROTRA records no refunds; the cancel confirmation warns how many players are marked paid and that refunds happen outside ROTRA. See [Cancelling a session](../sessions/README.md#cancelling-a-session-owner-decision-november-6-2026).
 
@@ -79,7 +84,7 @@ Inventory is club data behind the license gate: an expired club cannot open it.
 
 ## Boundaries
 
-- No payment collection, receipts, refunds, per-player bills, or gateways. Paid / not-paid is a manual tick only.
+- No payment collection, receipts, refunds, per-player bills, or gateways. Payments are manual records: a paid tick or an amount received (#479); Reimburse is a reminder, not a refund.
 - No per-player charges or different fees per player.
 - The estimate does not change minimum-game targets, matchmaking, or results.
 - Club license payments remain a separate, manual process in [Admin](../../../admin/modules/clubs-licenses/README.md).

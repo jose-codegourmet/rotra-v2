@@ -1,4 +1,5 @@
 import type { SessionCostEstimate } from '../session-cost/sessionCost.types'
+import type { PaymentStatus } from '../session-payment/sessionPayment.rules'
 import type { SessionPlayer } from '../session-roster/sessionRoster.types'
 import portraits from './playerPortraits.json'
 import { clubPlayers } from './players'
@@ -91,20 +92,53 @@ export const paymentPlayers = clubPlayers
     name: p.fullName,
     picture: p.playerId ? pictures[p.playerId] : undefined,
     paid: index < 15 ? { amount: 70000, at: Date.UTC(2026, 9, 22, 11, 42) } : undefined,
+    status: (index < 15 ? { kind: 'paid' } : { kind: 'unpaid' }) as PaymentStatus,
   }))
   .sort((a, b) => Number(!!a.paid) - Number(!!b.paid) || a.name.localeCompare(b.name))
 export const allPaymentPlayers = paymentPlayers.map((p) => ({
   ...p,
   paid: p.paid ?? { amount: 70000, at: Date.UTC(2026, 9, 22, 11, 42) },
+  status: { kind: 'paid' } as PaymentStatus,
 }))
-export const unpaidPaymentPlayers = paymentPlayers.map((p) => ({ ...p, paid: undefined }))
+export const unpaidPaymentPlayers = paymentPlayers.map((p) => ({
+  ...p,
+  paid: undefined,
+  status: { kind: 'unpaid' } as PaymentStatus,
+}))
+/** #479: one partial (₱500 of ₱700) and one overpayment (₱800 of ₱700) among the paid. */
+export const mixedPaymentPlayers = paymentPlayers.map((p, index) =>
+  index === 3
+    ? {
+        ...p,
+        paid: { amount: 50000, at: Date.UTC(2026, 9, 22, 11, 50) },
+        status: { kind: 'partial', left: 20000 } as PaymentStatus,
+      }
+    : index === 4
+      ? {
+          ...p,
+          paid: { amount: 80000, at: Date.UTC(2026, 9, 22, 11, 51) },
+          status: { kind: 'reimburse', toReturn: 10000 } as PaymentStatus,
+        }
+      : p,
+)
 export const paymentTotalsFixture = {
   paid: 15,
+  partial: 0,
   total: 18,
   collected: 1050000,
   stillDue: 210000,
+  toReimburse: 0,
   againstCosts: 163000,
   cost: 887000,
+}
+export const mixedPaymentTotalsFixture = {
+  ...paymentTotalsFixture,
+  paid: 14,
+  partial: 1,
+  collected: 1040000,
+  stillDue: 230000,
+  toReimburse: 10000,
+  againstCosts: 153000,
 }
 
 export function createFinancialFixtures(roster: SessionPlayer[], now = Date.now()) {

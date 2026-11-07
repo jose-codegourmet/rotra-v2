@@ -62,10 +62,10 @@ Unique `(session_id, inventory_item_id)` is **not** required: the prototype allo
 |---|---|
 | `session_id`, `session_player_id` | Composite PK; scoped FKs to the session and roster entry |
 | `club_id` | Scope |
-| `amount_minor`, `currency` | Amount due when ticked: the full payment per head (custom amount, else break-even share); evidence only |
-| `marked_at`, actor/device | When and where it was ticked |
+| `amount_minor`, `currency` | **Amount received** (owner decision, November 7, 2026, #479; no migration): a quick tick records the amount due then (the full payment per head); the amount editor records what was entered. Never rewritten by a pricing change. Legacy null counts as paid in full at today's amount due. Evidence only |
+| `marked_at`, actor/device | When and where it was ticked or the amount was recorded |
 
-Unticking deletes the row (keep an audit event if history matters). Marks are ordinary sync operations and work offline. Totals (paid count, collected, still due, against costs) are derived.
+Unticking deletes the row (keep an audit event if history matters). Recording an amount replaces the row (delete, then insert under the new operation ID); 0 deletes it. Marks are ordinary sync operations and work offline. Status and totals are derived against the **current** amount due: Paid (received = due), Partial (0 < received < due), Reimburse (received > due), Unpaid (no row or 0); paid count = Paid + Reimburse, collected = Σ received, still due = Σ max(due − received, 0) over the roster, to reimburse = Σ max(received − due, 0), against costs = collected − total cost. Reimburse is a label; no refund rows are stored.
 
 **Cancelled sessions (proposed, November 6, 2026).** Marks on a `cancelled` session are kept as they were and become read-only: ticks and unticks are refused like on an invalid session. ROTRA stores no refund rows; refunds happen outside ROTRA ([log](../../../../mockup-changes/2026-11-06-queue-example-sessions-and-cancel.md)).
 

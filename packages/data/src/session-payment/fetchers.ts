@@ -8,14 +8,16 @@ import { queueMutation, requireClubAccess, sessionIn } from '../mock/transaction
 import {
   realGetSessionPayments,
   realMarkAllPaid,
+  realSetPaymentAmount,
   realSetPaymentMarks,
   realTogglePaid,
 } from '../real/financials'
 import { isRealDataMode } from '../real/mode'
 import { sessionCostIn } from '../session-cost/fetchers'
-import { amountDuePerHead, paymentTotals } from '../session-cost/sessionCost.rules'
+import { amountDuePerHead } from '../session-cost/sessionCost.rules'
 import type { SessionCostInput } from '../session-cost/sessionCost.types'
-import type { SetPaymentMarksInput } from './sessionPayment.types'
+import { paymentStatus, paymentTotals } from './sessionPayment.rules'
+import type { SetPaymentAmountInput, SetPaymentMarksInput } from './sessionPayment.types'
 
 /** Uploaded pictures by global player id (registered and unclaimed players only). */
 const pictures: Record<string, string> = portraits
@@ -32,6 +34,7 @@ export async function getSessionPayments(sessionId: string) {
   const marks = state.paymentMarks.filter(
     (m) => m.sessionId === sessionId && roster.some((p) => p.id === m.sessionPlayerId),
   )
+  const amountDue = amountDuePerHead(estimate)
   const players = roster
     .map((p) => {
       const mark = marks.find((m) => m.sessionPlayerId === p.id)
@@ -42,10 +45,10 @@ export async function getSessionPayments(sessionId: string) {
         name: p.nameSnapshot,
         picture: clubPlayer?.playerId ? pictures[clubPlayer.playerId] : undefined,
         paid: mark ? { amount: mark.amountMinor, at: mark.markedAt } : undefined,
+        status: paymentStatus(mark, amountDue),
       }
     })
     .sort((a, b) => Number(!!a.paid) - Number(!!b.paid) || a.name.localeCompare(b.name))
-  const amountDue = amountDuePerHead(estimate)
   const dueBasis: SessionCostInput['paymentMode'] = cost?.saved.paymentMode ?? 'break_even'
   return {
     players,
@@ -100,6 +103,38 @@ export function setPaymentMarks({ sessionId, marks }: SetPaymentMarksInput) {
     return {
       data: { count },
       text: `${count} payment mark${count === 1 ? '' : 's'} saved`,
+    }
+  })
+}
+/**
+ * #479 · records the amount received from one roster player. A positive amount replaces the mark
+ * (amount and time); 0 removes it (not paid). Pricing changes never rewrite it.
+ */
+export function setPaymentAmount({ sessionId, clubPlayerId, amountMinor }: SetPaymentAmountInput) {
+  if (!Number.isSafeInteger(amountMinor) || amountMinor < 0)
+    return Promise.reject(new MockError('permission', 'Enter an amount, 0 or more.'))
+  if (isRealDataMode()) return realSetPaymentAmount({ sessionId, clubPlayerId, amountMinor })
+  return queueMutation({ area: 'Payments' }, (state) => {
+    requirePaymentsWrite(state, sessionId)
+    const player = state.roster.find(
+      (p) => p.sessionId === sessionId && p.clubPlayerId === clubPlayerId,
+    )
+    if (!player) throw new MockError('permission', 'Player not in this session.')
+    state.paymentMarks = state.paymentMarks.filter(
+      (m) => !(m.sessionId === sessionId && m.sessionPlayerId === player.id),
+    )
+    if (!amountMinor)
+      return { data: { paid: false }, text: `${player.nameSnapshot} marked not paid` }
+    state.paymentMarks.push({
+      sessionId,
+      sessionPlayerId: player.id,
+      amountMinor,
+      currency: 'PHP',
+      markedAt: Date.now(),
+    })
+    return {
+      data: { paid: true },
+      text: `${player.nameSnapshot} paid ${formatPeso(amountMinor)}`,
     }
   })
 }

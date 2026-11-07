@@ -1,5 +1,4 @@
 import type { InventoryItem } from '../inventory/inventory.types'
-import type { SessionPaymentMark } from '../session-payment/sessionPayment.types'
 import type { SessionCostContext, SessionCostInput, SessionCostResult } from './sessionCost.types'
 
 /** Money stays in integer centavos. Court division rounds to nearest centavo (owner decision). */
@@ -70,27 +69,6 @@ export function defaultShuttlePlan(
 /** No saved estimate means no fee, including when paid ticks have been recorded. */
 export function amountDuePerHead(estimate: SessionCostResult | null): number | null {
   return estimate?.perHead ?? null
-}
-export function paymentTotals({
-  marks,
-  total,
-  amountDue,
-  cost,
-}: {
-  marks: Pick<SessionPaymentMark, 'amountMinor'>[]
-  total: number
-  amountDue: number | null
-  cost: number | null
-}) {
-  const collected = marks.reduce((sum, m) => sum + m.amountMinor, 0)
-  return {
-    paid: marks.length,
-    total,
-    collected,
-    stillDue: amountDue === null ? null : (total - marks.length) * amountDue,
-    againstCosts: cost === null ? null : collected - cost,
-    cost,
-  }
 }
 /** Empty/zero shuttle lines are ignored, while an explicitly entered zero fee remains an estimate. */
 export function normalizeSessionCost(

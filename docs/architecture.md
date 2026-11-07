@@ -299,7 +299,8 @@ this device, which is untrue in real mode until Q11.
 
 **Session cost and payments (#397).** In real mode `getSessionCostEstimate` calls Queue's
 `GET /api/sessions/[sessionId]/cost`, and the `@rotra/data/session-payment` fetchers call
-`GET`/`POST /api/sessions/[sessionId]/payments` and `POST …/payments/mark-all`, backed by
+`GET`/`POST /api/sessions/[sessionId]/payments`, `POST …/payments/mark-all` and
+`POST …/payments/amount` (one player's amount received, #479), backed by
 `@rotra/db/queue/financials` (adapters in `packages/data/src/real/financials.ts`). Hooks, query keys
 and DTOs are unchanged, so the preparation overview, the session record's Financials tab, the setup
 estimate and the Payments checklist read saved data. The 800 ms switch batch (#300) is one

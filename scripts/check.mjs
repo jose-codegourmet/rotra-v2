@@ -4,9 +4,10 @@
 import { spawnSync } from 'node:child_process'
 
 // Vitest files for rules the owner has decided: session cost, minimum games,
-// substitution game credit, rank eligibility and award baselines.
+// payment status and totals, substitution game credit, rank eligibility and award baselines.
 const DECIDED_MATH_TESTS = [
   'src/session-cost/sessionCost.rules.test.ts',
+  'src/session-payment/sessionPayment.rules.test.ts',
   'src/match/match.rules.test.ts',
   'src/session-result/sessionResult.rules.test.ts',
   'src/player/player.rules.test.ts',

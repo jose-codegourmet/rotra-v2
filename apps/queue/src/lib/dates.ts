@@ -31,5 +31,6 @@ export function sessionHref(session: { id: string; state: string }): string {
   if (session.state === 'active') return `/sessions/${session.id}`
   if (session.state === 'finalizing') return `/sessions/${session.id}/finishing`
   if (session.state === 'prepared') return `/sessions/${session.id}/preparation`
+  // Completed, invalid and cancelled sessions open as their record.
   return `/sessions/${session.id}/record`
 }

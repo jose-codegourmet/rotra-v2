@@ -14,7 +14,7 @@ export type PublicSessionHeroProps = {
   /** The club's stored initials, e.g. "LS" */
   clubInitials: string
   clubLogoUrl?: string | null
-  /** live = active (Happening now), finished = completed (Finished), upcoming = prepared (no chip) */
+  /** live = active (Happening now), finished = completed (Finished), cancelled (Cancelled), upcoming = prepared (no chip) */
   state: NonNullable<PublicSessionHeroVariants['state']>
   className?: string
 }
@@ -54,6 +54,8 @@ export function PublicSessionHero({
         </div>
         {state === 'live' ? (
           <Chip tone="accent">Happening now</Chip>
+        ) : state === 'cancelled' ? (
+          <Chip tone="neutral">Cancelled</Chip>
         ) : state === 'finished' ? (
           <Chip tone="neutral">Finished</Chip>
         ) : null}

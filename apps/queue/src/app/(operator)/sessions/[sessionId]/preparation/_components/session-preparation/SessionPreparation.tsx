@@ -6,6 +6,7 @@ import {
   sessionMinutes,
   startBlocker,
 } from '@rotra/data/queue-session/queueSession.rules'
+import { useCancelSession } from '@rotra/data/queue-session/useCancelSession'
 import { useDeleteSession } from '@rotra/data/queue-session/useDeleteSession'
 import { useDownloadSession } from '@rotra/data/queue-session/useDownloadSession'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
@@ -20,6 +21,7 @@ import { courtNextDay } from '@rotra/schema/court-window'
 import { formatPeso } from '@rotra/schema/money'
 import { Breadcrumb } from '@rotra/ui/breadcrumb'
 import { Button } from '@rotra/ui/button'
+import { CancelSessionSheet } from '@rotra/ui/cancel-session-sheet'
 import { CostEstimateResult } from '@rotra/ui/cost-estimate-summary'
 import { DeleteSessionSheet } from '@rotra/ui/delete-session-sheet'
 import { DeviceDownloadCard } from '@rotra/ui/device-download-card'
@@ -78,6 +80,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
   const download = useDownloadSession()
   const start = useStartSession()
   const remove = useDeleteSession()
+  const cancel = useCancelSession()
   const setAcceptJoinRequests = useSetAcceptJoinRequests()
   const [tab, setTab] = useState('overview')
   const [liveSheet, setLiveSheet] = useState<
@@ -86,6 +89,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
   const [startOpen, setStartOpen] = useState(false)
   const [postOpen, setPostOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
+  const [cancelOpen, setCancelOpen] = useState(false)
   // The public link is origin + /s/<publicSlug>; the origin is only known in the browser.
   const [origin, setOrigin] = useState('')
   useEffect(() => setOrigin(window.location.origin), [])
@@ -167,6 +171,18 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
       },
     })
 
+  const confirmCancel = (reason: string) =>
+    cancel.mutate(
+      { sessionId, reason },
+      {
+        onSuccess: (result) => {
+          toast(result.message)
+          setCancelOpen(false)
+          router.push(`/sessions/${sessionId}/record`)
+        },
+      },
+    )
+
   const publicHref = s ? `/s/${s.publicSlug}` : '/'
   const sessionLink = `${origin}${publicHref}`
   const pendingRequests = (roster.data?.joinRequests ?? []).filter(
@@ -224,6 +240,16 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
                   onClick={() => setDeleteOpen(true)}
                 >
                   Delete session
+                </Button>
+              ) : null}
+              {s.state === 'prepared' ? (
+                <Button
+                  size="sm"
+                  variant="danger"
+                  disabled={!roster.data}
+                  onClick={() => setCancelOpen(true)}
+                >
+                  Cancel session
                 </Button>
               ) : null}
             </>
@@ -460,6 +486,23 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
             setDeleteOpen(false)
             setTab('roster')
           }}
+        />
+      ) : null}
+      {s?.state === 'prepared' ? (
+        <CancelSessionSheet
+          open={cancelOpen}
+          onOpenChange={(open) => {
+            if (!open) cancel.reset()
+            setCancelOpen(open)
+          }}
+          title={s.title}
+          whenLabel={`${date(s.scheduledStartAt)} · ${time(s.scheduledStartAt)}–${time(s.scheduledEndAt)}`}
+          joinedCount={rosterList.length}
+          waitlistCount={waitlist.length}
+          paidCount={payments.data?.totals.paid ?? 0}
+          isPending={cancel.isPending}
+          error={cancel.error ? errorMessage(cancel.error) : undefined}
+          onConfirm={confirmCancel}
         />
       ) : null}
       {live ? (

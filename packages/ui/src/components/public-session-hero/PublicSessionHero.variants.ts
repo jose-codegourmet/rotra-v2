@@ -9,6 +9,7 @@ export const publicSessionHeroVariants = cva('flex min-w-0 flex-col gap-2.5', {
       live: '',
       finished: '',
       upcoming: '',
+      cancelled: '',
     },
   },
   defaultVariants: { state: 'upcoming' },

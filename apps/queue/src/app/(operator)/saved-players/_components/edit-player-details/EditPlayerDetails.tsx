@@ -1,7 +1,7 @@
 'use client'
-import { MockError } from '@rotra/data/mock/errors'
 import { useClubPlayerDetails } from '@rotra/data/club-player/useClubPlayerDetails'
 import { useUpdateClubPlayerDetails } from '@rotra/data/club-player/useUpdateClubPlayerDetails'
+import { MockError } from '@rotra/data/mock/errors'
 import { EditPlayerDetailsForm } from '@rotra/ui/edit-player-details-form'
 import { toast } from '@rotra/ui/toaster'
 import { useEffect } from 'react'

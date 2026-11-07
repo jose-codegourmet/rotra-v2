@@ -11,7 +11,10 @@ import { TextInput } from '@rotra/ui/text-input'
 import { useEffect, useId } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
 import { editPlayerDetailsDefaultValues } from './EditPlayerDetailsForm.defaultValues'
-import { type EditPlayerDetailsValues, editPlayerDetailsSchema } from './EditPlayerDetailsForm.schema'
+import {
+  type EditPlayerDetailsValues,
+  editPlayerDetailsSchema,
+} from './EditPlayerDetailsForm.schema'
 
 export type EditPlayerDetailsFormProps = {
   open: boolean
@@ -120,7 +123,9 @@ export function EditPlayerDetailsForm({
               <Field
                 label="Email (optional)"
                 error={errors.email?.message}
-                hint={errors.email ? undefined : 'Fills in their registration. Never shown publicly.'}
+                hint={
+                  errors.email ? undefined : 'Fills in their registration. Never shown publicly.'
+                }
               >
                 <Controller
                   control={form.control}

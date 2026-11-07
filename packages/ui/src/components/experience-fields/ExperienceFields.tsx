@@ -45,7 +45,11 @@ export function playingSinceOf({ years, months }: ExperienceValue, now = new Dat
 }
 
 /** Playing since → years + months, or null while it is incomplete or in the future. */
-export function experienceOf(month: string, year: string, now = new Date()): ExperienceValue | null {
+export function experienceOf(
+  month: string,
+  year: string,
+  now = new Date(),
+): ExperienceValue | null {
   if (!month || !/^\d{4}$/.test(year.trim())) return null
   const elapsed = monthIndex(now) - (Number(year) * 12 + Number(month) - 1)
   if (elapsed < 0) return null

@@ -28,12 +28,12 @@ import { toast } from '@rotra/ui/toaster'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
-import { EditPlayerDetails } from '../edit-player-details/EditPlayerDetails'
 import { longDateLabel, shortDateLabel } from '@/lib/dates'
 import { useAppSelector } from '@/store/hooks'
 import { selectDev } from '@/store/slices/devSlice'
 import { AddPlayer } from '../../../_components/add-player/AddPlayer'
 import { QueryError } from '../../../_components/query-error/QueryError'
+import { EditPlayerDetails } from '../edit-player-details/EditPlayerDetails'
 
 type LiveState = { kind: 'playing' | 'waiting'; text: string }
 type LiveStates = Record<string, LiveState>

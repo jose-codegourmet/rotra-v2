@@ -2,7 +2,9 @@ import type { ClubPlayerDetails } from '@rotra/data/club-player/types'
 import type { EditPlayerDetailsValues } from './EditPlayerDetailsForm.schema'
 
 /** The form's starting values from what the club already entered. */
-export function editPlayerDetailsDefaultValues(details: ClubPlayerDetails): EditPlayerDetailsValues {
+export function editPlayerDetailsDefaultValues(
+  details: ClubPlayerDetails,
+): EditPlayerDetailsValues {
   const profile = details.profile
   return {
     fullName: details.fullName,

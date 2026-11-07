@@ -25,15 +25,30 @@ export default meta
 type Story = StoryObj<typeof meta>
 export const UnclaimedNoPhone: Story = {}
 export const UnclaimedPhoneOnFile: Story = {
-  args: { details: { ...unclaimed, phoneOnFile: true, profile: { ...unclaimed.profile!, email: 'faye@example.com' } } },
+  args: {
+    details: {
+      ...unclaimed,
+      phoneOnFile: true,
+      profile: { ...unclaimed.profile!, email: 'faye@example.com' },
+    },
+  },
 }
 export const Guest: Story = {
   args: {
-    details: { clubPlayerId: 'cp-2', identity: 'guest', fullName: 'Tin Gonzaga', nickname: null, phoneOnFile: false, profile: null },
+    details: {
+      clubPlayerId: 'cp-2',
+      identity: 'guest',
+      fullName: 'Tin Gonzaga',
+      nickname: null,
+      phoneOnFile: false,
+      profile: null,
+    },
   },
 }
 export const EmailTaken: Story = {
-  args: { serverError: { message: 'This email belongs to another ROTRA account.', field: 'email' } },
+  args: {
+    serverError: { message: 'This email belongs to another ROTRA account.', field: 'email' },
+  },
 }
 export const Pending: Story = { args: { isPending: true } }
 export const PhoneViewport: Story = { globals: { viewport: { value: 'phone' } } }

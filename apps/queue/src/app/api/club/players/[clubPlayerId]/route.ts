@@ -1,7 +1,4 @@
-import {
-  readClubPlayerDetails,
-  updateClubPlayerDetails,
-} from '@rotra/db/queue/club-player-details'
+import { readClubPlayerDetails, updateClubPlayerDetails } from '@rotra/db/queue/club-player-details'
 import { ServiceError } from '@rotra/db/service/errors'
 import { handleAccountRequest } from '@rotra/db/service/handler'
 import { intOrNull, readJsonBody, text } from '@rotra/db/service/request'

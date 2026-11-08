@@ -12,6 +12,9 @@ import { SessionGames } from '@rotra/ui/session-games'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { TextInput } from '@rotra/ui/text-input'
 export type AdminPlayerHistoryProps = {
+  /** Compact session summaries for the Quick view; defaults to the full history page. */
+  variant?: 'default' | 'compact'
+  limit?: number
   linkComponent?: import('react').ElementType
   name: string
   backHref: string
@@ -27,6 +30,8 @@ export type AdminPlayerHistoryProps = {
   onChange: (patch: Record<string, string>) => void
 }
 export function AdminPlayerHistory({
+  variant = 'default',
+  limit = 2,
   linkComponent: Link = 'a',
   name,
   backHref,
@@ -41,6 +46,58 @@ export function AdminPlayerHistory({
   page,
   onChange,
 }: AdminPlayerHistoryProps) {
+  if (variant === 'compact') {
+    const recent = sessions
+      ?.slice()
+      .sort((a, b) => Date.parse(b.finishedAt) - Date.parse(a.finishedAt))
+      .slice(0, limit)
+    return (
+      <section className="flex flex-col gap-1.5 border-t border-border pt-2.5" aria-label="History">
+        <h3 className="text-xs font-bold uppercase tracking-[0.06em] text-fg2">History</h3>
+        {error ? (
+          <ErrorState title="Couldn't load games." onRetry={onRetry} />
+        ) : !recent ? (
+          <Skeleton label="Loading history" />
+        ) : recent.length ? (
+          <div>
+            {recent.map((session) => {
+              const wins = session.games.filter((game) => game.result === 'won').length
+              const losses = session.games.filter((game) => game.result === 'lost').length
+              return (
+                <div
+                  key={session.id}
+                  className="flex items-baseline justify-between gap-2.5 border-t border-border py-2 first:border-t-0"
+                >
+                  <div className="min-w-0 [overflow-wrap:anywhere]">
+                    <b>{session.title}</b>
+                    <span className="text-sm text-fg2">
+                      {' '}
+                      · {session.clubName} ·{' '}
+                      {new Intl.DateTimeFormat('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                        timeZone: 'Asia/Manila',
+                      }).format(new Date(session.finishedAt))}
+                    </span>
+                  </div>
+                  <span
+                    className="shrink-0 tabular-nums"
+                    role="img"
+                    aria-label={`${wins} wins, ${losses} losses`}
+                  >
+                    {wins}–{losses}
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+        ) : (
+          <p className="text-sm text-fg2">No games yet</p>
+        )}
+      </section>
+    )
+  }
   const date = (at: string) =>
     new Intl.DateTimeFormat('en-CA', {
       timeZone: 'Asia/Manila',

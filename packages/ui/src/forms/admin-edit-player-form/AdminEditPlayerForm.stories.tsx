@@ -17,3 +17,6 @@ export default meta
 type Story = StoryObj<typeof meta>
 export const Default: Story = {}
 export const Light: Story = { globals: { theme: 'light' } }
+
+export const Embedded: Story = { args: { embedded: true } }
+export const EmbeddedLight: Story = { ...Embedded, globals: { theme: 'light' } }

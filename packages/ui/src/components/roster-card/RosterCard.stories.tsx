@@ -78,3 +78,32 @@ export const Desktop: Story = {
   args: { ...rowAt(1), level: 'intermediate_low' },
   globals: { viewport: { value: 'desktop' } },
 }
+
+const levelCases: [string, PlayingLevel | null][] = [
+  ['Beginner', 'beginner_mid'],
+  ['Intermediate', 'intermediate_mid'],
+  ['Advanced', 'advanced_mid'],
+  ['NoLevel', null],
+]
+
+/** Present / absent x each level group x paid / not paid, in the skill group's color. */
+export const LevelGroups: Story = {
+  render: () => (
+    <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-2.5">
+      {levelCases.flatMap(([label, level]) =>
+        [true, false].flatMap((present) =>
+          [true, false].map((paid) => (
+            <Demo
+              key={`${label}-${present}-${paid}`}
+              {...rowAt(0)}
+              name={`${label} ${present ? 'present' : 'absent'} ${paid ? 'paid' : 'not paid'}`}
+              level={level}
+              present={present}
+              paid={paid}
+            />
+          )),
+        ),
+      )}
+    </div>
+  ),
+}

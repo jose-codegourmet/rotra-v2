@@ -3,7 +3,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const rosterPanelMeta = {
   name: 'RosterPanel',
   description:
-    'The preparation "Roster and levels" panel: Mark all present / absent and Add player, the SlotMeter, the missing-level warning, level tabs with counts, Group by, List | Grid, and one RosterRow or RosterCard per confirmed slot.',
+    'The preparation "Roster and levels" panel: Mark all present / absent and Add player, the SlotMeter, the missing-level warning, level tabs with counts, Group by, the icon List | Grid toggle ("List view" / "Grid view"), and one RosterRow or RosterCard per confirmed slot.',
   usage: [
     'A player presencePending flag passes Saving presence… through RosterRow and RosterCard without disabling switches or the roster.',
     'Active Session settings passes readOnly to show locked levels and presence text; only Add player remains available.',
@@ -23,6 +23,7 @@ export const rosterPanelMeta = {
     'docs/screens/product/modules/queue/session-setup.md',
     'docs/screens/product/modules/queue/players-roster.md',
     'docs/mockup-changes/2026-11-06-queue-roster-views.md',
+    'docs/mockup-changes/2026-11-08-queue-roster-view-toggle-icons.md',
     'docs/business_logic/product/queue/modules/players/README.md',
   ],
   related: ['RosterRow', 'RosterCard', 'SlotMeter', 'WaitlistPanel', 'Notice', 'EmptyState'],

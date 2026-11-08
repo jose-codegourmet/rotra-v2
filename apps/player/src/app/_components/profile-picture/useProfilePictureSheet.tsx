@@ -1,27 +1,19 @@
 'use client'
+import { preparePlayerPhoto } from '@rotra/data/player/photo'
 import { type PlayerPictureChoice, parsePlayerPicture } from '@rotra/data/player/picture'
 import type { PlayerProfile } from '@rotra/data/player/types'
 import { useSetMyProfilePicture } from '@rotra/data/player/useSetMyProfilePicture'
 import { ProfilePictureSheet } from '@rotra/ui/profile-picture-sheet'
 import { toast } from '@rotra/ui/toaster'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 
-/** Opens the same immediate picture editor from My profile and Edit profile. */
+/** Both entry points share one local draft and persist only through Done. */
 export function useProfilePictureSheet(profile: PlayerProfile | null | undefined) {
   const [open, setOpen] = useState(false)
-  const saving = useRef(false)
   const mutation = useSetMyProfilePicture()
-  const choose = (choice: PlayerPictureChoice) => {
-    if (saving.current) return
-    saving.current = true
-    mutation.mutate(choice, {
-      onSuccess: () =>
-        toast(choice.kind === 'initials' ? 'Using your initials' : 'Profile picture updated'),
-      onError: (error) => toast.error(error.message),
-      onSettled: () => {
-        saving.current = false
-      },
-    })
+  const commit = async (choice: PlayerPictureChoice) => {
+    await mutation.mutateAsync(choice)
+    toast(choice.kind === 'initials' ? 'Using your initials' : 'Profile picture updated')
   }
   const sheet = profile ? (
     <ProfilePictureSheet
@@ -31,9 +23,8 @@ export function useProfilePictureSheet(profile: PlayerProfile | null | undefined
       name={profile.fullName}
       picture={parsePlayerPicture(profile.picture)}
       isPending={mutation.isPending}
-      onUpload={(file) => choose({ kind: 'photo', file })}
-      onUseInitials={() => choose({ kind: 'initials' })}
-      onSelectCharacter={(id) => choose({ kind: 'character', id })}
+      preparePhoto={preparePlayerPhoto}
+      onCommit={commit}
     />
   ) : null
   return { sheet, openSheet: () => setOpen(true) }

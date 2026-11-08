@@ -164,6 +164,12 @@ Individual presence uses a transient QueryClient/session-scoped DebouncedBatch o
 - **Dev toggles** (offline, license expired, next save fails, conflict) mirror each prototype's
   "Prototype" menu. They are developer tools, never product features, and are excluded from production builds.
 
+Profile picture drafts (#567) remain in the shared sheet until Done. `@rotra/data/player/photo`
+prepares HEIC locally with the approved lazy `libheif-js` worker and mocks the final transform in memory.
+Real Done sends the original web-format file plus crop to the owner-only `/api/me/profile` handler;
+Next's bundled Sharp preserves each GIF/WebP frame and encodes immutable multi-format Storage objects.
+See [picture storage](database_design/product/player-information/modules/identity.md#profile-picture-storage-542).
+
 ### Real mode (opt-in, partial)
 
 The frontend compatibility goal is to keep visual components and hook contracts stable as

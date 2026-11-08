@@ -1,4 +1,7 @@
+'use client'
+
 import { cn } from '@rotra/ui/cn'
+import { useRef } from 'react'
 import { type AvatarVariants, avatarVariants } from './Avatar.variants'
 
 export type AvatarProps = AvatarVariants & {
@@ -37,10 +40,42 @@ export function Avatar({
   onClick,
   className,
 }: AvatarProps) {
+  const frozen = useRef<HTMLCanvasElement>(null)
   const classes = cn(avatarVariants({ size, shape, tone }), className)
   const face = src ? (
-    <span className={classes}>
-      <img src={src} alt={name} className="size-full object-cover" />
+    <span className={cn(classes, 'relative')}>
+      <img
+        src={src}
+        alt={name}
+        className="size-full object-cover motion-reduce:invisible"
+        onLoad={(event) => {
+          const canvas = frozen.current
+          if (!canvas) return
+          const image = event.currentTarget
+          const side = Math.min(image.naturalWidth, image.naturalHeight)
+          canvas.width = 176
+          canvas.height = 176
+          canvas
+            .getContext('2d')
+            ?.drawImage(
+              image,
+              (image.naturalWidth - side) / 2,
+              (image.naturalHeight - side) / 2,
+              side,
+              side,
+              0,
+              0,
+              176,
+              176,
+            )
+        }}
+      />
+      <canvas
+        ref={frozen}
+        role="img"
+        aria-label={name}
+        className="absolute inset-0 hidden size-full object-cover motion-reduce:block"
+      />
     </span>
   ) : (
     <span aria-hidden className={classes}>

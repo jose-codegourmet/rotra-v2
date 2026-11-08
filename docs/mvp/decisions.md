@@ -166,10 +166,10 @@ Then add a row to the [index](#index) and link the entry from the workstream pag
 <a id="d-2026-11-08-03"></a>
 ### D-2026-11-08-03 — Profile pictures in Supabase Storage
 - **Decision status:** approved (2026-11-08; the owner delegated the choice and asked for the most efficient option)
-- **Implementation status:** implemented in source by #542, pending merge and batch verification. The `player-avatars` bucket must be provisioned separately; no shared environment has been changed.
+- **Implementation status:** implemented by #542; #567 adds local drafts, explicit Done, framing, animation and multi-format processing. Bucket configuration is deployment setup.
 - **Ticket:** [#522](https://github.com/jose-codegourmet/rotra-v2/issues/522) (mock data), [#542](https://github.com/jose-codegourmet/rotra-v2/issues/542) (Storage and real-mode writer), epic [#502](https://github.com/jose-codegourmet/rotra-v2/issues/502)
 - **Roadmap:** MVP candidate — [Player workstream](workstreams/player.md)
-- **Decision:** Reuse the club-logo pattern (#374) instead of building a new one. The Player app's existing `/api/me/profile` route (behind `requireOwnPlayer`) receives the photo, the server normalizes it to a square PNG (512 px), uploads it to a public **`player-avatars`** Supabase Storage bucket, and saves its immutable URL in `players.avatar_ref`. A character is saved as `character:<id>`; Use my initials saves null. No direct browser upload, no Edge Function, no migration (`avatar_ref` already exists). Old files are kept like club logo snapshots.
+- **Decision:** Reuse the club-logo pattern (#374) instead of building a new one. The Player app's existing `/api/me/profile` route (behind `requireOwnPlayer`) receives the photo, the server normalizes it to a square image (up to 512 px; #567 preserves JPEG/PNG/WebP/GIF and converts HEIC/HEIF to WebP), uploads it to a public **`player-avatars`** Supabase Storage bucket, and saves its immutable URL in `players.avatar_ref`. A character is saved as `character:<id>`; Use my initials saves null. No direct browser upload, no Edge Function, no migration (`avatar_ref` already exists). Old files are kept like club logo snapshots.
 - **References:** [architecture.md › Club logos](../architecture.md), [identity](../database_design/product/player-information/modules/identity.md), [mockup log](../mockup-changes/2026-11-08-player-change-avatar.md).
 
 <a id="d-2026-11-08-04"></a>
@@ -189,3 +189,12 @@ Then add a row to the [index](#index) and link the entry from the workstream pag
 ## Admin implementation gap index
 
 Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-index).
+
+### D-2026-11-08-05 — Profile picture drafts and HEIC decoder (#567)
+
+- **Decision status:** approved by the owner in issue #567 and its implementation chat (2026-11-08).
+- **Decision:** save only on Done; preserve GIF animation across crop/rotation; preserve web photo formats.
+  Add pinned `libheif-js@1.23.5` to `@rotra/data` for browser-independent local HEIC/HEIF decoding;
+  use Next's existing Sharp for every GIF frame. HEIC/HEIF becomes WebP for browser-compatible display.
+- **Later owner follow-up:** simplify the editor to a draggable crop and one Zoom slider; remove position sliders and rotation controls. Automatic source orientation remains.
+- **Limits:** retain the 2,097,152-byte stored-object cap. See the [storage decision](../database_design/product/player-information/modules/identity.md#profile-picture-storage-542) for input, pixel, frame and processing limits.

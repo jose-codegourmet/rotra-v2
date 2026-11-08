@@ -356,7 +356,9 @@
     "./admin-player/useAdminPlayerSelection": "./src/admin-player/useAdminPlayerSelection.ts",
     "./password-reset/types": "./src/password-reset/passwordReset.types.ts",
     "./password-reset/fetchers": "./src/password-reset/fetchers.ts",
-    "./password-reset/usePasswordResetRequests": "./src/password-reset/usePasswordResetRequests.ts"
+    "./password-reset/usePasswordResetRequests": "./src/password-reset/usePasswordResetRequests.ts",
+    "./player/photo": "./src/player/photo.ts",
+    "./player/heif": "./src/player/heif.ts"
   },
   "scripts": {
     "lint": "biome check .",
@@ -364,7 +366,8 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
-    "@rotra/schema": "workspace:*"
+    "@rotra/schema": "workspace:*",
+    "libheif-js": "1.23.5"
   },
   "peerDependencies": {
     "@tanstack/react-query": "^5.0.0",

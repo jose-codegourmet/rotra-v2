@@ -196,14 +196,17 @@ export async function realSetPhonePrivacy(input: { phoneHidden: boolean }) {
   return myAccountOf(account)
 }
 
-/** The same immediate picture command as mock mode, sent to the authenticated server. */
+/** The same explicit Done picture command as mock mode, sent to the authenticated server. */
 export async function realSetMyProfilePicture(choice: PlayerPictureChoice) {
   if (!loadedRevision) await realGetMyAccount()
   const form = new FormData()
   form.set('kind', choice.kind)
   form.set('expectedRevision', loadedRevision)
   if (choice.kind === 'character') form.set('id', choice.id)
-  if (choice.kind === 'photo') form.set('photo', choice.file)
+  if (choice.kind === 'photo') {
+    form.set('photo', choice.file)
+    if (choice.crop) form.set('crop', JSON.stringify(choice.crop))
+  }
   const { profile, revision } = await realRequest<{ profile: PlayerProfile; revision: string }>(
     '/api/me/profile',
     { method: 'PATCH', body: form },

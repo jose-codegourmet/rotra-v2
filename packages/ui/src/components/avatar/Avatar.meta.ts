@@ -5,6 +5,7 @@ export const avatarMeta = {
   description:
     "A player picture, or the player's initials when there is no picture. On operator screens it can open the player's profile.",
   usage: [
+    'Reduced-motion displays a frozen canvas snapshot of the loaded photo, preserving the stored animation.',
     'Pass onClick on operator screens (queue cards, match dialogs, roster, payments, leaderboard): it becomes a button named "View <name>\'s profile". Never on public pages.',
     'Pick the size the prototype uses at that spot (24, 28, 36, 40, 44, 52, 64, 88).',
     'shape="square" tone="accent" is the club logo / big initials tile (.avatar.lg, .avatar.xxl).',

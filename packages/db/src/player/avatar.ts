@@ -8,12 +8,17 @@ import { ServiceError } from '../service/errors'
 import { readMyAccount, readMyProfile } from './profile'
 
 const BUCKET = 'player-avatars'
-const MAX_PNG_BYTES = 2 * 1024 * 1024
+const MAX_PHOTO_BYTES = 2 * 1024 * 1024
 const CHARACTERS = new Set(['', 'a', 'b', 'c', 'd', 'e', 'f', 'g'])
 export type AvatarChoice =
   | { kind: 'initials' }
   | { kind: 'character'; id: string }
-  | { kind: 'photo'; png: Buffer }
+  | {
+      kind: 'photo'
+      bytes: Buffer
+      contentType: 'image/png' | 'image/jpeg' | 'image/gif' | 'image/webp'
+      extension: 'png' | 'jpg' | 'gif' | 'webp'
+    }
 
 /** Only the owning player can save a server-normalized picture under the loaded revision. */
 export async function updatePlayerAvatar(
@@ -26,16 +31,8 @@ export async function updatePlayerAvatar(
     throw new ServiceError('invalid', { revision: 'Reload and try again.' })
   if (choice.kind === 'character' && !CHARACTERS.has(choice.id))
     throw new ServiceError('invalid', { picture: 'Choose a character.' })
-  if (
-    choice.kind === 'photo' &&
-    (choice.png.length < 24 ||
-      choice.png.length > MAX_PNG_BYTES ||
-      !choice.png.subarray(0, 8).equals(Buffer.from('89504e470d0a1a0a', 'hex')) ||
-      choice.png.toString('ascii', 12, 16) !== 'IHDR' ||
-      choice.png.readUInt32BE(16) !== 512 ||
-      choice.png.readUInt32BE(20) !== 512)
-  )
-    throw new ServiceError('invalid', { picture: 'That image could not be read.' })
+  if (choice.kind === 'photo' && !validPhoto(choice))
+    throw new ServiceError('invalid', { picture: 'That image could not be read or exceeds 2 MiB.' })
   requireRevision(BigInt((await readMyAccount(context)).revision), expectedRevision)
   let reference: string | null = choice.kind === 'character' ? `character:${choice.id}` : null
   let uploaded: { remove: () => Promise<unknown> } | undefined
@@ -46,9 +43,9 @@ export async function updatePlayerAvatar(
     const storage = createClient(url, key, {
       auth: { persistSession: false, autoRefreshToken: false },
     }).storage.from(BUCKET)
-    const path = `${context.playerId}/${randomUUID()}.png`
-    const { error } = await storage.upload(path, choice.png, {
-      contentType: 'image/png',
+    const path = `${context.playerId}/${randomUUID()}.${choice.extension}`
+    const { error } = await storage.upload(path, choice.bytes, {
+      contentType: choice.contentType,
       cacheControl: '31536000',
       upsert: false,
     })
@@ -71,4 +68,27 @@ export async function updatePlayerAvatar(
     profile: await readMyProfile(context),
     revision: (BigInt(expectedRevision) + 1n).toString(),
   }
+}
+
+/** Defense at the service boundary: never trust a MIME label or extension alone. */
+function validPhoto(photo: Extract<AvatarChoice, { kind: 'photo' }>): boolean {
+  const b = photo.bytes
+  if (b.length < 24 || b.length > MAX_PHOTO_BYTES) return false
+  if (photo.contentType === 'image/png' && photo.extension === 'png')
+    return (
+      b.subarray(0, 8).equals(Buffer.from('89504e470d0a1a0a', 'hex')) &&
+      b.toString('ascii', 12, 16) === 'IHDR' &&
+      b.readUInt32BE(16) <= 512 &&
+      b.readUInt32BE(16) === b.readUInt32BE(20)
+    )
+  if (photo.contentType === 'image/jpeg' && photo.extension === 'jpg')
+    return b[0] === 255 && b[1] === 216 && b[2] === 255
+  if (photo.contentType === 'image/gif' && photo.extension === 'gif')
+    return /^GIF8[79]a$/.test(b.toString('ascii', 0, 6))
+  return (
+    photo.contentType === 'image/webp' &&
+    photo.extension === 'webp' &&
+    b.toString('ascii', 0, 4) === 'RIFF' &&
+    b.toString('ascii', 8, 12) === 'WEBP'
+  )
 }

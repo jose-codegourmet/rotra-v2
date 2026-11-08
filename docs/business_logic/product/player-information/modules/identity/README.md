@@ -93,3 +93,13 @@ See [claim/recovery flow](flow/claim-and-recover.md) and [Admin contact changes]
 ## Admin-issued registration links (#345)
 
 ROTRA Admin can issue a claim link for an unclaimed player, using `/claim/{token}`. It replaces the previous active link and expires after seven days. The audit records issuer and expiry, never the token. Queue's legacy mock invite now uses the same path, but its deterministic fixture token is still a preview placeholder. Dynamically issued Admin links resolve against the current in-memory store; cross-origin claims require the shared F07 transport. No email or SMS is sent. **No club is assigned** (owner decision, November 8, 2026): a player who registers from an Admin-issued link is not added to any club, and clubs that already played with the profile keep their own records; only a club's own invite or session add connects a player to that club.
+
+## Profile picture drafts (#567)
+
+Photo, initials and character choices remain local until **Done**, independently of Edit profile Save.
+Crop, position, zoom and rotation never upload or mutate the profile. Dismissal discards the draft;
+Done saves once through the authenticated owner-only handler under the loaded revision. Failure keeps
+the editable draft and previous picture. Supported photo inputs are WebP, GIF, PNG, HEIC/HEIF and JPEG.
+Animations remain animated after framing and persistence; HEIC/HEIF is converted to browser-compatible
+WebP. Resource/storage limits and the approved decoder are in the
+[storage decision](../../../../../database_design/product/player-information/modules/identity.md#profile-picture-storage-542).

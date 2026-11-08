@@ -8,6 +8,8 @@ Screen ID: P-PROFILE, P-EDIT
 Route: /player/players/u1
 Components: profile-picture-sheet, player-identity-card, edit-profile-form, player-profile
 
+Superseded by: 2026-11-08-player-picture-drafts.md
+
 ## What changed
 - Before: a player's picture could not be changed anywhere.
 - After: on your own profile the large picture has a small edit button on its corner, and Edit profile › Name

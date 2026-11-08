@@ -317,8 +317,9 @@ displayed `revision` and a settings save sends the `baseVersion`; a stale one co
 and save carries a command ID. Saving appends a version with the algorithm reference carried forward
 (`unapproved` until #247); it records configuration only and no rank is recalculated. Admin accounts
 store a display name, not an email, so the `…ByEmail` fields show that name (empty for the seeded
-version 1). Not connected: Player Information's ranking-settings reads (only Admin serves the route;
-a public read is the leaderboard/player adapters' concern), the Player dev settings control and the
+version 1). Player Information serves its own public `GET /api/ranking-settings` (`ranking.settings`
+public read, November 8, 2026): the versions' numbers without change notes or names. Not connected: the
+Player dev settings control and the
 Admin "Show a placeholder flag" dev toggle, which is client-only mock UI state and never adds a row
 over saved flags.
 

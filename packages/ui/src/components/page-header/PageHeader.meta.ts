@@ -5,6 +5,7 @@ export const pageHeaderMeta = {
   description:
     "A page's title with its description, an optional label row above, and the page's action buttons.",
   usage: [
+    'Use titleAction for an action immediately beside the title.',
     "One per page, directly under the Breadcrumb if there is one. The title is the page's only h1.",
     'Put page-level buttons in actions; on phones they become a two-column grid so nothing scrolls sideways.',
     'Use eyebrow for the live console\'s "Live session" label and state chips.',

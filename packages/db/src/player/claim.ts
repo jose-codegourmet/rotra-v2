@@ -9,8 +9,8 @@ import { toIso } from '../service/serialize'
 import { currentExperienceMonths, playingStyle } from './profile'
 
 /**
- * Links last 7 days and work once (#244). TBD (owner, 2026-11-08): a new link no longer revokes
- * earlier ones; each simply expires, and once the profile is registered the others read as used.
+ * Links last 7 days and work once; a new link revokes the player's earlier one (#244). The database
+ * allows one active link per player (`player_claim_links_one_active_per_player`).
  */
 export const CLAIM_LINK_DAYS = 7
 
@@ -54,6 +54,10 @@ export async function issueClaimLink(context: ClubContext, clubPlayerId: string)
     if (player.profileState === 'claimed')
       throw new ServiceError('conflict', { player: 'This player has already registered.' })
     const now = new Date()
+    await tx.playerClaimLink.updateMany({
+      where: { playerId: player.id, state: 'active' },
+      data: { state: 'revoked', revokedAt: now, revision: { increment: 1 } },
+    })
     const expiresAt = new Date(now.getTime() + CLAIM_LINK_DAYS * 86_400_000)
     await tx.playerClaimLink.create({
       data: {

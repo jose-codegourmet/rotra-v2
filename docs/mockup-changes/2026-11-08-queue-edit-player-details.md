@@ -18,6 +18,12 @@ Screen ID: Q-SAVED-PLAYERS
   another link without cancelling this one."
 - Prototype: Faye Dimaculangan is an unclaimed profile with no phone on file.
 
+## Correction, November 8, 2026
+- The Invite hint and "no longer cancels" behaviour were withdrawn the same day: the database allows one
+  active link per player, so a new link cancels the earlier one again. Hint now: "Works once and lasts
+  7 days. Opening Invite again makes a new link and cancels this one." Logged in
+  2026-11-08-queue-invite-cancels-previous-link.md.
+
 ## Why
 - Owner, November 8, 2026: the club fills in what it knows so the invited player mostly just sets a
   password; a profile with no phone could not be registered at all.

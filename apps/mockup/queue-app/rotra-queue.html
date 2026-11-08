@@ -3628,7 +3628,7 @@ const SHEETS = {
     const link = `https://rotra.example/join/${code}`;
     return sheetShell(claim ? `Invite ${esc(p.name)} to claim their profile` : `Invite ${esc(p.name)} to ROTRA`, `
       <p>${claim ? 'They already have a ROTRA profile from playing here. This link lets them claim it' : 'This link lets them create a ROTRA account'} with their phone and email, so their games and rank follow them to every club.</p>
-      ${S.online ? `<div class="field"><span>Invite link</span><div class="invite-link"><input class="input" id="invite-link" readonly value="${link}" aria-label="Invite link"><button class="btn sm primary" data-act="copyInvite" data-v="${link}">Copy link</button></div><span class="hint">Send it any way you like, such as Messenger or SMS. ${claim ? 'Works once and lasts 7 days; opening Invite again makes another link without cancelling this one.' : ''} Sample link in this prototype.</span></div>`
+      ${S.online ? `<div class="field"><span>Invite link</span><div class="invite-link"><input class="input" id="invite-link" readonly value="${link}" aria-label="Invite link"><button class="btn sm primary" data-act="copyInvite" data-v="${link}">Copy link</button></div><span class="hint">Send it any way you like, such as Messenger or SMS. ${claim ? 'Works once and lasts 7 days. Opening Invite again makes a new link and cancels this one.' : ''} Sample link in this prototype.</span></div>`
         : notice('warn', 'Making an invite link needs an internet connection.')}
       <p class="small muted">The link only sets up their account. It doesn't book them into a session; you still add players to each session yourself.</p>`,
       `<button class="btn" data-act="closeSheet">Done</button>`);

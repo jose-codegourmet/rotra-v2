@@ -54,9 +54,20 @@ export function playerProjection() {
     const name = names.get(id)
     if (name) Object.assign(rank, name)
   }
+  const profiles = new Map(store.playerProfiles.map((profile) => [profile.playerId, profile]))
   const candidates = leaderboardEntries.flatMap((entry) => {
     const rank = store.playerRanks[entry.id]
-    return rank ? [{ ...entry, ...rank, ...names.get(entry.id) }] : []
+    const profile = profiles.get(entry.id)
+    return rank
+      ? [
+          {
+            ...entry,
+            ...rank,
+            ...names.get(entry.id),
+            pictureUrl: profile ? profile.picture : entry.pictureUrl,
+          },
+        ]
+      : []
   })
   const entries =
     getMockDevState().leaderboardScenario === 'empty'

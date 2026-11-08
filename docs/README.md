@@ -1,9 +1,10 @@
 # ROTRA documentation
 
-**Last verified:** 2026-10-27. Agents start at [AGENTS.md](../AGENTS.md), whose routing table says which
+**Last verified:** 2026-11-07. Agents start at [AGENTS.md](../AGENTS.md), whose routing table says which
 file to read for each task. This page is the map for people.
 
-Everything here describes the **v1 target**, agreed October 25–27, 2026. Nothing is built yet.
+Everything here describes the **v1 target**, agreed October 25–27, 2026. The apps run on mock data by
+default, with an opt-in real mode for parts of each app; current build status is in the [MVP hub](mvp/README.md).
 
 ## Engineering
 
@@ -21,6 +22,7 @@ Everything here describes the **v1 target**, agreed October 25–27, 2026. Nothi
 | [Business logic](business_logic/product/README.md) | What each product does: rules per module, plus `flow/` journeys |
 | [Screens](screens/product/README.md) | What each screen shows: layout, controls, states, dialogs, by screen ID |
 | [Database design](database_design/product/README.md) | Proposed tables and fields per module |
+| [MVP](mvp/README.md) | MVP scope, status board, workstreams and the [decision register](mvp/decisions.md) |
 | Open decisions: [business](business_logic/product/open-decisions.md) · [screens](screens/product/open-decisions.md) · [database](database_design/product/open-decisions.md) | What is still undecided. Never fill these in by guessing |
 
 ## Design
@@ -51,6 +53,7 @@ docs/
   database_design/product/  conventions · transactions · access-retention · open-decisions
                             <product>/modules/<module>.md
   mockup-changes/   one log per mockup change (NEW → ALREADY A TICKET — #<n>)
+  mvp/              README (hub, status board) · decisions · workstreams/<workstream>.md
   ../apps/mockup/   canonical prototype HTML + README per app
   branding/
 ```

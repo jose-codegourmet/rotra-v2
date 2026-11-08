@@ -1,6 +1,6 @@
 # Cross-product states and permissions
 
-**Last verified:** 2026-11-06.
+**Last verified:** 2026-11-07.
 
 **Status:** Screen behavior contract. A proposed screen cannot weaken these agreed access/result boundaries.
 
@@ -11,7 +11,7 @@
 | Club sign-in | Allowed | Unavailable (“Signing in needs an internet connection.”) | — |
 | Create new session / save setup edits | Allowed with license | Form can be filled; Save disabled; draft cannot run | Requires online creation, not a reconstructed local event |
 | View active Session settings | Read-only preparation summary with existing live controls | Same summary from the downloaded session; existing offline guards still apply | Reconcile status; completed/invalid/cancelled sessions go to their record, finalizing sessions to finishing |
-| Start session | Allowed with levels set, license, no other active session; after the planned end or on another day, a new end after now is required first | Allowed only with a downloaded copy (same new-end rule) | Sync start as a pending change |
+| Start session | Allowed with levels set, license, no other active session; after the planned end or on another day, a new end after now is required first | Unavailable: start is online only ([D-2026-11-07-03](../../mvp/decisions.md#d-2026-11-07-03)) | — |
 | Add/remove free court, set end time (any time after now; Extend 30/60 min shortcuts) | Allowed | Allowed locally | Sync; public end time changes after sync |
 | Planned end passed (overdue) | Header “Planned end passed N ago” in warning; banner with **Set end time** and **Session done**; dashboard live card says the same; never closes by itself | Same reminder; Session done disabled | Same reminder |
 | Download session to this device | Allowed. Real mode (#399): not connected until #246 and Q11 | Unavailable | Refresh from server while preserving local pending work |

@@ -1,6 +1,6 @@
 # Design decisions before migrations
 
-**Last verified:** 2026-11-07 for player login mapping and claim-link rules (#244); 2026-11-06 for the On court, substitution-credit, court-fill, cancelled-session and times-and-days decisions (column names settled; drafted in `20261106000100`); 2026-11-01 for the F07.34 wiring gaps (#317).
+**Last verified:** 2026-11-07 for player login mapping and claim-link rules (#244) and the MVP offline-start note (D-2026-11-07-03); 2026-11-06 for the On court, substitution-credit, court-fill, cancelled-session and times-and-days decisions (column names settled; drafted in `20261106000100`); 2026-11-01 for the F07.34 wiring gaps (#317).
 
 **Status:** Review register, not a questionnaire or approval request for writing these docs.
 
@@ -22,7 +22,7 @@ and [schema dependencies](schema-dependencies.md) identify their consumers.
 | One PostgreSQL database, logical product ownership | Shared identity and atomic finalization | Physical schemas/worker boundaries |
 | Player UUID independent from auth UUID | Unclaimed profiles and permanent history | Migration and account-provider mapping |
 | Club-local player with optional global link | Guest participation and offline identity | Auditable historical attribution after confirmed identity; confirmation evidence and duplicate/mistaken-link resolution |
-| Session reservation before offline start authorization | Prevent a second distinct offline active session | When reservation is acquired/released; no new requirement that all downloads reserve a slot |
+| Session reservation before offline start authorization | Prevent a second distinct offline active session | When reservation is acquired/released; no new requirement that all downloads reserve a slot (MVP: offline start is out of MVP under [D-2026-11-07-03](../../mvp/decisions.md#d-2026-11-07-03), so this reservation is moot for MVP.) |
 | Enrolled device streams with contiguous sequence and final seals | Detect missing original records before Session done | Device 2 provisioning; conflicting terminal decisions; unknown/unregistered device prevention |
 | Immutable decisions plus conflict quarantine | Preserve touch-move while reconciling | Who selects among conflicting confirmed facts and what selection means |
 | Versioned finalization facts and rank jobs | Retry safely without double contribution | Projection delay UX and exact atomic visibility across products |

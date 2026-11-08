@@ -119,11 +119,13 @@ On failure keep any previous usable snapshot and label its age; a partial transf
 
 ## Q-START — Start review
 
-**Start session** (in the sticky bar) is disabled when any roster player has no level, another session is active (“TITLE is already running. Your club can run one session at a time.”), the device is offline without a download (“This device has no downloaded copy. Connect to start, or download first.”), or the license has ended (“Your license has ended, so new sessions can't start.”).
+**Start session** (in the sticky bar) is disabled when any roster player has no level, another session is active (“TITLE is already running. Your club can run one session at a time.”), the device is offline (start is online only, [D-2026-11-07-03](../../../../mvp/decisions.md#d-2026-11-07-03)), or the license has ended (“Your license has ended, so new sessions can't start.”).
 
 **Late or other-day start (owner decision, November 6, 2026).** When now is after the planned end, or on another calendar day than the planned start, the dialog opens with a warning notice “This session was planned for 6:00–9:00 PM yesterday. Set a new end time to start.” (further away: “planned for Sat, Nov 1, 6:00–9:00 PM”) and a required **New end** picker (today and tomorrow, after now and at most 24 h ahead), pre-filled with now + the planned length rounded up to the next 15 minutes and focused. **Start session** stays disabled until the new end is after now. Success saves the new end; courts that follow the session end move with it. The success toast becomes “Session started · levels locked · ends at 9:30 PM” (or “ends tomorrow 1:00 AM”).
 
 The dialog “Start session?” lists Session, Courts, Formats, Mode, Minimum, and Roster (“N confirmed · M present”), then: “Every player's level locks now. Players you add later get a level when you add them, and it locks too.” Offline adds “Starting on this device while offline. It syncs when you reconnect.” Actions **Back** and **Start session**.
+
+> MVP: offline start removed by [D-2026-11-07-03](../../../../mvp/decisions.md#d-2026-11-07-03); prototype copy update pending a mockup change (the sticky-bar and Q-START no-download reasons and the offline start line above).
 
 Success opens Q-CONSOLE on the Session view with “Session started · levels locked”. No match starts automatically. An empty roster does not block the start.
 

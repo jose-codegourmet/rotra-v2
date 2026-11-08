@@ -1,7 +1,7 @@
 # Architecture — ROTRA v1
 
-**Last verified:** 2026-11-06 · **Status:** target architecture for the v1 rebuild, with mock
-implementations in progress. Section 1 distinguishes implemented flows from future work.
+**Last verified:** 2026-11-07 · **Status:** target architecture for the v1 rebuild. Mock mode is the
+default; an opt-in real mode is partly connected (§5, §8, §10). Current status: [MVP hub](mvp/README.md).
 
 **Read this when** you add an app, package, route, provider, data hook, or dependency, or need to know
 where something belongs. For *how to write* the code, read [coding-conventions.md](coding-conventions.md).
@@ -23,8 +23,8 @@ where something belongs. For *how to write* the code, read [coding-conventions.m
 | `Makefile`, root `package.json` scripts | Run the three apps through Turborepo (F01.1) |
 | `.husky/`, `.github/` | Commitlint hook (pre-commit lint disabled) and advisory CI; see ways-of-working §5 |
 
-All three apps mount QueryClient providers. Implemented flows use in-memory mocks; real auth,
-persistence and backend integration remain future work. Player implementation and remaining account/claim
+All three apps mount QueryClient providers. Flows use in-memory mocks by default; real mode connects
+Route Handlers and `packages/db` services for parts of each app (see the [MVP hub](mvp/README.md)). Player implementation and remaining account/claim
 scope are recorded in `openspec/specs/player-information/spec.md`; no complete numerical ranking
 engine is implemented.
 
@@ -32,9 +32,9 @@ engine is implemented.
 
 ## 2. The shape of the system
 
-Three Next.js 16 apps share a component library and a mock data layer. Real persistence (Supabase +
-Prisma) is intended to preserve the existing screen and hook contracts while replacing mock fetchers
-and adding the server and offline infrastructure described in §5.
+Three Next.js 16 apps share a component library and a data layer that runs on mocks by default.
+Opt-in real mode (Supabase + Prisma) keeps the screen and hook contracts and swaps mock fetchers for
+Route Handlers; the offline infrastructure in §5 and §9 is not built yet.
 
 ```text
 rotra/
@@ -48,7 +48,7 @@ rotra/
 │   ├── data/         @rotra/data     Domain types, fixtures, mock store, fetchers, query keys, hooks
 │   ├── schema/       @rotra/schema   Shared Zod field schemas (email, phone, date, money, …)
 │   ├── config/       @rotra/config   tsconfig bases + Tailwind 4 theme tokens (CSS)
-│   └── db/           @rotra/db       Prisma schema + services (database epic, later)
+│   └── db/           @rotra/db       Prisma schema + server services (real mode)
 ├── docs/                             Product, screen, database, and engineering docs
 └── email-templates/                  Supabase auth email HTML (copy-paste artifacts)
 ```
@@ -164,7 +164,7 @@ Individual presence uses a transient QueryClient/session-scoped DebouncedBatch o
 - **Dev toggles** (offline, license expired, next save fails, conflict) mirror each prototype's
   "Prototype" menu. They are developer tools, never product features, and are excluded from production builds.
 
-### Real phase (later)
+### Real mode (opt-in, partial)
 
 The frontend compatibility goal is to keep visual components and hook contracts stable as
 `fetchers.ts` calls the app's Route Handlers:
@@ -217,7 +217,7 @@ Redux never holds server data and has no async thunks.
 
 ---
 
-## 8. Auth (target, not built)
+## 8. Auth (real for Queue, Admin and Player)
 
 | App | Who signs in | How |
 |---|---|---|
@@ -226,8 +226,10 @@ Redux never holds server data and has no async thunks.
 | Admin | Platform owner | Admin sign-in |
 | Public pages | Nobody | No auth |
 
-In the mock phase, sign-in is mocked like the prototypes (anything signs in) and `proxy.ts` only checks a
-mock session. Real auth (Supabase Auth) is its own epic. **No Facebook or any social login.**
+In mock mode, sign-in is mocked like the prototypes (anything signs in) and `proxy.ts` only checks a
+mock session. In real mode, Queue (club), Admin and Player sign-in use Supabase Auth (below); Player
+registration (`/api/claim/[token]`) and email password reset (`/api/auth/{password-reset,reset-password}`)
+are real too (#483). **No Facebook or any social login.**
 
 **Server boundary (F07.20).** `ROTRA_DATA_MODE` (server-only, default `mock`) picks the path; there is
 no fallback from real to mock. `NEXT_PUBLIC_ROTRA_DATA_MODE` (F07.34) is its client mirror: set both
@@ -237,7 +239,7 @@ to `real` in each app's own `.env.local` (Next reads env files from the app fold
 |---|---|
 | `proxy.ts` | `@rotra/db/auth/proxy-session` verifies the Supabase JWT (`getClaims`), refreshes session cookies, deletes `rotra-mock-*` cookies, and redirects. Navigation only; it never loads Prisma |
 | Route Handler | `handleAccountRequest(audience, routeCookieAdapter(await cookies()), run)` from `@rotra/db/service/handler`: verifies the session again, maps the subject to the app's account type from current server state (provisioned/not disabled club account, not disabled player account, active admin), then `run` checks scope with `@rotra/db/service/authorize` (`requireOwnClub`, `requireOwnPlayer`, `requireAdmin`, `requireClubEntitlement`, `requireRevision`) |
-| Sign-in | `@rotra/db/auth/sign-in` (`handleSignIn`, `handleSessionRead`, `handleSignOut`) behind `/api/auth/{sign-in,session,sign-out}` in Queue and Admin. Bodies are the shapes the existing hooks read (`MockSession`, `AdminSession`) |
+| Sign-in | `@rotra/db/auth/sign-in` (`handleSignIn`, `handleSessionRead`, `handleSignOut`) behind `/api/auth/{sign-in,session,sign-out}` in Queue and Admin (and Player since #483). Bodies are the shapes the existing hooks read (`MockSession`, `AdminSession`) |
 | Session cookie | One per app: `sb-rotra-{club,player,admin}-auth` (`authCookieName(audience)` in `@rotra/db/auth/supabase`), never Supabase's default shared name. Cookies ignore the port and are shared across a parent domain, so a shared name would make the apps one session: a club sign-in on `localhost:9000` would replace the Admin sign-in on `localhost:9002`. Every Supabase client, the proxy included, passes the app's audience |
 | `@rotra/data` fetchers | Journey fetchers branch on `isRealDataMode()` (`@rotra/data/real/mode`) to `real/*` clients that call the app's own `/api/*` and map DTOs back to the hook types; errors become the same `MockError` kinds. Every other fetcher, and any mock store read or write, fails with "This part of ROTRA isn't connected to saved data yet." in real mode |
 | Public reads | `handlePublicRead(id, run)`; only IDs in `PUBLIC_READS` are anonymous, each with an allowlisted projection |
@@ -406,7 +408,7 @@ The Queue app must keep running a downloaded session without internet. Rules:
 
 ---
 
-## 10. Database (later epic)
+## 10. Database
 
 - Supabase Postgres; Prisma in `@rotra/db`.
 - The **Prisma schema is split into files** by product and entity group. Never one `schema.prisma`:

@@ -1,6 +1,6 @@
 # Offline operation and recovery
 
-**Status:** Confirmed v1 target rules. This is a core requirement, not an optional later enhancement. Updated October 26, 2026 to match the [ROTRA Queue prototype](../../../../../../apps/mockup/queue-app/rotra-queue.html).
+**Status:** Confirmed v1 target rules. This is a core requirement, not an optional later enhancement. Updated October 26, 2026 to match the [ROTRA Queue prototype](../../../../../../apps/mockup/queue-app/rotra-queue.html); online boundaries updated November 7, 2026 for MVP by [D-2026-11-07-03](../../../../../mvp/decisions.md#d-2026-11-07-03).
 
 ## Online boundaries
 
@@ -9,11 +9,11 @@
 | Club sign-in | Online |
 | Create or edit a session's setup | Online; the form can be filled offline but not saved |
 | Download session for offline operation | Online |
-| Start a session | Online, or offline on a device holding a downloaded copy |
+| Start a session | Online only |
 | Generate/edit waiting matches, start/finish/invalidate games, substitute players, presence, extend time, add/remove free courts | Works on a downloaded session while offline |
-| Add an unexpected player | Works offline as a new player; Player Information search and linking wait for reconnection |
+| Add a player during an active session | Works offline for downloaded club players and newly entered guests; global ROTRA player search is online only |
 | Sync saved work | Automatic when internet returns |
-| Session done and final result slides | Online only, after reconciliation |
+| Session done and final result slides | Online only: needs reconnection, complete sync, and Queue Master review of every unresolved guest ([D-2026-11-07-03](../../../../../mvp/decisions.md#d-2026-11-07-03)) |
 | Publish results | Online only |
 | Tick players paid / not paid | Works offline; syncs like other changes |
 | Club settings (view or change club details, name-change request, password, license) | Online only; offline the page is unavailable |
@@ -40,7 +40,7 @@ The top bar always shows sync status:
 | Offline · N waiting to sync | Offline with N changes saved on this device |
 | Working offline | Offline with nothing waiting |
 
-Every change made offline is confirmed as "Saved on this device, waiting to sync". When the connection returns, ROTRA syncs automatically and reports how many changes synced. The console shows an offline notice, and Session done stays disabled until the device is online and every change has synced.
+Every change made offline is confirmed as "Saved on this device, waiting to sync". When the connection returns, ROTRA syncs automatically and reports how many changes synced. The console shows an offline notice, and Session done stays disabled until the device is online, every change has synced, and the Queue Master has reviewed every unresolved guest (confirm a match or create a new unclaimed player; never auto-linked by name; see [D-2026-11-07-03](../../../../../mvp/decisions.md#d-2026-11-07-03)).
 
 The primary operating device keeps the session moving offline. Public pages see the last synced information. Profile lookup, permanent RTR identity allocation, and cross-product updates cannot pretend to complete without connectivity.
 

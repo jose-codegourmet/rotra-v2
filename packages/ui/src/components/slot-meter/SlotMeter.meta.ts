@@ -6,12 +6,18 @@ export const slotMeterMeta = {
     'The slots meter on the roster: "N/M slots · N left before the waitlist" (accent), amber when 2 or fewer are left, "Full · new players go on the waitlist", "N over budget …", plus the waitlist count.',
   usage: [
     'Use in preparation and live Players; pass live for advisory counts and direct admission copy. The bar is a role=meter.',
+    'Pass skillCounts for the one-box summary: one bar spanning the slot budget, colored player segments by skill group (SkillMixSegment, hover or focus shows "Beginner: 4 players") then a grey open-slots remainder ("10 open slots", never pressable). Over budget there is no remainder and the segments fill the bar.',
+    'Pass onLevelPress to make each player segment a button; it reports the level (beginner, intermediate, advanced, unrated). activeLevel keeps that segment full and dims the other player segments (the open-slots segment stays as is). Pressing the active segment reports the same level again: the parent decides to clear it (show All).',
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',
-    screen: 'Q-PREPARE › slotMeter() (.slot-meter)',
+    screen:
+      'Q-PREPARE › slotMeter() (.slot-meter); Roster and levels › rosterSummary() (.roster-sum)',
   },
-  docs: ['docs/screens/product/modules/queue/players-roster.md'],
-  variants: ['ok', 'near', 'full', 'over', 'active'],
+  docs: [
+    'docs/screens/product/modules/queue/players-roster.md',
+    'docs/screens/product/modules/queue/session-setup.md',
+  ],
+  variants: ['ok', 'near', 'full', 'over', 'active', 'skill-mix', 'level-active'],
   related: ['RosterPanel', 'WaitlistPanel'],
 } satisfies ComponentMeta

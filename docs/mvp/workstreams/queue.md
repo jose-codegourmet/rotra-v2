@@ -1,6 +1,6 @@
 # Workstream — Queue core
 
-**Last verified:** 2026-11-07 (code audit of `main` @ `51abb94f`; traced, not run) · [MVP hub](../README.md)
+**Last verified:** 2026-11-08 (code trace of `main` @ `aca899f2`; traced, not run) · [MVP hub](../README.md)
 
 Path traced: UI route in `apps/queue/src/app/(operator|auth|public)` → `packages/data/src/<domain>`
 fetcher (real branch) → `packages/data/src/real/*.ts` → `apps/queue/src/app/api/**/route.ts` →
@@ -31,8 +31,9 @@ session page; the November 6 prototype changes (epic #408).
 | Club sign-in / session / sign-out | implemented | `(auth)/login/page.tsx` → `real/queue.ts:30-39` → `api/auth/{sign-in,session,sign-out}` → `db/src/auth/sign-in.ts` | #8 closed; #381, #382 open |
 | Club password change | not implemented | `data/src/club/settings.ts:97` mock only | Ticket: needed |
 | Club details: logo, venues, license read | implemented | `real/queue.ts:89-171` → `api/{club,venues,license}` → `db/src/admin/{club-logo,clubs,licenses}.ts` | #8 closed |
-| Club name-change request, session defaults, Facebook post template | not implemented | `data/src/club/settings.ts:38-95`; `club/fetchers.ts:400` mock only | Ticket: needed |
-| Copy Facebook post | not implemented | `data/src/club/settings.ts:141,145` mock only | Ticket: needed |
+| Club name-change request, session defaults | not implemented | `data/src/club/settings.ts` `requestClubNameChange`, `updateSessionDefaults` mock only; `club/fetchers.ts:400` mock only | Ticket: needed |
+| Facebook post template (save, reset to default) | implemented | `club/settings.ts` `saveFacebookPost`/`resetFacebookPostTemplate` → `real/queue.ts:135` → `api/club` PATCH | #473 |
+| Copy Facebook post | implemented | `club/settings.ts:135,144` → `real/facebook-post.ts` (saved template + current roster, read fresh from the Route Handlers) | #473 |
 | Session list / home / calendar | implemented | `queue-session/fetchers.ts:45` → `real/queue.ts:330` → `api/sessions` GET | #8, #9 closed |
 | Session create / edit setup | implemented | `queue-session/mutations.ts:109,183` → `api/sessions` POST, `api/sessions/[sessionId]` PATCH | #9, #432 closed |
 | Start session (incl. late start) | implemented | `real/session-live.ts:29` → `api/.../start` | #429, #436 closed |
@@ -41,9 +42,13 @@ session page; the November 6 prototype changes (epic #408).
 | Courts: add/edit/remove, open early, undo | implemented | `real/session-live.ts:126-202` → `api/.../courts/**` | #424, #436 closed |
 | Roster: add, remove, level, presence | implemented | `real/queue.ts:416-567`, `real/session-live.ts:232-269` → `api/.../roster/**`, `.../presence` | #10 open (no open sub-issues); #421, #426 closed |
 | Saved players (no session) | implemented | `club-player/mutations.ts:93,120` → `api/club/players` POST | #330 |
+| Edit details (guests, unclaimed profiles) | implemented | `api/club/players/[clubPlayerId]` GET/PATCH → `db/src/queue/club-player-details.ts:68,98`; Level for this club is not saved here yet | #484, #486 |
+| Delete a saved player (D-DELETE-PLAYER) | implemented | `club-player/delete.ts:13,36` → `real/queue.ts:564,570` → `api/club/players/[clubPlayerId]/delete-impact`, DELETE → `db/src/queue/club-player-delete.ts:57,76` (soft delete, `club_players.removed_at` migration) | #487 |
+| Invite / registration link | implemented | `club-player/fetchers.ts:165` → `real/queue.ts:550` → `api/club/players/[clubPlayerId]/registration-link` → `db/src/player/claim.ts:44`; unclaimed: 7-day single-use link, a new one cancels the previous one; guests: Player login link ([D-07](../decisions.md#d-2026-11-07-07)) | #478, #483, #485 |
 | Waitlist: give slot, fill, remove | implemented | `real/session-live.ts:277-293` → `api/.../waitlist/**` | #10 open |
 | Join requests (submit, confirm, decline) | implemented | `real/public-session.ts:19-49`; `real/session-live.ts:309,326` → `api/join-requests/[id]/{confirm,decline}` | #16 closed; #248 open |
-| Cost estimate, payments, mark all paid | implemented | `real/financials.ts:31-119` → `db/src/queue/financials.ts:230-479` | #17 closed; #245 open |
+| Cost estimate, payments, mark all paid | implemented | `real/financials.ts` → `db/src/queue/financials.ts` | #17 closed; #245 open |
+| Payment amounts (Paid, Partial, Reimburse, Unpaid) | implemented | `session-payment/fetchers.ts:116` → `api/sessions/[sessionId]/payments/amount`; [D-05](../decisions.md#d-2026-11-07-05) | #479 |
 | Inventory | implemented | `real/queue.ts:210-250` → `api/inventory/**` | #17 closed |
 | Match queue: add, make, reorder, edit, swap, remove, regenerate | implemented | `real/match.ts:164-318` → `api/.../matches/**` → `db/src/queue/match-queue.ts` | #12 open (no open sub-issues) |
 | Generate matches drafts | partially connected | `real/autoQueue.ts:16-25`: drafts in module memory (lost on reload); only "Add to Main Queue" writes | #247 open |
@@ -55,7 +60,7 @@ session page; the November 6 prototype changes (epic #408).
 | Finalization, status, invalid session | implemented | `real/finalization.ts:99,109`, `real/match.ts:632` → `finalization.ts:306,420,474` | #14 closed; #243 open |
 | Results view, publish/unpublish | implemented | `real/match.ts:572-603` → `db/src/queue/results.ts:103,152` | #15 closed |
 | Download result images | partially connected | Client-side frames only; `requestResultExport`/`markExportRendered` (`results.ts:248,305`) have no route | none found |
-| Public session page `/s/[slug]` | implemented | `(public)/s/[slug]/page.tsx` → `real/public-session.ts` | #16 closed |
+| Public session page `/s/[slug]` | implemented | `(public)/s/[slug]/page.tsx` → `real/public-session.ts`; masked names and aggregate skill mix ([D-06](../decisions.md#d-2026-11-07-06)); preview operator-only (#469); Request to join offers guest form or ROTRA Player login ([D-07](../decisions.md#d-2026-11-07-07)) | #16 closed; #469, #474, #475, #476 |
 
 Notes: the session done review has no guest step (see [queue-offline.md](queue-offline.md)); the rank
 job records evidence only until #247; payment rules are still an open decision (#245).
@@ -81,11 +86,27 @@ Epic #408 is **open**; all 30 sub-issues are **closed**, each with code on `main
 | Full-instant times; set end; late start; overdue reminder | implemented | `e2a78efc`, `beca60c9`, `755d57f7`, `63a3e37c` (#459) | #424, #425, #429, #436 |
 | Auto queue court filling | implemented | `ea7c370e` | #433 |
 | Session done drops On court; offline/permission states | implemented | `3dfc3628` (#462) | #438 |
+| Time fields: hour, minute and AM/PM dropdowns (2026-11-08) | implemented | `aca899f2` (#489) | — |
+
+### Obvious Queue bugs (#466, 2026-11-07)
+
+From the former MVP roadmap item 5 (main @ `66617c60`). **Implemented:** debounced inventory stock,
+prompt confirm/remove player, Facebook post from the saved template (real mode), preparation tabs in
+the URL, invite link + session QR, skill mix bar (roster and public, aggregate only), masked public
+names, operator-only preview, guest/ROTRA Player choice on Request to join, guest Invite to ROTRA,
+payment amounts with Partial/Reimburse (PRs #467–#481). **Still open:** Downloads / This device
+([#477](https://github.com/jose-codegourmet/rotra-v2/issues/477), blocked on #246); attaching a
+signed-in player to a join request and player sign-up (invite links point to player login until then);
+whether published results and profile pictures on the public page should also be masked.
+Decisions: [D-05](../decisions.md#d-2026-11-07-05), [D-06](../decisions.md#d-2026-11-07-06),
+[D-07](../decisions.md#d-2026-11-07-07).
 
 ## Remaining work
 
-- [ ] Club settings in real mode: name-change request, session defaults, Facebook post template, password change. Ticket: needed (MVP scope: open question 3).
-- [ ] Copy Facebook post in real mode. Ticket: needed.
+- [ ] Club settings in real mode: name-change request, session defaults, password change. Ticket: needed (MVP scope: open question 3).
+- [ ] Downloads / This device page. #477 (blocked on #246).
+- [ ] Attach a signed-in player to a join request; player sign-up (D-07). Ticket: needed.
+- [ ] Decide whether published results and profile pictures on the public page are masked too (D-06 "not covered yet"). Owner decision.
 - [ ] Generate matches drafts survive reload (or accept device memory) and final weights. #247 (decision); implementation Ticket: needed.
 - [ ] Server result-image export: wire or drop `requestResultExport`. Ticket: needed (or owner rules it out).
 - [ ] Close or re-scope epics #408, #10, #11, #12 (all sub-issues closed). Ticket: none (housekeeping; owner to confirm).
@@ -94,6 +115,9 @@ Epic #408 is **open**; all 30 sub-issues are **closed**, each with code on `main
 
 - [D-2026-11-07-03](../decisions.md#d-2026-11-07-03) — setup and start online only (matches current real mode).
 - [D-2026-11-07-04](../decisions.md#d-2026-11-07-04) — scope freeze.
+- [D-2026-11-07-05](../decisions.md#d-2026-11-07-05) — payment amounts.
+- [D-2026-11-07-06](../decisions.md#d-2026-11-07-06) — masked public names.
+- [D-2026-11-07-07](../decisions.md#d-2026-11-07-07) — invite links use player login.
 
 ## Blocking open decisions
 

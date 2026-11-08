@@ -1,6 +1,6 @@
 # Workstream — Admin
 
-**Last verified:** 2026-11-07 (code audit of `main` @ `51abb94f`; traced, not run) · [MVP hub](../README.md)
+**Last verified:** 2026-11-08 (code trace of `main` @ `aca899f2`; no Admin code changed since `51abb94f`; traced, not run) · [MVP hub](../README.md)
 
 Paths: `real/` = `packages/data/src/real/`, `api/` = `apps/admin/src/app/api/`, `db/` = `packages/db/`.
 
@@ -40,7 +40,8 @@ link ([D-2026-11-07-01](../decisions.md#d-2026-11-07-01)).
 | Contact-change approve | not implemented (service exists) | `contact-change-request/fetchers.ts:384` throws `NotConnectedError`; `reviewContactChange` (`contact-change.ts:352`) has no route | #244 open; Ticket: needed |
 | Provider apply / retry | not implemented (service exists) | `fetchers.ts:430`; `applyContactChange` (`contact-change.ts:432`) has no route | #244 open; Ticket: needed |
 | Status check | not implemented (service exists) | `fetchers.ts:457`; `reconcileContactChange`/`detectContactDrift` (`:500,:581`) have no route | Ticket: needed |
-| Manual player reset link (D-01) | not implemented | No UI in `apps/admin/src/app/(admin)/players/**`, no route, service or model | Ticket: needed |
+| Manual player reset link (D-01) | not implemented | No UI in `apps/admin/src/app/(admin)/players/**`, no route, service or model | Ticket: needed; whether D-01 still stands after the #483 email reset: hub open question 8 |
+| Registration link from a player's Admin profile | not implemented | `admin-player/mutations.ts:229` `issueRegistrationLink` mock only (Queue issuance is real since #483, see [player.md](player.md)) | none found; MVP scope: hub open question 9 |
 | Club accent persistence | not implemented / deferred candidate | `real/admin.ts:88-89` hardcodes `accent: false`; no `accent` in `prisma/schema` | #395 open (blocked) |
 
 ## Admin implementation gap index
@@ -51,7 +52,7 @@ a claim that each gap has a dedicated implementation ticket.
 | Gap | Decision / implementation state | Ticket coverage | MVP relevance |
 | --- | --- | --- | --- |
 | Contact-change approve, retry, status | Partially connected; decline and reads exist. Audit: services exist, no routes | [#244](https://github.com/jose-codegourmet/rotra-v2/issues/244) and [Admin requests epic #25](https://github.com/jose-codegourmet/rotra-v2/issues/25); audit found **no dedicated implementation ticket** | MVP |
-| Manual player reset link from Admin | Approved; not started (audit confirms: no UI, route, service or model) | **Ticket needed**; see [D-2026-11-07-01](../decisions.md#d-2026-11-07-01) | MVP |
+| Manual player reset link from Admin | Approved; not started (audit confirms: no UI, route, service or model). `main` ships player email reset (#483); owner to confirm whether D-01 is superseded | **Ticket needed** unless superseded; see [D-2026-11-07-01](../decisions.md#d-2026-11-07-01) | MVP (pending open question 8) |
 | Ranking calculations from saved settings | Settings persist; calculations incomplete (audit: no approved algorithm, recalculation has no caller) | [#247](https://github.com/jose-codegourmet/rotra-v2/issues/247) and [Admin configuration epic #26](https://github.com/jose-codegourmet/rotra-v2/issues/26) | MVP scope under ranking decision |
 | Club accent persistence | Open product/data-model decision; not completed | [#395](https://github.com/jose-codegourmet/rotra-v2/issues/395) | Lower priority / defer candidate |
 

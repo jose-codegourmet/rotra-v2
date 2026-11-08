@@ -1,6 +1,6 @@
 # MVP decisions and tracking
 
-**Last verified:** 2026-11-07 (code audit of `main` @ `51abb94f`). This is the short decision register
+**Last verified:** 2026-11-08 (code trace of `main` @ `aca899f2`). This is the short decision register
 for MVP discussions. The [MVP hub](README.md) summarizes delivery; GitHub issues track implementation.
 Product rules and existing open-decision documents remain authoritative for their domains.
 
@@ -60,7 +60,8 @@ Then add a row to the [index](#index) and link the entry from the workstream pag
 - **Not in MVP:** automated recovery emails, player-submitted reset requests, a recovery notification inbox, and club-owner access to reset player passwords.
 - **Security requirements:** Do not reveal or set the player's password; verify ownership before issuing a link; invalidate used or expired links; log link issuance without storing the token in plaintext.
 - **References:** [Player workstream](workstreams/player.md), [Admin workstream](workstreams/admin.md), `apps/player/src/app/(auth)/forgot-password`, `apps/admin/src/app/(admin)/players`.
-- **Notes (audit 2026-11-07):** "not started" confirmed: no reset UI in `apps/admin/src/app/(admin)/players/**`, no route, service or model. P-FORGOT still renders an email form (`requestPasswordReset`, mock only) and P-RESET has no route. Business docs now state manual MVP recovery (`claim-and-recover.md`, business `open-decisions.md` #244 row and L2). P-FORGOT in `access-registration.md` still describes email recovery with an MVP note, pending a mockup change; see [hub §7](README.md#7-docs-that-are-now-untrue).
+- **Notes (audit 2026-11-07):** "not started" confirmed: no reset UI in `apps/admin/src/app/(admin)/players/**`, no route, service or model. P-FORGOT still renders an email form (`requestPasswordReset`, mock only) and P-RESET has no route. Docs describe email recovery (#244 L2, `claim-and-recover.md`, `access-registration.md` P-FORGOT).
+- **Notes (2026-11-08):** `main` ships Supabase email password reset in #483 (`apps/player/src/app/api/auth/{password-reset,reset-password}` → `packages/db/src/player/account-access.ts`), and the docs on `main` describe it. The Admin reset link is still not built. Owner to confirm whether D-01 is superseded ([hub open question 8](README.md#6-open-questions-for-the-owner)).
 
 <a id="d-2026-11-07-02"></a>
 ### D-2026-11-07-02 — Decision and roadmap status tracking

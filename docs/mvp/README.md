@@ -1,6 +1,6 @@
 # ROTRA MVP
 
-**Last verified:** 2026-11-07 (code audit of `main` @ `51abb94f`) · **Audience:** contributors and AI agents.
+**Last verified:** 2026-11-08 (code trace of `main` @ `aca899f2`) · **Audience:** contributors and AI agents.
 
 **Purpose:** quick orientation on MVP scope, status and decisions. GitHub issues are the implementation
 tracker; this folder summarizes scope and status, it does not replace tickets. Product rules stay in
@@ -54,9 +54,9 @@ built, run or exercised against a database. Whether production sets real mode is
 
 | Workstream | Overall status | Biggest gap | Tickets | Blocking decisions | Page |
 |---|---|---|---|---|---|
-| Queue core | partially connected (almost all implemented) | Club settings and Copy Facebook post are mock-only in real mode | #408, #10, #12, #247 | #247, #381 | [queue.md](workstreams/queue.md) |
+| Queue core | partially connected (almost all implemented) | Club name change, session defaults and club password change are mock-only in real mode; Downloads page #477 blocked on #246 | #408, #466, #477, #10, #12, #247 | #247, #381 | [queue.md](workstreams/queue.md) |
 | Queue offline | not implemented | No durable device copy, outbox or replay; no guest review at Session done | #246, #18 | #246, [D-03](decisions.md#d-2026-11-07-03) reconciliation | [queue-offline.md](workstreams/queue-offline.md) |
-| Player access & Player Information | partially connected | No player sign-in, sign-out, claim or recovery routes | #244, #400 | #244, [D-01](decisions.md#d-2026-11-07-01), #247 | [player.md](workstreams/player.md) |
+| Player access & Player Information | partially connected | Sign-in, session, sign-out, registration and email reset are real (#483); D-01 manual recovery vs shipped email reset undecided; Admin registration link mock-only; rank empty until #247 | #244, #400, #483, #488 | [D-01](decisions.md#d-2026-11-07-01) vs #483, #247 | [player.md](workstreams/player.md) |
 | Admin | partially connected | Contact-change approve/apply/status, reset link (D-01), player writes | #24, #25, #26, #244, #395 | #244, #395, #377 | [admin.md](workstreams/admin.md) |
 | Ranking | partially connected (settings only) | No approved rank formula; leaderboard always empty in real mode | #247 | #247 | [ranking.md](workstreams/ranking.md) |
 | Backend decisions / infrastructure | partially connected | Production data mode unknown; scheduled jobs have no runner; offline sync routes unwired | #241, #243–#248, #387 | [database open decisions](../database_design/product/open-decisions.md) | [backend.md](workstreams/backend.md) |
@@ -83,7 +83,7 @@ Only what the owner stated ([D-2026-11-07-04](decisions.md#d-2026-11-07-04)):
 - [ ] Player Information exposes identities and history.
 - [ ] Admin manages clubs and access.
 - [ ] Offline operation works within [D-03](decisions.md#d-2026-11-07-03): setup and start online; offline add of downloaded club players and guests, matches and scores; Session done only after reconnection, complete sync and Queue Master review of every unresolved guest.
-- [ ] Manual player password recovery per [D-01](decisions.md#d-2026-11-07-01) works, meeting its security requirements.
+- [ ] Player password recovery works per the owner's ruling on [D-01](decisions.md#d-2026-11-07-01) vs the email reset shipped in #483 (open question 8), meeting D-01's security requirements if it stands.
 - [ ] The ranking work inside the frozen scope ([D-04](decisions.md#d-2026-11-07-04)) is complete.
 - [ ] Every approved MVP decision has an implementation ticket (no `Ticket: needed` left) and is `implemented`.
 - [ ] M1: the ticket backlog is complete.
@@ -98,32 +98,31 @@ Merged from both audits, deduped.
 |---|---|---|
 | 1 | Is production deployed with real data mode on? (Not in the repo.) | Backend, all |
 | 2 | Should Generate matches drafts persist across reload/devices, or is device memory acceptable for MVP? | Queue core |
-| 3 | Are club name-change, session defaults, Facebook post template and club password change MVP? (Mock-only in real mode.) | Queue core |
+| 3 | Are club name-change, session defaults and club password change MVP? (Mock-only in real mode; the Facebook post template is real since #473.) | Queue core |
 | 4 | Server-rendered result-image export: needed, or is the client-side download enough? | Queue core |
 | 5 | A new player entered with a phone: keep "lookup pending" profile matching on sync, or route it through D-03 Queue Master guest review? | Queue offline |
 | 6 | Who owns the offline implementation ticket(s): a new epic, or reopen Q11 #18? #246 excludes IndexedDB/outbox | Queue offline |
 | 7 | Close epics #408, #10, #11, #12 now that every sub-issue is closed? | Queue core (housekeeping) |
-| 8 | Does D-01 supersede #244 "recovery by email only"? Should docs drop email recovery, and does P-FORGOT need a mockup change log? | Player, Admin |
-| 9 | Who issues claim links in MVP: Queue Master only (#244 L5), Admin too (mock has an Admin registration link), or both? | Player, Admin |
+| 8 | `main` ships Supabase email password reset (#483) while [D-01](decisions.md#d-2026-11-07-01) (manual, Admin-issued reset link; no automated email) is approved. Is D-01 superseded? If not, P-FORGOT needs a mockup change and the email reset must be withdrawn | Player, Admin |
+| 9 | Queue Master issuance is real (#483). Is the Admin registration link (mock only) also MVP? | Player, Admin |
 | 10 | Are Admin player writes (create/edit/archive/remove), club price change and club-name review MVP? | Admin |
 | 11 | Do session awards ship with the `prototype-reference` formula, or wait for #247? | Ranking |
 | 12 | With no approved rank formula, should the leaderboard ship empty (current behaviour) or be hidden for MVP? | Ranking, Player |
 | 13 | Are license-lapse refresh and retention sweep jobs MVP, and which scheduler runs them? | Admin, Backend |
-| 14 | D-01 reset link: provider-generated recovery link, or a ROTRA table? Affects migration sign-off | Admin, Player, Backend |
+| 14 | If D-01 stands (question 8): provider-generated recovery link, or a ROTRA table? Affects migration sign-off | Admin, Player, Backend |
 
 ---
 
 ## 7. Docs that are now untrue
 
-Remaining follow-ups from the audit (fixed rows removed 2026-11-07). **Not fixed in this folder**; each needs its own change.
+Remaining follow-ups from the audit (fixed rows removed 2026-11-07 and 2026-11-08). **Not fixed in this folder**; each needs its own change.
 
 | File:line | Says | Reality / conflict |
 |---|---|---|
-| `AGENTS.md:171` | Testing switches back on when Supabase/Prisma is connected | Connected in real mode; trigger is ambiguous |
-| `docs/architecture.md:297` | Console offline notice says changes save on this device | Untrue in real mode (doc already flags it) |
-| `docs/screens/product/dialogs.md` (Start session), `docs/screens/product/modules/queue/session-setup.md` (Q-PREPARE, Q-START), `docs/screens/product/modules/player-information/access-registration.md` (P-FORGOT) | Offline-start and email-recovery UI copy, now marked with an MVP note | Matches the prototypes; needs a mockup change for D-03 / D-01 (rule 15) |
-| `docs/screens/product/modules/queue/players-roster.md:85`; `docs/business_logic/product/queue/modules/players/flow/add-player.md:6` | Phone makes identity matching eligible on sync; "Lookup pending" | Possible conflict with D-03 "never auto-link" (open question 5) |
-| `packages/db/src/player/claim.ts:11` (code) | `CLAIM_LINK_DAYS = 14` | Decided 7 days (#244 L5) |
+| `AGENTS.md:174` | Testing switches back on when Supabase/Prisma is connected | Connected in real mode; trigger is ambiguous |
+| `docs/architecture.md:299` | Console offline notice says changes save on this device | Untrue in real mode (doc already flags it) |
+| `docs/screens/product/dialogs.md` (Start session), `docs/screens/product/modules/queue/session-setup.md` (Q-PREPARE, Q-START) | Offline-start UI copy, now marked with an MVP note | Matches the prototypes; needs a mockup change for D-03 (rule 15) |
+| `docs/screens/product/modules/queue/players-roster.md:71`, `:89`; `docs/business_logic/product/queue/modules/players/flow/add-player.md:6` | Phone makes identity matching eligible on sync; "Lookup pending" | Possible conflict with D-03 "never auto-link" (open question 5) |
 | `packages/data/src/real/admin-audit.ts:12` (code comment) | Flags and ranking settings "wait on #402" | #402 is closed |
 | `docs/mockup-changes/2026-11-01-queue-auto-queue-copy.md`, `…-queue-presence-batches.md`, `…-queue-live-session-settings.md`, `2026-10-31-queue-routed-prototypes.md` | `Status: NEW` | Work looks shipped (unverified) |
 

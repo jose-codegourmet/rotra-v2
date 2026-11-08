@@ -22,6 +22,7 @@ import { type PodiumEntry, TopThreePodium } from '@rotra/ui/top-three-podium'
 import { type InfiniteData, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { pictureSrc } from '@/app/_components/profile-picture/pictureSrc'
 import { useAppSelector } from '@/store/hooks'
 import { selectAccount } from '@/store/slices/authSlice'
 import { selectDev } from '@/store/slices/devSlice'
@@ -150,7 +151,7 @@ export function LeaderboardPage() {
     fullName: entry.fullName,
     nickname: entry.nickname,
     levelLabel: levelLabel(entry.playingLevel),
-    picture: { src: entry.pictureUrl ?? undefined },
+    picture: { src: pictureSrc(entry.pictureUrl, entry.id, entry.fullName) },
     isMe: entry.id === account?.id,
   }))
   return (
@@ -174,7 +175,11 @@ export function LeaderboardPage() {
       {account && own.data && requirement !== undefined ? (
         <MyPositionCard
           fullName={own.data.fullName}
-          picture={{ src: ownProfile.data?.picture ?? undefined }}
+          picture={{
+            src: ownProfile.data
+              ? pictureSrc(ownProfile.data.picture, account.id, ownProfile.data.fullName)
+              : undefined,
+          }}
           levelLabel={
             own.data.levelIndex === null
               ? undefined
@@ -247,7 +252,7 @@ export function LeaderboardPage() {
                   position={entry.position}
                   fullName={entry.fullName}
                   nickname={entry.nickname}
-                  picture={{ src: entry.pictureUrl ?? undefined }}
+                  picture={{ src: pictureSrc(entry.pictureUrl, entry.id, entry.fullName) }}
                   levelLabel={levelLabel(entry.playingLevel)}
                   isMe={entry.id === account?.id}
                   variant={entry.position <= 3 ? `medal-${entry.position as 1 | 2 | 3}` : undefined}

@@ -5,10 +5,11 @@ export const profilePictureSheetMeta = {
   description: 'Choose a photo, initials or one of eight characters for a player profile.',
   usage: [
     'The container owns picture updates and toasts; choices apply independently of Edit profile Save.',
-    'Use profileCharacterUrl to display a selected character elsewhere.',
+    'Use profileCharacterUrl from @rotra/ui/profile-picture to display a selected character elsewhere.',
+    'While a choice is saving, isPending disables further choices.',
   ],
   prototype: { file: 'apps/mockup/player-app/rotra-player.html', screen: 'Profile picture sheet' },
   docs: ['docs/screens/product/modules/player-information/profile.md'],
-  variants: ['photo', 'initials', 'character'],
+  variants: ['photo', 'initials', 'character', 'pending'],
   related: ['Avatar', 'Sheet', 'PlayerIdentityCard', 'EditProfileForm'],
 } satisfies ComponentMeta

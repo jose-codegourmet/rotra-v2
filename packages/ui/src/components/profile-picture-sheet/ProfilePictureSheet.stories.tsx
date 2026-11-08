@@ -1,9 +1,10 @@
 import { playerProfiles } from '@rotra/data/fixtures/player-profiles'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
-import { ProfilePictureSheet, type ProfilePicture } from './ProfilePictureSheet'
+import type { ProfilePicture } from '@rotra/ui/profile-picture'
+import { ProfilePictureSheet } from './ProfilePictureSheet'
 
-function Demo({ initial }: { initial: ProfilePicture }) {
+function Demo({ initial, isPending = false }: { initial: ProfilePicture; isPending?: boolean }) {
   const [open, setOpen] = useState(true)
   const [picture, setPicture] = useState(initial)
   return (
@@ -13,6 +14,7 @@ function Demo({ initial }: { initial: ProfilePicture }) {
       playerId="u1"
       name="Jose"
       picture={picture}
+      isPending={isPending}
       onUpload={(file) => {
         const reader = new FileReader()
         reader.onload = () => setPicture({ kind: 'photo', src: String(reader.result) })
@@ -54,4 +56,8 @@ export const Photo: Story = {
 export const Phone: Story = {
   render: () => <Demo initial={{ kind: 'character', id: '' }} />,
   globals: { viewport: { value: 'phone' } },
+}
+
+export const Pending: Story = {
+  render: () => <Demo initial={{ kind: 'character', id: 'a' }} isPending />,
 }

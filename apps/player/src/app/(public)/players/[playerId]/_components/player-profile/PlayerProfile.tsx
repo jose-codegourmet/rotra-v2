@@ -25,6 +25,8 @@ import { RecentGamesCard } from '@rotra/ui/recent-games-card'
 import { SharedRankCard } from '@rotra/ui/shared-rank-card'
 import { toast } from '@rotra/ui/toaster'
 import { useRouter } from 'next/navigation'
+import { pictureSrc } from '@/app/_components/profile-picture/pictureSrc'
+import { useProfilePictureSheet } from '@/app/_components/profile-picture/useProfilePictureSheet'
 import { copyPlayerId } from '@/app/_components/copy-player-id/copyPlayerId'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { selectAccount, setAccount } from '@/store/slices/authSlice'
@@ -57,6 +59,7 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
     signOut = useSignOut('player')
   const player = profile.data,
     current = rank.data
+  const pictureEditor = useProfilePictureSheet(isOwn ? player : null)
   const failed = profile.isError || rank.isError || games.isError || settings.isError
   const retry = () => {
     void profile.refetch()
@@ -144,13 +147,18 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
       side={
         <>
           <PlayerIdentityCard
-            profile={player}
+            profile={{
+              ...player,
+              picture: pictureSrc(player.picture, player.playerId, player.fullName) ?? null,
+            }}
             isOwn={isOwn}
             idElementId={idElementId}
             onCopyId={() => void copyPlayerId(player.rtrId, idElementId)}
+            onChangePicture={pictureEditor.openSheet}
             onEdit={() => router.push('/profile/edit')}
             onOpenPlayerId={() => router.push('/profile/player-id')}
           />
+          {pictureEditor.sheet}
           {isOwn && myAccount.data ? (
             <AccountPanel
               phone={myAccount.data.phone}

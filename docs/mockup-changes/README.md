@@ -219,7 +219,7 @@ TICKETED: 9 · IN PROGRESS: 5 · IN MOCK APP: 48 · MOCKUP ONLY: 4
 | [2026-11-08-admin-sales-page](2026-11-08-admin-sales-page.md) | Admin gets a Sales page | sales-stat-card, admin-nav | TICKETED — #504 |
 | [2026-11-08-player-change-avatar](2026-11-08-player-change-avatar.md) | Players can change their profile picture | profile-picture-sheet, player-identity-card, edit-profile-form, player-profile | IN PROGRESS — #502 |
 | [2026-11-08-player-claim-prefill-and-experience](2026-11-08-player-claim-prefill-and-experience.md) | Registration form is prefilled by the club; experience has linked Playing since | — | IN MOCK APP — PR #484 |
-| [2026-11-08-player-compare-players](2026-11-08-player-compare-players.md) | Compare yourself with another player | compare-filter-bar | TICKETED — #502 |
+| [2026-11-08-player-compare-players](2026-11-08-player-compare-players.md) | Compare yourself with another player | compare-filter-bar | IN PROGRESS — #502 |
 | [2026-11-08-player-email-sign-in](2026-11-08-player-email-sign-in.md) | Player sign-in takes an email only, not a phone number | — | IN MOCK APP — PR #483 |
 | [2026-11-08-player-guest-registration](2026-11-08-player-guest-registration.md) | Guest invitations open registration | — | IN MOCK APP — #490 (PR #493) |
 | [2026-11-08-queue-delete-player](2026-11-08-queue-delete-player.md) | Saved players: Delete player | — | IN MOCK APP — PR #487 |

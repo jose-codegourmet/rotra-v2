@@ -1,6 +1,6 @@
 # Admin Players page gets a cleaner layout
 
-Status: TICKETED — #503
+Status: IN PROGRESS — #503
 Date: 2026-11-08
 App: admin
 Mockup: apps/mockup/admin-app/rotra-admin.html › Players

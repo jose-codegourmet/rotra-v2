@@ -22,6 +22,6 @@ Foundation's existing `/login` and protected `/me/*` paths take precedence over 
 Auth screens use `/login`, `/forgot-password`, `/reset-password/[token]`, `/claim/[token]`, and independent guest registration `/register/[clubId]` (#490).
 Account screens will use `/me/edit`, `/me/player-id`, `/me/privacy-and-contact` under the existing
 proxy boundary. The public profile destination now exists for leaderboard and RTR ID navigation.
-Sign-in at `/login`, email-recovery at `/forgot-password`, and mock reset links at
+Sign-in at `/login`, Admin-reviewed recovery at `/forgot-password`, and mock reset links at
 `/reset-password/[token]` are available. Private account controls, editing, ID/QR and registration
 remain in their own tickets.

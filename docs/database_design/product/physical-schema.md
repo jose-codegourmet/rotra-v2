@@ -301,3 +301,12 @@ close of a stream that never wrote, conflict categories and who may resolve one.
   earlier fails instead of deleting a renewed page.
 - **No cascade into history.** Every FK is `RESTRICT`; publications and exports are soft-deleted;
   nothing in facts, finalizations or identity references a publication.
+
+## #491 — Reviewed password recovery
+
+`20261108000100_password_reset_requests` adds the private `player_password_reset_requests`
+table and `password_reset_request_status` enum. Checks enforce normalized email, reviewed actor/time,
+issued identity, 32-byte digest, paired issuance lease and positive revision. Partial uniqueness:
+one pending request per email. Indexed player/reviewer FKs, status/time and newest-first list.
+RLS enabled; no anon/authenticated/PUBLIC grants. No existing data changes. Applied to ROTRA v2 ASIA
+on November 8, 2026 after explicit owner sign-off; expiry and passwords remain owned by Supabase Auth.

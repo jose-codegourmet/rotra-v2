@@ -14,6 +14,7 @@ export const adminNavMeta = {
     'players',
     'contact-changes',
     'club-names',
+    'password-resets',
     'ranking',
     'feature-flags',
     'no-counts',

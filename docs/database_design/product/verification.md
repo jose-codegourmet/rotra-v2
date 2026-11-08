@@ -113,3 +113,31 @@ the selected project.
 - Hand-written SQL relies on PostgreSQL 15+ (`NULLS NOT DISTINCT`) and the `btree_gist` extension.
 - Not verified: the Supabase project itself, its runtime/migration roles, pooler behaviour, advisors,
   backups, and any service code running against a database.
+
+## #491 — Admin-reviewed password recovery (November 8, 2026)
+
+Verified in a separate worktree against a disposable local PostgreSQL 15 database and fictional
+Supabase-compatible HTTP provider. The full migration history plus
+`20261108000100_password_reset_requests` rebuilds with no schema drift; all 59 existing integrity
+checks pass. No shared migration, real reset link, real password change or message delivery was
+performed during verification.
+
+The real Player/Admin Route Handlers were exercised for: generic known/unknown acknowledgements,
+zero recovery-email/provider-generation calls on submission, normalized pending deduplication,
+Admin-only reads/actions, inactive Admin refusal, required ownership confirmation, unmatched and
+declined requests, changed/disabled player refusal, provider subject mismatch, one-time digest
+consumption, link replacement, simulated provider expiry, password rejection, verification failure,
+retry after generation failure, concurrent issuance, redacted audit and no recovery cookies in the
+browser response. Provider-generated expiry itself was simulated; hosted provider configuration and
+external/manual delivery were not exercised.
+
+Browser checks: Player invalid/valid request and receipt; Admin navigation, review, generate/copy and
+link absent after reload; keyboard checkbox/Tab and mobile menu Escape. All new Admin component
+stories and affected Player recovery form/status stories rendered without horizontal overflow in
+dark/light at 375/1280 px. Compared the updated prototype's review card and actions. Screenshots
+are local verification artifacts outside the repository. Reduced-motion emulation was not run.
+
+**Shared migration, after explicit owner sign-off:** applied November 8, 2026 to ROTRA v2 ASIA
+(`xvsgwgihgbuqkcazikek`), with the matching checksum recorded in Prisma migration history. Read-only
+verification found RLS enabled, zero public-client grants, 6 CHECK constraints, 2 foreign keys,
+7 indexes and zero request rows. This schema check did not generate a live link or reset a password.

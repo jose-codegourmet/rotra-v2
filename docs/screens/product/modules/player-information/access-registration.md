@@ -57,17 +57,19 @@ No SMS step or Facebook authorization is part of the agreed flow. Link lifetime 
 | Provisioning still processing | Show pending state/retry status check; avoid duplicate submission |
 | Offline | Require connectivity; preserve unsent form values appropriately without claiming success |
 
-The club (Queue Master) can reissue the link, which invalidates the previous one (decided 2026-11-07, #244). Every field the club entered is prefilled and stays editable. Experience is Years + months and Playing since (month, year), linked. Exact wording and the replacement-link delivery method are still open. Operator role remains initial entry; normal forgotten-password recovery is by email.
+The club (Queue Master) can reissue the link, which invalidates the previous one (decided 2026-11-07, #244). Every field the club entered is prefilled and stays editable. Experience is Years + months and Playing since (month, year), linked. Exact wording and the replacement-link delivery method are still open. Operator role remains initial entry; normal forgotten-password recovery is reviewed by ROTRA Admin (#491).
 
-## P-FORGOT — Email recovery request
+## P-FORGOT — Admin-reviewed recovery request (#491)
 
-Explain that reset instructions are sent to the account's email. Real mode (November 8, 2026): the Player app asks Supabase to send its recovery email only when the email belongs to a registered, enabled player, and answers the same way either way; the email opens `/reset-password/<token>`, and the token is checked only when the new password is submitted (checking it uses it up). Proposed request input is email, with a generic acknowledgement regardless of account existence. Recovery stays email-only (decided 2026-11-07, #244); if a phone-based lookup is ever offered, the destination remains email and private-email disclosure must still be avoided.
-
-States: empty/invalid input, sending, generic sent acknowledgement, retryable service failure with safe wording. Resend limits/cooldowns come from actual service policy, not hardcoded screen assumptions. Do not route routine resets to a club operator.
+Enter the email on the ROTRA account and choose **Request password reset**. The server creates a
+private Admin review request, without emailing or generating a link. Pending duplicate addresses
+reuse one request. The acknowledgement is identical for known and unknown addresses: **Request
+received**. Contact ROTRA support through the usual channel to verify ownership; an Admin provides
+the link after review. The club operator cannot reset the password. Offline/errors retain the input.
 
 ## P-RESET — New password from recovery link
 
-Validate the recovery link/session before showing a usable form. Inputs: new password and proposed confirmation, password visibility controls, Save password. Successful completion directs to sign-in with a clear confirmation. Exact session-signout/provider behavior is implementation-dependent.
+The form opens without consuming the link; submit validates the Admin-issued digest and provider recovery token. Inputs: new password and proposed confirmation, password visibility controls, Save password. Successful completion directs to sign-in with a clear confirmation. Exact session-signout/provider behavior is implementation-dependent.
 
 Expired/invalid/used link shows Request another reset. Failure preserves unsaved password fields only as appropriate for the active secure form; never logs or displays the password in support details. No Admin or operator sees the new password.
 
@@ -76,7 +78,7 @@ Expired/invalid/used link shows Request another reset. Failure preserves unsaved
 - Only the account's email signs in; entering the player's phone number is rejected as not an email.
 - Registration cannot complete without phone and email, but social links remain optional.
 - A claim link cannot silently create a second profile for a phone already linked.
-- Password recovery uses email and does not require the original club operator.
+- Password recovery uses the account email for an Admin review request, without automatic email or club-owner access.
 
 
 ## Guest registration invitation — /register/[clubId] (#490)

@@ -8,18 +8,17 @@ Paths: `real/` = `packages/data/src/real/`, `api/` = `apps/player/src/app/api/`,
 ## Goal
 
 Player Information exposes identities/history. Players can sign in, claim their account and recover
-access. Recovery: [D-2026-11-07-01](../decisions.md#d-2026-11-07-01) (manual) is approved, while `main`
-ships Supabase email password reset (#483); the owner has to say which one MVP keeps (hub open question 8).
+access. Recovery follows [D-2026-11-07-01](../decisions.md#d-2026-11-07-01), updated by #491: Admin reviews submitted requests and provides links without automatic email.
 
 ## In scope
 
 Public profile, RTR ID lookup, games/history, rank page and leaderboard reads; own profile, phone
 privacy, contact-change submit; player sign-in (email + password only since 2026-11-08), sign-out, session; registration/account claim;
-password recovery (D-01 manual reset link, or the email reset shipped in #483: open question 8).
+password recovery through Admin-reviewed requests (#491).
 
 ## Out of scope / deferred
 
-- Automated recovery emails, player-submitted reset requests, a recovery notification inbox, club-owner password resets (D-01). `main` nevertheless ships an automated Supabase recovery email since #483; open question 8.
+- Automated recovery emails, a player notification inbox, and club-owner password resets. #491 adds submitted requests in Admin.
 - Meaningful rank and leaderboard values until #247 ([ranking.md](ranking.md)).
 
 ## Current state
@@ -38,8 +37,8 @@ password recovery (D-01 manual reset link, or the email reset shipped in #483: o
 | Registration / account claim (`/claim/[token]`) | implemented | `player-account/fetchers.ts:89,174` → `real/player.ts:39,47` → `api/claim/[token]` GET/POST → `db/src/player/{claim,account-access}.ts` (`readClaimLink`, `registerFromClaim`); prefilled from the club, phone typable when none on file (#484). The "processing" re-check (`checkClaimStatus`, `player-account/fetchers.ts:211`) is mock only | #483, #484 |
 | Claim-link issuance — Queue (Saved players › Invite) | implemented | `club-player/fetchers.ts:165` → `real/queue.ts:550` → Queue `api/club/players/[clubPlayerId]/registration-link` → `db/src/player/claim.ts:44`; 7 days (`CLAIM_LINK_DAYS = 7`), a new link cancels the previous one (#485); guests get independent registration at `/register/[clubId]` (#490) | #483, #485 |
 | Claim-link issuance — Admin | not implemented | `admin-player/mutations.ts:229` `issueRegistrationLink` mock only | none found |
-| Forgot Password screen | implemented as email reset (vs D-01) | `ForgotPassword.tsx` → `player-account/fetchers.ts:44` → `real/player.ts:81` → `api/auth/password-reset` → `db/src/player/account-access.ts:102` (Supabase `resetPasswordForEmail`). D-01's support-directed screen is not built | #483; D-01 open question 8 |
-| Reset password (`/reset-password/[token]`) | implemented (email recovery token) | `player-account/fetchers.ts:65` → `real/player.ts:87` → `api/auth/reset-password` → `account-access.ts:127` (`verifyOtp` recovery, `updateUser`). No Admin-issued reset link (D-01) | #483; D-01 |
+| Forgot Password screen | implemented in #491; schema applied | `/api/auth/password-reset` saves an Admin review request; no automatic email | #491 |
+| Reset password (`/reset-password/[token]`) | implemented in #491; schema applied | Reviewed digest + provider expiry/single use, mapped player check, new password chosen by player | #491 |
 | Guest registration (without an existing-profile claim link) | implemented | `/register/[clubId]` → `useGuestRegistration` → `/api/register/[clubId]` → `db/src/player/guest-registration.ts`; unique contacts, recoverable claim staging, no guest linkage. Local database + simulated-provider flow verified; production provider not exercised | #490 |
 
 ## Remaining work
@@ -48,7 +47,7 @@ password recovery (D-01 manual reset link, or the email reset shipped in #483: o
 - [x] Claim Route Handlers; 7 days; reissue cancels the previous link (#483, #485).
 - [x] Queue claim-link issuance (#483).
 - [ ] Admin claim-link issuance in real mode. Ticket: needed if Admin issuance is MVP (open question 9).
-- [ ] Recovery: owner to confirm whether the shipped email reset (#483) supersedes D-01; if D-01 stands, P-FORGOT → support-directed screen (mockup first, AGENTS §15) and an Admin-issued reset link. Ticket: needed once decided (open question 8).
+- [ ] Admin-reviewed password recovery (#491) is verified with the hosted provider (schema applied after sign-off).
 - [ ] Attach a signed-in player to a join request; player sign-up (D-07). Ticket: needed.
 - [ ] Rank and leaderboard become meaningful after #247. Ticket: #247.
 
@@ -61,7 +60,7 @@ password recovery (D-01 manual reset link, or the email reset shipped in #483: o
 
 ## Blocking open decisions
 
-- #244 (email verification on claim, password policy, contact-change enforcement, mistaken guest links); D-01 vs the email reset shipped in #483 (open question 8).
+- #244 (email verification on claim, password policy, contact-change enforcement, mistaken guest links); hosted provider handoff verification for #491.
 - #247 ranking math (rank, leaderboard).
 - [Business open decisions](../../business_logic/product/open-decisions.md) · [database open decisions](../../database_design/product/open-decisions.md) · [screen open decisions](../../screens/product/open-decisions.md).
 - Hub open questions 8, 9, 12, 14.
@@ -72,5 +71,5 @@ password recovery (D-01 manual reset link, or the email reset shipped in #483: o
 
 - [ ] In real mode, a player can claim an account, sign in, sign out, and read and edit their own profile.
 - [ ] Public profile, RTR ID lookup and history work for visitors.
-- [ ] Password recovery works per the owner's ruling on D-01 vs the #483 email reset (open question 8).
+- [ ] Admin-reviewed password recovery (#491) is verified with the hosted provider (schema applied after sign-off).
 - [ ] Rank and leaderboard behaviour matches the owner's ruling (open question 12).

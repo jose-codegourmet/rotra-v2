@@ -1211,17 +1211,16 @@ function viewLogin() {
 }
 function viewForgot() {
   const F = S.ui.forgot;
-  if (F.sent) return `<main class="login"><div class="card"><h1 style="font-size:22px">Check your email</h1>
-    ${notice('ok', `If an account uses <b>${esc(F.sent)}</b>, we've sent it a link to set a new password.`)}
-    <p class="small muted">It can take a few minutes. Check spam too. Your club can't reset your password for you.</p>
-    <button class="btn block" data-act="openReset" data-v="valid">Open the reset link (prototype)</button>
+  if (F.sent) return `<main class="login"><div class="card"><h1 style="font-size:22px">Request received</h1>
+    ${notice('ok', `If an account uses <b>${esc(F.sent)}</b>, ROTRA Admin can review your request after verifying ownership.`)}
+    <p class="small muted">Contact ROTRA support through your usual channel to verify ownership. An Admin will provide your reset link. No automatic email is sent.</p>
     <button class="btn ghost block" data-act="go" data-to="login">Back to sign in</button></div></main>`;
   return `<main class="login"><form class="card" data-form="forgot" novalidate>
     ${backBtn('goLogin', 'Sign in')}<h1 style="font-size:22px">Reset your password</h1>
-    <p class="muted small">Enter the email on your ROTRA account. We'll send a link to set a new password.</p>
+    <p class="muted small">Enter the email on your ROTRA account. ROTRA Admin will review your request before providing a reset link.</p>
     ${F.err ? notice('bad', esc(F.err)) : ''}
     ${field('forgot-email', 'Email', 'ui.forgot.email', F.email, '', { type: 'email', ac: 'email', inputmode: 'email' })}
-    <button class="btn primary block" type="submit" ${F.pending ? 'disabled' : ''}>${F.pending ? 'Sending…' : 'Send reset link'}</button></form></main>`;
+    <button class="btn primary block" type="submit" ${F.pending ? 'disabled' : ''}>${F.pending ? 'Sending…' : 'Request password reset'}</button></form></main>`;
 }
 function viewReset() {
   const R = S.ui.reset;
@@ -1249,7 +1248,7 @@ function viewClaim(standalone = false) {
   const st = standalone ? 'valid' : claimStatus();
   const wrap = (inner) => `<main class="wrap slim"><div class="page-head"><span class="label">Registration link from Lahug Smash Club</span>${inner}</div></main>`;
   if (st === 'claimed') return wrap(`<h1>This profile is already registered</h1>${notice('', 'This link was already used to finish registering. It can\'t create another account.')}
-    <div class="row"><button class="btn primary" data-act="go" data-to="login">Sign in</button><button class="btn" data-act="go" data-to="forgot">Reset password by email</button></div>`);
+    <div class="row"><button class="btn primary" data-act="go" data-to="login">Sign in</button><button class="btn" data-act="go" data-to="forgot">Request password reset</button></div>`);
   if (st === 'expired') return wrap(`<h1>This link can't be used</h1>${notice('bad', 'The registration link has expired or was replaced.')}
     <p class="muted">Ask the club that added you to send a new link. If you already registered, sign in instead.</p><div class="row"><button class="btn" data-act="go" data-to="login">Sign in</button></div>`);
   if (st === 'wrong') return wrap(`<h1>We've stopped here</h1>${notice('', 'Nothing was changed on this profile.')}

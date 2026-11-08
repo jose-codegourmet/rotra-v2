@@ -20,7 +20,7 @@ Proposed navigation:
 
 - Clubs and licenses.
 - Players.
-- Contact-change requests.
+- Requests: Contact changes, Club names, Password resets (#491).
 - Ranking configuration.
 - Feature flags.
 

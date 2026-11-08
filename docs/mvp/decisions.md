@@ -8,7 +8,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 
 | ID | Title | Decision status | Implementation | Ticket | Workstream |
 |---|---|---|---|---|---|
-| [D-2026-11-07-01](#d-2026-11-07-01) | Manual player password recovery for MVP | approved | not started | needed | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
+| [D-2026-11-07-01](#d-2026-11-07-01) | Manual player password recovery for MVP | approved (updated #491) | in progress | #491 | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 | [D-2026-11-07-02](#d-2026-11-07-02) | Decision and roadmap status tracking | approved | implemented | none | Tracking (this folder) |
 | [D-2026-11-07-03](#d-2026-11-07-03) | Offline session boundaries and guest reconciliation | approved | not started | needed; #246 | [Queue offline](workstreams/queue-offline.md), [Player](workstreams/player.md) |
 | [D-2026-11-07-04](#d-2026-11-07-04) | Freeze the current MVP scope | approved | not applicable | none | All |
@@ -51,17 +51,15 @@ Then add a row to the [index](#index) and link the entry from the workstream pag
 ## Decisions
 
 <a id="d-2026-11-07-01"></a>
-### D-2026-11-07-01 — Manual player password recovery for MVP
-- **Decision status:** approved
-- **Implementation status:** not started (the proposed Admin reset-link flow has not been verified on `main`)
-- **Ticket:** needed
-- **Roadmap:** MVP — [Player access](workstreams/player.md)
-- **Decision:** Players contact ROTRA support using their preferred channel (e.g. Instagram or Messenger). The platform Admin verifies ownership, then generates a short-lived, single-use password reset link from the player's Admin profile and shares it manually. The Player Forgot Password screen directs players to support.
-- **Not in MVP:** automated recovery emails, player-submitted reset requests, a recovery notification inbox, and club-owner access to reset player passwords.
-- **Security requirements:** Do not reveal or set the player's password; verify ownership before issuing a link; invalidate used or expired links; log link issuance without storing the token in plaintext.
-- **References:** [Player workstream](workstreams/player.md), [Admin workstream](workstreams/admin.md), `apps/player/src/app/(auth)/forgot-password`, `apps/admin/src/app/(admin)/players`.
-- **Notes (audit 2026-11-07):** "not started" confirmed: no reset UI in `apps/admin/src/app/(admin)/players/**`, no route, service or model. P-FORGOT still renders an email form (`requestPasswordReset`, mock only) and P-RESET has no route. Docs describe email recovery (#244 L2, `claim-and-recover.md`, `access-registration.md` P-FORGOT).
-- **Notes (2026-11-08):** `main` ships Supabase email password reset in #483 (`apps/player/src/app/api/auth/{password-reset,reset-password}` → `packages/db/src/player/account-access.ts`), and the docs on `main` describe it. The Admin reset link is still not built. Owner to confirm whether D-01 is superseded ([hub open question 8](README.md#6-open-questions-for-the-owner)).
+### D-2026-11-07-01 — Admin-reviewed player password recovery for MVP
+- **Decision status:** approved; updated by the owner November 8, 2026 in [#491](https://github.com/jose-codegourmet/rotra-v2/issues/491).
+- **Implementation status:** in progress on the tracking board; PR #494 contains the completed, locally verified implementation and the shared migration was applied after owner sign-off. Update the board to implemented once the PR is on main.
+- **Ticket:** #491
+- **Roadmap:** MVP — [Player access](workstreams/player.md), [Admin](workstreams/admin.md).
+- **Decision:** Forgot password submits a request to Admin > Requests. No automatic email. ROTRA Admin verifies ownership, then generates a secure, expiring, single-use link for manual delivery. The player chooses their password; the Admin never sees it. Delivery channel and arbitrary expiry duration are not prescribed.
+- **Supersedes:** the November 7 support-only/no-submitted-requests restriction and the automatic recovery email shipped in #483. Ownership verification, no plaintext-token storage, audit and no club-owner password-reset access remain.
+- **Implementation:** Supabase recovery token/expiry plus a private ROTRA request table holding a token digest, reviewer and issuance lease. The existing reset screen consumes only reviewed links and checks the account mapping. No provider call occurs when submitting the request. The additive migration was applied to ROTRA v2 ASIA on November 8 after explicit owner sign-off.
+- **References:** `apps/admin/src/app/(admin)/requests/password-resets`, `packages/db/src/admin/password-resets.ts`, [schema](../database_design/product/admin/modules/configuration-requests.md).
 
 <a id="d-2026-11-07-02"></a>
 ### D-2026-11-07-02 — Decision and roadmap status tracking

@@ -43,3 +43,23 @@ Business sources: [configuration](../../../../business_logic/product/admin/modul
 ## F07 follow-up: player management (#335)
 
 The mock UI now supports player archive and eligibility-checked removal. Operational persistence must add archive timestamp and revision, retain audit identity/RTR ID after eligible removal, enforce all history/reference guards transactionally, and allow an Admin claim-link issuer with seven-day expiry and revocation. No schema or migration is introduced by #335. Claims across app origins require a shared server transport, not client storage.
+
+## `player_password_reset_requests` (#491)
+
+Private Admin-review queue: UUID PK; normalized submitted email; nullable matched player FK;
+requested time; created/updated/revision; pending/issued/declined state; reviewer Admin FK/time; issued provider subject;
+SHA-256 digest of the provider recovery bearer token; consumed time. Unmatched submissions are
+retained for review but cannot issue a link. One pending request per normalized email (partial unique
+index); re-submission does not replace an issued link. Request state/time and FK indexes support the
+Admin list. RLS denies direct public-client access; server handlers authorize every operation.
+
+Issuance checks current email/account/provider identity, records the reviewer and an append-only
+audit event, and returns the secret once. No plaintext token, password or delivery record is stored.
+Replacement removes the prior digest. Consumption atomically clears the digest before provider
+verification; used, expired, unreviewed, replaced or mismatched links fail closed. Failed/uncertain
+redemption needs a new reviewed link. Supabase's configured recovery expiry is authoritative.
+Provider calls run outside database transactions, under a 60-second issuance lease (not link expiry).
+Each provider request times out at 15 seconds; abandoned leases can be replaced, and an old issuance
+cannot finalize over a newer one. The lease ID/time is never exposed publicly.
+
+Migration `20261108000100_password_reset_requests` applied to ROTRA v2 ASIA on November 8, 2026 after explicit owner sign-off.

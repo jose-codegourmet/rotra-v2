@@ -339,7 +339,10 @@
     "./admin-player/useAdminPlayerMutations": "./src/admin-player/useAdminPlayerMutations.ts",
     "./fixtures/admin-player-management": "./src/fixtures/adminPlayerManagement.ts",
     "./admin-player/useAdminPlayerGames": "./src/admin-player/useAdminPlayerGames.ts",
-    "./admin-player/useAdminPlayerSelection": "./src/admin-player/useAdminPlayerSelection.ts"
+    "./admin-player/useAdminPlayerSelection": "./src/admin-player/useAdminPlayerSelection.ts",
+    "./password-reset/types": "./src/password-reset/passwordReset.types.ts",
+    "./password-reset/fetchers": "./src/password-reset/fetchers.ts",
+    "./password-reset/usePasswordResetRequests": "./src/password-reset/usePasswordResetRequests.ts"
   },
   "scripts": {
     "lint": "biome check .",

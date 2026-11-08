@@ -39,7 +39,7 @@ export function ForgotPasswordForm({
         </Button>
       }
       title="Reset your password"
-      description="Enter the email on your ROTRA account. We'll send a link to set a new password."
+      description="Enter the email on your ROTRA account. ROTRA Admin will review your request before providing a reset link."
     >
       <FormProvider {...form}>
         <form
@@ -73,7 +73,7 @@ export function ForgotPasswordForm({
             />
           </Field>
           <Button type="submit" variant="primary" block disabled={isPending || offline}>
-            {isPending ? 'Sending…' : 'Send reset link'}
+            {isPending ? 'Sending…' : 'Request password reset'}
           </Button>
         </form>
       </FormProvider>

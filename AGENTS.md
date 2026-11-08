@@ -55,7 +55,7 @@ Umpire, tournaments, Facebook login) are **not** v1. See [product terms §14](do
 **Current phase:** **mock data** by default (TanStack Query hooks over an in-memory mock store). Opt-in
 real mode (`NEXT_PUBLIC_ROTRA_DATA_MODE=real` + `ROTRA_DATA_MODE=real`) runs Route Handlers over
 `packages/db` Prisma services: Supabase sign-in for Queue, Admin and Player, Queue core, Admin, Player
-registration and email password reset, and Player Information reads. Not real yet: durable offline
+registration and Admin-reviewed password reset, and Player Information reads. Not real yet: durable offline
 sync, rank calculation.
 Status: [docs/mvp/README.md](docs/mvp/README.md). Keep UI/hook contracts stable.
 

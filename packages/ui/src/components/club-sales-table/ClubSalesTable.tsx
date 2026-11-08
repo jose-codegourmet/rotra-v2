@@ -128,7 +128,9 @@ export function ClubSalesTable({
         <SalesStatCard
           label={`Paid to ROTRA (${months.length} months)`}
           value={money(total.paid)}
-          note={free ? 'Tester club, licenses at ₱0' : `${money(monthlyListMinor)} a month list price`}
+          note={
+            free ? 'Tester club, licenses at ₱0' : `${money(monthlyListMinor)} a month list price`
+          }
         />
         <SalesStatCard
           label="Sessions started"
@@ -166,8 +168,8 @@ export function ClubSalesTable({
               ? `After the estimated running cost, this club leaves ${money(margin)} over ${span} months.`
               : `The estimated running cost is ${money(-margin)} more than this club paid in ${span} months.`}{' '}
             Payments are the license payments you recorded, counted in the month paid, so a yearly
-            payment lands in one month. Sessions and matches are sample figures. The cost per
-            session ({money(costPerSessionMinor)}) is a placeholder until you set it.
+            payment lands in one month. The cost per session ({money(costPerSessionMinor)}) is a
+            placeholder until you set it.
           </p>
         </section>
       </Card>

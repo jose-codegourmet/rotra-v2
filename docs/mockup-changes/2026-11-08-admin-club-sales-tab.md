@@ -1,6 +1,6 @@
 # Club page gets a Sales tab
 
-Status: TICKETED — #504
+Status: IN MOCK APP — #504
 Date: 2026-11-08
 App: admin
 Mockup: apps/mockup/admin-app/rotra-admin.html › Club page › Sales tab (after License)
@@ -40,7 +40,7 @@ Components: sales-stat-card, admin-nav
 ## Like for like
 - Compare at: 375 px and 1280 px, dark and light, beside the mockup route above.
 - States and copy: exactly as listed under What changed; each ticket repeats them as acceptance criteria.
-- Known differences: none
+- Known differences: the prototype’s “sample figures” notes are left out, since the real app counts final session and match rows
 
 ## Reuse plan
 - Reuses `card/`, `chip/`, `data-table/`, `segmented-control/` (period switch); new `sales-stat-card/`, `bar-chart/`, `sales-breakdown-list/`, `club-sales-table/`

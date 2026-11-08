@@ -34,6 +34,7 @@ export const adminNavExamples = {
   hrefs: {
     clubs: '/clubs',
     players: '/players',
+    sales: '/sales',
     'contact-changes': '/requests/contact-changes',
     'club-names': '/requests/club-names',
     'password-resets': '/requests/password-resets',

@@ -4,6 +4,7 @@ import { useAuditEvents } from '@rotra/data/admin-audit/useAuditEvents'
 import { useAdminClub } from '@rotra/data/club/useAdminClub'
 import type { RetentionState } from '@rotra/data/license/types'
 import { useLicenseTerms } from '@rotra/data/license/useLicenseTerms'
+import { useClubSales } from '@rotra/data/sales/useClubSales'
 import { ActiveSessionCard } from '@rotra/ui/active-session-card'
 import { ActivityLog } from '@rotra/ui/activity-log'
 import { Breadcrumb } from '@rotra/ui/breadcrumb'
@@ -13,6 +14,7 @@ import { ClubAccountCard } from '@rotra/ui/club-account-card'
 import { ClubIdentityCard } from '@rotra/ui/club-identity-card'
 import { ClubLogo } from '@rotra/ui/club-logo'
 import { ClubPriceCard } from '@rotra/ui/club-price-card'
+import { ClubSalesTable } from '@rotra/ui/club-sales-table'
 import { DataTable } from '@rotra/ui/data-table'
 import { DetailHero } from '@rotra/ui/detail-hero'
 import { EmptyState } from '@rotra/ui/empty-state'
@@ -33,6 +35,15 @@ import { LicenseSheet } from '../license-sheet/LicenseSheet'
 import { CLUB_DETAIL_TABS, type ClubDetailTab } from './ClubDetail.tabs'
 import { ClubDetailSkeleton } from './ClubDetailSkeleton'
 import { licensePaymentColumns } from './LicensePayments.columns'
+
+/** 'YYYY-MM' → 'Jun 2026', the month column and the bar labels of the club Sales tab. */
+function monthLabel(month: string): string {
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(`${month}-01T00:00:00Z`))
+}
 
 /** The Public pages badge: a countdown or due deletion warns, a failed deletion is an error. */
 function pagesBadge(retention: RetentionState): TabBadge | null {
@@ -65,10 +76,17 @@ export function ClubDetail({
   const clubQuery = useAdminClub(clubId)
   const termsQuery = useLicenseTerms(clubId)
   const auditQuery = useAuditEvents({ targetType: 'club', targetId: clubId })
+  const salesQuery = useClubSales(clubId)
   const club = clubQuery.data
   const terms = termsQuery.data
   const audit = auditQuery.data
-  const denied = useDenyOnPermissionError(clubQuery.error, termsQuery.error, auditQuery.error)
+  const clubSales = salesQuery.data
+  const denied = useDenyOnPermissionError(
+    clubQuery.error,
+    termsQuery.error,
+    auditQuery.error,
+    salesQuery.error,
+  )
   const paymentsHeadingId = useId()
   const activityHeadingId = useId()
 
@@ -92,6 +110,19 @@ export function ClubDetail({
     scrolledToHash.current = true
     document.getElementById('name-request')?.scrollIntoView({ block: 'start' })
   }, [hasNameRequest, tab])
+
+  const salesMonths = useMemo(
+    () =>
+      (clubSales?.months ?? []).map((m) => ({
+        id: m.month,
+        label: monthLabel(m.month),
+        paidMinor: m.paid.amountMinor,
+        sessions: m.sessions,
+        matches: m.matches,
+        estCostMinor: m.estimatedCost.amountMinor,
+      })),
+    [clubSales],
+  )
 
   const activityEntries = useMemo(
     () =>
@@ -176,6 +207,7 @@ export function ClubDetail({
             badges: request ? [{ text: '1 request', tone: 'warn' }] : undefined,
           },
           { value: 'license', label: 'License' },
+          { value: 'sales', label: 'Sales' },
           { value: 'pages', label: 'Public pages', badges: pages ? [pages] : undefined },
           {
             value: 'activity',
@@ -257,6 +289,31 @@ export function ClubDetail({
               )}
             </section>
           </Card>
+        </TabsContent>
+        <TabsContent value="sales" className="flex flex-col gap-5">
+          {salesQuery.isError ? (
+            <ErrorState
+              title="Couldn't load this club's sales."
+              onRetry={() => void salesQuery.refetch()}
+              retrying={salesQuery.isFetching}
+              retryLabel="Retry"
+            >
+              Check your connection, then try again.
+            </ErrorState>
+          ) : clubSales ? (
+            <ClubSalesTable
+              months={salesMonths}
+              free={clubSales.pricing === 'free'}
+              monthlyListMinor={clubSales.monthlyListPrice?.amountMinor ?? 0}
+              costPerSessionMinor={clubSales.costPerSession.amountMinor}
+            />
+          ) : (
+            <Card aria-busy className="flex flex-col gap-3">
+              <Skeleton label="Loading sales" className="w-1/3" />
+              <Skeleton className="w-3/4" />
+              <Skeleton className="w-1/2" />
+            </Card>
+          )}
         </TabsContent>
         <TabsContent value="pages" className="flex flex-col gap-5">
           <RetentionCard retention={club.retention} />

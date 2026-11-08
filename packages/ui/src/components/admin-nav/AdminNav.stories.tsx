@@ -32,6 +32,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 export const ClubsCurrent: Story = {}
 export const PlayersCurrent: Story = { args: { current: 'players' } }
+export const SalesCurrent: Story = { args: { current: 'sales' } }
 export const ContactChangesCurrent: Story = { args: { current: 'contact-changes' } }
 export const ClubNamesCurrent: Story = { args: { current: 'club-names' } }
 export const RankingCurrent: Story = { args: { current: 'ranking' } }

@@ -14,6 +14,7 @@ import {
   realSetMyProfilePicture,
   realUpdateMyProfile,
 } from '../real/player'
+import { mockPhotoReference } from './photo'
 import { characterPictureReference, type PlayerPictureChoice } from './picture'
 import type { PlayerProfile, PlayerRank, PlayerSessionRecord } from './player.types'
 import { playerProjection } from './projection'
@@ -110,16 +111,7 @@ export async function setMyProfilePicture(choice: PlayerPictureChoice): Promise<
   else if (choice.kind === 'character') picture = characterPictureReference(choice.id)
   else if (choice.kind === 'photo') {
     if (!choice.file.type.startsWith('image/')) throw new Error('Choose an image file')
-    picture = await new Promise<string>((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onload = () =>
-        typeof reader.result === 'string'
-          ? resolve(reader.result)
-          : reject(new Error("Couldn't read that photo."))
-      reader.onerror = () => reject(new Error("Couldn't read that photo."))
-      reader.onabort = () => reject(new Error("Couldn't read that photo."))
-      reader.readAsDataURL(choice.file)
-    })
+    picture = await mockPhotoReference(choice.file, choice.crop)
   } else throw new Error('Choose a profile picture.')
   await delay(900)
   if (getMockDevState().offline)

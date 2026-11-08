@@ -2,11 +2,14 @@
 export const PLAYER_CHARACTER_IDS = ['', 'a', 'b', 'c', 'd', 'e', 'f', 'g'] as const
 export type PlayerCharacterId = (typeof PLAYER_CHARACTER_IDS)[number]
 
-/** The mock upload is read into memory; real storage is not connected yet. */
+/** Crop in auto-oriented image coordinates, after the clockwise quarter-turn. */
+export type PictureCrop = { x: number; y: number; zoom: number; rotation: number }
+
+/** A local draft until the explicit Done command; real mode uploads through the owner-only server. */
 export type PlayerPictureChoice =
   | { kind: 'initials' }
   | { kind: 'character'; id: PlayerCharacterId }
-  | { kind: 'photo'; file: File }
+  | { kind: 'photo'; file: File; crop?: PictureCrop }
 
 /** Interpret avatar references before giving them to an image component. */
 export function parsePlayerPicture(

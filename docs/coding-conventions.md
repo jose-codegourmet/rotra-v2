@@ -35,6 +35,7 @@ in the same PR.
 | Tables | TanStack Table v8 | §12 |
 | Animation | Motion (`motion/react`) | §11 |
 | Carousels | embla-carousel-react 8.6 | Approved by #301 for Saved player statistics; no autoplay |
+| HEIC decoding | libheif-js 1.23.5 | Owner-approved #567; lazy WASM in `@rotra/data`, local worker for previews, browser-compatible WebP output |
 | QR codes | qrcode-generator 1.4.4 | Only in `@rotra/ui/player-id-qr`; draws the module matrix as an SVG path |
 | Toasts | Sonner (shadcn's toast) | Only through `@rotra/ui/toaster`; restyled to the prototype toast |
 | Lint/format | Biome | `next lint` no longer exists in Next 16 |

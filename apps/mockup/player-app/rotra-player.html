@@ -1445,16 +1445,21 @@ function sheetWrap(title, body, foot, wide = false) {
     <header><h2 id="sheet-title" tabindex="-1">${title}</h2><button class="btn xs ghost icon-btn" data-act="closeSheet" aria-label="Close">${I.x}</button></header>
     <div class="sb">${body}</div>${foot ? `<footer>${foot}</footer>` : ''}</div>`;
 }
+let avatarDraft = null;
 const FACES = ['', 'a', 'b', 'c', 'd', 'e', 'f', 'g'];
 const SHEETS = {
   avatar: () => {
-    const a = S.accounts[S.me], p = profileOf(S.me);
+    const a = avatarDraft || S.accounts[S.me], p = { ...profileOf(S.me), ...a };
+    const c = a.crop || { x: .5, y: .5, zoom: 1, rotation: 0 };
+    const rw = c.rotation % 180 ? a.height : a.width, rh = c.rotation % 180 ? a.width : a.height;
+    const side = Math.min(rw || 1, rh || 1) / c.zoom;
+    const controls = a.width ? `<div class="stack"><button type="button" aria-label="Frame your photo" data-avdrag style="position:relative;display:block;padding:0;border:0;overflow:hidden;width:100%;max-width:256px;aspect-ratio:1;border-radius:14px;background:var(--elev);touch-action:none;cursor:grab"><img alt="Crop preview" draggable="false" src="${a.photoUrl}" style="position:absolute;max-width:none;user-select:none;pointer-events:none;width:${a.width/side*100}%;height:${a.height/side*100}%;left:${(rw/2-(rw-side)*c.x)/side*100}%;top:${(rh/2-(rh-side)*c.y)/side*100}%;transform:translate(-50%,-50%)"></button><span class="small muted">Drag to crop.</span><label style="display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--fg2)">Zoom<input type="range" style="min-height:44px;width:100%;accent-color:var(--accent)" data-avcrop="zoom" min="1" max="3" step=".01" value="${c.zoom}"></label></div>` : '';
     const opt = (face) => { const q = { ...a, photo: true, face, photoUrl: '' }; const on = a.photo && !a.photoUrl && (a.face || '') === face; return `<button type="button" class="av-pick" aria-pressed="${on}" aria-label="Character ${FACES.indexOf(face) + 1}" data-act="setFace" data-v="${face}">${avatar(q)}</button>`; };
     return sheetWrap('Profile picture', `<div class="stack">
       <div class="av-now">${avatar(p, 'xxl')}<div class="stack tight"><b>${a.photoUrl ? 'Your photo' : a.photo ? 'A character' : 'Your initials'}</b><span class="small muted">Everyone who sees your profile sees this.</span></div></div>
-      <div class="row"><label class="btn sm" for="av-file" style="cursor:pointer">Upload a photo</label><input type="file" id="av-file" accept="image/*" class="sr-only" data-avfile><button type="button" class="btn sm" data-act="useInitials" ${!a.photo && !a.photoUrl ? 'disabled' : ''}>Use my initials</button></div>
-      <div><span class="label">Or pick a character</span><div class="av-grid" role="group" aria-label="Characters">${FACES.map(opt).join('')}</div></div>
-      <p class="hint">Photos stay on this device in the prototype. Keep it to a clear picture of you; the club's Queue Master can ask you to change it.</p></div>`, '<button class="btn primary" data-act="closeSheet">Done</button>');
+      <div class="row"><label class="btn sm" for="av-file" style="cursor:pointer">Upload a photo</label><input type="file" id="av-file" accept="image/webp,image/gif,image/png,image/heic,image/heif,image/jpeg,.heic,.heif" class="sr-only" data-avfile><button type="button" class="btn sm" data-act="useInitials" ${!a.photo && !a.photoUrl ? 'disabled' : ''}>Use my initials</button></div>
+      ${controls}<div><span class="label">Or pick a character</span><div class="av-grid" role="group" aria-label="Characters">${FACES.map(opt).join('')}</div></div>
+      <p class="hint">Changes are saved only when you click Done. WebP, GIF, PNG, HEIC/HEIF and JPEG. Keep it to a clear picture of you; the club's Queue Master can ask you to change it.</p></div>`, '<button class="btn primary" data-act="saveAvatar">Done</button>');
   },
   discard: () => sheetWrap('Discard your changes?', '<p class="muted">Your edits to your profile haven\'t been saved.</p>', '<button class="btn" data-act="closeSheet">Keep editing</button><button class="btn danger" data-act="discard">Discard changes</button>'),
   request: () => {
@@ -1564,7 +1569,7 @@ const ACT = {
     render();
   },
   openDemo: () => { S.ui.resetArmed = false; S.ui.sheet = { type: 'demo' }; render(); },
-  closeSheet: () => { S.ui.sheet = null; S.ui.pendingGo = null; render(); },
+  closeSheet: () => { if (avatarDraft?.photoUrl?.startsWith('blob:')) URL.revokeObjectURL(avatarDraft.photoUrl); avatarDraft = null; S.ui.sheet = null; S.ui.pendingGo = null; render(); },
   showMore: () => { S.shown += 25; render(); },
   jumpMe: (el) => {
     S.q = ''; S.shown = Math.max(S.shown, Math.ceil(+el.dataset.pos / 25) * 25); render();
@@ -1592,9 +1597,22 @@ const ACT = {
       toast(want ? 'Your phone number is now hidden from clubs' : 'Clubs can now see your phone number');
     });
   },
-  openAvatar: () => { if (!S.me) return; S.ui.sheet = { type: 'avatar' }; render(); },
-  setFace: (el) => { const a = S.accounts[S.me]; a.photo = true; a.photoUrl = ''; a.face = el.dataset.v; render(); toast('Profile picture updated'); },
-  useInitials: () => { const a = S.accounts[S.me]; a.photo = false; a.photoUrl = ''; render(); toast('Using your initials'); },
+  openAvatar: () => { if (!S.me) return; avatarDraft = { ...S.accounts[S.me] }; S.ui.sheet = { type: 'avatar' }; render(); },
+  setFace: (el) => { if (avatarDraft.photoUrl?.startsWith('blob:')) URL.revokeObjectURL(avatarDraft.photoUrl); Object.assign(avatarDraft, { photo: true, photoUrl: '', face: el.dataset.v, width: 0, crop: null }); render(); },
+  useInitials: () => { if (avatarDraft.photoUrl?.startsWith('blob:')) URL.revokeObjectURL(avatarDraft.photoUrl); Object.assign(avatarDraft, { photo: false, photoUrl: '', width: 0, crop: null }); render(); },
+  saveAvatar: async () => {
+    const a = avatarDraft;
+    if (a.width) {
+      const data = await new Promise((resolve) => { const r = new FileReader(); r.onload = () => resolve(r.result); r.readAsDataURL(a.file); });
+      if (avatarDraft !== a) return;
+      const c = a.crop, rw = c.rotation % 180 ? a.height : a.width, rh = c.rotation % 180 ? a.width : a.height, side = Math.floor(Math.min(rw,rh)/c.zoom);
+      const left = Math.round((rw-side)*c.x), top = Math.round((rh-side)*c.y);
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${side} ${side}"><g transform="translate(${-left} ${-top}) translate(${rw/2} ${rh/2}) rotate(${c.rotation})"><image href="${data}" x="${-a.width/2}" y="${-a.height/2}" width="${a.width}" height="${a.height}"/></g></svg>`;
+      URL.revokeObjectURL(a.photoUrl); a.photoUrl = `data:image/svg+xml,${encodeURIComponent(svg)}`;
+    }
+    Object.assign(S.accounts[S.me], { photo: a.photo, photoUrl: a.photoUrl, face: a.face });
+    ACT.closeSheet(); toast('Profile picture updated');
+  },
   openRequest: () => {
     const r = S.requests[S.me];
     if (r && ['submitted', 'applying', 'failed'].includes(r.status)) { toast('You already have a request in progress'); go('account'); return; }
@@ -1818,14 +1836,52 @@ document.addEventListener('input', (ev) => {
   }
 });
 // Edit profile marks sections with unsaved changes; refresh those marks when a field is left.
+function paintAvatarCrop() {
+  const a = avatarDraft, box = document.querySelector('[data-avdrag]');
+  if (!a?.width || !box) return;
+  const c = a.crop, side = Math.max(1, Math.floor(Math.min(a.width, a.height) / c.zoom));
+  Object.assign(box.querySelector('img').style, { width: `${a.width/side*100}%`, height: `${a.height/side*100}%`, left: `${(a.width/2-Math.round((a.width-side)*c.x))/side*100}%`, top: `${(a.height/2-Math.round((a.height-side)*c.y))/side*100}%` });
+}
+let avatarDrag = null;
+document.addEventListener('pointerdown', (ev) => {
+  const box = ev.target.closest('[data-avdrag]');
+  if (!box || !avatarDraft?.width || ev.button !== 0) return;
+  const side = Math.max(1, Math.floor(Math.min(avatarDraft.width, avatarDraft.height)/avatarDraft.crop.zoom));
+  avatarDrag = { id: ev.pointerId, x: ev.clientX, y: ev.clientY, crop: { ...avatarDraft.crop }, side, size: box.getBoundingClientRect().width };
+  box.setPointerCapture(ev.pointerId);
+});
+document.addEventListener('pointermove', (ev) => {
+  const d = avatarDrag, a = avatarDraft;
+  if (!d || d.id !== ev.pointerId || !a?.width) return;
+  const clamp = (v) => Math.max(0, Math.min(1, v));
+  a.crop.x = a.width === d.side ? .5 : clamp(d.crop.x - (ev.clientX-d.x)*d.side/d.size/(a.width-d.side));
+  a.crop.y = a.height === d.side ? .5 : clamp(d.crop.y - (ev.clientY-d.y)*d.side/d.size/(a.height-d.side));
+  paintAvatarCrop();
+});
+document.addEventListener('pointerup', () => { avatarDrag = null; });
+document.addEventListener('pointercancel', () => { avatarDrag = null; });
+document.addEventListener('input', (ev) => { if (ev.target.dataset.avcrop && avatarDraft?.crop) { avatarDraft.crop.zoom = +ev.target.value; paintAvatarCrop(); } });
+document.addEventListener('keydown', (ev) => {
+  if (!ev.target.matches('[data-avdrag]') || !avatarDraft?.crop) return;
+  const key = { ArrowLeft: ['x', .03], ArrowRight: ['x', -.03], ArrowUp: ['y', .03], ArrowDown: ['y', -.03] }[ev.key];
+  if (!key) return;
+  ev.preventDefault(); avatarDraft.crop[key[0]] = Math.max(0,Math.min(1,avatarDraft.crop[key[0]]+key[1])); paintAvatarCrop();
+});
 document.addEventListener('change', (ev) => {
+  if (ev.target.dataset.avcrop && avatarDraft?.crop) { avatarDraft.crop[ev.target.dataset.avcrop] = +ev.target.value; render(); return; }
   if (ev.target.matches('[data-avfile]')) {
     const file = ev.target.files && ev.target.files[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) { toast('Choose an image file'); return; }
-    const rd = new FileReader();
-    rd.onload = () => { const a = S.accounts[S.me]; a.photo = true; a.photoUrl = String(rd.result); render(); toast('Profile picture updated'); };
-    rd.readAsDataURL(file);
+    if (file.size > 4 * 1024 * 1024) { toast('Choose a photo smaller than 4 MiB.'); return; }
+    const draft = avatarDraft, url = URL.createObjectURL(file), image = new Image();
+    image.onload = () => {
+      if (avatarDraft !== draft) { URL.revokeObjectURL(url); return; }
+      if (draft.photoUrl?.startsWith('blob:')) URL.revokeObjectURL(draft.photoUrl);
+      Object.assign(draft, { photo: true, photoUrl: url, file, width: image.naturalWidth, height: image.naturalHeight, crop: { x: .5, y: .5, zoom: 1, rotation: 0 } }); render();
+    };
+    image.onerror = () => { URL.revokeObjectURL(url); toast('This prototype needs a browser that can decode the selected image.'); };
+    image.src = url;
     return;
   }
   if ((ev.target.dataset.bind || '').startsWith('ui.edit.')) render();

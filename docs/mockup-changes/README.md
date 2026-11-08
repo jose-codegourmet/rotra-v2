@@ -218,11 +218,12 @@ IN MOCK APP: 63 · MOCKUP ONLY: 4
 | [2026-11-08-admin-password-reset-requests](2026-11-08-admin-password-reset-requests.md) | Admin-reviewed password reset requests | — | IN MOCK APP — #491 (PR #494) |
 | [2026-11-08-admin-players-layout](2026-11-08-admin-players-layout.md) | Admin Players page gets a cleaner layout | admin-player-stats, admin-player-filters, admin-player-card, admin-player-bulk-bar, player-pagination, admin-player-quick-view, admin-player-history | IN MOCK APP — #503 (PR #566) |
 | [2026-11-08-admin-sales-page](2026-11-08-admin-sales-page.md) | Admin gets a Sales page | sales-stat-card, admin-nav | IN MOCK APP — #504 |
-| [2026-11-08-player-change-avatar](2026-11-08-player-change-avatar.md) | Players can change their profile picture | profile-picture-sheet, player-identity-card, edit-profile-form, player-profile | IN MOCK APP — #502 |
+| [2026-11-08-player-change-avatar](2026-11-08-player-change-avatar.md) | Players can change their profile picture | profile-picture-sheet, player-identity-card, edit-profile-form, player-profile | IN MOCK APP — #502 (superseded by 2026-11-08-player-picture-drafts) |
 | [2026-11-08-player-claim-prefill-and-experience](2026-11-08-player-claim-prefill-and-experience.md) | Registration form is prefilled by the club; experience has linked Playing since | — | IN MOCK APP — PR #484 |
 | [2026-11-08-player-compare-players](2026-11-08-player-compare-players.md) | Compare yourself with another player | compare-filter-bar | IN MOCK APP — #502 |
 | [2026-11-08-player-email-sign-in](2026-11-08-player-email-sign-in.md) | Player sign-in takes an email only, not a phone number | — | IN MOCK APP — PR #483 |
 | [2026-11-08-player-guest-registration](2026-11-08-player-guest-registration.md) | Guest invitations open registration | — | IN MOCK APP — #490 (PR #493) |
+| [2026-11-08-player-picture-drafts](2026-11-08-player-picture-drafts.md) | Profile picture drafts, framing and save on Done | profile-picture-sheet, avatar | IN MOCK APP — #567 |
 | [2026-11-08-queue-delete-player](2026-11-08-queue-delete-player.md) | Saved players: Delete player | — | IN MOCK APP — PR #487 |
 | [2026-11-08-queue-edit-player-details](2026-11-08-queue-edit-player-details.md) | Queue Master can edit a guest's or unclaimed player's details before inviting them | — | IN MOCK APP — PR #484 |
 | [2026-11-08-queue-invite-cancels-previous-link](2026-11-08-queue-invite-cancels-previous-link.md) | Invite cancels the previous registration link again | — | IN MOCK APP — PR #485 |

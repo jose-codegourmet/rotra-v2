@@ -20,18 +20,56 @@ Do not store a password, Facebook OAuth identity, MMR, or EXP by default. Social
 
 ## Profile picture storage (#542)
 
-Provision a public Supabase Storage bucket named `player-avatars`, restricted to `image/png` with a
-2,097,152-byte file limit. The Player server verifies the signed-in player, accepts a bounded image
-upload, normalizes it to a 512 × 512 PNG, and writes `<player UUID>/<random UUID>.png` using the
-server-only `SUPABASE_SECRET_KEY`. Do not grant browser insert, update or delete policies. Character
-choices store `character:<id>` and initials store null in `avatar_ref`; no schema migration is needed.
+Provision a public Supabase Storage bucket named `player-avatars` with the explicit allowlist
+`image/webp`, `image/gif`, `image/png`, `image/heic`, `image/heif`, `image/jpeg` and a
+**2,097,152-byte stored-object limit**. Do not grant browser insert, update or delete policies.
+The authenticated Player server verifies the owning player and revision, detects content from bytes,
+and writes `<player UUID>/<random UUID>.<png|jpg|gif|webp>` using `SUPABASE_SECRET_KEY`.
+Character choices store `character:<id>` and initials store null in `avatar_ref`; no schema migration.
+Existing PNG URLs continue working. Club logo processing is unchanged.
+
+**Updated by #567, owner-approved 2026-11-08:** selecting any picture creates a local draft only.
+Photo files, draggable crop and zoom stay in memory; object URLs
+are revoked on replacement or dismissal. X, Escape and outside dismissal discard all choices.
+Only **Done** calls `/api/me/profile`; it commits once, disables dismissal while pending and closes
+with success only after persistence. A known failure keeps the draft and previous saved reference.
+Ambiguous network/DB failures retain the existing conservative “check whether it saved” handling.
+
+Input photos are limited to **4 MiB** (multipart body: 4 MiB + 16 KiB overhead), **24 million total
+decoded pixels across all frames**, and **120 frames**. The finished square is at most 512 px;
+output is also bounded to 24 million pixels and **2 MiB**. Limits are distinct: an input below
+4 MiB can still be refused if its finalized animation exceeds 2 MiB. Each Sharp operation times out
+after 7 seconds; the frame loop has a 12-second budget. Malformed images, MIME mismatches, invalid
+crop coordinates and excessive resources are refused without replacing the current reference.
+
+JPEG, PNG, GIF and WebP keep their format. Next's existing bundled Sharp coalesces animated GIF/WebP
+frames to RGBA; every frame receives the same crop/rotation/resize before reassembly with original
+frame delays and loop count. No canvas flattening of GIFs. The editor uses an oriented browser image
+with proportional dragging and one Zoom slider; server Sharp auto-orients before crop, including EXIF mirror/rotation.
+Animated PNG is refused with an actionable GIF/WebP alternative. Reduced-motion displays a static
+canvas snapshot in shared avatars and the editor without changing the persisted animated object.
+Review Next's private Sharp integration on Next upgrades.
+
+**Dependency decision (owner approved in #567's implementation chat, 2026-11-08):** add pinned
+`libheif-js@1.23.5` in `@rotra/data`. Lazy-loaded bundled WASM decodes HEIC/HEIF locally in a worker
+(12-second deadline; terminated on cancellation) and applies container orientation. A local WebP
+preview/upload draft works even in browsers without native HEIC decoding; it is not uploaded until
+Done. Original HEIC/HEIF sent directly to the authenticated handler is decoded by the same library
+and encoded to WebP. HEIF primary-image decoding is capped at 24 million pixels and 8 image handles;
+server raw decoding uses libheif's built-in safety bounds, not a terminable worker. The bucket admits
+HEIC/HEIF but the application stores browser-compatible WebP; it does not store an unusable original.
+
+The owner’s later #567 follow-up replaces the original position/rotation controls with simple drag
+and zoom. The wire decoder retains validated quarter-turn support, but the UI sends zero rotation.
+
+Mock mode stores only an in-memory SVG presentation containing the source image and transform;
+it preserves the animation without pretending to create a Storage object or perform server validation.
+Mock mode resets on reload. It shares the same draft/Done contract and HEIC preparation as real mode.
 
 Each photo uses an immutable path. Old photos are retained, and a known rejected database write
-removes only its new upload; ambiguous failures retain it. The existing club-logo setup and retention
-pattern is documented in [clubs and licenses](../../admin/modules/clubs-licenses.md#club-logo-persistence-374).
-The Player route uses Next's internal image optimizer (and its bundled sharp); review this integration
-when upgrading Next. Input is capped at 4 MiB and 24 million pixels. Bucket creation is a deployment
-setup step, not performed by this code.
+removes only its new upload; ambiguous failures retain it. Bucket configuration is deployment setup,
+not application DDL. The existing club-logo pattern is documented in
+[clubs and licenses](../../admin/modules/clubs-licenses.md#club-logo-persistence-374).
 
 ## Private contacts and account mapping
 

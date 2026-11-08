@@ -45,6 +45,10 @@ Components: compare-filter-bar
   comments, same day).
 
 ## Backend note
+- #541 implements the signed-in real-mode reader and drafts `20261108000200_player_compare_reader`:
+  one SQL function over final match facts, SQL filter totals and three-row pages, existing rank readers.
+  Shared migration application and the actual runtime-role EXECUTE grant require human sign-off;
+  batch checks and local SQL execution are pending. See the migration's deployment/verification notes.
 - Owner comment, same day: this will be a background Supabase Edge Function / cron, but check whether a cron is
   needed at all, because there should be no extra work after a session is submitted. Recommendation recorded in
   the docs: no cron; read the shared games from final match rows, or update a pair summary when the session is

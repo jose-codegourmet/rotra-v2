@@ -1,78 +1,43 @@
 import { cn } from '@rotra/ui/cn'
+import { SkillMixSegment } from './SkillMixSegment'
+import { type SkillMixCounts, skillMixSegments } from './skillMix'
 
-export type SkillDistributionCounts = {
-  beginner: number
-  intermediate: number
-  advanced: number
-  /** Players with no level yet */
-  unrated?: number
-}
+export type SkillDistributionCounts = SkillMixCounts
 
 export type SkillDistributionBarProps = {
   counts: SkillDistributionCounts
-  /** Heading on the left of the header row */
+  /** Small heading above the bar */
   label?: string
   className?: string
 }
 
-const SEGMENTS = [
-  { key: 'beginner', label: 'Beginner', tone: 'bg-accent/30' },
-  { key: 'intermediate', label: 'Intermediate', tone: 'bg-accent/60' },
-  { key: 'advanced', label: 'Advanced', tone: 'bg-accent' },
-  { key: 'unrated', label: 'No level', tone: 'bg-border-strong' },
-] as const
-
 /**
- * One stacked bar of how many players sit in each skill group, with a visible legend. Takes counts
- * only, never player data, so the public page can reuse it with aggregate numbers.
+ * One compact bar of how many players sit in each skill group. No legend and no rows: hover or focus a
+ * segment for its count. Takes counts only, never player data, so the public page can reuse it with
+ * aggregate numbers.
  */
 export function SkillDistributionBar({
   counts,
   label = 'Skill mix',
   className,
 }: SkillDistributionBarProps) {
-  const items = SEGMENTS.map((s) => ({ ...s, count: counts[s.key] ?? 0 })).filter(
-    (s) => s.count > 0,
-  )
-  const total = items.reduce((sum, s) => sum + s.count, 0)
-  const spoken = items
-    .map((s) => (s.key === 'unrated' ? `${s.count} with no level` : `${s.count} ${s.label}`))
-    .join(', ')
+  const segments = skillMixSegments(counts)
 
   return (
-    <div className={cn('flex flex-col gap-2', className)}>
-      <div className="flex items-baseline justify-between gap-3 text-[13px]">
-        <span className="font-semibold text-fg">{label}</span>
-        <span className="text-fg2">
-          {total ? `${total} ${total === 1 ? 'player' : 'players'}` : 'No players yet'}
-        </span>
+    <div className={cn('flex flex-col gap-1.5', className)}>
+      <div className="flex items-baseline justify-between gap-3 text-xs">
+        <span className="font-bold text-fg">{label}</span>
+        {segments.length ? null : <span className="text-fg2">No players yet</span>}
       </div>
-      {total ? (
-        <>
-          <div
-            role="img"
-            aria-label={`${label}: ${spoken}`}
-            className="flex h-2 w-full gap-0.5 overflow-hidden rounded-full"
-          >
-            {items.map((s) => (
-              <span
-                key={s.key}
-                className={cn('h-full min-w-0 first:rounded-l-full last:rounded-r-full', s.tone)}
-                style={{ flexGrow: s.count, flexBasis: 0 }}
-              />
-            ))}
-          </div>
-          <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-fg2">
-            {items.map((s) => (
-              <li key={s.key} className="inline-flex items-center gap-1.5">
-                <span aria-hidden className={cn('size-2 rounded-full', s.tone)} />
-                {s.label} {s.count}
-              </li>
-            ))}
-          </ul>
-        </>
+      {segments.length ? (
+        // biome-ignore lint/a11y/useSemanticElements: a group of bar segments is not a form fieldset.
+        <div role="group" aria-label={label} className="flex h-2.5 w-full gap-0.5">
+          {segments.map((s) => (
+            <SkillMixSegment key={s.key} segment={s} />
+          ))}
+        </div>
       ) : (
-        <div aria-hidden className="h-2 w-full rounded-full bg-border" />
+        <div aria-hidden className="h-2.5 w-full rounded-full bg-border" />
       )}
     </div>
   )

@@ -5,7 +5,7 @@ export const joinRequestCardMeta = {
   description:
     "Q-PUBLIC-JOIN › the public session page's Want to play? card: how many slots are open (or that confirmed guests join the waitlist) with Request to join, the off state when the club is not taking requests online, and the visitor's own request status afterwards.",
   usage: [
-    'Show under the hero on prepared and live public sessions. variant="open" with openSlots and capacity, "full" when every slot is taken, or "active" during play; all call onRequestToJoin, which opens JoinRequestForm.',
+    'Show under the hero on prepared and live public sessions. variant="open" with the actual openSlots and capacity (shown as “1 slot left” or “N slots left”), "full" when every slot is taken, or "active" during play; all call onRequestToJoin, which opens JoinRequestForm.',
     'Pass skillMix with confirmed player counts to show the SkillDistributionBar; omit it or pass zero counts when there are no players. Pass disabled on "open", "full" or "active" while the visitor is offline: sending a request needs internet, so Request to join is disabled.',
     'variant="off" when the session\'s Accept join requests is turned off: the card says to contact the Queue Master.',
     'After this visitor sent a request, pass their status instead: "sent" (with the name they typed), "confirmed-slot", "confirmed-waitlist" (with waitlistPosition) or "declined".',

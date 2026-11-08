@@ -10,6 +10,8 @@ export type SharedGamePlayer = {
   playerId: string | null
   name: string
   pictureUrl: string | null
+  /** Full name used to resolve a character reference; name may be a nickname. */
+  pictureName?: string
   level: PlayingLevel | null
   games: number
 }

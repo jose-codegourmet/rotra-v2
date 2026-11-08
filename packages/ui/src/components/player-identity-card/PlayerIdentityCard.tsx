@@ -16,6 +16,9 @@ export type PlayerIdentityCardProps = {
   onChangePicture?: () => void
   /** Owner only: opens My player ID */
   onOpenPlayerId?: () => void
+  /** Public profile: open the comparison (or sign-in). */
+  onCompare?: () => void
+  compareSignedIn?: boolean
 }
 export function PlayerIdentityCard({
   profile,
@@ -25,6 +28,8 @@ export function PlayerIdentityCard({
   onEdit,
   onChangePicture,
   onOpenPlayerId,
+  onCompare,
+  compareSignedIn = false,
 }: PlayerIdentityCardProps) {
   return (
     <Card asChild>
@@ -82,6 +87,10 @@ export function PlayerIdentityCard({
               <Icon name="qr" /> My player ID
             </Button>
           </div>
+        ) : onCompare ? (
+          <Button size="sm" variant="primary" onClick={onCompare}>
+            <Icon name="versus" /> Compare with {compareSignedIn ? 'me' : 'my results'}
+          </Button>
         ) : null}
       </section>
     </Card>

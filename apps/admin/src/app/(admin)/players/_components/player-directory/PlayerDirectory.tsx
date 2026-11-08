@@ -30,6 +30,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useDenyOnPermissionError } from '../../../_components/admin-workspace-shell/AdminWorkspaceShell'
 import { AddAdminPlayer } from '../add-admin-player/AddAdminPlayer'
 import { PlayerBulkActions } from '../player-bulk-actions/PlayerBulkActions'
+import { usePlayerEdit } from '../player-edit/usePlayerEdit'
 import { PlayerManagementActions } from '../player-management-actions/PlayerManagementActions'
 import { directoryFilters, writeDirectoryFilters } from './PlayerDirectory.url'
 export function PlayerDirectory() {
@@ -71,7 +72,8 @@ export function PlayerDirectory() {
     playerQuery = useAdminPlayer(peek, { enabled: !!peek }),
     games = useAdminPlayerGames(peek),
     profile = usePlayerProfile(peek),
-    requests = useContactRequests({ playerId: peek })
+    requests = useContactRequests({ playerId: peek }),
+    edit = usePlayerEdit(mutations.update, peek)
   const denied = useDenyOnPermissionError(
     list.error,
     clubs.error,
@@ -94,7 +96,7 @@ export function PlayerDirectory() {
   const from = returnParams.toString()
   const href = (id: string) => `/players/${id}?from=${encodeURIComponent(from)}`
   const closePeek = () => {
-    mutations.update.reset()
+    edit.reset()
     mutations.link.reset()
     setRegistration(null)
     const params = new URLSearchParams(query)
@@ -261,29 +263,19 @@ export function PlayerDirectory() {
           playerQuery.data
             ? {
                 offline,
-                isPending: mutations.update.variables?.id === peek && mutations.update.isPending,
-                serverError:
-                  mutations.update.variables?.id === peek
-                    ? mutations.update.error?.message
-                    : undefined,
+                isPending: edit.editingId === peek && edit.isPending,
+                serverError: edit.editingId === peek ? edit.serverError : undefined,
+                emailError: edit.editingId === peek ? edit.emailError : undefined,
+                emailLocked: edit.emailLocked,
                 onReload: () => {
                   void client.invalidateQueries()
-                  mutations.update.reset()
+                  edit.reset()
                   closePeek()
                 },
                 onSubmit: (values) => {
                   const player = playerQuery.data
                   if (!player) return
-                  mutations.update.mutate(
-                    { ...values, id: player.id, revision: player.revision },
-                    {
-                      onSuccess: () => {
-                        toast.success('Profile updated')
-                        closePeek()
-                      },
-                      onError: (error) => toast.error(error.message),
-                    },
-                  )
+                  void edit.submit(player, values, closePeek)
                 },
               }
             : undefined

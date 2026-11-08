@@ -115,10 +115,11 @@ export async function createAdminPlayer(input: AdminPlayerCreateValues) {
   })
 }
 export async function updateAdminPlayer(
-  input: AdminPlayerEditValues & { id: string; revision: number },
+  input: Omit<AdminPlayerEditValues, 'email'> & { id: string; revision: number },
 ) {
   await owner()
-  const values = adminPlayerEditSchema.parse(input)
+  // A new email is never saved here: it goes for review as a contact-change request (#564).
+  const values = adminPlayerEditSchema.omit({ email: true }).parse(input)
   return adminMutation(400, (draft) => {
     checkMockSave()
     const current = record(draft, input.id)

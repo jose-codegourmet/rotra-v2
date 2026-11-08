@@ -68,12 +68,14 @@ const UI_ACTION: Record<string, string> = {
   'club.name_change_rejected': 'club_name_change_rejected',
   'club.license_activated': 'license_activated',
   'club.license_renewed': 'license_renewed',
+  'player.contact_change_submitted': 'contact_change_submitted',
   'player.contact_change_approved': 'contact_change_approved',
   'player.contact_change_rejected': 'contact_change_declined',
   'player.contact_change_applied': 'contact_change_applied',
 }
 
 const CONTACT_ACTIONS = [
+  'player.contact_change_submitted',
   'player.contact_change_approved',
   'player.contact_change_rejected',
   'player.contact_change_applied',
@@ -292,6 +294,13 @@ async function summarizer(events: ReadEvent[]) {
               ? 'Declined'
               : 'Applied'
         return `${verb} ${CONTACT_FIELD_WORD[field]} change for ${name}.`
+      }
+      case 'player.contact_change_submitted': {
+        // Same copy as the mock's line (#564); the reason is stored, the contact never is.
+        const name = nameOf.get(event.targetId)
+        const reason = str(metadata.reason)
+        if (metadata.field !== 'email' || !name || !reason) return null
+        return `Email change for ${name} entered by ROTRA Admin. Reason: ${reason}`
       }
       default:
         return null

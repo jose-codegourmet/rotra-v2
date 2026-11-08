@@ -1159,13 +1159,16 @@ function playerManagementSheet(action,id) {
     </div>`;
   };
   const qvFoot = `<button class="btn" data-act="pmSheet" data-v="Edit profile" data-id="${id}">Edit</button><button class="btn" data-act="openPlayerHistory" data-id="${id}">Full history</button><button class="btn primary" data-act="openPlayer" data-id="${id}">Full profile</button>`;
+  // Open contact-change request (waiting, applying or failed) disables the Email field.
+  const hasOpenReq = !!p && S.requests.some((r) => r.pid === p.id && ['submitted', 'applying', 'failed'].includes(r.status));
   const editBody = () => `<div class="stack qv">
       <div class="qv-hero${p.claimed ? ' claimed' : ''}">${avatar(p,'lg')}<div class="qv-id"><h2>Edit ${name}</h2><span class="mono small muted">${esc(p.rtr)}</span></div></div>
       <label class="field"><span>Full name</span><input class="input" value="${esc(p.name)}"></label>
       <label class="field"><span>Nickname</span><input class="input" value="${esc(p.nick || '')}"></label>
       ${p.claimed ? '<p class="small muted">This player is registered, so they change their own photo.</p>' : '<label class="field"><span>Profile photo (link)</span><input class="input" type="url" placeholder="https://"></label>'}
-      <label class="field"><span>Reason for the change</span><textarea class="input" placeholder="Required. Saved in the record of actions."></textarea></label>
-      <p class="small muted">Phone, email, rank and the RTR ID can't be edited here. Contact changes go through a request.</p>
+      <label class="field"><span>Email</span><input class="input" type="email" inputmode="email" autocomplete="off" data-edit-email placeholder="name@example.com" value="${esc(p.email || '')}"${hasOpenReq ? ' disabled' : ''}><p class="small muted" style="margin:0">${hasOpenReq ? 'This player has an open contact-change request. Review it on the Contact tab.' : 'A new email is sent for review as a contact-change request. The current email stays until the change is applied.'}</p><p class="err" style="margin:0" data-edit-err hidden></p></label>
+      <label class="field"><span>Reason for the change</span><textarea class="input" data-edit-reason placeholder="Required. Saved in the record of actions."></textarea></label>
+      <p class="small muted">Phone, rank and the RTR ID cannot be edited here.</p>
     </div>`;
   const inviteLink = p ? `https://rotra.example/claim/${hashStr('inv-' + p.id).toString(36)}${hashStr('inv2-' + p.id).toString(36)}` : '';
   const inviteBody = () => `<div class="stack qv">
@@ -1175,7 +1178,7 @@ function playerManagementSheet(action,id) {
       <ul class="small muted" style="margin:0;padding-left:18px"><li>The link works for 7 days and once. Making a new one replaces this one.</li><li>ROTRA sends no email or text. Share the link yourself.</li></ul>
     </div>`;
   const inviteFoot = `<button class="btn" data-act="pmSheet" data-v="Quick view" data-id="${id}">Back</button><button class="btn primary" data-act="copyInvite" data-id="${id}">Copy link</button>`;
-  const editFoot = `<button class="btn" data-act="pmSheet" data-v="Quick view" data-id="${id}">Back</button><button class="btn primary">Review changes</button>`;
+  const editFoot = `<button class="btn" data-act="pmSheet" data-v="Quick view" data-id="${id}">Back</button><button class="btn primary" data-act="pmEditReview" data-id="${id}">Review changes</button>`;
   const body= action==='Quick view' ? qv() : action==='Invite to ROTRA' && p ? inviteBody() : action==='Edit profile' && p ? editBody() : action==='Games' ? '<p>Read-only. Admin cannot change ranks, winners or scores.</p><div class="toolbar"><button class="btn">Counted</button><button class="btn">Fun and partial</button><button class="btn">All</button></div><p>Date · Club · Session · Partner · Opponents · Score · Result · Counted for rank</p>' : action==='Actions' ? ['Quick view','View full profile','View full history','Copy RTR ID','Copy registration link','Edit profile','Archive','Restore','Remove'].map(x=>`<button class="btn" data-act="pmSheet" data-v="${x}" data-id="${id}">${x}</button>`).join('') : action==='Add player' || action==='Edit profile' ? `<div class="stack"><label>Full name<input class="input" value="${p?esc(p.name):''}"></label><label>Nickname<input class="input" value="${p?esc(p.nick||''):''}"></label>${action==='Add player'?'<label>Phone (optional)<input class="input"></label><label>Email (optional)<input class="input"></label><label>Place<select class="input"><option>Cebu City</option><option>Manila</option><option>Davao City</option></select></label><label>Club (optional)<select class="input"><option>Created by Admin</option></select></label>':`${!p?.claimed?'<label>Profile photo<input class="input" type="url"></label>':''}<label>Reason<textarea class="input"></textarea></label><p>Review before and after values before saving. Contacts, rank and RTR ID cannot be edited.</p>`}<button class="btn primary">${action==='Add player'?'Add player':'Review changes'}</button></div>` : `<p>${action} ${name}. ${action==='Remove'?'Permanent. Only records with no games and no claimed account.':'History is kept.'}</p><label>Reason<textarea class="input"></textarea></label>${action==='Remove'?'<label>Type the RTR ID<input class="input"></label>':''}<button class="btn primary">Confirm ${action}</button>`;
   document.querySelectorAll('.scrim,.sheet').forEach(x=>x.remove());
   document.body.insertAdjacentHTML('beforeend',sheetWrap(action==='Edit profile'&&p?'Edit profile':action,body,action==='Quick view'?qvFoot:action==='Edit profile'&&p?editFoot:action==='Invite to ROTRA'&&p?inviteFoot:''));
@@ -1614,6 +1617,32 @@ const ACT = {
   },
   plClear: () => { document.querySelectorAll('.player-select, [data-change="plSelectAll"]').forEach((x) => { x.checked = false; }); CHANGE.plCount(); },
   pmSheet: (el) => playerManagementSheet(el.dataset.v, el.dataset.id),
+  // Edit profile: the email is never changed here. It becomes an Admin-entered contact-change request (source owner, Pending).
+  // Mockup outcome switch: a Reason containing "fail" shows the "request failed" toast; any other reason succeeds.
+  pmEditReview: (el) => {
+    const p = playerOf(el.dataset.id), sb = document.querySelector('.sheet .sb');
+    const inp = sb.querySelector('[data-edit-email]'), err = sb.querySelector('[data-edit-err]');
+    const next = inp.disabled ? '' : inp.value.trim();
+    const changed = !inp.disabled && norm(next) !== norm(p.email);
+    let msg = '';
+    if (changed && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(next)) msg = 'Enter an email address, like name@example.com.';
+    else if (changed && S.players.some((x) => x.id !== p.id && norm(x.email) === norm(next))) msg = 'That email belongs to another ROTRA profile.';
+    err.textContent = msg; err.hidden = !msg;
+    if (msg) { inp.setAttribute('aria-invalid', 'true'); inp.focus(); return; }
+    inp.removeAttribute('aria-invalid');
+    const reason = sb.querySelector('[data-edit-reason]').value;
+    S.ui.editDraft = { email: changed ? next : '', failed: /fail/i.test(reason) };
+    sb.innerHTML = `<div class="stack qv"><h2>Review changes</h2><dl class="kv">${changed ? `<dt>Email</dt><dd class="mono wrapw">${esc(p.email || '—')} → ${esc(next)}<br><span class="small muted">Sent for review · not changed yet</span></dd>` : '<dt>Profile</dt><dd>No changes</dd>'}</dl></div>`;
+    document.querySelector('.sheet footer').innerHTML = `<button class="btn" data-act="pmSheet" data-v="Edit profile" data-id="${p.id}">Back</button><button class="btn primary" data-act="pmEditSave">Save</button>`;
+  },
+  pmEditSave: () => {
+    const d = S.ui.editDraft; S.ui.editDraft = null;
+    if (!d) return;
+    document.querySelectorAll('body > .scrim, body > .sheet').forEach((x) => x.remove());
+    if (!d.email) toast('Profile saved.');
+    else if (d.failed) toast("Profile saved, but the email change wasn't sent.");
+    else toast('Email change sent for review. Approve it on the Contact tab.');
+  },
   pmMenu: (el) => showPlayerActions(el, el.dataset.id),
   plAdv: () => { S.ui.playerAdv = !S.ui.playerAdv; render(); },
   plGrid: (el) => { S.ui.playerGrid = !!el.dataset.v; render(); },

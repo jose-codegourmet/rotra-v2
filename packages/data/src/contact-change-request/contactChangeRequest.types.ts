@@ -23,6 +23,9 @@ export type ContactChangeRequest = {
   requestedAt: number
 }
 
+/** Admin-entered email (A-PLAYERS › Edit profile, #564): the created pending request, by ID. */
+export type AdminContactChangeSubmitted = { requestId: string; status: ContactChangeStatus }
+
 /** Statuses that block a new request (one open request at a time). */
 export const OPEN_CONTACT_CHANGE_STATUSES: readonly ContactChangeStatus[] = [
   'pending',

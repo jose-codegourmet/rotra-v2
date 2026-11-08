@@ -1,6 +1,7 @@
 import { emailField } from '@rotra/schema/email'
 import { formatPhoneForDisplay, phoneField } from '@rotra/schema/phone'
 import { isAdminOffline } from '../admin-account/connectivity'
+import { getAdminSession } from '../admin-account/fetchers'
 import { adminMutation } from '../admin-account/mutation'
 import { appendAdminAudit } from '../admin-audit/fetchers'
 import { getSession } from '../auth/fetchers'
@@ -11,11 +12,13 @@ import { MockError, NotConnectedError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, mockStore, readMockState } from '../mock/store'
 import {
+  ADMIN_REQUEST_OPEN_ERROR,
   realDeclineContactChange,
   realGetContactRequest,
   realGetContactRequestCounts,
   realGetMyContactChangeRequest,
   realListContactRequests,
+  realSubmitAdminContactChange,
   realSubmitContactChangeRequest,
 } from '../real/contact-change'
 import { isRealDataMode } from '../real/mode'
@@ -30,6 +33,7 @@ import {
   normalizeContact,
 } from './contactChangeRequest.rules'
 import {
+  type AdminContactChangeSubmitted,
   type AdminContactRequestDetail,
   type AdminContactRequestItem,
   type AdminContactRequestList,
@@ -127,6 +131,73 @@ export async function submitContactChangeRequest(input: {
   })
   if (!created) throw new Error('Contact-change request produced no result.')
   return created
+}
+
+/**
+ * A-PLAYERS › Edit profile (#564): ROTRA Admin enters a player's new email. Creates a pending
+ * owner-sourced request only; the email changes through the Contact-tab review (Approve, then
+ * applied), never here. Registered and unclaimed players alike. Field errors are keyed `email`.
+ * The reason goes to the audit line, never a contact value.
+ */
+export async function submitAdminContactChange(input: {
+  playerId: string
+  field: 'email'
+  toValue: string
+  reason: string
+  commandId: string
+}): Promise<AdminContactChangeSubmitted> {
+  if (isRealDataMode()) return realSubmitAdminContactChange(input)
+  if ((await getAdminSession()).kind !== 'owner')
+    throw new MockError('permission', 'Only ROTRA Admin can change player records.')
+  const fieldError = (message: string) => new MockError('conflict', message, { email: message })
+  const email = emailField.safeParse(input.toValue)
+  if (!email.success) throw fieldError('Enter an email address, like name@example.com.')
+  const normalized = email.data.toLowerCase()
+  const reason = input.reason.trim()
+  if (!reason) throw new MockError('conflict', 'Enter a reason.', { reason: 'Enter a reason.' })
+  return adminMutation(800, (draft) => {
+    // Repeat-safe like the service: the same command returns the request it created.
+    const repeated = draft.contactChangeRequests.find(
+      (request) => request.requestId === `ccr-${input.commandId}`,
+    )
+    if (repeated) return { requestId: repeated.requestId, status: repeated.status }
+    const account = draft.playerAccounts.find((entry) => entry.playerId === input.playerId)
+    if (!account) throw fieldError('This player has no contact record yet.')
+    const current = normalizeContact('email', account.email)
+    if (normalized === current) throw fieldError("That's already this player's email.")
+    const taken = draft.playerAccounts.some(
+      (other) =>
+        other.playerId !== account.playerId &&
+        normalizeContact('email', other.email) === normalized,
+    )
+    if (taken) throw fieldError('That email belongs to another ROTRA profile.')
+    const open = draft.contactChangeRequests.some(
+      (request) =>
+        request.playerId === account.playerId &&
+        OPEN_CONTACT_CHANGE_STATUSES.includes(request.status),
+    )
+    if (open) throw fieldError(ADMIN_REQUEST_OPEN_ERROR)
+    const created: PlayerContactChangeRequest = {
+      requestId: `ccr-${input.commandId}`,
+      playerId: account.playerId,
+      field: 'email',
+      fromValue: account.email,
+      toValue: normalized,
+      status: 'pending',
+      requestedAt: Date.now(),
+      source: 'owner',
+      originalContactRevision: current,
+      providerOperationRef: null,
+    }
+    draft.contactChangeRequests.push(created)
+    appendAdminAudit(draft, {
+      action: 'contact_change_submitted',
+      targetType: 'contact_change_request',
+      targetId: created.requestId,
+      summary: `Email change for ${playerNameIn(draft, created.playerId)} entered by ROTRA Admin. Reason: ${reason}`,
+    })
+    return { requestId: created.requestId, status: created.status }
+  })
 }
 
 /** Admin-side transitions the DevMenu drives: each status may only move to the next ones. */

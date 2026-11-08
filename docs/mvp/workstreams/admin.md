@@ -31,7 +31,7 @@ link ([D-2026-11-07-01](../decisions.md#d-2026-11-07-01)).
 | Change club price | not implemented | `club/fetchers.ts:306` mock only; `setClubPricing` (`clubs.ts:211`) has no route | Ticket: needed |
 | Club-name requests (list/approve/reject) | not implemented | `club/fetchers.ts:350,376,400` mock only; `reviewClubNameChange` (`clubs.ts:502`) has no route | Ticket: needed |
 | Player directory / detail / games | implemented | `admin-player/fetchers.ts:89,103,136,147` → `real/admin-players.ts` → `db/src/admin/players.ts:13,106` | #25 open (epic) |
-| Player create/edit/archive/restore/remove | not implemented | `admin-player/mutations.ts:37,117,165,220-224` mock only | Ticket: needed (MVP scope: open question 10) |
+| Player create/edit/archive/restore/remove (Edit profile also sends an email change as an `owner` contact-change request, #564) | not implemented | `admin-player/mutations.ts:37,117,165,220-224` mock only | Ticket: needed (MVP scope: open question 10) |
 | Feature flags | implemented | `real/configuration.ts:77-108` → `api/feature-flags{,/[key]}` → `db/src/admin/configuration.ts:62,95,154` | #402 closed, #26 open |
 | Ranking settings (read/save versions) | implemented | `real/configuration.ts:123-157` → `api/ranking-settings` → `configuration.ts:72,190`; saving does not recalculate | #402 closed |
 | Audit log (club, player, contact request) | implemented | `real/admin-audit.ts:13-21` → `api/audit-events` → `db/src/admin/audit.ts:105`; shown inside detail pages | #401 closed |

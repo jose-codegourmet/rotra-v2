@@ -10,6 +10,7 @@ import { toast } from '@rotra/ui/toaster'
 import { useQueryClient } from '@tanstack/react-query'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
+import { usePlayerEdit } from '../player-edit/usePlayerEdit'
 export function PlayerManagementActions({ player }: { player: AdminPlayer }) {
   const router = useRouter(),
     search = useSearchParams(),
@@ -27,18 +28,17 @@ export function PlayerManagementActions({ player }: { player: AdminPlayer }) {
   const [editing, setEditing] = useState(false),
     { offline } = useAdminConnectivity(),
     mutations = useAdminPlayerMutations(),
-    client = useQueryClient()
+    client = useQueryClient(),
+    edit = usePlayerEdit(mutations.update, player.id)
   return (
     <>
       <AdminPlayerActions
         player={player}
         offline={offline}
-        pending={
-          mutations.link.isPending || mutations.update.isPending || mutations.change.isPending
-        }
+        pending={mutations.link.isPending || edit.isPending || mutations.change.isPending}
         onAction={(action) => {
           if (action === 'edit') {
-            mutations.update.reset()
+            edit.reset()
             setEditing(true)
           } else if (action === 'archive' || action === 'restore' || action === 'remove') {
             mutations.change.reset()
@@ -70,29 +70,21 @@ export function PlayerManagementActions({ player }: { player: AdminPlayer }) {
       <CopyPlayerValue value={copyValue} onClose={() => setCopyValue('')} />
       {editing ? (
         <AdminEditPlayerForm
-          key={player.revision}
+          // Not keyed by revision: a saved profile with a refused email keeps what was typed.
+          key={player.id}
           player={player}
           open
           onClose={() => setEditing(false)}
           offline={offline}
-          isPending={mutations.update.isPending}
-          serverError={mutations.update.error?.message}
+          isPending={edit.isPending}
+          serverError={edit.serverError}
+          emailError={edit.emailError}
+          emailLocked={edit.emailLocked}
           onReload={() => {
             void client.invalidateQueries()
             setEditing(false)
           }}
-          onSubmit={(values) =>
-            mutations.update.mutate(
-              { ...values, id: player.id, revision: player.revision },
-              {
-                onSuccess: () => {
-                  setEditing(false)
-                  toast.success('Profile updated')
-                },
-                onError: (error) => toast.error(error.message),
-              },
-            )
-          }
+          onSubmit={(values) => void edit.submit(player, values, () => setEditing(false))}
         />
       ) : null}
       {action ? (

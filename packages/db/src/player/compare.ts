@@ -29,7 +29,8 @@ type ComparePageRow = {
   games: SharedPlayerGame[]
 }
 
-const percentage = (wins: number, games: number) => (games ? Math.round((wins / games) * 100) : null)
+const percentage = (wins: number, games: number) =>
+  games ? Math.round((wins / games) * 100) : null
 
 function stats(games: number, myWins: number, otherWins: number): PlayerCompareStats {
   return {

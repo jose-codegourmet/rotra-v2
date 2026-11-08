@@ -1,5 +1,6 @@
 import { type PersonalProfileValues, personalProfileSchema } from '@rotra/schema/personal-details'
 import type { MockSession, SignInInput } from '../auth/auth.types'
+import type { PlayerPictureChoice } from '../player/picture'
 import type { PlayerProfile, PlayerRank, PlayerSessionRecord } from '../player/player.types'
 import type {
   ClaimLink,
@@ -193,4 +194,20 @@ export async function realSetPhonePrivacy(input: { phoneHidden: boolean }) {
     body: { phoneHidden: input.phoneHidden, expectedRevision: loadedRevision },
   })
   return myAccountOf(account)
+}
+
+/** The same immediate picture command as mock mode, sent to the authenticated server. */
+export async function realSetMyProfilePicture(choice: PlayerPictureChoice) {
+  if (!loadedRevision) await realGetMyAccount()
+  const form = new FormData()
+  form.set('kind', choice.kind)
+  form.set('expectedRevision', loadedRevision)
+  if (choice.kind === 'character') form.set('id', choice.id)
+  if (choice.kind === 'photo') form.set('photo', choice.file)
+  const { profile, revision } = await realRequest<{ profile: PlayerProfile; revision: string }>(
+    '/api/me/profile',
+    { method: 'PATCH', body: form },
+  )
+  loadedRevision = revision
+  return profile
 }

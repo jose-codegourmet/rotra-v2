@@ -2,7 +2,7 @@ import { type PersonalProfileValues, personalProfileSchema } from '@rotra/schema
 import { getSession } from '../auth/fetchers'
 import { playerRequest } from '../leaderboard/request'
 import { checkMockSave, getMockDevState } from '../mock/bridge'
-import { MockError, NotConnectedError } from '../mock/errors'
+import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { mockStore, readMockState } from '../mock/store'
 import { isRealDataMode } from '../real/mode'
@@ -11,10 +11,11 @@ import {
   realGetPlayerGames,
   realGetPlayerProfile,
   realGetPlayerRank,
+  realSetMyProfilePicture,
   realUpdateMyProfile,
 } from '../real/player'
-import type { PlayerProfile, PlayerRank, PlayerSessionRecord } from './player.types'
 import { characterPictureReference, type PlayerPictureChoice } from './picture'
+import type { PlayerProfile, PlayerRank, PlayerSessionRecord } from './player.types'
 import { playerProjection } from './projection'
 
 export async function getPlayerRank(
@@ -101,7 +102,7 @@ export async function updateMyProfile(input: PersonalProfileValues): Promise<Pla
 
 /** Set the signed-in player's picture in the mock store, independent of profile edits. */
 export async function setMyProfilePicture(choice: PlayerPictureChoice): Promise<PlayerProfile> {
-  if (isRealDataMode()) throw new NotConnectedError()
+  if (isRealDataMode()) return realSetMyProfilePicture(choice)
   const session = await getSession('player')
   if (!session) throw new MockError('permission', 'Sign in to edit your profile.')
   let picture: string | null

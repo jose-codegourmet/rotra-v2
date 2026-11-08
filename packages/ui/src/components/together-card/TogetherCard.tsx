@@ -50,7 +50,7 @@ export function TogetherCard({ me, them, games, won, winRate, className }: Toget
               value={won}
               max={games}
               aria-label={`Won ${won} of ${games} games together`}
-              className="h-3 rounded-none bg-border-strong [border-radius:0_999px_999px_0] [&>i]:rounded-none [&>i]:[border-radius:999px_0_0_999px] [&>i]:border-r-2 [&>i]:border-surface"
+              className="h-3 rounded-full bg-border-strong [&>i]:rounded-l-full [&>i]:rounded-r-none [&>i]:border-r-2 [&>i]:border-surface"
             />
             <p className="text-[13px] text-fg2">
               Your level together: {levelLabel(me.level)} and {levelLabel(them.level)}.

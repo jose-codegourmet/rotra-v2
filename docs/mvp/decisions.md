@@ -17,7 +17,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-07-07](#d-2026-11-07-07) | Player invite links use player login until sign-up exists | approved | implemented | #476, #478; #477 blocked | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
 | [D-2026-11-08-01](#d-2026-11-08-01) | Where Admin Sales numbers are calculated | approved | not started | #533, #540 (epic #504) | [Admin](workstreams/admin.md) |
 | [D-2026-11-08-02](#d-2026-11-08-02) | Player Compare data, rules and route | approved | implemented in source; SQL draft, verification pending | #525, #526, #541 (epic #502) | [Player](workstreams/player.md) |
-| [D-2026-11-08-03](#d-2026-11-08-03) | Profile pictures in Supabase Storage | approved | not started | #522, #542 (epic #502) | [Player](workstreams/player.md) |
+| [D-2026-11-08-03](#d-2026-11-08-03) | Profile pictures in Supabase Storage | approved | in progress | #522, #542 (epic #502) | [Player](workstreams/player.md) |
 | [D-2026-11-08-04](#d-2026-11-08-04) | Scheduled jobs: Supabase pg_cron calls protected Route Handlers | approved | not started | #545; #546, #547 blocked | [Backend](workstreams/backend.md) |
 
 ## Status conventions
@@ -166,7 +166,7 @@ Then add a row to the [index](#index) and link the entry from the workstream pag
 <a id="d-2026-11-08-03"></a>
 ### D-2026-11-08-03 — Profile pictures in Supabase Storage
 - **Decision status:** approved (2026-11-08; the owner delegated the choice and asked for the most efficient option)
-- **Implementation status:** not started
+- **Implementation status:** implemented in source by #542, pending merge and batch verification. The `player-avatars` bucket must be provisioned separately; no shared environment has been changed.
 - **Ticket:** [#522](https://github.com/jose-codegourmet/rotra-v2/issues/522) (mock data), [#542](https://github.com/jose-codegourmet/rotra-v2/issues/542) (Storage and real-mode writer), epic [#502](https://github.com/jose-codegourmet/rotra-v2/issues/502)
 - **Roadmap:** MVP candidate — [Player workstream](workstreams/player.md)
 - **Decision:** Reuse the club-logo pattern (#374) instead of building a new one. The Player app's existing `/api/me/profile` route (behind `requireOwnPlayer`) receives the photo, the server normalizes it to a square PNG (512 px), uploads it to a public **`player-avatars`** Supabase Storage bucket, and saves its immutable URL in `players.avatar_ref`. A character is saved as `character:<id>`; Use my initials saves null. No direct browser upload, no Edge Function, no migration (`avatar_ref` already exists). Old files are kept like club logo snapshots.

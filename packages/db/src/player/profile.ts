@@ -125,7 +125,7 @@ export async function readMyProfile(context: PlayerContext) {
 }
 
 /**
- * P-PROFILE edit: name, nickname, picture, style details, experience and social links under the
+ * P-PROFILE edit: name, nickname, style details, experience and social links under the
  * loaded revision. Contacts are never editable here (they go through a contact change request).
  */
 export async function updateMyProfile(
@@ -134,7 +134,6 @@ export async function updateMyProfile(
     expectedRevision: string
     fullName: string
     nickname: string | null
-    picture: string | null
     playingStyle: string
     experienceYears: number | null
     experienceMonths: number | null
@@ -167,7 +166,6 @@ export async function updateMyProfile(
       data: {
         fullName,
         nickname: input.nickname?.trim() || null,
-        avatarRef: input.picture,
         ...experienceUpdate(
           experience,
           currentExperienceMonths(player.experienceMonths, player.experienceRecordedAt),

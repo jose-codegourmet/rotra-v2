@@ -1,12 +1,12 @@
 'use client'
 import { useSession } from '@rotra/data/auth/use-session'
+import { PLAYING_LEVELS } from '@rotra/data/player/types'
 import type { PlayerCompareFilter, SharedGamePlayer } from '@rotra/data/player-compare/types'
 import { usePlayerCompare } from '@rotra/data/player-compare/usePlayerCompare'
-import { PLAYING_LEVELS } from '@rotra/data/player/types'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { CompareFilterBar } from '@rotra/ui/compare-filter-bar'
-import { CompareStats, type CompareStatRow } from '@rotra/ui/compare-stats'
+import { type CompareStatRow, CompareStats } from '@rotra/ui/compare-stats'
 import { ErrorState } from '@rotra/ui/error-state'
 import { levelLabel } from '@rotra/ui/level-pill'
 import { PageHeader } from '@rotra/ui/page-header'
@@ -175,7 +175,7 @@ export function PlayerCompare({ playerId }: { playerId: string }) {
           ← {other.profile.fullName}
         </Button>
         <PageHeader
-          className="[&>div>div:first-child]:text-xs [&>div>div:first-child]:font-semibold [&>div>div:first-child]:tracking-[0.6px] [&>div>div:first-child]:text-fg2 [&>div>div:first-child]:uppercase"
+          className="[&>div>p]:max-w-none [&>div>div:first-child]:text-xs [&>div>div:first-child]:font-semibold [&>div>div:first-child]:tracking-[0.6px] [&>div>div:first-child]:text-fg2 [&>div>div:first-child]:uppercase"
           eyebrow="Compare"
           title={`You and ${otherName}`}
           description="Official results from finished club sessions. Only singles and doubles count here; fun and partial games are left out."

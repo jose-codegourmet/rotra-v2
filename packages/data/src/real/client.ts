@@ -43,13 +43,22 @@ export async function realRequest<T>(
   const method = options.method ?? 'GET'
   if (offline())
     throw new MockError('offline', "You're offline. This needs an internet connection.")
+  const multipart = typeof FormData !== 'undefined' && options.body instanceof FormData
   let response: Response
   try {
     response = await fetch(path, {
       method,
       credentials: 'same-origin',
-      headers: options.body === undefined ? undefined : { 'Content-Type': 'application/json' },
-      body: options.body === undefined ? undefined : JSON.stringify(options.body),
+      headers:
+        options.body === undefined || multipart
+          ? undefined
+          : { 'Content-Type': 'application/json' },
+      body:
+        options.body === undefined
+          ? undefined
+          : multipart
+            ? (options.body as FormData)
+            : JSON.stringify(options.body),
       signal: options.signal,
       cache: 'no-store',
     })

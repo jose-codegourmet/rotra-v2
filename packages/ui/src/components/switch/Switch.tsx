@@ -17,13 +17,15 @@ export type SwitchProps = {
   'aria-label': string
   id?: string
   className?: string
+  /** Color when on: `accent` (default) or `warn` (e.g. a Partial payment) */
+  tone?: 'accent' | 'warn'
 }
 
 /**
  * The prototypes' .switch (presence, formats, settings). 46 × 28 px, 54 × 32 px on touch screens as
  * the experience contract sets for the Present switch.
  */
-export function Switch({ checked, onChange, className, ...props }: SwitchProps) {
+export function Switch({ checked, onChange, className, tone = 'accent', ...props }: SwitchProps) {
   return (
     <SwitchPrimitive.Root
       checked={checked}
@@ -31,7 +33,8 @@ export function Switch({ checked, onChange, className, ...props }: SwitchProps) 
       {...props}
       className={cn(
         'group relative h-7 w-[46px] flex-none cursor-pointer rounded-full border-0 bg-overlay transition-colors duration-150',
-        'data-[state=checked]:bg-accent disabled:cursor-not-allowed disabled:opacity-45',
+        tone === 'warn' ? 'data-[state=checked]:bg-warn' : 'data-[state=checked]:bg-accent',
+        'disabled:cursor-not-allowed disabled:opacity-45',
         'touch:h-8 touch:w-[54px] motion-reduce:transition-none',
         className,
       )}

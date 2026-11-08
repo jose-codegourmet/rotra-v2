@@ -1,6 +1,6 @@
 # Saved player statistics: edge fade, and arrows only when the cards overflow
 
-Status: TICKETED — #498
+Status: IN MOCK APP — #498
 Date: 2026-11-08
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Saved players › Statistics carousel

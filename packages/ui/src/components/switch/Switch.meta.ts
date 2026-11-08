@@ -7,6 +7,7 @@ export const switchMeta = {
   usage: [
     'Always pass aria-label naming what it controls, e.g. "Present: Jose".',
     'With React Hook Form pass checked={field.value} and onChange={field.onChange}.',
+    'tone="warn" turns the on state warning yellow (a Partial payment card); the default is the accent.',
     'Touch screens get the 54 × 32 px Present size automatically.',
   ],
   prototype: {

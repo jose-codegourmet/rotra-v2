@@ -1,3 +1,4 @@
+import { deleteClubPlayer } from '@rotra/db/queue/club-player-delete'
 import { readClubPlayerDetails, updateClubPlayerDetails } from '@rotra/db/queue/club-player-details'
 import { ServiceError } from '@rotra/db/service/errors'
 import { handleAccountRequest } from '@rotra/db/service/handler'
@@ -43,4 +44,12 @@ export async function PATCH(request: Request, ctx: Ctx) {
       }),
     }
   })
+}
+
+/** Delete player: soft delete; history stays (D-DELETE-PLAYER confirms first in the Active Session). */
+export async function DELETE(_request: Request, ctx: Ctx) {
+  const { clubPlayerId } = await ctx.params
+  return handleAccountRequest('club', routeCookieAdapter(await cookies()), async (club) => ({
+    body: await deleteClubPlayer(club, clubPlayerId),
+  }))
 }

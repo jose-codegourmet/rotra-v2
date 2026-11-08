@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-TICKETED: 20 · IN PROGRESS: 3 · IN MOCK APP: 39 · MOCKUP ONLY: 4
+TICKETED: 19 · IN PROGRESS: 4 · IN MOCK APP: 39 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -236,7 +236,7 @@ TICKETED: 20 · IN PROGRESS: 3 · IN MOCK APP: 39 · MOCKUP ONLY: 4
 | [2026-11-08-queue-roster-summary-one-box](2026-11-08-queue-roster-summary-one-box.md) | Roster tab: slots and skill mix in one box, one bar | slot-meter, preparation-roster | TICKETED — #498 |
 | [2026-11-08-queue-roster-view-toggle-icons](2026-11-08-queue-roster-view-toggle-icons.md) | Roster List / Grid toggle uses icons | roster-card, segmented-control, roster-panel, preparation-roster | TICKETED — #498 |
 | [2026-11-08-queue-saved-players-stats-fade](2026-11-08-queue-saved-players-stats-fade.md) | Saved player statistics: edge fade, and arrows only when the cards overflow | switch, payments-checklist, saved-player-stats-carousel | TICKETED — #498 |
-| [2026-11-08-queue-session-qr-share-card](2026-11-08-queue-session-qr-share-card.md) | Session QR becomes a branded share card with a logo in the QR | session-join-qr, session-preparation | TICKETED — #499 |
+| [2026-11-08-queue-session-qr-share-card](2026-11-08-queue-session-qr-share-card.md) | Session QR becomes a branded share card with a logo in the QR | session-join-qr, session-preparation | IN PROGRESS — #499 |
 | [2026-11-08-queue-setup-court-pictures](2026-11-08-queue-setup-court-pictures.md) | Session setup shows each court as a court picture that opens an edit dialog | setup-court-picture, session-setup-form, session-setup, add-court-form | TICKETED — #501 |
 | [2026-11-08-queue-setup-page1-rearranged](2026-11-08-queue-setup-page1-rearranged.md) | Session setup page 1 rearranged: venue up, steppers side by side, court times folded | session-setup-form, session-setup, add-court-form | TICKETED — #501 |
 | [2026-11-08-queue-setup-time-fields-layout](2026-11-08-queue-setup-time-fields-layout.md) | Setup: Starts and Ends side by side, next day becomes a small link | time-field, date-time-picker, session-setup-form, session-setup, add-court-form | TICKETED — #501 (superseded by 2026-11-08-queue-setup-when-block) |

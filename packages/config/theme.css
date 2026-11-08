@@ -70,6 +70,11 @@
   --color-bronze: var(--bronze);
   --color-qr-bg: var(--qr-bg);
   --color-qr-fg: var(--qr-fg);
+  /* Session share images keep the same dark brand palette in both app themes. */
+  --color-share-bg: var(--share-bg);
+  --color-share-fg: var(--share-fg);
+  --color-share-muted: var(--share-muted);
+  --color-share-accent: var(--share-accent);
 
   /* rounded-lg = --r (10px, cards, buttons); rounded-md = --r-sm (6px, inputs, small rows) */
   --radius-lg: var(--r);
@@ -95,6 +100,12 @@
 }
 
 :root {
+  /* Fixed share-card colors from the Session QR prototype; never overridden by light mode. */
+  --share-bg: #0b0b0c;
+  --share-fg: #f0f0f2;
+  --share-muted: #9090a0;
+  --share-accent: #00ff88;
+  --share-glow: rgba(0, 255, 136, 0.16);
   --bg: #0b0b0c;
   --surface: #1a1a1d;
   --elev: #2a2a2e;

@@ -3,7 +3,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const playerDetailMeta = {
   name: 'PlayerDetail',
   description:
-    'A-PLAYER-DETAIL container: useAdminPlayer, useContactRequests({playerId}) and the audit events of those requests for one player identity; a DetailHero, the same-name notice, and a two-column layout (main + 340 px side at 1040 px and wider) of Identity, Private contact, Contact-change requests, Account, Rank and games and Record of actions. Read-only: no edit controls.',
+    'A-PLAYER-DETAIL container with URL-backed Overview, Contact, Game history and Activity tabs, retaining Admin player actions and read-only history.',
   usage: [
     'Rendered by /players/[playerId], which awaits params and searchParams from (the directory query) and passes them in. Back goes to /players plus from, restoring the search, account filter and shown count.',
     'Private contact shows the applied phone and email only, never a pending request; Phone shown to clubs comes from the player’s own preference.',
@@ -29,6 +29,8 @@ export const playerDetailMeta = {
     'PlayerAccountCard',
     'PlayerRankCard',
     'ActivityLog',
+    'Tabs',
+    'AdminPlayerHistory',
     'ErrorState',
     'EmptyState',
     'Skeleton',

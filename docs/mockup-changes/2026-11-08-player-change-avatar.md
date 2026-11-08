@@ -1,6 +1,6 @@
 # Players can change their profile picture
 
-Status: TICKETED — #502
+Status: IN PROGRESS — #502
 Date: 2026-11-08
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › My profile (hero) and Edit profile › Name

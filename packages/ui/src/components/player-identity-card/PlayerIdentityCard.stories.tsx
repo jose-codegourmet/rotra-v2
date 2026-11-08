@@ -13,6 +13,7 @@ const meta = {
     idElementId: 'story-player-id',
     onCopyId: () => {},
     onEdit: () => {},
+    onChangePicture: () => {},
     onOpenPlayerId: () => {},
   },
 } satisfies Meta<typeof PlayerIdentityCard>

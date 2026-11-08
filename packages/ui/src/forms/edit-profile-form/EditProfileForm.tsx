@@ -1,6 +1,7 @@
 'use client'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { formatPhoneForDisplay } from '@rotra/schema/phone'
+import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { useSubmitOnce } from '@rotra/ui/hooks/use-submit-once'
@@ -57,6 +58,9 @@ export type EditProfileFormProps = {
   onOpenPhonePrivacy: () => void
   /** Lets the container guard navigation away from unsaved edits */
   onDirtyChange?: (dirty: boolean) => void
+  picture?: string | null
+  pictureName?: string
+  onChangePicture?: () => void
 }
 /** P-EDIT-PROFILE: one shared draft across four sections and one Save changes. */
 export function EditProfileForm({
@@ -69,6 +73,9 @@ export function EditProfileForm({
   onRequestContactChange,
   onOpenPhonePrivacy,
   onDirtyChange,
+  picture,
+  pictureName,
+  onChangePicture,
 }: EditProfileFormProps) {
   const form = useForm<EditProfileValues>({
     resolver: zodResolver(editProfileSchema),
@@ -140,6 +147,28 @@ export function EditProfileForm({
               <Notice tone="error">
                 Some details need fixing: {failing.map((entry) => entry.label).join(', ')}.
               </Notice>
+            ) : null}
+            {section.id === 'name' ? (
+              <div className="flex items-center gap-3.5">
+                <Avatar
+                  name={pictureName ?? defaultValues.fullName}
+                  src={picture ?? undefined}
+                  size={64}
+                  shape="square"
+                  tone={picture ? 'neutral' : 'accent'}
+                />
+                <div className="flex flex-col gap-1">
+                  <b>Profile picture</b>
+                  <span className="text-sm text-fg2">
+                    Shown on the leaderboard and your profile.
+                  </span>
+                  <div>
+                    <Button size="sm" onClick={onChangePicture}>
+                      Change picture
+                    </Button>
+                  </div>
+                </div>
+              </div>
             ) : null}
             {section.id === 'account' ? (
               <>

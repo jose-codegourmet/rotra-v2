@@ -5,6 +5,7 @@ export const editProfileFormMeta = {
     'P-EDIT-PROFILE: Name, Playing style, Links and a read-only Account section sharing one draft and one Save changes, with a dot for unsaved edits and a count of fields to fix per section.',
   usage: [
     'The container owns useUpdateMyProfile, toasts, navigation and D-DISCARD; onDirtyChange tells it when to guard.',
+    'The picture row calls onChangePicture independently of the form draft and Save.',
     'Phone, email and the RTR ID are display-only; the submitted values never contain them.',
     'Submitting with errors opens the first section with one and focuses its first invalid field.',
   ],

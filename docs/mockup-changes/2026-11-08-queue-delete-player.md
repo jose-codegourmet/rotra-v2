@@ -1,6 +1,6 @@
 # Saved players: Delete player
 
-Status: NEW
+Status: ALREADY A TICKET — #487
 Date: 2026-11-08
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Saved players › player profile dialog; D-DELETE-PLAYER

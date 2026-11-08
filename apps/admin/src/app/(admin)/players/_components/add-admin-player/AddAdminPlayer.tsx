@@ -6,6 +6,7 @@ import { foundingCities } from '@rotra/data/fixtures/founding-cities'
 import { AdminAddPlayerForm } from '@rotra/ui/admin-add-player-form'
 import { Button } from '@rotra/ui/button'
 import { CopyPlayerValue } from '@rotra/ui/copy-player-value'
+import { Icon } from '@rotra/ui/icon'
 import { toast } from '@rotra/ui/toaster'
 import { useState } from 'react'
 export function AddAdminPlayer({ onCreated }: { onCreated: () => void }) {
@@ -26,7 +27,7 @@ export function AddAdminPlayer({ onCreated }: { onCreated: () => void }) {
           setOpen(true)
         }}
       >
-        Add player
+        <Icon name="plus" size={16} /> Add player
       </Button>
       {open ? (
         <AdminAddPlayerForm

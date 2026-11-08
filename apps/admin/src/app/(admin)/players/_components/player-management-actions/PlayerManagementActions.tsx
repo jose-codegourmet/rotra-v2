@@ -8,11 +8,10 @@ import { AdminPlayerChangeForm } from '@rotra/ui/admin-player-change-form'
 import { CopyPlayerValue } from '@rotra/ui/copy-player-value'
 import { toast } from '@rotra/ui/toaster'
 import { useQueryClient } from '@tanstack/react-query'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 export function PlayerManagementActions({ player }: { player: AdminPlayer }) {
-  const pathname = usePathname(),
-    router = useRouter(),
+  const router = useRouter(),
     search = useSearchParams(),
     [copyValue, setCopyValue] = useState('')
   const from = search.get('from') ?? search.toString()
@@ -65,10 +64,7 @@ export function PlayerManagementActions({ player }: { player: AdminPlayer }) {
             router.push(`/players?${params}`, { scroll: false })
           } else if (action === 'profile')
             router.push(`/players/${player.id}?from=${encodeURIComponent(from)}`)
-          else
-            router.push(
-              `/players/${player.id}/games?from=${encodeURIComponent(from)}${pathname === '/players' ? '&origin=list' : ''}`,
-            )
+          else router.push(`/players/${player.id}?tab=history&from=${encodeURIComponent(from)}`)
         }}
       />
       <CopyPlayerValue value={copyValue} onClose={() => setCopyValue('')} />

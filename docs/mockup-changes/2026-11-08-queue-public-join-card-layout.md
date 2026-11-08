@@ -1,6 +1,6 @@
 # Public page "Want to play?" card gets a stacked layout
 
-Status: IN PROGRESS — #500
+Status: IN MOCK APP — #500 (PR #551)
 Date: 2026-11-08
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Public session page › Want to play? card
@@ -37,3 +37,10 @@ Components: join-request-card
 - Epic: #500 (Q15)
 - #515 Q15.3 · Want to play? card: stacked layout with slots and the Skill mix bar
 - #516 Q15.4 · Public page and operator preview use the new participants and Want to play? card
+
+## Verification — November 8, 2026
+- Public page and operator preview wiring completed in #516 (PR #551).
+- Component states checked in dark and light at 375 px and 1280 px, with the canonical prototype layout and copy.
+- Signed-out public page renders; signed-out preview redirects to it. Roster CTA opens Request to join; Escape returns focus.
+- End-of-list lint, type-check and build pass. Payload allowlist, masking, level labels and waitlist order checked with two passing temporary tests.
+- Live database payloads and production deployment were not verified.

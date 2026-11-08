@@ -20,7 +20,8 @@ export function publicLevel(
 ): Pick<PublicSessionParticipant, 'skillGroup' | 'levelLabel'> {
   if (!level || !PLAYING_LEVELS.includes(level)) return { skillGroup: null, levelLabel: null }
   const [group, tier] = level.split('_')
-  const capitalize = (word: string) => word[0].toUpperCase() + word.slice(1)
+  if (!group || !tier) return { skillGroup: null, levelLabel: null }
+  const capitalize = (word: string) => word.charAt(0).toUpperCase() + word.slice(1)
   return {
     skillGroup: group as NonNullable<PublicSessionParticipant['skillGroup']>,
     levelLabel: `${capitalize(group)} ${capitalize(tier)}`,

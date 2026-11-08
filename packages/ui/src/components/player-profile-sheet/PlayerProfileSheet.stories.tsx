@@ -1,5 +1,6 @@
 import type { ClubPlayer } from '@rotra/data/club-player/types'
 import { clubPlayers, players, storyIdentityPlayers } from '@rotra/data/fixtures/players'
+import { Toaster } from '@rotra/ui/toaster'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import { PlayerProfileSheet, type PlayerProfileSheetProps } from './PlayerProfileSheet'
@@ -67,9 +68,17 @@ export const SavedPlayerActions: Story = {
   },
 }
 export const GuestWithInvite: Story = {
+  decorators: [
+    (Story) => (
+      <>
+        <Story />
+        <Toaster />
+      </>
+    ),
+  ],
   args: propsFor(storyIdentityPlayers.guest, {
     sessionsHere: 1,
-    inviteUrl: 'https://player.rotra.club/login',
+    inviteUrl: 'https://player.rotra.club/register/6cd364d4-0e3a-5c3d-9e75-2116cc845714',
   }),
 }
 export const LookupPending: Story = {

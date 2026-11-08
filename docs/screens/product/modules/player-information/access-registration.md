@@ -16,7 +16,7 @@ The development mock matches the approved sign-in reference, including the sampl
 and any-password placeholder. A claimed fictional account must match; this is not real authentication
 or email delivery.
 
-No Facebook/social sign-in and no club username login on this form. Registration is through the club-issued claim link; do not offer an unagreed unrestricted account-creation path that duplicates existing unclaimed profiles.
+No Facebook/social sign-in and no club username login on this form. Existing unclaimed profiles use their club-issued claim link. Name-only guests use the independent registration invitation below (#490); matching contacts never create a duplicate profile.
 
 Loading disables duplicate submission. Network failure preserves input and offers retry. Offline cannot establish a new authenticated session; cached public content is a separate read state. Success returns to the intended permitted destination or own profile; final routing is implementation work.
 
@@ -77,3 +77,24 @@ Expired/invalid/used link shows Request another reset. Failure preserves unsaved
 - Registration cannot complete without phone and email, but social links remain optional.
 - A claim link cannot silently create a second profile for a phone already linked.
 - Password recovery uses email and does not require the original club operator.
+
+
+## Guest registration invitation — /register/[clubId] (#490)
+
+Owner decisions, November 8, 2026: guest registration is separate from guest-record linking.
+The existing ClaimForm starts empty (no identity preview) and asks for required name, phone,
+email and password plus the existing optional personal fields. The invitation's club supplies
+RTR ID allocation context only. Intro: “Create your ROTRA account with your phone and email.
+Your club guest record stays unlinked until you accept a separate linking invitation.”
+
+Before creating a new account, a phone or email match shows: “A ROTRA account or profile already
+uses this phone number or email. Is it yours?” No matched name, ID or contacts are disclosed.
+**Yes, sign in** opens `/login`; **Recover account** opens `/forgot-password`; **No, edit my details**
+keeps the form values and focuses the phone field. The note directs unclaimed-profile owners to
+ask their club for a claim link, and other conflicts to correct their contacts or contact ROTRA.
+No answer claims an account or links a guest. Existing contact uniqueness remains enforced.
+
+Loading and invalid-club states precede the form. Pending disables submission; offline/service
+errors preserve entries. Retries reuse the same registration attempt. Success shows the new Player
+ID, confirms the guest record remains unlinked, and opens the signed-in player's own profile.
+Copy invite link and Share in Queue use this same destination. No invitation is sent by ROTRA.

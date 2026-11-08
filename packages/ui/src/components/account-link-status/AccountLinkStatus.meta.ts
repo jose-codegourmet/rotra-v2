@@ -4,6 +4,7 @@ export const accountLinkStatusMeta = {
   description:
     'Every non-form outcome of a reset or registration link: reset email sent, reset link unusable, profile already registered, registration link unusable, wrong profile, still setting up, and registration complete.',
   usage: [
+    'standalone on claim-done shows the new Player ID and explains that the club guest record remains unlinked.',
     'Presentational only; containers choose the variant and own mutations and navigation.',
     "No variant shows a phone or email except the email the player just typed in 'reset-sent'.",
     'Reset outcomes sit in AuthCard; registration outcomes use LinkPage, as in the prototype.',

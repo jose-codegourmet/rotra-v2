@@ -4,6 +4,8 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./club-player/registration-url": "./src/club-player/registrationUrl.ts",
+    "./player-account/useGuestRegistration": "./src/player-account/useGuestRegistration.ts",
     "./mock/store": "./src/mock/store.ts",
     "./mock/latency": "./src/mock/latency.ts",
     "./mock/errors": "./src/mock/errors.ts",

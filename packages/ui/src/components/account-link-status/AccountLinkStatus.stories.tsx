@@ -40,3 +40,12 @@ export const Phone: Story = {
   args: { variant: 'claim-claimed' },
   globals: { viewport: { value: 'phone' } },
 }
+
+export const GuestRegistrationDone: Story = {
+  args: {
+    variant: 'claim-done',
+    standalone: true,
+    firstName: claimLinkScenarios.firstName,
+    rtrId: claimLinkScenarios.rtrId,
+  },
+}

@@ -40,7 +40,8 @@ export type JoinRequestFormProps = {
 export const PHONE_HINT =
   'Helps the club recognise you and link your ROTRA profile. Only the club sees it.'
 export const LEVEL_HINT = 'Your best guess. The Queue Master sets your level for the night.'
-export const SIGN_UP_NOTE = "New to ROTRA? Sign-up isn't open yet — continue as a guest for now."
+export const SIGN_UP_NOTE =
+  'New to ROTRA? Ask your club for a registration invite, or continue as a guest.'
 export const RETURNED_NOTE = "You're back — finish your request below."
 export const REQUEST_NOTE =
   'This is a request, not a booking. The Queue Master confirms each guest before giving a slot.'

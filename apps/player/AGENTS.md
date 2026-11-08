@@ -19,7 +19,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 Foundation's existing `/login` and protected `/me/*` paths take precedence over the proposed
 `/sign-in` and `/profile/*` aliases in P01.10. Public routes: `/`, `/rank`, `/find/[rtrId]`,
 `/players/[playerId]`, `/players/[playerId]/rank`, `/players/[playerId]/games`.
-Auth screens use `/login`, `/forgot-password`, `/reset-password/[token]`, `/claim/[token]`.
+Auth screens use `/login`, `/forgot-password`, `/reset-password/[token]`, `/claim/[token]`, and independent guest registration `/register/[clubId]` (#490).
 Account screens will use `/me/edit`, `/me/player-id`, `/me/privacy-and-contact` under the existing
 proxy boundary. The public profile destination now exists for leaderboard and RTR ID navigation.
 Sign-in at `/login`, email-recovery at `/forgot-password`, and mock reset links at

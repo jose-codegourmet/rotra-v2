@@ -1,6 +1,6 @@
 # Player identity and accounts
 
-**Last verified:** 2026-11-07 for player login mapping and claim-link rules (#244); 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-08 for guest registration (#490); 2026-11-07 for player login mapping and claim-link rules (#244); 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Confirmed v1 target rules.
 
@@ -21,6 +21,19 @@ When a returning guest's identity is confirmed and linked to a profile, include 
 ## Profile fields and registration
 
 The operator supplies a registration link tied to the existing player profile. The player completes their details and sets a password; SMS verification is not the agreed claiming mechanism.
+
+**Guest registration decision, November 8, 2026 (#490):** a name-only guest's invitation
+must open registration rather than generic sign-in. Registering an account leaves the club's
+guest record unlinked. Linking requires a separate invitation; registration or a matching name
+does not authorize it. When the supplied phone or email matches an existing ROTRA account,
+ask the person whether that account is theirs. Before creating a second account, **Yes** requires sign-in or email recovery of the existing account;
+**No** returns to contact correction or contacting ROTRA. A profile that has not registered yet
+requires its existing club-issued claim link. Never create duplicate contacts or treat answering
+yes as proof of ownership. No matched identity or private details are revealed.
+
+Guest registration opens `/register/[clubId]`. The inviting club supplies the existing founding-city
+context for RTR ID allocation only; no guest ID or name is in the URL. New profiles have no club
+player linkage or inherited games. The later guest-link invitation flow remains separate work.
 
 Registration includes:
 
@@ -47,7 +60,7 @@ Experience can inform the initial operator assessment but is not automatic ranki
 - Forgotten passwords are recovered by email only.
 - The club operator's role is initial player entry/registration-link delivery, not routine password recovery.
 - Claim links are valid **7 days** and **single use**; the club (Queue Master) can reissue, and reissuing invalidates the previous link (decided 2026-11-07, #244). If the phone or email at claim already belongs to another account, the claim is blocked with a contact-support route; never merge silently. An RTR ID or name alone never claims an account.
-- Still open: email verification on claim, password policy/complexity, guest invitation for a name-only guest, mistaken/duplicate guest links and permanent relink, and failed provider application handling.
+- Still open: email verification on claim, password policy/complexity, separate guest-link invitation verification, mistaken/duplicate guest links and permanent relink, and failed provider application handling.
 
 ## Personal editing and privacy
 

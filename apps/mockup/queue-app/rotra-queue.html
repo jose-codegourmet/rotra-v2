@@ -3560,7 +3560,7 @@ const SHEETS = {
   join(sh) {
     const s = cur(), e = sh.err || {};
     return sheetShell('Request to join', `<p class="small muted">${esc(s.title)} · ${fmtDate(s.start)}, ${fmtTime(s.start)} · ${esc(s.venue)}</p>
-      <div class="field"><div class="seg" role="group" aria-label="How to request"><button aria-pressed="true">Continue as guest</button><a class="btn" href="../player-app/rotra-player.html" target="_blank" rel="noopener">Log in with ROTRA Player</a></div><span class="hint">New to ROTRA? Sign-up isn't open yet — continue as a guest for now.</span></div>
+      <div class="field"><div class="seg" role="group" aria-label="How to request"><button aria-pressed="true">Continue as guest</button><a class="btn" href="../player-app/rotra-player.html" target="_blank" rel="noopener">Log in with ROTRA Player</a></div><span class="hint">New to ROTRA? Ask your club for a registration invite, or continue as a guest.</span></div>
       <label class="field"><span>Your name</span><input class="input${e.name ? ' bad' : ''}" id="join-name" data-bind="ui.sheet.name" value="${esc(sh.name || '')}" autocomplete="name" data-autofocus>${e.name ? `<span class="err">${e.name}</span>` : ''}</label>
       <label class="field"><span>Nickname (optional)</span><input class="input" id="join-nick" data-bind="ui.sheet.nick" value="${esc(sh.nick || '')}"></label>
       <label class="field"><span>Phone (optional)</span><input class="input${e.phone ? ' bad' : ''}" id="join-phone" type="tel" inputmode="tel" data-bind="ui.sheet.phone" value="${esc(sh.phone || '')}" autocomplete="tel">${e.phone ? `<span class="err">${e.phone}</span>` : '<span class="hint">Helps the club recognise you and link your ROTRA profile. Only the club sees it.</span>'}</label>
@@ -3653,7 +3653,7 @@ const SHEETS = {
         <dt>Sessions here</dt><dd>${p.prior}</dd>
         <dt>Phone</dt><dd>${p.phoneHidden ? 'Hidden by player' : p.identity === 'guest' ? 'None on file' : 'Kept private; confirmed in person when adding them to a session'}</dd>
       </dl>
-      ${p.identity === 'guest' ? `<section class="stack tight" aria-labelledby="guest-invite-h"><h3 id="guest-invite-h" style="margin:0;font-size:14px">Invite to ROTRA</h3><p class="small muted">Send this link so they can sign in to ROTRA Player. Their guest record isn't linked automatically.</p><div class="row"><button class="btn" data-act="copyGuestInvite">Copy invite link</button>${navigator.share ? '<button class="btn" data-act="shareGuestInvite">Share</button>' : ''}</div></section>` : ''}
+      ${p.identity === 'guest' ? `<section class="stack tight" aria-labelledby="guest-invite-h"><h3 id="guest-invite-h" style="margin:0;font-size:14px">Invite to ROTRA</h3><p class="small muted">Send this link so they can register for ROTRA Player. Their guest record stays unlinked until they accept a separate linking invitation.</p><div class="row"><button class="btn" data-act="copyGuestInvite">Copy invite link</button>${navigator.share ? '<button class="btn" data-act="shareGuestInvite">Share</button>' : ''}</div></section>` : ''}
       <p class="small muted">Levels are set per session while preparing a roster, not here.</p>`,
       `${sh.back ? `<button class="btn" data-act="profileBack">Back to ${{ suggest: 'suggestion', payments: 'payments', dispatch: 'match', match: 'match', onCourt: 'match', invalid: 'match' }[sh.back.type] || 'previous'}</button>` : '<button class="btn" data-act="closeSheet">Close</button>'}${sh.back ? '' : `<button class="btn danger" data-act="deletePlayer" data-id="${p.id}">Delete player</button>`}${canInvite(p) ? `<button class="btn" data-act="openEditPlayer" data-id="${p.id}">Edit details</button><button class="btn primary" data-act="openInvite" data-id="${p.id}">Invite</button>` : ''}`);
   },
@@ -3691,12 +3691,12 @@ const SHEETS = {
     const p = P(sh.id);
     const claim = p.identity === 'unclaimed';
     const code = (hashStr(`${p.id}${p.name}`) >>> 0).toString(36).toUpperCase().padStart(7, 'X').slice(0, 7);
-    const link = `https://rotra.example/join/${code}`;
+    const link = claim ? `https://player.rotra.club/claim/${code}` : 'https://player.rotra.club/register/6cd364d4-0e3a-5c3d-9e75-2116cc845714';
     return sheetShell(claim ? `Invite ${esc(p.name)} to claim their profile` : `Invite ${esc(p.name)} to ROTRA`, `
       <p>${claim ? 'They already have a ROTRA profile from playing here. This link lets them claim it' : 'This link lets them create a ROTRA account'} with their phone and email, so their games and rank follow them to every club.</p>
       ${S.online ? `<div class="field"><span>Invite link</span><div class="invite-link"><input class="input" id="invite-link" readonly value="${link}" aria-label="Invite link"><button class="btn sm primary" data-act="copyInvite" data-v="${link}">Copy link</button></div><span class="hint">Send it any way you like, such as Messenger or SMS. ${claim ? 'Works once and lasts 7 days. Opening Invite again makes a new link and cancels this one.' : ''} Sample link in this prototype.</span></div>`
         : notice('warn', 'Making an invite link needs an internet connection.')}
-      <p class="small muted">The link only sets up their account. It doesn't book them into a session; you still add players to each session yourself.</p>`,
+      <p class="small muted">${claim ? '' : 'Their guest record stays unlinked until they accept a separate linking invitation. '}The link only sets up their account. It doesn't book them into a session; you still add players to each session yourself.</p>`,
       `<button class="btn" data-act="closeSheet">Done</button>`);
   },
   sync() {
@@ -4417,11 +4417,11 @@ const ACT = {
     const b = document.querySelector(`.sheet [data-act="openProfile"][data-id="${id}"]`); if (b) b.focus();
   },
   copyGuestInvite: () => {
-    const url = 'https://player.rotra.club/login'; // targets player login until self-registration ships
+    const url = 'https://player.rotra.club/register/6cd364d4-0e3a-5c3d-9e75-2116cc845714';
     const fail = () => toast(`Copy this link: ${url}`);
     try { navigator.clipboard.writeText(url).then(() => toast('Invite link copied'), fail); } catch (e) { fail(); }
   },
-  shareGuestInvite: () => { try { navigator.share({ title: 'Sign in to ROTRA Player', url: 'https://player.rotra.club/login' }).catch(() => {}); } catch (e) { /* share unavailable */ } },
+  shareGuestInvite: () => { try { navigator.share({ title: 'Register for ROTRA Player', url: 'https://player.rotra.club/register/6cd364d4-0e3a-5c3d-9e75-2116cc845714' }).catch(() => {}); } catch (e) { /* share unavailable */ } },
   openInvite: (d) => openSheet({ type: 'invite', id: d.id }),
   deletePlayer: (d) => {
     const inActive = S.sessions.some((x) => x.status === 'active' && R(x, d.id));

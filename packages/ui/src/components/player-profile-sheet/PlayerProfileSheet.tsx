@@ -38,7 +38,7 @@ export type PlayerProfileSheetProps = {
   onDelete?: () => void
   /** The delete is being checked or saved */
   deleting?: boolean
-  /** Absolute ROTRA Player sign-in link. Guests get an Invite to ROTRA section with it; hidden when absent */
+  /** Absolute ROTRA Player registration link. Guests get an Invite to ROTRA section; hidden when absent. */
   inviteUrl?: string
 }
 
@@ -88,7 +88,7 @@ export function PlayerProfileSheet({
   }
   const shareInvite = async (url: string) => {
     try {
-      await navigator.share({ title: 'Sign in to ROTRA Player', url })
+      await navigator.share({ title: 'Register for ROTRA Player', url })
     } catch {
       // Dismissing the share sheet is not an error
     }
@@ -157,8 +157,8 @@ export function PlayerProfileSheet({
             Invite to ROTRA
           </h3>
           <p className="m-0 text-[13px] text-fg2">
-            Send this link so they can sign in to ROTRA Player. Their guest record isn't linked
-            automatically.
+            Send this link so they can register for ROTRA Player. Their guest record stays unlinked
+            until they accept a separate linking invitation.
           </p>
           <div className="flex flex-wrap gap-2">
             <Button onClick={() => void copyInvite(inviteUrl)}>Copy invite link</Button>

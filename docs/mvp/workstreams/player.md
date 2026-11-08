@@ -36,11 +36,11 @@ password recovery (D-01 manual reset link, or the email reset shipped in #483: o
 | Session read / proxy guard | implemented | `auth/fetchers.ts:27` → `real/player.ts:23` → `api/auth/session` → `handleSessionRead('player')`; `apps/player/src/proxy.ts` | #483 |
 | Logout | implemented | `auth/fetchers.ts:71` → `real/player.ts:32` → `api/auth/sign-out` → `handleSignOut('player')` | #483 |
 | Registration / account claim (`/claim/[token]`) | implemented | `player-account/fetchers.ts:89,174` → `real/player.ts:39,47` → `api/claim/[token]` GET/POST → `db/src/player/{claim,account-access}.ts` (`readClaimLink`, `registerFromClaim`); prefilled from the club, phone typable when none on file (#484). The "processing" re-check (`checkClaimStatus`, `player-account/fetchers.ts:211`) is mock only | #483, #484 |
-| Claim-link issuance — Queue (Saved players › Invite) | implemented | `club-player/fetchers.ts:165` → `real/queue.ts:550` → Queue `api/club/players/[clubPlayerId]/registration-link` → `db/src/player/claim.ts:44`; 7 days (`CLAIM_LINK_DAYS = 7`), a new link cancels the previous one (#485); guests get the Player login link (D-07) | #483, #485 |
+| Claim-link issuance — Queue (Saved players › Invite) | implemented | `club-player/fetchers.ts:165` → `real/queue.ts:550` → Queue `api/club/players/[clubPlayerId]/registration-link` → `db/src/player/claim.ts:44`; 7 days (`CLAIM_LINK_DAYS = 7`), a new link cancels the previous one (#485); guests get independent registration at `/register/[clubId]` (#490) | #483, #485 |
 | Claim-link issuance — Admin | not implemented | `admin-player/mutations.ts:229` `issueRegistrationLink` mock only | none found |
 | Forgot Password screen | implemented as email reset (vs D-01) | `ForgotPassword.tsx` → `player-account/fetchers.ts:44` → `real/player.ts:81` → `api/auth/password-reset` → `db/src/player/account-access.ts:102` (Supabase `resetPasswordForEmail`). D-01's support-directed screen is not built | #483; D-01 open question 8 |
 | Reset password (`/reset-password/[token]`) | implemented (email recovery token) | `player-account/fetchers.ts:65` → `real/player.ts:87` → `api/auth/reset-password` → `account-access.ts:127` (`verifyOtp` recovery, `updateUser`). No Admin-issued reset link (D-01) | #483; D-01 |
-| Player sign-up (without a claim link) | not implemented | Sign-up shows as not open yet; invite links use player login until it exists ([D-07](../decisions.md#d-2026-11-07-07)) | none found |
+| Guest registration (without an existing-profile claim link) | implemented | `/register/[clubId]` → `useGuestRegistration` → `/api/register/[clubId]` → `db/src/player/guest-registration.ts`; unique contacts, recoverable claim staging, no guest linkage. Local database + simulated-provider flow verified; production provider not exercised | #490 |
 
 ## Remaining work
 
@@ -56,7 +56,7 @@ password recovery (D-01 manual reset link, or the email reset shipped in #483: o
 
 - [D-2026-11-07-01](../decisions.md#d-2026-11-07-01) — manual password recovery.
 - [D-2026-11-07-03](../decisions.md#d-2026-11-07-03) — guest identity reconciliation.
-- [D-2026-11-07-07](../decisions.md#d-2026-11-07-07) — invite links use player login until sign-up exists.
+- [D-2026-11-07-07](../decisions.md#d-2026-11-07-07) — original login-only invite superseded by independent guest registration in #490.
 - [D-2026-11-07-04](../decisions.md#d-2026-11-07-04) — scope freeze.
 
 ## Blocking open decisions

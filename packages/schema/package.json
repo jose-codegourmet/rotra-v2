@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./registration": "./src/registration.ts",
     "./email": "./src/email.ts",
     "./phone": "./src/phone.ts",
     "./date": "./src/date.ts",

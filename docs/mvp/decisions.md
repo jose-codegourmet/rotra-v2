@@ -120,7 +120,8 @@ Then add a row to the [index](#index) and link the entry from the workstream pag
 - **Ticket:** [#476](https://github.com/jose-codegourmet/rotra-v2/issues/476), [#478](https://github.com/jose-codegourmet/rotra-v2/issues/478); Downloads page [#477](https://github.com/jose-codegourmet/rotra-v2/issues/477) blocked on #246
 - **Roadmap:** MVP — items 1 and 5 in the former MVP roadmap; now [Player workstream](workstreams/player.md) and [Queue workstream](workstreams/queue.md)
 - **Decision:** Request to join offers the guest form or "Log in with ROTRA Player" (returns to `/s/<slug>?join=1`); sign-up shows as not open yet. Guest "Invite to ROTRA" copies the player login link. A login never grants a slot, and a join request does not yet carry the signed-in player.
-- **References:** [Public session screens](../screens/product/modules/queue/public-session.md).
+- **Superseded for guest invitations, November 8, 2026 (#490):** Copy and Share now open independent registration at `/register/[clubId]`. The club supplies RTR allocation context only. Registration keeps the guest record unlinked until a separate linking invitation is accepted. Matching contacts prompt sign-in/recovery or correction/help; no duplicate account or automatic merge. Request to join still offers guest entry or login; its note now directs new players to ask the club for a registration invite.
+- **References:** [Public session screens](../screens/product/modules/queue/public-session.md), [registration screens](../screens/product/modules/player-information/access-registration.md).
 
 ## Admin implementation gap index
 

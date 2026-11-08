@@ -29,7 +29,7 @@ async function lockPhone(tx: Tx, phoneE164: string) {
  * Allocates the permanent RTR ID for a new player in the caller's transaction: one atomic counter
  * step for the creating club's founding city and sync day, then the immutable allocation row.
  */
-async function allocateRtrId(tx: Tx, playerId: string, clubId: string, at: Date) {
+export async function allocateRtrId(tx: Tx, playerId: string, clubId: string, at: Date) {
   const club = await tx.club.findUniqueOrThrow({
     where: { id: clubId },
     select: { foundingLocation: true },

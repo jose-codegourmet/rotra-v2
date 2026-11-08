@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 23 · IN MOCK APP: 39 · MOCKUP ONLY: 4
+TICKETED: 23 · IN MOCK APP: 39 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -213,35 +213,35 @@ NEW: 23 · IN MOCK APP: 39 · MOCKUP ONLY: 4
 | [2026-11-07-queue-public-skill-mix](2026-11-07-queue-public-skill-mix.md) | Public page shows an aggregate skill mix above the participants | — | IN MOCK APP — #474 (PR #482) |
 | [2026-11-07-queue-roster-skill-mix-bar](2026-11-07-queue-roster-skill-mix-bar.md) | Skill mix bar above the roster when grouped by Skill group | — | IN MOCK APP — #472 (PR #482) |
 | [2026-11-07-queue-session-qr](2026-11-07-queue-session-qr.md) | Session QR button and sheet added to the Preparation header | — | IN MOCK APP — #471 (PR #482) |
-| [2026-11-08-admin-club-sales-tab](2026-11-08-admin-club-sales-tab.md) | Club page gets a Sales tab | — | NEW |
+| [2026-11-08-admin-club-sales-tab](2026-11-08-admin-club-sales-tab.md) | Club page gets a Sales tab | sales-stat-card, admin-nav | TICKETED — #504 |
 | [2026-11-08-admin-password-reset-requests](2026-11-08-admin-password-reset-requests.md) | Admin-reviewed password reset requests | — | IN MOCK APP — #491 (PR #494) |
-| [2026-11-08-admin-players-layout](2026-11-08-admin-players-layout.md) | Admin Players page gets a cleaner layout | — | NEW |
-| [2026-11-08-admin-sales-page](2026-11-08-admin-sales-page.md) | Admin gets a Sales page | — | NEW |
-| [2026-11-08-player-change-avatar](2026-11-08-player-change-avatar.md) | Players can change their profile picture | — | NEW |
+| [2026-11-08-admin-players-layout](2026-11-08-admin-players-layout.md) | Admin Players page gets a cleaner layout | admin-player-stats, admin-player-filters, admin-player-card, admin-player-bulk-bar, player-pagination, admin-player-quick-view, admin-player-history | TICKETED — #503 |
+| [2026-11-08-admin-sales-page](2026-11-08-admin-sales-page.md) | Admin gets a Sales page | sales-stat-card, admin-nav | TICKETED — #504 |
+| [2026-11-08-player-change-avatar](2026-11-08-player-change-avatar.md) | Players can change their profile picture | profile-picture-sheet, player-identity-card, edit-profile-form, player-profile | TICKETED — #502 |
 | [2026-11-08-player-claim-prefill-and-experience](2026-11-08-player-claim-prefill-and-experience.md) | Registration form is prefilled by the club; experience has linked Playing since | — | IN MOCK APP — PR #484 |
-| [2026-11-08-player-compare-players](2026-11-08-player-compare-players.md) | Compare yourself with another player | — | NEW |
+| [2026-11-08-player-compare-players](2026-11-08-player-compare-players.md) | Compare yourself with another player | compare-filter-bar | TICKETED — #502 |
 | [2026-11-08-player-email-sign-in](2026-11-08-player-email-sign-in.md) | Player sign-in takes an email only, not a phone number | — | IN MOCK APP — PR #483 |
 | [2026-11-08-player-guest-registration](2026-11-08-player-guest-registration.md) | Guest invitations open registration | — | IN MOCK APP — #490 (PR #493) |
 | [2026-11-08-queue-delete-player](2026-11-08-queue-delete-player.md) | Saved players: Delete player | — | IN MOCK APP — PR #487 |
 | [2026-11-08-queue-edit-player-details](2026-11-08-queue-edit-player-details.md) | Queue Master can edit a guest's or unclaimed player's details before inviting them | — | IN MOCK APP — PR #484 |
 | [2026-11-08-queue-invite-cancels-previous-link](2026-11-08-queue-invite-cancels-previous-link.md) | Invite cancels the previous registration link again | — | IN MOCK APP — PR #485 |
-| [2026-11-08-queue-partial-payment-switch-yellow](2026-11-08-queue-partial-payment-switch-yellow.md) | Partial payment cards show the paid switch in yellow | — | NEW |
-| [2026-11-08-queue-phone-header-more-options](2026-11-08-queue-phone-header-more-options.md) | Preparation header keeps Session QR and Facebook post, rest goes under More options on phones | — | NEW |
-| [2026-11-08-queue-phone-tabs-dropdown](2026-11-08-queue-phone-tabs-dropdown.md) | Preparation and level tabs become styled dropdown menus on phones | — | NEW |
-| [2026-11-08-queue-public-join-card-layout](2026-11-08-queue-public-join-card-layout.md) | Public page "Want to play?" card gets a stacked layout | — | NEW |
-| [2026-11-08-queue-public-participants-plain-grid](2026-11-08-queue-public-participants-plain-grid.md) | Public page participants become a plain grid, not cards | — | NEW |
-| [2026-11-08-queue-public-waitlist-tiles](2026-11-08-queue-public-waitlist-tiles.md) | Public page waitlist shows as tiles with queue numbers | — | NEW |
-| [2026-11-08-queue-roster-card-emphasis](2026-11-08-queue-roster-card-emphasis.md) | Roster grid card puts presence and level first | — | NEW |
-| [2026-11-08-queue-roster-skill-mix-progress](2026-11-08-queue-roster-skill-mix-progress.md) | Roster skill mix is one compact bar with hover counts, in non-green colors | — | NEW (superseded by 2026-11-08-queue-roster-summary-one-box) |
-| [2026-11-08-queue-roster-summary-one-box](2026-11-08-queue-roster-summary-one-box.md) | Roster tab: slots and skill mix in one box, one bar | — | NEW |
-| [2026-11-08-queue-roster-view-toggle-icons](2026-11-08-queue-roster-view-toggle-icons.md) | Roster List / Grid toggle uses icons | — | NEW |
-| [2026-11-08-queue-saved-players-stats-fade](2026-11-08-queue-saved-players-stats-fade.md) | Saved player statistics: edge fade, and arrows only when the cards overflow | — | NEW |
-| [2026-11-08-queue-session-qr-share-card](2026-11-08-queue-session-qr-share-card.md) | Session QR becomes a branded share card with a logo in the QR | — | NEW |
-| [2026-11-08-queue-setup-court-pictures](2026-11-08-queue-setup-court-pictures.md) | Session setup shows each court as a court picture that opens an edit dialog | — | NEW |
-| [2026-11-08-queue-setup-page1-rearranged](2026-11-08-queue-setup-page1-rearranged.md) | Session setup page 1 rearranged: venue up, steppers side by side, court times folded | — | NEW |
-| [2026-11-08-queue-setup-time-fields-layout](2026-11-08-queue-setup-time-fields-layout.md) | Setup: Starts and Ends side by side, next day becomes a small link | — | NEW (superseded by 2026-11-08-queue-setup-when-block) |
-| [2026-11-08-queue-setup-when-block](2026-11-08-queue-setup-when-block.md) | Setup: date, start and end beside a total duration box | — | NEW |
-| [2026-11-08-queue-time-field-dialog](2026-11-08-queue-time-field-dialog.md) | Time fields open a time dialog instead of three dropdowns | — | NEW |
+| [2026-11-08-queue-partial-payment-switch-yellow](2026-11-08-queue-partial-payment-switch-yellow.md) | Partial payment cards show the paid switch in yellow | switch, payments-checklist, saved-player-stats-carousel | TICKETED — #498 |
+| [2026-11-08-queue-phone-header-more-options](2026-11-08-queue-phone-header-more-options.md) | Preparation header keeps Session QR and Facebook post, rest goes under More options on phones | page-header, more-options-sheet, session-preparation | TICKETED — #499 |
+| [2026-11-08-queue-phone-tabs-dropdown](2026-11-08-queue-phone-tabs-dropdown.md) | Preparation and level tabs become styled dropdown menus on phones | roster-panel, preparation-roster, tab-menu, tabs, session-preparation | TICKETED — #498 |
+| [2026-11-08-queue-public-join-card-layout](2026-11-08-queue-public-join-card-layout.md) | Public page "Want to play?" card gets a stacked layout | join-request-card | TICKETED — #500 |
+| [2026-11-08-queue-public-participants-plain-grid](2026-11-08-queue-public-participants-plain-grid.md) | Public page participants become a plain grid, not cards | public-participants | TICKETED — #500 |
+| [2026-11-08-queue-public-waitlist-tiles](2026-11-08-queue-public-waitlist-tiles.md) | Public page waitlist shows as tiles with queue numbers | public-participants | TICKETED — #500 |
+| [2026-11-08-queue-roster-card-emphasis](2026-11-08-queue-roster-card-emphasis.md) | Roster grid card puts presence and level first | roster-card, segmented-control, roster-panel, preparation-roster | TICKETED — #498 |
+| [2026-11-08-queue-roster-skill-mix-progress](2026-11-08-queue-roster-skill-mix-progress.md) | Roster skill mix is one compact bar with hover counts, in non-green colors | theme.css, skill-distribution-bar, slot-meter, preparation-roster | TICKETED — #498 (superseded by 2026-11-08-queue-roster-summary-one-box) |
+| [2026-11-08-queue-roster-summary-one-box](2026-11-08-queue-roster-summary-one-box.md) | Roster tab: slots and skill mix in one box, one bar | slot-meter, preparation-roster | TICKETED — #498 |
+| [2026-11-08-queue-roster-view-toggle-icons](2026-11-08-queue-roster-view-toggle-icons.md) | Roster List / Grid toggle uses icons | roster-card, segmented-control, roster-panel, preparation-roster | TICKETED — #498 |
+| [2026-11-08-queue-saved-players-stats-fade](2026-11-08-queue-saved-players-stats-fade.md) | Saved player statistics: edge fade, and arrows only when the cards overflow | switch, payments-checklist, saved-player-stats-carousel | TICKETED — #498 |
+| [2026-11-08-queue-session-qr-share-card](2026-11-08-queue-session-qr-share-card.md) | Session QR becomes a branded share card with a logo in the QR | session-join-qr, session-preparation | TICKETED — #499 |
+| [2026-11-08-queue-setup-court-pictures](2026-11-08-queue-setup-court-pictures.md) | Session setup shows each court as a court picture that opens an edit dialog | setup-court-picture, session-setup-form, session-setup, add-court-form | TICKETED — #501 |
+| [2026-11-08-queue-setup-page1-rearranged](2026-11-08-queue-setup-page1-rearranged.md) | Session setup page 1 rearranged: venue up, steppers side by side, court times folded | session-setup-form, session-setup, add-court-form | TICKETED — #501 |
+| [2026-11-08-queue-setup-time-fields-layout](2026-11-08-queue-setup-time-fields-layout.md) | Setup: Starts and Ends side by side, next day becomes a small link | time-field, date-time-picker, session-setup-form, session-setup, add-court-form | TICKETED — #501 (superseded by 2026-11-08-queue-setup-when-block) |
+| [2026-11-08-queue-setup-when-block](2026-11-08-queue-setup-when-block.md) | Setup: date, start and end beside a total duration box | session-setup-form, session-setup, add-court-form | TICKETED — #501 |
+| [2026-11-08-queue-time-field-dialog](2026-11-08-queue-time-field-dialog.md) | Time fields open a time dialog instead of three dropdowns | time-field, date-time-picker, session-setup, add-court-form | TICKETED — #501 |
 | [2026-11-08-queue-time-picker-hour-minute](2026-11-08-queue-time-picker-hour-minute.md) | Time fields pick hour, minute and AM/PM from three short dropdowns | — | IN MOCK APP — PR #489 (superseded by 2026-11-08-queue-time-field-dialog) |
-| [2026-11-08-queue-title-public-page-icon](2026-11-08-queue-title-public-page-icon.md) | Preparation title gets an "Open public page" icon button | — | NEW |
+| [2026-11-08-queue-title-public-page-icon](2026-11-08-queue-title-public-page-icon.md) | Preparation title gets an "Open public page" icon button | page-header, more-options-sheet, session-preparation | TICKETED — #499 |
 <!-- status-index:end -->

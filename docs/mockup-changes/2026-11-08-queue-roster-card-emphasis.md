@@ -1,10 +1,12 @@
 # Roster grid card puts presence and level first
 
-Status: NEW
+Status: TICKETED — #498
 Date: 2026-11-08
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Session preparation › Roster and levels tab › Grid view
 Screen ID: Q-PREPARE (roster tab, Grid)
+Route: /queue/sessions/s-tonight/preparation?tab=roster
+Components: roster-card, segmented-control, roster-panel, preparation-roster
 
 ## What changed
 - Before: every item on the card had the same weight (identity chip, suggestion, level select, Present
@@ -24,3 +26,18 @@ Screen ID: Q-PREPARE (roster tab, Grid)
 - Business logic: none needed
 - Database design: none needed
 - Screen docs: docs/screens/product/modules/queue/session-setup.md — Roster views, Grid description
+
+## Like for like
+- Compare at: 375 px and 1280 px, dark and light, beside the mockup route above.
+- States and copy: exactly as listed under What changed; each ticket repeats them as acceptance criteria.
+- Known differences: none
+
+## Reuse plan
+- Extends `roster-card/` and `segmented-control/` (icon option, reused by A05.1)
+- Reuses `switch/`, `level-select/`, `identity-chip/` as is
+- Shares work with: `2026-11-08-queue-phone-tabs-dropdown`, `2026-11-08-queue-roster-skill-mix-progress`, `2026-11-08-queue-roster-summary-one-box`, `2026-11-08-queue-roster-view-toggle-icons`
+
+## Tickets
+- Epic: #498 (Q13)
+- #507 Q13.3 · RosterCard leads with presence and level; icon List | Grid toggle
+- #536 Q13.6 · Roster summary bar drives the level tabs on Preparation and Session settings

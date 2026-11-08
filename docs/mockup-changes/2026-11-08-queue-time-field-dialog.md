@@ -1,12 +1,14 @@
 # Time fields open a time dialog instead of three dropdowns
 
-Status: NEW
+Status: TICKETED — #501
 Date: 2026-11-08
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › every time field (Session setup Starts and Ends, court planned start and end, Add / Edit court, Start session, live end)
 Screen ID: Q-SETUP, Q-START, Q-COURTS, Q-SESSION-ADJUST, Q-ADD-COURT
 Supersedes: 2026-11-08-queue-time-picker-hour-minute.md
 Superseded by: none
+Route: /queue/sessions/new
+Components: time-field, date-time-picker, session-setup, add-court-form
 
 ## What changed
 - Before (see 2026-11-08-queue-time-picker-hour-minute.md): one row of three small native dropdowns, hour :
@@ -28,3 +30,17 @@ Superseded by: none
 - Screen docs:
   - docs/screens/product/modules/queue/session-setup.md — Date-and-time picker section
   - docs/screens/product/experience-contract.md — Times and days bullet
+
+## Like for like
+- Compare at: 375 px and 1280 px, dark and light, beside the mockup route above.
+- States and copy: exactly as listed under What changed; each ticket repeats them as acceptance criteria.
+- Known differences: none
+
+## Reuse plan
+- Extends `time-field/` and `date-time-picker/`; reuses `sheet/`, `segmented-control/`, `button/`
+- Shares work with: `2026-11-08-queue-setup-court-pictures`, `2026-11-08-queue-setup-page1-rearranged`, `2026-11-08-queue-setup-time-fields-layout`, `2026-11-08-queue-setup-when-block`
+
+## Tickets
+- Epic: #501 (Q16)
+- #517 Q16.1 · TimeField opens a time dialog
+- #520 Q16.4 · Create / Edit session and every time field use the new controls

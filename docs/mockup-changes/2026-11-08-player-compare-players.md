@@ -1,10 +1,12 @@
 # Compare yourself with another player
 
-Status: NEW
+Status: TICKETED — #502
 Date: 2026-11-08
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › another player's profile › Compare with me, and the new compare page
 Screen ID: P-COMPARE (new)
+Route: /player/players/b0
+Components: compare-filter-bar
 
 ## What changed
 - New button **Compare with me** in the hero of any other player's profile. Signed out, it asks you to sign
@@ -51,3 +53,19 @@ Screen ID: P-COMPARE (new)
 - Business logic: none yet; pending the questions above
 - Database design: docs/database_design/product/open-decisions.md — proposal row for how compare data is produced (no cron by default)
 - Screen docs: docs/screens/product/modules/player-information/profile.md — new P-COMPARE section
+
+## Like for like
+- Compare at: 375 px and 1280 px, dark and light, beside the mockup route above.
+- States and copy: exactly as listed under What changed; each ticket repeats them as acceptance criteria.
+- Known differences: none
+
+## Reuse plan
+- Reuses `segmented-control/`, `avatar/`, `level-pill/`, `progress-bar/`, `value-tiles/` as is; new `compare-filter-bar/`, `compare-stats/`, `together-card/`, `shared-game-row/`; does not edit `court-drawing/` or `player-pagination/`
+- New `packages/data/src/player-compare/`; reuses match and ranking types
+- Shares work with: none
+
+## Tickets
+- Epic: #502 (P05)
+- #524 P05.4 · Compare components: filter bar, side-by-side stats, Together card, shared game row
+- #525 P05.5 · Shared games between two players
+- #526 P05.6 · Compare with me button and the P-COMPARE page

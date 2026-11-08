@@ -1,10 +1,12 @@
 # Admin gets a Sales page
 
-Status: NEW
+Status: TICKETED — #504
 Date: 2026-11-08
 App: admin
 Mockup: apps/mockup/admin-app/rotra-admin.html › new Sales page (left navigation, below Players)
 Screen ID: A-SALES (new)
+Route: Sales tab (/admin/clubs/c1?tab=sales)
+Components: sales-stat-card, admin-nav
 
 ## What changed
 - New navigation item **Sales** and a new page at `/sales`: a period switch (7 days, 30 days, 12 months), three
@@ -34,3 +36,19 @@ Screen ID: A-SALES (new)
   - docs/screens/product/modules/admin/sales.md — new
   - docs/screens/product/modules/admin/README.md — Sales row; analytics sentence
   - docs/screens/product/modules/admin/access-navigation.md — navigation list and route
+
+## Like for like
+- Compare at: 375 px and 1280 px, dark and light, beside the mockup route above.
+- States and copy: exactly as listed under What changed; each ticket repeats them as acceptance criteria.
+- Known differences: none
+
+## Reuse plan
+- Reuses `card/`, `chip/`, `data-table/`, `segmented-control/` (period switch); new `sales-stat-card/`, `bar-chart/`, `sales-breakdown-list/`, `club-sales-table/`
+- New `packages/data/src/sales/`; reuses license and session types
+- Shares work with: `2026-11-08-admin-club-sales-tab`
+
+## Tickets
+- Epic: #504 (A06)
+- #532 A06.1 · Sales components: stat cards, bar chart, breakdown lists, club sales table
+- #533 A06.2 · Sales figures for the platform and per club
+- #534 A06.3 · Sales page, navigation item and the club Sales tab

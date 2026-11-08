@@ -1,10 +1,12 @@
 # Club page gets a Sales tab
 
-Status: NEW
+Status: TICKETED — #504
 Date: 2026-11-08
 App: admin
 Mockup: apps/mockup/admin-app/rotra-admin.html › Club page › Sales tab (after License)
 Screen ID: A-CLUB-SALES (new)
+Route: Sales tab (/admin/clubs/c1?tab=sales)
+Components: sales-stat-card, admin-nav
 
 ## What changed
 - New **Sales** tab on each club's page. It shows what the club pays ROTRA against how much it uses ROTRA over the
@@ -33,3 +35,19 @@ Screen ID: A-CLUB-SALES (new)
 - Business logic: none yet; pending the questions above
 - Database design: none; the counts can be read from final session and match rows
 - Screen docs: docs/screens/product/modules/admin/clubs-licenses.md — new A-CLUB-SALES section
+
+## Like for like
+- Compare at: 375 px and 1280 px, dark and light, beside the mockup route above.
+- States and copy: exactly as listed under What changed; each ticket repeats them as acceptance criteria.
+- Known differences: none
+
+## Reuse plan
+- Reuses `card/`, `chip/`, `data-table/`, `segmented-control/` (period switch); new `sales-stat-card/`, `bar-chart/`, `sales-breakdown-list/`, `club-sales-table/`
+- New `packages/data/src/sales/`; reuses license and session types
+- Shares work with: `2026-11-08-admin-sales-page`
+
+## Tickets
+- Epic: #504 (A06)
+- #532 A06.1 · Sales components: stat cards, bar chart, breakdown lists, club sales table
+- #533 A06.2 · Sales figures for the platform and per club
+- #534 A06.3 · Sales page, navigation item and the club Sales tab

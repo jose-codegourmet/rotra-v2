@@ -1,12 +1,14 @@
 # Roster tab: slots and skill mix in one box, one bar
 
-Status: NEW
+Status: TICKETED — #498
 Date: 2026-11-08
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Roster and levels tab › header summary
 Screen ID: Q-PREPARE (roster tab)
 Supersedes: 2026-11-08-queue-roster-skill-mix-progress.md
 Superseded by: none
+Route: /queue/sessions/s-tonight/preparation?tab=roster
+Components: slot-meter, preparation-roster
 
 ## What changed
 - Before: two stacked blocks, a slots meter with its own progress bar and a Skill mix bar below it.
@@ -28,3 +30,17 @@ Superseded by: none
 - Screen docs:
   - docs/screens/product/modules/queue/session-setup.md — Roster and levels (tab) row
   - docs/screens/product/modules/queue/players-roster.md — Skill mix paragraph
+
+## Like for like
+- Compare at: 375 px and 1280 px, dark and light, beside the mockup route above.
+- States and copy: exactly as listed under What changed; each ticket repeats them as acceptance criteria.
+- Known differences: none
+
+## Reuse plan
+- Extends `slot-meter/` with skill segments; reuses the segment math and tooltip from `skill-distribution-bar/` (import, do not copy)
+- Shares work with: `2026-11-08-queue-phone-tabs-dropdown`, `2026-11-08-queue-roster-card-emphasis`, `2026-11-08-queue-roster-skill-mix-progress`, `2026-11-08-queue-roster-view-toggle-icons`
+
+## Tickets
+- Epic: #498 (Q13)
+- #506 Q13.2 · Roster summary: slots and skill mix in one bar, pressable segments
+- #536 Q13.6 · Roster summary bar drives the level tabs on Preparation and Session settings

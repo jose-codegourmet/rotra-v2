@@ -1,10 +1,12 @@
 # Session QR becomes a branded share card with a logo in the QR
 
-Status: NEW
+Status: TICKETED — #499
 Date: 2026-11-08
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Session preparation › Session QR sheet
 Screen ID: Q-PREPARE (Session QR sheet)
+Route: /queue/sessions/s-tonight/preparation
+Components: session-join-qr, session-preparation
 
 ## What changed
 - Before: a bare QR on white with the club name, date line and link as plain text.
@@ -25,3 +27,17 @@ Screen ID: Q-PREPARE (Session QR sheet)
 - Business logic: none needed
 - Database design: none needed
 - Screen docs: docs/screens/product/modules/queue/session-setup.md — Session QR in the header actions
+
+## Like for like
+- Compare at: 375 px and 1280 px, dark and light, beside the mockup route above.
+- States and copy: exactly as listed under What changed; each ticket repeats them as acceptance criteria.
+- Known differences: none
+
+## Reuse plan
+- Extends `session-join-qr/` (its helpers only); reuses `club-logo/`, `segmented-control/` and `qrcode-generator` (already a dependency); do not change `player-id-qr/`
+- Shares work with: `2026-11-08-queue-phone-header-more-options`, `2026-11-08-queue-phone-tabs-dropdown`, `2026-11-08-queue-title-public-page-icon`
+
+## Tickets
+- Epic: #499 (Q14)
+- #511 Q14.3 · Session QR share card: Post | Story, club logo in the QR, Download image
+- #512 Q14.4 · Preparation header, phone More options and preparation tabs menu

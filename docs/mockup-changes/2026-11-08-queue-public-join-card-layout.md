@@ -1,10 +1,12 @@
 # Public page "Want to play?" card gets a stacked layout
 
-Status: NEW
+Status: TICKETED — #500
 Date: 2026-11-08
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Public session page › Want to play? card
 Screen ID: public session page
+Route: /queue/s/s-tonight
+Components: join-request-card
 
 ## What changed
 - Before: a heading and a sentence on the left with a small “Request to join” button squeezed beside them.
@@ -21,3 +23,17 @@ Screen ID: public session page
 - Business logic: none needed
 - Database design: none needed
 - Screen docs: docs/screens/product/modules/queue/public-session.md — Want to play? card
+
+## Like for like
+- Compare at: 375 px and 1280 px, dark and light, beside the mockup route above.
+- States and copy: exactly as listed under What changed; each ticket repeats them as acceptance criteria.
+- Known differences: none
+
+## Reuse plan
+- Extends `join-request-card/`; reuses `skill-distribution-bar/` from Q13.1 as is
+- Shares work with: `2026-11-08-queue-public-participants-plain-grid`, `2026-11-08-queue-public-waitlist-tiles`
+
+## Tickets
+- Epic: #500 (Q15)
+- #515 Q15.3 · Want to play? card: stacked layout with slots and the Skill mix bar
+- #516 Q15.4 · Public page and operator preview use the new participants and Want to play? card

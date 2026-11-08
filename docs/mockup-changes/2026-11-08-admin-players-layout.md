@@ -1,10 +1,12 @@
 # Admin Players page gets a cleaner layout
 
-Status: NEW
+Status: TICKETED — #503
 Date: 2026-11-08
 App: admin
 Mockup: apps/mockup/admin-app/rotra-admin.html › Players
 Screen ID: A-PLAYERS
+Route: /admin/players
+Components: admin-player-stats, admin-player-filters, admin-player-card, admin-player-bulk-bar, player-pagination, admin-player-quick-view, admin-player-history
 
 ## What changed
 - Before: six large stat cards, two toolbars with every filter always visible, a hint line, a select-all row, the
@@ -72,3 +74,23 @@ Screen ID: A-PLAYERS
 - Business logic: none needed
 - Database design: none needed
 - Screen docs: docs/screens/product/modules/admin/players-requests.md — A-PLAYERS page layout
+
+## Like for like
+- Compare at: 375 px and 1280 px, dark and light, beside the mockup route above.
+- States and copy: exactly as listed under What changed; each ticket repeats them as acceptance criteria.
+- Known differences: none
+
+## Reuse plan
+- Extends `admin-player-stats/`, `admin-player-filters/`; reuses the SegmentedControl icon option from Q13.3, `switch/`, `select/`, `text-input/`
+- Extends `admin-player-card/`, `admin-player-bulk-bar/`, `player-pagination/` (also used by `admin-player-history/`; keep its default)
+- Extends `admin-player-quick-view/`, `admin-player-history/`; reuses `forms/admin-edit-player-form/`, `copy-player-value/`, `chip/`, `sheet/` as is
+- Reuses `tabs/`, `recent-games-card/`, `admin-player-history/` (after A05.3), `activity-log/`
+- Shares work with: none
+
+## Tickets
+- Epic: #503 (A05)
+- #527 A05.1 · Players toolbar, count cards and Filters panel
+- #528 A05.2 · Player rows, grid cards, bulk actions dock and pagination bar
+- #529 A05.3 · Compact Quick view with History, Edit and Invite to ROTRA
+- #530 A05.4 · Players page uses the new toolbar, rows, dock, pagination and Quick view
+- #531 A05.5 · Player page tabs: Overview, Contact, Game history, Activity

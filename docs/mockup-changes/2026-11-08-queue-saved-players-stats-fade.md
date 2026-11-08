@@ -1,10 +1,12 @@
 # Saved player statistics: edge fade, and arrows only when the cards overflow
 
-Status: NEW
+Status: TICKETED — #498
 Date: 2026-11-08
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Saved players › Statistics carousel
 Screen ID: Q-PLAYERS
+Route: Statistics carousel (/queue/saved-players)
+Components: switch, payments-checklist, saved-player-stats-carousel
 
 ## What changed
 - Before: the Previous / Next arrows always showed, and a card cut off at the edge just ended abruptly.
@@ -20,3 +22,16 @@ Screen ID: Q-PLAYERS
 - Business logic: none needed
 - Database design: none needed
 - Screen docs: docs/screens/product/modules/queue/players-roster.md — Statistics carousel
+
+## Like for like
+- Compare at: 375 px and 1280 px, dark and light, beside the mockup route above.
+- States and copy: exactly as listed under What changed; each ticket repeats them as acceptance criteria.
+- Known differences: none
+
+## Reuse plan
+- Extends `switch/` (tone), `payments-checklist/`, `saved-player-stats-carousel/`; no new components
+- Shares work with: `2026-11-08-queue-partial-payment-switch-yellow`
+
+## Tickets
+- Epic: #498 (Q13)
+- #508 Q13.5 · Partial payment switch in yellow; saved player statistics edge fade

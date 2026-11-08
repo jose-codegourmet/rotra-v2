@@ -1,10 +1,12 @@
 # Players can change their profile picture
 
-Status: NEW
+Status: TICKETED — #502
 Date: 2026-11-08
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › My profile (hero) and Edit profile › Name
 Screen ID: P-PROFILE, P-EDIT
+Route: /player/players/u1
+Components: profile-picture-sheet, player-identity-card, edit-profile-form, player-profile
 
 ## What changed
 - Before: a player's picture could not be changed anywhere.
@@ -22,3 +24,19 @@ Screen ID: P-PROFILE, P-EDIT
 - Business logic: none needed (the profile already carries an optional avatar)
 - Database design: none needed (`avatar_ref` already covers a character id or an uploaded file)
 - Screen docs: docs/screens/product/modules/player-information/profile.md — profile picture paragraph
+
+## Like for like
+- Compare at: 375 px and 1280 px, dark and light, beside the mockup route above.
+- States and copy: exactly as listed under What changed; each ticket repeats them as acceptance criteria.
+- Known differences: none
+
+## Reuse plan
+- New `profile-picture-sheet/`; extends `player-identity-card/` and `forms/edit-profile-form/`; reuses `avatar/`, `sheet/`, `button/` and the brand character images
+- Extends the existing player profile hooks
+- Shares work with: none
+
+## Tickets
+- Epic: #502 (P05)
+- #521 P05.1 · ProfilePictureSheet and the edit-picture button
+- #522 P05.2 · Set the profile picture (upload, initials or character)
+- #523 P05.3 · Profile picture on My profile, Edit profile and the leaderboard row

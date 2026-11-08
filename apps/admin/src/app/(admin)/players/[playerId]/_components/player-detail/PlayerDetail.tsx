@@ -3,14 +3,17 @@
 import { useAuditEvents } from '@rotra/data/admin-audit/useAuditEvents'
 import { useAuditEventsForTargets } from '@rotra/data/admin-audit/useAuditEventsForTargets'
 import { useAdminPlayer } from '@rotra/data/admin-player/useAdminPlayer'
+import { useAdminPlayerGames } from '@rotra/data/admin-player/useAdminPlayerGames'
 import { useAdminClubs } from '@rotra/data/club/useAdminClubs'
 import { useContactRequests } from '@rotra/data/contact-change-request/useContactRequests'
 import { PLAYING_LEVELS } from '@rotra/data/player/types'
 import { useRankingSettings } from '@rotra/data/ranking-settings'
 import { ActivityLog } from '@rotra/ui/activity-log'
+import { AdminPlayerHistory } from '@rotra/ui/admin-player-history'
 import { AdminPlayerIdentityCard } from '@rotra/ui/admin-player-identity-card'
 import { Avatar } from '@rotra/ui/avatar'
 import { Breadcrumb } from '@rotra/ui/breadcrumb'
+import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { ContactRequestList } from '@rotra/ui/contact-request-list'
 import { ContactRequestStatusChip } from '@rotra/ui/contact-request-status-chip'
@@ -23,8 +26,9 @@ import { PrivateContactCard } from '@rotra/ui/private-contact-card'
 import { RankStatusChip } from '@rotra/ui/rank-status-chip'
 import { SameNameNotice } from '@rotra/ui/same-name-notice'
 import { Skeleton } from '@rotra/ui/skeleton'
+import { Tabs, TabsContent } from '@rotra/ui/tabs'
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
+import { notFound, useRouter, useSearchParams } from 'next/navigation'
 import { useId, useMemo } from 'react'
 import { useDenyOnPermissionError } from '../../../../_components/admin-workspace-shell/AdminWorkspaceShell'
 import { PlayerManagementActions } from '../../../_components/player-management-actions/PlayerManagementActions'
@@ -52,12 +56,29 @@ function LinesSkeleton({ label }: { label: string }) {
  * the workspace.
  */
 export function PlayerDetail({ playerId, from }: { playerId: string; from: string }) {
+  const router = useRouter()
+  const search = useSearchParams()
+  const requestedTab = search.get('tab')
+  const tab =
+    requestedTab === 'contact' || requestedTab === 'history' || requestedTab === 'activity'
+      ? requestedTab
+      : 'overview'
+  const setTab = (next: string) => {
+    const params = new URLSearchParams(search.toString())
+    if (next === 'overview') params.delete('tab')
+    else params.set('tab', next)
+    router.replace(`?${params}`, { scroll: false })
+  }
   const playerQuery = useAdminPlayer(playerId)
+  const gamesQuery = useAdminPlayerGames(playerId)
   const requestsQuery = useContactRequests({ playerId })
   // Same cache as the workspace nav count; names the club that created the identity.
   const clubsQuery = useAdminClubs()
   const settingsQuery = useRankingSettings()
   const requests = requestsQuery.data?.rows
+  const openRequests =
+    requests?.filter((request) => ['pending', 'applying', 'failed'].includes(request.status))
+      .length ?? 0
   const requestIds = useMemo(() => (requests ?? []).map((request) => request.requestId), [requests])
   const auditQuery = useAuditEventsForTargets({
     targetType: 'contact_change_request',
@@ -69,6 +90,8 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
     requestsQuery.error,
     clubsQuery.error,
     auditQuery.error,
+    playerAuditQuery.error,
+    gamesQuery.error,
   )
   const requestsHeadingId = useId()
   const recordHeadingId = useId()
@@ -122,7 +145,13 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
   const level = player.levelIndex === null ? null : (PLAYING_LEVELS[player.levelIndex] ?? null)
   const matchRequirement = settingsQuery.data?.matchRequirement
   // The record is read per request, so a failed requests read fails it too; Retry asks again for both.
-  const recordError = requestsQuery.isError ? requestsQuery : auditQuery.isError ? auditQuery : null
+  const recordError = requestsQuery.isError
+    ? requestsQuery
+    : auditQuery.isError
+      ? auditQuery
+      : playerAuditQuery.isError
+        ? playerAuditQuery
+        : null
 
   return (
     <>
@@ -149,67 +178,152 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
         }))}
         linkComponent={Link}
       />
-      <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-5 min-[1040px]:grid-cols-[minmax(0,1fr)_340px]">
-        <div className="flex min-w-0 flex-col gap-5">
-          <AdminPlayerIdentityCard
-            fullName={player.name}
-            nickname={player.nickname}
-            rtrId={player.rtrId}
-            createdOn={player.createdOn}
-            createdBy={createdBy}
-          />
-          <PrivateContactCard
-            phone={player.phone}
-            email={player.email}
-            claimed={player.claimed}
-            phoneHidden={player.phoneHidden}
-          />
-          {requestsQuery.isError || !requests ? (
-            <Card asChild>
-              <section aria-labelledby={requestsHeadingId} className="flex flex-col gap-3">
-                <h2 id={requestsHeadingId}>Contact-change requests</h2>
-                {requestsQuery.isError ? (
-                  <ErrorState
-                    title="Couldn't load the contact-change requests."
-                    onRetry={() => void requestsQuery.refetch()}
-                    retrying={requestsQuery.isFetching}
-                    retryLabel="Retry"
-                  >
-                    Check your connection, then try again.
-                  </ErrorState>
-                ) : (
-                  <LinesSkeleton label="Loading the contact-change requests" />
-                )}
-              </section>
-            </Card>
-          ) : (
-            <ContactRequestList
-              requests={requests.map((request) => ({
-                id: request.requestId,
-                field: request.field,
-                from: request.fromValue,
-                to: request.toValue,
-                requestedAt: request.requestedAt,
-                status: <ContactRequestStatusChip status={request.status} />,
-                action: request.nextAction,
-                href: `/requests/contact-changes/${request.requestId}`,
-              }))}
-              linkComponent={Link}
+      <Tabs
+        aria-label="Player details"
+        value={tab}
+        onChange={setTab}
+        items={[
+          { value: 'overview', label: 'Overview' },
+          {
+            value: 'contact',
+            label: 'Contact',
+            badges: openRequests ? [{ text: `${openRequests} open`, tone: 'warn' }] : undefined,
+          },
+          { value: 'history', label: 'Game history', shortLabel: 'History' },
+          {
+            value: 'activity',
+            label: 'Activity',
+            badges:
+              audit && playerAuditQuery.data
+                ? [{ text: String(activityEntries.length) }]
+                : undefined,
+          },
+        ]}
+      >
+        <TabsContent value="overview">
+          <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-5 min-[1040px]:grid-cols-2">
+            <div className="flex min-w-0 flex-col gap-5">
+              <AdminPlayerIdentityCard
+                fullName={player.name}
+                nickname={player.nickname}
+                rtrId={player.rtrId}
+                createdOn={player.createdOn}
+                createdBy={createdBy}
+              />
+              <PlayerAccountCard claimed={player.claimed} registeredOn={player.registeredOn} />
+            </div>
+            <div className="flex min-w-0 flex-col gap-5">
+              {matchRequirement !== undefined ? (
+                <PlayerRankCard
+                  linkComponent={Link}
+                  historyHref={`/players/${playerId}/games?from=${encodeURIComponent(from)}`}
+                  status={player.rankStatus}
+                  level={level}
+                  recentMatches={player.recentStandardMatches}
+                  matchRequirement={matchRequirement}
+                />
+              ) : null}
+              <Card className="flex flex-col gap-3">
+                <div className="flex items-center justify-between gap-3">
+                  <h2>Recent games</h2>
+                  <Button size="xs" onClick={() => setTab('history')}>
+                    View all
+                  </Button>
+                </div>
+                <div className="[&>section]:border-0 [&>section]:pt-0 [&_h3]:hidden">
+                  <AdminPlayerHistory
+                    variant="compact"
+                    limit={3}
+                    name={player.name}
+                    backHref=""
+                    sessions={gamesQuery.data}
+                    error={gamesQuery.isError}
+                    onRetry={() => void gamesQuery.refetch()}
+                    tab="all"
+                    club=""
+                    from=""
+                    to=""
+                    page={1}
+                    onChange={() => {}}
+                  />
+                </div>
+                <p className="text-sm text-fg2">
+                  Wins–losses in each of the latest sessions. Read-only.
+                </p>
+              </Card>
+            </div>
+          </div>
+        </TabsContent>
+        <TabsContent value="contact">
+          <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-5 min-[1040px]:grid-cols-2">
+            <PrivateContactCard
+              phone={player.phone}
+              email={player.email}
+              claimed={player.claimed}
+              phoneHidden={player.phoneHidden}
             />
-          )}
-        </div>
-        <div className="flex min-w-0 flex-col gap-5">
-          <PlayerAccountCard claimed={player.claimed} registeredOn={player.registeredOn} />
-          {matchRequirement !== undefined ? (
-            <PlayerRankCard
-              linkComponent={Link}
-              historyHref={`/players/${playerId}/games?from=${encodeURIComponent(from)}`}
-              status={player.rankStatus}
-              level={level}
-              recentMatches={player.recentStandardMatches}
-              matchRequirement={matchRequirement}
-            />
-          ) : null}
+            {requestsQuery.isError || !requests ? (
+              <Card asChild>
+                <section aria-labelledby={requestsHeadingId} className="flex flex-col gap-3">
+                  <h2 id={requestsHeadingId}>Contact-change requests</h2>
+                  {requestsQuery.isError ? (
+                    <ErrorState
+                      title="Couldn't load the contact-change requests."
+                      onRetry={() => void requestsQuery.refetch()}
+                      retrying={requestsQuery.isFetching}
+                      retryLabel="Retry"
+                    >
+                      Check your connection, then try again.
+                    </ErrorState>
+                  ) : (
+                    <LinesSkeleton label="Loading the contact-change requests" />
+                  )}
+                </section>
+              </Card>
+            ) : (
+              <ContactRequestList
+                requests={requests.map((request) => ({
+                  id: request.requestId,
+                  field: request.field,
+                  from: request.fromValue,
+                  to: request.toValue,
+                  requestedAt: request.requestedAt,
+                  status: <ContactRequestStatusChip status={request.status} />,
+                  action: request.nextAction,
+                  href: `/requests/contact-changes/${request.requestId}`,
+                }))}
+                linkComponent={Link}
+              />
+            )}
+          </div>
+        </TabsContent>
+        <TabsContent value="history">
+          <Card className="flex flex-col gap-3">
+            <h2>Game history</h2>
+            <div className="[&>section]:border-0 [&>section]:pt-0 [&_h3]:hidden">
+              <AdminPlayerHistory
+                variant="compact"
+                limit={gamesQuery.data?.length ?? 0}
+                name={player.name}
+                backHref=""
+                sessions={gamesQuery.data}
+                error={gamesQuery.isError}
+                onRetry={() => void gamesQuery.refetch()}
+                tab="all"
+                club=""
+                from=""
+                to=""
+                page={1}
+                onChange={() => {}}
+              />
+            </div>
+            <p className="text-sm text-fg2">
+              Wins–losses in each session, newest first. Read-only: Admin can't change winners or
+              scores.
+            </p>
+          </Card>
+        </TabsContent>
+        <TabsContent value="activity">
           <Card asChild>
             <section aria-labelledby={recordHeadingId} className="flex flex-col gap-3">
               <h2 id={recordHeadingId}>Record of actions</h2>
@@ -222,7 +336,7 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
                 >
                   Check your connection, then try again.
                 </ErrorState>
-              ) : audit ? (
+              ) : audit && playerAuditQuery.data ? (
                 <ActivityLog
                   entries={activityEntries}
                   emptyText="No Admin actions recorded for this player."
@@ -232,8 +346,8 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
               )}
             </section>
           </Card>
-        </div>
-      </div>
+        </TabsContent>
+      </Tabs>
     </>
   )
 }

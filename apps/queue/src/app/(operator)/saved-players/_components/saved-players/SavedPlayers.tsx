@@ -1,6 +1,7 @@
 'use client'
 
 import { registeredCity } from '@rotra/data/club-player/fetchers'
+import { useClubPlayerDetails } from '@rotra/data/club-player/useClubPlayerDetails'
 import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import { useCreatePlayerInvite } from '@rotra/data/club-player/useCreatePlayerInvite'
 import { useSavedPlayerStats } from '@rotra/data/club-player/useSavedPlayerStats'
@@ -137,6 +138,12 @@ export function SavedPlayers() {
     players.find((p) => p.id === id) ?? all.data?.players.find((p) => p.id === id)
   const profile = byId(profileId)
   const invitee = byId(inviteId)
+  // Load Edit details while the profile is open, so choosing it swaps sheets with no blank gap.
+  useClubPlayerDetails(
+    profile && (profile.identity === 'guest' || profile.identity === 'unclaimed')
+      ? profile.id
+      : null,
+  )
 
   const jump = (letter: string) => {
     const heading = document.getElementById(letterHeadingId(letter))

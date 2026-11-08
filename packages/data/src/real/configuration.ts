@@ -132,9 +132,8 @@ export async function realGetRankingPolicy(signal?: AbortSignal): Promise<Rankin
 }
 
 /**
- * The version in effect in the reader shape. Only Admin serves `/api/ranking-settings`; elsewhere
- * (Player Information's public pages) the route does not exist, so the read is not connected yet
- * rather than a refusal.
+ * The version in effect in the reader shape. Admin serves every field; Player Information serves a
+ * public read without notes or names. A 404 (an app without the route) is "not connected yet".
  */
 export async function realGetRankingSettings(signal?: AbortSignal): Promise<RankingSettings> {
   try {

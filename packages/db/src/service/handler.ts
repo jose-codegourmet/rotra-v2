@@ -69,6 +69,7 @@ export const PUBLIC_READS = [
   'player.public-profile',
   'player.match-history',
   'leaderboard.list',
+  'ranking.settings',
 ] as const
 
 export type PublicReadId = (typeof PUBLIC_READS)[number]

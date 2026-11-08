@@ -547,7 +547,26 @@ export async function readPlayerRank(playerId: string) {
         },
       },
     })
-    if (!rank || !rank.player.idAllocation) return null
+    if (!rank) {
+      // A public profile with no rank row yet (e.g. just registered): "no rank yet", not "not found".
+      const player = await tx.player.findUnique({
+        where: { id: playerId },
+        select: { fullName: true, nickname: true, idAllocation: { select: { rtrId: true } } },
+      })
+      if (!player?.idAllocation) return null
+      return {
+        playerId,
+        fullName: player.fullName,
+        nickname: player.nickname,
+        levelIndex: null,
+        state: 'provisional' as const,
+        updatePending: null,
+        position: null,
+        recentCount: 0,
+        olderCount: 0,
+      }
+    }
+    if (!rank.player.idAllocation) return null
     const facts = await playerFacts(tx, playerId)
     const jobs = await tx.projectionJob.findMany({
       where: {

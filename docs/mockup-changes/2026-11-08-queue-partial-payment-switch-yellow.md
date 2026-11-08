@@ -1,6 +1,6 @@
 # Partial payment cards show the paid switch in yellow
 
-Status: TICKETED — #498
+Status: IN MOCK APP — #498
 Date: 2026-11-08
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Payments (session preparation, live settings and the session record)

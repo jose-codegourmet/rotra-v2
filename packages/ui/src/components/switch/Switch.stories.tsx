@@ -20,6 +20,11 @@ export const Default: Story = {
 
 export const On: Story = { args: { checked: true } }
 export const Off: Story = { args: { checked: false } }
+export const WarnOn: Story = { args: { checked: true, tone: 'warn' } }
+export const WarnOnLight: Story = {
+  args: { checked: true, tone: 'warn' },
+  globals: { theme: 'light' },
+}
 export const Disabled: Story = { args: { checked: true, disabled: true } }
 
 export const WithLabel: Story = {

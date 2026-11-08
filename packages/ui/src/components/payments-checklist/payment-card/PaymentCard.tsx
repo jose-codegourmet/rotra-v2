@@ -69,6 +69,7 @@ export function PaymentCard({
         <Switch
           aria-label={`${player.name} paid`}
           checked={!!player.paid}
+          tone={player.status.kind === 'partial' ? 'warn' : 'accent'}
           onChange={onTogglePaid}
           disabled={disabled}
         />

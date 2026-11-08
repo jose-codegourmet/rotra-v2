@@ -1,6 +1,6 @@
 # Session QR becomes a branded share card with a logo in the QR
 
-Status: IN PROGRESS — #499
+Status: IN MOCK APP — #499
 Date: 2026-11-08
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Session preparation › Session QR sheet

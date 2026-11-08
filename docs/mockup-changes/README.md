@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-TICKETED: 3 · IN PROGRESS: 5 · IN MOCK APP: 54 · MOCKUP ONLY: 4
+TICKETED: 3 · IN MOCK APP: 59 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -219,15 +219,15 @@ TICKETED: 3 · IN PROGRESS: 5 · IN MOCK APP: 54 · MOCKUP ONLY: 4
 | [2026-11-08-admin-sales-page](2026-11-08-admin-sales-page.md) | Admin gets a Sales page | sales-stat-card, admin-nav | TICKETED — #504 |
 | [2026-11-08-player-change-avatar](2026-11-08-player-change-avatar.md) | Players can change their profile picture | profile-picture-sheet, player-identity-card, edit-profile-form, player-profile | IN MOCK APP — #502 |
 | [2026-11-08-player-claim-prefill-and-experience](2026-11-08-player-claim-prefill-and-experience.md) | Registration form is prefilled by the club; experience has linked Playing since | — | IN MOCK APP — PR #484 |
-| [2026-11-08-player-compare-players](2026-11-08-player-compare-players.md) | Compare yourself with another player | compare-filter-bar | IN PROGRESS — #502 |
+| [2026-11-08-player-compare-players](2026-11-08-player-compare-players.md) | Compare yourself with another player | compare-filter-bar | IN MOCK APP — #502 |
 | [2026-11-08-player-email-sign-in](2026-11-08-player-email-sign-in.md) | Player sign-in takes an email only, not a phone number | — | IN MOCK APP — PR #483 |
 | [2026-11-08-player-guest-registration](2026-11-08-player-guest-registration.md) | Guest invitations open registration | — | IN MOCK APP — #490 (PR #493) |
 | [2026-11-08-queue-delete-player](2026-11-08-queue-delete-player.md) | Saved players: Delete player | — | IN MOCK APP — PR #487 |
 | [2026-11-08-queue-edit-player-details](2026-11-08-queue-edit-player-details.md) | Queue Master can edit a guest's or unclaimed player's details before inviting them | — | IN MOCK APP — PR #484 |
 | [2026-11-08-queue-invite-cancels-previous-link](2026-11-08-queue-invite-cancels-previous-link.md) | Invite cancels the previous registration link again | — | IN MOCK APP — PR #485 |
 | [2026-11-08-queue-partial-payment-switch-yellow](2026-11-08-queue-partial-payment-switch-yellow.md) | Partial payment cards show the paid switch in yellow | switch, payments-checklist, saved-player-stats-carousel | IN MOCK APP — #498 |
-| [2026-11-08-queue-phone-header-more-options](2026-11-08-queue-phone-header-more-options.md) | Preparation header keeps Session QR and Facebook post, rest goes under More options on phones | page-header, more-options-sheet, session-preparation | IN PROGRESS — #499 |
-| [2026-11-08-queue-phone-tabs-dropdown](2026-11-08-queue-phone-tabs-dropdown.md) | Preparation and level tabs become styled dropdown menus on phones | roster-panel, preparation-roster, tab-menu, tabs, session-preparation | IN PROGRESS — #498 |
+| [2026-11-08-queue-phone-header-more-options](2026-11-08-queue-phone-header-more-options.md) | Preparation header keeps Session QR and Facebook post, rest goes under More options on phones | page-header, more-options-sheet, session-preparation | IN MOCK APP — #499 |
+| [2026-11-08-queue-phone-tabs-dropdown](2026-11-08-queue-phone-tabs-dropdown.md) | Preparation and level tabs become styled dropdown menus on phones | roster-panel, preparation-roster, tab-menu, tabs, session-preparation | IN MOCK APP — #498 |
 | [2026-11-08-queue-public-join-card-layout](2026-11-08-queue-public-join-card-layout.md) | Public page "Want to play?" card gets a stacked layout | join-request-card | IN MOCK APP — #500 (PR #551) |
 | [2026-11-08-queue-public-participants-plain-grid](2026-11-08-queue-public-participants-plain-grid.md) | Public page participants become a plain grid, not cards | public-participants | IN MOCK APP — #500 (PR #551) |
 | [2026-11-08-queue-public-waitlist-tiles](2026-11-08-queue-public-waitlist-tiles.md) | Public page waitlist shows as tiles with queue numbers | public-participants | IN MOCK APP — #500 (PR #551) |
@@ -236,12 +236,12 @@ TICKETED: 3 · IN PROGRESS: 5 · IN MOCK APP: 54 · MOCKUP ONLY: 4
 | [2026-11-08-queue-roster-summary-one-box](2026-11-08-queue-roster-summary-one-box.md) | Roster tab: slots and skill mix in one box, one bar | slot-meter, preparation-roster | IN MOCK APP — #498 |
 | [2026-11-08-queue-roster-view-toggle-icons](2026-11-08-queue-roster-view-toggle-icons.md) | Roster List / Grid toggle uses icons | roster-card, segmented-control, roster-panel, preparation-roster | IN MOCK APP — #498 |
 | [2026-11-08-queue-saved-players-stats-fade](2026-11-08-queue-saved-players-stats-fade.md) | Saved player statistics: edge fade, and arrows only when the cards overflow | switch, payments-checklist, saved-player-stats-carousel | IN MOCK APP — #498 |
-| [2026-11-08-queue-session-qr-share-card](2026-11-08-queue-session-qr-share-card.md) | Session QR becomes a branded share card with a logo in the QR | session-join-qr, session-preparation | IN PROGRESS — #499 |
+| [2026-11-08-queue-session-qr-share-card](2026-11-08-queue-session-qr-share-card.md) | Session QR becomes a branded share card with a logo in the QR | session-join-qr, session-preparation | IN MOCK APP — #499 |
 | [2026-11-08-queue-setup-court-pictures](2026-11-08-queue-setup-court-pictures.md) | Session setup shows each court as a court picture that opens an edit dialog | setup-court-picture, session-setup-form, session-setup, add-court-form | IN MOCK APP — #501 |
 | [2026-11-08-queue-setup-page1-rearranged](2026-11-08-queue-setup-page1-rearranged.md) | Session setup page 1 rearranged: venue up, steppers side by side, court times folded | session-setup-form, session-setup, add-court-form | IN MOCK APP — #501 |
 | [2026-11-08-queue-setup-time-fields-layout](2026-11-08-queue-setup-time-fields-layout.md) | Setup: Starts and Ends side by side, next day becomes a small link | time-field, date-time-picker, session-setup-form, session-setup, add-court-form | IN MOCK APP — #501 (superseded by 2026-11-08-queue-setup-when-block) |
 | [2026-11-08-queue-setup-when-block](2026-11-08-queue-setup-when-block.md) | Setup: date, start and end beside a total duration box | session-setup-form, session-setup, add-court-form | IN MOCK APP — #501 |
 | [2026-11-08-queue-time-field-dialog](2026-11-08-queue-time-field-dialog.md) | Time fields open a time dialog instead of three dropdowns | time-field, date-time-picker, session-setup, add-court-form | IN MOCK APP — #501 |
 | [2026-11-08-queue-time-picker-hour-minute](2026-11-08-queue-time-picker-hour-minute.md) | Time fields pick hour, minute and AM/PM from three short dropdowns | — | IN MOCK APP — PR #489 (superseded by 2026-11-08-queue-time-field-dialog) |
-| [2026-11-08-queue-title-public-page-icon](2026-11-08-queue-title-public-page-icon.md) | Preparation title gets an "Open public page" icon button | page-header, more-options-sheet, session-preparation | IN PROGRESS — #499 |
+| [2026-11-08-queue-title-public-page-icon](2026-11-08-queue-title-public-page-icon.md) | Preparation title gets an "Open public page" icon button | page-header, more-options-sheet, session-preparation | IN MOCK APP — #499 |
 <!-- status-index:end -->

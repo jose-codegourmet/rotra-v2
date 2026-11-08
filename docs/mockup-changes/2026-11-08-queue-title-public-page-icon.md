@@ -1,6 +1,6 @@
 # Preparation title gets an "Open public page" icon button
 
-Status: IN PROGRESS — #499
+Status: IN MOCK APP — #499
 Date: 2026-11-08
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Session preparation and session settings › header

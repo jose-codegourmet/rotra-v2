@@ -16,7 +16,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-07-06](#d-2026-11-07-06) | Public participant names are masked | approved | implemented | #475, #474 | [Queue](workstreams/queue.md) |
 | [D-2026-11-07-07](#d-2026-11-07-07) | Player invite links use player login until sign-up exists | approved | implemented | #476, #478; #477 blocked | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
 | [D-2026-11-08-01](#d-2026-11-08-01) | Where Admin Sales numbers are calculated | approved | not started | #533, #540 (epic #504) | [Admin](workstreams/admin.md) |
-| [D-2026-11-08-02](#d-2026-11-08-02) | Player Compare data, rules and route | approved | not started | #525, #526, #541 (epic #502) | [Player](workstreams/player.md) |
+| [D-2026-11-08-02](#d-2026-11-08-02) | Player Compare data, rules and route | approved | implemented in source; SQL draft, verification pending | #525, #526, #541 (epic #502) | [Player](workstreams/player.md) |
 | [D-2026-11-08-03](#d-2026-11-08-03) | Profile pictures in Supabase Storage | approved | not started | #522, #542 (epic #502) | [Player](workstreams/player.md) |
 | [D-2026-11-08-04](#d-2026-11-08-04) | Scheduled jobs: Supabase pg_cron calls protected Route Handlers | approved | not started | #545; #546, #547 blocked | [Backend](workstreams/backend.md) |
 
@@ -152,7 +152,7 @@ Then add a row to the [index](#index) and link the entry from the workstream pag
 <a id="d-2026-11-08-02"></a>
 ### D-2026-11-08-02 — Player Compare data, rules and route
 - **Decision status:** approved (2026-11-08; the owner delegated the choice and asked for the most efficient option)
-- **Implementation status:** not started
+- **Implementation status:** mock reader (#525), screen (#526), and real-mode reader (#541) implemented in source. SQL-only migration `20261108000200_player_compare_reader` is drafted; shared application requires human sign-off and an explicit EXECUTE grant to the actual runtime role. Batch checks, local SQL execution and hosted verification remain pending.
 - **Ticket:** [#525](https://github.com/jose-codegourmet/rotra-v2/issues/525) (mock data), [#526](https://github.com/jose-codegourmet/rotra-v2/issues/526) (screen), [#541](https://github.com/jose-codegourmet/rotra-v2/issues/541) (Postgres and real-mode reader), epic [#502](https://github.com/jose-codegourmet/rotra-v2/issues/502)
 - **Roadmap:** MVP candidate — [Player workstream](workstreams/player.md)
 - **Decision:**

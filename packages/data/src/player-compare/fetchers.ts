@@ -1,5 +1,5 @@
 import { getSession } from '../auth/fetchers'
-import { MockError, NotConnectedError } from '../mock/errors'
+import { MockError } from '../mock/errors'
 import { readMockState } from '../mock/store'
 import { getPlayerGames, getPlayerProfile, getPlayerRank } from '../player/fetchers'
 import { isRealDataMode } from '../real/mode'
@@ -11,6 +11,7 @@ import {
   PLAYER_COMPARE_PAGE_SIZE,
   sharedPlayerGames,
 } from './projection'
+import { realGetPlayerCompare } from './real'
 
 /** viewerId scopes the cache; the signed-in session remains the authority for who is comparing. */
 export async function getPlayerCompare(
@@ -19,8 +20,7 @@ export async function getPlayerCompare(
   options: PlayerCompareOptions = {},
   signal?: AbortSignal,
 ): Promise<PlayerCompare | null> {
-  // #541 replaces this refusal with the authorized final-row Route Handler, never a mock fallback.
-  if (isRealDataMode()) throw new NotConnectedError()
+  if (isRealDataMode()) return realGetPlayerCompare(viewerId, otherId, options, signal)
   const session = await getSession('player')
   if (!session || session.account.id !== viewerId)
     throw new MockError('permission', 'Sign in to compare.')

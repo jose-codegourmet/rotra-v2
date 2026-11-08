@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 import { counts } from '../shared-game-row/SharedGameRow.storyData'
-import { CompareFilterBar, type CompareFilter } from './CompareFilterBar'
+import { type CompareFilter, CompareFilterBar } from './CompareFilterBar'
 
 const meta = {
   title: 'Player/CompareFilterBar',

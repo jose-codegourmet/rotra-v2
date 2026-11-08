@@ -1,5 +1,5 @@
 'use client'
-import { parsePlayerPicture, type PlayerPictureChoice } from '@rotra/data/player/picture'
+import { type PlayerPictureChoice, parsePlayerPicture } from '@rotra/data/player/picture'
 import type { PlayerProfile } from '@rotra/data/player/types'
 import { useSetMyProfilePicture } from '@rotra/data/player/useSetMyProfilePicture'
 import { ProfilePictureSheet } from '@rotra/ui/profile-picture-sheet'

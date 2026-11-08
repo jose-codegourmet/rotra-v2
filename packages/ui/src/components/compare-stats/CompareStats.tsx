@@ -101,7 +101,7 @@ export function CompareStats({
               value={myWins}
               max={games}
               aria-label={`You won ${myWins} of ${games} games, ${rightLabel} ${rightCount}`}
-              className="h-3 rounded-none bg-border-strong [border-radius:0_999px_999px_0] [&>i]:rounded-none [&>i]:[border-radius:999px_0_0_999px] [&>i]:border-r-2 [&>i]:border-surface"
+              className="h-3 rounded-full bg-border-strong [&>i]:rounded-l-full [&>i]:rounded-r-none [&>i]:border-r-2 [&>i]:border-surface"
             />
             <div className="flex min-w-14 flex-col items-center">
               <b className="text-[28px] leading-none tabular-nums">{rightCount}</b>

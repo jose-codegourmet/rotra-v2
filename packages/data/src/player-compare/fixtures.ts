@@ -1,11 +1,13 @@
-import { JOSE_PLAYER_ID, leaderboardPlayers } from '../fixtures/players'
+import { clubPlayers, JOSE_PLAYER_ID, leaderboardPlayers } from '../fixtures/players'
 import type { Match } from '../match/match.types'
 import type { MockState } from '../mock/store'
 import { PLAYING_LEVELS } from '../player/player.types'
 import type { SessionPlayer } from '../session-roster/sessionRoster.types'
 
 /** The prototype's demonstrative 8 / 6 / 2 pair, represented by explicit final match rows. */
-export const COMPARE_FIXTURE_OTHER_ID = leaderboardPlayers[0]?.id
+export const COMPARE_FIXTURE_OTHER_ID = leaderboardPlayers.find(
+  (player) => !clubPlayers.some((saved) => saved.playerId === player.id),
+)?.id
 
 export type CompareRows = Pick<MockState, 'sessions' | 'matches' | 'roster' | 'clubPlayers'>
 

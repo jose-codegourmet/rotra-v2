@@ -32,6 +32,7 @@
     "./admin/licenses": "./src/admin/licenses.ts",
     "./admin/configuration": "./src/admin/configuration.ts",
     "./player/identity": "./src/player/identity.ts",
+    "./player/avatar": "./src/player/avatar.ts",
     "./player/profile": "./src/player/profile.ts",
     "./player/claim": "./src/player/claim.ts",
     "./player/ranking-settings": "./src/player/ranking-settings.ts",

@@ -18,6 +18,21 @@
 
 Do not store a password, Facebook OAuth identity, MMR, or EXP by default. Social Facebook links are optional profile data. Player UUID remains stable if phone/email changes.
 
+## Profile picture storage (#542)
+
+Provision a public Supabase Storage bucket named `player-avatars`, restricted to `image/png` with a
+2,097,152-byte file limit. The Player server verifies the signed-in player, accepts a bounded image
+upload, normalizes it to a 512 × 512 PNG, and writes `<player UUID>/<random UUID>.png` using the
+server-only `SUPABASE_SECRET_KEY`. Do not grant browser insert, update or delete policies. Character
+choices store `character:<id>` and initials store null in `avatar_ref`; no schema migration is needed.
+
+Each photo uses an immutable path. Old photos are retained, and a known rejected database write
+removes only its new upload; ambiguous failures retain it. The existing club-logo setup and retention
+pattern is documented in [clubs and licenses](../../admin/modules/clubs-licenses.md#club-logo-persistence-374).
+The Player route uses Next's internal image optimizer (and its bundled sharp); review this integration
+when upgrading Next. Input is capped at 4 MiB and 24 million pixels. Bucket creation is a deployment
+setup step, not performed by this code.
+
 ## Private contacts and account mapping
 
 `player_private_contacts`: PK/FK `player_id`; required normalized phone for globally created identities; nullable normalized email until claiming; contact verification metadata and revision. Unique phone across all global players. Proposed unique non-null normalized email avoids ambiguous email login; exact canonicalization and shared-address policy need account-flow review. A claimed profile always has an email (decided 2026-11-07, #244).

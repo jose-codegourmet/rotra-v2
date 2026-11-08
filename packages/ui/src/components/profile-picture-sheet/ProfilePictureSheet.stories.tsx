@@ -1,7 +1,7 @@
 import { playerProfiles } from '@rotra/data/fixtures/player-profiles'
+import type { ProfilePicture } from '@rotra/ui/profile-picture'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
-import type { ProfilePicture } from '@rotra/ui/profile-picture'
 import { ProfilePictureSheet } from './ProfilePictureSheet'
 
 function Demo({ initial, isPending = false }: { initial: ProfilePicture; isPending?: boolean }) {

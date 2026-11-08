@@ -1,6 +1,7 @@
 'use client'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { leaderboardKeys } from '../leaderboard/queryKeys'
+import { playerCompareKeys } from '../player-compare/queryKeys'
 import { updateMyProfile } from './fetchers'
 import { playerKeys } from './queryKeys'
 export function useUpdateMyProfile() {
@@ -14,6 +15,7 @@ export function useUpdateMyProfile() {
         client.invalidateQueries({ queryKey: playerKeys.profile(profile.playerId) }),
         client.invalidateQueries({ queryKey: playerKeys.rank(profile.playerId) }),
         client.invalidateQueries({ queryKey: leaderboardKeys.all }),
+        client.invalidateQueries({ queryKey: playerCompareKeys.all }),
       ]),
   })
 }

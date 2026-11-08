@@ -80,15 +80,10 @@ export async function registerFromClaim(
 }
 
 async function saveDetails(context: PlayerContext, details: ClaimDetails) {
-  const current = await prisma.player.findUniqueOrThrow({
-    where: { id: context.playerId },
-    select: { avatarRef: true },
-  })
   await updateMyProfile(context, {
     expectedRevision: (await readMyAccount(context)).revision,
     fullName: details.fullName,
     nickname: details.nickname,
-    picture: current.avatarRef,
     playingStyle: details.playingStyle,
     experienceYears: details.experienceYears,
     experienceMonths: details.experienceMonths,

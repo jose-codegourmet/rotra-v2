@@ -2,15 +2,14 @@
 
 import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
-import { Sheet } from '@rotra/ui/sheet'
-import { useRef } from 'react'
-
 import {
   PROFILE_CHARACTER_IDS,
-  profileCharacterUrl,
   type ProfileCharacterId,
   type ProfilePicture,
+  profileCharacterUrl,
 } from '@rotra/ui/profile-picture'
+import { Sheet } from '@rotra/ui/sheet'
+import { useRef } from 'react'
 
 export type ProfilePictureSheetProps = {
   open: boolean
@@ -102,10 +101,9 @@ export function ProfilePictureSheet({
           <span className="text-xs font-semibold tracking-[0.5px] text-fg2 uppercase">
             Or pick a character
           </span>
-          <div
-            role="group"
+          <fieldset
             aria-label="Characters"
-            className="grid grid-cols-[repeat(auto-fill,minmax(72px,1fr))] gap-2.5"
+            className="m-0 grid min-w-0 grid-cols-[repeat(auto-fill,minmax(72px,1fr))] gap-2.5 border-0 p-0"
           >
             {PROFILE_CHARACTER_IDS.map((id, index) => (
               <button
@@ -124,7 +122,7 @@ export function ProfilePictureSheet({
                 />
               </button>
             ))}
-          </div>
+          </fieldset>
         </div>
         <p className="text-xs text-fg2">
           Photos stay on this device in the prototype. Keep it to a clear picture of you; the club's

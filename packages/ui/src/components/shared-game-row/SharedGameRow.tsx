@@ -44,10 +44,9 @@ export function SharedGameRow({ game, className }: SharedGameRowProps) {
   return (
     <div className={cn('flex flex-col items-start gap-2 border-t border-border py-3', className)}>
       <div className="grid w-full grid-cols-[40%_30%_30%] items-center [&>*]:min-w-0 [&>*]:pr-2">
-        <div
-          role="group"
+        <figure
           aria-label={`${game.mine.map((p) => p.label).join(' and ')} versus ${game.theirs.map((p) => p.label).join(' and ')}`}
-          className="relative grid grid-cols-2 overflow-hidden rounded-lg border border-accent/10 !pr-0"
+          className="relative m-0 grid grid-cols-2 overflow-hidden rounded-lg border border-accent/10 !pr-0"
         >
           <svg
             className="absolute inset-0 block size-full text-accent opacity-10"
@@ -113,7 +112,7 @@ export function SharedGameRow({ game, className }: SharedGameRowProps) {
               </div>
             )
           })}
-        </div>
+        </figure>
         <div className="flex flex-col gap-0.5 pl-2.5">
           <b className="text-[13px] [overflow-wrap:anywhere]">{game.dateLabel}</b>
           <span className="text-[13px] [overflow-wrap:anywhere]">{game.sessionTitle}</span>
@@ -126,11 +125,9 @@ export function SharedGameRow({ game, className }: SharedGameRowProps) {
           >
             {label}
           </Chip>
-          <span
-            className="text-[22px] font-extrabold whitespace-nowrap tabular-nums"
-            aria-label={game.score ? `Score ${game.score}` : 'No score recorded'}
-          >
-            {game.score ?? '—'}
+          <span className="text-[22px] font-extrabold whitespace-nowrap tabular-nums">
+            <span className="sr-only">{game.score ? 'Score ' : 'No score recorded'}</span>
+            <span aria-hidden={!game.score}>{game.score ?? '—'}</span>
           </span>
         </div>
       </div>

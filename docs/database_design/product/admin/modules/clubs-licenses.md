@@ -83,3 +83,5 @@ Replacements use new paths, preventing stale CDN images. Previous objects are re
 historical result snapshots can reference them. A known rejected database write removes only its
 new upload; an ambiguous database failure retains it to avoid deleting an image that may have
 committed. General orphan cleanup and historical asset retention remain separate work.
+
+The Player app uses the same setup pattern for its public `player-avatars` bucket; see [profile picture storage](../../player-information/modules/identity.md#profile-picture-storage-542).

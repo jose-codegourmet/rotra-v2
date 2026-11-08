@@ -1,6 +1,6 @@
 import { leaderboardEntries } from '@rotra/data/fixtures/leaderboard-players'
 import { genSessions, JOSE_SESSIONS, PLAYER_FIXTURE_NOW } from '@rotra/data/fixtures/player-games'
-import { playerProfiles, playerProfileScenarios } from '@rotra/data/fixtures/player-profiles'
+import { playerProfileScenarios, playerProfiles } from '@rotra/data/fixtures/player-profiles'
 import { JOSE_PLAYER_ID, leaderboardLevels, players } from '@rotra/data/fixtures/players'
 import { countRecentStandardMatches } from '@rotra/data/player/rules'
 import type { PlayingLevel } from '@rotra/data/player/types'

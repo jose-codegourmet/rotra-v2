@@ -12,7 +12,7 @@ import {
   realSendJoinRequest,
 } from '../real/public-session'
 import { submitJoinRequest } from '../session-roster/mutations'
-import { maskPublicName, publicSkillMix } from './publicSession.rules'
+import { maskPublicName, publicLevel, publicSkillMix } from './publicSession.rules'
 import type {
   MyJoinRequest,
   PublicSessionPage,
@@ -124,14 +124,22 @@ function project(
       return {
         name: maskPublicName(r.nameSnapshot),
         pictureUrl: hasRotraProfile && p?.playerId ? (pictures[p.playerId] ?? null) : null,
-        hasRotraProfile,
+        ...publicLevel(r.level),
       }
     }),
     skillMix: publicSkillMix(roster.map((r) => r.level)),
     waitlist: state.waitlist
       .filter((w) => w.sessionId === s.id)
       .sort((a, b) => a.addedAt - b.addedAt)
-      .map((w) => maskPublicName(clubPlayer(w.clubPlayerId)?.fullName ?? '')),
+      .map((w) => {
+        const p = clubPlayer(w.clubPlayerId)
+        const hasRotraProfile = p?.identity === 'registered' || p?.identity === 'unclaimed'
+        return {
+          name: maskPublicName(p?.fullName ?? ''),
+          pictureUrl: hasRotraProfile && p?.playerId ? (pictures[p.playerId] ?? null) : null,
+          ...publicLevel(w.level),
+        }
+      }),
     openSlots: Math.max(0, capacity - roster.length),
     slotBudget: capacity,
     acceptJoinRequests: s.acceptJoinRequests,

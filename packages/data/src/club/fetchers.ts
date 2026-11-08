@@ -20,6 +20,8 @@ import {
   realGetAdminClub,
   realGetClubIdentityIndex,
   realListAdminClubs,
+  realListClubNameRequests,
+  realReviewClubNameChange,
 } from '../real/admin'
 import { isRealDataMode } from '../real/mode'
 import { realGetClub } from '../real/queue'
@@ -347,7 +349,11 @@ export function changeClubPrice(
  * Approves the club's pending name change: the name changes everywhere, the old one is kept as an
  * earlier name and the initials follow. With no pending request (already decided) nothing changes.
  */
-export function approveClubNameChange(clubId: string): Promise<{ changed: boolean; name: string }> {
+export function approveClubNameChange(
+  clubId: string,
+  requestId?: string,
+): Promise<{ changed: boolean; name: string }> {
+  if (isRealDataMode()) return realReviewClubNameChange(clubId, requestId, 'approved')
   return adminMutation(900, (draft) => {
     const club = adminClubIn(draft, clubId)
     const request = pendingRequestOf(draft, clubId)
@@ -373,7 +379,11 @@ export function approveClubNameChange(clubId: string): Promise<{ changed: boolea
 }
 
 /** Rejects the pending name change; the club keeps its name. Already decided → nothing changes. */
-export function rejectClubNameChange(clubId: string): Promise<{ changed: boolean; name: string }> {
+export function rejectClubNameChange(
+  clubId: string,
+  requestId?: string,
+): Promise<{ changed: boolean; name: string }> {
+  if (isRealDataMode()) return realReviewClubNameChange(clubId, requestId, 'rejected')
   return adminMutation(800, (draft) => {
     const club = adminClubIn(draft, clubId)
     const request = pendingRequestOf(draft, clubId)
@@ -398,6 +408,7 @@ const NAME_DECISIONS: AdminAuditAction[] = [
 
 /** A-CLUB-NAMES: pending requests newest first, and up to six recent decisions from the record. */
 export async function listClubNameRequests(signal?: AbortSignal): Promise<ClubNameRequestList> {
+  if (isRealDataMode()) return realListClubNameRequests(signal)
   await delay(400, signal)
   const state = readMockState()
   const pending = state.clubNameChangeRequests

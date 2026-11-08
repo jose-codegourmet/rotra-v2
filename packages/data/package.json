@@ -261,6 +261,8 @@
     "./sync/useRetrySync": "./src/sync/useRetrySync.ts",
     "./sync/useSessionIntegrity": "./src/sync/useSessionIntegrity.ts",
     "./sync/useAnswerInterruption": "./src/sync/useAnswerInterruption.ts",
+    "./player/picture": "./src/player/picture.ts",
+    "./player/useSetMyProfilePicture": "./src/player/useSetMyProfilePicture.ts",
     "./player/useUpdateMyProfile": "./src/player/useUpdateMyProfile.ts",
     "./player-account/types": "./src/player-account/playerAccount.types.ts",
     "./player-account/useMyAccount": "./src/player-account/useMyAccount.ts",

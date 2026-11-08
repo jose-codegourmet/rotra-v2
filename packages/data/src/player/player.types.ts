@@ -61,6 +61,7 @@ export type PlayerProfile = {
   rtrId: string
   fullName: string
   nickname: string | null
+  /** Photo URL/data URL or character:<id>; null means initials. Resolve character references before display. */
   picture: string | null
   playingStyle: string
   experienceYears: number | null

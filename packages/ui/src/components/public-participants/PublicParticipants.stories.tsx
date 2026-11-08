@@ -1,16 +1,18 @@
 import type { ClubPlayer } from '@rotra/data/club-player/types'
+import { playerProfiles } from '@rotra/data/fixtures/player-profiles'
 import { clubPlayers } from '@rotra/data/fixtures/players'
+import { maskPublicName, publicLevel } from '@rotra/data/public-session/rules'
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { fn } from 'storybook/test'
 import { PublicParticipants } from './PublicParticipants'
 
-// The public projection of a saved player: name and whether a ROTRA profile exists. Pictures are not
-// in the F06.2 fixtures, so every card shows initials.
 const toParticipant = (p: ClubPlayer) => ({
   id: p.id,
-  name: p.fullName,
-  hasProfile: p.identity === 'registered' || p.identity === 'unclaimed',
+  name: maskPublicName(p.fullName),
+  pictureUrl: playerProfiles.find((profile) => profile.playerId === p.playerId)?.picture,
+  ...publicLevel(p.playingLevel),
 })
-const toWaitlisted = (p: ClubPlayer) => ({ id: p.id, name: p.fullName })
+const participants = clubPlayers.map(toParticipant)
 
 const meta = {
   title: 'Queue/PublicSession/PublicParticipants',
@@ -23,44 +25,61 @@ const meta = {
     ),
   ],
   args: {
-    participants: clubPlayers.slice(0, 18).map(toParticipant),
-    waitlist: clubPlayers.slice(18, 20).map(toWaitlisted),
-    skillMix: { beginner: 5, intermediate: 8, advanced: 4, unrated: 1 },
+    participants: participants.slice(0, 18),
+    waitlist: participants.slice(18, 20),
+    openSlots: 0,
+    finished: false,
+    acceptJoinRequests: true,
+    onRequestToJoin: fn(),
   },
 } satisfies Meta<typeof PublicParticipants>
 
 export default meta
 type Story = StoryObj<typeof meta>
 
-/** 18 confirmed registered players and two on the waitlist. */
-export const EighteenWithWaitlist: Story = {}
-
-export const NoWaitlist: Story = { args: { waitlist: [] } }
-
-/** Nobody has been added to the session yet; the skill mix bar is hidden. */
-export const Empty: Story = {
+/** All stories support both themes through the Theme toolbar. */
+export const OverCap: Story = {}
+export const UnderCap: Story = {
+  args: { participants: participants.slice(0, 3), waitlist: [], openSlots: 5 },
+}
+export const OpenSlotsCapped: Story = {
+  args: { participants: participants.slice(0, 3), waitlist: [], openSlots: 13 },
+}
+export const EmptyWithOpenSlots: Story = {
+  args: { participants: [], waitlist: [], openSlots: 12 },
+}
+export const Empty: Story = { args: { participants: [], waitlist: [] } }
+export const NinePlayers: Story = {
+  args: { participants: participants.slice(0, 9), waitlist: [] },
+}
+/** Capped on phones only: wider screens show all ten with no prompt. */
+export const TenPlayers: Story = {
+  args: { participants: participants.slice(0, 10), waitlist: [] },
+}
+export const TwelvePlayers: Story = {
+  args: { participants: participants.slice(0, 12), waitlist: [] },
+}
+export const ThirteenPlayers: Story = {
+  args: { participants: participants.slice(0, 13), waitlist: [] },
+}
+export const RequestsOff: Story = { args: { acceptJoinRequests: false } }
+export const Offline: Story = { args: { disabled: true } }
+export const Finished: Story = { args: { finished: true, openSlots: 8 } }
+export const FinishedEmpty: Story = {
+  args: { participants: [], waitlist: [], finished: true, openSlots: 12 },
+}
+export const WaitlistUncapped: Story = {
+  args: { participants: participants.slice(0, 3), waitlist: participants.slice(3, 18) },
+}
+export const LongMaskedNames: Story = {
   args: {
-    participants: [],
+    participants: participants.slice(0, 6).map((p) => ({
+      ...p,
+      name: maskPublicName(`${p.name} Bautista Villareal de los Reyes`),
+    })),
     waitlist: [],
-    skillMix: { beginner: 0, intermediate: 0, advanced: 0, unrated: 0 },
   },
 }
-
-/** No skill mix passed: the grid alone. */
-export const WithoutSkillMix: Story = { args: { skillMix: undefined } }
-
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
 export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }
-
-export const LongNames: Story = {
-  args: {
-    participants: clubPlayers.slice(0, 6).map((p, i) => ({
-      ...toParticipant(p),
-      name: i % 2 ? `${p.fullName} Bautista Villareal de los Reyes` : p.fullName,
-    })),
-    waitlist: clubPlayers
-      .slice(18, 20)
-      .map((p) => ({ ...toWaitlisted(p), name: `${p.fullName} Bautista Villareal de los Reyes` })),
-  },
-  globals: { viewport: { value: 'phone' } },
-}
+export const Light: Story = { globals: { theme: 'light' } }

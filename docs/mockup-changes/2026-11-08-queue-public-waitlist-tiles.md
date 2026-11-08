@@ -40,3 +40,6 @@ Components: public-participants
 - #513 Q15.1 · Public participants and waitlist carry their skill group
 - #514 Q15.2 · Public participants: plain grid with level rings, open slots, capped list and waitlist tiles
 - #516 Q15.4 · Public page and operator preview use the new participants and Want to play? card
+
+Component work (#514): the tile API and Storybook states are implemented. Public page and operator
+preview wiring remains in #516, so this change stays `IN PROGRESS` until the epic is integrated.

@@ -1,64 +1,109 @@
+import type { PublicSessionParticipant } from '@rotra/data/public-session/types'
+import { Button } from '@rotra/ui/button'
 import { cn } from '@rotra/ui/cn'
+import { Icon } from '@rotra/ui/icon'
 import { ParticipantCard } from '@rotra/ui/public-participants/participant-card'
-import {
-  SkillDistributionBar,
-  type SkillDistributionCounts,
-} from '@rotra/ui/skill-distribution-bar'
+import type { SkillDistributionCounts } from '@rotra/ui/skill-distribution-bar'
 
-export type PublicParticipant = {
+export type PublicParticipant = Omit<PublicSessionParticipant, 'skillGroup' | 'levelLabel'> & {
   id: string
-  name: string
-  /** Uploaded profile picture; initials show when missing. Guests never have one. */
-  pictureUrl?: string | null
-  /** Registered and unclaimed players have one; guests do not */
-  hasProfile: boolean
+  /** Optional during migration of the public page/preview to the new public read. */
+  skillGroup?: PublicSessionParticipant['skillGroup']
+  levelLabel?: string | null
+  /** @deprecated Public tiles no longer show a profile label. */
+  hasProfile?: boolean
 }
 
-export type PublicWaitlistEntry = {
-  id: string
-  name: string
-}
+export type PublicWaitlistEntry = PublicParticipant
 
 export type PublicParticipantsProps = {
-  /** Confirmed people with a slot, in roster order */
+  /** Public-safe masked names and levels, in roster order. */
   participants: PublicParticipant[]
-  /** People waiting for a slot, in the order they joined; the list is hidden when empty */
+  /** In admission order; never capped. */
   waitlist?: PublicWaitlistEntry[]
-  /**
-   * Aggregate skill-group counts over `participants` (#474), computed on the server. Counts only:
-   * never pass anything that maps a participant to a level. The bar is hidden with no participants.
-   */
+  /** Unfilled slots from the public read, shown as placeholders until finished. */
+  openSlots?: number
+  /** Finished sessions show the whole roster with no placeholders or join prompt. */
+  finished?: boolean
+  acceptJoinRequests?: boolean
+  /** Opens the Request to join sheet; a request never grants a slot or reveals more players. */
+  onRequestToJoin?: () => void
+  /** Sending needs internet; disable the join prompt while offline. */
+  disabled?: boolean
+  /** @deprecated Skill mix now belongs to the Want to play? card. Ignored here. */
   skillMix?: SkillDistributionCounts
   className?: string
 }
 
-/**
- * The public page's Participants tab (Q-PUBLIC-PARTICIPANTS): a grid of ParticipantCards, then
- * "Waitlist · N" as a numbered list of names when anyone is waiting. Empty: "Players have not been
- * added yet." Shows no phone, email, level, presence, games, notes or Off Day. Names arrive masked
- * ("J*** A***", #475), so the card text and avatar label never carry a full name. With at least one
- * participant, a "Skill mix" bar of aggregate counts sits above the grid (#474); it never says who
- * is which level, and the grid keeps roster order (never sorted or grouped by level).
- */
+const gridClass = 'm-0 grid list-none grid-cols-3 gap-x-[18px] gap-y-7 p-0 min-[641px]:grid-cols-4'
+
+/** Public participants: plain tiles, up to three rows before joining, followed by waitlist tiles. */
 export function PublicParticipants({
   participants,
   waitlist = [],
-  skillMix,
+  openSlots = 0,
+  finished = false,
+  acceptJoinRequests = true,
+  onRequestToJoin,
+  disabled = false,
   className,
 }: PublicParticipantsProps) {
+  // Never mount roster entries past the wider cap. CSS removes entries 10–12 on phones from
+  // both layout and the accessibility tree, with no viewport hook or hydration shift.
+  const visibleParticipants = finished ? participants : participants.slice(0, 12)
+  const placeholderCount = finished
+    ? 0
+    : Math.min(Math.max(0, Math.trunc(openSlots)), Math.max(0, 12 - visibleParticipants.length))
+  const showJoinPrompt = !finished && participants.length > 9
+
   return (
     <section aria-label="Participants" className={cn('flex min-w-0 flex-col gap-3', className)}>
-      {participants.length > 0 && skillMix ? (
-        <SkillDistributionBar counts={skillMix} label="Skill mix" />
-      ) : null}
-      {participants.length ? (
-        <ul className="m-0 grid list-none grid-cols-[repeat(auto-fill,minmax(min(100%,150px),1fr))] gap-2.5 p-0">
-          {participants.map((p) => (
-            <li key={p.id} className="min-w-0">
-              <ParticipantCard name={p.name} pictureUrl={p.pictureUrl} hasProfile={p.hasProfile} />
-            </li>
-          ))}
-        </ul>
+      {participants.length || placeholderCount ? (
+        <div className="relative">
+          <ul className={cn(gridClass, !finished && 'max-[640px]:[&>li:nth-child(n+10)]:hidden')}>
+            {visibleParticipants.map((p) => (
+              <li key={p.id} className="min-w-0">
+                <ParticipantCard
+                  name={p.name}
+                  pictureUrl={p.pictureUrl}
+                  skillGroup={p.skillGroup}
+                  levelLabel={p.levelLabel}
+                />
+              </li>
+            ))}
+            {Array.from({ length: placeholderCount }, (_, i) => (
+              <li key={`open-${i}`} aria-hidden="true" className="min-w-0">
+                <div className="flex flex-col items-center gap-3.5 text-center">
+                  <span className="mt-2 h-auto w-4/5 max-w-[77px] aspect-square rounded-full outline-[3px] outline-offset-4 outline-dashed outline-border-strong" />
+                  <b className="text-[17px] leading-[1.25] font-medium text-fg3">Open</b>
+                </div>
+              </li>
+            ))}
+          </ul>
+          {showJoinPrompt ? (
+            <div
+              className={cn(
+                'absolute inset-x-0 bottom-0 flex h-[170px] flex-col items-center justify-end gap-2 bg-[linear-gradient(to_bottom,transparent,var(--bg)_70%)] pb-1.5 text-fg',
+                participants.length <= 12 && 'min-[641px]:hidden',
+              )}
+            >
+              <span className="text-[13px] text-fg2">{participants.length} players are in</span>
+              {acceptJoinRequests ? (
+                <Button
+                  variant="primary"
+                  onClick={onRequestToJoin}
+                  disabled={disabled || !onRequestToJoin}
+                  className="min-h-12 max-w-full rounded-full px-[22px] text-[15px] font-extrabold shadow-[0_6px_20px_color-mix(in_srgb,var(--accent)_35%,transparent)] touch:px-[22px] touch:text-[15px]"
+                >
+                  <Icon name="lock" size={16} className="shrink-0" />
+                  Join to see the full roster
+                </Button>
+              ) : (
+                <span className="text-center font-bold">Join to see the full roster</span>
+              )}
+            </div>
+          ) : null}
+        </div>
       ) : (
         <div className="rounded-lg border border-border bg-surface px-3 py-6 text-center text-sm text-fg2 shadow-card">
           Players have not been added yet.
@@ -67,15 +112,21 @@ export function PublicParticipants({
       {waitlist.length ? (
         <>
           <h3>Waitlist · {waitlist.length}</h3>
-          <ol className="m-0 flex list-decimal flex-col gap-0.5 pl-[22px]">
-            {waitlist.map((w) => (
-              <li key={w.id} className="[overflow-wrap:anywhere]">
-                {w.name}
+          <ol className={gridClass}>
+            {waitlist.map((w, i) => (
+              <li key={w.id} className="min-w-0">
+                <ParticipantCard
+                  name={w.name}
+                  pictureUrl={w.pictureUrl}
+                  skillGroup={w.skillGroup}
+                  levelLabel={w.levelLabel}
+                  waitlistPosition={i + 1}
+                />
               </li>
             ))}
           </ol>
           <p className="m-0 text-[13px] text-fg2">
-            Waitlisted players get a slot if one opens. Ask the Queue Master.
+            Waitlisted players get a slot if one opens, in this order. Ask the Queue Master.
           </p>
         </>
       ) : null}

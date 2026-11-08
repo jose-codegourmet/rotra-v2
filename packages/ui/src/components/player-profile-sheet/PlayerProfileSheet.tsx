@@ -34,6 +34,10 @@ export type PlayerProfileSheetProps = {
   onInvite?: () => void
   /** Edit details, shown for guests and unclaimed profiles (a registered player owns their details) */
   onEdit?: () => void
+  /** Delete player, any saved player; hidden when opened from another dialog */
+  onDelete?: () => void
+  /** The delete is being checked or saved */
+  deleting?: boolean
   /** Absolute ROTRA Player sign-in link. Guests get an Invite to ROTRA section with it; hidden when absent */
   inviteUrl?: string
 }
@@ -63,6 +67,8 @@ export function PlayerProfileSheet({
   onBack,
   onInvite,
   onEdit,
+  onDelete,
+  deleting = false,
   inviteUrl,
 }: PlayerProfileSheetProps) {
   const canInvite = identity === 'guest' || identity === 'unclaimed'
@@ -99,6 +105,11 @@ export function PlayerProfileSheet({
           ) : (
             <Button onClick={() => onOpenChange(false)}>Close</Button>
           )}
+          {onDelete && !backLabel ? (
+            <Button variant="danger" onClick={onDelete} loading={deleting}>
+              Delete player
+            </Button>
+          ) : null}
           {canInvite && onEdit ? <Button onClick={onEdit}>Edit details</Button> : null}
           {canInvite && onInvite ? (
             <Button variant="primary" onClick={onInvite}>

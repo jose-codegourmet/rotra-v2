@@ -94,6 +94,8 @@
     "./club-player/useClubPlayer": "./src/club-player/useClubPlayer.ts",
     "./club-player/useCreatePlayerInvite": "./src/club-player/useCreatePlayerInvite.ts",
     "./club-player/details": "./src/club-player/details.ts",
+    "./club-player/delete": "./src/club-player/delete.ts",
+    "./club-player/useDeleteClubPlayer": "./src/club-player/useDeleteClubPlayer.ts",
     "./club-player/useClubPlayerDetails": "./src/club-player/useClubPlayerDetails.ts",
     "./club-player/useUpdateClubPlayerDetails": "./src/club-player/useUpdateClubPlayerDetails.ts",
     "./club-player/useAddNewSavedPlayer": "./src/club-player/useAddNewSavedPlayer.ts",

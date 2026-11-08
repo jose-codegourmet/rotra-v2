@@ -57,6 +57,15 @@ export const Unclaimed: Story = {
   args: propsFor(storyIdentityPlayers.unclaimed, { sessionsHere: 5 }),
 }
 export const Guest: Story = { args: propsFor(storyIdentityPlayers.guest, { sessionsHere: 1 }) }
+/** Saved players footer: Delete player, Edit details and Invite. */
+export const SavedPlayerActions: Story = {
+  args: {
+    ...propsFor(storyIdentityPlayers.guest, { sessionsHere: 1 }),
+    onDelete: () => {},
+    onEdit: () => {},
+    onInvite: () => {},
+  },
+}
 export const GuestWithInvite: Story = {
   args: propsFor(storyIdentityPlayers.guest, {
     sessionsHere: 1,

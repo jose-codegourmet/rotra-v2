@@ -1,9 +1,11 @@
 'use client'
 
 import { registeredCity } from '@rotra/data/club-player/fetchers'
+import type { DeleteImpact } from '@rotra/data/club-player/types'
 import { useClubPlayerDetails } from '@rotra/data/club-player/useClubPlayerDetails'
 import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import { useCreatePlayerInvite } from '@rotra/data/club-player/useCreatePlayerInvite'
+import { useDeleteClubPlayer } from '@rotra/data/club-player/useDeleteClubPlayer'
 import { useSavedPlayerStats } from '@rotra/data/club-player/useSavedPlayerStats'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { useNowCard } from '@rotra/data/queue-session/useNowCard'
@@ -12,6 +14,7 @@ import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { AlphabetIndex } from '@rotra/ui/alphabet-index'
 import { Breadcrumb } from '@rotra/ui/breadcrumb'
 import { Button } from '@rotra/ui/button'
+import { DeletePlayerSheet } from '@rotra/ui/delete-player-sheet'
 import { EmptyState } from '@rotra/ui/empty-state'
 import { InviteSheet } from '@rotra/ui/invite-sheet'
 import { LetterGroup, letterHeadingId } from '@rotra/ui/letter-group'
@@ -117,6 +120,14 @@ export function SavedPlayers() {
   const [profileId, setProfileId] = useState<string | null>(null)
   const [inviteId, setInviteId] = useState<string | null>(null)
   const [editId, setEditId] = useState<string | null>(null)
+  // D-DELETE-PLAYER, only when the player is in the Active Session
+  const [deleting, setDeleting] = useState<{
+    id: string
+    name: string
+    shortName: string
+    impact: DeleteImpact
+  } | null>(null)
+  const del = useDeleteClubPlayer()
   const [adding, setAdding] = useState(false)
   const invite = useCreatePlayerInvite()
 
@@ -164,6 +175,36 @@ export function SavedPlayers() {
         },
       })
   }
+  const removePlayer = (id: string) =>
+    del.remove.mutate(id, {
+      onSuccess: (result) => {
+        toast(`${result.name} deleted`)
+        setDeleting(null)
+        setProfileId(null)
+      },
+      onError: (error) => {
+        if (!deleting) toast.error(error.message)
+      },
+    })
+  /** Delete player: acts at once unless they're in the Active Session, which asks first. */
+  const startDelete = (p: { id: string; fullName: string; nickname: string | null }) =>
+    del.check.mutate(p.id, {
+      onSuccess: (impact) => {
+        if (!impact.activeSession) {
+          removePlayer(p.id)
+          return
+        }
+        del.remove.reset()
+        setProfileId(null)
+        setDeleting({
+          id: p.id,
+          name: p.fullName,
+          shortName: p.nickname || p.fullName.split(' ')[0] || p.fullName,
+          impact,
+        })
+      },
+      onError: (error) => toast.error(error.message),
+    })
   const copyLink = async (link: string) => {
     try {
       await navigator.clipboard.writeText(link)
@@ -272,6 +313,8 @@ export function SavedPlayers() {
               ? () => openInvite(profile.id)
               : undefined
           }
+          onDelete={() => startDelete(profile)}
+          deleting={del.check.isPending || (del.remove.isPending && !deleting)}
           onEdit={
             profile.identity === 'guest' || profile.identity === 'unclaimed'
               ? () => {
@@ -280,6 +323,22 @@ export function SavedPlayers() {
                 }
               : undefined
           }
+        />
+      ) : null}
+      {deleting?.impact.activeSession ? (
+        <DeletePlayerSheet
+          open
+          onOpenChange={(open) => {
+            if (!open && !del.remove.isPending) setDeleting(null)
+          }}
+          name={deleting.name}
+          shortName={deleting.shortName}
+          sessionTitle={deleting.impact.activeSession.title}
+          waitingMatches={deleting.impact.activeSession.waitingMatches}
+          busy={deleting.impact.busy}
+          isPending={del.remove.isPending}
+          error={del.remove.error?.message}
+          onConfirm={() => removePlayer(deleting.id)}
         />
       ) : null}
       {editId ? (

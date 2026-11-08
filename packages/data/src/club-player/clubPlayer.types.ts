@@ -10,6 +10,8 @@ export type ClubPlayer = {
   nickname: string | null
   identity: 'registered' | 'unclaimed' | 'guest' | 'pending'
   playingLevel: PlayingLevel | null
+  /** The club deleted this saved player; history still points at it (mock store only) */
+  removedAt?: number
 }
 
 /** Unfiltered Saved players overview for one club. */
@@ -51,4 +53,11 @@ export type ClubPlayerDetailsInput = {
   instagram: string
   youtube: string
   linkedin: string
+}
+
+/** What Delete player would affect. Only `activeSession` asks for confirmation (D-DELETE-PLAYER). */
+export type DeleteImpact = {
+  activeSession: { title: string; waitingMatches: number } | null
+  /** On court or playing: deleting is refused until that match is done */
+  busy: boolean
 }

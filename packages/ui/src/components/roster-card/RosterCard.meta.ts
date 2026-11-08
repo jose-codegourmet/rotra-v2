@@ -3,7 +3,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const rosterCardMeta = {
   name: 'RosterCard',
   description:
-    'One confirmed slot on the preparation roster grid: picture, name, identity chip, remove, the Player Information suggestion, the level select or “LEVEL · Fixed after start”, the suggestion indicator, Present or Present/Away, and Paid / Not paid.',
+    'One confirmed slot on the preparation roster grid. First level: picture, name, remove, a full-width Present band (accent tint when present, with the Switch) and a level block tinted and outlined in the skill group color (level select or “LEVEL · Fixed after start”, plus the suggestion indicator). Second level: one small muted line with the identity chip, Paid / Not paid (never green) and “Suggestion: LEVEL”.',
   usage: [
     'Use inside RosterPanel when Roster view is Grid.',
     'Do not use for the List view: that stays RosterRow.',
@@ -17,6 +17,7 @@ export const rosterCardMeta = {
   docs: [
     'docs/screens/product/modules/queue/session-setup.md',
     'docs/mockup-changes/2026-11-06-queue-roster-views.md',
+    'docs/mockup-changes/2026-11-08-queue-roster-card-emphasis.md',
   ],
   related: [
     'RosterPanel',

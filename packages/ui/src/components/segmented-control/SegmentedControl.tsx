@@ -7,6 +7,12 @@ import type { ReactNode, Ref } from 'react'
 export type SegmentedOption = {
   value: string
   label: ReactNode
+  /**
+   * Icon-only option: pass the icon as `label` and set `iconOnly`. `ariaLabel` is the accessible
+   * name and the hover title (e.g. "List view"). Text options leave both unset.
+   */
+  iconOnly?: boolean
+  ariaLabel?: string
   /** Muted number after the label (admin filters: "Pending 3") */
   count?: number
   disabled?: boolean
@@ -62,7 +68,10 @@ export function SegmentedControl({
             'inline-flex min-h-9 items-center gap-1.5 rounded-[7px] border-0 bg-transparent px-3.5 font-semibold text-fg2',
             'data-[state=on]:bg-elev data-[state=on]:text-fg disabled:cursor-not-allowed disabled:opacity-45',
             'touch:min-h-11 touch:px-4',
+            option.iconOnly && 'min-w-10 justify-center px-2.5 touch:px-2.5',
           )}
+          aria-label={option.iconOnly ? option.ariaLabel : undefined}
+          title={option.iconOnly ? option.ariaLabel : undefined}
         >
           {option.label}
           {option.count !== undefined ? (

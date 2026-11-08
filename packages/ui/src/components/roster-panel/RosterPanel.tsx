@@ -6,6 +6,7 @@ import { Card } from '@rotra/ui/card'
 import { Chip } from '@rotra/ui/chip'
 import { cn } from '@rotra/ui/cn'
 import { EmptyState } from '@rotra/ui/empty-state'
+import { Icon } from '@rotra/ui/icon'
 import type { Identity } from '@rotra/ui/identity-chip/variants'
 import { Notice } from '@rotra/ui/notice'
 import { RosterCard } from '@rotra/ui/roster-card'
@@ -335,8 +336,18 @@ export function RosterPanel({
                 value={view}
                 onChange={(value) => setView(value as RosterView)}
                 options={[
-                  { value: 'list', label: 'List' },
-                  { value: 'grid', label: 'Grid' },
+                  {
+                    value: 'list',
+                    label: <Icon name="list" />,
+                    iconOnly: true,
+                    ariaLabel: 'List view',
+                  },
+                  {
+                    value: 'grid',
+                    label: <Icon name="grid" />,
+                    iconOnly: true,
+                    ariaLabel: 'Grid view',
+                  },
                 ]}
               />
             </div>

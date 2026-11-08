@@ -316,6 +316,23 @@ export const ICONS = {
     strokeWidth: 2.2,
     body: <path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" />,
   },
+  list: {
+    size: 18,
+    strokeWidth: 2.2,
+    body: <path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01" />,
+  },
+  grid: {
+    size: 18,
+    strokeWidth: 2.2,
+    body: (
+      <>
+        <rect x="4" y="4" width="6.5" height="6.5" rx="1.5" />
+        <rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5" />
+        <rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5" />
+        <rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5" />
+      </>
+    ),
+  },
 } satisfies Record<string, IconDef>
 
 export type IconName = keyof typeof ICONS

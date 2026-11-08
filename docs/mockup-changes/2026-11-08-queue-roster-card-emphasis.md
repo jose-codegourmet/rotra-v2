@@ -1,6 +1,6 @@
 # Roster grid card puts presence and level first
 
-Status: TICKETED — #498
+Status: IN PROGRESS — #498
 Date: 2026-11-08
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Session preparation › Roster and levels tab › Grid view

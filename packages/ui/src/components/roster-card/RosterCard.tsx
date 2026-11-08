@@ -14,6 +14,14 @@ import { LevelSelect } from '@rotra/ui/level-select'
 import { Switch } from '@rotra/ui/switch'
 import { useId } from 'react'
 
+/** The level block in the skill group's color (the prototype's .rv-lv): outline plus a 12% tint. */
+const LEVEL_BLOCK = {
+  beginner: 'border-lv-beg bg-[color-mix(in_srgb,var(--lv-beg)_12%,transparent)]',
+  intermediate: 'border-lv-int bg-[color-mix(in_srgb,var(--lv-int)_12%,transparent)]',
+  advanced: 'border-lv-adv bg-[color-mix(in_srgb,var(--lv-adv)_12%,transparent)]',
+  none: 'border-border',
+} as const
+
 export type RosterCardProps = {
   name: string
   photoUrl?: string
@@ -38,9 +46,11 @@ export type RosterCardProps = {
 }
 
 /**
- * One confirmed slot on the preparation roster grid (the prototype's .rv-card): picture, name,
- * identity chip, remove, suggestion, the level select or "LEVEL · Fixed after start", the
- * suggestion indicator, Present or Present/Away, and Paid / Not paid.
+ * One confirmed slot on the preparation roster grid (the prototype's .rv-card). First level:
+ * picture, name, remove, a full-width Present band (accent tint when present) and a level block
+ * tinted in the skill group's color (level select or "LEVEL · Fixed after start", plus the
+ * suggestion indicator). Second level: one small muted line with the identity chip, Paid / Not
+ * paid and "Suggestion: LEVEL".
  */
 export function RosterCard({
   name,
@@ -61,6 +71,7 @@ export function RosterCard({
 }: RosterCardProps) {
   const diffId = useId()
   const afterStart = Boolean(levelLocked || readOnly)
+  const band = level ? (level.split('_')[0] as 'beginner' | 'intermediate' | 'advanced') : 'none'
   return (
     <Card asChild padding="none" className={cn('flex flex-col gap-2 p-3 shadow-card', className)}>
       <article aria-label={name}>
@@ -68,7 +79,6 @@ export function RosterCard({
           <Avatar name={name} src={photoUrl} onClick={onOpenProfile} />
           <div className="flex min-w-0 flex-1 flex-col gap-1">
             <b className="font-semibold [overflow-wrap:anywhere]">{name}</b>
-            <IdentityChip identity={identity} />
           </div>
           {!afterStart ? (
             <IconButton
@@ -81,10 +91,31 @@ export function RosterCard({
             </IconButton>
           ) : null}
         </div>
-        <span className="text-[13px] text-fg2">
-          {suggestion ? `Suggestion: ${levelLabel(suggestion)}` : 'No suggestion'}
-        </span>
-        <div className="flex min-w-0 flex-col gap-1">
+        <div
+          className={cn(
+            'flex items-center justify-between gap-2 rounded-md px-2.5 py-2',
+            present ? 'bg-accent-subtle text-accent' : 'bg-elev text-fg2',
+          )}
+        >
+          {afterStart ? (
+            <span className="text-sm font-semibold">
+              {presencePending ? 'Saving presence…' : present ? 'Present' : 'Away'}
+            </span>
+          ) : (
+            <>
+              <span className="text-sm font-semibold">
+                {presencePending ? 'Saving presence…' : present ? 'Present' : 'Not present'}
+              </span>
+              <Switch checked={present} onChange={onPresentChange} aria-label={`${name} present`} />
+            </>
+          )}
+        </div>
+        <div
+          className={cn(
+            'flex min-w-0 flex-col gap-1 rounded-md border px-2.5 py-2',
+            LEVEL_BLOCK[band],
+          )}
+        >
           {afterStart ? (
             <span className="font-semibold [overflow-wrap:anywhere]">
               {level ? levelLabel(level) : 'No level'} · Fixed after start
@@ -100,27 +131,13 @@ export function RosterCard({
           )}
           <LevelDiffIndicator id={diffId} level={level} suggestion={suggestion} />
         </div>
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          {afterStart ? (
-            <span className="text-[13px] text-fg2">
-              {presencePending ? 'Saving presence…' : present ? 'Present' : 'Away'}
-            </span>
-          ) : (
-            <span className="flex flex-nowrap items-center gap-2">
-              <span className="text-[13px] text-fg2">
-                {presencePending ? 'Saving presence…' : 'Present'}
-              </span>
-              <Switch checked={present} onChange={onPresentChange} aria-label={`${name} present`} />
-            </span>
-          )}
-          {paid ? (
-            <span className="inline-flex items-center gap-1 text-xs font-semibold text-accent">
-              <Icon name="check" size={13} />
-              Paid
-            </span>
-          ) : (
-            <span className="text-xs text-fg2">Not paid</span>
-          )}
+        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-fg2">
+          <IdentityChip identity={identity} />
+          <span className="inline-flex items-center gap-1">
+            {paid ? <Icon name="check" size={13} /> : null}
+            {paid ? 'Paid' : 'Not paid'}
+          </span>
+          <span>{suggestion ? `Suggestion: ${levelLabel(suggestion)}` : 'No suggestion'}</span>
         </div>
       </article>
     </Card>

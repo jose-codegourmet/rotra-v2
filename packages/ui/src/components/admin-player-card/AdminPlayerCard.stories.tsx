@@ -48,3 +48,24 @@ export const Selectable: Story = {
 }
 export const SelectableLight: Story = { ...Selectable, globals: { theme: 'light' } }
 export const Selected: Story = { args: { selected: true, onSelect: () => {} } }
+
+export const Grid: Story = {
+  args: {
+    view: 'grid',
+    selected: false,
+    onSelect: () => {},
+    actions: <AdminPlayerActions player={managementPlayer} onAction={() => {}} />,
+  },
+  decorators: [
+    (Story) => (
+      <div className="grid max-w-[340px] grid-cols-2 gap-2.5">
+        <Story />
+        <Story />
+      </div>
+    ),
+  ],
+}
+export const GridLight: Story = { ...Grid, globals: { theme: 'light' } }
+export const GridSelected: Story = { ...Grid, args: { ...Grid.args, selected: true } }
+export const GridSelectedLight: Story = { ...GridSelected, globals: { theme: 'light' } }
+export const SelectedLight: Story = { ...Selected, globals: { theme: 'light' } }

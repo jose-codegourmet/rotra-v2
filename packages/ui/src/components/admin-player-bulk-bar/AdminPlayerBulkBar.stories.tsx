@@ -11,3 +11,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 export const Default: Story = {}
 export const Light: Story = { globals: { theme: 'light' } }
+
+export const Empty: Story = { args: { players: [] } }
+export const Offline: Story = { args: { offline: true } }
+export const OfflineLight: Story = { ...Offline, globals: { theme: 'light' } }

@@ -77,7 +77,8 @@ export function RecordPublicTab({ sessionId, record }: RecordPublicTabProps) {
             key={i}
             name={x.name}
             pictureUrl={x.pictureUrl}
-            hasProfile={Boolean(x.pictureUrl)}
+            skillGroup={x.skillGroup}
+            levelLabel={x.levelLabel}
           />
         ))}
       </PublicPageSummary>

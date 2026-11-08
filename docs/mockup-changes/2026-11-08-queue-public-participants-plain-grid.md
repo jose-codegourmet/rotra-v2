@@ -1,6 +1,6 @@
 # Public page participants become a plain grid, not cards
 
-Status: IN PROGRESS — #500
+Status: IN MOCK APP — #500 (PR #551)
 Date: 2026-11-08
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Public session page › Participants (also its operator preview)
@@ -51,5 +51,9 @@ Components: public-participants
 - #514 Q15.2 · Public participants: plain grid with level rings, open slots, capped list and waitlist tiles
 - #516 Q15.4 · Public page and operator preview use the new participants and Want to play? card
 
-Component work (#514): the tile API and Storybook states are implemented. Public page and operator
-preview wiring remains in #516, so this change stays `IN PROGRESS` until the epic is integrated.
+## Verification — November 8, 2026
+- Public page and operator preview wiring completed in #516 (PR #551).
+- Component states checked in dark and light at 375 px and 1280 px, with the canonical prototype layout and copy.
+- Signed-out public page renders; signed-out preview redirects to it. Roster CTA opens Request to join; Escape returns focus.
+- End-of-list lint, type-check and build pass. Payload allowlist, masking, level labels and waitlist order checked with two passing temporary tests.
+- Live database payloads and production deployment were not verified.

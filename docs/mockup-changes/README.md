@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-TICKETED: 10 · IN PROGRESS: 7 · IN MOCK APP: 45 · MOCKUP ONLY: 4
+TICKETED: 10 · IN PROGRESS: 4 · IN MOCK APP: 48 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -228,9 +228,9 @@ TICKETED: 10 · IN PROGRESS: 7 · IN MOCK APP: 45 · MOCKUP ONLY: 4
 | [2026-11-08-queue-partial-payment-switch-yellow](2026-11-08-queue-partial-payment-switch-yellow.md) | Partial payment cards show the paid switch in yellow | switch, payments-checklist, saved-player-stats-carousel | IN MOCK APP — #498 |
 | [2026-11-08-queue-phone-header-more-options](2026-11-08-queue-phone-header-more-options.md) | Preparation header keeps Session QR and Facebook post, rest goes under More options on phones | page-header, more-options-sheet, session-preparation | IN PROGRESS — #499 |
 | [2026-11-08-queue-phone-tabs-dropdown](2026-11-08-queue-phone-tabs-dropdown.md) | Preparation and level tabs become styled dropdown menus on phones | roster-panel, preparation-roster, tab-menu, tabs, session-preparation | IN PROGRESS — #498 |
-| [2026-11-08-queue-public-join-card-layout](2026-11-08-queue-public-join-card-layout.md) | Public page "Want to play?" card gets a stacked layout | join-request-card | IN PROGRESS — #500 |
-| [2026-11-08-queue-public-participants-plain-grid](2026-11-08-queue-public-participants-plain-grid.md) | Public page participants become a plain grid, not cards | public-participants | IN PROGRESS — #500 |
-| [2026-11-08-queue-public-waitlist-tiles](2026-11-08-queue-public-waitlist-tiles.md) | Public page waitlist shows as tiles with queue numbers | public-participants | IN PROGRESS — #500 |
+| [2026-11-08-queue-public-join-card-layout](2026-11-08-queue-public-join-card-layout.md) | Public page "Want to play?" card gets a stacked layout | join-request-card | IN MOCK APP — #500 (PR #551) |
+| [2026-11-08-queue-public-participants-plain-grid](2026-11-08-queue-public-participants-plain-grid.md) | Public page participants become a plain grid, not cards | public-participants | IN MOCK APP — #500 (PR #551) |
+| [2026-11-08-queue-public-waitlist-tiles](2026-11-08-queue-public-waitlist-tiles.md) | Public page waitlist shows as tiles with queue numbers | public-participants | IN MOCK APP — #500 (PR #551) |
 | [2026-11-08-queue-roster-card-emphasis](2026-11-08-queue-roster-card-emphasis.md) | Roster grid card puts presence and level first | roster-card, segmented-control, roster-panel, preparation-roster | IN MOCK APP — #498 |
 | [2026-11-08-queue-roster-skill-mix-progress](2026-11-08-queue-roster-skill-mix-progress.md) | Roster skill mix is one compact bar with hover counts, in non-green colors | theme.css, skill-distribution-bar, slot-meter, preparation-roster | IN MOCK APP — #498 (superseded by 2026-11-08-queue-roster-summary-one-box) |
 | [2026-11-08-queue-roster-summary-one-box](2026-11-08-queue-roster-summary-one-box.md) | Roster tab: slots and skill mix in one box, one bar | slot-meter, preparation-roster | IN MOCK APP — #498 |

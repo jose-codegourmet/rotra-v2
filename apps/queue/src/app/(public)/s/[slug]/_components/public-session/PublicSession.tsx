@@ -76,15 +76,18 @@ function joinCardProps(
       : { variant: 'confirmed-slot' }
   }
   if (!page.acceptJoinRequests) return { variant: 'off' }
+  if (page.status === 'active')
+    return { variant: 'active', skillMix: page.skillMix, onRequestToJoin, disabled: offline }
   return page.openSlots > 0
     ? {
         variant: 'open',
         openSlots: page.openSlots,
         capacity: page.slotBudget,
+        skillMix: page.skillMix,
         onRequestToJoin,
         disabled: offline,
       }
-    : { variant: 'full', onRequestToJoin, disabled: offline }
+    : { variant: 'full', skillMix: page.skillMix, onRequestToJoin, disabled: offline }
 }
 
 /** The published slides as slide props; Off Day only when the publication included it. */
@@ -164,9 +167,7 @@ export function PublicSession({ slug, viewer, openJoin = false }: PublicSessionP
   const card = joinCardProps(p, mine.data, () => setJoinOpen(true), dev.offline)
   const participants = p.participants.map((x, i) => ({
     id: String(i),
-    name: x.name,
-    pictureUrl: x.pictureUrl,
-    hasProfile: Boolean(x.pictureUrl),
+    ...x,
   }))
 
   return (
@@ -213,8 +214,14 @@ export function PublicSession({ slug, viewer, openJoin = false }: PublicSessionP
         <TabsContent value="participants">
           <PublicParticipants
             participants={participants}
-            skillMix={p.skillMix}
-            waitlist={p.waitlist.map((entry, i) => ({ id: String(i), name: entry.name }))}
+            waitlist={p.waitlist.map((entry, i) => ({ ...entry, id: String(i) }))}
+            openSlots={p.openSlots}
+            finished={p.status === 'completed' || p.status === 'invalid'}
+            acceptJoinRequests={
+              p.acceptJoinRequests && (p.status === 'prepared' || p.status === 'active')
+            }
+            onRequestToJoin={() => setJoinOpen(true)}
+            disabled={dev.offline}
           />
         </TabsContent>
       </Tabs>

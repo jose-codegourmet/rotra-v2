@@ -21,6 +21,7 @@
   --r: 10px; --r-sm: 6px;
   --court: #14603f; --court-line: rgba(255, 255, 255, 0.85); --court-free: #232328; --court-free-line: rgba(255, 255, 255, 0.16);
   --shadow: none; --knob: var(--fg); --field: var(--bg);
+  --lv-beg: #3d9bff; --lv-int: #ffd23f; --lv-adv: #ff5a5f;
   color-scheme: dark;
 }
 @media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) {
@@ -32,6 +33,7 @@
   --border: #e2e5df; --border-strong: #cdd2c9; --scrim: rgba(18, 21, 19, 0.4);
   --court: #2e8b57; --court-line: #ffffff; --court-free: #e8ebe5; --court-free-line: rgba(18, 21, 19, 0.14);
   --shadow: 0 1px 2px rgba(18, 24, 20, 0.05), 0 2px 8px rgba(18, 24, 20, 0.04); --knob: #ffffff; --field: #ffffff;
+  --lv-beg: #1d6fd1; --lv-int: #d19a00; --lv-adv: #d6293a;
   color-scheme: light;
 } }
 :root[data-theme="light"] {
@@ -43,6 +45,7 @@
   --border: #e2e5df; --border-strong: #cdd2c9; --scrim: rgba(18, 21, 19, 0.4);
   --court: #2e8b57; --court-line: #ffffff; --court-free: #e8ebe5; --court-free-line: rgba(18, 21, 19, 0.14);
   --shadow: 0 1px 2px rgba(18, 24, 20, 0.05), 0 2px 8px rgba(18, 24, 20, 0.04); --knob: #ffffff; --field: #ffffff;
+  --lv-beg: #1d6fd1; --lv-int: #d19a00; --lv-adv: #d6293a;
   color-scheme: light;
 }
 * { box-sizing: border-box; }
@@ -52,6 +55,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 button, input, select, textarea { font: inherit; color: inherit; }
 h1, h2, h3 { margin: 0; text-wrap: balance; letter-spacing: -0.3px; }
 h1 { font-size: 26px; font-weight: 800; line-height: 1.2; }
+.title-row { display: flex; align-items: center; gap: 6px; min-width: 0; }
 h2 { font-size: 18px; font-weight: 700; }
 h3 { font-size: 15px; font-weight: 700; }
 p { margin: 0; }
@@ -173,14 +177,66 @@ button.conn:hover { border-color: var(--accent); background: var(--surface); }
 textarea.input { min-height: 80px; resize: vertical; }
 .input:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: transparent; }
 .input.bad { border-color: var(--error); }
+.sc-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); gap: 12px; }
+.sc-tile { display: flex; flex-direction: column; gap: 8px; padding: 8px; border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); color: var(--fg); font: inherit; text-align: left; cursor: pointer; min-width: 0; }
+.sc-tile:hover { border-color: var(--border-strong); }
+.sc-art { position: relative; display: block; }
+.sc-svg { display: block; width: 100%; height: auto; border-radius: 6px; }
+.sc-name { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); padding: 2px 10px; border-radius: 999px; background: rgba(0, 0, 0, 0.55); color: #fff; font-weight: 700; font-size: 13px; white-space: nowrap; max-width: 80%; overflow: hidden; text-overflow: ellipsis; }
+.sc-cap { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-size: 12px; color: var(--fg2); padding-inline: 2px; }
+.sc-cap b { color: var(--fg); }
+.step-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.stepcard { min-width: 0; display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); }
+.stepcard > span { font-size: 13px; color: var(--fg2); }
+.stepcard .row { justify-content: space-between; flex-wrap: nowrap; gap: 6px; }
+.stepcard .btn { min-width: 40px; padding: 0; }
+.stepcard b { font-size: 24px; min-width: 28px; text-align: center; }
+.disclose { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; padding: 12px 14px; border: 1px solid var(--border-strong); border-radius: var(--r); background: none; color: var(--fg); font: inherit; text-align: left; cursor: pointer; }
+.disclose[aria-expanded="true"] svg { transform: rotate(180deg); }
+.when-grid { display: grid; grid-template-columns: minmax(0, 4fr) minmax(84px, 1fr); gap: 14px; align-items: stretch; }
+.when-main { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.when-total { display: flex; flex-direction: column; justify-content: center; gap: 6px; padding: 12px; border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); text-align: center; }
+.when-total b { font-size: 22px; line-height: 1.15; }
+.when-total .label { font-size: 11px; }
+.time-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; align-items: start; }
+.time-pair .dt-field { max-width: none; padding-inline: 8px; gap: 4px; }
+.time-pair .dt-field > svg:last-child { width: 12px; height: 12px; flex: none; }
+.time-pair .dt-field > svg:first-child { display: none; }
+.time-pair .dt-val { white-space: nowrap; font-size: 14px; }
 .fgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
 .seg { display: inline-flex; border: 1px solid var(--border-strong); border-radius: var(--r); padding: 3px; gap: 3px; flex-wrap: wrap; align-self: flex-start; }
 .seg button { border: 0; background: transparent; min-height: 36px; padding: 0 14px; border-radius: 7px; cursor: pointer; font-weight: 600; color: var(--fg2); }
 .seg button[aria-pressed="true"] { background: var(--elev); color: var(--fg); }
+/* Session QR share card: fixed brand colors (dark, ROTRA green) so the downloaded image never changes with the app theme. */
+.qr-card { --qc-bg: #0b0b0c; --qc-fg: #f0f0f2; --qc-dim: #9090a0; --qc-accent: #00ff88; width: min(100%, 320px); display: flex; flex-direction: column; justify-content: space-between; gap: 14px; padding: 22px 20px 18px; border-radius: 20px; background: radial-gradient(120% 70% at 50% 0%, rgba(0, 255, 136, 0.16), transparent 60%), var(--qc-bg); color: var(--qc-fg); text-align: center; box-sizing: border-box; }
+.qr-card.post { aspect-ratio: 4 / 5; }
+.qr-card.story { aspect-ratio: 9 / 16; width: min(100%, 270px); padding-block: 28px 22px; }
+.qc-top { display: flex; align-items: center; justify-content: center; gap: 10px; text-align: left; }
+.qc-top b { display: block; font-size: 15px; }
+.qc-top div span { font-size: 12px; color: var(--qc-dim); }
+.qc-club { width: 40px; height: 40px; flex: none; border-radius: 50%; overflow: hidden; display: grid; place-items: center; background: var(--qc-accent); color: #0b0b0c; font-weight: 800; font-size: 14px; }
+.qc-club img, .qc-badge img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.qc-mid h3 { margin: 0 0 6px; font-size: 22px; font-weight: 800; line-height: 1.15; color: var(--qc-fg); text-wrap: balance; }
+.qr-card.story .qc-mid h3 { font-size: 24px; }
+.qc-mid p { margin: 0; font-size: 13px; line-height: 1.4; color: var(--qc-dim); }
+.qc-qr { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.qc-qr b { font-size: 15px; color: var(--qc-accent); }
+.qc-qr .mono { font-size: 10px; color: var(--qc-dim); overflow-wrap: anywhere; }
+.qc-code { position: relative; width: 148px; padding: 10px; border-radius: 14px; background: #fff; box-sizing: content-box; }
+.qr-card.story .qc-code { width: 170px; }
+.qc-code svg { display: block; width: 100%; height: auto; }
+/* Logo in the middle: about 22% of the code, on a white disc; needs high error correction in the real code. */
+.qc-badge { position: absolute; top: 50%; left: 50%; width: 22%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; background: #fff; border: 3px solid #fff; overflow: hidden; display: grid; place-items: center; background-clip: padding-box; font-size: 11px; font-weight: 800; color: #0b0b0c; box-shadow: 0 0 0 3px #fff; }
+.qc-badge:not(:has(img)) { background: var(--qc-accent); }
+.qc-foot { display: flex; align-items: baseline; justify-content: center; gap: 8px; font-size: 12px; color: var(--qc-dim); }
+.qc-word { font-weight: 800; letter-spacing: 0.1em; color: var(--qc-fg); }
+.qc-word b { color: var(--qc-accent); }
+.seg button.seg-ic { display: inline-flex; align-items: center; justify-content: center; min-width: 40px; padding: 0 10px; }
 .switch { position: relative; width: 46px; height: 28px; border-radius: 999px; background: var(--overlay); border: 0; cursor: pointer; flex: none; transition: background .15s; }
 .switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: var(--knob); box-shadow: var(--shadow); transition: transform .15s; }
 .switch[aria-checked="true"] { background: var(--accent); }
 .switch[aria-checked="true"]::after { transform: translateX(18px); background: var(--on-accent); }
+.pay-card.partial .switch[aria-checked="true"] { background: var(--warn); }
 .check { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; padding: 10px 12px; border: 1px solid var(--border-strong); border-radius: var(--r-sm); }
 .check input { width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--accent); flex: none; }
 .choice { display: flex; flex-direction: column; gap: 4px; text-align: left; padding: 12px 14px; border-radius: var(--r); border: 1px solid var(--border-strong); background: var(--bg); cursor: pointer; min-width: 0; }
@@ -195,7 +251,20 @@ textarea.input { min-height: 80px; resize: vertical; }
 .field-row { flex-wrap: nowrap; }
 .field-row > .btn { white-space: nowrap; }
 /* Phones: nothing scrolls sideways. Tabs share the width, action rows become tidy two-column grids, long lines stack. */
+.tabs-dd { display: none; }
+.hdr-more { display: none; }
+.tabmenu-btn { width: 100%; min-height: 44px; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 14px; border: 1px solid var(--border-strong); border-radius: var(--r); background: var(--surface); color: var(--fg); font: inherit; font-weight: 700; cursor: pointer; }
+.tabmenu-btn svg { flex: none; color: var(--fg2); }
+.tabmenu-btn[aria-expanded="true"] svg { transform: rotate(180deg); }
+.cmenu-list.tabmenu-list { left: 0; right: 0; min-width: 0; }
+.cmenu-list.tabmenu-list button { flex-direction: row; align-items: center; justify-content: space-between; gap: 8px; font-weight: 600; }
+.cmenu-list.tabmenu-list button.on { color: var(--accent); }
+.tm-cur { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
 @media (max-width: 640px) {
+  .tabs-dd { display: block; }
+  .row.acts .hdr-x { display: none; }
+  .row.acts .hdr-more { display: inline-flex; }
+  .tabs.has-dd, .tabs.rv-tabs.has-dd { display: none; }
   .tabs { display: grid; grid-template-columns: repeat(auto-fit, minmax(64px, 1fr)); overflow: visible; gap: 0; }
   .tabs button { flex-direction: column; justify-content: center; gap: 3px; padding: 9px 4px; font-size: 13px; white-space: normal; text-align: center; line-height: 1.2; }
   .tabs button .chip { font-size: 10px; padding: 0 6px; }
@@ -362,28 +431,50 @@ button.qf:hover .avatar { box-shadow: 0 0 0 2px var(--accent); }
 @media (max-width: 640px) { .prow { grid-template-columns: minmax(0, 1fr); gap: 8px; } .prow .lvcol { order: 2; } .prow > .row { order: 3; justify-content: space-between; } }
 /* Roster and levels: level tabs, Group by and List | Grid. Grid cards hold the same controls as a row. */
 .rv-bar { gap: 10px; }
-.skill-mix { display: flex; flex-direction: column; gap: 8px; }
-.skill-mix .sm-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-size: 13px; }
+.skill-mix { display: flex; flex-direction: column; gap: 6px; }
+.skill-mix .sm-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-size: 12px; }
 .skill-mix .sm-head b { color: var(--fg); }
 .skill-mix .sm-head span { color: var(--fg2); }
-.skill-mix .sm-bar { display: flex; gap: 2px; height: 8px; border-radius: 999px; overflow: hidden; }
-.skill-mix .sm-bar i { display: block; flex-basis: 0; min-width: 0; }
-.skill-mix .sm-bar.empty { background: var(--border); }
-.skill-mix .sm-legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12px; color: var(--fg2); list-style: none; margin: 0; padding: 0; }
-.skill-mix .sm-legend li { display: inline-flex; align-items: center; gap: 6px; }
-.skill-mix .sm-legend i { width: 8px; height: 8px; border-radius: 50%; }
-.skill-mix .sm-beginner { background: color-mix(in srgb, var(--accent) 30%, transparent); }
-.skill-mix .sm-intermediate { background: color-mix(in srgb, var(--accent) 60%, transparent); }
-.skill-mix .sm-advanced { background: var(--accent); }
+.skill-mix .sm-bar { position: relative; display: flex; gap: 2px; height: 10px; background: none; overflow: visible; }
+.skill-mix .sm-bar i { position: relative; display: block; flex-basis: 0; min-width: 4px; cursor: default; outline-offset: 2px; }
+.skill-mix .sm-bar i:first-child { border-radius: 999px 0 0 999px; }
+.skill-mix .sm-bar i:last-child { border-radius: 0 999px 999px 0; }
+.skill-mix .sm-bar i:only-child { border-radius: 999px; }
+.skill-mix .sm-bar i::after { content: attr(data-tip); position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); white-space: nowrap; padding: 4px 8px; border-radius: var(--r-sm); background: var(--overlay); color: var(--fg); font-size: 12px; font-style: normal; font-weight: 600; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25); opacity: 0; pointer-events: none; transition: opacity 0.12s; z-index: 5; }
+.skill-mix .sm-bar i:hover::after, .skill-mix .sm-bar i:focus-visible::after { opacity: 1; }
+.skill-mix .sm-bar.empty { height: 10px; border-radius: 999px; background: var(--border); }
+.skill-mix .sm-beginner { background: var(--lv-beg); }
+.skill-mix .sm-intermediate { background: var(--lv-int); }
+.skill-mix .sm-advanced { background: var(--lv-adv); }
 .skill-mix .sm-none { background: var(--border-strong); }
+.skill-mix .sm-open { background: var(--elev); }
+.roster-sum { padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); gap: 10px; }
+.roster-sum .sm-top { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.roster-sum .sm-bar { height: 12px; }
+.skill-mix .sm-bar button { position: relative; display: block; flex-basis: 0; min-width: 4px; padding: 0; border: 0; cursor: pointer; outline-offset: 2px; transition: opacity .12s; }
+.skill-mix .sm-bar button:first-child { border-radius: 999px 0 0 999px; }
+.skill-mix .sm-bar button:last-child { border-radius: 0 999px 999px 0; }
+.skill-mix .sm-bar button:only-child { border-radius: 999px; }
+.skill-mix .sm-bar button::after { content: attr(data-tip); position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); white-space: nowrap; padding: 4px 8px; border-radius: var(--r-sm); background: var(--overlay); color: var(--fg); font-size: 12px; font-weight: 600; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25); opacity: 0; pointer-events: none; transition: opacity .12s; z-index: 5; }
+.skill-mix .sm-bar button:hover::after, .skill-mix .sm-bar button:focus-visible::after { opacity: 1; }
+.roster-sum:has(button.on) .sm-bar button:not(.on) { opacity: .45; }
+.roster-sum .sm-top { font-size: 13px; color: var(--fg2); }
+.roster-sum.full .sm-top span { color: var(--warn); font-weight: 600; }
 .rv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: 10px; }
 .rv-card { display: flex; flex-direction: column; gap: 8px; min-width: 0; padding: 12px; border-radius: var(--r); border: 1px solid var(--border); background: var(--surface); box-shadow: var(--shadow); }
 .rv-top { display: flex; align-items: flex-start; gap: 10px; min-width: 0; }
 .rv-top .main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
 .rv-top .main b { overflow-wrap: anywhere; }
-.rv-st { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.rv-pres { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 10px; border-radius: var(--r-sm); background: var(--elev); color: var(--fg2); }
+.rv-pres-t { font-size: 14px; font-weight: 600; }
+.rv-card.is-present .rv-pres { background: var(--accent-subtle); color: var(--accent); }
+.rv-lv { padding: 8px 10px; border-radius: var(--r-sm); border: 1px solid var(--border); }
+.rv-lv.lv-beginner { border-color: var(--lv-beg); background: color-mix(in srgb, var(--lv-beg) 12%, transparent); }
+.rv-lv.lv-intermediate { border-color: var(--lv-int); background: color-mix(in srgb, var(--lv-int) 12%, transparent); }
+.rv-lv.lv-advanced { border-color: var(--lv-adv); background: color-mix(in srgb, var(--lv-adv) 12%, transparent); }
+.rv-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 10px; font-size: 12px; }
 .rv-paid { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--fg2); }
-.rv-paid.ok { color: var(--accent); font-weight: 600; }
+.rv-paid.ok { color: var(--fg2); }
 .rv-paid svg { width: 13px; height: 13px; }
 .footer-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 15; background: color-mix(in srgb, var(--bg) 94%, transparent); backdrop-filter: blur(8px); border-top: 1px solid var(--border); padding-bottom: env(safe-area-inset-bottom, 0px); }
 .start-why { color: var(--warn); font-weight: 600; }
@@ -533,6 +624,21 @@ button.qf:hover .avatar { box-shadow: 0 0 0 2px var(--accent); }
 .date-btn svg { color: var(--accent); flex: none; }
 .date-btn:hover { border-color: var(--accent); }
 /* Date-and-time picker: one row of three short dropdowns, hour : minute AM/PM, each with a drawn chevron. */
+.dt-field { width: 100%; max-width: 260px; min-height: 44px; }
+.dt-field .dt-val { flex: 1; font-weight: 600; }
+.dt-field svg:last-child { color: var(--fg2); }
+.dt-suf { display: block; font-size: 12px; font-weight: 500; line-height: 1.2; color: var(--fg2); }
+.dt-field .dt-val { min-width: 0; line-height: 1.2; }
+.tp-day { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0 0; border-top: 1px solid var(--border); }
+.tp-sheet { max-width: 420px; }
+.tp-now { font-size: 40px; font-weight: 800; text-align: center; letter-spacing: -0.5px; }
+.tp-ampm { align-self: center; }
+.tp-grid { display: grid; gap: 8px; margin-top: 8px; }
+.tp-grid.hours { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.tp-grid.mins { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.tp-b { min-height: 44px; border: 1px solid var(--border-strong); border-radius: var(--r-sm); background: none; color: var(--fg); font: inherit; font-weight: 700; cursor: pointer; }
+.tp-b.on { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.tp-b:disabled { color: var(--fg3); border-color: var(--border); cursor: not-allowed; opacity: .5; }
 .dt-time { display: flex; align-items: center; gap: 4px; max-width: 260px; }
 .dt-box { position: relative; flex: 1 1 0; min-width: 0; }
 .dt-box + .dt-box { margin-left: 4px; }
@@ -723,6 +829,12 @@ textarea.tpl { font-family: var(--mono); font-size: 13px; line-height: 1.55; min
 .sp-stats-head p { margin: 0; }
 .sp-stats-controls { display: flex; gap: 8px; }
 .sp-stats-controls .btn { min-width: 44px; min-height: 44px; }
+.sp-stats-wrap { position: relative; }
+.sp-stats-wrap::before, .sp-stats-wrap::after { content: ""; position: absolute; top: 0; bottom: 0; width: 56px; pointer-events: none; opacity: 0; transition: opacity .15s; z-index: 1; }
+.sp-stats-wrap::before { left: 0; background: linear-gradient(to right, var(--bg), transparent); }
+.sp-stats-wrap::after { right: 0; background: linear-gradient(to left, var(--bg), transparent); }
+.sp-stats[data-more-left="yes"] .sp-stats-wrap::before, .sp-stats[data-more-right="yes"] .sp-stats-wrap::after { opacity: 1; }
+.sp-stats[data-overflow="no"] .sp-stats-controls { display: none; }
 .sp-stats-viewport { overflow-x: auto; scrollbar-width: none; scroll-snap-type: x mandatory; }
 .sp-stats-track { display: flex; gap: 12px; }
 .sp-stat { flex: 0 0 224px; min-width: 0; padding: 16px; border: 1px solid var(--border-strong); border-radius: 16px; background: var(--surface); scroll-snap-align: start; }
@@ -746,6 +858,11 @@ textarea.tpl { font-family: var(--mono); font-size: 13px; line-height: 1.55; min
 .req-actions { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; }
 @media (max-width: 640px) { .req-actions { grid-template-columns: minmax(0, 1fr); } .req-actions .row > .btn { flex: 1; } }
 .join-card { border-color: var(--accent); }
+.jc-top { display: flex; align-items: baseline; justify-content: space-between; gap: 6px 12px; flex-wrap: wrap; }
+.jc-open { font-size: 13px; color: var(--fg2); }
+.jc-open b { font-size: 20px; color: var(--accent); }
+.jc-open.full { color: var(--warn); font-weight: 600; }
+.jc-btn { width: 100%; min-height: 44px; }
 .invite-link .input { font-family: var(--mono); font-size: 13px; }
 .invite-link .btn { white-space: nowrap; flex: none; }
 .hm.now { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-subtle); }
@@ -865,6 +982,28 @@ textarea.tpl { font-family: var(--mono); font-size: 13px; line-height: 1.55; min
 .pub-date { color: var(--accent); font-weight: 700; }
 .pgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr)); gap: 10px; }
 .pcard { display: flex; gap: 10px; align-items: center; padding: 10px; border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); min-width: 0; }
+.pgrid.pub { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px 18px; }
+@media (max-width: 640px) { .pgrid.pub { grid-template-columns: repeat(3, minmax(0, 1fr)); } .pgrid.pub .pcard.pub .avatar { max-width: 88px; } .pub-cap .pgrid.pub > :nth-child(n+10) { display: none; } }
+@media (min-width: 641px) { .pub-cap .pgrid.pub > :nth-child(n+13) { display: none; } }
+.pub-cap { position: relative; }
+.pub-more { position: absolute; left: 0; right: 0; bottom: 0; height: 170px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 8px; padding-bottom: 6px; background: linear-gradient(to bottom, transparent, var(--bg) 70%); color: var(--fg); }
+.pub-more .pm-count { font-size: 13px; color: var(--fg2); }
+.pub-more .pm-text { font-weight: 700; }
+.pub-more .pm-btn { min-height: 48px; padding: 0 22px; border-radius: 999px; font-size: 15px; font-weight: 800; box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 35%, transparent); }
+.pub-more .pm-btn svg { width: 16px; height: 16px; }
+@media (min-width: 641px) { .pub-more:not(.more-d) { display: none; } }
+.pcard.pub { flex-direction: column; gap: 14px; text-align: center; padding: 0; border: 0; background: none; --ring: var(--border-strong); }
+.pcard.pub.lv-beginner { --ring: var(--lv-beg); }
+.pcard.pub.lv-intermediate { --ring: var(--lv-int); }
+.pcard.pub.lv-advanced { --ring: var(--lv-adv); }
+.pcard.pub .avatar { width: 80%; max-width: 77px; height: auto; aspect-ratio: 1; margin-top: 8px; outline: 5px solid var(--ring); outline-offset: 4px; font-size: clamp(14px, 4.5vw, 22px); }
+.wl-av { position: relative; display: block; width: 100%; }
+.wl-av .avatar { margin-inline: auto; }
+.wl-n { position: absolute; top: 4px; right: calc(50% - 44px); min-width: 24px; height: 24px; padding: 0 6px; box-sizing: border-box; border-radius: 999px; display: grid; place-items: center; font-style: normal; font-size: 12px; font-weight: 800; background: var(--bg); color: var(--fg); border: 2px solid var(--ring); }
+.pgrid.pub.wl .pcard.pub .avatar { opacity: .85; }
+.pcard.pub.empty .avatar { background: none; outline: 3px dashed var(--border-strong); outline-offset: 4px; }
+.pcard.pub.empty b { color: var(--fg3); font-weight: 500; }
+.pcard.pub b { display: block; font-size: 17px; line-height: 1.25; }
 .pcard b { overflow-wrap: anywhere; font-weight: 600; font-size: 14px; }
 .proto-bar { background: var(--warn-subtle); border-bottom: 1px solid var(--warn); font-size: 13px; }
 .proto-bar .in { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; padding: 8px var(--page-r) 8px var(--page-l); }
@@ -1225,20 +1364,12 @@ function dtPicker(p) {
   if (!empty && p.refH != null && times.length) {
     const pm = p.refH >= 12, h12 = p.refH % 12 || 12;
     const has = (t) => times.includes(t);
-    const mins = [0, 15, 30, 45];
-    if (p.value != null && p.refM % 15) mins.push(p.refM);
-    const opt = (v, label, sel, on) => `<option value="${v}" ${sel ? 'selected' : ''} ${on ? '' : 'disabled'}>${label}</option>`;
-    const sel = (part, sid, name, opts, extra = '') => `<span class="dt-box"><select class="input dt-sel${bad}" id="${sid}" data-act-change="dtTime" data-k="${p.k}" data-part="${part}" aria-label="${esc(p.label)}: ${name}" ${dis} ${extra} ${aria}>${opts}</select></span>`;
-    row = `<div class="dt-time">
-      ${sel('hour', id, 'hour', [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((h) => { const h24 = (h % 12) + (pm ? 12 : 0); return opt(h24, String(h).padStart(2, '0'), h === h12, times.some((t) => new Date(t).getHours() === h24)); }).join(''), p.autofocus ? 'data-autofocus' : '')}
-      <b class="dt-colon" aria-hidden="true">:</b>
-      ${sel('minute', `${id}-min`, 'minute', mins.map((m) => opt(m, String(m).padStart(2, '0'), m === p.refM, has(dtAt(shown, p.refH, m)))).join(''))}
-      ${sel('meridiem', `${id}-ampm`, 'AM or PM', [false, true].map((isPm) => opt(isPm ? 'pm' : 'am', isPm ? 'PM' : 'AM', isPm === pm, times.some((t) => (new Date(t).getHours() >= 12) === isPm))).join(''))}
-    </div>`;
+    const at = dtAt(shown, p.refH, p.refM);
+    row = `<button type="button" class="input date-btn dt-field${bad}" id="${id}" data-act="openTime" data-k="${p.k}" aria-haspopup="dialog" aria-label="${esc(p.label)}: ${fmtTime(at)}. Change time" ${dis} ${p.autofocus ? 'data-autofocus' : ''} ${aria}>${I.clock}<span class="dt-val tnum">${fmtTime(at)}${p.suffix ? ` <small class="dt-suf">${esc(p.suffix)}</small>` : ''}</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>`;
   } else if (!empty) row = `<p class="hint" id="${id}" style="margin:0">No times left on this day</p>`;
   return `<div class="field">${p.hideLabel ? '' : `<span>${esc(p.label)}</span>`}
     ${p.emptyLabel != null ? `<div class="seg" role="group" aria-label="${esc(p.label)}: mode"><button type="button" id="${empty ? id : `${id}-empty`}" aria-pressed="${empty}" data-act="dtEmpty" data-k="${p.k}" ${dis}>${esc(p.emptyLabel)}</button><button type="button" id="${id}-set" aria-pressed="${!empty}" data-act="dtSet" data-k="${p.k}" ${dis} ${times.length ? '' : 'disabled'}>Set time</button></div>` : ''}
-    ${!empty && p.days.length > 1 ? `<div class="seg" role="group" aria-label="${esc(p.label)}: day">${p.days.map((t, i) => `<button type="button" id="${id}-d${i}" aria-pressed="${t === shown}" data-act="dtDay" data-k="${p.k}" data-v="${t}" ${p.disabled || !dtList(p, t).length ? 'disabled' : ''}>${dayLabel(t)}</button>`).join('')}</div>` : ''}
+    ${!empty && p.days.length > 1 && !p.hideDays ? `<div class="seg" role="group" aria-label="${esc(p.label)}: day">${p.days.map((t, i) => `<button type="button" id="${id}-d${i}" aria-pressed="${t === shown}" data-act="dtDay" data-k="${p.k}" data-v="${t}" ${p.disabled || !dtList(p, t).length ? 'disabled' : ''}>${dayLabel(t)}</button>`).join('')}</div>` : ''}
     ${row}${p.err ? `<span class="err" id="${id}-error" aria-live="polite">${esc(p.err)}</span>` : p.hint ? `<span class="hint">${p.hint}</span>` : ''}</div>`;
 }
 // A day button keeps the chosen clock time on the new day when it's valid there, else takes that day's first valid time.
@@ -1452,6 +1583,9 @@ const I = {
   play: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>',
   pause: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="4.5" width="4" height="15" rx="1"/><rect x="14" y="4.5" width="4" height="15" rx="1"/></svg>',
   pin: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>',
+  list: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></svg>',
+  grid: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/></svg>',
+  ext: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4"/></svg>',
   cal: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>',
 };
 
@@ -2313,7 +2447,7 @@ function histPublicPane(s, { invalid }) {
           : pub ? `<dl class="kv"><dt>Shared</dt><dd>${[pub.slides.includes(0) && 'Standings', pub.slides.includes(1) && 'Awards'].filter(Boolean).join(' and ') || 'Nothing'}</dd><dt>Off Day</dt><dd>${pub.offDay ? 'Shared' : 'Private'}</dd><dt>Published</dt><dd>${fmtDate(pub.at)} · ${fmtTime(pub.at)}</dd></dl>`
           : '<p class="small muted">Not shared yet. The page says results haven\'t been shared. Player records and ranks are already updated either way.</p>'}</section>
     </div>
-    <section class="stack"><h3>Participants · ${s.roster.length}</h3><div class="pgrid">${s.roster.map((r) => { const p = P(r.pid), m = maskName(p.name); return `<div class="pcard">${pubAvatar(p)}<div style="min-width:0"><b>${esc(m)}</b>${p.identity === 'registered' || p.identity === 'unclaimed' ? '<p class="small muted">Has a ROTRA profile</p>' : ''}</div></div>`; }).join('')}</div></section>`;
+    <section class="stack"><h3>Participants · ${s.roster.length}</h3><div class="pgrid pub">${s.roster.map((r) => { const p = P(r.pid), m = maskName(p.name); return `<div class="pcard pub lv-${rvBand(r)}" ${r.level != null ? `title="${esc(lvLabel(r.level))}"` : ''}>${pubAvatar(p)}<div style="min-width:0"><b>${esc(m)}</b></div></div>`; }).join('')}</div></section>`;
 }
 // Payments: a manual paid / not-paid checklist. ROTRA records who has paid; money changes hands outside the app.
 function duePerHead(s) {
@@ -2494,19 +2628,26 @@ function savedPlayerStats() {
       <button class="btn sm" data-act="spStatsScroll" data-d="-1" aria-label="Previous statistics" aria-controls="sp-stats-viewport">←</button>
       <button class="btn sm" data-act="spStatsScroll" data-d="1" aria-label="Next statistics" aria-controls="sp-stats-viewport">→</button>
     </div></div>
-    <div class="sp-stats-viewport" id="sp-stats-viewport" tabindex="0" role="group" aria-label="Statistics cards. Use left and right arrow keys."><div class="sp-stats-track">
+    <div class="sp-stats-wrap"><div class="sp-stats-viewport" id="sp-stats-viewport" tabindex="0" role="group" aria-label="Statistics cards. Use left and right arrow keys."><div class="sp-stats-track">
       ${cards.map(([label, value], i) => `<div class="sp-stat" role="group" aria-roledescription="slide" aria-label="${i + 1} of 6: ${label}"><span class="sp-stat-label">${label}</span><strong class="sp-stat-value">${value}</strong></div>`).join('')}
-    </div></div>
+    </div></div></div>
   </section>`;
 }
 function setupSavedPlayerStats() {
   const viewport = document.getElementById('sp-stats-viewport');
   if (!viewport) return;
+  const root = viewport.closest('.sp-stats');
   const update = () => {
+    const max = viewport.scrollWidth - viewport.clientWidth;
+    // Arrows and edge fades only exist while the cards overflow; a fade shows on the side that still has cards.
+    root.dataset.overflow = max > 1 ? 'yes' : 'no';
+    root.dataset.moreLeft = viewport.scrollLeft > 1 ? 'yes' : 'no';
+    root.dataset.moreRight = viewport.scrollLeft < max - 1 ? 'yes' : 'no';
     document.querySelector('[data-act="spStatsScroll"][data-d="-1"]').disabled = viewport.scrollLeft <= 1;
-    document.querySelector('[data-act="spStatsScroll"][data-d="1"]').disabled = viewport.scrollLeft >= viewport.scrollWidth - viewport.clientWidth - 1;
+    document.querySelector('[data-act="spStatsScroll"][data-d="1"]').disabled = viewport.scrollLeft >= max - 1;
   };
   viewport.addEventListener('scroll', update);
+  if (window.ResizeObserver) new ResizeObserver(update).observe(viewport);
   viewport.addEventListener('keydown', (event) => {
     if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
     event.preventDefault();
@@ -2661,6 +2802,11 @@ function wizStepState(d, i) {
   return valid ? 'done' : 'warn';
 }
 const markVisited = (d) => { d.visited = [...new Set([...(d.visited || []), d.step])]; };
+// A top-down badminton court (doubles court, 13.4 m x 6.1 m, drawn in decimetres): boundary, singles side lines, net, short and long service lines, center lines.
+const setupCourtSVG = () => `<svg class="sc-svg" viewBox="0 0 134 61" role="img" aria-label="Badminton court seen from above" preserveAspectRatio="xMidYMid meet"><rect width="134" height="61" rx="3" fill="var(--court)"/><g fill="none" stroke="var(--court-line)" stroke-width="1" stroke-linecap="square"><rect x="1" y="1" width="132" height="59"/><path d="M1 4.6H133M1 56.4H133M47.2 1V60M86.8 1V60M7.6 1V60M126.4 1V60M1 30.5H47.2M86.8 30.5H133"/></g><path d="M67 -1V62" stroke="var(--court-line)" stroke-width="2" stroke-dasharray="2 1.5"/></svg>`;
+let setupCourtDialog = '';
+// “4 HR”, “1 HR 30 MIN”, “45 MIN” for the setup summary.
+const durLabel = (mins) => { const h = Math.floor(mins / 60), m = mins % 60; return [h ? `${h} HR` : '', m ? `${m} MIN` : ''].filter(Boolean).join(' ') || '0 MIN'; };
 function viewSetup() {
   const d = S.ui.draft;
   const e = S.ui.errors;
@@ -2699,20 +2845,35 @@ function viewSetup() {
   const est = estimateGames(d.courts.length, durMins, nPlayers, per);
   const last = WIZ_STEPS.length - 1;
   const stepErr = Object.keys(e).some((k) => WIZ_FIELD_STEP[k] === d.step);
+  const ci = d.courtDialog;
+  // The dialog is drawn by render() next to the other sheets so it sits above the whole page.
+  const courtDialog = ci != null && d.courts[ci] != null ? `<div class="scrim" data-act="closeSetupCourt"></div><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+      <header><h2 id="sheet-title" tabindex="-1">Edit ${esc(d.courts[ci] || `Court ${ci + 1}`)}</h2><button class="btn xs ghost icon-btn" data-act="closeSetupCourt" aria-label="Close">${I.x}</button></header>
+      <div class="sb stack"><label class="field"><span>Court label</span><input class="input" id="f-court-${ci}" data-bind="ui.draft.courts.${ci}" value="${esc(d.courts[ci])}"></label>${courtPickers(ci)}${e.courts ? `<span class="err">${esc(e.courts)}</span>` : ''}
+        <p class="hint">Empty times follow the session. A court can open later or close earlier, never outside the session.</p></div>
+      <footer><button class="btn primary" data-act="closeSetupCourt">Done</button></footer></div>` : '';
+  setupCourtDialog = courtDialog;
   const parts = [
     `<label class="field"><span>Session title</span><input class="input${e.title ? ' bad' : ''}" id="f-title" data-bind="ui.draft.title" value="${esc(d.title)}" placeholder="e.g. Thursday Open Play">${e.title ? `<span class="err">${e.title}</span>` : ''}</label>
-      <div class="fgrid">
-        <div class="field"><span>Date</span><button type="button" class="input date-btn" id="f-date" data-act="openDatePicker" aria-haspopup="dialog" aria-label="Date, ${esc(fmtLongDate(ymdToTime(d.date)))}. Change date">${I.cal}<span>${esc(fmtLongDate(ymdToTime(d.date)))}</span></button></div>
-        ${dtPicker({ k: 'draft.start', label: 'Starts', id: 'f-start', value: span.start, days: [base], ok: () => true, set: (t) => { d.start = hhmm(t); clearErr('end'); } })}
-        ${dtPicker({ k: 'draft.end', label: 'Ends', id: 'f-end', value: span.end, days: [base, addDays(base, 1)], base, ok: (t) => t > span.start && t <= span.start + 864e5,
-          set: (t) => { d.end = hhmm(t); d.endDay = dayDiff(base, t); clearErr('end'); }, err: e.end || (endOk ? '' : 'Choose an end after the start.'), hint: `${d.endDay ? 'Ends the next day · ' : ''}${courtDuration(durMins)}` })}
-      </div>
-      ${repeatPanel(d, e)}
       <div class="field"><span>Venue</span><button type="button" class="input date-btn${e.venue ? ' bad' : ''}" id="f-venue" data-act="openVenue" aria-haspopup="dialog" aria-label="Venue: ${esc(d.venue || 'none chosen')}. Choose venue">${I.pin}<span class="stack tight" style="gap:0;min-width:0">${d.venue ? `<b>${esc(d.venue)}</b>${d.address ? `<span class="small muted">${esc(d.address)}</span>` : ''}` : '<span class="muted">Choose or add a venue</span>'}</span></button>${e.venue ? `<span class="err">${e.venue}</span>` : ''}</div>
-      <p class="hint">The venue can differ from where your club was founded. It doesn't change your club's founding address.</p>`,
-    `<div class="between"><span>How many courts did you book?</span><div class="row"><button class="btn sm icon-btn" data-act="courtCount" data-d="-1" aria-label="Remove a court" ${d.courts.length <= 1 ? 'disabled' : ''}>−</button><b class="tnum" style="font-size:22px;min-width:28px;text-align:center" aria-live="polite">${d.courts.length}</b><button class="btn sm icon-btn" data-act="courtCount" data-d="1" aria-label="Add a court">+</button></div></div>
-      <div class="stack">${d.courts.map((c, i) => `<div class="fgrid"><label class="field"><span>Court ${i + 1} label</span><input class="input" id="f-court-${i}" data-bind="ui.draft.courts.${i}" value="${esc(c)}"></label>${courtPickers(i)}</div>`).join('')}</div>${e.courts ? `<span class="err">${esc(e.courts)}</span>` : ''}
-      <div class="between"><div><span>Players per court</span><p class="hint">How many players you budget for each court you reserve.</p></div><div class="row"><button class="btn sm icon-btn" data-act="perCourt" data-d="-1" aria-label="Fewer players per court" ${(+d.perCourt || 8) <= 2 ? 'disabled' : ''}>−</button><b class="tnum" style="font-size:22px;min-width:28px;text-align:center" aria-live="polite">${+d.perCourt || 8}</b><button class="btn sm icon-btn" data-act="perCourt" data-d="1" aria-label="More players per court" ${(+d.perCourt || 8) >= 20 ? 'disabled' : ''}>+</button></div></div>
+      <p class="hint">The venue can differ from where your club was founded. It doesn't change your club's founding address.</p>
+      <div class="when-grid">
+        <div class="when-main">
+        <div class="field"><span>Date</span><button type="button" class="input date-btn" id="f-date" data-act="openDatePicker" aria-haspopup="dialog" aria-label="Date, ${esc(fmtLongDate(ymdToTime(d.date)))}. Change date">${I.cal}<span>${esc(fmtLongDate(ymdToTime(d.date)))}</span></button></div>
+        <div class="time-pair">
+        ${dtPicker({ k: 'draft.start', label: 'Starts', id: 'f-start', value: span.start, days: [base], ok: () => true, set: (t) => { d.start = hhmm(t); clearErr('end'); } })}
+        ${dtPicker({ k: 'draft.end', label: 'Ends', id: 'f-end', value: span.end, days: [base, addDays(base, 1)], base, hideDays: true, suffix: endOk && d.endDay ? 'next day' : '', ok: (t) => t > span.start && t <= span.start + 864e5,
+          set: (t) => { d.end = hhmm(t); d.endDay = dayDiff(base, t); clearErr('end'); }, err: e.end || (endOk ? '' : 'Choose an end after the start.') })}
+      </div>
+        </div>
+        <div class="when-total" aria-live="polite"><span class="label">Total duration</span><b class="tnum">${endOk ? durLabel(durMins) : '—'}</b></div>
+      </div>
+      ${repeatPanel(d, e)}`,
+    `<div class="step-pair">
+        <div class="stepcard"><span>Courts booked</span><div class="row"><button class="btn sm icon-btn" data-act="courtCount" data-d="-1" aria-label="Remove a court" ${d.courts.length <= 1 ? 'disabled' : ''}>−</button><b class="tnum" aria-live="polite">${d.courts.length}</b><button class="btn sm icon-btn" data-act="courtCount" data-d="1" aria-label="Add a court">+</button></div></div>
+        <div class="stepcard"><span>Players per court</span><div class="row"><button class="btn sm icon-btn" data-act="perCourt" data-d="-1" aria-label="Fewer players per court" ${(+d.perCourt || 8) <= 2 ? 'disabled' : ''}>−</button><b class="tnum" aria-live="polite">${+d.perCourt || 8}</b><button class="btn sm icon-btn" data-act="perCourt" data-d="1" aria-label="More players per court" ${(+d.perCourt || 8) >= 20 ? 'disabled' : ''}>+</button></div></div>
+      </div>
+      <div class="sc-tiles" aria-label="Courts">${d.courts.map((c, i) => { const cs = dayOf(d.courtStarts[i], d.courtStartDays[i]), ce = dayOf(d.courtEnds[i], d.courtEndDays[i]); return `<button type="button" class="sc-tile" data-i="${i}" data-act="openSetupCourt" data-i="${i}" aria-haspopup="dialog" aria-label="${esc(c)}: ${cs ? fmtTime(cs) : 'session start'} to ${ce ? fmtTime(ce) : 'session end'}. Edit this court"><span class="sc-art">${setupCourtSVG()}<span class="sc-name">${esc(c)}</span></span><span class="sc-cap"><b>${+d.perCourt || 8} players</b><span>${cs ? fmtTime(cs) : 'Session start'} – ${ce ? fmtTime(ce) : 'Session end'}</span></span></button>`; }).join('')}</div>
       ${notice('ok', `<b>${d.courts.length * (+d.perCourt || 8)} slots</b>: ${d.courts.length} court${d.courts.length > 1 ? 's' : ''} × ${+d.perCourt || 8} players. Anyone added after that goes on the waitlist.`)}
       ${(() => {
         const ex = d.id && S.sessions.find((x) => x.id === d.id), cap = d.courts.length * (+d.perCourt || 8);
@@ -2721,6 +2882,7 @@ function viewSetup() {
         const n = Math.min(cap - ex.roster.length, (ex.waitlist || []).length);
         return n ? notice('', `When you save, the first ${n} on the waitlist get the new slot${n > 1 ? 's' : ''}.`) : '';
       })()}
+      ${e.courts ? `<span class="err">${esc(e.courts)} Press a court to fix it.</span>` : ''}
       <p class="hint">You can still add or remove free courts during the session; slots follow the court count.</p>`,
     `<div class="li" style="padding:0"><div class="main"><h3>Singles</h3><p class="small muted">Include standard singles when generating matches.</p></div>${sw(d.singles, 'toggleDraft', 'data-k="singles"', 'Singles')}</div>
       <div class="li" style="padding:0"><div class="main"><h3>Doubles</h3><p class="small muted">Include standard doubles when generating matches.</p></div>${sw(d.doubles, 'toggleDraft', 'data-k="doubles"', 'Doubles')}</div>
@@ -2817,8 +2979,12 @@ function joinCard(s) {
   }
   const open = openSlots(s);
   if (s.acceptReq === false) return '<section class="card join-card"><p class="small muted">This session isn\'t taking requests online. Contact the Queue Master to play.</p></section>';
-  return `<section class="card stack join-card"><div class="between"><div><h2>Want to play?</h2><p class="small muted">${s.status === 'active' ? 'The Queue Master can admit additional players.' : open ? `${open} of ${capacityOf(s)} slots open.` : 'All slots are taken; confirmed guests join the waitlist.'} Send a quick request and the Queue Master confirms it.</p></div>
-    <button class="btn primary" data-act="openJoin">Request to join</button></div></section>`;
+  const cap = capacityOf(s);
+  const slots = s.status === 'active' ? '<span class="jc-open">Additional players can be admitted</span>' : open ? `<span class="jc-open"><b class="tnum">${open}</b> of ${cap} slots open</span>` : '<span class="jc-open full">All slots taken</span>';
+  return `<section class="card stack join-card"><div class="jc-top"><h2>Want to play?</h2>${slots}</div>
+    ${s.roster.length ? skillMix(s.roster) : ''}
+    <p class="small muted">${s.status === 'active' ? 'The Queue Master can admit additional players. ' : open ? '' : 'Confirmed guests join the waitlist. '}Send a quick request and the Queue Master confirms it.</p>
+    <button class="btn primary jc-btn" data-act="openJoin">Request to join</button></section>`;
 }
 function slotMeter(s) {
   const n = s.roster.length, cap = capacityOf(s), open = cap - n, wl = (s.waitlist || []).length;
@@ -2889,23 +3055,37 @@ function rvRow(s, r, live) {
       </div>`;
 }
 function rvCard(s, r, live) {
-  const p = P(r.pid), paid = (s.payments || {})[r.pid];
-  return `<article class="rv-card" aria-label="${esc(p.name)}">
-        <div class="rv-top">${faceBtn(p)}<div class="main"><b>${esc(p.name)}</b><div class="row" style="gap:6px">${identChip(p)}</div></div>${live ? '' : rvRemove(r, p)}</div>
-        ${rvSugg(p)}
-        ${rvLevel(r, p, live)}
-        <div class="rv-st">${live ? rvAway(r) : rvPresence(r, p)}<span class="rv-paid ${paid ? 'ok' : ''}">${paid ? `${I.check} Paid` : 'Not paid'}</span></div>
+  const p = P(r.pid), paid = (s.payments || {})[r.pid], band = rvBand(r);
+  // First level: presence and skill level. Second level (muted, last row): profile, payment, suggestion.
+  const pres = live ? `<span class="rv-pres-t">${r.present ? 'Present' : 'Away'}</span>` : `<span class="rv-pres-t">${presencePending.has(r.pid) ? 'Saving presence…' : r.present ? 'Present' : 'Not present'}</span>${sw(r.present, 'togglePresent', `data-pid="${r.pid}"`, `${p.name} present`)}`;
+  return `<article class="rv-card ${r.present ? 'is-present' : ''}" aria-label="${esc(p.name)}">
+        <div class="rv-top">${faceBtn(p)}<div class="main"><b>${esc(p.name)}</b></div>${live ? '' : rvRemove(r, p)}</div>
+        <div class="rv-pres">${pres}</div>
+        <div class="rv-lv lv-${band}">${rvLevel(r, p, live)}</div>
+        <div class="rv-meta small muted">${identChip(p)}<span class="rv-paid ${paid ? 'ok' : ''}">${paid ? `${I.check} Paid` : 'Not paid'}</span>${rvSugg(p)}</div>
       </article>`;
 }
 function skillMix(rows) {
   const n = (g) => rows.filter((r) => (r.level == null ? 'No level' : LEVELS[r.level].band) === g).length;
-  const items = [['advanced', 'Advanced'], ['intermediate', 'Intermediate'], ['beginner', 'Beginner'], ['none', 'No level']].map(([k, l]) => [k, l, n(l)]).filter(([, , c]) => c > 0);
+  const items = [['beginner', 'Beginner'], ['intermediate', 'Intermediate'], ['advanced', 'Advanced'], ['none', 'No level']].map(([k, l]) => [k, l, n(l)]).filter(([, , c]) => c > 0);
   const total = items.reduce((t, [, , c]) => t + c, 0);
   if (!total) return '<div class="skill-mix"><div class="sm-head"><b>Skill mix</b><span>No players yet</span></div><div class="sm-bar empty"></div></div>';
-  const say = items.map(([k, l, c]) => (k === 'none' ? `${c} with no level` : `${c} ${l}`)).join(', ');
-  return `<div class="skill-mix"><div class="sm-head"><b>Skill mix</b><span>${total} player${total === 1 ? '' : 's'}</span></div>
-    <div class="sm-bar" role="img" aria-label="Skill mix: ${say}">${items.map(([k, , c]) => `<i class="sm-${k}" style="flex-grow:${c}"></i>`).join('')}</div>
-    <ul class="sm-legend">${items.map(([k, l, c]) => `<li><i class="sm-${k}"></i>${l} ${c}</li>`).join('')}</ul></div>`;
+  const tip = (l, c) => (l === 'No level' ? `${c} with no level` : `${l}: ${c} player${c === 1 ? '' : 's'}`);
+  return `<div class="skill-mix"><div class="sm-head"><b>Skill mix</b></div>
+    <div class="sm-bar" role="group" aria-label="Skill mix">${items.map(([k, l, c]) => `<i class="sm-${k}" style="flex-grow:${c}" tabindex="0" role="img" data-tip="${tip(l, c)}" aria-label="${tip(l, c)}"></i>`).join('')}</div></div>`;
+}
+// One box for the roster tab: slots used and skill mix in a single bar. The bar spans the slot budget; colored segments are the
+// confirmed players by skill group, the grey remainder is open slots. Hover or focus a segment for its count.
+function rosterSummary(s, tab) {
+  const n = s.roster.length, cap = capacityOf(s), open = cap - n, wl = (s.waitlist || []).length;
+  const state = open <= 0 ? 'full' : open <= 2 ? 'near' : 'ok';
+  const text = s.status === 'active' ? `${open < 0 ? `${-open} over budget` : open === 0 ? 'Budget full' : `${open} within budget`} · additional players can be admitted` : open > 0 ? `${open} left before the waitlist` : open === 0 ? 'Full · new players go on the waitlist' : `${-open} over budget · new players go on the waitlist`;
+  const cnt = (g) => s.roster.filter((r) => (r.level == null ? 'No level' : LEVELS[r.level].band) === g).length;
+  const segs = [['beginner', 'Beginner'], ['intermediate', 'Intermediate'], ['advanced', 'Advanced'], ['none', 'No level']].map(([k, l]) => [k, l, cnt(l)]).filter(([, , c]) => c > 0);
+  const tip = (l, c) => (l === 'No level' ? `${c} with no level` : `${l}: ${c} player${c === 1 ? '' : 's'}`);
+  const bar = [...segs.map(([k, l, c]) => `<button class="sm-${k} ${tab === k ? 'on' : ''}" style="flex-grow:${c}" aria-pressed="${tab === k}" data-act="rvSet" data-k="tab" data-v="${tab === k ? 'all' : k}" data-tip="${tip(l, c)}" aria-label="${tip(l, c)}${tab === k ? '. Showing this level; press to show everyone' : '. Press to show only this level'}"></button>`), ...(open > 0 ? [`<i class="sm-open" style="flex-grow:${open}" tabindex="0" role="img" data-tip="${open} open slot${open === 1 ? '' : 's'}" aria-label="${open} open slot${open === 1 ? '' : 's'}"></i>`] : [])].join('');
+  return `<div class="skill-mix roster-sum ${state}"><div class="sm-top"><b class="tnum">${n}/${cap}</b><span>slots · ${text}${wl ? ` · ${wl} on the waitlist` : ''}</span></div>
+    <div class="sm-bar" role="group" aria-label="Slots and skill mix: ${n} of ${cap} slots used">${bar}</div></div>`;
 }
 function rosterPanel(s, live, missing) {
   const bandN = (b) => s.roster.filter((r) => rvBand(r) === b).length;
@@ -2923,15 +3103,16 @@ function rosterPanel(s, live, missing) {
   return `<section class="card stack">
       <div class="between"><div><h2>Roster and levels</h2><p class="small muted">${live ? 'Fixed after start: playing levels. Manage presence in the live Players view.' : "Confirm each player's slot and set their level for this club. Levels lock when the session starts."}</p></div>
         <div class="row acts">${!live && s.roster.some((r) => !r.present) ? '<button class="btn sm" data-act="allPresent">Mark all present</button>' : ''}${!live && s.roster.some((r) => r.present) ? '<button class="btn sm" data-act="allAbsent">Mark all absent</button>' : ''}<button class="btn sm primary" data-act="openAdd">Add player</button></div></div>
-      ${slotMeter(s)}
+      ${rosterSummary(s, tab)}
       ${missing ? notice('warn', `${missing} player${missing > 1 ? 's need' : ' needs'} a level before the session can start.`) : ''}
-      ${s.roster.length ? `<div class="tabs rv-tabs" role="tablist" aria-label="Levels">${tabs.map(([k, l, n]) => `<button role="tab" id="rvt-${k}" aria-selected="${tab === k}" aria-controls="rv-panel" data-act="rvSet" data-k="tab" data-v="${k}">${l} <span class="chip">${n}</span></button>`).join('')}</div>
+      ${s.roster.length ? `${tabMenu('dd-rv', 'Show level', tabs, tab)}
+      <div class="tabs rv-tabs has-dd" role="tablist" aria-label="Levels">${tabs.map(([k, l, n]) => `<button role="tab" id="rvt-${k}" aria-selected="${tab === k}" aria-controls="rv-panel" data-act="rvSet" data-k="tab" data-v="${k}">${l} <span class="chip">${n}</span></button>`).join('')}</div>
       <div class="row rv-bar">
         <select class="input inline" id="rv-by" data-act-change="rvSet" data-k="by" aria-label="Group players by">${byOpts.map(([k, l]) => `<option value="${k}" ${by[0] === k ? 'selected' : ''}>Group by: ${l}</option>`).join('')}</select>
-        <div class="seg" role="group" aria-label="Roster view">${[['list', 'List'], ['grid', 'Grid']].map(([k, l]) => `<button id="rvv-${k}" aria-pressed="${view === k}" data-act="rvSet" data-k="view" data-v="${k}">${l}</button>`).join('')}</div>
+        <div class="seg" role="group" aria-label="Roster view">${[['list', 'List', I.list], ['grid', 'Grid', I.grid]].map(([k, l, ic]) => `<button class="seg-ic" id="rvv-${k}" aria-pressed="${view === k}" aria-label="${l} view" title="${l}" data-act="rvSet" data-k="view" data-v="${k}">${ic}</button>`).join('')}</div>
       </div>
       <div id="rv-panel" role="tabpanel" aria-labelledby="rvt-${tab}" class="stack">${!rows.length ? `<div class="empty">No ${esc(tabs.find(([k]) => k === tab)[1])} players on the roster.</div>`
-        : sections ? (by[0] === 'skill' ? skillMix(rows) : '') + sections.map(([g, list], i) => `<section class="stack tight" aria-labelledby="rvg-${i}"><h3 id="rvg-${i}">${esc(g)} · ${list.length}</h3>${body(list)}</section>`).join('') : body(rows)}</div>`
+        : sections ? sections.map(([g, list], i) => `<section class="stack tight" aria-labelledby="rvg-${i}"><h3 id="rvg-${i}">${esc(g)} · ${list.length}</h3>${body(list)}</section>`).join('') : body(rows)}</div>`
         : '<div class="empty">No players yet. Add players from your saved list or as new guests.</div>'}
     </section>`;
 }
@@ -2948,14 +3129,15 @@ function viewPrepare() {
   const cantStart = missing || other || (!S.online && s.download !== 'ready') || S.licenseExpired;
   return `<main class="wrap">
     <div class="crumb"><button class="btn sm ghost" data-act="go" data-to="home">${I.back} Home</button></div>
-    <div class="between"><div class="stack tight"><span class="label">${live ? 'Session settings' : 'Preparation'}</span><h1>${esc(s.title)}</h1><p class="muted">${live ? `${fmtDate(s.startedAt)} · Started ${fmtTime(s.startedAt)} · Ends ${fmtTime(s.end)}${laterDay(s.startedAt, s.end)}` : `${fmtDate(s.start)} · ${fmtRange(s.start, s.end)}`} · ${esc(s.venue)}</p></div>
-      <div class="row acts">${live ? '<button class="btn sm" data-act="go" data-to="console">Back to live session</button>' : '<button class="btn sm" data-act="editSetup">Edit preparation</button>'}<button class="btn sm" data-act="go" data-to="public">Preview public page</button><button class="btn sm" data-act="copyLink">Copy invite link</button><button class="btn sm" data-act="openSessionQr">Session QR</button><button class="btn sm" data-act="openPost">Copy Facebook post</button>${live ? '' : '<button class="btn sm danger" data-act="openDeleteSession">Delete session</button><button class="btn sm danger" data-act="openCancelSession">Cancel session</button>'}</div></div>
+    <div class="between"><div class="stack tight"><span class="label">${live ? 'Session settings' : 'Preparation'}</span><div class="title-row"><h1>${esc(s.title)}</h1><button class="btn sm ghost icon-btn" data-act="go" data-to="public" aria-label="Open public page" title="Open public page">${I.ext}</button></div><p class="muted">${live ? `${fmtDate(s.startedAt)} · Started ${fmtTime(s.startedAt)} · Ends ${fmtTime(s.end)}${laterDay(s.startedAt, s.end)}` : `${fmtDate(s.start)} · ${fmtRange(s.start, s.end)}`} · ${esc(s.venue)}</p></div>
+      <div class="row acts">${live ? '<button class="btn sm hdr-x" data-act="go" data-to="console">Back to live session</button>' : '<button class="btn sm hdr-x" data-act="editSetup">Edit preparation</button>'}<button class="btn sm hdr-x" data-act="copyLink">Copy invite link</button><button class="btn sm" data-act="openSessionQr">Session QR</button><button class="btn sm" data-act="openPost">Copy Facebook post</button>${live ? '' : '<button class="btn sm danger hdr-x" data-act="openDeleteSession">Delete session</button><button class="btn sm danger hdr-x" data-act="openCancelSession">Cancel session</button>'}<button class="btn sm hdr-more" data-act="openPrepMore" aria-haspopup="dialog">More options</button></div></div>
     ${live ? notice('', 'Preparation values are read-only during play. Mode, formats, minimum and playing levels are fixed after start. Use the live controls in Overview to manage courts, time, arrivals, requests and payments.') : pendingReqs(s).length ? requestsPanel(s) : ''}
     ${(() => {
       const tab = ['overview', 'roster', 'waitlist', 'payments'].includes(S.ui.prepTab) ? S.ui.prepTab : 'overview';
       const paidN = Object.keys(s.payments || {}).filter((pid) => R(s, pid)).length;
       const tabs = [['overview', 'Overview', null], ['roster', 'Roster and levels', `${s.roster.length}/${capacityOf(s)}`], ['waitlist', 'Waitlist', (s.waitlist || []).length], ['payments', 'Payments', `${paidN}/${s.roster.length} paid`]];
-      return `<div class="tabs" role="tablist" aria-label="${live ? 'Session settings' : 'Preparation'}">${tabs.map(([k, l, n]) => `<button role="tab" id="ptb-${k}" aria-selected="${tab === k}" aria-controls="prep-panel" data-act="prepTab" data-k="${k}">${l}${n != null ? ` <span class="chip">${n}</span>` : ''}</button>`).join('')}</div>
+      return `${tabMenu('dd-prep', live ? 'Session settings section' : 'Preparation section', tabs, tab)}
+      <div class="tabs has-dd" role="tablist" aria-label="${live ? 'Session settings' : 'Preparation'}">${tabs.map(([k, l, n]) => `<button role="tab" id="ptb-${k}" aria-selected="${tab === k}" aria-controls="prep-panel" data-act="prepTab" data-k="${k}">${l}${n != null ? ` <span class="chip">${n}</span>` : ''}</button>`).join('')}</div>
       <div id="prep-panel" role="tabpanel" aria-labelledby="ptb-${tab}" class="stack">${tab === 'overview' ? prepOverview(s) : tab === 'waitlist' ? waitlistPanel(s) : tab === 'payments' ? paymentsPanel(s) : rosterPanel(s, live, missing)}</div>`;
     })()}
   </main>
@@ -3024,6 +3206,12 @@ function courtSides(s, m) {
   return `<div class="sides">${side(m.teamA, 'A')}${side(m.teamB, 'B')}</div>`;
 }
 // The court card's ⋯ menu. The card itself shows only the action for its state (Start anyway, or the match action).
+// Phone replacement for a tab row: a full-width button showing the current tab that opens a list of the tabs (reuses the court menu's open state and outside-click close).
+function tabMenu(id, label, opts, cur) {
+  const open = S.ui.courtMenu === id, now = opts.find(([k]) => k === cur) || opts[0];
+  const text = ([, l, n]) => `<span>${l}</span>${n != null ? `<span class="chip">${n}</span>` : ''}`;
+  return `<div class="cmenu tabs-dd"><button class="tabmenu-btn" data-act="toggleCourtMenu" data-id="${id}" aria-haspopup="listbox" aria-expanded="${open}" aria-label="${label}: ${esc(now[1])}"><span class="tm-cur">${text(now)}</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>${open ? `<div class="cmenu-list tabmenu-list" role="listbox" aria-label="${label}">${opts.map(([k, l, n]) => `<button role="option" aria-selected="${k === now[0]}" class="${k === now[0] ? 'on' : ''}" data-act="ddPick" data-menu="${id}" data-v="${k}"><span class="tm-cur">${text([k, l, n])}</span>${k === now[0] ? I.check : ''}</button>`).join('')}</div>` : ''}</div>`;
+}
 function courtMenu(s, c, busy) {
   const open = S.ui.courtMenu === c.id;
   const last = s.courts.length <= 1;
@@ -3479,7 +3667,7 @@ function viewPublic() {
       <dt>Minimum</dt><dd>${s.minimum} games per player</dd></dl>
       ${s.notes ? `<p>${esc(s.notes)}</p>` : ''}
       <p class="small muted">Slots are confirmed by the Queue Master. Last updated ${fmtWhen(S.lastSync, { lower: true })}${S.pending ? '. Recent changes from the venue haven’t synced yet.' : '.'}</p></section>`
-    : `<section class="stack">${s.roster.length ? `${skillMix(s.roster)}<div class="pgrid">${s.roster.map((r) => { const p = P(r.pid), m = maskName(p.name); return `<div class="pcard">${pubAvatar(p)}<div style="min-width:0"><b>${esc(m)}</b>${p.identity === 'registered' || p.identity === 'unclaimed' ? '<p class="small muted">Has a ROTRA profile</p>' : ''}</div></div>`; }).join('')}</div>` : '<div class="card empty">Players have not been added yet.</div>'}${(s.waitlist || []).length ? `<h3>Waitlist · ${s.waitlist.length}</h3><ol class="pub-wait">${waitOf(s).map((w) => `<li>${esc(maskName(P(w.pid).name))}</li>`).join('')}</ol><p class="small muted">Waitlisted players get a slot if one opens. Ask the Queue Master.</p>` : ''}</section>`}
+    : `<section class="stack">${s.roster.length ? `<div class="pub-cap"><div class="pgrid pub">${s.roster.map((r) => { const p = P(r.pid), m = maskName(p.name); return `<div class="pcard pub lv-${rvBand(r)}" ${r.level != null ? `title="${esc(lvLabel(r.level))}"` : ''}>${pubAvatar(p)}<div style="min-width:0"><b>${esc(m)}</b></div></div>`; }).join('')}${s.status === 'finalized' ? '' : Array.from({ length: Math.max(0, capacityOf(s) - s.roster.length) }, () => '<div class="pcard pub empty" aria-hidden="true"><span class="avatar"></span><div><b>Open</b></div></div>').join('')}</div>${s.roster.length > 9 ? `<div class="pub-more ${s.roster.length > 12 ? 'more-d' : ''}"><span class="pm-count">${s.roster.length} players are in</span>${s.acceptReq === false ? '<span class="pm-text">Join to see the full roster</span>' : `<button class="btn primary pm-btn" data-act="openJoin">${I.lock} Join to see the full roster</button>`}</div>` : ''}</div>` : '<div class="card empty">Players have not been added yet.</div>'}${(s.waitlist || []).length ? `<h3>Waitlist · ${s.waitlist.length}</h3><div class="pgrid pub wl">${waitOf(s).map((w, i) => { const p = P(w.pid); return `<div class="pcard pub lv-${rvBand(w)}" ${w.level != null ? `title="${esc(lvLabel(w.level))}"` : ''}><span class="wl-av">${pubAvatar(p)}<i class="wl-n" aria-hidden="true">${i + 1}</i></span><div style="min-width:0"><b><span class="sr-only">Waitlist number ${i + 1}: </span>${esc(maskName(p.name))}</b></div></div>`; }).join('')}</div><p class="small muted">Waitlisted players get a slot if one opens, in this order. Ask the Queue Master.</p>` : ''}</section>`}
     ${s.status === 'finalized' ? (pub ? `<section class="stack"><h2>Results</h2>${pub.slides.includes(0) ? slideStandings(s) : ''}${pub.slides.includes(1) ? slideAwards(s) : ''}${pub.offDay ? slideOffDay(s, true) : ''}</section>`
       : '<section class="card empty">Results for this session have not been shared.</section>') : ''}
   </main>`;
@@ -3602,17 +3790,46 @@ const SHEETS = {
       <p class="small muted">${s.roster.length} player${s.roster.length === 1 ? '' : 's'} listed. Copy it again after you add players to get the latest list. <button class="btn xs ghost" data-act="goClub" data-k="post">Edit template</button></p>`,
       '<button class="btn" data-act="closeSheet">Close</button><button class="btn primary" data-act="copyPost">Copy post</button>', true);
   },
-  sessionQr() {
-    const s = cur();
+  prepMore() {
+    const live = cur()?.status === 'active';
+    const item = (run, label, extra = '', cls = '') => `<button class="btn ${cls}" style="width:100%" data-act="moreRun" data-run="${run}" ${extra}>${label}</button>`;
+    return sheetShell('More options', `<div class="stack">${live ? item('go', 'Back to live session', 'data-goto="console"') : item('editSetup', 'Edit preparation')}${item('copyLink', 'Copy invite link')}${live ? '' : `${item('openDeleteSession', 'Delete session', '', 'danger')}${item('openCancelSession', 'Cancel session', '', 'danger')}`}</div>`);
+  },
+  sessionQr(sh) {
+    const s = cur(), fmt = sh.fmt === 'story' ? 'story' : 'post';
     // Static placeholder QR (finder squares + sample modules); the real app encodes the public session link.
     const sq = (x, y) => `<rect x="${x}" y="${y}" width="7" height="7" fill="#000"/><rect x="${x + 1}" y="${y + 1}" width="5" height="5" fill="#fff"/><rect x="${x + 2}" y="${y + 2}" width="3" height="3" fill="#000"/>`;
     const dots = [[9,1],[11,2],[13,1],[10,4],[12,5],[9,7],[14,8],[1,9],[3,10],[5,9],[8,10],[10,9],[12,11],[15,10],[2,12],[4,13],[7,12],[9,14],[11,13],[14,14],[16,12],[18,9],[19,11],[17,15],[20,13],[18,18],[12,17],[14,19],[10,19],[8,16],[16,19],[20,17]];
-    const svg = `<svg viewBox="0 0 21 21" width="200" height="200" shape-rendering="crispEdges" role="img" aria-label="QR code for the session link" style="background:#fff;padding:12px;border-radius:12px">${sq(0, 0)}${sq(14, 0)}${sq(0, 14)}${dots.map(([x, y]) => `<rect x="${x}" y="${y}" width="1" height="1" fill="#000"/>`).join('')}</svg>`;
-    return sheetShell('Session QR', `<div class="stack" style="align-items:center;text-align:center">${svg}
-      <p><b>${esc(S.club.name)}</b><br><span class="small muted">${fmtDate(s.start)}, ${fmtRange(s.start, s.end)} · ${esc(s.venue)}</span></p>
-      <p class="small muted mono">${esc(sessionLink(s))}</p>
-      <p class="small muted">Scanning opens the public session page. Download the image to use it in a Facebook post or print it.</p></div>`,
-      '<button class="btn" data-act="closeSheet">Close</button><button class="btn" data-act="downloadSessionQr">Share</button><button class="btn primary" data-act="downloadSessionQr">Download QR image</button>');
+    const qr = `<svg viewBox="0 0 21 21" shape-rendering="crispEdges" role="img" aria-label="QR code for the session link">${sq(0, 0)}${sq(14, 0)}${sq(0, 14)}${dots.map(([x, y]) => `<rect x="${x}" y="${y}" width="1" height="1" fill="#000"/>`).join('')}</svg>`;
+    const mark = S.club.logo ? `<img src="${S.club.logo}" alt="">` : `<span>${esc(S.club.initials)}</span>`;
+    // Brand card: the same image people post to Facebook and stories. Colors are fixed brand values, so it looks the same in both themes.
+    const card = `<div class="qr-card ${fmt}" role="group" aria-label="Share image preview">
+      <div class="qc-top"><span class="qc-club">${mark}</span><div><b>${esc(S.club.name)}</b><span>is playing badminton</span></div></div>
+      <div class="qc-mid"><h3>${esc(s.title)}</h3><p>${fmtDate(s.start)}<br>${fmtRange(s.start, s.end)} · ${esc(s.venue)}</p></div>
+      <div class="qc-qr"><div class="qc-code">${qr}<span class="qc-badge">${mark}</span></div><b>Scan to join</b><span class="mono">${esc(sessionLink(s))}</span></div>
+      <div class="qc-foot"><span class="qc-word">ROTR<b>A</b></span><span>Run the game.</span></div></div>`;
+    return sheetShell('Session QR', `<div class="stack" style="align-items:center;text-align:center">
+      <div class="seg" role="group" aria-label="Image format">${[['post', 'Post'], ['story', 'Story']].map(([k, l]) => `<button aria-pressed="${fmt === k}" data-act="qrFmt" data-k="${k}">${l}</button>`).join('')}</div>
+      ${card}
+      <p class="small muted">Scanning opens the public session page. ${fmt === 'story' ? 'Story size (9:16) for Facebook and Instagram stories.' : 'Post size (4:5) for Facebook and Instagram feeds.'} Download the image to share it or print it.</p></div>`,
+      '<button class="btn" data-act="closeSheet">Close</button><button class="btn" data-act="downloadSessionQr">Share</button><button class="btn primary" data-act="downloadSessionQr">Download image</button>');
+  },
+  timePick(sh) {
+    const p = DT[sh.k];
+    if (!p) return '';
+    const day = dayStart(sh.t), times = dtTimes(day, p.ok), d = new Date(sh.t), h24 = d.getHours(), mi = d.getMinutes(), pm = h24 >= 12, h12 = h24 % 12 || 12;
+    const has = (t) => times.includes(t) || t === sh.t;
+    const btn = (part, v, label, on, sel) => `<button type="button" id="tp-${part}-${v}" class="tp-b ${sel ? 'on' : ''}" aria-pressed="${sel}" data-act="tpPick" data-part="${part}" data-v="${v}" ${on ? '' : 'disabled'}>${label}</button>`;
+    return `<div class="scrim" data-act="closeSheet"></div><div class="sheet tp-sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+      <header><h2 id="sheet-title" tabindex="-1">${esc(p.label)}</h2><button class="btn xs ghost icon-btn" data-act="closeSheet" aria-label="Close">${I.x}</button></header>
+      <div class="sb stack">
+        <div class="tp-now tnum" aria-live="polite">${fmtTime(sh.t)}</div>
+        <div class="seg tp-ampm" role="group" aria-label="AM or PM">${[['am', 'AM', false], ['pm', 'PM', true]].map(([v, l, isPm]) => `<button type="button" id="tp-meridiem-${v}" aria-pressed="${pm === isPm}" data-act="tpPick" data-part="meridiem" data-v="${v}" ${times.some((t) => (new Date(t).getHours() >= 12) === isPm) ? '' : 'disabled'}>${l}</button>`).join('')}</div>
+        <div><span class="label">Hour</span><div class="tp-grid hours">${[12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((h) => { const h24c = (h % 12) + (pm ? 12 : 0); return btn('hour', h24c, h, times.some((t) => new Date(t).getHours() === h24c), h === h12); }).join('')}</div></div>
+        <div><span class="label">Minute</span><div class="tp-grid mins">${[0, 15, 30, 45, ...(mi % 15 ? [mi] : [])].sort((a, b) => a - b).map((m) => btn('minute', m, `:${String(m).padStart(2, '0')}`, has(dtAt(day, h24, m)), m === mi)).join('')}</div></div>
+        ${p.hideDays && p.days.length > 1 ? (() => { const other = p.days.find((x) => x !== day), on = day !== p.days[0]; return `<div class="tp-day"><span>Ends the next day</span>${sw(on, 'tpDay', `data-v="${other}" ${other != null && dtTimes(other, p.ok).length ? '' : 'disabled'}`, 'Ends the next day')}</div>`; })() : ''}
+      </div>
+      <footer><button class="btn primary" data-act="closeSheet">Done</button></footer></div>`;
   },
   venue(sh) {
     const d = S.ui.draft || {};
@@ -4214,7 +4431,11 @@ function applyVenue(v, msg) {
   S.ui.sheet = null; render();
   toast(msg || (fee || entry ? `${v.name} · ${[fee && `court fee ${peso(v.courtFee)}/h`, entry && `entrance ${peso(v.entranceFee)}`].filter(Boolean).join(' and ')} filled in` : `${v.name} selected`));
 }
-function closeSheet() { flushPayments(); S.ui.sheet = null; render(); }
+function closeSheet() {
+  // A time picker opened from inside another dialog returns to that dialog.
+  if (S.ui.sheet?.type === 'timePick') { const k = S.ui.sheet.k; S.ui.sheet = S.ui.timeBack || null; S.ui.timeBack = null; render(); document.getElementById(DT[k]?.id || `dt-${k.replace(/\W/g, '-')}`)?.focus(); return; }
+  flushPayments(); S.ui.sheet = null; render();
+}
 function go(to, id) {
   if (id) S.currentId = id;
   S.ui.sheet = null; S.ui.guest = false; S.ui.navOpen = false; S.ui.setOpen = false;
@@ -4276,8 +4497,12 @@ const ACT = {
   openSync: () => openSheet({ type: 'sync' }),
   openVenue: () => openSheet({ type: 'venue', mode: 'pick', q: '' }),
   openPost: () => openSheet({ type: 'post' }),
-  openSessionQr: () => openSheet({ type: 'sessionQr' }),
-  downloadSessionQr: () => toast('QR image downloaded (sample in this prototype)'),
+  openSessionQr: () => openSheet({ type: 'sessionQr', fmt: 'post' }),
+  qrFmt: (d) => { if (S.ui.sheet?.type === 'sessionQr') { S.ui.sheet.fmt = d.k; render(); } },
+  openPrepMore: () => openSheet({ type: 'prepMore' }),
+  ddPick: (d) => { S.ui.courtMenu = null; if (d.menu === 'dd-prep') ACT.prepTab({ k: d.v }); else { ACT.rvSet({ k: 'tab', v: d.v }); } const b = document.querySelector(`[data-act="toggleCourtMenu"][data-id="${d.menu}"]`); if (b) b.focus(); },
+  moreRun: (d) => { closeSheet(); ACT[d.run]({ ...d, to: d.goto }); },
+  downloadSessionQr: () => toast(`${S.ui.sheet?.fmt === 'story' ? 'Story' : 'Post'} image downloaded (sample in this prototype)`),
   copyLink: () => { const v = sessionLink(cur()); try { navigator.clipboard.writeText(v); } catch (e) { /* clipboard unavailable */ } toast('Session link copied'); },
   openGuest: (d) => { go('public', d.id); S.ui.guest = true; render(); },
   toggleAcceptReq: () => { const s = cur(); s.acceptReq = s.acceptReq === false; save(); render(); toast(s.acceptReq ? 'Join requests are on' : 'Join requests are off'); },
@@ -4509,6 +4734,29 @@ const ACT = {
   dpPick: (d) => { const sh = S.ui.sheet; sh.sel = +d.k; render(); const b = document.getElementById(`dp-${sh.sel}`); if (b) b.focus(); },
   dpToday: () => { const sh = S.ui.sheet; sh.sel = new Date().setHours(0, 0, 0, 0); sh.view = monthStart(sh.sel); render(); const b = document.getElementById(`dp-${sh.sel}`); if (b) b.focus(); },
   dpApply: () => { S.ui.draft.date = timeToYmd(S.ui.sheet.sel); S.ui.sheet = null; render(); },
+  openTime: (d) => { const p = DT[d.k]; if (!p) return; const t = p.value ?? p.fallback ?? p.times[0]; if (t == null) return; S.ui.timeBack = S.ui.sheet && S.ui.sheet.type !== 'timePick' ? S.ui.sheet : null; S.ui.sheet = { type: 'timePick', k: d.k, t }; render(); document.getElementById('sheet-title')?.focus(); },
+  tpPick: (d) => {
+    const sh = S.ui.sheet, p = sh && DT[sh.k]; if (!p) return;
+    const day = dayStart(sh.t), times = dtTimes(day, p.ok), cur = new Date(sh.t), h = cur.getHours(), m = cur.getMinutes();
+    const has = (t) => times.includes(t);
+    let t = null;
+    if (d.part === 'hour') { const want = dtAt(day, +d.v, m); t = has(want) ? want : times.find((x) => new Date(x).getHours() === +d.v); }
+    else if (d.part === 'minute') { const want = dtAt(day, h, +d.v); t = has(want) ? want : null; }
+    else { const isPm = d.v === 'pm', want = dtAt(day, (h % 12) + (isPm ? 12 : 0), m); t = has(want) ? want : times.find((x) => (new Date(x).getHours() >= 12) === isPm); }
+    if (t == null) return;
+    sh.t = t; p.set(t); render();
+    document.getElementById(`tp-${d.part}-${d.v}`)?.focus();
+  },
+  tpDay: (d) => {
+    const sh = S.ui.sheet, p = sh && DT[sh.k]; if (!p) return;
+    const day = +d.v, ref = new Date(sh.t), want = new Date(day); want.setHours(ref.getHours(), ref.getMinutes(), 0, 0);
+    const t = p.ok(want.getTime()) ? want.getTime() : dtTimes(day, p.ok)[0];
+    if (t == null) return;
+    sh.t = t; p.set(t); render();
+    document.querySelector('.tp-day .switch')?.focus();
+  },
+  openSetupCourt: (d) => { S.ui.draft.courtDialog = +d.i; render(); document.getElementById('sheet-title')?.focus(); },
+  closeSetupCourt: () => { const i = S.ui.draft.courtDialog; S.ui.draft.courtDialog = null; render(); document.querySelector(`.sc-tile[data-i="${i}"]`)?.focus(); },
   toggleDraft: (d) => { S.ui.draft[d.k] = !S.ui.draft[d.k]; render(); },
   draftPayMode: (d) => { S.ui.draft.custom = d.v === 'custom'; render(); if (d.v === 'custom') { const i = document.getElementById('f-pay'); if (i) i.focus(); } },
   setDraft: (d) => { S.ui.draft[d.k] = d.v; render(); },
@@ -5109,6 +5357,7 @@ document.addEventListener('keydown', (e) => {
     return;
   }
   if (e.key === 'Escape' && S.ui.courtMenu) { e.preventDefault(); const id = S.ui.courtMenu; S.ui.courtMenu = null; render(); const b = document.querySelector(`[data-act="toggleCourtMenu"][data-id="${id}"]`); if (b) b.focus(); }
+  else if (e.key === 'Escape' && S.ui.draft && S.ui.draft.courtDialog != null) { e.preventDefault(); ACT.closeSetupCourt(); }
   else if (e.key === 'Escape' && S.ui.sheet) { e.preventDefault(); closeSheet(); }
   else if (e.key === 'Escape' && S.ui.setOpen) { e.preventDefault(); ACT.closeSettingsMenu(); }
   else if (e.key === 'Escape' && S.ui.navOpen) { e.preventDefault(); S.ui.navOpen = false; render(); const b = document.querySelector('.burger'); if (b) b.focus(); }
@@ -5356,7 +5605,7 @@ function render() {
   const views = { login: viewLogin, home: viewHome, venues: viewVenues, club: viewClub, inventory: viewInventory, history: viewHistory, players: viewPlayers, setup: viewSetup, prepare: viewPrepare, console: viewConsole, finalizing: viewFinalizing, results: viewResults, public: viewPublic };
   const sh = S.ui.sheet;
   const page = (views[S.screen] || viewHome)();
-  const html = topBar() + (hasShell() ? `<div class="shell ${navMin ? 'rail-min' : ''} ${S.ui.navOpen ? 'nav-open' : ''}">${navRail()}<div class="nav-scrim" data-act="toggleNav" aria-hidden="true"></div><div class="shell-main">${page}</div>${mobileDock()}</div>` : page) + (sh ? SHEETS[sh.type](sh) : '');
+  const html = topBar() + (hasShell() ? `<div class="shell ${navMin ? 'rail-min' : ''} ${S.ui.navOpen ? 'nav-open' : ''}">${navRail()}<div class="nav-scrim" data-act="toggleNav" aria-hidden="true"></div><div class="shell-main">${page}</div>${mobileDock()}</div>` : page) + (S.screen === 'setup' ? setupCourtDialog : '') + (sh ? SHEETS[sh.type](sh) : '');
   document.getElementById('app').innerHTML = html;
   setupSavedPlayerStats();
   document.body.style.overflow = sh ? 'hidden' : '';

@@ -22,7 +22,7 @@ Admin may edit full name, nickname and photo for unclaimed players, and name and
 
 Archive requires a reason, is reversible and hides identities from default directories and club pickers. Sign-in and retained histories remain intact. Remove requires a reason and typed RTR ID and is allowed only with no games, no claimed account and no references requiring retention. Audit retains the RTR ID.
 
-Registration links open `/claim/{token}`, expire after seven days, and are issued as ROTRA Admin. Issuing replaces the earlier active link. Never put the token in the audit. ROTRA sends no email or SMS.
+Registration links open `/claim/{token}`, expire after seven days, and are issued as ROTRA Admin. Issuing replaces the earlier active link. Never put the token in the audit. ROTRA sends no email or SMS. A player who registers from an Admin link is not assigned to a club (owner decision, November 8, 2026).
 
 Bulk actions: Archive, Restore, Remove (only when all selected records qualify), Export CSV and Copy RTR IDs. CSV includes name, nickname, RTR ID, account, rank, clubs, added and place, never contacts. Selection survives pages and view changes; filters clear it. Mutations report each record and retry only failures.
 

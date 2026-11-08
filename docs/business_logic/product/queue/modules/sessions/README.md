@@ -41,7 +41,7 @@ Every time carries its day; ROTRA never guesses "next day" from a clock time.
 
 - **One date-and-time picker** for every time field: session start and end, each court's planned start and
   end (setup and Add / Edit court), the new end in Start session, and the live end in Courts and time. Day
-  buttons appear only when the field can fall on more than one day; then hour, minute and AM/PM dropdowns
+  buttons appear only when the field can fall on more than one day; then a time field that opens a dialog with AM/PM, hour and minute buttons
   (owner decision, November 8, 2026) in 15-minute steps offering **only valid times**. An existing value off
   the grid (a court opened at 10:42 PM) stays pickable so it can be kept. Before start, the session date itself is chosen with the calendar.
 - Valid times: a session end is after its start and at most 24 hours later; a court's planned start is not

@@ -9,9 +9,9 @@ import { type NextRequest, NextResponse } from 'next/server'
  */
 export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname
-  const protectedPath = ['/me', '/profile'].some(
-    (prefix) => path === prefix || path.startsWith(`${prefix}/`),
-  )
+  const protectedPath =
+    /^\/players\/[^/]+\/compare\/?$/.test(path) ||
+    ['/me', '/profile'].some((prefix) => path === prefix || path.startsWith(`${prefix}/`))
   const toLogin = () => {
     const login = new URL('/login', request.url)
     login.searchParams.set('returnTo', `${path}${request.nextUrl.search}`)

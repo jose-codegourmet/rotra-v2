@@ -15,6 +15,7 @@ const meta = {
     onEdit: () => {},
     onChangePicture: () => {},
     onOpenPlayerId: () => {},
+    onCompare: () => {},
   },
 } satisfies Meta<typeof PlayerIdentityCard>
 export default meta
@@ -27,3 +28,5 @@ export const OwnPhone: Story = {
   args: { isOwn: true },
   globals: { viewport: { value: 'phone' } },
 }
+
+export const PublicSignedIn: Story = { args: { compareSignedIn: true } }

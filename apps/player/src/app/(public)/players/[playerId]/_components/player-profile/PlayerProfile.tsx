@@ -1,4 +1,5 @@
 'use client'
+import { useSession } from '@rotra/data/auth/use-session'
 import { useSignOut } from '@rotra/data/auth/use-sign-out'
 import { OPEN_CONTACT_CHANGE_STATUSES } from '@rotra/data/contact-change-request/types'
 import { useMyContactChangeRequest } from '@rotra/data/contact-change-request/useMyContactChangeRequest'
@@ -52,7 +53,8 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
   const account = useAppSelector(selectAccount),
     { offline } = useAppSelector(selectDev),
     dispatch = useAppDispatch()
-  const isOwn = account?.id === playerId
+  const session = useSession('player')
+  const isOwn = (session.data?.account.id ?? account?.id) === playerId
   // Ownership is checked first: a visitor's page never requests private contacts.
   const myAccount = useMyAccount(isOwn ? playerId : null),
     contactRequest = useMyContactChangeRequest(isOwn ? playerId : null),
@@ -155,6 +157,18 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
             idElementId={idElementId}
             onCopyId={() => void copyPlayerId(player.rtrId, idElementId)}
             onChangePicture={pictureEditor.openSheet}
+            compareSignedIn={Boolean(session.data)}
+            onCompare={
+              session.isPending || session.isError
+                ? undefined
+                : () => {
+                    const path = `/players/${encodeURIComponent(playerId)}/compare`
+                    if (!session.data) {
+                      toast('Sign in to compare')
+                      router.push(`/login?returnTo=${encodeURIComponent(path)}`)
+                    } else router.push(path)
+                  }
+            }
             onEdit={() => router.push('/profile/edit')}
             onOpenPlayerId={() => router.push('/profile/player-id')}
           />

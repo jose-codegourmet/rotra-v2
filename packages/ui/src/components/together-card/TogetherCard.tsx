@@ -18,7 +18,7 @@ export type TogetherCardProps = {
 
 /** Same-team results share one record, so P-COMPARE uses a team card. */
 export function TogetherCard({ me, them, games, won, winRate, className }: TogetherCardProps) {
-  const firstName = them.name.split(/\s+/)[0] ?? them.name
+  const firstName = them.label ?? them.name.split(/\s+/)[0] ?? them.name
   return (
     <Card asChild className={cn('flex flex-col gap-3', className)}>
       <section aria-label="As a team">

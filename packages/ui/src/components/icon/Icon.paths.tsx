@@ -12,6 +12,7 @@ type IconDef = {
 // Copied from the prototypes' icon sets (`const I = { … }` in each apps/mockup/*.html). Nav icons
 // (`nav-*`) are the 20 px rail and dock icons; the rest are inline 13–18 px icons.
 export const ICONS = {
+  versus: { size: 16, strokeWidth: 2.2, body: <path d="M5 5l6 7-6 7M19 5l-6 7 6 7" /> },
   plus: { size: 20, strokeWidth: 2, body: <path d="M12 5v14M5 12h14" /> },
   'nav-pin': {
     size: 20,

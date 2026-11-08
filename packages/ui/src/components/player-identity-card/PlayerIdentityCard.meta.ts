@@ -6,6 +6,7 @@ export const playerIdentityCardMeta = {
   usage: [
     'Use as the side column of P-PUBLIC-PROFILE and P-OWN-PROFILE; never pass private contact data.',
     'The RTR ID hint never calls the ID a residence or current club.',
+    'Other profiles offer Compare with me, or Compare with my results when signed out.',
     'The owner picture edit button calls onChangePicture; public profiles do not show it.',
     'Clipboard handling and toasts belong to the container.',
   ],

@@ -3,7 +3,7 @@ import { Card } from '@rotra/ui/card'
 import { cn } from '@rotra/ui/cn'
 import { ProgressBar } from '@rotra/ui/progress-bar'
 
-export type CompareIdentity = { name: string; pictureUrl?: string | null }
+export type CompareIdentity = { name: string; label?: string; pictureUrl?: string | null }
 export type CompareStatRow = {
   label: string
   mine: string | number
@@ -33,7 +33,7 @@ export function CompareStats({
   otherWins,
   className,
 }: CompareStatsProps) {
-  const firstName = them.name.split(/\s+/)[0] ?? them.name
+  const firstName = them.label ?? them.name.split(/\s+/)[0] ?? them.name
   const rightLabel = filter === 'h2h' ? `${firstName} won` : 'You lost'
   const rightCount = filter === 'h2h' ? otherWins : games - myWins
   return (

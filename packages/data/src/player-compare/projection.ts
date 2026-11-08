@@ -87,6 +87,7 @@ export function sharedPlayerGames(state: MockState, viewerId: string, otherId: s
         playerId,
         name: profile?.nickname || profile?.fullName || row.nicknameSnapshot || row.nameSnapshot,
         pictureUrl: profile?.picture ?? null,
+        pictureName: profile?.fullName ?? row.nameSnapshot,
         level: row.level,
         games: countedGames(id, sessionMatches),
       }

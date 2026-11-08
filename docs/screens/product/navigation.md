@@ -98,5 +98,8 @@ Admin routes except `/login` are protected. Player `/` (leaderboard) and `/playe
 public; `/me` and its children are protected. The Foundation proxy wires these boundaries only;
 sign-in forms and the remaining screens arrive in their product tickets.
 
+P-COMPARE is `/players/[playerId]/compare` ([D-2026-11-08-02](../../mvp/decisions.md#d-2026-11-08-02)): it
+needs a signed-in player, so signed out it goes to `/login` and returns there.
+
 Guest registration invitations (#490) open `/register/[clubId]` in Player Information, with no
 sign-in required. The club is RTR allocation context only; existing profiles still use `/claim/[token]`.

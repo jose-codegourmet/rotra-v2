@@ -15,7 +15,9 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-07-05](#d-2026-11-07-05) | Payment amounts reuse the existing paid mark | approved | implemented | #479 | [Queue](workstreams/queue.md) |
 | [D-2026-11-07-06](#d-2026-11-07-06) | Public participant names are masked | approved | implemented | #475, #474 | [Queue](workstreams/queue.md) |
 | [D-2026-11-07-07](#d-2026-11-07-07) | Player invite links use player login until sign-up exists | approved | implemented | #476, #478; #477 blocked | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
-| [D-2026-11-08-01](#d-2026-11-08-01) | Where Admin Sales numbers are calculated | proposed | not started | needed | [Admin](workstreams/admin.md) |
+| [D-2026-11-08-01](#d-2026-11-08-01) | Where Admin Sales numbers are calculated | approved | not started | #533, #540 (epic #504) | [Admin](workstreams/admin.md) |
+| [D-2026-11-08-02](#d-2026-11-08-02) | Player Compare data, rules and route | approved | not started | #525, #526, #541 (epic #502) | [Player](workstreams/player.md) |
+| [D-2026-11-08-03](#d-2026-11-08-03) | Profile pictures in Supabase Storage | approved | not started | #522, #542 (epic #502) | [Player](workstreams/player.md) |
 
 ## Status conventions
 
@@ -124,12 +126,18 @@ Then add a row to the [index](#index) and link the entry from the workstream pag
 
 <a id="d-2026-11-08-01"></a>
 ### D-2026-11-08-01 — Where Admin Sales numbers are calculated
-- **Decision status:** proposed (owner leans to Supabase; not approved yet)
+- **Decision status:** approved (2026-11-08; the owner delegated the choice and asked for the most efficient option)
 - **Implementation status:** not started (the Sales page and the club Sales tab exist only in the Admin mockup, with sample figures)
-- **Ticket:** needed
+- **Ticket:** [#533](https://github.com/jose-codegourmet/rotra-v2/issues/533) (mock data), [#540](https://github.com/jose-codegourmet/rotra-v2/issues/540) (Postgres views and real-mode reader), epic [#504](https://github.com/jose-codegourmet/rotra-v2/issues/504)
 - **Roadmap:** MVP candidate — [Admin workstream](workstreams/admin.md)
 - **Question:** Should revenue, sessions-started, matches-played and per-club cost-per-session be calculated in Next.js (route handlers or server code) or in Supabase (Postgres)?
 - **Owner note (November 8, 2026):** Not sure Next.js is the right place to do calculations. Supabase feels right. This entry is where discussion and notes live, together with the AI recommendation.
+- **Decision:** The recommendation below, as written: one read-only SQL view (or SQL function) per report, added by a Prisma migration in `packages/db`; computed when the page opens; the Admin Route Handler only reads it behind `requireAdmin`. **No Supabase Edge Function, no pg_cron, no totals table.** Add a monthly totals table updated at finalization only if a report is measured to be slow. Product defaults, taken from the mockup:
+  - Revenue counts each recorded license payment in the **month it was paid** (no spreading of yearly payments).
+  - **Free (tester) clubs count** in sessions started and matches played; their revenue is ₱0.
+  - **“Revenue they pull in”** means what the club pays ROTRA. ROTRA never shows money clubs collect from their players.
+  - **Cost per session** is one Admin-editable number stored with the Admin configuration (a new field), starting at ₱15. ₱15 stays a placeholder until the owner sets the real figure in Admin; nothing is hardcoded.
+  - No CSV export and no history limit for MVP; the page shows the periods in the mockup (7 days, 30 days, 12 months; six months on the club tab).
 - **AI recommendation (not a decision):** Do the calculations in Postgres, and keep Next.js as a thin reader.
   1. **Why Postgres.** The inputs (license payments, finalized sessions, finalized matches) already live there. Summing and grouping by month or club is exactly what SQL does best, runs next to the data, returns a few small rows, and stays correct for every client (Admin web now, anything later). Doing it in Next.js means pulling many rows over the wire and re-implementing the same rules in TypeScript, where it can drift from the database.
   2. **Shape.** One **read-only SQL view or function per report** (for example monthly revenue, sessions and matches by club) owned by the `packages/db` schema, written as a Prisma migration. The Next.js Admin route handler only calls it, checks that the caller is the platform owner, and passes the rows to the screen, which formats peso amounts and dates. Cost-per-session is a number in the Admin configuration table (the mockup shows ₱15 as a placeholder), joined in the view.
@@ -137,8 +145,31 @@ Then add a row to the [index](#index) and link the entry from the workstream pag
   4. **Money rules.** Revenue is only the license payments Admin records (ROTRA does not collect money). Store amounts as integer centavos or pesos with a currency, never floats; decide once whether a yearly payment counts in the month paid (as the mockup does) or is spread over the months it covers.
   5. **Access.** Admin-only: the platform owner's session reads the view through the server. Nothing from these reports is exposed to clubs or players. Do not call these from the browser with the public key.
   6. **What would change this.** If a number needs logic that is awkward in SQL (for example a long-running estimate or an external price feed), do just that part in code, and still store the result in Postgres.
-- **Open questions:** What the real cost per session is and what it includes; whether free tester clubs count in sessions and matches; month-paid versus spread revenue; whether Admin wants CSV export of these reports; how far back history should go.
+- **Open questions:** None blocking. The owner sets the real cost per session in Admin when known.
 - **References:** [Sales screen](../screens/product/modules/admin/sales.md), [club Sales tab](../screens/product/modules/admin/clubs-licenses.md#a-club-sales--sales-tab-on-the-club-page), [Admin database design](../database_design/product/admin/README.md), [mockup log: Sales page](../mockup-changes/2026-11-08-admin-sales-page.md), [mockup log: club Sales tab](../mockup-changes/2026-11-08-admin-club-sales-tab.md).
+
+<a id="d-2026-11-08-02"></a>
+### D-2026-11-08-02 — Player Compare data, rules and route
+- **Decision status:** approved (2026-11-08; the owner delegated the choice and asked for the most efficient option)
+- **Implementation status:** not started
+- **Ticket:** [#525](https://github.com/jose-codegourmet/rotra-v2/issues/525) (mock data), [#526](https://github.com/jose-codegourmet/rotra-v2/issues/526) (screen), [#541](https://github.com/jose-codegourmet/rotra-v2/issues/541) (Postgres and real-mode reader), epic [#502](https://github.com/jose-codegourmet/rotra-v2/issues/502)
+- **Roadmap:** MVP candidate — [Player workstream](workstreams/player.md)
+- **Decision:**
+  - **Data:** read on request from the final match rows with one SQL function (two player IDs in, the shared counted games out), added by a Prisma migration and called by a Player Route Handler. **No Supabase Edge Function, no cron, no per-pair summary table**, and no extra work after a session is submitted. Add a pair summary updated at finalization only if the query is measured to be slow.
+  - **Which games:** only counted singles and doubles, as the mockup shows; fun and partial games are left out.
+  - **Who:** signed-in players compare themselves with any other player. No opt-out, because every number shown is already public on profiles.
+  - **Numbers:** level, position and games counted reuse the existing rank readers unchanged. Compare adds no ranking math.
+  - **Route:** `/players/[playerId]/compare`, next to `/players/[playerId]/rank` and `/players/[playerId]/games`. Signed out, it goes to sign-in and returns there.
+- **References:** [P-COMPARE](../screens/product/modules/player-information/profile.md#p-compare--you-and-another-player), [mockup log](../mockup-changes/2026-11-08-player-compare-players.md), [database open decisions](../database_design/product/open-decisions.md).
+
+<a id="d-2026-11-08-03"></a>
+### D-2026-11-08-03 — Profile pictures in Supabase Storage
+- **Decision status:** approved (2026-11-08; the owner delegated the choice and asked for the most efficient option)
+- **Implementation status:** not started
+- **Ticket:** [#522](https://github.com/jose-codegourmet/rotra-v2/issues/522) (mock data), [#542](https://github.com/jose-codegourmet/rotra-v2/issues/542) (Storage and real-mode writer), epic [#502](https://github.com/jose-codegourmet/rotra-v2/issues/502)
+- **Roadmap:** MVP candidate — [Player workstream](workstreams/player.md)
+- **Decision:** Reuse the club-logo pattern (#374) instead of building a new one. The Player app's existing `/api/me/profile` route (behind `requireOwnPlayer`) receives the photo, the server normalizes it to a square PNG (512 px), uploads it to a public **`player-avatars`** Supabase Storage bucket, and saves its immutable URL in `players.avatar_ref`. A character is saved as `character:<id>`; Use my initials saves null. No direct browser upload, no Edge Function, no migration (`avatar_ref` already exists). Old files are kept like club logo snapshots.
+- **References:** [architecture.md › Club logos](../architecture.md), [identity](../database_design/product/player-information/modules/identity.md), [mockup log](../mockup-changes/2026-11-08-player-change-avatar.md).
 
 ## Admin implementation gap index
 

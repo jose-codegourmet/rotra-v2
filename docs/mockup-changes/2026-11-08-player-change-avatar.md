@@ -40,3 +40,4 @@ Components: profile-picture-sheet, player-identity-card, edit-profile-form, play
 - #521 P05.1 · ProfilePictureSheet and the edit-picture button
 - #522 P05.2 · Set the profile picture (upload, initials or character)
 - #523 P05.3 · Profile picture on My profile, Edit profile and the leaderboard row
+- #542 P05.8 · Profile pictures in the player-avatars Storage bucket

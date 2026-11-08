@@ -21,6 +21,7 @@ Components: sales-stat-card, admin-nav
   sessions started.
 
 ## Open questions for the owner
+- **Decided in [D-2026-11-08-01](../mvp/decisions.md#d-2026-11-08-01) (owner delegated, 2026-11-08): revenue in the month paid; free clubs count in sessions and matches; nothing else on the page for MVP; Postgres views computed on read, no cron or Edge Function.** The questions below are kept for history.
 - Revenue by the date paid, or spread over the days each license covers?
 - Free (tester) clubs: counted in sessions and matches? (Assumed yes.)
 - Anything else on the page, such as renewals due, new clubs this month, or churn?
@@ -52,3 +53,4 @@ Components: sales-stat-card, admin-nav
 - #532 A06.1 · Sales components: stat cards, bar chart, breakdown lists, club sales table
 - #533 A06.2 · Sales figures for the platform and per club
 - #534 A06.3 · Sales page, navigation item and the club Sales tab
+- #540 A06.4 · Sales report views in Postgres and the Admin real-mode reader

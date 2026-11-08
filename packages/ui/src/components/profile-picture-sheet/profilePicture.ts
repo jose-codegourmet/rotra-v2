@@ -6,6 +6,19 @@ export type ProfilePicture =
   | { kind: 'photo'; src: string }
   | { kind: 'character'; id: ProfileCharacterId }
 
+/** Resolve the saved choice with the global identity, never a club-local ID or nickname. */
+export function profilePictureSrc(
+  reference: string | null | undefined,
+  playerId: string,
+  name: string,
+): string | undefined {
+  if (!reference) return undefined
+  if (!reference.startsWith('character:')) return reference
+  const id = reference.slice('character:'.length)
+  const face = PROFILE_CHARACTER_IDS.find((candidate) => candidate === id)
+  return face === undefined ? undefined : profileCharacterUrl(playerId, name, face)
+}
+
 export function profileCharacterUrl(
   playerId: string,
   name: string,

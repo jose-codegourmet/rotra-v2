@@ -1,7 +1,7 @@
 'use client'
 
 import { cn } from '@rotra/ui/cn'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { type AvatarVariants, avatarVariants } from './Avatar.variants'
 
 export type AvatarProps = AvatarVariants & {
@@ -9,7 +9,7 @@ export type AvatarProps = AvatarVariants & {
   name: string
   /** Use these initials instead of deriving them from name (clubs store their own, e.g. "LS") */
   initials?: string
-  /** Picture URL; initials show when missing */
+  /** Picture URL; initials show when missing or the image cannot load */
   src?: string
   /**
    * Opens the player's profile. Player pictures are clickable on operator screens; the avatar then
@@ -29,25 +29,26 @@ function initialsOf(name: string) {
     .join('')
 }
 
-/** The prototypes' .avatar: a player's picture, or their initials on a neutral circle. */
-export function Avatar({
+/** Keyed by source and identity so a changed picture cannot retain a failure or frozen frame. */
+function AvatarFace({
   name,
   initials,
   src,
   size,
   shape,
   tone,
-  onClick,
   className,
-}: AvatarProps) {
+}: Omit<AvatarProps, 'onClick'>) {
   const frozen = useRef<HTMLCanvasElement>(null)
+  const [failed, setFailed] = useState(false)
   const classes = cn(avatarVariants({ size, shape, tone }), className)
-  const face = src ? (
+  return src && !failed ? (
     <span className={cn(classes, 'relative')}>
       <img
         src={src}
         alt={name}
         className="size-full object-cover motion-reduce:invisible"
+        onError={() => setFailed(true)}
         onLoad={(event) => {
           const canvas = frozen.current
           if (!canvas) return
@@ -82,17 +83,22 @@ export function Avatar({
       {initials ?? initialsOf(name)}
     </span>
   )
+}
+
+/** The prototypes' .avatar: a player's picture, or their initials on a neutral circle. */
+export function Avatar({ onClick, ...props }: AvatarProps) {
+  const face = <AvatarFace key={JSON.stringify([props.src, props.name])} {...props} />
   if (!onClick) return face
   return (
     <button
       type="button"
       onClick={onClick}
-      aria-label={`View ${name}'s profile`}
-      title={name}
+      aria-label={`View ${props.name}'s profile`}
+      title={props.name}
       className={cn(
         'group/avatar m-0 flex-none rounded-full border-0 bg-transparent p-0 leading-none',
         '[&>span]:hover:shadow-[0_0_0_2px_var(--accent)]',
-        shape === 'square' && 'rounded-[14px]',
+        props.shape === 'square' && 'rounded-[14px]',
       )}
     >
       {face}

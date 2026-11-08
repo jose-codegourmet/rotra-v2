@@ -41,6 +41,8 @@ Rows: player/ID, requested field, request time, review/application status, and n
 
 Open review against the correct permanent ID, not a name-only match. Repeated requests for the same field need defined conflict behavior; flag them instead of processing stale values blindly.
 
+The Players list/grid, Quick view and full profile resolve the saved profile picture, including character choices, using the global player identity. Missing or failed pictures show initials. Returning to the tab refreshes the directory and player detail so avatar changes from Player Information can appear (#577).
+
 ## A-CONTACT-REVIEW — Approve and apply
 
 Show existing private contact, proposed contact, request source/time, current account identity, and available verification evidence. Required evidence and approval criteria are unresolved; do not invent a government-ID upload requirement.

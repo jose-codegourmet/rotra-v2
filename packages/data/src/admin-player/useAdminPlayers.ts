@@ -15,6 +15,8 @@ export function useAdminPlayers(
   options: { enabled?: boolean } = {},
 ) {
   return useQuery({
+    // Picking a new avatar in Player Information happens in another app/tab.
+    refetchOnWindowFocus: true,
     queryKey: adminPlayerKeys.list(params),
     queryFn: ({ signal }) => listAdminPlayers(params, signal),
     placeholderData: keepPreviousData,

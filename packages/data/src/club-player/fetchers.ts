@@ -41,6 +41,8 @@ export function clubPlayerView(state: MockState, player: ClubPlayer) {
     profile = state.players.find((p) => p.id === player.playerId)
   return {
     ...player,
+    picture: state.playerProfiles.find((p) => p.playerId === player.playerId)?.picture ?? null,
+    pictureName: profile?.fullName ?? null,
     displayName: player.fullName,
     rtrId: profile?.rtrId ?? null,
     suggestion: player.playingLevel,

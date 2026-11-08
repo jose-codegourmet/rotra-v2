@@ -62,7 +62,7 @@ Source: [#244](https://github.com/jose-codegourmet/rotra-v2/issues/244) (F07.3) 
 - A phone or email at claim that already belongs to another account blocks the claim; never merge.
 - An RTR ID or name alone never claims.
 
-Still open: email verification on claim; password policy; contact-change enforcement across direct provider APIs and its approval evidence; RTR location/date/sequence rules and simultaneous allocation; mistaken/duplicate guest links and permanent relink; name-only guest invitation; failed provider application handling. Club username (#381) and platform-owner sign-in are unchanged.
+Still open: email verification on claim; password policy; contact-change enforcement across direct provider APIs and its approval evidence (application itself is real since #575); RTR location/date/sequence rules and simultaneous allocation; mistaken/duplicate guest links and permanent relink; name-only guest invitation; audit lines for a failed or retried contact-change application in real mode (the mock writes them). Club username (#381) and platform-owner sign-in are unchanged.
 
 ## Owner decisions recorded November 6, 2026
 
@@ -118,7 +118,7 @@ the chore tickets wait for their own pickup.
 | RLS disabled on 55 public tables; `anon` can execute `rotra_next_player_sequence()` | #387 | Chore (#243), migration sign-off |
 | Club logo has no storage adapter | #374 (closed) | Done |
 | Player sign-in, registration (claim) and password reset have real-mode routes in the Player app since November 8, 2026 (`/api/auth/sign-in`, `session`, `sign-out`, `password-reset`, `reset-password`; `/api/claim/[token]`). The Queue Master issues registration links from Saved players › Invite (owner decision, November 8, 2026; Queue `/api/club/players/[clubPlayerId]/registration-link`). Admin's Copy registration link is still mock only: `player_claim_links.issuing_club_id` is required and an Admin-issued link has no club. Claims also confirm the email at once (`email_confirm: true`); email verification is still open | #244 | Done for Queue-issued links; Admin issuing and email verification open |
-| Contact-change Approve / Retry application / Check status change the provider login; not connected in real mode (#401) | #196, #244 | Decision |
+| Contact-change Approve / Retry application / Check status change the provider login | #196, #244, #575 | Done in real mode (#575, Jose, November 8, 2026): Approve = review then apply; the Supabase login email is set and read back before the private contact changes; any failure is Application failed. Approval evidence beyond the owner's manual review stays open |
 
 ### Gaps from the match and results wiring (#396)
 

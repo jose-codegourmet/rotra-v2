@@ -31,15 +31,14 @@ link ([D-2026-11-07-01](../decisions.md#d-2026-11-07-01)).
 | Change club price | not implemented | `club/fetchers.ts:306` mock only; `setClubPricing` (`clubs.ts:211`) has no route | Ticket: needed |
 | Club-name requests (list/approve/reject) | not implemented | `club/fetchers.ts:350,376,400` mock only; `reviewClubNameChange` (`clubs.ts:502`) has no route | Ticket: needed |
 | Player directory / detail / games | implemented | `admin-player/fetchers.ts:89,103,136,147` → `real/admin-players.ts` → `db/src/admin/players.ts:13,106` | #25 open (epic) |
-| Player create/edit/archive/restore/remove (Edit profile also sends an email change as an `owner` contact-change request, #564) | not implemented | `admin-player/mutations.ts:37,117,165,220-224` mock only | Ticket: needed (MVP scope: open question 10) |
+| Player edit profile (name + nickname) | implemented (#575) | `admin-player/mutations.ts` → `real/admin-players.ts` → `PATCH api/players/[playerId]` → `updateAdminPlayerProfile` (`db/src/admin/players.ts`); audit `player.profile_updated`; unclaimed photo link mock-only | #575 |
+| Player create/archive/restore/remove (Edit profile also sends an email change as an `owner` contact-change request, #564) | not implemented | `admin-player/mutations.ts` mock only | Ticket: needed (MVP scope: open question 10) |
 | Feature flags | implemented | `real/configuration.ts:77-108` → `api/feature-flags{,/[key]}` → `db/src/admin/configuration.ts:62,95,154` | #402 closed, #26 open |
 | Ranking settings (read/save versions) | implemented | `real/configuration.ts:123-157` → `api/ranking-settings` → `configuration.ts:72,190`; saving does not recalculate | #402 closed |
 | Audit log (club, player, contact request) | implemented | `real/admin-audit.ts:13-21` → `api/audit-events` → `db/src/admin/audit.ts:105`; shown inside detail pages | #401 closed |
 | Audit log (flags, ranking settings) | partially connected | Written by `configuration.ts`; reads exclude them (`real/admin-audit.ts:13`, `AuditReadTarget` `audit.ts:47`) | Ticket: needed |
 | Contact-change reads + decline | implemented | `real/contact-change.ts:167-217` → `api/contact-change-requests/**` → `db/src/player/contact-change.ts:245,332` | #401 closed |
-| Contact-change approve | not implemented (service exists) | `contact-change-request/fetchers.ts:384` throws `NotConnectedError`; `reviewContactChange` (`contact-change.ts:352`) has no route | #244 open; Ticket: needed |
-| Provider apply / retry | not implemented (service exists) | `fetchers.ts:430`; `applyContactChange` (`contact-change.ts:432`) has no route | #244 open; Ticket: needed |
-| Status check | not implemented (service exists) | `fetchers.ts:457`; `reconcileContactChange`/`detectContactDrift` (`:500,:581`) have no route | Ticket: needed |
+| Contact-change approve / apply / retry / status | implemented (#575) | `real/contact-change.ts` → `POST api/contact-change-requests/[requestId]/approve\|retry\|check` → `reviewContactChange`, `applyContactChange`, `reconcileContactChange` (`db/src/player/contact-change.ts`) with the Supabase admin adapter; gap: no audit line for a failed or retried application | #575; approval evidence still open in #244 |
 | Admin-reviewed player reset link | implemented in #491; schema applied | `/requests/password-resets`, protected API, request table + audit, provider recovery token | #491 |
 | Registration link from a player's Admin profile | not implemented | `admin-player/mutations.ts:229` `issueRegistrationLink` mock only (Queue issuance is real since #483, see [player.md](player.md)) | none found; MVP scope: hub open question 9 |
 | Club accent persistence | not implemented / deferred candidate | `real/admin.ts:88-89` hardcodes `accent: false`; no `accent` in `prisma/schema` | #395 open (blocked) |
@@ -51,7 +50,7 @@ a claim that each gap has a dedicated implementation ticket.
 
 | Gap | Decision / implementation state | Ticket coverage | MVP relevance |
 | --- | --- | --- | --- |
-| Contact-change approve, retry, status | Partially connected; decline and reads exist. Audit: services exist, no routes | [#244](https://github.com/jose-codegourmet/rotra-v2/issues/244) and [Admin requests epic #25](https://github.com/jose-codegourmet/rotra-v2/issues/25); audit found **no dedicated implementation ticket** | MVP |
+| Contact-change approve, retry, status | Implemented in real mode (#575); approval evidence and audit lines for failed/retried application open | [#244](https://github.com/jose-codegourmet/rotra-v2/issues/244) and [Admin requests epic #25](https://github.com/jose-codegourmet/rotra-v2/issues/25); audit found **no dedicated implementation ticket** | MVP |
 | Admin-reviewed player reset link | Owner-approved #491; implemented and locally verified; shared schema applied | #491; D-2026-11-07-01 | MVP |
 | Ranking calculations from saved settings | Settings persist; calculations incomplete (audit: no approved algorithm, recalculation has no caller) | [#247](https://github.com/jose-codegourmet/rotra-v2/issues/247) and [Admin configuration epic #26](https://github.com/jose-codegourmet/rotra-v2/issues/26) | MVP scope under ranking decision |
 | Club accent persistence | Open product/data-model decision; not completed | [#395](https://github.com/jose-codegourmet/rotra-v2/issues/395) | Lower priority / defer candidate |
@@ -76,7 +75,7 @@ duplicate issues merely because a related epic is open.
 
 ## Blocking open decisions
 
-- #244 contact-change enforcement and failed provider application handling; #395 accent data model; #377 license start date/reference; #380 founding locations.
+- #244 contact-change approval evidence and audit lines for failed or retried application (application itself is real, #575); #395 accent data model; #377 license start date/reference; #380 founding locations.
 - [Database open decisions](../../database_design/product/open-decisions.md) · [business open decisions](../../business_logic/product/open-decisions.md) · [screen open decisions](../../screens/product/open-decisions.md).
 - Hub open questions 9, 10, 13, 14.
 

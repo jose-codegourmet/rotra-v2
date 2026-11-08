@@ -13,11 +13,14 @@ import { delay } from '../mock/latency'
 import { type MockState, mockStore, readMockState } from '../mock/store'
 import {
   ADMIN_REQUEST_OPEN_ERROR,
+  realApproveContactChange,
+  realCheckContactApplication,
   realDeclineContactChange,
   realGetContactRequest,
   realGetContactRequestCounts,
   realGetMyContactChangeRequest,
   realListContactRequests,
+  realRetryContactApplication,
   realSubmitAdminContactChange,
   realSubmitContactChangeRequest,
 } from '../real/contact-change'
@@ -451,8 +454,7 @@ function scheduleApplication(requestId: string) {
  * and the player's contact changes when the provider accepts it ~1.8 s later.
  */
 export async function approveContactChange(requestId: string): Promise<PlayerContactChangeRequest> {
-  // Approval starts the provider application, which waits on #196/#244 (player login mapping).
-  if (isRealDataMode()) throw new NotConnectedError()
+  if (isRealDataMode()) return realApproveContactChange(requestId)
   const approved = await adminMutation(900, (draft) => {
     const request = findRequest(draft, requestId)
     if (request.status !== 'pending' || isBlocked(request.status, checksIn(draft, request)))
@@ -497,8 +499,7 @@ export async function declineContactChange(requestId: string): Promise<PlayerCon
 export async function retryContactApplication(
   requestId: string,
 ): Promise<PlayerContactChangeRequest> {
-  // Retrying applies at the sign-in provider: not connected until #196/#244 settle.
-  if (isRealDataMode()) throw new NotConnectedError()
+  if (isRealDataMode()) return realRetryContactApplication(requestId)
   const retried = await adminMutation(400, (draft) => {
     const request = findRequest(draft, requestId)
     if (request.status !== 'failed') throw new MockError('conflict', CONTACT_REVIEW_STALE_ERROR)
@@ -524,9 +525,8 @@ export async function retryContactApplication(
 export async function checkContactApplication(
   requestId: string,
 ): Promise<AdminContactRequestDetail | null> {
-  // Check status reads the provider back: not connected until #196/#244 settle.
-  if (isRealDataMode()) throw new NotConnectedError()
   if (isAdminOffline()) throw new MockError('offline', CONTACT_CHECK_OFFLINE_ERROR)
+  if (isRealDataMode()) return realCheckContactApplication(requestId)
   await delay(CHECK_MS)
   if (isAdminOffline()) throw new MockError('offline', CONTACT_CHECK_OFFLINE_ERROR)
   settleApplication(requestId, mockStore.getGeneration())

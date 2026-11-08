@@ -348,8 +348,7 @@ not built, so without a player session the own-account routes are not reachable 
 `GET /api/contact-change-requests[/[requestId]]`, declines through `POST …/[requestId]/decline`, and
 reads and submits the player's own request through Player's `GET`/`POST /api/account/contact-change`.
 Hooks, query keys and DTOs are unchanged; list filters and counts reuse the mock rules over the loaded
-rows. Approve, Retry application and Check status stay not connected: they change the provider login,
-which waits on #196/#244. See [services.md](database_design/product/services.md#admin-audit-and-contact-change-reads-401).
+rows. Approve, Retry application and Check status run in real mode since #575 (`POST …/[requestId]/approve|retry|check`; they set the Supabase login email, read it back, then update the private contact). Admin name/nickname save uses `PATCH /api/players/[playerId]`, and Player's private `GET /api/me/profile` reads the "Changed by ROTRA Admin" note. See [services.md](database_design/product/services.md#admin-audit-and-contact-change-reads-401).
 
 **Session lifecycle (2026-11-02).** In real mode the rest of a Queue Session's life also reads and
 writes saved data through `packages/data/src/real/session-live.ts`: Start session

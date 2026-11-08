@@ -230,6 +230,69 @@ export async function realDeclineContactChange(
   return declined
 }
 
+/**
+ * Approve, Retry application and Check status share one shape: the route returns the request as
+ * it now stands. A conflict (decided elsewhere, contacts changed, value taken) is a stale review.
+ */
+async function sendApplication(requestId: string, action: 'approve' | 'retry' | 'check') {
+  try {
+    const { request } = await realRequest<{ request: WireAdminRequest }>(
+      `/api/contact-change-requests/${encodeURIComponent(requestId)}/${action}`,
+      { method: 'POST' },
+    )
+    return detailOf(request)
+  } catch (error) {
+    if (error instanceof RealRequestError && error.status === 409)
+      throw new MockError('conflict', REVIEW_STALE_ERROR)
+    throw error
+  }
+}
+
+const gone = (error: unknown) => error instanceof RealRequestError && error.status === 404
+
+/**
+ * Approve change: reviewed and applied at the sign-in provider in one request. A saved approval
+ * comes back applied, applying or failed (Retry application), never as an error.
+ */
+export async function realApproveContactChange(
+  requestId: string,
+): Promise<PlayerContactChangeRequest> {
+  let approved: AdminContactRequestDetail
+  try {
+    approved = await sendApplication(requestId, 'approve')
+  } catch (error) {
+    if (gone(error)) throw new MockError('permission', GONE_ERROR)
+    throw error
+  }
+  if (approved.status === 'pending' || approved.status === 'rejected')
+    throw new MockError('conflict', REVIEW_STALE_ERROR)
+  return approved
+}
+
+/** Retry application: the same request and provider operation, never a new one. */
+export async function realRetryContactApplication(
+  requestId: string,
+): Promise<PlayerContactChangeRequest> {
+  try {
+    return await sendApplication(requestId, 'retry')
+  } catch (error) {
+    if (gone(error)) throw new MockError('permission', GONE_ERROR)
+    throw error
+  }
+}
+
+/** Check status: the provider is read back and the request returned as it stands; null = gone. */
+export async function realCheckContactApplication(
+  requestId: string,
+): Promise<AdminContactRequestDetail | null> {
+  try {
+    return await sendApplication(requestId, 'check')
+  } catch (error) {
+    if (gone(error)) return null
+    throw error
+  }
+}
+
 /** `adminRequestDto`: only the fields the Edit profile flow needs after sending. */
 type WireSubmitted = { id: string; rawStatus: ContactChangeStatus }
 

@@ -6,6 +6,8 @@ import { requireRevision } from '../service/authorize'
 import { ServiceError } from '../service/errors'
 import { toDecimalString } from '../service/serialize'
 
+type Db = Prisma.TransactionClient | typeof prisma
+
 const SOCIAL: SocialProvider[] = ['facebook', 'instagram', 'youtube', 'linkedin']
 
 /** Public profile allowlist (`PlayerProfile`). No contacts, account, claim or privacy fields. */
@@ -120,8 +122,44 @@ export async function readMyAccount(context: PlayerContext) {
   }
 }
 
+/**
+ * "Changed by ROTRA Admin: <reason>" on the player's own profile: the reason of the latest Admin
+ * profile edit made while the profile was claimed (the mock notes only registered players). Never
+ * part of the public profile.
+ */
+async function adminChangeNoteOf(db: Db, playerId: string) {
+  const account = await db.playerAccount.findUnique({
+    where: { playerId },
+    select: { claimedAt: true, player: { select: { profileState: true } } },
+  })
+  if (!account || account.player.profileState !== 'claimed') return null
+  const event = await db.adminAuditEvent.findFirst({
+    where: {
+      targetType: 'player',
+      targetId: playerId,
+      action: 'player.profile_updated',
+      occurredAt: { gte: account.claimedAt },
+    },
+    orderBy: [{ occurredAt: 'desc' }, { id: 'desc' }],
+    select: { metadata: true },
+  })
+  const metadata = event?.metadata
+  const reason =
+    metadata && typeof metadata === 'object' && !Array.isArray(metadata)
+      ? (metadata as Record<string, unknown>).reason
+      : null
+  return typeof reason === 'string' && reason ? reason : null
+}
+
+/** The public profile plus the owner-only Admin change note (P-EDIT-PROFILE). Private, no-store. */
+async function ownProfile(db: Db, profile: ReturnType<typeof publicProfileDto>) {
+  if (!profile) return profile
+  const note = await adminChangeNoteOf(db, profile.playerId)
+  return note ? { ...profile, adminChangeNote: note } : profile
+}
+
 export async function readMyProfile(context: PlayerContext) {
-  return readPublicProfile(context.playerId)
+  return ownProfile(prisma, await readPublicProfile(context.playerId))
 }
 
 /**
@@ -191,7 +229,7 @@ export async function updateMyProfile(
       where: { id: player.id },
       select: PUBLIC_PLAYER_SELECT,
     })
-    return publicProfileDto(row)
+    return ownProfile(tx, publicProfileDto(row))
   })
 }
 

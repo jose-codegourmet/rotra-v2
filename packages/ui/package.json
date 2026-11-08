@@ -172,6 +172,8 @@
     "./sheet": "./src/components/sheet/Sheet.tsx",
     "./sign-out-sheet": "./src/components/sign-out-sheet/SignOutSheet.tsx",
     "./skill-distribution-bar": "./src/components/skill-distribution-bar/SkillDistributionBar.tsx",
+    "./skill-mix": "./src/components/skill-distribution-bar/skillMix.ts",
+    "./skill-mix-segment": "./src/components/skill-distribution-bar/SkillMixSegment.tsx",
     "./skeleton": "./src/components/skeleton/Skeleton.tsx",
     "./skill-ladder": "./src/components/skill-ladder/SkillLadder.tsx",
     "./slot-meter": "./src/components/slot-meter/SlotMeter.tsx",

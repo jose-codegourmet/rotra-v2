@@ -1,6 +1,6 @@
 # Roster skill mix is one compact bar with hover counts, in non-green colors
 
-Status: TICKETED — #498
+Status: IN PROGRESS — #498
 Date: 2026-11-08
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Session preparation › Roster and levels tab (the same Skill mix also shows on the public session preview)

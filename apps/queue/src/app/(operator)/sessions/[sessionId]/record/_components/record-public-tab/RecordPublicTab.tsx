@@ -67,7 +67,7 @@ export function RecordPublicTab({ sessionId, record }: RecordPublicTabProps) {
               }
             : null
         }
-        participantCount={p.participants.length}
+        participantCount={p.participantCount ?? p.participants.length}
         onOpenPublicPage={() => router.push(`/sessions/${sessionId}/public-page`)}
         onPublish={() => setPublishOpen(true)}
       >

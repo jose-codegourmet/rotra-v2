@@ -1,6 +1,8 @@
 'use client'
 
 import { isPermissionRefusal } from '@rotra/data/mock/errors'
+import { playerLoginUrl } from '@rotra/data/public-session/context'
+import { usePlayerSessionAccess } from '@rotra/data/public-session/player-access'
 import type { MyJoinRequest, PublicSessionPage } from '@rotra/data/public-session/types'
 import { useMyJoinRequest } from '@rotra/data/public-session/useMyJoinRequest'
 import { usePublicSession } from '@rotra/data/public-session/usePublicSession'
@@ -14,9 +16,10 @@ import {
 } from '@rotra/ui/public-results-section'
 import { PublicSessionDetails } from '@rotra/ui/public-session-details'
 import { PublicSessionHero } from '@rotra/ui/public-session-hero'
+import { PublicSessionQueue } from '@rotra/ui/public-session-queue'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { Tabs, TabsContent } from '@rotra/ui/tabs'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import { JoinRequestSheet } from '@/app/(public)/s/[slug]/_components/join-request-sheet/JoinRequestSheet'
 import { useAppSelector } from '@/store/hooks'
@@ -123,7 +126,62 @@ export function PublicSession({ slug, viewer, openJoin = false }: PublicSessionP
   const dev = useAppSelector(selectDev)
   const page = usePublicSession(slug, { visitor: viewer === 'visitor' })
   const mine = useMyJoinRequest(slug)
+  const playerAccess = usePlayerSessionAccess(slug, viewer === 'visitor')
+  // A failed revalidation must never keep privileged roster data visible from the cache.
+  const access =
+    viewer === 'visitor' &&
+    playerAccess.isSuccess &&
+    playerAccess.fetchStatus !== 'paused' &&
+    !dev.offline
+      ? playerAccess.data
+      : null
   const [tab, setTab] = useState('details')
+  const [loginHref, setLoginHref] = useState<string>()
+  useEffect(() => {
+    const current = new URL(location.href)
+    let active = current.searchParams.get('tab') === 'participants' ? 'participants' : 'details'
+    try {
+      const saved = JSON.parse(sessionStorage.getItem(`rotra-public-nav:${slug}`) ?? 'null')
+      if (
+        saved &&
+        typeof saved.at === 'number' &&
+        Date.now() >= saved.at &&
+        Date.now() - saved.at < 30 * 60_000
+      ) {
+        if (!current.searchParams.has('tab') && saved.tab === 'participants')
+          active = 'participants'
+        if (!current.hash && typeof saved.hash === 'string') current.hash = saved.hash
+      }
+    } catch {
+      /* optional UI memory */
+    }
+    try {
+      sessionStorage.setItem(
+        `rotra-public-nav:${slug}`,
+        JSON.stringify({ tab: active, hash: current.hash, at: Date.now() }),
+      )
+    } catch {
+      /* optional UI memory */
+    }
+    setTab(active)
+    history.replaceState(null, '', current)
+    setLoginHref(playerLoginUrl(current.href))
+  }, [slug])
+  const changeTab = (value: string) => {
+    setTab(value)
+    const current = new URL(location.href)
+    current.searchParams.set('tab', value)
+    history.replaceState(null, '', current)
+    setLoginHref(playerLoginUrl(current.href))
+    try {
+      sessionStorage.setItem(
+        `rotra-public-nav:${slug}`,
+        JSON.stringify({ tab: value, hash: current.hash, at: Date.now() }),
+      )
+    } catch {
+      /* optional UI memory */
+    }
+  }
   const [joinOpen, setJoinOpen] = useState(openJoin && viewer === 'visitor')
 
   const p = page.data
@@ -165,7 +223,7 @@ export function PublicSession({ slug, viewer, openJoin = false }: PublicSessionP
   const cancelWhy = (p.cancelReason ?? '').replace(/[.\s]+$/, '')
   // Sending a request needs internet; the guest's own connection is the DevMenu toggle here.
   const card = joinCardProps(p, mine.data, () => setJoinOpen(true), dev.offline)
-  const participants = p.participants.map((x, i) => ({
+  const participants = (access?.fullRoster ? access.participants : p.participants).map((x, i) => ({
     id: String(i),
     ...x,
   }))
@@ -190,10 +248,13 @@ export function PublicSession({ slug, viewer, openJoin = false }: PublicSessionP
       <Tabs
         aria-label="Session page"
         value={tab}
-        onChange={setTab}
+        onChange={changeTab}
         items={[
           { value: 'details', label: 'Details' },
-          { value: 'participants', label: `Participants · ${p.participants.length}` },
+          {
+            value: 'participants',
+            label: `Participants · ${p.participantCount ?? p.participants.length}`,
+          },
         ]}
       >
         <TabsContent value="details">
@@ -210,10 +271,21 @@ export function PublicSession({ slug, viewer, openJoin = false }: PublicSessionP
             lastUpdatedLabel={time(p.lastSyncedAt)}
             hasPendingChanges={p.hasPendingChanges}
           />
+          {viewer === 'visitor' ? (
+            <PublicSessionQueue
+              access={access ?? null}
+              loginHref={loginHref}
+              checking={playerAccess.isPending}
+              failed={playerAccess.isError}
+              onRetry={() => void playerAccess.refetch()}
+            />
+          ) : null}
         </TabsContent>
         <TabsContent value="participants">
           <PublicParticipants
             participants={participants}
+            participantCount={p.participantCount ?? p.participants.length}
+            fullRoster={access?.fullRoster === true}
             waitlist={p.waitlist.map((entry, i) => ({ ...entry, id: String(i) }))}
             openSlots={p.openSlots}
             finished={p.status === 'completed' || p.status === 'invalid'}

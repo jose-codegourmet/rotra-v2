@@ -23,8 +23,11 @@ export type PublicParticipantsProps = {
   waitlist?: PublicWaitlistEntry[]
   /** Unfilled slots from the public read, shown as placeholders until finished. */
   openSlots?: number
-  /** Finished sessions show the whole roster with no placeholders or join prompt. */
+  /** Finished sessions show no placeholders or Request to join button. */
   finished?: boolean
+  /** Set only after server-verified membership; finished alone never grants full roster. */
+  fullRoster?: boolean
+  participantCount?: number
   acceptJoinRequests?: boolean
   /** Opens the Request to join sheet; a request never grants a slot or reveals more players. */
   onRequestToJoin?: () => void
@@ -43,6 +46,8 @@ export function PublicParticipants({
   waitlist = [],
   openSlots = 0,
   finished = false,
+  fullRoster = false,
+  participantCount = participants.length,
   acceptJoinRequests = true,
   onRequestToJoin,
   disabled = false,
@@ -50,17 +55,19 @@ export function PublicParticipants({
 }: PublicParticipantsProps) {
   // Never mount roster entries past the wider cap. CSS removes entries 10–12 on phones from
   // both layout and the accessibility tree, with no viewport hook or hydration shift.
-  const visibleParticipants = finished ? participants : participants.slice(0, 12)
+  const visibleParticipants = fullRoster ? participants : participants.slice(0, 12)
   const placeholderCount = finished
     ? 0
-    : Math.min(Math.max(0, Math.trunc(openSlots)), Math.max(0, 12 - visibleParticipants.length))
-  const showJoinPrompt = !finished && participants.length > 9
+    : fullRoster
+      ? Math.max(0, Math.trunc(openSlots))
+      : Math.min(Math.max(0, Math.trunc(openSlots)), Math.max(0, 12 - visibleParticipants.length))
+  const showJoinPrompt = !fullRoster && participantCount > 9
 
   return (
     <section aria-label="Participants" className={cn('flex min-w-0 flex-col gap-3', className)}>
       {participants.length || placeholderCount ? (
         <div className="relative">
-          <ul className={cn(gridClass, !finished && 'max-[640px]:[&>li:nth-child(n+10)]:hidden')}>
+          <ul className={cn(gridClass, !fullRoster && 'max-[640px]:[&>li:nth-child(n+10)]:hidden')}>
             {visibleParticipants.map((p) => (
               <li key={p.id} className="min-w-0">
                 <ParticipantCard
@@ -84,11 +91,16 @@ export function PublicParticipants({
             <div
               className={cn(
                 'absolute inset-x-0 bottom-0 flex h-[170px] flex-col items-center justify-end gap-2 bg-[linear-gradient(to_bottom,transparent,var(--bg)_70%)] pb-1.5 text-fg',
-                participants.length <= 12 && 'min-[641px]:hidden',
+                participantCount <= 12 && 'min-[641px]:hidden',
               )}
             >
-              <span className="text-[13px] text-fg2">{participants.length} players are in</span>
-              {acceptJoinRequests ? (
+              <span className="text-[13px] text-fg2">{participantCount} players are in</span>
+              {!finished && acceptJoinRequests ? (
+                <span className="text-center text-xs text-fg2">
+                  Full roster is for confirmed participants.
+                </span>
+              ) : null}
+              {!finished && acceptJoinRequests ? (
                 <Button
                   variant="primary"
                   onClick={onRequestToJoin}
@@ -99,7 +111,9 @@ export function PublicParticipants({
                   Join to see the full roster
                 </Button>
               ) : (
-                <span className="text-center font-bold">Join to see the full roster</span>
+                <span className="text-center font-bold">
+                  Full roster is for confirmed participants.
+                </span>
               )}
             </div>
           ) : null}

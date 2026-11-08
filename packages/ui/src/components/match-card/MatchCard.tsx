@@ -84,6 +84,8 @@ export type MatchCardProps = {
   onRemove?: () => void
   /** Renders the card as a selectable Auto Queue draft */
   draft?: MatchCardDraft
+  /** Public queue: static faces, no drag handle, actions or operator origin metadata. */
+  readOnly?: boolean
   className?: string
 }
 
@@ -207,6 +209,7 @@ export function MatchCard({
   onRemove,
   draft,
   className,
+  readOnly = false,
 }: MatchCardProps) {
   const ready = status.kind === 'ready'
   const startable = ready || (canOpenCourt && status.kind === 'waiting-for-courts')
@@ -282,41 +285,52 @@ export function MatchCard({
       <div className="flex min-w-0 items-center gap-1.5 touch:-mt-1.5 touch:-mr-1.5">
         <span className="font-mono font-bold">#{position}</span>
         <Chip tone="solid">{FORMAT_LABEL[format]}</Chip>
-        {manualProtected ? (
-          <span className="inline-flex text-fg2" title="Manual · protected from regeneration">
-            <Icon name="lock" aria-label="Manual · protected from regeneration" role="img" />
-          </span>
-        ) : (
-          <span className="text-[13px] text-fg2">
-            {origin === 'suggested' ? 'Suggested' : origin === 'auto' ? 'Auto' : 'Manual'}
-          </span>
-        )}
+        {!readOnly &&
+          (manualProtected ? (
+            <span className="inline-flex text-fg2" title="Manual · protected from regeneration">
+              <Icon name="lock" aria-label="Manual · protected from regeneration" role="img" />
+            </span>
+          ) : (
+            <span className="text-[13px] text-fg2">
+              {origin === 'suggested' ? 'Suggested' : origin === 'auto' ? 'Auto' : 'Manual'}
+            </span>
+          ))}
         <span className="flex-1" />
         {flow ? (
           <span aria-hidden className="font-extrabold text-fg3">
             {FLOW_ARROW[flow]}
           </span>
         ) : null}
-        <button
-          type="button"
-          aria-label={`Reorder match ${matchNo}: drag, or use the arrow keys`}
-          title="Drag to reorder"
-          {...handleRest}
-          className={cn(
-            'cursor-grab touch-none rounded-sm border-0 bg-transparent px-1.5 py-1 text-lg leading-none text-fg2',
-            'hover:bg-elev hover:text-fg active:cursor-grabbing',
-            'touch:min-h-11 touch:min-w-11 touch:p-0 touch:text-[22px]',
-            handleClassName,
-          )}
-        >
-          ⠿
-        </button>
+        {!readOnly ? (
+          <button
+            type="button"
+            aria-label={`Reorder match ${matchNo}: drag, or use the arrow keys`}
+            title="Drag to reorder"
+            {...handleRest}
+            className={cn(
+              'cursor-grab touch-none rounded-sm border-0 bg-transparent px-1.5 py-1 text-lg leading-none text-fg2',
+              'hover:bg-elev hover:text-fg active:cursor-grabbing',
+              'touch:min-h-11 touch:min-w-11 touch:p-0 touch:text-[22px]',
+              handleClassName,
+            )}
+          >
+            ⠿
+          </button>
+        ) : null}
       </div>
-      <Faces players={teamA} team="A" swappable={swappable} onSelectPlayer={onSelectPlayer} />
+      {readOnly ? (
+        <DraftFaces players={teamA} />
+      ) : (
+        <Faces players={teamA} team="A" swappable={swappable} onSelectPlayer={onSelectPlayer} />
+      )}
       <div className="text-center text-[10px] font-extrabold tracking-[1px] text-fg3">VS</div>
-      <Faces players={teamB} team="B" swappable={swappable} onSelectPlayer={onSelectPlayer} />
+      {readOnly ? (
+        <DraftFaces players={teamB} />
+      ) : (
+        <Faces players={teamB} team="B" swappable={swappable} onSelectPlayer={onSelectPlayer} />
+      )}
       {statusLine}
-      {onStart || onEdit || onRemove ? (
+      {!readOnly && (onStart || onEdit || onRemove) ? (
         <div className="flex flex-nowrap items-center gap-1 touch:gap-1.5">
           {onStart ? (
             <Button

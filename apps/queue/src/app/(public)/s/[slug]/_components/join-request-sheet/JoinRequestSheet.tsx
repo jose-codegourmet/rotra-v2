@@ -1,11 +1,15 @@
 'use client'
 
+import { playerOrigin, queueSessionUrl } from '@rotra/data/public-session/context'
 import { useSendJoinRequest } from '@rotra/data/public-session/useSendJoinRequest'
 import { JoinRequestForm } from '@rotra/ui/forms/join-request-form'
-import type { JoinRequestFormValues } from '@rotra/ui/forms/join-request-form/schema'
+import type {
+  JoinRequestFormInput,
+  JoinRequestFormValues,
+} from '@rotra/ui/forms/join-request-form/schema'
 import { Sheet } from '@rotra/ui/sheet'
 import { toast } from '@rotra/ui/toaster'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 export type JoinRequestSheetProps = {
   slug: string
@@ -22,12 +26,46 @@ export type JoinRequestSheetProps = {
 /** ROTRA Player login that returns to this session's Request to join (/login?next=...&join=1). */
 function playerLoginHref() {
   if (typeof location === 'undefined') return undefined
-  const local = location.hostname === 'localhost'
-  const back = new URL(location.pathname, location.origin)
+  const origin = playerOrigin(location.origin)
+  const back = new URL(location.href)
   back.searchParams.set('join', '1')
-  const login = new URL('/login', local ? 'http://localhost:9001' : 'https://player.rotra.club')
-  login.searchParams.set('next', back.href)
+  const destination = queueSessionUrl(back.href)
+  if (!origin || !destination) return undefined
+  const login = new URL('/login', origin)
+  login.searchParams.set('next', destination)
   return login.href
+}
+
+type Draft = { values: JoinRequestFormInput; requestId: string; at: number }
+const draftKey = (slug: string) => `rotra-session-request:${slug}`
+function readDraft(slug: string): Draft | null {
+  try {
+    const saved = JSON.parse(sessionStorage.getItem(draftKey(slug)) ?? 'null')
+    if (
+      !saved ||
+      typeof saved.at !== 'number' ||
+      Date.now() < saved.at ||
+      Date.now() - saved.at > 30 * 60_000 ||
+      typeof saved.requestId !== 'string' ||
+      !saved.values ||
+      !['name', 'nickname', 'phone', 'statedBand'].every(
+        (key) => typeof saved.values[key] === 'string',
+      )
+    ) {
+      clearDraft(slug)
+      return null
+    }
+    return saved
+  } catch {
+    return null
+  }
+}
+function clearDraft(slug: string) {
+  try {
+    sessionStorage.removeItem(draftKey(slug))
+  } catch {
+    /* optional UI memory */
+  }
 }
 
 const errorMessage = (error: unknown) =>
@@ -52,14 +90,30 @@ export function JoinRequestSheet({
   const [opened, setOpened] = useState(0)
   // One request ID per open sheet: a retry after a lost reply sends the same request.
   const [requestId, setRequestId] = useState(() => crypto.randomUUID())
+  const [defaultValues, setDefaultValues] = useState<Partial<JoinRequestFormInput>>()
+  const saveDraft = useCallback(
+    (values: JoinRequestFormInput) => {
+      try {
+        sessionStorage.setItem(
+          draftKey(slug),
+          JSON.stringify({ values, requestId, at: Date.now() }),
+        )
+      } catch {
+        /* Drafts are best-effort local UI state, never authorization. */
+      }
+    },
+    [slug, requestId],
+  )
 
   useEffect(() => {
     if (open) {
+      const saved = readDraft(slug)
+      setDefaultValues(saved?.values)
       setOpened((n) => n + 1)
-      setRequestId(crypto.randomUUID())
+      setRequestId(saved?.requestId ?? crypto.randomUUID())
       setServerError(undefined)
     }
-  }, [open])
+  }, [open, slug])
 
   const onSubmit = (values: JoinRequestFormValues) => {
     setServerError(undefined)
@@ -73,6 +127,7 @@ export function JoinRequestSheet({
       },
       {
         onSuccess: () => {
+          clearDraft(slug)
           onOpenChange(false)
           toast('Request sent')
         },
@@ -85,7 +140,10 @@ export function JoinRequestSheet({
     <Sheet
       open={open}
       onOpenChange={(next) => {
-        if (!send.isPending) onOpenChange(next)
+        if (!send.isPending) {
+          if (!next) clearDraft(slug)
+          onOpenChange(next)
+        }
       }}
       title="Request to join"
       dismissible={!send.isPending}
@@ -96,7 +154,12 @@ export function JoinRequestSheet({
         onSubmit={onSubmit}
         isPending={send.isPending}
         serverError={serverError}
-        onCancel={() => onOpenChange(false)}
+        onCancel={() => {
+          clearDraft(slug)
+          onOpenChange(false)
+        }}
+        defaultValues={defaultValues}
+        onValuesChange={saveDraft}
         autoFocus
         playerLoginHref={showPlayerLogin && open ? playerLoginHref() : undefined}
         returned={returned}

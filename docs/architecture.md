@@ -463,3 +463,33 @@ editing one changes nothing until it is pasted. See [email-templates.md](email-t
 | Hosting | Settled: one Vercel project with [services](https://vercel.com/docs/services) (`vercel.json`), routed by host: `queue.rotra.club`, `player.rotra.club`, `admin.rotra.club`. Automatic Git deployments are disabled with `git.deploymentEnabled: false`. Deploy manually from `main` through `.github/workflows/deploy.yml`; the GitHub `production` environment restricts deployments to `main` and holds the deployment credentials. See [deployment setup](../README.md#production-deployments). Storybook is not deployed. What the bare domain shows is open |
 | App ports | Settled: 9000 / 9001 / 9002 (F01.1) |
 | Test runner for money and ranking math | Vitest (F05.1); also allowed for phone parsing and queue rules |
+
+
+### Player access to a public Queue session (#569)
+
+The browser on Queue calls `GET /api/public-sessions/[slug]/access` **on the Player origin** with
+`credentials: include`. Player's host-only, audience-specific Supabase cookie stays on Player; no
+provider token is copied, no shared parent-domain cookie is assumed and Queue club auth is untouched.
+The endpoint uses `handleAccountRequest('player')`, loads the enabled Player account, resolves actual
+roster linkage server-side, and returns a narrow allowlisted waiting-queue / masked-participant DTO.
+All names remain masked; full roster means uncapped tiles. Only confirmed roster membership unlocks
+that cap; any signed-in Player can read waiting lineups. Read-only; no admission mutations.
+
+Supported pairs are `https://queue.rotra.club` → `https://player.rotra.club` and development
+`http://localhost:9000` → `http://localhost:9001`. These are same-site credentialed requests, not a
+third-party-cookie dependency. The handler requires the exact Queue Origin paired with its own Player
+origin; missing/null/unknown/mismatched origins fail closed. No wildcard, reflected arbitrary origin,
+credential proxy or generic CORS access to other Player APIs. Responses (including denial) are private,
+no-store and vary by Origin/Cookie. Preview domains are unsupported until explicitly configured.
+
+The Player-access query has zero cache retention, revalidates on mount/focus and every 15 seconds,
+and renders no privileged projection after a failed check or signed-out response. A sign-out in another
+Player tab is observed on the next check; it cannot revoke information already seen. Mock mode uses
+only its explicit Player mock marker and server fixture snapshot, never the real authorization path;
+separate app in-memory mock edits are not a durable shared backend.
+
+Temporary context is UI data only: a strict allowlisted Queue public-session return URL with `tab` and
+`join`, and an expiring same-tab pending return for invitation registration/claim. Queue-local request
+fields, retry ID and navigation state live in sessionStorage for 30 minutes. Auth credentials/tokens
+never enter URLs or this context. The existing Queue httpOnly visitor receipt remains on Queue and is
+not replaced by identity or transferred between apps.

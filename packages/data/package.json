@@ -359,7 +359,9 @@
     "./password-reset/fetchers": "./src/password-reset/fetchers.ts",
     "./password-reset/usePasswordResetRequests": "./src/password-reset/usePasswordResetRequests.ts",
     "./player/photo": "./src/player/photo.ts",
-    "./player/heif": "./src/player/heif.ts"
+    "./player/heif": "./src/player/heif.ts",
+    "./public-session/player-access": "./src/public-session/playerAccess.ts",
+    "./public-session/context": "./src/public-session/context.ts"
   },
   "scripts": {
     "lint": "biome check .",

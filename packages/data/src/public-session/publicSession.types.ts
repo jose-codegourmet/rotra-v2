@@ -1,3 +1,5 @@
+import type { MatchFormat } from '../match/match.types'
+import type { PlayingLevel } from '../player/player.types'
 import type { SessionMode } from '../queue-session/queueSession.types'
 import type { SessionJoinRequest } from '../session-roster/sessionRoster.types'
 
@@ -59,8 +61,10 @@ export type PublicSessionPage = {
   mode: SessionMode
   minimum: number
   notes?: string | null
+  /** Total before the anonymous 12-tile server cap. */
+  participantCount?: number
   participants: PublicSessionParticipant[]
-  /** Aggregate skill-group counts over exactly `participants` (never the waitlist), #474 */
+  /** Aggregate skill-group counts over the full confirmed roster (never the waitlist), #474 */
   skillMix: PublicSkillMix
   /** Public-safe waitlisted players in waitlist order. */
   waitlist: PublicSessionParticipant[]
@@ -89,4 +93,17 @@ export type MyJoinRequest = {
   status: SessionJoinRequest['status']
   /** 1-based waitlist position once confirmed onto the waitlist; null otherwise */
   waitlistPosition: number | null
+}
+
+/** Narrow Player-hosted projection; never a club session or operator data. */
+export type PlayerSessionAccess = {
+  playerId: string
+  fullRoster: boolean
+  participants: PublicSessionParticipant[]
+  queue: {
+    matchNo: number
+    format: MatchFormat
+    teamA: { name: string; level: PlayingLevel | null }[]
+    teamB: { name: string; level: PlayingLevel | null }[]
+  }[]
 }

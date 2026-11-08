@@ -15,6 +15,7 @@ import { submitJoinRequest } from '../session-roster/mutations'
 import { maskPublicName, publicLevel, publicSkillMix } from './publicSession.rules'
 import type {
   MyJoinRequest,
+  PlayerSessionAccess,
   PublicSessionPage,
   PublicSessionResults,
   SendJoinRequestInput,
@@ -94,6 +95,7 @@ function project(
   state: MockState,
   slug: string,
   sync: { hasPendingChanges: boolean; lastSyncedAt: number },
+  fullRoster = false,
 ): PublicSessionPage {
   const s = sessionBySlug(state, slug)
   const club = state.clubs.find((c) => c.id === s.clubId)
@@ -118,7 +120,8 @@ function project(
     mode: s.sessionMode,
     minimum: s.minimumGames,
     notes: s.notes || null,
-    participants: roster.map((r) => {
+    participantCount: roster.length,
+    participants: (fullRoster ? roster : roster.slice(0, 12)).map((r) => {
       const p = clubPlayer(r.clubPlayerId)
       const hasRotraProfile = p?.identity === 'registered' || p?.identity === 'unclaimed'
       return {
@@ -214,5 +217,37 @@ export async function getMyJoinRequest(slug: string): Promise<MyJoinRequest | nu
     name: r.name,
     status: r.status,
     waitlistPosition: index >= 0 ? index + 1 : null,
+  }
+}
+
+/** Mock server projection, identity supplied only by the Player-hosted mock session route. */
+export function mockPlayerSessionAccess(slug: string, playerId: string): PlayerSessionAccess {
+  const { state, ...sync } = serverState()
+  const session = sessionBySlug(state, slug)
+  const roster = state.roster.filter((entry) => entry.sessionId === session.id)
+  const linked = new Set(
+    state.clubPlayers.filter((entry) => entry.playerId === playerId).map((entry) => entry.id),
+  )
+  const fullRoster = roster.some((entry) => linked.has(entry.clubPlayerId))
+  const page = project(state, slug, sync, fullRoster)
+  const byId = new Map(roster.map((entry) => [entry.id, entry]))
+  const team = (ids: string[]) =>
+    ids.map((id) => {
+      const entry = byId.get(id)
+      return { name: maskPublicName(entry?.nameSnapshot ?? ''), level: entry?.level ?? null }
+    })
+  return {
+    playerId,
+    fullRoster,
+    participants: page.participants,
+    queue: state.matches
+      .filter((match) => match.sessionId === session.id && match.state === 'waiting')
+      .sort((a, b) => a.queuePosition - b.queuePosition)
+      .map((match) => ({
+        matchNo: match.matchNo,
+        format: match.format,
+        teamA: team(match.teamA),
+        teamB: team(match.teamB),
+      })),
   }
 }

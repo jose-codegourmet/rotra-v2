@@ -4,6 +4,7 @@ import {
   useGuestRegistration,
   useGuestRegistrationClub,
 } from '@rotra/data/player-account/useGuestRegistration'
+import { consumeSessionReturn, rememberSessionReturn } from '@rotra/data/public-session/context'
 import { AccountLinkStatus } from '@rotra/ui/account-link-status'
 import { LinkPage } from '@rotra/ui/account-link-status/link-page'
 import { ClaimForm } from '@rotra/ui/claim-form'
@@ -11,10 +12,14 @@ import { ErrorState } from '@rotra/ui/error-state'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { toast } from '@rotra/ui/toaster'
 import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 import { useAppDispatch } from '@/store/hooks'
 import { setAccount } from '@/store/slices/authSlice'
 
-export function GuestRegistration({ clubId }: { clubId: string }) {
+export function GuestRegistration({ clubId, returnTo }: { clubId: string; returnTo?: string }) {
+  useEffect(() => {
+    rememberSessionReturn(returnTo)
+  }, [returnTo])
   const club = useGuestRegistrationClub(clubId)
   const registration = useGuestRegistration(clubId)
   const dispatch = useAppDispatch()
@@ -75,6 +80,11 @@ export function GuestRegistration({ clubId }: { clubId: string }) {
             if (response.status === 'registered') {
               dispatch(setAccount(response.session.account))
               toast('Registration complete')
+              const back = consumeSessionReturn(returnTo)
+              if (back) {
+                window.location.assign(back)
+                return
+              }
             }
             window.scrollTo(0, 0)
           },

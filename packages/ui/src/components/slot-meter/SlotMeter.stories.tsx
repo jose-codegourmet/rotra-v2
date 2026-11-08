@@ -30,3 +30,32 @@ export const ActiveFull: Story = {
 export const ActiveOverPlan: Story = {
   args: { live: true, rosterCount: admission.over, capacity: admission.capacity },
 }
+
+const mix = { beginner: 4, intermediate: 6, advanced: 3, unrated: 1 }
+
+export const WithSkillMix: Story = { args: { skillCounts: mix } }
+export const SkillMixFull: Story = {
+  args: {
+    rosterCount: 24,
+    capacity: 24,
+    skillCounts: { beginner: 8, intermediate: 9, advanced: 6, unrated: 1 },
+  },
+}
+export const SkillMixOverBudget: Story = {
+  args: {
+    rosterCount: 10,
+    capacity: 8,
+    waitlistCount: 1,
+    skillCounts: { beginner: 3, intermediate: 4, advanced: 3 },
+  },
+}
+export const SkillMixLevelActive: Story = {
+  args: { skillCounts: mix, activeLevel: 'intermediate', onLevelPress: () => {} },
+}
+export const SkillMixOneOpenSlot: Story = {
+  args: {
+    rosterCount: 23,
+    capacity: 24,
+    skillCounts: { beginner: 8, intermediate: 9, advanced: 6 },
+  },
+}

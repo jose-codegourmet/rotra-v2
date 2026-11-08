@@ -6,6 +6,10 @@ export type SkillMixSegmentProps = {
   segment: SkillMixSegmentData
   /** Makes the segment a button (SlotMeter's pressable segments); otherwise it is a focusable image */
   onClick?: () => void
+  /** Pressable segments only: whether this level is the one showing */
+  pressed?: boolean
+  /** Spoken label when it should say more than the tip */
+  ariaLabel?: string
   className?: string
   style?: CSSProperties
 }
@@ -17,7 +21,14 @@ const BASE =
  * One colored segment with a hover and focus tooltip ("Beginner: 4 players"). Sized by head count via
  * flex-grow, so put it in a flex row. The label is spoken too, so color and hover are never the only signal.
  */
-export function SkillMixSegment({ segment, onClick, className, style }: SkillMixSegmentProps) {
+export function SkillMixSegment({
+  segment,
+  onClick,
+  pressed,
+  ariaLabel,
+  className,
+  style,
+}: SkillMixSegmentProps) {
   const tooltip = (
     <span
       aria-hidden
@@ -29,7 +40,14 @@ export function SkillMixSegment({ segment, onClick, className, style }: SkillMix
   const cls = cn(BASE, segment.tone, onClick && 'cursor-pointer', className)
   const merged = { flexGrow: segment.count, ...style }
   return onClick ? (
-    <button type="button" className={cls} style={merged} aria-label={segment.tip} onClick={onClick}>
+    <button
+      type="button"
+      className={cls}
+      style={merged}
+      aria-label={ariaLabel ?? segment.tip}
+      aria-pressed={pressed}
+      onClick={onClick}
+    >
       {tooltip}
     </button>
   ) : (

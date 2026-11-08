@@ -3,26 +3,19 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const publicParticipantsMeta = {
   name: 'PublicParticipants',
   description:
-    'The public page\'s Participants tab: a "Skill mix" bar of aggregate counts (when anyone is confirmed), a grid of confirmed people (picture or initials, name, "Has a ROTRA profile"), then "Waitlist · N" as a numbered list of names when anyone is waiting, or "Players have not been added yet." when the roster is empty.',
+    'Public masked participant tiles with skill-group rings and open slots: three columns on phones and four wider, capped at three rows with a join prompt. Finished sessions and the numbered waitlist are uncapped.',
   usage: [
-    'Use for the Participants tab of the public session page (Q-PUBLIC-PARTICIPANTS), in the operator preview and on the real public page.',
-    'Pass the public projection only: id, name, picture and hasProfile. The prop types have no phone, email, level, presence, games, notes, identity-verification state or Off Day.',
-    'skillMix takes aggregate counts from the server only (#474). Never pass or derive per-participant levels, and never sort or group the grid by level.',
-    'Cards are not links. For operator views of the roster use RosterRow or SavedPlayerCard.',
+    'Use for the public session Participants tab and its operator preview; pass only the public-safe projection in roster order.',
+    'Pass openSlots, finished, acceptJoinRequests and onRequestToJoin from the public page. The callback opens Request to join; it never grants a slot or expands the roster.',
+    'The cap hides entries after nine at widths up to 640 px and twelve above that. The fade and join prompt appear only when confirmed participants exceed that width’s cap.',
+    'Finished sessions have no cap, open placeholders or join prompt. Waitlist tiles are always uncapped and keep admission order.',
+    'Skill mix belongs to the Want to play? card; the deprecated skillMix and hasProfile props are ignored during consumer migration.',
+    'Use existing roster components for the operator post-session roster with levels and payments.',
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',
-    screen: 'Public page › viewPublic() › Participants tab (.pgrid, .pub-wait)',
+    screen: 'Public page › viewPublic() › Participants tab (.pgrid.pub, .pub-cap, .pub-more, .wl)',
   },
-  docs: [
-    'docs/screens/product/modules/queue/public-session.md',
-    'docs/business_logic/product/queue/README.md',
-  ],
-  related: [
-    'ParticipantCard',
-    'SkillDistributionBar',
-    'PublicSessionDetails',
-    'PublicSessionHero',
-    'EmptyState',
-  ],
+  docs: ['docs/screens/product/modules/queue/public-session.md'],
+  related: ['ParticipantCard', 'Avatar', 'JoinRequestCard', 'PublicSessionHero'],
 } satisfies ComponentMeta

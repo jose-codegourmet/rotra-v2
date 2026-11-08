@@ -27,6 +27,7 @@ function Badges({ badges }: { badges?: TabBadge[] }) {
       )}
     >
       {badge.text}
+      {badge.longText}
     </span>
   ))
 }

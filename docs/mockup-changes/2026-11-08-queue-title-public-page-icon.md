@@ -38,3 +38,8 @@ Components: page-header, more-options-sheet, session-preparation
 - Epic: #499 (Q14)
 - #510 Q14.2 · Header: Open public page icon beside the title; More options dialog on phones
 - #512 Q14.4 · Preparation header, phone More options and preparation tabs menu
+
+## Q14 implementation verification (November 8, 2026)
+- Q14 title action is wired to the existing public preview route; verified navigation from Preparation.
+- Inspected the header against the canonical prototype at phone and desktop sizes, in dark and light. Full state-by-state visual sign-off remains outstanding.
+- Workspace lint, type-check and build ran at the end of the four-ticket list, per owner instruction.

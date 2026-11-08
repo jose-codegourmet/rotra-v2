@@ -68,7 +68,12 @@ export function Tabs({
     >
       {phoneMenu ? (
         <div className="hidden max-[640px]:block">
-          <TabMenu items={items} value={value} onChange={onChange} aria-label={aria['aria-label']} />
+          <TabMenu
+            items={items}
+            value={value}
+            onChange={onChange}
+            aria-label={aria['aria-label']}
+          />
         </div>
       ) : null}
       <TabsPrimitive.List
@@ -76,7 +81,8 @@ export function Tabs({
         className={cn(
           'flex gap-1 overflow-x-auto border-b border-border',
           phoneMenu && 'max-[640px]:hidden',
-          !phoneMenu && 'max-[640px]:grid max-[640px]:grid-cols-[repeat(auto-fit,minmax(64px,1fr))] max-[640px]:gap-0 max-[640px]:overflow-visible',
+          !phoneMenu &&
+            'max-[640px]:grid max-[640px]:grid-cols-[repeat(auto-fit,minmax(64px,1fr))] max-[640px]:gap-0 max-[640px]:overflow-visible',
         )}
       >
         {items.map((item) => (

@@ -89,9 +89,17 @@ function PreparationTabs() {
     { value: 'payments', label: 'Payments', badges: [{ text: '8/14 paid' }] },
   ]
   return (
-    <Tabs items={items} value={value} onChange={setValue} aria-label="Preparation section" phoneMenu>
+    <Tabs
+      items={items}
+      value={value}
+      onChange={setValue}
+      aria-label="Preparation section"
+      phoneMenu
+    >
       {items.map((item) => (
-        <TabsContent key={item.value} value={item.value}>{item.label} view</TabsContent>
+        <TabsContent key={item.value} value={item.value}>
+          {item.label} view
+        </TabsContent>
       ))}
     </Tabs>
   )

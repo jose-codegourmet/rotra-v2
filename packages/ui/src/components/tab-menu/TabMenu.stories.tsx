@@ -7,12 +7,14 @@ const items = [
   { value: 'overview', label: 'Overview' },
   { value: 'roster', label: 'Roster and levels', badges: [{ text: '14/24' }] },
   { value: 'waitlist', label: 'Waitlist', badges: [{ text: '2' }] },
-  { value: 'payments', label: 'Payments', badges: [{ text: '8/14 paid' }] },
+  { value: 'payments', label: 'Payments', badges: [{ text: '8/14', longText: ' paid' }] },
 ]
 
 function Example() {
   const [value, setValue] = useState('roster')
-  return <TabMenu items={items} value={value} onChange={setValue} aria-label="Preparation section" />
+  return (
+    <TabMenu items={items} value={value} onChange={setValue} aria-label="Preparation section" />
+  )
 }
 
 const meta = {
@@ -24,11 +26,16 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Phone: Story = { render: () => <Example />, globals: { viewport: { value: 'phone' } } }
-export const PhoneLight: Story = { ...Phone, globals: { viewport: { value: 'phone' }, theme: 'light' } }
+export const PhoneLight: Story = {
+  ...Phone,
+  globals: { viewport: { value: 'phone' }, theme: 'light' },
+}
 export const Open: Story = {
   ...Phone,
   play: async ({ canvasElement }) => {
-    await userEvent.click(within(canvasElement).getByRole('button', { name: 'Preparation section: Roster and levels' }))
+    await userEvent.click(
+      within(canvasElement).getByRole('button', { name: 'Preparation section: Roster and levels' }),
+    )
   },
 }
 export const OpenLight: Story = {

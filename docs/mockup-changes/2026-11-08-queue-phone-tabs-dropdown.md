@@ -42,3 +42,8 @@ Components: roster-panel, preparation-roster, tab-menu, tabs, session-preparatio
 - #536 Q13.6 · Roster summary bar drives the level tabs on Preparation and Session settings
 - #509 Q14.1 · TabMenu: tabs as a styled menu on phones
 - #512 Q14.4 · Preparation header, phone More options and preparation tabs menu
+
+## Q14 implementation verification (November 8, 2026)
+- Q14 Preparation uses the phone menu. Verified keyboard selection, full count labels, menu dismissal, focus return and URL-backed tab changes.
+- Q13 roster level-tab work belongs to #535/#536; this shared log stays IN PROGRESS until that work and full visual comparison are complete.
+- Workspace lint, type-check and build ran at the end of the four-ticket list, per owner instruction.

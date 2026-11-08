@@ -39,3 +39,8 @@ Components: page-header, more-options-sheet, session-preparation
 - Epic: #499 (Q14)
 - #510 Q14.2 · Header: Open public page icon beside the title; More options dialog on phones
 - #512 Q14.4 · Preparation header, phone More options and preparation tabs menu
+
+## Q14 implementation verification (November 8, 2026)
+- Q14 phone actions are wired; verified Edit preparation, Copy invite link, Delete refusal and Cancel confirmation. Confirmations were dismissed without changing the session.
+- Delete and Cancel retain the existing disabled state until roster data is available. Live-session action composition has stories and source review; its full browser flow remains unverified.
+- Workspace lint, type-check and build ran at the end of the four-ticket list, per owner instruction.

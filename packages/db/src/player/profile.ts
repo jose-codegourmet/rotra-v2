@@ -48,6 +48,20 @@ export function currentExperienceMonths(
   return months + Math.max(0, elapsed)
 }
 
+/** Shape version of `players.personal_details`; the database requires it whenever details are set. */
+export const PERSONAL_DETAILS_VERSION = 1
+
+/**
+ * The experience columns for a save. Months and their recorded date are set or cleared together
+ * (`players_experience_recorded_check`); an unchanged value keeps its original recorded date.
+ */
+export function experienceUpdate(next: number | null, shown: number | null, now: Date) {
+  if (next === shown) return {}
+  return next == null
+    ? { experienceMonths: null, experienceRecordedAt: null }
+    : { experienceMonths: next, experienceRecordedAt: now }
+}
+
 /** Shapes `PlayerProfile`. Only profiles with a permanent RTR ID are public. */
 function publicProfileDto(row: PublicPlayerRow) {
   if (!row.idAllocation) return null
@@ -154,9 +168,13 @@ export async function updateMyProfile(
         fullName,
         nickname: input.nickname?.trim() || null,
         avatarRef: input.picture,
-        experienceMonths: experience,
-        experienceRecordedAt: experience === player.experienceMonths ? undefined : now,
+        ...experienceUpdate(
+          experience,
+          currentExperienceMonths(player.experienceMonths, player.experienceRecordedAt),
+          now,
+        ),
         personalDetails: { playingStyle: input.playingStyle.trim() },
+        detailsVersion: PERSONAL_DETAILS_VERSION,
         revision: { increment: 1 },
       },
     })

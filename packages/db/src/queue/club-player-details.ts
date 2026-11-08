@@ -2,7 +2,12 @@ import 'server-only'
 import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
 import type { Prisma, SocialProvider } from '../generated/prisma/client'
-import { currentExperienceMonths, playingStyle } from '../player/profile'
+import {
+  currentExperienceMonths,
+  experienceUpdate,
+  PERSONAL_DETAILS_VERSION,
+  playingStyle,
+} from '../player/profile'
 import { requireClubEntitlement } from '../service/authorize'
 import { ServiceError } from '../service/errors'
 
@@ -215,12 +220,12 @@ export async function updateClubPlayerDetails(
       data: {
         fullName,
         nickname: input.nickname?.trim() || null,
-        experienceMonths: experience === shown ? undefined : experience,
-        experienceRecordedAt: experience === shown ? undefined : now,
+        ...experienceUpdate(experience, shown, now),
         personalDetails: {
           ...details,
           playingStyle: input.playingStyle.trim(),
         } as Prisma.InputJsonValue,
+        detailsVersion: PERSONAL_DETAILS_VERSION,
         revision: { increment: 1 },
       },
     })

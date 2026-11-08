@@ -16,6 +16,8 @@ export const CLAIM_LINK_DAYS = 7
 
 const EXPIRED = 'The registration link has expired or was replaced.'
 const NEEDS_PHONE = 'Add your mobile number to finish registering.'
+const EMAIL_HAS_LOGIN =
+  'This email already has a ROTRA login, such as a club or Admin account. Use a different email, or ask ROTRA for help.'
 const PHONE_TAKEN = 'This number belongs to another ROTRA profile. Ask the club or ROTRA for help.'
 
 async function digest(token: string) {
@@ -152,8 +154,9 @@ export async function readClaimLink(token: string) {
 
 /**
  * P-CLAIM · Finish registering. Staged: (1) the provider login is created outside any transaction,
- * keyed on the link ID so a retry or lost response reuses it; (2) one transaction rechecks the
- * link, records the email, maps the account, marks the profile claimed and consumes the link.
+ * keyed on the player so a retry, lost response or reissued link reuses it; (2) one transaction
+ * rechecks the link, records the email, maps the account, marks the profile claimed and consumes
+ * the link.
  * A retry after success returns the same result. The password goes only to the provider.
  */
 export async function completeClaim(
@@ -195,17 +198,21 @@ export async function completeClaim(
 
   let subject: string
   try {
-    subject = (
-      await provider.createLogin({
-        operationRef: link.id,
-        email,
-        phoneE164,
-        initialPassword: input.password,
-      })
-    ).subject
+    subject =
+      // Keyed on the player, not the link: a retry from a reissued link reuses the same login.
+      (
+        await provider.createLogin({
+          operationRef: `claim:${player.id}`,
+          email,
+          phoneE164,
+          initialPassword: input.password,
+        })
+      ).subject
   } catch (error) {
     if (error instanceof ProviderError)
-      throw new ServiceError(error.code === 'provider_conflict' ? 'conflict' : 'unavailable')
+      throw error.code === 'provider_conflict'
+        ? new ServiceError('conflict', { email: EMAIL_HAS_LOGIN })
+        : new ServiceError('unavailable')
     throw error
   }
 

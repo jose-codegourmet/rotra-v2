@@ -6,16 +6,20 @@ import type { PlayerSessionRecord } from '@rotra/data/player/types'
 import type { AdminContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
 import { readPlayerMatchHistory } from '../player/projections'
-import { requireAdmin } from '../service/authorize'
+import { requireAdmin, requireRevision } from '../service/authorize'
 import { ServiceError } from '../service/errors'
+import { recordAudit } from './audit'
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 /** A-PLAYERS: explicitly allowlisted owner-only projection of allocated player identities. */
 export async function readAdminPlayerDirectory(
   context: AdminContext,
+  playerId?: string,
 ): Promise<(Omit<AdminPlayer, 'revision'> & { revision: string })[]> {
   requireAdmin(context)
   const players = await prisma.player.findMany({
-    where: { idAllocation: { isNot: null } },
+    where: { idAllocation: { isNot: null }, ...(playerId ? { id: playerId } : {}) },
     orderBy: { id: 'asc' },
     select: {
       id: true,
@@ -108,8 +112,7 @@ export async function readAdminPlayerGames(
   playerId: string,
 ): Promise<PlayerSessionRecord[]> {
   requireAdmin(context)
-  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(playerId))
-    throw new ServiceError('not_found')
+  if (!UUID.test(playerId)) throw new ServiceError('not_found')
   const player = await prisma.playerIdAllocation.findUnique({
     where: { playerId },
     select: { playerId: true },
@@ -131,4 +134,75 @@ export async function readAdminPlayerGames(
         ]
       : [],
   )
+}
+
+/**
+ * A-PLAYER Edit profile: full name and nickname under the loaded revision, with a reason. The global
+ * identity only: `club_players.display_name` is the club's own copy (clubs edit it) and the rank
+ * projection stores no name, so neither is rewritten. `avatar_ref` holds an uploaded photo
+ * reference, never a URL, so a changed photo link is refused rather than saved.
+ */
+export async function updateAdminPlayerProfile(
+  context: AdminContext,
+  input: {
+    playerId: string
+    expectedRevision: string
+    name: string
+    nickname: string
+    picture: string
+    reason: string
+  },
+) {
+  requireAdmin(context)
+  if (!UUID.test(input.playerId)) throw new ServiceError('not_found')
+  const name = input.name.trim()
+  const nickname = input.nickname.trim() || null
+  const reason = input.reason.trim()
+  if (!name) throw new ServiceError('invalid', { name: 'Enter a name.' })
+  if (!reason) throw new ServiceError('invalid', { reason: 'Enter a reason.' })
+  await prisma.$transaction(async (tx) => {
+    const rows = await tx.$queryRaw<{ id: string }[]>`
+      SELECT "id" FROM "players" WHERE "id" = ${input.playerId}::uuid FOR UPDATE`
+    if (!rows.length) throw new ServiceError('not_found')
+    const player = await tx.player.findUniqueOrThrow({
+      where: { id: input.playerId },
+      select: {
+        id: true,
+        fullName: true,
+        nickname: true,
+        avatarRef: true,
+        profileState: true,
+        revision: true,
+        idAllocation: { select: { playerId: true } },
+      },
+    })
+    if (!player.idAllocation) throw new ServiceError('not_found')
+    requireRevision(player.revision, input.expectedRevision)
+    // An empty picture keeps the current photo; only a different link is refused.
+    const picture = input.picture.trim()
+    if (picture && picture !== (player.avatarRef ?? ''))
+      throw new ServiceError('invalid', {
+        picture:
+          player.profileState === 'claimed'
+            ? 'Photos for registered players cannot be edited by Admin.'
+            : "Photo links can't be saved yet.",
+      })
+    await tx.player.update({
+      where: { id: player.id },
+      data: { fullName: name, nickname, revision: { increment: 1 } },
+    })
+    await recordAudit(tx, context, {
+      action: 'player.profile_updated',
+      targetType: 'player',
+      targetId: player.id,
+      metadata: {
+        before: { name: player.fullName, nickname: player.nickname },
+        after: { name, nickname },
+        reason,
+      },
+    })
+  })
+  const [player] = await readAdminPlayerDirectory(context, input.playerId)
+  if (!player) throw new ServiceError('not_found')
+  return player
 }

@@ -534,9 +534,13 @@ export async function reconcileContactChange(
   provider: ProviderAdmin,
   requestId: string,
 ) {
+  if (!UUID.test(requestId)) throw new ServiceError('not_found')
   const request = await prisma.playerContactChangeRequest.findUnique({ where: { id: requestId } })
   if (!request) throw new ServiceError('not_found')
   if (request.status === 'applied') return adminRequestDto(request)
+  // Only an approved change may write contacts; a pending or declined one must never apply.
+  if (!['approved', 'applying', 'failed'].includes(request.status))
+    throw new ServiceError('invalid', { request: 'Approve this request before applying it.' })
   const account = await prisma.playerAccount.findUnique({ where: { playerId: request.playerId } })
   if (account) {
     let login: Awaited<ReturnType<ProviderAdmin['readLogin']>>
@@ -554,11 +558,11 @@ export async function reconcileContactChange(
       )
   }
   try {
-    return await prisma.$transaction(async (tx) => {
+    const settled = await prisma.$transaction(async (tx) => {
       const current = await lockRequest(tx, requestId)
       if (current.status === 'applied') return adminRequestDto(current)
-      if (await collides(tx, current.playerId, current.field, current.proposedValue))
-        throw new ServiceError('conflict', { value: 'This contact is used by another player.' })
+      // The provider may already hold the value: fail (retryable), never leave it applying.
+      if (await collides(tx, current.playerId, current.field, current.proposedValue)) return null
       const now = new Date()
       const contact = await tx.playerPrivateContact.update({
         where: { playerId: current.playerId },
@@ -598,11 +602,84 @@ export async function reconcileContactChange(
       })
       return adminRequestDto(applied)
     })
+    return settled ?? (await markFailed(requestId, 'contact_collision'))
   } catch (error) {
     if ((error as { code?: string })?.code === 'P2002')
       return markFailed(requestId, 'contact_collision')
     throw error
   }
+}
+
+async function readOneAdminRequest(context: AdminContext, requestId: string) {
+  const [request] = await readAdminContactChangeRequests(context, { requestId })
+  if (!request) throw new ServiceError('not_found')
+  return request
+}
+
+/**
+ * Runs the application after a saved approval. A failure that is not the provider's own (the
+ * provider path already marks `failed`) still ends as `failed`, so the approval is never hidden
+ * behind an error; Retry resumes the same operation ref.
+ */
+async function applySaved(context: AdminContext, provider: ProviderAdmin, requestId: string) {
+  try {
+    await applyContactChange(context, provider, requestId)
+  } catch (error) {
+    try {
+      await markFailed(requestId, 'application_error')
+    } catch {
+      throw error
+    }
+  }
+}
+
+/**
+ * D-CONTACT › Approve change: review (rechecks the contact revision and collisions, reserves the
+ * value), then apply at the provider. Returns the request as it now stands: applied, failed, or
+ * applying. A repeated Approve for a change already being applied returns it unchanged.
+ */
+export async function approveContactChange(
+  context: AdminContext,
+  provider: ProviderAdmin,
+  requestId: string,
+) {
+  requireAdmin(context)
+  const reviewed = await reviewContactChange(context, { requestId, decision: 'approve' })
+  if (reviewed.rawStatus === 'approved') await applySaved(context, provider, requestId)
+  return readOneAdminRequest(context, requestId)
+}
+
+/**
+ * A-CONTACT-REVIEW › Retry application: the same request and provider operation ref go back to
+ * applying. Only a failed application is retried; one already applying or applied is returned.
+ */
+export async function retryContactApplication(
+  context: AdminContext,
+  provider: ProviderAdmin,
+  requestId: string,
+) {
+  requireAdmin(context)
+  const current = await readOneAdminRequest(context, requestId)
+  if (current.status === 'failed') await applySaved(context, provider, requestId)
+  else if (current.status !== 'applying' && current.status !== 'applied')
+    throw new ServiceError('conflict', { request: 'This request is not waiting for a retry.' })
+  return readOneAdminRequest(context, requestId)
+}
+
+/**
+ * A-CONTACT-REVIEW › Check status: reads the provider back for an approved change and settles it
+ * (applied only when provider and contact match). Any other request is returned as it stands.
+ */
+export async function checkContactApplication(
+  context: AdminContext,
+  provider: ProviderAdmin,
+  requestId: string,
+) {
+  requireAdmin(context)
+  const current = await readOneAdminRequest(context, requestId)
+  if (['approved', 'applying', 'failed'].includes(current.status))
+    await reconcileContactChange(context, provider, requestId)
+  return readOneAdminRequest(context, requestId)
 }
 
 /**

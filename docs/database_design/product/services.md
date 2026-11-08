@@ -269,11 +269,7 @@ do not apply migrations, create players, or change contacts, permissions or reta
   mock's copy, and the actor is the owner's display name. Events whose summary cannot be rebuilt from
   saved data (account provisioning, ranking policy, the license retention note) are left out, never
   guessed. Contact-change events are stored on the player with `metadata.requestId` and read per request.
-- **Not connected:** Approve, Retry application and Check status, which change the login identifier at
-  the sign-in provider (`applyContactChange` / `reconcileContactChange`). The provider holds only the
-  player's email (phone sign-in is a server lookup, decided November 7, 2026 in #244); contact-approval
-  enforcement is open in #196 and #244, and player sign-in
-  itself is not wired in real mode yet. They answer "isn't connected to saved data yet"; the DevMenu
-  advance helper is never sent. Flag and ranking-settings logs wait on #402.
+- **Connected (#575, November 8, 2026):** Approve, Retry application and Check status run `reviewContactChange`, `applyContactChange` and `reconcileContactChange` through `POST /api/contact-change-requests/[requestId]/approve|retry|check` and the Supabase admin adapter. The provider holds only the player's email (phone sign-in is a server lookup, #244). Apply sets the login email for a registered player, reads it back, then updates the private contact and marks Applied; failures (`application_error`, `contact_collision`) become Application failed; Retry reuses the operation ref. An unclaimed player has no login. Gap: no audit line for a failed or retried application. The DevMenu advance helper stays mock-only and is never sent. Approval evidence beyond manual review is open in #244.
+- **`updateAdminPlayerProfile` (#575):** `PATCH /api/players/[playerId]` saves name and nickname with a revision check and writes audit `player.profile_updated` (before/after, reason). Club-owned `club_players` names are not rewritten. `GET /api/me/profile` (Player, private) reads the latest such event since the claim for "Changed by ROTRA Admin: <reason>". Flag and ranking-settings logs wait on #402.
 - Not verified against a database: only the `@rotra/data` adapters are unit-tested
   (`packages/data/src/contact-change-request/fetchers.test.ts`).

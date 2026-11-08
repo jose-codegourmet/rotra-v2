@@ -219,10 +219,25 @@ describe('Contact-change requests and audit › real mode', () => {
     await expect(declineContactChange(REQUEST)).rejects.toMatchObject({ kind: 'conflict' })
   })
 
-  it('never sends approve, retry, check status or the DevMenu advance', async () => {
-    await expect(approveContactChange(REQUEST)).rejects.toBeInstanceOf(NotConnectedError)
-    await expect(retryContactApplication(REQUEST)).rejects.toBeInstanceOf(NotConnectedError)
-    await expect(checkContactApplication(REQUEST)).rejects.toBeInstanceOf(NotConnectedError)
+  it('approves, retries and checks status through the Admin routes', async () => {
+    reply(200, { request: wireRequest({ status: 'failed', failureCode: 'x', checks: null }) })
+    const approved = await approveContactChange(REQUEST)
+    expect(sent()).toMatchObject({
+      path: `/api/contact-change-requests/${REQUEST}/approve`,
+      method: 'POST',
+    })
+    expect(approved).toMatchObject({ status: 'failed', error: expect.any(String) })
+    reply(409, { error: { code: 'conflict', message: 'x' } })
+    await expect(approveContactChange(REQUEST)).rejects.toMatchObject({ kind: 'conflict' })
+    reply(200, { request: wireRequest({ status: 'applied', checks: null }) })
+    await expect(retryContactApplication(REQUEST)).resolves.toMatchObject({ status: 'applied' })
+    expect(sent(2).path).toBe(`/api/contact-change-requests/${REQUEST}/retry`)
+    reply(404, { error: { code: 'not_found', message: 'Not found.' } })
+    await expect(checkContactApplication(REQUEST)).resolves.toBeNull()
+    expect(sent(3).path).toBe(`/api/contact-change-requests/${REQUEST}/check`)
+  })
+
+  it('never sends the DevMenu advance', async () => {
     await expect(
       advanceContactChangeRequest({ requestId: REQUEST, to: 'applied' }),
     ).rejects.toBeInstanceOf(NotConnectedError)

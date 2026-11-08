@@ -150,6 +150,15 @@ function myAccountOf(account: WireMyAccount): MyAccount {
   }
 }
 
+/** The own profile with its Admin change note; signed out (or another account) is null. */
+export async function realGetMyProfile(signal?: AbortSignal) {
+  const body = await orNull(
+    realRequest<{ profile: PlayerProfile }>('/api/me/profile', { signal }),
+    [401, 403, 404],
+  )
+  return body?.profile ?? null
+}
+
 /** Signed out (or not a player account) is null, like the mock; never a public read. */
 export async function realGetMyAccount(signal?: AbortSignal) {
   const body = await orNull(

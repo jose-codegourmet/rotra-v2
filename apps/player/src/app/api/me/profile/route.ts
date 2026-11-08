@@ -1,5 +1,5 @@
 import { updatePlayerAvatar } from '@rotra/db/player/avatar'
-import { readMyAccount, updateMyProfile } from '@rotra/db/player/profile'
+import { readMyAccount, readMyProfile, updateMyProfile } from '@rotra/db/player/profile'
 import { handleAccountRequest } from '@rotra/db/service/handler'
 import { intOrNull, readJsonBody, text } from '@rotra/db/service/request'
 import { routeCookieAdapter } from '@rotra/db/service/route-cookies'
@@ -7,6 +7,13 @@ import { cookies } from 'next/headers'
 import { readAvatarRequest } from './avatar-request'
 
 const SOCIAL = ['facebook', 'instagram', 'youtube', 'linkedin'] as const
+
+/** The signed-in player's own profile: the public one plus the Admin change note. Private, no-store. */
+export async function GET() {
+  return handleAccountRequest('player', routeCookieAdapter(await cookies()), async (player) => ({
+    body: { profile: await readMyProfile(player) },
+  }))
+}
 
 /**
  * P-EDIT-PROFILE save under the loaded revision. Contacts are never accepted here. P-EDIT-PROFILE

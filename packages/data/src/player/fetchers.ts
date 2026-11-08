@@ -8,6 +8,7 @@ import { mockStore, readMockState } from '../mock/store'
 import { isRealDataMode } from '../real/mode'
 import {
   realFindPlayerByRtrId,
+  realGetMyProfile,
   realGetPlayerGames,
   realGetPlayerProfile,
   realGetPlayerRank,
@@ -51,7 +52,13 @@ export async function getPlayerProfile(
   playerId: string,
   signal?: AbortSignal,
 ): Promise<PlayerProfile | null> {
-  if (isRealDataMode()) return realGetPlayerProfile(playerId, signal)
+  if (isRealDataMode()) {
+    // Like the mock, only the signed-in owner sees the Admin change note; that read is private.
+    const session = await getSession('player').catch(() => null)
+    return session?.account.id === playerId
+      ? realGetMyProfile(signal)
+      : realGetPlayerProfile(playerId, signal)
+  }
   await playerRequest(signal)
   const profile = readMockState().playerProfiles.find((player) => player.playerId === playerId)
   if (!profile) return null

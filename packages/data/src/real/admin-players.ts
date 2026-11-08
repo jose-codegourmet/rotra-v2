@@ -1,18 +1,24 @@
+import type { AdminPlayerEditValues } from '@rotra/schema/admin-player'
 import type {
   AdminPlayer,
   AdminPlayerDetail,
   AdminPlayerListParams,
 } from '../admin-player/adminPlayer.types'
 import { selectAdminPlayers } from '../admin-player/management.rules'
+import { MockError } from '../mock/errors'
 import type { PlayerSessionRecord } from '../player/player.types'
-import { realRequest } from './client'
+import { RealRequestError, realRequest } from './client'
+
+type WireAdminPlayer = Omit<AdminPlayer, 'revision'> & { revision: string }
+const playerOf = (player: WireAdminPlayer): AdminPlayer => ({
+  ...player,
+  revision: Number(player.revision),
+})
 
 /** Same directory selectors as mock mode; private contacts stay on the Admin transport. */
 async function directory(signal?: AbortSignal) {
-  const { players } = await realRequest<{
-    players: (Omit<AdminPlayer, 'revision'> & { revision: string })[]
-  }>('/api/players', { signal })
-  return players.map((player) => ({ ...player, revision: Number(player.revision) }))
+  const { players } = await realRequest<{ players: WireAdminPlayer[] }>('/api/players', { signal })
+  return players.map(playerOf)
 }
 
 export async function realListAdminPlayers(params: AdminPlayerListParams, signal?: AbortSignal) {
@@ -46,4 +52,33 @@ export async function realGetAdminPlayerGames(id: string, signal?: AbortSignal) 
       { signal },
     )
   ).games
+}
+
+/** A-PLAYER Edit profile: name and nickname under the loaded revision; a stale form is a conflict. */
+export async function realUpdateAdminPlayer(
+  input: Omit<AdminPlayerEditValues, 'email'> & { id: string; revision: number },
+) {
+  try {
+    const { player } = await realRequest<{ player: WireAdminPlayer }>(
+      `/api/players/${encodeURIComponent(input.id)}`,
+      {
+        method: 'PATCH',
+        body: {
+          revision: String(input.revision),
+          name: input.name,
+          nickname: input.nickname,
+          picture: input.picture,
+          reason: input.reason,
+        },
+      },
+    )
+    return playerOf(player)
+  } catch (error) {
+    if (error instanceof RealRequestError && error.status === 409)
+      throw new MockError(
+        'conflict',
+        'This player changed since you opened the form. Reload before editing.',
+      )
+    throw error
+  }
 }

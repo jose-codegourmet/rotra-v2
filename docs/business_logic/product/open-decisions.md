@@ -19,7 +19,7 @@ The product direction is sufficiently defined for documentation. Resolve the rel
 | Conflicting confirmed results | How operator clarification chooses authoritative records without providing general edits to locked winners | Confirmation is permanent; sync conflicts require review |
 | Identity matching | Canonical phone representation, concurrent new-profile creation, duplicate resolution, mistaken links, hidden-phone lookup by clubs | Phone uniquely identifies profiles; name alone does not; ID/QR supports private numbers; phone is not a sign-in identifier (email only, decided 2026-11-08) |
 | Claim and recovery links | Link delivery method, email verification on claim, password policy/complexity, unclaimed-account behavior, lost access to contacts, failed provider application handling | Club supplies registration link; phone and email required; email + password login (phone is not a login, decided 2026-11-08); recovery by email only. Decided 2026-11-07 (#244): links last 7 days, single use, club reissue invalidates the previous link; contact collision at claim blocks (see [below](#settled-by-the-product-owner-on-november-7-2026)) |
-| Contact-change approval | Evidence needed, enforcement across direct provider APIs, request UX, notifications, contact conflicts | Owner manually approves; player cannot directly edit phone/email; RTR ID permanent |
+| Contact-change approval | Evidence needed, enforcement across direct provider APIs, request UX, notifications, contact conflicts. Approve / Retry application / Check status run in real mode (#575, November 8, 2026) | Owner manually approves; player cannot directly edit phone/email; RTR ID permanent |
 | Window boundaries | Calendar months versus fixed day count; timezone for rank windows and ID date | Three-month observations; RTR date is the first sync day |
 
 ## Remaining product details
@@ -55,7 +55,7 @@ Player login mapping and claim links ([#244](https://github.com/jose-codegourmet
 | L6 · Contact collisions at claim | If the phone or email already belongs to another account, **block** and show the contact-support route. Never merge silently |
 | L7 · No claim by ID or name | An RTR ID or a name alone can never claim an account |
 
-Still open after this decision: email verification on claim; password policy and complexity; contact-change enforcement across direct provider APIs and its approval evidence; RTR ID location/date/sequence rules and simultaneous allocation; mistaken or duplicate guest links and permanent relink; failed provider application handling. Guest registration is settled by #490 below; separate linking remains open.
+Still open after this decision: email verification on claim; password policy and complexity; contact-change enforcement across direct provider APIs and its approval evidence; RTR ID location/date/sequence rules and simultaneous allocation; mistaken or duplicate guest links and permanent relink; audit lines for a failed or retried contact-change application in real mode. Decided November 8, 2026 (#575): Approve reviews (rechecks revision and collisions, reserves the value) then applies; applying sets the Supabase login email for a registered player, reads it back, and only then updates the private contact and marks Applied; any failure is Application failed; Retry reuses the same operation ref; Check status reconciles; an unclaimed player has no login, so only the contact changes. Guest registration is settled by #490 below; separate linking remains open.
 
 ## Settled by the product owner on November 6, 2026
 

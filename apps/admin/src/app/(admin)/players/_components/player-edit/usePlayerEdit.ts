@@ -36,7 +36,9 @@ export function usePlayerEdit(update: ProfileUpdate, playerId: string) {
       !emailChanged ||
       values.name !== player.name ||
       values.nickname !== (player.nickname ?? '') ||
-      values.picture !== (player.picture ?? '')
+      // Same prefill as the form: only an unclaimed player's https link is editable.
+      values.picture !==
+        (!player.claimed && player.picture?.startsWith('https://') ? player.picture : '')
     if (profileChanged) {
       try {
         const { email: _email, ...profile } = values

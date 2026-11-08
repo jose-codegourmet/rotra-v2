@@ -72,6 +72,7 @@ const UI_ACTION: Record<string, string> = {
   'player.contact_change_approved': 'contact_change_approved',
   'player.contact_change_rejected': 'contact_change_declined',
   'player.contact_change_applied': 'contact_change_applied',
+  'player.profile_updated': 'player_updated',
 }
 
 const CONTACT_ACTIONS = [
@@ -301,6 +302,20 @@ async function summarizer(events: ReadEvent[]) {
         const reason = str(metadata.reason)
         if (metadata.field !== 'email' || !name || !reason) return null
         return `Email change for ${name} entered by ROTRA Admin. Reason: ${reason}`
+      }
+      case 'player.profile_updated': {
+        // The mock's line, from the stored name/nickname pair (a photo link is never saved here).
+        const identity = (value: unknown) => {
+          const side = metadataOf(value)
+          const name = str(side.name)
+          return name ? JSON.stringify({ name, nickname: str(side.nickname) }) : null
+        }
+        const before = identity(metadata.before)
+        const after = identity(metadata.after)
+        const reason = str(metadata.reason)
+        return before && after && reason
+          ? `Changed by ROTRA Admin: ${before} → ${after}. Reason: ${reason}`
+          : null
       }
       default:
         return null

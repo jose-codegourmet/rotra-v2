@@ -10,6 +10,8 @@ import { appendAdminAudit } from '../admin-audit/fetchers'
 import { checkMockSave } from '../mock/bridge'
 import { MockError } from '../mock/errors'
 import type { MockState } from '../mock/store'
+import { realUpdateAdminPlayer } from '../real/admin-players'
+import { isRealDataMode } from '../real/mode'
 import type { AdminPlayerBulkResult } from './adminPlayer.types'
 import { adminPlayerOf } from './fetchers'
 import { duplicateGroups } from './management.rules'
@@ -120,6 +122,8 @@ export async function updateAdminPlayer(
   await owner()
   // A new email is never saved here: it goes for review as a contact-change request (#564).
   const values = adminPlayerEditSchema.omit({ email: true }).parse(input)
+  if (isRealDataMode())
+    return realUpdateAdminPlayer({ ...values, id: input.id, revision: input.revision })
   return adminMutation(400, (draft) => {
     checkMockSave()
     const current = record(draft, input.id)
@@ -128,7 +132,10 @@ export async function updateAdminPlayer(
         'conflict',
         'This player changed since you opened the form. Reload before editing.',
       )
-    if (current.view.claimed && values.picture !== (current.view.picture ?? ''))
+    // An empty picture keeps a registered player's photo, and an unclaimed one's non-link photo.
+    const keepPicture =
+      !values.picture && (current.view.claimed || !current.view.picture?.startsWith('https://'))
+    if (current.view.claimed && !keepPicture && values.picture !== (current.view.picture ?? ''))
       throw new MockError('permission', 'Photos for registered players cannot be edited by Admin.')
     const before = JSON.stringify({
       name: current.view.name,
@@ -141,7 +148,7 @@ export async function updateAdminPlayer(
     if (profile) {
       profile.fullName = values.name
       profile.nickname = values.nickname || null
-      profile.picture = values.picture || null
+      if (!keepPicture) profile.picture = values.picture || null
       if (current.view.claimed) profile.adminChangeNote = values.reason
     }
     const rank = draft.playerRanks[input.id]
@@ -158,7 +165,7 @@ export async function updateAdminPlayer(
       action: 'player_updated',
       targetType: 'player',
       targetId: input.id,
-      summary: `Changed by ROTRA Admin: ${before} → ${JSON.stringify({ name: values.name, nickname: values.nickname || null, picture: values.picture || null })}. Reason: ${values.reason}`,
+      summary: `Changed by ROTRA Admin: ${before} → ${JSON.stringify({ name: values.name, nickname: values.nickname || null, picture: keepPicture ? current.view.picture : values.picture || null })}. Reason: ${values.reason}`,
     })
     return adminPlayerOf(draft, current.player)
   })

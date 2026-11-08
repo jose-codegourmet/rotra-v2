@@ -1,6 +1,6 @@
 # Preparation and level tabs become styled dropdown menus on phones
 
-Status: TICKETED — #498
+Status: IN PROGRESS — #498
 Date: 2026-11-08
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Session preparation (and live session settings) › tab row, and Roster and levels › level tabs

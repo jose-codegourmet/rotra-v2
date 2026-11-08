@@ -79,3 +79,33 @@ export const ClubSections: Story = {
     ],
   },
 }
+
+function PreparationTabs() {
+  const [value, setValue] = useState('roster')
+  const items: TabItem[] = [
+    { value: 'overview', label: 'Overview' },
+    { value: 'roster', label: 'Roster and levels', badges: [{ text: '14/24' }] },
+    { value: 'waitlist', label: 'Waitlist', badges: [{ text: '2' }] },
+    { value: 'payments', label: 'Payments', badges: [{ text: '8/14 paid' }] },
+  ]
+  return (
+    <Tabs items={items} value={value} onChange={setValue} aria-label="Preparation section" phoneMenu>
+      {items.map((item) => (
+        <TabsContent key={item.value} value={item.value}>{item.label} view</TabsContent>
+      ))}
+    </Tabs>
+  )
+}
+
+export const PhoneMenu: Story = {
+  render: () => <PreparationTabs />,
+  globals: { viewport: { value: 'phone' } },
+}
+export const PhoneMenuLight: Story = {
+  ...PhoneMenu,
+  globals: { viewport: { value: 'phone' }, theme: 'light' },
+}
+export const PhoneMenuDesktop: Story = {
+  render: () => <PreparationTabs />,
+  globals: { viewport: { value: 'desktop' } },
+}

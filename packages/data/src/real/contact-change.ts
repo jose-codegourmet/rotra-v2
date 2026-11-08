@@ -7,6 +7,7 @@ import {
   nextActionLabel,
 } from '../contact-change-request/contactChangeRequest.rules'
 import type {
+  AdminContactChangeSubmitted,
   AdminContactRequestDetail,
   AdminContactRequestList,
   ContactChangeField,
@@ -227,4 +228,53 @@ export async function realDeclineContactChange(
   }
   if (declined.status !== 'rejected') throw new MockError('conflict', REVIEW_STALE_ERROR)
   return declined
+}
+
+/** `adminRequestDto`: only the fields the Edit profile flow needs after sending. */
+type WireSubmitted = { id: string; rawStatus: ContactChangeStatus }
+
+/** Shared with the mock so both modes say the same thing. */
+export const ADMIN_REQUEST_OPEN_ERROR =
+  'This player has an open contact-change request. Review it on the Contact tab.'
+
+/** No private-contact row yet: the service answers not found (packages/db submit()). */
+const NO_CONTACT_RECORD = 'This player has no contact record yet.'
+
+/**
+ * Sends the owner's email for one player as a pending request. Field problems come back keyed
+ * `email` (the form field); an open request is a conflict pointing to the Contact tab.
+ */
+export async function realSubmitAdminContactChange(input: {
+  playerId: string
+  field: 'email'
+  toValue: string
+  reason: string
+  commandId: string
+}): Promise<AdminContactChangeSubmitted> {
+  try {
+    const { request } = await realRequest<{ request: WireSubmitted }>(
+      '/api/contact-change-requests',
+      {
+        method: 'POST',
+        body: {
+          commandId: input.commandId,
+          playerId: input.playerId,
+          field: input.field,
+          value: input.toValue.trim().toLowerCase(),
+          reason: input.reason,
+        },
+        fields: { value: 'email' },
+      },
+    )
+    return { requestId: request.id, status: request.rawStatus }
+  } catch (error) {
+    if (!(error instanceof RealRequestError)) throw error
+    if (error.fieldErrors?.request)
+      throw new MockError('conflict', ADMIN_REQUEST_OPEN_ERROR, { email: ADMIN_REQUEST_OPEN_ERROR })
+    if (error.status === 404)
+      throw new MockError('conflict', NO_CONTACT_RECORD, { email: NO_CONTACT_RECORD })
+    const onField = error.fieldErrors?.email
+    if (onField) throw new MockError('conflict', onField, { email: onField })
+    throw error
+  }
 }

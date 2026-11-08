@@ -114,11 +114,17 @@ async function submit(
   if (!contact) throw new ServiceError('not_found')
   const original = input.field === 'phone' ? contact.phoneE164 : contact.email
   const word = CONTACT_FIELD_WORD[input.field]
+  // The owner enters it for the player, so the copy names the player, not "your".
+  const owner = source.kind === 'owner'
   if (original === proposed)
-    throw new ServiceError('invalid', { value: `That's already your ${word}.` })
+    throw new ServiceError('invalid', {
+      value: owner ? `That's already this player's ${word}.` : `That's already your ${word}.`,
+    })
   if (await collides(tx, playerId, input.field, proposed))
     throw new ServiceError('conflict', {
-      value: `That ${word} belongs to another ROTRA profile. Contact ROTRA for help.`,
+      value: owner
+        ? `That ${word} belongs to another ROTRA profile.`
+        : `That ${word} belongs to another ROTRA profile. Contact ROTRA for help.`,
     })
   return tx.playerContactChangeRequest.create({
     data: {
@@ -164,16 +170,42 @@ export async function readOwnContactChanges(context: PlayerContext) {
   return rows.map(ownRequestDto)
 }
 
-/** A-REQUESTS · owner enters a request on the player's behalf. */
+/**
+ * A-REQUESTS · owner enters a request on the player's behalf (also A-PLAYERS › Edit profile, #564).
+ * Creates a pending request only. The owner's reason has no request column, so it is kept in the
+ * audit event of the same transaction (metadata: request ID, field and reason, never a contact).
+ */
 export async function submitContactChangeForPlayer(
   context: AdminContext,
-  input: { commandId: string; playerId: string; field: ContactChangeField; value: string },
+  input: {
+    commandId: string
+    playerId: string
+    field: ContactChangeField
+    value: string
+    reason?: string
+  },
 ) {
+  requireAdmin(context)
+  const reason = input.reason?.trim()
+  if (input.reason !== undefined && !reason)
+    throw new ServiceError('invalid', { reason: 'Enter a reason.' })
   try {
     return adminRequestDto(
-      await prisma.$transaction((tx) =>
-        submit(tx, input.playerId, input, { kind: 'owner', adminId: context.adminId }),
-      ),
+      await prisma.$transaction(async (tx) => {
+        const request = await submit(tx, input.playerId, input, {
+          kind: 'owner',
+          adminId: context.adminId,
+        })
+        if (reason)
+          await recordAudit(tx, context, {
+            action: 'player.contact_change_submitted',
+            targetType: 'player',
+            targetId: request.playerId,
+            sourceCommandId: input.commandId,
+            metadata: { requestId: request.id, field: request.field, reason },
+          })
+        return request
+      }),
     )
   } catch (error) {
     mapOpen(error)

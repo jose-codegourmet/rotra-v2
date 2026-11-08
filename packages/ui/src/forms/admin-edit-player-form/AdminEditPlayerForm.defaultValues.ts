@@ -4,5 +4,6 @@ export const adminEditPlayerDefaultValues = (player: AdminPlayer): AdminPlayerEd
   name: player.name,
   nickname: player.nickname ?? '',
   picture: player.picture ?? '',
+  email: player.email ?? '',
   reason: '',
 })

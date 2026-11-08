@@ -322,6 +322,7 @@
     "./contact-change-request/useDeclineContactChange": "./src/contact-change-request/useDeclineContactChange.ts",
     "./contact-change-request/useRetryContactApplication": "./src/contact-change-request/useRetryContactApplication.ts",
     "./contact-change-request/useCheckContactApplication": "./src/contact-change-request/useCheckContactApplication.ts",
+    "./contact-change-request/useSubmitAdminContactChange": "./src/contact-change-request/useSubmitAdminContactChange.ts",
     "./fixtures/contact-change-requests": "./src/fixtures/contactChangeRequests.ts",
     "./player-account/useSetPhonePrivacy": "./src/player-account/useSetPhonePrivacy.ts",
     "./feature-flag/types": "./src/feature-flag/featureFlag.types.ts",

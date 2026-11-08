@@ -18,7 +18,7 @@ Admin sees six filtered counts: Advanced, Intermediate, Beginner, No rank, Regis
 
 An explicit Add player header action creates an unclaimed profile, with optional club, phone and email and required place. No club means Created by Admin. Admin cannot assign rank. Duplicate matches require Create anyway. An empty search only offers Clear filters.
 
-Admin may edit full name, nickname and photo for unclaimed players, and name and nickname for claimed players. Review before/after, require a reason and a current revision. Claimed players see Changed by ROTRA Admin with the reason. Contacts still require contact-change requests.
+Admin may edit full name, nickname and photo for unclaimed players, and name and nickname for claimed players. Review before/after, require a reason and a current revision. Claimed players see Changed by ROTRA Admin with the reason. Admin may also enter a new email in Edit profile (#564, owner decision, November 8, 2026): saving does not change the email, it creates an Admin-entered contact-change request (source `owner`, pending) that is reviewed and applied like any other, for registered and unclaimed players alike. It is disabled while the player has an open request, removing an email is not offered, and the reason is recorded in the Record of actions. Phone, rank and the RTR ID stay outside Edit profile; phone changes still require a contact-change request.
 
 Archive requires a reason, is reversible and hides identities from default directories and club pickers. Sign-in and retained histories remain intact. Remove requires a reason and typed RTR ID and is allowed only with no games, no claimed account and no references requiring retention. Audit retains the RTR ID.
 

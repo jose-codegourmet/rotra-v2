@@ -3,7 +3,10 @@ import { emailField } from './email'
 import { nameField } from './name'
 import { phoneField } from './phone'
 
-/** Approved Admin identity fields; contacts are accepted only during creation. */
+/**
+ * Approved Admin identity fields. Contacts are set directly only during creation; an edited email is
+ * sent for review as a contact-change request and never changes the player here.
+ */
 export const adminPlayerCreateSchema = z.object({
   name: nameField,
   nickname: z.string().trim().max(60),
@@ -20,6 +23,7 @@ export const adminPlayerEditSchema = z.object({
     z.literal(''),
     z.url().refine((value) => value.startsWith('https://'), 'Use an HTTPS photo URL.'),
   ]),
+  email: z.union([z.literal(''), emailField]),
   reason: z.string().trim().min(1, 'Enter a reason.'),
 })
 export type AdminPlayerCreateValues = z.infer<typeof adminPlayerCreateSchema>

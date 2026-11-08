@@ -8,7 +8,7 @@ import { Field } from '@rotra/ui/field'
 import { Notice } from '@rotra/ui/notice'
 import { Sheet } from '@rotra/ui/sheet'
 import { TextInput } from '@rotra/ui/text-input'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
 import { adminEditPlayerDefaultValues } from './AdminEditPlayerForm.defaultValues'
 import { adminEditPlayerSchema } from './AdminEditPlayerForm.schema'
@@ -25,7 +25,21 @@ export type AdminEditPlayerFormProps = {
   isPending?: boolean
   offline?: boolean
   serverError?: string
+  /** A server problem with the new email (from the contact-change request); shown under Email */
+  emailError?: string
+  /** The player has an open contact-change request, so a new email can't be sent yet */
+  emailLocked?: boolean
   onReload: () => void
+}
+
+const EMAIL_HINT =
+  'A new email is sent for review as a contact-change request. The current email stays until the change is applied.'
+const EMAIL_LOCKED_HINT =
+  'This player has an open contact-change request. Review it on the Contact tab.'
+
+/** Whether the form's email differs from the player's current one (trimmed, any case). */
+export function adminEditEmailChanged(player: AdminPlayer, email: string) {
+  return email.trim().toLowerCase() !== (player.email ?? '').trim().toLowerCase()
 }
 export function AdminEditPlayerForm({
   player: p,
@@ -38,6 +52,8 @@ export function AdminEditPlayerForm({
   isPending,
   offline,
   serverError,
+  emailError,
+  emailLocked = false,
   onReload,
 }: AdminEditPlayerFormProps) {
   const form = useForm({
@@ -45,12 +61,27 @@ export function AdminEditPlayerForm({
       resolver: zodResolver(adminEditPlayerSchema),
     }),
     [review, setReview] = useState<AdminPlayerEditValues | null>(null)
+  // A rejected email goes back to the edit step with the message under Email.
+  useEffect(() => {
+    if (!emailError) return
+    setReview(null)
+    onReviewChange?.(false)
+    form.setError('email', { type: 'server', message: emailError }, { shouldFocus: true })
+  }, [emailError, form, onReviewChange])
   const content = (
     <FormProvider {...form}>
       <form
         id={embedded ? `admin-edit-player-${p.id}` : undefined}
         className="flex flex-col gap-4"
         onSubmit={form.handleSubmit((values) => {
+          // An email can be replaced, not removed: clearing one is not a contact change.
+          if (p.email && !values.email.trim()) {
+            form.setError('email', {
+              type: 'required',
+              message: 'Enter an email address, like name@example.com.',
+            })
+            return
+          }
           setReview(values)
           onReviewChange?.(true)
         })}
@@ -72,6 +103,18 @@ export function AdminEditPlayerForm({
                 to={review[key] || 'Not set'}
               />
             ))}
+            {adminEditEmailChanged(p, review.email) ? (
+              <div className="flex flex-col gap-1">
+                <ChangeCompare
+                  fromLabel="Current email"
+                  toLabel="New email"
+                  from={p.email || 'Not set'}
+                  to={review.email.trim().toLowerCase()}
+                  emphasis="mono"
+                />
+                <p className="text-sm text-fg2">Sent for review · not changed yet</p>
+              </div>
+            ) : null}
             <p>Reason: {review.reason}</p>
             <Button
               type="button"
@@ -96,10 +139,11 @@ export function AdminEditPlayerForm({
         ) : (
           <>
             {(
-              ['name', 'nickname', ...(p.claimed ? [] : ['picture']), 'reason'] as (
+              ['name', 'nickname', ...(p.claimed ? [] : ['picture']), 'email', 'reason'] as (
                 | 'name'
                 | 'nickname'
                 | 'picture'
+                | 'email'
                 | 'reason'
               )[]
             ).map((name) => (
@@ -118,17 +162,22 @@ export function AdminEditPlayerForm({
                             : 'Profile photo URL'
                           : name === 'nickname'
                             ? 'Nickname'
-                            : embedded
-                              ? 'Reason for the change'
-                              : 'Reason'
+                            : name === 'email'
+                              ? 'Email'
+                              : embedded
+                                ? 'Reason for the change'
+                                : 'Reason'
                     }
                     optional={name === 'nickname' || name === 'picture'}
+                    hint={
+                      name === 'email' ? (emailLocked ? EMAIL_LOCKED_HINT : EMAIL_HINT) : undefined
+                    }
                     error={fieldState.error?.message}
                   >
                     <TextInput
                       {...field}
-                      disabled={isPending}
-                      type={name === 'picture' ? 'url' : 'text'}
+                      disabled={isPending || (name === 'email' && emailLocked)}
+                      type={name === 'picture' ? 'url' : name === 'email' ? 'email' : 'text'}
                     />
                   </Field>
                 )}
@@ -140,10 +189,7 @@ export function AdminEditPlayerForm({
               </p>
             ) : null}
             {embedded ? (
-              <p className="text-sm text-fg2">
-                Phone, email, rank and the RTR ID can't be edited here. Contact changes go through a
-                request.
-              </p>
+              <p className="text-sm text-fg2">Phone, rank and the RTR ID cannot be edited here.</p>
             ) : null}
             <Button
               className={externalActions ? 'hidden' : undefined}

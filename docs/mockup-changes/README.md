@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-IN MOCK APP: 62 · MOCKUP ONLY: 4
+IN MOCK APP: 63 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -214,6 +214,7 @@ IN MOCK APP: 62 · MOCKUP ONLY: 4
 | [2026-11-07-queue-roster-skill-mix-bar](2026-11-07-queue-roster-skill-mix-bar.md) | Skill mix bar above the roster when grouped by Skill group | — | IN MOCK APP — #472 (PR #482) |
 | [2026-11-07-queue-session-qr](2026-11-07-queue-session-qr.md) | Session QR button and sheet added to the Preparation header | — | IN MOCK APP — #471 (PR #482) |
 | [2026-11-08-admin-club-sales-tab](2026-11-08-admin-club-sales-tab.md) | Club page gets a Sales tab | sales-stat-card, admin-nav | IN MOCK APP — #504 |
+| [2026-11-08-admin-edit-profile-email](2026-11-08-admin-edit-profile-email.md) | Edit profile gets an Email field that sends a contact-change request | player-edit-form, player-review-changes | IN MOCK APP — #564 |
 | [2026-11-08-admin-password-reset-requests](2026-11-08-admin-password-reset-requests.md) | Admin-reviewed password reset requests | — | IN MOCK APP — #491 (PR #494) |
 | [2026-11-08-admin-players-layout](2026-11-08-admin-players-layout.md) | Admin Players page gets a cleaner layout | admin-player-stats, admin-player-filters, admin-player-card, admin-player-bulk-bar, player-pagination, admin-player-quick-view, admin-player-history | IN MOCK APP — #503 (PR #566) |
 | [2026-11-08-admin-sales-page](2026-11-08-admin-sales-page.md) | Admin gets a Sales page | sales-stat-card, admin-nav | IN MOCK APP — #504 |

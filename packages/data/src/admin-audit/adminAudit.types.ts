@@ -23,6 +23,7 @@ export type AdminAuditAction =
   | 'club_name_change_rejected'
   | 'license_activated'
   | 'license_renewed'
+  | 'contact_change_submitted'
   | 'contact_change_approved'
   | 'contact_change_declined'
   | 'contact_change_applied'

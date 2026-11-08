@@ -41,7 +41,7 @@ Application design:
 4. Mark applied only when provider login and application identity agree. On failure, retain a retryable state, not a success message.
 5. Keep the player's UUID/RTR ID and history unchanged.
 
-Players cannot write contact rows directly or bypass this process through generic profile editing. Password-reset flows remain separate from contact changes.
+Admin Edit profile (email only, #564) is another entry point: it inserts a request with `source = owner` and status pending, the typed reason goes to the audit event for that request (no reason column on the request), and no schema change is needed. Players cannot write contact rows directly or bypass this process through generic profile editing. Password-reset flows remain separate from contact changes.
 
 ## `admin_audit_events`
 

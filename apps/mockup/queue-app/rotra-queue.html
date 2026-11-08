@@ -2979,8 +2979,7 @@ function joinCard(s) {
   }
   const open = openSlots(s);
   if (s.acceptReq === false) return '<section class="card join-card"><p class="small muted">This session isn\'t taking requests online. Contact the Queue Master to play.</p></section>';
-  const cap = capacityOf(s);
-  const slots = s.status === 'active' ? '<span class="jc-open">Additional players can be admitted</span>' : open ? `<span class="jc-open"><b class="tnum">${open}</b> of ${cap} slots open</span>` : '<span class="jc-open full">All slots taken</span>';
+  const slots = s.status === 'active' ? '<span class="jc-open">Additional players can be admitted</span>' : open ? `<span class="jc-open"><b class="tnum">${open}</b> slot${open === 1 ? '' : 's'} left</span>` : '<span class="jc-open full">All slots taken</span>';
   return `<section class="card stack join-card"><div class="jc-top"><h2>Want to play?</h2>${slots}</div>
     ${s.roster.length ? skillMix(s.roster) : ''}
     <p class="small muted">${s.status === 'active' ? 'The Queue Master can admit additional players. ' : open ? '' : 'Confirmed guests join the waitlist. '}Send a quick request and the Queue Master confirms it.</p>

@@ -32,7 +32,7 @@ type AvailabilityProps = {
 export type JoinRequestCardProps = CommonProps &
   (
     | ({
-        /** Slots are open: "N of M slots open." and Request to join */
+        /** Slots are open: "N slots left" and Request to join */
         variant: 'open'
         openSlots: number
         capacity: number
@@ -136,8 +136,8 @@ export function JoinRequestCard(props: JoinRequestCardProps) {
             <h2 id={headingId}>Want to play?</h2>
             {props.variant === 'open' ? (
               <span className="text-[13px] text-fg2">
-                <b className="text-xl tabular-nums text-accent">{props.openSlots}</b> of{' '}
-                {props.capacity} slots open
+                <b className="text-xl tabular-nums text-accent">{props.openSlots}</b>{' '}
+                {props.openSlots === 1 ? 'slot' : 'slots'} left
               </span>
             ) : props.variant === 'full' ? (
               <span className="text-[13px] font-semibold text-warn">All slots taken</span>

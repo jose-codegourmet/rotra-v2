@@ -38,8 +38,11 @@ const meta = {
 export default meta
 type Story = StoryObj<JoinRequestCardProps>
 
-/** "N of M slots open." with Request to join. */
+/** "N slots left" with Request to join. */
 export const Open: Story = {}
+
+/** Exactly one available slot. */
+export const OneSlotLeft: Story = { args: { variant: 'open', openSlots: 1, capacity } }
 
 /** Every slot is taken: confirmed guests join the waitlist; Request to join stays. */
 export const Full: Story = { args: { variant: 'full', onRequestToJoin: fn() } }

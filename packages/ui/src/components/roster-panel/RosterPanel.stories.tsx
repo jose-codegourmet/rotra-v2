@@ -150,6 +150,10 @@ export const Locked: Story = {
   },
 }
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
+export const PhoneLevelMenu: Story = {
+  args: { levelTab: 'advanced' },
+  globals: { viewport: { value: 'phone' } },
+}
 export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }
 
 export const ReadOnly: Story = { args: { ...Locked.args, readOnly: true } }

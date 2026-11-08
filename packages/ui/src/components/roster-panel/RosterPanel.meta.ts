@@ -10,6 +10,7 @@ export const rosterPanelMeta = {
     'Use for the Roster and levels tab of a prepared Queue Session (Q-PREPARE).',
     'Mark all present shows only while someone is not present; Mark all absent only while someone is present.',
     'Level tabs are All, Advanced, Intermediate, Beginner, and No level only while someone has none. Group by Skill group is offered on All only and shows the SkillDistributionBar above the groups.',
+    'At 640 px and narrower the level tabs become a TabMenu: one full-width button (current level, count, chevron) opening a list with count chips ("Advanced · 4") and a check on the current one. Wider screens keep the tab row.',
     'List is RosterRow; Grid is RosterCard. Tab, Group by and view can be controlled, or they stay on this component until the screen remembers them on the device.',
     'paid and returning are optional player flags for Group by Payment and Returning or first time; omit them until those are wired.',
     'Do not use in the live console: Queue › Players shows locked levels and no remove action.',
@@ -24,7 +25,8 @@ export const rosterPanelMeta = {
     'docs/screens/product/modules/queue/players-roster.md',
     'docs/mockup-changes/2026-11-06-queue-roster-views.md',
     'docs/mockup-changes/2026-11-08-queue-roster-view-toggle-icons.md',
+    'docs/mockup-changes/2026-11-08-queue-phone-tabs-dropdown.md',
     'docs/business_logic/product/queue/modules/players/README.md',
   ],
-  related: ['RosterRow', 'RosterCard', 'SlotMeter', 'WaitlistPanel', 'Notice', 'EmptyState'],
+  related: ['TabMenu', 'RosterRow', 'RosterCard', 'SlotMeter', 'WaitlistPanel', 'Notice', 'EmptyState'],
 } satisfies ComponentMeta

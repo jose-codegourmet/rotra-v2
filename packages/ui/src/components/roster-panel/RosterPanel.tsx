@@ -16,6 +16,7 @@ import { Select } from '@rotra/ui/select'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { SkillDistributionBar } from '@rotra/ui/skill-distribution-bar'
 import { SlotMeter } from '@rotra/ui/slot-meter'
+import { TabMenu } from '@rotra/ui/tab-menu'
 import { Tabs as TabsPrimitive } from 'radix-ui'
 import { useId, useState } from 'react'
 import {
@@ -300,7 +301,21 @@ export function RosterPanel({
         ) : null}
         {players.length ? (
           <>
+            {/* Phones: the prototype's .tab-menu (current level + count + chevron) */}
+            <div className="hidden max-[640px]:block">
+              <TabMenu
+                aria-label="Levels"
+                items={tabs.map((item) => ({
+                  value: item.value,
+                  label: item.label,
+                  badges: [{ text: String(item.count) }],
+                }))}
+                value={tab}
+                onChange={(value) => setLevelTab(value as RosterLevelTab)}
+              />
+            </div>
             <TabsPrimitive.Root
+              className="max-[640px]:hidden"
               value={tab}
               onValueChange={(value) => setLevelTab(value as RosterLevelTab)}
             >

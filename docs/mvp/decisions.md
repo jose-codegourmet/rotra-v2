@@ -15,7 +15,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-07-05](#d-2026-11-07-05) | Payment amounts reuse the existing paid mark | approved | implemented | #479 | [Queue](workstreams/queue.md) |
 | [D-2026-11-07-06](#d-2026-11-07-06) | Public participant names are masked | approved | implemented | #475, #474 | [Queue](workstreams/queue.md) |
 | [D-2026-11-07-07](#d-2026-11-07-07) | Player invite links use player login until sign-up exists | approved | implemented | #476, #478; #477 blocked | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
-| [D-2026-11-08-01](#d-2026-11-08-01) | Where Admin Sales numbers are calculated | approved | not started | #533, #540 (epic #504) | [Admin](workstreams/admin.md) |
+| [D-2026-11-08-01](#d-2026-11-08-01) | Where Admin Sales numbers are calculated | approved | implemented in source; SQL not yet verified against a database | #533, #540 (epic #504) | [Admin](workstreams/admin.md) |
 | [D-2026-11-08-02](#d-2026-11-08-02) | Player Compare data, rules and route | approved | implemented in source; SQL draft, verification pending | #525, #526, #541 (epic #502) | [Player](workstreams/player.md) |
 | [D-2026-11-08-03](#d-2026-11-08-03) | Profile pictures in Supabase Storage | approved | in progress | #522, #542 (epic #502) | [Player](workstreams/player.md) |
 | [D-2026-11-08-04](#d-2026-11-08-04) | Scheduled jobs: Supabase pg_cron calls protected Route Handlers | approved | not started | #545; #546, #547 blocked | [Backend](workstreams/backend.md) |
@@ -128,7 +128,7 @@ Then add a row to the [index](#index) and link the entry from the workstream pag
 <a id="d-2026-11-08-01"></a>
 ### D-2026-11-08-01 — Where Admin Sales numbers are calculated
 - **Decision status:** approved (2026-11-08; the owner delegated the choice and asked for the most efficient option)
-- **Implementation status:** not started (the Sales page and the club Sales tab exist only in the Admin mockup, with sample figures)
+- **Implementation status:** implemented in source (A06.1–A06.4); the Postgres functions have not run against a seeded database yet. Cost per session lives in the new single-row `admin_settings` table (owner choice, 2026-11-08), since no Admin configuration table existed
 - **Ticket:** [#533](https://github.com/jose-codegourmet/rotra-v2/issues/533) (mock data), [#540](https://github.com/jose-codegourmet/rotra-v2/issues/540) (Postgres views and real-mode reader), epic [#504](https://github.com/jose-codegourmet/rotra-v2/issues/504)
 - **Roadmap:** MVP candidate — [Admin workstream](workstreams/admin.md)
 - **Question:** Should revenue, sessions-started, matches-played and per-club cost-per-session be calculated in Next.js (route handlers or server code) or in Supabase (Postgres)?

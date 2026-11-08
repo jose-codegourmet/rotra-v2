@@ -15,6 +15,7 @@ model AdminAccount {
   createdFlags            FeatureFlag[]                @relation("FeatureFlagCreatedBy")
   updatedFlags            FeatureFlag[]                @relation("FeatureFlagUpdatedBy")
   rankingPolicies         RankingPolicyVersion[]
+  updatedSettings         AdminSetting[]
   passwordResetRequests   PlayerPasswordResetRequest[]
   auditEvents             AdminAuditEvent[]
   submittedContactChanges PlayerContactChangeRequest[] @relation("ContactChangeSubmittedBy")

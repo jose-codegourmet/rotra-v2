@@ -6,6 +6,7 @@ export const editProfileMeta = {
   usage: [
     'Signed-out visitors never reach it: proxy.ts sends /profile/* to sign-in with returnTo.',
     "Success toasts 'Profile saved' and returns to the profile; a failed or offline save keeps every typed value.",
+    'Picture changes save independently of the personal details draft and do not mark it dirty.',
     'D-DISCARD opens for Cancel, the back button, the top bar and browser Back, only when something changed.',
     'Request a phone or email change opens the P-CONTACT-REQUEST sheet over the form (the draft stays); Phone privacy goes to /profile/privacy-and-contact.',
   ],

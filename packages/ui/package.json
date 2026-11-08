@@ -234,6 +234,7 @@
     "./forms/publish-results-form/default-values": "./src/forms/publish-results-form/PublishResultsForm.defaultValues.ts",
     "./forms/publish-results-form/schema": "./src/forms/publish-results-form/PublishResultsForm.schema.ts",
     "./player-id-line": "./src/components/player-id-line/PlayerIdLine.tsx",
+    "./profile-picture": "./src/components/profile-picture-sheet/profilePicture.ts",
     "./profile-picture-sheet": "./src/components/profile-picture-sheet/ProfilePictureSheet.tsx",
     "./player-identity-card": "./src/components/player-identity-card/PlayerIdentityCard.tsx",
     "./player-about-card": "./src/components/player-about-card/PlayerAboutCard.tsx",

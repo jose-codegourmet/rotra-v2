@@ -15,6 +15,8 @@ import { Skeleton } from '@rotra/ui/skeleton'
 import { toast } from '@rotra/ui/toaster'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { pictureSrc } from '@/app/_components/profile-picture/pictureSrc'
+import { useProfilePictureSheet } from '@/app/_components/profile-picture/useProfilePictureSheet'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { selectAccount } from '@/store/slices/authSlice'
 import {
@@ -37,6 +39,7 @@ export function EditProfile() {
   const profile = usePlayerProfile(playerId)
   const myAccount = useMyAccount(account ? playerId : null)
   const update = useUpdateMyProfile()
+  const pictureEditor = useProfilePictureSheet(profile.data)
   // Opens over the edit page, so the profile draft stays.
   const contactChange = useContactChangeSheet(account ? playerId : null)
   const router = useRouter()
@@ -149,6 +152,9 @@ export function EditProfile() {
       ) : null}
       <EditProfileForm
         defaultValues={defaultValues}
+        picture={pictureSrc(profile.data.picture, playerId, profile.data.fullName)}
+        pictureName={profile.data.fullName}
+        onChangePicture={pictureEditor.openSheet}
         account={{
           phone: myAccount.data.phone,
           email: myAccount.data.email,
@@ -192,6 +198,7 @@ export function EditProfile() {
         onConfirm={discard}
       />
       {contactChange.sheet}
+      {pictureEditor.sheet}
     </main>
   )
 }

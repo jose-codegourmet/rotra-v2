@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./player/guest-registration": "./src/player/guest-registration.ts",
     "./client": "./src/client/prisma.ts",
     "./admin/club-identity": "./src/admin/club-identity.ts",
     "./player/rtr-id": "./src/player/rtr-id.ts",

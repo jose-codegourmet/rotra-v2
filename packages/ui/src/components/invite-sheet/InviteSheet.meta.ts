@@ -5,6 +5,7 @@ export const inviteSheetMeta = {
   description:
     'Gives the operator a link to send a guest (create a ROTRA account) or an unclaimed player (claim their profile).',
   usage: [
+    'Guest registration keeps the club guest record unlinked; a separate linking invitation is required.',
     'ROTRA never sends the invite: the operator copies the link and sends it through Messenger, SMS or similar.',
     'Pass link once it is made; while undefined a skeleton shows. offline replaces the link with "Making an invite link needs an internet connection."',
     'The container toasts after onCopy.',

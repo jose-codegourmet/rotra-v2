@@ -46,7 +46,9 @@ export async function signIn(audience: AuthAudience, input: SignInInput): Promis
     const account = readMockState().playerAccounts.find(
       (entry) => entry.claimed && entry.email?.toLowerCase() === email,
     )
-    player = account ? players.find((entry) => entry.id === account.playerId) : undefined
+    player = account
+      ? readMockState().players.find((entry) => entry.id === account.playerId)
+      : undefined
     if (!player)
       throw new MockError(
         'permission',

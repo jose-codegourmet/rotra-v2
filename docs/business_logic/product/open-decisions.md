@@ -52,7 +52,7 @@ Player login mapping and claim links ([#244](https://github.com/jose-codegourmet
 | L6 · Contact collisions at claim | If the phone or email already belongs to another account, **block** and show the contact-support route. Never merge silently |
 | L7 · No claim by ID or name | An RTR ID or a name alone can never claim an account |
 
-Still open after this decision: email verification on claim; password policy and complexity; contact-change enforcement across direct provider APIs and its approval evidence; RTR ID location/date/sequence rules and simultaneous allocation; mistaken or duplicate guest links and permanent relink; failed provider application handling; guest invitation for a name-only guest.
+Still open after this decision: email verification on claim; password policy and complexity; contact-change enforcement across direct provider APIs and its approval evidence; RTR ID location/date/sequence rules and simultaneous allocation; mistaken or duplicate guest links and permanent relink; failed provider application handling. Guest registration is settled by #490 below; separate linking remains open.
 
 ## Settled by the product owner on November 6, 2026
 
@@ -186,3 +186,13 @@ Decided by the platform owner on October 27, 2026, while reviewing the [ROTRA Ad
 ## Settled by the product owner (October 31, 2026)
 
 Queue prepared capacity, individual court windows, Auto Queue generation (now called Generate matches) and draft transfer are recorded in [the owner review](../../decisions/2026-10-30-queue-flexibility/05-owner-review.md). Pairing weights, money and ranking formulas remain open where previously recorded.
+
+
+## Guest registration settled on November 8, 2026 (#490)
+
+A name-only guest invitation opens registration. Creating an account leaves the club guest record
+unlinked until a separate linking invitation is accepted. Contact matches ask whether the existing
+account is theirs before creating any duplicate: Yes requires sign-in/email recovery; No allows
+contact correction or contacting ROTRA. A match or a Yes answer never proves ownership or links
+history. Unclaimed profiles retain their existing claim-link flow. Separate guest-link invitation
+verification and mistaken-link resolution remain open.

@@ -4,6 +4,7 @@ export const claimFormMeta = {
   description:
     'P-CLAIM step 2, Finish registering: the read-only masked phone, required email and password, and optional personal details.',
   usage: [
+    'standalone opens the empty guest registration form. accountMatch offers sign-in/recovery or editing contacts; it never reveals another profile or links the guest.',
     'The container owns useCompleteClaim, toasts and the next step; the form never mutates.',
     'Submitted values carry email, password and personal details, never the phone.',
     'No SMS step, Facebook authorization, age, gear, tournament or self-rating field.',

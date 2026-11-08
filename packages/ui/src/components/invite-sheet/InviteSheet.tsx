@@ -81,6 +81,9 @@ export function InviteSheet({
         </Field>
       )}
       <p className="m-0 text-[13px] text-fg2">
+        {!claim
+          ? 'Their guest record stays unlinked until they accept a separate linking invitation. '
+          : ''}
         The link only sets up their account. It doesn't book them into a session; you still add
         players to each session yourself.
       </p>

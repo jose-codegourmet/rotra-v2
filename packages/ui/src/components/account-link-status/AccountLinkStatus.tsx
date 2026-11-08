@@ -21,6 +21,8 @@ export type AccountLinkStatusProps = {
   /** claim-done */
   firstName?: string
   rtrId?: string
+  /** Newly registered through a guest invitation; no existing games or guest record were linked. */
+  standalone?: boolean
   /** claim-processing: Check again is running */
   isPending?: boolean
   onBackToSignIn?: () => void
@@ -38,6 +40,7 @@ export function AccountLinkStatus({
   clubName = 'your club',
   firstName,
   rtrId,
+  standalone = false,
   isPending = false,
   onBackToSignIn,
   onRequestAnother,
@@ -137,8 +140,11 @@ export function AccountLinkStatus({
           <Card asChild>
             <section className="flex flex-col gap-1.5">
               <p className="m-0">
-                Your player ID stays <span className="font-mono">{rtrId}</span>. Your games and rank
-                carry over.
+                {standalone ? 'Your player ID is ' : 'Your player ID stays '}
+                <span className="font-mono">{rtrId}</span>.
+                {standalone
+                  ? ' Your club guest record stays unlinked until you accept a separate linking invitation.'
+                  : ' Your games and rank carry over.'}
               </p>
               <div className={actions}>
                 <Button variant="primary" onClick={onOpenProfile}>

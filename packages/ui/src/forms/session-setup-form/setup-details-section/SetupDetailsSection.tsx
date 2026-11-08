@@ -1,5 +1,6 @@
 'use client'
 
+import { sessionWindowError } from '@rotra/schema/court-window'
 import { ClashNotice } from '@rotra/ui/clash-notice'
 import { cn } from '@rotra/ui/cn'
 import { formatLongDate } from '@rotra/ui/date-picker/date-calendar/helpers'
@@ -12,8 +13,8 @@ import { TextInput } from '@rotra/ui/text-input'
 import { Controller, useFormContext, useWatch } from 'react-hook-form'
 import {
   clockOf,
-  durationMinutes,
-  formatMinutes,
+  formatDurationLabel,
+  isOvernight,
   sessionDays,
   sessionTimes,
 } from '../SessionSetupForm.helpers'
@@ -31,7 +32,20 @@ export type SetupDetailsSectionProps = {
 const MINUTE = 60_000
 const DAY = 864e5
 
-/** Page 1 › Details: title, date, times, repeats (new sessions), and the venue. */
+// The prototype's .time-pair: the two time fields share one row, so they drop the clock icon, use a
+// 12 px chevron and a 14 px time that never wraps.
+const TIME_PAIR = cn(
+  'grid grid-cols-2 items-start gap-3.5',
+  '[&_button[aria-haspopup=dialog]]:max-w-none [&_button[aria-haspopup=dialog]]:gap-1 [&_button[aria-haspopup=dialog]]:px-2',
+  '[&_button[aria-haspopup=dialog]>svg:first-child]:hidden',
+  '[&_button[aria-haspopup=dialog]>svg:last-child]:size-3',
+  '[&_button[aria-haspopup=dialog]>span]:text-sm [&_button[aria-haspopup=dialog]>span]:whitespace-nowrap',
+)
+
+/**
+ * Page 1 › Details: title, venue, then the when block (Date with Starts and Ends side by side, and
+ * the Total duration box), repeats (new sessions) and the clash warning.
+ */
 export function SetupDetailsSection({
   mode,
   occurrences,
@@ -50,6 +64,8 @@ export function SetupDetailsSection({
     startTime: times.startTime,
     endTime: times.endTime,
   })
+  const endOk = Number.isFinite(start) && Number.isFinite(end) && !sessionWindowError(start, end)
+  const duration = endOk ? Math.round((end - start) / MINUTE) : null
   const everyClash = occurrences.length > 0 && occurrences.every((o) => o.clash)
   const venueError = errors.venue?.message ?? errors.venue?.venueId?.message
 
@@ -68,68 +84,113 @@ export function SetupDetailsSection({
           )}
         />
       </Field>
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,200px),1fr))] gap-3.5">
-        <div className="flex min-w-0 flex-col gap-1.5">
-          <span className="text-[13px] font-semibold text-fg2">Date</span>
-          <button
-            type="button"
-            onClick={onOpenDatePicker}
-            aria-haspopup="dialog"
-            aria-label={`Date, ${values.date ? formatLongDate(values.date) : 'none'}. Change date`}
-            className={cn(
-              inputVariants({}),
-              'flex items-center gap-2.5 text-left hover:border-accent',
-            )}
-          >
-            <Icon name="calendar" className="flex-none text-accent" />
-            <span className="min-w-0 truncate">
-              {values.date ? formatLongDate(values.date) : 'Choose a date'}
-            </span>
-          </button>
-        </div>
-        <Field label="Starts" error={errors.startTime?.message}>
-          <Controller
-            control={form.control}
-            name="startTime"
-            render={({ field }) => (
-              <DateTimePicker
-                ref={field.ref}
-                name={field.name}
-                onBlur={field.onBlur}
-                label="Starts"
-                value={Number.isFinite(start) ? start : null}
-                onChange={(next) => next != null && field.onChange(clockOf(next))}
-                days={Number.isFinite(start) ? [start] : []}
-                invalid={Boolean(errors.startTime)}
-              />
-            )}
-          />
-        </Field>
-        <Field
-          label="Ends"
-          error={errors.endTime?.message}
-          hint={formatMinutes(durationMinutes(times))}
+      <div className="flex min-w-0 flex-col gap-1.5">
+        <span className="text-[13px] font-semibold text-fg2">Venue</span>
+        <button
+          type="button"
+          onClick={onOpenVenuePicker}
+          aria-haspopup="dialog"
+          aria-label={`Venue: ${values.venue?.name || 'none chosen'}. Choose venue`}
+          className={cn(
+            inputVariants({ invalid: Boolean(venueError) }),
+            'flex min-h-12 items-center gap-2.5 text-left hover:border-accent',
+          )}
         >
-          <Controller
-            control={form.control}
-            name="endTime"
-            render={({ field }) => (
-              <DateTimePicker
-                ref={field.ref}
-                name={field.name}
-                onBlur={field.onBlur}
-                label="Ends"
-                value={Number.isFinite(end) ? end : null}
-                onChange={(next) => next != null && field.onChange(clockOf(next))}
-                days={sessionDays(start, start + DAY)}
-                base={start}
-                min={start + MINUTE}
-                max={start + DAY}
-                invalid={Boolean(errors.endTime)}
-              />
+          <Icon name="pin" className="flex-none text-accent" />
+          <span className="flex min-w-0 flex-col">
+            {values.venue?.name ? (
+              <>
+                <b className="truncate">{values.venue.name}</b>
+                {values.venue.address ? (
+                  <span className="truncate text-[13px] text-fg2">{values.venue.address}</span>
+                ) : null}
+              </>
+            ) : (
+              <span className="text-fg2">Choose or add a venue</span>
             )}
-          />
-        </Field>
+          </span>
+        </button>
+        <span aria-live="polite" className="text-[13px] font-semibold text-error empty:hidden">
+          {venueError}
+        </span>
+      </div>
+      <p className="m-0 text-xs text-fg2">
+        The venue can differ from where your club was founded. It doesn't change your club's
+        founding address.
+      </p>
+      <div className="grid grid-cols-[minmax(0,4fr)_minmax(84px,1fr)] items-stretch gap-3.5">
+        <div className="flex min-w-0 flex-col gap-3.5">
+          <div className="flex min-w-0 flex-col gap-1.5">
+            <span className="text-[13px] font-semibold text-fg2">Date</span>
+            <button
+              type="button"
+              onClick={onOpenDatePicker}
+              aria-haspopup="dialog"
+              aria-label={`Date, ${values.date ? formatLongDate(values.date) : 'none'}. Change date`}
+              className={cn(
+                inputVariants({}),
+                'flex items-center gap-2.5 text-left hover:border-accent',
+              )}
+            >
+              <Icon name="calendar" className="flex-none text-accent" />
+              <span className="min-w-0 truncate">
+                {values.date ? formatLongDate(values.date) : 'Choose a date'}
+              </span>
+            </button>
+          </div>
+          <div className={TIME_PAIR}>
+            <Field label="Starts" error={errors.startTime?.message}>
+              <Controller
+                control={form.control}
+                name="startTime"
+                render={({ field }) => (
+                  <DateTimePicker
+                    ref={field.ref}
+                    name={field.name}
+                    onBlur={field.onBlur}
+                    label="Starts"
+                    value={Number.isFinite(start) ? start : null}
+                    onChange={(next) => next != null && field.onChange(clockOf(next))}
+                    days={Number.isFinite(start) ? [start] : []}
+                    invalid={Boolean(errors.startTime)}
+                  />
+                )}
+              />
+            </Field>
+            <Field label="Ends" error={errors.endTime?.message}>
+              <Controller
+                control={form.control}
+                name="endTime"
+                render={({ field }) => (
+                  <DateTimePicker
+                    ref={field.ref}
+                    name={field.name}
+                    onBlur={field.onBlur}
+                    label="Ends"
+                    value={Number.isFinite(end) ? end : null}
+                    onChange={(next) => next != null && field.onChange(clockOf(next))}
+                    days={sessionDays(start, start + DAY)}
+                    base={start}
+                    min={start + MINUTE}
+                    max={start + DAY}
+                    nextDaySwitch
+                    suffix={endOk && isOvernight(times) ? 'next day' : undefined}
+                    invalid={Boolean(errors.endTime)}
+                  />
+                )}
+              />
+            </Field>
+          </div>
+        </div>
+        <div
+          aria-live="polite"
+          className="flex flex-col justify-center gap-1.5 rounded-lg border border-border bg-surface p-3 text-center"
+        >
+          <span className="text-[11px] font-semibold tracking-[0.5px] text-fg2 uppercase">
+            Total duration
+          </span>
+          <b className="text-[22px] leading-[1.15] tabular-nums">{formatDurationLabel(duration)}</b>
+        </div>
       </div>
       {mode === 'create' ? (
         <Controller
@@ -165,40 +226,6 @@ export function SetupDetailsSection({
           onView={onViewClash}
         />
       ) : null}
-      <div className="flex min-w-0 flex-col gap-1.5">
-        <span className="text-[13px] font-semibold text-fg2">Venue</span>
-        <button
-          type="button"
-          onClick={onOpenVenuePicker}
-          aria-haspopup="dialog"
-          aria-label={`Venue: ${values.venue?.name || 'none chosen'}. Choose venue`}
-          className={cn(
-            inputVariants({ invalid: Boolean(venueError) }),
-            'flex min-h-12 items-center gap-2.5 text-left hover:border-accent',
-          )}
-        >
-          <Icon name="pin" className="flex-none text-accent" />
-          <span className="flex min-w-0 flex-col">
-            {values.venue?.name ? (
-              <>
-                <b className="truncate">{values.venue.name}</b>
-                {values.venue.address ? (
-                  <span className="truncate text-[13px] text-fg2">{values.venue.address}</span>
-                ) : null}
-              </>
-            ) : (
-              <span className="text-fg2">Choose or add a venue</span>
-            )}
-          </span>
-        </button>
-        <span aria-live="polite" className="text-[13px] font-semibold text-error empty:hidden">
-          {venueError}
-        </span>
-      </div>
-      <p className="m-0 text-xs text-fg2">
-        The venue can differ from where your club was founded. It doesn't change your club's
-        founding address.
-      </p>
     </>
   )
 }

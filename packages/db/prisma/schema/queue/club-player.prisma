@@ -3,17 +3,19 @@
 // read private contacts. Names are not unique.
 
 model ClubPlayer {
-  id          String   @id @db.Uuid
-  clubId      String   @map("club_id") @db.Uuid
+  id          String    @id @db.Uuid
+  clubId      String    @map("club_id") @db.Uuid
   /// Null for guests. Unique per club when set.
-  playerId    String?  @map("player_id") @db.Uuid
-  displayName String   @map("display_name")
+  playerId    String?   @map("player_id") @db.Uuid
+  displayName String    @map("display_name")
   nickname    String?
   /// When the club first saved this player (Saved players "Added" sort/filter).
-  addedAt     DateTime @map("added_at") @db.Timestamptz(6)
-  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
-  revision    BigInt   @default(1)
+  addedAt     DateTime  @map("added_at") @db.Timestamptz(6)
+  /// The club deleted this saved player (soft delete; history keeps the row). Null = current.
+  removedAt   DateTime? @map("removed_at") @db.Timestamptz(6)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision    BigInt    @default(1)
 
   club            Club                    @relation(fields: [clubId], references: [id], onDelete: Restrict)
   player          Player?                 @relation(fields: [playerId], references: [id], onDelete: Restrict)

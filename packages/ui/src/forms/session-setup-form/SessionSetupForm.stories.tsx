@@ -266,7 +266,7 @@ export const FiveCourtBookingWindows: Story = {
   },
 }
 
-/** An end earlier than the start: the Ends picker lists "· next day" times, no guessed hint. */
+/** An end earlier than the start: Ends shows "next day"; Total duration reads "2 HR 30 MIN". */
 export const OvernightSession: Story = {
   args: {
     initialValues: {
@@ -280,8 +280,92 @@ export const OvernightSession: Story = {
   },
 }
 
-/** The same overnight session at phone width: court pickers with "Session start" / "Session end". */
+/** The same overnight session at phone width: court pictures with their planned times. */
 export const OvernightCourtWindows: Story = {
   args: OvernightSession.args,
   globals: { viewport: { value: 'phone' } },
+}
+
+/** Step 1 with one court: one court picture, "8 slots". */
+export const StepOneOneCourt: Story = {
+  args: {
+    initialValues: { ...withVenue, courtLabels: ['Court 1'], courtStarts: [''], courtEnds: [''] },
+  },
+}
+export const StepOneOneCourtLight: Story = { ...StepOneOneCourt, globals: { theme: 'light' } }
+
+/** Step 1 with three courts, one with its own planned start. */
+export const StepOneThreeCourts: Story = {
+  args: {
+    initialValues: {
+      ...withVenue,
+      courtLabels: ['Court 1', 'Court 2', 'Court 3'],
+      courtStarts: ['', '20:00', ''],
+      courtEnds: ['', '', ''],
+    },
+  },
+}
+export const StepOneThreeCourtsLight: Story = {
+  ...StepOneThreeCourts,
+  globals: { theme: 'light' },
+}
+export const StepOneThreeCourtsPhone: Story = {
+  ...StepOneThreeCourts,
+  globals: { viewport: { value: 'phone' } },
+}
+
+/** 9:00 PM to 1:00 AM: Ends shows "next day" and Total duration reads "4 HR". */
+export const NextDayEnd: Story = {
+  args: { initialValues: { ...withVenue, startTime: '21:00', endTime: '01:00' } },
+}
+export const NextDayEndLight: Story = { ...NextDayEnd, globals: { theme: 'light' } }
+
+/** An end that doesn't parse: Next shows the Ends error and Total duration reads "—". */
+export const InvalidEnd: Story = {
+  args: { initialValues: { ...withVenue, endTime: '' } },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: 'Next' }))
+  },
+}
+export const InvalidEndLight: Story = { ...InvalidEnd, globals: { theme: 'light' } }
+
+/** Court 2 open until after the session end: its picture and the line under the pictures show it. */
+export const CourtError: Story = {
+  args: {
+    initialValues: {
+      ...withVenue,
+      courtLabels: ['Court 1', 'Court 2'],
+      courtStarts: ['', ''],
+      courtEnds: ['', '23:00'],
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: 'Next' }))
+    await expect(await canvas.findByText(/Press a court to fix it\./)).toBeInTheDocument()
+  },
+}
+export const CourtErrorLight: Story = { ...CourtError, globals: { theme: 'light' } }
+
+/** Pressing a court picture opens Edit Court 1: label, planned start, planned end, Done. */
+export const EditCourtDialog: Story = {
+  args: StepOneThreeCourts.args,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: /^Court 1: .*Edit this court$/ }))
+  },
+}
+export const EditCourtDialogLight: Story = { ...EditCourtDialog, globals: { theme: 'light' } }
+
+/** The court error inside Edit Court 2; Done returns focus to its picture. */
+export const EditCourtDialogError: Story = {
+  args: CourtError.args,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: 'Next' }))
+    await userEvent.click(
+      await canvas.findByRole('button', { name: /^Court 2: .*Edit this court$/ }),
+    )
+  },
+}
+export const EditCourtDialogErrorLight: Story = {
+  ...EditCourtDialogError,
+  globals: { theme: 'light' },
 }

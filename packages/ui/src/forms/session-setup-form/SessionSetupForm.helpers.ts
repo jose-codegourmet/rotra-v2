@@ -24,6 +24,22 @@ export function formatMinutes(minutes: number): string {
 }
 
 /**
+ * The Total duration box: "4 HR", "1 HR 30 MIN", "45 MIN", or "—" while the end is invalid (null).
+ * The prototype's durLabel().
+ */
+export function formatDurationLabel(minutes: number | null): string {
+  if (minutes == null || !Number.isFinite(minutes)) return '—'
+  const h = Math.floor(minutes / 60)
+  const m = minutes % 60
+  return [h ? `${h} HR` : '', m ? `${m} MIN` : ''].filter(Boolean).join(' ') || '0 MIN'
+}
+
+/** "7:00 PM": a court's planned time on its setup picture (the prototype's fmtTime()). */
+export function formatCourtTime(instant: number): string {
+  return new Date(instant).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+}
+
+/**
  * Setup values as full instants: the one place the clock-only time fields become instants until
  * the date-and-time picker (Q12.24) sends each day. The start is on the session date; the end and
  * each court time are the first such clock time from the start (the end strictly after it, so at

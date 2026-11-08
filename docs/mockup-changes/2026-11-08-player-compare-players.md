@@ -1,6 +1,6 @@
 # Compare yourself with another player
 
-Status: IN PROGRESS — #502; components in #524, data and screen wiring remain
+Status: IN PROGRESS — #502; components in #524 and final-row mock data in #525; screen wiring remains in #526
 Date: 2026-11-08
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › another player's profile › Compare with me, and the new compare page

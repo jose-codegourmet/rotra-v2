@@ -185,6 +185,92 @@ button.brand { display: flex; align-items: baseline; gap: 8px; background: none;
 .live { display: inline-flex; align-items: center; gap: 6px; }
 .live i { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: pulse 1.6s infinite; flex: none; }
 @media (prefers-reduced-motion: reduce) { .live i { animation: none; } }
+.page-head > .row.between:has(.pl-add) { flex-wrap: nowrap; align-items: flex-start; gap: 12px; }
+.pl-add { flex: none; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; }
+.sl-bars { display: flex; align-items: flex-end; gap: 8px; height: 84px; padding-top: 6px; }
+.sl-bars span { flex: 1 1 0; min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px; }
+.sl-bars i { display: block; width: 100%; max-width: 44px; border-radius: 4px 4px 0 0; background: var(--accent); opacity: .85; }
+.sl-bars em { font-size: 11px; font-style: normal; color: var(--fg2); }
+.sl-tools { margin-bottom: 14px; }
+.sl-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 12px; margin-bottom: 14px; }
+.sl-kpi { color: var(--accent); gap: 8px; }
+.sl-kpi .label { color: var(--fg2); }
+.sl-val { font-size: 30px; font-weight: 800; line-height: 1.1; color: var(--fg); }
+.sl-chart { display: block; width: 100%; height: 56px; color: var(--accent); }
+.sl-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 12px; margin-bottom: 14px; }
+.sl-row { padding: 8px 0; border-top: 1px solid var(--border); gap: 10px; align-items: baseline; }
+.sl-row:first-child { border-top: 0; }
+.qv { gap: 12px; }
+.qv-hero { display: flex; gap: 12px; align-items: center; padding: 12px; border-radius: var(--r); background: var(--elev); }
+.qv-hero.claimed { background: linear-gradient(135deg, var(--accent-subtle), transparent 70%), var(--elev); }
+.qv-id { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.qv-id h2 { font-size: 18px; margin: 0; overflow-wrap: anywhere; }
+.qv-invite { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 10px 12px; border: 1px dashed var(--border-strong); border-radius: var(--r); }
+.qv-invite > div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.qv-kv { margin: 0; }
+.qv-kv dd { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.qv-soc a { text-decoration: none; }
+.qv-sec { display: flex; flex-direction: column; gap: 6px; padding-top: 10px; border-top: 1px solid var(--border); }
+.qv-sec h3 { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--fg2); margin: 0; }
+.pl-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 104px), 1fr)); gap: 10px; margin-bottom: 14px; }
+.pl-card { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding: 12px 14px; text-align: left; color: var(--fg); font: inherit; cursor: pointer; }
+.pl-card span { font-size: 12px; color: var(--fg2); }
+.pl-card b { font-size: 26px; line-height: 1.1; }
+.pl-card.pl-account b { color: var(--accent); }
+.pl-card:hover { border-color: var(--border-strong); background: var(--elev); }
+.pl-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.pl-strip { display: flex; flex-wrap: wrap; gap: 14px 28px; padding: 14px 16px; margin-bottom: 14px; }
+.pl-group { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.pl-cells { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.pl-cell { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; border: 0; background: none; color: var(--fg); font: inherit; padding: 4px 0; cursor: pointer; text-align: left; }
+.pl-cell span { font-size: 12px; color: var(--fg2); }
+.pl-cell b { font-size: 22px; line-height: 1.1; }
+.pl-cell:hover b { color: var(--accent); }
+.pl-tools { margin-bottom: 10px; }
+.pl-adv { margin-bottom: 10px; gap: 14px; }
+.pl-fgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr)); gap: 12px; }
+.pl-dup { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--r); cursor: pointer; }
+.pl-switch { appearance: none; -webkit-appearance: none; flex: none; position: relative; width: 46px; height: 28px; border-radius: 999px; background: var(--overlay); cursor: pointer; margin: 0; transition: background .15s; }
+.pl-switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: var(--fg); transition: transform .15s; }
+.pl-switch:checked { background: var(--accent); }
+.pl-switch:checked::after { transform: translateX(18px); background: var(--on-accent, #000); }
+.pl-switch:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.pl-adv-foot { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+.pl-bulk { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--r); margin-bottom: 12px; font-size: 13px; }
+.pl-all { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+.player-row { cursor: pointer; }
+.player-row:hover { border-color: var(--border-strong); background: var(--elev); }
+.player-row { display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto; align-items: center; gap: 4px 12px; padding: 12px 14px; }
+.player-row .main { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.player-row .main p { margin: 0; overflow-wrap: anywhere; }
+.player-row .main .row { gap: 6px; flex-wrap: wrap; }
+.player-row .link { text-align: left; font-weight: 700; }
+.player-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 148px), 1fr)) !important; gap: 10px !important; }
+.player-grid .player-row { grid-template-columns: auto 1fr auto; grid-template-areas: "sel . menu" "av av av" "main main main"; row-gap: 6px; padding: 8px 10px 14px; align-items: center; justify-items: center; text-align: center; }
+.player-grid .player-row > .player-selection { grid-area: sel; justify-self: start; }
+.player-grid .player-row > .avatar { grid-area: av; width: 56px; height: 56px; font-size: 18px; }
+.player-grid .player-row > .main { grid-area: main; align-items: center; width: 100%; }
+.player-grid .player-row > .main .row { justify-content: center; }
+.player-grid .player-row > .main .link { text-align: center; }
+.player-grid .player-row > .main .mono { font-size: 11px; }
+.player-grid .player-row > button.btn { grid-area: menu; justify-self: end; min-height: 32px; padding: 0 10px; }
+.pl-sp { flex: 1 1 8px; }
+.pager-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px 16px; flex-wrap: wrap; padding: 10px 12px; margin-top: 12px; border: 1px solid var(--border); border-radius: var(--r); }
+.pg-ctl { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.pg-nums { display: inline-flex; align-items: center; gap: 4px; }
+.pg-n { min-width: 36px; height: 36px; padding: 0 8px; border: 1px solid transparent; border-radius: var(--r-sm); background: none; color: var(--fg2); font: inherit; font-weight: 600; cursor: pointer; }
+.pg-n:hover { background: var(--elev); color: var(--fg); }
+.pg-n.on { background: var(--accent); color: var(--on-accent); }
+.pg-gap { padding: 0 4px; color: var(--fg3); }
+@media (max-width: 480px) { .pg-w { display: none; } .pg-ctl { flex-wrap: nowrap; } }
+.pg-size { display: inline-flex; align-items: center; gap: 8px; }
+.pg-size select { width: auto; min-height: 36px; }
+@media (max-width: 640px) { .pager-bar { flex-direction: column; align-items: stretch; } .pg-info, .pg-size { align-self: center; } }
+.pl-dock { display: none; position: fixed; left: 50%; transform: translateX(-50%); bottom: max(12px, env(safe-area-inset-bottom, 0px)); z-index: 30; width: min(calc(100% - 24px), 720px); align-items: center; gap: 8px 12px; flex-wrap: wrap; padding: 10px 12px; border: 1px solid var(--border-strong); border-radius: 16px; background: var(--surface); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35); }
+.pl-dock-n { font-size: 14px; flex: 1 1 auto; }
+.pl-dock-acts { display: flex; flex-wrap: wrap; gap: 6px; flex: 1 1 100%; order: 3; }
+body:has(.player-select:checked) .pl-dock { display: flex; }
+body:has(.player-select:checked) .shell-main { padding-bottom: 120px; }
 .more { display: flex; justify-content: center; padding-top: 12px; }
 
 /* Forms */
@@ -705,13 +791,14 @@ function topBar() {
     <button class="btn xs" data-act="openDemo">Prototype</button>
   </div></header>${S.online ? '' : `<div class="band-off" role="status"><div class="in">${I.alert}<span><b>You're offline.</b> Showing what this browser loaded at ${fmtTime(S.offlineAt || Date.now())}. Activating licenses, approving requests and saving settings need an internet connection.</span></div></div>`}`;
 }
-const HERE = { clubs: 'clubs', club: 'clubs', players: 'players', player: 'players', contacts: 'contacts', review: 'contacts', names: 'names', passwords: 'passwords', config: 'config', flags: 'flags' };
+const HERE = { clubs: 'clubs', club: 'clubs', players: 'players', player: 'players', sales: 'sales', contacts: 'contacts', review: 'contacts', names: 'names', passwords: 'passwords', config: 'config', flags: 'flags' };
 function rail() {
   const here = HERE[S.screen];
   const link = (k, label, ic, count, hot) => `<button class="rail-link ${k === here ? 'on' : ''}" data-act="go" data-to="${k}" ${k === here ? 'aria-current="page"' : ''}>${ic}<span>${label}</span>${count != null ? `<span class="count ${hot && count ? 'hot' : ''}">${count}</span>` : ''}</button>`;
   return `<nav class="rail" id="app-nav" aria-label="Admin">
     ${link('clubs', 'Clubs and licenses', I.n_club, S.clubs.length)}
     ${link('players', 'Players', I.n_players, num(S.players.length))}
+    ${link('sales', 'Sales', I.n_rank)}
     <div class="rail-label">Requests</div>
     ${link('contacts', 'Contact changes', I.n_contact, attentionContacts(), true)}
     ${link('names', 'Club names', I.n_name, pendingNames(), true)}
@@ -793,6 +880,26 @@ function retentionCard(c) {
     <div class="stack tight"><span class="label">Always kept</span><p class="small">Players' match history and earned ranks, still under the normal three-month leaderboard window.</p></div></div>
     <p class="small muted">Nothing here deletes a club or its players.</p></section>`;
 }
+// ---------- Club sales (club page tab) ----------
+// What one club pays ROTRA against how much it uses ROTRA, month by month. Payments are the recorded license payments; sessions and matches are
+// sample figures drawn from the day and the club (the same ones the Sales page uses); the cost per session is a sample estimate until you set it.
+const COST_PER_SESSION = 15;
+function clubSales(c, months = 6) {
+  const today = todayYmd(), [ty, tm] = ymdParts(today), rows = [];
+  for (let i = months - 1; i >= 0; i--) {
+    const first = new Date(ty, tm - 1 - i, 1), y = first.getFullYear(), m = first.getMonth() + 1, label = first.toLocaleDateString([], { month: 'short', year: 'numeric' });
+    const dim = new Date(y, m, 0).getDate(), last = i === 0 ? ymdParts(today)[2] : dim;
+    let sessions = 0, matches = 0;
+    for (let d = 1; d <= last; d++) {
+      const ymd = `${y}-${pad(m)}-${pad(d)}`, h = hashStr(`${c.id}-${ymd}`);
+      if (!c.terms.some((x) => x.from <= ymd && ymd <= x.to) || h % 7 > 1) continue;
+      sessions += 1; matches += 8 + ((h >>> 5) % 14);
+    }
+    const paid = c.terms.filter((x) => { const [py, pm] = ymdParts(x.paid); return py === y && pm === m; }).reduce((t, x) => t + (x.amount || 0), 0);
+    rows.push({ label, paid, sessions, matches, cost: sessions * COST_PER_SESSION });
+  }
+  return rows;
+}
 function viewClub() {
   const c = clubOf(S.viewId);
   if (!c) return shell(`${backBtn('clubs', 'Clubs and licenses')}<div class="card empty"><b>Club not found.</b></div>`);
@@ -804,7 +911,7 @@ function viewClub() {
     : a.state === 'expired' ? `<dt>Access</dt><dd>Ended ${fmtYmd(a.ended)} · ${plural(diffDays(a.since, todayYmd()), 'day')} ago</dd><dt>Last plan</dt><dd>${a.plan}</dd>${a.next ? `<dt>Next term</dt><dd>Starts ${fmtYmd(a.next)}</dd>` : ''}`
     : a.state === 'scheduled' ? `<dt>Access</dt><dd>Starts ${fmtYmd(a.starts)}</dd><dt>Plan</dt><dd>${a.plan}</dd>` : '<dt>Access</dt><dd>Never licensed. The club can sign in but can\'t run sessions.</dd>';
   const r = retention(c);
-  const TABS = [['overview', 'Overview', nr ? chip('1 request', 'warn') : ''], ['license', 'License', ''], ['pages', 'Public pages', ['stale', 'due', 'failed'].includes(r.k) ? chip(r.k === 'failed' ? 'Failed' : 'Countdown', r.k === 'failed' ? 'bad' : 'warn') : ''], ['activity', 'Activity', `<span class="c">${history.length}</span>`]];
+  const TABS = [['overview', 'Overview', nr ? chip('1 request', 'warn') : ''], ['license', 'License', ''], ['sales', 'Sales', ''], ['pages', 'Public pages', ['stale', 'due', 'failed'].includes(r.k) ? chip(r.k === 'failed' ? 'Failed' : 'Countdown', r.k === 'failed' ? 'bad' : 'warn') : ''], ['activity', 'Activity', `<span class="c">${history.length}</span>`]];
   const tab = TABS.some(([k]) => k === S.ui.clubTab) ? S.ui.clubTab : 'overview';
   const panels = {
     overview: `${nr ? `<section class="card stack warnc" id="name-request"><div class="sec-head"><div><h2>Name change requested</h2><p class="small muted">Sent ${fmtAt(nr.at)} · ${ago(nr.at)}</p></div>${chip('Waiting for you', 'warn')}</div>
@@ -840,6 +947,22 @@ function viewClub() {
           ${terms.map((x) => `<tr><td data-label="Paid" class="nw">${fmtYmd(x.paid)}</td><td data-label="Plan">${x.plan}</td><td data-label="Covers" class="small">${fmtYmd(x.from)} – ${fmtYmd(x.to)}</td><td data-label="Amount" class="n">${amountText(x.amount)}</td><td data-label="Reference" class="mono small">${esc(x.ref || '—')}</td></tr>`).join('')}
         </tbody></table></div><p class="small muted">What the club actually paid each time. Sample amounts.</p>` : '<div class="empty"><b>No payments recorded.</b><span>Activate the license after the club pays to add the first one.</span></div>'}</section>`,
     pages: retentionCard(c),
+    sales: (() => {
+      const rows = clubSales(c), tot = rows.reduce((t, x) => ({ paid: t.paid + x.paid, sessions: t.sessions + x.sessions, matches: t.matches + x.matches, cost: t.cost + x.cost }), { paid: 0, sessions: 0, matches: 0, cost: 0 });
+      const monthlyPay = c.price.free ? 0 : c.price.monthly, perSession = tot.sessions ? tot.paid / tot.sessions : 0, margin = tot.paid - tot.cost;
+      const max = Math.max(1, ...rows.map((x) => x.paid));
+      return `<div class="sl-kpis">
+        <section class="card stack sl-kpi"><span class="label">Paid to ROTRA (6 months)</span><b class="sl-val tnum">${peso(tot.paid)}</b><span class="small muted">${c.price.free ? 'Tester club, licenses at ₱0' : `${peso(monthlyPay)} a month list price`}</span></section>
+        <section class="card stack sl-kpi"><span class="label">Sessions started</span><b class="sl-val tnum">${num(tot.sessions)}</b><span class="small muted">${num(tot.matches)} matches played</span></section>
+        <section class="card stack sl-kpi"><span class="label">Paid per session</span><b class="sl-val tnum">${tot.sessions ? peso(perSession) : '—'}</b><span class="small muted">Against ${peso(COST_PER_SESSION)} estimated cost per session</span></section>
+      </div>
+      <section class="card stack"><h2>Month by month</h2>
+        <div class="tbl-wrap"><table class="tbl cards"><thead><tr><th>Month</th><th class="n">Paid</th><th class="n">Sessions</th><th class="n">Matches</th><th class="n">Paid per session</th><th class="n">Est. cost</th><th class="n">Left over</th></tr></thead><tbody>
+        ${rows.map((x) => `<tr><td data-label="Month">${esc(x.label)}</td><td data-label="Paid" class="n">${x.paid ? peso(x.paid) : '—'}</td><td data-label="Sessions" class="n">${x.sessions}</td><td data-label="Matches" class="n">${x.matches}</td><td data-label="Paid per session" class="n">${x.sessions && x.paid ? peso(x.paid / x.sessions) : '—'}</td><td data-label="Est. cost" class="n">${peso(x.cost)}</td><td data-label="Left over" class="n">${x.paid - x.cost < 0 ? `−${peso(x.cost - x.paid)}` : peso(x.paid - x.cost)}</td></tr>`).join('')}
+        </tbody></table></div>
+        <div class="sl-bars" role="img" aria-label="Paid each month">${rows.map((x) => `<span title="${esc(x.label)}: ${peso(x.paid)}"><i style="height:${Math.max(2, Math.round((x.paid / max) * 100))}%"></i><em>${esc(x.label.split(' ')[0])}</em></span>`).join('')}</div>
+        <p class="small muted">${margin >= 0 ? `After the estimated running cost, this club leaves ${peso(margin)} over six months.` : `The estimated running cost is ${peso(-margin)} more than this club paid in six months.`} Payments are the license payments you recorded, counted in the month paid, so a yearly payment lands in one month. Sessions and matches are sample figures. The cost per session (${peso(COST_PER_SESSION)}) is a placeholder until you set it.</p></section>`;
+    })(),
     activity: `<section class="card stack"><h2>Record of actions</h2>${history.length ? `<ul class="log">${history.map((l) => `<li>${esc(l.text)}<span>${fmtAt(l.at)} · ${esc(l.actor)}</span></li>`).join('')}</ul>` : '<p class="small muted">No Admin actions recorded for this club yet.</p>'}</section>`,
   };
   return shell(`${backBtn('clubs', 'Clubs and licenses')}
@@ -873,7 +996,78 @@ function viewNames() {
     ${done.length ? `<section class="card stack"><h2>Recently decided</h2><ul class="log">${done.map((l) => `<li>${esc(l.text)}<span>${fmtAt(l.at)} · ${esc(l.actor)}</span></li>`).join('')}</ul></section>` : ''}`);
 }
 
+// ---------- A-SALES ----------
+// Platform totals for the owner: license revenue (from the payments recorded per club), sessions started and matches played.
+// Revenue is real in this prototype (the sample payments in each club's history); sessions and matches are drawn from the date and the club,
+// so the same period always shows the same figures.
+const SALES_PERIODS = [['7', 'Last 7 days'], ['30', 'Last 30 days'], ['365', 'Last 12 months']];
+function salesData(period) {
+  const today = todayYmd(), monthly = period === '365';
+  const buckets = monthly ? 12 : +period;
+  const bucketOf = (ymd, offset = 0) => {
+    // Bucket 0 is the oldest of the shown period; offset 1 maps the period before it onto the same buckets for the comparison.
+    const [y, m] = ymdParts(ymd), [ty, tm] = ymdParts(today);
+    const ago = monthly ? (ty * 12 + tm) - (y * 12 + m) : diffDays(ymd, today);
+    return buckets - 1 - (ago - offset * buckets);
+  };
+  const series = () => ({ cur: Array(buckets).fill(0), prev: Array(buckets).fill(0) });
+  const rev = series(), ses = series(), mat = series();
+  const per = {}; // club id -> { sessions, matches, revenue } in the shown period
+  const add = (ser, ymd, v) => { for (const [k, off] of [['cur', 0], ['prev', 1]]) { const b = bucketOf(ymd, off); if (b >= 0 && b < buckets) ser[k][b] += v; } };
+  const inPeriod = (ymd) => { const b = bucketOf(ymd, 0); return b >= 0 && b < buckets; };
+  const pays = [];
+  S.clubs.forEach((c) => {
+    c.terms.forEach((x) => { add(rev, x.paid, x.amount || 0); if (inPeriod(x.paid)) { pays.push({ club: c, ...x }); (per[c.id] ||= { c, sessions: 0, matches: 0, revenue: 0 }).revenue += x.amount || 0; } });
+    // Every club with a license term running on a day starts a session on some days; the count is drawn from the day and the club.
+    const days = monthly ? 365 * 2 : +period * 2;
+    for (let i = 0; i < days; i++) {
+      const ymd = addDays(today, -i), h = hashStr(`${c.id}-${ymd}`);
+      if (!c.terms.some((x) => x.from <= ymd && ymd <= x.to)) continue;
+      if (h % 7 > 1) continue; // about two days in seven
+      const n = 1, mt = 8 + ((h >>> 5) % 14);
+      add(ses, ymd, n); add(mat, ymd, mt);
+      if (inPeriod(ymd)) { const row = (per[c.id] ||= { c, sessions: 0, matches: 0, revenue: 0 }); row.sessions += n; row.matches += mt; }
+    }
+  });
+  const sum = (a) => a.reduce((t, v) => t + v, 0);
+  // The comparison only makes sense when the period before it is fully inside the history we have.
+  const first = S.clubs.flatMap((c) => c.terms.map((x) => x.from)).sort()[0] || today;
+  const [ty, tm] = ymdParts(today);
+  const prevStart = monthly ? toYmd(new Date(ty, tm - 1 - (2 * buckets - 1), 1)) : addDays(today, -(2 * buckets - 1));
+  return { buckets, monthly, histOk: prevStart >= first, rev, ses, mat, per: Object.values(per), pays: pays.sort((a, b) => (a.paid < b.paid ? 1 : -1)), sum };
+}
+function salesChart(ser, label, fmt) {
+  const max = Math.max(1, ...ser.cur), n = ser.cur.length, w = 100 / n;
+  return `<svg class="sl-chart" viewBox="0 0 100 40" preserveAspectRatio="none" role="img" aria-label="${esc(label)} per ${n === 12 ? 'month' : 'day'}, highest ${esc(fmt(max))}">${ser.cur.map((v, i) => `<rect x="${(i * w + w * 0.12).toFixed(2)}" y="${(40 - (v / max) * 38).toFixed(2)}" width="${(w * 0.76).toFixed(2)}" height="${((v / max) * 38).toFixed(2)}" rx="0.6" fill="currentColor"${i === n - 1 ? '' : ' opacity=".55"'}><title>${esc(fmt(v))}</title></rect>`).join('')}</svg>`;
+}
+function viewSales() {
+  const P = SALES_PERIODS.some(([k]) => k === S.ui.salesP) ? S.ui.salesP : '30';
+  const D = salesData(P), pLabel = SALES_PERIODS.find(([k]) => k === P)[1].toLowerCase();
+  const kpi = (title, ser, fmt) => {
+    const cur = D.sum(ser.cur), prev = D.sum(ser.prev), d = prev ? Math.round(((cur - prev) / prev) * 100) : null;
+    const chipHtml = !D.histOk ? chip('Not enough history to compare', '') : d == null ? chip(prev === 0 && cur === 0 ? 'No change' : 'New', '') : chip(`${d > 0 ? '▲' : d < 0 ? '▼' : ''} ${Math.abs(d)}% vs the period before`, d > 0 ? 'ok' : d < 0 ? 'warn' : '');
+    return `<section class="card stack sl-kpi"><span class="label">${title}</span><b class="sl-val tnum">${fmt(cur)}</b><div class="row">${chipHtml}</div>${salesChart(ser, title, fmt)}</section>`;
+  };
+  const top = D.per.filter((r) => r.sessions || r.revenue).sort((a, b) => b.matches - a.matches || b.revenue - a.revenue).slice(0, 6);
+  const plan = (name) => { const list = D.pays.filter((x) => x.plan === name); return { n: list.length, sum: list.reduce((t, x) => t + (x.amount || 0), 0) }; };
+  const pm = plan('Monthly'), py = plan('Yearly');
+  return shell(`<div class="page-head"><div class="row between"><div><h1>Sales</h1><p class="muted">License revenue, sessions started and matches played, across every club</p></div></div></div>
+    <div class="toolbar sl-tools">${seg('salesP', P, SALES_PERIODS, 'Period')}</div>
+    <div class="sl-kpis">${kpi('Revenue', D.rev, peso)}${kpi('Sessions started', D.ses, num)}${kpi('Matches played', D.mat, num)}</div>
+    <div class="sl-cols">
+      <section class="card stack"><h2>Revenue by plan</h2>
+        <dl class="kv"><dt>Monthly</dt><dd>${peso(pm.sum)} <span class="small muted">· ${pm.n} payment${pm.n === 1 ? '' : 's'}</span></dd><dt>Yearly</dt><dd>${peso(py.sum)} <span class="small muted">· ${py.n} payment${py.n === 1 ? '' : 's'}</span></dd></dl>
+        <p class="small muted">Money clubs paid ${pLabel}, as you recorded it when activating or renewing. ROTRA doesn't collect it.</p></section>
+      <section class="card stack"><h2>Recent payments</h2>
+        ${D.pays.length ? `<div class="list">${D.pays.slice(0, 6).map((x) => `<div class="between sl-row"><div><button class="link" data-act="openClub" data-id="${x.club.id}">${esc(x.club.name)}</button><span class="small muted"> · ${esc(x.plan)} · ${fmtYmd(x.paid)}</span></div><b class="tnum">${amountText(x.amount)}</b></div>`).join('')}</div>` : '<p class="small muted">No payments were recorded ' + pLabel + '.</p>'}</section>
+    </div>
+    <section class="card stack"><h2>Most active clubs</h2>
+      ${top.length ? `<div class="tbl-wrap"><table class="tbl cards"><thead><tr><th>Club</th><th class="n">Sessions</th><th class="n">Matches</th><th class="n">Paid</th></tr></thead><tbody>${top.map((r) => `<tr><td data-label="Club"><button class="link" data-act="openClub" data-id="${r.c.id}">${esc(r.c.name)}</button></td><td data-label="Sessions" class="n">${r.sessions}</td><td data-label="Matches" class="n">${r.matches}</td><td data-label="Paid" class="n">${peso(r.revenue)}</td></tr>`).join('')}</tbody></table></div>` : '<p class="small muted">No sessions started ' + pLabel + '.</p>'}
+      <p class="small muted">Sessions and matches are sample figures in this prototype. Revenue comes from the recorded license payments.</p></section>`);
+}
 // ---------- A-PLAYERS ----------
+// The RTR ID carries the creation date as MMDDYY; show it the way people say it (“Jul 9, 2026”).
+const fmtAdded = (p) => { const d = p.rtr.split('-')[3] || ''; return /^\d{6}$/.test(d) ? fmtYmd(`20${d.slice(4)}-${d.slice(0, 2)}-${d.slice(2, 4)}`) : esc(d); };
 function playerMatches() {
   const q = S.ui.playersQ.trim(), F = S.ui.playersF;
   const qp = plain(q), qd = q.replace(/\D/g, '');
@@ -885,15 +1079,37 @@ function viewPlayers() {
   const shown = all.slice((page-1)*size,page*size);
   const labels = ['Advanced','Intermediate','Beginner','No rank','Registered','Unclaimed'];
   const counts = [all.filter(p=>p.level>=6).length, all.filter(p=>p.level>=3&&p.level<6).length, all.filter(p=>p.level!==null&&p.level<3).length, all.filter(p=>p.level===null).length, all.filter(p=>p.claimed).length, all.filter(p=>!p.claimed).length];
-  return shell(`<div class="page-head"><div class="row between"><h1>Players</h1><button class="btn primary" onclick="playerManagementSheet('Add player')">Add player</button></div><p class="muted">Every player identity with a permanent RTR ID.</p></div>
-    <div class="player-stats">${labels.map((label,i)=>`<button class="card" onclick="S.ui.playersF=${i===4?"'registered'":i===5?"'unclaimed'":"'all'"};render()"><span class="muted">${label}</span><h2>${counts[i]}</h2></button>`).join('')}</div>
-    <div class="toolbar"><div class="search"><input class="input" type="search" aria-label="Search players" placeholder="Search by name, RTR ID, phone or email" data-bind="ui.playersQ" data-live value="${esc(S.ui.playersQ)}"></div>${seg('playersF',S.ui.playersF,[['all','All'],['registered','Registered'],['unclaimed','Unclaimed']],'Filter by account')}<button class="btn" onclick="S.ui.playerGrid=!S.ui.playerGrid;render()">${S.ui.playerGrid?'List':'Grid'}</button></div>
-    <div class="toolbar"><label><input type="checkbox"> Duplicates only</label><label>Added from <input class="input" type="date"></label><label>Added to <input class="input" type="date"></label><label>Place registered <select class="input"><option>All places</option><option>Cebu City</option><option>Manila</option><option>Davao City</option></select></label><select class="input" aria-label="Archive status"><option>Active</option><option>Archived</option><option>All</option></select><button class="btn" data-act="clearPlayers">Clear filters</button></div>
-    <p class="hint">Duplicate matches share a normalized name, phone or email. Flag only; never merge.</p>
-    <div class="toolbar"><label><input type="checkbox" onchange="document.querySelectorAll('.player-select').forEach(x=>x.checked=this.checked)"> Select all on this page</label><button class="btn">Select all ${all.length} matching</button></div>
-    <section class="${S.ui.playerGrid?'player-grid':'stack'}">${shown.map(p=>`<article class="card row"><label class="player-selection"><input class="player-select" type="checkbox" aria-label="Select ${esc(p.name)}"></label>${avatar(p)}<div class="main"><button class="link" onclick="playerManagementSheet('Quick view','${p.id}')">${esc(p.name)}</button><p class="mono small">${esc(p.rtr)}</p><div class="row">${p.claimed?chip('Registered','ok'):chip('Unclaimed')}${rankOf(p).chip}</div><p class="small muted">${esc(p.club || 'Created by Admin')} · Added ${esc(p.rtr.split('-')[3])}</p></div><button class="btn" aria-label="Actions for ${esc(p.name)}" aria-haspopup="menu" onclick="showPlayerActions(this,'${p.id}')">⋯</button></article>`).join('') || '<div class="card empty">No players match. Clear filters.</div>'}</section>
-    <div class="more"><button class="btn" ${page===1?'disabled':''} onclick="S.ui.playerPage=${page-1};render()">Previous</button> Showing ${all.length?(page-1)*size+1:0}–${Math.min(page*size,all.length)} of ${all.length} <button class="btn" ${page*size>=all.length?'disabled':''} onclick="S.ui.playerPage=${page+1};render()">Next</button><select aria-label="Page size" onchange="S.ui.playerSize=+this.value;S.ui.playerPage=1;render()">${[25,50,100].map(n=>`<option ${n===size?'selected':''}>${n}</option>`).join('')}</select></div>
-    <section class="card toolbar"><span>N selected</span>${['Clear','Archive','Restore','Remove','Export CSV','Copy RTR IDs'].map(x=>`<button class="btn" onclick="playerManagementSheet('${x}')">${x}</button>`).join('')}</section>`);
+  const adv = !!S.ui.playerAdv;
+  const ic = (d) => `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+  const cell = (label, i) => `<button type="button" class="card pl-card ${i<4?'pl-level':'pl-account'}" data-act="playersF" data-v="${i===4?'registered':i===5?'unclaimed':'all'}" aria-label="${label}: ${counts[i]}. ${i>=4?'Show only these players':''}"><span>${label}</span><b class="tnum">${counts[i]}</b></button>`;
+  return shell(`<div class="page-head"><div class="row between"><div><h1>Players</h1><p class="muted">${all.length} player${all.length===1?'':'s'} · permanent RTR IDs</p></div><button class="btn primary pl-add" data-act="pmSheet" data-v="Add player"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> Add player</button></div></div>
+    <div class="pl-cards" role="group" aria-label="Player counts">${[0,1,2,3,4,5].map((i)=>cell(labels[i],i)).join('')}</div>
+    <div class="toolbar pl-tools"><div class="search"><input class="input" type="search" aria-label="Search players" placeholder="Search by name, RTR ID, phone or email" data-bind="ui.playersQ" data-live value="${esc(S.ui.playersQ)}"></div>${seg('playersF',S.ui.playersF,[['all','All'],['registered','Registered'],['unclaimed','Unclaimed']],'Filter by account')}
+      <button class="btn" aria-expanded="${adv}" aria-controls="pl-adv" data-act="plAdv">${ic('<path d="M4 6h16M7 12h10M10 18h4"/>')} Filters</button>
+      <div class="seg" role="group" aria-label="Layout"><button type="button" aria-pressed="${!S.ui.playerGrid}" aria-label="List view" title="List" data-act="plGrid" data-v="">${ic('<path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/>')}</button><button type="button" aria-pressed="${!!S.ui.playerGrid}" aria-label="Grid view" title="Grid" data-act="plGrid" data-v="1">${ic('<rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/>')}</button></div></div>
+    ${adv ? `<section class="card stack pl-adv" id="pl-adv" aria-label="More filters">
+      <div class="pl-fgrid">
+        <label class="field"><span>Added from</span><input class="input" type="date"></label>
+        <label class="field"><span>Added to</span><input class="input" type="date"></label>
+        <label class="field"><span>Place registered</span><select class="input"><option>All places</option><option>Cebu City</option><option>Manila</option><option>Davao City</option></select></label>
+        <label class="field"><span>Archive status</span><select class="input"><option>Active</option><option>Archived</option><option>All</option></select></label>
+      </div>
+      <label class="pl-dup"><span class="stack tight"><b>Duplicates only</b><span class="small muted">Duplicate matches share a normalized name, phone or email. Flag only; never merge.</span></span><input type="checkbox" role="switch" class="pl-switch" aria-label="Duplicates only"></label>
+      <div class="pl-adv-foot"><button class="btn" data-act="clearPlayers">Clear filters</button><button class="btn primary" data-act="plAdv">Done</button></div></section>` : ''}
+    <div class="pl-bulk"><label class="pl-all"><input type="checkbox" data-change="plSelectAll"> Select all on this page</label><button class="btn xs" type="button">Select all ${all.length} matching</button></div>
+    <section class="${S.ui.playerGrid?'player-grid':'stack'}">${shown.map(p=>`<article class="card player-row" data-act="pmSheet" data-v="Quick view" data-id="${p.id}"><label class="player-selection"><input class="player-select" type="checkbox" data-change="plCount" aria-label="Select ${esc(p.name)}"></label>${avatar(p)}<div class="main"><button class="link" data-act="pmSheet" data-v="Quick view" data-id="${p.id}">${esc(p.name)}</button><p class="mono small">${esc(p.rtr)}</p><div class="row">${p.claimed?chip('Registered','ok'):chip('Unclaimed')}${rankOf(p).chip}</div><p class="small muted">${esc(p.club || 'Created by Admin')} · Added ${fmtAdded(p)}</p></div><button class="btn" aria-label="Actions for ${esc(p.name)}" aria-haspopup="menu" data-act="pmMenu" data-id="${p.id}">⋯</button></article>`).join('') || '<div class="card empty">No players match. Clear filters.</div>'}</section>
+    ${(() => {
+      const pages = Math.max(1, Math.ceil(all.length / size));
+      // 1 … 4 5 6 … 12: always the first and last page, and the pages next to the current one.
+      const nums = [...new Set([1, page - 1, page, page + 1, pages].filter((n) => n >= 1 && n <= pages))].sort((x, y) => x - y);
+      const items = nums.flatMap((n, i) => (i && n - nums[i - 1] > 1 ? [null, n] : [n]));
+      const btn = (n) => n == null ? '<span class="pg-gap" aria-hidden="true">…</span>' : `<button class="pg-n ${n === page ? 'on' : ''}" data-act="plPage" data-v="${n}" ${n === page ? 'aria-current="page"' : ''} aria-label="Page ${n}">${n}</button>`;
+      return `<nav class="pager-bar" aria-label="Players pages">
+        <span class="small muted pg-info">Showing <b>${all.length ? (page - 1) * size + 1 : 0}–${Math.min(page * size, all.length)}</b> of <b>${all.length}</b></span>
+        <div class="pg-ctl"><button class="btn sm" data-act="plPage" data-v="${page - 1}" ${page === 1 ? 'disabled' : ''} aria-label="Previous page">‹<span class="pg-w"> Prev</span></button><span class="pg-nums">${items.map(btn).join('')}</span><button class="btn sm" data-act="plPage" data-v="${page + 1}" ${page >= pages ? 'disabled' : ''} aria-label="Next page"><span class="pg-w">Next </span>›</button></div>
+        <label class="pg-size small muted">Rows <select class="input" aria-label="Rows per page" data-change="plSize">${[25, 50, 100].map((n) => `<option ${n === size ? 'selected' : ''}>${n}</option>`).join('')}</select></label></nav>`;
+    })()}
+    <div class="pl-dock" role="region" aria-label="Actions for the selected players"><b class="pl-dock-n tnum">0 selected</b><div class="pl-dock-acts">${['Archive','Restore','Remove','Export CSV','Copy RTR IDs'].map(x=>`<button class="btn xs ${x==='Remove'?'danger':''}" data-act="pmSheet" data-v="${x}">${x}</button>`).join('')}</div><button class="btn xs ghost" data-act="plClear">Clear</button></div>`);
 }
 function showPlayerActions(trigger,id) {
   document.querySelector('.player-actions-popover')?.remove();
@@ -916,12 +1132,54 @@ function showPlayerActions(trigger,id) {
     if(e.key==='Escape')trigger.focus();
   });
 }
+// Sample game history for a player, newest first. Real history comes from finished club sessions; here it is drawn from the player id.
+const HIST_TITLES = ['Sunday Night Queue', 'Thursday Open Play', 'Friday Night Smash', 'Saturday Morning Rally', 'Wednesday Ladder Night', 'Tuesday Doubles'];
+function historyOf(p, n = 8) {
+  const out = [];
+  let ago = 2 + (hashStr(p.id) % 4);
+  for (let i = 0; i < n; i++) {
+    const h = hashStr(`${p.id}-h${i}`), games = 3 + (h % 6), won = Math.min(games, Math.round(games * (0.35 + ((h >>> 4) % 50) / 100)));
+    out.push({ ymd: addDays(todayYmd(), -ago), title: HIST_TITLES[(h >>> 8) % HIST_TITLES.length], club: p.club || 'Created by Admin', games, won });
+    ago += 4 + ((h >>> 12) % 6);
+  }
+  return out;
+}
+const histRow = (x) => `<div class="between sl-row"><div><b>${esc(x.title)}</b><span class="small muted"> · ${esc(x.club)} · ${fmtYmd(x.ymd)}</span></div><span class="tnum nw">${x.won}–${x.games - x.won}</span></div>`;
 function playerManagementSheet(action,id) {
   const p=playerOf(id), name=p?esc(p.name):'players';
-  const body= action==='Quick view' ? `<div class="stack">${avatar(p,'lg')}<h2>${name}</h2><p class="mono">${esc(p.rtr)}</p>${rankOf(p).chip}<p>${esc(p.club)} · ${p.claimed?'Registered':'Unclaimed'}</p><h3>Private contact</h3><p>${esc(p.phone||'Not given')} · ${esc(p.email||'Not given')}</p><h3>Recent games</h3><p>No games yet</p><button class="btn" data-act="openPlayer" data-id="${p.id}">View full profile</button><button class="btn" onclick="playerManagementSheet('Games','${id}')">View full history</button></div>` : action==='Games' ? '<p>Read-only. Admin cannot change ranks, winners or scores.</p><div class="toolbar"><button class="btn">Counted</button><button class="btn">Fun and partial</button><button class="btn">All</button></div><p>Date · Club · Session · Partner · Opponents · Score · Result · Counted for rank</p>' : action==='Actions' ? ['Quick view','View full profile','View full history','Copy RTR ID','Copy registration link','Edit profile','Archive','Restore','Remove'].map(x=>`<button class="btn" onclick="playerManagementSheet('${x}','${id}')">${x}</button>`).join('') : action==='Add player' || action==='Edit profile' ? `<div class="stack"><label>Full name<input class="input" value="${p?esc(p.name):''}"></label><label>Nickname<input class="input" value="${p?esc(p.nick||''):''}"></label>${action==='Add player'?'<label>Phone (optional)<input class="input"></label><label>Email (optional)<input class="input"></label><label>Place<select class="input"><option>Cebu City</option><option>Manila</option><option>Davao City</option></select></label><label>Club (optional)<select class="input"><option>Created by Admin</option></select></label>':`${!p?.claimed?'<label>Profile photo<input class="input" type="url"></label>':''}<label>Reason<textarea class="input"></textarea></label><p>Review before and after values before saving. Contacts, rank and RTR ID cannot be edited.</p>`}<button class="btn primary">${action==='Add player'?'Add player':'Review changes'}</button></div>` : `<p>${action} ${name}. ${action==='Remove'?'Permanent. Only records with no games and no claimed account.':'History is kept.'}</p><label>Reason<textarea class="input"></textarea></label>${action==='Remove'?'<label>Type the RTR ID<input class="input"></label>':''}<button class="btn primary">Confirm ${action}</button>`;
+  // Social links are written by the player on their own profile; the prototype draws a few from the name.
+  const socialsOf = (q) => { const slug = plain(q.name).replace(/[^a-z0-9]+/g, '.').replace(/^\.|\.$/g, ''), h = hashStr(`soc-${q.id}`); return [['Facebook', `facebook.com/${slug}`, true], ['Instagram', `instagram.com/${slug.replace(/\./g, '_')}`, h % 3 !== 0], ['YouTube', `youtube.com/@${slug.replace(/\./g, '')}`, h % 5 === 0], ['LinkedIn', `linkedin.com/in/${slug.replace(/\./g, '-')}`, h % 7 === 0]].filter((x) => x[2]); };
+  const qv = () => {
+    const rk = rankOf(p), soc = socialsOf(p);
+    return `<div class="stack qv">
+      <div class="qv-hero${p.claimed ? ' claimed' : ''}">${avatar(p,'lg')}<div class="qv-id"><h2>${name}</h2><div class="row">${p.level == null ? chip('No rank yet') : chip(LEVELS[p.level], 'ok')}${p.claimed ? chip('Registered') : chip('Unclaimed')}</div></div></div>
+      ${p.claimed ? '' : `<div class="qv-invite"><div><b>Not registered yet</b><span class="small muted">Send an invite so this player claims the profile.</span></div><button class="btn sm primary" data-act="pmSheet" data-v="Invite to ROTRA" data-id="${id}">Invite to ROTRA</button></div>`}
+      <dl class="kv qv-kv"><dt>ID</dt><dd><span class="mono">${esc(p.rtr)}</span> <button class="btn xs ghost" data-act="pmSheet" data-v="Copy RTR ID" data-id="${id}">Copy</button></dd><dt>Phone</dt><dd class="mono">${esc(p.phone || 'Not given')}</dd><dt>Email</dt><dd class="mono" style="overflow-wrap:anywhere">${esc(p.email || 'Not given')}</dd><dt>Socials</dt><dd class="qv-soc">${soc.length ? soc.map(([n, u]) => `<a class="chip" href="https://${esc(u)}" target="_blank" rel="noopener noreferrer" title="${esc(u)}">${n}</a>`).join('') : '<span class="muted">None added</span>'}</dd></dl>
+      <section class="qv-sec"><h3>History</h3><div class="list">${historyOf(p, 2).map(histRow).join('')}</div></section>
+    </div>`;
+  };
+  const qvFoot = `<button class="btn" data-act="pmSheet" data-v="Edit profile" data-id="${id}">Edit</button><button class="btn" data-act="openPlayerHistory" data-id="${id}">Full history</button><button class="btn primary" data-act="openPlayer" data-id="${id}">Full profile</button>`;
+  const editBody = () => `<div class="stack qv">
+      <div class="qv-hero${p.claimed ? ' claimed' : ''}">${avatar(p,'lg')}<div class="qv-id"><h2>Edit ${name}</h2><span class="mono small muted">${esc(p.rtr)}</span></div></div>
+      <label class="field"><span>Full name</span><input class="input" value="${esc(p.name)}"></label>
+      <label class="field"><span>Nickname</span><input class="input" value="${esc(p.nick || '')}"></label>
+      ${p.claimed ? '<p class="small muted">This player is registered, so they change their own photo.</p>' : '<label class="field"><span>Profile photo (link)</span><input class="input" type="url" placeholder="https://"></label>'}
+      <label class="field"><span>Reason for the change</span><textarea class="input" placeholder="Required. Saved in the record of actions."></textarea></label>
+      <p class="small muted">Phone, email, rank and the RTR ID can't be edited here. Contact changes go through a request.</p>
+    </div>`;
+  const inviteLink = p ? `https://rotra.example/claim/${hashStr('inv-' + p.id).toString(36)}${hashStr('inv2-' + p.id).toString(36)}` : '';
+  const inviteBody = () => `<div class="stack qv">
+      <div class="qv-hero"><div class="qv-id"><h2>Invite ${name} to ROTRA</h2><span class="small muted">Registration link for this profile</span></div></div>
+      <label class="field"><span>Link</span><input class="input mono" readonly value="${esc(inviteLink)}" aria-label="Registration link"></label>
+      ${notice('', '<b>No club is assigned.</b> A player who registers from an Admin link is not added to any club, and the clubs that already played with this profile keep their records as they are.')}
+      <ul class="small muted" style="margin:0;padding-left:18px"><li>The link works for 7 days and once. Making a new one replaces this one.</li><li>ROTRA sends no email or text. Share the link yourself.</li></ul>
+    </div>`;
+  const inviteFoot = `<button class="btn" data-act="pmSheet" data-v="Quick view" data-id="${id}">Back</button><button class="btn primary" data-act="copyInvite" data-id="${id}">Copy link</button>`;
+  const editFoot = `<button class="btn" data-act="pmSheet" data-v="Quick view" data-id="${id}">Back</button><button class="btn primary">Review changes</button>`;
+  const body= action==='Quick view' ? qv() : action==='Invite to ROTRA' && p ? inviteBody() : action==='Edit profile' && p ? editBody() : action==='Games' ? '<p>Read-only. Admin cannot change ranks, winners or scores.</p><div class="toolbar"><button class="btn">Counted</button><button class="btn">Fun and partial</button><button class="btn">All</button></div><p>Date · Club · Session · Partner · Opponents · Score · Result · Counted for rank</p>' : action==='Actions' ? ['Quick view','View full profile','View full history','Copy RTR ID','Copy registration link','Edit profile','Archive','Restore','Remove'].map(x=>`<button class="btn" data-act="pmSheet" data-v="${x}" data-id="${id}">${x}</button>`).join('') : action==='Add player' || action==='Edit profile' ? `<div class="stack"><label>Full name<input class="input" value="${p?esc(p.name):''}"></label><label>Nickname<input class="input" value="${p?esc(p.nick||''):''}"></label>${action==='Add player'?'<label>Phone (optional)<input class="input"></label><label>Email (optional)<input class="input"></label><label>Place<select class="input"><option>Cebu City</option><option>Manila</option><option>Davao City</option></select></label><label>Club (optional)<select class="input"><option>Created by Admin</option></select></label>':`${!p?.claimed?'<label>Profile photo<input class="input" type="url"></label>':''}<label>Reason<textarea class="input"></textarea></label><p>Review before and after values before saving. Contacts, rank and RTR ID cannot be edited.</p>`}<button class="btn primary">${action==='Add player'?'Add player':'Review changes'}</button></div>` : `<p>${action} ${name}. ${action==='Remove'?'Permanent. Only records with no games and no claimed account.':'History is kept.'}</p><label>Reason<textarea class="input"></textarea></label>${action==='Remove'?'<label>Type the RTR ID<input class="input"></label>':''}<button class="btn primary">Confirm ${action}</button>`;
   document.querySelectorAll('.scrim,.sheet').forEach(x=>x.remove());
-  document.body.insertAdjacentHTML('beforeend',sheetWrap(action,body,''));
-  if(action==='Quick view') document.querySelector('.sheet').classList.add('player-side-panel');
+  document.body.insertAdjacentHTML('beforeend',sheetWrap(action==='Edit profile'&&p?'Edit profile':action,body,action==='Quick view'?qvFoot:action==='Edit profile'&&p?editFoot:action==='Invite to ROTRA'&&p?inviteFoot:''));
+  if(action==='Quick view'||((action==='Edit profile'||action==='Invite to ROTRA')&&p)) document.querySelector('.sheet').classList.add('player-side-panel');
   document.getElementById('sheet-title')?.focus();
 }
 
@@ -934,31 +1192,44 @@ function viewPlayer() {
   const history = S.log.filter((l) => l.t === 'req' && reqs.some((r) => r.id === l.id));
   const [mm, dd, yy] = [p.rtr.slice(-11, -9), p.rtr.slice(-9, -7), p.rtr.slice(-7, -5)];
   const twin = S.players.filter((x) => x.id !== p.id && x.name === p.name);
-  return shell(`${backBtn('players', 'Players')}
-    <div class="hero">${avatar(p, 'lg')}<div class="main"><h1>${esc(p.name)}</h1><div class="row">${p.claimed ? chip('Registered', 'ok') : chip('Unclaimed')}${rk.chip}<span class="mono small muted">${esc(p.rtr)}</span></div></div></div>
-    ${twin.length ? notice('warn', `<b>Another player has the same name.</b> ${twin.map((x) => `<button class="link acc" data-act="openPlayer" data-id="${x.id}">${esc(x.name)}</button> (<span class="mono">${esc(x.rtr)}</span>)`).join(', ')} is a separate identity. Admin doesn't merge players.`) : ''}
-    <div class="detail"><div>
+  const openReqs = reqs.filter((r) => ['submitted', 'applying', 'failed'].includes(r.status)).length;
+  const PT = [['overview', 'Overview', ''], ['contact', 'Contact', openReqs ? chip(`${openReqs} open`, 'warn') : ''], ['history', 'Game history', ''], ['activity', 'Activity', `<span class="c">${history.length}</span>`]];
+  const ptab = PT.some(([k]) => k === S.ui.playerTab) ? S.ui.playerTab : 'overview';
+  const panels = {
+    overview: `<div class="detail"><div>
       <section class="card stack"><h2>Identity</h2><dl class="kv">
         <dt>Name</dt><dd>${esc(p.name)}</dd><dt>Nickname</dt><dd>${esc(p.nick || '—')}</dd>
         <dt>RTR ID</dt><dd class="mono">${esc(p.rtr)}</dd>
         <dt>Created</dt><dd>${fmtYmd(`20${yy}-${mm}-${dd}`)} by ${esc(p.club)}</dd></dl>
         <p class="small muted">The RTR ID never changes, including after a contact change.</p></section>
-      <section class="card stack"><div class="sec-head"><div><h2>Private contact</h2><p class="small muted">Only Admin sees these. Players can't change them themselves; they send a request.</p></div></div>
-        <dl class="kv"><dt>Phone</dt><dd class="mono">${esc(p.phone || 'Not given')}</dd><dt>Email</dt><dd class="mono">${esc(p.email || 'Not given')}</dd>
-        <dt>Sign in with</dt><dd>${p.claimed ? 'Email' : 'Nothing yet. The player hasn\'t registered.'}</dd>
-        <dt>Phone shown to clubs</dt><dd>${p.claimed ? (p.phoneHidden ? 'No, hidden by the player' : 'Yes') : 'Entered by the club'}</dd></dl></section>
-      <section class="card stack"><h2>Contact-change requests</h2>
-        ${reqs.length ? `<div class="list">${reqs.map((r) => `<div class="between" style="padding:10px 0;border-bottom:1px solid var(--border)"><div class="stack tight" style="min-width:0"><div class="row">${reqChip(r)}<span class="small muted">${FIELD[r.field][0].toUpperCase() + FIELD[r.field].slice(1)} · sent ${ago(r.at)}</span></div><span class="mono small wrapw">${esc(r.from || '—')} → ${esc(r.to)}</span></div><button class="btn sm" data-act="openReview" data-id="${r.id}">${nextAction(r)}</button></div>`).join('')}</div>`
-          : '<p class="small muted">No requests.</p>'}</section>
-    </div><div>
       <section class="card stack"><h2>Account</h2><dl class="kv">
         <dt>Status</dt><dd>${p.claimed ? `Registered ${fmtYmd(p.registered)}` : 'Unclaimed. The club created this profile; the player hasn\'t finished registering.'}</dd></dl></section>
+    </div><div>
       <section class="card stack"><h2>Rank and games</h2><dl class="kv">
         <dt>Rank</dt><dd>${esc(rk.text)}</dd>
         <dt>Recent matches</dt><dd>${p.recent} complete standard matches in the last three months · leaderboard needs ${T}</dd></dl>
         <p class="small muted">Read-only. Admin can't change ranks, winners or scores, and can't rebuild lost session records.</p></section>
-      <section class="card stack"><h2>Record of actions</h2>${history.length ? `<ul class="log">${history.map((l) => `<li>${esc(l.text)}<span>${fmtAt(l.at)} · ${esc(l.actor)}</span></li>`).join('')}</ul>` : '<p class="small muted">No Admin actions recorded for this player.</p>'}</section>
-    </div></div>`);
+      <section class="card stack"><div class="sec-head"><h2>Recent games</h2><button class="btn xs" data-act="playerTab" data-v="history">View all</button></div><div class="list">${historyOf(p, 3).map(histRow).join('')}</div><p class="small muted">Wins–losses in each of the latest sessions. Read-only.</p></section>
+    </div></div>`,
+    contact: `<div class="detail"><div>
+      <section class="card stack"><div class="sec-head"><div><h2>Private contact</h2><p class="small muted">Only Admin sees these. Players can't change them themselves; they send a request.</p></div></div>
+        <dl class="kv"><dt>Phone</dt><dd class="mono">${esc(p.phone || 'Not given')}</dd><dt>Email</dt><dd class="mono">${esc(p.email || 'Not given')}</dd>
+        <dt>Sign in with</dt><dd>${p.claimed ? 'Email' : 'Nothing yet. The player hasn\'t registered.'}</dd>
+        <dt>Phone shown to clubs</dt><dd>${p.claimed ? (p.phoneHidden ? 'No, hidden by the player' : 'Yes') : 'Entered by the club'}</dd></dl></section>
+    </div><div>
+      <section class="card stack"><h2>Contact-change requests</h2>
+        ${reqs.length ? `<div class="list">${reqs.map((r) => `<div class="between" style="padding:10px 0;border-bottom:1px solid var(--border)"><div class="stack tight" style="min-width:0"><div class="row">${reqChip(r)}<span class="small muted">${FIELD[r.field][0].toUpperCase() + FIELD[r.field].slice(1)} · sent ${ago(r.at)}</span></div><span class="mono small wrapw">${esc(r.from || '—')} → ${esc(r.to)}</span></div><button class="btn sm" data-act="openReview" data-id="${r.id}">${nextAction(r)}</button></div>`).join('')}</div>`
+          : '<p class="small muted">No requests.</p>'}</section>
+    </div></div>`,
+    history: `<section class="card stack" id="player-history"><h2>Game history</h2><div class="list">${historyOf(p, 16).map(histRow).join('')}</div><p class="small muted">Wins–losses in each session, newest first. Read-only: Admin can't change winners or scores.</p></section>`,
+    activity: `
+      <section class="card stack"><h2>Record of actions</h2>${history.length ? `<ul class="log">${history.map((l) => `<li>${esc(l.text)}<span>${fmtAt(l.at)} · ${esc(l.actor)}</span></li>`).join('')}</ul>` : '<p class="small muted">No Admin actions recorded for this player.</p>'}</section>`,
+  };
+  return shell(`${backBtn('players', 'Players')}
+    <div class="hero">${avatar(p, 'lg')}<div class="main"><h1>${esc(p.name)}</h1><div class="row">${p.claimed ? chip('Registered', 'ok') : chip('Unclaimed')}${rk.chip}<span class="mono small muted">${esc(p.rtr)}</span></div></div></div>
+    ${twin.length ? notice('warn', `<b>Another player has the same name.</b> ${twin.map((x) => `<button class="link acc" data-act="openPlayer" data-id="${x.id}">${esc(x.name)}</button> (<span class="mono">${esc(x.rtr)}</span>)`).join(', ')} is a separate identity. Admin doesn't merge players.`) : ''}
+    <div class="tabs" role="tablist" aria-label="Player sections">${PT.map(([k, l, badge]) => `<button role="tab" id="ptab-${k}" aria-selected="${k === ptab}" aria-controls="player-panel" data-act="playerTab" data-v="${k}">${l}${badge}</button>`).join('')}</div>
+    <div id="player-panel" role="tabpanel" aria-labelledby="ptab-${ptab}" class="stack" style="gap:20px">${panels[ptab]}</div>`);
 }
 
 // ---------- A-CONTACT-REQUESTS ----------
@@ -1252,6 +1523,8 @@ function go(to, id, anchor) {
   if (S.screen === 'config' && to !== 'config') { S.ui.cfg = null; S.ui.cfgErr = ''; S.ui.cfgConflict = false; }
   S.screen = to;
   if (id !== undefined) S.viewId = id;
+  // The quick view side panel is added straight to the page, so opening a page has to close it.
+  document.querySelectorAll('body > .scrim, body > .sheet').forEach((x) => x.remove());
   S.ui.sheet = null; S.ui.nav = false; S.ui.checking = null;
   render();
   const el = anchor && document.getElementById(anchor);
@@ -1315,7 +1588,9 @@ const ACT = {
   go: (el) => go(el.dataset.to, undefined),
   openClub: (el) => { S.ui.clubTab = 'overview'; go('club', el.dataset.id, el.dataset.anchor); },
   clubTab: (el) => { S.ui.clubTab = el.dataset.v; render(); },
-  openPlayer: (el) => go('player', el.dataset.id),
+  openPlayer: (el) => { S.ui.playerTab = 'overview'; go('player', el.dataset.id); },
+  openPlayerHistory: (el) => { S.ui.playerTab = 'history'; go('player', el.dataset.id); },
+  playerTab: (el) => { S.ui.playerTab = el.dataset.v; render(); },
   openReview: (el) => go('review', el.dataset.id),
   toggleNav: () => { S.ui.nav = !S.ui.nav; render(); },
   toggleTheme: () => {
@@ -1331,11 +1606,25 @@ const ACT = {
   demoDenied: () => { S.me = 'lahug.smash'; S.denied = NON_ADMIN['lahug.smash']; S.ui.sheet = null; render(); },
   clubsF: (el) => { S.ui.clubsF = el.dataset.v; render(); },
   clearClubs: () => { S.ui.clubsQ = ''; S.ui.clubsF = 'all'; render(); },
+  salesP: (el) => { S.ui.salesP = el.dataset.v; render(); },
+  copyInvite: (el) => {
+    const input = document.querySelector('body > .sheet input[aria-label="Registration link"]');
+    const done = () => { el.textContent = 'Copied'; };
+    try { navigator.clipboard.writeText(input.value).then(done, () => { input.select(); done(); }); } catch (e) { input.select(); done(); }
+  },
+  plClear: () => { document.querySelectorAll('.player-select, [data-change="plSelectAll"]').forEach((x) => { x.checked = false; }); CHANGE.plCount(); },
+  pmSheet: (el) => playerManagementSheet(el.dataset.v, el.dataset.id),
+  pmMenu: (el) => showPlayerActions(el, el.dataset.id),
+  plAdv: () => { S.ui.playerAdv = !S.ui.playerAdv; render(); },
+  plGrid: (el) => { S.ui.playerGrid = !!el.dataset.v; render(); },
+  plPage: (el) => { S.ui.playerPage = +el.dataset.v; render(); },
   playersF: (el) => { S.ui.playersF = el.dataset.v; S.ui.shown = 25; render(); },
   clearPlayers: () => { S.ui.playersQ = ''; S.ui.playersF = 'all'; S.ui.shown = 25; render(); },
   morePlayers: () => { S.ui.shown += 25; render(); },
   reqF: (el) => { S.ui.reqF = el.dataset.v; render(); },
   closeSheet: () => {
+    // The player quick view and its sibling dialogs are added straight to the page, outside the sheet state; close them first.
+    if (document.querySelector('body > .sheet')) { document.querySelectorAll('body > .scrim, body > .sheet').forEach((x) => x.remove()); return; }
     const sh = S.ui.sheet;
     if (!sh || sh.pending) return;
     if (sh.type === 'license') {
@@ -1588,9 +1877,17 @@ document.addEventListener('click', (ev) => {
   if (!el || el.disabled) return;
   // A button inside a clickable row handles the click itself.
   if (el.tagName === 'TR' && ev.target.closest('button, a, input') && ev.target.closest('button, a, input') !== el) return;
+  // A player row opens the quick view; its own checkbox, name and menu button keep their own jobs.
+  if (el.classList.contains('player-row') && ev.target.closest('button, a, input, label') && ev.target.closest('button, a, input, label') !== el) return;
   const fn = ACT[el.dataset.act];
   if (fn) { ev.preventDefault(); fn(el); }
 });
+const CHANGE = {
+  plSelectAll: (el) => { document.querySelectorAll('.player-select').forEach((x) => { x.checked = el.checked; }); CHANGE.plCount(); },
+  plCount: () => { const n = document.querySelectorAll('.player-select:checked').length, d = document.querySelector('.pl-dock-n'); if (d) d.textContent = `${n} selected`; },
+  plSize: (el) => { S.ui.playerSize = +el.value; S.ui.playerPage = 1; render(); },
+};
+document.addEventListener('change', (ev) => { const el = ev.target.closest('[data-change]'); if (el && CHANGE[el.dataset.change]) CHANGE[el.dataset.change](el); });
 document.addEventListener('submit', (ev) => {
   const f = ev.target.closest('[data-form]');
   if (!f) return;
@@ -1611,14 +1908,14 @@ document.addEventListener('input', (ev) => {
   if (el.dataset.live !== undefined) render(); else save();
 });
 document.addEventListener('keydown', (ev) => {
-  if (ev.key === 'Escape') { if (S.ui.sheet) ACT.closeSheet(); else if (S.ui.nav) ACT.toggleNav(); }
+  if (ev.key === 'Escape') { if (S.ui.sheet || document.querySelector('body > .sheet')) ACT.closeSheet(); else if (S.ui.nav) ACT.toggleNav(); }
 });
 
 // ---------- Prototype routes (same paths as apps/admin, under /admin) ----------
 let prototypeRouter;
 let prototypeReturn = null;
 let prototypeSignedIn = !!S.me;
-const adminPaths = { clubs: '/clubs', players: '/players', contacts: '/requests/contact-changes', names: '/requests/club-names', passwords: '/requests/password-resets', config: '/settings/ranking', flags: '/settings/feature-flags', login: '/login' };
+const adminPaths = { clubs: '/clubs', players: '/players', sales: '/sales', contacts: '/requests/contact-changes', names: '/requests/club-names', passwords: '/requests/password-resets', config: '/settings/ranking', flags: '/settings/feature-flags', login: '/login' };
 function prototypeBeforeRender() {
   if (S.me && !prototypeSignedIn && prototypeReturn) { const target = prototypeReturn; prototypeReturn = null; applyPrototypeRoute(target); }
   prototypeSignedIn = !!S.me;
@@ -1647,7 +1944,7 @@ function applyPrototypeRoute(url) {
     if (next?.startsWith('/admin/')) prototypeReturn = new URL(next, location.origin);
   }
   S.screen = screen; S.viewId = id; S.ui.sheet = null; S.ui.nav = false; S.ui.pendingGo = null;
-  S.ui.clubTab = ['overview', 'license', 'pages', 'activity'].includes(url.searchParams.get('tab')) ? url.searchParams.get('tab') : 'overview';
+  S.ui.clubTab = ['overview', 'license', 'sales', 'pages', 'activity'].includes(url.searchParams.get('tab')) ? url.searchParams.get('tab') : 'overview';
   if (screen !== 'config') { S.ui.cfg = null; S.ui.cfgErr = ''; S.ui.cfgConflict = false; }
   return true;
 }
@@ -1664,7 +1961,7 @@ function render() {
   let page;
   if (!S.me || S.screen === 'login') page = viewLogin();
   else if (S.denied) page = viewDenied();
-  else page = ({ clubs: viewClubs, club: viewClub, players: viewPlayers, player: viewPlayer, contacts: viewContacts, review: viewReview, names: viewNames, passwords: viewPasswordResets, config: viewConfig, flags: viewFlags }[S.screen] || viewClubs)();
+  else page = ({ clubs: viewClubs, club: viewClub, players: viewPlayers, sales: viewSales, player: viewPlayer, contacts: viewContacts, review: viewReview, names: viewNames, passwords: viewPasswordResets, config: viewConfig, flags: viewFlags }[S.screen] || viewClubs)();
   const sh = S.ui.sheet;
   // Privileged sheets only render inside a signed-in owner session; the Prototype sheet is always available.
   const showSheet = sh && (sh.type === 'demo' || (S.me && !S.denied));

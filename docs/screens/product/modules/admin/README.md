@@ -6,10 +6,11 @@
 |---|---|
 | [Access and workspace](access-navigation.md) | Admin access, focused navigation, failure states |
 | [Clubs and licenses](clubs-licenses.md) | Club directory/detail, adding a club, per-club price, monthly/yearly activation/renewal, expiry/retention |
+| [Sales](sales.md) | A-SALES: license revenue, sessions started and matches played, across every club |
 | [Players and requests](players-requests.md) | Identity oversight, contact requests, review/application status |
 | [Configuration](configuration.md) | 70/30 ranking weights, recent-match threshold, feature flags and adding a flag |
 
-Screen IDs begin with `A-`. No winner correction, manual offline reconstruction, full moderation suite, or invented analytics dashboards are included.
+Screen IDs begin with `A-`. No winner correction, manual offline reconstruction or full moderation suite is included. The only analytics page is [Sales](sales.md), added at the owner's request on November 8, 2026.
 
 Business source: [Admin](../../../../business_logic/product/admin/README.md).
 

@@ -38,7 +38,7 @@ A prompt to finish optional profile details is not a blocking onboarding gate or
 
 ## P-EDIT-PROFILE — Personal information only
 
-Editable: agreed personal name/nickname and supported optional social/playing-style/experience fields. Avatar editing is a composition proposal dependent on the existing file/identity design, not a promised external avatar provider.
+Editable: agreed personal name/nickname and supported optional social/playing-style/experience fields. **Profile picture** (owner request, November 8, 2026): on your own profile the picture has a small edit button on its corner (“Change profile picture”), and Edit profile › Name starts with a “Profile picture” row (picture, hint, **Change picture**). Both open a **Profile picture** dialog: the current picture and what it is (“Your photo”, “A character” or “Your initials”), **Upload a photo** (any image file), **Use my initials**, and a grid of eight characters to pick from (the chosen one is outlined). A choice applies at once with a toast “Profile picture updated” (or “Using your initials”); it does not wait for Edit profile's Save, and it does not mark that form as unsaved. **Done** closes the dialog. Other players' profiles have no edit control. The picture is stored through the existing `avatar_ref` (a character id or an uploaded file); this is not an external avatar provider.
 
 Phone and email are read-only with **Request a change**. Their fields must not become editable through a generic form payload or hidden input. Permanent RTR ID is read-only.
 
@@ -47,6 +47,25 @@ Save validates actual supported fields, preserves values on error, and shows suc
 Offline personal editing is not an agreed offline product feature. Keep a visible unsaved local draft if desired, but require internet to save and do not queue identity changes as if automatically approved.
 
 Invalid links/experience values: actionable inline errors. Social links must be treated as links, not authentication tokens or verified achievement claims. Personal experience does not directly award rank points.
+
+## P-COMPARE — You and another player
+
+Owner request, November 8, 2026. Another player's profile (signed in, not your own) has a **Compare with me** button (signed out: it asks you to sign in, then returns to the comparison). It opens a page “You and NAME” with a back link to that profile:
+
+- **Filter switch** at the top (owner comment, November 8, 2026): **All · 8** (default), **Head to head · 6** (games against each other) and **Together · 2** (games on the same team), each with its count. The numbers below and the list follow it; changing it goes back to the first page of games; opening the comparison always starts on All.
+- **Side by side** (All and Head to head; owner comment, November 8, 2026: head to head should show a comparison, together should have a different layout): both pictures with “You” and the other player's first name, then rows with your value on the left and theirs on the right, the better value in the accent color: **Level** and **Overall position** (lower is better), which do not change with the filter; on **Head to head** also **Games counted (3 months)** and **Win rate overall**; then, for the games the filter shows, **Shared games** (or “Games against each other”), **Wins in these games** and **Win rate in these games**. Against each other only one side wins a game.
+- **Together** replaces the side-by-side with a **team card**: your two overlapped pictures, “You and NAME · As a team”, three tiles **Games**, **Won** (accent) and **Lost**, “Win rate as a team” with the percentage and one bar, and a line “Your level together: LEVEL and LEVEL”. As partners you share every result, so there is nothing to compare between you.
+- **Record bar** under the rows: a count at each end and one bar. All: “You won” / “You lost”; Head to head: “You won” / “NAME won”; Together: “Won” / “Lost”. With no games in the filter it reads “You haven't played against NAME yet.”, “You haven't played on the same team as NAME yet.” or “No shared games yet.”
+- **Games you played together or against** (owner request, November 8, 2026): newest first, three per page. Each game is one row of three columns: **Court** (40% of the width), **Session** (30%) and **Result** (30%).
+  - **Court**: a top-down badminton court (net dashed in the middle) with no fill: only the lines and the outline, in the green accent at 10% opacity, so names and levels stay readable in both themes (owner comments, same day), your side on the left half and the other side on the right, one or two players stacked on each half. Each player is a 38 px picture (initials when none) with a small round badge on its top right corner holding how many games they played in that session, a green ring on the winning side, and under it their first name (“You” for you) and skill level in small text, over the court.
+  - **Session**: the date in bold, the session title and the club.
+  - **Result**: the label chip (“You won”, “NAME won”, “Together · won/lost”) with the score in large type under it (“21–9”), right-aligned.
+  A short line above the list explains the ring, the badge and the columns.
+- Only counted singles and doubles are included; fun and partial games are left out, like the rest of rank. Results are the same final results already on each profile.
+
+Backend note (owner comment, November 8, 2026): this should not need a background cron job. Once a session is submitted its results are final, so the shared games can be read from those final match rows when the page opens (or a per-pair summary can be updated in the same step that finalizes the session); nothing has to run afterwards. A Supabase Edge Function on a schedule is a new piece of infrastructure and needs an owner decision first; see the [database open decisions](../../../../database_design/product/open-decisions.md).
+
+Prototype data: the shared games are drawn from the two player ids, so the same pair always shows the same record. Not decided yet, to confirm with the owner: whether comparing is only for signed-in players (assumed), whether the other player can switch it off, and whether fun games should show as a separate line.
 
 ## Acceptance examples
 

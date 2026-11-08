@@ -15,6 +15,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-07-05](#d-2026-11-07-05) | Payment amounts reuse the existing paid mark | approved | implemented | #479 | [Queue](workstreams/queue.md) |
 | [D-2026-11-07-06](#d-2026-11-07-06) | Public participant names are masked | approved | implemented | #475, #474 | [Queue](workstreams/queue.md) |
 | [D-2026-11-07-07](#d-2026-11-07-07) | Player invite links use player login until sign-up exists | approved | implemented | #476, #478; #477 blocked | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
+| [D-2026-11-08-01](#d-2026-11-08-01) | Where Admin Sales numbers are calculated | proposed | not started | needed | [Admin](workstreams/admin.md) |
 
 ## Status conventions
 
@@ -120,6 +121,24 @@ Then add a row to the [index](#index) and link the entry from the workstream pag
 - **Decision:** Request to join offers the guest form or "Log in with ROTRA Player" (returns to `/s/<slug>?join=1`); sign-up shows as not open yet. Guest "Invite to ROTRA" copies the player login link. A login never grants a slot, and a join request does not yet carry the signed-in player.
 - **Superseded for guest invitations, November 8, 2026 (#490):** Copy and Share now open independent registration at `/register/[clubId]`. The club supplies RTR allocation context only. Registration keeps the guest record unlinked until a separate linking invitation is accepted. Matching contacts prompt sign-in/recovery or correction/help; no duplicate account or automatic merge. Request to join still offers guest entry or login; its note now directs new players to ask the club for a registration invite.
 - **References:** [Public session screens](../screens/product/modules/queue/public-session.md), [registration screens](../screens/product/modules/player-information/access-registration.md).
+
+<a id="d-2026-11-08-01"></a>
+### D-2026-11-08-01 — Where Admin Sales numbers are calculated
+- **Decision status:** proposed (owner leans to Supabase; not approved yet)
+- **Implementation status:** not started (the Sales page and the club Sales tab exist only in the Admin mockup, with sample figures)
+- **Ticket:** needed
+- **Roadmap:** MVP candidate — [Admin workstream](workstreams/admin.md)
+- **Question:** Should revenue, sessions-started, matches-played and per-club cost-per-session be calculated in Next.js (route handlers or server code) or in Supabase (Postgres)?
+- **Owner note (November 8, 2026):** Not sure Next.js is the right place to do calculations. Supabase feels right. This entry is where discussion and notes live, together with the AI recommendation.
+- **AI recommendation (not a decision):** Do the calculations in Postgres, and keep Next.js as a thin reader.
+  1. **Why Postgres.** The inputs (license payments, finalized sessions, finalized matches) already live there. Summing and grouping by month or club is exactly what SQL does best, runs next to the data, returns a few small rows, and stays correct for every client (Admin web now, anything later). Doing it in Next.js means pulling many rows over the wire and re-implementing the same rules in TypeScript, where it can drift from the database.
+  2. **Shape.** One **read-only SQL view or function per report** (for example monthly revenue, sessions and matches by club) owned by the `packages/db` schema, written as a Prisma migration. The Next.js Admin route handler only calls it, checks that the caller is the platform owner, and passes the rows to the screen, which formats peso amounts and dates. Cost-per-session is a number in the Admin configuration table (the mockup shows ₱15 as a placeholder), joined in the view.
+  3. **No cron by default.** Finalized sessions and matches never change, so the numbers can be computed when the page opens (indexed on club, month and status) with no scheduled job and no extra work after a session is submitted. If it ever gets slow, keep a **monthly totals table updated in the same transaction that finalizes a session**, not by a timer. Supabase Edge Functions or pg_cron stay off until you approve them (see the [database open decisions](../database_design/product/open-decisions.md)).
+  4. **Money rules.** Revenue is only the license payments Admin records (ROTRA does not collect money). Store amounts as integer centavos or pesos with a currency, never floats; decide once whether a yearly payment counts in the month paid (as the mockup does) or is spread over the months it covers.
+  5. **Access.** Admin-only: the platform owner's session reads the view through the server. Nothing from these reports is exposed to clubs or players. Do not call these from the browser with the public key.
+  6. **What would change this.** If a number needs logic that is awkward in SQL (for example a long-running estimate or an external price feed), do just that part in code, and still store the result in Postgres.
+- **Open questions:** What the real cost per session is and what it includes; whether free tester clubs count in sessions and matches; month-paid versus spread revenue; whether Admin wants CSV export of these reports; how far back history should go.
+- **References:** [Sales screen](../screens/product/modules/admin/sales.md), [club Sales tab](../screens/product/modules/admin/clubs-licenses.md#a-club-sales--sales-tab-on-the-club-page), [Admin database design](../database_design/product/admin/README.md), [mockup log: Sales page](../mockup-changes/2026-11-08-admin-sales-page.md), [mockup log: club Sales tab](../mockup-changes/2026-11-08-admin-club-sales-tab.md).
 
 ## Admin implementation gap index
 

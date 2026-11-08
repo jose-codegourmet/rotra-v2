@@ -128,6 +128,63 @@ button.conn:hover { border-color: var(--accent); background: var(--surface); }
 .avatar.lg { width: 52px; height: 52px; font-size: 18px; border-radius: 14px; background: var(--accent); color: var(--on-accent); font-weight: 800; }
 .avatar.photo { background: var(--elev); overflow: hidden; }
 .avatar.photo svg { width: 100%; height: 100%; display: block; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.avatar.photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.av-edit { position: relative; flex: none; display: block; }
+.av-edit .av-cam { position: absolute; right: -6px; bottom: -6px; width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--surface); background: var(--accent); color: var(--on-accent); display: grid; place-items: center; cursor: pointer; padding: 0; }
+.av-cam svg { width: 16px; height: 16px; }
+.av-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 10px; }
+.av-pick { padding: 4px; border: 2px solid transparent; border-radius: 16px; background: none; cursor: pointer; display: grid; place-items: center; }
+.av-pick[aria-pressed="true"] { border-color: var(--accent); }
+.av-pick .avatar { width: 56px; height: 56px; }
+.cmp-game { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px 0; border-top: 1px solid var(--border); }
+.cmp-game .cmp-row3 { align-self: stretch; display: grid; grid-template-columns: 40% 30% 30%; align-items: center; gap: 0; }
+.cmp-row3 > * { min-width: 0; padding-right: 8px; }
+.cmp-row3 > .cmp-court { padding-right: 0; }
+.cmp-info { display: flex; flex-direction: column; gap: 2px; padding-left: 10px; }
+.cmp-info b { font-size: 13px; }
+.cmp-info span { overflow-wrap: anywhere; }
+.cmp-res .chip { white-space: normal; text-align: center; line-height: 1.2; max-width: 100%; }
+.cmp-res { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; text-align: right; }
+.cmp-court { position: relative; display: grid; grid-template-columns: 1fr 1fr; border-radius: 8px; overflow: hidden; }
+.cmp-court .sc-svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0.1; }
+.cmp-court { background: none; border: 1px solid color-mix(in srgb, var(--accent) 10%, transparent); }
+.cmp-side { position: relative; display: flex; flex-direction: column; justify-content: space-evenly; align-items: center; gap: 10px; padding: 10px 2px; }
+.cmp-pl { display: flex; flex-direction: column; align-items: center; gap: 1px; text-align: center; min-width: 0; max-width: 100%; color: var(--fg); }
+.cmp-pl b { font-size: 11px; line-height: 1.15; margin-top: 4px; overflow-wrap: anywhere; }
+.cmp-lv { font-size: 9px; line-height: 1.2; color: var(--fg2); }
+.cmp-score { font-size: 22px; font-weight: 800; white-space: nowrap; }
+.cmp-av { position: relative; display: block; }
+.cmp-g { position: absolute; top: -6px; right: -8px; min-width: 18px; height: 18px; padding: 0 4px; box-sizing: border-box; border-radius: 999px; display: grid; place-items: center; font-style: normal; font-size: 11px; font-weight: 800; background: var(--bg); color: var(--fg); border: 2px solid var(--border-strong); }
+.cmp-pl.won .cmp-g { border-color: var(--accent); }
+.cmp-pl .avatar { width: 38px; height: 38px; font-size: 12px; box-shadow: 0 0 0 2px var(--border-strong); }
+.cmp-pl.won .avatar { box-shadow: 0 0 0 2px var(--accent); }
+.cmp-x { align-self: center; }
+.pager { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-top: 6px; }
+.cmp-tm { display: flex; align-items: center; gap: 14px; }
+.cmp-tm-av { display: flex; }
+.cmp-tm-av .avatar { box-shadow: 0 0 0 3px var(--surface); }
+.cmp-tm-av .avatar + .avatar { margin-left: -14px; }
+.cmp-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.cmp-tiles > div { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 12px 6px; border-radius: var(--r); background: var(--elev); }
+.cmp-tiles b { font-size: 26px; line-height: 1.1; }
+.cmp-tiles .won b { color: var(--accent); }
+.cmp-wr { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.cmp-wr b { font-size: 22px; }
+.cmp-head { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; }
+.cmp-who { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; min-width: 0; }
+.cmp-vs { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: var(--elev); color: var(--fg2); }
+.cmp-row { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center; padding: 10px 0; border-top: 1px solid var(--border); text-align: center; }
+.cmp-row b { font-size: 15px; overflow-wrap: anywhere; }
+.cmp-row b.lead { color: var(--accent); }
+.cmp-row > span { max-width: 110px; }
+.h2h { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; }
+.h2h-n { display: flex; flex-direction: column; align-items: center; min-width: 56px; }
+.h2h-n b { font-size: 28px; line-height: 1; }
+.h2h-bar { display: flex; gap: 2px; height: 12px; }
+.h2h-bar i { display: block; flex-basis: 0; background: var(--accent); border-radius: 999px 0 0 999px; }
+.h2h-bar i.them { background: var(--border-strong); border-radius: 0 999px 999px 0; }
+.av-now { display: flex; align-items: center; gap: 14px; }
 .avatar.xl { width: 64px; height: 64px; font-size: 20px; }
 .avatar.xl.photo { box-shadow: 0 0 0 2px var(--surface), 0 0 0 3px var(--border-strong); }
 .notice { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: var(--r); border: 1px solid var(--border-strong); background: var(--surface); font-size: 14px; }
@@ -599,7 +656,7 @@ const BACKDROP = ['#2f6f5e', '#3b4f8a', '#74488a', '#8a5a2f', '#2f6a85', '#7d3b4
 const SHIRT = ['#00cc6a', '#e6e6ec', '#ffb800', '#4a90e2', '#ff6b6b', '#9b6bff', '#24242a'];
 // Sample profile pictures, drawn the same way as in the Queue prototype; profiles without one show initials.
 function faceSVG(p) {
-  const h = hashStr(p.id + p.name);
+  const h = hashStr(p.id + p.name + (p.face || ''));
   const pick = (arr, k) => arr[(h >>> k) % arr.length];
   const skin = pick(SKIN, 0), hair = pick(HAIR, 3), bg = pick(BACKDROP, 6), shirt = pick(SHIRT, 9);
   const style = (h >>> 12) % 5, glasses = (h >>> 16) % 5 === 0;
@@ -624,7 +681,9 @@ function faceSVG(p) {
     ${glasses ? '<g fill="none" stroke="#1b1817" stroke-width="1.3"><circle cx="27" cy="29.5" r="4"/><circle cx="37" cy="29.5" r="4"/><path d="M31 29.5h2"/></g>' : ''}
   </svg>`;
 }
-const avatar = (p, cls = '') => (p.photo
+const avatar = (p, cls = '') => (p.photoUrl
+  ? `<span class="avatar photo ${cls}" role="img" aria-label="Profile picture of ${esc(p.name)}"><img src="${p.photoUrl}" alt=""></span>`
+  : p.photo
   ? `<span class="avatar photo ${cls}" role="img" aria-label="Profile picture of ${esc(p.name)}">${faceSVG(p)}</span>`
   : `<span class="avatar ${cls}" aria-hidden="true">${esc(initials(p.name))}</span>`);
 function toast(text) {
@@ -646,8 +705,10 @@ const I = {
   check: svg('<path d="m5 12 4 4 10-10"/>', 16, 2.6),
   x: svg('<path d="M6 6l12 12M18 6 6 18"/>', 18, 2.4),
   back: svg('<path d="m15 6-6 6 6 6"/>', 16, 2.4),
+  fwd: svg('<path d="m9 6 6 6-6 6"/>', 16, 2.4),
   copy: svg('<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>'),
   qr: svg('<rect x="3.5" y="3.5" width="6" height="6" rx="1"/><rect x="14.5" y="3.5" width="6" height="6" rx="1"/><rect x="3.5" y="14.5" width="6" height="6" rx="1"/><path d="M14.5 14.5h2v2M20.5 14.5v6h-6M17.5 18.5h.01"/>'),
+  versus: svg('<path d="M5 5l6 7-6 7M19 5l-6 7 6 7"/>', 16, 2.2),
   edit: svg('<path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="m13.5 6.5 4 4"/>'),
   lock: svg('<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>'),
   ext: svg('<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>', 14),
@@ -689,7 +750,7 @@ function boardList() {
   const out = [];
   const migs = migsOnBoard();
   BASE.forEach((e, i) => {
-    if (i === MIGS_SLOT && migs) out.push({ id: 'u1', name: S.accounts.u1.name, nick: S.accounts.u1.nick, photo: true, level: S.accounts.u1.level });
+    if (i === MIGS_SLOT && migs) out.push({ id: 'u1', name: S.accounts.u1.name, nick: S.accounts.u1.nick, photo: S.accounts.u1.photo, face: S.accounts.u1.face, photoUrl: S.accounts.u1.photoUrl, level: S.accounts.u1.level });
     if (e.recent >= T()) out.push(e);
   });
   return out;
@@ -920,11 +981,11 @@ function viewProfile() {
   return `<main class="wrap"><div class="prof">
     <aside class="side stack">
       <section class="card hero">
-        <div class="who">${avatar(p, 'xxl')}<div style="min-width:0" class="stack tight"><h1>${esc(p.name)}</h1>${p.nick ? `<p class="muted">“${esc(p.nick)}”</p>` : ''}${own ? `<div class="row">${chip('This is you', 'ok')}</div>` : ''}</div></div>
+        <div class="who">${own ? `<span class="av-edit">${avatar(p, 'xxl')}<button type="button" class="av-cam" data-act="openAvatar" aria-label="Change profile picture" title="Change profile picture">${I.edit}</button></span>` : avatar(p, 'xxl')}<div style="min-width:0" class="stack tight"><h1>${esc(p.name)}</h1>${p.nick ? `<p class="muted">“${esc(p.nick)}”</p>` : ''}${own ? `<div class="row">${chip('This is you', 'ok')}</div>` : ''}</div></div>
         <div class="stack tight"><span class="label">Player ID</span>
           <div class="rtr-line"><code id="rtr-${p.id}">${esc(p.rtr)}</code><button class="btn xs" data-act="copyId" data-id="${p.id}" aria-label="Copy player ID">${I.copy} Copy</button></div>
           <span class="hint">Shows the city and date this profile was first created. It isn't where ${own ? 'you live or which club you play for' : 'this player lives or which club they play for'}.</span></div>
-        ${own ? `<div class="acts"><button class="btn sm" data-act="openEdit">${I.edit} Edit profile</button><button class="btn sm" data-act="go" data-to="id">${I.qr} My player ID</button></div>` : ''}
+        ${own ? `<div class="acts"><button class="btn sm" data-act="openEdit">${I.edit} Edit profile</button><button class="btn sm" data-act="go" data-to="id">${I.qr} My player ID</button></div>` : `<div class="acts"><button class="btn sm primary" data-act="openCompare" data-id="${p.id}">${I.versus} Compare with ${S.me ? 'me' : 'my results'}</button></div>`}
       </section>
       ${own ? privatePanel(p) : ''}
     </aside>
@@ -988,6 +1049,91 @@ function privatePanel(p) {
     <dl class="kv"><dt>Phone</dt><dd class="mono">${esc(p.phone)}</dd><dt>Email</dt><dd style="overflow-wrap:anywhere">${esc(p.email)}</dd><dt>Clubs</dt><dd>${p.phoneHidden ? 'Phone hidden from clubs' : 'Clubs can see your phone'}</dd></dl>
     ${open ? `<p class="small">${chip(REQ[req.status].chip, REQ[req.status].k)} ${REQ_FIELD[req.field]} change</p>` : ''}
     <div class="acts"><button class="btn sm" data-act="go" data-to="account">Privacy and contact</button><button class="btn sm ghost" data-act="signOut">Sign out</button></div></section>`;
+}
+
+// ---------- P-COMPARE ----------
+// Head to head with the signed-in player. The prototype draws the shared games from the two ids, so the same pair always gives the same record.
+function sharedGames(aId, bId) {
+  const key = [aId, bId].sort().join('+'), h0 = hashStr(key), n = 4 + (h0 % 5), out = [];
+  const nm = (k) => `${FIRST[hashStr(key + k) % FIRST.length]} ${LAST[(hashStr(key + k) >>> 8) % LAST.length]}`;
+  for (let i = 0; i < n; i++) {
+    const h = hashStr(`${key}-${i}`), [club, titles] = CLUBS[h % CLUBS.length];
+    const together = h % 4 === 0, meWon = (h >>> 5) % 5 < 3, a = 21, b = 9 + ((h >>> 9) % 11);
+    const gm = (name) => 3 + (hashStr(`${key}-${i}-g-${name}`) % 7); // games that player played in that session
+    const other = (name) => ({ name, games: gm(name) });
+    const partner = together ? null : (h >>> 13) % 3 === 0 ? null : other(nm(`m${i}`)), oppPartner = together ? null : (h >>> 14) % 3 === 0 ? null : other(nm(`t${i}`));
+    const mine = together ? [{ who: 'me', games: gm('me') }, { who: 'them', games: gm('them') }] : [{ who: 'me', games: gm('me') }, ...(partner ? [partner] : [])];
+    const theirs = together ? [other(nm(`f${i}`)), other(nm(`g${i}`))] : [{ who: 'them', games: gm('them') }, ...(oppPartner ? [oppPartner] : [])];
+    out.push({ id: `${key}-${i}`, ago: 2 + i * 5 + ((h >>> 3) % 4), club, title: titles[(h >>> 11) % titles.length], together, meWon, score: meWon ? `${a}–${b}` : `${b}–${a}`, mine, theirs });
+  }
+  return out.sort((x, y) => x.ago - y.ago);
+}
+const winStats = (p) => { const gs = p.sessions.flatMap((s) => s.games).filter((g) => g.kind === 'counted'); const w = gs.filter((g) => g.res === 'W').length; return { w, l: gs.length - w, pct: gs.length ? Math.round((w / gs.length) * 100) : null }; };
+const CMP_PAGE = 3;
+// Top-down doubles court, 13.4 m x 6.1 m in decimetres, like the court pictures in the Queue app.
+const cmpCourtSVG = () => `<svg class="sc-svg" viewBox="0 0 134 61" aria-hidden="true" preserveAspectRatio="none"><g fill="none" stroke="var(--accent)" stroke-width="1.2" vector-effect="non-scaling-stroke"><rect x="1" y="1" width="132" height="59" vector-effect="non-scaling-stroke"/><path d="M1 4.6H133M1 56.4H133M47.2 1V60M86.8 1V60M7.6 1V60M126.4 1V60M1 30.5H47.2M86.8 30.5H133" vector-effect="non-scaling-stroke"/></g><path d="M67 -1V62" stroke="var(--accent)" stroke-width="2" stroke-dasharray="3 2" vector-effect="non-scaling-stroke"/></svg>`;
+function viewCompare() {
+  const them = profileOf(S.viewId), me = S.me ? profileOf(S.me) : null;
+  if (!them) return viewNotFound();
+  if (!me) return viewLogin();
+  if (them.id === me.id) { S.screen = 'profile'; return viewProfile(); }
+  const all = sharedGames(me.id, them.id), against = all.filter((g) => !g.together), together = all.filter((g) => g.together);
+  const flt = ['all', 'h2h', 'together'].includes(S.ui.cmpFilter) ? S.ui.cmpFilter : 'all';
+  const games = flt === 'h2h' ? against : flt === 'together' ? together : all;
+  const pages = Math.max(1, Math.ceil(games.length / CMP_PAGE)), page = Math.min(Math.max(0, S.ui.cmpPage || 0), pages - 1);
+  const myW = against.filter((g) => g.meWon).length, theirW = against.length - myW, togW = together.filter((g) => g.meWon).length;
+  const sm = winStats(me), st = winStats(them), pm = positionOf(me.id), pt = positionOf(them.id), fn = firstName(them);
+  // The numbers at the top follow the filter. “Wins” is per player: against each other one side wins, as partners both share the result.
+  const n = games.length, myWins = games.filter((g) => g.meWon).length, theirWins = games.filter((g) => (g.together ? g.meWon : !g.meWon)).length;
+  const recL = flt === 'h2h' ? myWins : myWins, recR = flt === 'h2h' ? theirWins : n - myWins;
+  const recLabelL = flt === 'together' ? 'Won' : 'You won', recLabelR = flt === 'h2h' ? `${fn} won` : flt === 'together' ? 'Lost' : 'You lost';
+  const who = (p, you) => `<div class="cmp-who">${avatar(p, 'xl')}<b>${you ? 'You' : esc(firstName(p))}</b></div>`;
+  const row = (label, a, b, better) => `<div class="cmp-row"><b class="${better === 'a' ? 'lead' : ''}">${a}</b><span class="small muted">${label}</span><b class="${better === 'b' ? 'lead' : ''}">${b}</b></div>`;
+  const hi = (x, y, low) => (x == null || y == null || x === y ? '' : (low ? x < y : x > y) ? 'a' : 'b');
+  const tot = against.length || 1;
+  const who2 = (x) => (x.who === 'me' ? me : x.who === 'them' ? them : { id: `x-${x.name}`, name: x.name, photo: hashStr(x.name) % 4 !== 0 });
+  const lvOf = (x, q) => (x.who === 'me' ? lvLabel(me.level) : x.who === 'them' ? lvLabel(them.level) : LEVELS[hashStr(`lv-${q.name}`) % LEVELS.length].label);
+  const pl = (x, won) => { const q = who2(x), nm = x.who === 'me' ? 'You' : firstName(q);
+    return `<span class="cmp-pl ${won ? 'won' : ''}"><span class="cmp-av">${avatar(q)}<i class="cmp-g tnum" role="img" aria-label="${esc(nm)}: ${x.games} games in that session">${x.games}</i></span><b>${esc(nm)}</b><span class="cmp-lv">${esc(lvOf(x, q))}</span></span>`; };
+  const gameLine = (g) => {
+    const label = g.together ? `<span class="chip ${g.meWon ? 'ok' : ''}">Together · ${g.meWon ? 'won' : 'lost'}</span>` : `<span class="chip ${g.meWon ? 'ok' : 'bad'}">${g.meWon ? 'You won' : `${esc(fn)} won`}</span>`;
+    const names = (side) => side.map((x) => (x.who === 'me' ? 'You' : esc(firstName(who2(x))))).join(' and ');
+    return `<div class="cmp-game"><div class="cmp-row3">
+      <div class="cmp-court" role="group" aria-label="${names(g.mine)} versus ${names(g.theirs)}">${cmpCourtSVG()}<div class="cmp-side">${g.mine.map((x) => pl(x, g.meWon)).join('')}</div><div class="cmp-side">${g.theirs.map((x) => pl(x, !g.meWon)).join('')}</div></div>
+      <div class="cmp-info"><b>${fmtDay(g.ago)}</b><span class="small">${esc(g.title)}</span><span class="small muted">${esc(g.club)}</span></div>
+      <div class="cmp-res">${label}<span class="cmp-score tnum" aria-label="Score ${g.score}">${g.score}</span></div>
+    </div></div>`;
+  };
+  return `<main class="wrap mid">
+    <div class="page-head">${backBtn('openProfile', them.name, them.id)}<span class="label">Compare</span><h1>You and ${esc(fn)}</h1>
+      <p class="muted">Official results from finished club sessions. Only singles and doubles count here; fun and partial games are left out.</p></div>
+    <div class="seg cmp-filter" role="group" aria-label="Show games">${[['all', 'All', all.length], ['h2h', 'Head to head', against.length], ['together', 'Together', together.length]].map(([k, l, n]) => `<button type="button" aria-pressed="${flt === k}" data-act="cmpFilter" data-v="${k}">${l} · ${n}</button>`).join('')}</div>
+    ${flt === 'together' ? `<section class="card stack cmp-team-card">
+      <div class="cmp-tm"><span class="cmp-tm-av">${avatar(me, 'xl')}${avatar(them, 'xl')}</span><div class="stack tight"><b>You and ${esc(fn)}</b><span class="small muted">As a team</span></div></div>
+      ${n ? `<div class="cmp-tiles"><div><b class="tnum">${n}</b><span class="small muted">Games</span></div><div class="won"><b class="tnum">${myWins}</b><span class="small muted">Won</span></div><div><b class="tnum">${n - myWins}</b><span class="small muted">Lost</span></div></div>
+      <div class="cmp-wr"><span class="small muted">Win rate as a team</span><b class="tnum">${Math.round((myWins / n) * 100)}%</b></div>
+      <div class="h2h-bar" role="img" aria-label="Won ${myWins} of ${n} games together"><i style="flex-grow:${myWins || 0.001}"></i><i class="them" style="flex-grow:${n - myWins || 0.001}"></i></div>
+      <p class="small muted">Your level together: ${esc(lvLabel(me.level))} and ${esc(lvLabel(them.level))}.</p>` : `<p class="muted">You haven't played on the same team as ${esc(fn)} yet.</p>`}
+    </section>` : `<section class="card stack">
+      <div class="cmp-head">${who(me, true)}<span class="cmp-vs" aria-hidden="true">${I.versus}</span>${who(them, false)}</div>
+      ${row('Level', esc(lvLabel(me.level)), esc(lvLabel(them.level)), hi(me.level, them.level))}
+      ${row('Overall position', pm ? `#${num(pm)}` : '—', pt ? `#${num(pt)}` : '—', hi(pm, pt, true))}
+      ${flt === 'h2h' ? `${row('Games counted (3 months)', num(me.recent), num(them.recent), hi(me.recent, them.recent))}${row('Win rate overall', sm.pct == null ? '—' : `${sm.pct}%`, st.pct == null ? '—' : `${st.pct}%`, hi(sm.pct, st.pct))}` : ''}
+      ${row(flt === 'all' ? 'Shared games' : flt === 'h2h' ? 'Games against each other' : 'Games as partners', n, n, '')}
+      ${row('Wins in these games', myWins, theirWins, hi(myWins, theirWins))}
+      ${row('Win rate in these games', n ? `${Math.round((myWins / n) * 100)}%` : '—', n ? `${Math.round((theirWins / n) * 100)}%` : '—', n ? hi(myWins, theirWins) : '')}
+      ${n ? `<div class="h2h"><div class="h2h-n"><b class="tnum">${recL}</b><span class="small muted">${recLabelL}</span></div>
+        <div class="h2h-bar" role="img" aria-label="${recLabelL} ${recL} of ${n} games, ${recLabelR} ${recR}"><i style="flex-grow:${recL || 0.001}"></i><i class="them" style="flex-grow:${recR || 0.001}"></i></div>
+        <div class="h2h-n"><b class="tnum">${recR}</b><span class="small muted">${recLabelR}</span></div></div>` : `<p class="muted">${flt === 'together' ? `You haven't played on the same team as ${esc(fn)} yet.` : flt === 'h2h' ? `You haven't played against ${esc(fn)} yet.` : 'No shared games yet.'}</p>`}
+    </section>`}
+    <section class="card stack"><h2>Games you played together or against</h2>
+      <p class="small muted">Winners have a green ring. The number on each picture is how many games that player played in the session. Your side is on the left of the net; each player's name and level are under their picture. Columns: court, session, result.</p>
+      ${games.length ? `<div>${games.slice(page * CMP_PAGE, (page + 1) * CMP_PAGE).map(gameLine).join('')}</div>
+        ${pages > 1 ? `<nav class="pager" aria-label="Shared games pages"><button class="btn sm" data-act="cmpPage" data-v="${page + 1}" ${page >= pages - 1 ? 'disabled' : ''}>${I.back} Older</button>
+          <span class="small muted" aria-live="polite">${page * CMP_PAGE + 1}–${Math.min(games.length, (page + 1) * CMP_PAGE)} of ${games.length}</span>
+          <button class="btn sm" data-act="cmpPage" data-v="${page - 1}" ${page === 0 ? 'disabled' : ''}>Newer ${I.fwd}</button></nav>` : ''}` : `<p class="muted">${flt === 'together' ? `You haven't played on the same team as ${esc(fn)} yet.` : flt === 'h2h' ? `You haven't played against ${esc(fn)} yet.` : 'No shared games yet.'}</p>`}
+    </section>
+  </main>`;
 }
 
 // ---------- P-RANK-DETAIL ----------
@@ -1173,7 +1319,7 @@ function viewEdit() {
       <p class="small muted">You can't edit these here. Phone and email changes go to the ROTRA platform owner for approval; your player ID never changes.</p>
       <div class="row"><button type="button" class="btn sm" data-act="openRequest">Request a phone or email change</button><button type="button" class="btn sm ghost" data-act="go" data-to="account">Phone privacy</button></div>
       <p class="hint">Rank, club levels and game results come from clubs and can't be changed by players.</p>`
-    : tab.body('ui.edit', d, e, 'ed');
+    : (tab.id === 'basics' ? `<div class="av-now">${avatar(p, 'xl')}<div class="stack tight"><b>Profile picture</b><span class="small muted">Shown on the leaderboard and your profile.</span><div class="row"><button type="button" class="btn sm" data-act="openAvatar">Change picture</button></div></div></div>` : '') + tab.body('ui.edit', d, e, 'ed');
   return `<main class="wrap mid">
     <div class="page-head">${backBtn('cancelEdit', 'My profile')}<h1>Edit profile</h1>
       <p class="muted">Fields marked public appear on your profile for anyone to see.</p></div>
@@ -1299,7 +1445,17 @@ function sheetWrap(title, body, foot, wide = false) {
     <header><h2 id="sheet-title" tabindex="-1">${title}</h2><button class="btn xs ghost icon-btn" data-act="closeSheet" aria-label="Close">${I.x}</button></header>
     <div class="sb">${body}</div>${foot ? `<footer>${foot}</footer>` : ''}</div>`;
 }
+const FACES = ['', 'a', 'b', 'c', 'd', 'e', 'f', 'g'];
 const SHEETS = {
+  avatar: () => {
+    const a = S.accounts[S.me], p = profileOf(S.me);
+    const opt = (face) => { const q = { ...a, photo: true, face, photoUrl: '' }; const on = a.photo && !a.photoUrl && (a.face || '') === face; return `<button type="button" class="av-pick" aria-pressed="${on}" aria-label="Character ${FACES.indexOf(face) + 1}" data-act="setFace" data-v="${face}">${avatar(q)}</button>`; };
+    return sheetWrap('Profile picture', `<div class="stack">
+      <div class="av-now">${avatar(p, 'xxl')}<div class="stack tight"><b>${a.photoUrl ? 'Your photo' : a.photo ? 'A character' : 'Your initials'}</b><span class="small muted">Everyone who sees your profile sees this.</span></div></div>
+      <div class="row"><label class="btn sm" for="av-file" style="cursor:pointer">Upload a photo</label><input type="file" id="av-file" accept="image/*" class="sr-only" data-avfile><button type="button" class="btn sm" data-act="useInitials" ${!a.photo && !a.photoUrl ? 'disabled' : ''}>Use my initials</button></div>
+      <div><span class="label">Or pick a character</span><div class="av-grid" role="group" aria-label="Characters">${FACES.map(opt).join('')}</div></div>
+      <p class="hint">Photos stay on this device in the prototype. Keep it to a clear picture of you; the club's Queue Master can ask you to change it.</p></div>`, '<button class="btn primary" data-act="closeSheet">Done</button>');
+  },
   discard: () => sheetWrap('Discard your changes?', '<p class="muted">Your edits to your profile haven\'t been saved.</p>', '<button class="btn" data-act="closeSheet">Keep editing</button><button class="btn danger" data-act="discard">Discard changes</button>'),
   request: () => {
     const p = profileOf(S.me), R = S.ui.req;
@@ -1394,6 +1550,9 @@ const ACT = {
   goBoard: () => go('board'),
   goLogin: () => go('login'),
   openProfile: (el) => go('profile', el.dataset.id),
+  openCompare: (el) => { if (!S.me) { S.ui.after = { to: 'compare', id: el.dataset.id }; toast('Sign in to compare'); go('login'); return; } S.ui.cmpPage = 0; S.ui.cmpFilter = 'all'; go('compare', el.dataset.id); },
+  cmpFilter: (el) => { S.ui.cmpFilter = el.dataset.v; S.ui.cmpPage = 0; render(); },
+  cmpPage: (el) => { S.ui.cmpPage = +el.dataset.v; render(); document.querySelector('.cmp-game')?.scrollIntoView({ block: 'center' }); },
   openRank: (el) => go('rank', el.dataset.id || null),
   openHistory: (el) => { S.ui.hist = 'counted'; go('history', el.dataset.id); },
   histTab: (el) => { S.ui.hist = el.dataset.v; render(); },
@@ -1433,6 +1592,9 @@ const ACT = {
       toast(want ? 'Your phone number is now hidden from clubs' : 'Clubs can now see your phone number');
     });
   },
+  openAvatar: () => { if (!S.me) return; S.ui.sheet = { type: 'avatar' }; render(); },
+  setFace: (el) => { const a = S.accounts[S.me]; a.photo = true; a.photoUrl = ''; a.face = el.dataset.v; render(); toast('Profile picture updated'); },
+  useInitials: () => { const a = S.accounts[S.me]; a.photo = false; a.photoUrl = ''; render(); toast('Using your initials'); },
   openRequest: () => {
     const r = S.requests[S.me];
     if (r && ['submitted', 'applying', 'failed'].includes(r.status)) { toast('You already have a request in progress'); go('account'); return; }
@@ -1656,7 +1818,18 @@ document.addEventListener('input', (ev) => {
   }
 });
 // Edit profile marks sections with unsaved changes; refresh those marks when a field is left.
-document.addEventListener('change', (ev) => { if ((ev.target.dataset.bind || '').startsWith('ui.edit.')) render(); });
+document.addEventListener('change', (ev) => {
+  if (ev.target.matches('[data-avfile]')) {
+    const file = ev.target.files && ev.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { toast('Choose an image file'); return; }
+    const rd = new FileReader();
+    rd.onload = () => { const a = S.accounts[S.me]; a.photo = true; a.photoUrl = String(rd.result); render(); toast('Profile picture updated'); };
+    rd.readAsDataURL(file);
+    return;
+  }
+  if ((ev.target.dataset.bind || '').startsWith('ui.edit.')) render();
+});
 document.addEventListener('keydown', (ev) => {
   if (ev.key === 'Escape' && S.ui.sheet) { ACT.closeSheet(); }
 });
@@ -1712,7 +1885,7 @@ function render() {
   const focusId = a && a.id && a !== document.body ? a.id : null;
   let sel = null;
   try { sel = a && typeof a.selectionStart === 'number' ? a.selectionStart : null; } catch (e) { sel = null; }
-  const views = { register: () => viewClaim(true), board: viewBoard, profile: viewProfile, rank: viewRank, history: viewHistory, id: viewId, account: viewAccount, edit: viewEdit, login: viewLogin, forgot: viewForgot, reset: viewReset, claim: viewClaim, claimDone: viewClaimDone, notfound: viewNotFound };
+  const views = { register: () => viewClaim(true), board: viewBoard, profile: viewProfile, rank: viewRank, history: viewHistory, compare: viewCompare, id: viewId, account: viewAccount, edit: viewEdit, login: viewLogin, forgot: viewForgot, reset: viewReset, claim: viewClaim, claimDone: viewClaimDone, notfound: viewNotFound };
   const sh = S.ui.sheet;
   document.getElementById('app').innerHTML = topBar() + (views[S.screen] || viewBoard)() + (sh ? SHEETS[sh.type](sh) : '');
   document.body.style.overflow = sh ? 'hidden' : '';

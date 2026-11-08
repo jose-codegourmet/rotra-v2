@@ -20,6 +20,7 @@ Proposed navigation:
 
 - Clubs and licenses.
 - Players.
+- Sales (owner request, November 8, 2026).
 - Requests: Contact changes, Club names, Password resets (#491).
 - Ranking configuration.
 - Feature flags.
@@ -53,7 +54,7 @@ and mutations. Signed-out and denied sessions read the mock marker without creat
 so the query cache remains empty. Only the owner session has a cached query. Developer controls
 are omitted from production for Admin.
 
-The mock owner lands on `/clubs`. Navigation targets are `/clubs`, `/players`,
+The mock owner lands on `/clubs`. Navigation targets are `/clubs`, `/players`, `/sales`,
 `/requests/contact-changes`, `/requests/club-names`, `/settings/ranking`, and
 `/settings/feature-flags`; detail routes belong to A02–A04. Until those screens land, unmatched
 links show the Admin not-found state with no placeholder records or counts.

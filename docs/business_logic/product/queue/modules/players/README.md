@@ -105,23 +105,23 @@ Owner decision, November 7, 2026 (#475).
   publicly, is masked the same way.
 - Masking happens on the server: the full name never enters the public page payload, tooltips or
   accessibility labels. The avatar's initials come from the masked name.
-- The public page never ties a participant (named or masked) to a skill level.
+- Owner decision, November 8, 2026: the public page shows each confirmed participant's level as a thick colored ring (with a small gap) around their picture (blue Beginner, yellow Intermediate, red Advanced; hovering shows “Beginner Mid”), not as text. This replaces the earlier rule that the page never tied a participant to a level. A participant with no level shows no level label. The waitlist still shows masked names only.
 
 ## Public skill mix
 
 Owner request, November 7, 2026 (#474).
 
 - The public page shows how many confirmed participants are Beginner, Intermediate and Advanced,
-  plus how many have no level yet, as one aggregate **Skill mix** bar. It never shows who is which
-  level: no per-person level, no skill-grouped list, no ordering of participants by level, and no
-  tooltip or accessibility label that names or points at a person.
+  plus how many have no level yet, as one aggregate **Skill mix** bar. The bar itself is counts only (hovering a segment shows its count, never
+  names). Since November 8, 2026 each participant also shows their own level; the list is still not
+  grouped or ordered by level.
 - Scope: exactly the confirmed participants the public list shows (never the waitlist or join
   requests). Each level maps to its skill group the same way as the roster's **Group by: Skill
   group**; a missing level counts as **No level**, never as a guess.
-- The server (and the mock server) computes the counts; the public page payload carries counts only.
+- The server (and the mock server) computes the counts. The public page payload carries each confirmed participant's masked name and level label, never the full name.
   The participant list keeps roster order (when each person was confirmed).
 - Hidden when nobody is confirmed. It refreshes with the public page itself.
-- **Has a ROTRA profile** stays as a label and is never a link to the profile.
+- The **Has a ROTRA profile** label is no longer shown on the public page (owner request, November 8, 2026); the level takes its place.
 - A visitor's own request status (**Request sent**, …) may still show the name they typed.
 - Operator screens (roster, live console, join requests) keep full names. Published result slides
   are not covered by this rule.

@@ -43,6 +43,16 @@ Allowed operational actions: open manual license activation/renewal; approve or 
 
 No manager invitations, role assignment, owner-player mapping requirement, or multi-club session concurrency override is included.
 
+## A-CLUB-SALES — Sales tab on the club page
+
+Owner request, November 8, 2026. A **Sales** tab after License: what this club pays ROTRA against how much it uses ROTRA, over the last six months.
+
+- Three numbers: **Paid to ROTRA** (the recorded license payments in the six months, with the monthly list price under it, or “Tester club, licenses at ₱0”), **Sessions started** (with matches played) and **Paid per session** (paid divided by sessions, next to the estimated cost per session).
+- **Month by month** table (stacked rows on a phone): Month, Paid, Sessions, Matches, Paid per session, Est. cost (sessions times the cost per session) and Left over (paid minus est. cost; negatives show with a minus sign), and a small bar chart of the amount paid each month.
+- A closing sentence says what the club leaves over, or how much the estimated cost exceeds what it paid, over the six months.
+- Payments count in the month they were recorded as paid, so a yearly payment lands in one month. Sessions and matches are sample figures in the prototype. The cost per session is a **placeholder (₱15)** until the owner sets it; the real figure, what it includes and whether it is shown are open. Route: the club page with `?tab=sales`.
+- Where these numbers are calculated is an open decision: see [D-2026-11-08-01](../../../../mvp/decisions.md#d-2026-11-08-01).
+
 ## A-CLUB-PRICE — Change a club's price
 
 Entry: **Change price** on the club's License tab. A sheet with **Paid** (monthly and yearly amounts, same validation as `A-ADD-CLUB`) or **Free**. Switching from Free back to Paid starts from the club's last paid price. Saving says the new price applies to later payments only; recorded payments keep their amounts.

@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-TICKETED: 22 · IN PROGRESS: 1 · IN MOCK APP: 39 · MOCKUP ONLY: 4
+TICKETED: 20 · IN PROGRESS: 3 · IN MOCK APP: 39 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -226,7 +226,7 @@ TICKETED: 22 · IN PROGRESS: 1 · IN MOCK APP: 39 · MOCKUP ONLY: 4
 | [2026-11-08-queue-edit-player-details](2026-11-08-queue-edit-player-details.md) | Queue Master can edit a guest's or unclaimed player's details before inviting them | — | IN MOCK APP — PR #484 |
 | [2026-11-08-queue-invite-cancels-previous-link](2026-11-08-queue-invite-cancels-previous-link.md) | Invite cancels the previous registration link again | — | IN MOCK APP — PR #485 |
 | [2026-11-08-queue-partial-payment-switch-yellow](2026-11-08-queue-partial-payment-switch-yellow.md) | Partial payment cards show the paid switch in yellow | switch, payments-checklist, saved-player-stats-carousel | TICKETED — #498 |
-| [2026-11-08-queue-phone-header-more-options](2026-11-08-queue-phone-header-more-options.md) | Preparation header keeps Session QR and Facebook post, rest goes under More options on phones | page-header, more-options-sheet, session-preparation | TICKETED — #499 |
+| [2026-11-08-queue-phone-header-more-options](2026-11-08-queue-phone-header-more-options.md) | Preparation header keeps Session QR and Facebook post, rest goes under More options on phones | page-header, more-options-sheet, session-preparation | IN PROGRESS — #499 |
 | [2026-11-08-queue-phone-tabs-dropdown](2026-11-08-queue-phone-tabs-dropdown.md) | Preparation and level tabs become styled dropdown menus on phones | roster-panel, preparation-roster, tab-menu, tabs, session-preparation | IN PROGRESS — #498 |
 | [2026-11-08-queue-public-join-card-layout](2026-11-08-queue-public-join-card-layout.md) | Public page "Want to play?" card gets a stacked layout | join-request-card | TICKETED — #500 |
 | [2026-11-08-queue-public-participants-plain-grid](2026-11-08-queue-public-participants-plain-grid.md) | Public page participants become a plain grid, not cards | public-participants | TICKETED — #500 |
@@ -243,5 +243,5 @@ TICKETED: 22 · IN PROGRESS: 1 · IN MOCK APP: 39 · MOCKUP ONLY: 4
 | [2026-11-08-queue-setup-when-block](2026-11-08-queue-setup-when-block.md) | Setup: date, start and end beside a total duration box | session-setup-form, session-setup, add-court-form | TICKETED — #501 |
 | [2026-11-08-queue-time-field-dialog](2026-11-08-queue-time-field-dialog.md) | Time fields open a time dialog instead of three dropdowns | time-field, date-time-picker, session-setup, add-court-form | TICKETED — #501 |
 | [2026-11-08-queue-time-picker-hour-minute](2026-11-08-queue-time-picker-hour-minute.md) | Time fields pick hour, minute and AM/PM from three short dropdowns | — | IN MOCK APP — PR #489 (superseded by 2026-11-08-queue-time-field-dialog) |
-| [2026-11-08-queue-title-public-page-icon](2026-11-08-queue-title-public-page-icon.md) | Preparation title gets an "Open public page" icon button | page-header, more-options-sheet, session-preparation | TICKETED — #499 |
+| [2026-11-08-queue-title-public-page-icon](2026-11-08-queue-title-public-page-icon.md) | Preparation title gets an "Open public page" icon button | page-header, more-options-sheet, session-preparation | IN PROGRESS — #499 |
 <!-- status-index:end -->

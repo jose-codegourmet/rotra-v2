@@ -1,5 +1,7 @@
 import { Button } from '@rotra/ui/button'
 import { Chip } from '@rotra/ui/chip'
+import { Icon } from '@rotra/ui/icon'
+import { IconButton } from '@rotra/ui/icon-button'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { PageHeader } from './PageHeader'
 
@@ -46,3 +48,20 @@ export const LiveConsole: Story = {
 }
 
 export const LiveConsolePhone: Story = { ...LiveConsole, globals: { viewport: { value: 'phone' } } }
+
+export const WithTitleAction: Story = {
+  args: {
+    title: 'Sunday Night Queue',
+    description: 'Sat, Nov 8 · 7:00 PM–10:00 PM · Greenfield Sports Hall',
+    titleAction: (
+      <IconButton variant="ghost" size="sm" label="Open public page">
+        <Icon name="external" />
+      </IconButton>
+    ),
+  },
+}
+
+export const WithTitleActionPhone: Story = {
+  ...WithTitleAction,
+  globals: { viewport: { value: 'phone' } },
+}

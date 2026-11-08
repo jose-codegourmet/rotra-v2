@@ -367,7 +367,8 @@
     "./admin-player-change-form": "./src/forms/admin-player-change-form/AdminPlayerChangeForm.tsx",
     "./admin-player-actions": "./src/components/admin-player-actions/AdminPlayerActions.tsx",
     "./copy-player-value": "./src/components/copy-player-value/CopyPlayerValue.tsx",
-    "./admin-player-bulk-bar": "./src/components/admin-player-bulk-bar/AdminPlayerBulkBar.tsx"
+    "./admin-player-bulk-bar": "./src/components/admin-player-bulk-bar/AdminPlayerBulkBar.tsx",
+    "./password-reset-requests": "./src/components/password-reset-requests/PasswordResetRequests.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

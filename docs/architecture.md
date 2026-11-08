@@ -222,13 +222,13 @@ Redux never holds server data and has no async thunks.
 | App | Who signs in | How |
 |---|---|---|
 | Queue | Club account | Username + password. Forgotten password is reset by the platform owner |
-| Player Information | Registered player | Email + password; recovery by email |
+| Player Information | Registered player | Email + password; Admin-reviewed recovery requests (#491) |
 | Admin | Platform owner | Admin sign-in |
 | Public pages | Nobody | No auth |
 
 In mock mode, sign-in is mocked like the prototypes (anything signs in) and `proxy.ts` only checks a
 mock session. In real mode, Queue (club), Admin and Player sign-in use Supabase Auth (below); Player
-registration (`/api/claim/[token]`) and email password reset (`/api/auth/{password-reset,reset-password}`)
+registration (`/api/claim/[token]`) and Admin-reviewed password reset (`/api/auth/{password-reset,reset-password}`; #491)
 are real too (#483). **No Facebook or any social login.**
 
 **Server boundary (F07.20).** `ROTRA_DATA_MODE` (server-only, default `mock`) picks the path; there is

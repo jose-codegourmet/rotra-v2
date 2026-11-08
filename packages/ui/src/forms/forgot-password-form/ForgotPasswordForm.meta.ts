@@ -1,7 +1,7 @@
 import type { ComponentMeta } from '@rotra/ui/meta'
 export const forgotPasswordFormMeta = {
   name: 'ForgotPasswordForm',
-  description: 'Email-based mock password recovery request without revealing account existence.',
+  description: 'Admin-reviewed password recovery request without revealing account existence.',
   usage: ['Presentational only; containers own mutations and navigation.'],
   prototype: {
     file: 'apps/mockup/player-app/rotra-player.html',

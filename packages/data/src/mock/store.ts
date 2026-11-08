@@ -30,6 +30,7 @@ import type { InventoryItem } from '../inventory/inventory.types'
 import type { ClubLicenseTerm, ClubRetentionRecord } from '../license/license.types'
 import type { AutoQueueDraftState } from '../match/autoQueue.types'
 import type { Match } from '../match/match.types'
+import type { PasswordResetRequest } from '../password-reset/passwordReset.types'
 import type { Player, PlayerProfile, PlayerRank, PlayerSessionRecord } from '../player/player.types'
 import type { ClaimLinkRecord } from '../player-account/playerAccount.types'
 import type {
@@ -57,6 +58,7 @@ import type {
 import type { SaveOutcome, SessionIntegrity, SyncState } from '../sync/sync.types'
 import { NotConnectedError } from './errors'
 export type MockState = {
+  passwordResetRequests: PasswordResetRequest[]
   adminPlayerRecords: Record<string, AdminPlayerRecord>
   inventory: InventoryItem[]
   costEstimates: Record<string, SessionCostEstimate>
@@ -141,6 +143,23 @@ function seedState(): MockState {
       ]),
   )
   const state: MockState = structuredClone({
+    passwordResetRequests: [
+      {
+        id: 'password-request-demo',
+        email: playerAccounts[0]?.email ?? 'jose@example.com',
+        playerId: playerAccounts[0]?.playerId ?? null,
+        playerName:
+          playerProfiles.find((p) => p.playerId === playerAccounts[0]?.playerId)?.fullName ??
+          'Jose Adrian',
+        rtrId:
+          playerProfiles.find((p) => p.playerId === playerAccounts[0]?.playerId)?.rtrId ?? null,
+        status: 'pending',
+        requestedAt: new Date(now).toISOString(),
+        reviewedAt: null,
+        reviewedBy: null,
+        canIssue: true,
+      },
+    ],
     adminPlayerRecords: {},
     ...createPlayerRankFixtures(),
     ...createFinancialFixtures([...roster, ...history.roster], now),

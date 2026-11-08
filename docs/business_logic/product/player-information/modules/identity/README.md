@@ -26,7 +26,7 @@ The operator supplies a registration link tied to the existing player profile. T
 must open registration rather than generic sign-in. Registering an account leaves the club's
 guest record unlinked. Linking requires a separate invitation; registration or a matching name
 does not authorize it. When the supplied phone or email matches an existing ROTRA account,
-ask the person whether that account is theirs. Before creating a second account, **Yes** requires sign-in or email recovery of the existing account;
+ask the person whether that account is theirs. Before creating a second account, **Yes** requires sign-in or Admin-reviewed recovery of the existing account;
 **No** returns to contact correction or contacting ROTRA. A profile that has not registered yet
 requires its existing club-issued claim link. Never create duplicate contacts or treat answering
 yes as proof of ownership. No matched identity or private details are revealed.
@@ -57,7 +57,7 @@ Experience can inform the initial operator assessment but is not automatic ranki
 - A failed sign-in never reveals whether an email exists or whether the profile is registered.
 - The player profile links to the auth user; the auth user is not the player identity.
 - No Facebook/social login.
-- Forgotten passwords are recovered by email only.
+- Forgotten passwords: submit the account email for ROTRA Admin review; no automatic email. Admin verifies ownership and provides a single-use expiring reset link (#491, owner request November 8, 2026).
 - The club operator's role is initial player entry/registration-link delivery, not routine password recovery.
 - Claim links are valid **7 days** and **single use**; the club (Queue Master) can reissue, and reissuing invalidates the previous link (decided 2026-11-07, #244). If the phone or email at claim already belongs to another account, the claim is blocked with a contact-support route; never merge silently. An RTR ID or name alone never claims an account.
 - Still open: email verification on claim, password policy/complexity, separate guest-link invitation verification, mistaken/duplicate guest links and permanent relink, and failed provider application handling.

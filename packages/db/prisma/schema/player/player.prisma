@@ -26,17 +26,18 @@ model Player {
   updatedAt            DateTime           @updatedAt @map("updated_at") @db.Timestamptz(6)
   revision             BigInt             @default(1)
 
-  privateContact PlayerPrivateContact?
-  account        PlayerAccount?
-  socialLinks    PlayerSocialLink[]
-  claimLinks     PlayerClaimLink[]
-  idAllocation   PlayerIdAllocation?
-  contactChanges PlayerContactChangeRequest[]
-  clubPlayers    ClubPlayer[]
-  resolvedInputs ClubPlayerPrivateInput[]     @relation("ClubPlayerInputResolved")
-  rosterEntries  SessionPlayer[]              @relation("SessionPlayerAtEntry")
-  assessments    ClubAssessment[]             @relation("AssessmentPlayer")
-  activeHold     ActivePlayerHold?            @relation("ActivePlayerHold")
+  privateContact        PlayerPrivateContact?
+  account               PlayerAccount?
+  socialLinks           PlayerSocialLink[]
+  claimLinks            PlayerClaimLink[]
+  idAllocation          PlayerIdAllocation?
+  passwordResetRequests PlayerPasswordResetRequest[]
+  contactChanges        PlayerContactChangeRequest[]
+  clubPlayers           ClubPlayer[]
+  resolvedInputs        ClubPlayerPrivateInput[]     @relation("ClubPlayerInputResolved")
+  rosterEntries         SessionPlayer[]              @relation("SessionPlayerAtEntry")
+  assessments           ClubAssessment[]             @relation("AssessmentPlayer")
+  activeHold            ActivePlayerHold?            @relation("ActivePlayerHold")
 
   facts          PlayerMatchFact[]          @relation("FactPlayer")
   rankCurrent    PlayerRankCurrent?

@@ -44,3 +44,5 @@ export const AskBeforeLeaving: Story = { args: { current: 'ranking', onNavigate:
 export const LongEmail: Story = { args: { accountEmail: adminAccessExamples.longEmail } }
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
 export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }
+
+export const PasswordResetsCurrent: Story = { args: { current: 'password-resets' } }

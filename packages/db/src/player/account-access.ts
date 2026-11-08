@@ -1,4 +1,5 @@
 import 'server-only'
+import { consumeReviewedResetToken } from '../admin/password-resets'
 import { loadAccountContext, type PlayerContext } from '../auth/account-context'
 import { MOCK_COOKIE_PREFIX } from '../auth/data-mode'
 import { AUTH_PROVIDER, type CookieAdapter, createSupabaseServer } from '../auth/supabase'
@@ -96,56 +97,48 @@ async function saveDetails(context: PlayerContext, details: ClaimDetails) {
 }
 
 /**
- * P-FORGOT. Sends the provider's recovery email only to a registered player's email, and answers
- * the same way whether or not one exists. The email links to `<redirectTo>/<token hash>`.
- */
-export async function requestPasswordReset(
-  cookies: CookieAdapter,
-  email: string,
-  redirectTo: string,
-) {
-  const address = email.trim().toLowerCase()
-  if (!address.includes('@'))
-    throw new ServiceError('invalid', { email: 'Enter an email address, like name@example.com.' })
-  const contact = await prisma.playerPrivateContact.findUnique({
-    where: { email: address },
-    select: { player: { select: { account: { select: { disabledAt: true } } } } },
-  })
-  const account = contact?.player.account
-  if (account && !account.disabledAt) {
-    const supabase = createSupabaseServer(withoutMockCookies(cookies), 'player')
-    const { error } = await supabase.auth.resetPasswordForEmail(address, { redirectTo })
-    if (error) console.error('[password-reset] provider refused', error.status ?? 'unknown')
-  }
-  return { acknowledged: true }
-}
-
-/**
  * P-RESET. Verifies the recovery token (single use), checks it belongs to a player account, sets
  * the new password and signs out again: the player then signs in with the new password.
  */
-export async function resetPassword(cookies: CookieAdapter, token: string, password: string) {
+export async function resetPassword(_cookies: CookieAdapter, token: string, password: string) {
   if (!password) throw new ServiceError('invalid', { password: 'Enter a new password.' })
-  const supabase = createSupabaseServer(withoutMockCookies(cookies), 'player')
+  const reviewed = await consumeReviewedResetToken(token)
+  // Recovery credentials stay server-side; failed verification never signs the browser in.
+  let recoveryCookies: ReturnType<CookieAdapter['getAll']> = []
+  const supabase = createSupabaseServer(
+    {
+      getAll: () => recoveryCookies,
+      setAll: (values) => {
+        recoveryCookies = values
+      },
+    },
+    'player',
+  )
   const { data, error } = await supabase.auth.verifyOtp({ type: 'recovery', token_hash: token })
   if (error || !data.user) {
-    if (error?.status && error.status >= 500) throw new ServiceError('unavailable')
+    if (error?.status && error.status >= 500)
+      throw new ServiceError('unavailable', {
+        link: 'The reset could not be completed. Request another reset link.',
+      })
     throw new ServiceError('forbidden', { link: RESET_LINK })
   }
   const context = await loadAccountContext(
     { provider: AUTH_PROVIDER, subject: data.user.id },
     'player',
   )
-  if (!context) {
+  if (!context || context.playerId !== reviewed.playerId || data.user.id !== reviewed.authSubject) {
     await supabase.auth.signOut({ scope: 'local' })
     throw new ServiceError('forbidden', { link: RESET_LINK })
   }
   const update = await supabase.auth.updateUser({ password })
   await supabase.auth.signOut({ scope: 'local' })
   if (update.error) {
-    if (update.error.status && update.error.status >= 500) throw new ServiceError('unavailable')
+    if (update.error.status && update.error.status >= 500)
+      throw new ServiceError('unavailable', {
+        link: 'The reset could not be completed. Request another reset link.',
+      })
     throw new ServiceError('invalid', {
-      password: update.error.message || 'Choose a different password.',
+      link: 'Your password was not accepted. Request another reset link and choose a different password.',
     })
   }
   return { saved: true }

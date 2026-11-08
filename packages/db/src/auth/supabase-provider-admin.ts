@@ -7,11 +7,20 @@ import { type ProviderAdmin, ProviderError } from './provider-admin'
 /** `auth.users.raw_app_meta_data` key that ties a login to the staged operation that created it. */
 const OPERATION_KEY = 'rotra_operation_ref'
 
-function adminClient() {
+function adminClient(timeoutMs?: number) {
   const url = process.env.SUPABASE_URL
   const key = process.env.SUPABASE_SECRET_KEY
   if (!url || !key) throw new ProviderError('provider_unavailable')
-  return createClient(url, key, { auth: { autoRefreshToken: false, persistSession: false } })
+  return createClient(url, key, {
+    auth: { autoRefreshToken: false, persistSession: false },
+    ...(timeoutMs
+      ? {
+          global: {
+            fetch: (url, init) => fetch(url, { ...init, signal: AbortSignal.timeout(timeoutMs) }),
+          },
+        }
+      : {}),
+  })
 }
 
 function failure(status: number | undefined): ProviderError {
@@ -62,4 +71,16 @@ export function supabaseProviderAdmin(): ProviderAdmin {
       if (error) throw failure(error.status)
     },
   }
+}
+
+/** Server-only recovery issuance. generateLink does not deliver email. Never log its response. */
+export async function generatePlayerRecoveryToken(subject: string, email: string) {
+  const client = adminClient(15000)
+  const current = await client.auth.admin.getUserById(subject)
+  if (current.error || !current.data.user) throw failure(current.error?.status)
+  if (current.data.user.email?.toLowerCase() !== email) throw new ProviderError('provider_conflict')
+  const { data, error } = await client.auth.admin.generateLink({ type: 'recovery', email })
+  if (error || !data.properties?.hashed_token) throw failure(error?.status)
+  if (data.user.id !== subject) throw new ProviderError('provider_conflict')
+  return data.properties.hashed_token
 }

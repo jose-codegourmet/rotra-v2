@@ -149,3 +149,10 @@ must not leave the matrix stale.
 
 Also: merging HTML does not change delivered mail until someone pastes it into the Supabase
 dashboard. See [architecture §11](architecture.md#11-email-templates).
+
+## Player recovery change (#491)
+
+Player Forgot password no longer sends the Supabase recovery email. It creates an Admin review
+request; Admin generates a recovery token without sending email and shares the ROTRA reset link
+manually after verifying ownership. The old reset template remains reference material and is not
+used by this flow. Expiry comes from the provider configuration, not an invented UI duration.

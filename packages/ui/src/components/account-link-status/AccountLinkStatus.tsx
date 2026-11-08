@@ -16,6 +16,8 @@ export type AccountLinkStatusProps = {
   variant: AccountLinkStatusVariant
   /** reset-sent: the email the player just typed; nothing else ever shows contact data */
   email?: string
+  /** reset-invalid: a failed redemption also needs a new reviewed link. */
+  resetError?: string
   /** The club that issued the registration link */
   clubName?: string
   /** claim-done */
@@ -37,6 +39,7 @@ export type AccountLinkStatusProps = {
 export function AccountLinkStatus({
   variant,
   email,
+  resetError,
   clubName = 'your club',
   firstName,
   rtrId,
@@ -55,14 +58,16 @@ export function AccountLinkStatus({
   switch (variant) {
     case 'reset-sent':
       return (
-        <AuthCard showBrand={false} title="Check your email">
+        <AuthCard showBrand={false} title="Request received">
           <Notice tone="success">
-            If an account uses <b>{email}</b>, we've sent it a link to set a new password.
+            If an account uses <b>{email}</b>, ROTRA Admin can review your request after verifying
+            ownership.
           </Notice>
           <p className="text-[13px] text-fg2">
-            It can take a few minutes. Check spam too. Your club can't reset your password for you.
+            Contact ROTRA support through your usual channel to verify ownership. An Admin will
+            provide your reset link.
           </p>
-          <p className="text-xs text-fg2">Prototype only: no email is sent.</p>
+          <p className="text-xs text-fg2">No automatic email is sent.</p>
           <Button variant="ghost" block onClick={onBackToSignIn}>
             Back to sign in
           </Button>
@@ -71,7 +76,9 @@ export function AccountLinkStatus({
     case 'reset-invalid':
       return (
         <AuthCard showBrand={false} title="This link can't be used">
-          <Notice tone="error">This reset link has expired or was already used.</Notice>
+          <Notice tone="error">
+            {resetError ?? 'This reset link has expired or was already used.'}
+          </Notice>
           <Button variant="primary" block onClick={onRequestAnother}>
             Request another reset
           </Button>
@@ -87,7 +94,7 @@ export function AccountLinkStatus({
             <Button variant="primary" onClick={onSignIn}>
               Sign in
             </Button>
-            <Button onClick={onResetByEmail}>Reset password by email</Button>
+            <Button onClick={onResetByEmail}>Request password reset</Button>
           </div>
         </LinkPage>
       )

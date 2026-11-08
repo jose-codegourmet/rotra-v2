@@ -379,7 +379,11 @@
     "./compare-filter-bar": "./src/components/compare-filter-bar/CompareFilterBar.tsx",
     "./compare-stats": "./src/components/compare-stats/CompareStats.tsx",
     "./together-card": "./src/components/together-card/TogetherCard.tsx",
-    "./shared-game-row": "./src/components/shared-game-row/SharedGameRow.tsx"
+    "./shared-game-row": "./src/components/shared-game-row/SharedGameRow.tsx",
+    "./sales-stat-card": "./src/components/sales-stat-card/SalesStatCard.tsx",
+    "./bar-chart": "./src/components/bar-chart/BarChart.tsx",
+    "./sales-breakdown-list": "./src/components/sales-breakdown-list/SalesBreakdownList.tsx",
+    "./club-sales-table": "./src/components/club-sales-table/ClubSalesTable.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

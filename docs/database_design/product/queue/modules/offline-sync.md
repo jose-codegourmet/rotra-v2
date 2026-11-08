@@ -1,53 +1,39 @@
 # Offline sync and interruption records
 
-**Status:** Proposed protocol/storage design. It does not resolve the remaining business question about contradictory confirmed winners.
+**Status:** Design for #246, based on the owner decisions of November 8, 2026. This is not a migration or an implemented protocol. [Business rules](../../../../business_logic/product/queue/modules/offline/README.md) take precedence.
 
-## Records
+## Session and device lifecycle
 
-| Record | Key fields and constraints |
-|---|---|
-| `devices` | UUID PK; club/account FK; registration time; device label; revoke metadata. A device is not a separate human manager |
-| `device_session_streams` | UUID stream PK; club/session/device FKs; positive `generation_no`; unique `(session_id, device_id, generation_no)`; downloaded server revision; contiguous acknowledged sequence; nullable sealed final sequence; state |
-| `sync_operations` | UUID operation PK; stream FK; positive sequence; entity ID/type; command kind; base revision; payload version; payload/digest; occurred/received time; acceptance state; unique `(stream_id, sequence)` |
-| `sync_conflicts` | UUID PK; session FK; implicated operation IDs; category; state; resolution evidence and actor. Do not store only a free-text winner correction |
-| `session_finalizations` | Session ID PK; unique command ID; verified stream manifest/digest; accepted session revision; completion time; policy version; state/digest of fact publication |
-| `projection_jobs` | UUID PK; source finalization/assessment ID; projection kind/version; unique source+kind+version; retry status and attempt metadata |
+- A Queue Master starts the session online. The server atomically checks that the club has no earlier session awaiting Session done, and marks this session active. A retry returns the same result.
+- Any device can continue the active session offline with a usable session copy. A device without a copy obtains one online or imports the CSV transfer; a file cannot give a device data that was never exported. Offline use does not require prior server enrollment. Importing a file does not grant a server credential; online sync uses the existing club authorization.
+- Each local copy has a random device-copy ID and a separate stream ID. IDs are created locally, not from a device clock. Registration occurs when the server first sees the stream. Registration is evidence of a known stream, not proof that no other stream exists.
+- A device atomically saves a change to its durable JSON working log and outbox before reporting it saved. The log records the session ID, source stream, stable operation ID, monotonic per-stream sequence, operation type, target, payload, base revision and local timestamp. It retains original records and any Queue Master resolution. Browser storage persistence and quota failures must be surfaced, never reported as a successful save.
+- A device with no changes has no new operations to send. It can report a zero-operation close when online; absence of such a close never proves an unknown or missing device has no changes. A closed stream cannot add operations past its declared sequence; new offline work requires a new stream. Closing one stream does not finish the session.
+- Transfers carry the session snapshot and the operations needed to merge it, including stable IDs and source stream/sequence. Define a versioned CSV representation that round-trips the JSON log, escaping text correctly and validating the club and session. Reject unsupported or incomplete files with an actionable error; do not partially apply them. A transfer is private session data and does not include reusable sign-in credentials.
 
-Keep FK-bearing conflict references relational; a versioned payload can hold diagnostic evidence. Sensitive intake fields in sync payloads are private and excluded from public exports/logging.
+## Upload, merge and review
 
-## Device working copy
+1. Authenticate the club online and verify session ownership and active state. Register previously unknown streams from valid operations; the server cannot infer unknown devices.
+2. Store each immutable operation and its digest. An identical retry returns the prior receipt. Reusing an operation ID or a stream sequence with different content is a conflict; never replace the original. A repeated imported copy is deduplicated by the same IDs.
+3. Track contiguous sequences for each stream. If sequence 3 arrives before 2, retain 3 as waiting and request 2; do not mark the prefix complete or apply dependent changes early. A missing sequence remains visible to the Queue Master.
+4. Apply independent changes without a collision. Where incompatible changes affect the same match, court, player availability or payment, retain both versions and quarantine the collision. Local timestamps help identify suspicious ordering but do not select the winner or prove completeness; clocks may be wrong.
+5. The Queue Master sees each version and its source, then chooses the correct result, timestamp, availability or payment status. Persist the decision, its actor and source-operation references. A disputed match the Queue Master cannot resolve may be marked invalid; it gives no winner or ranking credit. No automatic first-sync or last-sync winner.
+6. Match identity uses a locally generated globally unique ID. An offline match can display a temporary label; the server assigns its final shared number on sync under a session lock. Never use the display number to deduplicate matches.
 
-A session download contains only required roster/court/match/settings records and allowed profile display data, plus server revision and session-scoped authorization. Keep a durable outbox with stable operation IDs and monotonic stream sequence.
+## Session done
 
-An accepted local command and its outbox entry must be saved atomically on the device; otherwise a crash could show a confirmed winner with no recoverable operation. Local storage technology and eviction behavior must be validated before implementation.
+Session done requires an online club session, server validation, all known pending operations processed or explicitly resolved, and the Queue Master's confirmation that device data has been synced or imported. Show known streams and last sync information where available. If a device's data is missing, warn that games and payments can be lost; the Queue Master may explicitly accept that risk and finish with available data. Store this confirmation and warning acknowledgement with the finalization. It is not proof that unknown devices contained no work.
 
-Device 2 must already possess a valid downloaded snapshot or get one online. The user authorized recovery, not magic access to data that was never downloaded. Enroll every writable device stream online before offline use; this is a technical proposal needed for server-side completeness detection.
+Lock the club and session during final validation and finalization. If an upload changes the session revision before finalization, recheck the records and confirmation. Commit the final authoritative results and completion state together, with a stable finalization command ID; retries return the original result. Only this successful database commit makes the session done and permits a new session. Do not generate results from unmerged or invalid matches.
 
-## Upload and replay
+Reject late session operations from automatic application after Session done and preserve them for a future reviewed recovery process; reopening policy is not decided. A Queue Master may correct payment status after Session done via a separate audited update that cannot change match results. A confirmed online invalidation releases the club's active-session slot; it does not fabricate a successful Session done.
 
-1. Authenticate the club/device and verify session scope/authorization.
-2. Persist the operation envelope once. The same ID/sequence and digest returns the same acknowledgement on retry. Reuse with different content is a conflict/error, not an update.
-3. Track the **contiguous** received/validated prefix, not just the highest sequence seen. A receipt at sequence 20 does not prove 1–19 arrived.
-4. Apply causal commands only after prerequisites arrive. Compare base revisions; quarantine conflicts rather than silently replacing state.
-5. Accept a canonical mutation and its acceptance receipt atomically. Jobs use unique source keys to avoid duplicate performance application.
-6. Return the server revision and per-operation status so the device can distinguish received, accepted, rejected, and conflicted data.
+## Acceptance examples
 
-No timestamp-based last-write-wins for confirmed winners, presence dependencies, court occupancy, or frozen levels.
-
-## Finalization barrier
-
-Proposal: each enrolled writable stream submits a final seal identifying its last durable operation sequence and digest. Require a complete accepted/explicitly resolved prefix through every seal, no pending terminal conflicts, and a stable aggregate session revision.
-
-A seal cannot be fabricated by another device on behalf of missing original records. Reject new operations beyond a sealed/finalized boundary or route them to explicit investigation; never silently mutate a finalized session.
-
-Lock the session and manifest while confirming finalization. If a concurrent upload changes the revision, re-check rather than finalizing an old snapshot. Session done is online only.
-
-A downloaded stream that never wrote still needs a trustworthy close/zero-operation acknowledgement; the exact handling is open. The server cannot prove absence of work on a never-enrolled device, which is why unrestricted offline device enrollment is incompatible with this guarantee.
-
-## Interruption outcomes
-
-Missing/inconsistent records trigger the interrupted-session question. Yes requires original-device uploads and review. No invalidates the inconsistent session. Permanently unrecoverable original records leave it invalid; manual reconstruction is forbidden.
-
-Minimum-game shortfalls are not a completeness signal. Invalid sessions produce no official match facts, rankings, or slides. Retain only whatever non-counting diagnostic data a later retention policy permits.
-
-Separate sync conflict storage from canonical terminal decisions so unresolved contradictions cannot accidentally become player history. See [transactions](../../transactions.md) and [open decisions](../../open-decisions.md).
+- **Duplicate:** device A uploads operation 4 twice with the same ID and payload. Both replies refer to one receipt and one applied change.
+- **Changed payload:** operation 4 is resent with a different winner. Preserve the original, flag the collision and require review.
+- **Out of order:** operation 3 arrives before operation 2. Store 3 as waiting; process it only when its prerequisite arrives or the gap is reviewed.
+- **Missing device:** A is online, B is unavailable. ROTRA warns that B may contain games and payments; the QM may explicitly accept missing data before finishing. ROTRA does not assert B was empty.
+- **Contradictory result:** A says Team A won; B says Team B won. Keep both records and ask the QM. If the QM cannot determine the result, the match may be marked invalid.
+- **Payment collision:** A records paid and B records not paid for the same player. Ask the QM; record the chosen state and the evidence. A later payment correction is separate from match results.
+- **CSV transfer:** B imports A's export twice. Both imports represent the same operation IDs, so no change or game is counted twice. Import alone does not complete database sync.

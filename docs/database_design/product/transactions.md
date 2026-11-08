@@ -1,5 +1,8 @@
 # Transaction boundaries and replay behavior
 
+> **November 8, 2026:** The owner decisions in [Offline operation and recovery](../../business_logic/product/queue/modules/offline/README.md) supersede conflicting earlier offline, device, finalization, payment and conflict rules below. Late-record recovery and implementation details remain open.
+
+
 **Last verified:** 2026-11-06 for the proposed On court step; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Proposed command-level contracts, not implemented endpoints.
@@ -53,7 +56,7 @@ After confirmed historical guest linkage, include earlier valid games in persona
 ## 6. Finalize a complete session
 
 1. Verify online authorization, including any expiry exception.
-2. Lock the session and validate current revision, all enrolled writable stream seals, contiguous accepted/resolved operations, and absence of unresolved terminal conflicts.
+2. Lock the session and validate current revision, known stream receipts and contiguous accepted/resolved operations, the Queue Master’s confirmation and any explicit missing-data acknowledgement, and absence of unresolved terminal conflicts.
 3. Refuse finalization while any match is active (Playing) (v1 behavior until a closure policy is decided). Unused waiting drafts and `on_court` matches never started produce no facts and release their holds. Do not silently manufacture winners or invalidate active games.
 4. Insert one `session_finalizations` record and all authoritative finalized participation facts in the same canonical commit; use unique session/command and match/participant keys.
 5. Transition the session to completed and enqueue projection work atomically. Invalid sessions instead produce no official facts or result jobs.

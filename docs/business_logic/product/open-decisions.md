@@ -1,5 +1,8 @@
 # Open decisions before implementation
 
+> **November 8, 2026:** The owner decisions in [Offline operation and recovery](queue/modules/offline/README.md) supersede conflicting earlier offline, device, finalization, payment and conflict rules below. Late-record recovery and implementation details remain open.
+
+
 **Last verified:** 2026-11-07 for player login mapping and claim-link rules (#244); 2026-11-06 for the On court step, court filling, substitution game credit, times and days, and the connection rules for Cancel session and the court switch; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Deliberately unresolved. These are not additional approved requirements and are not a new questionnaire. Updated October 26, 2026: items the [ROTRA Queue prototype](../../../apps/mockup/queue-app/rotra-queue.html) settled are listed under [Settled by the prototype](#settled-by-the-prototype). Updated October 27, 2026: items the platform owner settled with the [ROTRA Admin prototype](../../../apps/mockup/admin-app/rotra-admin.html) are listed under [Settled by the Admin prototype](#settled-by-the-admin-prototype).

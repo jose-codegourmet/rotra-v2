@@ -1,18 +1,18 @@
 import type { SessionMode } from '../queue-session/queueSession.types'
 import type { SessionJoinRequest } from '../session-roster/sessionRoster.types'
 
-/** A confirmed person on the public page: no phone, level, presence, games or notes. */
+/** Public-safe participant or waitlist entry. */
 export type PublicSessionParticipant = {
   /** Masked on the server (`maskPublicName`): "J*** A***". The full name never enters the page. */
   name: string
   /** Uploaded picture of a registered or unclaimed player; guests never have one */
   pictureUrl?: string | null
-  /** Registered and unclaimed players; a guest has no profile */
-  hasRotraProfile: boolean
+  skillGroup: 'beginner' | 'intermediate' | 'advanced' | null
+  /** Full playing level for the avatar hover label, or null when unrated. */
+  levelLabel: string | null
 }
 /**
- * #474: how many public participants sit in each skill group, counts only. Never carries a name,
- * position or anything that maps a (masked) participant to a level. Missing level → unrated.
+ * #474: aggregate counts of public participants in each skill group. Missing level → unrated.
  */
 export type PublicSkillMix = {
   beginner: number
@@ -41,7 +41,7 @@ export type PublicSessionResults = {
 }
 /**
  * Q-PUBLIC-*: the public-safe projection of a session by its slug, built from the last synced
- * state. Private data (Off Day unless included, costs, phones, levels, presence) never enters it.
+ * state. Private data (Off Day unless included, costs, phones, presence) never enters it.
  */
 export type PublicSessionPage = {
   slug: string
@@ -62,8 +62,8 @@ export type PublicSessionPage = {
   participants: PublicSessionParticipant[]
   /** Aggregate skill-group counts over exactly `participants` (never the waitlist), #474 */
   skillMix: PublicSkillMix
-  /** Waitlisted names, masked like participant names, in the order they joined */
-  waitlist: string[]
+  /** Public-safe waitlisted players in waitlist order. */
+  waitlist: PublicSessionParticipant[]
   openSlots: number
   slotBudget: number
   acceptJoinRequests: boolean

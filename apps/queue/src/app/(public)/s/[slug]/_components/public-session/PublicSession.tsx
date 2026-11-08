@@ -166,7 +166,7 @@ export function PublicSession({ slug, viewer, openJoin = false }: PublicSessionP
     id: String(i),
     name: x.name,
     pictureUrl: x.pictureUrl,
-    hasProfile: x.hasRotraProfile,
+    hasProfile: Boolean(x.pictureUrl),
   }))
 
   return (
@@ -214,7 +214,7 @@ export function PublicSession({ slug, viewer, openJoin = false }: PublicSessionP
           <PublicParticipants
             participants={participants}
             skillMix={p.skillMix}
-            waitlist={p.waitlist.map((name, i) => ({ id: String(i), name }))}
+            waitlist={p.waitlist.map((entry, i) => ({ id: String(i), name: entry.name }))}
           />
         </TabsContent>
       </Tabs>

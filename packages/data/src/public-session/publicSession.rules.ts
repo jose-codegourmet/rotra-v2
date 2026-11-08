@@ -1,5 +1,5 @@
-import type { PlayingLevel } from '../player/player.types'
-import type { PublicSkillMix } from './publicSession.types'
+import { PLAYING_LEVELS, type PlayingLevel } from '../player/player.types'
+import type { PublicSessionParticipant, PublicSkillMix } from './publicSession.types'
 
 /**
  * Public participant names (owner decision, November 7, 2026; #475): each whitespace-separated word
@@ -14,12 +14,24 @@ export function maskPublicName(name: string): string {
   return words.map((w) => `${Array.from(w)[0]}***`).join(' ')
 }
 
+/** Project a recognized playing level into the public ring and hover label. */
+export function publicLevel(
+  level: PlayingLevel | null | undefined,
+): Pick<PublicSessionParticipant, 'skillGroup' | 'levelLabel'> {
+  if (!level || !PLAYING_LEVELS.includes(level)) return { skillGroup: null, levelLabel: null }
+  const [group, tier] = level.split('_')
+  const capitalize = (word: string) => word[0].toUpperCase() + word.slice(1)
+  return {
+    skillGroup: group as NonNullable<PublicSessionParticipant['skillGroup']>,
+    levelLabel: `${capitalize(group)} ${capitalize(tier)}`,
+  }
+}
+
 /**
  * #474: aggregate skill mix for the public page, computed on the server (or the mock server) over
  * the same entries as the public participant list. Same level → group rule as the organizer
  * roster's Skill group (`rosterLevelFamily`): `advanced_low|mid|high` → advanced, and so on; a
- * missing or unknown level → unrated. Takes levels only and returns counts only, so no participant
- * can be mapped to a level.
+ * missing or unknown level → unrated.
  */
 export function publicSkillMix(
   levels: (PlayingLevel | string | null | undefined)[],

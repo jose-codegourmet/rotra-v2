@@ -23,7 +23,14 @@ const wirePage: PublicSessionPage = {
   mode: 'fair',
   minimum: 3,
   notes: null,
-  participants: [{ name: 'Ana Reyes', pictureUrl: null, hasRotraProfile: true }],
+  participants: [
+    {
+      name: 'A*** R***',
+      pictureUrl: null,
+      skillGroup: 'intermediate',
+      levelLabel: 'Intermediate Mid',
+    },
+  ],
   skillMix: { beginner: 0, intermediate: 1, advanced: 0, unrated: 0 },
   waitlist: [],
   openSlots: 7,

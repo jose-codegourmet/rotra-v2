@@ -1,6 +1,6 @@
 import 'server-only'
 import { createHmac, timingSafeEqual } from 'node:crypto'
-import { maskPublicName, publicSkillMix } from '@rotra/data/public-session/rules'
+import { maskPublicName, publicLevel, publicSkillMix } from '@rotra/data/public-session/rules'
 import { loadAccountContext } from '../auth/account-context'
 import { MOCK_COOKIE_PREFIX } from '../auth/data-mode'
 import { type CookieAdapter, verifySubject } from '../auth/supabase'
@@ -84,7 +84,7 @@ export async function readPreviewAudience(cookies: CookieAdapter, sessionId: str
 
 /**
  * Q-PUBLIC-* (`public-session.page`): the allowlisted `PublicSessionPage` from accepted server
- * state. No phone, per-person level, presence, games, notes beyond the session notes, costs, Off Day or raw
+ * state. No phone, presence, games, notes beyond the session notes, costs, Off Day or raw
  * sync data. Participant and waitlist names are masked here (`maskPublicName`, #475), so a full
  * name never leaves the server. `skillMix` is aggregate counts only (#474). `results` is the stored public copy of the published slides, or null.
  */
@@ -137,12 +137,19 @@ export async function readPublicSession(slug: string) {
         return {
           name: maskPublicName(entry.nameSnapshot),
           pictureUrl: clubPlayer?.player?.avatarRef ?? null,
-          hasRotraProfile: !!entry.playerIdAtEntry,
+          ...publicLevel(levelCodeFor(entry.skillLevelId)),
         }
       }),
-      // #474: counts only, over the same roster as `participants`; no per-entry level leaves here.
+      // #474: counts over the same roster as `participants`.
       skillMix: publicSkillMix(roster.map((entry) => levelCodeFor(entry.skillLevelId))),
-      waitlist: waitlist.map((w) => maskPublicName(byId.get(w.clubPlayerId)?.displayName ?? '')),
+      waitlist: waitlist.map((w) => {
+        const clubPlayer = byId.get(w.clubPlayerId)
+        return {
+          name: maskPublicName(clubPlayer?.displayName ?? ''),
+          pictureUrl: clubPlayer?.player?.avatarRef ?? null,
+          ...publicLevel(levelCodeFor(w.skillLevelId)),
+        }
+      }),
       openSlots: Math.max(0, capacity - roster.length),
       slotBudget: capacity,
       acceptJoinRequests: session.acceptJoinRequests && TAKES_REQUESTS.includes(session.state),

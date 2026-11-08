@@ -77,7 +77,7 @@ export function RecordPublicTab({ sessionId, record }: RecordPublicTabProps) {
             key={i}
             name={x.name}
             pictureUrl={x.pictureUrl}
-            hasProfile={x.hasRotraProfile}
+            hasProfile={Boolean(x.pictureUrl)}
           />
         ))}
       </PublicPageSummary>

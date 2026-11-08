@@ -1,6 +1,6 @@
 # Public page participants become a plain grid, not cards
 
-Status: TICKETED — #500
+Status: IN PROGRESS — #500
 Date: 2026-11-08
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Public session page › Participants (also its operator preview)

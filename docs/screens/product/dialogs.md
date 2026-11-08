@@ -19,6 +19,15 @@ Always shown before a delete; it has two forms. Both show session, when, venue, 
 
 The save re-checks: if a player was confirmed meanwhile, the error shows in the dialog and nothing is deleted.
 
+## D-DELETE-PLAYER — Delete saved player
+
+Shown only when the player is in the **Active Session** (owner decision, November 8, 2026). Anywhere else **Delete player** acts at once with the toast “NAME deleted”.
+
+- **In the Active Session:** title **Delete NAME?** Copy: **“NAME is in TITLE, which is running now. They'll be marked not present, and N waiting matches with them will need attention.”** (the matches clause only when N > 0) and **“They're also taken out of any prepared or upcoming session. Their finished games and results stay.”** Secondary **Keep player**, primary **Delete player** (danger).
+- **On court or playing:** title **Can't delete NAME yet** Copy: **“NAME is on COURT / playing on COURT. Finish or substitute that match first, then delete them.”** Only **Back**.
+
+The save re-checks: if they went on court meanwhile, nothing is deleted and the error shows.
+
 ## D-CANCEL-SESSION — Cancel session
 
 Owner decision, November 6, 2026 ([log](../../mockup-changes/2026-11-06-queue-example-sessions-and-cancel.md)). Opened by **Cancel session** in a prepared session's Preparation header; never offered once the session has started.

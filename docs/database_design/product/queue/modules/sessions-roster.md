@@ -13,6 +13,7 @@
 | `player_id` | Nullable UUID FK to global players; null for guests |
 | `display_name`, `nickname` | Required name, optional nickname; club-local display |
 | `added_at` | Timestamptz the club first saved this player; drives the Saved players “Added” filter and the derived “New players this week” count (Monday 00:00 Asia/Manila through now, inclusive; decision #301, October 31, 2026) |
+| `removed_at` | Nullable timestamptz: the club deleted this saved player (November 8, 2026). Soft delete, because history (`session_players`, facts, summaries, assessments) keeps pointing at the row. Removed rows are left out of Saved players, its counts, search and Add player; adding the same linked profile again clears it |
 | `created_at`, `updated_at`, `revision` | Common metadata |
 
 Unique `(club_id, id)` supports scoped FKs. Partial unique `(club_id, player_id)` when linked prevents duplicate canonical members of the saved list. Name is **not unique**. Index `(club_id, display_name, id)` for saved-list lookup; substring/fuzzy indexing is a later query-driven choice.

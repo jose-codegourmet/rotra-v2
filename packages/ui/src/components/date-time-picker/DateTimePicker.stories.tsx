@@ -78,7 +78,7 @@ export const OffGridValue: Story = {
   render: (args) => {
     const [value, setValue] = useState(args.value)
     return (
-      <Field label={args.label} hint="10:42 PM is off the 15-minute grid and stays listed">
+      <Field label={args.label} hint="10:42 PM is off the 15-minute grid: minute 42 stays offered">
         <DateTimePicker {...args} value={value} onChange={setValue} />
       </Field>
     )
@@ -99,7 +99,7 @@ export const EmptyOption: Story = {
   render: (args) => {
     const [value, setValue] = useState(args.value)
     return (
-      <Field label={args.label} hint="Empty follows session end">
+      <Field label={args.label} hint="Empty follows session end. Set time starts from it">
         <DateTimePicker {...args} value={value} onChange={setValue} />
       </Field>
     )
@@ -188,4 +188,33 @@ export const Phone: Story = {
   render: TwoDays.render,
   args: TwoDays.args,
   globals: { viewport: { value: 'phone' } },
+}
+
+/** Court planned start and open until side by side: each picker fits a half-width column at 375 px. */
+export const PhoneHalfWidth: Story = {
+  args: OffGridValue.args,
+  globals: { viewport: { value: 'phone' } },
+  render: (args) => {
+    const [start, setStart] = useState(args.value)
+    const [end, setEnd] = useState<number | null>(null)
+    return (
+      <div className="grid grid-cols-2 gap-3">
+        <Field label="Planned start">
+          <DateTimePicker {...args} value={start} onChange={setStart} />
+        </Field>
+        <Field label="Open until">
+          <DateTimePicker
+            {...args}
+            label="Open until"
+            value={end}
+            onChange={setEnd}
+            min={(start ?? scheduledStart) + 60_000}
+            max={laterSessionEnd}
+            fallback={laterSessionEnd}
+            emptyLabel="Session end"
+          />
+        </Field>
+      </div>
+    )
+  },
 }

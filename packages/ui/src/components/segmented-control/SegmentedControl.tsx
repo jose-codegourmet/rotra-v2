@@ -2,7 +2,7 @@
 
 import { cn } from '@rotra/ui/cn'
 import { ToggleGroup } from 'radix-ui'
-import type { ReactNode } from 'react'
+import type { ReactNode, Ref } from 'react'
 
 export type SegmentedOption = {
   value: string
@@ -20,6 +20,8 @@ export type SegmentedControlProps = {
   'aria-label': string
   disabled?: boolean
   className?: string
+  /** The group; focusing it moves focus to the pressed option (Radix roving focus) */
+  ref?: Ref<HTMLDivElement>
 }
 
 /**
@@ -32,10 +34,12 @@ export function SegmentedControl({
   onChange,
   disabled,
   className,
+  ref,
   ...aria
 }: SegmentedControlProps) {
   return (
     <ToggleGroup.Root
+      ref={ref}
       type="single"
       value={value}
       // Radix lets a second tap clear a single group; a segmented control always keeps one option on.

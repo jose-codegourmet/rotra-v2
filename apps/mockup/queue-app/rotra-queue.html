@@ -532,6 +532,14 @@ button.qf:hover .avatar { box-shadow: 0 0 0 2px var(--accent); }
 .date-btn { display: flex; align-items: center; gap: 10px; text-align: left; cursor: pointer; }
 .date-btn svg { color: var(--accent); flex: none; }
 .date-btn:hover { border-color: var(--accent); }
+/* Date-and-time picker: one row of three short dropdowns, hour : minute AM/PM, each with a drawn chevron. */
+.dt-time { display: flex; align-items: center; gap: 4px; max-width: 260px; }
+.dt-box { position: relative; flex: 1 1 0; min-width: 0; }
+.dt-box + .dt-box { margin-left: 4px; }
+.dt-box::after { content: ""; position: absolute; right: 10px; top: 50%; width: 6px; height: 6px; border-right: 1.5px solid var(--fg2); border-bottom: 1.5px solid var(--fg2); transform: translateY(-70%) rotate(45deg); pointer-events: none; }
+select.input.dt-sel { appearance: none; -webkit-appearance: none; padding: 8px 22px 8px 10px; color: var(--fg); font-variant-numeric: tabular-nums; cursor: pointer; }
+select.input.dt-sel:disabled { opacity: .45; cursor: not-allowed; }
+.dt-colon { font-weight: 800; color: var(--fg); }
 .dp-sel { display: flex; flex-direction: column; gap: 2px; padding: 14px 16px; border-radius: var(--r); background: var(--accent-subtle); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); }
 .dp-sel b { font-size: 20px; font-weight: 800; letter-spacing: -0.3px; }
 .dp-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
@@ -1188,25 +1196,50 @@ function plannedFor(s) {
 const ceil15 = (t) => { const d = new Date(t), m = d.getMinutes(); const exact = m % 15 === 0 && !d.getSeconds() && !d.getMilliseconds(); d.setSeconds(0, 0); if (!exact) d.setMinutes(m - (m % 15) + 15); return d.getTime(); };
 const daysBetween = (a, b) => { const out = []; for (let t = dayStart(a); t <= dayStart(b) && out.length < 3; t = addDays(t, 1)) out.push(t); return out; };
 
-// One date-and-time picker for every time field: day buttons for the days the field can fall on (shown when there
-// is more than one), then a list of only the valid times on the chosen day, in 15-minute steps. A saved value off
-// the grid (a court that opened at 10:42 PM) stays in the list so it can be kept. Values carry their day; nothing
-// is guessed. `ok(t)` holds the field's rules; `set(t)` stores a choice (null = the empty option).
+// One date-and-time picker for every time field: a "Session start | Set time" switch when the field has an empty
+// option, day buttons for the days the field can fall on (shown when there is more than one), then one row of three
+// short dropdowns, hour : minute AM/PM. Only valid 15-minute times can be picked: options that give no valid time
+// are disabled. Hour and minute show two digits ("09 : 05 PM"). A saved value off the grid (a court that opened at 10:42 PM) keeps its minute as an extra option.
+// Values carry their day; nothing is guessed. `ok(t)` holds the field's rules; `set(t)` stores a choice (null = the empty option).
 const DT = {}; // the pickers on screen, by key, for the day and time handlers
 const dtTimes = (day, ok) => { const d = new Date(day), out = []; for (let i = 0; i < 96; i++) { const t = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, i * 15).getTime(); if (ok(t)) out.push(t); } return out; };
+const dtAt = (day, h, m) => { const d = new Date(day); return new Date(d.getFullYear(), d.getMonth(), d.getDate(), h, m).getTime(); };
+// The valid times on a day, with the saved value kept when it's off the grid.
+const dtList = (p, day) => { const out = dtTimes(day, p.ok); if (p.value != null && dayStart(p.value) === day && !out.includes(p.value)) { out.push(p.value); out.sort((a, b) => a - b); } return out; };
 function dtPicker(p) {
   DT[p.k] = p;
   const base = p.base ?? p.days[0];
   const shown = p.days.includes(dayStart(p.value ?? p.fallback ?? p.days[0])) ? dayStart(p.value ?? p.fallback ?? p.days[0]) : p.days[0];
-  const times = dtTimes(shown, p.ok);
-  if (p.value != null && dayStart(p.value) === shown && !times.includes(p.value)) { times.push(p.value); times.sort((a, b) => a - b); }
+  const times = dtList(p, shown);
+  // The clock the dropdowns show and build from: the value, else the fallback, else the first valid time.
+  const ref = p.value ?? p.fallback ?? times[0];
+  const refD = ref != null ? new Date(ref) : null;
+  Object.assign(p, { shown, times, refH: refD ? refD.getHours() : null, refM: refD ? refD.getMinutes() : 0 });
   const id = p.id || `dt-${p.k.replace(/\W/g, '-')}`;
   const dayLabel = (t) => `${fmtDate(t)}${dayDiff(base, t) === 1 ? ' · next day' : ''}`;
+  const empty = p.emptyLabel != null && p.value == null;
+  const dis = p.disabled ? 'disabled' : '';
+  const bad = p.err ? ' bad' : '';
+  const aria = p.err ? `aria-invalid="true" aria-describedby="${id}-error"` : '';
+  let row = '';
+  if (!empty && p.refH != null && times.length) {
+    const pm = p.refH >= 12, h12 = p.refH % 12 || 12;
+    const has = (t) => times.includes(t);
+    const mins = [0, 15, 30, 45];
+    if (p.value != null && p.refM % 15) mins.push(p.refM);
+    const opt = (v, label, sel, on) => `<option value="${v}" ${sel ? 'selected' : ''} ${on ? '' : 'disabled'}>${label}</option>`;
+    const sel = (part, sid, name, opts, extra = '') => `<span class="dt-box"><select class="input dt-sel${bad}" id="${sid}" data-act-change="dtTime" data-k="${p.k}" data-part="${part}" aria-label="${esc(p.label)}: ${name}" ${dis} ${extra} ${aria}>${opts}</select></span>`;
+    row = `<div class="dt-time">
+      ${sel('hour', id, 'hour', [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((h) => { const h24 = (h % 12) + (pm ? 12 : 0); return opt(h24, String(h).padStart(2, '0'), h === h12, times.some((t) => new Date(t).getHours() === h24)); }).join(''), p.autofocus ? 'data-autofocus' : '')}
+      <b class="dt-colon" aria-hidden="true">:</b>
+      ${sel('minute', `${id}-min`, 'minute', mins.map((m) => opt(m, String(m).padStart(2, '0'), m === p.refM, has(dtAt(shown, p.refH, m)))).join(''))}
+      ${sel('meridiem', `${id}-ampm`, 'AM or PM', [false, true].map((isPm) => opt(isPm ? 'pm' : 'am', isPm ? 'PM' : 'AM', isPm === pm, times.some((t) => (new Date(t).getHours() >= 12) === isPm))).join(''))}
+    </div>`;
+  } else if (!empty) row = `<p class="hint" id="${id}" style="margin:0">No times left on this day</p>`;
   return `<div class="field">${p.hideLabel ? '' : `<span>${esc(p.label)}</span>`}
-    ${p.days.length > 1 ? `<div class="seg" role="group" aria-label="${esc(p.label)}: day">${p.days.map((t, i) => `<button type="button" id="${id}-d${i}" aria-pressed="${t === shown}" data-act="dtDay" data-k="${p.k}" data-v="${t}" ${p.disabled || !dtTimes(t, p.ok).length ? 'disabled' : ''}>${dayLabel(t)}</button>`).join('')}</div>` : ''}
-    <select class="input${p.err ? ' bad' : ''}" id="${id}" data-act-change="dtTime" data-k="${p.k}" aria-label="${esc(p.label)}: time" ${p.disabled ? 'disabled' : ''} ${p.autofocus ? 'data-autofocus' : ''} ${p.err ? `aria-invalid="true" aria-describedby="${id}-error"` : ''}>
-      ${p.emptyLabel != null ? `<option value="" ${p.value == null ? 'selected' : ''}>${esc(p.emptyLabel)}</option>` : ''}${times.map((t) => `<option value="${t}" ${t === p.value ? 'selected' : ''}>${fmtTime(t)}</option>`).join('')}${!times.length && p.emptyLabel == null ? '<option value="" selected disabled>No times left on this day</option>' : ''}
-    </select>${p.err ? `<span class="err" id="${id}-error" aria-live="polite">${esc(p.err)}</span>` : p.hint ? `<span class="hint">${p.hint}</span>` : ''}</div>`;
+    ${p.emptyLabel != null ? `<div class="seg" role="group" aria-label="${esc(p.label)}: mode"><button type="button" id="${empty ? id : `${id}-empty`}" aria-pressed="${empty}" data-act="dtEmpty" data-k="${p.k}" ${dis}>${esc(p.emptyLabel)}</button><button type="button" id="${id}-set" aria-pressed="${!empty}" data-act="dtSet" data-k="${p.k}" ${dis} ${times.length ? '' : 'disabled'}>Set time</button></div>` : ''}
+    ${!empty && p.days.length > 1 ? `<div class="seg" role="group" aria-label="${esc(p.label)}: day">${p.days.map((t, i) => `<button type="button" id="${id}-d${i}" aria-pressed="${t === shown}" data-act="dtDay" data-k="${p.k}" data-v="${t}" ${p.disabled || !dtList(p, t).length ? 'disabled' : ''}>${dayLabel(t)}</button>`).join('')}</div>` : ''}
+    ${row}${p.err ? `<span class="err" id="${id}-error" aria-live="polite">${esc(p.err)}</span>` : p.hint ? `<span class="hint">${p.hint}</span>` : ''}</div>`;
 }
 // A day button keeps the chosen clock time on the new day when it's valid there, else takes that day's first valid time.
 function dtPickDay(k, day) {
@@ -1217,6 +1250,25 @@ function dtPickDay(k, day) {
   const t = p.ok(want.getTime()) ? want.getTime() : dtTimes(day, p.ok)[0];
   if (t != null) p.set(t);
 }
+// Hour: same day and AM/PM; keeps the minute when that time is valid, else the hour's first valid minute.
+// Minute: the current hour with that minute. AM/PM: keeps hour and minute when valid in the other half, else
+// that half's first valid time.
+function dtPickTime(k, part, v) {
+  const p = DT[k]; if (!p || p.refH == null) return;
+  const { shown, times, refH, refM } = p, has = (t) => times.includes(t);
+  let t = null;
+  if (part === 'hour') { const want = dtAt(shown, +v, refM); t = has(want) ? want : times.find((x) => new Date(x).getHours() === +v); }
+  else if (part === 'minute') { const want = dtAt(shown, refH, +v); t = has(want) ? want : null; }
+  else { const isPm = v === 'pm', want = dtAt(shown, (refH % 12) + (isPm ? 12 : 0), refM); t = has(want) ? want : times.find((x) => (new Date(x).getHours() >= 12) === isPm); }
+  if (t != null) p.set(t);
+}
+// Set time: the fallback (court fields: session start / end) when it's valid, else the first valid time.
+function dtSetTime(k) {
+  const p = DT[k]; if (!p) return;
+  const t = p.fallback != null && p.times.includes(p.fallback) ? p.fallback : p.times[0];
+  if (t != null) p.set(t);
+}
+const dtFocus = (sel) => { const b = document.querySelector(sel); if (b) b.focus(); };
 
 // Q-ADD-COURT mirrors @rotra/schema/court-window, including submit's validation.
 // Its window: within the session; the start is fixed once the court hosted a match; the end follows the session end or a set time.
@@ -4947,7 +4999,9 @@ const ACT = {
     S.ui.sheet = null; commit(`${label} ${existing ? 'updated' : 'added'} · open until ${fmtWhen(until || s.end, { lower: true })}${existing ? '' : autoNote(s, autoFill(s, { only: [id] }))}`); render();
   },
   extend: (d) => { const s = cur(), sh = S.ui.sheet; s.end += +d.m * 60000; if (sh && sh.type === 'adjust' && s.end > Date.now()) { sh.endAt = s.end; sh.err = ''; } commit(`Session ends ${atWhen(s.end)} · public page updates after sync`); render(); },
-  dtDay: (d) => { dtPickDay(d.k, +d.v); render(); const b = document.querySelector(`[data-act="dtDay"][data-k="${d.k}"][data-v="${d.v}"]`); if (b) b.focus(); },
+  dtDay: (d) => { dtPickDay(d.k, +d.v); render(); dtFocus(`[data-act="dtDay"][data-k="${d.k}"][data-v="${d.v}"]`); },
+  dtEmpty: (d) => { const p = DT[d.k]; if (p) p.set(null); render(); dtFocus(`[data-act="dtEmpty"][data-k="${d.k}"]`); },
+  dtSet: (d) => { dtSetTime(d.k); render(); dtFocus(`[data-act="dtSet"][data-k="${d.k}"]`); },
   openSessionDone: () => openSheet({ type: 'done', step: '' }),
   confirmDone: () => {
     const s = cur();
@@ -4973,7 +5027,7 @@ const ACT = {
   pubTab: (d) => { S.ui.pubTab = d.k; render(); },
 };
 const CHANGE = {
-  dtTime: (el) => { const p = DT[el.dataset.k]; if (!p) return; p.set(el.value === '' ? null : +el.value); render(); },
+  dtTime: (el) => { dtPickTime(el.dataset.k, el.dataset.part, el.value); render(); },
   autoSelect: (el) => ACT.autoSelect(el.dataset, el),
   draftShuttleItem: (el) => { S.ui.draft.shuttles[+el.dataset.i].itemId = el.value; render(); },
   plSet: (el) => { S.ui.pl = { ...(S.ui.pl || {}), [el.dataset.k]: el.value }; render(); },

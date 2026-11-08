@@ -16,6 +16,17 @@ Proposed minimal record: stable key PK (`^[a-z][a-z0-9_]{2,39}$`, immutable once
 
 Downloaded sessions need the relevant approved settings version. How flag changes affect an already-offline session is unresolved; a DB update cannot guarantee immediate remote application.
 
+## `admin_settings` (#540)
+
+One Admin settings row (fixed key `id = 1`, CHECK; seeded by the migration): cost per session in
+centavos ≥ 0 (default 1500, the ₱15 placeholder until the owner sets the real figure), currency
+`PHP`, nullable updated-by admin FK, updated time and revision. Admin Sales reads it
+([D-2026-11-08-01](../../../../mvp/decisions.md#d-2026-11-08-01)); the club Sales tab applies the
+current value to every month shown. RLS on; no public-client privileges.
+
+Sales reports are read-only views/functions over existing rows (`rotra_sales_*`, migration
+`20261108000300_admin_sales_reports`), computed on read in Manila days; no totals table.
+
 ## `player_contact_change_requests`
 
 Fields: UUID PK; player FK; requested field phone/email; protected proposed normalized value; original contact revision; requested time; status pending/approved/applying/applied/rejected/failed; reviewer admin/time; provider-operation idempotency reference; resolution note.

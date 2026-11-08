@@ -51,3 +51,22 @@ model RankingPolicyVersion {
   @@index([createdByAdminId])
   @@map("ranking_policy_versions")
 }
+
+/// The one Admin settings row (id = 1, CHECK and seed in SQL). Sales reads the cost per session from
+/// it (D-2026-11-08-01); ₱15 is a placeholder until the owner sets the real figure.
+model AdminSetting {
+  /// Always 1: a fixed key so only one row can exist (CHECK in SQL).
+  id                  Int      @id @default(1) @db.SmallInt
+  /// Estimated cost to ROTRA of one session, centavos ≥ 0 (CHECK in SQL).
+  costPerSessionMinor Int      @default(1500) @map("cost_per_session_minor")
+  currency            String   @default("PHP") @db.Char(3)
+  /// Null for the seeded row, which no admin saved.
+  updatedByAdminId    String?  @map("updated_by_admin_id") @db.Uuid
+  updatedAt           DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision            BigInt   @default(1)
+
+  updatedBy AdminAccount? @relation(fields: [updatedByAdminId], references: [id], onDelete: Restrict)
+
+  @@index([updatedByAdminId])
+  @@map("admin_settings")
+}

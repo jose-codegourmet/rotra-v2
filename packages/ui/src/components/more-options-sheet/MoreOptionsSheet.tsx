@@ -7,6 +7,7 @@ export type MoreOptionsAction = {
   label: string
   onSelect: () => void
   danger?: boolean
+  disabled?: boolean
 }
 
 export type MoreOptionsSheetProps = {
@@ -24,6 +25,7 @@ export function MoreOptionsSheet({ open, onOpenChange, actions }: MoreOptionsShe
           <Button
             key={action.label}
             block
+            disabled={action.disabled}
             variant={action.danger ? 'danger' : 'secondary'}
             onClick={() => {
               onOpenChange(false)

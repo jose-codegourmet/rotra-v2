@@ -47,7 +47,7 @@ export function SessionJoinQr({
   const [format, setFormat] = useState<SessionQrFormat>(initialFormat)
   const [logo, setLogo] = useState<{ url: string; image: HTMLImageElement | null } | null>(null)
   const [busy, setBusy] = useState(false)
-  const cardRef = useRef<HTMLDivElement>(null)
+  const cardRef = useRef<HTMLElement>(null)
   const qr = drawSessionQr(link)
   const initials =
     clubInitials ??
@@ -137,9 +137,8 @@ export function SessionJoinQr({
         disabled={busy}
         onChange={(next) => setFormat(next === 'story' ? 'story' : 'post')}
       />
-      <div
+      <section
         ref={cardRef}
-        role="group"
         aria-label="Share image preview"
         className={cn(
           'flex flex-col justify-between gap-3.5 rounded-[20px] bg-share-bg px-5 text-share-fg [background-image:radial-gradient(120%_70%_at_50%_0%,var(--share-glow),transparent_60%)]',
@@ -248,7 +247,7 @@ export function SessionJoinQr({
           </span>
           <span data-qr-text>Run the game.</span>
         </div>
-      </div>
+      </section>
       <p className="m-0 text-fg2 text-sm">
         Scanning opens the public session page.{' '}
         {format === 'story'

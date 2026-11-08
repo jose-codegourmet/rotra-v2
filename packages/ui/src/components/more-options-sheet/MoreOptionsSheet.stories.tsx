@@ -30,3 +30,15 @@ export const SessionSettings: Story = {
   },
   globals: { viewport: { value: 'phone' } },
 }
+
+export const RosterUnavailable: Story = {
+  args: {
+    actions: [
+      { label: 'Edit preparation', onSelect: fn() },
+      { label: 'Copy invite link', onSelect: fn() },
+      { label: 'Delete session', onSelect: fn(), danger: true, disabled: true },
+      { label: 'Cancel session', onSelect: fn(), danger: true, disabled: true },
+    ],
+  },
+  globals: { viewport: { value: 'phone' } },
+}

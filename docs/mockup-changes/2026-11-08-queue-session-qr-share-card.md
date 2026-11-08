@@ -46,3 +46,8 @@ Components: session-join-qr, session-preparation
 - Share-card component and stories implemented; preparation wiring remains in #512.
 - Like-for-like browser comparison and PNG download checks are pending the full epic batch.
 - Phone scanning of the downloaded QR images has not been verified.
+
+## Q14 implementation verification (November 8, 2026)
+- Downloaded Post and Story PNGs are 1080 × 1350 and 1080 × 1920. Native Vision QR decoding recovered the exact public-session URL from both formats, including the centered initials and vector-logo variants.
+- Verified the fixed dark brand card in the light app theme and the Preparation session details/public link. Physical phone scanning and complete long-copy visual comparison remain unverified.
+- Workspace lint, type-check and build ran at the end of the four-ticket list, per owner instruction.

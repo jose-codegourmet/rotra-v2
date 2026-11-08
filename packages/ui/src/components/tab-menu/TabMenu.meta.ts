@@ -2,7 +2,8 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 
 export const tabMenuMeta = {
   name: 'TabMenu',
-  description: 'A full-width menu for switching tabs on a phone, showing counts and the current selection.',
+  description:
+    'A full-width menu for switching tabs on a phone, showing counts and the current selection.',
   usage: [
     'Use for the Preparation and roster level tabs on phones; use Tabs with phoneMenu for tab panels.',
     'Pass the current value and update it through onChange. Disabled entries cannot be selected.',

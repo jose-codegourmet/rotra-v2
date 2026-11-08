@@ -28,6 +28,9 @@ import { CostEstimateResult } from '@rotra/ui/cost-estimate-summary'
 import { DeleteSessionSheet } from '@rotra/ui/delete-session-sheet'
 import { DeviceDownloadCard } from '@rotra/ui/device-download-card'
 import { formatMinutes } from '@rotra/ui/forms/session-setup-form/helpers'
+import { Icon } from '@rotra/ui/icon'
+import { IconButton } from '@rotra/ui/icon-button'
+import { MoreOptionsSheet } from '@rotra/ui/more-options-sheet'
 import { Notice } from '@rotra/ui/notice'
 import { PageHeader } from '@rotra/ui/page-header'
 import { SessionJoinQr } from '@rotra/ui/session-join-qr'
@@ -107,6 +110,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
   const [startOpen, setStartOpen] = useState(false)
   const [postOpen, setPostOpen] = useState(false)
   const [qrOpen, setQrOpen] = useState(false)
+  const [moreOpen, setMoreOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [cancelOpen, setCancelOpen] = useState(false)
   // The public link is origin + /s/<publicSlug>; the origin is only known in the browser.
@@ -241,20 +245,24 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
             </span>
           }
           title={s.title}
+          titleAction={
+            <IconButton label="Open public page" variant="ghost" size="sm" asChild>
+              <Link href={`/sessions/${sessionId}/public-page`}>
+                <Icon name="external" />
+              </Link>
+            </IconButton>
+          }
           description={`${date(s.scheduledStartAt)} · ${time(s.scheduledStartAt)}–${time(s.scheduledEndAt)} · ${s.venueName}`}
           actions={
             <>
-              <Button size="sm" asChild>
+              <Button size="sm" className="max-[640px]:hidden" asChild>
                 {live ? (
                   <Link href={`/sessions/${sessionId}`}>Back to live session</Link>
                 ) : (
                   <Link href={`/sessions/${sessionId}/edit`}>Edit preparation</Link>
                 )}
               </Button>
-              <Button size="sm" asChild>
-                <Link href={`/sessions/${sessionId}/public-page`}>Preview public page</Link>
-              </Button>
-              <Button size="sm" onClick={() => void copyLink()}>
+              <Button size="sm" className="max-[640px]:hidden" onClick={() => void copyLink()}>
                 Copy invite link
               </Button>
               <Button size="sm" onClick={() => setQrOpen(true)}>
@@ -267,6 +275,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
                 <Button
                   size="sm"
                   variant="danger"
+                  className="max-[640px]:hidden"
                   disabled={!roster.data}
                   onClick={() => setDeleteOpen(true)}
                 >
@@ -277,12 +286,21 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
                 <Button
                   size="sm"
                   variant="danger"
+                  className="max-[640px]:hidden"
                   disabled={!roster.data}
                   onClick={() => setCancelOpen(true)}
                 >
                   Cancel session
                 </Button>
               ) : null}
+              <Button
+                size="sm"
+                className="hidden max-[640px]:inline-flex"
+                aria-haspopup="dialog"
+                onClick={() => setMoreOpen(true)}
+              >
+                More options
+              </Button>
             </>
           }
         />
@@ -303,7 +321,8 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
         <JoinRequests sessionId={sessionId} />
       )}
       <Tabs
-        aria-label={live ? 'Session settings' : 'Preparation'}
+        phoneMenu
+        aria-label={live ? 'Session settings section' : 'Preparation section'}
         value={tab}
         onChange={async (value) => {
           await flushSessionPresence(sessionId)
@@ -482,12 +501,46 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
             link={sessionLink}
             slug={s.publicSlug}
             clubName={club.data?.name ?? 'ROTRA session'}
-            whenLabel={`${date(s.scheduledStartAt)} · ${time(s.scheduledStartAt)}–${time(s.scheduledEndAt)}`}
+            clubInitials={club.data?.initials}
+            clubLogoUrl={club.data?.logoUrl}
+            sessionTitle={s.title}
+            dateLabel={date(s.scheduledStartAt)}
+            timeLabel={`${time(s.scheduledStartAt)}–${time(s.scheduledEndAt)}`}
             venueName={s.venueName}
             onDownloaded={() => toast('QR image downloaded')}
             onError={(message) => toast.error(message)}
           />
         </Sheet>
+      ) : null}
+      {s ? (
+        <MoreOptionsSheet
+          open={moreOpen}
+          onOpenChange={setMoreOpen}
+          actions={[
+            {
+              label: live ? 'Back to live session' : 'Edit preparation',
+              onSelect: () =>
+                router.push(live ? `/sessions/${sessionId}` : `/sessions/${sessionId}/edit`),
+            },
+            { label: 'Copy invite link', onSelect: () => void copyLink() },
+            ...(s.state === 'prepared'
+              ? [
+                  {
+                    label: 'Delete session',
+                    danger: true,
+                    disabled: !roster.data,
+                    onSelect: () => setDeleteOpen(true),
+                  },
+                  {
+                    label: 'Cancel session',
+                    danger: true,
+                    disabled: !roster.data,
+                    onSelect: () => setCancelOpen(true),
+                  },
+                ]
+              : []),
+          ]}
+        />
       ) : null}
       {s?.state === 'prepared' ? (
         <StartSessionSheet

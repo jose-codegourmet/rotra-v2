@@ -5,8 +5,8 @@ import { SessionJoinQr } from './SessionJoinQr'
 
 const club = clubs[0]!
 const session = queueSessionFixtures.sessions[0]!
-// Self-contained image fixture: no external host or CORS dependency in logo stories.
-const logoUrl = `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text x="50" y="68" text-anchor="middle" font-size="50">🏸</text></svg>`)}`
+// Self-contained vector fixture: explicit dimensions and paths avoid SVG font/emoji canvas differences.
+const logoUrl = `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><g fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M28 67 72 23 80 47 52 75Z"/><path d="m28 67 13 13M38 57l28-28M48 65l27-27M55 39l16 16"/><path d="m22 73 12 12c-8 8-18 2-12-12Z"/></g></svg>`)}`
 const meta = {
   title: 'Queue/SessionJoinQr',
   component: SessionJoinQr,

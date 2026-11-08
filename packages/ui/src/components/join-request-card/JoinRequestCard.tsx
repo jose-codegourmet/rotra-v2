@@ -4,11 +4,16 @@ import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { cn } from '@rotra/ui/cn'
 import { Notice, type NoticeProps } from '@rotra/ui/notice'
+import {
+  SkillDistributionBar,
+  type SkillDistributionCounts,
+} from '@rotra/ui/skill-distribution-bar'
 import { useId } from 'react'
 
 export type JoinRequestCardVariant =
   | 'open'
   | 'full'
+  | 'active'
   | 'off'
   | 'sent'
   | 'confirmed-slot'
@@ -16,25 +21,27 @@ export type JoinRequestCardVariant =
   | 'declined'
 
 type CommonProps = { className?: string }
+type AvailabilityProps = {
+  /** Aggregate skill counts for confirmed players; omitted or empty hides the bar. */
+  skillMix?: SkillDistributionCounts
+  onRequestToJoin: () => void
+  /** Sending needs internet: disable the button while offline. */
+  disabled?: boolean
+}
 
 export type JoinRequestCardProps = CommonProps &
   (
-    | {
+    | ({
         /** Slots are open: "N of M slots open." and Request to join */
         variant: 'open'
         openSlots: number
         capacity: number
-        onRequestToJoin: () => void
-        /** Sending needs internet: an offline visitor sees the card with Request to join disabled */
-        disabled?: boolean
-      }
-    | {
+      } & AvailabilityProps)
+    | ({
         /** Every slot is taken: confirmed guests join the waitlist; Request to join stays */
         variant: 'full'
-        onRequestToJoin: () => void
-        /** Sending needs internet: an offline visitor sees the card with Request to join disabled */
-        disabled?: boolean
-      }
+      } & AvailabilityProps)
+    | ({ variant: 'active' } & AvailabilityProps)
     | {
         /** The club turned Accept join requests off: contact the Queue Master instead */
         variant: 'off'
@@ -117,30 +124,44 @@ export function JoinRequestCard(props: JoinRequestCardProps) {
     )
   }
 
-  if (props.variant === 'open' || props.variant === 'full') {
-    const slots =
-      props.variant === 'open'
-        ? `${props.openSlots} of ${props.capacity} slots open.`
-        : 'All slots are taken; confirmed guests join the waitlist.'
+  if (props.variant === 'open' || props.variant === 'full' || props.variant === 'active') {
+    const skillMix = props.skillMix
+    const hasPlayers =
+      skillMix &&
+      skillMix.beginner + skillMix.intermediate + skillMix.advanced + (skillMix.unrated ?? 0) > 0
     return (
       <Card asChild className={cardClass}>
         <section aria-labelledby={headingId}>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="min-w-0 flex-1 basis-60">
-              <h2 id={headingId}>Want to play?</h2>
-              <p className="m-0 text-[13px] text-fg2">
-                {slots} Send a quick request and the Queue Master confirms it.
-              </p>
-            </div>
-            <Button
-              variant="primary"
-              onClick={props.onRequestToJoin}
-              disabled={props.disabled}
-              className="max-sm:w-full"
-            >
-              Request to join
-            </Button>
+          <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1.5">
+            <h2 id={headingId}>Want to play?</h2>
+            {props.variant === 'open' ? (
+              <span className="text-[13px] text-fg2">
+                <b className="text-xl tabular-nums text-accent">{props.openSlots}</b> of{' '}
+                {props.capacity} slots open
+              </span>
+            ) : props.variant === 'full' ? (
+              <span className="text-[13px] font-semibold text-warn">All slots taken</span>
+            ) : (
+              <span className="text-[13px] text-fg2">Additional players can be admitted</span>
+            )}
           </div>
+          {hasPlayers && skillMix ? <SkillDistributionBar counts={skillMix} /> : null}
+          <p className="m-0 text-[13px] text-fg2">
+            {props.variant === 'active'
+              ? 'The Queue Master can admit additional players. '
+              : props.variant === 'full'
+                ? 'Confirmed guests join the waitlist. '
+                : ''}
+            Send a quick request and the Queue Master confirms it.
+          </p>
+          <Button
+            variant="primary"
+            onClick={props.onRequestToJoin}
+            disabled={props.disabled}
+            className="min-h-11 w-full"
+          >
+            Request to join
+          </Button>
         </section>
       </Card>
     )

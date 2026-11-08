@@ -26,7 +26,13 @@ const meta = {
       </div>
     ),
   ],
-  args: { variant: 'open', openSlots, capacity, onRequestToJoin: fn() },
+  args: {
+    variant: 'open',
+    openSlots,
+    capacity,
+    skillMix: { beginner: 5, intermediate: 8, advanced: 4 },
+    onRequestToJoin: fn(),
+  },
 } satisfies Meta<JoinRequestCardProps>
 
 export default meta
@@ -37,6 +43,19 @@ export const Open: Story = {}
 
 /** Every slot is taken: confirmed guests join the waitlist; Request to join stays. */
 export const Full: Story = { args: { variant: 'full', onRequestToJoin: fn() } }
+
+export const Active: Story = { args: { variant: 'active', onRequestToJoin: fn() } }
+
+/** No confirmed players: the skill mix bar is hidden. */
+export const EmptyRoster: Story = {
+  args: {
+    variant: 'open',
+    openSlots,
+    capacity,
+    skillMix: { beginner: 0, intermediate: 0, advanced: 0 },
+    onRequestToJoin: fn(),
+  },
+}
 
 /** An offline visitor: sending needs internet, so Request to join is disabled */
 export const Offline: Story = {

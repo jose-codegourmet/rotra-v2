@@ -41,6 +41,8 @@ import type {
 } from '../queue-session/queueSession.types'
 import type { RankingPolicyVersion } from '../ranking-settings/rankingSettings.types'
 import { isRealDataMode } from '../real/mode'
+import { salesSettingsSeed } from '../sales/sales.fixtures'
+import type { SalesSettings } from '../sales/sales.types'
 import type { SessionCostEstimate } from '../session-cost/sessionCost.types'
 import type { SessionPaymentMark } from '../session-payment/sessionPayment.types'
 import { createResultSnapshot } from '../session-result/sessionResult.rules'
@@ -85,6 +87,8 @@ export type MockState = {
   adminCommands: Record<string, { clubId: string }>
   /** Admin feature flags in list order; the catalog starts empty */
   featureFlags: FeatureFlag[]
+  /** Admin configuration › cost per session that Sales estimates with (D-2026-11-08-01) */
+  salesSettings: SalesSettings
   venues: ClubVenue[]
   players: Player[]
   clubPlayers: ClubPlayer[]
@@ -175,6 +179,7 @@ function seedState(): MockState {
     adminAuditEvents: createAdminAuditEvents(now),
     adminCommands: {},
     featureFlags,
+    salesSettings: salesSettingsSeed,
     venues,
     players,
     clubPlayers,

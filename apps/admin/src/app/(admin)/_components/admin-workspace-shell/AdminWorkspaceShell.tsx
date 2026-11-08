@@ -56,6 +56,7 @@ export function useDenyOnPermissionError(...errors: unknown[]) {
 const HREFS: Record<AdminNavKey, string> = {
   clubs: '/clubs',
   players: '/players',
+  sales: '/sales',
   'contact-changes': '/requests/contact-changes',
   'club-names': '/requests/club-names',
   'password-resets': '/requests/password-resets',

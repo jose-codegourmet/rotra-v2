@@ -5,6 +5,7 @@ import type { ElementType } from 'react'
 export type AdminNavKey =
   | 'clubs'
   | 'players'
+  | 'sales'
   | 'contact-changes'
   | 'club-names'
   | 'password-resets'
@@ -50,6 +51,7 @@ export function AdminNav({
       items: [
         item('clubs', 'Clubs and licenses', 'nav-club'),
         item('players', 'Players', 'nav-players'),
+        item('sales', 'Sales', 'nav-rank'),
       ],
     },
     {

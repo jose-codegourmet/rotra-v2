@@ -12,6 +12,7 @@ export const adminNavMeta = {
   variants: [
     'clubs',
     'players',
+    'sales',
     'contact-changes',
     'club-names',
     'password-resets',

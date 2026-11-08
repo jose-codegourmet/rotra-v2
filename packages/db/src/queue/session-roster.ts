@@ -146,7 +146,7 @@ export async function addSavedPlayerToSession(
     const clubPlayer = await tx.clubPlayer.findUnique({
       where: { clubId_id: { clubId: context.clubId, id: input.clubPlayerId } },
     })
-    if (!clubPlayer) throw new ServiceError('not_found')
+    if (!clubPlayer || clubPlayer.removedAt) throw new ServiceError('not_found')
     await requireIdentity(tx, clubPlayer, input.identityCheck)
     return place(tx, context, session, clubPlayer, skillLevelId, input.operationId, new Date())
   })
@@ -201,6 +201,15 @@ export async function clubPlayerForProfile(
   now: Date,
 ) {
   const saved = await tx.clubPlayer.findFirst({ where: { clubId: context.clubId, playerId } })
+  // A deleted saved player is restored rather than duplicated (one saved row per profile per club).
+  if (saved?.removedAt)
+    return {
+      clubPlayer: await tx.clubPlayer.update({
+        where: { clubId_id: { clubId: context.clubId, id: saved.id } },
+        data: { removedAt: null, revision: { increment: 1 } },
+      }),
+      created: true,
+    }
   if (saved) return { clubPlayer: saved, created: false }
   const player = await tx.player.findUnique({
     where: { id: playerId },

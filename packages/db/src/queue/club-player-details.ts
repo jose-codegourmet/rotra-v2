@@ -43,6 +43,7 @@ async function loadEditable(context: ClubContext, clubPlayerId: string) {
       displayName: true,
       nickname: true,
       playerId: true,
+      removedAt: true,
       privateInput: { select: { phoneE164: true } },
       player: {
         select: {
@@ -56,7 +57,7 @@ async function loadEditable(context: ClubContext, clubPlayerId: string) {
       },
     },
   })
-  if (!row) throw new ServiceError('not_found')
+  if (!row || row.removedAt) throw new ServiceError('not_found')
   if (row.player?.profileState === 'claimed')
     throw new ServiceError('forbidden', {
       player: 'This player registered, so they keep their own details.',

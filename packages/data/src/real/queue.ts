@@ -1,7 +1,11 @@
 import type { MockSession, SignInInput } from '../auth/auth.types'
 import { clubInitials } from '../club/club.rules'
 import type { Club } from '../club/club.types'
-import type { ClubPlayerDetails, ClubPlayerDetailsInput } from '../club-player/clubPlayer.types'
+import type {
+  ClubPlayerDetails,
+  ClubPlayerDetailsInput,
+  DeleteImpact,
+} from '../club-player/clubPlayer.types'
 import type { ClubPlayerView } from '../club-player/fetchers'
 import type { ClubVenue } from '../club-venue/clubVenue.types'
 import type { SaveInventoryItemInput } from '../inventory/fetchers'
@@ -554,6 +558,20 @@ export async function realCreatePlayerInvite(player: ClubPlayerView) {
     url: `${playerAppOrigin()}/claim/${encodeURIComponent(token)}`,
     message: 'Invite link ready',
   }
+}
+
+/** Delete player (D-DELETE-PLAYER): what it would affect, then the soft delete. */
+export async function realGetDeleteImpact(id: string) {
+  const { impact } = await realRequest<{ impact: DeleteImpact }>(
+    `/api/club/players/${encodeURIComponent(id)}/delete-impact`,
+  )
+  return impact
+}
+export function realDeleteClubPlayer(id: string) {
+  return realRequest<{ clubPlayerId: string; name: string }>(
+    `/api/club/players/${encodeURIComponent(id)}`,
+    { method: 'DELETE' },
+  )
 }
 
 /** Edit details: what the club entered for its own guest or unclaimed player. */

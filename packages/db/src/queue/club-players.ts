@@ -28,7 +28,7 @@ export type ClubPlayerDto = {
 /** Q-SAVED-PLAYERS: every player the club has saved, with identity, RTR ID and latest club level. */
 export async function listClubPlayers(context: ClubContext): Promise<ClubPlayerDto[]> {
   const rows = await prisma.clubPlayer.findMany({
-    where: { clubId: context.clubId },
+    where: { clubId: context.clubId, removedAt: null },
     orderBy: { displayName: 'asc' },
     select: {
       id: true,
@@ -100,7 +100,8 @@ export async function searchPlayerDirectory(
   const rows = await prisma.player.findMany({
     where: {
       idAllocation: { isNot: null },
-      clubPlayers: { none: { clubId: context.clubId } },
+      // A profile the club deleted shows again, so it can be added back (which restores it).
+      clubPlayers: { none: { clubId: context.clubId, removedAt: null } },
       ...(q
         ? {
             OR: [
@@ -181,6 +182,7 @@ export async function addNewSavedPlayer(
         const match = await tx.clubPlayer.findFirst({
           where: {
             clubId: context.clubId,
+            removedAt: null,
             OR: [
               { privateInput: { phoneE164: input.phone } },
               { player: { privateContact: { phoneE164: input.phone } } },

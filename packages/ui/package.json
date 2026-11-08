@@ -263,6 +263,7 @@
     "./session-recovery-screen": "./src/components/session-recovery-screen/SessionRecoveryScreen.tsx",
     "./account-panel": "./src/components/account-panel/AccountPanel.tsx",
     "./experience-fields": "./src/components/experience-fields/ExperienceFields.tsx",
+    "./delete-player-sheet": "./src/components/delete-player-sheet/DeletePlayerSheet.tsx",
     "./edit-player-details-form": "./src/forms/edit-player-details-form/EditPlayerDetailsForm.tsx",
     "./personal-details-fields": "./src/forms/personal-details-fields/PersonalDetailsFields.tsx",
     "./personal-details-fields/schema": "./src/forms/personal-details-fields/PersonalDetailsFields.schema.ts",

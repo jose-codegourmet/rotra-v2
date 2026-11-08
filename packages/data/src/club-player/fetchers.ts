@@ -109,6 +109,7 @@ export async function getClubPlayers(filters: ClubPlayerFilters = {}) {
     .filter(
       (p) =>
         p.clubId === DEMO_CLUB_ID &&
+        !p.removedAt &&
         (!p.playerId || !state.adminPlayerRecords[p.playerId]?.archivedAt),
     )
     .map((p) => clubPlayerView(state, p))
@@ -150,7 +151,7 @@ export async function getSavedPlayerStats() {
   const state = readMockState()
   return deriveSavedPlayerStats(
     state.clubPlayers.filter(
-      (p) => !p.playerId || !state.adminPlayerRecords[p.playerId]?.archivedAt,
+      (p) => !p.removedAt && (!p.playerId || !state.adminPlayerRecords[p.playerId]?.archivedAt),
     ),
     DEMO_CLUB_ID,
     Date.now(),

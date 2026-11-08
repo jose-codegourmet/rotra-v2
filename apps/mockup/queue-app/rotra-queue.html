@@ -1046,6 +1046,8 @@ const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '
 // Public participant names (owner decision, Nov 7 2026; #475): each word → first letter + fixed "***"; blank → "Player".
 const maskName = (n) => { const w = String(n ?? '').trim().split(/\s+/).filter(Boolean); return w.length ? w.map((x) => `${Array.from(x)[0]}***`).join(' ') : 'Player'; };
 const P = (id) => S.players.find((p) => p.id === id);
+// Saved players the club still has. A deleted player stays in S.players so past sessions keep their name.
+const saved = () => S.players.filter((p) => !p.removed);
 const nm = (id) => { const p = P(id); return p ? p.name : 'Unknown'; };
 const short = (id) => { const p = P(id); return p ? (p.nick || p.name.split(' ')[0]) : '?'; };
 const initials = (name) => name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join('');
@@ -1299,7 +1301,7 @@ function syncLabel() {
 // status pill can show what has synced and what is still waiting on this device.
 const AREA = {
   confirmReq: 'Roster', declineReq: 'Roster',
-  togglePaid: 'Payments', markAllPaid: 'Payments', savePayAmount: 'Payments', togglePresent: 'Roster', allPresent: 'Roster', allAbsent: 'Roster', giveSlot: 'Roster', fillSlots: 'Roster', removeWait: 'Roster', confirmAdd: 'Roster', confirmNew: 'Roster', setLevel: 'Roster', saveEditPlayer: 'Roster',
+  togglePaid: 'Payments', markAllPaid: 'Payments', savePayAmount: 'Payments', togglePresent: 'Roster', allPresent: 'Roster', allAbsent: 'Roster', giveSlot: 'Roster', fillSlots: 'Roster', removeWait: 'Roster', confirmAdd: 'Roster', confirmNew: 'Roster', setLevel: 'Roster', saveEditPlayer: 'Roster', confirmDeletePlayer: 'Roster',
   confirmStart: 'Session', confirmCancelSession: 'Session', confirmDeleteSession: 'Session', saveSetup: 'Session setup', confirmDone: 'Session done', confirmPublish: 'Published results',
   makeMatch: 'Queue', saveEditor: 'Queue', addSuggest: 'Queue', autoCommit: 'Queue', confirmRegen: 'Queue', move: 'Queue', moveTo: 'Queue', swapSides: 'Queue', removeWaiting: 'Queue',
   confirmDispatch: 'Matches and results', placeOnCourt: 'Matches and results', startOnCourt: 'Matches and results', sendBack: 'Queue', confirmSwap: 'Queue', confirmReplace: 'Matches and results', confirmMove: 'Matches and results', setCourtFill: 'Courts and time', confirmResult: 'Matches and results', confirmSub: 'Matches and results', confirmInvalid: 'Matches and results',
@@ -1667,7 +1669,7 @@ function navRail() {
   const live = S.sessions.find((x) => x.status === 'active');
   const here = S.screen === 'home' ? 'dash' : S.screen === 'players' ? 'players' : S.screen === 'venues' ? 'venues' : S.screen === 'inventory' ? 'inventory'
     : S.screen === 'club' ? (S.ui.clubTab === 'license' || S.ui.clubTab === 'payments' ? 'license' : S.ui.clubTab === 'device' ? 'device' : 'club') : S.screen === 'console' ? 'live' : '';
-  const count = { players: S.players.length, venues: (S.venues || []).length, inventory: S.inventory.length };
+  const count = { players: saved().length, venues: (S.venues || []).length, inventory: S.inventory.length };
   const items = [
     live && ['live', 'Live session', I.n_live, 'go', 'console', live.id],
     ['dash', 'Dashboard', I.n_home, 'go', 'home'], ['players', 'Saved players', I.n_users, 'go', 'players'], ['venues', 'Venues', I.n_pin, 'go', 'venues'],
@@ -1680,7 +1682,7 @@ function navRail() {
 function clubShortcuts() {
   const items = [
     ['club', 'Club settings', 'Name, logo, founding address'],
-    ['players', 'Saved players', `${S.players.length} players`],
+    ['players', 'Saved players', `${saved().length} players`],
     ['license', 'License', 'Yearly · until Mar 31, 2027'],
     ['inventory', 'Inventory', `${S.inventory.length} items`],
     ['device', 'This device', `${S.sessions.filter((s) => s.download === 'ready' && s.status !== 'cancelled').length} session${S.sessions.filter((s) => s.download === 'ready' && s.status !== 'cancelled').length === 1 ? '' : 's'} downloaded`],
@@ -2428,12 +2430,12 @@ function savedPlayerStats() {
   const now = Date.now(), local = new Date(now + 8 * 3600e3);
   const monday = Date.UTC(local.getUTCFullYear(), local.getUTCMonth(), local.getUTCDate() - (local.getUTCDay() + 6) % 7) - 8 * 3600e3;
   const cards = [
-    ['Total players', S.players.length],
-    ['Total registered', S.players.filter((p) => p.identity === 'registered').length],
-    ['Total beginners', S.players.filter((p) => bandOf(p) === 'beginner').length],
-    ['Total intermediates', S.players.filter((p) => bandOf(p) === 'intermediate').length],
-    ['Total advanced', S.players.filter((p) => bandOf(p) === 'advanced').length],
-    ['New players this week', S.players.filter((p) => p.added >= monday && p.added <= now).length],
+    ['Total players', saved().length],
+    ['Total registered', saved().filter((p) => p.identity === 'registered').length],
+    ['Total beginners', saved().filter((p) => bandOf(p) === 'beginner').length],
+    ['Total intermediates', saved().filter((p) => bandOf(p) === 'intermediate').length],
+    ['Total advanced', saved().filter((p) => bandOf(p) === 'advanced').length],
+    ['New players this week', saved().filter((p) => p.added >= monday && p.added <= now).length],
   ];
   return `<section class="sp-stats" aria-label="Saved player statistics" aria-roledescription="carousel">
     <div class="sp-stats-head"><p class="small muted">All saved players · This week starts Monday (Asia/Manila)</p><div class="sp-stats-controls">
@@ -2472,10 +2474,10 @@ function viewPlayers() {
   const day = 864e5, now = Date.now();
   const age = (p) => now - addedAt(p);
   const addedOk = { any: () => true, 7: (p) => age(p) <= 7 * day, 30: (p) => age(p) <= 30 * day, 90: (p) => age(p) <= 90 * day, older: (p) => age(p) > 90 * day };
-  const cities = [...new Set(S.players.map(regCity).filter(Boolean))].sort();
+  const cities = [...new Set(saved().map(regCity).filter(Boolean))].sort();
   const { sort: _sort, ...filters } = SP_FILTERS;
   const opts = { ...filters, city: ['Registered in', [['all', 'Anywhere'], ...cities.map((c) => [c, c]), ['none', 'Not registered yet']]] };
-  const list = S.players.filter((p) => (!q || p.name.toLowerCase().includes(q) || (p.nick || '').toLowerCase().includes(q) || (p.rtr || '').toLowerCase().includes(q))
+  const list = saved().filter((p) => (!q || p.name.toLowerCase().includes(q) || (p.nick || '').toLowerCase().includes(q) || (p.rtr || '').toLowerCase().includes(q))
     && (f.band === 'all' || bandOf(p) === f.band)
     && (f.city === 'all' || (regCity(p) || 'none') === f.city)
     && addedOk[f.added](p)
@@ -2489,13 +2491,13 @@ function viewPlayers() {
   const active = ['band', 'city', 'added', 'status', 'live'].filter((k) => f[k] !== { band: 'all', city: 'all', added: 'any', status: 'all', live: 'all' }[k]).length;
   return `<main class="wrap">
     <div class="crumb"><button class="btn sm ghost" data-act="go" data-to="home">${I.back} Home</button></div>
-    <div class="between"><div><h1>Saved players</h1><p class="muted small">${S.players.length} players this club has played with</p></div><button class="btn primary" data-act="openAddSaved">Add player</button></div>
+    <div class="between"><div><h1>Saved players</h1><p class="muted small">${saved().length} players this club has played with</p></div><button class="btn primary" data-act="openAddSaved">Add player</button></div>
     ${savedPlayerStats()}
     <div class="sp-tools-wrap"><div class="sp-tools">
       <label class="field sp-search"><span>Search</span><input class="input" id="saved-search" data-bind="ui.search" data-rerender placeholder="Name or nickname" value="${esc(S.ui.search)}"></label>
       ${Object.entries(opts).map(([k, [label, choices]]) => `<label class="field"><span>${label}</span><select class="input" id="sp-${k}" data-act-change="spSet" data-k="${k}">${choices.map(([v, l]) => `<option value="${esc(v)}" ${String(f[k]) === v ? 'selected' : ''} ${k === 'live' && v !== 'all' && !live ? 'disabled' : ''}>${esc(l)}</option>`).join('')}</select></label>`).join('')}
     </div></div>
-    <div class="between small"><span class="muted" aria-live="polite">Showing ${list.length} of ${S.players.length} · ${live ? `${esc(live.title)} is live` : 'No session is live right now'}</span>${active || q ? `<button class="btn xs ghost" data-act="spClear">Clear ${active ? `${active} filter${active > 1 ? 's' : ''}` : 'search'}</button>` : ''}</div>
+    <div class="between small"><span class="muted" aria-live="polite">Showing ${list.length} of ${saved().length} · ${live ? `${esc(live.title)} is live` : 'No session is live right now'}</span>${active || q ? `<button class="btn xs ghost" data-act="spClear">Clear ${active ? `${active} filter${active > 1 ? 's' : ''}` : 'search'}</button>` : ''}</div>
     ${list.length ? `<div class="sp-body">
       <div class="sp-sections">${Object.keys(groups).sort((a, b) => (a === '#') - (b === '#') || a.localeCompare(b)).map((L) => `<section class="sp-sec" id="sp-${L === '#' ? 'num' : L}" aria-labelledby="sp-h-${L === '#' ? 'num' : L}">
         <h2 class="sp-letter" id="sp-h-${L === '#' ? 'num' : L}" tabindex="-1">${L}<span class="small muted">${groups[L].length}</span></h2>
@@ -3601,7 +3603,19 @@ const SHEETS = {
       </dl>
       ${p.identity === 'guest' ? `<section class="stack tight" aria-labelledby="guest-invite-h"><h3 id="guest-invite-h" style="margin:0;font-size:14px">Invite to ROTRA</h3><p class="small muted">Send this link so they can sign in to ROTRA Player. Their guest record isn't linked automatically.</p><div class="row"><button class="btn" data-act="copyGuestInvite">Copy invite link</button>${navigator.share ? '<button class="btn" data-act="shareGuestInvite">Share</button>' : ''}</div></section>` : ''}
       <p class="small muted">Levels are set per session while preparing a roster, not here.</p>`,
-      `${sh.back ? `<button class="btn" data-act="profileBack">Back to ${{ suggest: 'suggestion', payments: 'payments', dispatch: 'match', match: 'match', onCourt: 'match', invalid: 'match' }[sh.back.type] || 'previous'}</button>` : '<button class="btn" data-act="closeSheet">Close</button>'}${canInvite(p) ? `<button class="btn" data-act="openEditPlayer" data-id="${p.id}">Edit details</button><button class="btn primary" data-act="openInvite" data-id="${p.id}">Invite</button>` : ''}`);
+      `${sh.back ? `<button class="btn" data-act="profileBack">Back to ${{ suggest: 'suggestion', payments: 'payments', dispatch: 'match', match: 'match', onCourt: 'match', invalid: 'match' }[sh.back.type] || 'previous'}</button>` : '<button class="btn" data-act="closeSheet">Close</button>'}${sh.back ? '' : `<button class="btn danger" data-act="deletePlayer" data-id="${p.id}">Delete player</button>`}${canInvite(p) ? `<button class="btn" data-act="openEditPlayer" data-id="${p.id}">Edit details</button><button class="btn primary" data-act="openInvite" data-id="${p.id}">Invite</button>` : ''}`);
+  },
+  deletePlayer(sh) {
+    // Only reached when the player is in the Active Session (D-DELETE-PLAYER). Elsewhere Delete player acts at once.
+    const p = P(sh.id), s = S.sessions.find((x) => x.status === 'active' && R(x, p.id));
+    const game = s && busyOf(s, p.id);
+    const att = s ? waiting(s).filter((m) => all(m).includes(p.id)).length : 0;
+    if (game) return sheetShell(`Can't delete ${esc(p.name)} yet`, `<p>${esc(short(p.id))} is ${busyText(s, game)}. Finish or substitute that match first, then delete them.</p>`,
+      '<button class="btn" data-act="closeSheet" data-autofocus>Back</button>');
+    return sheetShell(`Delete ${esc(p.name)}?`, `
+      <p>${esc(short(p.id))} is in <b>${esc(s.title)}</b>, which is running now. They'll be marked not present${att ? `, and ${att} waiting match${att === 1 ? '' : 'es'} with them will need attention` : ''}.</p>
+      <p>They're also taken out of any prepared or upcoming session. Their finished games and results stay.</p>`,
+      `<button class="btn" data-act="closeSheet" data-autofocus>Keep player</button><button class="btn danger" data-act="confirmDeletePlayer" data-id="${p.id}">Delete player</button>`);
   },
   editPlayer(sh) {
     // Saved players › player › Edit details. Guests and unclaimed profiles only: a registered player owns their details.
@@ -3731,8 +3745,8 @@ const SHEETS = {
     body += `<div class="seg" role="group" aria-label="How to add">${[['saved', 'Saved players'], ['global', 'Player Information'], ['new', 'New player']].filter(([k]) => !club || k !== 'saved').map(([k, l]) => `<button aria-pressed="${tab === k}" data-act="sheetSet" data-k="tab" data-v="${k}">${l}</button>`).join('')}</div>${club && sh.err && !sh.pick && tab === 'global' ? notice('bad', esc(sh.err)) : ''}`;
     if (tab === 'saved') {
       // Players already on the roster or waitlist are left out of the list rather than shown greyed out.
-      const list = S.players.filter((p) => !inRoster.has(p.id) && (!q || p.name.toLowerCase().includes(q) || (p.nick || '').toLowerCase().includes(q) || (p.rtr || '').toLowerCase().includes(q)));
-      const added = S.players.filter((p) => inRoster.has(p.id)).length;
+      const list = saved().filter((p) => !inRoster.has(p.id) && (!q || p.name.toLowerCase().includes(q) || (p.nick || '').toLowerCase().includes(q) || (p.rtr || '').toLowerCase().includes(q)));
+      const added = saved().filter((p) => inRoster.has(p.id)).length;
       body += `<label class="field"><span>Search saved players</span><input class="input" id="add-q" data-bind="ui.sheet.q" data-rerender value="${esc(sh.q || '')}" placeholder="Name, nickname or RTR ID" data-autofocus></label>
         ${added ? `<p class="small muted">${added} saved player${added > 1 ? 's are' : ' is'} already in this session and not listed.</p>` : ''}
         <div class="sel-list">${list.map((p) => `<button class="opt" data-act="pickPlayer" data-id="${p.id}">${avatar(p)}<div class="main"><b>${esc(p.name)}</b><div class="small muted">${p.rtr ? esc(p.rtr) : 'Guest'}</div></div>${identChip(p)}</button>`).join('') || (added && !q ? '<div class="empty">Every saved player is already in this session. Add someone new or search Player Information.</div>' : '<div class="empty">No saved player matches. Try Player Information or add a new player.</div>')}</div>`;
@@ -4357,6 +4371,24 @@ const ACT = {
   },
   shareGuestInvite: () => { try { navigator.share({ title: 'Sign in to ROTRA Player', url: 'https://player.rotra.club/login' }).catch(() => {}); } catch (e) { /* share unavailable */ } },
   openInvite: (d) => openSheet({ type: 'invite', id: d.id }),
+  deletePlayer: (d) => {
+    const inActive = S.sessions.some((x) => x.status === 'active' && R(x, d.id));
+    if (inActive) { openSheet({ type: 'deletePlayer', id: d.id }); return; }
+    ACT.confirmDeletePlayer(d);
+  },
+  confirmDeletePlayer: (d) => {
+    // Hidden from the club; finished sessions keep them. Active Session: Present off (waiting matches need
+    // attention). Prepared and upcoming sessions: slot and waitlist spot released.
+    const p = P(d.id);
+    S.sessions.forEach((x) => {
+      if (x.status === 'active') { const r = R(x, p.id); if (r) r.present = false; }
+      if (x.status === 'prepared') { x.roster = x.roster.filter((r) => r.pid !== p.id); x.waitlist = (x.waitlist || []).filter((w) => w.pid !== p.id); }
+    });
+    p.removed = true;
+    S.ui.sheet = null;
+    commit(`${p.name} deleted`);
+    render();
+  },
   openEditPlayer: (d) => {
     const p = P(d.id);
     openSheet({ type: 'editPlayer', id: p.id, d: { name: p.name, nick: p.nick || '', level: p.sugg ?? null, phone: '', email: p.email || '', style: p.style || '', expY: p.expY || '', expM: p.expM || '', sinceM: p.sinceM || '', sinceY: p.sinceY || '', facebook: p.social?.facebook || '', instagram: p.social?.instagram || '', youtube: p.social?.youtube || '', linkedin: p.social?.linkedin || '' } });

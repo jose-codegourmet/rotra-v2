@@ -1,6 +1,6 @@
 # Public page "Want to play?" card gets a stacked layout
 
-Status: TICKETED — #500
+Status: IN PROGRESS — #500
 Date: 2026-11-08
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Public session page › Want to play? card

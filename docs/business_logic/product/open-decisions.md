@@ -1,5 +1,8 @@
 # Open decisions before implementation
 
+> **November 8, 2026:** The owner decisions in [Offline operation and recovery](queue/modules/offline/README.md) supersede conflicting earlier offline, device, finalization, payment and conflict rules below. Late-record recovery and implementation details remain open.
+
+
 **Last verified:** 2026-11-07 for player login mapping and claim-link rules (#244); 2026-11-06 for the On court step, court filling, substitution game credit, times and days, and the connection rules for Cancel session and the court switch; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Deliberately unresolved. These are not additional approved requirements and are not a new questionnaire. Updated October 26, 2026: items the [ROTRA Queue prototype](../../../apps/mockup/queue-app/rotra-queue.html) settled are listed under [Settled by the prototype](#settled-by-the-prototype). Updated October 27, 2026: items the platform owner settled with the [ROTRA Admin prototype](../../../apps/mockup/admin-app/rotra-admin.html) are listed under [Settled by the Admin prototype](#settled-by-the-admin-prototype).
@@ -52,7 +55,7 @@ Player login mapping and claim links ([#244](https://github.com/jose-codegourmet
 | L6 · Contact collisions at claim | If the phone or email already belongs to another account, **block** and show the contact-support route. Never merge silently |
 | L7 · No claim by ID or name | An RTR ID or a name alone can never claim an account |
 
-Still open after this decision: email verification on claim; password policy and complexity; contact-change enforcement across direct provider APIs and its approval evidence; RTR ID location/date/sequence rules and simultaneous allocation; mistaken or duplicate guest links and permanent relink; failed provider application handling; guest invitation for a name-only guest.
+Still open after this decision: email verification on claim; password policy and complexity; contact-change enforcement across direct provider APIs and its approval evidence; RTR ID location/date/sequence rules and simultaneous allocation; mistaken or duplicate guest links and permanent relink; failed provider application handling. Guest registration is settled by #490 below; separate linking remains open.
 
 ## Settled by the product owner on November 6, 2026
 
@@ -186,3 +189,13 @@ Decided by the platform owner on October 27, 2026, while reviewing the [ROTRA Ad
 ## Settled by the product owner (October 31, 2026)
 
 Queue prepared capacity, individual court windows, Auto Queue generation (now called Generate matches) and draft transfer are recorded in [the owner review](../../decisions/2026-10-30-queue-flexibility/05-owner-review.md). Pairing weights, money and ranking formulas remain open where previously recorded.
+
+
+## Guest registration settled on November 8, 2026 (#490)
+
+A name-only guest invitation opens registration. Creating an account leaves the club guest record
+unlinked until a separate linking invitation is accepted. Contact matches ask whether the existing
+account is theirs before creating any duplicate: Yes requires sign-in/email recovery; No allows
+contact correction or contacting ROTRA. A match or a Yes answer never proves ownership or links
+history. Unclaimed profiles retain their existing claim-link flow. Separate guest-link invitation
+verification and mistaken-link resolution remain open.

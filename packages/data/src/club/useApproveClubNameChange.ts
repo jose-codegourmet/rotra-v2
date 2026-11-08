@@ -8,7 +8,8 @@ import { approveClubNameChange } from './fetchers'
 export function useApproveClubNameChange() {
   const client = useQueryClient()
   return useMutation({
-    mutationFn: (clubId: string) => approveClubNameChange(clubId),
+    mutationFn: ({ clubId, requestId }: { clubId: string; requestId: string }) =>
+      approveClubNameChange(clubId, requestId),
     networkMode: 'always',
     retry: false,
     onSuccess: () => invalidateAdminClubQueries(client),

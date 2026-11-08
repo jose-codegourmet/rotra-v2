@@ -1,6 +1,7 @@
 'use client'
 
 import { registeredCity } from '@rotra/data/club-player/fetchers'
+import { guestRegistrationUrl } from '@rotra/data/club-player/registration-url'
 import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import { slotCapacity } from '@rotra/data/queue-session/queueSession.rules'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
@@ -60,15 +61,6 @@ const time = (at: number) =>
   new Date(at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
 const errorMessage = (error: unknown) =>
   error instanceof Error ? error.message : 'Something went wrong. Try again.'
-
-/** ROTRA Player sign-in link for the guest invite; player self-registration does not exist yet */
-function playerLoginUrl() {
-  const base =
-    typeof location !== 'undefined' && location.hostname === 'localhost'
-      ? 'http://localhost:9001'
-      : 'https://player.rotra.club'
-  return `${base}/login`
-}
 
 /**
  * Q-ROSTER in preparation: the Roster and levels tab (RosterPanel) or the Waitlist tab
@@ -232,7 +224,7 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
           addedLabel={longDateLabel(profile.addedAt)}
           sessionsHere={profile.sessionsHere}
           phoneHidden={profile.phoneHidden}
-          inviteUrl={playerLoginUrl()}
+          inviteUrl={guestRegistrationUrl(profile.clubId)}
         />
       ) : null}
     </>

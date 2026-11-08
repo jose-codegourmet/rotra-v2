@@ -22,7 +22,7 @@ Profile creation does not bypass the valid-session performance gate. After a ret
 
 ## Recover or change contact information
 
-- Forgotten password: send recovery email; the operator does not issue replacement credentials.
+- Forgotten password: submit the account email for Admin review; no automatic email. ROTRA Admin verifies ownership and provides a reset link; the player chooses their own password (#491).
 - Phone/email change: request help from the platform owner; Admin must manually approve.
 - Public rank and match history are not player-editable account fields.
 

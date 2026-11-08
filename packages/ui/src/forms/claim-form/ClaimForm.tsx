@@ -23,6 +23,10 @@ export type ClaimFormProps = {
   isPending?: boolean
   /** An email or phone problem shows under that field; anything else as a notice at the top */
   serverError?: { message: string; field?: 'email' | 'phone' }
+  /** Guest invitation: empty registration, with no existing profile or guest linkage. */
+  standalone?: boolean
+  accountMatch?: boolean
+  onDismissMatch?: () => void
 }
 const sectionLabel = 'text-xs font-semibold tracking-[0.5px] text-fg2 uppercase'
 function Required({ children }: { children: string }) {
@@ -43,6 +47,9 @@ export function ClaimForm({
   onSubmit,
   isPending = false,
   serverError,
+  standalone = false,
+  accountMatch = false,
+  onDismissMatch,
 }: ClaimFormProps) {
   const [showPasswords, setShowPasswords] = useState(false)
   const form = useForm<ClaimValues>({
@@ -74,7 +81,11 @@ export function ClaimForm({
     <LinkPage
       label={`Registration link from ${clubName}`}
       title="Finish registering"
-      description="Your club filled in what it knows. Check it, change anything that's wrong, and choose a password."
+      description={
+        standalone
+          ? 'Create your ROTRA account with your phone and email. Your club guest record stays unlinked until you accept a separate linking invitation.'
+          : "Your club filled in what it knows. Check it, change anything that's wrong, and choose a password."
+      }
     >
       <FormProvider {...form}>
         <Card asChild>
@@ -89,6 +100,34 @@ export function ClaimForm({
               submitOnce(() => onSubmit(needsPhone ? values : { ...values, phone: '' }))
             })}
           >
+            {accountMatch ? (
+              <Notice
+                tone="warn"
+                title="Is this your account?"
+                action={
+                  <>
+                    <Button asChild variant="primary">
+                      <a href="/login">Yes, sign in</a>
+                    </Button>
+                    <Button asChild>
+                      <a href="/forgot-password">Recover account</a>
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        onDismissMatch?.()
+                        form.setFocus('phone')
+                      }}
+                    >
+                      No, edit my details
+                    </Button>
+                  </>
+                }
+              >
+                A ROTRA account or profile already uses this phone number or email. If you have not
+                registered yet, ask your club for your profile's registration link. Otherwise
+                correct your details or contact ROTRA for help. No accounts were linked.
+              </Notice>
+            ) : null}
             {serverError && !serverError.field ? (
               <Notice tone="error">{serverError.message}</Notice>
             ) : null}
@@ -100,7 +139,9 @@ export function ClaimForm({
                   hint={
                     errors.phone
                       ? undefined
-                      : 'This profile has no phone yet. Add your mobile number; it identifies your ROTRA profile.'
+                      : standalone
+                        ? 'Your mobile number identifies your ROTRA profile. Never shown publicly.'
+                        : 'This profile has no phone yet. Add your mobile number; it identifies your ROTRA profile.'
                   }
                   error={errors.phone?.message}
                 >

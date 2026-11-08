@@ -7,6 +7,7 @@ import type {
   DeleteImpact,
 } from '../club-player/clubPlayer.types'
 import type { ClubPlayerView } from '../club-player/fetchers'
+import { guestRegistrationUrl } from '../club-player/registrationUrl'
 import type { ClubVenue } from '../club-venue/clubVenue.types'
 import type { SaveInventoryItemInput } from '../inventory/fetchers'
 import type { InventoryItem } from '../inventory/inventory.types'
@@ -546,10 +547,10 @@ export function playerAppOrigin() {
     : 'https://player.rotra.club'
 }
 
-/** Invite: a registration link for an unclaimed profile; a guest gets the ROTRA Player login. */
+/** Invite: a registration link for an unclaimed profile; a guest gets independent registration with no guest identity attached. */
 export async function realCreatePlayerInvite(player: ClubPlayerView) {
   if (player.identity !== 'unclaimed')
-    return { url: `${playerAppOrigin()}/login`, message: 'Invite link ready' }
+    return { url: guestRegistrationUrl(player.clubId), message: 'Invite link ready' }
   const { token } = await realRequest<{ token: string; expiresAt: string }>(
     `/api/club/players/${encodeURIComponent(player.id)}/registration-link`,
     { method: 'POST' },

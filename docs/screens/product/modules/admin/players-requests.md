@@ -76,3 +76,17 @@ quick view; existing selection and bulk-action behavior is unchanged (#392).
 
 Player action menus render above the table/card scroll containers, stay inside the viewport, and
 scroll internally when needed. Escape closes the menu and restores focus to its trigger.
+
+## A-PASSWORD-REQUESTS — Password resets (#491)
+
+`/requests/password-resets`, under Requests. Paginated newest-first cards show the submitted email,
+request time, matched player name/RTR ID (or no eligible account), and Pending review, Link issued,
+or Declined. Existing player details remain the support context. The request itself does not prove
+ownership. Confirm “I have verified this player owns this account” before Generate reset link or
+Replace reset link. Pending requests can be declined. No evidence upload or delivery channel is added.
+
+The generated link appears only in the issuing response, with Copy link and instructions to share
+privately with the verified player. It is not included in list/history reads, storage or analytics.
+Link issued does not mean delivered or password changed. Replacement invalidates the earlier ROTRA
+link; provider expiry applies. Show load, empty, retry, pending and mutation errors; preserve review
+context after a failure. All reads/actions require the active platform-owner account and internet.

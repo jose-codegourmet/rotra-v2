@@ -37,3 +37,9 @@ at paste time — see the branch-compose section in the matrix doc.
   dashboard.
 - Adding or removing a template file REQUIRES flipping its checkbox in
   `docs/email-templates.md` in the same PR.
+
+## Player password recovery (#491)
+
+Forgot password now creates an Admin review request without sending email. The recovery template is
+retained as reference only. Admin generates a provider recovery link after ownership verification and
+shares it privately; the player chooses their password. Supabase's configured expiry still applies.

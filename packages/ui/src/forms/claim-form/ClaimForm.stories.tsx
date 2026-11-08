@@ -38,3 +38,11 @@ export const OfflineServerError: Story = {
   args: { serverError: { message: claimLinkScenarios.offline } },
 }
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
+
+/** Guest registration shares the same form, with no profile prefill or guest linkage. */
+export const GuestRegistration: Story = {
+  args: { standalone: true, maskedPhone: '', defaultValues: {} },
+}
+export const GuestAccountMatch: Story = {
+  args: { standalone: true, maskedPhone: '', accountMatch: true, onDismissMatch: fn() },
+}

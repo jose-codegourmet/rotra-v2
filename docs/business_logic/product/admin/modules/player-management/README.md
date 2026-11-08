@@ -27,3 +27,18 @@ Registration links open `/claim/{token}`, expire after seven days, and are issue
 Bulk actions: Archive, Restore, Remove (only when all selected records qualify), Export CSV and Copy RTR IDs. CSV includes name, nickname, RTR ID, account, rank, clubs, added and place, never contacts. Selection survives pages and view changes; filters clear it. Mutations report each record and retry only failures.
 
 Management mutations remain an in-memory mock. In real mode, the directory, identity detail, selected-ID reads and read-only history load persisted players through Admin-only endpoints (2026-11-01). Contact-request reads, Decline and the Record of actions also load saved data (#401). Approving and applying a contact change, ranking-settings reads and durable player mutations, including claim-link transport, remain F07 work.
+
+## Reviewed password recovery (#491, owner request November 8, 2026)
+
+Player Forgot password submits the registered email for Admin review, without automatic email.
+Known and unknown addresses receive the same acknowledgement. Repeated submissions while pending
+reuse that request. Admin alone sees requests, including unmatched addresses, and can decline or
+verify ownership through ROTRA support before generating a link. Matching email alone is not proof.
+Only an enabled player account with unchanged email and synchronized provider identity is eligible.
+An unmatched or changed account must use a fresh, corrected request, never manual reassignment.
+
+Admin never sets or sees the password. Copy the generated link for private manual delivery using
+the chosen support channel. The player sets their password at the existing reset screen; Supabase
+controls recovery expiry and single use. ROTRA also binds the issued token digest to the reviewed
+player/account, rejects unreviewed or replaced links, and records issuance/decline without secrets.
+Generating a replacement requires ownership confirmation again. Link issued is not delivery proof.

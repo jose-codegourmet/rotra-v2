@@ -8,6 +8,7 @@ import { checkMockSave, getMockDevState } from '../mock/bridge'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { mockStore, readMockState } from '../mock/store'
+import { submitMockPasswordReset } from '../password-reset/fetchers'
 import { applyPersonalProfile } from '../player/fetchers'
 import { isRealDataMode } from '../real/mode'
 import {
@@ -48,7 +49,7 @@ export async function requestPasswordReset(email: string) {
       'offline',
       "Couldn't send because you're offline. Try again when you're connected.",
     )
-  emailField.parse(email)
+  submitMockPasswordReset(emailField.parse(email))
   return { acknowledged: true }
 }
 /** Real mode can't check a recovery token without using it up, so the form opens and submit decides. */

@@ -97,3 +97,6 @@ All apps use `/login`. Queue public session links use `/s/[slug]`; the rest of Q
 Admin routes except `/login` are protected. Player `/` (leaderboard) and `/players/[playerId]` are
 public; `/me` and its children are protected. The Foundation proxy wires these boundaries only;
 sign-in forms and the remaining screens arrive in their product tickets.
+
+Guest registration invitations (#490) open `/register/[clubId]` in Player Information, with no
+sign-in required. The club is RTR allocation context only; existing profiles still use `/claim/[token]`.

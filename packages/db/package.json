@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./player/guest-registration": "./src/player/guest-registration.ts",
     "./client": "./src/client/prisma.ts",
     "./admin/club-identity": "./src/admin/club-identity.ts",
     "./player/rtr-id": "./src/player/rtr-id.ts",
@@ -49,7 +50,8 @@
     "./admin/retention": "./src/admin/retention.ts",
     "./auth/sign-in": "./src/auth/sign-in.ts",
     "./auth/supabase-provider-admin": "./src/auth/supabase-provider-admin.ts",
-    "./service/request": "./src/service/request.ts"
+    "./service/request": "./src/service/request.ts",
+    "./admin/password-resets": "./src/admin/password-resets.ts"
   },
   "scripts": {
     "db:generate": "prisma generate",

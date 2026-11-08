@@ -44,7 +44,7 @@ session page; the November 6 prototype changes (epic #408).
 | Saved players (no session) | implemented | `club-player/mutations.ts:93,120` → `api/club/players` POST | #330 |
 | Edit details (guests, unclaimed profiles) | implemented | `api/club/players/[clubPlayerId]` GET/PATCH → `db/src/queue/club-player-details.ts:68,98`; Level for this club is not saved here yet | #484, #486 |
 | Delete a saved player (D-DELETE-PLAYER) | implemented | `club-player/delete.ts:13,36` → `real/queue.ts:564,570` → `api/club/players/[clubPlayerId]/delete-impact`, DELETE → `db/src/queue/club-player-delete.ts:57,76` (soft delete, `club_players.removed_at` migration) | #487 |
-| Invite / registration link | implemented | `club-player/fetchers.ts:165` → `real/queue.ts:550` → `api/club/players/[clubPlayerId]/registration-link` → `db/src/player/claim.ts:44`; unclaimed: 7-day single-use link, a new one cancels the previous one; guests: Player login link ([D-07](../decisions.md#d-2026-11-07-07)) | #478, #483, #485 |
+| Invite / registration link | implemented | `club-player/fetchers.ts:165` → `real/queue.ts:550` → `api/club/players/[clubPlayerId]/registration-link` → `db/src/player/claim.ts:44`; unclaimed: 7-day single-use link, a new one cancels the previous one; guests: independent Player registration, no guest linkage (#490) | #478, #483, #485 |
 | Waitlist: give slot, fill, remove | implemented | `real/session-live.ts:277-293` → `api/.../waitlist/**` | #10 open |
 | Join requests (submit, confirm, decline) | implemented | `real/public-session.ts:19-49`; `real/session-live.ts:309,326` → `api/join-requests/[id]/{confirm,decline}` | #16 closed; #248 open |
 | Cost estimate, payments, mark all paid | implemented | `real/financials.ts` → `db/src/queue/financials.ts` | #17 closed; #245 open |
@@ -96,7 +96,7 @@ the URL, invite link + session QR, skill mix bar (roster and public, aggregate o
 names, operator-only preview, guest/ROTRA Player choice on Request to join, guest Invite to ROTRA,
 payment amounts with Partial/Reimburse (PRs #467–#481). **Still open:** Downloads / This device
 ([#477](https://github.com/jose-codegourmet/rotra-v2/issues/477), blocked on #246); attaching a
-signed-in player to a join request and player sign-up (invite links point to player login until then);
+signed-in player to a join request; guest registration now exists through club invitations (#490);
 whether published results and profile pictures on the public page should also be masked.
 Decisions: [D-05](../decisions.md#d-2026-11-07-05), [D-06](../decisions.md#d-2026-11-07-06),
 [D-07](../decisions.md#d-2026-11-07-07).
@@ -117,7 +117,7 @@ Decisions: [D-05](../decisions.md#d-2026-11-07-05), [D-06](../decisions.md#d-202
 - [D-2026-11-07-04](../decisions.md#d-2026-11-07-04) — scope freeze.
 - [D-2026-11-07-05](../decisions.md#d-2026-11-07-05) — payment amounts.
 - [D-2026-11-07-06](../decisions.md#d-2026-11-07-06) — masked public names.
-- [D-2026-11-07-07](../decisions.md#d-2026-11-07-07) — invite links use player login.
+- [D-2026-11-07-07](../decisions.md#d-2026-11-07-07) — guest invites now open registration (#490); Request to join still offers guest entry or login.
 
 ## Blocking open decisions
 

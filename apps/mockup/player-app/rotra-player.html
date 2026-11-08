@@ -1357,17 +1357,16 @@ function viewLogin() {
 }
 function viewForgot() {
   const F = S.ui.forgot;
-  if (F.sent) return `<main class="login"><div class="card"><h1 style="font-size:22px">Check your email</h1>
-    ${notice('ok', `If an account uses <b>${esc(F.sent)}</b>, we've sent it a link to set a new password.`)}
-    <p class="small muted">It can take a few minutes. Check spam too. Your club can't reset your password for you.</p>
-    <button class="btn block" data-act="openReset" data-v="valid">Open the reset link (prototype)</button>
+  if (F.sent) return `<main class="login"><div class="card"><h1 style="font-size:22px">Request received</h1>
+    ${notice('ok', `If an account uses <b>${esc(F.sent)}</b>, ROTRA Admin can review your request after verifying ownership.`)}
+    <p class="small muted">Contact ROTRA support through your usual channel to verify ownership. An Admin will provide your reset link. No automatic email is sent.</p>
     <button class="btn ghost block" data-act="go" data-to="login">Back to sign in</button></div></main>`;
   return `<main class="login"><form class="card" data-form="forgot" novalidate>
     ${backBtn('goLogin', 'Sign in')}<h1 style="font-size:22px">Reset your password</h1>
-    <p class="muted small">Enter the email on your ROTRA account. We'll send a link to set a new password.</p>
+    <p class="muted small">Enter the email on your ROTRA account. ROTRA Admin will review your request before providing a reset link.</p>
     ${F.err ? notice('bad', esc(F.err)) : ''}
     ${field('forgot-email', 'Email', 'ui.forgot.email', F.email, '', { type: 'email', ac: 'email', inputmode: 'email' })}
-    <button class="btn primary block" type="submit" ${F.pending ? 'disabled' : ''}>${F.pending ? 'Sending…' : 'Send reset link'}</button></form></main>`;
+    <button class="btn primary block" type="submit" ${F.pending ? 'disabled' : ''}>${F.pending ? 'Sending…' : 'Request password reset'}</button></form></main>`;
 }
 function viewReset() {
   const R = S.ui.reset;
@@ -1390,12 +1389,12 @@ function claimStatus() {
   if (S.claim === 'valid' && S.accounts.u2.claimed) return 'claimed';
   return S.claim;
 }
-function viewClaim() {
-  const a = S.accounts.u2;
-  const st = claimStatus();
+function viewClaim(standalone = false) {
+  const a = standalone ? {name: '', nick: '', email: '', phone: '', social: {}} : S.accounts.u2;
+  const st = standalone ? 'valid' : claimStatus();
   const wrap = (inner) => `<main class="wrap slim"><div class="page-head"><span class="label">Registration link from Lahug Smash Club</span>${inner}</div></main>`;
   if (st === 'claimed') return wrap(`<h1>This profile is already registered</h1>${notice('', 'This link was already used to finish registering. It can\'t create another account.')}
-    <div class="row"><button class="btn primary" data-act="go" data-to="login">Sign in</button><button class="btn" data-act="go" data-to="forgot">Reset password by email</button></div>`);
+    <div class="row"><button class="btn primary" data-act="go" data-to="login">Sign in</button><button class="btn" data-act="go" data-to="forgot">Request password reset</button></div>`);
   if (st === 'expired') return wrap(`<h1>This link can't be used</h1>${notice('bad', 'The registration link has expired or was replaced.')}
     <p class="muted">Ask the club that added you to send a new link. If you already registered, sign in instead.</p><div class="row"><button class="btn" data-act="go" data-to="login">Sign in</button></div>`);
   if (st === 'wrong') return wrap(`<h1>We've stopped here</h1>${notice('', 'Nothing was changed on this profile.')}
@@ -1405,15 +1404,16 @@ function viewClaim() {
   // Everything the club filled in (Queue › Saved players › Edit details) starts the form; the player can change it.
   const C = S.ui.claim || (S.ui.claim = { ...editFields(a), email: a.email || '', phone: '', pass: '', pass2: '', show: false });
   const e = S.ui.claimErr;
-  if (!S.ui.claimConfirmed) {
+  if (!standalone && !S.ui.claimConfirmed) {
     return wrap(`<h1>Is this you?</h1><p class="muted">Lahug Smash Club added this profile for you. Check it's yours before you set a password.</p>
       <section class="card stack"><div class="row" style="gap:14px">${avatar(a, 'xl')}<div class="stack tight"><h2>${esc(a.name)}</h2>${a.nick ? `<p class="muted">“${esc(a.nick)}”</p>` : ''}</div></div>
         <dl class="kv"><dt>Player ID</dt><dd class="mono" style="overflow-wrap:anywhere">${esc(a.rtr)}</dd><dt>Phone</dt><dd class="mono">${esc(maskPhone(a.phone))}</dd></dl>
         <div class="row"><button class="btn primary" data-act="claimYes">Yes, this is me</button><button class="btn" data-act="claimNo">This isn't me</button></div></section>`);
   }
   return `<main class="wrap slim"><div class="page-head"><span class="label">Registration link from Lahug Smash Club</span><h1>Finish registering</h1>
-    <p class="muted">Your club filled in what it knows. Check it, change anything that's wrong, and choose a password.</p></div>
-    <form class="card stack" data-form="claim" novalidate style="gap:16px">
+    <p class="muted">${standalone ? 'Create your ROTRA account with your phone and email. Your club guest record stays unlinked until you accept a separate linking invitation.' : "Your club filled in what it knows. Check it, change anything that's wrong, and choose a password."}</p></div>
+    <form class="card stack" data-form="${standalone ? 'register' : 'claim'}" novalidate style="gap:16px">
+      ${standalone && S.ui.registerMatch ? notice('warn', `A ROTRA account or profile already uses this phone number or email. Is it yours?<div class="row"><button type="button" class="btn primary" data-act="go" data-to="login">Yes, sign in</button><button type="button" class="btn" data-act="go" data-to="forgot">Recover account</button><button type="button" class="btn" data-act="registerNo">No, edit my details</button></div><p>If you have not registered yet, ask your club for your profile's registration link. Otherwise contact ROTRA for help.</p>`) : ''}
       ${S.ui.claimFail ? notice('bad', esc(S.ui.claimFail)) : ''}
       <div class="stack tight"><span class="label">Contact · private</span>
         ${a.phone ? `<div class="field"><span>Phone number</span><input class="input mono" id="cl-phone" value="${esc(maskPhone(a.phone))}" readonly aria-describedby="cl-phone-h"><span class="hint" id="cl-phone-h">Linked to this profile and can't be changed here. Not your number? Ask the club or ROTRA for help.</span></div>`
@@ -1483,7 +1483,7 @@ const SHEETS = {
         <label class="field" for="cfg-t"><span>Leaderboard match requirement</span><input class="input" id="cfg-t" type="number" min="1" max="40" value="${S.config.threshold}" data-cfg="threshold"></label></div>
         <span class="hint">Copy on the leaderboard, profiles and rank page follows these.</span></div>
       <div class="demo-sec"><span class="label">Contact-change request (Admin)</span>${reqBtns}</div>
-      <div class="demo-sec"><span class="label">Open a registration link (Jomar)</span><div class="row"><button class="btn xs" data-act="openClaim" data-v="valid">Unused</button><button class="btn xs" data-act="openClaim" data-v="processing">Still processing</button><button class="btn xs" data-act="openClaim" data-v="expired">Expired</button></div>
+      <div class="demo-sec"><button class="btn" data-act="openRegister">Guest registration invitation</button></div><div class="demo-sec"><span class="label">Open a registration link (Jomar)</span><div class="row"><button class="btn xs" data-act="openClaim" data-v="valid">Unused</button><button class="btn xs" data-act="openClaim" data-v="processing">Still processing</button><button class="btn xs" data-act="openClaim" data-v="expired">Expired</button></div>
         <span class="hint">Once Jomar registers, the unused link shows as already used.</span></div>
       <div class="demo-sec"><span class="label">Open a password reset link</span><div class="row"><button class="btn xs" data-act="openReset" data-v="valid">Valid</button><button class="btn xs" data-act="openReset" data-v="expired">Expired or used</button></div></div>
       <div class="demo-sec"><div class="setting"><div class="main"><b>Next profile save fails</b><p class="small muted">Shows the error and keeps the edits.</p></div>${sw(S.failNext, 'toggleFail', 'Next profile save fails')}</div></div>
@@ -1634,6 +1634,8 @@ const ACT = {
   toggleOnline: () => { S.online = !S.online; S.offlineAt = S.online ? null : Date.now(); render(); },
   toggleFail: () => { S.failNext = !S.failNext; render(); },
   openClaim: (el) => { S.claim = el.dataset.v; S.ui.claimConfirmed = false; S.ui.claimWrong = false; S.ui.claimErr = {}; S.ui.claimFail = ''; S.ui.claimChecks = 0; S.ui.sheet = null; go('claim'); },
+  registerNo: () => { S.ui.registerMatch = false; S.ui.claimFail = 'Correct your phone or email, or contact ROTRA for help. No accounts were linked.'; render(); },
+  openRegister: () => { S.ui.claim = null; S.ui.claimErr = {}; S.ui.claimFail = ''; S.ui.registerMatch = false; go('register'); },
   claimYes: () => { S.ui.claimConfirmed = true; render(); window.scrollTo(0, 0); },
   claimNo: () => { S.ui.claimWrong = true; render(); },
   claimBack: () => { S.ui.claimWrong = false; render(); },
@@ -1748,6 +1750,19 @@ const FORM = {
       if (!S.online) { S.ui.claimFail = 'You\'re offline, so registration wasn\'t sent. Your details are still here; try again when you\'re connected.'; return; }
       finishClaim(C);
     });
+  },
+  register: () => {
+    const C = S.ui.claim, e = validatePersonal(C);
+    if (!normPhone(C.phone || '')) e.phone = 'Enter a Philippine mobile number, like 0917 555 0142.';
+    if (!validEmail(C.email || '')) e.email = 'Enter an email address, like name@example.com.';
+    if (!C.pass) e.pass = 'Choose a password.';
+    if (C.pass !== C.pass2) e.pass2 = 'The two passwords do not match.';
+    S.ui.claimErr = e;
+    if (Object.keys(e).length) { render(); return; }
+    if (!S.online) { S.ui.claimFail = 'You are offline. Your details are still here; try again when connected.'; render(); return; }
+    S.ui.registerMatch = Object.values(S.accounts).some(a => (a.phone && digits(a.phone) === normPhone(C.phone)) || (a.email && a.email.toLowerCase() === C.email.trim().toLowerCase()));
+    if (!S.ui.registerMatch) S.ui.claimFail = 'Prototype only: registration complete. Your guest record stays unlinked; no account is saved by this preview.';
+    render();
   },
   request: () => ACT.submitRequest(),
 };
@@ -1870,7 +1885,7 @@ function render() {
   const focusId = a && a.id && a !== document.body ? a.id : null;
   let sel = null;
   try { sel = a && typeof a.selectionStart === 'number' ? a.selectionStart : null; } catch (e) { sel = null; }
-  const views = { board: viewBoard, profile: viewProfile, rank: viewRank, history: viewHistory, compare: viewCompare, id: viewId, account: viewAccount, edit: viewEdit, login: viewLogin, forgot: viewForgot, reset: viewReset, claim: viewClaim, claimDone: viewClaimDone, notfound: viewNotFound };
+  const views = { register: () => viewClaim(true), board: viewBoard, profile: viewProfile, rank: viewRank, history: viewHistory, compare: viewCompare, id: viewId, account: viewAccount, edit: viewEdit, login: viewLogin, forgot: viewForgot, reset: viewReset, claim: viewClaim, claimDone: viewClaimDone, notfound: viewNotFound };
   const sh = S.ui.sheet;
   document.getElementById('app').innerHTML = topBar() + (views[S.screen] || viewBoard)() + (sh ? SHEETS[sh.type](sh) : '');
   document.body.style.overflow = sh ? 'hidden' : '';

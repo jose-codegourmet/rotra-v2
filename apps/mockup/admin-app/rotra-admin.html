@@ -791,7 +791,7 @@ function topBar() {
     <button class="btn xs" data-act="openDemo">Prototype</button>
   </div></header>${S.online ? '' : `<div class="band-off" role="status"><div class="in">${I.alert}<span><b>You're offline.</b> Showing what this browser loaded at ${fmtTime(S.offlineAt || Date.now())}. Activating licenses, approving requests and saving settings need an internet connection.</span></div></div>`}`;
 }
-const HERE = { clubs: 'clubs', club: 'clubs', players: 'players', player: 'players', sales: 'sales', contacts: 'contacts', review: 'contacts', names: 'names', config: 'config', flags: 'flags' };
+const HERE = { clubs: 'clubs', club: 'clubs', players: 'players', player: 'players', sales: 'sales', contacts: 'contacts', review: 'contacts', names: 'names', passwords: 'passwords', config: 'config', flags: 'flags' };
 function rail() {
   const here = HERE[S.screen];
   const link = (k, label, ic, count, hot) => `<button class="rail-link ${k === here ? 'on' : ''}" data-act="go" data-to="${k}" ${k === here ? 'aria-current="page"' : ''}>${ic}<span>${label}</span>${count != null ? `<span class="count ${hot && count ? 'hot' : ''}">${count}</span>` : ''}</button>`;
@@ -802,6 +802,7 @@ function rail() {
     <div class="rail-label">Requests</div>
     ${link('contacts', 'Contact changes', I.n_contact, attentionContacts(), true)}
     ${link('names', 'Club names', I.n_name, pendingNames(), true)}
+    ${link('passwords', 'Password resets', I.n_contact, null, true)}
     <div class="rail-label">Settings</div>
     ${link('config', 'Ranking', I.n_rank)}
     ${link('flags', 'Feature flags', I.n_flag, S.flags.length)}
@@ -968,6 +969,20 @@ function viewClub() {
     <div class="hero">${logo(c, 'lg')}<div class="main"><h1>${esc(c.name)}</h1><div class="row">${accessChip(a)}${a.plan ? chip(a.plan) : ''}${c.live ? `<span class="small live"><i></i>Session running</span>` : ''}</div></div></div>
     <div class="tabs" role="tablist" aria-label="Club sections">${TABS.map(([k, l, badge]) => `<button role="tab" id="ctab-${k}" aria-selected="${k === tab}" aria-controls="club-panel" data-act="clubTab" data-v="${k}">${l}${badge}</button>`).join('')}</div>
     <div id="club-panel" role="tabpanel" aria-labelledby="ctab-${tab}" class="stack" style="gap:20px">${panels[tab]}</div>`);
+}
+
+// ---------- Password reset requests (#491) ----------
+const passwordDemo = { status: 'pending', verified: false, link: false };
+function viewPasswordResets() {
+  const r = passwordDemo, p = S.players[0];
+  return shell(`<div class="page-head"><h1>Password resets</h1><p class="muted">Verify account ownership through ROTRA support before generating a link. No automatic email is sent.</p></div>
+    <section class="card stack"><div class="between"><div><h2>${esc(p.name)}</h2><p class="small muted">${esc(p.email)}</p><p class="small muted mono">${esc(p.rtr)}</p></div><b class="small">${r.status === 'pending' ? 'Pending review' : r.status === 'declined' ? 'Declined' : 'Link issued'}</b></div>
+    <p class="small muted">Requested just now</p>${r.status !== 'pending' ? '<p class="small muted">Reviewed by ROTRA Admin · just now</p>' : ''}
+    ${r.status !== 'declined' ? `<label style="display:flex;align-items:flex-start;gap:10px;border:1px solid var(--border-strong);border-radius:var(--r-sm);padding:10px 12px;cursor:pointer"><input type="checkbox" style="width:22px;height:22px;flex:none;accent-color:var(--accent);margin-top:2px" data-act="passwordVerify" ${r.verified ? 'checked' : ''}><span><b>I have verified this player owns this account.</b><span class="small muted" style="display:block">A matching email and this request alone do not prove ownership.</span></span></label>
+    <div class="row"><button class="btn sm" data-act="openPlayer" data-id="${p.id}">View player</button><button class="btn primary" data-act="passwordIssue" ${!r.verified || !S.online ? 'disabled' : ''}>${r.status === 'issued' ? 'Replace reset link' : 'Generate reset link'}</button>
+    ${r.status === 'pending' ? '<button class="btn" data-act="passwordDecline">Decline</button>' : ''}</div>` : ''}
+    ${r.link ? notice('ok', 'Reset link generated. Share it privately with the verified player. It expires under the configured recovery policy and can be used once.') + '<input class="input" aria-label="Reset link" readonly value="https://player.rotra.club/reset-password/prototype-only"><div class="row"><button class="btn" data-act="passwordCopy">Copy link</button></div><p class="small muted">No email was sent. Link issued does not mean delivered or password changed.</p>' : ''}</section>
+    <nav class="row" aria-label="Password reset request pages"><button class="btn" disabled>Previous</button><span class="small muted">Page 1 · 1 requests</span><button class="btn" disabled>Next</button></nav>`);
 }
 
 // ---------- Club names ----------
@@ -1566,6 +1581,10 @@ function licDone(r, found) {
 }
 
 const ACT = {
+  passwordVerify: () => { passwordDemo.verified = !passwordDemo.verified; render(); },
+  passwordIssue: () => { if (!passwordDemo.verified || !S.online) return; passwordDemo.status = 'issued'; passwordDemo.verified = false; passwordDemo.link = true; render(); },
+  passwordDecline: () => { passwordDemo.status = 'declined'; passwordDemo.link = false; render(); },
+  passwordCopy: () => { navigator.clipboard.writeText('https://player.rotra.club/reset-password/prototype-only').then(() => toast('Link copied.')); },
   go: (el) => go(el.dataset.to, undefined),
   openClub: (el) => { S.ui.clubTab = 'overview'; go('club', el.dataset.id, el.dataset.anchor); },
   clubTab: (el) => { S.ui.clubTab = el.dataset.v; render(); },
@@ -1896,7 +1915,7 @@ document.addEventListener('keydown', (ev) => {
 let prototypeRouter;
 let prototypeReturn = null;
 let prototypeSignedIn = !!S.me;
-const adminPaths = { clubs: '/clubs', players: '/players', sales: '/sales', contacts: '/requests/contact-changes', names: '/requests/club-names', config: '/settings/ranking', flags: '/settings/feature-flags', login: '/login' };
+const adminPaths = { clubs: '/clubs', players: '/players', sales: '/sales', contacts: '/requests/contact-changes', names: '/requests/club-names', passwords: '/requests/password-resets', config: '/settings/ranking', flags: '/settings/feature-flags', login: '/login' };
 function prototypeBeforeRender() {
   if (S.me && !prototypeSignedIn && prototypeReturn) { const target = prototypeReturn; prototypeReturn = null; applyPrototypeRoute(target); }
   prototypeSignedIn = !!S.me;
@@ -1942,7 +1961,7 @@ function render() {
   let page;
   if (!S.me || S.screen === 'login') page = viewLogin();
   else if (S.denied) page = viewDenied();
-  else page = ({ clubs: viewClubs, club: viewClub, players: viewPlayers, sales: viewSales, player: viewPlayer, contacts: viewContacts, review: viewReview, names: viewNames, config: viewConfig, flags: viewFlags }[S.screen] || viewClubs)();
+  else page = ({ clubs: viewClubs, club: viewClub, players: viewPlayers, sales: viewSales, player: viewPlayer, contacts: viewContacts, review: viewReview, names: viewNames, passwords: viewPasswordResets, config: viewConfig, flags: viewFlags }[S.screen] || viewClubs)();
   const sh = S.ui.sheet;
   // Privileged sheets only render inside a signed-in owner session; the Prototype sheet is always available.
   const showSheet = sh && (sh.type === 'demo' || (S.me && !S.denied));

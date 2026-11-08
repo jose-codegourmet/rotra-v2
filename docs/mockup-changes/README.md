@@ -92,7 +92,7 @@ Never ticket a log that is anything but `NEW`.
 ## 5. Status index
 
 <!-- status-index:start -->
-NEW: 32 · ALREADY A TICKET: 32
+NEW: 32 · ALREADY A TICKET: 34
 
 | Log | Change | Status |
 |---|---|---|
@@ -132,12 +132,14 @@ NEW: 32 · ALREADY A TICKET: 32
 | [2026-11-07-queue-roster-skill-mix-bar](2026-11-07-queue-roster-skill-mix-bar.md) | Skill mix bar above the roster when grouped by Skill group | ALREADY A TICKET — #472 |
 | [2026-11-07-queue-session-qr](2026-11-07-queue-session-qr.md) | Session QR button and sheet added to the Preparation header | ALREADY A TICKET — #471 |
 | [2026-11-08-admin-club-sales-tab](2026-11-08-admin-club-sales-tab.md) | Club page gets a Sales tab | NEW |
+| [2026-11-08-admin-password-reset-requests](2026-11-08-admin-password-reset-requests.md) | Admin-reviewed password reset requests | ALREADY A TICKET — #491 |
 | [2026-11-08-admin-players-layout](2026-11-08-admin-players-layout.md) | Admin Players page gets a cleaner layout | NEW |
 | [2026-11-08-admin-sales-page](2026-11-08-admin-sales-page.md) | Admin gets a Sales page | NEW |
 | [2026-11-08-player-change-avatar](2026-11-08-player-change-avatar.md) | Players can change their profile picture | NEW |
 | [2026-11-08-player-claim-prefill-and-experience](2026-11-08-player-claim-prefill-and-experience.md) | Registration form is prefilled by the club; experience has linked Playing since | ALREADY A TICKET — #484 |
 | [2026-11-08-player-compare-players](2026-11-08-player-compare-players.md) | Compare yourself with another player | NEW |
 | [2026-11-08-player-email-sign-in](2026-11-08-player-email-sign-in.md) | Player sign-in takes an email only, not a phone number | ALREADY A TICKET — #483 |
+| [2026-11-08-player-guest-registration](2026-11-08-player-guest-registration.md) | Guest invitations open registration | ALREADY A TICKET — #490 |
 | [2026-11-08-queue-delete-player](2026-11-08-queue-delete-player.md) | Saved players: Delete player | ALREADY A TICKET — #487 |
 | [2026-11-08-queue-edit-player-details](2026-11-08-queue-edit-player-details.md) | Queue Master can edit a guest's or unclaimed player's details before inviting them | ALREADY A TICKET — #484 |
 | [2026-11-08-queue-invite-cancels-previous-link](2026-11-08-queue-invite-cancels-previous-link.md) | Invite cancels the previous registration link again | ALREADY A TICKET — #485 |

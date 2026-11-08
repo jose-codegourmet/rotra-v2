@@ -4,6 +4,8 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./club-player/registration-url": "./src/club-player/registrationUrl.ts",
+    "./player-account/useGuestRegistration": "./src/player-account/useGuestRegistration.ts",
     "./mock/store": "./src/mock/store.ts",
     "./mock/latency": "./src/mock/latency.ts",
     "./mock/errors": "./src/mock/errors.ts",
@@ -337,7 +339,10 @@
     "./admin-player/useAdminPlayerMutations": "./src/admin-player/useAdminPlayerMutations.ts",
     "./fixtures/admin-player-management": "./src/fixtures/adminPlayerManagement.ts",
     "./admin-player/useAdminPlayerGames": "./src/admin-player/useAdminPlayerGames.ts",
-    "./admin-player/useAdminPlayerSelection": "./src/admin-player/useAdminPlayerSelection.ts"
+    "./admin-player/useAdminPlayerSelection": "./src/admin-player/useAdminPlayerSelection.ts",
+    "./password-reset/types": "./src/password-reset/passwordReset.types.ts",
+    "./password-reset/fetchers": "./src/password-reset/fetchers.ts",
+    "./password-reset/usePasswordResetRequests": "./src/password-reset/usePasswordResetRequests.ts"
   },
   "scripts": {
     "lint": "biome check .",

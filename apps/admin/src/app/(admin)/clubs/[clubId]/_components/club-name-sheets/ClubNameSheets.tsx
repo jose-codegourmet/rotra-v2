@@ -69,24 +69,32 @@ export function ClubNameSheets({ club, decision, onClose }: ClubNameSheetsProps)
 
   const doApprove = () => {
     if (blockedOffline()) return
-    approve.mutate(club.id, {
-      onSuccess: ({ changed, name: next }) => {
-        onClose()
-        if (changed) toast(`Name changed to ${next}.`)
+    if (!club.pendingNameRequest) return
+    approve.mutate(
+      { clubId: club.id, requestId: club.pendingNameRequest.id },
+      {
+        onSuccess: ({ changed, name: next }) => {
+          onClose()
+          if (changed) toast(`Name changed to ${next}.`)
+        },
+        onError: (error) => toast.error(error.message),
       },
-      onError: (error) => toast.error(error.message),
-    })
+    )
   }
 
   const doReject = () => {
     if (blockedOffline()) return
-    reject.mutate(club.id, {
-      onSuccess: ({ changed, name: kept }) => {
-        onClose()
-        if (changed) toast(`Rejected. The club keeps ${kept}.`)
+    if (!club.pendingNameRequest) return
+    reject.mutate(
+      { clubId: club.id, requestId: club.pendingNameRequest.id },
+      {
+        onSuccess: ({ changed, name: kept }) => {
+          onClose()
+          if (changed) toast(`Rejected. The club keeps ${kept}.`)
+        },
+        onError: (error) => toast.error(error.message),
       },
-      onError: (error) => toast.error(error.message),
-    })
+    )
   }
 
   return (

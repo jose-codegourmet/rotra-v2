@@ -13,6 +13,7 @@ import type {
   AdminClubListItem,
   AdminClubListParams,
   ClubIdentityIndex,
+  ClubNameRequestList,
 } from '../club/club.types'
 import { accessOf, manilaToday, retentionOf } from '../license/license.rules'
 import type {
@@ -20,6 +21,7 @@ import type {
   ClubLicenseTerm,
   LicenseOperation,
 } from '../license/license.types'
+import { realListAuditEvents } from './admin-audit'
 import { minorOf, RealRequestError, realRequest, type WireMoney } from './client'
 
 /** A license term as `adminTermDto` sends it. `endsAt` is the instant access ends (exclusive). */
@@ -126,6 +128,57 @@ export async function realListAdminClubs(
     ),
     counts,
   }
+}
+
+/** Pending name requests and recent decisions from the authorized Admin reads. */
+export async function realListClubNameRequests(signal?: AbortSignal): Promise<ClubNameRequestList> {
+  const { clubs } = await realRequest<{ clubs: WireAdminClub[] }>('/api/clubs', { signal })
+  const pending = clubs
+    .flatMap((club) => {
+      const request = club.pendingNameRequest
+      if (!request) return []
+      return [
+        {
+          requestId: request.id,
+          clubId: club.id,
+          clubName: club.name,
+          initials: clubInitials(club.name),
+          logoUrl: club.logoRef,
+          accent: false,
+          username: club.username ?? '',
+          requestedName: request.requestedName,
+          requestedAt: request.requestedAt,
+        },
+      ]
+    })
+    .sort((a, b) => Date.parse(b.requestedAt) - Date.parse(a.requestedAt))
+  const events = await Promise.all(
+    clubs.map((club) => realListAuditEvents({ targetType: 'club', targetId: club.id }, signal)),
+  )
+  const recentlyDecided = events
+    .flat()
+    .filter(
+      (event) =>
+        event.action === 'club_name_change_approved' ||
+        event.action === 'club_name_change_rejected',
+    )
+    .sort((a, b) => Date.parse(b.at) - Date.parse(a.at))
+    .slice(0, 6)
+  return { pending, recentlyDecided }
+}
+
+export function realReviewClubNameChange(
+  clubId: string,
+  requestId: string | undefined,
+  decision: 'approved' | 'rejected',
+) {
+  return realRequest<{ changed: boolean; name: string }>(
+    `/api/clubs/${encodeURIComponent(clubId)}`,
+    {
+      method: 'PATCH',
+      body: { requestId, decision },
+    },
+  )
 }
 
 export async function realGetAdminClub(

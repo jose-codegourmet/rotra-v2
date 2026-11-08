@@ -1,4 +1,5 @@
 'use client'
+import { MockError } from '@rotra/data/mock/errors'
 import { useResetLink } from '@rotra/data/player-account/useResetLink'
 import { useResetPassword } from '@rotra/data/player-account/useResetPassword'
 import { AccountLinkStatus } from '@rotra/ui/account-link-status'
@@ -32,10 +33,13 @@ export function ResetPassword({ token }: { token: string }) {
         <Skeleton className="h-32" />
       </AuthCard>
     )
-  if (link.data.status !== 'valid' && !mutation.isPending && !mutation.isSuccess)
+  const resetError =
+    mutation.error instanceof MockError ? mutation.error.fieldErrors?.link : undefined
+  if ((link.data.status !== 'valid' || resetError) && !mutation.isPending && !mutation.isSuccess)
     return (
       <AccountLinkStatus
         variant="reset-invalid"
+        resetError={resetError}
         onRequestAnother={() => router.push('/forgot-password')}
       />
     )

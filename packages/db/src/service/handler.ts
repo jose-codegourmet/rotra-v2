@@ -103,6 +103,7 @@ export const VISITOR_COMMANDS = [
   'public-session.my-request',
   'player.claim-link',
   'player.claim',
+  'player.guest-registration',
   'player.password-reset',
 ] as const
 

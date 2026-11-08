@@ -40,7 +40,7 @@ Consume atomically once, after binding the correct identity, recording required 
 
 Public RTR IDs/QRs identify a profile but do not authorize claiming or account editing; an RTR ID or name alone never claims (decided 2026-11-07, #244). A QR must not contain a reusable claim secret or hidden phone.
 
-Forgot-password handling delegates to the approved email recovery flow. No application plaintext password or raw reset-token ledger is needed.
+Forgot-password handling creates an Admin review request (#491). Admin generates a Supabase recovery link after ownership verification. The private request table holds only its SHA-256 digest and review metadata; no plaintext password or usable reset token is stored.
 
 ## Worked examples (#244)
 
@@ -54,9 +54,24 @@ Fictional data only. Decided 2026-11-07 unless marked open.
 | Wrong-identity claim (collision) | Link for player A; the email entered already belongs to player B's account | Claim blocked; link not consumed; no merge; contact-support route shown |
 | Expired link, then reissue | Link issued Nov 1, opened Nov 9 | Expired state shown. The Queue Master reissues: the old link is revoked, the new one is valid 7 days and single use; after a successful claim it shows the used state |
 | RTR ID or name only | Someone has the public RTR ID or the name | Cannot claim; only a valid link plus completed provisioning claims |
-| Guest invite (name-only guest) | Guest with no phone and no global profile | **Open** |
+| Guest invite (name-only guest) | Guest with no phone and no global profile | Registration leaves the club guest record unlinked; a separate invitation is required to link it (owner, November 8, 2026, #490). Matching phone/email prompts whether the existing account is theirs. Yes requires sign-in/Admin-reviewed recovery; No requires contact correction or contacting ROTRA. Existing contact uniqueness stays in place; answering Yes never authorizes a link |
 | Simultaneous allocation | Two clubs sync the same new phone at once | **Open** beyond the existing unique-phone retry rule |
 | Failed provider application | Provider account step fails or the response is lost mid-claim | **Open**; the staged, idempotent recovery above is still the rule |
+
+## Guest registration implementation (#490)
+
+`/register/[clubId]` creates an independent player with unique contacts and the existing RTR ID
+allocation for the inviting club's founding city. It never inserts or updates `club_players`,
+roster identity, game facts or history attribution. Separate guest-link invitation acceptance is
+not part of registration.
+
+The existing `player_claim_links` table stages a newly submitted registration so provider failures
+and lost responses can retry. The browser retains a random retry secret and a contact fingerprint
+for this tab (no password or plain contacts); the database stores only the secret's SHA-256 digest.
+A retry must use the same club and contacts. Registration uses the existing seven-day expiry,
+provider operation keyed by player ID, single consumption, and email/password sign-in. No schema
+migration is required. Matching contacts or an existing provider email produce a generic account
+confirmation prompt before a new profile is staged. Phone/email uniqueness remains the race backstop.
 
 ## RTR ID allocation
 

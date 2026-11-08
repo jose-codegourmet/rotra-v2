@@ -21,7 +21,7 @@ Proposed navigation:
 - Clubs and licenses.
 - Players.
 - Sales (owner request, November 8, 2026).
-- Contact-change requests.
+- Requests: Contact changes, Club names, Password resets (#491).
 - Ranking configuration.
 - Feature flags.
 

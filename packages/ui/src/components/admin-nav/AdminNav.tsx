@@ -7,6 +7,7 @@ export type AdminNavKey =
   | 'players'
   | 'contact-changes'
   | 'club-names'
+  | 'password-resets'
   | 'ranking'
   | 'feature-flags'
 export type AdminNavProps = {
@@ -56,6 +57,7 @@ export function AdminNav({
       items: [
         item('contact-changes', 'Contact changes', 'nav-contact', true),
         item('club-names', 'Club names', 'nav-name', true),
+        item('password-resets', 'Password resets', 'nav-contact', true),
       ],
     },
     {

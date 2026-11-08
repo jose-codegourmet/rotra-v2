@@ -58,6 +58,7 @@ const HREFS: Record<AdminNavKey, string> = {
   players: '/players',
   'contact-changes': '/requests/contact-changes',
   'club-names': '/requests/club-names',
+  'password-resets': '/requests/password-resets',
   ranking: '/settings/ranking',
   'feature-flags': '/settings/feature-flags',
 }

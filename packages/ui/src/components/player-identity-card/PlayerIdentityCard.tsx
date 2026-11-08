@@ -12,6 +12,8 @@ export type PlayerIdentityCardProps = {
   onCopyId: () => void
   /** Owner only: opens Edit profile */
   onEdit?: () => void
+  /** Owner only: opens Profile picture */
+  onChangePicture?: () => void
   /** Owner only: opens My player ID */
   onOpenPlayerId?: () => void
 }
@@ -21,19 +23,33 @@ export function PlayerIdentityCard({
   idElementId,
   onCopyId,
   onEdit,
+  onChangePicture,
   onOpenPlayerId,
 }: PlayerIdentityCardProps) {
   return (
     <Card asChild>
       <section className="flex flex-col gap-3.5">
         <div className="flex min-w-0 items-center gap-3.5">
-          <Avatar
-            name={profile.fullName}
-            src={profile.picture ?? undefined}
-            size={88}
-            shape="square"
-            tone={profile.picture ? 'neutral' : 'accent'}
-          />
+          <span className="relative block flex-none">
+            <Avatar
+              name={profile.fullName}
+              src={profile.picture ?? undefined}
+              size={88}
+              shape="square"
+              tone={profile.picture ? 'neutral' : 'accent'}
+            />
+            {isOwn ? (
+              <button
+                type="button"
+                aria-label="Change profile picture"
+                title="Change profile picture"
+                onClick={onChangePicture}
+                className="absolute -right-1.5 -bottom-1.5 grid size-[34px] cursor-pointer place-items-center rounded-full border-2 border-surface bg-accent p-0 text-on-accent"
+              >
+                <Icon name="edit" className="size-4" />
+              </button>
+            ) : null}
+          </span>
           <div className="flex min-w-0 flex-col gap-2">
             <h1 className="[overflow-wrap:anywhere]">{profile.fullName}</h1>
             {profile.nickname ? <p className="text-fg2">“{profile.nickname}”</p> : null}

@@ -1,6 +1,7 @@
 'use client'
 
 import { cn } from '@rotra/ui/cn'
+import { TabMenu } from '@rotra/ui/tab-menu'
 import { Tabs as TabsPrimitive } from 'radix-ui'
 import type { ComponentProps, ReactNode } from 'react'
 
@@ -31,6 +32,8 @@ export type TabsProps = {
   /** The panels: one TabsContent per item */
   children?: ReactNode
   className?: string
+  /** Replace the tab row with a menu at 640 px and below. */
+  phoneMenu?: boolean
 }
 
 const badgeClass = (tone: TabBadge['tone']) =>
@@ -48,18 +51,32 @@ const badgeClass = (tone: TabBadge['tone']) =>
  * The prototypes' .tabs: an underlined tab row (Radix Tabs). On phones the tabs share the width
  * equally, stack label over count, and use short labels, so nothing scrolls sideways.
  */
-export function Tabs({ items, value, onChange, children, className, ...aria }: TabsProps) {
+export function Tabs({
+  items,
+  value,
+  onChange,
+  children,
+  className,
+  phoneMenu = false,
+  ...aria
+}: TabsProps) {
   return (
     <TabsPrimitive.Root
       value={value}
       onValueChange={onChange}
       className={cn('flex flex-col gap-5', className)}
     >
+      {phoneMenu ? (
+        <div className="hidden max-[640px]:block">
+          <TabMenu items={items} value={value} onChange={onChange} aria-label={aria['aria-label']} />
+        </div>
+      ) : null}
       <TabsPrimitive.List
         aria-label={aria['aria-label']}
         className={cn(
           'flex gap-1 overflow-x-auto border-b border-border',
-          'max-[640px]:grid max-[640px]:grid-cols-[repeat(auto-fit,minmax(64px,1fr))] max-[640px]:gap-0 max-[640px]:overflow-visible',
+          phoneMenu && 'max-[640px]:hidden',
+          !phoneMenu && 'max-[640px]:grid max-[640px]:grid-cols-[repeat(auto-fit,minmax(64px,1fr))] max-[640px]:gap-0 max-[640px]:overflow-visible',
         )}
       >
         {items.map((item) => (

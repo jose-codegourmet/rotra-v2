@@ -187,6 +187,7 @@
     "./switch": "./src/components/switch/Switch.tsx",
     "./sync-status": "./src/components/sync-status/SyncStatus.tsx",
     "./sync-status/sync-details": "./src/components/sync-status/sync-details/SyncDetails.tsx",
+    "./tab-menu": "./src/components/tab-menu/TabMenu.tsx",
     "./tabs": "./src/components/tabs/Tabs.tsx",
     "./team-lineup": "./src/components/team-lineup/TeamLineup.tsx",
     "./text-input": "./src/components/text-input/TextInput.tsx",

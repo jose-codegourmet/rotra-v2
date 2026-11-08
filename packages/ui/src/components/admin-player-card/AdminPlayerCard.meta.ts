@@ -1,8 +1,7 @@
 import type { ComponentMeta } from '@rotra/ui/meta'
 export const adminPlayerCardMeta = {
   name: 'AdminPlayerCard',
-  description:
-    'Player identity card with compact selection in the header and a separate actions menu.',
+  description: 'Player list row or compact grid card with selection and actions.',
   usage: [
     'Use on Admin Players management screens.',
     'Selection stays in the header and does not open quick view.',

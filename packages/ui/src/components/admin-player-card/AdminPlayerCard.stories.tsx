@@ -69,3 +69,14 @@ export const GridLight: Story = { ...Grid, globals: { theme: 'light' } }
 export const GridSelected: Story = { ...Grid, args: { ...Grid.args, selected: true } }
 export const GridSelectedLight: Story = { ...GridSelected, globals: { theme: 'light' } }
 export const SelectedLight: Story = { ...Selected, globals: { theme: 'light' } }
+
+export const SavedCharacter: Story = {
+  args: { player: { ...managementPlayer, picture: 'character:a' } },
+}
+export const SavedCharacterGrid: Story = {
+  ...Grid,
+  args: { ...Grid.args, player: { ...managementPlayer, picture: 'character:a' } },
+}
+export const FailedPicture: Story = {
+  args: { player: { ...managementPlayer, picture: 'data:image/png;base64,invalid' } },
+}

@@ -4,6 +4,7 @@ import { Avatar } from '@rotra/ui/avatar'
 import { Card } from '@rotra/ui/card'
 import { Checkbox } from '@rotra/ui/checkbox'
 import { PlayerAccountChip } from '@rotra/ui/player-account-chip'
+import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { RankStatusChip } from '@rotra/ui/rank-status-chip'
 import type { ReactNode } from 'react'
 
@@ -66,7 +67,7 @@ export function AdminPlayerCard({
       <div className={grid ? 'col-span-3 row-start-2' : ''}>
         <Avatar
           name={p.name}
-          src={p.picture ?? undefined}
+          src={profilePictureSrc(p.picture, p.id, p.name)}
           className={grid ? 'size-14 text-lg' : undefined}
         />
       </div>

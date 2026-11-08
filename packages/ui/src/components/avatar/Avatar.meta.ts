@@ -5,6 +5,8 @@ export const avatarMeta = {
   description:
     "A player picture, or the player's initials when there is no picture. On operator screens it can open the player's profile.",
   usage: [
+    'Missing or failed images show initials; a new source or identity resets the failure and frozen frame.',
+    'Resolve stored character references with profilePictureSrc from @rotra/ui/profile-picture before passing src.',
     'Reduced-motion displays a frozen canvas snapshot of the loaded photo, preserving the stored animation.',
     'Pass onClick on operator screens (queue cards, match dialogs, roster, payments, leaderboard): it becomes a button named "View <name>\'s profile". Never on public pages.',
     'Pick the size the prototype uses at that spot (24, 28, 36, 40, 44, 52, 64, 88).',

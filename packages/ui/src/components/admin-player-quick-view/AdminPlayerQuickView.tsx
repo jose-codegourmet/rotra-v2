@@ -14,6 +14,7 @@ import { ErrorState } from '@rotra/ui/error-state'
 import { Field } from '@rotra/ui/field'
 import { LEVEL_OPTION_GROUPS } from '@rotra/ui/level-select'
 import { Notice } from '@rotra/ui/notice'
+import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { Sheet } from '@rotra/ui/sheet'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { TextInput } from '@rotra/ui/text-input'
@@ -106,7 +107,9 @@ function QuickViewPanel({
           'bg-[linear-gradient(135deg,var(--color-accent-subtle),transparent_70%)] bg-elev',
       )}
     >
-      {mode !== 'invite' ? <Avatar name={p.name} src={p.picture ?? undefined} size={52} /> : null}
+      {mode !== 'invite' ? (
+        <Avatar name={p.name} src={profilePictureSrc(p.picture, p.id, p.name)} size={52} />
+      ) : null}
       <div className="flex min-w-0 flex-col gap-1.5">
         <h2 className="text-lg font-bold [overflow-wrap:anywhere]">
           {mode === 'edit' ? 'Edit ' : mode === 'invite' ? 'Invite ' : ''}

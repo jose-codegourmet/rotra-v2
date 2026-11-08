@@ -6,7 +6,7 @@ export const profilePictureSheetMeta = {
     'Frame a local photo draft, or choose initials or a character; Done commits the picture.',
   usage: [
     'The container owns picture updates and toasts; Done persists independently of Edit profile Save; dismissal discards the local draft.',
-    'Use profileCharacterUrl from @rotra/ui/profile-picture to display a selected character elsewhere.',
+    'Use profilePictureSrc from @rotra/ui/profile-picture to display a saved picture elsewhere.',
     'preparePhoto decodes HEIC locally; crop controls never upload. onCommit persists only on Done.',
     'Saving disables dismissal and further choices; failure keeps the editable draft.',
   ],

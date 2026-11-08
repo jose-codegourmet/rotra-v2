@@ -42,7 +42,7 @@ The mock seeds three recent additions when its fixtures load; a reload resets th
 | Guest | Name only, no phone; stays a club guest |
 | Lookup pending | New player entered with a phone; ROTRA matches or creates their profile when the session syncs |
 
-Registered and unclaimed players with an uploaded picture show it. Guests and profiles without a picture show initials.
+Registered and unclaimed players show their saved profile picture (uploaded photo or selected character) in preparation roster list/grid views and Saved players, including the profile dialog. Character choices use the linked global player ID and profile name, not the club-local ID or nickname. Guests, profiles without a picture and failed images show initials. Returning to the tab refreshes these player reads so a changed picture can appear (#577).
 
 ## Guests and incomplete profiles
 

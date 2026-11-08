@@ -4,6 +4,7 @@ import { queueSessionFixtures } from '@rotra/data/fixtures/queueSessions'
 import { sessionHistorySpecs } from '@rotra/data/fixtures/session-history'
 import { sessionWaitlistFixture } from '@rotra/data/fixtures/session-waitlist'
 import type { PlayingLevel } from '@rotra/data/player/types'
+import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 import { fn } from 'storybook/test'
@@ -179,3 +180,11 @@ export const GroupByProfile: Story = {
 export const GroupByPayment: Story = { args: { groupBy: 'paid' } }
 export const GroupBySkillGrid: Story = { args: { groupBy: 'skill', view: 'grid' } }
 export const LockedGrid: Story = { args: { ...Locked.args, view: 'grid' } }
+
+const picturePlayers = rosterPlayers.map((p, index) => ({
+  ...p,
+  photoUrl:
+    index === 1 ? 'data:image/png;base64,invalid' : profilePictureSrc('character:a', p.id, p.name),
+}))
+export const WithPictures: Story = { args: { players: picturePlayers } }
+export const WithPicturesGrid: Story = { args: { players: picturePlayers, view: 'grid' } }

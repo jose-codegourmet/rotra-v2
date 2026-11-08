@@ -23,6 +23,7 @@ import { PlayerAccountCard } from '@rotra/ui/player-account-card'
 import { PlayerAccountChip } from '@rotra/ui/player-account-chip'
 import { PlayerRankCard } from '@rotra/ui/player-rank-card'
 import { PrivateContactCard } from '@rotra/ui/private-contact-card'
+import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { RankStatusChip } from '@rotra/ui/rank-status-chip'
 import { SameNameNotice } from '@rotra/ui/same-name-notice'
 import { Skeleton } from '@rotra/ui/skeleton'
@@ -157,7 +158,13 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
     <>
       {back}
       <DetailHero
-        media={<Avatar name={player.name} src={player.picture ?? undefined} size={52} />}
+        media={
+          <Avatar
+            name={player.name}
+            src={profilePictureSrc(player.picture, player.id, player.name)}
+            size={52}
+          />
+        }
         title={player.name}
         meta={
           <>

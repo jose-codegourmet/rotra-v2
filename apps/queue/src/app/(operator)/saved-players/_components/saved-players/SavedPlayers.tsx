@@ -20,6 +20,7 @@ import { InviteSheet } from '@rotra/ui/invite-sheet'
 import { LetterGroup, letterHeadingId } from '@rotra/ui/letter-group'
 import { PageHeader } from '@rotra/ui/page-header'
 import { PlayerProfileSheet } from '@rotra/ui/player-profile-sheet'
+import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { SavedPlayerCard } from '@rotra/ui/saved-player-card'
 import { SavedPlayerStatsCarousel } from '@rotra/ui/saved-player-stats-carousel'
 import {
@@ -269,6 +270,11 @@ export function SavedPlayers() {
                   <SavedPlayerCard
                     key={p.id}
                     name={p.fullName}
+                    photoUrl={profilePictureSrc(
+                      p.picture,
+                      p.playerId ?? p.id,
+                      p.pictureName ?? p.fullName,
+                    )}
                     nickname={p.nickname}
                     identity={p.identity}
                     level={p.suggestion}
@@ -300,6 +306,11 @@ export function SavedPlayers() {
             if (!open) setProfileId(null)
           }}
           name={profile.fullName}
+          photoUrl={profilePictureSrc(
+            profile.picture,
+            profile.playerId ?? profile.id,
+            profile.pictureName ?? profile.fullName,
+          )}
           identity={profile.identity}
           nickname={profile.nickname}
           level={profile.suggestion}

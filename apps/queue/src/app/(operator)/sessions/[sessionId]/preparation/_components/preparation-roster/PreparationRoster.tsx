@@ -15,6 +15,7 @@ import { useSetAllPresence } from '@rotra/data/session-roster/useSetAllPresence'
 import { useSetPresenceMany } from '@rotra/data/session-roster/useSetPresenceMany'
 import { useSetRosterLevel } from '@rotra/data/session-roster/useSetRosterLevel'
 import { PlayerProfileSheet } from '@rotra/ui/player-profile-sheet'
+import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import {
   type RosterGroupBy,
   type RosterLevelTab,
@@ -117,6 +118,9 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
     return {
       id: r.id,
       name: r.nameSnapshot,
+      photoUrl: p
+        ? profilePictureSrc(p.picture, p.playerId ?? p.id, p.pictureName ?? p.fullName)
+        : undefined,
       identity: p?.identity ?? 'guest',
       suggestion: p?.suggestion ?? null,
       level: r.level,
@@ -131,6 +135,9 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
     return {
       id: w.id,
       name: p?.fullName ?? '…',
+      photoUrl: p
+        ? profilePictureSrc(p.picture, p.playerId ?? p.id, p.pictureName ?? p.fullName)
+        : undefined,
       level: w.level,
       waitingSinceLabel: time(w.addedAt),
     }
@@ -216,6 +223,11 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
             if (!open) setProfileId(null)
           }}
           name={profile.fullName}
+          photoUrl={profilePictureSrc(
+            profile.picture,
+            profile.playerId ?? profile.id,
+            profile.pictureName ?? profile.fullName,
+          )}
           identity={profile.identity}
           nickname={profile.nickname}
           level={profile.suggestion}

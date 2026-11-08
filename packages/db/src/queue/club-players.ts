@@ -15,6 +15,9 @@ export type ClubPlayerDto = {
   playerId: string | null
   fullName: string
   nickname: string | null
+  picture: string | null
+  /** Global name used with playerId to reproduce the saved character choice. */
+  pictureName: string | null
   identity: 'registered' | 'unclaimed' | 'guest' | 'pending'
   rtrId: string | null
   /** The level from the club's latest assessment, or null when they have none yet */
@@ -40,6 +43,8 @@ export async function listClubPlayers(context: ClubContext): Promise<ClubPlayerD
       privateInput: { select: { phoneE164: true } },
       player: {
         select: {
+          avatarRef: true,
+          fullName: true,
           profileState: true,
           hidePhoneFromClubs: true,
           privateContact: { select: { phoneE164: true } },
@@ -60,6 +65,8 @@ export async function listClubPlayers(context: ClubContext): Promise<ClubPlayerD
     playerId: p.playerId,
     fullName: p.displayName,
     nickname: p.nickname,
+    picture: p.player?.avatarRef ?? null,
+    pictureName: p.player?.fullName ?? null,
     identity: p.player
       ? p.player.profileState === 'claimed'
         ? 'registered'

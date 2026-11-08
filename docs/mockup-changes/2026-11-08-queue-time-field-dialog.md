@@ -1,6 +1,6 @@
 # Time fields open a time dialog instead of three dropdowns
 
-Status: TICKETED — #501
+Status: IN MOCK APP — #501
 Date: 2026-11-08
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › every time field (Session setup Starts and Ends, court planned start and end, Add / Edit court, Start session, live end)

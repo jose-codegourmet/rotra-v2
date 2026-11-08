@@ -1,6 +1,6 @@
 # Session setup page 1 rearranged: venue up, steppers side by side, court times folded
 
-Status: TICKETED — #501
+Status: IN MOCK APP — #501
 Date: 2026-11-08
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Create / Edit session › step 1 (Date, venue and courts)

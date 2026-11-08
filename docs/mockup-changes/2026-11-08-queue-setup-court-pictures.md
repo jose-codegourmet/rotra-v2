@@ -1,6 +1,6 @@
 # Session setup shows each court as a court picture that opens an edit dialog
 
-Status: TICKETED — #501
+Status: IN MOCK APP — #501
 Date: 2026-11-08
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Create / Edit session › step 1 › Courts

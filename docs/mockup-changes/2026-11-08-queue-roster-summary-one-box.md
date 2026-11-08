@@ -5,6 +5,8 @@ Date: 2026-11-08
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Roster and levels tab › header summary
 Screen ID: Q-PREPARE (roster tab)
+Supersedes: 2026-11-08-queue-roster-skill-mix-progress.md
+Superseded by: none
 
 ## What changed
 - Before: two stacked blocks, a slots meter with its own progress bar and a Skill mix bar below it.

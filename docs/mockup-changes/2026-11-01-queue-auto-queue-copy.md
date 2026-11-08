@@ -1,6 +1,6 @@
 # Explain Auto Queue choices, Catch Up targets and results
 
-Status: NEW
+Status: IN MOCK APP — #322 (PR #334)
 Date: 2026-11-01
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Queue › Auto Queue
@@ -26,4 +26,4 @@ Screen ID: Q-AUTO
 
 ## Real app work
 - Implemented under existing issue #322: AutoQueueWorkspace copy and accessible hints, current minimum/eligibility wiring, generation result strings, fixture-backed stories and updated stop-reason tests.
-- This log remains NEW as explicitly required by #322; #322 already covers the implementation.
+- Built under #322 (PR #334).

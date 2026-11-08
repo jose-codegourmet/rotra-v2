@@ -5,6 +5,8 @@ Date: 2026-11-08
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › every time field (Session setup Starts and Ends, court planned start and end, Add / Edit court, Start session, live end)
 Screen ID: Q-SETUP, Q-START, Q-COURTS, Q-SESSION-ADJUST, Q-ADD-COURT
+Supersedes: 2026-11-08-queue-time-picker-hour-minute.md
+Superseded by: none
 
 ## What changed
 - Before (see 2026-11-08-queue-time-picker-hour-minute.md): one row of three small native dropdowns, hour :

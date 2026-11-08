@@ -1,6 +1,6 @@
 # Public page shows an aggregate skill mix above the participants
 
-Status: ALREADY A TICKET — #474
+Status: IN MOCK APP — #474 (PR #482)
 Date: 2026-11-07
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Public page › Participants

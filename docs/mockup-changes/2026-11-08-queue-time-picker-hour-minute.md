@@ -1,10 +1,12 @@
 # Time fields pick hour, minute and AM/PM from three short dropdowns
 
-Status: NEW
+Status: IN MOCK APP — PR #489
 Date: 2026-11-08
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Session setup (Starts, Ends, court planned start and end), Start session (New end), Courts and time (New end), Add / Edit court (Planned start, Open until)
 Screen ID: Q-SETUP, Q-START, Q-COURTS, Q-SESSION-ADJUST, Q-ADD-COURT
+Supersedes: none
+Superseded by: 2026-11-08-queue-time-field-dialog.md
 
 ## What changed
 - **Time row.** Before: the shared date-and-time picker (`dtPicker`) chose the time from one native list of

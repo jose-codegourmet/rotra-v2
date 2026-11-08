@@ -1,6 +1,6 @@
 # Session QR button and sheet added to the Preparation header
 
-Status: ALREADY A TICKET — #471
+Status: IN MOCK APP — #471 (PR #482)
 Date: 2026-11-07
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Preparation (header) › Session QR sheet

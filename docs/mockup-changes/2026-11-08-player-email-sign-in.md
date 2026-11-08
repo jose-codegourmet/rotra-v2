@@ -1,6 +1,6 @@
 # Player sign-in takes an email only, not a phone number
 
-Status: ALREADY A TICKET — #483
+Status: IN MOCK APP — PR #483
 Date: 2026-11-08
 App: player (and one line in admin)
 Mockup: apps/mockup/player-app/rotra-player.html › Sign in; apps/mockup/admin-app/rotra-admin.html › Player detail › Private contact

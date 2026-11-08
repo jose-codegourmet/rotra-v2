@@ -1,6 +1,6 @@
 # Request to join offers Continue as guest or Log in with ROTRA Player
 
-Status: ALREADY A TICKET — #476
+Status: IN MOCK APP — #476 (PR #482)
 Date: 2026-11-07
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Public session (guest) › Request to join sheet

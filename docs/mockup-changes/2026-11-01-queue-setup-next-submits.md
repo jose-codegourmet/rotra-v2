@@ -1,6 +1,6 @@
 # Session setup: only page 3 saves, and Enter acts as Next
 
-Status: ALREADY A TICKET — #332
+Status: IN MOCK APP — #332 (PR #350)
 Date: 2026-11-01
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Create session / Edit preparation wizard

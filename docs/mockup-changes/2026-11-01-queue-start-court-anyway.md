@@ -1,6 +1,6 @@
 # Start anyway: open a court before its planned start
 
-Status: ALREADY A TICKET — #325
+Status: IN MOCK APP — #325 (PR #333)
 Date: 2026-11-01
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Live console › Session (courts), Start match sheet

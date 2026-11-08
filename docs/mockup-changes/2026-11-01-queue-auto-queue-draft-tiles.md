@@ -1,6 +1,6 @@
 # Auto Queue drafts look like queue tiles and are picked like players
 
-Status: ALREADY A TICKET — #321
+Status: IN MOCK APP — #321 (PR #366)
 Date: 2026-11-01
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Live console › Queue tab › Auto Queue (`autoWorkspace`, `draftTile`, `autoMoreMenu`, `autoSelectionBar`)

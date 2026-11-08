@@ -1,6 +1,6 @@
 # Queue pages fill the screen width
 
-Status: ALREADY A TICKET — #348
+Status: IN MOCK APP — #348 (PR #365)
 Date: 2026-11-01
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › every page (`.wrap`, `.top-in`, `.footer-bar .in`, `.proto-bar .in`), Queue tab and Session tab grids

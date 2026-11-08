@@ -1,6 +1,6 @@
 # Admin-reviewed password reset requests
 
-Status: ALREADY A TICKET — #491
+Status: IN MOCK APP — #491 (PR #494)
 
 Owner request: submitting Forgot password creates a request under Admin > Requests, with no automatic email. An authorized Admin verifies ownership and provides a single-use, expiring reset link. The player chooses their own password.
 

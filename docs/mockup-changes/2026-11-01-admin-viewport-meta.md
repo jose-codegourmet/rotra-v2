@@ -1,6 +1,6 @@
 # Admin prototype: add the viewport meta
 
-Status: NEW
+Status: MOCKUP ONLY — the real app already sends the viewport meta
 Date: 2026-11-01
 App: admin
 Mockup: apps/mockup/admin-app/rotra-admin.html › document head

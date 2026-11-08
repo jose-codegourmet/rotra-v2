@@ -1,6 +1,6 @@
 # Saved players: Add player without a session
 
-Status: ALREADY A TICKET — #330
+Status: IN MOCK APP — #330 (PR #367)
 Date: 2026-11-01
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Saved players header, Add player sheet (`add(sh)` with `sh.club`)

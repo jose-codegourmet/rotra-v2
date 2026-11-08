@@ -1,6 +1,6 @@
 # Skill mix bar above the roster when grouped by Skill group
 
-Status: ALREADY A TICKET — #472
+Status: IN MOCK APP — #472 (PR #482)
 Date: 2026-11-07
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Preparation › Roster and levels (Group by: Skill group)

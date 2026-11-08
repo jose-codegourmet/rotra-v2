@@ -1,6 +1,6 @@
 # Compact player selection and unclipped actions
 
-Status: ALREADY A TICKET — #392
+Status: IN MOCK APP — #392 (PR #394)
 Date: 2026-11-01
 App: admin
 Mockup: apps/mockup/admin-app/rotra-admin.html › Players

@@ -1,6 +1,6 @@
 # Players management overhaul
 
-Status: NEW
+Status: IN MOCK APP — #335
 Date: 2026-11-01
 App: admin
 Mockup: apps/mockup/admin-app/rotra-admin.html › Players

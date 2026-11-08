@@ -1,6 +1,6 @@
 # Invite cancels the previous registration link again
 
-Status: ALREADY A TICKET — #485
+Status: IN MOCK APP — PR #485
 Date: 2026-11-08
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Invite sheet

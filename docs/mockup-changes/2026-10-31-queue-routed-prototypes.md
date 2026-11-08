@@ -1,6 +1,6 @@
 # Give all three prototypes app routes and browser history
 
-Status: NEW
+Status: MOCKUP ONLY — prototype routing; the real apps already have these routes
 Date: 2026-10-31
 App: queue, player, admin (shared prototype infrastructure)
 Mockup: apps/mockup/{queue,player,admin}-app/rotra-{queue,player,admin}.html

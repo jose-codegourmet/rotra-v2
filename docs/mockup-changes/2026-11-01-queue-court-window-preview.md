@@ -1,6 +1,6 @@
 # Add / Edit court previews show the validated booking window
 
-Status: ALREADY A TICKET — #320
+Status: IN MOCK APP — #320 (PR #329)
 Date: 2026-11-01
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Session › Add / Edit court

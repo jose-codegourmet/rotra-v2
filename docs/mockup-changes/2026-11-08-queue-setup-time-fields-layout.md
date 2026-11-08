@@ -5,6 +5,8 @@ Date: 2026-11-08
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Create / Edit session › step 1 › Details
 Screen ID: Q-SETUP
+Supersedes: none
+Superseded by: 2026-11-08-queue-setup-when-block.md
 
 ## What changed
 - Before: Date, Starts and Ends sat in one auto-fit grid. Ends carried two day buttons (“Mon, Nov 9” and

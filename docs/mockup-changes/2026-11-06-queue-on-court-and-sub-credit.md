@@ -1,6 +1,6 @@
 # On court step, Auto Queue / Manual Queue court filling, and substitution game credit
 
-Status: ALREADY A TICKET — #408
+Status: IN MOCK APP — #408
 Date: 2026-11-06
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Live console (Courts, Queue, match sheets)

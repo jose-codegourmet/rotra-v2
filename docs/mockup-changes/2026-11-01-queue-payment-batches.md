@@ -1,6 +1,6 @@
 # Debounce payment switches and summarize each batch
 
-Status: ALREADY A TICKET — #300
+Status: IN MOCK APP — #300 (PR #372)
 Date: 2026-11-01
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Payments

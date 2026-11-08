@@ -1,6 +1,6 @@
 # Move the canonical mockups into apps/mockup
 
-Status: NEW
+Status: MOCKUP ONLY — repository and hosting move, no UI change
 Date: 2026-11-01
 App: queue | player | admin
 Mockup: apps/mockup/ › routed prototype launcher and all three HTML prototypes

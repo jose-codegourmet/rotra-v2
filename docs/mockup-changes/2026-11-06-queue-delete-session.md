@@ -1,6 +1,6 @@
 # Delete session added to the Preparation header, next to Cancel session
 
-Status: ALREADY A TICKET — #408
+Status: IN MOCK APP — #408
 Date: 2026-11-06
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Preparation (prepared session header)

@@ -52,7 +52,7 @@ docs/
                     modules/<product>/<module>.md
   database_design/product/  conventions · transactions · access-retention · open-decisions
                             <product>/modules/<module>.md
-  mockup-changes/   one log per mockup change (NEW → ALREADY A TICKET — #<n>)
+  mockup-changes/   one log per mockup change (NEW → TICKETED → IN PROGRESS → IN MOCK APP)
   mvp/              README (hub, status board) · decisions · workstreams/<workstream>.md
   ../apps/mockup/   canonical prototype HTML + README per app
   branding/

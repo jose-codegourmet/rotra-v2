@@ -1,6 +1,6 @@
 # Example sessions, Demo scenarios, Cancelled sessions, and the short-on-players banner
 
-Status: ALREADY A TICKET — #408
+Status: IN MOCK APP — #408
 Date: 2026-11-06
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Dashboard calendar, Preparation, Session record, Public page, Live console (Session view), Prototype menu

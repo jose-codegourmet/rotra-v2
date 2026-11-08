@@ -1,6 +1,6 @@
 # Show unavailable device-download evidence truthfully
 
-Status: ALREADY A TICKET — #385
+Status: IN MOCK APP — #385 (PR #388)
 Date: 2026-11-02
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Q-HOME › upcoming Now card

@@ -1,6 +1,6 @@
 # Invite to ROTRA section on the guest player details dialog
 
-Status: ALREADY A TICKET — #478
+Status: IN MOCK APP — #478 (PR #482)
 Date: 2026-11-07
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Player profile sheet (guest)

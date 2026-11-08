@@ -1,6 +1,6 @@
 # Public page shows masked participant and waitlist names
 
-Status: ALREADY A TICKET — #475
+Status: IN MOCK APP — #475 (PR #482)
 Date: 2026-11-07
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Public page › Participants; Session record › Public page tab

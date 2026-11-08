@@ -1,6 +1,6 @@
 # Presence switches save in a background batch
 
-Status: NEW
+Status: IN MOCK APP — #324 (PR #349)
 Date: 2026-11-01
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Players and preparation roster

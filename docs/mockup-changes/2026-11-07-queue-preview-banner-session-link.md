@@ -1,6 +1,6 @@
 # Public page preview banner shows the session link to share, with Copy link
 
-Status: ALREADY A TICKET — #469
+Status: IN MOCK APP — #469 (PR #482)
 Date: 2026-11-07
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Public page (viewPublic, operator preview banner)

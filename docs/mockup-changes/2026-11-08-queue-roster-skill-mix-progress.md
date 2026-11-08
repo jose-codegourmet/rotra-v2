@@ -5,6 +5,8 @@ Date: 2026-11-08
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Session preparation › Roster and levels tab (the same Skill mix also shows on the public session preview)
 Screen ID: Q-PREPARE (roster tab), public session preview
+Supersedes: none
+Superseded by: 2026-11-08-queue-roster-summary-one-box.md
 
 ## What changed
 - **Always visible.** Before: the Skill mix bar showed only after choosing Group by Skill group. After: it

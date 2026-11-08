@@ -1,6 +1,6 @@
 # Session setup: Expected players follows the slot budget until edited
 
-Status: ALREADY A TICKET — #331
+Status: IN MOCK APP — #331 (PR #352)
 Date: 2026-11-01
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Create session / Edit preparation › step 2 · Minimum games

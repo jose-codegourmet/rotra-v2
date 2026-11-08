@@ -1,6 +1,6 @@
 # Copy invite link added to the Preparation header, next to Preview public page
 
-Status: ALREADY A TICKET — #470
+Status: IN MOCK APP — #470 (PR #482)
 Date: 2026-11-07
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Preparation (header)

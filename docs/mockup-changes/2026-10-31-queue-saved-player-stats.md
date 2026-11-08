@@ -1,6 +1,6 @@
 # Saved player statistics carousel
 
-Status: ALREADY A TICKET — #301
+Status: IN MOCK APP — #301 (PR #308)
 Date: 2026-10-31
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Saved players

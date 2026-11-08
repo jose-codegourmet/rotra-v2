@@ -33,8 +33,10 @@
     `apps/mockup/*/*.html` first; the real app follows through a ticket. Every mockup change:
     (a) writes one log file in [docs/mockup-changes/](docs/mockup-changes/README.md) with
     `Status: NEW`; (b) updates the business logic and database design docs in the same change if the
-    mockup made them untrue. Turning a log into a ticket sets it to `Status: ALREADY A TICKET — #<n>`.
-    Never ticket a log that already says so.
+    mockup made them untrue. Statuses: `NEW` → `TICKETED` → `IN PROGRESS` → `IN MOCK APP`, or
+    `CANCELLED` / `MOCKUP ONLY`. Only `NEW` logs are ticketed, grouped by component (reuse first), and
+    the real app must match the mockup like for like. Artifacts shown to the owner are published from
+    the mockup file itself.
 
 ---
 
@@ -80,7 +82,7 @@ docs/
   business_logic/product/ WHAT the product does: rules per product › module (+ flow/ journeys)
   screens/product/        WHAT each screen shows: layouts, controls, states, dialogs, by screen ID
   database_design/product/ proposed tables and fields per module
-  mockup-changes/         one log file per mockup change; NEW until it becomes a ticket
+  mockup-changes/         one log file per mockup change, with its status (NEW → TICKETED → IN MOCK APP)
   mvp/                    MVP scope, status board, workstreams, decision register (D-ids)
   branding/               brand identity, logo, characters (visuals: the prototypes win)
   email-templates.md      Supabase auth email coverage

@@ -1,6 +1,6 @@
 # Payments: record full or partial amounts and flag reimbursements
 
-Status: ALREADY A TICKET — #479
+Status: IN MOCK APP — #479 (PR #482)
 Date: 2026-11-07
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › paymentsPanel (preparation Payments tab, console Payments sheet, session record Financials) · SHEETS.payAmount

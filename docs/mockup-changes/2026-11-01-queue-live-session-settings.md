@@ -1,6 +1,6 @@
 # Live sessions can reopen their preparation settings
 
-Status: NEW
+Status: IN MOCK APP — #323 (PR #347)
 Date: 2026-11-01
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Live console / Session settings

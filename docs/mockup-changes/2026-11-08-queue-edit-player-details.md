@@ -1,6 +1,6 @@
 # Queue Master can edit a guest's or unclaimed player's details before inviting them
 
-Status: ALREADY A TICKET — #484
+Status: IN MOCK APP — PR #484
 Date: 2026-11-08
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Saved players › player profile dialog › Edit details; Invite sheet

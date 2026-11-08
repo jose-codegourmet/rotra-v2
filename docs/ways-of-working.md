@@ -258,7 +258,7 @@ Check in this order:
 | `docs/product-terms.md` | A term, state name, or code identifier is added or renamed |
 | `docs/business_logic/`, `docs/screens/`, `docs/database_design/` | The product owner decides a behavior. Move it from open to settled |
 | `apps/mockup/*` | Any layout or UI change is requested (mockup first). Each change writes a log in [mockup-changes/](mockup-changes/README.md) and fixes business logic + database design docs it made untrue |
-| `docs/mockup-changes/*` | A mockup changes (new log, `Status: NEW`), or a log becomes a ticket (`Status: ALREADY A TICKET — #<n>`) |
+| `docs/mockup-changes/*` | A mockup changes (new log, `Status: NEW`), or its work moves (`TICKETED`, `IN PROGRESS`, `IN MOCK APP`, `CANCELLED`; see its README §4) |
 | `<Name>.meta.ts` | A component's purpose or variants change |
 
 Stamp `Last verified: YYYY-MM-DD` at the top of a doc when you confirm it, even if nothing changed.

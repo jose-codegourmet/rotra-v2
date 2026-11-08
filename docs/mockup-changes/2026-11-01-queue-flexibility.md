@@ -1,6 +1,6 @@
 # Queue flexibility review prototype
 
-Status: ALREADY A TICKET — #283
+Status: IN MOCK APP — #283 (PR #312)
 Date: 2026-11-01
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › preparation, Courts, Players, Queue

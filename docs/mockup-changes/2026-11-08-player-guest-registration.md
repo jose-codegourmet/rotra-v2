@@ -1,6 +1,6 @@
 # Guest invitations open registration
 
-Status: ALREADY A TICKET — #490
+Status: IN MOCK APP — #490 (PR #493)
 Date: 2026-11-08
 App: queue, player
 Mockup: apps/mockup/queue-app/rotra-queue.html › guest profile and Invite; apps/mockup/player-app/rotra-player.html › guest registration (developer menu)

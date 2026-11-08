@@ -5,6 +5,8 @@ Date: 2026-11-08
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Create / Edit session › step 1 › Details
 Screen ID: Q-SETUP
+Supersedes: 2026-11-08-queue-setup-time-fields-layout.md
+Superseded by: none
 
 ## What changed
 - Before: Date on its own row, Starts and Ends side by side below it, and the duration as a muted line

@@ -185,3 +185,6 @@ export const Desktop: Story = {
   ),
   globals: { viewport: { value: 'desktop' } },
 }
+
+/** Same queue tile with static faces and no operator controls; both themes via toolbar. */
+export const PlayerReadOnly: Story = { args: { readOnly: true } }

@@ -7,7 +7,7 @@ import { cn } from '@rotra/ui/cn'
 import { Field } from '@rotra/ui/field'
 import { Notice } from '@rotra/ui/notice'
 import { TextInput } from '@rotra/ui/text-input'
-import { useId } from 'react'
+import { useEffect, useId } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
 import { joinRequestFormDefaultValues } from './JoinRequestForm.defaultValues'
 import {
@@ -34,6 +34,8 @@ export type JoinRequestFormProps = {
   /** The visitor came back from the ROTRA Player login: "You're back" line above the form */
   returned?: boolean
   defaultValues?: Partial<JoinRequestFormInput>
+  /** Reports unsent input so the container can preserve a local login round trip. */
+  onValuesChange?: (values: JoinRequestFormInput) => void
   className?: string
 }
 
@@ -61,6 +63,7 @@ export function JoinRequestForm({
   playerLoginHref,
   returned = false,
   defaultValues,
+  onValuesChange,
   className,
 }: JoinRequestFormProps) {
   const id = useId()
@@ -68,6 +71,11 @@ export function JoinRequestForm({
     resolver: zodResolver(joinRequestSchema),
     defaultValues: { ...joinRequestFormDefaultValues, ...defaultValues },
   })
+  useEffect(() => {
+    if (!onValuesChange) return
+    const subscription = form.watch(() => onValuesChange(form.getValues()))
+    return () => subscription.unsubscribe()
+  }, [form, onValuesChange])
   const { errors } = form.formState
 
   return (

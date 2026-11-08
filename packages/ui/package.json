@@ -383,7 +383,8 @@
     "./sales-stat-card": "./src/components/sales-stat-card/SalesStatCard.tsx",
     "./bar-chart": "./src/components/bar-chart/BarChart.tsx",
     "./sales-breakdown-list": "./src/components/sales-breakdown-list/SalesBreakdownList.tsx",
-    "./club-sales-table": "./src/components/club-sales-table/ClubSalesTable.tsx"
+    "./club-sales-table": "./src/components/club-sales-table/ClubSalesTable.tsx",
+    "./public-session-queue": "./src/components/public-session-queue/PublicSessionQueue.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

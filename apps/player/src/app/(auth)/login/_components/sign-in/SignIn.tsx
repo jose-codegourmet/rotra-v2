@@ -1,26 +1,14 @@
 'use client'
 import { useSignIn } from '@rotra/data/auth/use-sign-in'
+import { consumeSessionReturn, rememberSessionReturn } from '@rotra/data/public-session/context'
 import { isRealDataMode } from '@rotra/data/real/mode'
 import { SignInForm } from '@rotra/ui/sign-in-form'
 import { toast } from '@rotra/ui/toaster'
 import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { setAccount } from '@/store/slices/authSlice'
 import { selectDev } from '@/store/slices/devSlice'
-
-/** The only other site a sign-in may return to: a public session page of the Queue app. */
-const QUEUE_ORIGINS = ['https://queue.rotra.club', 'http://localhost:9000']
-
-/** An absolute Queue app public session URL (/s/...) on an allowlisted origin, else null. */
-function queueSessionUrl(returnTo: string | undefined) {
-  if (!returnTo || returnTo.includes('\\')) return null
-  try {
-    const url = new URL(returnTo)
-    return QUEUE_ORIGINS.includes(url.origin) && url.pathname.startsWith('/s/') ? url.href : null
-  } catch {
-    return null
-  }
-}
 
 /** Accept only same-app absolute paths; never turn a return parameter into an external redirect. */
 function destination(returnTo: string | undefined, fallback: string) {
@@ -46,6 +34,9 @@ export function SignIn({
     router = useRouter(),
     dispatch = useAppDispatch()
   const { offline } = useAppSelector(selectDev)
+  useEffect(() => {
+    rememberSessionReturn(returnTo)
+  }, [returnTo])
   return (
     <SignInForm
       isPending={mutation.isPending}
@@ -60,7 +51,7 @@ export function SignIn({
           {
             onSuccess: (session) => {
               dispatch(setAccount(session.account))
-              const queueUrl = queueSessionUrl(returnTo)
+              const queueUrl = consumeSessionReturn(returnTo)
               if (queueUrl) window.location.assign(queueUrl)
               else router.replace(destination(returnTo, `/players/${session.account.id}`))
               toast('Signed in')

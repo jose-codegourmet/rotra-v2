@@ -5,6 +5,7 @@ export const matchCardMeta = {
   description:
     'One waiting match in the shared queue: queue position, format, origin, flow arrow and drag handle; Team A, VS, Team B (44 px faces, 15 px names, optional per-name wait); a status line (ready, needs attention, blocked, waiting for courts) that is always icon + text; Start, Edit and Remove.',
   usage: [
+    'readOnly removes the drag handle, operator metadata, profile buttons and actions for a signed-in Player on a public session page.',
     "Use for every waiting match in the Queue tab grid and in the Session view's upcoming row.",
     'Do not use for finished matches; the session record has its own row component in Queue › Results.',
     'Start renders only with onStart and is enabled only when the status is ready, or with canOpenCourt while the match only waits for a court and a court is not open yet (the Start match sheet then offers Start anyway). Edit and Remove render only with their callbacks.',

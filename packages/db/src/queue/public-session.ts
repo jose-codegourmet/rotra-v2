@@ -1,7 +1,7 @@
 import 'server-only'
 import { createHmac, timingSafeEqual } from 'node:crypto'
 import { maskPublicName, publicLevel, publicSkillMix } from '@rotra/data/public-session/rules'
-import { loadAccountContext } from '../auth/account-context'
+import { loadAccountContext, type PlayerContext } from '../auth/account-context'
 import { MOCK_COOKIE_PREFIX } from '../auth/data-mode'
 import { type CookieAdapter, verifySubject } from '../auth/supabase'
 import { prisma } from '../client/prisma'
@@ -132,7 +132,8 @@ export async function readPublicSession(slug: string) {
       mode: session.sessionMode,
       minimum: session.minimumGames,
       notes: session.notes,
-      participants: roster.map((entry) => {
+      participantCount: roster.length,
+      participants: roster.slice(0, 12).map((entry) => {
         const clubPlayer = byId.get(entry.clubPlayerId)
         return {
           name: maskPublicName(entry.nameSnapshot),
@@ -279,4 +280,62 @@ export async function readMyJoinRequest(
   })
   if (!request || request.session.publicSlug !== slug) throw new ServiceError('not_found')
   return myRequestDto(request)
+}
+
+/** #569: authenticated Player only. Eligibility is the current roster link, never a browser ID. */
+export async function readPlayerSessionAccess(context: PlayerContext, slug: string) {
+  const session = await prisma.queueSession.findUnique({
+    where: { publicSlug: slug },
+    select: { id: true, publication: { select: { state: true } } },
+  })
+  if (!session || session.publication?.state === 'deleted') throw new ServiceError('not_found')
+  return prisma.$transaction(async (tx) => {
+    const roster = await liveRoster(tx, session.id)
+    const linked = await tx.clubPlayer.findMany({
+      where: { id: { in: roster.map((entry) => entry.clubPlayerId) } },
+      select: { id: true, playerId: true, player: { select: { avatarRef: true } } },
+    })
+    const fullRoster = linked.some((entry) => entry.playerId === context.playerId)
+    const pictures = new Map(linked.map((entry) => [entry.id, entry.player?.avatarRef ?? null]))
+    const byId = new Map(roster.map((entry) => [entry.id, entry]))
+    // Only waiting lineups. No presence, court holds, games, scores, contacts or operator notes.
+    const matches = await tx.match.findMany({
+      where: { sessionId: session.id, state: 'waiting', removedAt: null },
+      orderBy: [{ queuePosition: 'asc' }, { matchNo: 'asc' }],
+      select: {
+        matchNo: true,
+        format: true,
+        participations: {
+          where: { leftAt: null },
+          orderBy: [{ joinedAt: 'asc' }, { id: 'asc' }],
+          select: { team: true, sessionPlayerId: true },
+        },
+      },
+    })
+    const team = (members: { team: string; sessionPlayerId: string }[], side: string) =>
+      members
+        .filter((member) => member.team === side)
+        .map((member) => {
+          const entry = byId.get(member.sessionPlayerId)
+          return {
+            name: maskPublicName(entry?.nameSnapshot ?? ''),
+            level: levelCodeFor(entry?.skillLevelId ?? null),
+          }
+        })
+    return {
+      playerId: context.playerId,
+      fullRoster,
+      participants: (fullRoster ? roster : roster.slice(0, 12)).map((entry) => ({
+        name: maskPublicName(entry.nameSnapshot),
+        pictureUrl: pictures.get(entry.clubPlayerId) ?? null,
+        ...publicLevel(levelCodeFor(entry.skillLevelId)),
+      })),
+      queue: matches.map((match) => ({
+        matchNo: match.matchNo,
+        format: match.format,
+        teamA: team(match.participations, 'A'),
+        teamB: team(match.participations, 'B'),
+      })),
+    }
+  })
 }

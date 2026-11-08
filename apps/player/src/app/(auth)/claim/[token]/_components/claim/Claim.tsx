@@ -3,6 +3,7 @@ import { MockError } from '@rotra/data/mock/errors'
 import { useCheckClaimStatus } from '@rotra/data/player-account/useCheckClaimStatus'
 import { useClaimLink } from '@rotra/data/player-account/useClaimLink'
 import { useCompleteClaim } from '@rotra/data/player-account/useCompleteClaim'
+import { consumeSessionReturn, rememberSessionReturn } from '@rotra/data/public-session/context'
 import { AccountLinkStatus } from '@rotra/ui/account-link-status'
 import { LinkPage } from '@rotra/ui/account-link-status/link-page'
 import { Card } from '@rotra/ui/card'
@@ -12,14 +13,17 @@ import { ErrorState } from '@rotra/ui/error-state'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { toast } from '@rotra/ui/toaster'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useAppDispatch } from '@/store/hooks'
 import { setAccount } from '@/store/slices/authSlice'
 
 type Step = 'check' | 'wrong' | 'form'
 type Done = { playerId: string; firstName: string; rtrId: string }
 
-export function Claim({ token }: { token: string }) {
+export function Claim({ token, returnTo }: { token: string; returnTo?: string }) {
+  useEffect(() => {
+    rememberSessionReturn(returnTo)
+  }, [returnTo])
   const link = useClaimLink(token)
   const complete = useCompleteClaim()
   const check = useCheckClaimStatus()
@@ -91,6 +95,8 @@ export function Claim({ token }: { token: string }) {
               }
               dispatch(setAccount(result.session.account))
               setDone(result)
+              const back = consumeSessionReturn(returnTo)
+              if (back) window.location.assign(back)
             },
             onError: (error) => toast.error(error.message),
           })
@@ -144,6 +150,8 @@ export function Claim({ token }: { token: string }) {
             onSuccess: (result) => {
               dispatch(setAccount(result.session.account))
               setDone(result)
+              const back = consumeSessionReturn(returnTo)
+              if (back) window.location.assign(back)
               window.scrollTo(0, 0)
               toast('Registration complete')
             },

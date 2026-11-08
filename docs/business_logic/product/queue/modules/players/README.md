@@ -145,3 +145,25 @@ Players in an On court match are **busy**, like players in a Playing match: they
 There is no rest-status workflow. The console derives a **wait time** for each available player: minutes since their last game ended, or since they were marked present (or the session started) if they have not played. A substituted-out player's wait starts when their match ends.
 
 See [add-player flow](flow/add-player.md).
+
+
+## Player access from the session link (#569)
+
+Owner decision, November 8, 2026: **Queue for any signed-in Player; full roster only for confirmed
+participants. Preserve individual level rings.** The ring decision supersedes #569's earlier request
+to hide individual levels. All participant and waitlist names remain masked, including the full roster.
+
+- Any enabled registered Player account can read this public session's **waiting queue**, in queue
+  order: position, format and masked lineups with playing levels. This is a read-only copy of the last
+  synced state, not the club console: no presence, games/results, operator notes, contacts or actions.
+- Full roster means removing the participant tile cap. Eligibility requires an unreleased roster
+  entry linked through the club player to the authenticated Player profile. A pending request,
+  waitlist position, matching name, browser player ID or registration alone does not qualify.
+- Anonymous and nonparticipant reads return at most 12 participant tiles, plus the total count. The
+  phone layout still shows at most nine. Names stay masked; aggregate skill mix and rings stay visible.
+  The waitlist remains the existing masked public projection and does not grant full-roster access.
+- Signing in and registering never reserve a slot, confirm a request, link a guest, or grant club
+  operating authority. The existing guest form and visitor receipt remain independent of Player access.
+- Login and invitation registration/claim return to the same public session and tab. Unsent request
+  fields and its retry ID stay temporarily in that Queue tab's sessionStorage (30 minutes); they are
+  cleared after send/cancel. No password, auth token or admission evidence is stored in this context.

@@ -5,6 +5,7 @@ export const publicSessionMeta = {
   description:
     'Q-PUBLIC-DETAILS / Q-PUBLIC-PARTICIPANTS / Q-PUBLIC-RESULTS / Q-PUBLIC-JOIN container: the public session page from usePublicSession(slug): PublicSessionHero, the JoinRequestCard (prepared and active sessions), Details and "Participants · N" tabs (local state), and PublicResultsSection below the tabs for completed sessions only.',
   usage: [
+    'Wires the Player-hosted access query to PublicSessionQueue and confirmed-only uncapped PublicParticipants; errors hide access data. Restores the local session tab/hash; identity never grants admission.',
     'Rendered by /s/[slug] (viewer "visitor": no sign-in, no operator top bar, nav or sync pill; proxy.ts lets /s/* through) and by the operator preview /sessions/[sessionId]/public-page under PublicPreviewBanner (viewer "operator").',
     'Hero chip: Happening now (active), Finished (completed), none for prepared and invalid sessions.',
     'JoinRequestCard variant: this visitor\'s own request from useMyJoinRequest first (Request sent, Confirmed · you have a slot, Confirmed · waitlist #N, Request not accepted), then requests off, active, "1 slot left" / "N slots left" or all slots taken. The available variants show the confirmed players’ Skill mix. Request to join opens JoinRequestSheet; sending creates a request only, so the participant list is unchanged until the Queue Master confirms it.',

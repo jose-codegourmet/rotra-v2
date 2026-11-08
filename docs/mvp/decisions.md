@@ -19,6 +19,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-08-02](#d-2026-11-08-02) | Player Compare data, rules and route | approved | implemented in source; SQL draft, verification pending | #525, #526, #541 (epic #502) | [Player](workstreams/player.md) |
 | [D-2026-11-08-03](#d-2026-11-08-03) | Profile pictures in Supabase Storage | approved | in progress | #522, #542 (epic #502) | [Player](workstreams/player.md) |
 | [D-2026-11-08-04](#d-2026-11-08-04) | Scheduled jobs: Supabase pg_cron calls protected Route Handlers | approved | not started | #545; #546, #547 blocked | [Backend](workstreams/backend.md) |
+| [D-2026-11-08-06](#d-2026-11-08-06) | Player access to public Queue sessions | approved | implemented in source; authenticated real verification pending | #569 | [Queue](workstreams/queue.md) |
 
 ## Status conventions
 
@@ -198,3 +199,15 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   use Next's existing Sharp for every GIF frame. HEIC/HEIF becomes WebP for browser-compatible display.
 - **Later owner follow-up:** simplify the editor to a draggable crop and one Zoom slider; remove position sliders and rotation controls. Automatic source orientation remains.
 - **Limits:** retain the 2,097,152-byte stored-object cap. See the [storage decision](../database_design/product/player-information/modules/identity.md#profile-picture-storage-542) for input, pixel, frame and processing limits.
+
+
+### D-2026-11-08-06 — Player access to public Queue sessions (#569)
+
+- **Status:** approved; implementation in #569.
+- **Owner decision, November 8, 2026:** “Queue for any signed-in Player; full roster only for confirmed
+  participants”; “Preserve individual level rings”. Names remain masked for every audience. Full roster
+  means uncapped participant tiles, verified through the authenticated Player's actual roster linkage.
+- **Supersedes:** #569's earlier acceptance about hiding individual levels. Keeps the later November 8
+  ring decision and November 7 name masking decision. No club/operator access or automatic confirmation.
+- **Flow:** credentialed exact-origin Player-hosted read; separate audience cookies; allowlisted return
+  context and expiring Queue-local draft. See architecture § Player access to a public Queue session.

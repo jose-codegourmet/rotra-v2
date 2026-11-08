@@ -83,3 +83,5 @@ export const LongMaskedNames: Story = {
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
 export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }
 export const Light: Story = { globals: { theme: 'light' } }
+
+export const ConfirmedParticipant: Story = { args: { fullRoster: true } }

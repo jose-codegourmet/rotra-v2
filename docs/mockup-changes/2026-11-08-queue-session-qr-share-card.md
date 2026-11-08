@@ -1,6 +1,6 @@
 # Session QR becomes a branded share card with a logo in the QR
 
-Status: TICKETED — #499
+Status: IN PROGRESS — #499
 Date: 2026-11-08
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Session preparation › Session QR sheet
@@ -41,3 +41,8 @@ Components: session-join-qr, session-preparation
 - Epic: #499 (Q14)
 - #511 Q14.3 · Session QR share card: Post | Story, club logo in the QR, Download image
 - #512 Q14.4 · Preparation header, phone More options and preparation tabs menu
+
+## Implementation verification (#511)
+- Share-card component and stories implemented; preparation wiring remains in #512.
+- Like-for-like browser comparison and PNG download checks are pending the full epic batch.
+- Phone scanning of the downloaded QR images has not been verified.

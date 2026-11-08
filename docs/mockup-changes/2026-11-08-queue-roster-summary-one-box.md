@@ -1,6 +1,6 @@
 # Roster tab: slots and skill mix in one box, one bar
 
-Status: TICKETED — #498
+Status: IN MOCK APP — #498
 Date: 2026-11-08
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Roster and levels tab › header summary

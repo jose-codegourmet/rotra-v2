@@ -1,6 +1,6 @@
 # Roster List | Grid toggle uses icons
 
-Status: IN PROGRESS — #498
+Status: IN MOCK APP — #498
 Date: 2026-11-08
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Roster and levels › view toggle

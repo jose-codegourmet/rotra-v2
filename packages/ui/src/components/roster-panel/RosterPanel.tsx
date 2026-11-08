@@ -14,7 +14,7 @@ import { RosterRow } from '@rotra/ui/roster-row'
 import { SegmentedControl } from '@rotra/ui/segmented-control'
 import { Select } from '@rotra/ui/select'
 import { Skeleton } from '@rotra/ui/skeleton'
-import { SkillDistributionBar } from '@rotra/ui/skill-distribution-bar'
+import type { SkillMixKey } from '@rotra/ui/skill-mix'
 import { SlotMeter } from '@rotra/ui/slot-meter'
 import { TabMenu } from '@rotra/ui/tab-menu'
 import { Tabs as TabsPrimitive } from 'radix-ui'
@@ -28,6 +28,7 @@ import {
   resolveRosterGroupBy,
   resolveRosterLevelTab,
   rosterGroupByOptions,
+  rosterLevelFamily,
   rosterLevelTabs,
 } from './RosterPanel.helpers'
 
@@ -229,8 +230,18 @@ export function RosterPanel({
   const groupOptions = rosterGroupByOptions(tab)
   const rows = filterRosterByLevelTab(players, tab)
   const sections = groupRosterPlayers(rows, groupBy)
-  const skillCount = (heading: string) =>
-    sections?.find((section) => section.heading === heading)?.players.length ?? 0
+  // The SlotMeter segments count the whole roster, whichever level tab is open
+  const skillCounts = { beginner: 0, intermediate: 0, advanced: 0, unrated: 0 }
+  for (const player of players) {
+    const family = rosterLevelFamily(player.level)
+    skillCounts[family === 'none' ? 'unrated' : family] += 1
+  }
+  const activeLevel: SkillMixKey | null = tab === 'all' ? null : tab === 'none' ? 'unrated' : tab
+  // Pressing a segment opens that level tab; pressing the open one goes back to All
+  const pressLevel = (level: SkillMixKey) => {
+    const next: RosterLevelTab = level === 'unrated' ? 'none' : level
+    setLevelTab(next === tab ? 'all' : next)
+  }
   const tabLabel = tabs.find((item) => item.value === tab)?.label ?? 'All'
 
   if (loading)
@@ -292,6 +303,9 @@ export function RosterPanel({
           rosterCount={players.length}
           capacity={capacity}
           waitlistCount={waitlistCount}
+          skillCounts={skillCounts}
+          activeLevel={activeLevel}
+          onLevelPress={pressLevel}
         />
         {!readOnly && missing ? (
           <Notice tone="warn">
@@ -370,40 +384,27 @@ export function RosterPanel({
               {!rows.length ? (
                 <EmptyState>No {tabLabel} players on the roster.</EmptyState>
               ) : sections ? (
-                [
-                  groupBy === 'skill' ? (
-                    <SkillDistributionBar
-                      key="skill-mix"
-                      counts={{
-                        beginner: skillCount('Beginner'),
-                        intermediate: skillCount('Intermediate'),
-                        advanced: skillCount('Advanced'),
-                        unrated: skillCount('No level'),
-                      }}
+                sections.map((section, index) => (
+                  <section
+                    key={section.heading}
+                    className="flex flex-col gap-2"
+                    aria-labelledby={`${headingId}-${index}`}
+                  >
+                    <h3 id={`${headingId}-${index}`} className="text-[15px] font-bold">
+                      {section.heading} · {section.players.length}
+                    </h3>
+                    <PlayerList
+                      players={section.players}
+                      view={view}
+                      levelsLocked={levelsLocked}
+                      readOnly={readOnly}
+                      onOpenProfile={onOpenProfile}
+                      onLevelChange={onLevelChange}
+                      onPresentChange={onPresentChange}
+                      onRemove={onRemove}
                     />
-                  ) : null,
-                  ...sections.map((section, index) => (
-                    <section
-                      key={section.heading}
-                      className="flex flex-col gap-2"
-                      aria-labelledby={`${headingId}-${index}`}
-                    >
-                      <h3 id={`${headingId}-${index}`} className="text-[15px] font-bold">
-                        {section.heading} · {section.players.length}
-                      </h3>
-                      <PlayerList
-                        players={section.players}
-                        view={view}
-                        levelsLocked={levelsLocked}
-                        readOnly={readOnly}
-                        onOpenProfile={onOpenProfile}
-                        onLevelChange={onLevelChange}
-                        onPresentChange={onPresentChange}
-                        onRemove={onRemove}
-                      />
-                    </section>
-                  )),
-                ]
+                  </section>
+                ))
               ) : (
                 <PlayerList
                   players={rows}

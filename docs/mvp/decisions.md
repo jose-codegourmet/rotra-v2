@@ -18,6 +18,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-08-01](#d-2026-11-08-01) | Where Admin Sales numbers are calculated | approved | not started | #533, #540 (epic #504) | [Admin](workstreams/admin.md) |
 | [D-2026-11-08-02](#d-2026-11-08-02) | Player Compare data, rules and route | approved | not started | #525, #526, #541 (epic #502) | [Player](workstreams/player.md) |
 | [D-2026-11-08-03](#d-2026-11-08-03) | Profile pictures in Supabase Storage | approved | not started | #522, #542 (epic #502) | [Player](workstreams/player.md) |
+| [D-2026-11-08-04](#d-2026-11-08-04) | Scheduled jobs: Supabase pg_cron calls protected Route Handlers | approved | not started | #545; #546, #547 blocked | [Backend](workstreams/backend.md) |
 
 ## Status conventions
 
@@ -170,6 +171,20 @@ Then add a row to the [index](#index) and link the entry from the workstream pag
 - **Roadmap:** MVP candidate — [Player workstream](workstreams/player.md)
 - **Decision:** Reuse the club-logo pattern (#374) instead of building a new one. The Player app's existing `/api/me/profile` route (behind `requireOwnPlayer`) receives the photo, the server normalizes it to a square PNG (512 px), uploads it to a public **`player-avatars`** Supabase Storage bucket, and saves its immutable URL in `players.avatar_ref`. A character is saved as `character:<id>`; Use my initials saves null. No direct browser upload, no Edge Function, no migration (`avatar_ref` already exists). Old files are kept like club logo snapshots.
 - **References:** [architecture.md › Club logos](../architecture.md), [identity](../database_design/product/player-information/modules/identity.md), [mockup log](../mockup-changes/2026-11-08-player-change-avatar.md).
+
+<a id="d-2026-11-08-04"></a>
+### D-2026-11-08-04 — Scheduled jobs: Supabase pg_cron calls protected Route Handlers
+- **Decision status:** approved (2026-11-08; the owner asked for Supabase over Vercel and delegated the details for efficiency)
+- **Implementation status:** not started
+- **Ticket:** [#545](https://github.com/jose-codegourmet/rotra-v2/issues/545) (scheduler and license lapse), [#546](https://github.com/jose-codegourmet/rotra-v2/issues/546) (retention sweep, blocked on #248), [#547](https://github.com/jose-codegourmet/rotra-v2/issues/547) (ranking ageing, blocked on #247); epic [#241](https://github.com/jose-codegourmet/rotra-v2/issues/241)
+- **Roadmap:** MVP — [Backend workstream](workstreams/backend.md)
+- **Decision:**
+  - **Scheduler: Supabase `pg_cron`**, enabled with `pg_net` by a Prisma migration. Free on the Supabase Free plan and runs at any interval. Not Vercel Cron: Vercel Hobby allows at most one run a day and only within a loose hour.
+  - **What runs: the existing TypeScript job, unchanged.** Each schedule makes one `net.http_post` to a protected Route Handler in the Admin app (`POST /api/jobs/<job>`) that calls the job function in `packages/db` (`refreshLapsedEntitlements`, `runRetentionSweep`, `scheduleAgeingJobs`). The URL and secret live in **Supabase Vault**; the handler checks `ROTRA_JOBS_SECRET` and answers anything else as not found.
+  - **No Supabase Edge Functions for these jobs.** They would need the Prisma-based rules rewritten for Deno (two copies of the same rules), and the retention sweep must purge the apps' page cache anyway. The jobs run once a day and spend their time in database queries, so an Edge Function would not make them faster. Edge Functions stay an option for a future job with no existing code to reuse (it needs its own decision).
+  - **Safety:** every job is idempotent and batch-limited, so a repeat or a missed day is harmless; responses are visible in `net._http_response`. Daily at 00:05 Asia/Manila unless a ticket says otherwise.
+- **Hosting note (not a decision):** Vercel Hobby is for non-commercial use and Supabase Free projects pause after a week of inactivity (a paused project runs no jobs). Both are fine while building; before paying clubs rely on ROTRA, plan Vercel Pro and Supabase Pro.
+- **References:** [Backend workstream](workstreams/backend.md), [Supabase cron](https://supabase.com/docs/guides/cron/quickstart), [Vercel cron limits](https://vercel.com/docs/cron-jobs/usage-and-pricing).
 
 ## Admin implementation gap index
 

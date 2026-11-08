@@ -27,14 +27,14 @@ real-mode switch; scheduled jobs; decision gates #243–#248 under [F07 #241](ht
 | Production data mode | unknown | Whether production sets `real` is not in the repo | Ticket: needed (or owner confirms) |
 | Mock fallback in real mode | implemented | Unwired fetchers throw `NotConnectedError` (`packages/data/src/mock/store.ts:207,229`, `mock/latency.ts:18`) | #386 (tracking) |
 | Finalization projection worker | partially connected | In-request worker (`packages/db/src/player/projections.ts`) | #243 open (worker design) |
-| Scheduled jobs (license lapse, retention, ageing) | not implemented | `refreshLapsedEntitlements`, `runRetentionSweep`, `scheduleAgeingJobs` have no caller; no cron in `.github/workflows` | Ticket: needed (MVP scope: open question 13) |
+| Scheduled jobs (license lapse, retention, ageing) | not implemented | `refreshLapsedEntitlements`, `runRetentionSweep`, `scheduleAgeingJobs` have no caller yet. Decided: Supabase pg_cron calls protected Admin Route Handlers ([D-2026-11-08-04](../decisions.md#d-2026-11-08-04)) | #545; #546 (blocked on #248), #547 (blocked on #247) |
 | Offline sync services | partially connected | `packages/db/src/queue/sync.ts:165-629`, no route ([queue-offline.md](queue-offline.md)) | #246 open |
 | RLS on public tables | not implemented | RLS disabled on 55 public tables; `anon` can execute `rotra_next_player_sequence()` (database open decisions, F07.34 gaps) | #387 (migration sign-off) |
 
 ## Remaining work
 
 - [ ] Confirm production sets `ROTRA_DATA_MODE` / `NEXT_PUBLIC_ROTRA_DATA_MODE=real`. Ticket: needed (or owner confirms).
-- [ ] Scheduler for license-lapse refresh, retention sweep and ageing jobs. Ticket: needed — confirm MVP scope.
+- [ ] Scheduler for license-lapse refresh, retention sweep and ageing jobs ([D-2026-11-08-04](../decisions.md#d-2026-11-08-04)). Tickets: #545, #546, #547.
 - [ ] Close the decision gates that block MVP work: #243 (worker), #244 (auth/claim/contacts), #245 (storage rules), #246 (offline), #247 (ranking), #248 (public projections/retention). Ticket: existing gates.
 - [ ] RLS / `anon` grant fix. Ticket: #387.
 

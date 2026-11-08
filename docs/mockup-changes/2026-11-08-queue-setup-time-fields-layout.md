@@ -1,6 +1,6 @@
 # Setup: Starts and Ends side by side, next day becomes a small link
 
-Status: TICKETED — #501
+Status: IN MOCK APP — #501
 Date: 2026-11-08
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Create / Edit session › step 1 › Details

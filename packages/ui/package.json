@@ -375,7 +375,11 @@
     "./admin-player-actions": "./src/components/admin-player-actions/AdminPlayerActions.tsx",
     "./copy-player-value": "./src/components/copy-player-value/CopyPlayerValue.tsx",
     "./admin-player-bulk-bar": "./src/components/admin-player-bulk-bar/AdminPlayerBulkBar.tsx",
-    "./password-reset-requests": "./src/components/password-reset-requests/PasswordResetRequests.tsx"
+    "./password-reset-requests": "./src/components/password-reset-requests/PasswordResetRequests.tsx",
+    "./compare-filter-bar": "./src/components/compare-filter-bar/CompareFilterBar.tsx",
+    "./compare-stats": "./src/components/compare-stats/CompareStats.tsx",
+    "./together-card": "./src/components/together-card/TogetherCard.tsx",
+    "./shared-game-row": "./src/components/shared-game-row/SharedGameRow.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

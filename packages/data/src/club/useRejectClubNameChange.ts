@@ -8,7 +8,8 @@ import { rejectClubNameChange } from './fetchers'
 export function useRejectClubNameChange() {
   const client = useQueryClient()
   return useMutation({
-    mutationFn: (clubId: string) => rejectClubNameChange(clubId),
+    mutationFn: ({ clubId, requestId }: { clubId: string; requestId: string }) =>
+      rejectClubNameChange(clubId, requestId),
     networkMode: 'always',
     retry: false,
     onSuccess: () => invalidateAdminClubQueries(client),

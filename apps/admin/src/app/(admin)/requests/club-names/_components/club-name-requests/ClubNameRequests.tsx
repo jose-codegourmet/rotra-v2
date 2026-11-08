@@ -49,7 +49,7 @@ export function ClubNameRequests() {
         retrying={query.isFetching}
         retryLabel="Retry"
       >
-        Check your connection, then try again.
+        Please try again. If the problem continues, try again later.
       </ErrorState>
     )
   } else if (!requests) {

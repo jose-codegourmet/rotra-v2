@@ -1,6 +1,6 @@
 # The own profile has a Your clubs card with Leave club and Report a problem
 
-Status: IN PROGRESS — #588
+Status: IN MOCK APP — #588
 Date: 2026-11-09
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › Own profile › Your clubs, Leave club sheet

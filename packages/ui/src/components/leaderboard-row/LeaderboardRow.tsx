@@ -11,6 +11,7 @@ export type LeaderboardRowProps = LeaderboardRowVariants & {
   levelLabel: string
   picture?: Pick<AvatarProps, 'src' | 'initials'>
   isMe?: boolean
+  masked?: boolean
   onSelect: () => void
 }
 
@@ -42,19 +43,22 @@ export function LeaderboardRow({
   isMe = false,
   variant,
   onSelect,
+  masked = false,
 }: LeaderboardRowProps) {
   const rowVariant = variant ?? (isMe ? 'me' : 'default')
   const medal = rowVariant.startsWith('medal-')
   const accessibleName = `${positionLabel(position, rowVariant, isMe)} ${fullName}, ${levelLabel}`
 
+  const Row = masked ? 'div' : 'button'
   return (
-    <button
+    <Row
       id={id}
-      type="button"
-      onClick={onSelect}
+      type={masked ? undefined : 'button'}
+      aria-disabled={masked || undefined}
+      onClick={masked ? undefined : onSelect}
       aria-label={accessibleName}
       className={cn(
-        leaderboardRowVariants({ variant: rowVariant }),
+        leaderboardRowVariants({ variant: masked ? 'masked' : rowVariant }),
         'group/leaderboard-row',
         rowVariant !== 'me' && 'shadow-[0_-1px_0_var(--border)] first:shadow-none',
       )}
@@ -70,8 +74,8 @@ export function LeaderboardRow({
       </span>
       <Avatar
         name={fullName}
-        src={picture?.src}
-        initials={picture?.initials}
+        src={masked ? undefined : picture?.src}
+        initials={masked ? undefined : picture?.initials}
         size={36}
         className={cn(
           'max-[560px]:row-span-2',
@@ -81,7 +85,7 @@ export function LeaderboardRow({
       />
       <span className="col-start-3 flex min-w-0 flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
         <b className={cn('min-w-0 [overflow-wrap:anywhere]', medal && 'text-base')}>{fullName}</b>
-        {nickname ? <span className="text-[13px] text-fg2">“{nickname}”</span> : null}
+        {!masked && nickname ? <span className="text-[13px] text-fg2">“{nickname}”</span> : null}
         {isMe ? <Chip tone="accent">You</Chip> : null}
       </span>
       <span
@@ -92,6 +96,6 @@ export function LeaderboardRow({
       >
         {levelLabel}
       </span>
-    </button>
+    </Row>
   )
 }

@@ -1,6 +1,8 @@
 import { formatPhoneForDisplay } from '@rotra/schema/phone'
 import { Card } from '@rotra/ui/card'
 import { KeyValueList } from '@rotra/ui/key-value-list'
+import { Notice } from '@rotra/ui/notice'
+import { Switch } from '@rotra/ui/switch'
 import { useId } from 'react'
 
 export type PrivateContactCardProps = {
@@ -9,9 +11,14 @@ export type PrivateContactCardProps = {
   /** The applied email, never a pending requested value */
   email?: string
   /** The player finished registering */
-  claimed: boolean
+  claimed?: boolean
   /** The player hid their phone from clubs (only meaningful once claimed) */
-  phoneHidden: boolean
+  phoneHidden?: boolean
+  /** Player profile visibility mode; omitted on the Admin private-contact readout. */
+  savedPrivate?: boolean
+  onToggleProfile?: (next: boolean) => void
+  isPending?: boolean
+  error?: string
 }
 
 function phoneShownToClubs({ claimed, phoneHidden }: PrivateContactCardProps) {
@@ -26,6 +33,41 @@ function phoneShownToClubs({ claimed, phoneHidden }: PrivateContactCardProps) {
 export function PrivateContactCard(props: PrivateContactCardProps) {
   const { phone, email, claimed } = props
   const headingId = useId()
+  if (props.onToggleProfile)
+    return (
+      <Card asChild>
+        <section className="flex flex-col gap-3">
+          <h2>Profile visibility</h2>
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex min-w-0 flex-col gap-1">
+              <label htmlFor={headingId} className="font-bold">
+                Private profile
+              </label>
+              <p className="text-sm text-fg2">
+                Private means guests don't see your ROTRA profile. Signed-in ROTRA players still see
+                it.
+              </p>
+            </div>
+            <Switch
+              id={headingId}
+              aria-label="Private profile"
+              checked={props.savedPrivate ?? false}
+              onChange={props.onToggleProfile}
+              disabled={props.isPending}
+              aria-busy={props.isPending}
+            />
+          </div>
+          <p className="text-sm" aria-live="polite">
+            {props.isPending
+              ? 'Saving…'
+              : props.savedPrivate
+                ? 'Saved: your profile is private.'
+                : 'Saved: your profile is public.'}
+          </p>
+          {props.error ? <Notice tone="error">{props.error}</Notice> : null}
+        </section>
+      </Card>
+    )
   return (
     <Card asChild>
       <section aria-labelledby={headingId} className="flex flex-col gap-3">

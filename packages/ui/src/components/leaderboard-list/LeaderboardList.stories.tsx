@@ -47,3 +47,17 @@ export const FooterWithMore: Story = {
 export const FooterComplete: Story = { args: { shown: 1_284, total: 1_284, children: null } }
 
 export const Refreshing: Story = { args: { busy: true } }
+
+export const MaskedRows: Story = {
+  render: () => (
+    <LeaderboardList>
+      <LeaderboardRow
+        position={6}
+        fullName="J*** A***"
+        masked
+        levelLabel="Intermediate High"
+        onSelect={noop}
+      />
+    </LeaderboardList>
+  ),
+}

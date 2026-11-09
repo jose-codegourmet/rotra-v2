@@ -175,10 +175,16 @@ export function autoFillPlacements(
  * Queue order, that are ready for `courtId` by the same check Auto Queue uses (one court, and
  * `canPlace` on that court). No ranking of its own; empty when the court is not free.
  */
-export const nextMatchCandidates = (courtId: string, ctx: MatchContext, limit = 2) =>
+export const nextMatchCandidates = (courtId: string, ctx: MatchContext, limit = 5) =>
   waitingMatches(ctx.matches)
     .filter((m) => courtsNeeded(m) === 1 && canPlace(m, [courtId], ctx))
-    .slice(0, limit)
+    .slice(0, Math.max(0, Math.min(limit, 5)))
+    .map((match) => ({
+      ...match,
+      gamesByPlayer: Object.fromEntries(
+        allPlayers(match).map((id) => [id, countedGames(id, ctx.matches)]),
+      ),
+    }))
 /** Players a standard match needs: doubles 4, else singles 2 (doubles first when both are on). */
 export const standardMatchSize = (session: Pick<QueueSession, 'allowSingles' | 'allowDoubles'>) =>
   session.allowDoubles ? 4 : session.allowSingles ? 2 : 0

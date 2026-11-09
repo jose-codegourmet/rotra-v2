@@ -151,6 +151,8 @@
     "./queue-session/useSetCourtFillMode": "./src/queue-session/useSetCourtFillMode.ts",
     "./queue-session/useFillOpenedCourts": "./src/queue-session/useFillOpenedCourts.ts",
     "./match/useAddMatch": "./src/match/useAddMatch.ts",
+    "./match/useClearQueue": "./src/match/useClearQueue.ts",
+    "./match/queueSearch.rules": "./src/match/queueSearch.rules.ts",
     "./match/useMakeMatch": "./src/match/useMakeMatch.ts",
     "./match/useUpdateMatchLineup": "./src/match/useUpdateMatchLineup.ts",
     "./match/useAddSuggestedMatch": "./src/match/useAddSuggestedMatch.ts",

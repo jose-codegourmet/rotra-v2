@@ -114,8 +114,15 @@ export function createMatchCardFixtures(now = Date.now()) {
     }),
   )
 
+  // Five ready candidates for slider stories; the prepared Sunday Night Queue starts empty.
+  const sliderCandidates = Array.from({ length: 5 }, (_, i) => ({
+    ...ready,
+    match: { ...ready.match, id: `slider-match-${i + 1}`, matchNo: 20 + i, queuePosition: i + 1 },
+  }))
+
   return {
     ready,
+    sliderCandidates,
     needsAttention,
     blocked,
     waitingForCourts,

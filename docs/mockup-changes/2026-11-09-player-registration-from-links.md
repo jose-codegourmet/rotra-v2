@@ -1,6 +1,6 @@
 # Registration from club, session and Admin links, email banner and Join club page
 
-Status: TICKETED — #588
+Status: IN PROGRESS — #588
 Date: 2026-11-09
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › Registration form (/register), success page, email banner, Join <club>? page, Prototype sheet

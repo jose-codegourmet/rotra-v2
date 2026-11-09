@@ -398,7 +398,9 @@
     "./bar-chart": "./src/components/bar-chart/BarChart.tsx",
     "./sales-breakdown-list": "./src/components/sales-breakdown-list/SalesBreakdownList.tsx",
     "./club-sales-table": "./src/components/club-sales-table/ClubSalesTable.tsx",
-    "./public-session-queue": "./src/components/public-session-queue/PublicSessionQueue.tsx"
+    "./public-session-queue": "./src/components/public-session-queue/PublicSessionQueue.tsx",
+    "./email-confirm-banner": "./src/components/email-confirm-banner/EmailConfirmBanner.tsx",
+    "./join-club-card": "./src/components/join-club-card/JoinClubCard.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

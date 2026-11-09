@@ -147,6 +147,7 @@ export function LeaderboardPage() {
       )
     : null
   const podiumEntries = entries.slice(0, 3).map((entry) => ({
+    masked: 'masked' in entry && !!entry.masked,
     id: `leaderboard-${entry.id}`,
     fullName: entry.fullName,
     nickname: entry.nickname,
@@ -250,6 +251,7 @@ export function LeaderboardPage() {
                   key={entry.id}
                   id={`leaderboard-${entry.id}`}
                   position={entry.position}
+                  masked={'masked' in entry && !!entry.masked}
                   fullName={entry.fullName}
                   nickname={entry.nickname}
                   picture={{ src: pictureSrc(entry.pictureUrl, entry.id, entry.fullName) }}

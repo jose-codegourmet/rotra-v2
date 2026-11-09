@@ -1,4 +1,5 @@
 'use client'
+import { PROFILE_LOGIN_MESSAGE } from '@rotra/data/player/visibility'
 import { usePlayerGames } from '@rotra/data/player/usePlayerGames'
 import { usePlayerRank } from '@rotra/data/player/usePlayerRank'
 import { Button } from '@rotra/ui/button'
@@ -21,6 +22,7 @@ export function GameHistory({ playerId }: { playerId: string }) {
   const player = rank.data
   const account = useAppSelector(selectAccount),
     { offline } = useAppSelector(selectDev)
+  if (rank.error?.message === PROFILE_LOGIN_MESSAGE || games.error?.message === PROFILE_LOGIN_MESSAGE) return <main className="mx-auto max-w-[920px] px-4 pt-5"><ProfileNotFound id={playerId ?? ''} loginRequired onSignIn={() => router.push(`/login?returnTo=${encodeURIComponent(`/players/${playerId}/games`)}`)}/></main>
   if (rank.data === null)
     return (
       <main className="mx-auto max-w-[920px] px-4 pt-5">

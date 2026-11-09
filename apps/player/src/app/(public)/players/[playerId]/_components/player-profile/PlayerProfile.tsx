@@ -1,4 +1,5 @@
 'use client'
+import { PROFILE_LOGIN_MESSAGE } from '@rotra/data/player/visibility'
 import { useSession } from '@rotra/data/auth/use-session'
 import { useSignOut } from '@rotra/data/auth/use-sign-out'
 import { OPEN_CONTACT_CHANGE_STATUSES } from '@rotra/data/contact-change-request/types'
@@ -84,6 +85,7 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
     void games.refetch()
     void settings.refetch()
   }
+  if (profile.error?.message === PROFILE_LOGIN_MESSAGE || rank.error?.message === PROFILE_LOGIN_MESSAGE || games.error?.message === PROFILE_LOGIN_MESSAGE) return <main className="mx-auto max-w-[920px] px-4 pt-5"><ProfileNotFound id={playerId ?? ''} loginRequired onSignIn={() => router.push(`/login?returnTo=${encodeURIComponent(`/players/${playerId}`)}`)}/></main>
   if (profile.data === null || rank.data === null)
     return (
       <main className="mx-auto flex max-w-[920px] flex-col gap-5 px-4 pt-5">

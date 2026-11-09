@@ -10,6 +10,7 @@ import { type CompareStatRow, CompareStats } from '@rotra/ui/compare-stats'
 import { ErrorState } from '@rotra/ui/error-state'
 import { levelLabel } from '@rotra/ui/level-pill'
 import { PageHeader } from '@rotra/ui/page-header'
+import { ProfileNotFound } from '@rotra/ui/profile-not-found'
 import { SharedGamesList } from '@rotra/ui/shared-game-row'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { TogetherCard } from '@rotra/ui/together-card'
@@ -45,11 +46,21 @@ export function PlayerCompare({ playerId }: { playerId: string }) {
   const [page, setPage] = useState(0)
   const compare = usePlayerCompare(viewerId, playerId, { filter, page })
   useEffect(() => {
-    if (session.isSuccess && !session.data)
-      router.replace(`/login?returnTo=${encodeURIComponent(`/players/${playerId}/compare`)}`)
-    else if (viewerId && viewerId === playerId)
+    if (viewerId && viewerId === playerId)
       router.replace(`/players/${encodeURIComponent(playerId)}`)
-  }, [session.isSuccess, session.data, viewerId, playerId, router])
+  }, [viewerId, playerId, router])
+  if (session.isSuccess && !session.data)
+    return (
+      <main className="mx-auto max-w-[920px] px-4 pt-5">
+        <ProfileNotFound
+          id={playerId}
+          loginRequired
+          onSignIn={() =>
+            router.push(`/login?returnTo=${encodeURIComponent(`/players/${playerId}/compare`)}`)
+          }
+        />
+      </main>
+    )
   const back = () => router.push(`/players/${encodeURIComponent(playerId)}`)
   if (
     session.isPending ||

@@ -2,12 +2,14 @@
 import { useSignOut } from '@rotra/data/auth/use-sign-out'
 import { useMyAccount } from '@rotra/data/player-account/useMyAccount'
 import { useSetPhonePrivacy } from '@rotra/data/player-account/useSetPhonePrivacy'
+import { useSetProfilePrivacy } from '@rotra/data/player-account/useSetProfilePrivacy'
 import { Button } from '@rotra/ui/button'
 import { ContactDetailsCard } from '@rotra/ui/contact-details-card'
 import { ContactRequestStatus } from '@rotra/ui/contact-request-status'
 import { ErrorState } from '@rotra/ui/error-state'
 import { PageHeader } from '@rotra/ui/page-header'
 import { PhonePrivacyCard } from '@rotra/ui/phone-privacy-card'
+import { PrivateContactCard } from '@rotra/ui/private-contact-card'
 import { SignOutCard } from '@rotra/ui/sign-out-card'
 import { toast } from '@rotra/ui/toaster'
 import { useRouter } from 'next/navigation'
@@ -24,6 +26,7 @@ export function PrivacyAndContact() {
   // A different player's private data is never requested: only the signed-in id is passed.
   const playerId = account?.id ?? null
   const myAccount = useMyAccount(playerId)
+  const setProfilePrivacy = useSetProfilePrivacy()
   const setPrivacy = useSetPhonePrivacy()
   const signOut = useSignOut('player')
   const contactChange = useContactChangeSheet(playerId)
@@ -61,6 +64,17 @@ export function PrivacyAndContact() {
         </Button>
         <PageHeader title="Privacy and contact" />
       </div>
+      <PrivateContactCard
+        savedPrivate={data.profilePrivate ?? false}
+        isPending={setProfilePrivacy.isPending}
+        error={setProfilePrivacy.error?.message}
+        onToggleProfile={(next) =>
+          setProfilePrivacy.mutate(
+            { profilePrivate: next },
+            { onError: (error) => toast.error(error.message) },
+          )
+        }
+      />
       <PhonePrivacyCard
         savedHidden={data.phoneHidden}
         isPending={setPrivacy.isPending}

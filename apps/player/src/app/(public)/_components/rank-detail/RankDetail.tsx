@@ -1,6 +1,7 @@
 'use client'
 import { PLAYING_LEVELS } from '@rotra/data/player/types'
 import { usePlayerRank } from '@rotra/data/player/usePlayerRank'
+import { PROFILE_LOGIN_MESSAGE } from '@rotra/data/player/visibility'
 import { useRankingSettings } from '@rotra/data/ranking-settings'
 import { Button } from '@rotra/ui/button'
 import { ErrorState } from '@rotra/ui/error-state'
@@ -20,6 +21,18 @@ export function RankDetail({ playerId }: { playerId?: string }) {
     player = rank.data
   const account = useAppSelector(selectAccount),
     { offline } = useAppSelector(selectDev)
+  if (rank.error?.message === PROFILE_LOGIN_MESSAGE)
+    return (
+      <main className="mx-auto max-w-[920px] px-4 pt-5">
+        <ProfileNotFound
+          id={playerId ?? ''}
+          loginRequired
+          onSignIn={() =>
+            router.push(`/login?returnTo=${encodeURIComponent(`/players/${playerId}/rank`)}`)
+          }
+        />
+      </main>
+    )
   if (playerId && rank.data === null)
     return (
       <main className="mx-auto max-w-[920px] px-4 pt-5">

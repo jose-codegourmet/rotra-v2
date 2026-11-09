@@ -5,8 +5,8 @@ import type { DeleteImpact } from '@rotra/data/club-player/types'
 import { useClubPlayerDetails } from '@rotra/data/club-player/useClubPlayerDetails'
 import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import { useCreatePlayerInvite } from '@rotra/data/club-player/useCreatePlayerInvite'
-import { useLinkGuestToSavedPlayer } from '@rotra/data/club-player/useLinkGuestToSavedPlayer'
 import { useDeleteClubPlayer } from '@rotra/data/club-player/useDeleteClubPlayer'
+import { useLinkGuestToSavedPlayer } from '@rotra/data/club-player/useLinkGuestToSavedPlayer'
 import { useSavedPlayerStats } from '@rotra/data/club-player/useSavedPlayerStats'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { useNowCard } from '@rotra/data/queue-session/useNowCard'
@@ -378,6 +378,7 @@ export function SavedPlayers() {
               identity: p.identity,
             }))}
           onChoose={(clubPlayerId) => {
+            if (link.isPending) return
             const chosen = all.data?.players.find((p) => p.id === clubPlayerId)
             link.mutate(
               { guestId: linking.id, clubPlayerId },

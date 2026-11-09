@@ -1,6 +1,6 @@
 # Club logo: Use previous logo (only current and previous are kept)
 
-Status: IN PROGRESS — #587
+Status: IN MOCK APP — #587
 Date: 2026-11-09
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Club settings › Club identity › Club logo

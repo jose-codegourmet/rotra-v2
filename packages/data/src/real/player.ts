@@ -212,7 +212,7 @@ export async function realSetMyProfilePicture(choice: PlayerPictureChoice) {
   form.set('kind', choice.kind)
   form.set('expectedRevision', loadedRevision)
   if (choice.kind === 'character') form.set('id', choice.id)
-  if (choice.kind === 'photo') {
+  if (choice.kind === 'photo' && 'file' in choice) {
     form.set('photo', choice.file)
     if (choice.crop) form.set('crop', JSON.stringify(choice.crop))
   }

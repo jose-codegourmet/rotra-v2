@@ -37,6 +37,8 @@ export async function getMyAccount(signal?: AbortSignal): Promise<MyAccount | nu
         email: account.email,
         phoneHidden: account.phoneHidden,
         emailConfirmedAt: account.emailConfirmedAt,
+        profilePrivate: account.profilePrivate ?? false,
+        avatarPreviousRef: account.avatarPreviousRef ?? null,
       }
     : null
 }
@@ -272,7 +274,9 @@ export async function setPhonePrivacy(input: { phoneHidden: boolean }): Promise<
       phone: account.phone,
       email: account.email,
       phoneHidden: account.phoneHidden,
-        emailConfirmedAt: account.emailConfirmedAt,
+      emailConfirmedAt: account.emailConfirmedAt,
+      profilePrivate: account.profilePrivate ?? false,
+      avatarPreviousRef: account.avatarPreviousRef ?? null,
     }
   })
   if (!saved) throw new Error('Phone privacy save produced no result.')

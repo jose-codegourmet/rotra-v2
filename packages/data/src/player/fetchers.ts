@@ -5,6 +5,7 @@ import { checkMockSave, getMockDevState } from '../mock/bridge'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { mockStore, readMockState } from '../mock/store'
+import { profileCharacters } from '../profile-character/fetchers'
 import { isRealDataMode } from '../real/mode'
 import {
   realFindPlayerByRtrId,
@@ -19,6 +20,7 @@ import { mockPhotoReference } from './photo'
 import { characterPictureReference, type PlayerPictureChoice } from './picture'
 import type { PlayerProfile, PlayerRank, PlayerSessionRecord } from './player.types'
 import { playerProjection } from './projection'
+import { isPrivatePlayer, requireProfileAccess } from './visibility'
 
 export async function getPlayerRank(
   playerId: string,
@@ -26,6 +28,7 @@ export async function getPlayerRank(
 ): Promise<PlayerRank | null> {
   if (isRealDataMode()) return realGetPlayerRank(playerId, signal)
   await playerRequest(signal)
+  await requireProfileAccess(playerId)
   return playerProjection().ranks[playerId] ?? null
 }
 export async function getPlayerGames(
@@ -34,6 +37,7 @@ export async function getPlayerGames(
 ): Promise<PlayerSessionRecord[]> {
   if (isRealDataMode()) return realGetPlayerGames(playerId, signal)
   await playerRequest(signal)
+  await requireProfileAccess(playerId)
   return playerProjection().games[playerId] ?? []
 }
 export async function findPlayerByRtrId(
@@ -43,6 +47,7 @@ export async function findPlayerByRtrId(
   if (isRealDataMode()) return realFindPlayerByRtrId(rtrId, signal)
   await playerRequest(signal)
   const player = playerProjection().players.find((p) => p.rtrId === rtrId.trim().toUpperCase())
+  if (player && isPrivatePlayer(player.id) && !(await getSession('player'))) return null
   return player && !readMockState().adminPlayerRecords[player.id]?.archivedAt
     ? { playerId: player.id }
     : null
@@ -60,6 +65,7 @@ export async function getPlayerProfile(
       : realGetPlayerProfile(playerId, signal)
   }
   await playerRequest(signal)
+  await requireProfileAccess(playerId)
   const profile = readMockState().playerProfiles.find((player) => player.playerId === playerId)
   if (!profile) return null
   if (profile.adminChangeNote && (await getSession('player'))?.account.id !== playerId)
@@ -110,13 +116,30 @@ export async function updateMyProfile(input: PersonalProfileValues): Promise<Pla
 
 /** Set the signed-in player's picture in the mock store, independent of profile edits. */
 export async function setMyProfilePicture(choice: PlayerPictureChoice): Promise<PlayerProfile> {
-  if (isRealDataMode()) return realSetMyProfilePicture(choice)
+  if (isRealDataMode()) {
+    if (choice.kind === 'previous' || (choice.kind === 'photo' && 'src' in choice))
+      throw new MockError('permission', "This part of ROTRA isn't connected to saved data yet.")
+    return realSetMyProfilePicture(choice)
+  }
   const session = await getSession('player')
   if (!session) throw new MockError('permission', 'Sign in to edit your profile.')
   let picture: string | null
   if (choice.kind === 'initials') picture = null
-  else if (choice.kind === 'character') picture = characterPictureReference(choice.id)
-  else if (choice.kind === 'photo') {
+  else if (choice.kind === 'character') {
+    if (!profileCharacters.some((c) => c.id === choice.id && c.shown))
+      throw new MockError('conflict', 'Choose a character.')
+    picture = characterPictureReference(choice.id)
+  } else if (choice.kind === 'previous' || (choice.kind === 'photo' && 'src' in choice)) {
+    const state = readMockState()
+    const previous = state.playerAccounts.find(
+      (a) => a.playerId === session.account.id,
+    )?.avatarPreviousRef
+    const current = state.playerProfiles.find((p) => p.playerId === session.account.id)?.picture
+    const src = choice.kind === 'previous' ? previous : choice.src
+    if (!src || (src !== previous && src !== current))
+      throw new MockError('conflict', 'That previous picture is no longer available.')
+    picture = src
+  } else if (choice.kind === 'photo' && 'file' in choice) {
     if (!choice.file.type.startsWith('image/')) throw new Error('Choose an image file')
     picture = await mockPhotoReference(choice.file, choice.crop)
   } else throw new Error('Choose a profile picture.')
@@ -132,6 +155,22 @@ export async function setMyProfilePicture(choice: PlayerPictureChoice): Promise<
   mockStore.update((draft) => {
     const profile = draft.playerProfiles.find((entry) => entry.playerId === session.account.id)
     if (!profile) throw new MockError('permission', 'This profile is not yours to edit.')
+    const account = draft.playerAccounts.find((a) => a.playerId === session.account.id)
+    if (!account) throw new MockError('permission', 'Sign in to edit your profile.')
+    const originalPrevious = account.avatarPreviousRef ?? null
+    if (profile.picture && !profile.picture.startsWith('character:') && profile.picture !== picture)
+      account.avatarPreviousRef = profile.picture
+    else if (picture === account.avatarPreviousRef) account.avatarPreviousRef = null
+    if ('previousPhoto' in choice) {
+      const allowed = [
+        null,
+        originalPrevious,
+        profile.picture && !profile.picture.startsWith('character:') ? profile.picture : null,
+      ]
+      if (!allowed.includes(choice.previousPhoto ?? null))
+        throw new MockError('conflict', 'That previous picture is no longer available.')
+      account.avatarPreviousRef = choice.previousPhoto ?? null
+    }
     profile.picture = picture
     saved = structuredClone(profile)
   })

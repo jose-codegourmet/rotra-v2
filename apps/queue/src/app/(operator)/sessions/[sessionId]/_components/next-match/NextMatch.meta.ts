@@ -3,7 +3,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const nextMatchMeta = {
   name: 'NextMatch',
   description:
-    'The next-match picker container (Q-NEXT-MATCH, issue #579): NextMatchSheet for the court a confirmed result freed, with candidates from nextMatchCandidates (match.rules), Pick this on usePlaceOnCourt and Skip for now handing the court back to Auto Queue through useFillOpenedCourts (afterSkip).',
+    'The next-match picker container (Q-NEXT-MATCH, issue #579): NextMatchSheet for the court a confirmed result freed, with up to five candidates and their player pictures and game counts from nextMatchCandidates (match.rules), Pick this on usePlaceOnCourt and Skip for now handing the court back to Auto Queue through useFillOpenedCourts (afterSkip).',
   usage: [
     'Mounted by ActiveMatch, which opens it after every successful Confirm result (Manual Queue and Auto Queue) for the first court the match used; Mark invalid does not open it.',
     'useCompleteMatch is called with holdCourtId, so Auto Queue leaves that court free while the picker is open; other freed courts fill as before.',

@@ -10,6 +10,7 @@ export const joinRequestCardMeta = {
     'variant="off" when the session\'s Accept join requests is turned off: the card says to contact the Queue Master.',
     'After this visitor sent a request, pass their status instead: "sent" (with the name they typed), "confirmed-slot", "confirmed-waitlist" (with waitlistPosition) or "declined".',
     'Signed-in ROTRA player not in the session: pass signedInName on "open", "full" or "active" for the one-tap "Request to join as NAME" (no form; onRequestToJoin sends). After sending, pass variant="sent" with name and onCancelRequest to show Cancel request; pass signedIn on "confirmed-waitlist". The sheet with its three choices is app code, not this component.',
+    'Guest (not signed in): pass registerNudge on "sent", "confirmed-slot", "confirmed-waitlist" and "declined" to add "Register to check in and see your matches." under the status notice; a guest has no My night card (D-2026-11-09-03). Leave it off for a signed-in ROTRA Player.',
     "A request is never a booking: never show a held slot. The Queue Master's review of requests is JoinRequestsPanel.",
   ],
   prototype: {

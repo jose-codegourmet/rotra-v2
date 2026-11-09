@@ -20,7 +20,14 @@ export type JoinRequestCardVariant =
   | 'confirmed-waitlist'
   | 'declined'
 
-type CommonProps = { className?: string }
+type CommonProps = {
+  className?: string
+  /**
+   * A guest's status card (Request sent, Confirmed, Request not accepted) adds "Register to check
+   * in and see your matches." (D-2026-11-09-03). Off for a signed-in ROTRA Player.
+   */
+  registerNudge?: boolean
+}
 type AvailabilityProps = {
   /** Aggregate skill counts for confirmed players; omitted or empty hides the bar. */
   skillMix?: SkillDistributionCounts
@@ -189,6 +196,9 @@ export function JoinRequestCard(props: JoinRequestCardProps) {
         <Notice tone={status.tone} title={status.title}>
           <span className="block">{status.text}</span>
         </Notice>
+        {props.registerNudge ? (
+          <p className="m-0 text-[13px] text-fg2">Register to check in and see your matches.</p>
+        ) : null}
         {props.variant === 'sent' && props.onCancelRequest ? (
           <Button
             variant="secondary"

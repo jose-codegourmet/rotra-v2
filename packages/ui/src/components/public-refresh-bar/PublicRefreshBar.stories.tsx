@@ -12,7 +12,12 @@ const meta = {
       </div>
     ),
   ],
-  args: { updatedLabel: '7:42 PM', hasPendingChanges: false, refreshThrottled: false, onRefresh: fn() },
+  args: {
+    updatedLabel: '7:42 PM',
+    hasPendingChanges: false,
+    refreshThrottled: false,
+    onRefresh: fn(),
+  },
 } satisfies Meta<typeof PublicRefreshBar>
 
 export default meta
@@ -26,8 +31,14 @@ export const PendingChangesPhone: Story = {
   args: { hasPendingChanges: true },
   globals: { viewport: { value: 'phone' } },
 }
-export const ThrottledLight: Story = { args: { refreshThrottled: true }, globals: { theme: 'light' } }
+export const ThrottledLight: Story = {
+  args: { refreshThrottled: true },
+  globals: { theme: 'light' },
+}
 export const PendingChangesLight: Story = {
   args: { hasPendingChanges: true },
   globals: { theme: 'light' },
 }
+/** Offline visitor: disabled, tooltip and aria "You're offline. Reconnect and try again." */
+export const Offline: Story = { args: { offline: true } }
+export const OfflineLight: Story = { args: { offline: true }, globals: { theme: 'light' } }

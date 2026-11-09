@@ -8,6 +8,8 @@ export type PublicRefreshBarProps = {
   hasPendingChanges?: boolean
   /** Refresh was tapped less than 10 s ago (the throttle lives in the data hook, Q17.3) */
   refreshThrottled?: boolean
+  /** The visitor is offline: Refresh is disabled and says "You're offline. Reconnect and try again." */
+  offline?: boolean
   onRefresh: () => void
   className?: string
 }
@@ -21,9 +23,15 @@ export function PublicRefreshBar({
   updatedLabel,
   hasPendingChanges = false,
   refreshThrottled = false,
+  offline = false,
   onRefresh,
   className,
 }: PublicRefreshBarProps) {
+  const hint = offline
+    ? "You're offline. Reconnect and try again."
+    : refreshThrottled
+      ? 'Refresh again in a few seconds'
+      : undefined
   return (
     <div
       aria-live="polite"
@@ -36,9 +44,9 @@ export function PublicRefreshBar({
       <Button
         size="xs"
         onClick={onRefresh}
-        disabled={refreshThrottled}
-        title={refreshThrottled ? 'Refresh again in a few seconds' : undefined}
-        aria-label={refreshThrottled ? 'Refresh. Refresh again in a few seconds' : undefined}
+        disabled={refreshThrottled || offline}
+        title={hint}
+        aria-label={hint ? `Refresh. ${hint}` : undefined}
       >
         Refresh
       </Button>

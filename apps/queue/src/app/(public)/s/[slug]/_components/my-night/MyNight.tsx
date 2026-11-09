@@ -15,6 +15,12 @@ export type MyNightProps = {
   startsLabel: string
   /** The Player app's match history (P-MATCH-HISTORY); null until the origin is known */
   matchHistoryHref?: string | null
+  /** The session is prepared or live; once it finishes or is cancelled, open requests and notices are hidden (kept in state) */
+  sessionOpen: boolean
+  /** The club takes join requests online; Invite is hidden when it does not */
+  acceptJoinRequests: boolean
+  /** The visitor is offline (DevMenu): a check-in reads "Checked in · the QM will see it when their device syncs" */
+  offline?: boolean
   /** Opens the Session invite sheet */
   onInvite: () => void
   /** Opens Request a match (Q17.14); the card shows the button for a present Player only */
@@ -39,6 +45,9 @@ export function MyNight({
   night,
   startsLabel,
   matchHistoryHref,
+  sessionOpen,
+  acceptJoinRequests,
+  offline = false,
   onInvite,
   onRequestMatch,
 }: MyNightProps) {
@@ -65,10 +74,10 @@ export function MyNight({
       stage={night.stage}
       waitlistPosition={night.waitlistPosition ?? undefined}
       startsLabel={startsLabel}
-      cantMakeItSent={night.cantMakeItSent}
+      cantMakeItSent={sessionOpen && night.cantMakeItSent}
       hasLeft={night.hasLeft}
       checkedIn={night.checkedIn}
-      offline={night.offline}
+      offline={night.offline || offline}
       games={night.games}
       won={night.won}
       lost={night.lost}
@@ -76,15 +85,15 @@ export function MyNight({
       queuePosition={night.inQueue?.position}
       matchLabel={match?.matchLabel}
       courtLabel={night.onCourt?.courtLabel}
-      matchRequestOpen={night.matchRequest !== null}
-      canInvite={night.canInvite}
+      matchRequestOpen={sessionOpen && night.matchRequest !== null}
+      canInvite={sessionOpen && acceptJoinRequests && night.canInvite}
       matchHistoryHref={matchHistoryHref ?? undefined}
       pending={pending}
       onCheckIn={run(checkIn)}
       onLeave={run(leave)}
       onCantMakeIt={run(dropOut)}
       onCancelMatchRequest={run(cancelRequest)}
-      onRequestMatch={onRequestMatch}
+      onRequestMatch={sessionOpen ? onRequestMatch : undefined}
       onInvite={onInvite}
     />
   )

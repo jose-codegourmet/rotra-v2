@@ -38,6 +38,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Identity: Story = { render: () => <Demo /> }
+export const InviteLink: Story = { render: () => <Demo initial="invite" /> }
 export const SessionDefaults: Story = { render: () => <Demo initial="defaults" /> }
 export const FacebookPost: Story = { render: () => <Demo initial="post" /> }
 export const License: Story = { render: () => <Demo initial="license" /> }
@@ -45,6 +46,10 @@ export const Downloads: Story = { render: () => <Demo initial="device" /> }
 export const Account: Story = { render: () => <Demo initial="account" /> }
 export const PhoneClosed: Story = {
   render: () => <Demo />,
+  globals: { viewport: { value: 'phone' } },
+}
+export const PhoneInviteLinkCurrent: Story = {
+  render: () => <Demo initial="invite" />,
   globals: { viewport: { value: 'phone' } },
 }
 export const PhoneDrawerOpen: Story = {

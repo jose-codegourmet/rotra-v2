@@ -31,6 +31,7 @@
     "./choice-group": "./src/components/choice-group/ChoiceGroup.tsx",
     "./choose-date-sheet": "./src/components/choose-date-sheet/ChooseDateSheet.tsx",
     "./choose-match-sheet": "./src/components/choose-match-sheet/ChooseMatchSheet.tsx",
+    "./club-invite-panel": "./src/components/club-invite-panel/ClubInvitePanel.tsx",
     "./match-request-sheet": "./src/components/match-request-sheet/MatchRequestSheet.tsx",
     "./my-night-card": "./src/components/my-night-card/MyNightCard.tsx",
     "./next-match-sheet": "./src/components/next-match-sheet/NextMatchSheet.tsx",

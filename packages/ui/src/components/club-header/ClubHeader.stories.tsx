@@ -17,6 +17,7 @@ const meta = {
     licenseLine: 'Yearly license · active until Mar 31, 2027',
     foundingLine: `Founded at ${club.foundingAddress}`,
     onCreateSession: fn(),
+    onShareClubInvite: fn(),
   },
 } satisfies Meta<typeof ClubHeader>
 

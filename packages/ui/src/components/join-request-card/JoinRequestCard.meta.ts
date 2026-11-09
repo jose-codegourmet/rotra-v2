@@ -9,6 +9,7 @@ export const joinRequestCardMeta = {
     'Pass skillMix with confirmed player counts to show the SkillDistributionBar; omit it or pass zero counts when there are no players. Pass disabled on "open", "full" or "active" while the visitor is offline: sending a request needs internet, so Request to join is disabled.',
     'variant="off" when the session\'s Accept join requests is turned off: the card says to contact the Queue Master.',
     'After this visitor sent a request, pass their status instead: "sent" (with the name they typed), "confirmed-slot", "confirmed-waitlist" (with waitlistPosition) or "declined".',
+    'Signed-in ROTRA player not in the session: pass signedInName on "open", "full" or "active" for the one-tap "Request to join as NAME" (no form; onRequestToJoin sends). After sending, pass variant="sent" with name and onCancelRequest to show Cancel request; pass signedIn on "confirmed-waitlist". The sheet with its three choices is app code, not this component.',
     "A request is never a booking: never show a held slot. The Queue Master's review of requests is JoinRequestsPanel.",
   ],
   prototype: {

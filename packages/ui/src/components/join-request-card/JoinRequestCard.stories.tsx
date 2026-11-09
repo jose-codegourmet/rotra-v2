@@ -79,5 +79,27 @@ export const ConfirmedWaitlist: Story = {
 
 export const Declined: Story = { args: { variant: 'declined' } }
 
+/** Signed-in ROTRA player not in the session: one tap, no form. */
+export const SignedInOpen: Story = {
+  args: { variant: 'open', openSlots, capacity, signedInName: 'Jamie Cruz', onRequestToJoin: fn() },
+}
+
+/** Signed-in, every slot taken: confirmed players join the waitlist. */
+export const SignedInFull: Story = {
+  args: { variant: 'full', signedInName: 'Jamie Cruz', onRequestToJoin: fn() },
+}
+
+/** Signed-in request waiting: Cancel request replaces the one-tap button. */
+export const SignedInSent: Story = {
+  args: { variant: 'sent', name: 'Jamie Cruz', onCancelRequest: fn() },
+}
+
+export const SignedInWaitlisted: Story = {
+  args: { variant: 'confirmed-waitlist', waitlistPosition: 2, signedIn: true },
+}
+
+/** Signed-in declined and requests off reuse the shared copy. */
+export const SignedInDeclined: Story = { args: { variant: 'declined' } }
+
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
 export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }

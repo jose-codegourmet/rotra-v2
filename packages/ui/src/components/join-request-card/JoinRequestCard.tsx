@@ -27,6 +27,11 @@ type AvailabilityProps = {
   onRequestToJoin: () => void
   /** Sending needs internet: disable the button while offline. */
   disabled?: boolean
+  /**
+   * Signed-in ROTRA player not in the session: one tap sends the request ("Request to join as
+   * NAME"), so onRequestToJoin sends directly instead of opening the form.
+   */
+  signedInName?: string
 }
 
 export type JoinRequestCardProps = CommonProps &
@@ -51,12 +56,18 @@ export type JoinRequestCardProps = CommonProps &
         variant: 'sent'
         /** The name the visitor typed in the request */
         name: string
+        /** Signed-in variant: shows Cancel request; the copy says "every request" */
+        onCancelRequest?: () => void
+        /** Disable Cancel request (offline or while cancelling) */
+        disabled?: boolean
       }
     | { variant: 'confirmed-slot' }
     | {
         variant: 'confirmed-waitlist'
         /** 1-based position on the waitlist */
         waitlistPosition: number
+        /** Signed-in player: "Ask the Queue Master about a slot." */
+        signedIn?: boolean
       }
     | { variant: 'declined' }
   )
@@ -77,7 +88,7 @@ function statusOf(props: StatusProps): {
       return {
         tone: 'warn',
         title: 'Request sent',
-        text: `Thanks, ${props.name}. The Queue Master confirms every guest, usually at the venue. Your slot isn't held until they do.`,
+        text: `Thanks, ${props.name}. The Queue Master confirms every ${props.onCancelRequest ? 'request' : 'guest'}, usually at the venue. Your slot isn't held until they do.`,
       }
     case 'confirmed-slot':
       return {
@@ -89,7 +100,9 @@ function statusOf(props: StatusProps): {
       return {
         tone: 'success',
         title: `Confirmed · waitlist #${props.waitlistPosition}`,
-        text: "You're on the waitlist. The Queue Master gives slots in order as they open.",
+        text: props.signedIn
+          ? "You're on the waitlist. Ask the Queue Master about a slot."
+          : "You're on the waitlist. The Queue Master gives slots in order as they open.",
       }
     case 'declined':
       return {
@@ -152,7 +165,9 @@ export function JoinRequestCard(props: JoinRequestCardProps) {
               : props.variant === 'full'
                 ? 'Confirmed guests join the waitlist. '
                 : ''}
-            Send a quick request and the Queue Master confirms it.
+            {props.signedInName
+              ? 'One tap sends your request and the Queue Master confirms it.'
+              : 'Send a quick request and the Queue Master confirms it.'}
           </p>
           <Button
             variant="primary"
@@ -160,7 +175,7 @@ export function JoinRequestCard(props: JoinRequestCardProps) {
             disabled={props.disabled}
             className="min-h-11 w-full"
           >
-            Request to join
+            {props.signedInName ? `Request to join as ${props.signedInName}` : 'Request to join'}
           </Button>
         </section>
       </Card>
@@ -174,6 +189,16 @@ export function JoinRequestCard(props: JoinRequestCardProps) {
         <Notice tone={status.tone} title={status.title}>
           <span className="block">{status.text}</span>
         </Notice>
+        {props.variant === 'sent' && props.onCancelRequest ? (
+          <Button
+            variant="secondary"
+            onClick={props.onCancelRequest}
+            disabled={props.disabled}
+            className="min-h-11 w-full"
+          >
+            Cancel request
+          </Button>
+        ) : null}
       </section>
     </Card>
   )

@@ -6,6 +6,8 @@ export type MyAccount = {
   email: string
   phoneHidden: boolean
   emailConfirmedAt?: string | null
+  profilePrivate?: boolean
+  avatarPreviousRef?: string | null
 }
 
 export type ClaimLinkStatus = 'valid' | 'claimed' | 'expired' | 'processing'

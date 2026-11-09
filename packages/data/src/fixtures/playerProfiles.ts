@@ -1,6 +1,6 @@
 import type { PlayerProfile } from '../player/player.types'
 import portraits from './playerPortraits.json'
-import { players } from './players'
+import { leaderboardPlayers, players } from './players'
 
 // Vector artwork copied from rotra-player.html faceSVG(), with its original bN/u1 seeds.
 // These are image asset colours, not interface theme colours.
@@ -9,6 +9,7 @@ export const playerProfiles: PlayerProfile[] = players.map((player) => {
   const jose = player.fullName === 'Jose'
   const raymark = player.rtrId === 'RTR-PH-CEB-040226-0007'
   return {
+    profilePrivate: [leaderboardPlayers[5]?.id, leaderboardPlayers[9]?.id].includes(player.id),
     playerId: player.id,
     rtrId: player.rtrId,
     fullName: player.fullName,

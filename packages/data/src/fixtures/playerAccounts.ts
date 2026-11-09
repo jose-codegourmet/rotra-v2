@@ -1,5 +1,5 @@
 import { maskPhone } from '../player-account/playerAccount.rules'
-import type { PlayerAccountRecord, ClaimLinkRecord } from '../player-account/playerAccount.types'
+import type { ClaimLinkRecord, PlayerAccountRecord } from '../player-account/playerAccount.types'
 import { playerProfiles } from './playerProfiles'
 
 // Fictional private account fixtures from rotra-player.html seedAccounts().
@@ -9,6 +9,9 @@ export const playerAccounts: PlayerAccountRecord[] = [
     playerId: '2c7f6a7b-eed9-5051-9426-6dbce5133fbc',
     phone: '+639175550142',
     email: 'jose@example.com',
+    avatarPreviousRef:
+      playerProfiles.find((p) => p.fullName !== 'Jose' && p.picture)?.picture ?? null,
+    profilePrivate: false,
     phoneHidden: true,
     claimed: true,
     emailConfirmedAt: '2026-11-01T00:00:00Z',

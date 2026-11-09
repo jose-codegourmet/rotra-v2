@@ -393,7 +393,10 @@
     "./player-club/useLeaveClub": "./src/player-club/useLeaveClub.ts",
     "./player-club/useMyClubs": "./src/player-club/useMyClubs.ts",
     "./player-account/useResendConfirmationEmail": "./src/player-account/useResendConfirmationEmail.ts",
-    "./player-account/useConfirmMockEmail": "./src/player-account/useConfirmMockEmail.ts"
+    "./player-account/useConfirmMockEmail": "./src/player-account/useConfirmMockEmail.ts",
+    "./profile-character/useProfileCharacters": "./src/profile-character/useProfileCharacters.ts",
+    "./player/visibility": "./src/player/visibility.ts",
+    "./player-account/useSetProfilePrivacy": "./src/player-account/useSetProfilePrivacy.ts"
   },
   "scripts": {
     "lint": "biome check .",

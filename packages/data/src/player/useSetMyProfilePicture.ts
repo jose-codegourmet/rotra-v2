@@ -1,6 +1,7 @@
 'use client'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { leaderboardKeys } from '../leaderboard/queryKeys'
+import { playerAccountKeys } from '../player-account/queryKeys'
 import { playerCompareKeys } from '../player-compare/queryKeys'
 import { setMyProfilePicture } from './fetchers'
 import { playerKeys } from './queryKeys'
@@ -12,6 +13,7 @@ export function useSetMyProfilePicture() {
     networkMode: 'always',
     onSuccess: (profile) =>
       Promise.all([
+        client.invalidateQueries({ queryKey: playerAccountKeys.me(profile.playerId) }),
         client.invalidateQueries({ queryKey: playerKeys.profile(profile.playerId) }),
         client.invalidateQueries({ queryKey: leaderboardKeys.all }),
         client.invalidateQueries({ queryKey: playerCompareKeys.all }),

@@ -9,12 +9,12 @@ import { Notice } from '@rotra/ui/notice'
 import { Sheet } from '@rotra/ui/sheet'
 import { type PointerEvent, type ReactNode, useRef, useState } from 'react'
 
-/** One waiting match the picker offers for the freed court. Strings support the existing console until it is wired to player lists. */
+/** One waiting match the picker offers for the freed court. */
 export type NextMatchCandidate = {
   matchId: string
   position: number
-  teamA: CourtPlayer[] | string
-  teamB: CourtPlayer[] | string
+  teamA: CourtPlayer[]
+  teamB: CourtPlayer[]
   formatLabel: string
 }
 
@@ -29,8 +29,7 @@ export type NextMatchSheetProps = {
   error?: ReactNode
 }
 
-function Team({ players }: { players: CourtPlayer[] | string }) {
-  if (typeof players === 'string') return <span className="font-bold">{players}</span>
+function Team({ players }: { players: CourtPlayer[] }) {
   return (
     <div className="flex flex-wrap justify-center gap-x-3.5 gap-y-2">
       {players.map((player) => (
@@ -55,8 +54,8 @@ function Team({ players }: { players: CourtPlayer[] | string }) {
   )
 }
 
-function teamNames(players: CourtPlayer[] | string) {
-  return typeof players === 'string' ? players : players.map((player) => player.name).join(' and ')
+function teamNames(players: CourtPlayer[]) {
+  return players.map((player) => player.name).join(' and ')
 }
 
 // Mounted inside the sheet and keyed by the offered matches: every new offer starts at #1.

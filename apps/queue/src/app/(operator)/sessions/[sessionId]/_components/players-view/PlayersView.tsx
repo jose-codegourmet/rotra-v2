@@ -8,10 +8,16 @@ import {
   courtNames,
   FORMAT_LABELS,
   isFunFormat,
+  queuedCount,
+  shortName,
   waitingMatches,
   waitMinutes,
 } from '@rotra/data/match/match.rules'
-import { formatForSelection } from '@rotra/data/match/queue.rules'
+import {
+  arrangeToBalance,
+  formatForSelection,
+  previewMakeMatch,
+} from '@rotra/data/match/queue.rules'
 import { useMakeMatch } from '@rotra/data/match/useMakeMatch'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { PLAYING_LEVELS } from '@rotra/data/player/types'
@@ -24,6 +30,7 @@ import { useRemoveFromWaitlist } from '@rotra/data/session-roster/useRemoveFromW
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { useSetPresenceMany } from '@rotra/data/session-roster/useSetPresenceMany'
 import { Button } from '@rotra/ui/button'
+import { ConfirmMakeMatchSheet } from '@rotra/ui/confirm-make-match-sheet'
 import { Card } from '@rotra/ui/card'
 import { EmptyState } from '@rotra/ui/empty-state'
 import { PlayerPoolCard, type PlayerPoolCardStatus } from '@rotra/ui/player-pool-card'
@@ -32,6 +39,7 @@ import {
   type PlayerPoolSort,
   PlayerPoolToolbar,
 } from '@rotra/ui/player-pool-toolbar'
+import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { SelectionBar } from '@rotra/ui/selection-bar'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { SlotMeter } from '@rotra/ui/slot-meter'
@@ -102,6 +110,9 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
   /** Roster ids in pick order */
   const [picked, setPicked] = useState<string[]>([])
   const [addOpen, setAddOpen] = useState(false)
+  const [draft, setDraft] = useState<ReturnType<typeof previewMakeMatch> | null>(null)
+  const [arranged, setArranged] = useState(false)
+  const [makeError, setMakeError] = useState<string | undefined>()
 
   const options = {
     onSuccess: (result: { message: string }) => toast(result.message),
@@ -128,7 +139,7 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
       <div className="flex flex-col gap-3">
         <Skeleton className="h-8 w-48" />
         <Skeleton className="h-11 w-80 max-w-full rounded-lg" />
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,156px),1fr))] gap-2">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,176px),1fr))] gap-3">
           {[0, 1, 2, 3, 4, 5].map((i) => (
             <Skeleton key={i} className="h-32 rounded-lg" />
           ))}
@@ -142,6 +153,12 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
   const waiting = waitingMatches(all)
   const byClubPlayer = (id: string) => clubPlayers.data?.players.find((p) => p.id === id)
 
+  const photoFor = (player: SessionPlayer | undefined) => {
+    const p = player ? byClubPlayer(player.clubPlayerId) : undefined
+    return p
+      ? profilePictureSrc(p.picture, p.playerId ?? p.id, p.pictureName ?? p.fullName)
+      : undefined
+  }
   const rows: PoolRow[] = rosterList.map((player) => {
     const active = activeMatchFor(player.id, all)
     const queueIndex = waiting.findIndex((m) => allPlayers(m).includes(player.id))
@@ -253,16 +270,17 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
         }}
       />
       {shown.length ? (
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,156px),1fr))] gap-2">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,176px),1fr))] gap-3">
           {shown.map((row) => {
             const order = selection.indexOf(row.player.id)
             return (
               <PlayerPoolCard
                 key={row.player.id}
                 name={row.player.nameSnapshot}
+                photoUrl={photoFor(row.player)}
                 level={row.player.level}
                 games={row.games}
-                minimumGames={s.minimumGames}
+                forTheNight={row.games + queuedCount(row.player.id, all)}
                 waitMinutes={row.minutes}
                 status={row.status}
                 present={row.player.present}
@@ -296,16 +314,10 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
           onClear={() => setPicked([])}
           onMakeMatch={async () => {
             await setPresence.flush()
-            makeMatch.mutate(
-              { sessionId, selection },
-              {
-                onSuccess: (result) => {
-                  setPicked([])
-                  toast(result.message)
-                },
-                onError: (error) => toast.error(errorMessage(error)),
-              },
-            )
+            if (!plan.format) return
+            setMakeError(undefined)
+            setArranged(false)
+            setDraft(previewMakeMatch(selected, plan.format))
           }}
         />
       ) : null}
@@ -328,10 +340,78 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
           onOpenProfile={openProfileFromWaitlist}
         />
       ) : null}
+      {draft ? (
+        <ConfirmMakeMatchSheet
+          open
+          teamA={draft.lineup.teamA.map((id) => {
+            const p = rosterList.find((player) => player.id === id)
+            return {
+              id,
+              name: p?.nameSnapshot ?? 'Player',
+              shortName: p ? shortName(p) : 'Player',
+              level: p?.level ?? null,
+              photoUrl: photoFor(p),
+              games: countedGames(id, all),
+            }
+          })}
+          teamB={draft.lineup.teamB.map((id) => {
+            const p = rosterList.find((player) => player.id === id)
+            return {
+              id,
+              name: p?.nameSnapshot ?? 'Player',
+              shortName: p ? shortName(p) : 'Player',
+              level: p?.level ?? null,
+              photoUrl: photoFor(p),
+              games: countedGames(id, all),
+            }
+          })}
+          formatLabel={FORMAT_LABELS[draft.lineup.format]}
+          levelA={draft.levelA}
+          levelB={draft.levelB}
+          arranged={arranged}
+          isPending={makeMatch.isPending}
+          error={makeError}
+          onCancel={() => {
+            setDraft(null)
+            setMakeError(undefined)
+          }}
+          onArrange={() => {
+            const ids = [...draft.lineup.teamA, ...draft.lineup.teamB]
+            const players = ids
+              .map((id) => rosterList.find((player) => player.id === id))
+              .filter((player): player is SessionPlayer => !!player)
+            if (players.length !== ids.length) {
+              setMakeError('Player not available.')
+              return
+            }
+            setDraft(arrangeToBalance(players, draft.lineup.format))
+            setArranged(true)
+            setMakeError(undefined)
+          }}
+          onConfirm={() => {
+            makeMatch.mutate(
+              {
+                sessionId,
+                selection: [...draft.lineup.teamA, ...draft.lineup.teamB],
+                lineup: draft.lineup,
+              },
+              {
+                onSuccess: (result) => {
+                  setPicked([])
+                  setDraft(null)
+                  setMakeError(undefined)
+                  toast(result.message)
+                },
+                onError: (error) => setMakeError(errorMessage(error)),
+              },
+            )
+          }}
+        />
+      ) : null}
       <p className="text-[13px] text-fg2">
-        Make match splits the players into teams balanced by level and adds it to the end of the
-        queue. Present controls who can be paired automatically; turning someone off never ends
-        their current game.
+        Make match shows the selected players in pick order. Arrange to balance teams by level, then
+        add the match to the end of the queue. Present controls who can be paired automatically;
+        turning someone off never ends their current game.
       </p>
       <AddPlayer sessionId={sessionId} open={addOpen} onOpenChange={setAddOpen} />
     </div>

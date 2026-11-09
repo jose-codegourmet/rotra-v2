@@ -26,10 +26,8 @@ export type PlayerPoolCardProps = {
   level: PlayingLevel | null
   /** Counted games so far */
   games: number
-  /** @deprecated Compatibility until the console passes forTheNight in #614; not displayed. */
-  minimumGames?: number
   /** Games played plus queued matches. */
-  forTheNight?: number
+  forTheNight: number
   selfCheckedInAt?: number | null
   leftAt?: number | null
   /** Minutes since the player's last game ended (or since they became present). Shown for available players only */
@@ -71,7 +69,7 @@ export function PlayerPoolCard({
   photoUrl,
   level,
   games,
-  forTheNight = games,
+  forTheNight,
   selfCheckedInAt,
   leftAt,
   waitMinutes,

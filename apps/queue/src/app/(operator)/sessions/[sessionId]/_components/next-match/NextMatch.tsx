@@ -1,9 +1,9 @@
 'use client'
 
+import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import {
   canPlace,
   FORMAT_LABELS,
-  listNames,
   type MatchContext,
   nextMatchCandidates,
   shortName,
@@ -17,6 +17,7 @@ import { useFillOpenedCourts } from '@rotra/data/queue-session/useFillOpenedCour
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { type NextMatchCandidate, NextMatchSheet } from '@rotra/ui/next-match-sheet'
+import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { toast } from '@rotra/ui/toaster'
 import { useRef, useState } from 'react'
 
@@ -40,7 +41,7 @@ const isSaveFailure = (error: unknown) =>
   error instanceof MockError && (error.kind === 'retryable' || error.kind === 'offline')
 
 /**
- * Q-NEXT-MATCH: after Confirm result, NextMatchSheet offers the first two ready waiting matches
+ * Q-NEXT-MATCH: after Confirm result, NextMatchSheet offers up to five ready waiting matches
  * for the freed court (nextMatchCandidates, the readiness check Auto Queue uses). Pick this goes
  * through usePlaceOnCourt (On court, getting ready, never started), rechecked at pick time: a match
  * no longer ready shows "That match is not ready any more. Pick again." and refetches. Skip for now
@@ -48,6 +49,7 @@ const isSaveFailure = (error: unknown) =>
  * Queue (useFillOpenedCourts with afterSkip), so it fills exactly as it would have.
  */
 export function NextMatch({ sessionId, request, onClose }: NextMatchProps) {
+  const clubPlayers = useClubPlayers()
   const session = useQueueSession(sessionId)
   const roster = useSessionRoster(sessionId)
   const matches = useSessionMatches(sessionId)
@@ -70,18 +72,31 @@ export function NextMatch({ sessionId, request, onClose }: NextMatchProps) {
   const court = s.courts.find((c) => c.id === courtId)
   const courtLabel = court?.label ?? 'Court'
   const queue = waitingMatches(ctx.matches)
-  const names = (ids: string[]) =>
-    listNames(
-      ids.map((id) => {
-        const p = ctx.roster.find((p) => p.id === id)
-        return p ? shortName(p) : 'Player'
-      }),
-    )
+  const players = (ids: string[], games: Record<string, number>) =>
+    ids.map((id) => {
+      const p = ctx.roster.find((player) => player.id === id)
+      const clubPlayer =
+        p && clubPlayers.data?.players.find((player) => player.id === p.clubPlayerId)
+      return {
+        id,
+        name: p?.nameSnapshot ?? 'Player',
+        shortName: p ? shortName(p) : 'Player',
+        level: p?.level ?? null,
+        photoUrl: clubPlayer
+          ? profilePictureSrc(
+              clubPlayer.picture,
+              clubPlayer.playerId ?? clubPlayer.id,
+              clubPlayer.pictureName ?? clubPlayer.fullName,
+            )
+          : undefined,
+        games: games[id] ?? 0,
+      }
+    })
   const candidates: NextMatchCandidate[] = nextMatchCandidates(courtId, ctx).map((m) => ({
     matchId: m.id,
     position: queue.findIndex((q) => q.id === m.id) + 1,
-    teamA: names(m.teamA),
-    teamB: names(m.teamB),
+    teamA: players(m.teamA, m.gamesByPlayer),
+    teamB: players(m.teamB, m.gamesByPlayer),
     formatLabel: FORMAT_LABELS[m.format],
   }))
 

@@ -1,6 +1,6 @@
 # Queued matches: a red Clear queue button removes every waiting match
 
-Status: IN PROGRESS — #586
+Status: IN MOCK APP — #586
 Date: 2026-11-09
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Live session › Queue pane › Queued matches header; Clear the queue? sheet

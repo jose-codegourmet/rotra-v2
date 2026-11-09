@@ -5,6 +5,7 @@ export const confirmSheetMeta = {
   description:
     'The confirmation pattern for important or permanent actions (D- dialogs): what is being confirmed, what happens, Back, and a primary button that names the action.',
   usage: [
+    'Pass solidDanger for the solid Clear queue confirmation button.',
     'Copy title, consequence and button labels word for word from docs/screens/product/dialogs.md.',
     'Put the target (session, players, match, courts, scores) in summary so the operator sees the actual values.',
     'note is an optional small muted line after the consequence (D-CLUB-NAME: what does not change).',

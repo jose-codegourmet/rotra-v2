@@ -7,6 +7,7 @@ export const publicResultsSectionMeta = {
   usage: [
     'Use at the bottom of the public session page for finished (finalized) sessions, and in the operator preview of that page.',
     'Pass only what the publication contains; the component renders exactly the slides it is given and cannot draw the private Off Day band.',
+    'For a signed-in viewer set highlightRowId inside published.standings (with matching row ids); the section passes it through unchanged.',
     'Do not use for invalid sessions (they have no results section) or for the private result review, which uses the slides directly with ResultsHeader.',
   ],
   prototype: {

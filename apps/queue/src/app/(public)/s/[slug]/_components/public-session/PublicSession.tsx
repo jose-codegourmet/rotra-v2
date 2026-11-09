@@ -22,6 +22,7 @@ import {
 } from '@rotra/data/public-session/usePublicSession'
 import { useRefreshSession } from '@rotra/data/public-session/useRefreshSession'
 import { isRealDataMode } from '@rotra/data/real/mode'
+import { Button } from '@rotra/ui/button'
 import { EmptyState } from '@rotra/ui/empty-state'
 import { JoinRequestCard, type JoinRequestCardProps } from '@rotra/ui/join-request-card'
 import { Notice } from '@rotra/ui/notice'
@@ -31,10 +32,7 @@ import {
   PublicResultsSection,
   type PublicResultsSectionPublished,
 } from '@rotra/ui/public-results-section'
-import {
-  PublicSessionDetails,
-  type PublicSessionCourtNow,
-} from '@rotra/ui/public-session-details'
+import { type PublicSessionCourtNow, PublicSessionDetails } from '@rotra/ui/public-session-details'
 import { PublicSessionHero } from '@rotra/ui/public-session-hero'
 import { PublicSessionQueue } from '@rotra/ui/public-session-queue'
 import { Skeleton } from '@rotra/ui/skeleton'
@@ -119,15 +117,19 @@ function joinCardProps(
             onCancelRequest: signedIn.onCancelRequest,
             disabled: offline || signedIn.busy,
           }
-        : { variant: 'sent', name: mine.name }
-    if (mine.status === 'declined') return { variant: 'declined' }
+        : { variant: 'sent', name: mine.name, registerNudge: true }
+    if (mine.status === 'declined')
+      return signedIn ? { variant: 'declined' } : { variant: 'declined', registerNudge: true }
     return mine.waitlistPosition
       ? {
           variant: 'confirmed-waitlist',
           waitlistPosition: mine.waitlistPosition,
           signedIn: signedIn ? true : undefined,
+          registerNudge: signedIn ? undefined : true,
         }
-      : { variant: 'confirmed-slot' }
+      : signedIn
+        ? { variant: 'confirmed-slot' }
+        : { variant: 'confirmed-slot', registerNudge: true }
   }
   if (!page.acceptJoinRequests) return { variant: 'off' }
   const availability = signedIn
@@ -228,12 +230,7 @@ function publishedSlides(page: PublicSessionPage): PublicResultsSectionPublished
  * variant from the page and useMyJoinRequest); Details and "Participants · N" tabs; and, for
  * completed sessions only, the Results section with the published slides. No operator controls.
  */
-export function PublicSession({
-  slug,
-  viewer,
-  openJoin = false,
-  inviteCode,
-}: PublicSessionProps) {
+export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: PublicSessionProps) {
   const dev = useAppSelector(selectDev)
   const page = usePublicSession(slug, { visitor: viewer === 'visitor' })
   const mine = useMyJoinRequest(slug)
@@ -381,18 +378,30 @@ export function PublicSession({
   // A signed-in Player's request comes from their account, not from this browser's guest request.
   // Already confirmed or waitlisted without a request (added by the Queue Master): no join card.
   const inSession = !!signedIn && night.data?.status !== 'none' && !night.data?.joinRequest
-  const card = inSession
-    ? null
-    : joinCardProps(
-        p,
-        signedIn ? night.data?.joinRequest : mine.data,
-        () => setJoinOpen(true),
-        dev.offline,
-        signedIn,
-      )
+  // While the signed-in Player's own read is loading or failed there is no join card (a guest
+  // form would be wrong for them); the My night area below shows the loading or error state.
+  const nightPending = !!viewerAccount && !night.data
+  const nightFailed = nightPending && (night.isError || night.fetchStatus === 'paused')
+  const card =
+    inSession || nightPending
+      ? null
+      : joinCardProps(
+          p,
+          signedIn ? night.data?.joinRequest : mine.data,
+          () => setJoinOpen(true),
+          dev.offline,
+          signedIn,
+        )
   // The signed-in read (names per the signed-in rule, no cap, the viewer flagged) when there is
   // one; otherwise the visitor page, or the Player-hosted full roster.
   const signedRead = viewerAccount && signedInPage.data ? signedInPage.data : null
+  // A signed-in Player's Queue never falls back to the Player-hosted read or the login prompt:
+  // checking while the read loads, "Couldn't check Player access." when it failed or is offline.
+  const signedReadFailed =
+    !!viewerAccount &&
+    !signedRead &&
+    (signedInPage.isError || signedInPage.fetchStatus === 'paused')
+  const sessionOpen = p.status === 'prepared' || p.status === 'active'
   const uncapped = !!signedRead || access?.fullRoster === true
   // Registered players only, for a signed-in viewer only: the Player app's profile, new tab.
   const tile = (x: PublicSessionParticipant, i: number) => ({
@@ -403,9 +412,9 @@ export function PublicSession({
         ? `${playerBase}/find/${encodeURIComponent(x.rtrId)}`
         : null,
   })
-  const participants = (access?.fullRoster && !signedRead ? access.participants : p.participants).map(
-    tile,
-  )
+  const participants = (
+    access?.fullRoster && !signedRead ? access.participants : p.participants
+  ).map(tile)
   const waitlist = p.waitlist.map(tile)
 
   return (
@@ -423,6 +432,7 @@ export function PublicSession({
           updatedLabel={time(refreshing.lastRefreshedAt ?? p.lastSyncedAt)}
           hasPendingChanges={p.hasPendingChanges}
           refreshThrottled={!refreshing.canRefresh}
+          offline={dev.offline}
           onRefresh={() => void refreshing.refresh()}
         />
       ) : null}
@@ -433,13 +443,35 @@ export function PublicSession({
       ) : card ? (
         <JoinRequestCard {...card} />
       ) : null}
+      {nightPending ? (
+        nightFailed ? (
+          <Notice tone="error">
+            Couldn't check Player access.{' '}
+            <Button
+              onClick={() => {
+                void night.refetch()
+                void signedInPage.refetch()
+              }}
+            >
+              Retry
+            </Button>
+          </Notice>
+        ) : (
+          <Skeleton label="Loading your night" className="h-24 rounded-lg" />
+        )
+      ) : null}
       {signedIn && night.data ? (
         <MyNight
           slug={slug}
           night={night.data}
+          sessionOpen={sessionOpen}
+          acceptJoinRequests={p.acceptJoinRequests}
+          offline={dev.offline}
           startsLabel={`${new Date(p.start).toLocaleDateString([], { month: 'short', day: 'numeric' })}, ${time(p.start)}`}
           matchHistoryHref={
-            playerBase ? `${playerBase}/players/${encodeURIComponent(night.data.playerId)}/games` : null
+            playerBase
+              ? `${playerBase}/players/${encodeURIComponent(night.data.playerId)}/games`
+              : null
           }
           onInvite={() => setInviteOpen(true)}
           onRequestMatch={requestMatch}
@@ -479,6 +511,13 @@ export function PublicSession({
                     access={queueAccess(viewerAccount.id, signedRead.queue)}
                     onRetry={() => void signedInPage.refetch()}
                   />
+                ) : viewerAccount ? (
+                  <PublicSessionQueue
+                    access={null}
+                    checking={!signedReadFailed}
+                    failed={signedReadFailed}
+                    onRetry={() => void signedInPage.refetch()}
+                  />
                 ) : (
                   <PublicSessionQueue
                     access={access ?? null}
@@ -509,7 +548,7 @@ export function PublicSession({
         </TabsContent>
       </Tabs>
       {p.status === 'completed' ? <PublicResultsSection published={publishedSlides(p)} /> : null}
-      {signedIn && viewerAccount && night.data?.canInvite ? (
+      {signedIn && viewerAccount && sessionOpen && p.acceptJoinRequests && night.data?.canInvite ? (
         <SessionInviteSheet
           slug={slug}
           playerId={viewerAccount.id}
@@ -526,7 +565,7 @@ export function PublicSession({
           waitlistOpen={p.openSlots === 0}
         />
       ) : null}
-      {signedIn && viewerAccount && night.data?.stage === 'live-present' ? (
+      {signedIn && viewerAccount && sessionOpen && night.data?.stage === 'live-present' ? (
         <MatchRequest
           slug={slug}
           viewer={{ id: viewerAccount.id, name: viewerAccount.name }}

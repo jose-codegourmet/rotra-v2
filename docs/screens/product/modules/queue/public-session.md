@@ -68,6 +68,8 @@ After six months of continuous expiry the page is deleted. Show a neutral unavai
 
 A previously cached copy may show with its last-update time. With no cache, explain that a connection is needed.
 
+A signed-in Player's My night keeps showing its last-loaded data offline. Offline, I'm leaving, I can't make it, Cancel match request, Request a match and Invite are disabled (“You're offline. Reconnect and try again.”); only **I'm here** works and queues (“Checked in · the QM will see it when their device syncs”). Decided by the owner 2026-11-10.
+
 ## Acceptance examples
 
 - A public visitor sees Details/Participants without signing in and can use Request to join when requests are enabled. A request never reserves a slot; only the Queue Master confirms or declines it.

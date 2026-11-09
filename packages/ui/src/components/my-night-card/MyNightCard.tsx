@@ -25,7 +25,7 @@ export type MyNightCardProps = {
   selfCheckInOff?: boolean
   /** Live, present: the player checked in themselves this session */
   checkedIn?: boolean
-  /** Live, present: this device is offline, so the Queue Master sees the check-in after a sync */
+  /** This device is offline: I'm leaving, I can't make it, Cancel, Request a match and Invite are disabled ("You're offline. Reconnect and try again."); I'm here still works and the Queue Master sees the check-in after a sync */
   offline?: boolean
   /** Live, present: games played, won, lost */
   games?: number
@@ -56,6 +56,8 @@ export type MyNightCardProps = {
   className?: string
 }
 
+const OFFLINE_TITLE = "You're offline. Reconnect and try again."
+
 const BIG_TILE = 'flex min-w-0 flex-col items-center justify-center gap-1.5 rounded-lg border p-3'
 
 function StatsPanel({
@@ -72,6 +74,7 @@ function StatsPanel({
   const hasMinimum = minimum > 0
   const done = hasMinimum && games >= minimum
   return (
+    // biome-ignore lint/a11y/useSemanticElements: a group/region div; a fieldset or section would change the drawn layout
     <div
       role="group"
       aria-label="Your night so far"
@@ -97,7 +100,9 @@ function StatsPanel({
             {done ? (
               <span className="text-[13px] font-semibold text-accent">Minimum reached</span>
             ) : (
-              <span className="text-[13px] text-fg2">{minimum - games} more to reach the minimum</span>
+              <span className="text-[13px] text-fg2">
+                {minimum - games} more to reach the minimum
+              </span>
             )}
           </>
         ) : null}
@@ -149,6 +154,9 @@ export function MyNightCard({
   onInvite,
   className,
 }: MyNightCardProps) {
+  // Offline, only I'm here still works (it queues); every other write is refused
+  const blocked = pending || offline
+  const offlineTitle = offline ? OFFLINE_TITLE : undefined
   const lines: ReactNode[] = []
   const actions: ReactNode[] = []
   let stats: ReactNode = null
@@ -161,7 +169,7 @@ export function MyNightCard({
     if (cantMakeItSent) lines.push("Told the QM you can't make it")
     else
       actions.push(
-        <Button key="cant" onClick={onCantMakeIt} disabled={pending}>
+        <Button key="cant" onClick={onCantMakeIt} disabled={blocked} title={offlineTitle}>
           I can't make it
         </Button>,
       )
@@ -205,19 +213,25 @@ export function MyNightCard({
     if (matchRequestOpen) {
       lines.push('Match request sent · the QM decides')
       actions.push(
-        <Button key="cancel" onClick={onCancelMatchRequest} disabled={pending}>
+        <Button key="cancel" onClick={onCancelMatchRequest} disabled={blocked} title={offlineTitle}>
           Cancel
         </Button>,
       )
     } else {
       actions.push(
-        <Button key="request" variant="primary" onClick={onRequestMatch} disabled={pending}>
+        <Button
+          key="request"
+          variant="primary"
+          onClick={onRequestMatch}
+          disabled={blocked}
+          title={offlineTitle}
+        >
           Request a match
         </Button>,
       )
     }
     actions.push(
-      <Button key="leave" onClick={onLeave} disabled={pending}>
+      <Button key="leave" onClick={onLeave} disabled={blocked} title={offlineTitle}>
         I'm leaving
       </Button>,
     )
@@ -225,7 +239,7 @@ export function MyNightCard({
 
   if (canInvite && (stage === 'waitlisted' || stage === 'before-start'))
     actions.push(
-      <Button key="invite" onClick={onInvite}>
+      <Button key="invite" onClick={onInvite} disabled={offline} title={offlineTitle}>
         Invite
       </Button>,
     )

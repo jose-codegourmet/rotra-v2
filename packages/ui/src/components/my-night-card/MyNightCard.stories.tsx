@@ -53,6 +53,11 @@ export const CheckedInOnline: Story = { args: { checkedIn: true } }
 
 export const CheckedInOffline: Story = { args: { checkedIn: true, offline: true } }
 
+/** Offline: only I'm here works; the other writes are disabled with the offline tooltip */
+export const OfflineWritesDisabled: Story = {
+  args: { checkedIn: true, offline: true, matchRequestOpen: true },
+}
+
 export const NotPresent: Story = { args: { stage: 'live-not-present' } }
 
 export const Left: Story = { args: { stage: 'live-not-present', hasLeft: true } }
@@ -95,4 +100,14 @@ export const Narrow420: Story = {
       </div>
     ),
   ],
+}
+
+export const CheckedInOfflineLight: Story = {
+  args: { checkedIn: true, offline: true },
+  globals: { theme: 'light' },
+}
+
+export const FinishedLight: Story = {
+  args: { stage: 'finished', games: 7, won: 4, lost: 3 },
+  globals: { theme: 'light' },
 }

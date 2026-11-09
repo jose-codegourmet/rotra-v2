@@ -103,3 +103,19 @@ export const SignedInDeclined: Story = { args: { variant: 'declined' } }
 
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
 export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }
+
+/** A guest's status cards add "Register to check in and see your matches." (D-2026-11-09-03). */
+export const SentGuestNudge: Story = {
+  args: { variant: 'sent', name: guest.name, registerNudge: true },
+}
+export const ConfirmedSlotGuestNudge: Story = {
+  args: { variant: 'confirmed-slot', registerNudge: true },
+}
+export const ConfirmedWaitlistGuestNudge: Story = {
+  args: { variant: 'confirmed-waitlist', waitlistPosition: 2, registerNudge: true },
+}
+export const DeclinedGuestNudge: Story = { args: { variant: 'declined', registerNudge: true } }
+export const DeclinedGuestNudgeLight: Story = {
+  args: { variant: 'declined', registerNudge: true },
+  globals: { theme: 'light' },
+}

@@ -1,7 +1,13 @@
 import portraits from '../fixtures/playerPortraits.json'
-import { allowedRequestFormats } from '../match-request/matchRequest.rules'
-import { computeStandings, countedGames, courtNames, holdsCourt, waitMinutes } from '../match/match.rules'
+import {
+  computeStandings,
+  countedGames,
+  courtNames,
+  holdsCourt,
+  waitMinutes,
+} from '../match/match.rules'
 import type { Match } from '../match/match.types'
+import { allowedRequestFormats } from '../match-request/matchRequest.rules'
 import { getMockDevState, requireOnline } from '../mock/bridge'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
@@ -27,11 +33,11 @@ import {
   selfCheckInMark,
 } from './publicSession.rules'
 import type {
+  MatchRequestOptions,
   MyJoinRequest,
   MyNight,
   MyNightMatch,
   MyNightStage,
-  MatchRequestOptions,
   PlayerSessionAccess,
   PublicCourtNow,
   PublicMatchPlayer,
@@ -352,13 +358,13 @@ function requireSignedInPlayer(state: MockState, playerId: string) {
  * nickname and RTR ID, guests masked, no cap, the viewer's rows flagged `isViewer`, plus Courts
  * now and the Queue. Built from the last synced state like the visitor version. Mock only: real
  * mode has no route yet (NotConnectedError); the Player-hosted read stays `usePlayerSessionAccess`.
+ * Works offline (owner, 2026-11-10): it shows the last-loaded data, like the operator's reads.
  */
 export async function getSignedInSession(
   slug: string,
   playerId: string,
 ): Promise<SignedInPublicSession> {
   await delay()
-  requireOnline()
   const { state, ...sync } = serverState()
   requireSignedInPlayer(state, playerId)
   const viewer = { playerId }
@@ -392,10 +398,10 @@ function myMatchOf(state: MockState, match: Match, rosterId: string, viewer: Vie
  * come from the last synced state; the Player's own writes (check-in marks, notices, requests, invite
  * code) are server-side facts, so they read straight from the store. Only the viewer's own
  * standing: never another player's results or positions. Mock only (NotConnectedError in real mode).
+ * Works offline (owner, 2026-11-10): `offline` is true, so a check-in shows the sync line.
  */
 export async function getMyNight(slug: string, playerId: string): Promise<MyNight> {
   await delay()
-  requireOnline()
   const { state } = serverState()
   requireSignedInPlayer(state, playerId)
   const live = mockStore.getSnapshot() as MockState

@@ -7,6 +7,7 @@ export const publicRefreshBarMeta = {
   usage: [
     'Use under the hero of the public session page for signed-in viewers (D-2026-11-09-04). Pass the already-formatted time; the component only lays it out.',
     'Presentation only: the 10 second throttle state comes from the data hook (Q17.3) through refreshThrottled. Refresh reloads data, never the page.',
+    'Pass offline while the visitor is offline: Refresh is disabled and its tooltip and aria say "You\'re offline. Reconnect and try again." A failed refresh keeps the data on screen and the bar as it was.',
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',

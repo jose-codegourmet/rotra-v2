@@ -5,6 +5,7 @@ import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { CountStepper } from '@rotra/ui/count-stepper'
 import { Field } from '@rotra/ui/field'
+import { ListRow } from '@rotra/ui/list-row'
 import { Switch } from '@rotra/ui/switch'
 import { TextInput } from '@rotra/ui/text-input'
 import { useId, useState } from 'react'
@@ -18,6 +19,9 @@ export type SessionDefaultsPanelProps = {
   onSaveEntranceFee: (minor: number) => void
   /** Turning the switch off removes the default fee */
   onClearEntranceFee: () => void
+  /** Players can tap I'm here on the session page (default on) */
+  selfCheckInEnabled?: boolean
+  onSelfCheckInChange?: (enabled: boolean) => void
   isPending?: boolean
 }
 
@@ -30,6 +34,8 @@ export function SessionDefaultsPanel({
   entranceFeeMinor,
   onSaveEntranceFee,
   onClearEntranceFee,
+  selfCheckInEnabled = true,
+  onSelfCheckInChange,
   isPending,
 }: SessionDefaultsPanelProps) {
   const id = useId()
@@ -121,6 +127,18 @@ export function SessionDefaultsPanel({
             </div>
           </Field>
         ) : null}
+        <ListRow
+          className="py-0"
+          title="Players can check themselves in"
+          subtitle="During a live session, confirmed ROTRA players can tap I'm here on the session page. Turn it off and only you mark presence."
+          trailing={
+            <Switch
+              aria-label="Players can check themselves in"
+              checked={selfCheckInEnabled}
+              onChange={onSelfCheckInChange}
+            />
+          }
+        />
       </section>
     </Card>
   )

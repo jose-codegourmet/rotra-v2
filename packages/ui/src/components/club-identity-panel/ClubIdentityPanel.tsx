@@ -17,6 +17,10 @@ export type ClubIdentityPanelProps = {
   clubName: string
   initials: string
   logoUrl?: string
+  /** The one earlier logo that is kept; a "Previous logo" row shows while it exists */
+  previousLogoUrl?: string
+  /** Swap the current and previous logos (the parent toasts "Previous logo restored") */
+  onUsePreviousLogo?: () => void
   /** A centre-cropped 256 px square PNG as a data URL */
   onLogoChange: (dataUrl: string) => void
   onLogoRemove: () => void
@@ -79,6 +83,8 @@ export function ClubIdentityPanel({
   clubName,
   initials,
   logoUrl,
+  previousLogoUrl,
+  onUsePreviousLogo,
   onLogoChange,
   onLogoRemove,
   onError,
@@ -154,6 +160,28 @@ export function ClubIdentityPanel({
                 </Button>
               ) : null}
             </div>
+            {previousLogoUrl ? (
+              <div className="flex items-center gap-2.5">
+                <Avatar
+                  name="Previous logo"
+                  src={previousLogoUrl}
+                  size={36}
+                  shape="square"
+                  className="bg-surface"
+                />
+                <div className="flex flex-col gap-1">
+                  <span className="text-[13px] text-fg2">Previous logo</span>
+                  <div>
+                    <Button size="sm" onClick={onUsePreviousLogo}>
+                      Use previous logo
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ) : null}
+            <span className="text-[13px] text-fg2">
+              Only the current and previous logo are kept.
+            </span>
           </div>
         </div>
         {pendingRequest ? (

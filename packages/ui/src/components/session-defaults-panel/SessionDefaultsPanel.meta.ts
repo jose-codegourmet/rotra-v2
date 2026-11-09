@@ -7,6 +7,7 @@ export const sessionDefaultsPanelMeta = {
   usage: [
     'Players per court is 2–20; the copy shows the slot budget for 3 courts and that extra players go on the waitlist.',
     'The entrance fee is optional: the switch shows an amount field with Save; turning it off calls onClearEntranceFee. Amounts are integer centavos.',
+    'Players can check themselves in is a switch row (default on): selfCheckInEnabled and onSelfCheckInChange. Off means only the Queue Master marks presence.',
     'These only fill in new sessions; each session can still change them.',
   ],
   prototype: {

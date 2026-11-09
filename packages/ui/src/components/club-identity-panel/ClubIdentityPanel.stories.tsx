@@ -42,6 +42,19 @@ export const WithLogo: Story = {
       'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64"/></svg>',
   },
 }
+const logoA =
+  'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64"/></svg>'
+const logoB =
+  'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle cx="32" cy="32" r="28"/></svg>'
+
+/** Current and previous logo: shows the Previous logo row with Use previous logo. */
+export const WithPreviousLogo: Story = {
+  args: { logoUrl: logoA, previousLogoUrl: logoB, onUsePreviousLogo: fn() },
+}
+/** After Remove: initials show and the removed logo is kept as the previous one. */
+export const AfterRemove: Story = {
+  args: { previousLogoUrl: logoA, onUsePreviousLogo: fn() },
+}
 export const PendingRequest: Story = {
   args: { pendingRequest: { name: 'Lahug Smashers', sentAt } },
 }

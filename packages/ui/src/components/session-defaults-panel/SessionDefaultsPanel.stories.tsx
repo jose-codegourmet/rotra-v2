@@ -20,6 +20,8 @@ const meta = {
     entranceFeeMinor: null,
     onSaveEntranceFee: fn(),
     onClearEntranceFee: fn(),
+    selfCheckInEnabled: true,
+    onSelfCheckInChange: fn(),
   },
 } satisfies Meta<typeof SessionDefaultsPanel>
 
@@ -42,6 +44,9 @@ export const WithEntranceFee: Story = { args: { entranceFeeMinor: 6000 } }
 
 /** Clear the amount and press Save to see "Enter an amount, 0 or more." */
 export const FeeError: Story = { args: { entranceFeeMinor: 6000 } }
+/** Self check-in on (the default) and off. */
+export const SelfCheckInOn: Story = { args: { selfCheckInEnabled: true } }
+export const SelfCheckInOff: Story = { args: { selfCheckInEnabled: false } }
 export const Phone: Story = {
   args: { entranceFeeMinor: 6000 },
   globals: { viewport: { value: 'phone' } },

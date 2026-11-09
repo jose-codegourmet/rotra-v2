@@ -67,3 +67,8 @@ export const LiveSettings: Story = {
     ),
   },
 }
+
+export const RequestsSome: Story = { args: { requestFormatLabels: ['2 v 2', '1 v 1'] } }
+export const RequestsNone: Story = { args: { requestFormatLabels: [] } }
+export const RequestsSomeLight: Story = { ...RequestsSome, globals: { theme: 'light' } }
+export const RequestsNoneLight: Story = { ...RequestsNone, globals: { theme: 'light' } }

@@ -4,7 +4,10 @@ export const setupFormatsSectionMeta = {
   name: 'SetupFormatsSection',
   description:
     'SessionSetupForm page 2 › Formats and mode: Singles and Doubles switches (warning when both are off) and the Chill / Fair / Hard mode cards with their descriptions.',
-  usage: ["Rendered inside SessionSetupForm's FormProvider only."],
+  usage: [
+    'Rendered inside SessionSetupForm’s FormProvider only.',
+    'Pass an explicit allowedRequestFormats set and callback to show the Players can request pills; defaults and form wiring are supplied by the caller.',
+  ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',
     screen: 'Q-SETUP › viewSetup() part 2 (Formats and mode), MODES',

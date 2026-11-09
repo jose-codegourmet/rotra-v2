@@ -22,6 +22,8 @@ export type SessionSetupCardProps = {
     | { kind: 'set'; low: number; high: number }
   rosterCount: number
   presentCount: number
+  /** Formatted labels for allowed match requests, in display order. */
+  requestFormatLabels?: string[]
   /** Extra rows, e.g. the Costs row from Queue › Financials */
   extraRows?: { label: string; value: ReactNode }[]
   /** Active Q-PREPARE: stored values are fixed; never describe a recalculating minimum. */
@@ -41,6 +43,7 @@ export function SessionSetupCard({
   minimum,
   rosterCount,
   presentCount,
+  requestFormatLabels,
   extraRows = [],
   fixedAfterStart = false,
   actions,
@@ -71,6 +74,16 @@ export function SessionSetupCard({
                 </>
               ),
             },
+            ...(requestFormatLabels
+              ? [
+                  {
+                    label: 'Requests',
+                    value: requestFormatLabels.length
+                      ? `Players can request ${requestFormatLabels.join(', ')}`
+                      : "Players can't request matches",
+                  },
+                ]
+              : []),
             {
               label: 'Mode',
               value: (

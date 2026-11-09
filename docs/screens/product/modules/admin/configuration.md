@@ -45,6 +45,18 @@ A sheet with:
 
 **Add flag** saves it and returns to the list with a toast. Closing with unsaved input asks before discarding. There is no field for which apps or behaviors a flag affects; the description covers it.
 
+## A-CHARACTERS — Profile characters
+
+`/admin/settings/profile-characters`, under Settings after Feature flags; the rail shows the number of shown images. Owner comments on the Admin artifact, November 9, 2026: “this is too much. I just want a simple grid of images…” and “for the admin character library it should just be me (admin) uploading images” ([D-2026-11-09-13](../../../../mvp/decisions.md#d-2026-11-09-13)).
+
+- Header **Profile characters** and one helper line: “Players see the shown images, 8 per page. Click an image to hide or show it. N shown · M hidden.”
+- A drag-and-drop upload zone: “Drag images here to upload” / “or click to choose · PNG, JPG or WebP, up to 1 MB each”. Clicking opens a file picker; several files at once. Each image is cropped to a centred square. Toasts: “N images added and shown to players.”, “Not added: <file> isn't a PNG, JPG or WebP image; <file> is over 1 MB.”
+- A plain grid of the images, in upload order. **Click an image** to hide or show it: a hidden image is dimmed to opacity .25 (`aria-pressed="false"`, label “Character N, hidden”). A small **×** on each image deletes it, with a toast “Character N deleted.” and **Undo** for 6 seconds.
+- At least **8** images stay shown: hiding or deleting a shown image below that is refused with a toast (“Keep at least 8 images shown…”).
+- No names, ordering controls or generated characters. Hiding or deleting never takes an image from players who already use it. Every change goes in the record of actions. Offline: the offline error, nothing changes.
+- Players see only shown images in the picker ([Player profile picture](../player-information/profile.md)), 8 per page; Admin's [A-PLAYER-EDIT](players-requests.md#a-player-edit--edit-a-player-everything-the-player-can-change) uses the same list.
+- Prototype: seeded with 24 sample uploads (illustrated faces); uploads are kept as data URLs in the page's saved state.
+
 ## Acceptance examples
 
 - 70/40 is rejected as an invalid total without saving either field separately.

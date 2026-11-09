@@ -24,6 +24,7 @@ Proposed navigation:
 - Requests: Contact changes, Club names, Password resets (#491).
 - Ranking configuration.
 - Feature flags.
+- Profile characters (A-CHARACTERS, owner request, November 9, 2026; `/settings/profile-characters`).
 
 The initial view can be the clubs list rather than a speculative analytics dashboard. Counts shown in navigation are actual records, not mock revenue, churn, active-user, moderation, or platform-health metrics.
 

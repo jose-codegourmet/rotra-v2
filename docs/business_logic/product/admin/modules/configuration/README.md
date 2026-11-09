@@ -22,3 +22,14 @@ Assessment and performance weights represent complementary shares of the same ra
 The agreed observation window is three months. The agreed Most Improved/Off Day requirement is five prior sessions at the same club within that window. Neither was explicitly requested as an Admin-adjustable setting; do not silently add controls for them.
 
 Whether configuration edits recompute existing ranks immediately or apply from a future point is unresolved. Feature flags must not become a back door for changing confirmed winners or bypassing lost-data invalidation.
+
+## Profile character library
+
+Owner decision, November 9, 2026 ([D-2026-11-09-13](../../../../mvp/decisions.md#d-2026-11-09-13); mockup log 2026-11-09-admin-profile-characters; not built yet). The characters players pick as their profile picture are images **the platform owner uploads** in Admin › Settings › Profile characters. No club or player adds to the library.
+
+- Uploads: images only (PNG, JPG or WebP), up to 1 MB each, cropped to a centred square; several at once.
+- Each image is **shown** or **hidden**; at least **8** stay shown. Players see shown images in upload order, **8 per page**. Delete has a short Undo.
+- Hiding or deleting an image never changes the picture of a player who already uses it.
+- The same shown list feeds the Player profile picture dialog, Admin's edit-player sheet and the club's picture editor (D-2026-11-09-12).
+- Every change is recorded in the Record of actions. Offline: no change.
+

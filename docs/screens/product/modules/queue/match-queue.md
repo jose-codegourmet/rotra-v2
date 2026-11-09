@@ -24,6 +24,8 @@ Attention notice: “N waiting matches need attention. Edit the lineup to swap t
 - Status line: **✓ Ready to start**; **⚠ reason** for needs attention (warning style, card highlighted); **ⓘ reason** for blocked or waiting for courts.
 - Actions: **Put on court** (primary, enabled only when ready; opens [Q-DISPATCH](match-control.md#q-dispatch--put-a-waiting-match-on-court)), **Edit**, Remove ×. No Earlier / Later buttons; reordering is on the drag handle.
 
+**Find a player (owner request, November 9, 2026; [log](../../../../mockup-changes/2026-11-09-queue-main-queue-search.md)).** A search field, placeholder “Find a player in the queue” (name or nickname, case-insensitive), sits above the cards. While it has text, every card holding a matching player glows in the warning color with that player's picture ringed and name bold; all other cards fade. A result line under the field reads “N queued match(es) with TEXT” or, muted, “Not in any queued match”. The first highlighted card scrolls into view when the text changes. Clearing the field restores every card. The search is view-only: it changes no order or lineup.
+
 Empty: “No waiting matches. Use Generate matches to make a few, or add one yourself.”
 
 **Switch sides by dragging (decided October 27, 2026).** A player's picture on a queue card, in Q-SUGGEST, in Q-MANUAL, in Q-DISPATCH and in Q-ON-COURT can be dragged onto a player on the **other** team to swap the two. Switching sides is allowed until **Start match**, including while the match is On court (decided November 6, 2026). This works the same in all five places:

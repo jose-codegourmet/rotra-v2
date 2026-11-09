@@ -38,6 +38,7 @@ The product direction is sufficiently defined for documentation. Resolve the rel
 | Financials | Currencies other than pesos; automatic stock deduction; whether inventory edits work offline |
 | ID allocation | Country/city code registry, grouping scope, concurrent sequence assignment, sequence beyond four digits |
 | Profile editing | Exact personal fields and social visibility; whether operator edits of personal information continue after a profile is claimed |
+| Club-set pictures at claim | What happens to the picture a club set for an unclaimed profile (or a guest) when the player claims or registers. Proposal: it becomes their starting picture, which they can change (owner request, November 9, 2026; [log](../../mockup-changes/2026-11-09-queue-club-set-player-pictures.md)). Also: where a guest's club-set picture is stored |
 | Expired-page behavior | Meaning/presentation of stale public pages; restoration after deletion; retention of internal club data beyond public pages |
 | Admin configuration | Effect of changing weights/eligibility on existing ranks; which flags exist, targeting, and when offline devices pick up a flag change |
 

@@ -102,6 +102,10 @@ ROTRA Admin can issue a claim link for an unclaimed player, using `/claim/{token
 
 Only the current and the previous uploaded photo are kept. A new upload makes the old current photo the previous one; **Use previous picture** swaps the two; choosing a character or initials, or **Remove**, makes the last photo the previous one. Characters and initials store no file. Anything older is deleted in the same request as the new upload.
 
+## Character choices come from the Admin library ([D-2026-11-09-13](../../../../mvp/decisions.md#d-2026-11-09-13))
+
+The characters a player can pick are the images the platform owner shows in Admin › Profile characters, in upload order, 8 per page. The dialog opens on the page holding the player's current character. A player keeps a character that Admin later hides or deletes. (Owner comment, November 9, 2026; not built yet.)
+
 ## Profile picture drafts (#567)
 
 Photo, initials and character choices remain local until **Done**, independently of Edit profile Save.

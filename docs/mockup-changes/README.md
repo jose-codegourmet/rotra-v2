@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 28 · IN MOCK APP: 68 · MOCKUP ONLY: 4
+NEW: 35 · IN MOCK APP: 68 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -249,6 +249,9 @@ NEW: 28 · IN MOCK APP: 68 · MOCKUP ONLY: 4
 | [2026-11-08-queue-time-field-dialog](2026-11-08-queue-time-field-dialog.md) | Time fields open a time dialog instead of three dropdowns | time-field, date-time-picker, session-setup, add-court-form | IN MOCK APP — #501 |
 | [2026-11-08-queue-time-picker-hour-minute](2026-11-08-queue-time-picker-hour-minute.md) | Time fields pick hour, minute and AM/PM from three short dropdowns | — | IN MOCK APP — PR #489 (superseded by 2026-11-08-queue-time-field-dialog) |
 | [2026-11-08-queue-title-public-page-icon](2026-11-08-queue-title-public-page-icon.md) | Preparation title gets an "Open public page" icon button | page-header, more-options-sheet, session-preparation | IN MOCK APP — #499 |
+| [2026-11-09-admin-edit-player-everything](2026-11-09-admin-edit-player-everything.md) | Edit player: Admin edits everything, with a picture picker and a beta-only password field | player-edit-form, profile-picture-picker, pager, avatar | NEW |
+| [2026-11-09-admin-profile-characters](2026-11-09-admin-profile-characters.md) | Settings › Profile characters: a plain grid of the character images players pick from | admin-rail, image-drop-zone, character-grid, toast (with Undo) | NEW |
+| [2026-11-09-player-avatar-character-pages](2026-11-09-player-avatar-character-pages.md) | The profile picture's character picker shows 8 per page with a pager | profile-picture-sheet, pager | NEW |
 | [2026-11-09-player-my-sessions](2026-11-09-player-my-sessions.md) | The own profile has a My sessions card | list-row, chip, empty-state, card (new: my-sessions-card) | NEW |
 | [2026-11-09-player-previous-picture](2026-11-09-player-previous-picture.md) | The profile picture picker keeps a previous picture | profile-picture-sheet, avatar | NEW |
 | [2026-11-09-player-private-profile](2026-11-09-player-private-profile.md) | Players can make their profile private | switch, leaderboard-row, leaderboard-list, profile-not-found, private-contact-card | NEW |
@@ -257,13 +260,17 @@ NEW: 28 · IN MOCK APP: 68 · MOCKUP ONLY: 4
 | [2026-11-09-player-your-clubs](2026-11-09-player-your-clubs.md) | The own profile has a Your clubs card with Leave club and Report a problem | avatar, club-logo, confirm-sheet, button, notice (new: player-clubs-card) | NEW |
 | [2026-11-09-queue-club-invite-link](2026-11-09-queue-club-invite-link.md) | Club invite link in settings, Share club invite on the dashboard | session-join-qr, club-settings, sheet, button | NEW |
 | [2026-11-09-queue-club-logo-previous](2026-11-09-queue-club-logo-previous.md) | Club logo: Use previous logo (only current and previous are kept) | club-logo, club-settings, button | NEW |
+| [2026-11-09-queue-club-set-player-pictures](2026-11-09-queue-club-set-player-pictures.md) | Clubs set profile pictures for guests and unclaimed players | edit-player-sheet, avatar, button | NEW |
 | [2026-11-09-queue-guest-linking](2026-11-09-queue-guest-linking.md) | Saved players: “Joined via” marks, and Link to saved player… on a guest's record | saved-player-card, player-profile-sheet, player-picker-sheet, sheet, button | NEW |
+| [2026-11-09-queue-main-queue-search](2026-11-09-queue-main-queue-search.md) | Find a player in the Main Queue | queue match card (qtile), search input | NEW |
+| [2026-11-09-queue-make-match-confirm](2026-11-09-queue-make-match-confirm.md) | Make match asks for confirmation on a court, with Arrange to balance | confirm-make-match sheet, court (pitch), player face with games badge | NEW |
 | [2026-11-09-queue-match-request-court](2026-11-09-queue-match-request-court.md) | Request a match: the request is laid out on a court | court-pitch, match-request-sheet | NEW |
 | [2026-11-09-queue-match-request-formats](2026-11-09-queue-match-request-formats.md) | Request a match: six format pills, gated by a session setting | match-request-sheet, segmented-control, session-setup-form, key-value-list, match-request-card | NEW |
 | [2026-11-09-queue-match-request-picker-filters](2026-11-09-queue-match-request-picker-filters.md) | Request a match: the partner / opponent picker gets tabs, a skill filter and a sort | player-picker-sheet, tabs, segmented-control, player-tile | NEW |
 | [2026-11-09-queue-next-match-fullscreen](2026-11-09-queue-next-match-fullscreen.md) | The next-match picker is fullscreen on phones | sheet, next-match-sheet | IN MOCK APP — #579 |
 | [2026-11-09-queue-next-match-picker](2026-11-09-queue-next-match-picker.md) | After a result, a next-match picker offers two ready matches (left or right) | sheet, next-match-sheet | IN MOCK APP — #579 |
 | [2026-11-09-queue-next-match-slider](2026-11-09-queue-next-match-slider.md) | Next-match picker: a slider of up to five ready matches, #1 first | next-match-sheet, sheet, avatar, chip, button | NEW |
+| [2026-11-09-queue-player-cards-games](2026-11-09-queue-player-cards-games.md) | Players view cards show games played and games for the night | player-card (pc3), player grid | NEW |
 | [2026-11-09-queue-player-match-request](2026-11-09-queue-player-match-request.md) | Session page: Request a match (player side) | sheet, segmented-control, player-tile, player-picker-sheet, team-lineup, button | NEW |
 | [2026-11-09-queue-player-my-night-stats](2026-11-09-queue-player-my-night-stats.md) | Session page: My night shows games and Won / Lost as big numbers; Invite only before the start | card, progress-bar, stat-tile, button | NEW |
 | [2026-11-09-queue-player-my-night](2026-11-09-queue-player-my-night.md) | Session page: My night card, refresh bar, Courts now and own standing | card, button, chip, match-card, standings-slide, public-session-details | NEW |

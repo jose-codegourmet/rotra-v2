@@ -69,13 +69,14 @@ Header “Players”, “Tap players to pick them, then make a match. P present 
 
 - Filter: **Available · N** (present and off court; default), **Present · N**, **Everyone · N**.
 - Sort: longest wait (default), least games, most games, level high to low.
-- Player card: picture, name, level, “G/MIN games”, “M min wait” (available players), status (**On Court X**, **Away**, **Queued · #P**, or **Free**), and a Present switch. Playing and away cards are styled distinctly.
+- Player card (owner request, November 9, 2026; [log](../../../../mockup-changes/2026-11-09-queue-player-cards-games.md)): picture, name, level, then two big numbers side by side: **played** (games played tonight) and **for the night** (played + queued matches, accent tinted). Under them the status (**On Court X**, **Away**, **Queued · #P**, or **Free**), with “· M min wait” appended for available players, and a Present switch. No queued or suggested counts on the card. Cards are roomier (14 px padding, 176 px minimum width, 12 px gaps). Playing and away cards are styled distinctly.
 - Tapping a card selects it; selected cards show their pick order. A selection bar shows the faces, “N selected · FORMAT” (or why not: “pick 2, 3, 4, 6, 8 or 10 players”, “singles is off for this session”), **Clear**, and **Make match**. Fun formats add “counts toward session games only”.
+- **Make match** opens [D-MAKE-MATCH](../../dialogs.md#d-make-match--confirm-a-match-from-picked-players) instead of adding the match straight away (owner request, November 9, 2026; [log](../../../../mockup-changes/2026-11-09-queue-make-match-confirm.md)).
 - Empty Available: “No one is free right now. Try Present or Everyone.”
 
 When anyone is waiting or the session is full, the same **Waitlist** panel as preparation appears under the grid; giving a slot during play makes the player present with a locked level.
 
-Footer copy: “Make match splits the players into teams balanced by level and adds it to the end of the queue. Present controls who can be paired automatically; turning someone off never ends their current game.”
+Footer copy: “Make match shows the teams on a court first; Arrange to balance splits them by level before you add it to the end of the queue. Present controls who can be paired automatically; turning someone off never ends their current game.”
 
 **Presence saving (Jose, November 1, 2026, #324).** Switches, status and Available/Present/Everyone counts change immediately. The grid stays interactive. Save wanted end states in one batch 800 ms after the last tap; returning a player to their accepted state within that window produces no write. Show “Saving presence…” on pending cards. A card leaving its current filter stays in place, greyed when away, until its batch settles or the operator changes filter/sort. Counts already reflect the new state.
 

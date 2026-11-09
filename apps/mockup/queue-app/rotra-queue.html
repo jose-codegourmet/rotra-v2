@@ -139,7 +139,13 @@ button.conn:hover { border-color: var(--accent); background: var(--surface); }
 .avatar { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 13px; background: var(--elev); color: var(--fg2); flex: none; }
 .avatar.lg { width: 52px; height: 52px; font-size: 18px; border-radius: 14px; background: var(--accent); color: var(--on-accent); font-weight: 800; }
 .avatar.photo { background: var(--elev); overflow: hidden; }
-.avatar.photo svg { width: 100%; height: 100%; display: block; }
+.avatar.photo svg, .avatar.photo img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.pic-edit { display: flex; gap: 16px; align-items: flex-start; }
+.pic-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap: 8px; max-width: 320px; }
+.pic-opt { min-width: 52px; min-height: 52px; padding: 4px; border-radius: 50%; border: 2px solid transparent; background: transparent; cursor: pointer; display: grid; place-items: center; }
+.pic-opt .avatar { width: 40px; height: 40px; }
+.pic-opt:hover .avatar { box-shadow: 0 0 0 2px var(--accent); }
+.pic-opt[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-subtle); }
 .avatar.xl { width: 64px; height: 64px; font-size: 20px; }
 .avatar.xl.photo { box-shadow: 0 0 0 2px var(--surface), 0 0 0 3px var(--border-strong); }
 
@@ -340,6 +346,10 @@ select.input.inline { width: auto; min-height: 42px; }
 .swap-card .vs { font-size: 10px; }
 .swap-card .pf-g { min-width: 18px; height: 18px; font-size: 11px; top: -4px; right: -8px; }
 .swap-card .qf-w { font-size: 11px; }
+.pf-lv { font-size: 10px; font-weight: 700; line-height: 1.2; padding: 0 6px; border-radius: 999px; background: rgba(0, 0, 0, 0.72); color: #fff; white-space: nowrap; }
+.pf-lv.lv-beginner { color: #8cc4ff; }
+.pf-lv.lv-intermediate { color: #ffd23f; }
+.pf-lv.lv-advanced { color: #ff8a8e; }
 .pf-face { position: relative; display: block; line-height: 0; }
 .pf-g { position: absolute; top: -3px; right: -7px; min-width: clamp(17px, 5.5cqw, 22px); height: clamp(17px, 5.5cqw, 22px); padding: 0 4px; border-radius: 999px; display: grid; place-items: center; font-size: clamp(10px, 3.2cqw, 13px); font-weight: 800; line-height: 1; color: #0b0b0c; background: rgba(255, 255, 255, 0.9); }
 /* The badge takes the face ring's color: white at rest, accent on hover. */
@@ -412,6 +422,10 @@ button.qf:hover .avatar { box-shadow: 0 0 0 2px var(--accent); }
 .qtile .status-line { font-size: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .qt-actions { gap: 4px; flex-wrap: wrap; }
 .qt-actions .btn { white-space: nowrap; }
+.qtile.hit { border-color: var(--warn); box-shadow: 0 0 0 2px var(--warn), 0 0 16px 2px color-mix(in srgb, var(--warn) 40%, transparent); }
+.qtile.dim { opacity: .45; }
+.qtile .qf.hit .avatar { box-shadow: 0 0 0 3px var(--warn); }
+.qtile .qf.hit .qf-n { color: var(--warn); font-weight: 800; }
 .qtile.qmore { border-style: dashed; background: transparent; align-items: center; justify-content: center; text-align: center; cursor: pointer; color: var(--fg); min-height: 150px; }
 .qtile.qmore:hover { border-color: var(--accent); background: var(--accent-subtle); }
 .qtile.qmore .plus { font-size: 26px; line-height: 1; color: var(--accent); }
@@ -924,8 +938,8 @@ textarea.tpl { font-family: var(--mono); font-size: 13px; line-height: 1.55; min
 .inv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: 10px; }
 .inv-card { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: var(--r); border: 1px solid var(--border-strong); background: var(--surface); min-width: 0; }
 .inv-card.low { border-color: var(--warn); }
-.pgrid3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 156px), 1fr)); gap: 8px; }
-.pc3 { position: relative; display: flex; flex-direction: column; gap: 6px; padding: 10px; border-radius: var(--r); border: 1px solid var(--border-strong); background: var(--surface); cursor: pointer; min-width: 0; user-select: none; }
+.pgrid3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 176px), 1fr)); gap: 12px; }
+.pc3 { position: relative; display: flex; flex-direction: column; gap: 10px; padding: 14px; border-radius: var(--r); border: 1px solid var(--border-strong); background: var(--surface); cursor: pointer; min-width: 0; user-select: none; }
 .pc3:hover { border-color: color-mix(in srgb, var(--accent) 60%, var(--border-strong)); }
 .pc3[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent) inset; background: var(--accent-subtle); }
 .pc3.away .avatar { filter: grayscale(1); opacity: .55; }
@@ -935,8 +949,13 @@ textarea.tpl { font-family: var(--mono); font-size: 13px; line-height: 1.55; min
 .pc3-top .avatar { width: 40px; height: 40px; }
 .pc3-name { font-weight: 700; font-size: 13px; line-height: 1.2; overflow-wrap: anywhere; }
 .pc3-lv { font-size: 11px; color: var(--fg2); line-height: 1.3; }
-.pc3-stats { display: flex; gap: 4px; flex-wrap: wrap; font-size: 11px; }
-.pc3-stats span { background: var(--bg); border-radius: 6px; padding: 2px 6px; }
+/* Owner request, November 9, 2026: a player card shows only games played and the night's total (played + queued). */
+.pc3-games { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.pc3-games > div { display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; border-radius: var(--r-sm); background: var(--bg); min-width: 0; }
+.pc3-games b { font-size: 24px; line-height: 1; font-weight: 800; letter-spacing: -.5px; }
+.pc3-games span { font-size: 11px; color: var(--fg2); }
+.pc3-games .pg-total { background: var(--accent-subtle); }
+.pc3-games .pg-total b { color: var(--accent); }
 .pc3-st { color: var(--fg2); }
 .pc3 .switch { transform: scale(.8); transform-origin: right center; }
 .selbar { position: sticky; bottom: calc(72px + env(safe-area-inset-bottom, 0px)); z-index: 14; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 14px; border-radius: var(--r); background: var(--elev); border: 1px solid var(--accent); box-shadow: 0 12px 30px rgba(0, 0, 0, .35); }
@@ -1313,14 +1332,20 @@ const initials = (name) => name.split(/\s+/).filter(Boolean).slice(0, 2).map((w)
 // Sample profile pictures: illustrated faces for players with a ROTRA profile. Guests and a few profiles
 // without an uploaded picture fall back to initials, as the public-page spec requires.
 const NO_PHOTO = new Set(['p10', 'p17', 'p20']);
-const hasPhoto = (p) => (p.identity === 'registered' || p.identity === 'unclaimed') && !NO_PHOTO.has(p.id);
+// Club-set pictures (owner request, Nov 9 2026): for a guest or unclaimed profile the club can set p.pic,
+// null (initials) | { kind: 'char', seed } | { kind: 'photo', src }. p.picPrev keeps the previous photo only
+// (D-2026-11-09-10). Without p.pic the sample picture applies.
+const picOf = (p) => (p.pic !== undefined ? p.pic
+  : (p.identity === 'registered' || p.identity === 'unclaimed') && !NO_PHOTO.has(p.id) ? { kind: 'char', seed: 0 } : null);
+const hasPhoto = (p) => !!picOf(p);
+const picInner = (p) => { const c = picOf(p); return c.kind === 'photo' ? `<img src="${esc(c.src)}" alt="">` : faceSVG(p, c.seed); };
 const SKIN = ['#f3cfae', '#e3b089', '#c98d62', '#ad7349', '#8c5836', '#f6dcc4'];
 const HAIR = ['#1b1817', '#2e211b', '#4a3021', '#6d4a2c', '#8f6b48', '#2a2a31'];
 const BACKDROP = ['#2f6f5e', '#3b4f8a', '#74488a', '#8a5a2f', '#2f6a85', '#7d3b4a', '#4d6b2f', '#5b4a8a'];
 const SHIRT = ['#00cc6a', '#e6e6ec', '#ffb800', '#4a90e2', '#ff6b6b', '#9b6bff', '#24242a'];
 function hashStr(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
-function faceSVG(p) {
-  const h = hashStr(p.id + p.name);
+function faceSVG(p, seed = 0) {
+  const h = hashStr(p.id + p.name + (seed ? `#${seed}` : ''));
   const pick = (arr, k) => arr[(h >>> k) % arr.length];
   const skin = pick(SKIN, 0), hair = pick(HAIR, 3), bg = pick(BACKDROP, 6), shirt = pick(SHIRT, 9);
   const style = (h >>> 12) % 5, glasses = (h >>> 16) % 5 === 0;
@@ -1346,11 +1371,11 @@ function faceSVG(p) {
   </svg>`;
 }
 const avatar = (p, cls = '') => (hasPhoto(p)
-  ? `<span class="avatar photo ${cls}" role="img" aria-label="Profile picture of ${esc(p.name)}">${faceSVG(p)}</span>`
+  ? `<span class="avatar photo ${cls}" role="img" aria-label="Profile picture of ${esc(p.name)}">${picInner(p)}</span>`
   : `<span class="avatar ${cls}" aria-hidden="true">${esc(initials(p.name))}</span>`);
 // Public page avatar: same face, but its label and initials use the masked name (#475).
 const pubAvatar = (p) => (hasPhoto(p)
-  ? `<span class="avatar photo" role="img" aria-label="Profile picture of ${esc(maskName(p.name))}">${faceSVG(p)}</span>`
+  ? `<span class="avatar photo" role="img" aria-label="Profile picture of ${esc(maskName(p.name))}">${picInner(p)}</span>`
   : `<span class="avatar" aria-hidden="true">${esc(initials(maskName(p.name)))}</span>`);
 const cur = () => S.sessions.find((s) => s.id === S.currentId);
 // Slot budget: players per reserved court × courts. Players added past it wait in a first-come waitlist
@@ -1598,7 +1623,7 @@ function syncLabel() {
 // status pill can show what has synced and what is still waiting on this device.
 const AREA = {
   confirmReq: 'Roster', declineReq: 'Roster', keepDropOut: 'Roster', removeDropOut: 'Roster', addMatchReq: 'Queue', declineMatchReq: 'Queue',
-  togglePaid: 'Payments', markAllPaid: 'Payments', savePayAmount: 'Payments', togglePresent: 'Roster', allPresent: 'Roster', allAbsent: 'Roster', giveSlot: 'Roster', fillSlots: 'Roster', removeWait: 'Roster', confirmAdd: 'Roster', confirmNew: 'Roster', setLevel: 'Roster', saveEditPlayer: 'Roster', confirmDeletePlayer: 'Roster',
+  togglePaid: 'Payments', markAllPaid: 'Payments', savePayAmount: 'Payments', togglePresent: 'Roster', allPresent: 'Roster', allAbsent: 'Roster', giveSlot: 'Roster', fillSlots: 'Roster', removeWait: 'Roster', confirmAdd: 'Roster', confirmNew: 'Roster', setLevel: 'Roster', saveEditPlayer: 'Roster', picChar: 'Roster', picRemove: 'Roster', picUsePrev: 'Roster', confirmDeletePlayer: 'Roster',
   confirmStart: 'Session', confirmCancelSession: 'Session', confirmDeleteSession: 'Session', saveSetup: 'Session setup', confirmDone: 'Session done', confirmPublish: 'Published results',
   makeMatch: 'Queue', saveEditor: 'Queue', addSuggest: 'Queue', autoCommit: 'Queue', confirmRegen: 'Queue', move: 'Queue', moveTo: 'Queue', swapSides: 'Queue', removeWaiting: 'Queue',
   confirmDispatch: 'Matches and results', placeOnCourt: 'Matches and results', startOnCourt: 'Matches and results', sendBack: 'Queue', confirmSwap: 'Queue', confirmReplace: 'Matches and results', confirmMove: 'Matches and results', setCourtFill: 'Courts and time', confirmResult: 'Matches and results', pickNextMatch: 'Matches and results', skipNextMatch: 'Matches and results', confirmSub: 'Matches and results', confirmInvalid: 'Matches and results',
@@ -3530,6 +3555,7 @@ function queuePane(s) {
     ${att ? notice('warn', `${att} waiting match${att > 1 ? 'es need' : ' needs'} attention. Edit the lineup to swap the player, or regenerate.`) : ''}
     <p class="small muted">One waiting list for every court. ${MODES[s.mode].label} mode guides suggestions; you can override any of it.</p>
     ${list.length ? `<p class="small muted">Order runs in a snake: left to right, then back right to left on the next row. Drag a card by ⠿ to reorder (arrow keys work on the handle too). Drag a player onto someone on the other team to switch sides. Any card marked ready can go on a court now, whatever its place.</p>
+    ${(() => { const q = (S.ui.qSearch || '').trim().toLowerCase(); const n = q ? list.filter((m) => all(m).some((pid) => { const pp = P(pid); return pp && `${pp.name} ${pp.nick || ''}`.toLowerCase().includes(q); })).length : 0; return `<label class="field"><span class="sr-only">Find a player in the queue</span><input class="input" id="queue-search" type="search" data-bind="ui.qSearch" data-rerender placeholder="Find a player in the queue" autocomplete="off" value="${esc(S.ui.qSearch || '')}">${q ? `<span class="small ${n ? '' : 'muted'}" aria-live="polite">${n ? `${n} queued match${n === 1 ? '' : 'es'} with ${esc(S.ui.qSearch.trim())}` : 'Not in any queued match'}</span>` : ''}</label>`; })()}
     <div class="qgrid" style="grid-template-columns:repeat(${queueCols()}, minmax(0, 1fr))">${list.map((m, i) => queueCard(s, m, i, list.length, queueCols())).join('')}</div>`
       : `<div class="card empty">No waiting matches. Use Generate matches to create a few, or add one yourself.</div>`}`;
 }
@@ -3663,6 +3689,9 @@ function queueCols(tileMin = QUEUE_TILE_MIN) {
 }
 function queueCard(s, m, i, n, cols) {
   const b = blockOf(s, m);
+  // Owner request, November 9, 2026: searching for a player highlights their cards in the Main Queue and softens the rest.
+  const qs = (S.ui.qSearch || '').trim().toLowerCase();
+  const hitIds = qs ? all(m).filter((pid) => { const pp = P(pid); return pp && `${pp.name} ${pp.nick || ''}`.toLowerCase().includes(qs); }) : [];
   const row = Math.floor(i / cols), k = i % cols, col = row % 2 === 0 ? k : cols - 1 - k;
   const flow = i === n - 1 ? '' : (k === cols - 1 ? '↓' : row % 2 === 0 ? '→' : '←');
   const status = !b ? `<span class="status-line ok">${I.check} Ready to start</span>`
@@ -3679,8 +3708,8 @@ function queueCard(s, m, i, n, cols) {
     return `<span class="qf-w tnum ${mins >= 16 ? 'err' : mins >= 10 ? 'warn' : ''}">${mins} min</span>`;
   };
   const waitLabel = (p) => { const r = R(s, p); return s.status === 'active' && r && r.present && !busyOf(s, p, m) ? `, waiting ${restInfo(s, p).mins} min` : ''; };
-  const faces = (ids, team) => `<div class="qfaces">${ids.map((p, j) => `<button class="qf" data-act="openProfile" data-id="${p}" data-swap="m:${m.id}" data-team="${team}" data-i="${j}" data-pid="${p}" title="${esc(nm(p))} · ${esc(lvLabel(R(s, p) ? R(s, p).level : null))} · drag onto the other team to switch sides" aria-label="${esc(nm(p))}${waitLabel(p)}. View profile. Left or right arrow switches sides">${avatar(P(p))}<span class="qf-n">${esc(short(p))}</span>${wait(p)}</button>`).join('')}</div>`;
-  return `<article class="qtile ${b && b.kind === 'attention' ? 'attn' : ''} ${!b ? 'ready' : ''}" data-qid="${m.id}" style="grid-row:${row + 1};grid-column:${col + 1}" aria-label="Queue position ${i + 1}">
+  const faces = (ids, team) => `<div class="qfaces">${ids.map((p, j) => `<button class="qf${hitIds.includes(p) ? ' hit' : ''}" data-act="openProfile" data-id="${p}" data-swap="m:${m.id}" data-team="${team}" data-i="${j}" data-pid="${p}" title="${esc(nm(p))} · ${esc(lvLabel(R(s, p) ? R(s, p).level : null))} · drag onto the other team to switch sides" aria-label="${esc(nm(p))}${waitLabel(p)}. View profile. Left or right arrow switches sides">${avatar(P(p))}<span class="qf-n">${esc(short(p))}</span>${wait(p)}</button>`).join('')}</div>`;
+  return `<article class="qtile ${b && b.kind === 'attention' ? 'attn' : ''} ${!b ? 'ready' : ''}${qs ? (hitIds.length ? ' hit' : ' dim') : ''}" data-qid="${m.id}" style="grid-row:${row + 1};grid-column:${col + 1}" aria-label="Queue position ${i + 1}">
     <div class="qt-head"><span class="qt-pos">#${i + 1}</span>${chip(FORMAT_LABEL[m.format], 'solid')}${m.protected ? `<span class="muted" title="Manual · protected from regeneration">${I.lock}</span>` : `<span class="small muted">${m.origin === 'suggested' ? 'Suggested' : 'Generated'}</span>`}<span class="grow"></span><span class="qt-flow" aria-hidden="true">${flow}</span><button class="qt-grip" data-drag-handle data-id="${m.id}" aria-label="Reorder match ${i + 1}: drag, or use the arrow keys" title="Drag to reorder">⠿</button></div>
     ${faces(m.teamA, 'teamA')}<div class="vs">VS</div>${faces(m.teamB, 'teamB')}
     ${status}
@@ -3727,8 +3756,8 @@ function playersPane(s) {
       return `<article class="pc3 ${x.a && x.a.status === 'active' ? 'playing' : ''} ${x.r.present ? '' : 'away'}" role="button" tabindex="0" data-act="selPlayer" data-pid="${x.r.pid}" aria-pressed="${i >= 0}" aria-label="${esc(x.p.name)}, ${esc(lvLabel(x.r.level))}, ${x.g} games">
         ${i >= 0 ? `<span class="sel-badge" aria-hidden="true">${i + 1}</span>` : ''}
         <div class="pc3-top">${avatar(x.p)}<div style="min-width:0"><div class="pc3-name">${esc(x.p.name)}</div><div class="pc3-lv">${esc(lvLabel(x.r.level))}</div></div></div>
-        <div class="pc3-stats"><span class="tnum">${x.g} played · ${queuedCount(s, x.r.pid)} queued · ${currentDrafts.filter((m) => all(m).includes(x.r.pid)).length} suggested (${esc(draftState ? AUTO_MODES[draftState.tab] : 'current tab')})</span>${x.a || !x.r.present ? '' : `<span class="tnum">${x.mins} min wait</span>`}</div>
-        <div class="between" style="flex-wrap:nowrap"><span class="pc3-st small">${st}</span>${sw(x.r.present, 'togglePresent', `data-pid="${x.r.pid}"`, `${x.p.name} present`)}</div>${presencePending.has(x.r.pid) ? '<span class="small muted">Saving presence…</span>' : ''}${selfMark(x.r)}
+        <div class="pc3-games" aria-label="${x.g} games played, ${x.g + queuedCount(s, x.r.pid)} for the night"><div class="pg-played"><b class="tnum">${x.g}</b><span>played</span></div><div class="pg-total"><b class="tnum">${x.g + queuedCount(s, x.r.pid)}</b><span>for the night</span></div></div>
+        <div class="between" style="flex-wrap:nowrap"><span class="pc3-st small">${st}${x.a || !x.r.present ? '' : ` · ${x.mins} min wait`}</span>${sw(x.r.present, 'togglePresent', `data-pid="${x.r.pid}"`, `${x.p.name} present`)}</div>${presencePending.has(x.r.pid) ? '<span class="small muted">Saving presence…</span>' : ''}${selfMark(x.r)}
       </article>`;
     }).join('')}</div>` : `<div class="card empty">${f.show === 'avail' ? 'No one is free right now. Try Present or Everyone.' : 'No players yet.'}</div>`}
     ${sel.length ? `<div class="selbar" role="region" aria-label="Selected players">
@@ -4350,7 +4379,16 @@ const SHEETS = {
     const claim = p.identity === 'unclaimed', phoneOnFile = claim && !p.noPhone;
     const SOC = [['facebook', 'Facebook', 'https://facebook.com/yourname'], ['instagram', 'Instagram', 'https://instagram.com/yourname'], ['youtube', 'YouTube', 'https://youtube.com/@yourname'], ['linkedin', 'LinkedIn', 'https://linkedin.com/in/yourname']];
     const input = (id, label, k, o = {}) => `<label class="field"><span>${label}</span><input class="input${e[k] ? ' bad' : ''}" id="${id}" data-bind="ui.sheet.d.${k}" value="${esc(d[k])}" ${o.type ? `type="${o.type}"` : ''} ${o.im ? `inputmode="${o.im}"` : ''} ${o.ph ? `placeholder="${esc(o.ph)}"` : ''}>${e[k] ? `<span class="err">${esc(e[k])}</span>` : o.hint ? `<span class="hint">${o.hint}</span>` : ''}</label>`;
+    const pc = picOf(p), seeds = [0, 1, 2, 3, 4, 5, 6, 7];
+    const picWhat = !pc ? 'Initials' : pc.kind === 'photo' ? 'A photo' : 'A character';
     return sheetShell(`Edit ${esc(p.name)}`, `
+      <div class="field"><span>Profile picture</span>
+        <div class="pic-edit">${avatar(p, 'xl')}<div class="stack tight"><span class="small muted">${picWhat}</span>
+          <div class="row"><label class="btn sm" for="pic-file">Upload photo</label><input type="file" id="pic-file" class="sr-only" accept="image/*" data-id="${p.id}">${pc ? `<button class="btn sm ghost" data-act="picRemove" data-id="${p.id}">Remove</button>` : ''}</div>
+          ${p.picPrev ? `<div class="row" style="gap:10px"><span class="avatar photo md"><img src="${esc(p.picPrev.src)}" alt="Previous picture"></span><div class="stack tight"><span class="small muted">Previous picture</span><div><button class="btn sm" data-act="picUsePrev" data-id="${p.id}">Use previous picture</button></div></div></div>` : ''}</div></div>
+        <span class="small muted" id="pic-chars-l">Choose a character</span>
+        <div class="pic-grid" role="group" aria-labelledby="pic-chars-l">${seeds.map((n) => `<button type="button" class="pic-opt" data-act="picChar" data-id="${p.id}" data-k="${n}" aria-pressed="${!!(pc && pc.kind === 'char' && pc.seed === n)}" aria-label="Character ${n + 1}"><span class="avatar photo" aria-hidden="true">${faceSVG(p, n)}</span></button>`).join('')}</div>
+        <span class="hint">Shown wherever this player appears in your club. When they claim their profile they can change it. Only the current and previous photo are kept.</span></div>
       ${claim ? notice('', 'What you fill in here is filled in for them when they open their invite link. They can still change it and only need to choose a password.') : ''}
       <div class="fgrid">${input('ep-name', 'Full or display name', 'name')}${input('ep-nick', 'Nickname (optional)', 'nick')}</div>
       <label class="field"><span>Level for this club (optional)</span>${selectLevel('ep-level', d.level, 'data-bind="ui.sheet.d.level" data-num')}</label>
@@ -4647,6 +4685,17 @@ const SHEETS = {
       ${!S.online ? notice('warn', "You're offline. Connect to delete this session.") : ''}
       <p>The session, its public link, its waitlist and any join requests are removed. This cannot be undone.</p>`,
       `<button class="btn" data-act="closeSheet" data-autofocus>Keep session</button><button class="btn danger" data-act="confirmDeleteSession" ${!S.online ? 'disabled' : ''}>Delete session</button>`);
+  },
+  confirmMake(sh) {
+    const s = cur();
+    const lv = (pid) => (R(s, pid).level != null ? R(s, pid).level : 4), sum = (ids) => ids.reduce((x, pid) => x + lv(pid), 0);
+    const side = (ids, team) => `<div class="side n${Math.min(ids.length, 5)}" style="--rows:${ids.length <= 2 ? ids.length : ids.length <= 4 ? 2 : 3}" role="group" aria-label="Team ${team}">${ids.map((pid) => `<div class="pf" aria-label="${esc(nm(pid))}, ${gamesOf(s, pid)} games played"><span class="pf-face">${avatar(P(pid))}<span class="pf-g tnum" aria-hidden="true">${gamesOf(s, pid)}</span></span><span class="pf-n">${esc(short(pid))}</span><span class="pf-lv lv-${rvBand(R(s, pid)).split(' ')[0]}">${esc(lvLabel(R(s, pid).level).replace('Beginner', 'Beg').replace('Intermediate', 'Int').replace('Advanced', 'Adv'))}</span></div>`).join('')}</div>`;
+    const a = sum(sh.teamA), b = sum(sh.teamB), diff = Math.abs(a - b);
+    return sheetShell('Make this match?', `<p class="small muted">${FORMAT_LABEL[sh.fmt]} · added to the end of the Main Queue. The number on each face is that player's games so far.</p>
+      <div class="pitch ${FORMATS[sh.fmt][0] > 3 || FORMATS[sh.fmt][1] > 3 ? 'tall' : ''}" role="img" aria-label="Team A versus Team B">${courtSVG(1)}<div class="sides">${side(sh.teamA, 'A')}${side(sh.teamB, 'B')}</div></div>
+      <div class="between small"><span>Team A level <b class="tnum">${a}</b></span><span class="${diff <= 1 ? '' : 'muted'}">${diff === 0 ? 'Even' : `${diff} apart`}</span><span>Team B level <b class="tnum">${b}</b></span></div>
+      ${sh.balanced ? notice('ok', 'Arranged to balance the teams by level.') : ''}`,
+      `<button class="btn" data-act="closeSheet">Cancel</button><button class="btn" data-act="arrangeBalance">Arrange to balance</button><button class="btn primary" data-act="confirmMake">Make match</button>`);
   },
   // Cancel a planned session (before Start session only). Final: the record keeps its roster, waitlist and payment marks.
   clearQueue() {
@@ -5245,6 +5294,10 @@ const ACT = {
     const p = P(d.id);
     openSheet({ type: 'editPlayer', id: p.id, d: { name: p.name, nick: p.nick || '', level: p.sugg ?? null, phone: '', email: p.email || '', style: p.style || '', expY: p.expY || '', expM: p.expM || '', sinceM: p.sinceM || '', sinceY: p.sinceY || '', facebook: p.social?.facebook || '', instagram: p.social?.instagram || '', youtube: p.social?.youtube || '', linkedin: p.social?.linkedin || '' } });
   },
+  // Club-set picture for a guest or unclaimed profile: applies at once, like the club logo (D-2026-11-09-10).
+  picChar: (d) => { const p = P(d.id); if (!p || p.identity === 'registered') return; const c = picOf(p); if (c && c.kind === 'photo') p.picPrev = c; p.pic = { kind: 'char', seed: +d.k }; commit(`Picture updated · ${p.name}`); render(); },
+  picRemove: (d) => { const p = P(d.id); if (!p || p.identity === 'registered') return; const c = picOf(p); if (c && c.kind === 'photo') p.picPrev = c; p.pic = null; commit(`Using initials · ${p.name}`); render(); },
+  picUsePrev: (d) => { const p = P(d.id); if (!p || !p.picPrev) return; const c = picOf(p); p.pic = p.picPrev; p.picPrev = c && c.kind === 'photo' ? c : null; commit(`Previous picture restored · ${p.name}`); render(); },
   saveEditPlayer: () => {
     const sh = S.ui.sheet, d = sh.d, p = P(sh.id), err = {};
     if (!d.name.trim()) err.name = 'Enter a name.';
@@ -5566,12 +5619,19 @@ const ACT = {
   plSet: (d) => { S.ui.pl = { ...(S.ui.pl || {}), [d.k]: d.v }; render(); },
   selPlayer: (d) => { const cur_ = S.ui.sel || []; S.ui.sel = cur_.includes(d.pid) ? cur_.filter((x) => x !== d.pid) : [...cur_, d.pid]; render(); const el = document.querySelector(`.pc3[data-pid="${d.pid}"]`); if (el) el.focus(); },
   selClear: () => { S.ui.sel = []; render(); },
+  // Owner request, November 9, 2026: Make match opens a confirmation with the court and each player's games; the teams start in pick order and Arrange to balance evens them out by level.
   makeMatch: () => {
     const s = cur(); const sel = (S.ui.sel || []).filter((pid) => R(s, pid)); const plan = matchPlan(s, sel);
     if (!plan.ok) return;
-    const m = addMatch(s, { format: plan.fmt, ...balancedTeams(s, sel, plan.fmt) }, 'manual', true);
+    const [na] = FORMATS[plan.fmt];
+    openSheet({ type: 'confirmMake', fmt: plan.fmt, teamA: sel.slice(0, na), teamB: sel.slice(na), balanced: false });
+  },
+  arrangeBalance: () => { const s = cur(), sh = S.ui.sheet, sel = [...sh.teamA, ...sh.teamB]; Object.assign(sh, balancedTeams(s, sel, sh.fmt), { balanced: true }); render(); },
+  confirmMake: () => {
+    const s = cur(), sh = S.ui.sheet;
+    const m = addMatch(s, { format: sh.fmt, teamA: sh.teamA, teamB: sh.teamB }, 'manual', true);
     const pos = waiting(s).findIndex((x) => x.id === m.id) + 1;
-    S.ui.sel = []; commit(`${FORMAT_LABEL[plan.fmt]} added to the queue at #${pos}${autoNote(s, autoFill(s))}`); render();
+    S.ui.sel = []; S.ui.sheet = null; commit(`${FORMAT_LABEL[sh.fmt]} added to the queue at #${pos}${autoNote(s, autoFill(s))}`); render();
   },
   openDispatch: (d) => {
     const s = cur(); const m = s.matches.find((x) => x.id === d.id);
@@ -5890,6 +5950,23 @@ function setPath(path, value) {
   for (let i = 0; i < keys.length - 1; i++) o = o[keys[i]];
   o[keys[keys.length - 1]] = value;
 }
+// Club-set player photo: same centre-crop as the logo; read locally, no network.
+function loadPlayerPic(file, id) {
+  const p = P(id);
+  if (!file || !p || p.identity === 'registered') return;
+  if (!/^image\//.test(file.type)) { toast('Choose an image file'); return; }
+  if (file.size > 4 * 1024 * 1024) { toast('Choose an image under 4 MB'); return; }
+  const img = new Image();
+  img.onload = () => {
+    const c = document.createElement('canvas'); c.width = c.height = 256;
+    const side = Math.min(img.width, img.height);
+    c.getContext('2d').drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, 256, 256);
+    const was = picOf(p); if (was && was.kind === 'photo') p.picPrev = was;
+    p.pic = { kind: 'photo', src: c.toDataURL('image/png') }; URL.revokeObjectURL(img.src); commit(`Picture updated · ${p.name}`); render();
+  };
+  img.onerror = () => toast('That image could not be read');
+  img.src = URL.createObjectURL(file);
+}
 // Logo upload: centre-crop to a 256 px square so the saved image stays small.
 function loadLogo(file) {
   if (!file) return;
@@ -5974,6 +6051,7 @@ function onBind(e) {
   const el = e.target;
   if (el.id === 'rp-range') { stopReplay(); replayTo(+el.value); return; }
   if (el.id === 'logo-file') { if (e.type === 'change') loadLogo(el.files && el.files[0]); return; }
+  if (el.id === 'pic-file') { if (e.type === 'change') loadPlayerPic(el.files && el.files[0], el.dataset.id); return; }
   if (el.dataset.actChange) { if (e.type === 'change') { curAct = el.dataset.actChange; CHANGE[el.dataset.actChange](el); } return; }
   if (!el.dataset.bind) return;
   let v = el.type === 'checkbox' ? el.checked : el.value;
@@ -6326,6 +6404,10 @@ if (!prototypeRouter) render();
 const pqSync = (el) => el.classList.toggle('at-end', el.hasAttribute('data-nm-slider') ? el.scrollWidth - el.scrollLeft - el.clientWidth <= 2 : el.scrollHeight - el.scrollTop - el.clientHeight <= 2);
 document.addEventListener('scroll', (e) => { const el = e.target; if (el && el.classList && (el.classList.contains('pq-scroll') || el.hasAttribute('data-nm-slider'))) pqSync(el); }, true);
 new MutationObserver(() => document.querySelectorAll('.pq-scroll, [data-nm-slider]').forEach(pqSync)).observe(document.body, { childList: true, subtree: true });
+
+// Main Queue search: bring the first highlighted card into view when the search text changes.
+let qsLast = '';
+new MutationObserver(() => { const q = (document.getElementById('queue-search') || {}).value || ''; if (q === qsLast) return; qsLast = q; const hit = q && document.querySelector('.qtile.hit'); if (hit) hit.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }).observe(document.body, { childList: true, subtree: true });
 </script>
 
 </body></html>

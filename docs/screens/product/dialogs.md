@@ -72,6 +72,10 @@ Title **Regenerate waiting queue?** Show counts: “Automatic waiting matches �
 
 Owner request, November 9, 2026. Title **Clear the queue?** Copy: “N waiting matches will be removed from the Main Queue.” · muted “Matches already on a court and finished matches are not affected. You can add or generate matches again afterwards.” Secondary **Keep queue**; destructive **Clear queue** (solid red). Confirming removes every waiting match (manual and automatic), records no game, and toasts “Queue cleared · N waiting matches removed”.
 
+## D-MAKE-MATCH — Confirm a match from picked players
+
+Owner request, November 9, 2026 ([log](../../mockup-changes/2026-11-09-queue-make-match-confirm.md)). Opened by **Make match** in the Players view (Q-POOL), for every format size (1 v 1 to 5 v 5). Title **Make this match?** Copy: “FORMAT · added to the end of the Main Queue. The number on each face is that player's games so far.” A court drawing shows Team A on the left and Team B on the right; each face carries a games-played badge and, under the short name, a small skill-level label (“Beg/Int/Adv Low/Mid/High”, tinted by band; “No level” when unassigned). A line reads “Team A level N · Even (or “D apart”) · Team B level N” (summed assigned levels; an unassigned player counts as 4). Teams start in **pick order** (the first picks fill Team A). Buttons: **Cancel** (closes; the selection stays), **Arrange to balance** (re-splits the same players with the Make match balancing rule and shows “Arranged to balance the teams by level.”), primary **Make match** (adds the shown teams to the end of the queue, clears the selection, toasts “FORMAT added to the queue at #P”).
+
 ## D-MINIMUM — Shortfall acknowledgement
 
 Title **Some players are below the minimum**. Show each name with “g of M”. Copy: “Late arrivals, early leavers and real-world choices happen. You can still finish.” Primary **Continue to finish session**; secondary Back to session. This does not bypass missing-record checks or mark a session invalid by itself.

@@ -1757,7 +1757,10 @@ function sheetWrap(title, body, foot, wide = false) {
     <div class="sb">${body}</div>${foot ? `<footer>${foot}</footer>` : ''}</div>`;
 }
 let avatarDraft = null;
-const FACES = ['', 'a', 'b', 'c', 'd', 'e', 'f', 'g'];
+// The character library is managed by the platform owner in the Admin app (Profile characters): only active characters, in the order set there.
+// The prototype stands in for that list with 24 seeded faces, shown 8 to a page (owner request, November 9, 2026).
+const FACES = ['', ...'abcdefghijklmnopqrstuvw'.split('')];
+const FACE_PAGE = 8;
 const SHEETS = {
   avatar: () => {
     const a = avatarDraft || S.accounts[S.me], p = { ...profileOf(S.me), ...a };
@@ -1770,7 +1773,11 @@ const SHEETS = {
       <div class="av-now">${avatar(p, 'xxl')}<div class="stack tight"><b>${a.photoUrl ? 'Your photo' : a.photo ? 'A character' : 'Your initials'}</b><span class="small muted">Everyone who sees your profile sees this.</span></div></div>
       <div class="row"><label class="btn sm" for="av-file" style="cursor:pointer">Upload a photo</label><input type="file" id="av-file" accept="image/webp,image/gif,image/png,image/heic,image/heif,image/jpeg,.heic,.heif" class="sr-only" data-avfile><button type="button" class="btn sm" data-act="useInitials" ${!a.photo && !a.photoUrl ? 'disabled' : ''}>Use my initials</button>${a.photoUrl ? '<button type="button" class="btn sm" data-act="removePhoto">Remove</button>' : ''}</div>
       ${a.photoPrevUrl && !a.width ? `<div class="av-now">${avatar({ ...a, name: a.name, photo: true, photoUrl: a.photoPrevUrl }, 'xl')}<div class="stack tight"><b>Previous picture</b><div class="row"><button type="button" class="btn sm" data-act="usePrevious">Use previous picture</button></div></div></div>` : ''}
-      ${controls}<div><span class="label">Or pick a character</span><div class="av-grid" role="group" aria-label="Characters">${FACES.map(opt).join('')}</div></div>
+      ${controls}${(() => {
+        const pages = Math.ceil(FACES.length / FACE_PAGE), cur = Math.min(Math.max(0, S.ui.avPage || 0), pages - 1);
+        return `<div><span class="label">Or pick a character</span><div class="av-grid" role="group" aria-label="Characters, page ${cur + 1} of ${pages}">${FACES.slice(cur * FACE_PAGE, (cur + 1) * FACE_PAGE).map(opt).join('')}</div>
+        <nav class="pager" aria-label="Character pages"><button type="button" class="btn sm" data-act="avPage" data-v="${cur - 1}" ${cur === 0 ? 'disabled' : ''}>${I.back} Previous</button><span class="small muted" aria-live="polite">Page ${cur + 1} of ${pages}</span><button type="button" class="btn sm" data-act="avPage" data-v="${cur + 1}" ${cur >= pages - 1 ? 'disabled' : ''}>Next ${I.fwd}</button></nav></div>`;
+      })()}
       <p class="hint">Only your current and previous photo are kept. Changes are saved only when you click Done. WebP, GIF, PNG, HEIC/HEIF and JPEG. Keep it to a clear picture of you; the club's Queue Master can ask you to change it.</p></div>`, '<button class="btn primary" data-act="saveAvatar">Done</button>');
   },
   share: (sh) => {
@@ -1884,6 +1891,7 @@ const ACT = {
   gateLogin: () => { S.ui.after = { to: S.screen, id: S.viewId }; go('login'); },
   openCompare: (el) => { if (!S.me) { S.ui.after = { to: 'compare', id: el.dataset.id }; toast('Sign in to compare'); go('login'); return; } S.ui.cmpPage = 0; S.ui.cmpFilter = 'all'; go('compare', el.dataset.id); },
   cmpFilter: (el) => { S.ui.cmpFilter = el.dataset.v; S.ui.cmpPage = 0; render(); },
+  avPage: (el) => { S.ui.avPage = +el.dataset.v; render(); },
   cmpPage: (el) => { S.ui.cmpPage = +el.dataset.v; render(); document.querySelector('.cmp-game')?.scrollIntoView({ block: 'center' }); },
   openRank: (el) => go('rank', el.dataset.id || null),
   openHistory: (el) => { S.ui.hist = 'counted'; go('history', el.dataset.id); },
@@ -1956,7 +1964,7 @@ const ACT = {
       toast(want ? 'Your profile is now private' : 'Your profile is now public');
     });
   },
-  openAvatar: () => { if (!S.me) return; avatarDraft = { ...S.accounts[S.me] }; S.ui.sheet = { type: 'avatar' }; render(); },
+  openAvatar: () => { if (!S.me) return; avatarDraft = { ...S.accounts[S.me] }; S.ui.avPage = avatarDraft.photo && !avatarDraft.photoUrl ? Math.floor(Math.max(0, FACES.indexOf(avatarDraft.face || '')) / FACE_PAGE) : 0; S.ui.sheet = { type: 'avatar' }; render(); },
   // A saved photo (no pending upload) that is replaced by a character, initials or Remove becomes the previous photo; an unsaved upload is simply dropped.
   setFace: (el) => { const d = avatarDraft; if (d.photoUrl?.startsWith('blob:')) URL.revokeObjectURL(d.photoUrl); else if (d.photoUrl && !d.width) d.photoPrevUrl = d.photoUrl; Object.assign(d, { photo: true, photoUrl: '', face: el.dataset.v, width: 0, crop: null }); render(); },
   useInitials: () => { const d = avatarDraft; if (d.photoUrl?.startsWith('blob:')) URL.revokeObjectURL(d.photoUrl); else if (d.photoUrl && !d.width) d.photoPrevUrl = d.photoUrl; Object.assign(d, { photo: false, photoUrl: '', width: 0, crop: null }); render(); },

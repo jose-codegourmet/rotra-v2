@@ -393,6 +393,36 @@ body:has(.player-select:checked) .shell-main { padding-bottom: 120px; }
 .player-selection:focus-within{outline:2px solid var(--accent);outline-offset:2px}
 .player-selection input{width:18px;height:18px;margin:0;accent-color:var(--accent);cursor:inherit}
 @media (pointer:coarse),(max-width:1024px){.player-selection{width:44px;height:44px}.player-selection input{width:22px;height:22px}}
+/* Admin edit-player sheet: profile picture picker */
+.avatar.pic { overflow: hidden; padding: 0; background: var(--elev); }
+.avatar.pic svg, .avatar.pic img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.pic-sec { display: flex; flex-direction: column; gap: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+.pic-now { display: flex; align-items: center; gap: 12px; }
+.pic-now .avatar { width: 72px; height: 72px; border-radius: 18px; font-size: 22px; }
+.pic-prev { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--r-sm); }
+.pic-prev .who .avatar { width: 40px; height: 40px; }
+.pic-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.pic-opt { display: block; width: 100%; aspect-ratio: 1; padding: 0; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; background: var(--elev); cursor: pointer; }
+.pic-opt svg, .pic-opt img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.pic-opt[aria-pressed="true"] { outline: 3px solid var(--accent); outline-offset: 2px; }
+.pic-pager { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.pic-file { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.pic-up:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* A-CHARACTERS: a plain grid of the uploaded character images */
+.ch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 12px; }
+.ch-item { position: relative; }
+.ch-img { display: block; width: 100%; aspect-ratio: 1; padding: 0; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; background: var(--elev); cursor: pointer; transition: opacity .15s; }
+.ch-img svg, .ch-img img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.ch-img[aria-pressed="false"] { opacity: .25; }
+.ch-del { position: absolute; top: -6px; right: -6px; width: 26px; height: 26px; display: grid; place-items: center; padding: 0; border-radius: 50%; border: 1px solid var(--border-strong); background: var(--surface); color: var(--fg); cursor: pointer; box-shadow: var(--shadow); }
+.ch-del:hover { background: var(--elev); }
+.ch-drop { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 120px; padding: 18px; border: 2px dashed var(--border-strong); border-radius: var(--r); text-align: center; color: var(--fg2); cursor: pointer; }
+.ch-drop b { color: var(--fg); }
+.ch-drop:hover, .ch-drop.over { border-color: var(--accent); background: var(--accent-subtle); }
+.ch-drop:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ch-drop input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.toast.undo { display: flex; align-items: center; justify-content: space-between; gap: 12px; pointer-events: auto; }
+.toast.undo button { background: none; border: 0; padding: 4px 6px; color: inherit; font-weight: 800; text-decoration: underline; cursor: pointer; }
 </style>
 
 <div id="app"></div>
@@ -558,12 +588,51 @@ function seedLog() {
   ].sort((a, b) => b.at - a.at);
 }
 
+// ---------- Profile characters (the faces players pick for their profile picture) ----------
+// Every character is an image the platform owner uploads. Order is the order players see; only shown (active) characters reach
+// the picker, 8 per page. Hiding or deleting one never takes it from players who already use it. The seeded library uses the
+// illustrated faces from the Player prototype as sample uploads; the prototype draws them instead of storing image files.
+const CHAR_PLAYER_PAGE = 8, CHAR_MIN_ACTIVE = 8, CHAR_MAX_BYTES = 1024 * 1024;
+const CH_SKIN = ['#f3cfae', '#e3b089', '#c98d62', '#ad7349', '#8c5836', '#f6dcc4'];
+const CH_HAIR = ['#1b1817', '#2e211b', '#4a3021', '#6d4a2c', '#8f6b48', '#2a2a31'];
+const CH_BACKDROP = ['#2f6f5e', '#3b4f8a', '#74488a', '#8a5a2f', '#2f6a85', '#7d3b4a', '#4d6b2f', '#5b4a8a'];
+const CH_SHIRT = ['#00cc6a', '#e6e6ec', '#ffb800', '#4a90e2', '#ff6b6b', '#9b6bff', '#24242a'];
+function charFaceSVG(seed) {
+  const h = hashStr(`rotra-character-${seed}`);
+  const pick = (arr, k) => arr[(h >>> k) % arr.length];
+  const skin = pick(CH_SKIN, 0), hair = pick(CH_HAIR, 3), bg = pick(CH_BACKDROP, 6), shirt = pick(CH_SHIRT, 9);
+  const style = (h >>> 12) % 5, glasses = (h >>> 16) % 5 === 0;
+  const front = ['M19 27C19 12 45 12 45 27C41 19 23 19 19 27Z', 'M18 29C16 11 45 9 46 26C40 17 31 22 22 19C21 22 19 25 18 29Z', 'M19 26C21 14 43 14 45 26C38 19 26 19 19 26Z', 'M19 27C19 13 45 13 45 27C41 20 23 20 19 27Z', 'M20 24C21 15 43 15 44 24C38 20 26 20 20 24Z'][style];
+  return `<svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" fill="${bg}"/>
+    ${style === 2 ? `<path d="M17 26C17 9 47 9 47 26L48 47C44 49 40 45 41 37H23C24 45 20 49 16 47Z" fill="${hair}"/>` : ''}
+    ${style === 3 ? `<circle cx="32" cy="10" r="6" fill="${hair}"/>` : ''}
+    <path d="M7 64C9 49 21 44 32 44S55 49 57 64Z" fill="${shirt}"/>
+    <rect x="27" y="37" width="10" height="9" rx="3" fill="${skin}"/>
+    <ellipse cx="19.5" cy="29" rx="2.4" ry="3.2" fill="${skin}"/><ellipse cx="44.5" cy="29" rx="2.4" ry="3.2" fill="${skin}"/>
+    <ellipse cx="32" cy="28" rx="12.5" ry="14.5" fill="${skin}"/>
+    <path d="${front}" fill="${hair}" ${style === 4 ? 'opacity=".85"' : ''}/>
+    <path d="M25 25.5h4M35 25.5h4" stroke="${hair}" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="27" cy="29.5" r="1.6" fill="#1b1817"/><circle cx="37" cy="29.5" r="1.6" fill="#1b1817"/>
+    <path d="M27.5 35.5Q32 39 36.5 35.5" fill="none" stroke="#7a3e2e" stroke-width="1.6" stroke-linecap="round"/>
+    ${glasses ? '<g fill="none" stroke="#1b1817" stroke-width="1.3"><circle cx="27" cy="29.5" r="4"/><circle cx="37" cy="29.5" r="4"/><path d="M31 29.5h2"/></g>' : ''}
+  </svg>`;
+}
+// Sample uploads: the eight faces players already see (keys '', 'a'..'g'), then sixteen more: 24 in all, three player pages of 8.
+const CHAR_KEYS = ['', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w'];
+function seedChars() {
+  return CHAR_KEYS.map((k, i) => ({ id: `ch${i + 1}`, n: i + 1, key: k, seed: k || 'base', name: '', img: '', active: true, source: 'sample', added: ymdT('2026-01-05') + 9 * H }));
+}
+const charName = (c) => c.name || `Character ${c.n}`;
+const charArt = (c) => (c.img ? `<img src="${c.img}" alt="">` : charFaceSVG(c.seed));
+const activeChars = () => S.chars.filter((c) => c.active);
+
 function freshState() {
   return {
     v: 1, online: true, offlineAt: null, me: null, denied: null, ended: false, screen: 'clubs', viewId: null,
     clubs: seedClubs().map((c) => ({ ...c, price: { monthly: SEED_PRICE[c.id][0], yearly: SEED_PRICE[c.id][1], free: c.id === 'c8' } })), players: seedPlayers(), requests: seedRequests(), log: seedLog(),
     config: [{ v: 1, assess: 70, perf: 30, threshold: 10, at: ymdT('2026-01-05') + 9 * H, by: OWNER }],
     flags: [],
+    chars: seedChars(),
     demo: { timeoutNext: false, failApply: false, failConfig: false, conflictConfig: false },
     ui: freshUi(),
   };
@@ -581,6 +650,8 @@ let S;
 try { S = JSON.parse(localStorage.getItem(KEY)); } catch (e) { S = null; }
 if (!S || S.v !== 1) S = freshState();
 // Saves from before per-club prices get the sample prices.
+// Saves from before the character library get the built-in characters.
+if (!Array.isArray(S.chars)) S.chars = seedChars();
 S.clubs.forEach((c) => { if (!c.price) { const p = SEED_PRICE[c.id] || [1500, 15000]; c.price = { monthly: p[0], yearly: p[1] }; } });
 Object.assign(S.ui, { sheet: null, pendingGo: null, resetArmed: false, nav: false });
 S.ui.login.pending = false;
@@ -633,6 +704,8 @@ const I = {
   n_name: svg('<path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="m13.5 6.5 4 4"/>', 20, 2),
   n_rank: svg('<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>', 20, 2),
   n_flag: svg('<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>', 20, 2),
+  next: svg('<path d="m9 6 6 6-6 6"/>', 16, 2.4),
+  n_face: svg('<circle cx="12" cy="12" r="9"/><path d="M9 10h.01M15 10h.01"/><path d="M8.5 14.5a4.5 4.5 0 0 0 7 0"/>', 20, 2),
   n_out: svg('<path d="M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4M10 17l5-5-5-5M15 12H3"/>', 20, 2),
 };
 const chip = (t, k = '') => `<span class="chip ${k}">${t}</span>`;
@@ -641,7 +714,10 @@ const sw = (on, act, label, attrs = '') => `<button class="switch" role="switch"
 const backBtn = (to, label) => `<button class="btn sm ghost back" data-act="go" data-to="${to}">${I.back} ${esc(label)}</button>`;
 const seg = (act, cur, opts, label) => `<div class="seg" role="group" aria-label="${esc(label)}">${opts.map(([v, l, c]) => `<button type="button" data-act="${act}" data-v="${v}" aria-pressed="${cur === v}">${l}${c != null ? ` <span class="c">${c}</span>` : ''}</button>`).join('')}</div>`;
 const logo = (c, cls = '') => `<span class="logo ${c.accent ? 'acc' : ''} ${cls}" aria-hidden="true">${esc(c.initials)}</span>`;
-const avatar = (p, cls = '') => `<span class="avatar ${cls}" aria-hidden="true">${esc(initials(p.name))}</span>`;
+// A player's picture: { kind: 'photo', img } or { kind: 'char', charId, img, seed } (a snapshot, so a hidden or deleted character still shows).
+const picArt = (pic) => (pic && pic.kind === 'photo' && pic.img ? `<img src="${pic.img}" alt="">` : pic && pic.kind === 'char' ? (pic.img ? `<img src="${pic.img}" alt="">` : charFaceSVG(pic.seed)) : '');
+const avatarOf = (name, pic, cls = '') => { const art = picArt(pic); return art ? `<span class="avatar pic ${cls}" aria-hidden="true">${art}</span>` : `<span class="avatar ${cls}" aria-hidden="true">${esc(initials(name))}</span>`; };
+const avatar = (p, cls = '') => avatarOf(p.name, p.pic, cls);
 const errLine = (t) => (t ? `<p class="err" role="alert">${t}</p>` : '');
 const OFFLINE_ERR = "You're offline, so nothing was saved. Try again once you're connected.";
 
@@ -791,7 +867,7 @@ function topBar() {
     <button class="btn xs" data-act="openDemo">Prototype</button>
   </div></header>${S.online ? '' : `<div class="band-off" role="status"><div class="in">${I.alert}<span><b>You're offline.</b> Showing what this browser loaded at ${fmtTime(S.offlineAt || Date.now())}. Activating licenses, approving requests and saving settings need an internet connection.</span></div></div>`}`;
 }
-const HERE = { clubs: 'clubs', club: 'clubs', players: 'players', player: 'players', sales: 'sales', contacts: 'contacts', review: 'contacts', names: 'names', passwords: 'passwords', config: 'config', flags: 'flags' };
+const HERE = { clubs: 'clubs', club: 'clubs', players: 'players', player: 'players', sales: 'sales', contacts: 'contacts', review: 'contacts', names: 'names', passwords: 'passwords', config: 'config', flags: 'flags', chars: 'chars' };
 function rail() {
   const here = HERE[S.screen];
   const link = (k, label, ic, count, hot) => `<button class="rail-link ${k === here ? 'on' : ''}" data-act="go" data-to="${k}" ${k === here ? 'aria-current="page"' : ''}>${ic}<span>${label}</span>${count != null ? `<span class="count ${hot && count ? 'hot' : ''}">${count}</span>` : ''}</button>`;
@@ -806,6 +882,7 @@ function rail() {
     <div class="rail-label">Settings</div>
     ${link('config', 'Ranking', I.n_rank)}
     ${link('flags', 'Feature flags', I.n_flag, S.flags.length)}
+    ${link('chars', 'Profile characters', I.n_face, S.chars.filter((c) => c.active).length)}
     <div class="rail-end"><div class="rail-who">Signed in as<br><b>${OWNER}</b></div><button class="rail-link" data-act="signOut">${I.n_out}<span>Sign out</span></button></div>
   </nav>`;
 }
@@ -1148,7 +1225,7 @@ const histRow = (x) => `<div class="between sl-row"><div><b>${esc(x.title)}</b><
 function playerManagementSheet(action,id) {
   const p=playerOf(id), name=p?esc(p.name):'players';
   // Social links are written by the player on their own profile; the prototype draws a few from the name.
-  const socialsOf = (q) => { const slug = plain(q.name).replace(/[^a-z0-9]+/g, '.').replace(/^\.|\.$/g, ''), h = hashStr(`soc-${q.id}`); return [['Facebook', `facebook.com/${slug}`, true], ['Instagram', `instagram.com/${slug.replace(/\./g, '_')}`, h % 3 !== 0], ['YouTube', `youtube.com/@${slug.replace(/\./g, '')}`, h % 5 === 0], ['LinkedIn', `linkedin.com/in/${slug.replace(/\./g, '-')}`, h % 7 === 0]].filter((x) => x[2]); };
+  const socialsOf = (q) => { const so = socialOf(q); return SOCIAL_KEYS.filter(([k]) => so[k]).map(([k, l]) => [l, so[k].replace(/^https?:\/\//, ''), true]); };
   const qv = () => {
     const rk = rankOf(p), soc = socialsOf(p);
     return `<div class="stack qv">
@@ -1159,17 +1236,33 @@ function playerManagementSheet(action,id) {
     </div>`;
   };
   const qvFoot = `<button class="btn" data-act="pmSheet" data-v="Edit profile" data-id="${id}">Edit</button><button class="btn" data-act="openPlayerHistory" data-id="${id}">Full history</button><button class="btn primary" data-act="openPlayer" data-id="${id}">Full profile</button>`;
-  // Open contact-change request (waiting, applying or failed) disables the Email field.
-  const hasOpenReq = !!p && S.requests.some((r) => r.pid === p.id && ['submitted', 'applying', 'failed'].includes(r.status));
-  const editBody = () => `<div class="stack qv">
+  const editBody = () => {
+    const so = socialOf(p), rk = rankOf(p);
+    const ef = (id, label, value, o = {}) => `<label class="field" for="pe-${id}"><span>${label}</span>${o.area ? `<textarea class="input" id="pe-${id}" rows="3" maxlength="${o.max || 280}" ${o.ph ? `placeholder="${esc(o.ph)}"` : ''}>${esc(value)}</textarea>` : `<input class="input${o.mono ? ' mono' : ''}" id="pe-${id}" value="${esc(value)}" ${o.type ? `type="${o.type}"` : ''} ${o.im ? `inputmode="${o.im}"` : ''} ${o.ph ? `placeholder="${esc(o.ph)}"` : ''} autocomplete="off">`}${o.hint ? `<span class="hint">${o.hint}</span>` : ''}<span class="err" id="pe-${id}-err" hidden></span></label>`;
+    const tog = (id, title, sub, on) => `<label class="pl-dup" for="pe-${id}"><span class="stack tight"><b>${title}</b><span class="small muted">${sub}</span></span><input type="checkbox" role="switch" class="pl-switch" id="pe-${id}" ${on ? 'checked' : ''}></label>`;
+    return `<div class="stack qv">
       <div class="qv-hero${p.claimed ? ' claimed' : ''}">${avatar(p,'lg')}<div class="qv-id"><h2>Edit ${name}</h2><span class="mono small muted">${esc(p.rtr)}</span></div></div>
-      <label class="field"><span>Full name</span><input class="input" value="${esc(p.name)}"></label>
-      <label class="field"><span>Nickname</span><input class="input" value="${esc(p.nick || '')}"></label>
-      ${p.claimed ? '<p class="small muted">This player is registered, so they change their own photo.</p>' : '<label class="field"><span>Profile photo (link)</span><input class="input" type="url" placeholder="https://"></label>'}
-      <label class="field"><span>Email</span><input class="input" type="email" inputmode="email" autocomplete="off" data-edit-email placeholder="name@example.com" value="${esc(p.email || '')}"${hasOpenReq ? ' disabled' : ''}><p class="small muted" style="margin:0">${hasOpenReq ? 'This player has an open contact-change request. Review it on the Contact tab.' : 'A new email is sent for review as a contact-change request. The current email stays until the change is applied.'}</p><p class="err" style="margin:0" data-edit-err hidden></p></label>
-      <label class="field"><span>Reason for the change</span><textarea class="input" data-edit-reason placeholder="Required. Saved in the record of actions."></textarea></label>
-      <p class="small muted">Phone, rank and the RTR ID cannot be edited here.</p>
+      <p class="small muted">As the platform owner you can change everything a player can, plus their sign-in details. Every save is recorded with your reason.</p>
+      <section class="pic-sec" id="pm-pic" aria-label="Profile picture">${picSection()}</section>
+      <div class="pic-sec"><span class="label">Name</span><div class="fgrid">${ef('name', 'Full name', p.name)}${ef('nick', 'Nickname', p.nick || '', { hint: 'Optional' })}</div></div>
+      <div class="pic-sec"><span class="label">Playing style</span>${ef('style', 'Playing style', p.style || '', { area: true, hint: 'Optional. How they play, in a sentence or two.' })}
+        <div class="fgrid">${ef('expY', 'Experience, years', p.expY ?? '', { im: 'numeric', ph: '0' })}${ef('expM', 'Experience, months', p.expM ?? '', { im: 'numeric', ph: '0' })}</div>
+        <div class="fgrid"><label class="field" for="pe-sinceM"><span>Playing since</span><select class="input" id="pe-sinceM"><option value="">Month</option>${MONTHS.map((m, i) => `<option value="${i + 1}" ${String(p.sinceM ?? '') === String(i + 1) ? 'selected' : ''}>${m}</option>`).join('')}</select></label>${ef('sinceY', 'Year', p.sinceY ?? '', { im: 'numeric', ph: String(new Date().getFullYear() - 2) })}</div></div>
+      <div class="pic-sec"><span class="label">Links</span><div class="fgrid">${SOCIAL_KEYS.map(([k, l, , eg]) => ef(k, l, so[k] || '', { type: 'url', im: 'url', ph: eg })).join('')}</div></div>
+      <div class="pic-sec"><span class="label">Privacy</span>
+        ${tog('private', 'Private profile', "Guests don't see this player's ROTRA profile. Signed-in players still do.", !!p.profilePrivate)}
+        ${tog('phoneHidden', 'Hide phone number from clubs', 'Clubs find the player by RTR ID or QR code instead.', !!p.phoneHidden)}</div>
+      <div class="pic-sec"><span class="label">Account</span>
+        <div class="fgrid">${ef('phone', 'Phone', p.phone || '', { type: 'tel', im: 'tel', mono: true, ph: '+63 9XX XXX XXXX' })}${ef('email', 'Email', p.email || '', { type: 'email', im: 'email', mono: true })}</div>
+        <p class="hint">${p.claimed ? 'The player signs in with these. Changing them here applies straight away, without a contact-change request.' : "The club entered these. The player hasn't registered yet."}</p>
+        <div class="field"><label for="pe-pass" style="font-size:13px;font-weight:600;color:var(--fg2)">Password *(for MVP or beta only)*</label>
+          <div class="pass"><input class="input" id="pe-pass" type="password" autocomplete="new-password" ${p.claimed ? 'placeholder="Leave empty to keep the current password"' : 'disabled placeholder="Not registered yet"'}><button type="button" class="btn xs ghost" data-act="pePassShow" aria-pressed="false" aria-label="Show password" ${p.claimed ? '' : 'disabled'}>Show</button></div>
+          <span class="hint">${p.claimed ? "Replaces the player's password. For manual recovery until players can reset it themselves. Leave empty to keep it. Give the new password to the player yourself; it isn't shown again." : "This player hasn't registered, so there's no password to replace."}</span><span class="err" id="pe-pass-err" hidden></span></div>
+        <dl class="kv small"><dt>RTR ID</dt><dd class="mono">${esc(p.rtr)}</dd><dt>Created by</dt><dd>${esc(p.club || 'Admin')}</dd><dt>Account</dt><dd>${p.claimed ? `Registered ${fmtYmd(p.registered)}` : 'Unclaimed'}</dd><dt>Rank</dt><dd>${esc(rk.text)}</dd><dt>Recent matches</dt><dd>${p.recent} in the last three months</dd>${p.pwSetAt ? `<dt>Password</dt><dd>Last set by Admin ${fmtAt(p.pwSetAt)}</dd>` : ''}</dl>
+        <p class="small muted">These stay read-only. The RTR ID never changes. Rank, level and match counts come from finished club sessions, and Admin can't change ranks, winners or scores. A profile becomes registered only when the player claims it.</p></div>
+      <div class="pic-sec">${ef('reason', 'Reason for the change', '', { area: true, max: 300, ph: 'Required. Saved in the record of actions.' })}</div>
     </div>`;
+  };
   const inviteLink = p ? `https://rotra.example/claim/${hashStr('inv-' + p.id).toString(36)}${hashStr('inv2-' + p.id).toString(36)}` : '';
   const inviteBody = () => `<div class="stack qv">
       <div class="qv-hero"><div class="qv-id"><h2>Invite ${name} to ROTRA</h2><span class="small muted">Registration link for this profile</span></div></div>
@@ -1178,7 +1271,8 @@ function playerManagementSheet(action,id) {
       <ul class="small muted" style="margin:0;padding-left:18px"><li>The link works for 7 days and once. Making a new one replaces this one.</li><li>ROTRA sends no email or text. Share the link yourself.</li></ul>
     </div>`;
   const inviteFoot = `<button class="btn" data-act="pmSheet" data-v="Quick view" data-id="${id}">Back</button><button class="btn primary" data-act="copyInvite" data-id="${id}">Copy link</button>`;
-  const editFoot = `<button class="btn" data-act="pmSheet" data-v="Quick view" data-id="${id}">Back</button><button class="btn primary" data-act="pmEditReview" data-id="${id}">Review changes</button>`;
+  const editFoot = `<button class="btn" data-act="pmSheet" data-v="Quick view" data-id="${id}">Back</button><button class="btn primary" data-act="pmSave" data-id="${id}">Save changes</button>`;
+  if (action === 'Edit profile' && p) PIC = { pid: p.id, draft: p.pic ? { ...p.pic } : null, page: 1, err: '' };
   const body= action==='Quick view' ? qv() : action==='Invite to ROTRA' && p ? inviteBody() : action==='Edit profile' && p ? editBody() : action==='Games' ? '<p>Read-only. Admin cannot change ranks, winners or scores.</p><div class="toolbar"><button class="btn">Counted</button><button class="btn">Fun and partial</button><button class="btn">All</button></div><p>Date · Club · Session · Partner · Opponents · Score · Result · Counted for rank</p>' : action==='Actions' ? ['Quick view','View full profile','View full history','Copy RTR ID','Copy registration link','Edit profile','Archive','Restore','Remove'].map(x=>`<button class="btn" data-act="pmSheet" data-v="${x}" data-id="${id}">${x}</button>`).join('') : action==='Add player' || action==='Edit profile' ? `<div class="stack"><label>Full name<input class="input" value="${p?esc(p.name):''}"></label><label>Nickname<input class="input" value="${p?esc(p.nick||''):''}"></label>${action==='Add player'?'<label>Phone (optional)<input class="input"></label><label>Email (optional)<input class="input"></label><label>Place<select class="input"><option>Cebu City</option><option>Manila</option><option>Davao City</option></select></label><label>Club (optional)<select class="input"><option>Created by Admin</option></select></label>':`${!p?.claimed?'<label>Profile photo<input class="input" type="url"></label>':''}<label>Reason<textarea class="input"></textarea></label><p>Review before and after values before saving. Contacts, rank and RTR ID cannot be edited.</p>`}<button class="btn primary">${action==='Add player'?'Add player':'Review changes'}</button></div>` : `<p>${action} ${name}. ${action==='Remove'?'Permanent. Only records with no games and no claimed account.':'History is kept.'}</p><label>Reason<textarea class="input"></textarea></label>${action==='Remove'?'<label>Type the RTR ID<input class="input"></label>':''}<button class="btn primary">Confirm ${action}</button>`;
   document.querySelectorAll('.scrim,.sheet').forEach(x=>x.remove());
   document.body.insertAdjacentHTML('beforeend',sheetWrap(action==='Edit profile'&&p?'Edit profile':action,body,action==='Quick view'?qvFoot:action==='Edit profile'&&p?editFoot:action==='Invite to ROTRA'&&p?inviteFoot:''));
@@ -1192,7 +1286,7 @@ function viewPlayer() {
   if (!p) return shell(`${backBtn('players', 'Players')}<div class="card empty"><b>Player not found.</b></div>`);
   const rk = rankOf(p), T = eff().threshold;
   const reqs = S.requests.filter((r) => r.pid === p.id).sort((a, b) => b.at - a.at);
-  const history = S.log.filter((l) => l.t === 'req' && reqs.some((r) => r.id === l.id));
+  const history = S.log.filter((l) => (l.t === 'req' && reqs.some((r) => r.id === l.id)) || (l.t === 'player' && l.id === p.id));
   const [mm, dd, yy] = [p.rtr.slice(-11, -9), p.rtr.slice(-9, -7), p.rtr.slice(-7, -5)];
   const twin = S.players.filter((x) => x.id !== p.id && x.name === p.name);
   const openReqs = reqs.filter((r) => ['submitted', 'applying', 'failed'].includes(r.status)).length;
@@ -1341,6 +1435,16 @@ function viewFlags() {
         ${sw(x.on, 'openFlag', `${x.name}, ${x.on ? 'on' : 'off'}`, `data-id="${x.id}"`)}</div>`).join('<hr style="border:0;border-top:1px solid var(--border);margin:4px 0">')}</section>`
       : `<section class="card"><div class="empty"><b>No feature flags yet.</b><span>Add a flag to describe a switch and what it does. New flags start off.</span><button class="btn sm primary" data-act="openAddFlag">Add flag</button></div></section>`}
     <p class="small muted">No flag can change confirmed winners or scores, or bring back lost offline records.</p>`);
+}
+
+// ---------- A-CHARACTERS ----------
+function viewChars() {
+  const all = S.chars, shown = activeChars().length, hidden = all.length - shown;
+  const item = (c) => `<div class="ch-item"><button type="button" class="ch-img" data-act="charToggle" data-id="${c.id}" aria-pressed="${c.active}" aria-label="${esc(charName(c))}, ${c.active ? 'shown' : 'hidden'}" title="${c.active ? 'Shown to players. Click to hide.' : 'Hidden from players. Click to show.'}">${charArt(c)}</button>
+    <button type="button" class="ch-del" data-act="charDelete" data-id="${c.id}" aria-label="Delete ${esc(charName(c))}" title="Delete">${I.xs}</button></div>`;
+  return shell(`<div class="page-head"><h1>Profile characters</h1><p class="muted">Players see the shown images, ${CHAR_PLAYER_PAGE} per page. Click an image to hide or show it. ${shown} shown${hidden ? ` · ${hidden} hidden` : ''}.</p></div>
+    <label class="ch-drop" for="char-file" data-drop="chars"><input id="char-file" type="file" multiple accept="image/png,image/jpeg,image/webp" data-change="charFiles"><b>Drag images here to upload</b><span class="small">or click to choose · PNG, JPG or WebP, up to 1 MB each</span></label>
+    <section class="ch-grid" aria-label="Character images">${all.map(item).join('')}</section>`);
 }
 
 // ---------- Sheets ----------
@@ -1583,13 +1687,112 @@ function licDone(r, found) {
   toast(`${found ? 'Found it: license' : 'License'} ${r.verb.toLowerCase()} until ${fmtYmd(r.x.to)}.${found ? ' Nothing was added twice.' : ''}`);
 }
 
+// ---------- Edit player: every field the player has, plus Admin-only ones ----------
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const SOCIAL_KEYS = [['facebook', 'Facebook', ['facebook.com', 'fb.com'], 'https://facebook.com/name'], ['instagram', 'Instagram', ['instagram.com'], 'https://instagram.com/name'], ['youtube', 'YouTube', ['youtube.com', 'youtu.be'], 'https://youtube.com/@channel'], ['linkedin', 'LinkedIn', ['linkedin.com'], 'https://linkedin.com/in/name']];
+// Players write their own links; until a player's links are saved, the prototype draws a few from the name.
+function socialOf(q) {
+  if (q.social) return q.social;
+  const slug = plain(q.name).replace(/[^a-z0-9]+/g, '.').replace(/^\.|\.$/g, ''), h = hashStr(`soc-${q.id}`);
+  return { facebook: `https://facebook.com/${slug}`, instagram: h % 3 !== 0 ? `https://instagram.com/${slug.replace(/\./g, '_')}` : '', youtube: h % 5 === 0 ? `https://youtube.com/@${slug.replace(/\./g, '')}` : '', linkedin: h % 7 === 0 ? `https://linkedin.com/in/${slug.replace(/\./g, '-')}` : '' };
+}
+const pv = (id) => { const el = document.getElementById(`pe-${id}`); return el ? (el.type === 'checkbox' ? el.checked : el.value.trim()) : ''; };
+function peErrors(p, d) {
+  const e = {}, nInt = (v, lo, hi) => v === '' || (/^\d+$/.test(v) && +v >= lo && +v <= hi);
+  if (!d.name) e.name = 'Enter the full name.'; else if (d.name.length > 60) e.name = 'Keep the name under 60 characters.';
+  if (d.nick.length > 30) e.nick = 'Keep the nickname under 30 characters.';
+  if (!nInt(d.expY, 0, 80)) e.expY = 'Use a whole number of years.';
+  if (!nInt(d.expM, 0, 11)) e.expM = 'Use 0 to 11 months.';
+  if (!nInt(d.sinceY, 1950, new Date().getFullYear())) e.sinceY = 'Use a year like 2022.';
+  SOCIAL_KEYS.forEach(([k, l, hosts]) => { const v = d[k]; if (!v) return; let u = null; try { u = new URL(v); } catch (x) { u = null; } if (!u || !/^https?:$/.test(u.protocol) || !hosts.some((h) => u.hostname === h || u.hostname.endsWith(`.${h}`))) e[k] = `Use a ${l} link, like ${SOCIAL_KEYS.find((x) => x[0] === k)[3]}.`; });
+  if (d.phone && d.phone.replace(/\D/g, '').length < 10) e.phone = 'Enter the full phone number, like +63 917 555 0142.';
+  else if (d.phone && S.players.some((x) => x.id !== p.id && norm(x.phone) === norm(d.phone))) e.phone = 'This phone number is already linked to another player.';
+  if (!d.email && p.claimed) e.email = 'A registered player signs in with email. Enter one.';
+  else if (d.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email)) e.email = 'Enter an email like name@example.com.';
+  else if (d.email && S.players.some((x) => x.id !== p.id && norm(x.email) === norm(d.email))) e.email = 'This email is already linked to another player.';
+  if (d.pass && d.pass.length < 8) e.pass = 'Use at least 8 characters, or leave it empty to keep the current password.';
+  return e;
+}
+
+// ---------- Edit player: profile picture ----------
+// The draft lives only while the edit sheet is open; Save changes applies it. Only the current and the previous picture are kept.
+let PIC = null;
+const picKey = (pic) => (!pic ? 'initials' : pic.kind === 'photo' ? `photo:${pic.img.length}:${pic.img.slice(-24)}` : `char:${pic.charId}`);
+const picLabel = (pic) => (!pic ? 'Initials' : pic.kind === 'photo' ? 'Photo' : 'Character');
+function picSection() {
+  if (!PIC) return '';
+  const p = playerOf(PIC.pid), d = PIC.draft, prev = p.prevPic !== undefined && picKey(p.prevPic) !== picKey(d) ? p.prevPic : undefined;
+  const list = activeChars(), pages = Math.max(1, Math.ceil(list.length / CHAR_PLAYER_PAGE)), page = Math.min(Math.max(1, PIC.page), pages);
+  const shown = list.slice((page - 1) * CHAR_PLAYER_PAGE, page * CHAR_PLAYER_PAGE);
+  const opt = (c) => `<button type="button" class="pic-opt" data-act="picChar" data-id="${c.id}" aria-pressed="${!!d && d.kind === 'char' && d.charId === c.id}" aria-label="${esc(charName(c))}">${charArt(c)}</button>`;
+  return `<span class="label">Profile picture</span>
+    <div class="pic-now">${avatarOf(p.name, d)}<div class="stack tight"><b>${picLabel(d)}</b><span class="small muted">${picKey(d) === picKey(p.pic) ? 'Current picture' : 'Changes when you save'}</span></div></div>
+    <div class="row"><label class="btn sm pic-up" for="pm-pic-file">Upload a photo<input class="pic-file" id="pm-pic-file" type="file" accept="image/png,image/jpeg,image/webp" data-change="picFile"></label><button type="button" class="btn sm" data-act="picInitials" ${d ? '' : 'disabled'}>Use initials</button></div>
+    <span class="hint">PNG, JPG or WebP, up to 1 MB. Cropped to a square.</span>${errLine(PIC.err)}
+    ${prev !== undefined ? `<div class="pic-prev"><div class="who">${avatarOf(p.name, prev)}<div class="main"><b>Previous picture</b><span class="small muted">${picLabel(prev)}</span></div></div><button type="button" class="btn xs" data-act="picPrev">Use previous picture</button></div>` : ''}
+    <div class="stack tight"><span class="small muted">Or pick a character</span>
+      <div class="pic-grid" role="group" aria-label="Characters">${shown.map(opt).join('')}</div>
+      ${pages > 1 ? `<div class="pic-pager"><button type="button" class="btn xs" data-act="picPage" data-v="${page - 1}" ${page === 1 ? 'disabled' : ''}>‹ Previous</button><span class="small muted">Page ${page} of ${pages}</span><button type="button" class="btn xs" data-act="picPage" data-v="${page + 1}" ${page >= pages ? 'disabled' : ''}>Next ›</button></div>` : ''}</div>`;
+}
+function picRefresh(focusSel) {
+  const box = document.getElementById('pm-pic');
+  if (!box) return;
+  box.innerHTML = picSection();
+  if (focusSel) box.querySelector(focusSel)?.focus();
+}
+
+// Character uploads: images only, up to 1 MB each, cropped to a centred square and kept as a data URL (prototype only; nothing leaves the browser).
+function cropToSquare(f) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(f), img = new Image();
+    img.onload = () => {
+      const side = Math.min(img.naturalWidth, img.naturalHeight), out = 192, cv = document.createElement('canvas');
+      cv.width = out; cv.height = out;
+      cv.getContext('2d').drawImage(img, (img.naturalWidth - side) / 2, (img.naturalHeight - side) / 2, side, side, 0, 0, out, out);
+      URL.revokeObjectURL(url);
+      resolve(cv.toDataURL(f.type === 'image/png' ? 'image/png' : 'image/jpeg', 0.86));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('unreadable')); };
+    img.src = url;
+  });
+}
+async function addCharFiles(list) {
+  const files = [...(list || [])];
+  if (!files.length) return;
+  if (!S.online) { toast(OFFLINE_ERR); return; }
+  let added = 0;
+  const skipped = [];
+  for (const f of files) {
+    if (!/^image\/(png|jpeg|webp)$/.test(f.type)) { skipped.push(`${f.name} isn't a PNG, JPG or WebP image`); continue; }
+    if (f.size > CHAR_MAX_BYTES) { skipped.push(`${f.name} is over 1 MB`); continue; }
+    try {
+      const img = await cropToSquare(f), n = Math.max(0, ...S.chars.map((c) => c.n)) + 1;
+      const id = `ch${Date.now()}-${n}`;
+      S.chars.push({ id, n, key: `x${n}`, seed: '', name: '', img, active: true, source: 'upload', added: Date.now() });
+      log('char', id, `Uploaded Character ${n}.`);
+      added += 1;
+    } catch (e) { skipped.push(`${f.name} couldn't be read`); }
+  }
+  render();
+  if (added) toast(`${plural(added, 'image')} added and shown to players.`);
+  if (skipped.length) toast(`Not added: ${skipped.join('; ')}.`);
+}
+function toastUndo(text, undo) {
+  const el = document.createElement('div');
+  el.className = 'toast undo';
+  el.innerHTML = `<span>${esc(text)}</span><button type="button">Undo</button>`;
+  el.querySelector('button').onclick = () => { el.remove(); undo(); };
+  document.getElementById('toasts').append(el);
+  setTimeout(() => el.remove(), 6000);
+}
+
 const ACT = {
+  go: (el) => go(el.dataset.to, undefined),
+  openClub: (el) => { S.ui.clubTab = 'overview'; go('club', el.dataset.id, el.dataset.anchor); },
   passwordVerify: () => { passwordDemo.verified = !passwordDemo.verified; render(); },
   passwordIssue: () => { if (!passwordDemo.verified || !S.online) return; passwordDemo.status = 'issued'; passwordDemo.verified = false; passwordDemo.link = true; render(); },
   passwordDecline: () => { passwordDemo.status = 'declined'; passwordDemo.link = false; render(); },
   passwordCopy: () => { navigator.clipboard.writeText('https://player.rotra.club/reset-password/prototype-only').then(() => toast('Link copied.')); },
-  go: (el) => go(el.dataset.to, undefined),
-  openClub: (el) => { S.ui.clubTab = 'overview'; go('club', el.dataset.id, el.dataset.anchor); },
   clubTab: (el) => { S.ui.clubTab = el.dataset.v; render(); },
   openPlayer: (el) => { S.ui.playerTab = 'overview'; go('player', el.dataset.id); },
   openPlayerHistory: (el) => { S.ui.playerTab = 'history'; go('player', el.dataset.id); },
@@ -1617,32 +1820,6 @@ const ACT = {
   },
   plClear: () => { document.querySelectorAll('.player-select, [data-change="plSelectAll"]').forEach((x) => { x.checked = false; }); CHANGE.plCount(); },
   pmSheet: (el) => playerManagementSheet(el.dataset.v, el.dataset.id),
-  // Edit profile: the email is never changed here. It becomes an Admin-entered contact-change request (source owner, Pending).
-  // Mockup outcome switch: a Reason containing "fail" shows the "request failed" toast; any other reason succeeds.
-  pmEditReview: (el) => {
-    const p = playerOf(el.dataset.id), sb = document.querySelector('.sheet .sb');
-    const inp = sb.querySelector('[data-edit-email]'), err = sb.querySelector('[data-edit-err]');
-    const next = inp.disabled ? '' : inp.value.trim();
-    const changed = !inp.disabled && norm(next) !== norm(p.email);
-    let msg = '';
-    if (changed && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(next)) msg = 'Enter an email address, like name@example.com.';
-    else if (changed && S.players.some((x) => x.id !== p.id && norm(x.email) === norm(next))) msg = 'That email belongs to another ROTRA profile.';
-    err.textContent = msg; err.hidden = !msg;
-    if (msg) { inp.setAttribute('aria-invalid', 'true'); inp.focus(); return; }
-    inp.removeAttribute('aria-invalid');
-    const reason = sb.querySelector('[data-edit-reason]').value;
-    S.ui.editDraft = { email: changed ? next : '', failed: /fail/i.test(reason) };
-    sb.innerHTML = `<div class="stack qv"><h2>Review changes</h2><dl class="kv">${changed ? `<dt>Email</dt><dd class="mono wrapw">${esc(p.email || '—')} → ${esc(next)}<br><span class="small muted">Sent for review · not changed yet</span></dd>` : '<dt>Profile</dt><dd>No changes</dd>'}</dl></div>`;
-    document.querySelector('.sheet footer').innerHTML = `<button class="btn" data-act="pmSheet" data-v="Edit profile" data-id="${p.id}">Back</button><button class="btn primary" data-act="pmEditSave">Save</button>`;
-  },
-  pmEditSave: () => {
-    const d = S.ui.editDraft; S.ui.editDraft = null;
-    if (!d) return;
-    document.querySelectorAll('body > .scrim, body > .sheet').forEach((x) => x.remove());
-    if (!d.email) toast('Profile saved.');
-    else if (d.failed) toast("Profile saved, but the email change wasn't sent.");
-    else toast('Email change sent for review. Approve it on the Contact tab.');
-  },
   pmMenu: (el) => showPlayerActions(el, el.dataset.id),
   plAdv: () => { S.ui.playerAdv = !S.ui.playerAdv; render(); },
   plGrid: (el) => { S.ui.playerGrid = !!el.dataset.v; render(); },
@@ -1653,7 +1830,7 @@ const ACT = {
   reqF: (el) => { S.ui.reqF = el.dataset.v; render(); },
   closeSheet: () => {
     // The player quick view and its sibling dialogs are added straight to the page, outside the sheet state; close them first.
-    if (document.querySelector('body > .sheet')) { document.querySelectorAll('body > .scrim, body > .sheet').forEach((x) => x.remove()); return; }
+    if (document.querySelector('body > .sheet')) { PIC = null; document.querySelectorAll('body > .scrim, body > .sheet').forEach((x) => x.remove()); return; }
     const sh = S.ui.sheet;
     if (!sh || sh.pending) return;
     if (sh.type === 'license') {
@@ -1866,6 +2043,66 @@ const ACT = {
     sh.pending = true; sh.err = ''; render();
     later(800, () => { const x = S.flags.find((f) => f.id === sh.id); x.on = !x.on; x.changed = Date.now(); S.ui.sheet = null; toast(`${x.name} is ${x.on ? 'on' : 'off'}.`); });
   },
+  // Edit player: profile picture
+  picChar: (el) => { const c = S.chars.find((x) => x.id === el.dataset.id); if (!PIC || !c) return; PIC.draft = { kind: 'char', charId: c.id, img: c.img, seed: c.seed }; PIC.err = ''; picRefresh(`[data-act="picChar"][data-id="${c.id}"]`); },
+  picInitials: () => { if (!PIC) return; PIC.draft = null; PIC.err = ''; picRefresh('[data-act="picChar"]'); },
+  picPrev: () => { if (!PIC) return; const p = playerOf(PIC.pid); PIC.draft = p.prevPic ? { ...p.prevPic } : null; PIC.err = ''; picRefresh('.pic-up input'); },
+  picPage: (el) => { if (!PIC) return; PIC.page = +el.dataset.v; picRefresh('[data-act="picPage"]:not(:disabled)'); },
+  pePassShow: (el) => { const i = document.getElementById('pe-pass'); if (!i) return; const show = i.type === 'password'; i.type = show ? 'text' : 'password'; el.textContent = show ? 'Hide' : 'Show'; el.setAttribute('aria-pressed', String(show)); el.setAttribute('aria-label', `${show ? 'Hide' : 'Show'} password`); },
+  pmSave: (el) => {
+    const p = playerOf(el.dataset.id);
+    if (!p || !PIC || PIC.pid !== p.id) return;
+    const d = { name: pv('name'), nick: pv('nick'), style: pv('style'), expY: pv('expY'), expM: pv('expM'), sinceM: pv('sinceM'), sinceY: pv('sinceY'), private: pv('private'), phoneHidden: pv('phoneHidden'), phone: pv('phone'), email: pv('email'), pass: (document.getElementById('pe-pass')?.value || ''), reason: pv('reason') };
+    const so = socialOf(p);
+    SOCIAL_KEYS.forEach(([k]) => { d[k] = pv(k); });
+    const before = { name: p.name, nick: p.nick || '', style: p.style || '', expY: String(p.expY ?? ''), expM: String(p.expM ?? ''), sinceM: String(p.sinceM ?? ''), sinceY: String(p.sinceY ?? ''), private: !!p.profilePrivate, phoneHidden: !!p.phoneHidden, phone: p.phone || '', email: p.email || '' };
+    SOCIAL_KEYS.forEach(([k]) => { before[k] = so[k] || ''; });
+    const LABEL = { name: 'name', nick: 'nickname', style: 'playing style', expY: 'experience', expM: 'experience', sinceM: 'playing since', sinceY: 'playing since', private: 'private profile', phoneHidden: 'phone privacy', phone: 'phone', email: 'email', facebook: 'Facebook link', instagram: 'Instagram link', youtube: 'YouTube link', linkedin: 'LinkedIn link' };
+    const changed = [...new Set(Object.keys(before).filter((k) => String(before[k]) !== String(d[k])).map((k) => LABEL[k]))];
+    const picChanged = picKey(PIC.draft) !== picKey(p.pic);
+    if (picChanged) changed.unshift('profile picture');
+    if (d.pass) changed.push('password');
+    const e = peErrors(p, d);
+    if (changed.length && !d.reason) e.reason = 'Say why you are making this change.';
+    document.querySelectorAll('body > .sheet .err[id^="pe-"]').forEach((x) => { x.hidden = true; x.textContent = ''; });
+    document.querySelectorAll('body > .sheet .input.bad').forEach((x) => x.classList.remove('bad'));
+    const keys = Object.keys(e);
+    if (keys.length) {
+      keys.forEach((k) => { const box = document.getElementById(`pe-${k}-err`), inp = document.getElementById(`pe-${k}`); if (box) { box.textContent = e[k]; box.hidden = false; } if (inp) { inp.classList.add('bad'); inp.setAttribute('aria-describedby', `pe-${k}-err`); } });
+      document.getElementById(`pe-${keys[0]}`)?.focus();
+      return;
+    }
+    if (!changed.length) { PIC = null; document.querySelectorAll('body > .scrim, body > .sheet').forEach((x) => x.remove()); render(); toast('Nothing changed.'); return; }
+    if (!S.online) { toast(OFFLINE_ERR); return; }
+    if (picChanged) { p.prevPic = p.pic || null; p.pic = PIC.draft; }
+    Object.assign(p, { name: d.name, nick: d.nick, style: d.style, expY: d.expY === '' ? null : +d.expY, expM: d.expM === '' ? null : +d.expM, sinceM: d.sinceM === '' ? null : +d.sinceM, sinceY: d.sinceY === '' ? null : +d.sinceY, profilePrivate: d.private, phoneHidden: d.phoneHidden, phone: d.phone, email: d.email });
+    p.social = Object.fromEntries(SOCIAL_KEYS.map(([k]) => [k, d[k]]));
+    if (d.pass) p.pwSetAt = Date.now(); // the prototype never stores the password itself
+    log('player', p.id, `Edited ${p.name}: ${changed.join(', ')}. Reason: ${d.reason}`);
+    PIC = null;
+    document.querySelectorAll('body > .scrim, body > .sheet').forEach((x) => x.remove());
+    render();
+    toast(`Saved ${p.name}: ${changed.join(', ')}.${d.pass ? ' Give the new password to the player yourself.' : ''}`);
+  },
+  // Profile characters
+  charToggle: (el) => {
+    const c = S.chars.find((x) => x.id === el.dataset.id);
+    if (!S.online) { toast(OFFLINE_ERR); return; }
+    if (c.active && activeChars().length <= CHAR_MIN_ACTIVE) { toast(`Keep at least ${CHAR_MIN_ACTIVE} images shown, so the players' first page is full.`); return; }
+    c.active = !c.active;
+    log('char', c.id, `${c.active ? 'Showed' : 'Hid'} ${charName(c)} in the player picker.`);
+    render();
+    document.querySelector(`.ch-img[data-id="${c.id}"]`)?.focus();
+  },
+  charDelete: (el) => {
+    if (!S.online) { toast(OFFLINE_ERR); return; }
+    const i = S.chars.findIndex((x) => x.id === el.dataset.id), c = S.chars[i];
+    if (c.active && activeChars().length <= CHAR_MIN_ACTIVE) { toast(`Keep at least ${CHAR_MIN_ACTIVE} images shown. Upload or show another one first.`); return; }
+    S.chars.splice(i, 1);
+    log('char', c.id, `Deleted ${charName(c)}. Players who use it keep it.`);
+    render();
+    toastUndo(`${charName(c)} deleted.`, () => { S.chars.splice(Math.min(i, S.chars.length), 0, c); log('char', c.id, `Undid deleting ${charName(c)}.`); render(); });
+  },
   // Prototype
   openDemo: () => { S.ui.sheet = { type: 'demo' }; S.ui.resetArmed = false; render(); },
   toggleOnline: () => { S.online = !S.online; S.offlineAt = S.online ? null : Date.now(); render(); },
@@ -1914,6 +2151,15 @@ document.addEventListener('click', (ev) => {
 const CHANGE = {
   plSelectAll: (el) => { document.querySelectorAll('.player-select').forEach((x) => { x.checked = el.checked; }); CHANGE.plCount(); },
   plCount: () => { const n = document.querySelectorAll('.player-select:checked').length, d = document.querySelector('.pl-dock-n'); if (d) d.textContent = `${n} selected`; },
+  picFile: (el) => {
+    const f = el.files && el.files[0], d = PIC;
+    if (!f || !d) return;
+    d.err = '';
+    if (!/^image\/(png|jpeg|webp)$/.test(f.type)) { d.err = 'Choose a PNG, JPG or WebP image.'; picRefresh(); return; }
+    if (f.size > CHAR_MAX_BYTES) { d.err = 'That image is over 1 MB. Choose a smaller one.'; picRefresh(); return; }
+    cropToSquare(f).then((img) => { if (PIC === d) { d.draft = { kind: 'photo', img }; picRefresh('.pic-up input'); } }, () => { if (PIC === d) { d.err = "That file couldn't be read as an image."; picRefresh(); } });
+  },
+  charFiles: (el) => { addCharFiles(el.files); el.value = ''; },
   plSize: (el) => { S.ui.playerSize = +el.value; S.ui.playerPage = 1; render(); },
 };
 document.addEventListener('change', (ev) => { const el = ev.target.closest('[data-change]'); if (el && CHANGE[el.dataset.change]) CHANGE[el.dataset.change](el); });
@@ -1936,6 +2182,11 @@ document.addEventListener('input', (ev) => {
   if (el.dataset.bind === 'ui.flag.name' && !S.ui.flag.keyTouched) S.ui.flag.key = flagKeyOf(el.value);
   if (el.dataset.live !== undefined) render(); else save();
 });
+// Dropping images on the character drop zone uploads them.
+const dropZone = (ev) => ev.target.closest && ev.target.closest('[data-drop="chars"]');
+document.addEventListener('dragover', (ev) => { const z = dropZone(ev); if (!z) return; ev.preventDefault(); z.classList.add('over'); });
+document.addEventListener('dragleave', (ev) => { const z = dropZone(ev); if (z && !z.contains(ev.relatedTarget)) z.classList.remove('over'); });
+document.addEventListener('drop', (ev) => { const z = dropZone(ev); if (!z) return; ev.preventDefault(); z.classList.remove('over'); addCharFiles(ev.dataTransfer && ev.dataTransfer.files); });
 document.addEventListener('keydown', (ev) => {
   if (ev.key === 'Escape') { if (S.ui.sheet || document.querySelector('body > .sheet')) ACT.closeSheet(); else if (S.ui.nav) ACT.toggleNav(); }
 });
@@ -1944,7 +2195,7 @@ document.addEventListener('keydown', (ev) => {
 let prototypeRouter;
 let prototypeReturn = null;
 let prototypeSignedIn = !!S.me;
-const adminPaths = { clubs: '/clubs', players: '/players', sales: '/sales', contacts: '/requests/contact-changes', names: '/requests/club-names', passwords: '/requests/password-resets', config: '/settings/ranking', flags: '/settings/feature-flags', login: '/login' };
+const adminPaths = { clubs: '/clubs', players: '/players', sales: '/sales', contacts: '/requests/contact-changes', names: '/requests/club-names', passwords: '/requests/password-resets', config: '/settings/ranking', flags: '/settings/feature-flags', chars: '/settings/profile-characters', login: '/login' };
 function prototypeBeforeRender() {
   if (S.me && !prototypeSignedIn && prototypeReturn) { const target = prototypeReturn; prototypeReturn = null; applyPrototypeRoute(target); }
   prototypeSignedIn = !!S.me;
@@ -1990,7 +2241,7 @@ function render() {
   let page;
   if (!S.me || S.screen === 'login') page = viewLogin();
   else if (S.denied) page = viewDenied();
-  else page = ({ clubs: viewClubs, club: viewClub, players: viewPlayers, sales: viewSales, player: viewPlayer, contacts: viewContacts, review: viewReview, names: viewNames, passwords: viewPasswordResets, config: viewConfig, flags: viewFlags }[S.screen] || viewClubs)();
+  else page = ({ clubs: viewClubs, club: viewClub, players: viewPlayers, sales: viewSales, player: viewPlayer, contacts: viewContacts, review: viewReview, names: viewNames, passwords: viewPasswordResets, config: viewConfig, flags: viewFlags, chars: viewChars }[S.screen] || viewClubs)();
   const sh = S.ui.sheet;
   // Privileged sheets only render inside a signed-in owner session; the Prototype sheet is always available.
   const showSheet = sh && (sh.type === 'demo' || (S.me && !S.denied));

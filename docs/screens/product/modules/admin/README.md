@@ -7,8 +7,8 @@
 | [Access and workspace](access-navigation.md) | Admin access, focused navigation, failure states |
 | [Clubs and licenses](clubs-licenses.md) | Club directory/detail, adding a club, per-club price, monthly/yearly activation/renewal, expiry/retention |
 | [Sales](sales.md) | A-SALES: license revenue, sessions started and matches played, across every club |
-| [Players and requests](players-requests.md) | Identity oversight, contact requests, review/application status |
-| [Configuration](configuration.md) | 70/30 ranking weights, recent-match threshold, feature flags and adding a flag |
+| [Players and requests](players-requests.md) | Identity oversight, A-PLAYER-EDIT (edit everything), contact requests, review/application status |
+| [Configuration](configuration.md) | 70/30 ranking weights, recent-match threshold, feature flags and adding a flag, A-CHARACTERS profile characters |
 
 Screen IDs begin with `A-`. No winner correction, manual offline reconstruction or full moderation suite is included. The only analytics page is [Sales](sales.md), added at the owner's request on November 8, 2026.
 

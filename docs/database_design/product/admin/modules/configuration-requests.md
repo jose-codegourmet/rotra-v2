@@ -27,6 +27,19 @@ current value to every month shown. RLS on; no public-client privileges.
 Sales reports are read-only views/functions over existing rows (`rotra_sales_*`, migration
 `20261108000300_admin_sales_reports`), computed on read in Manila days; no totals table.
 
+## `profile_characters` (proposed, [D-2026-11-09-13](../../../../mvp/decisions.md#d-2026-11-09-13))
+
+The character library players pick from, managed only by the platform owner in Admin › Settings ›
+Profile characters (mockup log 2026-11-09-admin-profile-characters; not built). Proposed fields: UUID
+PK; optional name (the prototype shows none and labels “Character N”); image reference (Storage
+object path in a separate admin-only-write bucket, for example `profile-characters`, images only,
+PNG/JPEG/WebP up to 1 MB, stored square); `shown` boolean (default true); `position` (upload order;
+players see shown rows by position, 8 per page); created-by admin FK and created time; revision.
+Keep at least 8 rows shown (enforced by the server handler). Delete is a soft delete or a
+retained Storage object, because a player whose `avatar_ref` is `character:<id>` keeps that picture
+after the image is hidden or deleted. The keep-two picture rule (D-2026-11-09-10) does not apply.
+Every change writes an `admin_audit_events` row. RLS: public read of shown rows; no client writes.
+
 ## `player_contact_change_requests`
 
 Fields: UUID PK; player FK; requested field phone/email; protected proposed normalized value; original contact revision; requested time; status pending/approved/applying/applied/rejected/failed; reviewer admin/time; provider-operation idempotency reference; resolution note.
@@ -47,7 +60,7 @@ Admin Edit profile (email only, #564) is another entry point: it inserts a reque
 
 UUID PK; actor admin FK; action; target type/ID; source command ID; timestamp; redacted before/after metadata. Append-only application access. Index actor/time and target/time for review.
 
-Do not log passwords, raw claim/reset tokens, or unnecessary contact values. Club actions identify club account/device elsewhere; shared credentials cannot prove the human operator's identity.
+Do not log passwords, raw claim/reset tokens, or unnecessary contact values. **Admin-set password (MVP or beta only, [D-2026-11-09-14](../../../../mvp/decisions.md#d-2026-11-09-14)):** the edit-player save may set a registered player's password through the auth provider; record only `player.password_set_by_admin` (actor, target, time), never the value, and remove the capability after the beta. This conflicts with [D-2026-11-07-01](../../../../mvp/decisions.md#d-2026-11-07-01) and needs owner sign-off before any build. The same save records one `player.profile_updated` event listing every changed field (picture, profile fields, privacy switches, phone, email) with redacted before/after and the reason. Club actions identify club account/device elsewhere; shared credentials cannot prove the human operator's identity.
 
 Business sources: [configuration](../../../../business_logic/product/admin/modules/configuration/README.md), [player management](../../../../business_logic/product/admin/modules/player-management/README.md).
 

@@ -31,6 +31,9 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-09-09](#d-2026-11-09-09) | Keeping the session page cheap to serve | approved | not started | needed | [Queue](workstreams/queue.md), [Backend](workstreams/backend.md) |
 | [D-2026-11-09-10](#d-2026-11-09-10) | Uploaded pictures: keep only the current and the previous | approved | not started | needed | [Player](workstreams/player.md), [Queue](workstreams/queue.md), [Backend](workstreams/backend.md) |
 | [D-2026-11-09-11](#d-2026-11-09-11) | Session page and Queue refinements from the owner's artifact review | approved | not started | needed | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
+| [D-2026-11-09-12](#d-2026-11-09-12) | Club-set pictures for guests and unclaimed players | approved | not started | needed | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
+| [D-2026-11-09-13](#d-2026-11-09-13) | Admin-managed profile character library | approved | not started | needed | [Admin](workstreams/admin.md), [Player](workstreams/player.md) |
+| [D-2026-11-09-14](#d-2026-11-09-14) | Admin edits everything on a player, with a beta-only password field | approved for MVP or beta only; needs owner sign-off on the D-2026-11-07-01 conflict | not started | needed | [Admin](workstreams/admin.md) |
 
 ## Status conventions
 
@@ -73,6 +76,7 @@ Then add a row to the [index](#index) and link the entry from the workstream pag
 - **Ticket:** #491
 - **Roadmap:** MVP — [Player access](workstreams/player.md), [Admin](workstreams/admin.md).
 - **Decision:** Forgot password submits a request to Admin > Requests. No automatic email. ROTRA Admin verifies ownership, then generates a secure, expiring, single-use link for manual delivery. The player chooses their password; the Admin never sees it. Delivery channel and arbitrary expiry duration are not prescribed.
+- **Amended by:** [D-2026-11-09-14](#d-2026-11-09-14) (an admin-typed password for the beta only; needs the owner's sign-off).
 - **Supersedes:** the November 7 support-only/no-submitted-requests restriction and the automatic recovery email shipped in #483. Ownership verification, no plaintext-token storage, audit and no club-owner password-reset access remain.
 - **Implementation:** Supabase recovery token/expiry plus a private ROTRA request table holding a token digest, reviewer and issuance lease. The existing reset screen consumes only reviewed links and checks the account mapping. No provider call occurs when submitting the request. The additive migration was applied to ROTRA v2 ASIA on November 8 after explicit owner sign-off.
 - **References:** `apps/admin/src/app/(admin)/requests/password-resets`, `packages/db/src/admin/password-resets.ts`, [schema](../database_design/product/admin/modules/configuration-requests.md).
@@ -404,7 +408,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 - **Implementation status:** not started — mockups updated November 9, 2026 (`NEW` logs dated 2026-11-09 in [mockup-changes](../mockup-changes/README.md))
 - **Ticket:** needed
 - **Roadmap:** MVP (same scope as [D-2026-11-09-04](#d-2026-11-09-04) and [D-2026-11-09-05](#d-2026-11-09-05)) — [Queue](workstreams/queue.md), [Player](workstreams/player.md)
-- **Amends:** [D-2026-11-09-01](#d-2026-11-09-01) (the picker is a slider), [D-2026-11-09-04](#d-2026-11-09-04) (Queue, Courts now and My night layout), [D-2026-11-09-05](#d-2026-11-09-05) (formats and picker controls), [D-2026-11-09-08](#d-2026-11-09-08) (when a player can invite).
+- **Amends:** [D-2026-11-09-01](#d-2026-11-09-01) (the picker is a slider, up to 5 matches), [D-2026-11-09-04](#d-2026-11-09-04) (Queue, Courts now and My night layout), [D-2026-11-09-05](#d-2026-11-09-05) (formats and picker controls), [D-2026-11-09-08](#d-2026-11-09-08) (when a player can invite).
 - **Decision:**
   - **Match request formats.** The player picks **2 v 2** (default), **1 v 1**, **1 v 2**, **3 v 3**, **4 v 4** or **5 v 5**. A format the session doesn't allow is disabled. The session setup has a toggle per format for which kinds of games players may request.
   - **Choose partner / opponent picker.** It has **All · Playing · Available** tabs (Playing = on a court), a skill filter (Beginner, Intermediate, Advanced) and a sort: longest wait, shortest wait, fewest games (default) or most games.
@@ -414,5 +418,50 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - **My night** puts games played (with progress toward the minimum) and Won / Lost first, as large numbers.
   - **Clear queue.** The Queue Master gets a red **Clear queue** button that, after a confirmation, removes every waiting match. Matches on a court and finished matches are not touched.
   - **Next-match picker** is a slider: one eligible match at a time, #1 on the left, up to **5** matches, draggable, with a fade on the right while more cards follow and a games-played count on each face. It replaces "the first two" in [D-2026-11-09-01](#d-2026-11-09-01).
+  - **Players tab player cards** (Queue Master) show only two numbers, large: **Played** (completed games) and **For the night** (played + queued games). Wait time sits in the status line.
+  - **Main Queue search.** A search box finds a player by name or nickname, highlights their queued matches and fades the rest.
+  - **Make match asks first.** The Players tab's Make match opens a confirmation with the court, each player's games played on their face and their skill level under their name. **Arrange to balance** evens the teams by level; Make match adds it to the end of the Main Queue.
 - **Open:** the prototype's defaults for which request formats are on in a new session (2 v 2 on, 1 v 1 follows Singles, fun formats off) are not an owner decision yet. Ask before building.
 - **References:** [Public session screens](../screens/product/modules/queue/public-session.md), [Match control › Q-NEXT-MATCH](../screens/product/modules/queue/match-control.md#q-next-match--next-match-picker-after-a-result), [mockup changes](../mockup-changes/README.md).
+
+<a id="d-2026-11-09-12"></a>
+### D-2026-11-09-12 — Club-set pictures for guests and unclaimed players
+- **Decision status:** approved (owner, November 9, 2026): "Club Owners can set profile pictures to guests and unclaimed players".
+- **Implementation status:** not started — mockups updated November 9, 2026 (`NEW` log 2026-11-09-queue-club-set-player-pictures in [mockup-changes](../mockup-changes/README.md))
+- **Ticket:** needed
+- **Roadmap:** MVP — [Queue](workstreams/queue.md), [Player](workstreams/player.md)
+- **Decision:**
+  - The club (Queue Master or owner) sets the picture in **Saved players › player › Edit details**, for **Guest** and **Unclaimed** players only. A registered player owns their own picture; the club cannot change it.
+  - The picture is an uploaded photo, one of the characters from the [character library](#d-2026-11-09-13), or initials. Characters and initials store no file.
+  - **Only the current and the previous photo are kept**, the same rule as [D-2026-11-09-10](#d-2026-11-09-10). **Use previous picture** swaps them; **Remove** returns to initials and keeps the removed photo as the previous one.
+  - It shows wherever that player appears for the club, including the public session page under the masking rules of [D-2026-11-07-06](#d-2026-11-07-06).
+- **Open:** what happens to a club-set picture when the player later claims the profile (proposal: it becomes their starting picture, which they can change), and where a guest's picture is stored, since guests have no `players` row. Ask before building.
+- **References:** [mockup log](../mockup-changes/2026-11-09-queue-club-set-player-pictures.md), [open decisions](../business_logic/product/open-decisions.md).
+
+<a id="d-2026-11-09-13"></a>
+### D-2026-11-09-13 — Admin-managed profile character library
+- **Decision status:** approved (owner, November 9, 2026): the character pictures players choose from "will be controlled in the admin app", and the library is only images the platform owner uploads.
+- **Implementation status:** not started — mockups updated November 9, 2026 (`NEW` logs dated 2026-11-09 in [mockup-changes](../mockup-changes/README.md))
+- **Ticket:** needed
+- **Roadmap:** MVP — [Admin](workstreams/admin.md), [Player](workstreams/player.md)
+- **Decision:**
+  - **Admin › Settings › Profile characters** is a plain grid of images. The admin adds images by dragging them in (images only, up to 1 MB each, cropped to a square). Clicking an image hides or shows it (hidden images are dimmed). A small x deletes one, with a short Undo.
+  - At least **8** images must stay shown. There is no generated character, no names and no ordering: players see the shown images in upload order.
+  - **Players' picker** shows only the shown images, **8 per page** with a pager. A player who already uses an image that is later hidden or deleted keeps showing it. Admin's edit-player sheet and the club's picture editor ([D-2026-11-09-12](#d-2026-11-09-12)) use the same list.
+- **Storage:** a character library (image reference, shown, position, created) in Supabase Storage plus one small table; images are admin uploads only, so the keep-two rule of [D-2026-11-09-10](#d-2026-11-09-10) does not apply.
+- **References:** [Admin screens](../screens/product/modules/admin/README.md), [mockup logs](../mockup-changes/README.md).
+
+<a id="d-2026-11-09-14"></a>
+### D-2026-11-09-14 — Admin edits everything on a player, with a beta-only password field
+- **Decision status:** approved by the owner for **MVP or beta only** (November 9, 2026): "since admin, you should be able to edit everything. also password (for now) wrap it with *(for mvp or beta only)*". It conflicts with [D-2026-11-07-01](#d-2026-11-07-01) and needs the owner's explicit sign-off before it is built.
+- **Implementation status:** not started — mockups updated November 9, 2026 (`NEW` logs dated 2026-11-09 in [mockup-changes](../mockup-changes/README.md))
+- **Ticket:** needed
+- **Roadmap:** MVP or beta — [Admin](workstreams/admin.md)
+- **Amends:** [D-2026-11-07-01](#d-2026-11-07-01) for the beta only.
+- **Decision:**
+  - **Admin › Players › Edit** can change the player's picture ([D-2026-11-09-13](#d-2026-11-09-13)), name, nickname, playing style, experience, playing since, the four social links, Private profile, Hide phone from clubs, and phone and email (checked for format and uniqueness). A reason is required, and the change is written to the player's Activity log.
+  - **Read-only:** RTR ID, created-by club, registered/unclaimed status, rank, level and match history (ranking math is not editable by Admin).
+  - **Password.** The field is labelled **Password *(for MVP or beta only)***. The admin types a new password (at least 8 characters); empty leaves it unchanged; it is not available for unclaimed players. Only that it was set, and by whom, is recorded, never the password.
+- **Conflict to resolve:** [D-2026-11-07-01](#d-2026-11-07-01) says "the Admin never sees" a player's password and the player chooses it. Setting one by hand needs the owner's confirmation, and an end date for removing the field.
+- **Not decided:** editing phone or email directly skips the contact-change request flow; an open request is not closed automatically.
+- **References:** [Admin screens](../screens/product/modules/admin/README.md), [mockup logs](../mockup-changes/README.md).

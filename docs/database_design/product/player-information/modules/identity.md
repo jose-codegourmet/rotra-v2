@@ -28,7 +28,12 @@ Provision a public Supabase Storage bucket named `player-avatars` with the expli
 The authenticated Player server verifies the owning player and revision, detects content from bytes,
 and writes `<player UUID>/<random UUID>.<png|jpg|gif|webp>` using `SUPABASE_SECRET_KEY`.
 Character choices store `character:<id>` and initials store null in `avatar_ref`; no schema migration.
+The `<id>` points at the Admin-managed character library (`profile_characters`, proposed in
+[configuration-requests](../../admin/modules/configuration-requests.md), D-2026-11-09-13); a hidden
+or deleted character still resolves for players who already use it.
 Existing PNG URLs continue working. Club logo processing is unchanged.
+
+**Club-set pictures (owner request, November 9, 2026):** a club can set the picture of its own guests and unclaimed profiles; it follows the same current-and-previous rule (`avatar_ref` + `avatar_previous_ref`, [D-2026-11-09-10](../../../../mvp/decisions.md#d-2026-11-09-10)). Where a guest's picture is stored (guests have no `players` row) is not yet designed.
 
 **Updated by #567, owner-approved 2026-11-08:** selecting any picture creates a local draft only.
 Photo files, draggable crop and zoom stay in memory; object URLs

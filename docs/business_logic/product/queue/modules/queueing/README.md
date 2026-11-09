@@ -11,7 +11,7 @@
 | Choice | Behavior | Origin | Protected from Regenerate |
 |---|---|---|---|
 | Add match (manual) | Operator picks format and fills every Team A / Team B slot | Manual | Yes |
-| Make match | Operator taps players in the Players view; ROTRA picks the format from the count and balances teams by level | Manual | Yes |
+| Make match | Operator taps players in the Players view; ROTRA picks the format from the count; the operator confirms the teams in pick order or after Arrange to balance (by level) | Manual | Yes |
 | Suggest | ROTRA proposes **one** lineup with a reason; operator adds it, edits it, or skips to the next suggestion | Suggested | No, unless edited |
 | Generate matches | Generates alternative drafts; the Queue Master selects and explicitly adds them to the Main Queue | Auto | No |
 
@@ -29,7 +29,7 @@ Selected-player count sets the format: 2 → singles, 3 → 1v2, 4 → doubles, 
 - Singles: higher level vs lower level. 1v2: the highest level alone against the next two.
 - 3v3, 4v4, 5v5: sorted by level and dealt A, B, B, A, A, B, B, A, …
 
-The match goes to the end of the queue.
+Confirmation (owner request, November 9, 2026): Make match first shows the teams on a court in **pick order** (the first picks are Team A), with each player's games played and skill level and each team's summed level. The balancing above is applied only when the operator taps **Arrange to balance**; the operator can also add the match in pick order. Nothing is added until the operator confirms. The match goes to the end of the queue.
 
 ### Manual editor
 

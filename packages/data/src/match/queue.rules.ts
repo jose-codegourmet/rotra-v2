@@ -76,6 +76,35 @@ export function balanceTeams(players: SessionPlayer[], format: MatchFormat): Mat
     teamB: sorted.filter((_, i) => i % 4 === 1 || i % 4 === 2),
   }
 }
+/** Draft a lineup in pick order without changing the queue. */
+export function previewMakeMatch(players: SessionPlayer[], format: MatchFormat) {
+  const aSize = format === 'singles' || format === 'fun_1v2' ? 1 : players.length / 2
+  const teamA = players.slice(0, aSize)
+  const teamB = players.slice(aSize)
+  const levelA = teamA.reduce((sum, player) => sum + level(player), 0)
+  const levelB = teamB.reduce((sum, player) => sum + level(player), 0)
+  return {
+    lineup: {
+      format,
+      teamA: teamA.map((player) => player.id),
+      teamB: teamB.map((player) => player.id),
+    },
+    levelA,
+    levelB,
+    difference: Math.abs(levelA - levelB),
+  }
+}
+
+/** Reuse the existing Make match balancing; level math is unchanged. */
+export function arrangeToBalance(players: SessionPlayer[], format: MatchFormat) {
+  const lineup = balanceTeams(players, format)
+  const byId = new Map(players.map((player) => [player.id, player]))
+  const ordered = [...lineup.teamA, ...lineup.teamB]
+    .map((id) => byId.get(id))
+    .filter((player): player is SessionPlayer => !!player)
+  return previewMakeMatch(ordered, format)
+}
+
 /** Reference heuristic from the prototype; the final strength model, mode weights and default run size are open decisions (business open-decisions › Queue generation). */
 export function splitTeams(
   session: Pick<QueueSession, 'sessionMode'>,

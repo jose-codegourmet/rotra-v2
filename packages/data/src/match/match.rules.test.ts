@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest'
+import { createConsoleFixtures } from '../fixtures/consoleSessions'
+import { createMatchCardFixtures } from '../fixtures/matchCards'
 import type { SessionCourt } from '../queue-session/queueSession.types'
 import type { SessionPlayer } from '../session-roster/sessionRoster.types'
 import {
@@ -18,6 +20,7 @@ import {
   freeCourts,
   type MatchContext,
   matchStatus,
+  nextMatchCandidates,
   onCourtMatches,
   replacedLineup,
   substitutionCandidates,
@@ -382,4 +385,34 @@ describe('On court actions', () => {
       swapTarget(placed, ctxOf([placed, queued('m3', 1, ['Eve', 'Fay'], ['Gus', 'Hal'])], away)),
     ).toBeNull()
   })
+})
+
+describe('next-match candidates', () => {
+  it('returns the first five ready matches in queue order and includes game counts', () => {
+    const complete = game(['Migs', 'Amy'], ['Ben', 'Dan'])
+    const waiting = Array.from({ length: 7 }, (_, i) => ({
+      ...lineup(`w${i}`, 'waiting', ['Migs', 'Amy'], ['Ben', 'Dan']),
+      queuePosition: 7 - i,
+    }))
+    const result = nextMatchCandidates('c1', ctxOf([complete, ...waiting]))
+    expect(result.map((m) => m.id)).toEqual(['w6', 'w5', 'w4', 'w3', 'w2'])
+    expect(result[0]?.gamesByPlayer.Migs).toBe(1)
+    expect(nextMatchCandidates('c1', ctxOf([complete, ...waiting]), 20)).toHaveLength(5)
+  })
+  it('returns none when the court is busy', () => {
+    const playing = lineup('playing', 'active', ['Migs', 'Amy'], ['Ben', 'Dan'], ['c1'])
+    const waiting = lineup('waiting', 'waiting', ['Eve', 'Fay'], ['Gus', 'Hal'])
+    expect(nextMatchCandidates('c1', ctxOf([playing, waiting]))).toEqual([])
+  })
+})
+
+it('offers five ready matches from the live Sunday Night fixture', () => {
+  const live = createConsoleFixtures()
+  const cards = createMatchCardFixtures().sliderCandidates
+  const candidates = nextMatchCandidates(live.courts[1]!.id, {
+    roster: live.roster,
+    courts: live.courts,
+    matches: [live.matches[0]!, ...cards.map((card) => card.match)],
+  })
+  expect(candidates.map((match) => match.id)).toEqual(cards.map((card) => card.match.id))
 })

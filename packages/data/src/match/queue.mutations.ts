@@ -1,6 +1,6 @@
 import { MockError } from '../mock/errors'
-import type { MockState } from '../mock/store'
-import { queueMutation, sessionIn } from '../mock/transaction'
+import { type MockState, mockStore } from '../mock/store'
+import { queueMutation, requireSessionWrite, sessionIn } from '../mock/transaction'
 import { autoFillCourts, autoFillNote } from '../queue-session/courtFill'
 import {
   realAddMatch,
@@ -112,8 +112,15 @@ export function addMatch(input: MatchLineup & { sessionId: string }) {
     }),
   )
 }
-export function makeMatch(input: { sessionId: string; selection: string[] }) {
-  if (isRealDataMode()) return realMakeMatch(input)
+export function makeMatch(input: { sessionId: string; selection: string[]; lineup?: MatchLineup }) {
+  if (isRealDataMode()) {
+    if (input.lineup)
+      throw new MockError(
+        'permission',
+        'Confirming an arranged lineup is not available in real mode.',
+      )
+    return realMakeMatch(input)
+  }
   return change(input.sessionId, (s) => {
     const plan = formatForSelection(input.selection.length, sessionIn(s, input.sessionId))
     if (!plan.format) throw new MockError('permission', plan.reason)
@@ -121,10 +128,19 @@ export function makeMatch(input: { sessionId: string; selection: string[] }) {
       s.roster.find((p) => p.id === id && p.sessionId === input.sessionId),
     )
     if (selected.some((p) => !p)) throw new MockError('permission', 'Player not available.')
-    const lineup = balanceTeams(
-        selected.filter((p): p is NonNullable<typeof p> => !!p),
-        plan.format,
-      ),
+    if (
+      input.lineup &&
+      (input.lineup.format !== plan.format ||
+        [...input.lineup.teamA, ...input.lineup.teamB].length !== input.selection.length ||
+        [...input.lineup.teamA, ...input.lineup.teamB].some((id) => !input.selection.includes(id)))
+    )
+      throw new MockError('permission', 'The lineup no longer matches the selected players.')
+    const lineup =
+        input.lineup ??
+        balanceTeams(
+          selected.filter((p): p is NonNullable<typeof p> => !!p),
+          plan.format,
+        ),
       data = append(s, input.sessionId, lineup, 'manual', true),
       position = s.matches.filter(
         (m) => m.sessionId === input.sessionId && m.state === 'waiting',
@@ -253,6 +269,27 @@ export function removeWaitingMatch(input: { sessionId: string; matchId: string }
     return { data: null, text: `Waiting match ${m.matchNo} removed` }
   })
 }
+/** Remove every waiting match in one write, leaving court and finished matches untouched. */
+export function clearQueue(sessionId: string) {
+  if (isRealDataMode())
+    throw new MockError('permission', 'Clear queue is not available in real mode.')
+  const snapshot = mockStore.getSnapshot()
+  requireSessionWrite(snapshot, sessionId)
+  requireLive(snapshot, sessionId)
+  if (!snapshot.matches.some((match) => match.sessionId === sessionId && match.state === 'waiting'))
+    return Promise.resolve({ data: 0, savedOffline: false, message: 'Queue is empty' })
+  return change(sessionId, (s) => {
+    const count = s.matches.filter((m) => m.sessionId === sessionId && m.state === 'waiting').length
+    s.matches = s.matches.filter((m) => m.sessionId !== sessionId || m.state !== 'waiting')
+    return {
+      data: count,
+      text: `Queue cleared · ${count} waiting match${count === 1 ? '' : 'es'} removed`,
+    }
+  })
+}
+export const canClearQueue = (matches: Match[]) =>
+  matches.some((match) => match.state === 'waiting')
+
 export function swapPlayers(input: { sessionId: string; matchId: string; a: string; b: string }) {
   if (isRealDataMode()) return realSwapPlayers(input)
   return change(input.sessionId, (s) => {

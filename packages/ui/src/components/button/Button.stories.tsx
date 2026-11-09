@@ -105,3 +105,15 @@ export const Phone: Story = {
   render: AllVariantsAndSizes.render,
   globals: { viewport: { value: 'phone' } },
 }
+
+export const DangerSolid: Story = {
+  args: { variant: 'danger-solid', size: 'sm', children: 'Clear queue' },
+}
+export const DangerSolidDisabled: Story = {
+  args: { variant: 'danger-solid', size: 'sm', children: 'Clear queue', disabled: true },
+}
+export const DangerSolidLight: Story = { ...DangerSolid, globals: { theme: 'light' } }
+export const DangerSolidDisabledLight: Story = {
+  ...DangerSolidDisabled,
+  globals: { theme: 'light' },
+}

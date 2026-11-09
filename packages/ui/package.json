@@ -140,6 +140,7 @@
     "./post-preview-sheet": "./src/components/post-preview-sheet/PostPreviewSheet.tsx",
     "./profile-not-found": "./src/components/profile-not-found/ProfileNotFound.tsx",
     "./progress-bar": "./src/components/progress-bar/ProgressBar.tsx",
+    "./queue-search-field": "./src/components/queue-search-field/QueueSearchField.tsx",
     "./queue-grid": "./src/components/queue-grid/QueueGrid.tsx",
     "./rank-explanation": "./src/components/rank-explanation/RankExplanation.tsx",
     "./rank-explanation/skill-ladder-full": "./src/components/rank-explanation/skill-ladder-full/SkillLadderFull.tsx",

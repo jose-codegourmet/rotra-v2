@@ -73,7 +73,12 @@ export const ThreeVersusThree: Story = {
   render: (args) => <AtWidths {...args} />,
 }
 export const FourVersusFour: Story = {
-  args: { teamA: merged.teamA.slice(0, 4), teamB: merged.teamB.slice(0, 4), courts: 2, showLevels: true },
+  args: {
+    teamA: merged.teamA.slice(0, 4),
+    teamB: merged.teamB.slice(0, 4),
+    tall: true,
+    showLevels: true,
+  },
   render: (args) => <AtWidths {...args} />,
 }
 export const FiveVersusFiveMerged: Story = {
@@ -116,6 +121,34 @@ export const Desktop: Story = {
 }
 
 export const LevelsAndUnassigned: Story = {
-  args: { showLevels: true, teamA: doubles.teamA.map((p, i) => i === 0 ? { ...p, level: null } : p) },
+  args: {
+    showLevels: true,
+    teamA: doubles.teamA.map((p, i) => (i === 0 ? { ...p, level: null } : p)),
+  },
   render: (args) => <AtWidths {...args} />,
 }
+
+/** Confirmation layout: one stretched court, distinct from two merged courts. */
+export const FiveVersusFiveTall: Story = {
+  args: { ...merged, tall: true },
+  render: (args) => <AtWidths {...args} />,
+}
+
+/** Game-count badges remain announced without a supplied session minimum. */
+export const GamesWithoutMinimum: Story = { args: { minimumGames: undefined } }
+
+/** All prototype skill-label tints, including the unassigned white label. */
+export const LevelBands: Story = {
+  args: {
+    teamA: doubles.teamA.map<CourtPlayer>((player, i) => ({
+      ...player,
+      level: i === 0 ? 'beginner_low' : 'intermediate_mid',
+    })),
+    teamB: doubles.teamB.map<CourtPlayer>((player, i) => ({
+      ...player,
+      level: i === 0 ? 'advanced_low' : null,
+    })),
+    showLevels: true,
+  },
+}
+export const LevelBandsLight: Story = { ...LevelBands, globals: { theme: 'light' } }

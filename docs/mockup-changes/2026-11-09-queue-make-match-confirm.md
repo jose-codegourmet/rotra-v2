@@ -22,7 +22,7 @@ Superseded by: none
 - Compare at: 375 px and 1280 px, dark and light.
 - States: pick order (no notice); after Arrange to balance (ok notice); each format 1v1, 1v2, 2v2, 3v3, 4v4, 5v5; player with no level.
 - Copy: title “Make this match?”; “FORMAT · added to the end of the Main Queue. The number on each face is that player's games so far.”; “Team A level N”, “Even” / “D apart”, “Team B level N”; “Arranged to balance the teams by level.”; buttons “Cancel”, “Arrange to balance”, “Make match”.
-- Tokens: existing tokens; the level label (`.pf-lv`) uses fixed band tints from the artifact (blue / yellow / red on a dark pill), as in the approved artifact.
+- Tokens: the level label (`.pf-lv`) uses fixed court-level-label / court-level-beg / court-level-int / court-level-adv tokens for the artifact’s blue / yellow / red tints on a dark pill in both themes. Owner approved adding these fixed tokens on November 9, 2026, following the prototype as the source of truth.
 - Known differences: none
 
 ## Reuse plan

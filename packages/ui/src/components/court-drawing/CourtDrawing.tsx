@@ -19,6 +19,8 @@ export type CourtPlayer = {
 export type CourtDrawingProps = {
   /** Two courts stack into one merged area with a single long net (5v5) */
   courts?: 1 | 2
+  /** Stretch one court vertically for larger lineups without adding a second court. */
+  tall?: boolean
   /** A free court: neutral colours and a "Free" label, no players */
   free?: boolean
   freeLabel?: string
@@ -48,10 +50,12 @@ const rowsFor = (n: number) => (n <= 2 ? n : n <= 4 ? 2 : 3)
 const sizeFor = (n: number): 34 | 28 | 24 => (n <= 1 ? 34 : n <= 3 ? 28 : 24)
 
 function profileLabel(player: CourtPlayer, team: 'A' | 'B', minimumGames: number | undefined) {
-  if (player.games === undefined || minimumGames === undefined) {
-    return `${player.name}, Team ${team}. View profile`
-  }
-  return `${player.name}, Team ${team}, ${player.games} of ${minimumGames} games. View profile`
+  if (player.games === undefined) return `${player.name}, Team ${team}. View profile`
+  const games =
+    minimumGames === undefined
+      ? `${player.games} games played`
+      : `${player.games} of ${minimumGames} games`
+  return `${player.name}, Team ${team}, ${games}. View profile`
 }
 
 /**
@@ -60,6 +64,7 @@ function profileLabel(player: CourtPlayer, team: 'A' | 'B', minimumGames: number
  */
 export function CourtDrawing({
   courts = 1,
+  tall = false,
   free = false,
   freeLabel = 'Free',
   teamA = [],
@@ -97,19 +102,39 @@ export function CourtDrawing({
                 className={courtFaceClass(n)}
               />
             ) : (
-              <div role="img" aria-label={`${p.name}${p.games === undefined ? '' : `, ${p.games} games played`}`} className={cn('flex min-w-0 flex-col items-center gap-px', courtFaceClass(n))}>
-                <Avatar name={p.name} src={p.photoUrl} size={sizeFor(n) === 34 ? 36 : sizeFor(n) as 24 | 28} className="ring-2 ring-on-photo/90" />
-                <span className="max-w-16 truncate rounded-full bg-photo-label px-[5px] text-[10px] leading-[1.3] font-bold text-on-photo">{p.shortName}</span>
+              <div
+                role="img"
+                aria-label={`${p.name}${p.games === undefined ? '' : `, ${p.games} games played`}`}
+                className={cn('flex min-w-0 flex-col items-center gap-px', courtFaceClass(n))}
+              >
+                <Avatar
+                  name={p.name}
+                  src={p.photoUrl}
+                  size={sizeFor(n) === 34 ? 36 : (sizeFor(n) as 24 | 28)}
+                  className="ring-2 ring-on-photo/90"
+                />
+                <span className="max-w-16 truncate rounded-full bg-photo-label px-[5px] text-[10px] leading-[1.3] font-bold text-on-photo">
+                  {p.shortName}
+                </span>
               </div>
             )}
             {showLevels ? (
-              <span className={cn(
-                'whitespace-nowrap rounded-full bg-scrim px-1.5 text-[10px] leading-[1.2] font-bold text-on-photo',
-                p.level?.startsWith('beginner') && 'text-[color:color-mix(in_srgb,var(--lv-beg)_60%,var(--on-photo))]',
-                p.level?.startsWith('intermediate') && 'text-[color:var(--lv-int)]',
-                p.level?.startsWith('advanced') && 'text-[color:color-mix(in_srgb,var(--lv-adv)_70%,var(--on-photo))]',
-              )}>
-                {p.level ? p.level.replace('beginner', 'Beg').replace('intermediate', 'Int').replace('advanced', 'Adv').replace('_', ' ').replace(/ (\w)/, (_, c: string) => ` ${c.toUpperCase()}`) : 'No level'}
+              <span
+                className={cn(
+                  'whitespace-nowrap rounded-full bg-court-level-label px-1.5 text-[10px] leading-[1.2] font-bold text-on-photo',
+                  p.level?.startsWith('beginner') && 'text-court-level-beg',
+                  p.level?.startsWith('intermediate') && 'text-court-level-int',
+                  p.level?.startsWith('advanced') && 'text-court-level-adv',
+                )}
+              >
+                {p.level
+                  ? p.level
+                      .replace('beginner', 'Beg')
+                      .replace('intermediate', 'Int')
+                      .replace('advanced', 'Adv')
+                      .replace('_', ' ')
+                      .replace(/ (\w)/, (_, c: string) => ` ${c.toUpperCase()}`)
+                  : 'No level'}
               </span>
             ) : null}
             {p.games !== undefined ? (
@@ -133,7 +158,7 @@ export function CourtDrawing({
     <div
       className={cn(
         '@container relative overflow-hidden rounded-md',
-        courts === 2 ? 'aspect-[134/122]' : 'aspect-[134/61]',
+        courts === 2 || tall ? 'aspect-[134/122]' : 'aspect-[134/61]',
         free
           ? '[--court-c:var(--color-court-free)] [--court-l:var(--color-court-free-line)]'
           : '[--court-c:var(--color-court)] [--court-l:var(--color-court-line)]',

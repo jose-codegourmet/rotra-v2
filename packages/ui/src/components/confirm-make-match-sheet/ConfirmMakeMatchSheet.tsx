@@ -65,7 +65,7 @@ export function ConfirmMakeMatchSheet({
         games so far.
       </p>
       <CourtDrawing
-        courts={Math.max(teamA.length, teamB.length) > 3 ? 2 : 1}
+        tall={Math.max(teamA.length, teamB.length) > 3}
         teamA={teamA}
         teamB={teamB}
         showLevels

@@ -6,6 +6,7 @@ export const confirmMakeMatchSheetMeta = {
     'D-MAKE-MATCH: confirm picked players on a court, with games and level labels and an optional arrangement notice.',
   usage: [
     'Pass teams in pick order and level totals; onArrange changes the teams in the caller. onConfirm adds the match and onCancel closes the sheet.',
+    'Large teams (4v4 and 5v5) use one tall court, matching the confirmation mockup.',
     'Pass isPending during placement and error when placement fails.',
   ],
   prototype: {

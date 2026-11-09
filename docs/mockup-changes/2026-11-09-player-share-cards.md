@@ -1,6 +1,6 @@
 # Players share a rank card, a session result and a session's games as link, QR or post/story image
 
-Status: NEW
+Status: TICKETED — #588
 Date: 2026-11-09
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › Own profile (Shared rank, My sessions) and Games (session groups) › Share sheet

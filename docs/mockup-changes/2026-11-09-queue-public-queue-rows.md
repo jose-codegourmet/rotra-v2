@@ -1,6 +1,6 @@
 # Session page: the Queue pins #1 and scrolls the rest as one-row matches
 
-Status: NEW
+Status: TICKETED — #585
 Date: 2026-11-09
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Public session page › Details › Queue; Prototype › Demo scenarios › Full house

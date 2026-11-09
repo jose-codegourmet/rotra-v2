@@ -1,6 +1,6 @@
 # Session page: Session invite share card for confirmed and waitlisted players
 
-Status: NEW
+Status: TICKETED — #585
 Date: 2026-11-09
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Public session page › My night › Invite › Session invite sheet

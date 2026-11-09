@@ -1,6 +1,6 @@
 # Roster: “Checked in themselves” mark, and the club setting Players can check themselves in
 
-Status: NEW
+Status: TICKETED — #586
 Date: 2026-11-09
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Roster and levels rows and cards, Live session › Players cards; Club settings › Session defaults

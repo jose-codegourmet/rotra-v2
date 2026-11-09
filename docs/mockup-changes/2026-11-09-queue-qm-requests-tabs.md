@@ -1,6 +1,6 @@
 # Requests · N with Join and Match tabs: ROTRA-player hints, drop-out notices, match request cards
 
-Status: NEW
+Status: TICKETED — #586
 Date: 2026-11-09
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Preparation › Requests card; Live session › Requests · N button › Requests sheet

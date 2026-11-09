@@ -1,6 +1,6 @@
 # Session page: signed-in Players open a participant's ROTRA profile
 
-Status: NEW
+Status: TICKETED — #585
 Date: 2026-11-09
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Public session page › Participants, Waitlist

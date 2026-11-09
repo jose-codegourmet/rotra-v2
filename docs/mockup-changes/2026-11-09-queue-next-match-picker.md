@@ -9,7 +9,7 @@ Screen ID: Q-NEXT-MATCH
 Artifact: none
 Components: sheet, next-match-sheet
 Supersedes: none
-Superseded by: none
+Superseded by: 2026-11-09-queue-next-match-slider.md
 
 ## What changed
 - Before: Confirm result freed the court, and with Auto Queue on the court was refilled automatically; with

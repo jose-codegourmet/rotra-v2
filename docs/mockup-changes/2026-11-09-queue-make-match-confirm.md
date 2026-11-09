@@ -1,6 +1,6 @@
 # Make match asks for confirmation on a court, with Arrange to balance
 
-Status: TICKETED — #586
+Status: IN PROGRESS — #586
 Date: 2026-11-09
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › live session › Players tab › pick players › Make match

@@ -1,6 +1,6 @@
 # Session page: Courts now shows the Queue Master's court cards, read-only
 
-Status: TICKETED — #585
+Status: IN PROGRESS — #585
 Date: 2026-11-09
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Public session page › Details › Courts now

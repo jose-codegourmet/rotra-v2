@@ -1,4 +1,5 @@
 import type { PlayingLevel } from '@rotra/data/player/types'
+import { Avatar } from '@rotra/ui/avatar'
 import { cn } from '@rotra/ui/cn'
 import { PlayerFaceButton } from '@rotra/ui/player-face-button'
 import { courtFaceClass, courtFaceFrameClass, courtGameBadgeClass } from './CourtDrawing.sizes'
@@ -25,6 +26,8 @@ export type CourtDrawingProps = {
   teamB?: CourtPlayer[]
   /** Session minimum games; used in each picture's accessible name with `games` */
   minimumGames?: number
+  /** Show abbreviated playing levels below names. */
+  showLevels?: boolean
   /** Opens a player's profile */
   onOpenProfile?: (playerId: string) => void
   className?: string
@@ -62,6 +65,7 @@ export function CourtDrawing({
   teamA = [],
   teamB = [],
   minimumGames,
+  showLevels = false,
   onOpenProfile,
   className,
 }: CourtDrawingProps) {
@@ -80,17 +84,34 @@ export function CourtDrawing({
       >
         {players.map((p) => (
           <div key={p.id} className="group/slot relative flex min-w-0 flex-col items-center">
-            <PlayerFaceButton
-              name={p.name}
-              shortName={p.shortName}
-              level={p.level}
-              photoUrl={p.photoUrl}
-              size={sizeFor(n)}
-              compact={n >= 4}
-              label={profileLabel(p, team, minimumGames)}
-              onClick={() => onOpenProfile?.(p.id)}
-              className={courtFaceClass(n)}
-            />
+            {onOpenProfile ? (
+              <PlayerFaceButton
+                name={p.name}
+                shortName={p.shortName}
+                level={p.level}
+                photoUrl={p.photoUrl}
+                size={sizeFor(n)}
+                compact={n >= 4}
+                label={profileLabel(p, team, minimumGames)}
+                onClick={() => onOpenProfile(p.id)}
+                className={courtFaceClass(n)}
+              />
+            ) : (
+              <div role="img" aria-label={`${p.name}${p.games === undefined ? '' : `, ${p.games} games played`}`} className={cn('flex min-w-0 flex-col items-center gap-px', courtFaceClass(n))}>
+                <Avatar name={p.name} src={p.photoUrl} size={sizeFor(n) === 34 ? 36 : sizeFor(n) as 24 | 28} className="ring-2 ring-on-photo/90" />
+                <span className="max-w-16 truncate rounded-full bg-photo-label px-[5px] text-[10px] leading-[1.3] font-bold text-on-photo">{p.shortName}</span>
+              </div>
+            )}
+            {showLevels ? (
+              <span className={cn(
+                'whitespace-nowrap rounded-full bg-scrim px-1.5 text-[10px] leading-[1.2] font-bold text-on-photo',
+                p.level?.startsWith('beginner') && 'text-[color:color-mix(in_srgb,var(--lv-beg)_60%,var(--on-photo))]',
+                p.level?.startsWith('intermediate') && 'text-[color:var(--lv-int)]',
+                p.level?.startsWith('advanced') && 'text-[color:color-mix(in_srgb,var(--lv-adv)_70%,var(--on-photo))]',
+              )}>
+                {p.level ? p.level.replace('beginner', 'Beg').replace('intermediate', 'Int').replace('advanced', 'Adv').replace('_', ' ').replace(/ (\w)/, (_, c: string) => ` ${c.toUpperCase()}`) : 'No level'}
+              </span>
+            ) : null}
             {p.games !== undefined ? (
               <span
                 aria-hidden

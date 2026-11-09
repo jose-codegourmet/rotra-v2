@@ -106,7 +106,19 @@ export type CourtCardFreeProps = CourtCardBase & {
   onAddMatch?: () => void
 }
 
-export type CourtCardProps = CourtCardInGameProps | CourtCardOnCourtProps | CourtCardFreeProps
+export type CourtCardReadOnlyProps = {
+  variant: 'read-only'
+  label: string
+  state: 'playing' | 'getting-ready' | 'free'
+  merged?: boolean
+  teamA?: CourtPlayer[]
+  teamB?: CourtPlayer[]
+  /** Formatted start time, supplied by the caller. */
+  startedLabel?: string
+  className?: string
+}
+
+export type CourtCardProps = CourtCardInGameProps | CourtCardOnCourtProps | CourtCardFreeProps | CourtCardReadOnlyProps
 
 function TimeLine({
   startLabel,
@@ -199,9 +211,25 @@ function listNames(names: string[]) {
  * .court.oncourt and .court.busy.
  */
 export function CourtCard(props: CourtCardProps) {
+  if (props.variant === 'read-only') return <ReadOnlyCourtCard {...props} />
   if (props.variant === 'in-game') return <PlayingCourtCard {...props} />
   if (props.variant === 'on-court') return <GettingReadyCourtCard {...props} />
   return <FreeCourtCard {...props} />
+}
+
+function ReadOnlyCourtCard({ label, state, merged = false, teamA = [], teamB = [], startedLabel, className }: CourtCardReadOnlyProps) {
+  const chip = state === 'playing' ? 'Playing' : state === 'getting-ready' ? 'Getting ready' : 'Free'
+  return (
+    <article aria-label={label} className={cn(courtCardVariants({ variant: state === 'playing' ? 'in-game' : 'free', merged }), className)}>
+      <div className="flex items-center justify-between gap-2">
+        <h3 className="text-base">{label}</h3>
+        <Chip tone={state === 'playing' ? 'accent' : undefined}>{merged && state !== 'free' ? `Merged · ${chip}` : chip}</Chip>
+      </div>
+      <CourtDrawing courts={merged ? 2 : 1} free={state === 'free'} teamA={teamA} teamB={teamB} />
+      {state === 'playing' && startedLabel ? <p className="text-[13px] text-fg2">Started {startedLabel}</p> : null}
+      {state === 'getting-ready' ? <p className="text-[13px] text-fg2">Waiting to start</p> : null}
+    </article>
+  )
 }
 
 /** Label, time line, state chip and ⋯ menu, then the court drawing with both teams. */

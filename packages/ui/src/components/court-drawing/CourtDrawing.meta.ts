@@ -8,6 +8,7 @@ export const courtDrawingMeta = {
     'Use inside CourtCard (in game and free) and the public page’s court strip. Pass courts={2} for a 5v5 match on two courts.',
     'Players stack top to bottom on their side (P1 over P2 | P3 over P4); teams of 3 or more wrap into a second column. Picture and name sizes use container query units so they grow from a 222 px card up to a wide card; do not size them through PlayerFaceButton.',
     'Pass each player’s completed games this session and the session minimum so the badge and accessible name read “NAME, Team A, G of MIN games. View profile”. Omit games to hide the badge.',
+    'Pass showLevels for abbreviated skill labels under each name, including No level when unassigned.',
     'Do not use for the queue card; it lists faces in a row, not on a court.',
   ],
   prototype: {

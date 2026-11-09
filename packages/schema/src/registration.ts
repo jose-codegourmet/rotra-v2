@@ -12,6 +12,7 @@ export const registrationSchema = z.object({
   email: emailField.transform((value) => value.toLowerCase()),
   phone: phoneField,
   password: passwordField,
+  cityCode: z.string().optional(),
 })
 export type RegistrationValues = z.infer<typeof registrationSchema>
 

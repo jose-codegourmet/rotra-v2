@@ -103,6 +103,8 @@ export async function submitContactChangeRequest(input: {
   mockStore.update((draft) => {
     const account = draft.playerAccounts.find((a) => a.playerId === session.account.id)
     if (!account) throw new MockError('permission', 'Sign in to request a contact change.')
+    if (account.emailConfirmedAt === null)
+      throw new MockError('permission', 'Confirm your email first.')
     const current = field === 'phone' ? account.phone : account.email.toLowerCase()
     if (normalized === current) throw fieldError(`That's already your ${word}.`)
     const taken = draft.playerAccounts.some(

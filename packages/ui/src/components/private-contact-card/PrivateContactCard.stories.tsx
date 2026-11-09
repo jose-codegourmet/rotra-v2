@@ -21,3 +21,13 @@ export const Phone: Story = { args: contact.hidden, globals: { viewport: { value
 export const Desktop: Story = { args: contact.hidden, globals: { viewport: { value: 'desktop' } } }
 export const Light: Story = { globals: { theme: 'light' } }
 export const UnclaimedLight: Story = { args: contact.unclaimed, globals: { theme: 'light' } }
+
+export const PublicProfile: Story = { args: { onToggleProfile: () => {}, savedPrivate: false } }
+export const PrivateProfile: Story = { args: { onToggleProfile: () => {}, savedPrivate: true } }
+export const SavingProfile: Story = { args: { onToggleProfile: () => {}, isPending: true } }
+export const OfflineProfile: Story = {
+  args: {
+    onToggleProfile: () => {},
+    error: "Couldn't save because you're offline. Your profile is still public.",
+  },
+}

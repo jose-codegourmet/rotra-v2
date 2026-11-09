@@ -199,12 +199,12 @@
 .rotra-pod.p3 .rotra-pod-step {
   height: 76px;
 }
-.rotra-pod:hover .rotra-pod-name,
-.rotra-pod:focus-visible .rotra-pod-name {
+.rotra-pod:not([aria-disabled]):hover .rotra-pod-name,
+.rotra-pod:not([aria-disabled]):focus-visible .rotra-pod-name {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
-.rotra-pod:hover .rotra-pod-step {
+.rotra-pod:not([aria-disabled]):hover .rotra-pod-step {
   filter: brightness(1.12);
 }
 .rotra-pod.me .rotra-pod-name::after {
@@ -301,4 +301,8 @@
     height: 118px;
     bottom: calc(100% - 78px);
   }
+}
+
+.rotra-pod[aria-disabled] {
+  cursor: default;
 }

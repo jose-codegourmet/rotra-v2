@@ -9,6 +9,7 @@ export type PodiumEntry = {
   nickname?: string | null
   levelLabel: string
   picture?: Pick<AvatarProps, 'src' | 'initials'>
+  masked?: boolean
   isMe?: boolean
 }
 export type TopThreePodiumProps = {
@@ -42,37 +43,41 @@ export function TopThreePodium({ entries, totalPlayers, onSelect }: TopThreePodi
         </span>
       </div>
       <div className="rotra-pod-stage">
-        {entries.map((entry, index) => (
-          <button
-            key={entry.id ?? entry.fullName}
-            id={entry.id}
-            type="button"
-            onClick={() => onSelect(index)}
-            aria-label={`${place[index]} place, ${entry.fullName}${entry.isMe ? ' (you)' : ''}, ${entry.levelLabel}`}
-            className={cn('rotra-pod', `p${index + 1}`, entry.isMe && 'me')}
-          >
-            <span className="rotra-pod-who">
-              {index === 0 ? <PixelFire /> : null}
-              <Avatar
-                name={entry.fullName}
-                src={entry.picture?.src}
-                initials={entry.picture?.initials}
-                size={index === 0 ? 88 : 64}
-                shape="square"
-                className="avatar"
-              />
-              <b className="rotra-pod-name">{entry.fullName}</b>
-              {entry.nickname ? (
-                <span className="relative z-10 text-[13px] text-fg2">“{entry.nickname}”</span>
-              ) : null}
-              <span className="rotra-pod-lv">{entry.levelLabel}</span>
-            </span>
-            <span className="rotra-pod-step" aria-hidden>
-              <b>{index + 1}</b>
-              <small>{short[index]}</small>
-            </span>
-          </button>
-        ))}
+        {entries.map((entry, index) => {
+          const Tile = entry.masked ? 'div' : 'button'
+          return (
+            <Tile
+              key={entry.id ?? entry.fullName}
+              id={entry.id}
+              type={entry.masked ? undefined : 'button'}
+              aria-disabled={entry.masked || undefined}
+              onClick={entry.masked ? undefined : () => onSelect(index)}
+              aria-label={`${place[index]} place, ${entry.fullName}${entry.isMe ? ' (you)' : ''}, ${entry.levelLabel}`}
+              className={cn('rotra-pod', `p${index + 1}`, entry.isMe && 'me')}
+            >
+              <span className="rotra-pod-who">
+                {index === 0 ? <PixelFire /> : null}
+                <Avatar
+                  name={entry.fullName}
+                  src={entry.masked ? undefined : entry.picture?.src}
+                  initials={entry.masked ? undefined : entry.picture?.initials}
+                  size={index === 0 ? 88 : 64}
+                  shape="square"
+                  className="avatar"
+                />
+                <b className="rotra-pod-name">{entry.fullName}</b>
+                {!entry.masked && entry.nickname ? (
+                  <span className="relative z-10 text-[13px] text-fg2">“{entry.nickname}”</span>
+                ) : null}
+                <span className="rotra-pod-lv">{entry.levelLabel}</span>
+              </span>
+              <span className="rotra-pod-step" aria-hidden>
+                <b>{index + 1}</b>
+                <small>{short[index]}</small>
+              </span>
+            </Tile>
+          )
+        })}
       </div>
     </section>
   )

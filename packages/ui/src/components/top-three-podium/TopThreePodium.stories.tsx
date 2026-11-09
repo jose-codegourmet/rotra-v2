@@ -22,3 +22,13 @@ export const Default: Story = {}
 export const MeInFirst: Story = {
   args: { entries: [{ ...entries[0], isMe: true }, entries[1], entries[2]] },
 }
+
+export const Masked: Story = {
+  args: {
+    entries: [
+      { ...entries[0], fullName: 'J*** A***', nickname: null, masked: true },
+      entries[1],
+      entries[2],
+    ],
+  },
+}

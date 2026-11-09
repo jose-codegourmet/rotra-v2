@@ -1,5 +1,17 @@
+import { Button } from '@rotra/ui/button'
 import { Notice } from '@rotra/ui/notice'
-export function ProfileNotFound({ id }: { id: string }) {
+export type ProfileNotFoundProps = { id: string; loginRequired?: boolean; onSignIn?: () => void }
+export function ProfileNotFound({ id, loginRequired, onSignIn }: ProfileNotFoundProps) {
+  if (loginRequired)
+    return (
+      <section className="flex flex-col gap-4">
+        <h1>Log in with ROTRA</h1>
+        <Notice>Log in with ROTRA to see this profile.</Notice>
+        <Button className="self-start" variant="primary" onClick={onSignIn}>
+          Sign in
+        </Button>
+      </section>
+    )
   return (
     <section className="flex flex-col gap-4">
       <h1>Profile not found</h1>

@@ -6,6 +6,7 @@ export const leaderboardRowVariants = cva(
     variants: {
       variant: {
         default: 'hover:bg-elev',
+        masked: 'cursor-default',
         me: 'bg-accent-subtle shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--accent)_45%,transparent)] hover:bg-accent-subtle',
         'medal-1':
           'min-h-[66px] bg-linear-to-r from-gold/15 to-transparent hover:from-gold/25 hover:to-elev',

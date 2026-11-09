@@ -5,6 +5,7 @@ export const privateContactCardMeta = {
   description:
     "The Private contact card on the Admin player detail: the player's login phone and email, how they sign in, and whether clubs see the phone.",
   usage: [
+    'Supports visitor privacy states for Player Information.',
     'Admin only. Pass the applied contacts; a pending or approved-but-unapplied request never changes what this card shows.',
     "Missing phone or email shows 'Not given'. Phones are E.164 and shown grouped.",
     "Phone shown to clubs: 'Yes, if provided' while unclaimed, otherwise the player's privacy choice.",

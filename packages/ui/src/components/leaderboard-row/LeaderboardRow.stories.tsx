@@ -78,3 +78,5 @@ export const LongNameAndNickname: Story = {
     levelLabel: 'Beginner Low',
   },
 }
+
+export const Masked: Story = { args: { fullName: 'J*** A***', nickname: null, masked: true } }

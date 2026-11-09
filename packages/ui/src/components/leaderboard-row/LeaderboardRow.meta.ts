@@ -5,6 +5,7 @@ export const leaderboardRowMeta = {
   description:
     'A selectable player row with avatar, global position, identity and shared rank; the signed-in player has an inset accent outline and You chip.',
   usage: [
+    'Supports visitor privacy states for Player Information.',
     'Use inside LeaderboardList for the overall ROTRA leaderboard.',
     'Pass isMe for the signed-in player.',
   ],

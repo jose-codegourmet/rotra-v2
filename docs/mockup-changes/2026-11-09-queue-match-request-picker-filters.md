@@ -1,6 +1,6 @@
 # Request a match: the partner / opponent picker gets tabs, a skill filter and a sort
 
-Status: IN MOCK APP — #585 (Q17.14, #603)
+Status: IN MOCK APP — #585 (PR #666)
 Date: 2026-11-09
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Public session page › Request a match › Choose partner / opponent

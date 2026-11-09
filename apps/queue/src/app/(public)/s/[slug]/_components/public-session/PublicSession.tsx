@@ -1,11 +1,19 @@
 'use client'
 
+import { useSession } from '@rotra/data/auth/use-session'
 import { isPermissionRefusal } from '@rotra/data/mock/errors'
 import { playerLoginUrl } from '@rotra/data/public-session/context'
 import { usePlayerSessionAccess } from '@rotra/data/public-session/player-access'
 import type { MyJoinRequest, PublicSessionPage } from '@rotra/data/public-session/types'
+import { useCancelMyJoinRequest } from '@rotra/data/public-session/useCancelMyJoinRequest'
+import { useJoinAsPlayer } from '@rotra/data/public-session/useJoinAsPlayer'
 import { useMyJoinRequest } from '@rotra/data/public-session/useMyJoinRequest'
-import { usePublicSession } from '@rotra/data/public-session/usePublicSession'
+import { useMyNight } from '@rotra/data/public-session/useMyNight'
+import {
+  usePublicSession,
+  useSignedInPublicSession,
+} from '@rotra/data/public-session/usePublicSession'
+import { isRealDataMode } from '@rotra/data/real/mode'
 import { EmptyState } from '@rotra/ui/empty-state'
 import { JoinRequestCard, type JoinRequestCardProps } from '@rotra/ui/join-request-card'
 import { Notice } from '@rotra/ui/notice'
@@ -19,6 +27,7 @@ import { PublicSessionHero } from '@rotra/ui/public-session-hero'
 import { PublicSessionQueue } from '@rotra/ui/public-session-queue'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { Tabs, TabsContent } from '@rotra/ui/tabs'
+import { toast } from '@rotra/ui/toaster'
 import { useEffect, useState } from 'react'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import { JoinRequestSheet } from '@/app/(public)/s/[slug]/_components/join-request-sheet/JoinRequestSheet'
@@ -63,34 +72,64 @@ const HERO_STATE = {
   cancelled: 'cancelled',
 } as const
 
+/** A signed-in ROTRA Player on the visitor's own page (D-2026-11-09-02): one tap, Cancel request. */
+type SignedInViewer = {
+  name: string
+  /** Request to join as NAME: sends straight away, no form */
+  onJoin: () => void
+  onCancelRequest: () => void
+  /** A send or cancel is in flight: the buttons stay disabled so a second tap is impossible */
+  busy: boolean
+}
+
 /** The join card variant: this visitor's own request first, then requests off, open or full. */
 function joinCardProps(
   page: PublicSessionPage,
   mine: MyJoinRequest | null | undefined,
   onRequestToJoin: () => void,
   offline: boolean,
+  signedIn?: SignedInViewer,
 ): JoinRequestCardProps | null {
   if (page.status !== 'prepared' && page.status !== 'active') return null
-  if (mine) {
-    if (mine.status === 'pending') return { variant: 'sent', name: mine.name }
+  // A cancelled or closed request is not a status: the card offers Request to join again.
+  if (mine && mine.status !== 'cancelled' && mine.status !== 'closed') {
+    if (mine.status === 'pending')
+      return signedIn
+        ? {
+            variant: 'sent',
+            name: mine.name,
+            onCancelRequest: signedIn.onCancelRequest,
+            disabled: offline || signedIn.busy,
+          }
+        : { variant: 'sent', name: mine.name }
     if (mine.status === 'declined') return { variant: 'declined' }
     return mine.waitlistPosition
-      ? { variant: 'confirmed-waitlist', waitlistPosition: mine.waitlistPosition }
+      ? {
+          variant: 'confirmed-waitlist',
+          waitlistPosition: mine.waitlistPosition,
+          signedIn: signedIn ? true : undefined,
+        }
       : { variant: 'confirmed-slot' }
   }
   if (!page.acceptJoinRequests) return { variant: 'off' }
+  const availability = signedIn
+    ? {
+        onRequestToJoin: signedIn.onJoin,
+        disabled: offline || signedIn.busy,
+        signedInName: signedIn.name,
+      }
+    : { onRequestToJoin, disabled: offline }
   if (page.status === 'active')
-    return { variant: 'active', skillMix: page.skillMix, onRequestToJoin, disabled: offline }
+    return { variant: 'active', skillMix: page.skillMix, ...availability }
   return page.openSlots > 0
     ? {
         variant: 'open',
         openSlots: page.openSlots,
         capacity: page.slotBudget,
         skillMix: page.skillMix,
-        onRequestToJoin,
-        disabled: offline,
+        ...availability,
       }
-    : { variant: 'full', skillMix: page.skillMix, onRequestToJoin, disabled: offline }
+    : { variant: 'full', skillMix: page.skillMix, ...availability }
 }
 
 /** The published slides as slide props; Off Day only when the publication included it. */
@@ -127,6 +166,18 @@ export function PublicSession({ slug, viewer, openJoin = false }: PublicSessionP
   const page = usePublicSession(slug, { visitor: viewer === 'visitor' })
   const mine = useMyJoinRequest(slug)
   const playerAccess = usePlayerSessionAccess(slug, viewer === 'visitor')
+  // The signed-in Player on the visitor's own page. Mock mode reads the mock Player sign-in; real
+  // mode has no Player session in this app yet, so no one-tap card there (the signed-in reads
+  // are mock only too).
+  const playerSession = useSession('player')
+  const viewerAccount =
+    viewer === 'visitor' && !isRealDataMode() && playerSession.data?.account.audience === 'player'
+      ? playerSession.data.account
+      : null
+  const signedInPage = useSignedInPublicSession(slug, viewerAccount?.id)
+  const night = useMyNight(slug, viewerAccount?.id)
+  const joinAsPlayer = useJoinAsPlayer(slug)
+  const cancelMyRequest = useCancelMyJoinRequest(slug)
   // A failed revalidation must never keep privileged roster data visible from the cache.
   const access =
     viewer === 'visitor' &&
@@ -184,7 +235,8 @@ export function PublicSession({ slug, viewer, openJoin = false }: PublicSessionP
   }
   const [joinOpen, setJoinOpen] = useState(openJoin && viewer === 'visitor')
 
-  const p = page.data
+  // The signed-in read when there is one; any failure leaves the visitor page.
+  const p = signedInPage.data ?? page.data
   // A cached copy keeps showing when a refetch fails (an offline visitor); without one, explain.
   if (!p && page.isError) {
     const notFound = isPermissionRefusal(page.error)
@@ -222,7 +274,41 @@ export function PublicSession({ slug, viewer, openJoin = false }: PublicSessionP
   const mode = MODES[p.mode]
   const cancelWhy = (p.cancelReason ?? '').replace(/[.\s]+$/, '')
   // Sending a request needs internet; the guest's own connection is the DevMenu toggle here.
-  const card = joinCardProps(p, mine.data, () => setJoinOpen(true), dev.offline)
+  const signedIn: SignedInViewer | undefined =
+    viewerAccount && night.data
+      ? {
+          name: viewerAccount.name,
+          busy: joinAsPlayer.isPending || cancelMyRequest.isPending,
+          onJoin: () =>
+            joinAsPlayer.mutate(
+              { playerId: viewerAccount.id },
+              {
+                onSuccess: (done) => toast(done.message),
+                onError: (error) => toast.error(error.message),
+              },
+            ),
+          onCancelRequest: () =>
+            cancelMyRequest.mutate(
+              { playerId: viewerAccount.id },
+              {
+                onSuccess: (done) => toast(done.message),
+                onError: (error) => toast.error(error.message),
+              },
+            ),
+        }
+      : undefined
+  // A signed-in Player's request comes from their account, not from this browser's guest request.
+  // Already confirmed or waitlisted without a request (added by the Queue Master): no join card.
+  const inSession = !!signedIn && night.data?.status !== 'none' && !night.data?.joinRequest
+  const card = inSession
+    ? null
+    : joinCardProps(
+        p,
+        signedIn ? night.data?.joinRequest : mine.data,
+        () => setJoinOpen(true),
+        dev.offline,
+        signedIn,
+      )
   const participants = (access?.fullRoster ? access.participants : p.participants).map((x, i) => ({
     id: String(i),
     ...x,
@@ -304,7 +390,8 @@ export function PublicSession({ slug, viewer, openJoin = false }: PublicSessionP
         open={joinOpen}
         onOpenChange={setJoinOpen}
         returned={openJoin && viewer === 'visitor'}
-        showPlayerLogin={viewer === 'visitor'}
+        showPlayerLogin={viewer === 'visitor' && !signedIn}
+        clubName={p.club.name}
       />
     </main>
   )

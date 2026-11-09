@@ -1,6 +1,6 @@
 # MVP decisions and tracking
 
-**Last verified:** 2026-11-08 (code trace of `main` @ `aca899f2`). This is the short decision register
+**Last verified:** 2026-11-08 (code trace of `main` @ `aca899f2`); decisions added 2026-11-09. This is the short decision register
 for MVP discussions. The [MVP hub](README.md) summarizes delivery; GitHub issues track implementation.
 Product rules and existing open-decision documents remain authoritative for their domains.
 
@@ -21,6 +21,15 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-08-04](#d-2026-11-08-04) | Scheduled jobs: Supabase pg_cron calls protected Route Handlers | approved | not started | #545; #546, #547 blocked | [Backend](workstreams/backend.md) |
 | [D-2026-11-08-06](#d-2026-11-08-06) | Player access to public Queue sessions | approved | implemented in source; authenticated real verification pending | #569 | [Queue](workstreams/queue.md) |
 | [D-2026-11-09-01](#d-2026-11-09-01) | Next-match picker after every result | approved | in progress | #579 | [Queue](workstreams/queue.md) |
+| [D-2026-11-09-02](#d-2026-11-09-02) | Signed-in Players on the session page: full names and one-tap join | approved | not started | needed | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
+| [D-2026-11-09-03](#d-2026-11-09-03) | Players check themselves in, leave, and say they can't make it | approved | not started | needed | [Queue](workstreams/queue.md) |
+| [D-2026-11-09-04](#d-2026-11-09-04) | The player's live view: My night, Courts now, own standing, refresh only | approved | not started | needed | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
+| [D-2026-11-09-05](#d-2026-11-09-05) | Match requests | approved | not started | needed | [Queue](workstreams/queue.md) |
+| [D-2026-11-09-06](#d-2026-11-09-06) | Registration from session and club links, guest linking and club membership | approved | not started | needed | [Player](workstreams/player.md), [Queue](workstreams/queue.md) |
+| [D-2026-11-09-07](#d-2026-11-09-07) | Public or private player profile | approved | not started | needed | [Player](workstreams/player.md) |
+| [D-2026-11-09-08](#d-2026-11-09-08) | Sharing: links, QR codes and post/story images | approved | not started | needed | [Player](workstreams/player.md), [Queue](workstreams/queue.md) |
+| [D-2026-11-09-09](#d-2026-11-09-09) | Keeping the session page cheap to serve | approved | not started | needed | [Queue](workstreams/queue.md), [Backend](workstreams/backend.md) |
+| [D-2026-11-09-10](#d-2026-11-09-10) | Uploaded pictures: keep only the current and the previous | approved | not started | needed | [Player](workstreams/player.md), [Queue](workstreams/queue.md), [Backend](workstreams/backend.md) |
 
 ## Status conventions
 
@@ -221,3 +230,166 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 - **Roadmap:** MVP — [Queue](workstreams/queue.md).
 - **Decision:** (1) Left and right are two equal options; neither is preferred. (2) Candidates are the first two waiting matches in Main Queue order that are ready for the freed court (one court needed, not blocked), the same readiness check Auto Queue and Q-CHOOSE-MATCH use; no new ranking or pairing rules. (3) The picker opens after every confirmed result, in both Manual Queue and Auto Queue. Picking places the match On court (getting ready, never started); Skip for now places nothing and Auto Queue then fills that court as usual.
 - **References:** [Q-NEXT-MATCH](../screens/product/modules/queue/match-control.md#q-next-match--next-match-picker-after-a-result), [court filling rule](../business_logic/product/queue/modules/queueing/README.md#auto-queue-and-manual-queue-court-filling), [mockup log](../mockup-changes/2026-11-09-queue-next-match-picker.md).
+
+<a id="d-2026-11-09-02"></a>
+### D-2026-11-09-02 — Signed-in Players on the session page: full names and one-tap join
+- **Decision status:** approved (owner discussion, November 9, 2026; the owner chose every recommended option)
+- **Implementation status:** not started
+- **Ticket:** needed (mockup change first, then tickets from its `NEW` logs)
+- **Roadmap:** MVP (owner, November 9, 2026: added to the scope frozen by [D-2026-11-07-04](#d-2026-11-07-04)) — [Queue](workstreams/queue.md), [Player](workstreams/player.md)
+- **Supersedes:** in part [D-2026-11-07-06](#d-2026-11-07-06) (names masked for everyone), [D-2026-11-08-06](#d-2026-11-08-06) (names masked for every audience; full roster only for confirmed players) and [D-2026-11-07-07](#d-2026-11-07-07) (a join request does not carry the signed-in player).
+- **Decision:**
+  - **Full names, for registered players only.** The full names of registered ROTRA players show only to signed-in ROTRA players. The viewer doesn't have to be confirmed in the session. Registered players show their full name with the nickname under it. Guests stay masked (`J*** A***`) for everyone. Anyone who isn't signed in sees every name masked.
+  - **Full roster when signed in.** Signing in removes the three-row cap. The owner's flow: a signed-in player "sees full roster with full names".
+  - **No privacy setting for this in v1.** The registration form says: "Your full name shows to signed-in ROTRA players on sessions you join."
+  - **One-tap join.** A signed-in player sees **Request to join as <name>** with no form. The request carries their account. The owner's words: "the player already has a rotra account. why would they need to sign up again?" The QM's request card shows "ROTRA player · already in your club" or "new to your club", plus their shared rank as a hint. The QM still sets the level for the night and still confirms or declines. Logging in never grants a slot.
+  - **Spam limit.** One open join request per account per session.
+- **References:** [Public session screens](../screens/product/modules/queue/public-session.md), [Players › Join requests](../business_logic/product/queue/modules/players/README.md#join-requests-from-the-session-link), [Players › Public participant names](../business_logic/product/queue/modules/players/README.md#public-participant-names). Profile privacy: [D-2026-11-09-07](#d-2026-11-09-07).
+
+<a id="d-2026-11-09-03"></a>
+### D-2026-11-09-03 — Players check themselves in, leave, and say they can't make it
+- **Decision status:** approved (owner discussion, November 9, 2026)
+- **Implementation status:** not started
+- **Ticket:** needed
+- **Roadmap:** MVP (owner, November 9, 2026: added to the scope frozen by [D-2026-11-07-04](#d-2026-11-07-04)) — [Queue](workstreams/queue.md)
+- **Decision:**
+  - **Self check-in.** During a live session, a confirmed signed-in player who isn't present sees a large **I'm here** button. Tapping it sets Present directly. The QM's roster shows a small "checked in themselves" mark and the QM can undo it. The club can turn self check-in off. Check-in is a tap only, with no location check and no venue QR scan.
+  - **Disagreements.** The QM's last action wins. A self check-in made after the QM turned Present off shows as a new check-in with the mark.
+  - **QM offline.** The player's page says "Checked in · the QM will see it when their device syncs". The QM's roster shows the check-in after the next sync.
+  - **I'm leaving** (during play) turns Present off and tells the QM. Afterwards the page says "You've left · tap I'm here if you come back". There's no separate "taking a break" control.
+  - **Cancel request** while the join request is pending.
+  - **I can't make it** (confirmed, before the session starts) sends a drop-out notice that the QM sees under **Requests**. The slot frees only when the QM removes the player. Players never take or release slots themselves.
+  - **Who may write.** The server checks every Player-side write (check-in, I'm leaving, match request, drop-out notice): the signed-in player must be linked to an unreleased roster slot in that session. Each player has at most one open drop-out notice at a time.
+  - **Finishing a session** closes every pending drop-out notice, match request and join request. They stay on the record but aren't shown.
+  - **Guests** get none of this. They keep today's request status card, plus the nudge "Register to check in and see your matches."
+- **References:** [product terms](../product-terms.md) Present / Available, [Players › Presence](../business_logic/product/queue/modules/players/README.md), [offline module](../business_logic/product/queue/modules/offline/README.md).
+
+<a id="d-2026-11-09-04"></a>
+### D-2026-11-09-04 — The player's live view: My night, Courts now, own standing, refresh only
+- **Decision status:** approved (owner discussion, November 9, 2026)
+- **Implementation status:** not started
+- **Ticket:** needed
+- **Roadmap:** MVP (owner, November 9, 2026: added to the scope frozen by [D-2026-11-07-04](#d-2026-11-07-04)) — [Queue](workstreams/queue.md), [Player](workstreams/player.md)
+- **Decision:**
+  - **No live updates.** The owner's words: "player view is never live." The page refreshes only its data, never the whole page. The player can pull down or tap **Refresh**, at most once every 10 seconds, and it also refreshes when they come back to the tab. A thin bar shows "Updated 7:42 PM · Refresh", adding "Venue changes haven't synced yet" when the server knows the venue has changes it hasn't received. The QM still calls names out loud. No polling, no push notifications and no Supabase Realtime.
+  - **Where it goes.** A **My night** card sits above the Details and Participants tabs. **Courts now** and the read-only **Queue** go inside Details. No new tab.
+  - **My night card, by stage:**
+    - Present: "3 of 6 games played · 2W 1L", then "In queue #3 · with A vs B, C" (or "Not in a queued match"), with **Request a match** and **I'm leaving**.
+    - On court: "You're on Court 2 · with A vs B, C", highlighted.
+    - After the minimum: "6 of 6 · Minimum reached", then "7 games · minimum 6". The count matches the QM roster's count.
+  - **Courts now** shows each court's players (names as in [D-2026-11-09-02](#d-2026-11-09-02)) and "Started 7:31 PM". No score and no running time.
+  - **Own standing only.** During the session, the player sees only their own line, with no position and no one else's results. After the QM publishes, they see the published Standings with their own row highlighted. Unpublished results stay out of the page data. If results are never published: "Results for this session have not been shared." The player's own games remain in their Player Information match history.
+  - **Finished:** "Session finished · 7 games · 4W 3L", Standings once they're published, and a link to Match history.
+  - **My sessions.** Their own profile in the Player app has a **My sessions** card listing the upcoming and live sessions they requested, are confirmed in or are waitlisted in, each linking to `/s/<slug>`. It loads once when the profile opens. A player confirmed in two sessions the same night sees both. An approved join request shows on that player's next refresh.
+- **References:** [Public session screens](../screens/product/modules/queue/public-session.md) (Signed-in Player access), [results sharing](../screens/product/modules/queue/results-sharing.md). Server load: [D-2026-11-09-09](#d-2026-11-09-09).
+
+<a id="d-2026-11-09-05"></a>
+### D-2026-11-09-05 — Match requests
+- **Decision status:** approved (owner discussion, November 9, 2026)
+- **Implementation status:** not started
+- **Ticket:** needed
+- **Roadmap:** MVP (owner, November 9, 2026: added to the scope frozen by [D-2026-11-07-04](#d-2026-11-07-04)) — [Queue](workstreams/queue.md)
+- **Decision:**
+  - **What it is.** A present, signed-in, confirmed player can send **Request a match**. In the sheet they pick:
+    - the format, if the session has more than one;
+    - a partner and opponents from the present players (doubles: 1 partner and 2 opponents; singles: 1 opponent), or leave a spot as "Anyone".
+
+    Once it's sent, the player sees "Match request sent · the QM decides", with **Cancel**.
+  - **Who sees presence.** Presence shows only inside that picker, and only to signed-in confirmed players. Players on a court or already in a waiting match can still be picked.
+  - **Limits.** One open match request per player. The other players named aren't asked to agree and aren't told. Only the QM sees requests.
+  - **QM side.** One **Requests · N** button with **Join** and **Match** tabs. Drop-out notices show there too, and self check-ins show on the roster. Counts arrive with the QM's existing refresh, with no extra requests. Each match request card shows each player's games played against the minimum, their level, and "On Court 2" or "In queue #3" where it applies. The QM taps **Add to queue**, which makes it a waiting match, or **Decline**. The QM judges fairness, and the server doesn't block requests.
+  - **Closing.** A request closes by itself when anyone named stops being present, or when the session ends.
+- **Name:** **Match request**, distinct from Join request.
+- **References:** [matches module](../business_logic/product/queue/modules/matches/), [queueing module](../business_logic/product/queue/modules/queueing/).
+
+<a id="d-2026-11-09-06"></a>
+### D-2026-11-09-06 — Registration from session and club links, guest linking and club membership
+- **Decision status:** approved (owner discussion, November 9, 2026)
+- **Implementation status:** not started
+- **Ticket:** needed
+- **Roadmap:** MVP (owner, November 9, 2026: added to the scope frozen by [D-2026-11-07-04](#d-2026-11-07-04)) — [Player](workstreams/player.md), [Queue](workstreams/queue.md)
+- **Supersedes:** in part the [#490](https://github.com/jose-codegourmet/rotra-v2/issues/490) rule in [D-2026-11-07-07](#d-2026-11-07-07) that registration only opens from a club invitation and always keeps the guest record unlinked.
+- **Decision:**
+  - **Three ways in from the session page:** **Continue as guest**, **Log in with ROTRA Player** and **Register with ROTRA**. Registering opens the registration form under the session's club and returns to `/s/<slug>` signed in, with the request ready to send. Guests are kept.
+  - **Club membership, in the owner's words:** "A guest should be binded by a club id. if they happen to click the registration link from that club. then they are registered via that club. if they happen to register via admin link. then they will have not club affiliated with it. BUT..... if the club owner happens to pull their records from the rotra system, then they will be part of that club. players CAN have multiple clubs."
+    - Registering through a club's link or a session link adds the player to that club's Saved players, marked "Joined via club link" or "Joined via session link".
+    - Registering through the Admin link gives no club.
+    - A club can add a registered player by RTR ID, QR or phone without the player's approval. Being in a club's Saved players is what makes them part of that club. If the club deletes them from Saved players, they leave the club.
+    - A player can belong to several clubs.
+  - **Linking guest history.** When a guest registers through a club's link, the server looks for a likely match by phone. The QM sees "Is this <name> from your saved players?" and taps **Link** once, and only then does the guest history merge. The QM can also link by hand ("Link to saved player…") when the guest left no phone. Nothing merges automatically. Earlier valid games then count as the October 28, 2026 decision already says.
+  - **RTR ID location for Admin-link registrations.** The form asks for their city or province, picked from the same location list clubs use, and the ID uses that. Club-link registrations keep the club's location.
+  - **Email confirmation.** The player is signed in right away and confirms the email later. A banner keeps asking until they do, and some actions (for example a contact change) wait until it's confirmed. Supabase sends auth emails through a proper email provider (for example Amazon SES or Resend), not the built-in testing email. Which provider is chosen when it's set up.
+  - **Spam.** Limit registrations per device or network for each hour.
+  - **Your clubs** shows on the player's own profile only, with **Leave club** (removes them from that club's Saved players; past games stay) and **Report a problem** for each club.
+  - **Report a problem** opens an email to ROTRA support, with the club name and RTR ID filled in. There's no table and no Admin screen in v1. **The support address is a placeholder; the owner supplies it before the real-app ticket ships.**
+  - **Ranking risk accepted.** A club that adds a player can record games that count toward that player's shared rank. This is accepted for v1. The protection is Report a problem, plus Admin marking that club's sessions invalid.
+  - **Names for the three invites:** **Registration invite** (per guest, already exists), **Club invite link** and **Session invite** (see [D-2026-11-09-08](#d-2026-11-09-08)).
+- **References:** [registration screens](../screens/product/modules/player-information/access-registration.md), [identity module](../business_logic/product/player-information/modules/identity/README.md), [product terms](../product-terms.md) (Registration invite, Unclaimed profile, RTR ID).
+
+<a id="d-2026-11-09-07"></a>
+### D-2026-11-09-07 — Public or private player profile
+- **Decision status:** approved (owner discussion, November 9, 2026)
+- **Implementation status:** not started
+- **Ticket:** needed
+- **Roadmap:** MVP (owner, November 9, 2026: added to the scope frozen by [D-2026-11-07-04](#d-2026-11-07-04)) — [Player](workstreams/player.md)
+- **Decision:**
+  - **The switch.** A player chooses **Public** or **Private**, on the **Privacy and contact** page next to the phone privacy switch. Profiles are public by default. In the owner's words, "private means guests dont see their rotra profile". Signed-in ROTRA players still see a private profile.
+  - **What a visitor sees** (not signed in). One rule everywhere: private players and guests are masked and don't open. That covers the leaderboard, other players' profiles and match history, share images, and club result images.
+    - **Leaderboard:** a private player keeps their position, but the name is masked and the row doesn't open. Name search doesn't match them.
+    - **RTR ID search:** a private player's ID gives the same neutral "Profile not found" as an unknown ID.
+    - **A shared link** to a private profile shows "Log in with ROTRA to see this profile." There are no share tokens.
+    - **Club Standings and Awards images:** private players show masked. Guests stay as the club shows them today.
+- **References:** [Player profile screens](../screens/product/modules/player-information/profile.md), [identity and privacy screens](../screens/product/modules/player-information/identity-privacy.md), [ranking and history screens](../screens/product/modules/player-information/ranking-history.md).
+
+<a id="d-2026-11-09-08"></a>
+### D-2026-11-09-08 — Sharing: links, QR codes and post/story images
+- **Decision status:** approved (owner discussion, November 9, 2026)
+- **Implementation status:** not started
+- **Ticket:** needed
+- **Roadmap:** MVP (owner, November 9, 2026: added to the scope frozen by [D-2026-11-07-04](#d-2026-11-07-04)) — [Player](workstreams/player.md), [Queue](workstreams/queue.md)
+- **Decision:**
+  - **What every share offers**, in the owner's words: "share by link", "share by QR", and "sharing pictures such as fb posts and ig stories posts… follow the ratio". Images reuse the Session QR share card's **Post | Story** switch: 4:5 (1080 × 1350) and 9:16 (1080 × 1920), on the fixed dark brand card. Every invitation image has a QR ("anything invitation is always a QR"). Info images also carry a small corner QR that opens the player's profile, which follows the privacy setting.
+  - **A player can share:**
+    - **Rank card:** level, overall position and ladder.
+    - **My session result:** position in the published Standings, games, W–L. It appears only after the QM publishes.
+    - **Session games:** one card per session with date, club, each game (partner, opponents, score, or "Winner recorded") and W–L, shared from the session group in Match history. It also appears only after the QM publishes.
+    - **Other players' names** on these images show the way a visitor would see them ([D-2026-11-09-07](#d-2026-11-09-07)).
+  - **Session invite.** Confirmed and waitlisted players can invite someone with the session's share card, "<name> invites you to play". The link carries a short random invite code, one per player and session, created the first time they tap Share, stored in a small table and never the RTR ID. The QM's join request card shows "Invited by <name>". `invite` joins the values allowed through the login and registration round trip (with `tab` and `join`). **Invite** is hidden when requests are off or the session has finished. When the session is full, the card says "Waitlist open".
+  - **Club invite link.** One standing link per club (`/register/[clubId]`) with a club share card (QR, Post | Story). It's in the club settings, plus **Share club invite** on the dashboard.
+    - A new person registers through it and joins the club's Saved players ([D-2026-11-09-06](#d-2026-11-09-06)).
+    - A signed-in ROTRA player who opens it sees "Join <club>?" and taps once to join.
+    - **Regenerate link** stops the old link, and its QR images, from working.
+  - **How images are made.** They're drawn on the phone, as the Session QR card already is, so there's no server cost. On phones, **Share** opens the phone's share sheet with the image attached, using the browser's built-in Web Share feature with no new dependency. Elsewhere, and in in-app browsers that don't support it, the button falls back to **Download image**. This hasn't been verified on real phones yet.
+  - **Link previews.** One fixed branded preview image per type (session, club, profile), with a dynamic title only. There are no per-page generated preview images.
+- **References:** [session QR share card log](../mockup-changes/2026-11-08-queue-session-qr-share-card.md), [results sharing screens](../screens/product/modules/queue/results-sharing.md).
+
+<a id="d-2026-11-09-09"></a>
+### D-2026-11-09-09 — Keeping the session page cheap to serve
+- **Decision status:** approved (owner discussion, November 9, 2026). The owner's priorities: "less server stress", "less server costs", "optimal QM and Player UX".
+- **Implementation status:** not started
+- **Ticket:** needed
+- **Roadmap:** MVP (owner, November 9, 2026: added to the scope frozen by [D-2026-11-07-04](#d-2026-11-07-04)) — [Queue](workstreams/queue.md), [Backend](workstreams/backend.md)
+- **Decision:**
+  - **Split the page data in two.** A shared session snapshot (details, courts, queue, roster) is cached on the server for about 10 seconds. It comes in two versions per session: one for visitors (everything masked) and one for signed-in players (registered full names). A small personal part (my status, my games, my requests) isn't cached.
+  - **Cost for one session of 24 players over 3 hours:** about 2,000 requests, mostly answered from the cache. If 24 players refresh at once, that costs about one database read.
+  - **The sign-in check** on each refresh happens on the server itself (Supabase `getClaims`), without asking Supabase each time.
+  - **The QM side** gets Requests counts with its existing refresh.
+  - **Not used:** Supabase Realtime, polling, push notifications, scheduled jobs.
+- **References:** [architecture](../architecture.md) (no Supabase Realtime; Player access to a public Queue session).
+
+<a id="d-2026-11-09-10"></a>
+### D-2026-11-09-10 — Uploaded pictures: keep only the current and the previous
+- **Decision status:** approved (owner discussion, November 9, 2026). In the owner's words: "to save money on storage. everytime a user uploads image for avatar or club photo only 2 will be saved: current and previous."
+- **Implementation status:** not started
+- **Ticket:** needed
+- **Roadmap:** MVP (owner, November 9, 2026: added to the scope frozen by [D-2026-11-07-04](#d-2026-11-07-04)) — [Player](workstreams/player.md), [Queue](workstreams/queue.md), [Backend](workstreams/backend.md)
+- **Supersedes:** in part [Club logo persistence (#374)](../database_design/product/admin/modules/clubs-licenses.md#club-logo-persistence-374), which keeps every previous logo for historical result snapshots, and the keep-everything behavior of [D-2026-11-08-03](#d-2026-11-08-03).
+- **Decision:**
+  - **What it covers.** Every user upload: player pictures (`player-avatars`), club logos (`club-logos`) and court pictures (kept per court), whether a player, a club or Admin uploads them.
+  - **Use previous picture.** One tap in the picker swaps current and previous. Choosing a character or initials, or tapping **Remove**, makes the last photo the previous one, so it can be brought back. Characters and initials store no file.
+  - **Cleanup.** In the same request, right after the new picture is saved, the server lists that owner's folder and deletes every file that isn't current or previous. A failed delete is cleaned up on the next upload. Extra files that exist today get cleared the same way, on each owner's next upload. There's no scheduled job.
+  - **Storage.** A small migration adds one column next to each current reference (`avatar_previous_ref`, `logo_previous_ref`, and the same for court pictures).
+  - **Old result images.** A result snapshot whose logo file is gone shows the club's current logo, or its initials.
+  - **Stale caches are accepted.** A deleted picture may still show for a while in Facebook previews or browser caches. The app itself never points to a deleted file.
+- **Scale note:** 10,000 players × 2 pictures × about 200 KB comes to about 4 GB.
+- **References:** [profile picture storage](../database_design/product/player-information/modules/identity.md#profile-picture-storage-542), [club logo persistence](../database_design/product/admin/modules/clubs-licenses.md#club-logo-persistence-374), [court pictures log](../mockup-changes/2026-11-08-queue-setup-court-pictures.md).

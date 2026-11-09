@@ -67,6 +67,29 @@ export const SavedPlayerActions: Story = {
     onInvite: () => {},
   },
 }
+/** Guest record: footer gains Link to saved player…. */
+export const GuestWithLink: Story = {
+  args: propsFor(storyIdentityPlayers.guest, {
+    sessionsHere: 1,
+    onLinkToSavedPlayer: fn(),
+    onDelete: fn(),
+  }),
+}
+/** Unclaimed profile: no Link to saved player… even if the handler were passed. */
+export const UnclaimedNoLink: Story = {
+  args: propsFor(storyIdentityPlayers.unclaimed, { sessionsHere: 5, onDelete: fn() }),
+}
+/** Guest opened from inside another dialog: Back to match, no Link to saved player…. */
+export const GuestOpenedFromMatch: Story = {
+  args: propsFor(storyIdentityPlayers.guest, {
+    sessionsHere: 1,
+    backLabel: 'match',
+    onBack: fn(),
+    onLinkToSavedPlayer: fn(),
+  }),
+}
+export const JoinedViaClubLink: Story = { args: { joinedVia: 'club' } }
+export const JoinedViaSessionLink: Story = { args: { joinedVia: 'session' } }
 export const GuestWithInvite: Story = {
   decorators: [
     (Story) => (

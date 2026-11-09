@@ -60,6 +60,10 @@ export const Guest: Story = { args: propsFor(byIdentity('guest'), 1) }
 export const LookupPending: Story = {
   args: { ...propsFor(byIdentity('guest'), 0), identity: 'pending', registeredCity: null },
 }
+export const JoinedViaClubLink: Story = { args: { joinedVia: 'club' } }
+export const JoinedViaSessionLink: Story = { args: { joinedVia: 'session' } }
+/** No joinedVia: "Added by the club". */
+export const AddedByTheClub: Story = { args: { joinedVia: null } }
 export const PlayingNow: Story = { args: { live: { kind: 'playing', text: 'Playing · Court 1' } } }
 export const AtTheSession: Story = { args: { live: { kind: 'waiting', text: 'At the session' } } }
 export const NoLevel: Story = { args: { level: null } }

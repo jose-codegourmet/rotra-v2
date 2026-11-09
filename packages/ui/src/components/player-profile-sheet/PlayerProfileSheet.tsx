@@ -7,6 +7,7 @@ import { IdentityChip } from '@rotra/ui/identity-chip'
 import type { Identity } from '@rotra/ui/identity-chip/variants'
 import { KeyValueList } from '@rotra/ui/key-value-list'
 import { levelLabel } from '@rotra/ui/level-pill'
+import { JOINED_VIA_TEXT } from '@rotra/ui/saved-player-card'
 import { Sheet } from '@rotra/ui/sheet'
 import { toast } from '@rotra/ui/toaster'
 
@@ -27,6 +28,8 @@ export type PlayerProfileSheetProps = {
   sessionsHere: number
   /** The player hid their phone. The number itself is never passed to this component */
   phoneHidden: boolean
+  /** How they joined; null or absent reads "Added by the club" */
+  joinedVia?: 'club' | 'session' | null
   /** Opened from a dialog: the footer offers Back to that dialog instead of Close */
   backLabel?: 'suggestion' | 'match' | 'payments'
   onBack?: () => void
@@ -36,6 +39,8 @@ export type PlayerProfileSheetProps = {
   onEdit?: () => void
   /** Delete player, any saved player; hidden when opened from another dialog */
   onDelete?: () => void
+  /** Opens the Link to saved player… sheet. Pass only for a guest's record, and not when opened from another dialog. */
+  onLinkToSavedPlayer?: () => void
   /** The delete is being checked or saved */
   deleting?: boolean
   /** Absolute ROTRA Player registration link. Guests get an Invite to ROTRA section; hidden when absent. */
@@ -63,11 +68,13 @@ export function PlayerProfileSheet({
   addedLabel,
   sessionsHere,
   phoneHidden,
+  joinedVia = null,
   backLabel,
   onBack,
   onInvite,
   onEdit,
   onDelete,
+  onLinkToSavedPlayer,
   deleting = false,
   inviteUrl,
 }: PlayerProfileSheetProps) {
@@ -110,6 +117,9 @@ export function PlayerProfileSheet({
               Delete player
             </Button>
           ) : null}
+          {identity === 'guest' && onLinkToSavedPlayer && !backLabel ? (
+            <Button onClick={onLinkToSavedPlayer}>Link to saved player…</Button>
+          ) : null}
           {canInvite && onEdit ? <Button onClick={onEdit}>Edit details</Button> : null}
           {canInvite && onInvite ? (
             <Button variant="primary" onClick={onInvite}>
@@ -149,6 +159,7 @@ export function PlayerProfileSheet({
           { label: 'Added to club', value: addedLabel },
           { label: 'Sessions here', value: sessionsHere },
           { label: 'Phone', value: phone },
+          { label: 'Joined', value: JOINED_VIA_TEXT[joinedVia ?? 'club-added'] },
         ]}
       />
       {identity === 'guest' && inviteUrl ? (

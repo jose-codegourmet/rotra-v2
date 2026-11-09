@@ -15,7 +15,7 @@ export function savedPlayerWeekStart(now: number): number {
 
 /** Count saved records, not names or session appearances. Filters never enter this calculation. */
 export function deriveSavedPlayerStats(
-  players: readonly ClubPlayer[],
+  players: readonly Omit<ClubPlayer, 'picture'>[],
   clubId: string,
   now: number,
 ): SavedPlayerStats {

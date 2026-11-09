@@ -1,4 +1,4 @@
-import type { ClubPlayer } from '../club-player/clubPlayer.types'
+import type { ClubPlayer, JoinedVia } from '../club-player/clubPlayer.types'
 import { PLAYING_LEVELS, type Player, type PlayingLevel } from '../player/player.types'
 import seed from './players.seed.json'
 
@@ -249,8 +249,20 @@ const savedClubPlayers = [
   },
 ] satisfies ClubPlayer[]
 
+/**
+ * Joined via seeds (D-2026-11-09-06), by player ID. The prototype's Iya Mercado and Andi Cruz share
+ * their RTR IDs with Derrick (…-0055, club link) and Trixie (…-0061, session link) here; the
+ * prototype's Lance Ybañez (…-0085) has no saved player in this pool. Everyone else: added.
+ */
+const joinedViaSeeds: Record<string, JoinedVia> = {
+  'b181416a-4006-5133-a6a3-521c33a16273': 'club',
+  'd0c2f1f2-5868-5260-b8dc-f9c8a75c3a58': 'session',
+}
+const seededJoinedVia = (playerId: string): JoinedVia => joinedViaSeeds[playerId] ?? 'added'
+
 export const clubPlayers = savedClubPlayers.map((player, index) => ({
   ...player,
+  joinedVia: seededJoinedVia(player.playerId),
   // The final three additions are recent on every fresh mock-store load, even just after Monday.
   addedAt: index >= 20 ? savedPlayersSeededAt : savedPlayersSeededAt - (30 + index) * 86_400_000,
 }))

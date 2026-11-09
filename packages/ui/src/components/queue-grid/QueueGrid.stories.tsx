@@ -1,11 +1,12 @@
 import type { MatchCardFixture } from '@rotra/data/fixtures/match-cards'
 import { queueGridFixtures } from '@rotra/data/fixtures/queue-grid'
+import { QueueSearchField } from '@rotra/ui/queue-search-field'
 import type { PlayerWait } from '@rotra/ui/player-face-button'
 import type { SwapSlot } from '@rotra/ui/swap-sides-area'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 import { fn } from 'storybook/test'
-import { QueueGrid, type QueueGridMatch, type QueueGridProps } from './QueueGrid'
+import { matchHasPlayer, QueueGrid, type QueueGridMatch, type QueueGridProps } from './QueueGrid'
 
 const matchFor = (c: MatchCardFixture): QueueGridMatch => ({
   id: c.match.id,
@@ -162,3 +163,25 @@ export const Desktop: Story = {
   render: (args) => <LiveQueueGrid {...args} />,
   globals: { viewport: { value: 'desktop' } },
 }
+
+export const SearchHit: Story = { args: { searchText: waiting[0]?.teamA[0]?.name ?? '' } }
+export const SearchMiss: Story = { args: { searchText: 'No such player' } }
+export const SearchHitLight: Story = { ...SearchHit, globals: { theme: 'light' } }
+export const SearchMissLight: Story = { ...SearchMiss, globals: { theme: 'light' } }
+
+export const InteractiveSearch: Story = {
+  render: (args) => {
+    const [text, setText] = useState('')
+    return (
+      <div className="flex flex-col gap-3">
+        <QueueSearchField
+          value={text}
+          onChange={setText}
+          matchCount={args.matches.filter((match) => matchHasPlayer(match, text)).length}
+        />
+        <QueueGrid {...args} searchText={text} />
+      </div>
+    )
+  },
+}
+export const InteractiveSearchLight: Story = { ...InteractiveSearch, globals: { theme: 'light' } }

@@ -4,7 +4,7 @@ import { cn } from '@rotra/ui/cn'
 import { MatchCard, type MatchCardFlow, type MatchCardProps } from '@rotra/ui/match-card'
 import { SwapSidesArea, type SwapSlot } from '@rotra/ui/swap-sides-area'
 import { useQueueColumns } from '@rotra/ui/upcoming-queue-row'
-import { type KeyboardEvent, type PointerEvent, useRef, useState } from 'react'
+import { type KeyboardEvent, type PointerEvent, useEffect, useRef, useState } from 'react'
 
 /** A waiting match as the grid draws it; the grid supplies position, flow arrow and the handle. */
 export type QueueGridMatch = Omit<
@@ -21,6 +21,7 @@ export type QueueGridProps = {
   onSwapSides?: (matchId: string, from: SwapSlot, to: SwapSlot) => void
   /** Fixes the column count instead of reading it from the window width (stories, tests) */
   columns?: number
+  searchText?: string
   className?: string
 }
 
@@ -37,6 +38,17 @@ export function snakePlacement(i: number, count: number, cols: number) {
   return { row, col, flow }
 }
 
+/** Match a player's full name or displayed nickname without changing the queue. */
+export function matchHasPlayer(match: Pick<QueueGridMatch, 'teamA' | 'teamB'>, text: string) {
+  const query = text.trim().toLocaleLowerCase()
+  return (
+    query !== '' &&
+    [...match.teamA, ...match.teamB].some((p) =>
+      `${p.name} ${p.shortName}`.toLocaleLowerCase().includes(query),
+    )
+  )
+}
+
 type Drag = { id: string; x: number; y: number; dx: number; dy: number; targetId: string | null }
 
 /**
@@ -44,11 +56,31 @@ type Drag = { id: string; x: number; y: number; dx: number; dy: number; targetId
  * arrows. Drag a card by its ⠿ handle (mouse or touch) onto another card to take its place, or
  * press ← / ↑ and → / ↓ on the focused handle to move one place; focus stays on the handle.
  */
-export function QueueGrid({ matches, onMove, onSwapSides, columns, className }: QueueGridProps) {
+export function QueueGrid({
+  matches,
+  onMove,
+  onSwapSides,
+  columns,
+  searchText = '',
+  className,
+}: QueueGridProps) {
   const [gridRef, measured] = useQueueColumns<HTMLDivElement>()
   const cols = Math.max(1, columns ?? measured)
   const [drag, setDrag] = useState<Drag | null>(null)
   const dragRef = useRef<Drag | null>(null)
+  const rootRef = useRef<HTMLDivElement>(null)
+  const query = searchText.trim().toLocaleLowerCase()
+  useEffect(() => {
+    if (query)
+      rootRef.current
+        ?.querySelector<HTMLElement>('[data-search-hit="true"]')
+        ?.scrollIntoView({
+          block: 'nearest',
+          behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+            ? 'instant'
+            : 'smooth',
+        })
+  }, [query])
 
   const update = (next: Drag | null) => {
     dragRef.current = next
@@ -104,7 +136,7 @@ export function QueueGrid({ matches, onMove, onSwapSides, columns, className }: 
   if (matches.length === 0) return null
 
   return (
-    <div className={cn('flex flex-col gap-3', className)}>
+    <div ref={rootRef} className={cn('flex flex-col gap-3', className)}>
       <p className="text-[13px] text-fg2">{QUEUE_GRID_HELP}</p>
       <div
         ref={gridRef}
@@ -116,9 +148,17 @@ export function QueueGrid({ matches, onMove, onSwapSides, columns, className }: 
           const dragging = drag?.id === m.id
           const target = drag?.targetId === m.id
           const { id, ...rest } = m
+          const hit = query !== '' && matchHasPlayer(m, query)
+          const highlightedPlayerIds = hit
+            ? [...m.teamA, ...m.teamB]
+                .filter((p) => `${p.name} ${p.shortName}`.toLocaleLowerCase().includes(query))
+                .map((p) => p.id)
+            : []
           const card = (
             <MatchCard
               {...rest}
+              searchState={query ? (hit ? 'hit' : 'dim') : undefined}
+              highlightedPlayerIds={highlightedPlayerIds}
               position={i + 1}
               flow={flow}
               handleProps={handleProps(id, i)}
@@ -129,6 +169,7 @@ export function QueueGrid({ matches, onMove, onSwapSides, columns, className }: 
             <div
               key={id}
               data-queue-id={id}
+              data-search-hit={hit || undefined}
               style={{
                 gridRow: row + 1,
                 gridColumn: col + 1,

@@ -86,6 +86,9 @@ export type MatchCardProps = {
   draft?: MatchCardDraft
   /** Public queue: static faces, no drag handle, actions or operator origin metadata. */
   readOnly?: boolean
+  /** Search highlights matching players without changing the match. */
+  searchState?: 'hit' | 'dim'
+  highlightedPlayerIds?: string[]
   className?: string
 }
 
@@ -105,7 +108,9 @@ function Faces({
   team,
   swappable,
   onSelectPlayer,
+  highlightedPlayerIds = [],
 }: {
+  highlightedPlayerIds?: string[]
   players: MatchCardPlayer[]
   team: MatchCardTeam
   swappable: boolean
@@ -124,6 +129,11 @@ function Faces({
             label={`${p.name}, Team ${team}. View profile`}
             size="queue"
             wait={p.wait}
+            className={
+              highlightedPlayerIds.includes(p.id)
+                ? '[&>:first-child]:!ring-[3px] [&>:first-child]:!ring-warn [&>:nth-child(2)]:!font-extrabold [&>:nth-child(2)]:!text-warn'
+                : undefined
+            }
             swap={swappable ? { team, index: i } : undefined}
             onClick={() => onSelectPlayer?.(p.id, team)}
           />
@@ -210,6 +220,8 @@ export function MatchCard({
   draft,
   className,
   readOnly = false,
+  searchState,
+  highlightedPlayerIds,
 }: MatchCardProps) {
   const ready = status.kind === 'ready'
   const startable = ready || (canOpenCourt && status.kind === 'waiting-for-courts')
@@ -280,7 +292,13 @@ export function MatchCard({
   return (
     <article
       aria-label={`Queue position ${position}`}
-      className={cn(matchCardVariants({ status: status.kind }), className)}
+      className={cn(
+        matchCardVariants({ status: status.kind }),
+        searchState === 'hit' &&
+          '!border-warn shadow-[0_0_0_2px_var(--warn),0_0_16px_2px_color-mix(in_srgb,var(--warn)_40%,transparent)]',
+        searchState === 'dim' && 'opacity-45',
+        className,
+      )}
     >
       <div className="flex min-w-0 items-center gap-1.5 touch:-mt-1.5 touch:-mr-1.5">
         <span className="font-mono font-bold">#{position}</span>
@@ -321,13 +339,25 @@ export function MatchCard({
       {readOnly ? (
         <DraftFaces players={teamA} />
       ) : (
-        <Faces players={teamA} team="A" swappable={swappable} onSelectPlayer={onSelectPlayer} />
+        <Faces
+          players={teamA}
+          team="A"
+          swappable={swappable}
+          onSelectPlayer={onSelectPlayer}
+          highlightedPlayerIds={highlightedPlayerIds}
+        />
       )}
       <div className="text-center text-[10px] font-extrabold tracking-[1px] text-fg3">VS</div>
       {readOnly ? (
         <DraftFaces players={teamB} />
       ) : (
-        <Faces players={teamB} team="B" swappable={swappable} onSelectPlayer={onSelectPlayer} />
+        <Faces
+          players={teamB}
+          team="B"
+          swappable={swappable}
+          onSelectPlayer={onSelectPlayer}
+          highlightedPlayerIds={highlightedPlayerIds}
+        />
       )}
       {statusLine}
       {!readOnly && (onStart || onEdit || onRemove) ? (

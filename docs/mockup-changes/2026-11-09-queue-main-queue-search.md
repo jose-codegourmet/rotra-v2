@@ -1,6 +1,6 @@
 # Find a player in the Main Queue
 
-Status: TICKETED — #586
+Status: IN PROGRESS — #586
 Date: 2026-11-09
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › live session › Queue tab › Main Queue

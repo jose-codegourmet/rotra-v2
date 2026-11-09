@@ -18,6 +18,8 @@ export const buttonVariants = cva(
           'border-accent bg-accent text-on-accent hover:not-disabled:bg-accent-dim aria-pressed:bg-accent',
         ghost: 'border-transparent bg-transparent',
         danger: 'border-error bg-transparent text-error',
+        'danger-solid':
+          'border-error bg-error text-on-photo hover:not-disabled:bg-error hover:not-disabled:brightness-90',
       },
       size: {
         md: 'min-h-11 px-4 touch:min-h-12 touch:px-[18px] touch:text-base',

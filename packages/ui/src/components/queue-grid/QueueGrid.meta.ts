@@ -5,6 +5,7 @@ export const queueGridMeta = {
   description:
     "The Queue tab's waiting list: MatchCards in as many columns as fit the grid's width (tiles of 220 px or more, no upper limit), ordered in a snake (left to right, then back right to left) with flow arrows, reordered by dragging the ⠿ handle or with the arrow keys on it, and with switch-sides dragging on every card.",
   usage: [
+    'Search highlights matching players and dims other cards without modifying the queue.',
     "Use for the whole waiting queue on the Queue tab (Q-QUEUE). The Session view's first row is UpcomingQueueRow.",
     'Give it the queue in order; it numbers positions from 1 and passes each card its flow arrow.',
     'onMove(matchId, toIndex) reports a drop or an arrow key on the handle; onSwapSides(matchId, from, to) reports a switch of sides. The container saves both (Q05.4).',

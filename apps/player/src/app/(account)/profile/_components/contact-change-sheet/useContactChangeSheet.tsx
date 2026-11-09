@@ -30,6 +30,10 @@ export function useContactChangeSheet(playerId: string | null) {
     setServerError(undefined)
   }
   const openSheet = () => {
+    if (account.data?.emailConfirmedAt === null) {
+      toast.error('Confirm your email first.')
+      return
+    }
     if (hasOpenRequest) {
       toast(IN_PROGRESS)
       return

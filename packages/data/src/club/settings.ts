@@ -3,7 +3,7 @@ import { nameField } from '@rotra/schema/name'
 import { applyMockClubPassword, validateMockClubPassword } from '../auth/fetchers'
 import { DEMO_CLUB_ID } from '../fixtures/clubs'
 import { requireOnline } from '../mock/bridge'
-import { MockError } from '../mock/errors'
+import { MockError, NotConnectedError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, readMockState } from '../mock/store'
 import { queueMutation, requireClubAccess } from '../mock/transaction'
@@ -28,9 +28,57 @@ export const updateClubLogo = (input: { logoUrl: string | null; expectedRevision
           !/^(https?:|data:image\/(png|jpeg|webp);base64,)/.test(input.logoUrl)
         )
           throw new MockError('permission', 'Choose an image.', { logoUrl: 'Choose an image.' })
-        clubIn(state).logoUrl = input.logoUrl
-        return { data: null, text: 'Club logo updated' }
+        const club = clubIn(state)
+        // At most two logos are held: uploading pushes the current one to previous, and Remove
+        // keeps the removed logo as previous (initials show).
+        if (club.logoUrl) club.logoPreviousUrl = club.logoUrl
+        club.logoUrl = input.logoUrl
+        return {
+          data: null,
+          text: input.logoUrl === null ? 'Club logo removed' : 'Club logo updated',
+        }
       })
+/** Swaps the current and previous logo. */
+export const restorePreviousClubLogo = () => {
+  if (isRealDataMode()) throw new NotConnectedError()
+  return changeClub((state) => {
+    const club = clubIn(state)
+    if (!club.logoPreviousUrl) throw new MockError('conflict', 'No previous logo to restore.')
+    const current = club.logoUrl
+    club.logoUrl = club.logoPreviousUrl
+    club.logoPreviousUrl = current
+    return { data: null, text: 'Previous logo restored' }
+  })
+}
+const INVITE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'
+function newInviteCode(not?: string) {
+  let code = ''
+  do {
+    const bytes = crypto.getRandomValues(new Uint8Array(8))
+    code = Array.from(bytes, (b) => INVITE_ALPHABET[b % INVITE_ALPHABET.length]).join('')
+  } while (code === not)
+  return code
+}
+/** Writes a fresh invite code; the old code stops being the current link. */
+export const regenerateClubInvite = () => {
+  if (isRealDataMode()) throw new NotConnectedError()
+  return changeClub((state) => {
+    const club = clubIn(state)
+    club.inviteCode = newInviteCode(club.inviteCode)
+    return { data: { inviteCode: club.inviteCode }, text: 'Club invite link regenerated' }
+  })
+}
+/** Whether players may check themselves in; missing reads as on. */
+export const updateSelfCheckIn = (input: { enabled: boolean }) => {
+  if (isRealDataMode()) throw new NotConnectedError()
+  return changeClub((state) => {
+    clubIn(state).selfCheckInEnabled = input.enabled
+    return {
+      data: null,
+      text: input.enabled ? 'Players can check themselves in' : 'Only you mark presence now',
+    }
+  })
+}
 export const requestClubNameChange = (input: { requestedName: string }) =>
   changeClub((state) => {
     const name = nameField.parse(input.requestedName)

@@ -5,6 +5,9 @@
   "type": "module",
   "exports": {
     "./club-player/registration-url": "./src/club-player/registrationUrl.ts",
+    "./club/useRegenerateClubInvite": "./src/club/useRegenerateClubInvite.ts",
+    "./club/useRestorePreviousClubLogo": "./src/club/useRestorePreviousClubLogo.ts",
+    "./club/useUpdateSelfCheckIn": "./src/club/useUpdateSelfCheckIn.ts",
     "./match-request/query-keys": "./src/match-request/queryKeys.ts",
     "./match-request/rules": "./src/match-request/matchRequest.rules.ts",
     "./match-request/types": "./src/match-request/matchRequest.types.ts",

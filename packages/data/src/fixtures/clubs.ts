@@ -100,6 +100,22 @@ const baseClubs = [
   },
 ]
 
+/** A one-pixel PNG standing in for the demo club's earlier logo, so Use previous works in mock mode. */
+const PREVIOUS_LOGO_FIXTURE =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGP4z8DwHwAFAAH/q842iQAAAABJRU5ErkJggg=='
+
+/** Sample club invite codes, one per club in order. */
+const INVITE_CODES = [
+  'K7M2QX9P',
+  'T4NB8WZ3',
+  'D9HX5RC2',
+  'P3GV7LA6',
+  'W8ZJ2KE4',
+  'F5QY9MB7',
+  'C2TR6XN8',
+  'H6LD3VS5',
+]
+
 /** Shared Queue demo club; matches the Admin fixture. */
 export const DEMO_CLUB_ID = '6cd364d4-0e3a-5c3d-9e75-2116cc845714'
 
@@ -108,6 +124,9 @@ export const clubs: Club[] = baseClubs.map((club, index) => ({
   licensePricing: club.licensePricing === 'free' ? 'free' : 'paid',
   currency: 'PHP',
   logoUrl: null,
+  logoPreviousUrl: index === 0 ? PREVIOUS_LOGO_FIXTURE : null,
+  inviteCode: INVITE_CODES[index] ?? 'ROTRA000',
+  selfCheckInEnabled: true,
   description:
     index === 0
       ? 'Friendly open play for all levels in Lahug. Bring your racket; shuttles are on us.'

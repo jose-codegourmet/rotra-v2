@@ -23,6 +23,14 @@ export function createSessionPublicationFixtures(now = Date.now()) {
       },
     ]
   })
+  // Match the Player mockup: Sunday is unshared; the four older samples are published.
+  for (const id of ['m2', 'm3', 'm4', 'm5'])
+    publications.push({
+      sessionId: id,
+      publishedSlides: ['standings'],
+      includeOffDay: false,
+      publishedAt: now - 86400000,
+    })
   const events: SessionPublicationEvent[] = publications.map((p) => ({
     id: `${p.sessionId}-publication-1`,
     sessionId: p.sessionId,

@@ -396,7 +396,11 @@
     "./player-account/useConfirmMockEmail": "./src/player-account/useConfirmMockEmail.ts",
     "./profile-character/useProfileCharacters": "./src/profile-character/useProfileCharacters.ts",
     "./player/visibility": "./src/player/visibility.ts",
-    "./player-account/useSetProfilePrivacy": "./src/player-account/useSetProfilePrivacy.ts"
+    "./player-account/useSetProfilePrivacy": "./src/player-account/useSetProfilePrivacy.ts",
+    "./player/useMySessions": "./src/player/useMySessions.ts",
+    "./player/mySessions": "./src/player/mySessions.ts",
+    "./player/usePlayerShareData": "./src/player/usePlayerShareData.ts",
+    "./profile-character/images": "./src/profile-character/fetchers.ts"
   },
   "scripts": {
     "lint": "biome check .",

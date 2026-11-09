@@ -102,12 +102,12 @@ Selections persist across tabs in selection order. Review that order before addi
 | Mode | What a free court does |
 |---|---|
 | Manual Queue | Shows the next eligible match (with the existing skip explanations). The operator taps **Put on court** (or **Pick another**). The match lands **On court**, not Playing |
-| Auto Queue | ROTRA places the next eligible match **On court** straight away. Copy: "Free courts get the next ready match. You still start each one." |
+| Auto Queue | ROTRA places the next eligible match **On court** straight away. Copy: "Free courts get the next ready match. You still start each one." The one exception is the court a result just freed: it goes to the next-match picker first (below) |
 
 **Auto Queue fills a court when:**
 
 - the switch is turned on: every free open court is filled now, in court order;
-- a court is freed by Match done, an invalid match, or **Move to another court**;
+- a court is freed by an invalid match or **Move to another court**. A court freed by a confirmed result is offered to the next-match picker first and filled only if the operator skips (below);
 - a match is added to the queue while a court is free;
 - a court opens or is added.
 
@@ -117,6 +117,8 @@ Selections persist across tabs in selection order. Review that order before addi
 - courts that are not open yet.
 
 The operator can still place those by hand. A court whose booking has ended **is** filled: its end time is a reminder, not a stop.
+
+**Next-match picker after every result (owner decision, November 9, 2026, #579).** In both modes, Confirm result frees the court and opens a picker for it ([screen](../../../../screens/product/modules/queue/match-control.md#q-next-match--next-match-picker-after-a-result)). The two candidates are the first two waiting matches in Main Queue order that are ready for that one court (one court needed, not blocked), the same readiness check Auto Queue uses; there is no new ranking. The two options are equal, left or right. Picking places that match **On court** (never started). **Skip for now**, or closing the picker, places nothing: Manual Queue leaves the court free, and Auto Queue then fills that court as usual. While the picker is open Auto Queue does not fill that court; other free courts are filled as before. With no ready match the picker says so and offers only Close.
 
 **Send back to queue in Auto Queue.** The sent-back match goes to the top of the queue, and the court is refilled with the next eligible match **other than** the one just sent back.
 

@@ -139,18 +139,24 @@ export type AutoPlacement = { matchId: string; courtId: string }
  * order of `ctx.courts`), gets the next eligible waiting match in queue order. Skips 5v5 (always
  * placed by hand, on two courts) and courts not open yet; a court whose booking ended still fills.
  * `exceptMatchId` never goes on (Send back refills with a different match); `onlyCourtIds` limits
- * the fill to courts that just opened or were added. Pure: the caller applies the placements, and
+ * the fill to courts that just opened or were added; `exceptCourtIds` leaves courts free (the court
+ * a just-confirmed result freed while the next-match picker is open). Pure: the caller applies the placements, and
  * decides whether Auto Queue is on and the device online. Each placement counts for the next one,
  * so a player is never placed twice.
  */
 export function autoFillPlacements(
   ctx: MatchContext,
-  options: { exceptMatchId?: string; onlyCourtIds?: readonly string[] } = {},
+  options: {
+    exceptMatchId?: string
+    onlyCourtIds?: readonly string[]
+    exceptCourtIds?: readonly string[]
+  } = {},
 ): AutoPlacement[] {
   const placements: AutoPlacement[] = []
   let matches = ctx.matches
   for (const court of freeCourts(ctx.courts, ctx.matches, ctx.now)) {
     if (options.onlyCourtIds && !options.onlyCourtIds.includes(court.id)) continue
+    if (options.exceptCourtIds?.includes(court.id)) continue
     const now: MatchContext = { ...ctx, matches }
     const next = waitingMatches(matches).find(
       (m) =>
@@ -164,6 +170,15 @@ export function autoFillPlacements(
   }
   return placements
 }
+/**
+ * The next-match picker after a result (Q-NEXT-MATCH): the first `limit` waiting matches, in Main
+ * Queue order, that are ready for `courtId` by the same check Auto Queue uses (one court, and
+ * `canPlace` on that court). No ranking of its own; empty when the court is not free.
+ */
+export const nextMatchCandidates = (courtId: string, ctx: MatchContext, limit = 2) =>
+  waitingMatches(ctx.matches)
+    .filter((m) => courtsNeeded(m) === 1 && canPlace(m, [courtId], ctx))
+    .slice(0, limit)
 /** Players a standard match needs: doubles 4, else singles 2 (doubles first when both are on). */
 export const standardMatchSize = (session: Pick<QueueSession, 'allowSingles' | 'allowDoubles'>) =>
   session.allowDoubles ? 4 : session.allowSingles ? 2 : 0

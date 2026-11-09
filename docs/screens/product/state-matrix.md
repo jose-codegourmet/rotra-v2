@@ -107,6 +107,9 @@ A conflict is not permission to open a generic winner editor. Accepted unchanged
 | Active session above slot budget | Show attendance and budget; additional admission remains available | Admit chosen player, present and level locked |
 | Court before planned start | Show planned window and not-started status | No placement on that court; Auto Queue skips it |
 | Court past planned end | Show Booking ended | Placing continues (by hand, or by Auto Queue) until manually removed while free |
+| Next-match picker, no ready match (`Q-NEXT-MATCH`) | Notice “No ready match for Court N right now.” and only **Close** | Close behaves as Skip; Auto Queue then tries that court as usual |
+| Next-match picker, one ready match | One full-width card, no Left/Right label, no swipe hint | **Pick this** is the only pick control; **Skip for now** |
+| Next-match picker, picked match no longer ready | Error notice “That match is not ready any more. Pick again.”; candidates refresh | Nothing is placed |
 | Generate matches draft stale | “The Main Queue changed since these were made. Check them before adding, or generate again.” Keep cards and selections visible | Review and revalidate on transfer; conflicts need attention |
 | Generate matches count missing | “Choose how many matches, then Generate.” Disabled actions explain “Choose how many matches first.” | Choose 2 / 3 / 4 / 6 explicitly |
 | Catch Up target missing / invalid | “Choose a game target, then Generate.”; “Enter a whole number of games, 1 or more.” for invalid input | Enter a target explicitly; the session minimum is only a placeholder and comparison |

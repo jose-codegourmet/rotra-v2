@@ -33,6 +33,10 @@ import {
 import type { TeamLineupPlayer } from '@rotra/ui/team-lineup'
 import { toast } from '@rotra/ui/toaster'
 import { useEffect, useRef, useState } from 'react'
+import {
+  NextMatch,
+  type NextMatchRequest,
+} from '@/app/(operator)/sessions/[sessionId]/_components/next-match/NextMatch'
 import { PlayerProfile } from '@/app/(operator)/sessions/[sessionId]/_components/player-profile/PlayerProfile'
 
 export type ActiveMatchProps = {
@@ -86,9 +90,13 @@ const newOperationId = () => crypto.randomUUID()
  * operation ID is fixed when the review step opens, so a retry replays the same confirmation.
  * "Something changed" refetches so the sheet shows what changed. Offline (with a downloaded copy)
  * each confirmation saves locally, the outcome is permanent at once and its toast ends in " · Saved
- * on this device, waiting to sync". Player cards open the profile with Back to match.
+ * on this device, waiting to sync". Player cards open the profile with Back to match. After a
+ * confirmed result the next-match picker (NextMatch, Q-NEXT-MATCH) opens for the first freed court.
  */
 export function ActiveMatch({ sessionId, now, matchId, onClose }: ActiveMatchProps) {
+  /** The next-match picker after a confirmed result; it outlives the active match sheet */
+  const [next, setNext] = useState<NextMatchRequest | null>(null)
+  const picker = <NextMatch sessionId={sessionId} request={next} onClose={() => setNext(null)} />
   const session = useQueueSession(sessionId)
   const roster = useSessionRoster(sessionId)
   const matches = useSessionMatches(sessionId)
@@ -101,24 +109,28 @@ export function ActiveMatch({ sessionId, now, matchId, onClose }: ActiveMatchPro
     if (gone) onClose()
   }, [gone, onClose])
 
-  if (!match || match.state !== 'active' || !s || !roster.data || !matches.data) return null
+  if (!match || match.state !== 'active' || !s || !roster.data || !matches.data) return picker
   const refresh = () => {
     void session.refetch()
     void roster.refetch()
     void matches.refetch()
   }
   return (
-    <OpenActiveMatch
-      key={match.id}
-      sessionId={sessionId}
-      now={now}
-      session={s}
-      roster={roster.data.roster}
-      matches={matches.data}
-      match={match}
-      onClose={onClose}
-      onRefresh={refresh}
-    />
+    <>
+      {picker}
+      <OpenActiveMatch
+        key={match.id}
+        sessionId={sessionId}
+        now={now}
+        session={s}
+        roster={roster.data.roster}
+        matches={matches.data}
+        match={match}
+        onClose={onClose}
+        onRefresh={refresh}
+        onCompleted={setNext}
+      />
+    </>
   )
 }
 
@@ -129,6 +141,8 @@ type OpenActiveMatchProps = Omit<ActiveMatchProps, 'matchId'> & {
   match: Match
   /** The recheck refused the commit: refetch so the sheet shows the current players and match */
   onRefresh: () => void
+  /** The result was confirmed: open the next-match picker for this freed court */
+  onCompleted: (next: NextMatchRequest) => void
 }
 
 /** The open sheet: mounted per match, so its step and choices start fresh for each Open match */
@@ -140,6 +154,7 @@ function OpenActiveMatch({
   match,
   onClose,
   onRefresh,
+  onCompleted,
 }: OpenActiveMatchProps) {
   const completeMatch = useCompleteMatch()
   const invalidateMatch = useInvalidateMatch()
@@ -222,6 +237,8 @@ function OpenActiveMatch({
   const onConfirmResult = () => {
     if (step.kind !== 'review' || !begin()) return
     const { values, operationId } = step
+    // The picker opens for the first court this match used; Auto Queue leaves that one free.
+    const freedCourtId = match.courtIds[0]
     completeMatch.mutate(
       {
         matchId: match.id,
@@ -229,10 +246,12 @@ function OpenActiveMatch({
         teamAScore: values.teamAScore,
         teamBScore: values.teamBScore,
         operationId,
+        holdCourtId: freedCourtId,
       },
       {
         onSuccess: (result) => {
           toast(result.message)
+          if (freedCourtId) onCompleted({ courtId: freedCourtId, matchNo: match.matchNo })
           close()
         },
         onError: onFailure,

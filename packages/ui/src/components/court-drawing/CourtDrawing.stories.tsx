@@ -51,7 +51,7 @@ function AtWidths(props: ComponentProps<typeof CourtDrawing>) {
 const meta = {
   title: 'Queue/CourtDrawing',
   component: CourtDrawing,
-  args: { ...doubles, minimumGames, onOpenProfile: fn() },
+  args: { ...doubles, minimumGames, onOpenProfile: fn(), showLevels: true },
 } satisfies Meta<typeof CourtDrawing>
 
 export default meta
@@ -73,7 +73,7 @@ export const ThreeVersusThree: Story = {
   render: (args) => <AtWidths {...args} />,
 }
 export const FourVersusFour: Story = {
-  args: { teamA: merged.teamA.slice(0, 4), teamB: merged.teamB.slice(0, 4) },
+  args: { teamA: merged.teamA.slice(0, 4), teamB: merged.teamB.slice(0, 4), courts: 2, showLevels: true },
   render: (args) => <AtWidths {...args} />,
 }
 export const FiveVersusFiveMerged: Story = {
@@ -113,4 +113,9 @@ export const Desktop: Story = {
     ),
   ],
   globals: { viewport: { value: 'desktop' } },
+}
+
+export const LevelsAndUnassigned: Story = {
+  args: { showLevels: true, teamA: doubles.teamA.map((p, i) => i === 0 ? { ...p, level: null } : p) },
+  render: (args) => <AtWidths {...args} />,
 }

@@ -357,3 +357,16 @@ export const BeforePlannedStartLight: Story = {
 }
 export const ManuallyRemovedLight: Story = { ...ManuallyRemoved, globals: { theme: 'light' } }
 export const CourtsGridLight: Story = { ...CourtsGrid, globals: { theme: 'light' } }
+
+export const ReadOnlyPlaying: Story = {
+  args: { variant: 'read-only', label: 'Court 1', state: 'playing', startedLabel: '7:31 PM', teamA: playing.teamA.map(playerOf), teamB: playing.teamB.map(playerOf) },
+}
+export const ReadOnlyGettingReady: Story = {
+  args: { variant: 'read-only', label: 'Court 2', state: 'getting-ready', teamA: ready.teamA.map(playerOf), teamB: ready.teamB.map(playerOf) },
+}
+export const ReadOnlyFree: Story = {
+  args: { variant: 'read-only', label: 'Court 3', state: 'free' },
+}
+export const ReadOnlyMerged: Story = {
+  args: { variant: 'read-only', label: 'Court 1 + Court 2', state: 'playing', merged: true, startedLabel: '7:31 PM', teamA: merged.teamA.map(playerOf), teamB: merged.teamB.map(playerOf) },
+}

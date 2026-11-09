@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 17 · IN MOCK APP: 68 · MOCKUP ONLY: 4
+NEW: 21 · IN MOCK APP: 68 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -257,12 +257,16 @@ NEW: 17 · IN MOCK APP: 68 · MOCKUP ONLY: 4
 | [2026-11-09-queue-club-invite-link](2026-11-09-queue-club-invite-link.md) | Club invite link in settings, Share club invite on the dashboard | session-join-qr, club-settings, sheet, button | NEW |
 | [2026-11-09-queue-club-logo-previous](2026-11-09-queue-club-logo-previous.md) | Club logo: Use previous logo (only current and previous are kept) | club-logo, club-settings, button | NEW |
 | [2026-11-09-queue-guest-linking](2026-11-09-queue-guest-linking.md) | Saved players: “Joined via” marks, and Link to saved player… on a guest's record | saved-player-card, player-profile-sheet, player-picker-sheet, sheet, button | NEW |
+| [2026-11-09-queue-match-request-court](2026-11-09-queue-match-request-court.md) | Request a match: the request is laid out on a court | court-pitch, match-request-sheet | NEW |
 | [2026-11-09-queue-next-match-fullscreen](2026-11-09-queue-next-match-fullscreen.md) | The next-match picker is fullscreen on phones | sheet, next-match-sheet | IN MOCK APP — #579 |
 | [2026-11-09-queue-next-match-picker](2026-11-09-queue-next-match-picker.md) | After a result, a next-match picker offers two ready matches (left or right) | sheet, next-match-sheet | IN MOCK APP — #579 |
 | [2026-11-09-queue-player-match-request](2026-11-09-queue-player-match-request.md) | Session page: Request a match (player side) | sheet, segmented-control, player-tile, player-picker-sheet, team-lineup, button | NEW |
 | [2026-11-09-queue-player-my-night](2026-11-09-queue-player-my-night.md) | Session page: My night card, refresh bar, Courts now and own standing | card, button, chip, match-card, standings-slide, public-session-details | NEW |
 | [2026-11-09-queue-player-self-check-in](2026-11-09-queue-player-self-check-in.md) | Session page: players check themselves in, leave, and say they can't make it | button, card, notice | NEW |
+| [2026-11-09-queue-public-payment-per-player](2026-11-09-queue-public-payment-per-player.md) | Session page: Details shows the payment per player | key-value-list, public-session-details | NEW |
+| [2026-11-09-queue-public-profile-links](2026-11-09-queue-public-profile-links.md) | Session page: signed-in Players open a participant's ROTRA profile | public-participant-tile, public-session-participants | NEW |
 | [2026-11-09-queue-public-signed-in-names-join](2026-11-09-queue-public-signed-in-names-join.md) | Session page: full names and one-tap join for signed-in players, three ways in | public-participants, public-session-queue, join-request-card, segmented-control, notice, button | NEW |
+| [2026-11-09-queue-public-you-label](2026-11-09-queue-public-you-label.md) | Session page: the signed-in viewer's own tile is labelled You | public-participant-tile, chip | NEW |
 | [2026-11-09-queue-qm-requests-tabs](2026-11-09-queue-qm-requests-tabs.md) | Requests · N with Join and Match tabs: ROTRA-player hints, drop-out notices, match request cards | join-requests-panel, join-request-card, tabs, sheet, notice, chip, list-row, button, level-select | NEW |
 | [2026-11-09-queue-qm-self-check-in](2026-11-09-queue-qm-self-check-in.md) | Roster: “Checked in themselves” mark, and the club setting Players can check themselves in | roster-row, roster-card, player-pool-card, switch, session-defaults-panel, list-row | NEW |
 | [2026-11-09-queue-session-invite](2026-11-09-queue-session-invite.md) | Session page: Session invite share card for confirmed and waitlisted players | session-join-qr, segmented-control, sheet, button | NEW |

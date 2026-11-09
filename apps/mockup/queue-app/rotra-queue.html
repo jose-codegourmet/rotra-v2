@@ -960,6 +960,14 @@ textarea.tpl { font-family: var(--mono); font-size: 13px; line-height: 1.55; min
 .ptile.busy .pt-st { color: var(--warn); }
 .ptile.fresh .pt-st { color: var(--accent); }
 @media (prefers-reduced-motion: reduce) { .ptile { transition: none; } .ptile:hover:not(:disabled) { transform: none; } }
+/* Request a match as a court: the viewer on the left with the Partner spot, opponent spots on the right. Empty spots are dashed “+” faces. */
+.mr-pitch { aspect-ratio: 134 / 72; }
+.mr-pitch .side { gap: 6px 10px; }
+.mr-pitch .pf-n { max-width: clamp(72px, 30cqw, 140px); }
+.mr-me .pf-n { background: var(--accent); color: var(--on-accent); }
+.mr-spot .avatar.mr-plus { background: rgba(0, 0, 0, 0.35); color: #fff; font-size: clamp(18px, 6cqw, 26px); font-weight: 500; box-shadow: none; outline: 2px dashed rgba(255, 255, 255, 0.85); outline-offset: -2px; }
+.mr-spot.empty .pf-n { background: rgba(0, 0, 0, 0.55); color: rgba(255, 255, 255, 0.9); font-weight: 600; }
+.mr-spot:hover .avatar, .mr-spot:focus-visible .avatar { box-shadow: 0 0 0 2px var(--accent); outline-color: var(--accent); }
 .slot-row { display: flex; gap: 6px; align-items: center; }
 .slot-btn { flex: 1; display: flex; align-items: center; gap: 10px; min-width: 0; min-height: 56px; padding: 8px 10px; border-radius: var(--r-sm); border: 1px solid var(--border-strong); background: var(--bg); cursor: pointer; text-align: left; }
 .slot-btn:hover { border-color: var(--accent); }
@@ -1026,6 +1034,12 @@ textarea.tpl { font-family: var(--mono); font-size: 13px; line-height: 1.55; min
 .pcard.pub.empty .avatar { background: none; outline: 3px dashed var(--border-strong); outline-offset: 4px; }
 .pcard.pub.empty b { color: var(--fg3); font-weight: 500; }
 .pcard.pub b { display: block; font-size: 17px; line-height: 1.25; }
+/* “You” label on the viewer's own participant or waitlist tile: accent fill, on-accent text (white in light, dark in dark for contrast). */
+.pcard.pub .you-tag { display: inline-block; margin-top: -6px; padding: 2px 10px; border-radius: 999px; background: var(--accent); color: var(--on-accent); font-size: 12px; font-weight: 800; letter-spacing: .4px; text-transform: uppercase; line-height: 1.4; }
+.pcard.pub.me .avatar { --ring: var(--accent); }
+a.pcard.pub.pub-link { color: inherit; text-decoration: none; cursor: pointer; border-radius: var(--r); }
+a.pcard.pub.pub-link:hover .avatar, a.pcard.pub.pub-link:focus-visible .avatar { box-shadow: 0 0 0 4px var(--surface), 0 0 0 7px var(--accent); }
+a.pcard.pub.pub-link:hover b { text-decoration: underline; text-underline-offset: 3px; }
 .pcard b { overflow-wrap: anywhere; font-weight: 600; font-size: 14px; }
 .proto-bar { background: var(--warn-subtle); border-bottom: 1px solid var(--warn); font-size: 13px; }
 .proto-bar .in { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; padding: 8px var(--page-r) 8px var(--page-l); }
@@ -3790,6 +3804,9 @@ const showsFull = (p) => pubSignedIn() && !!p && p.identity === 'registered';
 const pubNameText = (p) => (showsFull(p) ? p.name : maskName(p.name));
 const pubNameHtml = (p) => (showsFull(p) ? `<b>${esc(p.name)}</b>${p.nick ? `<br><span class="small muted">${esc(p.nick)}</span>` : ''}` : `<b>${esc(maskName(p.name))}</b>`);
 const pubAvatarOf = (p) => (showsFull(p) ? avatar(p) : pubAvatar(p));
+// Signed-in Players can open a registered participant's ROTRA profile; guests and unclaimed profiles stay plain tiles.
+// The viewer's own tile carries a “You” label (owner request, November 9, 2026).
+const pubTile = (p, cls, title, inner) => { const me = !!p && pubViewer()?.id === p.id; const body = me ? `${inner}<span class="you-tag">You</span>` : inner; cls = me ? `${cls} me` : cls; return showsFull(p) && p.rtr ? `<a class="${cls} pub-link" href="/player/find/${encodeURIComponent(p.rtr)}" target="_blank" rel="noopener" ${title} aria-label="${esc(p.name)} · view ROTRA profile">${body}</a>` : `<div class="${cls}" ${title}>${body}</div>`; };
 const playerJoinReq = (s, pid) => (s.requests || []).filter((x) => x.pid === pid && x.status !== 'closed').sort((a, b) => b.at - a.at)[0] || null;
 const openMatchReq = (s, pid) => (s.matchRequests || []).find((x) => x.pid === pid && x.status === 'open') || null;
 const openDropOut = (s, pid) => (s.dropOuts || []).find((x) => x.pid === pid && x.status === 'open') || null;
@@ -3924,10 +3941,11 @@ function viewPublic() {
       <dt>Courts</dt><dd>${s.courts.length} · ${s.courts.map((c) => esc(c.label)).join(', ')}</dd>
       <dt>Formats</dt><dd>${fmtFormats(s)}</dd>
       <dt>Mode</dt><dd>${MODES[s.mode].label} · <span class="muted">${MODES[s.mode].text}</span></dd>
-      <dt>Minimum</dt><dd>${s.minimum} games per player</dd></dl>
+      <dt>Minimum</dt><dd>${s.minimum} games per player</dd>
+      ${(() => { const due = duePerHead(s); return due == null ? '' : `<dt>Payment</dt><dd>${due ? `${peso(due)} per player` : 'Free'}${due ? ' <span class="muted small">· paid at the venue</span>' : ''}</dd>`; })()}</dl>
       ${s.notes ? `<p>${esc(s.notes)}</p>` : ''}
       <p class="small muted">Slots are confirmed by the Queue Master. Last updated ${fmtWhen(S.lastSync, { lower: true })}${S.pending ? '. Recent changes from the venue haven’t synced yet.' : '.'}</p></section>`
-    : `<section class="stack">${s.roster.length ? `<div class="${fullRoster ? '' : 'pub-cap'}"><div class="pgrid pub">${s.roster.map((r) => { const p = P(r.pid); return `<div class="pcard pub lv-${rvBand(r)}" ${r.level != null ? `title="${esc(lvLabel(r.level))}"` : ''}>${pubAvatarOf(p)}<div style="min-width:0">${pubNameHtml(p)}</div></div>`; }).join('')}${s.status === 'finalized' ? '' : Array.from({ length: Math.max(0, capacityOf(s) - s.roster.length) }, () => '<div class="pcard pub empty" aria-hidden="true"><span class="avatar"></span><div><b>Open</b></div></div>').join('')}</div>${!fullRoster && s.roster.length > 9 ? `<div class="pub-more ${s.roster.length > 12 ? 'more-d' : ''}"><span class="pm-count">${s.roster.length} players are in</span>${s.acceptReq === false || !['prepared', 'active'].includes(s.status) ? '<span class="pm-text">Full roster is for confirmed participants.</span>' : `<span class="small muted">Full roster is for confirmed participants.</span><button class="btn primary pm-btn" data-act="openJoin">${I.lock} Join to see the full roster</button>`}</div>` : ''}</div>` : '<div class="card empty">Players have not been added yet.</div>'}${(s.waitlist || []).length ? `<h3>Waitlist · ${s.waitlist.length}</h3><div class="pgrid pub wl">${waitOf(s).map((w, i) => { const p = P(w.pid); return `<div class="pcard pub lv-${rvBand(w)}" ${w.level != null ? `title="${esc(lvLabel(w.level))}"` : ''}><span class="wl-av">${pubAvatarOf(p)}<i class="wl-n" aria-hidden="true">${i + 1}</i></span><div style="min-width:0"><span class="sr-only">Waitlist number ${i + 1}: </span>${pubNameHtml(p)}</div></div>`; }).join('')}</div><p class="small muted">Waitlisted players get a slot if one opens, in this order. Ask the Queue Master.</p>` : ''}</section>`}
+    : `<section class="stack">${s.roster.length ? `<div class="${fullRoster ? '' : 'pub-cap'}"><div class="pgrid pub">${s.roster.map((r) => { const p = P(r.pid); return pubTile(p, `pcard pub lv-${rvBand(r)}`, r.level != null ? `title="${esc(lvLabel(r.level))}"` : '', `${pubAvatarOf(p)}<div style="min-width:0">${pubNameHtml(p)}</div>`); }).join('')}${s.status === 'finalized' ? '' : Array.from({ length: Math.max(0, capacityOf(s) - s.roster.length) }, () => '<div class="pcard pub empty" aria-hidden="true"><span class="avatar"></span><div><b>Open</b></div></div>').join('')}</div>${!fullRoster && s.roster.length > 9 ? `<div class="pub-more ${s.roster.length > 12 ? 'more-d' : ''}"><span class="pm-count">${s.roster.length} players are in</span>${s.acceptReq === false || !['prepared', 'active'].includes(s.status) ? '<span class="pm-text">Full roster is for confirmed participants.</span>' : `<span class="small muted">Full roster is for confirmed participants.</span><button class="btn primary pm-btn" data-act="openJoin">${I.lock} Join to see the full roster</button>`}</div>` : ''}</div>` : '<div class="card empty">Players have not been added yet.</div>'}${(s.waitlist || []).length ? `<h3>Waitlist · ${s.waitlist.length}</h3><div class="pgrid pub wl">${waitOf(s).map((w, i) => { const p = P(w.pid); return pubTile(p, `pcard pub lv-${rvBand(w)}`, w.level != null ? `title="${esc(lvLabel(w.level))}"` : '', `<span class="wl-av">${pubAvatarOf(p)}<i class="wl-n" aria-hidden="true">${i + 1}</i></span><div style="min-width:0"><span class="sr-only">Waitlist number ${i + 1}: </span>${pubNameHtml(p)}</div>`); }).join('')}</div><p class="small muted">Waitlisted players get a slot if one opens, in this order. Ask the Queue Master.</p>` : ''}</section>`}
     ${tab === 'details' && playerSignedIn && s.status === 'active' ? courtsNow(s) : ''}
     ${tab === 'details' ? `<section class="stack" aria-label="Queue"><h2>Queue</h2>${playerSignedIn ? `<p class="small muted">Read-only · Last synced queue</p><div class="grid">${s.matches.filter((m) => m.status === 'waiting').sort((a, b) => a.pos - b.pos).map((m, i) => `<article class="qtile"><div class="qt-head"><span class="qt-pos">#${i + 1}</span>${chip(FORMAT_LABEL[m.format], 'solid')}</div>${[m.teamA, m.teamB].map((ids) => `<div class="qfaces">${ids.map((pid) => `<span class="qf">${pubAvatarOf(P(pid))}<span class="qf-n">${esc(pubNameText(P(pid)))}</span></span>`).join('')}</div>`).join('<div class="vs">VS</div>')}<span class="status-line muted">Waiting in queue</span></article>`).join('') || '<p>No matches queued yet.</p>'}</div>` : '<p class="small muted">Log in with ROTRA Player to see the queue.</p>'}</section>` : ''}
     ${s.status === 'finalized' ? (pub ? `<section class="stack"><h2>Results</h2>${pub.slides.includes(0) ? slideStandings(s, pubViewer()?.id) : ''}${pub.slides.includes(1) ? slideAwards(s) : ''}${pub.offDay ? slideOffDay(s, true) : ''}</section>`
@@ -4082,9 +4100,20 @@ const SHEETS = {
         <p class="small muted">Present players only. Players on a court or already in a waiting match can still be picked.</p>`,
         `<button class="btn" data-act="mrAnyone">Anyone</button><button class="btn" data-act="mrBack">Back</button>`, true);
     }
-    return sheetShell('Request a match', `<p class="small muted">Pick who you want to play with, or leave a spot as Anyone. The QM decides.</p>
+    // Owner request (November 9, 2026): the request looks like a court. The viewer stands on the left with the Partner spot; opponent spots are on the right.
+    const me = `<div class="pf mr-me" aria-label="You, ${esc(v.name)}"><span class="pf-face">${avatar(v)}</span><span class="pf-n">You</span></div>`;
+    const courtSpot = (key, i, label) => {
+      const pid = key === 'partner' ? sh.partner : (sh.opp || [])[i];
+      const p = pid ? P(pid) : null;
+      return `<button class="pf mr-spot${p ? '' : ' empty'}" data-act="mrPick" data-key="${key}" data-i="${i}" aria-label="${label}: ${p ? esc(p.name) : 'Anyone'}. Change"><span class="pf-face">${p ? avatar(p) : '<span class="avatar mr-plus" aria-hidden="true">+</span>'}</span><span class="pf-n">${p ? esc(short(pid)) : label}</span></button>`;
+    };
+    const left = [me, ...spots.filter(([k]) => k === 'partner').map(([k, i, l]) => courtSpot(k, i, l))];
+    const right = spots.filter(([k]) => k === 'opp').map(([k, i, l]) => courtSpot(k, i, l));
+    const court = `<div class="pitch mr-pitch" role="group" aria-label="Your match request">${courtSVG(1)}<div class="sides"><div class="side n${left.length}" style="--rows:${left.length}">${left.join('')}</div><div class="side n${right.length}" style="--rows:${right.length}">${right.join('')}</div></div></div>`;
+    return sheetShell('Request a match', `<p class="small muted">Tap a spot to pick who you want to play with, or leave it as Anyone. The QM decides.</p>
       ${fmts.length > 1 ? `<div class="field"><span>Format</span><div class="seg" role="group" aria-label="Format">${fmts.map((k) => `<button aria-pressed="${fmt === k}" data-act="mrFormat" data-k="${k}">${FORMAT_LABEL[k]}</button>`).join('')}</div></div>` : ''}
-      <div class="stack tight">${spots.map(([k, i, l]) => spot(k, i, l)).join('')}</div>`,
+      ${court}
+      ${chosen.length ? `<div class="stack tight">${spots.filter(([k, i]) => (k === 'partner' ? sh.partner : (sh.opp || [])[i])).map(([k, i, l]) => spot(k, i, l)).join('')}</div>` : ''}`,
       '<button class="btn" data-act="closeSheet">Cancel</button><button class="btn primary" data-act="sendMatchReq">Send request</button>');
   },
   sessionQr(sh) {

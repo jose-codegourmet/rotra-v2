@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-TICKETED: 6 · IN PROGRESS: 10 · IN MOCK APP: 86 · CANCELLED: 1 · MOCKUP ONLY: 4
+TICKETED: 4 · IN PROGRESS: 12 · IN MOCK APP: 86 · CANCELLED: 1 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -252,12 +252,12 @@ TICKETED: 6 · IN PROGRESS: 10 · IN MOCK APP: 86 · CANCELLED: 1 · MOCKUP ONLY
 | [2026-11-09-admin-edit-player-everything](2026-11-09-admin-edit-player-everything.md) | Edit player: Admin edits everything, with a picture picker and a beta-only password field | player-edit-form, profile-picture-picker, pager, avatar | TICKETED — #589 |
 | [2026-11-09-admin-profile-characters](2026-11-09-admin-profile-characters.md) | Settings › Profile characters: a plain grid of the character images players pick from | admin-rail, image-drop-zone, character-grid, toast (with Undo) | TICKETED — #589 |
 | [2026-11-09-player-avatar-character-pages](2026-11-09-player-avatar-character-pages.md) | The profile picture's character picker shows 8 per page with a pager | profile-picture-sheet, pager | IN PROGRESS — #588 |
-| [2026-11-09-player-my-sessions](2026-11-09-player-my-sessions.md) | The own profile has a My sessions card | list-row, chip, empty-state, card (new: my-sessions-card) | TICKETED — #588 |
+| [2026-11-09-player-my-sessions](2026-11-09-player-my-sessions.md) | The own profile has a My sessions card | list-row, chip, empty-state, card (new: my-sessions-card) | IN PROGRESS — #588 |
 | [2026-11-09-player-previous-picture](2026-11-09-player-previous-picture.md) | The profile picture picker keeps a previous picture | profile-picture-sheet, avatar | IN PROGRESS — #588 |
 | [2026-11-09-player-private-profile](2026-11-09-player-private-profile.md) | Players can make their profile private | switch, leaderboard-row, leaderboard-list, profile-not-found, private-contact-card | TICKETED — #588 |
 | [2026-11-09-player-registration-from-links](2026-11-09-player-registration-from-links.md) | Registration from club, session and Admin links, email banner and Join club page | auth-card, field, notice, button, page-header (new: email-confirm-banner, join-club-card) | IN PROGRESS — #588 |
 | [2026-11-09-player-share-cards](2026-11-09-player-share-cards.md) | Players share a rank card, a session result and a session's games as link, QR or post/story image | session-join-qr, segmented-control, skill-ladder, sheet, avatar | TICKETED — #588 |
-| [2026-11-09-player-your-clubs](2026-11-09-player-your-clubs.md) | The own profile has a Your clubs card with Leave club and Report a problem | avatar, club-logo, confirm-sheet, button, notice (new: player-clubs-card) | TICKETED — #588 |
+| [2026-11-09-player-your-clubs](2026-11-09-player-your-clubs.md) | The own profile has a Your clubs card with Leave club and Report a problem | avatar, club-logo, confirm-sheet, button, notice (new: player-clubs-card) | IN PROGRESS — #588 |
 | [2026-11-09-queue-club-invite-link](2026-11-09-queue-club-invite-link.md) | Club invite link in settings, Share club invite on the dashboard | session-join-qr, club-settings, sheet, button | IN MOCK APP — #587 |
 | [2026-11-09-queue-club-logo-previous](2026-11-09-queue-club-logo-previous.md) | Club logo: Use previous logo (only current and previous are kept) | club-logo, club-settings, button | IN MOCK APP — #587 |
 | [2026-11-09-queue-club-set-player-pictures](2026-11-09-queue-club-set-player-pictures.md) | Clubs set profile pictures for guests and unclaimed players | edit-player-sheet, avatar, button | IN PROGRESS — #587 |

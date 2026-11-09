@@ -38,6 +38,7 @@
     "./club-settings-menu": "./src/components/club-settings-menu/ClubSettingsMenu.tsx",
     "./cn": "./src/lib/cn.ts",
     "./confirm-result-sheet": "./src/components/confirm-result-sheet/ConfirmResultSheet.tsx",
+    "./confirm-make-match-sheet": "./src/components/confirm-make-match-sheet/ConfirmMakeMatchSheet.tsx",
     "./confirm-sheet": "./src/components/confirm-sheet/ConfirmSheet.tsx",
     "./delete-session-sheet": "./src/components/delete-session-sheet/DeleteSessionSheet.tsx",
     "./console-footer-bar": "./src/components/console-footer-bar/ConsoleFooterBar.tsx",

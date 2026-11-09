@@ -514,6 +514,14 @@ button.qf:hover .avatar { box-shadow: 0 0 0 2px var(--accent); }
 .nm-hint { display: none; }
 @media (pointer: coarse) { .nm-hint { display: block; } }
 @media (prefers-reduced-motion: reduce) { .nm-pair.snap, .nm-card { transition: none; } .nm-card.lean { transform: none; } }
+/* Q-NEXT-MATCH on phones: fullscreen (same breakpoint as the bottom sheet). Wide screens keep the centered dialog. */
+@media (max-width: 640px) {
+  .sheet.full { top: 0; height: 100dvh; max-height: none; border: 0; border-radius: 0; padding-top: env(safe-area-inset-top, 0px); }
+  .sheet.full .sb { flex: 1; min-height: 0; }
+  .sheet.full .nm-pair { flex: 1; align-items: stretch; }
+  .sheet.full .nm-names { font-size: 18px; }
+  .sheet.full .nm-card .btn { margin-top: auto; }
+}
 .shell { --rail: 232px; --topbar: 57px; display: grid; grid-template-columns: var(--rail) minmax(0, 1fr); align-items: start; }
 .shell.rail-min { --rail: 68px; }
 .shell-main { min-width: 0; }
@@ -3724,8 +3732,8 @@ function pickerSheet(s, sh) {
 }
 
 // ---------- Sheets ----------
-function sheetShell(title, body, footer, wide) {
-  return `<div class="scrim" data-act="closeSheet"></div><div class="sheet ${wide ? 'wide' : ''}" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+function sheetShell(title, body, footer, wide, cls) {
+  return `<div class="scrim" data-act="closeSheet"></div><div class="sheet ${wide ? 'wide' : ''}${cls ? ` ${cls}` : ''}" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
     <header><h2 id="sheet-title" tabindex="-1">${title}</h2><button class="btn xs ghost icon-btn" data-act="closeSheet" aria-label="Close">${I.x}</button></header>
     <div class="sb">${body}</div>${footer ? `<footer>${footer}</footer>` : ''}</div>`;
 }
@@ -4312,7 +4320,7 @@ const SHEETS = {
     const cands = nextCandidates(s);
     const intro = `<p class="small muted">Match ${sh.seq} is done. Pick the match that goes on next. It goes on court getting ready; you start it from the court.</p>`;
     const err = sh.err ? notice('bad', esc(sh.err)) : '';
-    if (!cands.length) return sheetShell(`Next on ${court}`, `${intro}${err}${notice('', `No ready match for ${court} right now.`)}`, '<button class="btn" data-act="closeSheet" data-autofocus>Close</button>');
+    if (!cands.length) return sheetShell(`Next on ${court}`, `${intro}${err}${notice('', `No ready match for ${court} right now.`)}`, '<button class="btn" data-act="closeSheet" data-autofocus>Close</button>', false, 'full');
     const card = (m, side) => {
       const a = esc(listNames(m.teamA)), b = esc(listNames(m.teamB)), pos = order.indexOf(m) + 1;
       return `<article class="nm-card" data-nm-side="${side}">
@@ -4325,7 +4333,7 @@ const SHEETS = {
     return sheetShell(`Next on ${court}`, `${intro}${err}
       <div class="nm-pair ${two ? '' : 'one'}" ${two ? 'data-nm-swipe' : ''}>${card(cands[0], 'left')}${two ? card(cands[1], 'right') : ''}</div>
       ${two ? '<p class="small muted nm-hint">Swipe left or right to pick, or tap Pick this.</p>' : ''}`,
-      '<button class="btn" data-act="skipNextMatch">Skip for now</button>');
+      '<button class="btn" data-act="skipNextMatch">Skip for now</button>', false, 'full');
   },
   invItem(sh) {
     return sheetShell(sh.id ? 'Edit item' : 'Add item', `

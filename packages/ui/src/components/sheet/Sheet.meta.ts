@@ -9,6 +9,7 @@ export const sheetMeta = {
     'Put the named primary action last in footer, after Back or Cancel.',
     'For an irreversible or important confirmation (D- dialogs) use ConfirmSheet.',
     'Set dismissible={false} and hideClose while a permanent save is pending.',
+    'fullscreen fills the whole screen on phones (header on top, footer pinned, body scrolls between); wide screens keep the centered dialog.',
     'Motion matches the prototype and is instant under reduced motion.',
   ],
   prototype: {

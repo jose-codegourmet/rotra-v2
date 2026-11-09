@@ -20,6 +20,8 @@ export type SheetProps = {
   /** 820 px instead of 560 px on wide screens */
   wide?: boolean
   side?: boolean
+  /** Fills the screen on phones (safe-area padding, no rounded corners); centered as usual on wide screens */
+  fullscreen?: boolean
   /** Hides the header close button (e.g. while a permanent save is pending) */
   hideClose?: boolean
   /** Stops Escape and the scrim from closing it (e.g. while a permanent save is pending) */
@@ -46,12 +48,14 @@ export function Sheet({
   footer,
   wide,
   side,
+  fullscreen,
   hideClose,
   dismissible = true,
   returnFocusRef,
   className,
 }: SheetProps) {
   const phone = useMediaQuery(PHONE_QUERY)
+  const full = Boolean(fullscreen && phone && !side)
   const reduced = useReducedMotion()
   const titleRef = useRef<HTMLHeadingElement>(null)
 
@@ -127,14 +131,16 @@ export function Sheet({
                   'fixed z-41 flex flex-col border border-border-strong bg-surface text-fg shadow-sheet',
                   side
                     ? 'inset-y-0 right-0 h-dvh w-full max-w-[560px] rounded-none'
-                    : phone
-                      ? 'inset-x-0 bottom-0 max-h-[92dvh] w-full rounded-t-2xl pb-[env(safe-area-inset-bottom,0px)]'
-                      : cn(
-                          'top-1/2 left-1/2 max-h-[calc(100dvh-40px)] rounded-2xl',
-                          wide
-                            ? 'w-[min(820px,calc(100vw-24px))]'
-                            : 'w-[min(560px,calc(100vw-24px))]',
-                        ),
+                    : full
+                      ? 'inset-0 h-dvh w-full rounded-none border-0 pt-[env(safe-area-inset-top,0px)] pb-[env(safe-area-inset-bottom,0px)]'
+                      : phone
+                        ? 'inset-x-0 bottom-0 max-h-[92dvh] w-full rounded-t-2xl pb-[env(safe-area-inset-bottom,0px)]'
+                        : cn(
+                            'top-1/2 left-1/2 max-h-[calc(100dvh-40px)] rounded-2xl',
+                            wide
+                              ? 'w-[min(820px,calc(100vw-24px))]'
+                              : 'w-[min(560px,calc(100vw-24px))]',
+                          ),
                   className,
                 )}
               >
@@ -150,7 +156,12 @@ export function Sheet({
                     </Dialog.Close>
                   )}
                 </header>
-                <div className="flex min-h-0 flex-col gap-3.5 overflow-y-auto px-5 pt-2.5 pb-4">
+                <div
+                  className={cn(
+                    'flex min-h-0 flex-col gap-3.5 overflow-y-auto px-5 pt-2.5 pb-4',
+                    full && 'flex-1',
+                  )}
+                >
                   {children}
                 </div>
                 {footer ? (

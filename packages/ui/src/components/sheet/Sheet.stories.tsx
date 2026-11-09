@@ -58,6 +58,11 @@ export const Phone: Story = {
   globals: { viewport: { value: 'phone' } },
 }
 
+/** Fills the screen on phones; centered as usual on wide screens. */
+export const FullscreenPhone: Story = {
+  render: () => <SheetDemo open fullscreen />,
+  globals: { viewport: { value: 'phone' } },
+}
 export const LongBody: Story = {
   render: () => (
     <SheetDemo open title="Long content">

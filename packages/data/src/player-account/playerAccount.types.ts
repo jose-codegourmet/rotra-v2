@@ -5,6 +5,7 @@ export type MyAccount = {
   phone: string
   email: string
   phoneHidden: boolean
+  emailConfirmedAt?: string | null
 }
 
 export type ClaimLinkStatus = 'valid' | 'claimed' | 'expired' | 'processing'
@@ -53,3 +54,6 @@ export type CompleteClaimResult = {
   /** Nickname, or the first word of the full name */
   firstName: string
 }
+
+/** Private account storage; new registration awaits email confirmation. */
+export type PlayerAccountRecord = MyAccount & { claimed: boolean }

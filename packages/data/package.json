@@ -388,7 +388,12 @@
     "./player/photo": "./src/player/photo.ts",
     "./player/heif": "./src/player/heif.ts",
     "./public-session/player-access": "./src/public-session/playerAccess.ts",
-    "./public-session/context": "./src/public-session/context.ts"
+    "./public-session/context": "./src/public-session/context.ts",
+    "./player-club/useJoinClub": "./src/player-club/useJoinClub.ts",
+    "./player-club/useLeaveClub": "./src/player-club/useLeaveClub.ts",
+    "./player-club/useMyClubs": "./src/player-club/useMyClubs.ts",
+    "./player-account/useResendConfirmationEmail": "./src/player-account/useResendConfirmationEmail.ts",
+    "./player-account/useConfirmMockEmail": "./src/player-account/useConfirmMockEmail.ts"
   },
   "scripts": {
     "lint": "biome check .",

@@ -1,16 +1,17 @@
 import { maskPhone } from '../player-account/playerAccount.rules'
-import type { ClaimLinkRecord } from '../player-account/playerAccount.types'
+import type { PlayerAccountRecord, ClaimLinkRecord } from '../player-account/playerAccount.types'
 import { playerProfiles } from './playerProfiles'
 
 // Fictional private account fixtures from rotra-player.html seedAccounts().
 // Public profile and leaderboard projections must never return these records.
-export const playerAccounts = [
+export const playerAccounts: PlayerAccountRecord[] = [
   {
     playerId: '2c7f6a7b-eed9-5051-9426-6dbce5133fbc',
     phone: '+639175550142',
     email: 'jose@example.com',
     phoneHidden: true,
     claimed: true,
+    emailConfirmedAt: '2026-11-01T00:00:00Z',
   },
   {
     playerId: 'bc4c3446-0131-591b-ab03-af19225dbe8a',
@@ -18,6 +19,7 @@ export const playerAccounts = [
     email: 'raymark@example.com',
     phoneHidden: false,
     claimed: true,
+    emailConfirmedAt: '2026-11-01T00:00:00Z',
   },
   // Contacts for the players behind rotra-admin.html's contact-change requests (A03.6), on the real
   // players who hold those prototype RTR IDs: phones from the prototype, emails from their names.
@@ -27,6 +29,7 @@ export const playerAccounts = [
     email: 'jasper@example.com',
     phoneHidden: false,
     claimed: true,
+    emailConfirmedAt: '2026-11-01T00:00:00Z',
   },
   {
     playerId: 'd720c601-da89-5474-9351-00e2fb966e56', // Karl (prototype Paulo Garcia)
@@ -34,6 +37,7 @@ export const playerAccounts = [
     email: 'karl@example.com',
     phoneHidden: false,
     claimed: true,
+    emailConfirmedAt: '2026-11-01T00:00:00Z',
   },
   {
     playerId: 'f5a63c91-34fd-53ec-948d-0ef644b5aeac', // Mikee Abellana (prototype Kat Lim)
@@ -41,6 +45,7 @@ export const playerAccounts = [
     email: 'mikee.abellana@example.com',
     phoneHidden: false,
     claimed: true,
+    emailConfirmedAt: '2026-11-01T00:00:00Z',
   },
   {
     playerId: '9f83495f-9359-5f7f-82ad-4cf01b826471', // Emji (prototype Theo Ramos)
@@ -48,6 +53,7 @@ export const playerAccounts = [
     email: 'emji@example.com',
     phoneHidden: false,
     claimed: true,
+    emailConfirmedAt: '2026-11-01T00:00:00Z',
   },
   {
     playerId: '80861dfd-99c7-57bb-a46c-d8c76e9a8dcc', // Dalton (prototype Rafa Aquino)
@@ -55,6 +61,7 @@ export const playerAccounts = [
     email: 'dalton@example.com',
     phoneHidden: false,
     claimed: true,
+    emailConfirmedAt: '2026-11-01T00:00:00Z',
   },
 ]
 export const signInExamples = {

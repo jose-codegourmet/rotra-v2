@@ -262,7 +262,8 @@ const seededJoinedVia = (playerId: string): JoinedVia => joinedViaSeeds[playerId
 
 export const clubPlayers = savedClubPlayers.map((player, index) => ({
   ...player,
-  joinedVia: seededJoinedVia(player.playerId),
+  joinedVia:
+    player.playerId === JOSE_PLAYER_ID ? ('club' as const) : seededJoinedVia(player.playerId),
   // The final three additions are recent on every fresh mock-store load, even just after Monday.
   addedAt: index >= 20 ? savedPlayersSeededAt : savedPlayersSeededAt - (30 + index) * 86_400_000,
 }))
@@ -291,3 +292,16 @@ export const storyIdentityPlayers = {
     playingLevel: 'intermediate_mid',
   },
 } satisfies Record<string, ClubPlayer>
+
+// The own-profile prototype shows a second saved club membership.
+clubPlayers.push({
+  addedAt: savedPlayersSeededAt - 30 * 86400000,
+  id: 'player-second-club',
+  clubId: '3f8ad2ed-5978-5a6a-b3ba-10efdf750f53',
+  playerId: JOSE_PLAYER_ID,
+  fullName: 'Jose',
+  nickname: null,
+  identity: 'registered',
+  playingLevel: 'intermediate_low',
+  joinedVia: 'added',
+})

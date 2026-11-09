@@ -4,20 +4,21 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useRef } from 'react'
 import { authKeys } from '../auth/queryKeys'
 import { playerKeys } from '../player/queryKeys'
+import { playerClubKeys } from '../player-club/queryKeys'
 import { completeGuestRegistration, getGuestRegistrationClub } from './guestRegistration'
 import { playerAccountKeys } from './queryKeys'
 
-export function useGuestRegistrationClub(clubId: string) {
+export function useGuestRegistrationClub(clubId: string, sessionSlug?: string | null) {
   return useQuery({
-    queryKey: playerAccountKeys.guestRegistration(clubId),
-    queryFn: ({ signal }) => getGuestRegistrationClub(clubId, signal),
+    queryKey: [...playerAccountKeys.guestRegistration(clubId), sessionSlug ?? null],
+    queryFn: ({ signal }) => getGuestRegistrationClub(clubId, signal, sessionSlug),
     networkMode: 'always',
     retry: false,
   })
 }
 
 /** Keep only a random retry secret and a contact fingerprint, never a password or plain contacts. */
-export function useGuestRegistration(clubId: string) {
+export function useGuestRegistration(clubId: string, sessionSlug?: string | null) {
   const client = useQueryClient()
   const retry = useRef<{ fingerprint: string; attempt: string } | null>(null)
   return useMutation({
@@ -30,11 +31,13 @@ export function useGuestRegistration(clubId: string) {
         new Uint8Array(
           await crypto.subtle.digest(
             'SHA-256',
-            new TextEncoder().encode(`${clubId}:${values.email}:${values.phone}`),
+            new TextEncoder().encode(
+              `${clubId}:${sessionSlug ?? ''}:${values.email}:${values.phone}`,
+            ),
           ),
         ),
       )
-      const key = `rotra-guest-registration:${clubId}`
+      const key = `rotra-guest-registration:${clubId}:${sessionSlug ?? ''}`
       try {
         retry.current ??= JSON.parse(sessionStorage.getItem(key) ?? 'null')
       } catch {}
@@ -49,6 +52,7 @@ export function useGuestRegistration(clubId: string) {
       } catch {}
       const result = await completeGuestRegistration({
         clubId,
+        sessionSlug,
         attempt: retry.current.attempt,
         values,
       })
@@ -64,6 +68,7 @@ export function useGuestRegistration(clubId: string) {
       client.setQueryData(authKeys.session('player'), result.session)
       await Promise.all([
         client.invalidateQueries({ queryKey: playerKeys.all }),
+        client.invalidateQueries({ queryKey: playerClubKeys.all }),
         client.invalidateQueries({ queryKey: playerAccountKeys.all }),
       ])
     },

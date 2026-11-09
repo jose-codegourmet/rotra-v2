@@ -113,6 +113,8 @@
     "./license-panel": "./src/components/license-panel/LicensePanel.tsx",
     "./list-row": "./src/components/list-row/ListRow.tsx",
     "./live-leaderboard": "./src/components/live-leaderboard/LiveLeaderboard.tsx",
+    "./match-request-card": "./src/components/match-request-card/MatchRequestCard.tsx",
+    "./drop-out-notice-row": "./src/components/drop-out-notice-row/DropOutNoticeRow.tsx",
     "./match-card": "./src/components/match-card/MatchCard.tsx",
     "./match-card/variants": "./src/components/match-card/MatchCard.variants.ts",
     "./match-history": "./src/components/match-history/MatchHistory.tsx",

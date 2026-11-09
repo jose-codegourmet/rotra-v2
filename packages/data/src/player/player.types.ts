@@ -69,3 +69,10 @@ export type PlayerProfile = {
   experienceMonths: number | null
   socialLinks: { facebook: string; instagram: string; youtube: string; linkedin: string }
 }
+
+/** Public-safe share-image participants; masked players carry no picture. */
+export type PlayerShareParticipant = { name: string; picture: string | null }
+export type PlayerShareGame = PlayerGame & {
+  partnerPlayers?: PlayerShareParticipant[]
+  opponentPlayers?: PlayerShareParticipant[]
+}

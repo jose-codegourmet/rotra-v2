@@ -9,8 +9,12 @@ const candidates: NextMatchCandidate[] = chooseMatch.rows.map(
   ({ matchId, position, teamA, teamB, formatLabel }) => ({
     matchId,
     position,
-    teamA: teamA.split(' and ').map((name, i) => ({ id: `${matchId}-a${i}`, name, shortName: name, level: null, games: 2 })),
-    teamB: teamB.split(' and ').map((name, i) => ({ id: `${matchId}-b${i}`, name, shortName: name, level: null, games: 3 })),
+    teamA: teamA
+      .split(' and ')
+      .map((name, i) => ({ id: `${matchId}-a${i}`, name, shortName: name, level: null, games: 2 })),
+    teamB: teamB
+      .split(' and ')
+      .map((name, i) => ({ id: `${matchId}-b${i}`, name, shortName: name, level: null, games: 3 })),
     formatLabel,
   }),
 )
@@ -31,10 +35,10 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-/** Two equal options, Left and Right; on a touch screen the pair can be swiped. */
+/** Two ready matches: arrows and dragging navigate without picking. */
 export const TwoCandidates: Story = {}
 
-/** One ready match: one full-width card, no swipe and no hint. */
+/** One ready match: one full-width card, no arrows, mask or navigation hint. */
 export const OneCandidate: Story = { args: { candidates: candidates.slice(0, 1) } }
 
 /** Nothing ready for the court: the honest notice and only Close. */
@@ -63,9 +67,18 @@ export const PhoneOneCandidate: Story = {
 }
 
 export const FiveCandidates: Story = {
-  args: { candidates: Array.from({ length: 5 }, (_, i) => ({ ...candidates[i % candidates.length]!, matchId: `match-${i}`, position: i + 1 })) },
+  args: {
+    candidates: Array.from({ length: 5 }, (_, i) => ({
+      ...candidates[i % candidates.length]!,
+      matchId: `match-${i}`,
+      position: i + 1,
+    })),
+  },
 }
 export const FiveCandidatesLight: Story = { ...FiveCandidates, globals: { theme: 'light' } }
 export const NoCandidatesLight: Story = { args: { candidates: [] }, globals: { theme: 'light' } }
-export const PickErrorLight: Story = { args: { error: 'That match is not ready any more. Pick again.' }, globals: { theme: 'light' } }
+export const PickErrorLight: Story = {
+  args: { error: 'That match is not ready any more. Pick again.' },
+  globals: { theme: 'light' },
+}
 export const PendingLight: Story = { args: { isPending: true }, globals: { theme: 'light' } }

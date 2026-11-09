@@ -1,6 +1,6 @@
 # Saved players: “Joined via” marks, and Link to saved player… on a guest's record
 
-Status: IN PROGRESS — #587
+Status: IN MOCK APP — #587
 Date: 2026-11-09
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Saved players › cards and profile dialog › Link to saved player… sheet

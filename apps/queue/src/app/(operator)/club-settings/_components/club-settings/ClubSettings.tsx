@@ -7,16 +7,16 @@ import type { Club } from '@rotra/data/club/types'
 import { useCancelClubNameChange } from '@rotra/data/club/useCancelClubNameChange'
 import { useChangeClubPassword } from '@rotra/data/club/useChangeClubPassword'
 import { usePostPreview } from '@rotra/data/club/usePostPreview'
+import { useRegenerateClubInvite } from '@rotra/data/club/useRegenerateClubInvite'
 import { useRequestClubNameChange } from '@rotra/data/club/useRequestClubNameChange'
 import { useResetFacebookPostTemplate } from '@rotra/data/club/useResetFacebookPostTemplate'
-import { useSaveFacebookPost } from '@rotra/data/club/useSaveFacebookPost'
-import { useRegenerateClubInvite } from '@rotra/data/club/useRegenerateClubInvite'
 import { useRestorePreviousClubLogo } from '@rotra/data/club/useRestorePreviousClubLogo'
+import { useSaveFacebookPost } from '@rotra/data/club/useSaveFacebookPost'
 import { useUpdateClubLogo } from '@rotra/data/club/useUpdateClubLogo'
 import { useUpdateSelfCheckIn } from '@rotra/data/club/useUpdateSelfCheckIn'
 import { useUpdateSessionDefaults } from '@rotra/data/club/useUpdateSessionDefaults'
-import { useDeviceDownloads } from '@rotra/data/device/useDeviceDownloads'
 import { clubInviteUrl } from '@rotra/data/club-player/registration-url'
+import { useDeviceDownloads } from '@rotra/data/device/useDeviceDownloads'
 import { DEMO_CLUB_ID } from '@rotra/data/fixtures/clubs'
 import { licensePaymentsCsv } from '@rotra/data/license/fetchers'
 import { useClubLicense } from '@rotra/data/license/useClubLicense'
@@ -274,7 +274,9 @@ export function ClubSettings({ section }: ClubSettingsProps) {
             }
           : undefined
       }
-      isPending={logo.isPending || restoreLogo.isPending || requestName.isPending || cancelName.isPending}
+      isPending={
+        logo.isPending || restoreLogo.isPending || requestName.isPending || cancelName.isPending
+      }
       onError={(message) => toast.error(message)}
       onLogoChange={(dataUrl) =>
         logo.mutate(
@@ -355,17 +357,20 @@ export function ClubSettings({ section }: ClubSettingsProps) {
     <ClubInvitePanel
       link={clubInviteUrl(data.id, data.inviteCode ?? '')}
       onCopyLink={() => {
+        const unavailable = () => toast('Select the link and copy it')
         try {
-          void navigator.clipboard.writeText(clubInviteUrl(data.id, data.inviteCode ?? ''))
+          navigator.clipboard
+            .writeText(clubInviteUrl(data.id, data.inviteCode ?? ''))
+            .then(() => toast('Club invite link copied'), unavailable)
         } catch {
-          // Clipboard unavailable; the link is selectable in the field
+          unavailable()
         }
-        toast('Club invite link copied')
       }}
       onShareClubInvite={() => setShareOpen(true)}
       confirmOpen={regenerateOpen}
       onConfirmOpenChange={setRegenerateOpen}
-      onRegenerate={() =>
+      onRegenerate={() => {
+        if (regenerateInvite.isPending) return
         regenerateInvite.mutate(undefined, {
           onSuccess: () => {
             setRegenerateOpen(false)
@@ -373,7 +378,7 @@ export function ClubSettings({ section }: ClubSettingsProps) {
           },
           onError: (error) => toast.error(errorMessage(error)),
         })
-      }
+      }}
     />
   ) : section === 'post' ? (
     <FacebookPostSection key={data.postTemplate ?? 'default'} club={data} />

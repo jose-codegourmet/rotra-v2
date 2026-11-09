@@ -2,14 +2,12 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 
 export const nextMatchSheetMeta = {
   name: 'NextMatchSheet',
-  description:
-    'Q-NEXT-MATCH: after Confirm result, "Next on Court X" offers the first two ready waiting matches for the freed court as two equal cards (Left and Right): "#P" and the format chip, Team A "vs" Team B, and Pick this. Skip for now (or closing) places nothing; with none ready it shows "No ready match for Court X right now." and only Close.',
+  description: 'A slider of up to five ready matches, one per card, after a result. Each has teams, games played and Pick this.',
   usage: [
-    'On phones the sheet is fullscreen (Sheet fullscreen): intro on top, the card pair stretching to the free height, Skip for now pinned to the bottom. Wide screens keep the centered dialog.',
-    'Open it right after a confirmed result, for the first court the match freed. Pass at most two candidates from nextMatchCandidates(courtId, ctx) in match.rules (the same readiness check Auto Queue uses); the sheet never works out eligibility.',
-    'onPick puts the match On court (getting ready, never started) with the place-on-court mutation; recheck at pick time and pass error "That match is not ready any more. Pick again." with refreshed candidates when it fails.',
-    'onSkip covers Skip for now, Close, Escape and the scrim. In Auto Queue the caller then lets Auto Queue fill that court as it would have.',
-    'Swipe works only on coarse pointers with two candidates (|dx| at least 96 px or 30% of the pair width, horizontal dominating vertical by 1.5x); reduced motion keeps only the highlight. Left/Right arrow keys move focus between the two Pick this buttons.',
+    'Pass candidates in Main Queue order; only the first five are shown. Empty candidates show Close and the no-ready-match notice.',
+    'Each team accepts CourtPlayer lists with games; the legacy string form supports the existing console until its screen ticket is wired.',
+    'Arrows, mouse or pen dragging and native touch scrolling navigate without selecting; Pick this places a match. Reduced motion disables smooth arrow scrolling.',
+    'Pass the stale-pick error if readiness changed, and isPending while placement runs.',
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',

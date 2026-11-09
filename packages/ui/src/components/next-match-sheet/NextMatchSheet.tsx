@@ -1,247 +1,93 @@
 'use client'
 
+import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
 import { Chip } from '@rotra/ui/chip'
-import { cn } from '@rotra/ui/cn'
+import type { CourtPlayer } from '@rotra/ui/court-drawing'
 import { useMediaQuery } from '@rotra/ui/hooks/use-media-query'
 import { Notice } from '@rotra/ui/notice'
 import { Sheet } from '@rotra/ui/sheet'
-import {
-  type KeyboardEvent,
-  type PointerEvent,
-  type MouseEvent as ReactMouseEvent,
-  type ReactNode,
-  useRef,
-  useState,
-} from 'react'
+import { type PointerEvent, type ReactNode, useRef, useState } from 'react'
 
-/** One waiting match the picker offers for the freed court */
+/** One waiting match the picker offers for the freed court. Strings support the existing console until it is wired to player lists. */
 export type NextMatchCandidate = {
   matchId: string
-  /** Main Queue position P, shown as "#P" */
   position: number
-  /** Team A by short names, e.g. "Mikee and Dexter" */
-  teamA: string
-  /** Team B by short names, e.g. "Jose and Aaron" */
-  teamB: string
-  /** "Doubles", "1v2 fun" */
+  teamA: CourtPlayer[] | string
+  teamB: CourtPlayer[] | string
   formatLabel: string
 }
 
 export type NextMatchSheetProps = {
   open: boolean
-  /** The court the finished match freed, e.g. "Court 2" */
   courtLabel: string
-  /** The finished match's number, for "Match N is done." */
   matchNo: number
-  /** At most two, in Main Queue order; none shows the honest notice and only Close */
   candidates: NextMatchCandidate[]
-  /** Pick this (or a committed swipe): put that match On court on this court */
   onPick: (matchId: string) => void
-  /** Skip for now, Close, Escape and the scrim: the picker places nothing */
   onSkip: () => void
-  /** The placement is running: the controls are disabled and the sheet cannot be dismissed */
   isPending?: boolean
-  /** e.g. "That match is not ready any more. Pick again." */
   error?: ReactNode
 }
 
-/** Swipe commit: |dx| at least 96 px, or 30% of the pair's width if that is smaller */
-const COMMIT_PX = 96
-const COMMIT_SHARE = 0.3
-/** Horizontal must dominate vertical by this factor, or the gesture is a scroll */
-const DOMINANCE = 1.5
-/** Movement before a gesture is read as a drag (so a tap on Pick this stays a tap) */
-const SLOP_PX = 8
-const MAX_ROTATE_DEG = 6
-const SNAP_MS = 150
+function Team({ players }: { players: CourtPlayer[] | string }) {
+  if (typeof players === 'string') return <span className="font-bold">{players}</span>
+  return <div className="flex flex-wrap justify-center gap-2">{players.map((player) => (
+    <div key={player.id} className="flex flex-col items-center gap-1" aria-label={`${player.name}, ${player.games ?? 0} games played`}>
+      <span className="relative"><Avatar name={player.name} src={player.photoUrl} size={36} /><span aria-hidden className="absolute -top-1 -right-1 grid size-[18px] place-items-center rounded-full bg-on-photo text-[10px] font-extrabold text-bg">{player.games ?? 0}</span></span>
+      <span className="text-xs font-bold">{player.shortName}</span>
+    </div>
+  ))}</div>
+}
 
-type Drag = { id: number; x: number; y: number; dx: number; dy: number; horizontal: boolean }
-
-/**
- * Q-NEXT-MATCH: after Confirm result, "Next on Court X" offers the first two ready waiting matches
- * for the freed court as two equal cards, Left and Right. Pick this puts that match On court
- * (getting ready, never started); Skip for now (or closing) places nothing. On coarse pointers with
- * two candidates the pair can be swiped toward the card you want; buttons always work, and the
- * Left/Right arrow keys move focus between the two Pick this buttons.
- */
-export function NextMatchSheet({
-  open,
-  courtLabel,
-  matchNo,
-  candidates,
-  onPick,
-  onSkip,
-  isPending = false,
-  error,
-}: NextMatchSheetProps) {
-  const coarse = useMediaQuery('(pointer: coarse)')
+/** Offers up to five ready matches, one per scrollable card. */
+export function NextMatchSheet({ open, courtLabel, matchNo, candidates, onPick, onSkip, isPending = false, error }: NextMatchSheetProps) {
   const reduced = useMediaQuery('(prefers-reduced-motion: reduce)')
-  const pair = candidates.length === 2
-  const swipe = coarse && pair && !isPending
-  const shown = candidates.slice(0, 2)
-
-  const pairRef = useRef<HTMLDivElement>(null)
-  const buttons = useRef<(HTMLButtonElement | null)[]>([])
-  const drag = useRef<Drag | null>(null)
-  // A committed or abandoned drag must not also land as a click on the button under the finger.
-  const dragged = useRef(false)
-  const [offset, setOffset] = useState<{ dx: number; active: boolean }>({ dx: 0, active: false })
-
-  const reset = () => {
+  const shown = candidates.slice(0, 5)
+  const slider = useRef<HTMLDivElement>(null)
+  const drag = useRef<{ id: number; x: number; left: number; moved: boolean } | null>(null)
+  const suppressClick = useRef(false)
+  const [index, setIndex] = useState(0)
+  const scrollTo = (i: number) => {
+    const el = slider.current
+    if (!el) return
+    el.scrollTo({ left: Math.max(0, Math.min(i, shown.length - 1)) * el.clientWidth, behavior: reduced ? 'instant' : 'smooth' })
+  }
+  const onDown = (e: PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType === 'touch' || isPending || !e.isPrimary) return
+    drag.current = { id: e.pointerId, x: e.clientX, left: e.currentTarget.scrollLeft, moved: false }
+  }
+  const onMove = (e: PointerEvent<HTMLDivElement>) => {
+    const d = drag.current
+    if (!d || d.id !== e.pointerId) return
+    const dx = e.clientX - d.x
+    if (Math.abs(dx) > 6 && !d.moved) { d.moved = true; e.currentTarget.setPointerCapture(e.pointerId) }
+    if (d.moved) e.currentTarget.scrollLeft = d.left - dx
+  }
+  const onUp = (e: PointerEvent<HTMLDivElement>) => {
+    const d = drag.current
+    if (!d || d.id !== e.pointerId) return
     drag.current = null
-    setOffset({ dx: 0, active: false })
+    if (d.moved) { suppressClick.current = true; setTimeout(() => { suppressClick.current = false }, 0); scrollTo(Math.round(e.currentTarget.scrollLeft / e.currentTarget.clientWidth)) }
   }
-  const threshold = () => {
-    const width = pairRef.current?.getBoundingClientRect().width ?? 0
-    return width > 0 ? Math.min(COMMIT_PX, width * COMMIT_SHARE) : COMMIT_PX
-  }
-
-  const onPointerDown = (e: PointerEvent<HTMLDivElement>) => {
-    if (!swipe || !e.isPrimary) return
-    dragged.current = false
-    drag.current = { id: e.pointerId, x: e.clientX, y: e.clientY, dx: 0, dy: 0, horizontal: false }
-  }
-  const onPointerMove = (e: PointerEvent<HTMLDivElement>) => {
-    const d = drag.current
-    if (!d || d.id !== e.pointerId) return
-    d.dx = e.clientX - d.x
-    d.dy = e.clientY - d.y
-    if (!d.horizontal) {
-      if (Math.abs(d.dx) < SLOP_PX && Math.abs(d.dy) < SLOP_PX) return
-      if (Math.abs(d.dx) <= Math.abs(d.dy) * DOMINANCE) {
-        // Vertical: the sheet scrolls, nothing happens here.
-        reset()
-        return
-      }
-      d.horizontal = true
-      dragged.current = true
-      e.currentTarget.setPointerCapture(e.pointerId)
-    }
-    setOffset({ dx: d.dx, active: true })
-  }
-  const onPointerUp = (e: PointerEvent<HTMLDivElement>) => {
-    const d = drag.current
-    if (!d || d.id !== e.pointerId) return
-    const commit =
-      d.horizontal && Math.abs(d.dx) >= threshold() && Math.abs(d.dx) > Math.abs(d.dy) * DOMINANCE
-    const side = d.dx < 0 ? 0 : 1
-    reset()
-    const picked = shown[side]
-    if (commit && picked) onPick(picked.matchId)
-  }
-  const onClickCapture = (e: ReactMouseEvent<HTMLDivElement>) => {
-    if (!dragged.current) return
-    dragged.current = false
-    e.preventDefault()
-    e.stopPropagation()
-  }
-  const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
-    if (!pair) return
-    if (e.key === 'ArrowLeft') {
-      e.preventDefault()
-      buttons.current[0]?.focus()
-    } else if (e.key === 'ArrowRight') {
-      e.preventDefault()
-      buttons.current[1]?.focus()
-    }
-  }
-
-  const dx = offset.active ? offset.dx : 0
-  const leaning = offset.active && Math.abs(dx) >= SLOP_PX ? (dx < 0 ? 0 : 1) : null
-  const rotate = Math.max(-MAX_ROTATE_DEG, Math.min(MAX_ROTATE_DEG, dx / 20))
-  const pairStyle =
-    swipe && !reduced
-      ? {
-          transform: `translateX(${dx}px) rotate(${rotate}deg)`,
-          transition: offset.active ? 'none' : `transform ${SNAP_MS}ms ease-out`,
-        }
-      : undefined
-
-  const footer = (
-    <Button onClick={onSkip} disabled={isPending}>
-      {candidates.length === 0 ? 'Close' : 'Skip for now'}
-    </Button>
-  )
-
   return (
-    <Sheet
-      open={open}
-      onOpenChange={(next) => {
-        if (!next && !isPending) onSkip()
-      }}
-      title={`Next on ${courtLabel}`}
-      footer={footer}
-      fullscreen
-      dismissible={!isPending}
-      hideClose={isPending}
-    >
-      <p className="m-0 text-[13px] text-fg2">
-        Match {matchNo} is done. Pick the match that goes on next. It goes on court getting ready;
-        you start it from the court.
-      </p>
+    <Sheet open={open} onOpenChange={(next) => { if (!next && !isPending) onSkip() }} title={`Next on ${courtLabel}`} footer={<Button onClick={onSkip} disabled={isPending}>{shown.length ? 'Skip for now' : 'Close'}</Button>} fullscreen dismissible={!isPending} hideClose={isPending}>
+      <p className="m-0 text-[13px] text-fg2">Match {matchNo} is done. Pick the match that goes on next. It goes on court getting ready; you start it from the court.</p>
       {error ? <Notice tone="error">{error}</Notice> : null}
-      {candidates.length === 0 ? (
-        <Notice>No ready match for {courtLabel} right now.</Notice>
-      ) : (
-        // biome-ignore lint/a11y/noStaticElementInteractions: arrow keys move focus between the Pick this buttons
-        <div
-          ref={pairRef}
-          className={cn(
-            'grid gap-2 max-[640px]:flex-1',
-            pair ? 'grid-cols-2' : 'grid-cols-1',
-            swipe && 'touch-pan-y select-none',
-          )}
-          style={pairStyle}
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={onPointerUp}
-          onPointerCancel={reset}
-          onClickCapture={onClickCapture}
-          onKeyDown={onKeyDown}
-        >
-          {shown.map((c, i) => {
-            const side = pair ? (i === 0 ? 'Left' : 'Right') : null
-            const highlighted = leaning === i
-            return (
-              <div
-                key={c.matchId}
-                className={cn(
-                  'flex min-w-0 flex-col gap-2 rounded-md border bg-bg p-3',
-                  highlighted ? 'scale-[1.02] border-accent' : 'border-border-strong',
-                  !reduced && 'transition-[transform,border-color] duration-150',
-                )}
-              >
-                <div className="flex flex-wrap items-center gap-1.5">
-                  <span className="font-mono font-bold">#{c.position}</span>
-                  <Chip>{c.formatLabel}</Chip>
-                  {side ? <span className="ml-auto text-xs text-fg2">{side}</span> : null}
-                </div>
-                <div className="flex-1 break-words">
-                  <b className="block font-bold max-[640px]:text-[18px]">{c.teamA}</b>
-                  <span className="block text-fg2">vs</span>
-                  <b className="block font-bold max-[640px]:text-[18px]">{c.teamB}</b>
-                </div>
-                <Button
-                  ref={(el) => {
-                    buttons.current[i] = el
-                  }}
-                  variant="primary"
-                  block
-                  disabled={isPending}
-                  aria-label={`Put match #${c.position} on ${courtLabel}: ${c.teamA} vs ${c.teamB}`}
-                  onClick={() => onPick(c.matchId)}
-                >
-                  Pick this
-                </Button>
-              </div>
-            )
-          })}
+      {shown.length === 0 ? <Notice>No ready match for {courtLabel} right now.</Notice> : <>
+        <p className="m-0 text-[13px] text-fg2">Only matches that can go on right now. The number on each face is that player's games so far.</p>
+        <div className="relative min-w-0">
+          <div ref={slider} className="flex snap-x snap-mandatory overflow-x-auto [scrollbar-width:none]" onScroll={(e) => setIndex(Math.round(e.currentTarget.scrollLeft / e.currentTarget.clientWidth))} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={() => { drag.current = null }} onClickCapture={(e) => { if (suppressClick.current) { e.preventDefault(); e.stopPropagation(); suppressClick.current = false } }}>
+            {shown.map((c, i) => <div key={c.matchId} className="w-full shrink-0 snap-start rounded-md border border-border-strong bg-bg p-3">
+              <div className="flex items-center gap-1.5"><span className="font-mono font-bold">#{c.position}</span><Chip>{c.formatLabel}</Chip>{i === 0 ? <span className="text-xs text-fg2">Next in line</span> : null}<span className="ml-auto text-xs text-fg2">{i + 1} of {shown.length}</span></div>
+              <div className="flex items-center justify-center gap-3 py-5"><Team players={c.teamA} /><span className="text-xs font-bold text-fg2">VS</span><Team players={c.teamB} /></div>
+              <Button variant="primary" block disabled={isPending} onClick={() => onPick(c.matchId)}>Pick this</Button>
+            </div>)}
+          </div>
+          {shown.length > 1 && index < shown.length - 1 ? <span aria-hidden className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-bg to-transparent" /> : null}
         </div>
-      )}
-      {coarse && pair ? (
-        <p className="m-0 text-[13px] text-fg2">Swipe left or right to pick, or tap Pick this.</p>
-      ) : null}
+        {shown.length > 1 ? <div className="flex items-center justify-center gap-2"><Button aria-label="Previous match" disabled={isPending || index === 0} onClick={() => scrollTo(index - 1)}>‹</Button><Button aria-label="Next match" disabled={isPending || index >= shown.length - 1} onClick={() => scrollTo(index + 1)}>›</Button></div> : null}
+        <p className="m-0 text-[13px] text-fg2">Drag, swipe or use the arrows to see the next one. Up to 5 are shown.</p>
+      </>}
     </Sheet>
   )
 }

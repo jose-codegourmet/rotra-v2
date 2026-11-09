@@ -1,6 +1,6 @@
 # Club invite link in settings, Share club invite on the dashboard
 
-Status: TICKETED — #587
+Status: IN PROGRESS — #587
 Date: 2026-11-09
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Club settings › Club invite link; Home › club header

@@ -14,11 +14,13 @@ export type ClubHeaderProps = {
   /** "Founded at Salinas Dr, Lahug, Cebu City" */
   foundingLine: string
   onCreateSession: () => void
+  /** Opens the Share club invite sheet; the button shows only when this is passed */
+  onShareClubInvite?: () => void
 }
 
 /**
  * The top of the club dashboard: logo or initials, "Club dashboard · date", the club name, the
- * License active chip with the license and founding lines, and Create session.
+ * License active chip with the license and founding lines, Create session and Share club invite.
  */
 export function ClubHeader({
   clubName,
@@ -28,6 +30,7 @@ export function ClubHeader({
   licenseLine,
   foundingLine,
   onCreateSession,
+  onShareClubInvite,
 }: ClubHeaderProps) {
   return (
     <section aria-label="Club" className="flex min-w-0 flex-wrap items-center gap-4">
@@ -54,10 +57,17 @@ export function ClubHeader({
           </span>
         </div>
       </div>
-      <Button variant="primary" onClick={onCreateSession} className="max-[640px]:w-full">
-        <Icon name="plus" />
-        Create session
-      </Button>
+      <div className="flex flex-wrap gap-2 max-[640px]:w-full">
+        <Button variant="primary" onClick={onCreateSession} className="max-[640px]:flex-[1_1_100%]">
+          <Icon name="plus" />
+          Create session
+        </Button>
+        {onShareClubInvite ? (
+          <Button onClick={onShareClubInvite} className="max-[640px]:flex-[1_1_100%]">
+            Share club invite
+          </Button>
+        ) : null}
+      </div>
     </section>
   )
 }

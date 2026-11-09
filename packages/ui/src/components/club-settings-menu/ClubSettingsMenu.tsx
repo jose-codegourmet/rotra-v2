@@ -8,6 +8,7 @@ import { useEffect, useId, useRef, useState } from 'react'
 
 export type ClubSettingsSection =
   | 'identity'
+  | 'invite'
   | 'defaults'
   | 'post'
   | 'license'
@@ -20,6 +21,7 @@ const GROUPS: [string, [ClubSettingsSection, string][]][] = [
     'Club',
     [
       ['identity', 'Club identity'],
+      ['invite', 'Club invite link'],
       ['defaults', 'Session defaults'],
       ['post', 'Facebook post'],
     ],

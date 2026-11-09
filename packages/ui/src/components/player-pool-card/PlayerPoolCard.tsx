@@ -3,6 +3,7 @@
 import type { PlayingLevel } from '@rotra/data/player/types'
 import { Avatar } from '@rotra/ui/avatar'
 import { cn } from '@rotra/ui/cn'
+import { Icon } from '@rotra/ui/icon'
 import { levelLabel } from '@rotra/ui/level-pill'
 import { Switch } from '@rotra/ui/switch'
 import type { KeyboardEvent } from 'react'
@@ -25,8 +26,12 @@ export type PlayerPoolCardProps = {
   level: PlayingLevel | null
   /** Counted games so far */
   games: number
-  /** The session's minimum games */
-  minimumGames: number
+  /** @deprecated Compatibility until the console passes forTheNight in #614; not displayed. */
+  minimumGames?: number
+  /** Games played plus queued matches. */
+  forTheNight?: number
+  selfCheckedInAt?: number | null
+  leftAt?: number | null
   /** Minutes since the player's last game ended (or since they became present). Shown for available players only */
   waitMinutes?: number
   status: PlayerPoolCardStatus
@@ -58,7 +63,7 @@ function statusText(status: PlayerPoolCardStatus) {
 
 /**
  * One player in the live Players view (the prototype's .pc3): a role=button card with picture, name,
- * locked level, games against the minimum, wait time, status and the Present switch. Tapping, Enter
+ * locked level, played and for-the-night totals, wait time, status and the Present switch. Tapping, Enter
  * or Space toggles selection; selected cards show their pick order in a badge.
  */
 export function PlayerPoolCard({
@@ -66,7 +71,9 @@ export function PlayerPoolCard({
   photoUrl,
   level,
   games,
-  minimumGames,
+  forTheNight = games,
+  selfCheckedInAt,
+  leftAt,
   waitMinutes,
   status,
   present,
@@ -78,6 +85,12 @@ export function PlayerPoolCard({
   className,
 }: PlayerPoolCardProps) {
   const state = status.kind === 'playing' ? 'playing' : present ? 'available' : 'away'
+  const presenceCaption =
+    present && selfCheckedInAt != null
+      ? `Checked in themselves · ${new Date(selfCheckedInAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`
+      : !present && leftAt != null
+        ? `Left · ${new Date(leftAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`
+        : undefined
   const showWait = state === 'available' && waitMinutes !== undefined
   const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
     if (event.target !== event.currentTarget) return
@@ -92,7 +105,7 @@ export function PlayerPoolCard({
       role="button"
       tabIndex={0}
       aria-pressed={selected}
-      aria-label={`${name}, ${levelLabel(level)}, ${games} games`}
+      aria-label={`${name}, ${levelLabel(level)}, ${games} games played, ${forTheNight} for the night${presenceCaption ? `, ${presenceCaption}` : ''}`}
       onClick={onToggleSelect}
       onKeyDown={onKeyDown}
       className={cn(playerPoolCardVariants({ state }), className)}
@@ -117,21 +130,27 @@ export function PlayerPoolCard({
           <div className="text-[11px] leading-[1.3] text-fg2">{levelLabel(level)}</div>
         </div>
       </div>
-      <div className="flex flex-wrap gap-1 text-[11px]">
-        <span className="rounded-md bg-bg px-1.5 py-0.5 tabular-nums">
-          {games}/{minimumGames} games
-        </span>
-        {showWait ? (
-          <span className="rounded-md bg-bg px-1.5 py-0.5 tabular-nums">
-            {waitMinutes} min wait
-          </span>
-        ) : null}
+      <div
+        className="grid grid-cols-2 gap-2"
+        aria-label={`${games} games played, ${forTheNight} for the night${presenceCaption ? `, ${presenceCaption}` : ''}`}
+      >
+        <div className="flex min-w-0 flex-col gap-0.5 rounded-md bg-bg px-2.5 py-2">
+          <b className="text-2xl leading-none font-extrabold tabular-nums">{games}</b>
+          <span className="text-[11px] text-fg2">played</span>
+        </div>
+        <div className="flex min-w-0 flex-col gap-0.5 rounded-md bg-accent-subtle px-2.5 py-2">
+          <b className="text-2xl leading-none font-extrabold text-accent tabular-nums">
+            {forTheNight}
+          </b>
+          <span className="text-[11px] text-fg2">for the night</span>
+        </div>
       </div>
       <div className="flex flex-nowrap items-center justify-between gap-3">
         <span
           className={cn('text-[13px] text-fg2', state === 'playing' && 'font-semibold text-accent')}
         >
           {statusText(status)}
+          {showWait ? ` · ${waitMinutes} min wait` : null}
         </span>
         {/* The switch sits inside the card: stop its clicks and keys from reaching the card's selection. */}
         {/* biome-ignore lint/a11y/noStaticElementInteractions: a plain stop-propagation boundary around the Switch */}
@@ -148,6 +167,17 @@ export function PlayerPoolCard({
           />
         </span>
       </div>
+      {present && selfCheckedInAt != null ? (
+        <span className="inline-flex items-center gap-1 text-xs text-fg2">
+          <Icon name="check" size={13} />
+          Checked in themselves ·{' '}
+          {new Date(selfCheckedInAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+        </span>
+      ) : !present && leftAt != null ? (
+        <span className="text-xs text-fg2">
+          Left · {new Date(leftAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+        </span>
+      ) : null}
       {presencePending ? <span className="text-[11px] text-fg2">Saving presence…</span> : null}
     </div>
   )

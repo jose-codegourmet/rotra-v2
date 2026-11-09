@@ -23,6 +23,8 @@ export type RosterRowProps = {
   level: PlayingLevel | null
   present: boolean
   presencePending?: boolean
+  selfCheckedInAt?: number | null
+  leftAt?: number | null
   /** Levels lock when the session starts: the level shows as text with a lock, no select */
   levelLocked?: boolean
   /** Settings summary: presence is text and removal is unavailable. */
@@ -48,6 +50,8 @@ export function RosterRow({
   level,
   present,
   presencePending = false,
+  selfCheckedInAt,
+  leftAt,
   levelLocked,
   readOnly = false,
   onOpenProfile,
@@ -100,30 +104,46 @@ export function RosterRow({
         )}
         <LevelDiffIndicator id={diffId} level={level} suggestion={suggestion} />
       </div>
-      <div className="order-3 flex flex-nowrap items-center justify-between gap-2 sm:order-none sm:justify-start">
-        <span className="text-[13px] text-fg2">
-          {presencePending
-            ? 'Saving presence…'
-            : readOnly
-              ? present
-                ? 'Present'
-                : 'Away'
-              : 'Present'}
-        </span>
-        {!readOnly ? (
-          <>
-            <Switch checked={present} onChange={onPresentChange} aria-label={`${name} present`} />
-            {!levelLocked ? (
-              <IconButton
-                size="xs"
-                variant="ghost"
-                label={`Remove ${name} from roster`}
-                onClick={onRemove}
-              >
-                <Icon name="x" />
-              </IconButton>
-            ) : null}
-          </>
+      <div className="order-3 flex flex-col gap-1 sm:order-none">
+        <div className="flex flex-nowrap items-center justify-between gap-2 sm:justify-start">
+          <span className="text-[13px] text-fg2">
+            {presencePending
+              ? 'Saving presence…'
+              : readOnly
+                ? present
+                  ? 'Present'
+                  : 'Away'
+                : 'Present'}
+          </span>
+          {!readOnly ? (
+            <>
+              <Switch checked={present} onChange={onPresentChange} aria-label={`${name} present`} />
+              {!levelLocked ? (
+                <IconButton
+                  size="xs"
+                  variant="ghost"
+                  label={`Remove ${name} from roster`}
+                  onClick={onRemove}
+                >
+                  <Icon name="x" />
+                </IconButton>
+              ) : null}
+            </>
+          ) : null}
+        </div>
+        {present && selfCheckedInAt != null ? (
+          <span className="inline-flex items-center gap-1 text-xs text-fg2">
+            <Icon name="check" size={13} />
+            Checked in themselves ·{' '}
+            {new Date(selfCheckedInAt).toLocaleTimeString([], {
+              hour: 'numeric',
+              minute: '2-digit',
+            })}
+          </span>
+        ) : !present && leftAt != null ? (
+          <span className="text-xs text-fg2">
+            Left · {new Date(leftAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+          </span>
         ) : null}
       </div>
     </div>

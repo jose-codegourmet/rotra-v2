@@ -3,8 +3,9 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const playerPoolCardMeta = {
   name: 'PlayerPoolCard',
   description:
-    'One player in the live Players view: picture, name, locked level, "G/MIN games", "M min wait" when available, status (On Court X, Away, Queued · #P, Free) and the Present switch. Tapping the card picks the player for the next match and shows the pick order.',
+    'One player in the live Players view: picture, name, locked level, played and for-the-night game totals, "M min wait" when available, status (On Court X, Away, Queued · #P, Free) and the Present switch. Tapping the card picks the player for the next match and shows the pick order.',
   usage: [
+    'Pass forTheNight as played plus queued games, and selfCheckedInAt or leftAt for the presence caption.',
     'presencePending shows Saving presence… without disabling the switch; the data batch owns optimistic values and rollback.',
     'Use in the Q-POOL grid of the live console (Players tab). The whole card is a toggle button with aria-pressed; Enter and Space select it too.',
     'The Present switch is a separate control: toggling it never changes the selection, and turning someone off never ends their current game.',

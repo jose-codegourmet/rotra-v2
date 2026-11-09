@@ -2,11 +2,11 @@ import qrcode from 'qrcode-generator'
 
 const QUIET_ZONE = 4
 
-export type SessionQrDrawing = { size: number; count: number; path: string }
-export type SessionQrFormat = 'post' | 'story'
+export type ShareQrDrawing = { size: number; count: number; path: string }
+export type ShareFormat = 'post' | 'story'
 
 /** Encodes the exact public link with H correction and a four-module quiet zone. */
-export function drawSessionQr(link: string): SessionQrDrawing | null {
+export function drawShareQr(link: string): ShareQrDrawing | null {
   if (!link) return null
   try {
     const code = qrcode(0, 'H')
@@ -24,7 +24,7 @@ export function drawSessionQr(link: string): SessionQrDrawing | null {
 }
 
 /** CORS-enabled images can be included in the PNG; failures use the same initials fallback. */
-export async function loadSessionQrLogo(url: string): Promise<HTMLImageElement | null> {
+export async function loadShareLogo(url: string): Promise<HTMLImageElement | null> {
   const image = new Image()
   image.crossOrigin = 'anonymous'
   return new Promise((resolve) => {
@@ -35,11 +35,11 @@ export async function loadSessionQrLogo(url: string): Promise<HTMLImageElement |
 }
 
 /** Rasterizes the current card's measured layout, so wrapped copy and both formats match the preview. */
-export async function renderSessionQrPng(
+export async function renderSharePng(
   card: HTMLElement,
-  qr: SessionQrDrawing,
-  logo: HTMLImageElement | null,
-  format: SessionQrFormat,
+  qr: ShareQrDrawing,
+  logos: Record<string, HTMLImageElement | null>,
+  format: ShareFormat,
 ): Promise<Blob | null> {
   try {
     await document.fonts.ready
@@ -90,7 +90,8 @@ export async function renderSessionQrPng(
       ctx.fillStyle = style.backgroundColor
       ctx.fill()
       ctx.clip()
-      if (element.hasAttribute('data-qr-logo') && logo) {
+      const logo = logos[element.getAttribute('data-qr-logo') ?? ''] ?? null
+      if (logo) {
         const side = Math.min(logo.naturalWidth, logo.naturalHeight)
         ctx.drawImage(
           logo,

@@ -11,6 +11,7 @@ export function QueueSearchField({ value, onChange, matchCount }: QueueSearchFie
   const query = value.trim()
   return (
     <div className="flex flex-col gap-1.5">
+      {/* biome-ignore lint/a11y/noLabelWithoutControl: TextInput renders the input inside this label */}
       <label>
         <span className="sr-only">Find a player in the queue</span>
         <TextInput

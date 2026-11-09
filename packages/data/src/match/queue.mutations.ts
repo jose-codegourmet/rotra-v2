@@ -1,5 +1,5 @@
 import { MockError } from '../mock/errors'
-import { type MockState, mockStore } from '../mock/store'
+import { type MockState, readMockState } from '../mock/store'
 import { queueMutation, requireSessionWrite, sessionIn } from '../mock/transaction'
 import { autoFillCourts, autoFillNote } from '../queue-session/courtFill'
 import {
@@ -273,7 +273,7 @@ export function removeWaitingMatch(input: { sessionId: string; matchId: string }
 export function clearQueue(sessionId: string) {
   if (isRealDataMode())
     throw new MockError('permission', 'Clear queue is not available in real mode.')
-  const snapshot = mockStore.getSnapshot()
+  const snapshot = readMockState()
   requireSessionWrite(snapshot, sessionId)
   requireLive(snapshot, sessionId)
   if (!snapshot.matches.some((match) => match.sessionId === sessionId && match.state === 'waiting'))

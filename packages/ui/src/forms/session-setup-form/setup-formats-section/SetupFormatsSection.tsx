@@ -1,8 +1,8 @@
 'use client'
 
 import type { MatchFormat } from '@rotra/data/match/types'
-import { cn } from '@rotra/ui/cn'
 import { ChoiceGroup } from '@rotra/ui/choice-group'
+import { cn } from '@rotra/ui/cn'
 import { Notice } from '@rotra/ui/notice'
 import { Switch } from '@rotra/ui/switch'
 import { Controller, useFormContext, useWatch } from 'react-hook-form'
@@ -61,6 +61,7 @@ export function SetupFormatsSection({
       {allowedRequestFormats ? (
         <div className="flex flex-col gap-1.5">
           <span className="text-[13px] font-semibold text-fg2">Players can request</span>
+          {/* biome-ignore lint/a11y/useSemanticElements: a group/region div; a fieldset or section would change the drawn layout */}
           <div
             role="group"
             aria-label="Formats players can request"

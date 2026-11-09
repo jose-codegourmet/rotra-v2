@@ -46,7 +46,10 @@ export const FiveVersusFive: Story = {
 }
 export const Arranged: Story = { args: { arranged: true, levelA: 9, levelB: 9 } }
 export const Pending: Story = { args: { isPending: true } }
-export const Error: Story = { args: { error: 'Could not make the match. Try again.' } }
+export const ErrorState: Story = {
+  name: 'Error',
+  args: { error: 'Could not make the match. Try again.' },
+}
 export const DoublesLight: Story = { globals: { theme: 'light' } }
 export const SinglesLight: Story = { ...Singles, globals: { theme: 'light' } }
 export const OneVersusTwoLight: Story = { ...OneVersusTwo, globals: { theme: 'light' } }

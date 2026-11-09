@@ -7,6 +7,7 @@ Mockup: apps/mockup/admin-app/rotra-admin.html › Players › Quick view side p
 Screen ID: A-PLAYERS
 Route: /admin/players
 Components: player-edit-form, player-review-changes
+Superseded by: 2026-11-09-admin-edit-player-everything.md
 
 ## What changed
 - Before: Edit profile had Full name, Nickname, Profile photo link (unclaimed only), Reason for the change and

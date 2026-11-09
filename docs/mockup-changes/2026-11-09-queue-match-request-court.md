@@ -1,6 +1,6 @@
 # Request a match: the request is laid out on a court
 
-Status: NEW
+Status: TICKETED — #585
 Date: 2026-11-09
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Public session page › My night › Request a match sheet

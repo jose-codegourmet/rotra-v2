@@ -1,6 +1,6 @@
 # Request a match: six format pills, gated by a session setting
 
-Status: NEW
+Status: TICKETED — #585
 Date: 2026-11-09
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Public session page › Request a match; Session setup › Formats and mode; Preparation › Setup card; Requests › Match

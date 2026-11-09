@@ -10,7 +10,7 @@
 
 ## Q-QUEUE — One waiting list
 
-Header “Queued matches” with **Add match**, **Suggest**, **Generate matches**, and **Regenerate** (primary when something needs attention; disabled when the queue is empty).
+Header “Queued matches” with **Add match**, **Suggest**, **Generate matches**, and **Regenerate** (primary when something needs attention; disabled when the queue is empty), then a solid red **Clear queue** (owner request, November 9, 2026; disabled when no match is waiting) that opens [D-CLEAR-QUEUE](../../dialogs.md#d-clear-queue--remove-every-waiting-match).
 
 Attention notice: “N waiting matches need attention. Edit the lineup to swap the player, or regenerate.” Context: “One waiting list for every court. MODE mode guides suggestions; you can override any of it.”
 

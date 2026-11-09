@@ -44,7 +44,7 @@ There is **one queue for the session**, not one per court.
 - Queue position is a **suggestion, not a rule**. Any waiting match that is ready can go on court, whatever its place.
 - A free court proposes the **next eligible** match: the first ready match in queue order. If earlier matches were skipped, the court says why ("Skipped #1: Jom is playing on Court 2"). **Pick another** lists every waiting match with its status, and any ready one can be put on court there.
 - Blocked matches keep their place.
-- The operator reorders by dragging a match's handle (arrow keys on the handle do the same from the keyboard), and can remove a waiting match. Removing it records no game.
+- The operator reorders by dragging a match's handle (arrow keys on the handle do the same from the keyboard), and can remove a waiting match. Removing it records no game. **Clear queue** (owner request, November 9, 2026), after a confirmation, removes every waiting match at once, manual and automatic; On court, Playing and finished matches are untouched and no game is recorded.
 
 ### Match status
 
@@ -118,7 +118,7 @@ Selections persist across tabs in selection order. Review that order before addi
 
 The operator can still place those by hand. A court whose booking has ended **is** filled: its end time is a reminder, not a stop.
 
-**Next-match picker after every result (owner decision, November 9, 2026, #579).** In both modes, Confirm result frees the court and opens a picker for it ([screen](../../../../screens/product/modules/queue/match-control.md#q-next-match--next-match-picker-after-a-result)). The two candidates are the first two waiting matches in Main Queue order that are ready for that one court (one court needed, not blocked), the same readiness check Auto Queue uses; there is no new ranking. The two options are equal, left or right. Picking places that match **On court** (never started). **Skip for now**, or closing the picker, places nothing: Manual Queue leaves the court free, and Auto Queue then fills that court as usual. While the picker is open Auto Queue does not fill that court; other free courts are filled as before. With no ready match the picker says so and offers only Close.
+**Next-match picker after every result (owner decision, November 9, 2026, #579).** In both modes, Confirm result frees the court and opens a picker for it ([screen](../../../../screens/product/modules/queue/match-control.md#q-next-match--next-match-picker-after-a-result)). The candidates are the first five waiting matches in Main Queue order that are ready for that one court (one court needed, not blocked), the same readiness check Auto Queue uses; there is no new ranking. They show one at a time in a slider, #1 first (owner request, November 9, 2026; earlier: the first two, left or right). Picking places that match **On court** (never started). **Skip for now**, or closing the picker, places nothing: Manual Queue leaves the court free, and Auto Queue then fills that court as usual. While the picker is open Auto Queue does not fill that court; other free courts are filled as before. With no ready match the picker says so and offers only Close.
 
 **Send back to queue in Auto Queue.** The sent-back match goes to the top of the queue, and the court is refilled with the next eligible match **other than** the one just sent back.
 

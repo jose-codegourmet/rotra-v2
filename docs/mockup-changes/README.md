@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 21 · IN MOCK APP: 68 · MOCKUP ONLY: 4
+NEW: 28 · IN MOCK APP: 68 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -212,6 +212,7 @@ NEW: 21 · IN MOCK APP: 68 · MOCKUP ONLY: 4
 | [2026-11-07-queue-public-masked-names](2026-11-07-queue-public-masked-names.md) | Public page shows masked participant and waitlist names | — | IN MOCK APP — #475 (PR #482) |
 | [2026-11-07-queue-public-skill-mix](2026-11-07-queue-public-skill-mix.md) | Public page shows an aggregate skill mix above the participants | — | IN MOCK APP — #474 (PR #482) |
 | [2026-11-07-queue-roster-skill-mix-bar](2026-11-07-queue-roster-skill-mix-bar.md) | Skill mix bar above the roster when grouped by Skill group | — | IN MOCK APP — #472 (PR #482) |
+| [2026-11-07-queue-script-modules](2026-11-07-queue-script-modules.md) | Queue prototype script split into plain JS modules | — | NEW |
 | [2026-11-07-queue-session-qr](2026-11-07-queue-session-qr.md) | Session QR button and sheet added to the Preparation header | — | IN MOCK APP — #471 (PR #482) |
 | [2026-11-08-admin-club-sales-tab](2026-11-08-admin-club-sales-tab.md) | Club page gets a Sales tab | sales-stat-card, admin-nav | IN MOCK APP — #504 |
 | [2026-11-08-admin-edit-profile-email](2026-11-08-admin-edit-profile-email.md) | Edit profile gets an Email field that sends a contact-change request | player-edit-form, player-review-changes | IN MOCK APP — #564 |
@@ -258,15 +259,22 @@ NEW: 21 · IN MOCK APP: 68 · MOCKUP ONLY: 4
 | [2026-11-09-queue-club-logo-previous](2026-11-09-queue-club-logo-previous.md) | Club logo: Use previous logo (only current and previous are kept) | club-logo, club-settings, button | NEW |
 | [2026-11-09-queue-guest-linking](2026-11-09-queue-guest-linking.md) | Saved players: “Joined via” marks, and Link to saved player… on a guest's record | saved-player-card, player-profile-sheet, player-picker-sheet, sheet, button | NEW |
 | [2026-11-09-queue-match-request-court](2026-11-09-queue-match-request-court.md) | Request a match: the request is laid out on a court | court-pitch, match-request-sheet | NEW |
+| [2026-11-09-queue-match-request-formats](2026-11-09-queue-match-request-formats.md) | Request a match: six format pills, gated by a session setting | match-request-sheet, segmented-control, session-setup-form, key-value-list, match-request-card | NEW |
+| [2026-11-09-queue-match-request-picker-filters](2026-11-09-queue-match-request-picker-filters.md) | Request a match: the partner / opponent picker gets tabs, a skill filter and a sort | player-picker-sheet, tabs, segmented-control, player-tile | NEW |
 | [2026-11-09-queue-next-match-fullscreen](2026-11-09-queue-next-match-fullscreen.md) | The next-match picker is fullscreen on phones | sheet, next-match-sheet | IN MOCK APP — #579 |
 | [2026-11-09-queue-next-match-picker](2026-11-09-queue-next-match-picker.md) | After a result, a next-match picker offers two ready matches (left or right) | sheet, next-match-sheet | IN MOCK APP — #579 |
+| [2026-11-09-queue-next-match-slider](2026-11-09-queue-next-match-slider.md) | Next-match picker: a slider of up to five ready matches, #1 first | next-match-sheet, sheet, avatar, chip, button | NEW |
 | [2026-11-09-queue-player-match-request](2026-11-09-queue-player-match-request.md) | Session page: Request a match (player side) | sheet, segmented-control, player-tile, player-picker-sheet, team-lineup, button | NEW |
+| [2026-11-09-queue-player-my-night-stats](2026-11-09-queue-player-my-night-stats.md) | Session page: My night shows games and Won / Lost as big numbers; Invite only before the start | card, progress-bar, stat-tile, button | NEW |
 | [2026-11-09-queue-player-my-night](2026-11-09-queue-player-my-night.md) | Session page: My night card, refresh bar, Courts now and own standing | card, button, chip, match-card, standings-slide, public-session-details | NEW |
 | [2026-11-09-queue-player-self-check-in](2026-11-09-queue-player-self-check-in.md) | Session page: players check themselves in, leave, and say they can't make it | button, card, notice | NEW |
+| [2026-11-09-queue-public-court-cards](2026-11-09-queue-public-court-cards.md) | Session page: Courts now shows the Queue Master's court cards, read-only | court-card, court-pitch, chip, avatar, public-session-details | NEW |
 | [2026-11-09-queue-public-payment-per-player](2026-11-09-queue-public-payment-per-player.md) | Session page: Details shows the payment per player | key-value-list, public-session-details | NEW |
 | [2026-11-09-queue-public-profile-links](2026-11-09-queue-public-profile-links.md) | Session page: signed-in Players open a participant's ROTRA profile | public-participant-tile, public-session-participants | NEW |
+| [2026-11-09-queue-public-queue-rows](2026-11-09-queue-public-queue-rows.md) | Session page: the Queue pins #1 and scrolls the rest as one-row matches | public-session-queue, match-card, chip, avatar | NEW |
 | [2026-11-09-queue-public-signed-in-names-join](2026-11-09-queue-public-signed-in-names-join.md) | Session page: full names and one-tap join for signed-in players, three ways in | public-participants, public-session-queue, join-request-card, segmented-control, notice, button | NEW |
 | [2026-11-09-queue-public-you-label](2026-11-09-queue-public-you-label.md) | Session page: the signed-in viewer's own tile is labelled You | public-participant-tile, chip | NEW |
+| [2026-11-09-queue-qm-clear-queue](2026-11-09-queue-qm-clear-queue.md) | Queued matches: a red Clear queue button removes every waiting match | button, confirm-sheet, match-queue-panel | NEW |
 | [2026-11-09-queue-qm-requests-tabs](2026-11-09-queue-qm-requests-tabs.md) | Requests · N with Join and Match tabs: ROTRA-player hints, drop-out notices, match request cards | join-requests-panel, join-request-card, tabs, sheet, notice, chip, list-row, button, level-select | NEW |
 | [2026-11-09-queue-qm-self-check-in](2026-11-09-queue-qm-self-check-in.md) | Roster: “Checked in themselves” mark, and the club setting Players can check themselves in | roster-row, roster-card, player-pool-card, switch, session-defaults-panel, list-row | NEW |
 | [2026-11-09-queue-session-invite](2026-11-09-queue-session-invite.md) | Session page: Session invite share card for confirmed and waitlisted players | session-join-qr, segmented-control, sheet, button | NEW |

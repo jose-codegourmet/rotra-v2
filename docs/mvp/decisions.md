@@ -30,6 +30,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-09-08](#d-2026-11-09-08) | Sharing: links, QR codes and post/story images | approved | not started | needed | [Player](workstreams/player.md), [Queue](workstreams/queue.md) |
 | [D-2026-11-09-09](#d-2026-11-09-09) | Keeping the session page cheap to serve | approved | not started | needed | [Queue](workstreams/queue.md), [Backend](workstreams/backend.md) |
 | [D-2026-11-09-10](#d-2026-11-09-10) | Uploaded pictures: keep only the current and the previous | approved | not started | needed | [Player](workstreams/player.md), [Queue](workstreams/queue.md), [Backend](workstreams/backend.md) |
+| [D-2026-11-09-11](#d-2026-11-09-11) | Session page and Queue refinements from the owner's artifact review | approved | not started | needed | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
 
 ## Status conventions
 
@@ -229,6 +230,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 - **Ticket:** #579
 - **Roadmap:** MVP — [Queue](workstreams/queue.md).
 - **Decision:** (1) Left and right are two equal options; neither is preferred. (2) Candidates are the first two waiting matches in Main Queue order that are ready for the freed court (one court needed, not blocked), the same readiness check Auto Queue and Q-CHOOSE-MATCH use; no new ranking or pairing rules. (3) The picker opens after every confirmed result, in both Manual Queue and Auto Queue. Picking places the match On court (getting ready, never started); Skip for now places nothing and Auto Queue then fills that court as usual.
+- **Amended by:** [D-2026-11-09-11](#d-2026-11-09-11) (the picker is a slider of up to 5 eligible matches).
 - **References:** [Q-NEXT-MATCH](../screens/product/modules/queue/match-control.md#q-next-match--next-match-picker-after-a-result), [court filling rule](../business_logic/product/queue/modules/queueing/README.md#auto-queue-and-manual-queue-court-filling), [mockup log](../mockup-changes/2026-11-09-queue-next-match-picker.md).
 
 <a id="d-2026-11-09-02"></a>
@@ -300,6 +302,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - **QM side.** One **Requests · N** button with **Join** and **Match** tabs. Drop-out notices show there too, and self check-ins show on the roster. Counts arrive with the QM's existing refresh, with no extra requests. Each match request card shows each player's games played against the minimum, their level, and "On Court 2" or "In queue #3" where it applies. The QM taps **Add to queue**, which makes it a waiting match, or **Decline**. The QM judges fairness, and the server doesn't block requests.
   - **Closing.** A request closes by itself when anyone named stops being present, or when the session ends.
 - **Name:** **Match request**, distinct from Join request.
+- **Amended by:** [D-2026-11-09-11](#d-2026-11-09-11) (six formats and the picker controls).
 - **References:** [matches module](../business_logic/product/queue/modules/matches/), [queueing module](../business_logic/product/queue/modules/queueing/).
 
 <a id="d-2026-11-09-06"></a>
@@ -361,6 +364,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
     - **Regenerate link** stops the old link, and its QR images, from working.
   - **How images are made.** They're drawn on the phone, as the Session QR card already is, so there's no server cost. On phones, **Share** opens the phone's share sheet with the image attached, using the browser's built-in Web Share feature with no new dependency. Elsewhere, and in in-app browsers that don't support it, the button falls back to **Download image**. This hasn't been verified on real phones yet.
   - **Link previews.** One fixed branded preview image per type (session, club, profile), with a dynamic title only. There are no per-page generated preview images.
+- **Amended by:** [D-2026-11-09-11](#d-2026-11-09-11) (a player can invite only before the session starts).
 - **References:** [session QR share card log](../mockup-changes/2026-11-08-queue-session-qr-share-card.md), [results sharing screens](../screens/product/modules/queue/results-sharing.md).
 
 <a id="d-2026-11-09-09"></a>
@@ -393,3 +397,22 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - **Stale caches are accepted.** A deleted picture may still show for a while in Facebook previews or browser caches. The app itself never points to a deleted file.
 - **Scale note:** 10,000 players × 2 pictures × about 200 KB comes to about 4 GB.
 - **References:** [profile picture storage](../database_design/product/player-information/modules/identity.md#profile-picture-storage-542), [club logo persistence](../database_design/product/admin/modules/clubs-licenses.md#club-logo-persistence-374), [court pictures log](../mockup-changes/2026-11-08-queue-setup-court-pictures.md).
+
+<a id="d-2026-11-09-11"></a>
+### D-2026-11-09-11 — Session page and Queue refinements from the owner's artifact review
+- **Decision status:** approved (owner comments on the published Queue prototype, November 9, 2026). The comments are quoted in the matching [mockup logs](../mockup-changes/README.md).
+- **Implementation status:** not started — mockups updated November 9, 2026 (`NEW` logs dated 2026-11-09 in [mockup-changes](../mockup-changes/README.md))
+- **Ticket:** needed
+- **Roadmap:** MVP (same scope as [D-2026-11-09-04](#d-2026-11-09-04) and [D-2026-11-09-05](#d-2026-11-09-05)) — [Queue](workstreams/queue.md), [Player](workstreams/player.md)
+- **Amends:** [D-2026-11-09-01](#d-2026-11-09-01) (the picker is a slider), [D-2026-11-09-04](#d-2026-11-09-04) (Queue, Courts now and My night layout), [D-2026-11-09-05](#d-2026-11-09-05) (formats and picker controls), [D-2026-11-09-08](#d-2026-11-09-08) (when a player can invite).
+- **Decision:**
+  - **Match request formats.** The player picks **2 v 2** (default), **1 v 1**, **1 v 2**, **3 v 3**, **4 v 4** or **5 v 5**. A format the session doesn't allow is disabled. The session setup has a toggle per format for which kinds of games players may request.
+  - **Choose partner / opponent picker.** It has **All · Playing · Available** tabs (Playing = on a court), a skill filter (Beginner, Intermediate, Advanced) and a sort: longest wait, shortest wait, fewest games (default) or most games.
+  - **Invite only before the start.** The player **Invite** button shows only while the session hasn't started. This limits [D-2026-11-09-08](#d-2026-11-09-08), which had no such limit.
+  - **Public Queue.** Signed-in Players see the next match (#1) pinned on top with a yellow glow, and #2 onward in a scrolling list with a bottom fade that disappears at the end. Each match is one horizontal row. No format label: the number of heads shows the format.
+  - **Courts now** uses the Queue Master's court cards, read-only.
+  - **My night** puts games played (with progress toward the minimum) and Won / Lost first, as large numbers.
+  - **Clear queue.** The Queue Master gets a red **Clear queue** button that, after a confirmation, removes every waiting match. Matches on a court and finished matches are not touched.
+  - **Next-match picker** is a slider: one eligible match at a time, #1 on the left, up to **5** matches, draggable, with a fade on the right while more cards follow and a games-played count on each face. It replaces "the first two" in [D-2026-11-09-01](#d-2026-11-09-01).
+- **Open:** the prototype's defaults for which request formats are on in a new session (2 v 2 on, 1 v 1 follows Singles, fun formats off) are not an owner decision yet. Ask before building.
+- **References:** [Public session screens](../screens/product/modules/queue/public-session.md), [Match control › Q-NEXT-MATCH](../screens/product/modules/queue/match-control.md#q-next-match--next-match-picker-after-a-result), [mockup changes](../mockup-changes/README.md).

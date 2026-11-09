@@ -105,6 +105,8 @@ button.conn:hover { border-color: var(--accent); background: var(--surface); }
 .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 .btn.primary:hover:not(:disabled) { background: var(--accent-dim); }
 .btn.danger { border-color: var(--error); color: var(--error); background: transparent; }
+.btn.danger.fill { background: var(--error); border-color: var(--error); color: #fff; }
+.btn.danger.fill:hover:not(:disabled) { background: var(--error); filter: brightness(.9); }
 .btn.ghost { background: transparent; border-color: transparent; }
 .btn.ghost:hover:not(:disabled) { background: var(--elev); }
 .btn.sm { min-height: 36px; padding: 0 12px; font-size: 14px; }
@@ -511,6 +513,20 @@ button.qf:hover .avatar { box-shadow: 0 0 0 2px var(--accent); }
 .nm-names { display: flex; flex-direction: column; gap: 2px; flex: 1; overflow-wrap: anywhere; }
 .nm-names b { font-weight: 700; }
 .nm-names .vs { text-align: left; }
+.nm-slider-wrap { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.nm-slider { flex: 1; min-width: 0; display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; overscroll-behavior-x: contain; scrollbar-width: none; }
+.nm-slider::-webkit-scrollbar { display: none; }
+.nm-slider { cursor: grab; }
+.nm-slider.dragging { cursor: grabbing; scroll-snap-type: none; scroll-behavior: auto; user-select: none; }
+.nm-slider:not(.at-end) { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 56px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 56px), transparent); }
+.nm-slider .nm-card { flex: 0 0 100%; scroll-snap-align: start; align-items: stretch; gap: 10px; padding: 16px; }
+.nm-slider .qfaces { justify-content: center; gap: 8px 14px; }
+.nm-slider .qf .avatar { width: 52px; height: 52px; font-size: 16px; }
+.nm-slider .qf-n { font-size: 13px; }
+.nm-slider .pf-g { min-width: 20px; height: 20px; font-size: 12px; top: -4px; right: -8px; }
+.nm-slider .vs { text-align: center; }
+.nm-arrow { flex: none; font-size: 22px; }
+@media (max-width: 640px) { .sheet.full .nm-slider-wrap { flex: 1; } .sheet.full .nm-slider { align-self: stretch; } .sheet.full .nm-slider .nm-card { justify-content: center; } }
 .nm-hint { display: none; }
 @media (pointer: coarse) { .nm-hint { display: block; } }
 @media (prefers-reduced-motion: reduce) { .nm-pair.snap, .nm-card { transition: none; } .nm-card.lean { transform: none; } }
@@ -962,6 +978,9 @@ textarea.tpl { font-family: var(--mono); font-size: 13px; line-height: 1.55; min
 @media (prefers-reduced-motion: reduce) { .ptile { transition: none; } .ptile:hover:not(:disabled) { transform: none; } }
 /* Request a match as a court: the viewer on the left with the Partner spot, opponent spots on the right. Empty spots are dashed “+” faces. */
 .mr-pitch { aspect-ratio: 134 / 72; }
+.mr-pitch.big { aspect-ratio: 134 / 96; }
+.seg.mr-fmts button { min-width: 56px; padding: 0 10px; font-variant-numeric: tabular-nums; }
+.seg.mr-fmts button:disabled { opacity: .4; cursor: not-allowed; text-decoration: line-through; }
 .mr-pitch .side { gap: 6px 10px; }
 .mr-pitch .pf-n { max-width: clamp(72px, 30cqw, 140px); }
 .mr-me .pf-n { background: var(--accent); color: var(--on-accent); }
@@ -976,6 +995,49 @@ textarea.tpl { font-family: var(--mono); font-size: 13px; line-height: 1.55; min
 .slot-btn .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .slots { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 12px; }
 .slot-col { display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid var(--border-strong); border-radius: var(--r); min-width: 0; }
+
+/* Public queue (owner request, November 9, 2026): compact read-only copy of the QM's queue tiles. #1 glows yellow; the list scrolls from the top and fades at the bottom until it is scrolled to the end. */
+.pq-first { margin-bottom: 6px; }
+/* Each queued match is one horizontal row: position, team A, VS, team B (the faces tell the format). */
+.qtile.pq-row { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 8px 16px; padding: 14px 16px; }
+.pq-row .qt-head { flex-direction: column; align-items: flex-start; gap: 6px; min-width: 0; }
+.pq-row .qt-pos { font-size: 16px; }
+.pq-row .qfaces { flex-wrap: nowrap; justify-content: flex-start; gap: 4px 12px; }
+.pq-row .qf { width: 52px; }
+.qtile.pq .qf .avatar { width: 36px; height: 36px; font-size: 12px; }
+.qtile.pq .qf-n { font-size: 12px; max-width: 52px; }
+.pq-row .vs { font-size: 11px; opacity: .8; }
+.pq-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+@media (max-width: 640px) {
+  .qtile.pq-row { grid-template-columns: 46px minmax(0, 1fr); gap: 8px 12px; }
+  .pq-row .qt-head { grid-row: 1 / span 3; align-self: start; }
+  .pq-row .qfaces { flex-wrap: wrap; }
+  .pq-row .vs { text-align: left; }
+}
+.pq-scroll { max-height: 380px; overflow-y: auto; padding: 4px; margin: -4px; overscroll-behavior: contain; }
+.pq-scroll:not(.at-end) { -webkit-mask-image: linear-gradient(#000 calc(100% - 64px), transparent); mask-image: linear-gradient(#000 calc(100% - 64px), transparent); }
+.qtile.pq .status-line { font-size: 11px; }
+.qtile.pq.next { border-color: var(--warn); background: linear-gradient(180deg, var(--warn-subtle), transparent 70%), var(--surface); box-shadow: 0 0 0 1px var(--warn), 0 0 16px 2px color-mix(in srgb, var(--warn) 45%, transparent); }
+
+/* My night: games played and Won / Lost as big numbers. */
+.mn-stats { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 12px; align-items: stretch; }
+.mn-games, .mn-w, .mn-l { display: flex; flex-direction: column; justify-content: center; gap: 6px; padding: 12px; border: 1px solid var(--border); border-radius: var(--r); background: var(--bg); min-width: 0; }
+.mn-big { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.mn-big b { font-size: 40px; line-height: 1; font-weight: 800; letter-spacing: -1px; }
+.mn-big span { font-size: 13px; color: var(--fg2); }
+.mn-bar { height: 8px; border-radius: 999px; background: var(--elev); overflow: hidden; }
+.mn-bar i { display: block; height: 100%; background: var(--warn); border-radius: 999px; }
+.mn-bar.done i { background: var(--accent); }
+.mn-ok { color: var(--accent); font-weight: 600; }
+.mn-wl { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.mn-w, .mn-l { align-items: center; text-align: center; }
+.mn-w b, .mn-l b { font-size: 32px; line-height: 1; font-weight: 800; }
+.mn-w span, .mn-l span { font-size: 12px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: var(--fg2); }
+.mn-w { border-color: color-mix(in srgb, var(--accent) 45%, transparent); background: var(--accent-subtle); }
+.mn-w b { color: var(--accent); }
+.mn-l { border-color: color-mix(in srgb, var(--error) 45%, transparent); background: var(--error-subtle); }
+.mn-l b { color: var(--error); }
+@media (max-width: 420px) { .mn-stats { grid-template-columns: minmax(0, 1fr); } }
 
 /* Toast */
 .toasts { position: fixed; z-index: 60; left: 50%; transform: translateX(-50%); bottom: calc(80px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 8px; width: min(440px, calc(100vw - 32px)); pointer-events: none; }
@@ -1101,6 +1163,12 @@ function migrateLevels() {
 const FORMATS = { singles: [1, 1], doubles: [2, 2], '1v2': [1, 2], '3v3': [3, 3], '4v4': [4, 4], '5v5': [5, 5] };
 const FORMAT_LABEL = { singles: 'Singles', doubles: 'Doubles', '1v2': '1v2 fun', '3v3': '3v3 fun', '4v4': '4v4 fun', '5v5': '5v5 fun' };
 const FUN = ['1v2', '3v3', '4v4', '5v5'];
+// Match requests (owner request, November 9, 2026): every format is a pill, 2v2 first and default; the session's
+// "Players can request" switches decide which pills are enabled. Unset: the standard formats follow Singles/Doubles, fun games are off.
+const REQ_FORMATS = ['doubles', 'singles', '1v2', '3v3', '4v4', '5v5'];
+const REQ_LABEL = { doubles: '2 v 2', singles: '1 v 1', '1v2': '1 v 2', '3v3': '3 v 3', '4v4': '4 v 4', '5v5': '5 v 5' };
+const reqAllowed = (s) => s.reqFormats || { doubles: !!s.doubles, singles: !!s.singles, '1v2': false, '3v3': false, '4v4': false, '5v5': false };
+const reqDefaults = (d) => ({ doubles: !!d.doubles, singles: !!d.singles, '1v2': false, '3v3': false, '4v4': false, '5v5': false });
 const MODES = {
   chill: { label: 'Chill', text: 'Aims for roughly 30% easy games per player.' },
   fair: { label: 'Fair', text: 'Mainly level-matched games, roughly 10% easy games.' },
@@ -1517,7 +1585,7 @@ function swapCandidate(s, m) {
 }
 // Q-NEXT-MATCH: the first two waiting matches, in Main Queue order, that are ready for one free court.
 // Same readiness check as Auto Queue and Put a match on. No new ranking.
-const nextCandidates = (s) => waiting(s).filter((m) => courtsNeeded(m) === 1 && !blockOf(s, m)).slice(0, 2);
+const nextCandidates = (s) => waiting(s).filter((m) => courtsNeeded(m) === 1 && !blockOf(s, m)).slice(0, 5);
 const autoNote = (s, placed) => placed.map((m) => ` · Match ${m.seq} on ${courtsOf(s, m)} · getting ready`).join('');
 const attention = (s) => waiting(s).filter((m) => (blockOf(s, m) || {}).kind === 'attention');
 
@@ -2327,6 +2395,7 @@ function simulateLive(spec) {
   // Full house: a court that just freed up already has the next match playing on it.
   fill.forEach((c, i) => { const m = waiting(s).find((x) => !blockOf(s, x)); if (m) { m.status = 'active'; m.courts = [c.id]; m.startedAt = now - (2 + i) * 6e4; } });
   s.seq = seq;
+  if (spec.key === 'full') mixQueue(s);
   if (s.finance) roster.forEach((x, i) => { if (x.present && i % 5 !== 4) s.payments[x.pid] = { at: x.presentAt + 3 * 6e4, amount: duePerHead(s) }; });
   return s;
 }
@@ -2786,8 +2855,8 @@ function draftFrom(s, day) {
   const d = new Date(s ? s.start : day || todayAt(19, 0) + 864e5);
   const dstr = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
   const t = (x) => { const z = new Date(x); return `${pad(z.getHours())}:${pad(z.getMinutes())}`; };
-  return s ? { id: s.id, title: s.title, date: dstr, start: t(s.start), end: t(s.end), venue: s.venue, address: s.address, venueId: ((S.venues || []).find((v) => v.name === s.venue) || {}).id || null, courts: s.courts.map((c) => c.label), endDay: dayDiff(s.start, s.end), courtStarts: s.courts.map((c) => c.startsAt ? t(c.startsAt) : ''), courtStartDays: s.courts.map((c) => c.startsAt ? dayDiff(s.start, c.startsAt) : 0), courtEnds: s.courts.map((c) => c.until ? t(c.until) : ''), courtEndDays: s.courts.map((c) => c.until ? dayDiff(s.start, c.until) : 0), dayAware: true, singles: s.singles, doubles: s.doubles, mode: s.mode, minimum: s.minimum, minAuto: s.minAuto !== false, expected: s.expected || '', expectedAuto: !s.expected, perCourt: perCourtOf(s), notes: s.notes, ...financeDraft(s) }
-    : { id: null, title: '', date: dstr, start: '19:00', end: '22:00', endDay: 0, venue: '', address: '', venueId: null, courts: ['Court 1', 'Court 2'], courtStarts: ['', ''], courtStartDays: [0, 0], courtEnds: ['', ''], courtEndDays: [0, 0], dayAware: true, singles: false, doubles: true, mode: 'fair', minimum: 4, minAuto: true, expected: 2 * (S.club.perCourt || 8), expectedAuto: true, perCourt: S.club.perCourt || 8, notes: '', ...financeDraft(null) };
+  return s ? { id: s.id, title: s.title, date: dstr, start: t(s.start), end: t(s.end), venue: s.venue, address: s.address, venueId: ((S.venues || []).find((v) => v.name === s.venue) || {}).id || null, courts: s.courts.map((c) => c.label), endDay: dayDiff(s.start, s.end), courtStarts: s.courts.map((c) => c.startsAt ? t(c.startsAt) : ''), courtStartDays: s.courts.map((c) => c.startsAt ? dayDiff(s.start, c.startsAt) : 0), courtEnds: s.courts.map((c) => c.until ? t(c.until) : ''), courtEndDays: s.courts.map((c) => c.until ? dayDiff(s.start, c.until) : 0), dayAware: true, singles: s.singles, doubles: s.doubles, reqFormats: { ...reqAllowed(s) }, mode: s.mode, minimum: s.minimum, minAuto: s.minAuto !== false, expected: s.expected || '', expectedAuto: !s.expected, perCourt: perCourtOf(s), notes: s.notes, ...financeDraft(s) }
+    : { id: null, title: '', date: dstr, start: '19:00', end: '22:00', endDay: 0, venue: '', address: '', venueId: null, courts: ['Court 1', 'Court 2'], courtStarts: ['', ''], courtStartDays: [0, 0], courtEnds: ['', ''], courtEndDays: [0, 0], dayAware: true, singles: false, doubles: true, reqFormats: reqDefaults({ singles: false, doubles: true }), mode: 'fair', minimum: 4, minAuto: true, expected: 2 * (S.club.perCourt || 8), expectedAuto: true, perCourt: S.club.perCourt || 8, notes: '', ...financeDraft(null) };
 }
 // Three pages, each holding two sections, so a session can be set up quickly. Only page 1 has required fields;
 // "Create session" works from any page and fills the rest with defaults.
@@ -2944,6 +3013,8 @@ function viewSetup() {
     `<div class="li" style="padding:0"><div class="main"><h3>Singles</h3><p class="small muted">Include standard singles when generating matches.</p></div>${sw(d.singles, 'toggleDraft', 'data-k="singles"', 'Singles')}</div>
       <div class="li" style="padding:0"><div class="main"><h3>Doubles</h3><p class="small muted">Include standard doubles when generating matches.</p></div>${sw(d.doubles, 'toggleDraft', 'data-k="doubles"', 'Doubles')}</div>
       ${!d.singles && !d.doubles ? notice('warn', 'With both formats off, Generate matches has nothing to make. Only manual fun games would be possible.') : ''}
+      <div class="field"><span>Players can request</span><div class="seg mr-fmts" role="group" aria-label="Formats players can request">${REQ_FORMATS.map((k) => `<button aria-pressed="${!!(d.reqFormats || {})[k]}" data-act="toggleReqFormat" data-k="${k}">${REQ_LABEL[k]}</button>`).join('')}</div>
+      <span class="hint">Which kinds of games a signed-in player can ask for with Request a match. Greyed pills on their side are the ones you leave off here.${REQ_FORMATS.every((k) => !(d.reqFormats || {})[k]) ? ' With none on, players can\'t send match requests.' : ''}</span></div>
       <div class="field"><span>Mode</span><div class="choices">${Object.entries(MODES).map(([k, m]) => `<button class="choice" data-act="setDraft" data-k="mode" data-v="${k}" aria-pressed="${d.mode === k}"><b>${m.label}</b><span class="small muted">${m.text}</span></button>`).join('')}</div>
       <span class="hint">An easy game means that player's team is favored to win. Modes are flexible pairing presets. You can always change a match yourself.</span></div>`,
     `<div class="between"><span>Minimum completed games per player</span>${d.minAuto ? chip('Calculated', 'ok') : chip('Set by you')}</div>
@@ -3006,7 +3077,7 @@ const pendingReqs = (s) => (s.requests || []).filter((r) => r.status === 'pendin
 // QM side of the player-facing requests (D-2026-11-09-03/05): drop-out notices and match requests share the Requests button.
 const openMatchReqs = (s) => (s.matchRequests || []).filter((x) => x.status === 'open').sort((a, b) => a.at - b.at);
 const openDropOuts = (s) => (s.dropOuts || []).filter((x) => x.status === 'open').sort((a, b) => a.at - b.at);
-const mrNamed = (mr) => [mr.pid, mr.partner, ...(mr.opponents || [])].filter(Boolean);
+const mrNamed = (mr) => [mr.pid, ...(mr.partners || []), ...(mr.opponents || [])].filter(Boolean);
 // D-2026-11-09-05: a match request closes by itself when anyone named stops being present.
 const closeStaleMatchReqs = (s) => { openMatchReqs(s).forEach((mr) => { if (mrNamed(mr).some((pid) => !(R(s, pid) || {}).present)) mr.status = 'closed'; }); };
 const reqCount = (s) => { closeStaleMatchReqs(s); return pendingReqs(s).length + openMatchReqs(s).length + openDropOuts(s).length; };
@@ -3028,7 +3099,7 @@ function mergePlayer(fromId, toId) {
     (x.waitlist || []).forEach((w) => { w.pid = swap(w.pid); });
     (x.matches || []).forEach((m) => { m.teamA = m.teamA.map(swap); m.teamB = m.teamB.map(swap); });
     (x.requests || []).forEach((r) => { if (r.pid === fromId) r.pid = toId; });
-    (x.matchRequests || []).forEach((mr) => { mr.pid = swap(mr.pid); if (mr.partner) mr.partner = swap(mr.partner); mr.opponents = (mr.opponents || []).map(swap); });
+    (x.matchRequests || []).forEach((mr) => { mr.pid = swap(mr.pid); mr.partners = (mr.partners || []).map((x) => x && swap(x)); mr.opponents = (mr.opponents || []).map((x) => x && swap(x)); });
     (x.dropOuts || []).forEach((d) => { d.pid = swap(d.pid); });
     if (x.payments && x.payments[fromId]) { x.payments[toId] = x.payments[toId] || x.payments[fromId]; delete x.payments[fromId]; }
   });
@@ -3088,15 +3159,15 @@ function dropOutRow(s, d) {
 }
 // D-2026-11-09-05: each named player with games against the minimum, level, and where they are right now.
 function matchReqCard(s, mr) {
-  const fmt = mr.format, opp = mr.opponents || [];
-  const spots = fmt === 'singles' ? [[mr.pid, 'Requester'], [opp[0] || null, 'Opponent']] : [[mr.pid, 'Requester'], [mr.partner || null, 'Partner'], [opp[0] || null, 'Opponent'], [opp[1] || null, 'Opponent']];
+  const fmt = mr.format, opp = mr.opponents || [], pts = mr.partners || [], [na, nb] = FORMATS[fmt] || [2, 2];
+  const spots = [[mr.pid, 'Requester'], ...Array.from({ length: na - 1 }, (_, i) => [pts[i] || null, 'Partner']), ...Array.from({ length: nb }, (_, i) => [opp[i] || null, 'Opponent'])];
   const line = ([pid, role]) => {
     if (!pid) return `<div class="li" style="padding:0"><span class="avatar" aria-hidden="true">?</span><div class="main"><b>Anyone</b> <span class="small muted">· ${role}</span><p class="small muted">Filled from present players with the fewest games</p></div></div>`;
     const p = P(pid), r = R(s, pid) || {}, a = busyOf(s, pid), q = waiting(s).findIndex((m) => all(m).includes(pid));
     const where = a ? ` · On ${courtsOf(s, a)}` : q >= 0 ? ` · In queue #${q + 1}` : '';
     return `<div class="li" style="padding:0">${avatar(p)}<div class="main"><b>${esc(p.name)}</b> <span class="small muted">· ${role}</span><p class="small muted">${gamesOf(s, pid)} of ${s.minimum} games · ${esc(lvLabel(r.level))}${where}</p></div></div>`;
   };
-  return `<div class="req-row"><div><b>${esc(nm(mr.pid))} asks for a ${FORMAT_LABEL[fmt].toLowerCase()} match</b><p class="small muted">Requested ${fmtWhen(mr.at, { lower: true })}</p></div>
+  return `<div class="req-row"><div><b>${esc(nm(mr.pid))} asks for a ${REQ_LABEL[fmt] || fmt} ${FORMAT_LABEL[fmt].toLowerCase()} match</b><p class="small muted">Requested ${fmtWhen(mr.at, { lower: true })}</p></div>
       <div class="stack tight">${spots.map(line).join('')}</div>
       <div class="row"><button class="btn sm" data-act="declineMatchReq" data-id="${mr.id}">Decline</button><button class="btn sm primary" data-act="addMatchReq" data-id="${mr.id}">Add to queue</button></div></div>`;
 }
@@ -3165,6 +3236,7 @@ function prepOverview(s) {
       <section class="card stack${live ? ' live-settings' : ''}"><h2>Setup</h2><dl class="kv">
         <dt>Courts</dt><dd>${s.courts.map((c) => live ? `${esc(c.label)} · ${courtWindowText(c)}` : esc(c.label)).join(live ? '<br>' : ', ')}</dd>
         <dt>Formats</dt><dd>${fmtFormats(s)}${live ? ' · <span class="small muted">Fixed after start</span>' : ''}</dd>
+        <dt>Requests</dt><dd>${(() => { const a = reqAllowed(s), on = REQ_FORMATS.filter((k) => a[k]); return on.length ? `Players can request ${on.map((k) => REQ_LABEL[k]).join(', ')}` : 'Players can\'t request matches'; })()}</dd>
         <dt>Mode</dt><dd>${MODES[s.mode].label} · <span class="muted">${MODES[s.mode].text}</span>${live ? ' · <span class="small muted">Fixed after start</span>' : ''}</dd>
         <dt>Minimum</dt><dd>${s.minimum} completed games per player<br><span class="small muted">${live ? `Fixed after start · ${s.minAuto !== false ? 'Calculated before start' : 'Set by you'}.` : s.minAuto !== false ? `Calculated: ${playerCountOf(s)} players on ${est.usable} court${est.usable > 1 ? 's' : ''} for ${fmtDur(s.start, s.end)} gives about ${est.low}–${est.high} games each. Updates as the roster changes.` : `Set by you. The estimate suggests ${est.low}–${est.high}.`}</span></dd>
         <dt>Roster</dt><dd>${s.roster.length} confirmed · ${present} present</dd>
@@ -3454,7 +3526,7 @@ function queuePane(s) {
   const list = waiting(s);
   const att = attention(s).length;
   if (S.ui.queueWorkspace === 'auto') return autoWorkspace(s);
-  return `<div class="seg" role="group" aria-label="Queue workspace"><button aria-pressed="true">Main Queue</button><button data-act="queueWorkspace" data-k="auto">Generate matches</button></div><div class="between"><h2>Queued matches</h2><div class="row acts"><button class="btn sm" data-act="openEditor">Add match</button><button class="btn sm" data-act="openSuggest">Suggest</button><button class="btn sm" data-act="queueWorkspace" data-k="auto">Generate matches</button><button class="btn sm ${att ? 'primary' : ''}" data-act="openRegen" ${list.length ? '' : 'disabled'}>Regenerate</button></div></div>
+  return `<div class="seg" role="group" aria-label="Queue workspace"><button aria-pressed="true">Main Queue</button><button data-act="queueWorkspace" data-k="auto">Generate matches</button></div><div class="between"><h2>Queued matches</h2><div class="row acts"><button class="btn sm" data-act="openEditor">Add match</button><button class="btn sm" data-act="openSuggest">Suggest</button><button class="btn sm" data-act="queueWorkspace" data-k="auto">Generate matches</button><button class="btn sm ${att ? 'primary' : ''}" data-act="openRegen" ${list.length ? '' : 'disabled'}>Regenerate</button><button class="btn sm danger fill" data-act="openClearQueue" ${list.length ? '' : 'disabled'}>Clear queue</button></div></div>
     ${att ? notice('warn', `${att} waiting match${att > 1 ? 'es need' : ' needs'} attention. Edit the lineup to swap the player, or regenerate.`) : ''}
     <p class="small muted">One waiting list for every court. ${MODES[s.mode].label} mode guides suggestions; you can override any of it.</p>
     ${list.length ? `<p class="small muted">Order runs in a snake: left to right, then back right to left on the next row. Drag a card by ⠿ to reorder (arrow keys work on the handle too). Drag a player onto someone on the other team to switch sides. Any card marked ready can go on a court now, whatever its place.</p>
@@ -3862,32 +3934,63 @@ function refreshBar(s) {
 }
 // D-2026-11-09-04: Courts now, inside Details. Players' names per D-02, "Started 7:31 PM", no score and no running time.
 function courtsNow(s) {
-  return `<section class="stack" aria-label="Courts now"><h2>Courts now</h2><div class="grid">${s.courts.map((c) => {
+  // Owner request, November 9, 2026: the same court cards as the QM's console (court drawing, players on each side), read-only. Names follow D-02; no score and no running time.
+  const side = (ids, team) => `<div class="side n${Math.min(ids.length, 5)}" style="--rows:${ids.length <= 2 ? ids.length : ids.length <= 4 ? 2 : 3}" role="group" aria-label="Team ${team}">${ids.map((pid) => { const p = P(pid); return `<div class="pf" aria-label="${esc(pubNameText(p))}, Team ${team}"><span class="pf-face">${pubAvatarOf(p)}</span><span class="pf-n">${esc(pubNameText(p).split(' ')[0])}</span></div>`; }).join('')}</div>`;
+  const skip = new Set();
+  const cards = s.courts.map((c) => {
+    if (skip.has(c.id)) return '';
     const m = courtMatches(s).find((x) => x.courts.includes(c.id));
-    return `<article class="qtile"><div class="qt-head"><b>${esc(c.label)}</b>${m ? chip(FORMAT_LABEL[m.format], 'solid') : ''}</div>${m
-      ? `${[m.teamA, m.teamB].map((ids) => `<div class="qfaces">${ids.map((pid) => `<span class="qf">${pubAvatarOf(P(pid))}<span class="qf-n">${esc(pubNameText(P(pid)))}</span></span>`).join('')}</div>`).join('<div class="vs">VS</div>')}<span class="status-line muted">${m.startedAt ? `Started ${fmtTime(m.startedAt)}` : 'Getting ready'}</span>`
-      : '<span class="status-line muted">Free</span>'}</article>`;
-  }).join('')}</div></section>`;
+    if (!m) return `<div class="court"><div class="ct"><h3>${esc(c.label)}</h3>${chip('Free')}</div><div class="pitch empty" role="img" aria-label="${esc(c.label)} is free">${courtSVG(1)}<span class="free-lbl">Free</span></div></div>`;
+    const merged = m.courts.length > 1;
+    m.courts.forEach((x) => { if (x !== c.id) skip.add(x); });
+    const playing = m.status !== 'oncourt';
+    return `<div class="court ${playing ? 'busy' : 'oncourt'} ${merged ? 'merged' : ''}"><div class="ct"><h3>${esc(merged ? courtsOf(s, m) : c.label)}</h3>${playing ? chip(merged ? 'Merged · Playing' : 'Playing', 'ok') : chip(merged ? 'Merged · Getting ready' : 'Getting ready')}</div>
+      <div class="pitch ${merged ? 'tall' : ''}" role="img" aria-label="${esc(`Team A ${m.teamA.map((x) => pubNameText(P(x))).join(', ')} versus Team B ${m.teamB.map((x) => pubNameText(P(x))).join(', ')}`)}">${courtSVG(merged ? 2 : 1)}<div class="sides">${side(m.teamA, 'A')}${side(m.teamB, 'B')}</div></div>
+      <p class="small muted">${m.startedAt ? `Started ${fmtTime(m.startedAt)}` : 'Waiting to start'}</p></div>`;
+  }).join('');
+  return `<section class="stack" aria-label="Courts now"><h2>Courts now</h2><div class="courts">${cards}</div></section>`;
+}
+// Demo data (owner request, November 9, 2026): the Full house queue holds ten matches of different sizes (1 v 1, 1 v 2, 2 v 2, 3 v 3, 4 v 4, 5 v 5), so the public queue shows that the heads tell the format.
+function mixQueue(s) {
+  const FM = ['3v3', '5v5', '1v2', '4v4', 'doubles', 'singles', '1v2', '3v3', 'doubles', '4v4'];
+  const busy = new Set(courtMatches(s).flatMap(all));
+  const pool = s.roster.filter((x) => x.present && !busy.has(x.pid)).sort((a, b) => restInfo(s, b.pid).mins - restInfo(s, a.pid).mins).map((x) => x.pid).concat(s.roster.filter((x) => busy.has(x.pid)).map((x) => x.pid));
+  if (pool.length < 10) return false;
+  s.matches = s.matches.filter((m) => m.status !== 'waiting');
+  let seq = s.seq || 0, off = 0;
+  FM.forEach((fmt) => {
+    const [na, nb] = FORMATS[fmt], ids = Array.from({ length: na + nb }, (_, j) => pool[(off + j) % pool.length]);
+    off += na + nb; seq += 1;
+    s.matches.push({ id: `${s.id}-m${seq}`, seq, format: fmt, teamA: ids.slice(0, na), teamB: ids.slice(na), status: 'waiting', origin: 'auto', protected: false, courts: [], subs: [], pos: seq });
+  });
+  s.seq = seq; s.mixedQ = 2; return true;
 }
 // D-2026-11-09-03/04/05/08: the My night card for a signed-in player confirmed in the session (or waitlisted, for Invite).
 function myNight(s) {
   const v = pubViewer(); if (!v) return '';
   const r = R(s, v.id), w = (s.waitlist || []).find((x) => x.pid === v.id);
   if (!r && !w) return '';
-  const canInviteNow = s.acceptReq !== false && s.status !== 'finalized' && s.status !== 'cancelled';
+  // Owner request, November 9, 2026: players can invite only until the session starts.
+  const canInviteNow = s.acceptReq !== false && s.status === 'prepared';
   const invite = canInviteNow ? `<button class="btn" data-act="openSessionInvite">Invite</button>` : '';
   if (!r) return `<section class="card stack"><span class="label">My night</span><p>Waitlist #${waitOf(s).findIndex((x) => x.pid === v.id) + 1} · you get a slot if one opens</p>${invite ? `<div class="row acts">${invite}</div>` : ''}</section>`;
   const st = standings(s).find((x) => x.pid === v.id) || { w: 0, l: 0, g: 0 };
   const g = gamesOf(s, v.id);
   const lines = [], acts = [];
-  let hl = false;
+  let hl = false, stats = '';
+  // Owner request, November 9, 2026: games played and Won / Lost get the emphasis as big numbers, with a progress bar toward the minimum.
+  const statBlock = (min) => {
+    const pct = min > 0 ? Math.min(100, Math.round((g / min) * 100)) : 0, done = min > 0 && g >= min;
+    return `<div class="mn-stats" role="group" aria-label="Your night so far"><div class="mn-games"><div class="mn-big"><b class="tnum">${g}</b><span>game${g === 1 ? '' : 's'} played${min > 0 ? ` · minimum ${min}` : ''}</span></div>${min > 0 ? `<div class="mn-bar${done ? ' done' : ''}" role="progressbar" aria-valuemin="0" aria-valuemax="${min}" aria-valuenow="${Math.min(g, min)}" aria-label="Games toward the minimum"><i style="width:${pct}%"></i></div>${done ? '<span class="small mn-ok">Minimum reached</span>' : `<span class="small muted">${min - g} more to reach the minimum</span>`}` : ''}</div>
+      <div class="mn-wl"><div class="mn-w"><b class="tnum">${st.w}</b><span>Won</span></div><div class="mn-l"><b class="tnum">${st.l}</b><span>Lost</span></div></div></div>`;
+  };
   if (s.status === 'prepared') {
     const d = openDropOut(s, v.id);
     lines.push(`Confirmed · starts ${fmtDate(s.start)}, ${fmtTime(s.start)}`);
     if (d) lines.push('Told the QM you can\'t make it');
     else acts.push('<button class="btn" data-act="cantMakeIt">I can\'t make it</button>');
   } else if (s.status === 'finalized') {
-    lines.push(`Session finished · ${g} game${g === 1 ? '' : 's'} · ${st.w}W ${st.l}L`);
+    lines.push('Session finished'); stats = statBlock(0);
     acts.push('<a class="btn" href="../player-app/rotra-player.html" target="_blank" rel="noopener">Match history</a>');
   } else if (!r.present) {
     if (r.selfLeft) lines.push('You\'ve left · tap I\'m here if you come back');
@@ -3898,8 +4001,7 @@ function myNight(s) {
     const a = busyOf(s, v.id), q = waiting(s).findIndex((m) => all(m).includes(v.id)), m = a || (q >= 0 ? waiting(s)[q] : null);
     const withVs = (mm) => { const mine = mm.teamA.includes(v.id) ? mm.teamA : mm.teamB, opp = mine === mm.teamA ? mm.teamB : mm.teamA; const n = (pid) => pubNameText(P(pid)); const partners = mine.filter((p) => p !== v.id).map(n); return `${partners.length ? `with ${partners.join(', ')} ` : ''}vs ${opp.map(n).join(', ')}`; };
     if (r.selfCheckedIn) lines.push(S.online ? 'Checked in' : 'Checked in · the QM will see it when their device syncs');
-    if (s.minimum > 0 && g >= s.minimum) lines.push(g === s.minimum ? `${g} of ${s.minimum} · Minimum reached` : `${g} games · minimum ${s.minimum}`);
-    else lines.push(`${g} of ${s.minimum} games played · ${st.w}W ${st.l}L`);
+    stats = statBlock(s.minimum);
     if (a) { hl = true; lines.push(`You're on ${courtsOf(s, a)} · ${withVs(a)}`); }
     else if (m) lines.push(`In queue #${q + 1} · ${withVs(m)}`);
     else lines.push('Not in a queued match');
@@ -3909,7 +4011,7 @@ function myNight(s) {
     acts.push('<button class="btn" data-act="imLeaving">I\'m leaving</button>');
   }
   if (invite) acts.push(invite);
-  return `<section class="card stack${hl ? ' hl' : ''}" aria-label="My night"><span class="label">My night</span>${lines.map((t) => `<p>${t}</p>`).join('')}${acts.length ? `<div class="row acts">${acts.join('')}</div>` : ''}</section>`;
+  return `<section class="card stack${hl ? ' hl' : ''}" aria-label="My night"><span class="label">My night</span>${stats}${lines.map((t) => `<p>${t}</p>`).join('')}${acts.length ? `<div class="row acts">${acts.join('')}</div>` : ''}</section>`;
 }
 
 // ---------- Q-PUBLIC ----------
@@ -3947,7 +4049,12 @@ function viewPublic() {
       <p class="small muted">Slots are confirmed by the Queue Master. Last updated ${fmtWhen(S.lastSync, { lower: true })}${S.pending ? '. Recent changes from the venue haven’t synced yet.' : '.'}</p></section>`
     : `<section class="stack">${s.roster.length ? `<div class="${fullRoster ? '' : 'pub-cap'}"><div class="pgrid pub">${s.roster.map((r) => { const p = P(r.pid); return pubTile(p, `pcard pub lv-${rvBand(r)}`, r.level != null ? `title="${esc(lvLabel(r.level))}"` : '', `${pubAvatarOf(p)}<div style="min-width:0">${pubNameHtml(p)}</div>`); }).join('')}${s.status === 'finalized' ? '' : Array.from({ length: Math.max(0, capacityOf(s) - s.roster.length) }, () => '<div class="pcard pub empty" aria-hidden="true"><span class="avatar"></span><div><b>Open</b></div></div>').join('')}</div>${!fullRoster && s.roster.length > 9 ? `<div class="pub-more ${s.roster.length > 12 ? 'more-d' : ''}"><span class="pm-count">${s.roster.length} players are in</span>${s.acceptReq === false || !['prepared', 'active'].includes(s.status) ? '<span class="pm-text">Full roster is for confirmed participants.</span>' : `<span class="small muted">Full roster is for confirmed participants.</span><button class="btn primary pm-btn" data-act="openJoin">${I.lock} Join to see the full roster</button>`}</div>` : ''}</div>` : '<div class="card empty">Players have not been added yet.</div>'}${(s.waitlist || []).length ? `<h3>Waitlist · ${s.waitlist.length}</h3><div class="pgrid pub wl">${waitOf(s).map((w, i) => { const p = P(w.pid); return pubTile(p, `pcard pub lv-${rvBand(w)}`, w.level != null ? `title="${esc(lvLabel(w.level))}"` : '', `<span class="wl-av">${pubAvatarOf(p)}<i class="wl-n" aria-hidden="true">${i + 1}</i></span><div style="min-width:0"><span class="sr-only">Waitlist number ${i + 1}: </span>${pubNameHtml(p)}</div>`); }).join('')}</div><p class="small muted">Waitlisted players get a slot if one opens, in this order. Ask the Queue Master.</p>` : ''}</section>`}
     ${tab === 'details' && playerSignedIn && s.status === 'active' ? courtsNow(s) : ''}
-    ${tab === 'details' ? `<section class="stack" aria-label="Queue"><h2>Queue</h2>${playerSignedIn ? `<p class="small muted">Read-only · Last synced queue</p><div class="grid">${s.matches.filter((m) => m.status === 'waiting').sort((a, b) => a.pos - b.pos).map((m, i) => `<article class="qtile"><div class="qt-head"><span class="qt-pos">#${i + 1}</span>${chip(FORMAT_LABEL[m.format], 'solid')}</div>${[m.teamA, m.teamB].map((ids) => `<div class="qfaces">${ids.map((pid) => `<span class="qf">${pubAvatarOf(P(pid))}<span class="qf-n">${esc(pubNameText(P(pid)))}</span></span>`).join('')}</div>`).join('<div class="vs">VS</div>')}<span class="status-line muted">Waiting in queue</span></article>`).join('') || '<p>No matches queued yet.</p>'}</div>` : '<p class="small muted">Log in with ROTRA Player to see the queue.</p>'}</section>` : ''}
+    ${tab === 'details' ? `<section class="stack" aria-label="Queue"><h2>Queue</h2>${playerSignedIn ? `<p class="small muted">Read-only · Last synced queue</p>${(() => {
+        const q = s.matches.filter((m) => m.status === 'waiting').sort((a, b) => a.pos - b.pos);
+        const tile = (m, i) => `<article class="qtile pq pq-row${i === 0 ? ' next' : ''}" aria-label="Queue position ${i + 1}${i === 0 ? ', next match' : ''}"><div class="qt-head"><span class="qt-pos">#${i + 1}</span>${i === 0 ? chip('Next', 'warn') : ''}</div>${[m.teamA, m.teamB].map((ids) => `<div class="qfaces">${ids.map((pid) => `<span class="qf">${pubAvatarOf(P(pid))}<span class="qf-n">${esc(pubNameText(P(pid)).split(' ')[0])}</span></span>`).join('')}</div>`).join('<div class="vs">VS</div>')}</article>`;
+        if (!q.length) return '<p>No matches queued yet.</p>';
+        return `<div class="pq-first">${tile(q[0], 0)}</div>${q.length > 1 ? `<div class="pq-scroll" tabindex="0" role="region" aria-label="Rest of the queue, #2 onward, scrolls"><div class="pq-grid">${q.slice(1).map((m, i) => tile(m, i + 1)).join('')}</div></div>` : ''}`;
+      })()}` : '<p class="small muted">Log in with ROTRA Player to see the queue.</p>'}</section>` : ''}
     ${s.status === 'finalized' ? (pub ? `<section class="stack"><h2>Results</h2>${pub.slides.includes(0) ? slideStandings(s, pubViewer()?.id) : ''}${pub.slides.includes(1) ? slideAwards(s) : ''}${pub.offDay ? slideOffDay(s, true) : ''}</section>`
       : '<section class="card empty">Results for this session have not been shared.</section>') : ''}
   </main>`;
@@ -4084,36 +4191,47 @@ const SHEETS = {
   },
   matchReq(sh) {
     const s = cur(), v = pubViewer();
-    const fmts = [s.doubles && 'doubles', s.singles && 'singles'].filter(Boolean);
-    const fmt = sh.format || fmts[0] || 'doubles';
-    const spots = fmt === 'singles' ? [['opp', 0, 'Opponent']] : [['partner', 0, 'Partner'], ['opp', 0, 'Opponent 1'], ['opp', 1, 'Opponent 2']];
-    const chosen = [sh.partner, ...(sh.opp || [])].filter(Boolean);
+    const allowed = reqAllowed(s), fmt = sh.format, [na, nb] = FORMATS[fmt];
+    const spots = [...Array.from({ length: na - 1 }, (_, i) => ['partner', i, na > 2 ? `Partner ${i + 1}` : 'Partner']), ...Array.from({ length: nb }, (_, i) => ['opp', i, nb > 1 ? `Opponent ${i + 1}` : 'Opponent'])];
+    const at = (key, i) => (key === 'partner' ? sh.partners : sh.opp)[i];
+    const chosen = [...(sh.partners || []), ...(sh.opp || [])].filter(Boolean);
     const spot = (key, i, label) => {
-      const pid = key === 'partner' ? sh.partner : (sh.opp || [])[i];
+      const pid = at(key, i);
       const p = pid ? P(pid) : null, r = pid ? R(s, pid) : null;
       return `<div class="slot-row"><button class="slot-btn${p ? '' : ' empty'}" data-act="mrPick" data-key="${key}" data-i="${i}" aria-label="${label}: ${p ? esc(p.name) : 'Anyone'}. Change">${p ? `${avatar(p)}<span class="main"><b>${esc(p.name)}</b><span class="small muted">${esc(lvLabel(r.level))} · ${gamesOf(s, pid)}/${s.minimum}</span></span><span class="small muted">Change</span>` : `${label} · Anyone`}</button>${p ? `<button class="btn xs ghost icon-btn" data-act="mrClear" data-key="${key}" data-i="${i}" aria-label="Set ${label} back to Anyone">${I.x}</button>` : ''}</div>`;
     };
     if (sh.picking) {
-      const pk = sh.picking, current = pk.key === 'partner' ? sh.partner : (sh.opp || [])[pk.i];
-      const list = s.roster.filter((r) => r.present && r.pid !== v.id).sort((a, b) => gamesOf(s, a.pid) - gamesOf(s, b.pid));
-      return sheetShell(`Choose ${pk.label}`, `<div class="pick-grid">${list.map((r) => playerTile(s, r.pid, { attrs: `data-act="mrChoose" data-id="${r.pid}"`, pressed: r.pid === current, disabled: chosen.includes(r.pid) && r.pid !== current, note: chosen.includes(r.pid) && r.pid !== current ? 'Already picked' : '' })).join('') || '<div class="empty">No other present players.</div>'}</div>
+      const pk = sh.picking, current = at(pk.key, pk.i);
+      const f = { show: 'all', band: 'all', sort: 'gamesAsc', ...(sh.pf || {}) };
+      const here = s.roster.filter((r) => r.present && r.pid !== v.id);
+      const nPlay = here.filter((r) => busyOf(s, r.pid)).length;
+      let list = here.filter((r) => (f.show === 'playing' ? !!busyOf(s, r.pid) : f.show === 'available' ? !busyOf(s, r.pid) : true) && (f.band === 'all' || rvBand(r).split(' ')[0] === f.band));
+      const wt = (r) => restInfo(s, r.pid).mins, gm = (r) => gamesOf(s, r.pid);
+      list = list.sort({ waitDesc: (a, b) => wt(b) - wt(a), waitAsc: (a, b) => wt(a) - wt(b), gamesAsc: (a, b) => gm(a) - gm(b), gamesDesc: (a, b) => gm(b) - gm(a) }[f.sort] || ((a, b) => gm(a) - gm(b)));
+      const ctl = `<div class="stack tight">
+        <div class="tabs" role="tablist" aria-label="Show players">${[['all', `All · ${here.length}`], ['playing', `Playing · ${nPlay}`], ['available', `Available · ${here.length - nPlay}`]].map(([k, l]) => `<button role="tab" aria-selected="${f.show === k}" data-act="mrShow" data-k="${k}">${l}</button>`).join('')}</div>
+        <div class="row"><div class="seg" role="group" aria-label="Filter by skill">${[['all', 'All levels'], ['beginner', 'Beginner'], ['intermediate', 'Intermediate'], ['advanced', 'Advanced']].map(([k, l]) => `<button aria-pressed="${f.band === k}" data-act="mrBand" data-k="${k}">${l}</button>`).join('')}</div>
+        <div class="seg" role="group" aria-label="Sort players">${[['waitDesc', '↓ Longest wait', 'Waiting time, longest first'], ['waitAsc', '↑ Shortest wait', 'Waiting time, shortest first'], ['gamesAsc', '↑ Fewest games', 'Games played, fewest first'], ['gamesDesc', '↓ Most games', 'Games played, most first']].map(([k, l, d]) => `<button aria-pressed="${f.sort === k}" data-act="mrSort" data-k="${k}" title="${d}" aria-label="${d}">${l}</button>`).join('')}</div></div></div>`;
+      return sheetShell(`Choose ${pk.label}`, `${ctl}<div class="pick-grid">${list.map((r) => playerTile(s, r.pid, { attrs: `data-act="mrChoose" data-id="${r.pid}"`, pressed: r.pid === current, disabled: chosen.includes(r.pid) && r.pid !== current, note: chosen.includes(r.pid) && r.pid !== current ? 'Already picked' : '' })).join('') || '<div class="empty">No other present players.</div>'}</div>
         <p class="small muted">Present players only. Players on a court or already in a waiting match can still be picked.</p>`,
         `<button class="btn" data-act="mrAnyone">Anyone</button><button class="btn" data-act="mrBack">Back</button>`, true);
     }
     // Owner request (November 9, 2026): the request looks like a court. The viewer stands on the left with the Partner spot; opponent spots are on the right.
     const me = `<div class="pf mr-me" aria-label="You, ${esc(v.name)}"><span class="pf-face">${avatar(v)}</span><span class="pf-n">You</span></div>`;
     const courtSpot = (key, i, label) => {
-      const pid = key === 'partner' ? sh.partner : (sh.opp || [])[i];
+      const pid = at(key, i);
       const p = pid ? P(pid) : null;
       return `<button class="pf mr-spot${p ? '' : ' empty'}" data-act="mrPick" data-key="${key}" data-i="${i}" aria-label="${label}: ${p ? esc(p.name) : 'Anyone'}. Change"><span class="pf-face">${p ? avatar(p) : '<span class="avatar mr-plus" aria-hidden="true">+</span>'}</span><span class="pf-n">${p ? esc(short(pid)) : label}</span></button>`;
     };
     const left = [me, ...spots.filter(([k]) => k === 'partner').map(([k, i, l]) => courtSpot(k, i, l))];
     const right = spots.filter(([k]) => k === 'opp').map(([k, i, l]) => courtSpot(k, i, l));
-    const court = `<div class="pitch mr-pitch" role="group" aria-label="Your match request">${courtSVG(1)}<div class="sides"><div class="side n${left.length}" style="--rows:${left.length}">${left.join('')}</div><div class="side n${right.length}" style="--rows:${right.length}">${right.join('')}</div></div></div>`;
+    const rows = (n) => (n <= 2 ? n : n <= 4 ? 2 : 3);
+    const court = `<div class="pitch mr-pitch${na + nb >= 8 ? ' big' : ''}" role="group" aria-label="Your match request">${courtSVG(1)}<div class="sides"><div class="side n${Math.min(left.length, 5)}" style="--rows:${rows(left.length)}">${left.join('')}</div><div class="side n${Math.min(right.length, 5)}" style="--rows:${rows(right.length)}">${right.join('')}</div></div></div>`;
+    const pills = `<div class="field"><span>Format</span><div class="seg mr-fmts" role="group" aria-label="Format">${REQ_FORMATS.map((k) => `<button aria-pressed="${fmt === k}" data-act="mrFormat" data-k="${k}" ${allowed[k] ? '' : 'disabled title="Not allowed for requests in this session"'}>${REQ_LABEL[k]}</button>`).join('')}</div>${REQ_FORMATS.some((k) => !allowed[k]) ? '<span class="hint">Greyed formats aren\'t open for requests in this session.</span>' : ''}</div>`;
     return sheetShell('Request a match', `<p class="small muted">Tap a spot to pick who you want to play with, or leave it as Anyone. The QM decides.</p>
-      ${fmts.length > 1 ? `<div class="field"><span>Format</span><div class="seg" role="group" aria-label="Format">${fmts.map((k) => `<button aria-pressed="${fmt === k}" data-act="mrFormat" data-k="${k}">${FORMAT_LABEL[k]}</button>`).join('')}</div></div>` : ''}
+      ${pills}
       ${court}
-      ${chosen.length ? `<div class="stack tight">${spots.filter(([k, i]) => (k === 'partner' ? sh.partner : (sh.opp || [])[i])).map(([k, i, l]) => spot(k, i, l)).join('')}</div>` : ''}`,
+      ${chosen.length ? `<div class="stack tight">${spots.filter(([k, i]) => at(k, i)).map(([k, i, l]) => spot(k, i, l)).join('')}</div>` : ''}`,
       '<button class="btn" data-act="closeSheet">Cancel</button><button class="btn primary" data-act="sendMatchReq">Send request</button>');
   },
   sessionQr(sh) {
@@ -4531,6 +4649,12 @@ const SHEETS = {
       `<button class="btn" data-act="closeSheet" data-autofocus>Keep session</button><button class="btn danger" data-act="confirmDeleteSession" ${!S.online ? 'disabled' : ''}>Delete session</button>`);
   },
   // Cancel a planned session (before Start session only). Final: the record keeps its roster, waitlist and payment marks.
+  clearQueue() {
+    const n = waiting(cur()).length;
+    return sheetShell('Clear the queue?', `<p>${n} waiting match${n === 1 ? '' : 'es'} will be removed from the Main Queue.</p>
+      <p class="small muted">Matches already on a court and finished matches are not affected. You can add or generate matches again afterwards.</p>`,
+      '<button class="btn" data-act="closeSheet">Keep queue</button><button class="btn danger fill" data-act="confirmClearQueue">Clear queue</button>');
+  },
   cancelSession(sh) {
     const s = cur(), pay = s.payments || {};
     const paidN = s.roster.filter((r) => pay[r.pid]).length, wl = (s.waitlist || []).length;
@@ -4631,18 +4755,21 @@ const SHEETS = {
     const intro = `<p class="small muted">Match ${sh.seq} is done. Pick the match that goes on next. It goes on court getting ready; you start it from the court.</p>`;
     const err = sh.err ? notice('bad', esc(sh.err)) : '';
     if (!cands.length) return sheetShell(`Next on ${court}`, `${intro}${err}${notice('', `No ready match for ${court} right now.`)}`, '<button class="btn" data-act="closeSheet" data-autofocus>Close</button>', false, 'full');
-    const card = (m, side) => {
+    // Owner request, November 9, 2026: a slider with one eligible match at a time, #1 first (left), faces with their game counts.
+    const faces = (ids) => `<div class="qfaces">${ids.map((pid) => `<span class="qf"><span class="pf-face">${avatar(P(pid))}<span class="pf-g tnum" title="${gamesOf(s, pid)} games played" aria-label="${gamesOf(s, pid)} games played">${gamesOf(s, pid)}</span></span><span class="qf-n">${esc(short(pid))}</span></span>`).join('')}</div>`;
+    const card = (m, i) => {
       const a = esc(listNames(m.teamA)), b = esc(listNames(m.teamB)), pos = order.indexOf(m) + 1;
-      return `<article class="nm-card" data-nm-side="${side}">
-        ${cands.length > 1 ? `<span class="small muted">${side === 'left' ? 'Left' : 'Right'}</span>` : ''}
-        <div class="nm-head"><span class="qt-pos">#${pos}</span>${chip(FORMAT_LABEL[m.format], 'solid')}</div>
-        <div class="nm-names"><b>${a}</b><span class="vs muted small">vs</span><b>${b}</b></div>
-        <button class="btn primary" data-act="pickNextMatch" data-id="${m.id}" data-next-pick="${side}" aria-label="Put match #${pos} on ${court}: ${a} vs ${b}" ${side === 'left' ? 'data-autofocus' : ''}>Pick this</button></article>`;
+      return `<article class="nm-card" data-nm-i="${i}" aria-label="Match ${i + 1} of ${cands.length}">
+        <div class="nm-head"><span class="qt-pos">#${pos}</span>${chip(FORMAT_LABEL[m.format], 'solid')}${i === 0 ? chip('Next in line', 'warn') : ''}<span class="grow"></span><span class="small muted tnum">${i + 1} of ${cands.length}</span></div>
+        ${faces(m.teamA)}<div class="vs">VS</div>${faces(m.teamB)}
+        <button class="btn primary" data-act="pickNextMatch" data-id="${m.id}" aria-label="Put match #${pos} on ${court}: ${a} vs ${b}" ${i === 0 ? 'data-autofocus' : ''}>Pick this</button></article>`;
     };
-    const two = cands.length > 1;
+    const many = cands.length > 1;
     return sheetShell(`Next on ${court}`, `${intro}${err}
-      <div class="nm-pair ${two ? '' : 'one'}" ${two ? 'data-nm-swipe' : ''}>${card(cands[0], 'left')}${two ? card(cands[1], 'right') : ''}</div>
-      ${two ? '<p class="small muted nm-hint">Swipe left or right to pick, or tap Pick this.</p>' : ''}`,
+      <div class="nm-slider-wrap">${many ? '<button class="btn sm icon-btn nm-arrow" data-nm-go="-1" aria-label="Previous match">‹</button>' : ''}
+      <div class="nm-slider" data-nm-slider tabindex="0" role="region" aria-label="Matches ready for ${court}${many ? ', swipe sideways for more' : ''}">${cands.map(card).join('')}</div>
+      ${many ? '<button class="btn sm icon-btn nm-arrow" data-nm-go="1" aria-label="Next match">›</button>' : ''}</div>
+      <p class="small muted">Only matches that can go on right now. The number on each face is that player's games so far.${many ? ' Drag, swipe or use the arrows to see the next one. Up to 5 are shown.' : ''}</p>`,
       '<button class="btn" data-act="skipNextMatch">Skip for now</button>', false, 'full');
   },
   invItem(sh) {
@@ -4881,6 +5008,7 @@ const ACT = {
   downloadSessionQr: () => toast(`${S.ui.sheet?.fmt === 'story' ? 'Story' : 'Post'} image downloaded (sample in this prototype)`),
   copyLink: () => { const v = sessionLink(cur()); try { navigator.clipboard.writeText(v); } catch (e) { /* clipboard unavailable */ } toast('Session link copied'); },
   openGuest: (d) => { go('public', d.id); S.ui.guest = true; render(); },
+  toggleReqFormat: (d) => { const dr = S.ui.draft; dr.reqFormats = { ...reqDefaults(dr), ...(dr.reqFormats || {}) }; dr.reqFormats[d.k] = !dr.reqFormats[d.k]; render(); },
   toggleAcceptReq: () => { const s = cur(); s.acceptReq = s.acceptReq === false; save(); render(); toast(s.acceptReq ? 'Join requests are on' : 'Join requests are off'); },
   openJoin: () => openSheet({ type: 'join', band: null, how: 'guest' }),
   // D-2026-11-09-06, prototype: Log in / Register come back signed in as a sample ROTRA player, with the one-tap request ready.
@@ -4898,23 +5026,27 @@ const ACT = {
   imLeaving: () => { const s = cur(), r = R(s, pubViewer()?.id); if (!r) return; r.present = false; r.selfLeft = true; r.leftAt = Date.now(); const mr = openMatchReq(s, r.pid); if (mr) mr.status = 'closed'; if (!S.online) S.pending += 1; save(); render(); toast('Told the QM you\'re leaving'); },
   cantMakeIt: () => { const s = cur(), v = pubViewer(); if (!v || openDropOut(s, v.id)) return; s.dropOuts = [...(s.dropOuts || []), { id: `d${Date.now()}`, pid: v.id, at: Date.now(), status: 'open' }]; save(); render(); toast('Told the QM you can\'t make it'); },
   // D-2026-11-09-05, player side: Request a match.
-  openMatchReq: () => { const s = cur(); openSheet({ type: 'matchReq', format: s.doubles ? 'doubles' : 'singles', partner: null, opp: [] }); },
-  mrFormat: (d) => { const sh = S.ui.sheet; sh.format = d.k; if (d.k === 'singles') { sh.partner = null; sh.opp = sh.opp.slice(0, 1); } render(); },
-  mrPick: (d) => { const sh = S.ui.sheet; sh.picking = { key: d.key, i: +d.i, label: d.key === 'partner' ? 'partner' : sh.format === 'singles' ? 'opponent' : `opponent ${+d.i + 1}` }; render(); },
-  mrChoose: (d) => { const sh = S.ui.sheet, pk = sh.picking; if (pk.key === 'partner') sh.partner = d.id; else sh.opp[pk.i] = d.id; sh.picking = null; render(); },
-  mrAnyone: () => { const sh = S.ui.sheet, pk = sh.picking; if (pk.key === 'partner') sh.partner = null; else sh.opp[pk.i] = null; sh.picking = null; render(); },
-  mrClear: (d) => { const sh = S.ui.sheet; if (d.key === 'partner') sh.partner = null; else sh.opp[+d.i] = null; render(); },
+  openMatchReq: () => { const s = cur(), a = reqAllowed(s); if (!REQ_FORMATS.some((k) => a[k])) { toast('This session isn\'t taking match requests'); return; } openSheet({ type: 'matchReq', format: REQ_FORMATS.find((k) => a[k]), partners: [], opp: [] }); },
+  mrFormat: (d) => { const sh = S.ui.sheet; if (!reqAllowed(cur())[d.k]) return; sh.format = d.k; const [na, nb] = FORMATS[d.k]; sh.partners = sh.partners.slice(0, na - 1); sh.opp = sh.opp.slice(0, nb); render(); },
+  mrPick: (d) => { const sh = S.ui.sheet, [na, nb] = FORMATS[sh.format]; sh.picking = { key: d.key, i: +d.i, label: d.key === 'partner' ? (na > 2 ? `partner ${+d.i + 1}` : 'partner') : (nb > 1 ? `opponent ${+d.i + 1}` : 'opponent') }; render(); },
+  mrChoose: (d) => { const sh = S.ui.sheet, pk = sh.picking; (pk.key === 'partner' ? sh.partners : sh.opp)[pk.i] = d.id; sh.picking = null; render(); },
+  mrAnyone: () => { const sh = S.ui.sheet, pk = sh.picking; (pk.key === 'partner' ? sh.partners : sh.opp)[pk.i] = null; sh.picking = null; render(); },
+  mrClear: (d) => { const sh = S.ui.sheet; (d.key === 'partner' ? sh.partners : sh.opp)[+d.i] = null; render(); },
   mrBack: () => { S.ui.sheet.picking = null; render(); },
+  // Choose partner / opponent dialog (owner request, November 9, 2026): tabs, skill filter and sort. State lives on the open sheet.
+  mrShow: (d) => { const sh = S.ui.sheet; sh.pf = { ...(sh.pf || {}), show: d.k }; render(); },
+  mrBand: (d) => { const sh = S.ui.sheet; sh.pf = { ...(sh.pf || {}), band: d.k }; render(); },
+  mrSort: (d) => { const sh = S.ui.sheet; sh.pf = { ...(sh.pf || {}), sort: d.k }; render(); },
   sendMatchReq: () => {
     const s = cur(), v = pubViewer(), sh = S.ui.sheet;
     if (!v || openMatchReq(s, v.id)) { S.ui.sheet = null; render(); return; }
-    s.matchRequests = [...(s.matchRequests || []), { id: `mr${Date.now()}`, pid: v.id, format: sh.format, partner: sh.partner || null, opponents: (sh.opp || []).filter(Boolean), at: Date.now(), status: 'open' }];
+    s.matchRequests = [...(s.matchRequests || []), { id: `mr${Date.now()}`, pid: v.id, format: sh.format, partners: Array.from({ length: FORMATS[sh.format][0] - 1 }, (_, i) => sh.partners[i] || null), opponents: Array.from({ length: FORMATS[sh.format][1] }, (_, i) => sh.opp[i] || null), at: Date.now(), status: 'open' }];
     S.ui.sheet = null; save(); render(); toast('Match request sent');
   },
   cancelMatchReq: (d) => { const mr = (cur().matchRequests || []).find((x) => x.id === d.id); if (mr && mr.status === 'open') mr.status = 'cancelled'; save(); render(); toast('Match request cancelled'); },
   // D-2026-11-09-08 Session invite: one short code per player and session, made the first time they open the card.
   openSessionInvite: () => {
-    const s = cur(), v = pubViewer(); if (!v) return;
+    const s = cur(), v = pubViewer(); if (!v || s.status !== 'prepared') return;
     const row = R(s, v.id) || (s.waitlist || []).find((w) => w.pid === v.id); if (!row) return;
     if (!row.inviteCode) { row.inviteCode = Array.from({ length: 8 }, () => 'abcdefghjkmnpqrstuvwxyz23456789'[Math.floor(Math.random() * 31)]).join(''); save(); }
     openSheet({ type: 'sessionQr', fmt: 'post', invite: v.id });
@@ -4963,13 +5095,13 @@ const ACT = {
   // D-2026-11-09-05, QM side: Add to queue makes a waiting match at the end of the Main Queue, filling Anyone spots with the present players who have the fewest games.
   addMatchReq: (d) => {
     const s = cur(), mr = openMatchReqs(s).find((x) => x.id === d.id); if (!mr) return;
-    const fmt = mr.format, size = fmt === 'singles' ? 2 : 4, named = new Set(mrNamed(mr));
+    const fmt = mr.format, [na, nb] = FORMATS[fmt] || [2, 2], size = na + nb, named = new Set(mrNamed(mr));
     const load = (pid) => gamesOf(s, pid) + queuedCount(s, pid);
     const fill = s.roster.filter((r) => r.present && !named.has(r.pid)).map((r) => r.pid).sort((a, b) => load(a) - load(b)).slice(0, size - named.size);
     if (fill.length < size - named.size) { toast(`Not enough present players to fill this ${FORMAT_LABEL[fmt].toLowerCase()} match`); return; }
-    const opp = mr.opponents || [];
-    const teamA = fmt === 'singles' ? [mr.pid] : [mr.pid, mr.partner || fill.shift()];
-    const teamB = fmt === 'singles' ? [opp[0] || fill.shift()] : [opp[0] || fill.shift(), opp[1] || fill.shift()];
+    const opp = mr.opponents || [], pts = mr.partners || [];
+    const teamA = [mr.pid, ...Array.from({ length: na - 1 }, (_, i) => pts[i] || fill.shift())];
+    const teamB = Array.from({ length: nb }, (_, i) => opp[i] || fill.shift());
     const m = addMatch(s, { format: fmt, teamA, teamB }, 'manual', true);
     mr.status = 'added'; mr.matchId = m.id; mr.decidedAt = Date.now();
     commit('Match added to the queue'); render();
@@ -5265,7 +5397,7 @@ const ACT = {
     const courts = d.courts.map((label, i) => ({ id: `c${i + 1}`, label: label.trim() || `Court ${i + 1}`, startsAt: when(d.courtStarts[i], d.courtStartDays[i]), until: when(d.courtEnds[i], d.courtEndDays[i]) }));
     const finance = { courtFee: d.courtFee === '' ? null : +d.courtFee, entryFee: d.entryFee === '' ? null : +d.entryFee, custom: !!d.custom, payFee: d.custom ? +d.payFee : null, shuttles: (d.shuttles || []).filter((x) => x.itemId && +x.tubes > 0).map((x) => ({ itemId: x.itemId, tubes: +x.tubes })) };
     const est = estimateGames(courts.length, Math.round((end - start) / 60000), (existing && existing.roster.length) || +d.expected || courts.length * (+d.perCourt || 8), perGameOf(d));
-    const fields = { title: d.title.trim(), start, end, venue: d.venue.trim(), address: d.address.trim(), courts, singles: d.singles, doubles: d.doubles, mode: d.mode, minimum: d.minAuto ? est.low : +d.minimum, minAuto: d.minAuto, expected: d.expectedAuto ? null : +d.expected || null, perCourt: +d.perCourt || 8, notes: d.notes.trim(), finance };
+    const fields = { title: d.title.trim(), start, end, venue: d.venue.trim(), address: d.address.trim(), courts, singles: d.singles, doubles: d.doubles, reqFormats: { ...reqDefaults(d), ...(d.reqFormats || {}) }, mode: d.mode, minimum: d.minAuto ? est.low : +d.minimum, minAuto: d.minAuto, expected: d.expectedAuto ? null : +d.expected || null, perCourt: +d.perCourt || 8, notes: d.notes.trim(), finance };
     let bal = { moved: 0, filled: 0 };
     if (d.id) { const s = S.sessions.find((x) => x.id === d.id); Object.assign(s, fields); if (s.status === 'prepared') bal = rebalanceSlots(s); }
     let made = 1, skipped = 0;
@@ -5645,6 +5777,8 @@ const ACT = {
     commit('Queue order changed'); render();
     const g = document.querySelector(`.qt-grip[data-id="${d.id}"]`); if (g) g.focus();
   },
+  openClearQueue: () => { if (waiting(cur()).length) openSheet({ type: 'clearQueue' }); },
+  confirmClearQueue: () => { const s = cur(), n = waiting(s).length; s.matches = s.matches.filter((m) => m.status !== 'waiting'); S.ui.sel = []; S.ui.sheet = null; commit(`Queue cleared · ${n} waiting match${n === 1 ? '' : 'es'} removed`); render(); },
   removeWaiting: (d) => { const s = cur(); const m = s.matches.find((x) => x.id === d.id); s.matches = s.matches.filter((x) => x.id !== d.id); commit(`Waiting match ${m.seq} removed`); render(); },
   openAdjust: (d) => { const s = cur(); openSheet({ type: 'adjust', court: '', endAt: s.end > Date.now() ? s.end : ceil15(Date.now() + 1), focus: d && d.k === 'end' ? 'end' : '', err: '' }); },
   // Set end time: any time after now. Courts that follow the session end move with it; a court booked past the new end blocks it.
@@ -5958,6 +6092,34 @@ function endSwipe(apply) {
 document.addEventListener('pointerup', () => endSwipe(true));
 document.addEventListener('pointercancel', () => endSwipe(false));
 
+// Q-NEXT-MATCH slider: drag with a mouse or pen like a swipe (touch scrolls natively), then snap to the nearest card.
+let sdrag = null;
+document.addEventListener('pointerdown', (e) => {
+  if (e.pointerType === 'touch' || e.button !== 0) return;
+  const sl = e.target.closest && e.target.closest('[data-nm-slider]');
+  if (!sl || e.target.closest('button')) return;
+  sdrag = { sl, x: e.clientX, left: sl.scrollLeft, moved: false, id: e.pointerId };
+});
+document.addEventListener('pointermove', (e) => {
+  if (!sdrag || e.pointerId !== sdrag.id) return;
+  const dx = e.clientX - sdrag.x;
+  if (!sdrag.moved && Math.abs(dx) < 4) return;
+  if (!sdrag.moved) { sdrag.moved = true; sdrag.sl.classList.add('dragging'); try { sdrag.sl.setPointerCapture(e.pointerId); } catch (err) { /* capture unsupported */ } }
+  sdrag.sl.scrollLeft = sdrag.left - dx;
+});
+function endSlideDrag() {
+  if (!sdrag) return;
+  const { sl, moved } = sdrag; sdrag = null;
+  if (!moved) return;
+  sl.classList.remove('dragging');
+  const w = sl.clientWidth + 12;
+  sl.scrollTo({ left: Math.round(sl.scrollLeft / w) * w, behavior: reduceMotion() ? 'auto' : 'smooth' });
+}
+document.addEventListener('pointerup', endSlideDrag);
+document.addEventListener('pointercancel', endSlideDrag);
+// Q-NEXT-MATCH slider arrows: scroll one card.
+document.addEventListener('click', (e) => { const b = e.target.closest && e.target.closest('[data-nm-go]'); if (!b) return; const sl = b.parentElement.querySelector('[data-nm-slider]'); if (sl) sl.scrollBy({ left: +b.dataset.nmGo * sl.clientWidth, behavior: reduceMotion() ? 'auto' : 'smooth' }); });
+
 // Drag a player onto someone on the other team to switch sides: queue tiles, Start match, Suggested match and Edit lineup.
 // A mouse or pen drag starts after a few pixels; on touch, press and hold first so the page still scrolls.
 let pdrag = null, swallowClick = false;
@@ -6154,9 +6316,16 @@ function autoFillOpened() {
   if (placed.length) { const prev = curAct; curAct = 'setCourtFill'; commit(`Court open${autoNote(s, placed)}`); curAct = prev; }
 }
 setInterval(() => { if (S.screen === 'console' && !S.ui.sheet && !drag && !pdrag &&!(document.activeElement && /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName))) { autoFillOpened(); render(); } }, 30000);
+// Saved prototypes from before the mixed queue: give the Full house demo its mixed queue once.
+if ((S.sessions || []).filter((x) => x.demo === 'full' && x.status === 'active' && x.mixedQ !== 2).map((x) => mixQueue(x)).some(Boolean)) save();
 prototypeRouter = window.mountPrototypeRouter?.({ read: prototypePath, apply: applyPrototypeRoute, render, home: '/queue' });
 if (!prototypeRouter) render();
 })();
+
+// Public queue: the bottom fade shows until the list is scrolled to its end (or when it needs no scrolling). The Next-match slider fades its right edge the same way.
+const pqSync = (el) => el.classList.toggle('at-end', el.hasAttribute('data-nm-slider') ? el.scrollWidth - el.scrollLeft - el.clientWidth <= 2 : el.scrollHeight - el.scrollTop - el.clientHeight <= 2);
+document.addEventListener('scroll', (e) => { const el = e.target; if (el && el.classList && (el.classList.contains('pq-scroll') || el.hasAttribute('data-nm-slider'))) pqSync(el); }, true);
+new MutationObserver(() => document.querySelectorAll('.pq-scroll, [data-nm-slider]').forEach(pqSync)).observe(document.body, { childList: true, subtree: true });
 </script>
 
 </body></html>

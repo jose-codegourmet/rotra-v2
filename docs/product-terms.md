@@ -171,7 +171,7 @@ Rules: [Matches](business_logic/product/queue/modules/matches/README.md) ·
 | Result slides | Three private slides made at valid Session done: Standings, Awards (MVP, Most Improved), Off Day |
 | Off Day | Below-baseline session performance. Private unless explicitly included when sharing |
 | Publish | Optional sharing of chosen slides on the public page. Separate from profile/rank sync |
-| Match request | A present, signed-in, confirmed player asks for a specific game (format, partner, opponents or “Anyone”). The QM sees it in **Requests › Match** with each player's games against the minimum, level and “On Court 2” / “In queue #3”, then **Add to queue** (a waiting match at the end of the Main Queue, Anyone spots filled from present players with the fewest games) or **Decline**. Closes by itself when anyone named stops being present or the session ends ([D-2026-11-09-05](mvp/decisions.md#d-2026-11-09-05)) |
+| Match request | A present, signed-in, confirmed player asks for a specific game (format from the six pills the session's **Players can request** setting allows, partners, opponents or “Anyone”). The QM sees it in **Requests › Match** with each player's games against the minimum, level and “On Court 2” / “In queue #3”, then **Add to queue** (a waiting match at the end of the Main Queue, Anyone spots filled from present players with the fewest games) or **Decline**. Closes by itself when anyone named stops being present or the session ends ([D-2026-11-09-05](mvp/decisions.md#d-2026-11-09-05)) |
 
 ---
 

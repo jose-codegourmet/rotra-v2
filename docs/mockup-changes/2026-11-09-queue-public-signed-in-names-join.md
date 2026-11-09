@@ -1,6 +1,6 @@
 # Session page: full names and one-tap join for signed-in players, three ways in
 
-Status: IN PROGRESS — #585
+Status: IN MOCK APP — #585
 Date: 2026-11-09
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Public session page › proto-bar “View as”, Want to play? card, Request to join sheet, Participants, Queue

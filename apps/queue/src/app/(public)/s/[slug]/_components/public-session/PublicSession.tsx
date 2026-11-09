@@ -2,9 +2,16 @@
 
 import { useSession } from '@rotra/data/auth/use-session'
 import { isPermissionRefusal } from '@rotra/data/mock/errors'
-import { playerLoginUrl } from '@rotra/data/public-session/context'
+import { playerLoginUrl, playerOrigin } from '@rotra/data/public-session/context'
 import { usePlayerSessionAccess } from '@rotra/data/public-session/player-access'
-import type { MyJoinRequest, PublicSessionPage } from '@rotra/data/public-session/types'
+import type {
+  MyJoinRequest,
+  PlayerSessionAccess,
+  PublicCourtNow,
+  PublicQueuedMatch,
+  PublicSessionPage,
+  PublicSessionParticipant,
+} from '@rotra/data/public-session/types'
 import { useCancelMyJoinRequest } from '@rotra/data/public-session/useCancelMyJoinRequest'
 import { useJoinAsPlayer } from '@rotra/data/public-session/useJoinAsPlayer'
 import { useMyJoinRequest } from '@rotra/data/public-session/useMyJoinRequest'
@@ -13,16 +20,21 @@ import {
   usePublicSession,
   useSignedInPublicSession,
 } from '@rotra/data/public-session/usePublicSession'
+import { useRefreshSession } from '@rotra/data/public-session/useRefreshSession'
 import { isRealDataMode } from '@rotra/data/real/mode'
 import { EmptyState } from '@rotra/ui/empty-state'
 import { JoinRequestCard, type JoinRequestCardProps } from '@rotra/ui/join-request-card'
 import { Notice } from '@rotra/ui/notice'
 import { PublicParticipants } from '@rotra/ui/public-participants'
+import { PublicRefreshBar } from '@rotra/ui/public-refresh-bar'
 import {
   PublicResultsSection,
   type PublicResultsSectionPublished,
 } from '@rotra/ui/public-results-section'
-import { PublicSessionDetails } from '@rotra/ui/public-session-details'
+import {
+  PublicSessionDetails,
+  type PublicSessionCourtNow,
+} from '@rotra/ui/public-session-details'
 import { PublicSessionHero } from '@rotra/ui/public-session-hero'
 import { PublicSessionQueue } from '@rotra/ui/public-session-queue'
 import { Skeleton } from '@rotra/ui/skeleton'
@@ -132,6 +144,44 @@ function joinCardProps(
     : { variant: 'full', skillMix: page.skillMix, ...availability }
 }
 
+/** Courts now entries as the Details component's props (read-only court cards). */
+function courtsNowProps(courts: PublicCourtNow[]): PublicSessionCourtNow[] {
+  const faces = (side: 'a' | 'b', court: PublicCourtNow) =>
+    (side === 'a' ? court.teamA : court.teamB).map((player, i) => ({
+      id: `${court.id}-${side}-${i}`,
+      name: player.name,
+      shortName: player.name,
+      level: player.level,
+      photoUrl: player.pictureUrl ?? undefined,
+    }))
+  return courts.map((court) => ({
+    id: court.id,
+    label: court.label,
+    merged: court.merged,
+    status: court.status,
+    teamA: faces('a', court),
+    teamB: faces('b', court),
+    startedLabel: court.startedAt ? time(court.startedAt) : undefined,
+  }))
+}
+
+/** The signed-in read's Queue in the shape PublicSessionQueue reads (faces and first names). */
+function queueAccess(playerId: string, queue: PublicQueuedMatch[]): PlayerSessionAccess {
+  const side = (players: PublicQueuedMatch['teamA']) =>
+    players.map((player) => ({ name: player.name, level: player.level }))
+  return {
+    playerId,
+    fullRoster: true,
+    participants: [],
+    queue: queue.map((match) => ({
+      matchNo: match.matchNo,
+      format: match.format,
+      teamA: side(match.teamA),
+      teamB: side(match.teamB),
+    })),
+  }
+}
+
 /** The published slides as slide props; Off Day only when the publication included it. */
 function publishedSlides(page: PublicSessionPage): PublicResultsSectionPublished | null {
   if (!page.results) return null
@@ -141,8 +191,19 @@ function publishedSlides(page: PublicSessionPage): PublicResultsSectionPublished
     venue: page.venue.name,
   }
   const { standings, awards, offDay } = page.results
+  const own = standings?.find((row) => row.isViewer)
   return {
-    standings: standings ? { ...frame, rows: standings } : undefined,
+    standings: standings
+      ? {
+          ...frame,
+          // Position is unique, so it is the row id; the signed-in read flags the viewer's own row.
+          rows: standings.map(({ isViewer: _own, ...row }) => ({
+            ...row,
+            id: String(row.position),
+          })),
+          highlightRowId: own ? String(own.position) : undefined,
+        }
+      : undefined,
     awards: awards
       ? {
           ...frame,
@@ -178,6 +239,7 @@ export function PublicSession({ slug, viewer, openJoin = false }: PublicSessionP
   const night = useMyNight(slug, viewerAccount?.id)
   const joinAsPlayer = useJoinAsPlayer(slug)
   const cancelMyRequest = useCancelMyJoinRequest(slug)
+  const refreshing = useRefreshSession(slug)
   // A failed revalidation must never keep privileged roster data visible from the cache.
   const access =
     viewer === 'visitor' &&
@@ -188,6 +250,8 @@ export function PublicSession({ slug, viewer, openJoin = false }: PublicSessionP
       : null
   const [tab, setTab] = useState('details')
   const [loginHref, setLoginHref] = useState<string>()
+  // The Player app's origin for profile links; only known in the browser.
+  const [playerBase, setPlayerBase] = useState<string | null>(null)
   useEffect(() => {
     const current = new URL(location.href)
     let active = current.searchParams.get('tab') === 'participants' ? 'participants' : 'details'
@@ -217,6 +281,7 @@ export function PublicSession({ slug, viewer, openJoin = false }: PublicSessionP
     setTab(active)
     history.replaceState(null, '', current)
     setLoginHref(playerLoginUrl(current.href))
+    setPlayerBase(playerOrigin(location.origin))
   }, [slug])
   const changeTab = (value: string) => {
     setTab(value)
@@ -309,10 +374,23 @@ export function PublicSession({ slug, viewer, openJoin = false }: PublicSessionP
         dev.offline,
         signedIn,
       )
-  const participants = (access?.fullRoster ? access.participants : p.participants).map((x, i) => ({
+  // The signed-in read (names per the signed-in rule, no cap, the viewer flagged) when there is
+  // one; otherwise the visitor page, or the Player-hosted full roster.
+  const signedRead = viewerAccount && signedInPage.data ? signedInPage.data : null
+  const uncapped = !!signedRead || access?.fullRoster === true
+  // Registered players only, for a signed-in viewer only: the Player app's profile, new tab.
+  const tile = (x: PublicSessionParticipant, i: number) => ({
     id: String(i),
     ...x,
-  }))
+    href:
+      uncapped && x.rtrId && x.masked === false && playerBase
+        ? `${playerBase}/find/${encodeURIComponent(x.rtrId)}`
+        : null,
+  })
+  const participants = (access?.fullRoster && !signedRead ? access.participants : p.participants).map(
+    tile,
+  )
+  const waitlist = p.waitlist.map(tile)
 
   return (
     <main className="mx-auto flex max-w-[760px] flex-col gap-5 px-[max(16px,env(safe-area-inset-left,0px))] pt-5 pb-[120px]">
@@ -324,6 +402,14 @@ export function PublicSession({ slug, viewer, openJoin = false }: PublicSessionP
         clubLogoUrl={p.club.logoUrl}
         state={HERO_STATE[p.status]}
       />
+      {signedRead ? (
+        <PublicRefreshBar
+          updatedLabel={time(refreshing.lastRefreshedAt ?? p.lastSyncedAt)}
+          hasPendingChanges={p.hasPendingChanges}
+          refreshThrottled={!refreshing.canRefresh}
+          onRefresh={() => void refreshing.refresh()}
+        />
+      ) : null}
       {p.status === 'cancelled' ? (
         <Notice tone="warn" title="This session is cancelled.">
           {cancelWhy ? `${cancelWhy}.` : null}
@@ -353,26 +439,37 @@ export function PublicSession({ slug, viewer, openJoin = false }: PublicSessionP
             modeLabel={mode.label}
             modeDescription={mode.text}
             minimumGames={p.minimum}
+            amountDuePerPlayer={p.amountDuePerPlayer}
             notes={p.notes}
             lastUpdatedLabel={time(p.lastSyncedAt)}
             hasPendingChanges={p.hasPendingChanges}
+            courtsNow={signedRead ? courtsNowProps(signedRead.courtsNow) : undefined}
+            queueSlot={
+              viewer === 'visitor' ? (
+                signedRead && viewerAccount ? (
+                  <PublicSessionQueue
+                    access={queueAccess(viewerAccount.id, signedRead.queue)}
+                    onRetry={() => void signedInPage.refetch()}
+                  />
+                ) : (
+                  <PublicSessionQueue
+                    access={access ?? null}
+                    loginHref={loginHref}
+                    checking={playerAccess.isPending}
+                    failed={playerAccess.isError}
+                    onRetry={() => void playerAccess.refetch()}
+                  />
+                )
+              ) : undefined
+            }
           />
-          {viewer === 'visitor' ? (
-            <PublicSessionQueue
-              access={access ?? null}
-              loginHref={loginHref}
-              checking={playerAccess.isPending}
-              failed={playerAccess.isError}
-              onRetry={() => void playerAccess.refetch()}
-            />
-          ) : null}
         </TabsContent>
         <TabsContent value="participants">
           <PublicParticipants
             participants={participants}
             participantCount={p.participantCount ?? p.participants.length}
-            fullRoster={access?.fullRoster === true}
-            waitlist={p.waitlist.map((entry, i) => ({ ...entry, id: String(i) }))}
+            uncapped={uncapped}
+            waitlist={waitlist}
             openSlots={p.openSlots}
             finished={p.status === 'completed' || p.status === 'invalid'}
             acceptJoinRequests={

@@ -55,6 +55,14 @@ After three months without playing:
 
 Do not silently reset old visible ranks to Beginner. Handling the numerical blend when no recent performance exists remains open.
 
+## What a player may share
+
+A player can share, as a link, a QR code or a post/story image ([D-2026-11-09-08](../../../../mvp/decisions.md#d-2026-11-09-08)): their **rank card** (level, overall position, ladder), their **result in a session** (position in the published Standings, games, W–L) and their **games in a session** (partner, opponents, score, W–L).
+
+- **Published only.** Session results and games can be shared only after the Queue Master publishes the session's results. Until then there is nothing to share and the player sees “Results not shared yet by the club.”
+- **Own results only.** A player shares their own profile's data; the image's QR opens their profile, which follows the profile privacy setting ([D-2026-11-09-07](../../../../mvp/decisions.md#d-2026-11-09-07)).
+- **Other players' names** on images are shown as a visitor would see them: private players and guests masked, public registered players in full.
+
 ## Overall leaderboard
 
 A newcomer can have a public profile and provisional rank before qualifying for a leaderboard position.

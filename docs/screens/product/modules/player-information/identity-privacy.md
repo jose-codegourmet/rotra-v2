@@ -1,6 +1,6 @@
 # Player ID, phone privacy, and contact-change request
 
-**Surfaces:** `P-ID-QR`, `P-PHONE-PRIVACY`, `P-CONTACT-REQUEST`.
+**Surfaces:** `P-ID-QR`, `P-PROFILE-PRIVACY`, `P-PHONE-PRIVACY`, `P-CONTACT-REQUEST`.
 
 **Sources:** [identity](../../../../business_logic/product/player-information/modules/identity/README.md), [Admin contact approvals](../../../../business_logic/product/admin/modules/player-management/README.md).
 
@@ -14,6 +14,12 @@ Explain permanence only where useful: assigned at first sync using creating club
 
 Loading/no ID yet: show pending allocation honestly. If the player has a stable cached ID, displaying it offline can be allowed as a read behavior; verification by a new club may still need internet.
 
+## P-PROFILE-PRIVACY — Public or private profile
+
+A **Profile visibility** section on **Privacy and contact**, directly above Phone privacy, with the same switch layout. Switch label: **Private profile**. Helper text: "Private means guests don't see your ROTRA profile. Signed-in ROTRA players still see it." Saved line under the switch: "Saved: your profile is public." or "Saved: your profile is private." Profiles are public by default ([D-2026-11-09-07](../../../../mvp/decisions.md#d-2026-11-09-07)).
+
+States: saved (public or private), **Saving…** with the switch disabled, error when offline (the saved line stays as it was; the error says the profile is still public or private). Like the phone switch, the change is confirmed by the server before the saved line changes. What visitors see is in [Profile states](profile.md#profile-states) and [P-LEADERBOARD](ranking-history.md).
+
 ## P-PHONE-PRIVACY — Hide from club operators
 
 A clearly labeled switch: **Hide my phone number from clubs**. Explain that the player can use RTR ID or QR for identification instead. Email/phone remain absent from public profile views regardless of this setting.
@@ -22,7 +28,7 @@ Save requires server confirmation; pending/error states must not falsely claim a
 
 A change cannot erase information a human already saw or instantly revoke a disconnected cached value. The implementation should minimize cached private contacts and refresh/redact them on reconnection; avoid promising retroactive forgetting.
 
-This switch does not change the login phone or invalidate the permanent ID. It is not a setting to hide the player from the public leaderboard.
+This switch does not change the login phone or invalidate the permanent ID. Hiding the player from guests is the separate [Private profile](#p-profile-privacy--public-or-private-profile) switch.
 
 ## P-CONTACT-REQUEST — Ask to change phone or email
 

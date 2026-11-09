@@ -104,3 +104,15 @@ If a game cannot be completed, the operator may mark it invalid after a confirma
 An invalid match frees court(s), records no game played, no win, no loss, no performance, and no minimum-game credit. Retaining a non-counting operational event for sync is distinct from counting it as a player game.
 
 See [completion flow](flow/complete-or-invalidate.md) and the [open decisions](../../../open-decisions.md).
+
+## Match request, player side ([D-2026-11-09-05](../../../../../mvp/decisions.md#d-2026-11-09-05))
+
+- A present, signed-in, confirmed Player sends **Request a match** from the session page: the format when the session has more than one, and a partner and opponents picked from present players (doubles: 1 partner and 2 opponents; singles: 1 opponent), any spot left as “Anyone”. Presence shows only inside that picker, and only to signed-in confirmed players. Players on a court or in a waiting match can still be picked.
+- After sending, the page shows “Match request sent · the QM decides” with **Cancel**. One open match request per player. The players named are not asked and not told; only the QM sees requests.
+- A **Match request** is distinct from a Join request. A request closes by itself when anyone named stops being present, or when the session ends; the record keeps it, hidden.
+
+## Match request, QM side ([D-2026-11-09-05](../../../../../mvp/decisions.md#d-2026-11-09-05))
+
+- Open match requests show under **Requests · N › Match**, oldest first: “NAME asks for a doubles match”, then one line per spot (requester, partner, opponents) with that player's games against the minimum, their level, and “On Court 2” or “In queue #3” where it applies; an unnamed spot reads “Anyone”.
+- **Add to queue** makes it a waiting match at the end of the Main Queue, protected from regeneration like a manual match: the requester and partner on one side, the opponents on the other, each “Anyone” spot filled from present players not already named, fewest games (played plus queued) first. If not enough present players remain, nothing is added and the QM is told. The request becomes `added` and points at the match. **Decline** closes it as `declined`. Nothing tells the other players; the QM judges fairness, the server doesn't block requests.
+- Auto-close: the request closes (`closed`, hidden) when anyone named stops being present (the QM's Present switch, Mark all absent, removal, or the player's **I'm leaving**) or when the session finishes.

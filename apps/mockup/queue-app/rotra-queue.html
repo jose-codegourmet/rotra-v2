@@ -563,7 +563,8 @@ button.qf:hover .avatar { box-shadow: 0 0 0 2px var(--accent); }
 @media (max-width: 760px) { .hero { grid-template-columns: minmax(0, 1fr); padding: 18px; } }
 .club-head { display: flex; gap: 16px; align-items: center; min-width: 0; flex-wrap: wrap; }
 .club-head .club-id { flex: 1 1 220px; min-width: 0; }
-@media (max-width: 640px) { .club-head-cta { width: 100%; } }
+.club-head-acts { display: flex; gap: 8px; flex-wrap: wrap; }
+@media (max-width: 640px) { .club-head-acts { width: 100%; } .club-head-cta { flex: 1 1 100%; } }
 .now-card { position: relative; overflow: hidden; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px 28px; align-items: center; padding: 20px 22px 20px 26px; border-radius: 18px; border: 1px solid var(--border-strong); background: var(--surface); box-shadow: var(--shadow); }
 .now-card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--border-strong); }
 .now-card.live { border-color: var(--accent); background: linear-gradient(100deg, var(--accent-subtle), transparent 65%), var(--surface); }
@@ -1114,9 +1115,10 @@ function seedPlayers() {
     mk('p15', 'Ysa Fernandez', '', 'guest', null, null, 0, null),
     mk('p16', 'Marco Lopez', '', 'registered', 'RTR-PH-ILO-090226-0047', 15, 6, 0.72),
     mk('p17', 'Gab Torres', '', 'unclaimed', 'RTR-PH-CEB-090226-0050', 19, 1, null),
-    mk('p18', 'Iya Mercado', '', 'registered', 'RTR-PH-CEB-091626-0055', 14, 5, 0.4),
-    mk('p19', 'Kiko Salazar', '', 'guest', null, null, 6, 0.5),
-    mk('p20', 'Andi Cruz', '', 'registered', 'RTR-PH-CEB-100726-0061', 11, 0, null),
+    // D-2026-11-09-06: how a saved player joined the club (joinedVia), and a guest's phone kept for linking by the QM.
+    { ...mk('p18', 'Iya Mercado', '', 'registered', 'RTR-PH-CEB-091626-0055', 14, 5, 0.4), joinedVia: 'club' },
+    { ...mk('p19', 'Kiko Salazar', '', 'guest', null, null, 6, 0.5), phone: '0917 555 0188' },
+    { ...mk('p20', 'Andi Cruz', '', 'registered', 'RTR-PH-CEB-100726-0061', 11, 0, null), joinedVia: 'session' },
     // Regulars who fill the example sessions (full house, over budget, waitlists).
     mk('p21', 'Rhea Villanueva', '', 'registered', 'RTR-PH-CEB-101426-0064', 16, 4, 0.52),
     mk('p22', 'Jun Alcantara', 'Jun', 'registered', 'RTR-PH-CEB-101426-0066', 22, 7, 0.61),
@@ -1127,7 +1129,7 @@ function seedPlayers() {
     mk('p27', 'Tin Gonzaga', '', 'guest', null, null, 1, null),
     mk('p28', 'Arvin Uy', '', 'registered', 'RTR-PH-CEB-102826-0080', 24, 8, 0.64),
     { ...mk('p29', 'Faye Dimaculangan', '', 'unclaimed', 'RTR-PH-DVO-110426-0083', 13, 2, null), noPhone: true },
-    mk('p30', 'Lance Ybañez', '', 'registered', 'RTR-PH-CEB-110426-0085', 17, 4, 0.5),
+    { ...mk('p30', 'Lance Ybañez', '', 'registered', 'RTR-PH-CEB-110426-0085', 17, 4, 0.5), joinedVia: 'session' },
   ];
 }
 const DIRECTORY = [
@@ -1150,7 +1152,13 @@ function seedSessions() {
       singles: false, doubles: true, mode: 'fair', minimum: 4,
       notes: 'Open play for club regulars and guests. Bring your own racket; shuttles provided.',
       status: 'prepared', download: 'none',
-      roster: roster.map((pid, i) => ({ pid, level: pid === 'p6' ? null : (levels[pid] ?? sugg[pid]), present: i < 10, locked: false })),
+      roster: roster.map((pid, i) => ({ pid, level: pid === 'p6' ? null : (levels[pid] ?? sugg[pid]), present: i < 10, locked: false, ...(pid === 'p1' ? { inviteCode: 'k7m2p9qw' } : {}) })),
+      // Sample requests for the QM side (D-2026-11-09-02/06/08): a club member invited by Migs, a ROTRA player new to the club, and a guest whose phone matches a saved player.
+      requests: [
+        { id: 'q-seed-rhea', pid: 'p21', account: 'RTR-PH-CEB-101426-0064', name: 'Rhea Villanueva', nick: '', phone: '', band: 'Intermediate', level: 16, at: Date.now() - 25 * 60000, status: 'pending', inviteCode: 'k7m2p9qw' },
+        { id: 'q-seed-paolo', account: 'RTR-PH-MNL-020326-0112', name: 'Paolo Reyes', nick: '', phone: '', band: 'Beginner', level: 6, at: Date.now() - 18 * 60000, status: 'pending' },
+        { id: 'q-seed-kiko', name: 'Kiko Salazar', nick: '', phone: '0917 555 0188', band: 'Intermediate', at: Date.now() - 9 * 60000, status: 'pending' },
+      ],
       matches: [], seq: 0, published: null,
       finance: { courtFee: 350, entryFee: 60, custom: true, payFee: 900, shuttles: [{ itemId: 'inv1', tubes: 4 }, { itemId: 'inv2', tubes: 2 }] },
     },
@@ -1507,7 +1515,7 @@ function syncLabel() {
 // Every saved change goes into a per-device sync log, grouped by the part of the session it touched, so the
 // status pill can show what has synced and what is still waiting on this device.
 const AREA = {
-  confirmReq: 'Roster', declineReq: 'Roster',
+  confirmReq: 'Roster', declineReq: 'Roster', keepDropOut: 'Roster', removeDropOut: 'Roster', addMatchReq: 'Queue', declineMatchReq: 'Queue',
   togglePaid: 'Payments', markAllPaid: 'Payments', savePayAmount: 'Payments', togglePresent: 'Roster', allPresent: 'Roster', allAbsent: 'Roster', giveSlot: 'Roster', fillSlots: 'Roster', removeWait: 'Roster', confirmAdd: 'Roster', confirmNew: 'Roster', setLevel: 'Roster', saveEditPlayer: 'Roster', confirmDeletePlayer: 'Roster',
   confirmStart: 'Session', confirmCancelSession: 'Session', confirmDeleteSession: 'Session', saveSetup: 'Session setup', confirmDone: 'Session done', confirmPublish: 'Published results',
   makeMatch: 'Queue', saveEditor: 'Queue', addSuggest: 'Queue', autoCommit: 'Queue', confirmRegen: 'Queue', move: 'Queue', moveTo: 'Queue', swapSides: 'Queue', removeWaiting: 'Queue',
@@ -1743,7 +1751,7 @@ function viewHome() {
     <section class="club-head" aria-label="Club">${clubLogo('hero-logo')}
       <div class="club-id"><span class="label">Club dashboard · ${new Date().toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' })}</span><h1 class="hero-name">${esc(S.club.name)}</h1>
         <div class="row" style="gap:8px">${chip('License active', 'ok')}<span class="small muted">${esc(S.club.license)} · ${esc(S.club.founding)}</span></div></div>
-      <button class="btn primary club-head-cta" data-act="newSession">${I.plus || '+'} Create session</button>
+      <div class="club-head-acts"><button class="btn primary club-head-cta" data-act="newSession">${I.plus || '+'} Create session</button><button class="btn club-head-cta" data-act="openClubInvite">Share club invite</button></div>
     </section>
     ${nowCard(act, prepared)}
     ${calendarCard()}
@@ -2111,7 +2119,7 @@ const LICENSE_PAYMENTS = [
 ];
 const fmtYmd = (v) => new Date(ymdToTime(v)).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
 const CLUB_TABS = [
-  ['Club', [['identity', 'Club identity'], ['defaults', 'Session defaults'], ['post', 'Facebook post']]],
+  ['Club', [['identity', 'Club identity'], ['invite', 'Club invite link'], ['defaults', 'Session defaults'], ['post', 'Facebook post']]],
   ['License', [['license', 'License and payments']]],
   ['This device', [['device', 'Downloads']]],
   ['Account', [['account', 'Account']]],
@@ -2137,7 +2145,9 @@ function viewClub() {
   const html = `
     <section class="card stack" id="club-identity"><h2>Club identity</h2>
       <div class="logo-edit">${clubLogo('xxl')}<div class="stack tight"><b>Club logo</b><p class="small muted">Shown on the dashboard, the public session page and result images. A square image works best.</p>
-        <div class="row"><label class="btn sm" for="logo-file">${S.club.logo ? 'Replace logo' : 'Upload logo'}</label><input type="file" id="logo-file" class="sr-only" accept="image/*">${S.club.logo ? '<button class="btn sm ghost" data-act="removeLogo">Remove</button>' : ''}</div></div></div>
+        <div class="row"><label class="btn sm" for="logo-file">${S.club.logo ? 'Replace logo' : 'Upload logo'}</label><input type="file" id="logo-file" class="sr-only" accept="image/*">${S.club.logo ? '<button class="btn sm ghost" data-act="removeLogo">Remove</button>' : ''}</div>
+        ${S.club.logoPrev ? `<div class="row" style="gap:10px"><span class="avatar md club-logo"><img src="${S.club.logoPrev}" alt="Previous logo"></span><div class="stack tight"><span class="small muted">Previous logo</span><div><button class="btn sm" data-act="useLogoPrev">Use previous logo</button></div></div></div>` : ''}
+        <span class="hint">Only the current and previous logo are kept.</span></div></div>
       ${S.club.nameRequest ? `<div class="field"><span style="font-size:13px;font-weight:600;color:var(--fg2)">Club name</span><b>${esc(S.club.name)}</b>
         ${notice('warn', `<b>Name change requested: “${esc(S.club.nameRequest.name)}”</b> · sent ${fmtDate(S.club.nameRequest.at)}, ${fmtTime(S.club.nameRequest.at)}. The ROTRA platform owner reviews it in Admin. Your club keeps its current name everywhere until it's approved.`)}
         <div><button class="btn sm" data-act="cancelNameRequest">Cancel request</button></div></div>`
@@ -2146,6 +2156,10 @@ function viewClub() {
         ${S.ui.clubNameErr ? `<span class="err">${esc(S.ui.clubNameErr)}</span>` : `<span class="hint">${S.online ? 'Name changes need approval from the ROTRA platform owner. Nothing changes until they approve it.' : 'Sending a request needs an internet connection.'}</span>`}</div>`}
       <dl class="kv"><dt>Founding address</dt><dd>${esc(S.club.founding.replace(/^Founded at /, ''))}</dd><dt>City code</dt><dd><span class="mono">PH-CEB</span> · used in new players' RTR IDs</dd></dl>
       <p class="small muted">The founding address and city code are fixed. Playing at a different venue doesn't change them.</p></section>
+    <section class="card stack" id="club-invite"><h2>Club invite link</h2>
+      <p class="small muted">One standing link for your club. Anyone who registers through it joins your saved players. A signed-in ROTRA player who opens it joins with one tap.</p>
+      <div class="invite-link"><input class="input" id="club-invite-link" readonly value="${clubInviteLink()}" aria-label="Club invite link"><button class="btn sm primary" data-act="copyClubInvite">Copy link</button></div>
+      <div class="row"><button class="btn sm" data-act="openClubInvite">Share club invite</button><button class="btn sm" data-act="openRegenClubInvite">Regenerate link</button></div></section>
     <section class="card stack" id="club-post"><div><h2>Facebook post</h2><p class="small muted">The announcement you copy from a session with “Copy Facebook post”. Write it once with {{ keys }}; each session fills them in.</p></div>
       <div class="tabs" role="tablist" aria-label="Facebook post">${POST_TABS.map(([k, l]) => `<button role="tab" id="ptab-${k}" aria-selected="${ptab === k}" aria-controls="ppanel" data-act="postTab" data-k="${k}">${l}</button>`).join('')}</div>
       <div class="stack" id="ppanel" role="tabpanel" aria-labelledby="ptab-${ptab}">${ptab === 'desc' ? `
@@ -2163,6 +2177,7 @@ function viewClub() {
       <div class="li" style="padding:0"><div class="main"><b>Players per court</b><p class="small muted">Your slot budget: ${S.club.perCourt || 8} players for each court you reserve, so 3 courts give ${3 * (S.club.perCourt || 8)} slots. The rest go on the waitlist.</p></div><div class="row" style="flex-wrap:nowrap"><button class="btn sm icon-btn" data-act="clubPerCourt" data-d="-1" aria-label="Fewer players per court" ${(S.club.perCourt || 8) <= 2 ? 'disabled' : ''}>−</button><b class="tnum" style="font-size:20px;min-width:28px;text-align:center" aria-live="polite">${S.club.perCourt || 8}</b><button class="btn sm icon-btn" data-act="clubPerCourt" data-d="1" aria-label="More players per court" ${(S.club.perCourt || 8) >= 20 ? 'disabled' : ''}>+</button></div></div>
       <div class="li" style="padding:0"><div class="main"><b>Entrance fee per head</b><p class="small muted">${S.club.entranceFee != null ? `New sessions list a ${peso(S.club.entranceFee)} entrance fee per head, unless the venue has its own.` : 'New sessions start with no entrance fee, unless the venue has one.'} A misc cost, shown for transparency.</p></div>${sw(S.ui.feeOn ?? S.club.entranceFee != null, 'toggleClubFee', '', 'Add an entrance fee per head by default')}</div>
       ${(S.ui.feeOn ?? S.club.entranceFee != null) ? `<div class="field"><label for="club-fee" style="font-size:13px;font-weight:600;color:var(--fg2)">Amount per person</label><div class="row" style="flex-wrap:nowrap"><div class="money" style="flex:1"><span>₱</span><input class="input${S.ui.clubFeeErr ? ' bad' : ''}" id="club-fee" type="number" min="0" step="1" inputmode="numeric" data-bind="ui.clubFee" value="${esc(S.ui.clubFee ?? S.club.entranceFee ?? '')}" placeholder="0"></div><button class="btn" data-act="saveClubFee">Save</button></div>${S.ui.clubFeeErr ? `<span class="err">${esc(S.ui.clubFeeErr)}</span>` : '<span class="hint">It\'s added to each session\'s costs, so the payment per player covers it.</span>'}</div>` : ''}
+      <div class="li" style="padding:0"><div class="main"><b>Players can check themselves in</b><p class="small muted">During a live session, confirmed ROTRA players can tap I'm here on the session page. Turn it off and only you mark presence.</p></div>${sw(S.club.selfCheckIn !== false, 'toggleSelfCheckIn', '', 'Players can check themselves in')}</div>
     </section>
     <section class="card stack" id="club-license"><div class="between"><h2>License</h2>${chip('Active', 'ok')}</div>
       <div class="tiles4">
@@ -2736,6 +2751,7 @@ function playerCard(p) {
       <span class="sp-av">${avatar(p, 'xl')}<i class="sp-dot ${status}" aria-hidden="true"></i></span>
       <span class="sp-name">${esc(p.name)}</span>
       ${p.nick ? `<span class="sp-nick">“${esc(p.nick)}”</span>` : '<span class="sp-nick">&nbsp;</span>'}
+      <span class="small muted">${joinedViaText(p)}</span>
       <span class="sp-level"><span class="lvl-bars b${band}" aria-hidden="true"><i></i><i></i><i></i></span>${esc(sub)}</span>
       ${(() => { const st = liveState(p.id); return st && st.kind !== 'away' ? `<span class="sp-live ${st.kind}"><i aria-hidden="true"></i>${esc(st.text)}</span>` : ''; })()}
     </button>
@@ -2969,8 +2985,42 @@ function levelDiff(level, sugg, id) {
 }
 // Session link and guest join requests. The public session page doubles as the invite link: guests read the details
 // and can send a quick request; nothing is admitted until the Queue Master confirms it in preparation or the console.
+// D-2026-11-09-08 Club invite link: one standing link per club; Regenerate adds a new random code (S.club.inviteCode).
+const clubInviteLink = () => `${window.mountPrototypeRouter ? location.origin : 'https://rotra.app'}/register/lahug-smash${S.club.inviteCode ? `?k=${S.club.inviteCode}` : ''}`;
 const sessionLink = (s) => window.mountPrototypeRouter ? `${location.origin}/queue/s/${encodeURIComponent(s.id)}` : `https://rotra.app/s/${s.id.replace(/[^a-z0-9]/gi, '').slice(-6).toLowerCase()}`;
 const pendingReqs = (s) => (s.requests || []).filter((r) => r.status === 'pending').sort((a, b) => a.at - b.at);
+// QM side of the player-facing requests (D-2026-11-09-03/05): drop-out notices and match requests share the Requests button.
+const openMatchReqs = (s) => (s.matchRequests || []).filter((x) => x.status === 'open').sort((a, b) => a.at - b.at);
+const openDropOuts = (s) => (s.dropOuts || []).filter((x) => x.status === 'open').sort((a, b) => a.at - b.at);
+const mrNamed = (mr) => [mr.pid, mr.partner, ...(mr.opponents || [])].filter(Boolean);
+// D-2026-11-09-05: a match request closes by itself when anyone named stops being present.
+const closeStaleMatchReqs = (s) => { openMatchReqs(s).forEach((mr) => { if (mrNamed(mr).some((pid) => !(R(s, pid) || {}).present)) mr.status = 'closed'; }); };
+const reqCount = (s) => { closeStaleMatchReqs(s); return pendingReqs(s).length + openMatchReqs(s).length + openDropOuts(s).length; };
+const inClub = (r) => !!r.account && saved().some((p) => p.rtr === r.account);
+const digitsOf = (v) => String(v || '').replace(/\D/g, '');
+// D-2026-11-09-06: a guest request whose phone matches a saved player is offered for linking; nothing merges until the QM taps Link.
+const savedPhoneMatch = (r) => (r.pid || r.account || !r.phone || r.noLink ? null : saved().find((p) => p.identity !== 'registered' && p.phone && digitsOf(p.phone) === digitsOf(r.phone)) || null);
+// D-2026-11-09-08: "Invited by NAME" from the invite code the join request carried.
+const inviterOf = (s, r) => { if (!r.inviteCode) return null; const row = [...s.roster, ...(s.waitlist || [])].find((x) => x.inviteCode === r.inviteCode); return row ? P(row.pid) : null; };
+const JOINED_VIA = { club: 'Joined via club link', session: 'Joined via session link' };
+const joinedViaText = (p) => JOINED_VIA[p.joinedVia] || 'Added by the club';
+// Link a guest record to a saved player: the guest's slots, games and payments move to that record and the guest row is hidden.
+function mergePlayer(fromId, toId) {
+  const from = P(fromId), to = P(toId);
+  if (!from || !to || fromId === toId) return;
+  const swap = (pid) => (pid === fromId ? toId : pid);
+  S.sessions.forEach((x) => {
+    if (R(x, fromId) && R(x, toId)) x.roster = x.roster.filter((r) => r.pid !== fromId); else x.roster.forEach((r) => { r.pid = swap(r.pid); });
+    (x.waitlist || []).forEach((w) => { w.pid = swap(w.pid); });
+    (x.matches || []).forEach((m) => { m.teamA = m.teamA.map(swap); m.teamB = m.teamB.map(swap); });
+    (x.requests || []).forEach((r) => { if (r.pid === fromId) r.pid = toId; });
+    (x.matchRequests || []).forEach((mr) => { mr.pid = swap(mr.pid); if (mr.partner) mr.partner = swap(mr.partner); mr.opponents = (mr.opponents || []).map(swap); });
+    (x.dropOuts || []).forEach((d) => { d.pid = swap(d.pid); });
+    if (x.payments && x.payments[fromId]) { x.payments[toId] = x.payments[toId] || x.payments[fromId]; delete x.payments[fromId]; }
+  });
+  to.prior = (to.prior || 0) + (from.prior || 0);
+  from.removed = true; from.linkedTo = toId;
+}
 const BAND_CHOICES = [['Beginner', 'Beginner'], ['Intermediate', 'Intermediate'], ['Advanced', 'Advanced'], ['unsure', 'Not sure']];
 const bandMid = (band) => { const ix = LEVELS.map((l, i) => [l, i]).filter(([l]) => l.band.startsWith(band)).map(([, i]) => i); return ix.length ? ix[Math.floor(ix.length / 2)] : null; };
 function linkCard(s) {
@@ -2982,31 +3032,90 @@ function linkCard(s) {
   </section>`;
 }
 function requestsPanel(s, inSheet) {
-  const list = pendingReqs(s), done = (s.requests || []).filter((r) => r.status !== 'pending');
+  const joins = pendingReqs(s), drops = openDropOuts(s), mrs = openMatchReqs(s), done = (s.requests || []).filter((r) => r.status !== 'pending');
   const full = s.status !== 'active' && openSlots(s) === 0;
-  if (!list.length) return `<section class="${inSheet ? '' : 'card '}stack" id="join-requests"><h2>Join requests</h2><p class="small muted">No requests waiting.${done.length ? ` ${done.filter((r) => r.status === 'confirmed').length} confirmed, ${done.filter((r) => r.status === 'declined').length} declined so far.` : ' Guests who open the session link can ask for a slot; they show up here.'}</p></section>`;
-  return `<section class="${inSheet ? '' : 'card '}stack" id="join-requests"><div><h2>Join requests · ${list.length}</h2><p class="small muted">Check each one is a real person you expect (ask at the door, or match their name and phone) before confirming. Oldest first.${full ? ' Slots are full, so confirmed guests go on the waitlist.' : ''}</p></div>
-    <div class="list">${list.map((r) => { const lv = r.level ?? (r.band !== 'unsure' ? bandMid(r.band) : null); return `<div class="req-row">
+  const tab = S.ui.reqTab === 'match' ? 'match' : 'join';
+  const n = joins.length + drops.length + mrs.length;
+  // D-2026-11-09-05: one Requests · N button with Join and Match tabs; drop-out notices sit at the top of Join.
+  const head = inSheet ? '' : `<div><h2>Requests${n ? ` · ${n}` : ''}</h2><p class="small muted">Join requests, drop-out notices and match requests from the session page. Nothing changes until you act on one.</p></div>`;
+  const tabs = `<div class="tabs" role="tablist" aria-label="Requests">${[['join', `Join · ${joins.length + drops.length}`], ['match', `Match · ${mrs.length}`]].map(([k, l]) => `<button role="tab" id="rqt-${k}" aria-selected="${tab === k}" aria-controls="rq-panel" data-act="reqTab" data-k="${k}">${l}</button>`).join('')}</div>`;
+  let body;
+  if (tab === 'match') body = mrs.length ? `<div class="list">${mrs.map((mr) => matchReqCard(s, mr)).join('')}</div>` : '<p class="small muted">No match requests. Present players can ask for a match from the session page.</p>';
+  else {
+    const dropList = drops.length ? `<section class="stack tight" aria-labelledby="rq-drop-h"><h3 id="rq-drop-h" style="margin:0;font-size:14px">Can't make it · ${drops.length}</h3><p class="small muted">The slot stays until you remove the player.</p><div class="list">${drops.map((d) => dropOutRow(s, d)).join('')}</div></section>` : '';
+    const joinList = joins.length ? `<div class="stack tight">${drops.length ? `<h3 style="margin:0;font-size:14px">Join requests · ${joins.length}</h3>` : ''}<p class="small muted">Check each one is a real person you expect (ask at the door, or match their name and phone) before confirming. Oldest first.${full ? ' Slots are full, so confirmed players go on the waitlist.' : ''}</p>
+      <div class="list">${joins.map((r) => joinReqCard(s, r, full)).join('')}</div></div>`
+      : `<p class="small muted">No join requests waiting.${done.length ? ` ${done.filter((r) => r.status === 'confirmed').length} confirmed, ${done.filter((r) => r.status === 'declined').length} declined so far.` : ' Anyone who opens the session link can ask for a slot; they show up here.'}</p>`;
+    body = dropList + joinList;
+  }
+  return `<section class="${inSheet ? '' : 'card '}stack" id="join-requests">${head}${tabs}<div id="rq-panel" role="tabpanel" aria-labelledby="rqt-${tab}" class="stack">${body}</div></section>`;
+}
+// D-2026-11-09-02/06/08: a signed-in player's request shows the club tag, their shared rank as a hint and who invited them;
+// a guest request whose phone matches a saved player offers Link / Not them. The QM still picks the level and confirms or declines.
+function joinReqCard(s, r, full) {
+  const lv = r.level ?? (r.band !== 'unsure' ? bandMid(r.band) : null);
+  const acct = !!r.account, member = inClub(r);
+  const tag = acct ? chip(`ROTRA player · ${member ? 'already in your club' : 'new to your club'}`, member ? 'ok' : 'warn') : chip('Guest request', 'warn');
+  const inv = inviterOf(s, r), match = savedPhoneMatch(r);
+  const meta = acct ? `Requested ${fmtWhen(r.at, { lower: true })}` : `${r.phone ? esc(r.phone) : 'No phone given'} · says ${r.band === 'unsure' ? 'not sure of level' : esc(r.band)} · requested ${fmtWhen(r.at, { lower: true })}`;
+  return `<div class="req-row">
       <div class="li" style="padding:0"><span class="avatar" aria-hidden="true">${esc(initials(r.name))}</span><div class="main"><b>${esc(r.name)}${r.nick ? ` <span class="muted">“${esc(r.nick)}”</span>` : ''}</b>
-        <p class="small muted">${r.phone ? esc(r.phone) : 'No phone given'} · says ${r.band === 'unsure' ? 'not sure of level' : esc(r.band)} · requested ${fmtWhen(r.at, { lower: true })}</p></div>${chip('Guest request', 'warn')}</div>
+        <p class="small muted">${meta}</p>${acct ? `<p class="small muted">Shared rank: ${r.level != null ? esc(lvLabel(r.level)) : 'none yet'}</p>` : ''}${inv ? `<p class="small muted">Invited by ${esc(inv.name)}</p>` : ''}</div>${tag}</div>
+      ${r.linked ? notice('ok', `Linked to <b>${esc(nm(r.linked))}</b> from your saved players.`) : match ? notice('', `Is this <b>${esc(match.name)}</b> from your saved players?<div class="row" style="margin-top:8px"><button class="btn xs primary" data-act="linkReq" data-id="${r.id}" data-pid="${match.id}">Link</button><button class="btn xs" data-act="notThemReq" data-id="${r.id}">Not them</button></div>`) : ''}
       <div class="req-actions">${selectLevel(`req-lv-${r.id}`, lv, `data-act-change="reqLevel" data-id="${r.id}" aria-label="Level for ${esc(r.name)}"`, r.err && lv == null)}
-        <div class="row"><button class="btn sm" data-act="declineReq" data-id="${r.id}">Decline</button><button class="btn sm primary" data-act="confirmReq" data-id="${r.id}">${full ? 'Confirm to waitlist' : 'Confirm guest'}</button></div></div>
-      ${r.err ? `<span class="err">${esc(r.err)}</span>` : ''}</div>`; }).join('')}</div></section>`;
+        <div class="row"><button class="btn sm" data-act="declineReq" data-id="${r.id}">Decline</button><button class="btn sm primary" data-act="confirmReq" data-id="${r.id}">${full ? 'Confirm to waitlist' : acct ? 'Confirm' : 'Confirm guest'}</button></div></div>
+      ${r.err ? `<span class="err">${esc(r.err)}</span>` : ''}</div>`;
+}
+// D-2026-11-09-03: a drop-out notice frees nothing by itself. Remove from roster frees the slot; Keep closes the notice.
+function dropOutRow(s, d) {
+  const p = P(d.pid);
+  return `<div class="req-row"><div class="li" style="padding:0">${avatar(p)}<div class="main"><b>${esc(p.name)}</b><p class="small muted">Says they can't make it · ${fmtWhen(d.at, { lower: true })}</p></div></div>
+      <div class="row"><button class="btn sm" data-act="removeDropOut" data-id="${d.id}">Remove from roster</button><button class="btn sm" data-act="keepDropOut" data-id="${d.id}">Keep</button></div></div>`;
+}
+// D-2026-11-09-05: each named player with games against the minimum, level, and where they are right now.
+function matchReqCard(s, mr) {
+  const fmt = mr.format, opp = mr.opponents || [];
+  const spots = fmt === 'singles' ? [[mr.pid, 'Requester'], [opp[0] || null, 'Opponent']] : [[mr.pid, 'Requester'], [mr.partner || null, 'Partner'], [opp[0] || null, 'Opponent'], [opp[1] || null, 'Opponent']];
+  const line = ([pid, role]) => {
+    if (!pid) return `<div class="li" style="padding:0"><span class="avatar" aria-hidden="true">?</span><div class="main"><b>Anyone</b> <span class="small muted">· ${role}</span><p class="small muted">Filled from present players with the fewest games</p></div></div>`;
+    const p = P(pid), r = R(s, pid) || {}, a = busyOf(s, pid), q = waiting(s).findIndex((m) => all(m).includes(pid));
+    const where = a ? ` · On ${courtsOf(s, a)}` : q >= 0 ? ` · In queue #${q + 1}` : '';
+    return `<div class="li" style="padding:0">${avatar(p)}<div class="main"><b>${esc(p.name)}</b> <span class="small muted">· ${role}</span><p class="small muted">${gamesOf(s, pid)} of ${s.minimum} games · ${esc(lvLabel(r.level))}${where}</p></div></div>`;
+  };
+  return `<div class="req-row"><div><b>${esc(nm(mr.pid))} asks for a ${FORMAT_LABEL[fmt].toLowerCase()} match</b><p class="small muted">Requested ${fmtWhen(mr.at, { lower: true })}</p></div>
+      <div class="stack tight">${spots.map(line).join('')}</div>
+      <div class="row"><button class="btn sm" data-act="declineMatchReq" data-id="${mr.id}">Decline</button><button class="btn sm primary" data-act="addMatchReq" data-id="${mr.id}">Add to queue</button></div></div>`;
 }
 function joinCard(s) {
   if (s.status !== 'prepared' && s.status !== 'active') return '';
-  const mine = S.ui.guestReq && S.ui.guestReq.sid === s.id ? (s.requests || []).find((r) => r.id === S.ui.guestReq.id) : null;
+  const v = pubViewer();
+  const open = openSlots(s);
+  const slots = s.status === 'active' ? '<span class="jc-open">Additional players can be admitted</span>' : open ? `<span class="jc-open"><b class="tnum">${open}</b> slot${open === 1 ? '' : 's'} left</span>` : '<span class="jc-open full">All slots taken</span>';
+  // D-2026-11-09-02: a signed-in ROTRA player joins with one tap; the request carries their account. One open request per account.
+  if (v) {
+    if (R(s, v.id)) return '';
+    const wl = waitOf(s).findIndex((w) => w.pid === v.id);
+    if (wl >= 0) return `<section class="card stack join-card">${notice('ok', `<b>Confirmed · waitlist #${wl + 1}</b><br>You're on the waitlist. Ask the Queue Master about a slot.`)}</section>`;
+    const req = playerJoinReq(s, v.id);
+    if (req && req.status === 'pending') return `<section class="card stack join-card">${notice('warn', `<b>Request sent</b><br>Thanks, ${esc(v.name)}. The Queue Master confirms every request, usually at the venue. Your slot isn't held until they do.`)}<button class="btn jc-btn" data-act="cancelJoinReq" data-id="${req.id}">Cancel request</button></section>`;
+    if (req && req.status === 'declined') return `<section class="card stack join-card">${notice('bad', '<b>Request not accepted</b><br>The Queue Master didn\'t confirm this request. Contact them if you think it\'s a mistake.')}</section>`;
+    if (s.acceptReq === false) return '<section class="card join-card"><p class="small muted">This session isn\'t taking requests online. Contact the Queue Master to play.</p></section>';
+    return `<section class="card stack join-card"><div class="jc-top"><h2>Want to play?</h2>${slots}</div>
+    ${s.roster.length ? skillMix(s.roster) : ''}
+    <p class="small muted">${s.status === 'active' ? 'The Queue Master can admit additional players. ' : open ? '' : 'Confirmed players join the waitlist. '}One tap sends your request and the Queue Master confirms it.</p>
+    <button class="btn primary jc-btn" data-act="sendPlayerJoin">Request to join as ${esc(v.name)}</button></section>`;
+  }
+  const mine = pubAs().kind === 'guest' && S.ui.guestReq && S.ui.guestReq.sid === s.id ? (s.requests || []).find((r) => r.id === S.ui.guestReq.id) : null;
   if (mine) {
     const wl = mine.pid ? waitOf(s).findIndex((w) => w.pid === mine.pid) : -1;
     const [cls, title, text] = mine.status === 'pending' ? ['warn', 'Request sent', `Thanks, ${esc(mine.name)}. The Queue Master confirms every guest, usually at the venue. Your slot isn't held until they do.`]
       : mine.status === 'declined' ? ['bad', 'Request not accepted', 'The Queue Master didn\'t confirm this request. Contact them if you think it\'s a mistake.']
       : wl >= 0 ? ['ok', `Confirmed · waitlist #${wl + 1}`, 'You\'re on the waitlist. Ask the Queue Master about a slot.']
       : ['ok', 'Confirmed · you have a slot', 'See you on court. Your name is now in Participants.'];
-    return `<section class="card stack join-card">${notice(cls, `<b>${title}</b><br>${text}`)}</section>`;
+    // D-2026-11-09-03: guests keep the status card plus the registration nudge; no My night card.
+    return `<section class="card stack join-card">${notice(cls, `<b>${title}</b><br>${text}`)}<p class="small muted">Register to check in and see your matches.</p></section>`;
   }
-  const open = openSlots(s);
   if (s.acceptReq === false) return '<section class="card join-card"><p class="small muted">This session isn\'t taking requests online. Contact the Queue Master to play.</p></section>';
-  const slots = s.status === 'active' ? '<span class="jc-open">Additional players can be admitted</span>' : open ? `<span class="jc-open"><b class="tnum">${open}</b> slot${open === 1 ? '' : 's'} left</span>` : '<span class="jc-open full">All slots taken</span>';
   return `<section class="card stack join-card"><div class="jc-top"><h2>Want to play?</h2>${slots}</div>
     ${s.roster.length ? skillMix(s.roster) : ''}
     <p class="small muted">${s.status === 'active' ? 'The Queue Master can admit additional players. ' : open ? '' : 'Confirmed guests join the waitlist. '}Send a quick request and the Queue Master confirms it.</p>
@@ -3046,7 +3155,7 @@ function prepOverview(s) {
         <dt>Minimum</dt><dd>${s.minimum} completed games per player<br><span class="small muted">${live ? `Fixed after start · ${s.minAuto !== false ? 'Calculated before start' : 'Set by you'}.` : s.minAuto !== false ? `Calculated: ${playerCountOf(s)} players on ${est.usable} court${est.usable > 1 ? 's' : ''} for ${fmtDur(s.start, s.end)} gives about ${est.low}–${est.high} games each. Updates as the roster changes.` : `Set by you. The estimate suggests ${est.low}–${est.high}.`}</span></dd>
         <dt>Roster</dt><dd>${s.roster.length} confirmed · ${present} present</dd>
         ${s.finance ? (() => { const c = financeCalc(s.finance, s.courts.length, Math.round((s.end - s.start) / 60000), s.roster.length || s.expected); return `<dt>Costs</dt><dd>${peso(c.total)} estimated · ${peso(c.share)} a player to break even<br><span class="small muted">Players pay ${peso(c.perHead)}${c.custom ? ' (custom amount)' : ' (break-even)'}</span> · ${resultText(c)}</dd>`; })() : ''}${live && s.notes ? `<dt>Notes</dt><dd>${esc(s.notes)}</dd>` : ''}</dl>
-      ${live ? `<div class="row acts"><button class="btn sm" data-act="openAdjust">Courts and time</button><button class="btn sm" data-act="openAdd">Add player</button><button class="btn sm" data-act="openRequests">Join requests · ${pendingReqs(s).length}</button><button class="btn sm" data-act="openPayments">Payments</button></div>` : ''}</section>
+      ${live ? `<div class="row acts"><button class="btn sm" data-act="openAdjust">Courts and time</button><button class="btn sm" data-act="openAdd">Add player</button><button class="btn sm" data-act="openRequests">Requests · ${reqCount(s)}</button><button class="btn sm" data-act="openPayments">Payments</button></div>` : ''}</section>
       ${!live ? `<section class="card stack"><div class="between"><h2>This device</h2>${chip(dl[0], dl[1])}</div>
         <p class="small muted">Download the session so this device can keep running it if the venue's internet drops. A download on one device doesn't prepare any other device.</p>
         <div class="row"><button class="btn sm" data-act="download" ${!S.online || s.download === 'downloading' ? 'disabled' : ''}>${s.download === 'ready' ? 'Update download' : 'Download for offline use'}</button></div>
@@ -3070,8 +3179,10 @@ const RV_BY = [
 const rvLevel = (r, p, live) => `<div class="lvcol">${live ? `<b>${esc(lvLabel(r.level))} · Fixed after start</b>` : selectLevel(`lv-${r.pid}`, r.level, `data-act-change="setLevel" data-pid="${r.pid}" aria-label="Level for ${esc(p.name)} at this club" aria-describedby="lvd-${r.pid}"`, r.level == null)}${levelDiff(r.level, p.sugg, `lvd-${r.pid}`)}</div>`;
 const rvSugg = (p) => `<span class="small muted">${p.sugg != null ? `Suggestion: ${esc(lvLabel(p.sugg))}` : 'No suggestion'}</span>`;
 const rvRemove = (r, p) => `<button class="btn xs ghost icon-btn" data-act="removeRoster" data-pid="${r.pid}" aria-label="Remove ${esc(p.name)} from roster">${I.x}</button>`;
-const rvPresence = (r, p, extra = '') => `<div class="row" style="flex-wrap:nowrap"><span class="small muted">${presencePending.has(r.pid) ? 'Saving presence…' : 'Present'}</span>${sw(r.present, 'togglePresent', `data-pid="${r.pid}"`, `${p.name} present`)}${extra}</div>`;
-const rvAway = (r) => `<span class="small muted">${r.present ? 'Present' : 'Away'}</span>`;
+// D-2026-11-09-03: "Checked in themselves" while the player's own check-in stands; "Left" after I'm leaving, until Present is set again.
+const selfMark = (r) => (r.present && r.selfCheckedIn ? `<span class="small muted row" style="gap:4px;flex-wrap:nowrap">${I.check} Checked in themselves · ${fmtTime(r.selfCheckedInAt || r.presentAt || Date.now())}</span>` : !r.present && r.selfLeft ? `<span class="small muted">Left · ${fmtTime(r.leftAt || Date.now())}</span>` : '');
+const rvPresence = (r, p, extra = '') => `<div class="row" style="display:grid;gap:2px;justify-items:end"><div class="row" style="flex-wrap:nowrap"><span class="small muted">${presencePending.has(r.pid) ? 'Saving presence…' : 'Present'}</span>${sw(r.present, 'togglePresent', `data-pid="${r.pid}"`, `${p.name} present`)}${extra}</div>${selfMark(r)}</div>`;
+const rvAway = (r) => `<div class="row" style="display:grid;gap:2px"><span class="small muted">${r.present ? 'Present' : 'Away'}</span>${selfMark(r)}</div>`;
 function rvRow(s, r, live) {
   const p = P(r.pid);
   return `<div class="prow">
@@ -3086,7 +3197,7 @@ function rvCard(s, r, live) {
   const pres = live ? `<span class="rv-pres-t">${r.present ? 'Present' : 'Away'}</span>` : `<span class="rv-pres-t">${presencePending.has(r.pid) ? 'Saving presence…' : r.present ? 'Present' : 'Not present'}</span>${sw(r.present, 'togglePresent', `data-pid="${r.pid}"`, `${p.name} present`)}`;
   return `<article class="rv-card ${r.present ? 'is-present' : ''}" aria-label="${esc(p.name)}">
         <div class="rv-top">${faceBtn(p)}<div class="main"><b>${esc(p.name)}</b></div>${live ? '' : rvRemove(r, p)}</div>
-        <div class="rv-pres">${pres}</div>
+        <div class="rv-pres">${pres}</div>${selfMark(r) ? `<div class="rv-meta small muted">${selfMark(r)}</div>` : ''}
         <div class="rv-lv lv-${band}">${rvLevel(r, p, live)}</div>
         <div class="rv-meta small muted">${identChip(p)}<span class="rv-paid ${paid ? 'ok' : ''}">${paid ? `${I.check} Paid` : 'Not paid'}</span>${rvSugg(p)}</div>
       </article>`;
@@ -3157,7 +3268,7 @@ function viewPrepare() {
     <div class="crumb"><button class="btn sm ghost" data-act="go" data-to="home">${I.back} Home</button></div>
     <div class="between"><div class="stack tight"><span class="label">${live ? 'Session settings' : 'Preparation'}</span><div class="title-row"><h1>${esc(s.title)}</h1><button class="btn sm ghost icon-btn" data-act="go" data-to="public" aria-label="Open public page" title="Open public page">${I.ext}</button></div><p class="muted">${live ? `${fmtDate(s.startedAt)} · Started ${fmtTime(s.startedAt)} · Ends ${fmtTime(s.end)}${laterDay(s.startedAt, s.end)}` : `${fmtDate(s.start)} · ${fmtRange(s.start, s.end)}`} · ${esc(s.venue)}</p></div>
       <div class="row acts">${live ? '<button class="btn sm hdr-x" data-act="go" data-to="console">Back to live session</button>' : '<button class="btn sm hdr-x" data-act="editSetup">Edit preparation</button>'}<button class="btn sm hdr-x" data-act="copyLink">Copy invite link</button><button class="btn sm" data-act="openSessionQr">Session QR</button><button class="btn sm" data-act="openPost">Copy Facebook post</button>${live ? '' : '<button class="btn sm danger hdr-x" data-act="openDeleteSession">Delete session</button><button class="btn sm danger hdr-x" data-act="openCancelSession">Cancel session</button>'}<button class="btn sm hdr-more" data-act="openPrepMore" aria-haspopup="dialog">More options</button></div></div>
-    ${live ? notice('', 'Preparation values are read-only during play. Mode, formats, minimum and playing levels are fixed after start. Use the live controls in Overview to manage courts, time, arrivals, requests and payments.') : pendingReqs(s).length ? requestsPanel(s) : ''}
+    ${live ? notice('', 'Preparation values are read-only during play. Mode, formats, minimum and playing levels are fixed after start. Use the live controls in Overview to manage courts, time, arrivals, requests and payments.') : reqCount(s) ? requestsPanel(s) : ''}
     ${(() => {
       const tab = ['overview', 'roster', 'waitlist', 'payments'].includes(S.ui.prepTab) ? S.ui.prepTab : 'overview';
       const paidN = Object.keys(s.payments || {}).filter((pid) => R(s, pid)).length;
@@ -3188,7 +3299,7 @@ function viewConsole() {
     <div class="between">
       <div class="stack tight"><div class="row"><span class="label">Live session</span>${chip(MODES[s.mode].label)}${chip(fmtFormats(s))}${chip(`Min ${s.minimum} games`)}</div>
         <h1>${esc(s.title)}</h1><p class="muted small">${esc(s.venue)} · Started ${fmtWhen(s.startedAt, { lower: true })} · Ends ${fmtWhen(s.end, { lower: true })} · ${endSt.over ? `<span style="color:var(--warn)">${endSt.text}</span>` : endSt.text}</p></div>
-      <div class="row acts"><button class="btn sm" data-act="go" data-to="home">Home</button><button class="btn sm" data-act="go" data-to="prepare">Session settings</button><button class="btn sm" data-act="go" data-to="public">Public page</button><button class="btn sm" data-act="openPost">Copy Facebook post</button><button class="btn sm" data-act="openPayments">Payments</button><button class="btn sm" data-act="openAdjust">Courts and time</button>${pendingReqs(s).length ? `<button class="btn sm primary" data-act="openRequests">Join requests · ${pendingReqs(s).length}</button>` : ''}</div>
+      <div class="row acts"><button class="btn sm" data-act="go" data-to="home">Home</button><button class="btn sm" data-act="go" data-to="prepare">Session settings</button><button class="btn sm" data-act="go" data-to="public">Public page</button><button class="btn sm" data-act="openPost">Copy Facebook post</button><button class="btn sm" data-act="openPayments">Payments</button><button class="btn sm" data-act="openAdjust">Courts and time</button>${reqCount(s) ? `<button class="btn sm primary" data-act="openRequests">Requests · ${reqCount(s)}</button>` : ''}</div>
     </div>
     ${!S.online ? notice('warn', 'Working offline on this device. Matches, results and roster changes save here and sync when you reconnect. Session done needs internet.') : ''}
     <div class="tabs" role="tablist" aria-label="Console views">
@@ -3531,7 +3642,7 @@ function playersPane(s) {
         ${i >= 0 ? `<span class="sel-badge" aria-hidden="true">${i + 1}</span>` : ''}
         <div class="pc3-top">${avatar(x.p)}<div style="min-width:0"><div class="pc3-name">${esc(x.p.name)}</div><div class="pc3-lv">${esc(lvLabel(x.r.level))}</div></div></div>
         <div class="pc3-stats"><span class="tnum">${x.g} played · ${queuedCount(s, x.r.pid)} queued · ${currentDrafts.filter((m) => all(m).includes(x.r.pid)).length} suggested (${esc(draftState ? AUTO_MODES[draftState.tab] : 'current tab')})</span>${x.a || !x.r.present ? '' : `<span class="tnum">${x.mins} min wait</span>`}</div>
-        <div class="between" style="flex-wrap:nowrap"><span class="pc3-st small">${st}</span>${sw(x.r.present, 'togglePresent', `data-pid="${x.r.pid}"`, `${x.p.name} present`)}</div>${presencePending.has(x.r.pid) ? '<span class="small muted">Saving presence…</span>' : ''}
+        <div class="between" style="flex-wrap:nowrap"><span class="pc3-st small">${st}</span>${sw(x.r.present, 'togglePresent', `data-pid="${x.r.pid}"`, `${x.p.name} present`)}</div>${presencePending.has(x.r.pid) ? '<span class="small muted">Saving presence…</span>' : ''}${selfMark(x.r)}
       </article>`;
     }).join('')}</div>` : `<div class="card empty">${f.show === 'avail' ? 'No one is free right now. Try Present or Everyone.' : 'No players yet.'}</div>`}
     ${sel.length ? `<div class="selbar" role="region" aria-label="Selected players">
@@ -3627,9 +3738,9 @@ function awards(s) {
 function slideFrame(s, inner, title) {
   return `<div class="slide"><div class="sh">${clubLogo('lg')}<div><div class="label">${esc(S.club.name)}</div><h2>${esc(title)}</h2><p class="small muted">${esc(s.title)} · ${fmtDate(s.start)}</p></div></div>${inner}<div class="foot"><span>${esc(s.venue)}</span><b>powered by rotra</b></div></div>`;
 }
-function slideStandings(s) {
+function slideStandings(s, hlPid) {
   const st = standings(s);
-  return slideFrame(s, st.length ? `<table class="st-table"><thead><tr><th>#</th><th>Player</th><th class="n">W</th><th class="n">L</th><th class="n">G</th></tr></thead><tbody>${st.map((r, i) => `<tr><td class="tnum">${i + 1}</td><td>${esc(r.name)}</td><td class="n">${r.w}</td><td class="n">${r.l}</td><td class="n">${r.g}</td></tr>`).join('')}</tbody></table>` : '<p class="empty">No counted games were recorded in this session.</p>', 'Standings');
+  return slideFrame(s, st.length ? `<table class="st-table"><thead><tr><th>#</th><th>Player</th><th class="n">W</th><th class="n">L</th><th class="n">G</th></tr></thead><tbody>${st.map((r, i) => `<tr${hlPid && r.pid === hlPid ? ' style="background:var(--accent-subtle);font-weight:700" aria-current="true"' : ''}><td class="tnum">${i + 1}</td><td>${esc(r.name)}</td><td class="n">${r.w}</td><td class="n">${r.l}</td><td class="n">${r.g}</td></tr>`).join('')}</tbody></table>` : '<p class="empty">No counted games were recorded in this session.</p>', 'Standings');
 }
 function slideAwards(s) {
   const a = awards(s);
@@ -3668,24 +3779,144 @@ function viewFinalizing() {
     <p class="small muted" aria-live="polite">${st >= steps.length ? 'Done.' : steps[st] + '…'}</p></section></main>`;
 }
 
+// ---------- Q-PUBLIC audience (prototype) ----------
+// D-2026-11-09-02..08. Who is looking at /s/<slug>: a visitor (not signed in), a guest with a request, or a signed-in
+// ROTRA player (in the session or not). The real app learns this from the Player sign-in; the prototype picks it in the proto-bar.
+const pubAs = () => (S.ui.guest && S.ui.pubAs && S.ui.pubAs.sid === S.currentId ? S.ui.pubAs : { kind: 'visitor' });
+const pubSignedIn = () => pubAs().kind === 'player';
+const pubViewer = () => { const a = pubAs(); return a.kind === 'player' ? P(a.pid) || null : null; };
+// D-2026-11-09-02: registered players show their full name with the nickname under it, to signed-in players only. Guests stay masked.
+const showsFull = (p) => pubSignedIn() && !!p && p.identity === 'registered';
+const pubNameText = (p) => (showsFull(p) ? p.name : maskName(p.name));
+const pubNameHtml = (p) => (showsFull(p) ? `<b>${esc(p.name)}</b>${p.nick ? `<br><span class="small muted">${esc(p.nick)}</span>` : ''}` : `<b>${esc(maskName(p.name))}</b>`);
+const pubAvatarOf = (p) => (showsFull(p) ? avatar(p) : pubAvatar(p));
+const playerJoinReq = (s, pid) => (s.requests || []).filter((x) => x.pid === pid && x.status !== 'closed').sort((a, b) => b.at - a.at)[0] || null;
+const openMatchReq = (s, pid) => (s.matchRequests || []).find((x) => x.pid === pid && x.status === 'open') || null;
+const openDropOut = (s, pid) => (s.dropOuts || []).find((x) => x.pid === pid && x.status === 'open') || null;
+// Results the public page may show: the publication, or the proto-bar's published/unpublished override on a finished session.
+const pubResults = (s) => (S.ui.pubPubOverride === 'hide' ? null : S.ui.pubPubOverride === 'show' ? s.published || { slides: [0, 1], offDay: false, at: s.finalizedAt || Date.now() } : s.published);
+// Prototype audience options for the current session; a stage is offered only when a roster row is in it.
+function pubStageOptions(s) {
+  const live = s.status === 'active';
+  const pick = (f) => (s.roster.find((r) => f(r)) || {}).pid || null;
+  return [
+    ['visitor', 'Visitor · not signed in', true],
+    ['guest', 'Guest · request sent', ['prepared', 'active'].includes(s.status)],
+    ['newplayer', 'Signed-in player · not in the session', ['prepared', 'active'].includes(s.status)],
+    ['waitlist', 'Signed-in · waitlisted', (waitOf(s)[0] || {}).pid || null],
+    ['before', 'Confirmed · before start', s.status === 'prepared' ? pick(() => true) : null],
+    ['notin', 'Confirmed · present, not checked in', live ? pick((r) => !r.present && !r.selfLeft) || pick((r) => r.present && !busyOf(s, r.pid) && !waiting(s).some((m) => all(m).includes(r.pid))) : null],
+    ['queue', 'Confirmed · in queue', live ? pick((r) => r.present && !busyOf(s, r.pid) && waiting(s).some((m) => all(m).includes(r.pid))) || pick((r) => r.present && !busyOf(s, r.pid)) : null],
+    ['court', 'Confirmed · on court', live ? pick((r) => r.present && busyOf(s, r.pid)) : null],
+    ['min', 'Confirmed · minimum reached', live && s.minimum > 0 ? pick((r) => r.present && gamesOf(s, r.pid) >= s.minimum) : null],
+    ['left', 'Confirmed · I\'m leaving', live ? pick((r) => r.selfLeft) || pick((r) => r.present && !busyOf(s, r.pid)) : null],
+    ['finished', 'Confirmed · finished', s.status === 'finalized' ? pick(() => true) : null],
+  ];
+}
+function setPubAs(k) {
+  const s = cur(), opt = pubStageOptions(s).find((o) => o[0] === k);
+  if (!opt || !opt[2]) { render(); return; }
+  if (k === 'visitor') S.ui.pubAs = { kind: 'visitor', key: k, sid: s.id };
+  else if (k === 'guest') {
+    if (!(S.ui.guestReq && S.ui.guestReq.sid === s.id && (s.requests || []).some((r) => r.id === S.ui.guestReq.id))) {
+      const r = { id: `q${Date.now()}`, name: 'Rico Santos', nick: 'Rics', phone: '0917 555 0142', band: 'Intermediate', at: Date.now(), status: 'pending' };
+      s.requests = [...(s.requests || []), r]; S.ui.guestReq = { sid: s.id, id: r.id };
+    }
+    S.ui.pubAs = { kind: 'guest', key: k, sid: s.id };
+  } else if (k === 'newplayer') {
+    const taken = new Set([...s.roster.map((r) => r.pid), ...(s.waitlist || []).map((w) => w.pid)]);
+    const p = saved().find((x) => x.identity === 'registered' && !taken.has(x.id) && !playerJoinReq(s, x.id)) || saved().find((x) => x.identity === 'registered' && !taken.has(x.id));
+    S.ui.pubAs = { kind: 'player', pid: p ? p.id : null, key: k, sid: s.id };
+  } else {
+    const pid = opt[2];
+    // Prototype only: "I'm leaving" and "not checked in" turn Present off for the picked player when nobody is in that state yet.
+    if (k === 'left') { const r = R(s, pid); if (r && !r.selfLeft) { r.present = false; r.selfLeft = true; r.leftAt = Date.now(); } }
+    if (k === 'notin') { const r = R(s, pid); if (r && r.present) { r.present = false; r.selfLeft = false; } }
+    S.ui.pubAs = { kind: 'player', pid, key: k, sid: s.id };
+  }
+  if (k !== 'visitor') S.ui.guest = true;
+  S.ui.sheet = null; save(); render();
+}
+// D-2026-11-09-04: "Updated 7:42 PM · Refresh". Only data refreshes; at most once every 10 seconds.
+function refreshBar(s) {
+  const at = S.ui.pubRefreshedAt || S.lastSync;
+  const wait = S.ui.pubRefreshedAt && Date.now() - S.ui.pubRefreshedAt < 10000;
+  return `<div class="between small muted" aria-live="polite"><span>Updated ${fmtTime(at)}${S.pending ? ' · Venue changes haven\'t synced yet' : ''}</span><button class="btn xs" data-act="pubRefresh" ${wait ? 'disabled title="Refresh again in a few seconds" aria-label="Refresh. Refresh again in a few seconds"' : ''}>Refresh</button></div>`;
+}
+// D-2026-11-09-04: Courts now, inside Details. Players' names per D-02, "Started 7:31 PM", no score and no running time.
+function courtsNow(s) {
+  return `<section class="stack" aria-label="Courts now"><h2>Courts now</h2><div class="grid">${s.courts.map((c) => {
+    const m = courtMatches(s).find((x) => x.courts.includes(c.id));
+    return `<article class="qtile"><div class="qt-head"><b>${esc(c.label)}</b>${m ? chip(FORMAT_LABEL[m.format], 'solid') : ''}</div>${m
+      ? `${[m.teamA, m.teamB].map((ids) => `<div class="qfaces">${ids.map((pid) => `<span class="qf">${pubAvatarOf(P(pid))}<span class="qf-n">${esc(pubNameText(P(pid)))}</span></span>`).join('')}</div>`).join('<div class="vs">VS</div>')}<span class="status-line muted">${m.startedAt ? `Started ${fmtTime(m.startedAt)}` : 'Getting ready'}</span>`
+      : '<span class="status-line muted">Free</span>'}</article>`;
+  }).join('')}</div></section>`;
+}
+// D-2026-11-09-03/04/05/08: the My night card for a signed-in player confirmed in the session (or waitlisted, for Invite).
+function myNight(s) {
+  const v = pubViewer(); if (!v) return '';
+  const r = R(s, v.id), w = (s.waitlist || []).find((x) => x.pid === v.id);
+  if (!r && !w) return '';
+  const canInviteNow = s.acceptReq !== false && s.status !== 'finalized' && s.status !== 'cancelled';
+  const invite = canInviteNow ? `<button class="btn" data-act="openSessionInvite">Invite</button>` : '';
+  if (!r) return `<section class="card stack"><span class="label">My night</span><p>Waitlist #${waitOf(s).findIndex((x) => x.pid === v.id) + 1} · you get a slot if one opens</p>${invite ? `<div class="row acts">${invite}</div>` : ''}</section>`;
+  const st = standings(s).find((x) => x.pid === v.id) || { w: 0, l: 0, g: 0 };
+  const g = gamesOf(s, v.id);
+  const lines = [], acts = [];
+  let hl = false;
+  if (s.status === 'prepared') {
+    const d = openDropOut(s, v.id);
+    lines.push(`Confirmed · starts ${fmtDate(s.start)}, ${fmtTime(s.start)}`);
+    if (d) lines.push('Told the QM you can\'t make it');
+    else acts.push('<button class="btn" data-act="cantMakeIt">I can\'t make it</button>');
+  } else if (s.status === 'finalized') {
+    lines.push(`Session finished · ${g} game${g === 1 ? '' : 's'} · ${st.w}W ${st.l}L`);
+    acts.push('<a class="btn" href="../player-app/rotra-player.html" target="_blank" rel="noopener">Match history</a>');
+  } else if (!r.present) {
+    if (r.selfLeft) lines.push('You\'ve left · tap I\'m here if you come back');
+    // D-2026-11-09-03: the club can turn self check-in off (Club settings › Session defaults).
+    if (S.club.selfCheckIn !== false) acts.push('<button class="btn primary jc-btn" data-act="imHere">I\'m here</button>');
+    else lines.push('Ask the Queue Master to mark you present.');
+  } else {
+    const a = busyOf(s, v.id), q = waiting(s).findIndex((m) => all(m).includes(v.id)), m = a || (q >= 0 ? waiting(s)[q] : null);
+    const withVs = (mm) => { const mine = mm.teamA.includes(v.id) ? mm.teamA : mm.teamB, opp = mine === mm.teamA ? mm.teamB : mm.teamA; const n = (pid) => pubNameText(P(pid)); const partners = mine.filter((p) => p !== v.id).map(n); return `${partners.length ? `with ${partners.join(', ')} ` : ''}vs ${opp.map(n).join(', ')}`; };
+    if (r.selfCheckedIn) lines.push(S.online ? 'Checked in' : 'Checked in · the QM will see it when their device syncs');
+    if (s.minimum > 0 && g >= s.minimum) lines.push(g === s.minimum ? `${g} of ${s.minimum} · Minimum reached` : `${g} games · minimum ${s.minimum}`);
+    else lines.push(`${g} of ${s.minimum} games played · ${st.w}W ${st.l}L`);
+    if (a) { hl = true; lines.push(`You're on ${courtsOf(s, a)} · ${withVs(a)}`); }
+    else if (m) lines.push(`In queue #${q + 1} · ${withVs(m)}`);
+    else lines.push('Not in a queued match');
+    const mr = openMatchReq(s, v.id);
+    if (mr) { lines.push('Match request sent · the QM decides'); acts.push(`<button class="btn" data-act="cancelMatchReq" data-id="${mr.id}">Cancel</button>`); }
+    else acts.push('<button class="btn primary" data-act="openMatchReq">Request a match</button>');
+    acts.push('<button class="btn" data-act="imLeaving">I\'m leaving</button>');
+  }
+  if (invite) acts.push(invite);
+  return `<section class="card stack${hl ? ' hl' : ''}" aria-label="My night"><span class="label">My night</span>${lines.map((t) => `<p>${t}</p>`).join('')}${acts.length ? `<div class="row acts">${acts.join('')}</div>` : ''}</section>`;
+}
+
 // ---------- Q-PUBLIC ----------
 function viewPublic() {
   const s = cur();
   const tab = S.ui.pubTab;
   const back = s.status === 'active' ? 'console' : s.status === 'prepared' ? 'prepare' : 'history';
-  const pub = s.published;
-  // #569: Player access is separate from the club account; these are prototype audience flags.
-  const playerSignedIn = !!S.ui.playerSignedIn;
-  const fullRoster = playerSignedIn && !!S.ui.playerConfirmed;
+  const pub = pubResults(s);
+  // D-2026-11-09-02: Player access is separate from the club account; the prototype picks the audience in the proto-bar.
+  const playerSignedIn = pubSignedIn();
+  const fullRoster = playerSignedIn;
+  const aud = pubAs(), stages = pubStageOptions(s);
   const why = (s.cancelReason || '').replace(/[.\s]+$/, '');
-  return `<div class="proto-bar"><div class="in"><span>${S.ui.guest ? '<b>Guest view (prototype).</b> What a guest sees after opening your session link. Try Request to join.' : '<b>Public page preview.</b> What anyone with the session link sees, no sign-in needed.'}</span><button class="btn xs" data-act="go" data-to="${back}">${I.back} Back to Queue app</button></div>${S.ui.guest ? '' : `<div class="in share"><span>Share this link, not this page's address:</span><span class="mono">${esc(sessionLink(s))}</span><button class="btn xs" data-act="copyLink">Copy link</button></div>`}</div>
+  return `<div class="proto-bar"><div class="in"><span>${S.ui.guest ? `<b>Session page (prototype).</b> What this person sees after opening your session link.` : '<b>Public page preview.</b> What anyone with the session link sees, no sign-in needed.'}</span><button class="btn xs" data-act="go" data-to="${back}">${I.back} Back to Queue app</button></div>
+    <div class="in share"><label class="row" style="gap:8px"><span>View as</span><select class="input" style="min-height:32px;padding:0 8px" data-act-change="pubAs" aria-label="View the session page as">${stages.map(([k, l, ok]) => `<option value="${k}" ${(S.ui.guest ? aud.key || aud.kind : 'visitor') === k ? 'selected' : ''} ${ok ? '' : 'disabled'}>${l}${ok ? '' : ' · none right now'}</option>`).join('')}</select></label>${s.status === 'finalized' ? `<button class="btn xs" data-act="pubTogglePublished">${pub ? 'View unpublished' : 'View published'}</button>` : ''}${S.ui.guest ? '' : `<span>Share this link, not this page's address:</span><span class="mono">${esc(sessionLink(s))}</span><button class="btn xs" data-act="copyLink">Copy link</button>`}</div></div>
   <main class="wrap narrow">
     <section class="pub-hero">
       <span class="pub-date">${fmtDate(s.start)} · ${fmtRange(s.start, s.end)}</span>
       <h1>${esc(s.title)}</h1>
       <div class="li" style="padding:0">${clubLogo('')}<div class="main"><b>${esc(S.club.name)}</b><p class="small muted">Organizer</p></div>${s.status === 'active' ? chip('Happening now', 'ok') : s.status === 'finalized' ? chip('Finished') : s.status === 'cancelled' ? chip('Cancelled') : ''}</div>
     </section>
+    ${S.ui.guest ? refreshBar(s) : ''}
     ${s.status === 'cancelled' ? `<section class="card stack join-card">${notice('warn', `<b>This session is cancelled.</b>${why ? ` ${esc(why)}.` : ''}`)}</section>` : joinCard(s)}
+    ${s.status === 'cancelled' ? '' : myNight(s)}
     <div class="tabs" role="tablist" style="display:flex">${[['details', 'Details'], ['participants', `Participants · ${s.roster.length}`]].map(([k, l]) => `<button role="tab" aria-selected="${tab === k}" data-act="pubTab" data-k="${k}">${l}</button>`).join('')}</div>
     ${tab === 'details' ? `<section class="card stack"><dl class="kv">
       <dt>When</dt><dd>${fmtDate(s.start)}, ${fmtRange(s.start, s.end)} (${fmtDur(s.start, s.end)})</dd>
@@ -3696,9 +3927,10 @@ function viewPublic() {
       <dt>Minimum</dt><dd>${s.minimum} games per player</dd></dl>
       ${s.notes ? `<p>${esc(s.notes)}</p>` : ''}
       <p class="small muted">Slots are confirmed by the Queue Master. Last updated ${fmtWhen(S.lastSync, { lower: true })}${S.pending ? '. Recent changes from the venue haven’t synced yet.' : '.'}</p></section>`
-    : `<section class="stack">${s.roster.length ? `<div class="${fullRoster ? '' : 'pub-cap'}"><div class="pgrid pub">${s.roster.map((r) => { const p = P(r.pid), m = maskName(p.name); return `<div class="pcard pub lv-${rvBand(r)}" ${r.level != null ? `title="${esc(lvLabel(r.level))}"` : ''}>${pubAvatar(p)}<div style="min-width:0"><b>${esc(m)}</b></div></div>`; }).join('')}${s.status === 'finalized' ? '' : Array.from({ length: Math.max(0, capacityOf(s) - s.roster.length) }, () => '<div class="pcard pub empty" aria-hidden="true"><span class="avatar"></span><div><b>Open</b></div></div>').join('')}</div>${!fullRoster && s.roster.length > 9 ? `<div class="pub-more ${s.roster.length > 12 ? 'more-d' : ''}"><span class="pm-count">${s.roster.length} players are in</span>${s.acceptReq === false || !['prepared', 'active'].includes(s.status) ? '<span class="pm-text">Full roster is for confirmed participants.</span>' : `<span class="small muted">Full roster is for confirmed participants.</span><button class="btn primary pm-btn" data-act="openJoin">${I.lock} Join to see the full roster</button>`}</div>` : ''}</div>` : '<div class="card empty">Players have not been added yet.</div>'}${(s.waitlist || []).length ? `<h3>Waitlist · ${s.waitlist.length}</h3><div class="pgrid pub wl">${waitOf(s).map((w, i) => { const p = P(w.pid); return `<div class="pcard pub lv-${rvBand(w)}" ${w.level != null ? `title="${esc(lvLabel(w.level))}"` : ''}><span class="wl-av">${pubAvatar(p)}<i class="wl-n" aria-hidden="true">${i + 1}</i></span><div style="min-width:0"><b><span class="sr-only">Waitlist number ${i + 1}: </span>${esc(maskName(p.name))}</b></div></div>`; }).join('')}</div><p class="small muted">Waitlisted players get a slot if one opens, in this order. Ask the Queue Master.</p>` : ''}</section>`}
-    ${tab === 'details' ? `<section class="stack" aria-label="Queue"><h2>Queue</h2>${playerSignedIn ? `<p class="small muted">Read-only · Last synced queue</p><div class="grid">${s.matches.filter((m) => m.status === 'waiting').sort((a, b) => a.pos - b.pos).map((m, i) => `<article class="qtile"><div class="qt-head"><span class="qt-pos">#${i + 1}</span>${chip(FORMAT_LABEL[m.format], 'solid')}</div>${[m.teamA, m.teamB].map((ids) => `<div class="qfaces">${ids.map((pid) => `<span class="qf">${pubAvatar(P(pid))}<span class="qf-n">${esc(maskName(P(pid).name))}</span></span>`).join('')}</div>`).join('<div class="vs">VS</div>')}<span class="status-line muted">Waiting in queue</span></article>`).join('') || '<p>No matches queued yet.</p>'}</div>` : '<p class="small muted">Log in with ROTRA Player to see the queue.</p>'}</section>` : ''}
-    ${s.status === 'finalized' ? (pub ? `<section class="stack"><h2>Results</h2>${pub.slides.includes(0) ? slideStandings(s) : ''}${pub.slides.includes(1) ? slideAwards(s) : ''}${pub.offDay ? slideOffDay(s, true) : ''}</section>`
+    : `<section class="stack">${s.roster.length ? `<div class="${fullRoster ? '' : 'pub-cap'}"><div class="pgrid pub">${s.roster.map((r) => { const p = P(r.pid); return `<div class="pcard pub lv-${rvBand(r)}" ${r.level != null ? `title="${esc(lvLabel(r.level))}"` : ''}>${pubAvatarOf(p)}<div style="min-width:0">${pubNameHtml(p)}</div></div>`; }).join('')}${s.status === 'finalized' ? '' : Array.from({ length: Math.max(0, capacityOf(s) - s.roster.length) }, () => '<div class="pcard pub empty" aria-hidden="true"><span class="avatar"></span><div><b>Open</b></div></div>').join('')}</div>${!fullRoster && s.roster.length > 9 ? `<div class="pub-more ${s.roster.length > 12 ? 'more-d' : ''}"><span class="pm-count">${s.roster.length} players are in</span>${s.acceptReq === false || !['prepared', 'active'].includes(s.status) ? '<span class="pm-text">Full roster is for confirmed participants.</span>' : `<span class="small muted">Full roster is for confirmed participants.</span><button class="btn primary pm-btn" data-act="openJoin">${I.lock} Join to see the full roster</button>`}</div>` : ''}</div>` : '<div class="card empty">Players have not been added yet.</div>'}${(s.waitlist || []).length ? `<h3>Waitlist · ${s.waitlist.length}</h3><div class="pgrid pub wl">${waitOf(s).map((w, i) => { const p = P(w.pid); return `<div class="pcard pub lv-${rvBand(w)}" ${w.level != null ? `title="${esc(lvLabel(w.level))}"` : ''}><span class="wl-av">${pubAvatarOf(p)}<i class="wl-n" aria-hidden="true">${i + 1}</i></span><div style="min-width:0"><span class="sr-only">Waitlist number ${i + 1}: </span>${pubNameHtml(p)}</div></div>`; }).join('')}</div><p class="small muted">Waitlisted players get a slot if one opens, in this order. Ask the Queue Master.</p>` : ''}</section>`}
+    ${tab === 'details' && playerSignedIn && s.status === 'active' ? courtsNow(s) : ''}
+    ${tab === 'details' ? `<section class="stack" aria-label="Queue"><h2>Queue</h2>${playerSignedIn ? `<p class="small muted">Read-only · Last synced queue</p><div class="grid">${s.matches.filter((m) => m.status === 'waiting').sort((a, b) => a.pos - b.pos).map((m, i) => `<article class="qtile"><div class="qt-head"><span class="qt-pos">#${i + 1}</span>${chip(FORMAT_LABEL[m.format], 'solid')}</div>${[m.teamA, m.teamB].map((ids) => `<div class="qfaces">${ids.map((pid) => `<span class="qf">${pubAvatarOf(P(pid))}<span class="qf-n">${esc(pubNameText(P(pid)))}</span></span>`).join('')}</div>`).join('<div class="vs">VS</div>')}<span class="status-line muted">Waiting in queue</span></article>`).join('') || '<p>No matches queued yet.</p>'}</div>` : '<p class="small muted">Log in with ROTRA Player to see the queue.</p>'}</section>` : ''}
+    ${s.status === 'finalized' ? (pub ? `<section class="stack"><h2>Results</h2>${pub.slides.includes(0) ? slideStandings(s, pubViewer()?.id) : ''}${pub.slides.includes(1) ? slideAwards(s) : ''}${pub.offDay ? slideOffDay(s, true) : ''}</section>`
       : '<section class="card empty">Results for this session have not been shared.</section>') : ''}
   </main>`;
 }
@@ -3774,11 +4006,18 @@ const SHEETS = {
       ${S.screen === 'setup' ? '<p class="small muted">Your setup stays as it is if you go back.</p>' : ''}`,
       `<button class="btn" data-act="closeSheet">${S.screen === 'setup' ? 'Back to setup' : 'Close'}</button><button class="btn primary" data-act="go" data-to="${to}" data-id="${x.id}">Open ${x.status === 'active' ? 'live session' : x.status === 'prepared' ? 'preparation' : 'session record'}</button>`);
   },
-  requests() { return sheetShell('Join requests', requestsPanel(cur(), true).replace(/<h2>Join requests[^<]*<\/h2>/, ''), '<button class="btn" data-act="closeSheet">Done</button>', true); },
+  requests() { return sheetShell('Requests', requestsPanel(cur(), true), '<button class="btn" data-act="closeSheet">Done</button>', true); },
   join(sh) {
-    const s = cur(), e = sh.err || {};
+    const s = cur(), e = sh.err || {}, how = sh.how || 'guest';
+    // D-2026-11-09-06: three ways in. Log in and Register return to /s/<slug> signed in, with the request ready to send.
+    const ways = `<div class="field"><div class="seg" role="group" aria-label="How to request">${[['guest', 'Continue as guest'], ['login', 'Log in with ROTRA Player'], ['register', 'Register with ROTRA']].map(([k, l]) => `<button aria-pressed="${how === k}" data-act="sheetSet" data-k="how" data-v="${k}">${l}</button>`).join('')}</div></div>`;
+    if (how !== 'guest') return sheetShell('Request to join', `<p class="small muted">${esc(s.title)} · ${fmtDate(s.start)}, ${fmtTime(s.start)} · ${esc(s.venue)}</p>${ways}
+      <p>${how === 'login' ? 'Log in with ROTRA Player and you come back here signed in, with your request ready to send.' : `Register with ROTRA under ${esc(S.club.name)} and you come back here signed in, with your request ready to send.`}</p>
+      ${notice('', 'Logging in or registering never gives a slot. The Queue Master confirms every request.')}
+      <p class="small muted">Prototype: this signs you in as a sample ROTRA player.</p>`,
+      `<button class="btn" data-act="closeSheet">Cancel</button><button class="btn primary" data-act="protoSignIn">${how === 'login' ? 'Log in with ROTRA Player' : 'Register with ROTRA'}</button>`);
     return sheetShell('Request to join', `<p class="small muted">${esc(s.title)} · ${fmtDate(s.start)}, ${fmtTime(s.start)} · ${esc(s.venue)}</p>
-      <div class="field"><div class="seg" role="group" aria-label="How to request"><button aria-pressed="true">Continue as guest</button><a class="btn" href="../player-app/rotra-player.html" target="_blank" rel="noopener">Log in with ROTRA Player</a></div><span class="hint">New to ROTRA? Ask your club for a registration invite, or continue as a guest.</span></div>
+      ${ways}
       <label class="field"><span>Your name</span><input class="input${e.name ? ' bad' : ''}" id="join-name" data-bind="ui.sheet.name" value="${esc(sh.name || '')}" autocomplete="name" data-autofocus>${e.name ? `<span class="err">${e.name}</span>` : ''}</label>
       <label class="field"><span>Nickname (optional)</span><input class="input" id="join-nick" data-bind="ui.sheet.nick" value="${esc(sh.nick || '')}"></label>
       <label class="field"><span>Phone (optional)</span><input class="input${e.phone ? ' bad' : ''}" id="join-phone" type="tel" inputmode="tel" data-bind="ui.sheet.phone" value="${esc(sh.phone || '')}" autocomplete="tel">${e.phone ? `<span class="err">${e.phone}</span>` : '<span class="hint">Helps the club recognise you and link your ROTRA profile. Only the club sees it.</span>'}</label>
@@ -3825,24 +4064,56 @@ const SHEETS = {
     const item = (run, label, extra = '', cls = '') => `<button class="btn ${cls}" style="width:100%" data-act="moreRun" data-run="${run}" ${extra}>${label}</button>`;
     return sheetShell('More options', `<div class="stack">${live ? item('go', 'Back to live session', 'data-goto="console"') : item('editSetup', 'Edit preparation')}${item('copyLink', 'Copy invite link')}${live ? '' : `${item('openDeleteSession', 'Delete session', '', 'danger')}${item('openCancelSession', 'Cancel session', '', 'danger')}`}</div>`);
   },
+  matchReq(sh) {
+    const s = cur(), v = pubViewer();
+    const fmts = [s.doubles && 'doubles', s.singles && 'singles'].filter(Boolean);
+    const fmt = sh.format || fmts[0] || 'doubles';
+    const spots = fmt === 'singles' ? [['opp', 0, 'Opponent']] : [['partner', 0, 'Partner'], ['opp', 0, 'Opponent 1'], ['opp', 1, 'Opponent 2']];
+    const chosen = [sh.partner, ...(sh.opp || [])].filter(Boolean);
+    const spot = (key, i, label) => {
+      const pid = key === 'partner' ? sh.partner : (sh.opp || [])[i];
+      const p = pid ? P(pid) : null, r = pid ? R(s, pid) : null;
+      return `<div class="slot-row"><button class="slot-btn${p ? '' : ' empty'}" data-act="mrPick" data-key="${key}" data-i="${i}" aria-label="${label}: ${p ? esc(p.name) : 'Anyone'}. Change">${p ? `${avatar(p)}<span class="main"><b>${esc(p.name)}</b><span class="small muted">${esc(lvLabel(r.level))} · ${gamesOf(s, pid)}/${s.minimum}</span></span><span class="small muted">Change</span>` : `${label} · Anyone`}</button>${p ? `<button class="btn xs ghost icon-btn" data-act="mrClear" data-key="${key}" data-i="${i}" aria-label="Set ${label} back to Anyone">${I.x}</button>` : ''}</div>`;
+    };
+    if (sh.picking) {
+      const pk = sh.picking, current = pk.key === 'partner' ? sh.partner : (sh.opp || [])[pk.i];
+      const list = s.roster.filter((r) => r.present && r.pid !== v.id).sort((a, b) => gamesOf(s, a.pid) - gamesOf(s, b.pid));
+      return sheetShell(`Choose ${pk.label}`, `<div class="pick-grid">${list.map((r) => playerTile(s, r.pid, { attrs: `data-act="mrChoose" data-id="${r.pid}"`, pressed: r.pid === current, disabled: chosen.includes(r.pid) && r.pid !== current, note: chosen.includes(r.pid) && r.pid !== current ? 'Already picked' : '' })).join('') || '<div class="empty">No other present players.</div>'}</div>
+        <p class="small muted">Present players only. Players on a court or already in a waiting match can still be picked.</p>`,
+        `<button class="btn" data-act="mrAnyone">Anyone</button><button class="btn" data-act="mrBack">Back</button>`, true);
+    }
+    return sheetShell('Request a match', `<p class="small muted">Pick who you want to play with, or leave a spot as Anyone. The QM decides.</p>
+      ${fmts.length > 1 ? `<div class="field"><span>Format</span><div class="seg" role="group" aria-label="Format">${fmts.map((k) => `<button aria-pressed="${fmt === k}" data-act="mrFormat" data-k="${k}">${FORMAT_LABEL[k]}</button>`).join('')}</div></div>` : ''}
+      <div class="stack tight">${spots.map(([k, i, l]) => spot(k, i, l)).join('')}</div>`,
+      '<button class="btn" data-act="closeSheet">Cancel</button><button class="btn primary" data-act="sendMatchReq">Send request</button>');
+  },
   sessionQr(sh) {
-    const s = cur(), fmt = sh.fmt === 'story' ? 'story' : 'post';
+    const club = sh.kind === 'club', s = club ? null : cur(), fmt = sh.fmt === 'story' ? 'story' : 'post';
+    // D-2026-11-09-08 Session invite: the same card, "<name> invites you to play", with a short invite code on the link.
+    const inv = !club && sh.invite ? P(sh.invite) : null, invRow = inv ? R(s, inv.id) || (s.waitlist || []).find((w) => w.pid === inv.id) : null;
+    const invLink = club ? clubInviteLink() : inv ? `${sessionLink(s)}?invite=${invRow.inviteCode}` : sessionLink(s);
+    const full = !club && s.status !== 'active' && openSlots(s) === 0;
     // Static placeholder QR (finder squares + sample modules); the real app encodes the public session link.
     const sq = (x, y) => `<rect x="${x}" y="${y}" width="7" height="7" fill="#000"/><rect x="${x + 1}" y="${y + 1}" width="5" height="5" fill="#fff"/><rect x="${x + 2}" y="${y + 2}" width="3" height="3" fill="#000"/>`;
     const dots = [[9,1],[11,2],[13,1],[10,4],[12,5],[9,7],[14,8],[1,9],[3,10],[5,9],[8,10],[10,9],[12,11],[15,10],[2,12],[4,13],[7,12],[9,14],[11,13],[14,14],[16,12],[18,9],[19,11],[17,15],[20,13],[18,18],[12,17],[14,19],[10,19],[8,16],[16,19],[20,17]];
-    const qr = `<svg viewBox="0 0 21 21" shape-rendering="crispEdges" role="img" aria-label="QR code for the session link">${sq(0, 0)}${sq(14, 0)}${sq(0, 14)}${dots.map(([x, y]) => `<rect x="${x}" y="${y}" width="1" height="1" fill="#000"/>`).join('')}</svg>`;
+    const qr = `<svg viewBox="0 0 21 21" shape-rendering="crispEdges" role="img" aria-label="QR code for the ${club ? 'club invite' : 'session'} link">${sq(0, 0)}${sq(14, 0)}${sq(0, 14)}${dots.map(([x, y]) => `<rect x="${x}" y="${y}" width="1" height="1" fill="#000"/>`).join('')}</svg>`;
     const mark = S.club.logo ? `<img src="${S.club.logo}" alt="">` : `<span>${esc(S.club.initials)}</span>`;
     // Brand card: the same image people post to Facebook and stories. Colors are fixed brand values, so it looks the same in both themes.
     const card = `<div class="qr-card ${fmt}" role="group" aria-label="Share image preview">
-      <div class="qc-top"><span class="qc-club">${mark}</span><div><b>${esc(S.club.name)}</b><span>is playing badminton</span></div></div>
-      <div class="qc-mid"><h3>${esc(s.title)}</h3><p>${fmtDate(s.start)}<br>${fmtRange(s.start, s.end)} · ${esc(s.venue)}</p></div>
-      <div class="qc-qr"><div class="qc-code">${qr}<span class="qc-badge">${mark}</span></div><b>Scan to join</b><span class="mono">${esc(sessionLink(s))}</span></div>
+      <div class="qc-top"><span class="qc-club">${mark}</span><div><b>${esc(inv ? inv.name : S.club.name)}</b><span>${club ? 'invites you to play' : inv ? 'invites you to play' : 'is playing badminton'}</span></div></div>
+      <div class="qc-mid">${club ? `<h3>${esc(S.club.name)} invites you to play</h3><p>Register with ROTRA and join the club</p>` : `<h3>${esc(s.title)}</h3><p>${fmtDate(s.start)}<br>${fmtRange(s.start, s.end)} · ${esc(s.venue)}${inv ? `<br>${esc(S.club.name)}` : ''}</p>`}</div>
+      <div class="qc-qr"><div class="qc-code">${qr}<span class="qc-badge">${mark}</span></div><b>${inv && full ? 'Waitlist open' : 'Scan to join'}</b><span class="mono">${esc(invLink)}</span></div>
       <div class="qc-foot"><span class="qc-word">ROTR<b>A</b></span><span>Run the game.</span></div></div>`;
-    return sheetShell('Session QR', `<div class="stack" style="align-items:center;text-align:center">
+    return sheetShell(club ? 'Share club invite' : inv ? 'Session invite' : 'Session QR', `<div class="stack" style="align-items:center;text-align:center">
       <div class="seg" role="group" aria-label="Image format">${[['post', 'Post'], ['story', 'Story']].map(([k, l]) => `<button aria-pressed="${fmt === k}" data-act="qrFmt" data-k="${k}">${l}</button>`).join('')}</div>
       ${card}
-      <p class="small muted">Scanning opens the public session page. ${fmt === 'story' ? 'Story size (9:16) for Facebook and Instagram stories.' : 'Post size (4:5) for Facebook and Instagram feeds.'} Download the image to share it or print it.</p></div>`,
-      '<button class="btn" data-act="closeSheet">Close</button><button class="btn" data-act="downloadSessionQr">Share</button><button class="btn primary" data-act="downloadSessionQr">Download image</button>');
+      <p class="small muted">${club ? 'Scanning opens the club registration page.' : 'Scanning opens the public session page.'} ${fmt === 'story' ? 'Story size (9:16) for Facebook and Instagram stories.' : 'Post size (4:5) for Facebook and Instagram feeds.'} ${club ? 'Download the image to share it or print it.' : inv ? 'The Queue Master sees who invited each person who joins through it.' : 'Download the image to share it or print it.'}</p></div>`,
+      inv ? `<button class="btn" data-act="closeSheet">Close</button>${navigator.share ? '<button class="btn primary" data-act="shareInvite">Share</button>' : '<button class="btn primary" data-act="downloadSessionQr">Download image</button>'}`
+        : '<button class="btn" data-act="closeSheet">Close</button><button class="btn" data-act="downloadSessionQr">Share</button><button class="btn primary" data-act="downloadSessionQr">Download image</button>');
+  },
+  regenClubInvite() {
+    return sheetShell('Regenerate the club invite link?', '<p>The old link and every image with its QR stop working. People who already joined keep their place.</p>',
+      '<button class="btn" data-act="closeSheet" data-autofocus>Cancel</button><button class="btn primary" data-act="regenClubInvite">Regenerate</button>');
   },
   timePick(sh) {
     const p = DT[sh.k];
@@ -3898,11 +4169,21 @@ const SHEETS = {
         <dt>RTR ID</dt><dd>${p.rtr ? `<span class="mono small">${esc(p.rtr)}</span>` : 'None yet'}</dd>
         <dt>Added to club</dt><dd>${new Date(addedAt(p)).toLocaleDateString([], { month: 'long', day: 'numeric', year: 'numeric' })}</dd>
         <dt>Sessions here</dt><dd>${p.prior}</dd>
-        <dt>Phone</dt><dd>${p.phoneHidden ? 'Hidden by player' : p.identity === 'guest' ? 'None on file' : 'Kept private; confirmed in person when adding them to a session'}</dd>
+        <dt>Phone</dt><dd>${p.phoneHidden ? 'Hidden by player' : p.identity === 'guest' && !p.phone ? 'None on file' : 'Kept private; confirmed in person when adding them to a session'}</dd>
+        <dt>Joined</dt><dd>${joinedViaText(p)}</dd>
       </dl>
       ${p.identity === 'guest' ? `<section class="stack tight" aria-labelledby="guest-invite-h"><h3 id="guest-invite-h" style="margin:0;font-size:14px">Invite to ROTRA</h3><p class="small muted">Send this link so they can register for ROTRA Player. Their guest record stays unlinked until they accept a separate linking invitation.</p><div class="row"><button class="btn" data-act="copyGuestInvite">Copy invite link</button>${navigator.share ? '<button class="btn" data-act="shareGuestInvite">Share</button>' : ''}</div></section>` : ''}
       <p class="small muted">Levels are set per session while preparing a roster, not here.</p>`,
-      `${sh.back ? `<button class="btn" data-act="profileBack">Back to ${{ suggest: 'suggestion', payments: 'payments', dispatch: 'match', match: 'match', onCourt: 'match', invalid: 'match' }[sh.back.type] || 'previous'}</button>` : '<button class="btn" data-act="closeSheet">Close</button>'}${sh.back ? '' : `<button class="btn danger" data-act="deletePlayer" data-id="${p.id}">Delete player</button>`}${canInvite(p) ? `<button class="btn" data-act="openEditPlayer" data-id="${p.id}">Edit details</button><button class="btn primary" data-act="openInvite" data-id="${p.id}">Invite</button>` : ''}`);
+      `${sh.back ? `<button class="btn" data-act="profileBack">Back to ${{ suggest: 'suggestion', payments: 'payments', dispatch: 'match', match: 'match', onCourt: 'match', invalid: 'match' }[sh.back.type] || 'previous'}</button>` : '<button class="btn" data-act="closeSheet">Close</button>'}${sh.back ? '' : `<button class="btn danger" data-act="deletePlayer" data-id="${p.id}">Delete player</button>`}${p.identity === 'guest' && !sh.back ? `<button class="btn" data-act="openLinkPlayer" data-id="${p.id}">Link to saved player…</button>` : ''}${canInvite(p) ? `<button class="btn" data-act="openEditPlayer" data-id="${p.id}">Edit details</button><button class="btn primary" data-act="openInvite" data-id="${p.id}">Invite</button>` : ''}`);
+  },
+  // D-2026-11-09-06: the QM links a guest record to a saved player by hand when no phone matched. Nothing merges by itself.
+  linkPlayer(sh) {
+    const g = P(sh.id), q = (sh.q || '').trim().toLowerCase();
+    const list = saved().filter((p) => p.id !== g.id && (!q || p.name.toLowerCase().includes(q) || (p.nick || '').toLowerCase().includes(q) || (p.rtr || '').toLowerCase().includes(q))).sort((a, b) => a.name.localeCompare(b.name));
+    return sheetShell(`Link ${esc(g.name)} to a saved player`, `<p class="small muted">Choose the saved player who is the same person. ${esc(g.name)}'s slots, games and payments here move to that record. Nothing merges until you pick one.</p>
+      <label class="field"><span>Search saved players</span><input class="input" id="link-q" data-bind="ui.sheet.q" data-rerender value="${esc(sh.q || '')}" placeholder="Name, nickname or RTR ID" data-autofocus></label>
+      <div class="sel-list">${list.map((p) => `<button class="opt" data-act="linkPlayer" data-id="${p.id}">${avatar(p)}<div class="main"><b>${esc(p.name)}</b><div class="small muted">${p.rtr ? esc(p.rtr) : 'Guest'}</div></div>${identChip(p)}</button>`).join('') || '<div class="empty">No saved player matches.</div>'}</div>`,
+      `<button class="btn" data-act="openProfile" data-id="${g.id}">Back</button>`);
   },
   deletePlayer(sh) {
     // Only reached when the player is in the Active Session (D-DELETE-PLAYER). Elsewhere Delete player acts at once.
@@ -4501,7 +4782,7 @@ function go(to, id) {
   S.ui.sheet = null; S.ui.guest = false; S.ui.navOpen = false; S.ui.setOpen = false;
   if (to === 'results') S.ui.slide = 0;
   if (to === 'prepare' && cur()?.status === 'active') S.ui.prepTab = 'overview';
-  if (to === 'public') S.ui.pubTab = 'details';
+  if (to === 'public') { S.ui.pubTab = 'details'; S.ui.pubPubOverride = null; }
   S.screen = to;
   render();
   window.scrollTo(0, 0);
@@ -4557,6 +4838,12 @@ const ACT = {
   openSync: () => openSheet({ type: 'sync' }),
   openVenue: () => openSheet({ type: 'venue', mode: 'pick', q: '' }),
   openPost: () => openSheet({ type: 'post' }),
+  openClubInvite: () => openSheet({ type: 'sessionQr', kind: 'club', fmt: 'post' }),
+  copyClubInvite: () => { try { navigator.clipboard.writeText(clubInviteLink()); } catch (e) { /* clipboard unavailable */ } toast('Club invite link copied'); },
+  openRegenClubInvite: () => openSheet({ type: 'regenClubInvite' }),
+  regenClubInvite: () => { S.club.inviteCode = Array.from({ length: 8 }, () => 'abcdefghjkmnpqrstuvwxyz23456789'[Math.floor(Math.random() * 31)]).join(''); save(); closeSheet(); render(); toast('Club invite link regenerated'); },
+  // D-2026-11-09-10: only the current and previous logo are kept.
+  useLogoPrev: () => { const c = S.club.logo; S.club.logo = S.club.logoPrev; S.club.logoPrev = c || null; save(); render(); toast('Previous logo restored'); },
   openSessionQr: () => openSheet({ type: 'sessionQr', fmt: 'post' }),
   qrFmt: (d) => { if (S.ui.sheet?.type === 'sessionQr') { S.ui.sheet.fmt = d.k; render(); } },
   openPrepMore: () => openSheet({ type: 'prepMore' }),
@@ -4566,7 +4853,47 @@ const ACT = {
   copyLink: () => { const v = sessionLink(cur()); try { navigator.clipboard.writeText(v); } catch (e) { /* clipboard unavailable */ } toast('Session link copied'); },
   openGuest: (d) => { go('public', d.id); S.ui.guest = true; render(); },
   toggleAcceptReq: () => { const s = cur(); s.acceptReq = s.acceptReq === false; save(); render(); toast(s.acceptReq ? 'Join requests are on' : 'Join requests are off'); },
-  openJoin: () => openSheet({ type: 'join', band: null }),
+  openJoin: () => openSheet({ type: 'join', band: null, how: 'guest' }),
+  // D-2026-11-09-06, prototype: Log in / Register come back signed in as a sample ROTRA player, with the one-tap request ready.
+  protoSignIn: () => { const how = S.ui.sheet?.how; setPubAs('newplayer'); const v = pubViewer(); toast(v ? `${how === 'register' ? 'Registered' : 'Logged in'} as ${v.name} · your request is ready to send` : 'Signed in'); },
+  // D-2026-11-09-02: one-tap join for a signed-in player; the request carries the account, one open request per account.
+  sendPlayerJoin: () => {
+    const s = cur(), v = pubViewer();
+    if (!v || (playerJoinReq(s, v.id) || {}).status === 'pending') return;
+    const r = { id: `q${Date.now()}`, pid: v.id, account: v.rtr, name: v.name, nick: v.nick || '', phone: '', band: v.sugg != null ? LEVELS[v.sugg].band : 'unsure', level: v.sugg ?? null, at: Date.now(), status: 'pending' };
+    s.requests = [...(s.requests || []), r]; save(); render(); toast('Request sent');
+  },
+  cancelJoinReq: (d) => { const r = (cur().requests || []).find((x) => x.id === d.id); if (r && r.status === 'pending') r.status = 'cancelled'; save(); render(); toast('Request cancelled'); },
+  // D-2026-11-09-03: self check-in, I'm leaving, I can't make it. All write to the roster; the QM's last action wins.
+  imHere: () => { const s = cur(), r = R(s, pubViewer()?.id); if (!r) return; r.present = true; r.presentAt = Date.now(); r.selfCheckedIn = true; r.selfCheckedInAt = Date.now(); r.selfLeft = false; if (!S.online) S.pending += 1; save(); render(); toast(S.online ? 'Checked in' : 'Checked in · the QM will see it when their device syncs'); },
+  imLeaving: () => { const s = cur(), r = R(s, pubViewer()?.id); if (!r) return; r.present = false; r.selfLeft = true; r.leftAt = Date.now(); const mr = openMatchReq(s, r.pid); if (mr) mr.status = 'closed'; if (!S.online) S.pending += 1; save(); render(); toast('Told the QM you\'re leaving'); },
+  cantMakeIt: () => { const s = cur(), v = pubViewer(); if (!v || openDropOut(s, v.id)) return; s.dropOuts = [...(s.dropOuts || []), { id: `d${Date.now()}`, pid: v.id, at: Date.now(), status: 'open' }]; save(); render(); toast('Told the QM you can\'t make it'); },
+  // D-2026-11-09-05, player side: Request a match.
+  openMatchReq: () => { const s = cur(); openSheet({ type: 'matchReq', format: s.doubles ? 'doubles' : 'singles', partner: null, opp: [] }); },
+  mrFormat: (d) => { const sh = S.ui.sheet; sh.format = d.k; if (d.k === 'singles') { sh.partner = null; sh.opp = sh.opp.slice(0, 1); } render(); },
+  mrPick: (d) => { const sh = S.ui.sheet; sh.picking = { key: d.key, i: +d.i, label: d.key === 'partner' ? 'partner' : sh.format === 'singles' ? 'opponent' : `opponent ${+d.i + 1}` }; render(); },
+  mrChoose: (d) => { const sh = S.ui.sheet, pk = sh.picking; if (pk.key === 'partner') sh.partner = d.id; else sh.opp[pk.i] = d.id; sh.picking = null; render(); },
+  mrAnyone: () => { const sh = S.ui.sheet, pk = sh.picking; if (pk.key === 'partner') sh.partner = null; else sh.opp[pk.i] = null; sh.picking = null; render(); },
+  mrClear: (d) => { const sh = S.ui.sheet; if (d.key === 'partner') sh.partner = null; else sh.opp[+d.i] = null; render(); },
+  mrBack: () => { S.ui.sheet.picking = null; render(); },
+  sendMatchReq: () => {
+    const s = cur(), v = pubViewer(), sh = S.ui.sheet;
+    if (!v || openMatchReq(s, v.id)) { S.ui.sheet = null; render(); return; }
+    s.matchRequests = [...(s.matchRequests || []), { id: `mr${Date.now()}`, pid: v.id, format: sh.format, partner: sh.partner || null, opponents: (sh.opp || []).filter(Boolean), at: Date.now(), status: 'open' }];
+    S.ui.sheet = null; save(); render(); toast('Match request sent');
+  },
+  cancelMatchReq: (d) => { const mr = (cur().matchRequests || []).find((x) => x.id === d.id); if (mr && mr.status === 'open') mr.status = 'cancelled'; save(); render(); toast('Match request cancelled'); },
+  // D-2026-11-09-08 Session invite: one short code per player and session, made the first time they open the card.
+  openSessionInvite: () => {
+    const s = cur(), v = pubViewer(); if (!v) return;
+    const row = R(s, v.id) || (s.waitlist || []).find((w) => w.pid === v.id); if (!row) return;
+    if (!row.inviteCode) { row.inviteCode = Array.from({ length: 8 }, () => 'abcdefghjkmnpqrstuvwxyz23456789'[Math.floor(Math.random() * 31)]).join(''); save(); }
+    openSheet({ type: 'sessionQr', fmt: 'post', invite: v.id });
+  },
+  shareInvite: () => toast('Share sheet opened'),
+  // D-2026-11-09-04: Refresh refreshes data only, at most once every 10 seconds; the page renders in place.
+  pubRefresh: () => { if (S.ui.pubRefreshedAt && Date.now() - S.ui.pubRefreshedAt < 10000) return; S.ui.pubRefreshedAt = Date.now(); render(); setTimeout(() => { if (S.screen === 'public') render(); }, 10100); },
+  pubTogglePublished: () => { S.ui.pubPubOverride = pubResults(cur()) ? 'hide' : 'show'; render(); },
   sendJoin: () => {
     const sh = S.ui.sheet, s = cur(), err = {};
     if (!(sh.name || '').trim()) err.name = 'Enter your name.';
@@ -4576,7 +4903,7 @@ const ACT = {
     if (Object.keys(err).length) { render(); const f = document.getElementById(err.name ? 'join-name' : err.phone ? 'join-phone' : 'join-name'); if (f) f.focus(); return; }
     const r = { id: `q${Date.now()}`, name: sh.name.trim(), nick: (sh.nick || '').trim(), phone: (sh.phone || '').trim(), band: sh.band, at: Date.now(), status: 'pending' };
     s.requests = [...(s.requests || []), r];
-    S.ui.guestReq = { sid: s.id, id: r.id }; S.ui.sheet = null; save(); render(); toast('Request sent');
+    S.ui.guestReq = { sid: s.id, id: r.id }; S.ui.pubAs = { kind: 'guest', key: 'guest', sid: s.id }; S.ui.sheet = null; save(); render(); toast('Request sent');
   },
   fakeReq: (d) => {
     const s = S.sessions.find((x) => x.id === d.id); const names = [['Rico Santos', 'Rics', '0917 555 0142', 'Intermediate'], ['Mae Lagman', '', '', 'Beginner'], ['JP Uy', 'JP', '0928 555 0199', 'Advanced'], ['Tessa Ramos', '', '0905 555 0110', 'unsure']];
@@ -4597,6 +4924,33 @@ const ACT = {
     go('console', s.id); toast(`Demo scenario: ${LIVE_SCENARIOS[d.k].label}`);
   },
   openRequests: () => openSheet({ type: 'requests' }),
+  reqTab: (d) => { S.ui.reqTab = d.k; render(); },
+  // D-2026-11-09-06: Link merges the guest request into the saved player's record; Not them hides the prompt.
+  linkReq: (d) => { const s = cur(), r = (s.requests || []).find((x) => x.id === d.id), p = P(d.pid); if (!r || !p) return; r.pid = p.id; r.linked = p.id; if (!r.nick && p.nick) r.nick = p.nick; save(); render(); toast(`Linked to ${p.name}`); },
+  notThemReq: (d) => { const r = (cur().requests || []).find((x) => x.id === d.id); if (r) r.noLink = true; save(); render(); },
+  // D-2026-11-09-03: drop-out notices. The slot never frees by itself.
+  keepDropOut: (d) => { const s = cur(), x = (s.dropOuts || []).find((y) => y.id === d.id); if (!x) return; x.status = 'closed'; x.decision = 'kept'; x.closedAt = Date.now(); commit(`${nm(x.pid)} stays on the roster`); render(); },
+  removeDropOut: (d) => { const s = cur(), x = (s.dropOuts || []).find((y) => y.id === d.id); if (!x) return; x.status = 'closed'; x.decision = 'removed'; x.closedAt = Date.now(); s.roster = s.roster.filter((r) => r.pid !== x.pid); commit(`${nm(x.pid)} removed from the roster`); render(); },
+  // D-2026-11-09-05, QM side: Add to queue makes a waiting match at the end of the Main Queue, filling Anyone spots with the present players who have the fewest games.
+  addMatchReq: (d) => {
+    const s = cur(), mr = openMatchReqs(s).find((x) => x.id === d.id); if (!mr) return;
+    const fmt = mr.format, size = fmt === 'singles' ? 2 : 4, named = new Set(mrNamed(mr));
+    const load = (pid) => gamesOf(s, pid) + queuedCount(s, pid);
+    const fill = s.roster.filter((r) => r.present && !named.has(r.pid)).map((r) => r.pid).sort((a, b) => load(a) - load(b)).slice(0, size - named.size);
+    if (fill.length < size - named.size) { toast(`Not enough present players to fill this ${FORMAT_LABEL[fmt].toLowerCase()} match`); return; }
+    const opp = mr.opponents || [];
+    const teamA = fmt === 'singles' ? [mr.pid] : [mr.pid, mr.partner || fill.shift()];
+    const teamB = fmt === 'singles' ? [opp[0] || fill.shift()] : [opp[0] || fill.shift(), opp[1] || fill.shift()];
+    const m = addMatch(s, { format: fmt, teamA, teamB }, 'manual', true);
+    mr.status = 'added'; mr.matchId = m.id; mr.decidedAt = Date.now();
+    commit('Match added to the queue'); render();
+  },
+  declineMatchReq: (d) => { const mr = (cur().matchRequests || []).find((x) => x.id === d.id); if (!mr || mr.status !== 'open') return; mr.status = 'declined'; mr.decidedAt = Date.now(); commit(`${short(mr.pid)}'s match request declined`); render(); },
+  // D-2026-11-09-03: club setting. Off hides the player-side I'm here button.
+  toggleSelfCheckIn: () => { S.club.selfCheckIn = S.club.selfCheckIn === false; save(); render(); toast(S.club.selfCheckIn !== false ? 'Players can check themselves in' : 'Only you mark presence now'); },
+  // D-2026-11-09-06: Link to saved player… from a guest's record.
+  openLinkPlayer: (d) => openSheet({ type: 'linkPlayer', id: d.id, q: '' }),
+  linkPlayer: (d) => { const sh = S.ui.sheet, to = P(d.id); if (!sh || sh.type !== 'linkPlayer' || !to) return; mergePlayer(sh.id, to.id); S.ui.sheet = null; save(); render(); toast(`Linked to ${to.name}`); },
   openDeleteSession: () => { if (cur()?.status === 'prepared') openSheet({ type: 'deleteSession' }); },
   deleteOpenRoster: () => { S.ui.sheet = null; S.ui.prepTab = 'roster'; render(); const b = document.getElementById('ptb-roster'); if (b) b.focus(); },
   confirmDeleteSession: () => {
@@ -4621,8 +4975,8 @@ const ACT = {
     const s = cur(), r = (s.requests || []).find((x) => x.id === d.id);
     const lv = r.level ?? (r.band !== 'unsure' ? bandMid(r.band) : null);
     if (lv == null) { r.err = 'Choose a level for this club before confirming.'; render(); const f = document.getElementById(`req-lv-${r.id}`); if (f) f.focus(); return; }
-    const pid = `p${Date.now()}`;
-    S.players.push({ id: pid, name: r.name, nick: r.nick, identity: r.phone ? 'pending' : 'guest', rtr: null, sugg: null, prior: 0, base: null, added: Date.now() });
+    const pid = r.pid || `p${Date.now()}`;
+    if (!r.pid) S.players.push(r.account ? { id: pid, name: r.name, nick: r.nick, identity: 'registered', rtr: r.account, sugg: r.level ?? null, prior: 0, base: null, added: Date.now(), joinedVia: 'session' } : { id: pid, name: r.name, nick: r.nick, identity: r.phone ? 'pending' : 'guest', rtr: null, sugg: null, prior: 0, base: null, added: Date.now() });
     r.status = 'confirmed'; r.pid = pid; r.err = '';
     if (s.status !== 'active' && !openSlots(s)) { s.waitlist = [...(s.waitlist || []), { pid, level: +lv, at: r.at }]; commit(`${r.name} confirmed from a join request · waitlist #${waitOf(s).findIndex((w) => w.pid === pid) + 1}`); }
     else { s.roster.push({ pid, level: +lv, present: s.status === 'active', locked: s.status === 'active', presentAt: Date.now() }); commit(`${r.name} confirmed from a join request · ${lvLabel(+lv)}`); }
@@ -4759,7 +5113,7 @@ const ACT = {
     S.club.nameRequest = { name: v, at: Date.now() }; S.ui.clubName = null; S.ui.clubNameErr = '';
     save(); render(); toast('Name change requested. Waiting for approval');
   },
-  removeLogo: () => { S.club.logo = null; save(); render(); toast('Logo removed'); },
+  removeLogo: () => { S.club.logoPrev = S.club.logo || S.club.logoPrev || null; S.club.logo = null; save(); render(); toast('Logo removed'); },
   // Inside claude.ai the file goes through the viewer's save prompt; opened as a plain local file it downloads directly.
   exportPayments: async () => {
     const rows = [['Paid', 'Plan', 'Covers from', 'Covers to', 'Amount (PHP)', 'Reference'], ...LICENSE_PAYMENTS.map((x) => [x.paid, x.plan, x.from, x.to, x.amount, x.ref])];
@@ -4905,14 +5259,15 @@ const ACT = {
     const s = cur(); s.download = 'downloading'; render();
     setTimeout(() => { s.download = 'ready'; save(); render(); toast('Ready on this device'); }, 1500);
   },
-  allPresent: () => { cur().roster.forEach((r) => { r.present = true; }); commit('Everyone marked present'); render(); },
-  allAbsent: () => { cur().roster.forEach((r) => { r.present = false; }); commit('Everyone marked absent'); render(); },
+  allPresent: () => { cur().roster.forEach((r) => { r.present = true; r.selfLeft = false; }); commit('Everyone marked present'); render(); },
+  allAbsent: () => { cur().roster.forEach((r) => { r.present = false; r.selfCheckedIn = false; }); commit('Everyone marked absent'); render(); },
   togglePresent: (d) => {
     const s = cur(), r = R(s, d.pid);
     if (presencePending.size && [...presencePending.values()][0].sid !== s.id) flushPresence();
     const before = presencePending.get(d.pid) || { sid: s.id, pid: d.pid, before: r.present, beforeAt: r.presentAt };
     if (!heldPresence) heldPresence = { filter: S.ui.pl?.show || 'avail', ids: [...document.querySelectorAll('.pc3[data-pid]')].map((el) => el.dataset.pid) };
-    r.present = !r.present; if (r.present) r.presentAt = Date.now();
+    // D-2026-11-09-03: the QM's last action wins. Turning Present off clears the self check-in mark; turning it on clears Left.
+    r.present = !r.present; if (r.present) { r.presentAt = Date.now(); r.selfLeft = false; } else r.selfCheckedIn = false;
     if (r.present === before.before) { presencePending.delete(d.pid); r.presentAt = before.beforeAt; } else presencePending.set(d.pid, before);
     clearTimeout(presenceTimer); presenceTimer = setTimeout(flushPresence, 800); render();
   },
@@ -5328,6 +5683,9 @@ const ACT = {
     const s = cur();
     // On court matches were never started: they're dropped like waiting matches.
     onCourt(s).forEach((m) => { m.status = 'waiting'; m.courts = []; delete m.placedAt; });
+    (s.requests || []).forEach((r) => { if (r.status === 'pending') r.status = 'closed'; });
+    (s.matchRequests || []).forEach((r) => { if (r.status === 'open') r.status = 'closed'; });
+    (s.dropOuts || []).forEach((r) => { if (r.status === 'open') r.status = 'closed'; });
     S.ui.sheet = null; S.ui.finalStage = 0; S.screen = 'finalizing'; render();
     const tick = () => {
       S.ui.finalStage += 1; render();
@@ -5348,6 +5706,7 @@ const ACT = {
   pubTab: (d) => { S.ui.pubTab = d.k; render(); },
 };
 const CHANGE = {
+  pubAs: (el) => setPubAs(el.value),
   dtTime: (el) => { dtPickTime(el.dataset.k, el.dataset.part, el.value); render(); },
   autoSelect: (el) => ACT.autoSelect(el.dataset, el),
   draftShuttleItem: (el) => { S.ui.draft.shuttles[+el.dataset.i].itemId = el.value; render(); },
@@ -5378,6 +5737,7 @@ function loadLogo(file) {
     const c = document.createElement('canvas'); c.width = c.height = 256;
     const side = Math.min(img.width, img.height);
     c.getContext('2d').drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, 256, 256);
+    if (S.club.logo) S.club.logoPrev = S.club.logo;
     S.club.logo = c.toDataURL('image/png'); URL.revokeObjectURL(img.src); save(); render(); toast('Logo updated');
   };
   img.onerror = () => toast('That image could not be read');
@@ -5653,7 +6013,7 @@ window.addEventListener('resize', () => {
 // ---------- Prototype routes (same paths as apps/queue, under /queue) ----------
 let prototypeRouter;
 const queuePaths = { home: '', login: '/login', venues: '/venues', inventory: '/inventory', players: '/saved-players' };
-const settingsSlugs = { identity: 'club-identity', defaults: 'session-defaults', post: 'facebook-post', license: 'license', payments: 'license', device: 'this-device', account: 'account' };
+const settingsSlugs = { identity: 'club-identity', invite: 'invite', defaults: 'session-defaults', post: 'facebook-post', license: 'license', payments: 'license', device: 'this-device', account: 'account' };
 const sessionSuffixes = { prepare: '/preparation', console: '', history: '/record', finalizing: '/finishing', results: '/results' };
 function prototypePath() {
   let path = queuePaths[S.screen];

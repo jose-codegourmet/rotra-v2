@@ -56,7 +56,10 @@ Rules: [Sessions](business_logic/product/queue/modules/sessions/README.md) ·
 | Slot budget | Players per court (club default 8) × courts = number of slots |
 | Waitlist | Players awaiting admission; prepared placement is first-come, while during an active session the Queue Master may choose anyone |
 | Session link | The session's public page URL. Guests can send a join request from it |
-| Join request | A guest's request for a slot. Holds nothing until the QM confirms or declines |
+| Join request | A request for a slot from the session link, by a guest or a signed-in ROTRA player ([D-2026-11-09-02](mvp/decisions.md#d-2026-11-09-02)). Holds nothing until the QM confirms or declines. Not a Match request |
+| Drop-out notice | **I can't make it** from a confirmed signed-in player before start. Shows under **Requests** (“Can't make it”); the slot frees only when the QM taps **Remove from roster** ([D-2026-11-09-03](mvp/decisions.md#d-2026-11-09-03)) |
+| Requests · N | The QM's one button for join requests, drop-out notices and match requests, with **Join** and **Match** tabs ([D-2026-11-09-05](mvp/decisions.md#d-2026-11-09-05)) |
+| Session invite | A confirmed or waitlisted player's share card and link for one session, carrying a short invite code; the QM's join request card says “Invited by NAME” ([D-2026-11-09-08](mvp/decisions.md#d-2026-11-09-08)) |
 | Session mode | Pairing preset: **Chill** (≈30% easy games), **Fair** (mostly level-matched, ≈10% easy), **Hard** (allows 2–3 games in a row) |
 | Formats | Standard: singles, doubles. Fun: 1v2, 3v3, 4v4, 5v5 (5v5 uses two courts) |
 | Calculated minimum | Minimum-games target estimated from courts, length, players, formats; operator can override |
@@ -85,7 +88,11 @@ Rules: [Players](business_logic/product/queue/modules/players/README.md) ·
 | Unclaimed profile | Phone-linked identity not yet claimed through registration |
 | Registered player | Claimed profile with required phone, email, and password |
 | Player ID / RTR ID | Permanent identifier given on first profile sync, e.g. `RTR-PH-CEB-031526-0001`. Never a database key |
-| Invite (link) | Link for a guest or unclaimed profile to create or claim an account. Never books a session |
+| Invite (link) / Registration invite | Per-guest link for a guest or unclaimed profile to create or claim an account. Never books a session ([D-2026-11-09-06](mvp/decisions.md#d-2026-11-09-06)) |
+| Club invite link | One standing link per club (`/register/[clubId]`) with a share card; a new person registers through it and joins the club's Saved players (“Joined via club link”), a signed-in player taps once to join ([D-2026-11-09-06](mvp/decisions.md#d-2026-11-09-06), [D-2026-11-09-08](mvp/decisions.md#d-2026-11-09-08)) |
+| Joined via | How a saved player entered the club: “Joined via club link”, “Joined via session link” or “Added by the club” ([D-2026-11-09-06](mvp/decisions.md#d-2026-11-09-06)) |
+| Guest linking | The QM merges a guest record into a saved player: **Link** on a join request whose phone matches, or **Link to saved player…** on the guest's record. Nothing merges by itself ([D-2026-11-09-06](mvp/decisions.md#d-2026-11-09-06)) |
+| Self check-in | **I'm here** on the session page sets Present for a confirmed signed-in player; the roster shows “Checked in themselves · TIME”, the QM's last action wins, and the club setting **Players can check themselves in** can turn it off ([D-2026-11-09-03](mvp/decisions.md#d-2026-11-09-03)) |
 | Present | Operator switch: the player is available to automatic generation |
 | Available | Present **and** not on a court right now |
 | Wait time | Minutes since the player's last game ended (or since marked present). Derived, never stored as a status |
@@ -164,6 +171,7 @@ Rules: [Matches](business_logic/product/queue/modules/matches/README.md) ·
 | Result slides | Three private slides made at valid Session done: Standings, Awards (MVP, Most Improved), Off Day |
 | Off Day | Below-baseline session performance. Private unless explicitly included when sharing |
 | Publish | Optional sharing of chosen slides on the public page. Separate from profile/rank sync |
+| Match request | A present, signed-in, confirmed player asks for a specific game (format, partner, opponents or “Anyone”). The QM sees it in **Requests › Match** with each player's games against the minimum, level and “On Court 2” / “In queue #3”, then **Add to queue** (a waiting match at the end of the Main Queue, Anyone spots filled from present players with the fewest games) or **Decline**. Closes by itself when anyone named stops being present or the session ends ([D-2026-11-09-05](mvp/decisions.md#d-2026-11-09-05)) |
 
 ---
 
@@ -266,10 +274,14 @@ from the [database design](database_design/product/README.md). Add a row here **
 | Club expiry cycle | `ClubExpiryCycle` | `club_expiry_cycles` | Six-month public-page countdown from the first unlicensed day; renewal cancels it, a later expiry starts a new one. The mock records cancelled cycles in `ClubRetentionRecord` and derives the running one |
 | Public-page retention | `RetentionState` | — | Projection: `none` · `restored` · `stale` · `due` · `failed` · `deleted` |
 | Club entitlement | `ClubEntitlement` | `club_entitlements` | Projection of effective access; not stored in the mock (computed with `accessOf`) |
-| Saved club player | `ClubPlayer` | `club_players` | `playerId` null = guest |
+| Saved club player | `ClubPlayer` | `club_players` | `playerId` null = guest; `joinedVia`: `club_link` · `session_link` · `added_by_club`; `linkedToClubPlayerId` after guest linking ([D-2026-11-09-06](mvp/decisions.md#d-2026-11-09-06)) |
 | Saved player statistics | `SavedPlayerStats` | — | Derived club-wide totals; `SavedPlayerStatsCarousel` renders them; `useSavedPlayerStats` reads them |
 | Queue Session | `QueueSession` | `queue_sessions` | `state`: `prepared` · `active` · `finalizing` · `completed` · `invalid` · `cancelled` (November 6, 2026; from `prepared` only), with `cancelled_at` and a nullable `cancel_reason` (code: `cancelledAt`, `cancelReason`) |
-| Join request | `SessionJoinRequest` | `session_join_requests` | `status`: `pending` · `confirmed` · `declined` · `closed` (November 6, 2026: pending requests closed when the session is cancelled; not a decline) |
+| Join request | `SessionJoinRequest` | `session_join_requests` | `status`: `pending` · `confirmed` · `declined` · `closed` (November 6, 2026: pending requests closed when the session is cancelled; not a decline); `playerId`, `inviteCodeId`, `linkedClubPlayerId` for a signed-in player, a Session invite and QM guest linking |
+| Match request | `MatchRequest` | `match_requests` | `status`: `open` · `added` · `declined` · `cancelled` · `closed`; `matchId` set by **Add to queue** ([D-2026-11-09-05](mvp/decisions.md#d-2026-11-09-05)) |
+| Drop-out notice | `SessionDropOutNotice` | `session_drop_out_notices` | `status`: `open` · `closed`; `decision`: `kept` · `removed` ([D-2026-11-09-03](mvp/decisions.md#d-2026-11-09-03)) |
+| Session invite | `SessionInviteCode` | `session_invite_codes` | One `code` per player and session ([D-2026-11-09-08](mvp/decisions.md#d-2026-11-09-08)) |
+| Self check-in | `SessionPlayer.selfCheckedInAt` | `session_players.self_checked_in_at` | Null once the QM turns Present off; `left_at` for **I'm leaving** ([D-2026-11-09-03](mvp/decisions.md#d-2026-11-09-03)) |
 | Waitlist entry | `SessionWaitlistEntry` | `session_waitlist` | Ordered by `added_at` |
 | Roster entry (slot) | `SessionPlayer` | `session_players` | Slot order is `confirmed_at` |
 | Court in a session | `SessionCourt` | `session_courts` | `startsAt` (`starts_at`) is the planned start, `openedEarlyAt` (`opened_early_at`) the Start anyway time; `openUntil: null` follows session end. `useUpdateCourt` edits booking windows; a used start is fixed |
@@ -330,6 +342,7 @@ URL segments, component names, and query keys use the same words: `sessions/[ses
 |---|---|
 | Match done ↔ Session done | One game's permanent result vs. the whole session's online finalization |
 | Waiting queue ↔ Waitlist ↔ Join request | Matches waiting for courts vs. players waiting for a slot vs. a guest asking for a slot |
+| Join request ↔ Match request ↔ Drop-out notice | Asking for a slot vs. a present player asking for a specific game vs. a confirmed player saying they can't come. All three sit under **Requests · N** |
 | Match number ↔ Queue position | Fixed creation number vs. current, changing place in the queue |
 | Present ↔ Available ↔ Wait time | Operator switch vs. present and not playing vs. derived minutes |
 | Playing level ↔ Club assessment ↔ Session playing level ↔ Shared rank | The nine-level scale vs. one club's latest level vs. the level locked for one session vs. cross-club rank |

@@ -22,7 +22,9 @@ When a returning guest's identity is confirmed and linked to a profile, include 
 
 The operator supplies a registration link tied to the existing player profile. The player completes their details and sets a password; SMS verification is not the agreed claiming mechanism.
 
-**Guest registration decision, November 8, 2026 (#490):** a name-only guest's invitation
+**Registration sources, club membership and email ([D-2026-11-09-06](../../../../../mvp/decisions.md#d-2026-11-09-06)).** A player can register from a club link, a session link or the Admin link. A club or session link adds the player to that club's saved players (“Joined via club link” / “Joined via session link”); the Admin link gives no club and asks for a city or province for the player ID. Being in a club's saved players is what makes a player part of that club; a player can be in several, and a signed-in player opening a club link taps **Join <club>** once. **Leave club** removes the player from that club's saved players; past games stay. **Report a problem** opens an email to ROTRA support with the club name and player ID filled in; there is no table or Admin screen, and the support address is a placeholder the owner supplies. The player is signed in at once and confirms the email later: a banner keeps asking, and a contact-change request is refused (“Confirm your email first.”) until then.
+
+**Guest registration decision, November 8, 2026 (#490), partly superseded by D-2026-11-09-06 (linking now needs the QM's one-tap confirmation):** a name-only guest's invitation
 must open registration rather than generic sign-in. Registering an account leaves the club's
 guest record unlinked. Linking requires a separate invitation; registration or a matching name
 does not authorize it. When the supplied phone or email matches an existing ROTRA account,
@@ -68,6 +70,8 @@ Players may edit their own personal information after claiming the profile. They
 
 Registered players may hide their phone number from club operators. Phone/email are not public profile or leaderboard fields. A hidden phone must not leak through player search; ID/QR supports identification instead.
 
+**Public or private profile** ([D-2026-11-09-07](../../../../mvp/decisions.md#d-2026-11-09-07)): a player chooses Public (default) or Private. A private profile is hidden from visitors who aren't signed in: the leaderboard masks the name and doesn't open the row, search and RTR ID search don't find them, and a shared link shows "Log in with ROTRA to see this profile." Guests are treated the same way. Signed-in ROTRA players still see it. It changes nothing about phone privacy.
+
 Players cannot change phone or email themselves. They must contact the platform owner or submit a request, and the owner manually approves the change in Admin. A contact change does not replace the permanent RTR ID.
 
 Whether club operators can continue editing non-ranking personal details after a profile is claimed was not answered and remains open.
@@ -93,6 +97,10 @@ See [claim/recovery flow](flow/claim-and-recover.md) and [Admin contact changes]
 ## Admin-issued registration links (#345)
 
 ROTRA Admin can issue a claim link for an unclaimed player, using `/claim/{token}`. It replaces the previous active link and expires after seven days. The audit records issuer and expiry, never the token. Queue's legacy mock invite now uses the same path, but its deterministic fixture token is still a preview placeholder. Dynamically issued Admin links resolve against the current in-memory store; cross-origin claims require the shared F07 transport. No email or SMS is sent. **No club is assigned** (owner decision, November 8, 2026): a player who registers from an Admin-issued link is not added to any club, and clubs that already played with the profile keep their own records; only a club's own invite or session add connects a player to that club.
+
+## Two uploaded pictures only ([D-2026-11-09-10](../../../../mvp/decisions.md#d-2026-11-09-10))
+
+Only the current and the previous uploaded photo are kept. A new upload makes the old current photo the previous one; **Use previous picture** swaps the two; choosing a character or initials, or **Remove**, makes the last photo the previous one. Characters and initials store no file. Anything older is deleted in the same request as the new upload.
 
 ## Profile picture drafts (#567)
 

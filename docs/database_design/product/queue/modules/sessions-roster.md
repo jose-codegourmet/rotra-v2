@@ -13,6 +13,8 @@
 | `player_id` | Nullable UUID FK to global players; null for guests |
 | `display_name`, `nickname` | Required name, optional nickname; club-local display |
 | `added_at` | Timestamptz the club first saved this player; drives the Saved players “Added” filter and the derived “New players this week” count (Monday 00:00 Asia/Manila through now, inclusive; decision #301, October 31, 2026) |
+| `joined_via` | `club_link`, `session_link` or `added_by_club` ([D-2026-11-09-06](../../../../mvp/decisions.md#d-2026-11-09-06)): set when a registration through the club invite link or a session link adds the player, or when the club adds them (Add player, a confirmed guest request, a Player Information add). Shown as “Joined via club link” / “Joined via session link” / “Added by the club” |
+| `linked_to_club_player_id` | Nullable self-FK, set with `removed_at` when the QM links a guest record to a saved player (**Link** on a matching join request, or **Link to saved player…**); the guest's `session_players`, `match_participations` and payments are re-pointed in the same auditable operation and the row is hidden. Only the QM's tap links; a phone match only suggests ([D-2026-11-09-06](../../../../mvp/decisions.md#d-2026-11-09-06)) |
 | `removed_at` | Nullable timestamptz: the club deleted this saved player (November 8, 2026). Soft delete, because history (`session_players`, facts, summaries, assessments) keeps pointing at the row. Removed rows are left out of Saved players, its counts, search and Add player; adding the same linked profile again clears it |
 | `created_at`, `updated_at`, `revision` | Common metadata |
 
@@ -88,9 +90,20 @@ Guest requests sent from the session link (decided October 26, 2026).
 | `status` | `pending`, `confirmed`, `declined`, `closed` (November 6, 2026: a pending request closed by Cancel session; distinct from `declined`) |
 | `requested_at` | Server request time; orders the review list and supplies initial waitlist arrival evidence, subject to the displacement priority above |
 | `decided_at`, `decided_by_device` | Set on confirm/decline; a closed request gets the cancel time |
-| `club_player_id` | Set on confirm: the club player created for the guest |
+| `club_player_id` | Set on confirm: the club player created for the guest, or the existing club player of a signed-in Player |
+| `player_id` | Nullable FK to the canonical Player when a signed-in Player sent the request ([D-2026-11-09-02](../../../../mvp/decisions.md#d-2026-11-09-02)); `name`/`nickname` are then copied from the profile. Partial unique `(session_id, player_id) WHERE status = 'pending'` enforces one open request per account |
+| `invite_code_id` | Nullable FK to `session_invite_codes` when the link carried `?invite=` ([D-2026-11-09-08](../../../../mvp/decisions.md#d-2026-11-09-08)); feeds “Invited by NAME” |
+| `suggested_club_player_id`, `linked_club_player_id`, `link_declined_at` | Guest linking ([D-2026-11-09-06](../../../../mvp/decisions.md#d-2026-11-09-06)): the server's phone match among the club's unregistered saved players (never shown publicly), the record the QM chose with **Link**, and the time of **Not them**. Confirm then uses the linked record instead of creating a guest |
 
 A request never inserts `session_players` or `session_waitlist` by itself. **Confirm** creates the club player (guest, or lookup pending with a phone), then a `session_players` row with the chosen level, or a `session_waitlist` row with `added_at = requested_at` when slots are full, in one transaction. Creating requests is an unauthenticated public write: rate-limit per IP/device and session, cap pending requests per session, and reject when `accept_join_requests` is false or the session is finalized/invalid/cancelled. **Settled (November 6, 2026):** cancelling a session closes its pending requests in the same transaction (status `closed` with a decision time, alongside `pending` · `confirmed` · `declined`). Confirm/decline are ordinary club sync operations (work offline on a downloaded session).
+
+## `session_drop_out_notices`
+
+**I can't make it** from a confirmed signed-in Player before start ([D-2026-11-09-03](../../../../mvp/decisions.md#d-2026-11-09-03)). `id`, `club_id`, `session_id`, `session_player_id` (scoped FKs), `player_id` (the authenticated Player; must be linked to the unreleased roster slot), `status` (`open`, `closed`), `decision` (`kept`, `removed`, null while open or when closed by the session ending), `created_at`, `closed_at`, `closed_by_device`. Partial unique `(session_player_id) WHERE status = 'open'`. The slot stays until the operator removes the player (**Remove from roster** closes the notice as `removed` and releases the `session_players` row in one operation; **Keep** closes it as `kept`); finishing or cancelling the session closes open notices.
+
+## `session_invite_codes`
+
+Session invite ([D-2026-11-09-08](../../../../mvp/decisions.md#d-2026-11-09-08)): `id`, `club_id`, `session_id`, `player_id` (confirmed or waitlisted Player), `code` (short random text, unique, never the RTR ID), `created_at`. Unique `(session_id, player_id)`: one code per player and session, created the first time they open the card. Read by the public join flow to resolve `?invite=` into `session_join_requests.invite_code_id`.
 
 ## `club_venues`
 
@@ -115,6 +128,8 @@ Choosing a venue copies its rate into `session_cost_estimates.court_fee_per_cour
 | `name_snapshot` | Display at entry |
 | `present` | Operator-controlled boolean; false when added in preparation, true when added to an active session |
 | `present_changed_at` | Timestamp of the last presence change (reset to the start time at session start); feeds the derived wait time |
+| `self_checked_in_at` | Nullable timestamp of the player's own **I'm here** ([D-2026-11-09-03](../../../../mvp/decisions.md#d-2026-11-09-03)); set when the linked Player checks in, cleared when the operator changes presence after it. Drives the “checked in themselves” mark; the operator's last action wins |
+| `left_at` | Nullable timestamp of the player's own **I'm leaving**; cleared by the next check-in or when the operator sets Present. The QM roster shows “Checked in themselves · TIME” and “Left · TIME” from these two fields |
 | `assessment_id` | FK to the roster assessment revision selected for this entry |
 | `skill_level_id` | FK to one of the nine levels; required on confirmation/start/late entry. Permitted missing-level preparation states and physical nullability remain unresolved in #245 |
 | `level_locked_at` | Null before start; set at start or on late entry |

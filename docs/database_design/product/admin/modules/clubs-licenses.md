@@ -79,6 +79,12 @@ Provision a Supabase Storage bucket named `club-logos` with public reads, `image
 club authorization; do not grant browser insert/update/delete policies. Paths are generated on the
 server as `<club UUID>/<random UUID>.png`. No application schema migration is required.
 
+**Superseded in part by [D-2026-11-09-10](../../../../mvp/decisions.md#d-2026-11-09-10):** only the current and the previous logo are kept, not every logo. A small migration adds `clubs.logo_previous_ref` next to `logo_ref`. After saving a new logo the server deletes every other file in the club's folder. **Use previous logo** swaps the two references; **Remove** moves the current reference to `logo_previous_ref`. A result snapshot whose logo file is gone shows the club's current logo, or its initials.
+
+### Club invite code ([D-2026-11-09-08](../../../../mvp/decisions.md#d-2026-11-09-08))
+
+A `club_invite_codes`-style table (or one nullable column on `clubs`) holds one active code per club for the link `/register/[clubId]?k=<code>`. **Regenerate link** replaces the code, so the old link and its QR images stop working. Joining through the link adds the player to the club's Saved players and leaves existing members untouched.
+
 Replacements use new paths, preventing stale CDN images. Previous objects are retained because
 historical result snapshots can reference them. A known rejected database write removes only its
 new upload; an ambiguous database failure retains it to avoid deleting an image that may have

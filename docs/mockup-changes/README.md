@@ -1,6 +1,6 @@
 # Mockup changes — ROTRA
 
-**Last verified:** 2026-11-08 · **Audience:** contributors and AI coding agents.
+**Last verified:** 2026-11-09 · **Audience:** contributors and AI coding agents.
 
 Every change to a mockup in [apps/mockup](../../apps/mockup/README.md) gets **one log file
 here**. The log is what turns a design change into work on the real apps: an agent reads the `NEW` logs,
@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-IN MOCK APP: 68 · MOCKUP ONLY: 4
+NEW: 17 · IN MOCK APP: 68 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -248,6 +248,22 @@ IN MOCK APP: 68 · MOCKUP ONLY: 4
 | [2026-11-08-queue-time-field-dialog](2026-11-08-queue-time-field-dialog.md) | Time fields open a time dialog instead of three dropdowns | time-field, date-time-picker, session-setup, add-court-form | IN MOCK APP — #501 |
 | [2026-11-08-queue-time-picker-hour-minute](2026-11-08-queue-time-picker-hour-minute.md) | Time fields pick hour, minute and AM/PM from three short dropdowns | — | IN MOCK APP — PR #489 (superseded by 2026-11-08-queue-time-field-dialog) |
 | [2026-11-08-queue-title-public-page-icon](2026-11-08-queue-title-public-page-icon.md) | Preparation title gets an "Open public page" icon button | page-header, more-options-sheet, session-preparation | IN MOCK APP — #499 |
+| [2026-11-09-player-my-sessions](2026-11-09-player-my-sessions.md) | The own profile has a My sessions card | list-row, chip, empty-state, card (new: my-sessions-card) | NEW |
+| [2026-11-09-player-previous-picture](2026-11-09-player-previous-picture.md) | The profile picture picker keeps a previous picture | profile-picture-sheet, avatar | NEW |
+| [2026-11-09-player-private-profile](2026-11-09-player-private-profile.md) | Players can make their profile private | switch, leaderboard-row, leaderboard-list, profile-not-found, private-contact-card | NEW |
+| [2026-11-09-player-registration-from-links](2026-11-09-player-registration-from-links.md) | Registration from club, session and Admin links, email banner and Join club page | auth-card, field, notice, button, page-header (new: email-confirm-banner, join-club-card) | NEW |
+| [2026-11-09-player-share-cards](2026-11-09-player-share-cards.md) | Players share a rank card, a session result and a session's games as link, QR or post/story image | session-join-qr, segmented-control, skill-ladder, sheet, avatar | NEW |
+| [2026-11-09-player-your-clubs](2026-11-09-player-your-clubs.md) | The own profile has a Your clubs card with Leave club and Report a problem | avatar, club-logo, confirm-sheet, button, notice (new: player-clubs-card) | NEW |
+| [2026-11-09-queue-club-invite-link](2026-11-09-queue-club-invite-link.md) | Club invite link in settings, Share club invite on the dashboard | session-join-qr, club-settings, sheet, button | NEW |
+| [2026-11-09-queue-club-logo-previous](2026-11-09-queue-club-logo-previous.md) | Club logo: Use previous logo (only current and previous are kept) | club-logo, club-settings, button | NEW |
+| [2026-11-09-queue-guest-linking](2026-11-09-queue-guest-linking.md) | Saved players: “Joined via” marks, and Link to saved player… on a guest's record | saved-player-card, player-profile-sheet, player-picker-sheet, sheet, button | NEW |
 | [2026-11-09-queue-next-match-fullscreen](2026-11-09-queue-next-match-fullscreen.md) | The next-match picker is fullscreen on phones | sheet, next-match-sheet | IN MOCK APP — #579 |
 | [2026-11-09-queue-next-match-picker](2026-11-09-queue-next-match-picker.md) | After a result, a next-match picker offers two ready matches (left or right) | sheet, next-match-sheet | IN MOCK APP — #579 |
+| [2026-11-09-queue-player-match-request](2026-11-09-queue-player-match-request.md) | Session page: Request a match (player side) | sheet, segmented-control, player-tile, player-picker-sheet, team-lineup, button | NEW |
+| [2026-11-09-queue-player-my-night](2026-11-09-queue-player-my-night.md) | Session page: My night card, refresh bar, Courts now and own standing | card, button, chip, match-card, standings-slide, public-session-details | NEW |
+| [2026-11-09-queue-player-self-check-in](2026-11-09-queue-player-self-check-in.md) | Session page: players check themselves in, leave, and say they can't make it | button, card, notice | NEW |
+| [2026-11-09-queue-public-signed-in-names-join](2026-11-09-queue-public-signed-in-names-join.md) | Session page: full names and one-tap join for signed-in players, three ways in | public-participants, public-session-queue, join-request-card, segmented-control, notice, button | NEW |
+| [2026-11-09-queue-qm-requests-tabs](2026-11-09-queue-qm-requests-tabs.md) | Requests · N with Join and Match tabs: ROTRA-player hints, drop-out notices, match request cards | join-requests-panel, join-request-card, tabs, sheet, notice, chip, list-row, button, level-select | NEW |
+| [2026-11-09-queue-qm-self-check-in](2026-11-09-queue-qm-self-check-in.md) | Roster: “Checked in themselves” mark, and the club setting Players can check themselves in | roster-row, roster-card, player-pool-card, switch, session-defaults-panel, list-row | NEW |
+| [2026-11-09-queue-session-invite](2026-11-09-queue-session-invite.md) | Session page: Session invite share card for confirmed and waitlisted players | session-join-qr, segmented-control, sheet, button | NEW |
 <!-- status-index:end -->

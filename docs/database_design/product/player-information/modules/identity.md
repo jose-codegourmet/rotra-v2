@@ -10,8 +10,10 @@
 |---|---|
 | `id` | UUID PK, independent of authentication subject |
 | `full_name`, `nickname`, `avatar_ref` | Public/permitted display data; nickname/avatar optional |
+| `avatar_previous_ref` | Nullable; the previous uploaded photo, next to the current `avatar_ref`. Never a character or initials; only current and previous files are kept ([D-2026-11-09-10](../../mvp/decisions.md#d-2026-11-09-10)) |
 | `profile_state` | Unclaimed/claimed; no login is required for unclaimed identity |
 | `hide_phone_from_clubs` | Privacy preference |
+| `profile_private` | Boolean, default false. True hides the profile from visitors who are not signed in ([D-2026-11-09-07](../../mvp/decisions.md#d-2026-11-09-07)) |
 | `experience_months`, `experience_recorded_at` | Optional nonnegative self-reported experience snapshot; not rating credit. Playing since = `experience_recorded_at` minus `experience_months` (month precision); screens show years and months counted from it (November 8, 2026). Set by the player, or by the club for an unclaimed profile |
 | `personal_details`, `details_version` | Optional validated JSONB for agreed playing-style fields; final schema pending |
 | `created_at`, `updated_at`, `revision` | Common metadata |
@@ -110,6 +112,10 @@ Fictional data only. Decided 2026-11-07 unless marked open.
 | Guest invite (name-only guest) | Guest with no phone and no global profile | Registration leaves the club guest record unlinked; a separate invitation is required to link it (owner, November 8, 2026, #490). Matching phone/email prompts whether the existing account is theirs. Yes requires sign-in/Admin-reviewed recovery; No requires contact correction or contacting ROTRA. Existing contact uniqueness stays in place; answering Yes never authorizes a link |
 | Simultaneous allocation | Two clubs sync the same new phone at once | **Open** beyond the existing unique-phone retry rule |
 | Failed provider application | Provider account step fails or the response is lost mid-claim | **Open**; the staged, idempotent recovery above is still the rule |
+
+## Club membership, email confirmation and registration location ([D-2026-11-09-06](../../../../mvp/decisions.md#d-2026-11-09-06))
+
+Club membership is a row in `club_players` (the club's saved players). Add `joined_via` with `club_link | session_link | added_by_club`, shown as “Joined via club link”, “Joined via session link” or “Added by the club”. **Leave club** deletes that row; game history stays. A player can have several rows. `player_private_contacts` (or the account mapping) gains nullable `email_confirmed_at`; while null, contact-change requests are refused. Admin-link registrations store the chosen city or province (from `location_codes`) as the RTR ID location; club and session links use the club's founding location. Report a problem has no table.
 
 ## Guest registration implementation (#490)
 

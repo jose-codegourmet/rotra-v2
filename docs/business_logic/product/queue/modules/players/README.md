@@ -92,11 +92,16 @@ Decided October 26, 2026.
 - The club can turn requests off per session (**Accept join requests**). The public page then says to contact the Queue Master instead.
 - Sending a request needs internet (it goes straight to the server). Confirming or declining is an ordinary roster change that works offline on a downloaded session and syncs.
 - **Cancelled session** (owner decision, November 6, 2026): cancelling closes every pending request (kept on the record as closed), and the public page shows **Cancelled** with the reason instead of **Want to play?**, so no new requests can be sent. See [Cancelling a session](../sessions/README.md#cancelling-a-session-owner-decision-november-6-2026).
+- **Signed-in ROTRA Players** ([D-2026-11-09-02](../../../../../mvp/decisions.md#d-2026-11-09-02), [D-2026-11-09-06](../../../../../mvp/decisions.md#d-2026-11-09-06)): the sheet offers **Continue as guest**, **Log in with ROTRA Player** and **Register with ROTRA** (registration under the session's club, returning signed in with the request ready). A signed-in Player sends **Request to join as NAME** with one tap and no form; the request carries their account. One open join request per account per session; the player can **Cancel request** while it is pending. The QM's request card shows “ROTRA player · already in your club” or “new to your club” and their shared rank as a hint, and “Invited by NAME” when they came through a Session invite ([D-2026-11-09-08](../../../../../mvp/decisions.md#d-2026-11-09-08)). The QM still sets the level and confirms or declines; logging in never grants a slot. Finishing a session closes every pending join request (kept, not shown).
+- **QM side** ([D-2026-11-09-05](../../../../../mvp/decisions.md#d-2026-11-09-05)): join requests, drop-out notices and match requests share one **Requests · N** button and card with **Join** and **Match** tabs; drop-out notices sit at the top of Join as “Can't make it · N”. Counts arrive with the QM's existing refresh. Confirming a ROTRA player who is new to the club saves them as a registered saved player marked “Joined via session link” ([D-2026-11-09-06](../../../../../mvp/decisions.md#d-2026-11-09-06)).
+- **Club invite link** ([D-2026-11-09-08](../../../../../mvp/decisions.md#d-2026-11-09-08)): the club has one standing link (`/register/[clubId]`), shared from club settings or the dashboard as a link, QR or Post/Story image. A new person who registers through it joins the club's Saved players; a signed-in ROTRA player who opens it sees “Join <club>?” and joins with one tap. **Regenerate link** replaces the code, so the old link and its images stop working; people who already joined keep their place.
+- **Guest linking by the QM** ([D-2026-11-09-06](../../../../../mvp/decisions.md#d-2026-11-09-06)): when a guest request's phone matches a saved player (never a registered one), the card asks “Is this NAME from your saved players?”; **Link** attaches the request to that record so confirming it gives that player the slot, **Not them** hides the prompt. From a guest's saved record, **Link to saved player…** lets the QM pick the saved player the guest really is; the guest's slots, games and payments move to that record and the guest row is hidden. Nothing merges automatically, and earlier valid games then count as the October 28, 2026 decision says.
 
 ## Public participant names
 
 Owner decision, November 7, 2026 (#475).
 
+- Narrowed by [D-2026-11-09-02](../../../../../mvp/decisions.md#d-2026-11-09-02) (November 9, 2026): the masking below applies to anyone who is not signed in. A signed-in ROTRA Player sees registered players' full names with the nickname under them, on the participants grid, the waitlist, Courts now and the Queue; guests and unclaimed profiles stay masked for everyone. Signing in also removes the three-row roster cap (the viewer need not be confirmed). There is no privacy setting for this in v1; the registration form says “Your full name shows to signed-in ROTRA players on sessions you join.”
 - The public page (and the operator's preview of it, and the record's **Public page** tab, which show
   what visitors see) never shows a participant's full name. Each whitespace-separated word becomes
   its first letter plus a fixed `***`: “Jose Adrian” → “J*** A***”, “Mika” → “M***”. The fixed
@@ -146,12 +151,23 @@ There is no rest-status workflow. The console derives a **wait time** for each a
 
 See [add-player flow](flow/add-player.md).
 
+### Self check-in, I'm leaving, I can't make it ([D-2026-11-09-03](../../../../../mvp/decisions.md#d-2026-11-09-03))
+
+- During a live session, a confirmed signed-in Player who is not present taps **I'm here**; Present is set directly. The roster shows a small “Checked in themselves · TIME” mark and the QM can undo it with the ordinary Present switch (turning Present off clears the mark; a later self check-in shows a new mark). The club setting **Players can check themselves in** (Session defaults, default on) turns it off: the session page then says “Ask the Queue Master to mark you present.” A tap only: no location check, no venue QR.
+- The QM's last action wins. A self check-in after the QM turned Present off is a new check-in with the mark. If the QM is offline, the player's page says “Checked in · the QM will see it when their device syncs” and the roster shows it after the next sync.
+- **I'm leaving** turns Present off and tells the QM; the page then says “You've left · tap I'm here if you come back” and the roster shows “Left · TIME” until Present is set again. No separate break control.
+- **I can't make it** (confirmed, before start) sends a **drop-out notice** the QM sees under Requests (Join tab, “Can't make it · N”: “Says they can't make it · TIME”). The QM taps **Remove from roster** (frees the slot, the existing removal) or **Keep** (closes the notice, the player stays). The slot never frees by itself; players never take or release slots themselves. One open drop-out notice per player.
+- The server checks every Player-side write (check-in, I'm leaving, match request, drop-out notice): the signed-in Player must be linked to an unreleased roster slot in that session.
+- Finishing a session closes every pending drop-out notice, match request and join request; they stay on the record, hidden.
+- Guests get none of this: the request status card plus “Register to check in and see your matches.”
+
 
 ## Player access from the session link (#569)
 
 Owner decision, November 8, 2026: **Queue for any signed-in Player; full roster only for confirmed
 participants. Preserve individual level rings.** The ring decision supersedes #569's earlier request
 to hide individual levels. All participant and waitlist names remain masked, including the full roster.
+**Superseded in part on November 9, 2026** by [D-2026-11-09-02](../../../../../mvp/decisions.md#d-2026-11-09-02): names and the roster cap now follow [Public participant names](#public-participant-names); the Queue and login round-trip rules below stand. [D-2026-11-09-04](../../../../../mvp/decisions.md#d-2026-11-09-04) adds **Courts now** and the **My night** card (own standing only, refresh only, no live updates) to the signed-in page.
 
 - Any enabled registered Player account can read this public session's **waiting queue**, in queue
   order: position, format and masked lineups with playing levels. This is a read-only copy of the last

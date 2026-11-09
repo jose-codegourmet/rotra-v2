@@ -10,6 +10,8 @@
 
 Public without sign-in. Rows show global position, name/nickname, optional avatar, full skill label, and a link to the correct profile. No city, club, national, world-stage, or separate singles/doubles filters in v1.
 
+Visitors who aren't signed in ([D-2026-11-09-07](../../../../mvp/decisions.md#d-2026-11-09-07)): a private player (or guest) keeps their position and level, but the name shows the first letter of each word followed by `***` ("Jose Adrian" → "J*** A***"), the picture shows the initials of that mask, and the row (or podium step) doesn't open: no button, `aria-disabled`. Name search doesn't match them. Entering a private player's full RTR ID gives the same neutral "Profile not found" as an unknown ID. Signed-in players see everyone as usual.
+
 Pagination or progressive loading is a proposed presentation choice for scale, not an excuse to truncate the ranking. Keep ordering stable within a coherent refreshed result. Search, if included, searches this public ranking; it is not a hidden contact search or new discovery product.
 
 Eligibility help states the configured recent completed standard-match threshold, initially 10, within the last three months. Fun games, invalid games/sessions, and partial games do not count. Threshold text must use the current Admin configuration, not a hardcoded ten after changes.
@@ -50,6 +52,17 @@ Separate club-local fun-game history from long-term performance counting. Whethe
 After a guest's identity is confirmed and linked, include their earlier valid games in personal history and ranking under the existing eligibility/window rules (owner decision, October 28, 2026). A name match alone is insufficient. Show processing truthfully until attribution/recalculation completes; use original game dates and count each game once. Confirmation evidence and mistaken-link handling remain open. Invalid sessions/games do not appear as official wins, losses, or played games; fun/partial-game public visibility remains a separate open detail.
 
 If a public session page expires/deletes, preserve player history with a truthful unavailable-link state. Do not render broken link navigation as if history vanished.
+
+### Share cards
+
+Own profile only ([D-2026-11-09-08](../../../../mvp/decisions.md#d-2026-11-09-08)). One sheet, **Share rank**, **Share result** or **Share games**, with a **Post | Story** switch (4:5, 1080 × 1350; 9:16, 1080 × 1920) above the fixed dark brand card. The card is drawn on the device and looks the same in both themes. Its footer carries “ROTRA · Run the game.” and a small corner QR that opens the player's profile (`/player/players/<id>`). Hint: “The QR opens your profile. Private profiles ask visitors to log in.” Buttons: **Copy link**, then **Share** when the browser supports Web Share (the phone's share sheet with the image), otherwise **Download image** (PNG).
+
+- **Share rank:** from the profile, see [profile.md](profile.md#p-own-profile--signed-in-owner-view).
+- **Share result:** in My sessions (Finished) and on each session group in Match history. Card: session title, date and club, “#N in Standings”, “G games · W–L”.
+- **Share games:** on each session group in Match history. Card: date and club, one line per game (“with <partner> vs <opponent>, <opponent>” plus the score, or “Winner recorded”), and “Total W–L”. At most 8 lines, then “+N more games”.
+- **Published only:** a session that is not published shows no button and the muted “Results not shared yet by the club.” Share result and Share games appear only after the Queue Master publishes.
+- **Names on images:** other players show as a visitor would see them. Private players and guests are masked (first letter plus `***` per word), public registered players in full, whoever is signed in.
+- **Story** gives game lines two lines each; **Post** keeps one.
 
 ## Acceptance examples
 

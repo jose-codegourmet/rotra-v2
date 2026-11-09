@@ -79,6 +79,10 @@ Drafted in Prisma by F07.14; keys, triggers and the end-of-match order are in [p
 
 Business source: [matches](../../../../business_logic/product/queue/modules/matches/README.md), [queue rules](../../../../business_logic/product/queue/modules/queueing/README.md).
 
+## `match_requests`
+
+Player-side **Request a match** ([D-2026-11-09-05](../../../../mvp/decisions.md#d-2026-11-09-05)). `id`, `club_id`, `session_id`, `session_player_id` (the requester, scoped FKs), `player_id` (authenticated Player, linked to the unreleased slot), `format`, `partner_session_player_id` (nullable), `opponent_session_player_ids` (0–2 scoped refs; a join table if arrays are avoided), `status` (`open`, `added`, `declined`, `cancelled`, `closed`), `created_at`, `decided_at`, `decided_by_device`, `match_id` (nullable FK set when the QM's **Add to queue** creates the waiting match: `added`, named spots kept, “Anyone” spots filled from present players with the fewest games; **Decline** sets `declined`; the player's Cancel sets `cancelled`). Partial unique `(session_player_id) WHERE status = 'open'`. A request becomes `closed` when anyone named stops being present or when the session ends; the server does not judge fairness. QM decisions are ordinary club sync operations; the open-request count travels with the QM's existing refresh ([D-2026-11-09-05](../../../../mvp/decisions.md#d-2026-11-09-05)).
+
 ## Auto Queue handoff (October 31, 2026)
 
 The generator was renamed **Generate matches** on November 6, 2026 (formerly called Auto Queue); this heading keeps its historical name. Generate matches suggestions are alternative drafts outside the accepted Main Queue. Planned load, ordered cross-tab selection, transfer revalidation and idempotency need reconciliation before backend implementation. Drafts do not create played results; distinct intentional rematches remain valid. Storage and synchronization details are not decided by this handoff.

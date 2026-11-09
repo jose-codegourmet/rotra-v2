@@ -1,6 +1,6 @@
 # The profile picture's character picker shows 8 per page with a pager
 
-Status: TICKETED — #588
+Status: IN PROGRESS — #588
 Date: 2026-11-09
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › Profile picture dialog (own profile › Change profile picture, or Edit profile › Change picture) › Or pick a character

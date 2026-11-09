@@ -19,11 +19,7 @@ export function profilePictureSrc(
   return face === undefined ? undefined : profileCharacterUrl(playerId, name, face)
 }
 
-export function profileCharacterUrl(
-  playerId: string,
-  name: string,
-  face: ProfileCharacterId,
-): string {
+export function profileCharacterUrl(playerId: string, name: string, face: string): string {
   let h = 2166136261
   const seed = playerId + name + face
   for (let index = 0; index < seed.length; index++) {

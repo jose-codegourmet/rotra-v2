@@ -3,20 +3,28 @@
 import type { PictureCrop, PlayerPictureChoice } from '@rotra/data/player/picture'
 import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
-import {
-  PROFILE_CHARACTER_IDS,
-  type ProfilePicture,
-  profileCharacterUrl,
-} from '@rotra/ui/profile-picture'
+import { Pager } from '@rotra/ui/pager'
+import { PROFILE_CHARACTER_IDS, profileCharacterUrl } from '@rotra/ui/profile-picture'
 import { Sheet } from '@rotra/ui/sheet'
 import { useEffect, useRef, useState } from 'react'
+
+export type PictureCharacter = { id: string; image: string }
+export type PictureDraftChoice =
+  | { kind: 'initials' }
+  | { kind: 'character'; id: string }
+  | { kind: 'photo'; src: string }
+  | { kind: 'photo'; file: File; crop?: PictureCrop }
 
 export type ProfilePictureSheetProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   playerId: string
   name: string
-  picture: ProfilePicture
+  picture: { kind: 'initials' } | { kind: 'photo'; src: string } | { kind: 'character'; id: string }
+  characters?: PictureCharacter[]
+  previousPhoto?: string | null
+  currentCharacterImage?: string
+  onCommitDraft?: (choice: PictureDraftChoice, previousPhoto: string | null) => Promise<unknown>
   isPending?: boolean
   preparePhoto: (file: File, signal?: AbortSignal) => Promise<File>
   onCommit: (choice: PlayerPictureChoice) => Promise<unknown>
@@ -32,6 +40,13 @@ function PictureDraft({
   playerId,
   name,
   picture,
+  characters = PROFILE_CHARACTER_IDS.map((id) => ({
+    id,
+    image: profileCharacterUrl(playerId, name, id),
+  })),
+  previousPhoto = null,
+  currentCharacterImage,
+  onCommitDraft,
   isPending = false,
   preparePhoto,
   onCommit,
@@ -50,7 +65,15 @@ function PictureDraft({
     side: number
     size: number
   } | null>(null)
-  const [choice, setChoice] = useState<PlayerPictureChoice | null>(null)
+  const [choice, setChoice] = useState<PictureDraftChoice | null>(null)
+  const [previous, setPrevious] = useState<string | null>(previousPhoto)
+  const [page, setPage] = useState(() => {
+    const index =
+      picture.kind === 'character' ? characters.findIndex((item) => item.id === picture.id) : -1
+    return index < 0 ? 1 : Math.floor(index / 8) + 1
+  })
+  const pageCount = Math.max(1, Math.ceil(characters.length / 8))
+  const currentPage = Math.min(page, pageCount)
   const [crop, setCrop] = useState<PictureCrop>({ x: 0.5, y: 0.5, zoom: 1, rotation: 0 })
   const [url, setUrl] = useState<string>()
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
@@ -58,7 +81,7 @@ function PictureDraft({
   const [committing, setCommitting] = useState(false)
   const [error, setError] = useState('')
   const pending = isPending || committing
-  const file = choice?.kind === 'photo' ? choice.file : null
+  const file = choice?.kind === 'photo' && 'file' in choice ? choice.file : null
   useEffect(() => {
     alive.current = true
     return () => {
@@ -79,13 +102,14 @@ function PictureDraft({
   const selected = choice ?? picture
   const src =
     selected.kind === 'photo'
-      ? choice?.kind === 'photo'
+      ? 'file' in selected
         ? url
-        : picture.kind === 'photo'
-          ? picture.src
-          : undefined
+        : selected.src
       : selected.kind === 'character'
-        ? profileCharacterUrl(playerId, name, selected.id)
+        ? (characters.find((item) => item.id === selected.id)?.image ??
+          (picture.kind === 'character' && selected.id === picture.id
+            ? currentCharacterImage
+            : undefined))
         : undefined
   const width = dimensions.width
   const height = dimensions.height
@@ -99,7 +123,12 @@ function PictureDraft({
     top: `${((height / 2 - top) / side) * 100}%`,
     transform: 'translate(-50%, -50%)',
   }
-  const select = (next: PlayerPictureChoice) => {
+  const select = (next: PictureDraftChoice) => {
+    if (next.kind === 'photo' && 'src' in next) {
+      setPrevious(selected.kind === 'photo' && 'src' in selected ? selected.src : null)
+    } else if (selected.kind === 'photo' && 'src' in selected) {
+      setPrevious(selected.src)
+    }
     selection.current++
     drag.current = null
     preparation.current?.abort()
@@ -119,6 +148,7 @@ function PictureDraft({
       if (!alive.current || id !== selection.current) return
       setDimensions({ width: 0, height: 0 })
       setCrop({ x: 0.5, y: 0.5, zoom: 1, rotation: 0 })
+      if (selected.kind === 'photo' && 'src' in selected) setPrevious(selected.src)
       setChoice({ kind: 'photo', file: prepared })
     } catch (cause) {
       if (alive.current && id === selection.current)
@@ -137,7 +167,15 @@ function PictureDraft({
     setCommitting(true)
     setError('')
     try {
-      await onCommit(choice.kind === 'photo' ? { ...choice, crop } : choice)
+      const result = choice.kind === 'photo' && 'file' in choice ? { ...choice, crop } : choice
+      if (onCommitDraft) await onCommitDraft(result, previous)
+      else if (result.kind === 'photo' && 'src' in result) {
+        throw new Error("Couldn't save your picture. Try again.")
+      } else if (result.kind === 'character') {
+        const id = PROFILE_CHARACTER_IDS.find((candidate) => candidate === result.id)
+        if (id === undefined) throw new Error("Couldn't save your picture. Try again.")
+        await onCommit({ kind: 'character', id })
+      } else await onCommit(result)
       if (alive.current) onOpenChange(false)
     } catch (cause) {
       if (alive.current)
@@ -211,7 +249,27 @@ function PictureDraft({
           >
             Use my initials
           </Button>
+          {selected.kind === 'photo' ? (
+            <Button size="sm" disabled={pending} onClick={() => select({ kind: 'initials' })}>
+              Remove
+            </Button>
+          ) : null}
         </div>
+        {previous && !file && !preparing ? (
+          <div className="flex items-center gap-3.5">
+            <Avatar name={name} src={previous} size={64} shape="square" />
+            <div className="flex flex-col gap-1">
+              <b>Previous picture</b>
+              <Button
+                size="sm"
+                disabled={pending}
+                onClick={() => select({ kind: 'photo', src: previous })}
+              >
+                Use previous picture
+              </Button>
+            </div>
+          </div>
+        ) : null}
         {preparing ? (
           <p role="status" className="text-sm text-fg2">
             Preparing your photo…
@@ -360,31 +418,37 @@ function PictureDraft({
             Or pick a character
           </span>
           <fieldset
-            aria-label="Characters"
+            aria-label={`Characters, page ${currentPage} of ${pageCount}`}
             disabled={pending}
             className="m-0 grid min-w-0 grid-cols-[repeat(auto-fill,minmax(72px,1fr))] gap-2.5 border-0 p-0"
           >
-            {PROFILE_CHARACTER_IDS.map((id, index) => (
-              <button
-                key={id}
-                type="button"
-                aria-label={`Character ${index + 1}`}
-                aria-pressed={selected.kind === 'character' && selected.id === id}
-                onClick={() => select({ kind: 'character', id })}
-                className="grid cursor-pointer place-items-center rounded-2xl border-2 border-transparent bg-transparent p-1 aria-pressed:border-accent"
-              >
-                <Avatar
-                  name={name}
-                  src={profileCharacterUrl(playerId, name, id)}
-                  className="size-14"
-                />
-              </button>
-            ))}
+            {characters
+              .slice((currentPage - 1) * 8, currentPage * 8)
+              .map(({ id, image }, index) => (
+                <button
+                  key={id}
+                  type="button"
+                  aria-label={`Character ${(currentPage - 1) * 8 + index + 1}`}
+                  aria-pressed={selected.kind === 'character' && selected.id === id}
+                  onClick={() => select({ kind: 'character', id })}
+                  className="grid cursor-pointer place-items-center rounded-2xl border-2 border-transparent bg-transparent p-1 aria-pressed:border-accent"
+                >
+                  <Avatar name={name} src={image} className="size-14" />
+                </button>
+              ))}
           </fieldset>
+          <Pager
+            page={currentPage}
+            pageCount={pageCount}
+            onPage={setPage}
+            aria-label="Character pages"
+            disabled={pending}
+          />
         </div>
         <p className="text-xs text-fg2">
-          Changes are saved only when you click Done. WebP, GIF, PNG, HEIC/HEIF and JPEG. Keep it to
-          a clear picture of you; the club's Queue Master can ask you to change it.
+          Only your current and previous photo are kept. Changes are saved only when you click Done.
+          WebP, GIF, PNG, HEIC/HEIF and JPEG. Keep it to a clear picture of you; the club's Queue
+          Master can ask you to change it.
         </p>
       </div>
     </Sheet>

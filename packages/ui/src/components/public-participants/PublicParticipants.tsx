@@ -2,7 +2,7 @@ import type { PublicSessionParticipant } from '@rotra/data/public-session/types'
 import { Button } from '@rotra/ui/button'
 import { cn } from '@rotra/ui/cn'
 import { Icon } from '@rotra/ui/icon'
-import { ParticipantCard } from '@rotra/ui/public-participants/participant-card'
+import { PublicParticipantTile } from '@rotra/ui/public-participant-tile'
 import type { SkillDistributionCounts } from '@rotra/ui/skill-distribution-bar'
 
 export type PublicParticipant = Omit<PublicSessionParticipant, 'skillGroup' | 'levelLabel'> & {
@@ -12,6 +12,14 @@ export type PublicParticipant = Omit<PublicSessionParticipant, 'skillGroup' | 'l
   levelLabel?: string | null
   /** @deprecated Public tiles no longer show a profile label. */
   hasProfile?: boolean
+  /** Registered players only, shown under the name when the viewer is signed in (masked false). */
+  nickname?: string | null
+  /** True for guests, unclaimed profiles and every visitor view; no nickname, no link. Defaults true. */
+  masked?: boolean
+  /** The signed-in viewer's own tile: You pill and accent ring. */
+  isViewer?: boolean
+  /** Player app `/player/find/<RTR>` URL, set only for registered players seen by a signed-in viewer. */
+  href?: string | null
 }
 
 export type PublicWaitlistEntry = PublicParticipant
@@ -25,7 +33,9 @@ export type PublicParticipantsProps = {
   openSlots?: number
   /** Finished sessions show no placeholders or Request to join button. */
   finished?: boolean
-  /** Set only after server-verified membership; finished alone never grants full roster. */
+  /** Any signed-in viewer: lifts the three-row cap and the 12-tile cap. Visitors stay capped. */
+  uncapped?: boolean
+  /** @deprecated Use uncapped. Treated the same. */
   fullRoster?: boolean
   participantCount?: number
   acceptJoinRequests?: boolean
@@ -40,12 +50,13 @@ export type PublicParticipantsProps = {
 
 const gridClass = 'm-0 grid list-none grid-cols-3 gap-x-[18px] gap-y-7 p-0 min-[641px]:grid-cols-4'
 
-/** Public participants: plain tiles, up to three rows before joining, followed by waitlist tiles. */
+/** Public participants: tiles, up to three rows for visitors (uncapped when signed in), then the waitlist. */
 export function PublicParticipants({
   participants,
   waitlist = [],
   openSlots = 0,
   finished = false,
+  uncapped,
   fullRoster = false,
   participantCount = participants.length,
   acceptJoinRequests = true,
@@ -53,28 +64,33 @@ export function PublicParticipants({
   disabled = false,
   className,
 }: PublicParticipantsProps) {
+  const isUncapped = uncapped ?? fullRoster
   // Never mount roster entries past the wider cap. CSS removes entries 10–12 on phones from
   // both layout and the accessibility tree, with no viewport hook or hydration shift.
-  const visibleParticipants = fullRoster ? participants : participants.slice(0, 12)
+  const visibleParticipants = isUncapped ? participants : participants.slice(0, 12)
   const placeholderCount = finished
     ? 0
-    : fullRoster
+    : isUncapped
       ? Math.max(0, Math.trunc(openSlots))
       : Math.min(Math.max(0, Math.trunc(openSlots)), Math.max(0, 12 - visibleParticipants.length))
-  const showJoinPrompt = !fullRoster && participantCount > 9
+  const showJoinPrompt = !isUncapped && participantCount > 9
 
   return (
     <section aria-label="Participants" className={cn('flex min-w-0 flex-col gap-3', className)}>
       {participants.length || placeholderCount ? (
         <div className="relative">
-          <ul className={cn(gridClass, !fullRoster && 'max-[640px]:[&>li:nth-child(n+10)]:hidden')}>
+          <ul className={cn(gridClass, !isUncapped && 'max-[640px]:[&>li:nth-child(n+10)]:hidden')}>
             {visibleParticipants.map((p) => (
               <li key={p.id} className="min-w-0">
-                <ParticipantCard
+                <PublicParticipantTile
                   name={p.name}
+                  nickname={p.nickname}
                   pictureUrl={p.pictureUrl}
                   skillGroup={p.skillGroup}
                   levelLabel={p.levelLabel}
+                  masked={p.masked ?? true}
+                  isViewer={p.isViewer}
+                  href={p.href}
                 />
               </li>
             ))}
@@ -129,11 +145,15 @@ export function PublicParticipants({
           <ol className={gridClass}>
             {waitlist.map((w, i) => (
               <li key={w.id} className="min-w-0">
-                <ParticipantCard
+                <PublicParticipantTile
                   name={w.name}
+                  nickname={w.nickname}
                   pictureUrl={w.pictureUrl}
                   skillGroup={w.skillGroup}
                   levelLabel={w.levelLabel}
+                  masked={w.masked ?? true}
+                  isViewer={w.isViewer}
+                  href={w.href}
                   waitlistPosition={i + 1}
                 />
               </li>

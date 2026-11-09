@@ -404,7 +404,9 @@
     "./player-clubs-card": "./src/components/player-clubs-card/PlayerClubsCard.tsx",
     "./my-sessions-card": "./src/components/my-sessions-card/MySessionsCard.tsx",
     "./player-share-sheet": "./src/components/player-share-sheet/PlayerShareSheet.tsx",
-    "./rank-share-card": "./src/components/rank-share-card/RankShareCard.tsx"
+    "./rank-share-card": "./src/components/rank-share-card/RankShareCard.tsx",
+    "./session-result-share-card": "./src/components/session-result-share-card/SessionResultShareCard.tsx",
+    "./session-games-share-card": "./src/components/session-games-share-card/SessionGamesShareCard.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

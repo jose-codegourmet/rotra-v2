@@ -59,10 +59,10 @@ Own profile only ([D-2026-11-09-08](../../../../mvp/decisions.md#d-2026-11-09-08
 
 - **Share rank:** from the profile, see [profile.md](profile.md#p-own-profile--signed-in-owner-view).
 - **Share result:** in My sessions (Finished) and on each session group in Match history. Card: session title, date and club, “#N in Standings”, “G games · W–L”.
-- **Share games:** on each session group in Match history. Card: date and club, one line per game (“with <partner> vs <opponent>, <opponent>” plus the score, or “Winner recorded”), and “Total W–L”. At most 8 lines, then “+N more games”.
+- **Share games:** on each session group in Match history. Card: date and club, avatar groups for each team with a prominent score between them, and “Total W–L”. Post shows 3 games, Story 4, then “+N more games”. A missing score shows an em dash and “Winner recorded”.
 - **Published only:** a session that is not published shows no button and the muted “Results not shared yet by the club.” Share result and Share games appear only after the Queue Master publishes.
 - **Names on images:** other players show as a visitor would see them. Private players and guests are masked (first letter plus `***` per word), public registered players in full, whoever is signed in.
-- **Story** gives game lines two lines each; **Post** keeps one.
+- **Story** shows 4 avatar rows; **Post** shows 3. Both keep scores prominent and names secondary.
 
 ## Acceptance examples
 
@@ -70,3 +70,5 @@ Own profile only ([D-2026-11-09-08](../../../../mvp/decisions.md#d-2026-11-09-08
 - Old lifetime games outside the window do not count toward current eligibility.
 - Updating weights changes explanatory copy only when the corresponding configured calculation is in effect.
 - Deleting a club's public page leaves the player's retained official record intact.
+
+**Owner revision, November 10, 2026:** Share games uses paired avatar groups with a large score between them. The owner and partners appear on the left, opponents on the right, with short labels below. Public players may show pictures; private players and guests show masked initials only. A missing score shows an em dash and “Winner recorded”. Post shows 3 games, Story 4, with “+N more games” and the full session W–L total.

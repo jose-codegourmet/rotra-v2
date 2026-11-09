@@ -1,7 +1,8 @@
 'use client'
-import { PROFILE_LOGIN_MESSAGE } from '@rotra/data/player/visibility'
+import { useMySessions } from '@rotra/data/player/useMySessions'
 import { usePlayerGames } from '@rotra/data/player/usePlayerGames'
 import { usePlayerRank } from '@rotra/data/player/usePlayerRank'
+import { PROFILE_LOGIN_MESSAGE } from '@rotra/data/player/visibility'
 import { Button } from '@rotra/ui/button'
 import { ErrorState } from '@rotra/ui/error-state'
 import { MatchHistory } from '@rotra/ui/match-history'
@@ -10,6 +11,7 @@ import { PageHeader } from '@rotra/ui/page-header'
 import { ProfileNotFound } from '@rotra/ui/profile-not-found'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { usePlayerShareSheet } from '@/app/_components/share/usePlayerShareSheet'
 import { useAppSelector } from '@/store/hooks'
 import { selectAccount } from '@/store/slices/authSlice'
 import { selectDev } from '@/store/slices/devSlice'
@@ -22,7 +24,23 @@ export function GameHistory({ playerId }: { playerId: string }) {
   const player = rank.data
   const account = useAppSelector(selectAccount),
     { offline } = useAppSelector(selectDev)
-  if (rank.error?.message === PROFILE_LOGIN_MESSAGE || games.error?.message === PROFILE_LOGIN_MESSAGE) return <main className="mx-auto max-w-[920px] px-4 pt-5"><ProfileNotFound id={playerId ?? ''} loginRequired onSignIn={() => router.push(`/login?returnTo=${encodeURIComponent(`/players/${playerId}/games`)}`)}/></main>
+  const sharing = usePlayerShareSheet(account?.id === playerId ? playerId : null)
+  const mySessions = useMySessions(account?.id === playerId ? playerId : null)
+  if (
+    rank.error?.message === PROFILE_LOGIN_MESSAGE ||
+    games.error?.message === PROFILE_LOGIN_MESSAGE
+  )
+    return (
+      <main className="mx-auto max-w-[920px] px-4 pt-5">
+        <ProfileNotFound
+          id={playerId ?? ''}
+          loginRequired
+          onSignIn={() =>
+            router.push(`/login?returnTo=${encodeURIComponent(`/players/${playerId}/games`)}`)
+          }
+        />
+      </main>
+    )
   if (rank.data === null)
     return (
       <main className="mx-auto max-w-[920px] px-4 pt-5">
@@ -80,7 +98,11 @@ export function GameHistory({ playerId }: { playerId: string }) {
         activeTab={activeTab}
         onTabChange={setActiveTab}
         notices={notices}
+        publication={account?.id === playerId ? (mySessions.data?.publication ?? {}) : undefined}
+        onShareResult={account?.id === playerId ? sharing.openResult : undefined}
+        onShareGames={account?.id === playerId ? sharing.openGames : undefined}
       />
+      {sharing.sheet}
     </main>
   )
 }

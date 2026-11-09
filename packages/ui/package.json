@@ -400,7 +400,9 @@
     "./club-sales-table": "./src/components/club-sales-table/ClubSalesTable.tsx",
     "./public-session-queue": "./src/components/public-session-queue/PublicSessionQueue.tsx",
     "./email-confirm-banner": "./src/components/email-confirm-banner/EmailConfirmBanner.tsx",
-    "./join-club-card": "./src/components/join-club-card/JoinClubCard.tsx"
+    "./join-club-card": "./src/components/join-club-card/JoinClubCard.tsx",
+    "./player-clubs-card": "./src/components/player-clubs-card/PlayerClubsCard.tsx",
+    "./my-sessions-card": "./src/components/my-sessions-card/MySessionsCard.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

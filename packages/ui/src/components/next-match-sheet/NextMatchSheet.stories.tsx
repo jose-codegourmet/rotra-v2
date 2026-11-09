@@ -9,8 +9,8 @@ const candidates: NextMatchCandidate[] = chooseMatch.rows.map(
   ({ matchId, position, teamA, teamB, formatLabel }) => ({
     matchId,
     position,
-    teamA,
-    teamB,
+    teamA: teamA.split(' and ').map((name, i) => ({ id: `${matchId}-a${i}`, name, shortName: name, level: null, games: 2 })),
+    teamB: teamB.split(' and ').map((name, i) => ({ id: `${matchId}-b${i}`, name, shortName: name, level: null, games: 3 })),
     formatLabel,
   }),
 )
@@ -61,3 +61,11 @@ export const PhoneOneCandidate: Story = {
   args: { candidates: candidates.slice(0, 1) },
   globals: { viewport: { value: 'phone' } },
 }
+
+export const FiveCandidates: Story = {
+  args: { candidates: Array.from({ length: 5 }, (_, i) => ({ ...candidates[i % candidates.length]!, matchId: `match-${i}`, position: i + 1 })) },
+}
+export const FiveCandidatesLight: Story = { ...FiveCandidates, globals: { theme: 'light' } }
+export const NoCandidatesLight: Story = { args: { candidates: [] }, globals: { theme: 'light' } }
+export const PickErrorLight: Story = { args: { error: 'That match is not ready any more. Pick again.' }, globals: { theme: 'light' } }
+export const PendingLight: Story = { args: { isPending: true }, globals: { theme: 'light' } }

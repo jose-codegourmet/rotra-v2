@@ -44,3 +44,7 @@ Superseded by: none
 
 ## Real app work
 - Share sheet and three card layouts in `@rotra/ui`, wired from the profile, My sessions and Match history; canvas download and Web Share helper shared with the Queue Session QR card; the published flag from the session's publish state
+
+## Owner follow-up, November 10
+
+The text-only game lines are superseded by [avatar groups and prominent scores](2026-11-10-player-games-share-avatars.md), incorporated into #635 before merge. Post shows 3 games and Story 4; remaining games use the existing +N more games line.

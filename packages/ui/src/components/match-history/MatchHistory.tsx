@@ -1,5 +1,6 @@
 'use client'
 import type { PlayerSessionRecord } from '@rotra/data/player/types'
+import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { Notice } from '@rotra/ui/notice'
 import { SessionGames } from '@rotra/ui/session-games'
@@ -9,12 +10,18 @@ export type MatchHistoryProps = {
   activeTab: 'counted' | 'other'
   onTabChange: (tab: 'counted' | 'other') => void
   notices?: string[]
+  publication?: Record<string, boolean>
+  onShareResult?: (id: string) => void
+  onShareGames?: (id: string) => void
 }
 export function MatchHistory({
   sessions,
   activeTab,
   onTabChange,
   notices = [],
+  publication,
+  onShareResult,
+  onShareGames,
 }: MatchHistoryProps) {
   const counts = sessions
     .flatMap((s) => s.games)
@@ -61,7 +68,29 @@ export function MatchHistory({
             )}
             <Card className="flex flex-col gap-[22px]">
               {blocks.length ? (
-                blocks.map((session) => <SessionGames key={session.id} session={session} />)
+                blocks.map((session) => (
+                  <div key={session.id}>
+                    <SessionGames session={session} />
+                    {publication ? (
+                      publication[session.id] ? (
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {onShareResult ? (
+                            <Button size="xs" onClick={() => onShareResult(session.id)}>
+                              Share result
+                            </Button>
+                          ) : null}
+                          {onShareGames ? (
+                            <Button size="xs" onClick={() => onShareGames(session.id)}>
+                              Share games
+                            </Button>
+                          ) : null}
+                        </div>
+                      ) : (
+                        <p className="mt-2 text-sm text-fg2">Results not shared yet by the club.</p>
+                      )
+                    ) : null}
+                  </div>
+                ))
               ) : (
                 <p className="py-5 text-center text-sm text-fg2">
                   {tab === 'counted'

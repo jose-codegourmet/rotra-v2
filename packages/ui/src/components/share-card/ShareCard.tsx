@@ -4,6 +4,7 @@ import { Button } from '@rotra/ui/button'
 import { ClubLogo } from '@rotra/ui/club-logo'
 import { cn } from '@rotra/ui/cn'
 import { SegmentedControl } from '@rotra/ui/segmented-control'
+import type { ReactNode } from 'react'
 import { useEffect, useRef, useState } from 'react'
 import { drawShareQr, loadShareLogo, renderSharePng, type ShareFormat } from './ShareCard.helpers'
 
@@ -11,6 +12,12 @@ import { drawShareQr, loadShareLogo, renderSharePng, type ShareFormat } from './
 export type ShareCardSpot = { initials: string; imageUrl?: string | null }
 
 export type ShareCardProps = {
+  /** Player cards replace the middle content and use a corner QR. Existing invite cards keep their layout. */
+  children?: ReactNode | ((format: ShareFormat) => ReactNode)
+  /** Extra avatar assets used by custom content, keyed by data-qr-logo. */
+  additionalImages?: Record<string, string | null>
+  compactQr?: boolean
+  leadingAction?: ReactNode
   /** The exact link the QR encodes and the card prints. */
   link: string
   /** Names the download <fileName>-<post|story>.png. */
@@ -78,6 +85,10 @@ export function ShareCard({
   onShared,
   onDownloaded,
   onError,
+  children,
+  compactQr = false,
+  leadingAction,
+  additionalImages,
 }: ShareCardProps) {
   const [format, setFormat] = useState<ShareFormat>(initialFormat)
   const [loaded, setLoaded] = useState<Record<string, HTMLImageElement | null>>({})
@@ -90,12 +101,18 @@ export function ShareCard({
   const spotUrl = spot.imageUrl ?? null
   const markUrl = mark.imageUrl ?? null
   const imageFor = (url: string | null) => (url && loaded[url] ? loaded[url] : null)
-  const logoLoading = [spotUrl, markUrl].some((url) => !!url && !(url in loaded))
+  const extraImageKey = JSON.stringify(additionalImages ?? {})
+  const extraUrls = Object.values(additionalImages ?? {})
+  const logoLoading = [spotUrl, markUrl, ...extraUrls].some((url) => !!url && !(url in loaded))
   const canShare = webShare ?? detected
 
   useEffect(() => {
     let current = true
-    for (const url of [spotUrl, markUrl])
+    for (const url of new Set([
+      spotUrl,
+      markUrl,
+      ...Object.values(JSON.parse(extraImageKey) as Record<string, string | null>),
+    ]))
       if (url)
         void loadShareLogo(url).then((image) => {
           if (current) setLoaded((previous) => ({ ...previous, [url]: image }))
@@ -103,7 +120,7 @@ export function ShareCard({
     return () => {
       current = false
     }
-  }, [spotUrl, markUrl])
+  }, [spotUrl, markUrl, extraImageKey])
   useEffect(() => {
     try {
       const probe = new File([], fileName, { type: 'image/png' })
@@ -121,7 +138,13 @@ export function ShareCard({
         ? await renderSharePng(
             cardRef.current,
             qr,
-            { spot: imageFor(spotUrl), mark: imageFor(markUrl) },
+            {
+              spot: imageFor(spotUrl),
+              mark: imageFor(markUrl),
+              ...Object.fromEntries(
+                Object.entries(additionalImages ?? {}).map(([key, url]) => [key, imageFor(url)]),
+              ),
+            },
             format,
           )
         : null
@@ -170,13 +193,17 @@ export function ShareCard({
       data-qr-logo={name}
       className={cn(
         'shrink-0 overflow-hidden rounded-full bg-share-accent text-share-bg',
-        name === 'spot' ? 'size-10' : '',
+        name === 'spot' ? (compactQr ? 'size-13 rounded-[14px]' : 'size-10') : '',
       )}
     >
       <ClubLogo
         initials={imageFor(url) ? '' : item.initials}
         logoUrl={imageFor(url) ? url : null}
-        className={cn('size-full rounded-full border-0 bg-transparent text-share-bg', text)}
+        className={cn(
+          'size-full rounded-full border-0 bg-transparent text-share-bg',
+          compactQr && 'rounded-[14px]',
+          text,
+        )}
       />
     </span>
   )
@@ -206,7 +233,12 @@ export function ShareCard({
             : 'aspect-[9/16] w-[min(100%,270px)] pt-7 pb-[22px]',
         )}
       >
-        <div className="flex items-center justify-center gap-2.5 text-left">
+        <div
+          className={cn(
+            'flex items-center justify-center gap-2.5 text-left',
+            compactQr && 'justify-start gap-3',
+          )}
+        >
           {spotMark(spot, spotUrl, 'spot', 'text-[14px]')}
           <div className="min-w-0">
             <b data-qr-text className="block text-[15px] leading-normal [overflow-wrap:anywhere]">
@@ -219,27 +251,36 @@ export function ShareCard({
             ) : null}
           </div>
         </div>
-        <div>
-          <h3
-            data-qr-text
-            className={cn(
-              'm-0 mb-1.5 text-share-fg text-balance font-extrabold leading-[1.15] [overflow-wrap:anywhere]',
-              format === 'post' ? 'text-[22px]' : 'text-[24px]',
-            )}
-          >
-            {title}
-          </h3>
-          <p className="m-0 text-[13px] text-share-muted leading-[1.4]">
-            {infoLines.map((line, index) => (
-              // biome-ignore lint/suspicious/noArrayIndexKey: fixed, ordered lines
-              <span key={index}>
-                {index > 0 ? <br /> : null}
-                <span data-qr-text>{line}</span>
-              </span>
+        {typeof children === 'function'
+          ? children(format)
+          : (children ?? (
+              <div>
+                <h3
+                  data-qr-text
+                  className={cn(
+                    'm-0 mb-1.5 text-share-fg text-balance font-extrabold leading-[1.15] [overflow-wrap:anywhere]',
+                    format === 'post' ? 'text-[22px]' : 'text-[24px]',
+                  )}
+                >
+                  {title}
+                </h3>
+                <p className="m-0 text-[13px] text-share-muted leading-[1.4]">
+                  {infoLines.map((line, index) => (
+                    // biome-ignore lint/suspicious/noArrayIndexKey: fixed, ordered lines
+                    <span key={index}>
+                      {index > 0 ? <br /> : null}
+                      <span data-qr-text>{line}</span>
+                    </span>
+                  ))}
+                </p>
+              </div>
             ))}
-          </p>
-        </div>
-        <div className="flex flex-col items-center gap-1.5">
+        <div
+          className={cn(
+            'flex items-center gap-2',
+            compactQr ? 'flex-row-reverse justify-between' : 'flex-col gap-1.5',
+          )}
+        >
           {qr ? (
             <div
               data-qr-tile
@@ -247,7 +288,7 @@ export function ShareCard({
               aria-label={qrLabel}
               className={cn(
                 'relative box-content rounded-[14px] bg-qr-bg p-2.5 text-qr-fg',
-                format === 'post' ? 'w-[148px]' : 'w-[170px]',
+                compactQr ? 'w-12 p-1 rounded-md' : format === 'post' ? 'w-[148px]' : 'w-[170px]',
               )}
             >
               <svg
@@ -258,49 +299,69 @@ export function ShareCard({
               >
                 <path d={qr.path} fill="currentColor" />
               </svg>
-              <div
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-                style={{
-                  width: `${(0.22 * qr.count * (format === 'post' ? 148 : 170)) / qr.size}px`,
-                }}
-              >
-                <span
-                  data-qr-logo="mark"
-                  data-qr-center
-                  className="block aspect-square size-full rounded-full bg-share-accent text-share-bg shadow-[0_0_0_6px_var(--qr-bg)]"
+              {!compactQr && (
+                <div
+                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                  style={{
+                    width: `${(0.22 * qr.count * (format === 'post' ? 148 : 170)) / qr.size}px`,
+                  }}
                 >
-                  <ClubLogo
-                    initials={imageFor(markUrl) ? '' : mark.initials}
-                    logoUrl={imageFor(markUrl) ? markUrl : null}
-                    className="aspect-square size-full rounded-full border-0 bg-transparent text-[11px] text-share-bg"
-                  />
-                </span>
-              </div>
+                  <span
+                    data-qr-logo="mark"
+                    data-qr-center
+                    className="block aspect-square size-full rounded-full bg-share-accent text-share-bg shadow-[0_0_0_6px_var(--qr-bg)]"
+                  >
+                    <ClubLogo
+                      initials={imageFor(markUrl) ? '' : mark.initials}
+                      logoUrl={imageFor(markUrl) ? markUrl : null}
+                      className="aspect-square size-full rounded-full border-0 bg-transparent text-[11px] text-share-bg"
+                    />
+                  </span>
+                </div>
+              )}
             </div>
           ) : (
             <p data-qr-text className="m-0 text-[13px] text-share-muted">
               The QR code couldn't be drawn here. Copy the invite link instead.
             </p>
           )}
-          <b data-qr-text className="text-[15px] text-share-accent">
-            {qrCaption}
-          </b>
-          <span
-            data-qr-text
-            className="font-mono text-[10px] text-share-muted [overflow-wrap:anywhere]"
-          >
-            {link}
-          </span>
-        </div>
-        <div className="flex items-baseline justify-center gap-2 text-[12px] text-share-muted">
-          <span className="font-extrabold text-share-fg tracking-[0.1em]">
-            <span data-qr-text>ROTR</span>
-            <b data-qr-text className="text-share-accent">
-              A
+          {!compactQr && (
+            <b data-qr-text className="text-[15px] text-share-accent">
+              {qrCaption}
             </b>
-          </span>
-          <span data-qr-text>Run the game.</span>
+          )}
+          {compactQr ? (
+            <div className="text-left">
+              <span className="block text-[13px] font-extrabold tracking-[0.1em]">
+                <span data-qr-text>ROTR</span>
+                <b data-qr-text className="text-share-accent">
+                  A
+                </b>
+              </span>
+              <span data-qr-text className="text-[11px] text-share-muted">
+                Run the game.
+              </span>
+            </div>
+          ) : (
+            <span
+              data-qr-text
+              className="font-mono text-[10px] text-share-muted [overflow-wrap:anywhere]"
+            >
+              {link}
+            </span>
+          )}
         </div>
+        {!compactQr && (
+          <div className="flex items-baseline justify-center gap-2 text-[12px] text-share-muted">
+            <span className="font-extrabold text-share-fg tracking-[0.1em]">
+              <span data-qr-text>ROTR</span>
+              <b data-qr-text className="text-share-accent">
+                A
+              </b>
+            </span>
+            <span data-qr-text>Run the game.</span>
+          </div>
+        )}
       </section>
       <p className="m-0 text-fg2 text-sm">
         {noteStart ? `${noteStart} ` : ''}
@@ -310,6 +371,7 @@ export function ShareCard({
         {noteEnd ? ` ${noteEnd}` : ''}
       </p>
       <div className="flex flex-wrap justify-center gap-2">
+        {leadingAction}
         {showShare ? (
           <Button
             variant={showDownload ? undefined : 'primary'}

@@ -11,6 +11,7 @@ export function SharedRankCard({
   sentence,
   subject,
   onOpenRankDetail,
+  onShare,
 }: {
   level: number | null
   levelLabel?: string
@@ -18,6 +19,7 @@ export function SharedRankCard({
   status: string
   sentence: string
   subject: string
+  onShare?: () => void
   onOpenRankDetail: () => void
 }) {
   return (
@@ -26,9 +28,16 @@ export function SharedRankCard({
         <span className="text-xs font-semibold tracking-[0.6px] text-fg2 uppercase">
           Shared rank
         </span>
-        <Button size="xs" variant="ghost" onClick={onOpenRankDetail}>
-          How this rank works
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          {onShare && level !== null ? (
+            <Button size="xs" onClick={onShare}>
+              Share
+            </Button>
+          ) : null}
+          <Button size="xs" variant="ghost" onClick={onOpenRankDetail}>
+            How this rank works
+          </Button>
+        </div>
       </div>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>

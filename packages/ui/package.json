@@ -402,7 +402,9 @@
     "./email-confirm-banner": "./src/components/email-confirm-banner/EmailConfirmBanner.tsx",
     "./join-club-card": "./src/components/join-club-card/JoinClubCard.tsx",
     "./player-clubs-card": "./src/components/player-clubs-card/PlayerClubsCard.tsx",
-    "./my-sessions-card": "./src/components/my-sessions-card/MySessionsCard.tsx"
+    "./my-sessions-card": "./src/components/my-sessions-card/MySessionsCard.tsx",
+    "./player-share-sheet": "./src/components/player-share-sheet/PlayerShareSheet.tsx",
+    "./rank-share-card": "./src/components/rank-share-card/RankShareCard.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

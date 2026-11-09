@@ -7,6 +7,15 @@ import { IdentityChip } from '@rotra/ui/identity-chip'
 import { IDENTITY_LABEL, type Identity } from '@rotra/ui/identity-chip/variants'
 import { LevelPill, levelLabel } from '@rotra/ui/level-pill'
 
+/** How the player came to be saved: a club link, a session link, or added by hand (the default). */
+export type SavedPlayerJoinedVia = 'club' | 'session' | null
+
+export const JOINED_VIA_TEXT: Record<'club' | 'session' | 'club-added', string> = {
+  club: 'Joined via club link',
+  session: 'Joined via session link',
+  'club-added': 'Added by the club',
+}
+
 export type SavedPlayerCardProps = {
   name: string
   nickname?: string | null
@@ -21,6 +30,8 @@ export type SavedPlayerCardProps = {
   sessionsHere: number
   /** Formatted date the club saved them, e.g. "Oct 3" */
   addedLabel: string
+  /** How they joined; null or absent reads "Added by the club" */
+  joinedVia?: SavedPlayerJoinedVia
   onOpenProfile: () => void
   /** Shown only for guests and unclaimed profiles */
   onInvite?: () => void
@@ -47,6 +58,7 @@ export function SavedPlayerCard({
   registeredCity,
   sessionsHere,
   addedLabel,
+  joinedVia = null,
   onOpenProfile,
   onInvite,
 }: SavedPlayerCardProps) {
@@ -90,6 +102,7 @@ export function SavedPlayerCard({
         <span className="min-h-[18px] text-xs text-fg2 [overflow-wrap:anywhere]">
           {nickname ? `“${nickname}”` : ' '}
         </span>
+        <span className="text-[13px] text-fg2">{JOINED_VIA_TEXT[joinedVia ?? 'club-added']}</span>
         <LevelPill level={level} className="mt-1" />
         {live ? (
           <span

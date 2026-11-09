@@ -8,12 +8,24 @@ import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { Chip } from '@rotra/ui/chip'
 import { cn } from '@rotra/ui/cn'
+import { DropOutNoticeRow, type DropOutNoticeRowProps } from '@rotra/ui/drop-out-notice-row'
+import { MatchRequestCard, type MatchRequestCardProps } from '@rotra/ui/match-request-card'
+import { Tabs, TabsContent } from '@rotra/ui/tabs'
 import { LevelSelect } from '@rotra/ui/level-select'
 import { Notice } from '@rotra/ui/notice'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { useId, useState } from 'react'
 
+export type JoinRequestDetails = {
+  account?: 'in-club' | 'new-to-club'
+  sharedRank?: string | null
+  invitedBy?: string
+  phoneMatch?: { name: string; linked?: boolean; onLink: () => void; onNotThem: () => void }
+}
 export type JoinRequestsPanelProps = {
+  requestDetails?: Record<string, JoinRequestDetails>
+  dropOuts?: (DropOutNoticeRowProps & { id: string })[]
+  matchRequests?: (MatchRequestCardProps & { id: string })[]
   /**
    * Every join request of the session, any status. The panel lists the pending ones oldest first and
    * counts the decided ones for the empty state.
@@ -64,6 +76,9 @@ const LEVEL_ERROR = 'Choose a level for this club before confirming.'
  */
 export function JoinRequestsPanel({
   requests,
+  requestDetails = {},
+  dropOuts = [],
+  matchRequests = [],
   slotsFull = false,
   live = false,
   variant = 'card',
@@ -75,6 +90,7 @@ export function JoinRequestsPanel({
   className,
 }: JoinRequestsPanelProps) {
   const id = useId()
+  const [tab, setTab] = useState('join')
   const [levels, setLevels] = useState<Record<string, PlayingLevel | null>>({})
   const [errors, setErrors] = useState<Record<string, string>>({})
 
@@ -103,7 +119,8 @@ export function JoinRequestsPanel({
   }
 
   const inSheet = variant === 'sheet'
-  const heading = loading || !pending.length ? 'Join requests' : `Join requests · ${pending.length}`
+  const count = pending.length + dropOuts.length + matchRequests.length
+  const heading = count ? `Requests · ${count}` : 'Requests'
   const body = loading ? (
     <section
       id="join-requests"
@@ -139,86 +156,196 @@ export function JoinRequestsPanel({
       aria-label={inSheet ? heading : undefined}
       className={cn('flex min-w-0 flex-col gap-3', inSheet && className)}
     >
-      <div>
-        {inSheet ? null : <h2 id={`${id}-h`}>{heading}</h2>}
-        <p className="m-0 text-[13px] text-fg2">
-          {pending.length ? (
-            <>
-              Check each one is a real person you expect (ask at the door, or match their name and
-              phone) before confirming. Oldest first.
-              {slotsFull && !live ? ' Slots are full, so confirmed guests go on the waitlist.' : ''}
-            </>
-          ) : (
-            <>
-              No requests waiting.
-              {confirmed + declined > 0
-                ? ` ${confirmed} confirmed, ${declined} declined so far.`
-                : ' Guests who open the session link can ask for a slot; they show up here.'}
-            </>
-          )}
-        </p>
-      </div>
-      {serverError ? <Notice tone="error">{serverError}</Notice> : null}
-      {pending.length ? (
-        <div className="flex flex-col divide-y divide-border">
-          {pending.map((r) => {
-            const level = levelOf(r)
-            const error = errors[r.id]
-            return (
-              <div key={r.id} className="flex flex-col gap-2.5 py-3">
-                <div className="flex min-w-0 items-center gap-3">
-                  <Avatar name={r.name} />
-                  <span className="flex min-w-0 flex-1 flex-col">
-                    <b className="font-semibold [overflow-wrap:anywhere]">
-                      {r.name}
-                      {r.nickname ? <span className="text-fg2"> “{r.nickname}”</span> : null}
-                    </b>
-                    <span className="text-[13px] text-fg2">
-                      {r.phoneE164 ? localPhone(r.phoneE164) : 'No phone given'} · says{' '}
-                      {BAND_LABEL[r.statedBand]} · requested {formatTime(r.requestedAt)}
-                    </span>
-                  </span>
-                  <Chip tone="warn">Guest request</Chip>
-                </div>
-                <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 max-sm:grid-cols-1">
-                  <LevelSelect
-                    disabled={isPending}
-                    value={level}
-                    onChange={(next) => setLevel(r.id, next)}
-                    aria-label={`Level for ${r.name}`}
-                    missing={Boolean(error) && level == null}
-                  />
-                  <div className="flex flex-wrap items-center gap-2 max-sm:[&>*]:flex-1">
-                    <Button
-                      size="sm"
-                      disabled={isPending}
-                      onClick={() => onDecline(r.id)}
-                      aria-label={`Decline ${r.name}`}
-                    >
-                      Decline
-                    </Button>
-                    <Button
-                      size="sm"
-                      disabled={isPending}
-                      variant="primary"
-                      onClick={() => confirm(r)}
-                      aria-label={`${slotsFull && !live ? 'Confirm to waitlist' : 'Confirm guest'} ${r.name}`}
-                    >
-                      {slotsFull && !live ? 'Confirm to waitlist' : 'Confirm guest'}
-                    </Button>
-                  </div>
-                </div>
-                <span
-                  aria-live="polite"
-                  className="text-[13px] font-semibold text-error empty:hidden"
-                >
-                  {error}
-                </span>
-              </div>
-            )
-          })}
+      {inSheet ? null : (
+        <div>
+          <h2 id={`${id}-h`}>{heading}</h2>
+          <p className="m-0 text-[13px] text-fg2">
+            Join requests, drop-out notices and match requests from the session page. Nothing
+            changes until you act on one.
+          </p>
         </div>
-      ) : null}
+      )}
+      <Tabs
+        aria-label="Requests"
+        value={tab}
+        onChange={setTab}
+        items={[
+          { value: 'join', label: `Join · ${pending.length + dropOuts.length}` },
+          { value: 'match', label: `Match · ${matchRequests.length}` },
+        ]}
+      >
+        <TabsContent value="join" className="flex flex-col gap-3">
+          {dropOuts.length ? (
+            <section className="flex flex-col gap-2">
+              <h3 className="m-0 text-sm">Can't make it · {dropOuts.length}</h3>
+              <p className="m-0 text-[13px] text-fg2">
+                The slot stays until you remove the player.
+              </p>
+              <div className="divide-y divide-border">
+                {dropOuts.map(({ id: dropId, ...props }) => (
+                  <DropOutNoticeRow key={dropId} {...props} />
+                ))}
+              </div>
+            </section>
+          ) : null}
+          {pending.length && dropOuts.length ? (
+            <h3 className="m-0 text-sm">Join requests · {pending.length}</h3>
+          ) : null}
+          <p className="m-0 text-[13px] text-fg2">
+            {pending.length ? (
+              <>
+                Check each one is a real person you expect (ask at the door, or match their name and
+                phone) before confirming. Oldest first.
+                {slotsFull && !live
+                  ? ' Slots are full, so confirmed players go on the waitlist.'
+                  : ''}
+              </>
+            ) : (
+              <>
+                No join requests waiting.
+                {confirmed + declined > 0
+                  ? ` ${confirmed} confirmed, ${declined} declined so far.`
+                  : ' Anyone who opens the session link can ask for a slot; they show up here.'}
+              </>
+            )}
+          </p>
+          {serverError ? <Notice tone="error">{serverError}</Notice> : null}
+          {pending.length ? (
+            <div className="flex flex-col divide-y divide-border">
+              {pending.map((r) => {
+                const level = levelOf(r)
+                const error = errors[r.id]
+                const details = requestDetails[r.id]
+                return (
+                  <div key={r.id} className="flex flex-col gap-2.5 py-3">
+                    <div className="flex min-w-0 items-center gap-3">
+                      <Avatar name={r.name} />
+                      <span className="flex min-w-0 flex-1 flex-col">
+                        <b className="font-semibold [overflow-wrap:anywhere]">
+                          {r.name}
+                          {r.nickname ? <span className="text-fg2"> “{r.nickname}”</span> : null}
+                        </b>
+                        <span className="text-[13px] text-fg2">
+                          {details?.account ? (
+                            `Requested ${formatTime(r.requestedAt)}`
+                          ) : (
+                            <>
+                              {r.phoneE164 ? localPhone(r.phoneE164) : 'No phone given'} · says{' '}
+                              {BAND_LABEL[r.statedBand]} · requested {formatTime(r.requestedAt)}
+                            </>
+                          )}
+                        </span>
+                        {details?.account ? (
+                          <span className="text-[13px] text-fg2">
+                            Shared rank: {details.sharedRank ?? 'none yet'}
+                          </span>
+                        ) : null}
+                        {details?.invitedBy ? (
+                          <span className="text-[13px] text-fg2">
+                            Invited by {details.invitedBy}
+                          </span>
+                        ) : null}
+                      </span>
+                      {details?.account ? (
+                        <Chip tone={details.account === 'in-club' ? 'accent' : 'warn'}>
+                          ROTRA player ·{' '}
+                          {details.account === 'in-club'
+                            ? 'already in your club'
+                            : 'new to your club'}
+                        </Chip>
+                      ) : (
+                        <Chip tone="warn">Guest request</Chip>
+                      )}
+                    </div>
+                    {details?.phoneMatch ? (
+                      details.phoneMatch.linked ? (
+                        <Notice tone="success">
+                          Linked to {details.phoneMatch.name} from your saved players.
+                        </Notice>
+                      ) : (
+                        <Notice
+                          action={
+                            <div className="flex gap-2">
+                              <Button
+                                size="xs"
+                                variant="primary"
+                                disabled={isPending}
+                                onClick={details.phoneMatch.onLink}
+                              >
+                                Link
+                              </Button>
+                              <Button
+                                size="xs"
+                                disabled={isPending}
+                                onClick={details.phoneMatch.onNotThem}
+                              >
+                                Not them
+                              </Button>
+                            </div>
+                          }
+                        >
+                          Is this {details.phoneMatch.name} from your saved players?
+                        </Notice>
+                      )
+                    ) : null}
+                    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 max-sm:grid-cols-1">
+                      <LevelSelect
+                        disabled={isPending}
+                        value={level}
+                        onChange={(next) => setLevel(r.id, next)}
+                        aria-label={`Level for ${r.name}`}
+                        missing={Boolean(error) && level == null}
+                      />
+                      <div className="flex flex-wrap items-center gap-2 max-sm:[&>*]:flex-1">
+                        <Button
+                          size="sm"
+                          disabled={isPending}
+                          onClick={() => onDecline(r.id)}
+                          aria-label={`Decline ${r.name}`}
+                        >
+                          Decline
+                        </Button>
+                        <Button
+                          size="sm"
+                          disabled={isPending}
+                          variant="primary"
+                          onClick={() => confirm(r)}
+                          aria-label={`${slotsFull && !live ? 'Confirm to waitlist' : details?.account ? 'Confirm' : 'Confirm guest'} ${r.name}`}
+                        >
+                          {slotsFull && !live
+                            ? 'Confirm to waitlist'
+                            : details?.account
+                              ? 'Confirm'
+                              : 'Confirm guest'}
+                        </Button>
+                      </div>
+                    </div>
+                    <span
+                      aria-live="polite"
+                      className="text-[13px] font-semibold text-error empty:hidden"
+                    >
+                      {error}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+          ) : null}
+        </TabsContent>
+        <TabsContent value="match">
+          {matchRequests.length ? (
+            <div className="divide-y divide-border">
+              {matchRequests.map(({ id: matchId, ...props }) => (
+                <MatchRequestCard key={matchId} {...props} />
+              ))}
+            </div>
+          ) : (
+            <p className="m-0 text-[13px] text-fg2">
+              No match requests. Present players can ask for a match from the session page.
+            </p>
+          )}
+        </TabsContent>
+      </Tabs>
     </section>
   )
 

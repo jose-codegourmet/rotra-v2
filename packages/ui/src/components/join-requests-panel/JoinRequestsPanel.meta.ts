@@ -3,13 +3,11 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const joinRequestsPanelMeta = {
   name: 'JoinRequestsPanel',
   description:
-    'The join requests guests sent from the session link, oldest first: initials, name and nickname, phone (or "No phone given"), stated band and time, a Guest request chip, a level select preset to the middle of the stated band, and Decline / Confirm guest (Confirm to waitlist when slots are full).',
+    'Requests panel with Join and Match tabs, drop-out notices, join requests and match requests.',
   usage: [
-    'Use the card variant on Preparation above the tabs while requests are waiting, next to SessionLinkCard.',
-    'Use the sheet variant inside the live console\'s "Join requests" Sheet: no card chrome and no heading, since the sheet title names it.',
-    'Confirming with no level shows "Choose a level for this club before confirming." and does not call onConfirm. The container owns the confirm/decline mutations and their toasts.',
-    "A request's phone shows only here, for the Queue Master; never put this panel or its rows on a public screen.",
-    'Pass loading while the roster query runs (the live console sheet): Skeleton rows, never fake names.',
+    'Pass requestDetails for ROTRA player hints and phone-match actions, and dropOuts and matchRequests with callbacks. Counts are derived from those lists.',
+    'Use variant sheet inside a Sheet titled Requests with a Done footer; card variant supplies the heading and introduction.',
+    'The caller owns all mutations, linking and request lifecycle. The panel checks that a level is selected before confirming.',
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',

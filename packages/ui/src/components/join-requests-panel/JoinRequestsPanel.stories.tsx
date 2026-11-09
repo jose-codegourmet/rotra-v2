@@ -48,7 +48,7 @@ function SheetDemo({ slotsFull, loading }: { slotsFull?: boolean; loading?: bool
       <Sheet
         open={open}
         onOpenChange={setOpen}
-        title="Join requests"
+        title="Requests"
         wide
         footer={<Button onClick={() => setOpen(false)}>Done</Button>}
       >
@@ -79,3 +79,79 @@ export const AdmissionPending: Story = { args: { live: true, isPending: true } }
 export const AdmissionError: Story = {
   args: { live: true, serverError: 'Changes could not be saved' },
 }
+
+const dropOuts = [
+  { id: 'drop', name: 'Paolo Reyes', timeLabel: '7:20 PM', onRemove: fn(), onKeep: fn() },
+]
+const matchRequests = [
+  {
+    id: 'match',
+    requesterName: 'Miguel Santos',
+    formatLabel: '2 v 2 doubles',
+    requestedLabel: '7:21 PM',
+    spots: [
+      {
+        role: 'Requester' as const,
+        player: {
+          name: 'Miguel Santos',
+          games: 3,
+          minimumGames: 4,
+          level: 'advanced_low' as const,
+        },
+      },
+      { role: 'Partner' as const },
+      { role: 'Opponent' as const },
+      { role: 'Opponent' as const },
+    ],
+    onDecline: fn(),
+    onAddToQueue: fn(),
+  },
+]
+const firstId = joinRequests[0]?.id ?? ''
+const secondId = joinRequests[1]?.id ?? ''
+export const WithDropOuts: Story = { args: { dropOuts } }
+export const PlayerRequests: Story = {
+  args: {
+    requestDetails: {
+      [firstId]: { account: 'in-club', sharedRank: 'Intermediate Mid', invitedBy: 'Miguel Santos' },
+      [secondId]: { account: 'new-to-club', sharedRank: null },
+    },
+  },
+}
+export const PhoneMatch: Story = {
+  args: {
+    requestDetails: {
+      [firstId]: { phoneMatch: { name: 'Kiko Salazar', onLink: fn(), onNotThem: fn() } },
+    },
+  },
+}
+export const PhoneLinked: Story = {
+  args: {
+    requestDetails: {
+      [firstId]: {
+        phoneMatch: { name: 'Kiko Salazar', linked: true, onLink: fn(), onNotThem: fn() },
+      },
+    },
+  },
+}
+export const MatchTab: Story = {
+  args: { matchRequests },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('tab', { name: 'Match · 1' }))
+  },
+}
+export const EmptyMatchTab: Story = {
+  args: { requests: [] },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('tab', { name: 'Match · 0' }))
+  },
+}
+export const WithDropOutsLight: Story = { ...WithDropOuts, globals: { theme: 'light' } }
+export const PlayerRequestsLight: Story = { ...PlayerRequests, globals: { theme: 'light' } }
+export const PhoneMatchLight: Story = { ...PhoneMatch, globals: { theme: 'light' } }
+export const PhoneLinkedLight: Story = { ...PhoneLinked, globals: { theme: 'light' } }
+export const MatchTabLight: Story = { ...MatchTab, globals: { theme: 'light' } }
+export const EmptyMatchTabLight: Story = { ...EmptyMatchTab, globals: { theme: 'light' } }
+export const SlotsFullLight: Story = { ...SlotsFull, globals: { theme: 'light' } }
+export const LevelErrorLight: Story = { ...LevelError, globals: { theme: 'light' } }
+export const InSheetLight: Story = { ...InSheet, globals: { theme: 'light' } }

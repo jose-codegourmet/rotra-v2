@@ -71,3 +71,22 @@ export const MoreThanEight: Story = {
     })),
   },
 }
+
+export const Singles: Story = {
+  args: {
+    wins: 0,
+    losses: 1,
+    games: [
+      {
+        id: 'single',
+        format: 'singles',
+        partners: [],
+        opponents: ['Bea Castillo'],
+        opponentPlayers: [{ name: 'Bea Castillo', picture: portrait(1) }],
+        counting: 'counted',
+        result: 'lost',
+        score: '17–21',
+      },
+    ],
+  },
+}

@@ -122,6 +122,15 @@ export async function renderSharePng(
         )
       }
       ctx.restore()
+      if (element.hasAttribute('data-share-winner')) {
+        ctx.save()
+        ctx.strokeStyle = palette.getPropertyValue('--share-accent').trim()
+        ctx.lineWidth = 2
+        ctx.beginPath()
+        ctx.roundRect(r.x - 1, r.y - 1, r.w + 2, r.h + 2, radius + 1)
+        ctx.stroke()
+        ctx.restore()
+      }
       if (element.hasAttribute('data-qr-tile')) {
         const svg = element.querySelector('svg')
         if (!svg) return null

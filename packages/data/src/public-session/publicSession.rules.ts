@@ -113,8 +113,7 @@ export function playerSlot(
     roster:
       state.roster.find((r) => r.sessionId === session.id && linked.has(r.clubPlayerId)) ?? null,
     waitlist:
-      state.waitlist.find((w) => w.sessionId === session.id && linked.has(w.clubPlayerId)) ??
-      null,
+      state.waitlist.find((w) => w.sessionId === session.id && linked.has(w.clubPlayerId)) ?? null,
   }
 }
 
@@ -129,4 +128,30 @@ export function makeInviteCode(taken: ReadonlySet<string> = new Set()): string {
     const code = Array.from(bytes, (b) => INVITE_ALPHABET[b % INVITE_ALPHABET.length]).join('')
     if (!taken.has(code)) return code
   }
+}
+
+/** First word of a displayed name: “Jose Adrian” → “Jose”, a masked “Y*** Z***” → “Y***”. */
+export function publicFirstName(name: string): string {
+  return name.trim().split(/\s+/).filter(Boolean)[0] ?? 'Player'
+}
+
+/** “with A vs B, C”; “vs B, C” when the viewer plays alone; “with A” with no opponent named yet. */
+export function myMatchLabel(partners: string[], opponents: string[]): string {
+  const withPart = partners.length ? `with ${partners.join(', ')}` : ''
+  const vsPart = opponents.length ? `vs ${opponents.join(', ')}` : ''
+  return [withPart, vsPart].filter(Boolean).join(' ')
+}
+
+/** Refresh on the session page is disabled for 10 s after a tap (D-2026-11-09-04). */
+export const REFRESH_THROTTLE_MS = 10_000
+
+/** When Refresh works again after a refresh at `lastRefreshedAt`; null when it never ran. */
+export function refreshAvailableAt(lastRefreshedAt: number | null): number | null {
+  return lastRefreshedAt === null ? null : lastRefreshedAt + REFRESH_THROTTLE_MS
+}
+
+/** True when Refresh may run at `now` (never refreshed, or 10 s have passed). */
+export function canRefreshNow(lastRefreshedAt: number | null, now = Date.now()): boolean {
+  const next = refreshAvailableAt(lastRefreshedAt)
+  return next === null || now >= next
 }

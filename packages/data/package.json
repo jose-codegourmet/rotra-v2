@@ -251,6 +251,8 @@
     "./public-session/usePublicSession": "./src/public-session/usePublicSession.ts",
     "./public-session/useSendJoinRequest": "./src/public-session/useSendJoinRequest.ts",
     "./public-session/useMyJoinRequest": "./src/public-session/useMyJoinRequest.ts",
+    "./public-session/useMyNight": "./src/public-session/useMyNight.ts",
+    "./public-session/useRefreshSession": "./src/public-session/useRefreshSession.ts",
     "./fixtures/financials": "./src/fixtures/financials.ts",
     "./inventory/types": "./src/inventory/inventory.types.ts",
     "./fixtures/inventory": "./src/fixtures/inventory.ts",

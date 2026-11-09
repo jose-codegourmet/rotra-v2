@@ -4,6 +4,7 @@ import type { ClubSettingsSection } from '@rotra/ui/club-settings-menu'
 const SLUGS: Record<ClubSettingsSection, string> = {
   identity: 'club-identity',
   defaults: 'session-defaults',
+  invite: 'invite',
   post: 'facebook-post',
   license: 'license',
   device: 'this-device',

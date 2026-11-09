@@ -10,9 +10,13 @@ import { usePostPreview } from '@rotra/data/club/usePostPreview'
 import { useRequestClubNameChange } from '@rotra/data/club/useRequestClubNameChange'
 import { useResetFacebookPostTemplate } from '@rotra/data/club/useResetFacebookPostTemplate'
 import { useSaveFacebookPost } from '@rotra/data/club/useSaveFacebookPost'
+import { useRegenerateClubInvite } from '@rotra/data/club/useRegenerateClubInvite'
+import { useRestorePreviousClubLogo } from '@rotra/data/club/useRestorePreviousClubLogo'
 import { useUpdateClubLogo } from '@rotra/data/club/useUpdateClubLogo'
+import { useUpdateSelfCheckIn } from '@rotra/data/club/useUpdateSelfCheckIn'
 import { useUpdateSessionDefaults } from '@rotra/data/club/useUpdateSessionDefaults'
 import { useDeviceDownloads } from '@rotra/data/device/useDeviceDownloads'
+import { clubInviteUrl } from '@rotra/data/club-player/registration-url'
 import { DEMO_CLUB_ID } from '@rotra/data/fixtures/clubs'
 import { licensePaymentsCsv } from '@rotra/data/license/fetchers'
 import { useClubLicense } from '@rotra/data/license/useClubLicense'
@@ -26,6 +30,7 @@ import { Breadcrumb } from '@rotra/ui/breadcrumb'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { ClubIdentityPanel } from '@rotra/ui/club-identity-panel'
+import { ClubInvitePanel } from '@rotra/ui/club-invite-panel'
 import { ClubSettingsMenu, type ClubSettingsSection } from '@rotra/ui/club-settings-menu'
 import { FacebookPostEditor, type PostDraft } from '@rotra/ui/facebook-post-editor'
 import { ChangePasswordForm } from '@rotra/ui/forms/change-password-form'
@@ -45,6 +50,7 @@ import { selectAccount } from '@/store/slices/authSlice'
 import { selectDev } from '@/store/slices/devSlice'
 import { useOperatorShell } from '../../../_components/operator-shell/DockAction.context'
 import { QueryError } from '../../../_components/query-error/QueryError'
+import { ShareClubInviteSheet } from '../share-club-invite-sheet/ShareClubInviteSheet'
 import { slugFromSection } from './sections'
 
 const POST_KEY_LIST = POST_KEYS.map(([key, label]) => ({ key, label }))
@@ -193,6 +199,11 @@ export function ClubSettings({ section }: ClubSettingsProps) {
   const nowCard = useNowCard()
 
   const logo = useUpdateClubLogo()
+  const restoreLogo = useRestorePreviousClubLogo()
+  const regenerateInvite = useRegenerateClubInvite()
+  const selfCheckIn = useUpdateSelfCheckIn()
+  const [shareOpen, setShareOpen] = useState(false)
+  const [regenerateOpen, setRegenerateOpen] = useState(false)
   const requestName = useRequestClubNameChange()
   const cancelName = useCancelClubNameChange()
   const defaults = useUpdateSessionDefaults()
@@ -245,6 +256,13 @@ export function ClubSettings({ section }: ClubSettingsProps) {
       clubName={data.name}
       initials={data.initials}
       logoUrl={data.logoUrl ?? undefined}
+      previousLogoUrl={data.logoPreviousUrl ?? undefined}
+      onUsePreviousLogo={() =>
+        restoreLogo.mutate(undefined, {
+          onSuccess: () => toast('Previous logo restored'),
+          onError: (error) => toast.error(errorMessage(error)),
+        })
+      }
       foundingAddress={data.foundingAddress}
       cityCode={data.cityCode}
       offline={offline}
@@ -256,7 +274,7 @@ export function ClubSettings({ section }: ClubSettingsProps) {
             }
           : undefined
       }
-      isPending={logo.isPending || requestName.isPending || cancelName.isPending}
+      isPending={logo.isPending || restoreLogo.isPending || requestName.isPending || cancelName.isPending}
       onError={(message) => toast.error(message)}
       onLogoChange={(dataUrl) =>
         logo.mutate(
@@ -296,7 +314,18 @@ export function ClubSettings({ section }: ClubSettingsProps) {
     <SessionDefaultsPanel
       playersPerCourt={data.defaultPlayersPerCourt}
       entranceFeeMinor={data.defaultEntranceFeeMinor}
-      isPending={defaults.isPending}
+      selfCheckInEnabled={data.selfCheckInEnabled !== false}
+      onSelfCheckInChange={(enabled) =>
+        selfCheckIn.mutate(
+          { enabled },
+          {
+            onSuccess: () =>
+              toast(enabled ? 'Players can check themselves in' : 'Only you mark presence now'),
+            onError: (error) => toast.error(errorMessage(error)),
+          },
+        )
+      }
+      isPending={defaults.isPending || selfCheckIn.isPending}
       onPlayersPerCourtChange={(value) =>
         defaults.mutate(
           { defaultPlayersPerCourt: value, defaultEntranceFeeMinor: data.defaultEntranceFeeMinor },
@@ -320,6 +349,30 @@ export function ClubSettings({ section }: ClubSettingsProps) {
             onError: (error) => toast.error(errorMessage(error)),
           },
         )
+      }
+    />
+  ) : section === 'invite' ? (
+    <ClubInvitePanel
+      link={clubInviteUrl(data.id, data.inviteCode ?? '')}
+      onCopyLink={() => {
+        try {
+          void navigator.clipboard.writeText(clubInviteUrl(data.id, data.inviteCode ?? ''))
+        } catch {
+          // Clipboard unavailable; the link is selectable in the field
+        }
+        toast('Club invite link copied')
+      }}
+      onShareClubInvite={() => setShareOpen(true)}
+      confirmOpen={regenerateOpen}
+      onConfirmOpenChange={setRegenerateOpen}
+      onRegenerate={() =>
+        regenerateInvite.mutate(undefined, {
+          onSuccess: () => {
+            setRegenerateOpen(false)
+            toast('Club invite link regenerated')
+          },
+          onError: (error) => toast.error(errorMessage(error)),
+        })
       }
     />
   ) : section === 'post' ? (
@@ -374,6 +427,9 @@ export function ClubSettings({ section }: ClubSettingsProps) {
         />
         <div className="flex min-w-0 max-w-[820px] flex-col gap-4">{content}</div>
       </div>
+      {data ? (
+        <ShareClubInviteSheet club={data} open={shareOpen} onOpenChange={setShareOpen} />
+      ) : null}
       <SignOutSheet
         open={signOutOpen}
         onOpenChange={setSignOutOpen}

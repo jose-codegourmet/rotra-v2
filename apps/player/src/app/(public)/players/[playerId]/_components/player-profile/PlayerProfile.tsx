@@ -10,6 +10,14 @@ import { PLAYING_LEVELS } from '@rotra/data/player/types'
 import { usePlayerGames } from '@rotra/data/player/usePlayerGames'
 import { usePlayerProfile } from '@rotra/data/player/usePlayerProfile'
 import { usePlayerRank } from '@rotra/data/player/usePlayerRank'
+import { useMyClubs } from '@rotra/data/player-club/useMyClubs'
+import { useLeaveClub } from '@rotra/data/player-club/useLeaveClub'
+import { useMySessions } from '@rotra/data/player/useMySessions'
+import { PlayerClubsCard } from '@rotra/ui/player-clubs-card'
+import { MySessionsCard } from '@rotra/ui/my-sessions-card'
+import { ConfirmSheet } from '@rotra/ui/confirm-sheet'
+import { Skeleton } from '@rotra/ui/skeleton'
+import { useState } from 'react'
 import { useMyAccount } from '@rotra/data/player-account/useMyAccount'
 import { useRankingSettings } from '@rotra/data/ranking-settings'
 import { AccountPanel } from '@rotra/ui/account-panel'
@@ -43,6 +51,8 @@ function finishedAgo(finishedAt: string) {
     : format.format(-Math.round(hours / 24), 'day')
 }
 
+const REPORT_PROBLEM_EMAIL = 'support@rotra.example'
+
 export function PlayerProfile({ playerId }: { playerId: string }) {
   const profile = usePlayerProfile(playerId),
     rank = usePlayerRank(playerId),
@@ -59,6 +69,11 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
   const myAccount = useMyAccount(isOwn ? playerId : null),
     contactRequest = useMyContactChangeRequest(isOwn ? playerId : null),
     signOut = useSignOut('player')
+  const clubs = useMyClubs(isOwn ? playerId : null)
+  const mySessions = useMySessions(isOwn ? playerId : null)
+  const leaveClub = useLeaveClub()
+  const [leaving, setLeaving] = useState<string | null>(null)
+  const leavingClub = clubs.data?.find(c => c.id === leaving)
   const player = profile.data,
     current = rank.data
   const pictureEditor = useProfilePictureSheet(isOwn ? player : null)
@@ -188,6 +203,8 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
               onSignOut={leaveSignedOut}
             />
           ) : null}
+          {isOwn ? clubs.isPending ? <Skeleton className="h-36"/> : clubs.isError ? <ErrorState title="Couldn't load your clubs." onRetry={() => void clubs.refetch()}/> : <PlayerClubsCard clubs={(clubs.data ?? []).map(club => ({ ...club, reportHref: `mailto:${REPORT_PROBLEM_EMAIL}?subject=${encodeURIComponent(`Problem with ${club.name}`)}&body=${encodeURIComponent(`Club: ${club.name}\nMy ROTRA player ID: ${player.rtrId}\n\nWhat went wrong:\n`)}` }))} onLeave={id => { leaveClub.reset(); setLeaving(id) }}/> : null}
+          <ConfirmSheet open={!!leavingClub} onOpenChange={next => { if (!next) setLeaving(null) }} title={`Leave ${leavingClub?.name ?? ''}?`} consequence="You're removed from the club's saved players. Your past games stay." confirmLabel="Leave club" backLabel="Cancel" isPending={leaveClub.isPending} error={leaveClub.error?.message} onConfirm={() => { if (leavingClub) leaveClub.mutate(leavingClub.id, { onSuccess: () => { setLeaving(null); toast(`You left ${leavingClub.name}`) }, onError: error => toast.error(error.message) }) }}/>
         </>
       }
       main={
@@ -236,6 +253,7 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
             needsReassessment={current.state === 'needs_reassessment'}
             sentence={eligibility}
           />
+          {isOwn ? mySessions.isPending ? <Skeleton className="h-40"/> : mySessions.isError ? <ErrorState title="Couldn't load your sessions." onRetry={() => void mySessions.refetch()}/> : <MySessionsCard sessions={mySessions.data?.sessions ?? []} finished={mySessions.data?.finished}/> : null}
           <RecentGamesCard
             sessions={games.data}
             onOpenAll={() => router.push(`/players/${playerId}/games`)}

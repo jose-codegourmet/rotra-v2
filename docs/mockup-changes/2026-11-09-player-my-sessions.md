@@ -1,6 +1,6 @@
 # The own profile has a My sessions card
 
-Status: IN PROGRESS — #588
+Status: IN MOCK APP — #588
 Date: 2026-11-09
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › Own profile › My sessions

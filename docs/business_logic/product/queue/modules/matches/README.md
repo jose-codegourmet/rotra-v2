@@ -69,7 +69,7 @@ Score rules:
 
 A review step shows the winner, the opponents, the score or "No score entered", and the court(s), then **Confirm Team A wins** (or B). After confirmation, the winner and any submitted scores are **permanent**. Neither the operator nor Admin can edit them. This follows the user's “touch move” rule.
 
-Completion frees the occupied court(s). The permanent result can remain locally pending sync during offline operation.
+Completion frees the occupied court(s). The permanent result can remain locally pending sync during offline operation. After every confirmed result, in both Manual Queue and Auto Queue, the operator is offered the next match for the freed court (a pick of the first two ready waiting matches, or Skip for now); see [the next-match picker](../queueing/README.md#auto-queue-and-manual-queue-court-filling).
 
 ## Substitutions
 

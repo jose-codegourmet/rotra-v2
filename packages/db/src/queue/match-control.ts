@@ -213,6 +213,8 @@ export async function autoFillCourts(
     operationId: string
     exceptMatchId?: string
     onlyCourtIds?: string[]
+    /** Courts left free: the court the next-match picker opens for after a result (Q-NEXT-MATCH) */
+    exceptCourtIds?: string[]
   } & AutoFillOptions,
 ) {
   if (input.replay || session.state !== 'active' || session.courtFillMode !== 'auto') return []
@@ -220,6 +222,7 @@ export async function autoFillCourts(
   const placements = autoFillPlacements(ctx, {
     exceptMatchId: input.exceptMatchId,
     onlyCourtIds: input.onlyCourtIds,
+    exceptCourtIds: input.exceptCourtIds,
   })
   if (!placements.length) return []
   const now = new Date()
@@ -688,7 +691,7 @@ async function decide(
   matchId: string,
   operationId: string,
   outcome: Outcome,
-  options: AutoFillOptions,
+  options: AutoFillOptions & { exceptCourtIds?: string[] },
 ) {
   let autoPlaced: AutoPlaced = []
   const done = await matchCommand(context, sessionId, {}, async (tx, session) => {
@@ -750,6 +753,8 @@ export async function completeMatch(
     winningTeam?: 'A' | 'B' | null
     teamAScore?: number | null
     teamBScore?: number | null
+    /** The court the next-match picker opens for: Auto Queue leaves it free (Q-NEXT-MATCH) */
+    holdCourtId?: string | null
   },
   options: AutoFillOptions = {},
 ) {
@@ -770,7 +775,7 @@ export async function completeMatch(
       teamAScore: input.teamAScore ?? null,
       teamBScore: input.teamBScore ?? null,
     },
-    options,
+    { ...options, exceptCourtIds: input.holdCourtId ? [input.holdCourtId] : undefined },
   )
 }
 

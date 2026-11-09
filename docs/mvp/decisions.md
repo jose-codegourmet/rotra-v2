@@ -20,6 +20,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-08-03](#d-2026-11-08-03) | Profile pictures in Supabase Storage | approved | in progress | #522, #542 (epic #502) | [Player](workstreams/player.md) |
 | [D-2026-11-08-04](#d-2026-11-08-04) | Scheduled jobs: Supabase pg_cron calls protected Route Handlers | approved | not started | #545; #546, #547 blocked | [Backend](workstreams/backend.md) |
 | [D-2026-11-08-06](#d-2026-11-08-06) | Player access to public Queue sessions | approved | implemented in source; authenticated real verification pending | #569 | [Queue](workstreams/queue.md) |
+| [D-2026-11-09-01](#d-2026-11-09-01) | Next-match picker after every result | approved | in progress | #579 | [Queue](workstreams/queue.md) |
 
 ## Status conventions
 
@@ -211,3 +212,12 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   ring decision and November 7 name masking decision. No club/operator access or automatic confirmation.
 - **Flow:** credentialed exact-origin Player-hosted read; separate audience cookies; allowlisted return
   context and expiring Queue-local draft. See architecture § Player access to a public Queue session.
+
+<a id="d-2026-11-09-01"></a>
+### D-2026-11-09-01 — Next-match picker after every result (#579)
+- **Decision status:** approved by the owner (Jose), November 9, 2026.
+- **Implementation status:** in progress (mockup and docs in the #579 PR; real app in the same PR).
+- **Ticket:** #579
+- **Roadmap:** MVP — [Queue](workstreams/queue.md).
+- **Decision:** (1) Left and right are two equal options; neither is preferred. (2) Candidates are the first two waiting matches in Main Queue order that are ready for the freed court (one court needed, not blocked), the same readiness check Auto Queue and Q-CHOOSE-MATCH use; no new ranking or pairing rules. (3) The picker opens after every confirmed result, in both Manual Queue and Auto Queue. Picking places the match On court (getting ready, never started); Skip for now places nothing and Auto Queue then fills that court as usual.
+- **References:** [Q-NEXT-MATCH](../screens/product/modules/queue/match-control.md#q-next-match--next-match-picker-after-a-result), [court filling rule](../business_logic/product/queue/modules/queueing/README.md#auto-queue-and-manual-queue-court-filling), [mockup log](../mockup-changes/2026-11-09-queue-next-match-picker.md).

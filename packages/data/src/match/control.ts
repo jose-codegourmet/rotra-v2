@@ -201,13 +201,18 @@ export function swapWithQueue(input: {
     'Queue',
   )
 }
-/** Match done. In Auto Queue the freed court(s) get the next eligible match in the same write. */
+/**
+ * Match done. In Auto Queue the freed court(s) get the next eligible match in the same write,
+ * except `holdCourtId`: the court the next-match picker (Q-NEXT-MATCH) opens for stays free, and
+ * Skip for now hands it back to Auto Queue (fillOpenedCourts with afterSkip).
+ */
 export function completeMatch(input: {
   matchId: string
   winningTeam?: 'A' | 'B' | null
   teamAScore?: number | null
   teamBScore?: number | null
   operationId: string
+  holdCourtId?: string
 }) {
   if (isRealDataMode()) return realCompleteMatch(input)
   return control(input, 'complete', (s, m) => {
@@ -227,7 +232,9 @@ export function completeMatch(input: {
       teamBScore: input.teamBScore ?? null,
       confirmedAt: m.endedAt,
     }
-    const placed = autoFillCourts(s, m.sessionId)
+    const placed = autoFillCourts(s, m.sessionId, {
+      exceptCourtIds: input.holdCourtId ? [input.holdCourtId] : undefined,
+    })
     return `Team ${result.winner} wins match ${m.matchNo} · ${courtNames(m, s.courts)} free${autoFillNote(s, placed)}`
   })
 }

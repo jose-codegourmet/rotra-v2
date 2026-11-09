@@ -56,7 +56,11 @@ function autoFillOn(s: MockState, sessionId: string) {
 export function autoFillCourts(
   s: MockState,
   sessionId: string,
-  options: { exceptMatchId?: string; onlyCourtIds?: readonly string[] } = {},
+  options: {
+    exceptMatchId?: string
+    onlyCourtIds?: readonly string[]
+    exceptCourtIds?: readonly string[]
+  } = {},
 ): Match[] {
   if (!autoFillOn(s, sessionId)) return []
   const now = Date.now()
@@ -104,12 +108,22 @@ export function setCourtFillMode(input: { sessionId: string; mode: CourtFillMode
   )
 }
 
+/** The fill toast: "Court open · Match 5 on Court 2 · getting ready", or just the placement after Skip for now. */
+export const courtFillText = (note: string, afterSkip?: boolean) =>
+  afterSkip ? note.replace(/^ · /, '') : `Court open${note}`
+
 /**
  * Auto Queue when courts reach their planned opening time (the console notices on its refresh,
  * as the prototype does every 30 seconds). Fills only `courtIds`, and only in Auto Queue while
  * online; with nothing to place it writes nothing. `data` is the number of matches placed.
+ * `afterSkip`: Skip for now on the next-match picker (Q-NEXT-MATCH) hands the court it held back
+ * to Auto Queue; the toast is then just "Match 5 on Court 2 · getting ready".
  */
-export function fillOpenedCourts(input: { sessionId: string; courtIds: string[] }) {
+export function fillOpenedCourts(input: {
+  sessionId: string
+  courtIds: string[]
+  afterSkip?: boolean
+}) {
   if (isRealDataMode()) return realFillOpenedCourts(input)
   const current = readMockState()
   const none =
@@ -120,6 +134,6 @@ export function fillOpenedCourts(input: { sessionId: string; courtIds: string[] 
   if (none) return Promise.resolve({ savedOffline: false, message: '', data: 0 })
   return queueMutation({ area: 'Queue', sessionId: input.sessionId }, (s) => {
     const placed = autoFillCourts(s, input.sessionId, { onlyCourtIds: input.courtIds })
-    return { data: placed.length, text: `Court open${autoFillNote(s, placed)}` }
+    return { data: placed.length, text: courtFillText(autoFillNote(s, placed), input.afterSkip) }
   })
 }

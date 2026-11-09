@@ -1,6 +1,6 @@
 # Match start, substitutions, and permanent outcomes
 
-**Surfaces:** `Q-DISPATCH`, `Q-CHOOSE-MATCH`, `Q-ON-COURT`, `Q-ACTIVE-MATCH`, `Q-SUBSTITUTE`, `Q-MATCH-DONE`, `Q-INVALID-MATCH`, `Q-MATCH-RECORD`.
+**Surfaces:** `Q-DISPATCH`, `Q-CHOOSE-MATCH`, `Q-ON-COURT`, `Q-ACTIVE-MATCH`, `Q-SUBSTITUTE`, `Q-MATCH-DONE`, `Q-NEXT-MATCH`, `Q-INVALID-MATCH`, `Q-MATCH-RECORD`.
 
 **Source:** [match rules](../../../../business_logic/product/queue/modules/matches/README.md). Dialog language: [shared confirmations](../../dialogs.md). **Reference:** [ROTRA Queue prototype](../../../../../apps/mockup/queue-app/rotra-queue.html).
 
@@ -8,7 +8,7 @@
 
 ## Q-DISPATCH — Put a waiting match on court
 
-**Entry (Manual Queue, or by hand in Auto Queue):** **Put on court** on a free court, **Put on court** on a ready queue card, or the row action in Q-CHOOSE-MATCH. In Auto Queue, ROTRA places the next eligible match itself, without this sheet; 5v5 matches and courts not open yet are always placed by hand here. A court whose booking ended still gets filled; the end is a reminder.
+**Entry (Manual Queue, or by hand in Auto Queue):** **Put on court** on a free court, **Put on court** on a ready queue card, or the row action in Q-CHOOSE-MATCH. In Auto Queue, ROTRA places the next eligible match itself, without this sheet, on every free court except the one a result just freed: that court goes through [Q-NEXT-MATCH](#q-next-match--next-match-picker-after-a-result) first, and Auto Queue fills it only if the operator skips; 5v5 matches and courts not open yet are always placed by hand here. A court whose booking ended still gets filled; the end is a reminder.
 
 Sheet “Put match N on court”: format chip (plus **Fun game**), Team A vs Team B as picture cards (names and levels; drag a player onto the other team to switch sides, see [switch sides](match-queue.md)), and **Court** buttons for every free court — “Choose two free courts” for 5v5 with “5v5 uses two courts as one match.” The court that opened the sheet is preselected (plus a second free court for 5v5).
 
@@ -88,6 +88,30 @@ After confirmation:
 - Offline: the toast adds “Saved on this device, waiting to sync”.
 
 Submission timeout: first establish whether the confirmation was saved; retry the same operation, never a competing outcome.
+
+## Q-NEXT-MATCH — Next-match picker after a result
+
+**Owner decisions, November 9, 2026** ([log](../../../../mockup-changes/2026-11-09-queue-next-match-picker.md), issue #579):
+
+1. **Left and right are two equal options.** Neither side is preferred; swipe or tap toward the one you want.
+2. **Candidates** are the first two waiting matches in Main Queue order that are ready for the freed court: one court needed and not blocked (the same readiness check as Auto Queue and Q-CHOOSE-MATCH). No new ranking or pairing rule.
+3. **The picker opens after every confirmed result**, in both Manual Queue and Auto Queue.
+
+**Entry:** **Confirm Team X wins** on Q-MATCH-DONE. The match becomes done as before, then this sheet opens for the freed court (the first freed court of a 5v5 match; the other freed court is handled as before). With Auto Queue on, every other free court is filled as before, but the freed court is **not**: the picker replaces the automatic fill for that court.
+
+**Sheet “Next on Court N”:** intro “Match N is done. Pick the match that goes on next. It goes on court getting ready; you start it from the court.” Two cards in a two-column grid, side by side at every width including 375 px (gap 8 px). Each card: a small muted “Left” / “Right” label, “#P” (queue position) and the format chip, Team A names, “vs”, Team B names (names wrap, never truncate), and a full-width primary **Pick this** (aria-label “Put match #P on Court N: Team A vs Team B”). Footer: **Skip for now**.
+
+**Pick:** rechecks, then places the match **On court** (**Getting ready**, timer not started), exactly like Put on court. Toast “Match N on Court X · getting ready”. It never starts the match. If the match is no longer ready: error notice “That match is not ready any more. Pick again.”, candidates refresh, nothing is placed.
+
+**Skip for now** (also Close, Escape and the backdrop): places nothing. Manual Queue leaves the court free. Auto Queue then fills that one court exactly as before.
+
+| Candidates | Shows |
+|---|---|
+| Two | Both cards; on touch screens the hint “Swipe left or right to pick, or tap Pick this.” |
+| One | Only that card, full width, with no empty second slot, no “Left/Right” label, no hint and no swipe; its **Pick this** is the only pick control |
+| None | Notice “No ready match for Court N right now.” and only a **Close** button (behaves as Skip). No fake option |
+
+**Touch swipe (coarse pointer, two candidates only):** a horizontal drag on the card pair moves it with the finger (slight tilt, at most 6 degrees). Dragging left highlights the left card (accent border, scale 1.02); dragging right highlights the right card. Release picks that side when the drag is at least 96 px (or 30 % of the pair width, whichever is smaller) and horizontal movement clearly dominates vertical (|dx| > 1.5 × |dy|); otherwise the pair snaps back in 150 ms and nothing happens. Vertical scrolling is never taken for a swipe. With reduced motion, no tilt or movement, only the highlight. Desktop (fine pointer): no drag; the two buttons pick. Keyboard: Left and Right arrow keys move focus between the two **Pick this** buttons; Enter or Space picks.
 
 ## Q-INVALID-MATCH — End without a counted game
 

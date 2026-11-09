@@ -501,6 +501,19 @@ button.qf:hover .avatar { box-shadow: 0 0 0 2px var(--accent); }
 .opt[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-subtle); }
 .opt:disabled { opacity: .45; cursor: not-allowed; }
 .opt .main { flex: 1; min-width: 0; }
+/* Q-NEXT-MATCH: two equal cards side by side at every width; the pair follows a touch swipe. */
+.nm-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; touch-action: pan-y; will-change: transform; }
+.nm-pair.one { grid-template-columns: minmax(0, 1fr); }
+.nm-pair.snap { transition: transform .15s ease; }
+.nm-card { display: flex; flex-direction: column; gap: 8px; padding: 12px; background: var(--bg); border: 1px solid var(--border-strong); border-radius: var(--r); min-width: 0; transition: transform .12s ease, border-color .12s ease; }
+.nm-card.lean { border-color: var(--accent); transform: scale(1.02); }
+.nm-head { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.nm-names { display: flex; flex-direction: column; gap: 2px; flex: 1; overflow-wrap: anywhere; }
+.nm-names b { font-weight: 700; }
+.nm-names .vs { text-align: left; }
+.nm-hint { display: none; }
+@media (pointer: coarse) { .nm-hint { display: block; } }
+@media (prefers-reduced-motion: reduce) { .nm-pair.snap, .nm-card { transition: none; } .nm-card.lean { transform: none; } }
 .shell { --rail: 232px; --topbar: 57px; display: grid; grid-template-columns: var(--rail) minmax(0, 1fr); align-items: start; }
 .shell.rail-min { --rail: 68px; }
 .shell-main { min-width: 0; }
@@ -1472,6 +1485,9 @@ function swapCandidate(s, m) {
   m.status = 'oncourt';
   return next || null;
 }
+// Q-NEXT-MATCH: the first two waiting matches, in Main Queue order, that are ready for one free court.
+// Same readiness check as Auto Queue and Put a match on. No new ranking.
+const nextCandidates = (s) => waiting(s).filter((m) => courtsNeeded(m) === 1 && !blockOf(s, m)).slice(0, 2);
 const autoNote = (s, placed) => placed.map((m) => ` · Match ${m.seq} on ${courtsOf(s, m)} · getting ready`).join('');
 const attention = (s) => waiting(s).filter((m) => (blockOf(s, m) || {}).kind === 'attention');
 
@@ -1487,7 +1503,7 @@ const AREA = {
   togglePaid: 'Payments', markAllPaid: 'Payments', savePayAmount: 'Payments', togglePresent: 'Roster', allPresent: 'Roster', allAbsent: 'Roster', giveSlot: 'Roster', fillSlots: 'Roster', removeWait: 'Roster', confirmAdd: 'Roster', confirmNew: 'Roster', setLevel: 'Roster', saveEditPlayer: 'Roster', confirmDeletePlayer: 'Roster',
   confirmStart: 'Session', confirmCancelSession: 'Session', confirmDeleteSession: 'Session', saveSetup: 'Session setup', confirmDone: 'Session done', confirmPublish: 'Published results',
   makeMatch: 'Queue', saveEditor: 'Queue', addSuggest: 'Queue', autoCommit: 'Queue', confirmRegen: 'Queue', move: 'Queue', moveTo: 'Queue', swapSides: 'Queue', removeWaiting: 'Queue',
-  confirmDispatch: 'Matches and results', placeOnCourt: 'Matches and results', startOnCourt: 'Matches and results', sendBack: 'Queue', confirmSwap: 'Queue', confirmReplace: 'Matches and results', confirmMove: 'Matches and results', setCourtFill: 'Courts and time', confirmResult: 'Matches and results', confirmSub: 'Matches and results', confirmInvalid: 'Matches and results',
+  confirmDispatch: 'Matches and results', placeOnCourt: 'Matches and results', startOnCourt: 'Matches and results', sendBack: 'Queue', confirmSwap: 'Queue', confirmReplace: 'Matches and results', confirmMove: 'Matches and results', setCourtFill: 'Courts and time', confirmResult: 'Matches and results', pickNextMatch: 'Matches and results', skipNextMatch: 'Matches and results', confirmSub: 'Matches and results', confirmInvalid: 'Matches and results',
   confirmAddCourt: 'Courts and time', removeCourt: 'Courts and time', confirmOpenEarly: 'Courts and time', dispatchOpenEarly: 'Courts and time', undoEarly: 'Courts and time', addCourt: 'Courts and time', extend: 'Courts and time',
 };
 let curAct = null;
@@ -4291,6 +4307,26 @@ const SHEETS = {
         return `<div class="opt" style="cursor:default"><span class="qt-pos">#${i + 1}</span><div class="main"><b>${esc(listNames(m.teamA))} <span class="muted">vs</span> ${esc(listNames(m.teamB))}</b><div class="small ${b ? 'muted' : ''}" style="${b ? '' : 'color:var(--accent)'}">${FORMAT_LABEL[m.format]} · ${b ? esc(b.text) : 'Ready to go on court'}</div></div><button class="btn xs ${b ? '' : 'primary'}" data-act="${courtsNeeded(m) === 2 ? 'openDispatch' : 'placeOnCourt'}" data-id="${m.id}" data-court="${sh.court}" ${b ? 'disabled' : ''}>Put on court</button></div>`;
       }).join('')}</div>`, '<button class="btn" data-act="closeSheet">Close</button>');
   },
+  nextMatch(sh) {
+    const s = cur(), court = esc(courtLabel(s, sh.court)), order = waiting(s);
+    const cands = nextCandidates(s);
+    const intro = `<p class="small muted">Match ${sh.seq} is done. Pick the match that goes on next. It goes on court getting ready; you start it from the court.</p>`;
+    const err = sh.err ? notice('bad', esc(sh.err)) : '';
+    if (!cands.length) return sheetShell(`Next on ${court}`, `${intro}${err}${notice('', `No ready match for ${court} right now.`)}`, '<button class="btn" data-act="closeSheet" data-autofocus>Close</button>');
+    const card = (m, side) => {
+      const a = esc(listNames(m.teamA)), b = esc(listNames(m.teamB)), pos = order.indexOf(m) + 1;
+      return `<article class="nm-card" data-nm-side="${side}">
+        ${cands.length > 1 ? `<span class="small muted">${side === 'left' ? 'Left' : 'Right'}</span>` : ''}
+        <div class="nm-head"><span class="qt-pos">#${pos}</span>${chip(FORMAT_LABEL[m.format], 'solid')}</div>
+        <div class="nm-names"><b>${a}</b><span class="vs muted small">vs</span><b>${b}</b></div>
+        <button class="btn primary" data-act="pickNextMatch" data-id="${m.id}" data-next-pick="${side}" aria-label="Put match #${pos} on ${court}: ${a} vs ${b}" ${side === 'left' ? 'data-autofocus' : ''}>Pick this</button></article>`;
+    };
+    const two = cands.length > 1;
+    return sheetShell(`Next on ${court}`, `${intro}${err}
+      <div class="nm-pair ${two ? '' : 'one'}" ${two ? 'data-nm-swipe' : ''}>${card(cands[0], 'left')}${two ? card(cands[1], 'right') : ''}</div>
+      ${two ? '<p class="small muted nm-hint">Swipe left or right to pick, or tap Pick this.</p>' : ''}`,
+      '<button class="btn" data-act="skipNextMatch">Skip for now</button>');
+  },
   invItem(sh) {
     return sheetShell(sh.id ? 'Edit item' : 'Add item', `
       <label class="field"><span>Name</span><input class="input${sh.err ? ' bad' : ''}" id="inv-name" data-bind="ui.sheet.name" value="${esc(sh.name || '')}" placeholder="e.g. Yonex Aerosensa 30" data-autofocus>${sh.err ? `<span class="err">${esc(sh.err)}</span>` : ''}</label>
@@ -4437,7 +4473,17 @@ function applyVenue(v, msg) {
   S.ui.sheet = null; render();
   toast(msg || (fee || entry ? `${v.name} · ${[fee && `court fee ${peso(v.courtFee)}/h`, entry && `entrance ${peso(v.entranceFee)}`].filter(Boolean).join(' and ')} filled in` : `${v.name} selected`));
 }
+// Skip for now (also Close, Escape and the backdrop): the picker places nothing. Manual Queue leaves the court free;
+// Auto Queue then fills that one court exactly as before.
+function skipNextMatch() {
+  const sh = S.ui.sheet, s = cur();
+  curAct = 'skipNextMatch'; S.ui.sheet = null;
+  const placed = autoFill(s, { only: [sh.court] });
+  if (placed.length) commit(autoNote(s, placed).slice(3));
+  render();
+}
 function closeSheet() {
+  if (S.ui.sheet?.type === 'nextMatch') { skipNextMatch(); return; }
   // A time picker opened from inside another dialog returns to that dialog.
   if (S.ui.sheet?.type === 'timePick') { const k = S.ui.sheet.k; S.ui.sheet = S.ui.timeBack || null; S.ui.timeBack = null; render(); document.getElementById(DT[k]?.id || `dt-${k.replace(/\W/g, '-')}`)?.focus(); return; }
   flushPayments(); S.ui.sheet = null; render();
@@ -5113,8 +5159,21 @@ const ACT = {
     if (m.status !== 'active') { closeSheet(); return; }
     m.status = 'done'; m.winner = sh.winner; m.endedAt = Date.now();
     if (sh.mode === 'scores') { m.scoreA = +sh.a; m.scoreB = +sh.b; }
-    S.ui.sheet = null; commit(`Team ${sh.winner} wins match ${m.seq} · ${courtsOf(s, m)} free${autoNote(s, autoFill(s))}`); render();
+    // The first freed court is offered to the picker (Q-NEXT-MATCH); Auto Queue fills every other court as before.
+    const first = m.courts[0];
+    const placed = autoFill(s, { only: s.courts.map((c) => c.id).filter((id) => id !== first) });
+    S.ui.sheet = { type: 'nextMatch', court: first, seq: m.seq, err: '' };
+    commit(`Team ${sh.winner} wins match ${m.seq} · ${courtsOf(s, m)} free${autoNote(s, placed)}`); render();
   },
+  // Pick one of the two offered matches: placed On court (getting ready), never started. Rechecked first.
+  pickNextMatch: (d) => {
+    const s = cur(), sh = S.ui.sheet, m = s.matches.find((x) => x.id === d.id);
+    if (!sh || sh.type !== 'nextMatch') return;
+    if (!m || m.status !== 'waiting' || courtsNeeded(m) !== 1 || blockOf(s, m) || !freeCourts(s).some((c) => c.id === sh.court)) { sh.err = 'That match is not ready any more. Pick again.'; render(); return; }
+    placeMatch(m, [sh.court]);
+    S.ui.sheet = null; commit(`Match ${m.seq} on ${courtsOf(s, m)} · getting ready`); render();
+  },
+  skipNextMatch: () => skipNextMatch(),
   openSub: (d) => openSheet({ type: 'sub', id: d.id, out: null, in: null, credit: 'none', step: '' }),
   confirmSub: () => {
     const s = cur(), sh = S.ui.sheet, m = s.matches.find((x) => x.id === sh.id);
@@ -5338,6 +5397,12 @@ document.addEventListener('keydown', (e) => {
   if (el.matches && el.matches('.qt-grip[data-id]') && ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
     e.preventDefault(); curAct = 'move'; ACT.move({ id: el.dataset.id, d: e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 1 }); return;
   }
+  // Next match picker: arrow keys move focus between the two Pick this buttons. Enter or Space still does the picking.
+  if (el.matches && el.matches('[data-next-pick]') && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+    const to = document.querySelector(`[data-next-pick="${e.key === 'ArrowLeft' ? 'left' : 'right'}"]`);
+    if (to) { e.preventDefault(); to.focus(); }
+    return;
+  }
   // Keyboard alternative to dragging a player across: swap with the player opposite.
   if (el.dataset && el.dataset.swap && el.dataset.pid && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
     e.preventDefault();
@@ -5459,6 +5524,42 @@ function endDrag(apply) {
 }
 document.addEventListener('pointerup', () => endDrag(true));
 document.addEventListener('pointercancel', () => endDrag(false));
+
+// Q-NEXT-MATCH touch swipe: drag the card pair left or right. Past the threshold the leaned side is picked; otherwise it snaps back.
+let nswipe = null;
+const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+document.addEventListener('pointerdown', (e) => {
+  const pair = e.pointerType === 'mouse' ? null : e.target.closest('[data-nm-swipe]');
+  if (!pair) return;
+  pair.classList.remove('snap');
+  nswipe = { pair, id: e.pointerId, x: e.clientX, y: e.clientY, dx: 0, grabbed: false };
+});
+document.addEventListener('pointermove', (e) => {
+  if (!nswipe || e.pointerId !== nswipe.id) return;
+  const dx = e.clientX - nswipe.x, dy = e.clientY - nswipe.y;
+  if (!nswipe.grabbed) {
+    if (Math.abs(dy) > 10 && Math.abs(dy) >= Math.abs(dx)) { nswipe = null; return; }
+    if (Math.abs(dx) < 8 || Math.abs(dx) <= Math.abs(dy) * 1.5) return;
+    nswipe.grabbed = true;
+    try { nswipe.pair.setPointerCapture(e.pointerId); } catch (err) { /* capture unsupported */ }
+  }
+  nswipe.dx = dx;
+  const side = dx < 0 ? 'left' : 'right';
+  nswipe.pair.style.transform = reduceMotion() ? '' : `translateX(${dx}px) rotate(${Math.max(-6, Math.min(6, dx / 20))}deg)`;
+  nswipe.pair.querySelectorAll('.nm-card').forEach((c) => c.classList.toggle('lean', c.dataset.nmSide === side));
+});
+function endSwipe(apply) {
+  if (!nswipe) return;
+  const { pair, dx, grabbed } = nswipe;
+  nswipe = null;
+  pair.classList.add('snap'); pair.style.transform = '';
+  pair.querySelectorAll('.nm-card').forEach((c) => c.classList.remove('lean'));
+  if (!apply || !grabbed || Math.abs(dx) < Math.min(96, pair.offsetWidth * 0.3)) return;
+  const b = pair.querySelector(`[data-next-pick="${dx < 0 ? 'left' : 'right'}"]`);
+  if (b) { curAct = 'pickNextMatch'; ACT.pickNextMatch({ id: b.dataset.id }); }
+}
+document.addEventListener('pointerup', () => endSwipe(true));
+document.addEventListener('pointercancel', () => endSwipe(false));
 
 // Drag a player onto someone on the other team to switch sides: queue tiles, Start match, Suggested match and Edit lineup.
 // A mouse or pen drag starts after a few pixels; on touch, press and hold first so the page still scrolls.

@@ -482,6 +482,8 @@ export async function realCompleteMatch(input: {
   teamAScore?: number | null
   teamBScore?: number | null
   operationId: string
+  /** The court the next-match picker opens for: Auto Queue leaves it free (Q-NEXT-MATCH) */
+  holdCourtId?: string
 }) {
   requireOperationId(input.operationId)
   const { sessionId, courts } = await controlContext(input.matchId)
@@ -494,6 +496,7 @@ export async function realCompleteMatch(input: {
         winningTeam: input.winningTeam ?? null,
         teamAScore: input.teamAScore ?? null,
         teamBScore: input.teamBScore ?? null,
+        ...(input.holdCourtId ? { holdCourtId: input.holdCourtId } : {}),
       },
     },
   )
@@ -671,7 +674,12 @@ export async function realSetCourtFillMode(input: { sessionId: string; mode: Cou
 }
 
 /** Auto Queue for courts that reached their planned opening time; `data` is how many were placed. */
-export async function realFillOpenedCourts(input: { sessionId: string; courtIds: string[] }) {
+export async function realFillOpenedCourts(input: {
+  sessionId: string
+  courtIds: string[]
+  /** Skip for now on the next-match picker: the toast is just the placement */
+  afterSkip?: boolean
+}) {
   if (!input.courtIds.length) return { savedOffline: false, message: '', data: 0 }
   const path = `${sessionPath(input.sessionId)}/court-fill`
   const { result } = await realRequest<CourtFillReply>(path, {
@@ -680,5 +688,6 @@ export async function realFillOpenedCourts(input: { sessionId: string; courtIds:
   })
   const placed = result.placed.map(matchOf)
   if (!placed.length) return { savedOffline: false, message: '', data: 0 }
-  return accepted(placed.length, `Court open${await autoNote(input.sessionId, placed)}`)
+  const note = await autoNote(input.sessionId, placed)
+  return accepted(placed.length, input.afterSkip ? note.replace(/^ · /, '') : `Court open${note}`)
 }

@@ -2,6 +2,8 @@ import { cn } from '@rotra/ui/cn'
 import { ResultSlideFrame, type ResultSlideFrameProps } from '@rotra/ui/result-slide-frame'
 
 export type StandingsSlideRow = {
+  /** Stable row id; only needed to be matched by `highlightRowId` */
+  id?: string
   /** Unique position, 1-based */
   position: number
   name: string
@@ -13,6 +15,8 @@ export type StandingsSlideRow = {
 export type StandingsSlideProps = Omit<ResultSlideFrameProps, 'title' | 'children'> & {
   /** Players with at least one counted game, already ordered (Q08.4 computes this) */
   rows: StandingsSlideRow[]
+  /** The viewer's own row on the public page: accent-subtle background, bold, aria-current */
+  highlightRowId?: string
 }
 
 const TH = 'px-1.5 py-1 text-left text-[11px] tracking-[0.6px] text-fg2 uppercase'
@@ -21,10 +25,11 @@ const NUM = 'w-[42px] text-right'
 
 /**
  * Slide 1 — Standings: the prototype's .st-table (#, Player, W, L, G) inside the result slide
- * frame, with tabular numbers and the leader in accent. Read-only; shows the empty copy when no
+ * frame, with tabular numbers and the leader in accent; `highlightRowId` marks the viewer's own row
+ * on the public page. Read-only; shows the empty copy when no
  * counted games were recorded.
  */
-export function StandingsSlide({ rows, ...frame }: StandingsSlideProps) {
+export function StandingsSlide({ rows, highlightRowId, ...frame }: StandingsSlideProps) {
   return (
     <ResultSlideFrame {...frame} title="Standings">
       {rows.length ? (
@@ -49,18 +54,25 @@ export function StandingsSlide({ rows, ...frame }: StandingsSlideProps) {
             </tr>
           </thead>
           <tbody>
-            {rows.map((r, i) => (
-              <tr
-                key={`${r.position}-${r.name}`}
-                className={cn(i === 0 && 'font-bold text-accent')}
-              >
-                <td className={TD}>{r.position}</td>
-                <td className={cn(TD, '[overflow-wrap:anywhere]')}>{r.name}</td>
-                <td className={cn(TD, NUM)}>{r.wins}</td>
-                <td className={cn(TD, NUM)}>{r.losses}</td>
-                <td className={cn(TD, NUM)}>{r.games}</td>
-              </tr>
-            ))}
+            {rows.map((r, i) => {
+              const own = highlightRowId !== undefined && r.id === highlightRowId
+              return (
+                <tr
+                  key={`${r.position}-${r.name}`}
+                  aria-current={own ? 'true' : undefined}
+                  className={cn(
+                    i === 0 && 'font-bold text-accent',
+                    own && 'bg-accent-subtle font-bold',
+                  )}
+                >
+                  <td className={TD}>{r.position}</td>
+                  <td className={cn(TD, '[overflow-wrap:anywhere]')}>{r.name}</td>
+                  <td className={cn(TD, NUM)}>{r.wins}</td>
+                  <td className={cn(TD, NUM)}>{r.losses}</td>
+                  <td className={cn(TD, NUM)}>{r.games}</td>
+                </tr>
+              )
+            })}
           </tbody>
         </table>
       ) : (

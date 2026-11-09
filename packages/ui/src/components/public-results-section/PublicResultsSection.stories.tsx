@@ -42,3 +42,21 @@ export const NotSharedPhone: Story = {
   args: { published: null },
   globals: { viewport: { value: 'phone' } },
 }
+
+/** Signed-in viewer: their own Standings row is highlighted (passed through the standings slide). */
+export const OwnRowHighlighted: Story = {
+  args: {
+    published: {
+      standings: {
+        ...standingsSlide,
+        rows: standings.map((r) => ({ ...r, id: `row-${r.position}` })),
+        highlightRowId: 'row-5',
+      },
+      awards: awardsSlide,
+    },
+  },
+}
+export const OwnRowHighlightedLight: Story = {
+  ...OwnRowHighlighted,
+  globals: { theme: 'light' },
+}

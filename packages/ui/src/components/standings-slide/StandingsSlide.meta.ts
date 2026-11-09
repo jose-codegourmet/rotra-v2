@@ -7,6 +7,7 @@ export const standingsSlideMeta = {
   usage: [
     'Use for the Standings tab of the private results view, on the public session page when Standings are published, and as the reference for standings image frames.',
     'Rows arrive ordered with unique positions from the standings maths (Q08.4); the slide computes nothing and never sorts.',
+    "On the signed-in public page pass highlightRowId (matching a row id) to mark the viewer's own row with an accent-subtle background.",
     'Use LiveLeaderboard for the in-session table with levels and the minimum-games meter, not this.',
   ],
   prototype: {

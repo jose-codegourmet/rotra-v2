@@ -31,3 +31,12 @@ export const LongNames: Story = {
   },
   globals: { viewport: { value: 'phone' } },
 }
+
+/** The public page's signed-in version: the viewer's own row in accent-subtle. */
+export const OwnRowHighlighted: Story = {
+  args: {
+    rows: standings.map((r) => ({ ...r, id: `row-${r.position}` })),
+    highlightRowId: 'row-5',
+  },
+}
+export const OwnRowHighlightedLight: Story = { ...OwnRowHighlighted, globals: { theme: 'light' } }

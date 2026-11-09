@@ -1,6 +1,6 @@
 # Queue prototype script split into plain JS modules
 
-Status: NEW
+Status: CANCELLED — the module split was never committed; the Queue mockup keeps its single inline script, and apps/mockup/queue-app/js/ is not in the repository
 Date: 2026-11-07
 App: queue (prototype infrastructure only)
 Mockup: apps/mockup/queue-app/rotra-queue.html → apps/mockup/queue-app/js/

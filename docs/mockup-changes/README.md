@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 1 · TICKETED: 34 · IN MOCK APP: 68 · MOCKUP ONLY: 4
+TICKETED: 34 · IN MOCK APP: 68 · CANCELLED: 1 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -212,10 +212,10 @@ NEW: 1 · TICKETED: 34 · IN MOCK APP: 68 · MOCKUP ONLY: 4
 | [2026-11-07-queue-public-masked-names](2026-11-07-queue-public-masked-names.md) | Public page shows masked participant and waitlist names | — | IN MOCK APP — #475 (PR #482) |
 | [2026-11-07-queue-public-skill-mix](2026-11-07-queue-public-skill-mix.md) | Public page shows an aggregate skill mix above the participants | — | IN MOCK APP — #474 (PR #482) |
 | [2026-11-07-queue-roster-skill-mix-bar](2026-11-07-queue-roster-skill-mix-bar.md) | Skill mix bar above the roster when grouped by Skill group | — | IN MOCK APP — #472 (PR #482) |
-| [2026-11-07-queue-script-modules](2026-11-07-queue-script-modules.md) | Queue prototype script split into plain JS modules | — | NEW |
+| [2026-11-07-queue-script-modules](2026-11-07-queue-script-modules.md) | Queue prototype script split into plain JS modules | — | CANCELLED — the module split was never committed; the Queue mockup keeps its single inline script, and apps/mockup/queue-app/js/ is not in the repository |
 | [2026-11-07-queue-session-qr](2026-11-07-queue-session-qr.md) | Session QR button and sheet added to the Preparation header | — | IN MOCK APP — #471 (PR #482) |
 | [2026-11-08-admin-club-sales-tab](2026-11-08-admin-club-sales-tab.md) | Club page gets a Sales tab | sales-stat-card, admin-nav | IN MOCK APP — #504 |
-| [2026-11-08-admin-edit-profile-email](2026-11-08-admin-edit-profile-email.md) | Edit profile gets an Email field that sends a contact-change request | player-edit-form, player-review-changes | IN MOCK APP — #564 |
+| [2026-11-08-admin-edit-profile-email](2026-11-08-admin-edit-profile-email.md) | Edit profile gets an Email field that sends a contact-change request | player-edit-form, player-review-changes | IN MOCK APP — #564 (superseded by 2026-11-09-admin-edit-player-everything) |
 | [2026-11-08-admin-password-reset-requests](2026-11-08-admin-password-reset-requests.md) | Admin-reviewed password reset requests | — | IN MOCK APP — #491 (PR #494) |
 | [2026-11-08-admin-players-layout](2026-11-08-admin-players-layout.md) | Admin Players page gets a cleaner layout | admin-player-stats, admin-player-filters, admin-player-card, admin-player-bulk-bar, player-pagination, admin-player-quick-view, admin-player-history | IN MOCK APP — #503 (PR #566) |
 | [2026-11-08-admin-sales-page](2026-11-08-admin-sales-page.md) | Admin gets a Sales page | sales-stat-card, admin-nav | IN MOCK APP — #504 |

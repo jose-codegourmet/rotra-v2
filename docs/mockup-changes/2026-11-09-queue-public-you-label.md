@@ -1,6 +1,6 @@
 # Session page: the signed-in viewer's own tile is labelled You
 
-Status: IN PROGRESS — #585
+Status: IN MOCK APP — #585
 Date: 2026-11-09
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Public session page › Participants, Waitlist

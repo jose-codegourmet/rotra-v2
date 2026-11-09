@@ -1,5 +1,6 @@
 'use client'
 
+import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import {
   courtOpen,
   type MatchContext,
@@ -7,6 +8,8 @@ import {
   shortName,
   waitingMatches,
 } from '@rotra/data/match/match.rules'
+import { queueSearchHitCount } from '@rotra/data/match/queueSearch.rules'
+import { useClearQueue } from '@rotra/data/match/useClearQueue'
 import type { Match } from '@rotra/data/match/types'
 import { useMoveMatch } from '@rotra/data/match/useMoveMatch'
 import { useRemoveWaitingMatch } from '@rotra/data/match/useRemoveWaitingMatch'
@@ -16,10 +19,13 @@ import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import type { QueueWorkspace } from '@rotra/ui/auto-queue-workspace'
 import { Button } from '@rotra/ui/button'
+import { ConfirmSheet } from '@rotra/ui/confirm-sheet'
 import { Card } from '@rotra/ui/card'
 import { EmptyState } from '@rotra/ui/empty-state'
 import type { MatchCardPlayer } from '@rotra/ui/match-card'
 import { Notice } from '@rotra/ui/notice'
+import { profilePictureSrc } from '@rotra/ui/profile-picture'
+import { QueueSearchField } from '@rotra/ui/queue-search-field'
 import { QueueGrid, type QueueGridMatch } from '@rotra/ui/queue-grid'
 import { Skeleton } from '@rotra/ui/skeleton'
 import type { SwapSlot } from '@rotra/ui/swap-sides-area'
@@ -69,6 +75,11 @@ export function QueueView({
   onStartMatch,
 }: QueueViewProps) {
   const [workspace, setWorkspace] = useState<QueueWorkspace>('main')
+  const [search, setSearch] = useState('')
+  const [clearOpen, setClearOpen] = useState(false)
+  const [clearError, setClearError] = useState<string | undefined>()
+  const clubPlayers = useClubPlayers()
+  const clearQueue = useClearQueue()
   const session = useQueueSession(sessionId)
   const roster = useSessionRoster(sessionId)
   const matches = useSessionMatches(sessionId)
@@ -123,8 +134,16 @@ export function QueueView({
   const byId = (id: string) => ctx.roster.find((p) => p.id === id)
   const player = (id: string): MatchCardPlayer => {
     const p = byId(id)
+    const clubPlayer = p && clubPlayers.data?.players.find((item) => item.id === p.clubPlayerId)
     return {
       id,
+      photoUrl: clubPlayer
+        ? profilePictureSrc(
+            clubPlayer.picture,
+            clubPlayer.playerId ?? clubPlayer.id,
+            clubPlayer.pictureName ?? clubPlayer.fullName,
+          )
+        : undefined,
       name: p?.nameSnapshot ?? 'Player',
       shortName: p ? shortName(p) : 'Player',
       level: p?.level ?? null,
@@ -196,6 +215,17 @@ export function QueueView({
               >
                 Regenerate
               </Button>
+              <Button
+                size="sm"
+                variant="danger-solid"
+                disabled={waiting.length === 0}
+                onClick={() => {
+                  setClearError(undefined)
+                  setClearOpen(true)
+                }}
+              >
+                Clear queue
+              </Button>
             </div>
           </div>
           {attention ? (
@@ -208,8 +238,18 @@ export function QueueView({
             One waiting list for every court. {MODE_LABELS[s.sessionMode]} mode guides suggestions;
             you can override any of it.
           </p>
+          <QueueSearchField
+            value={search}
+            onChange={setSearch}
+            matchCount={queueSearchHitCount(waiting, ctx.roster, search)}
+          />
           {waiting.length ? (
-            <QueueGrid matches={cards} onMove={onMove} onSwapSides={onSwapSides} />
+            <QueueGrid
+              matches={cards}
+              searchText={search}
+              onMove={onMove}
+              onSwapSides={onSwapSides}
+            />
           ) : (
             <Card padding="none">
               <EmptyState>
@@ -217,6 +257,32 @@ export function QueueView({
               </EmptyState>
             </Card>
           )}
+          <ConfirmSheet
+            open={clearOpen}
+            onOpenChange={(open) => {
+              setClearOpen(open)
+              if (!open) setClearError(undefined)
+            }}
+            title="Clear the queue?"
+            consequence={`${waiting.length} waiting match${waiting.length === 1 ? '' : 'es'} will be removed from the Main Queue.`}
+            note="Matches already on a court and finished matches are not affected. You can add or generate matches again afterwards."
+            backLabel="Keep queue"
+            confirmLabel="Clear queue"
+            destructive
+            solidDanger
+            isPending={clearQueue.isPending}
+            error={clearError}
+            onConfirm={() =>
+              clearQueue.mutate(sessionId, {
+                onSuccess: (result) => {
+                  setClearOpen(false)
+                  setClearError(undefined)
+                  toast(result.message)
+                },
+                onError: (error) => setClearError(errorMessage(error)),
+              })
+            }
+          />
         </section>
       }
     />

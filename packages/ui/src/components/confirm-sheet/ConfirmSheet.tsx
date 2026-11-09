@@ -31,6 +31,8 @@ export type ConfirmSheetProps = {
   error?: ReactNode
   /** Danger styling for the primary (invalid match, reset) */
   destructive?: boolean
+  /** Use the solid danger style for the Clear queue confirmation. */
+  solidDanger?: boolean
   /** Primary stays disabled until the choice is complete (e.g. courts not chosen) */
   confirmDisabled?: boolean
 }
@@ -55,6 +57,7 @@ export function ConfirmSheet({
   isPending = false,
   error,
   destructive,
+  solidDanger = false,
   confirmDisabled,
 }: ConfirmSheetProps) {
   // One commit per attempt, even if a second click lands before the parent re-renders with isPending.
@@ -84,7 +87,7 @@ export function ConfirmSheet({
             {backLabel}
           </Button>
           <Button
-            variant={destructive ? 'danger' : 'primary'}
+            variant={solidDanger ? 'danger-solid' : destructive ? 'danger' : 'primary'}
             loading={isPending}
             disabled={confirmDisabled}
             onClick={confirm}

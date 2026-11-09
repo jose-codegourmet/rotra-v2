@@ -131,3 +131,19 @@ export const Pending: Story = { args: { isPending: true } }
 export const FailsOnce: Story = { render: () => <Demo failFirst /> }
 
 export const Phone: Story = { render: () => <Demo />, globals: { viewport: { value: 'phone' } } }
+
+export const ClearQueue: Story = {
+  render: () => (
+    <Demo
+      title="Clear the queue?"
+      summary={undefined}
+      consequence="1 waiting match will be removed from the Main Queue."
+      note="Matches already on a court and finished matches are not affected. You can add or generate matches again afterwards."
+      backLabel="Keep queue"
+      confirmLabel="Clear queue"
+      destructive
+      solidDanger
+    />
+  ),
+}
+export const ClearQueueLight: Story = { ...ClearQueue, globals: { theme: 'light' } }

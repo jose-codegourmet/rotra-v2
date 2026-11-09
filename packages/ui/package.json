@@ -169,6 +169,7 @@
     "./session-peek-sheet": "./src/components/session-peek-sheet/SessionPeekSheet.tsx",
     "./session-record-header": "./src/components/session-record-header/SessionRecordHeader.tsx",
     "./session-setup-card": "./src/components/session-setup-card/SessionSetupCard.tsx",
+    "./share-card": "./src/components/share-card/ShareCard.tsx",
     "./short-on-players-banner": "./src/components/short-on-players-banner/ShortOnPlayersBanner.tsx",
     "./setup-court-picture": "./src/components/setup-court-picture/SetupCourtPicture.tsx",
     "./setup-step-bar": "./src/components/setup-step-bar/SetupStepBar.tsx",

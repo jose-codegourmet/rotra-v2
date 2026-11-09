@@ -8,7 +8,7 @@ import { PLAYING_LEVELS, type PlayingLevel } from '../player/player.types'
 import { isRealDataMode } from '../real/mode'
 import { realAddDirectoryPlayerToClub, realAddNewSavedPlayer } from '../real/queue'
 import { levelLabel } from '../session-roster/sessionRoster.rules'
-import type { ClubPlayer } from './clubPlayer.types'
+import type { ClubPlayer, JoinedVia } from './clubPlayer.types'
 
 function fail(text: string): never {
   throw new MockError('permission', text)
@@ -40,17 +40,22 @@ export function createClubPlayer(
     identity: parsed ? 'pending' : 'guest',
     playingLevel,
     addedAt: Date.now(),
+    joinedVia: 'added',
   }
   s.clubPlayers.push(p)
   if (parsed?.success) s.privatePhones[p.id] = parsed.data
   return p
 }
 
-/** The saved club player for a Player Information profile, created (registered) when missing. */
+/**
+ * The saved club player for a Player Information profile, created (registered) when missing.
+ * `joinedVia` marks a new row only: the join-request confirm path (Q17/Q18) passes `session`.
+ */
 export function clubPlayerForProfile(
   s: MockState,
   profileId: string,
   playingLevel: PlayingLevel | null = directoryLevel(profileId),
+  joinedVia: JoinedVia = 'added',
 ) {
   const profile = directoryPlayers.find((p) => p.id === profileId)
   if (!profile || s.adminPlayerRecords[profile.id]?.archivedAt) fail('Player not available.')
@@ -65,6 +70,7 @@ export function clubPlayerForProfile(
     identity: 'registered',
     playingLevel,
     addedAt: Date.now(),
+    joinedVia,
   }
   s.clubPlayers.push(player)
   return { player, created: true }

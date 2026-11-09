@@ -330,6 +330,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - **Your clubs** shows on the player's own profile only, with **Leave club** (removes them from that club's Saved players; past games stay) and **Report a problem** for each club.
   - **Report a problem** opens an email to ROTRA support, with the club name and RTR ID filled in. There's no table and no Admin screen in v1. **The support address is a placeholder; the owner supplies it before the real-app ticket ships.**
   - **Ranking risk accepted.** A club that adds a player can record games that count toward that player's shared rank. This is accepted for v1. The protection is Report a problem, plus Admin marking that club's sessions invalid.
+  - **Linking a guest who shares a session with the saved player** (owner, November 10, 2026): the link is refused, and the Queue Master removes one of the two slots first. No ranking or payment surprises.
   - **Names for the three invites:** **Registration invite** (per guest, already exists), **Club invite link** and **Session invite** (see [D-2026-11-09-08](#d-2026-11-09-08)).
 - **References:** [registration screens](../screens/product/modules/player-information/access-registration.md), [identity module](../business_logic/product/player-information/modules/identity/README.md), [product terms](../product-terms.md) (Registration invite, Unclaimed profile, RTR ID).
 
@@ -435,7 +436,10 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - The picture is an uploaded photo, one of the characters from the [character library](#d-2026-11-09-13), or initials. Characters and initials store no file.
   - **Only the current and the previous photo are kept**, the same rule as [D-2026-11-09-10](#d-2026-11-09-10). **Use previous picture** swaps them; **Remove** returns to initials and keeps the removed photo as the previous one.
   - It shows wherever that player appears for the club, including the public session page under the masking rules of [D-2026-11-07-06](#d-2026-11-07-06).
-- **Open:** what happens to a club-set picture when the player later claims the profile (proposal: it becomes their starting picture, which they can change), and where a guest's picture is stored, since guests have no `players` row. Ask before building.
+- **Owner answers (November 10, 2026):**
+  - **On claim:** the club-set picture becomes the player's starting picture, which they can change.
+  - **Storage:** on the club's saved-player record (`club_players.avatar_ref`, `avatar_previous_ref`) for guests and unclaimed players alike; on claim it follows the answer above.
+  - **Characters:** Edit details uses the same picker and pager as P06.1 (#630), 8 per page; the mockup's eight faces are page 1 of the library.
 - **References:** [mockup log](../mockup-changes/2026-11-09-queue-club-set-player-pictures.md), [open decisions](../business_logic/product/open-decisions.md).
 
 <a id="d-2026-11-09-13"></a>

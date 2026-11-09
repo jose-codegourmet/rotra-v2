@@ -5,6 +5,7 @@ import { mockStore, readMockState } from '../mock/store'
 import { isRealDataMode } from '../real/mode'
 import { realGetClubPlayerDetails, realUpdateClubPlayerDetails } from '../real/queue'
 import type { ClubPlayerDetails, ClubPlayerDetailsInput } from './clubPlayer.types'
+import { clubPictureState } from './clubPlayerPicture.rules'
 
 const NOT_EDITABLE = 'This player registered, so they keep their own details.'
 const number = (typed: string) => (typed.trim() ? Number(typed) : null)
@@ -29,6 +30,7 @@ export async function getClubPlayerDetails(id: string): Promise<ClubPlayerDetail
     fullName: row.fullName,
     nickname: row.nickname,
     phoneOnFile: Boolean(account?.phone) || row.identity === 'pending',
+    picture: clubPictureState(row, profile?.picture ?? null),
     profile:
       row.identity === 'unclaimed' && profile
         ? {

@@ -8,6 +8,7 @@ import { requireClubAccess } from '../mock/transaction'
 import { isRealDataMode } from '../real/mode'
 import { realCreatePlayerInvite, realGetClubPlayers } from '../real/queue'
 import type { ClubPlayer } from './clubPlayer.types'
+import { clubPictureState, joinedViaOf } from './clubPlayerPicture.rules'
 import { guestRegistrationUrl } from './registrationUrl'
 import { deriveSavedPlayerStats } from './savedPlayerStats.rules'
 export type ClubPlayerFilters = {
@@ -41,7 +42,12 @@ export function clubPlayerView(state: MockState, player: ClubPlayer) {
     profile = state.players.find((p) => p.id === player.playerId)
   return {
     ...player,
-    picture: state.playerProfiles.find((p) => p.playerId === player.playerId)?.picture ?? null,
+    /** Avatar reference: the club-set picture for a guest or unclaimed player, else their own. */
+    picture: clubPictureState(
+      player,
+      state.playerProfiles.find((p) => p.playerId === player.playerId)?.picture ?? null,
+    ).reference,
+    joinedVia: joinedViaOf(player),
     pictureName: profile?.fullName ?? null,
     displayName: player.fullName,
     rtrId: profile?.rtrId ?? null,
@@ -113,6 +119,7 @@ export async function getClubPlayers(filters: ClubPlayerFilters = {}) {
       (p) =>
         p.clubId === DEMO_CLUB_ID &&
         !p.removedAt &&
+        !p.linkedToClubPlayerId &&
         (!p.playerId || !state.adminPlayerRecords[p.playerId]?.archivedAt),
     )
     .map((p) => clubPlayerView(state, p))
@@ -154,7 +161,10 @@ export async function getSavedPlayerStats() {
   const state = readMockState()
   return deriveSavedPlayerStats(
     state.clubPlayers.filter(
-      (p) => !p.removedAt && (!p.playerId || !state.adminPlayerRecords[p.playerId]?.archivedAt),
+      (p) =>
+        !p.removedAt &&
+        !p.linkedToClubPlayerId &&
+        (!p.playerId || !state.adminPlayerRecords[p.playerId]?.archivedAt),
     ),
     DEMO_CLUB_ID,
     Date.now(),

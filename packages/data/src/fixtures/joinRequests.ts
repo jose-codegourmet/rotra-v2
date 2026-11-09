@@ -1,4 +1,5 @@
 import type { SessionJoinRequest } from '../session-roster/sessionRoster.types'
+import { clubPlayers } from './players'
 
 /** The session the sample guests asked to join (tonight's prepared session in queueSessions). */
 export const JOIN_REQUEST_SESSION_ID = 's-tonight'
@@ -80,6 +81,33 @@ export function createDecidedJoinRequestFixtures(now = Date.now()): SessionJoinR
     decide(jp, 'confirmed', 'cp-jr-jp'),
     tessa,
   ]
+}
+
+/** The invite code Jose shares for tonight (the prototype's `k7m2p9qw` on p1). */
+export const TONIGHT_INVITE_CODE_ID = 'invite-s-tonight-jose'
+
+/**
+ * D-2026-11-09-02/08: one pending **Request to join as NAME** from a signed-in ROTRA player who is
+ * already in the club (Derrick, not on tonight's roster), invited through Jose's Session invite.
+ * Seeded in the mock store so the QM's Requests › Join shows the account variant.
+ */
+export function createAccountJoinRequestFixture(now = Date.now()): SessionJoinRequest {
+  const derrick = clubPlayers.find((p) => p.fullName === 'Derrick')
+  if (!derrick?.playerId) throw new Error('Missing Derrick on the club roster.')
+  return {
+    id: 'jr-account-derrick',
+    sessionId: JOIN_REQUEST_SESSION_ID,
+    name: derrick.fullName,
+    nickname: derrick.nickname,
+    phoneE164: null,
+    statedBand: 'intermediate',
+    status: 'pending',
+    requestedAt: now - 25 * 60_000,
+    decidedAt: null,
+    clubPlayerId: null,
+    playerId: derrick.playerId,
+    inviteCodeId: TONIGHT_INVITE_CODE_ID,
+  }
 }
 
 /** Pending sample requests, oldest first. */

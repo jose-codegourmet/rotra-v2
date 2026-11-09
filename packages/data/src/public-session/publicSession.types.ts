@@ -107,3 +107,11 @@ export type PlayerSessionAccess = {
     teamB: { name: string; level: PlayingLevel | null }[]
   }[]
 }
+
+/**
+ * A signed-in ROTRA Player acting on a session page (Q17.2). `playerId` is the authenticated
+ * Player profile; the server checks it is linked to an unreleased slot where the write needs one.
+ */
+export type PlayerSessionInput = { playerId: string }
+/** **Request to join as NAME**; `inviteCode` is the link's `?invite=` code, when it had one. */
+export type JoinAsPlayerInput = PlayerSessionInput & { inviteCode?: string | null }

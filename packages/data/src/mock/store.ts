@@ -30,6 +30,7 @@ import type { InventoryItem } from '../inventory/inventory.types'
 import type { ClubLicenseTerm, ClubRetentionRecord } from '../license/license.types'
 import type { AutoQueueDraftState } from '../match/autoQueue.types'
 import type { Match } from '../match/match.types'
+import type { MatchRequest } from '../match-request/matchRequest.types'
 import type { PasswordResetRequest } from '../password-reset/passwordReset.types'
 import type { Player, PlayerProfile, PlayerRank, PlayerSessionRecord } from '../player/player.types'
 import type { ClaimLinkRecord } from '../player-account/playerAccount.types'
@@ -53,6 +54,8 @@ import type {
   SessionResultSnapshot,
 } from '../session-result/sessionResult.types'
 import type {
+  DropOutNotice,
+  SessionInviteCode,
   SessionJoinRequest,
   SessionPlayer,
   SessionWaitlistEntry,
@@ -97,6 +100,12 @@ export type MockState = {
   roster: SessionPlayer[]
   waitlist: SessionWaitlistEntry[]
   joinRequests: SessionJoinRequest[]
+  /** Player-side I can't make it (D-2026-11-09-03), in every state; closed ones stay, hidden */
+  dropOutNotices: DropOutNotice[]
+  /** Player-side Request a match (D-2026-11-09-05), in every state; closed ones stay, hidden */
+  matchRequests: MatchRequest[]
+  /** Session invite codes (D-2026-11-09-08): one per Player and session */
+  sessionInviteCodes: SessionInviteCode[]
   /** Every club's license terms (Admin A-LICENSE); Queue reads the demo club's as its payments */
   licensePayments: ClubLicenseTerm[]
   /** Admin: public-page retention per club (cancelled countdowns, failed or finished deletion) */
@@ -128,7 +137,7 @@ function freeze<T>(value: T): DeepReadonly<T> {
 }
 function seedState(): MockState {
   const now = Date.now(),
-    { sessions, courts, roster, history } = createQueueFixtures(now),
+    { sessions, courts, roster, history, requests } = createQueueFixtures(now),
     publicationFixtures = createSessionPublicationFixtures(now)
   // The seeded completed history sessions carry the snapshot their finalization `slides` stage produced.
   const resultSnapshots = Object.fromEntries(
@@ -187,7 +196,10 @@ function seedState(): MockState {
     courts,
     roster: [...roster, ...history.roster],
     waitlist: [],
-    joinRequests: [],
+    joinRequests: requests.joinRequests,
+    dropOutNotices: requests.dropOutNotices,
+    matchRequests: [],
+    sessionInviteCodes: requests.sessionInviteCodes,
     licensePayments: adminClubTerms,
     clubRetentionRecords: adminClubRetentionRecords,
     downloads: {},

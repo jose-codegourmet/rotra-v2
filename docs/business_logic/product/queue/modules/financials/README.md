@@ -80,7 +80,7 @@ Inventory is club data behind the license gate: an expired club cannot open it.
 - Session setup page 3 (**Costs and review**) holds the Financials section above Notes and review. The review step summarizes total cost, what players pay (custom or break-even), and the result.
 - The preparation overview shows the estimate when one was saved.
 - Setup links to the inventory and back, keeping the unsaved setup draft.
-- Financial values are **not** shown on the public session page, result slides, or exports.
+- Cost lines, break-even math and payment states are **not** shown on the public session page, result slides, or exports. The **payment per player** alone appears on the public session page's Details (“₱X per player · paid at the venue”, or “Free”; nothing when no estimate is saved), as the post template already publishes it (owner request, November 9, 2026).
 
 ## Boundaries
 

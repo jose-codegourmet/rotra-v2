@@ -111,6 +111,7 @@ Owner decision, November 7, 2026 (#475).
 - Masking happens on the server: the full name never enters the public page payload, tooltips or
   accessibility labels. The avatar's initials come from the masked name.
 - Owner decision, November 8, 2026: the public page shows each confirmed participant's level as a thick colored ring (with a small gap) around their picture (blue Beginner, yellow Intermediate, red Advanced; hovering shows “Beginner Mid”), not as text. This replaces the earlier rule that the page never tied a participant to a level. A participant with no level shows no level label. The waitlist still shows masked names only.
+- For a signed-in Player, a registered participant's tile links to that player's ROTRA profile by RTR ID. Guests and unclaimed profiles never link (owner request, November 9, 2026).
 
 ## Public skill mix
 

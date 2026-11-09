@@ -18,6 +18,7 @@ import { longDayLabel, sessionHref, toDateParam } from '@/lib/dates'
 import { useNow } from '@/lib/useNow'
 import { useAppSelector } from '@/store/hooks'
 import { selectAccount } from '@/store/slices/authSlice'
+import { ShareClubInviteSheet } from '../../club-settings/_components/share-club-invite-sheet/ShareClubInviteSheet'
 import { QueryError } from '../query-error/QueryError'
 
 const KIND: Record<string, CalendarEvent['kind']> = {
@@ -43,6 +44,7 @@ export function ClubDashboard() {
   const clock = useNow()
   const [reference, setReference] = useState(() => new Date().setHours(0, 0, 0, 0))
   const [selected, setSelected] = useState<number>()
+  const [shareOpen, setShareOpen] = useState(false)
   const [openDay, setOpenDay] = useState<number | null>(null)
 
   const createSession = (date?: number) =>
@@ -96,6 +98,7 @@ export function ClubDashboard() {
           }
           foundingLine={`Founded at ${club.data.foundingAddress}`}
           onCreateSession={() => createSession()}
+          onShareClubInvite={() => setShareOpen(true)}
         />
       ) : (
         <div className="flex items-center gap-4">
@@ -173,6 +176,9 @@ export function ClubDashboard() {
           onCreateOnDay={createSession}
         />
       )}
+      {club.data ? (
+        <ShareClubInviteSheet club={club.data} open={shareOpen} onOpenChange={setShareOpen} />
+      ) : null}
       <CalendarDaySheet
         open={openDay !== null}
         onOpenChange={(open) => {

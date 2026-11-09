@@ -9,5 +9,12 @@ export const clubSettingsMeta = {
     'The phone settings drawer and the main nav drawer never open together (OperatorShell context).',
   ],
   docs: ['docs/screens/product/modules/queue/access-home.md', 'docs/screens/product/dialogs.md'],
-  related: ['ClubSettingsMenu', 'SignOutSheet', 'LicensePanel', 'FacebookPostEditor'],
+  related: [
+    'ClubSettingsMenu',
+    'ClubInvitePanel',
+    'ShareClubInviteSheet',
+    'SignOutSheet',
+    'LicensePanel',
+    'FacebookPostEditor',
+  ],
 } satisfies ComponentMeta

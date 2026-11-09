@@ -9,5 +9,5 @@ export const clubDashboardMeta = {
     'Create session goes to /sessions/new, with ?date=YYYY-MM-DD when started from a calendar day.',
   ],
   docs: ['docs/screens/product/modules/queue/access-home.md'],
-  related: ['ClubHeader', 'NowCard', 'SessionCalendar', 'CalendarDaySheet'],
+  related: ['ClubHeader', 'ShareClubInviteSheet', 'NowCard', 'SessionCalendar', 'CalendarDaySheet'],
 } satisfies ComponentMeta

@@ -1,20 +1,20 @@
 'use client'
 import { useSession } from '@rotra/data/auth/use-session'
 import { foundingCities } from '@rotra/data/fixtures/founding-cities'
-import { useMyClubs } from '@rotra/data/player-club/useMyClubs'
-import { useJoinClub } from '@rotra/data/player-club/useJoinClub'
-import { queueSessionUrl } from '@rotra/data/player/mySessions'
-import { JoinClubCard } from '@rotra/ui/join-club-card'
 import { MockError } from '@rotra/data/mock/errors'
+import { queueSessionUrl } from '@rotra/data/player/mySessions'
 import {
   useGuestRegistration,
   useGuestRegistrationClub,
 } from '@rotra/data/player-account/useGuestRegistration'
+import { useJoinClub } from '@rotra/data/player-club/useJoinClub'
+import { useMyClubs } from '@rotra/data/player-club/useMyClubs'
 import { consumeSessionReturn, rememberSessionReturn } from '@rotra/data/public-session/context'
 import { AccountLinkStatus } from '@rotra/ui/account-link-status'
 import { LinkPage } from '@rotra/ui/account-link-status/link-page'
 import { ClaimForm } from '@rotra/ui/claim-form'
 import { ErrorState } from '@rotra/ui/error-state'
+import { JoinClubCard } from '@rotra/ui/join-club-card'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { toast } from '@rotra/ui/toaster'
 import { useRouter } from 'next/navigation'
@@ -22,7 +22,15 @@ import { useEffect } from 'react'
 import { useAppDispatch } from '@/store/hooks'
 import { setAccount } from '@/store/slices/authSlice'
 
-export function GuestRegistration({ clubId, returnTo, sessionSlug }: { clubId: string; returnTo?: string; sessionSlug?: string }) {
+export function GuestRegistration({
+  clubId,
+  returnTo,
+  sessionSlug,
+}: {
+  clubId: string
+  returnTo?: string
+  sessionSlug?: string
+}) {
   useEffect(() => {
     rememberSessionReturn(returnTo)
   }, [returnTo])
@@ -41,7 +49,11 @@ export function GuestRegistration({ clubId, returnTo, sessionSlug }: { clubId: s
         standalone
         clubName={result.clubName ?? undefined}
         sessionTitle={result.sessionTitle}
-        onBackToSession={result.sessionSlug ? () => window.location.assign(queueSessionUrl(result.sessionSlug ?? '')) : undefined}
+        onBackToSession={
+          result.sessionSlug
+            ? () => window.location.assign(queueSessionUrl(result.sessionSlug ?? ''))
+            : undefined
+        }
         firstName={result.firstName}
         rtrId={result.rtrId}
         onOpenProfile={() => router.push(`/players/${result.playerId}`)}
@@ -107,8 +119,16 @@ export function GuestRegistration({ clubId, returnTo, sessionSlug }: { clubId: s
     <ClaimForm
       standalone
       clubName={club.data.clubName ?? ''}
-      contextLabel={!clubId ? 'ROTRA registration' : sessionSlug ? `Session link from ${club.data.clubName} · ${club.data.sessionTitle}` : `Registration link from ${club.data.clubName}`}
-      cities={!clubId ? foundingCities.map(city => ({ value: city.code, label: city.name })) : undefined}
+      contextLabel={
+        !clubId
+          ? 'ROTRA registration'
+          : sessionSlug
+            ? `Session link from ${club.data.clubName} · ${club.data.sessionTitle}`
+            : `Registration link from ${club.data.clubName}`
+      }
+      cities={
+        !clubId ? foundingCities.map((city) => ({ value: city.code, label: city.name })) : undefined
+      }
       maskedPhone=""
       isPending={registration.isPending}
       accountMatch={result?.status === 'account-match'}
@@ -122,7 +142,9 @@ export function GuestRegistration({ clubId, returnTo, sessionSlug }: { clubId: s
                   ? 'email'
                   : error instanceof MockError && error.fieldErrors?.phone
                     ? 'phone'
-                    : error instanceof MockError && error.fieldErrors?.cityCode ? 'cityCode' : undefined,
+                    : error instanceof MockError && error.fieldErrors?.cityCode
+                      ? 'cityCode'
+                      : undefined,
             }
           : undefined
       }

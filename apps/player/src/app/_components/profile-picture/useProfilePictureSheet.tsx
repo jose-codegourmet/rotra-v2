@@ -1,13 +1,14 @@
 'use client'
-import { useMyAccount } from '@rotra/data/player-account/useMyAccount'
-import { useProfileCharacters } from '@rotra/data/profile-character/useProfileCharacters'
 import { preparePlayerPhoto } from '@rotra/data/player/photo'
 import { type PlayerPictureChoice, parsePlayerPicture } from '@rotra/data/player/picture'
 import type { PlayerProfile } from '@rotra/data/player/types'
 import { useSetMyProfilePicture } from '@rotra/data/player/useSetMyProfilePicture'
+import { useMyAccount } from '@rotra/data/player-account/useMyAccount'
+import { useProfileCharacters } from '@rotra/data/profile-character/useProfileCharacters'
 import { ProfilePictureSheet } from '@rotra/ui/profile-picture-sheet'
 import { toast } from '@rotra/ui/toaster'
 import { useState } from 'react'
+import { pictureSrc } from './pictureSrc'
 
 /** Both entry points share one local draft and persist only through Done. */
 export function useProfilePictureSheet(profile: PlayerProfile | null | undefined) {
@@ -26,13 +27,26 @@ export function useProfilePictureSheet(profile: PlayerProfile | null | undefined
       playerId={profile.playerId}
       name={profile.fullName}
       picture={parsePlayerPicture(profile.picture)}
+      currentCharacterImage={pictureSrc(profile.picture, profile.playerId, profile.fullName)}
       previousPhoto={account.data?.avatarPreviousRef}
       characters={characters.data ?? []}
-      onCommitDraft={async choice => { await commit(choice) }}
+      onCommitDraft={async (choice, previousPhoto) => {
+        await commit({ ...choice, previousPhoto })
+      }}
       isPending={mutation.isPending}
       preparePhoto={preparePlayerPhoto}
       onCommit={commit}
     />
   ) : null
-  return { sheet, openSheet: () => setOpen(true) }
+  return {
+    sheet,
+    openSheet: () => {
+      if (characters.isError) {
+        toast.error(characters.error.message)
+        void characters.refetch()
+        return
+      }
+      setOpen(true)
+    },
+  }
 }

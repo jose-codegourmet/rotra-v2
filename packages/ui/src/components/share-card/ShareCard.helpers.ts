@@ -30,7 +30,23 @@ export async function loadShareLogo(url: string): Promise<HTMLImageElement | nul
   return new Promise((resolve) => {
     image.onload = () => resolve(image)
     image.onerror = () => resolve(null)
-    image.src = url
+    // SVGs with a viewBox but no intrinsic size can rasterize as only their background.
+    // Give the export image an explicit size without changing the on-screen asset.
+    if (url.startsWith('data:image/svg+xml,')) {
+      try {
+        const doc = new DOMParser().parseFromString(
+          decodeURIComponent(url.slice(url.indexOf(',') + 1)),
+          'image/svg+xml',
+        )
+        const root = doc.documentElement
+        const view = (root.getAttribute('viewBox') ?? '0 0 64 64').split(/\s+/).map(Number)
+        root.setAttribute('width', String(view[2] || 64))
+        root.setAttribute('height', String(view[3] || 64))
+        image.src = `data:image/svg+xml,${encodeURIComponent(new XMLSerializer().serializeToString(root))}`
+      } catch {
+        image.src = url
+      }
+    } else image.src = url
   })
 }
 
@@ -118,6 +134,19 @@ export async function renderSharePng(
         ctx.restore()
       }
     }
+    for (const cell of card.querySelectorAll<HTMLElement>('[data-share-cell]')) {
+      const r = rect(cell)
+      const style = getComputedStyle(cell)
+      ctx.fillStyle = style.backgroundColor
+      ctx.beginPath()
+      ctx.roundRect(r.x, r.y, r.w, r.h, 2)
+      ctx.fill()
+      if (cell.getAttribute('data-share-cell') === 'current') {
+        ctx.strokeStyle = palette.getPropertyValue('--share-accent').trim()
+        ctx.lineWidth = 1
+        ctx.strokeRect(r.x - 2, r.y - 2, r.w + 4, r.h + 4)
+      }
+    }
     // Range rectangles preserve the browser's wrapping, alignment, and letter spacing in the PNG.
     for (const element of card.querySelectorAll<HTMLElement>(
       '[data-qr-text], [data-qr-logo] > span',
@@ -125,6 +154,17 @@ export async function renderSharePng(
       const style = getComputedStyle(element)
       ctx.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`
       ctx.fillStyle = style.color
+      ctx.save()
+      const textBounds = rect(element)
+      const clipped = ['hidden', 'clip'].includes(style.overflowX)
+      const ellipsis =
+        clipped && style.textOverflow === 'ellipsis' && element.scrollWidth > element.clientWidth
+      const ellipsisWidth = ellipsis ? ctx.measureText('…').width : 0
+      if (clipped) {
+        ctx.beginPath()
+        ctx.rect(textBounds.x, textBounds.y, textBounds.w, textBounds.h)
+        ctx.clip()
+      }
       ctx.textBaseline = 'alphabetic'
       const metrics = ctx.measureText('Mg')
       const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT)
@@ -144,11 +184,20 @@ export async function renderSharePng(
               (metrics.fontBoundingBoxAscent ?? metrics.actualBoundingBoxAscent) -
               (metrics.fontBoundingBoxDescent ?? metrics.actualBoundingBoxDescent)) /
               2
-          ctx.fillText(character, r.left - bounds.left, baseline)
+          if (!ellipsis || r.right - bounds.left <= textBounds.x + textBounds.w - ellipsisWidth) {
+            ctx.fillText(
+              style.textTransform === 'uppercase' ? character.toUpperCase() : character,
+              r.left - bounds.left,
+              baseline,
+            )
+          } else if (ellipsis) {
+            ctx.fillText('…', textBounds.x + textBounds.w - ellipsisWidth, baseline)
+          }
           i += character.length
         }
         node = walker.nextNode()
       }
+      ctx.restore()
     }
     return await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'))
   } catch {

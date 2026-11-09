@@ -7,6 +7,7 @@ import { Field } from '@rotra/ui/field'
 import { PlayerTile, type PlayerTileStatus } from '@rotra/ui/player-tile'
 import { SegmentedControl } from '@rotra/ui/segmented-control'
 import { Sheet } from '@rotra/ui/sheet'
+import { Tabs } from '@rotra/ui/tabs'
 import { TextInput } from '@rotra/ui/text-input'
 import { useState } from 'react'
 
@@ -30,7 +31,9 @@ export type PlayerPickerCandidate = {
 
 export type PlayerPickerFilter = 'available' | 'present' | 'everyone'
 
-export type PlayerPickerSheetProps = {
+export type PlayerPickerLineupProps = {
+  /** The Q-PICK-PLAYER sheet the Queue Master uses; the default */
+  variant?: 'lineup'
   open: boolean
   onOpenChange: (open: boolean) => void
   /** The slot being filled: "Choose Team A · player N" */
@@ -51,6 +54,54 @@ export type PlayerPickerSheetProps = {
   /** "Back to lineup": closes without choosing; focus returns to the slot that opened the picker */
   onBack: () => void
 }
+
+/** One present player as the match-request picker shows them (the viewer is left out by the caller). */
+export type MatchRequestCandidate = {
+  /** The SessionPlayer id */
+  id: string
+  name: string
+  photoUrl?: string
+  /** The level locked for this session; null when none was set. Its group is the part before "_". */
+  level: PlayingLevel | null
+  /** Counted games so far */
+  games: number
+  /** The court label while playing; null when off court */
+  playingOn: string | null
+  /** Minutes since their last game ended (or since arriving): the waiting time */
+  restMinutes: number
+}
+
+export type MatchRequestShow = 'all' | 'playing' | 'available'
+export type MatchRequestSkill = 'all' | 'beginner' | 'intermediate' | 'advanced'
+export type MatchRequestSort = 'waitDesc' | 'waitAsc' | 'gamesAsc' | 'gamesDesc'
+
+export type PlayerPickerMatchRequestProps = {
+  /** Q-PUBLIC-DETAILS (My night › Request a match): choosing a partner or an opponent */
+  variant: 'matchRequest'
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  /** The spot being filled, as the request sheet names it: "Partner", "Opponent 1", ... */
+  spotLabel: string
+  /** Present players other than the viewer, in any order; the sheet sorts them */
+  players: MatchRequestCandidate[]
+  /** The session's minimum games */
+  minimumGames: number
+  /** The player already in this spot, shown pressed */
+  currentId?: string | null
+  /** Players already picked for other spots: disabled with "Already picked" */
+  pickedIds?: string[]
+  /** Opening choices; All, All levels and Fewest games by default */
+  initialShow?: MatchRequestShow
+  initialSkill?: MatchRequestSkill
+  initialSort?: MatchRequestSort
+  onChoose: (playerId: string) => void
+  /** "Anyone": leaves the spot open */
+  onAnyone: () => void
+  /** "Back": closes without choosing */
+  onBack: () => void
+}
+
+export type PlayerPickerSheetProps = PlayerPickerLineupProps | PlayerPickerMatchRequestProps
 
 const FILTERS: { value: PlayerPickerFilter; label: string }[] = [
   { value: 'available', label: 'Available now' },
@@ -76,7 +127,7 @@ function statusOf(p: PlayerPickerCandidate): PlayerTileStatus {
  * with "Already in this match". The order of `players` is the caller's (queue rules); the sheet only
  * applies the filter and the search.
  */
-export function PlayerPickerSheet({
+function LineupPicker({
   open,
   onOpenChange,
   team,
@@ -88,7 +139,7 @@ export function PlayerPickerSheet({
   initialFilter = 'available',
   onChoose,
   onBack,
-}: PlayerPickerSheetProps) {
+}: PlayerPickerLineupProps) {
   const [filter, setFilter] = useState<PlayerPickerFilter>(initialFilter)
   const [query, setQuery] = useState('')
   const q = query.trim().toLowerCase()
@@ -152,5 +203,168 @@ export function PlayerPickerSheet({
         start until they're free.
       </p>
     </Sheet>
+  )
+}
+
+const SHOW_TABS: { value: MatchRequestShow; label: string }[] = [
+  { value: 'all', label: 'All' },
+  { value: 'playing', label: 'Playing' },
+  { value: 'available', label: 'Available' },
+]
+
+const SKILLS: { value: MatchRequestSkill; label: string }[] = [
+  { value: 'all', label: 'All levels' },
+  { value: 'beginner', label: 'Beginner' },
+  { value: 'intermediate', label: 'Intermediate' },
+  { value: 'advanced', label: 'Advanced' },
+]
+
+const SORTS: { value: MatchRequestSort; label: string; name: string }[] = [
+  { value: 'waitDesc', label: '↓ Longest wait', name: 'Waiting time, longest first' },
+  { value: 'waitAsc', label: '↑ Shortest wait', name: 'Waiting time, shortest first' },
+  { value: 'gamesAsc', label: '↑ Fewest games', name: 'Games played, fewest first' },
+  { value: 'gamesDesc', label: '↓ Most games', name: 'Games played, most first' },
+]
+
+const SORTERS: Record<
+  MatchRequestSort,
+  (a: MatchRequestCandidate, b: MatchRequestCandidate) => number
+> = {
+  waitDesc: (a, b) => b.restMinutes - a.restMinutes,
+  waitAsc: (a, b) => a.restMinutes - b.restMinutes,
+  gamesAsc: (a, b) => a.games - b.games,
+  gamesDesc: (a, b) => b.games - a.games,
+}
+
+/**
+ * The match-request "Choose partner / opponent" sheet: All / Playing / Available tabs with counts,
+ * a skill-group filter, a sort, and a grid of PlayerTiles. Players already picked for another spot
+ * are disabled with "Already picked". The choices live here and reset when the sheet unmounts.
+ */
+function MatchRequestPicker({
+  open,
+  onOpenChange,
+  spotLabel,
+  players,
+  minimumGames,
+  currentId = null,
+  pickedIds = [],
+  initialShow = 'all',
+  initialSkill = 'all',
+  initialSort = 'gamesAsc',
+  onChoose,
+  onAnyone,
+  onBack,
+}: PlayerPickerMatchRequestProps) {
+  const [show, setShow] = useState<MatchRequestShow>(initialShow)
+  const [skill, setSkill] = useState<MatchRequestSkill>(initialSkill)
+  const [sort, setSort] = useState<MatchRequestSort>(initialSort)
+  const playing = players.filter((p) => p.playingOn !== null).length
+  const counts: Record<MatchRequestShow, number> = {
+    all: players.length,
+    playing,
+    available: players.length - playing,
+  }
+  const list = players
+    .filter(
+      (p) =>
+        (show === 'playing'
+          ? p.playingOn !== null
+          : show === 'available'
+            ? p.playingOn === null
+            : true) &&
+        (skill === 'all' || p.level?.split('_')[0] === skill),
+    )
+    .sort(SORTERS[sort])
+
+  return (
+    <Sheet
+      open={open}
+      onOpenChange={onOpenChange}
+      title={`Choose ${spotLabel}`}
+      footer={
+        <>
+          <Button onClick={onAnyone}>Anyone</Button>
+          <Button onClick={onBack}>Back</Button>
+        </>
+      }
+    >
+      <div className="flex flex-col gap-2.5">
+        <Tabs
+          aria-label="Show players"
+          items={SHOW_TABS.map((t) => ({
+            value: t.value,
+            label: `${t.label} · ${counts[t.value]}`,
+          }))}
+          value={show}
+          onChange={(value) => setShow(value as MatchRequestShow)}
+        />
+        <div className="flex flex-wrap items-center gap-2.5">
+          <SegmentedControl
+            aria-label="Filter by skill"
+            options={SKILLS}
+            value={skill}
+            onChange={(value) => setSkill(value as MatchRequestSkill)}
+          />
+          <SegmentedControl
+            aria-label="Sort players"
+            // iconOnly is how SegmentedControl names a pill and gives it a tooltip; the span puts the
+            // text pills' usual padding back.
+            options={SORTS.map((o) => ({
+              value: o.value,
+              iconOnly: true,
+              ariaLabel: o.name,
+              label: <span className="px-1 touch:px-1.5">{o.label}</span>,
+            }))}
+            value={sort}
+            onChange={(value) => setSort(value as MatchRequestSort)}
+          />
+        </div>
+      </div>
+      {list.length ? (
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,128px),1fr))] gap-2.5">
+          {list.map((p) => {
+            const picked = p.id !== currentId && pickedIds.includes(p.id)
+            return (
+              <PlayerTile
+                key={p.id}
+                name={p.name}
+                photoUrl={p.photoUrl}
+                level={p.level}
+                games={p.games}
+                minimumGames={minimumGames}
+                status={
+                  picked
+                    ? { kind: 'note', text: 'Already picked' }
+                    : p.playingOn !== null
+                      ? { kind: 'playing', courtLabel: p.playingOn }
+                      : { kind: 'resting', minutes: p.restMinutes }
+                }
+                pressed={p.id === currentId}
+                disabled={picked}
+                onClick={() => onChoose(p.id)}
+              />
+            )
+          })}
+        </div>
+      ) : (
+        <EmptyState>No other present players.</EmptyState>
+      )}
+      <p className="m-0 text-[13px] text-fg2">
+        Present players only. Players on a court or already in a waiting match can still be picked.
+      </p>
+    </Sheet>
+  )
+}
+
+/**
+ * Q-PICK-PLAYER for the Queue Master (default variant) or the match-request partner / opponent
+ * picker (`variant="matchRequest"`).
+ */
+export function PlayerPickerSheet(props: PlayerPickerSheetProps) {
+  return props.variant === 'matchRequest' ? (
+    <MatchRequestPicker {...props} />
+  ) : (
+    <LineupPicker {...props} />
   )
 }

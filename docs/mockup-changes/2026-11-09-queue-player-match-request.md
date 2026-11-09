@@ -1,6 +1,6 @@
 # Session page: Request a match (player side)
 
-Status: TICKETED — #585
+Status: IN PROGRESS — #585
 Date: 2026-11-09
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Public session page › My night › Request a match sheet

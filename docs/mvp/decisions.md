@@ -234,7 +234,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 <a id="d-2026-11-09-02"></a>
 ### D-2026-11-09-02 — Signed-in Players on the session page: full names and one-tap join
 - **Decision status:** approved (owner discussion, November 9, 2026; the owner chose every recommended option)
-- **Implementation status:** not started
+- **Implementation status:** not started — mockups updated November 9, 2026 (`NEW` logs dated 2026-11-09 in [mockup-changes](../mockup-changes/README.md))
 - **Ticket:** needed (mockup change first, then tickets from its `NEW` logs)
 - **Roadmap:** MVP (owner, November 9, 2026: added to the scope frozen by [D-2026-11-07-04](#d-2026-11-07-04)) — [Queue](workstreams/queue.md), [Player](workstreams/player.md)
 - **Supersedes:** in part [D-2026-11-07-06](#d-2026-11-07-06) (names masked for everyone), [D-2026-11-08-06](#d-2026-11-08-06) (names masked for every audience; full roster only for confirmed players) and [D-2026-11-07-07](#d-2026-11-07-07) (a join request does not carry the signed-in player).
@@ -249,7 +249,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 <a id="d-2026-11-09-03"></a>
 ### D-2026-11-09-03 — Players check themselves in, leave, and say they can't make it
 - **Decision status:** approved (owner discussion, November 9, 2026)
-- **Implementation status:** not started
+- **Implementation status:** not started — mockups updated November 9, 2026 (`NEW` logs dated 2026-11-09 in [mockup-changes](../mockup-changes/README.md))
 - **Ticket:** needed
 - **Roadmap:** MVP (owner, November 9, 2026: added to the scope frozen by [D-2026-11-07-04](#d-2026-11-07-04)) — [Queue](workstreams/queue.md)
 - **Decision:**
@@ -267,7 +267,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 <a id="d-2026-11-09-04"></a>
 ### D-2026-11-09-04 — The player's live view: My night, Courts now, own standing, refresh only
 - **Decision status:** approved (owner discussion, November 9, 2026)
-- **Implementation status:** not started
+- **Implementation status:** not started — mockups updated November 9, 2026 (`NEW` logs dated 2026-11-09 in [mockup-changes](../mockup-changes/README.md))
 - **Ticket:** needed
 - **Roadmap:** MVP (owner, November 9, 2026: added to the scope frozen by [D-2026-11-07-04](#d-2026-11-07-04)) — [Queue](workstreams/queue.md), [Player](workstreams/player.md)
 - **Decision:**
@@ -286,7 +286,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 <a id="d-2026-11-09-05"></a>
 ### D-2026-11-09-05 — Match requests
 - **Decision status:** approved (owner discussion, November 9, 2026)
-- **Implementation status:** not started
+- **Implementation status:** not started — mockups updated November 9, 2026 (`NEW` logs dated 2026-11-09 in [mockup-changes](../mockup-changes/README.md))
 - **Ticket:** needed
 - **Roadmap:** MVP (owner, November 9, 2026: added to the scope frozen by [D-2026-11-07-04](#d-2026-11-07-04)) — [Queue](workstreams/queue.md)
 - **Decision:**
@@ -305,7 +305,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 <a id="d-2026-11-09-06"></a>
 ### D-2026-11-09-06 — Registration from session and club links, guest linking and club membership
 - **Decision status:** approved (owner discussion, November 9, 2026)
-- **Implementation status:** not started
+- **Implementation status:** not started — mockups updated November 9, 2026 (`NEW` logs dated 2026-11-09 in [mockup-changes](../mockup-changes/README.md))
 - **Ticket:** needed
 - **Roadmap:** MVP (owner, November 9, 2026: added to the scope frozen by [D-2026-11-07-04](#d-2026-11-07-04)) — [Player](workstreams/player.md), [Queue](workstreams/queue.md)
 - **Supersedes:** in part the [#490](https://github.com/jose-codegourmet/rotra-v2/issues/490) rule in [D-2026-11-07-07](#d-2026-11-07-07) that registration only opens from a club invitation and always keeps the guest record unlinked.
@@ -329,7 +329,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 <a id="d-2026-11-09-07"></a>
 ### D-2026-11-09-07 — Public or private player profile
 - **Decision status:** approved (owner discussion, November 9, 2026)
-- **Implementation status:** not started
+- **Implementation status:** not started — mockups updated November 9, 2026 (`NEW` logs dated 2026-11-09 in [mockup-changes](../mockup-changes/README.md))
 - **Ticket:** needed
 - **Roadmap:** MVP (owner, November 9, 2026: added to the scope frozen by [D-2026-11-07-04](#d-2026-11-07-04)) — [Player](workstreams/player.md)
 - **Decision:**
@@ -344,7 +344,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 <a id="d-2026-11-09-08"></a>
 ### D-2026-11-09-08 — Sharing: links, QR codes and post/story images
 - **Decision status:** approved (owner discussion, November 9, 2026)
-- **Implementation status:** not started
+- **Implementation status:** not started — mockups updated November 9, 2026 (`NEW` logs dated 2026-11-09 in [mockup-changes](../mockup-changes/README.md))
 - **Ticket:** needed
 - **Roadmap:** MVP (owner, November 9, 2026: added to the scope frozen by [D-2026-11-07-04](#d-2026-11-07-04)) — [Player](workstreams/player.md), [Queue](workstreams/queue.md)
 - **Decision:**
@@ -366,7 +366,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 <a id="d-2026-11-09-09"></a>
 ### D-2026-11-09-09 — Keeping the session page cheap to serve
 - **Decision status:** approved (owner discussion, November 9, 2026). The owner's priorities: "less server stress", "less server costs", "optimal QM and Player UX".
-- **Implementation status:** not started
+- **Implementation status:** not started — mockups updated November 9, 2026 (`NEW` logs dated 2026-11-09 in [mockup-changes](../mockup-changes/README.md))
 - **Ticket:** needed
 - **Roadmap:** MVP (owner, November 9, 2026: added to the scope frozen by [D-2026-11-07-04](#d-2026-11-07-04)) — [Queue](workstreams/queue.md), [Backend](workstreams/backend.md)
 - **Decision:**
@@ -380,7 +380,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 <a id="d-2026-11-09-10"></a>
 ### D-2026-11-09-10 — Uploaded pictures: keep only the current and the previous
 - **Decision status:** approved (owner discussion, November 9, 2026). In the owner's words: "to save money on storage. everytime a user uploads image for avatar or club photo only 2 will be saved: current and previous."
-- **Implementation status:** not started
+- **Implementation status:** not started — mockups updated November 9, 2026 (`NEW` logs dated 2026-11-09 in [mockup-changes](../mockup-changes/README.md)); court-picture uploads have no mockup yet
 - **Ticket:** needed
 - **Roadmap:** MVP (owner, November 9, 2026: added to the scope frozen by [D-2026-11-07-04](#d-2026-11-07-04)) — [Player](workstreams/player.md), [Queue](workstreams/queue.md), [Backend](workstreams/backend.md)
 - **Supersedes:** in part [Club logo persistence (#374)](../database_design/product/admin/modules/clubs-licenses.md#club-logo-persistence-374), which keeps every previous logo for historical result snapshots, and the keep-everything behavior of [D-2026-11-08-03](#d-2026-11-08-03).

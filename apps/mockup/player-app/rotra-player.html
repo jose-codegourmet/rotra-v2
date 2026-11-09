@@ -268,6 +268,16 @@ button.brand { background: none; border: 0; padding: 0; cursor: pointer; color: 
 .band-off { background: var(--warn-subtle); border-bottom: 1px solid var(--warn); font-size: 13px; }
 .band-off .in { max-width: 1240px; margin: 0 auto; display: flex; gap: 10px; align-items: flex-start; padding: 8px max(16px, env(safe-area-inset-right, 0px)) 8px max(16px, env(safe-area-inset-left, 0px)); }
 .band-off svg { color: var(--warn); flex: none; margin-top: 2px; }
+.band-off .in .btns { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.srow { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 8px; min-height: 56px; border-radius: var(--r-sm); color: inherit; text-decoration: none; }
+.srow + .srow { box-shadow: 0 -1px 0 var(--border); }
+a.srow:hover { background: var(--elev); }
+a.srow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.srow .main { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.crow { display: flex; align-items: center; gap: 12px; padding: 10px 0; }
+.crow + .crow { border-top: 1px solid var(--border); }
+.crow .main { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.crow .btns { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
 .page-head { display: flex; flex-direction: column; gap: 6px; }
 .back { align-self: flex-start; margin-left: -10px; }
 .nowrap { flex-wrap: nowrap; }
@@ -290,6 +300,9 @@ button.brand { background: none; border: 0; padding: 0; cursor: pointer; color: 
 .lb-row.p2 { --medal: var(--silver); }
 .lb-row.p3 { --medal: var(--bronze); }
 .lb-row.podium:hover { background: linear-gradient(90deg, color-mix(in srgb, var(--medal) 24%, transparent), var(--elev) 75%); }
+.lb-row[aria-disabled="true"], .pod[aria-disabled="true"] { cursor: default; }
+.lb-row[aria-disabled="true"]:hover { background: transparent; }
+.lb-row.podium[aria-disabled="true"]:hover { background: linear-gradient(90deg, color-mix(in srgb, var(--medal) 15%, transparent), transparent 75%); }
 .lb-row.podium .lb-pos { justify-self: end; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; font-size: 16px; font-weight: 700; color: var(--medal); background: color-mix(in srgb, var(--medal) 18%, var(--surface)); box-shadow: inset 0 0 0 2px var(--medal); }
 .lb-row.podium .avatar { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--medal); }
 .lb-row.podium .lb-name b { font-size: 16px; }
@@ -478,6 +491,52 @@ button.brand { background: none; border: 0; padding: 0; cursor: pointer; color: 
 .demo-sec { display: flex; flex-direction: column; gap: 8px; padding-top: 12px; border-top: 1px solid var(--border); }
 .demo-sec:first-of-type { border-top: 0; padding-top: 0; }
 .sheet footer.single .btn { flex: 0 1 auto; }
+
+/* Share cards (D-2026-11-09-08): same fixed dark brand card as the Queue Session QR card, so the image never changes with the app theme. */
+.sess-share { margin: 2px 0 4px; }
+.srow-note { text-align: right; max-width: 150px; }
+.sh-wrap { align-items: center; text-align: center; }
+.sh-card { --qc-bg: #0b0b0c; --qc-fg: #f0f0f2; --qc-dim: #9090a0; --qc-accent: #00ff88; --qc-cell: rgba(255, 255, 255, 0.1); width: min(100%, 320px); display: flex; flex-direction: column; gap: 12px; padding: 20px; border-radius: 20px; background: radial-gradient(120% 70% at 50% 0%, rgba(0, 255, 136, 0.16), transparent 60%), var(--qc-bg); color: var(--qc-fg); text-align: left; box-sizing: border-box; overflow: hidden; }
+.sh-card.post { aspect-ratio: 4 / 5; }
+.sh-card.story { aspect-ratio: 9 / 16; width: min(100%, 270px); }
+.sh-top { display: flex; align-items: center; gap: 12px; }
+.sh-top b { display: block; font-size: 16px; line-height: 1.2; }
+.sh-top div span { font-size: 12px; color: var(--qc-dim); }
+.sh-av { width: 52px; height: 52px; flex: none; border-radius: 14px; overflow: hidden; display: grid; place-items: center; background: var(--qc-accent); color: #0b0b0c; font-weight: 800; font-size: 18px; }
+.sh-av img, .sh-av svg { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sh-mid { flex: 1 1 auto; min-height: 0; overflow: hidden; display: flex; flex-direction: column; gap: 8px; }
+.sh-mid h3 { margin: 0; font-size: 22px; font-weight: 800; line-height: 1.15; color: var(--qc-fg); text-wrap: balance; }
+.sh-card.games h3 { font-size: 18px; }
+.sh-mid p { margin: 0; font-size: 13px; line-height: 1.4; color: var(--qc-dim); }
+.sh-lv { font-size: 22px; font-weight: 800; color: var(--qc-accent); line-height: 1.1; }
+.sh-pos { display: flex; flex-direction: column; gap: 2px; }
+.sh-pos span { font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; color: var(--qc-dim); }
+.sh-pos b { font-family: var(--mono); font-size: 36px; line-height: 1; font-weight: 700; color: var(--qc-accent); }
+.sh-pos b.none { font-family: inherit; font-size: 20px; color: var(--qc-fg); }
+.sh-big { display: flex; align-items: baseline; gap: 8px; }
+.sh-big b { font-family: var(--mono); font-size: 40px; line-height: 1; font-weight: 700; color: var(--qc-accent); }
+.sh-big span { font-size: 13px; color: var(--qc-dim); }
+.sh-stat { font-size: 15px; font-weight: 700; color: var(--qc-fg); }
+.sh-ladder { display: flex; gap: 10px; }
+.sh-ladder .t { flex: 1 1 0; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.sh-ladder .bs { display: flex; gap: 3px; }
+.sh-ladder i { display: block; flex: 1; height: 10px; border-radius: 2px; background: var(--qc-cell); }
+.sh-ladder i.on { background: rgba(0, 255, 136, 0.32); }
+.sh-ladder i.cur { background: var(--qc-accent); box-shadow: 0 0 0 2px var(--qc-bg), 0 0 0 3px var(--qc-accent); }
+.sh-ladder em { font-style: normal; font-size: 10px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; color: var(--qc-dim); }
+.sh-lines { display: flex; flex-direction: column; gap: 5px; }
+.sh-gl { display: flex; align-items: flex-start; gap: 8px; font-size: 11px; line-height: 13px; }
+.sh-gl .r { flex: none; width: 16px; height: 16px; border-radius: 4px; display: grid; place-items: center; font-size: 10px; font-weight: 800; background: var(--qc-accent); color: #0b0b0c; }
+.sh-gl .r.L { background: var(--qc-cell); color: var(--qc-dim); }
+.sh-gl .t { flex: 1 1 auto; min-width: 0; display: -webkit-box; -webkit-line-clamp: var(--l, 1); -webkit-box-orient: vertical; overflow: hidden; color: var(--qc-fg); padding-top: 1.5px; }
+.sh-gl .s { flex: none; font-family: var(--mono); color: var(--qc-dim); padding-top: 1.5px; }
+.sh-more { font-size: 11px; color: var(--qc-dim); }
+.sh-foot { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.sh-foot .w { font-weight: 800; letter-spacing: 0.1em; font-size: 13px; color: var(--qc-fg); display: block; }
+.sh-foot .w b { color: var(--qc-accent); }
+.sh-foot span.tag { font-size: 11px; color: var(--qc-dim); }
+.sh-code { width: 64px; height: 64px; flex: none; border-radius: 8px; background: #fff; color: #000; overflow: hidden; }
+.sh-code svg { display: block; width: 100%; height: 100%; }
 </style>
 
 <div id="app"></div>
@@ -520,6 +579,8 @@ const CLUBS = [
 ];
 // Players who also appear in the Queue prototype keep their names here (index = order before Migs is placed).
 const FIXED = { 2: ['Theo Ramos'], 40: ['Marco Lopez'], 62: ['Enzo Navarro'], 96: ['Paulo Garcia', 'Pau'], 155: ['Bea Castillo'], 200: ['Rafa Aquino'], 339: ['Kat Lim'], 511: ['Dani Rivera'], 702: ['Carlo Medina'], 860: ['Iya Mercado'] };
+// Two sample players with a private profile (leaderboard positions 6 and 10), so visitors see the masking and the gate.
+const PRIVATE_SEED = new Set([5, 9]);
 const MIGS_SLOT = 127; // Migs is #128 while he qualifies
 
 function hashStr(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
@@ -533,34 +594,35 @@ for (let i = 0; i < 1283; i++) {
   BASE.push({
     id: `b${i}`, name, nick, photo: (h >>> 24) % 6 !== 0, level: levelAt(origPos), recent: 10 + ((h >>> 4) % 16),
     rtr: `RTR-PH-${CITIES[(h >>> 12) % CITIES.length]}-${DATES[(h >>> 6) % DATES.length]}-${String(100 + i).padStart(4, '0')}`,
+    profilePrivate: PRIVATE_SEED.has(i),
   });
 }
 
 const G = (fmt, partner, opp, res, score, kind = 'counted', note = '') => ({ fmt, partner, opp, res, score, kind, note });
 const MIGS_SESSIONS = [
-  { id: 'm1', title: 'Sunday Night Queue', club: 'Lahug Smash Club', ago: 1, games: [
+  { id: 'm1', title: 'Sunday Night Queue', club: 'Lahug Smash Club', ago: 1, published: false, games: [
     G('Doubles', ['Bea Castillo'], ['Enzo Navarro', 'Kat Lim'], 'W', '21–18'),
     G('Doubles', ['Rafa Aquino'], ['Paulo Garcia', 'Dani Rivera'], 'L', null),
     G('Singles', [], ['Carlo Medina'], 'W', '21–15'),
     G('3v3 fun', ['Jomar dela Cruz', 'Nina Ocampo'], ['Theo Ramos', 'Iya Mercado', 'Gab Torres'], 'W', '21–12', 'fun'),
   ] },
-  { id: 'm2', title: 'Thursday Open Play', club: 'Lahug Smash Club', ago: 4, games: [
+  { id: 'm2', title: 'Thursday Open Play', club: 'Lahug Smash Club', ago: 4, published: true, pos: 3, games: [
     G('Doubles', ['Paulo Garcia'], ['Marco Lopez', 'Bea Castillo'], 'W', '21–19'),
     G('Doubles', ['Kat Lim'], ['Enzo Navarro', 'Rafa Aquino'], 'L', '17–21'),
     G('Doubles', ['Dani Rivera'], ['Jomar dela Cruz', 'Iya Mercado'], 'W', null),
   ] },
-  { id: 'm3', title: 'Friday Night Smash', club: 'IT Park Badminton Club', ago: 18, games: [
+  { id: 'm3', title: 'Friday Night Smash', club: 'IT Park Badminton Club', ago: 18, published: true, pos: 7, games: [
     G('Doubles', ['Lara Uy'], ['Karl Sison', 'Janelle Go'], 'W', '21–16'),
     G('Singles', [], ['Vince Tolentino'], 'L', '19–21'),
     G('Doubles', ['Iya Mercado'], ['Mark Reyes', 'Pia Tan'], 'L', null, 'partial', 'Came in mid-game for Ramon Yap'),
     G('Doubles', ['Ramon Yap'], ['Grace Lacson', 'Ian Co'], 'W', '21–14'),
   ] },
-  { id: 'm4', title: 'Sunday Night Queue', club: 'Lahug Smash Club', ago: 29, pageGone: true, games: [
+  { id: 'm4', title: 'Sunday Night Queue', club: 'Lahug Smash Club', ago: 29, pageGone: true, published: true, pos: 5, games: [
     G('Doubles', ['Bea Castillo'], ['Theo Ramos', 'Marco Lopez'], 'L', '15–21'),
     G('Doubles', ['Enzo Navarro'], ['Kat Lim', 'Carlo Medina'], 'W', '21–17'),
     G('Singles', [], ['Rafa Aquino'], 'W', null),
   ] },
-  { id: 'm5', title: 'Thursday Open Play', club: 'Lahug Smash Club', ago: 46, games: [
+  { id: 'm5', title: 'Thursday Open Play', club: 'Lahug Smash Club', ago: 46, published: true, pos: 12, games: [
     G('Doubles', ['Nina Ocampo'], ['Paulo Garcia', 'Dani Rivera'], 'W', '21–11'),
     G('Doubles', ['Kat Lim'], ['Bea Castillo', 'Rafa Aquino'], 'L', '20–22'),
   ] },
@@ -590,12 +652,32 @@ function genSessions(seed, counted) {
   return out;
 }
 
+// Clubs, session links and the sessions Migs joined (fictional). Session slugs match the Queue prototype's /s/<slug> pages.
+const CLUB_DIR = {
+  c1: { name: 'Lahug Smash Club', code: 'CEB' }, c2: { name: 'IT Park Badminton Club', code: 'CEB' },
+  c3: { name: 'Mandaue Shuttle Society', code: 'MDE' }, c4: { name: 'Talamban Racket Club', code: 'CEB' },
+};
+const SESSION_DIR = {
+  's-tonight': { title: 'Sunday Night Queue', club: 'c1' }, 's-thu-open': { title: 'Thursday Open Play', club: 'c1' },
+  's-fri-smash': { title: 'Friday Night Smash', club: 'c2' },
+};
+const MY_SESSIONS = [
+  { slug: 's-tonight', day: 0, time: '6:00–9:00 PM', status: 'live' },
+  { slug: 's-thu-open', day: 3, time: '7:00–10:00 PM', status: 'confirmed' },
+  { slug: 's-fri-smash', day: 5, time: '8:00–11:00 PM', status: 'waitlist', n: 2 },
+];
+// Finished sessions shown in My sessions (ids from MIGS_SESSIONS). `published` is false until the Queue Master publishes the results (D-2026-11-09-08).
+const MY_FINISHED = ['m1', 'm2'];
+const VIA = { club_link: 'Joined via club link', session_link: 'Joined via session link', added_by_club: 'Added by the club' };
+const SUPPORT_EMAIL = 'support@rotra.example'; // placeholder: the owner supplies the real address before the real-app ticket ships
+const PLACES = [['CEB', 'Cebu City'], ['LAP', 'Lapu-Lapu'], ['MDE', 'Mandaue'], ['MNL', 'Manila'], ['DVO', 'Davao'], ['ILO', 'Iloilo'], ['BCD', 'Bacolod'], ['TAG', 'Tagbilaran']];
+const seedClubs = () => [{ id: 'c1', via: 'club_link' }, { id: 'c2', via: 'added_by_club' }];
 function seedAccounts() {
   return {
-    u1: { id: 'u1', name: 'Miguel Santos', nick: 'Migs', rtr: 'RTR-PH-CEB-031526-0001', phone: '+63 917 555 0142', email: 'migs.santos@example.com', phoneHidden: true, claimed: true, photo: true,
+    u1: { id: 'u1', name: 'Miguel Santos', nick: 'Migs', rtr: 'RTR-PH-CEB-031526-0001', phone: '+63 917 555 0142', email: 'migs.santos@example.com', phoneHidden: true, profilePrivate: false, claimed: true, photo: true, emailConfirmed: true, clubs: seedClubs(),
       style: 'Doubles, mostly at the front. I like fast drives and net kills, and I am working on my clears.', expY: '4', expM: '6',
       social: { facebook: 'https://facebook.com/migs.santos.badminton', instagram: 'https://instagram.com/migs.smash', youtube: '', linkedin: '' }, level: 5 },
-    u2: { id: 'u2', name: 'Jomar dela Cruz', nick: 'Jom', rtr: 'RTR-PH-CEB-040226-0007', phone: '+63 918 555 0377', email: 'jomar.dc@example.com', phoneHidden: false, claimed: false, photo: false,
+    u2: { id: 'u2', name: 'Jomar dela Cruz', nick: 'Jom', rtr: 'RTR-PH-CEB-040226-0007', phone: '+63 918 555 0377', email: 'jomar.dc@example.com', phoneHidden: false, profilePrivate: false, claimed: false, photo: false,
       style: '', expY: '', expM: '', social: { facebook: 'https://facebook.com/jomar.dc', instagram: '', youtube: '', linkedin: '' }, level: 3 },
   };
 }
@@ -614,10 +696,10 @@ function freshUi() {
     login: { id: '', pass: '', show: false, err: '', pending: false, note: '' },
     forgot: { email: '', err: '', pending: false, sent: '' },
     reset: { a: '', b: '', show: false, err: '', pending: false },
-    claim: null, claimErr: {}, claimPending: false, claimChecks: 0, claimConfirmed: false, claimWrong: false,
+    claim: null, regCtx: { club: null, session: null }, regDone: null, claimErr: {}, claimPending: false, claimChecks: 0, claimConfirmed: false, claimWrong: false,
     edit: null, editOrig: null, editErr: {}, editPending: false, editFail: '',
     req: null, reqErr: '', reqPending: false,
-    privacyPending: false, privacyErr: '',
+    privacyPending: false, privacyErr: '', profilePending: false, profileErr: '',
     sheet: null, hist: 'counted', findId: '', resetArmed: false, pendingGo: null,
   };
 }
@@ -629,7 +711,9 @@ if (S && S.v === 1) { Object.values(S.accounts || {}).forEach((a) => { if (a.lev
 if (!S || S.v !== 2) S = freshState();
 Object.assign(S.ui, { sheet: null, pendingGo: null, resetArmed: false });
 ['login', 'forgot', 'reset'].forEach((k) => { S.ui[k].pending = false; });
-S.ui.claimPending = false; S.ui.editPending = false; S.ui.reqPending = false; S.ui.privacyPending = false;
+if (S.accounts?.u1 && !S.accounts.u1.clubs) { S.accounts.u1.clubs = seedClubs(); S.accounts.u1.emailConfirmed = true; }
+S.ui.regCtx = S.ui.regCtx || { club: null, session: null };
+S.ui.claimPending = false; S.ui.editPending = false; S.ui.reqPending = false; S.ui.privacyPending = false; S.ui.profilePending = false;
 if (S.board === 'loading') S.board = 'ok';
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable: keep working in memory */ } }
 // Light / dark: dark by default (or the device setting until the viewer picks one); the choice is remembered on this device.
@@ -710,6 +794,7 @@ const I = {
   qr: svg('<rect x="3.5" y="3.5" width="6" height="6" rx="1"/><rect x="14.5" y="3.5" width="6" height="6" rx="1"/><rect x="3.5" y="14.5" width="6" height="6" rx="1"/><path d="M14.5 14.5h2v2M20.5 14.5v6h-6M17.5 18.5h.01"/>'),
   versus: svg('<path d="M5 5l6 7-6 7M19 5l-6 7 6 7"/>', 16, 2.2),
   edit: svg('<path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="m13.5 6.5 4 4"/>'),
+  share: svg('<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="m8.2 10.8 7.6-3.6M8.2 13.2l7.6 3.6"/>'),
   lock: svg('<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>'),
   ext: svg('<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>', 14),
 };
@@ -732,8 +817,8 @@ const genCache = new Map();
 function profileOf(pid) {
   if (S.accounts[pid]) {
     const a = S.accounts[pid];
-    const sessions = pid === 'u1' ? migsSessions() : (genCache.get(pid) || genCache.set(pid, genSessions(pid, 7)).get(pid));
-    const state = pid === 'u1' ? S.rank : 'below';
+    const sessions = pid === 'u1' ? migsSessions() : a.fresh ? [] : (genCache.get(pid) || genCache.set(pid, genSessions(pid, 7)).get(pid));
+    const state = pid === 'u1' ? S.rank : a.fresh ? 'new' : 'below';
     return { ...a, state, level: state === 'new' ? null : a.level, sessions, recent: countedIn(sessions, WINDOW_DAYS) };
   }
   const m = /^b(\d+)$/.exec(pid || '');
@@ -743,6 +828,10 @@ function profileOf(pid) {
   const sessions = genCache.get(pid);
   return { ...e, claimed: true, state: 'eligible', style: '', expY: '', expM: '', social: {}, sessions, recent: countedIn(sessions, WINDOW_DAYS) };
 }
+// Visitors (not signed in) never see a private player or a guest: masked and not opened (D-2026-11-09-07).
+const hiddenFromVisitor = (p) => !S.me && !!p && !!(p.profilePrivate || p.guest);
+const maskName = (name) => name.split(/\s+/).filter(Boolean).map((w) => `${w[0]}***`).join(' ');
+const maskedView = (e) => ({ id: e.id, name: maskName(e.name), nick: '', photo: false, level: e.level });
 // Migs joins the list only while his own figures qualify; everyone else is filtered by the current threshold.
 const migsOnBoard = () => S.rank !== 'new' && S.rank !== 'reassess' && countedIn(migsSessions(), WINDOW_DAYS) >= T();
 function boardList() {
@@ -750,7 +839,7 @@ function boardList() {
   const out = [];
   const migs = migsOnBoard();
   BASE.forEach((e, i) => {
-    if (i === MIGS_SLOT && migs) out.push({ id: 'u1', name: S.accounts.u1.name, nick: S.accounts.u1.nick, photo: S.accounts.u1.photo, face: S.accounts.u1.face, photoUrl: S.accounts.u1.photoUrl, level: S.accounts.u1.level });
+    if (i === MIGS_SLOT && migs) out.push({ id: 'u1', name: S.accounts.u1.name, nick: S.accounts.u1.nick, photo: S.accounts.u1.photo, face: S.accounts.u1.face, photoUrl: S.accounts.u1.photoUrl, level: S.accounts.u1.level, profilePrivate: S.accounts.u1.profilePrivate });
     if (e.recent >= T()) out.push(e);
   });
   return out;
@@ -778,12 +867,19 @@ function gameRow(g) {
   return `<div class="game">${res}<div class="main"><b>${esc(g.fmt)}</b>${g.partner.length ? ` <span class="muted">with ${people(g.partner)}</span>` : ''}
     <div class="small muted">vs ${people(g.opp)}</div>${g.note ? `<div class="small" style="color:var(--warn)">${esc(g.note)} · not counted</div>` : ''}</div>${score}</div>`;
 }
-function sessionBlock(s, kinds) {
+function sessionBlock(s, kinds, own = false) {
   const games = s.games.filter((g) => kinds.includes(g.kind));
   if (!games.length) return '';
   return `<section class="sess"><div class="sess-head"><div style="min-width:0"><h3>${esc(s.title)}</h3><p class="small muted">${fmtDay(s.ago)} · ${esc(s.club)}</p></div>
     ${s.pageGone ? '<span class="small muted">Session page no longer available</span>' : `<button class="btn xs ghost" data-act="sessionPage" data-title="${esc(s.title)}">Session page ${I.ext}</button>`}</div>
+    ${own && kinds.includes('counted') ? shareRow(s) : ''}
     ${games.map(gameRow).join('')}</section>`;
+}
+// Share result / Share games on a session of the signed-in player's own history. Only after the Queue Master publishes (D-2026-11-09-08).
+function shareRow(s) {
+  if (s.published === true) return `<div class="row sess-share"><button class="btn xs" data-act="openShare" data-kind="result" data-sid="${s.id}">${I.share} Share result</button><button class="btn xs" data-act="openShare" data-kind="games" data-sid="${s.id}">${I.share} Share games</button></div>`;
+  if (s.published === false) return '<p class="small muted sess-share">Results not shared yet by the club.</p>';
+  return '';
 }
 function eligibility(p, own) {
   const t = T(), pct = Math.min(100, Math.round((p.recent / t) * 100));
@@ -813,13 +909,26 @@ function topBar() {
     <div class="grow"></div>
     <button class="btn xs ghost icon-btn" data-act="toggleTheme" aria-label="Switch to ${isDark() ? 'light' : 'dark'} mode" title="${isDark() ? 'Light' : 'Dark'} mode">${isDark() ? I.sun : I.moon}</button>
     <button class="btn xs" data-act="openDemo">Prototype</button>
-  </div></header>${S.online ? '' : `<div class="band-off" role="status"><div class="in">${I.alert}<span><b>You're offline.</b> Showing what this device saved at ${fmtTime(S.offlineAt || Date.now())}. Signing in and saving changes need an internet connection.</span></div></div>`}`;
+  </div></header>${emailBanner()}${S.online ? '' : `<div class="band-off" role="status"><div class="in">${I.alert}<span><b>You're offline.</b> Showing what this device saved at ${fmtTime(S.offlineAt || Date.now())}. Signing in and saving changes need an internet connection.</span></div></div>`}`;
+}
+
+// Shown at the top of every page while the signed-in account has not confirmed its email (D-2026-11-09-06).
+function emailBanner() {
+  const a = S.me && S.accounts[S.me];
+  if (!a || a.emailConfirmed !== false) return '';
+  return `<div class="band-off" role="status"><div class="in">${I.alert}<div><span><b>Confirm your email.</b> We sent a link to ${esc(a.email)}. Some actions wait until it's confirmed.</span>
+    <div class="btns"><button class="btn xs" data-act="resendEmail">Resend email</button><button class="btn xs ghost" data-act="markConfirmed" title="Prototype only">Mark confirmed</button><span class="small muted" style="align-self:center">Prototype only</span></div></div></div></div>`;
 }
 
 // ---------- P-LEADERBOARD ----------
 function lbRow(e, pos) {
   const me = e.id === S.me;
   const medal = ['', 'first', 'second', 'third'][pos] || '';
+  if (hiddenFromVisitor(e)) {
+    const m = maskedView(e);
+    return `<div class="lb-row${medal ? ` podium p${pos}` : ''}" id="row-${e.id}" aria-disabled="true"><span class="lb-pos">${num(pos)}</span>${avatar(m)}
+    <span class="lb-name"><b>${esc(m.name)}</b></span><span class="lb-lv">${lvLabel(e.level)}</span></div>`;
+  }
   return `<button class="lb-row${me ? ' me' : ''}${medal ? ` podium p${pos}` : ''}" id="row-${e.id}" data-act="openProfile" data-id="${e.id}" aria-label="${medal ? `${medal[0].toUpperCase()}${medal.slice(1)} place` : `Number ${pos}`}, ${esc(e.name)}${me ? ' (you)' : ''}, ${lvLabel(e.level)}">
     <span class="lb-pos">${num(pos)}</span>${avatar(e)}
     <span class="lb-name"><b>${esc(e.name)}</b>${e.nick ? `<span class="small muted">“${esc(e.nick)}”</span>` : ''}${me ? chip('You', 'ok') : ''}</span>
@@ -847,7 +956,7 @@ function viewBoard() {
   } else if (!list.length) {
     body = `<div class="empty">No players qualify for the leaderboard yet. Players appear after ${T()} standard matches in the last three months.</div>`;
   } else if (q && !isId) {
-    const hits = list.map((e, i) => ({ e, pos: i + 1 })).filter(({ e }) => e.name.toLowerCase().includes(ql) || (e.nick || '').toLowerCase().includes(ql));
+    const hits = list.map((e, i) => ({ e, pos: i + 1 })).filter(({ e }) => !hiddenFromVisitor(e) && (e.name.toLowerCase().includes(ql) || (e.nick || '').toLowerCase().includes(ql)));
     body = hits.length
       ? `<p class="small muted" aria-live="polite">${hits.length} ${hits.length === 1 ? 'player matches' : 'players match'} “${esc(q)}”${hits.length > 50 ? '. Showing the first 50.' : '.'}</p><div class="lb">${lbHead()}${hits.slice(0, 50).map(({ e, pos }) => lbRow(e, pos)).join('')}</div>`
       : `<div class="empty" aria-live="polite">No one on the leaderboard matches “${esc(q)}”. Players below the match requirement aren't listed here.</div>`;
@@ -888,7 +997,11 @@ function podium(list) {
   const embers = Array.from({ length: 14 }, (_, k) => `<i style="left:${4 + ((k * 37) % 92)}%;animation-delay:${((k * 0.73) % 5).toFixed(2)}s;animation-duration:${4 + (k % 4)}s"></i>`).join('');
   return `<section class="podium" aria-labelledby="pod-title"><span class="embers" aria-hidden="true">${embers}</span>
     <div class="pod-head"><h2 id="pod-title">Top three</h2><span class="small muted">Overall ROTRA leaderboard · ${num(list.length)} players</span></div>
-    <div class="pod-stage">${list.slice(0, 3).map((e, i) => `
+    <div class="pod-stage">${list.slice(0, 3).map((e, i) => hiddenFromVisitor(e) ? `
+    <div class="pod p${i + 1}" aria-disabled="true">
+      <span class="pod-who">${i === 0 ? '<canvas class="fire" id="fire" width="48" height="40" aria-hidden="true"></canvas>' : ''}${avatar(maskedView(e), 'pod-av')}
+        <b class="pod-name">${esc(maskName(e.name))}</b><span class="pod-lv">${lvLabel(e.level)}</span></span>
+      <span class="pod-step" aria-hidden="true"><b>${i + 1}</b><small>${short[i]}</small></span></div>` : `
     <button class="pod p${i + 1}${e.id === S.me ? ' me' : ''}" data-act="openProfile" data-id="${e.id}" aria-label="${place[i]} place, ${esc(e.name)}${e.id === S.me ? ' (you)' : ''}, ${lvLabel(e.level)}">
       <span class="pod-who">${i === 0 ? '<canvas class="fire" id="fire" width="48" height="40" aria-hidden="true"></canvas>' : ''}${avatar(e, 'pod-av')}
         <b class="pod-name">${esc(e.name)}</b>${e.nick ? `<span class="small muted">“${esc(e.nick)}”</span>` : ''}<span class="pod-lv">${lvLabel(e.level)}</span></span>
@@ -972,6 +1085,7 @@ function startFire() {
 function viewProfile() {
   const p = profileOf(S.viewId);
   if (!p) return viewNotFound();
+  if (hiddenFromVisitor(p)) return viewPrivateGate();
   const own = p.id === S.me;
   const pos = positionOf(p.id);
   const st = rankStatus(p, pos);
@@ -987,14 +1101,14 @@ function viewProfile() {
           <span class="hint">Shows the city and date this profile was first created. It isn't where ${own ? 'you live or which club you play for' : 'this player lives or which club they play for'}.</span></div>
         ${own ? `<div class="acts"><button class="btn sm" data-act="openEdit">${I.edit} Edit profile</button><button class="btn sm" data-act="go" data-to="id">${I.qr} My player ID</button></div>` : `<div class="acts"><button class="btn sm primary" data-act="openCompare" data-id="${p.id}">${I.versus} Compare with ${S.me ? 'me' : 'my results'}</button></div>`}
       </section>
-      ${own ? privatePanel(p) : ''}
+      ${own ? privatePanel(p) + clubsPanel(p) : ''}
     </aside>
     <div class="stack" style="gap:20px">
       ${!S.online && own ? notice('warn', 'Saved copy. Your rank and games may have changed since this device was last online.') : ''}
       ${p.state === 'processing' ? notice('warn', `<b>Updating from Sunday Night Queue.</b> Lahug Smash Club finished the session last night. This is ${own ? 'your' : 'the'} last calculated rank until the update is ready.`) : ''}
       ${missing ? notice('', `Add your playing style and experience so clubs know your game. It's optional. <button class="btn xs" data-act="openEdit" style="margin-left:4px">Add details</button>`) : ''}
       <section class="card stack">
-        <div class="between"><span class="label">Shared rank</span><button class="btn xs ghost" data-act="openRank" data-id="${p.id}">How this rank works</button></div>
+        <div class="between"><span class="label">Shared rank</span><div class="row">${own && p.level != null ? `<button class="btn xs" data-act="openShare" data-kind="rank">${I.share} Share</button>` : ''}<button class="btn xs ghost" data-act="openRank" data-id="${p.id}">How this rank works</button></div></div>
         <div class="rank-main"><div class="stack tight"><div class="rank-label${p.level == null ? ' dim' : ''}">${lvLabel(p.level)}</div><div class="row">${st.chips}</div></div>
           ${pos ? `<div class="rank-pos"><span class="label">Overall</span><b>#${num(pos)}</b></div>` : `<div class="rank-pos none"><span class="label">Overall</span><b>No position</b></div>`}</div>
         ${ladder(p.level, st.stale)}
@@ -1002,6 +1116,7 @@ function viewProfile() {
         <p class="small muted">Clubs can still place ${own ? 'you' : firstName(p)} at a different level for their own sessions.</p>
       </section>
       ${eligibility(p, own)}
+      ${own ? mySessionsCard() : ''}
       <section class="card stack"><div class="between"><h2>Recent games</h2>${games.length ? `<button class="btn xs" data-act="openHistory" data-id="${p.id}">All games (${games.length})</button>` : ''}</div>
         ${games.length ? `<div>${games.slice(0, 3).map(({ g, s }) => gameRow({ ...g, note: '' }).replace('<div class="small muted">vs', `<div class="small muted">${fmtDay(s.ago)} · ${esc(s.club)}</div><div class="small muted">vs`)).join('')}</div>` : '<div class="empty">No recorded games yet.</div>'}
       </section>
@@ -1051,6 +1166,28 @@ function privatePanel(p) {
     <div class="acts"><button class="btn sm" data-act="go" data-to="account">Privacy and contact</button><button class="btn sm ghost" data-act="signOut">Sign out</button></div></section>`;
 }
 
+// My sessions: the player's upcoming and live sessions (requested, confirmed or waitlisted). Loads once when the profile opens; no live updates.
+function mySessionsCard() {
+  const list = S.me === 'u1' ? MY_SESSIONS : [];
+  const done = S.me === 'u1' ? MY_FINISHED.map((id) => migsSessions().find((x) => x.id === id)).filter(Boolean) : [];
+  const stat = (m) => (m.status === 'live' ? chip('Happening now', 'ok') : m.status === 'confirmed' ? chip('Confirmed', 'solid') : m.status === 'waitlist' ? chip(`Waitlist #${m.n}`, 'warn') : chip('Requested', 'warn'));
+  return `<section class="card stack"><h2>My sessions</h2>${list.length ? `<div>${list.map((m) => {
+    const d = SESSION_DIR[m.slug];
+    return `<a class="srow" href="/queue/s/${encodeURIComponent(m.slug)}"><span class="main"><b>${esc(d.title)}</b><span class="small muted">${fmtDay(-m.day)} · ${m.time} · ${esc(CLUB_DIR[d.club].name)}</span></span>${stat(m)}</a>`;
+  }).join('')}</div>` : '<div class="empty">No upcoming sessions. Sessions you join from a club\'s session link show here.</div>'}
+    ${done.length ? `<span class="label">Finished</span><div>${done.map((s) => `<div class="srow"><span class="main"><b>${esc(s.title)}</b><span class="small muted">${fmtDay(s.ago)} · ${esc(s.club)}</span></span>${s.published ? `<button class="btn xs" data-act="openShare" data-kind="result" data-sid="${s.id}">${I.share} Share result</button>` : '<span class="small muted srow-note">Results not shared yet by the club.</span>'}</div>`).join('')}</div>` : ''}</section>`;
+}
+// Your clubs: own profile only. Leaving removes the player from the club's saved players; past games stay.
+function clubsPanel(p) {
+  const list = p.clubs || [];
+  return `<section class="card stack"><h3>Your clubs</h3>${list.length ? `<div>${list.map((c) => {
+    const club = CLUB_DIR[c.id];
+    const mail = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(`Problem with ${club.name}`)}&body=${encodeURIComponent(`Club: ${club.name}\nMy ROTRA player ID: ${p.rtr}\n\nWhat went wrong:\n`)}`;
+    return `<div class="crow">${avatar({ name: club.name })}<div class="main"><b>${esc(club.name)}</b><span class="small muted">${VIA[c.via]}</span>
+      <div class="btns"><button class="btn xs" data-act="openLeaveClub" data-id="${c.id}">Leave club</button><a class="btn xs" href="${mail}">Report a problem</a></div></div></div>`;
+  }).join('')}</div><span class="hint">Report a problem opens your email app.</span>` : '<div class="empty">You\'re not in any club\'s saved players yet.</div>'}</section>`;
+}
+
 // ---------- P-COMPARE ----------
 // Head to head with the signed-in player. The prototype draws the shared games from the two ids, so the same pair always gives the same record.
 function sharedGames(aId, bId) {
@@ -1075,6 +1212,7 @@ const cmpCourtSVG = () => `<svg class="sc-svg" viewBox="0 0 134 61" aria-hidden=
 function viewCompare() {
   const them = profileOf(S.viewId), me = S.me ? profileOf(S.me) : null;
   if (!them) return viewNotFound();
+  if (hiddenFromVisitor(them)) return viewPrivateGate();
   if (!me) return viewLogin();
   if (them.id === me.id) { S.screen = 'profile'; return viewProfile(); }
   const all = sharedGames(me.id, them.id), against = all.filter((g) => !g.together), together = all.filter((g) => g.together);
@@ -1139,6 +1277,7 @@ function viewCompare() {
 // ---------- P-RANK-DETAIL ----------
 function viewRank() {
   const p = S.viewId ? profileOf(S.viewId) : null;
+  if (hiddenFromVisitor(p)) return viewPrivateGate();
   const w = S.config.weight;
   const st = p ? rankStatus(p, positionOf(p.id)) : null;
   return `<main class="wrap mid">
@@ -1173,9 +1312,10 @@ function viewRank() {
 function viewHistory() {
   const p = profileOf(S.viewId);
   if (!p) return viewNotFound();
+  if (hiddenFromVisitor(p)) return viewPrivateGate();
   const tab = S.ui.hist;
   const kinds = tab === 'counted' ? ['counted'] : ['fun', 'partial'];
-  const blocks = p.sessions.map((s) => sessionBlock(s, kinds)).filter(Boolean);
+  const blocks = p.sessions.map((s) => sessionBlock(s, kinds, p.id === S.me)).filter(Boolean);
   const nC = countedAll(p.sessions), nF = p.sessions.reduce((n, s) => n + s.games.filter((g) => g.kind !== 'counted').length, 0);
   return `<main class="wrap mid">
     <div class="page-head">${backBtn('openProfile', p.name, p.id)}<span class="label">${esc(p.name)}</span><h1>Games</h1>
@@ -1258,6 +1398,13 @@ function viewAccount() {
   const savedText = p.phoneHidden ? 'Saved: your phone number is hidden from clubs.' : 'Saved: clubs can see your phone number.';
   return `<main class="wrap slim">
     <div class="page-head">${backBtn('openProfile', 'My profile', p.id)}<h1>Privacy and contact</h1></div>
+    <section class="card stack"><h2>Profile visibility</h2>
+      <div class="setting"><div class="main stack tight"><label for="sw-profile" style="font-weight:700">Private profile</label>
+        <p class="small muted">Private means guests don't see your ROTRA profile. Signed-in ROTRA players still see it.</p></div>
+        ${sw(p.profilePrivate, 'toggleProfilePrivate', 'Private profile', `id="sw-profile" ${S.ui.profilePending ? 'disabled aria-busy="true"' : ''}`)}</div>
+      <p class="small" aria-live="polite">${S.ui.profilePending ? 'Saving…' : esc(p.profilePrivate ? 'Saved: your profile is private.' : 'Saved: your profile is public.')}</p>
+      ${S.ui.profileErr ? notice('bad', esc(S.ui.profileErr)) : ''}
+    </section>
     <section class="card stack"><h2>Phone privacy</h2>
       <div class="setting"><div class="main stack tight"><label for="sw-phone" style="font-weight:700">Hide my phone number from clubs</label>
         <p class="small muted">Clubs can find you by your player ID or QR code instead. Your phone and email are never on your public profile or the leaderboard, whatever this is set to.</p></div>
@@ -1352,7 +1499,7 @@ function viewLogin() {
       <button type="button" class="btn sm" data-act="toggleShow" data-k="login" aria-pressed="${!!L.show}" aria-label="${L.show ? 'Hide password' : 'Show password'}">${L.show ? 'Hide' : 'Show'}</button></div></div>
     <button class="btn primary block" type="submit" ${L.pending ? 'disabled' : ''}>${L.pending ? 'Signing in…' : 'Sign in'}</button>
     <button type="button" class="btn ghost block" data-act="go" data-to="forgot">Forgot password?</button>
-    <p class="small muted">New to ROTRA? A club adds you first, then sends you a link to finish registering. You don't need an account to view profiles or the leaderboard.</p>
+    <p class="small muted">New to ROTRA? New to ROTRA? Register from your club's invite link or a session link. You don't need an account to view profiles or the leaderboard.</p>
   </form></main>`;
 }
 function viewForgot() {
@@ -1392,7 +1539,7 @@ function claimStatus() {
 function viewClaim(standalone = false) {
   const a = standalone ? {name: '', nick: '', email: '', phone: '', social: {}} : S.accounts.u2;
   const st = standalone ? 'valid' : claimStatus();
-  const wrap = (inner) => `<main class="wrap slim"><div class="page-head"><span class="label">Registration link from Lahug Smash Club</span>${inner}</div></main>`;
+  const wrap = (inner) => `<main class="wrap slim"><div class="page-head"><span class="label">${standalone ? esc(regLabel()) : 'Registration link from Lahug Smash Club'}</span>${inner}</div></main>`;
   if (st === 'claimed') return wrap(`<h1>This profile is already registered</h1>${notice('', 'This link was already used to finish registering. It can\'t create another account.')}
     <div class="row"><button class="btn primary" data-act="go" data-to="login">Sign in</button><button class="btn" data-act="go" data-to="forgot">Request password reset</button></div>`);
   if (st === 'expired') return wrap(`<h1>This link can't be used</h1>${notice('bad', 'The registration link has expired or was replaced.')}
@@ -1402,7 +1549,8 @@ function viewClaim(standalone = false) {
   if (st === 'processing') return wrap(`<h1>Setting up your account</h1>${notice('warn', 'Your registration was received and is still being set up. You don\'t need to send it again.')}
     <div class="row"><button class="btn primary" data-act="claimCheck">Check again</button></div>`);
   // Everything the club filled in (Queue › Saved players › Edit details) starts the form; the player can change it.
-  const C = S.ui.claim || (S.ui.claim = { ...editFields(a), email: a.email || '', phone: '', pass: '', pass2: '', show: false });
+  const C = S.ui.claim || (S.ui.claim = { ...editFields(a), email: a.email || '', phone: '', pass: '', pass2: '', show: false, city: '' });
+  const adminLink = standalone && !S.ui.regCtx.club;
   const e = S.ui.claimErr;
   if (!standalone && !S.ui.claimConfirmed) {
     return wrap(`<h1>Is this you?</h1><p class="muted">Lahug Smash Club added this profile for you. Check it's yours before you set a password.</p>
@@ -1410,8 +1558,8 @@ function viewClaim(standalone = false) {
         <dl class="kv"><dt>Player ID</dt><dd class="mono" style="overflow-wrap:anywhere">${esc(a.rtr)}</dd><dt>Phone</dt><dd class="mono">${esc(maskPhone(a.phone))}</dd></dl>
         <div class="row"><button class="btn primary" data-act="claimYes">Yes, this is me</button><button class="btn" data-act="claimNo">This isn't me</button></div></section>`);
   }
-  return `<main class="wrap slim"><div class="page-head"><span class="label">Registration link from Lahug Smash Club</span><h1>Finish registering</h1>
-    <p class="muted">${standalone ? 'Create your ROTRA account with your phone and email. Your club guest record stays unlinked until you accept a separate linking invitation.' : "Your club filled in what it knows. Check it, change anything that's wrong, and choose a password."}</p></div>
+  return `<main class="wrap slim"><div class="page-head"><span class="label">${standalone ? esc(regLabel()) : 'Registration link from Lahug Smash Club'}</span><h1>Finish registering</h1>
+    <p class="muted">${standalone ? 'Create your ROTRA account with your phone and email. Your full name shows to signed-in ROTRA players on sessions you join.' : "Your club filled in what it knows. Check it, change anything that's wrong, and choose a password."}</p></div>
     <form class="card stack" data-form="${standalone ? 'register' : 'claim'}" novalidate style="gap:16px">
       ${standalone && S.ui.registerMatch ? notice('warn', `A ROTRA account or profile already uses this phone number or email. Is it yours?<div class="row"><button type="button" class="btn primary" data-act="go" data-to="login">Yes, sign in</button><button type="button" class="btn" data-act="go" data-to="forgot">Recover account</button><button type="button" class="btn" data-act="registerNo">No, edit my details</button></div><p>If you have not registered yet, ask your club for your profile's registration link. Otherwise contact ROTRA for help.</p>`) : ''}
       ${S.ui.claimFail ? notice('bad', esc(S.ui.claimFail)) : ''}
@@ -1423,9 +1571,35 @@ function viewClaim(standalone = false) {
           <div class="row nowrap"><input class="input${e.pass ? ' bad' : ''}" id="cl-pass" type="${C.show ? 'text' : 'password'}" autocomplete="new-password" data-bind="ui.claim.pass" value="${esc(C.pass)}">
           <button type="button" class="btn sm" data-act="toggleShow" data-k="claim" aria-pressed="${!!C.show}" aria-label="${C.show ? 'Hide passwords' : 'Show passwords'}">${C.show ? 'Hide' : 'Show'}</button></div>${e.pass ? `<span class="err">${esc(e.pass)}</span>` : ''}</div>
         <label class="field" for="cl-pass2"><span>Confirm password <span style="color:var(--error)" aria-hidden="true">*</span></span><input class="input${e.pass2 ? ' bad' : ''}" id="cl-pass2" type="${C.show ? 'text' : 'password'}" autocomplete="new-password" data-bind="ui.claim.pass2" value="${esc(C.pass2)}">${e.pass2 ? `<span class="err">${esc(e.pass2)}</span>` : ''}</label></div>
+      ${adminLink ? `<label class="field" for="cl-city"><span>City or province <span style="color:var(--error)" aria-hidden="true">*</span></span><select class="input${e.city ? ' bad' : ''}" id="cl-city" data-bind="ui.claim.city" ${e.city ? 'aria-invalid="true" aria-describedby="cl-city-err"' : ''}><option value="">Choose one</option>${PLACES.map(([c, n]) => `<option value="${c}" ${C.city === c ? 'selected' : ''}>${n}</option>`).join('')}</select>${e.city ? `<span class="err" id="cl-city-err">${esc(e.city)}</span>` : '<span class="hint">Used in your player ID.</span>'}</label>` : ''}
       <div class="stack" style="padding-top:12px;border-top:1px solid var(--border)"><span class="label">About you</span>${personalFields('ui.claim', C, e, 'cl')}</div>
       <div class="row end"><button class="btn primary" type="submit" ${S.ui.claimPending ? 'disabled' : ''}>${S.ui.claimPending ? 'Completing…' : 'Complete registration'}</button></div>
     </form></main>`;
+}
+function regLabel() {
+  const x = S.ui.regCtx, club = x.club && CLUB_DIR[x.club], ses = x.session && SESSION_DIR[x.session];
+  if (club && ses) return `Session link from ${club.name} · ${ses.title}`;
+  return club ? `Registration link from ${club.name}` : 'ROTRA registration';
+}
+function viewRegisterDone() {
+  const d = S.ui.regDone, a = d && S.accounts[d.id];
+  if (!a) return viewClaim(true);
+  const club = d.club && CLUB_DIR[d.club], ses = d.session && SESSION_DIR[d.session];
+  return `<main class="wrap slim"><div class="page-head"><span class="label">Registration complete</span><h1>Welcome, ${esc(firstName(a))}</h1></div>
+    ${club ? notice('ok', `You're now in ${esc(club.name)}'s saved players.`) : notice('ok', 'Your ROTRA account is ready.')}
+    ${ses ? notice('', `Your request to join ${esc(ses.title)} is ready to send.`) : ''}
+    <section class="card stack tight"><p>Your player ID is <span class="mono">${esc(a.rtr)}</span>.</p>
+      <div class="row">${ses ? `<a class="btn primary" href="/queue/s/${encodeURIComponent(d.session)}">Back to the session</a>` : ''}<button class="btn${ses ? '' : ' primary'}" data-act="openProfile" data-id="${a.id}">Go to my profile</button></div></section></main>`;
+}
+// A signed-in player who opens a club invite link (/register/[clubId]).
+function viewJoinClub() {
+  const club = CLUB_DIR[S.ui.regCtx.club], a = S.accounts[S.me];
+  if (!club || !a) return viewNotFound();
+  if ((a.clubs || []).some((c) => c.id === S.ui.regCtx.club)) return `<main class="wrap slim"><div class="page-head"><h1>${esc(club.name)}</h1></div>
+    ${notice('', `You're already in ${esc(club.name)}.`)}<div class="row"><button class="btn primary" data-act="openProfile" data-id="${a.id}">Go to my profile</button></div></main>`;
+  return `<main class="wrap slim"><div class="page-head"><h1>Join ${esc(club.name)}?</h1>
+    <p class="muted">You're added to ${esc(club.name)}'s saved players. The club can put you in its sessions and record your games. You can leave any time from your profile.</p></div>
+    <div class="row"><button class="btn primary" data-act="joinClub">Join ${esc(club.name)}</button><button class="btn" data-act="openProfile" data-id="${a.id}">Not now</button></div></main>`;
 }
 function viewClaimDone() {
   const p = profileOf('u2');
@@ -1434,9 +1608,146 @@ function viewClaimDone() {
     <section class="card stack tight"><p>Your player ID stays <span class="mono">${esc(p.rtr)}</span>. Your games and rank carry over.</p>
       <div class="row"><button class="btn primary" data-act="openProfile" data-id="u2">Go to my profile</button></div></section></main>`;
 }
+function viewPrivateGate() {
+  return `<main class="wrap slim"><div class="page-head">${backBtn('goBoard', 'Leaderboard')}<h1>Profile</h1></div>
+    ${notice('', 'Log in with ROTRA to see this profile.')}
+    <div class="row"><button class="btn primary" data-act="gateLogin">Sign in</button></div></main>`;
+}
 function viewNotFound() {
   return `<main class="wrap slim"><div class="page-head">${backBtn('goBoard', 'Leaderboard')}<h1>Profile not found</h1></div>
     ${notice('', `No ROTRA profile has the ID <span class="mono">${esc(S.ui.findId || S.viewId || '')}</span>. Check the ID and try again.`)}</main>`;
+}
+
+// ---------- Share cards (D-2026-11-09-08) ----------
+// Rank card, My session result and Session games share one sheet. The image is drawn on the device (canvas), like the Queue Session QR card.
+// Other players' names show the way a visitor would see them: private players and guests masked, public registered players in full.
+const SHARE_MASKED = new Set(['Kat Lim', 'Rafa Aquino', 'Ian Co', 'Pia Tan']); // prototype: private profile or guest
+const shareName = (n) => (SHARE_MASKED.has(n) ? maskName(n) : n);
+const profileLink = (id) => `${/^https?:/.test(location.origin) ? location.origin : 'https://rotra.example'}/player/players/${id}`;
+const SHARE_MAX_GAMES = 8;
+function shareModel(sh) {
+  if (!S.me) return null;
+  const p = profileOf(S.me), s = sh.sid ? migsSessions().find((x) => x.id === sh.sid) : null;
+  const top = { p, title: p.name, sub: p.nick ? `“${p.nick}”` : 'ROTRA player' };
+  const link = profileLink(p.id);
+  if (sh.kind === 'rank') {
+    if (p.level == null) return null;
+    const pos = positionOf(p.id);
+    return { kind: 'rank', title: 'Share rank', top, link, blocks: [{ t: 'rank', label: lvLabel(p.level), pos }, { t: 'ladder', level: p.level }] };
+  }
+  if (!s || s.published !== true) return null;
+  const gs = s.games.filter((g) => g.kind !== 'partial'), w = gs.filter((g) => g.res === 'W').length, l = gs.length - w;
+  const head = [{ t: 'h', text: s.title }, { t: 'p', text: `${fmtDay(s.ago)} · ${s.club}` }];
+  if (sh.kind === 'result') return { kind: 'result', title: 'Share result', top, link, blocks: [...head, { t: 'big', value: `#${s.pos}`, label: 'in Standings' }, { t: 'stat', text: `${gs.length} ${gs.length === 1 ? 'game' : 'games'} · ${w}–${l}` }] };
+  const lines = gs.slice(0, SHARE_MAX_GAMES).map((g) => ({
+    res: g.res, score: g.score || 'Winner recorded',
+    text: `${g.partner.length ? `with ${g.partner.map(shareName).join(', ')} ` : ''}vs ${g.opp.map(shareName).join(', ')}`,
+  }));
+  return { kind: 'games', title: 'Share games', top, link, blocks: [...head, { t: 'lines', lines }, ...(gs.length > SHARE_MAX_GAMES ? [{ t: 'more', text: `+${gs.length - SHARE_MAX_GAMES} more games` }] : []), { t: 'stat', text: `Total W–L ${w}–${l}` }] };
+}
+function shareCardHTML(m, fmt) {
+  const p = m.top.p, story = fmt === 'story';
+  const av = p.photoUrl ? `<img src="${p.photoUrl}" alt="">` : p.photo ? faceSVG(p) : esc(initials(p.name));
+  const blk = (b) => {
+    if (b.t === 'h') return `<h3>${esc(b.text)}</h3>`;
+    if (b.t === 'p') return `<p>${esc(b.text)}</p>`;
+    if (b.t === 'rank') return `<div class="sh-lv">${esc(b.label)}</div><div class="sh-pos"><span>Overall</span>${b.pos ? `<b>#${num(b.pos)}</b>` : '<b class="none">No position</b>'}</div>`;
+    if (b.t === 'ladder') return `<div class="sh-ladder" aria-hidden="true">${TIERS.map(([name, bands]) => `<div class="t"><div class="bs">${bands.map((i) => `<i class="${i === b.level ? 'cur' : i < b.level ? 'on' : ''}"></i>`).join('')}</div><em>${name}</em></div>`).join('')}</div>`;
+    if (b.t === 'big') return `<div class="sh-big"><b>${esc(b.value)}</b><span>${esc(b.label)}</span></div>`;
+    if (b.t === 'stat') return `<div class="sh-stat">${esc(b.text)}</div>`;
+    if (b.t === 'more') return `<div class="sh-more">${esc(b.text)}</div>`;
+    return `<div class="sh-lines">${b.lines.map((g) => `<div class="sh-gl"><span class="r ${g.res}">${g.res}</span><span class="t" style="--l:${story ? 2 : 1}">${esc(g.text)}</span><span class="s">${esc(g.score)}</span></div>`).join('')}</div>`;
+  };
+  return `<div class="sh-card ${fmt} ${m.kind}" role="group" aria-label="Share image preview">
+    <div class="sh-top"><span class="sh-av">${av}</span><div><b>${esc(m.top.title)}</b><span>${esc(m.top.sub)}</span></div></div>
+    <div class="sh-mid">${m.blocks.map(blk).join('')}</div>
+    <div class="sh-foot"><div><span class="w">ROTR<b>A</b></span><span class="tag">Run the game.</span></div><div class="sh-code" role="img" aria-label="QR code that opens your profile">${qrSVG(m.link) || ''}</div></div></div>`;
+}
+const loadImg = (src) => new Promise((res) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = src; });
+async function shareAvatar(p) {
+  if (p.photoUrl) return loadImg(p.photoUrl);
+  if (p.photo) return loadImg(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(faceSVG(p).replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" '))}`);
+  return null;
+}
+// Draws the card at 1080 x 1350 (Post) or 1080 x 1920 (Story). Sizes are in the preview's CSS pixels, scaled up.
+async function drawShareCard(m, fmt) {
+  const story = fmt === 'story', cw = story ? 270 : 320, ch = story ? 480 : 400, k = 1080 / cw, pad = 20;
+  const FG = '#f0f0f2', DIM = '#9090a0', ACC = '#00ff88', CELL = 'rgba(255,255,255,0.1)', SANS = 'system-ui, -apple-system, "Segoe UI", sans-serif', MONO = 'ui-monospace, Menlo, Consolas, monospace';
+  const c = document.createElement('canvas'); c.width = 1080; c.height = story ? 1920 : 1350;
+  const x = c.getContext('2d'); x.scale(k, k);
+  const rr = (X, Y, w, h, r) => { x.beginPath(); x.roundRect ? x.roundRect(X, Y, w, h, r) : x.rect(X, Y, w, h); };
+  const font = (wt, sz, fam = SANS) => { x.font = `${wt} ${sz}px ${fam}`; };
+  rr(0, 0, cw, ch, 20); x.fillStyle = '#0b0b0c'; x.fill(); x.save(); x.clip();
+  const g = x.createRadialGradient(cw / 2, 0, 0, cw / 2, 0, cw * 0.9); g.addColorStop(0, 'rgba(0,255,136,0.16)'); g.addColorStop(1, 'rgba(0,255,136,0)');
+  x.fillStyle = g; x.fillRect(0, 0, cw, ch * 0.7);
+  x.textBaseline = 'alphabetic';
+  const wrap = (text, maxW, maxLines) => {
+    const out = []; let cur = '';
+    for (const w of text.split(' ')) { const t = cur ? `${cur} ${w}` : w; if (!cur || x.measureText(t).width <= maxW) cur = t; else { out.push(cur); cur = w; } }
+    if (cur) out.push(cur);
+    if (out.length > maxLines) { let last = out.slice(maxLines - 1).join(' '); while (last.length > 1 && x.measureText(`${last}…`).width > maxW) last = last.slice(0, -1); out.length = maxLines - 1; out.push(`${last}…`); }
+    return out;
+  };
+  const W = cw - pad * 2;
+  let y = pad;
+  // top: picture, name, nickname
+  const p = m.top.p, img = await shareAvatar(p);
+  rr(pad, y, 52, 52, 14); x.save(); x.clip();
+  x.fillStyle = ACC; x.fillRect(pad, y, 52, 52);
+  if (img) x.drawImage(img, pad, y, 52, 52);
+  else { x.fillStyle = '#0b0b0c'; font(800, 18); x.textAlign = 'center'; x.fillText(initials(p.name), pad + 26, y + 32); x.textAlign = 'left'; }
+  x.restore();
+  x.fillStyle = FG; font(700, 16); x.fillText(wrap(m.top.title, W - 64, 1)[0], pad + 64, y + 24);
+  x.fillStyle = DIM; font(400, 12); x.fillText(m.top.sub, pad + 64, y + 42);
+  y += 52 + 14;
+  for (const b of m.blocks) {
+    if (b.t === 'h') { const sz = m.kind === 'games' ? 18 : 22; font(800, sz); x.fillStyle = FG; wrap(b.text, W, 2).forEach((ln) => { y += sz * 1.15; x.fillText(ln, pad, y - 3); }); y += 8; }
+    else if (b.t === 'p') { font(400, 13); x.fillStyle = DIM; wrap(b.text, W, 2).forEach((ln) => { y += 18; x.fillText(ln, pad, y - 4); }); y += 8; }
+    else if (b.t === 'rank') {
+      font(800, 22); x.fillStyle = ACC; y += 24; x.fillText(b.label, pad, y - 3); y += 10;
+      font(600, 11); x.fillStyle = DIM; x.fillText('OVERALL', pad, y + 8); y += 12;
+      if (b.pos) { font(700, 36, MONO); x.fillStyle = ACC; x.fillText(`#${num(b.pos)}`, pad, y + 34); y += 44; }
+      else { font(700, 20); x.fillStyle = FG; x.fillText('No position', pad, y + 20); y += 28; }
+      y += 6;
+    } else if (b.t === 'ladder') {
+      const tw = (W - 20) / 3, bw = (tw - 6) / 3;
+      TIERS.forEach(([name, bands], ti) => {
+        const X0 = pad + ti * (tw + 10);
+        bands.forEach((i, bi) => { const bx = X0 + bi * (bw + 3); x.fillStyle = i === b.level ? ACC : i < b.level ? 'rgba(0,255,136,0.32)' : CELL; rr(bx, y + 3, bw, 10, 2); x.fill(); });
+        font(600, 10); x.fillStyle = DIM; x.fillText(name.toUpperCase(), X0, y + 28);
+      });
+      y += 38;
+    } else if (b.t === 'big') {
+      font(700, 40, MONO); x.fillStyle = ACC; x.fillText(b.value, pad, y + 38); const vw = x.measureText(b.value).width;
+      font(400, 13); x.fillStyle = DIM; x.fillText(b.label, pad + vw + 8, y + 38); y += 52;
+    } else if (b.t === 'stat') { font(700, 15); x.fillStyle = FG; x.fillText(b.text, pad, y + 16); y += 26; }
+    else if (b.t === 'more') { font(400, 11); x.fillStyle = DIM; x.fillText(b.text, pad, y + 11); y += 18; }
+    else if (b.t === 'lines') {
+      b.lines.forEach((ln) => {
+        font(400, 11, MONO); const sw2 = x.measureText(ln.score).width;
+        font(400, 11); const tl = wrap(ln.text, W - 24 - sw2 - 8, story ? 2 : 1);
+        rr(pad, y, 16, 16, 4); x.fillStyle = ln.res === 'W' ? ACC : CELL; x.fill();
+        font(800, 10); x.fillStyle = ln.res === 'W' ? '#0b0b0c' : DIM; x.textAlign = 'center'; x.fillText(ln.res, pad + 8, y + 12); x.textAlign = 'left';
+        font(400, 11); x.fillStyle = FG; tl.forEach((t, i) => x.fillText(t, pad + 24, y + 11 + i * 13));
+        font(400, 11, MONO); x.fillStyle = DIM; x.textAlign = 'right'; x.fillText(ln.score, cw - pad, y + 11); x.textAlign = 'left';
+        y += Math.max(16, tl.length * 13) + 5;
+      });
+      y += 4;
+    }
+  }
+  // footer: ROTRA mark, tagline, small corner QR that opens the profile
+  const fy = ch - pad;
+  font(800, 13); try { x.letterSpacing = '1.3px'; } catch (e) { /* older browsers: no letter spacing */ }
+  x.fillStyle = FG; x.fillText('ROTR', pad, fy - 16); const rw = x.measureText('ROTR').width; x.fillStyle = ACC; x.fillText('A', pad + rw, fy - 16);
+  try { x.letterSpacing = '0px'; } catch (e) { /* ignore */ }
+  font(400, 11); x.fillStyle = DIM; x.fillText('Run the game.', pad, fy - 2);
+  let q = null;
+  try { if (typeof qrcode === 'function') { q = qrcode(0, 'M'); q.addData(m.link); q.make(); } } catch (e) { q = null; }
+  const qs = 64, qx = cw - pad - qs, qy = ch - pad - qs;
+  rr(qx, qy, qs, qs, 8); x.fillStyle = '#fff'; x.fill();
+  if (q) { const n = q.getModuleCount(), cell = qs / (n + 4); x.fillStyle = '#000'; for (let r = 0; r < n; r++) for (let cc = 0; cc < n; cc++) if (q.isDark(r, cc)) x.fillRect(qx + (cc + 2) * cell, qy + (r + 2) * cell, cell + 0.2, cell + 0.2); }
+  x.restore();
+  return c;
 }
 
 // ---------- Sheets ----------
@@ -1457,9 +1768,23 @@ const SHEETS = {
     const opt = (face) => { const q = { ...a, photo: true, face, photoUrl: '' }; const on = a.photo && !a.photoUrl && (a.face || '') === face; return `<button type="button" class="av-pick" aria-pressed="${on}" aria-label="Character ${FACES.indexOf(face) + 1}" data-act="setFace" data-v="${face}">${avatar(q)}</button>`; };
     return sheetWrap('Profile picture', `<div class="stack">
       <div class="av-now">${avatar(p, 'xxl')}<div class="stack tight"><b>${a.photoUrl ? 'Your photo' : a.photo ? 'A character' : 'Your initials'}</b><span class="small muted">Everyone who sees your profile sees this.</span></div></div>
-      <div class="row"><label class="btn sm" for="av-file" style="cursor:pointer">Upload a photo</label><input type="file" id="av-file" accept="image/webp,image/gif,image/png,image/heic,image/heif,image/jpeg,.heic,.heif" class="sr-only" data-avfile><button type="button" class="btn sm" data-act="useInitials" ${!a.photo && !a.photoUrl ? 'disabled' : ''}>Use my initials</button></div>
+      <div class="row"><label class="btn sm" for="av-file" style="cursor:pointer">Upload a photo</label><input type="file" id="av-file" accept="image/webp,image/gif,image/png,image/heic,image/heif,image/jpeg,.heic,.heif" class="sr-only" data-avfile><button type="button" class="btn sm" data-act="useInitials" ${!a.photo && !a.photoUrl ? 'disabled' : ''}>Use my initials</button>${a.photoUrl ? '<button type="button" class="btn sm" data-act="removePhoto">Remove</button>' : ''}</div>
+      ${a.photoPrevUrl && !a.width ? `<div class="av-now">${avatar({ ...a, name: a.name, photo: true, photoUrl: a.photoPrevUrl }, 'xl')}<div class="stack tight"><b>Previous picture</b><div class="row"><button type="button" class="btn sm" data-act="usePrevious">Use previous picture</button></div></div></div>` : ''}
       ${controls}<div><span class="label">Or pick a character</span><div class="av-grid" role="group" aria-label="Characters">${FACES.map(opt).join('')}</div></div>
-      <p class="hint">Changes are saved only when you click Done. WebP, GIF, PNG, HEIC/HEIF and JPEG. Keep it to a clear picture of you; the club's Queue Master can ask you to change it.</p></div>`, '<button class="btn primary" data-act="saveAvatar">Done</button>');
+      <p class="hint">Only your current and previous photo are kept. Changes are saved only when you click Done. WebP, GIF, PNG, HEIC/HEIF and JPEG. Keep it to a clear picture of you; the club's Queue Master can ask you to change it.</p></div>`, '<button class="btn primary" data-act="saveAvatar">Done</button>');
+  },
+  share: (sh) => {
+    const m = shareModel(sh), fmt = sh.fmt === 'story' ? 'story' : 'post';
+    if (!m) return sheetWrap('Share', '<p class="muted">There is nothing to share here yet.</p>', '<button class="btn" data-act="closeSheet">Close</button>');
+    return sheetWrap(m.title, `<div class="stack sh-wrap">
+      <div class="seg" role="group" aria-label="Image format">${[['post', 'Post'], ['story', 'Story']].map(([k, l]) => `<button aria-pressed="${fmt === k}" data-act="shareFmt" data-v="${k}">${l}</button>`).join('')}</div>
+      ${shareCardHTML(m, fmt)}
+      <p class="small muted">The QR opens your profile. Private profiles ask visitors to log in. ${fmt === 'story' ? 'Story size (9:16) for Facebook and Instagram stories.' : 'Post size (4:5) for Facebook and Instagram feeds.'}</p></div>`,
+    `<button class="btn" data-act="copyShareLink">${I.copy} Copy link</button>${navigator.share ? '<button class="btn primary" data-act="shareNative">Share</button>' : '<button class="btn primary" data-act="downloadShare">Download image</button>'}`);
+  },
+  leaveClub: (sh) => {
+    const c = CLUB_DIR[sh.id];
+    return sheetWrap(`Leave ${esc(c.name)}?`, '<p class="muted">You\'re removed from the club\'s saved players. Your past games stay.</p>', `<button class="btn" data-act="closeSheet">Cancel</button><button class="btn danger" data-act="leaveClub" data-id="${sh.id}">Leave club</button>`);
   },
   discard: () => sheetWrap('Discard your changes?', '<p class="muted">Your edits to your profile haven\'t been saved.</p>', '<button class="btn" data-act="closeSheet">Keep editing</button><button class="btn danger" data-act="discard">Discard changes</button>'),
   request: () => {
@@ -1488,7 +1813,8 @@ const SHEETS = {
         <label class="field" for="cfg-t"><span>Leaderboard match requirement</span><input class="input" id="cfg-t" type="number" min="1" max="40" value="${S.config.threshold}" data-cfg="threshold"></label></div>
         <span class="hint">Copy on the leaderboard, profiles and rank page follows these.</span></div>
       <div class="demo-sec"><span class="label">Contact-change request (Admin)</span>${reqBtns}</div>
-      <div class="demo-sec"><button class="btn" data-act="openRegister">Guest registration invitation</button></div><div class="demo-sec"><span class="label">Open a registration link (Jomar)</span><div class="row"><button class="btn xs" data-act="openClaim" data-v="valid">Unused</button><button class="btn xs" data-act="openClaim" data-v="processing">Still processing</button><button class="btn xs" data-act="openClaim" data-v="expired">Expired</button></div>
+      <div class="demo-sec"><span class="label">Registration links (signs you out)</span><div class="row"><button class="btn xs" data-act="openRegister" data-club="c1">Club link</button><button class="btn xs" data-act="openRegister" data-club="c1" data-session="s-tonight">Session link</button><button class="btn xs" data-act="openRegister">Admin link</button></div>
+        <span class="label">Club link while signed in (as Migs)</span><div class="row"><button class="btn xs" data-act="openJoin" data-club="c3">Join a new club</button><button class="btn xs" data-act="openJoin" data-club="c1">Already in the club</button></div></div><div class="demo-sec"><span class="label">Open a registration link (Jomar)</span><div class="row"><button class="btn xs" data-act="openClaim" data-v="valid">Unused</button><button class="btn xs" data-act="openClaim" data-v="processing">Still processing</button><button class="btn xs" data-act="openClaim" data-v="expired">Expired</button></div>
         <span class="hint">Once Jomar registers, the unused link shows as already used.</span></div>
       <div class="demo-sec"><span class="label">Open a password reset link</span><div class="row"><button class="btn xs" data-act="openReset" data-v="valid">Valid</button><button class="btn xs" data-act="openReset" data-v="expired">Expired or used</button></div></div>
       <div class="demo-sec"><div class="setting"><div class="main"><b>Next profile save fails</b><p class="small muted">Shows the error and keeps the edits.</p></div>${sw(S.failNext, 'toggleFail', 'Next profile save fails')}</div></div>
@@ -1555,6 +1881,7 @@ const ACT = {
   goBoard: () => go('board'),
   goLogin: () => go('login'),
   openProfile: (el) => go('profile', el.dataset.id),
+  gateLogin: () => { S.ui.after = { to: S.screen, id: S.viewId }; go('login'); },
   openCompare: (el) => { if (!S.me) { S.ui.after = { to: 'compare', id: el.dataset.id }; toast('Sign in to compare'); go('login'); return; } S.ui.cmpPage = 0; S.ui.cmpFilter = 'all'; go('compare', el.dataset.id); },
   cmpFilter: (el) => { S.ui.cmpFilter = el.dataset.v; S.ui.cmpPage = 0; render(); },
   cmpPage: (el) => { S.ui.cmpPage = +el.dataset.v; render(); document.querySelector('.cmp-game')?.scrollIntoView({ block: 'center' }); },
@@ -1577,6 +1904,26 @@ const ACT = {
     if (row) { row.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); row.focus({ preventScroll: true }); }
   },
   retryBoard: () => { S.board = 'loading'; render(); later(900, () => { S.board = S.online ? 'ok' : 'error'; }); },
+  openShare: (el) => { S.ui.sheet = { type: 'share', kind: el.dataset.kind, sid: el.dataset.sid || null, fmt: 'post' }; render(); },
+  shareFmt: (el) => { if (S.ui.sheet?.type === 'share') { S.ui.sheet.fmt = el.dataset.v; render(); } },
+  copyShareLink: () => {
+    const link = profileLink(S.me);
+    try { navigator.clipboard.writeText(link).then(() => toast('Link copied'), () => toast(`Couldn't copy. Your profile link is ${link}`)); } catch (e) { toast(`Couldn't copy. Your profile link is ${link}`); }
+  },
+  shareNative: () => toast('Share sheet opened'),
+  downloadShare: () => {
+    const sh = S.ui.sheet, m = sh && sh.type === 'share' ? shareModel(sh) : null;
+    if (!m) return;
+    const fmt = sh.fmt === 'story' ? 'story' : 'post';
+    drawShareCard(m, fmt).then((c) => c.toBlob((b) => {
+      if (!b) { toast('Couldn\'t make the image. Try again.'); return; }
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(b); a.download = `rotra-${m.kind}-${fmt}.png`;
+      document.body.append(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      toast(`${fmt === 'story' ? 'Story' : 'Post'} image downloaded`);
+    }, 'image/png'));
+  },
   sessionPage: (el) => toast(`Opens the public page for ${el.dataset.title} (see the Queue prototype)`),
   copyId: (el) => { const p = profileOf(el.dataset.id); copyText(p.rtr, document.getElementById(el.dataset.big ? 'rtr-big' : `rtr-${p.id}`)); },
   signOut: () => { S.me = null; S.ui.sheet = null; S.ui.edit = null; go('board'); toast('Signed out'); },
@@ -1597,9 +1944,24 @@ const ACT = {
       toast(want ? 'Your phone number is now hidden from clubs' : 'Clubs can now see your phone number');
     });
   },
+  toggleProfilePrivate: () => {
+    const a = S.accounts[S.me];
+    const want = !a.profilePrivate;
+    S.ui.profileErr = '';
+    S.ui.profilePending = true; render();
+    later(900, () => {
+      S.ui.profilePending = false;
+      if (!S.online) { S.ui.profileErr = `Couldn't save because you're offline. Your profile is still ${a.profilePrivate ? 'private' : 'public'}.`; return; }
+      a.profilePrivate = want;
+      toast(want ? 'Your profile is now private' : 'Your profile is now public');
+    });
+  },
   openAvatar: () => { if (!S.me) return; avatarDraft = { ...S.accounts[S.me] }; S.ui.sheet = { type: 'avatar' }; render(); },
-  setFace: (el) => { if (avatarDraft.photoUrl?.startsWith('blob:')) URL.revokeObjectURL(avatarDraft.photoUrl); Object.assign(avatarDraft, { photo: true, photoUrl: '', face: el.dataset.v, width: 0, crop: null }); render(); },
-  useInitials: () => { if (avatarDraft.photoUrl?.startsWith('blob:')) URL.revokeObjectURL(avatarDraft.photoUrl); Object.assign(avatarDraft, { photo: false, photoUrl: '', width: 0, crop: null }); render(); },
+  // A saved photo (no pending upload) that is replaced by a character, initials or Remove becomes the previous photo; an unsaved upload is simply dropped.
+  setFace: (el) => { const d = avatarDraft; if (d.photoUrl?.startsWith('blob:')) URL.revokeObjectURL(d.photoUrl); else if (d.photoUrl && !d.width) d.photoPrevUrl = d.photoUrl; Object.assign(d, { photo: true, photoUrl: '', face: el.dataset.v, width: 0, crop: null }); render(); },
+  useInitials: () => { const d = avatarDraft; if (d.photoUrl?.startsWith('blob:')) URL.revokeObjectURL(d.photoUrl); else if (d.photoUrl && !d.width) d.photoPrevUrl = d.photoUrl; Object.assign(d, { photo: false, photoUrl: '', width: 0, crop: null }); render(); },
+  removePhoto: () => ACT.useInitials(),
+  usePrevious: () => { const d = avatarDraft; if (!d.photoPrevUrl) return; const cur = d.photoUrl; Object.assign(d, { photo: true, photoUrl: d.photoPrevUrl, photoPrevUrl: cur || '', width: 0, crop: null }); render(); },
   saveAvatar: async () => {
     const a = avatarDraft;
     if (a.width) {
@@ -1610,7 +1972,10 @@ const ACT = {
       const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${side} ${side}"><g transform="translate(${-left} ${-top}) translate(${rw/2} ${rh/2}) rotate(${c.rotation})"><image href="${data}" x="${-a.width/2}" y="${-a.height/2}" width="${a.width}" height="${a.height}"/></g></svg>`;
       URL.revokeObjectURL(a.photoUrl); a.photoUrl = `data:image/svg+xml,${encodeURIComponent(svg)}`;
     }
-    Object.assign(S.accounts[S.me], { photo: a.photo, photoUrl: a.photoUrl, face: a.face });
+    const saved = S.accounts[S.me];
+    // A new upload pushes the saved photo to previous; only current and previous are kept (D-2026-11-09-10).
+    const prev = a.width ? (saved.photoUrl || saved.photoPrevUrl || '') : (a.photoPrevUrl || '');
+    Object.assign(saved, { photo: a.photo, photoUrl: a.photoUrl, face: a.face, photoPrevUrl: prev });
     ACT.closeSheet(); toast('Profile picture updated');
   },
   openRequest: () => {
@@ -1624,7 +1989,8 @@ const ACT = {
     const v = R.to.trim();
     let to = v;
     S.ui.reqErr = '';
-    if (!v) S.ui.reqErr = `Enter the new ${REQ_FIELD[R.field].toLowerCase()}.`;
+    if (a.emailConfirmed === false) S.ui.reqErr = 'Confirm your email first.';
+    else if (!v) S.ui.reqErr = `Enter the new ${REQ_FIELD[R.field].toLowerCase()}.`;
     else if (R.field === 'email' && !validEmail(v)) S.ui.reqErr = 'Enter an email address, like name@example.com.';
     else if (R.field === 'phone') { const n = normPhone(v); if (!n) S.ui.reqErr = 'Enter a Philippine mobile number, like 0917 555 0142.'; else to = fmtPhone(n); }
     if (!S.ui.reqErr) {
@@ -1653,7 +2019,25 @@ const ACT = {
   toggleFail: () => { S.failNext = !S.failNext; render(); },
   openClaim: (el) => { S.claim = el.dataset.v; S.ui.claimConfirmed = false; S.ui.claimWrong = false; S.ui.claimErr = {}; S.ui.claimFail = ''; S.ui.claimChecks = 0; S.ui.sheet = null; go('claim'); },
   registerNo: () => { S.ui.registerMatch = false; S.ui.claimFail = 'Correct your phone or email, or contact ROTRA for help. No accounts were linked.'; render(); },
-  openRegister: () => { S.ui.claim = null; S.ui.claimErr = {}; S.ui.claimFail = ''; S.ui.registerMatch = false; go('register'); },
+  openRegister: (el) => {
+    S.ui.sheet = null; if (S.me) { S.me = null; }
+    S.ui.claim = null; setRegCtx(el?.dataset?.club || null, el?.dataset?.session || null);
+    S.ui.claimErr = {}; S.ui.claimFail = ''; S.ui.registerMatch = false; go('register');
+  },
+  openJoin: (el) => { S.ui.sheet = null; S.me = 'u1'; setRegCtx(el.dataset.club, null); go('joinClub'); },
+  joinClub: () => {
+    const a = S.accounts[S.me], id = S.ui.regCtx.club;
+    a.clubs = [...(a.clubs || []), { id, via: 'club_link' }];
+    toast(`You joined ${CLUB_DIR[id].name}`); go('profile', a.id);
+  },
+  openLeaveClub: (el) => { S.ui.sheet = { type: 'leaveClub', id: el.dataset.id }; render(); },
+  leaveClub: (el) => {
+    const a = S.accounts[S.me], c = CLUB_DIR[el.dataset.id];
+    a.clubs = (a.clubs || []).filter((x) => x.id !== el.dataset.id);
+    S.ui.sheet = null; render(); toast(`You left ${c.name}`);
+  },
+  resendEmail: () => toast('Email sent again'),
+  markConfirmed: () => { const a = S.accounts[S.me]; if (a) { a.emailConfirmed = true; render(); toast('Email confirmed'); } },
   claimYes: () => { S.ui.claimConfirmed = true; render(); window.scrollTo(0, 0); },
   claimNo: () => { S.ui.claimWrong = true; render(); },
   claimBack: () => { S.ui.claimWrong = false; render(); },
@@ -1671,6 +2055,12 @@ const ACT = {
     S = freshState(); genCache.clear(); save(); render(); toast('Demo data reset');
   },
 };
+// The link a person opened decides the context of the registration form: a club, a session of that club, or neither (Admin link).
+function setRegCtx(club, session) {
+  const x = S.ui.regCtx || {};
+  if (x.club !== club || x.session !== session) S.ui.claim = null;
+  S.ui.regCtx = { club, session };
+}
 function finishClaim(C) {
   const a = S.accounts.u2;
   applyPersonal(a, C);
@@ -1685,7 +2075,8 @@ const FORM = {
     const q = S.q.trim();
     if (!/^rtr-/i.test(q)) return;
     const id = q.toUpperCase();
-    const hit = Object.values(S.accounts).find((a) => a.rtr === id) || BASE.find((e) => e.rtr === id);
+    const hit0 = Object.values(S.accounts).find((a) => a.rtr === id) || BASE.find((e) => e.rtr === id);
+    const hit = hiddenFromVisitor(hit0) ? null : hit0; // a private profile gives visitors the same answer as an unknown ID
     if (hit) { S.q = ''; go('profile', hit.id); } else { S.ui.findId = id; go('notfound', null); }
   },
   login: () => {
@@ -1770,17 +2161,29 @@ const FORM = {
     });
   },
   register: () => {
-    const C = S.ui.claim, e = validatePersonal(C);
+    const C = S.ui.claim, e = validatePersonal(C), ctx = S.ui.regCtx;
     if (!normPhone(C.phone || '')) e.phone = 'Enter a Philippine mobile number, like 0917 555 0142.';
     if (!validEmail(C.email || '')) e.email = 'Enter an email address, like name@example.com.';
+    if (!ctx.club && !PLACES.some(([c]) => c === C.city)) e.city = 'Pick your city or province.';
     if (!C.pass) e.pass = 'Choose a password.';
     if (C.pass !== C.pass2) e.pass2 = 'The two passwords do not match.';
     S.ui.claimErr = e;
-    if (Object.keys(e).length) { render(); return; }
+    if (Object.keys(e).length) { render(); const bad = document.querySelector('.input.bad'); if (bad) bad.focus(); return; }
     if (!S.online) { S.ui.claimFail = 'You are offline. Your details are still here; try again when connected.'; render(); return; }
     S.ui.registerMatch = Object.values(S.accounts).some(a => (a.phone && digits(a.phone) === normPhone(C.phone)) || (a.email && a.email.toLowerCase() === C.email.trim().toLowerCase()));
-    if (!S.ui.registerMatch) S.ui.claimFail = 'Prototype only: registration complete. Your guest record stays unlinked; no account is saved by this preview.';
-    render();
+    if (S.ui.registerMatch) { render(); return; }
+    S.ui.claimFail = ''; S.ui.claimPending = true; render();
+    later(1000, () => {
+      S.ui.claimPending = false;
+      const n = Object.keys(S.accounts).length + 1, id = `u${n + 1}`;
+      const code = ctx.club ? CLUB_DIR[ctx.club].code : C.city, t = new Date();
+      const date = `${String(t.getMonth() + 1).padStart(2, '0')}${String(t.getDate()).padStart(2, '0')}${String(t.getFullYear()).slice(2)}`;
+      const acct = { id, name: '', nick: '', rtr: `RTR-PH-${code}-${date}-${String(100 + n).padStart(4, '0')}`, phone: fmtPhone(normPhone(C.phone)), email: C.email.trim(), phoneHidden: false, profilePrivate: false, claimed: true, photo: false, fresh: true,
+        emailConfirmed: false, clubs: ctx.club ? [{ id: ctx.club, via: ctx.session ? 'session_link' : 'club_link' }] : [], style: '', expY: '', expM: '', social: {}, level: null };
+      applyPersonal(acct, C);
+      S.accounts[id] = acct; S.me = id; S.ui.regDone = { id, club: ctx.club, session: ctx.session }; S.ui.claim = null;
+      S.screen = 'registerDone'; window.scrollTo(0, 0);
+    });
   },
   request: () => ACT.submitRequest(),
 };
@@ -1899,6 +2302,12 @@ function prototypePath() {
   if (['profile', 'history', 'rank'].includes(S.screen)) path = S.viewId ? `/players/${encodeURIComponent(S.viewId)}${S.screen === 'history' ? '/games' : S.screen === 'rank' ? '/rank' : ''}` : '/rank';
   if (S.screen === 'notfound') path = `/find/${encodeURIComponent(S.ui.findId || S.viewId || 'unknown')}`;
   if (['claim', 'claimDone', 'reset'].includes(S.screen)) path = `/${S.screen === 'reset' ? 'reset-password' : 'claim'}/${encodeURIComponent(prototypeToken)}${S.screen === 'claimDone' ? '?complete=1' : ''}`;
+  if (['register', 'registerDone', 'joinClub'].includes(S.screen)) {
+    const x = S.ui.regCtx || {};
+    path = `/register${x.club ? `/${encodeURIComponent(x.club)}` : ''}`;
+    const q = [x.session && S.screen !== 'joinClub' ? `session=${encodeURIComponent(x.session)}` : '', S.screen === 'registerDone' ? 'complete=1' : ''].filter(Boolean).join('&');
+    if (q) path += `?${q}`;
+  }
   if (S.screen === 'history' && S.ui.hist === 'other') path += '?tab=other';
   if (S.screen === 'edit' && S.ui.editTab && S.ui.editTab !== 'basics') path += `?tab=${encodeURIComponent(S.ui.editTab)}`;
   if (S.screen === 'login' && S.ui.after && playerPaths[S.ui.after.to]) path += `?next=${encodeURIComponent('/player' + playerPaths[S.ui.after.to])}`;
@@ -1919,6 +2328,16 @@ function applyPrototypeRoute(url) {
     screen = hit ? 'profile' : 'notfound'; id = hit?.id || null; S.ui.findId = rtr;
   }
   if (token) { screen = token[1] === 'claim' ? (url.searchParams.get('complete') === '1' && S.accounts.u2.claimed ? 'claimDone' : 'claim') : 'reset'; prototypeToken = decodeURIComponent(token[2]); }
+  const reg = path.match(/^\/register(?:\/([^/]+))?$/);
+  if (reg) {
+    const club = reg[1] ? decodeURIComponent(reg[1]) : null, ses = url.searchParams.get('session');
+    if (club && !CLUB_DIR[club]) return false;
+    setRegCtx(club, club && ses && SESSION_DIR[ses] && SESSION_DIR[ses].club === club ? ses : null);
+    if (url.searchParams.get('complete') === '1' && S.ui.regDone && S.me === S.ui.regDone.id) screen = 'registerDone';
+    else if (S.me && club) screen = 'joinClub';
+    else if (S.me) { screen = 'profile'; id = S.me; }
+    else screen = 'register';
+  }
   if (!screen) return false;
   if (screen === 'login') {
     const next = url.searchParams.get('next');
@@ -1941,7 +2360,7 @@ function render() {
   const focusId = a && a.id && a !== document.body ? a.id : null;
   let sel = null;
   try { sel = a && typeof a.selectionStart === 'number' ? a.selectionStart : null; } catch (e) { sel = null; }
-  const views = { register: () => viewClaim(true), board: viewBoard, profile: viewProfile, rank: viewRank, history: viewHistory, compare: viewCompare, id: viewId, account: viewAccount, edit: viewEdit, login: viewLogin, forgot: viewForgot, reset: viewReset, claim: viewClaim, claimDone: viewClaimDone, notfound: viewNotFound };
+  const views = { register: () => viewClaim(true), registerDone: viewRegisterDone, joinClub: viewJoinClub, board: viewBoard, profile: viewProfile, rank: viewRank, history: viewHistory, compare: viewCompare, id: viewId, account: viewAccount, edit: viewEdit, login: viewLogin, forgot: viewForgot, reset: viewReset, claim: viewClaim, claimDone: viewClaimDone, notfound: viewNotFound };
   const sh = S.ui.sheet;
   document.getElementById('app').innerHTML = topBar() + (views[S.screen] || viewBoard)() + (sh ? SHEETS[sh.type](sh) : '');
   document.body.style.overflow = sh ? 'hidden' : '';

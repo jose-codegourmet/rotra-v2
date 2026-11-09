@@ -1,6 +1,6 @@
 # Session page: My night card, refresh bar, Courts now and own standing
 
-Status: IN PROGRESS — #585
+Status: IN MOCK APP — #585 (Q17.14, #603)
 Date: 2026-11-09
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Public session page › refresh bar, My night card, Details › Courts now, Results

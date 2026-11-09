@@ -268,3 +268,34 @@ export type PlayerSessionAccess = {
 export type PlayerSessionInput = { playerId: string }
 /** **Request to join as NAME**; `inviteCode` is the link's `?invite=` code, when it had one. */
 export type JoinAsPlayerInput = PlayerSessionInput & { inviteCode?: string | null }
+
+/** One present player the Request a match sheet and its picker can name (the viewer is left out). */
+export type MatchRequestOptionPlayer = {
+  /** The roster row id: what a request's partners and opponents hold */
+  id: string
+  /** Per the signed-in name rule (full for a registered player, masked for a guest) */
+  name: string
+  /** Nickname or first name, for the court face */
+  shortName: string
+  pictureUrl?: string | null
+  level: PlayingLevel | null
+  /** Counted games so far */
+  games: number
+  /** The court label while playing; null when off court */
+  playingOn: string | null
+  /** Minutes since their last game ended (or since arriving) */
+  restMinutes: number
+}
+
+/** The read behind Request a match (`useMatchRequestOptions`). */
+export type MatchRequestOptions = {
+  /** The viewer's own roster row id, null when not on the roster */
+  viewerRosterId: string | null
+  /** The viewer's own picture for the "You" face, or null */
+  viewerPictureUrl: string | null
+  /** The session's minimum games; 0 when it has none */
+  minimum: number
+  /** Formats the session allows, in pill order; empty means it takes no match requests */
+  allowedFormats: MatchFormat[]
+  players: MatchRequestOptionPlayer[]
+}

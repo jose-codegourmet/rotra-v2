@@ -1,6 +1,6 @@
 # Request a match: the request is laid out on a court
 
-Status: IN PROGRESS — #585
+Status: IN MOCK APP — #585 (Q17.14, #603)
 Date: 2026-11-09
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Public session page › My night › Request a match sheet

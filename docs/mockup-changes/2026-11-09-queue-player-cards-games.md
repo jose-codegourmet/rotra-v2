@@ -1,6 +1,6 @@
 # Players view cards show games played and games for the night
 
-Status: TICKETED — #586
+Status: IN PROGRESS — #586
 Date: 2026-11-09
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › live session › Players tab

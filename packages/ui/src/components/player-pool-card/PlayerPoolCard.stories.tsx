@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { fn } from 'storybook/test'
 import { PlayerPoolCard, type PlayerPoolCardProps } from './PlayerPoolCard'
 
-const { session, roster, matches } = consoleSessionFixture
+const { roster, matches } = consoleSessionFixture
 
 const playerAt = (i: number): SessionPlayer => {
   const p = roster[i]
@@ -27,7 +27,7 @@ const propsFor = (
   name: p.nameSnapshot,
   level: p.level,
   games: gamesOf(p),
-  minimumGames: session.minimumGames,
+  forTheNight: gamesOf(p) + (status.kind === 'queued' ? 1 : 0),
   waitMinutes,
   status,
   present: p.present,
@@ -46,7 +46,7 @@ const meta = {
   component: PlayerPoolCard,
   decorators: [
     (Story) => (
-      <div className="w-[156px]">
+      <div className="w-[176px]">
         <Story />
       </div>
     ),
@@ -136,3 +136,18 @@ export const GridDesktop: Story = {
 }
 
 export const SavingPresence: Story = { args: { ...away, presencePending: true } }
+
+export const SelfCheckedIn: Story = {
+  args: { selfCheckedInAt: new Date('2026-11-09T19:21:00').getTime() },
+}
+export const Left: Story = { args: { ...away, leftAt: new Date('2026-11-09T19:21:00').getTime() } }
+export const AvailableLight: Story = { globals: { theme: 'light' } }
+export const PlayingLight: Story = { args: playing, globals: { theme: 'light' } }
+export const AwayLight: Story = { args: away, globals: { theme: 'light' } }
+export const QueuedLight: Story = { args: queued, globals: { theme: 'light' } }
+export const SelectedLight: Story = {
+  args: { selected: true, pickOrder: 2 },
+  globals: { theme: 'light' },
+}
+export const SelfCheckedInLight: Story = { ...SelfCheckedIn, globals: { theme: 'light' } }
+export const LeftLight: Story = { ...Left, globals: { theme: 'light' } }

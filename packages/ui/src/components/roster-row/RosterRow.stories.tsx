@@ -80,3 +80,12 @@ export const Desktop: Story = {
 export const ReadOnly: Story = { args: { ...rowAt(0), levelLocked: true, readOnly: true } }
 
 export const SavingPresence: Story = { args: { ...rowAt(0), presencePending: true } }
+
+export const SelfCheckedIn: Story = {
+  args: { present: true, selfCheckedInAt: new Date('2026-11-09T19:21:00').getTime() },
+}
+export const Left: Story = {
+  args: { present: false, leftAt: new Date('2026-11-09T19:21:00').getTime() },
+}
+export const SelfCheckedInLight: Story = { ...SelfCheckedIn, globals: { theme: 'light' } }
+export const LeftLight: Story = { ...Left, globals: { theme: 'light' } }

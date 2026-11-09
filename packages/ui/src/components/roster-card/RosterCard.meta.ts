@@ -5,6 +5,7 @@ export const rosterCardMeta = {
   description:
     'One confirmed slot on the preparation roster grid. First level: picture, name, remove, a full-width Present band (accent tint when present, with the Switch) and a level block tinted and outlined in the skill group color (level select or “LEVEL · Fixed after start”, plus the suggestion indicator). Second level: one small muted line with the identity chip, Paid / Not paid (never green) and “Suggestion: LEVEL”.',
   usage: [
+    'Pass selfCheckedInAt or leftAt timestamps for the muted presence caption; the caller owns clearing rules.',
     'Use inside RosterPanel when Roster view is Grid.',
     'Do not use for the List view: that stays RosterRow.',
     'Do not use in the live console: Queue › Players shows PlayerPoolCard.',

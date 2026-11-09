@@ -34,14 +34,23 @@ export function SessionGamesShareCard({
         images[`game-${index}-${side}-${slot}`] = player.picture
       })
   })
-  const teamView = (players: PlayerShareParticipant[], index: number, side: 'mine' | 'theirs') => (
+  const teamView = (
+    players: PlayerShareParticipant[],
+    index: number,
+    side: 'mine' | 'theirs',
+    winning: boolean,
+  ) => (
     <div className={cn('flex min-w-0 flex-col gap-0.5', side === 'theirs' && 'items-end')}>
       <div className="flex items-center -space-x-1">
         {players.slice(0, 2).map((player, slot) => (
           <span
             key={`${slot}-${player.name}`}
             data-qr-logo={`game-${index}-${side}-${slot}`}
-            className="block size-6 shrink-0 overflow-hidden rounded-full bg-share-fg/10 ring-2 ring-share-bg"
+            data-share-winner={winning ? '' : undefined}
+            className={cn(
+              'block size-6 shrink-0 overflow-hidden rounded-full bg-share-fg/10 ring-2',
+              winning ? 'ring-share-accent' : 'ring-share-bg',
+            )}
           >
             <Avatar
               name={player.name}
@@ -62,9 +71,7 @@ export function SessionGamesShareCard({
         title={players.map((p) => p.name).join(', ')}
         className="max-w-full truncate text-[9px] leading-[11px] text-share-muted"
       >
-        {players
-          .map((p, slot) => (side === 'mine' && slot === 0 ? 'You' : p.name.split(/\s+/)[0]))
-          .join(' + ')}
+        {players.map((p) => p.name.split(/\s+/)[0]).join(' + ')}
       </span>
     </div>
   )
@@ -116,7 +123,7 @@ export function SessionGamesShareCard({
                   className="relative grid min-h-11 grid-cols-[minmax(0,1fr)_76px_minmax(0,1fr)] items-center gap-1 py-1"
                   aria-label={`Game ${index + 1}, ${game.result === 'won' ? 'Won' : 'Lost'}, ${game.score ?? 'Winner recorded'}`}
                 >
-                  {teamView(teams[index]?.mine ?? [], index, 'mine')}
+                  {teamView(teams[index]?.mine ?? [], index, 'mine', game.result === 'won')}
                   <div className="flex flex-col items-center gap-0.5">
                     <b
                       data-qr-text
@@ -131,7 +138,7 @@ export function SessionGamesShareCard({
                       {game.score ? (game.result === 'won' ? 'Won' : 'Lost') : 'Winner recorded'}
                     </span>
                   </div>
-                  {teamView(teams[index]?.theirs ?? [], index, 'theirs')}
+                  {teamView(teams[index]?.theirs ?? [], index, 'theirs', game.result === 'lost')}
                   <i
                     data-share-cell="divider"
                     className="absolute inset-x-0 bottom-0 h-px bg-share-fg/10"

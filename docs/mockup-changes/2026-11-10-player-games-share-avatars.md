@@ -1,6 +1,6 @@
 # Games share cards show teams and clear scores
 
-Status: IN MOCK APP — #635
+Status: IN MOCK APP — #682
 Date: 2026-11-10
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › Games › Share games
@@ -24,7 +24,7 @@ Superseded by: none
 ## Like for like
 - Compare at 375 px and 1280 px, dark and light; fixed dark brand image in both themes.
 - States: singles, doubles, fun teams, masked players, missing pictures, missing score, more games, Post and Story.
-- Copy: You, Won, Lost, Winner recorded, +N more games, Total W–L.
+- Copy: player names, Won, Lost, Winner recorded, +N more games, Total W–L.
 - Tokens: existing share tokens only.
 - Known differences: none.
 
@@ -37,3 +37,8 @@ Superseded by: none
 ## Docs
 - Screen docs: ranking-history.md updated.
 - Business logic and database design: unchanged; this changes presentation and safe read projections only.
+
+## Owner follow-up: names and winning side (#682)
+- Show the player’s name in the team caption instead of “You”, consistent with every other player on the card.
+- Give each avatar on the winning side a green border, for singles and pairs, including when only the winner was recorded.
+- Apply the same names and winner borders to the preview and downloaded Post/Story PNGs. Private players retain masked names and initials.

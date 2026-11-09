@@ -72,3 +72,5 @@ Own profile only ([D-2026-11-09-08](../../../../mvp/decisions.md#d-2026-11-09-08
 - Deleting a club's public page leaves the player's retained official record intact.
 
 **Owner revision, November 10, 2026:** Share games uses paired avatar groups with a large score between them. The owner and partners appear on the left, opponents on the right, with short labels below. Public players may show pictures; private players and guests show masked initials only. A missing score shows an em dash and “Winner recorded”. Post shows 3 games, Story 4, with “+N more games” and the full session W–L total.
+
+**Owner follow-up, November 10:** Games share cards use player names rather than “You”. The winning player or pair has green avatar borders; the same borders appear in the PNG export. Masked names remain masked.

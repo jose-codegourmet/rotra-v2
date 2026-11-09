@@ -17,7 +17,7 @@ export type MyNightProps = {
   matchHistoryHref?: string | null
   /** Opens the Session invite sheet */
   onInvite: () => void
-  /** Opens Request a match (Q17.14); not wired yet, so the card's button does nothing here */
+  /** Opens Request a match (Q17.14); the card shows the button for a present Player only */
   onRequestMatch?: () => void
 }
 

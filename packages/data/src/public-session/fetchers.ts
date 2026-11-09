@@ -1,5 +1,6 @@
 import portraits from '../fixtures/playerPortraits.json'
-import { computeStandings, courtNames, holdsCourt } from '../match/match.rules'
+import { allowedRequestFormats } from '../match-request/matchRequest.rules'
+import { computeStandings, countedGames, courtNames, holdsCourt, waitMinutes } from '../match/match.rules'
 import type { Match } from '../match/match.types'
 import { getMockDevState, requireOnline } from '../mock/bridge'
 import { MockError } from '../mock/errors'
@@ -30,6 +31,7 @@ import type {
   MyNight,
   MyNightMatch,
   MyNightStage,
+  MatchRequestOptions,
   PlayerSessionAccess,
   PublicCourtNow,
   PublicMatchPlayer,
@@ -499,6 +501,64 @@ export async function getMyNight(slug: string, playerId: string): Promise<MyNigh
     inviteCode:
       live.sessionInviteCodes.find((c) => c.sessionId === session.id && c.playerId === playerId)
         ?.code ?? null,
+  }
+}
+
+/**
+ * What Request a match needs (Q17.14): the session's allowed request formats, the minimum, and the
+ * present players other than the viewer with games, level, court and waiting time, for the sheet
+ * and its picker. Present players only; the viewer's own roster id is `viewerRosterId`. Names follow
+ * the signed-in rule. Presence is a server fact (live store); matches come from the last synced
+ * state like the rest of the projection. Mock only (NotConnectedError in real mode).
+ */
+export async function getMatchRequestOptions(
+  slug: string,
+  playerId: string,
+): Promise<MatchRequestOptions> {
+  await delay()
+  requireOnline()
+  const { state } = serverState()
+  requireSignedInPlayer(state, playerId)
+  const live = mockStore.getSnapshot() as MockState
+  const viewer = { playerId }
+  const session = sessionBySlug(state, slug)
+  const own = playerSlot(state, session, playerId).roster
+  const matches = state.matches.filter((m) => m.sessionId === session.id)
+  const courts = state.courts.filter((c) => c.sessionId === session.id && !c.removedAt)
+  const players = live.roster
+    .filter((r) => r.sessionId === session.id && r.present && r.id !== own?.id)
+    .map((r) => {
+      const person = publicPerson(
+        state,
+        r.clubPlayerId,
+        { fullName: r.nameSnapshot, nickname: r.nicknameSnapshot ?? null },
+        viewer,
+      )
+      const busy = matches.find((m) => holdsCourt(m) && [...m.teamA, ...m.teamB].includes(r.id))
+      return {
+        id: r.id,
+        name: person.name,
+        shortName: person.nickname || publicFirstName(person.name),
+        pictureUrl: person.pictureUrl,
+        level: r.level ?? null,
+        games: countedGames(r.id, matches),
+        playingOn: busy ? courtNames(busy, courts) : null,
+        restMinutes: waitMinutes(r, matches, session.startedAt),
+      }
+    })
+  return {
+    viewerRosterId: own?.id ?? null,
+    viewerPictureUrl: own
+      ? publicPerson(
+          state,
+          own.clubPlayerId,
+          { fullName: own.nameSnapshot, nickname: own.nicknameSnapshot ?? null },
+          viewer,
+        ).pictureUrl
+      : null,
+    minimum: session.minimumGames,
+    allowedFormats: allowedRequestFormats(session),
+    players,
   }
 }
 

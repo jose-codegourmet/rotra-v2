@@ -43,6 +43,8 @@ import { toast } from '@rotra/ui/toaster'
 import { useEffect, useState } from 'react'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import { JoinRequestSheet } from '@/app/(public)/s/[slug]/_components/join-request-sheet/JoinRequestSheet'
+import { MatchRequest } from '@/app/(public)/s/[slug]/_components/match-request/MatchRequest'
+import { useRequestMatchAction } from '@/app/(public)/s/[slug]/_components/match-request/useRequestMatchAction'
 import { MyNight } from '@/app/(public)/s/[slug]/_components/my-night/MyNight'
 import { SessionInviteSheet } from '@/app/(public)/s/[slug]/_components/session-invite-sheet/SessionInviteSheet'
 import { useAppSelector } from '@/store/hooks'
@@ -309,6 +311,10 @@ export function PublicSession({
   }
   const [joinOpen, setJoinOpen] = useState(openJoin && viewer === 'visitor')
   const [inviteOpen, setInviteOpen] = useState(false)
+  const [matchRequestOpen, setMatchRequestOpen] = useState(false)
+  const requestMatch = useRequestMatchAction(slug, viewerAccount?.id, () =>
+    setMatchRequestOpen(true),
+  )
 
   // The signed-in read when there is one; any failure leaves the visitor page.
   const p = signedInPage.data ?? page.data
@@ -436,6 +442,7 @@ export function PublicSession({
             playerBase ? `${playerBase}/players/${encodeURIComponent(night.data.playerId)}/games` : null
           }
           onInvite={() => setInviteOpen(true)}
+          onRequestMatch={requestMatch}
         />
       ) : null}
       <Tabs
@@ -517,6 +524,14 @@ export function PublicSession({
           timeLabel={`${time(p.start)}–${time(p.end)}`}
           venueName={p.venue.name}
           waitlistOpen={p.openSlots === 0}
+        />
+      ) : null}
+      {signedIn && viewerAccount && night.data?.stage === 'live-present' ? (
+        <MatchRequest
+          slug={slug}
+          viewer={{ id: viewerAccount.id, name: viewerAccount.name }}
+          open={matchRequestOpen}
+          onOpenChange={setMatchRequestOpen}
         />
       ) : null}
       <JoinRequestSheet

@@ -136,6 +136,8 @@ export function selfCheckIn(slug: string, input: PlayerSessionInput) {
     slug,
     (s, session) => {
       if (session.state !== 'active') fail('Check-in opens when the session starts.')
+      if (s.clubs.find((c) => c.id === session.clubId)?.selfCheckInEnabled === false)
+        fail('Your club has turned self check-in off.')
       const row = requireRosterRow(s, session, input.playerId)
       if (row.present) fail("You're already marked present.", 'conflict')
       const now = Date.now()

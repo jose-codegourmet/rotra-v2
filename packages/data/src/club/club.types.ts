@@ -7,6 +7,12 @@ export type Club = {
   /** Real settings revision; absent in prototype fixtures. */
   revision?: string
   logoUrl: string | null
+  /** The logo the club had before the current one (at most two are held); absent in real mode, read as null. */
+  logoPreviousUrl?: string | null
+  /** Current club invite code behind `/register/<clubId>?k=<code>`; absent in real mode. */
+  inviteCode?: string
+  /** Whether players may check themselves in (default true); absent in real mode, read as true. */
+  selfCheckInEnabled?: boolean
   description: string
   courtRules: string | null
   postTemplate: string | null

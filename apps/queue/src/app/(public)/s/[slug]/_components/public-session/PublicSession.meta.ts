@@ -9,6 +9,7 @@ export const publicSessionMeta = {
     'Rendered by /s/[slug] (viewer "visitor": no sign-in, no operator top bar, nav or sync pill; proxy.ts lets /s/* through) and by the operator preview /sessions/[sessionId]/public-page under PublicPreviewBanner (viewer "operator").',
     'Hero chip: Happening now (active), Finished (completed), none for prepared and invalid sessions.',
     'JoinRequestCard variant: this visitor\'s own request from useMyJoinRequest first (Request sent, Confirmed · you have a slot, Confirmed · waitlist #N, Request not accepted), then requests off, active, "1 slot left" / "N slots left" or all slots taken. The available variants show the confirmed players’ Skill mix. Request to join opens JoinRequestSheet; sending creates a request only, so the participant list is unchanged until the Queue Master confirms it.',
+    'Signed-in Player (mock mode): MyNight (useMyNight, MyNightCard) sits under the join area above the tabs for a confirmed or waitlisted Player; Invite opens SessionInviteSheet. ?invite=<code> is read by the page and sent with Request to join as NAME; it also survives the Player login round trip with tab and join. Request a match is Q17.14.',
     'Results: only the published slides, Off Day only when included (public variant, no private band). Before publication: "Results for this session have not been shared." Invalid sessions have no Results section and no join card.',
     'Loading: skeleton hero, tabs and cards with no names or counts. Unknown or deleted slug: the neutral EmptyState "This session page isn\'t available." with no club, roster or retained data (copy proposal; needs product-owner sign-off).',
     'Offline visitor (DevMenu Simulate offline in the visitor\'s tab; reach /s/<slug> with Open as a guest so the tab keeps its state): a cached copy keeps showing with "Last updated HH:MM" in Details, and Request to join is disabled because sending needs internet. With no cached copy, QueryError "Couldn\'t load this session page." with "You\'re offline. Reconnect, then try again." (title is a copy proposal; needs product-owner sign-off). The public page has no DevMenu of its own.',
@@ -28,6 +29,8 @@ export const publicSessionMeta = {
     'PublicParticipants',
     'PublicResultsSection',
     'JoinRequestSheet',
+    'MyNight',
+    'SessionInviteSheet',
     'PublicPagePreview',
   ],
 } satisfies ComponentMeta

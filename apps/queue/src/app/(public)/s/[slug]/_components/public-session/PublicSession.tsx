@@ -43,6 +43,8 @@ import { toast } from '@rotra/ui/toaster'
 import { useEffect, useState } from 'react'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import { JoinRequestSheet } from '@/app/(public)/s/[slug]/_components/join-request-sheet/JoinRequestSheet'
+import { MyNight } from '@/app/(public)/s/[slug]/_components/my-night/MyNight'
+import { SessionInviteSheet } from '@/app/(public)/s/[slug]/_components/session-invite-sheet/SessionInviteSheet'
 import { useAppSelector } from '@/store/hooks'
 import { selectDev } from '@/store/slices/devSlice'
 
@@ -55,6 +57,8 @@ export type PublicSessionProps = {
   viewer: 'visitor' | 'operator'
   /** ?join=1 on the visitor's link: open Request to join (back from the ROTRA Player login) */
   openJoin?: boolean
+  /** ?invite=<code> on the visitor's link: sent with Request to join as NAME ("Invited by NAME") */
+  inviteCode?: string
 }
 
 const MODES = {
@@ -222,7 +226,12 @@ function publishedSlides(page: PublicSessionPage): PublicResultsSectionPublished
  * variant from the page and useMyJoinRequest); Details and "Participants · N" tabs; and, for
  * completed sessions only, the Results section with the published slides. No operator controls.
  */
-export function PublicSession({ slug, viewer, openJoin = false }: PublicSessionProps) {
+export function PublicSession({
+  slug,
+  viewer,
+  openJoin = false,
+  inviteCode,
+}: PublicSessionProps) {
   const dev = useAppSelector(selectDev)
   const page = usePublicSession(slug, { visitor: viewer === 'visitor' })
   const mine = useMyJoinRequest(slug)
@@ -299,6 +308,7 @@ export function PublicSession({ slug, viewer, openJoin = false }: PublicSessionP
     }
   }
   const [joinOpen, setJoinOpen] = useState(openJoin && viewer === 'visitor')
+  const [inviteOpen, setInviteOpen] = useState(false)
 
   // The signed-in read when there is one; any failure leaves the visitor page.
   const p = signedInPage.data ?? page.data
@@ -346,7 +356,7 @@ export function PublicSession({ slug, viewer, openJoin = false }: PublicSessionP
           busy: joinAsPlayer.isPending || cancelMyRequest.isPending,
           onJoin: () =>
             joinAsPlayer.mutate(
-              { playerId: viewerAccount.id },
+              { playerId: viewerAccount.id, inviteCode: inviteCode ?? null },
               {
                 onSuccess: (done) => toast(done.message),
                 onError: (error) => toast.error(error.message),
@@ -417,6 +427,17 @@ export function PublicSession({ slug, viewer, openJoin = false }: PublicSessionP
       ) : card ? (
         <JoinRequestCard {...card} />
       ) : null}
+      {signedIn && night.data ? (
+        <MyNight
+          slug={slug}
+          night={night.data}
+          startsLabel={`${new Date(p.start).toLocaleDateString([], { month: 'short', day: 'numeric' })}, ${time(p.start)}`}
+          matchHistoryHref={
+            playerBase ? `${playerBase}/players/${encodeURIComponent(night.data.playerId)}/games` : null
+          }
+          onInvite={() => setInviteOpen(true)}
+        />
+      ) : null}
       <Tabs
         aria-label="Session page"
         value={tab}
@@ -481,6 +502,23 @@ export function PublicSession({ slug, viewer, openJoin = false }: PublicSessionP
         </TabsContent>
       </Tabs>
       {p.status === 'completed' ? <PublicResultsSection published={publishedSlides(p)} /> : null}
+      {signedIn && viewerAccount && night.data?.canInvite ? (
+        <SessionInviteSheet
+          slug={slug}
+          playerId={viewerAccount.id}
+          open={inviteOpen}
+          onOpenChange={setInviteOpen}
+          inviterName={viewerAccount.name}
+          clubName={p.club.name}
+          clubInitials={p.club.initials}
+          clubLogoUrl={p.club.logoUrl}
+          sessionTitle={p.title}
+          dateLabel={date(p.start)}
+          timeLabel={`${time(p.start)}–${time(p.end)}`}
+          venueName={p.venue.name}
+          waitlistOpen={p.openSlots === 0}
+        />
+      ) : null}
       <JoinRequestSheet
         slug={slug}
         sessionLine={`${p.title} · ${date(p.start)}, ${time(p.start)} · ${p.venue.name}`}

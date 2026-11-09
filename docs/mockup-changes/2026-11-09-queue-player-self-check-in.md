@@ -1,6 +1,6 @@
 # Session page: players check themselves in, leave, and say they can't make it
 
-Status: IN PROGRESS — #585
+Status: IN MOCK APP — #602
 Date: 2026-11-09
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Public session page › My night card (I'm here, I'm leaving, I can't make it)

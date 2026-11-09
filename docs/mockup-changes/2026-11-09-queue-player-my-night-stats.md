@@ -1,6 +1,6 @@
 # Session page: My night shows games and Won / Lost as big numbers; Invite only before the start
 
-Status: IN PROGRESS — #585
+Status: IN MOCK APP — #602
 Date: 2026-11-09
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Public session page › My night card

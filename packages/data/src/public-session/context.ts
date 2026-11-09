@@ -2,7 +2,7 @@
 export const QUEUE_ORIGINS = ['https://queue.rotra.club', 'http://localhost:9000']
 export const PLAYER_ORIGINS = ['https://player.rotra.club', 'http://localhost:9001']
 
-/** Only a public session and its two UI parameters may cross the app boundary. */
+/** Only a public session and its three UI parameters (join, tab, invite) may cross the app boundary. */
 export function queueSessionUrl(value: string | undefined): string | null {
   if (!value || value.includes('\\')) return null
   try {
@@ -13,6 +13,9 @@ export function queueSessionUrl(value: string | undefined): string | null {
     if (url.searchParams.get('join') === '1') clean.searchParams.set('join', '1')
     const tab = url.searchParams.get('tab')
     if (tab === 'details' || tab === 'participants') clean.searchParams.set('tab', tab)
+    // A Session invite code (8 letters or digits) rides along so it survives the login round trip.
+    const invite = url.searchParams.get('invite')
+    if (invite && /^[A-Za-z0-9]{8}$/.test(invite)) clean.searchParams.set('invite', invite)
     return clean.href
   } catch {
     return null
@@ -21,7 +24,7 @@ export function queueSessionUrl(value: string | undefined): string | null {
 
 export function playerOrigin(queueOrigin: string) {
   return QUEUE_ORIGINS.includes(queueOrigin)
-    ? PLAYER_ORIGINS[QUEUE_ORIGINS.indexOf(queueOrigin)]
+    ? (PLAYER_ORIGINS[QUEUE_ORIGINS.indexOf(queueOrigin)] ?? null)
     : null
 }
 

@@ -26,6 +26,7 @@ export const claimSchema = z
       ),
     password: z.string().min(1, 'Choose a password.').pipe(passwordField),
     confirmPassword: z.string(),
+    cityCode: z.string().optional(),
     ...personalDetailsShape,
     ...socialLinksShape,
   })

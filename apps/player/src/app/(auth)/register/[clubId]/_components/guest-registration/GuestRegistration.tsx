@@ -1,4 +1,10 @@
 'use client'
+import { useSession } from '@rotra/data/auth/use-session'
+import { foundingCities } from '@rotra/data/fixtures/founding-cities'
+import { useMyClubs } from '@rotra/data/player-club/useMyClubs'
+import { useJoinClub } from '@rotra/data/player-club/useJoinClub'
+import { queueSessionUrl } from '@rotra/data/player/mySessions'
+import { JoinClubCard } from '@rotra/ui/join-club-card'
 import { MockError } from '@rotra/data/mock/errors'
 import {
   useGuestRegistration,
@@ -16,12 +22,15 @@ import { useEffect } from 'react'
 import { useAppDispatch } from '@/store/hooks'
 import { setAccount } from '@/store/slices/authSlice'
 
-export function GuestRegistration({ clubId, returnTo }: { clubId: string; returnTo?: string }) {
+export function GuestRegistration({ clubId, returnTo, sessionSlug }: { clubId: string; returnTo?: string; sessionSlug?: string }) {
   useEffect(() => {
     rememberSessionReturn(returnTo)
   }, [returnTo])
-  const club = useGuestRegistrationClub(clubId)
-  const registration = useGuestRegistration(clubId)
+  const session = useSession('player')
+  const myClubs = useMyClubs(session.data?.account.id ?? null)
+  const join = useJoinClub()
+  const club = useGuestRegistrationClub(clubId, sessionSlug)
+  const registration = useGuestRegistration(clubId, sessionSlug)
   const dispatch = useAppDispatch()
   const router = useRouter()
   const result = registration.data
@@ -30,6 +39,9 @@ export function GuestRegistration({ clubId, returnTo }: { clubId: string; return
       <AccountLinkStatus
         variant="claim-done"
         standalone
+        clubName={result.clubName ?? undefined}
+        sessionTitle={result.sessionTitle}
+        onBackToSession={result.sessionSlug ? () => window.location.assign(queueSessionUrl(result.sessionSlug ?? '')) : undefined}
         firstName={result.firstName}
         rtrId={result.rtrId}
         onOpenProfile={() => router.push(`/players/${result.playerId}`)}
@@ -52,11 +64,51 @@ export function GuestRegistration({ clubId, returnTo }: { clubId: string; return
         <Skeleton className="h-40" />
       </LinkPage>
     )
+  if (session.isPending || (session.data && clubId && myClubs.isPending))
+    return (
+      <LinkPage title="Opening registration">
+        <Skeleton className="h-40" />
+      </LinkPage>
+    )
+  if (session.data && clubId && myClubs.isError)
+    return (
+      <LinkPage title="Couldn't load your clubs.">
+        <ErrorState title={myClubs.error.message} onRetry={() => void myClubs.refetch()} />
+      </LinkPage>
+    )
+  if (session.data && clubId)
+    return (
+      <main className="mx-auto flex max-w-[640px] flex-col gap-5 px-4 pt-5 pb-[120px]">
+        <JoinClubCard
+          clubName={club.data.clubName ?? ''}
+          clubInitials={(club.data.clubName ?? '')
+            .split(/\s+/)
+            .slice(0, 2)
+            .map((w) => w[0])
+            .join('')}
+          alreadyIn={myClubs.data?.some((c) => c.id === clubId)}
+          pending={join.isPending}
+          error={join.error?.message ?? myClubs.error?.message}
+          onNotNow={() => router.push(`/players/${session.data?.account.id}`)}
+          onJoin={() =>
+            join.mutate(clubId, {
+              onSuccess: () => {
+                toast(`You joined ${club.data.clubName}`)
+                router.push(`/players/${session.data?.account.id}`)
+              },
+              onError: (error) => toast.error(error.message),
+            })
+          }
+        />
+      </main>
+    )
   const error = registration.error
   return (
     <ClaimForm
       standalone
-      clubName={club.data.clubName}
+      clubName={club.data.clubName ?? ''}
+      contextLabel={!clubId ? 'ROTRA registration' : sessionSlug ? `Session link from ${club.data.clubName} · ${club.data.sessionTitle}` : `Registration link from ${club.data.clubName}`}
+      cities={!clubId ? foundingCities.map(city => ({ value: city.code, label: city.name })) : undefined}
       maskedPhone=""
       isPending={registration.isPending}
       accountMatch={result?.status === 'account-match'}
@@ -70,7 +122,7 @@ export function GuestRegistration({ clubId, returnTo }: { clubId: string; return
                   ? 'email'
                   : error instanceof MockError && error.fieldErrors?.phone
                     ? 'phone'
-                    : undefined,
+                    : error instanceof MockError && error.fieldErrors?.cityCode ? 'cityCode' : undefined,
             }
           : undefined
       }
@@ -80,11 +132,7 @@ export function GuestRegistration({ clubId, returnTo }: { clubId: string; return
             if (response.status === 'registered') {
               dispatch(setAccount(response.session.account))
               toast('Registration complete')
-              const back = consumeSessionReturn(returnTo)
-              if (back) {
-                window.location.assign(back)
-                return
-              }
+              consumeSessionReturn(returnTo)
             }
             window.scrollTo(0, 0)
           },

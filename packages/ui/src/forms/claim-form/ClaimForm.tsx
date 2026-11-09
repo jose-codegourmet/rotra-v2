@@ -8,6 +8,7 @@ import { useSubmitOnce } from '@rotra/ui/hooks/use-submit-once'
 import { Notice } from '@rotra/ui/notice'
 import { PersonalDetailsFields } from '@rotra/ui/personal-details-fields'
 import { PhoneOrEmailInput } from '@rotra/ui/phone-or-email-input'
+import { Select, type SelectOption } from '@rotra/ui/select'
 import { TextInput } from '@rotra/ui/text-input'
 import { useEffect, useState } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
@@ -16,13 +17,15 @@ import { type ClaimValues, claimSchema } from './ClaimForm.schema'
 
 export type ClaimFormProps = {
   clubName: string
+  contextLabel?: string
+  cities?: SelectOption[]
   /** Shown read-only, exactly as received. Empty when the profile has no phone: the player types one. */
   maskedPhone: string
   defaultValues?: Partial<ClaimValues>
   onSubmit: (values: ClaimValues) => void
   isPending?: boolean
   /** An email or phone problem shows under that field; anything else as a notice at the top */
-  serverError?: { message: string; field?: 'email' | 'phone' }
+  serverError?: { message: string; field?: 'email' | 'phone' | 'cityCode' }
   /** Guest invitation: empty registration, with no existing profile or guest linkage. */
   standalone?: boolean
   accountMatch?: boolean
@@ -42,6 +45,8 @@ function Required({ children }: { children: string }) {
 /** P-CLAIM step 2, Finish registering: private contact and password, then optional details. */
 export function ClaimForm({
   clubName,
+  contextLabel,
+  cities,
   maskedPhone,
   defaultValues,
   onSubmit,
@@ -79,11 +84,11 @@ export function ClaimForm({
   )
   return (
     <LinkPage
-      label={`Registration link from ${clubName}`}
-      title="Finish registering"
+      label={contextLabel ?? `Registration link from ${clubName}`}
+      title={standalone ? 'Create your account' : 'Finish registering'}
       description={
         standalone
-          ? 'Create your ROTRA account with your phone and email. Your club guest record stays unlinked until you accept a separate linking invitation.'
+          ? 'Create your ROTRA account with your phone and email. Your full name shows to signed-in ROTRA players on sessions you join.'
           : "Your club filled in what it knows. Check it, change anything that's wrong, and choose a password."
       }
     >
@@ -95,6 +100,10 @@ export function ClaimForm({
             onSubmit={form.handleSubmit((values) => {
               if (needsPhone && !values.phone.trim()) {
                 form.setError('phone', { type: 'required', message: 'Enter your mobile number.' })
+                return
+              }
+              if (cities && !cities.some((city) => city.value === values.cityCode)) {
+                form.setError('cityCode', { message: 'Pick your city or province.' })
                 return
               }
               submitOnce(() => onSubmit(needsPhone ? values : { ...values, phone: '' }))
@@ -130,6 +139,26 @@ export function ClaimForm({
             ) : null}
             {serverError && !serverError.field ? (
               <Notice tone="error">{serverError.message}</Notice>
+            ) : null}
+            {cities ? (
+              <Field
+                label={<Required>City or province</Required>}
+                hint="Used in your player ID."
+                error={errors.cityCode?.message}
+              >
+                <Controller
+                  control={form.control}
+                  name="cityCode"
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      options={cities}
+                      placeholder="Pick your city or province."
+                      disabled={isPending}
+                    />
+                  )}
+                />
+              </Field>
             ) : null}
             <div className="flex flex-col gap-3.5">
               <span className={sectionLabel}>Contact · private</span>
@@ -218,7 +247,13 @@ export function ClaimForm({
             </div>
             <div className="flex justify-end">
               <Button type="submit" variant="primary" disabled={isPending}>
-                {isPending ? 'Completing…' : 'Complete registration'}
+                {isPending
+                  ? standalone
+                    ? 'Creating…'
+                    : 'Completing…'
+                  : standalone
+                    ? 'Create account'
+                    : 'Complete registration'}
               </Button>
             </div>
           </form>

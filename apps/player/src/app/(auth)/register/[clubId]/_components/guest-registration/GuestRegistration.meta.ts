@@ -5,6 +5,7 @@ export const guestRegistrationMeta = {
   description:
     'Independent registration from a guest invitation, with existing-account confirmation and no club guest linkage.',
   usage: [
+    'Supports registration context and email confirmation states.',
     'Accepts an allowlisted public session return and restores it after registration; registration never links a guest or confirms admission.',
     'The club supplies RTR ID allocation context only. Contact matches require sign-in/recovery or correction, never an automatic merge.',
   ],

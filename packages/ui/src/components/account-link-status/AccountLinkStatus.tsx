@@ -25,6 +25,8 @@ export type AccountLinkStatusProps = {
   rtrId?: string
   /** Newly registered through a guest invitation; no existing games or guest record were linked. */
   standalone?: boolean
+  sessionTitle?: string | null
+  onBackToSession?: () => void
   /** claim-processing: Check again is running */
   isPending?: boolean
   onBackToSignIn?: () => void
@@ -44,6 +46,8 @@ export function AccountLinkStatus({
   firstName,
   rtrId,
   standalone = false,
+  sessionTitle,
+  onBackToSession,
   isPending = false,
   onBackToSignIn,
   onRequestAnother,
@@ -142,19 +146,29 @@ export function AccountLinkStatus({
       return (
         <LinkPage label="Registration complete" title={`Welcome, ${firstName ?? ''}`}>
           <Notice tone="success">
-            Your profile is registered. Sign in from now on with your email and your password.
+            {standalone
+              ? clubName !== 'your club'
+                ? `You're now in ${clubName}'s saved players.`
+                : 'Your ROTRA account is ready.'
+              : 'Your profile is registered. Sign in from now on with your email and your password.'}
           </Notice>
+          {standalone && sessionTitle ? (
+            <Notice>Your request to join {sessionTitle} is ready to send.</Notice>
+          ) : null}
           <Card asChild>
             <section className="flex flex-col gap-1.5">
               <p className="m-0">
                 {standalone ? 'Your player ID is ' : 'Your player ID stays '}
                 <span className="font-mono">{rtrId}</span>.
-                {standalone
-                  ? ' Your club guest record stays unlinked until you accept a separate linking invitation.'
-                  : ' Your games and rank carry over.'}
+                {standalone ? '' : ' Your games and rank carry over.'}
               </p>
               <div className={actions}>
-                <Button variant="primary" onClick={onOpenProfile}>
+                {onBackToSession ? (
+                  <Button variant="primary" onClick={onBackToSession}>
+                    Back to the session
+                  </Button>
+                ) : null}
+                <Button variant={onBackToSession ? undefined : 'primary'} onClick={onOpenProfile}>
                   Go to my profile
                 </Button>
               </div>

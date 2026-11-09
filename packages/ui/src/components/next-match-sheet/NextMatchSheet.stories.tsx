@@ -56,3 +56,8 @@ export const LightOneCandidate: Story = {
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
 export const PhoneLight: Story = { globals: { viewport: { value: 'phone' }, theme: 'light' } }
 export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }
+/** Fullscreen on phones with one candidate: one full-width card. */
+export const PhoneOneCandidate: Story = {
+  args: { candidates: candidates.slice(0, 1) },
+  globals: { viewport: { value: 'phone' } },
+}

@@ -5,6 +5,7 @@ export const nextMatchSheetMeta = {
   description:
     'Q-NEXT-MATCH: after Confirm result, "Next on Court X" offers the first two ready waiting matches for the freed court as two equal cards (Left and Right): "#P" and the format chip, Team A "vs" Team B, and Pick this. Skip for now (or closing) places nothing; with none ready it shows "No ready match for Court X right now." and only Close.',
   usage: [
+    'On phones the sheet is fullscreen (Sheet fullscreen): intro on top, the card pair stretching to the free height, Skip for now pinned to the bottom. Wide screens keep the centered dialog.',
     'Open it right after a confirmed result, for the first court the match freed. Pass at most two candidates from nextMatchCandidates(courtId, ctx) in match.rules (the same readiness check Auto Queue uses); the sheet never works out eligibility.',
     'onPick puts the match On court (getting ready, never started) with the place-on-court mutation; recheck at pick time and pass error "That match is not ready any more. Pick again." with refreshed candidates when it fails.',
     'onSkip covers Skip for now, Close, Escape and the scrim. In Auto Queue the caller then lets Auto Queue fill that court as it would have.',

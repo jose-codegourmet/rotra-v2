@@ -172,6 +172,7 @@ export function NextMatchSheet({
       }}
       title={`Next on ${courtLabel}`}
       footer={footer}
+      fullscreen
       dismissible={!isPending}
       hideClose={isPending}
     >
@@ -187,7 +188,7 @@ export function NextMatchSheet({
         <div
           ref={pairRef}
           className={cn(
-            'grid gap-2',
+            'grid gap-2 max-[640px]:flex-1',
             pair ? 'grid-cols-2' : 'grid-cols-1',
             swipe && 'touch-pan-y select-none',
           )}
@@ -217,9 +218,9 @@ export function NextMatchSheet({
                   {side ? <span className="ml-auto text-xs text-fg2">{side}</span> : null}
                 </div>
                 <div className="flex-1 break-words">
-                  <b className="block font-bold">{c.teamA}</b>
+                  <b className="block font-bold max-[640px]:text-[18px]">{c.teamA}</b>
                   <span className="block text-fg2">vs</span>
-                  <b className="block font-bold">{c.teamB}</b>
+                  <b className="block font-bold max-[640px]:text-[18px]">{c.teamB}</b>
                 </div>
                 <Button
                   ref={(el) => {

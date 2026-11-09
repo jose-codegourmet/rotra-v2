@@ -84,4 +84,45 @@ export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
 export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }
 export const Light: Story = { globals: { theme: 'light' } }
 
-export const ConfirmedParticipant: Story = { args: { fullRoster: true } }
+export const ConfirmedParticipant: Story = { args: { uncapped: true } }
+
+/** Signed-in view: registered tiles show full name, nickname and a profile link; guest and unclaimed stay masked. */
+const signedIn = participants.map((p, i) => {
+  const registered = i % 3 !== 2
+  return {
+    ...p,
+    name: registered ? (clubPlayers[i]?.fullName ?? p.name) : p.name,
+    nickname: registered ? 'Nick' : undefined,
+    masked: !registered,
+    href: registered ? `/player/find/RTR-${String(i + 1).padStart(5, '0')}` : undefined,
+  }
+})
+export const VisitorCapped: Story = { args: { participants: participants.slice(0, 18) } }
+export const SignedInUncappedMixed: Story = {
+  args: { participants: signedIn.slice(0, 18), waitlist: [], uncapped: true, participantCount: 18 },
+}
+export const ViewerConfirmed: Story = {
+  args: {
+    participants: signedIn.slice(0, 6).map((p, i) => ({ ...p, isViewer: i === 1 })),
+    waitlist: [],
+    uncapped: true,
+  },
+}
+export const ViewerWaitlisted: Story = {
+  args: {
+    participants: signedIn.slice(0, 3),
+    waitlist: signedIn.slice(3, 6).map((p, i) => ({ ...p, isViewer: i === 1 })),
+    uncapped: true,
+  },
+}
+export const ViewerNotInSession: Story = {
+  args: { participants: signedIn.slice(0, 6), waitlist: signedIn.slice(6, 8), uncapped: true },
+}
+export const SignedInLight: Story = {
+  args: {
+    participants: signedIn.slice(0, 6).map((p, i) => ({ ...p, isViewer: i === 1 })),
+    waitlist: signedIn.slice(6, 8),
+    uncapped: true,
+  },
+  globals: { theme: 'light' },
+}

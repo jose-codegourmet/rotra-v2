@@ -33,8 +33,10 @@ function Team({ players }: { players: CourtPlayer[] }) {
   return (
     <div className="flex flex-wrap justify-center gap-x-3.5 gap-y-2">
       {players.map((player) => (
+        // biome-ignore lint/a11y/useSemanticElements: a group/region div; a fieldset or section would change the drawn layout
         <div
           key={player.id}
+          role="group"
           className="flex flex-col items-center gap-1"
           aria-label={`${player.name}, ${player.games ?? 0} games played`}
         >
@@ -136,10 +138,13 @@ function MatchSlider({
         </Button>
       ) : null}
       <div className="relative min-w-0 flex-1 max-[640px]:self-stretch">
+        {/* biome-ignore lint/a11y/useSemanticElements: a labelled, keyboard-scrollable slider region */}
+        {/* biome-ignore lint/a11y/useSemanticElements: a group/region div; a fieldset or section would change the drawn layout */}
         <div
           ref={slider}
           role="region"
           aria-label={`Matches ready for ${courtLabel}`}
+          // biome-ignore lint/a11y/noNoninteractiveTabindex: a scroll region must be keyboard reachable
           tabIndex={0}
           className="relative flex h-full cursor-grab snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain select-none [scrollbar-width:none]"
           onScroll={(e) => {

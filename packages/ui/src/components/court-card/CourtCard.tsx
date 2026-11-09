@@ -118,7 +118,11 @@ export type CourtCardReadOnlyProps = {
   className?: string
 }
 
-export type CourtCardProps = CourtCardInGameProps | CourtCardOnCourtProps | CourtCardFreeProps | CourtCardReadOnlyProps
+export type CourtCardProps =
+  | CourtCardInGameProps
+  | CourtCardOnCourtProps
+  | CourtCardFreeProps
+  | CourtCardReadOnlyProps
 
 function TimeLine({
   startLabel,
@@ -217,16 +221,35 @@ export function CourtCard(props: CourtCardProps) {
   return <FreeCourtCard {...props} />
 }
 
-function ReadOnlyCourtCard({ label, state, merged = false, teamA = [], teamB = [], startedLabel, className }: CourtCardReadOnlyProps) {
-  const chip = state === 'playing' ? 'Playing' : state === 'getting-ready' ? 'Getting ready' : 'Free'
+function ReadOnlyCourtCard({
+  label,
+  state,
+  merged = false,
+  teamA = [],
+  teamB = [],
+  startedLabel,
+  className,
+}: CourtCardReadOnlyProps) {
+  const chip =
+    state === 'playing' ? 'Playing' : state === 'getting-ready' ? 'Getting ready' : 'Free'
   return (
-    <article aria-label={label} className={cn(courtCardVariants({ variant: state === 'playing' ? 'in-game' : 'free', merged }), className)}>
+    <article
+      aria-label={label}
+      className={cn(
+        courtCardVariants({ variant: state === 'playing' ? 'in-game' : 'free', merged }),
+        className,
+      )}
+    >
       <div className="flex items-center justify-between gap-2">
         <h3 className="text-base">{label}</h3>
-        <Chip tone={state === 'playing' ? 'accent' : undefined}>{merged && state !== 'free' ? `Merged · ${chip}` : chip}</Chip>
+        <Chip tone={state === 'playing' ? 'accent' : undefined}>
+          {merged && state !== 'free' ? `Merged · ${chip}` : chip}
+        </Chip>
       </div>
       <CourtDrawing courts={merged ? 2 : 1} free={state === 'free'} teamA={teamA} teamB={teamB} />
-      {state === 'playing' && startedLabel ? <p className="text-[13px] text-fg2">Started {startedLabel}</p> : null}
+      {state === 'playing' && startedLabel ? (
+        <p className="text-[13px] text-fg2">Started {startedLabel}</p>
+      ) : null}
       {state === 'getting-ready' ? <p className="text-[13px] text-fg2">Waiting to start</p> : null}
     </article>
   )

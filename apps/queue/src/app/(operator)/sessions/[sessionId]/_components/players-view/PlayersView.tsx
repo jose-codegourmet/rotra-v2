@@ -30,8 +30,8 @@ import { useRemoveFromWaitlist } from '@rotra/data/session-roster/useRemoveFromW
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { useSetPresenceMany } from '@rotra/data/session-roster/useSetPresenceMany'
 import { Button } from '@rotra/ui/button'
-import { ConfirmMakeMatchSheet } from '@rotra/ui/confirm-make-match-sheet'
 import { Card } from '@rotra/ui/card'
+import { ConfirmMakeMatchSheet } from '@rotra/ui/confirm-make-match-sheet'
 import { EmptyState } from '@rotra/ui/empty-state'
 import { PlayerPoolCard, type PlayerPoolCardStatus } from '@rotra/ui/player-pool-card'
 import {

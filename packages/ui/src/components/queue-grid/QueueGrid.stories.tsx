@@ -1,7 +1,7 @@
 import type { MatchCardFixture } from '@rotra/data/fixtures/match-cards'
 import { queueGridFixtures } from '@rotra/data/fixtures/queue-grid'
-import { QueueSearchField } from '@rotra/ui/queue-search-field'
 import type { PlayerWait } from '@rotra/ui/player-face-button'
+import { QueueSearchField } from '@rotra/ui/queue-search-field'
 import type { SwapSlot } from '@rotra/ui/swap-sides-area'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'

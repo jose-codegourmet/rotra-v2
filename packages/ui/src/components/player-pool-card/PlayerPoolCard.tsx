@@ -98,7 +98,7 @@ export function PlayerPoolCard({
     }
   }
   return (
-    // biome-ignore lint/a11y/useSemanticElements: the card holds a Switch, so it cannot be a <button>
+    // biome-ignore lint/a11y/useSemanticElements: the card holds block layout a native button cannot
     <div
       role="button"
       tabIndex={0}
@@ -128,7 +128,9 @@ export function PlayerPoolCard({
           <div className="text-[11px] leading-[1.3] text-fg2">{levelLabel(level)}</div>
         </div>
       </div>
+      {/* biome-ignore lint/a11y/useSemanticElements: a group/region div; a fieldset or section would change the drawn layout */}
       <div
+        role="group"
         className="grid grid-cols-2 gap-2"
         aria-label={`${games} games played, ${forTheNight} for the night${presenceCaption ? `, ${presenceCaption}` : ''}`}
       >
@@ -177,6 +179,7 @@ export function PlayerPoolCard({
         </span>
       ) : null}
       {presencePending ? <span className="text-[11px] text-fg2">Saving presence…</span> : null}
+      {/* biome-ignore lint/a11y/useSemanticElements: a group/region div; a fieldset or section would change the drawn layout */}
     </div>
   )
 }

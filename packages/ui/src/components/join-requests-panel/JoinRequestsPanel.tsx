@@ -9,11 +9,11 @@ import { Card } from '@rotra/ui/card'
 import { Chip } from '@rotra/ui/chip'
 import { cn } from '@rotra/ui/cn'
 import { DropOutNoticeRow, type DropOutNoticeRowProps } from '@rotra/ui/drop-out-notice-row'
-import { MatchRequestCard, type MatchRequestCardProps } from '@rotra/ui/match-request-card'
-import { Tabs, TabsContent } from '@rotra/ui/tabs'
 import { LevelSelect } from '@rotra/ui/level-select'
+import { MatchRequestCard, type MatchRequestCardProps } from '@rotra/ui/match-request-card'
 import { Notice } from '@rotra/ui/notice'
 import { Skeleton } from '@rotra/ui/skeleton'
+import { Tabs, TabsContent } from '@rotra/ui/tabs'
 import { useId, useState } from 'react'
 
 export type JoinRequestDetails = {

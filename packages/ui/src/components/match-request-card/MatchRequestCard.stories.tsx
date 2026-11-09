@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import { MatchRequestCard, type MatchRequestSpot } from './MatchRequestCard'
+
 const named = (role: MatchRequestSpot['role'], name: string, where?: string): MatchRequestSpot => ({
   role,
   player: { name, games: 3, minimumGames: 4, level: 'advanced_low', where },
@@ -67,7 +68,10 @@ export const FiveVersusFive: Story = {
   },
 }
 export const Pending: Story = { args: { isPending: true } }
-export const Error: Story = { args: { error: 'Could not add this request. Try again.' } }
+export const ErrorState: Story = {
+  name: 'Error',
+  args: { error: 'Could not add this request. Try again.' },
+}
 export const DoublesLight: Story = { globals: { theme: 'light' } }
 export const SinglesLight: Story = { ...Singles, globals: { theme: 'light' } }
 export const OneVersusTwoLight: Story = { ...OneVersusTwo, globals: { theme: 'light' } }

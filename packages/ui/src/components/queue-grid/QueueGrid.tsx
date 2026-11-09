@@ -72,14 +72,12 @@ export function QueueGrid({
   const query = searchText.trim().toLocaleLowerCase()
   useEffect(() => {
     if (query)
-      rootRef.current
-        ?.querySelector<HTMLElement>('[data-search-hit="true"]')
-        ?.scrollIntoView({
-          block: 'nearest',
-          behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
-            ? 'instant'
-            : 'smooth',
-        })
+      rootRef.current?.querySelector<HTMLElement>('[data-search-hit="true"]')?.scrollIntoView({
+        block: 'nearest',
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+          ? 'instant'
+          : 'smooth',
+      })
   }, [query])
 
   const update = (next: Drag | null) => {

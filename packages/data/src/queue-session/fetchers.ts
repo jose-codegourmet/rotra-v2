@@ -6,6 +6,7 @@ import {
   courtNames,
   onCourtMatches,
 } from '../match/match.rules'
+import { sessionRequestCount } from '../match-request/fetchers'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, readMockState } from '../mock/store'
@@ -70,6 +71,7 @@ export async function getQueueSession(id: string) {
     downloadState: state.downloads[id] ?? 'none',
     downloadedAt: state.downloadInfo[id]?.downloadedAt ?? null,
     downloadError: state.downloadInfo[id]?.error,
+    requestCount: sessionRequestCount(state, id),
   }
 }
 /** Q-SESSION-DONE: derived from roster, matches and the pending count behind the SyncStatus pill. */

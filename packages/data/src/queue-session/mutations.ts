@@ -6,6 +6,7 @@ import { delay } from '../mock/latency'
 import { required } from '../mock/required'
 import { type MockState, mockStore, readMockState } from '../mock/store'
 import { queueMutation, sessionIn } from '../mock/transaction'
+import { closeSessionRequests } from '../public-session/publicSession.rules'
 import { isRealDataMode } from '../real/mode'
 import { realCreateQueueSession } from '../real/queue'
 import {
@@ -405,11 +406,8 @@ export async function cancelSession(input: { sessionId: string; reason?: string 
     s.state = 'cancelled'
     s.cancelledAt = now
     s.cancelReason = cancelReasonOf(input.reason)
-    for (const request of state.joinRequests) {
-      if (request.sessionId !== s.id || request.status !== 'pending') continue
-      request.status = 'closed'
-      request.decidedAt = now
-    }
+    // Pending join requests, drop-out notices and match requests close (kept, hidden).
+    closeSessionRequests(state, s.id, now)
     return { data: structuredClone(s), text: `${s.title} cancelled` }
   })
 }

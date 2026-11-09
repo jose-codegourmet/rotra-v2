@@ -5,6 +5,7 @@ import { clubPlayerView } from '../club-player/fetchers'
 import { clubPlayerForProfile, createClubPlayer, directoryLevel } from '../club-player/mutations'
 import { DEMO_CLUB_ID } from '../fixtures/clubs'
 import { directoryPlayers, leaderboardPlayers } from '../fixtures/players'
+import { closeStaleMatchRequests } from '../match-request/matchRequest.rules'
 import { requireOnline } from '../mock/bridge'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
@@ -56,6 +57,8 @@ async function rosterMutation<T>(
   return queueMutation({ area: 'Roster', sessionId }, (s) => {
     const result = change(s)
     recomputeMinimum(s, sessionId)
+    // D-2026-11-09-05: a match request closes when anyone it names stops being present.
+    closeStaleMatchRequests(s, sessionId)
     return result
   })
 }
@@ -273,6 +276,7 @@ export function setPresenceMany(input: {
         [...m.teamA, ...m.teamB].some((id) => away.has(id)),
     ).length
     const absent = changes.size - present
+    closeStaleMatchRequests(s, input.sessionId)
     const text =
       present && absent
         ? `${present} player${present === 1 ? '' : 's'} marked present, ${absent} away`

@@ -1,4 +1,6 @@
 import type { Match, MatchFormat, MatchState } from '../match/match.types'
+import type { MatchRequest } from '../match-request/matchRequest.types'
+import { prototypeDefaultRequestFormats } from '../queue-session/queueSession.types'
 import { createQueueFixtures } from './queueSessions'
 /** Story-only scenarios; the normal store starts with no matches. */
 export function createConsoleFixtures(now = Date.now()) {
@@ -11,6 +13,8 @@ export function createConsoleFixtures(now = Date.now()) {
       scheduledStartAt: now - 3600000,
       startedAt: now - 3600000,
       scheduledEndAt: now + 7200000,
+      // Players can request 2 v 2 and 3 v 3 here, so the seeded 3 v 3 request is allowed.
+      requestFormats: { ...prototypeDefaultRequestFormats(seed), fun_3v3: true },
     },
     roster = base.roster.map((p, i) => ({
       ...p,
@@ -18,6 +22,8 @@ export function createConsoleFixtures(now = Date.now()) {
       present: i !== 5,
       levelLockedAt: session.startedAt,
       presentChangedAt: session.startedAt,
+      // Row 13 tapped I'm here 20 minutes ago and the QM has not changed it since.
+      ...(i === 12 ? { presentChangedAt: now - 1200000, selfCheckedInAt: now - 1200000 } : {}),
     })),
     courts = base.courts
       .filter((c) => c.sessionId === session.id)
@@ -103,11 +109,40 @@ export function createConsoleFixtures(now = Date.now()) {
       teamB: [6, 7, 8, 9, 10].map(pid),
       courtIds: [court(0), court(1)],
     }
+  // Two open match requests for the QM's Requests › Match tab (Q17.2): a 2 v 2 with one Anyone
+  // opponent from a player in queue, and a 3 v 3 with Anyone spots. Every named player is present.
+  const matchRequests: MatchRequest[] = [
+    {
+      id: 'match-request-2v2',
+      sessionId: session.id,
+      pid: pid(4),
+      format: 'doubles',
+      partners: [pid(6)],
+      opponents: [pid(8), null],
+      at: now - 900000,
+      status: 'open',
+      decidedAt: null,
+      matchId: null,
+    },
+    {
+      id: 'match-request-3v3',
+      sessionId: session.id,
+      pid: pid(9),
+      format: 'fun_3v3',
+      partners: [pid(10), null],
+      opponents: [pid(11), null, null],
+      at: now - 300000,
+      status: 'open',
+      decidedAt: null,
+      matchId: null,
+    },
+  ]
   return {
     session,
     roster,
     courts,
     matches,
+    matchRequests,
     merged: { session, roster, courts, matches: [merged, ...matches.slice(1)] },
   }
 }

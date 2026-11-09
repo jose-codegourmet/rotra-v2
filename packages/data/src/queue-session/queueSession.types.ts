@@ -33,7 +33,29 @@ export type QueueSession = {
   acceptJoinRequests: boolean
   /** Missing means `manual` (the default). */
   courtFillMode?: CourtFillMode
+  /**
+   * **Players can request**: which formats a signed-in Player may ask for with Request a match.
+   * Missing means `prototypeDefaultRequestFormats(session)` (sessions saved before the setting).
+   */
+  requestFormats?: RequestFormats
 }
+/** One switch per format a Player may request (`MatchFormat` keys). */
+export type RequestFormats = Record<import('../match/match.types').MatchFormat, boolean>
+/**
+ * PROTOTYPE DEFAULT, NOT AN OWNER DECISION (D-2026-11-09-11 is Open): 2 v 2 follows the Doubles
+ * switch, 1 v 1 follows the Singles switch, every fun format is off (the prototype's `reqDefaults`).
+ * The one place this default lives; Q18.14 (#618) owns the setup toggles and the decided default.
+ */
+export const prototypeDefaultRequestFormats = (
+  session: Pick<QueueSession, 'allowSingles' | 'allowDoubles'>,
+): RequestFormats => ({
+  doubles: session.allowDoubles,
+  singles: session.allowSingles,
+  fun_1v2: false,
+  fun_3v3: false,
+  fun_4v4: false,
+  fun_5v5: false,
+})
 export type SessionCourt = {
   id: string
   sessionId: string
@@ -56,6 +78,11 @@ export type QueueSessionSummary = QueueSession & {
   queuedCount: number
   /** `null` means this data mode has no device-download adapter yet. */
   downloadedHere: boolean | null
+  /**
+   * Requests · N (pending join requests + open drop-out notices + open match requests), carried by
+   * the session detail read. Missing where the read does not include it (lists, real mode).
+   */
+  requestCount?: number
 }
 export type QueueSessionInput = Pick<
   QueueSession,

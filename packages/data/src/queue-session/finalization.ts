@@ -4,6 +4,7 @@ import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, mockStore, readMockState } from '../mock/store'
 import { queueMutation, sessionIn } from '../mock/transaction'
+import { closeSessionRequests } from '../public-session/publicSession.rules'
 import { RealRequestError } from '../real/client'
 import { realFinalizeSession } from '../real/finalization'
 import { realInvalidateSession } from '../real/match'
@@ -185,6 +186,8 @@ async function run(
           now = Date.now()
         s.state = 'completed'
         s.finalizedAt = now
+        // Finishing closes pending join requests, drop-out notices and match requests (kept, hidden).
+        closeSessionRequests(draft, sessionId, now)
         const f = draft.finalizations[sessionId]
         if (f) f.state = 'committed'
       })

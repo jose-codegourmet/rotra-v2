@@ -1,8 +1,13 @@
 import { publicSlugFor } from '../queue-session/queueSession.rules'
 import type { QueueSession, SessionCourt } from '../queue-session/queueSession.types'
-import type { SessionPlayer } from '../session-roster/sessionRoster.types'
+import type {
+  DropOutNotice,
+  SessionInviteCode,
+  SessionPlayer,
+} from '../session-roster/sessionRoster.types'
 import { DEMO_CLUB_ID } from './clubs'
-import { clubPlayers } from './players'
+import { createAccountJoinRequestFixture, TONIGHT_INVITE_CODE_ID } from './joinRequests'
+import { clubPlayers, JOSE_PLAYER_ID } from './players'
 import { createSessionHistoryFixtures } from './sessionHistory'
 import { venues } from './venues'
 /** Same relative dates as seedSessions/PAST and ensureHistory; reset uses a new seed time. */
@@ -94,8 +99,39 @@ export function createQueueFixtures(now = Date.now()) {
       confirmedAt: now + i,
     })),
   ]
+  // Player-side requests for the QM's Requests card (Q17.2): Jose's invite code, Derrick's account
+  // request through it, and Klod (confirmed, not present yet) saying they can't make it.
+  const klod = roster[11]
+  const klodPlayerId = clubPlayers.find((p) => p.id === klod?.clubPlayerId)?.playerId
+  if (!klod || !klodPlayerId) throw new Error("Missing Klod on tonight's roster.")
+  const sessionInviteCodes: SessionInviteCode[] = [
+    {
+      id: TONIGHT_INVITE_CODE_ID,
+      sessionId: tonight.id,
+      playerId: JOSE_PLAYER_ID,
+      code: 'k7m2p9qw',
+      createdAt: now - 2 * 3600000,
+    },
+  ]
+  const dropOutNotices: DropOutNotice[] = [
+    {
+      id: 'drop-out-s-tonight-klod',
+      sessionId: tonight.id,
+      pid: klod.id,
+      playerId: klodPlayerId,
+      at: now - 12 * 60000,
+      status: 'open',
+      decision: null,
+      closedAt: null,
+    },
+  ]
+  const requests = {
+    joinRequests: [createAccountJoinRequestFixture(now)],
+    dropOutNotices,
+    sessionInviteCodes,
+  }
   /** `roster` is tonight's only; the past sessions' rosters, matches and finalizations live under `history`. */
-  return { sessions, courts, roster, history }
+  return { sessions, courts, roster, history, requests }
 }
 export const queueSessionFixtures = createQueueFixtures()
 export const liveSessionFixture = {

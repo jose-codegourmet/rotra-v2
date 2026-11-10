@@ -13,10 +13,10 @@ export const CLUB_PICTURE_MAX_BYTES = 4 * 1024 * 1024
 
 const NOT_EDITABLE = 'This player registered, so they keep their own details.'
 
-// OPEN (D-2026-11-09-12, Q19.5 #623 A and B): where a guest's picture is stored, and whether a
-// club-set picture carries over when the player claims the profile, are undecided. This mock keeps
-// it on the saved-player record (`ClubPlayer.picture`) and drops nothing; real mode refuses until
-// the owner answers.
+// Owner answered on 2026-11-10 (D-2026-11-09-12): A1, the club-set picture becomes the player's
+// starting picture on claim; B1, it is stored on the saved-player record (`club_players.avatar_ref`,
+// `avatar_previous_ref`). This mock keeps it on `ClubPlayer.picture`; real mode refuses until the
+// backend lands.
 
 function pictureRow(s: MockState, id: string) {
   const row = s.clubPlayers.find(

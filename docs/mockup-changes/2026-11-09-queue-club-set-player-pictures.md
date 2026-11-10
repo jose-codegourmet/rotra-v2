@@ -1,6 +1,6 @@
 # Clubs set profile pictures for guests and unclaimed players
 
-Status: IN PROGRESS — #587
+Status: IN MOCK APP — #587
 Date: 2026-11-09
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Saved players › player › Edit details

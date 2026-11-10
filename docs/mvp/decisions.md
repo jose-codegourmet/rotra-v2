@@ -22,16 +22,16 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-08-06](#d-2026-11-08-06) | Player access to public Queue sessions | approved | implemented in source; authenticated real verification pending | #569 | [Queue](workstreams/queue.md) |
 | [D-2026-11-09-01](#d-2026-11-09-01) | Next-match picker after every result | approved | in progress | #579 | [Queue](workstreams/queue.md) |
 | [D-2026-11-09-02](#d-2026-11-09-02) | Signed-in Players on the session page: full names and one-tap join | approved | not started | needed | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
-| [D-2026-11-09-03](#d-2026-11-09-03) | Players check themselves in, leave, and say they can't make it | approved | not started | needed | [Queue](workstreams/queue.md) |
+| [D-2026-11-09-03](#d-2026-11-09-03) | Players check themselves in, leave, and say they can't make it | approved | in progress | #617, #619, #624, #626 | [Queue](workstreams/queue.md) |
 | [D-2026-11-09-04](#d-2026-11-09-04) | The player's live view: My night, Courts now, own standing, refresh only | approved | not started | needed | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
 | [D-2026-11-09-05](#d-2026-11-09-05) | Match requests | approved | not started | needed | [Queue](workstreams/queue.md) |
-| [D-2026-11-09-06](#d-2026-11-09-06) | Registration from session and club links, guest linking and club membership | approved | not started | needed | [Player](workstreams/player.md), [Queue](workstreams/queue.md) |
+| [D-2026-11-09-06](#d-2026-11-09-06) | Registration from session and club links, guest linking and club membership | approved | in progress | #622, #625, #627 | [Player](workstreams/player.md), [Queue](workstreams/queue.md) |
 | [D-2026-11-09-07](#d-2026-11-09-07) | Public or private player profile | approved | not started | needed | [Player](workstreams/player.md) |
-| [D-2026-11-09-08](#d-2026-11-09-08) | Sharing: links, QR codes and post/story images | approved | not started | needed | [Player](workstreams/player.md), [Queue](workstreams/queue.md) |
+| [D-2026-11-09-08](#d-2026-11-09-08) | Sharing: links, QR codes and post/story images | approved | in progress | #620, #621, #624, #626 | [Player](workstreams/player.md), [Queue](workstreams/queue.md) |
 | [D-2026-11-09-09](#d-2026-11-09-09) | Keeping the session page cheap to serve | approved | not started | needed | [Queue](workstreams/queue.md), [Backend](workstreams/backend.md) |
-| [D-2026-11-09-10](#d-2026-11-09-10) | Uploaded pictures: keep only the current and the previous | approved | not started | needed | [Player](workstreams/player.md), [Queue](workstreams/queue.md), [Backend](workstreams/backend.md) |
+| [D-2026-11-09-10](#d-2026-11-09-10) | Uploaded pictures: keep only the current and the previous | approved | in progress | #619, #624, #626 | [Player](workstreams/player.md), [Queue](workstreams/queue.md), [Backend](workstreams/backend.md) |
 | [D-2026-11-09-11](#d-2026-11-09-11) | Session page and Queue refinements from the owner's artifact review | approved | in progress (Q18 Queue Master side in the mock app; request-format defaults decided 2026-11-10) | needed | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
-| [D-2026-11-09-12](#d-2026-11-09-12) | Club-set pictures for guests and unclaimed players | approved | not started | needed | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
+| [D-2026-11-09-12](#d-2026-11-09-12) | Club-set pictures for guests and unclaimed players | approved | in progress | #623, #628 | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
 | [D-2026-11-09-13](#d-2026-11-09-13) | Admin-managed profile character library | approved | not started | needed | [Admin](workstreams/admin.md), [Player](workstreams/player.md) |
 | [D-2026-11-09-14](#d-2026-11-09-14) | Admin edits everything on a player, with a beta-only password field | approved for MVP or beta only; needs owner sign-off on the D-2026-11-07-01 conflict | not started | needed | [Admin](workstreams/admin.md) |
 
@@ -255,8 +255,8 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 <a id="d-2026-11-09-03"></a>
 ### D-2026-11-09-03 — Players check themselves in, leave, and say they can't make it
 - **Decision status:** approved (owner discussion, November 9, 2026)
-- **Implementation status:** in progress — the Queue Master roster mark (Checked in themselves / Left, #617) is in the mock app; the club setting to turn self check-in off belongs to epic Q19 (#587) and is not started. Real mode does not persist it.
-- **Ticket:** needed
+- **Implementation status:** in progress — the Queue Master roster mark (Checked in themselves / Left, #617) and the club setting Players can check themselves in (Club settings › Session defaults, #619, #624, #626) are in the mock app. Real mode does not persist it.
+- **Ticket:** #617, #619, #624, #626
 - **Roadmap:** MVP (owner, November 9, 2026: added to the scope frozen by [D-2026-11-07-04](#d-2026-11-07-04)) — [Queue](workstreams/queue.md)
 - **Decision:**
   - **Self check-in.** During a live session, a confirmed signed-in player who isn't present sees a large **I'm here** button. Tapping it sets Present directly. The QM's roster shows a small "checked in themselves" mark and the QM can undo it. The club can turn self check-in off. Check-in is a tap only, with no location check and no venue QR scan.
@@ -312,8 +312,8 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 <a id="d-2026-11-09-06"></a>
 ### D-2026-11-09-06 — Registration from session and club links, guest linking and club membership
 - **Decision status:** approved (owner discussion, November 9, 2026)
-- **Implementation status:** not started — mockups updated November 9, 2026 (`NEW` logs dated 2026-11-09 in [mockup-changes](../mockup-changes/README.md))
-- **Ticket:** needed
+- **Implementation status:** in progress — the Queue club side (Joined via marks, Link to saved player…, guest linking: #622, #625, #627) is in the mock app; the Player side is in the mock app too (epic P06, #588); the Admin parts are not started. Real mode does not persist it.
+- **Ticket:** #622, #625, #627
 - **Roadmap:** MVP (owner, November 9, 2026: added to the scope frozen by [D-2026-11-07-04](#d-2026-11-07-04)) — [Player](workstreams/player.md), [Queue](workstreams/queue.md)
 - **Supersedes:** in part the [#490](https://github.com/jose-codegourmet/rotra-v2/issues/490) rule in [D-2026-11-07-07](#d-2026-11-07-07) that registration only opens from a club invitation and always keeps the guest record unlinked.
 - **Decision:**
@@ -352,8 +352,8 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 <a id="d-2026-11-09-08"></a>
 ### D-2026-11-09-08 — Sharing: links, QR codes and post/story images
 - **Decision status:** approved (owner discussion, November 9, 2026)
-- **Implementation status:** not started — mockups updated November 9, 2026 (`NEW` logs dated 2026-11-09 in [mockup-changes](../mockup-changes/README.md))
-- **Ticket:** needed
+- **Implementation status:** in progress — the Queue club side (club invite link, invite card, Share club invite on Home: #620, #621, #624, #626) is in the mock app; the Player side is in the mock app too (epic P06, #588); the Admin parts are not started. Real mode does not persist it.
+- **Ticket:** #620, #621, #624, #626
 - **Roadmap:** MVP (owner, November 9, 2026: added to the scope frozen by [D-2026-11-07-04](#d-2026-11-07-04)) — [Player](workstreams/player.md), [Queue](workstreams/queue.md)
 - **Decision:**
   - **What every share offers**, in the owner's words: "share by link", "share by QR", and "sharing pictures such as fb posts and ig stories posts… follow the ratio". Images reuse the Session QR share card's **Post | Story** switch: 4:5 (1080 × 1350) and 9:16 (1080 × 1920), on the fixed dark brand card. Every invitation image has a QR ("anything invitation is always a QR"). Info images also carry a small corner QR that opens the player's profile, which follows the privacy setting.
@@ -389,8 +389,8 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 <a id="d-2026-11-09-10"></a>
 ### D-2026-11-09-10 — Uploaded pictures: keep only the current and the previous
 - **Decision status:** approved (owner discussion, November 9, 2026). In the owner's words: "to save money on storage. everytime a user uploads image for avatar or club photo only 2 will be saved: current and previous."
-- **Implementation status:** not started — mockups updated November 9, 2026 (`NEW` logs dated 2026-11-09 in [mockup-changes](../mockup-changes/README.md)); court-picture uploads have no mockup yet
-- **Ticket:** needed
+- **Implementation status:** in progress — the Queue club side (club logo previous: #619, #624, #626) is in the mock app; the Player side is in the mock app too (epic P06, #588); the Admin parts are not started (court-picture uploads have no mockup yet). Real mode does not persist it.
+- **Ticket:** #619, #624, #626
 - **Roadmap:** MVP (owner, November 9, 2026: added to the scope frozen by [D-2026-11-07-04](#d-2026-11-07-04)) — [Player](workstreams/player.md), [Queue](workstreams/queue.md), [Backend](workstreams/backend.md)
 - **Supersedes:** in part [Club logo persistence (#374)](../database_design/product/admin/modules/clubs-licenses.md#club-logo-persistence-374), which keeps every previous logo for historical result snapshots, and the keep-everything behavior of [D-2026-11-08-03](#d-2026-11-08-03).
 - **Decision:**
@@ -428,8 +428,8 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 <a id="d-2026-11-09-12"></a>
 ### D-2026-11-09-12 — Club-set pictures for guests and unclaimed players
 - **Decision status:** approved (owner, November 9, 2026): "Club Owners can set profile pictures to guests and unclaimed players".
-- **Implementation status:** not started — mockups updated November 9, 2026 (`NEW` log 2026-11-09-queue-club-set-player-pictures in [mockup-changes](../mockup-changes/README.md))
-- **Ticket:** needed
+- **Implementation status:** in progress — the Queue side is in the mock app (Edit details › Profile picture: Upload photo, Remove, Use previous picture, characters 8 per page; #623, #628). Real mode does not store club-set pictures yet (no `club_players.avatar_ref` / `avatar_previous_ref`, no upload cleanup).
+- **Ticket:** #623, #628
 - **Roadmap:** MVP — [Queue](workstreams/queue.md), [Player](workstreams/player.md)
 - **Decision:**
   - The club (Queue Master or owner) sets the picture in **Saved players › player › Edit details**, for **Guest** and **Unclaimed** players only. A registered player owns their own picture; the club cannot change it.

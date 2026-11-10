@@ -22,7 +22,7 @@ import { append, requireLive } from './queue.mutations'
 const NOT_REAL = 'This request action is not available in real mode yet.'
 
 /** The pill wording a request card reads (“2 v 2”), the prototype's REQ_LABEL. */
-const REQUEST_FORMAT_PILL: Record<MatchFormat, string> = {
+export const REQUEST_FORMAT_PILL: Record<MatchFormat, string> = {
   doubles: '2 v 2',
   singles: '1 v 1',
   fun_1v2: '1 v 2',

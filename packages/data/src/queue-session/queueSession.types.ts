@@ -42,14 +42,15 @@ export type QueueSession = {
 /** One switch per format a Player may request (`MatchFormat` keys). */
 export type RequestFormats = Record<import('../match/match.types').MatchFormat, boolean>
 /**
- * PROTOTYPE DEFAULT, NOT AN OWNER DECISION (D-2026-11-09-11 is Open): 2 v 2 follows the Doubles
- * switch, 1 v 1 follows the Singles switch, every fun format is off (the prototype's `reqDefaults`).
- * The one place this default lives; Q18.14 (#618) owns the setup toggles and the decided default.
+ * The default for **Players can request** (owner's option A): 2 v 2 is on, 1 v 1 follows the Singles
+ * switch, and 1 v 2, 3 v 3, 4 v 4 and 5 v 5 are off. New sessions start here, and a session saved
+ * before the setting existed (no `requestFormats`) resolves to it until it is edited. The one place
+ * this default lives.
  */
 export const prototypeDefaultRequestFormats = (
-  session: Pick<QueueSession, 'allowSingles' | 'allowDoubles'>,
+  session: Pick<QueueSession, 'allowSingles'>,
 ): RequestFormats => ({
-  doubles: session.allowDoubles,
+  doubles: true,
   singles: session.allowSingles,
   fun_1v2: false,
   fun_3v3: false,
@@ -97,6 +98,7 @@ export type QueueSessionInput = Pick<
   | 'minimumGames'
   | 'minimumIsCalculated'
   | 'expectedPlayers'
+  | 'requestFormats'
 > & {
   costEstimate?: import('../session-cost/sessionCost.types').SessionCostInput | null
   playersPerCourt?: number

@@ -34,7 +34,11 @@ import {
   startBlocker,
   startNeedsNewEnd,
 } from './queueSession.rules'
-import type { QueueSession, QueueSessionInput } from './queueSession.types'
+import {
+  prototypeDefaultRequestFormats,
+  type QueueSession,
+  type QueueSessionInput,
+} from './queueSession.types'
 export function recomputeMinimum(state: MockState, id: string) {
   const s = sessionIn(state, id)
   if (s.state !== 'prepared' || !s.minimumIsCalculated) return
@@ -153,6 +157,7 @@ export function createQueueSession(input: QueueSessionInput) {
         seriesId,
         publicSlug: publicSlugFor(id),
         acceptJoinRequests: true,
+        requestFormats: input.requestFormats ?? prototypeDefaultRequestFormats(input),
       }
       state.sessions.push(s)
       const cost = normalizeSessionCost(input.costEstimate)
@@ -221,6 +226,7 @@ export function updateQueueSession({
         minimumIsCalculated: values.minimumIsCalculated,
         expectedPlayers: values.expectedPlayers,
         playersPerCourt: budget,
+        ...(values.requestFormats ? { requestFormats: values.requestFormats } : {}),
       })
       state.courts = state.courts.filter((c) => c.sessionId !== sessionId)
       state.courts.push(

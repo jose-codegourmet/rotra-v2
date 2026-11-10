@@ -2,6 +2,8 @@
 
 import { useClub } from '@rotra/data/club'
 import { DEMO_CLUB_ID } from '@rotra/data/fixtures/clubs'
+import { REQUEST_FORMAT_PILL } from '@rotra/data/match/matchRequestDecisions'
+import { allowedRequestFormats } from '@rotra/data/match-request/rules'
 import { isPermissionRefusal } from '@rotra/data/mock/errors'
 import {
   estimateMinimum,
@@ -359,6 +361,9 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
             <div className="flex flex-col gap-4">
               <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,320px),1fr))] gap-4">
                 <SessionSetupCard
+                  requestFormatLabels={allowedRequestFormats(s).map(
+                    (format) => REQUEST_FORMAT_PILL[format],
+                  )}
                   extraRows={[
                     ...(cost.data
                       ? [

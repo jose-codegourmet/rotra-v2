@@ -31,6 +31,8 @@ export function sessionSetupDefaultValues(playersPerCourt = 8): SessionSetupInpu
     playersPerCourt,
     allowSingles: false,
     allowDoubles: true,
+    // 2 v 2 on, 1 v 1 follows Singles (off), fun formats off: the data package's default.
+    requestFormats: ['doubles'],
     sessionMode: 'fair',
     minimumIsCalculated: true,
     minimumGames: '4',

@@ -49,6 +49,10 @@ export type RosterPanelPlayer = {
   paid?: boolean
   /** Played a session at this club before; omitted until the Returning flag is wired */
   returning?: boolean
+  /** The player's own I'm here time, only while no Queue Master presence change came after it */
+  selfCheckedInAt?: number | null
+  /** The player's own I'm leaving time, same rule */
+  leftAt?: number | null
 }
 
 export type RosterPanelProps = {
@@ -138,6 +142,8 @@ function PlayerList({
             present={p.present}
             presencePending={p.presencePending}
             paid={p.paid}
+            selfCheckedInAt={p.selfCheckedInAt}
+            leftAt={p.leftAt}
             levelLocked={levelsLocked}
             readOnly={readOnly}
             onOpenProfile={() => onOpenProfile(p.id)}
@@ -161,6 +167,8 @@ function PlayerList({
           level={p.level}
           present={p.present}
           presencePending={p.presencePending}
+          selfCheckedInAt={p.selfCheckedInAt}
+          leftAt={p.leftAt}
           levelLocked={levelsLocked}
           readOnly={readOnly}
           onOpenProfile={() => onOpenProfile(p.id)}

@@ -3,6 +3,7 @@
 import { registeredCity } from '@rotra/data/club-player/fetchers'
 import { guestRegistrationUrl } from '@rotra/data/club-player/registration-url'
 import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
+import { selfCheckInMark } from '@rotra/data/public-session/rules'
 import { slotCapacity } from '@rotra/data/queue-session/queueSession.rules'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionPayments } from '@rotra/data/session-payment/useSessionPayments'
@@ -115,6 +116,8 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
   )
   const players: RosterPanelPlayer[] = rosterList.map((r) => {
     const p = byClubPlayer(r.clubPlayerId)
+    // The Queue Master's last action wins; hide the mark while a presence change is still saving.
+    const mark = setPresence.pending.has(r.id) ? null : selfCheckInMark(r)
     return {
       id: r.id,
       name: r.nameSnapshot,
@@ -128,6 +131,8 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
       presencePending: setPresence.pending.has(r.id),
       paid: paidByClubPlayer.get(r.clubPlayerId),
       returning: r.hasPlayedAtClubBefore,
+      selfCheckedInAt: mark?.kind === 'checked-in' ? mark.at : null,
+      leftAt: mark?.kind === 'left' ? mark.at : null,
     }
   })
   const entries: WaitlistPanelEntry[] = waitlist.map((w) => {

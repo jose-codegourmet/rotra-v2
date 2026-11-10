@@ -1,7 +1,7 @@
 'use client'
 
 import { cn } from '@rotra/ui/cn'
-import { Icon } from '@rotra/ui/icon'
+import { Icon, type IconName } from '@rotra/ui/icon'
 import { IconButton } from '@rotra/ui/icon-button'
 import { DropdownMenu } from 'radix-ui'
 
@@ -14,6 +14,8 @@ export type OverflowMenuItem = {
   description?: string
   /** Error colour for a removal */
   destructive?: boolean
+  /** A leading icon; the row is then one line, icon then label (the preparation header's ⋯) */
+  icon?: IconName
 }
 
 export type OverflowMenuProps = {
@@ -22,6 +24,8 @@ export type OverflowMenuProps = {
   items: OverflowMenuItem[]
   /** Which edge of the trigger the list lines up with: `end` (default) for a menu at a card's right, `start` beside a left-aligned button */
   align?: 'start' | 'end'
+  /** The trigger's size: `xs` (default) on cards, `sm` beside a page title */
+  triggerSize?: 'xs' | 'sm'
   className?: string
 }
 
@@ -31,12 +35,18 @@ export type OverflowMenuProps = {
  * closes it and returns focus to the trigger. A portal prevents clipping by tables/cards;
  * collision handling and bounded scrolling keep the menu inside the viewport.
  */
-export function OverflowMenu({ label, items, align = 'end', className }: OverflowMenuProps) {
+export function OverflowMenu({
+  label,
+  items,
+  align = 'end',
+  triggerSize = 'xs',
+  className,
+}: OverflowMenuProps) {
   return (
     <DropdownMenu.Root modal={false}>
       <div className={cn('relative', className)}>
         <DropdownMenu.Trigger asChild>
-          <IconButton size="xs" variant="ghost" label={label}>
+          <IconButton size={triggerSize} variant="ghost" label={label}>
             <Icon name="more" />
           </IconButton>
         </DropdownMenu.Trigger>
@@ -64,13 +74,17 @@ export function OverflowMenu({ label, items, align = 'end', className }: Overflo
               disabled={!!item.disabledReason}
               onSelect={item.onSelect}
               className={cn(
-                'flex min-h-11 cursor-pointer flex-col items-start gap-0.5 rounded-sm px-3 py-2 text-left text-sm outline-none',
+                'flex min-h-11 cursor-pointer rounded-sm px-3 py-2 text-left text-sm outline-none',
+                item.icon
+                  ? 'flex-row items-center gap-3 font-semibold'
+                  : 'flex-col items-start gap-0.5',
                 'data-highlighted:bg-accent-subtle',
                 'data-disabled:cursor-not-allowed data-disabled:text-fg3',
                 item.destructive && !item.disabledReason ? 'text-error' : 'text-fg',
               )}
             >
               <button type="button" disabled={!!item.disabledReason}>
+                {item.icon ? <Icon name={item.icon} className="shrink-0" /> : null}
                 <span>{item.label}</span>
                 {item.disabledReason || item.description ? (
                   <span className="text-xs text-fg2">

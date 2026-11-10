@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 1 · TICKETED: 1 · IN PROGRESS: 4 · IN MOCK APP: 99 · CANCELLED: 1 · MOCKUP ONLY: 4
+TICKETED: 1 · IN PROGRESS: 4 · IN MOCK APP: 100 · CANCELLED: 1 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -286,6 +286,6 @@ NEW: 1 · TICKETED: 1 · IN PROGRESS: 4 · IN MOCK APP: 99 · CANCELLED: 1 · MO
 | [2026-11-09-queue-qm-self-check-in](2026-11-09-queue-qm-self-check-in.md) | Roster: “Checked in themselves” mark, and the club setting Players can check themselves in | roster-row, roster-card, player-pool-card, switch, session-defaults-panel, list-row | IN PROGRESS — #586 |
 | [2026-11-09-queue-session-invite](2026-11-09-queue-session-invite.md) | Session page: Session invite share card for confirmed and waitlisted players | session-join-qr, segmented-control, sheet, button | IN MOCK APP — #602 |
 | [2026-11-10-player-games-share-avatars](2026-11-10-player-games-share-avatars.md) | Games share cards show teams and clear scores | session-games-share-card, share-card, avatar | IN MOCK APP — #682 |
-| [2026-11-10-queue-prep-header-icons](2026-11-10-queue-prep-header-icons.md) | Preparation header: icon buttons, and Cancel/Delete session in a ⋯ menu | page-header, button, icon, overflow-menu, more-options-sheet | NEW |
+| [2026-11-10-queue-prep-header-icons](2026-11-10-queue-prep-header-icons.md) | Preparation header: icon buttons, and Cancel/Delete session in a ⋯ menu | page-header, button, icon, overflow-menu, more-options-sheet | IN MOCK APP — #697 (PR #698) |
 | [2026-11-10-queue-public-account-bar](2026-11-10-queue-public-account-bar.md) | Session page: account bar with Log in, or the signed-in Player and Sign out | public-account-bar (new), avatar, button | TICKETED — #585 |
 <!-- status-index:end -->

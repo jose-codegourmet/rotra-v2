@@ -10,12 +10,13 @@ export const overflowMenuMeta = {
     'Pass disabledReason instead of hiding an action that is not allowed right now ("A match is on this court").',
     'Items run without their own dialog; an item that needs one opens it from onSelect.',
     'Give description when the label alone does not say what happens (Auto Queue: "Keeps only the drafts you picked."). Use align="start" when the trigger sits beside a left-aligned button.',
+    'Give each item an icon for a one-line icon row (the preparation header: Cancel session, Delete session); use triggerSize="sm" beside a page title.',
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',
     screen: 'Live console › Courts › courtMenu() (.cmenu)',
   },
   docs: ['docs/screens/product/modules/queue/session-console.md'],
-  variants: ['closed', 'open', 'with a disabled item', 'inside a clipped container'],
+  variants: ['closed', 'open', 'with a disabled item', 'with icons', 'inside a clipped container'],
   related: ['CourtCard', 'IconButton'],
 } satisfies ComponentMeta

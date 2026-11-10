@@ -1,15 +1,18 @@
 'use client'
 import { zodResolver } from '@hookform/resolvers/zod'
-import type { ClubPlayerDetails } from '@rotra/data/club-player/types'
+import { takesClubPicture } from '@rotra/data/club-player/picture-rules'
+import type { ClubPlayerDetails, ClubPlayerPictureState } from '@rotra/data/club-player/types'
 import { Button } from '@rotra/ui/button'
 import { Field } from '@rotra/ui/field'
 import { Notice } from '@rotra/ui/notice'
 import { PersonalDetailsFields } from '@rotra/ui/personal-details-fields'
 import { PhoneOrEmailInput } from '@rotra/ui/phone-or-email-input'
+import type { PictureCharacter } from '@rotra/ui/profile-picture-sheet'
 import { Sheet } from '@rotra/ui/sheet'
 import { TextInput } from '@rotra/ui/text-input'
 import { useEffect, useId } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
+import { type ClubPictureChoice, ClubPictureField } from './ClubPictureField'
 import { editPlayerDetailsDefaultValues } from './EditPlayerDetailsForm.defaultValues'
 import {
   type EditPlayerDetailsValues,
@@ -24,6 +27,17 @@ export type EditPlayerDetailsFormProps = {
   isPending?: boolean
   /** A field problem shows under that field; anything else as a notice at the top */
   serverError?: { message: string; field?: 'fullName' | 'phone' | 'email' }
+  /** The club-set picture; without it the Profile picture field is not shown. Not part of Save details */
+  picture?: ClubPlayerPictureState
+  /** Characters to choose from, eight per page; defaults to the eight illustrated faces */
+  characters?: PictureCharacter[]
+  /** A picture change applies at once: a photo file (cropped by the caller) or a character */
+  onPictureChange?: (choice: ClubPictureChoice) => void
+  onPictureRemove?: () => void
+  onPicturePrevious?: () => void
+  /** Shown under the field, e.g. "That image could not be read" */
+  pictureError?: string
+  picturePending?: boolean
 }
 
 /**
@@ -37,6 +51,13 @@ export function EditPlayerDetailsForm({
   onSubmit,
   isPending = false,
   serverError,
+  picture,
+  characters,
+  onPictureChange,
+  onPictureRemove,
+  onPicturePrevious,
+  pictureError,
+  picturePending = false,
 }: EditPlayerDetailsFormProps) {
   const formId = useId()
   const form = useForm<EditPlayerDetailsValues>({
@@ -78,6 +99,19 @@ export function EditPlayerDetailsForm({
         >
           {serverError && !serverError.field ? (
             <Notice tone="error">{serverError.message}</Notice>
+          ) : null}
+          {picture && takesClubPicture(details) ? (
+            <ClubPictureField
+              playerId={details.clubPlayerId}
+              name={details.fullName}
+              picture={picture}
+              characters={characters}
+              onChange={onPictureChange}
+              onRemove={onPictureRemove}
+              onUsePrevious={onPicturePrevious}
+              error={pictureError}
+              pending={picturePending || isPending}
+            />
           ) : null}
           {claim ? (
             <Notice>

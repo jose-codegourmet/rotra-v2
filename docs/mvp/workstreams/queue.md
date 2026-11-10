@@ -88,6 +88,17 @@ Epic #408 is **open**; all 30 sub-issues are **closed**, each with code on `main
 | Session done drops On court; offline/permission states | implemented | `3dfc3628` (#462) | #438 |
 | Time fields: hour, minute and AM/PM dropdowns (2026-11-08) | implemented | `aca899f2` (#489) | — |
 
+### November 9–10 changes (epic #586, Q18)
+
+Mock app only. Real mode does not read or decide requests, and does not persist `requestFormats` (no
+Prisma column); the Checked in themselves mark has no server clearing rules yet.
+
+| Capability | Status | Evidence | Tickets |
+|---|---|---|---|
+| Requests · N with Join and Match tabs; Add to queue / Decline; drop-out notices; ROTRA-player join cards | implemented (mock app only) | commit `e64678bf` | #616 |
+| Checked in themselves / Left mark on roster rows, cards and live Players cards | implemented (mock app only) | commit `d7c92168` | #617 |
+| Request formats per session (default option A), `requestFormats` | implemented (mock app only) | commit `3abfba67`; defaults decided 2026-11-10 ([D-2026-11-09-11](../decisions.md#d-2026-11-09-11)) | #618 |
+
 ### Obvious Queue bugs (#466, 2026-11-07)
 
 From the former MVP roadmap item 5 (main @ `66617c60`). **Implemented:** debounced inventory stock,

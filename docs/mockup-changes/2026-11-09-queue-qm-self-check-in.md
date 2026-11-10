@@ -36,5 +36,8 @@ Superseded by: none
 - Database design: docs/database_design/product/queue/modules/sessions-roster.md — `session_players.self_checked_in_at` / `left_at` clearing rules (already listed); club setting to add to `clubs` when ticketed
 - Screen docs: docs/screens/product/modules/queue/players-roster.md — self check-in mark; docs/screens/product/modules/queue/access-home.md — Session defaults switch; docs/product-terms.md — Self check-in
 
+## Built so far
+- #617 (roster rows and cards, live Players cards): the Checked in themselves / Left mark is in the mock app. The club setting **Players can check themselves in** belongs to epic Q19 (#587, open), so this log stays `IN PROGRESS` until Q19 is done.
+
 ## Real app work
 - Roster and pool components read `selfCheckedInAt` / `leftAt`; presence writes clear them server-side; a `clubs.self_check_in_enabled` setting read by the Player-side I'm here guard.

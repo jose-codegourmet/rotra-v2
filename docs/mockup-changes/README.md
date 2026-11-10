@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-TICKETED: 2 · IN PROGRESS: 7 · IN MOCK APP: 94 · CANCELLED: 1 · MOCKUP ONLY: 4
+TICKETED: 2 · IN PROGRESS: 5 · IN MOCK APP: 96 · CANCELLED: 1 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -265,7 +265,7 @@ TICKETED: 2 · IN PROGRESS: 7 · IN MOCK APP: 94 · CANCELLED: 1 · MOCKUP ONLY:
 | [2026-11-09-queue-main-queue-search](2026-11-09-queue-main-queue-search.md) | Find a player in the Main Queue | queue match card (qtile), search input | IN MOCK APP — #586 |
 | [2026-11-09-queue-make-match-confirm](2026-11-09-queue-make-match-confirm.md) | Make match asks for confirmation on a court, with Arrange to balance | confirm-make-match sheet, court (pitch), player face with games badge | IN PROGRESS — #586 |
 | [2026-11-09-queue-match-request-court](2026-11-09-queue-match-request-court.md) | Request a match: the request is laid out on a court | court-pitch, match-request-sheet | IN MOCK APP — #585 (PR #666) |
-| [2026-11-09-queue-match-request-formats](2026-11-09-queue-match-request-formats.md) | Request a match: six format pills, gated by a session setting | match-request-sheet, segmented-control, session-setup-form, key-value-list, match-request-card | IN PROGRESS — #585 |
+| [2026-11-09-queue-match-request-formats](2026-11-09-queue-match-request-formats.md) | Request a match: six format pills, gated by a session setting | match-request-sheet, segmented-control, session-setup-form, key-value-list, match-request-card | IN MOCK APP — #585 |
 | [2026-11-09-queue-match-request-picker-filters](2026-11-09-queue-match-request-picker-filters.md) | Request a match: the partner / opponent picker gets tabs, a skill filter and a sort | player-picker-sheet, tabs, segmented-control, player-tile | IN MOCK APP — #585 (PR #666) |
 | [2026-11-09-queue-next-match-fullscreen](2026-11-09-queue-next-match-fullscreen.md) | The next-match picker is fullscreen on phones | sheet, next-match-sheet | IN MOCK APP — #579 |
 | [2026-11-09-queue-next-match-picker](2026-11-09-queue-next-match-picker.md) | After a result, a next-match picker offers two ready matches (left or right) | sheet, next-match-sheet | IN MOCK APP — #579 (superseded by 2026-11-09-queue-next-match-slider) |
@@ -282,7 +282,7 @@ TICKETED: 2 · IN PROGRESS: 7 · IN MOCK APP: 94 · CANCELLED: 1 · MOCKUP ONLY:
 | [2026-11-09-queue-public-signed-in-names-join](2026-11-09-queue-public-signed-in-names-join.md) | Session page: full names and one-tap join for signed-in players, three ways in | public-participants, public-session-queue, join-request-card, segmented-control, notice, button | IN MOCK APP — #585 |
 | [2026-11-09-queue-public-you-label](2026-11-09-queue-public-you-label.md) | Session page: the signed-in viewer's own tile is labelled You | public-participant-tile, chip | IN MOCK APP — #585 |
 | [2026-11-09-queue-qm-clear-queue](2026-11-09-queue-qm-clear-queue.md) | Queued matches: a red Clear queue button removes every waiting match | button, confirm-sheet, match-queue-panel | IN MOCK APP — #586 |
-| [2026-11-09-queue-qm-requests-tabs](2026-11-09-queue-qm-requests-tabs.md) | Requests · N with Join and Match tabs: ROTRA-player hints, drop-out notices, match request cards | join-requests-panel, join-request-card, tabs, sheet, notice, chip, list-row, button, level-select | IN PROGRESS — #586 |
+| [2026-11-09-queue-qm-requests-tabs](2026-11-09-queue-qm-requests-tabs.md) | Requests · N with Join and Match tabs: ROTRA-player hints, drop-out notices, match request cards | join-requests-panel, join-request-card, tabs, sheet, notice, chip, list-row, button, level-select | IN MOCK APP — #586 |
 | [2026-11-09-queue-qm-self-check-in](2026-11-09-queue-qm-self-check-in.md) | Roster: “Checked in themselves” mark, and the club setting Players can check themselves in | roster-row, roster-card, player-pool-card, switch, session-defaults-panel, list-row | IN PROGRESS — #586 |
 | [2026-11-09-queue-session-invite](2026-11-09-queue-session-invite.md) | Session page: Session invite share card for confirmed and waitlisted players | session-join-qr, segmented-control, sheet, button | IN MOCK APP — #602 |
 | [2026-11-10-player-games-share-avatars](2026-11-10-player-games-share-avatars.md) | Games share cards show teams and clear scores | session-games-share-card, share-card, avatar | IN MOCK APP — #682 |

@@ -1,13 +1,16 @@
 'use client'
 import { useAdminConnectivity } from '@rotra/data/admin-account/use-admin-connectivity'
 import type { AdminPlayer } from '@rotra/data/admin-player/types'
+import { useAdminPlayerGames } from '@rotra/data/admin-player/useAdminPlayerGames'
 import { useAdminPlayerMutations } from '@rotra/data/admin-player/useAdminPlayerMutations'
-import { AdminEditPlayerForm } from '@rotra/ui/admin-edit-player-form'
+import { usePlayerProfile } from '@rotra/data/player/usePlayerProfile'
 import { AdminPlayerActions } from '@rotra/ui/admin-player-actions'
 import { AdminPlayerChangeForm } from '@rotra/ui/admin-player-change-form'
+import { AdminPlayerQuickView } from '@rotra/ui/admin-player-quick-view'
 import { CopyPlayerValue } from '@rotra/ui/copy-player-value'
 import { toast } from '@rotra/ui/toaster'
 import { useQueryClient } from '@tanstack/react-query'
+import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import { usePlayerEdit } from '../player-edit/usePlayerEdit'
@@ -27,18 +30,15 @@ export function PlayerManagementActions({ player }: { player: AdminPlayer }) {
   const [action, setAction] = useState<'archive' | 'restore' | 'remove' | null>(null)
   const [editing, setEditing] = useState(false),
     { offline } = useAdminConnectivity(),
-    mutations = useAdminPlayerMutations(),
-    client = useQueryClient(),
-    edit = usePlayerEdit(mutations.update, player.id)
+    mutations = useAdminPlayerMutations()
   return (
     <>
       <AdminPlayerActions
         player={player}
         offline={offline}
-        pending={mutations.link.isPending || edit.isPending || mutations.change.isPending}
+        pending={mutations.link.isPending || mutations.change.isPending}
         onAction={(action) => {
           if (action === 'edit') {
-            edit.reset()
             setEditing(true)
           } else if (action === 'archive' || action === 'restore' || action === 'remove') {
             mutations.change.reset()
@@ -69,22 +69,11 @@ export function PlayerManagementActions({ player }: { player: AdminPlayer }) {
       />
       <CopyPlayerValue value={copyValue} onClose={() => setCopyValue('')} />
       {editing ? (
-        <AdminEditPlayerForm
-          // Not keyed by revision: a saved profile with a refused email keeps what was typed.
-          key={player.id}
+        <PlayerEditPanel
           player={player}
-          open
+          from={from}
           onClose={() => setEditing(false)}
-          offline={offline}
-          isPending={edit.isPending}
-          serverError={edit.serverError}
-          emailError={edit.emailError}
-          emailLocked={edit.emailLocked}
-          onReload={() => {
-            void client.invalidateQueries()
-            setEditing(false)
-          }}
-          onSubmit={(values) => void edit.submit(player, values, () => setEditing(false))}
+          onCopyId={() => void copy(player.rtrId, 'RTR ID copied')}
         />
       ) : null}
       {action ? (
@@ -114,5 +103,57 @@ export function PlayerManagementActions({ player }: { player: AdminPlayer }) {
         />
       ) : null}
     </>
+  )
+}
+
+/** Edit from the row's menu: the Players quick view side panel, opened on its Edit view. */
+function PlayerEditPanel({
+  player,
+  from,
+  onClose,
+  onCopyId,
+}: {
+  player: AdminPlayer
+  from: string
+  onClose: () => void
+  onCopyId: () => void
+}) {
+  const client = useQueryClient(),
+    games = useAdminPlayerGames(player.id),
+    profile = usePlayerProfile(player.id),
+    { edit, isError, refetch, reset } = usePlayerEdit(player.id, {
+      onDone: onClose,
+      // Stale revision: load what is current, then edit again.
+      onReload: () => {
+        void client.invalidateQueries()
+        reset()
+        onClose()
+      },
+    })
+  return (
+    <AdminPlayerQuickView
+      linkComponent={Link}
+      initialMode="edit"
+      open
+      onClose={() => {
+        reset()
+        onClose()
+      }}
+      player={player}
+      error={isError || profile.isError}
+      onRetry={() => {
+        refetch()
+        void profile.refetch()
+      }}
+      createdBy={edit?.createdBy ?? 'Admin'}
+      sessions={games.data}
+      gamesError={games.isError}
+      onRetryGames={() => void games.refetch()}
+      profileHref={`/players/${player.id}?from=${encodeURIComponent(from)}`}
+      historyHref={`/players/${player.id}?tab=history&from=${encodeURIComponent(from)}`}
+      socialLinks={profile.data?.socialLinks}
+      edit={edit}
+      onCopyId={onCopyId}
+    />
   )
 }

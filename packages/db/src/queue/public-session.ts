@@ -122,6 +122,7 @@ export async function readPublicSession(slug: string) {
       start: session.scheduledStartAt.getTime(),
       end: session.scheduledEndAt.getTime(),
       club: {
+        id: session.clubId,
         name: session.club.name,
         initials: initials(session.club.name),
         logoUrl: session.club.logoRef,

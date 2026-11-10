@@ -279,7 +279,7 @@ function project(
     title: s.title,
     start: s.scheduledStartAt,
     end: s.scheduledEndAt,
-    club: { name: club.name, initials: club.initials, logoUrl: club.logoUrl },
+    club: { id: club.id, name: club.name, initials: club.initials, logoUrl: club.logoUrl },
     venue: { name: s.venueName, address: s.venueAddress || null },
     courts: courts.map((c) => c.label),
     formats: { singles: s.allowSingles, doubles: s.allowDoubles },

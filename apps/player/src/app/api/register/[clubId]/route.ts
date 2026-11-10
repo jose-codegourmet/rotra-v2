@@ -6,10 +6,13 @@ import { routeCookieAdapter } from '@rotra/db/service/route-cookies'
 import { registrationRequestSchema } from '@rotra/schema/registration'
 import { cookies } from 'next/headers'
 
-export async function GET(_request: Request, ctx: RouteContext<'/api/register/[clubId]'>) {
+/** `?session=<slug>`: the session link the visitor registers from (#689); optional. */
+const sessionOf = (request: Request) => new URL(request.url).searchParams.get('session') || null
+
+export async function GET(request: Request, ctx: RouteContext<'/api/register/[clubId]'>) {
   const { clubId } = await ctx.params
   return handleVisitorRequest('player.guest-registration', async () => ({
-    body: await guestRegistrationClub(clubId),
+    body: await guestRegistrationClub(clubId, sessionOf(request)),
   }))
 }
 
@@ -25,25 +28,30 @@ export async function POST(request: Request, ctx: RouteContext<'/api/register/[c
         ),
       )
     const { attempt, values } = parsed.data
-    const result = await registerGuest(routeCookieAdapter(await cookies()), clubId, {
-      attempt,
-      email: values.email,
-      phoneE164: values.phone,
-      password: values.password,
-      details: {
-        fullName: values.fullName,
-        nickname: values.nickname || null,
-        playingStyle: values.playingStyle,
-        experienceYears: values.experienceYears ? Number(values.experienceYears) : null,
-        experienceMonths: values.experienceMonths ? Number(values.experienceMonths) : null,
-        socialLinks: {
-          facebook: values.facebook,
-          instagram: values.instagram,
-          youtube: values.youtube,
-          linkedin: values.linkedin,
+    const result = await registerGuest(
+      routeCookieAdapter(await cookies()),
+      clubId,
+      {
+        attempt,
+        email: values.email,
+        phoneE164: values.phone,
+        password: values.password,
+        details: {
+          fullName: values.fullName,
+          nickname: values.nickname || null,
+          playingStyle: values.playingStyle,
+          experienceYears: values.experienceYears ? Number(values.experienceYears) : null,
+          experienceMonths: values.experienceMonths ? Number(values.experienceMonths) : null,
+          socialLinks: {
+            facebook: values.facebook,
+            instagram: values.instagram,
+            youtube: values.youtube,
+            linkedin: values.linkedin,
+          },
         },
       },
-    })
+      sessionOf(request),
+    )
     return { body: result }
   })
 }

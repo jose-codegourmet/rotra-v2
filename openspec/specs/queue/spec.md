@@ -84,3 +84,42 @@ card SHALL summarize the allowed formats. The owner decided the defaults on
 - WHEN the Queue Master toggles a format
 - THEN players can request only the formats that are on
 - AND with none on, the setup shows that players can't send match requests.
+
+### Requirement: Club-set profile pictures
+
+Edit details on a Saved players row SHALL show a **Profile picture** field only for
+**Guest** and **Unclaimed** players. A registered player keeps their own picture, and
+Edit details does not open for them. The picture is an uploaded photo, a character
+from the library, or initials, and each change applies at once, independent of
+**Save details**.
+
+#### Scenario: Upload a photo
+- GIVEN a guest saved player in Edit details
+- WHEN the Queue Master chooses Upload photo and picks an image up to 4 MB
+- THEN the photo becomes the player's picture and the toast reads "Picture updated · NAME"
+- AND a file that is not an image shows "Choose an image file"
+- AND an image over 4 MB shows "Choose an image under 4 MB"
+- AND an image that cannot be read shows "That image could not be read".
+
+#### Scenario: Remove keeps the photo as previous
+- GIVEN an unclaimed saved player with a photo
+- WHEN the Queue Master chooses Remove
+- THEN the player shows initials, the toast reads "Using initials · NAME"
+- AND the removed photo becomes the previous picture.
+
+#### Scenario: Use previous picture swaps
+- GIVEN a saved player with a current and a previous picture
+- WHEN the Queue Master chooses Use previous picture
+- THEN the two pictures swap and the toast reads "Previous picture restored · NAME"
+- AND only the current and the previous picture are kept.
+
+#### Scenario: Pick a character
+- GIVEN the character picker in Edit details
+- WHEN the Queue Master opens it
+- THEN it shows 8 characters per page with a pager
+- AND choosing one sets it as the current picture without a file.
+
+#### Scenario: Registered players
+- GIVEN a registered saved player
+- WHEN the Queue Master opens their row
+- THEN no Edit details control shows that changes their picture.

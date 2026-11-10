@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-TICKETED: 2 · IN PROGRESS: 5 · IN MOCK APP: 96 · CANCELLED: 1 · MOCKUP ONLY: 4
+TICKETED: 2 · IN PROGRESS: 4 · IN MOCK APP: 97 · CANCELLED: 1 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -260,7 +260,7 @@ TICKETED: 2 · IN PROGRESS: 5 · IN MOCK APP: 96 · CANCELLED: 1 · MOCKUP ONLY:
 | [2026-11-09-player-your-clubs](2026-11-09-player-your-clubs.md) | The own profile has a Your clubs card with Leave club and Report a problem | avatar, club-logo, confirm-sheet, button, notice (new: player-clubs-card) | IN MOCK APP — #588 |
 | [2026-11-09-queue-club-invite-link](2026-11-09-queue-club-invite-link.md) | Club invite link in settings, Share club invite on the dashboard | session-join-qr, club-settings, sheet, button | IN MOCK APP — #587 |
 | [2026-11-09-queue-club-logo-previous](2026-11-09-queue-club-logo-previous.md) | Club logo: Use previous logo (only current and previous are kept) | club-logo, club-settings, button | IN MOCK APP — #587 |
-| [2026-11-09-queue-club-set-player-pictures](2026-11-09-queue-club-set-player-pictures.md) | Clubs set profile pictures for guests and unclaimed players | edit-player-sheet, avatar, button | IN PROGRESS — #587 |
+| [2026-11-09-queue-club-set-player-pictures](2026-11-09-queue-club-set-player-pictures.md) | Clubs set profile pictures for guests and unclaimed players | edit-player-sheet, avatar, button | IN MOCK APP — #587 |
 | [2026-11-09-queue-guest-linking](2026-11-09-queue-guest-linking.md) | Saved players: “Joined via” marks, and Link to saved player… on a guest's record | saved-player-card, player-profile-sheet, player-picker-sheet, sheet, button | IN MOCK APP — #587 |
 | [2026-11-09-queue-main-queue-search](2026-11-09-queue-main-queue-search.md) | Find a player in the Main Queue | queue match card (qtile), search input | IN MOCK APP — #586 |
 | [2026-11-09-queue-make-match-confirm](2026-11-09-queue-make-match-confirm.md) | Make match asks for confirmation on a court, with Arrange to balance | confirm-make-match sheet, court (pitch), player face with games badge | IN PROGRESS — #586 |

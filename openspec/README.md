@@ -2,13 +2,14 @@
 
 OpenSpec was cleared during the October 2026 v1 reset. At the product owner's
 request, this directory now records the Player implementation and its remaining
-scope, and also the Queue work of epic Q18. It does not restore old product requirements or replace the source-of-truth
+scope, and also the Queue work of epics Q18 and Q19. It does not restore old product requirements or replace the source-of-truth
 rules in `AGENTS.md` and `docs/ways-of-working.md`.
 
 - [Player Information specification](specs/player-information/spec.md)
 - [Player implementation and verification](changes/player-ranking-prototype/tasks.md)
 - [Queue specification](specs/queue/spec.md)
 - [Queue live console implementation and verification](changes/queue-live-console/tasks.md)
+- [Queue club settings and saved players implementation and verification](changes/queue-club-settings-saved-players/tasks.md)
 
 These Markdown records introduce no CLI dependency. Unchecked verification tasks
 mean the check has not passed; implemented behavior is separate from verification.

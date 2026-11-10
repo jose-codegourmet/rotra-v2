@@ -71,6 +71,23 @@ p { margin: 0; }
 .brand { display: flex; align-items: baseline; gap: 8px; font-weight: 800; letter-spacing: 1.5px; font-size: 17px; }
 .brand b { color: var(--accent); }
 .brand span { font-weight: 600; letter-spacing: 0; color: var(--fg2); font-size: 14px; }
+/* Session page account bar (owner request, November 10, 2026): who is signed in, Log in or Sign out. */
+.acct { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 4px 12px 4px 4px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); color: var(--fg); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+.acct:hover, .acct[aria-expanded="true"] { border-color: var(--border-strong); }
+.acct .avatar { width: 32px; height: 32px; font-size: 12px; }
+.acct-name { max-width: 14ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cmenu-list.acct-menu { min-width: 272px; padding: 6px; gap: 0; }
+.acct-head { display: flex; align-items: center; gap: 12px; padding: 10px 10px 12px; }
+.acct-head .avatar { width: 40px; height: 40px; font-size: 14px; }
+.acct-head-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.acct-head-text b { font-size: 15px; color: var(--fg); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.acct-head-text span { font-size: 12px; color: var(--fg2); font-family: var(--mono, ui-monospace, monospace); letter-spacing: .2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.acct-sep { height: 1px; margin: 4px 6px; background: var(--border); }
+.cmenu-list.acct-menu button { flex-direction: row; align-items: center; gap: 12px; padding: 8px 10px; font-weight: 600; }
+.cmenu-list.acct-menu button > svg:first-child { color: var(--fg2); flex: none; }
+.cmenu-list.acct-menu button .grow { flex: 1; }
+.cmenu-list.acct-menu button .trail { color: var(--fg3); display: inline-flex; }
+.cmenu-list.acct-menu button.danger > svg:first-child { color: var(--error); }
 .top .grow { flex: 1; }
 .conn { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--border-strong); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 52vw; }
 button.conn { background: transparent; cursor: pointer; min-height: 32px; }
@@ -1705,6 +1722,7 @@ const I = {
   n_gear: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
   n_card: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/></svg>',
   n_device: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/></svg>',
+  n_user: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4.2-6 8-6s7 2 8 6"/></svg>',
   n_logout: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>',
   n_live: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M5.6 5.6a9 9 0 0 0 0 12.8M18.4 5.6a9 9 0 0 1 0 12.8M8.5 8.5a5 5 0 0 0 0 7M15.5 8.5a5 5 0 0 1 0 7"/></svg>',
   clock: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
@@ -1818,7 +1836,7 @@ const sessionEstimate = (s) => estimateGames(s.courts.length, Math.round((s.end 
 // ---------- Top bar ----------
 const hasShell = () => !['login', 'public', 'finalizing'].includes(S.screen) && !(S.screen === 'home' && S.licenseExpired);
 function topBar() {
-  if (S.screen === 'public') return '';
+  if (S.screen === 'public') return pubTopBar();
   const c = syncLabel();
   const shell = hasShell();
   return `<header class="top"><div class="top-in">
@@ -1828,6 +1846,29 @@ function topBar() {
     ${S.screen !== 'login' ? `<button class="conn ${c.cls}" data-act="openSync" aria-haspopup="dialog" aria-label="Sync status: ${esc(c.text)}. Show what synced"><i></i><span class="conn-full">${esc(c.text)}</span><span class="conn-short" aria-hidden="true">${esc(c.short)}</span></button>` : ''}
     <button class="btn xs ghost icon-btn theme-btn" data-act="toggleTheme" aria-label="Switch to ${isDark() ? 'light' : 'dark'} mode" title="${isDark() ? 'Light' : 'Dark'} mode">${isDark() ? I.sun : I.moon}</button>
     <button class="btn xs" data-act="openDemo">Prototype</button>
+  </div></header>`;
+}
+
+// The session page's own bar (owner request, November 10, 2026): ROTRA, then the visitor's ROTRA Player
+// sign-in. Signed out (a visitor or a guest with a request): Log in. Signed in: the Player's picture and
+// first name, opening a menu with their name and RTR ID, My ROTRA profile and Sign out. The operator preview
+// shows the visitor's bar.
+function pubTopBar() {
+  const v = pubViewer(), open = S.ui.courtMenu === 'pub-account';
+  const account = v
+    ? `<div class="cmenu"><button class="acct" data-act="toggleCourtMenu" data-id="pub-account" aria-haspopup="menu" aria-expanded="${open}" aria-label="Signed in as ${esc(v.name)}. Account menu">${avatar(v)}<span class="acct-name">${esc(short(v.id))}</span>${I.down}</button>${open ? `<div class="cmenu-list acct-menu" role="menu" aria-label="Account">
+      <div class="acct-head">${avatar(v)}<div class="acct-head-text"><b>${esc(v.name)}</b>${v.rtr ? `<span>${esc(v.rtr)}</span>` : ''}</div></div>
+      <div class="acct-sep" role="separator"></div>
+      ${v.rtr ? `<button role="menuitem" data-act="pubMyProfile" data-id="${esc(v.rtr)}" aria-label="My ROTRA profile, opens in a new tab">${I.n_user}<span class="grow">My ROTRA profile</span><span class="trail">${I.ext}</span></button>` : ''}
+      <button role="menuitem" class="danger" data-act="pubSignOut">${I.n_logout}<span class="grow">Sign out</span></button>
+    </div>` : ''}</div>`
+    : `<button class="btn sm" data-act="pubLogIn" aria-label="Log in with ROTRA Player">Log in</button>`;
+  return `<header class="top"><div class="top-in">
+    <div class="brand" aria-label="ROTRA"><i style="font-style:normal">ROTR<b>A</b></i></div>
+    <div class="grow"></div>
+    <button class="btn xs ghost icon-btn theme-btn" data-act="toggleTheme" aria-label="Switch to ${isDark() ? 'light' : 'dark'} mode" title="${isDark() ? 'Light' : 'Dark'} mode">${isDark() ? I.sun : I.moon}</button>
+    <button class="btn xs" data-act="openDemo">Prototype</button>
+    ${account}
   </div></header>`;
 }
 
@@ -5061,6 +5102,10 @@ const ACT = {
   toggleAcceptReq: () => { const s = cur(); s.acceptReq = s.acceptReq === false; save(); render(); toast(s.acceptReq ? 'Join requests are on' : 'Join requests are off'); },
   openJoin: () => openSheet({ type: 'join', band: null, how: 'guest' }),
   // D-2026-11-09-06, prototype: Log in / Register come back signed in as a sample ROTRA player, with the one-tap request ready.
+  // Session page account bar. Prototype: Log in signs in as a sample ROTRA player, like the Request to join sheet.
+  pubLogIn: () => { if (!S.ui.guest) { toast('Preview · visitors log in with ROTRA Player here'); return; } setPubAs('newplayer'); const v = pubViewer(); toast(v ? `Logged in as ${v.name}` : 'Signed in'); },
+  pubSignOut: () => { S.ui.courtMenu = null; S.ui.pubAs = { kind: 'visitor', key: 'visitor', sid: S.currentId }; save(); render(); toast('Signed out'); },
+  pubMyProfile: (d) => { S.ui.courtMenu = null; render(); window.open(`/player/find/${encodeURIComponent(d.id)}`, '_blank', 'noopener'); },
   protoSignIn: () => { const how = S.ui.sheet?.how; setPubAs('newplayer'); const v = pubViewer(); toast(v ? `${how === 'register' ? 'Registered' : 'Logged in'} as ${v.name} · your request is ready to send` : 'Signed in'); },
   // D-2026-11-09-02: one-tap join for a signed-in player; the request carries the account, one open request per account.
   sendPlayerJoin: () => {

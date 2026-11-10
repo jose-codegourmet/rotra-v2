@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-TICKETED: 2 · IN PROGRESS: 4 · IN MOCK APP: 97 · CANCELLED: 1 · MOCKUP ONLY: 4
+TICKETED: 1 · IN PROGRESS: 4 · IN MOCK APP: 99 · CANCELLED: 1 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -215,7 +215,7 @@ TICKETED: 2 · IN PROGRESS: 4 · IN MOCK APP: 97 · CANCELLED: 1 · MOCKUP ONLY:
 | [2026-11-07-queue-script-modules](2026-11-07-queue-script-modules.md) | Queue prototype script split into plain JS modules | — | CANCELLED — the module split was never committed; the Queue mockup keeps its single inline script, and apps/mockup/queue-app/js/ is not in the repository |
 | [2026-11-07-queue-session-qr](2026-11-07-queue-session-qr.md) | Session QR button and sheet added to the Preparation header | — | IN MOCK APP — #471 (PR #482) |
 | [2026-11-08-admin-club-sales-tab](2026-11-08-admin-club-sales-tab.md) | Club page gets a Sales tab | sales-stat-card, admin-nav | IN MOCK APP — #504 |
-| [2026-11-08-admin-edit-profile-email](2026-11-08-admin-edit-profile-email.md) | Edit profile gets an Email field that sends a contact-change request | player-edit-form, player-review-changes | IN MOCK APP — #564 (superseded by 2026-11-09-admin-edit-player-everything) |
+| [2026-11-08-admin-edit-profile-email](2026-11-08-admin-edit-profile-email.md) | Edit profile gets an Email field that sends a contact-change request | player-edit-form, player-review-changes | IN MOCK APP — #564 (superseded by docs/mockup-changes/2026-11-09-admin-edit-player-everything) |
 | [2026-11-08-admin-password-reset-requests](2026-11-08-admin-password-reset-requests.md) | Admin-reviewed password reset requests | — | IN MOCK APP — #491 (PR #494) |
 | [2026-11-08-admin-players-layout](2026-11-08-admin-players-layout.md) | Admin Players page gets a cleaner layout | admin-player-stats, admin-player-filters, admin-player-card, admin-player-bulk-bar, player-pagination, admin-player-quick-view, admin-player-history | IN MOCK APP — #503 (PR #566) |
 | [2026-11-08-admin-sales-page](2026-11-08-admin-sales-page.md) | Admin gets a Sales page | sales-stat-card, admin-nav | IN MOCK APP — #504 |
@@ -249,8 +249,8 @@ TICKETED: 2 · IN PROGRESS: 4 · IN MOCK APP: 97 · CANCELLED: 1 · MOCKUP ONLY:
 | [2026-11-08-queue-time-field-dialog](2026-11-08-queue-time-field-dialog.md) | Time fields open a time dialog instead of three dropdowns | time-field, date-time-picker, session-setup, add-court-form | IN MOCK APP — #501 |
 | [2026-11-08-queue-time-picker-hour-minute](2026-11-08-queue-time-picker-hour-minute.md) | Time fields pick hour, minute and AM/PM from three short dropdowns | — | IN MOCK APP — PR #489 (superseded by 2026-11-08-queue-time-field-dialog) |
 | [2026-11-08-queue-title-public-page-icon](2026-11-08-queue-title-public-page-icon.md) | Preparation title gets an "Open public page" icon button | page-header, more-options-sheet, session-preparation | IN MOCK APP — #499 |
-| [2026-11-09-admin-edit-player-everything](2026-11-09-admin-edit-player-everything.md) | Edit player: Admin edits everything, with a picture picker and a beta-only password field | player-edit-form, profile-picture-picker, pager, avatar | TICKETED — #589 |
-| [2026-11-09-admin-profile-characters](2026-11-09-admin-profile-characters.md) | Settings › Profile characters: a plain grid of the character images players pick from | admin-rail, image-drop-zone, character-grid, toast (with Undo) | TICKETED — #589 |
+| [2026-11-09-admin-edit-player-everything](2026-11-09-admin-edit-player-everything.md) | Edit player: Admin edits everything, with a picture picker and a beta-only password field | player-edit-form, profile-picture-picker, pager, avatar | IN MOCK APP — #589 |
+| [2026-11-09-admin-profile-characters](2026-11-09-admin-profile-characters.md) | Settings › Profile characters: a plain grid of the character images players pick from | admin-rail, image-drop-zone, character-grid, toast (with Undo) | IN MOCK APP — #646 |
 | [2026-11-09-player-avatar-character-pages](2026-11-09-player-avatar-character-pages.md) | The profile picture's character picker shows 8 per page with a pager | profile-picture-sheet, pager | IN MOCK APP — #588 |
 | [2026-11-09-player-my-sessions](2026-11-09-player-my-sessions.md) | The own profile has a My sessions card | list-row, chip, empty-state, card (new: my-sessions-card) | IN MOCK APP — #588 |
 | [2026-11-09-player-previous-picture](2026-11-09-player-previous-picture.md) | The profile picture picker keeps a previous picture | profile-picture-sheet, avatar | IN MOCK APP — #588 |
@@ -286,4 +286,5 @@ TICKETED: 2 · IN PROGRESS: 4 · IN MOCK APP: 97 · CANCELLED: 1 · MOCKUP ONLY:
 | [2026-11-09-queue-qm-self-check-in](2026-11-09-queue-qm-self-check-in.md) | Roster: “Checked in themselves” mark, and the club setting Players can check themselves in | roster-row, roster-card, player-pool-card, switch, session-defaults-panel, list-row | IN PROGRESS — #586 |
 | [2026-11-09-queue-session-invite](2026-11-09-queue-session-invite.md) | Session page: Session invite share card for confirmed and waitlisted players | session-join-qr, segmented-control, sheet, button | IN MOCK APP — #602 |
 | [2026-11-10-player-games-share-avatars](2026-11-10-player-games-share-avatars.md) | Games share cards show teams and clear scores | session-games-share-card, share-card, avatar | IN MOCK APP — #682 |
+| [2026-11-10-queue-public-account-bar](2026-11-10-queue-public-account-bar.md) | Session page: account bar with Log in, or the signed-in Player and Sign out | public-account-bar (new), avatar, button | TICKETED — #585 |
 <!-- status-index:end -->

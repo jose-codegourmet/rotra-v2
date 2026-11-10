@@ -229,6 +229,7 @@
     "./match-record-card": "./src/components/match-record-card/MatchRecordCard.tsx",
     "./off-day-slide": "./src/components/off-day-slide/OffDaySlide.tsx",
     "./public-page-summary": "./src/components/public-page-summary/PublicPageSummary.tsx",
+    "./public-account-bar": "./src/components/public-account-bar/PublicAccountBar.tsx",
     "./public-participants": "./src/components/public-participants/PublicParticipants.tsx",
     "./public-participants/participant-card": "./src/components/public-participants/participant-card/ParticipantCard.tsx",
     "./public-preview-banner": "./src/components/public-preview-banner/PublicPreviewBanner.tsx",

@@ -251,6 +251,12 @@ export type MyJoinRequest = {
 /** Narrow Player-hosted projection; never a club session or operator data. */
 export type PlayerSessionAccess = {
   playerId: string
+  /** The signed-in Player's profile name, for **Request to join as NAME** (#687) */
+  name: string
+  /** Holds a slot or a waitlist place in this session */
+  inSession: boolean
+  /** The Player's latest request for this session (any status), or null */
+  joinRequest: MyJoinRequest | null
   fullRoster: boolean
   participants: PublicSessionParticipant[]
   queue: {

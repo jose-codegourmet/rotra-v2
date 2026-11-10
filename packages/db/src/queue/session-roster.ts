@@ -421,8 +421,10 @@ async function pendingRequest(tx: Tx, context: ClubContext, requestId: string) {
 }
 
 /**
- * Confirms a guest join request: creates the club player (phone kept as private intake), then a slot
- * or a waitlist entry that arrives at the request's time, in one transaction. Repeat-safe.
+ * Confirms a join request: a guest's creates the club player (phone kept as private intake); a
+ * signed-in Player's (`player_id`, D-2026-11-09-02) uses their saved player in this club, created
+ * or restored from the profile when needed, never a new guest. Then a slot or a waitlist entry that
+ * arrives at the request's time, in one transaction. Repeat-safe.
  */
 export async function confirmJoinRequest(
   context: ClubContext,
@@ -437,21 +439,27 @@ export async function confirmJoinRequest(
   return rosterCommand(context, request.sessionId, async (tx, session) => {
     const current = await pendingRequest(tx, context, input.requestId)
     if (current.status !== 'pending') {
+      // A Player's request keeps their own saved player, so the derived ID can't identify a replay;
+      // confirming it again has the same outcome.
       if (
         current.status === 'confirmed' &&
-        current.clubPlayerId === (await derivedId(input.operationId, 'club-player'))
+        (current.playerId != null ||
+          current.clubPlayerId === (await derivedId(input.operationId, 'club-player')))
       )
         return { request: joinRequestDto(current), rosterEntry: null, waitlist: null }
       throw new ServiceError('conflict', { request: 'This join request has already been decided.' })
     }
     const now = new Date()
-    const clubPlayer = await createClubPlayer(
-      tx,
-      context,
-      input.operationId,
-      { name: current.name, nickname: current.nickname, phone: current.phoneE164 },
-      now,
-    )
+    const clubPlayer = current.playerId
+      ? (await clubPlayerForProfile(tx, context, input.operationId, current.playerId, now))
+          .clubPlayer
+      : await createClubPlayer(
+          tx,
+          context,
+          input.operationId,
+          { name: current.name, nickname: current.nickname, phone: current.phoneE164 },
+          now,
+        )
     const placed = await place(
       tx,
       context,

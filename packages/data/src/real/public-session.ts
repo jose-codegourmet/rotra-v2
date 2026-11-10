@@ -1,3 +1,4 @@
+import { playerOrigin } from '../public-session/context'
 import type {
   MyJoinRequest,
   PublicSessionPage,
@@ -49,3 +50,22 @@ export async function realSendJoinRequest(
 export function realGetMyJoinRequest(slug: string) {
   return realRequest<MyJoinRequest | null>(`${base(slug)}/my-request`)
 }
+
+// ---------- Signed-in ROTRA Player on the session page (#687), on the Player origin ----------
+
+/**
+ * **Request to join as NAME** / **Cancel request**: credentialed calls to the Player app, which
+ * reads the Player's own sign-in. No Player token or cookie is ever copied into the Queue app.
+ */
+async function playerSessionWrite(slug: string, action: 'join' | 'cancel') {
+  const origin = typeof location === 'undefined' ? null : playerOrigin(location.origin)
+  if (!origin) throw new Error('Sign in with ROTRA Player to send a request.')
+  const done = await realRequest<{ requestId: string; message: string }>(
+    `${origin}${base(slug)}/${action}`,
+    { method: 'POST', body: {}, credentials: 'include' },
+  )
+  return { savedOffline: false, message: done.message, data: { requestId: done.requestId } }
+}
+
+export const realJoinAsPlayer = (slug: string) => playerSessionWrite(slug, 'join')
+export const realCancelMyJoinRequest = (slug: string) => playerSessionWrite(slug, 'cancel')

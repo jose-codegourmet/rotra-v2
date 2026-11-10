@@ -164,7 +164,7 @@ export async function readPublicSession(slug: string) {
 async function myRequestDto(request: {
   id: string
   name: string
-  status: 'pending' | 'confirmed' | 'declined' | 'closed'
+  status: 'pending' | 'confirmed' | 'declined' | 'closed' | 'cancelled'
   sessionId: string
   clubPlayerId: string | null
 }) {
@@ -282,6 +282,53 @@ export async function readMyJoinRequest(
   return myRequestDto(request)
 }
 
+type Tx = Parameters<Parameters<typeof prisma.$transaction>[0]>[0]
+
+/**
+ * The signed-in Player's own place in this session (D-2026-11-09-02), for the join card: their
+ * name, whether they hold a slot or a waitlist place, and their latest request. Own data only.
+ */
+async function playerStanding(tx: Tx, playerId: string, sessionId: string) {
+  const player = await tx.player.findUnique({
+    where: { id: playerId },
+    select: { fullName: true },
+  })
+  if (!player) throw new ServiceError('forbidden')
+  const roster = await tx.sessionPlayer.findFirst({
+    where: { sessionId, releasedAt: null, clubPlayer: { playerId } },
+    select: { id: true },
+  })
+  const waitlist = await orderedWaitlist(tx, sessionId)
+  const mine = waitlist.length
+    ? await tx.clubPlayer.findMany({
+        where: { id: { in: waitlist.map((w) => w.clubPlayerId) }, playerId },
+        select: { id: true },
+      })
+    : []
+  const waiting = new Set(mine.map((c) => c.id))
+  const request = await tx.sessionJoinRequest.findFirst({
+    where: { sessionId, playerId },
+    orderBy: [{ requestedAt: 'desc' }, { id: 'desc' }],
+  })
+  const inSession = !!roster || waitlist.some((w) => waiting.has(w.clubPlayerId))
+  let joinRequest = null
+  // A confirmed request whose place the Queue Master has since removed is history, not a status:
+  // the card offers Request to join again (the server accepts a new request then).
+  if (request && !(request.status === 'confirmed' && !inSession)) {
+    const index =
+      request.status === 'confirmed' && request.clubPlayerId
+        ? waitlist.findIndex((w) => w.clubPlayerId === request.clubPlayerId)
+        : -1
+    joinRequest = {
+      requestId: request.id,
+      name: request.name,
+      status: request.status,
+      waitlistPosition: index < 0 ? null : index + 1,
+    }
+  }
+  return { name: player.fullName, inSession, joinRequest }
+}
+
 /** #569: authenticated Player only. Eligibility is the current roster link, never a browser ID. */
 export async function readPlayerSessionAccess(context: PlayerContext, slug: string) {
   const session = await prisma.queueSession.findUnique({
@@ -324,6 +371,7 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
         })
     return {
       playerId: context.playerId,
+      ...(await playerStanding(tx, context.playerId, session.id)),
       fullRoster,
       participants: (fullRoster ? roster : roster.slice(0, 12)).map((entry) => ({
         name: maskPublicName(entry.nameSnapshot),
@@ -338,4 +386,96 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
       })),
     }
   })
+}
+
+/** The Player's latest club level as a stated band, for a one-tap request; `unsure` without one. */
+async function bandFor(tx: Tx, clubId: string, playerId: string): Promise<StatedBand> {
+  const last = await tx.sessionPlayer.findFirst({
+    where: { clubId, skillLevelId: { not: null }, clubPlayer: { playerId } },
+    orderBy: [{ confirmedAt: 'desc' }, { id: 'desc' }],
+    select: { skillLevelId: true },
+  })
+  const band = levelCodeFor(last?.skillLevelId ?? null)?.split('_')[0]
+  return BANDS.includes(band as StatedBand) ? (band as StatedBand) : 'unsure'
+}
+
+/**
+ * Q-PUBLIC-JOIN · **Request to join as NAME** (D-2026-11-09-02): a signed-in Player's one tap. The
+ * request carries the account (`player_id`) and the profile's name; no phone. Same session rules
+ * and cap as a guest's request. Refused while the Player's earlier request is pending (also the
+ * partial unique index) or once they hold a slot or a waitlist place. Never reserves a slot.
+ */
+export async function joinSessionAsPlayer(context: PlayerContext, slug: string) {
+  const session = await prisma.queueSession.findUnique({ where: { publicSlug: slug } })
+  if (!session) throw new ServiceError('not_found')
+  const requestId = crypto.randomUUID()
+  try {
+    await prisma.$transaction(async (tx) => {
+      const rows = await tx.$queryRaw<{ state: string; accept: boolean }[]>`
+        SELECT "state"::text AS state, "accept_join_requests" AS accept FROM "queue_sessions"
+        WHERE "id" = ${session.id}::uuid FOR UPDATE`
+      const current = rows[0]
+      if (current?.state === 'cancelled')
+        throw new ServiceError('forbidden', { request: 'This session is cancelled.' })
+      if (!current || !TAKES_REQUESTS.includes(current.state) || !current.accept)
+        throw new ServiceError('forbidden', { request: 'This session is not taking requests.' })
+      const standing = await playerStanding(tx, context.playerId, session.id)
+      if (standing.inSession)
+        throw new ServiceError('conflict', { request: "You're already in this session." })
+      if (standing.joinRequest?.status === 'pending')
+        throw new ServiceError('conflict', { request: 'Your request is already sent.' })
+      const pending = await tx.sessionJoinRequest.count({
+        where: { sessionId: session.id, status: 'pending' },
+      })
+      if (pending >= MAX_PENDING_REQUESTS_PER_SESSION)
+        throw new ServiceError('unavailable', {
+          request: 'Too many requests are waiting. Try again later.',
+        })
+      const profile = await tx.player.findUniqueOrThrow({
+        where: { id: context.playerId },
+        select: { fullName: true, nickname: true },
+      })
+      await tx.sessionJoinRequest.create({
+        data: {
+          id: requestId,
+          clubId: session.clubId,
+          sessionId: session.id,
+          playerId: context.playerId,
+          name: profile.fullName,
+          nickname: profile.nickname,
+          phoneE164: null,
+          statedBand: await bandFor(tx, session.clubId, context.playerId),
+          requestedAt: new Date(),
+        },
+      })
+    })
+  } catch (error) {
+    if ((error as { code?: string })?.code === 'P2002')
+      throw new ServiceError('conflict', { request: 'Your request is already sent.' })
+    throw error
+  }
+  return { requestId, message: 'Request sent' }
+}
+
+/** Q-PUBLIC-JOIN · **Cancel request**: the Player's own pending request becomes `cancelled`. */
+export async function cancelPlayerJoinRequest(context: PlayerContext, slug: string) {
+  const session = await prisma.queueSession.findUnique({
+    where: { publicSlug: slug },
+    select: { id: true },
+  })
+  if (!session) throw new ServiceError('not_found')
+  const pending = await prisma.sessionJoinRequest.findFirst({
+    where: { sessionId: session.id, playerId: context.playerId, status: 'pending' },
+    select: { id: true },
+  })
+  // Guarded on `pending`, so a request the Queue Master decided meanwhile is never overwritten.
+  const { count } = pending
+    ? await prisma.sessionJoinRequest.updateMany({
+        where: { id: pending.id, status: 'pending' },
+        data: { status: 'cancelled', decidedAt: new Date(), revision: { increment: 1 } },
+      })
+    : { count: 0 }
+  if (!pending || !count)
+    throw new ServiceError('conflict', { request: 'This join request has already been decided.' })
+  return { requestId: pending.id, message: 'Request cancelled' }
 }

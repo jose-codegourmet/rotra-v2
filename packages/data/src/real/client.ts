@@ -38,6 +38,8 @@ export async function realRequest<T>(
     body?: unknown
     signal?: AbortSignal
     fields?: Record<string, string>
+    /** 'include' for the Queue page's credentialed calls to the Player app (#569, #687) */
+    credentials?: RequestCredentials
   } = {},
 ): Promise<T> {
   const method = options.method ?? 'GET'
@@ -48,7 +50,7 @@ export async function realRequest<T>(
   try {
     response = await fetch(path, {
       method,
-      credentials: 'same-origin',
+      credentials: options.credentials ?? 'same-origin',
       headers:
         options.body === undefined || multipart
           ? undefined

@@ -631,8 +631,32 @@ export function mockPlayerSessionAccess(slug: string, playerId: string): PlayerS
       const entry = byId.get(id)
       return { name: maskPublicName(entry?.nameSnapshot ?? ''), level: entry?.level ?? null }
     })
+  const slot = playerSlot(state, session, playerId)
+  const waitlist = state.waitlist
+    .filter((w) => w.sessionId === session.id)
+    .sort((a, b) => a.addedAt - b.addedAt)
+  const latest = state.joinRequests
+    .filter((r) => r.sessionId === session.id && r.playerId === playerId)
+    .sort((a, b) => b.requestedAt - a.requestedAt)[0]
+  // As on the server: a confirmed request whose place was removed is history, not a status.
+  const request =
+    latest?.status === 'confirmed' && !slot.roster && !slot.waitlist ? undefined : latest
+  const waitIndex =
+    request?.status === 'confirmed' && request.clubPlayerId
+      ? waitlist.findIndex((w) => w.clubPlayerId === request.clubPlayerId)
+      : -1
   return {
     playerId,
+    name: state.players.find((p) => p.id === playerId)?.fullName ?? '',
+    inSession: !!slot.roster || !!slot.waitlist,
+    joinRequest: request
+      ? {
+          requestId: request.id,
+          name: request.name,
+          status: request.status,
+          waitlistPosition: waitIndex >= 0 ? waitIndex + 1 : null,
+        }
+      : null,
     fullRoster,
     participants: page.participants,
     queue: state.matches

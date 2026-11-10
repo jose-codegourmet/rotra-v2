@@ -96,5 +96,7 @@ export function joinRequestDto(request: SessionJoinRequest) {
     requestedAt: toIso(request.requestedAt),
     decidedAt: toIsoOrNull(request.decidedAt),
     clubPlayerId: request.clubPlayerId,
+    /** Set when a signed-in ROTRA Player sent it (D-2026-11-09-02) */
+    playerId: request.playerId,
   }
 }

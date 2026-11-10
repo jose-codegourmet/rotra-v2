@@ -22,7 +22,17 @@ export const SignedOut: Story = {}
 export const Checking: Story = { args: { checking: true } }
 export const Failed: Story = { args: { failed: true } }
 export const Empty: Story = {
-  args: { access: { playerId: 'fixture', fullRoster: false, participants: [], queue: [] } },
+  args: {
+    access: {
+      playerId: 'fixture',
+      name: 'Fixture',
+      inSession: false,
+      joinRequest: null,
+      fullRoster: false,
+      participants: [],
+      queue: [],
+    },
+  },
 }
 const NAMES = [
   'Jamie A***',
@@ -49,6 +59,9 @@ const match = (matchNo: number, a: number, b: number): PlayerSessionAccess['queu
 })
 const accessOf = (sizes: [number, number][]): PlayerSessionAccess => ({
   playerId: 'fixture',
+  name: 'Fixture',
+  inSession: false,
+  joinRequest: null,
   fullRoster: false,
   participants: [],
   queue: sizes.map(([a, b], i) => match(i + 1, a, b)),

@@ -41,6 +41,16 @@ const whole = (min: number, message: string) =>
       return n
     })
 
+/** The six Request a match formats (`MatchFormat` values), in pill order */
+export const REQUEST_FORMAT_VALUES = [
+  'doubles',
+  'singles',
+  'fun_1v2',
+  'fun_3v3',
+  'fun_4v4',
+  'fun_5v5',
+] as const
+
 export const sessionSetupSchema = z
   .object({
     title: z.string().trim().min(1, SESSION_TITLE_ERROR),
@@ -59,6 +69,8 @@ export const sessionSetupSchema = z
     playersPerCourt: z.number().int().min(2).max(20),
     allowSingles: z.boolean(),
     allowDoubles: z.boolean(),
+    /** Players can request: the formats a signed-in Player may ask for with Request a match */
+    requestFormats: z.array(z.enum(REQUEST_FORMAT_VALUES)),
     sessionMode: z.enum(['chill', 'fair', 'hard']),
     minimumIsCalculated: z.boolean(),
     /** Only read when minimumIsCalculated is false */
@@ -128,6 +140,7 @@ export const PAGE_FIELDS: (keyof SessionSetupInput)[][] = [
   [
     'allowSingles',
     'allowDoubles',
+    'requestFormats',
     'sessionMode',
     'minimumIsCalculated',
     'minimumGames',

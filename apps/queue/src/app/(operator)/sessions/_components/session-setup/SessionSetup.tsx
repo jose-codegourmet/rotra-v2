@@ -5,13 +5,14 @@ import { useClubVenues } from '@rotra/data/club-venue/useClubVenues'
 import { useSaveClubVenue } from '@rotra/data/club-venue/useSaveClubVenue'
 import { DEMO_CLUB_ID } from '@rotra/data/fixtures/clubs'
 import { useInventory } from '@rotra/data/inventory/useInventory'
+import { allowedRequestFormats, REQUEST_FORMAT_ORDER } from '@rotra/data/match-request/rules'
 import { isPermissionRefusal, MockError } from '@rotra/data/mock/errors'
 import {
   countsForClash,
   estimateMinimum,
   sessionOccurrences,
 } from '@rotra/data/queue-session/queueSession.rules'
-import type { QueueSessionInput } from '@rotra/data/queue-session/types'
+import type { QueueSessionInput, RequestFormats } from '@rotra/data/queue-session/types'
 import { useCreateQueueSession } from '@rotra/data/queue-session/useCreateQueueSession'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useQueueSessions } from '@rotra/data/queue-session/useQueueSessions'
@@ -195,6 +196,9 @@ export function SessionSetup(props: SessionSetupProps) {
       sessionMode: values.sessionMode,
       allowSingles: values.allowSingles,
       allowDoubles: values.allowDoubles,
+      requestFormats: Object.fromEntries(
+        REQUEST_FORMAT_ORDER.map((format) => [format, values.requestFormats.includes(format)]),
+      ) as RequestFormats,
       minimumGames: Number(values.minimumGames),
       minimumIsCalculated: values.minimumIsCalculated,
       expectedPlayers: values.expectedPlayers,
@@ -269,6 +273,7 @@ export function SessionSetup(props: SessionSetupProps) {
         playersPerCourt: s.playersPerCourt,
         allowSingles: s.allowSingles,
         allowDoubles: s.allowDoubles,
+        requestFormats: allowedRequestFormats(s),
         sessionMode: s.sessionMode,
         minimumIsCalculated: s.minimumIsCalculated,
         minimumGames: String(s.minimumGames),

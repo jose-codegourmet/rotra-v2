@@ -1,6 +1,6 @@
 # Requests · N with Join and Match tabs: ROTRA-player hints, drop-out notices, match request cards
 
-Status: IN PROGRESS — #586
+Status: IN MOCK APP — #586
 Date: 2026-11-09
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Preparation › Requests card; Live session › Requests · N button › Requests sheet
@@ -38,6 +38,9 @@ Superseded by: none
 - Business logic: docs/business_logic/product/queue/modules/players/README.md — QM side of join requests, drop-out handling, guest linking; docs/business_logic/product/queue/modules/matches/README.md — “Match request, QM side”
 - Database design: docs/database_design/product/queue/modules/sessions-roster.md — `session_drop_out_notices.decision`, join-request linking fields; docs/database_design/product/queue/modules/matches-queue.md — `match_requests` statuses (`added`) and decisions
 - Screen docs: docs/screens/product/modules/queue/session-setup.md — Requests card; docs/screens/product/modules/queue/session-console.md — Requests · N; docs/product-terms.md — Match request, Drop-out notice, Requests · N, Session invite
+
+## Built
+- #616 (epic #586): Requests · N with Join and Match tabs in the mock app. Real mode does not read or decide requests yet.
 
 ## Real app work
 - Requests sheet and card with tabs in `apps/queue`; `match_requests` and `session_drop_out_notices` reads and QM decisions (Add to queue creates the waiting match; Remove from roster releases the slot); join-request hints from `player_id`, `invite_code_id` and the server's phone suggestion; counts in the existing session refresh.

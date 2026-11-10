@@ -99,7 +99,7 @@ const MODE_LABELS = { chill: 'Chill', fair: 'Fair', hard: 'Hard' } as const
 
 /**
  * Q-CONSOLE: the live session shell. Header with the mode, formats and minimum chips and the
- * Home / Session settings / Public page / Copy Facebook post / Courts and time / Join requests · N actions, the view tabs
+ * Home / Session settings / Public page / Copy Facebook post / Courts and time / Requests · N actions, the view tabs
  * with live counts, the view panels (Session here; the others arrive in their own containers), the
  * ConsoleFooterBar and the dock's Session done pill. Sessions that are not live go to their own
  * screen: prepared to /preparation, finalizing to /finishing, finished or invalid to /record,
@@ -180,9 +180,11 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
   const inUse = active.reduce((n, m) => n + m.courtIds.length, 0)
   const attention = waiting.filter((m) => matchStatus(m, ctx).kind === 'needs-attention').length
   const present = rosterList.filter((p) => p.present).length
-  const pendingRequests = (roster.data?.joinRequests ?? []).filter(
-    (r) => r.status === 'pending',
-  ).length
+  // Requests · N: pending join requests + open drop-out notices + open match requests, carried by
+  // the session read; real mode has no Requests read yet, so it counts the join requests alone.
+  const requestCount =
+    s?.requestCount ??
+    (roster.data?.joinRequests ?? []).filter((r) => r.status === 'pending').length
   const leader = standings.data?.[0]
   const leaderPlayer = leader ? rosterList.find((p) => p.id === leader.playerId) : undefined
   const formats =
@@ -317,9 +319,9 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
               >
                 Courts and time
               </Button>
-              {pendingRequests > 0 ? (
+              {requestCount > 0 ? (
                 <Button size="sm" variant="primary" onClick={() => setSheet('join-requests')}>
-                  Join requests · {pendingRequests}
+                  Requests · {requestCount}
                 </Button>
               ) : null}
             </>
@@ -398,12 +400,9 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
       <Sheet
         open={sheet === 'join-requests'}
         onOpenChange={(open) => setSheet(open ? 'join-requests' : null)}
-        title="Join requests"
-        footer={
-          <Button variant="primary" onClick={() => setSheet(null)}>
-            Done
-          </Button>
-        }
+        title="Requests"
+        wide
+        footer={<Button onClick={() => setSheet(null)}>Done</Button>}
       >
         <JoinRequests sessionId={sessionId} variant="sheet" />
       </Sheet>

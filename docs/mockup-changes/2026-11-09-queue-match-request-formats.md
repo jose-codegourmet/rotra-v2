@@ -1,6 +1,6 @@
 # Request a match: six format pills, gated by a session setting
 
-Status: IN PROGRESS — #585
+Status: IN MOCK APP — #585
 Date: 2026-11-09
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Public session page › Request a match; Session setup › Formats and mode; Preparation › Setup card; Requests › Match
@@ -26,7 +26,7 @@ Superseded by: none
 - States: all six allowed; some disabled; none allowed (toast); each format's court with empty and picked spots; the setup pill row with none on (extra hint line); Setup card row both wordings; a 3 v 3 request card on the QM side.
 - Copy: as quoted under What changed.
 - Tokens: none new (`.seg`, `.hint`, court tokens).
-- Known differences: the defaults (2 v 2 on, 1 v 1 tied to Singles, fun formats off until switched on) and the pill wording “2 v 2” beside the product's “Doubles” are prototype decisions; the owner's comment gave only the list and the default. Owner to confirm.
+- Known differences: none. The owner confirmed the defaults on 2026-11-10 (option A: 2 v 2 on, 1 v 1 follows the Singles switch, 1 v 2, 3 v 3, 4 v 4 and 5 v 5 off; sessions saved before this change behave the same until edited), replacing his 2026-11-09 comment on #618 that chose all off. The pill wording “2 v 2” beside the product's “Doubles” stays a prototype choice. Real mode does not save `requestFormats` yet (no Prisma column).
 
 ## Reuse plan
 - Reuses as is: `segmented-control/`, `key-value-list/`, `court-pitch/`
@@ -39,6 +39,9 @@ Superseded by: none
 - Database design: docs/database_design/product/queue/modules/sessions-roster.md — `request_formats`; docs/database_design/product/queue/modules/matches-queue.md — `match_requests.partner_session_player_ids`
 - Screen docs: docs/screens/product/modules/queue/public-session.md — Request a match sheet; docs/screens/product/modules/queue/session-setup.md — Formats and mode, Match tab
 - Terms: docs/product-terms.md — Match request
+
+## Built
+- #618 (epic #586): the format toggles in Session setup and the Setup card row in the mock app, defaults option A. Real mode does not save `requestFormats` yet (no Prisma column).
 
 ## Real app work
 - `request_formats` on the session with the setup row and projection; the sheet's pill row and per-format spots; `partners[]` on match requests; Add to queue for every size.

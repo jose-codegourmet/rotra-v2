@@ -2,6 +2,8 @@
 
 import { useClub } from '@rotra/data/club'
 import { DEMO_CLUB_ID } from '@rotra/data/fixtures/clubs'
+import { REQUEST_FORMAT_PILL } from '@rotra/data/match/matchRequestDecisions'
+import { allowedRequestFormats } from '@rotra/data/match-request/rules'
 import { isPermissionRefusal } from '@rotra/data/mock/errors'
 import {
   estimateMinimum,
@@ -75,7 +77,7 @@ const errorMessage = (error: unknown) =>
   error instanceof Error ? error.message : 'Something went wrong. Try again.'
 
 /**
- * Q-PREPARE: header, the Join requests card while requests wait, tabs (Overview, Roster and levels,
+ * Q-PREPARE: header, the Requests card while anything waits, tabs (Overview, Roster and levels,
  * Waitlist), Setup / This device / Session link cards, the Start bar and dialog. Active sessions
  * retain the read-only summary with the existing live sheets and a Continue session dock action.
  */
@@ -208,9 +210,12 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
 
   const publicHref = s ? `/s/${s.publicSlug}` : '/'
   const sessionLink = `${origin}${publicHref}`
+  // Requests · N: pending join requests + open drop-out notices + open match requests, carried by
+  // the session read; real mode has no Requests read yet, so it counts the join requests alone.
   const pendingRequests = (roster.data?.joinRequests ?? []).filter(
     (r) => r.status === 'pending',
   ).length
+  const requestCount = s?.requestCount ?? pendingRequests
   const copyLink = async () => {
     try {
       await navigator.clipboard.writeText(sessionLink)
@@ -356,6 +361,9 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
             <div className="flex flex-col gap-4">
               <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,320px),1fr))] gap-4">
                 <SessionSetupCard
+                  requestFormatLabels={allowedRequestFormats(s).map(
+                    (format) => REQUEST_FORMAT_PILL[format],
+                  )}
                   extraRows={[
                     ...(cost.data
                       ? [
@@ -387,7 +395,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
                           Add player
                         </Button>
                         <Button size="sm" onClick={() => setLiveSheet('requests')}>
-                          Join requests · {pendingRequests}
+                          Requests · {requestCount}
                         </Button>
                         <Button size="sm" onClick={() => setLiveSheet('payments')}>
                           Payments
@@ -622,12 +630,9 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
             onOpenChange={(open) => {
               if (!open) setLiveSheet(null)
             }}
-            title={liveSheet === 'payments' ? 'Payments' : 'Join requests'}
-            footer={
-              <Button variant="primary" onClick={() => setLiveSheet(null)}>
-                Done
-              </Button>
-            }
+            title={liveSheet === 'payments' ? 'Payments' : 'Requests'}
+            wide
+            footer={<Button onClick={() => setLiveSheet(null)}>Done</Button>}
           >
             {liveSheet === 'payments' ? (
               <PaymentsPanel sessionId={sessionId} />

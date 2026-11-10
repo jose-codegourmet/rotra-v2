@@ -21,6 +21,7 @@ import {
 import { useMakeMatch } from '@rotra/data/match/useMakeMatch'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { PLAYING_LEVELS } from '@rotra/data/player/types'
+import { selfCheckInMark } from '@rotra/data/public-session/rules'
 import { slotCapacity } from '@rotra/data/queue-session/queueSession.rules'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import type { SessionPlayer } from '@rotra/data/session-roster/types'
@@ -273,6 +274,8 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
         <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,176px),1fr))] gap-3">
           {shown.map((row) => {
             const order = selection.indexOf(row.player.id)
+            // The Queue Master's last action wins; hide the mark while a presence change is saving.
+            const mark = setPresence.pending.has(row.player.id) ? null : selfCheckInMark(row.player)
             return (
               <PlayerPoolCard
                 key={row.player.id}
@@ -285,6 +288,8 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
                 status={row.status}
                 present={row.player.present}
                 presencePending={setPresence.pending.has(row.player.id)}
+                selfCheckedInAt={mark?.kind === 'checked-in' ? mark.at : null}
+                leftAt={mark?.kind === 'left' ? mark.at : null}
                 selected={order >= 0}
                 pickOrder={order >= 0 ? order + 1 : undefined}
                 onToggleSelect={() => toggle(row.player.id)}

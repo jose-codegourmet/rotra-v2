@@ -30,7 +30,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-09-08](#d-2026-11-09-08) | Sharing: links, QR codes and post/story images | approved | not started | needed | [Player](workstreams/player.md), [Queue](workstreams/queue.md) |
 | [D-2026-11-09-09](#d-2026-11-09-09) | Keeping the session page cheap to serve | approved | not started | needed | [Queue](workstreams/queue.md), [Backend](workstreams/backend.md) |
 | [D-2026-11-09-10](#d-2026-11-09-10) | Uploaded pictures: keep only the current and the previous | approved | not started | needed | [Player](workstreams/player.md), [Queue](workstreams/queue.md), [Backend](workstreams/backend.md) |
-| [D-2026-11-09-11](#d-2026-11-09-11) | Session page and Queue refinements from the owner's artifact review | approved | not started | needed | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
+| [D-2026-11-09-11](#d-2026-11-09-11) | Session page and Queue refinements from the owner's artifact review | approved | in progress (Q18 Queue Master side in the mock app; request-format defaults decided 2026-11-10) | needed | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
 | [D-2026-11-09-12](#d-2026-11-09-12) | Club-set pictures for guests and unclaimed players | approved | not started | needed | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
 | [D-2026-11-09-13](#d-2026-11-09-13) | Admin-managed profile character library | approved | not started | needed | [Admin](workstreams/admin.md), [Player](workstreams/player.md) |
 | [D-2026-11-09-14](#d-2026-11-09-14) | Admin edits everything on a player, with a beta-only password field | approved for MVP or beta only; needs owner sign-off on the D-2026-11-07-01 conflict | not started | needed | [Admin](workstreams/admin.md) |
@@ -255,7 +255,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 <a id="d-2026-11-09-03"></a>
 ### D-2026-11-09-03 — Players check themselves in, leave, and say they can't make it
 - **Decision status:** approved (owner discussion, November 9, 2026)
-- **Implementation status:** not started — mockups updated November 9, 2026 (`NEW` logs dated 2026-11-09 in [mockup-changes](../mockup-changes/README.md))
+- **Implementation status:** in progress — the Queue Master roster mark (Checked in themselves / Left, #617) is in the mock app; the club setting to turn self check-in off belongs to epic Q19 (#587) and is not started. Real mode does not persist it.
 - **Ticket:** needed
 - **Roadmap:** MVP (owner, November 9, 2026: added to the scope frozen by [D-2026-11-07-04](#d-2026-11-07-04)) — [Queue](workstreams/queue.md)
 - **Decision:**
@@ -292,7 +292,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 <a id="d-2026-11-09-05"></a>
 ### D-2026-11-09-05 — Match requests
 - **Decision status:** approved (owner discussion, November 9, 2026)
-- **Implementation status:** not started — mockups updated November 9, 2026 (`NEW` logs dated 2026-11-09 in [mockup-changes](../mockup-changes/README.md))
+- **Implementation status:** in progress — the Queue Master side (Requests · N with Join and Match tabs, Add to queue / Decline, request formats; #616, #618) is in the mock app. Real mode does not save `requestFormats` or decide match requests yet (no Prisma column).
 - **Ticket:** needed
 - **Roadmap:** MVP (owner, November 9, 2026: added to the scope frozen by [D-2026-11-07-04](#d-2026-11-07-04)) — [Queue](workstreams/queue.md)
 - **Decision:**
@@ -406,7 +406,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 <a id="d-2026-11-09-11"></a>
 ### D-2026-11-09-11 — Session page and Queue refinements from the owner's artifact review
 - **Decision status:** approved (owner comments on the published Queue prototype, November 9, 2026). The comments are quoted in the matching [mockup logs](../mockup-changes/README.md).
-- **Implementation status:** not started — mockups updated November 9, 2026 (`NEW` logs dated 2026-11-09 in [mockup-changes](../mockup-changes/README.md))
+- **Implementation status:** in progress — Queue Master side of epic Q18 (#586: Requests · N, the Checked in themselves mark, request formats; #616, #617, #618) is in the mock app; the rest is not started. Real mode does not save `requestFormats` yet (no Prisma column).
 - **Ticket:** needed
 - **Roadmap:** MVP (same scope as [D-2026-11-09-04](#d-2026-11-09-04) and [D-2026-11-09-05](#d-2026-11-09-05)) — [Queue](workstreams/queue.md), [Player](workstreams/player.md)
 - **Amends:** [D-2026-11-09-01](#d-2026-11-09-01) (the picker is a slider, up to 5 matches), [D-2026-11-09-04](#d-2026-11-09-04) (Queue, Courts now and My night layout), [D-2026-11-09-05](#d-2026-11-09-05) (formats and picker controls), [D-2026-11-09-08](#d-2026-11-09-08) (when a player can invite).
@@ -422,7 +422,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - **Players tab player cards** (Queue Master) show only two numbers, large: **Played** (completed games) and **For the night** (played + queued games). Wait time sits in the status line.
   - **Main Queue search.** A search box finds a player by name or nickname, highlights their queued matches and fades the rest.
   - **Make match asks first.** The Players tab's Make match opens a confirmation with the court, each player's games played on their face and their skill level under their name. **Arrange to balance** evens the teams by level; Make match adds it to the end of the Main Queue.
-- **Open:** the prototype's defaults for which request formats are on in a new session (2 v 2 on, 1 v 1 follows Singles, fun formats off) are not an owner decision yet. Ask before building.
+- **Request format defaults (decided by the owner, Jose, 2026-11-10; option A).** A new session allows **2 v 2**; **1 v 1** follows the Singles switch; **1 v 2**, **3 v 3**, **4 v 4** and **5 v 5** are off. Sessions saved before this change, with no saved selection, behave the same until edited. This replaces his earlier 2026-11-09 comment on #618, which chose all off (option D).
 - **References:** [Public session screens](../screens/product/modules/queue/public-session.md), [Match control › Q-NEXT-MATCH](../screens/product/modules/queue/match-control.md#q-next-match--next-match-picker-after-a-result), [mockup changes](../mockup-changes/README.md).
 
 <a id="d-2026-11-09-12"></a>

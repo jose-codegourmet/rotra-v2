@@ -280,7 +280,13 @@ export function SessionSetupForm({
       onViewClash={onViewClash}
     />,
     <SetupCourtsSection key="courts" editContext={editContext} />,
-    <SetupFormatsSection key="formats" />,
+    <SetupFormatsSection
+      key="formats"
+      allowedRequestFormats={values.requestFormats}
+      onRequestFormatsChange={(formats) =>
+        form.setValue('requestFormats', formats, { shouldDirty: true })
+      }
+    />,
     <SetupMinimumSection
       key="minimum"
       computeEstimate={computeEstimate}

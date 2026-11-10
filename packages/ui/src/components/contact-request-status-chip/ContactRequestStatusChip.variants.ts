@@ -15,3 +15,9 @@ export const ADMIN_REQUEST_STATUS: Record<
   failed: { label: 'Needs attention', tone: 'error' },
   rejected: { label: 'Not approved', tone: 'neutral' },
 }
+
+/** Owner answer on #649 (Option A): a request closed by a direct Admin edit. */
+export const SUPERSEDED: { label: string; tone: ChipProps['tone'] } = {
+  label: 'Superseded by an Admin edit',
+  tone: 'neutral',
+}

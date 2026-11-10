@@ -21,6 +21,12 @@ export type ContactChangeRequest = {
   status: ContactChangeStatus
   /** Epoch ms */
   requestedAt: number
+  /**
+   * Set when an Admin edit changed this field directly while the request was open (owner answer
+   * on #649, Option A): the request is closed as 'rejected' and can never be approved, applied or
+   * retried, so a stale value can't overwrite the edit. Shown as "Superseded by an Admin edit".
+   */
+  supersededAt?: number
 }
 
 /** Admin-entered email (A-PLAYERS › Edit profile, #564): the created pending request, by ID. */
@@ -45,7 +51,7 @@ export type AdminContactChangeRequest = ContactChangeRequest & {
   source: ContactChangeSource
   approvedAt?: number
   appliedAt?: number
-  /** When a rejected request was declined */
+  /** When a rejected request was declined (or superseded) */
   decidedAt?: number
   /** Why an approved change couldn't be applied (status 'failed') */
   error?: string

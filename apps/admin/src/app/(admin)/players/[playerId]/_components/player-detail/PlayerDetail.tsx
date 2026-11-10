@@ -295,7 +295,12 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
                   from: request.fromValue,
                   to: request.toValue,
                   requestedAt: request.requestedAt,
-                  status: <ContactRequestStatusChip status={request.status} />,
+                  status: (
+                    <ContactRequestStatusChip
+                      status={request.status}
+                      superseded={!!request.supersededAt}
+                    />
+                  ),
                   action: request.nextAction,
                   href: `/requests/contact-changes/${request.requestId}`,
                 }))}

@@ -5,7 +5,10 @@ import type { ReactNode } from 'react'
 import { REQUEST_FIELD_LABEL, REQUEST_STATUS } from './ContactRequestStatus.variants'
 
 export type ContactRequestStatusProps = {
-  request: Pick<ContactChangeRequest, 'field' | 'fromValue' | 'toValue' | 'status' | 'requestedAt'>
+  request: Pick<
+    ContactChangeRequest,
+    'field' | 'fromValue' | 'toValue' | 'status' | 'requestedAt' | 'supersededAt'
+  >
   /** 'compact' is the chip line for AccountPanel's requestSlot */
   variant?: 'full' | 'compact'
 }
@@ -54,7 +57,10 @@ function statusText({ field, fromValue, toValue, status }: ContactRequestStatusP
 
 /** The contact-change request's status: a notice with chip and text, or a compact chip line. */
 export function ContactRequestStatus({ request, variant = 'full' }: ContactRequestStatusProps) {
-  const s = REQUEST_STATUS[request.status]
+  // Closed by a direct Admin edit (owner answer on #649, Option A): only the label changes.
+  const s = request.supersededAt
+    ? { ...REQUEST_STATUS.rejected, chip: 'Superseded by an Admin edit' }
+    : REQUEST_STATUS[request.status]
   const fieldLabel = REQUEST_FIELD_LABEL[request.field]
   if (variant === 'compact') {
     return (
@@ -75,7 +81,7 @@ export function ContactRequestStatus({ request, variant = 'full' }: ContactReque
           {fieldLabel} change · sent {sent}
         </span>
       </span>
-      <span className="block">{statusText(request)}</span>
+      {request.supersededAt ? null : <span className="block">{statusText(request)}</span>}
     </Notice>
   )
 }

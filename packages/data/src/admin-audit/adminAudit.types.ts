@@ -30,6 +30,7 @@ export type AdminAuditAction =
   | 'contact_change_applied'
   | 'contact_change_application_failed'
   | 'contact_change_application_retried'
+  | 'contact_change_superseded'
   | 'feature_flag_created'
   | 'feature_flag_value_changed'
   | 'profile_character_added'

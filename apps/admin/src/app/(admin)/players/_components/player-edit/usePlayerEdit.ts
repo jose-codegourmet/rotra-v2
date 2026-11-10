@@ -1,93 +1,84 @@
 'use client'
-import type { AdminPlayer } from '@rotra/data/admin-player/types'
-import type { useAdminPlayerMutations } from '@rotra/data/admin-player/useAdminPlayerMutations'
-import { OPEN_CONTACT_CHANGE_STATUSES } from '@rotra/data/contact-change-request/types'
-import { useContactRequests } from '@rotra/data/contact-change-request/useContactRequests'
-import { useSubmitAdminContactChange } from '@rotra/data/contact-change-request/useSubmitAdminContactChange'
+import { useAdminPlayerEdit } from '@rotra/data/admin-player/useAdminPlayerEdit'
+import { useAdminPlayerMutations } from '@rotra/data/admin-player/useAdminPlayerMutations'
+import { useAdminClubs } from '@rotra/data/club/useAdminClubs'
 import { MockError } from '@rotra/data/mock/errors'
+import { cropProfileCharacterToSquare } from '@rotra/data/profile-character/crop'
+import { profileCharacterImage } from '@rotra/data/profile-character/images'
+import { useShownProfileCharacters } from '@rotra/data/profile-character/useShownProfileCharacters'
 import type { AdminPlayerEditValues } from '@rotra/schema/admin-player'
-import { adminEditEmailChanged } from '@rotra/ui/admin-edit-player-form'
+import type { AdminEditPlayerFormProps } from '@rotra/ui/admin-edit-player-form'
 import { toast } from '@rotra/ui/toaster'
-import { useState } from 'react'
+import { useMemo } from 'react'
 
-type ProfileUpdate = ReturnType<typeof useAdminPlayerMutations>['update']
+export type PlayerEditProps = Omit<AdminEditPlayerFormProps, 'formId'>
 
 /**
- * Edit profile (#564): name, nickname and photo save through the profile update as before; a new
- * email is sent for review as an Admin-entered contact-change request and never changes here. Both
- * use the same reason. A failure never shows success.
+ * A-PLAYER-EDIT (A07.7): wires the full Edit player form (rotra-admin.html pmSave). Saves everything
+ * through one revision-checked update and toasts the data layer's exact message. Nothing changed
+ * toasts "Nothing changed." and sends nothing. Offline shows as a toast and the form stays open.
+ * Field errors go inline, anything else (a stale revision) is the form's notice with Reload.
+ * The password lives only in the form and in the update call; it is never kept here.
  */
-export function usePlayerEdit(update: ProfileUpdate, playerId: string) {
-  const email = useSubmitAdminContactChange()
-  const requests = useContactRequests({ playerId }, { enabled: !!playerId })
-  const [editingId, setEditingId] = useState<string>()
-  /** The request was refused for the email itself (taken, same, open request, no contact record) */
-  const emailError = email.error instanceof MockError ? email.error.fieldErrors?.email : undefined
-  const reset = () => {
-    update.reset()
-    email.reset()
-  }
-  const submit = async (player: AdminPlayer, values: AdminPlayerEditValues, onDone: () => void) => {
-    reset()
-    setEditingId(player.id)
-    const emailChanged = adminEditEmailChanged(player, values.email)
-    // With no new email, Save profile saves as before, even when nothing else changed.
-    const profileChanged =
-      !emailChanged ||
-      values.name !== player.name ||
-      values.nickname !== (player.nickname ?? '') ||
-      // Same prefill as the form: only an unclaimed player's https link is editable.
-      values.picture !==
-        (!player.claimed && player.picture?.startsWith('https://') ? player.picture : '')
-    if (profileChanged) {
-      try {
-        const { email: _email, ...profile } = values
-        await update.mutateAsync({ ...profile, id: player.id, revision: player.revision })
-      } catch (error) {
-        toast.error(error instanceof Error ? error.message : String(error))
-        return
+export function usePlayerEdit(
+  playerId: string,
+  {
+    enabled = true,
+    onDone,
+    onReload,
+  }: { enabled?: boolean; onDone: () => void; onReload: () => void },
+) {
+  const record = useAdminPlayerEdit(playerId, { enabled: enabled && !!playerId })
+  const characters = useShownProfileCharacters()
+  const clubs = useAdminClubs()
+  const { update } = useAdminPlayerMutations()
+  const error = update.error
+  const fieldErrors = useMemo(
+    () => (error instanceof MockError && error.fieldErrors ? error.fieldErrors : undefined),
+    [error],
+  )
+  const offline = error instanceof MockError && error.kind === 'offline'
+  const player = record.data
+  const edit: PlayerEditProps | undefined = player
+    ? {
+        player,
+        characters: characters.data ?? [],
+        characterImage: profileCharacterImage,
+        cropPhoto: cropProfileCharacterToSquare,
+        createdBy:
+          clubs.data?.clubs.find((club) => club.id === player.createdByClubId)?.name ?? 'Admin',
+        isPending: update.isPending,
+        // Offline is a toast, not a notice; field errors are inline.
+        serverError: error && !fieldErrors && !offline ? error.message : undefined,
+        fieldErrors,
+        onReload,
+        onNothingChanged: () => {
+          toast('Nothing changed.')
+          onDone()
+        },
+        onSubmit: async (values: AdminPlayerEditValues) => {
+          update.reset()
+          try {
+            const result = await update.mutateAsync({
+              ...values,
+              id: player.id,
+              revision: player.revision,
+            })
+            toast.success(result.message)
+            onDone()
+          } catch (failure) {
+            if (failure instanceof MockError && failure.kind === 'offline')
+              toast.error(failure.message)
+          }
+        },
       }
-    }
-    if (!emailChanged) {
-      toast.success('Profile updated')
-      onDone()
-      return
-    }
-    try {
-      await email.mutateAsync({
-        playerId: player.id,
-        field: 'email',
-        toValue: values.email,
-        reason: values.reason,
-        commandId: crypto.randomUUID(),
-      })
-    } catch (error) {
-      if (profileChanged) toast.error("Profile saved, but the email change wasn't sent.")
-      else toast.error(error instanceof Error ? error.message : String(error))
-      return
-    }
-    toast.success(
-      profileChanged
-        ? 'Profile saved. Email change sent for review.'
-        : 'Email change sent for review. Approve it on the Contact tab.',
-    )
-    onDone()
-  }
+    : undefined
   return {
-    submit,
-    reset,
-    /** The player this edit was last sent for */
-    editingId,
-    isPending: update.isPending || email.isPending,
-    emailError,
-    /** A problem that isn't about the email field shows as the form's notice. */
-    serverError:
-      update.error?.message ?? (email.error && !emailError ? email.error.message : undefined),
-    /** One open request at a time: a new email waits until it is reviewed on the Contact tab. */
-    emailLocked:
-      !requests.isPlaceholderData &&
-      !!requests.data?.rows.some((request) =>
-        OPEN_CONTACT_CHANGE_STATUSES.includes(request.status),
-      ),
+    edit,
+    /** The edit record could not be loaded */
+    isError: record.isError,
+    refetch: () => void record.refetch(),
+    isPending: update.isPending,
+    reset: update.reset,
   }
 }

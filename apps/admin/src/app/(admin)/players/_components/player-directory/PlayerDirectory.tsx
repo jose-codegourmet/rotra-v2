@@ -73,7 +73,15 @@ export function PlayerDirectory() {
     games = useAdminPlayerGames(peek),
     profile = usePlayerProfile(peek),
     requests = useContactRequests({ playerId: peek }),
-    edit = usePlayerEdit(mutations.update, peek)
+    edit = usePlayerEdit(peek, {
+      enabled: !!peek,
+      onDone: () => closePeek(),
+      // Stale revision: load what is current, then edit again.
+      onReload: () => {
+        void client.invalidateQueries()
+        closePeek()
+      },
+    })
   const denied = useDenyOnPermissionError(
     list.error,
     clubs.error,
@@ -259,27 +267,7 @@ export function PlayerDirectory() {
         profileHref={href(peek)}
         historyHref={`/players/${peek}?tab=history&from=${encodeURIComponent(from)}`}
         socialLinks={profile.data?.socialLinks}
-        edit={
-          playerQuery.data
-            ? {
-                offline,
-                isPending: edit.editingId === peek && edit.isPending,
-                serverError: edit.editingId === peek ? edit.serverError : undefined,
-                emailError: edit.editingId === peek ? edit.emailError : undefined,
-                emailLocked: edit.emailLocked,
-                onReload: () => {
-                  void client.invalidateQueries()
-                  edit.reset()
-                  closePeek()
-                },
-                onSubmit: (values) => {
-                  const player = playerQuery.data
-                  if (!player) return
-                  void edit.submit(player, values, closePeek)
-                },
-              }
-            : undefined
-        }
+        edit={playerQuery.data ? edit.edit : undefined}
         onInvite={
           !offline && playerQuery.data
             ? () => {

@@ -1,6 +1,6 @@
 # Edit player: Admin edits everything, with a picture picker and a beta-only password field
 
-Status: IN PROGRESS — #589
+Status: IN MOCK APP — #589
 Date: 2026-11-09
 App: admin
 Mockup: apps/mockup/admin-app/rotra-admin.html › Players › Quick view side panel › Edit

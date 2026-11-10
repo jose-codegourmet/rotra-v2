@@ -1,6 +1,6 @@
 # Session page: account bar with Log in, or the signed-in Player and Sign out
 
-Status: TICKETED — #585
+Status: IN PROGRESS — #585
 Date: 2026-11-10
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Public session page › top bar (`pubTopBar`)

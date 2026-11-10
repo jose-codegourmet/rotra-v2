@@ -18,6 +18,7 @@ export const adminNavMeta = {
     'password-resets',
     'ranking',
     'feature-flags',
+    'profile-characters',
     'no-counts',
     'zero-counts',
     'ask-before-leaving',

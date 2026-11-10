@@ -11,6 +11,7 @@ export type AdminNavKey =
   | 'password-resets'
   | 'ranking'
   | 'feature-flags'
+  | 'profile-characters'
 export type AdminNavProps = {
   current: AdminNavKey | null
   hrefs: Record<AdminNavKey, string>
@@ -67,6 +68,7 @@ export function AdminNav({
       items: [
         item('ranking', 'Ranking', 'nav-rank'),
         item('feature-flags', 'Feature flags', 'nav-flag'),
+        item('profile-characters', 'Profile characters', 'nav-face'),
       ],
     },
   ]

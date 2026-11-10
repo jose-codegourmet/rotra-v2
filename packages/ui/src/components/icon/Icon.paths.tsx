@@ -149,6 +149,17 @@ export const ICONS = {
   },
   'nav-rank': { size: 20, strokeWidth: 2, body: <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" /> },
   'nav-flag': { size: 20, strokeWidth: 2, body: <path d="M5 21V4M5 4h11l-2 4 2 4H5" /> },
+  'nav-face': {
+    size: 20,
+    strokeWidth: 2,
+    body: (
+      <>
+        <circle cx="12" cy="12" r="9" />
+        <path d="M9 10h.01M15 10h.01" />
+        <path d="M8.5 14.5a4.5 4.5 0 0 0 7 0" />
+      </>
+    ),
+  },
   'nav-out': {
     size: 20,
     strokeWidth: 2,

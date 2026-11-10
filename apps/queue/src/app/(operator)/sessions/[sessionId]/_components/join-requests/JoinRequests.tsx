@@ -120,6 +120,18 @@ export function JoinRequests({ sessionId, variant = 'card', className }: JoinReq
     }
   }
 
+  // Real mode has no Requests read yet: a signed-in Player's request carries their account on the
+  // roster read (#687), and Saved players says whether they're already in the club (#694).
+  if (real)
+    for (const r of joinRequests)
+      if (r.playerId && !requestDetails[r.id]?.account)
+        requestDetails[r.id] = {
+          ...requestDetails[r.id],
+          account: clubPlayers.data?.players.some((p) => p.playerId === r.playerId)
+            ? 'in-club'
+            : 'new-to-club',
+        }
+
   // The prototype's avatar(): the saved player's picture on drop-out rows and named match spots.
   const photoFor = (rosterId: string) => {
     const row = roster.data?.roster.find((r) => r.id === rosterId)

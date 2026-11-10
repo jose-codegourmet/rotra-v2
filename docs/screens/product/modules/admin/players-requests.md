@@ -52,7 +52,7 @@ Owner comments on the Admin artifact, November 9, 2026: “admin should be able 
 
 **Save changes** (replaces Review changes) validates every field in place, focuses the first error, saves, writes **one** Activity entry (“Edited <name>: <changed fields>. Reason: …”), closes the panel and toasts “Saved <name>: <changed fields>.” (plus “Give the new password to the player yourself.” when a password was set). Nothing changed: “Nothing changed.”. Offline: the existing offline error, nothing saved.
 
-Open: the password field conflicts with approved decision [D-2026-11-07-01](../../../../mvp/decisions.md#d-2026-11-07-01) (“the Admin never sees” a player's password; the player chooses it). Do not build it until the owner signs off and sets an end date. Also not decided: whether a direct phone or email change closes an open contact-change request.
+Decided (owner, 2026-11-10): the password field is confirmed over [D-2026-11-07-01](../../../../mvp/decisions.md#d-2026-11-07-01), for MVP or beta only; no end date is set, so the label stays “Password *(for MVP or beta only)*”. A direct phone or email edit marks the open contact-change request for that field “Superseded by an Admin edit” (stored as rejected plus `supersededAt`), logs it in the Activity log, and it can no longer be approved or applied (Option A).
 
 ## A-CONTACT-REQUESTS — Review list
 

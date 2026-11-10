@@ -32,8 +32,8 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-09-10](#d-2026-11-09-10) | Uploaded pictures: keep only the current and the previous | approved | in progress | #619, #624, #626 | [Player](workstreams/player.md), [Queue](workstreams/queue.md), [Backend](workstreams/backend.md) |
 | [D-2026-11-09-11](#d-2026-11-09-11) | Session page and Queue refinements from the owner's artifact review | approved | in progress (Q18 Queue Master side in the mock app; request-format defaults decided 2026-11-10) | needed | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
 | [D-2026-11-09-12](#d-2026-11-09-12) | Club-set pictures for guests and unclaimed players | approved | in progress | #623, #628 | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
-| [D-2026-11-09-13](#d-2026-11-09-13) | Admin-managed profile character library | approved | not started | needed | [Admin](workstreams/admin.md), [Player](workstreams/player.md) |
-| [D-2026-11-09-14](#d-2026-11-09-14) | Admin edits everything on a player, with a beta-only password field | approved for MVP or beta only; needs owner sign-off on the D-2026-11-07-01 conflict | not started | needed | [Admin](workstreams/admin.md) |
+| [D-2026-11-09-13](#d-2026-11-09-13) | Admin-managed profile character library | approved | in progress (mock app; real mode not started) | #644, #645, #646 | [Admin](workstreams/admin.md), [Player](workstreams/player.md) |
+| [D-2026-11-09-14](#d-2026-11-09-14) | Admin edits everything on a player, with a beta-only password field | approved for MVP or beta only; signed off 2026-11-10 | in progress (mock app; real mode not started) | #647, #648, #649, #650 | [Admin](workstreams/admin.md) |
 
 ## Status conventions
 
@@ -76,7 +76,7 @@ Then add a row to the [index](#index) and link the entry from the workstream pag
 - **Ticket:** #491
 - **Roadmap:** MVP — [Player access](workstreams/player.md), [Admin](workstreams/admin.md).
 - **Decision:** Forgot password submits a request to Admin > Requests. No automatic email. ROTRA Admin verifies ownership, then generates a secure, expiring, single-use link for manual delivery. The player chooses their password; the Admin never sees it. Delivery channel and arbitrary expiry duration are not prescribed.
-- **Amended by:** [D-2026-11-09-14](#d-2026-11-09-14) (an admin-typed password for the beta only; needs the owner's sign-off).
+- **Amended by:** [D-2026-11-09-14](#d-2026-11-09-14) (an admin-typed password for the beta only; the owner signed off the amendment on 2026-11-10, no end date set).
 - **Supersedes:** the November 7 support-only/no-submitted-requests restriction and the automatic recovery email shipped in #483. Ownership verification, no plaintext-token storage, audit and no club-owner password-reset access remain.
 - **Implementation:** Supabase recovery token/expiry plus a private ROTRA request table holding a token digest, reviewer and issuance lease. The existing reset screen consumes only reviewed links and checks the account mapping. No provider call occurs when submitting the request. The additive migration was applied to ROTRA v2 ASIA on November 8 after explicit owner sign-off.
 - **References:** `apps/admin/src/app/(admin)/requests/password-resets`, `packages/db/src/admin/password-resets.ts`, [schema](../database_design/product/admin/modules/configuration-requests.md).
@@ -445,8 +445,8 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 <a id="d-2026-11-09-13"></a>
 ### D-2026-11-09-13 — Admin-managed profile character library
 - **Decision status:** approved (owner, November 9, 2026): the character pictures players choose from "will be controlled in the admin app", and the library is only images the platform owner uploads.
-- **Implementation status:** not started — mockups updated November 9, 2026 (`NEW` logs dated 2026-11-09 in [mockup-changes](../mockup-changes/README.md))
-- **Ticket:** needed
+- **Implementation status:** in progress — in the mock app (A07.1 CharacterGrid/ImageDropZone, A07.2 Admin library, A07.3 `/settings/profile-characters`); real mode not started (needs Supabase Storage and a `profile_characters` table).
+- **Ticket:** #644, #645, #646
 - **Roadmap:** MVP — [Admin](workstreams/admin.md), [Player](workstreams/player.md)
 - **Decision:**
   - **Admin › Settings › Profile characters** is a plain grid of images. The admin adds images by dragging them in (images only, up to 1 MB each, cropped to a square). Clicking an image hides or shows it (hidden images are dimmed). A small x deletes one, with a short Undo.
@@ -457,15 +457,16 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 
 <a id="d-2026-11-09-14"></a>
 ### D-2026-11-09-14 — Admin edits everything on a player, with a beta-only password field
-- **Decision status:** approved by the owner for **MVP or beta only** (November 9, 2026): "since admin, you should be able to edit everything. also password (for now) wrap it with *(for mvp or beta only)*". It conflicts with [D-2026-11-07-01](#d-2026-11-07-01) and needs the owner's explicit sign-off before it is built.
-- **Implementation status:** not started — mockups updated November 9, 2026 (`NEW` logs dated 2026-11-09 in [mockup-changes](../mockup-changes/README.md))
-- **Ticket:** needed
+- **Decision status:** approved by the owner for **MVP or beta only** (November 9, 2026): "since admin, you should be able to edit everything. also password (for now) wrap it with *(for mvp or beta only)*". It conflicts with [D-2026-11-07-01](#d-2026-11-07-01); the owner confirmed D-2026-11-09-14 over D-2026-11-07-01 on 2026-11-10 (Jose). End date: not set (the owner has no timeline).
+- **Implementation status:** in progress — in the mock app (A07.4 picture section, A07.5 full Edit player form, A07.6 Admin edits everything, A07.7 wiring); real mode not started (needs a full-form PATCH and an admin-set password through Supabase).
+- **Ticket:** #647, #648, #649, #650
 - **Roadmap:** MVP or beta — [Admin](workstreams/admin.md)
 - **Amends:** [D-2026-11-07-01](#d-2026-11-07-01) for the beta only.
 - **Decision:**
   - **Admin › Players › Edit** can change the player's picture ([D-2026-11-09-13](#d-2026-11-09-13)), name, nickname, playing style, experience, playing since, the four social links, Private profile, Hide phone from clubs, and phone and email (checked for format and uniqueness). A reason is required, and the change is written to the player's Activity log.
   - **Read-only:** RTR ID, created-by club, registered/unclaimed status, rank, level and match history (ranking math is not editable by Admin).
   - **Password.** The field is labelled **Password *(for MVP or beta only)***. The admin types a new password (at least 8 characters); empty leaves it unchanged; it is not available for unclaimed players. Only that it was set, and by whom, is recorded, never the password.
-- **Conflict to resolve:** [D-2026-11-07-01](#d-2026-11-07-01) says "the Admin never sees" a player's password and the player chooses it. Setting one by hand needs the owner's confirmation, and an end date for removing the field.
-- **Not decided:** editing phone or email directly skips the contact-change request flow; an open request is not closed automatically.
+- **Conflict resolved (2026-11-10):** [D-2026-11-07-01](#d-2026-11-07-01) says "the Admin never sees" a player's password; the owner confirmed this decision over it. The field keeps the label "Password *(for MVP or beta only)*" until an end date is set; no end date is set yet.
+- **Open contact-change requests (decided 2026-11-10, Option A):** on a direct Admin phone or email edit, the open request for that field is marked "Superseded by an Admin edit" (stored as rejected plus `supersededAt`), logged in the Activity log, and can no longer be approved or applied.
+- **Picture change (2026-11-10):** an Admin save makes the old picture the previous picture on any picture change (photo, character or initials), as the Admin mockup does. Known gap: when the old picture was initials, no "Previous picture" row shows (the mockup shows one).
 - **References:** [Admin screens](../screens/product/modules/admin/README.md), [mockup logs](../mockup-changes/README.md).

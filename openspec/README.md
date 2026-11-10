@@ -10,6 +10,7 @@ rules in `AGENTS.md` and `docs/ways-of-working.md`.
 - [Queue specification](specs/queue/spec.md)
 - [Queue live console implementation and verification](changes/queue-live-console/tasks.md)
 - [Queue club settings and saved players implementation and verification](changes/queue-club-settings-saved-players/tasks.md)
+- [Admin player edit and profile characters implementation](changes/admin-player-edit-and-characters/tasks.md)
 
 These Markdown records introduce no CLI dependency. Unchecked verification tasks
 mean the check has not passed; implemented behavior is separate from verification.

@@ -51,6 +51,26 @@ export const WithDisabledItem: Story = {
   play: Open.play,
 }
 
+/** The preparation header's ⋯ beside the title: icon rows, session-ending actions in red. */
+export const WithIcons: Story = {
+  args: {
+    label: 'More for this session',
+    triggerSize: 'sm',
+    align: 'end',
+    items: [
+      { label: 'Cancel session', icon: 'ban', destructive: true, onSelect: fn() },
+      { label: 'Delete session', icon: 'trash', destructive: true, onSelect: fn() },
+    ],
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole('button', { name: 'More for this session' }))
+    await expect(
+      within(canvasElement.ownerDocument.body).getByRole('menuitem', { name: 'Cancel session' }),
+    ).toHaveFocus()
+  },
+}
+
 export const InsideClippedContainer: Story = {
   decorators: [
     (Story) => (

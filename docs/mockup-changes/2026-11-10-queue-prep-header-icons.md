@@ -1,6 +1,6 @@
 # Preparation header: icon buttons, and Cancel/Delete session in a ⋯ menu
 
-Status: NEW
+Status: IN MOCK APP — #697 (PR #698)
 Date: 2026-11-10
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Preparation (and Session settings) › page header

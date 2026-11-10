@@ -345,6 +345,44 @@ export const ICONS = {
       </>
     ),
   },
+  // Preparation header (owner request, November 10, 2026; rotra-queue.html I.link / post / trash / ban).
+  link: {
+    size: 16,
+    strokeWidth: 2.2,
+    body: (
+      <>
+        <path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1" />
+        <path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1" />
+      </>
+    ),
+  },
+  megaphone: {
+    size: 16,
+    strokeWidth: 2.2,
+    body: (
+      <>
+        <path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z" />
+        <path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" />
+      </>
+    ),
+  },
+  trash: {
+    size: 16,
+    strokeWidth: 2.2,
+    body: (
+      <path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3" />
+    ),
+  },
+  ban: {
+    size: 16,
+    strokeWidth: 2.2,
+    body: (
+      <>
+        <circle cx="12" cy="12" r="9" />
+        <path d="m5.6 5.6 12.8 12.8" />
+      </>
+    ),
+  },
 } satisfies Record<string, IconDef>
 
 export type IconName = keyof typeof ICONS

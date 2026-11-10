@@ -32,8 +32,8 @@ import { DeviceDownloadCard } from '@rotra/ui/device-download-card'
 import { formatMinutes } from '@rotra/ui/forms/session-setup-form/helpers'
 import { Icon } from '@rotra/ui/icon'
 import { IconButton } from '@rotra/ui/icon-button'
-import { MoreOptionsSheet } from '@rotra/ui/more-options-sheet'
 import { Notice } from '@rotra/ui/notice'
+import { OverflowMenu, type OverflowMenuItem } from '@rotra/ui/overflow-menu'
 import { PageHeader } from '@rotra/ui/page-header'
 import { SessionJoinQr } from '@rotra/ui/session-join-qr'
 import { SessionLinkCard } from '@rotra/ui/session-link-card'
@@ -112,7 +112,6 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
   const [startOpen, setStartOpen] = useState(false)
   const [postOpen, setPostOpen] = useState(false)
   const [qrOpen, setQrOpen] = useState(false)
-  const [moreOpen, setMoreOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [cancelOpen, setCancelOpen] = useState(false)
   // The public link is origin + /s/<publicSlug>; the origin is only known in the browser.
@@ -239,6 +238,29 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
       </main>
     )
 
+  // Before start only, once the roster has loaded (both dialogs read it). Cancel first.
+  const sessionMenu: OverflowMenuItem[] =
+    s && !live && roster.data
+      ? [
+          ...(s.state === 'prepared'
+            ? [
+                {
+                  label: 'Cancel session',
+                  icon: 'ban' as const,
+                  destructive: true,
+                  onSelect: () => setCancelOpen(true),
+                },
+              ]
+            : []),
+          {
+            label: 'Delete session',
+            icon: 'trash' as const,
+            destructive: true,
+            onSelect: () => setDeleteOpen(true),
+          },
+        ]
+      : []
+
   return (
     <main className="flex flex-col gap-5 px-page pt-5 pb-[170px]">
       <Breadcrumb label="Home" href="/" linkAs={Link} />
@@ -251,60 +273,49 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
           }
           title={s.title}
           titleAction={
-            <IconButton label="Open public page" variant="ghost" size="sm" asChild>
-              <Link href={`/sessions/${sessionId}/public-page`}>
-                <Icon name="external" />
-              </Link>
-            </IconButton>
+            <div className="flex items-center gap-1">
+              <IconButton label="Open public page" variant="ghost" size="sm" asChild>
+                <Link href={`/sessions/${sessionId}/public-page`}>
+                  <Icon name="external" />
+                </Link>
+              </IconButton>
+              {/* The session-ending actions, apart from the everyday ones (owner, November 10, 2026). */}
+              {sessionMenu.length ? (
+                <OverflowMenu label="More for this session" triggerSize="sm" items={sessionMenu} />
+              ) : null}
+            </div>
           }
           description={`${date(s.scheduledStartAt)} · ${time(s.scheduledStartAt)}–${time(s.scheduledEndAt)} · ${s.venueName}`}
           actions={
             <>
-              <Button size="sm" className="max-[640px]:hidden" asChild>
-                {live ? (
-                  <Link href={`/sessions/${sessionId}`}>Back to live session</Link>
-                ) : (
-                  <Link href={`/sessions/${sessionId}/edit`}>Edit preparation</Link>
-                )}
-              </Button>
-              <Button size="sm" className="max-[640px]:hidden" onClick={() => void copyLink()}>
-                Copy invite link
-              </Button>
-              <Button size="sm" onClick={() => setQrOpen(true)}>
-                Session QR
-              </Button>
-              <Button size="sm" onClick={() => setPostOpen(true)}>
-                Copy Facebook post
-              </Button>
-              {!live ? (
-                <Button
-                  size="sm"
-                  variant="danger"
-                  className="max-[640px]:hidden"
-                  disabled={!roster.data}
-                  onClick={() => setDeleteOpen(true)}
-                >
-                  Delete session
-                </Button>
-              ) : null}
-              {s.state === 'prepared' ? (
-                <Button
-                  size="sm"
-                  variant="danger"
-                  className="max-[640px]:hidden"
-                  disabled={!roster.data}
-                  onClick={() => setCancelOpen(true)}
-                >
-                  Cancel session
-                </Button>
-              ) : null}
               <Button
                 size="sm"
-                className="hidden max-[640px]:inline-flex"
-                aria-haspopup="dialog"
-                onClick={() => setMoreOpen(true)}
+                asChild
+                aria-label={live ? 'Back to live session' : 'Edit preparation'}
               >
-                More options
+                {live ? (
+                  <Link href={`/sessions/${sessionId}`}>
+                    <Icon name="back" />
+                    <ActionLabel long="Back to live session" short="Live session" />
+                  </Link>
+                ) : (
+                  <Link href={`/sessions/${sessionId}/edit`}>
+                    <Icon name="edit" />
+                    <ActionLabel long="Edit preparation" short="Edit" />
+                  </Link>
+                )}
+              </Button>
+              <Button size="sm" aria-label="Copy invite link" onClick={() => void copyLink()}>
+                <Icon name="link" />
+                <ActionLabel long="Copy invite link" short="Invite link" />
+              </Button>
+              <Button size="sm" onClick={() => setQrOpen(true)}>
+                <Icon name="qr" />
+                Session QR
+              </Button>
+              <Button size="sm" aria-label="Copy Facebook post" onClick={() => setPostOpen(true)}>
+                <Icon name="megaphone" />
+                <ActionLabel long="Copy Facebook post" short="Facebook post" />
               </Button>
             </>
           }
@@ -520,36 +531,6 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
           />
         </Sheet>
       ) : null}
-      {s ? (
-        <MoreOptionsSheet
-          open={moreOpen}
-          onOpenChange={setMoreOpen}
-          actions={[
-            {
-              label: live ? 'Back to live session' : 'Edit preparation',
-              onSelect: () =>
-                router.push(live ? `/sessions/${sessionId}` : `/sessions/${sessionId}/edit`),
-            },
-            { label: 'Copy invite link', onSelect: () => void copyLink() },
-            ...(s.state === 'prepared'
-              ? [
-                  {
-                    label: 'Delete session',
-                    danger: true,
-                    disabled: !roster.data,
-                    onSelect: () => setDeleteOpen(true),
-                  },
-                  {
-                    label: 'Cancel session',
-                    danger: true,
-                    disabled: !roster.data,
-                    onSelect: () => setCancelOpen(true),
-                  },
-                ]
-              : []),
-          ]}
-        />
-      ) : null}
       {s?.state === 'prepared' ? (
         <StartSessionSheet
           open={startOpen}
@@ -644,5 +625,15 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
       ) : null}
       <FacebookPost sessionId={sessionId} open={postOpen} onOpenChange={setPostOpen} />
     </main>
+  )
+}
+
+/** A header action's label: the full one, or the short one on phones (640 px and narrower). */
+function ActionLabel({ long, short }: { long: string; short: string }) {
+  return (
+    <>
+      <span className="max-[640px]:hidden">{long}</span>
+      <span className="hidden max-[640px]:inline">{short}</span>
+    </>
   )
 }

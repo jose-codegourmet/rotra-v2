@@ -1,4 +1,7 @@
+import type { ClubPlayer } from '../club-player/clubPlayer.types'
+import type { Player } from '../player/player.types'
 import type { SessionJoinRequest } from '../session-roster/sessionRoster.types'
+import { DEMO_CLUB_ID } from './clubs'
 import { clubPlayers } from './players'
 
 /** The session the sample guests asked to join (tonight's prepared session in queueSessions). */
@@ -108,6 +111,110 @@ export function createAccountJoinRequestFixture(now = Date.now()): SessionJoinRe
     playerId: derrick.playerId,
     inviteCodeId: TONIGHT_INVITE_CODE_ID,
   }
+}
+
+/**
+ * The prototype's Rhea Villanueva (p21, same RTR ID): a registered ROTRA player saved in the club.
+ * Not in the shared player pool, so only the mock store's request seeds add her.
+ */
+export const RHEA_PLAYER: Player = {
+  id: 'player-rhea-villanueva',
+  fullName: 'Rhea Villanueva',
+  nickname: null,
+  rtrId: 'RTR-PH-CEB-101426-0064',
+}
+
+/**
+ * The prototype's Paolo Reyes (directory g1): a registered ROTRA player new to the club. His
+ * prototype RTR ID belongs to Camill in the shared pool, so this mock profile carries a fresh one.
+ */
+export const PAOLO_PLAYER: Player = {
+  id: 'player-paolo-reyes',
+  fullName: 'Paolo Reyes',
+  nickname: null,
+  rtrId: 'RTR-PH-MNL-020326-0201',
+}
+
+/** The prototype's Kiko Salazar (p19): a saved guest whose private phone is 0917 555 0188. */
+export const KIKO_CLUB_PLAYER_ID = 'club-player-kiko-salazar'
+export const KIKO_PHONE_E164 = '+639175550188'
+
+/**
+ * Saved players the prototype's sample requests need (D-2026-11-09-02/06): Rhea, already in the
+ * club, and Kiko, the guest the phone match suggests. Kept out of `clubPlayers` (the shared pool's
+ * 23 registered players); the mock store appends them.
+ */
+export function createRequestSeedClubPlayers(now = Date.now()): ClubPlayer[] {
+  return [
+    {
+      id: 'club-player-rhea-villanueva',
+      clubId: DEMO_CLUB_ID,
+      playerId: RHEA_PLAYER.id,
+      fullName: RHEA_PLAYER.fullName,
+      nickname: null,
+      identity: 'registered',
+      playingLevel: 'intermediate_mid',
+      addedAt: now - 51 * 86_400_000,
+      joinedVia: 'added',
+    },
+    {
+      id: KIKO_CLUB_PLAYER_ID,
+      clubId: DEMO_CLUB_ID,
+      playerId: null,
+      fullName: 'Kiko Salazar',
+      nickname: null,
+      identity: 'guest',
+      playingLevel: null,
+      addedAt: now,
+      joinedVia: 'added',
+    },
+  ]
+}
+
+/**
+ * The prototype's sample requests on Sunday Night Queue (D-2026-11-09-02/06/08), oldest first:
+ * Rhea (in the club, invited by Migs; Jose's invite stands in), Paolo Reyes (a ROTRA player new to
+ * the club), and Kiko Salazar (a guest whose
+ * phone matches the saved guest Kiko).
+ */
+export function createSessionPageJoinRequestFixtures(now = Date.now()): SessionJoinRequest[] {
+  const base = {
+    sessionId: JOIN_REQUEST_SESSION_ID,
+    phoneE164: null,
+    status: 'pending' as const,
+    decidedAt: null,
+    clubPlayerId: null,
+  }
+  return [
+    {
+      ...base,
+      id: 'q-seed-rhea',
+      name: RHEA_PLAYER.fullName,
+      nickname: null,
+      statedBand: 'intermediate',
+      requestedAt: now - 25 * 60_000,
+      playerId: RHEA_PLAYER.id,
+      inviteCodeId: TONIGHT_INVITE_CODE_ID,
+    },
+    {
+      ...base,
+      id: 'q-seed-paolo',
+      name: PAOLO_PLAYER.fullName,
+      nickname: null,
+      statedBand: 'beginner',
+      requestedAt: now - 18 * 60_000,
+      playerId: PAOLO_PLAYER.id,
+    },
+    {
+      ...base,
+      id: 'q-seed-kiko',
+      name: 'Kiko Salazar',
+      nickname: null,
+      phoneE164: KIKO_PHONE_E164,
+      statedBand: 'intermediate',
+      requestedAt: now - 9 * 60_000,
+    },
+  ]
 }
 
 /** Pending sample requests, oldest first. */

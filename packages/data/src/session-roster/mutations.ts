@@ -62,7 +62,8 @@ async function rosterMutation<T>(
     return result
   })
 }
-function place(
+/** Gives a club player a slot, or a waitlist place once a prepared session is full. */
+export function place(
   s: MockState,
   sessionId: string,
   p: ClubPlayer,

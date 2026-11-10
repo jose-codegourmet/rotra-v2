@@ -53,6 +53,13 @@ export type SessionJoinRequest = {
   playerId?: string | null
   /** The Session invite code the link carried (`?invite=`), read as “Invited by NAME” (D-2026-11-09-08). */
   inviteCodeId?: string | null
+  /**
+   * Guest linking (D-2026-11-09-06): the saved player the QM chose with **Link** on the phone-match
+   * prompt; Confirm then gives that saved player the slot instead of creating a guest.
+   */
+  linkedClubPlayerId?: string | null
+  /** When the QM tapped **Not them** on the phone-match prompt; the prompt stays hidden. */
+  linkDeclinedAt?: number | null
 }
 /**
  * **I can't make it** (D-2026-11-09-03): a confirmed signed-in Player tells the QM before the start.

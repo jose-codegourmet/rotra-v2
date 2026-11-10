@@ -30,6 +30,14 @@ export type ExperienceFieldsProps = {
   disabled?: boolean
   /** Fixed "today" for stories; defaults to the current date */
   now?: Date
+  /** Label of the years field; defaults to "Years" (Admin Edit player: "Experience, years") */
+  yearsLabel?: string
+  /** Label of the months field; defaults to "Months" (Admin Edit player: "Experience, months") */
+  monthsLabel?: string
+  /** An error from the form for the Playing since year (e.g. "Use a year like 2022."), checked on save */
+  sinceYearError?: string
+  /** Every Playing since edit, as typed, so a form can check the year on save */
+  onSinceChange?: (since: { month: string; year: string }) => void
 }
 
 const monthIndex = (date: Date) => date.getFullYear() * 12 + date.getMonth()
@@ -67,16 +75,23 @@ export function ExperienceFields({
   monthsError,
   disabled = false,
   now,
+  yearsLabel = 'Years',
+  monthsLabel = 'Months',
+  sinceYearError,
+  onSinceChange,
 }: ExperienceFieldsProps) {
   const [since, setSince] = useState(() => playingSinceOf(value, now))
   const [sinceError, setSinceError] = useState<string>()
   const typeDuration = (next: ExperienceValue) => {
     onChange(next)
-    setSince(playingSinceOf(next, now))
+    const derived = playingSinceOf(next, now)
+    setSince(derived)
+    onSinceChange?.(derived)
     setSinceError(undefined)
   }
   const typeSince = (month: string, year: string) => {
     setSince({ month, year })
+    onSinceChange?.({ month, year })
     const future =
       month && /^\d{4}$/.test(year.trim()) && !experienceOf(month, year, now)
         ? "Playing since can't be in the future."
@@ -88,7 +103,7 @@ export function ExperienceFields({
   return (
     <div className="flex flex-col gap-3.5">
       <div className="grid grid-cols-2 gap-3.5">
-        <Field label="Years" error={yearsError}>
+        <Field label={yearsLabel} error={yearsError}>
           <TextInput
             value={value.years}
             onChange={(event) => typeDuration({ ...value, years: event.target.value })}
@@ -97,7 +112,7 @@ export function ExperienceFields({
             disabled={disabled}
           />
         </Field>
-        <Field label="Months" error={monthsError}>
+        <Field label={monthsLabel} error={monthsError}>
           <TextInput
             value={value.months}
             onChange={(event) => typeDuration({ ...value, months: event.target.value })}
@@ -118,7 +133,7 @@ export function ExperienceFields({
             invalid={!!sinceError}
           />
         </Field>
-        <Field label="Year">
+        <Field label="Year" error={sinceYearError}>
           <TextInput
             value={since.year}
             onChange={(event) => typeSince(since.month, event.target.value)}

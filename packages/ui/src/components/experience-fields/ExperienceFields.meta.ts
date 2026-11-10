@@ -6,7 +6,8 @@ export const experienceFieldsMeta = {
     'Playing experience as Years + months and as Playing since (month, year), linked: typing either fills the other.',
   usage: [
     'Controlled: value holds years and months as typed strings; Playing since is derived and never a form value.',
-    'Used by PersonalDetailsFields (registration, Edit profile) and the Queue Edit details form.',
+    'Used by PersonalDetailsFields (registration, Edit profile), the Queue Edit details form and the Admin Edit player form.',
+    'Optional yearsLabel / monthsLabel rename the duration fields; sinceYearError + onSinceChange let a form check the Playing since year on save.',
   ],
   prototype: {
     file: 'apps/mockup/player-app/rotra-player.html',

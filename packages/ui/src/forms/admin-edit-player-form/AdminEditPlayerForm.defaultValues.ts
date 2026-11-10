@@ -1,10 +1,10 @@
-import type { AdminPlayer } from '@rotra/data/admin-player/types'
+import { adminPlayerEditValuesOf } from '@rotra/data/admin-player/rules'
+import type { AdminPlayerEdit } from '@rotra/data/admin-player/types'
 import type { AdminPlayerEditValues } from '@rotra/schema/admin-player'
-export const adminEditPlayerDefaultValues = (player: AdminPlayer): AdminPlayerEditValues => ({
-  name: player.name,
-  nickname: player.nickname ?? '',
-  // Only an unclaimed player's HTTPS photo link is editable; a character or uploaded photo stays.
-  picture: !player.claimed && player.picture?.startsWith('https://') ? player.picture : '',
-  email: player.email ?? '',
-  reason: '',
-})
+
+/**
+ * A-PLAYER-EDIT starting values: the loaded record, an empty password (empty keeps it) and an empty
+ * reason. The same derivation the data layer compares a save against.
+ */
+export const adminEditPlayerDefaultValues = (player: AdminPlayerEdit): AdminPlayerEditValues =>
+  adminPlayerEditValuesOf(player)

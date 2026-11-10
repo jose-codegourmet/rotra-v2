@@ -1,8 +1,10 @@
+import type { AdminPlayer, AdminPlayerEdit } from '@rotra/data/admin-player/types'
 import { managementPlayer } from '@rotra/data/fixtures/admin-player-management'
 import { adminPlayerDetailExamples } from '@rotra/data/fixtures/admin-players'
 import { CLAIM_TOKEN } from '@rotra/data/fixtures/player-accounts'
 import { JOSE_SESSIONS } from '@rotra/data/fixtures/player-games'
 import { playerProfiles } from '@rotra/data/fixtures/player-profiles'
+import { profileCharacters } from '@rotra/data/fixtures/profile-characters'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { AdminPlayerQuickView } from './AdminPlayerQuickView'
 
@@ -15,6 +17,36 @@ const registered = {
   picture: profile?.picture ?? null,
   levelIndex: 6,
 }
+const characters = profileCharacters
+  .filter((c) => c.shown)
+  .map(({ id, image, number }) => ({ id, image, number }))
+/** The A-PLAYER-EDIT record the Edit view loads for a directory row. */
+const editOf = (player: AdminPlayer): AdminPlayerEdit => ({
+  ...player,
+  playingStyle: player.claimed ? (profile?.playingStyle ?? '') : '',
+  experienceYears: player.claimed ? (profile?.experienceYears ?? null) : null,
+  experienceMonths: player.claimed ? (profile?.experienceMonths ?? null) : null,
+  socialLinks: {
+    facebook: '',
+    instagram: '',
+    youtube: '',
+    linkedin: '',
+    ...(player.claimed ? profile?.socialLinks : {}),
+  },
+  profilePrivate: false,
+  previousPicture: null,
+  hasAccount: true,
+  passwordSetAt: null,
+})
+const editProps = (player: AdminPlayer) => ({
+  player: editOf(player),
+  characters,
+  createdBy: 'Admin',
+  cropPhoto: async () => characters[0]?.image ?? '',
+  onSubmit: () => {},
+  onNothingChanged: () => {},
+  onReload: () => {},
+})
 const meta = {
   title: 'Admin/AdminPlayerQuickView',
   component: AdminPlayerQuickView,
@@ -31,7 +63,7 @@ const meta = {
     onRetry: () => {},
     onRetryGames: () => {},
     onCopyId: () => {},
-    edit: { onSubmit: () => {}, onReload: () => {} },
+    edit: editProps(registered),
     onInvite: () => {},
     onCopyRegistrationLink: () => {},
   },
@@ -44,16 +76,30 @@ export const Unclaimed: Story = { args: { player: managementPlayer, socialLinks:
 export const UnclaimedLight: Story = { ...Unclaimed, globals: { theme: 'light' } }
 export const Edit: Story = { args: { initialMode: 'edit' } }
 export const EditLight: Story = { ...Edit, globals: { theme: 'light' } }
-export const EditUnclaimed: Story = { args: { player: managementPlayer, initialMode: 'edit' } }
+export const EditUnclaimed: Story = {
+  args: { player: managementPlayer, initialMode: 'edit', edit: editProps(managementPlayer) },
+}
 export const EditUnclaimedLight: Story = { ...EditUnclaimed, globals: { theme: 'light' } }
 export const EditPending: Story = {
   args: { ...Edit.args, edit: { ...meta.args.edit, isPending: true } },
 }
 export const EditPendingLight: Story = { ...EditPending, globals: { theme: 'light' } }
-export const EditOffline: Story = {
-  args: { ...Edit.args, edit: { ...meta.args.edit, offline: true } },
+/** The edit record is still loading: Save changes is off. */
+export const EditLoading: Story = { args: { ...Edit.args, edit: undefined } }
+export const EditLoadingLight: Story = { ...EditLoading, globals: { theme: 'light' } }
+export const EditFieldErrors: Story = {
+  args: {
+    ...Edit.args,
+    edit: {
+      ...meta.args.edit,
+      fieldErrors: {
+        phone: 'This phone number is already linked to another player.',
+        email: 'This email is already linked to another player.',
+      },
+    },
+  },
 }
-export const EditOfflineLight: Story = { ...EditOffline, globals: { theme: 'light' } }
+export const EditFieldErrorsLight: Story = { ...EditFieldErrors, globals: { theme: 'light' } }
 export const EditError: Story = {
   args: {
     ...Edit.args,

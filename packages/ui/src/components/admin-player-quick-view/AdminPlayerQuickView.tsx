@@ -39,10 +39,11 @@ export type AdminPlayerQuickViewProps = {
   onCopyId: () => void
   /** Actual links from this player's public profile; never generated from their name. */
   socialLinks?: PlayerProfile['socialLinks']
-  edit?: Omit<
-    AdminEditPlayerFormProps,
-    'player' | 'open' | 'onClose' | 'embedded' | 'externalActions' | 'onReviewChange'
-  >
+  /**
+   * Edit (A-PLAYER-EDIT): the form's props, with the loaded edit record as `player`. Absent while it
+   * loads (Edit is off; Edit mode shows a skeleton). The footer's Save changes submits the form.
+   */
+  edit?: Omit<AdminEditPlayerFormProps, 'formId'>
   onInvite?: () => void
   registrationLink?: string
   invitePending?: boolean
@@ -78,7 +79,6 @@ function QuickViewPanel({
   initialMode = 'view',
 }: AdminPlayerQuickViewProps) {
   const [mode, setMode] = useState(initialMode)
-  const [reviewing, setReviewing] = useState(false)
   const level =
     p?.levelIndex == null
       ? null
@@ -94,10 +94,7 @@ function QuickViewPanel({
     const href = socialLinks?.[key]
     return href && /^https?:\/\//i.test(href) ? [{ label, href }] : []
   })
-  const back = () => {
-    setMode('view')
-    setReviewing(false)
-  }
+  const back = () => setMode('view')
   const hero = p ? (
     <div
       className={cn(
@@ -177,16 +174,15 @@ function QuickViewPanel({
               <Button disabled={edit?.isPending} onClick={back}>
                 Back
               </Button>
-              {!reviewing ? (
-                <Button
-                  type="submit"
-                  form={`admin-edit-player-${p.id}`}
-                  variant="primary"
-                  disabled={edit?.offline || edit?.isPending}
-                >
-                  Review changes
-                </Button>
-              ) : null}
+              <Button
+                type="submit"
+                form={`admin-edit-player-${p.id}`}
+                variant="primary"
+                disabled={!edit || edit.isPending}
+                loading={edit?.isPending}
+              >
+                Save changes
+              </Button>
             </>
           )
         ) : undefined
@@ -201,16 +197,12 @@ function QuickViewPanel({
       ) : (
         <>
           {hero}
-          {mode === 'edit' && edit ? (
-            <AdminEditPlayerForm
-              {...edit}
-              player={p}
-              open
-              embedded
-              externalActions
-              onReviewChange={setReviewing}
-              onClose={back}
-            />
+          {mode === 'edit' ? (
+            edit ? (
+              <AdminEditPlayerForm {...edit} formId={`admin-edit-player-${p.id}`} />
+            ) : (
+              <Skeleton label="Loading player" />
+            )
           ) : mode === 'invite' && !p.claimed ? (
             <>
               {inviteError ? (

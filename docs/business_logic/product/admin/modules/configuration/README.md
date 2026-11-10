@@ -25,7 +25,7 @@ Whether configuration edits recompute existing ranks immediately or apply from a
 
 ## Profile character library
 
-Owner decision, November 9, 2026 ([D-2026-11-09-13](../../../../mvp/decisions.md#d-2026-11-09-13); mockup log 2026-11-09-admin-profile-characters; not built yet). The characters players pick as their profile picture are images **the platform owner uploads** in Admin › Settings › Profile characters. No club or player adds to the library.
+Owner decision, November 9, 2026 ([D-2026-11-09-13](../../../../mvp/decisions.md#d-2026-11-09-13); mockup log 2026-11-09-admin-profile-characters; in the mock app, tickets #644–#646; real mode not started). The characters players pick as their profile picture are images **the platform owner uploads** in Admin › Settings › Profile characters. No club or player adds to the library.
 
 - Uploads: images only (PNG, JPG or WebP), up to 1 MB each, cropped to a centred square; several at once.
 - Each image is **shown** or **hidden**; at least **8** stay shown. Players see shown images in upload order, **8 per page**. Delete has a short Undo.

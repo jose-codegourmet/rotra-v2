@@ -41,6 +41,7 @@ link ([D-2026-11-07-01](../decisions.md#d-2026-11-07-01)).
 | Contact-change approve / apply / retry / status | implemented (#575) | `real/contact-change.ts` → `POST api/contact-change-requests/[requestId]/approve\|retry\|check` → `reviewContactChange`, `applyContactChange`, `reconcileContactChange` (`db/src/player/contact-change.ts`) with the Supabase admin adapter; gap: no audit line for a failed or retried application | #575; approval evidence still open in #244 |
 | Admin-reviewed player reset link | implemented in #491; schema applied | `/requests/password-resets`, protected API, request table + audit, provider recovery token | #491 |
 | Registration link from a player's Admin profile | not implemented | `admin-player/mutations.ts:229` `issueRegistrationLink` mock only (Queue issuance is real since #483, see [player.md](player.md)) | none found; MVP scope: hub open question 9 |
+| Admin edits everything on a player + profile character library (A07, epic #589) | in mock app; real mode not started | [D-2026-11-09-13](../decisions.md#d-2026-11-09-13), [D-2026-11-09-14](../decisions.md#d-2026-11-09-14) | #644–#650 |
 | Club accent persistence | not implemented / deferred candidate | `real/admin.ts:88-89` hardcodes `accent: false`; no `accent` in `prisma/schema` | #395 open (blocked) |
 
 ## Admin implementation gap index
@@ -66,11 +67,13 @@ duplicate issues merely because a related epic is open.
 - [ ] Admin player write routes (create/edit/archive/restore/remove/registration link). Ticket: needed — confirm MVP scope.
 - [ ] Audit reads for feature flags and ranking settings. Ticket: needed.
 - [ ] Scheduled license-lapse refresh and retention sweep runner. Ticket: needed — confirm MVP scope.
+- [ ] A07 real mode (backend follow-up, ticket: needed): Supabase Storage for characters, `profile_characters` table, full-form PATCH, admin-set password via Supabase (MVP or beta only, no end date set).
 - [ ] Club accent. Ticket: #395 (open, blocked).
 
 ## Related decisions
 
 - [D-2026-11-07-01](../decisions.md#d-2026-11-07-01) — Admin issues the manual reset link.
+- [D-2026-11-09-13](../decisions.md#d-2026-11-09-13), [D-2026-11-09-14](../decisions.md#d-2026-11-09-14) — profile character library; Admin edits everything.
 - [D-2026-11-07-04](../decisions.md#d-2026-11-07-04) — scope freeze.
 
 ## Blocking open decisions

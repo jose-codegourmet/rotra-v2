@@ -8,6 +8,7 @@ import { useClubNameRequests } from '@rotra/data/club/useClubNameRequests'
 import { useContactRequestCounts } from '@rotra/data/contact-change-request/useContactRequestCounts'
 import { useFeatureFlags } from '@rotra/data/feature-flag/useFeatureFlags'
 import { isPermissionRefusal } from '@rotra/data/mock/errors'
+import { useProfileCharacters } from '@rotra/data/profile-character/useProfileCharacters'
 import { AccessDeniedCard } from '@rotra/ui/access-denied-card'
 import { AdminAccountBadge } from '@rotra/ui/admin-account-badge'
 import { AdminNav, type AdminNavKey } from '@rotra/ui/admin-nav'
@@ -62,6 +63,7 @@ const HREFS: Record<AdminNavKey, string> = {
   'password-resets': '/requests/password-resets',
   ranking: '/settings/ranking',
   'feature-flags': '/settings/feature-flags',
+  'profile-characters': '/settings/profile-characters',
 }
 
 export function AdminWorkspaceShell({ children }: { children: ReactNode }) {
@@ -78,6 +80,7 @@ export function AdminWorkspaceShell({ children }: { children: ReactNode }) {
   const nameRequests = useClubNameRequests({ enabled: isOwner })
   const contactRequests = useContactRequestCounts({ enabled: isOwner })
   const featureFlags = useFeatureFlags({ enabled: isOwner })
+  const characters = useProfileCharacters({ enabled: isOwner })
   const reportPermissionDenied = useCallback(() => {
     void client.cancelQueries()
     client.clear()
@@ -114,7 +117,8 @@ export function AdminWorkspaceShell({ children }: { children: ReactNode }) {
     isPermissionError(players.error) ||
     isPermissionError(nameRequests.error) ||
     isPermissionError(contactRequests.error) ||
-    isPermissionError(featureFlags.error)
+    isPermissionError(featureFlags.error) ||
+    isPermissionError(characters.error)
   useLayoutEffect(() => {
     if (countsDenied) reportPermissionDenied()
   }, [countsDenied, reportPermissionDenied])
@@ -197,6 +201,7 @@ export function AdminWorkspaceShell({ children }: { children: ReactNode }) {
             'contact-changes': contactRequests.data?.attention,
             'club-names': nameRequests.data?.pending.length,
             'feature-flags': featureFlags.data?.length,
+            'profile-characters': characters.data?.filter((c) => c.shown).length,
           }}
           accountEmail={email}
           isSigningOut={signOut.isPending}

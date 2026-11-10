@@ -40,6 +40,7 @@ export const adminNavExamples = {
     'password-resets': '/requests/password-resets',
     ranking: '/settings/ranking',
     'feature-flags': '/settings/feature-flags',
+    'profile-characters': '/settings/profile-characters',
   },
   counts: {
     clubs: clubs.length,
@@ -47,7 +48,15 @@ export const adminNavExamples = {
     'contact-changes': 3,
     'club-names': 2,
     'feature-flags': 0,
+    'profile-characters': 24,
   },
-  zeroCounts: { clubs: 0, players: 0, 'contact-changes': 0, 'club-names': 0, 'feature-flags': 0 },
+  zeroCounts: {
+    clubs: 0,
+    players: 0,
+    'contact-changes': 0,
+    'club-names': 0,
+    'feature-flags': 0,
+    'profile-characters': 0,
+  },
   loadedAt: new Date('2026-10-27T21:41:00'),
 }

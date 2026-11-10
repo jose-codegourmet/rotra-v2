@@ -65,8 +65,9 @@ export async function getMyContactChangeRequest(
     .at(-1)
   if (!latest) return null
   // The player's view only: no Admin review fields (provider reference, error detail).
-  const { requestId, playerId, field, fromValue, toValue, status, requestedAt } = latest
-  return { requestId, playerId, field, fromValue, toValue, status, requestedAt }
+  const { requestId, playerId, field, fromValue, toValue, status, requestedAt, supersededAt } =
+    latest
+  return { requestId, playerId, field, fromValue, toValue, status, requestedAt, supersededAt }
 }
 
 /**
@@ -205,6 +206,41 @@ export async function submitAdminContactChange(input: {
   })
 }
 
+/** How a request closed by a direct Admin edit reads (owner answer on #649, Option A). */
+export const CONTACT_SUPERSEDED_NOTE = 'Superseded by an Admin edit'
+
+/**
+ * Admin › Players › Edit saved this player's phone or email directly. Every open request for that
+ * field (waiting, approved, applying or failed) closes as 'rejected' with `supersededAt`, inside the
+ * same store update as the edit, with one Activity log line each. Every later Approve, Decline,
+ * Retry, DevMenu step or late provider reply refuses it, because each needs an open status.
+ */
+export function supersedeOpenContactRequests(
+  draft: MockState,
+  playerId: string,
+  field: ContactChangeField,
+) {
+  const now = Date.now()
+  for (const request of draft.contactChangeRequests) {
+    if (
+      request.playerId !== playerId ||
+      request.field !== field ||
+      !OPEN_CONTACT_CHANGE_STATUSES.includes(request.status)
+    )
+      continue
+    request.status = 'rejected'
+    request.decidedAt = now
+    request.supersededAt = now
+    request.error = undefined
+    appendAdminAudit(draft, {
+      action: 'contact_change_superseded',
+      targetType: 'contact_change_request',
+      targetId: request.requestId,
+      summary: `${CONTACT_SUPERSEDED_NOTE}: ${CONTACT_FIELD_WORD[field]} change for ${playerNameIn(draft, playerId)}.`,
+    })
+  }
+}
+
 /** Admin-side transitions the DevMenu drives: each status may only move to the next ones. */
 const NEXT: Partial<Record<ContactChangeStatus, ContactChangeStatus[]>> = {
   pending: ['applying', 'rejected'],
@@ -228,7 +264,7 @@ export async function advanceContactChangeRequest(input: {
   mockStore.update((draft) => {
     const request = draft.contactChangeRequests.find((r) => r.requestId === input.requestId)
     if (!request) throw new MockError('permission', 'That request no longer exists.')
-    if (!NEXT[request.status]?.includes(input.to))
+    if (request.supersededAt || !NEXT[request.status]?.includes(input.to))
       throw new MockError('conflict', `A ${request.status} request can't become ${input.to}.`)
     request.status = input.to
     const now = Date.now()
@@ -399,7 +435,13 @@ function settleApplication(requestId: string, generation: number) {
     !isProductionBuild() && consumeMockDevToggle('adminNextContactApplicationFails')
   mockStore.update((draft) => {
     const request = draft.contactChangeRequests.find((entry) => entry.requestId === requestId)
-    if (!request || (request.status !== 'applying' && request.status !== 'approved')) return
+    // Superseded by an Admin edit meanwhile: it is closed, so the provider reply changes nothing.
+    if (
+      !request ||
+      request.supersededAt ||
+      (request.status !== 'applying' && request.status !== 'approved')
+    )
+      return
     const word = CONTACT_FIELD_WORD[request.field]
     const name = playerNameIn(draft, request.playerId)
     const account = draft.playerAccounts.find((entry) => entry.playerId === request.playerId)
@@ -459,7 +501,12 @@ export async function approveContactChange(requestId: string): Promise<PlayerCon
   if (isRealDataMode()) return realApproveContactChange(requestId)
   const approved = await adminMutation(900, (draft) => {
     const request = findRequest(draft, requestId)
-    if (request.status !== 'pending' || isBlocked(request.status, checksIn(draft, request)))
+    // A superseded request is closed ('rejected'), so it is refused here like any decided one.
+    if (
+      request.supersededAt ||
+      request.status !== 'pending' ||
+      isBlocked(request.status, checksIn(draft, request))
+    )
       throw new MockError('conflict', CONTACT_REVIEW_STALE_ERROR)
     request.status = 'applying'
     request.approvedAt = Date.now()
@@ -504,7 +551,8 @@ export async function retryContactApplication(
   if (isRealDataMode()) return realRetryContactApplication(requestId)
   const retried = await adminMutation(400, (draft) => {
     const request = findRequest(draft, requestId)
-    if (request.status !== 'failed') throw new MockError('conflict', CONTACT_REVIEW_STALE_ERROR)
+    if (request.supersededAt || request.status !== 'failed')
+      throw new MockError('conflict', CONTACT_REVIEW_STALE_ERROR)
     request.status = 'applying'
     request.error = undefined
     request.providerOperationRef ??= `provider-op-${crypto.randomUUID()}`

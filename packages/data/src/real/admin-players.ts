@@ -1,4 +1,4 @@
-import type { AdminPlayerEditValues } from '@rotra/schema/admin-player'
+import type { AdminPlayerProfilePatchValues } from '@rotra/schema/admin-player'
 import type {
   AdminPlayer,
   AdminPlayerDetail,
@@ -56,7 +56,7 @@ export async function realGetAdminPlayerGames(id: string, signal?: AbortSignal) 
 
 /** A-PLAYER Edit profile: name and nickname under the loaded revision; a stale form is a conflict. */
 export async function realUpdateAdminPlayer(
-  input: Omit<AdminPlayerEditValues, 'email'> & { id: string; revision: number },
+  input: AdminPlayerProfilePatchValues & { id: string; revision: number },
 ) {
   try {
     const { player } = await realRequest<{ player: WireAdminPlayer }>(

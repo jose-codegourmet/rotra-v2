@@ -1,16 +1,22 @@
 import type { ContactChangeStatus } from '@rotra/data/contact-change-request/types'
 import { Chip } from '@rotra/ui/chip'
-import { ADMIN_REQUEST_STATUS } from './ContactRequestStatusChip.variants'
+import { ADMIN_REQUEST_STATUS, SUPERSEDED } from './ContactRequestStatusChip.variants'
 
 export type ContactRequestStatusChipProps = {
   status: ContactChangeStatus
   /** A newer request for the same field, or a contact clash, blocks this one */
   conflict?: boolean
+  /** Closed by a direct Admin edit (request.supersededAt set; stored status 'rejected') */
+  superseded?: boolean
 }
 
 /** Admin's contact-change status chip (A-CONTACT-REQUESTS, A-CONTACT-REVIEW), plus Conflict. */
-export function ContactRequestStatusChip({ status, conflict }: ContactRequestStatusChipProps) {
-  const s = ADMIN_REQUEST_STATUS[status]
+export function ContactRequestStatusChip({
+  status,
+  conflict,
+  superseded,
+}: ContactRequestStatusChipProps) {
+  const s = superseded ? SUPERSEDED : ADMIN_REQUEST_STATUS[status]
   const chip = <Chip tone={s.tone}>{s.label}</Chip>
   if (!conflict) return chip
   return (

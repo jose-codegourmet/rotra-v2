@@ -16,6 +16,7 @@ import { createdOnFromRtrId, rankStatusOf } from './adminPlayer.rules'
 import type {
   AdminPlayer,
   AdminPlayerDetail,
+  AdminPlayerEdit,
   AdminPlayerList,
   AdminPlayerListParams,
 } from './adminPlayer.types'
@@ -113,6 +114,59 @@ export async function getAdminPlayer(
       .filter((entry) => entry.id !== id && entry.fullName === player.fullName)
       .map((entry) => ({ id: entry.id, name: entry.fullName, rtrId: entry.rtrId })),
   }
+}
+
+const EMPTY_LINKS = { facebook: '', instagram: '', youtube: '', linkedin: '' }
+
+/**
+ * A-PLAYER-EDIT read: the directory row plus the profile and account fields Edit changes. Admin
+ * only: it carries private contacts. Never the password, only when Admin last set one.
+ */
+export function adminPlayerEditOf(state: MockState, player: Player): AdminPlayerEdit {
+  const profile = state.playerProfiles.find((p) => p.playerId === player.id)
+  const account = state.playerAccounts.find((a) => a.playerId === player.id)
+  return {
+    ...adminPlayerOf(state, player),
+    playingStyle: profile?.playingStyle ?? '',
+    experienceYears: profile?.experienceYears ?? null,
+    experienceMonths: profile?.experienceMonths ?? null,
+    socialLinks: { ...(profile?.socialLinks ?? EMPTY_LINKS) },
+    profilePrivate: !!(account?.profilePrivate || profile?.profilePrivate),
+    previousPicture: account?.avatarPreviousRef ?? null,
+    hasAccount: !!account,
+    passwordSetAt: state.adminPlayerRecords[player.id]?.passwordSetAt ?? null,
+  }
+}
+/**
+ * A-PLAYER-EDIT; null = not found. Real mode has only the directory row so far: the profile fields
+ * read as empty and only name and nickname can be saved (backend follow-up of A07.6).
+ */
+export async function getAdminPlayerEdit(
+  id: string,
+  signal?: AbortSignal,
+): Promise<AdminPlayerEdit | null> {
+  if (isRealDataMode()) {
+    const player = await realGetAdminPlayer(id, signal)
+    if (!player) return null
+    const { samePlayers: _same, ...row } = player
+    return {
+      ...row,
+      playingStyle: '',
+      experienceYears: null,
+      experienceMonths: null,
+      socialLinks: { ...EMPTY_LINKS },
+      profilePrivate: false,
+      previousPicture: null,
+      hasAccount: row.phone !== undefined || row.email !== undefined,
+      passwordSetAt: null,
+    }
+  }
+  if ((await getAdminSession()).kind !== 'owner')
+    throw new MockError('permission', 'Only ROTRA Admin can view player management.')
+  await delay(400, signal)
+  const state = readMockState()
+  const player = state.players.find((entry) => entry.id === id)
+  return player ? adminPlayerEditOf(state, player) : null
 }
 
 export function hasPlayerGames(state: MockState, id: string) {

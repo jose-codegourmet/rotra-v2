@@ -112,5 +112,64 @@ export type AdminPlayerRecord = {
   revision: number
   createdByClubId: string | null
   adminCreated: boolean
+  /**
+   * Password *(for MVP or beta only)*: only that Admin set one, by whom and when (ISO). The
+   * password itself is never stored. Beta only, end date not set — D-2026-11-09-14.
+   */
+  passwordSetAt?: string | null
+  /** The signed-in Admin's email */
+  passwordSetBy?: string | null
+}
+
+/**
+ * A-PLAYER-EDIT: what the Edit form loads. The directory row plus every editable profile field from
+ * the player's profile and account, the previous picture and the beta-only password marker.
+ * Playing since is not stored: it is derived from the experience (ExperienceFields).
+ */
+export type AdminPlayerEdit = AdminPlayer & {
+  playingStyle: string
+  experienceYears: number | null
+  experienceMonths: number | null
+  socialLinks: { facebook: string; instagram: string; youtube: string; linkedin: string }
+  profilePrivate: boolean
+  /** The picture before the current one (photo or character), offered as Use previous picture; null = none */
+  previousPicture: string | null
+  /** Whether the player has a contact record (phone, email, sign-in). Without one, contacts stay empty. */
+  hasAccount: boolean
+  /** "Last set by Admin <time>"; null = Admin never set it. Never the password. */
+  passwordSetAt: string | null
+}
+
+/** The changed-field words, in the order the Activity log and toast list them (rotra-admin.html pmSave() LABEL). */
+export type AdminPlayerChangedField =
+  | 'profile picture'
+  | 'name'
+  | 'nickname'
+  | 'playing style'
+  | 'experience'
+  | 'private profile'
+  | 'phone privacy'
+  | 'phone'
+  | 'email'
+  | 'Facebook link'
+  | 'Instagram link'
+  | 'YouTube link'
+  | 'LinkedIn link'
+  | 'password'
+
+/** Save changes: the form values plus the record and revision it was loaded under. */
+export type AdminPlayerEditInput = import('@rotra/schema/admin-player').AdminPlayerEditValues & {
+  id: string
+  revision: number
+}
+
+/** Save changes' answer. Never carries the password. `message` is the toast. */
+export type AdminPlayerEditResult = {
+  player: AdminPlayer
+  /** Empty = "Nothing changed." (nothing saved, no Activity log entry, no revision bump) */
+  changed: AdminPlayerChangedField[]
+  passwordSet: boolean
+  /** 'Nothing changed.' or 'Saved <name>: <fields>.' (+ ' Give the new password to the player yourself.') */
+  message: string
 }
 export type AdminPlayerBulkResult = { id: string; name: string; success: boolean; error?: string }

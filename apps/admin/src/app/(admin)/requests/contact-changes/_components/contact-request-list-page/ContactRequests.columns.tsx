@@ -55,7 +55,11 @@ export function contactRequestColumns(
       enableSorting: false,
       header: 'Status',
       cell: ({ row }) => (
-        <ContactRequestStatusChip status={row.original.status} conflict={row.original.blocked} />
+        <ContactRequestStatusChip
+          status={row.original.status}
+          conflict={row.original.blocked}
+          superseded={!!row.original.supersededAt}
+        />
       ),
     },
     {

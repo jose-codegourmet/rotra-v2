@@ -15,6 +15,8 @@ export type ContactRequestStatusNoticeProps = {
   appliedAt?: number
   /** When a rejected request was declined */
   decidedAt?: number
+  /** Closed by a direct Admin edit instead of a decline (owner answer on #649, Option A) */
+  supersededAt?: number
   /** Why the approved change couldn't be applied */
   error?: string
   /** Reference time for "12 min ago"; stories pass the fixture's now */
@@ -36,6 +38,7 @@ export function ContactRequestStatusNotice({
   approvedAt,
   appliedAt,
   decidedAt,
+  supersededAt,
   error,
   now = new Date(),
 }: ContactRequestStatusNoticeProps) {
@@ -75,6 +78,13 @@ export function ContactRequestStatusNotice({
       )
     case 'rejected': {
       const decided = ago(decidedAt)
+      if (supersededAt)
+        return (
+          <Notice
+            tone="info"
+            title={`Superseded by an Admin edit${decided ? ` · ${decided}` : ''}.`}
+          />
+        )
       return (
         <Notice tone="info" title={`Not approved${decided ? ` · ${decided}` : ''}.`}>
           {firstName} keeps {mono(from)}. They can send a new request.

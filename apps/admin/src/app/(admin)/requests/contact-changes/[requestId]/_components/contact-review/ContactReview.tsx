@@ -172,7 +172,13 @@ export function ContactReview({ requestId, from }: { requestId: string; from: st
     <>
       {back}
       <PageHeader
-        eyebrow={<ContactRequestStatusChip status={request.status} conflict={request.blocked} />}
+        eyebrow={
+          <ContactRequestStatusChip
+            status={request.status}
+            conflict={request.blocked}
+            superseded={!!request.supersededAt}
+          />
+        }
         title={`${REQUEST_FIELD_LABEL[request.field]} change for ${player.fullName}`}
       />
       <ContactRequestStatusNotice
@@ -183,6 +189,7 @@ export function ContactReview({ requestId, from }: { requestId: string; from: st
         approvedAt={request.approvedAt}
         appliedAt={request.appliedAt}
         decidedAt={request.decidedAt}
+        supersededAt={request.supersededAt}
         error={request.error}
       />
       <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-5 min-[1040px]:grid-cols-[minmax(0,1fr)_340px]">

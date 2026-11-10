@@ -318,6 +318,7 @@
     "./admin-player/fetchers": "./src/admin-player/fetchers.ts",
     "./admin-player/useAdminPlayers": "./src/admin-player/useAdminPlayers.ts",
     "./admin-player/useAdminPlayer": "./src/admin-player/useAdminPlayer.ts",
+    "./admin-player/useAdminPlayerEdit": "./src/admin-player/useAdminPlayerEdit.ts",
     "./fixtures/founding-cities": "./src/fixtures/foundingCities.ts",
     "./admin-audit/types": "./src/admin-audit/adminAudit.types.ts",
     "./admin-audit/query-keys": "./src/admin-audit/queryKeys.ts",

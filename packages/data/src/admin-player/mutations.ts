@@ -1,19 +1,33 @@
 import {
+  ADMIN_PLAYER_REASON_REQUIRED,
   type AdminPlayerCreateValues,
-  type AdminPlayerEditValues,
   adminPlayerCreateSchema,
-  adminPlayerEditSchema,
+  adminPlayerEditSchemaFor,
 } from '@rotra/schema/admin-player'
 import { getAdminSession } from '../admin-account/fetchers'
 import { adminMutation } from '../admin-account/mutation'
 import { appendAdminAudit } from '../admin-audit/fetchers'
+import { normalizeContact } from '../contact-change-request/contactChangeRequest.rules'
+import { supersedeOpenContactRequests } from '../contact-change-request/fetchers'
+import { adminAccount } from '../fixtures/adminAccounts'
 import { checkMockSave } from '../mock/bridge'
-import { MockError } from '../mock/errors'
-import type { MockState } from '../mock/store'
+import { MockError, NotConnectedError } from '../mock/errors'
+import { type MockState, readMockState } from '../mock/store'
 import { realUpdateAdminPlayer } from '../real/admin-players'
 import { isRealDataMode } from '../real/mode'
-import type { AdminPlayerBulkResult } from './adminPlayer.types'
-import { adminPlayerOf } from './fetchers'
+import {
+  adminPlayerChangedFields,
+  adminPlayerEditedSummary,
+  adminPlayerSavedMessage,
+} from './adminPlayer.rules'
+import type {
+  AdminPlayer,
+  AdminPlayerBulkResult,
+  AdminPlayerChangedField,
+  AdminPlayerEditInput,
+  AdminPlayerEditResult,
+} from './adminPlayer.types'
+import { adminPlayerEditOf, adminPlayerOf, getAdminPlayerEdit } from './fetchers'
 import { duplicateGroups } from './management.rules'
 
 async function owner() {
@@ -116,59 +130,223 @@ export async function createAdminPlayer(input: AdminPlayerCreateValues) {
     return adminPlayerOf(draft, player)
   })
 }
+/** The order Save changes reports field errors in; the form focuses the first (rotra-admin.html peErrors()). */
+const EDIT_ERROR_ORDER = [
+  'picture',
+  'name',
+  'nickname',
+  'playingStyle',
+  'experienceYears',
+  'experienceMonths',
+  'facebook',
+  'instagram',
+  'youtube',
+  'linkedin',
+  'profilePrivate',
+  'phoneHidden',
+  'phone',
+  'email',
+  'password',
+  'reason',
+] as const
+const NO_CONTACT_RECORD = 'This player has no contact record yet.'
+const STALE_EDIT = 'This player changed since you opened the form. Reload before editing.'
+
+function editErrors(errors: Record<string, string>) {
+  const keys = EDIT_ERROR_ORDER.filter((key) => errors[key])
+  const ordered = Object.fromEntries(keys.map((key) => [key, errors[key] as string]))
+  const first = keys[0]
+  return new MockError('conflict', first ? (errors[first] as string) : 'Check the form.', ordered)
+}
+
+/** An unchanged picture is never rechecked (a stored reference may predate the picture rules). */
+const checkedForm = (
+  form: Omit<AdminPlayerEditInput, 'id' | 'revision'>,
+  changed: AdminPlayerChangedField[],
+) => (changed.includes('profile picture') ? form : { ...form, picture: null })
+
+/**
+ * Validates one Save changes against a store snapshot or draft: the revision, the field rules, the
+ * rules that depend on the player, uniqueness, the shown character and the reason. Throws every
+ * field error at once; returns the parsed values (never logged: they include the password) and the
+ * changed fields.
+ */
+function planEdit(state: MockState, input: AdminPlayerEditInput) {
+  const player = state.players.find((p) => p.id === input.id)
+  if (!player) throw new MockError('conflict', 'Player not found. Reload the list.')
+  const edit = adminPlayerEditOf(state, player)
+  if (edit.revision !== input.revision) throw new MockError('conflict', STALE_EDIT)
+  const { id: _id, revision: _revision, ...form } = input
+  const changed = adminPlayerChangedFields(edit, form)
+  const errors: Record<string, string> = {}
+  const parsed = adminPlayerEditSchemaFor(edit).safeParse(checkedForm(form, changed))
+  if (!parsed.success)
+    for (const issue of parsed.error.issues) {
+      const key = String(issue.path[0] ?? '')
+      errors[key] ??= issue.message
+    }
+  const values = parsed.success ? parsed.data : undefined
+  if (values && changed.includes('profile picture') && values.picture?.startsWith('character:')) {
+    const characterId = values.picture.slice('character:'.length)
+    if (!state.profileCharacters.some((c) => c.id === characterId && c.shown))
+      errors.picture = 'Choose a character.'
+  }
+  const others = state.playerAccounts.filter((a) => a.playerId !== player.id)
+  if (values && changed.includes('phone')) {
+    if (!edit.hasAccount) errors.phone = NO_CONTACT_RECORD
+    else if (
+      values.phone &&
+      others.some((a) => normalizeContact('phone', a.phone) === values.phone)
+    )
+      errors.phone = 'This phone number is already linked to another player.'
+  }
+  if (values && changed.includes('email')) {
+    if (!edit.hasAccount) errors.email = NO_CONTACT_RECORD
+    else if (
+      values.email &&
+      others.some(
+        (a) => normalizeContact('email', a.email) === normalizeContact('email', values.email),
+      )
+    )
+      errors.email = 'This email is already linked to another player.'
+  }
+  if (values && changed.includes('phone privacy') && !edit.hasAccount)
+    errors.phoneHidden = NO_CONTACT_RECORD
+  if (changed.length && !form.reason.trim()) errors.reason ??= ADMIN_PLAYER_REASON_REQUIRED
+  if (Object.keys(errors).length || !values) throw editErrors(errors)
+  return { player, edit, values, changed }
+}
+
+const editResult = (
+  player: AdminPlayer,
+  changed: AdminPlayerChangedField[],
+): AdminPlayerEditResult => ({
+  player,
+  changed,
+  passwordSet: changed.includes('password'),
+  message: adminPlayerSavedMessage(player.name, changed),
+})
+
+/**
+ * Admin › Players › Edit › Save changes (A07.6, D-2026-11-09-14): every field the player can change,
+ * plus phone and email (applied directly; no contact-change request) and the beta-only password.
+ * Revision-checked. "Nothing changed." saves nothing, logs nothing and keeps the revision, offline
+ * too (as the prototype). Otherwise one Activity log entry "Edited <name>: <fields>. Reason: …".
+ *
+ * Password *(for MVP or beta only)* — beta only, end date not set (D-2026-11-09-14): never stored,
+ * returned, logged or put in the audit summary; only that Admin set it, by whom and when.
+ */
 export async function updateAdminPlayer(
-  input: Omit<AdminPlayerEditValues, 'email'> & { id: string; revision: number },
-) {
+  input: AdminPlayerEditInput,
+): Promise<AdminPlayerEditResult> {
   await owner()
-  // A new email is never saved here: it goes for review as a contact-change request (#564).
-  const values = adminPlayerEditSchema.omit({ email: true }).parse(input)
-  if (isRealDataMode())
-    return realUpdateAdminPlayer({ ...values, id: input.id, revision: input.revision })
+  if (isRealDataMode()) return realEditAdminPlayer(input)
+  const plan = planEdit(readMockState(), input)
+  if (!plan.changed.length) return editResult(plan.edit, [])
   return adminMutation(400, (draft) => {
     checkMockSave()
-    const current = record(draft, input.id)
-    if (current.record.revision !== input.revision)
-      throw new MockError(
-        'conflict',
-        'This player changed since you opened the form. Reload before editing.',
-      )
-    // An empty picture keeps a registered player's photo, and an unclaimed one's non-link photo.
-    const keepPicture =
-      !values.picture && (current.view.claimed || !current.view.picture?.startsWith('https://'))
-    if (current.view.claimed && !keepPicture && values.picture !== (current.view.picture ?? ''))
-      throw new MockError('permission', 'Photos for registered players cannot be edited by Admin.')
-    const before = JSON.stringify({
-      name: current.view.name,
-      nickname: current.view.nickname,
-      picture: current.view.picture,
-    })
-    current.player.fullName = values.name
-    current.player.nickname = values.nickname || null
-    const profile = draft.playerProfiles.find((p) => p.playerId === input.id)
-    if (profile) {
-      profile.fullName = values.name
-      profile.nickname = values.nickname || null
-      if (!keepPicture) profile.picture = values.picture || null
-      if (current.view.claimed) profile.adminChangeNote = values.reason
+    // Rechecked on the draft: another save may have landed during the round trip.
+    const { player, edit, values, changed } = planEdit(draft, input)
+    const current = record(draft, player.id)
+    if (!changed.length) return editResult(edit, [])
+    const has = (field: AdminPlayerChangedField) => changed.includes(field)
+    const profile = draft.playerProfiles.find((p) => p.playerId === player.id)
+    if (!profile) throw new MockError('conflict', 'Player not found. Reload the list.')
+    const account = draft.playerAccounts.find((a) => a.playerId === player.id)
+    if (has('name') || has('nickname')) {
+      const name = values.name
+      const nickname = has('nickname') ? values.nickname || null : player.nickname
+      player.fullName = name
+      player.nickname = nickname
+      profile.fullName = name
+      profile.nickname = nickname
+      const rank = draft.playerRanks[player.id]
+      if (rank) {
+        rank.fullName = name
+        rank.nickname = nickname
+      }
+      for (const club of draft.clubPlayers.filter((p) => p.playerId === player.id)) {
+        club.fullName = name
+        if (has('nickname')) club.nickname = nickname
+      }
     }
-    const rank = draft.playerRanks[input.id]
-    if (rank) {
-      rank.fullName = values.name
-      rank.nickname = values.nickname || null
+    if (has('profile picture')) {
+      // rotra-admin.html pmSave(): on any picture change the old picture (photo, character or
+      // initials) becomes the previous picture. Admin save only; the player's own picker keeps
+      // its rule (D-2026-11-09-10). The store has no "initials" previous: null means none.
+      if (account) account.avatarPreviousRef = profile.picture
+      profile.picture = values.picture
     }
-    for (const club of draft.clubPlayers.filter((p) => p.playerId === input.id)) {
-      club.fullName = values.name
-      club.nickname = values.nickname || null
+    if (has('playing style')) profile.playingStyle = values.playingStyle
+    if (has('experience')) {
+      profile.experienceYears =
+        values.experienceYears === '' ? null : Number(values.experienceYears)
+      profile.experienceMonths =
+        values.experienceMonths === '' ? null : Number(values.experienceMonths)
     }
+    profile.socialLinks = {
+      facebook: values.facebook,
+      instagram: values.instagram,
+      youtube: values.youtube,
+      linkedin: values.linkedin,
+    }
+    if (has('private profile')) {
+      profile.profilePrivate = values.profilePrivate
+      if (account) account.profilePrivate = values.profilePrivate
+    }
+    if (account) {
+      if (has('phone privacy')) account.phoneHidden = values.phoneHidden
+      if (has('phone')) account.phone = values.phone
+      if (has('email')) account.email = values.email
+    }
+    if (has('password')) {
+      // The password itself goes nowhere in the mock (Supabase Auth in the backend follow-up).
+      current.record.passwordSetAt = new Date().toISOString()
+      current.record.passwordSetBy = adminAccount.email
+    }
+    if (current.view.claimed) profile.adminChangeNote = values.reason
     current.record.revision++
     appendAdminAudit(draft, {
       action: 'player_updated',
       targetType: 'player',
-      targetId: input.id,
-      summary: `Changed by ROTRA Admin: ${before} → ${JSON.stringify({ name: values.name, nickname: values.nickname || null, picture: keepPicture ? current.view.picture : values.picture || null })}. Reason: ${values.reason}`,
+      targetId: player.id,
+      summary: adminPlayerEditedSummary(values.name, changed, values.reason),
     })
-    return adminPlayerOf(draft, current.player)
+    // Owner answer on #649 (Option A): a stale open request for the same field can't be approved later.
+    if (has('phone')) supersedeOpenContactRequests(draft, player.id, 'phone')
+    if (has('email')) supersedeOpenContactRequests(draft, player.id, 'email')
+    return editResult(adminPlayerOf(draft, player), changed)
   })
+}
+
+/**
+ * Real mode keeps its name/nickname PATCH until the backend follow-up: the same checks against the
+ * real read, "Nothing changed." as in mock mode, and any other changed field is not connected yet.
+ */
+async function realEditAdminPlayer(input: AdminPlayerEditInput): Promise<AdminPlayerEditResult> {
+  const edit = await getAdminPlayerEdit(input.id)
+  if (!edit) throw new MockError('conflict', 'Player not found. Reload the list.')
+  if (edit.revision !== input.revision) throw new MockError('conflict', STALE_EDIT)
+  const { id: _id, revision: _revision, ...form } = input
+  const changed = adminPlayerChangedFields(edit, form)
+  const parsed = adminPlayerEditSchemaFor(edit).safeParse(checkedForm(form, changed))
+  const errors: Record<string, string> = {}
+  if (!parsed.success)
+    for (const issue of parsed.error.issues) errors[String(issue.path[0] ?? '')] ??= issue.message
+  if (changed.length && !form.reason.trim()) errors.reason ??= ADMIN_PLAYER_REASON_REQUIRED
+  if (Object.keys(errors).length || !parsed.success) throw editErrors(errors)
+  if (!changed.length) return editResult(edit, [])
+  if (changed.some((field) => field !== 'name' && field !== 'nickname'))
+    throw new NotConnectedError()
+  const player = await realUpdateAdminPlayer({
+    id: input.id,
+    revision: input.revision,
+    name: parsed.data.name,
+    nickname: parsed.data.nickname,
+    picture: '',
+    reason: parsed.data.reason,
+  })
+  return editResult(player, changed)
 }
 export async function changeAdminPlayers(input: {
   ids: string[]

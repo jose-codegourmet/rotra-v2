@@ -410,7 +410,13 @@
     "./player/useMySessions": "./src/player/useMySessions.ts",
     "./player/mySessions": "./src/player/mySessions.ts",
     "./player/usePlayerShareData": "./src/player/usePlayerShareData.ts",
-    "./profile-character/images": "./src/profile-character/fetchers.ts"
+    "./profile-character/images": "./src/profile-character/fetchers.ts",
+    "./profile-character/useShownProfileCharacters": "./src/profile-character/useShownProfileCharacters.ts",
+    "./profile-character/useProfileCharacterMutations": "./src/profile-character/useProfileCharacterMutations.ts",
+    "./profile-character/types": "./src/profile-character/profileCharacter.types.ts",
+    "./profile-character/rules": "./src/profile-character/profileCharacter.rules.ts",
+    "./profile-character/query-keys": "./src/profile-character/queryKeys.ts",
+    "./fixtures/profile-characters": "./src/fixtures/profileCharacters.ts"
   },
   "scripts": {
     "lint": "biome check .",

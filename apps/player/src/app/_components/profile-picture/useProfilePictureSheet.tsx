@@ -4,7 +4,7 @@ import { type PlayerPictureChoice, parsePlayerPicture } from '@rotra/data/player
 import type { PlayerProfile } from '@rotra/data/player/types'
 import { useSetMyProfilePicture } from '@rotra/data/player/useSetMyProfilePicture'
 import { useMyAccount } from '@rotra/data/player-account/useMyAccount'
-import { useProfileCharacters } from '@rotra/data/profile-character/useProfileCharacters'
+import { useShownProfileCharacters } from '@rotra/data/profile-character/useShownProfileCharacters'
 import { ProfilePictureSheet } from '@rotra/ui/profile-picture-sheet'
 import { toast } from '@rotra/ui/toaster'
 import { useState } from 'react'
@@ -15,7 +15,7 @@ export function useProfilePictureSheet(profile: PlayerProfile | null | undefined
   const [open, setOpen] = useState(false)
   const mutation = useSetMyProfilePicture()
   const account = useMyAccount(profile?.playerId ?? null)
-  const characters = useProfileCharacters()
+  const characters = useShownProfileCharacters()
   const commit = async (choice: PlayerPictureChoice) => {
     await mutation.mutateAsync(choice)
     toast(choice.kind === 'initials' ? 'Using your initials' : 'Profile picture updated')

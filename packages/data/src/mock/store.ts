@@ -22,6 +22,7 @@ import { playerAwardHistory } from '../fixtures/playerAwardHistory'
 import { playerProfiles } from '../fixtures/playerProfiles'
 import { createPlayerRankFixtures } from '../fixtures/playerRanks'
 import { clubPlayers, players } from '../fixtures/players'
+import { profileCharacters } from '../fixtures/profileCharacters'
 import { createQueueFixtures } from '../fixtures/queueSessions'
 import { rankingPolicyVersions } from '../fixtures/rankingSettings'
 import { createSessionPublicationFixtures } from '../fixtures/sessionPublications'
@@ -34,6 +35,7 @@ import type { MatchRequest } from '../match-request/matchRequest.types'
 import type { PasswordResetRequest } from '../password-reset/passwordReset.types'
 import type { Player, PlayerProfile, PlayerRank, PlayerSessionRecord } from '../player/player.types'
 import type { ClaimLinkRecord } from '../player-account/playerAccount.types'
+import type { ProfileCharacter } from '../profile-character/profileCharacter.types'
 import type {
   DownloadState,
   QueueSession,
@@ -90,6 +92,8 @@ export type MockState = {
   adminCommands: Record<string, { clubId: string }>
   /** Admin feature flags in list order; the catalog starts empty */
   featureFlags: FeatureFlag[]
+  /** Admin profile character library, shown and hidden (A-CHARACTERS) */
+  profileCharacters: ProfileCharacter[]
   /** Admin configuration › cost per session that Sales estimates with (D-2026-11-08-01) */
   salesSettings: SalesSettings
   venues: ClubVenue[]
@@ -188,6 +192,7 @@ function seedState(): MockState {
     adminAuditEvents: createAdminAuditEvents(now),
     adminCommands: {},
     featureFlags,
+    profileCharacters,
     salesSettings: salesSettingsSeed,
     venues,
     players: [...players, ...requests.players],

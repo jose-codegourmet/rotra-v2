@@ -5,6 +5,7 @@ export type AdminAuditTargetType =
   | 'contact_change_request'
   | 'feature_flag'
   | 'ranking_settings'
+  | 'profile_character'
 
 /**
  * Proposed action codes for admin_audit_events.action; no list is decided yet. Later Admin tickets
@@ -31,6 +32,11 @@ export type AdminAuditAction =
   | 'contact_change_application_retried'
   | 'feature_flag_created'
   | 'feature_flag_value_changed'
+  | 'profile_character_added'
+  | 'profile_character_shown'
+  | 'profile_character_hidden'
+  | 'profile_character_deleted'
+  | 'profile_character_restored'
 
 /**
  * One line of the Admin "Record of actions": who did what to which record, and when. Append-only;

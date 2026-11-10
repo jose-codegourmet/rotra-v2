@@ -5,7 +5,7 @@ import { checkMockSave, getMockDevState } from '../mock/bridge'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { mockStore, readMockState } from '../mock/store'
-import { profileCharacters } from '../profile-character/fetchers'
+import { isProfileCharacterShown } from '../profile-character/fetchers'
 import { isRealDataMode } from '../real/mode'
 import {
   realFindPlayerByRtrId,
@@ -126,8 +126,7 @@ export async function setMyProfilePicture(choice: PlayerPictureChoice): Promise<
   let picture: string | null
   if (choice.kind === 'initials') picture = null
   else if (choice.kind === 'character') {
-    if (!profileCharacters.some((c) => c.id === choice.id && c.shown))
-      throw new MockError('conflict', 'Choose a character.')
+    if (!isProfileCharacterShown(choice.id)) throw new MockError('conflict', 'Choose a character.')
     picture = characterPictureReference(choice.id)
   } else if (choice.kind === 'previous' || (choice.kind === 'photo' && 'src' in choice)) {
     const state = readMockState()

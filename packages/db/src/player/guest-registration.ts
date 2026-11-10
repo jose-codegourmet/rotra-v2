@@ -9,12 +9,34 @@ import { allocateRtrId } from './identity'
 const MATCH = { status: 'account-match' as const }
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
-/** Only the invitation's club name. No guest, player or private contact is exposed. */
-export async function guestRegistrationClub(clubId: string) {
+/**
+ * The registration page's context; no guest, player or private contact is exposed. `sessionSlug` (#689) is the session link the visitor came from
+ * (Register with ROTRA, D-2026-11-09-06): it must be this club's session with a live publication.
+ * It only adds the title and the way back; registering never sends a join request.
+ */
+export async function guestRegistrationClub(clubId: string, sessionSlug?: string | null) {
   if (!UUID.test(clubId)) throw new ServiceError('not_found')
   const club = await prisma.club.findUnique({ where: { id: clubId }, select: { name: true } })
   if (!club) throw new ServiceError('not_found')
-  return { clubName: club.name }
+  if (!sessionSlug)
+    return { clubName: club.name, sessionTitle: null, sessionSlug: null, sessionPageUrl: null }
+  const session = await prisma.queueSession.findUnique({
+    where: { publicSlug: sessionSlug },
+    select: {
+      clubId: true,
+      title: true,
+      publicSlug: true,
+      publication: { select: { state: true } },
+    },
+  })
+  if (!session || session.clubId !== clubId || session.publication?.state === 'deleted')
+    throw new ServiceError('not_found', { session: 'This session link is not available.' })
+  return {
+    clubName: club.name,
+    sessionTitle: session.title,
+    sessionSlug: session.publicSlug,
+    sessionPageUrl: `/s/${encodeURIComponent(session.publicSlug)}`,
+  }
 }
 
 /**
@@ -33,8 +55,9 @@ export async function registerGuest(
     password: string
     details: ClaimDetails
   },
+  sessionSlug?: string | null,
 ) {
-  await guestRegistrationClub(clubId)
+  const context = await guestRegistrationClub(clubId, sessionSlug)
   if (!/^[a-f0-9]{64}$/.test(input.attempt)) throw new ServiceError('invalid')
   const email = input.email.trim().toLowerCase()
   const token = `registration:${input.attempt}`
@@ -103,7 +126,13 @@ export async function registerGuest(
   for (let attempt = 0; ; attempt++) {
     try {
       const result = await registerFromClaim(cookies, token, { ...input, email })
-      return { status: 'registered' as const, ...result }
+      return {
+        status: 'registered' as const,
+        ...result,
+        clubName: context.clubName,
+        sessionSlug: context.sessionSlug,
+        sessionTitle: context.sessionTitle,
+      }
     } catch (error) {
       // Two replies for the same attempt may reach account creation/profile saving together.
       // Retry after the winner commits; the consumed claim still requires the same password.

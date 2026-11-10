@@ -78,7 +78,8 @@ export type PublicSessionPage = {
   title: string
   start: number
   end: number
-  club: { name: string; initials: string; logoUrl?: string | null }
+  /** `id` is the club's ID for its public registration link (Register with ROTRA, #689) */
+  club: { id?: string; name: string; initials: string; logoUrl?: string | null }
   venue: { name: string; address?: string | null }
   /** Court labels in order */
   courts: string[]

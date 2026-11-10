@@ -21,18 +21,22 @@ export type GuestRegistrationResult =
       sessionTitle: string | null
     } & CompleteClaimResult)
 
+/** The club's registration route; `?session=` when the visitor came from a session link (#689). */
+const registerPath = (clubId: string, sessionSlug?: string | null) =>
+  `/api/register/${encodeURIComponent(clubId)}${sessionSlug ? `?session=${encodeURIComponent(sessionSlug)}` : ''}`
+
 export async function getGuestRegistrationClub(
   clubId: string,
   signal?: AbortSignal,
   sessionSlug?: string | null,
 ) {
-  if (isRealDataMode() && (!clubId || sessionSlug)) throw new NotConnectedError()
+  if (isRealDataMode() && !clubId) throw new NotConnectedError()
   if (isRealDataMode())
     return realRequest<{
       clubName: string | null
       sessionTitle?: string | null
       sessionPageUrl?: string | null
-    }>(`/api/register/${encodeURIComponent(clubId)}`, {
+    }>(registerPath(clubId, sessionSlug), {
       signal,
     })
   await delay(200, signal)
@@ -60,9 +64,9 @@ export async function completeGuestRegistration(input: {
   values: RegistrationValues
 }): Promise<GuestRegistrationResult> {
   const parsed = registrationRequestSchema.parse(input)
-  if (isRealDataMode() && (!input.clubId || input.sessionSlug)) throw new NotConnectedError()
+  if (isRealDataMode() && !input.clubId) throw new NotConnectedError()
   if (isRealDataMode())
-    return realRequest(`/api/register/${encodeURIComponent(input.clubId)}`, {
+    return realRequest(registerPath(input.clubId, input.sessionSlug), {
       method: 'POST',
       body: parsed,
     })

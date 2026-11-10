@@ -2,7 +2,7 @@
 
 import { useSession } from '@rotra/data/auth/use-session'
 import { isPermissionRefusal } from '@rotra/data/mock/errors'
-import { playerLoginUrl, playerOrigin } from '@rotra/data/public-session/context'
+import { playerLoginUrl, playerOrigin, playerRegisterUrl } from '@rotra/data/public-session/context'
 import { usePlayerSessionAccess } from '@rotra/data/public-session/player-access'
 import type {
   MyJoinRequest,
@@ -602,6 +602,12 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
         returned={openJoin && viewer === 'visitor'}
         showPlayerLogin={viewer === 'visitor' && !signedIn}
         clubName={p.club.name}
+        // Real mode only: the mock Player app keeps its own store (#689).
+        registerHref={
+          joinOpen && isRealDataMode() && p.club.id && typeof location !== 'undefined'
+            ? playerRegisterUrl(p.club.id, location.href)
+            : undefined
+        }
       />
     </main>
   )

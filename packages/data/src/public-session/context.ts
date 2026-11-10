@@ -75,6 +75,23 @@ export function consumeSessionReturn(value?: string) {
   return url
 }
 
+/**
+ * Register with ROTRA (D-2026-11-09-06, #689): the Player app's registration form under the
+ * session's club, with the session for its title and the way back (`?join=1`).
+ */
+export function playerRegisterUrl(clubId: string, returnTo: string) {
+  const back = queueSessionUrl(returnTo)
+  if (!back) return undefined
+  const url = new URL(back)
+  const origin = playerOrigin(url.origin)
+  if (!origin) return undefined
+  url.searchParams.set('join', '1')
+  const register = new URL(`/register/${encodeURIComponent(clubId)}`, origin)
+  register.searchParams.set('session', url.pathname.split('/')[2] ?? '')
+  register.searchParams.set('next', url.href)
+  return register.href
+}
+
 export function playerLoginUrl(returnTo: string) {
   const back = queueSessionUrl(returnTo)
   if (!back) return undefined

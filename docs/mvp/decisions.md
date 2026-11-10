@@ -21,7 +21,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-08-04](#d-2026-11-08-04) | Scheduled jobs: Supabase pg_cron calls protected Route Handlers | approved | not started | #545; #546, #547 blocked | [Backend](workstreams/backend.md) |
 | [D-2026-11-08-06](#d-2026-11-08-06) | Player access to public Queue sessions | approved | implemented in source; authenticated real verification pending | #569 | [Queue](workstreams/queue.md) |
 | [D-2026-11-09-01](#d-2026-11-09-01) | Next-match picker after every result | approved | in progress | #579 | [Queue](workstreams/queue.md) |
-| [D-2026-11-09-02](#d-2026-11-09-02) | Signed-in Players on the session page: full names and one-tap join | approved | not started | needed | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
+| [D-2026-11-09-02](#d-2026-11-09-02) | Signed-in Players on the session page: full names and one-tap join | approved | in progress (mock app; real mode: join only) | #585, #687 | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
 | [D-2026-11-09-03](#d-2026-11-09-03) | Players check themselves in, leave, and say they can't make it | approved | in progress | #617, #619, #624, #626 | [Queue](workstreams/queue.md) |
 | [D-2026-11-09-04](#d-2026-11-09-04) | The player's live view: My night, Courts now, own standing, refresh only | approved | not started | needed | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
 | [D-2026-11-09-05](#d-2026-11-09-05) | Match requests | approved | not started | needed | [Queue](workstreams/queue.md) |
@@ -240,8 +240,8 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 <a id="d-2026-11-09-02"></a>
 ### D-2026-11-09-02 — Signed-in Players on the session page: full names and one-tap join
 - **Decision status:** approved (owner discussion, November 9, 2026; the owner chose every recommended option)
-- **Implementation status:** not started — mockups updated November 9, 2026 (`NEW` logs dated 2026-11-09 in [mockup-changes](../mockup-changes/README.md))
-- **Ticket:** needed (mockup change first, then tickets from its `NEW` logs)
+- **Implementation status:** in progress — the mock app has it all (Q17, #585). Real mode (#687, November 10, 2026): one-tap **Request to join as NAME**, **Request sent** / **Cancel request** and the confirmed, waitlist and declined cards, with identity from the Player app (`session_join_requests.player_id`, migration `20261110000100`). Full names, the uncapped roster and My night are still mock only in real mode.
+- **Ticket:** #585 (mock app), #687 (real-mode join)
 - **Roadmap:** MVP (owner, November 9, 2026: added to the scope frozen by [D-2026-11-07-04](#d-2026-11-07-04)) — [Queue](workstreams/queue.md), [Player](workstreams/player.md)
 - **Supersedes:** in part [D-2026-11-07-06](#d-2026-11-07-06) (names masked for everyone), [D-2026-11-08-06](#d-2026-11-08-06) (names masked for every audience; full roster only for confirmed players) and [D-2026-11-07-07](#d-2026-11-07-07) (a join request does not carry the signed-in player).
 - **Decision:**

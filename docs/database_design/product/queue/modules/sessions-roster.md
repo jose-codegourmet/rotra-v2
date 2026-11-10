@@ -88,11 +88,11 @@ Guest requests sent from the session link (decided October 26, 2026).
 | `name` | Required text; `nickname` optional |
 | `phone_e164` | Optional normalized mobile number; visible to the club only, never on the public page |
 | `stated_band` | `beginner`, `intermediate`, `advanced`, `unsure` (self-declared, not a level) |
-| `status` | `pending`, `confirmed`, `declined`, `closed` (November 6, 2026: a pending request closed by Cancel session; distinct from `declined`) |
+| `status` | `pending`, `confirmed`, `declined`, `closed` (November 6, 2026: a pending request closed by Cancel session; distinct from `declined`), `cancelled` (November 10, 2026, #687: a signed-in Player's own **Cancel request**) |
 | `requested_at` | Server request time; orders the review list and supplies initial waitlist arrival evidence, subject to the displacement priority above |
 | `decided_at`, `decided_by_device` | Set on confirm/decline; a closed request gets the cancel time |
 | `club_player_id` | Set on confirm: the club player created for the guest, or the existing club player of a signed-in Player |
-| `player_id` | Nullable FK to the canonical Player when a signed-in Player sent the request ([D-2026-11-09-02](../../../../mvp/decisions.md#d-2026-11-09-02)); `name`/`nickname` are then copied from the profile. Partial unique `(session_id, player_id) WHERE status = 'pending'` enforces one open request per account |
+| `player_id` | Nullable FK to the canonical Player when a signed-in Player sent the request ([D-2026-11-09-02](../../../../mvp/decisions.md#d-2026-11-09-02)); `name`/`nickname` are then copied from the profile. Partial unique `(session_id, player_id) WHERE status = 'pending'` enforces one open request per account. **Drafted** in migration `20261110000100` (#687, owner sign-off November 10, 2026); confirm then uses the Player's saved player in the club (created or restored from the profile) |
 | `invite_code_id` | Nullable FK to `session_invite_codes` when the link carried `?invite=` ([D-2026-11-09-08](../../../../mvp/decisions.md#d-2026-11-09-08)); feeds “Invited by NAME” |
 | `suggested_club_player_id`, `linked_club_player_id`, `link_declined_at` | Guest linking ([D-2026-11-09-06](../../../../mvp/decisions.md#d-2026-11-09-06)): the server's phone match among the club's unregistered saved players (never shown publicly), the record the QM chose with **Link**, and the time of **Not them**. Confirm then uses the linked record instead of creating a guest |
 

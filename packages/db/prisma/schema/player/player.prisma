@@ -38,6 +38,7 @@ model Player {
   rosterEntries         SessionPlayer[]              @relation("SessionPlayerAtEntry")
   assessments           ClubAssessment[]             @relation("AssessmentPlayer")
   activeHold            ActivePlayerHold?            @relation("ActivePlayerHold")
+  joinRequests          SessionJoinRequest[]
 
   facts          PlayerMatchFact[]          @relation("FactPlayer")
   rankCurrent    PlayerRankCurrent?

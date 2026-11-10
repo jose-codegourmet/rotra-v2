@@ -107,12 +107,14 @@ enum JoinRequestStatus {
   declined
   /// Pending requests closed by Cancel session (not a decline).
   closed
+  /// A signed-in Player withdrew their own pending request (Cancel request, D-2026-11-09-02).
+  cancelled
 
   @@map("join_request_status")
 }
 
-/// Guest request from the public session link. Never inserts roster/waitlist rows by itself.
-/// The public write endpoint and visitor ownership (#248) are later tickets.
+/// Request from the public session link: a guest's form, or a signed-in Player's one tap (player_id
+/// set, name copied from the profile). Never inserts roster/waitlist rows by itself.
 model SessionJoinRequest {
   id                String            @id @db.Uuid
   clubId            String            @map("club_id") @db.Uuid
@@ -127,8 +129,11 @@ model SessionJoinRequest {
   decidedAt         DateTime?         @map("decided_at") @db.Timestamptz(6)
   /// Device that confirmed/declined, from the same club (scoped FK added by F07.12).
   decidedByDeviceId String?           @map("decided_by_device_id") @db.Uuid
-  /// The club player created on confirm.
+  /// The club player created on confirm (or the Player's own saved player).
   clubPlayerId      String?           @map("club_player_id") @db.Uuid
+  /// The signed-in Player who sent it (D-2026-11-09-02); null for a guest. One pending per Player
+  /// and session (partial unique index in the migration).
+  playerId          String?           @map("player_id") @db.Uuid
   createdAt         DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt         DateTime          @updatedAt @map("updated_at") @db.Timestamptz(6)
   revision          BigInt            @default(1)
@@ -136,7 +141,9 @@ model SessionJoinRequest {
   session    QueueSession @relation(fields: [clubId, sessionId], references: [clubId, id], onDelete: Restrict)
   clubPlayer ClubPlayer?  @relation(fields: [clubId, clubPlayerId], references: [clubId, id], onDelete: Restrict)
   decidedBy  Device?      @relation(fields: [clubId, decidedByDeviceId], references: [clubId, id], onDelete: Restrict)
+  player     Player?      @relation(fields: [playerId], references: [id], onDelete: Restrict)
 
   @@index([sessionId, status, requestedAt])
+  @@index([playerId])
   @@map("session_join_requests")
 }

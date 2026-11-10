@@ -1,6 +1,6 @@
 # Public session page
 
-**Last verified:** 2026-11-09 for the signed-in Player experience (D-2026-11-09-02 to 05, 06, 08; mockup change, not yet in the real app). Earlier: the operator-only preview route (#469), masked participant names (#475) and the aggregate skill mix (#474).
+**Last verified:** 2026-11-10 for the real-mode signed-in join (#687). 2026-11-09 for the signed-in Player experience (D-2026-11-09-02 to 05, 06, 08; in the mock app, Q17). Earlier: the operator-only preview route (#469), masked participant names (#475) and the aggregate skill mix (#474).
 
 **Surfaces:** `Q-PUBLIC-DETAILS`, `Q-PUBLIC-PARTICIPANTS`, `Q-PUBLIC-RESULTS`, `Q-PUBLIC-STALE`, `Q-PUBLIC-JOIN`.
 
@@ -87,6 +87,8 @@ Decisions [D-2026-11-09-02](../../../../mvp/decisions.md#d-2026-11-09-02), [-03]
 **Names and roster.** Signed in: registered players show full name + nickname, guests masked, no three-row cap (participants and waitlist). Not signed in: everything masked and capped as today.
 
 **Join.** A signed-in Player not in the session sees the **Want to play?** card with the slot status, skill mix, “One tap sends your request and the Queue Master confirms it.” and a full-width **Request to join as NAME** button (no form). One tap sends; the card becomes **Request sent** (“Thanks, NAME. The Queue Master confirms every request, usually at the venue. Your slot isn't held until they do.”) with **Cancel request**. One open request per account: a second tap is impossible. Waitlisted: **Confirmed · waitlist #N**. Declined: **Request not accepted**.
+
+*Real mode (#687, November 10, 2026):* the Queue app holds no Player session. The page asks the Player app (`player.rotra.club/api/public-sessions/<slug>/access`, credentialed, paired origins only) who is signed in, and **Request to join as NAME** / **Cancel request** are `POST …/join` and `…/cancel` on the same origin. The join card waits for that check, so a signed-in Player never sees the guest card first. A signed-in Player never gets the Request to join sheet (no guest form, no Log in or Register choices); coming back from the login with `?join=1` shows the one-tap card. Full names, the uncapped roster, Courts now and My night are still mock only in real mode.
 
 **Refresh bar** (`/s/<slug>` only, under the hero): “Updated 7:42 PM · Refresh”, adding “· Venue changes haven't synced yet” when the server knows the venue has unsynced changes. **Refresh** is disabled for 10 s after a tap (tooltip/aria “Refresh again in a few seconds”). Only data refreshes, rendered in place; no polling, no Realtime.
 

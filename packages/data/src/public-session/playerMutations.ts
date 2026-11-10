@@ -3,6 +3,8 @@ import { getMockDevState, requireOnline } from '../mock/bridge'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, mockStore, readMockState } from '../mock/store'
+import { isRealDataMode } from '../real/mode'
+import { realCancelMyJoinRequest, realJoinAsPlayer } from '../real/public-session'
 import type { SaveOutcome } from '../sync/sync.types'
 import { makeInviteCode, playerSlot } from './publicSession.rules'
 import type { JoinAsPlayerInput, PlayerSessionInput } from './publicSession.types'
@@ -10,7 +12,8 @@ import type { JoinAsPlayerInput, PlayerSessionInput } from './publicSession.type
 /**
  * Player-side writes from a signed-in ROTRA Player on the session page (Q17.2, mock only). They go
  * straight to the server, never through the club device's sync log, so the Queue Master sees them
- * with their next refresh. Real mode has no route yet: `delay` refuses with NotConnectedError.
+ * with their next refresh. Real mode has no route yet for the others: `delay` refuses with NotConnectedError; Request to
+ * join and Cancel request go to the Player app (#687).
  * Identity (`playerId`) comes from the Player session; the server checks the roster link.
  */
 function fail(text: string, kind: 'permission' | 'conflict' = 'permission'): never {
@@ -56,6 +59,8 @@ function requireRosterRow(state: MockState, session: MockState['sessions'][numbe
  * `inviteCode` from `?invite=` that belongs to this session becomes “Invited by NAME”.
  */
 export function joinAsPlayer(slug: string, input: JoinAsPlayerInput) {
+  // Real mode (#687): the Player app knows who is signed in; no playerId or invite code is sent.
+  if (isRealDataMode()) return realJoinAsPlayer(slug)
   return playerWrite(
     slug,
     (s, session) => {
@@ -109,6 +114,7 @@ export function joinAsPlayer(slug: string, input: JoinAsPlayerInput) {
 
 /** **Cancel request** while the account's request is still pending; it becomes `cancelled`. */
 export function cancelMyJoinRequest(slug: string, input: PlayerSessionInput) {
+  if (isRealDataMode()) return realCancelMyJoinRequest(slug)
   return playerWrite(
     slug,
     (s, session) => {

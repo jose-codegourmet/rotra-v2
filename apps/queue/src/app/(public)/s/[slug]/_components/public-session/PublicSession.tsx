@@ -98,6 +98,10 @@ type SignedInViewer = {
   busy: boolean
 }
 
+/** The signed-in Player's ID: the mock session's account, or the Player app's access read. */
+const signedInId = (as: { id: string } | { playerId: string }) =>
+  'playerId' in as ? as.playerId : as.id
+
 /** The join card variant: this visitor's own request first, then requests off, open or full. */
 function joinCardProps(
   page: PublicSessionPage,
@@ -177,8 +181,12 @@ function courtsNowProps(courts: PublicCourtNow[]): PublicSessionCourtNow[] {
 function queueAccess(playerId: string, queue: PublicQueuedMatch[]): PlayerSessionAccess {
   const side = (players: PublicQueuedMatch['teamA']) =>
     players.map((player) => ({ name: player.name, level: player.level }))
+  // Only the queue is read here; the join fields come from the signed-in read's own data.
   return {
     playerId,
+    name: '',
+    inSession: true,
+    joinRequest: null,
     fullRoster: true,
     participants: [],
     queue: queue.map((match) => ({
@@ -235,9 +243,9 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
   const page = usePublicSession(slug, { visitor: viewer === 'visitor' })
   const mine = useMyJoinRequest(slug)
   const playerAccess = usePlayerSessionAccess(slug, viewer === 'visitor')
-  // The signed-in Player on the visitor's own page. Mock mode reads the mock Player sign-in; real
-  // mode has no Player session in this app yet, so no one-tap card there (the signed-in reads
-  // are mock only too).
+  // The signed-in Player on the visitor's own page. Mock mode reads the mock Player sign-in. Real
+  // mode has no Player session in this app: the Player app's access read (below) says who is
+  // signed in, for the join card only (#687); the other signed-in reads are mock only.
   const playerSession = useSession('player')
   const viewerAccount =
     viewer === 'visitor' && !isRealDataMode() && playerSession.data?.account.audience === 'player'
@@ -256,6 +264,10 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
     !dev.offline
       ? playerAccess.data
       : null
+  // Real mode (#687): the signed-in Player from the Player app's own sign-in, never a token here.
+  const realPlayer = viewer === 'visitor' && isRealDataMode() && access ? access : null
+  // Until that check answers, a signed-in Player must not see the guest card first.
+  const realPlayerChecking = viewer === 'visitor' && isRealDataMode() && playerAccess.isPending
   const [tab, setTab] = useState('details')
   const [loginHref, setLoginHref] = useState<string>()
   // The Player app's origin for profile links; only known in the browser.
@@ -352,42 +364,48 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
   const mode = MODES[p.mode]
   const cancelWhy = (p.cancelReason ?? '').replace(/[.\s]+$/, '')
   // Sending a request needs internet; the guest's own connection is the DevMenu toggle here.
-  const signedIn: SignedInViewer | undefined =
-    viewerAccount && night.data
-      ? {
-          name: viewerAccount.name,
-          busy: joinAsPlayer.isPending || cancelMyRequest.isPending,
-          onJoin: () =>
-            joinAsPlayer.mutate(
-              { playerId: viewerAccount.id, inviteCode: inviteCode ?? null },
-              {
-                onSuccess: (done) => toast(done.message),
-                onError: (error) => toast.error(error.message),
-              },
-            ),
-          onCancelRequest: () =>
-            cancelMyRequest.mutate(
-              { playerId: viewerAccount.id },
-              {
-                onSuccess: (done) => toast(done.message),
-                onError: (error) => toast.error(error.message),
-              },
-            ),
-        }
-      : undefined
+  const signedInAs = viewerAccount && night.data ? viewerAccount : realPlayer
+  const signedIn: SignedInViewer | undefined = signedInAs
+    ? {
+        name: signedInAs.name,
+        busy: joinAsPlayer.isPending || cancelMyRequest.isPending,
+        onJoin: () =>
+          joinAsPlayer.mutate(
+            { playerId: signedInId(signedInAs), inviteCode: inviteCode ?? null },
+            {
+              onSuccess: (done) => toast(done.message),
+              onError: (error) => toast.error(error.message),
+            },
+          ),
+        onCancelRequest: () =>
+          cancelMyRequest.mutate(
+            { playerId: signedInId(signedInAs) },
+            {
+              onSuccess: (done) => toast(done.message),
+              onError: (error) => toast.error(error.message),
+            },
+          ),
+      }
+    : undefined
   // A signed-in Player's request comes from their account, not from this browser's guest request.
   // Already confirmed or waitlisted without a request (added by the Queue Master): no join card.
-  const inSession = !!signedIn && night.data?.status !== 'none' && !night.data?.joinRequest
+  const ownRequest = realPlayer && !viewerAccount ? realPlayer.joinRequest : night.data?.joinRequest
+  const inSession =
+    realPlayer && !viewerAccount
+      ? realPlayer.inSession &&
+        ownRequest?.status !== 'pending' &&
+        ownRequest?.status !== 'confirmed'
+      : !!signedIn && night.data?.status !== 'none' && !night.data?.joinRequest
   // While the signed-in Player's own read is loading or failed there is no join card (a guest
   // form would be wrong for them); the My night area below shows the loading or error state.
   const nightPending = !!viewerAccount && !night.data
   const nightFailed = nightPending && (night.isError || night.fetchStatus === 'paused')
   const card =
-    inSession || nightPending
+    inSession || nightPending || realPlayerChecking
       ? null
       : joinCardProps(
           p,
-          signedIn ? night.data?.joinRequest : mine.data,
+          signedIn ? ownRequest : mine.data,
           () => setJoinOpen(true),
           dev.offline,
           signedIn,
@@ -542,8 +560,8 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
             acceptJoinRequests={
               p.acceptJoinRequests && (p.status === 'prepared' || p.status === 'active')
             }
-            onRequestToJoin={() => setJoinOpen(true)}
-            disabled={dev.offline}
+            onRequestToJoin={signedIn ? signedIn.onJoin : () => setJoinOpen(true)}
+            disabled={dev.offline || !!signedIn?.busy}
           />
         </TabsContent>
       </Tabs>
@@ -576,7 +594,10 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
       <JoinRequestSheet
         slug={slug}
         sessionLine={`${p.title} · ${date(p.start)}, ${time(p.start)} · ${p.venue.name}`}
-        open={joinOpen}
+        // A signed-in Player joins with the card's one tap, never the guest form (#687).
+        // While real mode checks the Player sign-in (back from the login with ?join=1), the guest
+        // form must not flash open first.
+        open={joinOpen && !signedIn && !realPlayerChecking}
         onOpenChange={setJoinOpen}
         returned={openJoin && viewer === 'visitor'}
         showPlayerLogin={viewer === 'visitor' && !signedIn}

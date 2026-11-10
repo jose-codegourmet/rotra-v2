@@ -11,6 +11,8 @@ export const publicSessionKeys = {
   matchRequestOptions: (slug: string, playerId: string) =>
     ['public-session', 'match-request-options', slug, playerId] as const,
   myRequest: (slug: string) => ['public-session', 'my-request', slug] as const,
+  /** The signed-in Player in the account bar (#693): name, nickname, RTR ID, picture */
+  account: (playerId: string) => ['public-session', 'account', playerId] as const,
   /** This Player's Session invite code for the session (made on first read, then stable) */
   inviteCode: (slug: string, playerId: string) =>
     ['public-session', 'invite-code', slug, playerId] as const,

@@ -292,7 +292,12 @@ type Tx = Parameters<Parameters<typeof prisma.$transaction>[0]>[0]
 async function playerStanding(tx: Tx, playerId: string, sessionId: string) {
   const player = await tx.player.findUnique({
     where: { id: playerId },
-    select: { fullName: true },
+    select: {
+      fullName: true,
+      nickname: true,
+      avatarRef: true,
+      idAllocation: { select: { rtrId: true } },
+    },
   })
   if (!player) throw new ServiceError('forbidden')
   const roster = await tx.sessionPlayer.findFirst({
@@ -327,7 +332,15 @@ async function playerStanding(tx: Tx, playerId: string, sessionId: string) {
       waitlistPosition: index < 0 ? null : index + 1,
     }
   }
-  return { name: player.fullName, inSession, joinRequest }
+  return {
+    name: player.fullName,
+    // The session page's account bar (#693)
+    nickname: player.nickname,
+    rtrId: player.idAllocation?.rtrId ?? null,
+    pictureUrl: player.avatarRef,
+    inSession,
+    joinRequest,
+  }
 }
 
 /** #569: authenticated Player only. Eligibility is the current roster link, never a browser ID. */

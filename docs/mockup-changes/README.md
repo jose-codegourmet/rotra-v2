@@ -287,5 +287,5 @@ TICKETED: 1 · IN PROGRESS: 4 · IN MOCK APP: 100 · CANCELLED: 1 · MOCKUP ONLY
 | [2026-11-09-queue-session-invite](2026-11-09-queue-session-invite.md) | Session page: Session invite share card for confirmed and waitlisted players | session-join-qr, segmented-control, sheet, button | IN MOCK APP — #602 |
 | [2026-11-10-player-games-share-avatars](2026-11-10-player-games-share-avatars.md) | Games share cards show teams and clear scores | session-games-share-card, share-card, avatar | IN MOCK APP — #682 |
 | [2026-11-10-queue-prep-header-icons](2026-11-10-queue-prep-header-icons.md) | Preparation header: icon buttons, and Cancel/Delete session in a ⋯ menu | page-header, button, icon, overflow-menu, more-options-sheet | IN MOCK APP — #697 (PR #698) |
-| [2026-11-10-queue-public-account-bar](2026-11-10-queue-public-account-bar.md) | Session page: account bar with Log in, or the signed-in Player and Sign out | public-account-bar (new), avatar, button | TICKETED — #585 |
+| [2026-11-10-queue-public-account-bar](2026-11-10-queue-public-account-bar.md) | Session page: account bar with Log in, or the signed-in Player and Sign out | public-account-bar (new), avatar, button | IN MOCK APP — #585 |
 <!-- status-index:end -->

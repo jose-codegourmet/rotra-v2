@@ -46,6 +46,7 @@ import type {
   PublicSessionParticipant,
   PublicSessionResults,
   SendJoinRequestInput,
+  SessionPageAccount,
   SignedInPublicSession,
 } from './publicSession.types'
 
@@ -348,6 +349,26 @@ export async function getPublicSession(
   return project(state, slug, sync)
 }
 
+/** The account bar's Player (#693): profile name, nickname, RTR ID and picture. */
+function sessionPageAccountOf(state: MockState, playerId: string): SessionPageAccount {
+  const player = state.players.find((p) => p.id === playerId)
+  return {
+    playerId,
+    name: player?.fullName ?? '',
+    nickname: player?.nickname ?? null,
+    rtrId: player?.rtrId ?? null,
+    pictureUrl: pictures[playerId] ?? null,
+  }
+}
+
+/** The signed-in Player for the session page's account bar (#693). Mock only. */
+export async function getSessionPageAccount(playerId: string): Promise<SessionPageAccount> {
+  await delay()
+  const { state } = serverState()
+  requireSignedInPlayer(state, playerId)
+  return sessionPageAccountOf(state, playerId)
+}
+
 function requireSignedInPlayer(state: MockState, playerId: string) {
   if (!state.players.some((p) => p.id === playerId))
     throw new MockError('permission', 'Sign in with ROTRA Player to see this.')
@@ -646,8 +667,7 @@ export function mockPlayerSessionAccess(slug: string, playerId: string): PlayerS
       ? waitlist.findIndex((w) => w.clubPlayerId === request.clubPlayerId)
       : -1
   return {
-    playerId,
-    name: state.players.find((p) => p.id === playerId)?.fullName ?? '',
+    ...sessionPageAccountOf(state, playerId),
     inSession: !!slot.roster || !!slot.waitlist,
     joinRequest: request
       ? {

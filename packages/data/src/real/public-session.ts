@@ -69,3 +69,18 @@ async function playerSessionWrite(slug: string, action: 'join' | 'cancel') {
 
 export const realJoinAsPlayer = (slug: string) => playerSessionWrite(slug, 'join')
 export const realCancelMyJoinRequest = (slug: string) => playerSessionWrite(slug, 'cancel')
+
+/**
+ * **Sign out** from the session page's account bar (#693): signs the Player out of ROTRA Player on
+ * this device. A credentialed call to the Player app, like Request to join.
+ */
+export async function realSignOutOnSessionPage(slug: string) {
+  const origin = typeof location === 'undefined' ? null : playerOrigin(location.origin)
+  if (!origin) return null
+  await realRequest<null>(`${origin}${base(slug)}/sign-out`, {
+    method: 'POST',
+    body: {},
+    credentials: 'include',
+  })
+  return null
+}

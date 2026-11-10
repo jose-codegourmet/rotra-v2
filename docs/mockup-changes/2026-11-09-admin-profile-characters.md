@@ -1,6 +1,6 @@
 # Settings › Profile characters: a plain grid of the character images players pick from
 
-Status: TICKETED — #589
+Status: IN PROGRESS — #589
 Date: 2026-11-09
 App: admin
 Mockup: apps/mockup/admin-app/rotra-admin.html › Settings › Profile characters

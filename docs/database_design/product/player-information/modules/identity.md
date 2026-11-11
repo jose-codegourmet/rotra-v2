@@ -120,7 +120,7 @@ Fictional data only. Decided 2026-11-07 unless marked open.
 
 ## Club membership, email confirmation and registration location ([D-2026-11-09-06](../../../../mvp/decisions.md#d-2026-11-09-06))
 
-Club membership is a row in `club_players` (the club's saved players). Add `joined_via` with `club_link | session_link | added_by_club`, shown as “Joined via club link”, “Joined via session link” or “Added by the club”. **Leave club** deletes that row; game history stays. A player can have several rows. `player_private_contacts` (or the account mapping) gains nullable `email_confirmed_at`; while null, contact-change requests are refused. Admin-link registrations store the chosen city or province (from `location_codes`) as the RTR ID location; club and session links use the club's founding location. Report a problem has no table.
+Club membership is a row in `club_players` (the club's saved players). Add `joined_via` with `club_link | session_link | added_by_club`, shown as “Joined via club link”, “Joined via session link” or “Added by the club”. **Leave club** sets that row's `removed_at` and keeps it for history, never a hard delete (owner decision, F07.64); Join club again clears `removed_at`. Game history stays. A player can have several rows. `player_private_contacts` (or the account mapping) gains nullable `email_confirmed_at`; while null, contact-change requests are refused. Admin-link registrations store the chosen city or province (from `location_codes`) as the RTR ID location; club and session links use the club's founding location. Report a problem has no table.
 
 ## Guest registration implementation (#490)
 

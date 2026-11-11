@@ -1222,21 +1222,21 @@ function seedPlayers() {
   return [
     mk('p1', 'Miguel Santos', 'Migs', 'registered', 'RTR-PH-CEB-031526-0001', 23, 6, 0.62, true),
     mk('p2', 'Bea Castillo', '', 'registered', 'RTR-PH-CEB-031526-0002', 19, 7, 0.55),
-    mk('p3', 'Jomar dela Cruz', 'Jom', 'unclaimed', 'RTR-PH-CEB-040226-0007', 18, 5, 0.48),
+    mk('p3', 'Jomar dela Cruz', 'Jom', 'unclaimed', null, 18, 5, 0.48),
     mk('p4', 'Kat Lim', '', 'registered', 'RTR-PH-CEB-040226-0011', 15, 8, 0.51, true),
     mk('p5', 'Enzo Navarro', '', 'registered', 'RTR-PH-MNL-050726-0014', 24, 6, 0.66),
-    mk('p6', 'Joanna Tan', 'Jo', 'unclaimed', 'RTR-PH-CEB-050726-0019', 14, 2, null),
+    mk('p6', 'Joanna Tan', 'Jo', 'unclaimed', null, 14, 2, null),
     mk('p7', 'Rafa Aquino', '', 'registered', 'RTR-PH-CEB-061126-0021', 20, 5, 0.58),
     mk('p8', 'Lia Bautista', '', 'guest', null, null, 1, null),
     mk('p9', 'Carlo Medina', '', 'registered', 'RTR-PH-CEB-061126-0025', 16, 6, 0.33),
-    mk('p10', 'Nina Ocampo', '', 'unclaimed', 'RTR-PH-CEB-070926-0030', 13, 5, 0.45),
+    mk('p10', 'Nina Ocampo', '', 'unclaimed', null, 13, 5, 0.45),
     mk('p11', 'Paulo Garcia', 'Pau', 'registered', 'RTR-PH-DVO-070926-0031', 21, 9, 0.6),
     mk('p12', 'Sam Villareal', '', 'guest', null, null, 3, null),
     mk('p13', 'Dani Rivera', '', 'registered', 'RTR-PH-CEB-081326-0040', 17, 5, 0.5),
     mk('p14', 'Theo Ramos', '', 'registered', 'RTR-PH-MNL-081326-0042', 25, 4, null),
     mk('p15', 'Ysa Fernandez', '', 'guest', null, null, 0, null),
     mk('p16', 'Marco Lopez', '', 'registered', 'RTR-PH-ILO-090226-0047', 15, 6, 0.72),
-    mk('p17', 'Gab Torres', '', 'unclaimed', 'RTR-PH-CEB-090226-0050', 19, 1, null),
+    mk('p17', 'Gab Torres', '', 'unclaimed', null, 19, 1, null),
     // D-2026-11-09-06: how a saved player joined the club (joinedVia), and a guest's phone kept for linking by the QM.
     { ...mk('p18', 'Iya Mercado', '', 'registered', 'RTR-PH-CEB-091626-0055', 14, 5, 0.4), joinedVia: 'club' },
     { ...mk('p19', 'Kiko Salazar', '', 'guest', null, null, 6, 0.5), phone: '0917 555 0188' },
@@ -1244,20 +1244,21 @@ function seedPlayers() {
     // Regulars who fill the example sessions (full house, over budget, waitlists).
     mk('p21', 'Rhea Villanueva', '', 'registered', 'RTR-PH-CEB-101426-0064', 16, 4, 0.52),
     mk('p22', 'Jun Alcantara', 'Jun', 'registered', 'RTR-PH-CEB-101426-0066', 22, 7, 0.61),
-    mk('p23', 'Mika Soriano', '', 'unclaimed', 'RTR-PH-CEB-102126-0070', 12, 3, null),
+    mk('p23', 'Mika Soriano', '', 'unclaimed', null, 12, 3, null),
     mk('p24', 'Bong Rosales', '', 'guest', null, null, 2, null),
     mk('p25', 'Cara Yap', '', 'registered', 'RTR-PH-CEB-102126-0073', 18, 6, 0.47),
     mk('p26', 'Nico Abella', '', 'registered', 'RTR-PH-MNL-102826-0077', 20, 5, 0.56),
     mk('p27', 'Tin Gonzaga', '', 'guest', null, null, 1, null),
     mk('p28', 'Arvin Uy', '', 'registered', 'RTR-PH-CEB-102826-0080', 24, 8, 0.64),
-    { ...mk('p29', 'Faye Dimaculangan', '', 'unclaimed', 'RTR-PH-DVO-110426-0083', 13, 2, null), noPhone: true },
+    { ...mk('p29', 'Faye Dimaculangan', '', 'unclaimed', null, 13, 2, null), noPhone: true },
     { ...mk('p30', 'Lance Ybañez', '', 'registered', 'RTR-PH-CEB-110426-0085', 17, 4, 0.5), joinedVia: 'session' },
   ];
 }
+// Player Information search shows registered players only. Guests and unclaimed profiles stay in the club
+// that saved them and are never found by another club (owner, Nov 11 2026).
 const DIRECTORY = [
   { id: 'g1', name: 'Paolo Reyes', identity: 'registered', rtr: 'RTR-PH-MNL-020326-0112', sugg: 6, rank: 'Rank 214' },
   { id: 'g2', name: 'Trish Mendoza', identity: 'registered', rtr: 'RTR-PH-DVO-041926-0038', sugg: 5, rank: 'Rank 388' },
-  { id: 'g3', name: 'Leo Pascual', identity: 'unclaimed', rtr: 'RTR-PH-CEB-052126-0016', sugg: 2, rank: 'Not ranked yet' },
   { id: 'g4', name: 'Marco Lim', identity: 'registered', rtr: 'RTR-PH-ILO-071226-0009', sugg: 4, rank: 'Rank 1,042' },
 ];
 
@@ -1766,6 +1767,8 @@ const monthStart = (t) => { const d = new Date(t); return new Date(d.getFullYear
 
 // ---------- Shared fragments ----------
 const chip = (t, k = '') => `<span class="chip ${k}">${t}</span>`;
+// The second line under a saved player's name: their RTR ID, or why they have none yet.
+const idLine = (p) => (p.rtr ? esc(p.rtr) : p.identity === 'unclaimed' ? 'Not registered yet' : 'Guest');
 const identChip = (p) => chip(IDENT[p.identity] || esc(p.identity), p.identity === 'registered' ? 'ok' : p.identity === 'pending' ? 'warn' : '');
 const sw = (on, act, attrs, label) => `<button class="switch" role="switch" aria-checked="${!!on}" aria-label="${esc(label)}" data-act="${act}" ${attrs}></button>`;
 const notice = (kind, html) => `<div class="notice ${kind}">${kind === 'ok' ? I.check : kind ? I.alert : I.info}<div>${html}</div></div>`;
@@ -3375,7 +3378,7 @@ const RV_BY = [
   ['skill', 'Skill group', (s, r) => (r.level == null ? 'No level' : LEVELS[r.level].band), ['Advanced', 'Intermediate', 'Beginner', 'No level']],
   ['avail', 'Availability', (s, r) => (r.present ? 'Present' : 'Not present'), ['Present', 'Not present']],
   ['prior', 'Returning or first time', (s, r) => (P(r.pid).prior > 0 ? 'Returning' : 'First time here'), ['Returning', 'First time here']],
-  ['profile', 'ROTRA profile', (s, r) => (['registered', 'unclaimed'].includes(P(r.pid).identity) ? 'Has a ROTRA profile' : 'Guest'), ['Has a ROTRA profile', 'Guest']],
+  ['profile', 'ROTRA profile', (s, r) => (P(r.pid).identity === 'registered' ? 'Has a ROTRA profile' : 'Guest'), ['Has a ROTRA profile', 'Guest']],
   ['paid', 'Payment', (s, r) => ((s.payments || {})[r.pid] ? 'Paid' : 'Not paid'), ['Paid', 'Not paid']],
 ];
 const rvLevel = (r, p, live) => `<div class="lvcol">${live ? `<b>${esc(lvLabel(r.level))} · Fixed after start</b>` : selectLevel(`lv-${r.pid}`, r.level, `data-act-change="setLevel" data-pid="${r.pid}" aria-label="Level for ${esc(p.name)} at this club" aria-describedby="lvd-${r.pid}"`, r.level == null)}${levelDiff(r.level, p.sugg, `lvd-${r.pid}`)}</div>`;
@@ -4424,14 +4427,14 @@ const SHEETS = {
   profile(sh) {
     const p = P(sh.id);
     const city = regCity(p);
-    const status = { registered: 'Registered ROTRA player', unclaimed: 'Profile exists but not claimed yet', guest: 'Guest, no ROTRA profile', pending: 'Profile lookup after the session syncs' }[p.identity];
+    const status = { registered: 'Registered ROTRA player', unclaimed: 'Saved by your club with a phone. Not registered with ROTRA yet', guest: 'Guest, no ROTRA profile', pending: 'Profile lookup after the session syncs' }[p.identity];
     return sheetShell(esc(p.name), `
       <div class="li" style="padding:0">${avatar(p, 'xl')}<div class="main stack tight"><div class="row">${identChip(p)}</div><span class="small muted">${status}</span></div></div>
       <dl class="kv">
         <dt>Nickname</dt><dd>${p.nick ? esc(p.nick) : '—'}</dd>
         <dt>Level suggestion</dt><dd>${p.sugg != null ? esc(lvLabel(p.sugg)) : 'None yet'}</dd>
         <dt>Registered in</dt><dd>${city ? esc(city) : 'Not registered yet'}</dd>
-        <dt>RTR ID</dt><dd>${p.rtr ? `<span class="mono small">${esc(p.rtr)}</span>` : 'None yet'}</dd>
+        <dt>RTR ID</dt><dd>${p.rtr ? `<span class="mono small">${esc(p.rtr)}</span>` : p.identity === 'unclaimed' ? 'Given when they register' : 'None yet'}</dd>
         <dt>Added to club</dt><dd>${new Date(addedAt(p)).toLocaleDateString([], { month: 'long', day: 'numeric', year: 'numeric' })}</dd>
         <dt>Sessions here</dt><dd>${p.prior}</dd>
         <dt>Phone</dt><dd>${p.phoneHidden ? 'Hidden by player' : p.identity === 'guest' && !p.phone ? 'None on file' : 'Kept private; confirmed in person when adding them to a session'}</dd>
@@ -4447,7 +4450,7 @@ const SHEETS = {
     const list = saved().filter((p) => p.id !== g.id && (!q || p.name.toLowerCase().includes(q) || (p.nick || '').toLowerCase().includes(q) || (p.rtr || '').toLowerCase().includes(q))).sort((a, b) => a.name.localeCompare(b.name));
     return sheetShell(`Link ${esc(g.name)} to a saved player`, `<p class="small muted">Choose the saved player who is the same person. ${esc(g.name)}'s slots, games and payments here move to that record. Nothing merges until you pick one.</p>
       <label class="field"><span>Search saved players</span><input class="input" id="link-q" data-bind="ui.sheet.q" data-rerender value="${esc(sh.q || '')}" placeholder="Name, nickname or RTR ID" data-autofocus></label>
-      <div class="sel-list">${list.map((p) => `<button class="opt" data-act="linkPlayer" data-id="${p.id}">${avatar(p)}<div class="main"><b>${esc(p.name)}</b><div class="small muted">${p.rtr ? esc(p.rtr) : 'Guest'}</div></div>${identChip(p)}</button>`).join('') || '<div class="empty">No saved player matches.</div>'}</div>`,
+      <div class="sel-list">${list.map((p) => `<button class="opt" data-act="linkPlayer" data-id="${p.id}">${avatar(p)}<div class="main"><b>${esc(p.name)}</b><div class="small muted">${idLine(p)}</div></div>${identChip(p)}</button>`).join('') || '<div class="empty">No saved player matches.</div>'}</div>`,
       `<button class="btn" data-act="openProfile" data-id="${g.id}">Back</button>`);
   },
   deletePlayer(sh) {
@@ -4482,7 +4485,7 @@ const SHEETS = {
       <div class="fgrid">${input('ep-name', 'Full or display name', 'name')}${input('ep-nick', 'Nickname (optional)', 'nick')}</div>
       <label class="field"><span>Level for this club (optional)</span>${selectLevel('ep-level', d.level, 'data-bind="ui.sheet.d.level" data-num')}</label>
       ${phoneOnFile ? `<div class="field"><span>Phone</span><p class="small">On file and kept private. Not their number? Ask ROTRA to change it.</p></div>`
-        : input('ep-phone', 'Phone (optional)', 'phone', { type: 'tel', im: 'tel', ph: '0917 555 0142', hint: claim ? 'This profile has no phone yet. They need one to register.' : "With a phone, ROTRA can match or create their profile when it syncs." })}
+        : input('ep-phone', 'Phone (optional)', 'phone', { type: 'tel', im: 'tel', ph: '0917 555 0142', hint: claim ? 'This profile has no phone yet. They need one to register.' : "With a phone, ROTRA can link them to their account if they're registered, when it syncs." })}
       ${claim ? `${input('ep-email', 'Email (optional)', 'email', { type: 'email', im: 'email', ph: 'name@example.com', hint: 'Fills in their registration. Never shown publicly.' })}
         <div class="field"><span>Playing style (optional)</span><textarea class="input" id="ep-style" data-bind="ui.sheet.d.style" maxlength="280">${esc(d.style)}</textarea></div>
         ${expFields('ep', 'ui.sheet.d', d, e.exp)}
@@ -4495,7 +4498,7 @@ const SHEETS = {
     const code = (hashStr(`${p.id}${p.name}`) >>> 0).toString(36).toUpperCase().padStart(7, 'X').slice(0, 7);
     const link = claim ? `https://player.rotra.club/claim/${code}` : 'https://player.rotra.club/register/6cd364d4-0e3a-5c3d-9e75-2116cc845714';
     return sheetShell(claim ? `Invite ${esc(p.name)} to claim their profile` : `Invite ${esc(p.name)} to ROTRA`, `
-      <p>${claim ? 'They already have a ROTRA profile from playing here. This link lets them claim it' : 'This link lets them create a ROTRA account'} with their phone and email, so their games and rank follow them to every club.</p>
+      <p>${claim ? 'Your club saved them with a phone. This link lets them turn that record into a ROTRA account' : 'This link lets them create a ROTRA account'} with their phone and email, so their games and rank follow them to every club.</p>
       ${S.online ? `<div class="field"><span>Invite link</span><div class="invite-link"><input class="input" id="invite-link" readonly value="${link}" aria-label="Invite link"><button class="btn sm primary" data-act="copyInvite" data-v="${link}">Copy link</button></div><span class="hint">Send it any way you like, such as Messenger or SMS. ${claim ? 'Works once and lasts 7 days. Opening Invite again makes a new link and cancels this one.' : ''} Sample link in this prototype.</span></div>`
         : notice('warn', 'Making an invite link needs an internet connection.')}
       <p class="small muted">${claim ? '' : 'Their guest record stays unlinked until they accept a separate linking invitation. '}The link only sets up their account. It doesn't book them into a session; you still add players to each session yourself.</p>`,
@@ -4584,17 +4587,11 @@ const SHEETS = {
     let body = `${club ? notice('', "Adding to your saved players. They won't be added to a session.") : notice('', `Adding to <b>${esc(s.title)}</b>.${live ? ' Late players get a level now, and it locks for the rest of the session.' : ''}`)}${sh.last && !sh.pick ? `<div role="status">${notice('ok', `${esc(sh.last)}${sh.added > 1 ? ` <span class="small muted">· ${sh.added} added so far</span>` : ''}`)}</div>` : ''}${full ? notice('warn', `<b>All ${capacityOf(s)} slots are taken.</b> New players go on the waitlist as #${waitOf(s).length + 1}. You can give them a slot later.`) : ''}`;
     if (sh.pick) {
       const p = sh.pick.dir ? DIRECTORY.find((x) => x.id === sh.pick.id) : P(sh.pick.id);
-      // Registered (claimed) profiles are tied to the player's own account, so only unclaimed ones need an in-person check,
-      // whether they come from Player Information or from the club's saved players.
-      const needsVerify = p.identity === 'unclaimed';
-      body += `<div class="card stack"><div class="li" style="padding:0">${avatar(p)}<div class="main"><b>${esc(p.name)}</b><p class="small muted">${p.rtr ? `<span class="mono">${esc(p.rtr)}</span>` : 'Guest · no RTR ID'}</p></div>${identChip(p)}</div>
-        ${needsVerify ? `<div class="stack tight"><span class="label">Confirm this is the right person</span><p class="small">Check with the player using one of these. A name match alone isn't enough.</p>
-          <div class="row"><button class="btn xs" aria-pressed="${sh.verify === 'id'}" data-act="sheetSet" data-k="verify" data-v="id">RTR ID matches</button><button class="btn xs" aria-pressed="${sh.verify === 'qr'}" data-act="sheetSet" data-k="verify" data-v="qr">Scanned their QR</button><button class="btn xs" aria-pressed="${sh.verify === 'phone'}" data-act="sheetSet" data-k="verify" data-v="phone">Phone confirmed</button></div>
-          ${sh.verify ? `<p class="small" style="color:var(--accent)">${I.check} Identity confirmed with the player</p>` : ''}</div>` : ''}
+      body += `<div class="card stack"><div class="li" style="padding:0">${avatar(p)}<div class="main"><b>${esc(p.name)}</b><p class="small muted">${p.rtr ? `<span class="mono">${esc(p.rtr)}</span>` : idLine(p)}</p></div>${identChip(p)}</div>
         ${p.phoneHidden ? '<p class="small muted">Phone hidden by player. Use their RTR ID or QR code instead.</p>' : ''}
         <div class="field"><span>Player Information suggestion</span><span class="small">${p.sugg != null ? esc(lvLabel(p.sugg)) : 'None yet'}</span></div>
         <label class="field"><span>${levelLabel}</span>${selectLevel('add-level', sh.level, 'data-bind="ui.sheet.level" data-num', !!sh.err && sh.level == null)}${sh.err ? `<span class="err">${esc(sh.err)}</span>` : ''}</label></div>`;
-      return sheetShell(needsVerify ? 'Confirm player' : 'Add player', body, `<button class="btn" data-act="sheetSet" data-k="pick" data-v="">Back</button><button class="btn primary" data-act="confirmAdd" ${needsVerify && !sh.verify ? 'disabled' : ''}>${primary}</button>`);
+      return sheetShell('Add player', body, `<button class="btn" data-act="sheetSet" data-k="pick" data-v="">Back</button><button class="btn primary" data-act="confirmAdd">${primary}</button>`);
     }
     body += `<div class="seg" role="group" aria-label="How to add">${[['saved', 'Saved players'], ['global', 'Player Information'], ['new', 'New player']].filter(([k]) => !club || k !== 'saved').map(([k, l]) => `<button aria-pressed="${tab === k}" data-act="sheetSet" data-k="tab" data-v="${k}">${l}</button>`).join('')}</div>${club && sh.err && !sh.pick && tab === 'global' ? notice('bad', esc(sh.err)) : ''}`;
     if (tab === 'saved') {
@@ -4603,7 +4600,7 @@ const SHEETS = {
       const added = saved().filter((p) => inRoster.has(p.id)).length;
       body += `<label class="field"><span>Search saved players</span><input class="input" id="add-q" data-bind="ui.sheet.q" data-rerender value="${esc(sh.q || '')}" placeholder="Name, nickname or RTR ID" data-autofocus></label>
         ${added ? `<p class="small muted">${added} saved player${added > 1 ? 's are' : ' is'} already in this session and not listed.</p>` : ''}
-        <div class="sel-list">${list.map((p) => `<button class="opt" data-act="pickPlayer" data-id="${p.id}">${avatar(p)}<div class="main"><b>${esc(p.name)}</b><div class="small muted">${p.rtr ? esc(p.rtr) : 'Guest'}</div></div>${identChip(p)}</button>`).join('') || (added && !q ? '<div class="empty">Every saved player is already in this session. Add someone new or search Player Information.</div>' : '<div class="empty">No saved player matches. Try Player Information or add a new player.</div>')}</div>`;
+        <div class="sel-list">${list.map((p) => `<button class="opt" data-act="pickPlayer" data-id="${p.id}">${avatar(p)}<div class="main"><b>${esc(p.name)}</b><div class="small muted">${idLine(p)}</div></div>${identChip(p)}</button>`).join('') || (added && !q ? '<div class="empty">Every saved player is already in this session. Add someone new or search Player Information.</div>' : '<div class="empty">No saved player matches. Try Player Information or add a new player.</div>')}</div>`;
     } else if (tab === 'global') {
       const list = DIRECTORY.filter((p) => !S.players.some((x) => x.rtr === p.rtr) && (!q || p.name.toLowerCase().includes(q) || p.rtr.toLowerCase().includes(q)));
       body += !S.online ? notice('warn', 'Player Information search needs internet. Add them as a new player now; their profile can be linked after you reconnect.')
@@ -4613,7 +4610,7 @@ const SHEETS = {
     } else {
       body += `<label class="field"><span>Full or display name</span><input class="input${sh.err && !(sh.name || '').trim() ? ' bad' : ''}" id="add-name" data-bind="ui.sheet.name" value="${esc(sh.name || '')}" data-autofocus></label>
         <label class="field"><span>Nickname (optional)</span><input class="input" id="add-nick" data-bind="ui.sheet.nick" value="${esc(sh.nick || '')}"></label>
-        <label class="field"><span>Phone (optional)</span><input class="input" id="add-phone" type="tel" data-bind="ui.sheet.phone" value="${esc(sh.phone || '')}"><span class="hint">Without a phone they're saved as a guest. With one, ROTRA can match or create their profile when the session syncs.</span></label>
+        <label class="field"><span>Phone (optional)</span><input class="input" id="add-phone" type="tel" data-bind="ui.sheet.phone" value="${esc(sh.phone || '')}"><span class="hint">Without a phone they're saved as a guest. With one, ROTRA can link them to their account if they're registered, when the session syncs. Only your club sees them otherwise.</span></label>
         <label class="field"><span>${levelLabel}</span>${selectLevel('add-level-new', sh.level, 'data-bind="ui.sheet.level" data-num', !!sh.err && sh.level == null)}</label>
         ${sh.err ? `<span class="err">${esc(sh.err)}</span>` : ''}`;
       return sheetShell('Add player', body, `<button class="btn" data-act="closeSheet">${sh.added ? 'Done' : 'Cancel'}</button><button class="btn primary" data-act="confirmNew">${primary}</button>`);
@@ -5676,10 +5673,10 @@ const ACT = {
   },
   pickPlayer: (d) => {
     const sh = S.ui.sheet; const p = d.dir ? DIRECTORY.find((x) => x.id === d.id) : P(d.id);
-    sh.pick = { id: d.id, dir: !!d.dir }; sh.level = p.sugg ?? null; sh.verify = null; sh.err = '';
-    // Only unclaimed profiles need the identity check; anyone else with a level is added in one tap
-    // at their Player Information level, which can still be changed in the roster before the session starts.
-    if (p.identity !== 'unclaimed' && p.sugg != null) { curAct = 'confirmAdd'; ACT.confirmAdd(); return; }
+    sh.pick = { id: d.id, dir: !!d.dir }; sh.level = p.sugg ?? null; sh.err = '';
+    // Anyone with a level is added in one tap at that level, which can still be changed in the roster before
+    // the session starts. Unclaimed profiles are this club's own records, so they need no identity check.
+    if (p.sugg != null) { curAct = 'confirmAdd'; ACT.confirmAdd(); return; }
     render();
   },
   confirmAdd: () => {

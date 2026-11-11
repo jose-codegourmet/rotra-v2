@@ -36,6 +36,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-09-14](#d-2026-11-09-14) | Admin edits everything on a player, with a beta-only password field | approved for MVP or beta only; signed off 2026-11-10 | in progress (mock app; real mode not started) | #647, #648, #649, #650 | [Admin](workstreams/admin.md) |
 | [D-2026-11-11-01](#d-2026-11-11-01) | Observability: OpenTelemetry traces to Grafana Cloud, plus a local Grafana stack | approved 2026-11-11 | implemented in the repository; Grafana Cloud stack and Vercel `OTEL_*` variables not set up yet | none | [Backend](workstreams/backend.md) |
 | [D-2026-11-11-02](#d-2026-11-11-02) | Join request: the player picks Join a slot or Be waitlisted, and can join from the waitlist | approved | in progress (mock app + real-mode services; migration not applied) | #706 | [Queue](workstreams/queue.md) |
+| [D-2026-11-11-03](#d-2026-11-11-03) | Guests and unclaimed profiles stay in their club | approved | not started (Queue mockup updated) | needed | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
 
 ## Status conventions
 
@@ -504,3 +505,21 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - Every request stays pending until the Queue Master confirms; nobody self-admits (existing rule).
 - **Not in MVP / Out of scope:** a guest (not signed in) asking to join from the waitlist; a new admission model; changes to the slot budget, first-come waitlist order or Give slot / Fill N open slots.
 - **References:** [Players › Join requests from the session link](../business_logic/product/queue/modules/players/README.md#join-requests-from-the-session-link), [Q-PUBLIC-JOIN](../screens/product/modules/queue/public-session.md#q-public-join--guest-join-request), [session_join_requests](../database_design/product/queue/modules/sessions-roster.md#session_join_requests), [mockup log](../mockup-changes/2026-11-11-queue-join-request-slot-or-waitlist.md).
+
+<a id="d-2026-11-11-03"></a>
+### D-2026-11-11-03 — Guests and unclaimed profiles stay in their club
+- **Decision status:** approved (owner discussion, November 11, 2026)
+- **Implementation status:** not started — Queue mockup updated November 11, 2026 ([log](../mockup-changes/2026-11-11-queue-club-only-unclaimed.md)); real mode still searches and links unclaimed profiles across clubs
+- **Ticket:** needed
+- **Roadmap:** MVP — [Queue](workstreams/queue.md), [Player](workstreams/player.md)
+- **Supersedes:** in part the October 28, 2026 owner decision that a phone-linked profile and its permanent RTR ID are created on the first entry sync, and the rule "the same phone number identifies the same profile across clubs" for unclaimed profiles.
+- **Decision:**
+  - **In the owner's words:** "guest should stay in the club's saved players and registered players live in rotra's saved players", and "Unclaimed profiles should never be found in other clubs. they should only live in club".
+  - **Player Information search** (Queue › Add player and Saved players › Add player) shows **registered (claimed) players only**. Guests and unclaimed profiles are never found by another club, by name, nickname or RTR ID.
+  - **Same phone in two clubs: keep separate** (owner choice). When Club B saves someone whose phone matches Club A's unclaimed profile, Club B gets its own record. Nothing links them while the person is unregistered. A phone that matches a **registered** player still links to that player, as today.
+  - **RTR ID only on registration** (owner choice). An unclaimed profile has no RTR ID. The one permanent RTR ID is given when the person registers, using the location rules of [D-2026-11-09-06](#d-2026-11-09-06).
+  - **On registration, records link automatically** (owner choice). Every club's unclaimed record with the same phone joins the new account, with no Queue Master tap. Earlier valid games then count under the October 28, 2026 history rules (original dates, each game once, permanent results unchanged).
+  - **No identity check for unclaimed profiles.** They are the club's own records, so the Queue Master's **Confirm player** step (RTR ID matches / Scanned their QR / Phone confirmed) no longer applies to them. A pick with a level is added in one tap; a pick with no level still opens the level step.
+- **Risk to review:** registration does not verify the phone (no SMS, [identity](../database_design/product/player-information/modules/identity.md)). With automatic linking, someone who registers with another person's phone number would collect that person's guest history from every club. [D-2026-11-09-06](#d-2026-11-09-06) used a Queue Master tap (**Link**) to guard against this. Not decided yet: whether this is accepted, like the ranking risk in D-2026-11-09-06.
+- **Not decided yet:** what Admin › Players shows for unclaimed club records (the Admin mockup still lists them with RTR IDs); and what happens to unclaimed `players` rows and RTR IDs that already exist (migration).
+- **References:** [product terms](../product-terms.md) (Unclaimed profile, RTR ID), [identity module](../business_logic/product/player-information/modules/identity/README.md), [players module](../business_logic/product/queue/modules/players/README.md), [Queue players and roster screens](../screens/product/modules/queue/players-roster.md), [identity database design](../database_design/product/player-information/modules/identity.md), code: `searchPlayerDirectory` in `packages/db/src/queue/club-players.ts`, `resolveClubPlayerIdentity` in `packages/db/src/player/identity.ts`.

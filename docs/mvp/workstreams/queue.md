@@ -111,7 +111,7 @@ payment amounts with Partial/Reimburse (PRs #467–#481). **Still open:** Downlo
 signed-in player to a join request; guest registration now exists through club invitations (#490);
 whether published results and profile pictures on the public page should also be masked.
 Decisions: [D-05](../decisions.md#d-2026-11-07-05), [D-06](../decisions.md#d-2026-11-07-06),
-[D-07](../decisions.md#d-2026-11-07-07).
+[D-07](../decisions.md#d-2026-11-07-07), [D-2026-11-11-03](../decisions.md#d-2026-11-11-03) (guests and unclaimed profiles stay in their club).
 
 ## Remaining work
 

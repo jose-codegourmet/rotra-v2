@@ -21,14 +21,23 @@ export type GuestRegistrationResult =
       sessionTitle: string | null
     } & CompleteClaimResult)
 
-/** The club's registration route; `?session=` when the visitor came from a session link (#689). */
-const registerPath = (clubId: string, sessionSlug?: string | null) =>
-  `/api/register/${encodeURIComponent(clubId)}${sessionSlug ? `?session=${encodeURIComponent(sessionSlug)}` : ''}`
+/**
+ * The club's registration route; `?session=` when the visitor came from a session link (#689),
+ * `?k=` with the club invite link's code, which the server checks (#712).
+ */
+function registerPath(clubId: string, sessionSlug?: string | null, inviteCode?: string | null) {
+  const search = new URLSearchParams()
+  if (sessionSlug) search.set('session', sessionSlug)
+  if (inviteCode) search.set('k', inviteCode)
+  const query = search.toString()
+  return `/api/register/${encodeURIComponent(clubId)}${query ? `?${query}` : ''}`
+}
 
 export async function getGuestRegistrationClub(
   clubId: string,
   signal?: AbortSignal,
   sessionSlug?: string | null,
+  inviteCode?: string | null,
 ) {
   if (isRealDataMode() && !clubId) throw new NotConnectedError()
   if (isRealDataMode())
@@ -36,7 +45,7 @@ export async function getGuestRegistrationClub(
       clubName: string | null
       sessionTitle?: string | null
       sessionPageUrl?: string | null
-    }>(registerPath(clubId, sessionSlug), {
+    }>(registerPath(clubId, sessionSlug, inviteCode), {
       signal,
     })
   await delay(200, signal)
@@ -60,13 +69,15 @@ export async function getGuestRegistrationClub(
 export async function completeGuestRegistration(input: {
   clubId: string
   sessionSlug?: string | null
+  /** The club invite link's `k`; checked on the server in real mode (#712). */
+  inviteCode?: string | null
   attempt: string
   values: RegistrationValues
 }): Promise<GuestRegistrationResult> {
   const parsed = registrationRequestSchema.parse(input)
   if (isRealDataMode() && !input.clubId) throw new NotConnectedError()
   if (isRealDataMode())
-    return realRequest(registerPath(input.clubId, input.sessionSlug), {
+    return realRequest(registerPath(input.clubId, input.sessionSlug, input.inviteCode), {
       method: 'POST',
       body: parsed,
     })

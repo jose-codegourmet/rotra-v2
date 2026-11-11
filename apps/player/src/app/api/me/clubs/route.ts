@@ -11,10 +11,10 @@ export async function GET() {
   }))
 }
 
-/** Join club from a club link, for the signed-in player only. */
+/** Join club from a club link, for the signed-in player only; `inviteCode` is its `k` (#712). */
 export async function POST(request: Request) {
   return handleAccountRequest('player', routeCookieAdapter(await cookies()), async (player) => {
     const body = await readJsonBody(request)
-    return { body: await joinMyClub(player, text(body.clubId)) }
+    return { body: await joinMyClub(player, text(body.clubId), text(body.inviteCode)) }
   })
 }

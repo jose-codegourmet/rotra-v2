@@ -110,6 +110,7 @@
     "./license/useActivateLicense": "./src/license/useActivateLicense.ts",
     "./license/useCheckLicenseOperation": "./src/license/useCheckLicenseOperation.ts",
     "./club/settings": "./src/club/settings.ts",
+    "./club/invite-code": "./src/club/inviteCode.ts",
     "./sync/fetchers": "./src/sync/fetchers.ts",
     "./queue-session/useQueueSessions": "./src/queue-session/useQueueSessions.ts",
     "./queue-session/useNowCard": "./src/queue-session/useNowCard.ts",

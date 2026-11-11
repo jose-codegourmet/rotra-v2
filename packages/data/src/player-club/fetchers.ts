@@ -42,8 +42,15 @@ export async function getMyClubs(signal?: AbortSignal): Promise<MyClub[]> {
         : []
     })
 }
-export async function joinClub(clubId: string) {
-  if (isRealDataMode()) return realJoinClub(clubId)
+/** Join club from a club invite link; `inviteCode` is the link's `k`, checked in real mode (#712). */
+export async function joinClub({
+  clubId,
+  inviteCode,
+}: {
+  clubId: string
+  inviteCode?: string | null
+}) {
+  if (isRealDataMode()) return realJoinClub(clubId, inviteCode)
   await delay(400)
   const id = await owner()
   checkMockSave()

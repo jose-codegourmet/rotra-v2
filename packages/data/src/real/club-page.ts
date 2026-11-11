@@ -4,7 +4,14 @@ import { queueSessionUrl } from '../player/mySessions'
 import { RealRequestError, realRequest } from './client'
 
 type ClubPageDto = {
-  club: { id: string; name: string; initials: string; logoUrl: string | null; city: string }
+  club: {
+    id: string
+    name: string
+    initials: string
+    logoUrl: string | null
+    city: string
+    inviteCode: string | null
+  }
   signedIn: boolean
   members: ClubPageMember[]
   sessions: {
@@ -18,8 +25,8 @@ type ClubPageDto = {
 }
 
 /**
- * P-CLUB-PAGE / P-CLUB-MEMBERS in real mode: `/api/clubs/[clubId]` (masked on the server). The
- * invite code is not stored yet (#707), so Join this club opens the plain club link. Null on 404.
+ * P-CLUB-PAGE / P-CLUB-MEMBERS in real mode: `/api/clubs/[clubId]` (masked on the server). Join
+ * this club opens the club's current invite link, `?k=<code>` included (#712). Null on 404.
  */
 export async function realGetClubPage(
   clubId: string,
@@ -31,7 +38,14 @@ export async function realGetClubPage(
       { signal },
     )
     return {
-      club: { ...page.club, joinHref: clubJoinHref(page.club.id) },
+      club: {
+        id: page.club.id,
+        name: page.club.name,
+        initials: page.club.initials,
+        logoUrl: page.club.logoUrl,
+        city: page.club.city,
+        joinHref: clubJoinHref(page.club.id, page.club.inviteCode),
+      },
       signedIn: page.signedIn,
       members: page.members,
       sessions: page.sessions.map(({ slug, ...s }) => ({

@@ -26,10 +26,13 @@ export function GuestRegistration({
   clubId,
   returnTo,
   sessionSlug,
+  inviteCode,
 }: {
   clubId: string
   returnTo?: string
   sessionSlug?: string
+  /** The club invite link's `k`; the server refuses a missing, wrong or regenerated code (#712) */
+  inviteCode?: string
 }) {
   useEffect(() => {
     rememberSessionReturn(returnTo)
@@ -37,8 +40,8 @@ export function GuestRegistration({
   const session = useSession('player')
   const myClubs = useMyClubs(session.data?.account.id ?? null)
   const join = useJoinClub()
-  const club = useGuestRegistrationClub(clubId, sessionSlug)
-  const registration = useGuestRegistration(clubId, sessionSlug)
+  const club = useGuestRegistrationClub(clubId, sessionSlug, inviteCode)
+  const registration = useGuestRegistration(clubId, sessionSlug, inviteCode)
   const dispatch = useAppDispatch()
   const router = useRouter()
   const result = registration.data
@@ -103,13 +106,16 @@ export function GuestRegistration({
           error={join.error?.message ?? myClubs.error?.message}
           onNotNow={() => router.push(`/players/${session.data?.account.id}`)}
           onJoin={() =>
-            join.mutate(clubId, {
-              onSuccess: () => {
-                toast(`You joined ${club.data.clubName}`)
-                router.push(`/players/${session.data?.account.id}`)
+            join.mutate(
+              { clubId, inviteCode },
+              {
+                onSuccess: () => {
+                  toast(`You joined ${club.data.clubName}`)
+                  router.push(`/players/${session.data?.account.id}`)
+                },
+                onError: (error) => toast.error(error.message),
               },
-              onError: (error) => toast.error(error.message),
-            })
+            )
           }
         />
       </main>

@@ -9,7 +9,7 @@ import { isRealDataMode } from '../real/mode'
 import { realCreatePlayerInvite, realGetClubPlayers } from '../real/queue'
 import type { ClubPlayer } from './clubPlayer.types'
 import { clubPictureState, joinedViaOf } from './clubPlayerPicture.rules'
-import { guestRegistrationUrl } from './registrationUrl'
+import { clubInviteUrl } from './registrationUrl'
 import { deriveSavedPlayerStats } from './savedPlayerStats.rules'
 export type ClubPlayerFilters = {
   search?: string
@@ -184,8 +184,10 @@ export async function createPlayerInvite(clubPlayerId: string) {
   if (!['guest', 'unclaimed'].includes(player.identity))
     throw new MockError('permission', 'This player does not need an invite.')
   if (isRealDataMode()) return realCreatePlayerInvite(player)
-  if (player.identity === 'guest')
-    return { url: guestRegistrationUrl(player.clubId), message: 'Invite link ready' }
+  if (player.identity === 'guest') {
+    const club = readMockState().clubs.find((c) => c.id === player.clubId)
+    return { url: clubInviteUrl(player.clubId, club?.inviteCode), message: 'Invite link ready' }
+  }
   let hash = 2166136261
   for (const letter of `${player.id}${player.fullName}`) {
     hash ^= letter.charCodeAt(0)

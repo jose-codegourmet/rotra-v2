@@ -355,7 +355,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 <a id="d-2026-11-09-08"></a>
 ### D-2026-11-09-08 — Sharing: links, QR codes and post/story images
 - **Decision status:** approved (owner discussion, November 9, 2026)
-- **Implementation status:** in progress — the Queue club side (club invite link, invite card, Share club invite on Home: #620, #621, #624, #626) is in the mock app; the Player side is in the mock app too (epic P06, #588); the Admin parts are not started. Real mode does not persist it.
+- **Implementation status:** in progress — the Queue club side (club invite link, invite card, Share club invite on Home: #620, #621, #624, #626) is in the mock app; the Player side is in the mock app too (epic P06, #588); the Admin parts are not started. Real mode does not persist it, except the club invite code: `?k=` is checked on the server and Regenerate link replaces it (P08.7, #712).
 - **Ticket:** #620, #621, #624, #626
 - **Roadmap:** MVP (owner, November 9, 2026: added to the scope frozen by [D-2026-11-07-04](#d-2026-11-07-04)) — [Player](workstreams/player.md), [Queue](workstreams/queue.md)
 - **Decision:**

@@ -1,4 +1,5 @@
 import 'server-only'
+import { newClubInviteCode } from '@rotra/data/club/invite-code'
 import type { AdminContext, ClubContext } from '../auth/account-context'
 import { type ProviderAdmin, ProviderError } from '../auth/provider-admin'
 import { AUTH_PROVIDER } from '../auth/supabase'
@@ -9,6 +10,7 @@ import { ServiceError } from '../service/errors'
 import { toDecimalString, toIso, toIsoOrNull, toMoney } from '../service/serialize'
 import { recordAudit } from './audit'
 import { clubNameKey, normalizeClubUsername } from './club-identity'
+import { readClubInvite } from './club-invite'
 import { adminTermDto } from './licenses'
 
 type Tx = Prisma.TransactionClient
@@ -142,6 +144,8 @@ export async function stageClub(
           licenseMonthlyMinor: input.pricing.pricing === 'paid' ? input.pricing.monthlyMinor : null,
           licenseYearlyMinor: input.pricing.pricing === 'paid' ? input.pricing.yearlyMinor : null,
           sourceCommandId: input.commandId,
+          // The club invite link works from day one (#712); Regenerate link replaces it.
+          inviteCode: newClubInviteCode(),
         },
       })
       const account = await tx.clubAccount.create({
@@ -362,6 +366,8 @@ export async function findLocationCode(code: string) {
 
 /** Q-CLUB settings read. Allowed after expiry so the club can see its own details. */
 export async function readClubSettings(context: ClubContext) {
+  // Fills the club invite code first for a club that has none yet (#712).
+  const { inviteCode } = await readClubInvite(context)
   const club = await prisma.club.findUniqueOrThrow({
     where: { id: context.clubId },
     include: {
@@ -381,6 +387,7 @@ export async function readClubSettings(context: ClubContext) {
     city: club.foundingLocation.displayName,
     cityCode: `${club.foundingLocation.countryCode}-${club.foundingLocation.cityCode}`,
     username: club.account?.username ?? '',
+    inviteCode: club.inviteCode ?? inviteCode,
     licensePricing: club.licensePricing,
     licenseMonthly: toMoney(club.licenseMonthlyMinor, club.currency),
     licenseYearly: toMoney(club.licenseYearlyMinor, club.currency),

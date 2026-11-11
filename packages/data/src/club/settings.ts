@@ -9,8 +9,9 @@ import { type MockState, readMockState } from '../mock/store'
 import { queueMutation, requireClubAccess } from '../mock/transaction'
 import { realGetFacebookPost, realGetPostPreview } from '../real/facebook-post'
 import { isRealDataMode } from '../real/mode'
-import { realSaveFacebookPost, realUpdateClubLogo } from '../real/queue'
+import { realRegenerateClubInvite, realSaveFacebookPost, realUpdateClubLogo } from '../real/queue'
 import { clubInitials, composeFacebookPost } from './club.rules'
+import { MOCK_INVITE_CODE_LENGTH, newClubInviteCode } from './inviteCode'
 
 function clubIn(state: MockState) {
   const club = state.clubs.find((c) => c.id === DEMO_CLUB_ID)
@@ -50,21 +51,12 @@ export const restorePreviousClubLogo = () => {
     return { data: null, text: 'Previous logo restored' }
   })
 }
-const INVITE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'
-function newInviteCode(not?: string) {
-  let code = ''
-  do {
-    const bytes = crypto.getRandomValues(new Uint8Array(8))
-    code = Array.from(bytes, (b) => INVITE_ALPHABET[b % INVITE_ALPHABET.length]).join('')
-  } while (code === not)
-  return code
-}
 /** Writes a fresh invite code; the old code stops being the current link. */
 export const regenerateClubInvite = () => {
-  if (isRealDataMode()) throw new NotConnectedError()
+  if (isRealDataMode()) return realRegenerateClubInvite()
   return changeClub((state) => {
     const club = clubIn(state)
-    club.inviteCode = newInviteCode(club.inviteCode)
+    club.inviteCode = newClubInviteCode(MOCK_INVITE_CODE_LENGTH, club.inviteCode)
     return { data: { inviteCode: club.inviteCode }, text: 'Club invite link regenerated' }
   })
 }

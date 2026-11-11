@@ -7,7 +7,7 @@ import type {
   DeleteImpact,
 } from '../club-player/clubPlayer.types'
 import type { ClubPlayerView } from '../club-player/fetchers'
-import { guestRegistrationUrl } from '../club-player/registrationUrl'
+import { clubInviteUrl } from '../club-player/registrationUrl'
 import type { ClubVenue } from '../club-venue/clubVenue.types'
 import {
   deviceDownloadOf,
@@ -93,6 +93,7 @@ type WireClubSettings = {
   city: string
   cityCode: string
   username: string
+  inviteCode: string
   licensePricing: 'paid' | 'free'
   licenseMonthly: WireMoney
   licenseYearly: WireMoney
@@ -117,6 +118,7 @@ export async function realGetClub(signal?: AbortSignal): Promise<Club> {
     cityCode: club.cityCode,
     locationCode: club.cityCode,
     username: club.username,
+    inviteCode: club.inviteCode,
     pendingNameChange: club.pendingNameChange
       ? {
           requestedName: club.pendingNameChange.requestedName,
@@ -137,6 +139,12 @@ export async function realUpdateClubLogo(input: {
 }) {
   await realRequest('/api/club', { method: 'PATCH', body: input })
   return accepted(null, input.logoUrl === null ? 'Club logo removed' : 'Club logo updated')
+}
+
+/** Q-CLUB › Regenerate link (#712): the old link and its QR images stop working. */
+export async function realRegenerateClubInvite() {
+  const result = await realRequest<{ inviteCode: string }>('/api/club/invite', { method: 'POST' })
+  return accepted({ inviteCode: result.inviteCode }, 'Club invite link regenerated')
 }
 
 /** Q-CLUB Facebook post: saves the given fields; `template: null` restores the default template. */
@@ -572,10 +580,15 @@ export function playerAppOrigin() {
     : 'https://player.rotra.club'
 }
 
-/** Invite: a registration link for an unclaimed profile; a guest gets independent registration with no guest identity attached. */
+/**
+ * Invite: a registration link for an unclaimed profile; a guest gets independent registration with
+ * no guest identity attached, through the club invite link and its current code (#712).
+ */
 export async function realCreatePlayerInvite(player: ClubPlayerView) {
-  if (player.identity !== 'unclaimed')
-    return { url: guestRegistrationUrl(player.clubId), message: 'Invite link ready' }
+  if (player.identity !== 'unclaimed') {
+    const { inviteCode } = await realRequest<{ inviteCode: string }>('/api/club/invite')
+    return { url: clubInviteUrl(player.clubId, inviteCode), message: 'Invite link ready' }
+  }
   const { token } = await realRequest<{ token: string; expiresAt: string }>(
     `/api/club/players/${encodeURIComponent(player.id)}/registration-link`,
     { method: 'POST' },

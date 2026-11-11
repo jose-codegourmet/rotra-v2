@@ -1,8 +1,10 @@
 'use client'
 
+import { useClub } from '@rotra/data/club'
 import { registeredCity } from '@rotra/data/club-player/fetchers'
-import { guestRegistrationUrl } from '@rotra/data/club-player/registration-url'
+import { clubInviteUrl } from '@rotra/data/club-player/registration-url'
 import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
+import { DEMO_CLUB_ID } from '@rotra/data/fixtures/clubs'
 import { selfCheckInMark, tonightStatus } from '@rotra/data/public-session/rules'
 import { expectedGames, slotCapacity } from '@rotra/data/queue-session/queueSession.rules'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
@@ -32,6 +34,8 @@ import { AddPlayer } from '@/app/(operator)/_components/add-player/AddPlayer'
 import { OverfillConfirm } from '@/app/(operator)/_components/overfill-confirm/OverfillConfirm'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import { longDateLabel } from '@/lib/dates'
+import { useAppSelector } from '@/store/hooks'
+import { selectAccount } from '@/store/slices/authSlice'
 
 export type PreparationRosterProps = {
   sessionId: string
@@ -80,6 +84,8 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
   const session = useQueueSession(sessionId)
   const roster = useSessionRoster(sessionId)
   const clubPlayers = useClubPlayers()
+  // A guest's invite is the club invite link with its current code (#712).
+  const club = useClub(useAppSelector(selectAccount)?.id ?? DEMO_CLUB_ID)
   const setLevel = useSetRosterLevel()
   const setPresence = useSetPresenceMany(sessionId, {
     onSuccess: (result) => toast(result.message),
@@ -282,7 +288,7 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
           addedLabel={longDateLabel(profile.addedAt)}
           sessionsHere={profile.sessionsHere}
           phoneHidden={profile.phoneHidden}
-          inviteUrl={guestRegistrationUrl(profile.clubId)}
+          inviteUrl={clubInviteUrl(profile.clubId, club.data?.inviteCode)}
         />
       ) : null}
     </>

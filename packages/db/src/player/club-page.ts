@@ -12,7 +12,15 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 /** The club page read's body: masking is applied here, so a visitor never receives a full name. */
 export type ClubPageDto = {
-  club: { id: string; name: string; initials: string; logoUrl: string | null; city: string }
+  club: {
+    id: string
+    name: string
+    initials: string
+    logoUrl: string | null
+    city: string
+    /** Join this club opens the club's current invite link (club-page.md, #712). */
+    inviteCode: string | null
+  }
   signedIn: boolean
   members: ClubPageMember[]
   sessions: {
@@ -63,6 +71,7 @@ export async function readClubPage(clubId: string, viewerId: string | null): Pro
       id: true,
       name: true,
       logoRef: true,
+      inviteCode: true,
       foundingLocation: { select: { displayName: true } },
     },
   })
@@ -125,6 +134,7 @@ export async function readClubPage(clubId: string, viewerId: string | null): Pro
       initials: initials(club.name),
       logoUrl: club.logoRef,
       city: club.foundingLocation.displayName,
+      inviteCode: club.inviteCode,
     },
     signedIn: !!viewerId,
     members,

@@ -9,7 +9,7 @@ export type Club = {
   logoUrl: string | null
   /** The logo the club had before the current one (at most two are held); absent in real mode, read as null. */
   logoPreviousUrl?: string | null
-  /** Current club invite code behind `/register/<clubId>?k=<code>`; absent in real mode. */
+  /** Current club invite code behind `/register/<clubId>?k=<code>` (#712); Regenerate replaces it. */
   inviteCode?: string
   /** Whether players may check themselves in (default true); absent in real mode, read as true. */
   selfCheckInEnabled?: boolean

@@ -431,7 +431,10 @@ a.srow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .hero { display: flex; flex-direction: column; gap: 14px; }
 /* Owner comment, November 11, 2026: the profile hero carries a public banner like Discord, with the picture overlapping it. */
 .card.hero { padding-top: 0; overflow: hidden; }
-.hero-banner { height: 96px; margin: 0 -16px; background: linear-gradient(135deg, var(--accent-dim), var(--accent) 55%, var(--accent-subtle)); }
+.hero-banner { height: 96px; margin: 0 -16px; background: linear-gradient(135deg, var(--accent-dim), var(--accent) 55%, var(--accent-subtle)) center / cover no-repeat; }
+.banner-now { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.banner-now > .stack { flex: 1 1 220px; min-width: 0; }
+.banner-prev { flex: 0 0 132px; height: 44px; border-radius: var(--r-sm); border: 1px solid var(--border); background: linear-gradient(135deg, var(--accent-dim), var(--accent) 55%, var(--accent-subtle)) center / cover no-repeat; }
 .hero .who { display: flex; gap: 14px; align-items: flex-end; min-width: 0; margin-top: -44px; }
 .hero .who .avatar.xxl { box-shadow: 0 0 0 5px var(--surface); }
 .hero .who h1 { margin: 0; }
@@ -1163,7 +1166,7 @@ function viewProfile() {
   return `<main class="wrap"><div class="prof">
     <aside class="side stack">
       <section class="card hero">
-        <div class="hero-banner" aria-hidden="true"></div>
+        <div class="hero-banner" aria-hidden="true"${p.bannerUrl ? ` style="background-image:url('${esc(p.bannerUrl)}')"` : ''}></div>
         <div class="who">${own ? `<span class="av-edit">${avatar(p, 'xxl', true)}<button type="button" class="av-cam" data-act="openAvatar" aria-label="Change profile picture" title="Change profile picture">${I.edit}</button></span>` : avatar(p, 'xxl', true)}<div style="min-width:0" class="stack tight"><h1>${esc(p.name)}</h1>${p.nick ? `<p class="muted">“${esc(p.nick)}”</p>` : ''}${own ? `<div class="row">${chip('This is you', 'ok')}</div>` : ''}</div></div>
         <div class="stack tight"><span class="label">Player ID</span>
           <div class="rtr-line"><code id="rtr-${p.id}">${esc(p.rtr)}</code><button class="btn xs" data-act="copyId" data-id="${p.id}" aria-label="Copy player ID">${I.copy} Copy</button></div>
@@ -1626,7 +1629,8 @@ function viewEdit() {
       <p class="small muted">You can't edit these here. Phone and email changes go to the ROTRA platform owner for approval; your player ID never changes.</p>
       <div class="row"><button type="button" class="btn sm" data-act="openRequest">Request a phone or email change</button><button type="button" class="btn sm ghost" data-act="go" data-to="account">Phone privacy</button></div>
       <p class="hint">Rank, club levels and game results come from clubs and can't be changed by players.</p>`
-    : (tab.id === 'basics' ? `<div class="av-now">${avatar(p, 'xl', true)}<div class="stack tight"><b>Profile picture</b><span class="small muted">Shown on the leaderboard and your profile.</span><div class="row"><button type="button" class="btn sm" data-act="openAvatar">Change picture</button></div></div></div>` : '') + tab.body('ui.edit', d, e, 'ed');
+    : (tab.id === 'basics' ? `<div class="av-now">${avatar(p, 'xl', true)}<div class="stack tight"><b>Profile picture</b><span class="small muted">Shown on the leaderboard and your profile.</span><div class="row"><button type="button" class="btn sm" data-act="openAvatar">Change picture</button></div></div></div>
+      <div class="banner-now"><div class="banner-prev" role="img" aria-label="${p.bannerUrl ? 'Your profile banner' : 'Default profile banner'}"${p.bannerUrl ? ` style="background-image:url('${esc(p.bannerUrl)}')"` : ''}></div><div class="stack tight"><b>Profile banner</b><span class="small muted">The strip across the top of your profile card, like a cover photo. Public. A wide image works best (about 3:1); up to 4 MiB.</span><div class="row"><label class="btn sm" for="banner-file" style="cursor:pointer">Upload banner</label><input type="file" id="banner-file" accept="image/webp,image/png,image/jpeg,image/gif" class="sr-only" data-bannerfile>${p.bannerUrl ? '<button type="button" class="btn sm" data-act="removeBanner">Remove banner</button>' : ''}</div></div></div>` : '') + tab.body('ui.edit', d, e, 'ed');
   return `<main class="wrap mid">
     <div class="page-head">${backBtn('cancelEdit', 'My profile')}<h1>Edit profile</h1>
       <p class="muted">Fields marked public appear on your profile for anyone to see.</p></div>
@@ -2203,6 +2207,7 @@ const ACT = {
   setFace: (el) => { const d = avatarDraft; if (d.photoUrl?.startsWith('blob:')) URL.revokeObjectURL(d.photoUrl); else if (d.photoUrl && !d.width) d.photoPrevUrl = d.photoUrl; Object.assign(d, { photo: true, photoUrl: '', face: el.dataset.v, width: 0, crop: null }); render(); },
   useInitials: () => { const d = avatarDraft; if (d.photoUrl?.startsWith('blob:')) URL.revokeObjectURL(d.photoUrl); else if (d.photoUrl && !d.width) d.photoPrevUrl = d.photoUrl; Object.assign(d, { photo: false, photoUrl: '', width: 0, crop: null }); render(); },
   removePhoto: () => ACT.useInitials(),
+  removeBanner: () => { const me = S.me && S.accounts[S.me]; if (!me) return; if (me.bannerUrl?.startsWith('blob:')) URL.revokeObjectURL(me.bannerUrl); me.bannerUrl = ''; render(); toast('Banner removed'); },
   usePrevious: () => { const d = avatarDraft; if (!d.photoPrevUrl) return; const cur = d.photoUrl; Object.assign(d, { photo: true, photoUrl: d.photoPrevUrl, photoPrevUrl: cur || '', width: 0, crop: null }); render(); },
   saveAvatar: async () => {
     const a = avatarDraft;
@@ -2514,6 +2519,17 @@ document.addEventListener('keydown', (ev) => {
 });
 document.addEventListener('change', (ev) => {
   if (ev.target.dataset.avcrop && avatarDraft?.crop) { avatarDraft.crop[ev.target.dataset.avcrop] = +ev.target.value; render(); return; }
+  // Owner comment, November 11, 2026: players can upload a profile banner from Edit profile. Applied at once in the mock.
+  if (ev.target.matches('[data-bannerfile]')) {
+    const file = ev.target.files && ev.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { toast('Choose an image file'); return; }
+    if (file.size > 4 * 1024 * 1024) { toast('Choose a banner smaller than 4 MiB.'); return; }
+    const me = S.me && S.accounts[S.me]; if (!me) return;
+    if (me.bannerUrl?.startsWith('blob:')) URL.revokeObjectURL(me.bannerUrl);
+    me.bannerUrl = URL.createObjectURL(file); ev.target.value = ''; render(); toast('Banner updated');
+    return;
+  }
   if (ev.target.matches('[data-avfile]')) {
     const file = ev.target.files && ev.target.files[0];
     if (!file) return;

@@ -42,3 +42,8 @@ Superseded by: none
 
 ## Real app work
 - `@rotra/ui` ProfileHero: banner strip and overlapping avatar, banner by key. EditProfileForm: banner radio group. `@rotra/data` `banner` key on the player profile; real mode needs one small column (migration sign-off needed). No storage.
+
+## Owner comment, November 11, 2026 (fourth, on Edit profile › Name)
+- "I think the layout here should mimic how the profile dialog looks like".
+- Changed: the top of Edit profile › Name is now a live preview of the profile card: the chosen banner runs edge to edge across the panel top, the picture overlaps it with the pencil button on it (opens the picture sheet), and the name and nickname beside it update as you type. Under it: the line **This is how the top of your profile card looks. Tap the pencil to change your picture; pick a banner below.**, then the **Banner** swatches with **Selected: NAME · Public. Pick one of ROTRA's banners; your own images can't be uploaded.** The separate Profile picture and Profile banner rows are gone.
+- Copy added: the two sentences above and the **Banner** label. Removed: **Profile picture**, **Shown on the leaderboard and your profile.**, **Change picture** (now the pencil), **Profile banner**.

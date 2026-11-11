@@ -11,8 +11,8 @@ export type ProfileBannerCardProps = {
   nickname?: string | null
   photoUrl?: string
   /**
-   * Opens the full photo (D-PHOTO-VIEWER, #716). With a photo, the big picture becomes a button
-   * named `photoLabel`; initials never open anything.
+   * Opens the full photo (PhotoViewer, D-PHOTO-VIEWER, #716). With a photo, the big picture becomes
+   * the Avatar view button named `photoLabel`; initials never open anything.
    */
   onPhotoClick?: () => void
   /** Accessible name of the photo button; defaults to “View full photo of NAME” */
@@ -124,9 +124,6 @@ export function ProfileBannerCard({
   children,
   className,
 }: ProfileBannerCardProps) {
-  const face = (
-    <Avatar name={name} src={photoUrl} size={64} className="shadow-[0_0_0_5px_var(--surface)]" />
-  )
   return (
     <div className={cn('relative min-w-0', className)}>
       <div
@@ -134,18 +131,14 @@ export function ProfileBannerCard({
         className="h-[84px] bg-[linear-gradient(135deg,var(--accent-dim),var(--accent)_55%,var(--accent-subtle))]"
       />
       <div className="absolute top-[44px] left-5">
-        {photoUrl && onPhotoClick ? (
-          <button
-            type="button"
-            onClick={onPhotoClick}
-            aria-label={photoLabel ?? `View full photo of ${name}`}
-            className="m-0 block cursor-zoom-in rounded-full border-0 bg-transparent p-0 leading-none focus-visible:outline-2 focus-visible:outline-offset-[7px] focus-visible:outline-accent"
-          >
-            {face}
-          </button>
-        ) : (
-          face
-        )}
+        <Avatar
+          name={name}
+          src={photoUrl}
+          size={64}
+          className="shadow-[0_0_0_5px_var(--surface)]"
+          onView={onPhotoClick}
+          viewLabel={photoLabel}
+        />
       </div>
       <div className="flex min-w-0 flex-col gap-3 px-5 pt-[52px] pb-5">
         <div className="flex min-w-0 flex-wrap items-baseline gap-2">

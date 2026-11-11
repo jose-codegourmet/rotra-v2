@@ -7,7 +7,7 @@ export const privateProfileCardMeta = {
   usage: [
     'Opened from a masked tile by a signed-in ROTRA Player (PublicParticipants onOpenParticipant with profile "private" or "guest"). The player themselves never sees it: their own tile opens ParticipantProfileSheet.',
     'name is always the masked name (“J*** A***”); the full name, level and games never reach this card.',
-    'private: pass the real photoUrl (picture and banner stay public, owner comment of November 11, 2026) and onPhotoClick for the full photo (#716, “View full photo”). guest: initials or the public picture; no photo button.',
+    'private: pass the real photoUrl (picture and banner stay public, owner comment of November 11, 2026) and onPhotoClick for the full photo: the Avatar view button (“View full photo”) that opens PhotoViewer (#716). guest: initials or the public picture; no photo button.',
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',

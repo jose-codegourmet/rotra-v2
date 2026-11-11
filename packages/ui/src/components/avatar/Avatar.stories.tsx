@@ -2,6 +2,7 @@ import { Button } from '@rotra/ui/button'
 import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
+import { fn } from 'storybook/test'
 import { Avatar } from './Avatar'
 
 const SIZES = [24, 28, 36, 40, 44, 52, 64, 88] as const
@@ -79,5 +80,46 @@ export const PictureChanges: Story = {
         <Button onClick={() => setChoice((current) => (current + 1) % 3)}>Change picture</Button>
       </div>
     )
+  },
+}
+
+/** onView with an uploaded photo: a button named “View full photo of NAME”, zoom-in cursor, focus ring. */
+export const ViewPhoto: Story = {
+  args: {
+    name: 'Mikee Abellana',
+    size: 64,
+    src: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64"/></svg>',
+    onView: fn(),
+  },
+}
+
+/** onView with a chosen character picture. */
+export const ViewCharacter: Story = {
+  args: {
+    name: 'Mikee Abellana',
+    size: 64,
+    src: profilePictureSrc('character:a', 'player-mikee', 'Mikee Abellana'),
+    onView: fn(),
+  },
+}
+
+/** onView on initials: nothing to enlarge, so no button. */
+export const ViewInitials: Story = {
+  args: { name: 'Raymark Bautista Villareal', size: 64, onView: fn() },
+}
+
+/** onView on a picture that fails to load: initials, no button. */
+export const ViewFailedPicture: Story = {
+  args: { name: 'Mikee Abellana', size: 64, src: 'data:image/png;base64,invalid', onView: fn() },
+}
+
+/** onClick and onView together: the profile stays the tap target. */
+export const ProfileWinsOverView: Story = {
+  args: {
+    name: 'Mikee Abellana',
+    size: 52,
+    src: profilePictureSrc('character:a', 'player-mikee', 'Mikee Abellana'),
+    onClick: fn(),
+    onView: fn(),
   },
 }

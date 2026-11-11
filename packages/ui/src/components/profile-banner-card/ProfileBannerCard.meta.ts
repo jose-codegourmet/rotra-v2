@@ -7,7 +7,7 @@ export const profileBannerCardMeta = {
   usage: [
     'Shared by ParticipantProfileSheet and PrivateProfileCard (session page) and PlayerProfileSheet (Queue Master). Put it in a Sheet with bodyClassName="p-0" so the banner runs edge to edge.',
     'tonight (ParticipantTonight) draws “Tonight · Playing · Court N” (accent dot and text), “On court · getting ready · Court N” (warn dot), “Queued · #N” or “Free” (muted dot) and “Away” (border dot). Leave it out when the player is not on tonight’s roster.',
-    'onPhotoClick with a photoUrl makes the picture a button for the full-photo viewer (#716), named “View full photo of NAME” or photoLabel; initials never open anything.',
+    'onPhotoClick with a photoUrl makes the picture the Avatar view button (onView: “View full photo of NAME” or photoLabel, zoom-in cursor, focus ring) that opens PhotoViewer (#716); initials never open anything.',
     'Colours are tokens only: the banner is linear-gradient(135deg, --accent-dim, --accent 55%, --accent-subtle).',
   ],
   prototype: {

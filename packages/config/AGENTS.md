@@ -27,6 +27,7 @@ per app with `next/font` and set `--font`, `--mono` (and `--pixel` in `apps/play
 | `border-border`, `border-border-strong`, `bg-scrim` | Lines and sheet scrim |
 | `*-court`, `*-court-line`, `*-court-free`, `*-court-free-line` | Court drawing |
 | `bg-court-level-label`, `text-court-level-beg`, `text-court-level-int`, `text-court-level-adv` | Fixed court skill-label pill and band tints, identical in both themes |
+| `bg-photo-scrim`, `text-photo-fg` | Full-photo viewer overlay (black, 94%) and its ×, identical in both themes |
 | `*-gold`, `*-silver`, `*-bronze`, `*-qr-bg`, `*-qr-fg` | Player Information podium and QR only |
 | `rounded-lg` / `rounded-md` | `--r` (10px) / `--r-sm` (6px) |
 | `shadow-card`, `shadow-sheet`, `shadow-pop`, `shadow-drawer` | Card lift (light only), sheet, toast, phone drawer |

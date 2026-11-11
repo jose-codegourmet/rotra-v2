@@ -1,5 +1,6 @@
 import 'server-only'
 import { randomUUID } from 'node:crypto'
+import { requireClubInvite } from '../admin/club-invite'
 import type { PlayerContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
 import { ServiceError } from '../service/errors'
@@ -46,16 +47,23 @@ export async function readMyClubs(context: PlayerContext) {
 
 /**
  * Join club from a club link: saves the player to the club, or brings back the row they left
- * (history keeps one row per club and player). An unknown club is refused. Repeat-safe.
+ * (history keeps one row per club and player). The link's invite code must be the club's current
+ * one (#712); a missing, wrong or regenerated code and an unknown club are refused. Repeat-safe.
  */
-export async function joinMyClub(context: PlayerContext, clubId: string) {
+export async function joinMyClub(
+  context: PlayerContext,
+  clubId: string,
+  inviteCode?: string | null,
+) {
+  await requireClubInvite(clubId, inviteCode)
   await addPlayerToClub(context.playerId, clubId)
   return { playerId: context.playerId, clubId }
 }
 
 /**
  * Saves a player to a club's saved players (D-2026-11-09-06): Join club, and registration from a
- * club or session link (#707). Repeat-safe; an unknown club is refused.
+ * club or session link (#707). Callers check the link first (the club invite code, #712, or the
+ * session link); this never does. Repeat-safe; an unknown club is refused.
  */
 export async function addPlayerToClub(playerId: string, clubId: string) {
   const unavailable = () =>

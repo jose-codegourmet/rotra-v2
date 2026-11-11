@@ -8,17 +8,30 @@ import { playerClubKeys } from '../player-club/queryKeys'
 import { completeGuestRegistration, getGuestRegistrationClub } from './guestRegistration'
 import { playerAccountKeys } from './queryKeys'
 
-export function useGuestRegistrationClub(clubId: string, sessionSlug?: string | null) {
+/** `inviteCode` is the club invite link's `k` (#712); the server refuses a missing or old one. */
+export function useGuestRegistrationClub(
+  clubId: string,
+  sessionSlug?: string | null,
+  inviteCode?: string | null,
+) {
   return useQuery({
-    queryKey: [...playerAccountKeys.guestRegistration(clubId), sessionSlug ?? null],
-    queryFn: ({ signal }) => getGuestRegistrationClub(clubId, signal, sessionSlug),
+    queryKey: [
+      ...playerAccountKeys.guestRegistration(clubId),
+      sessionSlug ?? null,
+      inviteCode ?? null,
+    ],
+    queryFn: ({ signal }) => getGuestRegistrationClub(clubId, signal, sessionSlug, inviteCode),
     networkMode: 'always',
     retry: false,
   })
 }
 
 /** Keep only a random retry secret and a contact fingerprint, never a password or plain contacts. */
-export function useGuestRegistration(clubId: string, sessionSlug?: string | null) {
+export function useGuestRegistration(
+  clubId: string,
+  sessionSlug?: string | null,
+  inviteCode?: string | null,
+) {
   const client = useQueryClient()
   const retry = useRef<{ fingerprint: string; attempt: string } | null>(null)
   return useMutation({
@@ -53,6 +66,7 @@ export function useGuestRegistration(clubId: string, sessionSlug?: string | null
       const result = await completeGuestRegistration({
         clubId,
         sessionSlug,
+        inviteCode,
         attempt: retry.current.attempt,
         values,
       })

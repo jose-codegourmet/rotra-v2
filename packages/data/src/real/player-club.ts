@@ -7,10 +7,11 @@ export async function realGetMyClubs(signal?: AbortSignal) {
   const { clubs } = await realRequest<{ clubs: MyClub[] }>('/api/me/clubs', { signal })
   return clubs
 }
-export function realJoinClub(clubId: string) {
+/** Join club through a club invite link; the server checks `inviteCode` (the link's `k`, #712). */
+export function realJoinClub(clubId: string, inviteCode?: string | null) {
   return realRequest<{ playerId: string; clubId: string }>('/api/me/clubs', {
     method: 'POST',
-    body: { clubId },
+    body: { clubId, inviteCode: inviteCode ?? '' },
   })
 }
 /** Marks the player's club row removed; the server keeps it for history. */

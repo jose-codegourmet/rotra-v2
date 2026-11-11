@@ -8,11 +8,13 @@ import { cookies } from 'next/headers'
 
 /** `?session=<slug>`: the session link the visitor registers from (#689); optional. */
 const sessionOf = (request: Request) => new URL(request.url).searchParams.get('session') || null
+/** `?k=<code>`: the club invite code; a club link without the current one is refused (#712). */
+const inviteOf = (request: Request) => new URL(request.url).searchParams.get('k') || null
 
 export async function GET(request: Request, ctx: RouteContext<'/api/register/[clubId]'>) {
   const { clubId } = await ctx.params
   return handleVisitorRequest('player.guest-registration', async () => ({
-    body: await guestRegistrationClub(clubId, sessionOf(request)),
+    body: await guestRegistrationClub(clubId, sessionOf(request), inviteOf(request)),
   }))
 }
 
@@ -51,6 +53,7 @@ export async function POST(request: Request, ctx: RouteContext<'/api/register/[c
         },
       },
       sessionOf(request),
+      inviteOf(request),
     )
     return { body: result }
   })

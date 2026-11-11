@@ -1,4 +1,5 @@
 import 'server-only'
+import { requireClubInvite } from '../admin/club-invite'
 import type { CookieAdapter } from '../auth/supabase'
 import { prisma } from '../client/prisma'
 import { ServiceError } from '../service/errors'
@@ -14,13 +15,21 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
  * The registration page's context; no guest, player or private contact is exposed. `sessionSlug` (#689) is the session link the visitor came from
  * (Register with ROTRA, D-2026-11-09-06): it must be this club's session with a live publication.
  * It only adds the title and the way back; registering never sends a join request.
+ * Without a session link this is the club invite link, which needs the club's current invite code
+ * `k` (#712): a missing, wrong or regenerated code is refused, never a silent join.
  */
-export async function guestRegistrationClub(clubId: string, sessionSlug?: string | null) {
+export async function guestRegistrationClub(
+  clubId: string,
+  sessionSlug?: string | null,
+  inviteCode?: string | null,
+) {
+  if (!sessionSlug) {
+    const club = await requireClubInvite(clubId, inviteCode)
+    return { clubName: club.name, sessionTitle: null, sessionSlug: null, sessionPageUrl: null }
+  }
   if (!UUID.test(clubId)) throw new ServiceError('not_found')
   const club = await prisma.club.findUnique({ where: { id: clubId }, select: { name: true } })
   if (!club) throw new ServiceError('not_found')
-  if (!sessionSlug)
-    return { clubName: club.name, sessionTitle: null, sessionSlug: null, sessionPageUrl: null }
   const session = await prisma.queueSession.findUnique({
     where: { publicSlug: sessionSlug },
     select: {
@@ -44,7 +53,7 @@ export async function guestRegistrationClub(clubId: string, sessionSlug?: string
  * #490: independent registration. The club supplies the RTR allocation context. Never links or
  * writes an existing guest record, roster, history attribution or permanent results. Once the
  * account exists, the new player is saved to the originating club (D-2026-11-09-06, #707), as the
- * mock does; a club link and a session link both join that club.
+ * mock does; a club link (with its current invite code, #712) and a session link both join that club.
  * A client-generated secret makes provider failures/lost replies retryable through the existing
  * claim staging. Only its digest is stored; a retry must still supply the same private contacts.
  */
@@ -59,8 +68,9 @@ export async function registerGuest(
     details: ClaimDetails
   },
   sessionSlug?: string | null,
+  inviteCode?: string | null,
 ) {
-  const context = await guestRegistrationClub(clubId, sessionSlug)
+  const context = await guestRegistrationClub(clubId, sessionSlug, inviteCode)
   if (!/^[a-f0-9]{64}$/.test(input.attempt)) throw new ServiceError('invalid')
   const email = input.email.trim().toLowerCase()
   const token = `registration:${input.attempt}`

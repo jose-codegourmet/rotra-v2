@@ -29,6 +29,7 @@
     "./admin/club-logo": "./src/admin/club-logo.ts",
     "./admin/players": "./src/admin/players.ts",
     "./admin/clubs": "./src/admin/clubs.ts",
+    "./admin/club-invite": "./src/admin/club-invite.ts",
     "./admin/licenses": "./src/admin/licenses.ts",
     "./admin/configuration": "./src/admin/configuration.ts",
     "./player/identity": "./src/player/identity.ts",

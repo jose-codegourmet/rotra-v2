@@ -3,7 +3,7 @@
 import { cn } from '@rotra/ui/cn'
 import { TabMenu } from '@rotra/ui/tab-menu'
 import { Tabs as TabsPrimitive } from 'radix-ui'
-import type { ComponentProps, ReactNode } from 'react'
+import { type ComponentProps, type ReactNode, useEffect } from 'react'
 
 export type TabBadge = {
   /** Always shown, e.g. "2/3" or "14" */
@@ -36,6 +36,31 @@ export type TabsProps = {
   phoneMenu?: boolean
 }
 
+/**
+ * Focus ring for tabs and segmented controls: none after a tap or click (even when the app
+ * re-focuses the tab), a thin 1 px accent ring, inset so a scrolling row does not clip it, only
+ * once the keyboard (Tab or arrows) was the last input. Pair with useKeyboardNav().
+ */
+export const tabFocusClass =
+  'outline-none [:root[data-kbd-nav]_&]:focus-visible:outline-1 [:root[data-kbd-nav]_&]:focus-visible:outline-accent [:root[data-kbd-nav]_&]:focus-visible:-outline-offset-3'
+
+/** Marks the page `data-kbd-nav` while the keyboard is the last input (Tab/arrows), cleared by a pointer press. */
+export function useKeyboardNav() {
+  useEffect(() => {
+    const root = document.documentElement
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Tab' || e.key.startsWith('Arrow')) root.setAttribute('data-kbd-nav', '')
+    }
+    const onPointer = () => root.removeAttribute('data-kbd-nav')
+    document.addEventListener('keydown', onKey, true)
+    document.addEventListener('pointerdown', onPointer, true)
+    return () => {
+      document.removeEventListener('keydown', onKey, true)
+      document.removeEventListener('pointerdown', onPointer, true)
+    }
+  }, [])
+}
+
 const badgeClass = (tone: TabBadge['tone']) =>
   cn(
     'inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold whitespace-nowrap',
@@ -60,6 +85,7 @@ export function Tabs({
   phoneMenu = false,
   ...aria
 }: TabsProps) {
+  useKeyboardNav()
   return (
     <TabsPrimitive.Root
       value={value}
@@ -94,6 +120,7 @@ export function Tabs({
               'inline-flex items-center gap-1.5 border-0 border-b-2 border-transparent bg-transparent px-3.5 py-2.5 font-bold whitespace-nowrap text-fg2',
               'hover:text-fg data-[state=active]:border-accent data-[state=active]:text-fg',
               'disabled:cursor-not-allowed disabled:opacity-45 touch:min-h-12',
+              tabFocusClass,
               'max-[640px]:flex-col max-[640px]:justify-center max-[640px]:gap-[3px] max-[640px]:px-1 max-[640px]:py-[9px]',
               'max-[640px]:text-center max-[640px]:text-[13px] max-[640px]:leading-tight max-[640px]:whitespace-normal',
             )}

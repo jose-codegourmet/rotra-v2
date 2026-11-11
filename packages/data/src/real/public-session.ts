@@ -4,6 +4,7 @@ import type {
   PublicSessionPage,
   SendJoinRequestInput,
 } from '../public-session/publicSession.types'
+import type { JoinRequestPlacement } from '../session-roster/sessionRoster.types'
 import { saveToastText } from '../sync/fetchers'
 import type { SaveOutcome } from '../sync/sync.types'
 import { realRequest } from './client'
@@ -37,6 +38,7 @@ export async function realSendJoinRequest(
       nickname: input.nickname ?? null,
       phone: input.phone ?? null,
       statedBand: input.statedBand,
+      placement: input.placement ?? 'slot',
     },
   })
   return {
@@ -57,17 +59,23 @@ export function realGetMyJoinRequest(slug: string) {
  * **Request to join as NAME** / **Cancel request**: credentialed calls to the Player app, which
  * reads the Player's own sign-in. No Player token or cookie is ever copied into the Queue app.
  */
-async function playerSessionWrite(slug: string, action: 'join' | 'cancel') {
+async function playerSessionWrite(
+  slug: string,
+  action: 'join' | 'cancel',
+  body: Record<string, unknown> = {},
+) {
   const origin = typeof location === 'undefined' ? null : playerOrigin(location.origin)
   if (!origin) throw new Error('Sign in with ROTRA Player to send a request.')
   const done = await realRequest<{ requestId: string; message: string }>(
     `${origin}${base(slug)}/${action}`,
-    { method: 'POST', body: {}, credentials: 'include' },
+    { method: 'POST', body, credentials: 'include' },
   )
   return { savedOffline: false, message: done.message, data: { requestId: done.requestId } }
 }
 
-export const realJoinAsPlayer = (slug: string) => playerSessionWrite(slug, 'join')
+/** The body carries the player's choice (D-2026-11-11-02): slot, waitlist or from_waitlist. */
+export const realJoinAsPlayer = (slug: string, placement: JoinRequestPlacement = 'slot') =>
+  playerSessionWrite(slug, 'join', { placement })
 export const realCancelMyJoinRequest = (slug: string) => playerSessionWrite(slug, 'cancel')
 
 /**

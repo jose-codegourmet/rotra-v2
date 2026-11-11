@@ -24,6 +24,8 @@ export async function POST(
       nickname: optional(body.nickname),
       phone: optional(body.phone),
       statedBand: text(body.statedBand) as Parameters<typeof sendJoinRequest>[1]['statedBand'],
+      // D-2026-11-11-02: Join a slot or Be waitlisted; missing reads slot.
+      placement: optional(body.placement) as Parameters<typeof sendJoinRequest>[1]['placement'],
     })
     ;(await cookies()).set(receiptCookie(slug, mine.requestId, receipt))
     return { body: mine }

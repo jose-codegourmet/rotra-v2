@@ -98,6 +98,7 @@ Prisma column); the Checked in themselves mark has no server clearing rules yet.
 | Requests · N with Join and Match tabs; Add to queue / Decline; drop-out notices; ROTRA-player join cards | implemented (mock app only) | commit `e64678bf` | #616 |
 | Checked in themselves / Left mark on roster rows, cards and live Players cards | implemented (mock app only) | commit `d7c92168` | #617 |
 | Request formats per session (default option A), `requestFormats` | implemented (mock app only) | commit `3abfba67`; defaults decided 2026-11-10 ([D-2026-11-09-11](../decisions.md#d-2026-11-09-11)) | #618 |
+| Join request: Join a slot / Be waitlisted choice, full-slots rule before start, Join from waitlist (`placement`) | in progress (mock app + real-mode services; migration `20261111000200` not applied) | [D-2026-11-11-02](../decisions.md#d-2026-11-11-02); [mockup log](../../mockup-changes/2026-11-11-queue-join-request-slot-or-waitlist.md) | #706 |
 
 ### Obvious Queue bugs (#466, 2026-11-07)
 

@@ -232,6 +232,8 @@ textarea.input { min-height: 80px; resize: vertical; }
 .seg { display: inline-flex; border: 1px solid var(--border-strong); border-radius: var(--r); padding: 3px; gap: 3px; flex-wrap: wrap; align-self: flex-start; }
 .seg button { border: 0; background: transparent; min-height: 36px; padding: 0 14px; border-radius: 7px; cursor: pointer; font-weight: 600; color: var(--fg2); }
 .seg button[aria-pressed="true"] { background: var(--elev); color: var(--fg); }
+/* #706: a choice that the session state rules out (Join a slot while every slot is taken). */
+.seg button:disabled { opacity: 0.45; cursor: not-allowed; text-decoration: line-through; }
 /* Session QR share card: fixed brand colors (dark, ROTRA green) so the downloaded image never changes with the app theme. */
 .qr-card { --qc-bg: #0b0b0c; --qc-fg: #f0f0f2; --qc-dim: #9090a0; --qc-accent: #00ff88; width: min(100%, 320px); display: flex; flex-direction: column; justify-content: space-between; gap: 14px; padding: 22px 20px 18px; border-radius: 20px; background: radial-gradient(120% 70% at 50% 0%, rgba(0, 255, 136, 0.16), transparent 60%), var(--qc-bg); color: var(--qc-fg); text-align: center; box-sizing: border-box; }
 .qr-card.post { aspect-ratio: 4 / 5; }
@@ -3231,12 +3233,16 @@ function joinReqCard(s, r, full) {
   const tag = acct ? chip(`ROTRA player · ${member ? 'already in your club' : 'new to your club'}`, member ? 'ok' : 'warn') : chip('Guest request', 'warn');
   const inv = inviterOf(s, r), match = savedPhoneMatch(r);
   const meta = acct ? `Requested ${fmtWhen(r.at, { lower: true })}` : `${r.phone ? esc(r.phone) : 'No phone given'} · says ${r.band === 'unsure' ? 'not sure of level' : esc(r.band)} · requested ${fmtWhen(r.at, { lower: true })}`;
+  // #706: the choice the player made. A waitlisted player's slot request names their place; the button follows the choice.
+  const want = wantOf(r), wlPos = want === 'fromWaitlist' ? waitOf(s).findIndex((w) => w.pid === r.pid) + 1 : 0;
+  const wantLine = want === 'fromWaitlist' ? `Waitlist #${wlPos || '?'} · asks for a slot` : WANT_TEXT[want];
+  const confirmLabel = want === 'fromWaitlist' ? (s.status === 'active' ? 'Admit player' : 'Give slot') : want === 'waitlist' || full ? 'Confirm to waitlist' : acct ? 'Confirm' : 'Confirm guest';
   return `<div class="req-row">
       <div class="li" style="padding:0">${face}<div class="main"><b>${esc(r.name)}${r.nick ? ` <span class="muted">“${esc(r.nick)}”</span>` : ''}</b>
-        <p class="small muted">${meta}</p>${acct ? `<p class="small muted">Shared rank: ${r.level != null ? esc(lvLabel(r.level)) : 'none yet'}</p>` : ''}${inv ? `<p class="small muted">Invited by ${esc(inv.name)}</p>` : ''}</div>${tag}</div>
+        <p class="small muted">${meta}</p><p class="small"><b>${wantLine}</b></p>${acct ? `<p class="small muted">Shared rank: ${r.level != null ? esc(lvLabel(r.level)) : 'none yet'}</p>` : ''}${inv ? `<p class="small muted">Invited by ${esc(inv.name)}</p>` : ''}</div>${tag}</div>
       ${r.linked ? notice('ok', `Linked to <b>${esc(nm(r.linked))}</b> from your saved players.`) : match ? notice('', `Is this <b>${esc(match.name)}</b> from your saved players?<div class="row" style="margin-top:8px"><button class="btn xs primary" data-act="linkReq" data-id="${r.id}" data-pid="${match.id}">Link</button><button class="btn xs" data-act="notThemReq" data-id="${r.id}">Not them</button></div>`) : ''}
       <div class="req-actions">${selectLevel(`req-lv-${r.id}`, lv, `data-act-change="reqLevel" data-id="${r.id}" aria-label="Level for ${esc(r.name)}"`, r.err && lv == null)}
-        <div class="row"><button class="btn sm" data-act="declineReq" data-id="${r.id}">Decline</button><button class="btn sm primary" data-act="confirmReq" data-id="${r.id}">${full ? 'Confirm to waitlist' : acct ? 'Confirm' : 'Confirm guest'}</button></div></div>
+        <div class="row"><button class="btn sm" data-act="declineReq" data-id="${r.id}">Decline</button><button class="btn sm primary" data-act="confirmReq" data-id="${r.id}">${confirmLabel}</button></div></div>
       ${r.err ? `<span class="err">${esc(r.err)}</span>` : ''}</div>`;
 }
 // D-2026-11-09-03: a drop-out notice frees nothing by itself. Remove from roster frees the slot; Keep closes the notice.
@@ -3259,6 +3265,21 @@ function matchReqCard(s, mr) {
       <div class="stack tight">${spots.map(line).join('')}</div>
       <div class="row"><button class="btn sm" data-act="declineMatchReq" data-id="${mr.id}">Decline</button><button class="btn sm primary" data-act="addMatchReq" data-id="${mr.id}">Add to queue</button></div></div>`;
 }
+// #706 (owner decision, November 11, 2026): the player picks how to join. `slot` = join a slot, `waitlist` = be
+// waitlisted, `fromWaitlist` = a waitlisted player asks for a slot. Join a slot is unavailable while every slot is
+// taken; every request still waits for the Queue Master. Requests from before this change count as `slot`.
+const WANT_CHOICES = [['slot', 'Join a slot'], ['waitlist', 'Be waitlisted']];
+const wantOf = (r) => r.want || 'slot';
+// "Slots are full" for a player's request: before start, with no open slot. During play the Queue Master can admit
+// additional players, so a slot request stays possible (the existing admission rules, #284–#287).
+const slotsFullFor = (s) => s.status !== 'active' && !openSlots(s);
+const WANT_TEXT = { slot: 'Asks for a slot', waitlist: 'Asks to be waitlisted', fromWaitlist: 'Asks for a slot from the waitlist' };
+// The signed-in card's choice; falls back to the waitlist when every slot is taken.
+const pubWantOf = (s) => (S.ui.pubWant === 'waitlist' || slotsFullFor(s) ? 'waitlist' : 'slot');
+function wantField(s, want, act, err) {
+  const full = slotsFullFor(s);
+  return `<div class="field"><span>How do you want to join?</span><div class="seg" role="group" aria-label="How do you want to join?">${WANT_CHOICES.map(([v, l]) => `<button aria-pressed="${want === v}" ${act} data-v="${v}" ${v === 'slot' && full ? 'disabled title="All slots are taken"' : ''}>${l}</button>`).join('')}</div>${err ? `<span class="err">${esc(err)}</span>` : `<span class="hint">${full ? 'All slots are taken, so you join the waitlist. The Queue Master gives slots as they open.' : 'A slot is yours once the Queue Master confirms. The waitlist keeps your place until a slot opens.'}</span>`}</div>`;
+}
 function joinCard(s) {
   if (s.status !== 'prepared' && s.status !== 'active') return '';
   const v = pubViewer();
@@ -3268,20 +3289,27 @@ function joinCard(s) {
   if (v) {
     if (R(s, v.id)) return '';
     const wl = waitOf(s).findIndex((w) => w.pid === v.id);
-    if (wl >= 0) return `<section class="card stack join-card">${notice('ok', `<b>Confirmed · waitlist #${wl + 1}</b><br>You're on the waitlist. Ask the Queue Master about a slot.`)}</section>`;
     const req = playerJoinReq(s, v.id);
-    if (req && req.status === 'pending') return `<section class="card stack join-card">${notice('warn', `<b>Request sent</b><br>Thanks, ${esc(v.name)}. The Queue Master confirms every request, usually at the venue. Your slot isn't held until they do.`)}<button class="btn jc-btn" data-act="cancelJoinReq" data-id="${req.id}">Cancel request</button></section>`;
+    if (wl >= 0) {
+      // #706: a waitlisted player may ask for a slot while slots are open; the Queue Master still confirms.
+      const asking = req && req.status === 'pending' && wantOf(req) === 'fromWaitlist';
+      const canAsk = !asking && open > 0 && s.acceptReq !== false;
+      return `<section class="card stack join-card">${notice('ok', `<b>Confirmed · waitlist #${wl + 1}</b><br>You're on the waitlist. ${asking ? 'You asked for a slot; the Queue Master confirms it.' : open > 0 ? `${open} slot${open === 1 ? ' is' : 's are'} open. Ask to join from the waitlist and the Queue Master confirms it.` : 'Ask the Queue Master about a slot.'}`)}
+        ${asking ? `<button class="btn jc-btn" data-act="cancelJoinReq" data-id="${req.id}">Cancel request</button>` : canAsk ? '<button class="btn primary jc-btn" data-act="joinFromWaitlist">Join from waitlist</button>' : ''}</section>`;
+    }
+    if (req && req.status === 'pending') return `<section class="card stack join-card">${notice('warn', `<b>Request sent</b><br>Thanks, ${esc(v.name)}. ${wantOf(req) === 'waitlist' ? 'You asked to be waitlisted. ' : ''}The Queue Master confirms every request, usually at the venue. Your ${wantOf(req) === 'waitlist' ? 'place' : 'slot'} isn't held until they do.`)}<button class="btn jc-btn" data-act="cancelJoinReq" data-id="${req.id}">Cancel request</button></section>`;
     if (req && req.status === 'declined') return `<section class="card stack join-card">${notice('bad', '<b>Request not accepted</b><br>The Queue Master didn\'t confirm this request. Contact them if you think it\'s a mistake.')}</section>`;
     if (s.acceptReq === false) return '<section class="card join-card"><p class="small muted">This session isn\'t taking requests online. Contact the Queue Master to play.</p></section>';
     return `<section class="card stack join-card"><div class="jc-top"><h2>Want to play?</h2>${slots}</div>
     ${s.roster.length ? skillMix(s.roster) : ''}
     <p class="small muted">${s.status === 'active' ? 'The Queue Master can admit additional players. ' : open ? '' : 'Confirmed players join the waitlist. '}One tap sends your request and the Queue Master confirms it.</p>
+    ${wantField(s, pubWantOf(s), 'data-act="pubWant"')}
     <button class="btn primary jc-btn" data-act="sendPlayerJoin">Request to join as ${esc(v.name)}</button></section>`;
   }
   const mine = pubAs().kind === 'guest' && S.ui.guestReq && S.ui.guestReq.sid === s.id ? (s.requests || []).find((r) => r.id === S.ui.guestReq.id) : null;
   if (mine) {
     const wl = mine.pid ? waitOf(s).findIndex((w) => w.pid === mine.pid) : -1;
-    const [cls, title, text] = mine.status === 'pending' ? ['warn', 'Request sent', `Thanks, ${esc(mine.name)}. The Queue Master confirms every guest, usually at the venue. Your slot isn't held until they do.`]
+    const [cls, title, text] = mine.status === 'pending' ? ['warn', 'Request sent', `Thanks, ${esc(mine.name)}. ${wantOf(mine) === 'waitlist' ? 'You asked to be waitlisted. ' : ''}The Queue Master confirms every guest, usually at the venue. Your ${wantOf(mine) === 'waitlist' ? 'place' : 'slot'} isn't held until they do.`]
       : mine.status === 'declined' ? ['bad', 'Request not accepted', 'The Queue Master didn\'t confirm this request. Contact them if you think it\'s a mistake.']
       : wl >= 0 ? ['ok', `Confirmed · waitlist #${wl + 1}`, 'You\'re on the waitlist. Ask the Queue Master about a slot.']
       : ['ok', 'Confirmed · you have a slot', 'See you on court. Your name is now in Participants.'];
@@ -4002,7 +4030,7 @@ function setPubAs(k) {
   if (k === 'visitor') S.ui.pubAs = { kind: 'visitor', key: k, sid: s.id };
   else if (k === 'guest') {
     if (!(S.ui.guestReq && S.ui.guestReq.sid === s.id && (s.requests || []).some((r) => r.id === S.ui.guestReq.id))) {
-      const r = { id: `q${Date.now()}`, name: 'Rico Santos', nick: 'Rics', phone: '0917 555 0142', band: 'Intermediate', at: Date.now(), status: 'pending' };
+      const r = { id: `q${Date.now()}`, name: 'Rico Santos', nick: 'Rics', phone: '0917 555 0142', band: 'Intermediate', at: Date.now(), status: 'pending', want: slotsFullFor(s) ? 'waitlist' : 'slot' };
       s.requests = [...(s.requests || []), r]; S.ui.guestReq = { sid: s.id, id: r.id };
     }
     S.ui.pubAs = { kind: 'guest', key: k, sid: s.id };
@@ -4241,7 +4269,8 @@ const SHEETS = {
       <label class="field"><span>Nickname (optional)</span><input class="input" id="join-nick" data-bind="ui.sheet.nick" value="${esc(sh.nick || '')}"></label>
       <label class="field"><span>Phone (optional)</span><input class="input${e.phone ? ' bad' : ''}" id="join-phone" type="tel" inputmode="tel" data-bind="ui.sheet.phone" value="${esc(sh.phone || '')}" autocomplete="tel">${e.phone ? `<span class="err">${e.phone}</span>` : '<span class="hint">Helps the club recognise you and link your ROTRA profile. Only the club sees it.</span>'}</label>
       <div class="field"><span>Your level</span><div class="seg" role="group" aria-label="Your level">${BAND_CHOICES.map(([v, l]) => `<button aria-pressed="${sh.band === v}" data-act="sheetSet" data-k="band" data-v="${v}">${l}</button>`).join('')}</div>${e.band ? `<span class="err">${e.band}</span>` : '<span class="hint">Your best guess. The Queue Master sets your level for the night.</span>'}</div>
-      ${notice('', 'This is a request, not a booking. The Queue Master confirms each guest before giving a slot.')}`,
+      ${wantField(s, slotsFullFor(s) ? 'waitlist' : sh.want || 'slot', 'data-act="sheetSet" data-k="want"', e.want)}
+      ${notice('', 'This is a request, not a booking. The Queue Master confirms each guest before giving a slot or a waitlist place.')}`,
       '<button class="btn" data-act="closeSheet">Cancel</button><button class="btn primary" data-act="sendJoin">Send request</button>');
   },
   // #479: the amount received from one player; the switch stays the quick paid toggle.
@@ -5117,7 +5146,17 @@ const ACT = {
   openGuest: (d) => { go('public', d.id); S.ui.guest = true; render(); },
   toggleReqFormat: (d) => { const dr = S.ui.draft; dr.reqFormats = { ...reqDefaults(dr), ...(dr.reqFormats || {}) }; dr.reqFormats[d.k] = !dr.reqFormats[d.k]; render(); },
   toggleAcceptReq: () => { const s = cur(); s.acceptReq = s.acceptReq === false; save(); render(); toast(s.acceptReq ? 'Join requests are on' : 'Join requests are off'); },
-  openJoin: () => openSheet({ type: 'join', band: null, how: 'guest' }),
+  openJoin: () => openSheet({ type: 'join', band: null, how: 'guest', want: slotsFullFor(cur()) ? 'waitlist' : 'slot' }),
+  // #706: the signed-in card's Join a slot / Be waitlisted choice.
+  pubWant: (d) => { S.ui.pubWant = d.v; render(); },
+  // #706: a waitlisted signed-in player asks for a slot while slots are open. Still a request: the Queue Master confirms.
+  joinFromWaitlist: () => {
+    const s = cur(), v = pubViewer(), w = v && (s.waitlist || []).find((x) => x.pid === v.id);
+    if (!w || (playerJoinReq(s, v.id) || {}).status === 'pending') return;
+    if (!openSlots(s)) { toast('All slots are taken. You keep your place on the waitlist.'); render(); return; }
+    const r = { id: `q${Date.now()}`, pid: v.id, account: v.rtr, name: v.name, nick: v.nick || '', phone: '', band: LEVELS[w.level] ? LEVELS[w.level].band : 'unsure', level: w.level, at: Date.now(), status: 'pending', want: 'fromWaitlist' };
+    s.requests = [...(s.requests || []), r]; save(); render(); toast('Slot requested');
+  },
   // D-2026-11-09-06, prototype: Log in / Register come back signed in as a sample ROTRA player, with the one-tap request ready.
   // Session page account bar. Prototype: Log in signs in as a sample ROTRA player, like the Request to join sheet.
   pubLogIn: () => { if (!S.ui.guest) { toast('Preview · visitors log in with ROTRA Player here'); return; } setPubAs('newplayer'); const v = pubViewer(); toast(v ? `Logged in as ${v.name}` : 'Signed in'); },
@@ -5128,7 +5167,10 @@ const ACT = {
   sendPlayerJoin: () => {
     const s = cur(), v = pubViewer();
     if (!v || (playerJoinReq(s, v.id) || {}).status === 'pending') return;
-    const r = { id: `q${Date.now()}`, pid: v.id, account: v.rtr, name: v.name, nick: v.nick || '', phone: '', band: v.sugg != null ? LEVELS[v.sugg].band : 'unsure', level: v.sugg ?? null, at: Date.now(), status: 'pending' };
+    // #706: Join a slot is refused while every slot is taken (the server's rule, not only the disabled choice).
+    const want = pubWantOf(s);
+    if (want === 'slot' && slotsFullFor(s)) { toast('All slots are taken. Join the waitlist instead.'); render(); return; }
+    const r = { id: `q${Date.now()}`, pid: v.id, account: v.rtr, name: v.name, nick: v.nick || '', phone: '', band: v.sugg != null ? LEVELS[v.sugg].band : 'unsure', level: v.sugg ?? null, at: Date.now(), status: 'pending', want };
     s.requests = [...(s.requests || []), r]; save(); render(); toast('Request sent');
   },
   cancelJoinReq: (d) => { const r = (cur().requests || []).find((x) => x.id === d.id); if (r && r.status === 'pending') r.status = 'cancelled'; save(); render(); toast('Request cancelled'); },
@@ -5171,9 +5213,13 @@ const ACT = {
     if (!(sh.name || '').trim()) err.name = 'Enter your name.';
     if ((sh.phone || '').trim() && (sh.phone.replace(/\D/g, '').length < 10)) err.phone = 'Enter a full mobile number, or leave it empty.';
     if (!sh.band) err.band = 'Pick your level, or Not sure.';
+    // #706: the player's choice; Join a slot is refused while every slot is taken.
+    const want = slotsFullFor(s) ? 'waitlist' : sh.want || 'slot';
+    if (!WANT_CHOICES.some(([v]) => v === want)) err.want = 'Pick Join a slot or Be waitlisted.';
+    else if (want === 'slot' && slotsFullFor(s)) err.want = 'All slots are taken. Join the waitlist instead.';
     sh.err = err;
     if (Object.keys(err).length) { render(); const f = document.getElementById(err.name ? 'join-name' : err.phone ? 'join-phone' : 'join-name'); if (f) f.focus(); return; }
-    const r = { id: `q${Date.now()}`, name: sh.name.trim(), nick: (sh.nick || '').trim(), phone: (sh.phone || '').trim(), band: sh.band, at: Date.now(), status: 'pending' };
+    const r = { id: `q${Date.now()}`, name: sh.name.trim(), nick: (sh.nick || '').trim(), phone: (sh.phone || '').trim(), band: sh.band, at: Date.now(), status: 'pending', want };
     s.requests = [...(s.requests || []), r];
     S.ui.guestReq = { sid: s.id, id: r.id }; S.ui.pubAs = { kind: 'guest', key: 'guest', sid: s.id }; S.ui.sheet = null; save(); render(); toast('Request sent');
   },
@@ -5247,10 +5293,21 @@ const ACT = {
     const s = cur(), r = (s.requests || []).find((x) => x.id === d.id);
     const lv = r.level ?? (r.band !== 'unsure' ? bandMid(r.band) : null);
     if (lv == null) { r.err = 'Choose a level for this club before confirming.'; render(); const f = document.getElementById(`req-lv-${r.id}`); if (f) f.focus(); return; }
-    const pid = r.pid || `p${Date.now()}`;
+    const pid = r.pid || `p${Date.now()}`, want = wantOf(r);
+    // #706: a waitlisted player's slot request. Before start it never overfills: full again means they stay waitlisted.
+    // During play the Queue Master may admit above the budget, as with Admit player on the waitlist.
+    if (want === 'fromWaitlist') {
+      const w = (s.waitlist || []).find((x) => x.pid === r.pid);
+      if (!w) { r.err = `${r.name} is no longer on the waitlist.`; render(); return; }
+      if (s.status !== 'active' && !openSlots(s)) { r.err = `Slots are full again. ${r.name} stays on the waitlist.`; render(); return; }
+      s.waitlist = s.waitlist.filter((x) => x.pid !== r.pid); r.status = 'confirmed'; r.err = '';
+      s.roster.push({ pid, level: +lv, present: s.status === 'active', locked: s.status === 'active', presentAt: Date.now() });
+      commit(`${r.name} got a slot from the waitlist · ${lvLabel(+lv)}`); render(); return;
+    }
     if (!r.pid) S.players.push(r.account ? { id: pid, name: r.name, nick: r.nick, identity: 'registered', rtr: r.account, sugg: r.level ?? null, prior: 0, base: null, added: Date.now(), joinedVia: 'session' } : { id: pid, name: r.name, nick: r.nick, identity: r.phone ? 'pending' : 'guest', rtr: null, sugg: null, prior: 0, base: null, added: Date.now() });
     r.status = 'confirmed'; r.pid = pid; r.err = '';
-    if (s.status !== 'active' && !openSlots(s)) { s.waitlist = [...(s.waitlist || []), { pid, level: +lv, at: r.at }]; commit(`${r.name} confirmed from a join request · waitlist #${waitOf(s).findIndex((w) => w.pid === pid) + 1}`); }
+    // #706: Be waitlisted always lands on the waitlist, even during play; Join a slot keeps the earlier rules.
+    if (want === 'waitlist' || (s.status !== 'active' && !openSlots(s))) { s.waitlist = [...(s.waitlist || []), { pid, level: +lv, at: r.at }]; commit(`${r.name} confirmed from a join request · waitlist #${waitOf(s).findIndex((w) => w.pid === pid) + 1}`); }
     else { s.roster.push({ pid, level: +lv, present: s.status === 'active', locked: s.status === 'active', presentAt: Date.now() }); commit(`${r.name} confirmed from a join request · ${lvLabel(+lv)}`); }
     render();
   },

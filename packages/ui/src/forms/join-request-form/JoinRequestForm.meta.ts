@@ -3,11 +3,12 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const joinRequestFormMeta = {
   name: 'JoinRequestForm',
   description:
-    "Q-PUBLIC-JOIN › Request to join: the session line, the guest's name (required), nickname and phone (optional) and their self-declared level (Beginner / Intermediate / Advanced / Not sure), with the note that a request is not a booking. Cancel and Send request.",
+    "Q-PUBLIC-JOIN › Request to join: the session line, the guest's name (required), nickname and phone (optional), their self-declared level (Beginner / Intermediate / Advanced / Not sure) and how they want to join (Join a slot / Be waitlisted; D-2026-11-11-02), with the note that a request is not a booking. Cancel and Send request.",
   usage: [
     'Reports current unsent inputs through onValuesChange; the container owns temporary draft storage and return navigation.',
     'Open it in a sheet titled "Request to join" from JoinRequestCard\'s Request to join button, with sessionLine as "title · date, time · venue".',
-    'onSubmit receives nickname and phone as null when empty, the phone in E.164, and statedBand as one of beginner, intermediate, advanced or unsure (session_join_requests.stated_band).',
+    'onSubmit receives nickname and phone as null when empty, the phone in E.164, statedBand as one of beginner, intermediate, advanced or unsure (session_join_requests.stated_band), and placement as slot or waitlist (session_join_requests.placement).',
+    'Pass slotsFull when the page\'s openSlots is 0: Join a slot is disabled (title "All slots are taken") and Be waitlisted is preselected, with the hint "All slots are taken, so you join the waitlist. The Queue Master gives slots as they open." The server refuses a slot request in that state too ("All slots are taken. Join the waitlist instead.").',
     'The form never sends: the container owns useSubmitJoinRequest, the "Request sent" toast and serverError. A failed send keeps what was typed; submit is disabled while isPending.',
     'Pass playerLoginHref to show the two-choice header: Continue as guest (this form, unchanged) and Log in with ROTRA Player (a link), with "New to ROTRA? Ask your club for a registration invite, or continue as a guest." There is no sign-up link. returned adds "You\'re back — finish your request below." Logging in never grants a slot; the request note stays in both paths.',
     "Sending needs internet. The Queue Master's level for the night is set when they confirm, in JoinRequestsPanel, never here.",

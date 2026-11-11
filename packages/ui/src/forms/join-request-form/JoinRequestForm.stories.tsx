@@ -21,6 +21,7 @@ const filled = {
   nickname: guest.nickname ?? '',
   phone: '0917 555 0142',
   statedBand: guest.statedBand,
+  placement: guest.placement,
 }
 
 const meta = {
@@ -60,6 +61,14 @@ export const WithPlayerLogin: Story = { args: { playerLoginHref } }
 export const ReturnedFromLogin: Story = { args: { playerLoginHref, returned: true } }
 
 export const Filled: Story = { args: { defaultValues: filled } }
+
+/** Every slot is taken (D-2026-11-11-02): Join a slot is disabled and Be waitlisted preselected. */
+export const SlotsFull: Story = { args: { slotsFull: true, defaultValues: filled } }
+export const SlotsFullLight: Story = { ...SlotsFull, globals: { theme: 'light' } }
+/** The guest asks to be waitlisted while slots are still open. */
+export const WaitlistChosen: Story = {
+  args: { defaultValues: { ...filled, placement: 'waitlist' } },
+}
 
 export const Pending: Story = { args: { isPending: true, defaultValues: filled } }
 

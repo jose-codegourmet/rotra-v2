@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-IN PROGRESS: 4 · IN MOCK APP: 103 · CANCELLED: 1 · MOCKUP ONLY: 4
+IN PROGRESS: 4 · IN MOCK APP: 105 · CANCELLED: 1 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -290,5 +290,6 @@ IN PROGRESS: 4 · IN MOCK APP: 103 · CANCELLED: 1 · MOCKUP ONLY: 4
 | [2026-11-10-queue-public-account-bar](2026-11-10-queue-public-account-bar.md) | Session page: account bar with Log in, or the signed-in Player and Sign out | public-account-bar (new), avatar, button | IN MOCK APP — #585 |
 | [2026-11-11-queue-hide-present-before-start](2026-11-11-queue-hide-present-before-start.md) | Preparation roster: no Present switches until the session has started | roster-row, roster-card, roster-panel | IN MOCK APP — #704 |
 | [2026-11-11-queue-join-request-avatars](2026-11-11-queue-join-request-avatars.md) | Join requests: a signed-in Player's request shows their profile picture | join-requests-panel, avatar | IN MOCK APP — PR #702 |
+| [2026-11-11-queue-join-request-slot-or-waitlist](2026-11-11-queue-join-request-slot-or-waitlist.md) | Join request: the player picks Join a slot or Be waitlisted, and can join from the waitlist | join-request-form, join-request-card, join-requests-panel | IN MOCK APP — #706 |
 | [2026-11-11-queue-share-club-invite-copy-link](2026-11-11-queue-share-club-invite-copy-link.md) | Copy invite link on the Share club invite sheet | club-invite-card, share-card | IN MOCK APP — #708 |
 <!-- status-index:end -->

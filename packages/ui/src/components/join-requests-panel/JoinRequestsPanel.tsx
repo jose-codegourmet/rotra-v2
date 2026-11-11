@@ -22,6 +22,30 @@ export type JoinRequestDetails = {
   sharedRank?: string | null
   invitedBy?: string
   phoneMatch?: { name: string; linked?: boolean; onLink: () => void; onNotThem: () => void }
+  /** A Join from waitlist request: the player's current 1-based place ("Waitlist #N · asks for a slot") */
+  waitlistPosition?: number | null
+}
+
+/** The player's choice on the request (D-2026-11-11-02), as the Queue Master reads it. */
+export function placementLabel(
+  placement: SessionJoinRequest['placement'] | undefined,
+  waitlistPosition?: number | null,
+) {
+  if (placement === 'waitlist') return 'Asks to be waitlisted'
+  if (placement === 'from_waitlist') return `Waitlist #${waitlistPosition ?? '?'} · asks for a slot`
+  return 'Asks for a slot'
+}
+
+/** The primary button by choice: Confirm to waitlist, Give slot / Admit player, Confirm guest / Confirm. */
+export function confirmLabel(
+  r: Pick<SessionJoinRequest, 'placement'>,
+  slotsFull: boolean,
+  live: boolean,
+  account: boolean,
+) {
+  if (r.placement === 'from_waitlist') return live ? 'Admit player' : 'Give slot'
+  if (r.placement === 'waitlist' || (slotsFull && !live)) return 'Confirm to waitlist'
+  return account ? 'Confirm' : 'Confirm guest'
 }
 export type JoinRequestsPanelProps = {
   requestDetails?: Record<string, JoinRequestDetails>
@@ -71,9 +95,11 @@ const LEVEL_ERROR = 'Choose a level for this club before confirming.'
 
 /**
  * Preparation › Join requests, and the live console's Join requests sheet: each waiting guest with
- * initials, name, phone, stated band and time, a level select preset to the middle of that band, and
- * Decline / Confirm guest (Confirm to waitlist when slots are full). Phones show here only, never on
- * public components. While loading it shows Skeleton rows.
+ * initials, name, phone, stated band and time, the choice they made (Asks for a slot / Asks to be
+ * waitlisted / Waitlist #N · asks for a slot; D-2026-11-11-02), a level select preset to the middle
+ * of that band, and Decline / Confirm guest (Confirm to waitlist for a waitlist request or when slots
+ * are full before start; Give slot / Admit player for a request from the waitlist). Phones show here
+ * only, never on public components. While loading it shows Skeleton rows.
  */
 export function JoinRequestsPanel({
   requests,
@@ -243,6 +269,9 @@ export function JoinRequestsPanel({
                             </>
                           )}
                         </span>
+                        <span className="text-[13px] font-semibold">
+                          {placementLabel(r.placement, details?.waitlistPosition)}
+                        </span>
                         {details?.account ? (
                           <span className="text-[13px] text-fg2">
                             Shared rank: {details.sharedRank ?? 'none yet'}
@@ -318,13 +347,9 @@ export function JoinRequestsPanel({
                           disabled={isPending}
                           variant="primary"
                           onClick={() => confirm(r)}
-                          aria-label={`${slotsFull && !live ? 'Confirm to waitlist' : details?.account ? 'Confirm' : 'Confirm guest'} ${r.name}`}
+                          aria-label={`${confirmLabel(r, slotsFull, live, !!details?.account)} ${r.name}`}
                         >
-                          {slotsFull && !live
-                            ? 'Confirm to waitlist'
-                            : details?.account
-                              ? 'Confirm'
-                              : 'Confirm guest'}
+                          {confirmLabel(r, slotsFull, live, !!details?.account)}
                         </Button>
                       </div>
                     </div>

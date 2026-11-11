@@ -101,6 +101,16 @@ enum StatedBand {
   @@map("stated_band")
 }
 
+/// The player's choice on a join request (D-2026-11-11-02): Join a slot, Be waitlisted, or a
+/// waitlisted Player asking for a slot. Rows from before the choice read `slot`.
+enum JoinRequestPlacement {
+  slot
+  waitlist
+  from_waitlist
+
+  @@map("join_request_placement")
+}
+
 enum JoinRequestStatus {
   pending
   confirmed
@@ -116,27 +126,30 @@ enum JoinRequestStatus {
 /// Request from the public session link: a guest's form, or a signed-in Player's one tap (player_id
 /// set, name copied from the profile). Never inserts roster/waitlist rows by itself.
 model SessionJoinRequest {
-  id                String            @id @db.Uuid
-  clubId            String            @map("club_id") @db.Uuid
-  sessionId         String            @map("session_id") @db.Uuid
+  id                String               @id @db.Uuid
+  clubId            String               @map("club_id") @db.Uuid
+  sessionId         String               @map("session_id") @db.Uuid
   name              String
   nickname          String?
   /// Visible to the club only, never on the public page.
-  phoneE164         String?           @map("phone_e164")
-  statedBand        StatedBand        @map("stated_band")
-  status            JoinRequestStatus @default(pending)
-  requestedAt       DateTime          @map("requested_at") @db.Timestamptz(6)
-  decidedAt         DateTime?         @map("decided_at") @db.Timestamptz(6)
+  phoneE164         String?              @map("phone_e164")
+  statedBand        StatedBand           @map("stated_band")
+  /// Join a slot (`slot`), Be waitlisted (`waitlist`) or Join from waitlist (`from_waitlist`).
+  /// `slot` is refused while the roster is at the budget; `from_waitlist` sets club_player_id at creation.
+  placement         JoinRequestPlacement @default(slot)
+  status            JoinRequestStatus    @default(pending)
+  requestedAt       DateTime             @map("requested_at") @db.Timestamptz(6)
+  decidedAt         DateTime?            @map("decided_at") @db.Timestamptz(6)
   /// Device that confirmed/declined, from the same club (scoped FK added by F07.12).
-  decidedByDeviceId String?           @map("decided_by_device_id") @db.Uuid
+  decidedByDeviceId String?              @map("decided_by_device_id") @db.Uuid
   /// The club player created on confirm (or the Player's own saved player).
-  clubPlayerId      String?           @map("club_player_id") @db.Uuid
+  clubPlayerId      String?              @map("club_player_id") @db.Uuid
   /// The signed-in Player who sent it (D-2026-11-09-02); null for a guest. One pending per Player
   /// and session (partial unique index in the migration).
-  playerId          String?           @map("player_id") @db.Uuid
-  createdAt         DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt         DateTime          @updatedAt @map("updated_at") @db.Timestamptz(6)
-  revision          BigInt            @default(1)
+  playerId          String?              @map("player_id") @db.Uuid
+  createdAt         DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime             @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision          BigInt               @default(1)
 
   session    QueueSession @relation(fields: [clubId, sessionId], references: [clubId, id], onDelete: Restrict)
   clubPlayer ClubPlayer?  @relation(fields: [clubId, clubPlayerId], references: [clubId, id], onDelete: Restrict)

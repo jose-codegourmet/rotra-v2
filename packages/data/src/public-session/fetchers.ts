@@ -508,6 +508,7 @@ export async function getMyNight(slug: string, playerId: string): Promise<MyNigh
           name: request.name,
           status: request.status,
           waitlistPosition: request.status === 'confirmed' && waitIndex >= 0 ? waitIndex + 1 : null,
+          placement: request.placement,
         }
       : null,
     matchRequest: openMatchRequest
@@ -604,6 +605,7 @@ export async function sendJoinRequest(slug: string, input: SendJoinRequestInput)
     nickname: input.nickname ?? undefined,
     phone: input.phone ?? undefined,
     statedBand: input.statedBand,
+    placement: input.placement,
   })
   myRequests.set(slug, {
     generation: mockStore.getGeneration(),
@@ -633,6 +635,7 @@ export async function getMyJoinRequest(slug: string): Promise<MyJoinRequest | nu
     name: r.name,
     status: r.status,
     waitlistPosition: index >= 0 ? index + 1 : null,
+    placement: r.placement,
   }
 }
 
@@ -669,12 +672,16 @@ export function mockPlayerSessionAccess(slug: string, playerId: string): PlayerS
   return {
     ...sessionPageAccountOf(state, playerId),
     inSession: !!slot.roster || !!slot.waitlist,
+    waitlistPosition: slot.waitlist
+      ? waitlist.findIndex((w) => w.id === slot.waitlist?.id) + 1 || null
+      : null,
     joinRequest: request
       ? {
           requestId: request.id,
           name: request.name,
           status: request.status,
           waitlistPosition: waitIndex >= 0 ? waitIndex + 1 : null,
+          placement: request.placement,
         }
       : null,
     fullRoster,

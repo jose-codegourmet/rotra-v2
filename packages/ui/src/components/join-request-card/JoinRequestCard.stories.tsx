@@ -94,6 +94,58 @@ export const SignedInSent: Story = {
   args: { variant: 'sent', name: 'Jamie Cruz', onCancelRequest: fn() },
 }
 
+/** D-2026-11-11-02: the signed-in player picks Join a slot or Be waitlisted above the one tap. */
+export const SignedInChoice: Story = {
+  args: {
+    variant: 'open',
+    openSlots,
+    capacity,
+    signedInName: 'Jamie Cruz',
+    placement: 'slot',
+    onPlacementChange: fn(),
+    onRequestToJoin: fn(),
+  },
+}
+/** Every slot is taken: Join a slot is disabled and the waitlist is the only choice. */
+export const SignedInChoiceFull: Story = {
+  args: {
+    variant: 'full',
+    signedInName: 'Jamie Cruz',
+    placement: 'waitlist',
+    onPlacementChange: fn(),
+    onRequestToJoin: fn(),
+  },
+}
+export const SignedInChoiceFullLight: Story = { ...SignedInChoiceFull, globals: { theme: 'light' } }
+/** A waitlist request waiting for the Queue Master. */
+export const SignedInSentWaitlist: Story = {
+  args: { variant: 'sent', name: 'Jamie Cruz', placement: 'waitlist', onCancelRequest: fn() },
+}
+/** Waitlisted while slots are open: Join from waitlist. */
+export const SignedInWaitlistedOpenSlots: Story = {
+  args: {
+    variant: 'confirmed-waitlist',
+    waitlistPosition: 2,
+    signedIn: true,
+    openSlots: 3,
+    onJoinFromWaitlist: fn(),
+  },
+}
+export const SignedInWaitlistedOpenSlotsLight: Story = {
+  ...SignedInWaitlistedOpenSlots,
+  globals: { theme: 'light' },
+}
+/** The waitlisted player asked for a slot; the Queue Master confirms it. */
+export const SignedInSlotRequested: Story = {
+  args: {
+    variant: 'confirmed-waitlist',
+    waitlistPosition: 2,
+    signedIn: true,
+    openSlots: 3,
+    slotRequestPending: true,
+    onCancelRequest: fn(),
+  },
+}
 export const SignedInWaitlisted: Story = {
   args: { variant: 'confirmed-waitlist', waitlistPosition: 2, signedIn: true },
 }

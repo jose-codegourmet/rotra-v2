@@ -18,6 +18,7 @@ const request = (id: string, status: SessionJoinRequest['status']): SessionJoinR
   nickname: null,
   phoneE164: null,
   statedBand: 'unsure',
+  placement: 'slot',
   status,
   requestedAt: now - 3600000,
   decidedAt: status === 'pending' ? null : now - 1800000,

@@ -1,6 +1,6 @@
 # Facebook post: court times on each court line and a join link (#730, proposed)
 
-Status: NEW
+Status: IN MOCK APP — #730
 Date: 2026-11-11
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Facebook post dialog (Copy Facebook post), Club settings › Facebook post template keys

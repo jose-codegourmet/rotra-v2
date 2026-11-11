@@ -19,6 +19,8 @@ import { ContactRequestList } from '@rotra/ui/contact-request-list'
 import { ContactRequestStatusChip } from '@rotra/ui/contact-request-status-chip'
 import { DetailHero } from '@rotra/ui/detail-hero'
 import { ErrorState } from '@rotra/ui/error-state'
+import { usePhotoViewer } from '@rotra/ui/hooks/use-photo-viewer'
+import { PhotoViewer } from '@rotra/ui/photo-viewer'
 import { PlayerAccountCard } from '@rotra/ui/player-account-card'
 import { PlayerAccountChip } from '@rotra/ui/player-account-chip'
 import { PlayerRankCard } from '@rotra/ui/player-rank-card'
@@ -70,6 +72,7 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
     else params.set('tab', next)
     router.replace(`?${params}`, { scroll: false })
   }
+  const photo = usePhotoViewer()
   const playerQuery = useAdminPlayer(playerId)
   const gamesQuery = useAdminPlayerGames(playerId)
   const requestsQuery = useContactRequests({ playerId })
@@ -154,6 +157,7 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
         ? playerAuditQuery
         : null
 
+  const picture = profilePictureSrc(player.picture, player.id, player.name)
   return (
     <>
       {back}
@@ -161,8 +165,9 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
         media={
           <Avatar
             name={player.name}
-            src={profilePictureSrc(player.picture, player.id, player.name)}
+            src={picture}
             size={52}
+            onView={picture ? () => photo.show({ src: picture, name: player.name }) : undefined}
           />
         }
         title={player.name}
@@ -364,6 +369,7 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
           </Card>
         </TabsContent>
       </Tabs>
+      {photo.viewerProps ? <PhotoViewer {...photo.viewerProps} /> : null}
     </>
   )
 }

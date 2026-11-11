@@ -14,6 +14,8 @@ export type MyPositionCardProps = {
     needsReassessment?: boolean
   }
   onShowMyRow?: () => void
+  /** Opens the full photo (PhotoViewer, #716); only a real picture is a button */
+  onViewPicture?: () => void
   onOpenProfile: () => void
 }
 export function MyPositionCard({
@@ -23,13 +25,19 @@ export function MyPositionCard({
   position,
   status,
   onShowMyRow,
+  onViewPicture,
   onOpenProfile,
 }: MyPositionCardProps) {
   if (position !== undefined && levelLabel)
     return (
       <Card tone="highlight" className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <Avatar name={fullName} src={picture?.src} initials={picture?.initials} />
+          <Avatar
+            name={fullName}
+            src={picture?.src}
+            initials={picture?.initials}
+            onView={onViewPicture}
+          />
           <div>
             <p className="m-0 text-[13px] text-fg2">Your position</p>
             <p className="m-0">

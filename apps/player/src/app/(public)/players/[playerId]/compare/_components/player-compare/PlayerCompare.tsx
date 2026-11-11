@@ -8,8 +8,10 @@ import { Card } from '@rotra/ui/card'
 import { CompareFilterBar } from '@rotra/ui/compare-filter-bar'
 import { type CompareStatRow, CompareStats } from '@rotra/ui/compare-stats'
 import { ErrorState } from '@rotra/ui/error-state'
+import { usePhotoViewer } from '@rotra/ui/hooks/use-photo-viewer'
 import { levelLabel } from '@rotra/ui/level-pill'
 import { PageHeader } from '@rotra/ui/page-header'
+import { PhotoViewer } from '@rotra/ui/photo-viewer'
 import { ProfileNotFound } from '@rotra/ui/profile-not-found'
 import { SharedGamesList } from '@rotra/ui/shared-game-row'
 import { Skeleton } from '@rotra/ui/skeleton'
@@ -44,6 +46,7 @@ export function PlayerCompare({ playerId }: { playerId: string }) {
   const viewerId = session.data?.account.id ?? ''
   const [filter, setFilter] = useState<PlayerCompareFilter>('all')
   const [page, setPage] = useState(0)
+  const photo = usePhotoViewer()
   const compare = usePlayerCompare(viewerId, playerId, { filter, page })
   useEffect(() => {
     if (viewerId && viewerId === playerId)
@@ -111,15 +114,27 @@ export function PlayerCompare({ playerId }: { playerId: string }) {
   const myLevel = my.rank?.levelIndex == null ? null : (PLAYING_LEVELS[my.rank.levelIndex] ?? null)
   const otherLevel =
     other.rank?.levelIndex == null ? null : (PLAYING_LEVELS[other.rank.levelIndex] ?? null)
+  const myPicture = pictureSrc(my.profile.picture, my.profile.playerId, my.profile.fullName)
+  const otherPicture = pictureSrc(
+    other.profile.picture,
+    other.profile.playerId,
+    other.profile.fullName,
+  )
   const me = {
     name: my.profile.fullName,
-    pictureUrl: pictureSrc(my.profile.picture, my.profile.playerId, my.profile.fullName),
+    pictureUrl: myPicture,
+    onViewPicture: myPicture
+      ? () => photo.show({ src: myPicture, name: my.profile.fullName })
+      : undefined,
     level: myLevel,
   }
   const them = {
     name: other.profile.fullName,
     label: otherName,
-    pictureUrl: pictureSrc(other.profile.picture, other.profile.playerId, other.profile.fullName),
+    pictureUrl: otherPicture,
+    onViewPicture: otherPicture
+      ? () => photo.show({ src: otherPicture, name: other.profile.fullName })
+      : undefined,
     level: otherLevel,
   }
   const stats = data.stats[filter]
@@ -238,6 +253,7 @@ export function PlayerCompare({ playerId }: { playerId: string }) {
         otherName={otherName}
         onPageChange={setPage}
       />
+      {photo.viewerProps ? <PhotoViewer {...photo.viewerProps} /> : null}
     </main>
   )
 }

@@ -24,8 +24,18 @@ export function TogetherCard({ me, them, games, won, winRate, className }: Toget
       <section aria-label="As a team">
         <div className="flex items-center gap-3.5">
           <span className="flex shrink-0 [&>span]:ring-[3px] [&>span]:ring-surface [&>span+span]:-ml-3.5">
-            <Avatar name={me.name} src={me.pictureUrl ?? undefined} size={64} />
-            <Avatar name={them.name} src={them.pictureUrl ?? undefined} size={64} />
+            <Avatar
+              name={me.name}
+              src={me.pictureUrl ?? undefined}
+              size={64}
+              onView={me.onViewPicture}
+            />
+            <Avatar
+              name={them.name}
+              src={them.pictureUrl ?? undefined}
+              size={64}
+              onView={them.onViewPicture}
+            />
           </span>
           <div className="flex min-w-0 flex-col gap-1.5">
             <b className="[overflow-wrap:anywhere]">You and {firstName}</b>

@@ -2,6 +2,7 @@ import type { ParticipantStats, ParticipantTonight } from '@rotra/data/public-se
 import { Avatar } from '@rotra/ui/avatar'
 import { Chip } from '@rotra/ui/chip'
 import { cn } from '@rotra/ui/cn'
+import { ProfileBanner } from '@rotra/ui/profile-banner'
 import type { ReactNode } from 'react'
 
 export type ProfileBannerCardProps = {
@@ -17,6 +18,10 @@ export type ProfileBannerCardProps = {
   onPhotoClick?: () => void
   /** Accessible name of the photo button; defaults to “View full photo of NAME” */
   photoLabel?: string
+  /** The player's Profile banner key (court, night, dusk, ember, sun, stripe); without it or an image, the accent gradient */
+  bannerKey?: string | null
+  /** An Admin-uploaded banner image; wins over bannerKey */
+  bannerImageUrl?: string | null
   /** The chip row: identity chip, level badge, Private profile or Not on ROTRA yet */
   chips?: ReactNode
   /** The small muted identity line under the chips (Queue Master's card) */
@@ -106,7 +111,7 @@ export function ProfileStatTiles({ stats }: { stats: ParticipantStats }) {
 }
 
 /**
- * The profile card (D-PARTICIPANT-PROFILE): a banner strip in the accent gradient, the big picture
+ * The profile card (D-PARTICIPANT-PROFILE): a banner strip (the player's Profile banner, else the accent gradient), the big picture
  * overlapping its bottom edge with a surface-coloured ring, the name in bold with the nickname in
  * quotes, the chip row, an optional identity line, the Tonight · status line, then boxed sections.
  * Shared by the session page's participant cards and the Queue Master's player profile. Put it in a
@@ -118,6 +123,8 @@ export function ProfileBannerCard({
   photoUrl,
   onPhotoClick,
   photoLabel,
+  bannerKey,
+  bannerImageUrl,
   chips,
   identityLine,
   tonight,
@@ -126,10 +133,14 @@ export function ProfileBannerCard({
 }: ProfileBannerCardProps) {
   return (
     <div className={cn('relative min-w-0', className)}>
-      <div
-        aria-hidden
-        className="h-[84px] bg-[linear-gradient(135deg,var(--accent-dim),var(--accent)_55%,var(--accent-subtle))]"
-      />
+      {bannerKey || bannerImageUrl ? (
+        <ProfileBanner bannerKey={bannerKey} imageUrl={bannerImageUrl} className="h-[84px]" />
+      ) : (
+        <div
+          aria-hidden
+          className="h-[84px] bg-[linear-gradient(135deg,var(--accent-dim),var(--accent)_55%,var(--accent-subtle))]"
+        />
+      )}
       <div className="absolute top-[44px] left-5">
         <Avatar
           name={name}

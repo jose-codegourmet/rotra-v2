@@ -34,6 +34,10 @@ export type PlayerProfileSheetProps = {
   tonight?: ParticipantTonight | null
   /** Opens the full photo (#716); without it the picture is not a button */
   onPhotoClick?: () => void
+  /** The player's Profile banner key; missing draws the accent gradient */
+  bannerKey?: string | null
+  /** An Admin-uploaded banner image; wins over bannerKey */
+  bannerImageUrl?: string | null
   /** City the profile was first registered in (from the RTR ID) */
   registeredCity: string | null
   /** null: "Given when they register" for an unclaimed player (club-only until they register), else "None yet" */
@@ -86,6 +90,8 @@ export function PlayerProfileSheet({
   tonightLevel,
   tonight,
   onPhotoClick,
+  bannerKey,
+  bannerImageUrl,
   registeredCity,
   rtrId,
   addedLabel,
@@ -158,6 +164,8 @@ export function PlayerProfileSheet({
         nickname={nickname}
         photoUrl={photoUrl}
         onPhotoClick={onPhotoClick}
+        bannerKey={bannerKey}
+        bannerImageUrl={bannerImageUrl}
         chips={
           <>
             <IdentityChip identity={identity} />

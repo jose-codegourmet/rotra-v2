@@ -3,7 +3,13 @@ import { Card } from '@rotra/ui/card'
 import { cn } from '@rotra/ui/cn'
 import { ProgressBar } from '@rotra/ui/progress-bar'
 
-export type CompareIdentity = { name: string; label?: string; pictureUrl?: string | null }
+export type CompareIdentity = {
+  name: string
+  label?: string
+  pictureUrl?: string | null
+  /** Opens the full photo (PhotoViewer, #716); only a real picture is a button */
+  onViewPicture?: () => void
+}
 export type CompareStatRow = {
   label: string
   mine: string | number
@@ -41,7 +47,12 @@ export function CompareStats({
       <section aria-label="Side by side">
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
           <div className="flex min-w-0 flex-col items-center gap-1 text-center">
-            <Avatar name={me.name} src={me.pictureUrl ?? undefined} size={64} />
+            <Avatar
+              name={me.name}
+              src={me.pictureUrl ?? undefined}
+              size={64}
+              onView={me.onViewPicture}
+            />
             <b>You</b>
           </div>
           <span
@@ -63,7 +74,12 @@ export function CompareStats({
             </svg>
           </span>
           <div className="flex min-w-0 flex-col items-center gap-1 text-center">
-            <Avatar name={them.name} src={them.pictureUrl ?? undefined} size={64} />
+            <Avatar
+              name={them.name}
+              src={them.pictureUrl ?? undefined}
+              size={64}
+              onView={them.onViewPicture}
+            />
             <b className="[overflow-wrap:anywhere]">{firstName}</b>
           </div>
         </div>

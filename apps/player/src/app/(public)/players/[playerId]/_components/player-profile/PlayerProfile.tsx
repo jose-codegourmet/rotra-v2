@@ -22,8 +22,10 @@ import { ConfirmSheet } from '@rotra/ui/confirm-sheet'
 import { ContactRequestStatus } from '@rotra/ui/contact-request-status'
 import { EligibilityCard } from '@rotra/ui/eligibility-card'
 import { ErrorState } from '@rotra/ui/error-state'
+import { usePhotoViewer } from '@rotra/ui/hooks/use-photo-viewer'
 import { MySessionsCard } from '@rotra/ui/my-sessions-card'
 import { Notice } from '@rotra/ui/notice'
+import { PhotoViewer } from '@rotra/ui/photo-viewer'
 import { PlayerAboutCard } from '@rotra/ui/player-about-card'
 import { PlayerClubsCard } from '@rotra/ui/player-clubs-card'
 import { PlayerIdentityCard } from '@rotra/ui/player-identity-card'
@@ -80,6 +82,7 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
     current = rank.data
   const sharing = usePlayerShareSheet(isOwn ? playerId : null)
   const pictureEditor = useProfilePictureSheet(isOwn ? player : null)
+  const photo = usePhotoViewer()
   const failed = profile.isError || rank.isError || games.isError || settings.isError
   const retry = () => {
     void profile.refetch()
@@ -191,21 +194,22 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
       },
       onError: (error) => toast.error(error.message),
     })
+  const picture = pictureSrc(player.picture, player.playerId, player.fullName) ?? null
   const missingDetails = isOwn && (!player.playingStyle || !player.experienceYears)
   return (
     <ProfileLayout
       side={
         <>
           <PlayerIdentityCard
-            profile={{
-              ...player,
-              picture: pictureSrc(player.picture, player.playerId, player.fullName) ?? null,
-            }}
+            profile={{ ...player, picture }}
             isOwn={isOwn}
             bannerKey={player.bannerKey}
             bannerImageUrl={player.bannerImageUrl}
             idElementId={idElementId}
             onCopyId={() => void copyPlayerId(player.rtrId, idElementId)}
+            onViewPicture={
+              picture ? () => photo.show({ src: picture, name: player.fullName }) : undefined
+            }
             onChangePicture={pictureEditor.openSheet}
             compareSignedIn={Boolean(session.data)}
             onCompare={
@@ -224,6 +228,7 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
             onShare={isOwn ? sharing.openProfile : undefined}
           />
           {pictureEditor.sheet}
+          {photo.viewerProps ? <PhotoViewer {...photo.viewerProps} /> : null}
           {sharing.sheet}
           {isOwn && myAccount.data ? (
             <AccountPanel

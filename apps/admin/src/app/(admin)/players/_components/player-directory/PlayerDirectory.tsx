@@ -18,7 +18,9 @@ import { Checkbox } from '@rotra/ui/checkbox'
 import { CopyPlayerValue } from '@rotra/ui/copy-player-value'
 import { EmptyState } from '@rotra/ui/empty-state'
 import { ErrorState } from '@rotra/ui/error-state'
+import { usePhotoViewer } from '@rotra/ui/hooks/use-photo-viewer'
 import { PageHeader } from '@rotra/ui/page-header'
+import { PhotoViewer } from '@rotra/ui/photo-viewer'
 import { PlayerPagination } from '@rotra/ui/player-pagination'
 import { SameNameNotice } from '@rotra/ui/same-name-notice'
 import { Skeleton } from '@rotra/ui/skeleton'
@@ -34,6 +36,7 @@ import { usePlayerEdit } from '../player-edit/usePlayerEdit'
 import { PlayerManagementActions } from '../player-management-actions/PlayerManagementActions'
 import { directoryFilters, writeDirectoryFilters } from './PlayerDirectory.url'
 export function PlayerDirectory() {
+  const photo = usePhotoViewer()
   const router = useRouter(),
     search = useSearchParams(),
     filters = directoryFilters(new URLSearchParams(search.toString()))
@@ -267,6 +270,7 @@ export function PlayerDirectory() {
         profileHref={href(peek)}
         historyHref={`/players/${peek}?tab=history&from=${encodeURIComponent(from)}`}
         socialLinks={profile.data?.socialLinks}
+        onViewPhoto={photo.show}
         edit={playerQuery.data ? edit.edit : undefined}
         onInvite={
           !offline && playerQuery.data
@@ -309,6 +313,7 @@ export function PlayerDirectory() {
             )
         }}
       />
+      {photo.viewerProps ? <PhotoViewer {...photo.viewerProps} /> : null}
     </div>
   )
 }

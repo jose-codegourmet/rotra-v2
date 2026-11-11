@@ -19,9 +19,11 @@ import { DataTable } from '@rotra/ui/data-table'
 import { DetailHero } from '@rotra/ui/detail-hero'
 import { EmptyState } from '@rotra/ui/empty-state'
 import { ErrorState } from '@rotra/ui/error-state'
+import { usePhotoViewer } from '@rotra/ui/hooks/use-photo-viewer'
 import { LicenseAccessChip } from '@rotra/ui/license-access-chip'
 import { LicenseStatusCard } from '@rotra/ui/license-status-card'
 import { NameChangeRequestCard } from '@rotra/ui/name-change-request-card'
+import { PhotoViewer } from '@rotra/ui/photo-viewer'
 import { RetentionCard } from '@rotra/ui/retention-card'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { type TabBadge, Tabs, TabsContent } from '@rotra/ui/tabs'
@@ -73,6 +75,7 @@ export function ClubDetail({
   const [tab, setTab] = useState(initialTab)
   const [sheet, setSheet] = useState<'license' | 'price' | null>(null)
   const [nameDecision, setNameDecision] = useState<ClubNameDecision | null>(null)
+  const photo = usePhotoViewer()
   const clubQuery = useAdminClub(clubId)
   const termsQuery = useLicenseTerms(clubId)
   const auditQuery = useAuditEvents({ targetType: 'club', targetId: clubId })
@@ -177,6 +180,17 @@ export function ClubDetail({
             initials={club.initials}
             logoUrl={club.logoUrl}
             tone={club.accent ? 'accent' : 'default'}
+            viewLabel={`View full logo of ${club.name}`}
+            onView={
+              club.logoUrl
+                ? () =>
+                    photo.show({
+                      src: club.logoUrl ?? '',
+                      name: club.name,
+                      label: `Logo of ${club.name}`,
+                    })
+                : undefined
+            }
           />
         }
         title={club.name}
@@ -361,6 +375,7 @@ export function ClubDetail({
         onOpenChange={(open) => setSheet(open ? 'price' : null)}
       />
       <ClubNameSheets club={club} decision={nameDecision} onClose={() => setNameDecision(null)} />
+      {photo.viewerProps ? <PhotoViewer {...photo.viewerProps} /> : null}
     </>
   )
 }

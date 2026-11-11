@@ -5,7 +5,10 @@ import { usePlayerGames } from '@rotra/data/player/usePlayerGames'
 import { usePlayerProfile } from '@rotra/data/player/usePlayerProfile'
 import { usePlayerRank } from '@rotra/data/player/usePlayerRank'
 import { type ClubMemberProfile, ClubMemberProfileSheet } from '@rotra/ui/club-member-profile-sheet'
+import { usePhotoViewer } from '@rotra/ui/hooks/use-photo-viewer'
 import { levelLabel } from '@rotra/ui/level-pill'
+import { PhotoViewer } from '@rotra/ui/photo-viewer'
+import { PROFILE_BANNERS } from '@rotra/ui/profile-banner'
 import { useRouter } from 'next/navigation'
 import { pictureSrc } from '@/app/_components/profile-picture/pictureSrc'
 
@@ -27,6 +30,7 @@ export function MemberProfile({
   const profile = usePlayerProfile(playerId)
   const rank = usePlayerRank(playerId)
   const games = usePlayerGames(playerId)
+  const photo = usePhotoViewer()
   if (!member) return null
   const picture = pictureSrc(member.picture, member.playerId ?? member.key, member.name) ?? null
   let card: ClubMemberProfile
@@ -43,6 +47,8 @@ export function MemberProfile({
       name: member.name,
       nickname: member.nickname,
       picture,
+      // One of the six predefined banners only; an uploaded banner image has no place in this union.
+      banner: PROFILE_BANNERS.find((b) => b.key === profile.data?.bannerKey)?.key,
       levelLabel: member.level ? levelLabel(member.level) : null,
       position: rank.data?.position ?? null,
       isYou: member.isYou,
@@ -52,16 +58,20 @@ export function MemberProfile({
     }
   }
   return (
-    <ClubMemberProfileSheet
-      open
-      onOpenChange={(open) => {
-        if (!open) onClose()
-      }}
-      profile={card}
-      loading={!member.masked && (games.isPending || profile.isPending)}
-      onOpenFullProfile={() => {
-        if (member.playerId) router.push(`/players/${member.playerId}`)
-      }}
-    />
+    <>
+      <ClubMemberProfileSheet
+        open
+        onOpenChange={(open) => {
+          if (!open) onClose()
+        }}
+        profile={card}
+        loading={!member.masked && (games.isPending || profile.isPending)}
+        onOpenFullProfile={() => {
+          if (member.playerId) router.push(`/players/${member.playerId}`)
+        }}
+        onViewPhoto={picture ? () => photo.show({ src: picture, name: member.name }) : undefined}
+      />
+      {photo.viewerProps ? <PhotoViewer {...photo.viewerProps} /> : null}
+    </>
   )
 }

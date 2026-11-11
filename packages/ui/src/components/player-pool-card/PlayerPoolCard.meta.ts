@@ -5,6 +5,7 @@ export const playerPoolCardMeta = {
   description:
     'One player in the live Players view: picture, name, locked level, played and for-the-night game totals, "M min wait" when available, status (On Court X, Away, Queued · #P, Free) and the Present switch. Tapping the card picks the player for the next match and shows the pick order.',
   usage: [
+    "Pass onStepDown for the secondary Move to waitlist button (#735); its taps never select the card. The container toasts “Finish or remove NAME's match first.” while the player is in a match.",
     'Pass forTheNight as played plus queued games, and selfCheckedInAt or leftAt for the presence caption.',
     'presencePending shows Saving presence… without disabling the switch; the data batch owns optimistic values and rollback.',
     'Use in the Q-POOL grid of the live console (Players tab). The whole card is a toggle button with aria-pressed; Enter and Space select it too.',

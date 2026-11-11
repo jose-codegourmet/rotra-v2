@@ -55,10 +55,18 @@ async function waitlistPosition(tx: Tx, sessionId: string, entryId: string) {
 }
 
 /**
+ * Add anyway / Add to waitlist on a full roster (#735, D-OVERFILL). `allowOverfill` is the Queue
+ * Master's explicit choice to go past the slot budget (marked `over_budget_at`); `toWaitlist`
+ * always waits. Neither keeps the budget rule.
+ */
+export type AddPlacement = { allowOverfill?: boolean; toWaitlist?: boolean }
+
+/**
  * Places a club player: a slot while one is open, otherwise the waitlist. `toWaitlist` (a Be
- * waitlisted request, D-2026-11-11-02) always gives the waitlist place, even during play. Refuses a
+ * waitlisted request, D-2026-11-11-02, or Add to waitlist) always gives the waitlist place, even
+ * during play; `allowOverfill` (Add anyway, #735) gives the slot beyond the budget. Refuses a
  * player already live on the roster or waiting. Concurrent admissions are serialized by the session
- * lock, so they cannot exceed capacity. Repeat-safe on `operationId`.
+ * lock, so they cannot exceed capacity without `allowOverfill`. Repeat-safe on `operationId`.
  */
 async function place(
   tx: Tx,
@@ -69,6 +77,7 @@ async function place(
   operationId: string,
   addedAt: Date,
   toWaitlist = false,
+  allowOverfill = false,
 ) {
   const waitlistId = await derivedId(operationId, 'waitlist')
   // A retry of the same operation returns what it already did.
@@ -105,14 +114,13 @@ async function place(
       addedAt,
     },
   })
-  const full =
-    toWaitlist || (await liveRoster(tx, session.id)).length >= (await capacityOf(tx, session))
-  if (full)
+  const atBudget = (await liveRoster(tx, session.id)).length >= (await capacityOf(tx, session))
+  if (toWaitlist || (atBudget && !allowOverfill))
     return {
       rosterEntry: null,
       waitlist: waitlistDto(waiter, await waitlistPosition(tx, session.id, waiter.id)),
     }
-  const entry = await promoteWaiter(tx, context, session, waiter, operationId, new Date())
+  const entry = await promoteWaiter(tx, context, session, waiter, operationId, new Date(), atBudget)
   return { rosterEntry: rosterEntryDto(entry, clubPlayer.nickname), waitlist: null }
 }
 
@@ -138,7 +146,7 @@ async function requireIdentity(tx: Tx, clubPlayer: ClubPlayer, check?: IdentityC
 export async function addSavedPlayerToSession(
   context: ClubContext,
   sessionId: string,
-  input: {
+  input: AddPlacement & {
     operationId: string
     clubPlayerId: string
     level: string
@@ -153,7 +161,7 @@ async function addSavedPlayerIn(
   tx: Tx,
   context: ClubContext,
   session: QueueSession,
-  input: {
+  input: AddPlacement & {
     operationId: string
     clubPlayerId: string
     level: string
@@ -166,7 +174,17 @@ async function addSavedPlayerIn(
   })
   if (!clubPlayer || clubPlayer.removedAt) throw new ServiceError('not_found')
   await requireIdentity(tx, clubPlayer, input.identityCheck)
-  return place(tx, context, session, clubPlayer, skillLevelId, input.operationId, new Date())
+  return place(
+    tx,
+    context,
+    session,
+    clubPlayer,
+    skillLevelId,
+    input.operationId,
+    new Date(),
+    input.toWaitlist,
+    input.allowOverfill,
+  )
 }
 
 /**
@@ -251,7 +269,12 @@ export async function clubPlayerForProfile(
 export async function addDirectoryPlayerToSession(
   context: ClubContext,
   sessionId: string,
-  input: { operationId: string; playerId: string; level: string; identityCheck?: IdentityCheck },
+  input: AddPlacement & {
+    operationId: string
+    playerId: string
+    level: string
+    identityCheck?: IdentityCheck
+  },
 ) {
   return rosterCommand(context, sessionId, (tx, session) =>
     addDirectoryPlayerIn(tx, context, session, input),
@@ -261,7 +284,12 @@ async function addDirectoryPlayerIn(
   tx: Tx,
   context: ClubContext,
   session: QueueSession,
-  input: { operationId: string; playerId: string; level: string; identityCheck?: IdentityCheck },
+  input: AddPlacement & {
+    operationId: string
+    playerId: string
+    level: string
+    identityCheck?: IdentityCheck
+  },
 ) {
   const skillLevelId = levelIdFor(input.level)
   const now = new Date()
@@ -273,14 +301,30 @@ async function addDirectoryPlayerIn(
     now,
   )
   await requireIdentity(tx, clubPlayer, input.identityCheck)
-  return place(tx, context, session, clubPlayer, skillLevelId, input.operationId, now)
+  return place(
+    tx,
+    context,
+    session,
+    clubPlayer,
+    skillLevelId,
+    input.operationId,
+    now,
+    input.toWaitlist,
+    input.allowOverfill,
+  )
 }
 
 /** `phone` is already normalized to E.164 by `@rotra/schema/phone` at the Route Handler. */
 export async function addNewPlayerToSession(
   context: ClubContext,
   sessionId: string,
-  input: { operationId: string; name: string; nickname?: string; phone?: string; level: string },
+  input: AddPlacement & {
+    operationId: string
+    name: string
+    nickname?: string
+    phone?: string
+    level: string
+  },
 ) {
   return rosterCommand(context, sessionId, (tx, session) =>
     addNewPlayerIn(tx, context, session, input),
@@ -290,12 +334,28 @@ async function addNewPlayerIn(
   tx: Tx,
   context: ClubContext,
   session: QueueSession,
-  input: { operationId: string; name: string; nickname?: string; phone?: string; level: string },
+  input: AddPlacement & {
+    operationId: string
+    name: string
+    nickname?: string
+    phone?: string
+    level: string
+  },
 ) {
   const skillLevelId = levelIdFor(input.level)
   const now = new Date()
   const clubPlayer = await createClubPlayer(tx, context, input.operationId, input, now)
-  return place(tx, context, session, clubPlayer, skillLevelId, input.operationId, now)
+  return place(
+    tx,
+    context,
+    session,
+    clubPlayer,
+    skillLevelId,
+    input.operationId,
+    now,
+    input.toWaitlist,
+    input.allowOverfill,
+  )
 }
 
 async function liveEntry(tx: Tx, sessionId: string, rosterId: string) {
@@ -356,6 +416,80 @@ async function removeRosterPlayerIn(tx: Tx, session: QueueSession, rosterId: str
     data: { releasedAt: new Date(), releaseReason: 'removed', revision: { increment: 1 } },
   })
   return null
+}
+
+/**
+ * Move to waitlist (#735): the admitted player steps down to the **front** of the waitlist, before
+ * and after Start. Like a budget demotion, the roster entry is released (reason `demoted`), so its
+ * assessments, paid mark and finished matches stay on the record and regaining a slot reactivates
+ * the same entry; the waitlist row carries the level and `demoted_at` puts it first. Refused while
+ * the player is in any waiting, On court or Playing match. Repeat-safe on `operationId`.
+ */
+export async function stepDownToWaitlist(
+  context: ClubContext,
+  sessionId: string,
+  input: { operationId: string; rosterId: string },
+) {
+  if (!input.operationId)
+    throw new ServiceError('invalid', { operationId: 'Missing operation id.' })
+  return rosterCommand(context, sessionId, (tx, session) =>
+    stepDownIn(tx, session, input, (name) => `Finish or remove ${name}'s match first.`),
+  )
+}
+
+/**
+ * The step-down itself, on a locked prepared or active session (shared by the Queue Master's Move
+ * to waitlist and the signed-in Player's Move me to the waitlist). `blocked` words the 409.
+ */
+export async function stepDownIn(
+  tx: Tx,
+  session: QueueSession,
+  input: { operationId: string; rosterId: string },
+  blocked: (shortName: string) => string,
+) {
+  const sessionId = session.id
+  const waitlistId = await derivedId(input.operationId, 'step-down')
+  const entry = await tx.sessionPlayer.findUnique({ where: { id: input.rosterId } })
+  if (!entry || entry.sessionId !== sessionId) throw new ServiceError('not_found')
+  // A retry of the same operation returns what it already did.
+  if (await tx.sessionWaitlistEntry.findUnique({ where: { id: waitlistId } }))
+    return { name: entry.nameSnapshot, clubPlayerId: entry.clubPlayerId }
+  if (entry.releasedAt) throw new ServiceError('not_found')
+  const busy = await tx.matchParticipation.findFirst({
+    where: {
+      sessionId,
+      sessionPlayerId: entry.id,
+      leftAt: null,
+      match: { state: { in: ['waiting', 'on_court', 'active'] }, removedAt: null },
+    },
+    select: { id: true },
+  })
+  if (busy) {
+    const clubPlayer = await tx.clubPlayer.findUniqueOrThrow({
+      where: { id: entry.clubPlayerId },
+      select: { nickname: true },
+    })
+    const name = clubPlayer.nickname || entry.nameSnapshot.split(' ')[0] || entry.nameSnapshot
+    throw new ServiceError('conflict', { player: blocked(name) })
+  }
+  const now = new Date()
+  await tx.sessionPlayer.update({
+    where: { id: entry.id },
+    data: { releasedAt: now, releaseReason: 'demoted', revision: { increment: 1 } },
+  })
+  await tx.sessionWaitlistEntry.create({
+    data: {
+      id: waitlistId,
+      clubId: session.clubId,
+      sessionId,
+      clubPlayerId: entry.clubPlayerId,
+      skillLevelId: entry.skillLevelId,
+      addedAt: entry.joinedAt,
+      demotedAt: now,
+      demotedConfirmedAt: entry.confirmedAt,
+    },
+  })
+  return { name: entry.nameSnapshot, clubPlayerId: entry.clubPlayerId }
 }
 
 export async function setPresence(
@@ -727,23 +861,23 @@ async function readSessionRosterIn(tx: Tx, context: ClubContext, session: QueueS
 
 /** One operation of the roster burst batch, as the Route Handler validated it. */
 export type RosterBatchOperation =
-  | {
+  | (AddPlacement & {
       op: 'add'
       operationId: string
       source: 'saved'
       clubPlayerId: string
       level: string
       identityCheck?: IdentityCheck
-    }
-  | {
+    })
+  | (AddPlacement & {
       op: 'add'
       operationId: string
       source: 'directory'
       playerId: string
       level: string
       identityCheck?: IdentityCheck
-    }
-  | {
+    })
+  | (AddPlacement & {
       op: 'add'
       operationId: string
       source: 'new'
@@ -751,7 +885,7 @@ export type RosterBatchOperation =
       nickname?: string
       phone?: string
       level: string
-    }
+    })
   | { op: 'remove'; operationId: string; rosterId: string }
   | { op: 'acceptRequest'; operationId: string; requestId: string; level: string }
   | { op: 'declineRequest'; operationId: string; requestId: string }

@@ -25,6 +25,11 @@ export type ConfirmSheetProps = {
   backLabel?: string
   /** Called by the secondary button; defaults to closing */
   onBack?: () => void
+  /**
+   * A second, non-primary choice between Back and the primary, e.g. D-OVERFILL's **Add to
+   * waitlist** (#735). Disabled while the commit runs.
+   */
+  extraAction?: { label: string; onClick: () => void }
   /** The commit is running: the primary shows a spinner and nothing can fire twice */
   isPending?: boolean
   /** Why the commit failed; shown above the buttons, nothing is claimed as saved */
@@ -54,6 +59,7 @@ export function ConfirmSheet({
   onConfirm,
   backLabel = 'Back',
   onBack,
+  extraAction,
   isPending = false,
   error,
   destructive,
@@ -86,6 +92,11 @@ export function ConfirmSheet({
           <Button disabled={isPending} onClick={onBack ?? (() => onOpenChange(false))}>
             {backLabel}
           </Button>
+          {extraAction ? (
+            <Button disabled={isPending} onClick={extraAction.onClick}>
+              {extraAction.label}
+            </Button>
+          ) : null}
           <Button
             variant={solidDanger ? 'danger-solid' : destructive ? 'danger' : 'primary'}
             loading={isPending}

@@ -147,3 +147,27 @@ export const ClearQueue: Story = {
   ),
 }
 export const ClearQueueLight: Story = { ...ClearQueue, globals: { theme: 'light' } }
+
+// D-OVERFILL (#735, rotra-queue.html SHEETS.overfill): Cancel, Add to waitlist and Add anyway.
+const OVERFILL = {
+  title: 'Add Mikee anyway?',
+  consequence: 'The roster is full (24/24). Add Mikee anyway?',
+  confirmLabel: 'Add anyway',
+  backLabel: 'Cancel',
+  destructive: false,
+}
+export const OverfillGamesDrop: Story = {
+  render: () => (
+    <Demo
+      {...OVERFILL}
+      note="Expected games drop from 4 to 3."
+      extraAction={{ label: 'Add to waitlist', onClick: () => {} }}
+    />
+  ),
+}
+/** Give slot anyway: no Add to waitlist (the player is already waiting). */
+export const OverfillGamesStay: Story = {
+  render: () => <Demo {...OVERFILL} note="Expected games stay at 4." />,
+}
+export const OverfillGamesDropLight: Story = { ...OverfillGamesDrop, globals: { theme: 'light' } }
+export const OverfillGamesStayLight: Story = { ...OverfillGamesStay, globals: { theme: 'light' } }

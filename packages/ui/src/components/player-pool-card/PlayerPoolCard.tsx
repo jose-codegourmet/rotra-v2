@@ -2,6 +2,7 @@
 
 import type { PlayingLevel } from '@rotra/data/player/types'
 import { Avatar } from '@rotra/ui/avatar'
+import { Button } from '@rotra/ui/button'
 import { cn } from '@rotra/ui/cn'
 import { Icon } from '@rotra/ui/icon'
 import { IconButton } from '@rotra/ui/icon-button'
@@ -49,6 +50,11 @@ export type PlayerPoolCardProps = {
    * Tapping it never selects the card.
    */
   onSetGames?: () => void
+  /**
+   * Move to waitlist (#735): a secondary button on the card's last row. Tapping it never selects
+   * the card. The container blocks it with a toast while the player is in a match.
+   */
+  onStepDown?: () => void
   className?: string
 }
 
@@ -87,6 +93,7 @@ export function PlayerPoolCard({
   onToggleSelect,
   onPresentChange,
   onSetGames,
+  onStepDown,
   className,
 }: PlayerPoolCardProps) {
   const state = status.kind === 'playing' ? 'playing' : present ? 'available' : 'away'
@@ -205,6 +212,19 @@ export function PlayerPoolCard({
         </span>
       ) : null}
       {presencePending ? <span className="text-[11px] text-fg2">Saving presence…</span> : null}
+      {onStepDown ? (
+        // The button sits inside the card: stop its clicks and keys from reaching the card's selection.
+        // biome-ignore lint/a11y/noStaticElementInteractions: a plain stop-propagation boundary around the button
+        <span
+          className="flex flex-wrap items-center gap-2"
+          onClick={(event) => event.stopPropagation()}
+          onKeyDown={(event) => event.stopPropagation()}
+        >
+          <Button size="xs" aria-label={`Move ${name} to the waitlist`} onClick={onStepDown}>
+            Move to waitlist
+          </Button>
+        </span>
+      ) : null}
       {/* biome-ignore lint/a11y/useSemanticElements: a group/region div; a fieldset or section would change the drawn layout */}
     </div>
   )

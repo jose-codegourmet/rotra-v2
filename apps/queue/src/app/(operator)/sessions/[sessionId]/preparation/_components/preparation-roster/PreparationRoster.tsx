@@ -4,7 +4,7 @@ import { registeredCity } from '@rotra/data/club-player/fetchers'
 import { guestRegistrationUrl } from '@rotra/data/club-player/registration-url'
 import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import { selfCheckInMark } from '@rotra/data/public-session/rules'
-import { slotCapacity } from '@rotra/data/queue-session/queueSession.rules'
+import { expectedGames, slotCapacity } from '@rotra/data/queue-session/queueSession.rules'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionPayments } from '@rotra/data/session-payment/useSessionPayments'
 import { useFillOpenSlots } from '@rotra/data/session-roster/useFillOpenSlots'
@@ -15,6 +15,7 @@ import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { useSetAllPresence } from '@rotra/data/session-roster/useSetAllPresence'
 import { useSetPresenceMany } from '@rotra/data/session-roster/useSetPresenceMany'
 import { useSetRosterLevel } from '@rotra/data/session-roster/useSetRosterLevel'
+import { useStepDownToWaitlist } from '@rotra/data/session-roster/useStepDownToWaitlist'
 import { PlayerProfileSheet } from '@rotra/ui/player-profile-sheet'
 import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import {
@@ -28,6 +29,7 @@ import { toast } from '@rotra/ui/toaster'
 import { WaitlistPanel, type WaitlistPanelEntry } from '@rotra/ui/waitlist-panel'
 import { useEffect, useRef, useState } from 'react'
 import { AddPlayer } from '@/app/(operator)/_components/add-player/AddPlayer'
+import { OverfillConfirm } from '@/app/(operator)/_components/overfill-confirm/OverfillConfirm'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import { longDateLabel } from '@/lib/dates'
 
@@ -70,7 +72,9 @@ const errorMessage = (error: unknown) =>
  * removing is immediate with its toast and no dialog. Pictures open PlayerProfileSheet; Add player
  * opens the shared AddPlayer container. While the session or roster loads the panels show Skeleton
  * rows; every mutation toasts its result (offline adds say "Saved on this device, waiting to sync")
- * or its error, and a refused change leaves the roster as it was.
+ * or its error, and a refused change leaves the roster as it was. Move to waitlist (#735) is on
+ * every row and card; the summary carries expected games; Give slot anyway on a full roster asks
+ * OverfillConfirm first.
  */
 export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
   const session = useQueueSession(sessionId)
@@ -87,6 +91,10 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
   const giveSlot = useGiveSlot()
   const fillOpenSlots = useFillOpenSlots()
   const removeFromWaitlist = useRemoveFromWaitlist()
+  const stepDown = useStepDownToWaitlist()
+  const steppingDown = useRef(new Set<string>())
+  /** Give slot anyway on a full roster waits for D-OVERFILL (#735) */
+  const [overfillWaiter, setOverfillWaiter] = useState<string | null>(null)
   const payments = useSessionPayments(sessionId)
   const [views, setViews] = useState<RosterViews>(DEFAULT_VIEWS)
   useEffect(() => setViews(readViews()), [])
@@ -147,6 +155,8 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
       waitingSinceLabel: time(w.addedAt),
     }
   })
+  const overfillEntry = entries.find((w) => w.id === overfillWaiter)
+  const giveSlotTo = (waitlistId: string) => giveSlot.mutate({ sessionId, waitlistId }, options)
   const profile = profileId ? byClubPlayer(profileId) : undefined
   const openProfileFromRoster = (rosterId: string) => {
     const r = rosterList.find((r) => r.id === rosterId)
@@ -193,6 +203,15 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
             setLevel.mutate({ sessionId, rosterId, level }, options)
           }
           onPresentChange={setPresence.set}
+          expectedGames={s ? expectedGames(s, s.courts.length, rosterList.length) : undefined}
+          onStepDown={(rosterId) => {
+            if (steppingDown.current.has(rosterId)) return
+            steppingDown.current.add(rosterId)
+            stepDown.mutate(
+              { sessionId, rosterId, operationId: crypto.randomUUID() },
+              { ...options, onSettled: () => steppingDown.current.delete(rosterId) },
+            )
+          }}
           onRemove={(rosterId) => {
             if (removing.current.has(rosterId)) return
             removing.current.add(rosterId)
@@ -216,11 +235,27 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
           courtCount={s?.courts.length ?? 0}
           playersPerCourt={s?.playersPerCourt ?? 0}
           onFillOpenSlots={() => fillOpenSlots.mutate(sessionId, options)}
-          onGiveSlot={(waitlistId) => giveSlot.mutate({ sessionId, waitlistId }, options)}
+          onGiveSlot={(waitlistId) => {
+            if (rosterList.length >= capacity) setOverfillWaiter(waitlistId)
+            else giveSlotTo(waitlistId)
+          }}
           onRemove={(waitlistId) => removeFromWaitlist.mutate({ sessionId, waitlistId }, options)}
           onOpenProfile={openProfileFromWaitlist}
         />
       )}
+      {s ? (
+        <OverfillConfirm
+          target={overfillEntry ? { name: overfillEntry.name } : null}
+          session={s}
+          rosterCount={rosterList.length}
+          capacity={capacity}
+          onCancel={() => setOverfillWaiter(null)}
+          onAddAnyway={() => {
+            setOverfillWaiter(null)
+            if (overfillEntry) giveSlotTo(overfillEntry.id)
+          }}
+        />
+      ) : null}
       <AddPlayer sessionId={sessionId} open={addOpen} onOpenChange={setAddOpen} />
       {profile ? (
         <PlayerProfileSheet

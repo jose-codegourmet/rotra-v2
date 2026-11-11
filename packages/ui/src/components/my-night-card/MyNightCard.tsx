@@ -53,6 +53,13 @@ export type MyNightCardProps = {
   onRequestMatch?: () => void
   onCancelMatchRequest?: () => void
   onInvite?: () => void
+  /**
+   * Move me to the waitlist (#735): shown for a confirmed player before the start and during play,
+   * never while `inMatch`, never once finished. Omit to hide it.
+   */
+  onStepDown?: () => void
+  /** The player is on court, playing or in a queued match: Move me to the waitlist is hidden */
+  inMatch?: boolean
   className?: string
 }
 
@@ -124,7 +131,7 @@ function StatsPanel({
 /**
  * The My night card on the public session page for a signed-in player: stage-driven lines, the games
  * and Won / Lost stats panel, and the player's own actions (I'm here, I'm leaving, I can't make it,
- * Request a match, Invite). Presentational: it reports taps through callbacks.
+ * Request a match, Move me to the waitlist, Invite). Presentational: it reports taps through callbacks.
  */
 export function MyNightCard({
   stage,
@@ -152,6 +159,8 @@ export function MyNightCard({
   onRequestMatch,
   onCancelMatchRequest,
   onInvite,
+  onStepDown,
+  inMatch = false,
   className,
 }: MyNightCardProps) {
   // Offline, only I'm here still works (it queues); every other write is refused
@@ -236,6 +245,18 @@ export function MyNightCard({
       </Button>,
     )
   }
+
+  // Owner comment, November 11, 2026: no Move me to the waitlist while you're in a match.
+  if (
+    onStepDown &&
+    !inMatch &&
+    (stage === 'before-start' || stage === 'live-not-present' || stage === 'live-present')
+  )
+    actions.push(
+      <Button key="step-down" onClick={onStepDown} disabled={blocked} title={offlineTitle}>
+        Move me to the waitlist
+      </Button>,
+    )
 
   if (canInvite && (stage === 'waitlisted' || stage === 'before-start'))
     actions.push(

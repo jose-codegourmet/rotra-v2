@@ -25,10 +25,17 @@ export async function GET(
 const identityCheckOf = (value: unknown): IdentityCheck | undefined =>
   value === 'rtr-id' || value === 'qr' || value === 'phone' ? value : undefined
 
+/** Add anyway / Add to waitlist on a full roster (#735); only `true` counts. */
+const placementOf = (body: Record<string, unknown>) => ({
+  allowOverfill: body.allowOverfill === true,
+  toWaitlist: body.toWaitlist === true,
+})
+
 /**
  * Q-ROSTER › Add player. `source` picks the tab: `saved` (a saved club player), `directory` (a
  * Player Information profile, saved to the club on the way), or a new player (the default; a guest
- * until identity resolves after sync).
+ * until identity resolves after sync). `allowOverfill` (Add anyway) and `toWaitlist` (Add to
+ * waitlist) are the Queue Master's D-OVERFILL choice on a full roster (#735).
  */
 export async function POST(
   request: Request,
@@ -42,6 +49,7 @@ export async function POST(
         operationId: text(body.operationId),
         level: text(body.level),
         identityCheck: identityCheckOf(body.identityCheck),
+        ...placementOf(body),
       }
       const entry =
         body.source === 'saved'
@@ -65,6 +73,7 @@ export async function POST(
       nickname: text(body.nickname) || undefined,
       phone: phone?.success ? phone.data : undefined,
       level: text(body.level),
+      ...placementOf(body),
     })
     return { status: 201, body: entry }
   })

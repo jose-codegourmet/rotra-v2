@@ -91,3 +91,19 @@ export const Left: Story = {
 }
 export const SelfCheckedInLight: Story = { ...SelfCheckedIn, globals: { theme: 'light' } }
 export const LeftLight: Story = { ...Left, globals: { theme: 'light' } }
+
+// #735: Move to waitlist next to remove, before Start and in the read-only summary after Start.
+export const WithMoveToWaitlist: Story = {
+  args: { ...rowAt(0), showPresence: false, onStepDown: fn() },
+}
+export const WithMoveToWaitlistAfterStart: Story = {
+  args: { ...rowAt(0), levelLocked: true, readOnly: true, onStepDown: fn() },
+}
+export const WithMoveToWaitlistLight: Story = {
+  ...WithMoveToWaitlist,
+  globals: { theme: 'light' },
+}
+export const WithMoveToWaitlistPhone: Story = {
+  ...WithMoveToWaitlist,
+  globals: { viewport: { value: 'phone' } },
+}

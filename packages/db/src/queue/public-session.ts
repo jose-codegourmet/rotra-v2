@@ -8,7 +8,20 @@ import { prisma } from '../client/prisma'
 import type { JoinRequestPlacement, QueueSession, StatedBand } from '../generated/prisma/client'
 import { ServiceError } from '../service/errors'
 import { readPublishedResults } from './results'
-import { capacityOf, levelCodeFor, liveCourts, liveRoster, orderedWaitlist } from './session-store'
+import { stepDownIn } from './session-roster'
+import {
+  capacityOf,
+  derivedId,
+  levelCodeFor,
+  liveCourts,
+  liveRoster,
+  lockSession,
+  mapDatabaseError,
+  orderedWaitlist,
+  recomputeMinimum,
+  requireState,
+  touchSession,
+} from './session-store'
 
 const E164 = /^\+[1-9][0-9]{7,14}$/
 const BANDS: StatedBand[] = ['beginner', 'intermediate', 'advanced', 'unsure']
@@ -558,4 +571,58 @@ export async function cancelPlayerJoinRequest(context: PlayerContext, slug: stri
   if (!pending || !count)
     throw new ServiceError('conflict', { request: 'This join request has already been decided.' })
   return { requestId: pending.id, message: 'Request cancelled' }
+}
+
+/**
+ * Q-PUBLIC-JOIN · **Move me to the waitlist** (#735): the signed-in Player's own roster entry in
+ * this session steps down to the front of the waitlist, before the start or during play, with the
+ * same rules as the Queue Master's Move to waitlist (one locked transaction, released entry, level
+ * and paid mark kept). Refused (409) while they are in a waiting, On court or Playing match.
+ * Repeat-safe on `operationId`.
+ */
+export async function movePlayerToWaitlist(
+  context: PlayerContext,
+  slug: string,
+  input: { operationId: string },
+) {
+  if (!input.operationId)
+    throw new ServiceError('invalid', { operationId: 'Missing operation id.' })
+  const found = await prisma.queueSession.findUnique({
+    where: { publicSlug: slug },
+    select: { id: true, clubId: true },
+  })
+  if (!found) throw new ServiceError('not_found')
+  try {
+    return await prisma.$transaction(async (tx) => {
+      const session = await lockSession(tx, found, found.id)
+      requireState(session, ['prepared', 'active'], 'This session has finished.')
+      const done = await tx.sessionWaitlistEntry.findUnique({
+        where: { id: await derivedId(input.operationId, 'step-down') },
+        select: { clubPlayerId: true },
+      })
+      if (done) return { clubPlayerId: done.clubPlayerId, message: 'You moved to the waitlist' }
+      const entry = await tx.sessionPlayer.findFirst({
+        where: {
+          sessionId: session.id,
+          releasedAt: null,
+          clubPlayer: { playerId: context.playerId },
+        },
+        select: { id: true },
+      })
+      if (!entry)
+        throw new ServiceError('invalid', {
+          player: 'Only confirmed players in this session can do this.',
+        })
+      const moved = await stepDownIn(
+        tx,
+        session,
+        { operationId: input.operationId, rosterId: entry.id },
+        () => "You're in a match. Ask the Queue Master to finish or remove it first.",
+      )
+      await recomputeMinimum(tx, await touchSession(tx, session))
+      return { clubPlayerId: moved.clubPlayerId, message: 'You moved to the waitlist' }
+    })
+  } catch (error) {
+    mapDatabaseError(error)
+  }
 }

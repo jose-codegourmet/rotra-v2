@@ -59,3 +59,40 @@ export const SkillMixOneOpenSlot: Story = {
     skillCounts: { beginner: 8, intermediate: 9, advanced: 6 },
   },
 }
+
+// #735: the roster summary at 23/24, 24/24 and 25/24 with expected games (both themes).
+const summaryMix = { beginner: 8, intermediate: 9, advanced: 6 }
+export const SummaryOneOpen: Story = {
+  args: {
+    rosterCount: 23,
+    capacity: 24,
+    skillCounts: summaryMix,
+    expectedGames: { low: 4, high: 5 },
+  },
+}
+export const SummaryFull: Story = {
+  args: {
+    rosterCount: 24,
+    capacity: 24,
+    skillCounts: { ...summaryMix, unrated: 1 },
+    expectedGames: { low: 4, high: 5 },
+  },
+}
+export const SummaryOverCapacity: Story = {
+  args: {
+    rosterCount: 25,
+    capacity: 24,
+    waitlistCount: 2,
+    skillCounts: { ...summaryMix, unrated: 2 },
+    expectedGames: { low: 3, high: 5 },
+  },
+}
+export const SummaryOverCapacityLive: Story = {
+  args: { ...SummaryOverCapacity.args, live: true },
+}
+export const SummaryOneOpenLight: Story = { ...SummaryOneOpen, globals: { theme: 'light' } }
+export const SummaryFullLight: Story = { ...SummaryFull, globals: { theme: 'light' } }
+export const SummaryOverCapacityLight: Story = {
+  ...SummaryOverCapacity,
+  globals: { theme: 'light' },
+}

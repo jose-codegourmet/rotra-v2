@@ -111,3 +111,30 @@ export const FinishedLight: Story = {
   args: { stage: 'finished', games: 7, won: 4, lost: 3 },
   globals: { theme: 'light' },
 }
+
+// #735: Move me to the waitlist, before the start and during play; hidden while in a match.
+export const MoveMeToWaitlistBeforeStart: Story = {
+  args: {
+    stage: 'before-start',
+    startsLabel: 'Nov 9, 7:30 PM',
+    canInvite: true,
+    onStepDown: fn(),
+  },
+}
+export const MoveMeToWaitlistLive: Story = {
+  args: { queuePosition: undefined, matchLabel: undefined, onStepDown: fn() },
+}
+/** Queued (or on court): the button is hidden. */
+export const MoveMeToWaitlistHiddenInMatch: Story = { args: { onStepDown: fn(), inMatch: true } }
+/** After moving: the card reads Waitlist #1. */
+export const MovedToWaitlist: Story = {
+  args: { stage: 'waitlisted', waitlistPosition: 1, onStepDown: fn() },
+}
+export const MoveMeToWaitlistBeforeStartLight: Story = {
+  ...MoveMeToWaitlistBeforeStart,
+  globals: { theme: 'light' },
+}
+export const MoveMeToWaitlistLiveLight: Story = {
+  ...MoveMeToWaitlistLive,
+  globals: { theme: 'light' },
+}

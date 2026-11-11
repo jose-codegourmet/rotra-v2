@@ -18,10 +18,19 @@ export type SlotMeterProps = {
   onLevelPress?: (level: SkillMixKey) => void
   /** The pressed level: its segment stays full and the other player segments dim */
   activeLevel?: SkillMixKey | null
+  /**
+   * The roster summary's “expected games about LOW–HIGH each” (#735), recomputed by the container
+   * on every roster count change. Shown with skillCounts only, while anyone has a slot.
+   */
+  expectedGames?: { low: number; high: number }
   className?: string
 }
 
-/** "14/24 slots · 10 left before the waitlist" with a bar; amber near or at the budget. */
+/**
+ * "14/24 slots · 10 left before the waitlist" with a bar; amber near or at the budget. With
+ * skillCounts it is the roster summary: past capacity the count turns amber too (25/24, “1 over
+ * capacity”, #735) and expectedGames adds “expected games about LOW–HIGH each”.
+ */
 export function SlotMeter({
   rosterCount,
   capacity,
@@ -30,6 +39,7 @@ export function SlotMeter({
   skillCounts,
   onLevelPress,
   activeLevel = null,
+  expectedGames,
   className,
 }: SlotMeterProps) {
   const open = capacity - rosterCount
@@ -43,6 +53,18 @@ export function SlotMeter({
         : `${-open} over budget · new players go on the waitlist`
   const warn = state !== 'ok' && state !== 'near'
   if (skillCounts) {
+    // The prototype's rosterSummary(): past capacity reads “N over capacity” (#735), live or not.
+    const summary =
+      (live
+        ? `${open < 0 ? `${-open} over capacity` : open === 0 ? 'Budget full' : `${open} within budget`} · additional players can be admitted`
+        : open > 0
+          ? `${open} left before the waitlist`
+          : open === 0
+            ? 'Full · new players go on the waitlist'
+            : `${-open} over capacity · new players go on the waitlist`) +
+      (rosterCount && expectedGames
+        ? ` · expected games about ${expectedGames.low}–${expectedGames.high} each`
+        : '')
     const segments = skillMixSegments(skillCounts)
     const openLabel = open === 1 ? '1 open slot' : `${open} open slots`
     return (
@@ -53,11 +75,11 @@ export function SlotMeter({
         )}
       >
         <div className="flex flex-wrap items-baseline gap-2 text-[13px] text-fg2">
-          <b className="text-xl text-fg tabular-nums">
+          <b className={cn('text-xl tabular-nums', state === 'over' ? 'text-warn' : 'text-fg')}>
             {rosterCount}/{capacity}
           </b>
           <span className={cn(warn && 'font-semibold text-warn')}>
-            slots · {text}
+            slots · {summary}
             {waitlistCount ? ` · ${waitlistCount} on the waitlist` : ''}
           </span>
         </div>

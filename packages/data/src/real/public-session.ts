@@ -59,17 +59,21 @@ export function realGetMyJoinRequest(slug: string) {
  * **Request to join as NAME** / **Cancel request**: credentialed calls to the Player app, which
  * reads the Player's own sign-in. No Player token or cookie is ever copied into the Queue app.
  */
+async function playerPost<T>(slug: string, action: string, body: Record<string, unknown>) {
+  const origin = typeof location === 'undefined' ? null : playerOrigin(location.origin)
+  if (!origin) throw new Error('Sign in with ROTRA Player to send a request.')
+  return realRequest<T>(`${origin}${base(slug)}/${action}`, {
+    method: 'POST',
+    body,
+    credentials: 'include',
+  })
+}
 async function playerSessionWrite(
   slug: string,
   action: 'join' | 'cancel',
   body: Record<string, unknown> = {},
 ) {
-  const origin = typeof location === 'undefined' ? null : playerOrigin(location.origin)
-  if (!origin) throw new Error('Sign in with ROTRA Player to send a request.')
-  const done = await realRequest<{ requestId: string; message: string }>(
-    `${origin}${base(slug)}/${action}`,
-    { method: 'POST', body, credentials: 'include' },
-  )
+  const done = await playerPost<{ requestId: string; message: string }>(slug, action, body)
   return { savedOffline: false, message: done.message, data: { requestId: done.requestId } }
 }
 
@@ -77,6 +81,18 @@ async function playerSessionWrite(
 export const realJoinAsPlayer = (slug: string, placement: JoinRequestPlacement = 'slot') =>
   playerSessionWrite(slug, 'join', { placement })
 export const realCancelMyJoinRequest = (slug: string) => playerSessionWrite(slug, 'cancel')
+
+/**
+ * **Move me to the waitlist** (#735): the signed-in Player's own step-down, on the Player origin
+ * like Request to join. One `operationId` per tap, so a retry repeats nothing. A 409 carries
+ * “You're in a match. Ask the Queue Master to finish or remove it first.” for the toast.
+ */
+export async function realMoveMeToWaitlist(slug: string) {
+  const done = await playerPost<{ clubPlayerId: string; message: string }>(slug, 'step-down', {
+    operationId: crypto.randomUUID(),
+  })
+  return { savedOffline: false, message: done.message, data: { clubPlayerId: done.clubPlayerId } }
+}
 
 /**
  * **Sign out** from the session page's account bar (#693): signs the Player out of ROTRA Player on

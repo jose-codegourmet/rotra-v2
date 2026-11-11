@@ -153,3 +153,10 @@ export const SelectedLight: Story = {
 }
 export const SelfCheckedInLight: Story = { ...SelfCheckedIn, globals: { theme: 'light' } }
 export const LeftLight: Story = { ...Left, globals: { theme: 'light' } }
+
+// #735: Move to waitlist on the Players card; the container blocks it with a toast while in a match.
+export const WithMoveToWaitlist: Story = { args: { onSetGames: fn(), onStepDown: fn() } }
+export const WithMoveToWaitlistLight: Story = {
+  ...WithMoveToWaitlist,
+  globals: { theme: 'light' },
+}

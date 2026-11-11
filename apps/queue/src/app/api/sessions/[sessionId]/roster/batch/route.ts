@@ -14,6 +14,12 @@ import { cookies } from 'next/headers'
 const identityCheckOf = (value: unknown): IdentityCheck | undefined =>
   value === 'rtr-id' || value === 'qr' || value === 'phone' ? value : undefined
 
+/** Add anyway / Add to waitlist on a full roster (#735); only `true` counts. */
+const placementOf = (body: Record<string, unknown>) => ({
+  allowOverfill: body.allowOverfill === true,
+  toWaitlist: body.toWaitlist === true,
+})
+
 /** One wire operation, shaped like the single-op routes read theirs; anything else is `invalid`. */
 function operationOf(raw: unknown): RosterBatchOperation {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) throw new ServiceError('invalid')
@@ -30,6 +36,7 @@ function operationOf(raw: unknown): RosterBatchOperation {
           clubPlayerId: text(body.clubPlayerId),
           level,
           identityCheck: identityCheckOf(body.identityCheck),
+          ...placementOf(body),
         }
       if (body.source === 'directory')
         return {
@@ -39,6 +46,7 @@ function operationOf(raw: unknown): RosterBatchOperation {
           playerId: text(body.playerId),
           level,
           identityCheck: identityCheckOf(body.identityCheck),
+          ...placementOf(body),
         }
       const rawPhone = text(body.phone).trim()
       const phone = rawPhone ? phoneField.safeParse(rawPhone) : null
@@ -52,6 +60,7 @@ function operationOf(raw: unknown): RosterBatchOperation {
         nickname: text(body.nickname) || undefined,
         phone: phone?.success ? phone.data : undefined,
         level,
+        ...placementOf(body),
       }
     }
     case 'remove':

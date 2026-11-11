@@ -5,8 +5,18 @@ import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, mockStore, readMockState } from '../mock/store'
 import { isRealDataMode } from '../real/mode'
-import { realCancelMyJoinRequest, realJoinAsPlayer } from '../real/public-session'
-import { SLOTS_FULL_ERROR, slotsFull } from '../session-roster/mutations'
+import {
+  realCancelMyJoinRequest,
+  realJoinAsPlayer,
+  realMoveMeToWaitlist,
+} from '../real/public-session'
+import {
+  SLOTS_FULL_ERROR,
+  settleRoster,
+  slotsFull,
+  stepDownChange,
+} from '../session-roster/mutations'
+import { SELF_STEP_DOWN_BLOCKED } from '../session-roster/sessionRoster.rules'
 import type { SaveOutcome } from '../sync/sync.types'
 import { makeInviteCode, playerSlot } from './publicSession.rules'
 import type { JoinAsPlayerInput, PlayerSessionInput } from './publicSession.types'
@@ -212,6 +222,30 @@ export function leaveSession(slug: string, input: PlayerSessionInput) {
       return { rosterId: row.id }
     },
     "Told the QM you're leaving",
+  )
+}
+
+/**
+ * **Move me to the waitlist** (#735): the signed-in confirmed Player steps down to the front of the
+ * waitlist, before the start or during play. The card hides the button while they are in a match;
+ * the server still refuses then (“You're in a match. Ask the Queue Master to finish or remove it
+ * first.”). Their level and paid mark stay and come back with a slot.
+ */
+export function moveMeToWaitlist(slug: string, input: PlayerSessionInput) {
+  // Real mode (#735): the Player app knows who is signed in. Before playerWrite, whose mock delay
+  // refuses in real mode.
+  if (isRealDataMode()) return realMoveMeToWaitlist(slug)
+  return playerWrite(
+    slug,
+    (s, session) => {
+      if (session.state !== 'prepared' && session.state !== 'active')
+        fail('This session has finished.')
+      const row = requireRosterRow(s, session, input.playerId)
+      stepDownChange(s, { sessionId: session.id, rosterId: row.id }, SELF_STEP_DOWN_BLOCKED)
+      settleRoster(s, session.id, null)
+      return { clubPlayerId: row.clubPlayerId }
+    },
+    'You moved to the waitlist',
   )
 }
 

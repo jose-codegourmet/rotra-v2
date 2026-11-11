@@ -1,6 +1,6 @@
 # Start session is online only
 
-Status: IN PROGRESS — #721
+Status: IN MOCK APP — #721
 Date: 2026-11-11
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Session preparation › sticky Start session bar and Start session sheet

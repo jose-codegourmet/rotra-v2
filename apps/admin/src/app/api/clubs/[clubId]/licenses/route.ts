@@ -5,8 +5,9 @@ import { routeCookieAdapter } from '@rotra/db/service/route-cookies'
 import { cookies } from 'next/headers'
 
 /**
- * D-LICENSE › Activate/Renew license. The server decides the start (when current access ends, or
- * now); the typed reference is kept as the term's note (both proposals, #245; gap logged).
+ * D-LICENSE › Activate/Renew license. The server computes the period (D-2026-11-11-06: the day after
+ * the current term ends, or today) and refuses a client-supplied start; the typed reference is kept
+ * as the term's note under the generated LIC number.
  */
 export async function POST(request: Request, ctx: RouteContext<'/api/clubs/[clubId]/licenses'>) {
   const { clubId } = await ctx.params
@@ -19,6 +20,11 @@ export async function POST(request: Request, ctx: RouteContext<'/api/clubs/[club
       amountMinor: int(body.amountMinor),
       paidOn: typeof body.paidOn === 'string' ? body.paidOn : null,
       notes: text(body.reference),
+      // Any start the client sends (even null) is refused by the service.
+      startsAt:
+        'startsOn' in body || 'startsAt' in body
+          ? (body.startsOn ?? body.startsAt ?? null)
+          : undefined,
     })
     return { status: 201, body: { term } }
   })

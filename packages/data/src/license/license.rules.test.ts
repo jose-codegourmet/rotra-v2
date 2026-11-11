@@ -16,7 +16,6 @@ import {
   licenseAuditSummary,
   licenseEffects,
   manilaToday,
-  overlapDays,
   planPriceMinor,
   retentionOf,
   termEnd,
@@ -321,15 +320,7 @@ describe('defaultLicenseDraft (rotra-admin.html licStart())', () => {
   })
 })
 
-describe('D-LICENSE overlap and effects (rotra-admin.html licEffects())', () => {
-  it('counts the days a new term starts inside the active period', () => {
-    const active = accessOf([term('Monthly', '2026-10-10', '2026-11-09')], TODAY)
-    expect(overlapDays(active, { startsOn: '2026-11-10' })).toBe(0)
-    expect(overlapDays(active, { startsOn: '2026-11-09' })).toBe(1)
-    expect(overlapDays(active, { startsOn: TODAY })).toBe(14)
-    expect(overlapDays({ state: 'none' }, { startsOn: TODAY })).toBe(0)
-  })
-
+describe('D-LICENSE effects (rotra-admin.html licEffects())', () => {
   it('lists what a renewal of an active club does', () => {
     const { club, terms, record } = fixtureClub('sampaloc.shuttle')
     const access = accessOf(terms, TODAY)

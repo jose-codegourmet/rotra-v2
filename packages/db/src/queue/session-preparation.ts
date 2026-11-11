@@ -413,8 +413,9 @@ export async function updateQueueSession(
 
 /**
  * Start: prepared → active under the club's current license term. Refuses while another session is
- * running or any entry lacks a level, freezes the minimum, and locks every entry's level. A retry
- * after a lost response returns the already-active session.
+ * running or any entry lacks a level, freezes the minimum, locks every entry's level and closes every
+ * pending join request (`closed`, not declined; D-2026-11-11-11), returning how many closed as
+ * `joinRequestsClosed`. A retry after a lost response returns the already-active session (0 closed).
  */
 export async function startSession(
   context: ClubContext,
@@ -428,7 +429,7 @@ export async function startSession(
   try {
     return await prisma.$transaction(async (tx) => {
       let session = await lockSession(tx, context, sessionId)
-      if (session.state === 'active') return sessionDto(session)
+      if (session.state === 'active') return { ...sessionDto(session), joinRequestsClosed: 0 }
       requireState(session, ['prepared'], 'Only a prepared session can start.')
       requireRevision(session.revision, expectedRevision)
       const running = await tx.queueSession.findFirst({
@@ -492,7 +493,12 @@ export async function startSession(
           revision: { increment: 1 },
         },
       })
-      return sessionDto(session)
+      // Join requests end at Start: online requests close; the Queue Master adds late players.
+      const closed = await tx.sessionJoinRequest.updateMany({
+        where: { clubId: context.clubId, sessionId, status: 'pending' },
+        data: { status: 'closed', decidedAt: now },
+      })
+      return { ...sessionDto(session), joinRequestsClosed: closed.count }
     })
   } catch (error) {
     mapDatabaseError(error)
@@ -561,8 +567,9 @@ async function requireLiveCourt(tx: Tx, sessionId: string, courtId: string) {
 const COURTS_CHANGED = { court: 'Something changed. Review the courts again.' }
 
 /**
- * Add / Edit court on a saved court: label, planned start and advisory end. The start is fixed once
- * the court has hosted a match or been opened early; a passed end may still be edited.
+ * Add / Edit court (Change time) on a saved court: label, planned start and advisory end. The start
+ * is fixed once the court has hosted a match or been opened early; the end and label stay editable,
+ * also while a match is on the court (the match is not touched), and a passed end may still be edited.
  */
 export async function updateCourt(
   context: ClubContext,

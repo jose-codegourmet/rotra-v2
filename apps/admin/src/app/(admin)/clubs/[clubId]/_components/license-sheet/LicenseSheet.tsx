@@ -77,8 +77,10 @@ function formInputFromValues(values: LicenseFormValues, today: string): Partial<
 
 /**
  * A-LICENSE / D-LICENSE: record an activation or renewal the club paid for outside ROTRA. Details
- * (LicenseForm, prefilled with defaultLicenseDraft) → review (LicenseReview with the term end,
- * effects and overlap from the license rules) → save over useActivateLicense. The sourceCommandId is
+ * (LicenseForm, prefilled with defaultLicenseDraft; the period is computed and shown read-only as
+ * Covers) → review (LicenseReview with the term end and effects from the license rules) → save over
+ * useActivateLicense, which sends no start: the period is computed where it is saved
+ * (D-2026-11-11-06). The sourceCommandId is
  * generated on entering review and reused by every save of that review, so a retry never records a
  * second term. A lost reply (MockError 'timeout') shows LicenseOperationNotice, with no way to close
  * the sheet, until Check status finds the term (close, toast) or reports it wasn't saved (back to
@@ -202,7 +204,6 @@ export function LicenseSheet({ club, terms, open, onOpenChange }: LicenseSheetPr
       {
         clubId: club.id,
         plan: values.plan,
-        startsOn: values.startsOn,
         paidOn: values.paidOn,
         amountMinor: values.amountMinor,
         reference: values.reference,

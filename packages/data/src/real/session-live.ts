@@ -1,5 +1,5 @@
 import type { PlayingLevel } from '../player/player.types'
-import { atWhenLabel } from '../queue-session/queueSession.rules'
+import { atWhenLabel, joinRequestsClosedNote } from '../queue-session/queueSession.rules'
 import type { QueueSessionInput, SessionCourt } from '../queue-session/queueSession.types'
 import { levelLabel } from '../session-roster/sessionRoster.rules'
 import type { RosterBatchOperation, RosterBatchResult } from '../session-roster/sessionRoster.types'
@@ -30,16 +30,24 @@ const readSession = async (sessionId: string) =>
 export async function realStartSession(input: { sessionId: string; newEndAt?: number | null }) {
   const { sessionId, newEndAt = null } = input
   const { revision } = await readSession(sessionId)
-  const session = await realRequest<WireSession>(`${sessionPath(sessionId)}/start`, {
-    method: 'POST',
-    body: { expectedRevision: revision, newEndAt: newEndAt == null ? null : iso(newEndAt) },
-    fields: { roster: 'roster', session: 'session' },
-  })
+  // The start service closes every pending join request and says how many (D-2026-11-11-11).
+  const session = await realRequest<WireSession & { joinRequestsClosed?: number }>(
+    `${sessionPath(sessionId)}/start`,
+    {
+      method: 'POST',
+      body: { expectedRevision: revision, newEndAt: newEndAt == null ? null : iso(newEndAt) },
+      fields: { roster: 'roster', session: 'session' },
+    },
+  )
   // The service saves the new end only on a late or other-day start.
   const endAt = Date.parse(session.scheduledEndAt)
   const ends =
     newEndAt != null && endAt === newEndAt ? ` · ends ${atWhenLabel(endAt, Date.now())}` : ''
-  return accepted(await realGetQueueSession(sessionId), `Session started · levels locked${ends}`)
+  const closed = joinRequestsClosedNote(session.joinRequestsClosed ?? 0)
+  return accepted(
+    await realGetQueueSession(sessionId),
+    `Session started · levels locked${ends}${closed}`,
+  )
 }
 
 export async function realUpdateQueueSession(input: {

@@ -1,14 +1,18 @@
 'use client'
 
+import { openedEarly } from '@rotra/data/match/match.rules'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { MockError } from '@rotra/data/mock/errors'
 import { useAddCourt } from '@rotra/data/queue-session/useAddCourt'
 import { useExtendSession } from '@rotra/data/queue-session/useExtendSession'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
-import { useRemoveCourt } from '@rotra/data/queue-session/useRemoveCourt'
 import { useSetSessionEnd } from '@rotra/data/queue-session/useSetSessionEnd'
 import { useUpdateCourt } from '@rotra/data/queue-session/useUpdateCourt'
-import { CourtsAndTimeSheet, type ExtendMinutes } from '@rotra/ui/courts-and-time-sheet'
+import {
+  CourtsAndTimeSheet,
+  type CourtsTimeStatus,
+  type ExtendMinutes,
+} from '@rotra/ui/courts-and-time-sheet'
 import { AddCourtForm } from '@rotra/ui/forms/add-court-form'
 import { nextCourtLabel, toTimeInput } from '@rotra/ui/forms/add-court-form/default-values'
 import type { AddCourtFormValues } from '@rotra/ui/forms/add-court-form/schema'
@@ -39,7 +43,8 @@ const isSaveFailure = (error: unknown) =>
   error instanceof MockError && (error.kind === 'retryable' || error.kind === 'offline')
 
 /**
- * Q-SESSION-ADJUST and Q-ADD-COURT: the Courts and time sheet on useSetSessionEnd and useExtendSession ("Session ends at
+ * Q-SESSION-ADJUST and Q-ADD-COURT: the Courts and time sheet (one row per court with its Playing /
+ * Getting ready / Free chip, booking line and Change time) on useSetSessionEnd and useExtendSession ("Session ends at
  * HH:MM · public page updates after sync") and the Add a court sheet on useAddCourt ("LABEL added · open until HH:MM"). "Add a court…"
  * in the first opens the second; the shell's + Add court tile opens it directly. Courts set to
  * "until the session ends" follow an extension (their openUntil is null); set-time courts keep theirs.
@@ -65,7 +70,6 @@ export function CourtsAndTime({
   const setEnd = useSetSessionEnd()
   const add = useAddCourt()
   const update = useUpdateCourt()
-  const remove = useRemoveCourt()
   const matches = useSessionMatches(sessionId)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [serverError, setServerError] = useState<string | undefined>()
@@ -75,7 +79,12 @@ export function CourtsAndTime({
   const sessionStart = s.startedAt ?? s.scheduledStartAt
   const courts = s.courts
   const editing = courts.find((c) => c.id === (editingId ?? editCourtId))
-  const used = !!editing && (matches.data ?? []).some((m) => m.courtIds.includes(editing.id))
+  // The planned start is fixed once the court hosted a match or was opened early; the end and the
+  // label stay editable, even while a match is on the court (the match is not touched).
+  const used =
+    !!editing &&
+    (editing.openedEarlyAt != null ||
+      (matches.data ?? []).some((m) => m.courtIds.includes(editing.id)))
 
   const onExtend = (minutes: ExtendMinutes) => {
     if (saving.current) return
@@ -148,14 +157,22 @@ export function CourtsAndTime({
       <CourtsAndTimeSheet
         open={open === 'adjust'}
         onOpenChange={(next) => onOpenChange(next ? 'adjust' : null)}
-        courts={courts.map((c) => ({
-          ...c,
-          startsAt: c.startsAt ?? sessionStart,
-          occupied: (matches.data ?? []).some(
-            (m) => m.state === 'active' && m.courtIds.includes(c.id),
-          ),
-          used: (matches.data ?? []).some((m) => m.courtIds.includes(c.id)),
-        }))}
+        courts={courts.map((c) => {
+          const onIt = (matches.data ?? []).filter((m) => m.courtIds.includes(c.id))
+          const status: CourtsTimeStatus = onIt.some((m) => m.state === 'active')
+            ? 'playing'
+            : onIt.some((m) => m.state === 'on_court')
+              ? 'getting-ready'
+              : 'free'
+          return {
+            ...c,
+            startsAt: c.startsAt ?? sessionStart,
+            status,
+            openedEarly: openedEarly(c, now),
+            occupied: status !== 'free',
+            used: onIt.length > 0 || c.openedEarlyAt != null,
+          }
+        })}
         startsAt={sessionStart}
         now={now}
         focusEnd={focusEnd}
@@ -174,7 +191,7 @@ export function CourtsAndTime({
         endsAt={s.scheduledEndAt}
         onAddCourt={() => openAddCourt(true)}
         onExtend={onExtend}
-        isPending={extend.isPending || setEnd.isPending || remove.isPending || matches.isPending}
+        isPending={extend.isPending || setEnd.isPending || matches.isPending}
       />
       {/* Remounted on each open so the label and mode start fresh from the current court count */}
       <AddCourtForm

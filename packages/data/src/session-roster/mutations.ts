@@ -508,6 +508,9 @@ export type JoinRequestInput = {
   placement?: Extract<JoinRequestPlacement, 'slot' | 'waitlist'>
 }
 export const SLOTS_FULL_ERROR = 'All slots are taken. Join the waitlist instead.'
+/** Join requests end at Start (D-2026-11-11-11): none is created once the session is live. */
+export const JOIN_REQUESTS_STARTED_ERROR =
+  'The session has started, so online join requests are closed.'
 /**
  * "Slots are full" for a player's request (D-2026-11-11-02): before start, with the roster at the
  * slot budget. During play the Queue Master can admit additional players (#284–#287), so a slot
@@ -518,8 +521,8 @@ export const slotsFull = (s: MockState, sessionId: string) =>
   s.roster.filter((r) => r.sessionId === sessionId).length >= capacity(s, sessionId)
 function request(s: MockState, input: JoinRequestInput) {
   const session = sessionIn(s, input.sessionId)
-  if (!session.acceptJoinRequests || !['prepared', 'active'].includes(session.state))
-    fail('Join requests are off.')
+  if (session.state === 'active') fail(JOIN_REQUESTS_STARTED_ERROR)
+  if (!session.acceptJoinRequests || session.state !== 'prepared') fail('Join requests are off.')
   const fields: Record<string, string> = {}
   const placement = input.placement ?? 'slot'
   if (!input.name.trim()) fields.name = 'Enter your name.'

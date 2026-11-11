@@ -112,7 +112,10 @@ type SignedInViewer = {
 const signedInId = (as: { id: string } | { playerId: string }) =>
   'playerId' in as ? as.playerId : as.id
 
-/** The join card variant: this visitor's own request first, then requests off, open or full. */
+/**
+ * The join card variant: this visitor's own request first, then started (live), requests off, open
+ * or full.
+ */
 function joinCardProps(
   page: PublicSessionPage,
   mine: MyJoinRequest | null | undefined,
@@ -129,13 +132,18 @@ function joinCardProps(
       variant: 'confirmed-waitlist',
       waitlistPosition: signedIn.waitlistPosition,
       signedIn: true,
-      openSlots: page.acceptJoinRequests ? page.openSlots : 0,
+      // No Join from waitlist once live: join requests end at Start (D-2026-11-11-11).
+      openSlots: page.acceptJoinRequests && page.status === 'prepared' ? page.openSlots : 0,
       onJoinFromWaitlist: signedIn.onJoinFromWaitlist,
       slotRequestPending: asking,
       onCancelRequest: signedIn.onCancelRequest,
       disabled: offline || signedIn.busy,
     }
   }
+  // Join requests close at Start (D-2026-11-11-11): once live, a signed-in Player without a slot
+  // and anyone without a request status of their own see the started notice instead of the form.
+  const started = { variant: 'started' } as const
+  if (signedIn && page.status === 'active' && mine?.status !== 'confirmed') return started
   // A cancelled or closed request is not a status: the card offers Request to join again.
   if (mine && mine.status !== 'cancelled' && mine.status !== 'closed') {
     if (mine.status === 'pending')
@@ -161,6 +169,7 @@ function joinCardProps(
         ? { variant: 'confirmed-slot' }
         : { variant: 'confirmed-slot', registerNudge: true }
   }
+  if (page.status === 'active') return started
   if (!page.acceptJoinRequests) return { variant: 'off' }
   const availability = signedIn
     ? {
@@ -171,8 +180,6 @@ function joinCardProps(
         onPlacementChange: signedIn.onPlacementChange,
       }
     : { onRequestToJoin, disabled: offline }
-  if (page.status === 'active')
-    return { variant: 'active', skillMix: page.skillMix, ...availability }
   return page.openSlots > 0
     ? {
         variant: 'open',
@@ -657,9 +664,7 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
               waitlist={waitlist}
               openSlots={p.openSlots}
               finished={p.status === 'completed' || p.status === 'invalid'}
-              acceptJoinRequests={
-                p.acceptJoinRequests && (p.status === 'prepared' || p.status === 'active')
-              }
+              acceptJoinRequests={p.acceptJoinRequests && p.status === 'prepared'}
               onRequestToJoin={signedIn ? signedIn.onJoin : () => setJoinOpen(true)}
               onOpenParticipant={profileViewerId ? setProfileOf : undefined}
               disabled={offline || !!signedIn?.busy}

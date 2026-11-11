@@ -26,6 +26,7 @@ import {
   cancelReasonError,
   cancelReasonOf,
   estimateMinimum,
+  joinRequestsClosedNote,
   publicSlugFor,
   rebalanceSlots,
   sessionEndCourtConflict,
@@ -315,7 +316,8 @@ export async function downloadSession(sessionId: string) {
 /**
  * Start session: prepared → active, levels lock. A late or other-day start (T3) needs `newEndAt`
  * (after now, at most 24 hours later); it becomes the end and courts that follow the session end
- * move with it. The actual start (`startedAt`) is fixed from here on.
+ * move with it. The actual start (`startedAt`) is fixed from here on. Every pending join request
+ * closes (`closed`, not declined; D-2026-11-11-11) and the toast adds "· N join requests closed".
  */
 export function startSession(input: string | { sessionId: string; newEndAt?: number | null }) {
   const { sessionId, newEndAt = null } = typeof input === 'string' ? { sessionId: input } : input
@@ -354,9 +356,16 @@ export function startSession(input: string | { sessionId: string; newEndAt?: num
       p.levelLockedAt = now
       if (p.present) p.presentChangedAt = now
     }
+    let closed = 0
+    for (const r of state.joinRequests)
+      if (r.sessionId === sessionId && r.status === 'pending') {
+        r.status = 'closed'
+        r.decidedAt = now
+        closed++
+      }
     return {
       data: s,
-      text: `Session started · levels locked${late ? ` · ends ${atWhenLabel(s.scheduledEndAt, now)}` : ''}`,
+      text: `Session started · levels locked${late ? ` · ends ${atWhenLabel(s.scheduledEndAt, now)}` : ''}${joinRequestsClosedNote(closed)}`,
     }
   })
 }

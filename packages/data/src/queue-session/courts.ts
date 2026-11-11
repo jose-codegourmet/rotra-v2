@@ -47,6 +47,10 @@ export function addCourt(input: {
   )
 }
 
+/**
+ * Edit / Change time on a court: label, planned start and end. Allowed while a match is on the court
+ * (the match is not touched); the planned start is fixed once the court hosted a match or opened early.
+ */
 export function updateCourt(input: {
   sessionId: string
   courtId: string

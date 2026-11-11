@@ -6,9 +6,10 @@ import { matchRequestKeys } from './queryKeys'
  * Q-REQUESTS, the Queue Master's side of the player-facing requests (Q18). Mock only for now.
  *
  * `data: SessionRequests`:
- * - `counts.total`: the **Requests · N** button (pending join requests + open drop-out notices +
- *   open match requests). `counts.join` is the **Join · N** tab (join requests + drop-out notices),
- *   `counts.match` the **Match · N** tab; `counts.joinRequests` and `counts.dropOuts` split Join.
+ * - `counts.total`: pending join requests + open drop-out notices + open match requests. No tabs
+ *   (D-2026-11-11-11): `counts.join` (join requests + drop-out notices) is the preparation card's
+ *   **Requests · N**, `counts.match` the live console's **Match requests · N**;
+ *   `counts.joinRequests` and `counts.dropOuts` split the first.
  * - `join`: pending join requests, oldest first, each a `SessionJoinRequest` plus `account`
  *   (`null` for a guest; `{ playerId, inClub }`: `inClub` true reads “ROTRA player · already in
  *   your club”, false “ROTRA player · new to your club”) and `invitedByName` (“Invited by NAME”, or

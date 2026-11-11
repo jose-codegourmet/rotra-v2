@@ -212,8 +212,9 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
 
   const publicHref = s ? `/s/${s.publicSlug}` : '/'
   const sessionLink = `${origin}${publicHref}`
-  // Requests · N: pending join requests + open drop-out notices + open match requests, carried by
-  // the session read; real mode has no Requests read yet, so it counts the join requests alone.
+  // Before Start, Requests · N: pending join requests + open drop-out notices; live, Match requests ·
+  // N (open match requests only). Carried by the session read; real mode has no Requests read yet,
+  // so it counts the pending join requests alone (none once live: Start closes them).
   const pendingRequests = (roster.data?.joinRequests ?? []).filter(
     (r) => r.status === 'pending',
   ).length
@@ -409,8 +410,12 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
                         <Button size="sm" onClick={() => setLiveSheet('add-player')}>
                           Add player
                         </Button>
-                        <Button size="sm" onClick={() => setLiveSheet('requests')}>
-                          Requests · {requestCount}
+                        <Button
+                          size="sm"
+                          aria-label={`Match requests · ${requestCount}${requestCount ? ' waiting' : ''}`}
+                          onClick={() => setLiveSheet('requests')}
+                        >
+                          Match requests · {requestCount}
                         </Button>
                         <Button size="sm" onClick={() => setLiveSheet('payments')}>
                           Payments

@@ -2,10 +2,12 @@ import { formatAmount } from '@rotra/data/club/rules'
 import { formatLicenseDate } from '@rotra/data/license/rules'
 import type { ClubLicenseTerm } from '@rotra/data/license/types'
 import type { DataTableProps } from '@rotra/ui/data-table'
+import { LicenseReferenceCell } from '@rotra/ui/license-reference-cell'
 
 /**
  * Club detail › License › Payment history (rotra-admin.html viewClub terms table). Rows come newest
  * first from the fetcher; the prototype has no sorting, so no header turns into a sort button.
+ * Reference shows the generated LIC number with the typed note under it (D-2026-11-11-06).
  */
 export const licensePaymentColumns: DataTableProps<ClubLicenseTerm>['columns'] = [
   {
@@ -43,7 +45,10 @@ export const licensePaymentColumns: DataTableProps<ClubLicenseTerm>['columns'] =
     enableSorting: false,
     header: 'Reference',
     cell: ({ row }) => (
-      <span className="font-mono text-[13px]">{row.original.paymentReference || '—'}</span>
+      <LicenseReferenceCell
+        licenseNumber={row.original.paymentReference}
+        note={row.original.notes}
+      />
     ),
   },
 ]

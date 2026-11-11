@@ -16,6 +16,7 @@ import {
   formatLicenseDate,
   isCalendarDate,
   licenseAuditSummary,
+  licenseTermStart,
   manilaToday,
   termEnd,
 } from './license.rules'
@@ -114,13 +115,18 @@ export async function listLicenseTerms(
     .sort(newestFirst)
 }
 
+/** The next `LIC-####` number across every recorded term (rotra-admin.html licCommit). */
+function nextLicenseNumber(terms: readonly ClubLicenseTerm[]) {
+  const seq = Math.max(0, ...terms.map((t) => Number(t.paymentReference.replace(/\D/g, '')) || 0))
+  return `LIC-${String(seq + 1).padStart(4, '0')}`
+}
+
 /** Same rules as the License form; the server rechecks what the form already checked. */
 function licenseErrors(input: ActivateLicenseInput, free: boolean, today: string) {
   const errors: Record<string, string> = {}
   if (input.plan !== 'Monthly' && input.plan !== 'Yearly') errors.plan = 'Choose monthly or yearly.'
-  if (!isCalendarDate(input.startsOn)) errors.startsOn = 'Enter the date the term starts.'
   if (input.reference.trim().length > LICENSE_REFERENCE_MAX)
-    errors.reference = 'Keep the reference under 40 characters.'
+    errors.reference = 'Keep the note under 40 characters.'
   if (free) return errors
   if (!input.paidOn || !isCalendarDate(input.paidOn))
     errors.paidOn = 'Enter the date the club paid.'
@@ -132,7 +138,9 @@ function licenseErrors(input: ActivateLicenseInput, free: boolean, today: string
 
 /**
  * Records one license term, idempotent on sourceCommandId: a repeat returns the term it already
- * added and never adds a second period. A free club's term is recorded at 0 with no payment date.
+ * added and never adds a second period. The start is computed (D-2026-11-11-06): the day after the
+ * current term ends, else today; a client-supplied start is refused. A free club's term is
+ * recorded at 0 with no payment date.
  * When an expired club's new term covers today, the current countdown is cancelled and the public
  * pages restored, unless they were already deleted. A later expiry starts a new countdown.
  */
@@ -148,20 +156,25 @@ export async function activateLicense(input: ActivateLicenseInput): Promise<Lice
     const today = manilaToday()
     const free = club.licensePricing === 'free'
     const errors = licenseErrors(input, free, today)
+    if ('startsOn' in input)
+      errors.startsOn = 'The term start is computed by ROTRA and cannot be sent.'
     const first = Object.values(errors)[0]
     if (first) throw new MockError('permission', first, errors)
     const before = draft.licensePayments.filter((term) => term.clubId === club.id)
     const access = accessOf(before, today)
+    const startsOn = licenseTermStart(before, today)
     const term: ClubLicenseTerm = {
       id: crypto.randomUUID(),
       clubId: club.id,
       plan: input.plan,
-      startsAt: input.startsOn,
-      endsAt: termEnd(input.startsOn, input.plan),
+      startsAt: startsOn,
+      endsAt: termEnd(startsOn, input.plan),
       amountMinor: free ? 0 : input.amountMinor,
       currency: 'PHP',
       paidOn: free ? null : input.paidOn,
-      paymentReference: input.reference.trim(),
+      // The generated LIC-#### number; the typed text is the term's note (rotra-admin.html licCommit).
+      paymentReference: nextLicenseNumber(draft.licensePayments),
+      notes: input.reference.trim() || undefined,
       activatedAt: new Date().toISOString(),
       activatedByEmail: adminAccount.email,
       sourceCommandId: input.sourceCommandId,

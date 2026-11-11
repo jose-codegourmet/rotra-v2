@@ -1,4 +1,41 @@
+import { clubs } from '@rotra/data/fixtures/clubs'
+import { dataMode } from '@rotra/db/auth/data-mode'
+import { guestRegistrationClub } from '@rotra/db/player/guest-registration'
+import type { Metadata } from 'next'
 import { GuestRegistration } from './_components/guest-registration/GuestRegistration'
+
+/**
+ * Share-link preview (#720) for the club invite link `/register/<clubId>` (with or without `?k=`).
+ * Only the club name is read; the invite code is never read or echoed. An unknown club or any
+ * failure gets the fallback copy and never an error.
+ */
+export async function generateMetadata(props: PageProps<'/register/[clubId]'>): Promise<Metadata> {
+  const { clubId } = await props.params
+  const clubName = await clubNameOf(clubId)
+  const copy = clubName
+    ? {
+        title: `Join ${clubName}`,
+        description: `You're invited to join ${clubName} as a player on ROTRA.`,
+      }
+    : {
+        title: 'Join this club on ROTRA',
+        description: "You're invited to join a club as a player on ROTRA.",
+      }
+  return {
+    ...copy,
+    openGraph: { ...copy, type: 'website', siteName: 'ROTRA' },
+    twitter: { card: 'summary', ...copy },
+  }
+}
+
+async function clubNameOf(clubId: string) {
+  try {
+    if (dataMode() === 'real') return (await guestRegistrationClub(clubId)).clubName || null
+    return clubs.find((club) => club.id === clubId)?.name || null
+  } catch {
+    return null
+  }
+}
 
 export default async function RegisterPage(props: PageProps<'/register/[clubId]'>) {
   const [{ clubId }, search] = await Promise.all([props.params, props.searchParams])

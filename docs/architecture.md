@@ -144,6 +144,17 @@ Route paths above illustrate the pattern; the real route list comes from the scr
 | `_components/<name>/` | Calling `@rotra/data` hooks, mutations, toasts, arranging `@rotra/ui` pieces | Its own visual design: anything with its own look goes in `@rotra/ui` |
 | `@rotra/ui` component | Markup, styles, animation, accessibility, local UI state | Fetching, routing, global state |
 
+### Share-link previews
+
+Three routes export `generateMetadata` (title, description, Open Graph `website` with `siteName`
+ROTRA, Twitter `summary`) so a pasted link previews the page instead of the app title (#720):
+`apps/queue/src/app/(public)/s/[slug]/page.tsx` (session title), `apps/player/src/app/(auth)/register/[clubId]/page.tsx`
+(club name; `?k=` is never read) and `apps/player/src/app/(auth)/claim/[token]/page.tsx` (one copy
+for both the profile invite and the claim-play link, never a person's name). The copy lives in each
+`page.tsx`. Real mode reads the name through the same `@rotra/db` service the route's Route Handler
+uses; mock mode reads `@rotra/data/fixtures/*`. Any failure, unknown id or missing name falls back to
+the ticket's generic copy; `generateMetadata` never throws.
+
 ---
 
 ## 5. Data flow

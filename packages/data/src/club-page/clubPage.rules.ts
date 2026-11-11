@@ -1,5 +1,5 @@
-import { maskPublicName } from '../public-session/publicSession.rules'
 import type { PlayingLevel } from '../player/player.types'
+import { maskPublicName } from '../public-session/publicSession.rules'
 import type { ClubPageMember, ClubPageSession, ClubPageSessionStatus } from './clubPage.types'
 
 /** Members shown at a time on the club page grid (Show more adds as many again). */
@@ -100,7 +100,10 @@ export function sessionPageKept(endsAt: number, now = Date.now()) {
 export function upcomingSessions(sessions: ClubPageSession[]) {
   return sessions
     .filter((s) => s.status !== 'done')
-    .sort((a, b) => Number(b.status === 'live') - Number(a.status === 'live') || a.startsAt - b.startsAt)
+    .sort(
+      (a, b) =>
+        Number(b.status === 'live') - Number(a.status === 'live') || a.startsAt - b.startsAt,
+    )
 }
 
 const monthIndex = (at: number) => new Date(at).getFullYear() * 12 + new Date(at).getMonth()
@@ -122,4 +125,10 @@ export { monthIndex }
 export function sessionsThisMonth(sessions: ClubPageSession[], now = Date.now()) {
   const inMonth = sessions.filter((s) => monthIndex(s.startsAt) === monthIndex(now))
   return { count: inMonth.length, done: inMonth.filter((s) => s.status === 'done').length }
+}
+
+/** The club's current invite link inside the Player app (the page and the link are separate). */
+export function clubJoinHref(clubId: string, inviteCode?: string | null) {
+  const base = `/register/${encodeURIComponent(clubId)}`
+  return inviteCode ? `${base}?k=${encodeURIComponent(inviteCode)}` : base
 }

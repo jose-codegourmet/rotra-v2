@@ -1,6 +1,6 @@
 # Player: New public club page with members, upcoming sessions and a calendar (#737, proposed)
 
-Status: NEW
+Status: IN MOCK APP — #737
 Date: 2026-11-11
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › Public club page (new screen, epic P07); linked from Your clubs › Club page and the Prototype menu

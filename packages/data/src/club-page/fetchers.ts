@@ -1,12 +1,13 @@
 import { getSession } from '../auth/fetchers'
 import { requireOnline } from '../mock/bridge'
-import { NotConnectedError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { readMockState } from '../mock/store'
 import { queueSessionUrl } from '../player/mySessions'
+import { realGetClubPage } from '../real/club-page'
 import { isRealDataMode } from '../real/mode'
 import {
   byShownName,
+  clubJoinHref,
   clubSessionStatus,
   type MemberVisibility,
   projectMember,
@@ -14,18 +15,12 @@ import {
 } from './clubPage.rules'
 import type { ClubPage, ClubPageSession } from './clubPage.types'
 
-/** The club's current invite link inside the Player app (the page and the link are separate). */
-export function clubJoinHref(clubId: string, inviteCode?: string | null) {
-  const base = `/register/${encodeURIComponent(clubId)}`
-  return inviteCode ? `${base}?k=${encodeURIComponent(inviteCode)}` : base
-}
-
 /**
  * P-CLUB-PAGE / P-CLUB-MEMBERS (#737): the club, its registered members (masked for the viewer) and
  * every session that is scheduled, live or done. Null for an unknown club (not found).
  */
 export async function getClubPage(clubId: string, signal?: AbortSignal): Promise<ClubPage | null> {
-  if (isRealDataMode()) throw new NotConnectedError()
+  if (isRealDataMode()) return realGetClubPage(clubId, signal)
   await delay(200, signal)
   requireOnline()
   const state = readMockState()

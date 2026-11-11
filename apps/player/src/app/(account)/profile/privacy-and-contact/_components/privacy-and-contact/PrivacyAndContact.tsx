@@ -1,15 +1,20 @@
 'use client'
 import { useSignOut } from '@rotra/data/auth/use-sign-out'
 import { useMyAccount } from '@rotra/data/player-account/useMyAccount'
+import { useSetHiddenFromDirectory } from '@rotra/data/player-account/useSetHiddenFromDirectory'
 import { useSetPhonePrivacy } from '@rotra/data/player-account/useSetPhonePrivacy'
-import { useSetProfilePrivacy } from '@rotra/data/player-account/useSetProfilePrivacy'
+import { useSetProfileVisibility } from '@rotra/data/player-account/useSetProfileVisibility'
 import { Button } from '@rotra/ui/button'
 import { ContactDetailsCard } from '@rotra/ui/contact-details-card'
 import { ContactRequestStatus } from '@rotra/ui/contact-request-status'
 import { ErrorState } from '@rotra/ui/error-state'
 import { PageHeader } from '@rotra/ui/page-header'
 import { PhonePrivacyCard } from '@rotra/ui/phone-privacy-card'
-import { PrivateContactCard } from '@rotra/ui/private-contact-card'
+import { PlayerInformationCard } from '@rotra/ui/player-information-card'
+import {
+  ProfileVisibilityControl,
+  profileVisibilityWord,
+} from '@rotra/ui/profile-visibility-control'
 import { SignOutCard } from '@rotra/ui/sign-out-card'
 import { toast } from '@rotra/ui/toaster'
 import { useRouter } from 'next/navigation'
@@ -26,11 +31,14 @@ export function PrivacyAndContact() {
   // A different player's private data is never requested: only the signed-in id is passed.
   const playerId = account?.id ?? null
   const myAccount = useMyAccount(playerId)
-  const setProfilePrivacy = useSetProfilePrivacy()
+  const setVisibility = useSetProfileVisibility()
+  const setHidden = useSetHiddenFromDirectory()
   const setPrivacy = useSetPhonePrivacy()
   const signOut = useSignOut('player')
   const contactChange = useContactChangeSheet(playerId)
   const [privacyError, setPrivacyError] = useState<string>()
+  const [visibilityError, setVisibilityError] = useState<string>()
+  const [hiddenError, setHiddenError] = useState<string>()
   const router = useRouter()
   const dispatch = useAppDispatch()
   const data = myAccount.data
@@ -64,16 +72,49 @@ export function PrivacyAndContact() {
         </Button>
         <PageHeader title="Privacy and contact" />
       </div>
-      <PrivateContactCard
-        savedPrivate={data.profilePrivate ?? false}
-        isPending={setProfilePrivacy.isPending}
-        error={setProfilePrivacy.error?.message}
-        onToggleProfile={(next) =>
-          setProfilePrivacy.mutate(
-            { profilePrivate: next },
-            { onError: (error) => toast.error(error.message) },
+      <ProfileVisibilityControl
+        savedVisibility={data.profileVisibility}
+        isPending={setVisibility.isPending}
+        error={visibilityError}
+        onChange={(next) => {
+          if (setVisibility.isPending || next === data.profileVisibility) return
+          setVisibilityError(undefined)
+          setVisibility.mutate(
+            { profileVisibility: next },
+            {
+              onSuccess: (saved) =>
+                toast(`Your profile is now ${profileVisibilityWord(saved.profileVisibility)}`),
+              onError: (error) => {
+                setVisibilityError(error.message)
+                toast.error(error.message)
+              },
+            },
           )
-        }
+        }}
+      />
+      <PlayerInformationCard
+        savedHidden={data.hiddenFromDirectory}
+        isPending={setHidden.isPending}
+        error={hiddenError}
+        onToggle={(next) => {
+          if (setHidden.isPending) return
+          setHiddenError(undefined)
+          setHidden.mutate(
+            { hiddenFromDirectory: next },
+            {
+              onSuccess: (saved) =>
+                toast(
+                  saved.hiddenFromDirectory
+                    ? 'You are now hidden from Player Information'
+                    : 'Clubs can now find you in Player Information',
+                ),
+              onError: (error) => {
+                setHiddenError(error.message)
+                toast.error(error.message)
+              },
+            },
+          )
+        }}
       />
       <PhonePrivacyCard
         savedHidden={data.phoneHidden}

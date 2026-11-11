@@ -1,4 +1,6 @@
-/** The signed-in player's private contacts. Only ever returned to that player. */
+import type { ProfileVisibility } from '../player/player.types'
+
+/** The signed-in player's private contacts and privacy settings. Only ever returned to that player. */
 export type MyAccount = {
   playerId: string
   /** E.164 */
@@ -6,7 +8,10 @@ export type MyAccount = {
   email: string
   phoneHidden: boolean
   emailConfirmedAt?: string | null
-  profilePrivate?: boolean
+  /** P-PROFILE-PRIVACY › Profile visibility (D-2026-11-12-01) */
+  profileVisibility: ProfileVisibility
+  /** P-PROFILE-PRIVACY › Hide me from Player Information */
+  hiddenFromDirectory: boolean
   avatarPreviousRef?: string | null
 }
 
@@ -57,5 +62,10 @@ export type CompleteClaimResult = {
   firstName: string
 }
 
-/** Private account storage; new registration awaits email confirmation. */
-export type PlayerAccountRecord = MyAccount & { claimed: boolean }
+/**
+ * Private account storage; new registration awaits email confirmation. Visibility settings live on
+ * the profile record (`PlayerProfile`), not here.
+ */
+export type PlayerAccountRecord = Omit<MyAccount, 'profileVisibility' | 'hiddenFromDirectory'> & {
+  claimed: boolean
+}

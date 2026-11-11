@@ -74,7 +74,7 @@ export function LeaderboardRow({
       </span>
       <Avatar
         name={fullName}
-        src={masked ? undefined : picture?.src}
+        src={picture?.src}
         initials={masked ? undefined : picture?.initials}
         size={36}
         className={cn(

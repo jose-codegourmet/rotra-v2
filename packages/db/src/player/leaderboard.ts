@@ -1,6 +1,7 @@
 import 'server-only'
 import type { LeaderboardEntry } from '@rotra/data/leaderboard/types'
 import type { PlayingLevel } from '@rotra/data/player/types'
+import { maskPublicName } from '@rotra/data/public-session/rules'
 import { prisma } from '../client/prisma'
 import type { Prisma } from '../generated/prisma/client'
 import { APPROVED_RANK_ALGORITHMS } from './projections'
@@ -15,7 +16,11 @@ import { APPROVED_RANK_ALGORITHMS } from './projections'
  * produced that are leaderboard-eligible with a stored rank and level are listed, in the stored
  * order already used by `readLeaderboard` (rank, then player ID). Tie precedence is still #247.
  */
-export type LeaderboardRow = LeaderboardEntry & { position: number }
+export type LeaderboardRow = LeaderboardEntry & {
+  position: number
+  masked?: boolean
+  levelHidden?: boolean
+}
 
 const approvedAlgorithms = () => [...APPROVED_RANK_ALGORITHMS]
 
@@ -35,20 +40,28 @@ const ROW_SELECT = {
   playerId: true,
   numericRank: true,
   skillLevel: { select: { code: true } },
-  player: { select: { fullName: true, nickname: true, avatarRef: true } },
+  player: { select: { fullName: true, nickname: true, avatarRef: true, profileVisibility: true } },
 } as const
 
 type Row = Prisma.PlayerRankCurrentGetPayload<{ select: typeof ROW_SELECT }>
 
-/** Public fields only: no contacts, rank components, evidence counts or private identity. */
-const entryOf = (row: Row, position: number): LeaderboardRow => ({
-  id: row.playerId,
-  fullName: row.player.fullName,
-  nickname: row.player.nickname,
-  playingLevel: row.skillLevel?.code as PlayingLevel,
-  pictureUrl: row.player.avatarRef,
-  position,
-})
+/**
+ * Public fields only: no contacts, rank components, evidence counts or private identity. This read is
+ * cached for every viewer, so an always-private player (D-2026-11-12-01) is masked here for everyone,
+ * their own row included; the picture and position stay, the level is hidden.
+ */
+const entryOf = (row: Row, position: number): LeaderboardRow => {
+  const masked = row.player.profileVisibility === 'always_private'
+  return {
+    id: row.playerId,
+    fullName: masked ? maskPublicName(row.player.fullName) : row.player.fullName,
+    nickname: masked ? null : row.player.nickname,
+    playingLevel: row.skillLevel?.code as PlayingLevel,
+    pictureUrl: row.player.avatarRef,
+    position,
+    ...(masked ? { masked: true, levelHidden: true } : {}),
+  }
+}
 
 /** 1 + listed rows ahead of this one in the stored order. */
 async function positionOf(row: Pick<Row, 'playerId' | 'numericRank'>) {
@@ -84,9 +97,11 @@ export async function readLeaderboardPage({ offset, limit }: { offset: number; l
 export async function searchLeaderboard(query: string) {
   const q = query.trim()
   if (!q || !APPROVED_RANK_ALGORITHMS.size) return { hits: [] as LeaderboardRow[], total: 0 }
+  // Masked names never match a search.
   const where: Prisma.PlayerRankCurrentWhereInput = {
     ...listedWhere(),
     player: {
+      profileVisibility: { not: 'always_private' },
       OR: [
         { fullName: { contains: q, mode: 'insensitive' } },
         { nickname: { contains: q, mode: 'insensitive' } },

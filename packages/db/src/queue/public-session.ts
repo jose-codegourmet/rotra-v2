@@ -414,6 +414,7 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
             avatarRef: true,
             nickname: true,
             profileState: true,
+            profileVisibility: true,
             idAllocation: { select: { rtrId: true } },
           },
         },
@@ -425,18 +426,26 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
     /**
      * D-2026-11-09-02 for a signed-in Player, #731: a registered (claimed) player's full name,
      * nickname and RTR ID, and which card the tile opens; guests and unclaimed profiles stay
-     * masked. Always private (#715) has no column yet, so it reads as not set here.
+     * masked. An always-private player (D-2026-11-12-01) is masked for everyone but themselves,
+     * keeps their picture and opens the private card.
      */
     const person = (entry: (typeof roster)[number]) => {
       const club = people.get(entry.clubPlayerId)
       const registered = !!club?.playerId && club.player?.profileState === 'claimed'
+      const isViewer = !!club?.playerId && club.playerId === context.playerId
+      const alwaysPrivate = registered && club?.player?.profileVisibility === 'always_private'
+      const showFull = registered && (!alwaysPrivate || isViewer)
       return {
-        name: registered ? entry.nameSnapshot : maskPublicName(entry.nameSnapshot),
-        masked: !registered,
-        nickname: registered ? (club?.player?.nickname ?? null) : null,
-        rtrId: registered ? (club?.player?.idAllocation?.rtrId ?? null) : null,
-        isViewer: !!club?.playerId && club.playerId === context.playerId,
-        profile: registered ? ('registered' as const) : ('guest' as const),
+        name: showFull ? entry.nameSnapshot : maskPublicName(entry.nameSnapshot),
+        masked: !showFull,
+        nickname: showFull ? (club?.player?.nickname ?? null) : null,
+        rtrId: showFull ? (club?.player?.idAllocation?.rtrId ?? null) : null,
+        isViewer,
+        profile: showFull
+          ? ('registered' as const)
+          : alwaysPrivate
+            ? ('private' as const)
+            : ('guest' as const),
       }
     }
     const byId = new Map(roster.map((entry) => [entry.id, entry]))

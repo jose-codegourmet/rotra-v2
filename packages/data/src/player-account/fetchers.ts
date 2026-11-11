@@ -22,26 +22,14 @@ import {
 } from '../real/player'
 import { maskPhone } from './playerAccount.rules'
 import type { ClaimLink, CompleteClaimResult, MyAccount } from './playerAccount.types'
+import { myAccountOf } from './visibilitySettings'
 
 /** The signed-in player's own contacts; null when signed out. Never a public fetcher. */
 export async function getMyAccount(signal?: AbortSignal): Promise<MyAccount | null> {
   if (isRealDataMode()) return realGetMyAccount(signal)
   await playerRequest(signal)
   const session = await getSession('player')
-  const account = session
-    ? readMockState().playerAccounts.find((entry) => entry.playerId === session.account.id)
-    : undefined
-  return account
-    ? {
-        playerId: account.playerId,
-        phone: account.phone,
-        email: account.email,
-        phoneHidden: account.phoneHidden,
-        emailConfirmedAt: account.emailConfirmedAt,
-        profilePrivate: account.profilePrivate ?? false,
-        avatarPreviousRef: account.avatarPreviousRef ?? null,
-      }
-    : null
+  return session ? myAccountOf(readMockState(), session.account.id) : null
 }
 
 /** Same acknowledgement for known and unknown emails. No email is delivered in the mock. */
@@ -265,20 +253,12 @@ export async function setPhonePrivacy(input: { phoneHidden: boolean }): Promise<
       `Couldn't save because you're offline. Your phone is still ${stored.phoneHidden ? 'hidden from' : 'visible to'} clubs.`,
     )
   checkMockSave()
-  let saved: MyAccount | undefined
+  let saved: MyAccount | null = null
   mockStore.update((draft) => {
     const account = draft.playerAccounts.find((a) => a.playerId === session.account.id)
     if (!account) throw new MockError('permission', 'Sign in to change your phone privacy.')
     account.phoneHidden = input.phoneHidden
-    saved = {
-      playerId: account.playerId,
-      phone: account.phone,
-      email: account.email,
-      phoneHidden: account.phoneHidden,
-      emailConfirmedAt: account.emailConfirmedAt,
-      profilePrivate: account.profilePrivate ?? false,
-      avatarPreviousRef: account.avatarPreviousRef ?? null,
-    }
+    saved = myAccountOf(draft, session.account.id)
   })
   if (!saved) throw new Error('Phone privacy save produced no result.')
   return saved

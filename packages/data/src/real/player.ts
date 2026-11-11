@@ -1,7 +1,12 @@
 import { type PersonalProfileValues, personalProfileSchema } from '@rotra/schema/personal-details'
 import type { MockSession, SignInInput } from '../auth/auth.types'
 import type { PlayerPictureChoice } from '../player/picture'
-import type { PlayerProfile, PlayerRank, PlayerSessionRecord } from '../player/player.types'
+import type {
+  PlayerProfile,
+  PlayerRank,
+  PlayerSessionRecord,
+  ProfileVisibility,
+} from '../player/player.types'
 import type {
   ClaimLink,
   CompleteClaimResult,
@@ -147,6 +152,8 @@ function myAccountOf(account: WireMyAccount): MyAccount {
     phone: account.phone,
     email: account.email,
     phoneHidden: account.phoneHidden,
+    profileVisibility: account.profileVisibility,
+    hiddenFromDirectory: account.hiddenFromDirectory,
   }
 }
 
@@ -202,6 +209,29 @@ export async function realSetPhonePrivacy(input: { phoneHidden: boolean }) {
     method: 'POST',
     body: { phoneHidden: input.phoneHidden, expectedRevision: loadedRevision },
   })
+  return myAccountOf(account)
+}
+
+/** P-PROFILE-PRIVACY › Profile visibility, under the account revision the screen loaded. */
+export async function realSetProfileVisibility(input: { profileVisibility: ProfileVisibility }) {
+  if (!loadedRevision) await realGetMyAccount()
+  const { account } = await realRequest<{ account: WireMyAccount }>('/api/me/profile-visibility', {
+    method: 'POST',
+    body: { profileVisibility: input.profileVisibility, expectedRevision: loadedRevision },
+  })
+  return myAccountOf(account)
+}
+
+/** P-PROFILE-PRIVACY › Hide me from Player Information. */
+export async function realSetHiddenFromDirectory(input: { hiddenFromDirectory: boolean }) {
+  if (!loadedRevision) await realGetMyAccount()
+  const { account } = await realRequest<{ account: WireMyAccount }>(
+    '/api/me/directory-visibility',
+    {
+      method: 'POST',
+      body: { hiddenFromDirectory: input.hiddenFromDirectory, expectedRevision: loadedRevision },
+    },
+  )
   return myAccountOf(account)
 }
 

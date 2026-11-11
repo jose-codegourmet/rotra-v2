@@ -131,7 +131,8 @@ export function adminPlayerEditOf(state: MockState, player: Player): AdminPlayer
     experienceYears: profile?.experienceYears ?? null,
     experienceMonths: profile?.experienceMonths ?? null,
     socialLinks: { ...(profile?.socialLinks ?? EMPTY_LINKS) },
-    profilePrivate: !!(account?.profilePrivate || profile?.profilePrivate),
+    // Admin's Private profile switch is on for both Private and Always private (D-2026-11-12-01).
+    profilePrivate: (profile?.profileVisibility ?? 'public') !== 'public',
     previousPicture: account?.avatarPreviousRef ?? null,
     hasAccount: !!account,
     passwordSetAt: state.adminPlayerRecords[player.id]?.passwordSetAt ?? null,

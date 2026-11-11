@@ -59,7 +59,7 @@ export function TopThreePodium({ entries, totalPlayers, onSelect }: TopThreePodi
                 {index === 0 ? <PixelFire /> : null}
                 <Avatar
                   name={entry.fullName}
-                  src={entry.masked ? undefined : entry.picture?.src}
+                  src={entry.picture?.src}
                   initials={entry.masked ? undefined : entry.picture?.initials}
                   size={index === 0 ? 88 : 64}
                   className="avatar"

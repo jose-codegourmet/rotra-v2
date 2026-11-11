@@ -166,15 +166,24 @@ export async function readMyShareSession(context: PlayerContext, sessionId: stri
       select: {
         id: true,
         nameSnapshot: true,
-        playerAtEntry: { select: { avatarRef: true, idAllocation: { select: { rtrId: true } } } },
+        playerAtEntry: {
+          select: {
+            avatarRef: true,
+            profileVisibility: true,
+            idAllocation: { select: { rtrId: true } },
+          },
+        },
       },
     })
+    // An always-private participant (D-2026-11-12-01) shows a masked name; their picture stays.
     const byId = new Map(
       entries.map((e) => [
         e.id,
-        e.playerAtEntry?.idAllocation
-          ? { name: e.nameSnapshot, picture: e.playerAtEntry.avatarRef }
-          : { name: maskPublicName(e.nameSnapshot), picture: null },
+        !e.playerAtEntry?.idAllocation
+          ? { name: maskPublicName(e.nameSnapshot), picture: null }
+          : e.playerAtEntry.profileVisibility === 'always_private'
+            ? { name: maskPublicName(e.nameSnapshot), picture: e.playerAtEntry.avatarRef }
+            : { name: e.nameSnapshot, picture: e.playerAtEntry.avatarRef },
       ]),
     )
     const participant = (id: string) => byId.get(id) ?? { name: maskPublicName(''), picture: null }

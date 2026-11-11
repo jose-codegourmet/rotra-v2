@@ -91,6 +91,9 @@ export async function createAdminPlayer(input: AdminPlayerCreateValues) {
     draft.playerProfiles.push({
       ...player,
       playerId: id,
+      // New profiles default to Private (D-2026-11-12-01).
+      profileVisibility: 'private',
+      hiddenFromDirectory: false,
       picture: null,
       playingStyle: '',
       experienceYears: null,
@@ -291,8 +294,12 @@ export async function updateAdminPlayer(
       linkedin: values.linkedin,
     }
     if (has('private profile')) {
-      profile.profilePrivate = values.profilePrivate
-      if (account) account.profilePrivate = values.profilePrivate
+      // Off makes the profile public; on makes it private unless the player chose always private.
+      profile.profileVisibility = !values.profilePrivate
+        ? 'public'
+        : profile.profileVisibility === 'always_private'
+          ? 'always_private'
+          : 'private'
     }
     if (account) {
       if (has('phone privacy')) account.phoneHidden = values.phoneHidden

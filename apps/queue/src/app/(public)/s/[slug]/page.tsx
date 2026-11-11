@@ -17,7 +17,10 @@ export async function generateMetadata(props: PageProps<'/s/[slug]'>): Promise<M
         title: `Join the ${sessionTitle} session`,
         description: 'Open this ROTRA session to see details and join.',
       }
-    : { title: 'Join this ROTRA session', description: 'Open this session to see details and join.' }
+    : {
+        title: 'Join this ROTRA session',
+        description: 'Open this session to see details and join.',
+      }
   return {
     ...copy,
     openGraph: { ...copy, type: 'website', siteName: 'ROTRA' },

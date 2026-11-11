@@ -21,6 +21,7 @@ const input: PostInput = {
   roster: roster.map((r) => ({ name: r.nameSnapshot, nickname: r.nicknameSnapshot })),
   waitlist: [],
   openSlots: slotBudget - roster.length,
+  joinUrl: `https://queue.rotra.app/s/${session.publicSlug}`,
   mode: session.sessionMode,
   minimum: session.minimumGames,
 }

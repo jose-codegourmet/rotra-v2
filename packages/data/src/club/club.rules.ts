@@ -4,6 +4,7 @@ import {
 } from '@rotra/schema/club-price'
 import { formatPeso } from '@rotra/schema/money'
 import type { ClubAccessState } from '../license/license.types'
+import { sessionLinkUrl } from '../session-roster/sessionRoster.rules'
 import type { AdminClubAccessFilter, Club } from './club.types'
 
 export const DEFAULT_POST_TEMPLATE = `@everyone
@@ -26,7 +27,9 @@ Players
 Waitlist:
 {{ waitlist }}
 
-{{ court_rules }}`
+{{ court_rules }}
+
+{{ join_link }}`
 export const DEFAULT_COURT_RULES =
   'Court rules:\n• Non-marking shoes only\n• Be ready within 2 minutes when your match is called\n• Winner-only scoring is fine; tell the Queue Master the result'
 export const POST_KEYS = [
@@ -38,12 +41,13 @@ export const POST_KEYS = [
   ['where', 'Venue and address'],
   ['when', 'Date and time'],
   ['x_courts', 'Courts reserved (number)'],
-  ['courts', 'Court names, one per line'],
+  ['courts', 'Court names and times, one per line'],
   ['tube_count', 'Total tubes'],
   ['x_tubes', 'Tubes per brand'],
   ['player_count', 'Number of players'],
   ['players', 'Numbered player list'],
   ['waitlist', 'Waitlist'],
+  ['join_link', 'Join line with the public session link'],
   ['mode', 'Mode'],
   ['minimum', 'Minimum games'],
   ['fee_per_head', 'Payment per player'],
@@ -60,10 +64,13 @@ export type PostInput = {
     venueName: string
     venueAddress: string
   }
-  courts: { label: string }[]
+  /** `startsAt` and `openUntil` are the court's own schedule; missing or null follows the session. */
+  courts: { label: string; startsAt?: number; openUntil?: number | null }[]
   roster: { name: string; nickname: string | null }[]
   waitlist: { name: string }[]
   openSlots: number
+  /** The public session page URL, e.g. https://host/s/abc123 */
+  joinUrl?: string
   mode: 'chill' | 'fair' | 'hard'
   minimum: number
   finance?: {
@@ -74,6 +81,13 @@ export type PostInput = {
 }
 export const formatTime = (time: number) =>
   new Date(time).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+const dayKey = (time: number) => new Date(time).toDateString()
+/** "7:30 PM–10:30 PM"; an end on a later calendar day than `base` adds " · next day". */
+export function formatTimeRange(start: number, end: number, base = start) {
+  return `${formatTime(start)}–${formatTime(end)}${dayKey(end) !== dayKey(base) ? ' · next day' : ''}`
+}
+export const joinLine = (joinUrl: string | undefined) =>
+  `To join and see the full roster, open this link: ${joinUrl ?? ''}`.trimEnd()
 export function buildPostValues(input: PostInput): Record<string, string> {
   const { club, session, courts, roster, waitlist, finance } = input,
     start = new Date(session.scheduledStartAt)
@@ -94,7 +108,12 @@ export function buildPostValues(input: PostInput): Record<string, string> {
     when: `${start.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })} · ${formatTime(session.scheduledStartAt)}–${formatTime(session.scheduledEndAt)}`,
     x_courts: String(courts.length),
     court_count: String(courts.length),
-    courts: courts.map((c) => c.label).join('\n'),
+    courts: courts
+      .map(
+        (c) =>
+          `${c.label} · ${formatTimeRange(c.startsAt ?? session.scheduledStartAt, c.openUntil ?? session.scheduledEndAt, session.scheduledStartAt)}`,
+      )
+      .join('\n'),
     tube_count: String(finance?.shuttles?.reduce((n, s) => n + s.tubes, 0) ?? 0),
     x_tubes: finance?.shuttles?.length
       ? finance.shuttles.map((s) => `${s.tubes} × ${s.name}`).join('\n')
@@ -115,9 +134,17 @@ export function buildPostValues(input: PostInput): Record<string, string> {
       ? `${peso(finance.entranceFeeMinor)} per head (included)`
       : 'None',
     court_rules: club.courtRules ?? DEFAULT_COURT_RULES,
+    join_link: joinLine(input.joinUrl),
   }
 }
+/** A club template saved before the join line existed still ends with it. */
 export function fillPostTemplate(template: string, values: Record<string, string>): string {
+  const filled = fillKeys(template, values)
+  return /\{\{\s*join_link\s*\}\}/.test(template) || values.join_link === undefined
+    ? filled
+    : `${filled.replace(/\s+$/, '')}\n\n${values.join_link}`
+}
+function fillKeys(template: string, values: Record<string, string>): string {
   return template.replace(/\{\{\s*(\w+)\s*\}\}/g, (match, key: string) =>
     Object.hasOwn(values, key) ? (values[key] ?? match) : match,
   )
@@ -127,6 +154,9 @@ export function fillPostTemplate(template: string, values: Record<string, string
  * The Copy Facebook post text and its player count from a club, a session, its courts and roster.
  * Unknown placeholders stay as written. Mock and real mode both build the post here.
  */
+/** The page origin in the browser; empty on the server (the post is composed in the browser). */
+const browserOrigin = () =>
+  (globalThis as { location?: { origin?: string } }).location?.origin ?? ''
 export function composeFacebookPost(input: {
   club: PostInput['club'] & { postTemplate: string | null }
   draft?: { template?: string; description?: string; courtRules?: string }
@@ -134,6 +164,7 @@ export function composeFacebookPost(input: {
     playersPerCourt: number
     sessionMode: PostInput['mode']
     minimumGames: number
+    publicSlug?: string
   }
   courts: PostInput['courts']
   roster: PostInput['roster']
@@ -147,6 +178,7 @@ export function composeFacebookPost(input: {
     roster,
     waitlist,
     openSlots: Math.max(0, courts.length * session.playersPerCourt - roster.length),
+    joinUrl: session.publicSlug ? sessionLinkUrl(session.publicSlug, browserOrigin()) : undefined,
     mode: session.sessionMode,
     minimum: session.minimumGames,
   })

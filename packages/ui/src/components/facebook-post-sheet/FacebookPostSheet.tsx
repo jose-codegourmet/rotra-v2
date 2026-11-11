@@ -58,7 +58,8 @@ export function FacebookPostSheet({
       }
     >
       <p className="m-0 text-[13px] text-fg2">
-        Filled in from {sessionTitle} and your club's template. Copy it and paste it into your
+        Filled in from {sessionTitle} and your club's template. Each court line shows that court's
+        time, and the post ends with the public session link. Copy it and paste it into your
         Facebook group or page.
       </p>
       <Textarea

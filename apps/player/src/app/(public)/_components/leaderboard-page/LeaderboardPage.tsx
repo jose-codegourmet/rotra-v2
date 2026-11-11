@@ -151,7 +151,7 @@ export function LeaderboardPage() {
     id: `leaderboard-${entry.id}`,
     fullName: entry.fullName,
     nickname: entry.nickname,
-    levelLabel: levelLabel(entry.playingLevel),
+    levelLabel: 'levelHidden' in entry && entry.levelHidden ? '' : levelLabel(entry.playingLevel),
     picture: { src: pictureSrc(entry.pictureUrl, entry.id, entry.fullName) },
     isMe: entry.id === account?.id,
   }))
@@ -255,7 +255,11 @@ export function LeaderboardPage() {
                   fullName={entry.fullName}
                   nickname={entry.nickname}
                   picture={{ src: pictureSrc(entry.pictureUrl, entry.id, entry.fullName) }}
-                  levelLabel={levelLabel(entry.playingLevel)}
+                  levelLabel={
+                    'levelHidden' in entry && entry.levelHidden
+                      ? ''
+                      : levelLabel(entry.playingLevel)
+                  }
                   isMe={entry.id === account?.id}
                   variant={entry.position <= 3 ? `medal-${entry.position as 1 | 2 | 3}` : undefined}
                   onSelect={() => openProfile(entry.id)}

@@ -16,6 +16,7 @@ import { delay } from '../mock/latency'
 import { type MockState, mockStore } from '../mock/store'
 import { recentGameStats } from '../player/player.rules'
 import { playerProjection } from '../player/projection'
+import { isAlwaysPrivatePlayer, PROFILE_PRIVATE_MESSAGE } from '../player/visibility'
 import { slotCapacity } from '../queue-session/queueSession.rules'
 import { RealRequestError } from '../real/client'
 import { isRealDataMode } from '../real/mode'
@@ -152,11 +153,13 @@ function publicPerson(
   const hasRotraProfile = p?.identity === 'registered' || p?.identity === 'unclaimed'
   const registered = p?.identity === 'registered' && !!p.playerId
   const isViewer = !!viewer && !!p?.playerId && p.playerId === viewer.playerId
-  // #715 (mock flag) for #731: always private is masked for everyone but the player themselves;
-  // their picture stays public.
+  // D-2026-11-12-01 for #731: always private is masked for everyone but the player themselves (the
+  // Queue Master sees the roster name on their own screens); their picture stays public.
   const alwaysPrivate =
     registered &&
-    !!state.playerProfiles.find((x) => x.playerId === p?.playerId)?.profileAlwaysPrivate
+    !!p?.playerId &&
+    state.playerProfiles.find((x) => x.playerId === p.playerId)?.profileVisibility ===
+      'always_private'
   const showFull = !!viewer && registered && (!alwaysPrivate || isViewer)
   const profile: ParticipantProfileKind = showFull
     ? 'registered'
@@ -711,9 +714,8 @@ export async function getParticipantStats(
   requireSignedInPlayer(state, viewerPlayerId)
   const player = state.players.find((p) => p.rtrId === rtrId.trim().toUpperCase())
   if (!player) return null
-  const profile = state.playerProfiles.find((p) => p.playerId === player.id)
-  if (profile?.profileAlwaysPrivate && player.id !== viewerPlayerId)
-    throw new MockError('permission', 'This player keeps their profile private.')
+  if (player.id !== viewerPlayerId && isAlwaysPrivatePlayer(player.id))
+    throw new MockError('permission', PROFILE_PRIVATE_MESSAGE)
   // Mock histories are dated from the fixture clock, like rank.
   return recentGameStats(playerProjection().games[player.id] ?? [], PLAYER_FIXTURE_NOW)
 }

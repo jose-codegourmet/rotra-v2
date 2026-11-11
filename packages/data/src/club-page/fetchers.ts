@@ -43,15 +43,8 @@ export async function getClubPage(clubId: string, signal?: AbortSignal): Promise
       // Guests and unclaimed profiles never appear (identity above, and an unclaimed account).
       if (account && !account.claimed) return []
       const visibility: MemberVisibility = {
-        profilePrivate: !!(profile?.profilePrivate || account?.profilePrivate),
-        alwaysPrivate: !!(
-          (profile as MemberVisibility | undefined)?.alwaysPrivate ||
-          (account as MemberVisibility | undefined)?.alwaysPrivate
-        ),
-        hiddenFromDirectory: !!(
-          (profile as MemberVisibility | undefined)?.hiddenFromDirectory ||
-          (account as MemberVisibility | undefined)?.hiddenFromDirectory
-        ),
+        alwaysPrivate: profile?.profileVisibility === 'always_private',
+        hiddenFromDirectory: !!profile?.hiddenFromDirectory,
       }
       // Hide me from Player Information: never listed, and not counted.
       if (visibility.hiddenFromDirectory) return []

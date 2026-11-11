@@ -322,8 +322,8 @@ from the [database design](database_design/product/README.md). Add a row here **
 | Leaderboard entry | `LeaderboardEntry` | — | Public projection, no table; overall position comes from eligible fixture order |
 | Player session record / player game | `PlayerSessionRecord` / `PlayerGame` | `player_match_facts` | Public read projection of valid finalized games |
 | Player profile | `PlayerProfile` | — | Public identity, picture, and optional playing details; no contacts |
-| Profile visibility | `profileVisibility` | `players.profile_visibility` | `public` · `private` (default) · `always_private`; replaces `profile_private` (proposed) |
-| Hidden from Player Information | `hiddenFromDirectory` | `players.hidden_from_directory` | Boolean, default false (proposed) |
+| Profile visibility | `profileVisibility` | `players.profile_visibility` | `public` · `private` (default) · `always_private`; replaces `profile_private` (D-2026-11-12-01) |
+| Hidden from Player Information | `hiddenFromDirectory` | `players.hidden_from_directory` | Boolean, default false; left out of Queue's Add player › Player Information and RTR ID search and of public club member lists |
 | Profile banner | `bannerId` | `players.banner_id` → `profile_banners` | Null = default banner; library managed in Admin (proposed) |
 | Player account | `PlayerAccount` | `player_accounts` | Claimed sign-in link for a player; `MyAccount` is the owner-only read of it in the mock phase |
 | Player private contact | `PlayerPrivateContact` | `player_private_contacts` | Phone, email and phone privacy; never in a public projection |

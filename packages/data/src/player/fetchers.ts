@@ -21,7 +21,7 @@ import { mockPhotoReference } from './photo'
 import { characterPictureReference, type PlayerPictureChoice } from './picture'
 import type { PlayerProfile, PlayerRank, PlayerSessionRecord } from './player.types'
 import { playerProjection } from './projection'
-import { isPrivatePlayer, requireProfileAccess } from './visibility'
+import { isPrivatePlayer, PROFILE_PRIVATE_MESSAGE, requireProfileAccess } from './visibility'
 
 export async function getPlayerRank(
   playerId: string,
@@ -61,9 +61,12 @@ export async function getPlayerProfile(
   if (isRealDataMode()) {
     // Like the mock, only the signed-in owner sees the Admin change note; that read is private.
     const session = await getSession('player').catch(() => null)
-    return session?.account.id === playerId
-      ? realGetMyProfile(signal)
-      : realGetPlayerProfile(playerId, signal)
+    if (session?.account.id === playerId) return realGetMyProfile(signal)
+    const profile = await realGetPlayerProfile(playerId, signal)
+    // The server already masked the name; the page shows the private card instead (D-2026-11-12-01).
+    if (profile?.profileVisibility === 'always_private')
+      throw new MockError('permission', PROFILE_PRIVATE_MESSAGE)
+    return profile
   }
   await playerRequest(signal)
   await requireProfileAccess(playerId)

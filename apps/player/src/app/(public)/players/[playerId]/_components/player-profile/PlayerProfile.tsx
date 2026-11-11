@@ -11,7 +11,7 @@ import { useMySessions } from '@rotra/data/player/useMySessions'
 import { usePlayerGames } from '@rotra/data/player/usePlayerGames'
 import { usePlayerProfile } from '@rotra/data/player/usePlayerProfile'
 import { usePlayerRank } from '@rotra/data/player/usePlayerRank'
-import { PROFILE_LOGIN_MESSAGE } from '@rotra/data/player/visibility'
+import { PROFILE_LOGIN_MESSAGE, PROFILE_PRIVATE_MESSAGE } from '@rotra/data/player/visibility'
 import { useMyAccount } from '@rotra/data/player-account/useMyAccount'
 import { useLeaveClub } from '@rotra/data/player-club/useLeaveClub'
 import { useMyClubs } from '@rotra/data/player-club/useMyClubs'
@@ -87,6 +87,20 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
     void games.refetch()
     void settings.refetch()
   }
+  // Always private (D-2026-11-12-01): the private card for everyone but the player, no sign-in button.
+  if (
+    profile.error?.message === PROFILE_PRIVATE_MESSAGE ||
+    rank.error?.message === PROFILE_PRIVATE_MESSAGE ||
+    games.error?.message === PROFILE_PRIVATE_MESSAGE
+  )
+    return (
+      <main className="mx-auto flex max-w-[920px] flex-col gap-5 px-4 pt-5">
+        <Button size="sm" variant="ghost" onClick={() => router.push('/')}>
+          ← Leaderboard
+        </Button>
+        <ProfileNotFound id={playerId} alwaysPrivate />
+      </main>
+    )
   if (
     profile.error?.message === PROFILE_LOGIN_MESSAGE ||
     rank.error?.message === PROFILE_LOGIN_MESSAGE ||

@@ -1,7 +1,25 @@
 import { Button } from '@rotra/ui/button'
 import { Notice } from '@rotra/ui/notice'
-export type ProfileNotFoundProps = { id: string; loginRequired?: boolean; onSignIn?: () => void }
-export function ProfileNotFound({ id, loginRequired, onSignIn }: ProfileNotFoundProps) {
+export type ProfileNotFoundProps = {
+  id: string
+  loginRequired?: boolean
+  onSignIn?: () => void
+  /** Always private (D-2026-11-12-01): the private card, with no sign-in button */
+  alwaysPrivate?: boolean
+}
+export function ProfileNotFound({
+  id,
+  loginRequired,
+  onSignIn,
+  alwaysPrivate,
+}: ProfileNotFoundProps) {
+  if (alwaysPrivate)
+    return (
+      <section className="flex flex-col gap-4">
+        <h1>Profile</h1>
+        <Notice>This player keeps their profile private.</Notice>
+      </section>
+    )
   if (loginRequired)
     return (
       <section className="flex flex-col gap-4">

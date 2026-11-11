@@ -53,18 +53,23 @@ export type PlayerRank = {
   olderCount: number
 }
 
-/** Who can see a profile: public, Private (today's switch) or always private (#715, mock only). */
+/**
+ * Who can see a profile (D-2026-11-12-01, `players.profile_visibility`): `public`; `private` (the
+ * default for new registrations: visitors see a masked name, signed-in players the profile);
+ * `always_private` (name, level and games masked for everyone but the player and the Queue Master of
+ * a session they joined; picture and banner stay public).
+ */
 export type ProfileVisibility = 'public' | 'private' | 'always_private'
 
 /** Public profile only; private account and contact fields are deliberately excluded. */
 export type PlayerProfile = {
-  profilePrivate?: boolean
+  /** Unset on an identity without a stored level reads as `public` (existing fixture identities). */
+  profileVisibility?: ProfileVisibility
   /**
-   * Always private (#715 proposal, used by #731): masked for every other viewer, signed in or not;
-   * only the picture and banner stay public. Mock flag only: no database column yet, so real mode
-   * reads it as not set. `profilePrivate` (today's Private switch) keeps its meaning.
+   * Hide me from Player Information (`players.hidden_from_directory`): left out of Queue's Add player
+   * › Player Information search, RTR ID search and public club member lists. Default false.
    */
-  profileAlwaysPrivate?: boolean
+  hiddenFromDirectory?: boolean
   /** Shown only on the signed-in player account, not public profile cards. */
   adminChangeNote?: string
   playerId: string

@@ -11,12 +11,10 @@ const DAY = 864e5
 export type ClubMemberBand = 'all' | 'beginner' | 'intermediate' | 'advanced' | 'none'
 
 /**
- * Visibility flags read for a member. `alwaysPrivate` and `hiddenFromDirectory` do not exist in the
- * mock store or the database yet (#715); they are read as optional fields with a false default so the
- * rule is ready when they land. `profilePrivate` is the existing visibility field.
+ * Visibility flags read for a member (D-2026-11-12-01): `alwaysPrivate` is
+ * `profile_visibility = 'always_private'`; `hiddenFromDirectory` is `hidden_from_directory`.
  */
 export type MemberVisibility = {
-  profilePrivate?: boolean
   alwaysPrivate?: boolean
   hiddenFromDirectory?: boolean
 }

@@ -6,19 +6,32 @@ import { leaderboardPlayers, players } from './players'
 // These are image asset colours, not interface theme colours.
 const pictures: Record<string, string> = portraits
 /**
- * #715 (proposed) for #731: two always-private players on tonight's roster, at the prototype's
- * places (p9 and p14): Albion and Emji.
+ * #715 (D-2026-11-12-01) for #731: two always-private players on tonight's roster, at the
+ * prototype's places (p9 and p14): Albion and Emji.
  */
 const ALWAYS_PRIVATE_PLAYER_IDS = [
   '85ae7866-ff62-59fc-8af8-985a594bb5b2',
   '9f83495f-9359-5f7f-82ad-4cf01b826471',
 ]
+/** Two sample private profiles (leaderboard positions 6 and 10), so visitors see the masking and the gate. */
+const PRIVATE_PLAYER_IDS = [leaderboardPlayers[5]?.id, leaderboardPlayers[9]?.id]
+/** Three registered players hidden from Player Information (rotra-player.html HIDDEN_SEED: positions 4, 21 and 42). */
+const HIDDEN_FROM_DIRECTORY_IDS = [
+  leaderboardPlayers[3]?.id,
+  leaderboardPlayers[20]?.id,
+  leaderboardPlayers[41]?.id,
+]
 export const playerProfiles: PlayerProfile[] = players.map((player) => {
   const jose = player.fullName === 'Jose'
   const raymark = player.rtrId === 'RTR-PH-CEB-040226-0007'
   return {
-    profilePrivate: [leaderboardPlayers[5]?.id, leaderboardPlayers[9]?.id].includes(player.id),
-    ...(ALWAYS_PRIVATE_PLAYER_IDS.includes(player.id) ? { profileAlwaysPrivate: true } : {}),
+    // Existing mock Private flags map to private, the rest to public; the seeded Jose stays public.
+    profileVisibility: ALWAYS_PRIVATE_PLAYER_IDS.includes(player.id)
+      ? 'always_private'
+      : PRIVATE_PLAYER_IDS.includes(player.id)
+        ? 'private'
+        : 'public',
+    hiddenFromDirectory: HIDDEN_FROM_DIRECTORY_IDS.includes(player.id),
     playerId: player.id,
     rtrId: player.rtrId,
     fullName: player.fullName,

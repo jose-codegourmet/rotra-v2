@@ -1,7 +1,8 @@
 import 'server-only'
+import { maskPublicName } from '@rotra/data/public-session/rules'
 import type { ClubContext, PlayerContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
-import type { Prisma, SocialProvider } from '../generated/prisma/client'
+import type { Prisma, ProfileVisibility, SocialProvider } from '../generated/prisma/client'
 import { requireRevision } from '../service/authorize'
 import { ServiceError } from '../service/errors'
 import { toDecimalString } from '../service/serialize'
@@ -10,12 +11,16 @@ type Db = Prisma.TransactionClient | typeof prisma
 
 const SOCIAL: SocialProvider[] = ['facebook', 'instagram', 'youtube', 'linkedin']
 
-/** Public profile allowlist (`PlayerProfile`). No contacts, account, claim or privacy fields. */
+/**
+ * Public profile allowlist (`PlayerProfile`). No contacts, account or claim fields; the visibility
+ * level is read so the projection can mask an always-private player (D-2026-11-12-01).
+ */
 const PUBLIC_PLAYER_SELECT = {
   id: true,
   fullName: true,
   nickname: true,
   avatarRef: true,
+  profileVisibility: true,
   experienceMonths: true,
   experienceRecordedAt: true,
   personalDetails: true,
@@ -64,27 +69,35 @@ export function experienceUpdate(next: number | null, shown: number | null, now:
     : { experienceMonths: next, experienceRecordedAt: now }
 }
 
-/** Shapes `PlayerProfile`. Only profiles with a permanent RTR ID are public. */
-function publicProfileDto(row: PublicPlayerRow) {
+/**
+ * Shapes `PlayerProfile`. Only profiles with a permanent RTR ID are public. An always-private
+ * profile (D-2026-11-12-01) leaves here with the name masked, no nickname and no details; the
+ * picture stays. `own` (the player's own read) keeps everything.
+ */
+function publicProfileDto(row: PublicPlayerRow, own = false) {
   if (!row.idAllocation) return null
   const links = Object.fromEntries(SOCIAL.map((p) => [p, ''])) as Record<SocialProvider, string>
   for (const link of row.socialLinks) links[link.provider] = link.url
   const months = currentExperienceMonths(row.experienceMonths, row.experienceRecordedAt)
+  const masked = !own && row.profileVisibility === 'always_private'
   return {
     playerId: row.id,
     rtrId: row.idAllocation.rtrId,
-    fullName: row.fullName,
-    nickname: row.nickname,
+    fullName: masked ? maskPublicName(row.fullName) : row.fullName,
+    nickname: masked ? null : row.nickname,
     picture: row.avatarRef,
-    playingStyle: playingStyle(row.personalDetails),
-    experienceYears: months == null ? null : Math.floor(months / 12),
-    experienceMonths: months == null ? null : months % 12,
-    socialLinks: links,
+    profileVisibility: row.profileVisibility,
+    playingStyle: masked ? '' : playingStyle(row.personalDetails),
+    experienceYears: masked || months == null ? null : Math.floor(months / 12),
+    experienceMonths: masked || months == null ? null : months % 12,
+    socialLinks: masked
+      ? (Object.fromEntries(SOCIAL.map((p) => [p, ''])) as Record<SocialProvider, string>)
+      : links,
   }
 }
 
 /** P-PROFILE public read (`player.public-profile`). Safe for shared caches. */
-export async function readPublicProfile(playerId: string) {
+export async function readPublicProfile(playerId: string, own = false) {
   // A URL segment that is not a UUID can name no player.
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(playerId))
     throw new ServiceError('not_found')
@@ -92,7 +105,7 @@ export async function readPublicProfile(playerId: string) {
     where: { id: playerId },
     select: PUBLIC_PLAYER_SELECT,
   })
-  const dto = row && publicProfileDto(row)
+  const dto = row && publicProfileDto(row, own)
   if (!dto) throw new ServiceError('not_found')
   return dto
 }
@@ -111,13 +124,22 @@ export async function findPublicProfileByRtrId(rtrId: string) {
 export async function readMyAccount(context: PlayerContext) {
   const player = await prisma.player.findUniqueOrThrow({
     where: { id: context.playerId },
-    select: { id: true, hidePhoneFromClubs: true, revision: true, privateContact: true },
+    select: {
+      id: true,
+      hidePhoneFromClubs: true,
+      profileVisibility: true,
+      hiddenFromDirectory: true,
+      revision: true,
+      privateContact: true,
+    },
   })
   return {
     playerId: player.id,
     phone: player.privateContact?.phoneE164 ?? '',
     email: player.privateContact?.email ?? '',
     phoneHidden: player.hidePhoneFromClubs,
+    profileVisibility: player.profileVisibility,
+    hiddenFromDirectory: player.hiddenFromDirectory,
     revision: toDecimalString(player.revision),
   }
 }
@@ -159,7 +181,7 @@ async function ownProfile(db: Db, profile: ReturnType<typeof publicProfileDto>) 
 }
 
 export async function readMyProfile(context: PlayerContext) {
-  return ownProfile(prisma, await readPublicProfile(context.playerId))
+  return ownProfile(prisma, await readPublicProfile(context.playerId, true))
 }
 
 /**
@@ -229,7 +251,7 @@ export async function updateMyProfile(
       where: { id: player.id },
       select: PUBLIC_PLAYER_SELECT,
     })
-    return ownProfile(tx, publicProfileDto(row))
+    return ownProfile(tx, publicProfileDto(row, true))
   })
 }
 
@@ -248,6 +270,42 @@ export async function setPhonePrivacy(
       })
     }
     return { phoneHidden: input.phoneHidden }
+  })
+}
+
+/** P-PROFILE-PRIVACY · Profile visibility (D-2026-11-12-01), under the loaded account revision. */
+export async function setProfileVisibility(
+  context: PlayerContext,
+  input: { profileVisibility: ProfileVisibility; expectedRevision: string },
+) {
+  return prisma.$transaction(async (tx) => {
+    const player = await tx.player.findUniqueOrThrow({ where: { id: context.playerId } })
+    if (player.profileVisibility !== input.profileVisibility) {
+      requireRevision(player.revision, input.expectedRevision)
+      await tx.player.update({
+        where: { id: player.id },
+        data: { profileVisibility: input.profileVisibility, revision: { increment: 1 } },
+      })
+    }
+    return { profileVisibility: input.profileVisibility }
+  })
+}
+
+/** P-PROFILE-PRIVACY · Hide me from Player Information, under the loaded account revision. */
+export async function setHiddenFromDirectory(
+  context: PlayerContext,
+  input: { hiddenFromDirectory: boolean; expectedRevision: string },
+) {
+  return prisma.$transaction(async (tx) => {
+    const player = await tx.player.findUniqueOrThrow({ where: { id: context.playerId } })
+    if (player.hiddenFromDirectory !== input.hiddenFromDirectory) {
+      requireRevision(player.revision, input.expectedRevision)
+      await tx.player.update({
+        where: { id: player.id },
+        data: { hiddenFromDirectory: input.hiddenFromDirectory, revision: { increment: 1 } },
+      })
+    }
+    return { hiddenFromDirectory: input.hiddenFromDirectory }
   })
 }
 

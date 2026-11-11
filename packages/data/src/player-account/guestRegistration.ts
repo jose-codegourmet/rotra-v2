@@ -138,6 +138,9 @@ export async function completeGuestRegistration(input: {
         rtrId,
         fullName: values.fullName,
         nickname: values.nickname || null,
+        // New registrations default to Private (D-2026-11-12-01).
+        profileVisibility: 'private',
+        hiddenFromDirectory: false,
         picture: null,
         playingStyle: '',
         experienceYears: null,

@@ -11,3 +11,5 @@ type Story = StoryObj<typeof meta>
 export const Default: Story = {}
 
 export const LoginRequired: Story = { args: { loginRequired: true, onSignIn: () => {} } }
+
+export const AlwaysPrivate: Story = { args: { alwaysPrivate: true } }

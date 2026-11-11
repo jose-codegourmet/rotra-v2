@@ -102,7 +102,9 @@ export type DirectoryPlayerDto = {
 
 /**
  * Player Information search by name, nickname or RTR ID. Profiles this club already saved are left
- * out (the sheet shows them under Saved players). At most 20 results, by name.
+ * out (the sheet shows them under Saved players), as are players who chose Hide me from Player
+ * Information (D-2026-11-12-01; a club that saved them still adds them from Saved players). At most
+ * 20 results, by name.
  */
 export async function searchPlayerDirectory(
   context: ClubContext,
@@ -112,6 +114,7 @@ export async function searchPlayerDirectory(
   const rows = await prisma.player.findMany({
     where: {
       idAllocation: { isNot: null },
+      hiddenFromDirectory: false,
       // A profile the club deleted shows again, so it can be added back (which restores it).
       clubPlayers: { none: { clubId: context.clubId, removedAt: null } },
       ...(q

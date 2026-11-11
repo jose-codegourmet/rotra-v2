@@ -11,7 +11,6 @@ export const playerAccounts: PlayerAccountRecord[] = [
     email: 'jose@example.com',
     avatarPreviousRef:
       playerProfiles.find((p) => p.fullName !== 'Jose' && p.picture)?.picture ?? null,
-    profilePrivate: false,
     phoneHidden: true,
     claimed: true,
     emailConfirmedAt: '2026-11-01T00:00:00Z',

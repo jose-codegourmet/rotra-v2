@@ -15,6 +15,7 @@ import { type MockState, readMockState } from '../mock/store'
 import { queueMutation, sessionIn } from '../mock/transaction'
 import { dispatch } from '../outbox/dispatch'
 import { PLAYING_LEVELS, type PlayingLevel } from '../player/player.types'
+import { isListedInDirectory } from '../player/visibility.rules'
 import { promoteWaiter, recomputeMinimum } from '../queue-session/mutations'
 import { slotCapacity } from '../queue-session/queueSession.rules'
 import { isRealDataMode } from '../real/mode'
@@ -166,8 +167,13 @@ export async function playerDirectorySearch(q: string): Promise<DirectoryPlayer[
   requireOnline()
   const s = readMockState(),
     query = q.trim().toLowerCase()
+  // Hide me from Player Information leaves a profile out of this search (name, nickname and RTR ID).
   return directoryPlayers
-    .filter((p) => !s.adminPlayerRecords[p.id]?.archivedAt)
+    .filter(
+      (p) =>
+        !s.adminPlayerRecords[p.id]?.archivedAt &&
+        isListedInDirectory(s.playerProfiles.find((profile) => profile.playerId === p.id)),
+    )
     .map((p, _i) => ({
       ...p,
       identity: 'registered' as const,

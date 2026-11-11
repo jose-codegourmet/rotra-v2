@@ -60,8 +60,8 @@ export async function optionalPlayerId(cookies: CookieAdapter) {
  * P-CLUB-PAGE / P-CLUB-MEMBERS (#737): the club, its registered members and its sessions. No table
  * is added (identity.md › Public club page reads). Members are `club_players` rows that are not
  * removed, linked to a claimed profile (guests and unclaimed profiles never appear). Masking
- * follows D-2026-11-11-11 for the viewer. `hidden_from_directory` and `profile_visibility` are not
- * migrated yet (#715), so nobody is hidden and only the signed-out rule masks for now.
+ * follows D-2026-11-11-11 for the viewer; always-private members stay masked for everyone but
+ * themselves, and members hidden from Player Information are left out (D-2026-11-12-01).
  */
 export async function readClubPage(clubId: string, viewerId: string | null): Promise<ClubPageDto> {
   if (!UUID.test(clubId)) throw new ServiceError('not_found')
@@ -82,13 +82,15 @@ export async function readClubPage(clubId: string, viewerId: string | null): Pro
         clubId,
         removedAt: null,
         playerId: { not: null },
-        player: { profileState: 'claimed' },
+        player: { profileState: 'claimed', hiddenFromDirectory: false },
       },
       select: {
         id: true,
         playerId: true,
         displayName: true,
-        player: { select: { fullName: true, nickname: true, avatarRef: true } },
+        player: {
+          select: { fullName: true, nickname: true, avatarRef: true, profileVisibility: true },
+        },
         assessments: { orderBy: { assessedAt: 'desc' }, take: 1, select: { skillLevelId: true } },
       },
     }),
@@ -120,7 +122,7 @@ export async function readClubPage(clubId: string, viewerId: string | null): Pro
                 picture: row.player.avatarRef,
                 level: levelCodeFor(row.assessments[0]?.skillLevelId ?? null),
               },
-              {},
+              { alwaysPrivate: row.player.profileVisibility === 'always_private' },
               viewerId,
             ),
           ]

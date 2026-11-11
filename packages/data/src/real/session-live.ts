@@ -129,12 +129,14 @@ export async function realAddCourt(input: {
   label: string
   startsAt?: number
   openUntil: number | null
+  /** The outbox's on a replay (#722): the court id, so a repeat adds one court */
+  operationId?: string
 }) {
   const path = `${sessionPath(input.sessionId)}/courts`
   const { court } = await realRequest<{ court: WireCourt }>(path, {
     method: 'POST',
     body: {
-      courtId: crypto.randomUUID(),
+      courtId: input.operationId ?? crypto.randomUUID(),
       label: input.label,
       startsAt: input.startsAt == null ? null : iso(input.startsAt),
       openUntil: input.openUntil == null ? null : iso(input.openUntil),
@@ -317,18 +319,25 @@ export async function realSetAllPresence(input: { sessionId: string; present: bo
   return accepted(null, `Everyone marked ${input.present ? 'present' : 'absent'}`)
 }
 
-export async function realGiveSlot(input: { sessionId: string; waitlistId: string }) {
+export async function realGiveSlot(input: {
+  sessionId: string
+  waitlistId: string
+  operationId?: string
+}) {
   await realRequest(
     `${sessionPath(input.sessionId)}/waitlist/${encodeURIComponent(input.waitlistId)}/slot`,
-    { method: 'POST', body: { operationId: crypto.randomUUID() } },
+    { method: 'POST', body: { operationId: input.operationId ?? crypto.randomUUID() } },
   )
   return accepted(null, 'Got a slot')
 }
 
-export async function realFillOpenSlots(sessionId: string) {
+export async function realFillOpenSlots(
+  sessionId: string,
+  operationId: string = crypto.randomUUID(),
+) {
   const { moved } = await realRequest<{ moved: number }>(
     `${sessionPath(sessionId)}/waitlist/fill`,
-    { method: 'POST', body: { operationId: crypto.randomUUID() } },
+    { method: 'POST', body: { operationId } },
   )
   return accepted(null, `${moved} players moved from the waitlist`)
 }

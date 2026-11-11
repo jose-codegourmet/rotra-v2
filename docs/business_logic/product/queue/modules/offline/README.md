@@ -69,10 +69,11 @@ Until a data mode has a device-download adapter, an upcoming Queue Session shows
 offline-copy status. This is not a claim that no download exists; it avoids turning unavailable device-local
 evidence into a false “No”.
 
-Real data mode has a durable **read-only** device copy in IndexedDB (#477): a downloaded session stays
-viewable offline. Offline writes (the outbox and replay above) are #722. Until #722 lands, real-mode writes
-are online only, so nothing is ever "Saved on this device"; the sync status reports the server's check time
-and whether a session's records are proven complete.
+Real data mode has a durable device copy in IndexedDB (#477) and, since #722, the outbox and replay
+above: a downloaded, started session stays viewable and workable offline, every allowed change is
+"Saved on this device, waiting to sync" and replays when the internet returns. The sync status reports
+what waits on this device, a running replay, the server's check time and whether a session's records
+are proven complete. Writes the table above keeps online refuse offline as before.
 
 The top bar always shows sync status:
 

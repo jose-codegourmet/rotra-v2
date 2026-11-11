@@ -1,6 +1,6 @@
 # Club settings › This device: Export play history and Import play history…
 
-Status: NEW
+Status: IN MOCK APP — #722
 Date: 2026-11-11
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Club settings › This device

@@ -1,8 +1,10 @@
 import { activeMatches, courtNames, onCourtMatches } from '../match/match.rules'
+import { ensureOutboxLoaded, pendingFor } from '../outbox/state'
 import type {
   FinalizationStage,
   SessionDoneReview,
   SessionFinalization,
+  UnresolvedGuest,
 } from '../queue-session/queueSession.types'
 import { RealRequestError, realRequest } from './client'
 import { realGetSessionMatches } from './match'
@@ -28,13 +30,17 @@ type WireReview = {
     pendingOperations: number
   }
   belowMinimum: { sessionPlayerId: string; name: string; games: number }[]
+  /** Older servers leave it out: then no guest is reported, never "none to review". */
+  unresolvedGuests?: UnresolvedGuest[]
 }
 
 /**
  * The review sheet's counts come from the saved session, roster and matches; the shortfall comes
- * from the server's own count of full games (the same segments finalization uses).
+ * from the server's own count of full games (the same segments finalization uses). Pending changes
+ * are this device's outbox (#722) plus what the server has not processed yet.
  */
 export async function realGetSessionDoneReview(sessionId: string): Promise<SessionDoneReview> {
+  await ensureOutboxLoaded()
   const [review, session, matches, { roster }] = await Promise.all([
     realRequest<WireReview>(`${sessionPath(sessionId)}/done-review`),
     realGetQueueSession(sessionId),
@@ -46,7 +52,7 @@ export async function realGetSessionDoneReview(sessionId: string): Promise<Sessi
     sessionId,
     gamesRecorded: matches.filter((m) => m.state === 'completed').length,
     participants: roster.length,
-    pendingChanges: review.completeness.pendingOperations,
+    pendingChanges: pendingFor(sessionId).length + review.completeness.pendingOperations,
     activeGames: activeMatches(matches).map((m) => ({
       matchId: m.id,
       courtLabels: courtNames(m, session.courts).split(' + '),
@@ -59,6 +65,7 @@ export async function realGetSessionDoneReview(sessionId: string): Promise<Sessi
       completedGames: p.games,
     })),
     minimum: session.minimumGames,
+    unresolvedGuests: review.unresolvedGuests ?? [],
   }
 }
 

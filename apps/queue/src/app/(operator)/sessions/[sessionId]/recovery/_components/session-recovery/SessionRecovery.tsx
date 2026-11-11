@@ -2,6 +2,7 @@
 
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useAnswerInterruption } from '@rotra/data/sync/useAnswerInterruption'
+import { useResolveSyncConflict } from '@rotra/data/sync/useResolveSyncConflict'
 import { useSessionIntegrity } from '@rotra/data/sync/useSessionIntegrity'
 import { Button } from '@rotra/ui/button'
 import { ConflictReviewList } from '@rotra/ui/conflict-review-list'
@@ -9,6 +10,7 @@ import { InterruptionCheckSheet } from '@rotra/ui/interruption-check-sheet'
 import { RecoveryStatusPanel } from '@rotra/ui/recovery-status-panel'
 import { SessionRecoveryScreen } from '@rotra/ui/session-recovery-screen'
 import { Skeleton } from '@rotra/ui/skeleton'
+import { toast } from '@rotra/ui/toaster'
 import { UnrecoverableSessionPanel } from '@rotra/ui/unrecoverable-session-panel'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -20,6 +22,7 @@ export function SessionRecovery({ sessionId }: { sessionId: string }) {
   const session = useQueueSession(sessionId),
     integrity = useSessionIntegrity(sessionId),
     answer = useAnswerInterruption(),
+    resolve = useResolveSyncConflict(),
     router = useRouter()
   const [invalid, setInvalid] = useState(false),
     [profile, setProfile] = useState<string | null>(null)
@@ -63,7 +66,29 @@ export function SessionRecovery({ sessionId }: { sessionId: string }) {
                 state={i.state === 'awaiting_original' ? 'waiting' : 'received'}
               />
               {i.state === 'conflicts' ? (
-                <ConflictReviewList conflicts={i.conflicts} onSelectPlayer={setProfile} />
+                <ConflictReviewList
+                  conflicts={i.conflicts}
+                  onSelectPlayer={setProfile}
+                  onKeepServer={(operationId) =>
+                    resolve.mutate(
+                      { operationId, decision: 'keep-server' },
+                      {
+                        onSuccess: ({ message }) => toast(message),
+                        onError: (error) => toast.error(error.message),
+                      },
+                    )
+                  }
+                  onRetry={(operationId) =>
+                    resolve.mutate(
+                      { operationId, decision: 'retry' },
+                      {
+                        onSuccess: ({ message }) => toast(message),
+                        onError: (error) => toast.error(error.message),
+                      },
+                    )
+                  }
+                  pendingId={resolve.isPending ? resolve.variables?.operationId : null}
+                />
               ) : null}
               {i.state === 'complete' ? (
                 <Button

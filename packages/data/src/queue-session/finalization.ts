@@ -5,6 +5,7 @@ import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, mockStore, readMockState } from '../mock/store'
 import { queueMutation, sessionIn } from '../mock/transaction'
+import { ensureOutboxLoaded, pendingFor } from '../outbox/state'
 import { closeSessionRequests } from '../public-session/publicSession.rules'
 import { RealRequestError } from '../real/client'
 import { realFinalizeSession } from '../real/finalization'
@@ -115,10 +116,22 @@ export async function finalizeSession(
   // Real mode: the server checks the proposed #246 barriers and commits once; the same request
   // runs the projection and slide jobs (interim in-request worker, #243). The dev stage toggle is
   // mock-only.
-  if (isRealDataMode())
+  if (isRealDataMode()) {
+    // The device's own gates first (#722): online, and nothing of this session waiting in the
+    // outbox. The server then checks its barriers (completeness proven, no active match, policy).
+    if (getConnectivity() === 'offline')
+      throw new SessionDoneError('offline', 'Connect to finish and sync this session.')
+    await ensureOutboxLoaded()
+    const waiting = pendingFor(sessionId).length
+    if (waiting > 0)
+      throw new SessionDoneError(
+        'pending_changes',
+        `${waiting} change${waiting === 1 ? ' is' : 's are'} still syncing.`,
+      )
     return realFinalizeSession({ sessionId, commandId }).catch((error: unknown) => {
       throw sessionDoneRefusal(error)
     })
+  }
   await delay()
   const snapshot = readMockState(),
     session = sessionIn(snapshot, sessionId),

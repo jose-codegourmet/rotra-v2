@@ -20,6 +20,13 @@ export type SessionDoneShortfall = {
   completedGames: number
 }
 
+export type SessionDoneGuest = {
+  clubPlayerId: string
+  name: string
+  /** Saved players of the club with the same name, for the Queue Master to confirm or not */
+  candidates: { clubPlayerId: string; name: string; rtrId: string | null }[]
+}
+
 export type SessionDoneSheetProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -44,6 +51,11 @@ export type SessionDoneSheetProps = {
   belowMinimum: SessionDoneShortfall[]
   /** The session's minimum games */
   minimum: number
+  /**
+   * Guests with no ROTRA identity yet (D-2026-11-07-03). Shown for the Queue Master's review; the
+   * link / create actions are not built yet, so this never blocks Session done.
+   */
+  unresolvedGuests?: SessionDoneGuest[]
   online: boolean
   /** Finalization is running: Confirm Session done shows a spinner and nothing can fire twice */
   isPending?: boolean
@@ -91,6 +103,7 @@ export function SessionDoneSheet({
   unplayedWaiting,
   belowMinimum,
   minimum,
+  unresolvedGuests = [],
   online,
   isPending = false,
   onBackToSession,
@@ -197,6 +210,21 @@ export function SessionDoneSheet({
           <Notice tone="warn">
             {count(below, 'player')} {below === 1 ? 'is' : 'are'} below the minimum of {minimum}{' '}
             games.
+          </Notice>
+        ) : null}
+        {unresolvedGuests.length > 0 ? (
+          <Notice
+            tone="info"
+            title={`${count(unresolvedGuests.length, 'guest')} without a ROTRA identity`}
+          >
+            {unresolvedGuests
+              .map((g) =>
+                g.candidates.length
+                  ? `${g.name} (same name as ${g.candidates.map((c) => c.name).join(', ')})`
+                  : g.name,
+              )
+              .join(' · ')}
+            . Their games stay on the session record and can be claimed later.
           </Notice>
         ) : null}
       </>

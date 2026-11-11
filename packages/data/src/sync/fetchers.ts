@@ -191,7 +191,7 @@ export async function answerInterruption({
   sessionId: string
   answer: 'yes' | 'no'
 }) {
-  if (isRealDataMode()) return realAnswerInterruption()
+  if (isRealDataMode()) return realAnswerInterruption({ sessionId, answer })
   await delay()
   mockStore.update((state) => {
     sessionIn(state, sessionId)

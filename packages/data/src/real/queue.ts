@@ -308,7 +308,7 @@ export async function realRemoveInventoryItem(id: string) {
 
 // ---------- Queue Sessions (Q-HOME, Q-SETUP, Q-PREPARE) ----------
 
-type WireSession = Omit<
+export type WireSession = Omit<
   QueueSession,
   | 'scheduledStartAt'
   | 'scheduledEndAt'
@@ -323,7 +323,7 @@ type WireSession = Omit<
   finalizedAt: string | null
   cancelledAt?: string | null
 }
-type WireCourt = {
+export type WireCourt = {
   id: string
   sessionId: string
   label: string
@@ -333,7 +333,7 @@ type WireCourt = {
   openUntil: string | null
   removedAt: string | null
 }
-type WireSessionSummary = {
+export type WireSessionSummary = {
   session: WireSession
   courts: WireCourt[]
   rosterCount: number
@@ -345,7 +345,7 @@ type WireSessionSummary = {
   queuedCount: number
 }
 
-const courtOf = (court: WireCourt): SessionCourt => ({
+export const courtOf = (court: WireCourt): SessionCourt => ({
   id: court.id,
   sessionId: court.sessionId,
   label: court.label,
@@ -355,7 +355,7 @@ const courtOf = (court: WireCourt): SessionCourt => ({
   removedAt: msOrNull(court.removedAt),
 })
 
-function summaryOf(wire: WireSessionSummary, downloadedHere: boolean): QueueSessionSummary {
+export function summaryOf(wire: WireSessionSummary, downloadedHere: boolean): QueueSessionSummary {
   const { session } = wire
   return {
     ...session,
@@ -438,7 +438,7 @@ export async function realCreateQueueSession(input: QueueSessionInput) {
 
 // ---------- Roster (Q-ROSTER) ----------
 
-type WireRosterEntry = {
+export type WireRosterEntry = {
   id: string
   sessionId: string
   clubPlayerId: string
@@ -454,7 +454,7 @@ type WireRosterEntry = {
   /** Set games played adjustment (#717); missing on older servers means 0 */
   gamesAdjustment?: number
 }
-type WireWaitlistEntry = {
+export type WireWaitlistEntry = {
   id: string
   sessionId: string
   clubPlayerId: string
@@ -462,7 +462,7 @@ type WireWaitlistEntry = {
   addedAt: string
   position: number
 }
-type WireJoinRequest = Omit<SessionJoinRequest, 'requestedAt' | 'decidedAt'> & {
+export type WireJoinRequest = Omit<SessionJoinRequest, 'requestedAt' | 'decidedAt'> & {
   requestedAt: string
   decidedAt: string | null
 }
@@ -513,13 +513,15 @@ export async function realAddNewPlayerToSession(input: {
   nickname?: string
   phone?: string
   level: PlayingLevel
+  /** The outbox's on a replay (#722), else fresh */
+  operationId?: string
 }) {
   const result = await realRequest<{
     rosterEntry: WireRosterEntry | null
     waitlist: WireWaitlistEntry | null
   }>(`/api/sessions/${encodeURIComponent(input.sessionId)}/roster`, {
     method: 'POST',
-    body: { ...input, operationId: crypto.randomUUID() },
+    body: { ...input, operationId: input.operationId ?? crypto.randomUUID() },
     fields: { player: 'name' },
   })
   const waitlistPosition = result.waitlist?.position ?? null
@@ -548,7 +550,7 @@ export async function realSetRosterLevel(input: {
 
 // ---------- Saved players and Player Information (Q-SAVED-PLAYERS, Q-ADD-PLAYER) ----------
 
-type WireClubPlayer = Omit<ClubPlayerView, 'addedAt' | 'displayName' | 'suggestion'> & {
+export type WireClubPlayer = Omit<ClubPlayerView, 'addedAt' | 'displayName' | 'suggestion'> & {
   addedAt: string
 }
 
@@ -656,10 +658,14 @@ export async function realAddSavedPlayerToSession(input: {
   clubPlayerId: string
   level: PlayingLevel
   identityCheck?: string
+  operationId?: string
 }) {
   const result = await realRequest<RosterAdd>(
     `/api/sessions/${encodeURIComponent(input.sessionId)}/roster`,
-    { method: 'POST', body: { ...input, source: 'saved', operationId: crypto.randomUUID() } },
+    {
+      method: 'POST',
+      body: { ...input, source: 'saved', operationId: input.operationId ?? crypto.randomUUID() },
+    },
   )
   return rosterAdded(result, input.level)
 }

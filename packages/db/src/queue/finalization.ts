@@ -114,6 +114,74 @@ export async function reviewSessionDone(context: ClubContext, sessionId: string)
       activeMatches: check.activeMatches,
       completeness: check.completeness,
       belowMinimum: await belowMinimum(tx, sessionId, session.minimumGames),
+      unresolvedGuests: await unresolvedGuests(tx, context.clubId, sessionId),
+    }
+  })
+}
+
+const normalizedName = (name: string | null | undefined) =>
+  (name ?? '').trim().toLocaleLowerCase().replace(/\s+/g, ' ')
+
+/**
+ * Guest review at Session done (D-2026-11-07-03, #722): roster entries whose saved player has no
+ * ROTRA profile (`playerId` null: a guest, or a pending phone lookup), each with the club's own saved
+ * profiles whose saved name or nickname is the same, as lightweight candidates. Club first, exact
+ * name only, never a scan of similar names; the global directory is the client's online search.
+ * A review surface only: nothing here links, creates or blocks (the existing tables cannot record a
+ * guest → saved player link, see the ticket's notes).
+ */
+async function unresolvedGuests(tx: Tx, clubId: string, sessionId: string) {
+  const roster = await tx.sessionPlayer.findMany({
+    where: { sessionId, releasedAt: null, clubPlayer: { playerId: null } },
+    select: {
+      id: true,
+      clubPlayerId: true,
+      nameSnapshot: true,
+      clubPlayer: { select: { displayName: true, nickname: true } },
+    },
+    orderBy: { confirmedAt: 'asc' },
+  })
+  if (!roster.length) return []
+  const profiles = await tx.clubPlayer.findMany({
+    where: { clubId, removedAt: null, playerId: { not: null } },
+    select: {
+      id: true,
+      displayName: true,
+      nickname: true,
+      player: {
+        select: {
+          fullName: true,
+          nickname: true,
+          profileState: true,
+          idAllocation: { select: { rtrId: true } },
+        },
+      },
+    },
+  })
+  return roster.map((entry) => {
+    const names = new Set(
+      [entry.clubPlayer.displayName, entry.clubPlayer.nickname, entry.nameSnapshot]
+        .map(normalizedName)
+        .filter(Boolean),
+    )
+    return {
+      clubPlayerId: entry.clubPlayerId,
+      sessionPlayerId: entry.id,
+      name: entry.nameSnapshot,
+      candidates: profiles
+        .filter((p) =>
+          [p.displayName, p.nickname, p.player?.fullName, p.player?.nickname].some((n) =>
+            names.has(normalizedName(n)),
+          ),
+        )
+        .map((p) => ({
+          clubPlayerId: p.id,
+          name: p.player?.fullName || p.displayName,
+          identity: (p.player?.profileState === 'claimed' ? 'registered' : 'unclaimed') as
+            | 'registered'
+            | 'unclaimed',
+          rtrId: p.player?.idAllocation?.rtrId ?? null,
+        })),
     }
   })
 }

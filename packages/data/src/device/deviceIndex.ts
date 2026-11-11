@@ -110,6 +110,11 @@ export async function saveDownload(
   records.set(downloadKey(accountId, record.sessionId), record)
 }
 
+/** Indexes a record whose bodies were already written (a play-history import). */
+export function saveDownloadRecord(accountId: string, record: DownloadRecord) {
+  records.set(downloadKey(accountId, record.sessionId), record)
+}
+
 export async function removeDownload(accountId: string, sessionId: string) {
   await deleteDownload(accountId, sessionId)
   records.delete(downloadKey(accountId, sessionId))

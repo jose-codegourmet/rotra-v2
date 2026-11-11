@@ -1,7 +1,6 @@
 import { QueryClient } from '@tanstack/react-query'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { getDeviceDownloads } from '../device/fetchers'
-import { NotConnectedError } from '../mock/errors'
 import { mockStore } from '../mock/store'
 import { connectRealSync } from '../real/sync'
 import {
@@ -104,11 +103,19 @@ describe('Sync, device and offline › real mode', () => {
     await expect(getSessionIntegrity(sessionId)).rejects.toMatchObject({ status: 404 })
   })
 
-  it('leaves the interruption answer not connected (#246)', async () => {
-    await expect(answerInterruption({ sessionId, answer: 'yes' })).rejects.toBeInstanceOf(
-      NotConnectedError,
-    )
+  it('Yes to the interruption question replays this device (nothing waits here) and re-checks the server (#722)', async () => {
+    reply(200, { streams: [], conflicts: [], completeness: proven })
+    const integrity = await answerInterruption({ sessionId, answer: 'yes' })
+    expect(sentPath()).toBe(`/api/sessions/${sessionId}/sync`)
+    expect(integrity).toEqual({ sessionId, state: 'complete', missingSummary: [], conflicts: [] })
+  })
+
+  it('offline, an unsynced session is reported as records missing, not checked with the server', async () => {
+    vi.stubGlobal('navigator', { onLine: false })
+    const integrity = await getSessionIntegrity(sessionId)
     expect(fetchMock).not.toHaveBeenCalled()
+    expect(integrity.state).toBe('records_missing')
+    expect(integrity.missingSummary.map((m) => m.label)).toEqual(['Not connected'])
   })
 
   it('lists no device downloads where there is no device storage, without asking the server (#477)', async () => {

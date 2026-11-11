@@ -1,6 +1,8 @@
 import { getConnectivity } from '../connectivity/connectivity'
+import { sessionIdOfPath } from '../device/deviceCopy'
 import { readOfflineBody, rememberGetBody } from '../device/deviceIndex'
 import { MockError, type MockErrorKind } from '../mock/errors'
+import { pathHasPendingWork } from '../outbox/state'
 
 /** A refused Route Handler call; `status` lets a read tell not-found from other failures. */
 export class RealRequestError extends MockError {
@@ -31,7 +33,10 @@ const KIND_BY_STATUS: Record<number, MockErrorKind> = {
  *
  * Device copy (#477): a successful GET of a downloaded session (or the club-level reads while one is
  * downloaded) is kept in IndexedDB after it is returned; offline, such a GET answers from that copy.
- * Every other offline call, and every offline write, refuses exactly as before.
+ * While changes of a session wait in the outbox (#722), its GETs keep answering from the copy even
+ * online, so the screens show what this device saved until the replay has landed it. Every other
+ * offline call, and every offline write, refuses exactly as before (writes the rules allow offline
+ * go through `outbox/dispatch.ts` before they reach here).
  */
 export async function realRequest<T>(
   path: string,
@@ -45,14 +50,13 @@ export async function realRequest<T>(
   } = {},
 ): Promise<T> {
   const method = options.method ?? 'GET'
+  const offline = getConnectivity() === 'offline'
   // Browser offline or DevMenu "Simulate offline": the same refusal either way.
-  if (getConnectivity() === 'offline') {
-    if (method === 'GET') {
-      const kept = await readOfflineBody(path)
-      if (kept.found) return kept.body as T
-    }
-    throw new MockError('offline', "You're offline. This needs an internet connection.")
+  if (method === 'GET' && (offline || (await pathHasPendingWork(sessionIdOfPath(path))))) {
+    const kept = await readOfflineBody(path)
+    if (kept.found) return kept.body as T
   }
+  if (offline) throw new MockError('offline', "You're offline. This needs an internet connection.")
   const multipart = typeof FormData !== 'undefined' && options.body instanceof FormData
   let response: Response
   try {

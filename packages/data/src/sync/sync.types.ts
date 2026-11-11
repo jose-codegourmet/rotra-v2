@@ -21,11 +21,16 @@ export type SyncState = {
 }
 export type SaveOutcome = { savedOffline: boolean; message: string }
 
-/** Read-only evidence from two devices. There is no supported authority-selection command yet. */
+/**
+ * Read-only evidence from two devices, or (real mode, #722) a change this device recorded that the
+ * server refused with a 409: `pending` names it, `versions` is then empty, and the Queue Master can
+ * keep the server's version or retry.
+ */
 export type SyncConflict = {
   id: string
   matchNumber: number
   courtLabel: string
+  pending?: { text: string; area: SyncArea; recordedAt: number; message: string }
   versions: {
     deviceLabel: string
     order: number

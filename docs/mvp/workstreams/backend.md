@@ -42,6 +42,7 @@ real-mode switch; scheduled jobs; decision gates #243–#248 under [F07 #241](ht
 
 - [D-2026-11-07-03](../decisions.md#d-2026-11-07-03) — offline boundaries (sync design, #246).
 - [D-2026-11-07-04](../decisions.md#d-2026-11-07-04) — offline mandatory; online-only launch not approved.
+- [D-2026-11-11-01](../decisions.md#d-2026-11-11-01) — OpenTelemetry traces to Grafana Cloud ([observability](../../observability.md)).
 
 ## Blocking open decisions
 

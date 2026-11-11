@@ -34,6 +34,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-09-12](#d-2026-11-09-12) | Club-set pictures for guests and unclaimed players | approved | in progress | #623, #628 | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
 | [D-2026-11-09-13](#d-2026-11-09-13) | Admin-managed profile character library | approved | in progress (mock app; real mode on branch `fix/real-mode-characters-clubs-sessions`, migration not applied) | #644, #645, #646 | [Admin](workstreams/admin.md), [Player](workstreams/player.md) |
 | [D-2026-11-09-14](#d-2026-11-09-14) | Admin edits everything on a player, with a beta-only password field | approved for MVP or beta only; signed off 2026-11-10 | in progress (mock app; real mode not started) | #647, #648, #649, #650 | [Admin](workstreams/admin.md) |
+| [D-2026-11-11-01](#d-2026-11-11-01) | Observability: OpenTelemetry traces to Grafana Cloud, plus a local Grafana stack | approved 2026-11-11 | implemented in the repository; Grafana Cloud stack and Vercel `OTEL_*` variables not set up yet | none | [Backend](workstreams/backend.md) |
 
 ## Status conventions
 
@@ -475,3 +476,17 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 - **Open contact-change requests (decided 2026-11-10, Option A):** on a direct Admin phone or email edit, the open request for that field is marked "Superseded by an Admin edit" (stored as rejected plus `supersededAt`), logged in the Activity log, and can no longer be approved or applied.
 - **Picture change (2026-11-10):** an Admin save makes the old picture the previous picture on any picture change (photo, character or initials), as the Admin mockup does. Known gap: when the old picture was initials, no "Previous picture" row shows (the mockup shows one).
 - **References:** [Admin screens](../screens/product/modules/admin/README.md), [mockup logs](../mockup-changes/README.md).
+
+<a id="d-2026-11-11-01"></a>
+### D-2026-11-11-01 — Observability: OpenTelemetry traces to Grafana Cloud, plus a local Grafana stack
+- **Decision status:** approved by the owner (November 11, 2026). This is the decision AGENTS.md rule 11 requires for the new dependencies.
+- **Implementation status:** implemented in the repository (instrumentation, local stack, docs). Not done yet: the Grafana Cloud stack and the Vercel `OTEL_*` variables, so production sends nothing until they are set.
+- **Ticket:** none
+- **Roadmap:** MVP — [Backend](workstreams/backend.md)
+- **Decision:**
+  - The Queue, Player and Admin apps export **OpenTelemetry traces** over OTLP with `@vercel/otel` and `@opentelemetry/api`, from each app's `src/instrumentation.ts` (service names `rotra-queue`, `rotra-player`, `rotra-admin`). No other observability dependencies.
+  - Telemetry is **off unless `OTEL_EXPORTER_OTLP_ENDPOINT` is set**. Configuration uses only the standard `OTEL_EXPORTER_OTLP_*` variables.
+  - **Production:** Grafana Cloud (free stack), exported directly from the functions, so it works on Vercel Hobby without trace drains. The variables live in the Vercel project env, never in the repository.
+  - **Local:** `grafana/otel-lgtm` through `docker-compose.observability.yml` and `make observability-up` / `make observability-down`.
+- **Not in MVP / Out of scope:** browser telemetry, Prisma query spans, metrics and log export.
+- **References:** [observability](../observability.md), [architecture §2](../architecture.md#2-the-shape-of-the-system).

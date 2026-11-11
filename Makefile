@@ -1,4 +1,4 @@
-.PHONY: install dev dev-queue dev-player dev-admin storybook lint check-fix type-check build check
+.PHONY: install dev dev-queue dev-player dev-admin storybook lint check-fix type-check build check observability-up observability-down
 
 # Every target loads nvm first so the Node version always matches .nvmrc
 NVM := . $(HOME)/.nvm/nvm.sh && nvm use
@@ -39,3 +39,10 @@ build:
 # The one gate before merging: lint, type-check, build, decided-math tests. Errors only.
 check:
 	@$(NVM) >/dev/null && node scripts/check.mjs
+
+# Local Grafana + OpenTelemetry stack (docs/observability.md). Grafana :3000, OTLP :4317/:4318
+observability-up:
+	@docker compose -f docker-compose.observability.yml up -d
+
+observability-down:
+	@docker compose -f docker-compose.observability.yml down

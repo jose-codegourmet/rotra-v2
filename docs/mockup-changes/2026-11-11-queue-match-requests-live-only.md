@@ -36,3 +36,8 @@ Superseded by: none
 
 ## Real app work
 - `@rotra/ui` RequestsPanel: render the Match tab and count match requests only when the session status is active.
+
+## Owner comment, November 11, 2026 (third): "can we rearrange the buttons and layout here?"
+- Changed: the live console header no longer has a six-button row under the title. The title block sits on the left; on the right (wrapping under the title on narrow screens) is one compact cluster: **Match requests · N** (warn-coloured while waiting), **Courts and time**, **Payments**, and a **⋯** More menu (same pattern as the preparation page's More menu) holding **Public page**, **Copy Facebook post**, **Session settings** and **Home**. Nothing was removed; the four less frequent actions moved into the menu.
+- Copy: **More for this session** (menu label). No other new strings.
+- States added: More menu open and closed; Esc and tapping outside close it.

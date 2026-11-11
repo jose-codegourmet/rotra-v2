@@ -3569,8 +3569,16 @@ function viewConsole() {
     <div class="between">
       <div class="between" style="align-items:flex-start;gap:12px"><div class="stack tight"><div class="row"><span class="label">Live session</span>${chip(MODES[s.mode].label)}${chip(fmtFormats(s))}${chip(`Min ${s.minimum} games`)}</div>
         <h1>${esc(s.title)}</h1><p class="muted small">${esc(s.venue)} · Started ${fmtWhen(s.startedAt, { lower: true })} · Ends ${fmtWhen(s.end, { lower: true })} · ${endSt.over ? `<span style="color:var(--warn)">${endSt.text}</span>` : endSt.text}</p></div>
-        ${(() => { const n = reqCount(s); return `<button class="btn sm${n ? ' attn' : ''}" style="flex:none" data-act="openRequests" aria-label="Match requests · ${n}${n ? ' waiting' : ''}">Match requests · ${n}</button>`; })()}</div>
-      <div class="row acts"><button class="btn sm" data-act="go" data-to="home">Home</button><button class="btn sm" data-act="go" data-to="prepare">Session settings</button><button class="btn sm" data-act="go" data-to="public">Public page</button><button class="btn sm" data-act="openPost">Copy Facebook post</button><button class="btn sm" data-act="openPayments">Payments</button><button class="btn sm" data-act="openAdjust">Courts and time</button></div>
+        ${(() => { const n = reqCount(s), open = S.ui.courtMenu === 'live-more'; return `<div class="row live-acts" style="flex:none;justify-content:flex-end;gap:8px">
+          <button class="btn sm${n ? ' attn' : ''}" data-act="openRequests" aria-label="Match requests · ${n}${n ? ' waiting' : ''}">Match requests · ${n}</button>
+          <button class="btn sm" data-act="openAdjust">Courts and time</button>
+          <button class="btn sm" data-act="openPayments">Payments</button>
+          <div class="cmenu"><button class="btn sm ghost icon-btn" data-act="toggleCourtMenu" data-id="live-more" aria-haspopup="menu" aria-expanded="${open}" aria-label="More for this session" title="More for this session">${I.more}</button>${open ? `<div class="cmenu-list icon-menu" role="menu" aria-label="More for this session">
+            <button role="menuitem" data-act="go" data-to="public">${I.ext}<span>Public page</span></button>
+            <button role="menuitem" data-act="openPost">${I.link}<span>Copy Facebook post</span></button>
+            <button role="menuitem" data-act="go" data-to="prepare">${I.n_gear}<span>Session settings</span></button>
+            <button role="menuitem" data-act="go" data-to="home">${I.back}<span>Home</span></button>
+          </div>` : ''}</div></div>`; })()}</div>
     </div>
     ${!S.online ? notice('warn', 'Working offline on this device. Matches, results and roster changes save here and sync when you reconnect. Session done needs internet.') : ''}
     <div class="tabs" role="tablist" aria-label="Console views">

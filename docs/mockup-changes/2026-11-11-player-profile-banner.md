@@ -47,3 +47,6 @@ Superseded by: none
 - "I think the layout here should mimic how the profile dialog looks like".
 - Changed: the top of Edit profile › Name is now a live preview of the profile card: the chosen banner runs edge to edge across the panel top, the picture overlaps it with the pencil button on it (opens the picture sheet), and the name and nickname beside it update as you type. Under it: the line **This is how the top of your profile card looks. Tap the pencil to change your picture; pick a banner below.**, then the **Banner** swatches with **Selected: NAME · Public. Pick one of ROTRA's banners; your own images can't be uploaded.** The separate Profile picture and Profile banner rows are gone.
 - Copy added: the two sentences above and the **Banner** label. Removed: **Profile picture**, **Shown on the leaderboard and your profile.**, **Change picture** (now the pencil), **Profile banner**.
+
+## Owner comment, November 11, 2026 (fifth): "avatar shape here needs to be circle"
+- Changed: the big 88 px profile picture on the profile card (and in the Edit profile preview) is a circle instead of a rounded square. The pencil button keeps its place at the bottom-right of the circle.

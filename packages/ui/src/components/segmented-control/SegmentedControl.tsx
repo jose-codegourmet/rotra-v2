@@ -1,6 +1,7 @@
 'use client'
 
 import { cn } from '@rotra/ui/cn'
+import { tabFocusClass, useKeyboardNav } from '@rotra/ui/tabs'
 import { ToggleGroup } from 'radix-ui'
 import type { ReactNode, Ref } from 'react'
 
@@ -43,6 +44,7 @@ export function SegmentedControl({
   ref,
   ...aria
 }: SegmentedControlProps) {
+  useKeyboardNav()
   return (
     <ToggleGroup.Root
       ref={ref}
@@ -68,6 +70,7 @@ export function SegmentedControl({
             'inline-flex min-h-9 items-center gap-1.5 rounded-[7px] border-0 bg-transparent px-3.5 font-semibold text-fg2',
             'data-[state=on]:bg-elev data-[state=on]:text-fg disabled:cursor-not-allowed disabled:opacity-45',
             'touch:min-h-11 touch:px-4',
+            tabFocusClass,
             option.iconOnly && 'min-w-10 justify-center px-2.5 touch:px-2.5',
           )}
           aria-label={option.iconOnly ? option.ariaLabel : undefined}

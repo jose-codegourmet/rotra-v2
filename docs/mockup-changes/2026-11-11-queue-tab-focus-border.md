@@ -1,6 +1,6 @@
 # Tabs: no thick focus border after a tap or click; thin ring for the keyboard (#736, proposed)
 
-Status: NEW
+Status: IN MOCK APP — #736
 Date: 2026-11-11
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Shared tab styles (.tabs and segmented controls), e.g. Preparation › Roster and levels and Waitlist tabs

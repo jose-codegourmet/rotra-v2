@@ -1452,9 +1452,9 @@ const avatar = (p, cls = '') => (hasPhoto(p)
   ? `<span class="avatar photo ${cls}" role="img" data-photo="${esc(p.id)}" aria-label="Profile picture of ${esc(p.name)}">${picInner(p)}</span>`
   : `<span class="avatar ${cls}" aria-hidden="true">${esc(initials(p.name))}</span>`);
 // Public page avatar: same face, but its label and initials use the masked name (#475).
-const pubAvatar = (p) => (hasPhoto(p)
-  ? `<span class="avatar photo" role="img" data-photo="${esc(p.id)}" aria-label="Profile picture of ${esc(maskName(p.name))}">${picInner(p)}</span>`
-  : `<span class="avatar" aria-hidden="true">${esc(initials(maskName(p.name)))}</span>`);
+const pubAvatar = (p, cls = '') => (hasPhoto(p)
+  ? `<span class="avatar photo ${cls}" role="img" data-photo="${esc(p.id)}" aria-label="Profile picture of ${esc(maskName(p.name))}">${picInner(p)}</span>`
+  : `<span class="avatar ${cls}" aria-hidden="true">${esc(initials(maskName(p.name)))}</span>`);
 const cur = () => S.sessions.find((s) => s.id === S.currentId);
 // Slot budget: players per reserved court × courts. Players added past it wait in a first-come waitlist
 // (kept apart from the roster) until the operator gives them a slot.
@@ -4134,7 +4134,7 @@ const pubNameHtml = (p) => (showsFull(p) ? `<b>${esc(p.name)}</b>${p.nick ? `<br
 const pubAvatarOf = (p) => (showsFull(p) || (pubSignedIn() && alwaysPrivate(p)) ? avatar(p) : pubAvatar(p));
 // Signed-in Players can open a registered participant's ROTRA profile; guests and unclaimed profiles stay plain tiles.
 // The viewer's own tile carries a “You” label (owner request, November 9, 2026).
-const pubTile = (p, cls, title, inner) => { const me = !!p && pubViewer()?.id === p.id; const body = me ? `${inner}<span class="you-tag">You</span>` : inner; cls = me ? `${cls} me` : cls; return pubSignedIn() && p && (me || p.identity === 'registered') ? `<button type="button" class="${cls} pub-link" data-act="pubProfile" data-id="${esc(p.id)}" ${title} aria-label="${me ? `${esc(p.name)} (you) · view your profile` : `${esc(showsFull(p) ? p.name : maskName(p.name))} · view profile`}">${body}</button>` : `<div class="${cls}" ${title}>${body}</div>`; };
+const pubTile = (p, cls, title, inner) => { const me = !!p && pubViewer()?.id === p.id; const body = me ? `${inner}<span class="you-tag">You</span>` : inner; cls = me ? `${cls} me` : cls; return pubSignedIn() && p ? `<button type="button" class="${cls} pub-link" data-act="pubProfile" data-id="${esc(p.id)}" ${title} aria-label="${me ? `${esc(p.name)} (you) · view your profile` : `${esc(showsFull(p) ? p.name : maskName(p.name))} · view profile`}">${body}</button>` : `<div class="${cls}" ${title}>${body}</div>`; };
 const playerJoinReq = (s, pid) => (s.requests || []).filter((x) => x.pid === pid && x.status !== 'closed').sort((a, b) => b.at - a.at)[0] || null;
 const openMatchReq = (s, pid) => (s.matchRequests || []).find((x) => x.pid === pid && x.status === 'open') || null;
 const openDropOut = (s, pid) => (s.dropOuts || []).find((x) => x.pid === pid && x.status === 'open') || null;
@@ -4630,17 +4630,19 @@ const SHEETS = {
   // #731 (proposed): a signed-in registered player opens a participant's profile from the session page's Participants tab.
   pubProfile(sh) {
     const p = P(sh.id), r = R(cur(), p.id);
-    // Owner comment, November 11, 2026: a private player's card still opens, with their picture and banner; everything else stays hidden.
-    if (alwaysPrivate(p) && pubViewer()?.id !== p.id) return sheetShell(esc(maskName(p.name)), `
+    // Owner comments, November 11, 2026: every tile opens a dialog. A private player's card shows their picture and banner and says the
+    // rest is private; a guest or unclaimed player (no ROTRA account) gets a card saying there is no profile yet.
+    const limited = pubViewer()?.id !== p.id && (alwaysPrivate(p) || p.identity !== 'registered');
+    if (limited) { const priv = alwaysPrivate(p); return sheetShell(esc(maskName(p.name)), `
       <div class="pp-card">
         <div class="pp-banner" aria-hidden="true"></div>
-        <div class="pp-avatar">${hasPhoto(p) ? `<button class="photo-btn" data-act="openPhoto" data-id="${esc(p.id)}" aria-label="View full photo">${avatar(p, 'xl')}</button>` : avatar(p, 'xl')}</div>
+        <div class="pp-avatar">${priv && hasPhoto(p) ? `<button class="photo-btn" data-act="openPhoto" data-id="${esc(p.id)}" aria-label="View full photo">${avatar(p, 'xl')}</button>` : priv ? avatar(p, 'xl') : pubAvatar(p, 'xl')}</div>
         <div class="pp-body">
           <div class="pp-name"><b>${esc(maskName(p.name))}</b></div>
-          <div class="row" style="gap:8px">${chip('Private profile')}</div>
-          <div class="pp-sec"><span class="label">Private</span><p class="muted" style="margin:0">This player keeps their profile private. Only their picture and banner are shown; their name, level and stats are hidden.</p></div>
+          <div class="row" style="gap:8px">${chip(priv ? 'Private profile' : 'Not on ROTRA yet')}</div>
+          <div class="pp-sec"><span class="label">${priv ? 'Private' : 'Guest'}</span><p class="muted" style="margin:0">${priv ? 'This player has chosen to keep their ROTRA profile private. You can see their picture and banner; their name, level and games stay between them and the Queue Master.' : 'This player is playing as a guest and hasn\'t registered with ROTRA yet, so there\'s no profile to show. The club keeps their games for when they do.'}</p></div>
         </div>
-      </div>`, '<button class="btn" data-act="closeSheet" data-autofocus>Close</button>', false, 'pp-sheet');
+      </div>`, '<button class="btn" data-act="closeSheet" data-autofocus>Close</button>', false, 'pp-sheet'); }
     const st = pubStats(p), city = regCity(p), s = cur();
     // Owner comment, November 11, 2026 ("like showing profile in discord"): banner, overlapping avatar, status line, level badge, stat tiles.
     const a = r ? busyOf(s, p.id) : null, qi = r ? waiting(s).findIndex((m) => all(m).includes(p.id)) : -1;

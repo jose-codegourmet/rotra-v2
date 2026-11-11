@@ -109,15 +109,16 @@ export type SessionInviteCode = {
   code: string
   createdAt: number
 }
-export type IdentityCheck = 'rtr-id' | 'qr' | 'phone'
-
-/** A Player Information result the Add player sheet can save or add. Never carries a phone. */
+/**
+ * A Player Information result the Add player sheet can save or add. Registered (claimed) players
+ * only: guests and unclaimed profiles stay in their club (D-2026-11-11-03). Never carries a phone.
+ */
 export type DirectoryPlayer = {
   id: string
   fullName: string
   nickname: string | null
   rtrId: string
-  identity: 'registered' | 'unclaimed'
+  identity: 'registered'
   /** Their own profile picture as an avatar reference, or null for initials */
   picture: string | null
   /** Their Player Information level, or null when they have none yet */
@@ -141,7 +142,6 @@ export type RosterBatchOperation =
       source: 'saved'
       clubPlayerId: string
       level: PlayingLevel
-      identityCheck?: IdentityCheck
     })
   | (AddPlacementFlags & {
       op: 'add'
@@ -149,7 +149,6 @@ export type RosterBatchOperation =
       source: 'directory'
       playerId: string
       level: PlayingLevel
-      identityCheck?: IdentityCheck
     })
   | (AddPlacementFlags & {
       op: 'add'

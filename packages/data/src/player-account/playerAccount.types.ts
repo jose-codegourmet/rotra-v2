@@ -16,12 +16,16 @@ export type MyAccount = {
 }
 
 export type ClaimLinkStatus = 'valid' | 'claimed' | 'expired' | 'processing'
-/** What a registration link shows before the recipient confirms: public identity and a masked phone. */
+/**
+ * What a registration link shows before the recipient confirms: public identity and a masked phone.
+ * A club's own unclaimed record (D-2026-11-11-03) has no global player and no RTR ID yet, so both
+ * are null; the RTR ID is given when they register.
+ */
 export type ClaimLinkPreview = {
-  playerId: string
+  playerId: string | null
   fullName: string
   nickname: string | null
-  rtrId: string
+  rtrId: string | null
   picture: string | null
   /** e.g. '+63 918 ••• ••77'; the full number never leaves the mock store in this flow */
   maskedPhone: string

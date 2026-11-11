@@ -12,11 +12,86 @@ import { recordAudit } from './audit'
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
-/** A-PLAYERS: explicitly allowlisted owner-only projection of allocated player identities. */
+type AdminPlayerRow = Omit<AdminPlayer, 'revision'> & { revision: string }
+
+/**
+ * A-PLAYERS rows for the clubs' unclaimed records (D-2026-11-11-03, owner answer November 12, 2026):
+ * a `club_players` row with a phone and no global player, listed under its club as "Not registered
+ * yet" with no RTR ID. Its `id` is the club player id; the place is the club's founding location,
+ * where the RTR ID would be allocated on registration. Never a guest (no phone).
+ */
+async function readClubOnlyRecords(id?: string): Promise<AdminPlayerRow[]> {
+  const records = await prisma.clubPlayer.findMany({
+    where: {
+      playerId: null,
+      removedAt: null,
+      privateInput: { phoneE164: { not: null } },
+      ...(id ? { id } : {}),
+    },
+    orderBy: [{ addedAt: 'asc' }, { id: 'asc' }],
+    select: {
+      id: true,
+      clubId: true,
+      displayName: true,
+      nickname: true,
+      addedAt: true,
+      revision: true,
+      privateInput: { select: { phoneE164: true, email: true } },
+      club: {
+        select: {
+          name: true,
+          foundingLocation: { select: { cityCode: true, displayName: true } },
+        },
+      },
+    },
+  })
+  return records.map((record) => {
+    const addedOn = record.addedAt.toISOString().slice(0, 10)
+    return {
+      id: record.id,
+      name: record.displayName,
+      nickname: record.nickname,
+      rtrId: null,
+      createdByClubId: record.clubId,
+      createdOn: addedOn,
+      addedOn,
+      picture: null,
+      registeredPlace: {
+        code: record.club.foundingLocation.cityCode,
+        name: record.club.foundingLocation.displayName,
+      },
+      phone: record.privateInput?.phoneE164 ?? undefined,
+      email: record.privateInput?.email ?? undefined,
+      phoneHidden: false,
+      claimed: false,
+      registeredOn: undefined,
+      clubs: [
+        {
+          clubId: record.clubId,
+          name: record.club.name,
+          addedAt: record.addedAt.getTime(),
+          identity: 'unclaimed' as const,
+        },
+      ],
+      levelIndex: null,
+      levelBand: null,
+      recentStandardMatches: 0,
+      rankStatus: { kind: 'none' as const, text: 'No rank yet' },
+      archivedAt: null,
+      revision: record.revision.toString(),
+      removalReason: 'Saved by its club only; the club manages this record',
+    }
+  })
+}
+
+/**
+ * A-PLAYERS: explicitly allowlisted owner-only projection of allocated player identities, followed
+ * by the clubs' unclaimed records (no RTR ID). `playerId` is a player id or a club player id.
+ */
 export async function readAdminPlayerDirectory(
   context: AdminContext,
   playerId?: string,
-): Promise<(Omit<AdminPlayer, 'revision'> & { revision: string })[]> {
+): Promise<AdminPlayerRow[]> {
   requireAdmin(context)
   const players = await prisma.player.findMany({
     where: { idAllocation: { isNot: null }, ...(playerId ? { id: playerId } : {}) },
@@ -53,7 +128,8 @@ export async function readAdminPlayerDirectory(
       },
     },
   })
-  return players.flatMap((player) => {
+  const clubOnly = await readClubOnlyRecords(playerId)
+  const rows = players.flatMap((player) => {
     const allocation = player.idAllocation
     if (!allocation) return []
     const rank = player.rankCurrent
@@ -104,6 +180,7 @@ export async function readAdminPlayerDirectory(
       },
     ]
   })
+  return [...rows, ...clubOnly]
 }
 
 /** Reuses the canonical read-only history projection, behind the Admin account boundary. */

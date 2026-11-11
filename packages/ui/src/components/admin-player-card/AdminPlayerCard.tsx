@@ -90,7 +90,11 @@ export function AdminPlayerCard({
         >
           {p.name}
         </a>
-        <p className="font-mono text-xs [overflow-wrap:anywhere]">{p.rtrId}</p>
+        {p.rtrId ? (
+          <p className="font-mono text-xs [overflow-wrap:anywhere]">{p.rtrId}</p>
+        ) : (
+          <p className="text-xs text-fg2">Not registered yet</p>
+        )}
         <div className={grid ? 'flex flex-wrap justify-center gap-1.5' : 'flex flex-wrap gap-1.5'}>
           <PlayerAccountChip claimed={p.claimed} />
           <RankStatusChip status={p.rankStatus} />

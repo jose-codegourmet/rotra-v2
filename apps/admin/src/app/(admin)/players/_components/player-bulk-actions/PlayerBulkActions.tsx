@@ -47,7 +47,8 @@ export function PlayerBulkActions({ ids, onClear }: { ids: string[]; onClear: ()
               link.click()
               setTimeout(() => URL.revokeObjectURL(url), 1000)
             } else if (action === 'copy') {
-              const value = players.map((p) => p.rtrId).join('\n')
+              // Unclaimed club records have no RTR ID to copy.
+              const value = players.flatMap((p) => (p.rtrId ? [p.rtrId] : [])).join('\n')
               void Promise.resolve()
                 .then(() => navigator.clipboard.writeText(value))
                 .then(

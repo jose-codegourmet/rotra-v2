@@ -225,6 +225,27 @@ SELECT pg_temp.expect_rejected('page deleted under a cancelled (renewed) expiry 
 SELECT pg_temp.expect_rejected('publication event rewritten', $q$
   UPDATE session_publication_events SET include_off_day = true WHERE id = '57000000-0000-4000-8000-0000000000a1' $q$);
 
+-- Club record claim links (P08.9) ---------------------------------------------------------------
+SELECT pg_temp.expect_accepted('registration invite for a club-only unclaimed record', $q$
+  INSERT INTO club_player_claim_links (id, club_id, club_player_id, token_digest, issued_at, expires_at, updated_at)
+  VALUES ('cc000000-0000-4000-8000-0000000000a1', 'c1000000-0000-4000-8000-00000000000a', 'cb000000-0000-4000-8000-0000000000a2',
+    decode(repeat('ab', 32), 'hex'), now(), now() + interval '7 days', now()) $q$);
+SELECT pg_temp.expect_rejected('second active invite for the same club record', $q$
+  INSERT INTO club_player_claim_links (id, club_id, club_player_id, token_digest, issued_at, expires_at, updated_at)
+  VALUES ('cc000000-0000-4000-8000-0000000000a1', 'c1000000-0000-4000-8000-00000000000a', 'cb000000-0000-4000-8000-0000000000a2',
+    decode(repeat('ab', 32), 'hex'), now(), now() + interval '7 days', now());
+  INSERT INTO club_player_claim_links (id, club_id, club_player_id, token_digest, issued_at, expires_at, updated_at)
+  VALUES ('cc000000-0000-4000-8000-0000000000a2', 'c1000000-0000-4000-8000-00000000000a', 'cb000000-0000-4000-8000-0000000000a2',
+    decode(repeat('cd', 32), 'hex'), now(), now() + interval '7 days', now()) $q$);
+SELECT pg_temp.expect_rejected('club record invite with a short digest', $q$
+  INSERT INTO club_player_claim_links (id, club_id, club_player_id, token_digest, issued_at, expires_at, updated_at)
+  VALUES ('cc000000-0000-4000-8000-0000000000a3', 'c1000000-0000-4000-8000-00000000000a', 'cb000000-0000-4000-8000-0000000000a2',
+    decode('ab', 'hex'), now(), now() + interval '7 days', now()) $q$);
+SELECT pg_temp.expect_rejected('club record invite for another club''s record', $q$
+  INSERT INTO club_player_claim_links (id, club_id, club_player_id, token_digest, issued_at, expires_at, updated_at)
+  VALUES ('cc000000-0000-4000-8000-0000000000a4', 'c1000000-0000-4000-8000-00000000000b', 'cb000000-0000-4000-8000-0000000000a2',
+    decode(repeat('ef', 32), 'hex'), now(), now() + interval '7 days', now()) $q$);
+
 -- Restrictive deletion --------------------------------------------------------------------------
 SELECT pg_temp.expect_rejected('club deleted', $q$ DELETE FROM clubs WHERE id = 'c1000000-0000-4000-8000-00000000000a' $q$);
 SELECT pg_temp.expect_rejected('player with history deleted', $q$ DELETE FROM players WHERE id = '91000000-0000-4000-8000-000000000001' $q$);

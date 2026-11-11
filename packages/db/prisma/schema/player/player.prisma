@@ -173,3 +173,27 @@ model PlayerClaimLink {
   @@index([issuingClubId, issuedAt(sort: Desc)])
   @@map("player_claim_links")
 }
+
+/// Registration invite for a club's unclaimed record (D-2026-11-11-03): a club_players row with no
+/// global player. Same token, state and expiry rules as player_claim_links; registering from it
+/// creates the player, contacts, account and RTR ID, then links the record.
+model ClubPlayerClaimLink {
+  id           String               @id @default(uuid(7)) @db.Uuid
+  clubId       String               @map("club_id") @db.Uuid
+  clubPlayerId String               @map("club_player_id") @db.Uuid
+  /// SHA-256 of the opaque token.
+  tokenDigest  Bytes                @unique @map("token_digest")
+  state        PlayerClaimLinkState @default(active)
+  issuedAt     DateTime             @map("issued_at") @db.Timestamptz(6)
+  expiresAt    DateTime             @map("expires_at") @db.Timestamptz(6)
+  consumedAt   DateTime?            @map("consumed_at") @db.Timestamptz(6)
+  revokedAt    DateTime?            @map("revoked_at") @db.Timestamptz(6)
+  createdAt    DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime             @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision     BigInt               @default(1)
+
+  clubPlayer ClubPlayer @relation(fields: [clubId, clubPlayerId], references: [clubId, id], onDelete: Restrict)
+
+  @@index([clubId, clubPlayerId, issuedAt(sort: Desc)])
+  @@map("club_player_claim_links")
+}

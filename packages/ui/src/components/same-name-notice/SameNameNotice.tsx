@@ -6,7 +6,8 @@ import { type ElementType, Fragment } from 'react'
 export type SameNameTwin = {
   id: string
   fullName: string
-  rtrId: string
+  /** Null for a club's unclaimed record (no RTR ID until they register) */
+  rtrId: string | null
   /** Player detail URL; the name renders as a link */
   href?: string
 }
@@ -77,7 +78,11 @@ export function SameNameNotice(props: SameNameNoticeProps) {
           ) : (
             <span className="[overflow-wrap:anywhere]">{twin.fullName}</span>
           )}{' '}
-          (<span className="font-mono text-[0.92em] [overflow-wrap:anywhere]">{twin.rtrId}</span>)
+          (
+          <span className="font-mono text-[0.92em] [overflow-wrap:anywhere]">
+            {twin.rtrId ?? 'Not registered yet'}
+          </span>
+          )
         </Fragment>
       ))}{' '}
       is a separate identity. Admin doesn't merge players.

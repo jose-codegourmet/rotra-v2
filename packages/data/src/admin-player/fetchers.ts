@@ -1,4 +1,6 @@
 import { getAdminSession } from '../admin-account/fetchers'
+import type { ClubPlayer } from '../club-player/clubPlayer.types'
+import { clubPictureState } from '../club-player/clubPlayerPicture.rules'
 import { foundingCities } from '../fixtures/foundingCities'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
@@ -79,6 +81,72 @@ export function adminPlayerOf(state: MockState, player: Player): AdminPlayer {
   }
 }
 
+/** A club's unclaimed record: saved with a phone, no global player yet (D-2026-11-11-03). */
+export function isClubOnlyRecord(record: ClubPlayer) {
+  return (
+    !record.playerId &&
+    !record.removedAt &&
+    !record.linkedToClubPlayerId &&
+    (record.identity === 'unclaimed' || record.identity === 'pending')
+  )
+}
+
+/**
+ * A-PLAYERS row for a club's unclaimed record (owner answer, November 12, 2026): listed under its
+ * club as "Not registered yet", with no RTR ID. Its `id` is the club player id; the place is the
+ * club's founding location, where the RTR ID would be allocated on registration.
+ */
+export function clubOnlyAdminPlayerOf(state: MockState, record: ClubPlayer): AdminPlayer {
+  const club = state.clubs.find((club) => club.id === record.clubId)
+  const addedOn = record.addedAt ? new Date(record.addedAt).toISOString().slice(0, 10) : ''
+  const place = foundingCities.find((c) => c.code === club?.locationCode)
+  return {
+    id: record.id,
+    name: record.fullName,
+    nickname: record.nickname,
+    rtrId: null,
+    createdByClubId: record.clubId,
+    createdOn: addedOn,
+    addedOn,
+    picture: clubPictureState(record, null).reference,
+    levelBand: null,
+    registeredPlace: {
+      code: club?.locationCode.split('-')[1] ?? '',
+      name: place?.name ?? club?.locationCode ?? '',
+    },
+    clubs: [
+      {
+        clubId: record.clubId,
+        name: club?.name ?? 'Unknown club',
+        addedAt: record.addedAt ?? null,
+        identity: 'unclaimed',
+      },
+    ],
+    archivedAt: null,
+    revision: 1,
+    removalReason: 'Saved by its club only; the club manages this record',
+    phone: state.privatePhones[record.id],
+    email: undefined,
+    claimed: false,
+    phoneHidden: false,
+    levelIndex: null,
+    recentStandardMatches: 0,
+    rankStatus: rankStatusOf(
+      null,
+      0,
+      effectiveRankingVersion(state.rankingPolicyVersions).recentStandardMatchThreshold,
+    ),
+  }
+}
+
+/** Every A-PLAYERS row: allocated player identities, then the clubs' unclaimed records. */
+function allAdminPlayers(state: MockState) {
+  return [
+    ...state.players.map((player) => adminPlayerOf(state, player)),
+    ...state.clubPlayers.filter(isClubOnlyRecord).map((r) => clubOnlyAdminPlayerOf(state, r)),
+  ]
+}
+
 /**
  * A-PLAYERS: privileged search, filtered counts, duplicate groups and numbered pagination.
  * This in-memory implementation has no cross-app transport or durable persistence.
@@ -91,9 +159,7 @@ export async function listAdminPlayers(
   if ((await getAdminSession()).kind !== 'owner')
     throw new MockError('permission', 'Only ROTRA Admin can view player management.')
   await delay(400, signal)
-  const state = readMockState()
-  const all = state.players.map((player) => adminPlayerOf(state, player))
-  return selectAdminPlayers(all, params)
+  return selectAdminPlayers(allAdminPlayers(readMockState()), params)
 }
 
 /** A-PLAYER-DETAIL; null = not found. */
@@ -106,13 +172,14 @@ export async function getAdminPlayer(
     throw new MockError('permission', 'Only ROTRA Admin can view player management.')
   await delay(400, signal)
   const state = readMockState()
-  const player = state.players.find((entry) => entry.id === id)
+  const all = allAdminPlayers(state)
+  const player = all.find((entry) => entry.id === id)
   if (!player) return null
   return {
-    ...adminPlayerOf(state, player),
-    samePlayers: state.players
-      .filter((entry) => entry.id !== id && entry.fullName === player.fullName)
-      .map((entry) => ({ id: entry.id, name: entry.fullName, rtrId: entry.rtrId })),
+    ...player,
+    samePlayers: all
+      .filter((entry) => entry.id !== id && entry.name === player.name)
+      .map((entry) => ({ id: entry.id, name: entry.name, rtrId: entry.rtrId })),
   }
 }
 
@@ -203,7 +270,6 @@ export async function getAdminPlayersByIds(ids: string[], signal?: AbortSignal) 
   if ((await getAdminSession()).kind !== 'owner')
     throw new MockError('permission', 'Only ROTRA Admin can view player management.')
   await delay(200, signal)
-  const state = readMockState(),
-    selected = new Set(ids)
-  return state.players.filter((p) => selected.has(p.id)).map((p) => adminPlayerOf(state, p))
+  const selected = new Set(ids)
+  return allAdminPlayers(readMockState()).filter((p) => selected.has(p.id))
 }

@@ -27,7 +27,11 @@ export type AdminPlayer = {
   name: string
   /** The public nickname, else the first nickname a club saved for the player */
   nickname: string | null
-  rtrId: string
+  /**
+   * The permanent RTR ID; null for a club's unclaimed record, which has none until the person
+   * registers (D-2026-11-11-03). Such a row's `id` is the club player id.
+   */
+  rtrId: string | null
   createdByClubId: string | null
   /** 'YYYY-MM-DD', from the RTR ID date segment (MMDDYY) */
   createdOn: string

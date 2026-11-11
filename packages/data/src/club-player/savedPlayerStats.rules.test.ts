@@ -89,14 +89,15 @@ describe('Saved player statistics', () => {
     })
   })
 
-  it('preserves all 23 fixture players and supplies meaningful values for every statistic', () => {
+  it('preserves every fixture player and supplies meaningful values for every statistic', () => {
+    // 23 registered demo-club players, the club-only unclaimed Gab Torres and the second-club row.
     const now = Math.max(...clubPlayers.map((entry) => entry.addedAt))
-    expect(new Set(clubPlayers.map((entry) => entry.id)).size).toBe(23)
+    expect(new Set(clubPlayers.map((entry) => entry.id)).size).toBe(25)
     expect(deriveSavedPlayerStats(clubPlayers, DEMO_CLUB_ID, now)).toEqual({
-      totalPlayers: 23,
+      totalPlayers: 24,
       totalRegistered: 23,
       totalBeginners: 2,
-      totalIntermediates: 14,
+      totalIntermediates: 15,
       totalAdvanced: 7,
       newPlayersThisWeek: 3,
     })

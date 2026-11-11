@@ -670,7 +670,6 @@ export async function realAddSavedPlayerToSession(input: {
   sessionId: string
   clubPlayerId: string
   level: PlayingLevel
-  identityCheck?: string
   operationId?: string
 }) {
   const result = await realRequest<RosterAdd>(
@@ -687,7 +686,6 @@ export async function realAddDirectoryPlayerToSession(input: {
   sessionId: string
   playerId: string
   level: PlayingLevel
-  identityCheck?: string
 }) {
   const result = await realRequest<RosterAdd>(
     `/api/sessions/${encodeURIComponent(input.sessionId)}/roster`,

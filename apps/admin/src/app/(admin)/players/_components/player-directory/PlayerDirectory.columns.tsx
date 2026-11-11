@@ -64,7 +64,13 @@ export function playerDirectoryColumns(
       enableSorting: false,
       header: 'RTR ID',
       meta: { nowrap: true },
-      cell: ({ row }) => <span className="font-mono text-xs">{row.original.rtrId}</span>,
+      // A club's unclaimed record has no RTR ID until the person registers (D-2026-11-11-03).
+      cell: ({ row }) =>
+        row.original.rtrId ? (
+          <span className="font-mono text-xs">{row.original.rtrId}</span>
+        ) : (
+          <span className="text-xs text-fg2">Not registered yet</span>
+        ),
     },
     {
       id: 'account',

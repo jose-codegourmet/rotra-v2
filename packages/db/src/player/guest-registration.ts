@@ -5,7 +5,7 @@ import { prisma } from '../client/prisma'
 import { ServiceError } from '../service/errors'
 import { type ClaimDetails, registerFromClaim } from './account-access'
 import { CLAIM_LINK_DAYS } from './claim'
-import { allocateRtrId } from './identity'
+import { allocateRtrId, linkClubRecordsByPhone } from './identity'
 import { addPlayerToClub } from './my-clubs'
 
 const MATCH = { status: 'account-match' as const }
@@ -50,10 +50,13 @@ export async function guestRegistrationClub(
 }
 
 /**
- * #490: independent registration. The club supplies the RTR allocation context. Never links or
- * writes an existing guest record, roster, history attribution or permanent results. Once the
- * account exists, the new player is saved to the originating club (D-2026-11-09-06, #707), as the
- * mock does; a club link (with its current invite code, #712) and a session link both join that club.
+ * #490: independent registration. The club supplies the RTR allocation context, and the RTR ID is
+ * allocated here, at registration (D-2026-11-11-03). Never writes roster, history attribution or
+ * permanent results. Once the account exists, every club's unclaimed record with the same phone
+ * links to the new player automatically (D-2026-11-11-03, owner answer November 12, 2026: no Queue
+ * Master tap; the phone is not verified, an accepted MVP risk), then the new player is saved to the
+ * originating club (D-2026-11-09-06, #707), as the mock does; a club link (with its current invite
+ * code, #712) and a session link both join that club.
  * A client-generated secret makes provider failures/lost replies retryable through the existing
  * claim staging. Only its digest is stored; a retry must still supply the same private contacts.
  */
@@ -139,9 +142,19 @@ export async function registerGuest(
   for (let attempt = 0; ; attempt++) {
     try {
       const result = await registerFromClaim(cookies, token, { ...input, email })
-      // Repeat-safe, so a retried attempt that already joined is a no-op. The account is made and
-      // signed in by now: a failed join must not report the registration as failed; the player
-      // can still tap Join from the same link.
+      // Repeat-safe, so a retried attempt that already linked or joined is a no-op. The account is
+      // made and signed in by now: a failed link or join must not report the registration as
+      // failed; the player can still tap Join from the same link.
+      await prisma
+        .$transaction((tx) =>
+          linkClubRecordsByPhone(tx, result.playerId, input.phoneE164, new Date()),
+        )
+        .catch((error: unknown) => {
+          console.error(
+            '[guest-registration] link club records',
+            error instanceof Error ? error.name : typeof error,
+          )
+        })
       await addPlayerToClub(result.playerId, clubId).catch((error: unknown) => {
         console.error(
           '[guest-registration] join club',

@@ -120,7 +120,9 @@ function QuickViewPanel({
           </div>
         ) : (
           <span className={cn('text-sm text-fg2', mode === 'edit' && 'font-mono')}>
-            {mode === 'edit' ? p.rtrId : 'Registration link for this profile'}
+            {mode === 'edit'
+              ? (p.rtrId ?? 'Not registered yet')
+              : 'Registration link for this profile'}
           </span>
         )}
       </div>
@@ -255,10 +257,16 @@ function QuickViewPanel({
               <dl className="grid grid-cols-[max-content_minmax(0,1fr)] gap-x-4 gap-y-2 text-sm max-[420px]:grid-cols-1 max-[420px]:gap-y-0 [&>dt]:text-fg2 [&>dd]:min-w-0 [&>dd]:[overflow-wrap:anywhere] max-[420px]:[&>dd]:mb-2">
                 <dt>ID</dt>
                 <dd className="flex flex-wrap items-center gap-2">
-                  <span className="font-mono">{p.rtrId}</span>
-                  <Button size="xs" variant="ghost" onClick={onCopyId}>
-                    Copy
-                  </Button>
+                  {p.rtrId ? (
+                    <>
+                      <span className="font-mono">{p.rtrId}</span>
+                      <Button size="xs" variant="ghost" onClick={onCopyId}>
+                        Copy
+                      </Button>
+                    </>
+                  ) : (
+                    <span className="text-fg2">Not registered yet</span>
+                  )}
                 </dd>
                 <dt>Phone</dt>
                 <dd className="font-mono">{p.phone || 'Not given'}</dd>

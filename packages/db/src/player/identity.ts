@@ -11,7 +11,9 @@ const E164 = /^\+[1-9][0-9]{7,14}$/
 const MAX_RACE_RETRIES = 3
 
 export type IdentityResolution =
-  | { state: 'resolved'; playerId: string; rtrId: string; created: boolean }
+  | { state: 'resolved'; playerId: string; rtrId: string }
+  /** The phone matched no registered player: the record stays the club's unclaimed profile. */
+  | { state: 'unclaimed' }
   | { state: 'pending' }
   | { state: 'conflicted' }
   | { state: 'guest' }
@@ -54,11 +56,58 @@ export async function allocateRtrId(tx: Tx, playerId: string, clubId: string, at
 }
 
 /**
- * Resolves one club player's private phone intake to a global player, once the entry has synced
- * (owner decision 2026-10-28) and before Session done. The same phone always maps to one player and
- * one RTR ID: creation for a phone is serialized by an advisory lock, and the unique phone
- * constraint is the backstop. A unique race retries from resolution and never publishes the losing
- * allocation. Identity creation grants no match credit.
+ * Links every club's unclaimed record whose private phone is `phoneE164` to the player who just
+ * registered with that phone (D-2026-11-11-03: automatic, no Queue Master tap). One record per club
+ * (the earliest saved); a club that already lists the player keeps that row. Game history stays on
+ * the club records (`club_player_id`); no attribution or permanent result is written here.
+ */
+export async function linkClubRecordsByPhone(
+  tx: Tx,
+  playerId: string,
+  phoneE164: string,
+  now: Date,
+) {
+  const records = await tx.clubPlayer.findMany({
+    where: {
+      playerId: null,
+      removedAt: null,
+      privateInput: { phoneE164, state: { in: ['pending', 'conflicted'] } },
+    },
+    orderBy: [{ addedAt: 'asc' }, { id: 'asc' }],
+    select: { id: true, clubId: true },
+  })
+  const linked: { clubId: string; clubPlayerId: string }[] = []
+  for (const record of records) {
+    if (linked.some((l) => l.clubId === record.clubId)) continue
+    const existing = await tx.clubPlayer.findUnique({
+      where: { clubId_playerId: { clubId: record.clubId, playerId } },
+      select: { id: true },
+    })
+    if (existing) continue
+    await tx.clubPlayer.update({
+      where: { clubId_id: { clubId: record.clubId, id: record.id } },
+      data: { playerId, revision: { increment: 1 } },
+    })
+    await tx.clubPlayerPrivateInput.update({
+      where: { clubPlayerId: record.id },
+      data: {
+        state: 'resolved',
+        resolvedPlayerId: playerId,
+        resolvedAt: now,
+        revision: { increment: 1 },
+      },
+    })
+    linked.push({ clubId: record.clubId, clubPlayerId: record.id })
+  }
+  return linked
+}
+
+/**
+ * Resolves one club player's private phone intake once the entry has synced (owner decision
+ * 2026-10-28) and before Session done. Since D-2026-11-11-03 the lookup only **links**: a phone that
+ * belongs to a registered (claimed) player links the record to that player; any other phone leaves
+ * the record as the club's own unclaimed profile, with no `players` row and no RTR ID (both come
+ * with registration). Linking grants no match credit.
  */
 export async function resolveClubPlayerIdentity(
   context: ClubContext,
@@ -90,12 +139,7 @@ async function resolveOnce(
       where: { playerId: clubPlayer.playerId },
     })
     if (allocation)
-      return {
-        state: 'resolved',
-        playerId: clubPlayer.playerId,
-        rtrId: allocation.rtrId,
-        created: false,
-      }
+      return { state: 'resolved', playerId: clubPlayer.playerId, rtrId: allocation.rtrId }
   }
   const intake = clubPlayer.privateInput
   if (!intake?.phoneE164) return { state: 'guest' }
@@ -112,38 +156,28 @@ async function resolveOnce(
   const now = new Date()
   const known = await tx.playerPrivateContact.findUnique({
     where: { phoneE164: intake.phoneE164 },
-    select: { playerId: true },
+    select: { playerId: true, player: { select: { profileState: true } } },
   })
-  let playerId: string
-  let rtrId: string
-  let created = false
-  if (known) {
-    // The club already saved this person under another club-player row: keep both pending review.
-    const linked = await tx.clubPlayer.findUnique({
-      where: { clubId_playerId: { clubId: context.clubId, playerId: known.playerId } },
-      select: { id: true },
+  // Only a registered player links; an unregistered phone stays the club's own record.
+  if (!known || known.player.profileState !== 'claimed') return { state: 'unclaimed' }
+  // The club already saved this person under another club-player row: keep both pending review.
+  const linked = await tx.clubPlayer.findUnique({
+    where: { clubId_playerId: { clubId: context.clubId, playerId: known.playerId } },
+    select: { id: true },
+  })
+  if (linked && linked.id !== clubPlayerId) {
+    await tx.clubPlayerPrivateInput.update({
+      where: { clubPlayerId },
+      data: { state: 'conflicted', revision: { increment: 1 } },
     })
-    if (linked && linked.id !== clubPlayerId) {
-      await tx.clubPlayerPrivateInput.update({
-        where: { clubPlayerId },
-        data: { state: 'conflicted', revision: { increment: 1 } },
-      })
-      return { state: 'conflicted' }
-    }
-    playerId = known.playerId
-    const allocation = await tx.playerIdAllocation.findUnique({ where: { playerId } })
-    rtrId = allocation ? allocation.rtrId : await allocateRtrId(tx, playerId, context.clubId, now)
-  } else {
-    const player = await tx.player.create({
-      data: { fullName: clubPlayer.displayName, nickname: clubPlayer.nickname },
-    })
-    await tx.playerPrivateContact.create({
-      data: { playerId: player.id, phoneE164: intake.phoneE164 },
-    })
-    playerId = player.id
-    rtrId = await allocateRtrId(tx, playerId, context.clubId, now)
-    created = true
+    return { state: 'conflicted' }
   }
+  const playerId = known.playerId
+  const allocation = await tx.playerIdAllocation.findUnique({ where: { playerId } })
+  // A registered player always has an RTR ID (allocated at registration); a missing one is repaired.
+  const rtrId = allocation
+    ? allocation.rtrId
+    : await allocateRtrId(tx, playerId, context.clubId, now)
   await tx.clubPlayer.update({
     where: { clubId_id: { clubId: context.clubId, id: clubPlayerId } },
     data: { playerId, revision: { increment: 1 } },
@@ -157,7 +191,7 @@ async function resolveOnce(
       revision: { increment: 1 },
     },
   })
-  return { state: 'resolved', playerId, rtrId, created }
+  return { state: 'resolved', playerId, rtrId }
 }
 
 /** Resolves every pending intake on a session's roster; called after its entries sync. */

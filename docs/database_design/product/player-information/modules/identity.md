@@ -1,6 +1,6 @@
 # Identity, contacts, accounts, and permanent RTR IDs
 
-**Last verified:** 2026-11-12 for visibility, hide-from-directory, banner and club-only unclaimed profiles (migration `20261112000100_round2_profiles_banners_invites`, P08.1); 2026-11-07 for player login mapping and claim-link rules (#244); 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-12 for visibility, hide-from-directory, banner and club-only unclaimed profiles (migrations `20261112000100_round2_profiles_banners_invites`, P08.1, and `20261112000200_club_player_claim_links`, P08.9); 2026-11-07 for player login mapping and claim-link rules (#244); 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Proposed logical schema. Player account mapping and claim-link rules are decided (2026-11-07, #244); email verification, password policy and contact-change enforcement remain unresolved.
 
@@ -92,16 +92,17 @@ removes only its new upload; ambiguous failures retain it. Bucket configuration 
 not application DDL. The existing club-logo pattern is documented in
 [clubs and licenses](../../admin/modules/clubs-licenses.md#club-logo-persistence-374).
 
-## Club-only unclaimed profiles ([D-2026-11-11-03](../../../../mvp/decisions.md#d-2026-11-11-03)) — storage built, services pending
+## Club-only unclaimed profiles ([D-2026-11-11-03](../../../../mvp/decisions.md#d-2026-11-11-03)) — storage and services built
 
 Decided behaviour: an unclaimed profile lives only in its club, has no RTR ID, and is never found by another club; two clubs with the same phone keep separate records; on registration every club's record with that phone links automatically. Storage (migration `20261112000100_round2_profiles_banners_invites`, P08.1; no new columns were needed, `club_players` already carried `display_name`, `nickname` and the private-intake phone):
 
 - An unclaimed profile is a `club_players` row with `player_id` null plus its `club_player_private_inputs` phone. No `players`, `player_private_contacts` or `player_id_allocations` row is created for it, so the global unique phone and the RTR ID belong to registered players only. Several clubs may hold the same phone in their private inputs.
 - Entry sync links `club_players.player_id` only when the phone matches a **claimed** player's `player_private_contacts`; otherwise the input stays with the club.
-- A registration invite for an unclaimed profile points at `(club_id, club_player_id)` instead of a `players` row. Registering creates the player, contacts, account and RTR ID allocation, then links every unlinked `club_players` row whose private phone matches, with a history attribution per row.
+- A registration invite for an unclaimed profile is a `club_player_claim_links` row keyed by `(club_id, club_player_id)` (migration `20261112000200_club_player_claim_links`, P08.9; same token, state and expiry rules as `player_claim_links`, one active link per record). Registering from it, or independently with the same phone, creates the player (claimed), contacts, account and RTR ID allocation (the inviting club's founding location), then links every unlinked `club_players` row whose private phone matches, one per club (`club_player_private_inputs` → `resolved`). No history attribution row is written by the link (open: see below).
 - Player Information search filters to `profile_state = claimed`.
 - **Existing data (migrated 2026-11-12):** every unclaimed `players` row linked from a club record was moved onto its club records (nickname copied where missing, phone copied into the club's private intake as `pending`), roster/hold/join-request snapshots that pointed at it were cleared (the entries stay attached through `club_player_id`), its invite links were deleted, its RTR ID allocation released (counters not rewound) and the `players` row deleted. Rows with immutable facts, assessments, attributions, projections, a rank, an account or requests stop the migration instead (none existed). Unclaimed rows with no club record are the registration service's staging rows and are left alone. Details: the migration's README.
-- **Still open:** the services (`resolveClubPlayerIdentity` still creates unclaimed `players` rows on sync; `searchPlayerDirectory` still finds them; `issueClaimLink` still needs a `players` row, so an invite for a club-only record needs `player_claim_links` to point at `(club_id, club_player_id)`); a club-set picture or experience for a club-only record (no column yet, no data existed); Admin's view of unclaimed club records; the unverified-phone risk of automatic linking (see the decision).
+- **Services (P08.9, 2026-11-12):** `searchPlayerDirectory` filters to `profile_state = claimed`; `resolveClubPlayerIdentity` only links a phone that belongs to a claimed player and never creates `players` rows or RTR IDs (an unmatched phone leaves the input `pending`, so a club-only record reads as Lookup pending in real mode until a marker state is decided); `issueClaimLink` issues a `club_player_claim_links` row for a club-only record; `registerGuest` and the record claim link both run the phone linking above. Admin › Players lists club-only records under their club as “Not registered yet” with no RTR ID (owner answer, November 12, 2026). The unverified-phone risk of automatic linking is accepted for MVP (owner answer, same day).
+- **Still open:** a history attribution per linked record (none is written; the record's games stay reachable through `club_player_id`); a club-set picture or experience for a club-only record (no column yet, no data existed); a marker for “looked up, nobody registered has this phone” on `club_player_private_inputs`.
 
 ## Private contacts and account mapping
 
@@ -118,6 +119,8 @@ Claiming is not permission to edit contact identity directly. Initial email comp
 ## Registration links
 
 `player_claim_links`: UUID PK; player FK; issuing club/account; unique opaque token digest; issued/expiry/consumed/revoked times; claim-state/version metadata. Store a digest rather than a reusable plaintext secret.
+
+`club_player_claim_links` (P08.9): the same columns keyed by `(club_id, club_player_id)` → `club_players` instead of a player, for a club's own unclaimed record. One token namespace: a claim read looks the digest up in both tables.
 
 **Decided 2026-11-07 (#244), lifetime changed 2026-11-11 ([D-2026-11-11-08](../../../../mvp/decisions.md#d-2026-11-11-08)):** expiry is the issued time plus **24 hours** (was 7 days). No email verification on claim: the claim confirms the email at once. Password: at least 8 characters, nothing else. A link claimed by the wrong person is not undone; the Queue Master creates a new player. A link is **single use**: consumed time is set once, and a consumed link never claims again. The club (Queue Master) can **reissue**; reissuing sets the revoked time on the player's current active link in the same write, so at most one active link exists per player. Expired, consumed and revoked links resolve to the existing expired/used states. If the phone or email being bound already belongs to another account (unique contact or account constraint), the claim is **blocked**, nothing is consumed or merged, and the screen shows the contact-support route.
 

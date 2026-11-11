@@ -3949,7 +3949,7 @@ function playersPane(s) {
       const st = x.a ? (x.a.status === 'oncourt' ? `On court · getting ready · ${courtsOf(s, x.a)}` : `Playing · ${courtsOf(s, x.a)}`) : !x.r.present ? 'Away' : x.qpos ? `Queued · #${x.qpos}` : 'Free';
       return `<article class="pc3 ${x.a && x.a.status === 'active' ? 'playing' : ''} ${x.r.present ? '' : 'away'}" role="button" tabindex="0" data-act="selPlayer" data-pid="${x.r.pid}" aria-pressed="${i >= 0}" aria-label="${esc(x.p.name)}, ${esc(lvLabel(x.r.level))}, ${x.g} games">
         ${i >= 0 ? `<span class="sel-badge" aria-hidden="true">${i + 1}</span>` : ''}
-        <div class="pc3-top">${avatar(x.p)}<div style="min-width:0;flex:1"><div class="pc3-name">${esc(x.p.name)}</div><div class="pc3-lv">${esc(lvLabel(x.r.level))}</div></div><button class="btn xs ghost icon-btn" data-act="openSetGames" data-pid="${x.r.pid}" aria-label="Set games played… ${esc(x.p.name)}" title="Set games played…">${I.edit}</button></div>
+        <div class="pc3-top"><button class="face-btn" data-act="openProfile" data-id="${x.r.pid}" aria-label="View ${esc(x.p.name)}'s profile">${avatar(x.p)}</button><div style="min-width:0;flex:1"><div class="pc3-name">${esc(x.p.name)}</div><div class="pc3-lv">${esc(lvLabel(x.r.level))}</div></div><button class="btn xs ghost icon-btn" data-act="openSetGames" data-pid="${x.r.pid}" aria-label="Set games played… ${esc(x.p.name)}" title="Set games played…">${I.edit}</button></div>
         <div class="pc3-games" aria-label="${x.g} games played, ${x.g + queuedCount(s, x.r.pid)} for the night"><div class="pg-played"><b class="tnum">${x.g}</b><span>played</span></div><div class="pg-total"><b class="tnum">${x.g + queuedCount(s, x.r.pid)}</b><span>for the night</span></div></div>
         <div class="between" style="flex-wrap:nowrap"><span class="pc3-st small">${st}${x.a || !x.r.present ? '' : ` · ${x.mins} min wait`}</span>${sw(x.r.present, 'togglePresent', `data-pid="${x.r.pid}"`, `${x.p.name} present`)}</div>${presencePending.has(x.r.pid) ? '<span class="small muted">Saving presence…</span>' : ''}${selfMark(x.r)}
         <div class="row"><button class="btn xs" data-act="stepDown" data-pid="${x.r.pid}" aria-label="Move ${esc(x.p.name)} to the waitlist">Move to waitlist</button></div>
@@ -4548,21 +4548,37 @@ const SHEETS = {
     const p = P(sh.id);
     const city = regCity(p);
     const status = { registered: 'Registered ROTRA player', unclaimed: 'Saved by your club with a phone. Not registered with ROTRA yet', guest: 'Guest, no ROTRA profile', pending: 'Profile lookup after the session syncs' }[p.identity];
+    // Owner comment, November 11, 2026: the same banner profile card as the participant profile, with the club-private rows below.
+    const s = cur(), r = s ? R(s, p.id) : null;
+    const a = r ? busyOf(s, p.id) : null, qi = r ? waiting(s).findIndex((m) => all(m).includes(p.id)) : -1;
+    const tonight = !r ? null : a ? (a.status === 'oncourt' ? `On court · getting ready · ${courtsOf(s, a)}` : `Playing · ${courtsOf(s, a)}`) : !r.present ? 'Away' : qi >= 0 ? `Queued · #${qi + 1}` : 'Free';
+    const tone = a ? (a.status === 'active' ? 'live' : 'soon') : r && !r.present ? 'away' : 'free';
     return sheetShell(esc(p.name), `
-      <div class="li" style="padding:0">${avatar(p, 'xl')}<div class="main stack tight"><div class="row">${identChip(p)}</div><span class="small muted">${status}</span></div></div>
-      <dl class="kv">
-        <dt>Nickname</dt><dd>${p.nick ? esc(p.nick) : '—'}</dd>
-        <dt>Level suggestion</dt><dd>${p.sugg != null ? esc(lvLabel(p.sugg)) : 'None yet'}</dd>
-        <dt>Registered in</dt><dd>${city ? esc(city) : 'Not registered yet'}</dd>
-        <dt>RTR ID</dt><dd>${p.rtr ? `<span class="mono small">${esc(p.rtr)}</span>` : p.identity === 'unclaimed' ? 'Given when they register' : 'None yet'}</dd>
-        <dt>Added to club</dt><dd>${new Date(addedAt(p)).toLocaleDateString([], { month: 'long', day: 'numeric', year: 'numeric' })}</dd>
-        <dt>Sessions here</dt><dd>${p.prior}</dd>
-        <dt>Phone</dt><dd>${p.phoneHidden ? 'Hidden by player' : p.identity === 'guest' && !p.phone ? 'None on file' : 'Kept private; confirmed in person when adding them to a session'}</dd>
-        <dt>Joined</dt><dd>${joinedViaText(p)}</dd>
-      </dl>
+      <div class="pp-card">
+        <div class="pp-banner" aria-hidden="true"></div>
+        <div class="pp-avatar">${hasPhoto(p) ? `<button class="photo-btn" data-act="openPhoto" data-id="${esc(p.id)}" aria-label="View full photo of ${esc(p.name)}">${avatar(p, 'xl')}</button>` : avatar(p, 'xl')}</div>
+        <div class="pp-body">
+          <div class="pp-name"><b>${esc(p.name)}</b>${p.nick ? `<span class="muted">“${esc(p.nick)}”</span>` : ''}</div>
+          <div class="row" style="gap:8px">${identChip(p)}<span class="chip pp-level">${r && r.level != null ? `${esc(lvLabel(r.level))} tonight` : p.sugg != null ? `${esc(lvLabel(p.sugg))} · suggestion` : 'No level yet'}</span></div>
+          <span class="small muted">${status}</span>
+          ${tonight ? `<div class="pp-status ${tone}"><span class="pp-dot" aria-hidden="true"></span>Tonight · ${esc(tonight)}</div>` : ''}
+          <div class="pp-sec"><span class="label">About</span>
+            <dl class="kv">
+              <dt>Registered in</dt><dd>${city ? esc(city) : 'Not registered yet'}</dd>
+              <dt>RTR ID</dt><dd>${p.rtr ? `<span class="mono small">${esc(p.rtr)}</span>` : p.identity === 'unclaimed' ? 'Given when they register' : 'None yet'}</dd>
+              <dt>Joined</dt><dd>${joinedViaText(p)}</dd>
+            </dl></div>
+          <div class="pp-sec"><span class="label">In your club</span>
+            <dl class="kv">
+              <dt>Added to club</dt><dd>${new Date(addedAt(p)).toLocaleDateString([], { month: 'long', day: 'numeric', year: 'numeric' })}</dd>
+              <dt>Sessions here</dt><dd>${p.prior}</dd>
+              <dt>Phone</dt><dd>${p.phoneHidden ? 'Hidden by player' : p.identity === 'guest' && !p.phone ? 'None on file' : 'Kept private; confirmed in person when adding them to a session'}</dd>
+            </dl></div>
       ${p.identity === 'guest' ? `<section class="stack tight" aria-labelledby="guest-invite-h"><h3 id="guest-invite-h" style="margin:0;font-size:14px">Invite to ROTRA</h3><p class="small muted">Send this link so they can register for ROTRA Player. Their guest record stays unlinked until they accept a separate linking invitation.</p><div class="row"><button class="btn" data-act="copyGuestInvite">Copy invite link</button>${navigator.share ? '<button class="btn" data-act="shareGuestInvite">Share</button>' : ''}</div></section>` : ''}
-      <p class="small muted">Levels are set per session while preparing a roster, not here.</p>`,
-      `${sh.back ? `<button class="btn" data-act="profileBack">Back to ${{ suggest: 'suggestion', payments: 'payments', dispatch: 'match', match: 'match', onCourt: 'match', invalid: 'match' }[sh.back.type] || 'previous'}</button>` : '<button class="btn" data-act="closeSheet">Close</button>'}${sh.back ? '' : `<button class="btn danger" data-act="deletePlayer" data-id="${p.id}">Delete player</button>`}${p.identity === 'guest' && !sh.back ? `<button class="btn" data-act="openLinkPlayer" data-id="${p.id}">Link to saved player…</button>` : ''}${canInvite(p) ? `<button class="btn" data-act="openEditPlayer" data-id="${p.id}">Edit details</button><button class="btn primary" data-act="openInvite" data-id="${p.id}">Invite</button>` : ''}`);
+      <p class="small muted" style="margin:0">Levels are set per session while preparing a roster, not here.</p>
+        </div>
+      </div>`,
+      `${sh.back ? `<button class="btn" data-act="profileBack">Back to ${{ suggest: 'suggestion', payments: 'payments', dispatch: 'match', match: 'match', onCourt: 'match', invalid: 'match' }[sh.back.type] || 'previous'}</button>` : '<button class="btn" data-act="closeSheet">Close</button>'}${sh.back ? '' : `<button class="btn danger" data-act="deletePlayer" data-id="${p.id}">Delete player</button>`}${p.identity === 'guest' && !sh.back ? `<button class="btn" data-act="openLinkPlayer" data-id="${p.id}">Link to saved player…</button>` : ''}${canInvite(p) ? `<button class="btn" data-act="openEditPlayer" data-id="${p.id}">Edit details</button><button class="btn primary" data-act="openInvite" data-id="${p.id}">Invite</button>` : ''}`, false, 'pp-sheet');
   },
   // #739 (proposed): add a bagging pair. A player can be in one pair; picking one who is already paired offers to replace that pair.
   bagAdd(sh) {

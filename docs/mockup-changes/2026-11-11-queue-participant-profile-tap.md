@@ -57,3 +57,9 @@ Superseded by: none
 ## Owner comment, November 11, 2026 (third, on the session page waitlist)
 - "you should be able to click on yourself and show the profile dialog".
 - Changed: on the session page (Participants grid and the Waitlist grid), the signed-in viewer's own tile is always a button that opens the profile card, whatever the identity flag on their record. Accessible name: **NAME (you) · view your profile**. An always-private player sees their own profile in full; only other viewers get the masked card.
+
+## Owner comment, November 11, 2026 (fourth, on the session page waitlist)
+- "private accounts can show their profile dialogs, but since they are private it should show that … the only public is their face and their banner".
+- Changed: an always-private player's tile shows their real picture (not initials) to signed-in viewers, and tapping it opens the same banner profile card with the picture (tap for the full photo), the banner, the masked name, a **Private profile** chip and one boxed section **Private**: “This player keeps their profile private. Only their picture and banner are shown; their name, level and stats are hidden.” No level, status, About or Stats. The player themselves still sees their full card.
+- This overrides the #715 proposal that always-private hides the photo too (answer Q3 in the decision pack as “name only; picture and banner stay public”).
+- Copy added: **Private profile** (chip), **Private** (section label), the sentence above.

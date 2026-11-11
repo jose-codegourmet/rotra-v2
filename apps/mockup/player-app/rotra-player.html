@@ -252,7 +252,7 @@ textarea.input { min-height: 80px; resize: vertical; }
 
 
 /* ---------- Player Information ---------- */
-:root { --qr-bg: #ffffff; --qr-fg: #0b0b0c; --top-h: 61px; --gold: #f2c14e; --silver: #c3c8d0; --bronze: #d38b52; }
+:root { --viewer-bg: #000000; --viewer-fg: #ffffff; --qr-bg: #ffffff; --qr-fg: #0b0b0c; --top-h: 61px; --gold: #f2c14e; --silver: #c3c8d0; --bronze: #d38b52; }
 @media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) { --gold: #946600; --silver: #5f6774; --bronze: #93501f; } }
 :root[data-theme="light"] { --gold: #946600; --silver: #5f6774; --bronze: #93501f; }
 button.brand { background: none; border: 0; padding: 0; cursor: pointer; color: inherit; font: inherit; font-weight: 800; letter-spacing: 1.5px; font-size: 17px; }
@@ -545,6 +545,52 @@ a.srow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .sh-foot span.tag { font-size: 11px; color: var(--qc-dim); }
 .sh-code { width: 64px; height: 64px; flex: none; border-radius: 8px; background: #fff; color: #000; overflow: hidden; }
 .sh-code svg { display: block; width: 100%; height: 100%; }
+/* Photo viewer (#716, proposed): black overlay, photo centred, × top right; tap the overlay, press × or Esc to close. */
+.av-open { display: inline-flex; padding: 0; border: 0; background: none; color: inherit; border-radius: inherit; cursor: zoom-in; flex: none; }
+.av-open:focus-visible { outline: none; }
+.av-open:focus-visible .avatar { outline: 2px solid var(--accent); outline-offset: 2px; }
+.viewer { position: fixed; inset: 0; z-index: 60; background: var(--viewer-bg); display: grid; place-items: center; padding: 64px 16px; cursor: zoom-out; animation: fade .15s; }
+.viewer h2:focus { outline: none; }
+.viewer-x { position: absolute; top: calc(12px + env(safe-area-inset-top, 0px)); right: 12px; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; padding: 0; border: 1px solid color-mix(in srgb, var(--viewer-fg) 45%, transparent); background: transparent; color: var(--viewer-fg); cursor: pointer; }
+.viewer-x:focus-visible { outline: 2px solid var(--viewer-fg); outline-offset: 2px; }
+.viewer-img { width: min(100%, 640px, calc(100dvh - 128px)); aspect-ratio: 1; border-radius: 12px; overflow: hidden; }
+.viewer-img img, .viewer-img svg { width: 100%; height: 100%; display: block; object-fit: contain; }
+@media (prefers-reduced-motion: reduce) { .viewer { animation: none !important; } }
+/* Profile visibility (#715, proposed): three choices instead of one switch. */
+.choices { display: flex; flex-direction: column; gap: 8px; }
+.choice { display: flex; gap: 12px; align-items: flex-start; text-align: left; width: 100%; min-height: 44px; padding: 12px; border: 1px solid var(--border-strong); border-radius: var(--r); background: var(--bg); color: var(--fg); font: inherit; cursor: pointer; }
+.choice[aria-checked="true"] { border-color: var(--accent); background: var(--accent-subtle); }
+.choice:disabled { opacity: .6; cursor: default; }
+.choice:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.choice .dot { flex: none; width: 18px; height: 18px; margin-top: 2px; border-radius: 50%; border: 2px solid var(--border-strong); }
+.choice[aria-checked="true"] .dot { border-color: var(--accent); background: var(--accent); box-shadow: inset 0 0 0 3px var(--bg); }
+/* Share profile (#738, proposed): profile card blocks and the link field. */
+.sh-lv.dim { color: var(--qc-fg); }
+.sh-stats { display: flex; flex-direction: column; gap: 8px; }
+.sh-stats > span { font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; color: var(--qc-dim); }
+.sh-stats .g { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.sh-stats .g div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.sh-stats .g b { font: 700 20px/1.1 var(--mono); color: var(--qc-fg); }
+.sh-stats .g em { font-style: normal; font-size: 10px; color: var(--qc-dim); }
+.sh-link { width: 100%; display: flex; flex-direction: column; gap: 6px; text-align: left; }
+.rtr-line input { flex: 1; min-width: 0; border: 0; background: none; color: inherit; font: 13px var(--mono); padding: 0; text-overflow: ellipsis; }
+.rtr-line input:focus { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+/* Public club page (#737, proposed). */
+.crow.mbtn { width: 100%; border: 0; border-radius: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+button.crow.mbtn:hover { background: var(--elev); }
+button.crow.mbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.cal-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.cal .dow { font-size: 11px; font-weight: 600; text-align: center; color: var(--fg2); }
+.cal .day { min-height: 44px; border-radius: var(--r-sm); border: 1px solid var(--border); padding: 4px; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 13px; background: var(--bg); }
+.cal .day.out { border-color: transparent; background: none; }
+.cal .day.today { border-color: var(--accent); }
+.cal .dots { display: flex; gap: 3px; }
+.cal .dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.cal .dots i.done { background: var(--fg3); }
+.cal-key { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--fg2); }
+.cal-key i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); margin-right: 6px; }
+.cal-key i.done { background: var(--fg3); }
 </style>
 
 <div id="app"></div>
@@ -589,6 +635,9 @@ const CLUBS = [
 const FIXED = { 2: ['Theo Ramos'], 40: ['Marco Lopez'], 62: ['Enzo Navarro'], 96: ['Paulo Garcia', 'Pau'], 155: ['Bea Castillo'], 200: ['Rafa Aquino'], 339: ['Kat Lim'], 511: ['Dani Rivera'], 702: ['Carlo Medina'], 860: ['Iya Mercado'] };
 // Two sample players with a private profile (leaderboard positions 6 and 10), so visitors see the masking and the gate.
 const PRIVATE_SEED = new Set([5, 9]);
+// Proposed (#715): one sample player is always private (leaderboard position 12) and three are hidden from Player Information.
+const ALWAYS_SEED = new Set([11]);
+const HIDDEN_SEED = new Set([3, 20, 41]);
 const MIGS_SLOT = 127; // Migs is #128 while he qualifies
 
 function hashStr(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
@@ -602,7 +651,7 @@ for (let i = 0; i < 1283; i++) {
   BASE.push({
     id: `b${i}`, name, nick, photo: (h >>> 24) % 6 !== 0, level: levelAt(origPos), recent: 10 + ((h >>> 4) % 16),
     rtr: `RTR-PH-${CITIES[(h >>> 12) % CITIES.length]}-${DATES[(h >>> 6) % DATES.length]}-${String(100 + i).padStart(4, '0')}`,
-    profilePrivate: PRIVATE_SEED.has(i),
+    profilePrivate: PRIVATE_SEED.has(i) || ALWAYS_SEED.has(i), alwaysPrivate: ALWAYS_SEED.has(i), hiddenDir: HIDDEN_SEED.has(i),
   });
 }
 
@@ -707,7 +756,7 @@ function freshUi() {
     claim: null, regCtx: { club: null, session: null }, regDone: null, claimErr: {}, claimPending: false, claimChecks: 0, claimConfirmed: false, claimWrong: false,
     edit: null, editOrig: null, editErr: {}, editPending: false, editFail: '',
     req: null, reqErr: '', reqPending: false,
-    privacyPending: false, privacyErr: '', profilePending: false, profileErr: '',
+    privacyPending: false, privacyErr: '', profilePending: false, profileErr: '', dirPending: false, dirErr: '',
     sheet: null, hist: 'counted', findId: '', resetArmed: false, pendingGo: null,
   };
 }
@@ -721,7 +770,7 @@ Object.assign(S.ui, { sheet: null, pendingGo: null, resetArmed: false });
 ['login', 'forgot', 'reset'].forEach((k) => { S.ui[k].pending = false; });
 if (S.accounts?.u1 && !S.accounts.u1.clubs) { S.accounts.u1.clubs = seedClubs(); S.accounts.u1.emailConfirmed = true; }
 S.ui.regCtx = S.ui.regCtx || { club: null, session: null };
-S.ui.claimPending = false; S.ui.editPending = false; S.ui.reqPending = false; S.ui.privacyPending = false; S.ui.profilePending = false;
+S.ui.claimPending = false; S.ui.editPending = false; S.ui.reqPending = false; S.ui.privacyPending = false; S.ui.profilePending = false; S.ui.dirPending = false;
 if (S.board === 'loading') S.board = 'ok';
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable: keep working in memory */ } }
 // Light / dark: dark by default (or the device setting until the viewer picks one); the choice is remembered on this device.
@@ -773,11 +822,16 @@ function faceSVG(p) {
     ${glasses ? '<g fill="none" stroke="#1b1817" stroke-width="1.3"><circle cx="27" cy="29.5" r="4"/><circle cx="37" cy="29.5" r="4"/><path d="M31 29.5h2"/></g>' : ''}
   </svg>`;
 }
-const avatar = (p, cls = '') => (p.photoUrl
+const avatarEl = (p, cls = '') => (p.photoUrl
   ? `<span class="avatar photo ${cls}" role="img" aria-label="Profile picture of ${esc(p.name)}"><img src="${p.photoUrl}" alt=""></span>`
   : p.photo
   ? `<span class="avatar photo ${cls}" role="img" aria-label="Profile picture of ${esc(p.name)}">${faceSVG(p)}</span>`
   : `<span class="avatar ${cls}" aria-hidden="true">${esc(initials(p.name))}</span>`);
+// Proposed (#716): an avatar with a real picture (photo or character, never initials) opens the full photo when `view` is set.
+// Avatars that sit inside a tap target that opens a profile (leaderboard rows, the podium, club members) pass no `view`; the photo opens from the big photo inside the profile.
+const avatar = (p, cls = '', view = false) => (view && (p.photoUrl || p.photo) && p.id && !hiddenFromViewer(p)
+  ? `<button type="button" class="av-open" data-act="viewPhoto" data-id="${esc(p.id)}" aria-label="View full photo of ${esc(p.name)}">${avatarEl(p, cls)}</button>`
+  : avatarEl(p, cls));
 function toast(text) {
   const el = document.createElement('div');
   el.className = 'toast';
@@ -837,7 +891,8 @@ function profileOf(pid) {
   return { ...e, claimed: true, state: 'eligible', style: '', expY: '', expM: '', social: {}, sessions, recent: countedIn(sessions, WINDOW_DAYS) };
 }
 // Visitors (not signed in) never see a private player or a guest: masked and not opened (D-2026-11-09-07).
-const hiddenFromVisitor = (p) => !S.me && !!p && !!(p.profilePrivate || p.guest);
+// Proposed (#715): an always-private player stays masked for signed-in players too; the player sees their own profile.
+const hiddenFromViewer = (p) => !!p && p.id !== S.me && (!!p.alwaysPrivate || (!S.me && !!(p.profilePrivate || p.guest)));
 const maskName = (name) => name.split(/\s+/).filter(Boolean).map((w) => `${w[0]}***`).join(' ');
 const maskedView = (e) => ({ id: e.id, name: maskName(e.name), nick: '', photo: false, level: e.level });
 // Migs joins the list only while his own figures qualify; everyone else is filtered by the current threshold.
@@ -847,7 +902,7 @@ function boardList() {
   const out = [];
   const migs = migsOnBoard();
   BASE.forEach((e, i) => {
-    if (i === MIGS_SLOT && migs) out.push({ id: 'u1', name: S.accounts.u1.name, nick: S.accounts.u1.nick, photo: S.accounts.u1.photo, face: S.accounts.u1.face, photoUrl: S.accounts.u1.photoUrl, level: S.accounts.u1.level, profilePrivate: S.accounts.u1.profilePrivate });
+    if (i === MIGS_SLOT && migs) out.push({ id: 'u1', name: S.accounts.u1.name, nick: S.accounts.u1.nick, photo: S.accounts.u1.photo, face: S.accounts.u1.face, photoUrl: S.accounts.u1.photoUrl, level: S.accounts.u1.level, profilePrivate: S.accounts.u1.profilePrivate, alwaysPrivate: S.accounts.u1.alwaysPrivate });
     if (e.recent >= T()) out.push(e);
   });
   return out;
@@ -932,7 +987,7 @@ function emailBanner() {
 function lbRow(e, pos) {
   const me = e.id === S.me;
   const medal = ['', 'first', 'second', 'third'][pos] || '';
-  if (hiddenFromVisitor(e)) {
+  if (hiddenFromViewer(e)) {
     const m = maskedView(e);
     return `<div class="lb-row${medal ? ` podium p${pos}` : ''}" id="row-${e.id}" aria-disabled="true"><span class="lb-pos">${num(pos)}</span>${avatar(m)}
     <span class="lb-name"><b>${esc(m.name)}</b></span><span class="lb-lv">${lvLabel(e.level)}</span></div>`;
@@ -946,7 +1001,7 @@ function meCard(list) {
   if (!S.me) return '';
   const p = profileOf(S.me);
   const pos = list.findIndex((e) => e.id === S.me) + 1;
-  if (pos) return `<section class="card hl between"><div class="row" style="gap:12px">${avatar(p)}<div><p class="small muted">Your position</p><p><b class="mono" style="font-size:20px">#${num(pos)}</b> · ${lvLabel(p.level)}</p></div></div><button class="btn sm" data-act="jumpMe" data-pos="${pos}">Show my row</button></section>`;
+  if (pos) return `<section class="card hl between"><div class="row" style="gap:12px">${avatar(p, '', true)}<div><p class="small muted">Your position</p><p><b class="mono" style="font-size:20px">#${num(pos)}</b> · ${lvLabel(p.level)}</p></div></div><button class="btn sm" data-act="jumpMe" data-pos="${pos}">Show my row</button></section>`;
   const st = rankStatus(p, null);
   return `<section class="card stack tight"><div class="between"><h3>You're not on the leaderboard${p.state === 'reassess' ? ' right now' : ' yet'}</h3>${st.chips}</div><p class="small muted">${st.text}</p>
     <div class="row"><button class="btn xs" data-act="openProfile" data-id="${p.id}">Open my profile</button></div></section>`;
@@ -964,7 +1019,7 @@ function viewBoard() {
   } else if (!list.length) {
     body = `<div class="empty">No players qualify for the leaderboard yet. Players appear after ${T()} standard matches in the last three months.</div>`;
   } else if (q && !isId) {
-    const hits = list.map((e, i) => ({ e, pos: i + 1 })).filter(({ e }) => !hiddenFromVisitor(e) && (e.name.toLowerCase().includes(ql) || (e.nick || '').toLowerCase().includes(ql)));
+    const hits = list.map((e, i) => ({ e, pos: i + 1 })).filter(({ e }) => !hiddenFromViewer(e) && (e.name.toLowerCase().includes(ql) || (e.nick || '').toLowerCase().includes(ql)));
     body = hits.length
       ? `<p class="small muted" aria-live="polite">${hits.length} ${hits.length === 1 ? 'player matches' : 'players match'} “${esc(q)}”${hits.length > 50 ? '. Showing the first 50.' : '.'}</p><div class="lb">${lbHead()}${hits.slice(0, 50).map(({ e, pos }) => lbRow(e, pos)).join('')}</div>`
       : `<div class="empty" aria-live="polite">No one on the leaderboard matches “${esc(q)}”. Players below the match requirement aren't listed here.</div>`;
@@ -1005,7 +1060,7 @@ function podium(list) {
   const embers = Array.from({ length: 14 }, (_, k) => `<i style="left:${4 + ((k * 37) % 92)}%;animation-delay:${((k * 0.73) % 5).toFixed(2)}s;animation-duration:${4 + (k % 4)}s"></i>`).join('');
   return `<section class="podium" aria-labelledby="pod-title"><span class="embers" aria-hidden="true">${embers}</span>
     <div class="pod-head"><h2 id="pod-title">Top three</h2><span class="small muted">Overall ROTRA leaderboard · ${num(list.length)} players</span></div>
-    <div class="pod-stage">${list.slice(0, 3).map((e, i) => hiddenFromVisitor(e) ? `
+    <div class="pod-stage">${list.slice(0, 3).map((e, i) => hiddenFromViewer(e) ? `
     <div class="pod p${i + 1}" aria-disabled="true">
       <span class="pod-who">${i === 0 ? '<canvas class="fire" id="fire" width="48" height="40" aria-hidden="true"></canvas>' : ''}${avatar(maskedView(e), 'pod-av')}
         <b class="pod-name">${esc(maskName(e.name))}</b><span class="pod-lv">${lvLabel(e.level)}</span></span>
@@ -1093,7 +1148,7 @@ function startFire() {
 function viewProfile() {
   const p = profileOf(S.viewId);
   if (!p) return viewNotFound();
-  if (hiddenFromVisitor(p)) return viewPrivateGate();
+  if (hiddenFromViewer(p)) return viewPrivateGate(p);
   const own = p.id === S.me;
   const pos = positionOf(p.id);
   const st = rankStatus(p, pos);
@@ -1103,11 +1158,11 @@ function viewProfile() {
   return `<main class="wrap"><div class="prof">
     <aside class="side stack">
       <section class="card hero">
-        <div class="who">${own ? `<span class="av-edit">${avatar(p, 'xxl')}<button type="button" class="av-cam" data-act="openAvatar" aria-label="Change profile picture" title="Change profile picture">${I.edit}</button></span>` : avatar(p, 'xxl')}<div style="min-width:0" class="stack tight"><h1>${esc(p.name)}</h1>${p.nick ? `<p class="muted">“${esc(p.nick)}”</p>` : ''}${own ? `<div class="row">${chip('This is you', 'ok')}</div>` : ''}</div></div>
+        <div class="who">${own ? `<span class="av-edit">${avatar(p, 'xxl', true)}<button type="button" class="av-cam" data-act="openAvatar" aria-label="Change profile picture" title="Change profile picture">${I.edit}</button></span>` : avatar(p, 'xxl', true)}<div style="min-width:0" class="stack tight"><h1>${esc(p.name)}</h1>${p.nick ? `<p class="muted">“${esc(p.nick)}”</p>` : ''}${own ? `<div class="row">${chip('This is you', 'ok')}</div>` : ''}</div></div>
         <div class="stack tight"><span class="label">Player ID</span>
           <div class="rtr-line"><code id="rtr-${p.id}">${esc(p.rtr)}</code><button class="btn xs" data-act="copyId" data-id="${p.id}" aria-label="Copy player ID">${I.copy} Copy</button></div>
           <span class="hint">Shows the city and date this profile was first created. It isn't where ${own ? 'you live or which club you play for' : 'this player lives or which club they play for'}.</span></div>
-        ${own ? `<div class="acts"><button class="btn sm" data-act="openEdit">${I.edit} Edit profile</button><button class="btn sm" data-act="go" data-to="id">${I.qr} My player ID</button></div>` : `<div class="acts"><button class="btn sm primary" data-act="openCompare" data-id="${p.id}">${I.versus} Compare with ${S.me ? 'me' : 'my results'}</button></div>`}
+        ${own ? `<div class="acts"><button class="btn sm" data-act="openEdit">${I.edit} Edit profile</button><button class="btn sm" data-act="go" data-to="id">${I.qr} My player ID</button><button class="btn sm" data-act="openShare" data-kind="profile">${I.share} Share profile</button></div>` : `<div class="acts"><button class="btn sm primary" data-act="openCompare" data-id="${p.id}">${I.versus} Compare with ${S.me ? 'me' : 'my results'}</button></div>`}
       </section>
       ${own ? privatePanel(p) + clubsPanel(p) : ''}
     </aside>
@@ -1192,9 +1247,87 @@ function clubsPanel(p) {
     const club = CLUB_DIR[c.id];
     const mail = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(`Problem with ${club.name}`)}&body=${encodeURIComponent(`Club: ${club.name}\nMy ROTRA player ID: ${p.rtr}\n\nWhat went wrong:\n`)}`;
     return `<div class="crow">${avatar({ name: club.name })}<div class="main"><b>${esc(club.name)}</b><span class="small muted">${VIA[c.via]}</span>
-      <div class="btns"><button class="btn xs" data-act="openLeaveClub" data-id="${c.id}">Leave club</button><a class="btn xs" href="${mail}">Report a problem</a></div></div></div>`;
+      <div class="btns"><button class="btn xs" data-act="openClub" data-id="${c.id}">Club page</button><button class="btn xs" data-act="openLeaveClub" data-id="${c.id}">Leave club</button><a class="btn xs" href="${mail}">Report a problem</a></div></div></div>`;
   }).join('')}</div><span class="hint">Report a problem opens your email app.</span>` : '<div class="empty">You\'re not in any club\'s saved players yet.</div>'}</section>`;
 }
+
+// ---------- P-CLUB-PAGE (public club page, epic P07, proposed #737) ----------
+// Public: anyone can open /clubs/[clubId]. Registered members only; visitors see names masked like the public session page,
+// signed-in players see names, always-private members stay masked, members hidden from Player Information are not listed,
+// and guests and unclaimed profiles never appear. The page is separate from the club invite link (Join this club opens that link).
+const CLUB_IDS = Object.keys(CLUB_DIR);
+const CLUB_MEMBERS_PAGE = 12;
+function clubMembers(id) {
+  const out = [];
+  Object.values(S.accounts).forEach((a) => {
+    if (!a.claimed || a.hiddenDir || !(a.clubs || []).some((c) => c.id === id)) return;
+    const p = profileOf(a.id);
+    out.push({ id: a.id, name: a.name, nick: a.nick, photo: a.photo, face: a.face, photoUrl: a.photoUrl, level: p.level, profilePrivate: a.profilePrivate, alwaysPrivate: a.alwaysPrivate });
+  });
+  BASE.forEach((e) => { if (!e.hiddenDir && CLUB_IDS[hashStr(`club-${e.id}`) % CLUB_IDS.length] === id) out.push(e); });
+  return out;
+}
+// Upcoming (scheduled and live, never cancelled) and done sessions from the last 90 days. `ago` is days back; negative is ahead.
+function clubSessions(id) {
+  const up = MY_SESSIONS.filter((m) => SESSION_DIR[m.slug].club === id).map((m) => ({ slug: m.slug, title: SESSION_DIR[m.slug].title, ago: -m.day, time: m.time, live: m.status === 'live', done: false }));
+  const done = MIGS_SESSIONS.filter((x) => x.club === CLUB_DIR[id].name && x.ago <= WINDOW_DAYS).map((x) => ({ title: x.title, ago: x.ago, time: '', live: false, done: true, gone: !!x.pageGone }));
+  return { up: up.sort((a, b) => b.ago - a.ago), all: [...up, ...done] };
+}
+const monthIdx = (d) => d.getFullYear() * 12 + d.getMonth();
+function clubCalendar(sessions, off) {
+  const now = new Date(), first = new Date(now.getFullYear(), now.getMonth() + off, 1), idx = monthIdx(first);
+  const days = new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate();
+  const inMonth = sessions.filter((x) => monthIdx(dayOf(x.ago)) === idx).sort((a, b) => b.ago - a.ago);
+  const on = (d) => inMonth.filter((x) => dayOf(x.ago).getDate() === d);
+  const cells = [...Array(first.getDay()).fill(null), ...Array.from({ length: days }, (_, k) => k + 1)];
+  const title = first.toLocaleDateString([], { month: 'long', year: 'numeric' });
+  const grid = `<div class="cal" role="group" aria-label="${title}">${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => `<span class="dow" aria-hidden="true">${d}</span>`).join('')}${cells.map((d) => {
+    if (!d) return '<span class="day out" aria-hidden="true"></span>';
+    const list = on(d), isToday = off === 0 && d === now.getDate();
+    return `<span class="day${isToday ? ' today' : ''}"${isToday ? ' aria-current="date"' : ''}${list.length ? ` aria-label="${esc(`${title.split(' ')[0]} ${d}: ${list.map((x) => x.title).join(', ')}`)}"` : ''}>${d}${list.length ? `<span class="dots" aria-hidden="true">${list.map((x) => `<i${x.done ? ' class="done"' : ''}></i>`).join('')}</span>` : ''}</span>`;
+  }).join('')}</div>`;
+  return { title, grid, inMonth };
+}
+function viewClub() {
+  const id = S.viewId, club = CLUB_DIR[id];
+  if (!club) return viewNotFound();
+  const city = (PLACES.find(([c]) => c === club.code) || [0, club.code])[1];
+  const members = clubMembers(id), shown = Math.min(members.length, S.ui.clubShown || CLUB_MEMBERS_PAGE);
+  const { up, all } = clubSessions(id);
+  const off = Math.max(minOff(), Math.min(S.ui.clubMonth || 0, maxOff(all)));
+  const cal = clubCalendar(all, off);
+  const stat = (x) => (x.live ? chip('Happening now', 'ok') : x.done ? chip('Done') : chip('Scheduled', 'solid'));
+  const when = (x) => `${fmtDay(x.ago)}${x.time ? ` · ${x.time}` : ''}`;
+  const member = (e) => {
+    const hid = hiddenFromViewer(e), m = hid ? maskedView(e) : e;
+    const inner = `${avatar(m)}<div class="main"><b>${esc(m.name)}</b>${!hid && e.id === S.me ? ' ' + chip('You', 'ok') : ''}<span class="small muted">${lvLabel(e.level)}</span></div>`;
+    return hid ? `<div class="crow">${inner}</div>` : `<button type="button" class="crow mbtn" data-act="openProfile" data-id="${e.id}" aria-label="${esc(e.name)}, ${lvLabel(e.level)}">${inner}</button>`;
+  };
+  const sessionRow = (x) => (x.done
+    ? `<div class="srow"><span class="main"><b>${esc(x.title)}</b><span class="small muted">${when(x)}</span></span><span class="row">${stat(x)}${x.gone ? '<span class="small muted srow-note">Session page no longer available</span>' : `<button class="btn xs ghost" data-act="sessionPage" data-title="${esc(x.title)}">Session page ${I.ext}</button>`}</span></div>`
+    : `<a class="srow" href="/queue/s/${encodeURIComponent(x.slug)}"><span class="main"><b>${esc(x.title)}</b><span class="small muted">${when(x)}</span></span>${stat(x)}</a>`);
+  return `<main class="wrap mid">
+    <div class="page-head">${backBtn('goBoard', 'Leaderboard')}</div>
+    <section class="card hero">
+      <div class="who">${avatar({ name: club.name }, 'xxl')}<div style="min-width:0" class="stack tight"><h1>${esc(club.name)}</h1>
+        <dl class="kv"><dt>Founding city</dt><dd>${esc(city)}</dd><dt>Members</dt><dd>${num(members.length)}</dd></dl></div></div>
+      <div class="acts"><button class="btn sm primary" data-act="clubJoin" data-club="${id}">Join this club</button><button class="btn sm" data-act="shareClub" data-club="${id}">${I.share} Share club page</button></div>
+    </section>
+    <section class="card stack"><h2>Members</h2>
+      ${S.me ? '' : '<p class="small muted">Names are masked. Sign in with ROTRA to see them.</p>'}
+      ${members.length ? `<div>${members.slice(0, shown).map(member).join('')}</div>${shown < members.length ? `<div class="row"><button class="btn sm" data-act="clubMore">Show more members</button><span class="small muted">${num(shown)} of ${num(members.length)}</span></div>` : ''}` : '<div class="empty">No registered members yet.</div>'}</section>
+    <section class="card stack"><h2>Upcoming sessions</h2>
+      ${up.length ? `<div>${up.map(sessionRow).join('')}</div>` : '<div class="empty">No upcoming sessions.</div>'}</section>
+    <section class="card stack"><div class="cal-head"><h2>Calendar</h2><div class="row"><button class="btn xs" data-act="clubMonth" data-v="${off - 1}" aria-label="Previous month" ${off <= minOff() ? 'disabled' : ''}>${I.back}</button><b aria-live="polite">${cal.title}</b><button class="btn xs" data-act="clubMonth" data-v="${off + 1}" aria-label="Next month" ${off >= maxOff(all) ? 'disabled' : ''}>${I.fwd}</button></div></div>
+      ${cal.grid}
+      <div class="cal-key" aria-hidden="true"><span><i></i>Upcoming</span><span><i class="done"></i>Done</span></div>
+      ${cal.inMonth.length ? `<div>${cal.inMonth.map(sessionRow).join('')}</div>` : `<div class="empty">No sessions in ${esc(cal.title)}.</div>`}
+      <span class="hint">Done sessions from the last three months stay on the calendar.</span></section>
+  </main>`;
+}
+// The calendar reaches back three months and forward to the last upcoming session.
+const minOff = () => monthIdx(dayOf(WINDOW_DAYS)) - monthIdx(new Date());
+const maxOff = (all) => Math.max(0, ...all.filter((x) => !x.done).map((x) => monthIdx(dayOf(x.ago)) - monthIdx(new Date())));
 
 // ---------- P-COMPARE ----------
 // Head to head with the signed-in player. The prototype draws the shared games from the two ids, so the same pair always gives the same record.
@@ -1220,7 +1353,7 @@ const cmpCourtSVG = () => `<svg class="sc-svg" viewBox="0 0 134 61" aria-hidden=
 function viewCompare() {
   const them = profileOf(S.viewId), me = S.me ? profileOf(S.me) : null;
   if (!them) return viewNotFound();
-  if (hiddenFromVisitor(them)) return viewPrivateGate();
+  if (hiddenFromViewer(them)) return viewPrivateGate(them);
   if (!me) return viewLogin();
   if (them.id === me.id) { S.screen = 'profile'; return viewProfile(); }
   const all = sharedGames(me.id, them.id), against = all.filter((g) => !g.together), together = all.filter((g) => g.together);
@@ -1233,14 +1366,14 @@ function viewCompare() {
   const n = games.length, myWins = games.filter((g) => g.meWon).length, theirWins = games.filter((g) => (g.together ? g.meWon : !g.meWon)).length;
   const recL = flt === 'h2h' ? myWins : myWins, recR = flt === 'h2h' ? theirWins : n - myWins;
   const recLabelL = flt === 'together' ? 'Won' : 'You won', recLabelR = flt === 'h2h' ? `${fn} won` : flt === 'together' ? 'Lost' : 'You lost';
-  const who = (p, you) => `<div class="cmp-who">${avatar(p, 'xl')}<b>${you ? 'You' : esc(firstName(p))}</b></div>`;
+  const who = (p, you) => `<div class="cmp-who">${avatar(p, 'xl', true)}<b>${you ? 'You' : esc(firstName(p))}</b></div>`;
   const row = (label, a, b, better) => `<div class="cmp-row"><b class="${better === 'a' ? 'lead' : ''}">${a}</b><span class="small muted">${label}</span><b class="${better === 'b' ? 'lead' : ''}">${b}</b></div>`;
   const hi = (x, y, low) => (x == null || y == null || x === y ? '' : (low ? x < y : x > y) ? 'a' : 'b');
   const tot = against.length || 1;
   const who2 = (x) => (x.who === 'me' ? me : x.who === 'them' ? them : { id: `x-${x.name}`, name: x.name, photo: hashStr(x.name) % 4 !== 0 });
   const lvOf = (x, q) => (x.who === 'me' ? lvLabel(me.level) : x.who === 'them' ? lvLabel(them.level) : LEVELS[hashStr(`lv-${q.name}`) % LEVELS.length].label);
   const pl = (x, won) => { const q = who2(x), nm = x.who === 'me' ? 'You' : firstName(q);
-    return `<span class="cmp-pl ${won ? 'won' : ''}"><span class="cmp-av">${avatar(q)}<i class="cmp-g tnum" role="img" aria-label="${esc(nm)}: ${x.games} games in that session">${x.games}</i></span><b>${esc(nm)}</b><span class="cmp-lv">${esc(lvOf(x, q))}</span></span>`; };
+    return `<span class="cmp-pl ${won ? 'won' : ''}"><span class="cmp-av">${avatar(q, '', !!x.who)}<i class="cmp-g tnum" role="img" aria-label="${esc(nm)}: ${x.games} games in that session">${x.games}</i></span><b>${esc(nm)}</b><span class="cmp-lv">${esc(lvOf(x, q))}</span></span>`; };
   const gameLine = (g) => {
     const label = g.together ? `<span class="chip ${g.meWon ? 'ok' : ''}">Together · ${g.meWon ? 'won' : 'lost'}</span>` : `<span class="chip ${g.meWon ? 'ok' : 'bad'}">${g.meWon ? 'You won' : `${esc(fn)} won`}</span>`;
     const names = (side) => side.map((x) => (x.who === 'me' ? 'You' : esc(firstName(who2(x))))).join(' and ');
@@ -1255,7 +1388,7 @@ function viewCompare() {
       <p class="muted">Official results from finished club sessions. Only singles and doubles count here; fun and partial games are left out.</p></div>
     <div class="seg cmp-filter" role="group" aria-label="Show games">${[['all', 'All', all.length], ['h2h', 'Head to head', against.length], ['together', 'Together', together.length]].map(([k, l, n]) => `<button type="button" aria-pressed="${flt === k}" data-act="cmpFilter" data-v="${k}">${l} · ${n}</button>`).join('')}</div>
     ${flt === 'together' ? `<section class="card stack cmp-team-card">
-      <div class="cmp-tm"><span class="cmp-tm-av">${avatar(me, 'xl')}${avatar(them, 'xl')}</span><div class="stack tight"><b>You and ${esc(fn)}</b><span class="small muted">As a team</span></div></div>
+      <div class="cmp-tm"><span class="cmp-tm-av">${avatar(me, 'xl', true)}${avatar(them, 'xl', true)}</span><div class="stack tight"><b>You and ${esc(fn)}</b><span class="small muted">As a team</span></div></div>
       ${n ? `<div class="cmp-tiles"><div><b class="tnum">${n}</b><span class="small muted">Games</span></div><div class="won"><b class="tnum">${myWins}</b><span class="small muted">Won</span></div><div><b class="tnum">${n - myWins}</b><span class="small muted">Lost</span></div></div>
       <div class="cmp-wr"><span class="small muted">Win rate as a team</span><b class="tnum">${Math.round((myWins / n) * 100)}%</b></div>
       <div class="h2h-bar" role="img" aria-label="Won ${myWins} of ${n} games together"><i style="flex-grow:${myWins || 0.001}"></i><i class="them" style="flex-grow:${n - myWins || 0.001}"></i></div>
@@ -1285,7 +1418,7 @@ function viewCompare() {
 // ---------- P-RANK-DETAIL ----------
 function viewRank() {
   const p = S.viewId ? profileOf(S.viewId) : null;
-  if (hiddenFromVisitor(p)) return viewPrivateGate();
+  if (hiddenFromViewer(p)) return viewPrivateGate(p);
   const w = S.config.weight;
   const st = p ? rankStatus(p, positionOf(p.id)) : null;
   return `<main class="wrap mid">
@@ -1320,7 +1453,7 @@ function viewRank() {
 function viewHistory() {
   const p = profileOf(S.viewId);
   if (!p) return viewNotFound();
-  if (hiddenFromVisitor(p)) return viewPrivateGate();
+  if (hiddenFromViewer(p)) return viewPrivateGate(p);
   const tab = S.ui.hist;
   const kinds = tab === 'counted' ? ['counted'] : ['fun', 'partial'];
   const blocks = p.sessions.map((s) => sessionBlock(s, kinds, p.id === S.me)).filter(Boolean);
@@ -1398,20 +1531,33 @@ function requestCard(p) {
   }[r.status];
   return `<div class="notice ${r.status === 'applied' ? 'ok' : r.status === 'failed' ? 'bad' : r.status === 'rejected' ? '' : 'warn'}">${r.status === 'applied' ? I.check : I.info}<div class="stack tight"><div class="row">${chip(REQ[r.status].chip, REQ[r.status].k)}<span class="small muted">${REQ_FIELD[r.field]} change · sent ${fmtTime(r.at)}</span></div><p>${text}</p></div></div>`;
 }
+// Proposed (#715): three profile visibility levels. Public sets neither flag, Private sets profilePrivate, Always private sets both.
+const VIS = [
+  ['public', 'Public', 'Visitors and signed-in ROTRA players see your profile.'],
+  ['private', 'Private', 'Visitors see your name masked. Signed-in ROTRA players see your profile.'],
+  ['always', 'Always private', 'Everyone sees your name masked and your initials instead of your photo, except the Queue Master of a session you join.'],
+];
+const VIS_LABEL = { public: 'public', private: 'private', always: 'always private' };
 function viewAccount() {
   if (!S.me) return viewLogin();
   const p = profileOf(S.me);
   const r = S.requests[p.id];
   const open = r && ['submitted', 'applying', 'failed'].includes(r.status);
   const savedText = p.phoneHidden ? 'Saved: your phone number is hidden from clubs.' : 'Saved: clubs can see your phone number.';
+  const vis = p.alwaysPrivate ? 'always' : p.profilePrivate ? 'private' : 'public';
   return `<main class="wrap slim">
     <div class="page-head">${backBtn('openProfile', 'My profile', p.id)}<h1>Privacy and contact</h1></div>
     <section class="card stack"><h2>Profile visibility</h2>
-      <div class="setting"><div class="main stack tight"><label for="sw-profile" style="font-weight:700">Private profile</label>
-        <p class="small muted">Private means guests don't see your ROTRA profile. Signed-in ROTRA players still see it.</p></div>
-        ${sw(p.profilePrivate, 'toggleProfilePrivate', 'Private profile', `id="sw-profile" ${S.ui.profilePending ? 'disabled aria-busy="true"' : ''}`)}</div>
-      <p class="small" aria-live="polite">${S.ui.profilePending ? 'Saving…' : esc(p.profilePrivate ? 'Saved: your profile is private.' : 'Saved: your profile is public.')}</p>
+      <div class="choices" role="radiogroup" aria-label="Profile visibility">${VIS.map(([k, l, h]) => `<button type="button" class="choice" role="radio" aria-checked="${vis === k}" data-act="setVisibility" data-v="${k}" ${S.ui.profilePending ? 'disabled aria-busy="true"' : ''}><span class="dot" aria-hidden="true"></span><span class="stack tight"><b>${l}</b><span class="small muted">${h}</span></span></button>`).join('')}</div>
+      <p class="small" aria-live="polite">${S.ui.profilePending ? 'Saving…' : esc(`Saved: your profile is ${VIS_LABEL[vis]}.`)}</p>
       ${S.ui.profileErr ? notice('bad', esc(S.ui.profileErr)) : ''}
+    </section>
+    <section class="card stack"><h2>Player Information</h2>
+      <div class="setting"><div class="main stack tight"><label for="sw-dir" style="font-weight:700">Hide me from Player Information</label>
+        <p class="small muted">Clubs can't find you in the Player Information search or by RTR ID. Clubs that already saved you can still add you. You join sessions yourself.</p></div>
+        ${sw(p.hiddenDir, 'toggleDirectory', 'Hide me from Player Information', `id="sw-dir" ${S.ui.dirPending ? 'disabled aria-busy="true"' : ''}`)}</div>
+      <p class="small" aria-live="polite">${S.ui.dirPending ? 'Saving…' : esc(p.hiddenDir ? 'Saved: you are hidden from Player Information.' : 'Saved: clubs can find you in Player Information.')}</p>
+      ${S.ui.dirErr ? notice('bad', esc(S.ui.dirErr)) : ''}
     </section>
     <section class="card stack"><h2>Phone privacy</h2>
       <div class="setting"><div class="main stack tight"><label for="sw-phone" style="font-weight:700">Hide my phone number from clubs</label>
@@ -1474,7 +1620,7 @@ function viewEdit() {
       <p class="small muted">You can't edit these here. Phone and email changes go to the ROTRA platform owner for approval; your player ID never changes.</p>
       <div class="row"><button type="button" class="btn sm" data-act="openRequest">Request a phone or email change</button><button type="button" class="btn sm ghost" data-act="go" data-to="account">Phone privacy</button></div>
       <p class="hint">Rank, club levels and game results come from clubs and can't be changed by players.</p>`
-    : (tab.id === 'basics' ? `<div class="av-now">${avatar(p, 'xl')}<div class="stack tight"><b>Profile picture</b><span class="small muted">Shown on the leaderboard and your profile.</span><div class="row"><button type="button" class="btn sm" data-act="openAvatar">Change picture</button></div></div></div>` : '') + tab.body('ui.edit', d, e, 'ed');
+    : (tab.id === 'basics' ? `<div class="av-now">${avatar(p, 'xl', true)}<div class="stack tight"><b>Profile picture</b><span class="small muted">Shown on the leaderboard and your profile.</span><div class="row"><button type="button" class="btn sm" data-act="openAvatar">Change picture</button></div></div></div>` : '') + tab.body('ui.edit', d, e, 'ed');
   return `<main class="wrap mid">
     <div class="page-head">${backBtn('cancelEdit', 'My profile')}<h1>Edit profile</h1>
       <p class="muted">Fields marked public appear on your profile for anyone to see.</p></div>
@@ -1616,7 +1762,9 @@ function viewClaimDone() {
     <section class="card stack tight"><p>Your player ID stays <span class="mono">${esc(p.rtr)}</span>. Your games and rank carry over.</p>
       <div class="row"><button class="btn primary" data-act="openProfile" data-id="u2">Go to my profile</button></div></section></main>`;
 }
-function viewPrivateGate() {
+function viewPrivateGate(p) {
+  if (p && p.alwaysPrivate) return `<main class="wrap slim"><div class="page-head">${backBtn('goBoard', 'Leaderboard')}<h1>Profile</h1></div>
+    ${notice('', 'This player keeps their profile private.')}</main>`;
   return `<main class="wrap slim"><div class="page-head">${backBtn('goBoard', 'Leaderboard')}<h1>Profile</h1></div>
     ${notice('', 'Log in with ROTRA to see this profile.')}
     <div class="row"><button class="btn primary" data-act="gateLogin">Sign in</button></div></main>`;
@@ -1639,6 +1787,16 @@ function shareModel(sh) {
   const p = profileOf(S.me), s = sh.sid ? migsSessions().find((x) => x.id === sh.sid) : null;
   const top = { p, title: p.name, sub: p.nick ? `“${p.nick}”` : 'ROTRA player' };
   const link = profileLink(p.id);
+  // Proposed (#738): Share profile, own profile only. Always available: no level shows "Not ranked yet", no games shows "No games yet".
+  if (sh.kind === 'profile') {
+    const pos = positionOf(p.id);
+    const gs = p.sessions.filter((x) => x.ago <= WINDOW_DAYS).flatMap((x) => x.games.filter((g) => g.kind === 'counted'));
+    const w = gs.filter((g) => g.res === 'W').length, l = gs.length - w;
+    return { kind: 'profile', title: 'Share profile', top, link, blocks: [
+      { t: 'rank', label: p.level == null ? 'Not ranked yet' : lvLabel(p.level), pos, hidePos: true, dim: p.level == null },
+      gs.length ? { t: 'stats', note: 'Last 90 days', items: [['Games', String(gs.length)], ['W–L', `${w}–${l}`], ['Win rate', `${Math.round((w / gs.length) * 100)}%`]] } : { t: 'stat', text: 'No games yet' },
+    ] };
+  }
   if (sh.kind === 'rank') {
     if (p.level == null) return null;
     const pos = positionOf(p.id);
@@ -1663,7 +1821,8 @@ function shareCardHTML(m, fmt) {
   const blk = (b) => {
     if (b.t === 'h') return `<h3>${esc(b.text)}</h3>`;
     if (b.t === 'p') return `<p>${esc(b.text)}</p>`;
-    if (b.t === 'rank') return `<div class="sh-lv">${esc(b.label)}</div><div class="sh-pos"><span>Overall</span>${b.pos ? `<b>#${num(b.pos)}</b>` : '<b class="none">No position</b>'}</div>`;
+    if (b.t === 'rank') return `<div class="sh-lv${b.dim ? ' dim' : ''}">${esc(b.label)}</div>${b.hidePos && !b.pos ? '' : `<div class="sh-pos"><span>Overall</span>${b.pos ? `<b>#${num(b.pos)}</b>` : '<b class="none">No position</b>'}</div>`}`;
+    if (b.t === 'stats') return `<div class="sh-stats"><span>${esc(b.note)}</span><div class="g">${b.items.map(([k, v]) => `<div><b>${esc(v)}</b><em>${esc(k)}</em></div>`).join('')}</div></div>`;
     if (b.t === 'ladder') return `<div class="sh-ladder" aria-hidden="true">${TIERS.map(([name, bands]) => `<div class="t"><div class="bs">${bands.map((i) => `<i class="${i === b.level ? 'cur' : i < b.level ? 'on' : ''}"></i>`).join('')}</div><em>${name}</em></div>`).join('')}</div>`;
     if (b.t === 'big') return `<div class="sh-big"><b>${esc(b.value)}</b><span>${esc(b.label)}</span></div>`;
     if (b.t === 'stat') return `<div class="sh-stat">${esc(b.text)}</div>`;
@@ -1718,11 +1877,17 @@ async function drawShareCard(m, fmt) {
     if (b.t === 'h') { const sz = m.kind === 'games' ? 18 : 22; font(800, sz); x.fillStyle = FG; wrap(b.text, W, 2).forEach((ln) => { y += sz * 1.15; x.fillText(ln, pad, y - 3); }); y += 8; }
     else if (b.t === 'p') { font(400, 13); x.fillStyle = DIM; wrap(b.text, W, 2).forEach((ln) => { y += 18; x.fillText(ln, pad, y - 4); }); y += 8; }
     else if (b.t === 'rank') {
-      font(800, 22); x.fillStyle = ACC; y += 24; x.fillText(b.label, pad, y - 3); y += 10;
+      font(800, 22); x.fillStyle = b.dim ? FG : ACC; y += 24; x.fillText(b.label, pad, y - 3); y += 10;
+      if (b.hidePos && !b.pos) { y += 6; continue; }
       font(600, 11); x.fillStyle = DIM; x.fillText('OVERALL', pad, y + 8); y += 12;
       if (b.pos) { font(700, 36, MONO); x.fillStyle = ACC; x.fillText(`#${num(b.pos)}`, pad, y + 34); y += 44; }
       else { font(700, 20); x.fillStyle = FG; x.fillText('No position', pad, y + 20); y += 28; }
       y += 6;
+    } else if (b.t === 'stats') {
+      font(600, 10); x.fillStyle = DIM; x.fillText(b.note.toUpperCase(), pad, y + 10); y += 22;
+      const cw3 = W / 3;
+      b.items.forEach(([k, v], i) => { font(700, 20, MONO); x.fillStyle = FG; x.fillText(v, pad + i * cw3, y + 18); font(400, 10); x.fillStyle = DIM; x.fillText(k, pad + i * cw3, y + 33); });
+      y += 44;
     } else if (b.t === 'ladder') {
       const tw = (W - 20) / 3, bw = (tw - 6) / 3;
       TIERS.forEach(([name, bands], ti) => {
@@ -1814,8 +1979,18 @@ const SHEETS = {
     return sheetWrap(m.title, `<div class="stack sh-wrap">
       <div class="seg" role="group" aria-label="Image format">${[['post', 'Post'], ['story', 'Story']].map(([k, l]) => `<button aria-pressed="${fmt === k}" data-act="shareFmt" data-v="${k}">${l}</button>`).join('')}</div>
       ${shareCardHTML(m, fmt)}
-      <p class="small muted">The QR opens your profile. Private profiles ask visitors to log in. ${fmt === 'story' ? 'Story size (9:16) for Facebook and Instagram stories.' : 'Post size (4:5) for Facebook and Instagram feeds.'}</p></div>`,
-    `<button class="btn" data-act="copyShareLink">${I.copy} Copy link</button>${navigator.share ? '<button class="btn primary" data-act="shareNative">Share</button>' : '<button class="btn primary" data-act="downloadShare">Download image</button>'}`);
+      <p class="small muted">The QR opens your profile. Private profiles ask visitors to log in. ${fmt === 'story' ? 'Story size (9:16) for Facebook and Instagram stories.' : 'Post size (4:5) for Facebook and Instagram feeds.'}</p>
+      ${m.kind === 'profile' ? `<div class="sh-link"><label class="label" for="sh-link">Profile link</label><div class="rtr-line"><input id="sh-link" readonly value="${esc(m.link)}" onfocus="this.select()"><button class="btn xs" data-act="copyShareLink" aria-label="Copy profile link">${I.copy} Copy</button></div></div>` : ''}</div>`,
+    m.kind === 'profile' ? '<button class="btn" data-act="downloadShare">Download image</button><button class="btn primary" data-act="shareNative">Share</button>'
+      : `<button class="btn" data-act="copyShareLink">${I.copy} Copy link</button>${navigator.share ? '<button class="btn primary" data-act="shareNative">Share</button>' : '<button class="btn primary" data-act="downloadShare">Download image</button>'}`);
+  },
+  // Proposed (#716): full-photo viewer. Nothing opens for initials or for a picture masked for this viewer.
+  photo: (sh) => {
+    const p = profileOf(sh.id);
+    if (!p || hiddenFromViewer(p) || !(p.photoUrl || p.photo)) return '';
+    return `<div class="viewer" role="dialog" aria-modal="true" aria-labelledby="sheet-title" data-act="closeSheet"><h2 id="sheet-title" class="sr-only" tabindex="-1">Photo of ${esc(p.name)}</h2>
+      <button type="button" class="viewer-x" data-act="closeSheet" aria-label="Close photo">${I.x}</button>
+      <div class="viewer-img">${p.photoUrl ? `<img src="${p.photoUrl}" alt="Photo of ${esc(p.name)}">` : faceSVG(p)}</div></div>`;
   },
   leaveClub: (sh) => {
     const c = CLUB_DIR[sh.id];
@@ -1851,6 +2026,7 @@ const SHEETS = {
       <div class="demo-sec"><span class="label">Registration links (signs you out)</span><div class="row"><button class="btn xs" data-act="openRegister" data-club="c1">Club link</button><button class="btn xs" data-act="openRegister" data-club="c1" data-session="s-tonight">Session link</button><button class="btn xs" data-act="openRegister">Admin link</button></div>
         <span class="label">Club link while signed in (as Migs)</span><div class="row"><button class="btn xs" data-act="openJoin" data-club="c3">Join a new club</button><button class="btn xs" data-act="openJoin" data-club="c1">Already in the club</button></div></div><div class="demo-sec"><span class="label">Open a registration link (Jomar)</span><div class="row"><button class="btn xs" data-act="openClaim" data-v="valid">Unused</button><button class="btn xs" data-act="openClaim" data-v="processing">Still processing</button><button class="btn xs" data-act="openClaim" data-v="expired">Expired</button></div>
         <span class="hint">Once Jomar registers, the unused link shows as already used.</span></div>
+      <div class="demo-sec"><span class="label">Public club pages</span><div class="row"><button class="btn xs" data-act="openClub" data-id="c1">Lahug Smash Club</button><button class="btn xs" data-act="openClub" data-id="c3">Mandaue Shuttle Society</button></div></div>
       <div class="demo-sec"><span class="label">Open a password reset link</span><div class="row"><button class="btn xs" data-act="openReset" data-v="valid">Valid</button><button class="btn xs" data-act="openReset" data-v="expired">Expired or used</button></div></div>
       <div class="demo-sec"><div class="setting"><div class="main"><b>Next profile save fails</b><p class="small muted">Shows the error and keeps the edits.</p></div>${sw(S.failNext, 'toggleFail', 'Next profile save fails')}</div></div>
       <div class="demo-sec"><button class="btn sm danger" data-act="resetDemo">${S.ui.resetArmed ? 'Tap again to reset everything' : 'Reset demo data'}</button></div>`,
@@ -1922,6 +2098,15 @@ const ACT = {
   avPage: (el) => { S.ui.avPage = +el.dataset.v; render(); },
   cmpPage: (el) => { S.ui.cmpPage = +el.dataset.v; render(); document.querySelector('.cmp-game')?.scrollIntoView({ block: 'center' }); },
   openRank: (el) => go('rank', el.dataset.id || null),
+  openClub: (el) => { S.ui.clubMonth = 0; S.ui.clubShown = CLUB_MEMBERS_PAGE; go('club', el.dataset.id); },
+  clubMore: () => { S.ui.clubShown = (S.ui.clubShown || CLUB_MEMBERS_PAGE) + CLUB_MEMBERS_PAGE; render(); },
+  clubMonth: (el) => { S.ui.clubMonth = +el.dataset.v; render(); },
+  // Join this club opens the club's current invite link (/register/[clubId]); regenerating the invite code changes that link, not this page.
+  clubJoin: (el) => (S.me ? ACT.openJoin(el) : ACT.openRegister(el)),
+  shareClub: (el) => {
+    const link = `${/^https?:/.test(location.origin) ? location.origin : 'https://rotra.example'}/player/clubs/${el.dataset.club}`;
+    try { navigator.clipboard.writeText(link).then(() => toast('Club page link copied'), () => toast(`Couldn't copy. The club page link is ${link}`)); } catch (e) { toast(`Couldn't copy. The club page link is ${link}`); }
+  },
   openHistory: (el) => { S.ui.hist = 'counted'; go('history', el.dataset.id); },
   histTab: (el) => { S.ui.hist = el.dataset.v; render(); },
   editTab: (el) => { S.ui.editTab = el.dataset.v; render(); },
@@ -1980,18 +2165,32 @@ const ACT = {
       toast(want ? 'Your phone number is now hidden from clubs' : 'Clubs can now see your phone number');
     });
   },
-  toggleProfilePrivate: () => {
-    const a = S.accounts[S.me];
-    const want = !a.profilePrivate;
+  setVisibility: (el) => {
+    const a = S.accounts[S.me], v = el.dataset.v;
+    const cur = a.alwaysPrivate ? 'always' : a.profilePrivate ? 'private' : 'public';
+    if (v === cur || S.ui.profilePending) return;
     S.ui.profileErr = '';
     S.ui.profilePending = true; render();
     later(900, () => {
       S.ui.profilePending = false;
-      if (!S.online) { S.ui.profileErr = `Couldn't save because you're offline. Your profile is still ${a.profilePrivate ? 'private' : 'public'}.`; return; }
-      a.profilePrivate = want;
-      toast(want ? 'Your profile is now private' : 'Your profile is now public');
+      if (!S.online) { S.ui.profileErr = `Couldn't save because you're offline. Your profile is still ${VIS_LABEL[cur]}.`; return; }
+      a.profilePrivate = v !== 'public'; a.alwaysPrivate = v === 'always';
+      toast(`Your profile is now ${VIS_LABEL[v]}`);
     });
   },
+  toggleDirectory: () => {
+    const a = S.accounts[S.me];
+    const want = !a.hiddenDir;
+    S.ui.dirErr = '';
+    S.ui.dirPending = true; render();
+    later(900, () => {
+      S.ui.dirPending = false;
+      if (!S.online) { S.ui.dirErr = `Couldn't save because you're offline. You are still ${a.hiddenDir ? 'hidden from' : 'findable in'} Player Information.`; return; }
+      a.hiddenDir = want;
+      toast(want ? 'You are now hidden from Player Information' : 'Clubs can now find you in Player Information');
+    });
+  },
+  viewPhoto: (el) => { S.ui.sheet = { type: 'photo', id: el.dataset.id }; render(); },
   openAvatar: () => { if (!S.me) return; avatarDraft = { ...S.accounts[S.me] }; S.ui.avPage = avatarDraft.photo && !avatarDraft.photoUrl ? Math.floor(Math.max(0, FACES.indexOf(avatarDraft.face || '')) / FACE_PAGE) : 0; S.ui.sheet = { type: 'avatar' }; render(); },
   // A saved photo (no pending upload) that is replaced by a character, initials or Remove becomes the previous photo; an unsaved upload is simply dropped.
   setFace: (el) => { const d = avatarDraft; if (d.photoUrl?.startsWith('blob:')) URL.revokeObjectURL(d.photoUrl); else if (d.photoUrl && !d.width) d.photoPrevUrl = d.photoUrl; Object.assign(d, { photo: true, photoUrl: '', face: el.dataset.v, width: 0, crop: null }); render(); },
@@ -2112,7 +2311,7 @@ const FORM = {
     if (!/^rtr-/i.test(q)) return;
     const id = q.toUpperCase();
     const hit0 = Object.values(S.accounts).find((a) => a.rtr === id) || BASE.find((e) => e.rtr === id);
-    const hit = hiddenFromVisitor(hit0) ? null : hit0; // a private profile gives visitors the same answer as an unknown ID
+    const hit = hiddenFromViewer(hit0) ? null : hit0; // a private profile gives visitors the same answer as an unknown ID
     if (hit) { S.q = ''; go('profile', hit.id); } else { S.ui.findId = id; go('notfound', null); }
   },
   login: () => {
@@ -2214,7 +2413,7 @@ const FORM = {
       const n = Object.keys(S.accounts).length + 1, id = `u${n + 1}`;
       const code = ctx.club ? CLUB_DIR[ctx.club].code : C.city, t = new Date();
       const date = `${String(t.getMonth() + 1).padStart(2, '0')}${String(t.getDate()).padStart(2, '0')}${String(t.getFullYear()).slice(2)}`;
-      const acct = { id, name: '', nick: '', rtr: `RTR-PH-${code}-${date}-${String(100 + n).padStart(4, '0')}`, phone: fmtPhone(normPhone(C.phone)), email: C.email.trim(), phoneHidden: false, profilePrivate: false, claimed: true, photo: false, fresh: true,
+      const acct = { id, name: '', nick: '', rtr: `RTR-PH-${code}-${date}-${String(100 + n).padStart(4, '0')}`, phone: fmtPhone(normPhone(C.phone)), email: C.email.trim(), phoneHidden: false, profilePrivate: true, claimed: true, photo: false, fresh: true,
         emailConfirmed: false, clubs: ctx.club ? [{ id: ctx.club, via: ctx.session ? 'session_link' : 'club_link' }] : [], style: '', expY: '', expM: '', social: {}, level: null };
       applyPersonal(acct, C);
       S.accounts[id] = acct; S.me = id; S.ui.regDone = { id, club: ctx.club, session: ctx.session }; S.ui.claim = null;
@@ -2336,6 +2535,7 @@ const playerPaths = { board: '', login: '/login', forgot: '/forgot-password', ed
 function prototypePath() {
   let path = playerPaths[S.screen];
   if (['profile', 'history', 'rank'].includes(S.screen)) path = S.viewId ? `/players/${encodeURIComponent(S.viewId)}${S.screen === 'history' ? '/games' : S.screen === 'rank' ? '/rank' : ''}` : '/rank';
+  if (S.screen === 'club') path = `/clubs/${encodeURIComponent(S.viewId)}`;
   if (S.screen === 'notfound') path = `/find/${encodeURIComponent(S.ui.findId || S.viewId || 'unknown')}`;
   if (['claim', 'claimDone', 'reset'].includes(S.screen)) path = `/${S.screen === 'reset' ? 'reset-password' : 'claim'}/${encodeURIComponent(prototypeToken)}${S.screen === 'claimDone' ? '?complete=1' : ''}`;
   if (['register', 'registerDone', 'joinClub'].includes(S.screen)) {
@@ -2356,6 +2556,8 @@ function applyPrototypeRoute(url) {
   const profile = path.match(/^\/players\/([^/]+)(?:\/(rank|games))?$/);
   const token = path.match(/^\/(claim|reset-password)\/([^/]+)$/);
   const find = path.match(/^\/find\/([^/]+)$/);
+  const clubPage = path.match(/^\/clubs\/([^/]+)$/);
+  if (clubPage) { id = decodeURIComponent(clubPage[1]); if (!CLUB_DIR[id]) return false; screen = 'club'; S.ui.clubMonth = 0; S.ui.clubShown = CLUB_MEMBERS_PAGE; }
   if (profile) { screen = profile[2] === 'games' ? 'history' : profile[2] === 'rank' ? 'rank' : 'profile'; id = decodeURIComponent(profile[1]); if (!Object.hasOwn(S.accounts, id) && !BASE.some((p) => p.id === id)) return false; }
   if (path === '/rank') screen = 'rank';
   if (find) {
@@ -2396,7 +2598,7 @@ function render() {
   const focusId = a && a.id && a !== document.body ? a.id : null;
   let sel = null;
   try { sel = a && typeof a.selectionStart === 'number' ? a.selectionStart : null; } catch (e) { sel = null; }
-  const views = { register: () => viewClaim(true), registerDone: viewRegisterDone, joinClub: viewJoinClub, board: viewBoard, profile: viewProfile, rank: viewRank, history: viewHistory, compare: viewCompare, id: viewId, account: viewAccount, edit: viewEdit, login: viewLogin, forgot: viewForgot, reset: viewReset, claim: viewClaim, claimDone: viewClaimDone, notfound: viewNotFound };
+  const views = { register: () => viewClaim(true), registerDone: viewRegisterDone, joinClub: viewJoinClub, board: viewBoard, profile: viewProfile, club: viewClub, rank: viewRank, history: viewHistory, compare: viewCompare, id: viewId, account: viewAccount, edit: viewEdit, login: viewLogin, forgot: viewForgot, reset: viewReset, claim: viewClaim, claimDone: viewClaimDone, notfound: viewNotFound };
   const sh = S.ui.sheet;
   document.getElementById('app').innerHTML = topBar() + (views[S.screen] || viewBoard)() + (sh ? SHEETS[sh.type](sh) : '');
   document.body.style.overflow = sh ? 'hidden' : '';

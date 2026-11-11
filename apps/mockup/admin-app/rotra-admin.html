@@ -423,6 +423,19 @@ body:has(.player-select:checked) .shell-main { padding-bottom: 120px; }
 .ch-drop input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 .toast.undo { display: flex; align-items: center; justify-content: space-between; gap: 12px; pointer-events: auto; }
 .toast.undo button { background: none; border: 0; padding: 4px 6px; color: inherit; font-weight: 800; text-decoration: underline; cursor: pointer; }
+/* Photo viewer (#716, proposed): black overlay, photo centred, × top right; click the overlay, press × or Esc to close. */
+:root { --viewer-bg: #000000; --viewer-fg: #ffffff; }
+.av-open { display: inline-flex; padding: 0; border: 0; background: none; color: inherit; border-radius: inherit; cursor: zoom-in; flex: none; }
+.av-open:focus-visible { outline: none; }
+.av-open:focus-visible .avatar, .av-open:focus-visible .logo { outline: 2px solid var(--accent); outline-offset: 2px; }
+.viewer { position: fixed; inset: 0; z-index: 55; background: var(--viewer-bg); display: grid; place-items: center; padding: 64px 16px; cursor: zoom-out; animation: fade .15s; }
+.viewer h2:focus { outline: none; }
+.viewer .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.viewer-x { position: absolute; top: calc(12px + env(safe-area-inset-top, 0px)); right: 12px; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; padding: 0; border: 1px solid color-mix(in srgb, var(--viewer-fg) 45%, transparent); background: transparent; color: var(--viewer-fg); cursor: pointer; }
+.viewer-x:focus-visible { outline: 2px solid var(--viewer-fg); outline-offset: 2px; }
+.viewer-img { width: min(100%, 640px, calc(100dvh - 128px)); aspect-ratio: 1; border-radius: 12px; overflow: hidden; }
+.viewer-img img, .viewer-img svg { width: 100%; height: 100%; display: block; object-fit: contain; }
+@media (prefers-reduced-motion: reduce) { .viewer { animation: none !important; } }
 </style>
 
 <div id="app"></div>
@@ -524,10 +537,10 @@ const plain = (s) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerC
 const P = (id, name, nick, rtr, club, phone, email, level, recent, o = {}) => ({ id, name, nick, rtr, club, phone, email, claimed: !!email, phoneHidden: false, level, recent, registered: null, ...o });
 function seedPlayers() {
   const out = [
-    P('p1', 'Miguel Santos', 'Migs', 'RTR-PH-CEB-031526-0001', 'Lahug Smash Club', '+63 917 555 0142', 'migs.santos@example.com', 5, 12, { phoneHidden: true, registered: '2026-03-18' }),
-    P('p2', 'Bea Castillo', '', 'RTR-PH-CEB-031526-0002', 'Lahug Smash Club', '+63 917 555 0213', 'bea.castillo.cebu@example.com', 6, 14, { registered: '2026-03-21' }),
+    P('p1', 'Miguel Santos', 'Migs', 'RTR-PH-CEB-031526-0001', 'Lahug Smash Club', '+63 917 555 0142', 'migs.santos@example.com', 5, 12, { phoneHidden: true, registered: '2026-03-18', pic: { kind: 'char', charId: 'ch1', seed: 'base' } }),
+    P('p2', 'Bea Castillo', '', 'RTR-PH-CEB-031526-0002', 'Lahug Smash Club', '+63 917 555 0213', 'bea.castillo.cebu@example.com', 6, 14, { registered: '2026-03-21', pic: { kind: 'char', charId: 'ch4', seed: 'c' } }),
     P('p3', 'Jomar dela Cruz', 'Jom', 'RTR-PH-CEB-040226-0007', 'Lahug Smash Club', '+63 918 555 0377', '', 3, 9),
-    P('p4', 'Kat Lim', '', 'RTR-PH-CEB-040226-0011', 'Lahug Smash Club', '+63 920 555 0458', 'kat.lim@example.com', 5, 11, { registered: '2026-04-05' }),
+    P('p4', 'Kat Lim', '', 'RTR-PH-CEB-040226-0011', 'Lahug Smash Club', '+63 920 555 0458', 'kat.lim@example.com', 5, 11, { registered: '2026-04-05', pic: { kind: 'char', charId: 'ch3', seed: 'b' } }),
     P('p5', 'Enzo Navarro', '', 'RTR-PH-MNL-050726-0014', 'Sampaloc Shuttle Club', '+63 917 555 0631', 'enzo.navarro@example.com', 7, 15, { registered: '2026-05-09' }),
     P('p6', 'Joanna Tan', 'Jo', 'RTR-PH-CEB-050726-0019', 'Lahug Smash Club', '+63 919 555 0702', '', null, 2),
     P('p7', 'Rafa Aquino', '', 'RTR-PH-CEB-061126-0021', 'IT Park Badminton Club', '+63 915 555 0814', 'rafa.aquino@example.com', 6, 10, { registered: '2026-06-14' }),
@@ -713,11 +726,18 @@ const notice = (kind, html) => `<div class="notice ${kind}">${kind === 'ok' ? I.
 const sw = (on, act, label, attrs = '') => `<button class="switch" role="switch" aria-checked="${!!on}" aria-label="${esc(label)}" data-act="${act}" ${attrs}></button>`;
 const backBtn = (to, label) => `<button class="btn sm ghost back" data-act="go" data-to="${to}">${I.back} ${esc(label)}</button>`;
 const seg = (act, cur, opts, label) => `<div class="seg" role="group" aria-label="${esc(label)}">${opts.map(([v, l, c]) => `<button type="button" data-act="${act}" data-v="${v}" aria-pressed="${cur === v}">${l}${c != null ? ` <span class="c">${c}</span>` : ''}</button>`).join('')}</div>`;
-const logo = (c, cls = '') => `<span class="logo ${c.accent ? 'acc' : ''} ${cls}" aria-hidden="true">${esc(c.initials)}</span>`;
+const logoEl = (c, cls = '') => `<span class="logo ${c.accent ? 'acc' : ''} ${cls}" aria-hidden="true">${esc(c.initials)}</span>`;
+// Proposed (#716): a club logo that is a real picture opens the full photo when `view` is set. Initials do nothing.
+const logo = (c, cls = '', view = false) => (view && c.img ? `<button type="button" class="av-open" data-act="viewPhoto" data-kind="club" data-id="${esc(c.id)}" aria-label="View full logo of ${esc(c.name)}">${logoEl(c, cls)}</button>` : logoEl(c, cls));
 // A player's picture: { kind: 'photo', img } or { kind: 'char', charId, img, seed } (a snapshot, so a hidden or deleted character still shows).
 const picArt = (pic) => (pic && pic.kind === 'photo' && pic.img ? `<img src="${pic.img}" alt="">` : pic && pic.kind === 'char' ? (pic.img ? `<img src="${pic.img}" alt="">` : charFaceSVG(pic.seed)) : '');
 const avatarOf = (name, pic, cls = '') => { const art = picArt(pic); return art ? `<span class="avatar pic ${cls}" aria-hidden="true">${art}</span>` : `<span class="avatar ${cls}" aria-hidden="true">${esc(initials(name))}</span>`; };
-const avatar = (p, cls = '') => avatarOf(p.name, p.pic, cls);
+// Proposed (#716): an avatar with a real picture (photo or character, never initials) opens the full photo when `view` is set.
+// Avatars inside a row or card that already opens something (the Players list opens Quick view, the contact-change table opens the request) pass no `view`;
+// the photo opens from the big photo inside Quick view and the player detail.
+const avatar = (p, cls = '', view = false) => (view && picArt(p.pic) && p.id
+  ? `<button type="button" class="av-open" data-act="viewPhoto" data-kind="player" data-id="${esc(p.id)}" aria-label="View full photo of ${esc(p.name)}">${avatarOf(p.name, p.pic, cls)}</button>`
+  : avatarOf(p.name, p.pic, cls));
 const errLine = (t) => (t ? `<p class="err" role="alert">${t}</p>` : '');
 const OFFLINE_ERR = "You're offline, so nothing was saved. Try again once you're connected.";
 
@@ -1043,7 +1063,7 @@ function viewClub() {
     activity: `<section class="card stack"><h2>Record of actions</h2>${history.length ? `<ul class="log">${history.map((l) => `<li>${esc(l.text)}<span>${fmtAt(l.at)} · ${esc(l.actor)}</span></li>`).join('')}</ul>` : '<p class="small muted">No Admin actions recorded for this club yet.</p>'}</section>`,
   };
   return shell(`${backBtn('clubs', 'Clubs and licenses')}
-    <div class="hero">${logo(c, 'lg')}<div class="main"><h1>${esc(c.name)}</h1><div class="row">${accessChip(a)}${a.plan ? chip(a.plan) : ''}${c.live ? `<span class="small live"><i></i>Session running</span>` : ''}</div></div></div>
+    <div class="hero">${logo(c, 'lg', true)}<div class="main"><h1>${esc(c.name)}</h1><div class="row">${accessChip(a)}${a.plan ? chip(a.plan) : ''}${c.live ? `<span class="small live"><i></i>Session running</span>` : ''}</div></div></div>
     <div class="tabs" role="tablist" aria-label="Club sections">${TABS.map(([k, l, badge]) => `<button role="tab" id="ctab-${k}" aria-selected="${k === tab}" aria-controls="club-panel" data-act="clubTab" data-v="${k}">${l}${badge}</button>`).join('')}</div>
     <div id="club-panel" role="tabpanel" aria-labelledby="ctab-${tab}" class="stack" style="gap:20px">${panels[tab]}</div>`);
 }
@@ -1229,7 +1249,7 @@ function playerManagementSheet(action,id) {
   const qv = () => {
     const rk = rankOf(p), soc = socialsOf(p);
     return `<div class="stack qv">
-      <div class="qv-hero${p.claimed ? ' claimed' : ''}">${avatar(p,'lg')}<div class="qv-id"><h2>${name}</h2><div class="row">${p.level == null ? chip('No rank yet') : chip(LEVELS[p.level], 'ok')}${p.claimed ? chip('Registered') : chip('Unclaimed')}</div></div></div>
+      <div class="qv-hero${p.claimed ? ' claimed' : ''}">${avatar(p,'lg',true)}<div class="qv-id"><h2>${name}</h2><div class="row">${p.level == null ? chip('No rank yet') : chip(LEVELS[p.level], 'ok')}${p.claimed ? chip('Registered') : chip('Unclaimed')}</div></div></div>
       ${p.claimed ? '' : `<div class="qv-invite"><div><b>Not registered yet</b><span class="small muted">Send an invite so this player claims the profile.</span></div><button class="btn sm primary" data-act="pmSheet" data-v="Invite to ROTRA" data-id="${id}">Invite to ROTRA</button></div>`}
       <dl class="kv qv-kv"><dt>ID</dt><dd><span class="mono">${esc(p.rtr)}</span> <button class="btn xs ghost" data-act="pmSheet" data-v="Copy RTR ID" data-id="${id}">Copy</button></dd><dt>Phone</dt><dd class="mono">${esc(p.phone || 'Not given')}</dd><dt>Email</dt><dd class="mono" style="overflow-wrap:anywhere">${esc(p.email || 'Not given')}</dd><dt>Socials</dt><dd class="qv-soc">${soc.length ? soc.map(([n, u]) => `<a class="chip" href="https://${esc(u)}" target="_blank" rel="noopener noreferrer" title="${esc(u)}">${n}</a>`).join('') : '<span class="muted">None added</span>'}</dd></dl>
       <section class="qv-sec"><h3>History</h3><div class="list">${historyOf(p, 2).map(histRow).join('')}</div></section>
@@ -1241,7 +1261,7 @@ function playerManagementSheet(action,id) {
     const ef = (id, label, value, o = {}) => `<label class="field" for="pe-${id}"><span>${label}</span>${o.area ? `<textarea class="input" id="pe-${id}" rows="3" maxlength="${o.max || 280}" ${o.ph ? `placeholder="${esc(o.ph)}"` : ''}>${esc(value)}</textarea>` : `<input class="input${o.mono ? ' mono' : ''}" id="pe-${id}" value="${esc(value)}" ${o.type ? `type="${o.type}"` : ''} ${o.im ? `inputmode="${o.im}"` : ''} ${o.ph ? `placeholder="${esc(o.ph)}"` : ''} autocomplete="off">`}${o.hint ? `<span class="hint">${o.hint}</span>` : ''}<span class="err" id="pe-${id}-err" hidden></span></label>`;
     const tog = (id, title, sub, on) => `<label class="pl-dup" for="pe-${id}"><span class="stack tight"><b>${title}</b><span class="small muted">${sub}</span></span><input type="checkbox" role="switch" class="pl-switch" id="pe-${id}" ${on ? 'checked' : ''}></label>`;
     return `<div class="stack qv">
-      <div class="qv-hero${p.claimed ? ' claimed' : ''}">${avatar(p,'lg')}<div class="qv-id"><h2>Edit ${name}</h2><span class="mono small muted">${esc(p.rtr)}</span></div></div>
+      <div class="qv-hero${p.claimed ? ' claimed' : ''}">${avatar(p,'lg',true)}<div class="qv-id"><h2>Edit ${name}</h2><span class="mono small muted">${esc(p.rtr)}</span></div></div>
       <p class="small muted">As the platform owner you can change everything a player can, plus their sign-in details. Every save is recorded with your reason.</p>
       <section class="pic-sec" id="pm-pic" aria-label="Profile picture">${picSection()}</section>
       <div class="pic-sec"><span class="label">Name</span><div class="fgrid">${ef('name', 'Full name', p.name)}${ef('nick', 'Nickname', p.nick || '', { hint: 'Optional' })}</div></div>
@@ -1323,7 +1343,7 @@ function viewPlayer() {
       <section class="card stack"><h2>Record of actions</h2>${history.length ? `<ul class="log">${history.map((l) => `<li>${esc(l.text)}<span>${fmtAt(l.at)} · ${esc(l.actor)}</span></li>`).join('')}</ul>` : '<p class="small muted">No Admin actions recorded for this player.</p>'}</section>`,
   };
   return shell(`${backBtn('players', 'Players')}
-    <div class="hero">${avatar(p, 'lg')}<div class="main"><h1>${esc(p.name)}</h1><div class="row">${p.claimed ? chip('Registered', 'ok') : chip('Unclaimed')}${rk.chip}<span class="mono small muted">${esc(p.rtr)}</span></div></div></div>
+    <div class="hero">${avatar(p, 'lg', true)}<div class="main"><h1>${esc(p.name)}</h1><div class="row">${p.claimed ? chip('Registered', 'ok') : chip('Unclaimed')}${rk.chip}<span class="mono small muted">${esc(p.rtr)}</span></div></div></div>
     ${twin.length ? notice('warn', `<b>Another player has the same name.</b> ${twin.map((x) => `<button class="link acc" data-act="openPlayer" data-id="${x.id}">${esc(x.name)}</button> (<span class="mono">${esc(x.rtr)}</span>)`).join(', ')} is a separate identity. Admin doesn't merge players.`) : ''}
     <div class="tabs" role="tablist" aria-label="Player sections">${PT.map(([k, l, badge]) => `<button role="tab" id="ptab-${k}" aria-selected="${k === ptab}" aria-controls="player-panel" data-act="playerTab" data-v="${k}">${l}${badge}</button>`).join('')}</div>
     <div id="player-panel" role="tabpanel" aria-labelledby="ptab-${ptab}" class="stack" style="gap:20px">${panels[ptab]}</div>`);
@@ -1377,7 +1397,7 @@ function viewReview() {
       <section class="card stack"><h2>Verification</h2><p class="small">What proof approval needs hasn't been decided, so this prototype doesn't ask for ID documents. The request itself is the only evidence shown.</p></section>` : ''}
       ${actions ? `<div class="row end">${actions}</div>` : ''}
     </div><div>
-      <section class="card stack"><div class="who">${avatar(p)}<div class="main"><button class="link" data-act="openPlayer" data-id="${p.id}">${esc(p.name)}</button><span class="mono small muted">${esc(p.rtr)}</span></div></div>
+      <section class="card stack"><div class="who">${avatar(p, '', true)}<div class="main"><button class="link" data-act="openPlayer" data-id="${p.id}">${esc(p.name)}</button><span class="mono small muted">${esc(p.rtr)}</span></div></div>
         <dl class="kv"><dt>Account</dt><dd>${p.claimed ? 'Registered' : 'Unclaimed'}</dd><dt>Phone</dt><dd class="mono">${esc(p.phone || 'Not given')}</dd><dt>Email</dt><dd class="mono">${esc(p.email || 'Not given')}</dd></dl>
         <p class="small muted">These are the contacts in use right now. An approved change shows here only once it's applied.</p></section>
       <section class="card stack"><h2>What approval changes</h2><ul class="bul"><li>Only the ${f} ${esc(firstName(p))} signs in with.</li><li>Not the RTR ID, match history, results or rank.</li><li>Never another player's profile.</li></ul></section>
@@ -1828,6 +1848,16 @@ const ACT = {
   clearPlayers: () => { S.ui.playersQ = ''; S.ui.playersF = 'all'; S.ui.shown = 25; render(); },
   morePlayers: () => { S.ui.shown += 25; render(); },
   reqF: (el) => { S.ui.reqF = el.dataset.v; render(); },
+  viewPhoto: (el) => {
+    const club = el.dataset.kind === 'club', who = club ? clubOf(el.dataset.id) : playerOf(el.dataset.id);
+    const art = club ? (who && who.img ? `<img src="${who.img}" alt="">` : '') : who && picArt(who.pic);
+    if (!art) return;
+    document.querySelector('.viewer')?.remove();
+    document.body.insertAdjacentHTML('beforeend', `<div class="viewer" role="dialog" aria-modal="true" aria-labelledby="viewer-title" data-act="closePhoto"><h2 id="viewer-title" class="sr-only" tabindex="-1">Photo of ${esc(who.name)}</h2>
+      <button type="button" class="viewer-x" data-act="closePhoto" aria-label="Close photo">${I.x}</button><div class="viewer-img">${art}</div></div>`);
+    PHOTO_FROM = el; document.getElementById('viewer-title').focus();
+  },
+  closePhoto: () => { document.querySelector('.viewer')?.remove(); if (PHOTO_FROM && document.contains(PHOTO_FROM)) PHOTO_FROM.focus(); PHOTO_FROM = null; },
   closeSheet: () => {
     // The player quick view and its sibling dialogs are added straight to the page, outside the sheet state; close them first.
     if (document.querySelector('body > .sheet')) { PIC = null; document.querySelectorAll('body > .scrim, body > .sheet').forEach((x) => x.remove()); return; }
@@ -2148,6 +2178,7 @@ document.addEventListener('click', (ev) => {
   const fn = ACT[el.dataset.act];
   if (fn) { ev.preventDefault(); fn(el); }
 });
+let PHOTO_FROM = null; // the avatar that opened the photo viewer, so focus goes back to it
 const CHANGE = {
   plSelectAll: (el) => { document.querySelectorAll('.player-select').forEach((x) => { x.checked = el.checked; }); CHANGE.plCount(); },
   plCount: () => { const n = document.querySelectorAll('.player-select:checked').length, d = document.querySelector('.pl-dock-n'); if (d) d.textContent = `${n} selected`; },
@@ -2188,6 +2219,7 @@ document.addEventListener('dragover', (ev) => { const z = dropZone(ev); if (!z) 
 document.addEventListener('dragleave', (ev) => { const z = dropZone(ev); if (z && !z.contains(ev.relatedTarget)) z.classList.remove('over'); });
 document.addEventListener('drop', (ev) => { const z = dropZone(ev); if (!z) return; ev.preventDefault(); z.classList.remove('over'); addCharFiles(ev.dataTransfer && ev.dataTransfer.files); });
 document.addEventListener('keydown', (ev) => {
+  if (ev.key === 'Escape' && document.querySelector('.viewer')) { ACT.closePhoto(); return; }
   if (ev.key === 'Escape') { if (S.ui.sheet || document.querySelector('body > .sheet')) ACT.closeSheet(); else if (S.ui.nav) ACT.toggleNav(); }
 });
 

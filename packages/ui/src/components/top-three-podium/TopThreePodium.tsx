@@ -44,14 +44,14 @@ export function TopThreePodium({ entries, totalPlayers, onSelect }: TopThreePodi
       </div>
       <div className="rotra-pod-stage">
         {entries.map((entry, index) => {
-          const Tile = entry.masked ? 'div' : 'button'
+          // Masked tiles open the profile too (private card or sign-in gate), as in the prototype.
+          const Tile = 'button'
           return (
             <Tile
               key={entry.id ?? entry.fullName}
               id={entry.id}
-              type={entry.masked ? undefined : 'button'}
-              aria-disabled={entry.masked || undefined}
-              onClick={entry.masked ? undefined : () => onSelect(index)}
+              type="button"
+              onClick={() => onSelect(index)}
               aria-label={`${place[index]} place, ${entry.fullName}${entry.isMe ? ' (you)' : ''}, ${entry.levelLabel}`}
               className={cn('rotra-pod', `p${index + 1}`, entry.isMe && 'me')}
             >

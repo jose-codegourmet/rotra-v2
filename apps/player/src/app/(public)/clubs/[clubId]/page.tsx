@@ -1,14 +1,19 @@
 import { clubs } from '@rotra/data/fixtures/clubs'
 import { dataMode } from '@rotra/db/auth/data-mode'
+import { clubPageName } from '@rotra/db/player/club-page'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { connection } from 'next/server'
 import { ClubPage } from './_components/club-page/ClubPage'
 
-/** Mock mode answers from the club fixtures; real mode reads the club (P07.5). */
+/** The club's name, or null when unknown. Mock mode answers from the club fixtures. */
 async function clubNameOf(clubId: string) {
-  if (dataMode() === 'real') return null
-  return clubs.find((club) => club.id === clubId)?.name ?? null
+  try {
+    if (dataMode() === 'real') return await clubPageName(clubId)
+    return clubs.find((club) => club.id === clubId)?.name ?? null
+  } catch {
+    return null
+  }
 }
 
 /** P-CLUB-PAGE (#737): public, served per request, never indexed and never static. */

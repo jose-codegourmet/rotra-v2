@@ -106,6 +106,8 @@ export const VISITOR_COMMANDS = [
   'player.claim',
   'player.guest-registration',
   'player.password-reset',
+  /** P-CLUB-PAGE / P-CLUB-MEMBERS: public, but masked per viewer, so private and no-store */
+  'player.club-page',
 ] as const
 
 export type VisitorCommandId = (typeof VISITOR_COMMANDS)[number]

@@ -133,10 +133,12 @@ button.conn:hover { border-color: var(--accent); background: var(--surface); }
 .av-edit { position: relative; flex: none; display: block; }
 .av-edit .av-cam { position: absolute; right: -6px; bottom: -6px; width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--surface); background: var(--accent); color: var(--on-accent); display: grid; place-items: center; cursor: pointer; padding: 0; }
 .av-cam svg { width: 16px; height: 16px; }
-.av-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 10px; }
-.av-pick { padding: 4px; border: 2px solid transparent; border-radius: 16px; background: none; cursor: pointer; display: grid; place-items: center; }
+/* Owner comment, November 11, 2026: the character picker is 5 big circles in a row, 3 rows, 15 per page. */
+.av-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.av-pick { padding: 3px; border: 3px solid transparent; border-radius: 50%; background: none; cursor: pointer; display: grid; place-items: center; min-width: 0; }
 .av-pick[aria-pressed="true"] { border-color: var(--accent); }
-.av-pick .avatar { width: 56px; height: 56px; }
+.av-pick .avatar { width: 100%; height: auto; aspect-ratio: 1; border-radius: 50%; font-size: clamp(16px, 4vw, 28px); }
+.av-pick .avatar svg, .av-pick .avatar img { width: 100%; height: 100%; }
 .cmp-game { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px 0; border-top: 1px solid var(--border); }
 .cmp-game .cmp-row3 { align-self: stretch; display: grid; grid-template-columns: 40% 30% 30%; align-items: center; gap: 0; }
 .cmp-row3 > * { min-width: 0; padding-right: 8px; }
@@ -1984,7 +1986,7 @@ let avatarDraft = null;
 // The character library is managed by the platform owner in the Admin app (Profile characters): only active characters, in the order set there.
 // The prototype stands in for that list with 24 seeded faces, shown 8 to a page (owner request, November 9, 2026).
 const FACES = ['', ...'abcdefghijklmnopqrstuvw'.split('')];
-const FACE_PAGE = 8;
+const FACE_PAGE = 15; // Owner comment, November 11, 2026: 5 in a row, 3 rows, big circles.
 const SHEETS = {
   avatar: () => {
     const a = avatarDraft || S.accounts[S.me], p = { ...profileOf(S.me), ...a };

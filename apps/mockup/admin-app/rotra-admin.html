@@ -622,7 +622,7 @@ function seedLog() {
 // Every character is an image the platform owner uploads. Order is the order players see; only shown (active) characters reach
 // the picker, 8 per page. Hiding or deleting one never takes it from players who already use it. The seeded library uses the
 // illustrated faces from the Player prototype as sample uploads; the prototype draws them instead of storing image files.
-const CHAR_PLAYER_PAGE = 8, CHAR_MIN_ACTIVE = 8, CHAR_MAX_BYTES = 1024 * 1024;
+const CHAR_PLAYER_PAGE = 15, CHAR_MIN_ACTIVE = 15, CHAR_MAX_BYTES = 1024 * 1024; // 15 per page: owner comment, November 11, 2026 (5 in a row, 3 rows)
 const CH_SKIN = ['#f3cfae', '#e3b089', '#c98d62', '#ad7349', '#8c5836', '#f6dcc4'];
 const CH_HAIR = ['#1b1817', '#2e211b', '#4a3021', '#6d4a2c', '#8f6b48', '#2a2a31'];
 const CH_BACKDROP = ['#2f6f5e', '#3b4f8a', '#74488a', '#8a5a2f', '#2f6a85', '#7d3b4a', '#4d6b2f', '#5b4a8a'];

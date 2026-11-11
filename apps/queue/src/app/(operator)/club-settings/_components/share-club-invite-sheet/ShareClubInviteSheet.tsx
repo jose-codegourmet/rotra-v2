@@ -15,6 +15,15 @@ export type ShareClubInviteSheetProps = {
 
 /** Q-CLUB / Q-HOME: the Share club invite sheet around ClubInviteCard, opened from settings and Home. */
 export function ShareClubInviteSheet({ club, open, onOpenChange }: ShareClubInviteSheetProps) {
+  const link = clubInviteUrl(club.id, club.inviteCode)
+  const copyLink = () => {
+    const unavailable = () => toast('Select the link and copy it')
+    try {
+      navigator.clipboard.writeText(link).then(() => toast('Club invite link copied'), unavailable)
+    } catch {
+      unavailable()
+    }
+  }
   return (
     <Sheet
       open={open}
@@ -23,11 +32,12 @@ export function ShareClubInviteSheet({ club, open, onOpenChange }: ShareClubInvi
       footer={<Button onClick={() => onOpenChange(false)}>Close</Button>}
     >
       <ClubInviteCard
-        link={clubInviteUrl(club.id, club.inviteCode)}
+        link={link}
         slug={club.id}
         clubName={club.name}
         clubInitials={club.initials}
         clubLogoUrl={club.logoUrl}
+        onCopyLink={copyLink}
         onShared={() => toast('Share sheet opened')}
         onDownloaded={() => toast('QR image downloaded')}
         onError={(message) => toast.error(message)}

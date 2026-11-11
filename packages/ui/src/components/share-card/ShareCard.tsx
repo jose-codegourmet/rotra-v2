@@ -18,6 +18,8 @@ export type ShareCardProps = {
   additionalImages?: Record<string, string | null>
   compactQr?: boolean
   leadingAction?: ReactNode
+  /** A full-width block on its own row directly above the Share / Download image row. */
+  primaryRowAbove?: ReactNode
   /** The exact link the QR encodes and the card prints. */
   link: string
   /** Names the download <fileName>-<post|story>.png. */
@@ -88,6 +90,7 @@ export function ShareCard({
   children,
   compactQr = false,
   leadingAction,
+  primaryRowAbove,
   additionalImages,
 }: ShareCardProps) {
   const [format, setFormat] = useState<ShareFormat>(initialFormat)
@@ -370,6 +373,7 @@ export function ShareCard({
           : 'Post size (4:5) for Facebook and Instagram feeds.'}
         {noteEnd ? ` ${noteEnd}` : ''}
       </p>
+      {primaryRowAbove ? <div className="flex flex-col">{primaryRowAbove}</div> : null}
       <div className="flex flex-wrap justify-center gap-2">
         {leadingAction}
         {showShare ? (

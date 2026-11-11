@@ -4343,9 +4343,9 @@ const SHEETS = {
     return sheetShell(club ? 'Share club invite' : inv ? 'Session invite' : 'Session QR', `<div class="stack" style="align-items:center;text-align:center">
       <div class="seg" role="group" aria-label="Image format">${[['post', 'Post'], ['story', 'Story']].map(([k, l]) => `<button aria-pressed="${fmt === k}" data-act="qrFmt" data-k="${k}">${l}</button>`).join('')}</div>
       ${card}
-      <p class="small muted">${club ? 'Scanning opens the club registration page.' : 'Scanning opens the public session page.'} ${fmt === 'story' ? 'Story size (9:16) for Facebook and Instagram stories.' : 'Post size (4:5) for Facebook and Instagram feeds.'} ${club ? 'Download the image to share it or print it.' : inv ? 'The Queue Master sees who invited each person who joins through it.' : 'Download the image to share it or print it.'}</p></div>`,
+      <p class="small muted">${club ? 'Scanning opens the club registration page.' : 'Scanning opens the public session page.'} ${fmt === 'story' ? 'Story size (9:16) for Facebook and Instagram stories.' : 'Post size (4:5) for Facebook and Instagram feeds.'} ${club ? 'Download the image to share it or print it.' : inv ? 'The Queue Master sees who invited each person who joins through it.' : 'Download the image to share it or print it.'}</p>${club ? '<button class="btn" style="width:100%" data-act="copyClubInvite">Copy invite link</button>' : ''}</div>`,
       inv ? `<button class="btn" data-act="closeSheet">Close</button>${navigator.share ? '<button class="btn primary" data-act="shareInvite">Share</button>' : '<button class="btn primary" data-act="downloadSessionQr">Download image</button>'}`
-        : '<button class="btn" data-act="closeSheet">Close</button><button class="btn" data-act="downloadSessionQr">Share</button><button class="btn primary" data-act="downloadSessionQr">Download image</button>');
+        : `<button class="btn" data-act="closeSheet">Close</button><button class="btn" data-act="downloadSessionQr">Share</button><button class="btn primary" data-act="downloadSessionQr">Download image</button>`);
   },
   regenClubInvite() {
     return sheetShell('Regenerate the club invite link?', '<p>The old link and every image with its QR stop working. People who already joined keep their place.</p>',

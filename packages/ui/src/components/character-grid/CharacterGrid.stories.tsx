@@ -1,3 +1,4 @@
+import { PROFILE_BANNERS, ProfileBanner } from '@rotra/ui/profile-banner'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 import { CharacterGrid, type CharacterGridItem } from './CharacterGrid'
@@ -60,3 +61,17 @@ export const Interactive: Story = {
     )
   },
 }
+
+const banners: CharacterGridItem[] = PROFILE_BANNERS.map((banner, i) => ({
+  id: `bn${i + 1}`,
+  label: banner.name,
+  caption: banner.name,
+  art: <ProfileBanner bannerKey={banner.key} className="size-full" />,
+  shown: i !== 3,
+}))
+
+export const Banners: Story = {
+  args: { variant: 'banner', items: banners, 'aria-label': 'Banner images' },
+}
+export const BannersLight: Story = { ...Banners, globals: { theme: 'light' } }
+export const BannersDisabled: Story = { args: { ...Banners.args, disabled: true } }

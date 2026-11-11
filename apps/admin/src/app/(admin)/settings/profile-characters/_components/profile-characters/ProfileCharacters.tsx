@@ -1,8 +1,6 @@
 'use client'
 
 import {
-  PROFILE_CHARACTER_MIN_SHOWN,
-  PROFILE_CHARACTER_PLAYER_PAGE,
   PROFILE_CHARACTER_UNDO_MS,
   profileCharacterDeletedToast,
   shownProfileCharacterCount,
@@ -16,6 +14,7 @@ import {
 import { useProfileCharacters } from '@rotra/data/profile-character/useProfileCharacters'
 import { Card } from '@rotra/ui/card'
 import { CharacterGrid } from '@rotra/ui/character-grid'
+import { CHARACTER_PICKER_PAGE_SIZE } from '@rotra/ui/character-picker'
 import { EmptyState } from '@rotra/ui/empty-state'
 import { ErrorState } from '@rotra/ui/error-state'
 import { ImageDropZone } from '@rotra/ui/image-drop-zone'
@@ -82,7 +81,7 @@ export function ProfileCharacters() {
     <>
       <PageHeader
         title="Profile characters"
-        description={`Players see the shown images, ${PROFILE_CHARACTER_PLAYER_PAGE} per page. Click an image to hide or show it. ${shown} shown${hidden ? ` · ${hidden} hidden` : ''}.`}
+        description={`Players see the shown images, ${CHARACTER_PICKER_PAGE_SIZE} per page. Click an image to hide or show it. ${shown} shown${hidden ? ` · ${hidden} hidden` : ''}.`}
       />
       {characters.isError && !characters.data ? (
         <Card>
@@ -103,7 +102,7 @@ export function ProfileCharacters() {
           {list.length === 0 ? (
             <Card>
               <EmptyState title="No images yet.">
-                Upload at least {PROFILE_CHARACTER_MIN_SHOWN} images so the players' first page is
+                Upload at least {CHARACTER_PICKER_PAGE_SIZE} images so the players' first page is
                 full.
               </EmptyState>
             </Card>

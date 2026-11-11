@@ -62,7 +62,6 @@ export function TopThreePodium({ entries, totalPlayers, onSelect }: TopThreePodi
                   src={entry.masked ? undefined : entry.picture?.src}
                   initials={entry.masked ? undefined : entry.picture?.initials}
                   size={index === 0 ? 88 : 64}
-                  shape="square"
                   className="avatar"
                 />
                 <b className="rotra-pod-name">{entry.fullName}</b>

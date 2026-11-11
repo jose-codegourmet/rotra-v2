@@ -8,7 +8,7 @@ export default function Loading() {
       side={
         <Card aria-busy="true" aria-label="Loading player identity">
           <div className="flex items-center gap-3.5">
-            <Skeleton className="size-[88px] flex-none rounded-[20px]" />
+            <Skeleton className="size-[88px] flex-none rounded-full" />
             <div className="flex min-w-0 flex-1 flex-col gap-2">
               <Skeleton className="h-7" />
               <Skeleton className="h-4 w-1/2" />

@@ -97,7 +97,7 @@
   height: 64px;
   font-size: 20px;
   margin-bottom: 8px;
-  border-radius: 12px;
+  border-radius: 50%;
   box-shadow:
     0 0 0 3px var(--surface),
     0 0 0 5px color-mix(in srgb, var(--accent) var(--glow), var(--border-strong));
@@ -106,7 +106,7 @@
   width: 86px;
   height: 86px;
   font-size: 26px;
-  border-radius: 14px;
+  border-radius: 50%;
   box-shadow:
     0 0 0 3px var(--surface),
     0 0 0 6px var(--accent),

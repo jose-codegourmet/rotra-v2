@@ -6,6 +6,7 @@ export const personalDetailsFieldsMeta = {
   usage: [
     'Render inside a parent form that owns FormProvider and personalDetailsFieldsSchema; it reads the form context.',
     'Edit profile passes one section at a time; the claim form (P03.4) passes all three.',
+    'The four link fields stack one per row at every width (log 2026-11-11-player-edit-profile-links-rows).',
     'Never add phone, email or the RTR ID here; they are not editable through this form.',
     'Open decisions: field limits, free-text playing style and link visibility use the prototype placeholders.',
   ],

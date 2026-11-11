@@ -3,7 +3,7 @@
 import type { PictureCrop, PlayerPictureChoice } from '@rotra/data/player/picture'
 import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
-import { Pager } from '@rotra/ui/pager'
+import { CharacterPicker } from '@rotra/ui/character-picker'
 import { PROFILE_CHARACTER_IDS, profileCharacterUrl } from '@rotra/ui/profile-picture'
 import { Sheet } from '@rotra/ui/sheet'
 import { useEffect, useRef, useState } from 'react'
@@ -67,13 +67,6 @@ function PictureDraft({
   } | null>(null)
   const [choice, setChoice] = useState<PictureDraftChoice | null>(null)
   const [previous, setPrevious] = useState<string | null>(previousPhoto)
-  const [page, setPage] = useState(() => {
-    const index =
-      picture.kind === 'character' ? characters.findIndex((item) => item.id === picture.id) : -1
-    return index < 0 ? 1 : Math.floor(index / 8) + 1
-  })
-  const pageCount = Math.max(1, Math.ceil(characters.length / 8))
-  const currentPage = Math.min(page, pageCount)
   const [crop, setCrop] = useState<PictureCrop>({ x: 0.5, y: 0.5, zoom: 1, rotation: 0 })
   const [url, setUrl] = useState<string>()
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
@@ -206,13 +199,7 @@ function PictureDraft({
     >
       <div className="flex flex-col gap-3.5" aria-busy={pending || preparing}>
         <div className="flex items-center gap-3.5">
-          <Avatar
-            name={name}
-            src={src}
-            size={88}
-            shape="square"
-            tone={src ? 'neutral' : 'accent'}
-          />
+          <Avatar name={name} src={src} size={88} tone={src ? 'neutral' : 'accent'} />
           <div className="flex flex-col gap-1">
             <b>
               {selected.kind === 'photo'
@@ -257,7 +244,7 @@ function PictureDraft({
         </div>
         {previous && !file && !preparing ? (
           <div className="flex items-center gap-3.5">
-            <Avatar name={name} src={previous} size={64} shape="square" />
+            <Avatar name={name} src={previous} size={64} />
             <div className="flex flex-col gap-1">
               <b>Previous picture</b>
               <Button
@@ -417,31 +404,11 @@ function PictureDraft({
           <span className="text-xs font-semibold tracking-[0.5px] text-fg2 uppercase">
             Or pick a character
           </span>
-          <fieldset
-            aria-label={`Characters, page ${currentPage} of ${pageCount}`}
-            disabled={pending}
-            className="m-0 grid min-w-0 grid-cols-[repeat(auto-fill,minmax(72px,1fr))] gap-2.5 border-0 p-0"
-          >
-            {characters
-              .slice((currentPage - 1) * 8, currentPage * 8)
-              .map(({ id, image }, index) => (
-                <button
-                  key={id}
-                  type="button"
-                  aria-label={`Character ${(currentPage - 1) * 8 + index + 1}`}
-                  aria-pressed={selected.kind === 'character' && selected.id === id}
-                  onClick={() => select({ kind: 'character', id })}
-                  className="grid cursor-pointer place-items-center rounded-2xl border-2 border-transparent bg-transparent p-1 aria-pressed:border-accent"
-                >
-                  <Avatar name={name} src={image} className="size-14" />
-                </button>
-              ))}
-          </fieldset>
-          <Pager
-            page={currentPage}
-            pageCount={pageCount}
-            onPage={setPage}
-            aria-label="Character pages"
+          <CharacterPicker
+            characters={characters}
+            name={name}
+            selectedId={selected.kind === 'character' ? selected.id : null}
+            onSelect={(id) => select({ kind: 'character', id })}
             disabled={pending}
           />
         </div>

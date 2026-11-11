@@ -196,17 +196,13 @@ export function ShareCard({
       data-qr-logo={name}
       className={cn(
         'shrink-0 overflow-hidden rounded-full bg-share-accent text-share-bg',
-        name === 'spot' ? (compactQr ? 'size-13 rounded-[14px]' : 'size-10') : '',
+        name === 'spot' ? (compactQr ? 'size-13' : 'size-10') : '',
       )}
     >
       <ClubLogo
         initials={imageFor(url) ? '' : item.initials}
         logoUrl={imageFor(url) ? url : null}
-        className={cn(
-          'size-full rounded-full border-0 bg-transparent text-share-bg',
-          compactQr && 'rounded-[14px]',
-          text,
-        )}
+        className={cn('size-full rounded-full border-0 bg-transparent text-share-bg', text)}
       />
     </span>
   )

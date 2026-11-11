@@ -1,10 +1,10 @@
 import type { PlayerProfile } from '@rotra/data/player/types'
-import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { Chip } from '@rotra/ui/chip'
 import { Icon } from '@rotra/ui/icon'
 import { PlayerIdLine } from '@rotra/ui/player-id-line'
+import { ProfileHero } from '@rotra/ui/profile-hero'
 export type PlayerIdentityCardProps = {
   profile: PlayerProfile
   isOwn?: boolean
@@ -21,6 +21,10 @@ export type PlayerIdentityCardProps = {
   /** Public profile: open the comparison (or sign-in). */
   onCompare?: () => void
   compareSignedIn?: boolean
+  /** The player's Profile banner key (court, night, dusk, ember, sun, stripe); missing = Court */
+  bannerKey?: string | null
+  /** An Admin-uploaded banner image; wins over bannerKey */
+  bannerImageUrl?: string | null
 }
 export function PlayerIdentityCard({
   profile,
@@ -33,41 +37,21 @@ export function PlayerIdentityCard({
   onShare,
   onCompare,
   compareSignedIn = false,
+  bannerKey,
+  bannerImageUrl,
 }: PlayerIdentityCardProps) {
   return (
-    <Card asChild>
+    <Card asChild className="overflow-hidden pt-0">
       <section className="flex flex-col gap-3.5">
-        <div className="flex min-w-0 items-center gap-3.5">
-          <span className="relative block flex-none">
-            <Avatar
-              name={profile.fullName}
-              src={profile.picture ?? undefined}
-              size={88}
-              shape="square"
-              tone={profile.picture ? 'neutral' : 'accent'}
-            />
-            {isOwn ? (
-              <button
-                type="button"
-                aria-label="Change profile picture"
-                title="Change profile picture"
-                onClick={onChangePicture}
-                className="absolute -right-1.5 -bottom-1.5 grid size-[34px] cursor-pointer place-items-center rounded-full border-2 border-surface bg-accent p-0 text-on-accent"
-              >
-                <Icon name="edit" className="size-4" />
-              </button>
-            ) : null}
-          </span>
-          <div className="flex min-w-0 flex-col gap-2">
-            <h1 className="[overflow-wrap:anywhere]">{profile.fullName}</h1>
-            {profile.nickname ? <p className="text-fg2">“{profile.nickname}”</p> : null}
-            {isOwn ? (
-              <div className="flex">
-                <Chip tone="accent">This is you</Chip>
-              </div>
-            ) : null}
-          </div>
-        </div>
+        <ProfileHero
+          name={profile.fullName}
+          nickname={profile.nickname}
+          pictureSrc={profile.picture}
+          bannerKey={bannerKey}
+          bannerImageUrl={bannerImageUrl}
+          onChangePicture={isOwn ? (onChangePicture ?? (() => {})) : undefined}
+          badges={isOwn ? <Chip tone="accent">This is you</Chip> : undefined}
+        />
         <div className="flex flex-col gap-2">
           <span className="text-xs font-semibold tracking-[0.6px] text-fg2 uppercase">
             Player ID

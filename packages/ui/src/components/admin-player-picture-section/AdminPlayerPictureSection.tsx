@@ -119,9 +119,8 @@ export function AdminPlayerPictureSection({
           name={name}
           src={pictureSrc(picture)}
           size={64}
-          shape="square"
           tone={picture.kind === 'initials' ? 'accent' : 'neutral'}
-          className="size-[72px] rounded-[18px] text-[22px]"
+          className="size-[72px] text-[22px]"
         />
         <div className="flex flex-col gap-1">
           <b>{pictureLabel(picture)}</b>

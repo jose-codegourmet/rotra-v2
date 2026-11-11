@@ -46,3 +46,7 @@ Superseded by: none
 ## Owner request, November 11, 2026 ("please do this next", #739)
 - Verified in the browser: the switch, the pairs card, Add bagging pair, and Generate matches with a pair.
 - Changed: an applicable pair whose two players are both free now **leads the next doubles draft** (the owner's answer to Q12: the pair beats fairness; court capacity still wins). Before, the pair only joined a draft when the usual ordering happened to pick one of them, so a fresh pair could stay out of the drafts. The draft tile keeps the reason line **Bagging pair: NAME and NAME are partners**.
+
+## Owner comment, November 11, 2026 (on the Add bagging pair sheet): "this should be a grid of players in avatar with skill circle, and just click and click to match the pair"
+- Changed: the two dropdowns are gone. The sheet shows every present player as a round avatar with their level ring (the same colours as the session page's Participants grid), first name and level under it. Tap one player, then another: the two get **1** and **2** badges and a green ring, the status line reads **Kat and Bea · tap a player to change the pair**, and **Add pair** saves. Tapping a picked player clears them; tapping a third player swaps the partner. The pattern segment (**All games · Games 1 and 3 · Games 2 and 4**) and the replace-pair notice stay.
+- Copy added: **Tap two players to make a pair. The ring is tonight's level.**, **NAME · tap their partner**, **NAME and NAME · tap a player to change the pair**; accessible names end with **picked first** / **picked second**.

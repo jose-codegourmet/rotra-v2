@@ -1154,6 +1154,15 @@ textarea.tpl { font-family: var(--mono); font-size: 13px; line-height: 1.55; min
 .wl-n { position: absolute; top: 4px; right: calc(50% - 44px); min-width: 24px; height: 24px; padding: 0 6px; box-sizing: border-box; border-radius: 999px; display: grid; place-items: center; font-style: normal; font-size: 12px; font-weight: 800; background: var(--bg); color: var(--fg); border: 2px solid var(--ring); }
 .pgrid.pub.wl .pcard.pub .avatar { opacity: .85; }
 .pcard.pub.empty .avatar { background: none; outline: 3px dashed var(--border-strong); outline-offset: 4px; }
+/* Add bagging pair (owner comment, November 11, 2026): tap two avatars in a grid; the ring is the level band. */
+.bag-grid { grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 10px 6px; }
+.bag-p { font: inherit; color: inherit; cursor: pointer; border-radius: var(--r); padding: 6px 2px 8px; gap: 6px; }
+.pcard.pub.bag-p .avatar { width: 56px; height: 56px; max-width: none; aspect-ratio: auto; margin-top: 6px; outline-width: 4px; font-size: 18px; }
+.pcard.pub.bag-p.on { background: var(--accent-subtle); }
+.pcard.pub.bag-p.on .avatar { outline-color: var(--accent); }
+.bag-p:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.bag-av { position: relative; display: inline-block; }
+.bag-n { position: absolute; right: -6px; bottom: -4px; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: 12px; font-weight: 800; background: var(--accent); color: var(--on-accent); box-shadow: 0 0 0 2px var(--surface); }
 .pcard.pub.empty b { color: var(--fg3); font-weight: 500; }
 .pcard.pub b { display: block; font-size: 17px; line-height: 1.25; }
 /* “You” label on the viewer's own participant or waitlist tile: accent fill, on-accent text (white in light, dark in dark for contrast). */
@@ -4617,9 +4626,13 @@ const SHEETS = {
   // #739 (proposed): add a bagging pair. A player can be in one pair; picking one who is already paired offers to replace that pair.
   bagAdd(sh) {
     const s = cur(), pairs = s.bagging.pairs || [], here = s.roster.filter((r) => r.present).map((r) => r.pid);
-    const pick = (slot, other) => `<label class="field"><span>${slot === 'a' ? 'First player' : 'Second player'}</span><select class="input" id="bag-${slot}" data-act-change="bagPick" data-slot="${slot}"><option value="">Choose a player…</option>${here.filter((pid) => pid !== other).map((pid) => `<option value="${pid}" ${sh[slot] === pid ? 'selected' : ''}>${esc(nm(pid))}</option>`).join('')}</select></label>`;
-    const clash = [sh.a, sh.b].filter(Boolean).map((pid) => { const pr = pairs.find((x) => x.a === pid || x.b === pid); return pr ? `${esc(short(pid))} is already paired with ${esc(short(pr.a === pid ? pr.b : pr.a))}. Adding this pair replaces it.` : ''; }).filter(Boolean);
-    return sheetShell('Add bagging pair', `${here.length < 2 ? notice('', 'Mark at least two players present first.') : ''}${pick('a', sh.b)}${pick('b', sh.a)}
+    // Owner comment, November 11, 2026: a grid of present players as avatars with their skill ring; tap one, tap another, and that's the pair.
+    const tile = (pid) => { const r = R(s, pid), p = P(pid), n = sh.a === pid ? 1 : sh.b === pid ? 2 : 0; return `<button type="button" class="pcard pub bag-p lv-${rvBand(r)}${n ? ' on' : ''}" data-act="bagTap" data-pid="${pid}" aria-pressed="${!!n}" aria-label="${esc(p.name)}, ${esc(lvLabel(r.level))}${n ? `, picked ${n === 1 ? 'first' : 'second'}` : ''}"><span class="bag-av">${avatar(p)}${n ? `<i class="bag-n" aria-hidden="true">${n}</i>` : ''}</span><b>${esc(short(pid))}</b><span class="small muted">${esc(lvLabel(r.level))}</span></button>`; };
+    const sel = [sh.a, sh.b].filter(Boolean);
+    const clash = sel.map((pid) => { const pr = pairs.find((x) => x.a === pid || x.b === pid); return pr ? `${esc(short(pid))} is already paired with ${esc(short(pr.a === pid ? pr.b : pr.a))}. Adding this pair replaces it.` : ''; }).filter(Boolean);
+    return sheetShell('Add bagging pair', `${here.length < 2 ? notice('', 'Mark at least two players present first.') : ''}
+      <p class="small muted" style="margin:0" aria-live="polite">${sel.length === 2 ? `<b>${esc(short(sh.a))} and ${esc(short(sh.b))}</b> · tap a player to change the pair` : sel.length === 1 ? `<b>${esc(short(sel[0]))}</b> · tap their partner` : 'Tap two players to make a pair. The ring is tonight\'s level.'}</p>
+      <div class="pgrid pub bag-grid" role="group" aria-label="Present players">${here.map(tile).join('')}</div>
       <div class="field"><span>Partners in</span><div class="seg" role="group" aria-label="Partners in">${BAG_PATTERNS.map(([k, l]) => `<button data-act="sheetSet" data-k="pattern" data-v="${k}" aria-pressed="${(sh.pattern || 'all') === k}">${l}</button>`).join('')}</div></div>
       ${clash.map((t) => notice('warn', t)).join('')}`,
       `<button class="btn" data-act="closeSheet" data-autofocus>Cancel</button><button class="btn primary" data-act="bagSave" ${sh.a && sh.b ? '' : 'disabled'}>${clash.length ? 'Replace pair' : 'Add pair'}</button>`);
@@ -5945,6 +5958,8 @@ const ACT = {
   clubPerCourt: (x) => { S.club.perCourt = Math.max(2, Math.min(20, (S.club.perCourt || 8) + +x.d)); save(); render(); },
   toggleBagging: () => { const s = cur(); s.bagging = s.bagging || { on: false, pairs: [] }; s.bagging.on = !s.bagging.on; save(); render(); toast(s.bagging.on ? 'Bagging mode on' : 'Bagging mode off'); },
   bagOpenAdd: () => openSheet({ type: 'bagAdd', a: '', b: '', pattern: 'all' }),
+  // Tap to pair: first tap picks the first player, second tap the partner; tapping a picked player clears them; a third tap swaps the partner.
+  bagTap: (d) => { const sh = S.ui.sheet, pid = d.pid; if (sh.a === pid) { sh.a = sh.b || null; sh.b = null; } else if (sh.b === pid) sh.b = null; else if (!sh.a) sh.a = pid; else sh.b = pid; render(); },
   bagSave: () => {
     const s = cur(), sh = S.ui.sheet; if (!sh.a || !sh.b || sh.a === sh.b) return;
     s.bagging.pairs = (s.bagging.pairs || []).filter((x) => ![sh.a, sh.b].some((pid) => x.a === pid || x.b === pid));

@@ -67,6 +67,10 @@ The mockup service publishes `dist/public` as static files; the other services u
 Deploy production workflow builds and publishes all four services together. Domain attachment/DNS
 is configured outside the repository; see the [deployment setup](../README.md#production-deployments).
 
+The Queue, Player and Admin services export OpenTelemetry traces to Grafana Cloud when
+`OTEL_EXPORTER_OTLP_ENDPOINT` is set; locally, `make observability-up` runs a Grafana stack. See
+[observability](observability.md).
+
 
 ### Product → app
 

@@ -115,6 +115,7 @@ email-templates/          auth email HTML, pasted into the Supabase dashboard by
 | **Prisma / tables** (database epic) | [database_design/product/README.md](docs/database_design/product/README.md) → [conventions](docs/database_design/product/conventions.md) → [coding-conventions.md](docs/coding-conventions.md) §13 |
 | **Offline** (Queue) | [architecture.md](docs/architecture.md) §9 → [offline module](docs/business_logic/product/queue/modules/offline/README.md) |
 | An **auth email template** | [email-templates.md](docs/email-templates.md) |
+| **Observability** (OpenTelemetry, Grafana, tracing) | [observability.md](docs/observability.md) |
 | A **layout / UI change** request | [mockup-changes/README.md](docs/mockup-changes/README.md) → the app's mockup → its business module + database design |
 | Turning **mockup changes into tickets** | [mockup-changes/README.md](docs/mockup-changes/README.md) → [ways-of-working.md](docs/ways-of-working.md) §3 |
 | **MVP scope, status, or decisions** | [mvp/README.md](docs/mvp/README.md) → the workstream page → [mvp/decisions.md](docs/mvp/decisions.md) |

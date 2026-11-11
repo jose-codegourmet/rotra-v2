@@ -12,17 +12,19 @@
     "type-check": "next typegen && tsc --noEmit"
   },
   "dependencies": {
+    "@opentelemetry/api": "^1.10.0",
+    "@reduxjs/toolkit": "^2.0.0",
+    "@rotra/data": "workspace:*",
+    "@rotra/db": "workspace:*",
+    "@rotra/schema": "workspace:*",
     "@rotra/ui": "workspace:*",
+    "@tanstack/react-query": "^5.0.0",
+    "@tanstack/react-query-devtools": "^5.0.0",
+    "@vercel/otel": "^2.3.0",
     "next": "16.4.3",
     "react": "~19.2.9",
     "react-dom": "~19.2.9",
-    "@rotra/data": "workspace:*",
-    "@rotra/schema": "workspace:*",
-    "@tanstack/react-query": "^5.0.0",
-    "@tanstack/react-query-devtools": "^5.0.0",
-    "@reduxjs/toolkit": "^2.0.0",
-    "react-redux": "^9.0.0",
-    "@rotra/db": "workspace:*"
+    "react-redux": "^9.0.0"
   },
   "devDependencies": {
     "@rotra/config": "workspace:*",

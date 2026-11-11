@@ -43,3 +43,12 @@ Superseded by: none
 
 ## Real app work
 - Epic P07 in apps/player: route /clubs/[clubId] (served per request, never indexed, never static); club header, members list, upcoming sessions, calendar; Join this club (current invite link) and Share club page; real-mode reads that apply the masking and hidden-from-directory rules. Link from the Your clubs list.
+
+## Owner comment, November 11, 2026: "the club page looks so bad, please redesign"
+- Changed: the page is rebuilt in the profile-card language.
+  - **Hero:** the club's banner (one of the predefined banners) runs across the top of the card with the club mark (initials, 88 px circle) overlapping it; the club name beside or below it; a chip row (**Cebu City**, **320 members**, and **Playing now** or **Next Thu, Nov 13**); **Join this club** (primary) and **Share club page** (top right on wide screens, stacked on phones); then a three-tile strip: **Registered members**, **Upcoming sessions**, **Sessions this month**.
+  - **Next up card:** the soonest session as a highlighted card: a date block (day number and month), **Next up** or **Happening now**, title, date and time (“· courts are running” when live), and **Open session page** or **Watch live**.
+  - **Two columns from 920 px:** left **Upcoming sessions** (the rest, each with a date block and a Scheduled chip; “That's the only one scheduled so far.” when only one) and **Calendar** (unchanged month grid, now with date-block rows); right **Members** as a four-across grid of circular avatars with first names and levels (masked members shown without a button), **Show more** with “12 of 320”.
+  - On phones everything stacks; the name sits under the club mark; the Next up button spans the card.
+- Copy added: **Registered members**, **Upcoming session(s)**, **Session(s) this month**, **Next up**, **Happening now**, **courts are running**, **Open session page**, **Watch live**, **Playing now**, **Next DATE**, **That's the only one scheduled so far.**, **Show more**. Removed: the Founding city / Members key-value list, “Show more members”.
+- States: with a live session (Playing now chip, Happening now card), without any upcoming session (no Next up card, empty state), signed out (masked names), signed in (names, You), calendar months.

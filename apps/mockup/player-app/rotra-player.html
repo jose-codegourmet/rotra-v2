@@ -600,6 +600,43 @@ a.srow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .crow.mbtn { width: 100%; border: 0; border-radius: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
 button.crow.mbtn:hover { background: var(--elev); }
 button.crow.mbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+/* P-CLUB-PAGE redesign (owner comment, November 11, 2026): banner hero, stats strip, Next up card, two columns, member avatar grid. */
+.club-page { max-width: 1180px; }
+.club-hero .who h1 { font-size: clamp(24px, 4vw, 34px); }
+.club-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.club-acts { display: flex; flex-wrap: wrap; gap: 8px; }
+.club-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.stat { padding: 12px 14px; border-radius: var(--r); background: var(--elev); min-width: 0; }
+.stat b { display: block; font-size: 24px; line-height: 1.1; }
+.stat span { font-size: 12px; color: var(--fg2); }
+.club-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (min-width: 920px) { .club-grid { grid-template-columns: minmax(0, 1fr) 380px; } .club-hero .club-acts { position: absolute; right: 16px; top: 112px; } .club-hero { position: relative; } }
+@media (max-width: 640px) {
+  .club-hero .who { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .club-hero .who h1 { font-size: 24px; }
+  .next-card { flex-wrap: wrap; }
+  .next-card .btn { flex: 1 1 100%; justify-content: center; }
+}
+.next-card { display: flex; align-items: center; gap: 16px; border-color: color-mix(in srgb, var(--accent) 45%, transparent); background: linear-gradient(135deg, var(--accent-subtle), transparent 70%); }
+.next-card .main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.next-card .next-title { font-size: 18px; }
+.next-card.live { border-color: var(--accent); }
+.next-card .dblk { width: 64px; height: 64px; }
+.next-card .dblk b { font-size: 24px; }
+.dblk { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 52px; height: 52px; flex: none; border-radius: var(--r-sm); border: 1px solid var(--border); background: var(--surface); }
+.dblk b { font-size: 18px; line-height: 1; }
+.dblk span { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--fg2); margin-top: 2px; }
+.urow { display: flex; align-items: center; gap: 12px; padding: 10px 0; color: inherit; text-decoration: none; min-width: 0; }
+.urow + .urow { border-top: 1px solid var(--border); }
+.urow .main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.urow .main b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+a.urow:hover .main b, a.urow:focus-visible .main b { color: var(--accent); }
+.mgrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.mcell { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; min-width: 0; padding: 6px 2px; border: 0; border-radius: var(--r-sm); background: none; color: inherit; font: inherit; }
+button.mcell { cursor: pointer; }
+.mcell b { font-size: 12px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mcell span { font-size: 11px; color: var(--fg2); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+button.mcell:hover .avatar, button.mcell:focus-visible .avatar { box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--accent); }
 .cal-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
 .cal .dow { font-size: 11px; font-weight: 600; text-align: center; color: var(--fg2); }
@@ -1311,6 +1348,8 @@ function clubCalendar(sessions, off) {
   return { title, grid, inMonth };
 }
 function viewClub() {
+  // Redesigned November 11, 2026 (owner comment: "the club page looks so bad"): banner hero like the profile card, a stats strip,
+  // a Next up card for the soonest session, then two columns: sessions and calendar on the left, a member avatar grid on the right.
   const id = S.viewId, club = CLUB_DIR[id];
   if (!club) return viewNotFound();
   const city = (PLACES.find(([c]) => c === club.code) || [0, club.code])[1];
@@ -1318,33 +1357,53 @@ function viewClub() {
   const { up, all } = clubSessions(id);
   const off = Math.max(minOff(), Math.min(S.ui.clubMonth || 0, maxOff(all)));
   const cal = clubCalendar(all, off);
+  const thisMonth = all.filter((x) => monthIdx(dayOf(x.ago)) === monthIdx(new Date())).length;
+  const bannerKey = { c1: 'court', c2: 'dusk', c3: 'sun', c4: 'night' }[id] || 'court';
+  const next = up[0] || null, rest = up.slice(1);
   const stat = (x) => (x.live ? chip('Happening now', 'ok') : x.done ? chip('Done') : chip('Scheduled', 'solid'));
+  const dblk = (ago) => { const d = dayOf(ago); return `<span class="dblk" aria-hidden="true"><b>${d.getDate()}</b><span>${d.toLocaleDateString([], { month: 'short' })}</span></span>`; };
   const when = (x) => `${fmtDay(x.ago)}${x.time ? ` · ${x.time}` : ''}`;
   const member = (e) => {
     const hid = hiddenFromViewer(e), m = hid ? maskedView(e) : e;
-    const inner = `${avatar(m)}<div class="main"><b>${esc(m.name)}</b>${!hid && e.id === S.me ? ' ' + chip('You', 'ok') : ''}<span class="small muted">${lvLabel(e.level)}</span></div>`;
-    return hid ? `<div class="crow">${inner}</div>` : `<button type="button" class="crow mbtn" data-act="openProfile" data-id="${e.id}" aria-label="${esc(e.name)}, ${lvLabel(e.level)}">${inner}</button>`;
+    const inner = `${avatar(m, 'lg')}<b>${esc(m.name)}</b><span>${!hid && e.id === S.me ? 'You' : lvLabel(e.level)}</span>`;
+    return hid ? `<div class="mcell">${inner}</div>` : `<button type="button" class="mcell" data-act="openProfile" data-id="${e.id}" aria-label="${esc(e.name)}, ${lvLabel(e.level)}">${inner}</button>`;
   };
   const sessionRow = (x) => (x.done
-    ? `<div class="srow"><span class="main"><b>${esc(x.title)}</b><span class="small muted">${when(x)}</span></span><span class="row">${stat(x)}${x.gone ? '<span class="small muted srow-note">Session page no longer available</span>' : `<button class="btn xs ghost" data-act="sessionPage" data-title="${esc(x.title)}">Session page ${I.ext}</button>`}</span></div>`
-    : `<a class="srow" href="/queue/s/${encodeURIComponent(x.slug)}"><span class="main"><b>${esc(x.title)}</b><span class="small muted">${when(x)}</span></span>${stat(x)}</a>`);
-  return `<main class="wrap mid">
+    ? `<div class="urow">${dblk(x.ago)}<span class="main"><b>${esc(x.title)}</b><span class="small muted">${when(x)}</span></span><span class="row">${stat(x)}${x.gone ? '<span class="small muted srow-note">Session page no longer available</span>' : `<button class="btn xs ghost" data-act="sessionPage" data-title="${esc(x.title)}">Session page ${I.ext}</button>`}</span></div>`
+    : `<a class="urow" href="/queue/s/${encodeURIComponent(x.slug)}">${dblk(x.ago)}<span class="main"><b>${esc(x.title)}</b><span class="small muted">${when(x)}</span></span>${stat(x)}</a>`);
+  const nextCard = next ? `<section class="card next-card${next.live ? ' live' : ''}" aria-label="Next session">
+      ${dblk(next.ago)}<div class="main"><span class="label">${next.live ? 'Happening now' : 'Next up'}</span><b class="next-title">${esc(next.title)}</b><span class="small muted">${when(next)}${next.live ? ' · courts are running' : ''}</span></div>
+      <a class="btn sm primary" href="/queue/s/${encodeURIComponent(next.slug)}">${next.live ? 'Watch live' : 'Open session page'}</a></section>` : '';
+  return `<main class="wrap club-page">
     <div class="page-head">${backBtn('goBoard', 'Leaderboard')}</div>
-    <section class="card hero">
+    <section class="card hero club-hero">
+      <div class="hero-banner bn-${bannerKey}" aria-hidden="true"></div>
       <div class="who">${avatar({ name: club.name }, 'xxl')}<div style="min-width:0" class="stack tight"><h1>${esc(club.name)}</h1>
-        <dl class="kv"><dt>Founding city</dt><dd>${esc(city)}</dd><dt>Members</dt><dd>${num(members.length)}</dd></dl></div></div>
-      <div class="acts"><button class="btn sm primary" data-act="clubJoin" data-club="${id}">Join this club</button><button class="btn sm" data-act="shareClub" data-club="${id}">${I.share} Share club page</button></div>
+        <div class="club-meta">${chip(`${I.pin || ''}${esc(city)}`)}${chip(`${num(members.length)} member${members.length === 1 ? '' : 's'}`)}${next ? chip(next.live ? 'Playing now' : `Next ${fmtDay(next.ago)}`, next.live ? 'ok' : '') : ''}</div></div></div>
+      <div class="club-acts"><button class="btn primary" data-act="clubJoin" data-club="${id}">Join this club</button><button class="btn" data-act="shareClub" data-club="${id}">${I.share} Share club page</button></div>
+      <div class="club-stats" aria-label="Club at a glance">
+        <div class="stat"><b class="tnum">${num(members.length)}</b><span>Registered members</span></div>
+        <div class="stat"><b class="tnum">${num(up.length)}</b><span>Upcoming session${up.length === 1 ? '' : 's'}</span></div>
+        <div class="stat"><b class="tnum">${num(thisMonth)}</b><span>Session${thisMonth === 1 ? '' : 's'} this month</span></div>
+      </div>
     </section>
-    <section class="card stack"><h2>Members</h2>
-      ${S.me ? '' : '<p class="small muted">Names are masked. Sign in with ROTRA to see them.</p>'}
-      ${members.length ? `<div>${members.slice(0, shown).map(member).join('')}</div>${shown < members.length ? `<div class="row"><button class="btn sm" data-act="clubMore">Show more members</button><span class="small muted">${num(shown)} of ${num(members.length)}</span></div>` : ''}` : '<div class="empty">No registered members yet.</div>'}</section>
-    <section class="card stack"><h2>Upcoming sessions</h2>
-      ${up.length ? `<div>${up.map(sessionRow).join('')}</div>` : '<div class="empty">No upcoming sessions.</div>'}</section>
-    <section class="card stack"><div class="cal-head"><h2>Calendar</h2><div class="row"><button class="btn xs" data-act="clubMonth" data-v="${off - 1}" aria-label="Previous month" ${off <= minOff() ? 'disabled' : ''}>${I.back}</button><b aria-live="polite">${cal.title}</b><button class="btn xs" data-act="clubMonth" data-v="${off + 1}" aria-label="Next month" ${off >= maxOff(all) ? 'disabled' : ''}>${I.fwd}</button></div></div>
-      ${cal.grid}
-      <div class="cal-key" aria-hidden="true"><span><i></i>Upcoming</span><span><i class="done"></i>Done</span></div>
-      ${cal.inMonth.length ? `<div>${cal.inMonth.map(sessionRow).join('')}</div>` : `<div class="empty">No sessions in ${esc(cal.title)}.</div>`}
-      <span class="hint">Done sessions from the last three months stay on the calendar.</span></section>
+    <div class="club-grid">
+      <div class="stack" style="gap:20px">
+        ${nextCard}
+        <section class="card stack"><div class="between"><h2>Upcoming sessions</h2><span class="small muted">${num(up.length)}</span></div>
+          ${rest.length ? `<div>${rest.map(sessionRow).join('')}</div>` : next ? '<p class="small muted" style="margin:0">That\'s the only one scheduled so far.</p>' : '<div class="empty">No upcoming sessions.</div>'}</section>
+        <section class="card stack"><div class="cal-head"><h2>Calendar</h2><div class="row"><button class="btn xs" data-act="clubMonth" data-v="${off - 1}" aria-label="Previous month" ${off <= minOff() ? 'disabled' : ''}>${I.back}</button><b aria-live="polite">${cal.title}</b><button class="btn xs" data-act="clubMonth" data-v="${off + 1}" aria-label="Next month" ${off >= maxOff(all) ? 'disabled' : ''}>${I.fwd}</button></div></div>
+          ${cal.grid}
+          <div class="cal-key" aria-hidden="true"><span><i></i>Upcoming</span><span><i class="done"></i>Done</span></div>
+          ${cal.inMonth.length ? `<div>${cal.inMonth.map(sessionRow).join('')}</div>` : `<div class="empty">No sessions in ${esc(cal.title)}.</div>`}
+          <span class="hint">Done sessions from the last three months stay on the calendar.</span></section>
+      </div>
+      <aside class="stack" style="gap:20px">
+        <section class="card stack"><div class="between"><h2>Members</h2><span class="small muted">${num(members.length)}</span></div>
+          ${S.me ? '' : '<p class="small muted" style="margin:0">Names are masked. Sign in with ROTRA to see them.</p>'}
+          ${members.length ? `<div class="mgrid">${members.slice(0, shown).map(member).join('')}</div>${shown < members.length ? `<div class="row"><button class="btn sm" data-act="clubMore">Show more</button><span class="small muted">${num(shown)} of ${num(members.length)}</span></div>` : ''}` : '<div class="empty">No registered members yet.</div>'}</section>
+      </aside>
+    </div>
   </main>`;
 }
 // The calendar reaches back three months and forward to the last upcoming session.

@@ -32,7 +32,9 @@ Superseded by: none
 - Shares work with: none
 
 ## Docs updated
-- none yet — proposal pending owner approval
+- Business logic: none needed.
+- Database design: none needed.
+- Screen docs: `docs/screens/product/modules/queue/session-setup.md` › Roster views (Grid view is two compact columns at 640 px and narrower).
 
 ## Real app work
 - `@rotra/ui` RosterGrid: two-column compact variant under 640 px.

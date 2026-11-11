@@ -33,7 +33,10 @@ Superseded by: none
 - Shares work with: Player log 2026-11-11-player-profile-banner (the picker reads this set)
 
 ## Docs updated
-- none yet — proposal pending owner approval; Admin configuration module and screen docs follow when approved (next to Profile character library, D-2026-11-09-13)
+- Business logic: docs/business_logic/product/admin/modules/configuration/README.md (new Profile banner library section; Profile character library: 15 per page, at least 15 shown, upload progress bar)
+- Database design: docs/database_design/product/admin/modules/configuration-requests.md (new `profile_banners` section; players reference a banner key, no uploads by players; character minimum 15 noted)
+- Screen docs: docs/screens/product/modules/admin/configuration.md (new A-BANNERS; A-CHARACTERS 15 per page and progress bar), docs/screens/product/modules/admin/access-navigation.md (rail item), docs/screens/product/modules/admin/README.md (index)
+- MVP: docs/mvp/workstreams/admin.md (status row, gap line, related decision)
 
 ## Real app work
 - Admin: `/settings/profile-banners` route, `ProfileBannersPage` in `@rotra/ui` reusing the characters page; `profile_banners` table like `profile_characters` (migration sign-off needed); Supabase Storage for uploads (D-2026-11-08-03). Player: banner picker reads the shown banners; `players.banner_id`.

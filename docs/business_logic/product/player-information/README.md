@@ -1,12 +1,12 @@
 # Player Information app
 
-**Last verified:** 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-11 for the public club page; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Lean v1 target product.
 
 **Reference prototype:** [`apps/mockup/player-app/rotra-player.html`](../../../../apps/mockup/player-app/rotra-player.html), also published as the ROTRA Players artifact. It shows these rules on screen; it adds no rules of its own.
 
-This product stores player identity and shared rank across clubs. Profiles and the overall ROTRA leaderboard are public. Registered players sign in to edit their personal information, but cannot edit games, results, or calculated ranks.
+This product stores player identity and shared rank across clubs. Profiles and the overall ROTRA leaderboard are public, subject to each player's [profile visibility](modules/identity/README.md#personal-editing-and-privacy) (Public · Private · Always private; default Private). Registered players sign in to edit their personal information, but cannot edit games, results, or calculated ranks.
 
 | Module | Owns |
 |---|---|
@@ -25,3 +25,15 @@ This product stores player identity and shared rank across clubs. Profiles and t
 - No old review, skill-dimension, EXP, or separate MMR system is implicitly included.
 
 World discovery is v2 and has no further requirements here.
+
+## Public club page (#737, epic P07)
+
+A club has a public page in the Player app at `/clubs/[clubId]`, opened from **Your clubs** on a player's own profile ([D-2026-11-11-11](../../../mvp/decisions.md#d-2026-11-11-11)). Epic **P07**; the MVP timing is not decided (the scope freeze D-04 still governs the real-app order).
+
+- **What it shows.** A club header (the club's mark and name, city, member count, whether a session is happening or the next one is scheduled, **Join this club**, **Share club page**), stat cards, a **Next up** card for the soonest session, **Upcoming sessions**, a month **Calendar** with the club's complete schedule, and **Members**. **No banner**: banners belong to player profiles only.
+- **Members are registered members only.** Guests and unclaimed profiles never appear. Names are masked for visitors exactly as on the public session page and the rows don't open; signed-in players see names and open the player profile dialog. An always-private member shows a masked name with their picture; a member who turned on **Hide from Player Information** is not listed. The member count equals the members listed.
+- **Schedule.** Upcoming means scheduled or live, never cancelled; each session opens its public session page. The calendar lists every session of the club, upcoming and done, however old; done sessions keep their session page for three months, after which the existing "Session page no longer available" note shows.
+- **Join this club** opens the club's current invite link (sign-up when signed out, **Join <club>?** when signed in). **Share club page** copies the page link. The invite link and the page link are separate: regenerating the invite code changes where the button goes, not the page URL.
+- **Members page** `/clubs/[clubId]/members`: all members, searchable by name or nickname, filterable by level, grouped by first letter with an A–Z index, like Queue's Saved players. Masked members are listed without a button and never match a search.
+- **Profile dialog.** A member opens a dialog instead of leaving the page: banner, picture (opens the full photo), name and nickname, level, overall position when there is one, **About** (registered in, RTR ID) and **Stats · last 90 days**. A private member's dialog shows picture and banner only.
+- The page is served per request, never indexed and never static.

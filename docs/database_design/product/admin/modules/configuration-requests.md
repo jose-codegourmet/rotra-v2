@@ -44,7 +44,7 @@ order), no created-by column: every change writes an `admin_audit_events` row
 `{ number }`). Seeded with the 24 mock characters, same ids, images and order.
 
 Rules on the server (`packages/db/src/admin/profile-characters.ts`, one advisory lock per write):
-at least 8 rows stay shown (hide/delete refusals use the mock's copy); restore of a row already back
+at least 8 rows stay shown today, to become **15** per [D-2026-11-11-11](../../../../mvp/decisions.md#d-2026-11-11-11) (hide/delete refusals use the mock's copy); restore of a row already back
 is a conflict. Images are PNG/JPEG/WebP up to 1 MB, cropped square in the browser, bytes checked on
 the server, stored in the public bucket `profile-characters` at `<id>.<ext>` (created by hand; see
 [identity](../../player-information/modules/identity.md#profile-picture-storage-542)). The keep-two
@@ -52,6 +52,12 @@ picture rule (D-2026-11-09-10) does not apply.
 
 RLS on; no anon/authenticated/PUBLIC privileges. The public read of shown rows is served by the
 Player and Admin servers (`GET /api/profile-characters/shown`), not by client RLS.
+
+## `profile_banners` ([D-2026-11-11-11](../../../../mvp/decisions.md#d-2026-11-11-11))
+
+**Proposed; not built, migration needs sign-off.** The banner library players pick from, managed only by the platform owner in Admin › Settings › Profile banners (mockup log 2026-11-11-admin-profile-banners). Same shape and rules as `profile_characters`: `id` text PK; `image` text (a data: URL for seeded rows or the public Storage URL); `shown` boolean (default true); `uploaded_at` timestamptz (upload order); `name` text (the page shows a name under each banner; the six seeded samples are Court, Night, Dusk, Ember, Sun, Stripe; whether uploads get a generated name is for the migration ticket to confirm); `deleted_at` timestamptz, nullable (soft delete so Undo works and `banner:<id>` references keep resolving). Every change writes an `admin_audit_events` row (`profile_banner.added|shown|hidden|deleted|restored`).
+
+Rules on the server: at least **2** rows stay shown; images are PNG/JPEG/WebP up to **2 MB**, centred-cropped to 3:1 in the browser, bytes checked on the server, stored in a public Storage bucket (D-2026-11-08-03). **Players never upload**: a player's profile stores only a reference to a banner key (`players.banner_id`, nullable), which keeps resolving after the banner is hidden or deleted. The keep-two picture rule does not apply. RLS on; the public read of shown rows is served by the Player and Admin servers, not by client RLS.
 
 ## `player_contact_change_requests`
 

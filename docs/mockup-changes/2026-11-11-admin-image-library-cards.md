@@ -35,7 +35,7 @@ Superseded by: none
 - Shares work with: 2026-11-11-admin-profile-banners
 
 ## Docs updated
-- none yet — proposal pending owner approval; the Admin configuration screen doc follows when approved
+- Cancelled, so the card layout is not documented. Only the upload progress bar applies: docs/screens/product/modules/admin/configuration.md (A-CHARACTERS upload zone and A-BANNERS; a note that the card layout was reverted) and docs/business_logic/product/admin/modules/configuration/README.md (Profile character library and Profile banner library uploads)
 
 ## Real app work
 - `@rotra/ui` ProfileCharactersPage and ProfileBannersPage: render ImageCard (image, name, Shown/Hidden chip, Hide/Show, Delete) instead of the tile and corner ×.

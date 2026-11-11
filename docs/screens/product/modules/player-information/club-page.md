@@ -1,0 +1,28 @@
+# Public club page and club members
+
+**Last verified:** 2026-11-11 · **Surfaces:** `P-CLUB-PAGE`, `P-CLUB-MEMBERS`. **Epic:** P07.
+
+**Sources:** [Public club page rules](../../../../business_logic/product/player-information/README.md#public-club-page-737-epic-p07), [identity](../../../../business_logic/product/player-information/modules/identity/README.md), [D-2026-11-11-11](../../../../mvp/decisions.md#d-2026-11-11-11). Prototype: [`rotra-player.html`](../../../../../apps/mockup/player-app/rotra-player.html) at `/player/clubs/c1` (also c2, c3, c4). Routes: `/clubs/[clubId]` and `/clubs/[clubId]/members` (see [navigation](../../navigation.md#player-club-routes-epic-p07)).
+
+## P-CLUB-PAGE — A club's public page
+
+Public, served per request, never indexed, never static. **Your clubs** on My profile has a **Club page** button per club; the Prototype menu lists club pages (visitors have no other way in yet). An unknown club id is not found. Two columns from 920 px; on phones everything stacks.
+
+- **Hero card**, no banner strip (banners are a player-profile thing only): the club mark (the club's initials in a circle, the fixtures have no club picture) and the club name side by side; a chip row (city, for example **Cebu City**; **320 members**; and **Playing now** or **Next Thu, Nov 13**); **Join this club** (primary) and **Share club page** (top right on wide screens, stacked on phones).
+- **Stat cards** (one per row on phones): a round accent icon, the number with its label and a one-line detail on the right. **Registered members** · **N shown below** / **None yet**; **Upcoming sessions** · **Next DATE** / **One is happening now** / **Nothing scheduled**; **Sessions this month** · **N done · N to come**.
+- **Next up card**, the soonest session: a date block (day number and month), **Next up** or **Happening now**, title, date and time (“· courts are running” when live), and **Open session page** or **Watch live**. With no upcoming session there is no card, only the empty state.
+- **Upcoming sessions** (left): the rest, each with a date block and a **Scheduled** chip; “That's the only one scheduled so far.” when only one. Scheduled and live, never cancelled; each row opens that session's public page. Empty: **No upcoming sessions.**
+- **Calendar** (left): the Queue dashboard's month view. Day cells show up to two session chips (start time and title, colour-coded: **Happening now** accent, **Scheduled** warn, **Done** grey) with “+N more”; on phones the cells show coloured dots. **Today** jumps back and selects today; tapping a date lists that day's sessions under the grid as cards (date and time, title, status chip, **Session page** link for done ones). **Previous month** / **Next month** (disabled at the ends; the arrows reach back to the oldest session). Empty month: **No sessions in <Month Year>.** Legend: **Happening now · Scheduled · Done · Tap a date to see its sessions.** Hint: “Every session of this club, upcoming and done. Done sessions keep their session page for three months.” A done session whose page is gone shows **Session page no longer available**.
+- **Members** (right): a four-across grid of circular avatars with first names and levels, **Show more** with “12 of 320” (12 at a time), and **See all N** to the Members page. A masked member is shown without a button. Empty: **No registered members yet.**
+- **Who is listed** ([D-2026-11-11-11](../../../../mvp/decisions.md#d-2026-11-11-11)): registered members only; guests and unclaimed profiles never; members who turned on **Hide me from Player Information** never; the count equals the members listed. Signed out: names masked with the hint **Names are masked. Sign in with ROTRA to see them.** and rows don't open. Signed in: names, a **You** chip on your own row, and a tap opens the [profile dialog](profile.md#profile-dialog). An always-private member stays masked for everyone (picture shown); a private member is masked for visitors.
+- **Join this club** opens the club's current invite link (sign-up when signed out, **Join <club>?** when signed in; an existing member gets the existing already-in message). **Share club page** copies the page link: toast **Club page link copied**, or “Couldn't copy. The club page link is …”. The invite link and the page are separate; regenerating the invite code changes the button's target, not the page URL.
+
+## P-CLUB-MEMBERS — All members
+
+Opened from **See all N** in the Members card; a back link returns to the club page. Like Queue › Saved players: a **Search** box (name or nickname, live); a **Level** segment (**All levels · Beginner · Intermediate · Advanced · No level yet**); “Showing N of M” with **Clear**; one card per first letter with a sticky letter heading and its count; rows with the round avatar, name, **You** chip and level; and an **A–Z** index on the right that jumps to a letter (letters with no members are greyed). Masked members (visitors, always-private) are listed without a button and never match a search. Empty: **No members match.** Tapping a member opens the [profile dialog](profile.md#profile-dialog), not a page.
+
+## Acceptance examples
+
+- A signed-out visitor sees masked names and nothing opens.
+- A member who turns on **Hide me from Player Information** disappears from the list and the count.
+- A club with no sessions shows the empty states and no Next up card.

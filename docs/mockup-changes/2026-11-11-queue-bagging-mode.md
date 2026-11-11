@@ -36,9 +36,9 @@ Superseded by: none
 - Shares work with: none
 
 ## Docs updated
-- Business logic: none yet — proposal pending owner approval; business/screen docs follow when approved
-- Database design: none yet — proposal pending owner approval; business/screen docs follow when approved
-- Screen docs: none yet — proposal pending owner approval; business/screen docs follow when approved
+- Business logic: `docs/business_logic/product/queue/modules/queueing/README.md` › Bagging mode and bagging pairs (new section, D-2026-11-11-11); `modules/queueing/flow/generate-and-dispatch.md` step 3; `modules/sessions/README.md` › Running (setting bullet); `docs/business_logic/product/open-decisions.md` (Queue rows: settled and still open).
+- Database design: `docs/database_design/product/queue/modules/sessions-roster.md` › `queue_sessions` (proposed Bagging mode setting: on/off and pairs with a, b and pattern `all` or game numbers; proposed names, not settled).
+- Screen docs: `docs/screens/product/modules/queue/match-queue.md` › Q-AUTO (switch, Bagging pairs card, reason line); `docs/screens/product/dialogs.md` › D-BAGGING-PAIR (new); `docs/screens/product/open-decisions.md` (Queue rows).
 
 ## Real app work
 - Session setting `bagging` (switch + pairs) on the live session, Queue Master only; Generate matches partner placement in all tabs; Queue UI above. No auto-generate path yet (see open #725). Database design and business docs follow approval.

@@ -37,9 +37,11 @@ Superseded by: none
 - Shares work with: the profile visibility log (masking and hidden players) and the avatar photo viewer logs (member rows open profiles, the photo opens from the profile).
 
 ## Docs updated
-- Business logic: none yet — proposal pending owner approval; business/screen docs follow when approved
-- Database design: none yet — proposal pending owner approval; business/screen docs follow when approved
-- Screen docs: none yet — proposal pending owner approval; business/screen docs follow when approved
+- Business logic: `docs/business_logic/product/player-information/README.md` › Public club page (#737, epic P07).
+- Database design: `docs/database_design/product/player-information/modules/identity.md` › Public club page reads (no new table); `docs/database_design/product/player-information/README.md`.
+- Screen docs: new `docs/screens/product/modules/player-information/club-page.md` (P-CLUB-PAGE, P-CLUB-MEMBERS, every string); `docs/screens/product/modules/player-information/profile.md` › Profile dialog, Your clubs (Club page button); `docs/screens/product/modules/player-information/README.md`; `docs/screens/product/navigation.md` (module table, Player club routes).
+- Other: `docs/product-terms.md` › Public club page; open decisions (Player rows).
+- Note: the redesign comments override the first version of this log (no banner on the club page, Members page, profile dialog, complete calendar); the docs follow the final state.
 
 ## Real app work
 - Epic P07 in apps/player: route /clubs/[clubId] (served per request, never indexed, never static); club header, members list, upcoming sessions, calendar; Join this club (current invite link) and Share club page; real-mode reads that apply the masking and hidden-from-directory rules. Link from the Your clubs list.

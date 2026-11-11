@@ -36,9 +36,9 @@ Superseded by: none
 - Shares work with: 2026-11-11-queue-set-games-played.md (Players tab cards), 2026-11-11-queue-start-session-online-only.md (Players tab and roster)
 
 ## Docs updated
-- Business logic: none yet — proposal pending owner approval; business/screen docs follow when approved
-- Database design: none yet — proposal pending owner approval; business/screen docs follow when approved
-- Screen docs: none yet — proposal pending owner approval; business/screen docs follow when approved
+- Business logic: `docs/business_logic/product/queue/modules/players/README.md` › Slots and waitlist (stepping down, overfilling, expected games), Roster changes; `docs/business_logic/product/open-decisions.md` (Queue rows: standings for a stepped-down player still open).
+- Database design: `docs/database_design/product/queue/modules/sessions-roster.md` › `session_waitlist` (step-down inserts at the front, refused while in an unfinished match; no new field).
+- Screen docs: `docs/screens/product/dialogs.md` › D-OVERFILL (new); `docs/screens/product/modules/queue/session-setup.md` › Roster and levels, Waitlist; `docs/screens/product/modules/queue/players-roster.md` › Q-ADD-PLAYER, Q-ROSTER; `docs/screens/product/modules/queue/session-console.md` › Q-POOL; `docs/screens/product/modules/queue/public-session.md` › My night (Move me to the waitlist, hidden while in a match); `docs/screens/product/open-decisions.md`.
 
 ## Real app work
 - Step-down action for the Queue Master and for the signed-in player, server-side block while in an unfinished match, front-of-waitlist placement, over-capacity add with confirmation, expected games recomputed on every roster count change (queue app, player app session page, packages/ui roster-card and summary). Needs a decision on keeping finished games for a stepped-down player in the standings.

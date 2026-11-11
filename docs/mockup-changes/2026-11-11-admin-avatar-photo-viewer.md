@@ -34,9 +34,9 @@ Superseded by: none
 - Shares work with: 2026-11-11-player-avatar-photo-viewer.md
 
 ## Docs updated
-- Business logic: none yet — proposal pending owner approval; business/screen docs follow when approved
-- Database design: none yet — proposal pending owner approval; business/screen docs follow when approved
-- Screen docs: none yet — proposal pending owner approval; business/screen docs follow when approved
+- Business logic: none needed (the viewer is presentation only)
+- Database design: none needed
+- Screen docs: docs/screens/product/modules/admin/players-requests.md (Full-photo viewer paragraph after A-PLAYERS/A-PLAYER-DETAIL picture rules; covers Quick view, Edit profile, Player detail, contact-change review, club detail logo); approved in D-2026-11-11-11
 
 ## Real app work
 - Use the shared Avatar view behaviour and PhotoViewer dialog on Admin Quick view, Edit profile, player detail, the contact-change review card and the club detail logo; keep row taps opening Quick view and the contact-change review.

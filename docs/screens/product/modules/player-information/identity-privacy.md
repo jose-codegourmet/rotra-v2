@@ -14,11 +14,21 @@ Explain permanence only where useful: assigned at first sync using creating club
 
 Loading/no ID yet: show pending allocation honestly. If the player has a stable cached ID, displaying it offline can be allowed as a read behavior; verification by a new club may still need internet.
 
-## P-PROFILE-PRIVACY — Public or private profile
+## P-PROFILE-PRIVACY — Profile visibility and Player Information
 
-A **Profile visibility** section on **Privacy and contact**, directly above Phone privacy, with the same switch layout. Switch label: **Private profile**. Helper text: "Private means guests don't see your ROTRA profile. Signed-in ROTRA players still see it." Saved line under the switch: "Saved: your profile is public." or "Saved: your profile is private." Profiles are public by default ([D-2026-11-09-07](../../../../mvp/decisions.md#d-2026-11-09-07)).
+Two sections on **Privacy and contact**, directly above Phone privacy ([D-2026-11-11-11](../../../../mvp/decisions.md#d-2026-11-11-11), replacing the single **Private profile** switch of [D-2026-11-09-07](../../../../mvp/decisions.md#d-2026-11-09-07)).
 
-States: saved (public or private), **Saving…** with the switch disabled, error when offline (the saved line stays as it was; the error says the profile is still public or private). Like the phone switch, the change is confirmed by the server before the saved line changes. What visitors see is in [Profile states](profile.md#profile-states) and [P-LEADERBOARD](ranking-history.md).
+**Profile visibility** is a three-choice radio group with helper text under each choice; the default is **Private**:
+
+- **Public**: “Visitors and signed-in ROTRA players see your profile.” (wording not in the ticket; added for completeness).
+- **Private**: “Visitors see your name masked. Signed-in ROTRA players see your profile.”
+- **Always private**: “Everyone sees your name masked; your picture and banner stay visible. Only the Queue Master of a session you join sees your name.” *The first sentence conflicts with the decision, which keeps the picture and banner public; the helper text is to be corrected to the decision (see the [mockup log](../../../../mockup-changes/2026-11-11-player-profile-visibility-hide-from-directory.md)).*
+
+Saved line: “Saved: your profile is public.” / “private.” / “always private.” Toasts: **Your profile is now public** / **private** / **always private**. States: each choice selected; **Saving…** with the choices disabled; offline error “Couldn't save because you're offline. Your profile is still …” (the saved line stays as it was). Like the phone switch, the change is confirmed by the server before the saved line changes.
+
+**Player Information** is its own card with one switch, **Hide me from Player Information** (default off). Helper: “Clubs can't find you in the Player Information search or by RTR ID. Clubs that already saved you can still add you. You join sessions yourself.” Saved line: **Saved: you are hidden from Player Information.** / **Saved: clubs can find you in Player Information.** Toasts: **You are now hidden from Player Information** / **Clubs can now find you in Player Information**. States: on, off, saving, offline error, as for the phone switch.
+
+What visitors see is in [Profile states](profile.md#profile-states) and [P-LEADERBOARD](ranking-history.md); the club page member list follows the same rules ([club page](club-page.md)).
 
 ## P-PHONE-PRIVACY — Hide from club operators
 
@@ -28,7 +38,7 @@ Save requires server confirmation; pending/error states must not falsely claim a
 
 A change cannot erase information a human already saw or instantly revoke a disconnected cached value. The implementation should minimize cached private contacts and refresh/redact them on reconnection; avoid promising retroactive forgetting.
 
-This switch does not change the login phone or invalidate the permanent ID. Hiding the player from guests is the separate [Private profile](#p-profile-privacy--public-or-private-profile) switch.
+This switch does not change the login phone or invalidate the permanent ID. Who sees the profile is the separate [Profile visibility](#p-profile-privacy--profile-visibility-and-player-information) choice, and being found by clubs is **Hide me from Player Information**.
 
 ## P-CONTACT-REQUEST — Ask to change phone or email
 

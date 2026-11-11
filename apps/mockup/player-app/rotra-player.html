@@ -1020,7 +1020,7 @@ function profileOf(pid) {
 // Proposed (#715): an always-private player stays masked for signed-in players too; the player sees their own profile.
 const hiddenFromViewer = (p) => !!p && p.id !== S.me && (!!p.alwaysPrivate || (!S.me && !!(p.profilePrivate || p.guest)));
 const maskName = (name) => name.split(/\s+/).filter(Boolean).map((w) => `${w[0]}***`).join(' ');
-const maskedView = (e) => ({ id: e.id, name: maskName(e.name), nick: '', photo: false, level: e.level });
+const maskedView = (e) => ({ id: e.id, name: maskName(e.name), nick: '', photo: e.photo, face: e.face, photoUrl: e.photoUrl, level: e.level }); // picture stays visible: D-2026-11-11-11
 // Migs joins the list only while his own figures qualify; everyone else is filtered by the current threshold.
 const migsOnBoard = () => S.rank !== 'new' && S.rank !== 'reassess' && countedIn(migsSessions(), WINDOW_DAYS) >= T();
 function boardList() {
@@ -1755,7 +1755,7 @@ function requestCard(p) {
 const VIS = [
   ['public', 'Public', 'Visitors and signed-in ROTRA players see your profile.'],
   ['private', 'Private', 'Visitors see your name masked. Signed-in ROTRA players see your profile.'],
-  ['always', 'Always private', 'Everyone sees your name masked and your initials instead of your photo, except the Queue Master of a session you join.'],
+  ['always', 'Always private', 'Everyone sees your name masked; your picture and banner stay visible. Only the Queue Master of a session you join sees your name.'],
 ];
 const VIS_LABEL = { public: 'public', private: 'private', always: 'always private' };
 function viewAccount() {

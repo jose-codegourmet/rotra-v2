@@ -50,7 +50,7 @@ If a player in an On court match is marked not present, the court shows the reas
 
 A Playing match shows its court(s), format, start time, minutes played, teams, and any substitutions. Closing that view does not end the game; the court stays in use until a winner or an invalid decision is confirmed.
 
-Removing or editing a court is blocked while any match (On court or Playing) is on it.
+Removing a court is blocked while any match (On court or Playing) is on it. Since November 11, 2026 a court's end time and label can still change while a match is on it (the match is not touched; the planned start stays fixed once used; [Sessions › Running](../sessions/README.md#running)).
 
 There are two ways to complete a valid game:
 

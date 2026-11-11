@@ -34,9 +34,10 @@ Superseded by: none
 - Shares work with: any log that changes the share card (none open today).
 
 ## Docs updated
-- Business logic: none yet — proposal pending owner approval; business/screen docs follow when approved
-- Database design: none yet — proposal pending owner approval; business/screen docs follow when approved
-- Screen docs: none yet — proposal pending owner approval; business/screen docs follow when approved
+- Business logic: `docs/business_logic/product/player-information/modules/ranking/README.md` › What a player may share (Share profile).
+- Database design: none needed (no storage; uses the profile and the derived 90-day win count).
+- Screen docs: `docs/screens/product/modules/player-information/profile.md` › P-OWN-PROFILE (Share profile card, link field, copy); `docs/screens/product/modules/player-information/ranking-history.md` › Share cards; `docs/screens/product/modules/player-information/README.md` (P-OWN-PROFILE row).
+- Open: Post size 1080 × 1350 vs the pack's 1080 × 1080, recorded in `docs/screens/product/open-decisions.md`.
 
 ## Real app work
 - Add a Share profile button to the own-profile hero in apps/player; add a "profile" kind to the share model and card in @rotra/ui (level, position when there is one, 90-day wins; empty states), a read-only link field with Copy in the share sheet, canvas drawing for the new blocks. Stats use the same 90-day window as rank. Own profile only.

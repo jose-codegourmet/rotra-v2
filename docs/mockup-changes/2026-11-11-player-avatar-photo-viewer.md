@@ -35,9 +35,10 @@ Superseded by: none
 - Shares work with: the Admin avatar photo viewer log (same dialog) and the Queue log for the same ticket, if one exists.
 
 ## Docs updated
-- Business logic: none yet — proposal pending owner approval; business/screen docs follow when approved
-- Database design: none yet — proposal pending owner approval; business/screen docs follow when approved
-- Screen docs: none yet — proposal pending owner approval; business/screen docs follow when approved
+- Business logic: `docs/business_logic/product/player-information/modules/identity/README.md` › Profile banner (the “Full photo” paragraph: which avatars open it, never initials, closes by tap, × or Esc, opens from inside a profile where a tap already opens one).
+- Database design: none needed (no data; masked pictures simply have nothing to enlarge).
+- Screen docs: `docs/screens/product/modules/player-information/profile.md` › Full photo (overlay tokens, accessible names, where it applies); also ‘Profile dialog’ in the same file for the photo opened from the dialog.
+- Note: the log says an always-private player's picture is masked; the owner's decision ([D-2026-11-11-11](../mvp/decisions.md#d-2026-11-11-11)) keeps the picture public, so the docs say the photo can be enlarged.
 
 ## Real app work
 - One behaviour in the shared Avatar component in @rotra/ui plus one PhotoViewer dialog; use it on every avatar with a real picture, and not on avatars inside a profile-opening tap target. No viewer when the picture is masked for the viewer.

@@ -34,9 +34,10 @@ Superseded by: none
 - Shares work with: 2026-11-11-queue-participant-profile-tap.md
 
 ## Docs updated
-- Business logic: none yet — proposal pending owner approval; business/screen docs follow when approved
-- Database design: none yet — proposal pending owner approval; business/screen docs follow when approved
-- Screen docs: none yet — proposal pending owner approval; business/screen docs follow when approved
+- Business logic: `docs/business_logic/product/queue/modules/players/README.md` › Identity states (the **Full photo** rule, #716; D-2026-11-11-11).
+- Database design: none needed (UI only; `docs/database_design/product/queue/modules/results-publication.md` notes the viewer stores nothing).
+- Screen docs: `docs/screens/product/dialogs.md` › D-PHOTO-VIEWER (new); `docs/screens/product/modules/queue/players-roster.md` › Full profile dialog (photo opens from inside the profile); `docs/screens/product/modules/queue/public-session.md` and D-PARTICIPANT-PROFILE (photo opens from the big picture in the card).
+- Known gap: the new token `--photo-scrim` and Player, Admin and public-page avatars belong to other logs and docs.
 
 ## Real app work
 - Shared Avatar behaviour in packages/ui (opens the viewer when a picture exists and the avatar is not inside a profile button), the photo-viewer dialog, `--photo-scrim` token, big photo button in profile sheets. Player and Admin parts are separate logs.

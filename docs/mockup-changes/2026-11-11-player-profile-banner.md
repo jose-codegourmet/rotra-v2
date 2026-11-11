@@ -38,7 +38,10 @@ Superseded by: none
 - Shares work with: the Queue participant profile card (same banner treatment, #731 log)
 
 ## Docs updated
-- none yet — proposal pending owner approval; screen docs follow when approved
+- Business logic: `docs/business_logic/product/player-information/modules/identity/README.md` › Profile banner (predefined banners only, managed in Admin, no uploads, default Court, avatars are circles); header “Last verified”.
+- Database design: `docs/database_design/product/player-information/modules/identity.md` › `players` (`banner_id`, reference to Admin's `profile_banners`, null = default; no storage for players).
+- Screen docs: `docs/screens/product/modules/player-information/profile.md` › P-PUBLIC-PROFILE, Profile banner, P-EDIT-PROFILE (name preview, Banner swatches, copy); `docs/screens/product/modules/player-information/README.md` (P-PUBLIC-PROFILE and P-EDIT-PROFILE rows).
+- Other: `docs/product-terms.md` › §4 Profile banner, §12 Profile banner row.
 
 ## Real app work
 - `@rotra/ui` ProfileHero: banner strip and overlapping avatar, banner by key. EditProfileForm: banner radio group. `@rotra/data` `banner` key on the player profile; real mode needs one small column (migration sign-off needed). No storage.

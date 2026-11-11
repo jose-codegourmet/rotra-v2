@@ -34,9 +34,9 @@ Superseded by: none
 - Shares work with: none
 
 ## Docs updated
-- Business logic: none yet — proposal pending owner approval; business/screen docs follow when approved
-- Database design: none yet — proposal pending owner approval; business/screen docs follow when approved
-- Screen docs: none yet — proposal pending owner approval; business/screen docs follow when approved
+- Business logic: none needed.
+- Database design: none needed.
+- Screen docs: `docs/screens/product/modules/queue/session-setup.md` › Tabs row (focus rule). The shared rule belongs in `docs/screens/product/experience-contract.md`, which is outside this change's ownership; it is flagged for the owner of that file.
 
 ## Real app work
 - Focus style in the shared Tabs component (:focus-visible thin ring, no outline for pointer focus); apply the same to the segmented control. Player and Admin tab bars follow the same component.

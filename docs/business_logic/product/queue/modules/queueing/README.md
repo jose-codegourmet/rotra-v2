@@ -1,6 +1,6 @@
 # Queue generation and dispatch
 
-**Last verified:** 2026-11-06.
+**Last verified:** 2026-11-11 for Bagging mode ([D-2026-11-11-11](../../../../../mvp/decisions.md#d-2026-11-11-11), #739); 2026-11-06 for the rest.
 
 **Status:** Confirmed v1 target rules. Updated October 26, 2026 to match the [ROTRA Queue prototype](../../../../../../apps/mockup/queue-app/rotra-queue.html). Updated November 6, 2026 for the owner's On court step and the Auto Queue / Manual Queue court switch ([log](../../../../../mockup-changes/2026-11-06-queue-on-court-and-sub-credit.md)).
 
@@ -69,7 +69,7 @@ The club selects one preset for the session and displays it for transparency. Th
 
 An easy game means the player's **team is favored to win**, whether because of partner strength or weaker opponents. Percentages are flexible goals, not guaranteed quotas.
 
-Balanced teams matter, but reaching the minimum-game target takes priority over mode preferences. Automatic generation uses present players and the enabled singles/doubles formats; only Plan Ahead initially includes players currently playing. Fun formats are never generated.
+Balanced teams matter, but reaching the minimum-game target takes priority over mode preferences. A bagging pair ([below](#bagging-mode-and-bagging-pairs)) overrides fairness and level balance for its games when Bagging mode is on. Automatic generation uses present players and the enabled singles/doubles formats; only Plan Ahead initially includes players currently playing. Fun formats are never generated.
 
 ### Previous prototype reference heuristic
 
@@ -94,6 +94,16 @@ Formerly called Auto Queue; renamed 2026-11-06. The Main Queue is the shared acc
 Generation accounts for current Main Queue assignments and earlier drafts within its batch as planned load. Longest Wait and Fewest Games use that load with longest wait and stable player order for ties. Catch Up uses an explicitly chosen target for completed games, prioritizes players below it, and fills from eligible players with the lowest planned load. It stops when the target is met in the plan, the chosen batch limit is reached, or no valid match can make progress; show the reason. This target is not the session minimum. Played counts follow existing completed-match rules plus the Queue Master's games played adjustment ([players › Games played override](../players/README.md#games-played-override-717), #717); queued counts derive from current Main Queue waiting matches. A draft is not a completed result and alternative tabs do not increase the Main Queue count. Existing team-balancing heuristics are prototype references, not newly approved pairing weights.
 
 Selections persist across tabs in selection order. Review that order before adding selected drafts to the Main Queue. Add all applies to the current tab. Clear this tab and Generate again act on drafts; Replace unselected preserves selected drafts, and Remove unselected removes the others. A Main Queue change makes existing drafts stale without hiding them; revalidate on transfer and show conflicts for attention. A draft cannot be transferred twice; a distinct intentional rematch is allowed. Main Queue regeneration remains a separate control and retains its existing protected-manual rules.
+
+### Bagging mode and bagging pairs
+
+**Owner decisions, November 11, 2026 ([D-2026-11-11-11](../../../../../mvp/decisions.md#d-2026-11-11-11), #739; [log](../../../../../mockup-changes/2026-11-11-queue-bagging-mode.md)).** Bagging mode lets the Queue Master keep two players together as partners when Generate matches drafts doubles.
+
+- **One switch for the session.** **Bagging mode** is a session-wide switch in the Generate matches workspace, off by default. It exists for **doubles only**: with no doubles in the session the switch is not offered. Only the Queue Master uses it. Switching it off keeps the pairs list; Generate matches then ignores it.
+- **Bagging pairs list.** While the switch is on, the Queue Master keeps a list of pairs. A pair is two **present** roster players. A player is in **one pair at a time**: choosing someone already paired offers to replace that pair. There is no limit on the number of pairs. A pair can be removed at any time.
+- **Which games.** Each pair says which of its games it plays together: **ALL**, or chosen game numbers from 1 up to the **session minimum** (a minimum of 4 offers 1 to 4). Picking every number, or none, means ALL. A pair's game number counts **games actually played together**: the lower of the two players' games played (including the Queue Master's games played adjustment) plus 1, never drafts. A pair applies to its next game when that number is picked, or always under ALL; games past the minimum count only under ALL. On the games a pair does not apply to, the two are not required to be together, and nothing special happens when they have played fewer games.
+- **What Generate matches does.** In every tab, Catch Up included, a pair that applies keeps both players on the same team as partners. If one is among the players picked and the other is free, the partner is swapped in; if both are picked, they go on the same team. An applicable pair whose players are **both free leads the next doubles draft** (owner answer, November 11, 2026). If the partner is not free (playing, away, or already in a draft), the player is generated like anyone else and the pair stays listed. The pair wins over fairness and level balance; **court capacity still wins over the pair**. The draft tile's reason reads “Bagging pair: A and B are partners”.
+- **What it does not touch.** Auto Queue (court filling), Suggest, Add match and Make match (matches built by hand) ignore the list; nothing about the Main Queue, protection or regeneration changes. A pair guides drafts only.
 
 ## Auto Queue and Manual Queue (court filling)
 

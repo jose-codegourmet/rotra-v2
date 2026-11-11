@@ -1,6 +1,6 @@
 # Shared match queue and generation
 
-**Last verified:** 2026-11-06.
+**Last verified:** 2026-11-11 for Bagging mode in Q-AUTO ([D-2026-11-11-11](../../../../mvp/decisions.md#d-2026-11-11-11)); 2026-11-06 for the rest.
 
 > **Name change, November 6, 2026.** The draft generator was formerly called Auto Queue; renamed **Generate matches** on 2026-11-06 ([log](../../../../mockup-changes/2026-11-06-queue-on-court-and-sub-credit.md)). **Auto Queue** now names the court-fill switch on [Q-COURTS](session-console.md#q-courts--court-cards). The screen ID `Q-AUTO` and code names (`AutoQueueWorkspace`, `AutoQueueMode`, `AutoQueueCount`) are unchanged until the real-app ticket.
 
@@ -97,6 +97,8 @@ The Queue view switches between Main Queue and Generate matches. Generate matche
 **Picking works like Players.** The whole tile is a toggle (`role="button"`, `aria-pressed`; Space or Enter). Its accessible name is the match (“Draft Doubles: Migs and Dani vs Marco and Paolo, picked 2”), not “Select Doubles”. Picked tiles get the accent border, the inset ring and a pick-order badge, so the state does not rely on colour alone. Pick order across tabs is the order drafts are added in.
 
 Header hint: “Drafts are suggestions. Nothing joins the Main Queue until you add it.”
+
+**Bagging mode (owner decisions, November 11, 2026, #739; [log](../../../../mockup-changes/2026-11-11-queue-bagging-mode.md); rules: [Queueing › Bagging mode](../../../../business_logic/product/queue/modules/queueing/README.md#bagging-mode-and-bagging-pairs)).** The workspace header carries a **Bagging mode** switch (off by default; hidden when the session has no doubles; toasts “Bagging mode on” / “Bagging mode off”). While on, a **Bagging pairs** card sits under the header: title “Bagging pairs · N”, the helper “Pairs guide Generate matches. Auto Queue and matches you build by hand are not affected.”, **Add pair**, and one row per pair: two avatars, “A and B”, the games row **ALL** then **1** to **N** (N = the session minimum; accessible names **Game N**; tapping every number or none falls back to ALL) and **Remove** (toast “Pair removed · A and B”). Empty: “No pairs yet. Add a pair to keep two players as partners.” **Add pair** opens the wide sheet [D-BAGGING-PAIR](../../dialogs.md#d-bagging-pair--add-bagging-pair) (“Add bagging pair”; toast “Bagging pair added · A and B”). A draft built from a pair shows the reason line “Bagging pair: A and B are partners” on its tile. Switching the mode off keeps the list; Generate then ignores it.
 
 | Tab | Description |
 |---|---|

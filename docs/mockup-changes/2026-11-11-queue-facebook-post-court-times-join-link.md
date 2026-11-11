@@ -34,9 +34,9 @@ Superseded by: none
 - Shares work with: none
 
 ## Docs updated
-- Business logic: none yet — proposal pending owner approval; business/screen docs follow when approved
-- Database design: none yet — proposal pending owner approval; business/screen docs follow when approved
-- Screen docs: none yet — proposal pending owner approval; business/screen docs follow when approved
+- Business logic: `docs/business_logic/product/queue/README.md` (Facebook post template paragraph: court times and the `{{ join_link }}` line).
+- Database design: none needed (the template is the club's saved text; the key is added in the post generator).
+- Screen docs: `docs/screens/product/modules/queue/session-setup.md` › Copy Facebook post (court lines, join line, dialog helper); `docs/screens/product/modules/queue/access-home.md` › Facebook post keys (`courts` with times, new `join_link`).
 
 ## Real app work
 - Court line format and the join line in the post generator (packages/ui and the Queue copy-post code), default template, template key list, dialog helper text. Public session URL is the existing session link.

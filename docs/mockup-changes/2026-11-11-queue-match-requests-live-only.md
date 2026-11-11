@@ -32,7 +32,9 @@ Superseded by: none
 - Shares work with: none
 
 ## Docs updated
-- none yet — proposal pending owner approval; D-2026-11-09-05 and the preparation screen doc follow when approved
+- Business logic: `docs/business_logic/product/queue/modules/sessions/README.md` › Starting (join requests end at Start); `modules/players/README.md` › Join requests from the session link (overrides the during-play parts of D-2026-11-11-02) and QM side; `docs/business_logic/product/open-decisions.md` (Queue rows).
+- Database design: `docs/database_design/product/queue/modules/sessions-roster.md` › `session_join_requests` (Start closes pending requests as `closed`; none created after Start; no new field).
+- Screen docs: `docs/screens/product/modules/queue/session-setup.md` › Requests card (no tabs), Q-START toast; `docs/screens/product/modules/queue/session-console.md` › Q-CONSOLE header (Match requests at the upper right, three live controls and a More menu); `docs/screens/product/modules/queue/public-session.md` › Q-PUBLIC-JOIN (closed notice after Start).
 
 ## Real app work
 - `@rotra/ui` RequestsPanel: render the Match tab and count match requests only when the session status is active.

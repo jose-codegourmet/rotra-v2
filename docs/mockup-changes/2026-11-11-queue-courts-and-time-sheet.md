@@ -32,7 +32,9 @@ Superseded by: none
 - Shares work with: none
 
 ## Docs updated
-- none yet — proposal pending owner approval; docs/screens/product/dialogs.md (D-COURTS-TIME) and the matches module follow when approved
+- Business logic: `docs/business_logic/product/queue/modules/sessions/README.md` › Running (court time changes during a match); `modules/matches/README.md` (editing no longer blocked); `docs/business_logic/product/open-decisions.md` (D3 amended).
+- Database design: `docs/database_design/product/queue/modules/sessions-roster.md` › `session_courts` (edit allowed while a match is on the court; start stays fixed once used).
+- Screen docs: `docs/screens/product/dialogs.md` › D-COURTS-TIME (new); `docs/screens/product/modules/queue/session-console.md` › Q-SESSION-ADJUST, Q-COURTS (Change time menu item), Court windows and live admission.
 
 ## Real app work
 - `@rotra/ui` CourtsTimeSheet: court rows with status and Change time; `@rotra/data` `editCourt` no longer refuses a court with a match on it (start locked, end and label editable).

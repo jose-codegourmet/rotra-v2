@@ -32,7 +32,9 @@ Superseded by: none
 - Shares work with: none
 
 ## Docs updated
-- Screen docs: none needed (layout detail only; the screen doc does not fix the column count)
+- Business logic: none needed.
+- Database design: none needed.
+- Screen docs: `docs/screens/product/modules/player-information/profile.md` › P-EDIT-PROFILE (Links stack one per row); `docs/screens/product/modules/player-information/README.md` › P-EDIT-PROFILE row.
 
 ## Real app work
 - `@rotra/ui` EditProfileForm: render the links fields in the vertical stack instead of the two-column grid.

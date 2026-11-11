@@ -35,9 +35,10 @@ Superseded by: none
 - Shares work with: 2026-11-11-queue-avatar-photo-viewer.md
 
 ## Docs updated
-- Business logic: none yet — proposal pending owner approval; business/screen docs follow when approved
-- Database design: none yet — proposal pending owner approval; business/screen docs follow when approved
-- Screen docs: none yet — proposal pending owner approval; business/screen docs follow when approved
+- Business logic: `docs/business_logic/product/queue/modules/players/README.md` › Public participant names (tile opens the profile card; private, always-private and guest variants; own tile); `docs/business_logic/product/queue/README.md` › Public session page.
+- Database design: none needed (reads Player Information and the live session; `docs/database_design/product/queue/modules/results-publication.md` notes it).
+- Screen docs: `docs/screens/product/dialogs.md` › D-PARTICIPANT-PROFILE (new; includes the Queue Master's player profile card); `docs/screens/product/modules/queue/public-session.md` › Q-PUBLIC-PARTICIPANTS; `docs/screens/product/modules/queue/players-roster.md` › Full profile dialog; `docs/screens/product/modules/queue/session-console.md` › Q-POOL (avatar button).
+- Profile visibility levels and banners are owned by the Player and Admin docs, not here.
 
 ## Real app work
 - Signed-in viewer check, public profile reads (stats over the same 90-day window as rank), always-private handling (depends on #715's third visibility level), tile button and sheets in the player app session page and packages/ui.

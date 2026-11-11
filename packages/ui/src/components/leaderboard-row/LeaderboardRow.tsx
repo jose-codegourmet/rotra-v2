@@ -49,13 +49,13 @@ export function LeaderboardRow({
   const medal = rowVariant.startsWith('medal-')
   const accessibleName = `${positionLabel(position, rowVariant, isMe)} ${fullName}, ${levelLabel}`
 
-  const Row = masked ? 'div' : 'button'
+  // The prototype's every row is a button, masked or not: opening a masked profile shows the
+  // private card (or the sign-in gate for visitors).
   return (
-    <Row
+    <button
       id={id}
-      type={masked ? undefined : 'button'}
-      aria-disabled={masked || undefined}
-      onClick={masked ? undefined : onSelect}
+      type="button"
+      onClick={onSelect}
       aria-label={accessibleName}
       className={cn(
         leaderboardRowVariants({ variant: masked ? 'masked' : rowVariant }),
@@ -96,6 +96,6 @@ export function LeaderboardRow({
       >
         {levelLabel}
       </span>
-    </Row>
+    </button>
   )
 }

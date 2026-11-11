@@ -59,6 +59,7 @@ password recovery through Admin-reviewed requests (#491).
 
 - [D-2026-11-07-01](../decisions.md#d-2026-11-07-01) — manual password recovery.
 - [D-2026-11-07-03](../decisions.md#d-2026-11-07-03) — guest identity reconciliation.
+- [D-2026-11-11-03](../decisions.md#d-2026-11-11-03) — guests and unclaimed profiles stay in their club; RTR ID on registration.
 - [D-2026-11-07-07](../decisions.md#d-2026-11-07-07) — original login-only invite superseded by independent guest registration in #490.
 - [D-2026-11-07-04](../decisions.md#d-2026-11-07-04) — scope freeze.
 

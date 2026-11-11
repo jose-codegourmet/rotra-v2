@@ -90,6 +90,16 @@ removes only its new upload; ambiguous failures retain it. Bucket configuration 
 not application DDL. The existing club-logo pattern is documented in
 [clubs and licenses](../../admin/modules/clubs-licenses.md#club-logo-persistence-374).
 
+## Club-only unclaimed profiles ([D-2026-11-11-03](../../../../mvp/decisions.md#d-2026-11-11-03)) — proposed
+
+Decided behaviour: an unclaimed profile lives only in its club, has no RTR ID, and is never found by another club; two clubs with the same phone keep separate records; on registration every club's record with that phone links automatically. Proposed storage, not yet built:
+
+- An unclaimed profile is a `club_players` row with `player_id` null plus its `club_player_private_inputs` phone. No `players`, `player_private_contacts` or `player_id_allocations` row is created for it, so the global unique phone and the RTR ID belong to registered players only. Several clubs may hold the same phone in their private inputs.
+- Entry sync links `club_players.player_id` only when the phone matches a **claimed** player's `player_private_contacts`; otherwise the input stays with the club.
+- A registration invite for an unclaimed profile points at `(club_id, club_player_id)` instead of a `players` row. Registering creates the player, contacts, account and RTR ID allocation, then links every unlinked `club_players` row whose private phone matches, with a history attribution per row.
+- Player Information search filters to `profile_state = claimed`.
+- Open: migrating unclaimed `players` rows and RTR IDs that already exist; Admin's view of unclaimed club records; the unverified-phone risk of automatic linking (see the decision).
+
 ## Private contacts and account mapping
 
 `player_private_contacts`: PK/FK `player_id`; required normalized phone for globally created identities; nullable normalized email until claiming; contact verification metadata and revision. Unique phone across all global players. Proposed unique non-null normalized email avoids ambiguous email login; exact canonicalization and shared-address policy need account-flow review. A claimed profile always has an email (decided 2026-11-07, #244).
@@ -167,7 +177,7 @@ Allocation transaction:
 
 IDs stay permanent. Later contact/address changes do not rerun allocation. Do not assume gap-free sequences or truncate values over four digits; overflow presentation is open.
 
-**Owner decision, October 28, 2026:** resolve/create the profile and allocate its permanent RTR ID as soon as the entry successfully syncs, without waiting for Session done. Keep unresolved or conflicting input pending; never claim a permanent ID was allocated offline. Identity creation does not grant match-performance credit before valid finalization.
+**Owner decision, October 28, 2026** (*superseded in part on November 11, 2026: the RTR ID is allocated on registration, not on entry sync; [D-2026-11-11-03](../../../../mvp/decisions.md#d-2026-11-11-03)*)**:** resolve/create the profile and allocate its permanent RTR ID as soon as the entry successfully syncs, without waiting for Session done. Keep unresolved or conflicting input pending; never claim a permanent ID was allocated offline. Identity creation does not grant match-performance credit before valid finalization.
 
 After a historical guest identity is confirmed, attribute earlier valid games to that profile for personal history and ranking under the existing eligibility/window rules. Keep original entry/finalization identity snapshots and permanent outcomes intact; the auditable linkage/projection mechanism, confirmation evidence, and mistaken-link handling must be designed before implementation. Use original played dates and deduplicate contributions.
 

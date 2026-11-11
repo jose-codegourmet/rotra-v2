@@ -24,7 +24,7 @@ Every agreed business module has a corresponding screen contract. The checks bel
 | Operator adds and confirms all slots | [Roster](modules/queue/players-roster.md) | No public Request to join/Cancel attendance controls |
 | Club remembers returning players and guests | [Saved players](modules/queue/players-roster.md) | Club list searched first; no formal membership workflow implied |
 | Name lookup suggests global identity | [Identity confirmation](modules/queue/players-roster.md) | Name match does not auto-link two different people |
-| Phone uniquely links across clubs | [Identity confirmation](modules/queue/players-roster.md) | Same phone resolves existing profile; conflict is explicit |
+| Phone uniquely links a registered player across clubs (unclaimed profiles stay in their club, D-2026-11-11-03) | [Identity confirmation](modules/queue/players-roster.md) | Same phone resolves existing profile; conflict is explicit |
 | No phone means guest; account not needed to play | [Add player](modules/queue/players-roster.md) | Slot can be confirmed without email/phone; no global ID invented |
 | Incomplete profile enrichment or operator-issued registration link | [Roster](modules/queue/players-roster.md), [claim](modules/player-information/access-registration.md) | Missing socials do not block participation; no offline fake claim link |
 | Offline late arrival allowed | [Roster](modules/queue/players-roster.md), [sync](modules/queue/offline-recovery.md) | Name/level/optional phone saved locally; link waits for connection |

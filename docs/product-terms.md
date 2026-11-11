@@ -86,10 +86,10 @@ Rules: [Players](business_logic/product/queue/modules/players/README.md) ·
 |---|---|
 | Saved club player | A player the club remembers. Not necessarily a formal member |
 | Guest | Name-only entrant with no linked Player Information profile |
-| Lookup pending | New player entered with a phone; matched or created when the session syncs |
-| Unclaimed profile | Phone-linked identity not yet claimed through registration |
+| Lookup pending | New player entered with a phone; matched to a registered player when the session syncs, or kept as the club's unclaimed profile ([D-2026-11-11-03](mvp/decisions.md#d-2026-11-11-03)) |
+| Unclaimed profile | A club's saved player with a phone who hasn't registered. Lives only in that club: no RTR ID, never found by another club ([D-2026-11-11-03](mvp/decisions.md#d-2026-11-11-03)) |
 | Registered player | Claimed profile with required phone, email, and password |
-| Player ID / RTR ID | Permanent identifier given on first profile sync, e.g. `RTR-PH-CEB-031526-0001`. Never a database key |
+| Player ID / RTR ID | Permanent identifier given when the player registers, e.g. `RTR-PH-CEB-031526-0001` ([D-2026-11-11-03](mvp/decisions.md#d-2026-11-11-03)). Never a database key |
 | Invite (link) / Registration invite | Per-guest link for a guest or unclaimed profile to create or claim an account. Never books a session ([D-2026-11-09-06](mvp/decisions.md#d-2026-11-09-06)) |
 | Club invite link | One standing link per club (`/register/[clubId]`) with a share card; a new person registers through it and joins the club's Saved players (“Joined via club link”), a signed-in player taps once to join ([D-2026-11-09-06](mvp/decisions.md#d-2026-11-09-06), [D-2026-11-09-08](mvp/decisions.md#d-2026-11-09-08)) |
 | Joined via | How a saved player entered the club: “Joined via club link”, “Joined via session link” or “Added by the club” ([D-2026-11-09-06](mvp/decisions.md#d-2026-11-09-06)) |
@@ -102,6 +102,8 @@ Rules: [Players](business_logic/product/queue/modules/players/README.md) ·
 Phones and emails are **never public**, never in search results, participant cards, exports, or error text.
 
 **Owner decisions, October 28, 2026:** a phone-linked profile and permanent RTR ID are matched/created as soon as the entry successfully syncs, without waiting for Session done. After a guest's identity is confirmed and linked, earlier valid games also contribute to personal history and ranking under the existing eligibility and rolling-window rules. Original dates, club history, and permanent results are preserved; linking never counts a game twice. Identity-confirmation evidence and mistaken-link handling still need specification.
+
+**Updated November 11, 2026 ([D-2026-11-11-03](mvp/decisions.md#d-2026-11-11-03)):** an unclaimed profile stays in its club and gets no RTR ID; the RTR ID is given on registration. On registration, every club's record with the same phone links to the account automatically, and the history rules above apply.
 
 ---
 
@@ -354,7 +356,7 @@ URL segments, component names, and query keys use the same words: `sessions/[ses
 | Invalid match ↔ Invalid session | One game with no credit vs. a whole session with untrusted records |
 | Invalid session ↔ Cancelled session | A session that ran but whose records can't be trusted vs. one called off before it started |
 | Publish ↔ sync | Optional public sharing vs. automatic profile and rank updates |
-| Guest ↔ Unclaimed profile ↔ Registered player | Name only vs. phone-linked but unclaimed vs. claimed with a password |
+| Guest ↔ Unclaimed profile ↔ Registered player | Name only vs. club record with a phone, not registered vs. claimed with a password. Only registered players are found across clubs |
 | Cost estimate ↔ Payments checklist | Planning numbers vs. a manual paid tick. Neither collects money |
 
 ---

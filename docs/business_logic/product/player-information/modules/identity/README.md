@@ -9,12 +9,12 @@
 | State | Behavior |
 |---|---|
 | Name-only guest | Remembered by the club; no automatic Player Information profile |
-| Phone-linked, unclaimed profile | Created as soon as the phone-linked entry successfully syncs; player has not completed registration |
+| Phone-linked, unclaimed profile | A club's saved player with a phone who has not registered. Lives only in that club: no RTR ID, never in another club's search ([D-2026-11-11-03](../../../../../mvp/decisions.md#d-2026-11-11-03)) |
 | Registered/claimed profile | Required phone and email supplied; password set; player can sign in and edit permitted personal details |
 
-Phone number uniquely identifies a player across clubs. Name matches only suggest possible identities. Registered players hiding their phone can identify themselves with RTR ID or QR code.
+Phone number uniquely identifies a **registered** player across clubs. Unclaimed profiles never link across clubs: two clubs that save the same phone keep separate records until the person registers, and then every record with that phone links to the account automatically ([D-2026-11-11-03](../../../../../mvp/decisions.md#d-2026-11-11-03)). Name matches only suggest possible identities. Registered players hiding their phone can identify themselves with RTR ID or QR code.
 
-**Owner decisions, October 28, 2026:** profile creation and permanent RTR ID allocation happen on successful entry sync, without waiting for Session done. Existing profiles are reused. Match performance remains gated by valid session finalization.
+**Owner decisions, October 28, 2026:** profile creation and permanent RTR ID allocation happen on successful entry sync, without waiting for Session done. Existing profiles are reused. *Superseded in part on November 11, 2026 ([D-2026-11-11-03](../../../../../mvp/decisions.md#d-2026-11-11-03)): sync only links a phone to a registered player; the RTR ID is given on registration.* Match performance remains gated by valid session finalization.
 
 When a returning guest's identity is confirmed and linked to a profile, include their earlier valid games in personal history and ranking under the existing eligibility rules. Use the original game dates for rolling windows; linking does not make an old game newly played. Preserve club history and permanent results, and count each game once. The confirmation evidence, mistaken-link resolution, and public presentation of fun/partial games remain separate open details.
 
@@ -88,7 +88,7 @@ Format: **`RTR-PH-CEB-102926-0001`**.
 | `102926` | First profile-sync date in MMDDYY form; example is October 29, 2026 |
 | `0001` | Sequence restarting for each city on each sync day |
 
-Assign the permanent ID **on the first successful entry sync into Player Information**, never offline and without waiting for Session done. Use the day synced, not the original offline entry date. Existing profiles keep their ID when another club adds them.
+Assign the permanent ID **when the player registers** ([D-2026-11-11-03](../../../../../mvp/decisions.md#d-2026-11-11-03); before November 11, 2026 it was the first entry sync), never offline. The date part is the registration day. Existing IDs keep their value when another club adds the player.
 
 The ID remains permanent even after address, club, phone, or email changes. Code mappings, date timezone, allocation under concurrent sync, and large-sequence formatting need technical specification; do not create provisional offline IDs in this permanent format.
 

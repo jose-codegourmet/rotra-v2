@@ -140,7 +140,7 @@ function PlayerList({
 }) {
   if (view === 'grid') {
     return (
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,220px),1fr))] gap-2.5">
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,220px),1fr))] gap-2.5 max-[641px]:grid-cols-2 max-[641px]:gap-2">
         {players.map((p) => (
           <RosterCard
             key={p.id}
@@ -162,6 +162,7 @@ function PlayerList({
             onPresentChange={(present) => onPresentChange(p.id, present)}
             onRemove={() => onRemove(p.id)}
             onStepDown={onStepDown ? () => onStepDown(p.id) : undefined}
+            compactOnPhone
           />
         ))}
       </div>

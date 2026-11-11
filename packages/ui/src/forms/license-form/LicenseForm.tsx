@@ -45,10 +45,17 @@ export type LicenseFormProps = {
   club: LicenseFormClub
   /** licenseStatusLine(access): "Active until Mar 31, 2027", "Expired since …", "Starts …", "Never licensed" */
   statusLine: string
-  /** The club has an active term: shows the note that the suggested start is a placeholder rule */
+  /**
+   * The club has a current term: under Covers, "A renewal starts the day after the current term
+   * ends." The start itself is computed (defaultValues.startsOn) and shown read-only.
+   */
   isActive?: boolean
   prices: LicenseFormPrices
-  /** Values to start from (the prototype's licStart), or everything kept when coming Back from review */
+  /**
+   * Values to start from (the prototype's licStart), or everything kept when coming Back from review.
+   * startsOn is required in practice: the computed start (the day after the current term ends, else
+   * today). There is no field for it; Covers shows it read-only.
+   */
   defaultValues?: Partial<LicenseFormInput>
   /** The term's last day 'YYYY-MM-DD' for a start date and plan, from the @rotra/data license rules */
   getTermEnd: (startsOn: string, plan: LicensePlan) => string
@@ -75,9 +82,10 @@ const isPlan = (value: string): value is LicensePlan =>
   (LICENSE_PLANS as readonly string[]).includes(value)
 
 /**
- * A-LICENSE step 1: record an activation or renewal the club paid for outside ROTRA. Plan, term start
- * (with its end as a hint), and for a paid club the date paid and amount; a free club shows Amount:
- * Free. Review submits to the container, which shows LicenseReview. It never saves anything.
+ * A-LICENSE step 1: record an activation or renewal the club paid for outside ROTRA. Plan, the
+ * computed period read-only as Covers ("Dec 1, 2026 – Dec 31, 2026"), and for a paid club the date
+ * paid and amount; a free club shows Amount: Free. Then an optional Note. Review submits to the
+ * container, which shows LicenseReview. It never saves anything.
  */
 export function LicenseForm({
   club,
@@ -184,26 +192,26 @@ export function LicenseForm({
             ) : null}
           </div>
           <div className={FIELD_GRID}>
-            <Field
-              label="Term starts"
-              hint={termEnd ? `Ends ${formatYmd(termEnd)}` : undefined}
-              error={errors.startsOn?.message}
-            >
-              <Controller
-                control={form.control}
-                name="startsOn"
-                render={({ field }) => (
-                  <DatePicker
-                    ref={field.ref}
-                    name={field.name}
-                    value={field.value}
-                    onChange={field.onChange}
-                    onBlur={field.onBlur}
-                    invalid={Boolean(errors.startsOn)}
-                  />
-                )}
-              />
-            </Field>
+            <div className="flex min-w-0 flex-col gap-1.5">
+              <span className={LABEL}>Covers</span>
+              <b>
+                {dateField.safeParse(startsOn).success
+                  ? termEnd
+                    ? `${formatYmd(startsOn)} – ${formatYmd(termEnd)}`
+                    : `From ${formatYmd(startsOn)}`
+                  : '—'}
+              </b>
+              {isActive ? (
+                <span className="text-xs text-fg2">
+                  A renewal starts the day after the current term ends.
+                </span>
+              ) : null}
+              {errors.startsOn ? (
+                <span role="alert" className="text-[13px] font-semibold text-error">
+                  {errors.startsOn.message}
+                </span>
+              ) : null}
+            </div>
             {prices.isFree ? (
               <div className="flex min-w-0 flex-col gap-1.5">
                 <span className={LABEL}>Amount</span>
@@ -245,7 +253,7 @@ export function LicenseForm({
                 </Field>
               </>
             )}
-            <Field label="Reference" optional error={errors.reference?.message}>
+            <Field label="Note" optional error={errors.reference?.message}>
               <Controller
                 control={form.control}
                 name="reference"
@@ -259,12 +267,6 @@ export function LicenseForm({
               />
             </Field>
           </div>
-          {isActive ? (
-            <Notice>
-              The start date is suggested as the day after the current term ends. The rule for
-              renewing early hasn't been decided, so check it before you continue.
-            </Notice>
-          ) : null}
         </form>
       </FormProvider>
       <div className="flex flex-wrap justify-end gap-2.5 [&>*]:flex-auto">

@@ -55,7 +55,11 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Registered: Story = {}
-export const Unclaimed: Story = { args: propsFor(byIdentity('unclaimed'), 5) }
+/** Unclaimed: the club's own record with no RTR ID until they register, so "Not registered". */
+export const Unclaimed: Story = {
+  args: { ...propsFor(byIdentity('unclaimed'), 5), registeredCity: null },
+}
+export const UnclaimedLight: Story = { ...Unclaimed, globals: { theme: 'light' } }
 export const Guest: Story = { args: propsFor(byIdentity('guest'), 1) }
 export const LookupPending: Story = {
   args: { ...propsFor(byIdentity('guest'), 0), identity: 'pending', registeredCity: null },

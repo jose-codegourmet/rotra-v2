@@ -11,7 +11,7 @@ export type InviteSheetProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   name: string
-  /** Guests are invited to make an account; unclaimed profiles to claim theirs */
+  /** Guests are invited to make an account; an unclaimed player (saved by this club with a phone) to turn that record into one */
   identity: 'guest' | 'unclaimed'
   /** The invite link; undefined while it is being made */
   link?: string
@@ -43,7 +43,7 @@ export function InviteSheet({
     >
       <p className="m-0">
         {claim
-          ? 'They already have a ROTRA profile from playing here. This link lets them claim it'
+          ? 'Your club saved them with a phone. This link lets them turn that record into a ROTRA account'
           : 'This link lets them create a ROTRA account'}{' '}
         with their phone and email, so their games and rank follow them to every club.
       </p>

@@ -81,6 +81,22 @@ export const Desktop: Story = {
   globals: { viewport: { value: 'desktop' } },
 }
 
+/** In the roster grid at 640 px and narrower: compact card for the two-column grid. */
+export const CompactPhone: Story = {
+  args: { ...rowAt(5), compactOnPhone: true, showPresence: false },
+  globals: { viewport: { value: 'phone' } },
+  decorators: [(Story) => <div className="grid w-full grid-cols-2 gap-2">{Story()}</div>],
+}
+export const CompactPhoneLight: Story = {
+  ...CompactPhone,
+  globals: { viewport: { value: 'phone' }, theme: 'light' },
+}
+/** Compact after Start: Present text centred, level fixed, no remove ×. */
+export const CompactPhoneAfterStart: Story = {
+  ...CompactPhone,
+  args: { ...rowAt(0), compactOnPhone: true, levelLocked: true },
+}
+
 const levelCases: [string, PlayingLevel | null][] = [
   ['Beginner', 'beginner_mid'],
   ['Intermediate', 'intermediate_mid'],

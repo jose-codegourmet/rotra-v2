@@ -7,6 +7,7 @@ export const savedPlayerCardMeta = {
   usage: [
     'Use in the Saved players grid (inside LetterGroup). The top area is one button that opens the profile.',
     'Invite shows only for guests and unclaimed profiles. Never show the RTR ID or a phone number on the card.',
+    'An unclaimed player has no RTR ID until they register (D-2026-11-11-03): pass registeredCity null and the pin line reads "Not registered", as the prototype\'s playerCard does.',
     'joinedVia ("club", "session" or null) sets the caption: "Joined via club link", "Joined via session link" or "Added by the club".',
     'registeredCity comes from the RTR ID\'s city code; when unknown the card says "Not registered", or "Lookup after sync" for a pending lookup.',
   ],

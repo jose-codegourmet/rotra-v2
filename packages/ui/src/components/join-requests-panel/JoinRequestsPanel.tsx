@@ -14,7 +14,6 @@ import { MatchRequestCard, type MatchRequestCardProps } from '@rotra/ui/match-re
 import { Notice } from '@rotra/ui/notice'
 import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { Skeleton } from '@rotra/ui/skeleton'
-import { Tabs, TabsContent } from '@rotra/ui/tabs'
 import { useId, useState } from 'react'
 
 export type JoinRequestDetails = {
@@ -49,7 +48,9 @@ export function confirmLabel(
 }
 export type JoinRequestsPanelProps = {
   requestDetails?: Record<string, JoinRequestDetails>
+  /** Drop-out notices, listed before Start only */
   dropOuts?: (DropOutNoticeRowProps & { id: string })[]
+  /** Open match requests, listed once the session is live only */
   matchRequests?: (MatchRequestCardProps & { id: string })[]
   /**
    * Every join request of the session, any status. The panel lists the pending ones oldest first and
@@ -58,6 +59,10 @@ export type JoinRequestsPanelProps = {
   requests: SessionJoinRequest[]
   /** No open slot left: confirmed guests go on the waitlist and the primary button says so */
   slotsFull?: boolean
+  /**
+   * The session has started. There are no tabs: before Start the panel lists join requests and
+   * drop-out notices; once live it lists match requests only (join requests close at Start).
+   */
   live?: boolean
   /** `card` on Preparation; `sheet` drops the card chrome and heading for the live console's sheet */
   variant?: 'card' | 'sheet'
@@ -94,7 +99,8 @@ const formatTime = (at: number) =>
 const LEVEL_ERROR = 'Choose a level for this club before confirming.'
 
 /**
- * Preparation › Join requests, and the live console's Join requests sheet: each waiting guest with
+ * The Requests panel, no tabs (owner, November 11, 2026). Live: match requests only. Before Start:
+ * drop-out notices, then join requests: each waiting guest with
  * initials, name, phone, stated band and time, the choice they made (Asks for a slot / Asks to be
  * waitlisted / Waitlist #N · asks for a slot; D-2026-11-11-02), a level select preset to the middle
  * of that band, and Decline / Confirm guest (Confirm to waitlist for a waitlist request or when slots
@@ -117,7 +123,6 @@ export function JoinRequestsPanel({
   className,
 }: JoinRequestsPanelProps) {
   const id = useId()
-  const [tab, setTab] = useState('join')
   const [levels, setLevels] = useState<Record<string, PlayingLevel | null>>({})
   const [errors, setErrors] = useState<Record<string, string>>({})
 
@@ -146,13 +151,13 @@ export function JoinRequestsPanel({
   }
 
   const inSheet = variant === 'sheet'
-  const count = pending.length + dropOuts.length + matchRequests.length
+  const count = live ? matchRequests.length : pending.length + dropOuts.length
   const heading = count ? `Requests · ${count}` : 'Requests'
   const body = loading ? (
     <section
       id="join-requests"
       aria-busy
-      aria-label="Loading join requests"
+      aria-label={live ? 'Loading match requests' : 'Loading join requests'}
       className={cn('flex min-w-0 flex-col gap-3', inSheet && className)}
     >
       {inSheet ? null : <h2>{heading}</h2>}
@@ -187,21 +192,30 @@ export function JoinRequestsPanel({
         <div>
           <h2 id={`${id}-h`}>{heading}</h2>
           <p className="m-0 text-[13px] text-fg2">
-            Join requests, drop-out notices and match requests from the session page. Nothing
-            changes until you act on one.
+            {live
+              ? 'Match requests from players on the session page.'
+              : 'Join requests and drop-out notices from the session page.'}{' '}
+            Nothing changes until you act on one.
           </p>
         </div>
       )}
-      <Tabs
-        aria-label="Requests"
-        value={tab}
-        onChange={setTab}
-        items={[
-          { value: 'join', label: `Join · ${pending.length + dropOuts.length}` },
-          { value: 'match', label: `Match · ${matchRequests.length}` },
-        ]}
-      >
-        <TabsContent value="join" className="flex flex-col gap-3">
+      {live ? (
+        <div className="flex flex-col gap-3">
+          {serverError ? <Notice tone="error">{serverError}</Notice> : null}
+          {matchRequests.length ? (
+            <div className="divide-y divide-border">
+              {matchRequests.map(({ id: matchId, ...props }) => (
+                <MatchRequestCard key={matchId} {...props} />
+              ))}
+            </div>
+          ) : (
+            <p className="m-0 text-[13px] text-fg2">
+              No match requests. Present players can ask for a match from the session page.
+            </p>
+          )}
+        </div>
+      ) : (
+        <div className="flex flex-col gap-3">
           {dropOuts.length ? (
             <section className="flex flex-col gap-2">
               <h3 className="m-0 text-sm">Can't make it · {dropOuts.length}</h3>
@@ -364,21 +378,8 @@ export function JoinRequestsPanel({
               })}
             </div>
           ) : null}
-        </TabsContent>
-        <TabsContent value="match">
-          {matchRequests.length ? (
-            <div className="divide-y divide-border">
-              {matchRequests.map(({ id: matchId, ...props }) => (
-                <MatchRequestCard key={matchId} {...props} />
-              ))}
-            </div>
-          ) : (
-            <p className="m-0 text-[13px] text-fg2">
-              No match requests. Present players can ask for a match from the session page.
-            </p>
-          )}
-        </TabsContent>
-      </Tabs>
+        </div>
+      )}
     </section>
   )
 

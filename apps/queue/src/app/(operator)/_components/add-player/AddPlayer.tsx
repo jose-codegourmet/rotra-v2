@@ -8,10 +8,7 @@ import { MockError } from '@rotra/data/mock/errors'
 import { slotCapacity } from '@rotra/data/queue-session/queueSession.rules'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import type { RosterAddPlacement } from '@rotra/data/session-roster/mutations'
-import {
-  needsConfirmStep,
-  ROSTER_DUPLICATE_ERROR,
-} from '@rotra/data/session-roster/sessionRoster.rules'
+import { ROSTER_DUPLICATE_ERROR } from '@rotra/data/session-roster/sessionRoster.rules'
 import { useAddDirectoryPlayerToSession } from '@rotra/data/session-roster/useAddDirectoryPlayerToSession'
 import { useAddNewPlayerToSession } from '@rotra/data/session-roster/useAddNewPlayerToSession'
 import { useAddSavedPlayerToSession } from '@rotra/data/session-roster/useAddSavedPlayerToSession'
@@ -118,7 +115,6 @@ function useAddSheet(open: boolean, returnsToList: (error: unknown) => boolean) 
       onDirectorySearch: setQuery,
       directoryResults,
       directoryLoading: !offline && directory.isFetching && !directory.data,
-      needsConfirmStep: (candidate: AddPlayerCandidate) => needsConfirmStep(candidate),
       serverErrorReturnsToList: errorReturnsToList,
       lastAdded,
       addedCount,
@@ -191,9 +187,8 @@ function SessionAddPlayer({
     else run({})
   }
 
-  const confirm = ({ candidate, source, level, identityCheck }: AddPlayerConfirmInput) => {
+  const confirm = ({ candidate, source, level }: AddPlayerConfirmInput) => {
     if (!s || !roster.data || !clubPlayers.data) return
-    const identityCheckInput = identityCheck ?? undefined
     placeOrAsk(candidate.name, (placement) => {
       if (!add.begin()) return
       if (source === 'saved')
@@ -202,7 +197,6 @@ function SessionAddPlayer({
             sessionId,
             clubPlayerId: candidate.id,
             level,
-            identityCheck: identityCheckInput,
             ...placement,
           },
           add.options,
@@ -213,7 +207,6 @@ function SessionAddPlayer({
             sessionId,
             playerId: candidate.id,
             level,
-            identityCheck: identityCheckInput,
             ...placement,
           },
           add.options,

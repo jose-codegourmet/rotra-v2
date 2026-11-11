@@ -36,6 +36,7 @@ export type PlayerProfileSheetProps = {
   onPhotoClick?: () => void
   /** City the profile was first registered in (from the RTR ID) */
   registeredCity: string | null
+  /** null: "Given when they register" for an unclaimed player (club-only until they register), else "None yet" */
   rtrId: string | null
   /** Long date the club saved them, e.g. "October 3, 2026" */
   addedLabel: string
@@ -63,7 +64,7 @@ export type PlayerProfileSheetProps = {
 
 const STATUS: Record<Identity, string> = {
   registered: 'Registered ROTRA player',
-  unclaimed: 'Profile exists but not claimed yet',
+  unclaimed: 'Saved by your club with a phone. Not registered with ROTRA yet',
   guest: 'Guest, no ROTRA profile',
   pending: 'Profile lookup after the session syncs',
 }
@@ -178,7 +179,13 @@ export function PlayerProfileSheet({
               { label: 'Registered in', value: registeredCity ?? 'Not registered yet' },
               {
                 label: 'RTR ID',
-                value: rtrId ? <span className="font-mono text-[13px]">{rtrId}</span> : 'None yet',
+                value: rtrId ? (
+                  <span className="font-mono text-[13px]">{rtrId}</span>
+                ) : identity === 'unclaimed' ? (
+                  'Given when they register'
+                ) : (
+                  'None yet'
+                ),
               },
               { label: 'Joined', value: JOINED_VIA_TEXT[joinedVia ?? 'club-added'] },
             ]}

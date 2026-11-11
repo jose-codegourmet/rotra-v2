@@ -171,18 +171,6 @@ export function CourtsAndTime({
           setEditingId(id)
           onOpenChange('add-court')
         }}
-        onRemoveCourt={(courtId) =>
-          remove.mutate(
-            { sessionId, courtId },
-            {
-              onSuccess: (result) => {
-                setServerError(undefined)
-                toast(result.message)
-              },
-              onError: (error) => setServerError(errorMessage(error)),
-            },
-          )
-        }
         endsAt={s.scheduledEndAt}
         onAddCourt={() => openAddCourt(true)}
         onExtend={onExtend}

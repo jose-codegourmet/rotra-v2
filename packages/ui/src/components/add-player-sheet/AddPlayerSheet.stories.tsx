@@ -10,7 +10,7 @@ import { queueSessionFixtures } from '@rotra/data/fixtures/queueSessions'
 import { admissionCapacityFixture as admission } from '@rotra/data/fixtures/session-waitlist'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
-import { fn } from 'storybook/test'
+import { expect, fn, userEvent, within } from 'storybook/test'
 import { type AddPlayerCandidate, AddPlayerSheet, type AddPlayerSheetProps } from './AddPlayerSheet'
 
 const tonight = queueSessionFixtures.sessions[0]
@@ -18,13 +18,15 @@ if (!tonight) throw new Error('Session fixture missing')
 const CAPACITY = 3 * tonight.playersPerCourt
 const ROSTER_IDS = queueSessionFixtures.roster.map((r) => r.clubPlayerId)
 
-// Saved players as the mock store's clubPlayerView() presents them: RTR ID from the public profile,
-// the club level as the suggestion, and the first and fourth players hiding their phone.
+// Saved players as the mock store's clubPlayerView() presents them: RTR ID from the public profile
+// (none for an unclaimed player until they register, D-2026-11-11-03), the club level as the
+// suggestion, and the first and fourth players hiding their phone.
 const savedCandidates: AddPlayerCandidate[] = clubPlayers.map((p: ClubPlayer, i) => ({
   id: p.id,
   name: p.fullName,
   nickname: p.nickname,
-  rtrId: players.find((x) => x.id === p.playerId)?.rtrId ?? null,
+  rtrId:
+    p.identity === 'unclaimed' ? null : (players.find((x) => x.id === p.playerId)?.rtrId ?? null),
   identity: p.identity,
   suggestion: p.playingLevel,
   phoneHidden: i === 0 || i === 3,
@@ -190,5 +192,52 @@ export const SavedPlayersClubDuplicate: Story = {
 export const SavedPlayersClubOffline: Story = { args: { club: true, offline: true } }
 export const SavedPlayersClubPhone: Story = {
   args: { club: true, initialTab: 'new' },
+  globals: { viewport: { value: 'phone' } },
+}
+
+// A saved player not in the session and without a level opens the level step; one with a level is
+// added in one tap.
+const notInSession = savedCandidates.filter((p) => !ROSTER_IDS.includes(p.id))
+const noLevel = notInSession.find((p) => !p.suggestion) ?? notInSession[0]
+const withLevel = notInSession.find((p) => p.suggestion)
+const unclaimedSaved = notInSession.find((p) => p.identity === 'unclaimed')
+
+/** An unclaimed saved player lists "Not registered yet" under the name (guests still read Guest). */
+export const UnclaimedNotRegistered: Story = {
+  args: { savedPlayers: unclaimedSaved ? [unclaimedSaved, ...savedCandidates] : savedCandidates },
+}
+export const UnclaimedNotRegisteredLight: Story = {
+  ...UnclaimedNotRegistered,
+  globals: { theme: 'light' },
+}
+
+/** A pick with a level is added in one tap: onConfirm fires with that level, no card opens. */
+export const PickWithLevelOneTap: Story = {
+  play: async ({ canvasElement, args }) => {
+    if (!withLevel) return
+    const body = within(canvasElement.ownerDocument.body)
+    await userEvent.click(body.getByRole('button', { name: new RegExp(withLevel.name) }))
+    await expect(args.onConfirm).toHaveBeenCalled()
+    await expect(body.getByRole('dialog', { name: 'Add player' })).toBeInTheDocument()
+  },
+}
+
+/** A pick without a level opens the level step; the title stays "Add player". */
+export const PickWithoutLevel: Story = {
+  args: {
+    savedPlayers: noLevel
+      ? [{ ...noLevel, suggestion: null }, ...savedCandidates.filter((p) => p.id !== noLevel.id)]
+      : savedCandidates,
+  },
+  play: async ({ canvasElement }) => {
+    if (!noLevel) return
+    const body = within(canvasElement.ownerDocument.body)
+    await userEvent.click(body.getByRole('button', { name: new RegExp(noLevel.name) }))
+    await expect(body.getByRole('dialog', { name: 'Add player' })).toBeInTheDocument()
+  },
+}
+export const PickWithoutLevelLight: Story = { ...PickWithoutLevel, globals: { theme: 'light' } }
+export const PickWithoutLevelPhone: Story = {
+  ...PickWithoutLevel,
   globals: { viewport: { value: 'phone' } },
 }

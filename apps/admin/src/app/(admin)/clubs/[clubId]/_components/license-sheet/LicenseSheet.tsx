@@ -9,7 +9,6 @@ import {
   formatLicenseDate,
   licenseEffects,
   manilaToday,
-  overlapDays,
   planPriceMinor,
   termEnd,
 } from '@rotra/data/license/rules'
@@ -271,7 +270,6 @@ export function LicenseSheet({ club, terms, open, onOpenChange }: LicenseSheetPr
         planPriceMinor={planPriceMinor(club, values.plan)}
         reference={values.reference}
         effects={licenseEffects(club, club.access, club.retention, values, today)}
-        overlapDays={overlapDays(club.access, values)}
         onBack={back}
         onConfirm={save}
         isPending={activate.isPending}

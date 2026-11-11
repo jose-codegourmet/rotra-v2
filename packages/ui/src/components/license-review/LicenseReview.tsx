@@ -3,7 +3,6 @@ import { formatPeso } from '@rotra/schema/money'
 import { Button } from '@rotra/ui/button'
 import { KeyValueList } from '@rotra/ui/key-value-list'
 import { formatYmd } from '@rotra/ui/license-access-chip/variants'
-import { Notice } from '@rotra/ui/notice'
 import { SheetSteps } from '@rotra/ui/sheet-steps'
 
 export type LicenseReviewProps = {
@@ -18,12 +17,10 @@ export type LicenseReviewProps = {
   payment: { amountMinor: number; paidOn: string } | null
   /** The club's price for this plan, in centavos; a different amount adds a note under Paid */
   planPriceMinor: number
-  /** Optional reference; "—" when empty */
+  /** The owner-typed note (optional), shown as Note; "—" when empty. The LIC number is assigned when saved */
   reference: string
   /** "What this does" bullets, worked out by the container (rotra-admin.html licEffects) */
   effects: string[]
-  /** Days the new term overlaps the current one; above 0 shows the undecided-overlap warning */
-  overlapDays: number
   /** Back to the details step with every value kept */
   onBack: () => void
   onConfirm: () => void
@@ -35,11 +32,9 @@ export type LicenseReviewProps = {
 
 const STEPS = ['Details', 'Review']
 
-const plural = (n: number, word: string) =>
-  `${n.toLocaleString('en-US')} ${word}${n === 1 ? '' : 's'}`
-
 /**
- * A-LICENSE step 2 (D-LICENSE): the club, plan, period, payment and reference to check, what the
+ * A-LICENSE step 2 (D-LICENSE): the club, plan, period, payment, Reference (the LIC number assigned
+ * when saved) and the typed Note to check, what the
  * license does to access and public pages, and Activate license / Renew license. Payment happened
  * outside ROTRA; nothing here collects money.
  */
@@ -53,7 +48,6 @@ export function LicenseReview({
   planPriceMinor,
   reference,
   effects,
-  overlapDays,
   onBack,
   onConfirm,
   isPending = false,
@@ -92,7 +86,11 @@ export function LicenseReview({
               'Free · tester club'
             ),
           },
-          { label: 'Reference', value: <span className="font-mono">{reference || '—'}</span> },
+          {
+            label: 'Reference',
+            value: <span className="text-[13px] text-fg2">LIC number assigned when saved</span>,
+          },
+          { label: 'Note', value: reference || '—' },
         ]}
       />
       <div className="flex flex-col gap-1.5">
@@ -105,12 +103,6 @@ export function LicenseReview({
           ))}
         </ul>
       </div>
-      {overlapDays > 0 ? (
-        <Notice tone="warn">
-          This term overlaps the current one by {plural(overlapDays, 'day')}. How overlapping terms
-          combine hasn't been decided.
-        </Notice>
-      ) : null}
       {serverError ? (
         <p role="alert" className="m-0 text-[13px] font-semibold text-error">
           {serverError}

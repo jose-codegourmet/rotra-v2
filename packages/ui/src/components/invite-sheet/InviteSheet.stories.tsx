@@ -23,7 +23,14 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const InviteGuest: Story = {}
+/** "Your club saved them with a phone. This link lets them turn that record into a ROTRA account …" */
 export const InviteUnclaimed: Story = { args: { name: unclaimed.fullName, identity: 'unclaimed' } }
+export const InviteUnclaimedLight: Story = { ...InviteUnclaimed, globals: { theme: 'light' } }
+export const InviteUnclaimedPhone: Story = {
+  ...InviteUnclaimed,
+  globals: { viewport: { value: 'phone' } },
+}
+export const InviteGuestLight: Story = { globals: { theme: 'light' } }
 export const Offline: Story = { args: { offline: true } }
 export const LoadingLink: Story = { args: { link: undefined } }
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }

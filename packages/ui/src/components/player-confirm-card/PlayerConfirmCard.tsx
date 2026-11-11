@@ -1,13 +1,11 @@
 'use client'
 
 import type { PlayingLevel } from '@rotra/data/player/types'
-import type { IdentityCheck } from '@rotra/data/session-roster/types'
 import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { cn } from '@rotra/ui/cn'
 import { Field } from '@rotra/ui/field'
-import { Icon } from '@rotra/ui/icon'
 import { IdentityChip } from '@rotra/ui/identity-chip'
 import type { Identity } from '@rotra/ui/identity-chip/variants'
 import { LevelSelect, levelLabel } from '@rotra/ui/level-select'
@@ -15,19 +13,19 @@ import { LevelSelect, levelLabel } from '@rotra/ui/level-select'
 export type PlayerConfirmCardProps = {
   name: string
   photoUrl?: string
-  /** Shown in monospace; null shows "Guest · no RTR ID" */
+  /**
+   * Shown in monospace; null shows "Not registered yet" for an unclaimed profile (its RTR ID is
+   * given when they register) and "Guest" otherwise
+   */
   rtrId: string | null
   identity: Identity
-  /** The player chose to hide their phone from clubs: the Phone confirmed check is left out */
+  /** The player chose to hide their phone from clubs: "Phone hidden by player. …" */
   phoneHidden?: boolean
   /** Player Information suggestion; null shows "None yet" */
   suggestion: PlayingLevel | null
   /** Level for this club, preset to the suggestion by the sheet */
   level: PlayingLevel | null
   onLevelChange: (level: PlayingLevel) => void
-  /** The identity check chosen for an unclaimed profile; null until one is tapped */
-  check?: IdentityCheck | null
-  onCheckChange?: (check: IdentityCheck | null) => void
   /** The session is live: the level label says it locks immediately */
   live?: boolean
   /** "Choose a level for this club before adding." or the server's refusal */
@@ -46,26 +44,10 @@ export type PlayerConfirmCardProps = {
   className?: string
 }
 
-const CHECKS: { value: IdentityCheck; label: string }[] = [
-  { value: 'rtr-id', label: 'RTR ID matches' },
-  { value: 'qr', label: 'Scanned their QR' },
-  { value: 'phone', label: 'Phone confirmed' },
-]
-
-/** Only unclaimed profiles need the in-person identity check; the primary waits for one. */
-export function needsIdentityCheck(identity: Identity) {
-  return identity === 'unclaimed'
-}
-
-/** True once the card can be confirmed: a check is chosen for an unclaimed profile, nothing else needed. */
-export function canConfirmPlayer(identity: Identity, check: IdentityCheck | null | undefined) {
-  return !needsIdentityCheck(identity) || check != null
-}
-
 /**
- * Q-IDENTIFY / Q-ASSESS: the picked player's identity, the identity check that only unclaimed
- * profiles need, the Player Information suggestion and the level for this club. Never shows a phone
- * number; a hidden phone only says so.
+ * Q-ASSESS: the picked player's identity, the Player Information suggestion and the level for this
+ * club. There is no identity check (owner, November 11, 2026: unclaimed profiles are the club's own
+ * records). Never shows a phone number; a hidden phone only says so.
  */
 export function PlayerConfirmCard({
   name,
@@ -76,8 +58,6 @@ export function PlayerConfirmCard({
   suggestion,
   level,
   onLevelChange,
-  check = null,
-  onCheckChange,
   live = false,
   error,
   full = false,
@@ -88,8 +68,6 @@ export function PlayerConfirmCard({
   className,
 }: PlayerConfirmCardProps) {
   const club = context === 'club'
-  const needsCheck = needsIdentityCheck(identity)
-  const checks = CHECKS.filter((c) => c.value !== 'phone' || !phoneHidden)
   const levelMissing = Boolean(error) && level == null
 
   return (
@@ -102,45 +80,15 @@ export function PlayerConfirmCard({
             <span className="text-[13px] text-fg2">
               {rtrId ? (
                 <span className="font-mono text-[0.92em]">{rtrId}</span>
+              ) : identity === 'unclaimed' ? (
+                'Not registered yet'
               ) : (
-                'Guest · no RTR ID'
+                'Guest'
               )}
             </span>
           </span>
           <IdentityChip identity={identity} />
         </div>
-
-        {needsCheck ? (
-          <fieldset className="m-0 flex min-w-0 flex-col gap-1.5 border-0 p-0">
-            <legend className="mb-1.5 p-0 text-xs font-semibold tracking-[0.5px] text-fg2 uppercase">
-              Confirm this is the right person
-            </legend>
-            <p className="m-0 text-[13px]">
-              Check with the player using one of these. A name match alone isn't enough.
-            </p>
-            <div className="flex flex-wrap items-center gap-2">
-              {checks.map((c) => (
-                <Button
-                  key={c.value}
-                  size="xs"
-                  aria-pressed={check === c.value}
-                  onClick={() => onCheckChange?.(check === c.value ? null : c.value)}
-                >
-                  {c.label}
-                </Button>
-              ))}
-            </div>
-            {check ? (
-              <p
-                role="status"
-                className="m-0 inline-flex items-center gap-1.5 text-[13px] font-semibold text-accent"
-              >
-                <Icon name="check" size={14} />
-                Identity confirmed with the player
-              </p>
-            ) : null}
-          </fieldset>
-        ) : null}
 
         {phoneHidden ? (
           <p className="m-0 text-[13px] text-fg2">
@@ -172,12 +120,7 @@ export function PlayerConfirmCard({
           <Button disabled={isPending} onClick={onBack}>
             Back
           </Button>
-          <Button
-            variant="primary"
-            loading={isPending}
-            disabled={!canConfirmPlayer(identity, check)}
-            onClick={onConfirm}
-          >
+          <Button variant="primary" loading={isPending} onClick={onConfirm}>
             {club ? 'Save player' : full && !live ? 'Add to waitlist' : 'Confirm player slot'}
           </Button>
         </div>

@@ -48,7 +48,7 @@ export type NewPlayerFormProps = NewPlayerFormBaseProps &
   )
 
 export const PHONE_HINT =
-  "Without a phone they're saved as a guest. With one, ROTRA can match or create their profile when the session syncs."
+  "Without a phone they're saved as a guest. With one, ROTRA can link them to their account if they're registered, when the session syncs. Only your club sees them otherwise."
 
 /** The submit label the prototype uses: a slot when one is open, otherwise the waitlist; Save player with no session. */
 export function addPlayerSubmitLabel(

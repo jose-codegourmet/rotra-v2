@@ -48,6 +48,13 @@ export const OneSlotLeft: Story = { args: { variant: 'open', openSlots: 1, capac
 export const Full: Story = { args: { variant: 'full', onRequestToJoin: fn() } }
 
 export const Active: Story = { args: { variant: 'active', onRequestToJoin: fn() } }
+/** After Start: online join requests are closed (visitors and signed-in players see the same card). */
+export const Started: Story = { args: { variant: 'started' } }
+export const StartedLight: Story = { args: { variant: 'started' }, globals: { theme: 'light' } }
+export const StartedPhone: Story = {
+  args: { variant: 'started' },
+  globals: { viewport: { value: 'phone' } },
+}
 
 /** No confirmed players: the skill mix bar is hidden. */
 export const EmptyRoster: Story = {

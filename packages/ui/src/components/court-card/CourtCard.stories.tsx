@@ -256,11 +256,13 @@ const openMenu = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
   const body = within(canvasElement.ownerDocument.body)
   await expect(body.getByRole('menuitem', { name: 'Edit' })).toHaveFocus()
 }
-/** A match is on the court: Edit, Undo early open and Remove are disabled with their reasons */
+/** A match is on the court: Change time stays enabled; Remove is disabled with its reason */
 const openBusyMenu = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
   await userEvent.click(within(canvasElement).getByRole('button', { name: /^More for / }))
   const body = within(canvasElement.ownerDocument.body)
-  await expect(body.getByRole('menuitem', { name: /^Edit/ })).toHaveAttribute('data-disabled')
+  await expect(body.getByRole('menuitem', { name: 'Change time' })).not.toHaveAttribute(
+    'data-disabled',
+  )
   await expect(body.getByRole('menuitem', { name: /^Remove/ })).toHaveAttribute('data-disabled')
 }
 /** After Start anyway: Free, with "Opened early · planned …" and Undo early open in the ⋯ menu */
@@ -280,7 +282,7 @@ export const LastCourtMenuOpen: Story = {
   args: free(courtAt(2), [ready], { isLastCourt: true }),
   play: openMenu,
 }
-/** Playing on an early-opened court: Edit, Undo early open and Remove wait until the court is free */
+/** Playing on an early-opened court: Change time works; Undo early open and Remove wait until the court is free */
 export const InGameOpenedEarlyMenu: Story = {
   args: inGame(playing, {
     startLabel: fmtTime(courtWindowFixture.courts[3]!.startsAt),
@@ -290,6 +292,13 @@ export const InGameOpenedEarlyMenu: Story = {
   play: openBusyMenu,
 }
 /** Getting ready: the ⋯ menu starts with "Swap with #P · Match N" */
+/** Playing: the ⋯ menu reads Change time (enabled) instead of Edit */
+export const InGameChangeTimeMenu: Story = { args: inGame(playing), play: openBusyMenu }
+export const InGameChangeTimeMenuLight: Story = {
+  args: inGame(playing),
+  play: openBusyMenu,
+  globals: { theme: 'light' },
+}
 export const GettingReadySwapMenu: Story = {
   args: onCourt(ready),
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {

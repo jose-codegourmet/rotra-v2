@@ -52,8 +52,24 @@ export type RosterCardProps = {
    * (also in the read-only summary). Omit to hide it.
    */
   onStepDown?: () => void
+  /**
+   * In the roster's Grid view: at 640 px and narrower the card turns compact for the two-column grid
+   * (56 px picture centred on top, name under it, chips and buttons centred, remove × in the card's
+   * top-right corner). Unchanged from 641 px up.
+   */
+  compactOnPhone?: boolean
   className?: string
 }
+
+/** The prototype's `.rv-grid .rv-card` rules under `@media (max-width: 640px)` */
+const COMPACT = {
+  card: 'max-[641px]:gap-1.5 max-[641px]:p-2.5 max-[641px]:text-center',
+  top: 'relative max-[641px]:flex-col max-[641px]:items-center max-[641px]:gap-1.5',
+  avatar: 'max-[641px]:size-14 max-[641px]:text-lg',
+  main: 'max-[641px]:items-center',
+  remove: 'max-[641px]:absolute max-[641px]:-top-1 max-[641px]:-right-1',
+  centre: 'max-[641px]:justify-center',
+} as const
 
 /**
  * One confirmed slot on the preparation roster grid (the prototype's .rv-card). First level:
@@ -81,17 +97,28 @@ export function RosterCard({
   onPresentChange,
   onRemove,
   onStepDown,
+  compactOnPhone = false,
   className,
 }: RosterCardProps) {
+  const compact = (part: keyof typeof COMPACT) => (compactOnPhone ? COMPACT[part] : undefined)
   const diffId = useId()
   const afterStart = Boolean(levelLocked || readOnly)
   const band = level ? (level.split('_')[0] as 'beginner' | 'intermediate' | 'advanced') : 'none'
   return (
-    <Card asChild padding="none" className={cn('flex flex-col gap-2 p-3 shadow-card', className)}>
+    <Card
+      asChild
+      padding="none"
+      className={cn('flex flex-col gap-2 p-3 shadow-card', compact('card'), className)}
+    >
       <article aria-label={name}>
-        <div className="flex min-w-0 items-start gap-2.5">
-          <Avatar name={name} src={photoUrl} onClick={onOpenProfile} />
-          <div className="flex min-w-0 flex-1 flex-col gap-1">
+        <div className={cn('flex min-w-0 items-start gap-2.5', compact('top'))}>
+          <Avatar
+            name={name}
+            src={photoUrl}
+            onClick={onOpenProfile}
+            className={compact('avatar')}
+          />
+          <div className={cn('flex min-w-0 flex-1 flex-col gap-1', compact('main'))}>
             <b className="font-semibold [overflow-wrap:anywhere]">{name}</b>
           </div>
           {!afterStart ? (
@@ -100,6 +127,7 @@ export function RosterCard({
               variant="ghost"
               label={`Remove ${name} from roster`}
               onClick={onRemove}
+              className={compact('remove')}
             >
               <Icon name="x" />
             </IconButton>
@@ -110,6 +138,7 @@ export function RosterCard({
             className={cn(
               'flex items-center justify-between gap-2 rounded-md px-2.5 py-2',
               present ? 'bg-accent-subtle text-accent' : 'bg-elev text-fg2',
+              afterStart && compact('centre'),
             )}
           >
             {afterStart ? (
@@ -131,7 +160,9 @@ export function RosterCard({
           </div>
         ) : null}
         {present && selfCheckedInAt != null ? (
-          <span className="inline-flex items-center gap-1 text-xs text-fg2">
+          <span
+            className={cn('inline-flex items-center gap-1 text-xs text-fg2', compact('centre'))}
+          >
             <Icon name="check" size={13} />
             Checked in themselves ·{' '}
             {new Date(selfCheckedInAt).toLocaleTimeString([], {
@@ -165,7 +196,13 @@ export function RosterCard({
           )}
           <LevelDiffIndicator id={diffId} level={level} suggestion={suggestion} />
         </div>
-        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-fg2">
+        <div
+          className={cn(
+            'flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-fg2',
+            compact('centre'),
+            compactOnPhone && 'max-[641px]:gap-1.5',
+          )}
+        >
           <IdentityChip identity={identity} />
           <span className="inline-flex items-center gap-1">
             {paid ? <Icon name="check" size={13} /> : null}
@@ -174,7 +211,7 @@ export function RosterCard({
           <span>{suggestion ? `Suggestion: ${levelLabel(suggestion)}` : 'No suggestion'}</span>
         </div>
         {onStepDown ? (
-          <div className="flex flex-wrap items-center gap-2">
+          <div className={cn('flex flex-wrap items-center gap-2', compact('centre'))}>
             <Button size="xs" aria-label={`Move ${name} to the waitlist`} onClick={onStepDown}>
               Move to waitlist
             </Button>

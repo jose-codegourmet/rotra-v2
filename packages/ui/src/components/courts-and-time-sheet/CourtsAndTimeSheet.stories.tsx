@@ -10,6 +10,12 @@ const HOUR = 60 * MINUTE
 const started = session.startedAt
 // A fixed "now" (the fixture's own) keeps the picker's times and the overdue text stable.
 const now = started + HOUR
+// Court 1 playing, Court 2 getting ready, Court 3 free (D-COURTS-TIME).
+const statusCourts = courts.map((court, i) => ({
+  ...court,
+  status: (['playing', 'getting-ready', 'free'] as const)[i % 3],
+  used: i < 2,
+}))
 
 const meta = {
   title: 'Queue/CourtsAndTimeSheet',
@@ -17,8 +23,9 @@ const meta = {
   args: {
     open: true,
     onOpenChange: fn(),
-    courts,
+    courts: statusCourts,
     startsAt: started,
+    onEditCourt: fn(),
     endsAt: session.scheduledEndAt,
     now,
     onAddCourt: fn(),
@@ -31,8 +38,35 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-/** New end pre-filled with the current end, Set end time, and Extend 30 / 60 as shortcuts. */
+/**
+ * One row per court: Playing / Getting ready / Free with the booking line and Change time; New end
+ * pre-filled with the current end, Set end time, and Extend 30 / 60 as shortcuts.
+ */
 export const Default: Story = {}
+
+/** Every court free: plain chips, "Until …" booking lines. */
+export const AllFree: Story = { args: { courts } }
+
+/** Court 1's booking ended while its match plays on: "Booking ended 9:00 PM" in the warn colour. */
+export const BookingEnded: Story = {
+  args: {
+    courts: statusCourts.map((court, i) =>
+      i === 0 ? { ...court, openUntil: now - 5 * MINUTE } : court,
+    ),
+  },
+}
+
+/** Court 3 was opened early with Start anyway: "Opened early · planned 9:30 PM – 10:00 PM". */
+export const OpenedEarly: Story = {
+  args: {
+    courts: statusCourts.map((court, i) =>
+      i === 2 ? { ...court, openedEarly: true, startsAt: now + 30 * MINUTE } : court,
+    ),
+  },
+}
+
+/** Without onEditCourt the rows show no Change time button. */
+export const NoChangeTime: Story = { args: { onEditCourt: undefined } }
 
 /** A change is running: Set end time and both Extend buttons are disabled. */
 export const Extending: Story = { args: { isPending: true } }
@@ -81,7 +115,12 @@ export const FiveBookingWindows: Story = {
     startsAt: courtWindowFixture.session.scheduledStartAt,
     endsAt: courtWindowFixture.session.scheduledEndAt,
     now: courtWindowFixture.session.scheduledStartAt + HOUR,
-    onEditCourt: fn(),
-    onRemoveCourt: fn(),
   },
+}
+
+export const PhoneLight: Story = {
+  globals: { viewport: { value: 'phone' }, theme: 'light' },
+}
+export const DesktopLight: Story = {
+  globals: { viewport: { value: 'desktop' }, theme: 'light' },
 }

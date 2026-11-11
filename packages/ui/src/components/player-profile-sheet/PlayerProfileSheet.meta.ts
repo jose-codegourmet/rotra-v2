@@ -8,6 +8,7 @@ export const playerProfileSheetMeta = {
     'Open it from any player picture on operator screens (queue cards, match dialogs, roster, payments, leaderboard). Never on public pages.',
     'Opened from inside a dialog, pass backLabel ("suggestion", "match" or "payments") and onBack to return to that dialog in the same state; otherwise the footer says Close.',
     'The phone number is never a prop: pass only phoneHidden. Invite shows for guests and unclaimed profiles.',
+    'An unclaimed player is the club\'s own record (D-2026-11-11-03): the identity line reads "Saved by your club with a phone. Not registered with ROTRA yet" and, with rtrId null, RTR ID reads "Given when they register" (others with no RTR ID read "None yet").',
     'The level badge reads “LEVEL tonight” from tonightLevel (the player is on tonight’s roster), else “LEVEL · suggestion” from level, else “No level yet”. Pass tonight (ParticipantTonight) for the Tonight · line; leave it out when the player is not on tonight’s roster.',
     'onPhotoClick makes the big picture the Avatar view button (“View full photo of NAME”, zoom-in cursor, focus ring); open PhotoViewer from it (#716). Initials never open anything.',
     'joinedVia ("club", "session" or null) sets the Joined row: "Joined via club link", "Joined via session link" or "Added by the club".',

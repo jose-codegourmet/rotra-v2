@@ -45,6 +45,7 @@ export async function listClubPlayers(context: ClubContext): Promise<ClubPlayerD
         select: {
           avatarRef: true,
           fullName: true,
+          nickname: true,
           profileState: true,
           hidePhoneFromClubs: true,
           privateContact: { select: { phoneE164: true } },
@@ -63,8 +64,10 @@ export async function listClubPlayers(context: ClubContext): Promise<ClubPlayerD
     id: p.id,
     clubId: p.clubId,
     playerId: p.playerId,
-    fullName: p.displayName,
-    nickname: p.nickname,
+    // A linked profile's own name wins over the club's saved copy, so a claim or profile edit
+    // shows on every card (#705). Guests have no profile and keep what the club entered.
+    fullName: p.player?.fullName || p.displayName,
+    nickname: p.player ? p.player.nickname : p.nickname,
     picture: p.player?.avatarRef ?? null,
     pictureName: p.player?.fullName ?? null,
     identity: p.player

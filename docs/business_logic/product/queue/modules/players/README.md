@@ -44,6 +44,8 @@ The mock seeds three recent additions when its fixtures load; a reload resets th
 
 Registered and unclaimed players show their saved profile picture (uploaded photo or selected character) in preparation roster list/grid views and Saved players, including the profile dialog. Character choices use the linked global player ID and profile name, not the club-local ID or nickname. Guests, profiles without a picture and failed images show initials. Returning to the tab refreshes these player reads so a changed picture can appear (#577).
 
+Saved players show a linked player's own name and nickname from their ROTRA profile, not the copy the club saved (owner decision, November 11, 2026, #705). When an unclaimed or registered player changes their name through the invite link (registration) or later in their profile, every saved-player card linked to that profile shows the new name and nickname on the next load or refresh; there is no live push. A guest has no linked profile, so their card keeps the name the club entered; independent registration (#490) never links or renames the guest record.
+
 ## Guests and incomplete profiles
 
 - No phone number: retain a club/session guest; bypass automatic Player Information creation.

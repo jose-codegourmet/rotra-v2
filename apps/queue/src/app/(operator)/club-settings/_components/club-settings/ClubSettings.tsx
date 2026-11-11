@@ -16,6 +16,7 @@ import { useUpdateClubLogo } from '@rotra/data/club/useUpdateClubLogo'
 import { useUpdateSelfCheckIn } from '@rotra/data/club/useUpdateSelfCheckIn'
 import { useUpdateSessionDefaults } from '@rotra/data/club/useUpdateSessionDefaults'
 import { clubInviteUrl } from '@rotra/data/club-player/registration-url'
+import { useConnectivity } from '@rotra/data/connectivity/useConnectivity'
 import { useDeviceDownloads } from '@rotra/data/device/useDeviceDownloads'
 import { DEMO_CLUB_ID } from '@rotra/data/fixtures/clubs'
 import { licensePaymentsCsv } from '@rotra/data/license/fetchers'
@@ -47,7 +48,6 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useAppSelector } from '@/store/hooks'
 import { selectAccount } from '@/store/slices/authSlice'
-import { selectDev } from '@/store/slices/devSlice'
 import { useOperatorShell } from '../../../_components/operator-shell/DockAction.context'
 import { QueryError } from '../../../_components/query-error/QueryError'
 import { ShareClubInviteSheet } from '../share-club-invite-sheet/ShareClubInviteSheet'
@@ -192,7 +192,7 @@ export function ClubSettings({ section }: ClubSettingsProps) {
   const router = useRouter()
   const shell = useAppShell()
   const { settingsMenuOpen, setSettingsMenuOpen } = useOperatorShell()
-  const offline = useAppSelector(selectDev).offline
+  const offline = !useConnectivity().online
   const clubId = useAppSelector(selectAccount)?.id ?? DEMO_CLUB_ID
   const club = useClub(clubId)
   const sync = useSyncState()

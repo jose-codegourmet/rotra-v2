@@ -1,6 +1,6 @@
+import { getConnectivity } from '../connectivity/connectivity'
 import { autoFillPlacements, courtNames, type MatchContext } from '../match/match.rules'
 import type { Match } from '../match/match.types'
-import { getMockDevState } from '../mock/bridge'
 import { MockError } from '../mock/errors'
 import { type MockState, readMockState } from '../mock/store'
 import { queueMutation, sessionIn } from '../mock/transaction'
@@ -44,7 +44,7 @@ function autoFillOn(s: MockState, sessionId: string) {
     !!session &&
     session.state === 'active' &&
     courtFillModeOf(session) === 'auto' &&
-    !getMockDevState().offline
+    getConnectivity() === 'online'
   )
 }
 

@@ -3,6 +3,7 @@
 import { useAddDirectoryPlayerToClub } from '@rotra/data/club-player/useAddDirectoryPlayerToClub'
 import { useAddNewSavedPlayer } from '@rotra/data/club-player/useAddNewSavedPlayer'
 import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
+import { useConnectivity } from '@rotra/data/connectivity/useConnectivity'
 import { MockError } from '@rotra/data/mock/errors'
 import { slotCapacity } from '@rotra/data/queue-session/queueSession.rules'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
@@ -28,8 +29,6 @@ import type {
 import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { toast } from '@rotra/ui/toaster'
 import { useRef, useState } from 'react'
-import { useAppSelector } from '@/store/hooks'
-import { selectDev } from '@/store/slices/devSlice'
 
 export type AddPlayerProps = {
   /** The session to add to. Without one (Saved players), the sheet saves to the club's saved players only. */
@@ -52,7 +51,7 @@ const rankLabel = (label: string) =>
  */
 function useAddSheet(open: boolean, returnsToList: (error: unknown) => boolean) {
   const submitting = useRef(false)
-  const offline = useAppSelector(selectDev).offline
+  const offline = !useConnectivity().online
   const [query, setQuery] = useState('')
   const directory = usePlayerDirectorySearch(query)
   const [lastAdded, setLastAdded] = useState<string | null>(null)

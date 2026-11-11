@@ -3,7 +3,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const startSessionBarMeta = {
   name: 'StartSessionBar',
   description:
-    'The sticky Start bar on preparation: the first blocking reason in amber (levels missing, another session live with Open TITLE, no download while offline, license ended) or the ready line, and Start session.',
+    'The sticky Start bar on preparation: the first blocking reason in amber (levels missing, another session live with Open TITLE, offline (Starting needs an internet connection.), license ended) or the ready line, and Start session.',
   usage: [
     'The container passes startBlocker() from @rotra/data. On phones (≤ 900 px) the dock carries Start session: the bar shows only the reason, or hides when ready.',
     'Inside the operator shell the bar starts at the rail edge through the --rail custom property.',

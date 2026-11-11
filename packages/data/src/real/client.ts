@@ -1,3 +1,5 @@
+import { getConnectivity } from '../connectivity/connectivity'
+import { readOfflineBody, rememberGetBody } from '../device/deviceIndex'
 import { MockError, type MockErrorKind } from '../mock/errors'
 
 /** A refused Route Handler call; `status` lets a read tell not-found from other failures. */
@@ -22,14 +24,14 @@ const KIND_BY_STATUS: Record<number, MockErrorKind> = {
   422: 'permission',
 }
 
-function offline() {
-  return typeof navigator !== 'undefined' && navigator.onLine === false
-}
-
 /**
  * One call to the app's own Route Handlers. Failures become the same `MockError` kinds the screens
  * already handle; a write whose reply never arrives is a 'timeout' (it may have been saved), never
  * a success. `fields` maps service field keys to the form's field names.
+ *
+ * Device copy (#477): a successful GET of a downloaded session (or the club-level reads while one is
+ * downloaded) is kept in IndexedDB after it is returned; offline, such a GET answers from that copy.
+ * Every other offline call, and every offline write, refuses exactly as before.
  */
 export async function realRequest<T>(
   path: string,
@@ -43,8 +45,14 @@ export async function realRequest<T>(
   } = {},
 ): Promise<T> {
   const method = options.method ?? 'GET'
-  if (offline())
+  // Browser offline or DevMenu "Simulate offline": the same refusal either way.
+  if (getConnectivity() === 'offline') {
+    if (method === 'GET') {
+      const kept = await readOfflineBody(path)
+      if (kept.found) return kept.body as T
+    }
     throw new MockError('offline', "You're offline. This needs an internet connection.")
+  }
   const multipart = typeof FormData !== 'undefined' && options.body instanceof FormData
   let response: Response
   try {
@@ -73,7 +81,10 @@ export async function realRequest<T>(
     )
   }
   const body = (await response.json().catch(() => null)) as (T & ErrorBody) | null
-  if (response.ok) return body as T
+  if (response.ok) {
+    if (method === 'GET') rememberGetBody(path, body)
+    return body as T
+  }
   const message = body?.error?.message ?? 'Something went wrong. Try again.'
   const fields = body?.error?.fields
   const mapped = fields

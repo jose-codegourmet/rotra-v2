@@ -1,3 +1,4 @@
+import { getConnectivity } from '../connectivity/connectivity'
 import { getMockDevState, requireOnline, subscribeMockBridge } from '../mock/bridge'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
@@ -17,7 +18,10 @@ export async function playerRequest(signal?: AbortSignal) {
         reject(signal?.reason)
       }
       const unsubscribe = subscribeMockBridge(() => {
-        if (getMockDevState().leaderboardScenario !== 'loading' || getMockDevState().offline) {
+        if (
+          getMockDevState().leaderboardScenario !== 'loading' ||
+          getConnectivity() === 'offline'
+        ) {
           cleanup()
           resolve()
         }

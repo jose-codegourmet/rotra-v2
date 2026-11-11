@@ -1,4 +1,5 @@
-import { getMockDevState, subscribeMockBridge, subscribeMockSaveFailure } from '../mock/bridge'
+import { getConnectivity, subscribeConnectivity } from '../connectivity/connectivity'
+import { getMockDevState, subscribeMockSaveFailure } from '../mock/bridge'
 import { delay } from '../mock/latency'
 import { type MockState, mockStore, readMockState } from '../mock/store'
 import { sessionIn } from '../mock/transaction'
@@ -20,7 +21,7 @@ export function recordChange(
   now = Date.now(),
 ): SaveOutcome {
   const dev = getMockDevState(),
-    savedOffline = dev.offline,
+    savedOffline = getConnectivity() === 'offline',
     pending =
       savedOffline || !!dev.syncFails || (!!dev.authorizationExpired && !dev.activeFinishAllowed)
   state.sync.online = !savedOffline
@@ -47,7 +48,7 @@ let epoch = 0
 async function reconcile() {
   const token = ++epoch,
     dev = getMockDevState(),
-    offline = dev.offline,
+    offline = getConnectivity() === 'offline',
     authorizationBlocked = !!dev.authorizationExpired && !dev.activeFinishAllowed
   mockStore.update((state) => {
     state.sync.online = !offline
@@ -67,7 +68,11 @@ async function reconcile() {
     return
   const generation = mockStore.getGeneration()
   await delay(1400)
-  if (token !== epoch || getMockDevState().offline || generation !== mockStore.getGeneration())
+  if (
+    token !== epoch ||
+    getConnectivity() === 'offline' ||
+    generation !== mockStore.getGeneration()
+  )
     return
   if (getMockDevState().syncFails) {
     mockStore.update((state) => {
@@ -86,22 +91,28 @@ async function reconcile() {
     if (state.sync.problem === 'retry') state.sync.problem = undefined
   })
 }
-/** No upload/replay engine: only in-memory state transitions driven by dev controls. */
+/**
+ * No upload/replay engine: only in-memory state transitions driven by dev controls and the
+ * browser's own online / offline events, so reconnecting reconciles however the device went offline.
+ */
 export function connectMockSync() {
   let previous = getMockDevState()
+  let previousOffline = getConnectivity() === 'offline'
   applyRecoveryDevState(
     { offline: false, licenseExpired: false, nextSaveFails: false, nextSaveConflict: false },
     previous,
   )
-  const unsubscribe = subscribeMockBridge(() => {
-    const next = getMockDevState()
+  const unsubscribe = subscribeConnectivity(() => {
+    const next = getMockDevState(),
+      offline = getConnectivity() === 'offline'
     applyRecoveryDevState(previous, next)
     const connectivityChanged =
-      next.offline !== previous.offline ||
+      offline !== previousOffline ||
       next.syncFails !== previous.syncFails ||
       next.authorizationExpired !== previous.authorizationExpired ||
       next.activeFinishAllowed !== previous.activeFinishAllowed
     previous = { ...next }
+    previousOffline = offline
     if (connectivityChanged) void reconcile()
   })
   const unsubscribeFailure = subscribeMockSaveFailure(() =>
@@ -125,7 +136,7 @@ export async function getSyncStatus(): Promise<SyncStatus> {
   const state = readMockState(),
     dev = getMockDevState()
   return {
-    connectivity: dev.offline ? 'offline' : 'online',
+    connectivity: getConnectivity(),
     syncing: state.sync.syncing,
     pendingCount: state.sync.pendingCount,
     lastSyncedAt: state.sync.lastSyncedAt,
@@ -159,11 +170,12 @@ export async function retrySync() {
   if (isRealDataMode()) return realRetrySync()
   await reconcile()
   return {
-    message: getMockDevState().offline
-      ? 'Waiting for internet'
-      : getMockDevState().syncFails
-        ? 'Sync needs attention'
-        : 'Sync checked',
+    message:
+      getConnectivity() === 'offline'
+        ? 'Waiting for internet'
+        : getMockDevState().syncFails
+          ? 'Sync needs attention'
+          : 'Sync checked',
   }
 }
 export async function getSessionIntegrity(sessionId: string) {

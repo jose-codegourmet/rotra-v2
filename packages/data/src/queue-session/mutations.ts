@@ -7,6 +7,7 @@ import { required } from '../mock/required'
 import { type MockState, mockStore, readMockState } from '../mock/store'
 import { queueMutation, sessionIn } from '../mock/transaction'
 import { closeSessionRequests } from '../public-session/publicSession.rules'
+import { realDownloadSession } from '../real/device'
 import { isRealDataMode } from '../real/mode'
 import { realCreateQueueSession } from '../real/queue'
 import {
@@ -269,6 +270,7 @@ export function updateQueueSession({
   )
 }
 export async function downloadSession(sessionId: string) {
+  if (isRealDataMode()) return realDownloadSession(sessionId)
   requireOnline()
   const s = mockStore.getSnapshot().sessions.find((s) => s.id === sessionId)
   if (!s || !['prepared', 'active'].includes(s.state))

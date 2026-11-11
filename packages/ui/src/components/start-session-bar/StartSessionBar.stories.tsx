@@ -33,8 +33,8 @@ export const AnotherSessionLive: Story = {
     otherLive: { title: tonight.title, onOpen: fn() },
   },
 }
-export const NoDownloadOffline: Story = {
-  args: { blocker: 'No downloaded copy on this device. Connect, or download first.' },
+export const Offline: Story = {
+  args: { blocker: 'Starting needs an internet connection.' },
 }
 export const LicenseEnded: Story = {
   args: { blocker: 'Your license has ended, so new sessions can’t start.' },

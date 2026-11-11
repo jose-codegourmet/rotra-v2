@@ -291,8 +291,15 @@ httpOnly, same-site browser-session cookie scoped to `/api/public-sessions/[slug
 the visitor's status and a missing or non-matching receipt reads as null. Receipt expiry and
 lost-receipt recovery stay open in #248. Sending needs internet; offline nothing is sent.
 
-**Device, sync and batch (#399).** Real mode has no browser outbox or device copy (Q11), so every real
-write is online and saved only when its Route Handler accepted it; nothing ever waits on the device.
+**Device, sync and batch (#399).** Real mode has a read-only device copy (#477) and no browser outbox
+(Q11), so every real write is online and saved only when its Route Handler accepted it; nothing ever
+waits on the device. The copy is raw IndexedDB (`packages/data/src/device/deviceCopy.ts`, database
+`rotra-queue-device`, keys scoped by account id): `downloadSession` fetches every GET the session
+screens read and writes them with one download record in a single transaction, `realRequest` keeps
+later successful GETs of a downloaded session (and the club-level reads while one is downloaded) and,
+offline, answers those GETs from the copy instead of refusing; `getDeviceDownloads` lists the records
+(empty storage is an empty list, unreadable storage a load failure) and sign-out clears the account's
+copy.
 `@rotra/data/sync` reports exactly that: `getSyncStatus`/`getSyncState` call Queue's `GET /api/sync`
 (`readClubSyncSummary`: prepared/active sessions whose F07.28 completeness is unproven, plus the
 server's `checkedAt`, shown as "Synced HH:MM"), with zero pending changes and connectivity from the
@@ -301,7 +308,7 @@ cached status offline on the browser's `offline` event. `getSessionIntegrity` re
 `GET /api/sessions/[sessionId]/sync` (`readSyncStatus`); unproven completeness shows as missing
 records with the server's counts, never invented conflict evidence. `getSyncLog` is empty (no device
 change log yet) and `retrySync` re-reads the status. **Not connected** (`NotConnectedError`):
-`getDeviceDownloads` and `answerInterruption`, because enrollment, numbering, seals, conflict
+`answerInterruption`, because enrollment, numbering, seals, conflict
 authority and the interruption recovery path wait on
 [#246](https://github.com/jose-codegourmet/rotra-v2/issues/246) and durable storage on Q11; no route
 calls `registerDevice`, `enrollStream`, `uploadOperations`, `sealStream` or `resolveConflict` yet.
@@ -412,8 +419,9 @@ The Queue app must keep running a downloaded session without internet. Rules:
   screens), driven by a dev toggle in the mock store.
 - **Later epic:** IndexedDB persistence, a durable operation queue, sync and conflict handling. Built
   after the database exists.
-- **Real mode today (#399):** online only. The sync status and session integrity read the server;
-  downloads and offline writes are not connected (see "Device, sync and batch (#399)" above).
+- **Real mode today (#399, #477):** reads of a downloaded session come from the read-only device
+  copy while offline; the sync status and session integrity read the server; offline writes are not
+  connected (see "Device, sync and batch (#399)" above).
 
 ---
 

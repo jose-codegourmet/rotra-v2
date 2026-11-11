@@ -2,9 +2,10 @@ import { emailField } from '@rotra/schema/email'
 import { passwordField } from '@rotra/schema/password'
 import { type PersonalProfileValues, personalProfileSchema } from '@rotra/schema/personal-details'
 import { getSession, signIn } from '../auth/fetchers'
+import { getConnectivity } from '../connectivity/connectivity'
 import { claimLinkScenarios } from '../fixtures/playerAccounts'
 import { playerRequest } from '../leaderboard/request'
-import { checkMockSave, getMockDevState } from '../mock/bridge'
+import { checkMockSave } from '../mock/bridge'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { mockStore, readMockState } from '../mock/store'
@@ -47,7 +48,7 @@ export async function getMyAccount(signal?: AbortSignal): Promise<MyAccount | nu
 export async function requestPasswordReset(email: string) {
   if (isRealDataMode()) return realRequestPasswordReset(emailField.parse(email))
   await delay(400)
-  if (getMockDevState().offline)
+  if (getConnectivity() === 'offline')
     throw new MockError(
       'offline',
       "Couldn't send because you're offline. Try again when you're connected.",
@@ -59,7 +60,7 @@ export async function requestPasswordReset(email: string) {
 export async function getResetLink(token: string, signal?: AbortSignal) {
   if (isRealDataMode()) return { token, status: 'valid' as const }
   await delay(200, signal)
-  if (getMockDevState().offline)
+  if (getConnectivity() === 'offline')
     throw new MockError('offline', "You're offline. Reconnect to check this reset link.")
   const status = readMockState().resetLinks[token]
   return { token, status: status === 'valid' ? ('valid' as const) : ('invalid' as const) }
@@ -68,7 +69,7 @@ export async function getResetLink(token: string, signal?: AbortSignal) {
 export async function resetPassword({ token, password }: { token: string; password: string }) {
   if (isRealDataMode()) return realResetPassword({ token, password: passwordField.parse(password) })
   await delay(400)
-  if (getMockDevState().offline)
+  if (getConnectivity() === 'offline')
     throw new MockError(
       'offline',
       "Couldn't save because you're offline. Try again when you're connected.",
@@ -92,7 +93,7 @@ const EMAIL_CONFLICT =
 export async function getClaimLink(token: string, signal?: AbortSignal): Promise<ClaimLink | null> {
   if (isRealDataMode()) return realGetClaimLink(token, signal)
   await delay(300, signal)
-  if (getMockDevState().offline)
+  if (getConnectivity() === 'offline')
     throw new MockError('offline', "You're offline. Reconnect to open this registration link.")
   const state = readMockState()
   const record = state.claimLinks[token]
@@ -177,7 +178,7 @@ function finishClaim(token: string, changes?: { email: string; personal: Persona
 export async function completeClaim({ token, values }: CompleteClaimInput) {
   if (isRealDataMode()) return realCompleteClaim({ token, values })
   await delay(1100)
-  if (getMockDevState().offline) throw new MockError('offline', CLAIM_OFFLINE)
+  if (getConnectivity() === 'offline') throw new MockError('offline', CLAIM_OFFLINE)
   const { email: rawEmail, password, phone: _phone, ...rest } = values
   const personal = personalProfileSchema.parse(rest)
   const email = emailField.parse(rawEmail)
@@ -214,7 +215,7 @@ export async function completeClaim({ token, values }: CompleteClaimInput) {
 /** Processing links: the first check is still processing, the second completes (prototype). */
 export async function checkClaimStatus(token: string) {
   await delay(600)
-  if (getMockDevState().offline)
+  if (getConnectivity() === 'offline')
     throw new MockError('offline', "You're offline. Reconnect to check your registration.")
   let checks = 0
   mockStore.update((draft) => {
@@ -258,7 +259,7 @@ export async function setPhonePrivacy(input: { phoneHidden: boolean }): Promise<
   if (!session) throw new MockError('permission', 'Sign in to change your phone privacy.')
   const stored = readMockState().playerAccounts.find((a) => a.playerId === session.account.id)
   if (!stored) throw new MockError('permission', 'Sign in to change your phone privacy.')
-  if (getMockDevState().offline)
+  if (getConnectivity() === 'offline')
     throw new MockError(
       'offline',
       `Couldn't save because you're offline. Your phone is still ${stored.phoneHidden ? 'hidden from' : 'visible to'} clubs.`,

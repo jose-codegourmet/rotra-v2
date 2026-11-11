@@ -1,4 +1,5 @@
 import { formatPeso } from '@rotra/schema/money'
+import { getConnectivity } from '../connectivity/connectivity'
 import portraits from '../fixtures/playerPortraits.json'
 import { getMockDevState } from '../mock/bridge'
 import { MockError } from '../mock/errors'
@@ -69,7 +70,7 @@ function requirePaymentsWrite(state: MockState, sessionId: string) {
   if (['invalid', 'finalizing', 'cancelled'].includes(session.state))
     throw new MockError('permission', 'Payments are not available for this session.')
   if (getMockDevState().licenseExpired && session.state !== 'active') requireClubAccess()
-  if (getMockDevState().offline && state.downloads[sessionId] !== 'ready')
+  if (getConnectivity() === 'offline' && state.downloads[sessionId] !== 'ready')
     throw new MockError('offline', 'No downloaded copy on this device. Connect, or download first.')
 }
 /** One atomic desired-state write; existing paid amounts/timestamps are never rewritten. */

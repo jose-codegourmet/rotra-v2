@@ -1,6 +1,7 @@
 'use client'
 
 import { useClub } from '@rotra/data/club'
+import { useConnectivity } from '@rotra/data/connectivity/useConnectivity'
 import { DEMO_CLUB_ID } from '@rotra/data/fixtures/clubs'
 import { REQUEST_FORMAT_PILL } from '@rotra/data/match/matchRequestDecisions'
 import { allowedRequestFormats } from '@rotra/data/match-request/rules'
@@ -86,6 +87,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
   const cost = useSessionCostEstimate(sessionId)
   const payments = useSessionPayments(sessionId)
   const dev = useAppSelector(selectDev)
+  const offline = !useConnectivity().online
   const session = useQueueSession(sessionId)
   const clubId = useAppSelector(selectAccount)?.id ?? DEMO_CLUB_ID
   const club = useClub(clubId)
@@ -137,7 +139,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
           sessions: sessions.data,
           roster: rosterList,
           licenseExpired: dev.licenseExpired,
-          offline: dev.offline,
+          offline: offline,
           downloaded: s.downloadState === 'ready',
         })
       : null
@@ -442,7 +444,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
                 {!live ? (
                   <DeviceDownloadCard
                     state={download.isPending ? 'downloading' : s.downloadState}
-                    offline={dev.offline}
+                    offline={offline}
                     snapshotAge={
                       s.downloadError && s.downloadState === 'ready'
                         ? s.downloadedAt
@@ -546,7 +548,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
           rosterCount={rosterList.length}
           presentCount={present}
           waitlistCount={waitlist.length}
-          offline={dev.offline}
+          offline={offline}
           isPending={start.isPending}
           error={start.error ? errorMessage(start.error) : undefined}
           plannedStartAt={s.scheduledStartAt}
@@ -567,7 +569,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
           confirmedCount={rosterList.length}
           waitlistCount={waitlist.length}
           pendingRequestCount={pendingRequests}
-          offline={dev.offline}
+          offline={offline}
           isPending={remove.isPending}
           error={remove.error ? errorMessage(remove.error) : undefined}
           onConfirm={confirmDelete}

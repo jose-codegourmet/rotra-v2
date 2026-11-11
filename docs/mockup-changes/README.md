@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 1 · IN PROGRESS: 4 · IN MOCK APP: 105 · CANCELLED: 1 · MOCKUP ONLY: 4
+NEW: 1 · IN PROGRESS: 5 · IN MOCK APP: 105 · CANCELLED: 1 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -293,4 +293,5 @@ NEW: 1 · IN PROGRESS: 4 · IN MOCK APP: 105 · CANCELLED: 1 · MOCKUP ONLY: 4
 | [2026-11-11-queue-join-request-avatars](2026-11-11-queue-join-request-avatars.md) | Join requests: a signed-in Player's request shows their profile picture | join-requests-panel, avatar | IN MOCK APP — PR #702 |
 | [2026-11-11-queue-join-request-slot-or-waitlist](2026-11-11-queue-join-request-slot-or-waitlist.md) | Join request: the player picks Join a slot or Be waitlisted, and can join from the waitlist | join-request-form, join-request-card, join-requests-panel | IN MOCK APP — #706 |
 | [2026-11-11-queue-share-club-invite-copy-link](2026-11-11-queue-share-club-invite-copy-link.md) | Copy invite link on the Share club invite sheet | club-invite-card, share-card | IN MOCK APP — #708 |
+| [2026-11-11-queue-start-session-online-only](2026-11-11-queue-start-session-online-only.md) | Start session is online only | start-session-sheet, start-session-bar | IN PROGRESS — #721 |
 <!-- status-index:end -->

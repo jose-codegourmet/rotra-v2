@@ -1,3 +1,4 @@
+import { getConnectivity } from '../connectivity/connectivity'
 import { DEMO_CLUB_ID } from '../fixtures/clubs'
 import { recordChange } from '../sync/fetchers'
 import type { SaveOutcome, SyncArea } from '../sync/sync.types'
@@ -17,7 +18,7 @@ export function requireSessionWrite(state: MockState, id: string) {
   const session = sessionIn(state, id)
   if (session.state !== 'prepared' && session.state !== 'active')
     throw new MockError('permission', 'This session is read-only.')
-  if (getMockDevState().offline && state.downloads[id] !== 'ready')
+  if (getConnectivity() === 'offline' && state.downloads[id] !== 'ready')
     throw new MockError('offline', 'No downloaded copy on this device. Connect, or download first.')
   if (getMockDevState().licenseExpired && session.state !== 'active') requireClubAccess()
   return session

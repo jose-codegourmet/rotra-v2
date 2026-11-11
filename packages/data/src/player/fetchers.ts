@@ -1,7 +1,8 @@
 import { type PersonalProfileValues, personalProfileSchema } from '@rotra/schema/personal-details'
 import { getSession } from '../auth/fetchers'
+import { getConnectivity } from '../connectivity/connectivity'
 import { playerRequest } from '../leaderboard/request'
-import { checkMockSave, getMockDevState } from '../mock/bridge'
+import { checkMockSave } from '../mock/bridge'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { mockStore, readMockState } from '../mock/store'
@@ -93,7 +94,7 @@ export function applyPersonalProfile(profile: PlayerProfile, values: PersonalPro
 export async function updateMyProfile(input: PersonalProfileValues): Promise<PlayerProfile> {
   if (isRealDataMode()) return realUpdateMyProfile(input)
   await delay(900)
-  if (getMockDevState().offline)
+  if (getConnectivity() === 'offline')
     throw new MockError(
       'offline',
       "You're offline, so nothing was saved. Your edits are still here; save again when you're connected.",
@@ -143,7 +144,7 @@ export async function setMyProfilePicture(choice: PlayerPictureChoice): Promise<
     picture = await mockPhotoReference(choice.file, choice.crop)
   } else throw new Error('Choose a profile picture.')
   await delay(900)
-  if (getMockDevState().offline)
+  if (getConnectivity() === 'offline')
     throw new MockError('offline', "You're offline. Reconnect and try again.")
   // Do not write to the previously signed-in player's account if the session changed while reading.
   const currentSession = await getSession('player')

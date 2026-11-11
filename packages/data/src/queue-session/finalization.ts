@@ -1,3 +1,4 @@
+import { getConnectivity } from '../connectivity/connectivity'
 import { activeMatches } from '../match/match.rules'
 import { checkMockSave, getMockDevState } from '../mock/bridge'
 import { MockError } from '../mock/errors'
@@ -32,7 +33,7 @@ export class SessionDoneError extends MockError {
 /** Mirrors `sessionIn` for the whole-session gates; a prepared session has nothing to finish. */
 function sessionDoneBlocker(state: MockState, sessionId: string): SessionDoneError | null {
   const matches = activeMatches(state.matches.filter((m) => m.sessionId === sessionId))
-  if (getMockDevState().offline)
+  if (getConnectivity() === 'offline')
     return new SessionDoneError('offline', 'Connect to finish and sync this session.')
   if (getMockDevState().authorizationExpired && !getMockDevState().activeFinishAllowed)
     return new SessionDoneError(

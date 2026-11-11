@@ -1,5 +1,6 @@
+import { getConnectivity } from '../connectivity/connectivity'
 import { closeStaleMatchRequests } from '../match-request/matchRequest.rules'
-import { getMockDevState, requireOnline } from '../mock/bridge'
+import { requireOnline } from '../mock/bridge'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, mockStore, readMockState } from '../mock/store'
@@ -186,7 +187,7 @@ export function selfCheckIn(slug: string, input: PlayerSessionInput) {
       return { rosterId: row.id }
     },
     () =>
-      getMockDevState().offline
+      getConnectivity() === 'offline'
         ? 'Checked in · the QM will see it when their device syncs'
         : 'Checked in',
   )

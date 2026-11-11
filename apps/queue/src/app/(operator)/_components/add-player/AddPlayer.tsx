@@ -25,6 +25,7 @@ import type {
   NewPlayerFormValues,
   NewSavedPlayerFormValues,
 } from '@rotra/ui/forms/new-player-form/schema'
+import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { toast } from '@rotra/ui/toaster'
 import { useRef, useState } from 'react'
 import { useAppSelector } from '@/store/hooks'
@@ -75,6 +76,7 @@ function useAddSheet(open: boolean, returnsToList: (error: unknown) => boolean) 
     id: p.id,
     name: p.fullName,
     nickname: p.nickname,
+    photoUrl: profilePictureSrc(p.picture, p.id, p.fullName),
     rtrId: p.rtrId,
     identity: p.identity,
     suggestion: p.suggestion,
@@ -169,6 +171,7 @@ function SessionAddPlayer({
     id: p.id,
     name: p.fullName,
     nickname: p.nickname,
+    photoUrl: profilePictureSrc(p.picture, p.playerId ?? p.id, p.pictureName ?? p.fullName),
     rtrId: p.rtrId,
     identity: p.identity,
     suggestion: p.suggestion,

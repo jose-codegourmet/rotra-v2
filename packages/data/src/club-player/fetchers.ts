@@ -39,9 +39,17 @@ function addedAt(player: ClubPlayer) {
 }
 export function clubPlayerView(state: MockState, player: ClubPlayer) {
   const index = fixturePlayers.findIndex((p) => p.id === player.id),
-    profile = state.players.find((p) => p.id === player.playerId)
+    profile = state.players.find((p) => p.id === player.playerId),
+    // A linked profile's own name wins over the club's saved copy, so a claim or profile edit
+    // shows on every card (#705). Guests have no profile and keep what the club entered.
+    own = player.playerId
+      ? state.playerProfiles.find((p) => p.playerId === player.playerId)
+      : undefined,
+    fullName = own?.fullName || player.fullName
   return {
     ...player,
+    fullName,
+    nickname: own ? own.nickname : player.nickname,
     /** Avatar reference: the club-set picture for a guest or unclaimed player, else their own. */
     picture: clubPictureState(
       player,
@@ -49,7 +57,7 @@ export function clubPlayerView(state: MockState, player: ClubPlayer) {
     ).reference,
     joinedVia: joinedViaOf(player),
     pictureName: profile?.fullName ?? null,
-    displayName: player.fullName,
+    displayName: fullName,
     rtrId: profile?.rtrId ?? null,
     suggestion: player.playingLevel,
     phoneHidden: index === 0 || index === 3,

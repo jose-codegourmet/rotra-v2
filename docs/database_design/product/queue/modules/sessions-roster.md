@@ -11,7 +11,7 @@
 | `id` | UUID PK; can originate offline |
 | `club_id` | UUID FK to clubs; required |
 | `player_id` | Nullable UUID FK to global players; null for guests |
-| `display_name`, `nickname` | Required name, optional nickname; club-local display |
+| `display_name`, `nickname` | Required name, optional nickname; club-local display. For a linked row (`player_id` set) Saved players reads the global `players.full_name` / `players.nickname` instead, so a player's own name change shows (#705); this copy is what the club entered and stays the name for guests |
 | `added_at` | Timestamptz the club first saved this player; drives the Saved players “Added” filter and the derived “New players this week” count (Monday 00:00 Asia/Manila through now, inclusive; decision #301, October 31, 2026) |
 | `joined_via` | `club_link`, `session_link` or `added_by_club` ([D-2026-11-09-06](../../../../mvp/decisions.md#d-2026-11-09-06)): set when a registration through the club invite link or a session link adds the player, or when the club adds them (Add player, a confirmed guest request, a Player Information add). Shown as “Joined via club link” / “Joined via session link” / “Added by the club” |
 | `linked_to_club_player_id` | Nullable self-FK, set with `removed_at` when the QM links a guest record to a saved player (**Link** on a matching join request, or **Link to saved player…**); the guest's `session_players`, `match_participations` and payments are re-pointed in the same auditable operation and the row is hidden. Only the QM's tap links; a phone match only suggests ([D-2026-11-09-06](../../../../mvp/decisions.md#d-2026-11-09-06)) |

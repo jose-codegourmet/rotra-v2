@@ -18,11 +18,14 @@ import { useUpdateSessionDefaults } from '@rotra/data/club/useUpdateSessionDefau
 import { clubInviteUrl } from '@rotra/data/club-player/registration-url'
 import { useConnectivity } from '@rotra/data/connectivity/useConnectivity'
 import { useDeviceDownloads } from '@rotra/data/device/useDeviceDownloads'
+import { useExportPlayHistory } from '@rotra/data/device/useExportPlayHistory'
+import { useImportPlayHistory } from '@rotra/data/device/useImportPlayHistory'
 import { DEMO_CLUB_ID } from '@rotra/data/fixtures/clubs'
 import { licensePaymentsCsv } from '@rotra/data/license/fetchers'
 import { useClubLicense } from '@rotra/data/license/useClubLicense'
 import { useLicensePayments } from '@rotra/data/license/useLicensePayments'
 import { MockError } from '@rotra/data/mock/errors'
+import { PLAY_HISTORY_FILE_NAME } from '@rotra/data/outbox/types'
 import { useNowCard } from '@rotra/data/queue-session/useNowCard'
 import { useSyncState } from '@rotra/data/sync/useSyncState'
 import { formatPeso } from '@rotra/schema/money'
@@ -172,15 +175,52 @@ function LicenseSection({ clubName }: { clubName: string }) {
   )
 }
 
+/**
+ * This device (D-2026-11-11-04): the downloads, Export play history (saves `playhistory.json`
+ * through the browser) and Import play history… (reads the chosen file; its changes join this
+ * device's outbox). Both work offline.
+ */
 function DeviceSection() {
   const downloads = useDeviceDownloads()
+  const exportHistory = useExportPlayHistory()
+  const importHistory = useImportPlayHistory()
   if (downloads.isError) return <QueryError query={downloads} title="Couldn't load downloads." />
   if (!downloads.data) return <Skeleton className="h-40 rounded-lg" />
+  const onExport = () =>
+    exportHistory.mutate(undefined, {
+      onSuccess: ({ text, message }) => {
+        try {
+          const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }))
+          const a = document.createElement('a')
+          a.href = url
+          a.download = PLAY_HISTORY_FILE_NAME
+          a.click()
+          setTimeout(() => URL.revokeObjectURL(url), 1000)
+          toast(message)
+        } catch {
+          toast.error('This browser blocked the download')
+        }
+      },
+      onError: (error) => toast.error(errorMessage(error)),
+    })
+  const onImport = (file: File) => {
+    file
+      .text()
+      .then((text) =>
+        importHistory.mutateAsync(text).then(({ message }) => {
+          toast(message)
+        }),
+      )
+      .catch((error: unknown) => toast.error(errorMessage(error)))
+  }
   return (
     <ThisDevicePanel
       downloaded={downloads.data
         .filter((d) => d.state === 'ready')
         .map((d) => ({ sessionId: d.sessionId, title: d.title, startsAt: d.startsAt }))}
+      onExport={onExport}
+      onImport={onImport}
+      isPending={exportHistory.isPending || importHistory.isPending}
     />
   )
 }

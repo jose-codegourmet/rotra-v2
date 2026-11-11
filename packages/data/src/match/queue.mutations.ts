@@ -1,18 +1,8 @@
 import { MockError } from '../mock/errors'
 import { type MockState, readMockState } from '../mock/store'
 import { queueMutation, requireSessionWrite, sessionIn } from '../mock/transaction'
+import { dispatch } from '../outbox/dispatch'
 import { autoFillCourts, autoFillNote } from '../queue-session/courtFill'
-import {
-  realAddMatch,
-  realAddSuggestedMatch,
-  realAutoQueue,
-  realMakeMatch,
-  realMoveMatch,
-  realRegenerateQueue,
-  realRemoveWaitingMatch,
-  realSwapPlayers,
-  realUpdateMatchLineup,
-} from '../real/match'
 import { isRealDataMode } from '../real/mode'
 import { allPlayers, completeLineup, FORMAT_LABELS, matchStatus, shortName } from './match.rules'
 import type { Match, MatchLineup, MatchOrigin } from './match.types'
@@ -98,139 +88,145 @@ function waiting(s: MockState, id: string, sessionId: string) {
   return match
 }
 export function addMatch(input: MatchLineup & { sessionId: string }) {
-  if (isRealDataMode()) return realAddMatch(input)
-  return change(input.sessionId, (s) =>
-    withAutoFill(s, input.sessionId, {
-      data: append(
-        s,
-        input.sessionId,
-        { format: input.format, teamA: input.teamA, teamB: input.teamB },
-        'manual',
-        true,
-      ),
-      text: 'Match added to the queue',
-    }),
+  return dispatch('queue.add', input, () =>
+    change(input.sessionId, (s) =>
+      withAutoFill(s, input.sessionId, {
+        data: append(
+          s,
+          input.sessionId,
+          { format: input.format, teamA: input.teamA, teamB: input.teamB },
+          'manual',
+          true,
+        ),
+        text: 'Match added to the queue',
+      }),
+    ),
   )
 }
 export function makeMatch(input: { sessionId: string; selection: string[]; lineup?: MatchLineup }) {
-  if (isRealDataMode()) {
-    if (input.lineup)
-      throw new MockError(
-        'permission',
-        'Confirming an arranged lineup is not available in real mode.',
+  if (isRealDataMode() && input.lineup)
+    throw new MockError(
+      'permission',
+      'Confirming an arranged lineup is not available in real mode.',
+    )
+  return dispatch('queue.make', input, () =>
+    change(input.sessionId, (s) => {
+      const plan = formatForSelection(input.selection.length, sessionIn(s, input.sessionId))
+      if (!plan.format) throw new MockError('permission', plan.reason)
+      const selected = input.selection.map((id) =>
+        s.roster.find((p) => p.id === id && p.sessionId === input.sessionId),
       )
-    return realMakeMatch(input)
-  }
-  return change(input.sessionId, (s) => {
-    const plan = formatForSelection(input.selection.length, sessionIn(s, input.sessionId))
-    if (!plan.format) throw new MockError('permission', plan.reason)
-    const selected = input.selection.map((id) =>
-      s.roster.find((p) => p.id === id && p.sessionId === input.sessionId),
-    )
-    if (selected.some((p) => !p)) throw new MockError('permission', 'Player not available.')
-    if (
-      input.lineup &&
-      (input.lineup.format !== plan.format ||
-        [...input.lineup.teamA, ...input.lineup.teamB].length !== input.selection.length ||
-        [...input.lineup.teamA, ...input.lineup.teamB].some((id) => !input.selection.includes(id)))
-    )
-      throw new MockError('permission', 'The lineup no longer matches the selected players.')
-    const lineup =
-        input.lineup ??
-        balanceTeams(
-          selected.filter((p): p is NonNullable<typeof p> => !!p),
-          plan.format,
-        ),
-      data = append(s, input.sessionId, lineup, 'manual', true),
-      position = s.matches.filter(
-        (m) => m.sessionId === input.sessionId && m.state === 'waiting',
-      ).length
-    return withAutoFill(s, input.sessionId, {
-      data,
-      text: `${FORMAT_LABELS[plan.format]} added to the queue at #${position}`,
-    })
-  })
+      if (selected.some((p) => !p)) throw new MockError('permission', 'Player not available.')
+      if (
+        input.lineup &&
+        (input.lineup.format !== plan.format ||
+          [...input.lineup.teamA, ...input.lineup.teamB].length !== input.selection.length ||
+          [...input.lineup.teamA, ...input.lineup.teamB].some(
+            (id) => !input.selection.includes(id),
+          ))
+      )
+        throw new MockError('permission', 'The lineup no longer matches the selected players.')
+      const lineup =
+          input.lineup ??
+          balanceTeams(
+            selected.filter((p): p is NonNullable<typeof p> => !!p),
+            plan.format,
+          ),
+        data = append(s, input.sessionId, lineup, 'manual', true),
+        position = s.matches.filter(
+          (m) => m.sessionId === input.sessionId && m.state === 'waiting',
+        ).length
+      return withAutoFill(s, input.sessionId, {
+        data,
+        text: `${FORMAT_LABELS[plan.format]} added to the queue at #${position}`,
+      })
+    }),
+  )
 }
 export function updateMatchLineup(input: {
   sessionId: string
   matchId: string
   lineup: MatchLineup
 }) {
-  if (isRealDataMode()) return realUpdateMatchLineup(input)
-  return change(input.sessionId, (s) => {
-    const m = waiting(s, input.matchId, input.sessionId)
-    validate(s, input.sessionId, input.lineup, true)
-    m.format = input.lineup.format
-    m.teamA = [...input.lineup.teamA]
-    m.teamB = [...input.lineup.teamB]
-    m.manualProtected = true
-    m.origin = 'manual'
-    return { data: m, text: 'Lineup saved · protected from regeneration' }
-  })
+  return dispatch('queue.lineup', input, () =>
+    change(input.sessionId, (s) => {
+      const m = waiting(s, input.matchId, input.sessionId)
+      validate(s, input.sessionId, input.lineup, true)
+      m.format = input.lineup.format
+      m.teamA = [...input.lineup.teamA]
+      m.teamB = [...input.lineup.teamB]
+      m.manualProtected = true
+      m.origin = 'manual'
+      return { data: m, text: 'Lineup saved · protected from regeneration' }
+    }),
+  )
 }
 export function addSuggestedMatch(input: {
   sessionId: string
   lineup: MatchLineup
   switched: boolean
 }) {
-  if (isRealDataMode()) return realAddSuggestedMatch(input)
-  return change(input.sessionId, (s) =>
-    withAutoFill(s, input.sessionId, {
-      data: append(s, input.sessionId, input.lineup, 'suggested', input.switched),
-      text: 'Suggestion added to the queue',
-    }),
+  return dispatch('queue.suggested', input, () =>
+    change(input.sessionId, (s) =>
+      withAutoFill(s, input.sessionId, {
+        data: append(s, input.sessionId, input.lineup, 'suggested', input.switched),
+        text: 'Suggestion added to the queue',
+      }),
+    ),
   )
 }
 export function autoQueue(input: { sessionId: string; n: 2 | 3 | 4 | 6 }) {
-  if (isRealDataMode()) return realAutoQueue(input)
-  return change(input.sessionId, (s) => {
-    if (![2, 3, 4, 6].includes(input.n))
-      throw new MockError('permission', 'Choose 2, 3, 4 or 6 matches.')
-    const result = generateMatches(
-      sessionIn(s, input.sessionId),
-      s.roster,
-      s.matches,
-      input.n,
-      Math.random,
-    )
-    if (result.error) throw new MockError('permission', result.error)
-    const matches = result.matches.map((m) => append(s, input.sessionId, m, 'auto', false))
-    return withAutoFill(s, input.sessionId, {
-      data: matches,
-      text: `${matches.length} matches added to the queue`,
-    })
-  })
+  return dispatch('queue.auto', input, () =>
+    change(input.sessionId, (s) => {
+      if (![2, 3, 4, 6].includes(input.n))
+        throw new MockError('permission', 'Choose 2, 3, 4 or 6 matches.')
+      const result = generateMatches(
+        sessionIn(s, input.sessionId),
+        s.roster,
+        s.matches,
+        input.n,
+        Math.random,
+      )
+      if (result.error) throw new MockError('permission', result.error)
+      const matches = result.matches.map((m) => append(s, input.sessionId, m, 'auto', false))
+      return withAutoFill(s, input.sessionId, {
+        data: matches,
+        text: `${matches.length} matches added to the queue`,
+      })
+    }),
+  )
 }
 export function regenerateQueue(sessionId: string) {
-  if (isRealDataMode()) return realRegenerateQueue(sessionId)
-  return change(sessionId, (s) => {
-    const ctx = matchContext(s, sessionId),
-      replace = ctx.matches
-        .filter(
-          (m) =>
-            m.state === 'waiting' &&
-            (!m.manualProtected || matchStatus(m, ctx).kind === 'needs-attention'),
-        )
-        .sort((a, b) => a.queuePosition - b.queuePosition)
-    if (!replace.length)
-      throw new MockError('permission', 'There are no waiting matches to rebuild.')
-    s.matches = s.matches.filter((m) => !replace.some((r) => r.id === m.id))
-    const result = generateMatches(
-      sessionIn(s, sessionId),
-      ctx.roster,
-      s.matches,
-      replace.length,
-      Math.random,
-    )
-    if (result.error) throw new MockError('permission', result.error)
-    const matches = result.matches.map((lineup, i) =>
-      append(s, sessionId, lineup, 'auto', false, replace[i]?.queuePosition),
-    )
-    return withAutoFill(s, sessionId, {
-      data: matches,
-      text: `Queue regenerated · ${matches.length} rebuilt`,
-    })
-  })
+  return dispatch('queue.regenerate', sessionId, () =>
+    change(sessionId, (s) => {
+      const ctx = matchContext(s, sessionId),
+        replace = ctx.matches
+          .filter(
+            (m) =>
+              m.state === 'waiting' &&
+              (!m.manualProtected || matchStatus(m, ctx).kind === 'needs-attention'),
+          )
+          .sort((a, b) => a.queuePosition - b.queuePosition)
+      if (!replace.length)
+        throw new MockError('permission', 'There are no waiting matches to rebuild.')
+      s.matches = s.matches.filter((m) => !replace.some((r) => r.id === m.id))
+      const result = generateMatches(
+        sessionIn(s, sessionId),
+        ctx.roster,
+        s.matches,
+        replace.length,
+        Math.random,
+      )
+      if (result.error) throw new MockError('permission', result.error)
+      const matches = result.matches.map((lineup, i) =>
+        append(s, sessionId, lineup, 'auto', false, replace[i]?.queuePosition),
+      )
+      return withAutoFill(s, sessionId, {
+        data: matches,
+        text: `Queue regenerated · ${matches.length} rebuilt`,
+      })
+    }),
+  )
 }
 export function moveMatch(input: {
   sessionId: string
@@ -238,36 +234,38 @@ export function moveMatch(input: {
   toIndex: number
   method?: 'arrow' | 'drop'
 }) {
-  if (isRealDataMode()) return realMoveMatch(input)
-  return change(input.sessionId, (s) => {
-    const m = waiting(s, input.matchId, input.sessionId),
-      list = s.matches
-        .filter((m) => m.sessionId === input.sessionId && m.state === 'waiting')
-        .sort((a, b) => a.queuePosition - b.queuePosition),
-      from = list.indexOf(m),
-      to = Math.max(0, Math.min(list.length - 1, Math.trunc(input.toIndex)))
-    if (!Number.isFinite(to)) throw new MockError('permission', 'Choose a queue position.')
-    list.splice(from, 1)
-    list.splice(to, 0, m)
-    list.forEach((m, i) => {
-      m.queuePosition = i + 1
-    })
-    return {
-      data: null,
-      text:
-        input.method === 'arrow' || (input.method === undefined && Math.abs(to - from) === 1)
-          ? 'Queue order changed'
-          : `Match ${m.matchNo} moved to #${to + 1}`,
-    }
-  })
+  return dispatch('queue.move', input, () =>
+    change(input.sessionId, (s) => {
+      const m = waiting(s, input.matchId, input.sessionId),
+        list = s.matches
+          .filter((m) => m.sessionId === input.sessionId && m.state === 'waiting')
+          .sort((a, b) => a.queuePosition - b.queuePosition),
+        from = list.indexOf(m),
+        to = Math.max(0, Math.min(list.length - 1, Math.trunc(input.toIndex)))
+      if (!Number.isFinite(to)) throw new MockError('permission', 'Choose a queue position.')
+      list.splice(from, 1)
+      list.splice(to, 0, m)
+      list.forEach((m, i) => {
+        m.queuePosition = i + 1
+      })
+      return {
+        data: null,
+        text:
+          input.method === 'arrow' || (input.method === undefined && Math.abs(to - from) === 1)
+            ? 'Queue order changed'
+            : `Match ${m.matchNo} moved to #${to + 1}`,
+      }
+    }),
+  )
 }
 export function removeWaitingMatch(input: { sessionId: string; matchId: string }) {
-  if (isRealDataMode()) return realRemoveWaitingMatch(input)
-  return change(input.sessionId, (s) => {
-    const m = waiting(s, input.matchId, input.sessionId)
-    s.matches = s.matches.filter((x) => x.id !== m.id)
-    return { data: null, text: `Waiting match ${m.matchNo} removed` }
-  })
+  return dispatch('queue.remove', input, () =>
+    change(input.sessionId, (s) => {
+      const m = waiting(s, input.matchId, input.sessionId)
+      s.matches = s.matches.filter((x) => x.id !== m.id)
+      return { data: null, text: `Waiting match ${m.matchNo} removed` }
+    }),
+  )
 }
 /** Remove every waiting match in one write, leaving court and finished matches untouched. */
 export function clearQueue(sessionId: string) {
@@ -291,24 +289,25 @@ export const canClearQueue = (matches: Match[]) =>
   matches.some((match) => match.state === 'waiting')
 
 export function swapPlayers(input: { sessionId: string; matchId: string; a: string; b: string }) {
-  if (isRealDataMode()) return realSwapPlayers(input)
-  return change(input.sessionId, (s) => {
-    const m = waiting(s, input.matchId, input.sessionId),
-      a = m.teamA.includes(input.a) ? input.a : input.b,
-      b = m.teamB.includes(input.b) ? input.b : input.a
-    if (a === b || !m.teamA.includes(a) || !m.teamB.includes(b))
-      throw new MockError('permission', 'Choose one player from each team.')
-    const pa = s.roster.find((p) => p.id === input.a),
-      pb = s.roster.find((p) => p.id === input.b)
-    if (!pa || !pb) throw new MockError('permission', 'Player not available.')
-    m.teamA = m.teamA.map((id) => (id === a ? b : id))
-    m.teamB = m.teamB.map((id) => (id === b ? a : id))
-    validate(s, input.sessionId, m, true)
-    m.origin = 'manual'
-    m.manualProtected = true
-    return {
-      data: null,
-      text: `Match ${m.matchNo}: ${shortName(pa)} and ${shortName(pb)} switched sides · protected from regeneration`,
-    }
-  })
+  return dispatch('queue.swapPlayers', input, () =>
+    change(input.sessionId, (s) => {
+      const m = waiting(s, input.matchId, input.sessionId),
+        a = m.teamA.includes(input.a) ? input.a : input.b,
+        b = m.teamB.includes(input.b) ? input.b : input.a
+      if (a === b || !m.teamA.includes(a) || !m.teamB.includes(b))
+        throw new MockError('permission', 'Choose one player from each team.')
+      const pa = s.roster.find((p) => p.id === input.a),
+        pb = s.roster.find((p) => p.id === input.b)
+      if (!pa || !pb) throw new MockError('permission', 'Player not available.')
+      m.teamA = m.teamA.map((id) => (id === a ? b : id))
+      m.teamB = m.teamB.map((id) => (id === b ? a : id))
+      validate(s, input.sessionId, m, true)
+      m.origin = 'manual'
+      m.manualProtected = true
+      return {
+        data: null,
+        text: `Match ${m.matchNo}: ${shortName(pa)} and ${shortName(pb)} switched sides · protected from regeneration`,
+      }
+    }),
+  )
 }

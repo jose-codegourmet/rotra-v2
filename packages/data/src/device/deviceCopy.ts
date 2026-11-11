@@ -1,19 +1,31 @@
 import { MockError } from '../mock/errors'
 
 /**
- * The read-only device copy for real mode (#477, Q11 partial). Raw IndexedDB, no dependency:
- * database `rotra-queue-device` with two object stores:
- *   - `bodies`: successful GET bodies, keyed `${accountId}|${path}`;
- *   - `downloads`: one record per downloaded session, keyed `${accountId}|${sessionId}`.
- * Downloaded sessions stay viewable offline; nothing here is an outbox and nothing written offline
- * is kept (writes still refuse offline in `real/client.ts`). Without `indexedDB` (server render,
- * tests) there is no storage: reads answer empty and a requested save fails honestly.
+ * The device copy for real mode (#477, #722). Raw IndexedDB, no dependency: database
+ * `rotra-queue-device` with four object stores:
+ *   - `bodies`: successful GET bodies, keyed `${accountId}|${path}`; offline writes update them too;
+ *   - `downloads`: one record per downloaded session, keyed `${accountId}|${sessionId}`;
+ *   - `outbox`: commands recorded offline, keyed `${accountId}|${seq}` (`outbox/outboxStore.ts`);
+ *   - `aliases`: local id → server id learned on replay, keyed `${accountId}|${localId}`.
+ * Downloaded sessions stay viewable offline and, once started, writable through the outbox
+ * (D-2026-11-11-04). Without `indexedDB` (server render, tests) there is no storage: reads answer
+ * empty and a requested save fails honestly.
  */
 
 export const DEVICE_DB_NAME = 'rotra-queue-device'
-const DB_VERSION = 1
+const DB_VERSION = 2
 const BODIES = 'bodies'
 const DOWNLOADS = 'downloads'
+const OUTBOX = 'outbox'
+const ALIASES = 'aliases'
+const STORE_NAMES = [BODIES, DOWNLOADS, OUTBOX, ALIASES] as const
+
+export type DeviceStores = {
+  bodies: IDBObjectStore
+  downloads: IDBObjectStore
+  outbox: IDBObjectStore
+  aliases: IDBObjectStore
+}
 
 /** Scope of the one signed-in session body (`/api/auth/session`), read before any account is known. */
 export const DEVICE_SCOPE = 'device'
@@ -47,7 +59,7 @@ export type DownloadRecord = {
   paths: string[]
 }
 
-type StoredBody = { key: string; body: unknown }
+export type StoredBody = { key: string; body: unknown }
 type StoredDownload = DownloadRecord & { key: string; accountId: string }
 
 export class DeviceStorageError extends MockError {
@@ -123,9 +135,9 @@ export function deviceDownloadsOf(records: readonly DownloadRecord[]) {
 
 export const hasDeviceStorage = () => typeof indexedDB !== 'undefined'
 
-const prefixRange = (prefix: string) => IDBKeyRange.bound(prefix, `${prefix}￿`)
+export const prefixRange = (prefix: string) => IDBKeyRange.bound(prefix, `${prefix}￿`)
 
-const requestOf = <T>(request: IDBRequest<T>) =>
+export const requestOf = <T>(request: IDBRequest<T>) =>
   new Promise<T>((resolve, reject) => {
     request.onsuccess = () => resolve(request.result)
     request.onerror = () => reject(request.error)
@@ -146,9 +158,8 @@ function openDb(): Promise<IDBDatabase> {
     const request = indexedDB.open(DEVICE_DB_NAME, DB_VERSION)
     request.onupgradeneeded = () => {
       const db = request.result
-      if (!db.objectStoreNames.contains(BODIES)) db.createObjectStore(BODIES, { keyPath: 'key' })
-      if (!db.objectStoreNames.contains(DOWNLOADS))
-        db.createObjectStore(DOWNLOADS, { keyPath: 'key' })
+      for (const name of STORE_NAMES)
+        if (!db.objectStoreNames.contains(name)) db.createObjectStore(name, { keyPath: 'key' })
     }
     request.onsuccess = () => {
       const db = request.result
@@ -171,10 +182,11 @@ function openDb(): Promise<IDBDatabase> {
   return dbPromise
 }
 
-async function withStores<T>(
+/** One transaction over every device store; any failure becomes a `DeviceStorageError(failure)`. */
+export async function withDeviceStores<T>(
   mode: IDBTransactionMode,
   failure: string,
-  run: (bodies: IDBObjectStore, downloads: IDBObjectStore) => Promise<T>,
+  run: (stores: DeviceStores) => Promise<T>,
 ): Promise<T> {
   let db: IDBDatabase
   try {
@@ -183,8 +195,13 @@ async function withStores<T>(
     throw new DeviceStorageError(failure)
   }
   try {
-    const tx = db.transaction([BODIES, DOWNLOADS], mode)
-    const result = await run(tx.objectStore(BODIES), tx.objectStore(DOWNLOADS))
+    const tx = db.transaction([...STORE_NAMES], mode)
+    const result = await run({
+      bodies: tx.objectStore(BODIES),
+      downloads: tx.objectStore(DOWNLOADS),
+      outbox: tx.objectStore(OUTBOX),
+      aliases: tx.objectStore(ALIASES),
+    })
     await done(tx)
     return result
   } catch (error) {
@@ -192,6 +209,12 @@ async function withStores<T>(
     throw new DeviceStorageError(failure)
   }
 }
+
+const withStores = <T>(
+  mode: IDBTransactionMode,
+  failure: string,
+  run: (bodies: IDBObjectStore, downloads: IDBObjectStore) => Promise<T>,
+) => withDeviceStores(mode, failure, (stores) => run(stores.bodies, stores.downloads))
 
 /** Every download record on this device, all accounts; empty without storage. */
 export async function readAllDownloadRecords(): Promise<StoredDownload[]> {
@@ -261,13 +284,20 @@ export async function deleteDownload(accountId: string, sessionId: string) {
   })
 }
 
-/** Everything kept for one account, plus the signed-in session body. */
+/** Everything kept for one account (copy, outbox and aliases), plus the signed-in session body. */
 export async function clearAccount(accountId: string | null) {
   if (!hasDeviceStorage()) return
-  await withStores('readwrite', SAVE_FAILED, async (bodies, downloads) => {
-    bodies.delete(bodyKey(DEVICE_SCOPE, AUTH_SESSION_PATH))
-    if (accountId === null) return
-    bodies.delete(prefixRange(`${accountId}|`))
-    downloads.delete(prefixRange(`${accountId}|`))
-  })
+  await withDeviceStores(
+    'readwrite',
+    SAVE_FAILED,
+    async ({ bodies, downloads, outbox, aliases }) => {
+      bodies.delete(bodyKey(DEVICE_SCOPE, AUTH_SESSION_PATH))
+      if (accountId === null) return
+      const range = prefixRange(`${accountId}|`)
+      bodies.delete(range)
+      downloads.delete(range)
+      outbox.delete(range)
+      aliases.delete(range)
+    },
+  )
 }

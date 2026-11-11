@@ -1,8 +1,7 @@
 import { flushSessionPresence } from '../batch/flushBatches'
 import type { MockState } from '../mock/store'
 import { queueMutation } from '../mock/transaction'
-import { isRealDataMode } from '../real/mode'
-import { realApplyRosterBatch } from '../real/session-live'
+import { dispatch } from '../outbox/dispatch'
 import type { SaveOutcome } from '../sync/sync.types'
 import type { getSessionRoster } from './fetchers'
 import {
@@ -112,16 +111,17 @@ export async function applyRosterBatch(input: {
     return { savedOffline: false, message: 'No roster changes', data: { results: [] } }
   // Pending presence lands first; not rosterMutation, whose preflight flush would wait for this batch.
   await flushSessionPresence(input.sessionId)
-  if (isRealDataMode()) return realApplyRosterBatch(input)
-  return queueMutation({ area: 'Roster', sessionId: input.sessionId }, (s) => {
-    const results: RosterBatchResult[] = []
-    const texts: string[] = []
-    for (const operation of input.operations) {
-      const { text, result } = applyOne(s, input.sessionId, operation)
-      texts.push(text)
-      results.push(result)
-    }
-    settleRoster(s, input.sessionId, null)
-    return { data: { results }, text: rosterBatchSummary(input.operations, texts) }
-  })
+  return dispatch('roster.batch', input, () =>
+    queueMutation({ area: 'Roster', sessionId: input.sessionId }, (s) => {
+      const results: RosterBatchResult[] = []
+      const texts: string[] = []
+      for (const operation of input.operations) {
+        const { text, result } = applyOne(s, input.sessionId, operation)
+        texts.push(text)
+        results.push(result)
+      }
+      settleRoster(s, input.sessionId, null)
+      return { data: { results }, text: rosterBatchSummary(input.operations, texts) }
+    }),
+  )
 }

@@ -6,13 +6,8 @@ import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, readMockState } from '../mock/store'
 import { queueMutation, requireClubAccess, sessionIn } from '../mock/transaction'
-import {
-  realGetSessionPayments,
-  realMarkAllPaid,
-  realSetPaymentAmount,
-  realSetPaymentMarks,
-  realTogglePaid,
-} from '../real/financials'
+import { dispatch } from '../outbox/dispatch'
+import { realGetSessionPayments } from '../real/financials'
 import { isRealDataMode } from '../real/mode'
 import { sessionCostIn } from '../session-cost/fetchers'
 import { amountDuePerHead } from '../session-cost/sessionCost.rules'
@@ -77,35 +72,36 @@ function requirePaymentsWrite(state: MockState, sessionId: string) {
 export function setPaymentMarks({ sessionId, marks }: SetPaymentMarksInput) {
   if (!marks.length)
     return Promise.resolve({ data: { count: 0 }, savedOffline: false, message: '' })
-  if (isRealDataMode()) return realSetPaymentMarks({ sessionId, marks })
-  return queueMutation({ area: 'Payments' }, (state) => {
-    requirePaymentsWrite(state, sessionId)
-    const wanted = new Map(marks.map((mark) => [mark.clubPlayerId, mark.paid]))
-    const amount = sessionCostIn(state, sessionId)?.estimate.perHead ?? 0
-    for (const [clubPlayerId, paid] of wanted) {
-      const player = state.roster.find(
-        (p) => p.sessionId === sessionId && p.clubPlayerId === clubPlayerId,
-      )
-      if (!player) throw new MockError('permission', 'Player not in this session.')
-      const mark = state.paymentMarks.find(
-        (m) => m.sessionId === sessionId && m.sessionPlayerId === player.id,
-      )
-      if (!paid && mark) state.paymentMarks = state.paymentMarks.filter((m) => m !== mark)
-      if (paid && !mark)
-        state.paymentMarks.push({
-          sessionId,
-          sessionPlayerId: player.id,
-          amountMinor: amount,
-          currency: 'PHP',
-          markedAt: Date.now(),
-        })
-    }
-    const count = wanted.size
-    return {
-      data: { count },
-      text: `${count} payment mark${count === 1 ? '' : 's'} saved`,
-    }
-  })
+  return dispatch('payments.marks', { sessionId, marks }, () =>
+    queueMutation({ area: 'Payments' }, (state) => {
+      requirePaymentsWrite(state, sessionId)
+      const wanted = new Map(marks.map((mark) => [mark.clubPlayerId, mark.paid]))
+      const amount = sessionCostIn(state, sessionId)?.estimate.perHead ?? 0
+      for (const [clubPlayerId, paid] of wanted) {
+        const player = state.roster.find(
+          (p) => p.sessionId === sessionId && p.clubPlayerId === clubPlayerId,
+        )
+        if (!player) throw new MockError('permission', 'Player not in this session.')
+        const mark = state.paymentMarks.find(
+          (m) => m.sessionId === sessionId && m.sessionPlayerId === player.id,
+        )
+        if (!paid && mark) state.paymentMarks = state.paymentMarks.filter((m) => m !== mark)
+        if (paid && !mark)
+          state.paymentMarks.push({
+            sessionId,
+            sessionPlayerId: player.id,
+            amountMinor: amount,
+            currency: 'PHP',
+            markedAt: Date.now(),
+          })
+      }
+      const count = wanted.size
+      return {
+        data: { count },
+        text: `${count} payment mark${count === 1 ? '' : 's'} saved`,
+      }
+    }),
+  )
 }
 /**
  * #479 · records the amount received from one roster player. A positive amount replaces the mark
@@ -114,30 +110,31 @@ export function setPaymentMarks({ sessionId, marks }: SetPaymentMarksInput) {
 export function setPaymentAmount({ sessionId, clubPlayerId, amountMinor }: SetPaymentAmountInput) {
   if (!Number.isSafeInteger(amountMinor) || amountMinor < 0)
     return Promise.reject(new MockError('permission', 'Enter an amount, 0 or more.'))
-  if (isRealDataMode()) return realSetPaymentAmount({ sessionId, clubPlayerId, amountMinor })
-  return queueMutation({ area: 'Payments' }, (state) => {
-    requirePaymentsWrite(state, sessionId)
-    const player = state.roster.find(
-      (p) => p.sessionId === sessionId && p.clubPlayerId === clubPlayerId,
-    )
-    if (!player) throw new MockError('permission', 'Player not in this session.')
-    state.paymentMarks = state.paymentMarks.filter(
-      (m) => !(m.sessionId === sessionId && m.sessionPlayerId === player.id),
-    )
-    if (!amountMinor)
-      return { data: { paid: false }, text: `${player.nameSnapshot} marked not paid` }
-    state.paymentMarks.push({
-      sessionId,
-      sessionPlayerId: player.id,
-      amountMinor,
-      currency: 'PHP',
-      markedAt: Date.now(),
-    })
-    return {
-      data: { paid: true },
-      text: `${player.nameSnapshot} paid ${formatPeso(amountMinor)}`,
-    }
-  })
+  return dispatch('payments.amount', { sessionId, clubPlayerId, amountMinor }, () =>
+    queueMutation({ area: 'Payments' }, (state) => {
+      requirePaymentsWrite(state, sessionId)
+      const player = state.roster.find(
+        (p) => p.sessionId === sessionId && p.clubPlayerId === clubPlayerId,
+      )
+      if (!player) throw new MockError('permission', 'Player not in this session.')
+      state.paymentMarks = state.paymentMarks.filter(
+        (m) => !(m.sessionId === sessionId && m.sessionPlayerId === player.id),
+      )
+      if (!amountMinor)
+        return { data: { paid: false }, text: `${player.nameSnapshot} marked not paid` }
+      state.paymentMarks.push({
+        sessionId,
+        sessionPlayerId: player.id,
+        amountMinor,
+        currency: 'PHP',
+        markedAt: Date.now(),
+      })
+      return {
+        data: { paid: true },
+        text: `${player.nameSnapshot} paid ${formatPeso(amountMinor)}`,
+      }
+    }),
+  )
 }
 export function togglePaid({
   sessionId,
@@ -146,49 +143,51 @@ export function togglePaid({
   sessionId: string
   clubPlayerId: string
 }) {
-  if (isRealDataMode()) return realTogglePaid({ sessionId, clubPlayerId })
-  return queueMutation({ area: 'Payments' }, (state) => {
-    requirePaymentsWrite(state, sessionId)
-    const player = state.roster.find(
-      (p) => p.sessionId === sessionId && p.clubPlayerId === clubPlayerId,
-    )
-    if (!player) throw new MockError('permission', 'Player not in this session.')
-    const mark = state.paymentMarks.find(
-      (m) => m.sessionId === sessionId && m.sessionPlayerId === player.id,
-    )
-    if (mark) {
-      state.paymentMarks = state.paymentMarks.filter((m) => m !== mark)
-      return { data: { paid: false }, text: `${player.nameSnapshot} marked not paid` }
-    }
-    const amount = sessionCostIn(state, sessionId)?.estimate.perHead ?? 0
-    state.paymentMarks.push({
-      sessionId,
-      sessionPlayerId: player.id,
-      amountMinor: amount,
-      currency: 'PHP',
-      markedAt: Date.now(),
-    })
-    return { data: { paid: true }, text: `${player.nameSnapshot} paid ${formatPeso(amount)}` }
-  })
-}
-export function markAllPaid(sessionId: string) {
-  if (isRealDataMode()) return realMarkAllPaid(sessionId)
-  return queueMutation({ area: 'Payments' }, (state) => {
-    requirePaymentsWrite(state, sessionId)
-    const amount = sessionCostIn(state, sessionId)?.estimate.perHead ?? 0
-    let count = 0
-    for (const p of state.roster.filter((p) => p.sessionId === sessionId)) {
-      if (state.paymentMarks.some((m) => m.sessionId === sessionId && m.sessionPlayerId === p.id))
-        continue
+  return dispatch('payments.toggle', { sessionId, clubPlayerId }, () =>
+    queueMutation({ area: 'Payments' }, (state) => {
+      requirePaymentsWrite(state, sessionId)
+      const player = state.roster.find(
+        (p) => p.sessionId === sessionId && p.clubPlayerId === clubPlayerId,
+      )
+      if (!player) throw new MockError('permission', 'Player not in this session.')
+      const mark = state.paymentMarks.find(
+        (m) => m.sessionId === sessionId && m.sessionPlayerId === player.id,
+      )
+      if (mark) {
+        state.paymentMarks = state.paymentMarks.filter((m) => m !== mark)
+        return { data: { paid: false }, text: `${player.nameSnapshot} marked not paid` }
+      }
+      const amount = sessionCostIn(state, sessionId)?.estimate.perHead ?? 0
       state.paymentMarks.push({
         sessionId,
-        sessionPlayerId: p.id,
+        sessionPlayerId: player.id,
         amountMinor: amount,
         currency: 'PHP',
         markedAt: Date.now(),
       })
-      count++
-    }
-    return { data: { count }, text: `${count} players marked paid` }
-  })
+      return { data: { paid: true }, text: `${player.nameSnapshot} paid ${formatPeso(amount)}` }
+    }),
+  )
+}
+export function markAllPaid(sessionId: string) {
+  return dispatch('payments.markAll', sessionId, () =>
+    queueMutation({ area: 'Payments' }, (state) => {
+      requirePaymentsWrite(state, sessionId)
+      const amount = sessionCostIn(state, sessionId)?.estimate.perHead ?? 0
+      let count = 0
+      for (const p of state.roster.filter((p) => p.sessionId === sessionId)) {
+        if (state.paymentMarks.some((m) => m.sessionId === sessionId && m.sessionPlayerId === p.id))
+          continue
+        state.paymentMarks.push({
+          sessionId,
+          sessionPlayerId: p.id,
+          amountMinor: amount,
+          currency: 'PHP',
+          markedAt: Date.now(),
+        })
+        count++
+      }
+      return { data: { count }, text: `${count} players marked paid` }
+    }),
+  )
 }

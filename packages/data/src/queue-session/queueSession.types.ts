@@ -118,6 +118,24 @@ export type SessionDoneReview = {
   unplayedWaiting: number
   belowMinimum: { clubPlayerId: string; name: string; completedGames: number }[]
   minimum: number
+  /**
+   * Guest review at Session done (D-2026-11-07-03, #722): roster players with no ROTRA identity
+   * (a guest the club entered by name), each with the club's saved players whose name matches, as
+   * lightweight candidates. The Queue Master confirms a match or creates a new unclaimed player;
+   * nothing is linked by name. Missing where the read does not include it (mock mode).
+   */
+  unresolvedGuests?: UnresolvedGuest[]
+}
+export type UnresolvedGuest = {
+  clubPlayerId: string
+  sessionPlayerId: string
+  name: string
+  candidates: {
+    clubPlayerId: string
+    name: string
+    identity: 'registered' | 'unclaimed'
+    rtrId: string | null
+  }[]
 }
 export type FinalizationStage = 'checking' | 'finishing' | 'player_records' | 'slides'
 export const FINALIZATION_STAGES: readonly FinalizationStage[] = [

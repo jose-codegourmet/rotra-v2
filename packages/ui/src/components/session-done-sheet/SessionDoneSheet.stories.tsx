@@ -90,3 +90,17 @@ export const Desktop: Story = {
   args: scenario(sessionDoneFixtures.shortfalls),
   globals: { viewport: { value: 'desktop' } },
 }
+/** Guest review (D-2026-11-07-03, #722): guests with no ROTRA identity, with same-name saved players. */
+export const ReviewWithUnresolvedGuests: Story = {
+  args: {
+    ...scenario(sessionDoneFixtures.clean),
+    unresolvedGuests: [
+      {
+        clubPlayerId: 'guest-1',
+        name: 'Mikee Santos',
+        candidates: [{ clubPlayerId: 'saved-1', name: 'Mikee Santos', rtrId: 'RTR-PH-CEB-0012' }],
+      },
+      { clubPlayerId: 'guest-2', name: 'Paolo', candidates: [] },
+    ],
+  },
+}

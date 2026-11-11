@@ -113,6 +113,7 @@ export function SessionDoneFlow({ sessionId, open, onOpenChange }: SessionDoneFl
         unplayedWaiting={r.unplayedWaiting}
         belowMinimum={r.belowMinimum}
         minimum={r.minimum}
+        unresolvedGuests={r.unresolvedGuests}
         online={online}
         authorizationBlocked={syncStatus.data?.canFinishAndSync === false}
         isPending={finalize.isPending}

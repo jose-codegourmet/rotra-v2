@@ -304,30 +304,44 @@ httpOnly, same-site browser-session cookie scoped to `/api/public-sessions/[slug
 the visitor's status and a missing or non-matching receipt reads as null. Receipt expiry and
 lost-receipt recovery stay open in #248. Sending needs internet; offline nothing is sent.
 
-**Device, sync and batch (#399).** Real mode has a read-only device copy (#477) and no browser outbox
-(Q11), so every real write is online and saved only when its Route Handler accepted it; nothing ever
-waits on the device. The copy is raw IndexedDB (`packages/data/src/device/deviceCopy.ts`, database
-`rotra-queue-device`, keys scoped by account id): `downloadSession` fetches every GET the session
+**Device, sync and batch (#399, #477, #722).** Real mode has a durable device copy and an outbox
+([D-2026-11-11-04](mvp/decisions.md#d-2026-11-11-04), option A). The copy is raw IndexedDB
+(`packages/data/src/device/deviceCopy.ts`, database `rotra-queue-device`, keys scoped by account id,
+stores `bodies`, `downloads`, `outbox`, `aliases`): `downloadSession` fetches every GET the session
 screens read and writes them with one download record in a single transaction, `realRequest` keeps
-later successful GETs of a downloaded session (and the club-level reads while one is downloaded) and,
-offline, answers those GETs from the copy instead of refusing; `getDeviceDownloads` lists the records
-(empty storage is an empty list, unreadable storage a load failure) and sign-out clears the account's
-copy.
-`@rotra/data/sync` reports exactly that: `getSyncStatus`/`getSyncState` call Queue's `GET /api/sync`
-(`readClubSyncSummary`: prepared/active sessions whose F07.28 completeness is unproven, plus the
-server's `checkedAt`, shown as "Synced HH:MM"), with zero pending changes and connectivity from the
-browser; offline they skip the server and keep the last checked time, and `connectRealSync` marks the
-cached status offline on the browser's `offline` event. `getSessionIntegrity` reads
-`GET /api/sessions/[sessionId]/sync` (`readSyncStatus`); unproven completeness shows as missing
-records with the server's counts, never invented conflict evidence. `getSyncLog` is empty (no device
-change log yet) and `retrySync` re-reads the status. **Not connected** (`NotConnectedError`):
-`answerInterruption`, because enrollment, numbering, seals, conflict
-authority and the interruption recovery path wait on
-[#246](https://github.com/jose-codegourmet/rotra-v2/issues/246) and durable storage on Q11; no route
-calls `registerDevice`, `enrollStream`, `uploadOperations`, `sealStream` or `resolveConflict` yet.
-`@rotra/data/batch` is a client-side debounce over each domain's own fetcher (presence, payment
-marks, and the roster burst batch of #718, whose real-mode fetcher is one Route Handler call), so it needs no adapter. Known gap: the console's offline notice still says changes save on
-this device, which is untrue in real mode until Q11.
+later successful GETs of a downloaded session (and the club-level reads while one is downloaded) and
+answers those GETs from the copy while offline, or while the session has changes waiting in the
+outbox; `getDeviceDownloads` lists the records and sign-out clears the account's copy, outbox and
+aliases. **Offline writes** go through one door, `dispatch(name, args, local)` in
+`packages/data/src/outbox/dispatch.ts`: mock mode runs the mock path; real mode online sends the
+real adapter named in the registry (`outbox/commands.ts`); real mode offline on a downloaded session
+(or online while that session still has commands waiting, so order is kept) builds a `MockState`
+from the copy's bodies (`outbox/workingState.ts`), runs the existing mock reducer over it through
+`withWorkingState` in `mock/store.ts`, writes the changed bodies and the command
+(`{ operationId, name, args, recordedAt, sessionId, text, area, localData, created }`) in one
+transaction, and answers "· Saved on this device, waiting to sync". A storage failure answers that
+the change could not be saved on this device and changes nothing. **Replay** (`outbox/replay.ts`)
+runs when the connectivity signal returns online (and at startup): commands in sequence order through
+their real adapters with the command's own `operationId`, a fresh queue read before each so the
+revisions sent are current, server ids learned from each reply (or a roster re-read) and rewritten
+into the commands that follow; a 409 marks the command for Q-CONFLICT (Keep the server's version
+drops it, Retry sends it again), any other failure keeps it and the sync status needs attention;
+a session with nothing left waiting has its copy downloaded again. Still online only: setup, Start,
+Delete, Cancel, Session done, Publish, Manual | Auto Queue, Generate matches drafts › Add to Main
+Queue, global player search, roster level and remove, join-request decisions. `@rotra/data/sync`
+reports the outbox: `pendingCount` is its length, `syncing` a running replay, `problem: 'retry'` a
+refused replay, `canFinishAndSync` is online with nothing waiting; `getSyncLog` lists the outbox as
+Waiting to sync and this tab's replayed commands as Synced; `retrySync` replays then re-reads
+`GET /api/sync`; `getSessionIntegrity` reports a refused command as `conflicts`, unsent commands or
+offline as `records_missing`, else the server's completeness; `answerInterruption` Yes replays
+(`awaiting_original` while offline), No clears the session's commands and removes its copy.
+**Play-history file** (`outbox/playHistory.ts`): `playhistory.json` =
+`{ format, version, exportedAt, clubCopy, sessions: [{ session, deviceCopy, outbox }] }`; import
+merges commands by `operationId` after this device's own, takes the file's copy only for sessions not
+held here, then replays. The server's stream protocol (`registerDevice`, `enrollStream`,
+`uploadOperations`, `sealStream`) is not built for MVP. `@rotra/data/batch` is a client-side debounce
+over each domain's own fetcher (presence, payment marks, and the roster burst batch of #718), so it
+needs no adapter; the batches flush before a roster command and land through the same door.
 
 **Session cost and payments (#397).** In real mode `getSessionCostEstimate` calls Queue's
 `GET /api/sessions/[sessionId]/cost`, and the `@rotra/data/session-payment` fetchers call
@@ -396,8 +410,8 @@ unchanged. `real/match.ts` keeps the last read of each session's queue: reorder,
 switch sides, remove, Generate matches, Regenerate and an accepted suggestion send its queue revision (a
 suggestion also its session revision), so a change made elsewhere is a conflict; match control
 sends the screen's `operationId`, other commands a fresh one. Live standings use the shared
-counting rule over the saved roster and matches. Everything is online only: the outbox and offline
-match numbering wait on #246. **Generate matches drafts** (formerly called Auto Queue) stay a working set on the device
+counting rule over the saved roster and matches. Offline, these commands are recorded in the outbox
+and replayed (#722); a match made offline carries a temporary number until its replay. **Generate matches drafts** (formerly called Auto Queue) stay a working set on the device
 (`real/autoQueue.ts`, one per session, lost on reload): built from the saved session, roster and
 matches and generated with the shared `autoQueue.rules` (the prototype's draft weights, pending
 #247), never the mock store. Add to Main Queue rechecks each draft against a fresh read, then sends
@@ -430,11 +444,14 @@ The Queue app must keep running a downloaded session without internet. Rules:
 
 - **Mock phase:** UI states only (offline banner, pending-sync counts, recovery and reconciliation
   screens), driven by a dev toggle in the mock store.
-- **Later epic:** IndexedDB persistence, a durable operation queue, sync and conflict handling. Built
-  after the database exists.
-- **Real mode today (#399, #477):** reads of a downloaded session come from the read-only device
-  copy while offline; the sync status and session integrity read the server; offline writes are not
-  connected (see "Device, sync and batch (#399)" above).
+- **Real mode (#399, #477, #722, [D-2026-11-11-04](mvp/decisions.md#d-2026-11-11-04)):** a
+  downloaded, started session keeps working offline. Reads come from the device copy; every write the
+  offline rules allow is applied to the copy by the mock reducers and recorded in the IndexedDB
+  outbox, replayed in order through the real adapters when the internet returns, with 409s reviewed
+  in Q-CONFLICT. Club settings › This device exports and imports `playhistory.json` (copy + outbox).
+  Session done needs internet, an empty outbox, the server's proven completeness and the guest
+  review (a notice today; see "Device, sync and batch" in §5). No Service Worker: the page shell
+  itself still needs the network to load.
 
 ---
 

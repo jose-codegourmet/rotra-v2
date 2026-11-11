@@ -161,11 +161,16 @@ export async function realGetLiveStandings(sessionId: string) {
   return computeStandings(roster, matches)
 }
 
-export async function realAddMatch(input: MatchLineup & { sessionId: string }) {
+/** Each command's operation id: the outbox's on a replay (#722), else fresh. */
+const opId = (input: { operationId?: string }) => input.operationId ?? crypto.randomUUID()
+
+export async function realAddMatch(
+  input: MatchLineup & { sessionId: string; operationId?: string },
+) {
   const done = await fillCommand<WireMatch>(input.sessionId, '/matches', {
     body: {
       source: 'manual',
-      operationId: crypto.randomUUID(),
+      operationId: opId(input),
       lineup: { format: input.format, teamA: input.teamA, teamB: input.teamB },
     },
   })
@@ -176,10 +181,14 @@ export async function realAddMatch(input: MatchLineup & { sessionId: string }) {
   )
 }
 
-export async function realMakeMatch(input: { sessionId: string; selection: string[] }) {
+export async function realMakeMatch(input: {
+  sessionId: string
+  selection: string[]
+  operationId?: string
+}) {
   const read = await lastRead(input.sessionId)
   const done = await fillCommand<WireMatch>(input.sessionId, '/matches', {
-    body: { source: 'selection', operationId: crypto.randomUUID(), selection: input.selection },
+    body: { source: 'selection', operationId: opId(input), selection: input.selection },
   })
   const match = matchOf(done.result)
   const position = shownWaiting(read).filter((m) => m.id !== match.id).length + 1
@@ -194,12 +203,13 @@ export async function realAddSuggestedMatch(input: {
   sessionId: string
   lineup: MatchLineup
   switched: boolean
+  operationId?: string
 }) {
   const read = await lastRead(input.sessionId)
   const done = await fillCommand<WireMatch>(input.sessionId, '/matches', {
     body: {
       source: 'suggested',
-      operationId: crypto.randomUUID(),
+      operationId: opId(input),
       lineup: input.lineup,
       switched: input.switched,
       expectedQueueRevision: read.queueRevision,
@@ -212,14 +222,18 @@ export async function realAddSuggestedMatch(input: {
   )
 }
 
-export async function realAutoQueue(input: { sessionId: string; n: 2 | 3 | 4 | 6 }) {
+export async function realAutoQueue(input: {
+  sessionId: string
+  n: 2 | 3 | 4 | 6
+  operationId?: string
+}) {
   const read = await lastRead(input.sessionId)
   const { result: matches, autoPlaced } = await fillCommand<WireMatch[]>(
     input.sessionId,
     '/matches/auto',
     {
       body: {
-        operationId: crypto.randomUUID(),
+        operationId: opId(input),
         n: input.n,
         expectedQueueRevision: read.queueRevision,
       },
@@ -231,12 +245,12 @@ export async function realAutoQueue(input: { sessionId: string; n: 2 | 3 | 4 | 6
   )
 }
 
-export async function realRegenerateQueue(sessionId: string) {
+export async function realRegenerateQueue(sessionId: string, operationId?: string) {
   const read = await lastRead(sessionId)
   const { result: matches, autoPlaced } = await fillCommand<WireMatch[]>(
     sessionId,
     '/matches/regenerate',
-    { body: { operationId: crypto.randomUUID(), expectedQueueRevision: read.queueRevision } },
+    { body: { operationId: opId({ operationId }), expectedQueueRevision: read.queueRevision } },
   )
   return accepted(
     matches.map(matchOf),
@@ -267,10 +281,16 @@ export async function realMoveMatch(input: {
   )
 }
 
-function saveLineup(sessionId: string, matchId: string, lineup: MatchLineup, revision: string) {
+function saveLineup(
+  sessionId: string,
+  matchId: string,
+  lineup: MatchLineup,
+  revision: string,
+  operationId?: string,
+) {
   return queueCommand<WireMatch>(sessionId, `/matches/${encodeURIComponent(matchId)}`, {
     method: 'PATCH',
-    body: { operationId: crypto.randomUUID(), lineup, expectedQueueRevision: revision },
+    body: { operationId: opId({ operationId }), lineup, expectedQueueRevision: revision },
   })
 }
 
@@ -278,9 +298,16 @@ export async function realUpdateMatchLineup(input: {
   sessionId: string
   matchId: string
   lineup: MatchLineup
+  operationId?: string
 }) {
   const read = await lastRead(input.sessionId)
-  const match = await saveLineup(input.sessionId, input.matchId, input.lineup, read.queueRevision)
+  const match = await saveLineup(
+    input.sessionId,
+    input.matchId,
+    input.lineup,
+    read.queueRevision,
+    input.operationId,
+  )
   return accepted(matchOf(match), 'Lineup saved · protected from regeneration')
 }
 
@@ -290,6 +317,7 @@ export async function realSwapPlayers(input: {
   matchId: string
   a: string
   b: string
+  operationId?: string
 }) {
   const read = await lastRead(input.sessionId)
   const m = shownMatch(read, input.matchId)
@@ -308,7 +336,7 @@ export async function realSwapPlayers(input: {
     teamA: m.teamA.map((id) => (id === a ? b : id)),
     teamB: m.teamB.map((id) => (id === b ? a : id)),
   }
-  await saveLineup(input.sessionId, m.id, lineup, read.queueRevision)
+  await saveLineup(input.sessionId, m.id, lineup, read.queueRevision, input.operationId)
   return accepted(
     null,
     `Match ${m.matchNo}: ${shortName(pa)} and ${shortName(pb)} switched sides · protected from regeneration`,

@@ -12,3 +12,24 @@ export default meta
 type Story = StoryObj<typeof meta>
 export const TwoConflicts: Story = {}
 export const OneConflictLongNames: Story = { args: { conflicts: [longSyncConflictFixture] } }
+/** Real mode (#722): a change this device saved offline that the server refused on replay. */
+export const RefusedDeviceChange: Story = {
+  args: {
+    conflicts: [
+      {
+        id: 'op-1',
+        matchNumber: 0,
+        courtLabel: '',
+        versions: [],
+        pending: {
+          text: 'Team A wins match 5 · Court 2 free',
+          area: 'Matches and results',
+          recordedAt: Date.now() - 20 * 60_000,
+          message: 'This match already has a confirmed outcome or is not active.',
+        },
+      },
+    ],
+    onKeepServer: fn(),
+    onRetry: fn(),
+  },
+}

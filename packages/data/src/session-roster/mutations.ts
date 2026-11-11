@@ -13,30 +13,21 @@ import { delay } from '../mock/latency'
 import { required } from '../mock/required'
 import { type MockState, readMockState } from '../mock/store'
 import { queueMutation, sessionIn } from '../mock/transaction'
+import { dispatch } from '../outbox/dispatch'
 import { PLAYING_LEVELS, type PlayingLevel } from '../player/player.types'
 import { promoteWaiter, recomputeMinimum } from '../queue-session/mutations'
 import { slotCapacity } from '../queue-session/queueSession.rules'
 import { isRealDataMode } from '../real/mode'
 import {
   realAddDirectoryPlayerToSession,
-  realAddNewPlayerToSession,
-  realAddSavedPlayerToSession,
   realPlayerDirectorySearch,
   realSetRosterLevel,
 } from '../real/queue'
 import {
   realConfirmJoinRequest,
   realDeclineJoinRequest,
-  realFillOpenSlots,
-  realGiveSlot,
-  realRemoveFromWaitlist,
   realRemoveRosterPlayer,
   realSetAcceptJoinRequests,
-  realSetAllPresence,
-  realSetGamesPlayed,
-  realSetPresence,
-  realSetPresenceMany,
-  realStepDownToWaitlist,
 } from '../real/session-live'
 import {
   inUnfinishedMatch,
@@ -164,11 +155,10 @@ export function addSavedPlayerChange(s: MockState, input: AddSavedPlayerInput) {
   }
 }
 export async function addSavedPlayerToSession(input: AddSavedPlayerInput) {
-  if (isRealDataMode()) {
-    await flushSessionBatches(input.sessionId)
-    return realAddSavedPlayerToSession(input)
-  }
-  return rosterMutation(input.sessionId, (s) => addSavedPlayerChange(s, input))
+  await flushSessionBatches(input.sessionId)
+  return dispatch('roster.addSaved', input, () =>
+    rosterMutation(input.sessionId, (s) => addSavedPlayerChange(s, input)),
+  )
 }
 export async function playerDirectorySearch(q: string): Promise<DirectoryPlayer[]> {
   if (isRealDataMode()) return realPlayerDirectorySearch(q)
@@ -252,11 +242,10 @@ export function addNewPlayerChange(s: MockState, input: AddNewPlayerInput) {
   }
 }
 export async function addNewPlayerToSession(input: AddNewPlayerInput) {
-  if (isRealDataMode()) {
-    await flushSessionBatches(input.sessionId)
-    return realAddNewPlayerToSession(input)
-  }
-  return rosterMutation(input.sessionId, (s) => addNewPlayerChange(s, input))
+  await flushSessionBatches(input.sessionId)
+  return dispatch('roster.addNew', input, () =>
+    rosterMutation(input.sessionId, (s) => addNewPlayerChange(s, input)),
+  )
 }
 function row(s: MockState, id: string, sessionId: string) {
   const p = s.roster.find((p) => p.id === id && p.sessionId === sessionId)
@@ -327,70 +316,77 @@ export function stepDownChange(s: MockState, input: StepDownInput, blocked?: str
   return { data: null, text: `${p.nameSnapshot} moved to the waitlist` }
 }
 export async function stepDownToWaitlist(input: StepDownInput) {
-  if (isRealDataMode()) {
-    await flushSessionBatches(input.sessionId)
-    return realStepDownToWaitlist(input)
-  }
-  return rosterMutation(input.sessionId, (s) => stepDownChange(s, input))
+  await flushSessionBatches(input.sessionId)
+  return dispatch('roster.stepDown', input, () =>
+    rosterMutation(input.sessionId, (s) => stepDownChange(s, input)),
+  )
 }
-export function setPresence(input: { sessionId: string; rosterId: string; present: boolean }) {
-  if (isRealDataMode()) return realSetPresence(input)
-  return rosterMutation(input.sessionId, (s) => {
-    const p = row(s, input.rosterId, input.sessionId)
-    p.present = input.present
-    p.presentChangedAt = Date.now()
-    const n = input.present
-      ? 0
-      : s.matches.filter(
-          (m) =>
-            m.sessionId === input.sessionId &&
-            m.state === 'waiting' &&
-            [...m.teamA, ...m.teamB].includes(p.id),
-        ).length
-    return {
-      data: null,
-      text: `${shortName(p)} is ${input.present ? '' : 'not '}present${n ? ` · ${n} waiting match${n === 1 ? ' needs' : 'es need'} attention` : ''}`,
-    }
-  })
+export async function setPresence(input: {
+  sessionId: string
+  rosterId: string
+  present: boolean
+}) {
+  // Pending batches land first, before the one door: an offline apply never nests another.
+  await flushSessionBatches(input.sessionId)
+  return dispatch('roster.presence', input, () =>
+    rosterMutation(input.sessionId, (s) => {
+      const p = row(s, input.rosterId, input.sessionId)
+      p.present = input.present
+      p.presentChangedAt = Date.now()
+      const n = input.present
+        ? 0
+        : s.matches.filter(
+            (m) =>
+              m.sessionId === input.sessionId &&
+              m.state === 'waiting' &&
+              [...m.teamA, ...m.teamB].includes(p.id),
+          ).length
+      return {
+        data: null,
+        text: `${shortName(p)} is ${input.present ? '' : 'not '}present${n ? ` · ${n} waiting match${n === 1 ? ' needs' : 'es need'} attention` : ''}`,
+      }
+    }),
+  )
 }
 /** One atomic Roster command: wanted end states, unique attention count, one sync entry. */
 export function setPresenceMany(input: {
   sessionId: string
   changes: { rosterId: string; present: boolean }[]
 }) {
-  if (isRealDataMode() && input.changes.length) return realSetPresenceMany(input)
   if (!input.changes.length)
     return Promise.resolve({ data: null, savedOffline: false, message: 'No presence changes' })
   // Do not call rosterMutation here: its preflight flush would wait for this same batch.
-  return queueMutation({ area: 'Roster', sessionId: input.sessionId }, (s) => {
-    const changes = new Map(input.changes.map((change) => [change.rosterId, change.present]))
-    const away = new Set<string>()
-    let present = 0
-    for (const [id, wanted] of changes) {
-      if (typeof wanted !== 'boolean') fail('Choose a presence state.')
-      const player = row(s, id, input.sessionId)
-      player.present = wanted
-      player.presentChangedAt = Date.now()
-      if (wanted) present++
-      else away.add(id)
-    }
-    const n = s.matches.filter(
-      (m) =>
-        m.sessionId === input.sessionId &&
-        m.state === 'waiting' &&
-        [...m.teamA, ...m.teamB].some((id) => away.has(id)),
-    ).length
-    const absent = changes.size - present
-    closeStaleMatchRequests(s, input.sessionId)
-    const text =
-      present && absent
-        ? `${present} player${present === 1 ? '' : 's'} marked present, ${absent} away`
-        : `${changes.size} player${changes.size === 1 ? '' : 's'} marked ${present ? 'present' : 'away'}`
-    return {
-      data: null,
-      text: text + (n ? ` · ${n} waiting match${n === 1 ? ' needs' : 'es need'} attention` : ''),
-    }
-  })
+  return dispatch('roster.presenceMany', input, () =>
+    queueMutation({ area: 'Roster', sessionId: input.sessionId }, (s) => {
+      const changes = new Map(input.changes.map((change) => [change.rosterId, change.present]))
+      const away = new Set<string>()
+      let present = 0
+      for (const [id, wanted] of changes) {
+        if (typeof wanted !== 'boolean') fail('Choose a presence state.')
+        const player = row(s, id, input.sessionId)
+        player.present = wanted
+        player.presentChangedAt = Date.now()
+        if (wanted) present++
+        else away.add(id)
+      }
+      const n = s.matches.filter(
+        (m) =>
+          m.sessionId === input.sessionId &&
+          m.state === 'waiting' &&
+          [...m.teamA, ...m.teamB].some((id) => away.has(id)),
+      ).length
+      const absent = changes.size - present
+      closeStaleMatchRequests(s, input.sessionId)
+      const text =
+        present && absent
+          ? `${present} player${present === 1 ? '' : 's'} marked present, ${absent} away`
+          : `${changes.size} player${changes.size === 1 ? '' : 's'} marked ${present ? 'present' : 'away'}`
+      return {
+        data: null,
+        text: text + (n ? ` · ${n} waiting match${n === 1 ? ' needs' : 'es need'} attention` : ''),
+      }
+    }),
+  )
 }
 export const GAMES_PLAYED_MAX = 99
 export type SetGamesPlayedInput = {
@@ -407,92 +403,100 @@ export type SetGamesPlayedInput = {
  * Live sessions only. One Roster sync entry; offline on a downloaded session it saves locally.
  */
 export function setGamesPlayed(input: SetGamesPlayedInput) {
-  if (isRealDataMode()) return realSetGamesPlayed(input)
-  return queueMutation(
-    {
-      area: 'Roster',
-      sessionId: input.sessionId,
-      operationId: input.operationId,
-      fingerprint: input.operationId ? JSON.stringify([input.rosterId, input.games]) : undefined,
-    },
-    (s) => {
-      if (sessionIn(s, input.sessionId).state !== 'active') fail('Start the session first.')
-      if (!Number.isSafeInteger(input.games) || input.games < 0 || input.games > GAMES_PLAYED_MAX)
-        fail(`Enter a whole number of games, 0 to ${GAMES_PLAYED_MAX}.`)
-      const matches = s.matches.filter((m) => m.sessionId === input.sessionId)
-      const rows =
-        input.rosterId === 'all'
-          ? s.roster.filter((p) => p.sessionId === input.sessionId)
-          : [row(s, input.rosterId, input.sessionId)]
-      if (!rows.length) fail('No players on the roster yet.')
-      for (const p of rows) p.gamesAdjustment = input.games - countedGames(p.id, matches)
-      const one = input.rosterId === 'all' ? null : rows[0]
-      return {
-        data: rows.map((p) => ({ rosterId: p.id, games: gamesPlayed(p, matches) })),
-        text: one
-          ? `Games played set · ${shortName(one)}`
-          : `Games played set for ${rows.length} player${rows.length === 1 ? '' : 's'}`,
-      }
-    },
+  return dispatch('roster.gamesPlayed', input, () =>
+    queueMutation(
+      {
+        area: 'Roster',
+        sessionId: input.sessionId,
+        operationId: input.operationId,
+        fingerprint: input.operationId ? JSON.stringify([input.rosterId, input.games]) : undefined,
+      },
+      (s) => {
+        if (sessionIn(s, input.sessionId).state !== 'active') fail('Start the session first.')
+        if (!Number.isSafeInteger(input.games) || input.games < 0 || input.games > GAMES_PLAYED_MAX)
+          fail(`Enter a whole number of games, 0 to ${GAMES_PLAYED_MAX}.`)
+        const matches = s.matches.filter((m) => m.sessionId === input.sessionId)
+        const rows =
+          input.rosterId === 'all'
+            ? s.roster.filter((p) => p.sessionId === input.sessionId)
+            : [row(s, input.rosterId, input.sessionId)]
+        if (!rows.length) fail('No players on the roster yet.')
+        for (const p of rows) p.gamesAdjustment = input.games - countedGames(p.id, matches)
+        const one = input.rosterId === 'all' ? null : rows[0]
+        return {
+          data: rows.map((p) => ({ rosterId: p.id, games: gamesPlayed(p, matches) })),
+          text: one
+            ? `Games played set · ${shortName(one)}`
+            : `Games played set for ${rows.length} player${rows.length === 1 ? '' : 's'}`,
+        }
+      },
+    ),
   )
 }
 export function setAllPresence(input: { sessionId: string; present: boolean }) {
-  if (isRealDataMode()) return realSetAllPresence(input)
-  return rosterMutation(input.sessionId, (s) => {
-    if (sessionIn(s, input.sessionId).state !== 'prepared')
-      fail('Mark players individually after the session starts.')
-    for (const p of s.roster.filter((p) => p.sessionId === input.sessionId)) {
-      p.present = input.present
-      p.presentChangedAt = Date.now()
-    }
-    return { data: null, text: `Everyone marked ${input.present ? 'present' : 'absent'}` }
-  })
+  return dispatch('roster.presenceAll', input, () =>
+    rosterMutation(input.sessionId, (s) => {
+      if (sessionIn(s, input.sessionId).state !== 'prepared')
+        fail('Mark players individually after the session starts.')
+      for (const p of s.roster.filter((p) => p.sessionId === input.sessionId)) {
+        p.present = input.present
+        p.presentChangedAt = Date.now()
+      }
+      return { data: null, text: `Everyone marked ${input.present ? 'present' : 'absent'}` }
+    }),
+  )
 }
 function waiter(s: MockState, id: string, sessionId: string) {
   const w = s.waitlist.find((w) => w.id === id && w.sessionId === sessionId)
   if (!w) fail('Waitlist entry not available.')
   return w
 }
-export function giveSlot(input: { sessionId: string; waitlistId: string }) {
-  if (isRealDataMode()) return realGiveSlot(input)
-  return rosterMutation(input.sessionId, (s) => {
-    const w = waiter(s, input.waitlistId, input.sessionId),
-      p = required(s.clubPlayers.find((p) => p.id === w.clubPlayerId))
-    promoteWaiter(s, w)
-    const n = s.roster.filter((r) => r.sessionId === input.sessionId).length,
-      budget = capacity(s, input.sessionId)
-    return {
-      data: null,
-      text: `${p.nickname || p.fullName.split(' ')[0]} got a slot${sessionIn(s, input.sessionId).state === 'active' ? ' · level locked' : ''}${n > budget ? ` · now ${n} players for ${budget} slots` : ''}`,
-    }
-  })
+export async function giveSlot(input: { sessionId: string; waitlistId: string }) {
+  await flushSessionBatches(input.sessionId)
+  return dispatch('roster.giveSlot', input, () =>
+    rosterMutation(input.sessionId, (s) => {
+      const w = waiter(s, input.waitlistId, input.sessionId),
+        p = required(s.clubPlayers.find((p) => p.id === w.clubPlayerId))
+      promoteWaiter(s, w)
+      const n = s.roster.filter((r) => r.sessionId === input.sessionId).length,
+        budget = capacity(s, input.sessionId)
+      return {
+        data: null,
+        text: `${p.nickname || p.fullName.split(' ')[0]} got a slot${sessionIn(s, input.sessionId).state === 'active' ? ' · level locked' : ''}${n > budget ? ` · now ${n} players for ${budget} slots` : ''}`,
+      }
+    }),
+  )
 }
-export function fillOpenSlots(sessionId: string) {
-  if (isRealDataMode()) return realFillOpenSlots(sessionId)
-  return rosterMutation(sessionId, (s) => {
-    const open = Math.max(
-        0,
-        capacity(s, sessionId) - s.roster.filter((r) => r.sessionId === sessionId).length,
-      ),
-      waiting = s.waitlist
-        .filter((w) => w.sessionId === sessionId)
-        .sort((a, b) => a.addedAt - b.addedAt)
-        .slice(0, open)
-    for (const w of waiting) promoteWaiter(s, w)
-    return { data: null, text: `${waiting.length} players moved from the waitlist` }
-  })
+export async function fillOpenSlots(sessionId: string) {
+  await flushSessionBatches(sessionId)
+  return dispatch('roster.fillOpenSlots', sessionId, () =>
+    rosterMutation(sessionId, (s) => {
+      const open = Math.max(
+          0,
+          capacity(s, sessionId) - s.roster.filter((r) => r.sessionId === sessionId).length,
+        ),
+        waiting = s.waitlist
+          .filter((w) => w.sessionId === sessionId)
+          .sort((a, b) => a.addedAt - b.addedAt)
+          .slice(0, open)
+      for (const w of waiting) promoteWaiter(s, w)
+      return { data: null, text: `${waiting.length} players moved from the waitlist` }
+    }),
+  )
 }
-export function removeFromWaitlist(input: { sessionId: string; waitlistId: string }) {
-  if (isRealDataMode()) return realRemoveFromWaitlist(input)
-  return rosterMutation(input.sessionId, (s) => {
-    const w = waiter(s, input.waitlistId, input.sessionId),
-      p = required(s.clubPlayers.find((p) => p.id === w.clubPlayerId))
-    s.waitlist = s.waitlist.filter((x) => x.id !== w.id)
-    return {
-      data: null,
-      text: `${p.nickname || p.fullName.split(' ')[0]} removed from the waitlist`,
-    }
-  })
+export async function removeFromWaitlist(input: { sessionId: string; waitlistId: string }) {
+  await flushSessionBatches(input.sessionId)
+  return dispatch('roster.removeFromWaitlist', input, () =>
+    rosterMutation(input.sessionId, (s) => {
+      const w = waiter(s, input.waitlistId, input.sessionId),
+        p = required(s.clubPlayers.find((p) => p.id === w.clubPlayerId))
+      s.waitlist = s.waitlist.filter((x) => x.id !== w.id)
+      return {
+        data: null,
+        text: `${p.nickname || p.fullName.split(' ')[0]} removed from the waitlist`,
+      }
+    }),
+  )
 }
 export type JoinRequestInput = {
   sessionId: string

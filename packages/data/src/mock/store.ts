@@ -233,6 +233,32 @@ function seedState(): MockState {
   seedAdminPlayerManagement(state)
   return state
 }
+/**
+ * Real mode's offline working state (#722, D-2026-11-11-04): while `withWorkingState` runs, the
+ * store's reads and writes go to this state instead of the demo data, so the existing mock
+ * reducers apply an offline change to the downloaded copy. Null outside such a run, when every
+ * mock read or write in real mode refuses as before.
+ */
+let working: { snapshot: MockState } | null = null
+
+/**
+ * Runs `run` with the mock store pointed at `state` (a copy of it), then returns the result and the
+ * state as the reducers left it. Callers serialize their runs; a nested run is refused.
+ */
+export async function withWorkingState<T>(
+  state: MockState,
+  run: () => Promise<T>,
+): Promise<{ result: T; state: MockState }> {
+  if (working) throw new Error('A working state is already active.')
+  working = { snapshot: structuredClone(state) }
+  try {
+    const result = await run()
+    return { result, state: working.snapshot }
+  } finally {
+    working = null
+  }
+}
+
 /** Reset is in-memory only; neither fixture objects nor snapshots can be mutated through a reader. */
 export function createMockStore() {
   let snapshot = freeze(seedState())
@@ -242,9 +268,16 @@ export function createMockStore() {
     for (const listener of listeners) listener()
   }
   return {
-    getSnapshot: () => snapshot,
+    getSnapshot: () => (working ? (working.snapshot as DeepReadonly<MockState>) : snapshot),
     getGeneration: () => generation,
     update(change: (draft: MockState) => void) {
+      if (working) {
+        // The working state is private to one offline apply: no freeze, no listeners.
+        const draft = structuredClone(working.snapshot) as MockState
+        change(draft)
+        working.snapshot = draft
+        return
+      }
       if (isRealDataMode()) throw new NotConnectedError()
       const draft = structuredClone(snapshot) as MockState
       change(draft)
@@ -267,6 +300,7 @@ export function createMockStore() {
 export const mockStore = createMockStore()
 /** Mock reads and writes refuse in real data mode, so nothing falls back to in-memory data. */
 export const readMockState = (): MockState => {
+  if (working) return structuredClone(working.snapshot)
   if (isRealDataMode()) throw new NotConnectedError()
   return structuredClone(mockStore.getSnapshot()) as MockState
 }

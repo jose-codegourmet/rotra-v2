@@ -96,7 +96,7 @@ Then add a row to the [index](#index) and link the entry from the workstream pag
 <a id="d-2026-11-07-03"></a>
 ### D-2026-11-07-03 — Offline session boundaries and guest reconciliation
 - **Decision status:** approved
-- **Implementation status:** not started (offline working copy and guest reconciliation are not connected in real mode)
+- **Implementation status:** partly built (#722, November 12, 2026): the offline working copy and outbox are connected in real mode; Session done is refused offline or while this device's changes wait; `GET …/done-review` lists every roster guest without a ROTRA profile with same-name saved players as candidates and the Session done sheet shows them. Not built: confirming a match (a guest → saved player merge service; the tables have no column to record the link) and creating a new unclaimed player from a guest (RTR ID allocation), so the guest step is a notice, not a gate
 - **Ticket:** needed; related design issue [#246](https://github.com/jose-codegourmet/rotra-v2/issues/246)
 - **Roadmap:** MVP — [Queue offline](workstreams/queue-offline.md) and [Player identity](workstreams/player.md)
 - **Decision:** Session setup and start require internet. During an active session, downloaded club players and newly entered guests may be added offline, alongside offline match and score operations. Global ROTRA player search is online only. Session end/finalization requires reconnection, complete sync, and queue-master review of every unresolved guest.
@@ -526,7 +526,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 
 ### D-2026-11-11-04 — Offline writes: an outbox replayed through the existing adapters, plus a play-history file
 - **Decision status:** approved (owner answers, November 11, 2026)
-- **Implementation status:** not started — Queue mockup updated November 11, 2026 ([log](../mockup-changes/2026-11-11-queue-device-play-history-file.md)); real mode has a read-only device copy only (#722)
+- **Implementation status:** built (#722, November 12, 2026): `packages/data/src/outbox/` (IndexedDB outbox next to the device copy, local apply through the mock reducers over the downloaded copy, ordered replay through the real adapters with learned ids, 409 → Q-CONFLICT with Keep the server's version / Retry, `playhistory.json` export/import in Club settings › This device). Still open: Generate matches drafts › Add to Main Queue stays online only; the guest review at Session done is a read-only notice (no link / create-unclaimed services yet, see D-2026-11-07-03); the mockup log is [IN MOCK APP](../mockup-changes/2026-11-11-queue-device-play-history-file.md)
 - **Ticket:** [#722](https://github.com/jose-codegourmet/rotra-v2/issues/722) (unblocked)
 - **Roadmap:** MVP — [Queue offline](workstreams/queue-offline.md)
 - **Supersedes:** the "CSV export/import" wording of the November 8, 2026 offline decisions (now a JSON file); the full device-stream protocol in [offline-sync.md](../database_design/product/queue/modules/offline-sync.md) is **not** built for MVP.

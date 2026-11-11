@@ -1,6 +1,6 @@
 # Workstream — Queue offline
 
-**Last verified:** 2026-11-07 (code audit of `main` @ `51abb94f`; traced, not run) · [MVP hub](../README.md)
+**Last verified:** 2026-11-12 (#722 landed; traced and type-checked, not run against Supabase) · [MVP hub](../README.md)
 
 Paths: `real/` = `packages/data/src/real/`, `api/` = `apps/queue/src/app/api/`, `db/` = `packages/db/`.
 
@@ -28,28 +28,31 @@ downloads and interruption recovery. See [Queue offline rules](../../business_lo
 
 | Capability | Status | Evidence | Tickets |
 |---|---|---|---|
-| Offline UI states (banner, sync pill, recovery screen, download card) | partially connected | Mock simulation only (`data/src/sync/fetchers.ts`, `queue-session/mutations.ts:264`); route `sessions/[sessionId]/recovery/page.tsx` | #18, #385 closed |
+| Offline UI states (banner, sync pill, recovery screen, download card) | connected | Mock simulation (`data/src/sync/fetchers.ts`) and, in real mode, the outbox (`real/sync.ts` over `outbox/state.ts`): "Offline · N waiting to sync", Q-SYNC lists the outbox, Q-CONFLICT shows refused commands with Keep the server's version / Retry | #18, #385 closed; #722 |
 | Online sync status / completeness read | implemented | `real/sync.ts:38-110` → `api/sync`, `api/sessions/[sessionId]/sync` → `db/src/queue/sync.ts:569,644` | #269 closed |
-| Durable device copy (IndexedDB / storage) | partially connected — read-only copy in IndexedDB (`packages/data/src/device/deviceCopy.ts`): downloaded sessions stay viewable offline; no offline writes/outbox | `real/client.ts` keeps successful GETs of a downloaded session and answers them offline; `device/deviceIndex.ts` indexes the records; no service worker, so the page shell itself still needs the network | #477 |
-| Session download (offline copy) | partially connected — read-only copy in IndexedDB (`packages/data/src/device/deviceCopy.ts`): downloaded sessions stay viewable offline; no offline writes/outbox | `real/device.ts` `realDownloadSession` pre-warms the session's reads and writes one record per session and account; `realGetDeviceDownloads` lists them (empty storage → empty list, unreadable storage → load failure); sign-out clears the account's copy | #477 |
-| Outbox + replay | not implemented | `realRequest` refuses when offline (`real/client.ts:44`); `realGetSyncLog` empty (`real/sync.ts:66`) | #722 |
-| Server device streams, upload, seal, conflicts | partially connected | `db/src/queue/sync.ts:165-629` (`registerDevice`, `enrollStream`, `uploadOperations`, `sealStream`, `resolveConflict`, `resumeSessionStreams`); no route calls them | #253, #269 closed; #246 open |
-| Interrupted-device answer | not implemented | `realAnswerInterruption` throws (`real/sync.ts:112`) | #246 open/blocked |
+| Durable device copy (IndexedDB / storage) | implemented — copy + outbox + aliases in one IndexedDB database (`packages/data/src/device/deviceCopy.ts`, `outbox/outboxStore.ts`); offline writes rewrite the copy's bodies in the same transaction as the command | `real/client.ts` answers GETs from the copy offline and while the session has commands waiting; no service worker, so the page shell itself still needs the network | #477, #722 |
+| Session download (offline copy) | implemented | `real/device.ts` `realDownloadSession` pre-warms the session's reads and writes one record per session and account; a drained replay downloads the copy again; `realGetDeviceDownloads` lists them; sign-out clears the account's copy, outbox and aliases; `playhistory.json` export/import (`outbox/playHistory.ts`) moves a copy between devices | #477, #722 |
+| Outbox + replay | implemented (option A) | `outbox/dispatch.ts` (one door for every allowed write: mock path, real adapter, or local apply through `mock/store.ts` `withWorkingState` + outbox), `outbox/commands.ts` (registry name → real adapter), `outbox/replay.ts` (in order, own `operationId`, learned ids, 409 → conflict, other failures → attention, copy refreshed) | #722 |
+| Server device streams, upload, seal, conflicts | not built for MVP (D-2026-11-11-04) | `db/src/queue/sync.ts:165-629` stays unrouted; the replay uses the ordinary command Route Handlers, and conflicts are the outbox's refused commands on the device | #253, #269 closed; #246 open |
+| Interrupted-device answer | implemented over the outbox | `realAnswerInterruption` (`real/sync.ts`): Yes replays this device (awaiting original while offline), No clears the session's commands and removes the copy (`outbox/conflicts.ts`) | #722; #246 open for two-device conflicts |
 | D-03: setup/start online only | implemented | Real mode is online only everywhere | — |
-| D-03: offline add of downloaded club players + guests | not implemented | Needs device copy + outbox | #722 |
+| D-03: offline add of downloaded club players + guests | implemented | `roster.batch`, `roster.addSaved`, `roster.addNew` in `outbox/commands.ts`; a guest made offline gets a local id, learned from the replay reply | #722 |
 | D-03: global search online only | implemented | `real/queue.ts:500` → `api/players` | — |
-| D-03: finalization requires reconnect + full sync + guest review | not implemented | `db/src/queue/finalization.ts:104` review has no guest step; no candidate-match search; `canFinishAndSync: true` always (`real/sync.ts:47`) | #722 |
+| D-03: finalization requires reconnect + full sync + guest review | partially connected | `queue-session/finalization.ts` refuses Session done offline or with commands waiting; `canFinishAndSync` is online with an empty outbox; `reviewSessionDone` returns `unresolvedGuests` (roster guests without a profile, same-name saved players as candidates) and the sheet shows them as a notice. Not built: confirm-a-match (guest → saved player merge; no column records the link), create a new unclaimed player (RTR ID allocation), so the guest step does not block | #722; follow-up ticket needed |
 
-Notes: online writes already carry an `operationId` (idempotent), a base for the outbox. The real-mode
-console offline notice still says changes save on this device (`docs/architecture.md:297`).
+Notes: every replayed command sends the outbox's own `operationId` (the adapters accept it), so a lost
+reply and a retry never save twice. Known limits: Generate matches drafts › Add to Main Queue stays
+online only (the drafts are a device working set outside the outbox); a match made offline shows a
+temporary number until its replay; collision-free numbers across two offline devices are undecided.
 
 ## Remaining work
 
 - [x] Durable read-only device copy + session download in real mode (#477). Offline writes/outbox: #722.
-- [ ] Outbox in IndexedDB, local apply through the existing reducers, replay through the existing real adapters, 409 → Q-CONFLICT, `playhistory.json` export/import in This device. #722, engine decided November 11, 2026 ([D-2026-11-11-04](../decisions.md#d-2026-11-11-04)); the device-stream routes (`uploadOperations`/`sealStream`) are not built for MVP.
-- [ ] Add downloaded club players and guests offline. #722.
-- [ ] Interruption answer + conflict review in real mode. #246 (decision); implementation #722.
-- [ ] Guest reconciliation at Session done (club first, then global; explicit confirm or create unclaimed). #722 (D-03).
+- [x] Outbox in IndexedDB, local apply through the existing reducers, replay through the existing real adapters, 409 → Q-CONFLICT, `playhistory.json` export/import in This device. #722 ([D-2026-11-11-04](../decisions.md#d-2026-11-11-04)); the device-stream routes (`uploadOperations`/`sealStream`) are not built for MVP.
+- [x] Add downloaded club players and guests offline. #722.
+- [x] Interruption answer + conflict review in real mode (refused outbox commands). #722. Two-device match conflicts: #246 (decision).
+- [ ] Guest reconciliation at Session done: the review read and notice landed (#722); the confirm-a-match merge service, create-unclaimed-player (RTR ID) service and the sheet's actions need a ticket and an owner answer on recording the link (no column today).
+- [ ] Generate matches drafts › Add to Main Queue offline (the drafts working set is outside the outbox).
 - [x] Fix the real-mode console offline notice copy (#721).
 - [x] Reconcile offline docs with D-03 (offline start): done by the 2026-11-11 start-session-online-only mockup change.
 

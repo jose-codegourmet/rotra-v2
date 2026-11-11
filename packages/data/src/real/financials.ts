@@ -51,7 +51,7 @@ export async function realGetSessionCostEstimate(sessionId: string) {
 
 // ---------- Payments checklist (Q-MONEY) ----------
 
-type WirePayments = {
+export type WirePayments = {
   players: {
     sessionPlayerId: string
     clubPlayerId: string
@@ -100,25 +100,39 @@ type WireMarks = {
   marks: { clubPlayerId: string; paid: boolean; amount: WireMoney }[]
 }
 
-const postMarks = (sessionId: string, marks: SetPaymentMarksInput['marks']) =>
+const postMarks = (
+  sessionId: string,
+  marks: SetPaymentMarksInput['marks'],
+  operationId: string = crypto.randomUUID(),
+) =>
   realRequest<WireMarks>(sessionPath(sessionId, 'payments'), {
     method: 'POST',
-    body: { operationId: crypto.randomUUID(), marks },
+    body: { operationId, marks },
   })
 
 /** One batch of desired end states (#300), saved together or not at all. */
-export async function realSetPaymentMarks({ sessionId, marks }: SetPaymentMarksInput) {
-  const { count } = await postMarks(sessionId, marks)
+export async function realSetPaymentMarks({
+  sessionId,
+  marks,
+  operationId,
+}: SetPaymentMarksInput & { operationId?: string }) {
+  const { count } = await postMarks(sessionId, marks, operationId)
   return accepted({ count }, `${count} payment mark${count === 1 ? '' : 's'} saved`)
 }
 
 /** Flips the saved tick: reads the current state, then saves its opposite. */
-export async function realTogglePaid(input: { sessionId: string; clubPlayerId: string }) {
+export async function realTogglePaid(input: {
+  sessionId: string
+  clubPlayerId: string
+  operationId?: string
+}) {
   const current = await realGetSessionPayments(input.sessionId)
   const player = current?.players.find((p) => p.clubPlayerId === input.clubPlayerId)
-  const result = await postMarks(input.sessionId, [
-    { clubPlayerId: input.clubPlayerId, paid: !player?.paid },
-  ])
+  const result = await postMarks(
+    input.sessionId,
+    [{ clubPlayerId: input.clubPlayerId, paid: !player?.paid }],
+    input.operationId,
+  )
   const mark = result.marks[0]
   const name = player?.name ?? 'Player'
   return mark?.paid
@@ -131,22 +145,26 @@ export async function realSetPaymentAmount({
   sessionId,
   clubPlayerId,
   amountMinor,
-}: SetPaymentAmountInput) {
+  operationId = crypto.randomUUID() as string,
+}: SetPaymentAmountInput & { operationId?: string }) {
   const current = await realGetSessionPayments(sessionId)
   const name = current?.players.find((p) => p.clubPlayerId === clubPlayerId)?.name ?? 'Player'
   const { paid } = await realRequest<{ paid: boolean; amount: WireMoney }>(
     sessionPath(sessionId, 'payments/amount'),
-    { method: 'POST', body: { operationId: crypto.randomUUID(), clubPlayerId, amountMinor } },
+    { method: 'POST', body: { operationId, clubPlayerId, amountMinor } },
   )
   return paid
     ? accepted({ paid: true }, `${name} paid ${formatPeso(amountMinor)}`)
     : accepted({ paid: false }, `${name} marked not paid`)
 }
 
-export async function realMarkAllPaid(sessionId: string) {
+export async function realMarkAllPaid(
+  sessionId: string,
+  operationId: string = crypto.randomUUID(),
+) {
   const { count } = await realRequest<{ count: number }>(
     sessionPath(sessionId, 'payments/mark-all'),
-    { method: 'POST', body: { operationId: crypto.randomUUID() } },
+    { method: 'POST', body: { operationId } },
   )
   return accepted({ count }, `${count} players marked paid`)
 }

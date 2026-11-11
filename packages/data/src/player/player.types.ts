@@ -78,6 +78,19 @@ export type PlayerProfile = {
   nickname: string | null
   /** Photo URL/data URL or character:<id>; null means initials. Resolve character references before display. */
   picture: string | null
+  /**
+   * The chosen Profile banner (`players.banner_id`, a `profile_banners` id); null or unset = the
+   * default banner. Public, like the picture.
+   */
+  bannerId?: string | null
+  /**
+   * The banner the profile card draws (a ProfileBanner key or an uploaded banner's id), after the
+   * default rule: a chosen banner is kept even when hidden or deleted; null → Court while it is
+   * shown, else the first shown banner (resolveProfileBanner). Set on every profile read.
+   */
+  bannerKey?: string
+  /** The resolved banner's uploaded 3:1 image; null for a seeded banner drawn from theme tokens */
+  bannerImageUrl?: string | null
   playingStyle: string
   experienceYears: number | null
   experienceMonths: number | null

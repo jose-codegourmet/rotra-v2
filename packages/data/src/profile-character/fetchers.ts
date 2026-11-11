@@ -167,7 +167,7 @@ function addResult(added: ProfileCharacter[], notAdded: string[]): AddProfileCha
 }
 
 /**
- * A-CHARACTERS › click an image: hide or show it. Hiding one of only 8 shown images rejects with
+ * A-CHARACTERS › click an image: hide or show it. Hiding one of only 15 shown images rejects with
  * MockError('conflict', PROFILE_CHARACTER_HIDE_REFUSAL). The same value as now changes nothing.
  */
 export function setProfileCharacterShown(input: { id: string; shown: boolean }) {
@@ -198,7 +198,7 @@ export function setProfileCharacterShown(input: { id: string; shown: boolean }) 
 }
 
 /**
- * A-CHARACTERS › x: delete an image. Deleting a shown image when only 8 are shown rejects with
+ * A-CHARACTERS › x: delete an image. Deleting a shown image when only 15 are shown rejects with
  * MockError('conflict', PROFILE_CHARACTER_DELETE_REFUSAL); a hidden image can always go. Resolves
  * with the deleted image, which the Undo button passes to restoreProfileCharacter. Players who use
  * it keep it (see ProfileCharacter).

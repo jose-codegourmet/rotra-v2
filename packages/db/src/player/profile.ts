@@ -1,5 +1,7 @@
 import 'server-only'
+import { PROFILE_BANNER_NOT_PICKABLE } from '@rotra/data/profile-banner/rules'
 import { maskPublicName } from '@rotra/data/public-session/rules'
+import { isProfileBannerPickable, resolvePlayerBanner } from '../admin/profile-banners'
 import type { ClubContext, PlayerContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
 import type { Prisma, ProfileVisibility, SocialProvider } from '../generated/prisma/client'
@@ -20,6 +22,8 @@ const PUBLIC_PLAYER_SELECT = {
   fullName: true,
   nickname: true,
   avatarRef: true,
+  bannerId: true,
+  banner: { select: { id: true, image: true } },
   profileVisibility: true,
   experienceMonths: true,
   experienceRecordedAt: true,
@@ -86,6 +90,7 @@ function publicProfileDto(row: PublicPlayerRow, own = false) {
     fullName: masked ? maskPublicName(row.fullName) : row.fullName,
     nickname: masked ? null : row.nickname,
     picture: row.avatarRef,
+    bannerId: row.bannerId,
     profileVisibility: row.profileVisibility,
     playingStyle: masked ? '' : playingStyle(row.personalDetails),
     experienceYears: masked || months == null ? null : Math.floor(months / 12),
@@ -94,6 +99,16 @@ function publicProfileDto(row: PublicPlayerRow, own = false) {
       ? (Object.fromEntries(SOCIAL.map((p) => [p, ''])) as Record<SocialProvider, string>)
       : links,
   }
+}
+
+/**
+ * The profile with the banner its card draws (`bannerKey`, `bannerImageUrl`). The banner is public,
+ * like the picture, so an always-private profile keeps it.
+ */
+async function profileWithBanner(db: Db, row: PublicPlayerRow, own = false) {
+  const dto = publicProfileDto(row, own)
+  if (!dto) return null
+  return { ...dto, ...(await resolvePlayerBanner(row.banner, db)) }
 }
 
 /** P-PROFILE public read (`player.public-profile`). Safe for shared caches. */
@@ -105,7 +120,7 @@ export async function readPublicProfile(playerId: string, own = false) {
     where: { id: playerId },
     select: PUBLIC_PLAYER_SELECT,
   })
-  const dto = row && publicProfileDto(row, own)
+  const dto = row && (await profileWithBanner(prisma, row, own))
   if (!dto) throw new ServiceError('not_found')
   return dto
 }
@@ -174,7 +189,7 @@ async function adminChangeNoteOf(db: Db, playerId: string) {
 }
 
 /** The public profile plus the owner-only Admin change note (P-EDIT-PROFILE). Private, no-store. */
-async function ownProfile(db: Db, profile: ReturnType<typeof publicProfileDto>) {
+async function ownProfile(db: Db, profile: Awaited<ReturnType<typeof profileWithBanner>>) {
   if (!profile) return profile
   const note = await adminChangeNoteOf(db, profile.playerId)
   return note ? { ...profile, adminChangeNote: note } : profile
@@ -251,7 +266,38 @@ export async function updateMyProfile(
       where: { id: player.id },
       select: PUBLIC_PLAYER_SELECT,
     })
-    return ownProfile(tx, publicProfileDto(row, true))
+    return ownProfile(tx, await profileWithBanner(tx, row, true))
+  })
+}
+
+/**
+ * Edit profile › Name › Banner, applied at once under the loaded revision. Only a shown, not deleted
+ * banner can be newly picked; keeping the current one is allowed even when it is hidden. Players
+ * never upload a banner.
+ */
+export async function setMyProfileBanner(
+  context: PlayerContext,
+  input: { bannerId: string; expectedRevision: string },
+) {
+  return prisma.$transaction(async (tx) => {
+    const rows = await tx.$queryRaw<{ id: string }[]>`
+      SELECT "id" FROM "players" WHERE "id" = ${context.playerId}::uuid FOR UPDATE`
+    if (!rows.length) throw new ServiceError('not_found')
+    const player = await tx.player.findUniqueOrThrow({ where: { id: context.playerId } })
+    if (player.bannerId !== input.bannerId) {
+      requireRevision(player.revision, input.expectedRevision)
+      if (!(await isProfileBannerPickable(input.bannerId, tx)))
+        throw new ServiceError('conflict', { banner: PROFILE_BANNER_NOT_PICKABLE })
+      await tx.player.update({
+        where: { id: player.id },
+        data: { bannerId: input.bannerId, revision: { increment: 1 } },
+      })
+    }
+    const row = await tx.player.findUniqueOrThrow({
+      where: { id: player.id },
+      select: PUBLIC_PLAYER_SELECT,
+    })
+    return ownProfile(tx, await profileWithBanner(tx, row, true))
   })
 }
 

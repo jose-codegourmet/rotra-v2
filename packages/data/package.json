@@ -315,6 +315,7 @@
     "./sync/useAnswerInterruption": "./src/sync/useAnswerInterruption.ts",
     "./player/picture": "./src/player/picture.ts",
     "./player/useSetMyProfilePicture": "./src/player/useSetMyProfilePicture.ts",
+    "./player/useSetMyProfileBanner": "./src/player/useSetMyProfileBanner.ts",
     "./player/useUpdateMyProfile": "./src/player/useUpdateMyProfile.ts",
     "./player-account/types": "./src/player-account/playerAccount.types.ts",
     "./player-account/useMyAccount": "./src/player-account/useMyAccount.ts",
@@ -442,7 +443,16 @@
     "./profile-character/types": "./src/profile-character/profileCharacter.types.ts",
     "./profile-character/rules": "./src/profile-character/profileCharacter.rules.ts",
     "./profile-character/query-keys": "./src/profile-character/queryKeys.ts",
-    "./fixtures/profile-characters": "./src/fixtures/profileCharacters.ts"
+    "./fixtures/profile-characters": "./src/fixtures/profileCharacters.ts",
+    "./profile-banner/fetchers": "./src/profile-banner/fetchers.ts",
+    "./profile-banner/crop": "./src/profile-banner/crop.ts",
+    "./profile-banner/useProfileBanners": "./src/profile-banner/useProfileBanners.ts",
+    "./profile-banner/useShownProfileBanners": "./src/profile-banner/useShownProfileBanners.ts",
+    "./profile-banner/useProfileBannerMutations": "./src/profile-banner/useProfileBannerMutations.ts",
+    "./profile-banner/types": "./src/profile-banner/profileBanner.types.ts",
+    "./profile-banner/rules": "./src/profile-banner/profileBanner.rules.ts",
+    "./profile-banner/query-keys": "./src/profile-banner/queryKeys.ts",
+    "./fixtures/profile-banners": "./src/fixtures/profileBanners.ts"
   },
   "scripts": {
     "lint": "biome check .",

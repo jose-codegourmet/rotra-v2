@@ -128,7 +128,7 @@ The characters a player can pick are the images the platform owner shows in Admi
 
 Every profile has a **banner**: the strip across the top of the profile card, public like the picture, in the same way for the player's own profile and for another player's, and for every visibility level including Always private.
 
-- **Predefined banners only.** A player picks one of the banners the platform owner shows in Admin › Settings › Profile banners, managed like the profile characters. There is **no upload and no remove** for players; the default is the first one (Court in the prototype). A player keeps a banner that Admin later hides or deletes.
+- **Predefined banners only.** A player picks one of the banners the platform owner shows in Admin › Settings › Profile banners, managed like the profile characters. There is **no upload and no remove** for players; the default is **Court**, or the first shown banner when Court is hidden or deleted (owner, November 12, 2026). A player keeps a banner that Admin later hides or deletes.
 - Picking a banner applies at once; there is nothing to save separately (confirmation toast **Banner updated**) and no file is stored for the player.
 - Banners are drawn from the theme tokens in the prototype, so both themes hold up.
 

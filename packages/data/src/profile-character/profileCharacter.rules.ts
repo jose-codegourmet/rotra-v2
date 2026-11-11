@@ -1,9 +1,9 @@
 import type { ProfileCharacter } from './profileCharacter.types'
 
-/** rotra-admin.html CHAR_PLAYER_PAGE: images per page in the player picker */
-export const PROFILE_CHARACTER_PLAYER_PAGE = 8
+/** rotra-admin.html CHAR_PLAYER_PAGE: images per page in the player picker (5 in a row, 3 rows) */
+export const PROFILE_CHARACTER_PLAYER_PAGE = 15
 /** rotra-admin.html CHAR_MIN_ACTIVE: the players' first page must stay full */
-export const PROFILE_CHARACTER_MIN_SHOWN = 8
+export const PROFILE_CHARACTER_MIN_SHOWN = 15
 /** rotra-admin.html CHAR_MAX_BYTES: 1 MB per image */
 export const PROFILE_CHARACTER_MAX_BYTES = 1024 * 1024
 /** Accepted image types (rotra-admin.html `accept` and type check) */

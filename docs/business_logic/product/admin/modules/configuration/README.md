@@ -37,7 +37,7 @@ Owner decision, November 9, 2026 ([D-2026-11-09-13](../../../../../mvp/decisions
 
 ## Profile banner library
 
-Owner decision, November 11, 2026 ([D-2026-11-11-11](../../../../../mvp/decisions.md#d-2026-11-11-11); mockup log 2026-11-11-admin-profile-banners; real mode not started). A banner is the strip across the top of a player's ROTRA profile card, like a Discord banner. Players pick one of the **predefined banners** the platform owner manages in Admin › Settings › Profile banners. It is managed exactly like the [character library](#profile-character-library); **no club or player ever uploads a banner**.
+Owner decision, November 11, 2026 ([D-2026-11-11-11](../../../../../mvp/decisions.md#d-2026-11-11-11); mockup log 2026-11-11-admin-profile-banners; mock app and real-mode services built in P08.6). A banner is the strip across the top of a player's ROTRA profile card, like a Discord banner. Players pick one of the **predefined banners** the platform owner manages in Admin › Settings › Profile banners. It is managed exactly like the [character library](#profile-character-library); **no club or player ever uploads a banner**.
 
 - Uploads: images only (PNG, JPG or WebP), up to 2 MB each, centred-cropped to **3:1**; several at once, with the same **Uploading N of M…** progress bar.
 - Each banner is **shown** or **hidden**; at least **2** stay shown, so players have a choice. Delete has a short Undo.

@@ -41,6 +41,7 @@ export const adminNavExamples = {
     ranking: '/settings/ranking',
     'feature-flags': '/settings/feature-flags',
     'profile-characters': '/settings/profile-characters',
+    'profile-banners': '/settings/profile-banners',
   },
   counts: {
     clubs: clubs.length,
@@ -49,6 +50,7 @@ export const adminNavExamples = {
     'club-names': 2,
     'feature-flags': 0,
     'profile-characters': 24,
+    'profile-banners': 6,
   },
   zeroCounts: {
     clubs: 0,
@@ -57,6 +59,7 @@ export const adminNavExamples = {
     'club-names': 0,
     'feature-flags': 0,
     'profile-characters': 0,
+    'profile-banners': 0,
   },
   loadedAt: new Date('2026-10-27T21:41:00'),
 }

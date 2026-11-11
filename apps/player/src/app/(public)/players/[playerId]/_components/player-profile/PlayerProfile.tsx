@@ -202,6 +202,8 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
               picture: pictureSrc(player.picture, player.playerId, player.fullName) ?? null,
             }}
             isOwn={isOwn}
+            bannerKey={player.bannerKey}
+            bannerImageUrl={player.bannerImageUrl}
             idElementId={idElementId}
             onCopyId={() => void copyPlayerId(player.rtrId, idElementId)}
             onChangePicture={pictureEditor.openSheet}

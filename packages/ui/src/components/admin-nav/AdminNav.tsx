@@ -12,6 +12,7 @@ export type AdminNavKey =
   | 'ranking'
   | 'feature-flags'
   | 'profile-characters'
+  | 'profile-banners'
 export type AdminNavProps = {
   current: AdminNavKey | null
   hrefs: Record<AdminNavKey, string>
@@ -69,6 +70,7 @@ export function AdminNav({
         item('ranking', 'Ranking', 'nav-rank'),
         item('feature-flags', 'Feature flags', 'nav-flag'),
         item('profile-characters', 'Profile characters', 'nav-face'),
+        item('profile-banners', 'Profile banners', 'nav-banner'),
       ],
     },
   ]

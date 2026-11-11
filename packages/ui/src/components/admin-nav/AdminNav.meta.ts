@@ -19,6 +19,7 @@ export const adminNavMeta = {
     'ranking',
     'feature-flags',
     'profile-characters',
+    'profile-banners',
     'no-counts',
     'zero-counts',
     'ask-before-leaving',

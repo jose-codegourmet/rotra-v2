@@ -71,6 +71,7 @@ export const PUBLIC_READS = [
   'leaderboard.list',
   'ranking.settings',
   'profile-character.shown',
+  'profile-banner.shown',
 ] as const
 
 export type PublicReadId = (typeof PUBLIC_READS)[number]

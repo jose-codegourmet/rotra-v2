@@ -42,7 +42,7 @@ link ([D-2026-11-07-01](../decisions.md#d-2026-11-07-01)).
 | Admin-reviewed player reset link | implemented in #491; schema applied | `/requests/password-resets`, protected API, request table + audit, provider recovery token | #491 |
 | Registration link from a player's Admin profile | not implemented | `admin-player/mutations.ts:229` `issueRegistrationLink` mock only (Queue issuance is real since #483, see [player.md](player.md)) | none found; MVP scope: hub open question 9 |
 | Admin edits everything on a player + profile character library (A07, epic #589) | in mock app; real mode not started | [D-2026-11-09-13](../decisions.md#d-2026-11-09-13), [D-2026-11-09-14](../decisions.md#d-2026-11-09-14) | #644–#650 |
-| Profile banners (A-BANNERS), character picker 15 per page, image-library upload progress bar, Admin avatar full-photo viewer | in the mockup; mock app and real mode not started | [D-2026-11-11-11](../decisions.md#d-2026-11-11-11) | none yet |
+| Profile banners (A-BANNERS), character picker 15 per page, image-library upload progress bar, Admin avatar full-photo viewer | profile banners and the 15-shown character rule in the mock app and real-mode services (P08.6, #754; Storage bucket `profile-banners` still to be created by hand); the rest in the mockup | [D-2026-11-11-11](../decisions.md#d-2026-11-11-11) | none yet |
 | Club accent persistence | not implemented / deferred candidate | `real/admin.ts:88-89` hardcodes `accent: false`; no `accent` in `prisma/schema` | #395 open (blocked) |
 
 ## Admin implementation gap index
@@ -68,7 +68,7 @@ duplicate issues merely because a related epic is open.
 - [ ] Admin player write routes (create/edit/archive/restore/remove/registration link). Ticket: needed — confirm MVP scope.
 - [ ] Audit reads for feature flags and ranking settings. Ticket: needed.
 - [ ] Scheduled license-lapse refresh and retention sweep runner. Ticket: needed — confirm MVP scope.
-- [ ] Profile banners real mode (ticket: needed): `profile_banners` table (migration sign-off), `players.banner_id`, Storage bucket for uploads.
+- [ ] Profile banners real mode: services and routes built (P08.6, #754); the public Storage bucket `profile-banners` must still be created by hand in the Supabase dashboard, and nothing was run against a database.
 - [ ] A07 real mode (backend follow-up, ticket: needed): Supabase Storage for characters, `profile_characters` table, full-form PATCH, admin-set password via Supabase (MVP or beta only, no end date set).
 - [x] Club accent: not for MVP (#395 closed, D-2026-11-11-10).
 

@@ -6,6 +6,8 @@ import { checkMockSave } from '../mock/bridge'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { mockStore, readMockState } from '../mock/store'
+import { isProfileBannerShown, resolveMockProfileBanner } from '../profile-banner/fetchers'
+import { PROFILE_BANNER_NOT_PICKABLE } from '../profile-banner/profileBanner.rules'
 import { isProfileCharacterShown } from '../profile-character/fetchers'
 import { isRealDataMode } from '../real/mode'
 import {
@@ -14,6 +16,7 @@ import {
   realGetPlayerGames,
   realGetPlayerProfile,
   realGetPlayerRank,
+  realSetMyProfileBanner,
   realSetMyProfilePicture,
   realUpdateMyProfile,
 } from '../real/player'
@@ -74,7 +77,16 @@ export async function getPlayerProfile(
   if (!profile) return null
   if (profile.adminChangeNote && (await getSession('player'))?.account.id !== playerId)
     delete profile.adminChangeNote
-  return profile
+  return withBanner(profile)
+}
+
+/** Mock mode: the profile with its resolved banner (bannerKey, bannerImageUrl), like the server's. */
+function withBanner(profile: PlayerProfile): PlayerProfile {
+  return {
+    ...profile,
+    bannerId: profile.bannerId ?? null,
+    ...resolveMockProfileBanner(profile.bannerId),
+  }
 }
 
 /** Writes validated personal fields onto a store profile; blank experience is stored as null. */
@@ -115,7 +127,7 @@ export async function updateMyProfile(input: PersonalProfileValues): Promise<Pla
     saved = structuredClone(profile)
   })
   if (!saved) throw new Error('Profile save produced no result.')
-  return saved
+  return withBanner(saved)
 }
 
 /** Set the signed-in player's picture in the mock store, independent of profile edits. */
@@ -178,5 +190,35 @@ export async function setMyProfilePicture(choice: PlayerPictureChoice): Promise<
     saved = structuredClone(profile)
   })
   if (!saved) throw new Error('Profile picture save produced no result.')
-  return saved
+  return withBanner(saved)
+}
+
+/**
+ * Edit profile › Name › Banner: applies a shown banner at once, outside Save changes. A hidden,
+ * deleted or unknown banner is refused with MockError('conflict', 'Choose a banner.'); offline
+ * saves nothing.
+ */
+export async function setMyProfileBanner(bannerId: string): Promise<PlayerProfile> {
+  if (isRealDataMode()) return realSetMyProfileBanner(bannerId)
+  const session = await getSession('player')
+  if (!session) throw new MockError('permission', 'Sign in to edit your profile.')
+  await delay(400)
+  if (getConnectivity() === 'offline')
+    throw new MockError('offline', "You're offline. Reconnect and try again.")
+  const currentSession = await getSession('player')
+  if (currentSession?.account.id !== session.account.id)
+    throw new MockError('permission', 'Sign in to edit your profile.')
+  checkMockSave()
+  const pickable = isProfileBannerShown(bannerId)
+  let saved: PlayerProfile | undefined
+  mockStore.update((draft) => {
+    const profile = draft.playerProfiles.find((entry) => entry.playerId === session.account.id)
+    if (!profile) throw new MockError('permission', 'This profile is not yours to edit.')
+    if (profile.bannerId !== bannerId && !pickable)
+      throw new MockError('conflict', PROFILE_BANNER_NOT_PICKABLE)
+    profile.bannerId = bannerId
+    saved = structuredClone(profile)
+  })
+  if (!saved) throw new Error('Profile banner save produced no result.')
+  return withBanner(saved)
 }

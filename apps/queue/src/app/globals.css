@@ -3,3 +3,12 @@
 
 /* Components live in @rotra/ui; Tailwind must see their class names */
 @source "../../../../packages/ui/src";
+
+/* Fixed scale on iPhone/iPad (#719): no pinch-zoom in standalone mode, no OS text inflation */
+html {
+  -webkit-text-size-adjust: 100%;
+}
+html,
+body {
+  touch-action: pan-x pan-y;
+}

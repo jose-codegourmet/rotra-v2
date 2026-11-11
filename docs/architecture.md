@@ -115,7 +115,7 @@ barrels anywhere.
 ```text
 apps/queue/src/
 ├── app/
-│   ├── layout.tsx                       Root layout: fonts, <html data-theme>, providers
+│   ├── layout.tsx                       Root layout: fonts, <html data-theme>, providers, fixed-scale viewport (queue)
 │   ├── (auth)/login/page.tsx            Club sign-in
 │   ├── (operator)/                      Signed-in club screens; shared shell layout
 │   │   ├── layout.tsx                   Top bar (sync status, theme switch), left nav, bottom dock

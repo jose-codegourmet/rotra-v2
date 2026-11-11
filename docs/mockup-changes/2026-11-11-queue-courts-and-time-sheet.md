@@ -1,6 +1,6 @@
 # Courts and time sheet: lists each court with its status and time; a court's time can change during a match
 
-Status: NEW
+Status: IN MOCK APP — #756
 Date: 2026-11-11
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Live session › Courts and time sheet; court card ⋯ menu

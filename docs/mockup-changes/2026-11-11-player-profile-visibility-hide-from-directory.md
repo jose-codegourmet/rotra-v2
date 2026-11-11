@@ -1,6 +1,6 @@
 # Player: Profile visibility has three levels, plus Hide me from Player Information (#715, proposed)
 
-Status: NEW
+Status: IN MOCK APP — #753
 Date: 2026-11-11
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › Privacy and contact › Profile visibility and Player Information; leaderboard, podium and public profile views for an always-private player

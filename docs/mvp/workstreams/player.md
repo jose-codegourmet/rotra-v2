@@ -1,6 +1,6 @@
 # Workstream — Player access & Player Information
 
-**Last verified:** 2026-11-08 (code trace of `main` @ `aca899f2`; traced, not run) · [MVP hub](../README.md)
+**Last verified:** 2026-11-12 (round-2 status lines; code trace of `main` @ `aca899f2` for the rest; traced, not run) · [MVP hub](../README.md)
 
 Paths: `real/` = `packages/data/src/real/`, `api/` = `apps/player/src/app/api/`, `db/` = `packages/db/`.
 "Mock only" = in real mode the screen shows "This part of ROTRA isn't connected to saved data yet."
@@ -43,7 +43,8 @@ password recovery through Admin-reviewed requests (#491).
 | Forgot Password screen | implemented in #491; schema applied | `/api/auth/password-reset` saves an Admin review request; no automatic email | #491 |
 | Reset password (`/reset-password/[token]`) | implemented in #491; schema applied | Reviewed digest + provider expiry/single use, mapped player check, new password chosen by player | #491 |
 | Guest registration (without an existing-profile claim link) | implemented | `/register/[clubId]` → `useGuestRegistration` → `/api/register/[clubId]` → `db/src/player/guest-registration.ts`; unique contacts, recoverable claim staging, no guest linkage. Once the account exists the new player is saved to the originating club (`addPlayerToClub` in `my-clubs.ts`, D-2026-11-09-06, #707); a failed join does not fail the registration. Local database + simulated-provider flow verified; production provider not exercised | #490, #707 |
-| Club invite code (`/register/[clubId]?k=<code>`) | not connected | No column or table stores the code yet (designed in `database_design/product/admin/modules/clubs-licenses.md`, D-2026-11-09-08), so real mode ignores `k`: the link opens the plain club link (register, or **Join <club>** when signed in). With no code, `clubInviteUrl` prints the plain link, never an empty `?k=` (#707). Regenerate link stays not connected. Validating `k` needs a migration | #707 |
+| Club invite code (`/register/[clubId]?k=<code>`) | implemented in source (P08.7, #755; not run against a database) | One `clubs.invite_code` column, every club backfilled in `20261112000100`; the server checks `k` and Regenerate link replaces it; a plain link without a valid code is refused ([D-2026-11-12-01](../decisions.md#d-2026-11-12-01)). Open: the public club page's Join button sends the current code to anyone who opens the page | #707, #712, #755 |
+| Profile visibility (Public · Private · Always private), Hide me from Player Information, profile banners | implemented in source (P08.5, P08.6; #753, #754) | `players.profile_visibility`, `hidden_from_directory`, `banner_id`; the hide flag applies to Queue Add player › Player Information and RTR ID search only; an always-private leaderboard row keeps position, picture and banner and hides the level; banner default = first shown banner; the Edit profile swatches cannot show a banner Admin later hid ([D-2026-11-12-01](../decisions.md#d-2026-11-12-01)) | #715, #753, #754 |
 
 ## Remaining work
 
@@ -59,7 +60,8 @@ password recovery through Admin-reviewed requests (#491).
 
 - [D-2026-11-07-01](../decisions.md#d-2026-11-07-01) — manual password recovery.
 - [D-2026-11-07-03](../decisions.md#d-2026-11-07-03) — guest identity reconciliation.
-- [D-2026-11-11-03](../decisions.md#d-2026-11-11-03) — guests and unclaimed profiles stay in their club; RTR ID on registration.
+- [D-2026-11-11-03](../decisions.md#d-2026-11-11-03) — guests and unclaimed profiles stay in their club; RTR ID on registration; built in P08.9 (#757).
+- [D-2026-11-12-01](../decisions.md#d-2026-11-12-01) — answers to the leftover questions of the November 11 round.
 - [D-2026-11-07-07](../decisions.md#d-2026-11-07-07) — original login-only invite superseded by independent guest registration in #490.
 - [D-2026-11-07-04](../decisions.md#d-2026-11-07-04) — scope freeze.
 

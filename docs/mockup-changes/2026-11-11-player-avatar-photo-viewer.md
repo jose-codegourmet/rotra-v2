@@ -1,6 +1,6 @@
 # Player: Tap a picture avatar to see the full photo in a black-overlay dialog (#716, proposed)
 
-Status: NEW
+Status: IN MOCK APP — #758
 Date: 2026-11-11
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › Profile photo (hero), Your position card, Compare, Edit profile › Profile picture; full-photo dialog

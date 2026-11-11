@@ -1,6 +1,6 @@
 # Workstream — Queue core
 
-**Last verified:** 2026-11-08 (code trace of `main` @ `aca899f2`; traced, not run) · [MVP hub](../README.md)
+**Last verified:** 2026-11-12 (round-2 status lines; code trace of `main` @ `aca899f2` for the rest; traced, not run) · [MVP hub](../README.md)
 
 Path traced: UI route in `apps/queue/src/app/(operator|auth|public)` → `packages/data/src/<domain>`
 fetcher (real branch) → `packages/data/src/real/*.ts` → `apps/queue/src/app/api/**/route.ts` →
@@ -42,6 +42,7 @@ session page; the November 6 prototype changes (epic #408).
 | Courts: add/edit/remove, open early, undo | implemented | `real/session-live.ts:126-202` → `api/.../courts/**` | #424, #436 closed |
 | Roster: add, remove, level, presence | implemented | `real/queue.ts:416-567`, `real/session-live.ts:232-269` → `api/.../roster/**`, `.../presence` | #10 open (no open sub-issues); #421, #426 closed |
 | Saved players (no session) | implemented | `club-player/mutations.ts:93,120` → `api/club/players` POST | #330 |
+| Club-only guests and unclaimed profiles (D-2026-11-11-03), live console header, Courts and time, Match requests after Start, phone grid view, avatar photo viewer | implemented in source (P08.4, P08.8, P08.9; #752, #756, #757, #758; not run against a database) | Player Information search lists registered players only and honours Hide me from Player Information; unclaimed records stay in their club, link automatically at registration, no identity check. Open: a real-mode marker for Lookup pending versus Unclaimed in Saved players; drop-out notices are not closed at Start ([D-2026-11-12-01](../decisions.md#d-2026-11-12-01)) | #748 |
 | Edit details (guests, unclaimed profiles) | implemented | `api/club/players/[clubPlayerId]` GET/PATCH → `db/src/queue/club-player-details.ts:68,98`; Level for this club is not saved here yet | #484, #486 |
 | Delete a saved player (D-DELETE-PLAYER) | implemented | `club-player/delete.ts:13,36` → `real/queue.ts:564,570` → `api/club/players/[clubPlayerId]/delete-impact`, DELETE → `db/src/queue/club-player-delete.ts:57,76` (soft delete, `club_players.removed_at` migration) | #487 |
 | Invite / registration link | implemented | `club-player/fetchers.ts:165` → `real/queue.ts:550` → `api/club/players/[clubPlayerId]/registration-link` → `db/src/player/claim.ts:44`; unclaimed: 7-day single-use link, a new one cancels the previous one; guests: independent Player registration, no guest linkage (#490) | #478, #483, #485 |
@@ -112,7 +113,7 @@ payment amounts with Partial/Reimburse (PRs #467–#481). **Still open:** Downlo
 signed-in player to a join request; guest registration now exists through club invitations (#490);
 whether published results and profile pictures on the public page should also be masked.
 Decisions: [D-05](../decisions.md#d-2026-11-07-05), [D-06](../decisions.md#d-2026-11-07-06),
-[D-07](../decisions.md#d-2026-11-07-07), [D-2026-11-11-03](../decisions.md#d-2026-11-11-03) (guests and unclaimed profiles stay in their club).
+[D-07](../decisions.md#d-2026-11-07-07), [D-2026-11-11-03](../decisions.md#d-2026-11-11-03) (guests and unclaimed profiles stay in their club), [D-2026-11-12-01](../decisions.md#d-2026-11-12-01) (answers to the November 11 leftovers).
 
 ## Remaining work
 

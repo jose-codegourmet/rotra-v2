@@ -1,6 +1,6 @@
 # Admin: Click an avatar or club logo picture to see it in a black-overlay dialog (#716, proposed)
 
-Status: NEW
+Status: IN MOCK APP — #758
 Date: 2026-11-11
 App: admin
 Mockup: apps/mockup/admin-app/rotra-admin.html › Players › Quick view and Edit profile heroes, Player detail hero, Contact change review player card; Club detail hero (logo); full-photo dialog

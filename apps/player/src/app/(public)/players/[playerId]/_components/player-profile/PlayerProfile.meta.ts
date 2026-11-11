@@ -6,6 +6,7 @@ export const playerProfileMeta = {
   usage: [
     'Ownership is checked before anything private renders: visitors never mount AccountPanel or request useMyAccount.',
     'The owner can change their picture immediately; visitors do not get the editor.',
+    "The identity card's Profile banner is the profile's resolved bannerKey / bannerImageUrl (the default banner when none is chosen), the same for own and public profiles.",
     'Sign out has no confirmation dialog; D-SIGN-OUT belongs to the club account.',
     'My player ID and Privacy and contact routes are built in P04.',
   ],

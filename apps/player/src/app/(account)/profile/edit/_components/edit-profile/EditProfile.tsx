@@ -1,8 +1,11 @@
 'use client'
 import { MockError } from '@rotra/data/mock/errors'
 import { usePlayerProfile } from '@rotra/data/player/usePlayerProfile'
+import { useSetMyProfileBanner } from '@rotra/data/player/useSetMyProfileBanner'
 import { useUpdateMyProfile } from '@rotra/data/player/useUpdateMyProfile'
 import { useMyAccount } from '@rotra/data/player-account/useMyAccount'
+import { profileBannerName } from '@rotra/data/profile-banner/rules'
+import { useShownProfileBanners } from '@rotra/data/profile-banner/useShownProfileBanners'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { ConfirmSheet } from '@rotra/ui/confirm-sheet'
@@ -39,6 +42,8 @@ export function EditProfile() {
   const profile = usePlayerProfile(playerId)
   const myAccount = useMyAccount(account ? playerId : null)
   const update = useUpdateMyProfile()
+  const banners = useShownProfileBanners()
+  const setBanner = useSetMyProfileBanner()
   const pictureEditor = useProfilePictureSheet(profile.data)
   // Opens over the edit page, so the profile draft stays.
   const contactChange = useContactChangeSheet(account ? playerId : null)
@@ -155,6 +160,20 @@ export function EditProfile() {
         picture={pictureSrc(profile.data.picture, playerId, profile.data.fullName)}
         pictureName={profile.data.fullName}
         onChangePicture={pictureEditor.openSheet}
+        bannerKey={profile.data.bannerKey}
+        bannerImageUrl={profile.data.bannerImageUrl}
+        banners={banners.data?.map((banner) => ({
+          key: banner.id,
+          name: profileBannerName(banner),
+          imageUrl: banner.image || null,
+        }))}
+        bannerDisabled={setBanner.isPending || !banners.data}
+        onBannerChange={(bannerId) =>
+          setBanner.mutate(bannerId, {
+            onSuccess: () => toast('Banner updated'),
+            onError: (error) => toast.error(error.message),
+          })
+        }
         account={{
           phone: myAccount.data.phone,
           email: myAccount.data.email,

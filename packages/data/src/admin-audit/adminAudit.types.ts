@@ -6,6 +6,7 @@ export type AdminAuditTargetType =
   | 'feature_flag'
   | 'ranking_settings'
   | 'profile_character'
+  | 'profile_banner'
 
 /**
  * Proposed action codes for admin_audit_events.action; no list is decided yet. Later Admin tickets
@@ -38,6 +39,11 @@ export type AdminAuditAction =
   | 'profile_character_hidden'
   | 'profile_character_deleted'
   | 'profile_character_restored'
+  | 'profile_banner_added'
+  | 'profile_banner_shown'
+  | 'profile_banner_hidden'
+  | 'profile_banner_deleted'
+  | 'profile_banner_restored'
 
 /**
  * One line of the Admin "Record of actions": who did what to which record, and when. Append-only;

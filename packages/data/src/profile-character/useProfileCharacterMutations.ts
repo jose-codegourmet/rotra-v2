@@ -30,7 +30,7 @@ export function useAddProfileCharacters() {
   })
 }
 
-/** mutate({ id, shown }) → the saved ProfileCharacter. The refusal below 8 shown is a MockError('conflict'). */
+/** mutate({ id, shown }) → the saved ProfileCharacter. The refusal below 15 shown is a MockError('conflict'). */
 export function useSetProfileCharacterShown() {
   return useMutation({
     mutationFn: (input: { id: string; shown: boolean }) => setProfileCharacterShown(input),

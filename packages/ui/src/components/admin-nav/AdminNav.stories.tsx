@@ -38,6 +38,7 @@ export const ClubNamesCurrent: Story = { args: { current: 'club-names' } }
 export const RankingCurrent: Story = { args: { current: 'ranking' } }
 export const FeatureFlagsCurrent: Story = { args: { current: 'feature-flags' } }
 export const ProfileCharactersCurrent: Story = { args: { current: 'profile-characters' } }
+export const ProfileBannersCurrent: Story = { args: { current: 'profile-banners' } }
 export const WithCounts: Story = { args: { counts: adminNavExamples.counts } }
 export const ZeroCounts: Story = { args: { counts: adminNavExamples.zeroCounts } }
 export const NoCounts: Story = {}

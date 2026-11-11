@@ -160,6 +160,16 @@ export const ICONS = {
       </>
     ),
   },
+  'nav-banner': {
+    size: 20,
+    strokeWidth: 2,
+    body: (
+      <>
+        <rect x="3" y="5" width="18" height="14" rx="2" />
+        <path d="M3 13l5-4 4 3 4-5 5 6" />
+      </>
+    ),
+  },
   'nav-out': {
     size: 20,
     strokeWidth: 2,

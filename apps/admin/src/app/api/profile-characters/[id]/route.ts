@@ -9,7 +9,7 @@ import { readJsonBody } from '@rotra/db/service/request'
 import { routeCookieAdapter } from '@rotra/db/service/route-cookies'
 import { cookies } from 'next/headers'
 
-/** A-CHARACTERS › click an image: `{ shown }`. Hiding one of only 8 shown images is a conflict. */
+/** A-CHARACTERS › click an image: `{ shown }`. Hiding one of only 15 shown images is a conflict. */
 export async function PATCH(
   request: Request,
   context: RouteContext<'/api/profile-characters/[id]'>,

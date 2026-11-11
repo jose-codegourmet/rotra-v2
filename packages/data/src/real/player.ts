@@ -253,3 +253,14 @@ export async function realSetMyProfilePicture(choice: PlayerPictureChoice) {
   loadedRevision = revision
   return profile
 }
+
+/** Edit profile › Name › Banner, under the account revision the screen loaded. */
+export async function realSetMyProfileBanner(bannerId: string) {
+  if (!loadedRevision) await realGetMyAccount()
+  const { profile, revision } = await realRequest<{ profile: PlayerProfile; revision: string }>(
+    '/api/me/profile-banner',
+    { method: 'POST', body: { bannerId, expectedRevision: loadedRevision } },
+  )
+  loadedRevision = revision
+  return profile
+}

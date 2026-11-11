@@ -50,7 +50,7 @@ const dto = (row: ProfileCharacter): ProfileCharacterDto => ({
 const missing = () => new ServiceError('conflict', { character: PROFILE_CHARACTER_MISSING })
 const order = [{ uploadedAt: 'asc' }, { number: 'asc' }] as const
 
-/** Every write takes the same lock, so the 8-shown rule and the running number never race. */
+/** Every write takes the same lock, so the 15-shown rule and the running number never race. */
 const lock = (tx: Tx) =>
   tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext('profile_characters'))`
 
@@ -188,7 +188,7 @@ async function current(tx: Tx, id: string) {
 }
 
 /**
- * A-CHARACTERS › click an image: hide or show it. Hiding one of only 8 shown images is a conflict
+ * A-CHARACTERS › click an image: hide or show it. Hiding one of only 15 shown images is a conflict
  * with PROFILE_CHARACTER_HIDE_REFUSAL. The same value as now changes nothing and logs nothing.
  */
 export async function setProfileCharacterShown(
@@ -217,7 +217,7 @@ export async function setProfileCharacterShown(
 }
 
 /**
- * A-CHARACTERS › x: a soft delete. Deleting a shown image when only 8 are shown is a conflict with
+ * A-CHARACTERS › x: a soft delete. Deleting a shown image when only 15 are shown is a conflict with
  * PROFILE_CHARACTER_DELETE_REFUSAL; a hidden image can always go. The row and the stored image stay,
  * so players who use it keep it, and Undo (`restoreProfileCharacter`) brings it back in place.
  */

@@ -4,7 +4,8 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import { PrivateProfileCard } from './PrivateProfileCard'
 
-const alwaysPrivate = playerProfiles.find((p) => p.profileAlwaysPrivate) ?? playerProfiles[0]
+const alwaysPrivate =
+  playerProfiles.find((p) => p.profileVisibility === 'always_private') ?? playerProfiles[0]
 
 const meta = {
   title: 'Queue/PublicSession/PrivateProfileCard',

@@ -1,6 +1,6 @@
 # Guests and unclaimed profiles stay in their club; Player Information search shows registered players only
 
-Status: NEW
+Status: IN MOCK APP — #757
 Date: 2026-11-11
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Add player sheet (Saved players and Player Information tabs), Saved players list, player profile sheet, Edit details, Invite sheet, history "ROTRA profile" filter

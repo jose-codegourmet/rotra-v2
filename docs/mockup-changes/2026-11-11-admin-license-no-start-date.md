@@ -1,6 +1,6 @@
 # A-LICENSE: no Term starts field; the period is computed and shown read-only; history shows LIC number plus note
 
-Status: NEW
+Status: IN MOCK APP — #756
 Date: 2026-11-11
 App: admin
 Mockup: apps/mockup/admin-app/rotra-admin.html › Club detail › License tab › Activate / Renew license sheet and payment history

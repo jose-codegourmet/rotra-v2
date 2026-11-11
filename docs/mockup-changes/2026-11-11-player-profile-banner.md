@@ -1,6 +1,6 @@
 # Profile page: a public banner across the top of the profile card, like Discord
 
-Status: NEW
+Status: IN MOCK APP — #754
 Date: 2026-11-11
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › Player profile (own and public) › left profile card

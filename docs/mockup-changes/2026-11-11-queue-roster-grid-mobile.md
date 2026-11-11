@@ -1,6 +1,6 @@
 # Roster and levels › Grid view on phones: two compact columns
 
-Status: NEW
+Status: IN MOCK APP — #752
 Date: 2026-11-11
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Preparation › Roster and levels › Grid view

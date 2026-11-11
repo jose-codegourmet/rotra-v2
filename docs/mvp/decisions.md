@@ -1,6 +1,6 @@
 # MVP decisions and tracking
 
-**Last verified:** 2026-11-08 (code trace of `main` @ `aca899f2`); decisions added 2026-11-09. This is the short decision register
+**Last verified:** 2026-11-12 (decisions and status lines; code trace of `main` @ `aca899f2` for the older entries); decisions added 2026-11-09. This is the short decision register
 for MVP discussions. The [MVP hub](README.md) summarizes delivery; GitHub issues track implementation.
 Product rules and existing open-decision documents remain authoritative for their domains.
 
@@ -26,8 +26,8 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-09-04](#d-2026-11-09-04) | The player's live view: My night, Courts now, own standing, refresh only | approved | not started | needed | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
 | [D-2026-11-09-05](#d-2026-11-09-05) | Match requests | approved | not started | needed | [Queue](workstreams/queue.md) |
 | [D-2026-11-09-06](#d-2026-11-09-06) | Registration from session and club links, guest linking and club membership | approved | in progress | #622, #625, #627 | [Player](workstreams/player.md), [Queue](workstreams/queue.md) |
-| [D-2026-11-09-07](#d-2026-11-09-07) | Public or private player profile | approved | not started | needed | [Player](workstreams/player.md) |
-| [D-2026-11-09-08](#d-2026-11-09-08) | Sharing: links, QR codes and post/story images | approved | in progress | #620, #621, #624, #626 | [Player](workstreams/player.md), [Queue](workstreams/queue.md) |
+| [D-2026-11-09-07](#d-2026-11-09-07) | Public or private player profile | approved | in progress (three levels and the hide switch built in P08.5, #753; always-private rules in the services) | #753 | [Player](workstreams/player.md) |
+| [D-2026-11-09-08](#d-2026-11-09-08) | Sharing: links, QR codes and post/story images | approved | in progress (club invite code checked on the server in real mode, #755; Post image stays 1080 × 1350) | #620, #621, #624, #626, #755 | [Player](workstreams/player.md), [Queue](workstreams/queue.md) |
 | [D-2026-11-09-09](#d-2026-11-09-09) | Keeping the session page cheap to serve | approved | not started | needed | [Queue](workstreams/queue.md), [Backend](workstreams/backend.md) |
 | [D-2026-11-09-10](#d-2026-11-09-10) | Uploaded pictures: keep only the current and the previous | approved | in progress | #619, #624, #626 | [Player](workstreams/player.md), [Queue](workstreams/queue.md), [Backend](workstreams/backend.md) |
 | [D-2026-11-09-11](#d-2026-11-09-11) | Session page and Queue refinements from the owner's artifact review | approved | in progress (Q18 Queue Master side in the mock app; request-format defaults decided 2026-11-10) | needed | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
@@ -36,7 +36,8 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-09-14](#d-2026-11-09-14) | Admin edits everything on a player, with a beta-only password field | approved for MVP or beta only; signed off 2026-11-10 | in progress (mock app; real mode not started) | #647, #648, #649, #650 | [Admin](workstreams/admin.md) |
 | [D-2026-11-11-01](#d-2026-11-11-01) | Observability: OpenTelemetry traces to Grafana Cloud, plus a local Grafana stack | approved 2026-11-11 | implemented in the repository; Grafana Cloud stack and Vercel `OTEL_*` variables not set up yet | none | [Backend](workstreams/backend.md) |
 | [D-2026-11-11-02](#d-2026-11-11-02) | Join request: the player picks Join a slot or Be waitlisted, and can join from the waitlist | approved | in progress (mock app + real-mode services; migration applied 2026-11-11) | #706 | [Queue](workstreams/queue.md) |
-| [D-2026-11-11-03](#d-2026-11-11-03) | Guests and unclaimed profiles stay in their club | approved | not started (Queue mockup updated) | needed | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
+| [D-2026-11-11-03](#d-2026-11-11-03) | Guests and unclaimed profiles stay in their club | approved | in progress on Epic P08 (migration and services built, #749, #757; real-mode marker and history attribution still open) | #749, #757 | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
+| [D-2026-11-12-01](#d-2026-11-12-01) | Answers to the leftover questions of the November 11 round | approved 2026-11-12 | in progress on Epic P08, #748 | #748, #749–#759 | [Queue](workstreams/queue.md), [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 
 ## Status conventions
 
@@ -372,7 +373,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
     - **Regenerate link** stops the old link, and its QR images, from working.
   - **How images are made.** They're drawn on the phone, as the Session QR card already is, so there's no server cost. On phones, **Share** opens the phone's share sheet with the image attached, using the browser's built-in Web Share feature with no new dependency. Elsewhere, and in in-app browsers that don't support it, the button falls back to **Download image**. This hasn't been verified on real phones yet.
   - **Link previews.** One fixed branded preview image per type (session, club, profile), with a dynamic title only. There are no per-page generated preview images.
-- **Amended by:** [D-2026-11-09-11](#d-2026-11-09-11) (a player can invite only before the session starts).
+- **Amended by:** [D-2026-11-09-11](#d-2026-11-09-11) (a player can invite only before the session starts); [D-2026-11-12-01](#d-2026-11-12-01) (one `invite_code` column on clubs; the Post image stays 1080 × 1350).
 - **References:** [session QR share card log](../mockup-changes/2026-11-08-queue-session-qr-share-card.md), [results sharing screens](../screens/product/modules/queue/results-sharing.md).
 
 <a id="d-2026-11-09-09"></a>
@@ -510,7 +511,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 ### D-2026-11-11-03 — Guests and unclaimed profiles stay in their club
 - **Decision status:** approved (owner discussion, November 11, 2026)
 - **Implementation status:** in progress — Queue mockup updated November 11, 2026 ([log](../mockup-changes/2026-11-11-queue-club-only-unclaimed.md)); storage and data migration done in P08.1 (`20261112000100_round2_profiles_banners_invites`: existing unclaimed `players` rows and RTR IDs moved onto their `club_players` records); services in P08.9 (#757, November 12, 2026: registered-only search, link-only sync, no identity check, automatic linking at registration, `club_player_claim_links` invites for club-only records, Admin rows “Not registered yet”); still open: a history attribution per linked record and a real-mode marker that distinguishes Lookup pending from a club-only unclaimed record
-- **Ticket:** needed
+- **Ticket:** [#749](https://github.com/jose-codegourmet/rotra-v2/issues/749), [#757](https://github.com/jose-codegourmet/rotra-v2/issues/757) (epic #748)
 - **Roadmap:** MVP — [Queue](workstreams/queue.md), [Player](workstreams/player.md)
 - **Supersedes:** in part the October 28, 2026 owner decision that a phone-linked profile and its permanent RTR ID are created on the first entry sync, and the rule "the same phone number identifies the same profile across clubs" for unclaimed profiles.
 - **Decision:**
@@ -635,7 +636,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 
 ### D-2026-11-11-11 — The November 11 design proposals are approved as shown in the prototypes
 - **Decision status:** approved (owner review of the three prototype artifacts on November 11, 2026; "please merge these artifacts to mock and update the decision logs and the affected")
-- **Implementation status:** in the mockups (merged to main with this decision); real-mode tickets follow from the logs
+- **Implementation status:** in the mockups (merged to main with this decision). The round-2 design (photo viewer, profile banners, visibility, circle avatars and character picker, live console, club-only unclaimed profiles, club invite code, Admin license period) is built in the mock app and real mode on Epic P08 (#748, tickets #749–#759, November 12, 2026); its mockup logs are IN MOCK APP. Answers to the leftovers: [D-2026-11-12-01](#d-2026-11-12-01)
 - **Ticket:** #739, #738, #737, #736, #735, #731, #730, #716, #715 (the design parts), plus the comment-driven changes logged the same day; #712 (server-side, unchanged) and #725 (parked) carry no mockup change
 - **Roadmap:** MVP — [Queue](workstreams/queue.md), [Player](workstreams/player.md), [Admin](workstreams/admin.md)
 - **Decision:** every change logged in [docs/mockup-changes](../mockup-changes/README.md) dated 2026-11-11 from the proposal branch is the agreed design. The owner's answers that shaped them, by ticket:
@@ -649,5 +650,30 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - **Profile banners:** players pick one of the **predefined banners** managed by the platform owner in Admin › Settings › Profile banners (like profile characters); no uploads by players. The big profile picture and every other avatar are circles. The character picker is 5 circles across, 15 per page (Admin keeps at least 15 shown).
   - **Live console:** Match requests at the upper right in a noticeable colour; join requests end at Start; three live controls plus a More menu; Courts and time lists each court and lets a court's time change during a match; Grid view is two columns on phones.
   - **Admin image libraries:** plain tiles (the card layout was reverted on request) with an upload progress bar.
-- **Not decided yet:** the ranking constants for #247 and the other leftovers listed in the decision pack; MVP timing of #739 and #737 (the owner asked for both in the prototypes; the scope freeze D-04 still governs the real-app order).
+- **Not decided yet:** the ranking constants for #247. The other leftovers were answered on November 12, 2026 ([D-2026-11-12-01](#d-2026-11-12-01)); MVP timing of #739 and #737 is moot, both shipped on 2026-11-12 (#747). Earlier wording: MVP timing of #739 and #737 (the owner asked for both in the prototypes; the scope freeze D-04 still governs the real-app order).
 - **References:** the mockup logs dated 2026-11-11, the three prototypes, the decision pack artifact.
+
+<a id="d-2026-11-12-01"></a>
+### D-2026-11-12-01 — Answers to the leftover questions of the November 11 round
+- **Decision status:** approved (owner answers, November 12, 2026: the recommended option for every question)
+- **Implementation status:** in progress on Epic P08, [#748](https://github.com/jose-codegourmet/rotra-v2/issues/748). Built in the mock app and real mode: tokens and photo viewer (#750, #758), schema (#749), UI components (#751, #752), banners (#754), visibility (#753), club invite code (#755), live console and Admin license period (#756), club-only unclaimed profiles (#757). Docs and status (#759). Not run against a production database.
+- **Ticket:** #748 (epic), #749, #750, #751, #752, #753, #754, #755, #756, #757, #758, #759
+- **Roadmap:** MVP — [Queue](workstreams/queue.md), [Player](workstreams/player.md), [Admin](workstreams/admin.md)
+- **Decision:** the answers, by question:
+  - **#716, photo colours:** one shared token pair, `--photo-scrim` and `--photo-fg`, for all three apps, built as one ticket (#750).
+  - **#715, profile visibility:** stored as a `profile_visibility` enum (`public` · `private` · `always_private`) plus a separate `hidden_from_directory` flag. Existing Private profiles become `private`, all others `public`; new registrations default to Private.
+    - The Queue Master of a session the player joined sees an always-private player's name.
+    - An always-private leaderboard row shows the position, hides the level, and keeps the picture and banner.
+    - **Hide me from Player Information** applies to Queue › Add player › Player Information and to RTR ID search only. Saved players, Admin and the public session page are unchanged.
+  - **#712, club invite code:** one `invite_code` column on `clubs`. Every club got a code in the migration. A plain club link without a valid code is refused.
+  - **Profile banners:** a `profile_banners` table and a `profile-banners` Storage bucket, modelled on profile characters ([D-2026-11-09-13](#d-2026-11-09-13)); `players.banner_id`. The default banner is the first shown banner when Court is hidden or deleted. The bucket was created on 2026-11-12 with the same settings as `profile-characters`.
+  - **[D-2026-11-11-03](#d-2026-11-11-03), unclaimed profiles:** the unverified-phone risk is accepted for MVP (automatic linking at registration; revisit when SMS verification exists). Admin › Players lists unclaimed club records under their club as “Not registered yet”, with no RTR ID. Existing unclaimed `players` rows were migrated into club-only records and their RTR IDs released (migration `20261112000100`); club-record claim links came with `20261112000200`.
+  - **Share image:** the Post image stays 1080 × 1350. The question of MVP timing for the club page and Bagging mode is moot: both shipped on 2026-11-12 (#747).
+- **Still open:**
+  - A real-mode marker for a club-only record whose phone lookup found nobody: “Lookup pending” versus “Unclaimed” in Saved players.
+  - Admin › Add player still creates an unclaimed `players` row with an RTR ID, which contradicts “RTR ID only on registration”.
+  - The public club page's Join button sends the current invite code to anyone who opens the page.
+  - The Edit profile banner swatches cannot show a banner Admin later hid.
+  - Drop-out notices are not closed at Start.
+- **Amends:** [D-2026-11-09-07](#d-2026-11-09-07) (three levels), [D-2026-11-09-08](#d-2026-11-09-08) (invite code), [D-2026-11-11-03](#d-2026-11-11-03) (risk accepted, Admin listing), [D-2026-11-11-11](#d-2026-11-11-11) (leftovers answered).
+- **References:** [mockup logs dated 2026-11-11](../mockup-changes/README.md), [identity database design](../database_design/product/player-information/modules/identity.md), migrations `20261112000100_round2_profiles_banners_invites` and `20261112000200`, [real-mode ticket status](README.md).

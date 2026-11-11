@@ -1,6 +1,6 @@
 # Edit profile › Links: the four link fields stack one per row
 
-Status: NEW
+Status: IN MOCK APP — #751
 Date: 2026-11-11
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › My profile › Edit profile › Personal › Links

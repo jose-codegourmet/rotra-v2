@@ -3,7 +3,7 @@
 > **November 8, 2026:** The owner decisions in [Offline operation and recovery](../../business_logic/product/queue/modules/offline/README.md) supersede conflicting earlier offline, device, finalization, payment and conflict rules below. Late-record recovery and implementation details remain open.
 
 
-**Last verified:** 2026-11-07 for player login mapping and claim-link rules (#244) and the MVP offline-start note (D-2026-11-07-03); 2026-11-06 for the On court, substitution-credit, court-fill, cancelled-session and times-and-days decisions (column names settled; drafted in `20261106000100`); 2026-11-01 for the F07.34 wiring gaps (#317).
+**Last verified:** 2026-11-12 for the round-2 columns (D-2026-11-12-01); 2026-11-07 for player login mapping and claim-link rules (#244) and the MVP offline-start note (D-2026-11-07-03); 2026-11-06 for the On court, substitution-credit, court-fill, cancelled-session and times-and-days decisions (column names settled; drafted in `20261106000100`); 2026-11-01 for the F07.34 wiring gaps (#317).
 
 **Status:** Review register, not a questionnaire or approval request for writing these docs.
 
@@ -46,6 +46,13 @@ and [schema dependencies](schema-dependencies.md) identify their consumers.
 - Phone/contact conflict handling and aliasing duplicate offline club-player IDs without rewriting confirmed history.
 - Sequence formatting above 9999 (the city registry, Admin-added cities and founding-location corrections were settled November 11, 2026).
 - Refunds, offline expiry enforcement, flag targeting, and when offline devices pick up flag changes (renewal dates and overlapping terms were settled November 11, 2026). (Per-club prices, free tester clubs, owner-added clubs and owner-created flags were settled October 27, 2026.)
+
+## Owner decisions recorded November 12, 2026
+
+Source: [D-2026-11-12-01](../../mvp/decisions.md#d-2026-11-12-01), built in migrations `20261112000100_round2_profiles_banners_invites` and `20261112000200`.
+
+- **Settled:** `players.profile_visibility` enum (`public` · `private` · `always_private`) plus `players.hidden_from_directory`; existing Private maps to `private`, others to `public`, new registrations default `private`. `clubs.invite_code` (one column, every club backfilled). `profile_banners` table and `profile-banners` Storage bucket modelled on characters, `players.banner_id`; the default banner is the first shown one. Unclaimed `players` rows were moved onto `club_players` and their RTR IDs released.
+- **Still open:** a stored marker that distinguishes a club-only record whose phone lookup found nobody (“Lookup pending”) from “Unclaimed”; whether Admin › Add player may still create an unclaimed `players` row with an RTR ID; the invite code shown to anyone who opens the public club page (Join sends it); the banner picker for a banner Admin later hid; closing drop-out notices at Start; an attribution history per linked club record.
 
 ## Owner decisions recorded November 11, 2026
 

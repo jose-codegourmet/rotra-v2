@@ -1,6 +1,6 @@
 # Avatar photo viewer: tap a picture to see the full photo (#716, proposed; Queue part)
 
-Status: NEW
+Status: IN MOCK APP — #758
 Date: 2026-11-11
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Every avatar that shows a picture; Full-photo viewer; Profile sheet big photo

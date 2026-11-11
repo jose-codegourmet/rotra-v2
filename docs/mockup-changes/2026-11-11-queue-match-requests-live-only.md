@@ -1,6 +1,6 @@
 # Requests: join requests before Start, match requests after; the live console shows Match requests at the upper right
 
-Status: NEW
+Status: IN MOCK APP — #756
 Date: 2026-11-11
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Preparation › Requests card (and the Requests sheet)

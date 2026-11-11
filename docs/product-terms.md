@@ -1,6 +1,6 @@
 # Product terms — ROTRA v1
 
-**Last verified:** 2026-11-11 · **Owner:** product owner · **Single source of vocabulary.** If a word here
+**Last verified:** 2026-11-12 · **Owner:** product owner · **Single source of vocabulary.** If a word here
 disagrees with a business, screen, or database doc, this file is wrong and must be fixed in the same PR.
 
 **Read this when** a task uses a domain word, or names a type, component, route, query key, enum value,
@@ -100,6 +100,7 @@ Rules: [Players](business_logic/product/queue/modules/players/README.md) ·
 | Public club page | A club's public page at `/clubs/[clubId]` in Player Information (epic P07): header, members, upcoming sessions and a calendar. Not the club's session page and not the invite link ([D-2026-11-11-11](mvp/decisions.md#d-2026-11-11-11)) |
 | Player ID / RTR ID | Permanent identifier given when the player registers, e.g. `RTR-PH-CEB-031526-0001` ([D-2026-11-11-03](mvp/decisions.md#d-2026-11-11-03)). Never a database key |
 | Invite (link) / Registration invite | Per-guest link for a guest or unclaimed profile to create or claim an account. Never books a session ([D-2026-11-09-06](mvp/decisions.md#d-2026-11-09-06)) |
+| Club invite code | The secret `k` value of the club invite link (`/register/[clubId]?k=<code>`), stored in `clubs.invite_code`; every club has one, a plain link without a valid code is refused, and Regenerate link replaces it ([D-2026-11-12-01](mvp/decisions.md#d-2026-11-12-01)) |
 | Club invite link | One standing link per club (`/register/[clubId]`) with a share card; a new person registers through it and joins the club's Saved players (“Joined via club link”), a signed-in player taps once to join ([D-2026-11-09-06](mvp/decisions.md#d-2026-11-09-06), [D-2026-11-09-08](mvp/decisions.md#d-2026-11-09-08)) |
 | Joined via | How a saved player entered the club: “Joined via club link”, “Joined via session link” or “Added by the club” ([D-2026-11-09-06](mvp/decisions.md#d-2026-11-09-06)) |
 | Guest linking | The QM merges a guest record into a saved player: **Link** on a join request whose phone matches, or **Link to saved player…** on the guest's record. Nothing merges by itself ([D-2026-11-09-06](mvp/decisions.md#d-2026-11-09-06)) |
@@ -322,9 +323,9 @@ from the [database design](database_design/product/README.md). Add a row here **
 | Leaderboard entry | `LeaderboardEntry` | — | Public projection, no table; overall position comes from eligible fixture order |
 | Player session record / player game | `PlayerSessionRecord` / `PlayerGame` | `player_match_facts` | Public read projection of valid finalized games |
 | Player profile | `PlayerProfile` | — | Public identity, picture, and optional playing details; no contacts |
-| Profile visibility | `profileVisibility` | `players.profile_visibility` | `public` · `private` (default) · `always_private`; replaces `profile_private` (D-2026-11-12-01) |
+| Profile visibility | `profileVisibility` | `players.profile_visibility` | `public` · `private` (default) · `always_private`; replaces `profile_private` ([D-2026-11-12-01](mvp/decisions.md#d-2026-11-12-01)) |
 | Hidden from Player Information | `hiddenFromDirectory` | `players.hidden_from_directory` | Boolean, default false; left out of Queue's Add player › Player Information and RTR ID search and of public club member lists |
-| Profile banner | `bannerId` | `players.banner_id` → `profile_banners` | Null = default banner; library managed in Admin (proposed) |
+| Profile banner | `bannerId` | `players.banner_id` → `profile_banners` | Null = default banner; library managed in Admin; the default is the first shown banner |
 | Player account | `PlayerAccount` | `player_accounts` | Claimed sign-in link for a player; `MyAccount` is the owner-only read of it in the mock phase |
 | Player private contact | `PlayerPrivateContact` | `player_private_contacts` | Phone, email and phone privacy; never in a public projection |
 | Player social link | `PlayerSocialLink` | `player_social_links` | Facebook, Instagram, YouTube or LinkedIn URL; a description, never a sign-in method |

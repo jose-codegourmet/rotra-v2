@@ -1,6 +1,6 @@
 # Admin › Settings › Profile banners: the owner manages the banners players can pick
 
-Status: NEW
+Status: IN MOCK APP — #754
 Date: 2026-11-11
 App: admin
 Mockup: apps/mockup/admin-app/rotra-admin.html › Settings › Profile banners

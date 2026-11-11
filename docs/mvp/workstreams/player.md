@@ -42,7 +42,8 @@ password recovery through Admin-reviewed requests (#491).
 | Claim-link issuance — Admin | not implemented | `admin-player/mutations.ts:229` `issueRegistrationLink` mock only | none found |
 | Forgot Password screen | implemented in #491; schema applied | `/api/auth/password-reset` saves an Admin review request; no automatic email | #491 |
 | Reset password (`/reset-password/[token]`) | implemented in #491; schema applied | Reviewed digest + provider expiry/single use, mapped player check, new password chosen by player | #491 |
-| Guest registration (without an existing-profile claim link) | implemented | `/register/[clubId]` → `useGuestRegistration` → `/api/register/[clubId]` → `db/src/player/guest-registration.ts`; unique contacts, recoverable claim staging, no guest linkage. Local database + simulated-provider flow verified; production provider not exercised | #490 |
+| Guest registration (without an existing-profile claim link) | implemented | `/register/[clubId]` → `useGuestRegistration` → `/api/register/[clubId]` → `db/src/player/guest-registration.ts`; unique contacts, recoverable claim staging, no guest linkage. Once the account exists the new player is saved to the originating club (`addPlayerToClub` in `my-clubs.ts`, D-2026-11-09-06, #707); a failed join does not fail the registration. Local database + simulated-provider flow verified; production provider not exercised | #490, #707 |
+| Club invite code (`/register/[clubId]?k=<code>`) | not connected | No column or table stores the code yet (designed in `database_design/product/admin/modules/clubs-licenses.md`, D-2026-11-09-08), so real mode ignores `k`: the link opens the plain club link (register, or **Join <club>** when signed in). With no code, `clubInviteUrl` prints the plain link, never an empty `?k=` (#707). Regenerate link stays not connected. Validating `k` needs a migration | #707 |
 
 ## Remaining work
 

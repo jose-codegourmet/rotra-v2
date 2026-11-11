@@ -355,12 +355,12 @@ export function ClubSettings({ section }: ClubSettingsProps) {
     />
   ) : section === 'invite' ? (
     <ClubInvitePanel
-      link={clubInviteUrl(data.id, data.inviteCode ?? '')}
+      link={clubInviteUrl(data.id, data.inviteCode)}
       onCopyLink={() => {
         const unavailable = () => toast('Select the link and copy it')
         try {
           navigator.clipboard
-            .writeText(clubInviteUrl(data.id, data.inviteCode ?? ''))
+            .writeText(clubInviteUrl(data.id, data.inviteCode))
             .then(() => toast('Club invite link copied'), unavailable)
         } catch {
           unavailable()

@@ -1,0 +1,26 @@
+// The profile banner library players pick from (D-2026-11-11-11), modelled on `profile_characters`.
+// Only the platform owner adds, hides, deletes and restores rows, through the Admin server; players
+// reference a row through `players.banner_id`, so a row is never removed: delete is a soft delete.
+
+/// One library banner. Players see shown, not deleted rows in upload order; at least 2 stay shown
+/// (enforced by the Admin server). Seeded with the six mock banners (court, night, dusk, ember, sun,
+/// stripe), whose `image` is '' because the apps draw them from theme tokens by id.
+model ProfileBanner {
+  /// A seeded key (lowercase word) or a client UUID (CHECK in SQL).
+  id         String    @id
+  /// '' for a seeded, token-drawn banner; otherwise the public `profile-banners` Storage URL of the
+  /// 3:1 image.
+  image      String
+  shown      Boolean   @default(true)
+  /// Upload time; the order players and Admin see. Strictly increasing per upload.
+  uploadedAt DateTime  @default(now()) @map("uploaded_at") @db.Timestamptz(6)
+  /// Running upload number; Admin labels the image "Banner <number>" (> 0, CHECK in SQL).
+  number     Int       @unique
+  /// Set by Delete, cleared by Undo. A deleted row still resolves for players who use it.
+  deletedAt  DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  players Player[]
+
+  @@index([uploadedAt, number])
+  @@map("profile_banners")
+}

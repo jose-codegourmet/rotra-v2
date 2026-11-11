@@ -76,15 +76,35 @@ SELECT pg_temp.expect_rejected('duplicate club name key', $q$
 SELECT pg_temp.expect_rejected('duplicate club username', $q$
   UPDATE club_accounts SET username = 'fictional-shuttle' WHERE club_id = 'c1000000-0000-4000-8000-00000000000b' $q$);
 SELECT pg_temp.expect_rejected('duplicate phone across players', $q$
-  UPDATE player_private_contacts SET phone_e164 = '+639175550101' WHERE player_id = '91000000-0000-4000-8000-000000000002' $q$);
+  UPDATE player_private_contacts SET phone_e164 = '+639175550101' WHERE player_id = '91000000-0000-4000-8000-000000000003' $q$);
 SELECT pg_temp.expect_rejected('second RTR ID for the same player', $q$
   INSERT INTO player_id_allocations (player_id, rtr_id, creating_club_id, location_code_id, country_code, city_code, sync_date, sequence)
   VALUES ('91000000-0000-4000-8000-000000000001', 'RTR-PH-CEB-100926-0009', 'c1000000-0000-4000-8000-00000000000a', '10c00000-0000-4000-8000-000000000001', 'PH', 'CEB', '2026-10-09', 9) $q$);
 SELECT pg_temp.expect_rejected('RTR ID rewritten', $q$
   UPDATE player_id_allocations SET rtr_id = 'RTR-PH-CEB-100926-0099' WHERE player_id = '91000000-0000-4000-8000-000000000001' $q$);
 SELECT pg_temp.expect_rejected('claimed account without an email', $q$
+  WITH p AS (INSERT INTO players (id, full_name, updated_at) VALUES ('91000000-0000-4000-8000-0000000000e2', 'No Email', now()) RETURNING id),
+       c AS (INSERT INTO player_private_contacts (player_id, phone_e164, updated_at) SELECT id, '+639175550122', now() FROM p)
   INSERT INTO player_accounts (player_id, auth_provider, auth_subject, claimed_at, contact_sync_version, updated_at)
-  VALUES ('91000000-0000-4000-8000-000000000002', 'supabase', gen_random_uuid(), now(), 1, now()) $q$);
+  SELECT id, 'supabase', gen_random_uuid(), now(), 1, now() FROM p $q$);
+SELECT pg_temp.expect_rejected('registered player with an unknown banner', $q$
+  UPDATE players SET banner_id = 'nope' WHERE id = '91000000-0000-4000-8000-000000000001' $q$);
+SELECT pg_temp.expect_rejected('banner used by a player deleted', $q$ DELETE FROM profile_banners WHERE id = 'night' $q$);
+SELECT pg_temp.expect_rejected('banner id outside the key or UUID format', $q$
+  INSERT INTO profile_banners (id, image, number) VALUES ('Night 2', '', 99) $q$);
+SELECT pg_temp.expect_rejected('duplicate club invite code', $q$
+  UPDATE clubs SET invite_code = 'FICTAAAA01' WHERE id = 'c1000000-0000-4000-8000-00000000000b' $q$);
+SELECT pg_temp.expect_rejected('lowercase club invite code', $q$
+  UPDATE clubs SET invite_code = 'abcdefgh' WHERE id = 'c1000000-0000-4000-8000-00000000000b' $q$);
+SELECT pg_temp.expect_accepted('new registration defaults to a private profile', $q$
+  INSERT INTO players (id, full_name, updated_at)
+  SELECT '91000000-0000-4000-8000-0000000000e3', 'Default Visibility', now()
+  RETURNING 1 / (profile_visibility = 'private' AND NOT hidden_from_directory)::int $q$);
+SELECT pg_temp.expect_accepted('a second club keeps its own unclaimed record for the same phone', $q$
+  WITH cp AS (INSERT INTO club_players (id, club_id, player_id, display_name, added_at, updated_at)
+    VALUES ('cb000000-0000-4000-8000-0000000000b9', 'c1000000-0000-4000-8000-00000000000b', NULL, 'Juan Dela Cruz', now(), now()) RETURNING id, club_id)
+  INSERT INTO club_player_private_inputs (club_player_id, club_id, phone_e164, captured_at, updated_at)
+  SELECT id, club_id, '+639175550102', now(), now() FROM cp $q$);
 SELECT pg_temp.expect_rejected('same-name players stay distinct: duplicate roster entry for one club player', $q$
   INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present_changed_at, confirmed_at, joined_at, updated_at)
   VALUES (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a1', 'cb000000-0000-4000-8000-0000000000a1', 'X', now(), now(), now(), now()) $q$);
@@ -155,7 +175,7 @@ SELECT pg_temp.expect_rejected('duplicate fact for one match participant', $q$
   VALUES (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a1', '3a000000-0000-4000-8000-0000000a1001', 'e1000000-0000-4000-8000-0000000a1001',
     'cb000000-0000-4000-8000-0000000000a1', now(), 'doubles', 'A', 'A', true, true, 4, '{}', '{}', 2) $q$);
 SELECT pg_temp.expect_rejected('fact rewritten by a later identity link', $q$
-  UPDATE player_match_facts SET player_id_at_finalization = '91000000-0000-4000-8000-000000000002' WHERE id = 'fa000000-0000-4000-8000-0000000a1003' $q$);
+  UPDATE player_match_facts SET player_id_at_finalization = '91000000-0000-4000-8000-000000000003' WHERE id = 'fa000000-0000-4000-8000-0000000a1003' $q$);
 SELECT pg_temp.expect_rejected('finalization for an invalid session', $q$
   INSERT INTO session_finalizations (session_id, club_id, command_id, stream_manifest, manifest_digest, accepted_session_revision, policy_version_id, started_at, updated_at)
   SELECT '5e000000-0000-4000-8000-0000000000b1', 'c1000000-0000-4000-8000-00000000000b', gen_random_uuid(), '[]', sha256('[]'::bytea), 1, id, now(), now()

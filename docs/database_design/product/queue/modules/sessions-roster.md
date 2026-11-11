@@ -10,7 +10,7 @@
 |---|---|
 | `id` | UUID PK; can originate offline |
 | `club_id` | UUID FK to clubs; required |
-| `player_id` | Nullable UUID FK to global players; null for guests |
+| `player_id` | Nullable UUID FK to global players; null for guests **and for the club's own unclaimed profiles** ([D-2026-11-11-03](../../../../mvp/decisions.md#d-2026-11-11-03), migration `20261112000100_round2_profiles_banners_invites`): an unclaimed profile is a `club_players` row with no `players` row and no RTR ID, its phone kept in `club_player_private_inputs`; a linked row always points at a registered (claimed) player once the services follow. Two clubs with the same phone keep two separate records |
 | `display_name`, `nickname` | Required name, optional nickname; club-local display. For a linked row (`player_id` set) Saved players reads the global `players.full_name` / `players.nickname` instead, so a player's own name change shows (#705); this copy is what the club entered and stays the name for guests |
 | `added_at` | Timestamptz the club first saved this player; drives the Saved players “Added” filter and the derived “New players this week” count (Monday 00:00 Asia/Manila through now, inclusive; decision #301, October 31, 2026) |
 | `joined_via` | `club_link`, `session_link` or `added_by_club` ([D-2026-11-09-06](../../../../mvp/decisions.md#d-2026-11-09-06)): set when a registration through the club invite link or a session link adds the player, or when the club adds them (Add player, a confirmed guest request, a Player Information add). Shown as “Joined via club link” / “Joined via session link” / “Added by the club” |

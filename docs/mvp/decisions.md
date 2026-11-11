@@ -32,10 +32,10 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-09-10](#d-2026-11-09-10) | Uploaded pictures: keep only the current and the previous | approved | in progress | #619, #624, #626 | [Player](workstreams/player.md), [Queue](workstreams/queue.md), [Backend](workstreams/backend.md) |
 | [D-2026-11-09-11](#d-2026-11-09-11) | Session page and Queue refinements from the owner's artifact review | approved | in progress (Q18 Queue Master side in the mock app; request-format defaults decided 2026-11-10) | needed | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
 | [D-2026-11-09-12](#d-2026-11-09-12) | Club-set pictures for guests and unclaimed players | approved | in progress | #623, #628 | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
-| [D-2026-11-09-13](#d-2026-11-09-13) | Admin-managed profile character library | approved | in progress (mock app; real mode on branch `fix/real-mode-characters-clubs-sessions`, migration not applied) | #644, #645, #646 | [Admin](workstreams/admin.md), [Player](workstreams/player.md) |
+| [D-2026-11-09-13](#d-2026-11-09-13) | Admin-managed profile character library | approved | in progress (mock app; real mode merged in #703, migration applied) | #644, #645, #646 | [Admin](workstreams/admin.md), [Player](workstreams/player.md) |
 | [D-2026-11-09-14](#d-2026-11-09-14) | Admin edits everything on a player, with a beta-only password field | approved for MVP or beta only; signed off 2026-11-10 | in progress (mock app; real mode not started) | #647, #648, #649, #650 | [Admin](workstreams/admin.md) |
 | [D-2026-11-11-01](#d-2026-11-11-01) | Observability: OpenTelemetry traces to Grafana Cloud, plus a local Grafana stack | approved 2026-11-11 | implemented in the repository; Grafana Cloud stack and Vercel `OTEL_*` variables not set up yet | none | [Backend](workstreams/backend.md) |
-| [D-2026-11-11-02](#d-2026-11-11-02) | Join request: the player picks Join a slot or Be waitlisted, and can join from the waitlist | approved | in progress (mock app + real-mode services; migration not applied) | #706 | [Queue](workstreams/queue.md) |
+| [D-2026-11-11-02](#d-2026-11-11-02) | Join request: the player picks Join a slot or Be waitlisted, and can join from the waitlist | approved | in progress (mock app + real-mode services; migration applied 2026-11-11) | #706 | [Queue](workstreams/queue.md) |
 | [D-2026-11-11-03](#d-2026-11-11-03) | Guests and unclaimed profiles stay in their club | approved | not started (Queue mockup updated) | needed | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
 
 ## Status conventions
@@ -449,7 +449,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 ### D-2026-11-09-13 — Admin-managed profile character library
 - **Decision status:** approved (owner, November 9, 2026): the character pictures players choose from "will be controlled in the admin app", and the library is only images the platform owner uploads.
 - **Implementation status:** in progress — in the mock app (A07.1 CharacterGrid/ImageDropZone, A07.2 Admin library, A07.3 `/settings/profile-characters`). Real mode written on branch `fix/real-mode-characters-clubs-sessions` (draft tickets 408/409), not merged and not run against a database:
-  - Table `profile_characters` (`packages/db/prisma/schema/admin/profile-character.prisma`, migration `20261111000100_profile_characters`, **not applied**), seeded with the 24 mock characters under the same ids, so every saved `character:<id>` keeps resolving. Delete is a soft delete (`deleted_at`), so Undo works.
+  - Table `profile_characters` (`packages/db/prisma/schema/admin/profile-character.prisma`, migration `20261111000100_profile_characters`, applied), seeded with the 24 mock characters under the same ids, so every saved `character:<id>` keeps resolving. Delete is a soft delete (`deleted_at`), so Undo works.
   - Services in `packages/db/src/admin/profile-characters.ts`: Admin list, add (one image per request, PNG/JPEG/WebP up to 1 MB, bytes checked, stored at `profile-characters/<id>.<ext>`), show/hide, delete, restore, with the keep-8-shown rule on the server and an `admin_audit_events` row per change; a public list of shown images. `updatePlayerAvatar` accepts any id that exists, is shown and is not deleted.
   - Routes: Admin `/api/profile-characters` (GET, POST), `/shown`, `/[id]` (PATCH, DELETE), `/[id]/restore`; Player `/api/profile-characters/shown`; and `/api/profile-characters/[id]/image` in Queue, Player and Admin, which serves any library image (hidden and deleted too). In real mode `profileCharacterImage` falls back to that path for an id no loaded list named. The id `''` travels as `_` in a path.
   - **Setup by hand:** create the public Supabase Storage bucket `profile-characters` in the dashboard (images only: `image/png`, `image/jpeg`, `image/webp`; 1,048,576-byte object limit; no browser insert/update/delete policies), as `player-avatars` was.
@@ -495,7 +495,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 <a id="d-2026-11-11-02"></a>
 ### D-2026-11-11-02 — Join request: the player picks Join a slot or Be waitlisted, and can join from the waitlist
 - **Decision status:** approved (Jose, November 11, 2026, voice call; who picks answered in the implementation brief for #706)
-- **Implementation status:** in progress — mock app and real-mode services in #706; migration `20261111000200` drafted, not applied
+- **Implementation status:** in progress — mock app and real-mode services in #706; migration `20261111000200` applied 2026-11-11
 - **Ticket:** #706
 - **Roadmap:** MVP — [Queue](workstreams/queue.md)
 - **Decision:**

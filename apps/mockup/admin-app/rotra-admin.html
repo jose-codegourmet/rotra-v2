@@ -421,6 +421,16 @@ body:has(.player-select:checked) .shell-main { padding-bottom: 120px; }
 .ch-drop:hover, .ch-drop.over { border-color: var(--accent); background: var(--accent-subtle); }
 .ch-drop:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
 .ch-drop input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+/* A-BANNERS (owner comment, November 11, 2026): the profile banners players pick, managed like the characters. Wide tiles, 3:1. */
+.bn-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; }
+.bn-grid .ch-img { aspect-ratio: 3 / 1; border-radius: var(--r); }
+.bn-grid .ch-name { display: block; margin-top: 4px; font-size: 12px; color: var(--fg2); }
+.bn-court { background: linear-gradient(135deg, var(--accent-dim), var(--accent) 55%, var(--accent-subtle)); }
+.bn-night { background: linear-gradient(135deg, var(--elev), var(--overlay) 60%, var(--border-strong)); }
+.bn-dusk { background: linear-gradient(135deg, var(--overlay), var(--accent-dim)); }
+.bn-ember { background: linear-gradient(135deg, var(--error), var(--warn)); }
+.bn-sun { background: linear-gradient(135deg, var(--warn), var(--accent)); }
+.bn-stripe { background: repeating-linear-gradient(135deg, var(--accent-dim) 0 14px, var(--elev) 14px 28px); }
 .toast.undo { display: flex; align-items: center; justify-content: space-between; gap: 12px; pointer-events: auto; }
 .toast.undo button { background: none; border: 0; padding: 4px 6px; color: inherit; font-weight: 800; text-decoration: underline; cursor: pointer; }
 /* Photo viewer (#716, proposed): black overlay, photo centred, × top right; click the overlay, press × or Esc to close. */
@@ -639,6 +649,19 @@ const charName = (c) => c.name || `Character ${c.n}`;
 const charArt = (c) => (c.img ? `<img src="${c.img}" alt="">` : charFaceSVG(c.seed));
 const activeChars = () => S.chars.filter((c) => c.active);
 
+// ---------- Profile banners (owner comment, November 11, 2026) ----------
+// Like Discord banners: the strip across the top of a player's profile card. Players pick one of these; nothing is uploaded by
+// players. The platform owner manages the set here, exactly like the characters: upload, show or hide, delete. The six seeded
+// banners are the ones the Player prototype draws from its theme tokens; the prototype draws them instead of storing image files.
+const BANNER_MIN_ACTIVE = 2, BANNER_MAX_BYTES = 2 * 1024 * 1024;
+const BANNER_SEEDS = [['court', 'Court'], ['night', 'Night'], ['dusk', 'Dusk'], ['ember', 'Ember'], ['sun', 'Sun'], ['stripe', 'Stripe']];
+function seedBanners() {
+  return BANNER_SEEDS.map(([k, name], i) => ({ id: `bn${i + 1}`, n: i + 1, key: k, name, img: '', active: true, source: 'sample', added: ymdT('2026-01-05') + 9 * H }));
+}
+const bannerName = (b) => b.name || `Banner ${b.n}`;
+const bannerArt = (b) => (b.img ? `<img src="${b.img}" alt="">` : `<span class="bn-${b.key}" style="display:block;width:100%;height:100%" aria-hidden="true"></span>`);
+const activeBanners = () => S.banners.filter((b) => b.active);
+
 function freshState() {
   return {
     v: 1, online: true, offlineAt: null, me: null, denied: null, ended: false, screen: 'clubs', viewId: null,
@@ -646,6 +669,7 @@ function freshState() {
     config: [{ v: 1, assess: 70, perf: 30, threshold: 10, at: ymdT('2026-01-05') + 9 * H, by: OWNER }],
     flags: [],
     chars: seedChars(),
+    banners: seedBanners(),
     demo: { timeoutNext: false, failApply: false, failConfig: false, conflictConfig: false },
     ui: freshUi(),
   };
@@ -665,6 +689,7 @@ if (!S || S.v !== 1) S = freshState();
 // Saves from before per-club prices get the sample prices.
 // Saves from before the character library get the built-in characters.
 if (!Array.isArray(S.chars)) S.chars = seedChars();
+if (!Array.isArray(S.banners)) S.banners = seedBanners();
 S.clubs.forEach((c) => { if (!c.price) { const p = SEED_PRICE[c.id] || [1500, 15000]; c.price = { monthly: p[0], yearly: p[1] }; } });
 Object.assign(S.ui, { sheet: null, pendingGo: null, resetArmed: false, nav: false });
 S.ui.login.pending = false;
@@ -717,6 +742,7 @@ const I = {
   n_name: svg('<path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="m13.5 6.5 4 4"/>', 20, 2),
   n_rank: svg('<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>', 20, 2),
   n_flag: svg('<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>', 20, 2),
+  n_banner: svg('<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 13l5-4 4 3 4-5 5 6"/>', 20, 2),
   next: svg('<path d="m9 6 6 6-6 6"/>', 16, 2.4),
   n_face: svg('<circle cx="12" cy="12" r="9"/><path d="M9 10h.01M15 10h.01"/><path d="M8.5 14.5a4.5 4.5 0 0 0 7 0"/>', 20, 2),
   n_out: svg('<path d="M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4M10 17l5-5-5-5M15 12H3"/>', 20, 2),
@@ -887,7 +913,7 @@ function topBar() {
     <button class="btn xs" data-act="openDemo">Prototype</button>
   </div></header>${S.online ? '' : `<div class="band-off" role="status"><div class="in">${I.alert}<span><b>You're offline.</b> Showing what this browser loaded at ${fmtTime(S.offlineAt || Date.now())}. Activating licenses, approving requests and saving settings need an internet connection.</span></div></div>`}`;
 }
-const HERE = { clubs: 'clubs', club: 'clubs', players: 'players', player: 'players', sales: 'sales', contacts: 'contacts', review: 'contacts', names: 'names', passwords: 'passwords', config: 'config', flags: 'flags', chars: 'chars' };
+const HERE = { clubs: 'clubs', club: 'clubs', players: 'players', player: 'players', sales: 'sales', contacts: 'contacts', review: 'contacts', names: 'names', passwords: 'passwords', config: 'config', flags: 'flags', chars: 'chars', banners: 'banners' };
 function rail() {
   const here = HERE[S.screen];
   const link = (k, label, ic, count, hot) => `<button class="rail-link ${k === here ? 'on' : ''}" data-act="go" data-to="${k}" ${k === here ? 'aria-current="page"' : ''}>${ic}<span>${label}</span>${count != null ? `<span class="count ${hot && count ? 'hot' : ''}">${count}</span>` : ''}</button>`;
@@ -903,6 +929,7 @@ function rail() {
     ${link('config', 'Ranking', I.n_rank)}
     ${link('flags', 'Feature flags', I.n_flag, S.flags.length)}
     ${link('chars', 'Profile characters', I.n_face, S.chars.filter((c) => c.active).length)}
+    ${link('banners', 'Profile banners', I.n_banner, S.banners.filter((b) => b.active).length)}
     <div class="rail-end"><div class="rail-who">Signed in as<br><b>${OWNER}</b></div><button class="rail-link" data-act="signOut">${I.n_out}<span>Sign out</span></button></div>
   </nav>`;
 }
@@ -1467,6 +1494,17 @@ function viewChars() {
     <section class="ch-grid" aria-label="Character images">${all.map(item).join('')}</section>`);
 }
 
+// ---------- A-BANNERS (owner comment, November 11, 2026) ----------
+function viewBanners() {
+  const all = S.banners, shown = activeBanners().length, hidden = all.length - shown;
+  const item = (b) => `<div class="ch-item"><button type="button" class="ch-img" data-act="bannerToggle" data-id="${b.id}" aria-pressed="${b.active}" aria-label="${esc(bannerName(b))}, ${b.active ? 'shown' : 'hidden'}" title="${b.active ? 'Shown to players. Click to hide.' : 'Hidden from players. Click to show.'}">${bannerArt(b)}</button>
+    <span class="ch-name">${esc(bannerName(b))}</span>
+    <button type="button" class="ch-del" data-act="bannerDelete" data-id="${b.id}" aria-label="Delete ${esc(bannerName(b))}" title="Delete">${I.xs}</button></div>`;
+  return shell(`<div class="page-head"><h1>Profile banners</h1><p class="muted">The strip across the top of a player's profile card, like a Discord banner. Players pick one of the shown banners from Edit profile; they can't upload their own. Click a banner to hide or show it. ${shown} shown${hidden ? ` · ${hidden} hidden` : ''}.</p></div>
+    <label class="ch-drop" for="banner-file" data-drop="banners"><input id="banner-file" type="file" multiple accept="image/png,image/jpeg,image/webp" data-change="bannerFiles"><b>Drag banners here to upload</b><span class="small">or click to choose · PNG, JPG or WebP, up to 2 MB each · cropped to 3:1</span></label>
+    <section class="bn-grid" aria-label="Banner images">${all.map(item).join('')}</section>`);
+}
+
 // ---------- Sheets ----------
 function sheetWrap(title, body, foot, closable = true) {
   return `<div class="scrim" data-act="closeSheet"></div><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
@@ -1792,6 +1830,42 @@ async function addCharFiles(list) {
   }
   render();
   if (added) toast(`${plural(added, 'image')} added and shown to players.`);
+  if (skipped.length) toast(`Not added: ${skipped.join('; ')}.`);
+}
+// Banners are cropped to 3:1 (600 x 200 in the prototype), centred.
+function cropToWide(f) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(f), img = new Image();
+    img.onload = () => {
+      const w = img.naturalWidth, h = img.naturalHeight, cw = Math.min(w, h * 3), ch = cw / 3, cv = document.createElement('canvas');
+      cv.width = 600; cv.height = 200;
+      cv.getContext('2d').drawImage(img, (w - cw) / 2, (h - ch) / 2, cw, ch, 0, 0, 600, 200);
+      URL.revokeObjectURL(url);
+      resolve(cv.toDataURL(f.type === 'image/png' ? 'image/png' : 'image/jpeg', 0.86));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('unreadable')); };
+    img.src = url;
+  });
+}
+async function addBannerFiles(list) {
+  const files = [...(list || [])];
+  if (!files.length) return;
+  if (!S.online) { toast(OFFLINE_ERR); return; }
+  let added = 0;
+  const skipped = [];
+  for (const f of files) {
+    if (!/^image\/(png|jpeg|webp)$/.test(f.type)) { skipped.push(`${f.name} isn't a PNG, JPG or WebP image`); continue; }
+    if (f.size > BANNER_MAX_BYTES) { skipped.push(`${f.name} is over 2 MB`); continue; }
+    try {
+      const img = await cropToWide(f), n = Math.max(0, ...S.banners.map((b) => b.n)) + 1;
+      const id = `bn${Date.now()}-${n}`;
+      S.banners.push({ id, n, key: `x${n}`, name: '', img, active: true, source: 'upload', added: Date.now() });
+      log('banner', id, `Uploaded Banner ${n}.`);
+      added += 1;
+    } catch (e) { skipped.push(`${f.name} couldn't be read`); }
+  }
+  render();
+  if (added) toast(`${plural(added, 'banner')} added and shown to players.`);
   if (skipped.length) toast(`Not added: ${skipped.join('; ')}.`);
 }
 function toastUndo(text, undo) {
@@ -2130,6 +2204,25 @@ const ACT = {
     render();
     toastUndo(`${charName(c)} deleted.`, () => { S.chars.splice(Math.min(i, S.chars.length), 0, c); log('char', c.id, `Undid deleting ${charName(c)}.`); render(); });
   },
+  // Profile banners
+  bannerToggle: (el) => {
+    const b = S.banners.find((x) => x.id === el.dataset.id);
+    if (!S.online) { toast(OFFLINE_ERR); return; }
+    if (b.active && activeBanners().length <= BANNER_MIN_ACTIVE) { toast(`Keep at least ${BANNER_MIN_ACTIVE} banners shown, so players have a choice.`); return; }
+    b.active = !b.active;
+    log('banner', b.id, `${b.active ? 'Showed' : 'Hid'} ${bannerName(b)} in the player picker.`);
+    render();
+    document.querySelector(`.ch-img[data-id="${b.id}"]`)?.focus();
+  },
+  bannerDelete: (el) => {
+    if (!S.online) { toast(OFFLINE_ERR); return; }
+    const i = S.banners.findIndex((x) => x.id === el.dataset.id), b = S.banners[i];
+    if (b.active && activeBanners().length <= BANNER_MIN_ACTIVE) { toast(`Keep at least ${BANNER_MIN_ACTIVE} banners shown. Upload or show another one first.`); return; }
+    S.banners.splice(i, 1);
+    log('banner', b.id, `Deleted ${bannerName(b)}. Players who use it keep it.`);
+    render();
+    toastUndo(`${bannerName(b)} deleted.`, () => { S.banners.splice(Math.min(i, S.banners.length), 0, b); log('banner', b.id, `Undid deleting ${bannerName(b)}.`); render(); });
+  },
   // Prototype
   openDemo: () => { S.ui.sheet = { type: 'demo' }; S.ui.resetArmed = false; render(); },
   toggleOnline: () => { S.online = !S.online; S.offlineAt = S.online ? null : Date.now(); render(); },
@@ -2188,6 +2281,7 @@ const CHANGE = {
     cropToSquare(f).then((img) => { if (PIC === d) { d.draft = { kind: 'photo', img }; picRefresh('.pic-up input'); } }, () => { if (PIC === d) { d.err = "That file couldn't be read as an image."; picRefresh(); } });
   },
   charFiles: (el) => { addCharFiles(el.files); el.value = ''; },
+  bannerFiles: (el) => { addBannerFiles(el.files); el.value = ''; },
   plSize: (el) => { S.ui.playerSize = +el.value; S.ui.playerPage = 1; render(); },
 };
 document.addEventListener('change', (ev) => { const el = ev.target.closest('[data-change]'); if (el && CHANGE[el.dataset.change]) CHANGE[el.dataset.change](el); });
@@ -2211,10 +2305,10 @@ document.addEventListener('input', (ev) => {
   if (el.dataset.live !== undefined) render(); else save();
 });
 // Dropping images on the character drop zone uploads them.
-const dropZone = (ev) => ev.target.closest && ev.target.closest('[data-drop="chars"]');
+const dropZone = (ev) => ev.target.closest && ev.target.closest('[data-drop="chars"], [data-drop="banners"]');
 document.addEventListener('dragover', (ev) => { const z = dropZone(ev); if (!z) return; ev.preventDefault(); z.classList.add('over'); });
 document.addEventListener('dragleave', (ev) => { const z = dropZone(ev); if (z && !z.contains(ev.relatedTarget)) z.classList.remove('over'); });
-document.addEventListener('drop', (ev) => { const z = dropZone(ev); if (!z) return; ev.preventDefault(); z.classList.remove('over'); addCharFiles(ev.dataTransfer && ev.dataTransfer.files); });
+document.addEventListener('drop', (ev) => { const z = dropZone(ev); if (!z) return; ev.preventDefault(); z.classList.remove('over'); (z.dataset.drop === 'banners' ? addBannerFiles : addCharFiles)(ev.dataTransfer && ev.dataTransfer.files); });
 document.addEventListener('keydown', (ev) => {
   if (ev.key === 'Escape' && document.querySelector('.viewer')) { ACT.closePhoto(); return; }
   if (ev.key === 'Escape') { if (S.ui.sheet || document.querySelector('body > .sheet')) ACT.closeSheet(); else if (S.ui.nav) ACT.toggleNav(); }
@@ -2224,7 +2318,7 @@ document.addEventListener('keydown', (ev) => {
 let prototypeRouter;
 let prototypeReturn = null;
 let prototypeSignedIn = !!S.me;
-const adminPaths = { clubs: '/clubs', players: '/players', sales: '/sales', contacts: '/requests/contact-changes', names: '/requests/club-names', passwords: '/requests/password-resets', config: '/settings/ranking', flags: '/settings/feature-flags', chars: '/settings/profile-characters', login: '/login' };
+const adminPaths = { clubs: '/clubs', players: '/players', sales: '/sales', contacts: '/requests/contact-changes', names: '/requests/club-names', passwords: '/requests/password-resets', config: '/settings/ranking', flags: '/settings/feature-flags', chars: '/settings/profile-characters', banners: '/settings/profile-banners', login: '/login' };
 function prototypeBeforeRender() {
   if (S.me && !prototypeSignedIn && prototypeReturn) { const target = prototypeReturn; prototypeReturn = null; applyPrototypeRoute(target); }
   prototypeSignedIn = !!S.me;
@@ -2270,7 +2364,7 @@ function render() {
   let page;
   if (!S.me || S.screen === 'login') page = viewLogin();
   else if (S.denied) page = viewDenied();
-  else page = ({ clubs: viewClubs, club: viewClub, players: viewPlayers, sales: viewSales, player: viewPlayer, contacts: viewContacts, review: viewReview, names: viewNames, passwords: viewPasswordResets, config: viewConfig, flags: viewFlags, chars: viewChars }[S.screen] || viewClubs)();
+  else page = ({ clubs: viewClubs, club: viewClub, players: viewPlayers, sales: viewSales, player: viewPlayer, contacts: viewContacts, review: viewReview, names: viewNames, passwords: viewPasswordResets, config: viewConfig, flags: viewFlags, chars: viewChars, banners: viewBanners }[S.screen] || viewClubs)();
   const sh = S.ui.sheet;
   // Privileged sheets only render inside a signed-in owner session; the Prototype sheet is always available.
   const showSheet = sh && (sh.type === 'demo' || (S.me && !S.denied));

@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 16 · IN PROGRESS: 5 · IN MOCK APP: 106 · CANCELLED: 1 · MOCKUP ONLY: 4
+NEW: 17 · IN PROGRESS: 5 · IN MOCK APP: 106 · CANCELLED: 1 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -290,6 +290,7 @@ NEW: 16 · IN PROGRESS: 5 · IN MOCK APP: 106 · CANCELLED: 1 · MOCKUP ONLY: 4
 | [2026-11-10-queue-public-account-bar](2026-11-10-queue-public-account-bar.md) | Session page: account bar with Log in, or the signed-in Player and Sign out | public-account-bar (new), avatar, button | IN MOCK APP — #585 |
 | [2026-11-11-admin-avatar-photo-viewer](2026-11-11-admin-avatar-photo-viewer.md) | Admin: Click an avatar or club logo picture to see it in a black-overlay dialog (#716, proposed) | avatar, club-logo, photo-viewer dialog | NEW |
 | [2026-11-11-admin-license-no-start-date](2026-11-11-admin-license-no-start-date.md) | A-LICENSE: no Term starts field; the period is computed and shown read-only; history shows LIC number plus note | license-sheet, payment-history-table | NEW |
+| [2026-11-11-admin-profile-banners](2026-11-11-admin-profile-banners.md) | Admin › Settings › Profile banners: the owner manages the banners players can pick | image-library-page, drop-zone, image-tile | NEW |
 | [2026-11-11-player-avatar-photo-viewer](2026-11-11-player-avatar-photo-viewer.md) | Player: Tap a picture avatar to see the full photo in a black-overlay dialog (#716, proposed) | avatar (new optional view behaviour), photo-viewer dialog | NEW |
 | [2026-11-11-player-edit-profile-links-rows](2026-11-11-player-edit-profile-links-rows.md) | Edit profile › Links: the four link fields stack one per row | edit-profile-form, text-field | NEW |
 | [2026-11-11-player-profile-banner](2026-11-11-player-profile-banner.md) | Profile page: a public banner across the top of the profile card, like Discord | profile-hero | NEW |

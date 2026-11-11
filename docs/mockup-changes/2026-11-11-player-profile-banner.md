@@ -29,7 +29,7 @@ Superseded by: none
 - "please add a corner for updating banner", then "the banner settings should show only predefined banners. it should not be uploadable".
 - Changed: Edit profile › Name gets a **Profile banner** block under the picture row: six predefined banners as swatches (**Court**, **Night**, **Dusk**, **Ember**, **Sun**, **Stripe**; a radio group), the current one outlined, and the line **Selected: Court**. Tapping a swatch applies it at once with the toast **Banner updated**. No upload and no remove: the default is Court. The profile card shows the chosen banner. The banner is public, like the picture. Every banner is drawn from the theme tokens, so both themes hold up.
 - Copy added: **Profile banner**, **The strip across the top of your profile card. Public. Pick one of ROTRA's banners; your own images can't be uploaded.**, **Selected: NAME**, the six banner names, **Banner updated**.
-- Not decided: whether the set of banners is managed by the platform owner in Admin like profile characters ([D-2026-11-09-13](../mvp/decisions.md#d-2026-11-09-13)) or fixed in code. The mock fixes it in code.
+- The set is managed by the platform owner in Admin › Settings › Profile banners (owner comment, November 11, 2026; Admin log 2026-11-11-admin-profile-banners), like profile characters. The Player prototype shows the six seeded samples.
 
 ## Reuse plan
 - Reuses as is: card, avatar

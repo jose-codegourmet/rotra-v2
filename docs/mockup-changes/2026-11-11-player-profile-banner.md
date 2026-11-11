@@ -50,3 +50,4 @@ Superseded by: none
 
 ## Owner comment, November 11, 2026 (fifth): "avatar shape here needs to be circle"
 - Changed: the big 88 px profile picture on the profile card (and in the Edit profile preview) is a circle instead of a rounded square. The pencil button keeps its place at the bottom-right of the circle.
+- Also circles now (second “needs to be circle shape” comment): the share card picture (on screen and in the downloaded image), the large leaderboard podium picture and the 52 px avatar used on cards. No rounded-square avatar remains in the Player prototype.

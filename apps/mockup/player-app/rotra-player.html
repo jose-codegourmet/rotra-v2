@@ -125,7 +125,7 @@ button.conn:hover { border-color: var(--accent); background: var(--surface); }
 .chip.bad { color: var(--error); border-color: color-mix(in srgb, var(--error) 45%, transparent); background: var(--error-subtle); }
 .chip.solid { background: var(--elev); color: var(--fg); }
 .avatar { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 13px; background: var(--elev); color: var(--fg2); flex: none; }
-.avatar.lg { width: 52px; height: 52px; font-size: 18px; border-radius: 14px; background: var(--accent); color: var(--on-accent); font-weight: 800; }
+.avatar.lg { width: 52px; height: 52px; font-size: 18px; border-radius: 50%; background: var(--accent); color: var(--on-accent); font-weight: 800; }
 .avatar.photo { background: var(--elev); overflow: hidden; }
 .avatar.photo svg { width: 100%; height: 100%; display: block; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
@@ -329,7 +329,7 @@ a.srow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .pod-who { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center; min-width: 0; max-width: 100%; padding-inline: 4px; }
 .pod-who .avatar { position: relative; z-index: 1; width: 64px; height: 64px; font-size: 20px; margin-bottom: 8px; border-radius: 12px;
   box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px color-mix(in srgb, var(--accent) var(--glow), var(--border-strong)); }
-.pod.p1 .pod-who .avatar { width: 86px; height: 86px; font-size: 26px; border-radius: 14px;
+.pod.p1 .pod-who .avatar { width: 86px; height: 86px; font-size: 26px; border-radius: 50%;
   box-shadow: 0 0 0 3px var(--surface), 0 0 0 6px var(--accent), 0 0 32px 6px color-mix(in srgb, var(--accent) 50%, transparent); }
 .pod-name { position: relative; z-index: 1; font-weight: 700; font-size: 15px; line-height: 1.25; overflow-wrap: anywhere; }
 .pod.p1 .pod-name { font-size: 18px; }
@@ -523,7 +523,7 @@ a.srow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .sh-top { display: flex; align-items: center; gap: 12px; }
 .sh-top b { display: block; font-size: 16px; line-height: 1.2; }
 .sh-top div span { font-size: 12px; color: var(--qc-dim); }
-.sh-av { width: 52px; height: 52px; flex: none; border-radius: 14px; overflow: hidden; display: grid; place-items: center; background: var(--qc-accent); color: #0b0b0c; font-weight: 800; font-size: 18px; }
+.sh-av { width: 52px; height: 52px; flex: none; border-radius: 50%; overflow: hidden; display: grid; place-items: center; background: var(--qc-accent); color: #0b0b0c; font-weight: 800; font-size: 18px; }
 .sh-av img, .sh-av svg { width: 100%; height: 100%; object-fit: cover; display: block; }
 .sh-mid { flex: 1 1 auto; min-height: 0; overflow: hidden; display: flex; flex-direction: column; gap: 8px; }
 .sh-mid h3 { margin: 0; font-size: 22px; font-weight: 800; line-height: 1.15; color: var(--qc-fg); text-wrap: balance; }
@@ -1898,7 +1898,7 @@ async function drawShareCard(m, fmt) {
   let y = pad;
   // top: picture, name, nickname
   const p = m.top.p, img = await shareAvatar(p);
-  rr(pad, y, 52, 52, 14); x.save(); x.clip();
+  rr(pad, y, 52, 52, 26); x.save(); x.clip();
   x.fillStyle = ACC; x.fillRect(pad, y, 52, 52);
   if (img) x.drawImage(img, pad, y, 52, 52);
   else { x.fillStyle = '#0b0b0c'; font(800, 18); x.textAlign = 'center'; x.fillText(initials(p.name), pad + 26, y + 32); x.textAlign = 'left'; }

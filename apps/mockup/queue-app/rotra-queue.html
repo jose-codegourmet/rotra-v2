@@ -1150,6 +1150,25 @@ a.pcard.pub.pub-link { color: inherit; text-decoration: none; cursor: pointer; b
 button.pcard.pub.pub-link { font: inherit; color: inherit; cursor: pointer; border-radius: var(--r); width: 100%; background: none; border: 0; padding: 0; }
 button.pcard.pub.pub-link:hover .avatar, button.pcard.pub.pub-link:focus-visible .avatar { box-shadow: 0 0 0 4px var(--surface), 0 0 0 7px var(--accent); }
 .pp-head { display: flex; gap: 14px; align-items: center; }
+/* Owner comment, November 11, 2026: the participant profile reads like a Discord profile card. */
+.sheet.pp-sheet .sb { padding: 0; }
+.pp-card { position: relative; }
+.pp-banner { height: 84px; background: linear-gradient(135deg, var(--accent-dim), var(--accent) 55%, var(--accent-subtle)); }
+.pp-avatar { position: absolute; top: 44px; left: 20px; }
+.pp-avatar .avatar, .pp-avatar .photo-btn .avatar { box-shadow: 0 0 0 5px var(--surface); }
+.pp-body { padding: 52px 20px 20px; display: flex; flex-direction: column; gap: 12px; }
+.pp-name { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; }
+.pp-name b { font-size: 20px; font-weight: 800; letter-spacing: -.2px; }
+.chip.pp-level { border-color: color-mix(in srgb, var(--accent) 45%, transparent); background: var(--accent-subtle); color: var(--fg); }
+.pp-status { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--fg2); }
+.pp-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--fg2); box-shadow: 0 0 0 3px var(--surface), 0 0 0 4px var(--border-strong); }
+.pp-status.live .pp-dot { background: var(--accent); } .pp-status.live { color: var(--accent); }
+.pp-status.soon .pp-dot { background: var(--warn, var(--fg2)); }
+.pp-status.away .pp-dot { background: var(--border-strong); }
+.pp-sec { border: 1px solid var(--border); border-radius: var(--r); background: var(--bg); padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.pp-sec .label { font-size: 11px; letter-spacing: .6px; text-transform: uppercase; color: var(--fg2); font-weight: 700; }
+.pp-sec .kv { margin: 0; }
+.pp-sec .pp-stats > div { background: var(--surface); }
 .pp-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 0; }
 .pp-stats > div { border: 1px solid var(--border); border-radius: var(--r); padding: 10px 12px; background: var(--bg); }
 .pp-stats dt { font-size: 12px; color: var(--fg2); font-weight: 600; }
@@ -4567,17 +4586,28 @@ const SHEETS = {
   pubProfile(sh) {
     const p = P(sh.id), r = R(cur(), p.id);
     if (alwaysPrivate(p)) return sheetShell(esc(maskName(p.name)), `<div class="pp-private"><span class="avatar xl" aria-hidden="true">${esc(initials(maskName(p.name)))}</span><b>${esc(maskName(p.name))}</b><p class="muted">This player keeps their profile private.</p></div>`, '<button class="btn" data-act="closeSheet" data-autofocus>Close</button>');
-    const st = pubStats(p), city = regCity(p);
+    const st = pubStats(p), city = regCity(p), s = cur();
+    // Owner comment, November 11, 2026 ("like showing profile in discord"): banner, overlapping avatar, status line, level badge, stat tiles.
+    const a = r ? busyOf(s, p.id) : null, qi = r ? waiting(s).findIndex((m) => all(m).includes(p.id)) : -1;
+    const tonight = !r ? null : a ? (a.status === 'oncourt' ? `On court · getting ready · ${courtsOf(s, a)}` : `Playing · ${courtsOf(s, a)}`) : !r.present ? 'Away' : qi >= 0 ? `Queued · #${qi + 1}` : 'Free';
+    const tone = a ? (a.status === 'active' ? 'live' : 'soon') : r && !r.present ? 'away' : 'free';
     return sheetShell(esc(p.name), `
-      <div class="pp-head">${hasPhoto(p) ? `<button class="photo-btn" data-act="openPhoto" data-id="${esc(p.id)}" aria-label="View full photo of ${esc(p.name)}">${avatar(p, 'xl')}</button>` : avatar(p, 'xl')}<div class="stack tight"><div class="row">${identChip(p)}</div><span class="small muted">Registered ROTRA player</span></div></div>
-      <dl class="kv">
-        <dt>Nickname</dt><dd>${p.nick ? esc(p.nick) : '—'}</dd>
-        <dt>Level</dt><dd>${esc(lvLabel(r && r.level != null ? r.level : p.sugg))}</dd>
-        <dt>Registered in</dt><dd>${city ? esc(city) : '—'}</dd>
-        <dt>RTR ID</dt><dd>${p.rtr ? `<span class="mono small">${esc(p.rtr)}</span>` : '—'}</dd>
-      </dl>
-      <section class="stack tight" aria-labelledby="pp-stats-h"><h3 id="pp-stats-h" style="margin:0;font-size:14px">Stats · last 90 days</h3>${st ? `<dl class="pp-stats"><div><dt>Games played</dt><dd>${st.games}</dd></div><div><dt>Win rate</dt><dd>${st.rate}%</dd></div><div><dt>Wins</dt><dd>${st.wins}</dd></div><div><dt>Losses</dt><dd>${st.games - st.wins}</dd></div></dl>` : '<p class="muted">No games yet</p>'}</section>`,
-      `<button class="btn" data-act="closeSheet" data-autofocus>Close</button>${p.rtr ? `<a class="btn primary" href="/player/find/${encodeURIComponent(p.rtr)}" target="_blank" rel="noopener">Open ROTRA profile</a>` : ''}`);
+      <div class="pp-card">
+        <div class="pp-banner" aria-hidden="true"></div>
+        <div class="pp-avatar">${hasPhoto(p) ? `<button class="photo-btn" data-act="openPhoto" data-id="${esc(p.id)}" aria-label="View full photo of ${esc(p.name)}">${avatar(p, 'xl')}</button>` : avatar(p, 'xl')}</div>
+        <div class="pp-body">
+          <div class="pp-name"><b>${esc(p.name)}</b>${p.nick ? `<span class="muted">“${esc(p.nick)}”</span>` : ''}</div>
+          <div class="row" style="gap:8px">${identChip(p)}<span class="chip pp-level">${esc(lvLabel(r && r.level != null ? r.level : p.sugg))}</span></div>
+          ${tonight ? `<div class="pp-status ${tone}"><span class="pp-dot" aria-hidden="true"></span>Tonight · ${esc(tonight)}</div>` : ''}
+          <div class="pp-sec"><span class="label">About</span>
+            <dl class="kv">
+              <dt>Registered in</dt><dd>${city ? esc(city) : '—'}</dd>
+              <dt>RTR ID</dt><dd>${p.rtr ? `<span class="mono small">${esc(p.rtr)}</span>` : '—'}</dd>
+            </dl></div>
+          <div class="pp-sec"><span class="label">Stats · last 90 days</span>${st ? `<dl class="pp-stats"><div><dt>Games</dt><dd>${st.games}</dd></div><div><dt>Wins</dt><dd>${st.wins}</dd></div><div><dt>Losses</dt><dd>${st.games - st.wins}</dd></div><div><dt>Win rate</dt><dd>${st.rate}%</dd></div></dl>` : '<p class="muted" style="margin:0">No games yet</p>'}</div>
+        </div>
+      </div>`,
+      `<button class="btn" data-act="closeSheet" data-autofocus>Close</button>${p.rtr ? `<a class="btn primary" href="/player/find/${encodeURIComponent(p.rtr)}" target="_blank" rel="noopener">Open ROTRA profile</a>` : ''}`, false, 'pp-sheet');
   },
   // #716 (proposed): the full photo on a black overlay. Closes on the overlay, the × or Esc, back to what was open.
   photo(sh) {

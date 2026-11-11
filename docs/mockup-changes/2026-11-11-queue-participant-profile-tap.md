@@ -41,3 +41,9 @@ Superseded by: none
 
 ## Real app work
 - Signed-in viewer check, public profile reads (stats over the same 90-day window as rank), always-private handling (depends on #715's third visibility level), tile button and sheets in the player app session page and packages/ui.
+
+## Owner comment, November 11, 2026 (artifact thread on the Queue prototype)
+- "please update like showing profile in discord — the layout here looks so boring".
+- Changed: the participant profile sheet is now a profile card. A banner strip across the top (accent gradient from the existing tokens), the big photo overlapping the banner's bottom edge with a surface-coloured ring (still opens the full photo, #716), the name in bold with the nickname in quotes beside it, the **Registered** chip and a **level badge** on one row, then a **Tonight ·** status line with a coloured dot (Playing · Court N / On court · getting ready · Court N / Queued · #N / Free / Away, from the live session; hidden when the player is not on tonight's roster), then two boxed sections: **About** (Registered in, RTR ID) and **Stats · last 90 days** as four tiles (Games, Wins, Losses, Win rate) or “No games yet”. The sheet body has no padding so the banner runs edge to edge. Nickname and Level left the key-value list.
+- Copy added: **Tonight ·**, **About**, **Games**, **Wins**, **Losses**, **Win rate**. Removed: the **Nickname** and **Level** rows.
+- States added: status dot colours for playing (accent), getting ready, free and away; no status line when the player is not in this session.

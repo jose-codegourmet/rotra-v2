@@ -28,9 +28,21 @@ Provision a public Supabase Storage bucket named `player-avatars` with the expli
 The authenticated Player server verifies the owning player and revision, detects content from bytes,
 and writes `<player UUID>/<random UUID>.<png|jpg|gif|webp>` using `SUPABASE_SECRET_KEY`.
 Character choices store `character:<id>` and initials store null in `avatar_ref`; no schema migration.
-The `<id>` points at the Admin-managed character library (`profile_characters`, proposed in
-[configuration-requests](../../admin/modules/configuration-requests.md), D-2026-11-09-13); a hidden
+The `<id>` points at the Admin-managed character library (`profile_characters`, see
+[configuration-requests](../../admin/modules/configuration-requests.md#profile_characters-d-2026-11-09-13), D-2026-11-09-13); a hidden
 or deleted character still resolves for players who already use it.
+
+**Character library in real mode (tickets 408/409, branch `fix/real-mode-characters-clubs-sessions`,
+migration `20261111000100_profile_characters` not applied yet).** The server accepts a character
+choice only when the id exists in `profile_characters`, is shown and is not deleted (it no longer
+uses a fixed `''`/a–g list). The 24 seeded rows keep the mock ids `''` and a–w and their data: URL
+images. Uploaded images live in a separate public Storage bucket `profile-characters` at
+`<id>.<png|jpg|webp>`, written only by the Admin server with `SUPABASE_SECRET_KEY`. **Create it by
+hand** in the Supabase dashboard, as `player-avatars` was: public, allowlist `image/png`,
+`image/jpeg`, `image/webp`, a **1,048,576-byte** object limit, and no browser insert, update or
+delete policies. Screens resolve `character:<id>` from the loaded list, else from
+`GET /api/profile-characters/<id>/image` in their own app (Queue, Player, Admin), which redirects to
+the stored URL or serves a seeded data: image, for hidden and deleted rows too.
 Existing PNG URLs continue working. Club logo processing is unchanged.
 
 **Club-set pictures (owner request, November 9, 2026):** a club can set the picture of its own guests and unclaimed profiles; it follows the same current-and-previous rule (`avatar_ref` + `avatar_previous_ref`, [D-2026-11-09-10](../../../../mvp/decisions.md#d-2026-11-09-10)). Where a guest's picture is stored (guests have no `players` row) is not yet designed.
@@ -120,7 +132,7 @@ Fictional data only. Decided 2026-11-07 unless marked open.
 
 ## Club membership, email confirmation and registration location ([D-2026-11-09-06](../../../../mvp/decisions.md#d-2026-11-09-06))
 
-Club membership is a row in `club_players` (the club's saved players). Add `joined_via` with `club_link | session_link | added_by_club`, shown as “Joined via club link”, “Joined via session link” or “Added by the club”. **Leave club** deletes that row; game history stays. A player can have several rows. `player_private_contacts` (or the account mapping) gains nullable `email_confirmed_at`; while null, contact-change requests are refused. Admin-link registrations store the chosen city or province (from `location_codes`) as the RTR ID location; club and session links use the club's founding location. Report a problem has no table.
+Club membership is a row in `club_players` (the club's saved players). Add `joined_via` with `club_link | session_link | added_by_club`, shown as “Joined via club link”, “Joined via session link” or “Added by the club”. **Leave club** sets that row's `removed_at` and keeps it for history, never a hard delete (owner decision, F07.64); Join club again clears `removed_at`. Game history stays. A player can have several rows. `player_private_contacts` (or the account mapping) gains nullable `email_confirmed_at`; while null, contact-change requests are refused. Admin-link registrations store the chosen city or province (from `location_codes`) as the RTR ID location; club and session links use the club's founding location. Report a problem has no table.
 
 ## Guest registration implementation (#490)
 

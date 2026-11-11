@@ -32,7 +32,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-09-10](#d-2026-11-09-10) | Uploaded pictures: keep only the current and the previous | approved | in progress | #619, #624, #626 | [Player](workstreams/player.md), [Queue](workstreams/queue.md), [Backend](workstreams/backend.md) |
 | [D-2026-11-09-11](#d-2026-11-09-11) | Session page and Queue refinements from the owner's artifact review | approved | in progress (Q18 Queue Master side in the mock app; request-format defaults decided 2026-11-10) | needed | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
 | [D-2026-11-09-12](#d-2026-11-09-12) | Club-set pictures for guests and unclaimed players | approved | in progress | #623, #628 | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
-| [D-2026-11-09-13](#d-2026-11-09-13) | Admin-managed profile character library | approved | in progress (mock app; real mode not started) | #644, #645, #646 | [Admin](workstreams/admin.md), [Player](workstreams/player.md) |
+| [D-2026-11-09-13](#d-2026-11-09-13) | Admin-managed profile character library | approved | in progress (mock app; real mode on branch `fix/real-mode-characters-clubs-sessions`, migration not applied) | #644, #645, #646 | [Admin](workstreams/admin.md), [Player](workstreams/player.md) |
 | [D-2026-11-09-14](#d-2026-11-09-14) | Admin edits everything on a player, with a beta-only password field | approved for MVP or beta only; signed off 2026-11-10 | in progress (mock app; real mode not started) | #647, #648, #649, #650 | [Admin](workstreams/admin.md) |
 
 ## Status conventions
@@ -445,7 +445,12 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 <a id="d-2026-11-09-13"></a>
 ### D-2026-11-09-13 — Admin-managed profile character library
 - **Decision status:** approved (owner, November 9, 2026): the character pictures players choose from "will be controlled in the admin app", and the library is only images the platform owner uploads.
-- **Implementation status:** in progress — in the mock app (A07.1 CharacterGrid/ImageDropZone, A07.2 Admin library, A07.3 `/settings/profile-characters`); real mode not started (needs Supabase Storage and a `profile_characters` table).
+- **Implementation status:** in progress — in the mock app (A07.1 CharacterGrid/ImageDropZone, A07.2 Admin library, A07.3 `/settings/profile-characters`). Real mode written on branch `fix/real-mode-characters-clubs-sessions` (draft tickets 408/409), not merged and not run against a database:
+  - Table `profile_characters` (`packages/db/prisma/schema/admin/profile-character.prisma`, migration `20261111000100_profile_characters`, **not applied**), seeded with the 24 mock characters under the same ids, so every saved `character:<id>` keeps resolving. Delete is a soft delete (`deleted_at`), so Undo works.
+  - Services in `packages/db/src/admin/profile-characters.ts`: Admin list, add (one image per request, PNG/JPEG/WebP up to 1 MB, bytes checked, stored at `profile-characters/<id>.<ext>`), show/hide, delete, restore, with the keep-8-shown rule on the server and an `admin_audit_events` row per change; a public list of shown images. `updatePlayerAvatar` accepts any id that exists, is shown and is not deleted.
+  - Routes: Admin `/api/profile-characters` (GET, POST), `/shown`, `/[id]` (PATCH, DELETE), `/[id]/restore`; Player `/api/profile-characters/shown`; and `/api/profile-characters/[id]/image` in Queue, Player and Admin, which serves any library image (hidden and deleted too). In real mode `profileCharacterImage` falls back to that path for an id no loaded list named. The id `''` travels as `_` in a path.
+  - **Setup by hand:** create the public Supabase Storage bucket `profile-characters` in the dashboard (images only: `image/png`, `image/jpeg`, `image/webp`; 1,048,576-byte object limit; no browser insert/update/delete policies), as `player-avatars` was.
+  - Not covered: the Queue club picture editor (`PROFILE_CHARACTER_IDS`) and the screens that call `profilePictureSrc` from `@rotra/ui` (Queue lists, Admin player card and detail) still draw the built-in faces for ids `''`/a–g and initials for any other id; they do not read the library or the image route yet.
 - **Ticket:** #644, #645, #646
 - **Roadmap:** MVP — [Admin](workstreams/admin.md), [Player](workstreams/player.md)
 - **Decision:**

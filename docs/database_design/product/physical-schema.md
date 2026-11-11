@@ -310,3 +310,12 @@ issued identity, 32-byte digest, paired issuance lease and positive revision. Pa
 one pending request per email. Indexed player/reviewer FKs, status/time and newest-first list.
 RLS enabled; no anon/authenticated/PUBLIC grants. No existing data changes. Applied to ROTRA v2 ASIA
 on November 8, 2026 after explicit owner sign-off; expiry and passwords remain owned by Supabase Auth.
+
+## Tickets 408/409 — Profile character library
+
+`20261111000100_profile_characters` adds `profile_characters`: PK `id` (text, `''`/a–z or a
+lowercase UUID, CHECK), unique `number` (> 0, CHECK), index `(uploaded_at, number)`, image reference
+CHECK (`data:image/%` or `https://%`), nullable `deleted_at` (soft delete; no row is ever removed).
+Seeds the 24 mock characters with the same ids. No FKs: `players.avatar_ref` stores
+`character:<id>` as text. RLS enabled; no anon/authenticated/PUBLIC grants. Not applied yet; the
+public Storage bucket `profile-characters` is created by hand.

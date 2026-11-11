@@ -1,0 +1,22 @@
+// The profile character library players pick from (D-2026-11-09-13). Only the platform owner adds,
+// hides, deletes and restores rows, through the Admin server; players store `character:<id>` in
+// `players.avatar_ref`, so a row is never removed: delete is a soft delete (`deleted_at`).
+
+/// One library image. Players see shown, not deleted rows in upload order, 8 per page; at least 8
+/// stay shown (enforced by the Admin server). Seeded with the 24 mock characters, same ids.
+model ProfileCharacter {
+  /// The `<id>` of a `character:<id>` picture: a seeded id ('' or a–w) or a client UUID (CHECK in SQL).
+  id         String    @id
+  /// A data: URL (seeded rows) or the public `profile-characters` Storage URL of the square image.
+  image      String
+  shown      Boolean   @default(true)
+  /// Upload time; the order players and Admin see. Strictly increasing per upload.
+  uploadedAt DateTime  @default(now()) @map("uploaded_at") @db.Timestamptz(6)
+  /// Running upload number; Admin labels the image "Character <number>" (> 0, CHECK in SQL).
+  number     Int       @unique
+  /// Set by Delete, cleared by Undo. A deleted row still resolves for players who use it.
+  deletedAt  DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  @@index([uploadedAt, number])
+  @@map("profile_characters")
+}

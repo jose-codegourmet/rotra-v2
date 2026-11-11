@@ -1,6 +1,7 @@
 import 'server-only'
 import { randomUUID } from 'node:crypto'
 import { createClient } from '@supabase/supabase-js'
+import { isProfileCharacterPickable } from '../admin/profile-characters'
 import type { PlayerContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
 import { requireOwnPlayer, requireRevision } from '../service/authorize'
@@ -9,7 +10,6 @@ import { readMyAccount, readMyProfile } from './profile'
 
 const BUCKET = 'player-avatars'
 const MAX_PHOTO_BYTES = 2 * 1024 * 1024
-const CHARACTERS = new Set(['', 'a', 'b', 'c', 'd', 'e', 'f', 'g'])
 export type AvatarChoice =
   | { kind: 'initials' }
   | { kind: 'character'; id: string }
@@ -29,7 +29,8 @@ export async function updatePlayerAvatar(
   requireOwnPlayer(context, context.playerId)
   if (!/^\d{1,19}$/.test(expectedRevision) || BigInt(expectedRevision) >= 9223372036854775807n)
     throw new ServiceError('invalid', { revision: 'Reload and try again.' })
-  if (choice.kind === 'character' && !CHARACTERS.has(choice.id))
+  // Any library image that is shown and not deleted (D-2026-11-09-13); a hidden one can't be newly picked.
+  if (choice.kind === 'character' && !(await isProfileCharacterPickable(choice.id)))
     throw new ServiceError('invalid', { picture: 'Choose a character.' })
   if (choice.kind === 'photo' && !validPhoto(choice))
     throw new ServiceError('invalid', { picture: 'That image could not be read or exceeds 2 MiB.' })

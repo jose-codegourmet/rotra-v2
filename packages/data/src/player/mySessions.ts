@@ -1,10 +1,11 @@
 import { getSession } from '../auth/fetchers'
 import { JOSE_PLAYER_ID } from '../fixtures/players'
 import { requireOnline } from '../mock/bridge'
-import { MockError, NotConnectedError } from '../mock/errors'
+import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { readMockState } from '../mock/store'
 import { isRealDataMode } from '../real/mode'
+import { realGetMySessions } from '../real/my-sessions'
 import { playerProjection } from './projection'
 /** Matches existing sessionPageUrl fixtures; replace the origin before real-mode rollout. */
 export const PLAYER_QUEUE_ORIGIN = 'http://localhost:9000'
@@ -25,8 +26,34 @@ const date = (at: number | string) =>
     month: 'short',
     day: 'numeric',
   })
+const time = (at: number | string) =>
+  new Date(at).toLocaleTimeString('en-PH', {
+    timeZone: 'Asia/Manila',
+    hour: 'numeric',
+    minute: '2-digit',
+  })
+/** Saved sessions, shaped and labeled exactly as the mock rows below. */
+async function realMySessions(signal?: AbortSignal) {
+  const body = await realGetMySessions(signal)
+  const sessions: MySession[] = body.sessions.map((s) => ({
+    id: s.id,
+    title: s.title,
+    subtitle: `${date(s.start)} · ${time(s.start)}–${time(s.end)} · ${s.clubName}`,
+    href: queueSessionUrl(s.slug),
+    status: s.status,
+    waitlistPosition: s.waitlistPosition ?? undefined,
+  }))
+  const finished: MyFinishedSession[] = body.finished.slice(0, 2).map((s) => ({
+    id: s.id,
+    title: s.title,
+    subtitle: `${date(s.finishedAt)} · ${s.clubName}`,
+    published: s.published,
+  }))
+  const publication = Object.fromEntries(body.finished.map((s) => [s.id, s.published]))
+  return { sessions, finished, publication }
+}
 export async function getMySessions(signal?: AbortSignal) {
-  if (isRealDataMode()) throw new NotConnectedError()
+  if (isRealDataMode()) return realMySessions(signal)
   await delay(200, signal)
   requireOnline()
   const account = (await getSession('player'))?.account
@@ -54,12 +81,6 @@ export async function getMySessions(signal?: AbortSignal) {
       )
       if (!roster && index < 0 && !requested) return []
       const club = state.clubs.find((c) => c.id === s.clubId)
-      const time = (at: number) =>
-        new Date(at).toLocaleTimeString('en-PH', {
-          timeZone: 'Asia/Manila',
-          hour: 'numeric',
-          minute: '2-digit',
-        })
       return [
         {
           id: s.id,

@@ -27,18 +27,31 @@ current value to every month shown. RLS on; no public-client privileges.
 Sales reports are read-only views/functions over existing rows (`rotra_sales_*`, migration
 `20261108000300_admin_sales_reports`), computed on read in Manila days; no totals table.
 
-## `profile_characters` (proposed, [D-2026-11-09-13](../../../../mvp/decisions.md#d-2026-11-09-13))
+## `profile_characters` ([D-2026-11-09-13](../../../../mvp/decisions.md#d-2026-11-09-13))
 
 The character library players pick from, managed only by the platform owner in Admin › Settings ›
-Profile characters (mockup log 2026-11-09-admin-profile-characters; not built). Proposed fields: UUID
-PK; optional name (the prototype shows none and labels “Character N”); image reference (Storage
-object path in a separate admin-only-write bucket, for example `profile-characters`, images only,
-PNG/JPEG/WebP up to 1 MB, stored square); `shown` boolean (default true); `position` (upload order;
-players see shown rows by position, 8 per page); created-by admin FK and created time; revision.
-Keep at least 8 rows shown (enforced by the server handler). Delete is a soft delete or a
-retained Storage object, because a player whose `avatar_ref` is `character:<id>` keeps that picture
-after the image is hidden or deleted. The keep-two picture rule (D-2026-11-09-10) does not apply.
-Every change writes an `admin_audit_events` row. RLS: public read of shown rows; no client writes.
+Profile characters (mockup log 2026-11-09-admin-profile-characters).
+
+**Built (tickets 408/409, branch `fix/real-mode-characters-clubs-sessions`; migration
+`20261111000100_profile_characters`, not applied yet).** Fields: `id` text PK (a seeded id `''`/a–w
+or a lowercase UUID the Admin client picks, CHECK); `image` text (a data: URL for seeded rows or the
+public Storage URL, CHECK `data:image/%` or `https://%`); `shown` boolean (default true);
+`uploaded_at` timestamptz (upload order, strictly increasing); `number` int, unique, > 0 (“Character
+N”); `deleted_at` timestamptz, nullable (soft delete, so Undo works and `character:<id>` pictures
+keep resolving). Index `(uploaded_at, number)`. No name, no position column (upload order is the
+order), no created-by column: every change writes an `admin_audit_events` row
+(`profile_character.added|shown|hidden|deleted|restored`, target `profile_character`, metadata
+`{ number }`). Seeded with the 24 mock characters, same ids, images and order.
+
+Rules on the server (`packages/db/src/admin/profile-characters.ts`, one advisory lock per write):
+at least 8 rows stay shown (hide/delete refusals use the mock's copy); restore of a row already back
+is a conflict. Images are PNG/JPEG/WebP up to 1 MB, cropped square in the browser, bytes checked on
+the server, stored in the public bucket `profile-characters` at `<id>.<ext>` (created by hand; see
+[identity](../../player-information/modules/identity.md#profile-picture-storage-542)). The keep-two
+picture rule (D-2026-11-09-10) does not apply.
+
+RLS on; no anon/authenticated/PUBLIC privileges. The public read of shown rows is served by the
+Player and Admin servers (`GET /api/profile-characters/shown`), not by client RLS.
 
 ## `player_contact_change_requests`
 

@@ -1,18 +1,25 @@
 import { getSession } from '../auth/fetchers'
+import type { Club } from '../club/club.types'
 import { checkMockSave, requireOnline } from '../mock/bridge'
-import { MockError, NotConnectedError } from '../mock/errors'
+import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { mockStore, readMockState } from '../mock/store'
 import { isRealDataMode } from '../real/mode'
+import { realGetMyClubs, realJoinClub, realLeaveClub } from '../real/player-club'
+
+/** One row of Your clubs: what the card shows, in both modes. */
+export type MyClub = Pick<Club, 'id' | 'name' | 'initials' | 'logoUrl'> & {
+  joinedVia: 'club_link' | 'session_link' | 'club_added'
+}
 
 async function owner() {
-  if (isRealDataMode()) throw new NotConnectedError()
   requireOnline()
   const session = await getSession('player')
   if (!session) throw new MockError('permission', 'Sign in to see your clubs.')
   return session.account.id
 }
-export async function getMyClubs(signal?: AbortSignal) {
+export async function getMyClubs(signal?: AbortSignal): Promise<MyClub[]> {
+  if (isRealDataMode()) return realGetMyClubs(signal)
   await delay(200, signal)
   const id = await owner(),
     state = readMockState()
@@ -36,6 +43,7 @@ export async function getMyClubs(signal?: AbortSignal) {
     })
 }
 export async function joinClub(clubId: string) {
+  if (isRealDataMode()) return realJoinClub(clubId)
   await delay(400)
   const id = await owner()
   checkMockSave()
@@ -68,6 +76,7 @@ export async function joinClub(clubId: string) {
   return { playerId: id, clubId }
 }
 export async function leaveClub(clubId: string) {
+  if (isRealDataMode()) return realLeaveClub(clubId)
   await delay(400)
   const id = await owner()
   checkMockSave()

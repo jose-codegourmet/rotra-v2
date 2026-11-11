@@ -1,9 +1,10 @@
 import { getSession } from '../auth/fetchers'
-import { MockError, NotConnectedError } from '../mock/errors'
+import { MockError } from '../mock/errors'
 import { readMockState } from '../mock/store'
 import { profileCharacterImage } from '../profile-character/fetchers'
 import { maskPublicName } from '../public-session/publicSession.rules'
 import { isRealDataMode } from '../real/mode'
+import { realGetMyShareSession } from '../real/my-sessions'
 import { getPlayerGames, getPlayerProfile, getPlayerRank } from './fetchers'
 import type { PlayerShareGame, PlayerShareParticipant } from './player.types'
 import { isPrivatePlayer } from './visibility'
@@ -24,7 +25,6 @@ export async function getPlayerShareData(
   sessionId?: string,
   signal?: AbortSignal,
 ) {
-  if (isRealDataMode()) throw new NotConnectedError()
   if ((await getSession('player'))?.account.id !== playerId)
     throw new MockError('permission', 'Sign in to share your results.')
   const [profile, rank, history] = await Promise.all([
@@ -38,6 +38,39 @@ export async function getPlayerShareData(
     return rank?.levelIndex != null ? { kind: 'rank' as const, profile, rank, link } : null
   const session = history.find((s) => s.id === sessionId)
   if (!session) return null
+  if (isRealDataMode()) {
+    const saved = await realGetMyShareSession(sessionId, signal)
+    if (!saved.published)
+      return { kind: 'not-shared' as const, message: 'Results not shared yet by the club.' }
+    const real = (name: string, from?: PlayerShareParticipant): PlayerShareParticipant =>
+      from
+        ? { name: from.name, picture: profileCharacterImage(from.picture) ?? from.picture }
+        : { name: maskPublicName(name), picture: null }
+    const games: PlayerShareGame[] = session.games
+      .filter((game) => game.counting !== 'partial')
+      .map((game) => {
+        const people = saved.games[game.id]
+        const partnerPlayers = game.partners.map((n, i) => real(n, people?.partners[i])),
+          opponentPlayers = game.opponents.map((n, i) => real(n, people?.opponents[i]))
+        return {
+          ...game,
+          partners: partnerPlayers.map((p) => p.name),
+          opponents: opponentPlayers.map((p) => p.name),
+          partnerPlayers,
+          opponentPlayers,
+        }
+      })
+    const wins = games.filter((g) => g.result === 'won').length
+    return {
+      kind: 'session' as const,
+      profile,
+      session: { ...session, games },
+      position: saved.position,
+      wins,
+      losses: games.length - wins,
+      link,
+    }
+  }
   const publication = readMockState().publications[sessionId]
   if (!publication?.publishedSlides.includes('standings'))
     return { kind: 'not-shared' as const, message: 'Results not shared yet by the club.' }

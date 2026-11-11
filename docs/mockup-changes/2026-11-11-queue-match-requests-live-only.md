@@ -1,4 +1,4 @@
-# Requests before Start: no Match tab; match requests exist only while the session is live
+# Requests: join requests before Start, match requests after; the live console shows Match requests at the upper right
 
 Status: NEW
 Date: 2026-11-11
@@ -12,16 +12,16 @@ Supersedes: none
 Superseded by: none
 
 ## What changed
-- Before: the Requests card on the preparation page showed two tabs, **Join · N** and **Match · 0**, even though the session had not started.
-- After: before Start session the card has no tabs and lists join requests and drop-out notices only; its intro reads “Join requests and drop-out notices from the session page. Nothing changes until you act on one.” and the Requests count badge ignores match requests. Once the session is live the Join and Match tabs appear as before. The public page already offers **Request a match** only during a live session.
+- Before: the Requests card on the preparation page showed **Join · N** and **Match · 0** tabs before Start; on the live console a **Requests · N** button sat at the end of the actions row and only when something was waiting; the public page kept offering **Request to join** after Start.
+- After: no tabs anywhere. Before Start the Requests card lists join requests and drop-out notices only (intro: “Join requests and drop-out notices from the session page. Nothing changes until you act on one.”). At Start every pending join request is closed (the Start toast adds “· N join requests closed”) and the public page shows “The session has started, so online join requests are closed. Ask the Queue Master at the venue to add you.” instead of Request to join. On the live console a **Match requests · N** button sits at the **upper right** of the header, always visible, and turns the warn colour (bold) while any match request is waiting; it opens the Requests sheet, which lists match requests only (intro: “Match requests from players on the session page. Nothing changes until you act on one.”). The Overview card's row says **Match requests · N** too.
 
 ## Why
-- Owner comment on the Queue artifact, November 11, 2026: “this doesn't make sense because the game hasn't started yet, there shouldn't be match requests”.
+- Owner comments on the Queue artifact, November 11, 2026: “this doesn't make sense because the game hasn't started yet, there shouldn't be match requests” and “should be located upper right, noticeable color if there are match requests, since the session started there shouldn't be any join requests anymore”.
 
 ## Like for like
 - Compare at: 375 px and 1280 px, dark and light.
-- States: preparation with join requests, preparation with none, live session (tabs back), Requests sheet on the live console.
-- Copy: **Join requests and drop-out notices from the session page. Nothing changes until you act on one.** (before Start); the live copy is unchanged.
+- States: preparation with join requests, preparation with none, live console with 0 match requests (plain button, upper right), live console with waiting match requests (warn-coloured button), Requests sheet on the live console, public page after Start (closed card, for visitors and signed-in players).
+- Copy: **Join requests and drop-out notices from the session page. Nothing changes until you act on one.**; **Match requests from players on the session page. Nothing changes until you act on one.**; **Match requests · N**; **The session has started, so online join requests are closed. Ask the Queue Master at the venue to add you.**; Start toast suffix **· N join requests closed**.
 - Tokens: none
 - Known differences: none
 

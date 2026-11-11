@@ -120,6 +120,8 @@ button.conn:hover { border-color: var(--accent); background: var(--surface); }
 .btn:hover:not(:disabled) { background: var(--elev); }
 .btn:disabled { opacity: .45; cursor: not-allowed; }
 .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+/* Owner comment, November 11, 2026: the Match requests button turns a noticeable colour while requests are waiting. */
+.btn.attn { background: var(--warn); border-color: var(--warn); color: var(--on-accent); font-weight: 800; }
 .btn.primary:hover:not(:disabled) { background: var(--accent-dim); }
 .btn.danger { border-color: var(--error); color: var(--error); background: transparent; }
 .btn.danger.fill { background: var(--error); border-color: var(--error); color: #fff; }
@@ -3221,7 +3223,7 @@ const openDropOuts = (s) => (s.dropOuts || []).filter((x) => x.status === 'open'
 const mrNamed = (mr) => [mr.pid, ...(mr.partners || []), ...(mr.opponents || [])].filter(Boolean);
 // D-2026-11-09-05: a match request closes by itself when anyone named stops being present.
 const closeStaleMatchReqs = (s) => { openMatchReqs(s).forEach((mr) => { if (mrNamed(mr).some((pid) => !(R(s, pid) || {}).present)) mr.status = 'closed'; }); };
-const reqCount = (s) => { closeStaleMatchReqs(s); return pendingReqs(s).length + (s.status === 'active' ? openMatchReqs(s).length : 0) + openDropOuts(s).length; };
+const reqCount = (s) => { closeStaleMatchReqs(s); return s.status === 'active' ? openMatchReqs(s).length : pendingReqs(s).length + openDropOuts(s).length; };
 const inClub = (r) => !!r.account && saved().some((p) => p.rtr === r.account);
 const digitsOf = (v) => String(v || '').replace(/\D/g, '');
 // D-2026-11-09-06: a guest request whose phone matches a saved player is offered for linking; nothing merges until the QM taps Link.
@@ -3260,13 +3262,13 @@ function linkCard(s) {
 function requestsPanel(s, inSheet) {
   const joins = pendingReqs(s), drops = openDropOuts(s), mrs = openMatchReqs(s), done = (s.requests || []).filter((r) => r.status !== 'pending');
   const full = s.status !== 'active' && openSlots(s) === 0;
-  // Owner comment, November 11, 2026: match requests only exist once the session is live. Before Start there is no Match tab.
+  // Owner comments, November 11, 2026: before Start there are only join requests and drop-out notices; once the session is live there
+  // are only match requests (join requests close at Start; the Queue Master adds late players directly). So there are no tabs.
   const live = s.status === 'active';
-  const tab = live && S.ui.reqTab === 'match' ? 'match' : 'join';
-  const n = joins.length + drops.length + (live ? mrs.length : 0);
-  // D-2026-11-09-05: one Requests · N button with Join and Match tabs; drop-out notices sit at the top of Join.
-  const head = inSheet ? '' : `<div><h2>Requests${n ? ` · ${n}` : ''}</h2><p class="small muted">${live ? 'Join requests, drop-out notices and match requests' : 'Join requests and drop-out notices'} from the session page. Nothing changes until you act on one.</p></div>`;
-  const tabs = live ? `<div class="tabs" role="tablist" aria-label="Requests">${[['join', `Join · ${joins.length + drops.length}`], ['match', `Match · ${mrs.length}`]].map(([k, l]) => `<button role="tab" id="rqt-${k}" aria-selected="${tab === k}" aria-controls="rq-panel" data-act="reqTab" data-k="${k}">${l}</button>`).join('')}</div>` : '';
+  const tab = live ? 'match' : 'join';
+  const n = live ? mrs.length : joins.length + drops.length;
+  const head = inSheet ? '' : `<div><h2>Requests${n ? ` · ${n}` : ''}</h2><p class="small muted">${live ? 'Match requests from players on the session page' : 'Join requests and drop-out notices from the session page'}. Nothing changes until you act on one.</p></div>`;
+  const tabs = '';
   let body;
   if (tab === 'match') body = mrs.length ? `<div class="list">${mrs.map((mr) => matchReqCard(s, mr)).join('')}</div>` : '<p class="small muted">No match requests. Present players can ask for a match from the session page.</p>';
   else {
@@ -3353,6 +3355,8 @@ function joinCard(s) {
       return `<section class="card stack join-card">${notice('ok', `<b>Confirmed · waitlist #${wl + 1}</b><br>You're on the waitlist. ${asking ? 'You asked for a slot; the Queue Master confirms it.' : open > 0 ? `${open} slot${open === 1 ? ' is' : 's are'} open. Ask to join from the waitlist and the Queue Master confirms it.` : 'Ask the Queue Master about a slot.'}`)}
         ${asking ? `<button class="btn jc-btn" data-act="cancelJoinReq" data-id="${req.id}">Cancel request</button>` : canAsk ? '<button class="btn primary jc-btn" data-act="joinFromWaitlist">Join from waitlist</button>' : ''}</section>`;
     }
+    // Owner comment, November 11, 2026: no join requests once the session has started; the Queue Master adds late players at the venue.
+    if (s.status === 'active') return '<section class="card join-card"><p class="small muted">The session has started, so online join requests are closed. Ask the Queue Master at the venue to add you.</p></section>';
     if (req && req.status === 'pending') return `<section class="card stack join-card">${notice('warn', `<b>Request sent</b><br>Thanks, ${esc(v.name)}. ${wantOf(req) === 'waitlist' ? 'You asked to be waitlisted. ' : ''}The Queue Master confirms every request, usually at the venue. Your ${wantOf(req) === 'waitlist' ? 'place' : 'slot'} isn't held until they do.`)}<button class="btn jc-btn" data-act="cancelJoinReq" data-id="${req.id}">Cancel request</button></section>`;
     if (req && req.status === 'declined') return `<section class="card stack join-card">${notice('bad', '<b>Request not accepted</b><br>The Queue Master didn\'t confirm this request. Contact them if you think it\'s a mistake.')}</section>`;
     if (s.acceptReq === false) return '<section class="card join-card"><p class="small muted">This session isn\'t taking requests online. Contact the Queue Master to play.</p></section>';
@@ -3372,10 +3376,11 @@ function joinCard(s) {
     // D-2026-11-09-03: guests keep the status card plus the registration nudge; no My night card.
     return `<section class="card stack join-card">${notice(cls, `<b>${title}</b><br>${text}`)}<p class="small muted">Register to check in and see your matches.</p></section>`;
   }
+  if (s.status === 'active') return '<section class="card join-card"><p class="small muted">The session has started, so online join requests are closed. Ask the Queue Master at the venue to add you.</p></section>';
   if (s.acceptReq === false) return '<section class="card join-card"><p class="small muted">This session isn\'t taking requests online. Contact the Queue Master to play.</p></section>';
   return `<section class="card stack join-card"><div class="jc-top"><h2>Want to play?</h2>${slots}</div>
     ${s.roster.length ? skillMix(s.roster) : ''}
-    <p class="small muted">${s.status === 'active' ? 'The Queue Master can admit additional players. ' : open ? '' : 'Confirmed guests join the waitlist. '}Send a quick request and the Queue Master confirms it.</p>
+    <p class="small muted">${open ? '' : 'Confirmed guests join the waitlist. '}Send a quick request and the Queue Master confirms it.</p>
     <button class="btn primary jc-btn" data-act="openJoin">Request to join</button></section>`;
 }
 function slotMeter(s) {
@@ -3413,7 +3418,7 @@ function prepOverview(s) {
         <dt>Minimum</dt><dd>${s.minimum} completed games per player<br><span class="small muted">${live ? `Fixed after start · ${s.minAuto !== false ? 'Calculated before start' : 'Set by you'}.` : s.minAuto !== false ? `Calculated: ${playerCountOf(s)} players on ${est.usable} court${est.usable > 1 ? 's' : ''} for ${fmtDur(s.start, s.end)} gives about ${est.low}–${est.high} games each. Updates as the roster changes.` : `Set by you. The estimate suggests ${est.low}–${est.high}.`}</span></dd>
         <dt>Roster</dt><dd>${s.roster.length} confirmed · ${present} present</dd>
         ${s.finance ? (() => { const c = financeCalc(s.finance, s.courts.length, Math.round((s.end - s.start) / 60000), s.roster.length || s.expected); return `<dt>Costs</dt><dd>${peso(c.total)} estimated · ${peso(c.share)} a player to break even<br><span class="small muted">Players pay ${peso(c.perHead)}${c.custom ? ' (custom amount)' : ' (break-even)'}</span> · ${resultText(c)}</dd>`; })() : ''}${live && s.notes ? `<dt>Notes</dt><dd>${esc(s.notes)}</dd>` : ''}</dl>
-      ${live ? `<div class="row acts"><button class="btn sm" data-act="openAdjust">Courts and time</button><button class="btn sm" data-act="openAdd">Add player</button><button class="btn sm" data-act="openRequests">Requests · ${reqCount(s)}</button><button class="btn sm" data-act="openPayments">Payments</button></div>` : ''}</section>
+      ${live ? `<div class="row acts"><button class="btn sm" data-act="openAdjust">Courts and time</button><button class="btn sm" data-act="openAdd">Add player</button><button class="btn sm${reqCount(s) ? ' attn' : ''}" data-act="openRequests">Match requests · ${reqCount(s)}</button><button class="btn sm" data-act="openPayments">Payments</button></div>` : ''}</section>
       ${!live ? `<section class="card stack"><div class="between"><h2>This device</h2>${chip(dl[0], dl[1])}</div>
         <p class="small muted">Download the session so this device can keep running it if the venue's internet drops. A download on one device doesn't prepare any other device.</p>
         <div class="row"><button class="btn sm" data-act="download" ${!S.online || s.download === 'downloading' ? 'disabled' : ''}>${s.download === 'ready' ? 'Update download' : 'Download for offline use'}</button></div>
@@ -3562,9 +3567,10 @@ function viewConsole() {
   const endSt = endStatus(s);
   return `<main class="wrap">
     <div class="between">
-      <div class="stack tight"><div class="row"><span class="label">Live session</span>${chip(MODES[s.mode].label)}${chip(fmtFormats(s))}${chip(`Min ${s.minimum} games`)}</div>
+      <div class="between" style="align-items:flex-start;gap:12px"><div class="stack tight"><div class="row"><span class="label">Live session</span>${chip(MODES[s.mode].label)}${chip(fmtFormats(s))}${chip(`Min ${s.minimum} games`)}</div>
         <h1>${esc(s.title)}</h1><p class="muted small">${esc(s.venue)} · Started ${fmtWhen(s.startedAt, { lower: true })} · Ends ${fmtWhen(s.end, { lower: true })} · ${endSt.over ? `<span style="color:var(--warn)">${endSt.text}</span>` : endSt.text}</p></div>
-      <div class="row acts"><button class="btn sm" data-act="go" data-to="home">Home</button><button class="btn sm" data-act="go" data-to="prepare">Session settings</button><button class="btn sm" data-act="go" data-to="public">Public page</button><button class="btn sm" data-act="openPost">Copy Facebook post</button><button class="btn sm" data-act="openPayments">Payments</button><button class="btn sm" data-act="openAdjust">Courts and time</button>${reqCount(s) ? `<button class="btn sm primary" data-act="openRequests">Requests · ${reqCount(s)}</button>` : ''}</div>
+        ${(() => { const n = reqCount(s); return `<button class="btn sm${n ? ' attn' : ''}" style="flex:none" data-act="openRequests" aria-label="Match requests · ${n}${n ? ' waiting' : ''}">Match requests · ${n}</button>`; })()}</div>
+      <div class="row acts"><button class="btn sm" data-act="go" data-to="home">Home</button><button class="btn sm" data-act="go" data-to="prepare">Session settings</button><button class="btn sm" data-act="go" data-to="public">Public page</button><button class="btn sm" data-act="openPost">Copy Facebook post</button><button class="btn sm" data-act="openPayments">Payments</button><button class="btn sm" data-act="openAdjust">Courts and time</button></div>
     </div>
     ${!S.online ? notice('warn', 'Working offline on this device. Matches, results and roster changes save here and sync when you reconnect. Session done needs internet.') : ''}
     <div class="tabs" role="tablist" aria-label="Console views">
@@ -5993,7 +5999,10 @@ const ACT = {
     s.status = 'active'; s.startedAt = Date.now();
     s.courts.forEach((c) => { if (!c.startsAt || c.startsAt === s.start) c.startsAt = s.startedAt; });
     s.roster.forEach((r) => { r.locked = true; if (r.present) r.presentAt = s.startedAt; });
-    S.ui.sheet = null; S.ui.pane = 'live'; S.screen = 'console'; commit(`Session started · levels locked${newEnd ? ` · ends ${atWhen(s.end)}` : ''}`); render(); window.scrollTo(0, 0);
+    // Owner comment, November 11, 2026: join requests end at Start. Pending ones close; the public page tells visitors to ask at the venue.
+    const closed = (s.requests || []).filter((r) => r.status === 'pending');
+    closed.forEach((r) => { r.status = 'closed'; r.closedAt = s.startedAt; });
+    S.ui.sheet = null; S.ui.pane = 'live'; S.screen = 'console'; commit(`Session started · levels locked${newEnd ? ` · ends ${atWhen(s.end)}` : ''}${closed.length ? ` · ${closed.length} join request${closed.length === 1 ? '' : 's'} closed` : ''}`); render(); window.scrollTo(0, 0);
   },
   pane: (d) => { S.ui.pane = d.k; render(); },
   prepTab: (d) => { S.ui.prepTab = d.k; render(); const b = document.getElementById(`ptb-${d.k}`); if (b) b.focus(); },

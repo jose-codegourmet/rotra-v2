@@ -163,6 +163,8 @@ the ticket's generic copy; `generateMetadata` never throws.
 
 Individual presence uses a transient QueryClient/session-scoped DebouncedBatch overlay, observed by useSessionRoster. Accepted query data remains separate so background refetches cannot overwrite newer intent. useDebouncedBatch handles lifecycle flushes; setPresenceMany makes one guarded atomic mock write. Other roster mutations await pending presence first. Payments use the same helper: useSetPaymentMarks batches desired paid states, and useSessionPayments overlays intent onto accepted marks for every reader and derives totals with the existing paymentTotals rule. Both use 800 ms and flush on panel exit; this is not durable offline storage.
 
+The roster burst batch (#718) uses the same helper for structural changes: adding a player (saved, Player Information or new), removing a roster player, and accepting or declining a join request, in preparation and live. `session-roster/rosterBatch.ts` keys each tap (player added, row removed, request decided), lays the pending operations over the accepted roster read in `useSessionRoster` (temporary row ids until the server replies), and after 800 ms without another tap sends the burst in click order as one `applyRosterBatch` call: in the mock one `queueMutation` with one Roster sync entry; in real mode one `POST /api/sessions/[sessionId]/roster/batch` over `@rotra/db/queue/session-roster#applyRosterBatch`, one locked-session transaction that reuses the single-op rules and is repeat-safe per `operationId`. Add then remove of the same player before sending cancels out; accept then decline of the same request sends the last decision. A refused burst drops only its own operations from the overlay (later taps stay), and the last error callback the screen passed shows one toast with the server's reason. The hooks (`useAddSavedPlayerToSession`, `useRemoveRosterPlayer`, `useConfirmRequest`, `useDeclineJoinRequest`, …) keep `mutate(input, options)` and settle at once; `flushSessionRoster(sessionId)` runs where the presence flush runs (tab changes, Session done, page hide and exit), and every other roster command awaits both batches first.
+
 ```text
 @rotra/ui component (props)
   ◄── _components container ('use client')
@@ -324,7 +326,7 @@ authority and the interruption recovery path wait on
 [#246](https://github.com/jose-codegourmet/rotra-v2/issues/246) and durable storage on Q11; no route
 calls `registerDevice`, `enrollStream`, `uploadOperations`, `sealStream` or `resolveConflict` yet.
 `@rotra/data/batch` is a client-side debounce over each domain's own fetcher (presence, payment
-marks), so it needs no adapter. Known gap: the console's offline notice still says changes save on
+marks, and the roster burst batch of #718, whose real-mode fetcher is one Route Handler call), so it needs no adapter. Known gap: the console's offline notice still says changes save on
 this device, which is untrue in real mode until Q11.
 
 **Session cost and payments (#397).** In real mode `getSessionCostEstimate` calls Queue's

@@ -474,12 +474,13 @@ const rosterOf = (entry: WireRosterEntry): SessionPlayer => ({
   confirmedAt: msOf(entry.confirmedAt),
 })
 
-export async function realGetSessionRoster(sessionId: string) {
-  const wire = await realRequest<{
-    roster: WireRosterEntry[]
-    waitlist: WireWaitlistEntry[]
-    joinRequests: WireJoinRequest[]
-  }>(`/api/sessions/${encodeURIComponent(sessionId)}/roster`)
+export type WireRosterRead = {
+  roster: WireRosterEntry[]
+  waitlist: WireWaitlistEntry[]
+  joinRequests: WireJoinRequest[]
+}
+/** The roster GET body (and the roster batch reply's `roster`) as the hooks read it. */
+export function rosterReadOf(wire: WireRosterRead) {
   return {
     roster: wire.roster.map(rosterOf),
     waitlist: wire.waitlist.map(
@@ -499,6 +500,11 @@ export async function realGetSessionRoster(sessionId: string) {
       }),
     ),
   }
+}
+export async function realGetSessionRoster(sessionId: string) {
+  return rosterReadOf(
+    await realRequest<WireRosterRead>(`/api/sessions/${encodeURIComponent(sessionId)}/roster`),
+  )
 }
 
 export async function realAddNewPlayerToSession(input: {

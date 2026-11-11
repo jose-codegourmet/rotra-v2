@@ -33,6 +33,7 @@
 | Payments checklist (tick paid / not paid) | Allowed. Real mode (#397): a tick with no fee set is refused (#245) | Allowed locally. Real mode (#397) is online only until sync is wired (#399): nothing is sent and the error says you're offline | Sync as pending changes |
 | Guest sends a join request (public page) | Allowed while requests are on and the session is prepared or live | Not possible offline for the guest; the request goes straight to the server | — |
 | Confirm or decline a join request | Allowed | Allowed locally on a downloaded session (requests received before going offline) | Sync as pending roster changes |
+| Add player, remove roster player, confirm or decline a join request in a burst (#718) | Debounced background batch, optimistic: each tap applies at once and the burst saves 800 ms after the last tap as one request; one error toast rolls the whole burst back and keeps later taps. Real mode is online only | Mock: the burst saves locally on a downloaded session like other roster writes; without one it is refused and rolled back. Real mode: refused before sending, rolled back with the offline error | Sync as pending roster changes (mock) |
 | Club settings (club details, name-change request, password, license page) | Allowed | Unavailable (“Club settings need an internet connection.”) | — |
 | Cancel session (prepared only, before Start session) | Allowed after [D-CANCEL-SESSION](dialogs.md#d-cancel-session--cancel-session); final; pending join requests close; opens the cancelled record | Not specified (open); the prototype doesn't check the connection | Re-check the session is still prepared; if it started elsewhere, nothing is cancelled |
 | Open a cancelled session (calendar, day dialog, preparation URL) | Read-only cancelled session record: chip, reason, joined / waitlist / marked paid, roster, waitlist | Same, from what this device has | — |
@@ -130,6 +131,10 @@ The live clock refreshes eligibility every second, including while the Put on co
 ### Presence batches (mock, #324)
 
 Presence switches remain interactive while saving. A pending optimistic overlay survives query refetches and shows “Saving presence…”; no saved claim appears before acceptance. A failed batch removes only its unchanged revisions, leaving later taps intact, with one existing error toast. Offline without a downloaded copy, an expired prepared session, and finalizing/completed/invalid sessions reject the whole batch atomically. Active sessions keep the existing license-continuation exception. Before browser exit, initiate a flush and warn while it remains outstanding; destruction/reload still resets in-memory mock data.
+
+### Roster burst batches (#718)
+
+Add player, Remove and the join-request decisions stay interactive while a burst saves. Pending adds and accepted requests show as rows under temporary ids, removed rows and decided requests leave at once, and the overlay survives refetches until the server accepts the burst. One flush per burst, 800 ms after the last tap, in click order; add then remove of the same player cancels out, and the last decision on a request wins. A refused burst removes only its own rows from the overlay, leaves later taps intact, and shows one error toast with the server's reason. Before browser exit, a flush starts and the page warns while work remains outstanding. Remove keeps its per-item confirmation.
 
 ### Payment batches (mock, #300)
 

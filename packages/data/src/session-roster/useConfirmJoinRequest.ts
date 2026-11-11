@@ -1,6 +1,7 @@
 'use client'
-import { useMockMutation } from '../mock/query'
-import { confirmJoinRequest } from './mutations'
+import { enqueueAcceptRequest } from './enqueueRosterOps'
+import { useRosterEnqueue } from './useRosterEnqueue'
+/** Confirm a join request: applied at once, saved in the roster burst batch (#718). */
 export function useConfirmJoinRequest() {
-  return useMockMutation(confirmJoinRequest)
+  return useRosterEnqueue(enqueueAcceptRequest)
 }

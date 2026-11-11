@@ -1,5 +1,5 @@
 import { phoneField } from '@rotra/schema/phone'
-import { flushSessionPresence } from '../batch/flushBatches'
+import { flushSessionBatches, flushSessionPresence } from '../batch/flushBatches'
 import type { ClubPlayer } from '../club-player/clubPlayer.types'
 import { clubPlayerView } from '../club-player/fetchers'
 import { clubPlayerForProfile, createClubPlayer, directoryLevel } from '../club-player/mutations'
@@ -60,14 +60,16 @@ async function rosterMutation<T>(
   sessionId: string,
   change: (s: MockState) => { data: T; text: string },
 ) {
-  await flushSessionPresence(sessionId)
-  return queueMutation({ area: 'Roster', sessionId }, (s) => {
-    const result = change(s)
-    recomputeMinimum(s, sessionId)
-    // D-2026-11-09-05: a match request closes when anyone it names stops being present.
-    closeStaleMatchRequests(s, sessionId)
-    return result
-  })
+  // Pending roster and presence batches land first, so this command sees what the QM already did.
+  await flushSessionBatches(sessionId)
+  return queueMutation({ area: 'Roster', sessionId }, (s) => settleRoster(s, sessionId, change(s)))
+}
+/** What every roster write ends with: the calculated minimum and stale match requests. */
+export function settleRoster<T>(s: MockState, sessionId: string, result: T) {
+  recomputeMinimum(s, sessionId)
+  // D-2026-11-09-05: a match request closes when anyone it names stops being present.
+  closeStaleMatchRequests(s, sessionId)
+  return result
 }
 /**
  * Gives a club player a slot, or a waitlist place once a prepared session is full. `toWaitlist`
@@ -116,30 +118,33 @@ function identity(s: MockState, p: ClubPlayer, check?: IdentityCheck) {
   )
     fail('Confirm this player’s identity before adding them.')
 }
-export async function addSavedPlayerToSession(input: {
+export type AddSavedPlayerInput = {
   sessionId: string
   clubPlayerId: string
   level: PlayingLevel
   identityCheck?: IdentityCheck
-}) {
+}
+/** The mock write of Add player › Saved players; the roster batch (#718) applies it in order. */
+export function addSavedPlayerChange(s: MockState, input: AddSavedPlayerInput) {
+  const p = s.clubPlayers.find((p) => p.id === input.clubPlayerId && p.clubId === DEMO_CLUB_ID)
+  if (!p || (p.playerId && s.adminPlayerRecords[p.playerId]?.archivedAt))
+    fail('Player not available.')
+  identity(s, p, input.identityCheck)
+  const data = place(s, input.sessionId, p, input.level),
+    name = p.nickname || p.fullName.split(' ')[0]
+  return {
+    data,
+    text: data.waitlistPosition
+      ? `${name} added to the waitlist as #${data.waitlistPosition} · ${levelLabel(input.level)}`
+      : `${name} added · ${levelLabel(input.level)}${data.locked ? ' · level locked' : ''}`,
+  }
+}
+export async function addSavedPlayerToSession(input: AddSavedPlayerInput) {
   if (isRealDataMode()) {
-    await flushSessionPresence(input.sessionId)
+    await flushSessionBatches(input.sessionId)
     return realAddSavedPlayerToSession(input)
   }
-  return rosterMutation(input.sessionId, (s) => {
-    const p = s.clubPlayers.find((p) => p.id === input.clubPlayerId && p.clubId === DEMO_CLUB_ID)
-    if (!p || (p.playerId && s.adminPlayerRecords[p.playerId]?.archivedAt))
-      fail('Player not available.')
-    identity(s, p, input.identityCheck)
-    const data = place(s, input.sessionId, p, input.level),
-      name = p.nickname || p.fullName.split(' ')[0]
-    return {
-      data,
-      text: data.waitlistPosition
-        ? `${name} added to the waitlist as #${data.waitlistPosition} · ${levelLabel(input.level)}`
-        : `${name} added · ${levelLabel(input.level)}${data.locked ? ' · level locked' : ''}`,
-    }
-  })
+  return rosterMutation(input.sessionId, (s) => addSavedPlayerChange(s, input))
 }
 export async function playerDirectorySearch(q: string): Promise<DirectoryPlayer[]> {
   if (isRealDataMode()) return realPlayerDirectorySearch(q)
@@ -165,49 +170,53 @@ export async function playerDirectorySearch(q: string): Promise<DirectoryPlayer[
         ) && [p.fullName, p.nickname, p.rtrId].some((v) => v?.toLowerCase().includes(query)),
     )
 }
-export async function addDirectoryPlayerToSession(input: {
+export type AddDirectoryPlayerInput = {
   sessionId: string
   playerId: string
   level: PlayingLevel
   identityCheck?: IdentityCheck
-}) {
+}
+export function addDirectoryPlayerChange(s: MockState, input: AddDirectoryPlayerInput) {
+  const p = clubPlayerForProfile(s, input.playerId).player
+  identity(s, p, input.identityCheck)
+  const data = place(s, input.sessionId, p, input.level)
+  return {
+    data,
+    text: `${p.nickname || p.fullName.split(' ')[0]} added${data.waitlistPosition ? ` to the waitlist as #${data.waitlistPosition}` : ''} · ${levelLabel(input.level)}${!data.waitlistPosition && data.locked ? ' · level locked' : ''}`,
+  }
+}
+export async function addDirectoryPlayerToSession(input: AddDirectoryPlayerInput) {
   if (isRealDataMode()) {
-    await flushSessionPresence(input.sessionId)
+    await flushSessionBatches(input.sessionId)
     return realAddDirectoryPlayerToSession(input)
   }
-  return rosterMutation(input.sessionId, (s) => {
-    const p = clubPlayerForProfile(s, input.playerId).player
-    identity(s, p, input.identityCheck)
-    const data = place(s, input.sessionId, p, input.level)
-    return {
-      data,
-      text: `${p.nickname || p.fullName.split(' ')[0]} added${data.waitlistPosition ? ` to the waitlist as #${data.waitlistPosition}` : ''} · ${levelLabel(input.level)}${!data.waitlistPosition && data.locked ? ' · level locked' : ''}`,
-    }
-  })
+  return rosterMutation(input.sessionId, (s) => addDirectoryPlayerChange(s, input))
 }
-export async function addNewPlayerToSession(input: {
+export type AddNewPlayerInput = {
   sessionId: string
   name: string
   nickname?: string
   phone?: string
   level: PlayingLevel
-}) {
+}
+export function addNewPlayerChange(s: MockState, input: AddNewPlayerInput) {
+  const p = createClubPlayer(s, input),
+    data = place(s, input.sessionId, p, input.level)
+  return {
+    data,
+    text: data.waitlistPosition
+      ? `${p.fullName} added to the waitlist as #${data.waitlistPosition}`
+      : p.identity === 'guest'
+        ? `${p.fullName} added as a guest`
+        : `${p.fullName} added · profile lookup after sync`,
+  }
+}
+export async function addNewPlayerToSession(input: AddNewPlayerInput) {
   if (isRealDataMode()) {
-    await flushSessionPresence(input.sessionId)
+    await flushSessionBatches(input.sessionId)
     return realAddNewPlayerToSession(input)
   }
-  return rosterMutation(input.sessionId, (s) => {
-    const p = createClubPlayer(s, input),
-      data = place(s, input.sessionId, p, input.level)
-    return {
-      data,
-      text: data.waitlistPosition
-        ? `${p.fullName} added to the waitlist as #${data.waitlistPosition}`
-        : p.identity === 'guest'
-          ? `${p.fullName} added as a guest`
-          : `${p.fullName} added · profile lookup after sync`,
-    }
-  })
+  return rosterMutation(input.sessionId, (s) => addNewPlayerChange(s, input))
 }
 function row(s: MockState, id: string, sessionId: string) {
   const p = s.roster.find((p) => p.id === id && p.sessionId === sessionId)
@@ -220,7 +229,7 @@ export async function setRosterLevel(input: {
   level: PlayingLevel
 }) {
   if (isRealDataMode()) {
-    await flushSessionPresence(input.sessionId)
+    await flushSessionBatches(input.sessionId)
     return realSetRosterLevel(input)
   }
   return rosterMutation(input.sessionId, (s) => {
@@ -232,15 +241,19 @@ export async function setRosterLevel(input: {
     return { data: null, text: `${shortName(p)}: ${levelLabel(input.level)}` }
   })
 }
+export function removeRosterPlayerChange(
+  s: MockState,
+  input: { sessionId: string; rosterId: string },
+) {
+  if (sessionIn(s, input.sessionId).state !== 'prepared')
+    fail('Only a prepared roster can remove players.')
+  const p = row(s, input.rosterId, input.sessionId)
+  s.roster = s.roster.filter((r) => r.id !== p.id)
+  return { data: null, text: `${shortName(p)} removed from the roster` }
+}
 export function removeRosterPlayer(input: { sessionId: string; rosterId: string }) {
   if (isRealDataMode()) return realRemoveRosterPlayer(input)
-  return rosterMutation(input.sessionId, (s) => {
-    if (sessionIn(s, input.sessionId).state !== 'prepared')
-      fail('Only a prepared roster can remove players.')
-    const p = row(s, input.rosterId, input.sessionId)
-    s.roster = s.roster.filter((r) => r.id !== p.id)
-    return { data: null, text: `${shortName(p)} removed from the roster` }
-  })
+  return rosterMutation(input.sessionId, (s) => removeRosterPlayerChange(s, input))
 }
 export function setPresence(input: { sessionId: string; rosterId: string; present: boolean }) {
   if (isRealDataMode()) return realSetPresence(input)
@@ -466,42 +479,48 @@ function pending(s: MockState, id: string) {
   if (!r || r.status !== 'pending') fail('This join request has already been decided.')
   return r
 }
+/** Confirm a guest's join request: a new guest record, then a slot or the waitlist place. */
+export function confirmJoinRequestChange(
+  s: MockState,
+  input: { requestId: string; level: PlayingLevel },
+) {
+  const request = pending(s, input.requestId),
+    p = createClubPlayer(s, {
+      name: request.name,
+      nickname: request.nickname ?? undefined,
+      phone: request.phoneE164 ?? undefined,
+    }),
+    data = place(
+      s,
+      request.sessionId,
+      p,
+      input.level,
+      request.requestedAt,
+      request.placement === 'waitlist',
+    )
+  request.status = 'confirmed'
+  request.decidedAt = Date.now()
+  request.clubPlayerId = p.id
+  return {
+    data,
+    text: `${p.fullName} confirmed from a join request · ${data.waitlistPosition ? `waitlist #${data.waitlistPosition}` : levelLabel(input.level)}`,
+  }
+}
 export function confirmJoinRequest(input: { requestId: string; level: PlayingLevel }) {
   if (isRealDataMode()) return realConfirmJoinRequest(input)
   const r = pending(readMockState(), input.requestId)
-  return rosterMutation(r.sessionId, (s) => {
-    const request = pending(s, input.requestId),
-      p = createClubPlayer(s, {
-        name: request.name,
-        nickname: request.nickname ?? undefined,
-        phone: request.phoneE164 ?? undefined,
-      }),
-      data = place(
-        s,
-        request.sessionId,
-        p,
-        input.level,
-        request.requestedAt,
-        request.placement === 'waitlist',
-      )
-    request.status = 'confirmed'
-    request.decidedAt = Date.now()
-    request.clubPlayerId = p.id
-    return {
-      data,
-      text: `${p.fullName} confirmed from a join request · ${data.waitlistPosition ? `waitlist #${data.waitlistPosition}` : levelLabel(input.level)}`,
-    }
-  })
+  return rosterMutation(r.sessionId, (s) => confirmJoinRequestChange(s, input))
+}
+export function declineJoinRequestChange(s: MockState, requestId: string) {
+  const r = pending(s, requestId)
+  r.status = 'declined'
+  r.decidedAt = Date.now()
+  return { data: null, text: `${r.name}'s join request declined` }
 }
 export function declineJoinRequest(requestId: string) {
   if (isRealDataMode()) return realDeclineJoinRequest(requestId)
   const r = pending(readMockState(), requestId)
-  return rosterMutation(r.sessionId, (s) => {
-    const r = pending(s, requestId)
-    r.status = 'declined'
-    r.decidedAt = Date.now()
-    return { data: null, text: `${r.name}'s join request declined` }
-  })
+  return rosterMutation(r.sessionId, (s) => declineJoinRequestChange(s, requestId))
 }
 export function setAcceptJoinRequests(input: { sessionId: string; accept: boolean }) {
   if (isRealDataMode()) return realSetAcceptJoinRequests(input)

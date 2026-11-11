@@ -1,6 +1,7 @@
 'use client'
-import { useMockMutation } from '../mock/query'
-import { addNewPlayerToSession } from './mutations'
+import { enqueueAddNewPlayer } from './enqueueRosterOps'
+import { useRosterEnqueue } from './useRosterEnqueue'
+/** Add player › New player: applied at once, saved in the roster burst batch (#718). */
 export function useAddNewPlayerToSession() {
-  return useMockMutation(addNewPlayerToSession, { backgroundRefresh: true })
+  return useRosterEnqueue(enqueueAddNewPlayer)
 }

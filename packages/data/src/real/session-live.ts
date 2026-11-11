@@ -2,8 +2,9 @@ import type { PlayingLevel } from '../player/player.types'
 import { atWhenLabel } from '../queue-session/queueSession.rules'
 import type { QueueSessionInput, SessionCourt } from '../queue-session/queueSession.types'
 import { levelLabel } from '../session-roster/sessionRoster.rules'
+import type { RosterBatchOperation, RosterBatchResult } from '../session-roster/sessionRoster.types'
 import { realRequest } from './client'
-import { accepted, realGetQueueSession } from './queue'
+import { accepted, realGetQueueSession, rosterReadOf, type WireRosterRead } from './queue'
 
 /**
  * Real mode for the rest of a Queue Session's life: start, edit preparation, courts and time,
@@ -322,6 +323,38 @@ export async function realRemoveFromWaitlist(input: { sessionId: string; waitlis
     { method: 'DELETE' },
   )
   return accepted(null, 'Removed from the waitlist')
+}
+
+type WireBatchResult = {
+  operationId: string
+  rosterEntry: { id: string; clubPlayerId: string } | null
+  waitlist: { id: string; clubPlayerId: string } | null
+}
+
+/**
+ * The roster burst batch (#718): one `POST …/roster/batch` with the burst's operations in click
+ * order, applied in one transaction. The reply carries each operation's outcome and the roster as
+ * saved now, so the hooks settle without another read. Offline it is refused before anything is sent.
+ */
+export async function realApplyRosterBatch(input: {
+  sessionId: string
+  operations: RosterBatchOperation[]
+}) {
+  const reply = await realRequest<{ results: WireBatchResult[]; roster: WireRosterRead }>(
+    `${sessionPath(input.sessionId)}/roster/batch`,
+    { method: 'POST', body: { operations: input.operations } },
+  )
+  const results: RosterBatchResult[] = reply.results.map((result) => ({
+    operationId: result.operationId,
+    rosterId: result.rosterEntry?.id ?? null,
+    waitlistId: result.waitlist?.id ?? null,
+    clubPlayerId: result.rosterEntry?.clubPlayerId ?? result.waitlist?.clubPlayerId ?? null,
+  }))
+  const n = input.operations.length
+  return accepted(
+    { results, roster: rosterReadOf(reply.roster) },
+    `${n} roster change${n === 1 ? '' : 's'} saved`,
+  )
 }
 
 // ---------- Join requests ----------

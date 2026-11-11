@@ -145,15 +145,28 @@ export async function addSavedPlayerToSession(
     identityCheck?: IdentityCheck
   },
 ) {
+  return rosterCommand(context, sessionId, (tx, session) =>
+    addSavedPlayerIn(tx, context, session, input),
+  )
+}
+async function addSavedPlayerIn(
+  tx: Tx,
+  context: ClubContext,
+  session: QueueSession,
+  input: {
+    operationId: string
+    clubPlayerId: string
+    level: string
+    identityCheck?: IdentityCheck
+  },
+) {
   const skillLevelId = levelIdFor(input.level)
-  return rosterCommand(context, sessionId, async (tx, session) => {
-    const clubPlayer = await tx.clubPlayer.findUnique({
-      where: { clubId_id: { clubId: context.clubId, id: input.clubPlayerId } },
-    })
-    if (!clubPlayer || clubPlayer.removedAt) throw new ServiceError('not_found')
-    await requireIdentity(tx, clubPlayer, input.identityCheck)
-    return place(tx, context, session, clubPlayer, skillLevelId, input.operationId, new Date())
+  const clubPlayer = await tx.clubPlayer.findUnique({
+    where: { clubId_id: { clubId: context.clubId, id: input.clubPlayerId } },
   })
+  if (!clubPlayer || clubPlayer.removedAt) throw new ServiceError('not_found')
+  await requireIdentity(tx, clubPlayer, input.identityCheck)
+  return place(tx, context, session, clubPlayer, skillLevelId, input.operationId, new Date())
 }
 
 /**
@@ -240,19 +253,27 @@ export async function addDirectoryPlayerToSession(
   sessionId: string,
   input: { operationId: string; playerId: string; level: string; identityCheck?: IdentityCheck },
 ) {
+  return rosterCommand(context, sessionId, (tx, session) =>
+    addDirectoryPlayerIn(tx, context, session, input),
+  )
+}
+async function addDirectoryPlayerIn(
+  tx: Tx,
+  context: ClubContext,
+  session: QueueSession,
+  input: { operationId: string; playerId: string; level: string; identityCheck?: IdentityCheck },
+) {
   const skillLevelId = levelIdFor(input.level)
-  return rosterCommand(context, sessionId, async (tx, session) => {
-    const now = new Date()
-    const { clubPlayer } = await clubPlayerForProfile(
-      tx,
-      context,
-      input.operationId,
-      input.playerId,
-      now,
-    )
-    await requireIdentity(tx, clubPlayer, input.identityCheck)
-    return place(tx, context, session, clubPlayer, skillLevelId, input.operationId, now)
-  })
+  const now = new Date()
+  const { clubPlayer } = await clubPlayerForProfile(
+    tx,
+    context,
+    input.operationId,
+    input.playerId,
+    now,
+  )
+  await requireIdentity(tx, clubPlayer, input.identityCheck)
+  return place(tx, context, session, clubPlayer, skillLevelId, input.operationId, now)
 }
 
 /** `phone` is already normalized to E.164 by `@rotra/schema/phone` at the Route Handler. */
@@ -261,12 +282,20 @@ export async function addNewPlayerToSession(
   sessionId: string,
   input: { operationId: string; name: string; nickname?: string; phone?: string; level: string },
 ) {
+  return rosterCommand(context, sessionId, (tx, session) =>
+    addNewPlayerIn(tx, context, session, input),
+  )
+}
+async function addNewPlayerIn(
+  tx: Tx,
+  context: ClubContext,
+  session: QueueSession,
+  input: { operationId: string; name: string; nickname?: string; phone?: string; level: string },
+) {
   const skillLevelId = levelIdFor(input.level)
-  return rosterCommand(context, sessionId, async (tx, session) => {
-    const now = new Date()
-    const clubPlayer = await createClubPlayer(tx, context, input.operationId, input, now)
-    return place(tx, context, session, clubPlayer, skillLevelId, input.operationId, now)
-  })
+  const now = new Date()
+  const clubPlayer = await createClubPlayer(tx, context, input.operationId, input, now)
+  return place(tx, context, session, clubPlayer, skillLevelId, input.operationId, now)
 }
 
 async function liveEntry(tx: Tx, sessionId: string, rosterId: string) {
@@ -313,17 +342,20 @@ export async function removeRosterPlayer(
   sessionId: string,
   rosterId: string,
 ) {
-  return rosterCommand(context, sessionId, async (tx, session) => {
-    requireState(session, ['prepared'], 'Only a prepared roster can remove players.')
-    const entry = await tx.sessionPlayer.findUnique({ where: { id: rosterId } })
-    if (!entry || entry.sessionId !== sessionId) throw new ServiceError('not_found')
-    if (entry.releasedAt) return null
-    await tx.sessionPlayer.update({
-      where: { id: entry.id },
-      data: { releasedAt: new Date(), releaseReason: 'removed', revision: { increment: 1 } },
-    })
-    return null
+  return rosterCommand(context, sessionId, (tx, session) =>
+    removeRosterPlayerIn(tx, session, rosterId),
+  )
+}
+async function removeRosterPlayerIn(tx: Tx, session: QueueSession, rosterId: string) {
+  requireState(session, ['prepared'], 'Only a prepared roster can remove players.')
+  const entry = await tx.sessionPlayer.findUnique({ where: { id: rosterId } })
+  if (!entry || entry.sessionId !== session.id) throw new ServiceError('not_found')
+  if (entry.releasedAt) return null
+  await tx.sessionPlayer.update({
+    where: { id: entry.id },
+    data: { releasedAt: new Date(), releaseReason: 'removed', revision: { increment: 1 } },
   })
+  return null
 }
 
 export async function setPresence(
@@ -486,111 +518,121 @@ export async function confirmJoinRequest(
   context: ClubContext,
   input: { operationId: string; requestId: string; level: string; deviceId?: string | null },
 ) {
-  const skillLevelId = levelIdFor(input.level)
+  levelIdFor(input.level)
   const request = await prisma.sessionJoinRequest.findUnique({
     where: { id: input.requestId },
     select: { sessionId: true, clubId: true },
   })
   if (!request || request.clubId !== context.clubId) throw new ServiceError('not_found')
-  return rosterCommand(context, request.sessionId, async (tx, session) => {
-    const current = await pendingRequest(tx, context, input.requestId)
-    if (current.status !== 'pending') {
-      // A Player's request keeps their own saved player, so the derived ID can't identify a replay;
-      // confirming it again has the same outcome.
-      if (
-        current.status === 'confirmed' &&
-        (current.playerId != null ||
-          current.clubPlayerId === (await derivedId(input.operationId, 'club-player')))
-      )
-        return { request: joinRequestDto(current), rosterEntry: null, waitlist: null }
-      throw new ServiceError('conflict', { request: 'This join request has already been decided.' })
-    }
-    const now = new Date()
-    // D-2026-11-11-02: Join from waitlist. Give slot (prepared, never over the budget) / Admit
-    // player (live, over the budget allowed) on the Player's own waitlist entry.
-    if (current.placement === 'from_waitlist') {
-      const entry = current.clubPlayerId
-        ? await tx.sessionWaitlistEntry.findUnique({
-            where: {
-              sessionId_clubPlayerId: { sessionId: session.id, clubPlayerId: current.clubPlayerId },
-            },
-          })
-        : null
-      // Removed from the waitlist meanwhile: refused, the QM declines the request.
-      if (!entry)
-        throw new ServiceError('conflict', {
-          request: `${current.name} is no longer on the waitlist.`,
+  return rosterCommand(context, request.sessionId, (tx, session) =>
+    confirmJoinRequestIn(tx, context, session, input),
+  )
+}
+/** The confirm inside a locked session; a request of another session is not found here. */
+async function confirmJoinRequestIn(
+  tx: Tx,
+  context: ClubContext,
+  session: QueueSession,
+  input: { operationId: string; requestId: string; level: string; deviceId?: string | null },
+) {
+  const skillLevelId = levelIdFor(input.level)
+  const current = await pendingRequest(tx, context, input.requestId)
+  if (current.sessionId !== session.id) throw new ServiceError('not_found')
+  if (current.status !== 'pending') {
+    // A Player's request keeps their own saved player, so the derived ID can't identify a replay;
+    // confirming it again has the same outcome.
+    if (
+      current.status === 'confirmed' &&
+      (current.playerId != null ||
+        current.clubPlayerId === (await derivedId(input.operationId, 'club-player')))
+    )
+      return { request: joinRequestDto(current), rosterEntry: null, waitlist: null }
+    throw new ServiceError('conflict', { request: 'This join request has already been decided.' })
+  }
+  const now = new Date()
+  // D-2026-11-11-02: Join from waitlist. Give slot (prepared, never over the budget) / Admit
+  // player (live, over the budget allowed) on the Player's own waitlist entry.
+  if (current.placement === 'from_waitlist') {
+    const entry = current.clubPlayerId
+      ? await tx.sessionWaitlistEntry.findUnique({
+          where: {
+            sessionId_clubPlayerId: { sessionId: session.id, clubPlayerId: current.clubPlayerId },
+          },
         })
-      const over = (await liveRoster(tx, session.id)).length >= (await capacityOf(tx, session))
-      if (over && session.state !== 'active')
-        throw new ServiceError('conflict', {
-          request: `Slots are full again. ${current.name} stays on the waitlist.`,
-        })
-      const levelled = await tx.sessionWaitlistEntry.update({
-        where: { id: entry.id },
-        data: { skillLevelId },
+      : null
+    // Removed from the waitlist meanwhile: refused, the QM declines the request.
+    if (!entry)
+      throw new ServiceError('conflict', {
+        request: `${current.name} is no longer on the waitlist.`,
       })
-      const promoted = await promoteWaiter(
-        tx,
-        context,
-        session,
-        levelled,
-        input.operationId,
-        now,
-        over,
-      )
-      const clubPlayer = await tx.clubPlayer.findUniqueOrThrow({
-        where: { id: promoted.clubPlayerId },
+    const over = (await liveRoster(tx, session.id)).length >= (await capacityOf(tx, session))
+    if (over && session.state !== 'active')
+      throw new ServiceError('conflict', {
+        request: `Slots are full again. ${current.name} stays on the waitlist.`,
       })
-      const decided = await tx.sessionJoinRequest.update({
-        where: { id: current.id },
-        data: {
-          status: 'confirmed',
-          decidedAt: now,
-          decidedByDeviceId: input.deviceId ?? null,
-          revision: { increment: 1 },
-        },
-        include: withPlayerPicture,
-      })
-      return {
-        request: joinRequestDto(decided),
-        rosterEntry: rosterEntryDto(promoted, clubPlayer.nickname),
-        waitlist: null,
-      }
-    }
-    const clubPlayer = current.playerId
-      ? (await clubPlayerForProfile(tx, context, input.operationId, current.playerId, now))
-          .clubPlayer
-      : await createClubPlayer(
-          tx,
-          context,
-          input.operationId,
-          { name: current.name, nickname: current.nickname, phone: current.phoneE164 },
-          now,
-        )
-    const placed = await place(
+    const levelled = await tx.sessionWaitlistEntry.update({
+      where: { id: entry.id },
+      data: { skillLevelId },
+    })
+    const promoted = await promoteWaiter(
       tx,
       context,
       session,
-      clubPlayer,
-      skillLevelId,
+      levelled,
       input.operationId,
-      current.requestedAt,
-      current.placement === 'waitlist',
+      now,
+      over,
     )
+    const clubPlayer = await tx.clubPlayer.findUniqueOrThrow({
+      where: { id: promoted.clubPlayerId },
+    })
     const decided = await tx.sessionJoinRequest.update({
       where: { id: current.id },
       data: {
         status: 'confirmed',
         decidedAt: now,
         decidedByDeviceId: input.deviceId ?? null,
-        clubPlayerId: clubPlayer.id,
         revision: { increment: 1 },
       },
       include: withPlayerPicture,
     })
-    return { request: joinRequestDto(decided), ...placed }
+    return {
+      request: joinRequestDto(decided),
+      rosterEntry: rosterEntryDto(promoted, clubPlayer.nickname),
+      waitlist: null,
+    }
+  }
+  const clubPlayer = current.playerId
+    ? (await clubPlayerForProfile(tx, context, input.operationId, current.playerId, now)).clubPlayer
+    : await createClubPlayer(
+        tx,
+        context,
+        input.operationId,
+        { name: current.name, nickname: current.nickname, phone: current.phoneE164 },
+        now,
+      )
+  const placed = await place(
+    tx,
+    context,
+    session,
+    clubPlayer,
+    skillLevelId,
+    input.operationId,
+    current.requestedAt,
+    current.placement === 'waitlist',
+  )
+  const decided = await tx.sessionJoinRequest.update({
+    where: { id: current.id },
+    data: {
+      status: 'confirmed',
+      decidedAt: now,
+      decidedByDeviceId: input.deviceId ?? null,
+      clubPlayerId: clubPlayer.id,
+      revision: { increment: 1 },
+    },
+    include: withPlayerPicture,
   })
+  return { request: joinRequestDto(decided), ...placed }
 }
 
 export async function declineJoinRequest(
@@ -602,23 +644,32 @@ export async function declineJoinRequest(
     select: { sessionId: true, clubId: true },
   })
   if (!request || request.clubId !== context.clubId) throw new ServiceError('not_found')
-  return rosterCommand(context, request.sessionId, async (tx) => {
-    const current = await pendingRequest(tx, context, input.requestId)
-    if (current.status === 'declined') return joinRequestDto(current)
-    if (current.status !== 'pending')
-      throw new ServiceError('conflict', { request: 'This join request has already been decided.' })
-    const decided = await tx.sessionJoinRequest.update({
-      where: { id: current.id },
-      data: {
-        status: 'declined',
-        decidedAt: new Date(),
-        decidedByDeviceId: input.deviceId ?? null,
-        revision: { increment: 1 },
-      },
-      include: withPlayerPicture,
-    })
-    return joinRequestDto(decided)
+  return rosterCommand(context, request.sessionId, (tx, session) =>
+    declineJoinRequestIn(tx, context, session, input),
+  )
+}
+async function declineJoinRequestIn(
+  tx: Tx,
+  context: ClubContext,
+  session: QueueSession,
+  input: { requestId: string; deviceId?: string | null },
+) {
+  const current = await pendingRequest(tx, context, input.requestId)
+  if (current.sessionId !== session.id) throw new ServiceError('not_found')
+  if (current.status === 'declined') return joinRequestDto(current)
+  if (current.status !== 'pending')
+    throw new ServiceError('conflict', { request: 'This join request has already been decided.' })
+  const decided = await tx.sessionJoinRequest.update({
+    where: { id: current.id },
+    data: {
+      status: 'declined',
+      decidedAt: new Date(),
+      decidedByDeviceId: input.deviceId ?? null,
+      revision: { increment: 1 },
+    },
+    include: withPlayerPicture,
   })
+  return joinRequestDto(decided)
 }
 
 /** Q-ROSTER read: live roster in slot order, waitlist in its order with positions, pending requests. */
@@ -628,44 +679,146 @@ export async function readSessionRoster(context: ClubContext, sessionId: string)
   })
   if (!session) throw new ServiceError('not_found')
   await requireSessionAccess(context, session)
-  return prisma.$transaction(async (tx) => {
-    const roster = await liveRoster(tx, sessionId)
-    const waitlist = await orderedWaitlist(tx, sessionId)
-    const nicknames = new Map(
-      (
-        await tx.clubPlayer.findMany({
-          where: { clubId: context.clubId, id: { in: roster.map((r) => r.clubPlayerId) } },
-          select: { id: true, nickname: true },
-        })
-      ).map((p) => [p.id, p.nickname]),
-    )
-    const clubPlayerIds = [...new Set(roster.map((entry) => entry.clubPlayerId))]
-    const prior = clubPlayerIds.length
-      ? await tx.clubSessionPlayerSummary.findMany({
-          where: {
-            clubId: context.clubId,
-            clubPlayerId: { in: clubPlayerIds },
-            sessionId: { not: sessionId },
-            finalization: { committedAt: { lt: session.finalizedAt ?? new Date() } },
-          },
-          select: { clubPlayerId: true },
-          distinct: ['clubPlayerId'],
-        })
-      : []
-    const returning = new Set(prior.map((row) => row.clubPlayerId))
-    const requests = await tx.sessionJoinRequest.findMany({
-      where: { sessionId, status: 'pending' },
-      orderBy: [{ requestedAt: 'asc' }, { id: 'asc' }],
-      include: withPlayerPicture,
-    })
-    return {
-      capacity: await capacityOf(tx, session),
-      roster: roster.map((entry) => ({
-        ...rosterEntryDto(entry, nicknames.get(entry.clubPlayerId) ?? null),
-        hasPlayedAtClubBefore: returning.has(entry.clubPlayerId),
-      })),
-      waitlist: waitlist.map((entry, index) => waitlistDto(entry, index + 1)),
-      joinRequests: requests.map(joinRequestDto),
+  return prisma.$transaction((tx) => readSessionRosterIn(tx, context, session))
+}
+async function readSessionRosterIn(tx: Tx, context: ClubContext, session: QueueSession) {
+  const sessionId = session.id
+  const roster = await liveRoster(tx, sessionId)
+  const waitlist = await orderedWaitlist(tx, sessionId)
+  const nicknames = new Map(
+    (
+      await tx.clubPlayer.findMany({
+        where: { clubId: context.clubId, id: { in: roster.map((r) => r.clubPlayerId) } },
+        select: { id: true, nickname: true },
+      })
+    ).map((p) => [p.id, p.nickname]),
+  )
+  const clubPlayerIds = [...new Set(roster.map((entry) => entry.clubPlayerId))]
+  const prior = clubPlayerIds.length
+    ? await tx.clubSessionPlayerSummary.findMany({
+        where: {
+          clubId: context.clubId,
+          clubPlayerId: { in: clubPlayerIds },
+          sessionId: { not: sessionId },
+          finalization: { committedAt: { lt: session.finalizedAt ?? new Date() } },
+        },
+        select: { clubPlayerId: true },
+        distinct: ['clubPlayerId'],
+      })
+    : []
+  const returning = new Set(prior.map((row) => row.clubPlayerId))
+  const requests = await tx.sessionJoinRequest.findMany({
+    where: { sessionId, status: 'pending' },
+    orderBy: [{ requestedAt: 'asc' }, { id: 'asc' }],
+    include: withPlayerPicture,
+  })
+  return {
+    capacity: await capacityOf(tx, session),
+    roster: roster.map((entry) => ({
+      ...rosterEntryDto(entry, nicknames.get(entry.clubPlayerId) ?? null),
+      hasPlayedAtClubBefore: returning.has(entry.clubPlayerId),
+    })),
+    waitlist: waitlist.map((entry, index) => waitlistDto(entry, index + 1)),
+    joinRequests: requests.map(joinRequestDto),
+  }
+}
+
+// ---------- Roster burst batch (#718) ----------
+
+/** One operation of the roster burst batch, as the Route Handler validated it. */
+export type RosterBatchOperation =
+  | {
+      op: 'add'
+      operationId: string
+      source: 'saved'
+      clubPlayerId: string
+      level: string
+      identityCheck?: IdentityCheck
     }
+  | {
+      op: 'add'
+      operationId: string
+      source: 'directory'
+      playerId: string
+      level: string
+      identityCheck?: IdentityCheck
+    }
+  | {
+      op: 'add'
+      operationId: string
+      source: 'new'
+      name: string
+      nickname?: string
+      phone?: string
+      level: string
+    }
+  | { op: 'remove'; operationId: string; rosterId: string }
+  | { op: 'acceptRequest'; operationId: string; requestId: string; level: string }
+  | { op: 'declineRequest'; operationId: string; requestId: string }
+
+export const MAX_ROSTER_BATCH_OPERATIONS = 100
+
+/**
+ * The Queue Master's burst of adds, removes and join-request decisions (#718), applied in the
+ * order given inside one locked-session transaction: all of it lands or none of it does, with one
+ * revision bump and one minimum recomputation. Each operation runs the same rules as its single-op
+ * service and is repeat-safe on its `operationId`, so a retried batch repeats nothing. The reply
+ * carries every operation's outcome and the roster as saved now.
+ */
+export async function applyRosterBatch(
+  context: ClubContext,
+  sessionId: string,
+  operations: RosterBatchOperation[],
+  deviceId: string | null = null,
+) {
+  if (!operations.length || operations.length > MAX_ROSTER_BATCH_OPERATIONS)
+    throw new ServiceError('invalid', { operations: 'Send between 1 and 100 roster changes.' })
+  const ids = new Set(operations.map((operation) => operation.operationId))
+  if (ids.size !== operations.length || [...ids].some((id) => !id))
+    throw new ServiceError('invalid', { operations: 'Every change needs its own operation id.' })
+  return rosterCommand(context, sessionId, async (tx, session) => {
+    const results: {
+      operationId: string
+      op: RosterBatchOperation['op']
+      rosterEntry: ReturnType<typeof rosterEntryDto> | null
+      waitlist: ReturnType<typeof waitlistDto> | null
+      request: ReturnType<typeof joinRequestDto> | null
+    }[] = []
+    for (const operation of operations) {
+      const base = { operationId: operation.operationId, op: operation.op }
+      switch (operation.op) {
+        case 'add': {
+          const placed =
+            operation.source === 'saved'
+              ? await addSavedPlayerIn(tx, context, session, operation)
+              : operation.source === 'directory'
+                ? await addDirectoryPlayerIn(tx, context, session, operation)
+                : await addNewPlayerIn(tx, context, session, operation)
+          results.push({ ...base, ...placed, request: null })
+          break
+        }
+        case 'remove':
+          await removeRosterPlayerIn(tx, session, operation.rosterId)
+          results.push({ ...base, rosterEntry: null, waitlist: null, request: null })
+          break
+        case 'acceptRequest': {
+          const confirmed = await confirmJoinRequestIn(tx, context, session, {
+            ...operation,
+            deviceId,
+          })
+          results.push({ ...base, ...confirmed })
+          break
+        }
+        case 'declineRequest':
+          results.push({
+            ...base,
+            rosterEntry: null,
+            waitlist: null,
+            request: await declineJoinRequestIn(tx, context, session, { ...operation, deviceId }),
+          })
+          break
+      }
+    }
+    return { results, roster: await readSessionRosterIn(tx, context, session) }
   })
 }

@@ -3,9 +3,13 @@ export function guestRegistrationUrl(clubId: string) {
   return `${registrationOrigin()}/register/${encodeURIComponent(clubId)}`
 }
 
-/** The club invite link a Queue Master shares: `/register/<clubId>?k=<code>`. */
-export function clubInviteUrl(clubId: string, code: string) {
-  return `${registrationOrigin()}/register/${encodeURIComponent(clubId)}?k=${encodeURIComponent(code)}`
+/**
+ * The club invite link a Queue Master shares: `/register/<clubId>?k=<code>`. Real mode stores no
+ * invite code yet (#707), so with no code it is the plain club link, never an empty `?k=`.
+ */
+export function clubInviteUrl(clubId: string, code?: string | null) {
+  const base = guestRegistrationUrl(clubId)
+  return code ? `${base}?k=${encodeURIComponent(code)}` : base
 }
 
 function registrationOrigin() {

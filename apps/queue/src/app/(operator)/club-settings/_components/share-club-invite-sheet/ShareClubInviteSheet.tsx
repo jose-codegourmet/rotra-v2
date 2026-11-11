@@ -23,7 +23,7 @@ export function ShareClubInviteSheet({ club, open, onOpenChange }: ShareClubInvi
       footer={<Button onClick={() => onOpenChange(false)}>Close</Button>}
     >
       <ClubInviteCard
-        link={clubInviteUrl(club.id, club.inviteCode ?? '')}
+        link={clubInviteUrl(club.id, club.inviteCode)}
         slug={club.id}
         clubName={club.name}
         clubInitials={club.initials}

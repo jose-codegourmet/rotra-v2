@@ -49,28 +49,32 @@ export async function readMyClubs(context: PlayerContext) {
  * (history keeps one row per club and player). An unknown club is refused. Repeat-safe.
  */
 export async function joinMyClub(context: PlayerContext, clubId: string) {
+  await addPlayerToClub(context.playerId, clubId)
+  return { playerId: context.playerId, clubId }
+}
+
+/**
+ * Saves a player to a club's saved players (D-2026-11-09-06): Join club, and registration from a
+ * club or session link (#707). Repeat-safe; an unknown club is refused.
+ */
+export async function addPlayerToClub(playerId: string, clubId: string) {
   const unavailable = () =>
     new ServiceError('not_found', { club: 'This club link is not available.' })
   if (!UUID.test(clubId)) throw unavailable()
   try {
-    await joinInTransaction(context, clubId, unavailable)
+    await joinInTransaction(playerId, clubId, unavailable)
   } catch (error) {
     // A second tap that raced the first created the same (club, player) row: already joined.
     if ((error as { code?: string })?.code !== 'P2002') throw error
   }
-  return { playerId: context.playerId, clubId }
 }
 
-function joinInTransaction(
-  context: PlayerContext,
-  clubId: string,
-  unavailable: () => ServiceError,
-) {
+function joinInTransaction(playerId: string, clubId: string, unavailable: () => ServiceError) {
   return prisma.$transaction(async (tx) => {
     const club = await tx.club.findUnique({ where: { id: clubId }, select: { id: true } })
     if (!club) throw unavailable()
     const existing = await tx.clubPlayer.findUnique({
-      where: { clubId_playerId: { clubId, playerId: context.playerId } },
+      where: { clubId_playerId: { clubId, playerId } },
       select: { id: true, removedAt: true },
     })
     if (existing) {
@@ -82,7 +86,7 @@ function joinInTransaction(
       return
     }
     const player = await tx.player.findUnique({
-      where: { id: context.playerId },
+      where: { id: playerId },
       select: { fullName: true, nickname: true },
     })
     if (!player) throw new ServiceError('forbidden')
@@ -90,7 +94,7 @@ function joinInTransaction(
       data: {
         id: randomUUID(),
         clubId,
-        playerId: context.playerId,
+        playerId,
         displayName: player.fullName,
         nickname: player.nickname,
         addedAt: new Date(),

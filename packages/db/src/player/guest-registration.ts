@@ -5,6 +5,7 @@ import { ServiceError } from '../service/errors'
 import { type ClaimDetails, registerFromClaim } from './account-access'
 import { CLAIM_LINK_DAYS } from './claim'
 import { allocateRtrId } from './identity'
+import { addPlayerToClub } from './my-clubs'
 
 const MATCH = { status: 'account-match' as const }
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -40,8 +41,10 @@ export async function guestRegistrationClub(clubId: string, sessionSlug?: string
 }
 
 /**
- * #490: independent registration. The club supplies the existing RTR allocation context only.
- * Never reads or writes club_players, roster, history attribution or permanent results.
+ * #490: independent registration. The club supplies the RTR allocation context. Never links or
+ * writes an existing guest record, roster, history attribution or permanent results. Once the
+ * account exists, the new player is saved to the originating club (D-2026-11-09-06, #707), as the
+ * mock does; a club link and a session link both join that club.
  * A client-generated secret makes provider failures/lost replies retryable through the existing
  * claim staging. Only its digest is stored; a retry must still supply the same private contacts.
  */
@@ -126,6 +129,15 @@ export async function registerGuest(
   for (let attempt = 0; ; attempt++) {
     try {
       const result = await registerFromClaim(cookies, token, { ...input, email })
+      // Repeat-safe, so a retried attempt that already joined is a no-op. The account is made and
+      // signed in by now: a failed join must not report the registration as failed; the player
+      // can still tap Join from the same link.
+      await addPlayerToClub(result.playerId, clubId).catch((error: unknown) => {
+        console.error(
+          '[guest-registration] join club',
+          error instanceof Error ? error.name : typeof error,
+        )
+      })
       return {
         status: 'registered' as const,
         ...result,

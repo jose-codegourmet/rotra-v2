@@ -8,11 +8,13 @@ export const letterGroupMeta = {
     'One per first letter that has players, in A–Z order with "#" last.',
     'AlphabetIndex jumps here: focus document.getElementById(letterHeadingId(letter)).',
     'The grid keeps at least two cards across on a 375 px phone.',
+    'layout="list" (Player › club Members, P-CLUB-MEMBERS): one card per letter with stacked rows (ClubMemberList).',
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',
     screen: 'Q-SAVED-PLAYERS › .sp-sec, .sp-letter, .sp-grid',
   },
   docs: ['docs/screens/product/modules/queue/access-home.md'],
-  related: ['AlphabetIndex', 'SavedPlayerCard'],
+  variants: ['grid', 'list'],
+  related: ['AlphabetIndex', 'SavedPlayerCard', 'ClubMemberList'],
 } satisfies ComponentMeta

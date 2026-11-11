@@ -10,6 +10,8 @@ export type PlayerClubRow = {
   logoUrl?: string | null
   joinedVia: 'club_link' | 'session_link' | 'club_added'
   reportHref: string
+  /** The club's public page (/clubs/[clubId], P-CLUB-PAGE); the Club page button shows when set */
+  clubPageHref?: string
 }
 export type PlayerClubsCardProps = { clubs: PlayerClubRow[]; onLeave: (id: string) => void }
 const via = {
@@ -34,6 +36,11 @@ export function PlayerClubsCard({ clubs, onLeave }: PlayerClubsCardProps) {
                     <>
                       <span>{via[club.joinedVia]}</span>
                       <span className="mt-2 flex flex-wrap gap-2">
+                        {club.clubPageHref ? (
+                          <Button size="xs" asChild>
+                            <a href={club.clubPageHref}>Club page</a>
+                          </Button>
+                        ) : null}
                         <Button size="xs" onClick={() => onLeave(club.id)}>
                           Leave club
                         </Button>

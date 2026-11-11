@@ -12,6 +12,7 @@ const meta = {
         initials: 'LS',
         joinedVia: 'club_link',
         reportHref: 'mailto:support@rotra.example',
+        clubPageHref: '#',
       },
       {
         id: 'c2',
@@ -19,6 +20,7 @@ const meta = {
         initials: 'CB',
         joinedVia: 'session_link',
         reportHref: 'mailto:support@rotra.example',
+        clubPageHref: '#',
       },
     ],
     onLeave: () => {},
@@ -41,3 +43,4 @@ export const LongName: Story = {
     ],
   },
 }
+export const TwoClubsLight: Story = { globals: { theme: 'light' } }

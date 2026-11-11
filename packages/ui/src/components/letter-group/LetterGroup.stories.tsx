@@ -67,3 +67,17 @@ export const Phone: Story = {
   render: () => <Directory />,
   globals: { viewport: { value: 'phone' } },
 }
+/** Player › club Members (P-CLUB-MEMBERS): one card per letter with stacked rows. */
+export const ListLayout: Story = {
+  args: { letter: 'K', count: 2, layout: 'list', children: null },
+  render: (args) => (
+    <LetterGroup {...args}>
+      {['Kenji', 'Kenjie'].map((name) => (
+        <div key={name} className="border-b border-border py-2.5 last:border-0">
+          {name}
+        </div>
+      ))}
+    </LetterGroup>
+  ),
+}
+export const ListLayoutLight: Story = { ...ListLayout, globals: { theme: 'light' } }

@@ -35,21 +35,30 @@ and [schema dependencies](schema-dependencies.md) identify their consumers.
 
 ## Blocking unresolved details
 
-- Exact numerical ranking/performance model, label thresholds, global tie behavior, and policy-change retroactivity.
-- Three calendar months versus a day count, and canonical timezone for ID dates/window cutoffs.
-- Authentication provider support/configuration for club username login; email verification on claim; password policy. (Player login mapping was decided November 7, 2026 and changed to email only on November 8, below.)
-- Historical guest-link confirmation evidence, mistaken-link handling, and the auditable attribution mechanism; including earlier games after confirmed identity is settled below.
+- Rating constants (band edges, step sizes) for the rating-by-wins engine; the engine itself, the 90-day window, Asia/Manila midnight, tie order and recompute-on-save were settled November 11, 2026 (below).
+- Historical guest-link confirmation evidence and the auditable attribution mechanism; including earlier games after confirmed identity is settled below. (Mistaken links: not undone, settled November 11, 2026.)
 - Whether assessments for no-shows, roster entries removed during preparation, or invalid sessions remain eligible; assessment changes already sync immediately, independently of match performance.
 - Exact award evidence calculations (partial substitutes are excluded from local standings and awards unless the Queue Master gave one the game; see below).
 - Interrupted-device conflict resolution versus irreversible winners. Never implement last-write-wins as an accidental answer.
 - Long-term policy for finalization with active games (v1 refuses it); whether unused waiting matches are kept frozen or marked removed; recovery of a session already marked invalid.
 - Collision-free `match_no` allocation across offline devices, and collision-free court placement (two devices putting the same match or court On court while disconnected).
-- Whether shuttle plan lines snapshot the inventory unit cost at save time (the prototype uses the live price).
-- What happens to a paid mark when a budget reduction moves that player to the waitlist (the prototype keeps it and shows it again if they regain a slot; `session_payment_marks` keys on the roster entry).
 - Offline inventory edits, automatic stock deduction, and non-peso currencies.
 - Phone/contact conflict handling and aliasing duplicate offline club-player IDs without rewriting confirmed history.
-- City/country code registry, sequence formatting above 9999, and founding-location corrections.
-- Renewal dates and overlapping terms, refunds, offline expiry enforcement, flag targeting, and when offline devices pick up flag changes. (Per-club prices, free tester clubs, owner-added clubs and owner-created flags were settled October 27, 2026.)
+- Sequence formatting above 9999 (the city registry, Admin-added cities and founding-location corrections were settled November 11, 2026).
+- Refunds, offline expiry enforcement, flag targeting, and when offline devices pick up flag changes (renewal dates and overlapping terms were settled November 11, 2026). (Per-club prices, free tester clubs, owner-added clubs and owner-created flags were settled October 27, 2026.)
+
+## Owner decisions recorded November 11, 2026
+
+Source: the owner's answers of November 11, 2026, recorded as [D-2026-11-11-04](../../mvp/decisions.md#d-2026-11-11-04) to [D-2026-11-11-10](../../mvp/decisions.md#d-2026-11-11-10). Prose rules only; no DDL or migration is approved by this.
+
+- **Offline writes (D-04, #722):** an IndexedDB outbox of commands applied locally by the existing reducers and replayed through the existing real adapters on reconnect; 409 goes to Q-CONFLICT. The device-stream protocol in [offline-sync.md](queue/modules/offline-sync.md) is not built for MVP. A `playhistory.json` export/import in Club settings › This device is the manual fallback.
+- **Ranking (D-05, #247):** rating by wins weighted by opponent strength; seeded from the first level for the night; assessments have zero influence after that; Provisional for ~10 games; 90 rolling days, Asia/Manila midnight; saving settings recomputes everyone from the game facts; leaderboard ties by games in the window, then name; prototype award formula and Generate matches weights approved as is. The `club_assessments` vote model and the 70/30 policy fields no longer feed rank ([ranking](player-information/modules/ranking.md)). Constants in #247.
+- **Roster and payments (D-06, #245):** a paid mark survives demotion to the waitlist; payments can change after Session done with an audit record; shuttle plan lines snapshot the unit cost at save; a level saved for a roster player removed before start is dropped.
+- **Licenses (D-06, #377):** terms stack, a renewal starts the day after the current term ends, else today; no client-supplied start date; payment history keeps the generated `LIC-####` and the typed note as separate fields.
+- **Club sign-in (D-07, #381, #382, #380):** the synthetic `<username>@clubs.rotra.invalid` login stays and a username change rewrites it; a forgotten club password is a request the platform owner sees in Admin › Requests and answers with a temporary password; Q-LOGIN says "Username or password is incorrect."; A-ADD-CLUB says "Password incorrect. Try another password." on a provider rejection; the six cities are the v1 list and the platform owner adds cities from Admin; RTR IDs are display only (records key on the UUID) and never change on a city correction.
+- **Accounts (D-08, #244):** registration links expire **24 hours** after issue (was 7 days), still single use with reissue revoking the old one; no email verification on claim; password at least 8 characters; a wrong claim is not undone; name-only guests are invited once a contact is added; RTR sequence first come, first served.
+- **Public pages (D-09, #248, #398):** cookie receipt; public pages have no time limit while licensed and are never indexed or static; no Unpublish; join requests, server logs and exports are kept 90 days.
+- **Housekeeping (D-10):** #243 closed as overtaken (RLS stays #387); no club accent for MVP (#395 closed); the pg_cron jobs of D-2026-11-08-04 are parked, so ageing, eligibility and license state are computed on read.
 
 ## Owner decisions recorded November 7, 2026
 

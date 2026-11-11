@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 1 · IN PROGRESS: 5 · IN MOCK APP: 106 · CANCELLED: 1 · MOCKUP ONLY: 4
+NEW: 3 · IN PROGRESS: 5 · IN MOCK APP: 106 · CANCELLED: 1 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -288,7 +288,9 @@ NEW: 1 · IN PROGRESS: 5 · IN MOCK APP: 106 · CANCELLED: 1 · MOCKUP ONLY: 4
 | [2026-11-10-player-games-share-avatars](2026-11-10-player-games-share-avatars.md) | Games share cards show teams and clear scores | session-games-share-card, share-card, avatar | IN MOCK APP — #682 |
 | [2026-11-10-queue-prep-header-icons](2026-11-10-queue-prep-header-icons.md) | Preparation header: icon buttons, and Cancel/Delete session in a ⋯ menu | page-header, button, icon, overflow-menu, more-options-sheet | IN MOCK APP — #697 (PR #698) |
 | [2026-11-10-queue-public-account-bar](2026-11-10-queue-public-account-bar.md) | Session page: account bar with Log in, or the signed-in Player and Sign out | public-account-bar (new), avatar, button | IN MOCK APP — #585 |
+| [2026-11-11-admin-license-no-start-date](2026-11-11-admin-license-no-start-date.md) | A-LICENSE: no Term starts field; the period is computed and shown read-only; history shows LIC number plus note | license-sheet, payment-history-table | NEW |
 | [2026-11-11-queue-club-only-unclaimed](2026-11-11-queue-club-only-unclaimed.md) | Guests and unclaimed profiles stay in their club; Player Information search shows registered players only | add-player-sheet, saved-player-card, player-profile-sheet, invite-sheet, identity-chip | NEW |
+| [2026-11-11-queue-device-play-history-file](2026-11-11-queue-device-play-history-file.md) | Club settings › This device: Export play history and Import play history… | device-downloads-card, button, toaster | NEW |
 | [2026-11-11-queue-hide-present-before-start](2026-11-11-queue-hide-present-before-start.md) | Preparation roster: no Present switches until the session has started | roster-row, roster-card, roster-panel | IN MOCK APP — #704 |
 | [2026-11-11-queue-join-request-avatars](2026-11-11-queue-join-request-avatars.md) | Join requests: a signed-in Player's request shows their profile picture | join-requests-panel, avatar | IN MOCK APP — PR #702 |
 | [2026-11-11-queue-join-request-slot-or-waitlist](2026-11-11-queue-join-request-slot-or-waitlist.md) | Join request: the player picks Join a slot or Be waitlisted, and can join from the waitlist | join-request-form, join-request-card, join-requests-panel | IN MOCK APP — #706 |

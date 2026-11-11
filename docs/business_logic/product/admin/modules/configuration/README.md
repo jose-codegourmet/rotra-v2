@@ -11,21 +11,23 @@ The platform owner manages feature flags in Admin. Updated October 27, 2026 from
 
 ## Agreed adjustable settings
 
+Decided November 11, 2026 ([D-2026-11-11-05](../../../../../mvp/decisions.md#d-2026-11-11-05)); the 70% / 30% weight fields are gone.
+
 | Setting | Initial value | Scope |
 |---|---|---|
-| Club-assessment contribution | 70% | Shared player rank |
-| Match-performance contribution | 30% | Shared player rank |
-| Recent standard matches required | 10 | Overall leaderboard eligibility |
+| Normal step size | chosen in #247 | How far a rating moves after a counted game |
+| Provisional step size | chosen in #247 | The bigger step while a player is Provisional |
+| Provisional game count | 10 | Counted games before a player leaves Provisional |
+| Leaderboard game count | 10 | Counted games in the window for a leaderboard position |
+| Window length | 90 days | Rolling window, Asia/Manila midnight boundary |
 
-Assessment and performance weights represent complementary shares of the same rank. Their exact normalized numerical model still needs specification.
+**Saving settings recomputes everyone** from the stored game facts; rank is a projection, the facts never change, and there is no "old world / new world" split.
 
-The agreed observation window is three months. The agreed Most Improved/Off Day requirement is five prior sessions at the same club within that window. Neither was explicitly requested as an Admin-adjustable setting; do not silently add controls for them.
-
-Whether configuration edits recompute existing ranks immediately or apply from a future point is unresolved. Feature flags must not become a back door for changing confirmed winners or bypassing lost-data invalidation.
+The agreed Most Improved/Off Day requirement is five prior sessions at the same club within the window; the prototype award formula is approved as is for v1 and is not an Admin setting. Feature flags must not become a back door for changing confirmed winners or bypassing lost-data invalidation.
 
 ## Profile character library
 
-Owner decision, November 9, 2026 ([D-2026-11-09-13](../../../../mvp/decisions.md#d-2026-11-09-13); mockup log 2026-11-09-admin-profile-characters; in the mock app, tickets #644–#646; real mode not started). The characters players pick as their profile picture are images **the platform owner uploads** in Admin › Settings › Profile characters. No club or player adds to the library.
+Owner decision, November 9, 2026 ([D-2026-11-09-13](../../../../../mvp/decisions.md#d-2026-11-09-13); mockup log 2026-11-09-admin-profile-characters; in the mock app, tickets #644–#646; real mode not started). The characters players pick as their profile picture are images **the platform owner uploads** in Admin › Settings › Profile characters. No club or player adds to the library.
 
 - Uploads: images only (PNG, JPG or WebP), up to 1 MB each, cropped to a centred square; several at once.
 - Each image is **shown** or **hidden**; at least **8** stay shown. Players see shown images in upload order, **8 per page**. Delete has a short Undo.

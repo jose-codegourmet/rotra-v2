@@ -478,7 +478,7 @@ const plural = (n, w) => `${num(n)} ${w}${n === 1 ? '' : 's'}`;
 
 // ---------- Fixtures (fictional) ----------
 const H = 36e5, D = 864e5;
-const term = (paid, plan, from, to, amount, ref) => ({ paid, plan, from, to, amount, ref, by: OWNER });
+const term = (paid, plan, from, to, amount, ref, note = '') => ({ paid, plan, from, to, amount, ref, note, by: OWNER });
 function seedClubs() {
   const now = Date.now();
   return [
@@ -1021,7 +1021,7 @@ function viewClub() {
         <p class="small muted">The License form fills in the amount from this price. Changing it doesn't change payments already recorded.</p></section>
       <section class="card stack"><div class="sec-head"><div><h2>Payment history</h2><p class="small muted">Recorded each time you activate or renew. The club sees the same list in Club settings.</p></div></div>
         ${terms.length ? `<div class="tbl-wrap"><table class="tbl cards"><thead><tr><th>Paid</th><th>Plan</th><th>Covers</th><th class="n">Amount</th><th>Reference</th></tr></thead><tbody>
-          ${terms.map((x) => `<tr><td data-label="Paid" class="nw">${fmtYmd(x.paid)}</td><td data-label="Plan">${x.plan}</td><td data-label="Covers" class="small">${fmtYmd(x.from)} – ${fmtYmd(x.to)}</td><td data-label="Amount" class="n">${amountText(x.amount)}</td><td data-label="Reference" class="mono small">${esc(x.ref || '—')}</td></tr>`).join('')}
+          ${terms.map((x) => `<tr><td data-label="Paid" class="nw">${fmtYmd(x.paid)}</td><td data-label="Plan">${x.plan}</td><td data-label="Covers" class="small">${fmtYmd(x.from)} – ${fmtYmd(x.to)}</td><td data-label="Amount" class="n">${amountText(x.amount)}</td><td data-label="Reference" class="small"><span class="mono">${esc(x.ref || '—')}</span>${x.note ? `<br><span class="muted">${esc(x.note)}</span>` : ''}</td></tr>`).join('')}
         </tbody></table></div><p class="small muted">What the club actually paid each time. Sample amounts.</p>` : '<div class="empty"><b>No payments recorded.</b><span>Activate the license after the club pays to add the first one.</span></div>'}</section>`,
     pages: retentionCard(c),
     sales: (() => {
@@ -1458,13 +1458,12 @@ const licDirty = () => S.ui.lic && licFields(S.ui.lic) !== S.ui.lic.init;
 function licErrors(L) {
   const e = {};
   if (!['Monthly', 'Yearly'].includes(L.plan)) e.plan = 'Choose monthly or yearly.';
-  if (!validYmd(L.from)) e.from = 'Enter the date the term starts.';
   if (clubOf(L.club).price.free) return e; // free clubs record no payment date or amount
   if (!validYmd(L.paid)) e.paid = 'Enter the date the club paid.';
   else if (L.paid > todayYmd()) e.paid = "The payment date can't be in the future.";
   const amt = String(L.amount).replace(/,/g, '').trim();
   if (!/^\d+$/.test(amt) || +amt <= 0) e.amount = 'Enter the amount the club paid, in pesos.';
-  if (String(L.ref).length > 40) e.ref = 'Keep the reference under 40 characters.';
+  if (String(L.ref).length > 40) e.ref = 'Keep the note under 40 characters.';
   return e;
 }
 function licEffects(c, L) {
@@ -1492,27 +1491,24 @@ const SHEETS = {
     const steps = `<div class="steps"><span class="${L.step === 'form' ? 'on' : ''}">1 Details</span><span aria-hidden="true">·</span><span class="${L.step !== 'form' ? 'on' : ''}">2 Review</span></div>`;
     if (L.step === 'review' || L.step === 'saving') {
       const to = termEnd(L.from, L.plan);
-      const overlap = a.state === 'active' && L.from <= a.until ? diffDays(L.from, a.until) + 1 : 0;
       return sheetWrap(`${verb} license`, `${steps}
-        <dl class="kv"><dt>Club</dt><dd><b>${esc(c.name)}</b> · <span class="mono">${esc(c.username)}</span></dd><dt>Plan</dt><dd>${L.plan}</dd><dt>Covers</dt><dd>${fmtYmd(L.from)} – ${fmtYmd(to)}</dd><dt>Paid</dt><dd>${p.free ? 'Free · tester club' : `${peso(toNum(L.amount))} on ${fmtYmd(L.paid)}`}${!p.free && planPrice != null && toNum(L.amount) !== planPrice ? `<br><span class="small muted">The club's ${L.plan.toLowerCase()} price is ${peso(planPrice)}.</span>` : ''}</dd><dt>Reference</dt><dd class="mono">${esc(L.ref || '—')}</dd></dl>
+        <dl class="kv"><dt>Club</dt><dd><b>${esc(c.name)}</b> · <span class="mono">${esc(c.username)}</span></dd><dt>Plan</dt><dd>${L.plan}</dd><dt>Covers</dt><dd>${fmtYmd(L.from)} – ${fmtYmd(to)}</dd><dt>Paid</dt><dd>${p.free ? 'Free · tester club' : `${peso(toNum(L.amount))} on ${fmtYmd(L.paid)}`}${!p.free && planPrice != null && toNum(L.amount) !== planPrice ? `<br><span class="small muted">The club's ${L.plan.toLowerCase()} price is ${peso(planPrice)}.</span>` : ''}</dd><dt>Reference</dt><dd class="small muted">LIC number assigned when saved</dd><dt>Note</dt><dd>${esc(L.ref || '—')}</dd></dl>
         <div class="stack tight"><span class="label">What this does</span><ul class="bul">${licEffects(c, L).map((x) => `<li>${x}</li>`).join('')}</ul></div>
-        ${overlap ? notice('warn', `This term overlaps the current one by ${plural(overlap, 'day')}. How overlapping terms combine hasn't been decided.`) : ''}
         ${errLine(L.err)}`,
         `<button class="btn" data-act="licEdit" ${L.step === 'saving' ? 'disabled' : ''}>Back</button><button class="btn primary" data-act="licSave" ${L.step === 'saving' ? 'disabled' : ''}>${L.step === 'saving' ? 'Saving…' : `${verb} license`}</button>`, L.step !== 'saving');
     }
     const e = L.showErr ? licErrors(L) : {};
-    const to = validYmd(L.from) && L.plan ? termEnd(L.from, L.plan) : null;
+    const to = L.plan ? termEnd(L.from, L.plan) : null;
     return sheetWrap(`${verb} license`, `${steps}
       <div class="who">${logo(c)}<div class="main"><b>${esc(c.name)}</b><span class="small muted">${a.state === 'active' ? `Active until ${fmtYmd(a.until)}` : a.state === 'expired' ? `Expired since ${fmtYmd(a.since)}` : a.state === 'scheduled' ? `Starts ${fmtYmd(a.starts)}` : 'Never licensed'}</span></div></div>
       <form data-form="license" class="stack" novalidate>
         <div class="field"><span>Plan</span><div class="choices" role="group" aria-label="Plan">${[['Monthly', `${p.free ? 'Free' : peso(p.monthly)} for one month`], ['Yearly', `${p.free ? 'Free' : peso(p.yearly)} for one year`]].map(([v, sub]) => `<button type="button" class="choice" data-act="licPlan" data-v="${v}" aria-pressed="${L.plan === v}"><b>${v}</b><span class="small muted">${sub}</span></button>`).join('')}</div>${errLine(e.plan)}</div>
         <div class="fgrid">
-          <label class="field" for="lic-from"><span>Term starts</span><input class="input ${e.from ? 'bad' : ''}" id="lic-from" type="date" data-bind="ui.lic.from" data-live value="${esc(L.from)}">${to ? `<span class="hint">Ends ${fmtYmd(to)}</span>` : ''}${errLine(e.from)}</label>
+          <div class="field"><span>Covers</span><b>${to ? `${fmtYmd(L.from)} – ${fmtYmd(to)}` : `From ${fmtYmd(L.from)}`}</b>${a.state === 'active' ? '<span class="hint">A renewal starts the day after the current term ends.</span>' : ''}</div>
           ${p.free ? `<div class="field"><span>Amount</span><b>Free</b><span class="hint">This is a tester club, so nothing is charged. Change it from the club's Price card.</span></div>` : `<label class="field" for="lic-paid"><span>Paid on</span><input class="input ${e.paid ? 'bad' : ''}" id="lic-paid" type="date" max="${todayYmd()}" data-bind="ui.lic.paid" value="${esc(L.paid)}">${errLine(e.paid)}</label>
           <label class="field" for="lic-amount"><span>Amount paid</span><div class="affix"><b>₱</b><input class="input ${e.amount ? 'bad' : ''}" id="lic-amount" inputmode="numeric" data-bind="ui.lic.amount" value="${esc(L.amount)}"></div><span class="hint">Filled in from this club's price. Change it if the club paid a different amount.</span>${errLine(e.amount)}</label>`}
-          <label class="field" for="lic-ref"><span>Reference <span class="hint">(optional)</span></span><input class="input ${e.ref ? 'bad' : ''}" id="lic-ref" data-bind="ui.lic.ref" value="${esc(L.ref)}" placeholder="Receipt or transfer reference">${errLine(e.ref)}</label>
+          <label class="field" for="lic-ref"><span>Note <span class="hint">(optional)</span></span><input class="input ${e.ref ? 'bad' : ''}" id="lic-ref" data-bind="ui.lic.ref" value="${esc(L.ref)}" placeholder="Receipt or transfer reference">${errLine(e.ref)}</label>
         </div>
-        ${a.state === 'active' ? notice('', 'The start date is suggested as the day after the current term ends. The rule for renewing early hasn\'t been decided, so check it before you continue.') : ''}
       </form>`,
       '<button class="btn" data-act="closeSheet">Cancel</button><button class="btn primary" data-act="licReview">Review</button>');
   },
@@ -1672,14 +1668,15 @@ function licStart(c) {
 }
 function licCommit() {
   const L = S.ui.lic, c = clubOf(L.club), a = access(c), t = todayYmd(), verb = c.terms.length ? 'Renewed' : 'Activated';
-  const x = { ...term(L.paid, L.plan, L.from, termEnd(L.from, L.plan), +String(L.amount).replace(/,/g, ''), L.ref.trim()), op: L.op };
+  const seq = Math.max(0, ...S.clubs.flatMap((k) => k.terms).map((k) => +String(k.ref || '').replace(/\D/g, '') || 0)) + 1;
+  const x = { ...term(L.paid, L.plan, L.from, termEnd(L.from, L.plan), +String(L.amount).replace(/,/g, ''), `LIC-${String(seq).padStart(4, '0')}`, L.ref.trim()), op: L.op };
   c.terms.push(x);
   let extra = '';
   if (a.state === 'expired' && L.from <= t && x.to >= t) {
     if (c.ret.deletedOn) extra = ' Public pages were already deleted and were not restored.';
     else { c.ret.cycles.push({ expired: a.since, cancelled: t }); c.ret.failedOn = null; extra = ` Public pages restored; deletion countdown from ${fmtYmd(a.since)} cancelled.`; }
   }
-  log('club', c.id, `${verb} license: ${x.plan}, ${fmtYmd(x.from)} – ${fmtYmd(x.to)} · ${amountText(x.amount)}${x.ref ? ` · ${x.ref}` : ''}.${extra}`);
+  log('club', c.id, `${verb} license: ${x.plan}, ${fmtYmd(x.from)} – ${fmtYmd(x.to)} · ${amountText(x.amount)} · ${x.ref}${x.note ? ` (${x.note})` : ''}.${extra}`);
   return { c, x, verb };
 }
 function licDone(r, found) {

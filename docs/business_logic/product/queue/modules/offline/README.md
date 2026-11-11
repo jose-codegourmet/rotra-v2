@@ -2,6 +2,22 @@
 
 **Status:** Confirmed v1 target rules. This is a core requirement, not an optional later enhancement. Updated October 26, 2026 to match the [ROTRA Queue prototype](../../../../../../apps/mockup/queue-app/rotra-queue.html); online boundaries updated November 7, 2026 for MVP by [D-2026-11-07-03](../../../../../mvp/decisions.md#d-2026-11-07-03).
 
+## Owner decisions — November 11, 2026 (#722, [D-2026-11-11-04](../../../../../mvp/decisions.md#d-2026-11-11-04))
+
+- **Engine (option A).** Every change made offline on a downloaded, started session is recorded as a
+  command (name, arguments, `operationId`) in an IndexedDB **outbox** and applied locally by running the
+  existing mock-store reducers over the downloaded snapshot. When internet returns, the commands replay in
+  order through the existing real adapters (every online write already carries an idempotent
+  `operationId`). A server disagreement (409) goes to **Q-CONFLICT** for Queue Master review. The full
+  device-stream protocol of offline-sync.md is not built for MVP.
+- **Nothing is lost on reload or restart:** the local copy and the outbox are durable on the device.
+- **Play-history file, for non-technical rescue.** Club settings › This device has **Export play history**
+  (downloads `playhistory.json`: the downloaded session, its local changes and the outbox) and **Import
+  play history…** (loads such a file onto this device). The file is the fallback when a device dies or a
+  session must move to another device; importing is not a database sync, the imported commands join this
+  device's outbox and replay like its own. This replaces the "CSV export/import" wording below.
+- Session done still needs internet, complete sync and the guest review of D-2026-11-07-03.
+
 ## Owner decisions — November 8, 2026 (#246)
 
 These decisions supersede older conflicting offline and recovery rules below and in the linked flow.
@@ -13,7 +29,7 @@ They describe the target, not functionality currently implemented.
   guests, changing availability, queue management and Auto Queue, and recording payments. Registered
   players cannot be deleted offline.
 - Each device keeps a durable JSON session log, including changes and their source, to support merge
-  and review. A CSV export/import transfers session data between devices; importing is not itself a
+  and review. A play-history file (JSON, see November 11 above) transfers session data between devices; importing is not itself a
   database sync. Check the club and session, avoid duplicate operations, and retain source evidence.
 - Merge non-conflicting changes automatically. The Queue Master reviews conflicting matches, winners,
   timestamps and payment states, choosing the correct record; keep the original records and decision.
@@ -53,10 +69,10 @@ Until a data mode has a device-download adapter, an upcoming Queue Session shows
 offline-copy status. This is not a claim that no download exists; it avoids turning unavailable device-local
 evidence into a false “No”.
 
-Real data mode (#399) has no device-download adapter yet: device enrollment waits on
-[#246](https://github.com/jose-codegourmet/rotra-v2/issues/246) and durable browser storage on Q11. Real
-mode is online only, so nothing is ever "Saved on this device"; the sync status reports the server's
-check time and whether a session's records are proven complete.
+Real data mode has a durable **read-only** device copy in IndexedDB (#477): a downloaded session stays
+viewable offline. Offline writes (the outbox and replay above) are #722. Until #722 lands, real-mode writes
+are online only, so nothing is ever "Saved on this device"; the sync status reports the server's check time
+and whether a session's records are proven complete.
 
 The top bar always shows sync status:
 

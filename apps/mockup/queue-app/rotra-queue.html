@@ -2368,7 +2368,9 @@ function viewClub() {
       <p class="small muted">Sample amounts. License prices haven't been decided yet.</p></section>
     <section class="card stack" id="club-device"><h2>This device</h2>
       ${downloaded.length ? `<div class="list">${downloaded.map((s) => `<div class="li"><div class="main"><b>${esc(s.title)}</b><p class="small muted">${fmtDate(s.start)} · ready for offline use</p></div>${chip('Ready', 'ok')}</div>`).join('')}</div>` : '<p class="small muted">No sessions downloaded on this device yet. Download one from its preparation page.</p>'}
-      <p class="small muted">Downloads are per device. A session downloaded on a laptop isn't ready on a phone.</p></section>
+      <p class="small muted">Downloads are per device. A session downloaded on a laptop isn't ready on a phone.</p>
+      <div class="row"><button class="btn sm" data-act="exportPlayHistory" ${downloaded.length ? '' : 'disabled'}>Export play history</button><label class="btn sm" for="play-history-file">Import play history…</label><input type="file" id="play-history-file" class="sr-only" accept="application/json,.json"></div>
+      <p class="small muted">Changes made offline are saved on this device automatically. The file is a backup for moving a session to another device or recovering one that broke.</p></section>
     <section class="card stack" id="club-account"><h2>Account</h2>
       <dl class="kv"><dt>Username</dt><dd class="mono">${esc(S.ui.login.user || 'lahug.smash')}</dd></dl>
       <form class="stack" data-form="password" novalidate><div><h3>Change password</h3><p class="small muted">Enter your current password to set a new one. It changes for every device that signs in to this club account.</p></div>
@@ -5460,6 +5462,12 @@ const ACT = {
     S.club.nameRequest = { name: v, at: Date.now() }; S.ui.clubName = null; S.ui.clubNameErr = '';
     save(); render(); toast('Name change requested. Waiting for approval');
   },
+  exportPlayHistory: () => {
+    const sessions = S.sessions.filter((s) => s.download === 'ready' && s.status !== 'cancelled');
+    const blob = new Blob([JSON.stringify({ rotra: 'play-history', version: 1, club: S.club.name, exportedAt: new Date().toISOString(), pending: S.pending, sessions }, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'playhistory.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    toast('Play history exported');
+  },
   removeLogo: () => { S.club.logoPrev = S.club.logo || S.club.logoPrev || null; S.club.logo = null; save(); render(); toast('Logo removed'); },
   // Inside claude.ai the file goes through the viewer's save prompt; opened as a plain local file it downloads directly.
   exportPayments: async () => {
@@ -6121,6 +6129,17 @@ function loadPlayerPic(file, id) {
   img.src = URL.createObjectURL(file);
 }
 // Logo upload: centre-crop to a 256 px square so the saved image stays small.
+function importPlayHistory(file) {
+  if (!file) return;
+  file.text().then((txt) => {
+    let data = null;
+    try { data = JSON.parse(txt); } catch (_) { data = null; }
+    if (!data || data.rotra !== 'play-history' || !Array.isArray(data.sessions)) { toast("That file isn't a ROTRA play history."); return; }
+    data.sessions.forEach((s) => { const i = S.sessions.findIndex((x) => x.id === s.id); if (i >= 0) S.sessions[i] = { ...S.sessions[i], ...s, download: 'ready' }; else S.sessions.push({ ...s, download: 'ready' }); });
+    const n = +data.pending || 0; S.pending += n; save(); render();
+    toast(`Play history imported · ${n} change${n === 1 ? '' : 's'} waiting to sync`);
+  });
+}
 function loadLogo(file) {
   if (!file) return;
   if (!/^image\//.test(file.type)) { toast('Choose an image file'); return; }
@@ -6204,6 +6223,7 @@ function onBind(e) {
   const el = e.target;
   if (el.id === 'rp-range') { stopReplay(); replayTo(+el.value); return; }
   if (el.id === 'logo-file') { if (e.type === 'change') loadLogo(el.files && el.files[0]); return; }
+  if (el.id === 'play-history-file') { if (e.type === 'change') importPlayHistory(el.files && el.files[0]); return; }
   if (el.id === 'pic-file') { if (e.type === 'change') loadPlayerPic(el.files && el.files[0], el.dataset.id); return; }
   if (el.dataset.actChange) { if (e.type === 'change') { curAct = el.dataset.actChange; CHANGE[el.dataset.actChange](el); } return; }
   if (!el.dataset.bind) return;

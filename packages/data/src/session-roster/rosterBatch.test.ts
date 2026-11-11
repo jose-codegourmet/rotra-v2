@@ -6,7 +6,6 @@ import { setMockLatencyEnabled } from '../mock/latency'
 import { mockStore, readMockState } from '../mock/store'
 import { getQueueSession } from '../queue-session/fetchers'
 import { queueSessionKeys } from '../queue-session/queryKeys'
-import { ROSTER_DUPLICATE_ERROR } from './sessionRoster.rules'
 import {
   enqueueAcceptRequest,
   enqueueAddNewPlayer,
@@ -17,6 +16,7 @@ import {
 import { getSessionRoster } from './fetchers'
 import { sessionRosterKeys } from './queryKeys'
 import { getRosterBatch, overlayRoster, type PendingRosterOp, readRosterView } from './rosterBatch'
+import { ROSTER_DUPLICATE_ERROR } from './sessionRoster.rules'
 
 let restoreLatency: () => void
 let disconnect: (() => void) | undefined

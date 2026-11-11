@@ -1,6 +1,6 @@
 import type { QueryClient } from '@tanstack/react-query'
-import { clubPlayerKeys } from '../club-player/queryKeys'
 import type { ClubPlayer } from '../club-player/clubPlayer.types'
+import { clubPlayerKeys } from '../club-player/queryKeys'
 import { MockError } from '../mock/errors'
 import type { PlayingLevel } from '../player/player.types'
 import { queueSessionKeys } from '../queue-session/queryKeys'

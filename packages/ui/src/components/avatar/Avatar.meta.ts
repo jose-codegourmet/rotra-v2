@@ -12,7 +12,7 @@ export const avatarMeta = {
     'Pass onView (D-PHOTO-VIEWER, #716) wherever the avatar is not already a profile button and the viewer may see the picture: a loaded picture (photo or character) becomes a button named "View full photo of <name>" (viewLabel overrides) with a zoom-in cursor and an accent focus ring; it calls onView, which opens PhotoViewer. Initials and failed images stay inert.',
     'onClick wins over onView: an avatar that opens a profile keeps opening it, and the photo opens from the big picture inside the profile. Never pass onView to an avatar inside another button or link (row, tile, PlayerFaceButton).',
     'Pick the size the prototype uses at that spot (24, 28, 36, 40, 44, 52, 64, 88).',
-    'shape="square" tone="accent" is the club logo / big initials tile (.avatar.lg, .avatar.xxl).',
+    'Every player picture is a circle (the default shape) in all three apps (D-2026-11-11-11). shape="square" is only for club logos (tone="accent" initials tile); never use it for a player.',
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',

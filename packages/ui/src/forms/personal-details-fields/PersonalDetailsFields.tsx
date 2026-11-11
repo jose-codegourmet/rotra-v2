@@ -113,7 +113,8 @@ export function PersonalDetailsFields({ sections, disabled = false }: PersonalDe
             Optional. Links describe you to others; you can't sign in with them. Whether links are
             public is still being decided.
           </p>
-          <div className={gridClass}>
+          {/* One per row at every width (log 2026-11-11-player-edit-profile-links-rows) */}
+          <div className="flex flex-col gap-3.5">
             {SOCIAL_PROVIDERS.map((provider) => (
               <Field key={provider.key} label={provider.label} error={error(provider.key)}>
                 {text(provider.key, {

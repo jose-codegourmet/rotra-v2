@@ -1,7 +1,7 @@
 'use client'
 
 import { cn } from '@rotra/ui/cn'
-import { type DragEvent, useState } from 'react'
+import { type DragEvent, type ReactNode, useState } from 'react'
 
 export type ImageDropZoneProps = {
   /** Called with the dropped or chosen files, unchecked. Crop, size and type checks belong to the caller. */
@@ -11,6 +11,10 @@ export type ImageDropZoneProps = {
   /** Forces the drag-over look (stories); normally the zone tracks the drag itself */
   dragOver?: boolean
   id?: string
+  /** Bold line; defaults to the characters copy "Drag images here to upload" */
+  title?: ReactNode
+  /** Muted line; defaults to "or click to choose · PNG, JPG or WebP, up to 1 MB each" */
+  hint?: ReactNode
   className?: string
 }
 
@@ -18,7 +22,15 @@ export type ImageDropZoneProps = {
  * The prototype's .ch-drop (Admin › Settings › Profile characters): a dashed zone that takes several
  * images by drag or by the file picker. It neither crops nor stores; it only reports the files.
  */
-export function ImageDropZone({ onFiles, disabled, dragOver, id, className }: ImageDropZoneProps) {
+export function ImageDropZone({
+  onFiles,
+  disabled,
+  dragOver,
+  id,
+  title = 'Drag images here to upload',
+  hint = 'or click to choose · PNG, JPG or WebP, up to 1 MB each',
+  className,
+}: ImageDropZoneProps) {
   const [over, setOver] = useState(false)
   const active = !disabled && (dragOver || over)
 
@@ -61,8 +73,8 @@ export function ImageDropZone({ onFiles, disabled, dragOver, id, className }: Im
         }}
         className="pointer-events-none absolute size-px opacity-0"
       />
-      <b className="text-fg">Drag images here to upload</b>
-      <span className="text-[13px]">or click to choose · PNG, JPG or WebP, up to 1 MB each</span>
+      <b className="text-fg">{title}</b>
+      <span className="text-[13px]">{hint}</span>
     </label>
   )
 }

@@ -88,7 +88,7 @@ const columns = [
     meta: { lead: true },
     cell: ({ row }) => (
       <div className="flex min-w-0 items-center gap-3">
-        <Avatar name={row.original.name} shape="square" size={36} />
+        <Avatar name={row.original.name} size={36} />
         <div className="flex min-w-0 flex-col">
           <b className="[overflow-wrap:anywhere]">{row.original.name}</b>
           <span className="font-mono text-[13px] text-fg2">{row.original.username}</span>

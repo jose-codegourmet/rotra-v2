@@ -2,12 +2,13 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const playerIdentityCardMeta = {
   name: 'PlayerIdentityCard',
   description:
-    'Profile identity card: picture or initials, name, nickname, the permanent RTR ID with Copy, and the owner actions Edit profile and My player ID.',
+    'Profile identity card: the ProfileHero (Profile banner strip, circular picture overlapping it, name, nickname), the permanent RTR ID with Copy, and the owner actions Edit profile and My player ID.',
   usage: [
     'Use as the side column of P-PUBLIC-PROFILE and P-OWN-PROFILE; never pass private contact data.',
     'The RTR ID hint never calls the ID a residence or current club.',
     'Other profiles offer Compare with me, or Compare with my results when signed out.',
     'The owner picture edit button calls onChangePicture; public profiles do not show it.',
+    'bannerKey (or an uploaded bannerImageUrl) picks the banner; missing = Court.',
     'Clipboard handling and toasts belong to the container.',
   ],
   prototype: {
@@ -16,5 +17,5 @@ export const playerIdentityCardMeta = {
   },
   docs: ['docs/screens/product/modules/player-information/profile.md'],
   variants: ['public', 'own'],
-  related: ['PlayerIdLine', 'AccountPanel', 'ProfileLayout'],
+  related: ['ProfileHero', 'PlayerIdLine', 'AccountPanel', 'ProfileLayout'],
 } satisfies ComponentMeta

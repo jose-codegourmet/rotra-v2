@@ -5,6 +5,7 @@ export const adminPlayerPictureSectionMeta = {
   description:
     "The Profile picture section of Admin's Edit player form: preview, upload, initials, previous picture and the shown library characters, 8 per page.",
   usage: [
+    'Player pictures are circles, on screen and in any downloaded image (D-2026-11-11-11).',
     'Inline inside the Edit player form, not a sheet and without a Done step; the form owns the draft and saves it with Save changes.',
     'Pass the draft as picture, the saved one as savedPicture, and only the shown library images as characters (upload order). A character in use that is no longer shown still appears in the preview, carrying its own image.',
     'Upload checks type (PNG, JPG, WebP) and size (1 MB) itself and calls onUpload only with a valid file; onUpload crops to a square and may throw when the file cannot be read.',

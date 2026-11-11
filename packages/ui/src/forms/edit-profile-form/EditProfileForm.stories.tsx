@@ -19,6 +19,8 @@ const meta = {
     picture: jose.picture,
     pictureName: jose.fullName,
     onChangePicture: fn(),
+    bannerKey: 'court',
+    onBannerChange: fn(),
     onRequestContactChange: fn(),
     onOpenPhonePrivacy: fn(),
   },
@@ -32,8 +34,32 @@ const openSection =
     await userEvent.click(await within(canvasElement).findByRole('tab', { name: new RegExp(name) }))
   }
 export const NameSection: Story = {}
+export const NameSectionLight: Story = { globals: { theme: 'light' } }
+/** The Name preview with the Night banner and initials (no picture) */
+export const NightBannerInitials: Story = { args: { bannerKey: 'night', picture: null } }
+/** Typing updates the preview's name and nickname */
+export const PreviewUpdatesAsTyped: Story = {
+  play: async ({ canvasElement, userEvent }) => {
+    const canvas = within(canvasElement)
+    const nickname = await canvas.findByLabelText(/Nickname/)
+    await userEvent.clear(nickname)
+    await userEvent.type(nickname, 'Smash King')
+  },
+}
+/** A banner is saving: the swatches are disabled */
+export const BannerSaving: Story = { args: { bannerKey: 'ember', bannerDisabled: true } }
+/** Without onBannerChange the Banner swatches are left out */
+export const WithoutBannerPicker: Story = { args: { onBannerChange: undefined } }
 export const PlayingStyleSection: Story = { play: openSection('Playing style') }
 export const LinksSection: Story = { play: openSection('Links') }
+export const LinksSectionLight: Story = {
+  play: openSection('Links'),
+  globals: { theme: 'light' },
+}
+export const LinksSectionPhone: Story = {
+  play: openSection('Links'),
+  globals: { viewport: { value: 'phone' } },
+}
 export const AccountSection: Story = { play: openSection('Account') }
 /** Edits in Name and Links: both tabs show the unsaved dot */
 export const DirtyDots: Story = {
@@ -69,3 +95,4 @@ export const Offline: Story = {
   },
 }
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
+export const PhoneLight: Story = { globals: { viewport: { value: 'phone' }, theme: 'light' } }

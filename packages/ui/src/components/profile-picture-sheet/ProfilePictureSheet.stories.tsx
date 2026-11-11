@@ -5,7 +5,8 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 import { ProfilePictureSheet, type ProfilePictureSheetProps } from './ProfilePictureSheet'
 
-const characters = ['', ...'abcdefghijklmnopqrstuvw'].map((id) => ({
+// 36 characters: three pages of 15, the last with 6.
+const characters = ['', ...'abcdefghijklmnopqrstuvwxyz012345678'].map((id) => ({
   id,
   image: profileCharacterUrl('u1', 'Miguel Santos', id),
 }))
@@ -74,10 +75,10 @@ export const Photo: Story = {
   render: () => <Demo initial={{ kind: 'photo', src: photo }} previous={previousPhoto} />,
 }
 export const MiddlePage: Story = {
-  render: () => <Demo initial={{ kind: 'character', id: 'i' }} previous={previousPhoto} />,
+  render: () => <Demo initial={{ kind: 'character', id: 'q' }} previous={previousPhoto} />,
 }
 export const LastPage: Story = {
-  render: () => <Demo initial={{ kind: 'character', id: 'w' }} />,
+  render: () => <Demo initial={{ kind: 'character', id: '8' }} />,
 }
 export const PendingUpload: Story = {
   render: () => <Demo initial={{ kind: 'photo', src: photo }} previous={previousPhoto} />,

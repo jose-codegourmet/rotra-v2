@@ -1,7 +1,7 @@
 'use client'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { formatPhoneForDisplay } from '@rotra/schema/phone'
-import { Avatar } from '@rotra/ui/avatar'
+import { type BannerOption, BannerPicker } from '@rotra/ui/banner-picker'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { useSubmitOnce } from '@rotra/ui/hooks/use-submit-once'
@@ -11,6 +11,7 @@ import {
   PersonalDetailsFields,
   type PersonalDetailsSection,
 } from '@rotra/ui/personal-details-fields'
+import { ProfileHero } from '@rotra/ui/profile-hero'
 import { useEffect, useId, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { editProfileDefaultValues } from './EditProfileForm.defaultValues'
@@ -60,7 +61,21 @@ export type EditProfileFormProps = {
   onDirtyChange?: (dirty: boolean) => void
   picture?: string | null
   pictureName?: string
+  /** The pencil on the Name preview's picture: opens the Profile picture sheet */
   onChangePicture?: () => void
+  /** The saved Profile banner key; missing = Court */
+  bannerKey?: string | null
+  /** The saved banner when it is an Admin upload; wins over bannerKey in the preview */
+  bannerImageUrl?: string | null
+  /**
+   * A banner swatch was picked. Applies at once, outside Save changes; the container saves it and
+   * shows the toast “Banner updated”. The Banner swatches show only when this is passed.
+   */
+  onBannerChange?: (key: string) => void
+  /** The banners shown to players (Admin › Profile banners); defaults to the six predefined ones */
+  banners?: BannerOption[]
+  /** While a banner saves, or offline */
+  bannerDisabled?: boolean
 }
 /** P-EDIT-PROFILE: one shared draft across four sections and one Save changes. */
 export function EditProfileForm({
@@ -76,6 +91,11 @@ export function EditProfileForm({
   picture,
   pictureName,
   onChangePicture,
+  bannerKey,
+  bannerImageUrl,
+  onBannerChange,
+  banners,
+  bannerDisabled,
 }: EditProfileFormProps) {
   const form = useForm<EditProfileValues>({
     resolver: zodResolver(editProfileSchema),
@@ -83,6 +103,7 @@ export function EditProfileForm({
     shouldFocusError: false,
   })
   const { errors, dirtyFields, isDirty } = form.formState
+  const [previewName = '', previewNickname] = form.watch(['fullName', 'nickname'])
   const [selected, setSelected] = useState<SectionId>('name')
   const [focusKey, setFocusKey] = useState<keyof EditProfileValues | null>(null)
   const submitOnce = useSubmitOnce(isPending)
@@ -149,26 +170,30 @@ export function EditProfileForm({
               </Notice>
             ) : null}
             {section.id === 'name' ? (
-              <div className="flex items-center gap-3.5">
-                <Avatar
-                  name={pictureName ?? defaultValues.fullName}
-                  src={picture ?? undefined}
-                  size={64}
-                  shape="square"
-                  tone={picture ? 'neutral' : 'accent'}
-                />
-                <div className="flex flex-col gap-1">
-                  <b>Profile picture</b>
-                  <span className="text-sm text-fg2">
-                    Shown on the leaderboard and your profile.
-                  </span>
-                  <div>
-                    <Button size="sm" onClick={onChangePicture}>
-                      Change picture
-                    </Button>
-                  </div>
-                </div>
-              </div>
+              <>
+                <ProfileHero
+                  placement="preview"
+                  name={previewName.trim() || pictureName || defaultValues.fullName}
+                  nickname={previewNickname?.trim() || null}
+                  pictureSrc={picture}
+                  bannerKey={bannerKey}
+                  bannerImageUrl={bannerImageUrl}
+                  onChangePicture={onChangePicture ?? (() => {})}
+                >
+                  <p className="m-0 text-xs text-fg2">
+                    This is how the top of your profile card looks. Tap the pencil to change your
+                    picture; pick a banner below.
+                  </p>
+                </ProfileHero>
+                {onBannerChange ? (
+                  <BannerPicker
+                    value={bannerKey}
+                    onChange={onBannerChange}
+                    options={banners}
+                    disabled={bannerDisabled}
+                  />
+                ) : null}
+              </>
             ) : null}
             {section.id === 'account' ? (
               <>

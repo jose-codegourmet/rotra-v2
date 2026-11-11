@@ -5,6 +5,7 @@ export const topThreePodiumMeta = {
   description:
     'The prototype’s grid-lit, pixel-notched stage with avatar artwork, rising fire and reduced-motion support for the first three entries in the overall ROTRA leaderboard.',
   usage: [
+    'Player pictures are circles, on screen and in any downloaded image (D-2026-11-11-11).',
     'Supports visitor privacy states for Player Information.',
     'Use above the leaderboard list when at least three players qualify.',
   ],

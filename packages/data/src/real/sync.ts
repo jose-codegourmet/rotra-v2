@@ -1,14 +1,17 @@
 import type { QueryClient } from '@tanstack/react-query'
+import { getConnectivity, subscribeConnectivity } from '../connectivity/connectivity'
 import { NotConnectedError } from '../mock/errors'
 import { syncKeys } from '../sync/queryKeys'
 import type { SessionIntegrity, SyncChange, SyncState, SyncStatus } from '../sync/sync.types'
 import { msOf, realRequest } from './client'
 
 /**
- * Real-mode sync (#399). There is no browser outbox or device copy yet (Q11), so every real write is
- * online and "saved" only when its Route Handler accepted it: nothing ever waits on this device.
- * These adapters report that truthfully plus what the server holds (F07.28 completeness). Device
- * enrollment, uploads, seals, the interruption answer and conflict authority wait on #246 / Q11.
+ * Real-mode sync (#399). The device copy is read-only (`device/deviceCopy.ts`, #477): downloaded
+ * sessions stay viewable offline, but there is no browser outbox, so every real write is online and
+ * "saved" only when its Route Handler accepted it: nothing ever waits on this device, and nothing
+ * here may say "Saved on this device". These adapters report that truthfully plus what the server
+ * holds (F07.28 completeness). Device enrollment, uploads, seals, the interruption answer and
+ * conflict authority wait on #246 / Q11.
  */
 
 type WireClubSyncSummary = { incompleteSessionIds: string[]; checkedAt: string }
@@ -23,7 +26,7 @@ type WireSessionSync = {
   }
 }
 
-const online = () => typeof navigator === 'undefined' || navigator.onLine !== false
+const online = () => getConnectivity() === 'online'
 
 /** Last server answer in this tab; offline, the top bar keeps it instead of inventing a time. */
 let lastSummary: { incompleteRecords: boolean; checkedAt: number } | null = null
@@ -113,15 +116,13 @@ export async function realAnswerInterruption(): Promise<SessionIntegrity> {
   throw new NotConnectedError()
 }
 
-/** Offline copies need device enrollment (#246) and durable browser storage (Q11). */
-export async function realGetDeviceDownloads(): Promise<never> {
-  throw new NotConnectedError()
-}
-
-/** Connectivity changes don't refetch paused queries, so the sync status follows them here. */
+/**
+ * Connectivity changes (browser events or "Simulate offline") don't refetch paused queries, so the
+ * sync status follows them here.
+ */
 export function connectRealSync(client: QueryClient) {
   if (typeof window === 'undefined') return () => {}
-  const offline = () => {
+  const wentOffline = () => {
     client.setQueryData<SyncStatus>(syncKeys.status(), (old) =>
       old ? { ...old, connectivity: 'offline' } : old,
     )
@@ -130,10 +131,12 @@ export function connectRealSync(client: QueryClient) {
     )
   }
   const reconnected = () => void client.invalidateQueries({ queryKey: syncKeys.all })
-  window.addEventListener('offline', offline)
-  window.addEventListener('online', reconnected)
-  return () => {
-    window.removeEventListener('offline', offline)
-    window.removeEventListener('online', reconnected)
-  }
+  let previous = getConnectivity()
+  return subscribeConnectivity(() => {
+    const next = getConnectivity()
+    if (next === previous) return
+    previous = next
+    if (next === 'offline') wentOffline()
+    else reconnected()
+  })
 }

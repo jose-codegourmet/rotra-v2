@@ -9,11 +9,18 @@ import type {
 import type { ClubPlayerView } from '../club-player/fetchers'
 import { guestRegistrationUrl } from '../club-player/registrationUrl'
 import type { ClubVenue } from '../club-venue/clubVenue.types'
+import {
+  deviceDownloadOf,
+  deviceDownloadRecords,
+  downloadErrorOf,
+  isDownloading,
+} from '../device/deviceIndex'
 import type { SaveInventoryItemInput } from '../inventory/fetchers'
 import type { InventoryItem } from '../inventory/inventory.types'
 import type { ClubAccess } from '../license/license.types'
 import type { PlayingLevel } from '../player/player.types'
 import type {
+  DownloadState,
   QueueSession,
   QueueSessionInput,
   QueueSessionSummary,
@@ -348,7 +355,7 @@ const courtOf = (court: WireCourt): SessionCourt => ({
   removedAt: msOrNull(court.removedAt),
 })
 
-function summaryOf(wire: WireSessionSummary): QueueSessionSummary {
+function summaryOf(wire: WireSessionSummary, downloadedHere: boolean): QueueSessionSummary {
   const { session } = wire
   return {
     ...session,
@@ -366,24 +373,32 @@ function summaryOf(wire: WireSessionSummary): QueueSessionSummary {
     capacity: wire.capacity,
     waitlistCount: wire.waitlistCount,
     queuedCount: wire.queuedCount,
-    // Device-local downloads are intentionally not inferred from server data (#399).
-    downloadedHere: null,
+    // Device-local: whether this device holds a read-only copy of the session (#477).
+    downloadedHere,
   }
 }
 
 export async function realGetQueueSessions() {
   const { sessions } = await realRequest<{ sessions: WireSessionSummary[] }>('/api/sessions')
-  return sessions.map(summaryOf)
+  const downloaded = new Set(
+    (await deviceDownloadRecords().catch(() => [])).map((record) => record.sessionId),
+  )
+  return sessions.map((wire) => summaryOf(wire, downloaded.has(wire.session.id)))
 }
 
 export async function realGetQueueSession(id: string) {
   const wire = await realRequest<WireSessionSummary>(`/api/sessions/${encodeURIComponent(id)}`)
+  const download = await deviceDownloadOf(id)
   return {
-    ...summaryOf(wire),
+    ...summaryOf(wire, download !== null),
     courts: wire.courts.map(courtOf),
-    downloadState: 'none' as const,
-    downloadedAt: null,
-    downloadError: undefined,
+    downloadState: (isDownloading(id)
+      ? 'downloading'
+      : download
+        ? 'ready'
+        : 'none') as DownloadState,
+    downloadedAt: download?.downloadedAt ?? null,
+    downloadError: downloadErrorOf(id),
   }
 }
 

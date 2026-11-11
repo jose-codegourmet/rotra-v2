@@ -255,8 +255,7 @@ export function startBlocker(
   )
   if (active) return `${active.title} is already running. One session at a time.`
   if (ctx.licenseExpired) return 'Your license has ended, so new sessions can’t start.'
-  if (ctx.offline && !ctx.downloaded)
-    return 'No downloaded copy on this device. Connect, or download first.'
+  if (ctx.offline) return 'Starting needs an internet connection.'
   const missing = ctx.roster.filter((p) => !p.level).length
   if (missing)
     return `${missing} player${missing === 1 ? ' needs' : 's need'} a level before you can start.`

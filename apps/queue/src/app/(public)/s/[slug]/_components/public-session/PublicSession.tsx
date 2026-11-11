@@ -1,6 +1,7 @@
 'use client'
 
 import { useSession } from '@rotra/data/auth/use-session'
+import { useConnectivity } from '@rotra/data/connectivity/useConnectivity'
 import { isPermissionRefusal } from '@rotra/data/mock/errors'
 import { playerLoginUrl, playerOrigin, playerRegisterUrl } from '@rotra/data/public-session/context'
 import { usePlayerSessionAccess } from '@rotra/data/public-session/player-access'
@@ -49,8 +50,6 @@ import { MatchRequest } from '@/app/(public)/s/[slug]/_components/match-request/
 import { useRequestMatchAction } from '@/app/(public)/s/[slug]/_components/match-request/useRequestMatchAction'
 import { MyNight } from '@/app/(public)/s/[slug]/_components/my-night/MyNight'
 import { SessionInviteSheet } from '@/app/(public)/s/[slug]/_components/session-invite-sheet/SessionInviteSheet'
-import { useAppSelector } from '@/store/hooks'
-import { selectDev } from '@/store/slices/devSlice'
 
 export type PublicSessionProps = {
   slug: string
@@ -267,7 +266,7 @@ function publishedSlides(page: PublicSessionPage): PublicResultsSectionPublished
  * completed sessions only, the Results section with the published slides. No operator controls.
  */
 export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: PublicSessionProps) {
-  const dev = useAppSelector(selectDev)
+  const offline = !useConnectivity().online
   const page = usePublicSession(slug, { visitor: viewer === 'visitor' })
   const mine = useMyJoinRequest(slug)
   const playerAccess = usePlayerSessionAccess(slug, viewer === 'visitor')
@@ -291,7 +290,7 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
     viewer === 'visitor' &&
     playerAccess.isSuccess &&
     playerAccess.fetchStatus !== 'paused' &&
-    !dev.offline
+    !offline
       ? playerAccess.data
       : null
   // Real mode (#687): the signed-in Player from the Player app's own sign-in, never a token here.
@@ -501,7 +500,7 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
           p,
           signedIn ? ownRequest : mine.data,
           () => setJoinOpen(true),
-          dev.offline,
+          offline,
           signedIn,
         )
   // The signed-in read (names per the signed-in rule, no cap, the viewer flagged) when there is
@@ -546,7 +545,7 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
             updatedLabel={time(refreshing.lastRefreshedAt ?? p.lastSyncedAt)}
             hasPendingChanges={p.hasPendingChanges}
             refreshThrottled={!refreshing.canRefresh}
-            offline={dev.offline}
+            offline={offline}
             onRefresh={() => void refreshing.refresh()}
           />
         ) : null}
@@ -580,7 +579,7 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
             night={night.data}
             sessionOpen={sessionOpen}
             acceptJoinRequests={p.acceptJoinRequests}
-            offline={dev.offline}
+            offline={offline}
             startsLabel={`${new Date(p.start).toLocaleDateString([], { month: 'short', day: 'numeric' })}, ${time(p.start)}`}
             matchHistoryHref={
               playerBase
@@ -657,7 +656,7 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
                 p.acceptJoinRequests && (p.status === 'prepared' || p.status === 'active')
               }
               onRequestToJoin={signedIn ? signedIn.onJoin : () => setJoinOpen(true)}
-              disabled={dev.offline || !!signedIn?.busy}
+              disabled={offline || !!signedIn?.busy}
             />
           </TabsContent>
         </Tabs>

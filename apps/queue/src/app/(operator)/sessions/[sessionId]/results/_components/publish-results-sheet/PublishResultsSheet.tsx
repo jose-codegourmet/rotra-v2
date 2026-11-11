@@ -1,17 +1,15 @@
 'use client'
 
+import { useConnectivity } from '@rotra/data/connectivity/useConnectivity'
 import type { PublishedSlide } from '@rotra/data/session-result/types'
 import { usePublishResults } from '@rotra/data/session-result/usePublishResults'
 import { useSessionPublication } from '@rotra/data/session-result/useSessionPublication'
 import { useSessionResults } from '@rotra/data/session-result/useSessionResults'
-import { useSyncState } from '@rotra/data/sync/useSyncState'
 import { PublishResultsForm } from '@rotra/ui/forms/publish-results-form'
 import { publishResultsFormDefaultValues } from '@rotra/ui/forms/publish-results-form/default-values'
 import type { PublishResultsFormValues } from '@rotra/ui/forms/publish-results-form/schema'
 import { toast } from '@rotra/ui/toaster'
 import { useEffect, useState } from 'react'
-import { useAppSelector } from '@/store/hooks'
-import { selectDev } from '@/store/slices/devSlice'
 
 export type PublishResultsSheetProps = {
   sessionId: string
@@ -31,8 +29,6 @@ const errorMessage = (error: unknown) =>
  * with the reason and the selection; the previous publication is untouched.
  */
 export function PublishResultsSheet({ sessionId, open, onOpenChange }: PublishResultsSheetProps) {
-  const dev = useAppSelector(selectDev)
-  const sync = useSyncState()
   const results = useSessionResults(sessionId)
   const publication = useSessionPublication(sessionId)
   const publish = usePublishResults()
@@ -47,6 +43,8 @@ export function PublishResultsSheet({ sessionId, open, onOpenChange }: PublishRe
     }
   }, [open])
 
+  const { online } = useConnectivity()
+
   const snapshot = results.data
   if (!snapshot || publication.isPending) return null
 
@@ -56,7 +54,6 @@ export function PublishResultsSheet({ sessionId, open, onOpenChange }: PublishRe
         awards: publication.data.publishedSlides.includes('awards'),
       }
     : null
-  const online = !dev.offline && (sync.data ? sync.data.online : true)
 
   const onSubmit = (values: PublishResultsFormValues) => {
     setServerError(undefined)

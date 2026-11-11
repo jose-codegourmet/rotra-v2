@@ -36,6 +36,8 @@
     "./fixtures/venues": "./src/fixtures/venues.ts",
     "./fixtures/players": "./src/fixtures/players.ts",
     "./mock/bridge": "./src/mock/bridge.ts",
+    "./connectivity": "./src/connectivity/connectivity.ts",
+    "./connectivity/useConnectivity": "./src/connectivity/useConnectivity.ts",
     "./mock/reset": "./src/mock/reset.ts",
     "./fixtures/dev-menu": "./src/fixtures/devMenu.ts",
     "./auth/types": "./src/auth/auth.types.ts",

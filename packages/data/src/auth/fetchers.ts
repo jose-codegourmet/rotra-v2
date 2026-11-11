@@ -1,9 +1,11 @@
+import { getConnectivity } from '../connectivity/connectivity'
 import { DEMO_CLUB_ID } from '../fixtures/clubs'
 import { players } from '../fixtures/players'
-import { getMockDevState, requireOnline } from '../mock/bridge'
+import { requireOnline } from '../mock/bridge'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { readMockState } from '../mock/store'
+import { clearDeviceCopyOnSignOut } from '../real/device'
 import { isRealDataMode } from '../real/mode'
 import { realGetPlayerSession, realSignInPlayer, realSignOutPlayer } from '../real/player'
 import { realGetClubSession, realSignInClub, realSignOutClub } from '../real/queue'
@@ -32,7 +34,7 @@ export async function signIn(audience: AuthAudience, input: SignInInput): Promis
   if (isRealDataMode() && audience === 'club') return realSignInClub(input)
   if (isRealDataMode() && audience === 'player') return realSignInPlayer(input)
   await delay()
-  if (audience === 'player' && getMockDevState().offline)
+  if (audience === 'player' && getConnectivity() === 'offline')
     throw new MockError('offline', "You're offline. Signing in needs an internet connection.")
   requireOnline()
   if (!input.identifier.trim() || !input.password)
@@ -69,7 +71,12 @@ export async function signIn(audience: AuthAudience, input: SignInInput): Promis
   return session
 }
 export async function signOut(audience: AuthAudience) {
-  if (isRealDataMode() && audience === 'club') return realSignOutClub()
+  if (isRealDataMode() && audience === 'club') {
+    const result = await realSignOutClub()
+    // Only after the server ended the session: the account's device copy leaves this device (#477).
+    await clearDeviceCopyOnSignOut()
+    return result
+  }
   if (isRealDataMode() && audience === 'player') return realSignOutPlayer()
   if (typeof document !== 'undefined') {
     // biome-ignore lint/suspicious/noDocumentCookie: remove the F06.4 mock session marker

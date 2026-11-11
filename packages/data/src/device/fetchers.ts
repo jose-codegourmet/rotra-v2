@@ -1,9 +1,9 @@
 import { delay } from '../mock/latency'
 import { readMockState } from '../mock/store'
+import { realGetDeviceDownloads } from '../real/device'
 import { isRealDataMode } from '../real/mode'
-import { realGetDeviceDownloads } from '../real/sync'
 
-/** Real mode: not connected until device enrollment (#246) and browser storage (Q11) exist. */
+/** Real mode: the sessions this device holds a read-only copy of, for the signed-in account (#477). */
 export async function getDeviceDownloads() {
   if (isRealDataMode()) return realGetDeviceDownloads()
   await delay()

@@ -1,5 +1,6 @@
 'use client'
 
+import { useConnectivity } from '@rotra/data/connectivity/useConnectivity'
 import { useFinalizeSession } from '@rotra/data/queue-session/useFinalizeSession'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionDoneReview } from '@rotra/data/queue-session/useSessionDoneReview'
@@ -13,8 +14,6 @@ import { SessionDoneSheet, type SessionDoneStep } from '@rotra/ui/session-done-s
 import { toast } from '@rotra/ui/toaster'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
-import { useAppSelector } from '@/store/hooks'
-import { selectDev } from '@/store/slices/devSlice'
 import { InvalidSessionDialog } from '../invalid-session-dialog/InvalidSessionDialog'
 
 export type SessionDoneFlowProps = {
@@ -38,10 +37,10 @@ const errorMessage = (error: unknown) =>
  */
 export function SessionDoneFlow({ sessionId, open, onOpenChange }: SessionDoneFlowProps) {
   const router = useRouter()
-  const dev = useAppSelector(selectDev)
   const session = useQueueSession(sessionId)
   const review = useSessionDoneReview(sessionId, { enabled: open })
   const sync = useSyncState()
+  const { online } = useConnectivity()
   const syncStatus = useSyncStatus()
   const integrity = useSessionIntegrity(sessionId),
     answer = useAnswerInterruption()
@@ -65,9 +64,7 @@ export function SessionDoneFlow({ sessionId, open, onOpenChange }: SessionDoneFl
   const r = review.data
   if (!s || !r) return null
 
-  // The DevMenu toggle disables Confirm the moment the device goes offline, before the sync
-  // state refetches; the pending count is the live one, so Confirm enables as soon as it reaches 0.
-  const online = !dev.offline && (sync.data ? sync.data.online : true)
+  // The pending count is the live one, so Confirm enables as soon as it reaches 0.
   const pendingChanges = sync.data ? sync.data.pendingCount : r.pendingChanges
 
   const continueToConfirm = () => {

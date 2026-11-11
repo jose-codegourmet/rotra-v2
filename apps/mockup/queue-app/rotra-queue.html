@@ -2422,7 +2422,7 @@ function simulateHistory(spec) {
     const pick = avail.slice(0, 4).map((x) => x.pid);
     const o = evenSplit(pick, lv);
     const sa = o.A.reduce((t, p) => t + lv(p), 0), sb = o.B.reduce((t, p) => t + lv(p), 0);
-    const aWins = r() < 1 / (1 + Math.pow(10, (sb - sa) / 4));
+    const aWins = r() < 1 / (1 + 10 ** ((sb - sa) / 4));
     const dur = 13 + Math.floor(r() * 8);
     seq += 1;
     const invalid = (spec.invalidSeq || []).includes(seq);
@@ -2463,7 +2463,7 @@ function simulateLive(spec) {
     if (t1 > now) { pick.forEach((p) => { free[p] = Infinity; }); courtFree[c.id] = Infinity; }
     else {
       const sa = o.A.reduce((t, p) => t + lv(p), 0), sb = o.B.reduce((t, p) => t + lv(p), 0);
-      const aWins = r() < 1 / (1 + Math.pow(10, (sb - sa) / 4)), withScore = r() < 0.6, lose = 9 + Math.floor(r() * 11);
+      const aWins = r() < 1 / (1 + 10 ** ((sb - sa) / 4)), withScore = r() < 0.6, lose = 9 + Math.floor(r() * 11);
       Object.assign(m, { status: 'done', endedAt: t1, winner: aWins ? 'A' : 'B', scoreA: withScore ? (aWins ? 21 : lose) : undefined, scoreB: withScore ? (aWins ? lose : 21) : undefined });
       pick.forEach((p) => { games[p] += 1; free[p] = t1 + (1 + Math.floor(r() * (spec.rest || 6))) * 6e4; });
       courtFree[c.id] = t1 + 2 * 6e4;
@@ -3470,7 +3470,7 @@ function viewPrepare() {
   const present = s.roster.filter((r) => r.present).length;
   const other = S.sessions.find((x) => x.status === 'active' && x.id !== s.id);
   const dl = { none: ['Not downloaded on this device', ''], downloading: ['Downloading…', 'warn'], ready: ['Ready on this device', 'ok'] }[s.download];
-  const cantStart = missing || other || (!S.online && s.download !== 'ready') || S.licenseExpired;
+  const cantStart = missing || other || !S.online || S.licenseExpired;
   return `<main class="wrap">
     <div class="crumb"><button class="btn sm ghost" data-act="go" data-to="home">${I.back} Home</button></div>
     <div class="between"><div class="stack tight"><span class="label">${live ? 'Session settings' : 'Preparation'}</span><div class="title-row"><h1>${esc(s.title)}</h1><button class="btn sm ghost icon-btn" data-act="go" data-to="public" aria-label="Open public page" title="Open public page">${I.ext}</button>${live ? '' : prepDangerMenu()}</div><p class="muted">${live ? `${fmtDate(s.startedAt)} · Started ${fmtTime(s.startedAt)} · Ends ${fmtTime(s.end)}${laterDay(s.startedAt, s.end)}` : `${fmtDate(s.start)} · ${fmtRange(s.start, s.end)}`} · ${esc(s.venue)}</p></div>
@@ -3488,7 +3488,7 @@ function viewPrepare() {
   ${!live ? `<div class="footer-bar ${cantStart ? 'dock-note' : 'dock-dup'}"><div class="in">
     <span class="small ${cantStart ? 'start-why' : 'muted'}">${other ? `${esc(other.title)} is already running. One session at a time. <button class="btn xs" data-act="go" data-to="console" data-id="${other.id}">Open ${esc(other.title)}</button>`
       : S.licenseExpired ? 'Your license has ended, so new sessions can’t start.'
-      : !S.online && s.download !== 'ready' ? 'No downloaded copy on this device. Connect, or download first.'
+      : !S.online ? 'Starting needs an internet connection.'
       : missing ? `${missing} player${missing > 1 ? 's need' : ' needs'} a level before you can start.`
       : `${s.roster.length} players · ${present} present. Starting locks levels; no match starts by itself.`}</span>
     <button class="btn primary" data-act="openStart" ${cantStart ? 'disabled' : ''}>Start session</button>
@@ -3934,7 +3934,7 @@ function awards(s) {
       if (!counted(m, r.pid)) return;
       const onA = sideOf(m, r.pid) === 'A';
       const mine = avg(onA ? m.teamA : m.teamB), opp = avg(onA ? m.teamB : m.teamA);
-      const expected = 1 / (1 + Math.pow(10, (opp - mine) / 2));
+      const expected = 1 / (1 + 10 ** ((opp - mine) / 2));
       const won = (m.winner === 'A') === onA;
       score += (won ? 1 : 0) - expected; g++; if (won) w++;
     });
@@ -4623,8 +4623,8 @@ const SHEETS = {
       ${dtPicker({ k: 'sheet.endAt', label: 'New end', id: 'st-end', value: sh.endAt, days: daysBetween(now, now + 864e5), base: dayStart(now), ok: (t) => t > now && t <= now + 864e5, set: (t) => { sh.endAt = t; }, autofocus: true })}` : '';
     return sheetShell('Start session?', `${endPicker}<dl class="kv"><dt>Session</dt><dd>${esc(s.title)}</dd><dt>Courts</dt><dd>${s.courts.length}</dd><dt>Formats</dt><dd>${fmtFormats(s)}</dd><dt>Mode</dt><dd>${MODES[s.mode].label}</dd><dt>Minimum</dt><dd>${s.minimum} games</dd><dt>Roster</dt><dd>${s.roster.length} confirmed · ${s.roster.filter((r) => r.present).length} present${(s.waitlist || []).length ? ` · ${s.waitlist.length} on the waitlist` : ''}</dd></dl>
       ${notice('', "Every player's level locks now. Players you add later get a level when you add them, and it locks too.")}
-      ${!S.online ? notice('warn', 'Starting on this device while offline. It syncs when you reconnect.') : ''}`,
-      `<button class="btn" data-act="closeSheet">Back</button><button class="btn primary" data-act="confirmStart" ${late && !(sh.endAt > now) ? 'disabled' : ''}>Start session</button>`);
+      ${!S.online ? notice('warn', 'Starting needs an internet connection.') : ''}`,
+      `<button class="btn" data-act="closeSheet">Back</button><button class="btn primary" data-act="confirmStart" ${!S.online || (late && !(sh.endAt > now)) ? 'disabled' : ''}>Start session</button>`);
   },
   openEarly(sh) {
     const s = cur();

@@ -8,6 +8,7 @@ import { useCreatePlayerInvite } from '@rotra/data/club-player/useCreatePlayerIn
 import { useDeleteClubPlayer } from '@rotra/data/club-player/useDeleteClubPlayer'
 import { useLinkGuestToSavedPlayer } from '@rotra/data/club-player/useLinkGuestToSavedPlayer'
 import { useSavedPlayerStats } from '@rotra/data/club-player/useSavedPlayerStats'
+import { useConnectivity } from '@rotra/data/connectivity/useConnectivity'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { useNowCard } from '@rotra/data/queue-session/useNowCard'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
@@ -36,8 +37,6 @@ import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import { longDateLabel, shortDateLabel } from '@/lib/dates'
-import { useAppSelector } from '@/store/hooks'
-import { selectDev } from '@/store/slices/devSlice'
 import { AddPlayer } from '../../../_components/add-player/AddPlayer'
 import { QueryError } from '../../../_components/query-error/QueryError'
 import { EditPlayerDetails } from '../edit-player-details/EditPlayerDetails'
@@ -109,7 +108,7 @@ export function SavedPlayers() {
   const pathname = usePathname()
   const params = useSearchParams()
   const filters = readFilters(params)
-  const offline = useAppSelector(selectDev).offline
+  const offline = !useConnectivity().online
   const nowCard = useNowCard()
   const live = nowCard.data?.live ?? null
 

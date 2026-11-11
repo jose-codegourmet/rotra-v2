@@ -1,3 +1,4 @@
+import { getConnectivity } from '../connectivity/connectivity'
 import portraits from '../fixtures/playerPortraits.json'
 import {
   computeStandings,
@@ -8,7 +9,7 @@ import {
 } from '../match/match.rules'
 import type { Match } from '../match/match.types'
 import { allowedRequestFormats } from '../match-request/matchRequest.rules'
-import { getMockDevState, requireOnline } from '../mock/bridge'
+import { requireOnline } from '../mock/bridge'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, mockStore } from '../mock/store'
@@ -485,7 +486,7 @@ export async function getMyNight(slug: string, playerId: string): Promise<MyNigh
           (d) => d.sessionId === session.id && d.pid === row.id && d.status === 'open',
         )
       : false,
-    offline: getMockDevState().offline,
+    offline: getConnectivity() === 'offline',
     games: standing?.games ?? 0,
     won: standing?.wins ?? 0,
     lost: standing?.losses ?? 0,

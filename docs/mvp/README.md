@@ -56,7 +56,7 @@ built, run or exercised against a database. Whether production sets real mode is
 |---|---|---|---|---|---|
 | Queue core | partially connected (almost all implemented) | Club name change, session defaults and club password change are mock-only in real mode; Downloads page #477 blocked on #246 | #408, #466, #477, #10, #12, #247 | #247, #381 | [queue.md](workstreams/queue.md) |
 | Queue, November 9–10 | Q18 (Requests, self check-in mark, request formats) and Q19 (club invite link, previous logo, self check-in switch, Joined via, guest linking, club-set pictures) done in the mock app; real mode not connected | No server paths or `requestFormats` column; no Prisma columns, server paths or storage/cleanup for Q19 | #586, #616–#618, #587, #619–#629 | [D-11](decisions.md#d-2026-11-09-11), [D-12](decisions.md#d-2026-11-09-12) | [queue.md](workstreams/queue.md) |
-| Queue offline | not implemented | No durable device copy, outbox or replay; no guest review at Session done | #246, #18 | #246, [D-03](decisions.md#d-2026-11-07-03) reconciliation | [queue-offline.md](workstreams/queue-offline.md) |
+| Queue offline | partially connected | Read-only device copy in IndexedDB: downloaded sessions stay viewable offline (#477); no outbox or replay, no offline writes, no guest review at Session done | #721, #722 | #246, [D-03](decisions.md#d-2026-11-07-03) reconciliation | [queue-offline.md](workstreams/queue-offline.md) |
 | Player access & Player Information | partially connected | Sign-in, session, sign-out, registration are real (#483); Admin-reviewed reset implemented in #491, schema applied; Your clubs, Join club and Leave club real (#703); registration from a club or session link joins that club (#707); club invite codes (`?k=`) not stored or checked in real mode, so the link works as the plain club link; Admin registration link mock-only; rank empty until #247 | #244, #400, #483, #488 | [D-01](decisions.md#d-2026-11-07-01), #491, #247 | [player.md](workstreams/player.md) |
 | Admin | partially connected | Reset link (D-01), player create/archive/restore/remove (contact-change approve/apply/status and name/nickname edit are real, #575). A07 (#589, #644–#650): profile character library and Admin edit-everything in the mock app; real mode is a backend follow-up (Supabase Storage, `profile_characters` table, full-form PATCH, admin-set password) | #24, #25, #26, #244, #395 | #244, #395, #377 | [admin.md](workstreams/admin.md) |
 | Ranking | partially connected (settings only) | No approved rank formula; leaderboard always empty in real mode | #247 | #247 | [ranking.md](workstreams/ranking.md) |
@@ -102,7 +102,7 @@ Merged from both audits, deduped.
 | 3 | Are club name-change, session defaults and club password change MVP? (Mock-only in real mode; the Facebook post template is real since #473.) | Queue core |
 | 4 | Server-rendered result-image export: needed, or is the client-side download enough? | Queue core |
 | 5 | A new player entered with a phone: keep "lookup pending" profile matching on sync, or route it through D-03 Queue Master guest review? | Queue offline |
-| 6 | Who owns the offline implementation ticket(s): a new epic, or reopen Q11 #18? #246 excludes IndexedDB/outbox | Queue offline |
+| 6 | Offline writes are tracked in #722 (blocked on the engine decision in that ticket); connectivity, D-03 rules and the read-only device copy shipped in #721 | Queue offline |
 | 7 | Close epics #408, #10, #11, #12 now that every sub-issue is closed? | Queue core (housekeeping) |
 | 8 | Settled by #491: Admin-reviewed submitted requests, no automatic email. D-01 updated | Player, Admin |
 | 9 | Queue Master issuance is real (#483). Is the Admin registration link (mock only) also MVP? | Player, Admin |
@@ -121,8 +121,6 @@ Remaining follow-ups from the audit (fixed rows removed 2026-11-07 and 2026-11-0
 | File:line | Says | Reality / conflict |
 |---|---|---|
 | `AGENTS.md:174` | Testing switches back on when Supabase/Prisma is connected | Connected in real mode; trigger is ambiguous |
-| `docs/architecture.md:299` | Console offline notice says changes save on this device | Untrue in real mode (doc already flags it) |
-| `docs/screens/product/dialogs.md` (Start session), `docs/screens/product/modules/queue/session-setup.md` (Q-PREPARE, Q-START) | Offline-start UI copy, now marked with an MVP note | Matches the prototypes; needs a mockup change for D-03 (rule 15) |
 | `docs/screens/product/modules/queue/players-roster.md:71`, `:89`; `docs/business_logic/product/queue/modules/players/flow/add-player.md:6` | Phone makes identity matching eligible on sync; "Lookup pending" | Possible conflict with D-03 "never auto-link" (open question 5) |
 | `packages/data/src/real/admin-audit.ts:12` (code comment) | Flags and ranking settings "wait on #402" | #402 is closed |
 | `docs/mockup-changes/2026-11-01-queue-auto-queue-copy.md`, `…-queue-presence-batches.md`, `…-queue-live-session-settings.md`, `2026-10-31-queue-routed-prototypes.md` | `Status: NEW` | Work looks shipped (unverified) |

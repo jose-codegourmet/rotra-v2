@@ -104,11 +104,16 @@ describe('Sync, device and offline › real mode', () => {
     await expect(getSessionIntegrity(sessionId)).rejects.toMatchObject({ status: 404 })
   })
 
-  it('leaves the interruption answer and device downloads not connected (#246)', async () => {
+  it('leaves the interruption answer not connected (#246)', async () => {
     await expect(answerInterruption({ sessionId, answer: 'yes' })).rejects.toBeInstanceOf(
       NotConnectedError,
     )
-    await expect(getDeviceDownloads()).rejects.toBeInstanceOf(NotConnectedError)
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it('lists no device downloads where there is no device storage, without asking the server (#477)', async () => {
+    expect(typeof indexedDB).toBe('undefined')
+    await expect(getDeviceDownloads()).resolves.toEqual([])
     expect(fetchMock).not.toHaveBeenCalled()
   })
 
@@ -126,6 +131,7 @@ describe('Sync, device and offline › real mode', () => {
     })
     client.setQueryData<Partial<SyncState>>(syncKeys.state(), { online: true })
     const disconnect = connectRealSync(client)
+    vi.stubGlobal('navigator', { onLine: false })
     events.dispatchEvent(new Event('offline'))
     expect(client.getQueryData<SyncStatus>(syncKeys.status())?.connectivity).toBe('offline')
     expect(client.getQueryData<SyncState>(syncKeys.state())?.online).toBe(false)

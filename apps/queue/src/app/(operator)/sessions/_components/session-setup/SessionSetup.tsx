@@ -3,6 +3,7 @@
 import { useClub } from '@rotra/data/club'
 import { useClubVenues } from '@rotra/data/club-venue/useClubVenues'
 import { useSaveClubVenue } from '@rotra/data/club-venue/useSaveClubVenue'
+import { useConnectivity } from '@rotra/data/connectivity/useConnectivity'
 import { DEMO_CLUB_ID } from '@rotra/data/fixtures/clubs'
 import { useInventory } from '@rotra/data/inventory/useInventory'
 import { allowedRequestFormats, REQUEST_FORMAT_ORDER } from '@rotra/data/match-request/rules'
@@ -55,7 +56,6 @@ import { useEffect, useRef, useState } from 'react'
 import { sessionHref } from '@/lib/dates'
 import { useAppSelector } from '@/store/hooks'
 import { selectAccount } from '@/store/slices/authSlice'
-import { selectDev } from '@/store/slices/devSlice'
 import { QueryError } from '../../../_components/query-error/QueryError'
 
 export type SessionSetupProps =
@@ -76,7 +76,7 @@ type VenueEdit = { mode: 'new'; prefillName: string } | { mode: 'edit'; id: stri
 /** Q-SETUP: Create session / Edit preparation, with the date, venue and clash dialogs. */
 export function SessionSetup(props: SessionSetupProps) {
   const router = useRouter()
-  const offline = useAppSelector(selectDev).offline
+  const offline = !useConnectivity().online
   const clubId = useAppSelector(selectAccount)?.id ?? DEMO_CLUB_ID
   const club = useClub(clubId)
   const venues = useClubVenues()

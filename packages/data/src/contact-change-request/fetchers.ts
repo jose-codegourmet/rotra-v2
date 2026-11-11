@@ -5,8 +5,9 @@ import { getAdminSession } from '../admin-account/fetchers'
 import { adminMutation } from '../admin-account/mutation'
 import { appendAdminAudit } from '../admin-audit/fetchers'
 import { getSession } from '../auth/fetchers'
+import { getConnectivity } from '../connectivity/connectivity'
 import { playerRequest } from '../leaderboard/request'
-import { consumeMockDevToggle, getMockDevState } from '../mock/bridge'
+import { consumeMockDevToggle } from '../mock/bridge'
 import { isProductionBuild } from '../mock/env'
 import { MockError, NotConnectedError } from '../mock/errors'
 import { delay } from '../mock/latency'
@@ -80,7 +81,7 @@ export async function submitContactChangeRequest(input: {
 }): Promise<ContactChangeRequest> {
   if (isRealDataMode()) return realSubmitContactChangeRequest(input)
   await delay(800)
-  if (getMockDevState().offline)
+  if (getConnectivity() === 'offline')
     throw new MockError(
       'offline',
       "Couldn't send because you're offline. Try again when you're connected.",

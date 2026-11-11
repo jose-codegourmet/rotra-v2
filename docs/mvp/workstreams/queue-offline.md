@@ -21,7 +21,7 @@ downloads and interruption recovery. See [Queue offline rules](../../business_lo
 
 ## Out of scope / deferred
 
-- Offline session start (D-03; existing docs that still allow it: [hub §7](../README.md#7-docs-that-are-now-untrue)).
+- Offline session start (D-03).
 - Expensive fuzzy matching, exhaustive same-name searches, automatic identity linking (D-03).
 
 ## Current state
@@ -30,28 +30,28 @@ downloads and interruption recovery. See [Queue offline rules](../../business_lo
 |---|---|---|---|
 | Offline UI states (banner, sync pill, recovery screen, download card) | partially connected | Mock simulation only (`data/src/sync/fetchers.ts`, `queue-session/mutations.ts:264`); route `sessions/[sessionId]/recovery/page.tsx` | #18, #385 closed |
 | Online sync status / completeness read | implemented | `real/sync.ts:38-110` → `api/sync`, `api/sessions/[sessionId]/sync` → `db/src/queue/sync.ts:569,644` | #269 closed |
-| Durable device copy (IndexedDB / storage) | not implemented | No IndexedDB, service worker or manifest in `apps/`, `packages/`; `apps/queue/public` absent | Ticket: needed |
-| Session download (offline copy) | not implemented | `queue-session/mutations.ts:264` mock only; `realGetDeviceDownloads` throws (`real/sync.ts:117`) | #246 open/blocked; Ticket: needed |
-| Outbox + replay | not implemented | `realRequest` refuses when offline (`real/client.ts:44`); `realGetSyncLog` empty (`real/sync.ts:66`) | Ticket: needed |
+| Durable device copy (IndexedDB / storage) | partially connected — read-only copy in IndexedDB (`packages/data/src/device/deviceCopy.ts`): downloaded sessions stay viewable offline; no offline writes/outbox | `real/client.ts` keeps successful GETs of a downloaded session and answers them offline; `device/deviceIndex.ts` indexes the records; no service worker, so the page shell itself still needs the network | #477 |
+| Session download (offline copy) | partially connected — read-only copy in IndexedDB (`packages/data/src/device/deviceCopy.ts`): downloaded sessions stay viewable offline; no offline writes/outbox | `real/device.ts` `realDownloadSession` pre-warms the session's reads and writes one record per session and account; `realGetDeviceDownloads` lists them (empty storage → empty list, unreadable storage → load failure); sign-out clears the account's copy | #477 |
+| Outbox + replay | not implemented | `realRequest` refuses when offline (`real/client.ts:44`); `realGetSyncLog` empty (`real/sync.ts:66`) | #722 |
 | Server device streams, upload, seal, conflicts | partially connected | `db/src/queue/sync.ts:165-629` (`registerDevice`, `enrollStream`, `uploadOperations`, `sealStream`, `resolveConflict`, `resumeSessionStreams`); no route calls them | #253, #269 closed; #246 open |
 | Interrupted-device answer | not implemented | `realAnswerInterruption` throws (`real/sync.ts:112`) | #246 open/blocked |
 | D-03: setup/start online only | implemented | Real mode is online only everywhere | — |
-| D-03: offline add of downloaded club players + guests | not implemented | Needs device copy + outbox | Ticket: needed |
+| D-03: offline add of downloaded club players + guests | not implemented | Needs device copy + outbox | #722 |
 | D-03: global search online only | implemented | `real/queue.ts:500` → `api/players` | — |
-| D-03: finalization requires reconnect + full sync + guest review | not implemented | `db/src/queue/finalization.ts:104` review has no guest step; no candidate-match search; `canFinishAndSync: true` always (`real/sync.ts:47`) | Ticket: needed |
+| D-03: finalization requires reconnect + full sync + guest review | not implemented | `db/src/queue/finalization.ts:104` review has no guest step; no candidate-match search; `canFinishAndSync: true` always (`real/sync.ts:47`) | #722 |
 
 Notes: online writes already carry an `operationId` (idempotent), a base for the outbox. The real-mode
 console offline notice still says changes save on this device (`docs/architecture.md:297`).
 
 ## Remaining work
 
-- [ ] Durable device copy + session download in real mode. Ticket: needed (#246 excludes IndexedDB/outbox).
-- [ ] Outbox, replay via `uploadOperations`/`sealStream` routes, device enrollment. Ticket: needed; blocked by #246.
-- [ ] Add downloaded club players and guests offline. Ticket: needed.
-- [ ] Interruption answer + conflict review in real mode. #246 (decision); implementation Ticket: needed.
-- [ ] Guest reconciliation at Session done (club first, then global; explicit confirm or create unclaimed). Ticket: needed (D-03).
-- [ ] Fix the real-mode console offline notice copy. Ticket: needed.
-- [ ] Reconcile offline docs with D-03 (offline start). Ticket: needed (D-03 says "in the implementation ticket").
+- [x] Durable read-only device copy + session download in real mode (#477). Offline writes/outbox: #722.
+- [ ] Outbox, replay via `uploadOperations`/`sealStream` routes, device enrollment. #722 (needs the owner's engine decision).
+- [ ] Add downloaded club players and guests offline. #722.
+- [ ] Interruption answer + conflict review in real mode. #246 (decision); implementation #722.
+- [ ] Guest reconciliation at Session done (club first, then global; explicit confirm or create unclaimed). #722 (D-03).
+- [x] Fix the real-mode console offline notice copy (#721).
+- [x] Reconcile offline docs with D-03 (offline start): done by the 2026-11-11 start-session-online-only mockup change.
 
 ## Related decisions
 

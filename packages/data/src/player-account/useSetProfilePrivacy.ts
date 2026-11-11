@@ -1,8 +1,9 @@
 'use client'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { getSession } from '../auth/fetchers'
+import { getConnectivity } from '../connectivity/connectivity'
 import { leaderboardKeys } from '../leaderboard/queryKeys'
-import { checkMockSave, getMockDevState } from '../mock/bridge'
+import { checkMockSave } from '../mock/bridge'
 import { MockError, NotConnectedError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { mockStore, readMockState } from '../mock/store'
@@ -15,7 +16,7 @@ export async function setProfilePrivacy(input: { profilePrivate: boolean }) {
   const session = await getSession('player')
   if (!session) throw new MockError('permission', 'Sign in to change your profile privacy.')
   const stored = readMockState().playerAccounts.find((a) => a.playerId === session.account.id)
-  if (getMockDevState().offline)
+  if (getConnectivity() === 'offline')
     throw new MockError(
       'offline',
       `Couldn't save because you're offline. Your profile is still ${stored?.profilePrivate ? 'private' : 'public'}.`,

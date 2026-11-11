@@ -1,3 +1,4 @@
+import { getConnectivity } from '../connectivity/connectivity'
 import { MockError } from './errors'
 
 export type MockDevState = {
@@ -95,7 +96,8 @@ export function subscribeMockBridge(listener: () => void) {
   }
 }
 export function requireOnline() {
-  if (read().offline) throw new MockError('offline', "You're offline. Reconnect and try again.")
+  if (getConnectivity() === 'offline')
+    throw new MockError('offline', "You're offline. Reconnect and try again.")
 }
 /** Consumed at commit time, before any store write; a rejected write leaves state intact. */
 export function checkMockSave() {

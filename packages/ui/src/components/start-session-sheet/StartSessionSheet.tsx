@@ -90,7 +90,7 @@ export function StartSessionSheet({
       backLabel="Back"
       isPending={isPending}
       error={error}
-      confirmDisabled={late && !newEndValid}
+      confirmDisabled={offline || (late && !newEndValid)}
       onConfirm={() => (late && newEndAt !== null ? onConfirm(newEndAt) : onConfirm())}
       summary={
         <>
@@ -127,11 +127,7 @@ export function StartSessionSheet({
               },
             ]}
           />
-          {offline ? (
-            <Notice tone="warn">
-              Starting on this device while offline. It syncs when you reconnect.
-            </Notice>
-          ) : null}
+          {offline ? <Notice tone="warn">Starting needs an internet connection.</Notice> : null}
         </>
       }
       consequence="Every player's level locks now. Players you add later get a level when you add them, and it locks too."

@@ -1,5 +1,6 @@
 'use client'
 
+import { useConnectivity } from '@rotra/data/connectivity/useConnectivity'
 import {
   activeMatches,
   matchStatus,
@@ -10,10 +11,10 @@ import { useLiveStandings } from '@rotra/data/match/useLiveStandings'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { isPermissionRefusal } from '@rotra/data/mock/errors'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
+import { isRealDataMode } from '@rotra/data/real/mode'
 import { useSessionPayments } from '@rotra/data/session-payment/useSessionPayments'
 import { flushSessionPresence } from '@rotra/data/session-roster/flushSessionPresence'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
-import { useSyncState } from '@rotra/data/sync/useSyncState'
 import { Button } from '@rotra/ui/button'
 import { Chip } from '@rotra/ui/chip'
 import { ConsoleFooterBar } from '@rotra/ui/console-footer-bar'
@@ -52,8 +53,6 @@ import {
 import { SuggestMatch } from '@/app/(operator)/sessions/[sessionId]/_components/suggest-match/SuggestMatch'
 import { sessionHref } from '@/lib/dates'
 import { useNow } from '@/lib/useNow'
-import { useAppSelector } from '@/store/hooks'
-import { selectDev } from '@/store/slices/devSlice'
 import { ConsoleDeviceNotice } from '../console-device-notice/ConsoleDeviceNotice'
 
 export type SessionConsoleProps = { sessionId: string; resumeSessionDone?: boolean }
@@ -81,6 +80,10 @@ export type ConsoleViewProps = {
 
 const OFFLINE_NOTICE =
   'Working offline on this device. Matches, results and roster changes save here and sync when you reconnect. Session done needs internet.'
+
+// Real data mode has no device copy that saves changes yet, so the mock text above would be untrue.
+const OFFLINE_NOTICE_REAL =
+  'Working offline. This device shows the last session data it loaded; changes need an internet connection until you reconnect. Session done needs internet.'
 
 /**
  * The views other tickets add, one container file each; the shell shows a view's tab and panel as
@@ -112,13 +115,11 @@ const MODE_LABELS = { chill: 'Chill', fair: 'Fair', hard: 'Hard' } as const
  */
 export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleProps) {
   const router = useRouter()
-  const dev = useAppSelector(selectDev)
   const session = useQueueSession(sessionId)
   const roster = useSessionRoster(sessionId)
   const matches = useSessionMatches(sessionId)
   const standings = useLiveStandings(sessionId)
   const payments = useSessionPayments(sessionId)
-  const sync = useSyncState()
   const [view, setView] = useState<ConsoleView>('session')
   const [sheet, setSheet] = useState<ConsoleSheet>(resumeSessionDone ? 'session-done' : null)
   const [matchSheet, setMatchSheet] = useState<MatchSheet | null>(null)
@@ -149,8 +150,8 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
     void refetchSession()
   }, [now, refetchSession])
 
-  // Online from the sync state (the mock follows the DevMenu's Simulate offline toggle).
-  const online = sync.data ? sync.data.online : !dev.offline
+  // Online: the browser's connection, or the DevMenu's Simulate offline toggle.
+  const { online } = useConnectivity()
 
   // Session done opens the three-step sheet from the footer button and the dock pill alike; offline
   // both are disabled.
@@ -347,7 +348,9 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
           onSessionDone={onSessionDone}
         />
       ) : null}
-      {online ? null : <Notice tone="offline">{OFFLINE_NOTICE}</Notice>}
+      {online ? null : (
+        <Notice tone="offline">{isRealDataMode() ? OFFLINE_NOTICE_REAL : OFFLINE_NOTICE}</Notice>
+      )}
       <Tabs
         aria-label="Console views"
         value={view}

@@ -8,9 +8,7 @@ Every dialog names the target session/player/match, shows the actual selected va
 
 ## D-START-SESSION — Start session
 
-Title **Start session?** Show session, court count, formats, mode, minimum, roster “N confirmed · M present”. Copy: **“Every player's level locks now. Players you add later get a level when you add them, and it locks too.”** Offline adds “Starting on this device while offline. It syncs when you reconnect.” Primary **Start session**; secondary Back. Eligibility/license/other-active-session checks still apply; a dialog does not bypass them. Started late or on another day than planned (November 6, 2026): first “This session was planned for 6:00–9:00 PM yesterday. Set a new end time to start.” and a required **New end**, pre-filled with now + the planned length rounded up to 15 minutes; Start session is disabled until it is after now ([Q-START](modules/queue/session-setup.md#q-start--start-review)).
-
-> MVP: offline start removed by [D-2026-11-07-03](../../mvp/decisions.md#d-2026-11-07-03); prototype copy update pending a mockup change.
+Title **Start session?** Show session, court count, formats, mode, minimum, roster “N confirmed · M present”. Copy: **“Every player's level locks now. Players you add later get a level when you add them, and it locks too.”** Offline adds “Starting needs an internet connection.” and Start session is disabled. Primary **Start session**; secondary Back. Eligibility/license/other-active-session checks still apply; a dialog does not bypass them. Started late or on another day than planned (November 6, 2026): first “This session was planned for 6:00–9:00 PM yesterday. Set a new end time to start.” and a required **New end**, pre-filled with now + the planned length rounded up to 15 minutes; Start session is disabled until it is after now ([Q-START](modules/queue/session-setup.md#q-start--start-review)).
 
 ## D-DELETE-SESSION — Delete session
 

@@ -3876,7 +3876,10 @@ function generateDrafts(s, tab, count, target, fixed) {
     });
     const pick = sorted.slice(0,size);
     if (tab === 'catchup' && !pick.some((p) => load[p] < +target)) { stop = `Made ${out.length} of ${count}: no other match helps anyone reach ${target} game${+target === 1 ? '' : 's'}.`; break; }
-    const pk = fmt === 'doubles' && baggingPairs(s).length ? bagFill(s, pick, sorted) : pick;
+    // Bagging (owner answer Q12, November 11, 2026: the pair beats fairness): an applicable pair with both players free leads the next doubles draft.
+    const seedPair = fmt === 'doubles' ? baggingPairs(s).find((pr) => bagApplies(s, pr) && sorted.includes(pr.a) && sorted.includes(pr.b) && !out.some((m) => m.teamA.concat(m.teamB).includes(pr.a))) : null;
+    const seeded = seedPair ? [seedPair.a, seedPair.b, ...sorted.filter((p) => p !== seedPair.a && p !== seedPair.b).slice(0, size - 2)] : pick;
+    const pk = fmt === 'doubles' && baggingPairs(s).length ? bagFill(s, seeded, sorted) : pick;
     out.push({ format: fmt, ...(fmt === 'doubles' && baggingPairs(s).length ? bagTeams(s, splitTeams(s, pk, fmt)) : splitTeams(s,pk,fmt)) }); pk.forEach((p) => load[p]++);
   }
   stop ||= `Made ${out.length} of ${count} match${count === 1 ? '' : 'es'}.`;

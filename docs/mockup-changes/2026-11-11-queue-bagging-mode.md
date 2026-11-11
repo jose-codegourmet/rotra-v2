@@ -42,3 +42,7 @@ Superseded by: none
 
 ## Real app work
 - Session setting `bagging` (switch + pairs) on the live session, Queue Master only; Generate matches partner placement in all tabs; Queue UI above. No auto-generate path yet (see open #725). Database design and business docs follow approval.
+
+## Owner request, November 11, 2026 ("please do this next", #739)
+- Verified in the browser: the switch, the pairs card, Add bagging pair, and Generate matches with a pair.
+- Changed: an applicable pair whose two players are both free now **leads the next doubles draft** (the owner's answer to Q12: the pair beats fairness; court capacity still wins). Before, the pair only joined a draft when the usual ordering happened to pick one of them, so a fresh pair could stay out of the drafts. The draft tile keeps the reason line **Bagging pair: NAME and NAME are partners**.

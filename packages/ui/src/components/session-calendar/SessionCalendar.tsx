@@ -45,7 +45,28 @@ export type SessionCalendarProps = {
   /** A date was tapped (month and week open the day dialog; the day strip moves the view) */
   onOpenDay: (date: number) => void
   onOpenSession: (sessionId: string) => void
-  onCreateOnDay: (date: number) => void
+  /** Day view's "Create session on this day"; hidden when absent */
+  onCreateOnDay?: (date: number) => void
+  /**
+   * Public club page (P07): chip, aria and legend wording per kind, e.g. live → "Happening now".
+   * Defaults to the Queue dashboard's labels.
+   */
+  kindLabels?: Partial<Record<CalendarEventKind, string>>
+  /** Legend entries; defaults to the dashboard's five */
+  legend?: [CalendarEventKind, string][]
+  /** Previous / Next are disabled at the ends of the schedule (club page) */
+  canMovePrevious?: boolean
+  canMoveNext?: boolean
+  /**
+   * What a date tap does in the month view: open the day dialog (dashboard) or select the day so a
+   * list under the grid shows it (club page; the date button is then a toggle and only a selected
+   * day is tinted).
+   */
+  dayOpens?: 'dialog' | 'select'
+  /** Month view on phones (≤ 640 px): coloured dots instead of session chips (club page) */
+  phoneDots?: boolean
+  /** Shown under the legend (club page: the selected day's sessions and a hint) */
+  children?: ReactNode
   className?: string
 }
 
@@ -108,23 +129,37 @@ function Header({
   unit,
   onMove,
   onToday,
+  canMovePrevious = true,
+  canMoveNext = true,
 }: {
   title: string
   unit: CalendarView
   onMove: SessionCalendarProps['onMove']
   onToday: () => void
+  canMovePrevious?: boolean
+  canMoveNext?: boolean
 }) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
       <h2>{title}</h2>
       <div className="flex items-center gap-1">
-        <IconButton size="xs" label={`Previous ${unit}`} onClick={() => onMove(-1, unit)}>
+        <IconButton
+          size="xs"
+          label={`Previous ${unit}`}
+          disabled={!canMovePrevious}
+          onClick={() => onMove(-1, unit)}
+        >
           <Icon name="back" />
         </IconButton>
         <Button size="xs" onClick={onToday}>
           Today
         </Button>
-        <IconButton size="xs" label={`Next ${unit}`} onClick={() => onMove(1, unit)}>
+        <IconButton
+          size="xs"
+          label={`Next ${unit}`}
+          disabled={!canMoveNext}
+          onClick={() => onMove(1, unit)}
+        >
           <Icon name="back" className="-scale-x-100" />
         </IconButton>
       </div>
@@ -132,11 +167,17 @@ function Header({
   )
 }
 
-function Legend({ hint }: { hint: string }) {
+function Legend({
+  hint,
+  entries = LEGEND,
+}: {
+  hint: string
+  entries?: [CalendarEventKind, string][]
+}) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 text-[13px] text-fg2">
       <div className="flex flex-wrap items-center gap-3">
-        {LEGEND.map(([kind, label]) => (
+        {entries.map(([kind, label]) => (
           <span key={kind} className="inline-flex items-center gap-1">
             <Swatch kind={kind} />
             {label}
@@ -163,8 +204,16 @@ export function SessionCalendar({
   onOpenDay,
   onOpenSession,
   onCreateOnDay,
+  kindLabels,
+  legend,
+  canMovePrevious,
+  canMoveNext,
+  dayOpens = 'dialog',
+  phoneDots = false,
+  children,
   className,
 }: SessionCalendarProps) {
+  const labelOf = (kind: CalendarEventKind) => kindLabels?.[kind] ?? KIND_LABEL[kind]
   const phone = useMediaQuery(DAY_VIEW_QUERY)
   const tablet = useMediaQuery(WEEK_VIEW_QUERY)
   const view: CalendarView = viewProp ?? (phone ? 'day' : tablet ? 'week' : 'month')
@@ -294,7 +343,7 @@ export function SessionCalendar({
           ) : (
             <div className="flex flex-col items-center gap-2 px-3 py-6 text-center text-sm text-fg2">
               No sessions this day.
-              {isTodayOrLater(referenceDate, today) ? (
+              {onCreateOnDay && isTodayOrLater(referenceDate, today) ? (
                 <Button size="sm" variant="primary" onClick={() => onCreateOnDay(referenceDate)}>
                   Create session on this day
                 </Button>
@@ -311,10 +360,18 @@ export function SessionCalendar({
   const ref = new Date(referenceDate)
   const first = new Date(ref.getFullYear(), ref.getMonth(), 1)
   const daysIn = new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate()
-  const selectedKey = selectedDate !== undefined ? dayKey(selectedDate) : todayKey
+  const selectedKey =
+    selectedDate !== undefined ? dayKey(selectedDate) : dayOpens === 'select' ? '' : todayKey
   const cells: ReactNode[] = []
   const blank = (key: string) => (
-    <span key={key} aria-hidden className="min-h-24 border-r border-b border-border bg-bg/55" />
+    <span
+      key={key}
+      aria-hidden
+      className={cn(
+        'min-h-24 border-r border-b border-border bg-bg/55',
+        phoneDots && 'max-[640px]:min-h-[54px]',
+      )}
+    />
   )
   for (let i = 0; i < first.getDay(); i++) cells.push(blank(`lead-${i}`))
   for (let day = 1; day <= daysIn; day++) {
@@ -327,13 +384,15 @@ export function SessionCalendar({
         key={key}
         className={cn(
           'relative flex min-h-24 min-w-0 flex-col gap-1 border-r border-b border-border p-1.5 hover:bg-elev',
+          phoneDots && 'max-[640px]:min-h-[54px] max-[640px]:p-1',
           key === selectedKey && 'bg-accent-subtle',
         )}
       >
         <button
           type="button"
           onClick={() => onOpenDay(at)}
-          aria-haspopup="dialog"
+          aria-haspopup={dayOpens === 'dialog' ? 'dialog' : undefined}
+          aria-pressed={dayOpens === 'select' ? key === selectedKey : undefined}
           aria-label={dayName(at, list.length)}
           className={cn(
             'size-[26px] cursor-pointer self-start rounded-full border-0 bg-transparent p-0 text-[13px] font-bold text-fg tabular-nums after:absolute after:inset-0 focus-visible:after:ring-2 focus-visible:after:ring-accent focus-visible:after:ring-inset',
@@ -342,14 +401,14 @@ export function SessionCalendar({
         >
           {day}
         </button>
-        <div className="flex min-w-0 flex-col gap-0.5">
+        <div className={cn('flex min-w-0 flex-col gap-0.5', phoneDots && 'max-[640px]:hidden')}>
           {list.slice(0, 2).map((event) => (
             <button
               key={event.sessionId}
               type="button"
               onClick={() => onOpenSession(event.sessionId)}
               title={`${event.title} · ${formatTime(event.startsAt)}`}
-              aria-label={`${formatTime(event.startsAt)} ${event.title}, ${KIND_LABEL[event.kind]}`}
+              aria-label={`${formatTime(event.startsAt)} ${event.title}, ${labelOf(event.kind)}`}
               className={cn(
                 'relative z-10 max-w-full truncate rounded-[4px] border-0 border-l-[3px] bg-elev px-1.5 py-0.5 text-left text-[11px] font-semibold whitespace-nowrap text-fg',
                 KIND_EDGE[event.kind],
@@ -364,13 +423,20 @@ export function SessionCalendar({
             <button
               type="button"
               onClick={() => onOpenDay(at)}
-              aria-haspopup="dialog"
+              aria-haspopup={dayOpens === 'dialog' ? 'dialog' : undefined}
               className="relative z-10 border-0 bg-transparent px-1.5 text-left text-[11px] text-fg2"
             >
               +{list.length - 2} more
             </button>
           ) : null}
         </div>
+        {phoneDots && list.length ? (
+          <span aria-hidden className="hidden gap-[3px] max-[640px]:flex">
+            {list.slice(0, 3).map((event) => (
+              <Swatch key={event.sessionId} kind={event.kind} />
+            ))}
+          </span>
+        ) : null}
       </div>,
     )
   }
@@ -384,6 +450,8 @@ export function SessionCalendar({
         unit="month"
         onMove={onMove}
         onToday={onToday}
+        canMovePrevious={canMovePrevious}
+        canMoveNext={canMoveNext}
       />
       <div className="flex flex-col gap-1.5">
         <div className="grid grid-cols-7 overflow-hidden rounded-md border-t border-l border-border">
@@ -391,15 +459,20 @@ export function SessionCalendar({
             <span
               key={name}
               aria-hidden
-              className="border-r border-b border-border px-2 py-1.5 text-[11px] font-bold tracking-[0.5px] text-fg2 uppercase"
+              className={cn(
+                'border-r border-b border-border px-2 py-1.5 text-[11px] font-bold tracking-[0.5px] text-fg2 uppercase',
+                phoneDots &&
+                  'max-[640px]:px-0.5 max-[640px]:py-1 max-[640px]:text-center max-[640px]:text-[10px]',
+              )}
             >
               {name}
             </span>
           ))}
           {cells}
         </div>
-        <Legend hint="Tap a date to see its sessions." />
+        <Legend hint="Tap a date to see its sessions." entries={legend} />
       </div>
+      {children}
     </section>
   )
 }

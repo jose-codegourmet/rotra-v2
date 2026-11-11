@@ -3793,7 +3793,7 @@ function baggingCard(s) {
   return `<section class="card stack" aria-label="Bagging pairs"><div class="between"><h3 style="margin:0;font-size:16px">Bagging pairs${pairs.length ? ` · ${pairs.length}` : ''}</h3><button class="btn sm primary" data-act="bagOpenAdd">Add pair</button></div>
     <p class="small muted">Pairs guide Generate matches. Auto Queue and matches you build by hand are not affected.</p>
     ${pairs.length ? `<div class="list">${pairs.map((pr) => `<div class="li" style="flex-wrap:wrap"><span class="sel-faces">${avatar(P(pr.a))}${avatar(P(pr.b))}</span><div class="main"><b>${esc(short(pr.a))} and ${esc(short(pr.b))}</b></div>
-      <div class="seg" role="group" aria-label="Pattern for ${esc(short(pr.a))} and ${esc(short(pr.b))}">${BAG_PATTERNS.map(([k, l]) => `<button data-act="bagPattern" data-id="${pr.id}" data-v="${k}" aria-pressed="${pr.pattern === k}">${l}</button>`).join('')}</div>
+      ${bagSeg(s, pr.pattern, (v) => `data-act="bagPattern" data-id="${pr.id}" data-v="${v}"`, `Games for ${esc(short(pr.a))} and ${esc(short(pr.b))}`)}
       <button class="btn xs ghost" data-act="bagRemove" data-id="${pr.id}" aria-label="Remove pair ${esc(short(pr.a))} and ${esc(short(pr.b))}">Remove</button></div>`).join('')}</div>` : '<p class="small muted">No pairs yet. Add a pair to keep two players as partners.</p>'}</section>`;
 }
 // The ⋯ menu beside Generate: the secondary draft actions, each with what it does.
@@ -3837,11 +3837,20 @@ function autoSelectionBar(s, a, batch) {
 
 // #739 (proposed): Bagging mode keeps listed pairs together as partners on their pattern games. Doubles only, one switch for the whole
 // session, Queue Master only. Court capacity still wins; a pair whose partner is not free is generated like anyone else.
-const BAG_PATTERNS = [['all', 'All games'], ['13', 'Games 1 and 3'], ['24', 'Games 2 and 4']];
+// Owner comment, November 11, 2026: the pattern is the game numbers the pair plays together, 1 to the session minimum, or ALL.
+// Stored as 'all' or a comma list like '1,3'. Games past the minimum only count under ALL.
+const bagGames = (pattern) => (pattern === 'all' ? [] : String(pattern || '').split(',').filter(Boolean).map(Number));
+const bagToggle = (pattern, v, max) => {
+  if (v === 'all') return 'all';
+  const n = +v, cur = bagGames(pattern), next = cur.includes(n) ? cur.filter((x) => x !== n) : [...cur, n].sort((a, b) => a - b);
+  return next.length === 0 || next.length >= max ? 'all' : next.join(',');
+};
+const bagPatternText = (pattern) => (pattern === 'all' ? 'All games' : `Game${bagGames(pattern).length === 1 ? '' : 's'} ${bagGames(pattern).join(', ')}`);
+const bagSeg = (s, pattern, attrs, label) => { const on = bagGames(pattern); return `<div class="seg bag-seg" role="group" aria-label="${label}"><button type="button" ${attrs('all')} aria-pressed="${pattern === 'all'}">ALL</button>${Array.from({ length: Math.max(1, s.minimum || 1) }, (_, i) => i + 1).map((n) => `<button type="button" ${attrs(String(n))} aria-pressed="${pattern !== 'all' && on.includes(n)}" aria-label="Game ${n}">${n}</button>`).join('')}</div>`; };
 const baggingOn = (s) => !!(s.doubles && s.bagging && s.bagging.on);
 const baggingPairs = (s) => (baggingOn(s) ? s.bagging.pairs || [] : []);
 // The pair's next game together, counted on games actually played (not drafts): 1st, 2nd, 3rd...
-const bagApplies = (s, pr) => { const g = Math.min(gamesOf(s, pr.a), gamesOf(s, pr.b)) + 1; return pr.pattern === 'all' || (pr.pattern === '13' ? g % 2 === 1 : g % 2 === 0); };
+const bagApplies = (s, pr) => { const g = Math.min(gamesOf(s, pr.a), gamesOf(s, pr.b)) + 1; return pr.pattern === 'all' || bagGames(pr.pattern).includes(g); };
 function bagFill(s, pick, sorted) {
   let out = pick.slice();
   baggingPairs(s).filter((pr) => bagApplies(s, pr)).forEach((pr) => {
@@ -4633,7 +4642,7 @@ const SHEETS = {
     return sheetShell('Add bagging pair', `${here.length < 2 ? notice('', 'Mark at least two players present first.') : ''}
       <p class="small muted" style="margin:0" aria-live="polite">${sel.length === 2 ? `<b>${esc(short(sh.a))} and ${esc(short(sh.b))}</b> · tap a player to change the pair` : sel.length === 1 ? `<b>${esc(short(sel[0]))}</b> · tap their partner` : 'Tap two players to make a pair. The ring is tonight\'s level.'}</p>
       <div class="pgrid pub bag-grid" role="group" aria-label="Present players">${here.map(tile).join('')}</div>
-      <div class="field"><span>Partners in</span><div class="seg" role="group" aria-label="Partners in">${BAG_PATTERNS.map(([k, l]) => `<button data-act="sheetSet" data-k="pattern" data-v="${k}" aria-pressed="${(sh.pattern || 'all') === k}">${l}</button>`).join('')}</div></div>
+      <div class="field"><span>Partners in · tap the game numbers, or ALL</span>${bagSeg(s, sh.pattern || 'all', (v) => `data-act="bagPatToggle" data-v="${v}"`, 'Partners in')}</div>
       ${clash.map((t) => notice('warn', t)).join('')}`,
       `<button class="btn" data-act="closeSheet" data-autofocus>Cancel</button><button class="btn primary" data-act="bagSave" ${sh.a && sh.b ? '' : 'disabled'}>${clash.length ? 'Replace pair' : 'Add pair'}</button>`);
   },
@@ -5966,7 +5975,8 @@ const ACT = {
     s.bagging.pairs.push({ id: `bg${Date.now().toString(36)}`, a: sh.a, b: sh.b, pattern: sh.pattern || 'all' });
     S.ui.sheet = null; commit(`Bagging pair added · ${short(sh.a)} and ${short(sh.b)}`); render();
   },
-  bagPattern: (d) => { const pr = (cur().bagging.pairs || []).find((x) => x.id === d.id); if (pr) { pr.pattern = d.v; save(); render(); } },
+  bagPattern: (d) => { const s = cur(), pr = (s.bagging.pairs || []).find((x) => x.id === d.id); if (pr) { pr.pattern = bagToggle(pr.pattern, d.v, s.minimum); save(); render(); } },
+  bagPatToggle: (d) => { const sh = S.ui.sheet; sh.pattern = bagToggle(sh.pattern || 'all', d.v, cur().minimum); render(); },
   bagRemove: (d) => { const s = cur(); const pr = s.bagging.pairs.find((x) => x.id === d.id); s.bagging.pairs = s.bagging.pairs.filter((x) => x.id !== d.id); save(); render(); if (pr) toast(`Pair removed · ${short(pr.a)} and ${short(pr.b)}`); },
   stepDown: (d) => { const s = cur(); if (stepDownToWait(s, d.pid, false)) { render(); toast(`${nm(d.pid)} moved to the waitlist`); } },
   pubStepDown: () => { const s = cur(), v = pubViewer(); if (!v) return; if (stepDownToWait(s, v.id, true)) { if (!S.online) S.pending += 1; save(); render(); toast('You moved to the waitlist'); } },

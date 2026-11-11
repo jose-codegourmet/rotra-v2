@@ -410,6 +410,7 @@
     "./my-sessions-card": "./src/components/my-sessions-card/MySessionsCard.tsx",
     "./player-share-sheet": "./src/components/player-share-sheet/PlayerShareSheet.tsx",
     "./rank-share-card": "./src/components/rank-share-card/RankShareCard.tsx",
+    "./profile-share-card": "./src/components/profile-share-card/ProfileShareCard.tsx",
     "./session-result-share-card": "./src/components/session-result-share-card/SessionResultShareCard.tsx",
     "./session-games-share-card": "./src/components/session-games-share-card/SessionGamesShareCard.tsx"
   },

@@ -1,10 +1,12 @@
 'use client'
 import { PLAYING_LEVELS } from '@rotra/data/player/types'
+import { usePlayerProfileShareData } from '@rotra/data/player/usePlayerProfileShareData'
 import { usePlayerShareData } from '@rotra/data/player/usePlayerShareData'
 import { ErrorState } from '@rotra/ui/error-state'
 import { levelLabel } from '@rotra/ui/level-pill'
 import { Notice } from '@rotra/ui/notice'
 import { PlayerShareSheet } from '@rotra/ui/player-share-sheet'
+import { ProfileShareCard } from '@rotra/ui/profile-share-card'
 import { RankShareCard } from '@rotra/ui/rank-share-card'
 import { SessionGamesShareCard } from '@rotra/ui/session-games-share-card'
 import { SessionResultShareCard } from '@rotra/ui/session-result-share-card'
@@ -13,39 +15,53 @@ import { toast } from '@rotra/ui/toaster'
 import { useState } from 'react'
 import { pictureSrc } from '../profile-picture/pictureSrc'
 
-type Selection = { kind: 'rank' | 'result' | 'games'; sessionId?: string }
+type Selection = { kind: 'rank' | 'result' | 'games' | 'profile'; sessionId?: string }
 export function usePlayerShareSheet(playerId: string | null) {
   const [selection, setSelection] = useState<Selection | null>(null)
-  const data = usePlayerShareData(playerId, selection?.sessionId, !!selection)
+  const data = usePlayerShareData(
+    playerId,
+    selection?.sessionId,
+    !!selection && selection.kind !== 'profile',
+  )
+  const profileData = usePlayerProfileShareData(playerId, selection?.kind === 'profile')
+  const profileShare = profileData.data
   const value = data.data
   const profile = value && 'profile' in value ? value.profile : null
   const link =
     value && 'link' in value && typeof window !== 'undefined'
       ? new URL(value.link ?? '', window.location.origin).href
       : ''
+  const profileLink =
+    profileShare && typeof window !== 'undefined'
+      ? new URL(profileShare.link, window.location.origin).href
+      : ''
+  const copyLink = async (url: string) => {
+    try {
+      await navigator.clipboard.writeText(url)
+      toast('Link copied')
+    } catch {
+      toast.error("Couldn't copy the link. Copy it from the address bar.")
+    }
+  }
   const common = {
     link,
     name: profile?.fullName ?? '',
     nickname: profile?.nickname,
     picture: profile ? pictureSrc(profile.picture, profile.playerId, profile.fullName) : null,
-    onCopy: async () => {
-      try {
-        await navigator.clipboard.writeText(link)
-        toast('Link copied')
-      } catch {
-        toast.error("Couldn't copy the link. Copy it from the address bar.")
-      }
-    },
+    onCopy: () => void copyLink(link),
     onError: (message: string) => toast.error(message),
     onShared: () => toast('Share sheet opened'),
     onDownloaded: () => toast('Image downloaded'),
   }
   const title =
-    selection?.kind === 'rank'
-      ? 'Share rank'
-      : selection?.kind === 'result'
-        ? 'Share result'
-        : 'Share games'
+    selection?.kind === 'profile'
+      ? 'Share profile'
+      : selection?.kind === 'rank'
+        ? 'Share rank'
+        : selection?.kind === 'result'
+          ? 'Share result'
+          : 'Share games'
+  const active = selection?.kind === 'profile' ? profileData : data
   const sheet = (
     <PlayerShareSheet
       open={!!selection}
@@ -54,12 +70,39 @@ export function usePlayerShareSheet(playerId: string | null) {
       }}
       title={title}
     >
-      {data.isPending ? (
+      {active.isPending ? (
         <Skeleton className="h-80" />
-      ) : data.isError ? (
-        <ErrorState title="Couldn't load the share card." onRetry={() => void data.refetch()}>
-          {data.error.message}
+      ) : active.isError ? (
+        <ErrorState title="Couldn't load the share card." onRetry={() => void active.refetch()}>
+          {active.error.message}
         </ErrorState>
+      ) : selection?.kind === 'profile' ? (
+        profileShare ? (
+          <ProfileShareCard
+            {...common}
+            link={profileLink}
+            onCopy={() => void copyLink(profileLink)}
+            name={profileShare.profile.fullName}
+            nickname={profileShare.profile.nickname}
+            picture={pictureSrc(
+              profileShare.profile.picture,
+              profileShare.profile.playerId,
+              profileShare.profile.fullName,
+            )}
+            levelLabel={
+              profileShare.levelIndex === null
+                ? null
+                : levelLabel(PLAYING_LEVELS[profileShare.levelIndex] ?? null)
+            }
+            position={profileShare.position}
+            wins={profileShare.wins}
+            onDownloaded={(format) =>
+              toast(format === 'story' ? 'Story image downloaded' : 'Post image downloaded')
+            }
+          />
+        ) : (
+          <Notice>No share card is available.</Notice>
+        )
       ) : value?.kind === 'not-shared' ? (
         <Notice>{value.message}</Notice>
       ) : value?.kind === 'rank' ? (
@@ -107,6 +150,7 @@ export function usePlayerShareSheet(playerId: string | null) {
   )
   return {
     sheet,
+    openProfile: () => setSelection({ kind: 'profile' }),
     openRank: () => setSelection({ kind: 'rank' }),
     openResult: (sessionId: string) => setSelection({ kind: 'result', sessionId }),
     openGames: (sessionId: string) => setSelection({ kind: 'games', sessionId }),

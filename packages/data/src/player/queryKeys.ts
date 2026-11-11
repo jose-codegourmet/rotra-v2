@@ -1,6 +1,7 @@
 export const playerKeys = {
   mySessions: (id: string) => ['player', 'my-sessions', id] as const,
   share: (id: string, sessionId?: string) => ['player', 'share', id, sessionId ?? null] as const,
+  profileShare: (id: string) => ['player', 'share-profile', id] as const,
   all: ['player'] as const,
   profile: (playerId: string) => ['player', 'profile', playerId] as const,
   rank: (playerId: string) => ['player', 'rank', playerId] as const,

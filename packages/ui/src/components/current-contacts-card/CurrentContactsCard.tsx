@@ -13,6 +13,10 @@ export type CurrentContactsCardProps = {
   linkComponent?: ElementType
   /** Used when there is no href; the name renders as a button */
   onOpenPlayer?: () => void
+  /** The player's picture; initials show when missing */
+  pictureSrc?: string
+  /** Opens the full photo (PhotoViewer, #716); only a real picture is a button */
+  onViewPicture?: () => void
   /** The player finished registering */
   claimed: boolean
   /** The applied phone (E.164), never the requested value */
@@ -31,6 +35,8 @@ export function CurrentContactsCard({
   href,
   linkComponent,
   onOpenPlayer,
+  pictureSrc,
+  onViewPicture,
   claimed,
   phone,
   email,
@@ -45,6 +51,8 @@ export function CurrentContactsCard({
           href={href}
           linkComponent={linkComponent}
           onOpen={onOpenPlayer}
+          pictureSrc={pictureSrc}
+          onViewPicture={onViewPicture}
         />
         <KeyValueList
           items={[

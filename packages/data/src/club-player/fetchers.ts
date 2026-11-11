@@ -5,6 +5,7 @@ import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, readMockState } from '../mock/store'
 import { requireClubAccess } from '../mock/transaction'
+import { resolveMockProfileBanner } from '../profile-banner/fetchers'
 import { isRealDataMode } from '../real/mode'
 import { realCreatePlayerInvite, realGetClubPlayers } from '../real/queue'
 import type { ClubPlayer } from './clubPlayer.types'
@@ -45,7 +46,9 @@ export function clubPlayerView(state: MockState, player: ClubPlayer) {
     own = player.playerId
       ? state.playerProfiles.find((p) => p.playerId === player.playerId)
       : undefined,
-    fullName = own?.fullName || player.fullName
+    fullName = own?.fullName || player.fullName,
+    // The banner is public, like the picture; only a registered player has chosen one.
+    banner = own && player.identity === 'registered' ? resolveMockProfileBanner(own.bannerId) : null
   return {
     ...player,
     fullName,
@@ -57,6 +60,9 @@ export function clubPlayerView(state: MockState, player: ClubPlayer) {
     ).reference,
     joinedVia: joinedViaOf(player),
     pictureName: profile?.fullName ?? null,
+    /** The resolved Profile banner a registered player's card draws; null = the default gradient */
+    bannerKey: banner?.bannerKey ?? null,
+    bannerImageUrl: banner?.bannerImageUrl ?? null,
     displayName: fullName,
     rtrId: profile?.rtrId ?? null,
     suggestion: player.playingLevel,

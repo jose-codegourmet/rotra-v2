@@ -8,6 +8,7 @@ export const profileHeroMeta = {
     'placement="card" (default): first child of the profile card (PlayerIdentityCard); the Card needs pt-0 and overflow-hidden so the strip runs from the top edge.',
     'placement="preview": Edit profile › Name, under the section intro; the name is bold text, not a heading, and updates as the player types.',
     'bannerKey picks one of the six predefined banners (missing or unknown = Court); bannerImageUrl shows an Admin-uploaded banner and wins.',
+    'onViewPicture makes a real picture the Avatar view button (“View full photo of NAME”) that opens PhotoViewer (#716); initials never open anything.',
     'onChangePicture adds the pencil (“Change profile picture”); leave it out on someone else’s profile.',
     'Do not use for the Queue participant profile sheet; that is ProfileBannerCard.',
   ],

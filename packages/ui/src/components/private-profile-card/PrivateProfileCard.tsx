@@ -19,6 +19,10 @@ export type PrivateProfileCardProps = {
   photoUrl?: string
   /** Opens the full photo (#716), always-private players only */
   onPhotoClick?: () => void
+  /** The player's Profile banner key; missing draws the accent gradient */
+  bannerKey?: string | null
+  /** An Admin-uploaded banner image; wins over bannerKey */
+  bannerImageUrl?: string | null
 }
 
 const COPY = {
@@ -46,6 +50,8 @@ export function PrivateProfileCard({
   name,
   photoUrl,
   onPhotoClick,
+  bannerKey,
+  bannerImageUrl,
 }: PrivateProfileCardProps) {
   const copy = COPY[variant]
   return (
@@ -60,6 +66,8 @@ export function PrivateProfileCard({
         name={name}
         photoUrl={photoUrl}
         onPhotoClick={variant === 'private' ? onPhotoClick : undefined}
+        bannerKey={bannerKey}
+        bannerImageUrl={bannerImageUrl}
         photoLabel="View full photo"
         chips={<Chip>{copy.chip}</Chip>}
       >

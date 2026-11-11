@@ -18,10 +18,12 @@ import { Breadcrumb } from '@rotra/ui/breadcrumb'
 import { Button } from '@rotra/ui/button'
 import { DeletePlayerSheet } from '@rotra/ui/delete-player-sheet'
 import { EmptyState } from '@rotra/ui/empty-state'
+import { usePhotoViewer } from '@rotra/ui/hooks/use-photo-viewer'
 import { InviteSheet } from '@rotra/ui/invite-sheet'
 import { LetterGroup, letterHeadingId } from '@rotra/ui/letter-group'
 import { LinkSavedPlayerSheet } from '@rotra/ui/link-saved-player-sheet'
 import { PageHeader } from '@rotra/ui/page-header'
+import { PhotoViewer } from '@rotra/ui/photo-viewer'
 import { PlayerProfileSheet } from '@rotra/ui/player-profile-sheet'
 import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { SavedPlayerCard } from '@rotra/ui/saved-player-card'
@@ -155,7 +157,15 @@ export function SavedPlayers() {
   ].sort() as string[]
   const byId = (id: string | null) =>
     players.find((p) => p.id === id) ?? all.data?.players.find((p) => p.id === id)
+  const photo = usePhotoViewer()
   const profile = byId(profileId)
+  const profilePhotoUrl = profile
+    ? profilePictureSrc(
+        profile.picture,
+        profile.playerId ?? profile.id,
+        profile.pictureName ?? profile.fullName,
+      )
+    : undefined
   const invitee = byId(inviteId)
   const linking = byId(linkId)
   // Load Edit details while the profile is open, so choosing it swaps sheets with no blank gap.
@@ -315,11 +325,14 @@ export function SavedPlayers() {
             if (!open) setProfileId(null)
           }}
           name={profile.fullName}
-          photoUrl={profilePictureSrc(
-            profile.picture,
-            profile.playerId ?? profile.id,
-            profile.pictureName ?? profile.fullName,
-          )}
+          photoUrl={profilePhotoUrl}
+          onPhotoClick={
+            profilePhotoUrl
+              ? () => photo.show({ src: profilePhotoUrl, name: profile.fullName })
+              : undefined
+          }
+          bannerKey={profile.bannerKey}
+          bannerImageUrl={profile.bannerImageUrl}
           identity={profile.identity}
           nickname={profile.nickname}
           level={profile.suggestion}
@@ -354,6 +367,7 @@ export function SavedPlayers() {
           }
         />
       ) : null}
+      {photo.viewerProps ? <PhotoViewer {...photo.viewerProps} /> : null}
       {linking && linking.identity === 'guest' ? (
         <LinkSavedPlayerSheet
           open

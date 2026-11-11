@@ -32,6 +32,8 @@ export const SomeoneElseLight: Story = { globals: { theme: 'light' } }
 export const Own: Story = {
   args: { onChangePicture: fn(), badges: <Chip tone="accent">This is you</Chip> },
 }
+/** The big picture opens the full photo (PhotoViewer, #716); initials stay inert */
+export const ViewablePicture: Story = { args: { onViewPicture: fn() } }
 export const OwnLight: Story = { ...Own, globals: { theme: 'light' } }
 export const Character: Story = {
   args: {

@@ -8,6 +8,8 @@ import { AdminPlayerActions } from '@rotra/ui/admin-player-actions'
 import { AdminPlayerChangeForm } from '@rotra/ui/admin-player-change-form'
 import { AdminPlayerQuickView } from '@rotra/ui/admin-player-quick-view'
 import { CopyPlayerValue } from '@rotra/ui/copy-player-value'
+import { usePhotoViewer } from '@rotra/ui/hooks/use-photo-viewer'
+import { PhotoViewer } from '@rotra/ui/photo-viewer'
 import { toast } from '@rotra/ui/toaster'
 import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
@@ -121,6 +123,7 @@ function PlayerEditPanel({
   const client = useQueryClient(),
     games = useAdminPlayerGames(player.id),
     profile = usePlayerProfile(player.id),
+    photo = usePhotoViewer(),
     { edit, isError, refetch, reset } = usePlayerEdit(player.id, {
       onDone: onClose,
       // Stale revision: load what is current, then edit again.
@@ -131,29 +134,33 @@ function PlayerEditPanel({
       },
     })
   return (
-    <AdminPlayerQuickView
-      linkComponent={Link}
-      initialMode="edit"
-      open
-      onClose={() => {
-        reset()
-        onClose()
-      }}
-      player={player}
-      error={isError || profile.isError}
-      onRetry={() => {
-        refetch()
-        void profile.refetch()
-      }}
-      createdBy={edit?.createdBy ?? 'Admin'}
-      sessions={games.data}
-      gamesError={games.isError}
-      onRetryGames={() => void games.refetch()}
-      profileHref={`/players/${player.id}?from=${encodeURIComponent(from)}`}
-      historyHref={`/players/${player.id}?tab=history&from=${encodeURIComponent(from)}`}
-      socialLinks={profile.data?.socialLinks}
-      edit={edit}
-      onCopyId={onCopyId}
-    />
+    <>
+      <AdminPlayerQuickView
+        linkComponent={Link}
+        initialMode="edit"
+        open
+        onClose={() => {
+          reset()
+          onClose()
+        }}
+        player={player}
+        error={isError || profile.isError}
+        onRetry={() => {
+          refetch()
+          void profile.refetch()
+        }}
+        createdBy={edit?.createdBy ?? 'Admin'}
+        sessions={games.data}
+        gamesError={games.isError}
+        onRetryGames={() => void games.refetch()}
+        profileHref={`/players/${player.id}?from=${encodeURIComponent(from)}`}
+        historyHref={`/players/${player.id}?tab=history&from=${encodeURIComponent(from)}`}
+        socialLinks={profile.data?.socialLinks}
+        edit={edit}
+        onViewPhoto={photo.show}
+        onCopyId={onCopyId}
+      />
+      {photo.viewerProps ? <PhotoViewer {...photo.viewerProps} /> : null}
+    </>
   )
 }

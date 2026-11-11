@@ -17,6 +17,7 @@ import { type MockState, mockStore } from '../mock/store'
 import { recentGameStats } from '../player/player.rules'
 import { playerProjection } from '../player/projection'
 import { isAlwaysPrivatePlayer, PROFILE_PRIVATE_MESSAGE } from '../player/visibility'
+import { resolveMockProfileBanner } from '../profile-banner/fetchers'
 import { slotCapacity } from '../queue-session/queueSession.rules'
 import { RealRequestError } from '../real/client'
 import { isRealDataMode } from '../real/mode'
@@ -161,6 +162,12 @@ function publicPerson(
     state.playerProfiles.find((x) => x.playerId === p.playerId)?.profileVisibility ===
       'always_private'
   const showFull = !!viewer && registered && (!alwaysPrivate || isViewer)
+  const banner =
+    registered && p?.playerId
+      ? resolveMockProfileBanner(
+          state.playerProfiles.find((x) => x.playerId === p.playerId)?.bannerId,
+        )
+      : null
   const profile: ParticipantProfileKind = showFull
     ? 'registered'
     : registered && alwaysPrivate
@@ -174,6 +181,8 @@ function publicPerson(
     pictureUrl: hasRotraProfile && p?.playerId ? (pictures[p.playerId] ?? null) : null,
     isViewer,
     profile,
+    bannerKey: banner?.bannerKey ?? null,
+    bannerImageUrl: banner?.bannerImageUrl ?? null,
   }
 }
 
@@ -207,6 +216,8 @@ function participantOf(
         rtrId: person.rtrId,
         isViewer: person.isViewer,
         profile: person.profile,
+        bannerKey: person.bannerKey,
+        bannerImageUrl: person.bannerImageUrl,
         // Always-private and guest cards show no status; only the full profile card does.
         ...(tonight && person.profile === 'registered' ? { tonight } : {}),
       }

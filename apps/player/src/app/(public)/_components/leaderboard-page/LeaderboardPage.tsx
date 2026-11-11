@@ -11,6 +11,7 @@ import { useRankingSettings } from '@rotra/data/ranking-settings'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { ErrorState } from '@rotra/ui/error-state'
+import { usePhotoViewer } from '@rotra/ui/hooks/use-photo-viewer'
 import { LeaderboardList } from '@rotra/ui/leaderboard-list'
 import { LeaderboardRow } from '@rotra/ui/leaderboard-row'
 import { LeaderboardRulesCard } from '@rotra/ui/leaderboard-rules-card'
@@ -18,6 +19,7 @@ import { LeaderboardSearch } from '@rotra/ui/leaderboard-search'
 import { MyPositionCard } from '@rotra/ui/my-position-card'
 import { Notice } from '@rotra/ui/notice'
 import { PageHeader } from '@rotra/ui/page-header'
+import { PhotoViewer } from '@rotra/ui/photo-viewer'
 import { type PodiumEntry, TopThreePodium } from '@rotra/ui/top-three-podium'
 import { type InfiniteData, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
@@ -47,6 +49,7 @@ export function LeaderboardPage() {
     own = usePlayerRank(account?.id ?? '')
   const position = useMyLeaderboardPosition(account?.id)
   const ownProfile = usePlayerProfile(account?.id ?? '')
+  const photo = usePhotoViewer()
   const entries = board.data?.pages.flatMap((page) => page.entries) ?? []
   const total = board.data?.pages[0]?.total ?? 0
   const nameSearch = Boolean(query.trim()) && !/^RTR-/i.test(query.trim())
@@ -187,6 +190,18 @@ export function LeaderboardPage() {
               : levelLabel(PLAYING_LEVELS[own.data.levelIndex] ?? '')
           }
           position={own.data.position === null ? undefined : (position.data ?? own.data.position)}
+          onViewPicture={(() => {
+            const src = ownProfile.data
+              ? pictureSrc(ownProfile.data.picture, account.id, ownProfile.data.fullName)
+              : undefined
+            return src
+              ? () =>
+                  photo.show({
+                    src,
+                    name: own.data?.fullName ?? ownProfile.data?.fullName ?? 'You',
+                  })
+              : undefined
+          })()}
           onShowMyRow={() => {
             setQuery('')
             setJumpToMe(true)
@@ -280,6 +295,7 @@ export function LeaderboardPage() {
           onOpenRankDetail={() => router.push('/rank')}
         />
       ) : null}
+      {photo.viewerProps ? <PhotoViewer {...photo.viewerProps} /> : null}
     </main>
   )
 }

@@ -35,6 +35,8 @@ export type AdminPlayerPictureSectionProps = {
   onUseInitials: () => void
   onUsePrevious: () => void
   onPickCharacter: (id: string) => void
+  /** Opens the full photo (PhotoViewer, #716) of the draft picture; initials stay inert */
+  onView?: (src: string) => void
   /** An error from outside, shown under the buttons when no upload error of its own is showing */
   error?: string | null
   /** The form is saving: every control is off */
@@ -75,6 +77,7 @@ export function AdminPlayerPictureSection({
   onUseInitials,
   onUsePrevious,
   onPickCharacter,
+  onView,
   error = null,
   disabled = false,
   className,
@@ -121,6 +124,10 @@ export function AdminPlayerPictureSection({
           size={64}
           tone={picture.kind === 'initials' ? 'accent' : 'neutral'}
           className="size-[72px] text-[22px]"
+          onView={(() => {
+            const src = pictureSrc(picture)
+            return src && onView ? () => onView(src) : undefined
+          })()}
         />
         <div className="flex flex-col gap-1">
           <b>{pictureLabel(picture)}</b>

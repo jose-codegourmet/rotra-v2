@@ -6,6 +6,8 @@ import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { tonightStatus } from '@rotra/data/public-session/rules'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
+import { usePhotoViewer } from '@rotra/ui/hooks/use-photo-viewer'
+import { PhotoViewer } from '@rotra/ui/photo-viewer'
 import { PlayerProfileSheet } from '@rotra/ui/player-profile-sheet'
 import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { useParams } from 'next/navigation'
@@ -32,6 +34,7 @@ export function PlayerProfile({ clubPlayerId, onClose, backLabel, onBack }: Play
   const session = useQueueSession(sessionId)
   const roster = useSessionRoster(sessionId)
   const matches = useSessionMatches(sessionId)
+  const photo = usePhotoViewer()
   const profile = clubPlayerId
     ? clubPlayers.data?.players.find((p) => p.id === clubPlayerId)
     : undefined
@@ -43,30 +46,39 @@ export function PlayerProfile({ clubPlayerId, onClose, backLabel, onBack }: Play
     entry && live && matches.data && session.data
       ? tonightStatus(entry, matches.data, session.data.courts)
       : null
+  const photoUrl = profilePictureSrc(
+    profile.picture,
+    profile.playerId ?? profile.id,
+    profile.pictureName ?? profile.fullName,
+  )
   return (
-    <PlayerProfileSheet
-      open={clubPlayerId !== null}
-      onOpenChange={(open) => {
-        if (!open) onClose()
-      }}
-      name={profile.fullName}
-      photoUrl={profilePictureSrc(
-        profile.picture,
-        profile.playerId ?? profile.id,
-        profile.pictureName ?? profile.fullName,
-      )}
-      identity={profile.identity}
-      nickname={profile.nickname}
-      level={profile.suggestion}
-      tonightLevel={live ? entry?.level : null}
-      tonight={tonight}
-      registeredCity={registeredCity(profile.rtrId)}
-      rtrId={profile.rtrId}
-      addedLabel={longDateLabel(profile.addedAt)}
-      sessionsHere={profile.sessionsHere}
-      phoneHidden={profile.phoneHidden}
-      backLabel={backLabel}
-      onBack={onBack}
-    />
+    <>
+      <PlayerProfileSheet
+        open={clubPlayerId !== null}
+        onOpenChange={(open) => {
+          if (!open) onClose()
+        }}
+        name={profile.fullName}
+        photoUrl={photoUrl}
+        onPhotoClick={
+          photoUrl ? () => photo.show({ src: photoUrl, name: profile.fullName }) : undefined
+        }
+        bannerKey={profile.bannerKey}
+        bannerImageUrl={profile.bannerImageUrl}
+        identity={profile.identity}
+        nickname={profile.nickname}
+        level={profile.suggestion}
+        tonightLevel={live ? entry?.level : null}
+        tonight={tonight}
+        registeredCity={registeredCity(profile.rtrId)}
+        rtrId={profile.rtrId}
+        addedLabel={longDateLabel(profile.addedAt)}
+        sessionsHere={profile.sessionsHere}
+        phoneHidden={profile.phoneHidden}
+        backLabel={backLabel}
+        onBack={onBack}
+      />
+      {photo.viewerProps ? <PhotoViewer {...photo.viewerProps} /> : null}
+    </>
   )
 }

@@ -1,5 +1,6 @@
 import { adminClubRows } from '@rotra/data/fixtures/admin-clubs'
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { fn } from 'storybook/test'
 import { ClubLogo } from './ClubLogo'
 
 const club = adminClubRows[1]
@@ -28,6 +29,15 @@ export const Accent: Story = {
   args: { initials: adminClubRows[0]?.initials ?? 'LS', tone: 'accent' },
 }
 export const WithImage: Story = { args: { size: 'lg', logoUrl: sampleLogo } }
+/** A real logo with onView is the button “View full logo of …”; initials never are */
+export const ViewableLogo: Story = {
+  args: {
+    size: 'lg',
+    logoUrl: sampleLogo,
+    onView: fn(),
+    viewLabel: `View full logo of ${club.name}`,
+  },
+}
 export const Light: Story = {
   render: (args) => (
     <div className="flex items-center gap-3">

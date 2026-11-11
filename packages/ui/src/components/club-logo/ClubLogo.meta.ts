@@ -7,6 +7,7 @@ export const clubLogoMeta = {
   usage: [
     'Always shown next to the club name, so it is aria-hidden.',
     'sm in directory rows, lg in the club detail hero. accent is the prototype highlight Lahug Smash Club uses.',
+    'onView (with logoUrl and viewLabel “View full logo of CLUB”) makes the logo a button that opens PhotoViewer (#716); initials never open anything, and it is left out when the logo sits in another control.',
   ],
   prototype: {
     file: 'apps/mockup/admin-app/rotra-admin.html',

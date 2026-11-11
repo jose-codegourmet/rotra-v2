@@ -2,6 +2,7 @@
 
 import { ADMIN_OFFLINE_ERROR } from '@rotra/data/admin-account'
 import { useAdminConnectivity } from '@rotra/data/admin-account/use-admin-connectivity'
+import { useAdminPlayer } from '@rotra/data/admin-player/useAdminPlayer'
 import { CONTACT_CHECK_OFFLINE_ERROR } from '@rotra/data/contact-change-request/fetchers'
 import { CONTACT_FIELD_WORD } from '@rotra/data/contact-change-request/rules'
 import type { ContactChangeStatus } from '@rotra/data/contact-change-request/types'
@@ -18,7 +19,10 @@ import { ContactRequestStatusNotice } from '@rotra/ui/contact-request-status-not
 import { ContactVerificationNote } from '@rotra/ui/contact-verification-note'
 import { CurrentContactsCard } from '@rotra/ui/current-contacts-card'
 import { ErrorState } from '@rotra/ui/error-state'
+import { usePhotoViewer } from '@rotra/ui/hooks/use-photo-viewer'
 import { PageHeader } from '@rotra/ui/page-header'
+import { PhotoViewer } from '@rotra/ui/photo-viewer'
+import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { RequestedChangeCard } from '@rotra/ui/requested-change-card'
 import { toast } from '@rotra/ui/toaster'
 import Link from 'next/link'
@@ -59,6 +63,9 @@ export function ContactReview({ requestId, from }: { requestId: string; from: st
   const status = request?.status
 
   const player = request?.player
+  const photo = usePhotoViewer()
+  // The request carries no picture, so the card's picture comes from the player's own record.
+  const playerRecord = useAdminPlayer(player?.id ?? '', { enabled: !!player })
   const firstName = player
     ? player.nickname || player.fullName.split(' ')[0] || player.fullName
     : ''
@@ -101,6 +108,9 @@ export function ContactReview({ requestId, from }: { requestId: string; from: st
     )
   }
 
+  const picture = playerRecord.data
+    ? profilePictureSrc(playerRecord.data.picture, player.id, player.fullName)
+    : undefined
   const fromQuery = from ? `?from=${encodeURIComponent(from)}` : ''
 
   const checkStatus = () => {
@@ -224,6 +234,10 @@ export function ContactReview({ requestId, from }: { requestId: string; from: st
             rtrId={player.rtrId}
             href={`/players/${player.id}`}
             linkComponent={Link}
+            pictureSrc={picture}
+            onViewPicture={
+              picture ? () => photo.show({ src: picture, name: player.fullName }) : undefined
+            }
             claimed={player.claimed}
             phone={player.phone}
             email={player.email}
@@ -237,6 +251,7 @@ export function ContactReview({ requestId, from }: { requestId: string; from: st
         decision={decision}
         onClose={() => setDecision(null)}
       />
+      {photo.viewerProps ? <PhotoViewer {...photo.viewerProps} /> : null}
     </>
   )
 }

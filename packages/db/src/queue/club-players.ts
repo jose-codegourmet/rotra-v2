@@ -1,4 +1,6 @@
 import 'server-only'
+import { resolveProfileBanner } from '@rotra/data/profile-banner/rules'
+import { readShownProfileBanners } from '../admin/profile-banners'
 import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
 import { requireClubEntitlement } from '../service/authorize'
@@ -18,6 +20,9 @@ export type ClubPlayerDto = {
   picture: string | null
   /** Global name used with playerId to reproduce the saved character choice. */
   pictureName: string | null
+  /** The resolved Profile banner of a registered player; null for guests and unclaimed profiles */
+  bannerKey: string | null
+  bannerImageUrl: string | null
   identity: 'registered' | 'unclaimed' | 'guest' | 'pending'
   rtrId: string | null
   /** The level from the club's latest assessment, or null when they have none yet */
@@ -47,6 +52,7 @@ export async function listClubPlayers(context: ClubContext): Promise<ClubPlayerD
           fullName: true,
           nickname: true,
           profileState: true,
+          banner: { select: { id: true, image: true } },
           hidePhoneFromClubs: true,
           privateContact: { select: { phoneE164: true } },
           idAllocation: { select: { rtrId: true } },
@@ -60,30 +66,43 @@ export async function listClubPlayers(context: ClubContext): Promise<ClubPlayerD
       rosterEntries: { select: { sessionId: true } },
     },
   })
-  return rows.map((p) => ({
-    id: p.id,
-    clubId: p.clubId,
-    playerId: p.playerId,
-    // A linked profile's own name wins over the club's saved copy, so a claim or profile edit
-    // shows on every card (#705). Guests have no profile and keep what the club entered.
-    fullName: p.player?.fullName || p.displayName,
-    nickname: p.player ? p.player.nickname : p.nickname,
-    picture: p.player?.avatarRef ?? null,
-    pictureName: p.player?.fullName ?? null,
-    identity: p.player
-      ? p.player.profileState === 'claimed'
-        ? 'registered'
-        : 'unclaimed'
-      : p.privateInput?.phoneE164
-        ? 'pending'
-        : 'guest',
-    rtrId: p.player?.idAllocation?.rtrId ?? null,
-    playingLevel: levelCodeFor(p.assessments[0]?.skillLevelId ?? null),
-    phoneHidden: p.player?.hidePhoneFromClubs ?? false,
-    hasPhone: Boolean(p.player?.privateContact?.phoneE164 ?? p.privateInput?.phoneE164),
-    sessionsHere: new Set(p.rosterEntries.map((r) => r.sessionId)).size,
-    addedAt: p.addedAt.toISOString(),
-  }))
+  const shownBanners = await readShownProfileBanners()
+  return rows.map((p) => {
+    const banner =
+      p.player?.profileState === 'claimed'
+        ? resolveProfileBanner(
+            p.player.banner?.id ?? null,
+            () => p.player?.banner ?? undefined,
+            shownBanners,
+          )
+        : null
+    return {
+      id: p.id,
+      clubId: p.clubId,
+      playerId: p.playerId,
+      // A linked profile's own name wins over the club's saved copy, so a claim or profile edit
+      // shows on every card (#705). Guests have no profile and keep what the club entered.
+      fullName: p.player?.fullName || p.displayName,
+      nickname: p.player ? p.player.nickname : p.nickname,
+      picture: p.player?.avatarRef ?? null,
+      pictureName: p.player?.fullName ?? null,
+      bannerKey: banner?.bannerKey ?? null,
+      bannerImageUrl: banner?.bannerImageUrl ?? null,
+      identity: p.player
+        ? p.player.profileState === 'claimed'
+          ? 'registered'
+          : 'unclaimed'
+        : p.privateInput?.phoneE164
+          ? 'pending'
+          : 'guest',
+      rtrId: p.player?.idAllocation?.rtrId ?? null,
+      playingLevel: levelCodeFor(p.assessments[0]?.skillLevelId ?? null),
+      phoneHidden: p.player?.hidePhoneFromClubs ?? false,
+      hasPhone: Boolean(p.player?.privateContact?.phoneE164 ?? p.privateInput?.phoneE164),
+      sessionsHere: new Set(p.rosterEntries.map((r) => r.sessionId)).size,
+      addedAt: p.addedAt.toISOString(),
+    }
+  })
 }
 
 /**

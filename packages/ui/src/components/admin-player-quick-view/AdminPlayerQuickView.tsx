@@ -50,6 +50,11 @@ export type AdminPlayerQuickViewProps = {
   inviteError?: string
   onCopyRegistrationLink?: () => void
   initialMode?: 'view' | 'edit' | 'invite'
+  /**
+   * Opens the full photo (PhotoViewer, #716) from the hero picture and, in Edit, the Profile
+   * picture preview. Esc closes the viewer only; this panel stays open behind it.
+   */
+  onViewPhoto?: (photo: { src: string; name: string }) => void
 }
 
 export function AdminPlayerQuickView(props: AdminPlayerQuickViewProps) {
@@ -77,6 +82,7 @@ function QuickViewPanel({
   inviteError,
   onCopyRegistrationLink,
   initialMode = 'view',
+  onViewPhoto,
 }: AdminPlayerQuickViewProps) {
   const [mode, setMode] = useState(initialMode)
   const level =
@@ -105,7 +111,15 @@ function QuickViewPanel({
       )}
     >
       {mode !== 'invite' ? (
-        <Avatar name={p.name} src={profilePictureSrc(p.picture, p.id, p.name)} size={52} />
+        <Avatar
+          name={p.name}
+          src={profilePictureSrc(p.picture, p.id, p.name)}
+          size={52}
+          onView={(() => {
+            const src = profilePictureSrc(p.picture, p.id, p.name)
+            return src && onViewPhoto ? () => onViewPhoto({ src, name: p.name }) : undefined
+          })()}
+        />
       ) : null}
       <div className="flex min-w-0 flex-col gap-1.5">
         <h2 className="text-lg font-bold [overflow-wrap:anywhere]">
@@ -201,7 +215,13 @@ function QuickViewPanel({
           {hero}
           {mode === 'edit' ? (
             edit ? (
-              <AdminEditPlayerForm {...edit} formId={`admin-edit-player-${p.id}`} />
+              <AdminEditPlayerForm
+                {...edit}
+                formId={`admin-edit-player-${p.id}`}
+                onViewPicture={
+                  onViewPhoto ? (src) => onViewPhoto({ src, name: p.name }) : undefined
+                }
+              />
             ) : (
               <Skeleton label="Loading player" />
             )

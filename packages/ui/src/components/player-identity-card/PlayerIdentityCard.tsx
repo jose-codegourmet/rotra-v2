@@ -12,6 +12,8 @@ export type PlayerIdentityCardProps = {
   onCopyId: () => void
   /** Owner only: opens Edit profile */
   onEdit?: () => void
+  /** Opens the full photo (#716) from the big picture; only a real picture is a button */
+  onViewPicture?: () => void
   /** Owner only: opens Profile picture */
   onChangePicture?: () => void
   /** Owner only: opens My player ID */
@@ -32,6 +34,7 @@ export function PlayerIdentityCard({
   idElementId,
   onCopyId,
   onEdit,
+  onViewPicture,
   onChangePicture,
   onOpenPlayerId,
   onShare,
@@ -49,6 +52,7 @@ export function PlayerIdentityCard({
           pictureSrc={profile.picture}
           bannerKey={bannerKey}
           bannerImageUrl={bannerImageUrl}
+          onViewPicture={onViewPicture}
           onChangePicture={isOwn ? (onChangePicture ?? (() => {})) : undefined}
           badges={isOwn ? <Chip tone="accent">This is you</Chip> : undefined}
         />

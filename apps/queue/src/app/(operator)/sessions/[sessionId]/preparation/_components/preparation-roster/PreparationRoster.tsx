@@ -18,6 +18,8 @@ import { useSetAllPresence } from '@rotra/data/session-roster/useSetAllPresence'
 import { useSetPresenceMany } from '@rotra/data/session-roster/useSetPresenceMany'
 import { useSetRosterLevel } from '@rotra/data/session-roster/useSetRosterLevel'
 import { useStepDownToWaitlist } from '@rotra/data/session-roster/useStepDownToWaitlist'
+import { usePhotoViewer } from '@rotra/ui/hooks/use-photo-viewer'
+import { PhotoViewer } from '@rotra/ui/photo-viewer'
 import { PlayerProfileSheet } from '@rotra/ui/player-profile-sheet'
 import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import {
@@ -163,7 +165,15 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
   })
   const overfillEntry = entries.find((w) => w.id === overfillWaiter)
   const giveSlotTo = (waitlistId: string) => giveSlot.mutate({ sessionId, waitlistId }, options)
+  const photo = usePhotoViewer()
   const profile = profileId ? byClubPlayer(profileId) : undefined
+  const profilePhotoUrl = profile
+    ? profilePictureSrc(
+        profile.picture,
+        profile.playerId ?? profile.id,
+        profile.pictureName ?? profile.fullName,
+      )
+    : undefined
   // D-PARTICIPANT-PROFILE: on this roster, the badge reads the session level and Tonight shows
   // Free or Away (no matches before the start).
   const profileEntry = profile ? rosterList.find((r) => r.clubPlayerId === profile.id) : undefined
@@ -273,11 +283,14 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
             if (!open) setProfileId(null)
           }}
           name={profile.fullName}
-          photoUrl={profilePictureSrc(
-            profile.picture,
-            profile.playerId ?? profile.id,
-            profile.pictureName ?? profile.fullName,
-          )}
+          photoUrl={profilePhotoUrl}
+          onPhotoClick={
+            profilePhotoUrl
+              ? () => photo.show({ src: profilePhotoUrl, name: profile.fullName })
+              : undefined
+          }
+          bannerKey={profile.bannerKey}
+          bannerImageUrl={profile.bannerImageUrl}
           identity={profile.identity}
           nickname={profile.nickname}
           level={profile.suggestion}
@@ -291,6 +304,7 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
           inviteUrl={clubInviteUrl(profile.clubId, club.data?.inviteCode)}
         />
       ) : null}
+      {photo.viewerProps ? <PhotoViewer {...photo.viewerProps} /> : null}
     </>
   )
 }

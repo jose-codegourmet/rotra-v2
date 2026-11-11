@@ -32,6 +32,14 @@ export type PublicSessionParticipant = {
   name: string
   /** Uploaded picture of a registered or unclaimed player; guests never have one */
   pictureUrl?: string | null
+  /**
+   * Signed-in version, registered and always-private players only (the banner is public, like the
+   * picture): the resolved Profile banner their profile card draws. Missing for guests and
+   * unclaimed profiles, who get the default gradient.
+   */
+  bannerKey?: string | null
+  /** The resolved banner's uploaded 3:1 image; null for a banner drawn from theme tokens */
+  bannerImageUrl?: string | null
   skillGroup: 'beginner' | 'intermediate' | 'advanced' | null
   /** Full playing level for the avatar hover label, or null when unrated. */
   levelLabel: string | null

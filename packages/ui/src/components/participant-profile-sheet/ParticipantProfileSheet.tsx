@@ -22,6 +22,10 @@ export type ParticipantProfileSheetProps = {
   photoUrl?: string
   /** Opens the full photo (#716); without it the picture is not a button */
   onPhotoClick?: () => void
+  /** The player's Profile banner key; missing draws the accent gradient */
+  bannerKey?: string | null
+  /** An Admin-uploaded banner image; wins over bannerKey */
+  bannerImageUrl?: string | null
   /** Full playing level for the badge, e.g. “Intermediate High”; null reads “No level yet” */
   levelLabel: string | null
   /** The Tonight · line; null when the player is not on tonight's roster */
@@ -51,6 +55,8 @@ export function ParticipantProfileSheet({
   nickname,
   photoUrl,
   onPhotoClick,
+  bannerKey,
+  bannerImageUrl,
   levelLabel,
   tonight,
   registeredCity,
@@ -84,6 +90,8 @@ export function ParticipantProfileSheet({
         nickname={nickname}
         photoUrl={photoUrl}
         onPhotoClick={onPhotoClick}
+        bannerKey={bannerKey}
+        bannerImageUrl={bannerImageUrl}
         chips={
           <>
             <IdentityChip identity="registered" />

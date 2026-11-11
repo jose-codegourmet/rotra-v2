@@ -16,6 +16,8 @@ export type ProfileHeroProps = ProfileHeroVariants & {
   bannerKey?: string | null
   /** An uploaded banner from the Admin library; wins over bannerKey */
   bannerImageUrl?: string | null
+  /** Opens the full photo (PhotoViewer, #716); only a real picture becomes the view button, initials stay inert */
+  onViewPicture?: () => void
   /** The pencil on the picture (own profile, Edit profile preview); hidden when missing */
   onChangePicture?: () => void
   /** Under the name and nickname, e.g. the This is you chip */
@@ -37,6 +39,7 @@ export function ProfileHero({
   pictureSrc,
   bannerKey,
   bannerImageUrl,
+  onViewPicture,
   onChangePicture,
   badges,
   children,
@@ -44,9 +47,10 @@ export function ProfileHero({
   className,
 }: ProfileHeroProps) {
   const preview = placement === 'preview'
+  // The Edit profile preview is a named group; the profile card is plain layout.
+  const Wrapper = preview ? 'section' : 'div'
   return (
-    <div
-      role={preview ? 'group' : undefined}
+    <Wrapper
       aria-label={preview ? 'Profile card preview' : undefined}
       className={cn('flex min-w-0 flex-col gap-3.5', className)}
     >
@@ -63,6 +67,7 @@ export function ProfileHero({
             size={88}
             tone={pictureSrc ? 'neutral' : 'accent'}
             className="shadow-[0_0_0_5px_var(--surface)]"
+            onView={onViewPicture}
           />
           {onChangePicture ? (
             <button
@@ -87,6 +92,6 @@ export function ProfileHero({
         </div>
       </div>
       {children}
-    </div>
+    </Wrapper>
   )
 }

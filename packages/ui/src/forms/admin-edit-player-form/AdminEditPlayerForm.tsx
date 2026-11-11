@@ -53,6 +53,8 @@ export type AdminEditPlayerFormProps = {
   serverError?: string
   /** Field errors from the data layer (MockError fieldErrors): shown inline, the first is focused */
   fieldErrors?: Partial<Record<AdminEditPlayerField, string>>
+  /** Opens the full photo (PhotoViewer, #716) of the picture in the Profile picture section */
+  onViewPicture?: (src: string) => void
   /** Shown with a stale-revision serverError ("… Reload before editing.") */
   onReload?: () => void
 }
@@ -138,6 +140,7 @@ export function AdminEditPlayerForm({
   serverError,
   fieldErrors,
   onReload,
+  onViewPicture,
 }: AdminEditPlayerFormProps) {
   const form = useForm({
     defaultValues: adminEditPlayerDefaultValues(p),
@@ -284,6 +287,7 @@ export function AdminEditPlayerForm({
           onUseInitials={() => setPicture(null)}
           onUsePrevious={() => setPicture(p.previousPicture)}
           onPickCharacter={(id) => setPicture(`character:${id}`)}
+          onView={onViewPicture}
           error={errors.picture?.message}
           disabled={disabled}
         />

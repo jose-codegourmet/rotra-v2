@@ -72,5 +72,7 @@ export const LongName: Story = {
     nickname: 'The Unstoppable Shuttle Commander',
   },
 }
+export const NightBanner: Story = { args: { bannerKey: 'night' } }
+export const StripeBanner: Story = { args: { bannerKey: 'stripe' }, globals: { theme: 'light' } }
 export const Light: Story = { globals: { theme: 'light' } }
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }

@@ -1,6 +1,8 @@
 import 'server-only'
 import { createHmac, timingSafeEqual } from 'node:crypto'
+import { resolveProfileBanner } from '@rotra/data/profile-banner/rules'
 import { maskPublicName, publicLevel, publicSkillMix } from '@rotra/data/public-session/rules'
+import { readShownProfileBanners } from '../admin/profile-banners'
 import { loadAccountContext, type PlayerContext } from '../auth/account-context'
 import { MOCK_COOKIE_PREFIX } from '../auth/data-mode'
 import { type CookieAdapter, verifySubject } from '../auth/supabase'
@@ -415,11 +417,13 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
             nickname: true,
             profileState: true,
             profileVisibility: true,
+            banner: { select: { id: true, image: true } },
             idAllocation: { select: { rtrId: true } },
           },
         },
       },
     })
+    const shownBanners = await readShownProfileBanners(tx)
     const fullRoster = linked.some((entry) => entry.playerId === context.playerId)
     const pictures = new Map(linked.map((entry) => [entry.id, entry.player?.avatarRef ?? null]))
     const people = new Map(linked.map((entry) => [entry.id, entry]))
@@ -435,7 +439,14 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
       const isViewer = !!club?.playerId && club.playerId === context.playerId
       const alwaysPrivate = registered && club?.player?.profileVisibility === 'always_private'
       const showFull = registered && (!alwaysPrivate || isViewer)
+      // The banner is public, like the picture: registered and always-private players only.
+      const chosen = club?.player?.banner ?? undefined
+      const banner = registered
+        ? resolveProfileBanner(chosen?.id ?? null, () => chosen, shownBanners)
+        : null
       return {
+        bannerKey: banner?.bannerKey ?? null,
+        bannerImageUrl: banner?.bannerImageUrl ?? null,
         name: showFull ? entry.nameSnapshot : maskPublicName(entry.nameSnapshot),
         masked: !showFull,
         nickname: showFull ? (club?.player?.nickname ?? null) : null,

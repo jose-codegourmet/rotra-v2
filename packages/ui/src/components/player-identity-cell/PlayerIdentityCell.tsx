@@ -17,6 +17,10 @@ export type PlayerIdentityCellProps = PlayerIdentityCellVariants & {
   linkComponent?: ElementType
   /** Used when there is no href; the name renders as a button */
   onOpen?: () => void
+  /** Real picture URL; initials show when missing */
+  pictureSrc?: string
+  /** Opens the full photo (PhotoViewer, #716); only a real picture is a button */
+  onViewPicture?: () => void
 }
 
 const nameClass =
@@ -35,11 +39,13 @@ export function PlayerIdentityCell({
   href,
   linkComponent: Link = 'a',
   onOpen,
+  pictureSrc,
+  onViewPicture,
 }: PlayerIdentityCellProps) {
   const secondLine = variant === 'request' ? rtrId : nickname ? `“${nickname}”` : null
   return (
     <div className="flex min-w-0 items-center gap-3">
-      <Avatar name={fullName} />
+      <Avatar name={fullName} src={pictureSrc} onView={onViewPicture} />
       <div className="flex min-w-0 flex-col gap-px">
         {href ? (
           <Link href={href} className={nameClass}>

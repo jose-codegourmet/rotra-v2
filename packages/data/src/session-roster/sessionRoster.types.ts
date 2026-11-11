@@ -51,6 +51,13 @@ export type SessionJoinRequest = {
    * a guest. One pending request per account and session.
    */
   playerId?: string | null
+  /**
+   * The requesting Player's own profile picture as an avatar reference (their account's, read live);
+   * null or missing for a guest or a Player without one, which shows initials.
+   */
+  picture?: string | null
+  /** The Player's current full name, which seeds a character picture (like saved players' `pictureName`) */
+  pictureName?: string | null
   /** The Session invite code the link carried (`?invite=`), read as “Invited by NAME” (D-2026-11-09-08). */
   inviteCodeId?: string | null
   /**

@@ -3225,11 +3225,14 @@ function requestsPanel(s, inSheet) {
 function joinReqCard(s, r, full) {
   const lv = r.level ?? (r.band !== 'unsure' ? bandMid(r.band) : null);
   const acct = !!r.account, member = inClub(r);
+  // A signed-in ROTRA Player's request shows their profile picture (their saved player when the club has one,
+  // otherwise their account's own picture); a guest request keeps initials.
+  const face = acct ? avatar(P(r.pid) || saved().find((p) => p.rtr === r.account) || { id: r.account, name: r.name, identity: 'registered' }) : `<span class="avatar" aria-hidden="true">${esc(initials(r.name))}</span>`;
   const tag = acct ? chip(`ROTRA player · ${member ? 'already in your club' : 'new to your club'}`, member ? 'ok' : 'warn') : chip('Guest request', 'warn');
   const inv = inviterOf(s, r), match = savedPhoneMatch(r);
   const meta = acct ? `Requested ${fmtWhen(r.at, { lower: true })}` : `${r.phone ? esc(r.phone) : 'No phone given'} · says ${r.band === 'unsure' ? 'not sure of level' : esc(r.band)} · requested ${fmtWhen(r.at, { lower: true })}`;
   return `<div class="req-row">
-      <div class="li" style="padding:0"><span class="avatar" aria-hidden="true">${esc(initials(r.name))}</span><div class="main"><b>${esc(r.name)}${r.nick ? ` <span class="muted">“${esc(r.nick)}”</span>` : ''}</b>
+      <div class="li" style="padding:0">${face}<div class="main"><b>${esc(r.name)}${r.nick ? ` <span class="muted">“${esc(r.nick)}”</span>` : ''}</b>
         <p class="small muted">${meta}</p>${acct ? `<p class="small muted">Shared rank: ${r.level != null ? esc(lvLabel(r.level)) : 'none yet'}</p>` : ''}${inv ? `<p class="small muted">Invited by ${esc(inv.name)}</p>` : ''}</div>${tag}</div>
       ${r.linked ? notice('ok', `Linked to <b>${esc(nm(r.linked))}</b> from your saved players.`) : match ? notice('', `Is this <b>${esc(match.name)}</b> from your saved players?<div class="row" style="margin-top:8px"><button class="btn xs primary" data-act="linkReq" data-id="${r.id}" data-pid="${match.id}">Link</button><button class="btn xs" data-act="notThemReq" data-id="${r.id}">Not them</button></div>`) : ''}
       <div class="req-actions">${selectLevel(`req-lv-${r.id}`, lv, `data-act-change="reqLevel" data-id="${r.id}" aria-label="Level for ${esc(r.name)}"`, r.err && lv == null)}

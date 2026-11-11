@@ -36,8 +36,15 @@ export async function getSessionRoster(sessionId: string) {
     waitlist: state.waitlist
       .filter((w) => w.sessionId === sessionId)
       .sort((a, b) => a.addedAt - b.addedAt),
+    // The requesting Player's own picture, read live from their profile (as real mode does); guests have none.
     joinRequests: state.joinRequests
       .filter((r) => r.sessionId === sessionId)
-      .sort((a, b) => a.requestedAt - b.requestedAt),
+      .sort((a, b) => a.requestedAt - b.requestedAt)
+      .map((r) => {
+        const profile = r.playerId
+          ? state.playerProfiles.find((p) => p.playerId === r.playerId)
+          : undefined
+        return { ...r, picture: profile?.picture ?? null, pictureName: profile?.fullName ?? null }
+      }),
   }
 }

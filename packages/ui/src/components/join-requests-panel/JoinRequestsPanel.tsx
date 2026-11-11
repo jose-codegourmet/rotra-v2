@@ -12,6 +12,7 @@ import { DropOutNoticeRow, type DropOutNoticeRowProps } from '@rotra/ui/drop-out
 import { LevelSelect } from '@rotra/ui/level-select'
 import { MatchRequestCard, type MatchRequestCardProps } from '@rotra/ui/match-request-card'
 import { Notice } from '@rotra/ui/notice'
+import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { Tabs, TabsContent } from '@rotra/ui/tabs'
 import { useId, useState } from 'react'
@@ -219,7 +220,14 @@ export function JoinRequestsPanel({
                 return (
                   <div key={r.id} className="flex flex-col gap-2.5 py-3">
                     <div className="flex min-w-0 items-center gap-3">
-                      <Avatar name={r.name} />
+                      <Avatar
+                        name={r.name}
+                        src={
+                          r.playerId
+                            ? profilePictureSrc(r.picture, r.playerId, r.pictureName ?? r.name)
+                            : undefined
+                        }
+                      />
                       <span className="flex min-w-0 flex-1 flex-col">
                         <b className="font-semibold [overflow-wrap:anywhere]">
                           {r.name}

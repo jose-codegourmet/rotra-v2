@@ -414,8 +414,14 @@ export async function removeFromWaitlist(
   })
 }
 
+/** The requesting Player's picture (and its name seed) for `joinRequestDto`; a guest's request has no Player. */
+const withPlayerPicture = { player: { select: { avatarRef: true, fullName: true } } } as const
+
 async function pendingRequest(tx: Tx, context: ClubContext, requestId: string) {
-  const request = await tx.sessionJoinRequest.findUnique({ where: { id: requestId } })
+  const request = await tx.sessionJoinRequest.findUnique({
+    where: { id: requestId },
+    include: withPlayerPicture,
+  })
   if (!request || request.clubId !== context.clubId) throw new ServiceError('not_found')
   return request
 }
@@ -478,6 +484,7 @@ export async function confirmJoinRequest(
         clubPlayerId: clubPlayer.id,
         revision: { increment: 1 },
       },
+      include: withPlayerPicture,
     })
     return { request: joinRequestDto(decided), ...placed }
   })
@@ -505,6 +512,7 @@ export async function declineJoinRequest(
         decidedByDeviceId: input.deviceId ?? null,
         revision: { increment: 1 },
       },
+      include: withPlayerPicture,
     })
     return joinRequestDto(decided)
   })
@@ -545,6 +553,7 @@ export async function readSessionRoster(context: ClubContext, sessionId: string)
     const requests = await tx.sessionJoinRequest.findMany({
       where: { sessionId, status: 'pending' },
       orderBy: [{ requestedAt: 'asc' }, { id: 'asc' }],
+      include: withPlayerPicture,
     })
     return {
       capacity: await capacityOf(tx, session),

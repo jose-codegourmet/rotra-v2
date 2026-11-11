@@ -84,7 +84,9 @@ export function waitlistDto(entry: SessionWaitlistEntry, position: number) {
 }
 
 /** Club view of a join request. The phone is the club's to see, never the public page's. */
-export function joinRequestDto(request: SessionJoinRequest) {
+export function joinRequestDto(
+  request: SessionJoinRequest & { player?: { avatarRef: string | null; fullName: string } | null },
+) {
   return {
     id: request.id,
     sessionId: request.sessionId,
@@ -98,5 +100,9 @@ export function joinRequestDto(request: SessionJoinRequest) {
     clubPlayerId: request.clubPlayerId,
     /** Set when a signed-in ROTRA Player sent it (D-2026-11-09-02) */
     playerId: request.playerId,
+    /** The requesting Player's profile picture (avatar reference); null for a guest */
+    picture: request.player?.avatarRef ?? null,
+    /** The Player's current full name, the character picture's seed */
+    pictureName: request.player?.fullName ?? null,
   }
 }

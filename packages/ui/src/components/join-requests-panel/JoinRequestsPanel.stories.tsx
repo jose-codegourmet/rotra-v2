@@ -1,4 +1,5 @@
 import { decidedJoinRequests, joinRequests } from '@rotra/data/fixtures/joinRequests'
+import { playerProfiles } from '@rotra/data/fixtures/player-profiles'
 import { Button } from '@rotra/ui/button'
 import { Sheet } from '@rotra/ui/sheet'
 import type { Meta, StoryObj } from '@storybook/react-vite'
@@ -110,8 +111,23 @@ const matchRequests = [
 const firstId = joinRequests[0]?.id ?? ''
 const secondId = joinRequests[1]?.id ?? ''
 export const WithDropOuts: Story = { args: { dropOuts } }
+const pictured = playerProfiles.find((p) => p.picture)
+/** Two signed-in Players: the first shows their profile picture, the second has none (initials). */
 export const PlayerRequests: Story = {
   args: {
+    requests: joinRequests.map((r, i) =>
+      i === 0 && pictured
+        ? {
+            ...r,
+            name: pictured.fullName,
+            playerId: pictured.playerId,
+            picture: pictured.picture,
+            pictureName: pictured.fullName,
+          }
+        : i === 1
+          ? { ...r, playerId: 'story-player-no-picture' }
+          : r,
+    ),
     requestDetails: {
       [firstId]: { account: 'in-club', sharedRank: 'Intermediate Mid', invitedBy: 'Miguel Santos' },
       [secondId]: { account: 'new-to-club', sharedRank: null },

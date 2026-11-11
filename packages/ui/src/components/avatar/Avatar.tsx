@@ -16,6 +16,15 @@ export type AvatarProps = AvatarVariants & {
    * renders as a button named "View <name>'s profile".
    */
   onClick?: () => void
+  /**
+   * Opens the full photo (PhotoViewer, D-PHOTO-VIEWER). Only a real picture that has loaded renders
+   * as a button named "View full photo of <name>" (zoom-in cursor, focus ring); initials stay inert.
+   * Ignored when onClick is set: an avatar that opens a profile keeps opening the profile.
+   * Leave it out when the avatar sits inside another button or link.
+   */
+  onView?: () => void
+  /** Accessible name of the view button; defaults to "View full photo of <name>" */
+  viewLabel?: string
   className?: string
 }
 
@@ -38,11 +47,20 @@ function AvatarFace({
   shape,
   tone,
   className,
+  onView,
+  viewLabel,
 }: Omit<AvatarProps, 'onClick'>) {
   const frozen = useRef<HTMLCanvasElement>(null)
   const [failed, setFailed] = useState(false)
   const classes = cn(avatarVariants({ size, shape, tone }), className)
-  return src && !failed ? (
+  if (!src || failed) {
+    return (
+      <span aria-hidden className={classes}>
+        {initials ?? initialsOf(name)}
+      </span>
+    )
+  }
+  const picture = (
     <span className={cn(classes, 'relative')}>
       <img
         src={src}
@@ -78,17 +96,33 @@ function AvatarFace({
         className="absolute inset-0 hidden size-full object-cover motion-reduce:block"
       />
     </span>
-  ) : (
-    <span aria-hidden className={classes}>
-      {initials ?? initialsOf(name)}
-    </span>
+  )
+  if (!onView) return picture
+  return (
+    <button
+      type="button"
+      onClick={onView}
+      aria-label={viewLabel ?? `View full photo of ${name}`}
+      className={cn(
+        'm-0 inline-flex flex-none cursor-zoom-in border-0 bg-transparent p-0 leading-none',
+        'focus-visible:outline-none focus-visible:[&>span]:outline-2 focus-visible:[&>span]:outline-offset-2 focus-visible:[&>span]:outline-accent',
+        shape === 'square' ? 'rounded-[14px]' : 'rounded-full',
+      )}
+    >
+      {picture}
+    </button>
   )
 }
 
-/** The prototypes' .avatar: a player's picture, or their initials on a neutral circle. */
-export function Avatar({ onClick, ...props }: AvatarProps) {
+/**
+ * The prototypes' .avatar: a player's picture, or their initials on a neutral circle. onClick opens
+ * the profile; onView opens the full photo (pictures only); with neither it is just a picture.
+ */
+export function Avatar({ onClick, onView, ...props }: AvatarProps) {
+  if (!onClick) {
+    return <AvatarFace key={JSON.stringify([props.src, props.name])} {...props} onView={onView} />
+  }
   const face = <AvatarFace key={JSON.stringify([props.src, props.name])} {...props} />
-  if (!onClick) return face
   return (
     <button
       type="button"

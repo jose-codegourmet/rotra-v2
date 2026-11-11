@@ -24,8 +24,8 @@ Superseded by: none
 ## Like for like
 - Compare at: 375 px and 1280 px, dark and light.
 - States: photo avatar (button, zoom-in cursor, keyboard focus ring), character avatar, initials (no button), open viewer, closed by overlay, by ×, by Esc; focus moves to the dialog title and the page is locked while open; reduced motion (no fade).
-- Copy: accessible names only: **View full photo of <name>** (avatar button), **Photo of <name>** (dialog title and image), **Close photo** (×).
-- Tokens: new --viewer-bg #000000 and --viewer-fg #ffffff, the same in dark and light (the overlay is always black)
+- Copy: accessible names only: **View full photo of <name>** (avatar button), **Photo of <name>** (dialog title and image), **Close** (owner decision, November 12, 2026; the mockup says Close photo) (×).
+- Tokens: new --viewer-bg #000000 and --viewer-fg #ffffff in the mockup; the real app uses the shared --photo-scrim rgba(0, 0, 0, 0.94) and --photo-fg #ffffff (owner decision, November 12, 2026), the same in dark and light (the overlay is always black)
 - Known differences: none
 
 ## Reuse plan

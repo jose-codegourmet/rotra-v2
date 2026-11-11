@@ -9,7 +9,7 @@ export const participantProfileSheetMeta = {
     'Public fields only: no phone, contacts or club-private rows (those belong to PlayerProfileSheet on operator screens).',
     'stats comes from useParticipantStats (the rank window, 90 days); pass statsLoading while it loads and statsError when it failed. null is “No games yet”.',
     'profileHref is the Player app’s /find/<RTR> profile, opened in a new tab; Open ROTRA profile hides without it.',
-    'onPhotoClick makes the big picture open the full photo (#716); leave it out until the viewer exists.',
+    'onPhotoClick makes the big picture the Avatar view button (“View full photo of NAME”, zoom-in cursor, focus ring); open PhotoViewer from it (#716, usePhotoViewer keeps the state). Initials never open anything.',
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',

@@ -9,7 +9,7 @@ export const playerProfileSheetMeta = {
     'Opened from inside a dialog, pass backLabel ("suggestion", "match" or "payments") and onBack to return to that dialog in the same state; otherwise the footer says Close.',
     'The phone number is never a prop: pass only phoneHidden. Invite shows for guests and unclaimed profiles.',
     'The level badge reads “LEVEL tonight” from tonightLevel (the player is on tonight’s roster), else “LEVEL · suggestion” from level, else “No level yet”. Pass tonight (ParticipantTonight) for the Tonight · line; leave it out when the player is not on tonight’s roster.',
-    'onPhotoClick makes the big picture a button (“View full photo of NAME”) for the full-photo viewer (#716); initials never open anything.',
+    'onPhotoClick makes the big picture the Avatar view button (“View full photo of NAME”, zoom-in cursor, focus ring); open PhotoViewer from it (#716). Initials never open anything.',
     'joinedVia ("club", "session" or null) sets the Joined row: "Joined via club link", "Joined via session link" or "Added by the club".',
     "Link to saved player…: pass onLinkToSavedPlayer only for a guest's record; it is ignored for other identities and when backLabel is set (opened from inside another dialog). The container opens LinkSavedPlayerSheet.",
     'Pass inviteUrl (the absolute ROTRA Player registration link) to show Invite to ROTRA for guests only: Copy invite link (toast; on clipboard failure the toast shows the link) and Share when the browser supports it. No auto-send, no identity linking.',

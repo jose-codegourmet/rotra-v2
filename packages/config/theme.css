@@ -74,6 +74,9 @@
   --color-court-level-beg: var(--court-level-beg);
   --color-court-level-int: var(--court-level-int);
   --color-court-level-adv: var(--court-level-adv);
+  /* Full-photo viewer (D-PHOTO-VIEWER): the black overlay and its × */
+  --color-photo-scrim: var(--photo-scrim);
+  --color-photo-fg: var(--photo-fg);
   /* Player Information only: podium medals and QR codes */
   --color-gold: var(--gold);
   --color-silver: var(--silver);
@@ -159,6 +162,9 @@
   --court-level-beg: #8cc4ff;
   --court-level-int: #ffd23f;
   --court-level-adv: #ff8a8e;
+  /* Full-photo viewer (D-PHOTO-VIEWER, #716): black overlay and its × in both themes. */
+  --photo-scrim: rgba(0, 0, 0, 0.94);
+  --photo-fg: #ffffff;
 
   /* Player Information prototype only */
   --gold: #f2c14e;

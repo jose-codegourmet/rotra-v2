@@ -23,8 +23,8 @@ Superseded by: none
 ## Like for like
 - Compare at: 375 px and 1280 px, dark and light.
 - States: avatar with a picture (button, zoom-in cursor, focus ring), initials (no button), viewer open over Quick view, closed by overlay, by ×, by Esc; focus returns to the avatar that opened it; reduced motion (no fade); club logo with initials (inert).
-- Copy: accessible names only: **View full photo of <name>**, **View full logo of <club>**, **Photo of <name>**, **Close photo**.
-- Tokens: new --viewer-bg #000000 and --viewer-fg #ffffff, the same in dark and light
+- Copy: accessible names only: **View full photo of <name>**, **View full logo of <club>**, **Photo of <name>**, **Close** (owner decision, November 12, 2026; the mockup says Close photo).
+- Tokens: new --viewer-bg #000000 and --viewer-fg #ffffff in the mockup; the real app uses the shared --photo-scrim rgba(0, 0, 0, 0.94) and --photo-fg #ffffff (owner decision, November 12, 2026), the same in dark and light
 - Known differences: none
 
 ## Reuse plan

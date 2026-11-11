@@ -83,30 +83,17 @@ export function ClubMemberProfileSheet({
 }: ClubMemberProfileSheetProps) {
   const isPublic = profile.kind === 'public'
   const banner = isPublic ? (profile.banner ?? 'court') : 'court'
-  const avatar = (
-    <Avatar
-      name={profile.name}
-      src={profile.picture ?? undefined}
-      size={64}
-      className="shadow-[0_0_0_5px_var(--surface)]"
-    />
-  )
   const head = (
     <>
       <div aria-hidden className={cn('h-[84px]', BANNER[banner])} />
       <div className="absolute top-11 left-5">
-        {isPublic && profile.picture && onViewPhoto ? (
-          <button
-            type="button"
-            onClick={onViewPhoto}
-            aria-label={`View full photo of ${profile.name}`}
-            className="cursor-zoom-in rounded-full border-0 bg-transparent p-0"
-          >
-            {avatar}
-          </button>
-        ) : (
-          avatar
-        )}
+        <Avatar
+          name={profile.name}
+          src={profile.picture ?? undefined}
+          size={64}
+          className="shadow-[0_0_0_5px_var(--surface)]"
+          onView={isPublic ? onViewPhoto : undefined}
+        />
       </div>
     </>
   )

@@ -1,6 +1,6 @@
 # Admin › Profile characters and Profile banners: each image is a card
 
-Status: CANCELLED
+Status: CANCELLED — the owner tried the card layout and reverted it on November 11, 2026
 Date: 2026-11-11
 App: admin
 Mockup: apps/mockup/admin-app/rotra-admin.html › Settings › Profile characters, Settings › Profile banners

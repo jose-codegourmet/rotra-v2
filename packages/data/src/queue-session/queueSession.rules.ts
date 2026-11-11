@@ -36,6 +36,27 @@ export function estimateMinimum(input: {
     usable,
   }
 }
+/**
+ * “Expected games about LOW–HIGH each” for `players` on the roster (#735): the same estimate as the
+ * calculated minimum, recomputed whenever the roster count changes (overfill, step down, waitlist
+ * promotion, late add, removal). D-OVERFILL compares `low` for the count now and one more.
+ */
+export function expectedGames(
+  session: Pick<
+    QueueSession,
+    'scheduledStartAt' | 'scheduledEndAt' | 'allowSingles' | 'allowDoubles'
+  >,
+  courts: number,
+  players: number,
+) {
+  return estimateMinimum({
+    courts,
+    minutes: sessionMinutes(session.scheduledStartAt, session.scheduledEndAt),
+    players,
+    allowSingles: session.allowSingles,
+    allowDoubles: session.allowDoubles,
+  })
+}
 /** Invalid and cancelled sessions never take part in venue or time clashes. */
 export function countsForClash(session: Pick<QueueSession, 'state'>) {
   return session.state !== 'invalid' && session.state !== 'cancelled'

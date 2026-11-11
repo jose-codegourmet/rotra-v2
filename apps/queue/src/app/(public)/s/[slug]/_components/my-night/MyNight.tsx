@@ -3,6 +3,7 @@
 import { useCancelMatchRequest } from '@rotra/data/match-request/useCancelMatchRequest'
 import type { MyNight as MyNightData } from '@rotra/data/public-session/types'
 import { useLeaveSession } from '@rotra/data/public-session/useLeaveSession'
+import { useMoveMeToWaitlist } from '@rotra/data/public-session/useMoveMeToWaitlist'
 import { useSelfCheckIn } from '@rotra/data/public-session/useSelfCheckIn'
 import { useSendDropOutNotice } from '@rotra/data/public-session/useSendDropOutNotice'
 import { MyNightCard } from '@rotra/ui/my-night-card'
@@ -37,7 +38,8 @@ type Writer = {
 
 /**
  * Q-PUBLIC-JOIN › My night: wires the personal projection (useMyNight) to MyNightCard and the
- * Player's own writes: I'm here, I'm leaving, I can't make it and Cancel on an open match request.
+ * Player's own writes: I'm here, I'm leaving, I can't make it, Cancel on an open match request and
+ * Move me to the waitlist (#735, hidden while the Player is on court, playing or queued).
  * Each toast is the write's own message; offline, the check-in message carries the sync line.
  */
 export function MyNight({
@@ -55,10 +57,15 @@ export function MyNight({
   const leave = useLeaveSession(slug)
   const dropOut = useSendDropOutNotice(slug)
   const cancelRequest = useCancelMatchRequest(slug)
+  const stepDown = useMoveMeToWaitlist(slug)
   if (night.status === 'none' || !night.stage) return null
 
   const pending =
-    checkIn.isPending || leave.isPending || dropOut.isPending || cancelRequest.isPending
+    checkIn.isPending ||
+    leave.isPending ||
+    dropOut.isPending ||
+    cancelRequest.isPending ||
+    stepDown.isPending
   const run = (write: Writer) => () =>
     write.mutate(
       { playerId: night.playerId },
@@ -95,6 +102,8 @@ export function MyNight({
       onCancelMatchRequest={run(cancelRequest)}
       onRequestMatch={sessionOpen ? onRequestMatch : undefined}
       onInvite={onInvite}
+      onStepDown={sessionOpen ? run(stepDown) : undefined}
+      inMatch={night.onCourt !== null || night.inQueue !== null}
     />
   )
 }

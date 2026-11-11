@@ -8,7 +8,12 @@ import { slotCapacity } from '../queue-session/queueSession.rules'
 import type { QueueSession } from '../queue-session/queueSession.types'
 import { accepted } from '../real/queue'
 import type { SaveOutcome } from '../sync/sync.types'
-import type { AddDirectoryPlayerInput, AddNewPlayerInput, AddSavedPlayerInput } from './mutations'
+import type {
+  AddDirectoryPlayerInput,
+  AddNewPlayerInput,
+  AddSavedPlayerInput,
+  RosterAddPlacement,
+} from './mutations'
 import { sessionRosterKeys } from './queryKeys'
 import {
   getRosterBatch,
@@ -42,13 +47,28 @@ function sessionInfo(client: QueryClient, sessionId: string) {
   }
 }
 
-/** Slot or waitlist, as the mock and the server decide it: before start, a full roster waits. */
-function placement(client: QueryClient, sessionId: string, forceWaitlist = false) {
+/**
+ * Slot or waitlist, as the mock and the server decide it: before start, a full roster waits, unless
+ * the Queue Master chose Add anyway (`allowOverfill`, #735); Add to waitlist always waits.
+ */
+function placement(
+  client: QueryClient,
+  sessionId: string,
+  forceWaitlist = false,
+  allowOverfill = false,
+) {
   const view = readRosterView(client, sessionId) ?? EMPTY
   const { live, capacity } = sessionInfo(client, sessionId)
-  const toWaitlist = forceWaitlist || (!live && capacity != null && view.roster.length >= capacity)
+  const toWaitlist =
+    forceWaitlist || (!allowOverfill && !live && capacity != null && view.roster.length >= capacity)
   return { view, live, toWaitlist, position: toWaitlist ? view.waitlist.length + 1 : 0 }
 }
+
+/** Only the flags that are set, so an ordinary add sends exactly what it did before #735. */
+const placementFlags = ({ allowOverfill, toWaitlist }: RosterAddPlacement) => ({
+  ...(allowOverfill ? { allowOverfill: true } : {}),
+  ...(toWaitlist ? { toWaitlist: true } : {}),
+})
 
 const firstName = (player: { fullName: string; nickname: string | null }) =>
   player.nickname || player.fullName.split(' ')[0] || player.fullName
@@ -117,7 +137,7 @@ export function enqueueAddSavedPlayer(
   client: QueryClient,
   input: AddSavedPlayerInput,
 ): Enqueued<Placed> {
-  const place = placement(client, input.sessionId)
+  const place = placement(client, input.sessionId, input.toWaitlist, input.allowOverfill)
   // A duplicate is a conflict: the Add player sheet drops the pick and returns to the list.
   if (inSession(place.view, input.clubPlayerId))
     throw new MockError('conflict', ROSTER_DUPLICATE_ERROR)
@@ -129,6 +149,7 @@ export function enqueueAddSavedPlayer(
       op: 'add',
       operationId: crypto.randomUUID(),
       source: 'saved',
+      ...placementFlags(input),
       clubPlayerId: input.clubPlayerId,
       level: input.level,
       identityCheck: input.identityCheck,
@@ -158,7 +179,7 @@ export function enqueueAddDirectoryPlayer(
   client: QueryClient,
   input: AddDirectoryPlayerInput,
 ): Enqueued<Placed> {
-  const place = placement(client, input.sessionId)
+  const place = placement(client, input.sessionId, input.toWaitlist, input.allowOverfill)
   const shared = getRosterBatch(client, input.sessionId)
   const saved = savedPlayerForProfile(client, input.playerId)
   if (
@@ -183,6 +204,7 @@ export function enqueueAddDirectoryPlayer(
       op: 'add',
       operationId: crypto.randomUUID(),
       source: 'directory',
+      ...placementFlags(input),
       playerId: input.playerId,
       level: input.level,
       identityCheck: input.identityCheck,
@@ -208,13 +230,14 @@ export function enqueueAddNewPlayer(
 ): Enqueued<Placed> {
   const name = input.name.trim()
   if (!name) throw new MockError('permission', 'Enter your name.')
-  const place = placement(client, input.sessionId)
+  const place = placement(client, input.sessionId, input.toWaitlist, input.allowOverfill)
   const clubPlayerId = crypto.randomUUID()
   getRosterBatch(client, input.sessionId).enqueue({
     operation: {
       op: 'add',
       operationId: crypto.randomUUID(),
       source: 'new',
+      ...placementFlags(input),
       name,
       nickname: input.nickname?.trim() || undefined,
       phone: input.phone?.trim() || undefined,

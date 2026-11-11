@@ -5,6 +5,7 @@ export const rosterRowMeta = {
   description:
     'One confirmed slot on the preparation roster: picture, name, identity chip, the Player Information suggestion, the level select with its diff indicator, the Present switch and remove.',
   usage: [
+    'Pass onStepDown for the secondary Move to waitlist button next to remove (#735); it also shows in the read-only summary after Start.',
     'Pass selfCheckedInAt or leftAt timestamps for the muted presence caption; the caller owns clearing rules.',
     'presencePending shows Saving presence… without disabling the switch; the data batch owns optimistic values and rollback.',
     'Before Start session the route passes showPresence=false: no Present text or switch, remove stays. Read-only Session settings passes readOnly for locked level and presence text without removal or presence controls.',

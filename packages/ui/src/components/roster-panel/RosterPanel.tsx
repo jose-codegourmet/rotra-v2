@@ -84,6 +84,10 @@ export type RosterPanelProps = {
   onLevelChange: (playerId: string, level: PlayingLevel) => void
   onPresentChange: (playerId: string, present: boolean) => void
   onRemove: (playerId: string) => void
+  /** Move to waitlist on every row and card (#735), before and after Start; omit to hide it */
+  onStepDown?: (playerId: string) => void
+  /** “expected games about LOW–HIGH each” on the summary (#735), from expectedGames() in @rotra/data */
+  expectedGames?: { low: number; high: number }
   className?: string
 }
 
@@ -121,6 +125,7 @@ function PlayerList({
   onLevelChange,
   onPresentChange,
   onRemove,
+  onStepDown,
 }: {
   players: RosterPanelPlayer[]
   view: RosterView
@@ -131,6 +136,7 @@ function PlayerList({
   onLevelChange: (playerId: string, level: PlayingLevel) => void
   onPresentChange: (playerId: string, present: boolean) => void
   onRemove: (playerId: string) => void
+  onStepDown?: (playerId: string) => void
 }) {
   if (view === 'grid') {
     return (
@@ -155,6 +161,7 @@ function PlayerList({
             onLevelChange={(level) => onLevelChange(p.id, level)}
             onPresentChange={(present) => onPresentChange(p.id, present)}
             onRemove={() => onRemove(p.id)}
+            onStepDown={onStepDown ? () => onStepDown(p.id) : undefined}
           />
         ))}
       </div>
@@ -181,6 +188,7 @@ function PlayerList({
           onLevelChange={(level) => onLevelChange(p.id, level)}
           onPresentChange={(present) => onPresentChange(p.id, present)}
           onRemove={() => onRemove(p.id)}
+          onStepDown={onStepDown ? () => onStepDown(p.id) : undefined}
         />
       ))}
     </div>
@@ -214,6 +222,8 @@ export function RosterPanel({
   onLevelChange,
   onPresentChange,
   onRemove,
+  onStepDown,
+  expectedGames,
   className,
 }: RosterPanelProps) {
   const headingId = useId()
@@ -321,6 +331,7 @@ export function RosterPanel({
           skillCounts={skillCounts}
           activeLevel={activeLevel}
           onLevelPress={pressLevel}
+          expectedGames={expectedGames}
         />
         {!readOnly && missing ? (
           <Notice tone="warn">
@@ -418,6 +429,7 @@ export function RosterPanel({
                       onLevelChange={onLevelChange}
                       onPresentChange={onPresentChange}
                       onRemove={onRemove}
+                      onStepDown={onStepDown}
                     />
                   </section>
                 ))
@@ -432,6 +444,7 @@ export function RosterPanel({
                   onLevelChange={onLevelChange}
                   onPresentChange={onPresentChange}
                   onRemove={onRemove}
+                  onStepDown={onStepDown}
                 />
               )}
             </div>

@@ -16,7 +16,8 @@ export type Tx = Prisma.TransactionClient
  * Locks the club's session row for the rest of the transaction (`FOR UPDATE`), so admissions,
  * budget changes and start are serialized per session. Another club's session ID is `not_found`.
  */
-export async function lockSession(tx: Tx, context: ClubContext, sessionId: string) {
+/** Locks the club's session row; only `clubId` is read, so a Player write can lock it too. */
+export async function lockSession(tx: Tx, context: Pick<ClubContext, 'clubId'>, sessionId: string) {
   const rows = await tx.$queryRaw<{ id: string }[]>`
     SELECT "id" FROM "queue_sessions"
     WHERE "club_id" = ${context.clubId}::uuid AND "id" = ${sessionId}::uuid

@@ -127,29 +127,31 @@ export type DirectoryPlayer = {
   phoneHidden?: boolean
 }
 
+/** Add anyway / Add to waitlist on a full roster (#735, D-OVERFILL); omitted on an ordinary add. */
+type AddPlacementFlags = { allowOverfill?: boolean; toWaitlist?: boolean }
 /**
  * One change of the roster burst batch (#718): the Queue Master's adds, removes and join-request
  * decisions of one burst, sent together in click order and applied on the server in one
  * transaction. Each carries its own `operationId`, so a retry of the batch repeats nothing.
  */
 export type RosterBatchOperation =
-  | {
+  | (AddPlacementFlags & {
       op: 'add'
       operationId: string
       source: 'saved'
       clubPlayerId: string
       level: PlayingLevel
       identityCheck?: IdentityCheck
-    }
-  | {
+    })
+  | (AddPlacementFlags & {
       op: 'add'
       operationId: string
       source: 'directory'
       playerId: string
       level: PlayingLevel
       identityCheck?: IdentityCheck
-    }
-  | {
+    })
+  | (AddPlacementFlags & {
       op: 'add'
       operationId: string
       source: 'new'
@@ -157,7 +159,7 @@ export type RosterBatchOperation =
       nickname?: string
       phone?: string
       level: PlayingLevel
-    }
+    })
   | { op: 'remove'; operationId: string; rosterId: string }
   | { op: 'acceptRequest'; operationId: string; requestId: string; level: PlayingLevel }
   | { op: 'declineRequest'; operationId: string; requestId: string }

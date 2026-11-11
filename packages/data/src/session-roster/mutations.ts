@@ -36,8 +36,15 @@ import {
   realSetGamesPlayed,
   realSetPresence,
   realSetPresenceMany,
+  realStepDownToWaitlist,
 } from '../real/session-live'
-import { levelLabel, ROSTER_DUPLICATE_ERROR, shortName } from './sessionRoster.rules'
+import {
+  inUnfinishedMatch,
+  levelLabel,
+  ROSTER_DUPLICATE_ERROR,
+  shortName,
+  stepDownBlockedText,
+} from './sessionRoster.rules'
 import type {
   DirectoryPlayer,
   IdentityCheck,
@@ -72,8 +79,15 @@ export function settleRoster<T>(s: MockState, sessionId: string, result: T) {
   return result
 }
 /**
+ * Where the Queue Master's add goes when the roster is full (#735, D-OVERFILL): `allowOverfill`
+ * is **Add anyway** (a slot beyond the budget), `toWaitlist` is **Add to waitlist**. Neither keeps
+ * the old rule: before start a full roster waits.
+ */
+export type RosterAddPlacement = { allowOverfill?: boolean; toWaitlist?: boolean }
+/**
  * Gives a club player a slot, or a waitlist place once a prepared session is full. `toWaitlist`
- * (a Be waitlisted request, D-2026-11-11-02) always gives the waitlist place, even during play.
+ * (a Be waitlisted request, D-2026-11-11-02, or Add to waitlist) always gives the waitlist place,
+ * even during play; `allowOverfill` (Add anyway, #735) gives the slot even when the roster is full.
  */
 export function place(
   s: MockState,
@@ -82,6 +96,7 @@ export function place(
   level: PlayingLevel,
   addedAt = Date.now(),
   toWaitlist = false,
+  allowOverfill = false,
 ) {
   levelCheck(level)
   const session = sessionIn(s, sessionId)
@@ -96,7 +111,8 @@ export function place(
     throw new MockError('conflict', ROSTER_DUPLICATE_ERROR)
   const full =
       toWaitlist ||
-      (session.state !== 'active' &&
+      (!allowOverfill &&
+        session.state !== 'active' &&
         s.roster.filter((r) => r.sessionId === sessionId).length >= capacity(s, sessionId)),
     id = crypto.randomUUID()
   s.waitlist.push({ id, sessionId, clubPlayerId: p.id, level, addedAt })
@@ -118,7 +134,7 @@ function identity(s: MockState, p: ClubPlayer, check?: IdentityCheck) {
   )
     fail('Confirm this player’s identity before adding them.')
 }
-export type AddSavedPlayerInput = {
+export type AddSavedPlayerInput = RosterAddPlacement & {
   sessionId: string
   clubPlayerId: string
   level: PlayingLevel
@@ -130,7 +146,15 @@ export function addSavedPlayerChange(s: MockState, input: AddSavedPlayerInput) {
   if (!p || (p.playerId && s.adminPlayerRecords[p.playerId]?.archivedAt))
     fail('Player not available.')
   identity(s, p, input.identityCheck)
-  const data = place(s, input.sessionId, p, input.level),
+  const data = place(
+      s,
+      input.sessionId,
+      p,
+      input.level,
+      Date.now(),
+      input.toWaitlist,
+      input.allowOverfill,
+    ),
     name = p.nickname || p.fullName.split(' ')[0]
   return {
     data,
@@ -170,7 +194,7 @@ export async function playerDirectorySearch(q: string): Promise<DirectoryPlayer[
         ) && [p.fullName, p.nickname, p.rtrId].some((v) => v?.toLowerCase().includes(query)),
     )
 }
-export type AddDirectoryPlayerInput = {
+export type AddDirectoryPlayerInput = RosterAddPlacement & {
   sessionId: string
   playerId: string
   level: PlayingLevel
@@ -179,7 +203,15 @@ export type AddDirectoryPlayerInput = {
 export function addDirectoryPlayerChange(s: MockState, input: AddDirectoryPlayerInput) {
   const p = clubPlayerForProfile(s, input.playerId).player
   identity(s, p, input.identityCheck)
-  const data = place(s, input.sessionId, p, input.level)
+  const data = place(
+    s,
+    input.sessionId,
+    p,
+    input.level,
+    Date.now(),
+    input.toWaitlist,
+    input.allowOverfill,
+  )
   return {
     data,
     text: `${p.nickname || p.fullName.split(' ')[0]} added${data.waitlistPosition ? ` to the waitlist as #${data.waitlistPosition}` : ''} · ${levelLabel(input.level)}${!data.waitlistPosition && data.locked ? ' · level locked' : ''}`,
@@ -192,7 +224,7 @@ export async function addDirectoryPlayerToSession(input: AddDirectoryPlayerInput
   }
   return rosterMutation(input.sessionId, (s) => addDirectoryPlayerChange(s, input))
 }
-export type AddNewPlayerInput = {
+export type AddNewPlayerInput = RosterAddPlacement & {
   sessionId: string
   name: string
   nickname?: string
@@ -201,7 +233,15 @@ export type AddNewPlayerInput = {
 }
 export function addNewPlayerChange(s: MockState, input: AddNewPlayerInput) {
   const p = createClubPlayer(s, input),
-    data = place(s, input.sessionId, p, input.level)
+    data = place(
+      s,
+      input.sessionId,
+      p,
+      input.level,
+      Date.now(),
+      input.toWaitlist,
+      input.allowOverfill,
+    )
   return {
     data,
     text: data.waitlistPosition
@@ -254,6 +294,44 @@ export function removeRosterPlayerChange(
 export function removeRosterPlayer(input: { sessionId: string; rosterId: string }) {
   if (isRealDataMode()) return realRemoveRosterPlayer(input)
   return rosterMutation(input.sessionId, (s) => removeRosterPlayerChange(s, input))
+}
+export type StepDownInput = { sessionId: string; rosterId: string; operationId?: string }
+/**
+ * Move to waitlist (#735): the admitted player goes to the **front** of the waitlist, before and
+ * after Start. Their level rides on the waitlist entry and their paid mark (kept per club player)
+ * stays, so both come back with a slot. Refused while they are in any waiting, On court or Playing
+ * match. The mock leaderboard is built from the roster, so a stepped-down player's finished games
+ * leave tonight's mock standings (the real app keeps them on the record).
+ */
+export function stepDownChange(s: MockState, input: StepDownInput, blocked?: string) {
+  const session = sessionIn(s, input.sessionId)
+  if (session.state !== 'prepared' && session.state !== 'active') fail('This session is closed.')
+  const p = row(s, input.rosterId, input.sessionId)
+  if (
+    inUnfinishedMatch(
+      p.id,
+      s.matches.filter((m) => m.sessionId === input.sessionId),
+    )
+  )
+    throw new MockError('conflict', blocked ?? stepDownBlockedText(shortName(p)))
+  const waiting = s.waitlist.filter((w) => w.sessionId === input.sessionId)
+  const front = Math.min(Date.now(), ...waiting.map((w) => w.addedAt)) - 1
+  s.roster = s.roster.filter((r) => r.id !== p.id)
+  s.waitlist.push({
+    id: crypto.randomUUID(),
+    sessionId: input.sessionId,
+    clubPlayerId: p.clubPlayerId,
+    level: p.level,
+    addedAt: front,
+  })
+  return { data: null, text: `${p.nameSnapshot} moved to the waitlist` }
+}
+export async function stepDownToWaitlist(input: StepDownInput) {
+  if (isRealDataMode()) {
+    await flushSessionBatches(input.sessionId)
+    return realStepDownToWaitlist(input)
+  }
+  return rosterMutation(input.sessionId, (s) => stepDownChange(s, input))
 }
 export function setPresence(input: { sessionId: string; rosterId: string; present: boolean }) {
   if (isRealDataMode()) return realSetPresence(input)

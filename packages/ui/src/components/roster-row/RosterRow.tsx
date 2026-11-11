@@ -2,6 +2,7 @@
 
 import type { PlayingLevel } from '@rotra/data/player/types'
 import { Avatar } from '@rotra/ui/avatar'
+import { Button } from '@rotra/ui/button'
 import { cn } from '@rotra/ui/cn'
 import { Icon } from '@rotra/ui/icon'
 import { IconButton } from '@rotra/ui/icon-button'
@@ -35,13 +36,18 @@ export type RosterRowProps = {
   onLevelChange: (level: PlayingLevel) => void
   onPresentChange: (present: boolean) => void
   onRemove: () => void
+  /**
+   * Move to waitlist (#735): a secondary button next to remove, before and after Start (also in
+   * the read-only summary). Omit to hide it.
+   */
+  onStepDown?: () => void
   className?: string
 }
 
 /**
  * One confirmed slot on the preparation roster (the prototype's .prow): picture, name, identity,
- * suggestion, the level select with its diff indicator, the Present switch and remove. Phones stack
- * the name, then the level, then Present and remove. Once levels are locked the level is plain text
+ * suggestion, the level select with its diff indicator, the Present switch, Move to waitlist and
+ * remove. Phones stack the name, then the level, then Present, Move to waitlist and remove. Once levels are locked the level is plain text
  * with a lock icon and an explanation; there is no edit path.
  */
 export function RosterRow({
@@ -61,6 +67,7 @@ export function RosterRow({
   onLevelChange,
   onPresentChange,
   onRemove,
+  onStepDown,
   className,
 }: RosterRowProps) {
   const diffId = useId()
@@ -119,6 +126,11 @@ export function RosterRow({
                     : 'Away'
                   : 'Present'}
             </span>
+          ) : null}
+          {onStepDown ? (
+            <Button size="xs" aria-label={`Move ${name} to the waitlist`} onClick={onStepDown}>
+              Move to waitlist
+            </Button>
           ) : null}
           {!readOnly ? (
             <>

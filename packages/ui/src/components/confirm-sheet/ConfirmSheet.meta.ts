@@ -9,6 +9,7 @@ export const confirmSheetMeta = {
     'Copy title, consequence and button labels word for word from docs/screens/product/dialogs.md.',
     'Put the target (session, players, match, courts, scores) in summary so the operator sees the actual values.',
     'note is an optional small muted line after the consequence (D-CLUB-NAME: what does not change).',
+    'extraAction is an optional second choice between Back and the primary (D-OVERFILL: Add to waitlist).',
     'notice is an optional Notice after the consequence and note (D-CONFIG: the warn notice about the undecided recalculation policy).',
     'Pass isPending from the mutation: the primary shows a spinner, Back and Escape are blocked, and a second tap cannot commit again.',
     'Pass error when the commit fails; keep the sheet open and never toast success.',
@@ -19,6 +20,6 @@ export const confirmSheetMeta = {
     screen: 'Mark match invalid? / Confirm match result / Start session? sheets',
   },
   docs: ['docs/screens/product/dialogs.md'],
-  variants: ['default', 'destructive', 'with note', 'with notice'],
+  variants: ['default', 'destructive', 'with note', 'with notice', 'with extra action'],
   related: ['Sheet', 'Button', 'Notice'],
 } satisfies ComponentMeta

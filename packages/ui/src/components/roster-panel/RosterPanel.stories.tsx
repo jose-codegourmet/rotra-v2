@@ -190,3 +190,21 @@ const picturePlayers = rosterPlayers.map((p, index) => ({
 }))
 export const WithPictures: Story = { args: { players: picturePlayers } }
 export const WithPicturesGrid: Story = { args: { players: picturePlayers, view: 'grid' } }
+
+// #735: Move to waitlist on rows and cards, and the summary with expected games, over capacity.
+export const WithMoveToWaitlist: Story = {
+  args: { showPresence: false, onStepDown: fn(), expectedGames: { low: 5, high: 7 } },
+}
+export const WithMoveToWaitlistGrid: Story = {
+  args: { ...WithMoveToWaitlist.args, view: 'grid' },
+}
+export const OverCapacity: Story = {
+  args: {
+    showPresence: false,
+    capacity: rosterPlayers.length - 1,
+    waitlistCount: sessionWaitlistFixture.length,
+    onStepDown: fn(),
+    expectedGames: { low: 4, high: 6 },
+  },
+}
+export const OverCapacityLight: Story = { ...OverCapacity, globals: { theme: 'light' } }

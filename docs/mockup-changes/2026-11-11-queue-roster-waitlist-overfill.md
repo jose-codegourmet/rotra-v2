@@ -1,6 +1,6 @@
 # Admitted players can step down to the waitlist; Queue Master can overfill the roster (#735, proposed)
 
-Status: NEW
+Status: IN MOCK APP — #735
 Date: 2026-11-11
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Preparation › Roster and levels tab (rows and grid cards), Live console › Players tab cards, public session page › My night, Overfill confirmation sheet

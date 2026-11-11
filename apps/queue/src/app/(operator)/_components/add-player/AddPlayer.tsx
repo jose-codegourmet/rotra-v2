@@ -7,6 +7,7 @@ import { useConnectivity } from '@rotra/data/connectivity/useConnectivity'
 import { MockError } from '@rotra/data/mock/errors'
 import { slotCapacity } from '@rotra/data/queue-session/queueSession.rules'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
+import type { RosterAddPlacement } from '@rotra/data/session-roster/mutations'
 import {
   needsConfirmStep,
   ROSTER_DUPLICATE_ERROR,
@@ -29,6 +30,7 @@ import type {
 import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { toast } from '@rotra/ui/toaster'
 import { useRef, useState } from 'react'
+import { OverfillConfirm } from '@/app/(operator)/_components/overfill-confirm/OverfillConfirm'
 
 export type AddPlayerProps = {
   /** The session to add to. Without one (Saved players), the sheet saves to the club's saved players only. */
@@ -178,58 +180,105 @@ function SessionAddPlayer({
   }))
 
   const isPending = addSaved.isPending || addDirectory.isPending || addNew.isPending
+  /** D-OVERFILL (#735): the add waiting on Add anyway / Add to waitlist while the roster is full */
+  const [overfill, setOverfill] = useState<{
+    name: string
+    run: (placement: RosterAddPlacement) => void
+  } | null>(null)
+  /** Runs the add now, or asks once first when the roster is already at the slot budget. */
+  const placeOrAsk = (name: string, run: (placement: RosterAddPlacement) => void) => {
+    if (rosterList.length >= capacity) setOverfill({ name, run })
+    else run({})
+  }
 
   const confirm = ({ candidate, source, level, identityCheck }: AddPlayerConfirmInput) => {
-    if (!s || !roster.data || !clubPlayers.data || !add.begin()) return
+    if (!s || !roster.data || !clubPlayers.data) return
     const identityCheckInput = identityCheck ?? undefined
-    if (source === 'saved')
-      addSaved.mutate(
-        { sessionId, clubPlayerId: candidate.id, level, identityCheck: identityCheckInput },
-        add.options,
-      )
-    else
-      addDirectory.mutate(
-        { sessionId, playerId: candidate.id, level, identityCheck: identityCheckInput },
-        add.options,
-      )
+    placeOrAsk(candidate.name, (placement) => {
+      if (!add.begin()) return
+      if (source === 'saved')
+        addSaved.mutate(
+          {
+            sessionId,
+            clubPlayerId: candidate.id,
+            level,
+            identityCheck: identityCheckInput,
+            ...placement,
+          },
+          add.options,
+        )
+      else
+        addDirectory.mutate(
+          {
+            sessionId,
+            playerId: candidate.id,
+            level,
+            identityCheck: identityCheckInput,
+            ...placement,
+          },
+          add.options,
+        )
+    })
   }
 
   const submitNewPlayer = (values: NewPlayerFormValues) => {
-    if (!s || !roster.data || !add.begin()) return
-    addNew.mutate(
-      {
-        sessionId,
-        name: values.name,
-        nickname: values.nickname ?? undefined,
-        phone: values.phone ?? undefined,
-        level: values.level,
-      },
-      add.options,
-    )
+    if (!s || !roster.data) return
+    placeOrAsk(values.name.trim(), (placement) => {
+      if (!add.begin()) return
+      addNew.mutate(
+        {
+          sessionId,
+          name: values.name,
+          nickname: values.nickname ?? undefined,
+          phone: values.phone ?? undefined,
+          level: values.level,
+          ...placement,
+        },
+        add.options,
+      )
+    })
+  }
+  const answer = (placement: RosterAddPlacement) => {
+    const pending = overfill
+    setOverfill(null)
+    pending?.run(placement)
   }
 
   return (
-    <AddPlayerSheet
-      {...add.sheet}
-      open={open}
-      onOpenChange={onOpenChange}
-      sessionTitle={s?.title ?? '…'}
-      live={s?.state === 'active'}
-      capacity={capacity}
-      openSlots={Math.max(0, capacity - rosterList.length)}
-      waitlistCount={waitlist.length}
-      savedPlayers={savedPlayers}
-      inSessionIds={inSessionIds}
-      onConfirm={confirm}
-      onSubmitNewPlayer={submitNewPlayer}
-      isPending={isPending || session.isPending || roster.isPending || clubPlayers.isPending}
-      serverError={
-        add.serverError ??
-        (session.error || roster.error || clubPlayers.error
-          ? 'Could not load players. Close and reopen to retry.'
-          : undefined)
-      }
-    />
+    <>
+      <AddPlayerSheet
+        {...add.sheet}
+        open={open}
+        onOpenChange={onOpenChange}
+        sessionTitle={s?.title ?? '…'}
+        live={s?.state === 'active'}
+        capacity={capacity}
+        openSlots={Math.max(0, capacity - rosterList.length)}
+        waitlistCount={waitlist.length}
+        savedPlayers={savedPlayers}
+        inSessionIds={inSessionIds}
+        onConfirm={confirm}
+        onSubmitNewPlayer={submitNewPlayer}
+        isPending={isPending || session.isPending || roster.isPending || clubPlayers.isPending}
+        serverError={
+          add.serverError ??
+          (session.error || roster.error || clubPlayers.error
+            ? 'Could not load players. Close and reopen to retry.'
+            : undefined)
+        }
+      />
+      {s ? (
+        <OverfillConfirm
+          target={open && overfill ? { name: overfill.name } : null}
+          session={s}
+          rosterCount={rosterList.length}
+          capacity={capacity}
+          onCancel={() => setOverfill(null)}
+          onAddToWaitlist={() => answer({ toWaitlist: true })}
+          onAddAnyway={() => answer({ allowOverfill: true })}
+        />
+      ) : null}
+    </>
   )
 }
 

@@ -2,6 +2,7 @@
 
 import type { PlayingLevel } from '@rotra/data/player/types'
 import { Avatar } from '@rotra/ui/avatar'
+import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { cn } from '@rotra/ui/cn'
 import { Icon } from '@rotra/ui/icon'
@@ -46,6 +47,11 @@ export type RosterCardProps = {
   onLevelChange: (level: PlayingLevel) => void
   onPresentChange: (present: boolean) => void
   onRemove: () => void
+  /**
+   * Move to waitlist (#735): a secondary button on the card's last row, before and after Start
+   * (also in the read-only summary). Omit to hide it.
+   */
+  onStepDown?: () => void
   className?: string
 }
 
@@ -54,7 +60,7 @@ export type RosterCardProps = {
  * picture, name, remove, a full-width Present band (accent tint when present) and a level block
  * tinted in the skill group's color (level select or "LEVEL · Fixed after start", plus the
  * suggestion indicator). Second level: one small muted line with the identity chip, Paid / Not
- * paid and "Suggestion: LEVEL".
+ * paid and "Suggestion: LEVEL". Last, Move to waitlist when `onStepDown` is given (#735).
  */
 export function RosterCard({
   name,
@@ -74,6 +80,7 @@ export function RosterCard({
   onLevelChange,
   onPresentChange,
   onRemove,
+  onStepDown,
   className,
 }: RosterCardProps) {
   const diffId = useId()
@@ -166,6 +173,13 @@ export function RosterCard({
           </span>
           <span>{suggestion ? `Suggestion: ${levelLabel(suggestion)}` : 'No suggestion'}</span>
         </div>
+        {onStepDown ? (
+          <div className="flex flex-wrap items-center gap-2">
+            <Button size="xs" aria-label={`Move ${name} to the waitlist`} onClick={onStepDown}>
+              Move to waitlist
+            </Button>
+          </div>
+        ) : null}
       </article>
     </Card>
   )

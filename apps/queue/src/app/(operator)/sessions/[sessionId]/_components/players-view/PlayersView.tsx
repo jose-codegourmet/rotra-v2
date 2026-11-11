@@ -25,6 +25,10 @@ import { PLAYING_LEVELS } from '@rotra/data/player/types'
 import { selfCheckInMark } from '@rotra/data/public-session/rules'
 import { slotCapacity } from '@rotra/data/queue-session/queueSession.rules'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
+import {
+  inUnfinishedMatch,
+  stepDownBlockedText,
+} from '@rotra/data/session-roster/sessionRoster.rules'
 import type { SessionPlayer } from '@rotra/data/session-roster/types'
 import { useFillOpenSlots } from '@rotra/data/session-roster/useFillOpenSlots'
 import { useGiveSlot } from '@rotra/data/session-roster/useGiveSlot'
@@ -32,6 +36,7 @@ import { useRemoveFromWaitlist } from '@rotra/data/session-roster/useRemoveFromW
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { useSetGamesPlayed } from '@rotra/data/session-roster/useSetGamesPlayed'
 import { useSetPresenceMany } from '@rotra/data/session-roster/useSetPresenceMany'
+import { useStepDownToWaitlist } from '@rotra/data/session-roster/useStepDownToWaitlist'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { ConfirmMakeMatchSheet } from '@rotra/ui/confirm-make-match-sheet'
@@ -49,8 +54,9 @@ import { Skeleton } from '@rotra/ui/skeleton'
 import { SlotMeter } from '@rotra/ui/slot-meter'
 import { toast } from '@rotra/ui/toaster'
 import { WaitlistPanel, type WaitlistPanelEntry } from '@rotra/ui/waitlist-panel'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { AddPlayer } from '@/app/(operator)/_components/add-player/AddPlayer'
+import { OverfillConfirm } from '@/app/(operator)/_components/overfill-confirm/OverfillConfirm'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import type { ConsoleViewProps } from '@/app/(operator)/sessions/[sessionId]/_components/session-console/SessionConsole'
 
@@ -103,7 +109,9 @@ const errorMessage = (error: unknown) =>
  * Queued · #P / Free), the pick order in local state with the SelectionBar while anyone is picked,
  * the Waitlist panel when anyone waits or the session is full, and the footer line. Set games for
  * all… and each card's Set games played… open SetGamesSheet on useSetGamesPlayed (#717); games is the
- * adjusted count (gamesPlayed). Pictures on
+ * adjusted count (gamesPlayed). Each card's Move to waitlist (#735) toasts “Finish or remove NAME's
+ * match first.” while the player is in a match, otherwise steps them down; Admit player on a full
+ * roster asks OverfillConfirm first. Pictures on
  * waitlist rows open profiles through onOpenProfile; the Present switch uses a shared optimistic 800 ms presence batch, retaining pending cards in their
  * filter and reporting one summary with the unique waiting-match attention count.
  */
@@ -129,6 +137,10 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
   const fillOpenSlots = useFillOpenSlots()
   const removeFromWaitlist = useRemoveFromWaitlist()
   const setGamesPlayed = useSetGamesPlayed()
+  const stepDown = useStepDownToWaitlist()
+  const steppingDown = useRef(new Set<string>())
+  /** Admit player on a full roster waits for D-OVERFILL (#735) */
+  const [overfillWaiter, setOverfillWaiter] = useState<string | null>(null)
   /** Set games played: one roster id, or 'all' */
   const [setGamesFor, setSetGamesFor] = useState<string | 'all' | null>(null)
   const [setGamesError, setSetGamesError] = useState<string | undefined>()
@@ -254,6 +266,22 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
       waitingSinceLabel: time(w.addedAt),
     }
   })
+  const overfillEntry = entries.find((w) => w.id === overfillWaiter)
+  const giveSlotTo = (waitlistId: string) => giveSlot.mutate({ sessionId, waitlistId }, options)
+  /** Move to waitlist (#735): blocked with a toast while the player is in any unfinished match. */
+  const stepDownPlayer = (player: SessionPlayer) => {
+    if (inUnfinishedMatch(player.id, all)) {
+      toast(stepDownBlockedText(shortName(player)))
+      return
+    }
+    if (steppingDown.current.has(player.id)) return
+    steppingDown.current.add(player.id)
+    setPicked((prev) => prev.filter((id) => id !== player.id))
+    stepDown.mutate(
+      { sessionId, rosterId: player.id, operationId: crypto.randomUUID() },
+      { ...options, onSettled: () => steppingDown.current.delete(player.id) },
+    )
+  }
   const openProfileFromWaitlist = (waitlistId: string) => {
     const w = waitlist.find((w) => w.id === waitlistId)
     if (w) onOpenProfile(w.clubPlayerId)
@@ -336,6 +364,9 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
                   setSetGamesError(undefined)
                   void setPresence.flush().then(() => setSetGamesFor(row.player.id))
                 }}
+                onStepDown={() => {
+                  void setPresence.flush().then(() => stepDownPlayer(row.player))
+                }}
                 onPresentChange={(present) => {
                   if (!setPresence.pending.size || held?.filter !== show)
                     setHeld({ filter: show, ids: shown.map((r) => r.player.id) })
@@ -383,7 +414,10 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
           courtCount={s.courts.length}
           playersPerCourt={s.playersPerCourt}
           onFillOpenSlots={() => fillOpenSlots.mutate(sessionId, options)}
-          onGiveSlot={(waitlistId) => giveSlot.mutate({ sessionId, waitlistId }, options)}
+          onGiveSlot={(waitlistId) => {
+            if (full) setOverfillWaiter(waitlistId)
+            else giveSlotTo(waitlistId)
+          }}
           onRemove={(waitlistId) => removeFromWaitlist.mutate({ sessionId, waitlistId }, options)}
           onOpenProfile={openProfileFromWaitlist}
         />
@@ -484,6 +518,17 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
           }}
         />
       ) : null}
+      <OverfillConfirm
+        target={overfillEntry ? { name: overfillEntry.name } : null}
+        session={s}
+        rosterCount={rosterList.length}
+        capacity={capacity}
+        onCancel={() => setOverfillWaiter(null)}
+        onAddAnyway={() => {
+          setOverfillWaiter(null)
+          if (overfillEntry) giveSlotTo(overfillEntry.id)
+        }}
+      />
       <AddPlayer sessionId={sessionId} open={addOpen} onOpenChange={setAddOpen} />
     </div>
   )

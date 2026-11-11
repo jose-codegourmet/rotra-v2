@@ -238,6 +238,22 @@ export async function realRemoveRosterPlayer(input: { sessionId: string; rosterI
   return accepted(null, 'Removed from the roster')
 }
 
+/**
+ * Move to waitlist (#735): one `POST …/roster/:rosterId/waitlist`, repeat-safe on `operationId`.
+ * The server refuses it while the player is in an unfinished match.
+ */
+export async function realStepDownToWaitlist(input: {
+  sessionId: string
+  rosterId: string
+  operationId?: string
+}) {
+  const result = await realRequest<{ name: string }>(
+    `${sessionPath(input.sessionId)}/roster/${encodeURIComponent(input.rosterId)}/waitlist`,
+    { method: 'POST', body: { operationId: input.operationId ?? crypto.randomUUID() } },
+  )
+  return accepted(null, `${result.name} moved to the waitlist`)
+}
+
 export async function realSetPresenceMany(input: {
   sessionId: string
   changes: { rosterId: string; present: boolean }[]

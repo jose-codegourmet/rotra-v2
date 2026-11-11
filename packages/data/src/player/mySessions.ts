@@ -7,10 +7,14 @@ import { readMockState } from '../mock/store'
 import { isRealDataMode } from '../real/mode'
 import { realGetMySessions } from '../real/my-sessions'
 import { playerProjection } from './projection'
-/** Matches existing sessionPageUrl fixtures; replace the origin before real-mode rollout. */
-export const PLAYER_QUEUE_ORIGIN = 'http://localhost:9000'
-export const queueSessionUrl = (slug: string) =>
-  `${PLAYER_QUEUE_ORIGIN}/s/${encodeURIComponent(slug)}`
+/** The ROTRA Queue app's origin, as seen from the Player app (localhost in local work). */
+export function queueAppOrigin() {
+  return typeof location !== 'undefined' && location.hostname === 'localhost'
+    ? 'http://localhost:9000'
+    : 'https://queue.rotra.club'
+}
+/** A public session page on the Queue app, for links the Player app renders. */
+export const queueSessionUrl = (slug: string) => `${queueAppOrigin()}/s/${encodeURIComponent(slug)}`
 export type MySession = {
   id: string
   title: string

@@ -638,6 +638,23 @@ button.crow.mbtn:focus-visible { outline: 2px solid var(--accent); outline-offse
 .urow .main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .urow .main b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 a.urow:hover .main b, a.urow:focus-visible .main b { color: var(--accent); }
+/* Profile card dialog (owner comment, November 11, 2026): the same banner card as the Queue app's participant profile. */
+.sb:has(> .pp-card) { padding: 0; }
+.pp-card { position: relative; }
+.pp-banner { height: 84px; }
+.pp-avatar { position: absolute; top: 44px; left: 20px; }
+.pp-avatar .avatar { box-shadow: 0 0 0 5px var(--surface); }
+.pp-avatar .photo-btn { border: 0; background: none; padding: 0; cursor: zoom-in; border-radius: 50%; }
+.pp-body { padding: 52px 20px 20px; display: flex; flex-direction: column; gap: 12px; }
+.pp-name { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; }
+.pp-name b { font-size: 20px; font-weight: 800; letter-spacing: -.2px; }
+.pp-sec { border: 1px solid var(--border); border-radius: var(--r); background: var(--bg); padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.pp-sec .label { font-size: 11px; letter-spacing: .6px; text-transform: uppercase; color: var(--fg2); font-weight: 700; }
+.pp-sec .kv { margin: 0; }
+.pp-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 0; }
+.pp-stats > div { border: 1px solid var(--border); border-radius: var(--r); padding: 10px 12px; background: var(--surface); }
+.pp-stats dt { font-size: 12px; color: var(--fg2); font-weight: 600; }
+.pp-stats dd { margin: 2px 0 0; font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; }
 /* P-CLUB-MEMBERS: contacts-style list like Queue › Saved players (owner comment, November 11, 2026). */
 .sp-filters { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
 @media (min-width: 720px) { .sp-filters { grid-template-columns: minmax(0, 1fr) auto; align-items: end; } }
@@ -1448,7 +1465,7 @@ function viewClub() {
   const member = (e) => {
     const hid = hiddenFromViewer(e), m = hid ? maskedView(e) : e;
     const inner = `${avatar(m, 'lg')}<b>${esc(m.name)}</b><span>${!hid && e.id === S.me ? 'You' : lvLabel(e.level)}</span>`;
-    return hid ? `<div class="mcell">${inner}</div>` : `<button type="button" class="mcell" data-act="openProfile" data-id="${e.id}" aria-label="${esc(e.name)}, ${lvLabel(e.level)}">${inner}</button>`;
+    return hid ? `<div class="mcell">${inner}</div>` : `<button type="button" class="mcell" data-act="openProfileCard" data-id="${e.id}" aria-label="${esc(e.name)}, ${lvLabel(e.level)}">${inner}</button>`;
   };
   const sessionRow = (x) => (x.done
     ? `<div class="urow">${dblk(x.ago)}<span class="main"><b>${esc(x.title)}</b><span class="small muted">${when(x)}</span></span><span class="row">${stat(x)}${x.gone ? '<span class="small muted srow-note">Session page no longer available</span>' : `<button class="btn xs ghost" data-act="sessionPage" data-title="${esc(x.title)}">Session page ${I.ext}</button>`}</span></div>`
@@ -1510,7 +1527,7 @@ function viewClubMembers() {
   const letters = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '#'];
   const row = ({ e, hid, m }) => {
     const inner = `${avatar(m, 'lg')}<div class="main"><b>${esc(m.name)}</b>${!hid && e.id === S.me ? ' ' + chip('You', 'ok') : ''}<span class="small muted">${lvLabel(e.level)}</span></div>`;
-    return hid ? `<div class="crow">${inner}</div>` : `<button type="button" class="crow mbtn" data-act="openProfile" data-id="${e.id}" aria-label="${esc(e.name)}, ${lvLabel(e.level)}">${inner}</button>`;
+    return hid ? `<div class="crow">${inner}</div>` : `<button type="button" class="crow mbtn" data-act="openProfileCard" data-id="${e.id}" aria-label="${esc(e.name)}, ${lvLabel(e.level)}">${inner}</button>`;
   };
   const bands = [['all', 'All levels'], ['beginner', 'Beginner'], ['intermediate', 'Intermediate'], ['advanced', 'Advanced'], ['none', 'No level yet']];
   const filtered = q || f.band !== 'all';
@@ -2169,6 +2186,27 @@ let avatarDraft = null;
 const FACES = ['', ...'abcdefghijklmnopqrstuvw'.split('')];
 const FACE_PAGE = 15; // Owner comment, November 11, 2026: 5 in a row, 3 rows, big circles.
 const SHEETS = {
+  // Owner comment, November 11, 2026: clicking a member opens a profile dialog (the same banner card as the Queue app) instead of leaving the page.
+  profileCard: (sh) => {
+    const p = profileOf(sh.id);
+    if (!p) return sheetWrap('Profile', '<div class="empty">This player could not be found.</div>', '<button class="btn" data-act="closeSheet" data-autofocus>Close</button>');
+    const hid = hiddenFromViewer(p), m = hid ? maskedView(p) : p;
+    const head = `<div class="pp-banner bn-${esc(hid ? 'court' : bannerOf(p))}" aria-hidden="true"></div>
+        <div class="pp-avatar">${!hid && (p.photoUrl || p.photo) ? `<button type="button" class="photo-btn" data-act="viewPhoto" data-id="${esc(p.id)}" aria-label="View full photo of ${esc(p.name)}">${avatar(m, 'xl')}</button>` : avatar(m, 'xl')}</div>`;
+    if (hid) return sheetWrap(esc(m.name), `<div class="pp-card">${head}<div class="pp-body"><div class="pp-name"><b>${esc(m.name)}</b></div><div class="row" style="gap:8px">${chip('Private profile')}</div>
+        <div class="pp-sec"><span class="label">Private</span><p class="muted" style="margin:0">This player has chosen to keep their ROTRA profile private. You can see their picture and banner; their name, level and games stay between them and their clubs.</p></div></div></div>`,
+      '<button class="btn" data-act="closeSheet" data-autofocus>Close</button>');
+    const gs = p.sessions.filter((x) => x.ago <= WINDOW_DAYS).flatMap((x) => x.games.filter((g) => g.kind === 'counted'));
+    const w = gs.filter((g) => g.res === 'W').length, l = gs.length - w, pos = positionOf(p.id);
+    const code = (p.rtr || '').split('-')[2], city = (PLACES.find(([c]) => c === code) || [])[1];
+    return sheetWrap(esc(p.name), `<div class="pp-card">${head}<div class="pp-body">
+        <div class="pp-name"><b>${esc(p.name)}</b>${p.nick ? `<span class="muted">“${esc(p.nick)}”</span>` : ''}</div>
+        <div class="row" style="gap:8px">${chip(p.level == null ? 'Not ranked yet' : lvLabel(p.level), p.level == null ? '' : 'ok')}${pos ? chip(`#${num(pos)} overall`) : ''}${p.id === S.me ? chip('You', 'ok') : ''}</div>
+        <div class="pp-sec"><span class="label">About</span><dl class="kv"><dt>Registered in</dt><dd>${city ? esc(city) : '—'}</dd><dt>RTR ID</dt><dd><code>${esc(p.rtr || '—')}</code></dd></dl></div>
+        <div class="pp-sec"><span class="label">Stats · last 90 days</span>${gs.length ? `<dl class="pp-stats"><div><dt>Games</dt><dd>${gs.length}</dd></div><div><dt>Wins</dt><dd>${w}</dd></div><div><dt>Losses</dt><dd>${l}</dd></div><div><dt>Win rate</dt><dd>${Math.round((w / gs.length) * 100)}%</dd></div></dl>` : '<p class="muted" style="margin:0">No games yet</p>'}</div>
+      </div></div>`,
+      `<button class="btn" data-act="closeSheet" data-autofocus>Close</button><button class="btn primary" data-act="openProfile" data-id="${esc(p.id)}">Open full profile</button>`);
+  },
   avatar: () => {
     const a = avatarDraft || S.accounts[S.me], p = { ...profileOf(S.me), ...a };
     const c = a.crop || { x: .5, y: .5, zoom: 1, rotation: 0 };
@@ -2306,6 +2344,7 @@ const ACT = {
   goBoard: () => go('board'),
   goLogin: () => go('login'),
   openProfile: (el) => go('profile', el.dataset.id),
+  openProfileCard: (el) => { S.ui.sheet = { type: 'profileCard', id: el.dataset.id }; render(); },
   gateLogin: () => { S.ui.after = { to: S.screen, id: S.viewId }; go('login'); },
   openCompare: (el) => { if (!S.me) { S.ui.after = { to: 'compare', id: el.dataset.id }; toast('Sign in to compare'); go('login'); return; } S.ui.cmpPage = 0; S.ui.cmpFilter = 'all'; go('compare', el.dataset.id); },
   cmpFilter: (el) => { S.ui.cmpFilter = el.dataset.v; S.ui.cmpPage = 0; render(); },

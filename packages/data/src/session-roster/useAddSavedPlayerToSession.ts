@@ -1,6 +1,7 @@
 'use client'
-import { useMockMutation } from '../mock/query'
-import { addSavedPlayerToSession } from './mutations'
+import { enqueueAddSavedPlayer } from './enqueueRosterOps'
+import { useRosterEnqueue } from './useRosterEnqueue'
+/** Add player › Saved players: applied at once, saved in the roster burst batch (#718). */
 export function useAddSavedPlayerToSession() {
-  return useMockMutation(addSavedPlayerToSession, { backgroundRefresh: true })
+  return useRosterEnqueue(enqueueAddSavedPlayer)
 }

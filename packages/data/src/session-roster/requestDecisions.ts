@@ -1,4 +1,4 @@
-import { flushSessionPresence } from '../batch/flushBatches'
+import { flushSessionBatches } from '../batch/flushBatches'
 import type { ClubPlayer } from '../club-player/clubPlayer.types'
 import { createClubPlayer } from '../club-player/mutations'
 import { leaderboardLevels } from '../fixtures/players'
@@ -10,7 +10,13 @@ import { queueMutation, sessionIn } from '../mock/transaction'
 import type { PlayingLevel } from '../player/player.types'
 import { promoteWaiter, recomputeMinimum } from '../queue-session/mutations'
 import { isRealDataMode } from '../real/mode'
-import { capacity, confirmJoinRequest, place, slotsFull } from './mutations'
+import {
+  capacity,
+  confirmJoinRequest,
+  confirmJoinRequestChange,
+  place,
+  slotsFull,
+} from './mutations'
 import { levelLabel } from './sessionRoster.rules'
 import type { SessionJoinRequest } from './sessionRoster.types'
 
@@ -31,7 +37,7 @@ async function requestMutation<T>(
   sessionId: string,
   change: (s: MockState) => { data: T; text: string },
 ) {
-  await flushSessionPresence(sessionId)
+  await flushSessionBatches(sessionId)
   return queueMutation({ area: 'Roster', sessionId }, (s) => {
     const result = change(s)
     recomputeMinimum(s, sessionId)
@@ -165,30 +171,42 @@ function accountPlayer(s: MockState, clubId: string, r: SessionJoinRequest): Clu
 export function confirmRequest(input: { requestId: string; level: PlayingLevel }) {
   const r = isRealDataMode() ? null : pendingRequest(readMockState(), input.requestId)
   if (!r || (!r.playerId && !r.linkedClubPlayerId)) return confirmJoinRequest(input)
-  if (r.placement === 'from_waitlist') return giveSlotFromRequest(r.sessionId, input)
-  return requestMutation(r.sessionId, (s) => {
-    const request = pendingRequest(s, input.requestId)
-    const clubId = sessionIn(s, request.sessionId).clubId
-    const p = request.playerId
-      ? accountPlayer(s, clubId, request)
-      : savedPlayer(s, clubId, request.linkedClubPlayerId)
-    if (!p) fail('Player not available.', 'conflict')
-    const data = place(
-      s,
-      request.sessionId,
-      p,
-      input.level,
-      request.requestedAt,
-      request.placement === 'waitlist',
-    )
-    request.status = 'confirmed'
-    request.decidedAt = Date.now()
-    request.clubPlayerId = p.id
-    return {
-      data,
-      text: `${p.fullName} confirmed from a join request · ${data.waitlistPosition ? `waitlist #${data.waitlistPosition}` : levelLabel(input.level)}`,
-    }
-  })
+  return requestMutation(r.sessionId, (s) => confirmRequestChange(s, input))
+}
+
+/**
+ * The mock write behind Confirm for every kind of join request, chosen from the request as saved
+ * now: a guest's, a linked guest's, a signed-in Player's, or a Join from waitlist. The roster
+ * batch (#718) applies it in click order with the other roster changes of one burst.
+ */
+export function confirmRequestChange(
+  s: MockState,
+  input: { requestId: string; level: PlayingLevel },
+) {
+  const r = pendingRequest(s, input.requestId)
+  if (!r.playerId && !r.linkedClubPlayerId) return confirmJoinRequestChange(s, input)
+  if (r.placement === 'from_waitlist') return giveSlotFromRequestChange(s, input)
+  const request = pendingRequest(s, input.requestId)
+  const clubId = sessionIn(s, request.sessionId).clubId
+  const p = request.playerId
+    ? accountPlayer(s, clubId, request)
+    : savedPlayer(s, clubId, request.linkedClubPlayerId)
+  if (!p) fail('Player not available.', 'conflict')
+  const data = place(
+    s,
+    request.sessionId,
+    p,
+    input.level,
+    request.requestedAt,
+    request.placement === 'waitlist',
+  )
+  request.status = 'confirmed'
+  request.decidedAt = Date.now()
+  request.clubPlayerId = p.id
+  return {
+    data,
+    text: `${p.fullName} confirmed from a join request · ${data.waitlistPosition ? `waitlist #${data.waitlistPosition}` : levelLabel(input.level)}`,
+  }
 }
 
 /**
@@ -197,31 +215,32 @@ export function confirmRequest(input: { requestId: string; level: PlayingLevel }
  * again means a refusal and the player keeps their place. During play the QM may admit above the
  * budget, as with Admit player. A player no longer on the waitlist is refused; the QM declines it.
  */
-function giveSlotFromRequest(sessionId: string, input: { requestId: string; level: PlayingLevel }) {
-  return requestMutation(sessionId, (s) => {
-    const request = pendingRequest(s, input.requestId)
-    const session = sessionIn(s, request.sessionId)
-    const entry = s.waitlist.find(
-      (w) => w.sessionId === session.id && w.clubPlayerId === request.clubPlayerId,
-    )
-    // Removed from the waitlist meanwhile: the QM declines the request (no partial write here).
-    if (!entry) fail(`${request.name} is no longer on the waitlist.`, 'conflict')
-    if (session.state !== 'active' && slotsFull(s, session.id))
-      fail(`Slots are full again. ${request.name} stays on the waitlist.`, 'conflict')
-    entry.level = input.level
-    promoteWaiter(s, entry)
-    request.status = 'confirmed'
-    request.decidedAt = Date.now()
-    const n = s.roster.filter((x) => x.sessionId === session.id).length
-    return {
-      data: {
-        waitlistPosition: 0,
-        locked: session.state === 'active',
-        clubPlayerId: entry.clubPlayerId,
-      },
-      text: `${request.name} got a slot from the waitlist · ${levelLabel(input.level)}${session.state === 'active' && n > capacity(s, session.id) ? ` · now ${n} players for ${capacity(s, session.id)} slots` : ''}`,
-    }
-  })
+function giveSlotFromRequestChange(
+  s: MockState,
+  input: { requestId: string; level: PlayingLevel },
+) {
+  const request = pendingRequest(s, input.requestId)
+  const session = sessionIn(s, request.sessionId)
+  const entry = s.waitlist.find(
+    (w) => w.sessionId === session.id && w.clubPlayerId === request.clubPlayerId,
+  )
+  // Removed from the waitlist meanwhile: the QM declines the request (no partial write here).
+  if (!entry) fail(`${request.name} is no longer on the waitlist.`, 'conflict')
+  if (session.state !== 'active' && slotsFull(s, session.id))
+    fail(`Slots are full again. ${request.name} stays on the waitlist.`, 'conflict')
+  entry.level = input.level
+  promoteWaiter(s, entry)
+  request.status = 'confirmed'
+  request.decidedAt = Date.now()
+  const n = s.roster.filter((x) => x.sessionId === session.id).length
+  return {
+    data: {
+      waitlistPosition: 0,
+      locked: session.state === 'active',
+      clubPlayerId: entry.clubPlayerId,
+    },
+    text: `${request.name} got a slot from the waitlist · ${levelLabel(input.level)}${session.state === 'active' && n > capacity(s, session.id) ? ` · now ${n} players for ${capacity(s, session.id)} slots` : ''}`,
+  }
 }
 
 function openNotice(s: MockState, sessionId: string, noticeId: string) {

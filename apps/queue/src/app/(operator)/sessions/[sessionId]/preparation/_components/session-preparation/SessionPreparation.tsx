@@ -20,6 +20,7 @@ import { useStartSession } from '@rotra/data/queue-session/useStartSession'
 import { useSessionCostEstimate } from '@rotra/data/session-cost/useSessionCostEstimate'
 import { useSessionPayments } from '@rotra/data/session-payment/useSessionPayments'
 import { flushSessionPresence } from '@rotra/data/session-roster/flushSessionPresence'
+import { flushSessionRoster } from '@rotra/data/session-roster/flushSessionRoster'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { useSetAcceptJoinRequests } from '@rotra/data/session-roster/useSetAcceptJoinRequests'
 import { courtNextDay } from '@rotra/schema/court-window'
@@ -343,6 +344,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
         aria-label={live ? 'Session settings section' : 'Preparation section'}
         value={tab}
         onChange={async (value) => {
+          await flushSessionRoster(sessionId)
           await flushSessionPresence(sessionId)
           setTab(value)
         }}

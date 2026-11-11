@@ -126,3 +126,45 @@ export type DirectoryPlayer = {
   rankLabel: string
   phoneHidden?: boolean
 }
+
+/**
+ * One change of the roster burst batch (#718): the Queue Master's adds, removes and join-request
+ * decisions of one burst, sent together in click order and applied on the server in one
+ * transaction. Each carries its own `operationId`, so a retry of the batch repeats nothing.
+ */
+export type RosterBatchOperation =
+  | {
+      op: 'add'
+      operationId: string
+      source: 'saved'
+      clubPlayerId: string
+      level: PlayingLevel
+      identityCheck?: IdentityCheck
+    }
+  | {
+      op: 'add'
+      operationId: string
+      source: 'directory'
+      playerId: string
+      level: PlayingLevel
+      identityCheck?: IdentityCheck
+    }
+  | {
+      op: 'add'
+      operationId: string
+      source: 'new'
+      name: string
+      nickname?: string
+      phone?: string
+      level: PlayingLevel
+    }
+  | { op: 'remove'; operationId: string; rosterId: string }
+  | { op: 'acceptRequest'; operationId: string; requestId: string; level: PlayingLevel }
+  | { op: 'declineRequest'; operationId: string; requestId: string }
+/** What one operation of the batch ended as: the saved roster row or waitlist entry, if any. */
+export type RosterBatchResult = {
+  operationId: string
+  rosterId: string | null
+  waitlistId: string | null
+  clubPlayerId: string | null
+}

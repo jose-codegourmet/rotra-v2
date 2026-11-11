@@ -14,6 +14,7 @@ import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { isRealDataMode } from '@rotra/data/real/mode'
 import { useSessionPayments } from '@rotra/data/session-payment/useSessionPayments'
 import { flushSessionPresence } from '@rotra/data/session-roster/flushSessionPresence'
+import { flushSessionRoster } from '@rotra/data/session-roster/flushSessionRoster'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { Button } from '@rotra/ui/button'
 import { Chip } from '@rotra/ui/chip'
@@ -156,6 +157,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
   // Session done opens the three-step sheet from the footer button and the dock pill alike; offline
   // both are disabled.
   const onSessionDone = useCallback(async () => {
+    await flushSessionRoster(sessionId)
     await flushSessionPresence(sessionId)
     setSheet('session-done')
   }, [sessionId])
@@ -355,6 +357,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
         aria-label="Console views"
         value={view}
         onChange={async (value) => {
+          await flushSessionRoster(sessionId)
           await flushSessionPresence(sessionId)
           setView(value as ConsoleView)
         }}

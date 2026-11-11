@@ -1,6 +1,7 @@
 'use client'
-import { useMockMutation } from '../mock/query'
-import { addDirectoryPlayerToSession } from './mutations'
+import { enqueueAddDirectoryPlayer } from './enqueueRosterOps'
+import { useRosterEnqueue } from './useRosterEnqueue'
+/** Add player › Player Information: applied at once, saved in the roster burst batch (#718). */
 export function useAddDirectoryPlayerToSession() {
-  return useMockMutation(addDirectoryPlayerToSession, { backgroundRefresh: true })
+  return useRosterEnqueue(enqueueAddDirectoryPlayer)
 }

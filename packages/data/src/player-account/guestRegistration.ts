@@ -65,7 +65,10 @@ export async function getGuestRegistrationClub(
   }
 }
 
-/** Mock registration joins only the originating club; session requests remain unsent. */
+/**
+ * Mock registration joins the originating club and links every club's unclaimed record with the
+ * same phone (D-2026-11-11-03); session requests remain unsent.
+ */
 export async function completeGuestRegistration(input: {
   clubId: string
   sessionSlug?: string | null
@@ -178,6 +181,28 @@ export async function completeGuestRegistration(input: {
         clubName: club.clubName ?? 'ROTRA',
         status: 'valid',
         checks: 0,
+      }
+    }
+    // D-2026-11-11-03: every club's unclaimed record with this phone joins the new account
+    // automatically, with no Queue Master tap; one record per club, the earliest saved one.
+    if (!previous) {
+      const linkedClubs = new Set<string>()
+      for (const record of [...draft.clubPlayers].sort(
+        (a, b) => (a.addedAt ?? 0) - (b.addedAt ?? 0),
+      )) {
+        if (
+          record.playerId ||
+          record.removedAt ||
+          record.linkedToClubPlayerId ||
+          (record.identity !== 'unclaimed' && record.identity !== 'pending') ||
+          draft.privatePhones[record.id] !== values.phone ||
+          linkedClubs.has(record.clubId) ||
+          draft.clubPlayers.some((p) => p.clubId === record.clubId && p.playerId === id)
+        )
+          continue
+        record.playerId = id
+        record.identity = 'registered'
+        linkedClubs.add(record.clubId)
       }
     }
     if (

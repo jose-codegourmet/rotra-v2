@@ -57,6 +57,7 @@ only through server Route Handlers and services, never through the Supabase Data
 | `player_accounts` | PK/FK `player_id`; unique `(auth_provider, auth_subject)` | deferred constraint trigger: a claimed account needs phone **and** email at commit | `RESTRICT`; no FK to `auth.users` |
 | `player_social_links` | PK `id`; unique `(player_id, provider)` | `https://` URL | `RESTRICT` |
 | `player_claim_links` | PK `id`; unique `token_digest` (32-byte SHA-256); partial unique `player_id WHERE state = 'active'`; index `(player_id, issued_at desc)`, `(issuing_club_id, issued_at desc)` | expiry > issue; `active · consumed · revoked` each match their timestamps | `RESTRICT` |
+| `club_player_claim_links` | PK `id`; unique `token_digest`; partial unique `(club_id, club_player_id) WHERE state = 'active'`; index `(club_id, club_player_id, issued_at desc)`; FK `(club_id, club_player_id)` → `club_players` | same as `player_claim_links` | `RESTRICT` |
 | `player_id_counters` | PK `(location_code_id, sync_date)` | `last_sequence > 0`; advanced only by `rotra_next_player_sequence` (one atomic upsert) | `RESTRICT` |
 | `player_id_allocations` | PK/FK `player_id`; unique `rtr_id`, `(location_code_id, sync_date, sequence)`; FK to its counter | RTR format `RTR-CC-CCC-MMDDYY-NNNN+` with the frozen codes; **append-only** trigger | `RESTRICT` |
 

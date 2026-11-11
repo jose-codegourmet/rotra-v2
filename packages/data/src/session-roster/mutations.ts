@@ -1,7 +1,6 @@
 import { phoneField } from '@rotra/schema/phone'
 import { flushSessionBatches, flushSessionPresence } from '../batch/flushBatches'
 import type { ClubPlayer } from '../club-player/clubPlayer.types'
-import { clubPlayerView } from '../club-player/fetchers'
 import { clubPlayerForProfile, createClubPlayer, directoryLevel } from '../club-player/mutations'
 import { DEMO_CLUB_ID } from '../fixtures/clubs'
 import { directoryPlayers, leaderboardPlayers } from '../fixtures/players'
@@ -39,7 +38,6 @@ import {
 } from './sessionRoster.rules'
 import type {
   DirectoryPlayer,
-  IdentityCheck,
   JoinRequestPlacement,
   SessionJoinRequest,
 } from './sessionRoster.types'
@@ -117,27 +115,19 @@ export function place(
     : 0
   return { waitlistPosition: position, locked: session.state === 'active', clubPlayerId: p.id }
 }
-function identity(s: MockState, p: ClubPlayer, check?: IdentityCheck) {
-  if (
-    p.identity === 'unclaimed' &&
-    (!check ||
-      !['rtr-id', 'qr', 'phone'].includes(check) ||
-      (check === 'phone' && clubPlayerView(s, p).phoneHidden))
-  )
-    fail('Confirm this player’s identity before adding them.')
-}
 export type AddSavedPlayerInput = RosterAddPlacement & {
   sessionId: string
   clubPlayerId: string
   level: PlayingLevel
-  identityCheck?: IdentityCheck
 }
-/** The mock write of Add player › Saved players; the roster batch (#718) applies it in order. */
+/**
+ * The mock write of Add player › Saved players; the roster batch (#718) applies it in order. An
+ * unclaimed profile is the club's own record, so no identity check applies (D-2026-11-11-03).
+ */
 export function addSavedPlayerChange(s: MockState, input: AddSavedPlayerInput) {
   const p = s.clubPlayers.find((p) => p.id === input.clubPlayerId && p.clubId === DEMO_CLUB_ID)
   if (!p || (p.playerId && s.adminPlayerRecords[p.playerId]?.archivedAt))
     fail('Player not available.')
-  identity(s, p, input.identityCheck)
   const data = place(
       s,
       input.sessionId,
@@ -194,11 +184,9 @@ export type AddDirectoryPlayerInput = RosterAddPlacement & {
   sessionId: string
   playerId: string
   level: PlayingLevel
-  identityCheck?: IdentityCheck
 }
 export function addDirectoryPlayerChange(s: MockState, input: AddDirectoryPlayerInput) {
   const p = clubPlayerForProfile(s, input.playerId).player
-  identity(s, p, input.identityCheck)
   const data = place(
     s,
     input.sessionId,

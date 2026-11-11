@@ -21,7 +21,7 @@ import { claimLinks, playerAccounts } from '../fixtures/playerAccounts'
 import { playerAwardHistory } from '../fixtures/playerAwardHistory'
 import { playerProfiles } from '../fixtures/playerProfiles'
 import { createPlayerRankFixtures } from '../fixtures/playerRanks'
-import { clubPlayers, players } from '../fixtures/players'
+import { clubPlayers, GAB_CLUB_PLAYER_ID, GAB_PHONE_E164, players } from '../fixtures/players'
 import { profileBanners } from '../fixtures/profileBanners'
 import { profileCharacters } from '../fixtures/profileCharacters'
 import { createQueueFixtures } from '../fixtures/queueSessions'
@@ -224,7 +224,7 @@ function seedState(): MockState {
     publications: publicationFixtures.publications,
     publicationEvents: publicationFixtures.events,
     operations: {},
-    privatePhones: requests.privatePhones,
+    privatePhones: { ...requests.privatePhones, [GAB_CLUB_PLAYER_ID]: GAB_PHONE_E164 },
     sampleRequestIndex: 0,
     sync: {
       online: true,

@@ -390,7 +390,14 @@ export function AdminEditPlayerForm({
           />
           <KeyValueList
             items={[
-              { label: 'RTR ID', value: <span className="font-mono">{p.rtrId}</span> },
+              {
+                label: 'RTR ID',
+                value: p.rtrId ? (
+                  <span className="font-mono">{p.rtrId}</span>
+                ) : (
+                  'Not registered yet'
+                ),
+              },
               { label: 'Created by', value: createdBy },
               {
                 label: 'Account',

@@ -40,7 +40,15 @@ export function ClaimIdentityCheck({
           </div>
           <KeyValueList
             items={[
-              { label: 'Player ID', value: <span className="font-mono">{preview.rtrId}</span> },
+              // A club's own record has no RTR ID yet: it is given when they register.
+              ...(preview.rtrId
+                ? [
+                    {
+                      label: 'Player ID',
+                      value: <span className="font-mono">{preview.rtrId}</span>,
+                    },
+                  ]
+                : []),
               { label: 'Phone', value: <span className="font-mono">{preview.maskedPhone}</span> },
             ]}
           />

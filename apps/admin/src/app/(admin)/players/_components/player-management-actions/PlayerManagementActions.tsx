@@ -43,7 +43,7 @@ export function PlayerManagementActions({ player }: { player: AdminPlayer }) {
           } else if (action === 'archive' || action === 'restore' || action === 'remove') {
             mutations.change.reset()
             setAction(action)
-          } else if (action === 'copy') void copy(player.rtrId, 'RTR ID copied')
+          } else if (action === 'copy') void copy(player.rtrId ?? '', 'RTR ID copied')
           else if (action === 'link')
             mutations.link.mutate(player.id, {
               onSuccess: (link) => {
@@ -73,7 +73,7 @@ export function PlayerManagementActions({ player }: { player: AdminPlayer }) {
           player={player}
           from={from}
           onClose={() => setEditing(false)}
-          onCopyId={() => void copy(player.rtrId, 'RTR ID copied')}
+          onCopyId={() => void copy(player.rtrId ?? '', 'RTR ID copied')}
         />
       ) : null}
       {action ? (

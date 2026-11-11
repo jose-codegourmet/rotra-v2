@@ -8,8 +8,12 @@ export function levelLabel(level: PlayingLevel) {
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(' ')
 }
-export function needsConfirmStep(player: { identity: string; suggestion: PlayingLevel | null }) {
-  return player.identity === 'unclaimed' || !player.suggestion
+/**
+ * Only a pick with no level opens the level step; unclaimed profiles are the club's own records and
+ * need no identity check (D-2026-11-11-03).
+ */
+export function needsConfirmStep(player: { suggestion: PlayingLevel | null }) {
+  return !player.suggestion
 }
 export function levelDiff(level: PlayingLevel, suggestion: PlayingLevel) {
   const n = PLAYING_LEVELS.indexOf(level) - PLAYING_LEVELS.indexOf(suggestion)

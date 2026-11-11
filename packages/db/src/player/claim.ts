@@ -3,9 +3,11 @@ import type { ClubContext } from '../auth/account-context'
 import { type ProviderAdmin, ProviderError } from '../auth/provider-admin'
 import { AUTH_PROVIDER } from '../auth/supabase'
 import { prisma } from '../client/prisma'
+import type { Prisma } from '../generated/prisma/client'
 import { requireClubEntitlement } from '../service/authorize'
 import { ServiceError } from '../service/errors'
 import { toIso } from '../service/serialize'
+import { allocateRtrId, linkClubRecordsByPhone } from './identity'
 import { currentExperienceMonths, playingStyle } from './profile'
 
 /**
@@ -37,9 +39,14 @@ export function maskPhone(e164: string) {
   return `+${country} ${rest.slice(0, 3)} ••• ••${rest.slice(-2)}`
 }
 
+const NEEDS_PHONE_TO_INVITE = 'Add this player’s phone before inviting them.'
+
 /**
- * Q-SAVED-PLAYERS · Invite. Issues a link for this club's linked, unclaimed player and returns the
- * plaintext token once; only its digest is stored. Names or RTR IDs alone never issue a link.
+ * Q-SAVED-PLAYERS · Invite. Issues a link for this club's unclaimed player and returns the plaintext
+ * token once; only its digest is stored. Since D-2026-11-11-03 an unclaimed profile is the club's own
+ * record (no `players` row), so its link is keyed by `(club_id, club_player_id)`
+ * (`club_player_claim_links`); a linked, still-unclaimed `players` row keeps the player-keyed link.
+ * Names or RTR IDs alone never issue a link: the record needs a phone.
  */
 export async function issueClaimLink(context: ClubContext, clubPlayerId: string) {
   await requireClubEntitlement(context)
@@ -47,25 +54,47 @@ export async function issueClaimLink(context: ClubContext, clubPlayerId: string)
   return prisma.$transaction(async (tx) => {
     const clubPlayer = await tx.clubPlayer.findUnique({
       where: { clubId_id: { clubId: context.clubId, id: clubPlayerId } },
-      select: { player: { select: { id: true, profileState: true } } },
+      select: {
+        id: true,
+        removedAt: true,
+        privateInput: { select: { phoneE164: true } },
+        player: { select: { id: true, profileState: true } },
+      },
     })
-    if (!clubPlayer) throw new ServiceError('not_found')
+    if (!clubPlayer || clubPlayer.removedAt) throw new ServiceError('not_found')
     const player = clubPlayer.player
-    if (!player)
-      throw new ServiceError('invalid', { player: 'Add this player’s phone before inviting them.' })
-    if (player.profileState === 'claimed')
+    if (player?.profileState === 'claimed')
       throw new ServiceError('conflict', { player: 'This player has already registered.' })
     const now = new Date()
-    await tx.playerClaimLink.updateMany({
-      where: { playerId: player.id, state: 'active' },
+    const expiresAt = new Date(now.getTime() + CLAIM_LINK_DAYS * 86_400_000)
+    const tokenDigest = await digest(token)
+    if (player) {
+      await tx.playerClaimLink.updateMany({
+        where: { playerId: player.id, state: 'active' },
+        data: { state: 'revoked', revokedAt: now, revision: { increment: 1 } },
+      })
+      await tx.playerClaimLink.create({
+        data: {
+          playerId: player.id,
+          issuingClubId: context.clubId,
+          tokenDigest,
+          issuedAt: now,
+          expiresAt,
+        },
+      })
+      return { token, expiresAt: toIso(expiresAt) }
+    }
+    if (!clubPlayer.privateInput?.phoneE164)
+      throw new ServiceError('invalid', { player: NEEDS_PHONE_TO_INVITE })
+    await tx.clubPlayerClaimLink.updateMany({
+      where: { clubId: context.clubId, clubPlayerId: clubPlayer.id, state: 'active' },
       data: { state: 'revoked', revokedAt: now, revision: { increment: 1 } },
     })
-    const expiresAt = new Date(now.getTime() + CLAIM_LINK_DAYS * 86_400_000)
-    await tx.playerClaimLink.create({
+    await tx.clubPlayerClaimLink.create({
       data: {
-        playerId: player.id,
-        issuingClubId: context.clubId,
-        tokenDigest: await digest(token),
+        clubId: context.clubId,
+        clubPlayerId: clubPlayer.id,
+        tokenDigest,
         issuedAt: now,
         expiresAt,
       },
@@ -74,7 +103,7 @@ export async function issueClaimLink(context: ClubContext, clubPlayerId: string)
   })
 }
 
-type LinkPlayer = NonNullable<Awaited<ReturnType<typeof findLink>>>['player']
+type LinkPlayer = NonNullable<Awaited<ReturnType<typeof findPlayerLink>>>['player']
 
 /** The registration form's starting values, as text the way the form holds them. */
 function presetOf(player: LinkPlayer) {
@@ -95,9 +124,10 @@ function presetOf(player: LinkPlayer) {
   }
 }
 
-async function findLink(token: string) {
+/** A player-keyed link (a `players` row: registration staging or a linked unclaimed profile). */
+async function findPlayerLink(tokenDigest: Uint8Array<ArrayBuffer>) {
   return prisma.playerClaimLink.findUnique({
-    where: { tokenDigest: await digest(token) },
+    where: { tokenDigest },
     include: {
       issuingClub: { select: { name: true } },
       player: {
@@ -120,15 +150,87 @@ async function findLink(token: string) {
   })
 }
 
+/** A record-keyed link: the club's own unclaimed record, with no `players` row yet. */
+async function findRecordLink(tokenDigest: Uint8Array<ArrayBuffer>) {
+  return prisma.clubPlayerClaimLink.findUnique({
+    where: { tokenDigest },
+    include: {
+      clubPlayer: {
+        select: {
+          id: true,
+          clubId: true,
+          displayName: true,
+          nickname: true,
+          playerId: true,
+          removedAt: true,
+          club: { select: { name: true } },
+          privateInput: { select: { phoneE164: true, email: true } },
+        },
+      },
+    },
+  })
+}
+
+async function findLink(token: string) {
+  const tokenDigest = await digest(token)
+  const player = await findPlayerLink(tokenDigest)
+  if (player) return { kind: 'player' as const, link: player }
+  const record = await findRecordLink(tokenDigest)
+  return record ? { kind: 'record' as const, link: record } : null
+}
+
+/** The form's empty starting values for a club record: the club typed only name, nickname and email. */
+function recordPresetOf(record: NonNullable<Awaited<ReturnType<typeof findRecordLink>>>) {
+  return {
+    fullName: record.clubPlayer.displayName,
+    nickname: record.clubPlayer.nickname ?? '',
+    email: record.clubPlayer.privateInput?.email ?? '',
+    playingStyle: '',
+    experienceYears: '',
+    experienceMonths: '',
+    facebook: '',
+    instagram: '',
+    youtube: '',
+    linkedin: '',
+  }
+}
+
 /**
  * P-CLAIM read (`ClaimLink`): public identity, a masked phone and what the club entered for the form
  * (Queue › Edit details), including the email it typed. Nothing the player set is ever here: the
- * profile is unclaimed.
+ * profile is unclaimed. A club record's link shows no RTR ID (given when they register) and no
+ * picture.
  */
 export async function readClaimLink(token: string) {
-  const link = await findLink(token)
-  if (!link || link.state === 'revoked' || !link.player.idAllocation)
-    throw new ServiceError('not_found')
+  const found = await findLink(token)
+  if (!found || found.link.state === 'revoked') throw new ServiceError('not_found')
+  if (found.kind === 'record') {
+    const link = found.link
+    if (link.clubPlayer.removedAt) throw new ServiceError('not_found')
+    const status =
+      link.state === 'consumed' || link.clubPlayer.playerId
+        ? 'claimed'
+        : link.expiresAt <= new Date()
+          ? 'expired'
+          : 'valid'
+    return {
+      status,
+      clubName: link.clubPlayer.club.name,
+      preview: {
+        playerId: link.clubPlayer.playerId,
+        fullName: link.clubPlayer.displayName,
+        nickname: link.clubPlayer.nickname,
+        rtrId: null,
+        picture: null,
+        maskedPhone: link.clubPlayer.privateInput?.phoneE164
+          ? maskPhone(link.clubPlayer.privateInput.phoneE164)
+          : '',
+      },
+      preset: recordPresetOf(link),
+    }
+  }
+  const link = found.link
+  if (!link.player.idAllocation) throw new ServiceError('not_found')
   const status =
     link.state === 'consumed' || link.player.profileState === 'claimed'
       ? 'claimed'
@@ -152,6 +254,127 @@ export async function readClaimLink(token: string) {
   }
 }
 
+const firstNameOf = (player: { fullName: string; nickname: string | null }) =>
+  player.nickname || player.fullName.split(' ')[0] || player.fullName
+
+async function createLogin(
+  provider: ProviderAdmin,
+  input: { operationRef: string; email: string; phoneE164: string; initialPassword: string },
+) {
+  try {
+    return (await provider.createLogin(input)).subject
+  } catch (error) {
+    if (error instanceof ProviderError)
+      throw error.code === 'provider_conflict'
+        ? new ServiceError('conflict', { email: EMAIL_HAS_LOGIN })
+        : new ServiceError('unavailable')
+    throw error
+  }
+}
+
+/**
+ * Finish registering from a club record's link (D-2026-11-11-03). Staged like `completeClaim`: the
+ * provider login is created first, keyed on the record so a retry reuses it; then one transaction
+ * creates the player (claimed), its private contact, the RTR ID (the inviting club's founding
+ * location), the account mapping, links this record and every other club's record with the same
+ * phone, and consumes the link. A retry after success returns the same result.
+ */
+async function completeRecordClaim(
+  provider: ProviderAdmin,
+  link: NonNullable<Awaited<ReturnType<typeof findRecordLink>>>,
+  input: { email: string; password: string; phoneE164?: string },
+) {
+  const record = link.clubPlayer
+  const resultOf = async (tx: Pick<Prisma.TransactionClient, 'player'>, playerId: string) => {
+    const player = await tx.player.findUniqueOrThrow({
+      where: { id: playerId },
+      select: { fullName: true, nickname: true, idAllocation: { select: { rtrId: true } } },
+    })
+    return { playerId, rtrId: player.idAllocation?.rtrId ?? '', firstName: firstNameOf(player) }
+  }
+  if (record.removedAt) throw new ServiceError('forbidden', { link: EXPIRED })
+  if (record.playerId) {
+    // Registered meanwhile: through this link (a retry) or by registering with the same phone.
+    if (link.state === 'consumed') return resultOf(prisma, record.playerId)
+    throw new ServiceError('forbidden', { link: 'This profile is already registered.' })
+  }
+  if (link.state !== 'active' || link.expiresAt <= new Date())
+    throw new ServiceError('forbidden', { link: EXPIRED })
+  // The club's phone on file wins; a record without one takes the player's own number here.
+  const phoneE164 = record.privateInput?.phoneE164 ?? input.phoneE164
+  if (!phoneE164) throw new ServiceError('invalid', { phone: NEEDS_PHONE })
+  const owner = await prisma.playerPrivateContact.findUnique({
+    where: { phoneE164 },
+    select: { playerId: true },
+  })
+  if (owner) throw new ServiceError('conflict', { phone: PHONE_TAKEN })
+  const taken = await prisma.playerPrivateContact.findUnique({
+    where: { email: input.email },
+    select: { playerId: true },
+  })
+  if (taken)
+    throw new ServiceError('conflict', { email: 'This email is already used by another player.' })
+  const subject = await createLogin(provider, {
+    // Keyed on the club record, not the link: a retry from a reissued link reuses the same login.
+    operationRef: `claim:record:${record.clubId}:${record.id}`,
+    email: input.email,
+    phoneE164,
+    initialPassword: input.password,
+  })
+  return prisma.$transaction(async (tx) => {
+    const current = await tx.clubPlayerClaimLink.findUniqueOrThrow({ where: { id: link.id } })
+    const fresh = await tx.clubPlayer.findUniqueOrThrow({
+      where: { clubId_id: { clubId: record.clubId, id: record.id } },
+      select: { playerId: true },
+    })
+    if (fresh.playerId) {
+      const account = await tx.playerAccount.findUnique({ where: { playerId: fresh.playerId } })
+      if (account?.authSubject !== subject) throw new ServiceError('conflict')
+      return resultOf(tx, fresh.playerId)
+    }
+    if (current.state !== 'active') throw new ServiceError('forbidden', { link: EXPIRED })
+    const now = new Date()
+    const player = await tx.player.create({
+      data: { fullName: record.displayName, nickname: record.nickname, profileState: 'claimed' },
+      select: { id: true, fullName: true, nickname: true },
+    })
+    const contact = await tx.playerPrivateContact.create({
+      data: { playerId: player.id, phoneE164, email: input.email },
+    })
+    const rtrId = await allocateRtrId(tx, player.id, record.clubId, now)
+    await tx.playerAccount.create({
+      data: {
+        playerId: player.id,
+        authProvider: AUTH_PROVIDER,
+        authSubject: subject,
+        claimedAt: now,
+        contactSyncVersion: contact.revision,
+      },
+    })
+    await tx.clubPlayer.update({
+      where: { clubId_id: { clubId: record.clubId, id: record.id } },
+      data: { playerId: player.id, revision: { increment: 1 } },
+    })
+    if (record.privateInput)
+      await tx.clubPlayerPrivateInput.update({
+        where: { clubPlayerId: record.id },
+        data: {
+          state: 'resolved',
+          resolvedPlayerId: player.id,
+          resolvedAt: now,
+          revision: { increment: 1 },
+        },
+      })
+    // Every other club's record with this phone joins the new account (no Queue Master tap).
+    await linkClubRecordsByPhone(tx, player.id, phoneE164, now)
+    await tx.clubPlayerClaimLink.update({
+      where: { id: link.id },
+      data: { state: 'consumed', consumedAt: now, revision: { increment: 1 } },
+    })
+    return { playerId: player.id, rtrId, firstName: firstNameOf(player) }
+  })
+}
+
 /**
  * P-CLAIM · Finish registering. Staged: (1) the provider login is created outside any transaction,
  * keyed on the player so a retry, lost response or reissued link reuses it; (2) one transaction
@@ -164,13 +387,16 @@ export async function completeClaim(
   input: { token: string; email: string; password: string; phoneE164?: string },
 ) {
   const email = input.email.trim().toLowerCase()
-  const link = await findLink(input.token)
-  if (!link || link.state === 'revoked') throw new ServiceError('forbidden', { link: EXPIRED })
+  const found = await findLink(input.token)
+  if (!found || found.link.state === 'revoked')
+    throw new ServiceError('forbidden', { link: EXPIRED })
+  if (found.kind === 'record') return completeRecordClaim(provider, found.link, { ...input, email })
+  const link = found.link
   const player = link.player
   const result = {
     playerId: player.id,
     rtrId: player.idAllocation?.rtrId ?? '',
-    firstName: player.nickname || player.fullName.split(' ')[0] || player.fullName,
+    firstName: firstNameOf(player),
   }
   if (link.state === 'consumed' || player.profileState === 'claimed') {
     if (link.state === 'consumed') return result
@@ -196,25 +422,13 @@ export async function completeClaim(
   if (taken && taken.playerId !== player.id)
     throw new ServiceError('conflict', { email: 'This email is already used by another player.' })
 
-  let subject: string
-  try {
-    subject =
-      // Keyed on the player, not the link: a retry from a reissued link reuses the same login.
-      (
-        await provider.createLogin({
-          operationRef: `claim:${player.id}`,
-          email,
-          phoneE164,
-          initialPassword: input.password,
-        })
-      ).subject
-  } catch (error) {
-    if (error instanceof ProviderError)
-      throw error.code === 'provider_conflict'
-        ? new ServiceError('conflict', { email: EMAIL_HAS_LOGIN })
-        : new ServiceError('unavailable')
-    throw error
-  }
+  const subject = await createLogin(provider, {
+    // Keyed on the player, not the link: a retry from a reissued link reuses the same login.
+    operationRef: `claim:${player.id}`,
+    email,
+    phoneE164,
+    initialPassword: input.password,
+  })
 
   return prisma.$transaction(async (tx) => {
     const current = await tx.playerClaimLink.findUniqueOrThrow({ where: { id: link.id } })

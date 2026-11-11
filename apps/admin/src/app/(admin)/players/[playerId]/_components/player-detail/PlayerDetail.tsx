@@ -170,7 +170,11 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
           <>
             <PlayerAccountChip claimed={player.claimed} />
             <RankStatusChip status={player.rankStatus} />
-            <span className="font-mono text-[13px] text-fg2">{player.rtrId}</span>
+            {player.rtrId ? (
+              <span className="font-mono text-[13px] text-fg2">{player.rtrId}</span>
+            ) : (
+              <span className="text-[13px] text-fg2">Not registered yet</span>
+            )}
           </>
         }
       />

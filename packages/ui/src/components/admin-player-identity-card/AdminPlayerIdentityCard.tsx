@@ -6,8 +6,9 @@ import { useId } from 'react'
 export type AdminPlayerIdentityCardProps = {
   fullName: string
   nickname?: string | null
-  rtrId: string
-  /** 'YYYY-MM-DD' the profile was first created (the date in the RTR ID) */
+  /** The permanent RTR ID; null for a club's unclaimed record, which gets one when they register */
+  rtrId: string | null
+  /** 'YYYY-MM-DD' the profile was first created (the date in the RTR ID, or when the club saved it) */
   createdOn: string
   /** The club that created the profile */
   createdBy: string
@@ -33,12 +34,17 @@ export function AdminPlayerIdentityCard({
           items={[
             { label: 'Name', value: fullName },
             { label: 'Nickname', value: nickname || '—' },
-            { label: 'RTR ID', value: <span className="font-mono">{rtrId}</span> },
+            {
+              label: 'RTR ID',
+              value: rtrId ? <span className="font-mono">{rtrId}</span> : 'Not registered yet',
+            },
             { label: 'Created', value: `${formatYmd(createdOn)} by ${createdBy}` },
           ]}
         />
         <p className="m-0 text-[13px] text-fg2">
-          The RTR ID never changes, including after a contact change.
+          {rtrId
+            ? 'The RTR ID never changes, including after a contact change.'
+            : 'Saved by the club with a phone. The RTR ID is given when they register.'}
         </p>
       </section>
     </Card>

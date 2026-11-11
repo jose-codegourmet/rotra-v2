@@ -152,7 +152,6 @@ export function enqueueAddSavedPlayer(
       ...placementFlags(input),
       clubPlayerId: input.clubPlayerId,
       level: input.level,
-      identityCheck: input.identityCheck,
     },
     preview: preview(
       {
@@ -207,7 +206,6 @@ export function enqueueAddDirectoryPlayer(
       ...placementFlags(input),
       playerId: input.playerId,
       level: input.level,
-      identityCheck: input.identityCheck,
     },
     preview: preview(
       { clubPlayerId, nameSnapshot: fullName, nicknameSnapshot: nickname, level: input.level },

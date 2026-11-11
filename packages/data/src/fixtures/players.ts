@@ -38,7 +38,7 @@ export const directoryPlayers = selectPlayers(seed.directoryPlayerIds)
 
 const savedPlayersSeededAt = Date.now()
 
-/** Queue's 23 saved players, all registered. Kenji, Kenjie and Atty Steph are appended last. */
+/** Queue's 23 registered saved players. Kenji, Kenjie and Atty Steph are appended last. */
 const savedClubPlayers = [
   {
     id: 'c3e0d1c0-f087-5514-8c94-7ce61c54ed3f',
@@ -292,6 +292,26 @@ export const storyIdentityPlayers = {
     playingLevel: 'intermediate_mid',
   },
 } satisfies Record<string, ClubPlayer>
+
+/**
+ * The prototype's Gab Torres: the demo club's own unclaimed profile (D-2026-11-11-03). Saved with a
+ * phone, not registered: a club-only record with no global player and no RTR ID. The phone lives in
+ * the mock store's private phones (`GAB_PHONE_E164`), never on the card.
+ */
+export const GAB_CLUB_PLAYER_ID = 'club-only-gab-torres'
+export const GAB_PHONE_E164 = '+639175550177'
+// The array literal above infers registered-only members; the type allows a club-only record.
+;(clubPlayers as ClubPlayer[]).push({
+  addedAt: savedPlayersSeededAt - 19 * 86_400_000,
+  id: GAB_CLUB_PLAYER_ID,
+  clubId: '6cd364d4-0e3a-5c3d-9e75-2116cc845714',
+  playerId: null,
+  fullName: 'Gab Torres',
+  nickname: null,
+  identity: 'unclaimed',
+  playingLevel: 'intermediate_mid',
+  joinedVia: 'added',
+})
 
 // The own-profile prototype shows a second saved club membership.
 clubPlayers.push({

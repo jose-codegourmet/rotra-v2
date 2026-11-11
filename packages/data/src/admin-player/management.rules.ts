@@ -123,7 +123,7 @@ export function adminPlayersCsv(players: readonly AdminPlayer[]) {
     ...players.map((p) => [
       p.name,
       p.nickname ?? '',
-      p.rtrId,
+      p.rtrId ?? '',
       p.claimed ? 'Registered' : 'Unclaimed',
       p.rankStatus.text,
       p.clubs.map((c) => c.name).join('; '),

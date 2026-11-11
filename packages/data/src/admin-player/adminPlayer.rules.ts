@@ -40,13 +40,19 @@ export function rankStatusOf(
  * Admin only: public search must never match phones or emails.
  */
 export function matchesAdminPlayerSearch(
-  player: { name: string; nickname: string | null; rtrId: string; email?: string; phone?: string },
+  player: {
+    name: string
+    nickname: string | null
+    rtrId: string | null
+    email?: string
+    phone?: string
+  },
   q: string | undefined,
 ): boolean {
   const query = (q ?? '').trim()
   if (!query) return true
   const text = plainIdentity(
-    [player.name, player.nickname ?? '', player.rtrId, player.email ?? ''].join(' '),
+    [player.name, player.nickname ?? '', player.rtrId ?? '', player.email ?? ''].join(' '),
   )
   if (text.includes(plainIdentity(query))) return true
   const digits = query.replace(/\D/g, '')

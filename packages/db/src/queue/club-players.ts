@@ -86,13 +86,16 @@ export async function listClubPlayers(context: ClubContext): Promise<ClubPlayerD
   }))
 }
 
-/** One Player Information result (Q-ADD-PLAYER › Player Information). Never carries a phone. */
+/**
+ * One Player Information result (Q-ADD-PLAYER › Player Information): a registered (claimed) player.
+ * Never carries a phone.
+ */
 export type DirectoryPlayerDto = {
   id: string
   fullName: string
   nickname: string | null
   rtrId: string
-  identity: 'registered' | 'unclaimed'
+  identity: 'registered'
   /** The player's own profile picture (avatar reference), or null for initials */
   picture: string | null
   /** The player's current rank level, or null when they have none yet */
@@ -101,10 +104,11 @@ export type DirectoryPlayerDto = {
 }
 
 /**
- * Player Information search by name, nickname or RTR ID. Profiles this club already saved are left
- * out (the sheet shows them under Saved players), as are players who chose Hide me from Player
- * Information (D-2026-11-12-01; a club that saved them still adds them from Saved players). At most
- * 20 results, by name.
+ * Player Information search by name, nickname or RTR ID: registered (claimed) players only. Guests
+ * and unclaimed profiles stay in the club that saved them and are never found by another club
+ * (D-2026-11-11-03). Profiles this club already saved are left out (the sheet shows them under
+ * Saved players), as are players who chose Hide me from Player Information (D-2026-11-12-01; a
+ * club that saved them still adds them from Saved players). At most 20 results, by name.
  */
 export async function searchPlayerDirectory(
   context: ClubContext,
@@ -113,6 +117,7 @@ export async function searchPlayerDirectory(
   const q = query.trim()
   const rows = await prisma.player.findMany({
     where: {
+      profileState: 'claimed',
       idAllocation: { isNot: null },
       hiddenFromDirectory: false,
       // A profile the club deleted shows again, so it can be added back (which restores it).
@@ -133,7 +138,6 @@ export async function searchPlayerDirectory(
       id: true,
       fullName: true,
       nickname: true,
-      profileState: true,
       avatarRef: true,
       hidePhoneFromClubs: true,
       idAllocation: { select: { rtrId: true } },
@@ -145,7 +149,7 @@ export async function searchPlayerDirectory(
     fullName: p.fullName,
     nickname: p.nickname,
     rtrId: p.idAllocation?.rtrId ?? '',
-    identity: p.profileState === 'claimed' ? 'registered' : 'unclaimed',
+    identity: 'registered',
     picture: p.avatarRef ?? null,
     suggestion: levelCodeFor(p.rankCurrent?.skillLevelId ?? null),
     phoneHidden: p.hidePhoneFromClubs,

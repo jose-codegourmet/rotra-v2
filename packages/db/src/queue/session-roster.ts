@@ -22,9 +22,6 @@ import {
   touchSession,
 } from './session-store'
 
-/** How the operator confirmed an unclaimed profile's identity (Q-ROSTER). */
-export type IdentityCheck = 'rtr-id' | 'qr' | 'phone'
-
 const E164 = /^\+[1-9][0-9]{7,14}$/
 
 /**
@@ -124,25 +121,10 @@ async function place(
   return { rosterEntry: rosterEntryDto(entry, clubPlayer.nickname), waitlist: null }
 }
 
-/** Unclaimed profiles need an identity check; a phone check is not allowed when the phone is hidden. */
-async function requireIdentity(tx: Tx, clubPlayer: ClubPlayer, check?: IdentityCheck) {
-  if (!clubPlayer.playerId) return
-  const player = await tx.player.findUniqueOrThrow({
-    where: { id: clubPlayer.playerId },
-    select: { profileState: true, hidePhoneFromClubs: true },
-  })
-  if (player.profileState !== 'unclaimed') return
-  if (
-    !check ||
-    !['rtr-id', 'qr', 'phone'].includes(check) ||
-    (check === 'phone' && player.hidePhoneFromClubs)
-  )
-    throw new ServiceError('invalid', {
-      identity: 'Confirm this player’s identity before adding them.',
-    })
-}
-
-/** Adds a saved club player to the session (Q-ROSTER · Saved players). */
+/**
+ * Adds a saved club player to the session (Q-ROSTER · Saved players). An unclaimed profile is the
+ * club's own record, so no identity check applies (D-2026-11-11-03).
+ */
 export async function addSavedPlayerToSession(
   context: ClubContext,
   sessionId: string,
@@ -150,7 +132,6 @@ export async function addSavedPlayerToSession(
     operationId: string
     clubPlayerId: string
     level: string
-    identityCheck?: IdentityCheck
   },
 ) {
   return rosterCommand(context, sessionId, (tx, session) =>
@@ -165,7 +146,6 @@ async function addSavedPlayerIn(
     operationId: string
     clubPlayerId: string
     level: string
-    identityCheck?: IdentityCheck
   },
 ) {
   const skillLevelId = levelIdFor(input.level)
@@ -173,7 +153,6 @@ async function addSavedPlayerIn(
     where: { clubId_id: { clubId: context.clubId, id: input.clubPlayerId } },
   })
   if (!clubPlayer || clubPlayer.removedAt) throw new ServiceError('not_found')
-  await requireIdentity(tx, clubPlayer, input.identityCheck)
   return place(
     tx,
     context,
@@ -273,7 +252,6 @@ export async function addDirectoryPlayerToSession(
     operationId: string
     playerId: string
     level: string
-    identityCheck?: IdentityCheck
   },
 ) {
   return rosterCommand(context, sessionId, (tx, session) =>
@@ -288,7 +266,6 @@ async function addDirectoryPlayerIn(
     operationId: string
     playerId: string
     level: string
-    identityCheck?: IdentityCheck
   },
 ) {
   const skillLevelId = levelIdFor(input.level)
@@ -300,7 +277,6 @@ async function addDirectoryPlayerIn(
     input.playerId,
     now,
   )
-  await requireIdentity(tx, clubPlayer, input.identityCheck)
   return place(
     tx,
     context,
@@ -867,7 +843,6 @@ export type RosterBatchOperation =
       source: 'saved'
       clubPlayerId: string
       level: string
-      identityCheck?: IdentityCheck
     })
   | (AddPlacement & {
       op: 'add'
@@ -875,7 +850,6 @@ export type RosterBatchOperation =
       source: 'directory'
       playerId: string
       level: string
-      identityCheck?: IdentityCheck
     })
   | (AddPlacement & {
       op: 'add'

@@ -1,6 +1,5 @@
 import {
   applyRosterBatch,
-  type IdentityCheck,
   MAX_ROSTER_BATCH_OPERATIONS,
   type RosterBatchOperation,
 } from '@rotra/db/queue/session-roster'
@@ -10,9 +9,6 @@ import { readJsonBody, text } from '@rotra/db/service/request'
 import { routeCookieAdapter } from '@rotra/db/service/route-cookies'
 import { phoneField } from '@rotra/schema/phone'
 import { cookies } from 'next/headers'
-
-const identityCheckOf = (value: unknown): IdentityCheck | undefined =>
-  value === 'rtr-id' || value === 'qr' || value === 'phone' ? value : undefined
 
 /** Add anyway / Add to waitlist on a full roster (#735); only `true` counts. */
 const placementOf = (body: Record<string, unknown>) => ({
@@ -35,7 +31,6 @@ function operationOf(raw: unknown): RosterBatchOperation {
           source: 'saved',
           clubPlayerId: text(body.clubPlayerId),
           level,
-          identityCheck: identityCheckOf(body.identityCheck),
           ...placementOf(body),
         }
       if (body.source === 'directory')
@@ -45,7 +40,6 @@ function operationOf(raw: unknown): RosterBatchOperation {
           source: 'directory',
           playerId: text(body.playerId),
           level,
-          identityCheck: identityCheckOf(body.identityCheck),
           ...placementOf(body),
         }
       const rawPhone = text(body.phone).trim()

@@ -1,6 +1,6 @@
 # Player identity and accounts
 
-**Last verified:** 2026-11-11 for profile visibility, Hide from Player Information, banners and avatars ([D-2026-11-11-11](../../../../../mvp/decisions.md#d-2026-11-11-11)); 2026-11-08 for guest registration (#490); 2026-11-07 for player login mapping and claim-link rules (#244); 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-12 for club-only unclaimed profiles in the services (P08.9: registered-only search, link-only sync, automatic linking at registration, club-record invites); 2026-11-11 for profile visibility, Hide from Player Information, banners and avatars ([D-2026-11-11-11](../../../../../mvp/decisions.md#d-2026-11-11-11)); 2026-11-08 for guest registration (#490); 2026-11-07 for player login mapping and claim-link rules (#244); 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Confirmed v1 target rules.
 
@@ -13,6 +13,8 @@
 | Registered/claimed profile | Required phone and email supplied; password set; player can sign in and edit permitted personal details |
 
 Phone number uniquely identifies a **registered** player across clubs. Unclaimed profiles never link across clubs: two clubs that save the same phone keep separate records until the person registers, and then every record with that phone links to the account automatically ([D-2026-11-11-03](../../../../../mvp/decisions.md#d-2026-11-11-03)). Name matches only suggest possible identities. Registered players hiding their phone can identify themselves with RTR ID or QR code.
+
+**Accepted risk (owner answer, November 12, 2026):** registration does not verify the phone (no SMS). With automatic linking, someone who registers with another person's number collects that person's guest records from every club. Accepted for MVP, like the ranking risk in [D-2026-11-09-06](../../../../../mvp/decisions.md#d-2026-11-09-06); revisit when SMS verification exists. There is no Queue Master **Link** tap.
 
 **Owner decisions, October 28, 2026:** profile creation and permanent RTR ID allocation happen on successful entry sync, without waiting for Session done. Existing profiles are reused. *Superseded in part on November 11, 2026 ([D-2026-11-11-03](../../../../../mvp/decisions.md#d-2026-11-11-03)): sync only links a phone to a registered player; the RTR ID is given on registration.* Match performance remains gated by valid session finalization.
 

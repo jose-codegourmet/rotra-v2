@@ -1162,6 +1162,17 @@ textarea.tpl { font-family: var(--mono); font-size: 13px; line-height: 1.55; min
 .pcard.pub.bag-p.on .avatar { outline-color: var(--accent); }
 .bag-p:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .bag-av { position: relative; display: inline-block; }
+.bag-slots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.bag-slot { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 8px 10px; border-radius: var(--r); border: 1px dashed var(--border-strong); background: var(--bg); color: inherit; font: inherit; text-align: left; --ring: var(--border-strong); }
+.bag-slot.on { border-style: solid; border-color: var(--accent); background: var(--accent-subtle); cursor: pointer; }
+.bag-slot.lv-beginner { --ring: var(--lv-beg); } .bag-slot.lv-intermediate { --ring: var(--lv-int); } .bag-slot.lv-advanced { --ring: var(--lv-adv); }
+.bag-slot.on .avatar { outline: 3px solid var(--ring); outline-offset: 2px; }
+.bag-slot .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.bag-slot .main b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bag-x { color: var(--fg2); display: inline-flex; }
+.bag-rule { border: 0; border-top: 1px solid var(--border); margin: 2px 0; }
+.sheet.bag-sheet .bag-grid { grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); }
+@media (max-width: 640px) { .bag-slots { grid-template-columns: minmax(0, 1fr); } }
 .bag-n { position: absolute; right: -6px; bottom: -4px; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: 12px; font-weight: 800; background: var(--accent); color: var(--on-accent); box-shadow: 0 0 0 2px var(--surface); }
 .pcard.pub.empty b { color: var(--fg3); font-weight: 500; }
 .pcard.pub b { display: block; font-size: 17px; line-height: 1.25; }
@@ -3839,6 +3850,7 @@ function autoSelectionBar(s, a, batch) {
 // session, Queue Master only. Court capacity still wins; a pair whose partner is not free is generated like anyone else.
 // Owner comment, November 11, 2026: the pattern is the game numbers the pair plays together, 1 to the session minimum, or ALL.
 // Stored as 'all' or a comma list like '1,3'. Games past the minimum only count under ALL.
+const BAG_PAGE = 24;
 const bagGames = (pattern) => (pattern === 'all' ? [] : String(pattern || '').split(',').filter(Boolean).map(Number));
 const bagToggle = (pattern, v, max) => {
   if (v === 'all') return 'all';
@@ -4634,17 +4646,22 @@ const SHEETS = {
   },
   // #739 (proposed): add a bagging pair. A player can be in one pair; picking one who is already paired offers to replace that pair.
   bagAdd(sh) {
+    // Owner comment, November 11, 2026: a wide dialog; the two picks on top as slots, the GAMES row, then a paginated grid of present players.
     const s = cur(), pairs = s.bagging.pairs || [], here = s.roster.filter((r) => r.present).map((r) => r.pid);
-    // Owner comment, November 11, 2026: a grid of present players as avatars with their skill ring; tap one, tap another, and that's the pair.
+    const pages = Math.max(1, Math.ceil(here.length / BAG_PAGE)), page = Math.min(Math.max(0, sh.page || 0), pages - 1), shown = here.slice(page * BAG_PAGE, (page + 1) * BAG_PAGE);
     const tile = (pid) => { const r = R(s, pid), p = P(pid), n = sh.a === pid ? 1 : sh.b === pid ? 2 : 0; return `<button type="button" class="pcard pub bag-p lv-${rvBand(r)}${n ? ' on' : ''}" data-act="bagTap" data-pid="${pid}" aria-pressed="${!!n}" aria-label="${esc(p.name)}, ${esc(lvLabel(r.level))}${n ? `, picked ${n === 1 ? 'first' : 'second'}` : ''}"><span class="bag-av">${avatar(p)}${n ? `<i class="bag-n" aria-hidden="true">${n}</i>` : ''}</span><b>${esc(short(pid))}</b><span class="small muted">${esc(lvLabel(r.level))}</span></button>`; };
+    const slot = (pid, n) => (pid ? `<button type="button" class="bag-slot on lv-${rvBand(R(s, pid))}" data-act="bagTap" data-pid="${pid}" aria-label="Selection ${n}: ${esc(P(pid).name)}. Tap to clear">${avatar(P(pid))}<span class="main"><b>${esc(P(pid).name)}</b><span class="small muted">${esc(lvLabel(R(s, pid).level))}</span></span><span class="bag-x" aria-hidden="true">${I.x}</span></button>` : `<div class="bag-slot" aria-label="Selection ${n}: empty"><span class="avatar" aria-hidden="true">${n}</span><span class="main"><b class="muted">Selection ${n}</b><span class="small muted">${n === 1 ? 'Tap a player below' : 'Then their partner'}</span></span></div>`);
     const sel = [sh.a, sh.b].filter(Boolean);
     const clash = sel.map((pid) => { const pr = pairs.find((x) => x.a === pid || x.b === pid); return pr ? `${esc(short(pid))} is already paired with ${esc(short(pr.a === pid ? pr.b : pr.a))}. Adding this pair replaces it.` : ''; }).filter(Boolean);
     return sheetShell('Add bagging pair', `${here.length < 2 ? notice('', 'Mark at least two players present first.') : ''}
-      <p class="small muted" style="margin:0" aria-live="polite">${sel.length === 2 ? `<b>${esc(short(sh.a))} and ${esc(short(sh.b))}</b> · tap a player to change the pair` : sel.length === 1 ? `<b>${esc(short(sel[0]))}</b> · tap their partner` : 'Tap two players to make a pair. The ring is tonight\'s level.'}</p>
-      <div class="pgrid pub bag-grid" role="group" aria-label="Present players">${here.map(tile).join('')}</div>
-      <div class="field"><span>Partners in · tap the game numbers, or ALL</span>${bagSeg(s, sh.pattern || 'all', (v) => `data-act="bagPatToggle" data-v="${v}"`, 'Partners in')}</div>
+      <div class="bag-slots">${slot(sh.a, 1)}${slot(sh.b, 2)}</div>
+      <div class="field"><span>Games · the ones they play together, or ALL</span>${bagSeg(s, sh.pattern || 'all', (v) => `data-act="bagPatToggle" data-v="${v}"`, 'Games')}</div>
+      <hr class="bag-rule">
+      <div class="between"><span class="label">Present players · ${here.length}</span>${pages > 1 ? `<div class="row" style="gap:6px"><button type="button" class="btn xs" data-act="bagPage" data-v="${page - 1}" ${page === 0 ? 'disabled' : ''}>${I.back} Previous</button><span class="small muted" aria-live="polite">Page ${page + 1} of ${pages}</span><button type="button" class="btn xs" data-act="bagPage" data-v="${page + 1}" ${page >= pages - 1 ? 'disabled' : ''}>Next</button></div>` : ''}</div>
+      <div class="pgrid pub bag-grid" role="group" aria-label="Present players, page ${page + 1} of ${pages}">${shown.map(tile).join('')}</div>
+      <hr class="bag-rule">
       ${clash.map((t) => notice('warn', t)).join('')}`,
-      `<button class="btn" data-act="closeSheet" data-autofocus>Cancel</button><button class="btn primary" data-act="bagSave" ${sh.a && sh.b ? '' : 'disabled'}>${clash.length ? 'Replace pair' : 'Add pair'}</button>`);
+      `<button class="btn" data-act="closeSheet" data-autofocus>Cancel</button><button class="btn primary" data-act="bagSave" ${sh.a && sh.b ? '' : 'disabled'}>${clash.length ? 'Replace pair' : 'Add pair'}</button>`, true, 'bag-sheet');
   },
   // #735 (proposed): the Queue Master adds past a full roster. Asked once; the count then shows 25/24.
   overfill(sh) {
@@ -5976,6 +5993,7 @@ const ACT = {
     S.ui.sheet = null; commit(`Bagging pair added · ${short(sh.a)} and ${short(sh.b)}`); render();
   },
   bagPattern: (d) => { const s = cur(), pr = (s.bagging.pairs || []).find((x) => x.id === d.id); if (pr) { pr.pattern = bagToggle(pr.pattern, d.v, s.minimum); save(); render(); } },
+  bagPage: (d) => { S.ui.sheet.page = +d.v; render(); },
   bagPatToggle: (d) => { const sh = S.ui.sheet; sh.pattern = bagToggle(sh.pattern || 'all', d.v, cur().minimum); render(); },
   bagRemove: (d) => { const s = cur(); const pr = s.bagging.pairs.find((x) => x.id === d.id); s.bagging.pairs = s.bagging.pairs.filter((x) => x.id !== d.id); save(); render(); if (pr) toast(`Pair removed · ${short(pr.a)} and ${short(pr.b)}`); },
   stepDown: (d) => { const s = cur(); if (stepDownToWait(s, d.pid, false)) { render(); toast(`${nm(d.pid)} moved to the waitlist`); } },

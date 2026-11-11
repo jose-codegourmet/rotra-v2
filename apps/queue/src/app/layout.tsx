@@ -1,5 +1,5 @@
 import { getThemeScript } from '@rotra/ui/theme-provider/script'
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import type { ReactNode } from 'react'
 import { AppProviders } from '@/providers/AppProviders'
 import { THEME_STORAGE_KEY } from '@/providers/themeStorageKey'
@@ -9,6 +9,15 @@ import './globals.css'
 export const metadata: Metadata = {
   title: 'ROTRA Queue',
   description: 'Run the game: club sessions, courts and the shared queue.',
+  appleWebApp: { capable: true, title: 'ROTRA Queue', statusBarStyle: 'black' },
+}
+
+// Fixed scale: no pinch-zoom, no Safari auto-zoom on input focus (#719)
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 }
 
 export default function RootLayout({ children }: { children: ReactNode }) {

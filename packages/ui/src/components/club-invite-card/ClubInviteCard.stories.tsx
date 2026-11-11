@@ -14,6 +14,7 @@ const meta = {
     clubName: club.name,
     clubInitials: club.initials,
     webShare: true,
+    onCopyLink: () => {},
   },
   decorators: [(Story) => <div className="mx-auto max-w-[480px]">{Story()}</div>],
 } satisfies Meta<typeof ClubInviteCard>

@@ -1,5 +1,6 @@
 'use client'
 
+import { Button } from '@rotra/ui/button'
 import { ShareCard, type ShareCardProps } from '@rotra/ui/share-card'
 
 export type ClubInviteCardProps = Pick<
@@ -13,6 +14,8 @@ export type ClubInviteCardProps = Pick<
   clubName: string
   clubInitials?: string
   clubLogoUrl?: string | null
+  /** Copies the same link the QR encodes (#708). */
+  onCopyLink: () => void
 }
 
 /** Q-CLUB's Share club invite sheet: ShareCard's club-invite variant. */
@@ -21,6 +24,7 @@ export function ClubInviteCard({
   clubName,
   clubInitials,
   clubLogoUrl,
+  onCopyLink,
   ...rest
 }: ClubInviteCardProps) {
   const initials =
@@ -46,6 +50,11 @@ export function ClubInviteCard({
       shareTitle={`${clubName} invites you to play`}
       noteStart="Scanning opens the club registration page."
       noteEnd="Download the image to share it or print it."
+      primaryRowAbove={
+        <Button className="w-full" onClick={onCopyLink}>
+          Copy invite link
+        </Button>
+      }
       actions="share-or-download"
     />
   )

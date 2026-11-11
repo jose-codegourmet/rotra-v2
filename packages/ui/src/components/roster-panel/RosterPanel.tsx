@@ -66,6 +66,8 @@ export type RosterPanelProps = {
   loading?: boolean
   /** Active settings summary: locked levels and presence text, with Add player only. */
   readOnly?: boolean
+  /** False before Start session: the roster shows no Present switches. Defaults to true. */
+  showPresence?: boolean
   /** Controlled level tab; omit to keep the choice on this component */
   levelTab?: RosterLevelTab
   onLevelTabChange?: (tab: RosterLevelTab) => void
@@ -114,6 +116,7 @@ function PlayerList({
   view,
   levelsLocked,
   readOnly,
+  showPresence,
   onOpenProfile,
   onLevelChange,
   onPresentChange,
@@ -123,6 +126,7 @@ function PlayerList({
   view: RosterView
   levelsLocked?: boolean
   readOnly?: boolean
+  showPresence?: boolean
   onOpenProfile: (playerId: string) => void
   onLevelChange: (playerId: string, level: PlayingLevel) => void
   onPresentChange: (playerId: string, present: boolean) => void
@@ -146,6 +150,7 @@ function PlayerList({
             leftAt={p.leftAt}
             levelLocked={levelsLocked}
             readOnly={readOnly}
+            showPresence={showPresence}
             onOpenProfile={() => onOpenProfile(p.id)}
             onLevelChange={(level) => onLevelChange(p.id, level)}
             onPresentChange={(present) => onPresentChange(p.id, present)}
@@ -171,6 +176,7 @@ function PlayerList({
           leftAt={p.leftAt}
           levelLocked={levelsLocked}
           readOnly={readOnly}
+          showPresence={showPresence}
           onOpenProfile={() => onOpenProfile(p.id)}
           onLevelChange={(level) => onLevelChange(p.id, level)}
           onPresentChange={(present) => onPresentChange(p.id, present)}
@@ -194,6 +200,7 @@ export function RosterPanel({
   levelsLocked,
   loading = false,
   readOnly = false,
+  showPresence = true,
   levelTab: levelTabProp,
   onLevelTabChange,
   groupBy: groupByProp,
@@ -282,12 +289,12 @@ export function RosterPanel({
             </p>
           </div>
           <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:items-center">
-            {!readOnly && someoneAbsent ? (
+            {!readOnly && showPresence && someoneAbsent ? (
               <Button size="sm" onClick={onMarkAllPresent} className="w-full sm:w-auto">
                 Mark all present
               </Button>
             ) : null}
-            {!readOnly && someonePresent ? (
+            {!readOnly && showPresence && someonePresent ? (
               <Button size="sm" onClick={onMarkAllAbsent} className="w-full sm:w-auto">
                 Mark all absent
               </Button>
@@ -299,7 +306,7 @@ export function RosterPanel({
               // The prototype's .acts: an odd last button spans both phone columns
               className={cn(
                 'w-full sm:w-auto',
-                (readOnly || someoneAbsent === someonePresent) && 'col-span-2',
+                (readOnly || !showPresence || someoneAbsent === someonePresent) && 'col-span-2',
               )}
             >
               Add player
@@ -406,6 +413,7 @@ export function RosterPanel({
                       view={view}
                       levelsLocked={levelsLocked}
                       readOnly={readOnly}
+                      showPresence={showPresence}
                       onOpenProfile={onOpenProfile}
                       onLevelChange={onLevelChange}
                       onPresentChange={onPresentChange}
@@ -419,6 +427,7 @@ export function RosterPanel({
                   view={view}
                   levelsLocked={levelsLocked}
                   readOnly={readOnly}
+                  showPresence={showPresence}
                   onOpenProfile={onOpenProfile}
                   onLevelChange={onLevelChange}
                   onPresentChange={onPresentChange}

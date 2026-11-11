@@ -29,6 +29,8 @@ export type RosterRowProps = {
   levelLocked?: boolean
   /** Settings summary: presence is text and removal is unavailable. */
   readOnly?: boolean
+  /** False before Start session: no Present text or switch (presence shows once the session has started) */
+  showPresence?: boolean
   onOpenProfile: () => void
   onLevelChange: (level: PlayingLevel) => void
   onPresentChange: (present: boolean) => void
@@ -54,6 +56,7 @@ export function RosterRow({
   leftAt,
   levelLocked,
   readOnly = false,
+  showPresence = true,
   onOpenProfile,
   onLevelChange,
   onPresentChange,
@@ -106,18 +109,26 @@ export function RosterRow({
       </div>
       <div className="order-3 flex flex-col gap-1 sm:order-none">
         <div className="flex flex-nowrap items-center justify-between gap-2 sm:justify-start">
-          <span className="text-[13px] text-fg2">
-            {presencePending
-              ? 'Saving presence…'
-              : readOnly
-                ? present
-                  ? 'Present'
-                  : 'Away'
-                : 'Present'}
-          </span>
+          {showPresence ? (
+            <span className="text-[13px] text-fg2">
+              {presencePending
+                ? 'Saving presence…'
+                : readOnly
+                  ? present
+                    ? 'Present'
+                    : 'Away'
+                  : 'Present'}
+            </span>
+          ) : null}
           {!readOnly ? (
             <>
-              <Switch checked={present} onChange={onPresentChange} aria-label={`${name} present`} />
+              {showPresence ? (
+                <Switch
+                  checked={present}
+                  onChange={onPresentChange}
+                  aria-label={`${name} present`}
+                />
+              ) : null}
               {!levelLocked ? (
                 <IconButton
                   size="xs"

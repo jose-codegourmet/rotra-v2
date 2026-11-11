@@ -141,7 +141,9 @@ Owner request, November 7, 2026 (#474).
 
 ## Presence
 
-The operator toggles present / not present, one at a time or with **Mark all present** / **Mark all absent** during preparation. Generate matches and Suggest use present players only.
+The operator toggles present / not present, one at a time or with **Mark all present** / **Mark all absent** (neither is shown before Start session, #704). Generate matches and Suggest use present players only.
+
+**Owner decision, November 11, 2026 (#704):** the preparation roster shows no Present switches before Start session; they show once the session has started, on any roster surface, including Preparation reached again from a live session. Hiding the switches and the Mark all buttons changes no presence value, model or live behavior; existing presence is kept.
 
 **Owner decision, November 1, 2026 (#324):** individual presence switches update immediately and save wanted end states together after 800 ms without another tap. One batch produces one summary confirmation and one Roster sync entry; reversals before saving are omitted. A failed batch preserves newer intent while rolling back its failed revisions. Pending writes flush before other roster operations.
 

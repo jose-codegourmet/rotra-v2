@@ -157,6 +157,8 @@ export const PhoneLevelMenu: Story = {
 }
 export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }
 
+/** Before Start session: no Present switches on rows or cards. */
+export const BeforeStart: Story = { args: { showPresence: false } }
 export const ReadOnly: Story = { args: { ...Locked.args, readOnly: true } }
 
 export const Grid: Story = { args: { view: 'grid' } }

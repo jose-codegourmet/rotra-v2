@@ -40,6 +40,8 @@ export type RosterCardProps = {
   levelLocked?: boolean
   /** Settings summary: presence is text and removal is unavailable. */
   readOnly?: boolean
+  /** False before Start session: no Present band or switch (presence shows once the session has started) */
+  showPresence?: boolean
   onOpenProfile: () => void
   onLevelChange: (level: PlayingLevel) => void
   onPresentChange: (present: boolean) => void
@@ -67,6 +69,7 @@ export function RosterCard({
   paid = false,
   levelLocked,
   readOnly = false,
+  showPresence = true,
   onOpenProfile,
   onLevelChange,
   onPresentChange,
@@ -95,25 +98,31 @@ export function RosterCard({
             </IconButton>
           ) : null}
         </div>
-        <div
-          className={cn(
-            'flex items-center justify-between gap-2 rounded-md px-2.5 py-2',
-            present ? 'bg-accent-subtle text-accent' : 'bg-elev text-fg2',
-          )}
-        >
-          {afterStart ? (
-            <span className="text-sm font-semibold">
-              {presencePending ? 'Saving presence…' : present ? 'Present' : 'Away'}
-            </span>
-          ) : (
-            <>
+        {showPresence ? (
+          <div
+            className={cn(
+              'flex items-center justify-between gap-2 rounded-md px-2.5 py-2',
+              present ? 'bg-accent-subtle text-accent' : 'bg-elev text-fg2',
+            )}
+          >
+            {afterStart ? (
               <span className="text-sm font-semibold">
-                {presencePending ? 'Saving presence…' : present ? 'Present' : 'Not present'}
+                {presencePending ? 'Saving presence…' : present ? 'Present' : 'Away'}
               </span>
-              <Switch checked={present} onChange={onPresentChange} aria-label={`${name} present`} />
-            </>
-          )}
-        </div>
+            ) : (
+              <>
+                <span className="text-sm font-semibold">
+                  {presencePending ? 'Saving presence…' : present ? 'Present' : 'Not present'}
+                </span>
+                <Switch
+                  checked={present}
+                  onChange={onPresentChange}
+                  aria-label={`${name} present`}
+                />
+              </>
+            )}
+          </div>
+        ) : null}
         {present && selfCheckedInAt != null ? (
           <span className="inline-flex items-center gap-1 text-xs text-fg2">
             <Icon name="check" size={13} />

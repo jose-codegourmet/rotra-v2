@@ -182,6 +182,7 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
           onViewChange={(view) => updateViews({ view })}
           levelsLocked={s ? s.state !== 'prepared' : false}
           readOnly={s?.state === 'active'}
+          showPresence={s ? s.state !== 'prepared' : false}
           onMarkAllPresent={() => setAllPresence.mutate({ sessionId, present: true }, options)}
           onMarkAllAbsent={() => setAllPresence.mutate({ sessionId, present: false }, options)}
           onAddPlayer={() => {

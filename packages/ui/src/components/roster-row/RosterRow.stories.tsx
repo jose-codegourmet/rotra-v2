@@ -77,6 +77,8 @@ export const Desktop: Story = {
   globals: { viewport: { value: 'desktop' } },
 }
 
+/** Before Start session: no Present text or switch; remove stays. */
+export const BeforeStart: Story = { args: { ...rowAt(0), showPresence: false } }
 export const ReadOnly: Story = { args: { ...rowAt(0), levelLocked: true, readOnly: true } }
 
 export const SavingPresence: Story = { args: { ...rowAt(0), presencePending: true } }

@@ -9,7 +9,7 @@ export const rosterCardMeta = {
     'Use inside RosterPanel when Roster view is Grid.',
     'Do not use for the List view: that stays RosterRow.',
     'Do not use in the live console: Queue › Players shows PlayerPoolCard.',
-    'After start (levelLocked or readOnly) the level is “LEVEL · Fixed after start”, presence is Present/Away text, and remove is hidden.',
+    'Before Start session the route passes showPresence=false: no Present band or switch. After start (levelLocked or readOnly) the level is “LEVEL · Fixed after start”, presence is Present/Away text, and remove is hidden.',
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',

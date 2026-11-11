@@ -3362,16 +3362,17 @@ function rvRow(s, r, live) {
   return `<div class="prow">
         <div class="li" style="padding:0">${faceBtn(p)}<div class="main"><div class="pn"><b>${esc(p.name)}</b></div><div class="row" style="gap:6px">${identChip(p)}${rvSugg(p)}</div></div></div>
         ${rvLevel(r, p, live)}
-        ${live ? rvAway(r) : rvPresence(r, p, rvRemove(r, p))}
+        ${live ? rvAway(r) : `<div class="row" style="justify-content:flex-end">${rvRemove(r, p)}</div>`}
       </div>`;
 }
 function rvCard(s, r, live) {
   const p = P(r.pid), paid = (s.payments || {})[r.pid], band = rvBand(r);
   // First level: presence and skill level. Second level (muted, last row): profile, payment, suggestion.
-  const pres = live ? `<span class="rv-pres-t">${r.present ? 'Present' : 'Away'}</span>` : `<span class="rv-pres-t">${presencePending.has(r.pid) ? 'Saving presence…' : r.present ? 'Present' : 'Not present'}</span>${sw(r.present, 'togglePresent', `data-pid="${r.pid}"`, `${p.name} present`)}`;
+  // #704: before Start session there is no Present switch or text; presence shows only once the session has started.
+  const pres = live ? `<span class="rv-pres-t">${r.present ? 'Present' : 'Away'}</span>` : '';
   return `<article class="rv-card ${r.present ? 'is-present' : ''}" aria-label="${esc(p.name)}">
         <div class="rv-top">${faceBtn(p)}<div class="main"><b>${esc(p.name)}</b></div>${live ? '' : rvRemove(r, p)}</div>
-        <div class="rv-pres">${pres}</div>${selfMark(r) ? `<div class="rv-meta small muted">${selfMark(r)}</div>` : ''}
+        ${live ? `<div class="rv-pres">${pres}</div>` : ''}${selfMark(r) ? `<div class="rv-meta small muted">${selfMark(r)}</div>` : ''}
         <div class="rv-lv lv-${band}">${rvLevel(r, p, live)}</div>
         <div class="rv-meta small muted">${identChip(p)}<span class="rv-paid ${paid ? 'ok' : ''}">${paid ? `${I.check} Paid` : 'Not paid'}</span>${rvSugg(p)}</div>
       </article>`;
@@ -3398,6 +3399,7 @@ function rosterSummary(s, tab) {
   return `<div class="skill-mix roster-sum ${state}"><div class="sm-top"><b class="tnum">${n}/${cap}</b><span>slots · ${text}${wl ? ` · ${wl} on the waitlist` : ''}</span></div>
     <div class="sm-bar" role="group" aria-label="Slots and skill mix: ${n} of ${cap} slots used">${bar}</div></div>`;
 }
+// #704: no Present switches before start, so no Mark all present / Mark all absent either; after start they were never shown here.
 function rosterPanel(s, live, missing) {
   const bandN = (b) => s.roster.filter((r) => rvBand(r) === b).length;
   const tabs = [['all', 'All', s.roster.length], ...[...LEVEL_GROUPS].reverse().map((b) => [b.toLowerCase(), b, bandN(b.toLowerCase())])];
@@ -3413,7 +3415,7 @@ function rosterPanel(s, live, missing) {
   const sections = by[2] ? by[3].map((g) => [g, rows.filter((r) => by[2](s, r) === g)]).filter(([, list]) => list.length) : null;
   return `<section class="card stack">
       <div class="between"><div><h2>Roster and levels</h2><p class="small muted">${live ? 'Fixed after start: playing levels. Manage presence in the live Players view.' : "Confirm each player's slot and set their level for this club. Levels lock when the session starts."}</p></div>
-        <div class="row acts">${!live && s.roster.some((r) => !r.present) ? '<button class="btn sm" data-act="allPresent">Mark all present</button>' : ''}${!live && s.roster.some((r) => r.present) ? '<button class="btn sm" data-act="allAbsent">Mark all absent</button>' : ''}<button class="btn sm primary" data-act="openAdd">Add player</button></div></div>
+        <div class="row acts"><button class="btn sm primary" data-act="openAdd">Add player</button></div></div>
       ${rosterSummary(s, tab)}
       ${missing ? notice('warn', `${missing} player${missing > 1 ? 's need' : ' needs'} a level before the session can start.`) : ''}
       ${s.roster.length ? `${tabMenu('dd-rv', 'Show level', tabs, tab)}

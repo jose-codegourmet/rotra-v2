@@ -7,7 +7,7 @@ export const rosterRowMeta = {
   usage: [
     'Pass selfCheckedInAt or leftAt timestamps for the muted presence caption; the caller owns clearing rules.',
     'presencePending shows Saving presence… without disabling the switch; the data batch owns optimistic values and rollback.',
-    'Read-only Session settings passes readOnly for locked level and presence text without removal or presence controls.',
+    'Before Start session the route passes showPresence=false: no Present text or switch, remove stays. Read-only Session settings passes readOnly for locked level and presence text without removal or presence controls.',
     'Use inside RosterPanel for every player with a slot in a prepared session.',
     'Do not use in the live console: Queue › Players shows locked levels and no remove action (PlayerPoolCard).',
     'Do not use for the Grid view: that is RosterCard.',

@@ -1,6 +1,6 @@
 # Admin › Profile characters and Profile banners: each image is a card
 
-Status: NEW
+Status: CANCELLED
 Date: 2026-11-11
 App: admin
 Mockup: apps/mockup/admin-app/rotra-admin.html › Settings › Profile characters, Settings › Profile banners
@@ -10,6 +10,9 @@ Artifact: https://claude.ai/artifact/1Au5cHUNCeZJ3JQNPWXsXz
 Components: image-library-page, image-card
 Supersedes: none
 Superseded by: none
+
+## Cancelled
+- Owner comment on the same thread, November 11, 2026: "please revert this". The card layout was reverted the same day; Profile characters and Profile banners are back to the plain image tiles with the corner ×. The upload progress bar (second comment on this log) and the 15-per-page size stay.
 
 ## What changed
 - Before: a tight grid of bare image tiles (88 px squares); hidden ones were faded to 25%; a small × floated on each corner for delete.

@@ -15,8 +15,11 @@ import {
   allAutoQueueDrafts,
   autoQueueDraftConflict,
   autoQueueFingerprint,
+  type BaggingEdit,
   clearAutoQueueDrafts,
+  editBagging,
   emptyAutoQueueDraftState,
+  emptyBaggingSettings,
   generateAutoQueueMatches,
   selectAutoQueueDraft,
 } from './autoQueue.rules'
@@ -25,6 +28,8 @@ import { append, matchContext, requireLive } from './queue.mutations'
 
 export function draftState(s: MockState, sessionId: string) {
   s.autoQueueDrafts[sessionId] ??= emptyAutoQueueDraftState()
+  // Working sets made before Bagging mode (#739) have no switch yet.
+  s.autoQueueDrafts[sessionId].bagging ??= emptyBaggingSettings()
   return s.autoQueueDrafts[sessionId]
 }
 /**
@@ -49,8 +54,10 @@ export async function getAutoQueueDrafts(sessionId: string) {
   await delay()
   const s = readMockState()
   const session = sessionIn(s, sessionId)
+  const state = s.autoQueueDrafts[sessionId] ?? emptyAutoQueueDraftState()
   return {
-    ...(s.autoQueueDrafts[sessionId] ?? emptyAutoQueueDraftState()),
+    ...state,
+    bagging: state.bagging ?? emptyBaggingSettings(),
     fingerprint: autoQueueFingerprint(session, matchContext(s, sessionId)),
   }
 }
@@ -59,6 +66,7 @@ export function editAutoQueueDrafts(
     | { action: 'select'; draftId: string; selected: boolean }
     | { action: 'unselect-all' }
     | { action: 'clear'; mode: AutoQueueMode; unselectedOnly: boolean }
+    | BaggingEdit
   ),
 ) {
   if (isRealDataMode()) return realEditAutoQueueDrafts(input)
@@ -66,7 +74,21 @@ export function editAutoQueueDrafts(
     const state = draftState(s, input.sessionId)
     if (input.action === 'select') selectAutoQueueDraft(state, input.draftId, input.selected)
     else if (input.action === 'unselect-all') state.selectedIds = []
-    else clearAutoQueueDrafts(state, input.mode, input.unselectedOnly)
+    else if (input.action === 'clear') clearAutoQueueDrafts(state, input.mode, input.unselectedOnly)
+    else {
+      // Bagging pairs are two present roster players (#739); the sheet only offers those.
+      if (input.action === 'bagging-add') {
+        const roster = matchContext(s, input.sessionId).roster
+        for (const id of [input.a, input.b])
+          if (!roster.some((p) => p.id === id && p.present))
+            throw new MockError('conflict', 'Mark both players present first.')
+      }
+      try {
+        editBagging(state.bagging, input)
+      } catch (error) {
+        throw new MockError('conflict', error instanceof Error ? error.message : 'Try again.')
+      }
+    }
     return state
   })
 }
@@ -96,6 +118,7 @@ export function generateAutoQueueDrafts(input: {
       limit: Math.max(0, input.count - retained.length),
       retained,
       catchUpTarget: input.catchUpTarget,
+      bagging: state.bagging,
     })
     if (result.error) throw new MockError('permission', result.error)
     const fingerprint = autoQueueFingerprint(session, ctx)
@@ -113,7 +136,7 @@ export function generateAutoQueueDrafts(input: {
           ...m,
           id: crypto.randomUUID(),
           mode: input.mode,
-          reason,
+          reason: m.reason ?? reason,
           fingerprint,
         })),
       ],

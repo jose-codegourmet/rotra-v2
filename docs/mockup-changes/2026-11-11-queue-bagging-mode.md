@@ -1,6 +1,6 @@
 # Generate matches: bagging mode with a bagging pairs list (#739, proposed)
 
-Status: NEW
+Status: IN MOCK APP — #739
 Date: 2026-11-11
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Live console › Queue tab › Generate matches workspace › header switch, Bagging pairs card, Add bagging pair sheet

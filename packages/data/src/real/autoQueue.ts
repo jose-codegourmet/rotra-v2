@@ -2,7 +2,9 @@ import {
   allAutoQueueDrafts,
   autoQueueDraftConflict,
   autoQueueFingerprint,
+  type BaggingEdit,
   clearAutoQueueDrafts,
+  editBagging,
   emptyAutoQueueDraftState,
   generateAutoQueueMatches,
   selectAutoQueueDraft,
@@ -67,13 +69,22 @@ export async function realEditAutoQueueDrafts(
     | { action: 'select'; draftId: string; selected: boolean }
     | { action: 'unselect-all' }
     | { action: 'clear'; mode: AutoQueueMode; unselectedOnly: boolean }
+    | BaggingEdit
   ),
 ) {
   requireLive(await realGetQueueSession(input.sessionId))
   const state = stateOf(input.sessionId)
   if (input.action === 'select') selectAutoQueueDraft(state, input.draftId, input.selected)
   else if (input.action === 'unselect-all') state.selectedIds = []
-  else clearAutoQueueDrafts(state, input.mode, input.unselectedOnly)
+  else if (input.action === 'clear') clearAutoQueueDrafts(state, input.mode, input.unselectedOnly)
+  else {
+    // Bagging mode and its pairs (#739) live with the drafts: on this device only, never saved.
+    try {
+      editBagging(state.bagging, input)
+    } catch (error) {
+      throw new MockError('conflict', error instanceof Error ? error.message : 'Try again.')
+    }
+  }
   return shown(state)
 }
 
@@ -106,6 +117,7 @@ export async function realGenerateAutoQueueDrafts(input: {
     limit: Math.max(0, input.count - retained.length),
     retained,
     catchUpTarget: input.catchUpTarget,
+    bagging: state.bagging,
   })
   if (result.error) throw new MockError('permission', result.error)
   const fingerprint = autoQueueFingerprint(session, ctx)
@@ -117,7 +129,7 @@ export async function realGenerateAutoQueueDrafts(input: {
         ...m,
         id: crypto.randomUUID(),
         mode: input.mode,
-        reason,
+        reason: m.reason ?? reason,
         fingerprint,
       })),
     ],

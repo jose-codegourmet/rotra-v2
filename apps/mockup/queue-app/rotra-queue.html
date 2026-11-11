@@ -3221,7 +3221,7 @@ const openDropOuts = (s) => (s.dropOuts || []).filter((x) => x.status === 'open'
 const mrNamed = (mr) => [mr.pid, ...(mr.partners || []), ...(mr.opponents || [])].filter(Boolean);
 // D-2026-11-09-05: a match request closes by itself when anyone named stops being present.
 const closeStaleMatchReqs = (s) => { openMatchReqs(s).forEach((mr) => { if (mrNamed(mr).some((pid) => !(R(s, pid) || {}).present)) mr.status = 'closed'; }); };
-const reqCount = (s) => { closeStaleMatchReqs(s); return pendingReqs(s).length + openMatchReqs(s).length + openDropOuts(s).length; };
+const reqCount = (s) => { closeStaleMatchReqs(s); return pendingReqs(s).length + (s.status === 'active' ? openMatchReqs(s).length : 0) + openDropOuts(s).length; };
 const inClub = (r) => !!r.account && saved().some((p) => p.rtr === r.account);
 const digitsOf = (v) => String(v || '').replace(/\D/g, '');
 // D-2026-11-09-06: a guest request whose phone matches a saved player is offered for linking; nothing merges until the QM taps Link.
@@ -3260,11 +3260,13 @@ function linkCard(s) {
 function requestsPanel(s, inSheet) {
   const joins = pendingReqs(s), drops = openDropOuts(s), mrs = openMatchReqs(s), done = (s.requests || []).filter((r) => r.status !== 'pending');
   const full = s.status !== 'active' && openSlots(s) === 0;
-  const tab = S.ui.reqTab === 'match' ? 'match' : 'join';
-  const n = joins.length + drops.length + mrs.length;
+  // Owner comment, November 11, 2026: match requests only exist once the session is live. Before Start there is no Match tab.
+  const live = s.status === 'active';
+  const tab = live && S.ui.reqTab === 'match' ? 'match' : 'join';
+  const n = joins.length + drops.length + (live ? mrs.length : 0);
   // D-2026-11-09-05: one Requests · N button with Join and Match tabs; drop-out notices sit at the top of Join.
-  const head = inSheet ? '' : `<div><h2>Requests${n ? ` · ${n}` : ''}</h2><p class="small muted">Join requests, drop-out notices and match requests from the session page. Nothing changes until you act on one.</p></div>`;
-  const tabs = `<div class="tabs" role="tablist" aria-label="Requests">${[['join', `Join · ${joins.length + drops.length}`], ['match', `Match · ${mrs.length}`]].map(([k, l]) => `<button role="tab" id="rqt-${k}" aria-selected="${tab === k}" aria-controls="rq-panel" data-act="reqTab" data-k="${k}">${l}</button>`).join('')}</div>`;
+  const head = inSheet ? '' : `<div><h2>Requests${n ? ` · ${n}` : ''}</h2><p class="small muted">${live ? 'Join requests, drop-out notices and match requests' : 'Join requests and drop-out notices'} from the session page. Nothing changes until you act on one.</p></div>`;
+  const tabs = live ? `<div class="tabs" role="tablist" aria-label="Requests">${[['join', `Join · ${joins.length + drops.length}`], ['match', `Match · ${mrs.length}`]].map(([k, l]) => `<button role="tab" id="rqt-${k}" aria-selected="${tab === k}" aria-controls="rq-panel" data-act="reqTab" data-k="${k}">${l}</button>`).join('')}</div>` : '';
   let body;
   if (tab === 'match') body = mrs.length ? `<div class="list">${mrs.map((mr) => matchReqCard(s, mr)).join('')}</div>` : '<p class="small muted">No match requests. Present players can ask for a match from the session page.</p>';
   else {

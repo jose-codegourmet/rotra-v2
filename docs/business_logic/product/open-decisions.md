@@ -13,34 +13,38 @@ The product direction is sufficiently defined for documentation. Resolve the rel
 
 | Area | What remains unresolved | What is already fixed |
 |---|---|---|
-| Numerical ranking | Skill-label mapping; normalization of the two components; performance calculation; score influence; handling sparse/absent recent data; global ties | 70% equally weighted latest club assessments, 30% performance; last three months; operator-assigned local levels are authoritative |
-| Queue generation | Final team-strength/probability model; meaning of level-matched/easy in numbers; mode and fairness weights; default number of matches per Generate matches run (formerly called Auto Queue) | Shared queue, operator starts, minimum-game priority, flexible Chill/Fair targets, manual overrides; operator picks 2/3/4/6 per run; the prototype heuristic is the reference |
+| Numerical ranking | Rating constants (band edges, step sizes) and worked examples, #247 | **Settled November 11, 2026 ([D-2026-11-11-05](../../mvp/decisions.md#d-2026-11-11-05)):** rating by wins weighted by who you beat; seeded from the first level for the night; assessments have zero influence after that; Provisional ~10 games; 90 rolling days, Asia/Manila midnight; recompute on settings save; ties by games in window, then name; score margin ignored |
+| Queue generation | Nothing for v1 | **Settled November 11, 2026 (D-05):** the prototype's draft weights are the official v1 pairing rule; operator picks 2/3/4/6 per run; minimum-game priority; manual overrides |
 | Offline completeness | How devices know required records exist; detection of gaps; second-device prerequisites; duplicate prevention; device handoff | Original records must be recovered; second device may continue; no offline finalization or manual reconstruction |
 | Conflicting confirmed results | How operator clarification chooses authoritative records without providing general edits to locked winners | Confirmation is permanent; sync conflicts require review |
 | Identity matching | Canonical phone representation, concurrent new-profile creation, duplicate resolution, mistaken links, hidden-phone lookup by clubs | Phone uniquely identifies profiles; name alone does not; ID/QR supports private numbers; phone is not a sign-in identifier (email only, decided 2026-11-08) |
-| Claim and recovery links | Link delivery method, email verification on claim, password policy/complexity, unclaimed-account behavior, lost access to contacts, failed provider application handling | Club supplies registration link; phone and email required; email + password login (phone is not a login, decided 2026-11-08); recovery by email only. Decided 2026-11-07 (#244): links last 7 days, single use, club reissue invalidates the previous link; contact collision at claim blocks (see [below](#settled-by-the-product-owner-on-november-7-2026)) |
+| Claim and recovery links | Failed provider application recovery beyond "Application failed" | **Settled November 11, 2026 ([D-2026-11-11-08](../../mvp/decisions.md#d-2026-11-11-08)):** links last **24 hours** (was 7 days), single use, reissue revokes the old one; no email verification on claim; password at least 8 characters; a wrong claim is not undone (the Queue Master creates a new player); name-only guests invited once a contact is added. Email + password login; recovery by email via Admin review |
 | Contact-change approval | Evidence needed, enforcement across direct provider APIs, request UX, notifications, contact conflicts. Approve / Retry application / Check status run in real mode (#575, November 8, 2026) | Owner manually approves; player cannot directly edit phone/email; RTR ID permanent |
-| Window boundaries | Calendar months versus fixed day count; timezone for rank windows and ID date | Three-month observations; RTR date is the first sync day |
+| Window boundaries | Nothing | **Settled November 11, 2026 (D-05):** 90 rolling days; Asia/Manila midnight; RTR date is the first sync day |
 
 ## Remaining product details
 
 | Area | Open detail |
 |---|---|
-| Licensing | Renewal effective dates (early renewal, overlapping terms), refund policy, offline entitlement mechanism, forgotten club password reset method |
+| Licensing | Refund policy, offline entitlement mechanism | **Settled November 11, 2026 ([D-2026-11-11-06](../../mvp/decisions.md#d-2026-11-11-06), [D-07](../../mvp/decisions.md#d-2026-11-11-07)):** terms stack (a renewal starts the day after the current term), no start-date field; forgotten club password is a request the platform owner answers with a temporary password |
 | Closing a session | Final policy for games still in play (v1 blocks Session done while any match is Playing, until it is finished or invalidated); whether unplayed waiting matches are kept anywhere (they are dropped from results, and On court matches that never started are dropped the same way, settled November 6, 2026); when an invalid session releases the active-session slot |
 | Mid-session settings | Whether mode, formats, or the minimum can change after start; they stay fixed until decided |
 | Invalid-session recovery | Whether later recovery of the original device can reopen an already-invalid session; original records are mandatory in every case |
-| Assessment timing | Whether an assessment saved for a roster player who never attends or whose session becomes invalid still contributes; immediate assessment updates were agreed, but rollback/removal rules were not |
+| Assessment timing | Nothing | **Settled November 11, 2026 (D-05, D-06):** the level for the night never feeds shared rank after a player's first night; a level saved for a roster player removed before start is dropped |
 | Guest linking implementation | Who confirms a historical guest identity, what evidence is required, and how mistaken/duplicate links are resolved; including earlier games after identity confirmation is settled below |
 | Session standings | Three-or-more-way ties, conflicting head-to-head results, and identical names; do not replace the agreed wins/losses/head-to-head/name order |
-| Awards | Final MVP, Most Improved, and Off Day math; the prototype formula is a reference only; five prior club sessions within three months and at least two counted games for MVP are fixed |
-| Publication withdrawal | Whether published results can be fully unpublished; re-publishing with a new selection is allowed |
-| Financials | Currencies other than pesos; automatic stock deduction; whether inventory edits work offline |
-| ID allocation | Country/city code registry, grouping scope, concurrent sequence assignment, sequence beyond four digits |
+| Awards | Nothing for v1 | **Settled November 11, 2026 (D-05):** the prototype Most Improved / Off Day formula is approved as is for v1; five prior club sessions within the window and at least two counted games for MVP stay fixed |
+| Publication withdrawal | Nothing | **Settled November 11, 2026 ([D-2026-11-11-09](../../mvp/decisions.md#d-2026-11-11-09)):** no Unpublish; re-publishing with a new selection is the only change |
+| Financials | Currencies other than pesos; automatic stock deduction; whether inventory edits work offline | **Settled November 11, 2026 (D-06):** shuttle unit cost snapshotted at save; paid mark survives demotion; payments can change after Session done |
+| ID allocation | Sequence beyond four digits | **Settled November 11, 2026 (D-07, D-08):** six v1 cities, the platform owner adds cities from Admin; first-come sequence from the database; RTR ID is display only and never changes on a city correction |
 | Profile editing | Exact personal fields and social visibility; whether operator edits of personal information continue after a profile is claimed |
 | Club-set pictures at claim | What happens to the picture a club set for an unclaimed profile (or a guest) when the player claims or registers. Proposal: it becomes their starting picture, which they can change (owner request, November 9, 2026; [log](../../mockup-changes/2026-11-09-queue-club-set-player-pictures.md)). Also: where a guest's club-set picture is stored |
-| Expired-page behavior | Meaning/presentation of stale public pages; restoration after deletion; retention of internal club data beyond public pages |
-| Admin configuration | Effect of changing weights/eligibility on existing ranks; which flags exist, targeting, and when offline devices pick up a flag change |
+| Expired-page behavior | Meaning/presentation of stale public pages; restoration after deletion | **Settled November 11, 2026 (D-09):** no time limit while licensed; never indexed or static; join requests, logs and exports kept 90 days |
+| Admin configuration | Which flags exist, targeting, and when offline devices pick up a flag change | **Settled November 11, 2026 (D-05):** saving ranking settings recomputes every rank from the game facts |
+
+## Settled by the product owner on November 11, 2026
+
+Recorded as [D-2026-11-11-04](../../mvp/decisions.md#d-2026-11-11-04) to [D-2026-11-11-10](../../mvp/decisions.md#d-2026-11-11-10) (offline writes, ranking by wins, roster payments and license terms, club sign-in and cities, accounts and 24-hour links, public pages and 90-day retention, housekeeping). The tables above carry the one-line summaries; the modules carry the rules.
 
 ## Settled by the product owner on November 7, 2026
 

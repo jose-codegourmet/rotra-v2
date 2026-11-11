@@ -61,8 +61,14 @@ Experience can inform the initial operator assessment but is not automatic ranki
 - No Facebook/social login.
 - Forgotten passwords: submit the account email for ROTRA Admin review; no automatic email. Admin verifies ownership and provides a single-use expiring reset link (#491, owner request November 8, 2026).
 - The club operator's role is initial player entry/registration-link delivery, not routine password recovery.
-- Claim links are valid **7 days** and **single use**; the club (Queue Master) can reissue, and reissuing invalidates the previous link (decided 2026-11-07, #244). If the phone or email at claim already belongs to another account, the claim is blocked with a contact-support route; never merge silently. An RTR ID or name alone never claims an account.
-- Still open: email verification on claim, password policy/complexity, separate guest-link invitation verification, mistaken/duplicate guest links and permanent relink, and failed provider application handling.
+- Claim links are valid **24 hours** and **single use** (changed from 7 days on November 11, 2026, [D-2026-11-11-08](../../../../../mvp/decisions.md#d-2026-11-11-08)); the club (Queue Master) can reissue, and reissuing invalidates the previous link (decided 2026-11-07, #244). If the phone or email at claim already belongs to another account, the claim is blocked with a contact-support route; never merge silently. An RTR ID or name alone never claims an account.
+- **Decided November 11, 2026 ([D-2026-11-11-08](../../../../../mvp/decisions.md#d-2026-11-11-08)):**
+  - **No email verification on claim.** Opening the club's link is the proof; the claim confirms the email at once.
+  - **Password rule:** at least 8 characters, nothing else.
+  - **A link claimed by the wrong person is not undone.** The Queue Master is responsible for the links and creates a new player for the right person; the short lifetime is the guard.
+  - **Name-only guests** can be invited once the club adds a phone or email to the record.
+  - **RTR ID sequence:** the database hands out the next number first come, first served. The RTR ID is display only; every record keys on the player UUID. Founding cities are added by the platform owner from Admin ([D-2026-11-11-07](../../../../../mvp/decisions.md#d-2026-11-11-07)).
+- Still open: contact-change approval evidence beyond the owner's manual review, and failed provider application recovery beyond "Application failed".
 
 ## Personal editing and privacy
 
@@ -70,7 +76,7 @@ Players may edit their own personal information after claiming the profile. They
 
 Registered players may hide their phone number from club operators. Phone/email are not public profile or leaderboard fields. A hidden phone must not leak through player search; ID/QR supports identification instead.
 
-**Public or private profile** ([D-2026-11-09-07](../../../../mvp/decisions.md#d-2026-11-09-07)): a player chooses Public (default) or Private. A private profile is hidden from visitors who aren't signed in: the leaderboard masks the name and doesn't open the row, search and RTR ID search don't find them, and a shared link shows "Log in with ROTRA to see this profile." Guests are treated the same way. Signed-in ROTRA players still see it. It changes nothing about phone privacy.
+**Public or private profile** ([D-2026-11-09-07](../../../../../mvp/decisions.md#d-2026-11-09-07)): a player chooses Public (default) or Private. A private profile is hidden from visitors who aren't signed in: the leaderboard masks the name and doesn't open the row, search and RTR ID search don't find them, and a shared link shows "Log in with ROTRA to see this profile." Guests are treated the same way. Signed-in ROTRA players still see it. It changes nothing about phone privacy.
 
 Players cannot change phone or email themselves. They must contact the platform owner or submit a request, and the owner manually approves the change in Admin. A contact change does not replace the permanent RTR ID.
 
@@ -96,13 +102,13 @@ See [claim/recovery flow](flow/claim-and-recover.md) and [Admin contact changes]
 
 ## Admin-issued registration links (#345)
 
-ROTRA Admin can issue a claim link for an unclaimed player, using `/claim/{token}`. It replaces the previous active link and expires after seven days. The audit records issuer and expiry, never the token. Queue's legacy mock invite now uses the same path, but its deterministic fixture token is still a preview placeholder. Dynamically issued Admin links resolve against the current in-memory store; cross-origin claims require the shared F07 transport. No email or SMS is sent. **No club is assigned** (owner decision, November 8, 2026): a player who registers from an Admin-issued link is not added to any club, and clubs that already played with the profile keep their own records; only a club's own invite or session add connects a player to that club.
+ROTRA Admin can issue a claim link for an unclaimed player, using `/claim/{token}`. It replaces the previous active link and expires after 24 hours (changed from seven days on November 11, 2026). The audit records issuer and expiry, never the token. Queue's legacy mock invite now uses the same path, but its deterministic fixture token is still a preview placeholder. Dynamically issued Admin links resolve against the current in-memory store; cross-origin claims require the shared F07 transport. No email or SMS is sent. **No club is assigned** (owner decision, November 8, 2026): a player who registers from an Admin-issued link is not added to any club, and clubs that already played with the profile keep their own records; only a club's own invite or session add connects a player to that club.
 
-## Two uploaded pictures only ([D-2026-11-09-10](../../../../mvp/decisions.md#d-2026-11-09-10))
+## Two uploaded pictures only ([D-2026-11-09-10](../../../../../mvp/decisions.md#d-2026-11-09-10))
 
 Only the current and the previous uploaded photo are kept. A new upload makes the old current photo the previous one; **Use previous picture** swaps the two; choosing a character or initials, or **Remove**, makes the last photo the previous one. Characters and initials store no file. Anything older is deleted in the same request as the new upload.
 
-## Character choices come from the Admin library ([D-2026-11-09-13](../../../../mvp/decisions.md#d-2026-11-09-13))
+## Character choices come from the Admin library ([D-2026-11-09-13](../../../../../mvp/decisions.md#d-2026-11-09-13))
 
 The characters a player can pick are the images the platform owner shows in Admin › Profile characters, in upload order, 8 per page. The dialog opens on the page holding the player's current character. A player keeps a character that Admin later hides or deletes. (Owner comment, November 9, 2026; not built yet.)
 

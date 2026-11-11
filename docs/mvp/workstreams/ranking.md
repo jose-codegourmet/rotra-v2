@@ -35,19 +35,21 @@ and generation weights.
 
 ## Remaining work
 
-- [ ] Owner approval of formula, normalization, ties, sparse data, award evidence. Ticket: #247 (open, blocked).
-- [ ] After #247: approved algorithm version, eligibility, recalculation on policy save, ageing scheduler, attribution recompute. Ticket: needed.
-- [ ] Decide whether `prototype-reference` awards ship in MVP. Ticket: #247.
+- [x] Owner approval of the engine, ties, window, sparse data, award evidence: [D-2026-11-11-05](../decisions.md#d-2026-11-11-05) (rating by wins), November 11, 2026.
+- [ ] #247 (unblocked): the constants (band edges, step sizes) and worked examples.
+- [ ] After #247: approved algorithm version, eligibility, recalculation on policy save, attribution recompute. Ageing is computed on read while jobs are parked ([D-2026-11-11-10](../decisions.md#d-2026-11-11-10)). Ticket: needed.
+- [x] `prototype-reference` awards ship in MVP as is (D-05).
 - [ ] Owner path to retry a failed projection job. Ticket: needed.
 
 ## Related decisions
 
 - [D-2026-11-07-03](../decisions.md#d-2026-11-07-03) — confirmed guest identity feeds history attribution.
 - [D-2026-11-07-04](../decisions.md#d-2026-11-07-04) — ranking work is in the frozen scope.
+- [D-2026-11-11-05](../decisions.md#d-2026-11-11-05) — rating by wins, weighted by who you beat; awards and Generate matches weights approved as is.
 
 ## Blocking open decisions
 
-- #247 F07.6 ranking/award/fairness math, ties, precision, retroactivity — blocks all rank, leaderboard and award approval.
+- None since November 11, 2026 ([D-2026-11-11-05](../decisions.md#d-2026-11-11-05)); #247 now carries only the constants and examples.
 - [Database open decisions](../../database_design/product/open-decisions.md) (numerical model, window length and timezone, award evidence) · [business open decisions](../../business_logic/product/open-decisions.md).
 - Hub open questions 11, 12.
 

@@ -427,6 +427,8 @@ body:has(.player-select:checked) .shell-main { padding-bottom: 120px; }
 .ch-drop:hover, .ch-drop.over { border-color: var(--accent); background: var(--accent-subtle); }
 .ch-drop:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
 .ch-drop input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.ch-uploading { display: flex; flex-direction: column; gap: 6px; }
+.ch-uploading .prog i { background: var(--accent); transition: width .2s; }
 /* A-BANNERS (owner comment, November 11, 2026): the profile banners players pick, managed like the characters. Wide tiles, 3:1. */
 .bn-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; }
 .bn-grid .ch-img { aspect-ratio: 3 / 1; border-radius: var(--r); }
@@ -696,7 +698,7 @@ if (!S || S.v !== 1) S = freshState();
 if (!Array.isArray(S.chars)) S.chars = seedChars();
 if (!Array.isArray(S.banners)) S.banners = seedBanners();
 S.clubs.forEach((c) => { if (!c.price) { const p = SEED_PRICE[c.id] || [1500, 15000]; c.price = { monthly: p[0], yearly: p[1] }; } });
-Object.assign(S.ui, { sheet: null, pendingGo: null, resetArmed: false, nav: false });
+Object.assign(S.ui, { sheet: null, pendingGo: null, resetArmed: false, nav: false, upload: null });
 S.ui.login.pending = false;
 if (S.ui.lic && ['saving', 'checking'].includes(S.ui.lic.step)) S.ui.lic = null;
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable: keep working in memory */ } }
@@ -1489,6 +1491,8 @@ function viewFlags() {
     <p class="small muted">No flag can change confirmed winners or scores, or bring back lost offline records.</p>`);
 }
 
+// Owner comment, November 11, 2026: uploads show a progress bar under the drop zone (N of M, then done).
+const uploadProgress = (kind) => (S.ui.upload && S.ui.upload.kind === kind ? `<div class="ch-uploading" role="status" aria-live="polite"><span class="small">Uploading ${S.ui.upload.done} of ${S.ui.upload.total}…</span><div class="prog"><i style="width:${Math.round((S.ui.upload.done / Math.max(1, S.ui.upload.total)) * 100)}%"></i></div></div>` : '');
 // ---------- A-CHARACTERS ----------
 function viewChars() {
   const all = S.chars, shown = activeChars().length, hidden = all.length - shown;
@@ -1498,6 +1502,7 @@ function viewChars() {
     <div class="row"><button type="button" class="btn xs" data-act="charToggle" data-id="${c.id}">${c.active ? 'Hide' : 'Show'}</button><button type="button" class="btn xs ghost" data-act="charDelete" data-id="${c.id}" aria-label="Delete ${esc(charName(c))}">Delete</button></div></div></article>`;
   return shell(`<div class="page-head"><h1>Profile characters</h1><p class="muted">Players see the shown images, ${CHAR_PLAYER_PAGE} per page. Click an image to hide or show it. ${shown} shown${hidden ? ` · ${hidden} hidden` : ''}.</p></div>
     <label class="ch-drop" for="char-file" data-drop="chars"><input id="char-file" type="file" multiple accept="image/png,image/jpeg,image/webp" data-change="charFiles"><b>Drag images here to upload</b><span class="small">or click to choose · PNG, JPG or WebP, up to 1 MB each</span></label>
+    ${uploadProgress('chars')}
     <section class="ch-grid" aria-label="Character images">${all.map(item).join('')}</section>`);
 }
 
@@ -1509,6 +1514,7 @@ function viewBanners() {
     <div class="row"><button type="button" class="btn xs" data-act="bannerToggle" data-id="${b.id}">${b.active ? 'Hide' : 'Show'}</button><button type="button" class="btn xs ghost" data-act="bannerDelete" data-id="${b.id}" aria-label="Delete ${esc(bannerName(b))}">Delete</button></div></div></article>`;
   return shell(`<div class="page-head"><h1>Profile banners</h1><p class="muted">The strip across the top of a player's profile card, like a Discord banner. Players pick one of the shown banners from Edit profile; they can't upload their own. Click a banner to hide or show it. ${shown} shown${hidden ? ` · ${hidden} hidden` : ''}.</p></div>
     <label class="ch-drop" for="banner-file" data-drop="banners"><input id="banner-file" type="file" multiple accept="image/png,image/jpeg,image/webp" data-change="bannerFiles"><b>Drag banners here to upload</b><span class="small">or click to choose · PNG, JPG or WebP, up to 2 MB each · cropped to 3:1</span></label>
+    ${uploadProgress('banners')}
     <section class="bn-grid" aria-label="Banner images">${all.map(item).join('')}</section>`);
 }
 
@@ -1824,17 +1830,21 @@ async function addCharFiles(list) {
   if (!S.online) { toast(OFFLINE_ERR); return; }
   let added = 0;
   const skipped = [];
+  S.ui.upload = { kind: 'chars', done: 0, total: files.length }; render();
   for (const f of files) {
-    if (!/^image\/(png|jpeg|webp)$/.test(f.type)) { skipped.push(`${f.name} isn't a PNG, JPG or WebP image`); continue; }
-    if (f.size > CHAR_MAX_BYTES) { skipped.push(`${f.name} is over 1 MB`); continue; }
-    try {
+    if (!/^image\/(png|jpeg|webp)$/.test(f.type)) { skipped.push(`${f.name} isn't a PNG, JPG or WebP image`); }
+    else if (f.size > CHAR_MAX_BYTES) { skipped.push(`${f.name} is over 1 MB`); }
+    else try {
       const img = await cropToSquare(f), n = Math.max(0, ...S.chars.map((c) => c.n)) + 1;
       const id = `ch${Date.now()}-${n}`;
       S.chars.push({ id, n, key: `x${n}`, seed: '', name: '', img, active: true, source: 'upload', added: Date.now() });
       log('char', id, `Uploaded Character ${n}.`);
       added += 1;
     } catch (e) { skipped.push(`${f.name} couldn't be read`); }
+    S.ui.upload.done += 1; render();
+    await new Promise((r) => setTimeout(r, 350)); // the prototype has no network; a short pause makes the bar visible
   }
+  S.ui.upload = null;
   render();
   if (added) toast(`${plural(added, 'image')} added and shown to players.`);
   if (skipped.length) toast(`Not added: ${skipped.join('; ')}.`);
@@ -1860,17 +1870,21 @@ async function addBannerFiles(list) {
   if (!S.online) { toast(OFFLINE_ERR); return; }
   let added = 0;
   const skipped = [];
+  S.ui.upload = { kind: 'banners', done: 0, total: files.length }; render();
   for (const f of files) {
-    if (!/^image\/(png|jpeg|webp)$/.test(f.type)) { skipped.push(`${f.name} isn't a PNG, JPG or WebP image`); continue; }
-    if (f.size > BANNER_MAX_BYTES) { skipped.push(`${f.name} is over 2 MB`); continue; }
-    try {
+    if (!/^image\/(png|jpeg|webp)$/.test(f.type)) { skipped.push(`${f.name} isn't a PNG, JPG or WebP image`); }
+    else if (f.size > BANNER_MAX_BYTES) { skipped.push(`${f.name} is over 2 MB`); }
+    else try {
       const img = await cropToWide(f), n = Math.max(0, ...S.banners.map((b) => b.n)) + 1;
       const id = `bn${Date.now()}-${n}`;
       S.banners.push({ id, n, key: `x${n}`, name: '', img, active: true, source: 'upload', added: Date.now() });
       log('banner', id, `Uploaded Banner ${n}.`);
       added += 1;
     } catch (e) { skipped.push(`${f.name} couldn't be read`); }
+    S.ui.upload.done += 1; render();
+    await new Promise((r) => setTimeout(r, 350)); // the prototype has no network; a short pause makes the bar visible
   }
+  S.ui.upload = null;
   render();
   if (added) toast(`${plural(added, 'banner')} added and shown to players.`);
   if (skipped.length) toast(`Not added: ${skipped.join('; ')}.`);

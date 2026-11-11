@@ -36,3 +36,8 @@ Superseded by: none
 
 ## Real app work
 - `@rotra/ui` ProfileCharactersPage and ProfileBannersPage: render ImageCard (image, name, Shown/Hidden chip, Hide/Show, Delete) instead of the tile and corner ×.
+
+## Owner comment, November 11, 2026 (second): "when dragging and dropping or uploading there should be a progress bar"
+- Changed: while files are being added (drag-and-drop or the file picker), a progress block appears under the drop zone on both pages: **Uploading N of M…** with an accent progress bar that fills as each file is processed, then disappears when the usual toast reports the result. Rejected files still count towards M. In the prototype each file pauses briefly so the bar is visible; the real app drives it from the Supabase Storage upload progress.
+- Copy added: **Uploading N of M…**
+- States added: uploading (bar), finished (bar gone, toast).

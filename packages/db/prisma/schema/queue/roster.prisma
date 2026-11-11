@@ -118,7 +118,7 @@ enum JoinRequestStatus {
   pending
   confirmed
   declined
-  /// Pending requests closed by Cancel session (not a decline).
+  /// Pending requests closed by Start or Cancel session (not a decline).
   closed
   /// A signed-in Player withdrew their own pending request (Cancel request, D-2026-11-09-02).
   cancelled

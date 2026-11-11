@@ -11,6 +11,7 @@ import {
   realMoveMeToWaitlist,
 } from '../real/public-session'
 import {
+  JOIN_REQUESTS_STARTED_ERROR,
   SLOTS_FULL_ERROR,
   settleRoster,
   slotsFull,
@@ -78,10 +79,8 @@ export function joinAsPlayer(slug: string, input: JoinAsPlayerInput) {
     slug,
     (s, session) => {
       requireOnline()
-      if (
-        !session.acceptJoinRequests ||
-        (session.state !== 'prepared' && session.state !== 'active')
-      )
+      if (session.state === 'active') fail(JOIN_REQUESTS_STARTED_ERROR)
+      if (!session.acceptJoinRequests || session.state !== 'prepared')
         fail('Join requests are off.')
       const player = s.players.find((p) => p.id === input.playerId)
       if (!player) fail('Sign in with ROTRA Player to send a request.')

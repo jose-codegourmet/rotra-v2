@@ -177,6 +177,11 @@ export function atWhenLabel(at: number, now: number) {
   return clubDayDiff(now, at) === 0 ? `at ${clubTimeLabel(at)}` : whenLabel(at, now)
 }
 
+/** The Start toast's suffix when Start closed pending join requests (D-2026-11-11-11). */
+export function joinRequestsClosedNote(closed: number) {
+  return closed > 0 ? ` · ${closed} join request${closed === 1 ? '' : 's'} closed` : ''
+}
+
 export const END_AFTER_NOW_ERROR = 'Choose an end time after now.'
 export const END_WITHIN_DAY_ERROR = 'Choose an end at most 24 hours after play began.'
 export const START_NEEDS_NEW_END = 'Set a new end time after now to start.'

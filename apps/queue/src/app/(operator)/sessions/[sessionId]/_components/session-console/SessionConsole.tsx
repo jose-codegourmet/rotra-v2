@@ -19,6 +19,7 @@ import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { Button } from '@rotra/ui/button'
 import { Chip } from '@rotra/ui/chip'
 import { ConsoleFooterBar } from '@rotra/ui/console-footer-bar'
+import { ConsoleHeaderActions } from '@rotra/ui/console-header-actions'
 import { Notice } from '@rotra/ui/notice'
 import { formatWhen } from '@rotra/ui/now-card/helpers'
 import { OverdueBanner, sessionEndStatus } from '@rotra/ui/overdue-banner'
@@ -26,7 +27,6 @@ import { PageHeader } from '@rotra/ui/page-header'
 import { Sheet } from '@rotra/ui/sheet'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { type TabItem, Tabs, TabsContent } from '@rotra/ui/tabs'
-import Link from 'next/link'
 import { notFound, useRouter } from 'next/navigation'
 import { type ComponentType, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useDockAction } from '@/app/(operator)/_components/operator-shell/DockAction.context'
@@ -59,7 +59,14 @@ import { ConsoleDeviceNotice } from '../console-device-notice/ConsoleDeviceNotic
 export type SessionConsoleProps = { sessionId: string; resumeSessionDone?: boolean }
 
 export type ConsoleView = 'session' | 'queue' | 'players' | 'leaderboard' | 'payments'
-export type ConsoleSheet = 'join-requests' | 'post' | 'adjust' | 'add-court' | 'session-done' | null
+export type ConsoleSheet =
+  | 'join-requests'
+  | 'payments'
+  | 'post'
+  | 'adjust'
+  | 'add-court'
+  | 'session-done'
+  | null
 /** The Queue › Match editing and generation sheets: Add match / Edit lineup, Suggested match, Auto queue, Regenerate */
 export type MatchSheet =
   | MatchLineupRequest
@@ -102,8 +109,10 @@ const VIEWS: Partial<
 const MODE_LABELS = { chill: 'Chill', fair: 'Fair', hard: 'Hard' } as const
 
 /**
- * Q-CONSOLE: the live session shell. Header with the mode, formats and minimum chips and the
- * Home / Session settings / Public page / Copy Facebook post / Courts and time / Requests · N actions, the view tabs
+ * Q-CONSOLE: the live session shell. Header with the mode, formats and minimum chips and, at the
+ * upper right, ConsoleHeaderActions: Match requests · N (the Requests sheet, match requests only),
+ * Courts and time, Payments and the More menu (Public page, Copy Facebook post, Session settings,
+ * Home). Then the view tabs
  * with live counts, the view panels (Session here; the others arrive in their own containers), the
  * ConsoleFooterBar and the dock's Session done pill. Sessions that are not live go to their own
  * screen: prepared to /preparation, finalizing to /finishing, finished or invalid to /record,
@@ -183,11 +192,9 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
   const inUse = active.reduce((n, m) => n + m.courtIds.length, 0)
   const attention = waiting.filter((m) => matchStatus(m, ctx).kind === 'needs-attention').length
   const present = rosterList.filter((p) => p.present).length
-  // Requests · N: pending join requests + open drop-out notices + open match requests, carried by
-  // the session read; real mode has no Requests read yet, so it counts the join requests alone.
-  const requestCount =
-    s?.requestCount ??
-    (roster.data?.joinRequests ?? []).filter((r) => r.status === 'pending').length
+  // Match requests · N: open match requests, carried by the live session read. Join requests close
+  // at Start, so none count here; real mode has no Requests read yet and shows 0.
+  const matchRequestCount = s?.requestCount ?? 0
   const leader = standings.data?.[0]
   const leaderPlayer = leader ? rosterList.find((p) => p.id === leader.playerId) : undefined
   const formats =
@@ -300,34 +307,19 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
             </>
           }
           actions={
-            <>
-              <Button size="sm" asChild>
-                <Link href="/">Home</Link>
-              </Button>
-              <Button size="sm" asChild>
-                <Link href={`/sessions/${sessionId}/preparation`}>Session settings</Link>
-              </Button>
-              <Button size="sm" asChild>
-                <Link href={`/sessions/${sessionId}/public-page`}>Public page</Link>
-              </Button>
-              <Button size="sm" onClick={() => setSheet('post')}>
-                Copy Facebook post
-              </Button>
-              <Button
-                size="sm"
-                onClick={() => {
-                  setFocusEnd(false)
-                  setSheet('adjust')
-                }}
-              >
-                Courts and time
-              </Button>
-              {requestCount > 0 ? (
-                <Button size="sm" variant="primary" onClick={() => setSheet('join-requests')}>
-                  Requests · {requestCount}
-                </Button>
-              ) : null}
-            </>
+            <ConsoleHeaderActions
+              matchRequestCount={matchRequestCount}
+              onOpenMatchRequests={() => setSheet('join-requests')}
+              onOpenCourtsAndTime={() => {
+                setFocusEnd(false)
+                setSheet('adjust')
+              }}
+              onOpenPayments={() => setSheet('payments')}
+              onOpenPublicPage={() => router.push(`/sessions/${sessionId}/public-page`)}
+              onCopyFacebookPost={() => setSheet('post')}
+              onOpenSessionSettings={() => router.push(`/sessions/${sessionId}/preparation`)}
+              onGoHome={() => router.push('/')}
+            />
           }
         />
       ) : (
@@ -411,6 +403,15 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
         footer={<Button onClick={() => setSheet(null)}>Done</Button>}
       >
         <JoinRequests sessionId={sessionId} variant="sheet" />
+      </Sheet>
+      <Sheet
+        open={sheet === 'payments'}
+        onOpenChange={(open) => setSheet(open ? 'payments' : null)}
+        title="Payments"
+        wide
+        footer={<Button onClick={() => setSheet(null)}>Done</Button>}
+      >
+        <PaymentsPanel sessionId={sessionId} asSheet />
       </Sheet>
       <FacebookPost
         sessionId={sessionId}

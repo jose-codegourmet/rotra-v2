@@ -105,7 +105,9 @@ async function nextPaymentReference(tx: Tx) {
  * cancels the exact running expiry cycle, all in one transaction. Repeat-safe on `commandId`: a
  * concurrent or repeated call applies one term. Prices on the club are never rewritten.
  *
- * Proposal (stacking pending #245): a renewal starts when current access ends, or now if lapsed.
+ * The period is computed, never sent (D-2026-11-11-06): a club with current access starts the moment
+ * it ends (the day after the current term's last day), any other club now. A client-supplied start
+ * is refused.
  */
 export async function activateLicense(
   context: AdminContext,
@@ -117,8 +119,14 @@ export async function activateLicense(
     amountMinor?: number
     paidOn?: string | null
     notes?: string
+    /** Whatever the client sent as a start; anything but undefined is refused */
+    startsAt?: unknown
   },
 ) {
+  if (input.startsAt !== undefined)
+    throw new ServiceError('invalid', {
+      startsOn: 'The term start is computed by ROTRA and cannot be sent.',
+    })
   if (input.plan !== 'monthly' && input.plan !== 'yearly')
     throw new ServiceError('invalid', { plan: 'Choose monthly or yearly.' })
   return prisma.$transaction(async (tx) => {
@@ -140,6 +148,7 @@ export async function activateLicense(
       throw new ServiceError('invalid', { paidOn: 'Enter the date the club paid.' })
     const entitlement = await tx.clubEntitlement.findUnique({ where: { clubId: club.id } })
     const accessEnd = entitlement?.effectiveAccessEndsAt
+    // A renewal stacks after the current term; a lapsed or never-licensed club starts today.
     const startsAt = accessEnd && accessEnd > now ? accessEnd : now
     const endsAt = addMonths(startsAt, input.plan === 'monthly' ? 1 : 12)
     const term = await tx.clubLicenseTerm.create({

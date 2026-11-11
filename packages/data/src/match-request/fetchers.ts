@@ -232,7 +232,12 @@ export async function getSessionRequests(sessionId: string): Promise<SessionRequ
   return sessionRequests(readMockState(), sessionId)
 }
 
-/** The Requests · N count alone, for folding into the QM's existing session read. */
+/**
+ * The Requests count alone, for folding into the QM's existing session read: before Start, pending
+ * join requests + open drop-out notices (Requests · N); once live, open match requests only (Match
+ * requests · N), since join requests close at Start.
+ */
 export function sessionRequestCount(state: MockState, sessionId: string) {
-  return sessionRequests(state, sessionId).counts.total
+  const { counts } = sessionRequests(state, sessionId)
+  return sessionIn(state, sessionId).state === 'active' ? counts.match : counts.join
 }

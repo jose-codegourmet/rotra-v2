@@ -13,7 +13,6 @@ import {
   addDirectoryPlayerToSession,
   addNewPlayerToSession,
   addSavedPlayerToSession,
-  confirmJoinRequest,
   giveSlot,
   submitJoinRequest,
 } from '../session-roster/mutations'
@@ -379,8 +378,24 @@ describe('complete flexible Queue Session rules', () => {
       level: 'intermediate_mid',
     })
     expect(prepared.data.waitlistPosition).toBe(1)
+    const early = await submitJoinRequest({
+      sessionId,
+      name: 'Early guest',
+      statedBand: 'intermediate',
+      placement: 'waitlist',
+    })
     const before = readMockState()
-    await startSession(sessionId)
+    const pendingIn = (s: typeof before) =>
+      s.joinRequests.filter((r) => r.sessionId === sessionId && r.status === 'pending')
+    const waiting = pendingIn(before).length
+    // Start closes every pending join request (`closed`, not declined) and says so in its toast.
+    expect((await startSession(sessionId)).message).toMatch(
+      new RegExp(` · ${waiting} join requests? closed$`),
+    )
+    expect(readMockState().joinRequests.find((r) => r.id === early.data.requestId)!.status).toBe(
+      'closed',
+    )
+    expect(pendingIn(readMockState())).toHaveLength(0)
     expect(readMockState().waitlist).toEqual(before.waitlist)
     expect(readMockState().roster).toHaveLength(before.roster.length)
     const saved = readMockState().clubPlayers.find(
@@ -408,18 +423,10 @@ describe('complete flexible Queue Session rules', () => {
       (await addNewPlayerToSession({ sessionId, name: 'Walk-in guest', level: 'intermediate_mid' }))
         .data.waitlistPosition,
     ).toBe(0)
-    const request = await submitJoinRequest({
-      sessionId,
-      name: 'Requested guest',
-      statedBand: 'intermediate',
-    })
-    expect(readMockState().joinRequests.find((r) => r.id === request.data.requestId)!.status).toBe(
-      'pending',
-    )
-    expect(
-      (await confirmJoinRequest({ requestId: request.data.requestId, level: 'intermediate_mid' }))
-        .data.waitlistPosition,
-    ).toBe(0)
+    // Join requests end at Start (D-2026-11-11-11): none is created once the session is live.
+    await expect(
+      submitJoinRequest({ sessionId, name: 'Requested guest', statedBand: 'intermediate' }),
+    ).rejects.toThrow('online join requests are closed')
     await giveSlot({ sessionId, waitlistId: readMockState().waitlist[0]!.id })
     expect(readMockState().waitlist).toHaveLength(0)
     const snapshot = readMockState()

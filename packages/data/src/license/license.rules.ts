@@ -175,32 +175,33 @@ export function retentionOf(
 // ---------- A-LICENSE / D-LICENSE ----------
 
 /**
+ * The start of the term Activate/Renew records (D-2026-11-11-06): never typed. A club with a current
+ * term starts the day after it ends (renewals stack); any other club starts today.
+ */
+export function licenseTermStart(terms: readonly ClubLicenseTerm[], today: string): string {
+  const access = accessOf(terms, today)
+  return access.state === 'active' ? addDays(access.until, 1) : today
+}
+
+/**
  * Prefilled values for Activate/Renew license (rotra-admin.html licStart()): the latest plan, the
- * club's price for it (0 when free), paid today. Renewal start rule is the prototype placeholder (open
- * decision: early renewal and overlapping terms): the day after access ends when active, else today.
+ * club's price for it (0 when free), paid today, and the computed start (licenseTermStart), shown
+ * read-only as Covers.
  */
 export function defaultLicenseDraft(
   club: ClubPrice,
   terms: readonly ClubLicenseTerm[],
   today: string,
 ): LicenseDraft {
-  const access = accessOf(terms, today)
   const latest = [...terms].sort((a, b) => b.startsAt.localeCompare(a.startsAt))[0]
   const plan = latest?.plan ?? null
   return {
     plan,
-    startsOn: access.state === 'active' ? addDays(access.until, 1) : today,
+    startsOn: licenseTermStart(terms, today),
     paidOn: today,
     amountMinor: club.licensePricing === 'free' ? 0 : plan ? planPriceMinor(club, plan) : null,
     reference: '',
   }
-}
-
-/** Days the new term starts inside the current active period (D-LICENSE overlap note); 0 if none. */
-export function overlapDays(access: ClubAccessState, draft: { startsOn: string }): number {
-  return access.state === 'active' && draft.startsOn <= access.until
-    ? diffDays(draft.startsOn, access.until) + 1
-    : 0
 }
 
 /** What saving this term will do, as D-LICENSE lists it (rotra-admin.html licEffects()). */

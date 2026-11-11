@@ -80,8 +80,9 @@ export type QueueSessionSummary = QueueSession & {
   /** `null` means this data mode has no device-download adapter yet. */
   downloadedHere: boolean | null
   /**
-   * Requests · N (pending join requests + open drop-out notices + open match requests), carried by
-   * the session detail read. Missing where the read does not include it (lists, real mode).
+   * Before Start, Requests · N (pending join requests + open drop-out notices); once live, Match
+   * requests · N (open match requests only). Carried by the session detail read. Missing where the
+   * read does not include it (lists, real mode).
    */
   requestCount?: number
 }

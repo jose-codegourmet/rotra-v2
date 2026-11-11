@@ -29,6 +29,8 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 /** Every prepared or live session takes requests while the club has them on (players module). */
 const TAKES_REQUESTS = ['prepared', 'active']
+/** Join requests end at Start (D-2026-11-11-11): none is created once the session is live. */
+const JOIN_REQUESTS_STARTED = 'The session has started, so online join requests are closed.'
 
 /** Rate/abuse guard (proposal pending #248): pending requests one session will hold at once. */
 export const MAX_PENDING_REQUESTS_PER_SESSION = 60
@@ -264,7 +266,9 @@ export async function sendJoinRequest(
       // A cancelled session's page shows Cancelled and takes no requests.
       if (current?.state === 'cancelled')
         throw new ServiceError('forbidden', { request: 'This session is cancelled.' })
-      if (!current || !TAKES_REQUESTS.includes(current.state) || !current.accept)
+      if (current?.state === 'active')
+        throw new ServiceError('forbidden', { request: JOIN_REQUESTS_STARTED })
+      if (!current || current.state !== 'prepared' || !current.accept)
         throw new ServiceError('forbidden', { request: 'This session is not taking requests.' })
       // D-2026-11-11-02: players cannot join a slot while every slot is taken; the waitlist remains.
       if (placement === 'slot' && (await slotsFull(tx, session)))
@@ -520,7 +524,9 @@ export async function joinSessionAsPlayer(
       const current = rows[0]
       if (current?.state === 'cancelled')
         throw new ServiceError('forbidden', { request: 'This session is cancelled.' })
-      if (!current || !TAKES_REQUESTS.includes(current.state) || !current.accept)
+      if (current?.state === 'active')
+        throw new ServiceError('forbidden', { request: JOIN_REQUESTS_STARTED })
+      if (!current || current.state !== 'prepared' || !current.accept)
         throw new ServiceError('forbidden', { request: 'This session is not taking requests.' })
       const standing = await playerStanding(tx, context.playerId, session.id)
       if (standing.joinRequest?.status === 'pending')

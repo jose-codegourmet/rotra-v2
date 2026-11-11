@@ -28,7 +28,7 @@ export type JoinRequestsProps = {
   sessionId: string
   /**
    * `card` (Preparation, between the header and the tabs) renders nothing while nothing waits;
-   * `sheet` (the "Requests" sheet behind Requests · N) always renders the panel body.
+   * `sheet` (the live console's Requests sheet behind Match requests · N) always renders the panel body.
    */
   variant?: 'card' | 'sheet'
   className?: string
@@ -47,8 +47,9 @@ function whereLabel(where: RequestSpot['where']) {
 }
 
 /**
- * Requests from the session page (Q18.12): JoinRequestsPanel with the Join tab (drop-out notices,
- * then join requests) and the Match tab. Join requests come from useSessionRoster; the ROTRA-player
+ * Requests from the session page (Q18.12): JoinRequestsPanel without tabs. Before Start it lists
+ * drop-out notices, then join requests; once live, match requests only (join requests close at
+ * Start). Join requests come from useSessionRoster; the ROTRA-player
  * hints, drop-out notices and match requests from useSessionRequests, and the shared rank and
  * phone-match prompt from useJoinRequestHints. Every decision toasts its result or its error; a
  * refused decision leaves the request waiting.
@@ -89,7 +90,9 @@ export function JoinRequests({ sessionId, variant = 'card', className }: JoinReq
   const view = requests.data
   const dropOuts = view?.dropOuts ?? []
   const matchRequests = view?.match ?? []
-  const waiting = pending + dropOuts.length + matchRequests.length
+  // No tabs: before Start the panel lists join requests and drop-out notices; live, match requests only.
+  const live = s?.state === 'active'
+  const waiting = live ? matchRequests.length : pending + dropOuts.length
   // The card only appears once something is waiting, so it stays hidden while loading; the sheet
   // always has a body and shows Skeleton rows until the roster arrives.
   const real = isRealDataMode()
@@ -214,7 +217,7 @@ export function JoinRequests({ sessionId, variant = 'card', className }: JoinReq
         onAddToQueue: () => run(addMatch.mutate, { sessionId, requestId: m.id }),
         onDecline: () => run(declineMatch.mutate, { sessionId, requestId: m.id }),
       }))}
-      live={s?.state === 'active'}
+      live={live}
       slotsFull={slotsFull}
       variant={variant}
       className={className}

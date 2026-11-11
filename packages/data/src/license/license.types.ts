@@ -109,11 +109,13 @@ export type LicenseDraft = {
   reference: string
 }
 
-/** What D-LICENSE › Activate/Renew license sends. One sourceCommandId per review, kept across retries. */
+/**
+ * What D-LICENSE › Activate/Renew license sends. One sourceCommandId per review, kept across retries.
+ * No start: the period is computed where it is saved (D-2026-11-11-06, licenseTermStart).
+ */
 export type ActivateLicenseInput = {
   clubId: string
   plan: LicensePlan
-  startsOn: string
   /** Ignored for a free club (recorded as null) */
   paidOn: string | null
   /** Ignored for a free club (recorded as 0) */

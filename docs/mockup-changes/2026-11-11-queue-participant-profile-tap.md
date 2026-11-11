@@ -53,3 +53,7 @@ Superseded by: none
 - Changed: the Queue Master's own **player profile** sheet (opened from court faces, queue faces, the Players tab and Saved players) uses the same banner profile card: banner, overlapping photo (opens the full photo), name and nickname, the identity chip and a level badge (**Intermediate High tonight** when the player is on the roster, **Intermediate High · suggestion** otherwise, **No level yet**), the identity line, the **Tonight ·** status line, then boxed sections **About** (Registered in, RTR ID, Joined) and **In your club** (Added to club, Sessions here, Phone). The guest invite section and the levels note stay below. Footer unchanged (Back / Close, Delete player, Link to saved player…, Invite).
 - The avatar on each Players-tab card is now a button that opens that profile (the card itself still selects the player for a match).
 - Copy added: **In your club**, **tonight** and **· suggestion** suffixes on the level badge, **No level yet**. Removed rows: **Nickname**, **Level suggestion** (now the badge).
+
+## Owner comment, November 11, 2026 (third, on the session page waitlist)
+- "you should be able to click on yourself and show the profile dialog".
+- Changed: on the session page (Participants grid and the Waitlist grid), the signed-in viewer's own tile is always a button that opens the profile card, whatever the identity flag on their record. Accessible name: **NAME (you) · view your profile**. An always-private player sees their own profile in full; only other viewers get the masked card.

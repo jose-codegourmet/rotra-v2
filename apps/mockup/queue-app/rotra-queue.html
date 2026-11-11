@@ -4105,7 +4105,7 @@ const pubNameHtml = (p) => (showsFull(p) ? `<b>${esc(p.name)}</b>${p.nick ? `<br
 const pubAvatarOf = (p) => (showsFull(p) ? avatar(p) : alwaysPrivate(p) ? `<span class="avatar" aria-hidden="true">${esc(initials(maskName(p.name)))}</span>` : pubAvatar(p));
 // Signed-in Players can open a registered participant's ROTRA profile; guests and unclaimed profiles stay plain tiles.
 // The viewer's own tile carries a “You” label (owner request, November 9, 2026).
-const pubTile = (p, cls, title, inner) => { const me = !!p && pubViewer()?.id === p.id; const body = me ? `${inner}<span class="you-tag">You</span>` : inner; cls = me ? `${cls} me` : cls; return pubSignedIn() && p && p.identity === 'registered' ? `<button type="button" class="${cls} pub-link" data-act="pubProfile" data-id="${esc(p.id)}" ${title} aria-label="${esc(showsFull(p) ? p.name : maskName(p.name))} · view profile">${body}</button>` : `<div class="${cls}" ${title}>${body}</div>`; };
+const pubTile = (p, cls, title, inner) => { const me = !!p && pubViewer()?.id === p.id; const body = me ? `${inner}<span class="you-tag">You</span>` : inner; cls = me ? `${cls} me` : cls; return pubSignedIn() && p && (me || p.identity === 'registered') ? `<button type="button" class="${cls} pub-link" data-act="pubProfile" data-id="${esc(p.id)}" ${title} aria-label="${me ? `${esc(p.name)} (you) · view your profile` : `${esc(showsFull(p) ? p.name : maskName(p.name))} · view profile`}">${body}</button>` : `<div class="${cls}" ${title}>${body}</div>`; };
 const playerJoinReq = (s, pid) => (s.requests || []).filter((x) => x.pid === pid && x.status !== 'closed').sort((a, b) => b.at - a.at)[0] || null;
 const openMatchReq = (s, pid) => (s.matchRequests || []).find((x) => x.pid === pid && x.status === 'open') || null;
 const openDropOut = (s, pid) => (s.dropOuts || []).find((x) => x.pid === pid && x.status === 'open') || null;
@@ -4601,7 +4601,7 @@ const SHEETS = {
   // #731 (proposed): a signed-in registered player opens a participant's profile from the session page's Participants tab.
   pubProfile(sh) {
     const p = P(sh.id), r = R(cur(), p.id);
-    if (alwaysPrivate(p)) return sheetShell(esc(maskName(p.name)), `<div class="pp-private"><span class="avatar xl" aria-hidden="true">${esc(initials(maskName(p.name)))}</span><b>${esc(maskName(p.name))}</b><p class="muted">This player keeps their profile private.</p></div>`, '<button class="btn" data-act="closeSheet" data-autofocus>Close</button>');
+    if (alwaysPrivate(p) && pubViewer()?.id !== p.id) return sheetShell(esc(maskName(p.name)), `<div class="pp-private"><span class="avatar xl" aria-hidden="true">${esc(initials(maskName(p.name)))}</span><b>${esc(maskName(p.name))}</b><p class="muted">This player keeps their profile private.</p></div>`, '<button class="btn" data-act="closeSheet" data-autofocus>Close</button>');
     const st = pubStats(p), city = regCity(p), s = cur();
     // Owner comment, November 11, 2026 ("like showing profile in discord"): banner, overlapping avatar, status line, level badge, stat tiles.
     const a = r ? busyOf(s, p.id) : null, qi = r ? waiting(s).findIndex((m) => all(m).includes(p.id)) : -1;

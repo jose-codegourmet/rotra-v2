@@ -1788,13 +1788,14 @@ function shareModel(sh) {
   const top = { p, title: p.name, sub: p.nick ? `“${p.nick}”` : 'ROTRA player' };
   const link = profileLink(p.id);
   // Proposed (#738): Share profile, own profile only. Always available: no level shows "Not ranked yet", no games shows "No games yet".
+  // Owner comment, November 11, 2026: show the ranking when there is one, and the number of wins.
   if (sh.kind === 'profile') {
     const pos = positionOf(p.id);
     const gs = p.sessions.filter((x) => x.ago <= WINDOW_DAYS).flatMap((x) => x.games.filter((g) => g.kind === 'counted'));
-    const w = gs.filter((g) => g.res === 'W').length, l = gs.length - w;
+    const w = gs.filter((g) => g.res === 'W').length;
     return { kind: 'profile', title: 'Share profile', top, link, blocks: [
-      { t: 'rank', label: p.level == null ? 'Not ranked yet' : lvLabel(p.level), pos, hidePos: true, dim: p.level == null },
-      gs.length ? { t: 'stats', note: 'Last 90 days', items: [['Games', String(gs.length)], ['W–L', `${w}–${l}`], ['Win rate', `${Math.round((w / gs.length) * 100)}%`]] } : { t: 'stat', text: 'No games yet' },
+      { t: 'rank', label: p.level == null ? 'Not ranked yet' : lvLabel(p.level), pos, hidePos: pos == null, dim: p.level == null },
+      gs.length ? { t: 'stats', note: 'Last 90 days', items: [['Wins', String(w)]] } : { t: 'stat', text: 'No games yet' },
     ] };
   }
   if (sh.kind === 'rank') {

@@ -42,3 +42,6 @@ Superseded by: none
 
 ## Real app work
 - Step-down action for the Queue Master and for the signed-in player, server-side block while in an unfinished match, front-of-waitlist placement, over-capacity add with confirmation, expected games recomputed on every roster count change (queue app, player app session page, packages/ui roster-card and summary). Needs a decision on keeping finished games for a stepped-down player in the standings.
+
+## Owner comment, November 11, 2026 (on My night): "you can't be moved to waitlist, you already are playing!"
+- Changed: the **Move me to the waitlist** button is not shown while the player is in a match (on court, playing, or in a queued match). It shows again once their match is done. The Queue Master's **Move to waitlist** on the Players tab keeps its blocking toast.

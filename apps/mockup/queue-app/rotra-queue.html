@@ -4266,7 +4266,9 @@ function myNight(s) {
     else acts.push('<button class="btn primary" data-act="openMatchReq">Request a match</button>');
     acts.push('<button class="btn" data-act="imLeaving">I\'m leaving</button>');
   }
-  if (s.status !== 'finalized') acts.push('<button class="btn" data-act="pubStepDown">Move me to the waitlist</button>');
+  // Owner comment, November 11, 2026: no "Move me to the waitlist" while you're in a match (on court, playing or queued).
+  const inMatch = s.status === 'active' && (!!busyOf(s, v.id) || waiting(s).some((mm) => all(mm).includes(v.id)));
+  if (s.status !== 'finalized' && !inMatch) acts.push('<button class="btn" data-act="pubStepDown">Move me to the waitlist</button>');
   if (invite) acts.push(invite);
   return `<section class="card stack${hl ? ' hl' : ''}" aria-label="My night"><span class="label">My night</span>${stats}${lines.map((t) => `<p>${t}</p>`).join('')}${acts.length ? `<div class="row acts">${acts.join('')}</div>` : ''}</section>`;
 }

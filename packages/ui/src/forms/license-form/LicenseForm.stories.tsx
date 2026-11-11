@@ -87,12 +87,12 @@ export const Free: Story = {
     defaultValues: { startsOn: ADMIN_LICENSE_TODAY },
   },
 }
-/** Review with nothing chosen: plan, start, date paid and amount messages. */
+/** Review with nothing chosen: plan, date paid and amount messages (the start is computed). */
 export const Errors: Story = {
-  args: { defaultValues: { startsOn: '', paidOn: '' } },
+  args: { defaultValues: { startsOn: ADMIN_LICENSE_TODAY, paidOn: '' } },
   play: review,
 }
-/** A payment date after today, an amount with centavos and a reference over 40 characters. */
+/** A payment date after today, an amount with centavos and a note over 40 characters. */
 export const InvalidValues: Story = {
   args: {
     defaultValues: {
@@ -108,7 +108,7 @@ export const InvalidValues: Story = {
 export const FreeErrors: Story = {
   ...Free,
   play: review,
-  args: { ...Free.args, defaultValues: {} },
+  args: { ...Free.args, defaultValues: { startsOn: ADMIN_LICENSE_TODAY } },
 }
 export const Pending: Story = { args: { ...RenewActive.args, isPending: true } }
 export const ServerError: Story = {

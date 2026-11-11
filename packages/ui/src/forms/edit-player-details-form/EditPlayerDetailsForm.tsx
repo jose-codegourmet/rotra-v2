@@ -135,7 +135,7 @@ export function EditPlayerDetailsForm({
                   ? undefined
                   : claim
                     ? 'This profile has no phone yet. They need one to register.'
-                    : 'With a phone, ROTRA can match or create their profile when it syncs.'
+                    : "With a phone, ROTRA can link them to their account if they're registered, when it syncs."
               }
             >
               <Controller

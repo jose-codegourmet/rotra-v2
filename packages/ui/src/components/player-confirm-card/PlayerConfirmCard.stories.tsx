@@ -6,7 +6,6 @@ import {
   storyIdentityPlayers,
 } from '@rotra/data/fixtures/players'
 import type { PlayingLevel } from '@rotra/data/player/types'
-import type { IdentityCheck } from '@rotra/data/session-roster/types'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 import { fn } from 'storybook/test'
@@ -34,24 +33,14 @@ const propsFor = (p: ClubPlayer): PlayerConfirmCardProps => ({
   suggestion: p.playingLevel,
   level: p.playingLevel,
   onLevelChange: fn(),
-  onCheckChange: fn(),
   onBack: fn(),
   onConfirm: fn(),
 })
 
-/** Holds the level and the identity check like the sheet does. */
+/** Holds the level like the sheet does. */
 function Demo(props: PlayerConfirmCardProps) {
   const [level, setLevel] = useState<PlayingLevel | null>(props.level)
-  const [check, setCheck] = useState<IdentityCheck | null>(props.check ?? null)
-  return (
-    <PlayerConfirmCard
-      {...props}
-      level={level}
-      onLevelChange={setLevel}
-      check={check}
-      onCheckChange={setCheck}
-    />
-  )
+  return <PlayerConfirmCard {...props} level={level} onLevelChange={setLevel} />
 }
 
 const meta = {
@@ -64,17 +53,17 @@ const meta = {
       </div>
     ),
   ],
-  args: propsFor(unclaimed),
+  // Unclaimed players have no RTR ID until they register (D-2026-11-11-03).
+  args: { ...propsFor(unclaimed), rtrId: null, suggestion: null, level: null },
   render: (args) => <Demo {...args} />,
 } satisfies Meta<typeof PlayerConfirmCard>
 
 export default meta
 type Story = StoryObj<typeof meta>
 
-/** An unclaimed saved player: the primary waits until a check is chosen. */
-export const UnclaimedNoCheck: Story = {}
-
-export const UnclaimedChecked: Story = { args: { check: 'rtr-id' } }
+/** An unclaimed saved player with no level: "Not registered yet", no identity check, pick a level. */
+export const UnclaimedNoLevel: Story = {}
+export const UnclaimedNoLevelLight: Story = { globals: { theme: 'light' } }
 
 export const HiddenPhone: Story = { args: { phoneHidden: true } }
 
@@ -91,7 +80,8 @@ export const FromPlayerInformation: Story = {
 
 export const Registered: Story = { args: propsFor(registered) }
 
-export const Guest: Story = { args: { ...propsFor(guest), level: null } }
+export const Guest: Story = { args: { ...propsFor(guest), rtrId: null, level: null } }
+export const GuestLight: Story = { ...Guest, globals: { theme: 'light' } }
 
 export const LiveSession: Story = { args: { ...propsFor(registered), live: true } }
 

@@ -31,13 +31,12 @@ const activate: LicenseReviewProps = {
   endsOn: '2027-10-26',
   payment: { amountMinor: 1500000, paidOn: ADMIN_LICENSE_TODAY },
   planPriceMinor: 1500000,
-  reference: 'LIC-0022',
+  reference: 'GCash transfer 8812',
   effects: [
     canUse('Banilad Smash Club', ADMIN_LICENSE_TODAY, '2027-10-26'),
     STILL_ONE_SESSION,
     ADDS_RECORD,
   ],
-  overlapDays: 0,
   onBack: fn(),
   onConfirm: fn(),
 }
@@ -51,20 +50,20 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
+/** A typed note: Reference reads "LIC number assigned when saved", Note shows the text. */
 export const Activate: Story = {}
-/** Lahug is active until Mar 31, 2027; a yearly term from Mar 1 overlaps it by 31 days. */
-export const RenewOverlap: Story = {
+/** Lahug is active until Mar 31, 2027: the renewal starts the day after, Apr 1, 2027. No note. */
+export const Renew: Story = {
   args: {
     verb: 'Renew',
     club: { name: lahug.name, username: lahug.username },
     plan: 'Yearly',
-    startsOn: '2027-03-01',
-    endsOn: '2028-02-29',
+    startsOn: '2027-04-01',
+    endsOn: '2028-03-31',
     payment: { amountMinor: lahug.licenseYearlyMinor, paidOn: ADMIN_LICENSE_TODAY },
     planPriceMinor: lahug.licenseYearlyMinor,
     reference: '',
-    effects: [canUse(lahug.name, '2027-03-01', '2028-02-29'), STILL_ONE_SESSION, ADDS_RECORD],
-    overlapDays: 31,
+    effects: [canUse(lahug.name, '2027-04-01', '2028-03-31'), STILL_ONE_SESSION, ADDS_RECORD],
   },
 }
 /** Talamban expired on Oct 1 and paid less than its monthly price; renewing restores its pages. */
@@ -77,7 +76,7 @@ export const AmountDiffers: Story = {
     endsOn: '2026-11-26',
     payment: { amountMinor: 120000, paidOn: '2026-10-26' },
     planPriceMinor: talamban.licenseMonthlyMinor,
-    reference: 'LIC-0022',
+    reference: 'GCash transfer 8812',
     effects: [
       canUse(talamban.name, ADMIN_LICENSE_TODAY, '2026-11-26'),
       `Restores the club's stale public pages and cancels the deletion scheduled for ${formatYmd('2027-04-01')}.`,
@@ -122,14 +121,14 @@ export const Free: Story = {
     ],
   },
 }
-export const Saving: Story = { args: { ...RenewOverlap.args, isPending: true } }
+export const Saving: Story = { args: { ...Renew.args, isPending: true } }
 /** After Check status found nothing (rotra-admin.html licCheck). */
 export const ServerError: Story = {
-  args: { ...RenewOverlap.args, serverError: "It wasn't saved. You can save it again." },
+  args: { ...Renew.args, serverError: "It wasn't saved. You can save it again." },
 }
-export const Phone: Story = { ...RenewOverlap, globals: { viewport: { value: 'phone' } } }
-export const Desktop: Story = { ...RenewOverlap, globals: { viewport: { value: 'desktop' } } }
+export const Phone: Story = { ...Renew, globals: { viewport: { value: 'phone' } } }
+export const Desktop: Story = { ...Renew, globals: { viewport: { value: 'desktop' } } }
 export const ActivateLight: Story = { globals: { theme: 'light' } }
-export const RenewOverlapLight: Story = { ...RenewOverlap, globals: { theme: 'light' } }
+export const RenewLight: Story = { ...Renew, globals: { theme: 'light' } }
 export const AmountDiffersLight: Story = { ...AmountDiffers, globals: { theme: 'light' } }
 export const FreeLight: Story = { ...Free, globals: { theme: 'light' } }

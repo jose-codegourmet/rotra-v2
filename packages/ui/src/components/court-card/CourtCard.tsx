@@ -17,7 +17,10 @@ type CourtCardBase = {
   bookingEnded?: boolean
   /** Opened before its planned start (Start anyway): the time line reads "Opened early · planned START – UNTIL" */
   openedEarly?: boolean
-  /** ⋯ menu: Edit the court's label and window; disabled "A match is on this court" while a match is on it */
+  /**
+   * ⋯ menu: "Edit" the court's label and window, or "Change time" while a match is on it (always
+   * enabled; the court sheet keeps a used start fixed and the match is not touched)
+   */
   onEdit?: () => void
   /** ⋯ menu: Undo early open, back to Not open yet; disabled while a match is on the court */
   onUndoEarlyOpen?: () => void
@@ -144,7 +147,7 @@ function TimeLine({
   )
 }
 
-/** Swap (Getting ready only), Edit, Undo early open and Remove; the card keeps only the actions for its state. */
+/** Swap (Getting ready only), Edit / Change time, Undo early open and Remove; the card keeps only the actions for its state. */
 function CourtMenu({
   label,
   busy,
@@ -175,12 +178,7 @@ function CourtMenu({
             disabledReason: 'No other waiting match is ready',
           },
     )
-  if (onEdit)
-    items.push({
-      label: 'Edit',
-      onSelect: onEdit,
-      disabledReason: busy ? 'A match is on this court' : undefined,
-    })
+  if (onEdit) items.push({ label: busy ? 'Change time' : 'Edit', onSelect: onEdit })
   if (onUndoEarlyOpen)
     items.push({
       label: 'Undo early open',

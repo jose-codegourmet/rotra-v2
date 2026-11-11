@@ -79,9 +79,19 @@ export const Light: Story = {
   globals: { theme: 'light' },
 }
 export const HiddenPhone: Story = { args: propsFor(byName('Jose'), { phoneHidden: true }) }
+/**
+ * Unclaimed (club-only, D-2026-11-11-03): "Saved by your club with a phone. Not registered with
+ * ROTRA yet", Registered in "Not registered yet", RTR ID "Given when they register".
+ */
 export const Unclaimed: Story = {
-  args: propsFor(storyIdentityPlayers.unclaimed, { sessionsHere: 5 }),
+  args: propsFor(storyIdentityPlayers.unclaimed, {
+    sessionsHere: 5,
+    rtrId: null,
+    registeredCity: null,
+  }),
 }
+export const UnclaimedLight: Story = { ...Unclaimed, globals: { theme: 'light' } }
+export const UnclaimedPhone: Story = { ...Unclaimed, globals: { viewport: { value: 'phone' } } }
 export const Guest: Story = { args: propsFor(storyIdentityPlayers.guest, { sessionsHere: 1 }) }
 /** Saved players footer: Delete player, Edit details and Invite. */
 export const SavedPlayerActions: Story = {

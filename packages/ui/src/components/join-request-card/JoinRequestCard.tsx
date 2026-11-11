@@ -17,6 +17,7 @@ export type JoinRequestCardVariant =
   | 'full'
   | 'active'
   | 'off'
+  | 'started'
   | 'sent'
   | 'confirmed-slot'
   | 'confirmed-waitlist'
@@ -67,10 +68,23 @@ export type JoinRequestCardProps = CommonProps &
         /** Every slot is taken: confirmed guests join the waitlist; Request to join stays */
         variant: 'full'
       } & AvailabilityProps)
-    | ({ variant: 'active' } & AvailabilityProps)
+    | ({
+        /**
+         * Superseded (owner, November 11, 2026): join requests close at Start, so a live session
+         * shows `started` instead. Kept until the public page moves over.
+         */
+        variant: 'active'
+      } & AvailabilityProps)
     | {
         /** The club turned Accept join requests off: contact the Queue Master instead */
         variant: 'off'
+      }
+    | {
+        /**
+         * The session has started: online join requests are closed, for visitors and signed-in
+         * players alike; the Queue Master adds late players at the venue
+         */
+        variant: 'started'
       }
     | {
         /** This visitor's request is waiting for the Queue Master */
@@ -158,7 +172,8 @@ function statusOf(props: StatusProps): {
 
 /**
  * Q-PUBLIC-JOIN › the public session page's Want to play? card (prototype joinCard / .join-card):
- * open or full with Request to join, off when the club is not taking requests online, and the
+ * open or full with Request to join, off when the club is not taking requests online, started once
+ * the session is live (online join requests closed), and the
  * visitor's own status afterwards: Request sent, Confirmed · you have a slot, Confirmed ·
  * waitlist #N, or Request not accepted. A request is never a booking.
  */
@@ -168,12 +183,14 @@ export function JoinRequestCard(props: JoinRequestCardProps) {
   // .join-card: the card keeps the accent border in every variant.
   const cardClass = cn('flex flex-col gap-3 border-accent', props.className)
 
-  if (props.variant === 'off') {
+  if (props.variant === 'off' || props.variant === 'started') {
     return (
       <Card asChild className={cardClass}>
         <section aria-label="Want to play?">
           <p className="m-0 text-[13px] text-fg2">
-            This session isn't taking requests online. Contact the Queue Master to play.
+            {props.variant === 'started'
+              ? 'The session has started, so online join requests are closed. Ask the Queue Master at the venue to add you.'
+              : "This session isn't taking requests online. Contact the Queue Master to play."}
           </p>
         </section>
       </Card>

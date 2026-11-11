@@ -162,9 +162,32 @@ export const BeforeStart: Story = { args: { showPresence: false } }
 export const ReadOnly: Story = { args: { ...Locked.args, readOnly: true } }
 
 export const Grid: Story = { args: { view: 'grid' } }
+/** 640 px and narrower: two columns of compact cards (picture on top, remove × in the corner). */
 export const GridPhone: Story = {
   args: { view: 'grid' },
   globals: { viewport: { value: 'phone' } },
+}
+export const GridPhoneLight: Story = {
+  args: { view: 'grid' },
+  globals: { viewport: { value: 'phone' }, theme: 'light' },
+}
+/** After Start: Present / Away text centred, levels fixed, no remove ×. */
+export const GridPhoneLocked: Story = {
+  args: { ...Locked.args, view: 'grid' },
+  globals: { viewport: { value: 'phone' } },
+}
+export const GridPhoneLockedLight: Story = {
+  args: { ...Locked.args, view: 'grid' },
+  globals: { viewport: { value: 'phone' }, theme: 'light' },
+}
+/** From 641 px up the grid is unchanged. */
+export const GridDesktop: Story = {
+  args: { view: 'grid' },
+  globals: { viewport: { value: 'desktop' } },
+}
+export const GridDesktopLight: Story = {
+  args: { view: 'grid' },
+  globals: { viewport: { value: 'desktop' }, theme: 'light' },
 }
 export const TabAdvanced: Story = { args: { levelTab: 'advanced' } }
 export const TabIntermediate: Story = { args: { levelTab: 'intermediate' } }
@@ -190,6 +213,10 @@ const picturePlayers = rosterPlayers.map((p, index) => ({
 }))
 export const WithPictures: Story = { args: { players: picturePlayers } }
 export const WithPicturesGrid: Story = { args: { players: picturePlayers, view: 'grid' } }
+export const WithPicturesGridPhone: Story = {
+  args: { players: picturePlayers, view: 'grid' },
+  globals: { viewport: { value: 'phone' } },
+}
 
 // #735: Move to waitlist on rows and cards, and the summary with expected games, over capacity.
 export const WithMoveToWaitlist: Story = {

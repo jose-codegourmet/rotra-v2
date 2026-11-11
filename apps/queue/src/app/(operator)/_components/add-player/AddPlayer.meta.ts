@@ -3,7 +3,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const addPlayerMeta = {
   name: 'AddPlayer',
   description:
-    'The Add player sheet container (Q-ADD-PLAYER / Q-IDENTIFY / Q-ASSESS): AddPlayerSheet on useAddSavedPlayerToSession, useAddDirectoryPlayerToSession and useAddNewPlayerToSession, saved players from useClubPlayers, Player Information results from usePlayerDirectorySearch, and the one-tap rule from needsConfirmStep.',
+    'The Add player sheet container (Q-ADD-PLAYER / Q-ASSESS): AddPlayerSheet on useAddSavedPlayerToSession, useAddDirectoryPlayerToSession and useAddNewPlayerToSession, saved players from useClubPlayers, Player Information results from usePlayerDirectorySearch. A pick with a level is added in one tap (the sheet decides); no identity check.',
   usage: [
     'Opened from Add player in preparation and Add late player in the live console (live follows the session state) with a sessionId, and from Saved players › Add player without one; keep one instance per page.',
     "Without a sessionId it uses the sheet's club context on useAddNewSavedPlayer and useAddDirectoryPlayerToClub: it saves to the saved players only and never touches a session; an already-saved profile or phone returns the sheet to the list.",

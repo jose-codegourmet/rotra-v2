@@ -1,12 +1,13 @@
 'use client'
 
 import type { SessionCourt } from '@rotra/data/queue-session/types'
-import { courtNextDay } from '@rotra/schema/court-window'
 import { Button } from '@rotra/ui/button'
+import { Chip } from '@rotra/ui/chip'
 import { DateTimePicker } from '@rotra/ui/date-time-picker'
 import { Field } from '@rotra/ui/field'
+import { ListRow } from '@rotra/ui/list-row'
 import { Notice } from '@rotra/ui/notice'
-import { formatTime, formatWhen } from '@rotra/ui/now-card/helpers'
+import { formatWhen } from '@rotra/ui/now-card/helpers'
 import { sessionEndStatus } from '@rotra/ui/overdue-banner'
 import { Sheet } from '@rotra/ui/sheet'
 import { ceilToQuarterHour } from '@rotra/ui/start-session-sheet/helpers'
@@ -14,20 +15,41 @@ import { useEffect, useRef, useState } from 'react'
 
 export type ExtendMinutes = 30 | 60
 
+/** A court's state in the sheet: a started match, a match placed but not started, or none */
+export type CourtsTimeStatus = 'playing' | 'getting-ready' | 'free'
+
+const STATUS_CHIP: Record<
+  CourtsTimeStatus,
+  { label: string; tone: 'accent' | 'warn' | 'neutral' }
+> = {
+  playing: { label: 'Playing', tone: 'accent' },
+  'getting-ready': { label: 'Getting ready', tone: 'warn' },
+  free: { label: 'Free', tone: 'neutral' },
+}
+
 export type CourtsAndTimeSheetProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
-  /** The session's courts (not removed), in order, with booking windows and edit/removal guards. */
+  /**
+   * The session's courts (not removed), in order, each with its booking window and state. `status`
+   * picks the Playing / Getting ready / Free chip; without it a court with `occupied` reads Playing.
+   * `openedEarly` (Start anyway) makes the booking line "Opened early · planned START – UNTIL".
+   */
   courts: (Pick<SessionCourt, 'id' | 'label'> & {
     startsAt?: number
     openUntil?: number | null
+    status?: CourtsTimeStatus
+    openedEarly?: boolean
     occupied?: boolean
     used?: boolean
   })[]
-  /** When play began; the New end may be up to 24 h after it, and "· next day" counts from it */
+  /** When play began; the New end may be up to 24 h after it */
   startsAt?: number
+  /**
+   * "Change time" on a court row: the container opens the court sheet (AddCourtForm editing), where
+   * the planned start stays fixed once the court was used. Works while a match is on the court.
+   */
   onEditCourt?: (courtId: string) => void
-  onRemoveCourt?: (courtId: string) => void
   serverError?: string
   /** The session's planned end, shown as "Ends 9:00 PM" with its day */
   endsAt: number
@@ -66,9 +88,10 @@ function newEndPrefill(endsAt: number, now: number): number {
 }
 
 /**
- * Q-SESSION-ADJUST › Courts and time: the session's court labels with "Add a court…", the end time
- * with a New end picker, Set end time and the Extend 30 min / Extend 60 min shortcuts, and the notes
- * that the start is fixed and nothing running is changed here.
+ * Q-SESSION-ADJUST › Courts and time (D-COURTS-TIME): one row per court with its Playing / Getting
+ * ready / Free chip, booking line and Change time, then "Add a court…", the end time with a New end
+ * picker, Set end time and the Extend 30 min / Extend 60 min shortcuts, and the notes that the start
+ * is fixed and a court's time change doesn't touch its match.
  */
 export function CourtsAndTimeSheet({
   open,
@@ -76,7 +99,6 @@ export function CourtsAndTimeSheet({
   courts,
   startsAt,
   onEditCourt,
-  onRemoveCourt,
   serverError,
   endsAt,
   onAddCourt,
@@ -144,50 +166,48 @@ export function CourtsAndTimeSheet({
     >
       {serverError ? <Notice tone="error">{serverError}</Notice> : null}
       <div className="flex min-w-0 flex-col gap-1.5">
-        <span className="text-[13px] font-semibold text-fg2">Courts</span>
-        {courts.map((court) => (
-          <div
-            key={court.id}
-            className="flex flex-wrap items-center justify-between gap-2 border-b border-border py-2"
-          >
-            <div>
-              <b>{court.label}</b>
-              <p className="text-[13px] text-fg2">
-                {court.startsAt !== undefined
-                  ? `${formatTime(court.startsAt)}${startsAt !== undefined && courtNextDay(court.startsAt, startsAt) ? ' · next day' : ''} – `
-                  : ''}
-                {formatTime(court.openUntil ?? endsAt)}
-                {startsAt !== undefined && courtNextDay(court.openUntil ?? endsAt, startsAt)
-                  ? ' · next day'
-                  : ''}
-                {court.used ? ' · start fixed after use' : ''}
-              </p>
-            </div>
-            <div className="flex gap-2">
-              {onEditCourt ? (
-                <Button size="sm" disabled={isPending} onClick={() => onEditCourt(court.id)}>
-                  Edit {court.label}
-                </Button>
-              ) : null}
-              {onRemoveCourt ? (
-                <Button
-                  size="sm"
-                  disabled={isPending || court.occupied || courts.length === 1}
-                  title={
-                    court.occupied
-                      ? 'Only a free court can be removed'
-                      : courts.length === 1
-                        ? 'A session needs at least one court'
-                        : undefined
-                  }
-                  onClick={() => onRemoveCourt(court.id)}
-                >
-                  Remove {court.label}
-                </Button>
-              ) : null}
-            </div>
-          </div>
-        ))}
+        <span className="text-[13px] font-semibold text-fg2">Courts · {courts.length}</span>
+        <div className="flex flex-col divide-y divide-border">
+          {courts.map((court) => {
+            const status = STATUS_CHIP[court.status ?? (court.occupied ? 'playing' : 'free')]
+            const until = court.openUntil ?? endsAt
+            const ended = now > until
+            const untilText = formatWhen(until, now, { lower: true })
+            return (
+              <ListRow
+                key={court.id}
+                className="py-2"
+                title={
+                  <span className="flex flex-wrap items-center gap-2">
+                    {court.label}
+                    <Chip tone={status.tone}>{status.label}</Chip>
+                  </span>
+                }
+                subtitle={
+                  ended ? (
+                    <span className="text-warn">Booking ended {untilText}</span>
+                  ) : court.openedEarly && court.startsAt !== undefined ? (
+                    `Opened early · planned ${formatWhen(court.startsAt, now, { lower: true })} – ${untilText}`
+                  ) : (
+                    `Until ${untilText}`
+                  )
+                }
+                trailing={
+                  onEditCourt ? (
+                    <Button
+                      size="xs"
+                      disabled={isPending}
+                      aria-label={`Change time for ${court.label}`}
+                      onClick={() => onEditCourt(court.id)}
+                    >
+                      Change time
+                    </Button>
+                  ) : null
+                }
+              />
+            )
+          })}
+        </div>
       </div>
       <div className="flex flex-wrap items-center gap-2">
         <Button size="sm" disabled={isPending} onClick={onAddCourt}>
@@ -270,8 +290,8 @@ export function CourtsAndTimeSheet({
       )}
       <p className="m-0 text-[13px] text-fg2">Start time is fixed: it records when play began.</p>
       <p className="m-0 text-[13px] text-fg2">
-        Occupied courts can't be removed, and running matches aren't changed here. Changing mode,
-        formats or the minimum during play hasn't been decided.
+        Changing a court's time while a match is on it doesn't touch the match. Occupied courts
+        can't be removed. Changing mode, formats or the minimum during play hasn't been decided.
       </p>
     </Sheet>
   )

@@ -19,7 +19,7 @@ export type LicenseSchemaOptions = {
 /**
  * A-LICENSE details step (rotra-admin.html licErrors). Paid clubs need the date paid (not in the
  * future) and a whole amount in pesos above zero (moneyField via parseWholePesos); free clubs skip both.
- * The reference stays optional.
+ * The note (`reference`) stays optional. startsOn is computed by the container, not typed.
  */
 export function createLicenseSchema({ isFree, today }: LicenseSchemaOptions) {
   const paidOn = isFree
@@ -45,10 +45,7 @@ export function createLicenseSchema({ isFree, today }: LicenseSchemaOptions) {
       startsOn: z.string().refine(isYmd, 'Enter the date the term starts.'),
       paidOn,
       amount,
-      reference: z
-        .string()
-        .trim()
-        .max(LICENSE_REFERENCE_MAX, 'Keep the reference under 40 characters.'),
+      reference: z.string().trim().max(LICENSE_REFERENCE_MAX, 'Keep the note under 40 characters.'),
     })
     .transform(({ plan, startsOn, paidOn, amount, reference }) => ({
       plan,

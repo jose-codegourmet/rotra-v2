@@ -1,7 +1,6 @@
 'use client'
 
 import type { PlayingLevel } from '@rotra/data/player/types'
-import type { IdentityCheck } from '@rotra/data/session-roster/types'
 import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
 import { cn } from '@rotra/ui/cn'
@@ -15,11 +14,7 @@ import type {
 import { IdentityChip } from '@rotra/ui/identity-chip'
 import type { Identity } from '@rotra/ui/identity-chip/variants'
 import { Notice } from '@rotra/ui/notice'
-import {
-  canConfirmPlayer,
-  needsIdentityCheck,
-  PlayerConfirmCard,
-} from '@rotra/ui/player-confirm-card'
+import { PlayerConfirmCard } from '@rotra/ui/player-confirm-card'
 import { SegmentedControl } from '@rotra/ui/segmented-control'
 import { Sheet } from '@rotra/ui/sheet'
 import { Skeleton } from '@rotra/ui/skeleton'
@@ -37,7 +32,7 @@ export type AddPlayerCandidate = {
   identity: Identity
   /** Player Information suggestion; null when the player has no level yet */
   suggestion: PlayingLevel | null
-  /** The player hides their phone from clubs: the Phone confirmed check is left out */
+  /** The player hides their phone from clubs: the card says so instead of showing a number */
   phoneHidden?: boolean
   /** Player Information rows only: "Rank 214" or "Not ranked yet" */
   rankLabel?: string
@@ -50,8 +45,6 @@ export type AddPlayerConfirmInput = {
   candidate: AddPlayerCandidate
   source: AddPlayerSource
   level: PlayingLevel
-  /** The check chosen for an unclaimed profile; null for registered profiles and guests */
-  identityCheck: IdentityCheck | null
 }
 
 /** Saving to the saved players with no session: the level may stay empty (no level yet). */
@@ -102,11 +95,6 @@ export type AddPlayerSheetProps = (AddPlayerSessionContext | AddPlayerClubContex
   directoryResults?: AddPlayerCandidate[]
   /** Player Information lookup running: Skeleton rows (the container must end it, it never spins forever) */
   directoryLoading?: boolean
-  /**
-   * Decides whether a pick opens the confirmation card. Omitted, every pick does; a container can
-   * pass the one-tap rule (registered profile with a level) so those are confirmed straight away.
-   */
-  needsConfirmStep?: (candidate: AddPlayerCandidate, source: AddPlayerSource) => boolean
   /** An add is running: primaries show a spinner and nothing fires twice */
   isPending?: boolean
   /** Why the last add was refused; shown on the card or the form, nothing is claimed as added */
@@ -173,8 +161,9 @@ function CandidateRow({
 
 /**
  * Q-ADD-PLAYER: the Add player sheet that stays open while adding. Saved players, Player
- * Information and New player tabs; picking a player shows PlayerConfirmCard (titled Confirm player
- * for unclaimed profiles). After each add the container passes lastAdded and a new addedCount: the
+ * Information and New player tabs. A pick with a level is added in one tap at that level; a pick
+ * without one opens PlayerConfirmCard for the level. No identity check; the title is always "Add
+ * player" (owner, November 11, 2026). After each add the container passes lastAdded and a new addedCount: the
  * tab clears and focus returns to its first field. A refusal (serverError) stays on the card or the
  * form with what was typed; with serverErrorReturnsToList it drops the card and shows above the list.
  */
@@ -186,7 +175,6 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
     onDirectorySearch,
     directoryResults = [],
     directoryLoading = false,
-    needsConfirmStep,
     isPending = false,
     serverError,
     serverErrorReturnsToList = false,
@@ -208,7 +196,6 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
     source: AddPlayerSource
   } | null>(null)
   const [level, setLevel] = useState<PlayingLevel | null>(null)
-  const [check, setCheck] = useState<IdentityCheck | null>(null)
   const [levelError, setLevelError] = useState('')
   // Remounts the search field or the form so it starts empty after an add.
   const [round, setRound] = useState(0)
@@ -217,7 +204,6 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
     setQuery('')
     setPick(null)
     setLevel(null)
-    setCheck(null)
     setLevelError('')
     setRound((r) => r + 1)
   }
@@ -273,15 +259,15 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
     else if (input.level) props.onConfirm({ ...input, level: input.level })
   }
 
+  // Any pick with a level is added in one tap at that level (it can still change on the roster
+  // before Start); without one, the level step opens.
   const pickCandidate = (candidate: AddPlayerCandidate, source: AddPlayerSource) => {
-    const confirmStep = needsConfirmStep?.(candidate, source) ?? true
-    if (!confirmStep && candidate.suggestion) {
-      confirm({ candidate, source, level: candidate.suggestion, identityCheck: null })
+    if (candidate.suggestion) {
+      confirm({ candidate, source, level: candidate.suggestion })
       return
     }
     setPick({ candidate, source })
     setLevel(candidate.suggestion)
-    setCheck(null)
     setLevelError('')
   }
 
@@ -292,7 +278,7 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
       setLevelError(LEVEL_ERROR)
       return
     }
-    confirm({ candidate: pick.candidate, source: pick.source, level, identityCheck: check })
+    confirm({ candidate: pick.candidate, source: pick.source, level })
   }
 
   const full = session !== null && !live && session.openSlots <= 0
@@ -300,7 +286,6 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
   const inSession = new Set(session?.inSessionIds)
   const alreadyCount = savedPlayers.filter((p) => inSession.has(p.id)).length
   const savedList = savedPlayers.filter((p) => !inSession.has(p.id) && matches(p, q))
-  const confirming = pick ? needsIdentityCheck(pick.candidate.identity) : false
   const primaryLabel = addPlayerSubmitLabel(full, false, props.context)
 
   const closeLabel = addedCount > 0 ? 'Done' : 'Cancel'
@@ -317,12 +302,7 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
         <Button disabled={isPending} onClick={() => setPick(null)}>
           Back
         </Button>
-        <Button
-          variant="primary"
-          loading={isPending}
-          disabled={!canConfirmPlayer(pick.candidate.identity, check)}
-          onClick={confirmPick}
-        >
+        <Button variant="primary" loading={isPending} onClick={confirmPick}>
           {primaryLabel}
         </Button>
       </>
@@ -344,7 +324,7 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
       onOpenChange={(next) => {
         if (!isPending) onOpenChange(next)
       }}
-      title={confirming ? 'Confirm player' : 'Add player'}
+      title="Add player"
       dismissible={!isPending}
       hideClose={isPending}
       footer={footer}
@@ -385,8 +365,6 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
             setLevel(next)
             setLevelError('')
           }}
-          check={check}
-          onCheckChange={setCheck}
           live={live}
           full={full}
           context={props.context}
@@ -427,7 +405,10 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
                     <CandidateRow
                       key={candidate.id}
                       candidate={candidate}
-                      subtitle={candidate.rtrId ?? 'Guest'}
+                      subtitle={
+                        candidate.rtrId ??
+                        (candidate.identity === 'unclaimed' ? 'Not registered yet' : 'Guest')
+                      }
                       onPick={() => pickCandidate(candidate, 'saved')}
                       disabled={isPending}
                     />

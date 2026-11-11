@@ -90,6 +90,8 @@ export type DirectoryPlayerDto = {
   nickname: string | null
   rtrId: string
   identity: 'registered' | 'unclaimed'
+  /** The player's own profile picture (avatar reference), or null for initials */
+  picture: string | null
   /** The player's current rank level, or null when they have none yet */
   suggestion: string | null
   phoneHidden: boolean
@@ -126,6 +128,7 @@ export async function searchPlayerDirectory(
       fullName: true,
       nickname: true,
       profileState: true,
+      avatarRef: true,
       hidePhoneFromClubs: true,
       idAllocation: { select: { rtrId: true } },
       rankCurrent: { select: { skillLevelId: true } },
@@ -137,6 +140,7 @@ export async function searchPlayerDirectory(
     nickname: p.nickname,
     rtrId: p.idAllocation?.rtrId ?? '',
     identity: p.profileState === 'claimed' ? 'registered' : 'unclaimed',
+    picture: p.avatarRef ?? null,
     suggestion: levelCodeFor(p.rankCurrent?.skillLevelId ?? null),
     phoneHidden: p.hidePhoneFromClubs,
   }))

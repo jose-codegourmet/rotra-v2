@@ -140,6 +140,7 @@ export async function playerDirectorySearch(q: string): Promise<DirectoryPlayer[
     .map((p, _i) => ({
       ...p,
       identity: 'registered' as const,
+      picture: s.playerProfiles.find((profile) => profile.playerId === p.id)?.picture ?? null,
       suggestion: directoryLevel(p.id),
       rankLabel: `#${leaderboardPlayers.findIndex((entry) => entry.id === p.id) + 1}`,
     }))

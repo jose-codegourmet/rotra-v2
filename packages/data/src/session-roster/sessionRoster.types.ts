@@ -98,6 +98,8 @@ export type DirectoryPlayer = {
   nickname: string | null
   rtrId: string
   identity: 'registered' | 'unclaimed'
+  /** Their own profile picture as an avatar reference, or null for initials */
+  picture: string | null
   /** Their Player Information level, or null when they have none yet */
   suggestion: PlayingLevel | null
   /** "#214", or "Not ranked" */

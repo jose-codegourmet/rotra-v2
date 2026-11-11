@@ -25,11 +25,11 @@ Superseded by: none
 - Tokens: none new (banner uses --accent-dim, --accent, --accent-subtle; ring uses --surface).
 - Known differences: none
 
-## Owner comment, November 11, 2026 (second)
-- "since I am allowing a show banner in profile like discord — please add a corner for updating banner".
-- Changed: Edit profile › Name gets a **Profile banner** row under the picture row: a small preview of the current banner (the default gradient or the uploaded image), **Upload banner** (image file, up to 4 MiB) and **Remove banner** when one is set. In the mock the upload applies at once with the toast **Banner updated**; **Remove banner** restores the default gradient with **Banner removed**. The profile card shows the uploaded image as the banner (centred, cover). The banner is public, like the picture.
-- Copy added: **Profile banner**, **The strip across the top of your profile card, like a cover photo. Public. A wide image works best (about 3:1); up to 4 MiB.**, **Upload banner**, **Remove banner**, **Banner updated**, **Banner removed**, **Choose a banner smaller than 4 MiB.**
-- Not decided: cropping and the exact stored size; a Supabase Storage path like profile pictures ([D-2026-11-08-03](../mvp/decisions.md#d-2026-11-08-03)) is the obvious home.
+## Owner comments, November 11, 2026 (second and third)
+- "please add a corner for updating banner", then "the banner settings should show only predefined banners. it should not be uploadable".
+- Changed: Edit profile › Name gets a **Profile banner** block under the picture row: six predefined banners as swatches (**Court**, **Night**, **Dusk**, **Ember**, **Sun**, **Stripe**; a radio group), the current one outlined, and the line **Selected: Court**. Tapping a swatch applies it at once with the toast **Banner updated**. No upload and no remove: the default is Court. The profile card shows the chosen banner. The banner is public, like the picture. Every banner is drawn from the theme tokens, so both themes hold up.
+- Copy added: **Profile banner**, **The strip across the top of your profile card. Public. Pick one of ROTRA's banners; your own images can't be uploaded.**, **Selected: NAME**, the six banner names, **Banner updated**.
+- Not decided: whether the set of banners is managed by the platform owner in Admin like profile characters ([D-2026-11-09-13](../mvp/decisions.md#d-2026-11-09-13)) or fixed in code. The mock fixes it in code.
 
 ## Reuse plan
 - Reuses as is: card, avatar
@@ -41,4 +41,4 @@ Superseded by: none
 - none yet — proposal pending owner approval; screen docs follow when approved
 
 ## Real app work
-- `@rotra/ui` ProfileHero: banner strip and overlapping avatar, optional banner image. EditProfileForm: banner row with upload and remove. `@rotra/data` `bannerUrl` on the player profile; real mode stores it in Supabase Storage next to profile pictures (new column, migration sign-off needed).
+- `@rotra/ui` ProfileHero: banner strip and overlapping avatar, banner by key. EditProfileForm: banner radio group. `@rotra/data` `banner` key on the player profile; real mode needs one small column (migration sign-off needed). No storage.

@@ -4,6 +4,7 @@ import {
   AUTO_QUEUE_MODES,
   autoQueueDraftConflict,
   autoQueuePlayerCounts,
+  toggleBaggingGame,
 } from '@rotra/data/match/auto-queue-rules'
 import { activeMatchFor, allPlayers, shortName } from '@rotra/data/match/match.rules'
 import { useAutoQueueDrafts } from '@rotra/data/match/useAutoQueueDrafts'
@@ -12,14 +13,18 @@ import { useGenerateAutoQueueDrafts } from '@rotra/data/match/useGenerateAutoQue
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { useTransferAutoQueueDrafts } from '@rotra/data/match/useTransferAutoQueueDrafts'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
+import { levelLabel } from '@rotra/data/session-roster/sessionRoster.rules'
+import type { SessionPlayer } from '@rotra/data/session-roster/types'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import {
+  type AutoQueueBaggingProps,
   type AutoQueueCount,
   type AutoQueueMode,
   AutoQueueWorkspace,
   type AutoQueueWorkspaceProps,
   type QueueWorkspace,
 } from '@rotra/ui/auto-queue-workspace'
+import type { BaggingPlayer } from '@rotra/ui/bagging-pairs-card'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { toast } from '@rotra/ui/toaster'
 import { type ReactNode, useRef, useState } from 'react'
@@ -33,6 +38,14 @@ export type AutoQueueProps = {
 }
 const errorMessage = (error: unknown) =>
   error instanceof Error ? error.message : 'Something went wrong. Try again.'
+/** A roster player as the bagging surfaces draw them; a player gone from the roster keeps a name. */
+const baggingPlayer = (p: SessionPlayer | undefined, id: string): BaggingPlayer => ({
+  id,
+  name: p?.nameSnapshot ?? 'Player',
+  shortName: p ? shortName(p) : 'Player',
+  level: p?.level ?? null,
+  levelLabel: p?.level ? levelLabel(p.level) : null,
+})
 
 /** In-memory draft wiring; accepted matches remain the sole source for dispatch and shared counts. */
 export function AutoQueue({ sessionId, workspace, onWorkspaceChange, mainQueue }: AutoQueueProps) {
@@ -113,17 +126,61 @@ export function AutoQueue({ sessionId, workspace, onWorkspaceChange, mainQueue }
     }
   }
   const onEdit = async (input: Parameters<typeof edit.mutateAsync>[0]) => {
-    if (busy.current) return
+    if (busy.current) return false
     busy.current = true
     setTransferError(undefined)
     try {
       await edit.mutateAsync(input)
+      return true
     } catch (error) {
       setErrors((previous) => ({ ...previous, [mode]: errorMessage(error) }))
+      return false
     } finally {
       busy.current = false
     }
   }
+  // Bagging mode (#739): doubles only, kept with the drafts on this device. Names in the toasts are
+  // the roster's short names, like the pair rows.
+  const rosterPlayer = (id: string) => ctx.roster.find((p) => p.id === id)
+  const pairNames = (a: string, b: string) =>
+    `${baggingPlayer(rosterPlayer(a), a).shortName} and ${baggingPlayer(rosterPlayer(b), b).shortName}`
+  const bagging: AutoQueueBaggingProps | undefined = s.allowDoubles
+    ? {
+        enabled: state.bagging.enabled,
+        players: ctx.roster.filter((p) => p.present).map((p) => baggingPlayer(p, p.id)),
+        pairs: state.bagging.pairs.map((pair) => ({
+          id: pair.id,
+          a: baggingPlayer(rosterPlayer(pair.a), pair.a),
+          b: baggingPlayer(rosterPlayer(pair.b), pair.b),
+          games: pair.games,
+        })),
+        onEnabledChange: async (enabled) => {
+          if (await onEdit({ sessionId, action: 'bagging-enabled', enabled }))
+            toast(enabled ? 'Bagging mode on' : 'Bagging mode off')
+        },
+        onAddPair: async (pair) => {
+          const ok = await onEdit({ sessionId, action: 'bagging-add', ...pair })
+          if (ok) toast(`Bagging pair added · ${pairNames(pair.a, pair.b)}`)
+          return ok
+        },
+        onToggleGame: (pairId, value) => {
+          const pair = state.bagging.pairs.find((current) => current.id === pairId)
+          if (!pair) return
+          void onEdit({
+            sessionId,
+            action: 'bagging-games',
+            pairId,
+            games: toggleBaggingGame(pair.games, value, s.minimumGames),
+          })
+        },
+        onRemovePair: async (pairId) => {
+          const pair = state.bagging.pairs.find((current) => current.id === pairId)
+          if (!pair) return
+          if (await onEdit({ sessionId, action: 'bagging-remove', pairId }))
+            toast(`Pair removed · ${pairNames(pair.a, pair.b)}`)
+        },
+      }
+    : undefined
   const onTransfer = async (draftIds: string[]) => {
     if (busy.current) return false
     busy.current = true
@@ -191,6 +248,7 @@ export function AutoQueue({ sessionId, workspace, onWorkspaceChange, mainQueue }
         void onEdit({ sessionId, action: 'clear', mode: nextMode, unselectedOnly: true })
       }}
       onAddToMainQueue={onTransfer}
+      bagging={bagging}
     />
   )
 }

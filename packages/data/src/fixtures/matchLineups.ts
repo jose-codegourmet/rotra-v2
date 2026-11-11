@@ -5,7 +5,7 @@ import type { MatchFormat } from '../match/match.types'
 import { generateMatches, regenerateScope } from '../match/queue.rules'
 import type { PlayingLevel } from '../player/player.types'
 import type { SessionMode } from '../queue-session/queueSession.types'
-import { shortName } from '../session-roster/sessionRoster.rules'
+import { levelLabel, shortName } from '../session-roster/sessionRoster.rules'
 import type { SessionPlayer } from '../session-roster/sessionRoster.types'
 import { createConsoleFixtures } from './consoleSessions'
 
@@ -164,6 +164,37 @@ export function createMatchLineupFixtures(now = Date.now()) {
     },
   }
 
+  // Bagging mode (#739): every present player as the Add bagging pair sheet draws them, four pairs
+  // (the second on games 1 and 3), and a roster past one page of 24 for the pager.
+  const baggingPlayers = roster
+    .filter((p) => p.present)
+    .map((p) => ({
+      id: p.id,
+      name: p.nameSnapshot,
+      shortName: shortName(p),
+      level: p.level,
+      levelLabel: p.level ? levelLabel(p.level) : null,
+    }))
+  const baggingPlayer = (i: number) => {
+    const p = baggingPlayers[i]
+    if (!p) throw new Error('Missing roster fixture.')
+    return p
+  }
+  const bagging = {
+    minimumGames: session.minimumGames,
+    players: baggingPlayers,
+    pairs: [
+      { id: 'bagging-1', a: baggingPlayer(0), b: baggingPlayer(1), games: 'all' as const },
+      { id: 'bagging-2', a: baggingPlayer(2), b: baggingPlayer(3), games: [1, 3] },
+      { id: 'bagging-3', a: baggingPlayer(4), b: baggingPlayer(5), games: 'all' as const },
+      { id: 'bagging-4', a: baggingPlayer(6), b: baggingPlayer(7), games: 'all' as const },
+    ],
+    manyPlayers: Array.from({ length: 30 }, (_, i) => {
+      const p = baggingPlayer(i % baggingPlayers.length)
+      return i < baggingPlayers.length ? p : { ...p, id: `${p.id}-again-${i}` }
+    }),
+  }
+
   // Waiting matches 2, 3 and 4 are manual; 4 has an absent player, 1 is on court.
   const regenerate = {
     withCounts: regenerateScope(matches, ctx),
@@ -188,6 +219,7 @@ export function createMatchLineupFixtures(now = Date.now()) {
     bothFormatsOff,
     autoQueue,
     autoQueueWorkspace,
+    bagging,
     autoQueueCopyStates: {
       shortBatch: {
         drafts: [],
@@ -226,5 +258,10 @@ export function createAutoQueueDraftFixtures(now = Date.now()): AutoQueueDraftSt
     reason: 'Available players with the lowest planned load',
     fingerprint: autoQueueFingerprint(session, { roster, courts, matches }),
   }
-  return { batches: { available: { drafts: [draft] } }, selectedIds: [draft.id], committedIds: [] }
+  return {
+    batches: { available: { drafts: [draft] } },
+    selectedIds: [draft.id],
+    committedIds: [],
+    bagging: { enabled: false, pairs: [] },
+  }
 }

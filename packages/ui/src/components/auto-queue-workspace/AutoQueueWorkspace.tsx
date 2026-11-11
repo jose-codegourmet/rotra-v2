@@ -1,7 +1,14 @@
 'use client'
 
+import type { BaggingGames } from '@rotra/data/match/auto-queue-types'
 import type { MatchFormat } from '@rotra/data/match/types'
 import type { PlayingLevel } from '@rotra/data/player/types'
+import { BaggingPairSheet } from '@rotra/ui/bagging-pair-sheet'
+import {
+  BaggingPairsCard,
+  type BaggingPairView,
+  type BaggingPlayer,
+} from '@rotra/ui/bagging-pairs-card'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { Chip } from '@rotra/ui/chip'
@@ -12,6 +19,7 @@ import { OverflowMenu } from '@rotra/ui/overflow-menu'
 import { SegmentedControl } from '@rotra/ui/segmented-control'
 import { SelectionBar } from '@rotra/ui/selection-bar'
 import { Sheet } from '@rotra/ui/sheet'
+import { Switch } from '@rotra/ui/switch'
 import { Tabs, TabsContent } from '@rotra/ui/tabs'
 import { TextInput } from '@rotra/ui/text-input'
 import { DRAFT_TILE_MIN, useQueueColumns } from '@rotra/ui/upcoming-queue-row'
@@ -55,6 +63,28 @@ export type AutoQueueBatch = {
   error?: string
 }
 
+/**
+ * Bagging mode (#739): the session-wide switch in the header and, while on, the Bagging pairs card
+ * and the Add bagging pair sheet. Leave the prop out when the session has no doubles: the switch is
+ * then not offered.
+ */
+export type AutoQueueBaggingProps = {
+  enabled: boolean
+  onEnabledChange: (enabled: boolean) => void
+  pairs: BaggingPairView[]
+  /** Every present roster player, for the Add bagging pair sheet */
+  players: BaggingPlayer[]
+  /** Add pair / Replace pair: the container removes any pair either player was in */
+  onAddPair: (pair: {
+    a: string
+    b: string
+    games: BaggingGames
+  }) => boolean | void | Promise<boolean | void>
+  /** A tap on a pair's games row; the container applies toggleBaggingGame */
+  onToggleGame: (pairId: string, value: 'all' | number) => void
+  onRemovePair: (pairId: string) => void
+}
+
 export type AutoQueueWorkspaceProps = {
   workspace: QueueWorkspace
   onWorkspaceChange: (workspace: QueueWorkspace) => void
@@ -84,6 +114,8 @@ export type AutoQueueWorkspaceProps = {
   transferError?: string
   isPending?: boolean
   pendingMessage?: string
+  /** Bagging mode; omitted when the session has no doubles */
+  bagging?: AutoQueueBaggingProps
 }
 
 const MODE_ITEMS: { value: AutoQueueMode; label: string; shortLabel: string }[] = [
@@ -158,8 +190,10 @@ export function AutoQueueWorkspace({
   transferError,
   isPending = false,
   pendingMessage,
+  bagging,
 }: AutoQueueWorkspaceProps) {
   const hintId = useId()
+  const [addPairOpen, setAddPairOpen] = useState(false)
   const [gridRef, columns] = useQueueColumns<HTMLDivElement>(DRAFT_TILE_MIN)
   const [reviewIds, setReviewIds] = useState<string[] | null>(null)
   const reviewErrorRef = useRef<HTMLDivElement>(null)
@@ -244,14 +278,37 @@ export function AutoQueueWorkspace({
         </div>
       ) : (
         <div className="flex min-w-0 flex-col gap-5">
-          <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <h2 ref={headingRef} tabIndex={-1} className="m-0 text-xl font-bold text-fg">
-              Generate matches
-            </h2>
+          <div className="flex flex-col gap-1.5">
+            <div className="flex flex-wrap items-center justify-between gap-2.5">
+              <h2 ref={headingRef} tabIndex={-1} className="m-0 text-xl font-bold text-fg">
+                Generate matches
+              </h2>
+              {bagging ? (
+                <div className="flex flex-nowrap items-center gap-2 text-[13px] text-fg">
+                  <b aria-hidden="true">Bagging mode</b>
+                  <Switch
+                    aria-label="Bagging mode"
+                    checked={bagging.enabled}
+                    disabled={isPending}
+                    onChange={bagging.onEnabledChange}
+                  />
+                </div>
+              ) : null}
+            </div>
             <span className="text-[13px] text-fg2">
               Drafts are suggestions. Nothing joins the Main Queue until you add it.
             </span>
           </div>
+          {bagging?.enabled ? (
+            <BaggingPairsCard
+              pairs={bagging.pairs}
+              minimumGames={minimumGames}
+              disabled={isPending}
+              onAddPair={() => setAddPairOpen(true)}
+              onToggleGame={bagging.onToggleGame}
+              onRemove={bagging.onRemovePair}
+            />
+          ) : null}
           <Tabs
             aria-label="Generation strategy"
             items={MODE_ITEMS.map((item) => ({
@@ -483,6 +540,19 @@ export function AutoQueueWorkspace({
           </Tabs>
         </div>
       )}
+      {bagging ? (
+        <BaggingPairSheet
+          open={addPairOpen}
+          onOpenChange={setAddPairOpen}
+          players={bagging.players}
+          pairs={bagging.pairs}
+          minimumGames={minimumGames}
+          isPending={isPending}
+          onAdd={async (pair) => {
+            if ((await bagging.onAddPair(pair)) !== false) setAddPairOpen(false)
+          }}
+        />
+      ) : null}
       <Sheet
         open={reviewIds !== null}
         onOpenChange={(open) => {

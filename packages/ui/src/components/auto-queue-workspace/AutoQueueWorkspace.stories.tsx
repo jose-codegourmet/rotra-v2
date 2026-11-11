@@ -1,8 +1,10 @@
 import { matchLineupFixtures } from '@rotra/data/fixtures/match-lineups'
+import { toggleBaggingGame } from '@rotra/data/match/auto-queue-rules'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
-import { expect, fn } from 'storybook/test'
+import { expect, fn, within } from 'storybook/test'
 import {
+  type AutoQueueBaggingProps,
   type AutoQueueCount,
   type AutoQueueMode,
   AutoQueueWorkspace,
@@ -11,6 +13,57 @@ import {
 } from './AutoQueueWorkspace'
 
 const fixture = matchLineupFixtures.autoQueueWorkspace
+const baggingFixture = matchLineupFixtures.bagging
+
+/** Bagging mode props with the switch and the pairs list held in story state. */
+function useBaggingDemo(initial: AutoQueueBaggingProps | undefined) {
+  const [enabled, setEnabled] = useState(initial?.enabled ?? false)
+  const [pairs, setPairs] = useState(initial?.pairs ?? [])
+  if (!initial) return undefined
+  const bagging: AutoQueueBaggingProps = {
+    ...initial,
+    enabled,
+    pairs,
+    onEnabledChange: (next) => {
+      initial.onEnabledChange(next)
+      setEnabled(next)
+    },
+    onAddPair: (pair) => {
+      initial.onAddPair(pair)
+      const a = baggingFixture.players.find((p) => p.id === pair.a),
+        b = baggingFixture.players.find((p) => p.id === pair.b)
+      if (a && b)
+        setPairs((current) => [
+          ...current.filter((p) => ![pair.a, pair.b].some((id) => p.a.id === id || p.b.id === id)),
+          { id: `bagging-${pair.a}-${pair.b}`, a, b, games: pair.games },
+        ])
+    },
+    onToggleGame: (pairId, value) => {
+      initial.onToggleGame(pairId, value)
+      setPairs((current) =>
+        current.map((p) =>
+          p.id === pairId
+            ? { ...p, games: toggleBaggingGame(p.games, value, baggingFixture.minimumGames) }
+            : p,
+        ),
+      )
+    },
+    onRemovePair: (pairId) => {
+      initial.onRemovePair(pairId)
+      setPairs((current) => current.filter((p) => p.id !== pairId))
+    },
+  }
+  return bagging
+}
+const baggingArgs = (enabled: boolean, pairs = baggingFixture.pairs): AutoQueueBaggingProps => ({
+  enabled,
+  pairs,
+  players: baggingFixture.players,
+  onEnabledChange: fn(),
+  onAddPair: fn(),
+  onToggleGame: fn(),
+  onRemovePair: fn(),
+})
 
 function Demo(args: AutoQueueWorkspaceProps) {
   const [workspace, setWorkspace] = useState<QueueWorkspace>(args.workspace)
@@ -19,9 +72,11 @@ function Demo(args: AutoQueueWorkspaceProps) {
   const [target, setTarget] = useState(args.catchUpTarget)
   const [batches, setBatches] = useState(args.batches)
   const [selected, setSelected] = useState(args.selectedIds)
+  const bagging = useBaggingDemo(args.bagging)
   return (
     <AutoQueueWorkspace
       {...args}
+      bagging={bagging}
       workspace={workspace}
       onWorkspaceChange={setWorkspace}
       mode={mode}
@@ -199,5 +254,54 @@ export const NoEligiblePlayersAfterGeneration: Story = {
     count: 2,
     hasEligiblePlayers: false,
     batches: { available: matchLineupFixtures.autoQueueCopyStates.shortBatch },
+  },
+}
+
+/** Doubles session: the header switch, off. The list is kept but Generate ignores it. */
+export const BaggingOff: Story = { args: { count: 2, bagging: baggingArgs(false) } }
+/** Switch on with no pairs yet. */
+export const BaggingOnEmpty: Story = { args: { count: 2, bagging: baggingArgs(true, []) } }
+/** Switch on with pairs; the first draft carries the bagging reason line. */
+export const BaggingOnWithPairs: Story = {
+  args: {
+    count: 2,
+    bagging: baggingArgs(true),
+    batches: {
+      ...fixture,
+      available: {
+        ...fixture.available,
+        drafts: fixture.available.drafts.map((draft, i) =>
+          i === 0
+            ? {
+                ...draft,
+                reason: `Bagging pair: ${baggingFixture.pairs[0]?.a.shortName} and ${baggingFixture.pairs[0]?.b.shortName} are partners`,
+              }
+            : draft,
+        ),
+      },
+    },
+  },
+}
+/** No doubles in the session: no switch and no card (the `bagging` prop is left out). */
+export const BaggingHidden: Story = { args: { count: 2, batches: {} } }
+export const BaggingPhone: Story = {
+  args: { count: 2, bagging: baggingArgs(true) },
+  globals: { viewport: { value: 'phone' } },
+}
+/** Turn the switch on, open Add pair, pick two players and add them. */
+export const BaggingAddPair: Story = {
+  args: { count: 2, batches: {}, bagging: baggingArgs(false, []) },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('switch', { name: 'Bagging mode' }))
+    await expect(
+      canvas.getByText('No pairs yet. Add a pair to keep two players as partners.'),
+    ).toBeVisible()
+    await userEvent.click(canvas.getByRole('button', { name: 'Add pair' }))
+    const sheet = within(document.body)
+    const [first, second] = baggingFixture.players
+    await userEvent.click(sheet.getByRole('button', { name: new RegExp(`^${first!.name},`) }))
+    await userEvent.click(sheet.getByRole('button', { name: new RegExp(`^${second!.name},`) }))
+    await userEvent.click(sheet.getByRole('button', { name: 'Add pair' }))
+    await expect(canvas.getByRole('heading', { name: 'Bagging pairs · 1' })).toBeVisible()
   },
 }

@@ -134,6 +134,27 @@ export const PlayerRequests: Story = {
     },
   },
 }
+/** D-2026-11-11-02: one asks for a slot, one asks to be waitlisted, Derrick asks for a slot from waitlist #2. */
+export const Placements: Story = {
+  args: {
+    requests: joinRequests.map((r, i) =>
+      i === 1
+        ? { ...r, placement: 'waitlist' }
+        : i === 2
+          ? { ...r, placement: 'from_waitlist', playerId: 'story-player-waitlisted' }
+          : r,
+    ),
+    requestDetails: {
+      [joinRequests[2]?.id ?? '']: {
+        account: 'in-club',
+        sharedRank: 'Advanced Mid',
+        waitlistPosition: 2,
+      },
+    },
+  },
+}
+export const PlacementsLive: Story = { ...Placements, args: { ...Placements.args, live: true } }
+export const PlacementsLight: Story = { ...Placements, globals: { theme: 'light' } }
 export const PhoneMatch: Story = {
   args: {
     requestDetails: {

@@ -1,7 +1,10 @@
 import type { MatchFormat } from '../match/match.types'
 import type { PlayingLevel } from '../player/player.types'
 import type { SessionMode } from '../queue-session/queueSession.types'
-import type { SessionJoinRequest } from '../session-roster/sessionRoster.types'
+import type {
+  JoinRequestPlacement,
+  SessionJoinRequest,
+} from '../session-roster/sessionRoster.types'
 
 /** Public-safe participant or waitlist entry. */
 export type PublicSessionParticipant = {
@@ -237,6 +240,8 @@ export type SendJoinRequestInput = {
   nickname?: string | null
   phone?: string | null
   statedBand: SessionJoinRequest['statedBand']
+  /** Join a slot (default) or Be waitlisted (D-2026-11-11-02); a slot is refused while every slot is taken */
+  placement?: Extract<JoinRequestPlacement, 'slot' | 'waitlist'>
   /** Generated once per open sheet; real mode sends it so a retry saves one request */
   requestId?: string
 }
@@ -247,6 +252,8 @@ export type MyJoinRequest = {
   status: SessionJoinRequest['status']
   /** 1-based waitlist position once confirmed onto the waitlist; null otherwise */
   waitlistPosition: number | null
+  /** The player's choice (D-2026-11-11-02); missing on older replies reads `slot` */
+  placement?: JoinRequestPlacement
 }
 
 /** Narrow Player-hosted projection; never a club session or operator data. */
@@ -260,6 +267,8 @@ export type PlayerSessionAccess = {
   pictureUrl?: string | null
   /** Holds a slot or a waitlist place in this session */
   inSession: boolean
+  /** 1-based place on the waitlist while waitlisted (Join from waitlist, D-2026-11-11-02); null otherwise */
+  waitlistPosition?: number | null
   /** The Player's latest request for this session (any status), or null */
   joinRequest: MyJoinRequest | null
   fullRoster: boolean
@@ -286,7 +295,14 @@ export type SessionPageAccount = {
   pictureUrl: string | null
 }
 /** **Request to join as NAME**; `inviteCode` is the link's `?invite=` code, when it had one. */
-export type JoinAsPlayerInput = PlayerSessionInput & { inviteCode?: string | null }
+export type JoinAsPlayerInput = PlayerSessionInput & {
+  inviteCode?: string | null
+  /**
+   * Join a slot (default), Be waitlisted, or, for a waitlisted Player, Join from waitlist
+   * (`from_waitlist`; D-2026-11-11-02). A slot is refused while every slot is taken.
+   */
+  placement?: JoinRequestPlacement
+}
 
 /** One present player the Request a match sheet and its picker can name (the viewer is left out). */
 export type MatchRequestOptionPlayer = {

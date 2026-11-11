@@ -5,6 +5,7 @@ import { delay } from '../mock/latency'
 import { type MockState, mockStore, readMockState } from '../mock/store'
 import { isRealDataMode } from '../real/mode'
 import { realCancelMyJoinRequest, realJoinAsPlayer } from '../real/public-session'
+import { SLOTS_FULL_ERROR, slotsFull } from '../session-roster/mutations'
 import type { SaveOutcome } from '../sync/sync.types'
 import { makeInviteCode, playerSlot } from './publicSession.rules'
 import type { JoinAsPlayerInput, PlayerSessionInput } from './publicSession.types'
@@ -60,7 +61,8 @@ function requireRosterRow(state: MockState, session: MockState['sessions'][numbe
  */
 export function joinAsPlayer(slug: string, input: JoinAsPlayerInput) {
   // Real mode (#687): the Player app knows who is signed in; no playerId or invite code is sent.
-  if (isRealDataMode()) return realJoinAsPlayer(slug)
+  if (isRealDataMode()) return realJoinAsPlayer(slug, input.placement ?? 'slot')
+  const placement = input.placement ?? 'slot'
   return playerWrite(
     slug,
     (s, session) => {
@@ -73,7 +75,6 @@ export function joinAsPlayer(slug: string, input: JoinAsPlayerInput) {
       const player = s.players.find((p) => p.id === input.playerId)
       if (!player) fail('Sign in with ROTRA Player to send a request.')
       const slot = playerSlot(s, session, input.playerId)
-      if (slot.roster || slot.waitlist) fail("You're already in this session.", 'conflict')
       if (
         s.joinRequests.some(
           (r) =>
@@ -81,6 +82,36 @@ export function joinAsPlayer(slug: string, input: JoinAsPlayerInput) {
         )
       )
         fail('Your request is already sent.', 'conflict')
+      // D-2026-11-11-02: Join from waitlist. Only a waitlisted Player, only while a slot is open;
+      // the Queue Master still confirms (Give slot / Admit player).
+      if (placement === 'from_waitlist') {
+        if (slot.roster) fail("You're already in this session.", 'conflict')
+        if (!slot.waitlist) fail('Only waitlisted players can ask to join from the waitlist.')
+        if (slotsFull(s, session.id))
+          fail('All slots are taken. You keep your place on the waitlist.', 'conflict')
+        const band = slot.waitlist.level?.split('_')[0]
+        const id = crypto.randomUUID()
+        s.joinRequests.push({
+          id,
+          sessionId: session.id,
+          name: player.fullName,
+          nickname: player.nickname,
+          phoneE164: null,
+          statedBand:
+            band === 'beginner' || band === 'intermediate' || band === 'advanced' ? band : 'unsure',
+          placement: 'from_waitlist',
+          status: 'pending',
+          requestedAt: Date.now(),
+          decidedAt: null,
+          clubPlayerId: slot.waitlist.clubPlayerId,
+          playerId: input.playerId,
+          inviteCodeId: null,
+        })
+        return { requestId: id }
+      }
+      if (slot.roster || slot.waitlist) fail("You're already in this session.", 'conflict')
+      // D-2026-11-11-02: players cannot join a slot while every slot is taken; the waitlist remains.
+      if (placement === 'slot' && slotsFull(s, session.id)) fail(SLOTS_FULL_ERROR, 'conflict')
       const invite = input.inviteCode
         ? s.sessionInviteCodes.find(
             (c) => c.sessionId === session.id && c.code === input.inviteCode,
@@ -99,6 +130,7 @@ export function joinAsPlayer(slug: string, input: JoinAsPlayerInput) {
         phoneE164: null,
         statedBand:
           band === 'beginner' || band === 'intermediate' || band === 'advanced' ? band : 'unsure',
+        placement,
         status: 'pending',
         requestedAt: Date.now(),
         decidedAt: null,
@@ -108,7 +140,7 @@ export function joinAsPlayer(slug: string, input: JoinAsPlayerInput) {
       })
       return { requestId: id }
     },
-    'Request sent',
+    placement === 'from_waitlist' ? 'Slot requested' : 'Request sent',
   )
 }
 

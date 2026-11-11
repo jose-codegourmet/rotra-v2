@@ -5,4 +5,5 @@ export const joinRequestFormDefaultValues: JoinRequestFormInput = {
   nickname: '',
   phone: '',
   statedBand: '',
+  placement: '',
 }

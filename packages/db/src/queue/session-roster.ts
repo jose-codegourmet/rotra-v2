@@ -54,9 +54,10 @@ async function waitlistPosition(tx: Tx, sessionId: string, entryId: string) {
 }
 
 /**
- * Places a club player: a slot while one is open, otherwise the waitlist. Refuses a player already
- * live on the roster or waiting. Concurrent admissions are serialized by the session lock, so they
- * cannot exceed capacity. Repeat-safe on `operationId`.
+ * Places a club player: a slot while one is open, otherwise the waitlist. `toWaitlist` (a Be
+ * waitlisted request, D-2026-11-11-02) always gives the waitlist place, even during play. Refuses a
+ * player already live on the roster or waiting. Concurrent admissions are serialized by the session
+ * lock, so they cannot exceed capacity. Repeat-safe on `operationId`.
  */
 async function place(
   tx: Tx,
@@ -66,6 +67,7 @@ async function place(
   skillLevelId: number,
   operationId: string,
   addedAt: Date,
+  toWaitlist = false,
 ) {
   const waitlistId = await derivedId(operationId, 'waitlist')
   // A retry of the same operation returns what it already did.
@@ -102,7 +104,8 @@ async function place(
       addedAt,
     },
   })
-  const full = (await liveRoster(tx, session.id)).length >= (await capacityOf(tx, session))
+  const full =
+    toWaitlist || (await liveRoster(tx, session.id)).length >= (await capacityOf(tx, session))
   if (full)
     return {
       rosterEntry: null,
@@ -456,6 +459,58 @@ export async function confirmJoinRequest(
       throw new ServiceError('conflict', { request: 'This join request has already been decided.' })
     }
     const now = new Date()
+    // D-2026-11-11-02: Join from waitlist. Give slot (prepared, never over the budget) / Admit
+    // player (live, over the budget allowed) on the Player's own waitlist entry.
+    if (current.placement === 'from_waitlist') {
+      const entry = current.clubPlayerId
+        ? await tx.sessionWaitlistEntry.findUnique({
+            where: {
+              sessionId_clubPlayerId: { sessionId: session.id, clubPlayerId: current.clubPlayerId },
+            },
+          })
+        : null
+      // Removed from the waitlist meanwhile: refused, the QM declines the request.
+      if (!entry)
+        throw new ServiceError('conflict', {
+          request: `${current.name} is no longer on the waitlist.`,
+        })
+      const over = (await liveRoster(tx, session.id)).length >= (await capacityOf(tx, session))
+      if (over && session.state !== 'active')
+        throw new ServiceError('conflict', {
+          request: `Slots are full again. ${current.name} stays on the waitlist.`,
+        })
+      const levelled = await tx.sessionWaitlistEntry.update({
+        where: { id: entry.id },
+        data: { skillLevelId },
+      })
+      const promoted = await promoteWaiter(
+        tx,
+        context,
+        session,
+        levelled,
+        input.operationId,
+        now,
+        over,
+      )
+      const clubPlayer = await tx.clubPlayer.findUniqueOrThrow({
+        where: { id: promoted.clubPlayerId },
+      })
+      const decided = await tx.sessionJoinRequest.update({
+        where: { id: current.id },
+        data: {
+          status: 'confirmed',
+          decidedAt: now,
+          decidedByDeviceId: input.deviceId ?? null,
+          revision: { increment: 1 },
+        },
+        include: withPlayerPicture,
+      })
+      return {
+        request: joinRequestDto(decided),
+        rosterEntry: rosterEntryDto(promoted, clubPlayer.nickname),
+        waitlist: null,
+      }
+    }
     const clubPlayer = current.playerId
       ? (await clubPlayerForProfile(tx, context, input.operationId, current.playerId, now))
           .clubPlayer
@@ -474,6 +529,7 @@ export async function confirmJoinRequest(
       skillLevelId,
       input.operationId,
       current.requestedAt,
+      current.placement === 'waitlist',
     )
     const decided = await tx.sessionJoinRequest.update({
       where: { id: current.id },

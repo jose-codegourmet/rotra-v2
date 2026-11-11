@@ -24,6 +24,7 @@ import { useRefreshSession } from '@rotra/data/public-session/useRefreshSession'
 import { useSessionPageAccount } from '@rotra/data/public-session/useSessionPageAccount'
 import { useSessionPageSignOut } from '@rotra/data/public-session/useSessionPageSignOut'
 import { isRealDataMode } from '@rotra/data/real/mode'
+import type { JoinRequestPlacement } from '@rotra/data/session-roster/types'
 import { Button } from '@rotra/ui/button'
 import { EmptyState } from '@rotra/ui/empty-state'
 import { JoinRequestCard, type JoinRequestCardProps } from '@rotra/ui/join-request-card'
@@ -94,11 +95,17 @@ const HERO_STATE = {
 /** A signed-in ROTRA Player on the visitor's own page (D-2026-11-09-02): one tap, Cancel request. */
 type SignedInViewer = {
   name: string
-  /** Request to join as NAME: sends straight away, no form */
+  /** Request to join as NAME: sends straight away, no form, with the chosen placement */
   onJoin: () => void
   onCancelRequest: () => void
   /** A send or cancel is in flight: the buttons stay disabled so a second tap is impossible */
   busy: boolean
+  /** The Join a slot / Be waitlisted choice on the card (D-2026-11-11-02) */
+  placement: Extract<JoinRequestPlacement, 'slot' | 'waitlist'>
+  onPlacementChange: (placement: Extract<JoinRequestPlacement, 'slot' | 'waitlist'>) => void
+  /** Waitlisted: their 1-based place, for the Confirmed · waitlist #N card and Join from waitlist */
+  waitlistPosition: number | null
+  onJoinFromWaitlist: () => void
 }
 
 /** The signed-in Player's ID: the mock session's account, or the Player app's access read. */
@@ -114,6 +121,21 @@ function joinCardProps(
   signedIn?: SignedInViewer,
 ): JoinRequestCardProps | null {
   if (page.status !== 'prepared' && page.status !== 'active') return null
+  // D-2026-11-11-02: a waitlisted signed-in Player sees their waitlist card, with Join from waitlist
+  // while a slot is open, and Cancel request while their slot request waits for the Queue Master.
+  if (signedIn?.waitlistPosition) {
+    const asking = mine?.status === 'pending' && mine.placement === 'from_waitlist'
+    return {
+      variant: 'confirmed-waitlist',
+      waitlistPosition: signedIn.waitlistPosition,
+      signedIn: true,
+      openSlots: page.acceptJoinRequests ? page.openSlots : 0,
+      onJoinFromWaitlist: signedIn.onJoinFromWaitlist,
+      slotRequestPending: asking,
+      onCancelRequest: signedIn.onCancelRequest,
+      disabled: offline || signedIn.busy,
+    }
+  }
   // A cancelled or closed request is not a status: the card offers Request to join again.
   if (mine && mine.status !== 'cancelled' && mine.status !== 'closed') {
     if (mine.status === 'pending')
@@ -121,10 +143,11 @@ function joinCardProps(
         ? {
             variant: 'sent',
             name: mine.name,
+            placement: mine.placement,
             onCancelRequest: signedIn.onCancelRequest,
             disabled: offline || signedIn.busy,
           }
-        : { variant: 'sent', name: mine.name, registerNudge: true }
+        : { variant: 'sent', name: mine.name, placement: mine.placement, registerNudge: true }
     if (mine.status === 'declined')
       return signedIn ? { variant: 'declined' } : { variant: 'declined', registerNudge: true }
     return mine.waitlistPosition
@@ -144,6 +167,8 @@ function joinCardProps(
         onRequestToJoin: signedIn.onJoin,
         disabled: offline || signedIn.busy,
         signedInName: signedIn.name,
+        placement: signedIn.placement,
+        onPlacementChange: signedIn.onPlacementChange,
       }
     : { onRequestToJoin, disabled: offline }
   if (page.status === 'active')
@@ -274,6 +299,9 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
   // Until that check answers, a signed-in Player must not see the guest card first.
   const realPlayerChecking = viewer === 'visitor' && isRealDataMode() && playerAccess.isPending
   const [tab, setTab] = useState('details')
+  // The signed-in card's Join a slot / Be waitlisted choice (D-2026-11-11-02)
+  const [placement, setPlacement] =
+    useState<Extract<JoinRequestPlacement, 'slot' | 'waitlist'>>('slot')
   const [loginHref, setLoginHref] = useState<string>()
   // The Player app's origin for profile links; only known in the browser.
   const [playerBase, setPlayerBase] = useState<string | null>(null)
@@ -415,18 +443,32 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
   const cancelWhy = (p.cancelReason ?? '').replace(/[.\s]+$/, '')
   // Sending a request needs internet; the guest's own connection is the DevMenu toggle here.
   const signedInAs = viewerAccount && night.data ? viewerAccount : realPlayer
+  // D-2026-11-11-02: Join a slot is unavailable before start while every slot is taken. During play
+  // the Queue Master can admit additional players, so the choice stays open.
+  const slotsFull = p.status === 'prepared' && p.openSlots === 0
+  const chosenPlacement = slotsFull ? 'waitlist' : placement
+  const sendAsPlayer = (as: NonNullable<typeof signedInAs>, how: JoinRequestPlacement) =>
+    joinAsPlayer.mutate(
+      { playerId: signedInId(as), inviteCode: inviteCode ?? null, placement: how },
+      {
+        onSuccess: (done) => toast(done.message),
+        onError: (error) => toast.error(error.message),
+      },
+    )
   const signedIn: SignedInViewer | undefined = signedInAs
     ? {
         name: signedInAs.name,
         busy: joinAsPlayer.isPending || cancelMyRequest.isPending,
-        onJoin: () =>
-          joinAsPlayer.mutate(
-            { playerId: signedInId(signedInAs), inviteCode: inviteCode ?? null },
-            {
-              onSuccess: (done) => toast(done.message),
-              onError: (error) => toast.error(error.message),
-            },
-          ),
+        placement: chosenPlacement,
+        onPlacementChange: setPlacement,
+        onJoin: () => sendAsPlayer(signedInAs, chosenPlacement),
+        onJoinFromWaitlist: () => sendAsPlayer(signedInAs, 'from_waitlist'),
+        waitlistPosition:
+          realPlayer && !viewerAccount
+            ? (realPlayer.waitlistPosition ?? null)
+            : night.data?.status === 'waitlisted'
+              ? night.data.waitlistPosition
+              : null,
         onCancelRequest: () =>
           cancelMyRequest.mutate(
             { playerId: signedInId(signedInAs) },
@@ -440,12 +482,14 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
   // A signed-in Player's request comes from their account, not from this browser's guest request.
   // Already confirmed or waitlisted without a request (added by the Queue Master): no join card.
   const ownRequest = realPlayer && !viewerAccount ? realPlayer.joinRequest : night.data?.joinRequest
+  // A waitlisted Player keeps a card (Confirmed · waitlist #N with Join from waitlist).
   const inSession =
     realPlayer && !viewerAccount
       ? realPlayer.inSession &&
+        !realPlayer.waitlistPosition &&
         ownRequest?.status !== 'pending' &&
         ownRequest?.status !== 'confirmed'
-      : !!signedIn && night.data?.status !== 'none' && !night.data?.joinRequest
+      : !!signedIn && night.data?.status === 'confirmed' && !night.data?.joinRequest
   // While the signed-in Player's own read is loading or failed there is no join card (a guest
   // form would be wrong for them); the My night area below shows the loading or error state.
   const nightPending = !!viewerAccount && !night.data
@@ -658,6 +702,7 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
           returned={openJoin && viewer === 'visitor'}
           showPlayerLogin={viewer === 'visitor' && !signedIn}
           clubName={p.club.name}
+          slotsFull={slotsFull}
           // Real mode only: the mock Player app keeps its own store (#689).
           registerHref={
             joinOpen && isRealDataMode() && p.club.id && typeof location !== 'undefined'

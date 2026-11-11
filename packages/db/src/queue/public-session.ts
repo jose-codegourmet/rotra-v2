@@ -5,7 +5,7 @@ import { loadAccountContext, type PlayerContext } from '../auth/account-context'
 import { MOCK_COOKIE_PREFIX } from '../auth/data-mode'
 import { type CookieAdapter, verifySubject } from '../auth/supabase'
 import { prisma } from '../client/prisma'
-import type { QueueSession, StatedBand } from '../generated/prisma/client'
+import type { JoinRequestPlacement, QueueSession, StatedBand } from '../generated/prisma/client'
 import { ServiceError } from '../service/errors'
 import { readPublishedResults } from './results'
 import { capacityOf, levelCodeFor, liveCourts, liveRoster, orderedWaitlist } from './session-store'
@@ -166,6 +166,7 @@ async function myRequestDto(request: {
   id: string
   name: string
   status: 'pending' | 'confirmed' | 'declined' | 'closed' | 'cancelled'
+  placement: JoinRequestPlacement
   sessionId: string
   clubPlayerId: string | null
 }) {
@@ -177,7 +178,26 @@ async function myRequestDto(request: {
       )
       return index < 0 ? null : index + 1
     })
-  return { requestId: request.id, name: request.name, status: request.status, waitlistPosition }
+  return {
+    requestId: request.id,
+    name: request.name,
+    status: request.status,
+    waitlistPosition,
+    placement: request.placement,
+  }
+}
+
+const PLACEMENTS: JoinRequestPlacement[] = ['slot', 'waitlist', 'from_waitlist']
+const SLOTS_FULL = 'All slots are taken. Join the waitlist instead.'
+
+/**
+ * "Slots are full" for a player's request (D-2026-11-11-02): before start, with the live roster at
+ * the slot budget. During play the Queue Master can admit additional players (#284–#287), so a slot
+ * request stays possible.
+ */
+async function slotsFull(tx: Tx, session: QueueSession) {
+  if (session.state === 'active') return false
+  return (await liveRoster(tx, session.id)).length >= (await capacityOf(tx, session))
 }
 
 /**
@@ -194,9 +214,14 @@ export async function sendJoinRequest(
     nickname?: string | null
     phone?: string | null
     statedBand: StatedBand
+    /** Join a slot (default) or Be waitlisted (D-2026-11-11-02) */
+    placement?: JoinRequestPlacement | null
   },
 ) {
   if (!UUID.test(input.requestId)) throw new ServiceError('invalid')
+  const placement = input.placement ?? 'slot'
+  if (placement !== 'slot' && placement !== 'waitlist')
+    throw new ServiceError('invalid', { placement: 'Pick Join a slot or Be waitlisted.' })
   const name = input.name.trim()
   if (!name) throw new ServiceError('invalid', { name: 'Enter your name.' })
   const phone = input.phone?.trim() || null
@@ -228,6 +253,9 @@ export async function sendJoinRequest(
         throw new ServiceError('forbidden', { request: 'This session is cancelled.' })
       if (!current || !TAKES_REQUESTS.includes(current.state) || !current.accept)
         throw new ServiceError('forbidden', { request: 'This session is not taking requests.' })
+      // D-2026-11-11-02: players cannot join a slot while every slot is taken; the waitlist remains.
+      if (placement === 'slot' && (await slotsFull(tx, session)))
+        throw new ServiceError('conflict', { placement: SLOTS_FULL })
       const pending = await tx.sessionJoinRequest.count({
         where: { sessionId: session.id, status: 'pending' },
       })
@@ -254,6 +282,7 @@ export async function sendJoinRequest(
           nickname: input.nickname?.trim() || null,
           phoneE164: phone,
           statedBand: input.statedBand,
+          placement,
           requestedAt: new Date(),
         },
       })
@@ -316,7 +345,8 @@ async function playerStanding(tx: Tx, playerId: string, sessionId: string) {
     where: { sessionId, playerId },
     orderBy: [{ requestedAt: 'desc' }, { id: 'desc' }],
   })
-  const inSession = !!roster || waitlist.some((w) => waiting.has(w.clubPlayerId))
+  const waitIndex = waitlist.findIndex((w) => waiting.has(w.clubPlayerId))
+  const inSession = !!roster || waitIndex >= 0
   let joinRequest = null
   // A confirmed request whose place the Queue Master has since removed is history, not a status:
   // the card offers Request to join again (the server accepts a new request then).
@@ -330,6 +360,7 @@ async function playerStanding(tx: Tx, playerId: string, sessionId: string) {
       name: request.name,
       status: request.status,
       waitlistPosition: index < 0 ? null : index + 1,
+      placement: request.placement,
     }
   }
   return {
@@ -339,6 +370,10 @@ async function playerStanding(tx: Tx, playerId: string, sessionId: string) {
     rtrId: player.idAllocation?.rtrId ?? null,
     pictureUrl: player.avatarRef,
     inSession,
+    // Join from waitlist (D-2026-11-11-02): the Player's own place while waitlisted
+    waitlistPosition: !roster && waitIndex >= 0 ? waitIndex + 1 : null,
+    waitlistClubPlayerId:
+      !roster && waitIndex >= 0 ? (waitlist[waitIndex]?.clubPlayerId ?? null) : null,
     joinRequest,
   }
 }
@@ -383,9 +418,14 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
             level: levelCodeFor(entry?.skillLevelId ?? null),
           }
         })
+    const { waitlistClubPlayerId: _, ...standing } = await playerStanding(
+      tx,
+      context.playerId,
+      session.id,
+    )
     return {
       playerId: context.playerId,
-      ...(await playerStanding(tx, context.playerId, session.id)),
+      ...standing,
       fullRoster,
       participants: (fullRoster ? roster : roster.slice(0, 12)).map((entry) => ({
         name: maskPublicName(entry.nameSnapshot),
@@ -419,9 +459,16 @@ async function bandFor(tx: Tx, clubId: string, playerId: string): Promise<Stated
  * and cap as a guest's request. Refused while the Player's earlier request is pending (also the
  * partial unique index) or once they hold a slot or a waitlist place. Never reserves a slot.
  */
-export async function joinSessionAsPlayer(context: PlayerContext, slug: string) {
+export async function joinSessionAsPlayer(
+  context: PlayerContext,
+  slug: string,
+  input: { placement?: JoinRequestPlacement | null } = {},
+) {
   const session = await prisma.queueSession.findUnique({ where: { publicSlug: slug } })
   if (!session) throw new ServiceError('not_found')
+  const placement = input.placement ?? 'slot'
+  if (!PLACEMENTS.includes(placement))
+    throw new ServiceError('invalid', { placement: 'Pick Join a slot or Be waitlisted.' })
   const requestId = crypto.randomUUID()
   try {
     await prisma.$transaction(async (tx) => {
@@ -434,10 +481,26 @@ export async function joinSessionAsPlayer(context: PlayerContext, slug: string) 
       if (!current || !TAKES_REQUESTS.includes(current.state) || !current.accept)
         throw new ServiceError('forbidden', { request: 'This session is not taking requests.' })
       const standing = await playerStanding(tx, context.playerId, session.id)
-      if (standing.inSession)
-        throw new ServiceError('conflict', { request: "You're already in this session." })
       if (standing.joinRequest?.status === 'pending')
         throw new ServiceError('conflict', { request: 'Your request is already sent.' })
+      const full = await slotsFull(tx, session)
+      // D-2026-11-11-02: Join from waitlist, only for a waitlisted Player while a slot is open.
+      if (placement === 'from_waitlist') {
+        if (!standing.waitlistClubPlayerId)
+          throw new ServiceError(standing.inSession ? 'conflict' : 'forbidden', {
+            request: standing.inSession
+              ? "You're already in this session."
+              : 'Only waitlisted players can ask to join from the waitlist.',
+          })
+        if (full)
+          throw new ServiceError('conflict', {
+            request: 'All slots are taken. You keep your place on the waitlist.',
+          })
+      } else if (standing.inSession)
+        throw new ServiceError('conflict', { request: "You're already in this session." })
+      // D-2026-11-11-02: players cannot join a slot while every slot is taken; the waitlist remains.
+      else if (placement === 'slot' && full)
+        throw new ServiceError('conflict', { placement: SLOTS_FULL })
       const pending = await tx.sessionJoinRequest.count({
         where: { sessionId: session.id, status: 'pending' },
       })
@@ -459,6 +522,9 @@ export async function joinSessionAsPlayer(context: PlayerContext, slug: string) 
           nickname: profile.nickname,
           phoneE164: null,
           statedBand: await bandFor(tx, session.clubId, context.playerId),
+          placement,
+          // A request from the waitlist already knows the waitlisted club player.
+          clubPlayerId: placement === 'from_waitlist' ? standing.waitlistClubPlayerId : null,
           requestedAt: new Date(),
         },
       })
@@ -468,7 +534,7 @@ export async function joinSessionAsPlayer(context: PlayerContext, slug: string) 
       throw new ServiceError('conflict', { request: 'Your request is already sent.' })
     throw error
   }
-  return { requestId, message: 'Request sent' }
+  return { requestId, message: placement === 'from_waitlist' ? 'Slot requested' : 'Request sent' }
 }
 
 /** Q-PUBLIC-JOIN · **Cancel request**: the Player's own pending request becomes `cancelled`. */

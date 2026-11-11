@@ -21,6 +21,7 @@ export function createJoinRequestFixtures(now = Date.now()): SessionJoinRequest[
       nickname: 'Trace',
       phoneE164: '+639175550142',
       statedBand: 'intermediate',
+      placement: 'slot',
       status: 'pending',
       requestedAt: minutesAgo(42),
       decidedAt: null,
@@ -33,6 +34,7 @@ export function createJoinRequestFixtures(now = Date.now()): SessionJoinRequest[
       nickname: null,
       phoneE164: null,
       statedBand: 'beginner',
+      placement: 'slot',
       status: 'pending',
       requestedAt: minutesAgo(31),
       decidedAt: null,
@@ -45,6 +47,7 @@ export function createJoinRequestFixtures(now = Date.now()): SessionJoinRequest[
       nickname: 'PJ',
       phoneE164: '+639285550199',
       statedBand: 'advanced',
+      placement: 'slot',
       status: 'pending',
       requestedAt: minutesAgo(17),
       decidedAt: null,
@@ -57,6 +60,7 @@ export function createJoinRequestFixtures(now = Date.now()): SessionJoinRequest[
       nickname: null,
       phoneE164: '+639055550110',
       statedBand: 'unsure',
+      placement: 'slot',
       status: 'pending',
       requestedAt: minutesAgo(6),
       decidedAt: null,
@@ -110,6 +114,7 @@ export function createAccountJoinRequestFixture(now = Date.now()): SessionJoinRe
     clubPlayerId: null,
     playerId: derrick.playerId,
     inviteCodeId: TONIGHT_INVITE_CODE_ID,
+    placement: 'slot',
   }
 }
 
@@ -192,6 +197,7 @@ export function createSessionPageJoinRequestFixtures(now = Date.now()): SessionJ
       name: RHEA_PLAYER.fullName,
       nickname: null,
       statedBand: 'intermediate',
+      placement: 'slot',
       requestedAt: now - 25 * 60_000,
       playerId: RHEA_PLAYER.id,
       inviteCodeId: TONIGHT_INVITE_CODE_ID,
@@ -202,6 +208,7 @@ export function createSessionPageJoinRequestFixtures(now = Date.now()): SessionJ
       name: PAOLO_PLAYER.fullName,
       nickname: null,
       statedBand: 'beginner',
+      placement: 'slot',
       requestedAt: now - 18 * 60_000,
       playerId: PAOLO_PLAYER.id,
     },
@@ -212,6 +219,7 @@ export function createSessionPageJoinRequestFixtures(now = Date.now()): SessionJ
       nickname: null,
       phoneE164: KIKO_PHONE_E164,
       statedBand: 'intermediate',
+      placement: 'slot',
       requestedAt: now - 9 * 60_000,
     },
   ]

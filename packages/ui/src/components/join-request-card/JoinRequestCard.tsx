@@ -1,7 +1,9 @@
 'use client'
 
+import type { JoinRequestPlacement } from '@rotra/data/session-roster/types'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
+import { ChoiceGroup } from '@rotra/ui/choice-group'
 import { cn } from '@rotra/ui/cn'
 import { Notice, type NoticeProps } from '@rotra/ui/notice'
 import {
@@ -39,7 +41,19 @@ type AvailabilityProps = {
    * NAME"), so onRequestToJoin sends directly instead of opening the form.
    */
   signedInName?: string
+  /**
+   * The signed-in player's choice (D-2026-11-11-02): Join a slot or Be waitlisted, shown above the
+   * one-tap button when onPlacementChange is set. A guest picks on the form instead.
+   */
+  placement?: Extract<JoinRequestPlacement, 'slot' | 'waitlist'>
+  onPlacementChange?: (placement: Extract<JoinRequestPlacement, 'slot' | 'waitlist'>) => void
 }
+
+export const PLACEMENT_LABEL = 'How do you want to join?'
+export const PLACEMENT_HINT =
+  'A slot is yours once the Queue Master confirms. The waitlist keeps your place until a slot opens.'
+export const PLACEMENT_FULL_HINT =
+  'All slots are taken, so you join the waitlist. The Queue Master gives slots as they open.'
 
 export type JoinRequestCardProps = CommonProps &
   (
@@ -67,6 +81,8 @@ export type JoinRequestCardProps = CommonProps &
         onCancelRequest?: () => void
         /** Disable Cancel request (offline or while cancelling) */
         disabled?: boolean
+        /** The request's choice: "You asked to be waitlisted." for a waitlist request */
+        placement?: JoinRequestPlacement
       }
     | { variant: 'confirmed-slot' }
     | {
@@ -75,6 +91,17 @@ export type JoinRequestCardProps = CommonProps &
         waitlistPosition: number
         /** Signed-in player: "Ask the Queue Master about a slot." */
         signedIn?: boolean
+        /**
+         * Join from waitlist (D-2026-11-11-02), signed-in only: how many slots are open; with
+         * onJoinFromWaitlist and at least one open slot the card offers the primary button.
+         */
+        openSlots?: number
+        onJoinFromWaitlist?: () => void
+        /** The player's slot request is waiting for the Queue Master: Cancel request instead */
+        slotRequestPending?: boolean
+        onCancelRequest?: () => void
+        /** Offline or a send is in flight */
+        disabled?: boolean
       }
     | { variant: 'declined' }
   )
@@ -91,26 +118,35 @@ function statusOf(props: StatusProps): {
   text: string
 } {
   switch (props.variant) {
-    case 'sent':
+    case 'sent': {
+      const waitlist = props.placement === 'waitlist'
       return {
         tone: 'warn',
         title: 'Request sent',
-        text: `Thanks, ${props.name}. The Queue Master confirms every ${props.onCancelRequest ? 'request' : 'guest'}, usually at the venue. Your slot isn't held until they do.`,
+        text: `Thanks, ${props.name}. ${waitlist ? 'You asked to be waitlisted. ' : ''}The Queue Master confirms every ${props.onCancelRequest ? 'request' : 'guest'}, usually at the venue. Your ${waitlist ? 'place' : 'slot'} isn't held until they do.`,
       }
+    }
     case 'confirmed-slot':
       return {
         tone: 'success',
         title: 'Confirmed · you have a slot',
         text: 'See you on court. Your name is now in Participants.',
       }
-    case 'confirmed-waitlist':
+    case 'confirmed-waitlist': {
+      const open = props.openSlots ?? 0
+      const canAsk = props.signedIn && props.onJoinFromWaitlist && open > 0
       return {
         tone: 'success',
         title: `Confirmed · waitlist #${props.waitlistPosition}`,
         text: props.signedIn
-          ? "You're on the waitlist. Ask the Queue Master about a slot."
+          ? props.slotRequestPending
+            ? "You're on the waitlist. You asked for a slot; the Queue Master confirms it."
+            : canAsk
+              ? `You're on the waitlist. ${open} slot${open === 1 ? ' is' : 's are'} open. Ask to join from the waitlist and the Queue Master confirms it.`
+              : "You're on the waitlist. Ask the Queue Master about a slot."
           : "You're on the waitlist. The Queue Master gives slots in order as they open.",
       }
+    }
     case 'declined':
       return {
         tone: 'error',
@@ -149,6 +185,9 @@ export function JoinRequestCard(props: JoinRequestCardProps) {
     const hasPlayers =
       skillMix &&
       skillMix.beginner + skillMix.intermediate + skillMix.advanced + (skillMix.unrated ?? 0) > 0
+    // D-2026-11-11-02: Join a slot is unavailable while every slot is taken before start. During
+    // play the Queue Master can admit additional players, so the "active" variant never disables it.
+    const full = props.variant === 'full'
     return (
       <Card asChild className={cardClass}>
         <section aria-labelledby={headingId}>
@@ -176,6 +215,29 @@ export function JoinRequestCard(props: JoinRequestCardProps) {
               ? 'One tap sends your request and the Queue Master confirms it.'
               : 'Send a quick request and the Queue Master confirms it.'}
           </p>
+          {props.signedInName && props.onPlacementChange ? (
+            <div className="flex min-w-0 flex-col gap-1.5">
+              <span id={`${id}-placement`} className="text-[13px] font-semibold text-fg2">
+                {PLACEMENT_LABEL}
+              </span>
+              <ChoiceGroup
+                type="single"
+                aria-label={PLACEMENT_LABEL}
+                disabled={props.disabled}
+                choices={[
+                  { value: 'slot', title: 'Join a slot', disabled: full },
+                  { value: 'waitlist', title: 'Be waitlisted' },
+                ]}
+                value={full ? 'waitlist' : (props.placement ?? 'slot')}
+                onChange={(value) =>
+                  props.onPlacementChange?.(value === 'waitlist' ? 'waitlist' : 'slot')
+                }
+              />
+              <span className="text-xs font-normal text-fg2">
+                {full ? PLACEMENT_FULL_HINT : PLACEMENT_HINT}
+              </span>
+            </div>
+          ) : null}
           <Button
             variant="primary"
             onClick={props.onRequestToJoin}
@@ -199,7 +261,9 @@ export function JoinRequestCard(props: JoinRequestCardProps) {
         {props.registerNudge ? (
           <p className="m-0 text-[13px] text-fg2">Register to check in and see your matches.</p>
         ) : null}
-        {props.variant === 'sent' && props.onCancelRequest ? (
+        {(props.variant === 'sent' ||
+          (props.variant === 'confirmed-waitlist' && props.slotRequestPending)) &&
+        props.onCancelRequest ? (
           <Button
             variant="secondary"
             onClick={props.onCancelRequest}
@@ -207,6 +271,20 @@ export function JoinRequestCard(props: JoinRequestCardProps) {
             className="min-h-11 w-full"
           >
             Cancel request
+          </Button>
+        ) : null}
+        {props.variant === 'confirmed-waitlist' &&
+        props.signedIn &&
+        !props.slotRequestPending &&
+        props.onJoinFromWaitlist &&
+        (props.openSlots ?? 0) > 0 ? (
+          <Button
+            variant="primary"
+            onClick={props.onJoinFromWaitlist}
+            disabled={props.disabled}
+            className="min-h-11 w-full"
+          >
+            Join from waitlist
           </Button>
         ) : null}
       </section>

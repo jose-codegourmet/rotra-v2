@@ -94,6 +94,8 @@ export function joinRequestDto(
     nickname: request.nickname,
     phoneE164: request.phoneE164,
     statedBand: request.statedBand,
+    /** The player's choice (D-2026-11-11-02): slot, waitlist or from_waitlist */
+    placement: request.placement,
     status: request.status,
     requestedAt: toIso(request.requestedAt),
     decidedAt: toIsoOrNull(request.decidedAt),

@@ -35,6 +35,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-09-13](#d-2026-11-09-13) | Admin-managed profile character library | approved | in progress (mock app; real mode on branch `fix/real-mode-characters-clubs-sessions`, migration not applied) | #644, #645, #646 | [Admin](workstreams/admin.md), [Player](workstreams/player.md) |
 | [D-2026-11-09-14](#d-2026-11-09-14) | Admin edits everything on a player, with a beta-only password field | approved for MVP or beta only; signed off 2026-11-10 | in progress (mock app; real mode not started) | #647, #648, #649, #650 | [Admin](workstreams/admin.md) |
 | [D-2026-11-11-01](#d-2026-11-11-01) | Observability: OpenTelemetry traces to Grafana Cloud, plus a local Grafana stack | approved 2026-11-11 | implemented in the repository; Grafana Cloud stack and Vercel `OTEL_*` variables not set up yet | none | [Backend](workstreams/backend.md) |
+| [D-2026-11-11-02](#d-2026-11-11-02) | Join request: the player picks Join a slot or Be waitlisted, and can join from the waitlist | approved | in progress (mock app + real-mode services; migration not applied) | #706 | [Queue](workstreams/queue.md) |
 
 ## Status conventions
 
@@ -490,3 +491,16 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - **Local:** `grafana/otel-lgtm` through `docker-compose.observability.yml` and `make observability-up` / `make observability-down`.
 - **Not in MVP / Out of scope:** browser telemetry, Prisma query spans, metrics and log export.
 - **References:** [observability](../observability.md), [architecture §2](../architecture.md#2-the-shape-of-the-system).
+<a id="d-2026-11-11-02"></a>
+### D-2026-11-11-02 — Join request: the player picks Join a slot or Be waitlisted, and can join from the waitlist
+- **Decision status:** approved (Jose, November 11, 2026, voice call; who picks answered in the implementation brief for #706)
+- **Implementation status:** in progress — mock app and real-mode services in #706; migration `20261111000200` drafted, not applied
+- **Ticket:** #706
+- **Roadmap:** MVP — [Queue](workstreams/queue.md)
+- **Decision:**
+  - “a player can request to join, but they can be waitlisted if they want, or they can just join the slot directly.” The **player** picks **Join a slot** or **Be waitlisted** on the request (guest form and signed-in one tap). The Queue Master sees the choice on the request.
+  - **Players cannot join if the slots are full.** Before start, while every slot is taken, Join a slot is unavailable and refused by the server; only the waitlist remains. During play the Queue Master can admit additional players (#284–#287), so the choice stays open and the QM decides.
+  - **If the slots are not full and a waitlisted player decides to join, they can join from the waitlist.** It is a join request like any other, so the Queue Master confirms it; if slots are full again by then, before start, the confirmation is refused and the player keeps their waitlist place. The Queue Master's own admission above the planned capacity during play (#284–#287) is unchanged.
+  - Every request stays pending until the Queue Master confirms; nobody self-admits (existing rule).
+- **Not in MVP / Out of scope:** a guest (not signed in) asking to join from the waitlist; a new admission model; changes to the slot budget, first-come waitlist order or Give slot / Fill N open slots.
+- **References:** [Players › Join requests from the session link](../business_logic/product/queue/modules/players/README.md#join-requests-from-the-session-link), [Q-PUBLIC-JOIN](../screens/product/modules/queue/public-session.md#q-public-join--guest-join-request), [session_join_requests](../database_design/product/queue/modules/sessions-roster.md#session_join_requests), [mockup log](../mockup-changes/2026-11-11-queue-join-request-slot-or-waitlist.md).

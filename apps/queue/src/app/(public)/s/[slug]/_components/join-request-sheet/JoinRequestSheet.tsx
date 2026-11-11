@@ -33,6 +33,8 @@ export type JoinRequestSheetProps = {
    * (/register/<clubId>?next=<this page>). Missing leaves Register with ROTRA unavailable.
    */
   registerHref?: string
+  /** Every slot is taken (the page's openSlots is 0): Join a slot is disabled (D-2026-11-11-02) */
+  slotsFull?: boolean
 }
 
 type HowToRequest = 'guest' | 'login' | 'register'
@@ -69,7 +71,9 @@ function readDraft(slug: string): Draft | null {
       !saved.values ||
       !['name', 'nickname', 'phone', 'statedBand'].every(
         (key) => typeof saved.values[key] === 'string',
-      )
+      ) ||
+      // Drafts from before the Join a slot / Be waitlisted choice start that field afresh.
+      (saved.values.placement != null && typeof saved.values.placement !== 'string')
     ) {
       clearDraft(slug)
       return null
@@ -104,6 +108,7 @@ export function JoinRequestSheet({
   showPlayerLogin = false,
   clubName = 'the club',
   registerHref,
+  slotsFull = false,
 }: JoinRequestSheetProps) {
   const send = useSendJoinRequest(slug)
   const signIn = useSignIn('player')
@@ -172,6 +177,7 @@ export function JoinRequestSheet({
         nickname: values.nickname,
         phone: values.phone,
         statedBand: values.statedBand,
+        placement: values.placement,
         requestId,
       },
       {
@@ -222,6 +228,7 @@ export function JoinRequestSheet({
           }}
           defaultValues={defaultValues}
           onValuesChange={saveDraft}
+          slotsFull={slotsFull}
           autoFocus
           returned={returned}
         />

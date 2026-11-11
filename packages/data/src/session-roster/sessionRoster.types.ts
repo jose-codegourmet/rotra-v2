@@ -31,6 +31,12 @@ export type SessionWaitlistEntry = {
   level: PlayingLevel | null
   addedAt: number
 }
+/**
+ * The player's choice on a join request (D-2026-11-11-02): `slot` = Join a slot, `waitlist` = Be
+ * waitlisted, `from_waitlist` = a waitlisted Player asking for a slot (Join from waitlist). A slot
+ * request is refused while every slot is taken. Requests from before the choice read `slot`.
+ */
+export type JoinRequestPlacement = 'slot' | 'waitlist' | 'from_waitlist'
 export type SessionJoinRequest = {
   id: string
   sessionId: string
@@ -38,6 +44,7 @@ export type SessionJoinRequest = {
   nickname: string | null
   phoneE164: string | null
   statedBand: 'beginner' | 'intermediate' | 'advanced' | 'unsure'
+  placement: JoinRequestPlacement
   /**
    * `closed`: a pending request closed by Cancel session or Session done (not a decline);
    * `decidedAt` is that time. `cancelled`: the signed-in Player's own **Cancel request**.

@@ -101,11 +101,23 @@ export function JoinRequests({ sessionId, variant = 'card', className }: JoinReq
   // Real mode has no Requests read yet; its refusal must not hide the guest requests that do work.
   const requestsError = real ? null : requests.error
 
+  // D-2026-11-11-02: a Join from waitlist request names the player's current place.
+  const waitlistOrder = (roster.data?.waitlist ?? []).slice().sort((a, b) => a.addedAt - b.addedAt)
+  const waitlistPositionOf = (clubPlayerId: string | null | undefined) => {
+    const index = clubPlayerId
+      ? waitlistOrder.findIndex((w) => w.clubPlayerId === clubPlayerId)
+      : -1
+    return index < 0 ? null : index + 1
+  }
   const requestDetails: Record<string, JoinRequestDetails> = {}
+  for (const r of joinRequests)
+    if (r.placement === 'from_waitlist')
+      requestDetails[r.id] = { waitlistPosition: waitlistPositionOf(r.clubPlayerId) }
   for (const r of view?.join ?? []) {
     const hint = hints.data?.[r.id]
     const match = hint?.linked ?? hint?.phoneMatch
     requestDetails[r.id] = {
+      ...requestDetails[r.id],
       account: r.account ? (r.account.inClub ? 'in-club' : 'new-to-club') : undefined,
       sharedRank: hint?.sharedRank ? levelLabel(hint.sharedRank) : null,
       invitedBy: r.invitedByName ?? undefined,

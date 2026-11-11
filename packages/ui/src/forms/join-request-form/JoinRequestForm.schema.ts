@@ -1,4 +1,4 @@
-import type { SessionJoinRequest } from '@rotra/data/session-roster/types'
+import type { JoinRequestPlacement, SessionJoinRequest } from '@rotra/data/session-roster/types'
 import { nameField } from '@rotra/schema/name'
 import { phoneField } from '@rotra/schema/phone'
 import { z } from 'zod'
@@ -7,6 +7,18 @@ export const NICKNAME_MAX = 40
 export const NAME_ERROR = 'Enter your name.'
 export const PHONE_ERROR = 'Enter a full mobile number, or leave it empty.'
 export const BAND_ERROR = 'Pick your level, or Not sure.'
+export const PLACEMENT_ERROR = 'Pick Join a slot or Be waitlisted.'
+/** The server's refusal of Join a slot while every slot is taken (D-2026-11-11-02). */
+export const SLOTS_FULL_ERROR = 'All slots are taken. Join the waitlist instead.'
+
+/** The player's choice a guest can make on the form (Join from waitlist is for signed-in Players). */
+export type FormPlacement = Extract<JoinRequestPlacement, 'slot' | 'waitlist'>
+/** The prototype's WANT_CHOICES, in order; the values are session_join_requests.placement. */
+export const PLACEMENT_CHOICES: { value: FormPlacement; label: string }[] = [
+  { value: 'slot', label: 'Join a slot' },
+  { value: 'waitlist', label: 'Be waitlisted' },
+]
+const PLACEMENT_VALUES = new Set<string>(PLACEMENT_CHOICES.map((choice) => choice.value))
 
 export type StatedBand = SessionJoinRequest['statedBand']
 
@@ -43,9 +55,19 @@ const requiredBand = z.string().transform((value, ctx) => {
   return value as StatedBand
 })
 
+/** The placement holds '' until picked; Join a slot or Be waitlisted is required. */
+const requiredPlacement = z.string().transform((value, ctx) => {
+  if (!PLACEMENT_VALUES.has(value)) {
+    ctx.addIssue({ code: 'custom', message: PLACEMENT_ERROR })
+    return z.NEVER
+  }
+  return value as FormPlacement
+})
+
 /**
- * Q-PUBLIC-JOIN › Request to join: a required name, optional nickname and phone, and the guest's
- * self-declared level. A request is not a booking; the Queue Master sets the level for the night.
+ * Q-PUBLIC-JOIN › Request to join: a required name, optional nickname and phone, the guest's
+ * self-declared level and how they want to join (a slot, or the waitlist; D-2026-11-11-02). A
+ * request is not a booking; the Queue Master sets the level for the night.
  */
 export const joinRequestSchema = z.object({
   // The shared name rule with the public page's wording for an empty name.
@@ -57,9 +79,10 @@ export const joinRequestSchema = z.object({
     .transform((value) => value || null),
   phone: optionalPhone,
   statedBand: requiredBand,
+  placement: requiredPlacement,
 })
 
 /** What the fields hold while typing (phone as typed, statedBand '' until picked). */
 export type JoinRequestFormInput = z.input<typeof joinRequestSchema>
-/** What onSubmit receives (nickname and phone null when empty, phone in E.164, statedBand required). */
+/** What onSubmit receives (nickname and phone null when empty, phone in E.164, statedBand and placement required). */
 export type JoinRequestFormValues = z.output<typeof joinRequestSchema>

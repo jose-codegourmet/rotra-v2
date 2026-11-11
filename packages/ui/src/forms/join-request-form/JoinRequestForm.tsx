@@ -16,6 +16,7 @@ import {
   type JoinRequestFormValues,
   joinRequestSchema,
   NICKNAME_MAX,
+  PLACEMENT_CHOICES,
 } from './JoinRequestForm.schema'
 
 export type JoinRequestFormProps = {
@@ -36,6 +37,11 @@ export type JoinRequestFormProps = {
   defaultValues?: Partial<JoinRequestFormInput>
   /** Reports unsent input so the container can preserve a local login round trip. */
   onValuesChange?: (values: JoinRequestFormInput) => void
+  /**
+   * Every slot is taken (the page's openSlots is 0): Join a slot is disabled and Be waitlisted is
+   * preselected (D-2026-11-11-02). The server refuses a slot request in that state too.
+   */
+  slotsFull?: boolean
   className?: string
 }
 
@@ -46,7 +52,12 @@ export const SIGN_UP_NOTE =
   'New to ROTRA? Ask your club for a registration invite, or continue as a guest.'
 export const RETURNED_NOTE = "You're back — finish your request below."
 export const REQUEST_NOTE =
-  'This is a request, not a booking. The Queue Master confirms each guest before giving a slot.'
+  'This is a request, not a booking. The Queue Master confirms each guest before giving a slot or a waitlist place.'
+export const PLACEMENT_LABEL = 'How do you want to join?'
+export const PLACEMENT_HINT =
+  'A slot is yours once the Queue Master confirms. The waitlist keeps your place until a slot opens.'
+export const PLACEMENT_FULL_HINT =
+  'All slots are taken, so you join the waitlist. The Queue Master gives slots as they open.'
 
 /**
  * Q-PUBLIC-JOIN › Request to join: the guest's name, optional nickname and phone, and their
@@ -64,12 +75,20 @@ export function JoinRequestForm({
   returned = false,
   defaultValues,
   onValuesChange,
+  slotsFull = false,
   className,
 }: JoinRequestFormProps) {
   const id = useId()
   const form = useForm<JoinRequestFormInput, unknown, JoinRequestFormValues>({
     resolver: zodResolver(joinRequestSchema),
-    defaultValues: { ...joinRequestFormDefaultValues, ...defaultValues },
+    defaultValues: {
+      ...joinRequestFormDefaultValues,
+      // The prototype preselects the choice the session allows; a draft's Join a slot is dropped
+      // once every slot is taken.
+      placement: slotsFull ? 'waitlist' : 'slot',
+      ...defaultValues,
+      ...(slotsFull ? { placement: 'waitlist' } : null),
+    },
   })
   useEffect(() => {
     if (!onValuesChange) return
@@ -162,6 +181,37 @@ export function JoinRequestForm({
             </span>
           ) : (
             <span className="text-xs font-normal text-fg2">{LEVEL_HINT}</span>
+          )}
+        </div>
+        <div className="flex min-w-0 flex-col gap-1.5">
+          <span id={`${id}-placement`} className="text-[13px] font-semibold text-fg2">
+            {PLACEMENT_LABEL}
+          </span>
+          <Controller
+            control={form.control}
+            name="placement"
+            render={({ field }) => (
+              <ChoiceGroup
+                type="single"
+                aria-label={PLACEMENT_LABEL}
+                choices={PLACEMENT_CHOICES.map((choice) => ({
+                  value: choice.value,
+                  title: choice.label,
+                  disabled: choice.value === 'slot' && slotsFull,
+                }))}
+                value={field.value}
+                onChange={field.onChange}
+              />
+            )}
+          />
+          {errors.placement ? (
+            <span aria-live="polite" className="text-[13px] font-semibold text-error">
+              {errors.placement.message}
+            </span>
+          ) : (
+            <span className="text-xs font-normal text-fg2">
+              {slotsFull ? PLACEMENT_FULL_HINT : PLACEMENT_HINT}
+            </span>
           )}
         </div>
         <Notice tone="info">{REQUEST_NOTE}</Notice>

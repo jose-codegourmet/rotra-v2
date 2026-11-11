@@ -36,7 +36,12 @@ import {
   realSetPresenceMany,
 } from '../real/session-live'
 import { levelLabel, ROSTER_DUPLICATE_ERROR, shortName } from './sessionRoster.rules'
-import type { DirectoryPlayer, IdentityCheck, SessionJoinRequest } from './sessionRoster.types'
+import type {
+  DirectoryPlayer,
+  IdentityCheck,
+  JoinRequestPlacement,
+  SessionJoinRequest,
+} from './sessionRoster.types'
 
 function fail(text: string): never {
   throw new MockError('permission', text)
@@ -44,7 +49,7 @@ function fail(text: string): never {
 function levelCheck(level: PlayingLevel) {
   if (!PLAYING_LEVELS.includes(level)) fail('Choose a level for this club before confirming.')
 }
-const capacity = (s: MockState, id: string) =>
+export const capacity = (s: MockState, id: string) =>
   slotCapacity(
     s.courts.filter((c) => c.sessionId === id && !c.removedAt).length,
     sessionIn(s, id).playersPerCourt,
@@ -62,13 +67,17 @@ async function rosterMutation<T>(
     return result
   })
 }
-/** Gives a club player a slot, or a waitlist place once a prepared session is full. */
+/**
+ * Gives a club player a slot, or a waitlist place once a prepared session is full. `toWaitlist`
+ * (a Be waitlisted request, D-2026-11-11-02) always gives the waitlist place, even during play.
+ */
 export function place(
   s: MockState,
   sessionId: string,
   p: ClubPlayer,
   level: PlayingLevel,
   addedAt = Date.now(),
+  toWaitlist = false,
 ) {
   levelCheck(level)
   const session = sessionIn(s, sessionId)
@@ -82,8 +91,9 @@ export function place(
     // A duplicate is a conflict: the Add player sheet drops the pick and returns to the list.
     throw new MockError('conflict', ROSTER_DUPLICATE_ERROR)
   const full =
-      session.state !== 'active' &&
-      s.roster.filter((r) => r.sessionId === sessionId).length >= capacity(s, sessionId),
+      toWaitlist ||
+      (session.state !== 'active' &&
+        s.roster.filter((r) => r.sessionId === sessionId).length >= capacity(s, sessionId)),
     id = crypto.randomUUID()
   s.waitlist.push({ id, sessionId, clubPlayerId: p.id, level, addedAt })
   if (!full) promoteWaiter(s, required(s.waitlist.find((w) => w.id === id)), addedAt)
@@ -353,17 +363,33 @@ export type JoinRequestInput = {
   nickname?: string
   phone?: string
   statedBand: SessionJoinRequest['statedBand']
+  /** Join a slot (default) or Be waitlisted (D-2026-11-11-02) */
+  placement?: Extract<JoinRequestPlacement, 'slot' | 'waitlist'>
 }
+export const SLOTS_FULL_ERROR = 'All slots are taken. Join the waitlist instead.'
+/**
+ * "Slots are full" for a player's request (D-2026-11-11-02): before start, with the roster at the
+ * slot budget. During play the Queue Master can admit additional players (#284–#287), so a slot
+ * request stays possible.
+ */
+export const slotsFull = (s: MockState, sessionId: string) =>
+  sessionIn(s, sessionId).state !== 'active' &&
+  s.roster.filter((r) => r.sessionId === sessionId).length >= capacity(s, sessionId)
 function request(s: MockState, input: JoinRequestInput) {
   const session = sessionIn(s, input.sessionId)
   if (!session.acceptJoinRequests || !['prepared', 'active'].includes(session.state))
     fail('Join requests are off.')
   const fields: Record<string, string> = {}
+  const placement = input.placement ?? 'slot'
   if (!input.name.trim()) fields.name = 'Enter your name.'
   const phone = input.phone?.trim() ? phoneField.safeParse(input.phone) : null
   if (phone && !phone.success) fields.phone = 'Enter a full mobile number, or leave it empty.'
   if (!['beginner', 'intermediate', 'advanced', 'unsure'].includes(input.statedBand))
     fields.statedBand = 'Pick your level, or Not sure.'
+  if (placement !== 'slot' && placement !== 'waitlist')
+    fields.placement = 'Pick Join a slot or Be waitlisted.'
+  // D-2026-11-11-02: players cannot join a slot while every slot is taken; the waitlist remains.
+  else if (placement === 'slot' && slotsFull(s, session.id)) fields.placement = SLOTS_FULL_ERROR
   if (Object.keys(fields).length)
     throw new MockError('permission', required(Object.values(fields)[0]), fields)
   const r: SessionJoinRequest = {
@@ -373,6 +399,7 @@ function request(s: MockState, input: JoinRequestInput) {
     nickname: input.nickname?.trim() || null,
     phoneE164: phone?.success ? phone.data : null,
     statedBand: input.statedBand,
+    placement,
     status: 'pending',
     requestedAt: Date.now(),
     decidedAt: null,
@@ -403,7 +430,14 @@ export function confirmJoinRequest(input: { requestId: string; level: PlayingLev
         nickname: request.nickname ?? undefined,
         phone: request.phoneE164 ?? undefined,
       }),
-      data = place(s, request.sessionId, p, input.level, request.requestedAt)
+      data = place(
+        s,
+        request.sessionId,
+        p,
+        input.level,
+        request.requestedAt,
+        request.placement === 'waitlist',
+      )
     request.status = 'confirmed'
     request.decidedAt = Date.now()
     request.clubPlayerId = p.id
@@ -439,7 +473,11 @@ const samples = [
 export function addSampleJoinRequest(sessionId: string) {
   return rosterMutation(sessionId, (s) => {
     const sample = required(samples[s.sampleRequestIndex++ % samples.length]),
-      r = request(s, { ...sample, sessionId })
+      r = request(s, {
+        ...sample,
+        sessionId,
+        placement: slotsFull(s, sessionId) ? 'waitlist' : 'slot',
+      })
     return {
       data: { requestId: r.id },
       text: `${r.name} sent a join request to ${sessionIn(s, sessionId).title}`,

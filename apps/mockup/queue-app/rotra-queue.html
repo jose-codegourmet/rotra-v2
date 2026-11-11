@@ -3646,7 +3646,7 @@ function courtMenu(s, c, busy) {
   const item = (act, label, why, cls = '') => `<button role="menuitem" class="${cls}" data-act="${act}" data-id="${c.id}" ${why ? 'disabled' : ''}><span>${label}</span>${why ? `<span class="why">${why}</span>` : ''}</button>`;
   return `<div class="cmenu"><button class="btn xs ghost icon-btn" data-act="toggleCourtMenu" data-id="${c.id}" aria-haspopup="menu" aria-expanded="${open}" aria-label="More for ${esc(c.label)}">${I.more}</button>${open ? `<div class="cmenu-list" role="menu" aria-label="${esc(c.label)}">
     ${(() => { const m = courtMatches(s).find((x) => x.status === 'oncourt' && x.courts.includes(c.id)); if (!m) return ''; const n = swapCandidate(s, m); return item('openSwap', n ? `Swap with #${waiting(s).indexOf(n) + 1} · Match ${n.seq}` : 'Swap with the queue', n ? '' : 'No other waiting match is ready'); })()}
-    ${item('editCourt', 'Edit', busy ? 'A match is on this court' : '')}
+    ${item('editCourt', busy ? 'Change time' : 'Edit', '')}
     ${openedEarly(s, c) ? item('undoEarly', 'Undo early open', busy ? 'A match is on this court' : '') : ''}
     ${item('removeCourt', 'Remove', busy ? 'Only a free court can be removed' : last ? 'A session needs at least one court' : '', 'danger')}
   </div>` : ''}</div>`;
@@ -5090,14 +5090,16 @@ const SHEETS = {
   adjust(sh) {
     // The end can move to any time after now, later or earlier, up to 24 h after play began.
     const s = cur(), now = Date.now(), st = endStatus(s, now), hi = sessionCourtStart(s) + 864e5, ok = (t) => t > now && t <= hi;
+    // Owner comment, November 11, 2026: list the courts with their status and booking time; each court's time can change even while a match is on it.
+    const courtRow = (c) => { const m = courtMatches(s).find((x) => x.courts.includes(c.id)); const stat = m ? (m.status === 'active' ? chip('Playing', 'ok') : chip('Getting ready', 'warn')) : chip('Free'); return `<div class="li" style="padding:8px 0"><div class="main"><div class="row" style="gap:8px"><b>${esc(c.label)}</b>${stat}</div>${courtTimeLine(s, c)}</div><button class="btn xs" data-act="editCourt" data-id="${c.id}" aria-label="Change time for ${esc(c.label)}">Change time</button></div>`; };
     return sheetShell('Courts and time', `
-      <div class="field"><span>Courts</span><p class="small">${s.courts.map((c) => esc(c.label)).join(', ')}</p></div>
+      <div class="field"><span>Courts · ${s.courts.length}</span><div class="list">${s.courts.map(courtRow).join('')}</div></div>
       <div class="row"><button class="btn sm" data-act="quickAddCourt">Add a court…</button></div>
       <div class="field"><span>Ends ${fmtWhen(s.end, { lower: true })}${st.over ? ` · <span style="color:var(--warn)">${st.text}</span>` : ''}</span>
         ${dtPicker({ k: 'sheet.endAt', label: 'New end', id: 'adj-end', value: sh.endAt, days: daysBetween(now, hi), base: dayStart(sessionCourtStart(s)), ok, set: (t) => { sh.endAt = t; sh.err = ''; }, err: sh.err, autofocus: sh.focus === 'end' })}
         <div class="row"><button class="btn sm primary" data-act="setEnd" ${sh.endAt > now ? '' : 'disabled'}>Set end time</button>${[30, 60].map((m) => `<button class="btn sm" data-act="extend" data-m="${m}">Extend ${m} min</button>`).join('')}</div><span class="hint">The public page shows the new end time after it syncs.</span></div>
       <p class="small muted">Start time is fixed: it records when play began.</p>
-      <p class="small muted">Occupied courts can't be removed, and running matches aren't changed here. Changing mode, formats or the minimum during play hasn't been decided.</p>`,
+      <p class="small muted">Changing a court's time while a match is on it doesn't touch the match. Occupied courts can't be removed. Changing mode, formats or the minimum during play hasn't been decided.</p>`,
       '<button class="btn" data-act="closeSheet">Done</button>');
   },
   chooseMatch(sh) {
@@ -6295,7 +6297,8 @@ const ACT = {
     delete c.openedEarlyAt;
     commit(`${c.label} back to Not open yet · opens ${fmtWhen(courtStart(s, c), { lower: true })}`); render();
   },
-  editCourt: (d) => { S.ui.courtMenu = null; const s = cur(), c = s.courts.find((x) => x.id === d.id); if (s.status === 'active' && courtMatches(s).some((m) => m.courts.includes(c.id))) { toast('A match is on this court. Edit it when the court is free.'); render(); return; } openSheet({ type: 'addCourt', id: c.id, label: c.label, startAt: courtStart(s, c), mode: c.until ? 'time' : 'end', untilAt: c.until || s.end, err: '' }); },
+  // Owner comment, November 11, 2026: a court's time can change even while a match is on it (the match keeps playing; only the booking end moves).
+  editCourt: (d) => { S.ui.courtMenu = null; const s = cur(), c = s.courts.find((x) => x.id === d.id); openSheet({ type: 'addCourt', id: c.id, label: c.label, startAt: courtStart(s, c), mode: c.until ? 'time' : 'end', untilAt: c.until || s.end, err: '', busy: s.status === 'active' && courtMatches(s).some((m) => m.courts.includes(c.id)) }); },
   quickAddCourt: () => { const s = cur(); openSheet({ type: 'addCourt', label: `Court ${s.courts.length + 1}`, startAt: sessionCourtStart(s), mode: 'end', untilAt: s.end, err: '' }); },
   confirmAddCourt: () => {
     const s = cur(), sh = S.ui.sheet;

@@ -49,6 +49,7 @@
     "./player/compare": "./src/player/compare.ts",
     "./player/leaderboard": "./src/player/leaderboard.ts",
     "./player/my-clubs": "./src/player/my-clubs.ts",
+    "./player/my-sessions": "./src/player/my-sessions.ts",
     "./queue/results": "./src/queue/results.ts",
     "./admin/retention": "./src/admin/retention.ts",
     "./auth/sign-in": "./src/auth/sign-in.ts",

@@ -1,4 +1,5 @@
 import { getSession } from '../auth/fetchers'
+import { PLAYER_FIXTURE_NOW } from '../fixtures/playerGames'
 import { MockError } from '../mock/errors'
 import { readMockState } from '../mock/store'
 import { profileCharacterImage } from '../profile-character/fetchers'
@@ -6,6 +7,7 @@ import { maskPublicName } from '../public-session/publicSession.rules'
 import { isRealDataMode } from '../real/mode'
 import { realGetMyShareSession } from '../real/my-sessions'
 import { getPlayerGames, getPlayerProfile, getPlayerRank } from './fetchers'
+import { countRecentCountedWins } from './player.rules'
 import type { PlayerShareGame, PlayerShareParticipant } from './player.types'
 import { isPrivatePlayer } from './visibility'
 
@@ -106,5 +108,27 @@ export async function getPlayerShareData(
     wins,
     losses: games.length - wins,
     link,
+  }
+}
+
+/** The own profile card: always available, even with no level, position or games. */
+export async function getPlayerProfileShareData(playerId: string, signal?: AbortSignal) {
+  if ((await getSession('player'))?.account.id !== playerId)
+    throw new MockError('permission', 'Sign in to share your profile.')
+  const [profile, rank, history] = await Promise.all([
+    getPlayerProfile(playerId, signal),
+    getPlayerRank(playerId, signal),
+    getPlayerGames(playerId, signal),
+  ])
+  if (!profile) return null
+  const now = isRealDataMode() ? Date.now() : PLAYER_FIXTURE_NOW.getTime()
+  const recent = countRecentCountedWins(history, now)
+  return {
+    kind: 'profile' as const,
+    profile,
+    levelIndex: rank?.levelIndex ?? null,
+    position: rank?.position ?? null,
+    wins: recent.games > 0 ? recent.wins : null,
+    link: `/players/${encodeURIComponent(playerId)}`,
   }
 }

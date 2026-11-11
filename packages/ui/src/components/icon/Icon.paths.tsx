@@ -346,6 +346,18 @@ export const ICONS = {
     ),
   },
   // Preparation header (owner request, November 10, 2026; rotra-queue.html I.link / post / trash / ban).
+  share: {
+    size: 16,
+    strokeWidth: 2.2,
+    body: (
+      <>
+        <circle cx="6" cy="12" r="2.5" />
+        <circle cx="18" cy="6" r="2.5" />
+        <circle cx="18" cy="18" r="2.5" />
+        <path d="m8.2 10.8 7.6-3.6M8.2 13.2l7.6 3.6" />
+      </>
+    ),
+  },
   link: {
     size: 16,
     strokeWidth: 2.2,

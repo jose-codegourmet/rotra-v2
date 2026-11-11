@@ -205,6 +205,7 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
             }
             onEdit={() => router.push('/profile/edit')}
             onOpenPlayerId={() => router.push('/profile/player-id')}
+            onShare={isOwn ? sharing.openProfile : undefined}
           />
           {pictureEditor.sheet}
           {sharing.sheet}

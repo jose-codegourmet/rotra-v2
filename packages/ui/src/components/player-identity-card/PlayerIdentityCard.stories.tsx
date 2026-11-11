@@ -15,6 +15,7 @@ const meta = {
     onEdit: () => {},
     onChangePicture: () => {},
     onOpenPlayerId: () => {},
+    onShare: () => {},
     onCompare: () => {},
   },
 } satisfies Meta<typeof PlayerIdentityCard>

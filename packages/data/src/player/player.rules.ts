@@ -20,6 +20,27 @@ export function countRecentStandardMatches(
     )
   }, 0)
 }
+/** Counted wins inside the same window as the rank (fun and partial games never count). */
+export function countRecentCountedWins(
+  sessions: readonly PlayerSessionRecord[],
+  now: Date | number,
+  windowDays = WINDOW_DAYS,
+): { games: number; wins: number } {
+  const end = Number(now),
+    start = end - windowDays * 86400000
+  let games = 0,
+    wins = 0
+  for (const session of sessions) {
+    const at = Date.parse(session.finishedAt)
+    if (at < start || at > end) continue
+    for (const game of session.games)
+      if (game.counting === 'counted') {
+        games += 1
+        if (game.result === 'won') wins += 1
+      }
+  }
+  return { games, wins }
+}
 export function isLeaderboardEligible(
   recentCount: number,
   matchRequirement: number,

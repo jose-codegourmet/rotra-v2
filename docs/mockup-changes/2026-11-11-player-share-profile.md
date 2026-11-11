@@ -1,6 +1,6 @@
 # Player: Share profile card with QR, photo, level, stats and a copyable link (#738, proposed)
 
-Status: NEW
+Status: IN MOCK APP — #738
 Date: 2026-11-11
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › My profile › Share profile (new share sheet kind, same sheet as Share rank, Share result, Share games)

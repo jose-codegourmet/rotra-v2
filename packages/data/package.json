@@ -418,6 +418,7 @@
     "./player/useMySessions": "./src/player/useMySessions.ts",
     "./player/mySessions": "./src/player/mySessions.ts",
     "./player/usePlayerShareData": "./src/player/usePlayerShareData.ts",
+    "./player/usePlayerProfileShareData": "./src/player/usePlayerProfileShareData.ts",
     "./profile-character/images": "./src/profile-character/fetchers.ts",
     "./profile-character/crop": "./src/profile-character/crop.ts",
     "./profile-character/useShownProfileCharacters": "./src/profile-character/useShownProfileCharacters.ts",

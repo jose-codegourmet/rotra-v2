@@ -52,7 +52,7 @@ export type ShareCardProps = {
   /** Overrides the browser's Web Share check (stories and tests). */
   webShare?: boolean
   onShared?: () => void
-  onDownloaded?: () => void
+  onDownloaded?: (format: ShareFormat) => void
   onError?: (message: string) => void
 }
 
@@ -168,7 +168,7 @@ export function ShareCard({
       anchor.remove()
       // Give the browser time to consume the download before releasing the blob.
       setTimeout(() => URL.revokeObjectURL(url), 1000)
-      onDownloaded?.()
+      onDownloaded?.(format)
     } finally {
       setBusy(false)
     }

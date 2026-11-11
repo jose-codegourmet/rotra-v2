@@ -66,8 +66,9 @@ flowchart TD
 | Module | Defined surfaces |
 |---|---|
 | [Player sign-in, registration claim, and password recovery](modules/player-information/access-registration.md) | `P-LOGIN`, `P-CLAIM`, `P-CLAIM-STATUS`, `P-FORGOT`, `P-RESET` |
-| [Player ID, phone privacy, and contact-change request](modules/player-information/identity-privacy.md) | `P-ID-QR`, `P-PHONE-PRIVACY`, `P-CONTACT-REQUEST` |
+| [Player ID, profile visibility, phone privacy, and contact-change request](modules/player-information/identity-privacy.md) | `P-ID-QR`, `P-PROFILE-PRIVACY`, `P-PHONE-PRIVACY`, `P-CONTACT-REQUEST` |
 | [Public and own player profile](modules/player-information/profile.md) | `P-PUBLIC-PROFILE`, `P-OWN-PROFILE`, `P-EDIT-PROFILE` |
+| [Public club page and club members](modules/player-information/club-page.md) | `P-CLUB-PAGE`, `P-CLUB-MEMBERS` |
 | [Global leaderboard, rank explanation, and game history](modules/player-information/ranking-history.md) | `P-LEADERBOARD`, `P-RANK-DETAIL`, `P-ELIGIBILITY`, `P-MATCH-HISTORY` |
 
 ### Admin
@@ -103,3 +104,7 @@ needs a signed-in player, so signed out it goes to `/login` and returns there.
 
 Guest registration invitations (#490) open `/register/[clubId]` in Player Information, with no
 sign-in required. The club is RTR allocation context only; existing profiles still use `/claim/[token]`.
+
+### Player club routes (epic P07)
+
+Proposed November 11, 2026 ([D-2026-11-11-11](../../mvp/decisions.md#d-2026-11-11-11)): `/clubs/[clubId]` (`P-CLUB-PAGE`) and `/clubs/[clubId]/members` (`P-CLUB-MEMBERS`) in Player Information. Both are public (no sign-in), served per request, never indexed and never static; signed-out visitors see masked member names. Linked from **Your clubs** on the own profile. The Members page's back link returns to the club page. Member taps open the profile dialog and don't navigate. Unknown club ids are not found. The prototype serves them under `/player/clubs/c1`.

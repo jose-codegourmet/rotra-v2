@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 3 · IN PROGRESS: 5 · IN MOCK APP: 106 · CANCELLED: 1 · MOCKUP ONLY: 4
+NEW: 21 · IN PROGRESS: 5 · IN MOCK APP: 106 · CANCELLED: 1 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -288,13 +288,31 @@ NEW: 3 · IN PROGRESS: 5 · IN MOCK APP: 106 · CANCELLED: 1 · MOCKUP ONLY: 4
 | [2026-11-10-player-games-share-avatars](2026-11-10-player-games-share-avatars.md) | Games share cards show teams and clear scores | session-games-share-card, share-card, avatar | IN MOCK APP — #682 |
 | [2026-11-10-queue-prep-header-icons](2026-11-10-queue-prep-header-icons.md) | Preparation header: icon buttons, and Cancel/Delete session in a ⋯ menu | page-header, button, icon, overflow-menu, more-options-sheet | IN MOCK APP — #697 (PR #698) |
 | [2026-11-10-queue-public-account-bar](2026-11-10-queue-public-account-bar.md) | Session page: account bar with Log in, or the signed-in Player and Sign out | public-account-bar (new), avatar, button | IN MOCK APP — #585 |
+| [2026-11-11-admin-avatar-photo-viewer](2026-11-11-admin-avatar-photo-viewer.md) | Admin: Click an avatar or club logo picture to see it in a black-overlay dialog (#716, proposed) | avatar, club-logo, photo-viewer dialog | NEW |
+| [2026-11-11-admin-image-library-cards](2026-11-11-admin-image-library-cards.md) | Admin › Profile characters and Profile banners: each image is a card | image-library-page, image-card | NEW |
 | [2026-11-11-admin-license-no-start-date](2026-11-11-admin-license-no-start-date.md) | A-LICENSE: no Term starts field; the period is computed and shown read-only; history shows LIC number plus note | license-sheet, payment-history-table | NEW |
+| [2026-11-11-admin-profile-banners](2026-11-11-admin-profile-banners.md) | Admin › Settings › Profile banners: the owner manages the banners players can pick | image-library-page, drop-zone, image-tile | NEW |
+| [2026-11-11-player-avatar-photo-viewer](2026-11-11-player-avatar-photo-viewer.md) | Player: Tap a picture avatar to see the full photo in a black-overlay dialog (#716, proposed) | avatar (new optional view behaviour), photo-viewer dialog | NEW |
+| [2026-11-11-player-character-picker-circles](2026-11-11-player-character-picker-circles.md) | Profile picture sheet: characters as big circles, 5 in a row, 15 per page | profile-picture-sheet, character-picker | NEW |
+| [2026-11-11-player-edit-profile-links-rows](2026-11-11-player-edit-profile-links-rows.md) | Edit profile › Links: the four link fields stack one per row | edit-profile-form, text-field | NEW |
+| [2026-11-11-player-profile-banner](2026-11-11-player-profile-banner.md) | Profile page: a public banner across the top of the profile card, like Discord | profile-hero | NEW |
+| [2026-11-11-player-profile-visibility-hide-from-directory](2026-11-11-player-profile-visibility-hide-from-directory.md) | Player: Profile visibility has three levels, plus Hide me from Player Information (#715, proposed) | profile-visibility choice (radio group), settings switch, avatar | NEW |
+| [2026-11-11-player-public-club-page](2026-11-11-player-public-club-page.md) | Player: New public club page with members, upcoming sessions and a calendar (#737, proposed) | club-header (avatar plus facts and actions), member-row, session-row (reuses the My sessions row), month-calendar | NEW |
+| [2026-11-11-player-share-profile](2026-11-11-player-share-profile.md) | Player: Share profile card with QR, photo, level, stats and a copyable link (#738, proposed) | share-card (the share sheet and card used by Share rank, Share result and Share games), avatar | NEW |
+| [2026-11-11-queue-avatar-photo-viewer](2026-11-11-queue-avatar-photo-viewer.md) | Avatar photo viewer: tap a picture to see the full photo (#716, proposed; Queue part) | avatar, photo-viewer (new) | NEW |
+| [2026-11-11-queue-bagging-mode](2026-11-11-queue-bagging-mode.md) | Generate matches: bagging mode with a bagging pairs list (#739, proposed) | generate-matches-workspace, switch, segmented-control, bagging-pairs-card (new), bagging-pair-sheet (new), player-select | NEW |
 | [2026-11-11-queue-club-only-unclaimed](2026-11-11-queue-club-only-unclaimed.md) | Guests and unclaimed profiles stay in their club; Player Information search shows registered players only | add-player-sheet, saved-player-card, player-profile-sheet, invite-sheet, identity-chip | NEW |
 | [2026-11-11-queue-device-play-history-file](2026-11-11-queue-device-play-history-file.md) | Club settings › This device: Export play history and Import play history… | device-downloads-card, button, toaster | NEW |
+| [2026-11-11-queue-facebook-post-court-times-join-link](2026-11-11-queue-facebook-post-court-times-join-link.md) | Facebook post: court times on each court line and a join link (#730, proposed) | facebook-post-dialog, post-template-keys | NEW |
 | [2026-11-11-queue-hide-present-before-start](2026-11-11-queue-hide-present-before-start.md) | Preparation roster: no Present switches until the session has started | roster-row, roster-card, roster-panel | IN MOCK APP — #704 |
 | [2026-11-11-queue-join-request-avatars](2026-11-11-queue-join-request-avatars.md) | Join requests: a signed-in Player's request shows their profile picture | join-requests-panel, avatar | IN MOCK APP — PR #702 |
 | [2026-11-11-queue-join-request-slot-or-waitlist](2026-11-11-queue-join-request-slot-or-waitlist.md) | Join request: the player picks Join a slot or Be waitlisted, and can join from the waitlist | join-request-form, join-request-card, join-requests-panel | IN MOCK APP — #706 |
+| [2026-11-11-queue-match-requests-live-only](2026-11-11-queue-match-requests-live-only.md) | Requests: join requests before Start, match requests after; the live console shows Match requests at the upper right | requests-panel, tabs | NEW |
+| [2026-11-11-queue-participant-profile-tap](2026-11-11-queue-participant-profile-tap.md) | Tap a participant on the session page to open their profile (#731, proposed) | participant-tile, player-profile-sheet (new public variant), private-profile-card (new), avatar | NEW |
+| [2026-11-11-queue-roster-grid-mobile](2026-11-11-queue-roster-grid-mobile.md) | Roster and levels › Grid view on phones: two compact columns | roster-card, roster-grid | NEW |
+| [2026-11-11-queue-roster-waitlist-overfill](2026-11-11-queue-roster-waitlist-overfill.md) | Admitted players can step down to the waitlist; Queue Master can overfill the roster (#735, proposed) | roster-card, roster-row, player-pool-card, slot-meter (roster summary), confirm-sheet, my-night-card | NEW |
 | [2026-11-11-queue-set-games-played](2026-11-11-queue-set-games-played.md) | Queue Master can set games played, for one player or everyone | set-games-sheet, player-pool-card, confirm-sheet, count-stepper, button | IN PROGRESS — #717 |
 | [2026-11-11-queue-share-club-invite-copy-link](2026-11-11-queue-share-club-invite-copy-link.md) | Copy invite link on the Share club invite sheet | club-invite-card, share-card | IN MOCK APP — #708 |
 | [2026-11-11-queue-start-session-online-only](2026-11-11-queue-start-session-online-only.md) | Start session is online only | start-session-sheet, start-session-bar | IN MOCK APP — #721 |
+| [2026-11-11-queue-tab-focus-border](2026-11-11-queue-tab-focus-border.md) | Tabs: no thick focus border after a tap or click; thin ring for the keyboard (#736, proposed) | tabs | NEW |
 <!-- status-index:end -->

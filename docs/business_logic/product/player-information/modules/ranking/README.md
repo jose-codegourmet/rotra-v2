@@ -60,7 +60,8 @@ A player can share, as a link, a QR code or a post/story image ([D-2026-11-09-08
 
 - **Published only.** Session results and games can be shared only after the Queue Master publishes the session's results. Until then there is nothing to share and the player sees “Results not shared yet by the club.”
 - **Own results only.** A player shares their own profile's data; the image's QR opens their profile, which follows the profile privacy setting ([D-2026-11-09-07](../../../../../mvp/decisions.md#d-2026-11-09-07)).
-- **Other players' names** on images are shown as a visitor would see them: private players and guests masked, public registered players in full.
+- **Other players' names** on images are shown as a visitor would see them: Private and Always private players and guests masked, public registered players in full.
+- **Share profile** ([D-2026-11-11-11](../../../../../mvp/decisions.md#d-2026-11-11-11), #738). Separate from the three cards above and not tied to a published session: the player's own **profile card** with the picture, name and nickname, level (or **Not ranked yet**), overall leaderboard position whenever the player has one, and **Last 90 days** with the number of **wins** counted in that window (or **No games yet**). Games played, losses and win rate are not on the card. The image carries a QR to the public profile and the screen shows the profile link with a **Copy** button. It uses the same 90-day window as rank. Always available on the own profile, even with no photo, level or games.
 
 ## Overall leaderboard
 
@@ -70,7 +71,7 @@ A newcomer can have a public profile and provisional rank before qualifying for 
 - Require **10 counted singles/doubles games within the last 90 days**.
 - The threshold is adjustable in Admin.
 - Ordered by rating. **Ties:** more counted games in the window first, then name (decided November 11, 2026).
-- Private players keep their position with a masked name ([D-2026-11-09-07](../../../../../mvp/decisions.md#d-2026-11-09-07)).
+- Private players keep their position with a masked name ([D-2026-11-09-07](../../../../../mvp/decisions.md#d-2026-11-09-07)); an Always private player's name is masked for everyone but themselves, and their picture stays visible ([D-2026-11-11-11](../../../../../mvp/decisions.md#d-2026-11-11-11)).
 - Exclude fun games, invalid matches, and partial games from that count.
 - Ten is a rolling requirement, not a lifetime milestone. Falling below it removes eligibility even if a profile/rank remains visible.
 - The fresh-assessment rule does not waive the match-count requirement.

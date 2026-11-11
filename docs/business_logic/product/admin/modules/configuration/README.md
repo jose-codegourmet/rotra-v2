@@ -29,9 +29,19 @@ The agreed Most Improved/Off Day requirement is five prior sessions at the same 
 
 Owner decision, November 9, 2026 ([D-2026-11-09-13](../../../../../mvp/decisions.md#d-2026-11-09-13); mockup log 2026-11-09-admin-profile-characters; in the mock app, tickets #644–#646; real mode not started). The characters players pick as their profile picture are images **the platform owner uploads** in Admin › Settings › Profile characters. No club or player adds to the library.
 
-- Uploads: images only (PNG, JPG or WebP), up to 1 MB each, cropped to a centred square; several at once.
-- Each image is **shown** or **hidden**; at least **8** stay shown. Players see shown images in upload order, **8 per page**. Delete has a short Undo.
+- Uploads: images only (PNG, JPG or WebP), up to 1 MB each, cropped to a centred square; several at once. While files are added, a progress bar shows **Uploading N of M…** (November 11, 2026, [D-2026-11-11-11](../../../../../mvp/decisions.md#d-2026-11-11-11)); rejected files count towards M.
+- Each image is **shown** or **hidden**; at least **15** stay shown. Players see shown images in upload order, **15 per page**. Delete has a short Undo. *(Changed November 11, 2026, [D-2026-11-11-11](../../../../../mvp/decisions.md#d-2026-11-11-11): the picker was 8 per page with at least 8 shown; it is now 5 circles across, 15 per page, so Admin keeps at least 15 shown.)*
 - Hiding or deleting an image never changes the picture of a player who already uses it.
 - The same shown list feeds the Player profile picture dialog, Admin's edit-player sheet and the club's picture editor (D-2026-11-09-12).
+- Every change is recorded in the Record of actions. Offline: no change.
+
+## Profile banner library
+
+Owner decision, November 11, 2026 ([D-2026-11-11-11](../../../../../mvp/decisions.md#d-2026-11-11-11); mockup log 2026-11-11-admin-profile-banners; real mode not started). A banner is the strip across the top of a player's ROTRA profile card, like a Discord banner. Players pick one of the **predefined banners** the platform owner manages in Admin › Settings › Profile banners. It is managed exactly like the [character library](#profile-character-library); **no club or player ever uploads a banner**.
+
+- Uploads: images only (PNG, JPG or WebP), up to 2 MB each, centred-cropped to **3:1**; several at once, with the same **Uploading N of M…** progress bar.
+- Each banner is **shown** or **hidden**; at least **2** stay shown, so players have a choice. Delete has a short Undo.
+- Six sample banners are seeded: Court, Night, Dusk, Ember, Sun and Stripe.
+- Players pick one of the shown banners in Edit profile. Hiding or deleting a banner never changes the banner of a player who already uses it.
 - Every change is recorded in the Record of actions. Offline: no change.
 

@@ -4,7 +4,7 @@ Generate matches was formerly called Auto Queue; renamed 2026-11-06.
 
 1. The operator marks roster players present.
 2. Add waiting matches by Add match, Make match (select players), Suggest, or selecting Generate matches drafts and reviewing their transfer to the Main Queue.
-3. Generate matches works in the selected strategy tab using enabled formats, presence, played and queued counts and planned load; its drafts remain separate until transfer.
+3. Generate matches works in the selected strategy tab using enabled formats, presence, played and queued counts and planned load; its drafts remain separate until transfer. With **Bagging mode** on (doubles), listed bagging pairs that apply to their next game are kept together as partners in every tab ([rules](../README.md#bagging-mode-and-bagging-pairs)).
 4. The operator reorders, edits, or removes waiting matches. Edited matches become protected manual matches.
 5. When a court is free, it proposes the first ready match in queue order and explains any skipped ones. The operator can pick any other ready match instead.
 6. **Put on court.** In Manual Queue the operator reviews the match, chooses the court (two courts for 5v5), and taps **Put on court**. In Auto Queue ROTRA places the next eligible match itself (never a 5v5, never on a court not open yet; a court whose booking ended still fills). Either way the match is now **On court**, not started, and its players are busy.

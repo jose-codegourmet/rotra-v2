@@ -1,6 +1,6 @@
 # Identity, contacts, accounts, and permanent RTR IDs
 
-**Last verified:** 2026-11-07 for player login mapping and claim-link rules (#244); 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-11 for visibility, hide-from-directory and banner fields; 2026-11-07 for player login mapping and claim-link rules (#244); 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Proposed logical schema. Player account mapping and claim-link rules are decided (2026-11-07, #244); email verification, password policy and contact-change enforcement remain unresolved.
 
@@ -13,7 +13,9 @@
 | `avatar_previous_ref` | Nullable; the previous uploaded photo, next to the current `avatar_ref`. Never a character or initials; only current and previous files are kept ([D-2026-11-09-10](../../../../mvp/decisions.md#d-2026-11-09-10)) |
 | `profile_state` | Unclaimed/claimed; no login is required for unclaimed identity |
 | `hide_phone_from_clubs` | Privacy preference |
-| `profile_private` | Boolean, default false. True hides the profile from visitors who are not signed in ([D-2026-11-09-07](../../../../mvp/decisions.md#d-2026-11-09-07)) |
+| `profile_visibility` | Enum `public` · `private` · `always_private`, **default `private`**. Replaces the boolean `profile_private` ([D-2026-11-09-07](../../../../mvp/decisions.md#d-2026-11-09-07), changed by [D-2026-11-11-11](../../../../mvp/decisions.md#d-2026-11-11-11)). `private` hides the profile from visitors who are not signed in; `always_private` hides name, level and games from everyone but the player (and the Queue Master of a session they join), while `avatar_ref` and `banner_id` stay public. Proposed; needs owner sign-off for the migration, and how existing `profile_private` rows map to the new levels is not decided |
+| `hidden_from_directory` | Boolean, default false. True leaves the player out of Queue's Add player › Player Information search and RTR ID search and out of public club page member lists; Saved players, Admin and the public session page are unaffected ([D-2026-11-11-11](../../../../mvp/decisions.md#d-2026-11-11-11)). Proposed; needs owner sign-off for the migration |
+| `banner_id` | Nullable reference to the Admin-managed banner library (`profile_banners`, see the Admin [configuration requests](../../admin/modules/configuration-requests.md)); null means the default banner. A hidden or deleted banner still resolves for players who already use it. Public like `avatar_ref`. Players cannot upload banners, so **no storage, bucket or file field** belongs to the player for it ([D-2026-11-11-11](../../../../mvp/decisions.md#d-2026-11-11-11)). Proposed; one small column, needs owner sign-off for the migration |
 | `experience_months`, `experience_recorded_at` | Optional nonnegative self-reported experience snapshot; not rating credit. Playing since = `experience_recorded_at` minus `experience_months` (month precision); screens show years and months counted from it (November 8, 2026). Set by the player, or by the club for an unclaimed profile |
 | `personal_details`, `details_version` | Optional validated JSONB for agreed playing-style fields; final schema pending |
 | `created_at`, `updated_at`, `revision` | Common metadata |
@@ -182,5 +184,9 @@ IDs stay permanent. Later contact/address changes do not rerun allocation. Do no
 After a historical guest identity is confirmed, attribute earlier valid games to that profile for personal history and ranking under the existing eligibility/window rules. Keep original entry/finalization identity snapshots and permanent outcomes intact; the auditable linkage/projection mechanism, confirmation evidence, and mistaken-link handling must be designed before implementation. Use original played dates and deduplicate contributions.
 
 Indexes: unique phone, non-null email proposal, auth subject, RTR ID, allocation city/date/sequence; name lookup can use a safe public search projection. No public phone index/query API is implied.
+
+## Public club page reads (#737, epic P07)
+
+The page at `/clubs/[clubId]` adds **no table**. The member list is a read of `club_players` (not removed, `player_id` not null, so guests and unclaimed profiles never appear) joined to registered `players` whose `hidden_from_directory` is false; the count is the number of rows listed. Masking follows `profile_visibility` and the viewer (a visitor sees `private` and `always_private` names masked; a signed-in viewer sees `private` names; `always_private` stays masked for everyone but the player) while `avatar_ref` and `banner_id` are returned for all. Upcoming sessions, the calendar and stats read the club's `queue_sessions` and public session pages. Reads are served per request and never indexed ([D-2026-11-11-09](../../../../mvp/decisions.md#d-2026-11-11-09) for page retention). The Share profile card adds no storage: it uses the profile and the 90-day win count already derived for rank.
 
 Business source: [identity](../../../../business_logic/product/player-information/modules/identity/README.md).

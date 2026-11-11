@@ -1,6 +1,6 @@
 # Product terms — ROTRA v1
 
-**Last verified:** 2026-11-06 · **Owner:** product owner · **Single source of vocabulary.** If a word here
+**Last verified:** 2026-11-11 · **Owner:** product owner · **Single source of vocabulary.** If a word here
 disagrees with a business, screen, or database doc, this file is wrong and must be fixed in the same PR.
 
 **Read this when** a task uses a domain word, or names a type, component, route, query key, enum value,
@@ -58,7 +58,12 @@ Rules: [Sessions](business_logic/product/queue/modules/sessions/README.md) ·
 | Session link | The session's public page URL. Guests can send a join request from it |
 | Join request | A request for a slot from the session link, by a guest or a signed-in ROTRA player ([D-2026-11-09-02](mvp/decisions.md#d-2026-11-09-02)). Holds nothing until the QM confirms or declines. Not a Match request |
 | Drop-out notice | **I can't make it** from a confirmed signed-in player before start. Shows under **Requests** (“Can't make it”); the slot frees only when the QM taps **Remove from roster** ([D-2026-11-09-03](mvp/decisions.md#d-2026-11-09-03)) |
-| Requests · N | The QM's one button for join requests, drop-out notices and match requests, with **Join** and **Match** tabs ([D-2026-11-09-05](mvp/decisions.md#d-2026-11-09-05)) |
+| Requests · N | Before Start: the preparation card for join requests and drop-out notices. After Start: the **Match requests · N** button at the upper right of the live console, match requests only, in the warn colour while any is waiting; join requests close at Start ([D-2026-11-09-05](mvp/decisions.md#d-2026-11-09-05), [D-2026-11-11-11](mvp/decisions.md#d-2026-11-11-11)) |
+| Bagging mode | A session-wide switch in Generate matches (doubles only). While it is on, the **Bagging pairs** list guides every Generate tab, including Catch Up; Auto Queue and hand-built matches are untouched ([D-2026-11-11-11](mvp/decisions.md#d-2026-11-11-11)) |
+| Bagging pair | Two players the Queue Master keeps together as partners for the games picked in **ALL 1 … N** (N = the session minimum). A player is in one pair at a time; an applicable pair with both players free leads the next doubles draft |
+| Move to waitlist | The Queue Master's action on a roster player (before Start, and after Start when the player is not in a match) that puts them at the front of the waitlist, keeping their level and paid mark. A player does the same to themselves with **Move me to the waitlist** on the session page |
+| Over capacity | A roster past its slot count after the Queue Master adds someone anyway (**Add NAME anyway?**); the count reads 25/24 in the warn colour and expected games are recomputed |
+| Participant profile card | The dialog a signed-in player opens by tapping a participant tile on the session page (and the Queue Master opens from any avatar): banner, picture, name, level, status, About and 90-day stats. Private players show only their picture and banner; guests show a “no profile yet” card |
 | Session invite | A confirmed or waitlisted player's share card and link for one session, carrying a short invite code; the QM's join request card says “Invited by NAME” ([D-2026-11-09-08](mvp/decisions.md#d-2026-11-09-08)) |
 | Join a slot · Be waitlisted | The player's choice on a join request ([D-2026-11-11-02](mvp/decisions.md#d-2026-11-11-02)): a slot, or a waitlist place. Join a slot is unavailable before start while every slot is taken. Code value `placement`: `slot` · `waitlist` · `from_waitlist` |
 | Join from waitlist | A waitlisted signed-in Player's request for a slot while slots are open; the Queue Master confirms it (**Give slot** / **Admit player**) and it never overfills before start ([D-2026-11-11-02](mvp/decisions.md#d-2026-11-11-02)) |
@@ -89,6 +94,10 @@ Rules: [Players](business_logic/product/queue/modules/players/README.md) ·
 | Lookup pending | New player entered with a phone; matched to a registered player when the session syncs, or kept as the club's unclaimed profile ([D-2026-11-11-03](mvp/decisions.md#d-2026-11-11-03)) |
 | Unclaimed profile | A club's saved player with a phone who hasn't registered. Lives only in that club: no RTR ID, never found by another club ([D-2026-11-11-03](mvp/decisions.md#d-2026-11-11-03)) |
 | Registered player | Claimed profile with required phone, email, and password |
+| Always private | The strictest **Profile visibility** level (Public · Private · Always private; default Private). Nobody but the player sees their name, level and games; the picture and banner stay public ([D-2026-11-11-11](mvp/decisions.md#d-2026-11-11-11)) |
+| Hide from Player Information | The player's switch **Hide me from Player Information**: clubs can't find them in Queue's Add player › Player Information search or by RTR ID, and they're left out of public club page member lists; Saved players, Admin and the public session page are unaffected ([D-2026-11-11-11](mvp/decisions.md#d-2026-11-11-11)) |
+| Profile banner | The strip across the top of a player's profile card, public like the picture. A player picks one of the predefined banners the platform owner manages in Admin › Settings › Profile banners; no uploads ([D-2026-11-11-11](mvp/decisions.md#d-2026-11-11-11)) |
+| Public club page | A club's public page at `/clubs/[clubId]` in Player Information (epic P07): header, members, upcoming sessions and a calendar. Not the club's session page and not the invite link ([D-2026-11-11-11](mvp/decisions.md#d-2026-11-11-11)) |
 | Player ID / RTR ID | Permanent identifier given when the player registers, e.g. `RTR-PH-CEB-031526-0001` ([D-2026-11-11-03](mvp/decisions.md#d-2026-11-11-03)). Never a database key |
 | Invite (link) / Registration invite | Per-guest link for a guest or unclaimed profile to create or claim an account. Never books a session ([D-2026-11-09-06](mvp/decisions.md#d-2026-11-09-06)) |
 | Club invite link | One standing link per club (`/register/[clubId]`) with a share card; a new person registers through it and joins the club's Saved players (“Joined via club link”), a signed-in player taps once to join ([D-2026-11-09-06](mvp/decisions.md#d-2026-11-09-06), [D-2026-11-09-08](mvp/decisions.md#d-2026-11-09-08)) |
@@ -313,6 +322,9 @@ from the [database design](database_design/product/README.md). Add a row here **
 | Leaderboard entry | `LeaderboardEntry` | — | Public projection, no table; overall position comes from eligible fixture order |
 | Player session record / player game | `PlayerSessionRecord` / `PlayerGame` | `player_match_facts` | Public read projection of valid finalized games |
 | Player profile | `PlayerProfile` | — | Public identity, picture, and optional playing details; no contacts |
+| Profile visibility | `profileVisibility` | `players.profile_visibility` | `public` · `private` (default) · `always_private`; replaces `profile_private` (proposed) |
+| Hidden from Player Information | `hiddenFromDirectory` | `players.hidden_from_directory` | Boolean, default false (proposed) |
+| Profile banner | `bannerId` | `players.banner_id` → `profile_banners` | Null = default banner; library managed in Admin (proposed) |
 | Player account | `PlayerAccount` | `player_accounts` | Claimed sign-in link for a player; `MyAccount` is the owner-only read of it in the mock phase |
 | Player private contact | `PlayerPrivateContact` | `player_private_contacts` | Phone, email and phone privacy; never in a public projection |
 | Player social link | `PlayerSocialLink` | `player_social_links` | Facebook, Instagram, YouTube or LinkedIn URL; a description, never a sign-in method |
@@ -346,7 +358,7 @@ URL segments, component names, and query keys use the same words: `sessions/[ses
 |---|---|
 | Match done ↔ Session done | One game's permanent result vs. the whole session's online finalization |
 | Waiting queue ↔ Waitlist ↔ Join request | Matches waiting for courts vs. players waiting for a slot vs. a guest asking for a slot |
-| Join request ↔ Match request ↔ Drop-out notice | Asking for a slot vs. a present player asking for a specific game vs. a confirmed player saying they can't come. All three sit under **Requests · N** |
+| Join request ↔ Match request ↔ Drop-out notice | Asking for a slot vs. a present player asking for a specific game vs. a confirmed player saying they can't come. Join requests and drop-out notices live in the preparation Requests card; match requests live in the live console's **Match requests · N** button |
 | Match number ↔ Queue position | Fixed creation number vs. current, changing place in the queue |
 | Present ↔ Available ↔ Wait time | Operator switch vs. present and not playing vs. derived minutes |
 | Playing level ↔ Club assessment ↔ Session playing level ↔ Shared rank | The nine-level scale vs. one club's latest level vs. the level locked for one session vs. cross-club rank |

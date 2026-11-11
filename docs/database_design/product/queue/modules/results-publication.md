@@ -43,7 +43,7 @@ Most Improved/Off Day need five **previous** qualifying sessions at that same cl
 
 `session_publications`: unique session FK; opaque public page key; safe Details/Participants projection; nullable published result snapshot ID; `published_slides` (subset of standings/awards); explicit `include_off_day`; publication actor/time; publication state; expiry-cycle FK and last synced time. The public details page may exist before result publication.
 
-The public Details projection includes the minimum games per player; Participants include name, permitted picture, and a "has a ROTRA profile" flag only — no level, presence, contact, or cost data.
+The public Details projection includes the minimum games per player; Participants include name, permitted picture, and a "has a ROTRA profile" flag only — no level, presence, contact, or cost data. The signed-in viewer's **participant profile card** (November 11, 2026, [D-2026-11-11-11](../../../../mvp/decisions.md#d-2026-11-11-11), #731) stores nothing on the session: it reads the player's Player Information profile (name, level, 90-day stats, banner, visibility) and tonight's status from the live session, and the full-photo viewer is UI only.
 
 Re-publication is allowed: each publish command replaces `published_slides` and **must supply `include_off_day` explicitly** (the UI always starts it unchecked); never carry it over from the previous row. Keep an append-only `session_publication_events` log (selection, Off Day choice, actor, time) so earlier consent is auditable. Full withdrawal is not specified.
 

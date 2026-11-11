@@ -25,6 +25,7 @@ Proposed navigation:
 - Ranking configuration.
 - Feature flags.
 - Profile characters (A-CHARACTERS, owner request, November 9, 2026; `/settings/profile-characters`).
+- Profile banners (A-BANNERS, November 11, 2026, [D-2026-11-11-11](../../../../mvp/decisions.md#d-2026-11-11-11); `/settings/profile-banners`; the rail badge counts shown banners).
 
 The initial view can be the clubs list rather than a speculative analytics dashboard. Counts shown in navigation are actual records, not mock revenue, churn, active-user, moderation, or platform-health metrics.
 

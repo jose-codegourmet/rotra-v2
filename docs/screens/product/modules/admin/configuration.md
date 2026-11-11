@@ -49,13 +49,25 @@ A sheet with:
 
 `/admin/settings/profile-characters`, under Settings after Feature flags; the rail shows the number of shown images. Owner comments on the Admin artifact, November 9, 2026: “this is too much. I just want a simple grid of images…” and “for the admin character library it should just be me (admin) uploading images” ([D-2026-11-09-13](../../../../mvp/decisions.md#d-2026-11-09-13)).
 
-- Header **Profile characters** and one helper line: “Players see the shown images, 8 per page. Click an image to hide or show it. N shown · M hidden.”
-- A drag-and-drop upload zone: “Drag images here to upload” / “or click to choose · PNG, JPG or WebP, up to 1 MB each”. Clicking opens a file picker; several files at once. Each image is cropped to a centred square. Toasts: “N images added and shown to players.”, “Not added: <file> isn't a PNG, JPG or WebP image; <file> is over 1 MB.”
+- Header **Profile characters** and one helper line: “Players see the shown images, 15 per page. Click an image to hide or show it. N shown · M hidden.”
+- A drag-and-drop upload zone: “Drag images here to upload” / “or click to choose · PNG, JPG or WebP, up to 1 MB each”. Clicking opens a file picker; several files at once. Each image is cropped to a centred square. While files are added, a progress block under the zone shows **Uploading N of M…** with an accent bar that fills per file (rejected files count towards M) and disappears when the result toast appears (November 11, 2026, [D-2026-11-11-11](../../../../mvp/decisions.md#d-2026-11-11-11)). Toasts: “N images added and shown to players.”, “Not added: <file> isn't a PNG, JPG or WebP image; <file> is over 1 MB.”
 - A plain grid of the images, in upload order. **Click an image** to hide or show it: a hidden image is dimmed to opacity .25 (`aria-pressed="false"`, label “Character N, hidden”). A small **×** on each image deletes it, with a toast “Character N deleted.” and **Undo** for 6 seconds.
-- At least **8** images stay shown: hiding or deleting a shown image below that is refused with a toast (“Keep at least 8 images shown…”).
+- At least **15** images stay shown (was 8 until November 11, 2026, [D-2026-11-11-11](../../../../mvp/decisions.md#d-2026-11-11-11)): hiding or deleting a shown image below that is refused with a toast (“Keep at least 15 images shown…”).
 - No names, ordering controls or generated characters. Hiding or deleting never takes an image from players who already use it. Every change goes in the record of actions. Offline: the offline error, nothing changes.
-- Players see only shown images in the picker ([Player profile picture](../player-information/profile.md)), 8 per page; Admin's [A-PLAYER-EDIT](players-requests.md#a-player-edit--edit-a-player-everything-the-player-can-change) uses the same list.
+- Players see only shown images in the picker ([Player profile picture](../player-information/profile.md)), 5 circles across and 15 per page; Admin's [A-PLAYER-EDIT](players-requests.md#a-player-edit--edit-a-player-everything-the-player-can-change) uses the same list.
 - Prototype: seeded with 24 sample uploads (illustrated faces); uploads are kept as data URLs in the page's saved state.
+- Plain tiles with the corner **×** stay: a card layout (name, Shown/Hidden chip, Hide and Delete buttons) was tried on November 11, 2026 and reverted on request (log 2026-11-11-admin-image-library-cards, CANCELLED).
+
+## A-BANNERS — Profile banners
+
+`/admin/settings/profile-banners`, in the Settings group of the left rail after Profile characters; the rail badge shows the number of shown banners. Owner comment on the Admin artifact, November 11, 2026: “please add banners, like profile characters…”; approved in [D-2026-11-11-11](../../../../mvp/decisions.md#d-2026-11-11-11). The page is built exactly like [A-CHARACTERS](#a-characters--profile-characters), with these differences.
+
+- Header **Profile banners** and the helper line: “The strip across the top of a player's profile card, like a Discord banner. Players pick one of the shown banners from Edit profile; they can't upload their own. Click a banner to hide or show it. N shown · N hidden.”
+- Upload zone: “Drag banners here to upload” / “or click to choose · PNG, JPG or WebP, up to 2 MB each · cropped to 3:1”. Each image is centred-cropped to 3:1 and shown to players at once. Toasts: “N banners added and shown to players.”, “Not added: …”. The **Uploading N of M…** progress bar works as on A-CHARACTERS.
+- A grid of wide 3:1 tiles, each with its name under it, in upload order. **Click a tile** to hide or show it (hidden tiles dim; “Shown to players. Click to hide.” / “Hidden from players. Click to show.”). A corner **×** deletes with the toast “NAME deleted.” and **Undo**.
+- At least **2** banners stay shown: hiding or deleting below that is refused (“Keep at least 2 banners shown. Upload or show another one first.”; page hint “Keep at least 2 banners shown, so players have a choice.”).
+- Six seeded samples: Court, Night, Dusk, Ember, Sun, Stripe (the same six the Player prototype offers). Hiding or deleting never takes a banner from players who already use it. Every change goes in the record of actions. Offline: the offline error, nothing changes.
+- Players only pick from the shown banners in Edit profile ([Player profile](../player-information/profile.md)); they never upload.
 
 ## Acceptance examples
 

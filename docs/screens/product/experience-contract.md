@@ -39,6 +39,7 @@ Owner decision, November 6, 2026 ([business rule](../../business_logic/product/q
 
 - Every input, score side, switch, and icon action has an accessible name.
 - Dialogs identify the action, focus their heading/first relevant control, trap focus, and restore it to the trigger on cancellation.
+- Tab bars and segmented controls show no focus ring after a tap or click; a thin ring appears only for keyboard focus (`:focus-visible`), and a tab re-focused by a re-render after a tap shows none ([D-2026-11-11-11](../../mvp/decisions.md#d-2026-11-11-11), log 2026-11-11-queue-tab-focus-border).
 - Keyboard and touch alternatives accompany drag reordering: Move up/Move down is a proposed accessible equivalent.
 - Needs attention uses text/icon/border emphasis as well as optional pulse. Respect reduced motion and do not depend on color alone.
 - Announce durable-save, sync-failure, and validation messages without moving focus away from the current task.

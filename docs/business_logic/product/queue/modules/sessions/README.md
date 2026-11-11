@@ -1,6 +1,6 @@
 # Sessions
 
-**Last verified:** 2026-11-06.
+**Last verified:** 2026-11-11 for join requests closing at Start, court time changes during a match and Bagging mode ([D-2026-11-11-11](../../../../../mvp/decisions.md#d-2026-11-11-11)); 2026-11-06 for the rest.
 
 **Status:** Confirmed v1 target rules. Updated October 26, 2026 to match the [ROTRA Queue prototype](../../../../../../apps/mockup/queue-app/rotra-queue.html).
 
@@ -131,6 +131,8 @@ An empty roster or no present players does not block the start.
 
 Starting locks every roster level and starts no match. The console opens on the Session view.
 
+**Join requests end at Start (owner decision, November 11, 2026, [D-2026-11-11-11](../../../../../mvp/decisions.md#d-2026-11-11-11); [log](../../../../../mockup-changes/2026-11-11-queue-match-requests-live-only.md)).** Starting closes every pending join request (kept on the record as `closed`, not declined; the Start toast adds “· N join requests closed”), and from then on the public page offers no **Request to join**: it says “The session has started, so online join requests are closed. Ask the Queue Master at the venue to add you.” A late player is added by the Queue Master ([Players › Join requests](../players/README.md#join-requests-from-the-session-link)). Drop-out notices only exist before Start; match requests only after it.
+
 **Late or other-day start (owner decision, November 6, 2026).** When now is after the planned end, or on a
 different calendar day than the planned start, Start session first asks for a **New end**: "This session was
 planned for 6:00–9:00 PM yesterday. Set a new end time to start." It is pre-filled with now plus the planned
@@ -142,11 +144,13 @@ The actual start time (`startedAt`) is fixed once play begins: "Start time is fi
 
 ## Running
 
-**Owner decision, November 1, 2026 (#323):** active sessions expose **Session settings**, the read-only preparation summary. Mode, formats, minimum, saved fee/costs, notes and roster levels can be inspected; fixed fields explain that they lock after start. Existing live controls remain available through their current sheets (courts/time, adding players, join requests, payments). This does not authorize editing preparation during play.
+**Owner decision, November 1, 2026 (#323):** active sessions expose **Session settings**, the read-only preparation summary. Mode, formats, minimum, saved fee/costs, notes and roster levels can be inspected; fixed fields explain that they lock after start. Existing live controls remain available through their current sheets (courts/time, adding players, match requests, payments; join requests end at Start). This does not authorize editing preparation during play.
 
 - The operator can add players at any time, including offline; late players get a level that locks immediately.
 - **Add court:** label (defaults to the next "Court N") and **Open until** — either until the session ends (moves when the end time changes) or until a set time within the session; the planned start determines when the court becomes available, unless the operator opens it early with **Start anyway**.
-- **Remove court:** only a free court, and a session keeps at least one court. Removing or editing a court is blocked while any match (On court or Playing) is on it.
+- **Remove court:** only a free court, and a session keeps at least one court. Removing a court is blocked while any match (On court or Playing) is on it.
+- **Change a court's time while a match is on it (owner comment, November 11, 2026; [log](../../../../../mockup-changes/2026-11-11-queue-courts-and-time-sheet.md)):** the court's **end** (until the session ends, or a set time) and its label can change even while a match is On court or Playing, and the match is not touched. The planned start stays fixed once the court has been used. This replaces the earlier rule that editing a court was blocked while a match was on it.
+- **Bagging mode (November 11, 2026):** a session-wide Generate matches setting for doubles sessions, changed by the Queue Master during play: on or off, and a list of bagging pairs. See [Queueing › Bagging mode](../queueing/README.md#bagging-mode-and-bagging-pairs).
 - **Manual Queue | Auto Queue:** a per-session switch for how free courts get matches, starting on Manual Queue and changeable at any time. Neither mode starts a match. See [court filling](../queueing/README.md#auto-queue-and-manual-queue-court-filling).
 - Each court shows its closing time. After that time it shows **Booking ended**, whether the court is free or has a match on it. ROTRA never stops a game at a closing time; it is a reminder for the operator.
 - **Set end time** (owner decision, November 6, 2026): in **Courts and time** the end can move to any time after now, later or earlier, up to 24 hours after play began. **Extend 30 min** and **Extend 60 min** stay as shortcuts. Courts that follow the session end move with it; a court with its own set time does not, and blocks a new end before its booking ends or before it opens (edit that court first). The public page shows the new end after it syncs.

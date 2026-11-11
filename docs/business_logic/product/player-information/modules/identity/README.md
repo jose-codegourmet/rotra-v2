@@ -1,6 +1,6 @@
 # Player identity and accounts
 
-**Last verified:** 2026-11-08 for guest registration (#490); 2026-11-07 for player login mapping and claim-link rules (#244); 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-11 for profile visibility, Hide from Player Information, banners and avatars ([D-2026-11-11-11](../../../../../mvp/decisions.md#d-2026-11-11-11)); 2026-11-08 for guest registration (#490); 2026-11-07 for player login mapping and claim-link rules (#244); 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Confirmed v1 target rules.
 
@@ -76,7 +76,19 @@ Players may edit their own personal information after claiming the profile. They
 
 Registered players may hide their phone number from club operators. Phone/email are not public profile or leaderboard fields. A hidden phone must not leak through player search; ID/QR supports identification instead.
 
-**Public or private profile** ([D-2026-11-09-07](../../../../../mvp/decisions.md#d-2026-11-09-07)): a player chooses Public (default) or Private. A private profile is hidden from visitors who aren't signed in: the leaderboard masks the name and doesn't open the row, search and RTR ID search don't find them, and a shared link shows "Log in with ROTRA to see this profile." Guests are treated the same way. Signed-in ROTRA players still see it. It changes nothing about phone privacy.
+**Profile visibility** ([D-2026-11-11-11](../../../../../mvp/decisions.md#d-2026-11-11-11), superseding in part [D-2026-11-09-07](../../../../../mvp/decisions.md#d-2026-11-09-07), which had one Public/Private switch with Public as the default). A player picks one of three levels; **the default is Private**, including for new registrations:
+
+| Level | Who sees the profile |
+|---|---|
+| **Public** | Visitors and signed-in ROTRA players see name, level, games and the profile |
+| **Private** (default) | Visitors who aren't signed in see a masked name; signed-in ROTRA players see the profile. The leaderboard masks the name and doesn't open the row for a visitor, name search and RTR ID search don't find them, and a shared link shows "Log in with ROTRA to see this profile." Guests are treated the same way |
+| **Always private** | Nobody but the player sees their **name, level and games**, signed in or not, except the Queue Master of a session the player joins. The **picture and banner stay public**. A profile card or page for them shows the picture, the banner, a masked name and a **Private profile** note; there is no sign-in button, because signing in would not change what is shown |
+
+Visibility changes nothing about phone privacy.
+
+**Always private, what is exposed.** Face and banner are the only parts of an always-private player that others can see: the picture (photo, character or initials as the player chose) and the profile banner. The name is masked as "first letter of each word followed by `***`" everywhere another person would see it (leaderboard, podium, club member lists, session participants, share images). Level, games and stats stay hidden. The player themselves always sees everything about their own profile.
+
+**Hide from Player Information** ([D-2026-11-11-11](../../../../../mvp/decisions.md#d-2026-11-11-11)). A separate switch, off by default, in the Player Information card of Privacy and contact. When on, clubs can't find the player in Queue's **Add player › Player Information** search or by RTR ID, and the player is left out of the member list of a [public club page](../../README.md#public-club-page-737-epic-p07). It does not hide them from a club's **Saved players**, from Admin or from the public session page, and a club that already saved the player can still add them from Saved players. The player joins sessions themselves (a club link or a session link), so they only join a queue when they intend to (owner, November 11, 2026). It is independent of profile visibility and of phone privacy.
 
 Players cannot change phone or email themselves. They must contact the platform owner or submit a request, and the owner manually approves the change in Admin. A contact change does not replace the permanent RTR ID.
 
@@ -108,9 +120,21 @@ ROTRA Admin can issue a claim link for an unclaimed player, using `/claim/{token
 
 Only the current and the previous uploaded photo are kept. A new upload makes the old current photo the previous one; **Use previous picture** swaps the two; choosing a character or initials, or **Remove**, makes the last photo the previous one. Characters and initials store no file. Anything older is deleted in the same request as the new upload.
 
-## Character choices come from the Admin library ([D-2026-11-09-13](../../../../../mvp/decisions.md#d-2026-11-09-13))
+## Character choices come from the Admin library ([D-2026-11-09-13](../../../../../mvp/decisions.md#d-2026-11-09-13), page size changed by [D-2026-11-11-11](../../../../../mvp/decisions.md#d-2026-11-11-11))
 
-The characters a player can pick are the images the platform owner shows in Admin › Profile characters, in upload order, 8 per page. The dialog opens on the page holding the player's current character. A player keeps a character that Admin later hides or deletes. (Owner comment, November 9, 2026; not built yet.)
+The characters a player can pick are the images the platform owner shows in Admin › Profile characters, in upload order, **15 per page** (was 8; owner comment, November 11, 2026): the picker is a fixed grid of 5 round characters per row, 3 rows. Admin keeps at least 15 shown so the first page is full. The dialog opens on the page holding the player's current character. A player keeps a character that Admin later hides or deletes. (Owner comment, November 9, 2026; not built yet.)
+
+## Profile banner ([D-2026-11-11-11](../../../../../mvp/decisions.md#d-2026-11-11-11))
+
+Every profile has a **banner**: the strip across the top of the profile card, public like the picture, in the same way for the player's own profile and for another player's, and for every visibility level including Always private.
+
+- **Predefined banners only.** A player picks one of the banners the platform owner shows in Admin › Settings › Profile banners, managed like the profile characters. There is **no upload and no remove** for players; the default is the first one (Court in the prototype). A player keeps a banner that Admin later hides or deletes.
+- Picking a banner applies at once; there is nothing to save separately (confirmation toast **Banner updated**) and no file is stored for the player.
+- Banners are drawn from the theme tokens in the prototype, so both themes hold up.
+
+**Avatars are circles.** The big profile picture and every other avatar shown anywhere in ROTRA are circles (owner comments, November 11, 2026); no rounded-square avatar remains.
+
+**Full photo.** Any avatar that shows a real picture (an uploaded photo or a chosen character, never initials) opens the full picture on a black overlay, closed by a tap, **×** or Esc. Where a tap already opens a profile, the picture opens from inside that profile instead. Nothing opens when there is no picture to show.
 
 ## Profile picture drafts (#567)
 

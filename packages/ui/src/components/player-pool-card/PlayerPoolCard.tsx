@@ -4,6 +4,7 @@ import type { PlayingLevel } from '@rotra/data/player/types'
 import { Avatar } from '@rotra/ui/avatar'
 import { cn } from '@rotra/ui/cn'
 import { Icon } from '@rotra/ui/icon'
+import { IconButton } from '@rotra/ui/icon-button'
 import { levelLabel } from '@rotra/ui/level-pill'
 import { Switch } from '@rotra/ui/switch'
 import type { KeyboardEvent } from 'react'
@@ -43,6 +44,11 @@ export type PlayerPoolCardProps = {
   onToggleSelect: () => void
   /** The Present switch; toggling it never changes the selection */
   onPresentChange: (present: boolean) => void
+  /**
+   * Set games played… (#717, D-SET-GAMES): shows a small ghost pencil button at the card's top right.
+   * Tapping it never selects the card.
+   */
+  onSetGames?: () => void
   className?: string
 }
 
@@ -80,6 +86,7 @@ export function PlayerPoolCard({
   pickOrder,
   onToggleSelect,
   onPresentChange,
+  onSetGames,
   className,
 }: PlayerPoolCardProps) {
   const state = status.kind === 'playing' ? 'playing' : present ? 'available' : 'away'
@@ -123,10 +130,29 @@ export function PlayerPoolCard({
           size={40}
           className={cn(state === 'away' && 'opacity-55 grayscale')}
         />
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <div className="text-[13px] leading-tight font-bold [overflow-wrap:anywhere]">{name}</div>
           <div className="text-[11px] leading-[1.3] text-fg2">{levelLabel(level)}</div>
         </div>
+        {onSetGames ? (
+          // The button sits inside the card: stop its clicks and keys from reaching the card's selection.
+          // biome-ignore lint/a11y/noStaticElementInteractions: a plain stop-propagation boundary around the button
+          <span
+            className="flex-none"
+            onClick={(event) => event.stopPropagation()}
+            onKeyDown={(event) => event.stopPropagation()}
+          >
+            <IconButton
+              variant="ghost"
+              size="xs"
+              label={`Set games played… ${name}`}
+              title="Set games played…"
+              onClick={onSetGames}
+            >
+              <Icon name="edit" size={16} />
+            </IconButton>
+          </span>
+        ) : null}
       </div>
       {/* biome-ignore lint/a11y/useSemanticElements: a group/region div; a fieldset or section would change the drawn layout */}
       <div

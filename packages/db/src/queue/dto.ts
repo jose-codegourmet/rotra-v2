@@ -68,6 +68,7 @@ export function rosterEntryDto(entry: SessionPlayer, nickname: string | null) {
     level: levelCodeFor(entry.skillLevelId),
     levelLockedAt: toIsoOrNull(entry.levelLockedAt),
     confirmedAt: toIso(entry.confirmedAt),
+    gamesAdjustment: entry.gamesAdjustment,
     revision: toDecimalString(entry.revision),
   }
 }

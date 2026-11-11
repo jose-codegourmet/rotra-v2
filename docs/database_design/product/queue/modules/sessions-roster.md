@@ -135,6 +135,7 @@ Choosing a venue copies its rate into `session_cost_estimates.court_fee_per_cour
 | `assessment_id` | FK to the roster assessment revision selected for this entry |
 | `skill_level_id` | FK to one of the nine levels; required on confirmation/start/late entry. Permitted missing-level preparation states and physical nullability remain unresolved in #245 |
 | `level_locked_at` | Null before start; set at start or on late entry |
+| `games_adjustment` | Integer, default 0, may be negative (#717, owner decisions November 11, 2026). The Queue Master's **Set games played** override, stored as requested − games counted from completed matches at override time, so displayed games played = counted + adjustment (floored at 0) and keeps counting up. Session-running aid only: facts, results and rank never read it. **Drafted** in migration `20261111000300_roster_games_adjustment`, pending |
 | `confirmed_at`, `joined_at`, `revision` | Timestamps/revision |
 
 Unique `(session_id, club_player_id)` and partial unique `(session_id, player_id_at_entry)` for known profiles. Composite unique `(club_id, session_id, id)` supports match participation FKs.

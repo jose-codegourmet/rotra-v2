@@ -298,6 +298,25 @@ export function countsFor(m: Match, id: string) {
 export function countedGames(id: string, matches: Match[]) {
   return matches.filter((m) => countsFor(m, id)).length
 }
+/** A roster row's Set games played adjustment (#717); 0 when none. */
+export type GamesAdjusted = Pick<SessionPlayer, 'id'> & Pick<SessionPlayer, 'gamesAdjustment'>
+export const gamesAdjustmentOf = (player: Pick<SessionPlayer, 'gamesAdjustment'> | undefined) =>
+  player?.gamesAdjustment ?? 0
+/**
+ * Games played as shown everywhere (#717): the counted games (`countedGames`) plus the Queue
+ * Master's Set games played adjustment, floored at 0. Auto Queue, Catch Up, fewest-games sorting,
+ * the Players tab cards and the live standings read this; facts and results never do.
+ */
+export function gamesPlayed(player: GamesAdjusted, matches: Match[]) {
+  return Math.max(0, countedGames(player.id, matches) + gamesAdjustmentOf(player))
+}
+/** `gamesPlayed` by roster id, for callers holding a MatchContext; an unknown id has no adjustment. */
+export function gamesPlayedFor(id: string, ctx: Pick<MatchContext, 'roster' | 'matches'>) {
+  return gamesPlayed(
+    { id, gamesAdjustment: gamesAdjustmentOf(ctx.roster.find((p) => p.id === id)) },
+    ctx.matches,
+  )
+}
 export function waitMinutes(
   player: SessionPlayer,
   matches: Match[],
@@ -326,7 +345,8 @@ export function computeStandings(roster: SessionPlayer[], matches: Match[]) {
         losses = games.filter(
           (m) => m.decision?.winningTeam && m.decision.winningTeam !== countedTeam(m, p.id),
         ).length
-      return { playerId: p.id, name: p.nameSnapshot, wins, losses, games: games.length }
+      // Games is the shown count (#717 adjustment); wins, losses and head-to-head stay as recorded.
+      return { playerId: p.id, name: p.nameSnapshot, wins, losses, games: gamesPlayed(p, matches) }
     })
     .filter((r) => r.games > 0)
   const headToHead = (a: string, b: string) =>

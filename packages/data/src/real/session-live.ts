@@ -266,6 +266,32 @@ export async function realSetPresence(input: {
   return accepted(null, input.present ? 'Marked present' : 'Marked not present')
 }
 
+/** Set games played (#717): `PATCH …/roster/games`; the server stores the adjustment. */
+export async function realSetGamesPlayed(input: {
+  sessionId: string
+  rosterId: string | 'all'
+  games: number
+  operationId?: string
+}) {
+  const result = await realRequest<{
+    changed: { rosterId: string; name: string; games: number }[]
+  }>(`${sessionPath(input.sessionId)}/roster/games`, {
+    method: 'PATCH',
+    body: {
+      operationId: input.operationId ?? crypto.randomUUID(),
+      games: input.games,
+      ...(input.rosterId === 'all' ? { all: true } : { rosterId: input.rosterId }),
+    },
+  })
+  const one = input.rosterId === 'all' ? null : result.changed[0]
+  return accepted(
+    result.changed.map((c) => ({ rosterId: c.rosterId, games: c.games })),
+    one
+      ? `Games played set · ${one.name}`
+      : `Games played set for ${result.changed.length} player${result.changed.length === 1 ? '' : 's'}`,
+  )
+}
+
 export async function realSetAllPresence(input: { sessionId: string; present: boolean }) {
   await realRequest(`${sessionPath(input.sessionId)}/presence`, {
     method: 'POST',

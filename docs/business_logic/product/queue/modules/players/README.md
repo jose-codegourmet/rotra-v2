@@ -155,6 +155,16 @@ Turning someone off never ends their current game. Waiting matches that include 
 
 Players in an On court match are **busy**, like players in a Playing match: they cannot be put on another court or start elsewhere ("Migs is on Court 1").
 
+## Games played override (#717)
+
+**Owner decisions, November 11, 2026.** During a live session the Queue Master can set a player's **games played**, or set every roster player's games played to the same number, from the Players tab (**Set games played…** on a card, **Set games for all…** in the header). Both go through the confirmation [D-SET-GAMES](../../../../../screens/product/dialogs.md#d-set-games--set-games-played) first.
+
+- The override is stored on the shared session as an **adjustment** per roster entry (`games_adjustment` = requested − games counted from completed matches at override time), never as an absolute number, so games keep counting up after the override. Games played shown anywhere = counted games (existing completed-match and substitute-credit rules) + adjustment, floored at 0. The adjustment itself may be negative.
+- "Set all" means every roster player shows the same number N; the sheet prefills the roster's median count. A single-player override prefills that player's current count. Range 0–99.
+- Generate matches (Available Players, Plan Ahead, Longest Wait, Fewest Games loads and the Catch Up target), fewest-games sorting (the Players tab sort, the picker order, filling “Anyone” spots on a match request), the Players tab cards (**played** and **for the night**) and the live Leaderboard's Games column read the adjusted count immediately. Wins, losses and head-to-head come from recorded matches only; the adjustment adds no result.
+- Facts, results, rank and long-term performance are unchanged: the adjustment is a session-running aid, not a recorded game. Whether the Session done minimum-games check should read the adjusted count is not decided; it reads counted games.
+- It is an ordinary Roster write: offline on a downloaded session it saves on the device and syncs later, like presence.
+
 There is no rest-status workflow. The console derives a **wait time** for each available player: minutes since their last game ended, or since they were marked present (or the session started) if they have not played. A substituted-out player's wait starts when their match ends.
 
 See [add-player flow](flow/add-player.md).

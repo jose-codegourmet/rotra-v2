@@ -23,6 +23,12 @@ export type SessionPlayer = {
   selfCheckedInAt?: number | null
   /** The linked Player's own **I'm leaving**; “Left · TIME” while not present and nothing came after it. */
   leftAt?: number | null
+  /**
+   * Set games played (#717): requested − games counted from completed matches at override time, so
+   * the shown count (`gamesPlayed` in match.rules) keeps counting up afterwards. May be negative;
+   * missing or 0 means no override.
+   */
+  gamesAdjustment?: number
 }
 export type SessionWaitlistEntry = {
   id: string

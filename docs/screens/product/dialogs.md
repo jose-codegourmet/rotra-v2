@@ -66,6 +66,10 @@ Title **Confirm substitution**. Show Out, In (with level), Team, and the **Who g
 
 Title **Regenerate waiting queue?** Show counts: “Automatic waiting matches — N rebuilt”, “Healthy manual matches — N kept”, “Manual matches needing attention — N rebuilt”, “Games in play — N untouched” (On court matches are counted here too; Regenerate never changes them). Primary **Regenerate waiting queue** (disabled when nothing would be rebuilt); secondary **Keep current queue**. Failure leaves the previous durable queue intact.
 
+## D-SET-GAMES — Set games played
+
+Title **Set games played** (#717, owner decisions November 11, 2026). Opened from the Players tab by **Set games for all…** (header) or a card's **Set games played…**. Step 1: for one player the rows “Player — NAME” and “Games played now — N”, for all “Players — N on the roster”; a − N + stepper **Games played** (0–99; prefilled with the player's current count, or the roster's median count for all); copy **“Auto Queue, Catch Up and fewest-games sorting use the new count right away.”**; secondary **Back** (closes), primary **Next**. Step 2 (the confirmation): **“NAME's games played changes from 3 to 5.”** for one player, **“Every player on the roster will show N games played.”** for all, with the same copy line; secondary **Back** (to step 1), primary **Set games**. Toast **“Games played set · NAME”** or **“Games played set for 14 players”**; offline, the usual saved-on-this-device suffix. The save stores an adjustment (requested − counted games), so games keep counting up afterwards; a failure shows in the sheet and nothing is claimed as saved.
+
 ## D-CLEAR-QUEUE — Remove every waiting match
 
 Owner request, November 9, 2026. Title **Clear the queue?** Copy: “N waiting matches will be removed from the Main Queue.” · muted “Matches already on a court and finished matches are not affected. You can add or generate matches again afterwards.” Secondary **Keep queue**; destructive **Clear queue** (solid red). Confirming removes every waiting match (manual and automatic), records no game, and toasts “Queue cleared · N waiting matches removed”.

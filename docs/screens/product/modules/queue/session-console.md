@@ -65,11 +65,11 @@ Removing an occupied court (Getting ready or Playing) is refused with “Only a 
 
 ## Q-POOL — Players view
 
-Header “Players”, “Tap players to pick them, then make a match. P present of R.”, action **Add late player**.
+Header “Players”, “Tap players to pick them, then make a match. P present of R.”, actions (right side) **Set games for all…** (secondary, small; opens [D-SET-GAMES](../../dialogs.md#d-set-games--set-games-played) for every roster player, #717) and **Add late player**.
 
 - Filter: **Available · N** (present and off court; default), **Present · N**, **Everyone · N**.
 - Sort: longest wait (default), least games, most games, level high to low.
-- Player card (owner request, November 9, 2026; [log](../../../../mockup-changes/2026-11-09-queue-player-cards-games.md)): picture, name, level, then two big numbers side by side: **played** (games played tonight) and **for the night** (played + queued matches, accent tinted). Under them the status (**On Court X**, **Away**, **Queued · #P**, or **Free**), with “· M min wait” appended for available players, and a Present switch. No queued or suggested counts on the card. Cards are roomier (14 px padding, 176 px minimum width, 12 px gaps). Playing and away cards are styled distinctly.
+- Player card (owner request, November 9, 2026; [log](../../../../mockup-changes/2026-11-09-queue-player-cards-games.md)): picture, name, level, then two big numbers side by side: **played** (games played tonight) and **for the night** (played + queued matches, accent tinted). Under them the status (**On Court X**, **Away**, **Queued · #P**, or **Free**), with “· M min wait” appended for available players, and a Present switch. No queued or suggested counts on the card. Cards are roomier (14 px padding, 176 px minimum width, 12 px gaps). Playing and away cards are styled distinctly. At the top right of the card a small ghost icon button (pencil) **Set games played…** opens [D-SET-GAMES](../../dialogs.md#d-set-games--set-games-played) for that player (#717); tapping it never selects the card. **played** is the adjusted count (games counted from matches plus the Queue Master's adjustment, floored at 0), and **for the night** adds the queued matches to it; least/most games sorting uses the same count.
 - Tapping a card selects it; selected cards show their pick order. A selection bar shows the faces, “N selected · FORMAT” (or why not: “pick 2, 3, 4, 6, 8 or 10 players”, “singles is off for this session”), **Clear**, and **Make match**. Fun formats add “counts toward session games only”.
 - **Make match** opens [D-MAKE-MATCH](../../dialogs.md#d-make-match--confirm-a-match-from-picked-players) instead of adding the match straight away (owner request, November 9, 2026; [log](../../../../mockup-changes/2026-11-09-queue-make-match-confirm.md)).
 - Empty Available: “No one is free right now. Try Present or Everyone.”
@@ -86,7 +86,7 @@ One success toast per batch: “N player(s) marked present, M away” (omit a ze
 
 Copy: “Tonight's standings from completed games: most wins, then fewest losses, then head-to-head. It updates each time you confirm a result. Partial and invalid games don't count.”
 
-Table: rank (top three highlighted), player picture, name and level, W, L, Games “g/min”, Win %. Empty: “No completed games yet. Standings appear after the first confirmed result.”
+Table: rank (top three highlighted), player picture, name and level, W, L, Games “g/min” (the adjusted games played count after a Set games played override, #717; W and L stay as recorded), Win %. Empty: “No completed games yet. Standings appear after the first confirmed result.”
 
 ## Q-SESSION-ADJUST — Courts and time
 

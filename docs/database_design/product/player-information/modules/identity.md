@@ -10,10 +10,10 @@
 |---|---|
 | `id` | UUID PK, independent of authentication subject |
 | `full_name`, `nickname`, `avatar_ref` | Public/permitted display data; nickname/avatar optional |
-| `avatar_previous_ref` | Nullable; the previous uploaded photo, next to the current `avatar_ref`. Never a character or initials; only current and previous files are kept ([D-2026-11-09-10](../../mvp/decisions.md#d-2026-11-09-10)) |
+| `avatar_previous_ref` | Nullable; the previous uploaded photo, next to the current `avatar_ref`. Never a character or initials; only current and previous files are kept ([D-2026-11-09-10](../../../../mvp/decisions.md#d-2026-11-09-10)) |
 | `profile_state` | Unclaimed/claimed; no login is required for unclaimed identity |
 | `hide_phone_from_clubs` | Privacy preference |
-| `profile_private` | Boolean, default false. True hides the profile from visitors who are not signed in ([D-2026-11-09-07](../../mvp/decisions.md#d-2026-11-09-07)) |
+| `profile_private` | Boolean, default false. True hides the profile from visitors who are not signed in ([D-2026-11-09-07](../../../../mvp/decisions.md#d-2026-11-09-07)) |
 | `experience_months`, `experience_recorded_at` | Optional nonnegative self-reported experience snapshot; not rating credit. Playing since = `experience_recorded_at` minus `experience_months` (month precision); screens show years and months counted from it (November 8, 2026). Set by the player, or by the club for an unclaimed profile |
 | `personal_details`, `details_version` | Optional validated JSONB for agreed playing-style fields; final schema pending |
 | `created_at`, `updated_at`, `revision` | Common metadata |
@@ -116,7 +116,7 @@ Claiming is not permission to edit contact identity directly. Initial email comp
 
 `player_claim_links`: UUID PK; player FK; issuing club/account; unique opaque token digest; issued/expiry/consumed/revoked times; claim-state/version metadata. Store a digest rather than a reusable plaintext secret.
 
-**Decided 2026-11-07 (#244):** expiry is the issued time plus **7 days**. A link is **single use**: consumed time is set once, and a consumed link never claims again. The club (Queue Master) can **reissue**; reissuing sets the revoked time on the player's current active link in the same write, so at most one active link exists per player. Expired, consumed and revoked links resolve to the existing expired/used states. If the phone or email being bound already belongs to another account (unique contact or account constraint), the claim is **blocked**, nothing is consumed or merged, and the screen shows the contact-support route.
+**Decided 2026-11-07 (#244), lifetime changed 2026-11-11 ([D-2026-11-11-08](../../../../mvp/decisions.md#d-2026-11-11-08)):** expiry is the issued time plus **24 hours** (was 7 days). No email verification on claim: the claim confirms the email at once. Password: at least 8 characters, nothing else. A link claimed by the wrong person is not undone; the Queue Master creates a new player. A link is **single use**: consumed time is set once, and a consumed link never claims again. The club (Queue Master) can **reissue**; reissuing sets the revoked time on the player's current active link in the same write, so at most one active link exists per player. Expired, consumed and revoked links resolve to the existing expired/used states. If the phone or email being bound already belongs to another account (unique contact or account constraint), the claim is **blocked**, nothing is consumed or merged, and the screen shows the contact-support route.
 
 Consume atomically once, after binding the correct identity, recording required email/phone, and completing account provisioning. Authentication-provider calls and database writes are not one transaction: use recoverable staged provisioning with idempotency, and mark claimed only after both sides are consistent. Never bind merely by matching the name in the link form.
 
@@ -134,7 +134,7 @@ Fictional data only. Decided 2026-11-07 unless marked open.
 | Hidden-phone sign-in | Same player with `hide_phone_from_clubs` on | Sign-in by phone works exactly as above; clubs still cannot see or search the phone |
 | Unknown or wrong credentials | Phone with no account, unclaimed profile's phone, or wrong password | The same generic credential error each time; nothing reveals whether the phone or email exists |
 | Wrong-identity claim (collision) | Link for player A; the email entered already belongs to player B's account | Claim blocked; link not consumed; no merge; contact-support route shown |
-| Expired link, then reissue | Link issued Nov 1, opened Nov 9 | Expired state shown. The Queue Master reissues: the old link is revoked, the new one is valid 7 days and single use; after a successful claim it shows the used state |
+| Expired link, then reissue | Link issued Nov 1 at 19:00, opened Nov 3 | Expired state shown. The Queue Master reissues: the old link is revoked, the new one is valid 24 hours and single use; after a successful claim it shows the used state |
 | RTR ID or name only | Someone has the public RTR ID or the name | Cannot claim; only a valid link plus completed provisioning claims |
 | Guest invite (name-only guest) | Guest with no phone and no global profile | Registration leaves the club guest record unlinked; a separate invitation is required to link it (owner, November 8, 2026, #490). Matching phone/email prompts whether the existing account is theirs. Yes requires sign-in/Admin-reviewed recovery; No requires contact correction or contacting ROTRA. Existing contact uniqueness stays in place; answering Yes never authorizes a link |
 | Simultaneous allocation | Two clubs sync the same new phone at once | **Open** beyond the existing unique-phone retry rule |

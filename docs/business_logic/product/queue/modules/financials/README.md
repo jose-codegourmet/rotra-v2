@@ -21,7 +21,7 @@ Every field is optional. A session can be created and run with no financial info
 Calculation:
 
 - **Court cost** = court fee × number of courts × session length in hours, rounded to the nearest centavo (decided October 28, 2026).
-- **Shuttle cost** = sum of (planned tubes × that item's inventory cost per unit). Lines with no item or zero tubes are dropped on save.
+- **Shuttle cost** = sum of (planned tubes × that item's cost per unit). The cost per unit is **snapshotted when the line is saved** (decided November 11, 2026, [D-2026-11-11-06](../../../../../mvp/decisions.md#d-2026-11-11-06)); a later inventory price change does not rewrite a saved estimate. The prototype still shows the live price and follows through a ticket. Lines with no item or zero tubes are dropped on save.
 - **Entrance fees** = entrance fee per head × player count (misc).
 - **Total cost** = court cost + shuttle cost + entrance fees.
 - **Per player to break even** = total cost ÷ player count, rounded **up** to a whole amount. Player count is the roster size, or the expected-player count before anyone is on the roster (minimum 1).
@@ -49,7 +49,8 @@ Each session has a **Payments** list of its roster players (waitlisted players a
 - **Owner decision, November 1, 2026 (#300):** payment switches update optimistically, then save desired end states together after 800 ms without another switch. A switch returned to its accepted state in the window needs no write. Flush before Mark all paid and on tab/sheet/page exit. A failed batch rolls back only its changes, preserving newer intent. Show one summary toast per accepted batch; recorded amounts and storage stay unchanged.
 - Totals (#479): **paid** count (e.g. 15/18) counts Paid and Reimburse players (fully covered), with "N partial" when any are partial; **collected** = sum of amounts received; **still due** = sum over the roster of what each player still owes (amount due − received, never below 0); **to reimburse** = sum of overpayments, shown only when above 0; and collected **against costs** (collected − estimated total cost).
 - Filter: Everyone, Not paid (Unpaid and Partial), Paid (Paid and Reimburse). Players with no payment recorded are listed first.
-- It is available before, during and after the session: on the preparation page, from **Payments** in the live console, and in the session record's Financials tab. Ticks are ordinary changes that work offline and sync.
+- It is available before, during and after the session: on the preparation page, from **Payments** in the live console, and in the session record's Financials tab. Ticks are ordinary changes that work offline and sync. **After Session done** the Queue Master can still tick paid / not paid (decided November 11, 2026, [D-2026-11-11-06](../../../../../mvp/decisions.md#d-2026-11-11-06)); payments are bookkeeping with an audit record and never reopen or change results.
+- **Demotion keeps the paid mark** (same decision): a paid player moved to the waitlist by a capacity change keeps the mark, and it shows again if they regain a slot.
 - **Cancelled session** (owner decision, November 6, 2026): payment marks are kept on the read-only record and can no longer change ("Payments are not available for this session.", as for an invalid session). ROTRA records no refunds; the cancel confirmation warns how many players are marked paid and that refunds happen outside ROTRA. See [Cancelling a session](../sessions/README.md#cancelling-a-session-owner-decision-november-6-2026).
 
 This is a record kept by the operator, not proof of payment. ROTRA doesn't show players' contact details here; private phone and email rules still apply.

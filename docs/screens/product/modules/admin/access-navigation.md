@@ -60,8 +60,10 @@ The mock owner lands on `/clubs`. Navigation targets are `/clubs`, `/players`, `
 `/settings/feature-flags`; detail routes belong to A02–A04. Until those screens land, unmatched
 links show the Admin not-found state with no placeholder records or counts.
 
-Invalid-credential copy from ticket #186 is **“Email or password is incorrect.”** This copy awaits
-product-owner confirmation. Offline sign-in uses **“Signing in needs an internet connection.”**
+Invalid-credential copy from ticket #186 is **“Email or password is incorrect.”** (Q-LOGIN's mirror
+“Username or password is incorrect.” was confirmed November 11, 2026.) On A-ADD-CLUB, a provider
+rejection of the initial club password shows **“Password incorrect. Try another password.”** under the
+field, with no policy text up front ([D-2026-11-11-07](../../../../mvp/decisions.md#d-2026-11-11-07)). Offline sign-in uses **“Signing in needs an internet connection.”**
 The final Admin auth/provider/session policy remains open.
 
 The product owner requested no lint, type-check, or build checks. The #183 follow-up was

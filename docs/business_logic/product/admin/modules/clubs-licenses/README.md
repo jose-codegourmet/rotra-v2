@@ -13,20 +13,20 @@ The club account combines owner/manager and Queue Master authority. Named manage
 The platform owner adds every club in Admin; clubs do not apply. Adding a club needs:
 
 - **Name:** unique among clubs.
-- **Founding address and city:** fixed once saved. The city sets the club's RTR city code for new player IDs.
-- **Username:** the club's sign-in name for the Queue app, suggested from the club name. Lowercase letters and numbers, optionally separated by dots, 3–30 characters, unique.
-- **Initial password:** at least 8 characters, set by the platform owner and given to the club outside ROTRA. The club can change it later from Club settings. ROTRA never shows it again after the club is created.
+- **Founding address and city:** fixed once saved. The city sets the club's RTR city code for new player IDs. The six prototype cities are the approved v1 list; **the platform owner adds a city from Admin › Settings** (no code change). A corrected founding city never changes issued RTR IDs, which are display only: every record keys on the player's UUID ([D-2026-11-11-07](../../../../../mvp/decisions.md#d-2026-11-11-07)).
+- **Username:** the club's sign-in name for the Queue app, suggested from the club name. Lowercase letters and numbers, optionally separated by dots, 3–30 characters, unique. Behind the scenes it maps to the provider login `<username>@clubs.rotra.invalid`; a username change rewrites that login ([D-2026-11-11-07](../../../../../mvp/decisions.md#d-2026-11-11-07)).
+- **Initial password:** at least 8 characters, set by the platform owner and given to the club outside ROTRA. The club can change it later from Club settings. ROTRA never shows it again after the club is created. There is no other password policy; if the provider rejects the password, the form says **“Password incorrect. Try another password.”** under the field ([D-2026-11-11-07](../../../../../mvp/decisions.md#d-2026-11-11-07)).
 - **Price:** a monthly and yearly price, or Free (see below).
 
 The platform owner reviews these before creating the club. A new club has no license, so it cannot use the Queue app until the platform owner activates one.
 
 The club changes its own **logo** from Club settings. A **name change is a request**: the club submits the new name, and it only takes effect after the platform owner approves it in Admin; until then the old name shows everywhere and the club can cancel the request. One pending request at a time. Sending one needs internet. The founding address and city code stay fixed.
 
-The club can **change its own password** from Club settings by entering the current password correctly; the new one applies to every device that signs in to the club account. A forgotten password is reset by the platform owner. Club settings as a whole need internet; offline, the page says so and shows nothing else.
+The club can **change its own password** from Club settings by entering the current password correctly; the new one applies to every device that signs in to the club account. **Forgotten password** ([D-2026-11-11-07](../../../../../mvp/decisions.md#d-2026-11-11-07)): the club sends a reset request from Q-LOGIN; the platform owner gets a notification in Admin › Requests, sets a temporary password and gives it to the club outside ROTRA; the club changes it afterwards from Club settings. Club settings as a whole need internet; offline, the page says so and shows nothing else.
 
 ## License payment history
 
-Each manual activation records a license payment the club can see in Club settings: date paid, plan (monthly or yearly), the period it covers, amount, and a reference. The club can export this history as CSV. These are records of payments made outside ROTRA; ROTRA does not take the payment.
+Each manual activation records a license payment the club can see in Club settings: date paid, plan (monthly or yearly), the period it covers, amount, and **two references**: the generated `LIC-####` number and the owner-typed text, kept as a note ([D-2026-11-11-06](../../../../../mvp/decisions.md#d-2026-11-11-06)). The club can export this history as CSV. These are records of payments made outside ROTRA; ROTRA does not take the payment.
 
 ## Commercial model
 
@@ -37,7 +37,7 @@ Each manual activation records a license payment the club can see in Club settin
 - The platform owner activates and renews access manually in Admin. The amount is filled in from the club's current price for the chosen plan and can be changed for that payment.
 - Changing a club's price, or making it free, affects later payments only. Recorded payments keep the amount they were recorded with.
 - One active session per club at a time, regardless of venue or device.
-- Renewal effective-date rules (early renewal, overlapping terms) and refunds have not been specified.
+- **Terms stack** ([D-2026-11-11-06](../../../../../mvp/decisions.md#d-2026-11-11-06)): a renewal starts the day after the current term ends; an early renewal never shortens or overlaps the current term. A club with no current term starts today. There is no start-date field. Refunds are not specified.
 
 ## Expiry
 
@@ -53,7 +53,11 @@ An expired club cannot use the Queue app, including its saved players and histor
 - A later expiry starts a fresh six-month countdown.
 - Deleting pages does not delete players' completed match history or earned rankings.
 
-Exact stale-page presentation is undecided. The six-month decision applies to public pages; retention of other internal club data was not specified. Do not expand it into a destructive club/profile purge.
+While the club is licensed, public result pages have **no time limit** ([D-2026-11-11-09](../../../../../mvp/decisions.md#d-2026-11-11-09)). Every public page is **never indexed and never static**: served per request with `noindex, nofollow` and disallowed in `robots.txt`; no static generation or ISR.
+
+**Private retention, 90 days** (same decision): join requests (they hold phone numbers), server request logs and generated exports are deleted 90 days after creation. Players' match history and ranks are never touched. The daily jobs that would enforce this are parked for MVP ([D-2026-11-11-10](../../../../../mvp/decisions.md#d-2026-11-11-10)); until then the sweep runs by hand.
+
+Exact stale-page presentation is undecided. The six-month decision applies to public pages. Do not expand it into a destructive club/profile purge.
 
 Previously earned rank/history remains stored, but normal rolling-window leaderboard/rank rules still apply. Retention does not freeze a player's leaderboard eligibility forever.
 

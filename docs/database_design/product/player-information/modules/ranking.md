@@ -2,7 +2,7 @@
 
 **Last verified:** 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
-**Status:** Proposed persistence model. Ranking mathematics is deliberately unspecified beyond agreed weights and input rules.
+**Status:** Proposed persistence model, **partly superseded on November 11, 2026** by [D-2026-11-11-05](../../../../mvp/decisions.md#d-2026-11-11-05): rank is a **rating by wins, weighted by who you beat**, projected from the game facts. The assessment-vote model below (`club_assessments` as rank input, the 70/30 `RankingPolicyVersion` weights) no longer feeds the rank; the level for the night stays a per-session value and seeds a new player's starting rating only. The rating constants are chosen in #247; this file is redrawn there.
 
 ## `skill_levels`
 

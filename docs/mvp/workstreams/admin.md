@@ -16,7 +16,7 @@ link ([D-2026-11-07-01](../decisions.md#d-2026-11-07-01)).
 
 ## Out of scope / deferred
 
-- Club accent persistence: lower priority / defer candidate (#395, blocked on a data-model decision).
+- Club accent persistence: **not for MVP** (#395 closed, [D-2026-11-11-10](../decisions.md#d-2026-11-11-10)).
 - Rank calculation itself → [ranking.md](ranking.md).
 
 ## Current state
@@ -68,7 +68,7 @@ duplicate issues merely because a related epic is open.
 - [ ] Audit reads for feature flags and ranking settings. Ticket: needed.
 - [ ] Scheduled license-lapse refresh and retention sweep runner. Ticket: needed — confirm MVP scope.
 - [ ] A07 real mode (backend follow-up, ticket: needed): Supabase Storage for characters, `profile_characters` table, full-form PATCH, admin-set password via Supabase (MVP or beta only, no end date set).
-- [ ] Club accent. Ticket: #395 (open, blocked).
+- [x] Club accent: not for MVP (#395 closed, D-2026-11-11-10).
 
 ## Related decisions
 
@@ -78,7 +78,7 @@ duplicate issues merely because a related epic is open.
 
 ## Blocking open decisions
 
-- #244 contact-change approval evidence and audit lines for failed or retried application (application itself is real, #575); #395 accent data model; #377 license start date/reference; #380 founding locations.
+- #244 contact-change approval evidence and audit lines for failed or retried application (application itself is real, #575). #377, #380 and #395 were decided November 11, 2026 ([D-2026-11-11-06](../decisions.md#d-2026-11-11-06), [D-07](../decisions.md#d-2026-11-11-07), [D-10](../decisions.md#d-2026-11-11-10)).
 - [Database open decisions](../../database_design/product/open-decisions.md) · [business open decisions](../../business_logic/product/open-decisions.md) · [screen open decisions](../../screens/product/open-decisions.md).
 - Hub open questions 9, 10, 13, 14.
 

@@ -65,15 +65,15 @@ Entry: selected club detail. The platform owner has collected payment outside RO
 |---|---|
 | Club | Read-only selected identity; review before commit |
 | Plan | Monthly or yearly; each choice shows the club's price for it |
-| Effective period | Display/propose start and expiry according to the eventual renewal policy; do not silently assume how early renewal stacks |
+| Covers | Read-only computed period ([D-2026-11-11-06](../../../../mvp/decisions.md#d-2026-11-11-06)): starts the day after the current term ends, else today; ends after one month or one year. Hint when a term is current: “A renewal starts the day after the current term ends.” No start-date field ([log](../../../../mockup-changes/2026-11-11-admin-license-no-start-date.md)) |
 | Date paid | Required, not in the future (paid clubs) |
 | Amount | Filled in from the club's price for the chosen plan, editable for this payment. A free club shows **Amount: Free** with no date paid or amount fields; the term is recorded at ₱0 |
-| Note/reference | Optional operational reference; not a required payment receipt or in-app billing record |
+| Note/reference | Optional owner-typed text, kept as a **Note**. Payment history shows the generated `LIC-####` as **Reference** with the note under it |
 | Review | Shows actual access effect and period before confirmation |
 
 Actions: Activate license or Renew license, depending on state. Prevent duplicates. Save only succeeds when the license is actually persisted; a timeout requires retrieving the operation result before reapplying the same term.
 
-Validation: required supported plan and valid effective period; for paid clubs a date paid and a whole amount above zero. Review notes when the amount differs from the club's price. Refunds and overlapping-term policy remain unresolved. Do not invent controls for these merely to complete a billing form.
+Validation: required supported plan; for paid clubs a date paid and a whole amount above zero. Review notes when the amount differs from the club's price. Terms stack, so there is no overlap warning. Refunds remain unresolved; do not invent controls for them.
 
 On renewal, show whether retained public pages were restored and the deletion countdown cancelled. If already deleted, do not promise recovery that was never agreed. A subsequent expiry begins a new six-month countdown.
 

@@ -523,3 +523,112 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 - **Risk to review:** registration does not verify the phone (no SMS, [identity](../database_design/product/player-information/modules/identity.md)). With automatic linking, someone who registers with another person's phone number would collect that person's guest history from every club. [D-2026-11-09-06](#d-2026-11-09-06) used a Queue Master tap (**Link**) to guard against this. Not decided yet: whether this is accepted, like the ranking risk in D-2026-11-09-06.
 - **Not decided yet:** what Admin › Players shows for unclaimed club records (the Admin mockup still lists them with RTR IDs); and what happens to unclaimed `players` rows and RTR IDs that already exist (migration).
 - **References:** [product terms](../product-terms.md) (Unclaimed profile, RTR ID), [identity module](../business_logic/product/player-information/modules/identity/README.md), [players module](../business_logic/product/queue/modules/players/README.md), [Queue players and roster screens](../screens/product/modules/queue/players-roster.md), [identity database design](../database_design/product/player-information/modules/identity.md), code: `searchPlayerDirectory` in `packages/db/src/queue/club-players.ts`, `resolveClubPlayerIdentity` in `packages/db/src/player/identity.ts`.
+
+### D-2026-11-11-04 — Offline writes: an outbox replayed through the existing adapters, plus a play-history file
+- **Decision status:** approved (owner answers, November 11, 2026)
+- **Implementation status:** not started — Queue mockup updated November 11, 2026 ([log](../mockup-changes/2026-11-11-queue-device-play-history-file.md)); real mode has a read-only device copy only (#722)
+- **Ticket:** [#722](https://github.com/jose-codegourmet/rotra-v2/issues/722) (unblocked)
+- **Roadmap:** MVP — [Queue offline](workstreams/queue-offline.md)
+- **Supersedes:** the "CSV export/import" wording of the November 8, 2026 offline decisions (now a JSON file); the full device-stream protocol in [offline-sync.md](../database_design/product/queue/modules/offline-sync.md) is **not** built for MVP.
+- **Decision:**
+  - **Engine (option A).** Every change made offline on a downloaded, started session is recorded as a command (name, arguments, `operationId`) in an IndexedDB outbox and applied locally by running the existing mock-store reducers over the downloaded snapshot. When internet returns, the commands replay in order through the existing real adapters, which already carry idempotent operation IDs. A server disagreement (409) goes to Q-CONFLICT for Queue Master review. Nothing is lost on reload: the outbox and the local copy are durable on the device.
+  - **Play-history file, for non-technical rescue.** Club settings › This device gets **Export play history** (downloads `playhistory.json`: the downloaded session, its local changes and the outbox) and **Import play history…** (loads such a file onto this device). In the owner's words: it is "for brute force sake (for non technical people)" — the automatic device storage is the normal path; the file is the fallback when a device dies or a session must move to another device. Importing is not a database sync; the imported commands join this device's outbox and replay like its own.
+  - Session done still needs internet, complete sync and the guest review of [D-2026-11-07-03](#d-2026-11-07-03).
+- **Not decided yet:** collision-free match numbers and court placement across two offline devices (the outbox replays in order; the second device's conflicting placement lands in Q-CONFLICT).
+- **References:** [offline module](../business_logic/product/queue/modules/offline/README.md), [Club settings screen](../screens/product/modules/queue/access-home.md), code: `packages/data/src/device/deviceCopy.ts`, `packages/db/src/queue/sync.ts`.
+
+### D-2026-11-11-05 — Rank comes from wins, weighted by who you beat
+- **Decision status:** approved (owner answers, November 11, 2026: "all recommended" on the [ranking-by-wins proposal](../decisions/2026-11-11-ranking-by-wins/01-proposal.md))
+- **Implementation status:** not started — real mode has no approved algorithm (`APPROVED_RANK_ALGORITHMS` is empty)
+- **Ticket:** [#247](https://github.com/jose-codegourmet/rotra-v2/issues/247) (unblocked: write the worked examples and pick the constants there)
+- **Roadmap:** MVP — [Ranking](workstreams/ranking.md)
+- **Supersedes:** the 70% club assessments / 30% match performance blend; "saving a roster assessment immediately influences shared rank"; equal club weighting; "latest assessment per club within three months"; the two weight fields on A-RANK-CONFIG.
+- **Decision:**
+  - **Engine.** Each player has one hidden rating. Before a counted game the two teams are compared (team strength = average of its two players). After the game each player moves up or down by a step: beating a stronger team moves you up a lot, beating a weaker team a little; losing to a stronger team costs almost nothing, losing to a weaker team costs a lot. Clubs do not vote on the rating.
+  - **What counts.** Only valid, full singles and doubles games in a valid, finished session. Fun games, invalid games or sessions and both players of a mid-game substitution do not count (as already decided). A game with only a winner counts the same as a game with a score.
+  - **Score does not change the step** in v1 (option A on the proposal's question 5).
+  - **New players start from the first night (option A).** The Queue Master's first level for the night seeds the starting rating. After that, assessments have **zero** influence on shared rank (question 3, option A). The level for the night stays local to that session and only helps Generate matches pair people.
+  - **Provisional** until about 10 counted games, with a bigger step; the rank card says "Provisional" and there is no leaderboard position yet.
+  - **Nine levels stay as bands** on the rating; the shown level is read off the rating.
+  - **Window and clock:** three months means **90 rolling days**, day boundary **Asia/Manila midnight**. Saving new Admin settings **recomputes everyone** from the stored game facts (rank is a projection; the facts never change).
+  - **Inactivity:** no counted games for 90 days → rank stays visible as Needs reassessment and the player leaves the leaderboard; on return they are Provisional again for a few games. Nobody is silently reset to Beginner.
+  - **Leaderboard:** overall ROTRA only; 10 counted games in the window (Admin-adjustable); ordered by rating; ties: more counted games in the window first, then name. Private players keep their position with a masked name.
+  - **Admin settings** replace the 70/30 fields with: normal step size, Provisional step size, Provisional game count, leaderboard game count, window length.
+  - **Session awards (Most Improved, Off Day):** the prototype formula is approved **as is** for v1 (question 18, option A).
+  - **Generate matches:** the prototype's draft weights are the official v1 pairing rule (question 19, option A).
+  - **Accepted risks:** clubs that never mix are islands until players travel; padding earns little because beating weak teams earns little; partner luck averages out over 10+ games.
+- **Not decided yet:** the actual constants (band edges, step sizes), chosen in #247 together with the worked examples.
+- **References:** [proposal](../decisions/2026-11-11-ranking-by-wins/01-proposal.md), [ranking module](../business_logic/product/player-information/modules/ranking/README.md), [Admin configuration module](../business_logic/product/admin/modules/configuration/README.md), [ranking database design](../database_design/product/player-information/modules/ranking.md).
+
+### D-2026-11-11-06 — Roster payments, shuttle prices and license terms
+- **Decision status:** approved (owner answers, November 11, 2026)
+- **Implementation status:** partly in the mock app (paid mark survives demotion already); Admin mockup updated November 11, 2026 ([log](../mockup-changes/2026-11-11-admin-license-no-start-date.md))
+- **Ticket:** [#245](https://github.com/jose-codegourmet/rotra-v2/issues/245) (unblocked), [#377](https://github.com/jose-codegourmet/rotra-v2/issues/377) (decided, closed)
+- **Roadmap:** MVP — [Queue](workstreams/queue.md), [Admin](workstreams/admin.md)
+- **Decision:**
+  - **Paid mark survives demotion.** A player marked paid who is moved to the waitlist keeps the mark, and it shows again if they regain a slot (prototype behaviour).
+  - **Payments after Session done.** The Queue Master can tick paid / not paid after Session done; payments are bookkeeping and never reopen or change results (audit record, as already decided).
+  - **Shuttle price is snapshotted** when the shuttle plan line is saved, so history stays true when inventory prices change. (The prototype used the live price; it follows through a ticket.)
+  - **A level for the night saved for a roster player who is removed before start is dropped.** Moot for shared rank under [D-2026-11-11-05](#d-2026-11-11-05), where assessments never feed rank after the first night.
+  - **License terms stack.** A renewal starts the day after the current term ends; an early renewal never shortens or overlaps the current term. A club with no current term starts today.
+  - **No Starts on field.** The A-LICENSE sheet shows the computed period read-only; the field is removed from the Admin mockup (rule 15).
+  - **Payment history shows both references:** the generated `LIC-####` number and the owner-typed text, kept as a note.
+- **Not decided yet:** refunds; currencies other than pesos; automatic stock deduction; offline inventory edits.
+- **References:** [clubs and licenses module](../business_logic/product/admin/modules/clubs-licenses/README.md), [financials module](../business_logic/product/queue/modules/financials/README.md), [A-LICENSE screen](../screens/product/modules/admin/clubs-licenses.md).
+
+### D-2026-11-11-07 — Club sign-in identity, password reset, error copy and founding cities
+- **Decision status:** approved (owner answers, November 11, 2026)
+- **Implementation status:** sign-in identity and Q-LOGIN copy already in real mode; club password-reset request and Admin notification not started; Admin-added cities not started
+- **Ticket:** [#381](https://github.com/jose-codegourmet/rotra-v2/issues/381), [#382](https://github.com/jose-codegourmet/rotra-v2/issues/382), [#380](https://github.com/jose-codegourmet/rotra-v2/issues/380) (all decided, closed); implementation tickets needed for the reset request and the city registry
+- **Roadmap:** MVP — [Queue](workstreams/queue.md), [Admin](workstreams/admin.md)
+- **Decision:**
+  - **Club sign-in** keeps the synthetic provider login `<username>@clubs.rotra.invalid`. No username-capable provider adapter.
+  - **A club username change rewrites the provider login** in the same operation.
+  - **Forgotten club password:** the club sends a reset request from Q-LOGIN; the platform owner gets an **Admin notification** (Admin › Requests), sets a temporary password and gives it to the club outside ROTRA. The club changes it from Club settings afterwards.
+  - **Q-LOGIN** invalid credentials: **"Username or password is incorrect."** (confirmed).
+  - **A-ADD-CLUB:** there is no password policy beyond the existing minimum of 8 characters. When the provider rejects the initial password, the form shows a generic **"Password incorrect. Try another password."** under the password field; no policy text is shown up front.
+  - **Founding cities:** the six prototype cities and codes are the approved v1 list. **The platform owner adds a city from Admin** (Admin › Settings); no code change. A corrected founding city never changes issued RTR IDs.
+  - **RTR ID is display only.** Every record keys on the player's UUID; the RTR ID is a label on the profile (already the design).
+- **Not decided yet:** sequence formatting above 9999 (first come, first served allocation by the database is confirmed, see [D-2026-11-11-08](#d-2026-11-11-08)).
+- **References:** [clubs and licenses module](../business_logic/product/admin/modules/clubs-licenses/README.md), [identity module](../business_logic/product/player-information/modules/identity/README.md), [Q-LOGIN](../screens/product/modules/queue/access-home.md), [A-ADD-CLUB](../screens/product/modules/admin/clubs-licenses.md), code: `packages/db/src/auth/sign-in.ts`.
+
+### D-2026-11-11-08 — Accounts and registration links: no email verification, 8 characters, links last 24 hours
+- **Decision status:** approved (owner answers, November 11, 2026)
+- **Implementation status:** real mode issues 7-day links and confirms the email at claim; the 24-hour expiry and the Admin unlink are not started
+- **Ticket:** [#244](https://github.com/jose-codegourmet/rotra-v2/issues/244) (unblocked; remaining items listed below)
+- **Roadmap:** MVP — [Player](workstreams/player.md), [Admin](workstreams/admin.md)
+- **Supersedes:** the **7-day** registration-link lifetime of November 7, 2026 (#244). Single use and reissue-revokes-the-old-link stay.
+- **Decision:**
+  - **No email verification on claim.** Opening the club's registration link is the proof; the claim confirms the email at once (as real mode already does).
+  - **Password rule:** at least 8 characters, nothing else.
+  - **Registration links expire 24 hours after issue.** Still single use; the Queue Master can reissue, which revokes the old link. In the owner's words: "QMs are responsible for the links".
+  - **A link claimed by the wrong person is not undone.** The Queue Master creates a new player for the right person; the claimed account stays as it is. The short lifetime is the guard.
+  - **Name-only guests** can be invited later, once the club adds a phone or email to the record.
+  - **RTR ID sequence:** the database hands out the next number first come, first served (already how `rotra_next_player_sequence()` works).
+- **Not decided yet:** contact-change approval evidence beyond the owner's manual review; failed provider application recovery beyond "Application failed".
+- **References:** [identity module](../business_logic/product/player-information/modules/identity/README.md), [identity database design](../database_design/product/player-information/modules/identity.md), code: `packages/db/src/player/claim.ts`, `/api/club/players/[clubPlayerId]/registration-link`.
+
+### D-2026-11-11-09 — Public pages: cookie receipt, pages stay while licensed, never indexed, 90-day private retention
+- **Decision status:** approved (owner answers, November 11, 2026)
+- **Implementation status:** cookie receipt exists (#398 proposal); the no-index and per-request rules need checking in the Queue app; the 90-day sweep has no runner (jobs parked, [D-2026-11-11-10](#d-2026-11-11-10))
+- **Ticket:** [#248](https://github.com/jose-codegourmet/rotra-v2/issues/248) (unblocked), [#398](https://github.com/jose-codegourmet/rotra-v2/issues/398)
+- **Roadmap:** MVP — [Queue](workstreams/queue.md), [Player](workstreams/player.md)
+- **Decision:**
+  - **Join-request receipt is a browser cookie.** A lost cookie means the visitor asks the club; no secret link, no SMS.
+  - **Public result pages have no time limit while the club is licensed.** The six-month deletion after continuous license expiry stays as decided.
+  - **Never crawlable, never static.** Every public page (session page, published results, public profiles) is served per request with `noindex, nofollow` (meta and `X-Robots-Tag`) and is disallowed in `robots.txt`. No static generation, no ISR; the short per-request cache of [D-2026-11-09-09](#d-2026-11-09-09) is allowed because it is still request driven.
+  - **No Unpublish button.** Republishing with a new selection stays the only change after publication.
+  - **Private retention: 90 days.** Join requests (they hold phone numbers), server request logs and generated exports are deleted 90 days after they were created. Players' match history and ranks are never touched by this.
+- **References:** [results module](../business_logic/product/queue/modules/results/README.md), [access and retention](../database_design/product/access-retention.md), [public session screen](../screens/product/modules/queue/public-session.md).
+
+### D-2026-11-11-10 — Housekeeping: #243 closed as overtaken, no club accent for MVP, scheduled jobs parked
+- **Decision status:** approved (owner answers, November 11, 2026)
+- **Implementation status:** n/a
+- **Ticket:** [#243](https://github.com/jose-codegourmet/rotra-v2/issues/243) closed; [#395](https://github.com/jose-codegourmet/rotra-v2/issues/395) closed; [#545](https://github.com/jose-codegourmet/rotra-v2/issues/545), [#546](https://github.com/jose-codegourmet/rotra-v2/issues/546), [#547](https://github.com/jose-codegourmet/rotra-v2/issues/547) parked
+- **Roadmap:** [Backend](workstreams/backend.md)
+- **Supersedes:** the implementation timing of [D-2026-11-08-04](#d-2026-11-08-04) (pg_cron): the design stands, the work is **not for MVP**.
+- **Decision:**
+  - **#243 (Prisma version, migration ownership, database access) is closed as overtaken:** real mode runs on Prisma with applied migrations. The one leftover, turning on row-level security (#387), stays its own chore.
+  - **No club accent colour for MVP** (#395 closed).
+  - **Daily jobs are parked.** License lapse, the retention sweep and ranking ageing get no scheduler for MVP. Until then: "Needs reassessment", leaderboard eligibility and license state are **computed when a page is read**, and the 90-day retention of [D-2026-11-11-09](#d-2026-11-11-09) runs by hand when needed.
+- **References:** [backend workstream](workstreams/backend.md).

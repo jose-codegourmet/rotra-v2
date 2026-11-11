@@ -34,8 +34,8 @@ real-mode switch; scheduled jobs; decision gates #243–#248 under [F07 #241](ht
 ## Remaining work
 
 - [ ] Confirm production sets `ROTRA_DATA_MODE` / `NEXT_PUBLIC_ROTRA_DATA_MODE=real`. Ticket: needed (or owner confirms).
-- [ ] Scheduler for license-lapse refresh, retention sweep and ageing jobs ([D-2026-11-08-04](../decisions.md#d-2026-11-08-04)). Tickets: #545, #546, #547.
-- [ ] Close the decision gates that block MVP work: #243 (worker), #244 (auth/claim/contacts), #245 (storage rules), #246 (offline), #247 (ranking), #248 (public projections/retention). Ticket: existing gates.
+- [ ] Scheduler for license-lapse refresh, retention sweep and ageing jobs ([D-2026-11-08-04](../decisions.md#d-2026-11-08-04)): **parked, not for MVP** ([D-2026-11-11-10](../decisions.md#d-2026-11-11-10)); license state, ageing and eligibility are computed on read. Tickets: #545, #546, #547 (parked).
+- [x] Decision gates answered November 11, 2026 ([D-2026-11-11-04](../decisions.md#d-2026-11-11-04) to [D-10](../decisions.md#d-2026-11-11-10)): #243 closed as overtaken; #244, #245, #247, #248 unblocked and carry only their remaining implementation items; #246 stays as before.
 - [ ] RLS / `anon` grant fix. Ticket: #387.
 
 ## Related decisions
@@ -47,7 +47,7 @@ real-mode switch; scheduled jobs; decision gates #243–#248 under [F07 #241](ht
 ## Blocking open decisions
 
 - [Database open decisions](../../database_design/product/open-decisions.md): auth provider configuration for club username login, email verification on claim, password policy, interrupted-device conflicts, `match_no` allocation, finalization with active games, and the F07.34 / #396 gap tables.
-- Decision gates #243–#248 under [#241](https://github.com/jose-codegourmet/rotra-v2/issues/241); #381 club username identity.
+- None since November 11, 2026: #381 (club username identity), #380, #382 and #377 are decided ([D-2026-11-11-06](../decisions.md#d-2026-11-11-06), [D-07](../decisions.md#d-2026-11-11-07)); #244, #245, #247, #248 carry implementation items only.
 - [Business open decisions](../../business_logic/product/open-decisions.md) · [screen open decisions](../../screens/product/open-decisions.md).
 - Hub open questions 1, 13, 14.
 

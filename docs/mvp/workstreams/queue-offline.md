@@ -46,7 +46,7 @@ console offline notice still says changes save on this device (`docs/architectur
 ## Remaining work
 
 - [x] Durable read-only device copy + session download in real mode (#477). Offline writes/outbox: #722.
-- [ ] Outbox, replay via `uploadOperations`/`sealStream` routes, device enrollment. #722 (needs the owner's engine decision).
+- [ ] Outbox in IndexedDB, local apply through the existing reducers, replay through the existing real adapters, 409 → Q-CONFLICT, `playhistory.json` export/import in This device. #722, engine decided November 11, 2026 ([D-2026-11-11-04](../decisions.md#d-2026-11-11-04)); the device-stream routes (`uploadOperations`/`sealStream`) are not built for MVP.
 - [ ] Add downloaded club players and guests offline. #722.
 - [ ] Interruption answer + conflict review in real mode. #246 (decision); implementation #722.
 - [ ] Guest reconciliation at Session done (club first, then global; explicit confirm or create unclaimed). #722 (D-03).

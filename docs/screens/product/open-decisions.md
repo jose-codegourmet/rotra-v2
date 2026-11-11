@@ -13,19 +13,19 @@ The screen tree specifies all agreed v1 workflows. Where behavior is undecided, 
 
 | Decision | Affected screens | Current safe boundary |
 |---|---|---|
-| Club password recovery | Q-LOGIN, Q-CLUB, A-CLUB-DETAIL | No fabricated manager or password-export flow. The club can change its own password with the current one; forgotten-password reset stays with the platform owner, but how is not specified, so Admin shows no reset control yet. (The club edits its logo and requests name changes.) |
-| License stacking/effective dates and refunds | Q-ACCESS, A-LICENSE | A renewal is proposed to start the day after the current term ends; overlaps show a warning. No refund flow |
+| Club password recovery | Q-LOGIN, Q-CLUB, A-CLUB-DETAIL, A-REQUESTS | **Settled November 11, 2026 ([D-2026-11-11-07](../../mvp/decisions.md#d-2026-11-11-07)):** Q-LOGIN gets a reset request; Admin › Requests shows it; the platform owner sets a temporary password. Mockup-first; no control exists yet |
+| License stacking/effective dates and refunds | Q-ACCESS, A-LICENSE | **Settled November 11, 2026 ([D-2026-11-11-06](../../mvp/decisions.md#d-2026-11-11-06)):** no start-date field; a renewal starts the day after the current term, else today; the period shows read-only ([log](../../mockup-changes/2026-11-11-admin-license-no-start-date.md)). No refund flow |
 | Offline start authorization and device enrollment | Q-DOWNLOAD, Q-START, Q-DEVICE-CONTINUE | A downloaded screen is not automatically proof of write/start authorization (MVP: offline start is out of MVP under [D-2026-11-07-03](../../mvp/decisions.md#d-2026-11-07-03), so start authorization is moot for MVP; device enrollment for continuation stays open) |
 | Conflicting permanent outcomes | Q-CONFLICT | No last-write-wins or generic winner edit |
 | Final policy for games still in play / unused waiting queue | Q-SESSION-DONE | V1 blocks Session done while any match is Playing, until it is finished or invalidated; unplayed waiting matches and On court matches never started are dropped from results (the latter settled November 6, 2026); never manufacture winners or silently invalidate |
 | Releasing the active-session slot after invalidation | Q-INVALID-SESSION | Invalidity is permanent, as explicitly agreed; slot-release mechanics still need definition |
 | Historical guest identity confirmation and link conflicts | Q-ADD-PLAYER, P-ID-QR, P-MATCH-HISTORY | Profile/ID creation on successful entry sync and inclusion of earlier guest games after identity confirmation are settled below. No name-only transfer or invented offline permanent ID; confirmation evidence and conflict resolution remain open |
 | Post-claim operator edits and contact verification | Q-ADD-PLAYER, P-CLAIM, A-PLAYER-DETAIL | No unrestricted personal/contact overwrite |
-| Claim email verification, password policy, loss of contacts | P-CLAIM, P-CLAIM-STATUS, P-FORGOT, P-RESET, P-CONTACT-REQUEST | Defined flow boundaries, no invented SMS/social-login/evidence requirement. Link lifetime is settled below (November 7, 2026) |
-| Final rank/pairing/award formulas and window boundary | Q-SUGGEST, Q-AUTO, Q-AWARDS-SLIDE, P-RANK-DETAIL | The prototype heuristic and award formula are references; no win probabilities shown to operators |
+| Claim email verification, password policy, loss of contacts | P-CLAIM, P-CLAIM-STATUS, P-FORGOT, P-RESET, P-CONTACT-REQUEST | **Settled November 11, 2026 ([D-2026-11-11-08](../../mvp/decisions.md#d-2026-11-11-08)):** no email verification; password at least 8 characters; links last 24 hours. Loss of contacts stays an Admin review |
+| Final rank/pairing/award formulas and window boundary | Q-SUGGEST, Q-AUTO, Q-AWARDS-SLIDE, P-RANK-DETAIL, A-RANK-CONFIG | **Settled November 11, 2026 ([D-2026-11-11-05](../../mvp/decisions.md#d-2026-11-11-05)):** rating by wins; prototype pairing weights and award formula approved as is; 90 days. A-RANK-CONFIG loses the two weight fields and gains the five rating settings (mockup-first, log pending). No win probabilities shown to operators |
 | Three-or-more-way head-to-head and identical-name ties | Q-STANDINGS-SLIDE, Q-LEADERBOARD | Preserve wins/losses/head-to-head/name order; no substitute strength tiebreak |
 | Public history/social visibility | P-PUBLIC-PROFILE, P-MATCH-HISTORY | Expose only approved fields; no contact/private-Off-Day leak |
-| Stale-page access and post-deletion restoration | Q-PUBLIC-STALE, A-RETENTION | Distinguish stale/deleted; no unsupported restoration promise |
+| Stale-page access and post-deletion restoration | Q-PUBLIC-STALE, A-RETENTION | Distinguish stale/deleted; no unsupported restoration promise. **Settled November 11, 2026 (D-09):** public pages never indexed or static; no time limit while licensed |
 | Settings effective-time, flag targeting and offline flag effects | A-RANK-CONFIG, A-FEATURE-FLAGS | No false instant rerank or remote update guarantee; flags are platform-wide on/off |
 
 ## Composition/interaction details proposed but not yet fixed
@@ -33,7 +33,6 @@ The screen tree specifies all agreed v1 workflows. Where behavior is undecided, 
 - Exact routes beyond the approved mock auth boundary (`/login` in all apps, public Queue `/s/[slug]`, public Player `/players/[playerId]`, protected Player `/me`; approved October 27, 2026), component names, page-versus-sheet boundaries, field-length limits, design tokens, and export pixel dimensions.
 - Changing mode/formats/minimum during an active session. They stay visible and fixed until decided.
 - The Generate matches (formerly called Auto Queue) match count is explicitly selected from 2, 3, 4 or 6, with no preselected default (owner decision October 31, 2026).
-- Fully withdrawing a publication (re-publishing a new selection is settled).
 - Access to five-session history for award calculations when a returning guest was duplicated rather than recognized.
 - Whether individual club assessments are itemized publicly. Equal-weight aggregation is agreed; public assessment disclosure is not.
 - Read-only historical/cache behavior on disconnected devices and preserving unsynced work on sign-out.
@@ -44,6 +43,10 @@ The screen tree specifies all agreed v1 workflows. Where behavior is undecided, 
 - Two offline devices placing the same match or court by hand with **Put on court** (collision-free assignment stays open). The Manual Queue | Auto Queue switch offline is settled below.
 - The offline notice copy for Cancel session and the Manual Queue | Auto Queue switch (both need internet, settled below), to be taken from the mockup. Also settled November 6, 2026: the Preparation header keeps **both** Delete session (nobody confirmed) and Cancel session (players joined); the prototype now shows both ([log](../../mockup-changes/2026-11-06-queue-delete-session.md)).
 - What Q-POOL shows for a player in a Getting ready match (the status list has **On Court X**, **Away**, **Queued · #P**, **Free**).
+
+## Settled by the product owner on November 11, 2026
+
+Recorded as [D-2026-11-11-04](../../mvp/decisions.md#d-2026-11-11-04) to [D-2026-11-11-10](../../mvp/decisions.md#d-2026-11-11-10). Screen effects: Q-CLUB › This device gains Export / Import play history ([log](../../mockup-changes/2026-11-11-queue-device-play-history-file.md)); A-LICENSE loses the start-date field ([log](../../mockup-changes/2026-11-11-admin-license-no-start-date.md)); Q-LOGIN copy "Username or password is incorrect." confirmed; A-ADD-CLUB says "Password incorrect. Try another password." on a provider rejection; no Unpublish control anywhere; A-RANK-CONFIG and a Q-LOGIN reset request are mockup-first follow-ups.
 
 ## Settled by the product owner on November 7, 2026
 

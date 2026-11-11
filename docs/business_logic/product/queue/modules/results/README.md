@@ -77,11 +77,11 @@ The operator chooses when to publish, online only. The publish review states the
 - **Standings** and **Awards**, both selected by default the first time, or the previously published selection when updating.
 - **Include Off Day**, always **off** each time the review opens, even if Off Day was shared before. It names who would appear.
 
-Publishing needs at least one selection. The operator can publish again later to change the selection (**Update publication**). Withdrawing a publication entirely is not specified.
+Publishing needs at least one selection. The operator can publish again later to change the selection (**Update publication**). There is **no Unpublish**: republishing with a new selection is the only change after publication (decided November 11, 2026, [D-2026-11-11-09](../../../../../mvp/decisions.md#d-2026-11-11-09)).
 
 Published slides appear on the public session page below Details and Participants. Before publication the page says "Results for this session have not been shared."
 
-Publishing does not delay profile, performance, or global leaderboard updates after valid finalization. Public session-page lifetime follows [license retention rules](../../../admin/modules/clubs-licenses/README.md).
+Publishing does not delay profile, performance, or global leaderboard updates after valid finalization. Public session-page lifetime follows [license retention rules](../../../admin/modules/clubs-licenses/README.md): no time limit while the club is licensed. Public pages are **never indexed and never static**: served per request with `noindex, nofollow`, disallowed in `robots.txt`, no static generation or ISR ([D-2026-11-11-09](../../../../../mvp/decisions.md#d-2026-11-11-09)).
 
 ## Image downloads
 

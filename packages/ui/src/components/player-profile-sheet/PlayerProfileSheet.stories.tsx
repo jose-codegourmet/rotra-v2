@@ -1,4 +1,5 @@
 import type { ClubPlayer } from '@rotra/data/club-player/types'
+import { playerProfiles } from '@rotra/data/fixtures/player-profiles'
 import { clubPlayers, players, storyIdentityPlayers } from '@rotra/data/fixtures/players'
 import { Toaster } from '@rotra/ui/toaster'
 import type { Meta, StoryObj } from '@storybook/react-vite'
@@ -31,6 +32,7 @@ const propsFor = (
   open: true,
   onOpenChange: fn(),
   name: p.fullName,
+  photoUrl: playerProfiles.find((x) => x.playerId === p.playerId)?.picture ?? undefined,
   identity: p.identity,
   nickname: p.nickname,
   level: p.playingLevel,
@@ -52,7 +54,30 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
+/** All stories support both themes through the Theme toolbar. Not on tonight's roster: suggestion badge, no Tonight line. */
 export const Registered: Story = {}
+/** On tonight's roster and playing: “LEVEL tonight” badge and the Tonight · line. */
+export const PlayingTonight: Story = {
+  args: { tonightLevel: 'intermediate_high', tonight: { kind: 'playing', courtLabel: 'Court 2' } },
+}
+export const GettingReadyTonight: Story = {
+  args: {
+    tonightLevel: 'intermediate_high',
+    tonight: { kind: 'getting-ready', courtLabel: 'Court 1' },
+  },
+}
+export const QueuedTonight: Story = {
+  args: { tonightLevel: 'intermediate_high', tonight: { kind: 'queued', position: 2 } },
+}
+export const AwayTonight: Story = {
+  args: { tonightLevel: 'intermediate_high', tonight: { kind: 'away' } },
+}
+export const NoLevelYet: Story = { args: { level: null, tonightLevel: null } }
+export const WithPhotoButton: Story = { args: { onPhotoClick: fn() } }
+export const Light: Story = {
+  args: { tonightLevel: 'intermediate_high', tonight: { kind: 'free' } },
+  globals: { theme: 'light' },
+}
 export const HiddenPhone: Story = { args: propsFor(byName('Jose'), { phoneHidden: true }) }
 export const Unclaimed: Story = {
   args: propsFor(storyIdentityPlayers.unclaimed, { sessionsHere: 5 }),

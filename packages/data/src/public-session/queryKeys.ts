@@ -14,6 +14,9 @@ export const publicSessionKeys = {
   /** The signed-in Player in the account bar (#693): name, nickname, RTR ID, picture */
   account: (playerId: string) => ['public-session', 'account', playerId] as const,
   /** This Player's Session invite code for the session (made on first read, then stable) */
+  /** Stats · last 90 days on the participant profile card (#731) */
+  participantStats: (rtrId: string, viewerPlayerId: string) =>
+    ['public-session', 'participant-stats', rtrId, viewerPlayerId] as const,
   inviteCode: (slug: string, playerId: string) =>
     ['public-session', 'invite-code', slug, playerId] as const,
 }

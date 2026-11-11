@@ -53,9 +53,18 @@ export type PlayerRank = {
   olderCount: number
 }
 
+/** Who can see a profile: public, Private (today's switch) or always private (#715, mock only). */
+export type ProfileVisibility = 'public' | 'private' | 'always_private'
+
 /** Public profile only; private account and contact fields are deliberately excluded. */
 export type PlayerProfile = {
   profilePrivate?: boolean
+  /**
+   * Always private (#715 proposal, used by #731): masked for every other viewer, signed in or not;
+   * only the picture and banner stay public. Mock flag only: no database column yet, so real mode
+   * reads it as not set. `profilePrivate` (today's Private switch) keeps its meaning.
+   */
+  profileAlwaysPrivate?: boolean
   /** Shown only on the signed-in player account, not public profile cards. */
   adminChangeNote?: string
   playerId: string

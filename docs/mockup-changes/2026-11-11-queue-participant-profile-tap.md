@@ -1,6 +1,6 @@
 # Tap a participant on the session page to open their profile (#731, proposed)
 
-Status: NEW
+Status: IN MOCK APP — #731
 Date: 2026-11-11
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Public session page › Participants tab › participant tile, Participant profile sheet, Private profile card

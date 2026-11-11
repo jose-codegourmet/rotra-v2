@@ -11,12 +11,15 @@ export type PublicParticipantTileProps = {
   skillGroup?: PublicSessionParticipant['skillGroup']
   /** Full playing level for the hover label and accessible text. */
   levelLabel?: string | null
-  /** Guest, unclaimed profile or visitor view: the name is masked, so no nickname and no link. */
+  /** Guest, unclaimed profile, always-private player or visitor view: masked name, no nickname. */
   masked?: boolean
   /** The signed-in viewer's own tile: You pill and accent ring. */
   isViewer?: boolean
-  /** Player app profile URL (`/player/find/<RTR>`); only a registered, unmasked tile links. */
-  href?: string | null
+  /**
+   * Signed-in viewers only (#731): the tile is a button that opens the profile card, masked tiles
+   * included. Accessible name “NAME · view profile”, or “NAME (you) · view your profile”.
+   */
+  onOpen?: () => void
   /** One-based waitlist position; adds the picture badge and dims the picture. */
   waitlistPosition?: number
   className?: string
@@ -31,7 +34,7 @@ const ringClasses = {
 
 /**
  * Public participant tile: picture with a skill-group ring, the name, the nickname for registered
- * players, an optional You pill, and a link to the ROTRA profile for signed-in viewers.
+ * players, an optional You pill, and for signed-in viewers a button that opens the profile card.
  */
 export function PublicParticipantTile({
   name,
@@ -41,17 +44,18 @@ export function PublicParticipantTile({
   levelLabel,
   masked = true,
   isViewer = false,
-  href,
+  onOpen,
   waitlistPosition,
   className,
 }: PublicParticipantTileProps) {
-  const link = !masked && href ? href : null
+  const link = !!onOpen
   const shownNickname = !masked && nickname ? nickname : null
   const classes = cn(
     'group flex min-w-0 flex-col items-center gap-3.5 text-center',
     ringClasses[skillGroup ?? 'none'],
     isViewer && 'is-viewer',
-    link && 'rounded-md text-inherit no-underline',
+    link &&
+      'm-0 w-full cursor-pointer rounded-md border-0 bg-transparent p-0 font-[inherit] text-inherit',
     className,
   )
   const body = (
@@ -106,16 +110,15 @@ export function PublicParticipantTile({
   )
 
   return link ? (
-    <a
-      href={link}
-      target="_blank"
-      rel="noopener noreferrer"
+    <button
+      type="button"
+      onClick={onOpen}
       title={levelLabel ?? undefined}
-      aria-label={`${name} · view ROTRA profile`}
+      aria-label={isViewer ? `${name} (you) · view your profile` : `${name} · view profile`}
       className={classes}
     >
       {body}
-    </a>
+    </button>
   ) : (
     <div title={levelLabel ?? undefined} className={classes}>
       {body}

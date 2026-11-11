@@ -29,6 +29,8 @@ export type SheetProps = {
   /** Fallback when a successful action removes the button that opened this sheet. */
   returnFocusRef?: RefObject<HTMLElement | null>
   className?: string
+  /** Classes for the body (.sb), e.g. `p-0` for a card that runs edge to edge (D-PARTICIPANT-PROFILE) */
+  bodyClassName?: string
 }
 
 // Durations and easing from the prototypes: scrim fades in 0.15 s; the sheet pops in 0.16 s
@@ -53,6 +55,7 @@ export function Sheet({
   dismissible = true,
   returnFocusRef,
   className,
+  bodyClassName,
 }: SheetProps) {
   const phone = useMediaQuery(PHONE_QUERY)
   const full = Boolean(fullscreen && phone && !side)
@@ -160,6 +163,7 @@ export function Sheet({
                   className={cn(
                     'flex min-h-0 flex-col gap-3.5 overflow-y-auto px-5 pt-2.5 pb-4',
                     full && 'flex-1',
+                    bodyClassName,
                   )}
                 >
                   {children}

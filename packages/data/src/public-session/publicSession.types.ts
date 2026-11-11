@@ -6,6 +6,26 @@ import type {
   SessionJoinRequest,
 } from '../session-roster/sessionRoster.types'
 
+/**
+ * The **Tonight ·** line on a profile card (#731): Playing · Court N, On court · getting ready ·
+ * Court N, Queued · #N, Free or Away. `courtLabel` is "Court 1 + Court 2" on merged courts.
+ */
+export type ParticipantTonight =
+  | { kind: 'playing'; courtLabel: string }
+  | { kind: 'getting-ready'; courtLabel: string }
+  | { kind: 'queued'; position: number }
+  | { kind: 'free' }
+  | { kind: 'away' }
+
+/**
+ * Which card a tap opens on the session page (#731): `registered` the participant profile,
+ * `private` the always-private card, `guest` the Not on ROTRA yet card (guests and unclaimed).
+ */
+export type ParticipantProfileKind = 'registered' | 'private' | 'guest'
+
+/** Stats · last 90 days on the participant profile card; null is "No games yet". */
+export type ParticipantStats = { games: number; wins: number; losses: number; winRate: number }
+
 /** Public-safe participant or waitlist entry. */
 export type PublicSessionParticipant = {
   /** Masked on the server (`maskPublicName`): "J*** A***". The full name never enters the page. */
@@ -32,6 +52,16 @@ export type PublicSessionParticipant = {
   rtrId?: string | null
   /** Signed-in version only: this row is the viewer's own (the You pill). */
   isViewer?: boolean
+  /**
+   * Signed-in version only (#731): which card the tile opens. Missing means the tile stays plain
+   * (visitor views, and real-mode reads that do not say who the player is).
+   */
+  profile?: ParticipantProfileKind
+  /**
+   * Signed-in version only (#731), roster entries of a prepared or live session: the Tonight line.
+   * Missing on the waitlist and when the player is not on tonight's roster.
+   */
+  tonight?: ParticipantTonight
 }
 /**
  * #474: aggregate counts of public participants in each skill group. Missing level → unrated.

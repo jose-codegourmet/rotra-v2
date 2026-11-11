@@ -1,9 +1,15 @@
+import { allPlayers, courtNames, holdsCourt } from '../match/match.rules'
+import type { Match } from '../match/match.types'
 import type { SelfCheckInMark } from '../match-request/matchRequest.types'
 import type { MockState } from '../mock/store'
 import { PLAYING_LEVELS, type PlayingLevel } from '../player/player.types'
-import type { QueueSession } from '../queue-session/queueSession.types'
+import type { QueueSession, SessionCourt } from '../queue-session/queueSession.types'
 import type { SessionPlayer } from '../session-roster/sessionRoster.types'
-import type { PublicSessionParticipant, PublicSkillMix } from './publicSession.types'
+import type {
+  ParticipantTonight,
+  PublicSessionParticipant,
+  PublicSkillMix,
+} from './publicSession.types'
 
 /**
  * Public participant names (owner decision, November 7, 2026; #475): each whitespace-separated word
@@ -154,4 +160,29 @@ export function refreshAvailableAt(lastRefreshedAt: number | null): number | nul
 export function canRefreshNow(lastRefreshedAt: number | null, now = Date.now()): boolean {
   const next = refreshAvailableAt(lastRefreshedAt)
   return next === null || now >= next
+}
+
+/**
+ * The Tonight · line on a profile card (#731, D-PARTICIPANT-PROFILE) for one roster entry: Playing
+ * or On court · getting ready on its courts, else Away when not present, Queued · #N (its waiting
+ * match's place in the queue), or Free. Same order as the Players view's status.
+ */
+export function tonightStatus(
+  entry: Pick<SessionPlayer, 'id' | 'present'>,
+  matches: Match[],
+  courts: SessionCourt[],
+): ParticipantTonight {
+  const busy = matches.find((m) => holdsCourt(m) && allPlayers(m).includes(entry.id))
+  if (busy) {
+    const courtLabel = courtNames(busy, courts)
+    return busy.state === 'active'
+      ? { kind: 'playing', courtLabel }
+      : { kind: 'getting-ready', courtLabel }
+  }
+  if (!entry.present) return { kind: 'away' }
+  const position = matches
+    .filter((m) => m.state === 'waiting')
+    .sort((a, b) => a.queuePosition - b.queuePosition)
+    .findIndex((m) => allPlayers(m).includes(entry.id))
+  return position >= 0 ? { kind: 'queued', position: position + 1 } : { kind: 'free' }
 }

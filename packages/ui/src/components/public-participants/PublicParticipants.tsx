@@ -18,7 +18,10 @@ export type PublicParticipant = Omit<PublicSessionParticipant, 'skillGroup' | 'l
   masked?: boolean
   /** The signed-in viewer's own tile: You pill and accent ring. */
   isViewer?: boolean
-  /** Player app `/player/find/<RTR>` URL, set only for registered players seen by a signed-in viewer. */
+  /**
+   * Player app `/player/find/<RTR>` URL, set only for registered players seen by a signed-in viewer:
+   * the profile card's Open ROTRA profile. Tiles no longer link (#731).
+   */
   href?: string | null
 }
 
@@ -41,6 +44,12 @@ export type PublicParticipantsProps = {
   acceptJoinRequests?: boolean
   /** Opens the Request to join sheet; a request never grants a slot or reveals more players. */
   onRequestToJoin?: () => void
+  /**
+   * Signed-in viewers (#731): every tile whose entry says which card it opens (`profile`) becomes a
+   * button calling this, and the hint “Tap a player to see their profile and stats.” shows above
+   * the grid. Visitors pass nothing and keep plain tiles.
+   */
+  onOpenParticipant?: (participant: PublicParticipant) => void
   /** Sending needs internet; disable the join prompt while offline. */
   disabled?: boolean
   /** @deprecated Skill mix now belongs to the Want to play? card. Ignored here. */
@@ -61,9 +70,13 @@ export function PublicParticipants({
   participantCount = participants.length,
   acceptJoinRequests = true,
   onRequestToJoin,
+  onOpenParticipant,
   disabled = false,
   className,
 }: PublicParticipantsProps) {
+  const openerFor = (p: PublicParticipant) =>
+    onOpenParticipant && p.profile ? () => onOpenParticipant(p) : undefined
+  const showHint = !!onOpenParticipant && participants.some((p) => p.profile)
   const isUncapped = uncapped ?? fullRoster
   // Never mount roster entries past the wider cap. CSS removes entries 10–12 on phones from
   // both layout and the accessibility tree, with no viewport hook or hydration shift.
@@ -77,6 +90,9 @@ export function PublicParticipants({
 
   return (
     <section aria-label="Participants" className={cn('flex min-w-0 flex-col gap-3', className)}>
+      {showHint ? (
+        <p className="m-0 text-[13px] text-fg2">Tap a player to see their profile and stats.</p>
+      ) : null}
       {participants.length || placeholderCount ? (
         <div className="relative">
           <ul className={cn(gridClass, !isUncapped && 'max-[640px]:[&>li:nth-child(n+10)]:hidden')}>
@@ -90,7 +106,7 @@ export function PublicParticipants({
                   levelLabel={p.levelLabel}
                   masked={p.masked ?? true}
                   isViewer={p.isViewer}
-                  href={p.href}
+                  onOpen={openerFor(p)}
                 />
               </li>
             ))}
@@ -153,7 +169,7 @@ export function PublicParticipants({
                   levelLabel={w.levelLabel}
                   masked={w.masked ?? true}
                   isViewer={w.isViewer}
-                  href={w.href}
+                  onOpen={openerFor(w)}
                   waitlistPosition={i + 1}
                 />
               </li>

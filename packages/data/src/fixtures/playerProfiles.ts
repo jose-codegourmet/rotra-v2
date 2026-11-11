@@ -5,11 +5,20 @@ import { leaderboardPlayers, players } from './players'
 // Vector artwork copied from rotra-player.html faceSVG(), with its original bN/u1 seeds.
 // These are image asset colours, not interface theme colours.
 const pictures: Record<string, string> = portraits
+/**
+ * #715 (proposed) for #731: two always-private players on tonight's roster, at the prototype's
+ * places (p9 and p14): Albion and Emji.
+ */
+const ALWAYS_PRIVATE_PLAYER_IDS = [
+  '85ae7866-ff62-59fc-8af8-985a594bb5b2',
+  '9f83495f-9359-5f7f-82ad-4cf01b826471',
+]
 export const playerProfiles: PlayerProfile[] = players.map((player) => {
   const jose = player.fullName === 'Jose'
   const raymark = player.rtrId === 'RTR-PH-CEB-040226-0007'
   return {
     profilePrivate: [leaderboardPlayers[5]?.id, leaderboardPlayers[9]?.id].includes(player.id),
+    ...(ALWAYS_PRIVATE_PLAYER_IDS.includes(player.id) ? { profileAlwaysPrivate: true } : {}),
     playerId: player.id,
     rtrId: player.rtrId,
     fullName: player.fullName,

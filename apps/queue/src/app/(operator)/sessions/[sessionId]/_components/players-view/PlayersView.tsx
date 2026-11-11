@@ -360,6 +360,7 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
                 selected={order >= 0}
                 pickOrder={order >= 0 ? order + 1 : undefined}
                 onToggleSelect={() => toggle(row.player.id)}
+                onOpenProfile={() => onOpenProfile(row.player.clubPlayerId)}
                 onSetGames={() => {
                   setSetGamesError(undefined)
                   void setPresence.flush().then(() => setSetGamesFor(row.player.id))

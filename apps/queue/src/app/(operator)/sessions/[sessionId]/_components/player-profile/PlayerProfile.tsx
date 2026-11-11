@@ -2,7 +2,13 @@
 
 import { registeredCity } from '@rotra/data/club-player/fetchers'
 import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
+import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
+import { tonightStatus } from '@rotra/data/public-session/rules'
+import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
+import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { PlayerProfileSheet } from '@rotra/ui/player-profile-sheet'
+import { profilePictureSrc } from '@rotra/ui/profile-picture'
+import { useParams } from 'next/navigation'
 import { longDateLabel } from '@/lib/dates'
 
 export type PlayerProfileProps = {
@@ -16,15 +22,27 @@ export type PlayerProfileProps = {
 
 /**
  * The player profile dialog shared by the console views: PlayerProfileSheet on useClubPlayers for
- * the saved player a court, queue card, pool card or leaderboard row points at. Renders nothing
- * until the player is known.
+ * the saved player a court, queue card, pool card or leaderboard row points at, with the session's
+ * roster level (“LEVEL tonight”) and the Tonight · line while the session is prepared or live
+ * (D-PARTICIPANT-PROFILE). Renders nothing until the player is known.
  */
 export function PlayerProfile({ clubPlayerId, onClose, backLabel, onBack }: PlayerProfileProps) {
+  const { sessionId = '' } = useParams<{ sessionId?: string }>()
   const clubPlayers = useClubPlayers()
+  const session = useQueueSession(sessionId)
+  const roster = useSessionRoster(sessionId)
+  const matches = useSessionMatches(sessionId)
   const profile = clubPlayerId
     ? clubPlayers.data?.players.find((p) => p.id === clubPlayerId)
     : undefined
   if (!profile) return null
+  const entry = roster.data?.roster.find((r) => r.clubPlayerId === profile.id)
+  const state = session.data?.state
+  const live = state === 'prepared' || state === 'active' || state === 'finalizing'
+  const tonight =
+    entry && live && matches.data && session.data
+      ? tonightStatus(entry, matches.data, session.data.courts)
+      : null
   return (
     <PlayerProfileSheet
       open={clubPlayerId !== null}
@@ -32,9 +50,16 @@ export function PlayerProfile({ clubPlayerId, onClose, backLabel, onBack }: Play
         if (!open) onClose()
       }}
       name={profile.fullName}
+      photoUrl={profilePictureSrc(
+        profile.picture,
+        profile.playerId ?? profile.id,
+        profile.pictureName ?? profile.fullName,
+      )}
       identity={profile.identity}
       nickname={profile.nickname}
       level={profile.suggestion}
+      tonightLevel={live ? entry?.level : null}
+      tonight={tonight}
       registeredCity={registeredCity(profile.rtrId)}
       rtrId={profile.rtrId}
       addedLabel={longDateLabel(profile.addedAt)}

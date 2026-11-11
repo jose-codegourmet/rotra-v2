@@ -5,6 +5,7 @@ import {
   isLeaderboardEligible,
   orderLeaderboard,
   rankDisplayStatus,
+  recentGameStats,
 } from './player.rules'
 
 const now = PLAYER_FIXTURE_NOW
@@ -93,5 +94,24 @@ describe('prototype ranking eligibility rules', () => {
         now,
       ),
     ).toBe(0)
+  })
+})
+
+describe('Stats · last 90 days (#731)', () => {
+  it('counts every game inside the rank window, wins and losses, and a whole-percent rate', () => {
+    const sessions = genSessions('stats', 12)
+    const stats = recentGameStats(sessions, now)
+    const inside = sessions
+      .filter((x) => Date.parse(x.finishedAt) >= now.getTime() - 90 * 86400000)
+      .flatMap((x) => x.games)
+    expect(stats?.games).toBe(inside.length)
+    expect(stats?.wins).toBe(inside.filter((g) => g.result === 'won').length)
+    expect((stats?.wins ?? 0) + (stats?.losses ?? 0)).toBe(stats?.games)
+    expect(stats?.winRate).toBe(Math.round(((stats?.wins ?? 0) / (stats?.games ?? 1)) * 100))
+  })
+  it('is null without games in the window ("No games yet")', () => {
+    expect(recentGameStats([], now)).toBeNull()
+    const old = genSessions('old', 3).map((x) => ({ ...x, finishedAt: daysAgo(120) }))
+    expect(recentGameStats(old, now)).toBeNull()
   })
 })

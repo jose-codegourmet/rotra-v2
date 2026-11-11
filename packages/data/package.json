@@ -409,6 +409,7 @@
     "./public-session/context": "./src/public-session/context.ts",
     "./public-session/useSessionPageAccount": "./src/public-session/useSessionPageAccount.ts",
     "./public-session/useSessionPageSignOut": "./src/public-session/useSessionPageSignOut.ts",
+    "./public-session/useParticipantStats": "./src/public-session/useParticipantStats.ts",
     "./player-club/useJoinClub": "./src/player-club/useJoinClub.ts",
     "./player-club/useLeaveClub": "./src/player-club/useLeaveClub.ts",
     "./player-club/useMyClubs": "./src/player-club/useMyClubs.ts",

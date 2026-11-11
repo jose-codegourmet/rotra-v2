@@ -77,3 +77,35 @@ export function orderLeaderboard<
     (e) => e.levelIndex !== null && isLeaderboardEligible(e.recentCount, matchRequirement, e.state),
   )
 }
+
+/** Games, wins, losses and win rate (whole percent) over the rank window; null without games. */
+export type RecentGameStats = { games: number; wins: number; losses: number; winRate: number }
+/**
+ * Stats · last 90 days on the participant profile card (#731): every game in the player's official
+ * history (valid finalized sessions) that finished inside the same window as rank. No rating math.
+ */
+export function recentGameStats(
+  sessions: readonly {
+    finishedAt: string | null
+    games: readonly { result: string }[]
+  }[],
+  now: Date | number,
+  windowDays = WINDOW_DAYS,
+): RecentGameStats | null {
+  const end = Number(now),
+    start = end - windowDays * 86400000
+  const games = sessions
+    .filter((s) => {
+      const at = s.finishedAt ? Date.parse(s.finishedAt) : Number.NaN
+      return at >= start && at <= end
+    })
+    .flatMap((s) => s.games)
+  if (!games.length) return null
+  const wins = games.filter((g) => g.result === 'won').length
+  return {
+    games: games.length,
+    wins,
+    losses: games.length - wins,
+    winRate: Math.round((wins / games.length) * 100),
+  }
+}

@@ -1,12 +1,17 @@
 'use client'
 
 import type { PlayingLevel } from '@rotra/data/player/types'
-import { Avatar } from '@rotra/ui/avatar'
+import type { ParticipantTonight } from '@rotra/data/public-session/types'
 import { Button } from '@rotra/ui/button'
 import { IdentityChip } from '@rotra/ui/identity-chip'
 import type { Identity } from '@rotra/ui/identity-chip/variants'
 import { KeyValueList } from '@rotra/ui/key-value-list'
 import { levelLabel } from '@rotra/ui/level-pill'
+import {
+  ProfileBannerCard,
+  ProfileCardSection,
+  ProfileLevelBadge,
+} from '@rotra/ui/profile-banner-card'
 import { JOINED_VIA_TEXT } from '@rotra/ui/saved-player-card'
 import { Sheet } from '@rotra/ui/sheet'
 import { toast } from '@rotra/ui/toaster'
@@ -20,6 +25,15 @@ export type PlayerProfileSheetProps = {
   nickname: string | null
   /** The club's level suggestion for this player */
   level: PlayingLevel | null
+  /**
+   * On tonight's roster: their level for this session (badge “LEVEL tonight”). Missing or null
+   * falls back to the suggestion (“LEVEL · suggestion”), then “No level yet”.
+   */
+  tonightLevel?: PlayingLevel | null
+  /** The Tonight · line from the live session; hidden when not on tonight's roster */
+  tonight?: ParticipantTonight | null
+  /** Opens the full photo (#716); without it the picture is not a button */
+  onPhotoClick?: () => void
   /** City the profile was first registered in (from the RTR ID) */
   registeredCity: string | null
   rtrId: string | null
@@ -54,7 +68,12 @@ const STATUS: Record<Identity, string> = {
   pending: 'Profile lookup after the session syncs',
 }
 
-/** A player's profile on operator screens, opened from any player picture. Never shows a phone number. */
+/**
+ * A player's profile on operator screens, opened from any player picture: the banner profile card
+ * (D-PARTICIPANT-PROFILE) with the identity chip and level badge, the identity line, the Tonight ·
+ * line, boxed About and In your club, then the guest invite and the levels note. Never shows a
+ * phone number.
+ */
 export function PlayerProfileSheet({
   open,
   onOpenChange,
@@ -63,6 +82,9 @@ export function PlayerProfileSheet({
   identity,
   nickname,
   level,
+  tonightLevel,
+  tonight,
+  onPhotoClick,
   registeredCity,
   rtrId,
   addedLabel,
@@ -105,6 +127,7 @@ export function PlayerProfileSheet({
       open={open}
       onOpenChange={onOpenChange}
       title={name}
+      bodyClassName="p-0"
       footer={
         <>
           {backLabel ? (
@@ -129,57 +152,66 @@ export function PlayerProfileSheet({
         </>
       }
     >
-      <div className="flex min-w-0 items-center gap-3">
-        <Avatar
-          name={name}
-          src={photoUrl}
-          size={64}
-          className={
-            photoUrl
-              ? 'shadow-[0_0_0_2px_var(--surface),0_0_0_3px_var(--border-strong)]'
-              : undefined
-          }
-        />
-        <div className="flex min-w-0 flex-col gap-1.5">
-          <div>
+      <ProfileBannerCard
+        name={name}
+        nickname={nickname}
+        photoUrl={photoUrl}
+        onPhotoClick={onPhotoClick}
+        chips={
+          <>
             <IdentityChip identity={identity} />
-          </div>
-          <span className="text-[13px] text-fg2">{STATUS[identity]}</span>
-        </div>
-      </div>
-      <KeyValueList
-        items={[
-          { label: 'Nickname', value: nickname || '—' },
-          { label: 'Level suggestion', value: level ? levelLabel(level) : 'None yet' },
-          { label: 'Registered in', value: registeredCity ?? 'Not registered yet' },
-          {
-            label: 'RTR ID',
-            value: rtrId ? <span className="font-mono text-[13px]">{rtrId}</span> : 'None yet',
-          },
-          { label: 'Added to club', value: addedLabel },
-          { label: 'Sessions here', value: sessionsHere },
-          { label: 'Phone', value: phone },
-          { label: 'Joined', value: JOINED_VIA_TEXT[joinedVia ?? 'club-added'] },
-        ]}
-      />
-      {identity === 'guest' && inviteUrl ? (
-        <section className="flex flex-col gap-2" aria-labelledby="invite-to-rotra">
-          <h3 id="invite-to-rotra" className="m-0 text-[14px] font-semibold">
-            Invite to ROTRA
-          </h3>
-          <p className="m-0 text-[13px] text-fg2">
-            Send this link so they can register for ROTRA Player. Their guest record stays unlinked
-            until they accept a separate linking invitation.
-          </p>
-          <div className="flex flex-wrap gap-2">
-            <Button onClick={() => void copyInvite(inviteUrl)}>Copy invite link</Button>
-            {canShare ? <Button onClick={() => void shareInvite(inviteUrl)}>Share</Button> : null}
-          </div>
-        </section>
-      ) : null}
-      <p className="m-0 text-[13px] text-fg2">
-        Levels are set per session while preparing a roster, not here.
-      </p>
+            <ProfileLevelBadge>
+              {tonightLevel
+                ? `${levelLabel(tonightLevel)} tonight`
+                : level
+                  ? `${levelLabel(level)} · suggestion`
+                  : 'No level yet'}
+            </ProfileLevelBadge>
+          </>
+        }
+        identityLine={STATUS[identity]}
+        tonight={tonight}
+      >
+        <ProfileCardSection label="About">
+          <KeyValueList
+            items={[
+              { label: 'Registered in', value: registeredCity ?? 'Not registered yet' },
+              {
+                label: 'RTR ID',
+                value: rtrId ? <span className="font-mono text-[13px]">{rtrId}</span> : 'None yet',
+              },
+              { label: 'Joined', value: JOINED_VIA_TEXT[joinedVia ?? 'club-added'] },
+            ]}
+          />
+        </ProfileCardSection>
+        <ProfileCardSection label="In your club">
+          <KeyValueList
+            items={[
+              { label: 'Added to club', value: addedLabel },
+              { label: 'Sessions here', value: sessionsHere },
+              { label: 'Phone', value: phone },
+            ]}
+          />
+        </ProfileCardSection>
+        {identity === 'guest' && inviteUrl ? (
+          <section className="flex flex-col gap-2" aria-labelledby="invite-to-rotra">
+            <h3 id="invite-to-rotra" className="m-0 text-[14px] font-semibold">
+              Invite to ROTRA
+            </h3>
+            <p className="m-0 text-[13px] text-fg2">
+              Send this link so they can register for ROTRA Player. Their guest record stays
+              unlinked until they accept a separate linking invitation.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <Button onClick={() => void copyInvite(inviteUrl)}>Copy invite link</Button>
+              {canShare ? <Button onClick={() => void shareInvite(inviteUrl)}>Share</Button> : null}
+            </div>
+          </section>
+        ) : null}
+        <p className="m-0 text-[13px] text-fg2">
+          Levels are set per session while preparing a roster, not here.
+        </p>
+      </ProfileBannerCard>
     </Sheet>
   )
 }

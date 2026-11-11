@@ -6,6 +6,7 @@ import {
   activeMatchFor,
   allPlayers,
   countedGames,
+  gamesPlayed,
   type MatchContext,
   matchStatus,
   queuedCount,
@@ -147,7 +148,7 @@ export function generateMatches(
   const load = new Map(
       present.map((p) => [
         p.id,
-        countedGames(p.id, games) +
+        gamesPlayed(p, games) +
           (session.sessionMode === 'hard' ? 0 : 0.9 * queuedCount(p.id, games)) +
           rng() * 0.4,
       ]),
@@ -183,10 +184,10 @@ export function suggestionReason(
   matches: Match[],
 ) {
   const selected = roster.filter((p) => allPlayers(lineup).includes(p.id)),
-    below = selected.filter((p) => countedGames(p.id, matches) < session.minimumGames)
+    below = selected.filter((p) => gamesPlayed(p, matches) < session.minimumGames)
   return below.length
     ? `${below
-        .map((p) => `${shortName(p)} (${countedGames(p.id, matches)}/${session.minimumGames})`)
+        .map((p) => `${shortName(p)} (${gamesPlayed(p, matches)}/${session.minimumGames})`)
         .join(', ')} are below the minimum.`
     : 'Everyone has met the minimum. These players have the fewest games.'
 }
@@ -213,7 +214,7 @@ export function pickerOrder(
     (a, b) =>
       Number(!!activeMatchFor(a.id, matches)) - Number(!!activeMatchFor(b.id, matches)) ||
       Number(b.present) - Number(a.present) ||
-      countedGames(a.id, matches) - countedGames(b.id, matches) ||
+      gamesPlayed(a, matches) - gamesPlayed(b, matches) ||
       waitMinutes(b, matches, startedAt, now) - waitMinutes(a, matches, startedAt, now),
   )
 }

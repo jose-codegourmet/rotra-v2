@@ -171,6 +171,18 @@ async function completedParticipations(tx: Tx, sessionId: string) {
 async function belowMinimum(tx: Tx, sessionId: string, minimumGames: number) {
   if (minimumGames <= 0) return []
   const roster = await tx.sessionPlayer.findMany({ where: { sessionId, releasedAt: null } })
+  const games = await countedGamesByEntry(tx, sessionId)
+  return roster
+    .map((r) => ({ sessionPlayerId: r.id, name: r.nameSnapshot, games: games.get(r.id) ?? 0 }))
+    .filter((r) => r.games < minimumGames)
+}
+
+/**
+ * Counted games per roster entry from the session's completed matches: full games plus games the
+ * operator gave after a substitution (the same count as `countedGames` in the data rules). Set games
+ * played (#717) stores its adjustment against this number.
+ */
+export async function countedGamesByEntry(tx: Tx, sessionId: string) {
   const parts = await completedParticipations(tx, sessionId)
   const segments = new Map<string, number>()
   for (const p of parts)
@@ -191,9 +203,7 @@ async function belowMinimum(tx: Tx, sessionId: string, minimumGames: number) {
     const entryId = key.slice(key.indexOf(':') + 1)
     games.set(entryId, (games.get(entryId) ?? 0) + 1)
   }
-  return roster
-    .map((r) => ({ sessionPlayerId: r.id, name: r.nameSnapshot, games: games.get(r.id) ?? 0 }))
-    .filter((r) => r.games < minimumGames)
+  return games
 }
 
 /**

@@ -4,6 +4,7 @@ import { prisma } from '../client/prisma'
 import type { ClubPlayer, QueueSession, SessionWaitlistEntry } from '../generated/prisma/client'
 import { ServiceError } from '../service/errors'
 import { joinRequestDto, rosterEntryDto, waitlistDto } from './dto'
+import { countedGamesByEntry } from './finalization'
 import {
   assessEntry,
   capacityOf,
@@ -338,6 +339,52 @@ export async function setPresence(
       data: { present: input.present, presentChangedAt: new Date(), revision: { increment: 1 } },
     })
     return null
+  })
+}
+
+export const GAMES_PLAYED_MAX = 99
+
+/**
+ * Set games played (#717, D-SET-GAMES): one live entry, or every live entry (`all`), shows `games`
+ * from now on. Stored as `games_adjustment = games − counted games` so later matches keep counting
+ * up; the shown count is `max(0, counted + adjustment)`. Active sessions only. Repeat-safe in effect:
+ * a retry with the same target and count rewrites the same adjustment as long as no match completed
+ * in between (no operation row exists for this command yet; `operationId` is accepted for the sync
+ * log and future idempotency).
+ */
+export async function setGamesPlayed(
+  context: ClubContext,
+  sessionId: string,
+  input: { operationId: string; games: number; rosterId?: string; all?: boolean },
+) {
+  return rosterCommand(context, sessionId, async (tx, session) => {
+    requireState(session, ['active'], 'Start the session first.')
+    if (!Number.isSafeInteger(input.games) || input.games < 0 || input.games > GAMES_PLAYED_MAX)
+      throw new ServiceError('invalid', {
+        games: `Enter a whole number of games, 0 to ${GAMES_PLAYED_MAX}.`,
+      })
+    const entries = input.all
+      ? await liveRoster(tx, sessionId)
+      : [await liveEntry(tx, sessionId, input.rosterId ?? '')]
+    if (!entries.length)
+      throw new ServiceError('invalid', { roster: 'No players on the roster yet.' })
+    const counted = await countedGamesByEntry(tx, sessionId)
+    const changed: { rosterId: string; name: string; games: number }[] = []
+    for (const entry of entries) {
+      const played = counted.get(entry.id) ?? 0
+      const adjustment = input.games - played
+      if (entry.gamesAdjustment !== adjustment)
+        await tx.sessionPlayer.update({
+          where: { id: entry.id },
+          data: { gamesAdjustment: adjustment, revision: { increment: 1 } },
+        })
+      changed.push({
+        rosterId: entry.id,
+        name: entry.nameSnapshot,
+        games: Math.max(0, played + adjustment),
+      })
+    }
+    return { changed }
   })
 }
 

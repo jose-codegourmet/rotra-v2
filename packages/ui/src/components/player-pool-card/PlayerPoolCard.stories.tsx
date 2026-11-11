@@ -68,6 +68,8 @@ export const Queued: Story = { args: queued }
 /** Picked for the next match: accent ring and the pick-order badge */
 export const SelectedWithOrder: Story = { args: { selected: true, pickOrder: 2 } }
 export const NoLevel: Story = { args: { level: null } }
+/** The live console passes onSetGames: a ghost pencil button opens Set games played (#717) */
+export const WithSetGames: Story = { args: { onSetGames: fn() } }
 export const LongName: Story = {
   args: { name: `${free.name} Bautista Villareal de la Cruz` },
 }

@@ -5,9 +5,9 @@ import { queueMutation } from '../mock/transaction'
 import { autoFillCourts, autoFillNote } from '../queue-session/courtFill'
 import { isRealDataMode } from '../real/mode'
 import {
-  countedGames,
   FORMAT_LABELS,
   FORMAT_TEAM_SIZES,
+  gamesPlayedFor,
   queuedCount,
   shortName,
 } from './match.rules'
@@ -69,9 +69,10 @@ export function addMatchRequestToQueue(input: { sessionId: string; requestId: st
     const named = new Set(namedIn(r))
     const need = na + nb - named.size
     const matches = s.matches.filter((m) => m.sessionId === input.sessionId)
-    const load = (id: string) => countedGames(id, matches) + queuedCount(id, matches)
-    const fill = s.roster
-      .filter((p) => p.sessionId === input.sessionId && p.present && !named.has(p.id))
+    const roster = s.roster.filter((p) => p.sessionId === input.sessionId)
+    const load = (id: string) => gamesPlayedFor(id, { roster, matches }) + queuedCount(id, matches)
+    const fill = roster
+      .filter((p) => p.present && !named.has(p.id))
       .map((p) => p.id)
       .sort((a, b) => load(a) - load(b))
       .slice(0, need)

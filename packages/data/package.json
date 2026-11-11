@@ -389,6 +389,7 @@
     "./batch/useDebouncedBatch": "./src/batch/useDebouncedBatch.ts",
     "./session-roster/flushSessionPresence": "./src/batch/flushBatches.ts",
     "./session-roster/useSetPresenceMany": "./src/session-roster/useSetPresenceMany.ts",
+    "./session-roster/useSetGamesPlayed": "./src/session-roster/useSetGamesPlayed.ts",
     "./admin-player/management-rules": "./src/admin-player/management.rules.ts",
     "./admin-player/mutations": "./src/admin-player/mutations.ts",
     "./admin-player/useAdminPlayerMutations": "./src/admin-player/useAdminPlayerMutations.ts",

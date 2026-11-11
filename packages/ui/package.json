@@ -179,6 +179,7 @@
     "./session-setup-card": "./src/components/session-setup-card/SessionSetupCard.tsx",
     "./share-card": "./src/components/share-card/ShareCard.tsx",
     "./short-on-players-banner": "./src/components/short-on-players-banner/ShortOnPlayersBanner.tsx",
+    "./set-games-sheet": "./src/components/set-games-sheet/SetGamesSheet.tsx",
     "./setup-court-picture": "./src/components/setup-court-picture/SetupCourtPicture.tsx",
     "./setup-step-bar": "./src/components/setup-step-bar/SetupStepBar.tsx",
     "./shared-rank-card": "./src/components/shared-rank-card/SharedRankCard.tsx",

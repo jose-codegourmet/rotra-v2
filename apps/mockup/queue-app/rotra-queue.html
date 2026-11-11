@@ -1445,7 +1445,9 @@ const creditedOf = (m) => { const out = new Map(); (m.subs || []).forEach((x) =>
 const sideOf = (m, pid) => (m.teamA.includes(pid) && !partialSet(m).has(pid) ? 'A' : m.teamB.includes(pid) && !partialSet(m).has(pid) ? 'B' : creditedOf(m).get(pid) || null);
 const counted = (m, pid) => m.status === 'done' && ((all(m).includes(pid) && !partialSet(m).has(pid)) || creditedOf(m).has(pid));
 const subLine = (x, m) => { const who = m && m.status === 'invalid' ? null : x.credit === 'in' ? x.in : x.credit === 'out' ? x.out : null; return `${nm(x.in)} replaced ${nm(x.out)} · ${who ? `${nm(who)} got the game (QM choice)` : 'Neither gets credit for this game'}`; };
-const gamesOf = (s, pid) => s.matches.filter((m) => counted(m, pid)).length;
+// #717: games played = counted games + the Queue Master's adjustment (Set games played), floored at 0.
+const countedGamesOf = (s, pid) => s.matches.filter((m) => counted(m, pid)).length;
+const gamesOf = (s, pid) => Math.max(0, countedGamesOf(s, pid) + ((R(s, pid) || {}).gamesAdj || 0));
 const queuedCount = (s, pid) => waiting(s).filter((m) => all(m).includes(pid)).length;
 const courtLabel = (s, id) => (s.courts.find((c) => c.id === id) || {}).label || 'Court';
 // A court is open from its planned start, or from when the Queue Master opened it early (Start anyway).
@@ -1646,7 +1648,7 @@ function syncLabel() {
 const AREA = {
   confirmReq: 'Roster', declineReq: 'Roster', keepDropOut: 'Roster', removeDropOut: 'Roster', addMatchReq: 'Queue', declineMatchReq: 'Queue',
   togglePaid: 'Payments', markAllPaid: 'Payments', savePayAmount: 'Payments', togglePresent: 'Roster', allPresent: 'Roster', allAbsent: 'Roster', giveSlot: 'Roster', fillSlots: 'Roster', removeWait: 'Roster', confirmAdd: 'Roster', confirmNew: 'Roster', setLevel: 'Roster', saveEditPlayer: 'Roster', picChar: 'Roster', picRemove: 'Roster', picUsePrev: 'Roster', confirmDeletePlayer: 'Roster',
-  confirmStart: 'Session', confirmCancelSession: 'Session', confirmDeleteSession: 'Session', saveSetup: 'Session setup', confirmDone: 'Session done', confirmPublish: 'Published results',
+  confirmSetGames: 'Roster', confirmStart: 'Session', confirmCancelSession: 'Session', confirmDeleteSession: 'Session', saveSetup: 'Session setup', confirmDone: 'Session done', confirmPublish: 'Published results',
   makeMatch: 'Queue', saveEditor: 'Queue', addSuggest: 'Queue', autoCommit: 'Queue', confirmRegen: 'Queue', move: 'Queue', moveTo: 'Queue', swapSides: 'Queue', removeWaiting: 'Queue',
   confirmDispatch: 'Matches and results', placeOnCourt: 'Matches and results', startOnCourt: 'Matches and results', sendBack: 'Queue', confirmSwap: 'Queue', confirmReplace: 'Matches and results', confirmMove: 'Matches and results', setCourtFill: 'Courts and time', confirmResult: 'Matches and results', pickNextMatch: 'Matches and results', skipNextMatch: 'Matches and results', confirmSub: 'Matches and results', confirmInvalid: 'Matches and results',
   confirmAddCourt: 'Courts and time', removeCourt: 'Courts and time', confirmOpenEarly: 'Courts and time', dispatchOpenEarly: 'Courts and time', undoEarly: 'Courts and time', addCourt: 'Courts and time', extend: 'Courts and time',
@@ -3841,7 +3843,7 @@ function playersPane(s) {
   const plan = matchPlan(s, sel);
   const draftState = S.ui.autoDraft && S.ui.autoDraft.sid === s.id ? S.ui.autoDraft : null;
   const currentDrafts = draftState?.batches[draftState.tab]?.cards || [];
-  return `<div class="between"><div><h2>Players</h2><p class="small muted">Tap players to pick them, then make a match. ${counts.present} present of ${counts.all}.</p></div><button class="btn sm" data-act="openAdd">Add late player</button></div>
+  return `<div class="between"><div><h2>Players</h2><p class="small muted">Tap players to pick them, then make a match. ${counts.present} present of ${counts.all}.</p></div><div class="row" style="flex-wrap:nowrap"><button class="btn sm" data-act="openSetGames">Set games for all…</button><button class="btn sm" data-act="openAdd">Add late player</button></div></div>
     <div class="row" style="gap:10px">
       <div class="seg" role="group" aria-label="Show">${[['avail', `Available · ${counts.avail}`], ['present', `Present · ${counts.present}`], ['all', `Everyone · ${counts.all}`]].map(([k, l]) => `<button aria-pressed="${f.show === k}" data-act="plSet" data-k="show" data-v="${k}">${l}</button>`).join('')}</div>
       <select class="input inline" id="pl-sort" data-act-change="plSet" data-k="sort" aria-label="Sort players">${[['wait', 'Sort: longest wait'], ['least', 'Sort: least games'], ['most', 'Sort: most games'], ['level', 'Sort: level, high to low']].map(([v, l]) => `<option value="${v}" ${f.sort === v ? 'selected' : ''}>${l}</option>`).join('')}</select>
@@ -3851,7 +3853,7 @@ function playersPane(s) {
       const st = x.a ? (x.a.status === 'oncourt' ? `On court · getting ready · ${courtsOf(s, x.a)}` : `Playing · ${courtsOf(s, x.a)}`) : !x.r.present ? 'Away' : x.qpos ? `Queued · #${x.qpos}` : 'Free';
       return `<article class="pc3 ${x.a && x.a.status === 'active' ? 'playing' : ''} ${x.r.present ? '' : 'away'}" role="button" tabindex="0" data-act="selPlayer" data-pid="${x.r.pid}" aria-pressed="${i >= 0}" aria-label="${esc(x.p.name)}, ${esc(lvLabel(x.r.level))}, ${x.g} games">
         ${i >= 0 ? `<span class="sel-badge" aria-hidden="true">${i + 1}</span>` : ''}
-        <div class="pc3-top">${avatar(x.p)}<div style="min-width:0"><div class="pc3-name">${esc(x.p.name)}</div><div class="pc3-lv">${esc(lvLabel(x.r.level))}</div></div></div>
+        <div class="pc3-top">${avatar(x.p)}<div style="min-width:0;flex:1"><div class="pc3-name">${esc(x.p.name)}</div><div class="pc3-lv">${esc(lvLabel(x.r.level))}</div></div><button class="btn xs ghost icon-btn" data-act="openSetGames" data-pid="${x.r.pid}" aria-label="Set games played… ${esc(x.p.name)}" title="Set games played…">${I.edit}</button></div>
         <div class="pc3-games" aria-label="${x.g} games played, ${x.g + queuedCount(s, x.r.pid)} for the night"><div class="pg-played"><b class="tnum">${x.g}</b><span>played</span></div><div class="pg-total"><b class="tnum">${x.g + queuedCount(s, x.r.pid)}</b><span>for the night</span></div></div>
         <div class="between" style="flex-wrap:nowrap"><span class="pc3-st small">${st}${x.a || !x.r.present ? '' : ` · ${x.mins} min wait`}</span>${sw(x.r.present, 'togglePresent', `data-pid="${x.r.pid}"`, `${x.p.name} present`)}</div>${presencePending.has(x.r.pid) ? '<span class="small muted">Saving presence…</span>' : ''}${selfMark(x.r)}
       </article>`;
@@ -3910,7 +3912,7 @@ function standings(s) {
   const rows = s.roster.map((r) => {
     let w = 0, l = 0;
     done.forEach((m) => { if (counted(m, r.pid)) { const onA = sideOf(m, r.pid) === 'A'; if ((m.winner === 'A') === onA) w++; else l++; } });
-    return { pid: r.pid, name: nm(r.pid), w, l, g: w + l };
+    return { pid: r.pid, name: nm(r.pid), w, l, g: gamesOf(s, r.pid) };
   }).filter((x) => x.g > 0);
   const h2h = (a, b) => {
     let aw = 0, bw = 0;
@@ -4378,6 +4380,21 @@ const SHEETS = {
       <p class="small muted">${club ? 'Scanning opens the club registration page.' : 'Scanning opens the public session page.'} ${fmt === 'story' ? 'Story size (9:16) for Facebook and Instagram stories.' : 'Post size (4:5) for Facebook and Instagram feeds.'} ${club ? 'Download the image to share it or print it.' : inv ? 'The Queue Master sees who invited each person who joins through it.' : 'Download the image to share it or print it.'}</p>${club ? '<button class="btn" style="width:100%" data-act="copyClubInvite">Copy invite link</button>' : ''}</div>`,
       inv ? `<button class="btn" data-act="closeSheet">Close</button>${navigator.share ? '<button class="btn primary" data-act="shareInvite">Share</button>' : '<button class="btn primary" data-act="downloadSessionQr">Download image</button>'}`
         : `<button class="btn" data-act="closeSheet">Close</button><button class="btn" data-act="downloadSessionQr">Share</button><button class="btn primary" data-act="downloadSessionQr">Download image</button>`);
+  },
+  // #717 Set games played (D-SET-GAMES): one player or every roster player; the stored value is an adjustment, so games keep counting up afterwards.
+  setGames(sh) {
+    const s = cur(), one = sh.pid ? R(s, sh.pid) : null, name = one ? nm(one.pid) : '', n = s.roster.length;
+    const current = one ? gamesOf(s, one.pid) : null;
+    const who = one ? `<dl class="kv"><dt>Player</dt><dd>${esc(name)}</dd><dt>Games played now</dt><dd class="tnum">${current}</dd></dl>` : `<dl class="kv"><dt>Players</dt><dd>${n} on the roster</dd></dl>`;
+    if (sh.step === 2) {
+      const line = one ? `<b>${esc(name)}</b>'s games played changes from ${current} to ${sh.games}.` : `Every player on the roster will show <b>${sh.games}</b> game${sh.games === 1 ? '' : 's'} played.`;
+      return sheetShell('Set games played', `${who}<p>${line}</p><p class="small muted">Auto Queue, Catch Up and fewest-games sorting use the new count right away.</p>`,
+        `<button class="btn" data-act="setGamesBack" data-autofocus>Back</button><button class="btn primary" data-act="confirmSetGames">Set games</button>`);
+    }
+    return sheetShell('Set games played', `${who}
+      <div class="stepcard"><span id="set-games-label">Games played</span><div class="row"><button class="btn sm icon-btn" data-act="setGamesDelta" data-d="-1" aria-label="One game fewer" ${sh.games <= 0 ? 'disabled' : ''}>−</button><b class="tnum" aria-live="polite" aria-labelledby="set-games-label">${sh.games}</b><button class="btn sm icon-btn" data-act="setGamesDelta" data-d="1" aria-label="One game more" ${sh.games >= 99 ? 'disabled' : ''}>+</button></div></div>
+      <p class="small muted">Auto Queue, Catch Up and fewest-games sorting use the new count right away.</p>`,
+      `<button class="btn" data-act="closeSheet">Back</button><button class="btn primary" data-act="setGamesNext">Next</button>`);
   },
   regenClubInvite() {
     return sheetShell('Regenerate the club invite link?', '<p>The old link and every image with its QR stop working. People who already joined keep their place.</p>',
@@ -5591,6 +5608,26 @@ const ACT = {
   },
   allPresent: () => { cur().roster.forEach((r) => { r.present = true; r.selfLeft = false; }); commit('Everyone marked present'); render(); },
   allAbsent: () => { cur().roster.forEach((r) => { r.present = false; r.selfCheckedIn = false; }); commit('Everyone marked absent'); render(); },
+  // #717: Set games played, for one player (data-pid) or everyone on the roster.
+  openSetGames: (d) => {
+    const s = cur(); if (!s || s.status !== 'active') return;
+    const pid = d && d.pid && R(s, d.pid) ? d.pid : null;
+    let games = 0;
+    if (pid) games = gamesOf(s, pid);
+    else if (s.roster.length) { const c = s.roster.map((r) => gamesOf(s, r.pid)).sort((a, b) => a - b), mid = c.length / 2; games = c.length % 2 ? c[Math.floor(mid)] : Math.round((c[mid - 1] + c[mid]) / 2); }
+    openSheet({ type: 'setGames', pid, games: Math.min(99, Math.max(0, games)), step: 1 });
+  },
+  setGamesDelta: (d) => { const sh = S.ui.sheet; if (!sh || sh.type !== 'setGames') return; sh.games = Math.min(99, Math.max(0, sh.games + (+d.d || 0))); render(); },
+  setGamesNext: () => { const sh = S.ui.sheet; if (!sh || sh.type !== 'setGames') return; sh.step = 2; render(); },
+  setGamesBack: () => { const sh = S.ui.sheet; if (!sh || sh.type !== 'setGames') return; sh.step = 1; render(); },
+  confirmSetGames: () => {
+    const sh = S.ui.sheet, s = cur(); if (!sh || sh.type !== 'setGames' || !s) return;
+    const rows = sh.pid ? [R(s, sh.pid)].filter(Boolean) : s.roster;
+    rows.forEach((r) => { r.gamesAdj = sh.games - countedGamesOf(s, r.pid); });
+    S.ui.sheet = null;
+    commit(sh.pid ? `Games played set · ${nm(sh.pid)}` : `Games played set for ${rows.length} player${rows.length === 1 ? '' : 's'}`);
+    render();
+  },
   togglePresent: (d) => {
     const s = cur(), r = R(s, d.pid);
     if (presencePending.size && [...presencePending.values()][0].sid !== s.id) flushPresence();

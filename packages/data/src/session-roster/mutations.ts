@@ -5,6 +5,7 @@ import { clubPlayerView } from '../club-player/fetchers'
 import { clubPlayerForProfile, createClubPlayer, directoryLevel } from '../club-player/mutations'
 import { DEMO_CLUB_ID } from '../fixtures/clubs'
 import { directoryPlayers, leaderboardPlayers } from '../fixtures/players'
+import { countedGames, gamesPlayed } from '../match/match.rules'
 import { closeStaleMatchRequests } from '../match-request/matchRequest.rules'
 import { requireOnline } from '../mock/bridge'
 import { MockError } from '../mock/errors'
@@ -32,6 +33,7 @@ import {
   realRemoveRosterPlayer,
   realSetAcceptJoinRequests,
   realSetAllPresence,
+  realSetGamesPlayed,
   realSetPresence,
   realSetPresenceMany,
 } from '../real/session-live'
@@ -298,6 +300,50 @@ export function setPresenceMany(input: {
       text: text + (n ? ` · ${n} waiting match${n === 1 ? ' needs' : 'es need'} attention` : ''),
     }
   })
+}
+export const GAMES_PLAYED_MAX = 99
+export type SetGamesPlayedInput = {
+  sessionId: string
+  /** One roster entry, or `'all'` for every roster player (Set games for all…) */
+  rosterId: string | 'all'
+  /** The games played count to show, 0–99 */
+  games: number
+  operationId?: string
+}
+/**
+ * Set games played (#717, D-SET-GAMES): stores `gamesAdjustment = games − counted` on each target
+ * roster row, so the shown count equals `games` now and keeps counting up with later matches.
+ * Live sessions only. One Roster sync entry; offline on a downloaded session it saves locally.
+ */
+export function setGamesPlayed(input: SetGamesPlayedInput) {
+  if (isRealDataMode()) return realSetGamesPlayed(input)
+  return queueMutation(
+    {
+      area: 'Roster',
+      sessionId: input.sessionId,
+      operationId: input.operationId,
+      fingerprint: input.operationId ? JSON.stringify([input.rosterId, input.games]) : undefined,
+    },
+    (s) => {
+      if (sessionIn(s, input.sessionId).state !== 'active') fail('Start the session first.')
+      if (!Number.isSafeInteger(input.games) || input.games < 0 || input.games > GAMES_PLAYED_MAX)
+        fail(`Enter a whole number of games, 0 to ${GAMES_PLAYED_MAX}.`)
+      const matches = s.matches.filter((m) => m.sessionId === input.sessionId)
+      const rows =
+        input.rosterId === 'all'
+          ? s.roster.filter((p) => p.sessionId === input.sessionId)
+          : [row(s, input.rosterId, input.sessionId)]
+      if (!rows.length) fail('No players on the roster yet.')
+      for (const p of rows) p.gamesAdjustment = input.games - countedGames(p.id, matches)
+      const one = input.rosterId === 'all' ? null : rows[0]
+      return {
+        data: rows.map((p) => ({ rosterId: p.id, games: gamesPlayed(p, matches) })),
+        text: one
+          ? `Games played set · ${shortName(one)}`
+          : `Games played set for ${rows.length} player${rows.length === 1 ? '' : 's'}`,
+      }
+    },
+  )
 }
 export function setAllPresence(input: { sessionId: string; present: boolean }) {
   if (isRealDataMode()) return realSetAllPresence(input)

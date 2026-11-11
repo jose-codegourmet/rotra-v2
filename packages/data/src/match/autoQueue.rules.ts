@@ -4,7 +4,8 @@ import {
   activeMatchFor,
   allPlayers,
   completeLineup,
-  countedGames,
+  gamesPlayed,
+  gamesPlayedFor,
   type MatchContext,
   queuedCount,
   shortName,
@@ -41,7 +42,7 @@ export function autoQueuePlayerCounts(
   drafts: AutoQueueDraftLineup[],
 ) {
   return {
-    played: countedGames(id, ctx.matches),
+    played: gamesPlayedFor(id, ctx),
     queued: queuedCount(id, ctx.matches),
     suggested: drafts.filter((d) => allPlayers(d).includes(id)).length,
     playingNow: !!activeMatchFor(id, ctx.matches),
@@ -111,7 +112,7 @@ export function generateAutoQueueMatches({
       error: 'Enter a whole number of games, 1 or more.',
     }
   const target = catchUpTarget ?? 0
-  const played = new Map(players.map((p) => [p.id, countedGames(p.id, ctx.matches)]))
+  const played = new Map(players.map((p) => [p.id, gamesPlayed(p, ctx.matches)]))
   const load = new Map(
     players.map((p) => [
       p.id,

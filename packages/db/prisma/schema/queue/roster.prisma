@@ -37,6 +37,9 @@ model SessionPlayer {
   overBudgetAt     DateTime?            @map("over_budget_at") @db.Timestamptz(6)
   releasedAt       DateTime?            @map("released_at") @db.Timestamptz(6)
   releaseReason    RosterReleaseReason? @map("release_reason")
+  /// Set games played (#717): requested − games counted from completed matches at override time.
+  /// Displayed games played = counted + this, floored at 0; may be negative. Session-running aid only.
+  gamesAdjustment  Int                  @default(0) @map("games_adjustment")
   createdAt        DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt        DateTime             @updatedAt @map("updated_at") @db.Timestamptz(6)
   revision         BigInt               @default(1)

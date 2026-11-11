@@ -451,6 +451,8 @@ type WireRosterEntry = {
   confirmedAt: string
   /** Present on the roster GET; mutations still use the stored entry DTO. */
   hasPlayedAtClubBefore?: boolean
+  /** Set games played adjustment (#717); missing on older servers means 0 */
+  gamesAdjustment?: number
 }
 type WireWaitlistEntry = {
   id: string

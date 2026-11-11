@@ -7,6 +7,7 @@ import {
   countedGames,
   courtNames,
   FORMAT_LABELS,
+  gamesPlayed,
   isFunFormat,
   queuedCount,
   shortName,
@@ -29,6 +30,7 @@ import { useFillOpenSlots } from '@rotra/data/session-roster/useFillOpenSlots'
 import { useGiveSlot } from '@rotra/data/session-roster/useGiveSlot'
 import { useRemoveFromWaitlist } from '@rotra/data/session-roster/useRemoveFromWaitlist'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
+import { useSetGamesPlayed } from '@rotra/data/session-roster/useSetGamesPlayed'
 import { useSetPresenceMany } from '@rotra/data/session-roster/useSetPresenceMany'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
@@ -42,6 +44,7 @@ import {
 } from '@rotra/ui/player-pool-toolbar'
 import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { SelectionBar } from '@rotra/ui/selection-bar'
+import { SetGamesSheet, type SetGamesTarget } from '@rotra/ui/set-games-sheet'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { SlotMeter } from '@rotra/ui/slot-meter'
 import { toast } from '@rotra/ui/toaster'
@@ -77,6 +80,16 @@ const SORTERS: Record<PlayerPoolSort, (a: PoolRow, b: PoolRow) => number> = {
     a.player.nameSnapshot.localeCompare(b.player.nameSnapshot),
 }
 
+/** The roster's median shown count, prefilled by Set games for all… (#717); 0 for an empty roster */
+export const medianGames = (counts: number[]) => {
+  const sorted = [...counts].sort((a, b) => a - b)
+  if (!sorted.length) return 0
+  const mid = sorted.length / 2
+  return sorted.length % 2
+    ? (sorted[Math.floor(mid)] ?? 0)
+    : Math.round(((sorted[mid - 1] ?? 0) + (sorted[mid] ?? 0)) / 2)
+}
+
 const time = (at: number) =>
   new Date(at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
 const errorMessage = (error: unknown) =>
@@ -88,10 +101,20 @@ const errorMessage = (error: unknown) =>
  * PlayerPoolToolbar filter and sort in local state (Available, longest wait by default), the
  * PlayerPoolCard grid built from the match rules (games, wait minutes, On Court X / Away /
  * Queued · #P / Free), the pick order in local state with the SelectionBar while anyone is picked,
- * the Waitlist panel when anyone waits or the session is full, and the footer line. Pictures on
+ * the Waitlist panel when anyone waits or the session is full, and the footer line. Set games for
+ * all… and each card's Set games played… open SetGamesSheet on useSetGamesPlayed (#717); games is the
+ * adjusted count (gamesPlayed). Pictures on
  * waitlist rows open profiles through onOpenProfile; the Present switch uses a shared optimistic 800 ms presence batch, retaining pending cards in their
  * filter and reporting one summary with the unique waiting-match attention count.
  */
+/** What the Set games played sheet shows for one card or for Set games for all… */
+function setGamesTarget(target: string | 'all', rows: PoolRow[]): SetGamesTarget {
+  if (target === 'all')
+    return { kind: 'all', count: rows.length, median: medianGames(rows.map((r) => r.games)) }
+  const row = rows.find((r) => r.player.id === target)
+  return { kind: 'one', name: row?.player.nameSnapshot ?? 'Player', current: row?.games ?? 0 }
+}
+
 export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps) {
   const session = useQueueSession(sessionId)
   const roster = useSessionRoster(sessionId)
@@ -105,6 +128,10 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
   const giveSlot = useGiveSlot()
   const fillOpenSlots = useFillOpenSlots()
   const removeFromWaitlist = useRemoveFromWaitlist()
+  const setGamesPlayed = useSetGamesPlayed()
+  /** Set games played: one roster id, or 'all' */
+  const [setGamesFor, setSetGamesFor] = useState<string | 'all' | null>(null)
+  const [setGamesError, setSetGamesError] = useState<string | undefined>()
   const [show, setShow] = useState<PlayerPoolShow>('available')
   const [sort, setSort] = useState<PlayerPoolSort>('wait')
   const [held, setHeld] = useState<{ filter: PlayerPoolShow; ids: string[] } | null>(null)
@@ -173,7 +200,7 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
     return {
       player,
       playing: !!active,
-      games: countedGames(player.id, all),
+      games: gamesPlayed(player, all),
       minutes: waitMinutes(player, all, s.startedAt, now),
       status,
     }
@@ -242,14 +269,26 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
             {counts.everyone}.
           </p>
         </div>
-        <Button
-          size="sm"
-          onClick={() => {
-            void setPresence.flush().then(() => setAddOpen(true))
-          }}
-        >
-          Add late player
-        </Button>
+        <div className="flex flex-nowrap gap-2">
+          <Button
+            size="sm"
+            disabled={!rosterList.length}
+            onClick={() => {
+              setSetGamesError(undefined)
+              void setPresence.flush().then(() => setSetGamesFor('all'))
+            }}
+          >
+            Set games for all…
+          </Button>
+          <Button
+            size="sm"
+            onClick={() => {
+              void setPresence.flush().then(() => setAddOpen(true))
+            }}
+          >
+            Add late player
+          </Button>
+        </div>
       </div>
       <SlotMeter
         live
@@ -293,6 +332,10 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
                 selected={order >= 0}
                 pickOrder={order >= 0 ? order + 1 : undefined}
                 onToggleSelect={() => toggle(row.player.id)}
+                onSetGames={() => {
+                  setSetGamesError(undefined)
+                  void setPresence.flush().then(() => setSetGamesFor(row.player.id))
+                }}
                 onPresentChange={(present) => {
                   if (!setPresence.pending.size || held?.filter !== show)
                     setHeld({ filter: show, ids: shown.map((r) => r.player.id) })
@@ -356,7 +399,7 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
               shortName: p ? shortName(p) : 'Player',
               level: p?.level ?? null,
               photoUrl: photoFor(p),
-              games: countedGames(id, all),
+              games: p ? gamesPlayed(p, all) : countedGames(id, all),
             }
           })}
           teamB={draft.lineup.teamB.map((id) => {
@@ -367,7 +410,7 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
               shortName: p ? shortName(p) : 'Player',
               level: p?.level ?? null,
               photoUrl: photoFor(p),
-              games: countedGames(id, all),
+              games: p ? gamesPlayed(p, all) : countedGames(id, all),
             }
           })}
           formatLabel={FORMAT_LABELS[draft.lineup.format]}
@@ -418,6 +461,29 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
         add the match to the end of the queue. Present controls who can be paired automatically;
         turning someone off never ends their current game.
       </p>
+      {setGamesFor ? (
+        <SetGamesSheet
+          open
+          onOpenChange={(open) => {
+            if (!open) setSetGamesFor(null)
+          }}
+          target={setGamesTarget(setGamesFor, rows)}
+          isPending={setGamesPlayed.isPending}
+          error={setGamesError}
+          onConfirm={(games) => {
+            setGamesPlayed.mutate(
+              { sessionId, rosterId: setGamesFor, games, operationId: crypto.randomUUID() },
+              {
+                onSuccess: (result) => {
+                  setSetGamesFor(null)
+                  toast(result.message)
+                },
+                onError: (error) => setSetGamesError(errorMessage(error)),
+              },
+            )
+          }}
+        />
+      ) : null}
       <AddPlayer sessionId={sessionId} open={addOpen} onOpenChange={setAddOpen} />
     </div>
   )

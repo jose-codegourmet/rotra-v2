@@ -11,6 +11,7 @@ export const playerPoolCardMeta = {
     'The Present switch is a separate control: toggling it never changes the selection, and turning someone off never ends their current game.',
     'Pass waitMinutes only for available players (present and off court); playing and away cards show no wait.',
     'For the preparation roster use RosterRow; for saved players use SavedPlayerCard.',
+    'Pass onSetGames to show the ghost pencil button (Set games played…, D-SET-GAMES); games is the adjusted count from gamesPlayed() in the match rules.',
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',
@@ -20,6 +21,6 @@ export const playerPoolCardMeta = {
     'docs/screens/product/modules/queue/session-console.md#q-pool--players-view',
     'docs/business_logic/product/queue/modules/players/README.md#presence',
   ],
-  variants: ['available', 'playing', 'away'],
-  related: ['PlayerPoolToolbar', 'SelectionBar', 'RosterRow', 'Switch', 'Avatar'],
+  variants: ['available', 'playing', 'away', 'with Set games played'],
+  related: ['PlayerPoolToolbar', 'SelectionBar', 'SetGamesSheet', 'RosterRow', 'Switch', 'Avatar'],
 } satisfies ComponentMeta

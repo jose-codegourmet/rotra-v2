@@ -1594,7 +1594,7 @@ const fieldsGame = (base, d, e, pre) => `${field(`${pre}-style`, 'Playing style'
       ${field(`${pre}-sinceY`, 'Year', `${base}.sinceY`, d.sinceY, e.since, { inputmode: 'numeric', ph: String(new Date().getFullYear() - 2), exp: pre })}</div>
       <span class="hint">Optional. Fill in either one; the other follows. Clubs may use it for a first assessment; it doesn't add rank points.</span></div>`;
 const fieldsLinks = (base, d, e, pre) => `<p class="hint">Optional. Links describe you to others; you can't sign in with them. Whether links are public is still being decided.</p>
-    <div class="fgrid">${Object.entries(SOCIAL).map(([k, s]) => field(`${pre}-${k}`, s.label, `${base}.${k}`, d[k], e[k], { type: 'url', ph: s.eg, inputmode: 'url' })).join('')}</div>`;
+    <div class="stack">${Object.entries(SOCIAL).map(([k, s]) => field(`${pre}-${k}`, s.label, `${base}.${k}`, d[k], e[k], { type: 'url', ph: s.eg, inputmode: 'url' })).join('')}</div>`;
 function personalFields(base, d, e, pre) {
   return `${fieldsBasics(base, d, e, pre)}${fieldsGame(base, d, e, pre)}
     <fieldset class="stack" style="border:0;padding:0;margin:0"><legend class="label" style="margin-bottom:8px">Links</legend>${fieldsLinks(base, d, e, pre)}</fieldset>`;

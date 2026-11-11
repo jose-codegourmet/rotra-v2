@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 14 · IN PROGRESS: 5 · IN MOCK APP: 106 · CANCELLED: 1 · MOCKUP ONLY: 4
+NEW: 15 · IN PROGRESS: 5 · IN MOCK APP: 106 · CANCELLED: 1 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -291,6 +291,7 @@ NEW: 14 · IN PROGRESS: 5 · IN MOCK APP: 106 · CANCELLED: 1 · MOCKUP ONLY: 4
 | [2026-11-11-admin-avatar-photo-viewer](2026-11-11-admin-avatar-photo-viewer.md) | Admin: Click an avatar or club logo picture to see it in a black-overlay dialog (#716, proposed) | avatar, club-logo, photo-viewer dialog | NEW |
 | [2026-11-11-admin-license-no-start-date](2026-11-11-admin-license-no-start-date.md) | A-LICENSE: no Term starts field; the period is computed and shown read-only; history shows LIC number plus note | license-sheet, payment-history-table | NEW |
 | [2026-11-11-player-avatar-photo-viewer](2026-11-11-player-avatar-photo-viewer.md) | Player: Tap a picture avatar to see the full photo in a black-overlay dialog (#716, proposed) | avatar (new optional view behaviour), photo-viewer dialog | NEW |
+| [2026-11-11-player-edit-profile-links-rows](2026-11-11-player-edit-profile-links-rows.md) | Edit profile › Links: the four link fields stack one per row | edit-profile-form, text-field | NEW |
 | [2026-11-11-player-profile-visibility-hide-from-directory](2026-11-11-player-profile-visibility-hide-from-directory.md) | Player: Profile visibility has three levels, plus Hide me from Player Information (#715, proposed) | profile-visibility choice (radio group), settings switch, avatar | NEW |
 | [2026-11-11-player-public-club-page](2026-11-11-player-public-club-page.md) | Player: New public club page with members, upcoming sessions and a calendar (#737, proposed) | club-header (avatar plus facts and actions), member-row, session-row (reuses the My sessions row), month-calendar | NEW |
 | [2026-11-11-player-share-profile](2026-11-11-player-share-profile.md) | Player: Share profile card with QR, photo, level, stats and a copyable link (#738, proposed) | share-card (the share sheet and card used by Share rank, Share result and Share games), avatar | NEW |

@@ -641,6 +641,37 @@ button.mcell { cursor: pointer; }
 .mcell span { font-size: 11px; color: var(--fg2); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 button.mcell:hover .avatar, button.mcell:focus-visible .avatar { box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--accent); }
 .cal-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+/* Club calendar, same month view as the Queue dashboard (owner comment, November 11, 2026). */
+.cal-grid2 { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); border-top: 1px solid var(--border); border-left: 1px solid var(--border); border-radius: var(--r-sm); overflow: hidden; }
+.cal-wd2 { padding: 6px 8px; font-size: 11px; font-weight: 700; color: var(--fg2); text-transform: uppercase; letter-spacing: .5px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.cal-cell { min-height: 96px; padding: 6px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 4px; cursor: pointer; min-width: 0; }
+.cal-cell.blank { background: color-mix(in srgb, var(--bg) 55%, transparent); cursor: default; }
+.cal-cell:not(.blank):hover { background: var(--elev); }
+.cal-cell.sel { background: var(--accent-subtle); }
+.cal-num { align-self: flex-start; border: 0; background: transparent; color: inherit; font: inherit; font-weight: 700; font-size: 13px; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; font-variant-numeric: tabular-nums; padding: 0; }
+.cal-cell.today .cal-num { background: var(--accent); color: var(--on-accent); }
+.cal-evs { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.cal-ev { display: block; border-left: 3px solid var(--fg2); font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: var(--elev); max-width: 100%; }
+.cal-ev.live { border-left-color: var(--accent); background: var(--accent-subtle); }
+.cal-ev.prep { border-left-color: var(--warn); }
+.cal-ev.done { border-left-color: var(--fg3); color: var(--fg2); }
+.cal-more { font-size: 11px; color: var(--fg2); padding: 0 6px; }
+.cal-cell .cal-dots { display: none; gap: 3px; }
+.cal-dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--fg3); }
+.cal-dots i.live { background: var(--accent); } .cal-dots i.prep { background: var(--warn); }
+.cal-key2 { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; background: var(--fg3); }
+.cal-key2.live { background: var(--accent); } .cal-key2.prep { background: var(--warn); }
+.cal-card { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; width: 100%; min-width: 0; padding: 8px 10px; border: 1px solid var(--border); border-left: 3px solid var(--fg2); border-radius: var(--r-sm); background: var(--surface); color: var(--fg); text-align: left; text-decoration: none; }
+.cal-card + .cal-card { margin-top: 6px; }
+.cal-card.live { border-left-color: var(--accent); } .cal-card.prep { border-left-color: var(--warn); } .cal-card.done { border-left-color: var(--fg3); }
+a.cal-card:hover { border-color: var(--border-strong); background: var(--elev); }
+.cal-time { font-size: 12px; font-weight: 700; color: var(--fg2); }
+@media (max-width: 640px) {
+  .cal-cell { min-height: 54px; padding: 4px; }
+  .cal-cell .cal-evs { display: none; }
+  .cal-cell .cal-dots { display: flex; }
+  .cal-wd2 { padding: 4px 2px; text-align: center; font-size: 10px; }
+}
 .cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
 .cal .dow { font-size: 11px; font-weight: 600; text-align: center; color: var(--fg2); }
 .cal .day { min-height: 44px; border-radius: var(--r-sm); border: 1px solid var(--border); padding: 4px; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 13px; background: var(--bg); }
@@ -1332,10 +1363,42 @@ function clubMembers(id) {
 // Upcoming (scheduled and live, never cancelled) and done sessions from the last 90 days. `ago` is days back; negative is ahead.
 function clubSessions(id) {
   const up = MY_SESSIONS.filter((m) => SESSION_DIR[m.slug].club === id).map((m) => ({ slug: m.slug, title: SESSION_DIR[m.slug].title, ago: -m.day, time: m.time, live: m.status === 'live', done: false }));
-  const done = MIGS_SESSIONS.filter((x) => x.club === CLUB_DIR[id].name && x.ago <= WINDOW_DAYS).map((x) => ({ title: x.title, ago: x.ago, time: '', live: false, done: true, gone: !!x.pageGone }));
+  const done = MIGS_SESSIONS.filter((x) => x.club === CLUB_DIR[id].name).map((x) => ({ title: x.title, ago: x.ago, time: '', live: false, done: true, gone: !!x.pageGone }));
   return { up: up.sort((a, b) => b.ago - a.ago), all: [...up, ...done] };
 }
 const monthIdx = (d) => d.getFullYear() * 12 + d.getMonth();
+// Owner comment, November 11, 2026: the club calendar is the same month view as the Queue dashboard: every session of the club
+// (upcoming and done, any age) as chips in the day cells, Today, and a tap on a day lists that day's sessions below.
+const dayKeyOf = (d) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+function clubCalendarFull(sessions, off, selT) {
+  const now = new Date(), first = new Date(now.getFullYear(), now.getMonth() + off, 1), idx = monthIdx(first);
+  const daysIn = new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate(), todayK = dayKeyOf(now);
+  const byDay = {};
+  sessions.forEach((x) => { const k = dayKeyOf(dayOf(x.ago)); (byDay[k] = byDay[k] || []).push(x); });
+  const kindOf = (x) => (x.live ? 'live' : x.done ? 'done' : 'prep');
+  const sel = selT ? new Date(selT) : null, selK = sel ? dayKeyOf(sel) : '';
+  const cells = [];
+  for (let i = 0; i < first.getDay(); i++) cells.push('<span class="cal-cell blank" aria-hidden="true"></span>');
+  for (let d = 1; d <= daysIn; d++) {
+    const t = new Date(first.getFullYear(), first.getMonth(), d), k = dayKeyOf(t), evs = byDay[k] || [];
+    const label = `${t.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' })}${k === todayK ? ', today' : ''}${evs.length ? `, ${evs.length} session${evs.length > 1 ? 's' : ''}` : ''}`;
+    cells.push(`<div class="cal-cell ${k === todayK ? 'today' : ''} ${k === selK ? 'sel' : ''}" data-act="clubDay" data-k="${t.getTime()}">
+      <button type="button" class="cal-num" data-act="clubDay" data-k="${t.getTime()}" aria-label="${esc(label)}" aria-pressed="${k === selK}">${d}</button>
+      <div class="cal-evs">${evs.slice(0, 2).map((x) => `<span class="cal-ev ${kindOf(x)}" title="${esc(x.title)}${x.time ? ` · ${esc(x.time)}` : ''}">${x.time ? `${esc(x.time.split(/[–-]/)[0].trim())} ` : ''}${esc(x.title)}</span>`).join('')}${evs.length > 2 ? `<span class="cal-more">+${evs.length - 2} more</span>` : ''}</div>
+      <span class="cal-dots" aria-hidden="true">${evs.slice(0, 3).map((x) => `<i class="${kindOf(x)}"></i>`).join('')}</span></div>`);
+  }
+  while (cells.length % 7) cells.push('<span class="cal-cell blank" aria-hidden="true"></span>');
+  const title = first.toLocaleDateString([], { month: 'long', year: 'numeric' });
+  const inMonth = sessions.filter((x) => monthIdx(dayOf(x.ago)) === idx).sort((a, b) => b.ago - a.ago);
+  const dayList = sel ? (byDay[selK] || []) : [];
+  const card = (x) => (x.done
+    ? `<div class="cal-card ${kindOf(x)}"><span class="cal-time">${fmtDay(x.ago)}</span><b>${esc(x.title)}</b>${x.gone ? '<span class="small muted">Session page no longer available</span>' : `<button type="button" class="btn xs ghost" data-act="sessionPage" data-title="${esc(x.title)}">Session page ${I.ext}</button>`}${chip('Done')}</div>`
+    : `<a class="cal-card ${kindOf(x)}" href="/queue/s/${encodeURIComponent(x.slug)}"><span class="cal-time">${fmtDay(x.ago)}${x.time ? ` · ${esc(x.time)}` : ''}</span><b>${esc(x.title)}</b>${chip(x.live ? 'Happening now' : 'Scheduled', x.live ? 'ok' : 'warn')}</a>`);
+  const grid = `<div class="cal-grid2" role="group" aria-label="${esc(title)}">${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((w) => `<span class="cal-wd2" aria-hidden="true">${w}</span>`).join('')}${cells.join('')}</div>`;
+  const legend = '<div class="between small muted"><div class="row" style="gap:12px"><span><i class="cal-key2 live"></i>Happening now</span><span><i class="cal-key2 prep"></i>Scheduled</span><span><i class="cal-key2 done"></i>Done</span></div><span>Tap a date to see its sessions.</span></div>';
+  const list = sel ? `<div class="stack tight"><span class="label">${esc(sel.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' }))}</span>${dayList.length ? dayList.map(card).join('') : '<div class="empty">No sessions this day.</div>'}</div>` : '';
+  return { title, grid, legend, list, inMonth };
+}
 function clubCalendar(sessions, off) {
   const now = new Date(), first = new Date(now.getFullYear(), now.getMonth() + off, 1), idx = monthIdx(first);
   const days = new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate();
@@ -1358,8 +1421,8 @@ function viewClub() {
   const city = (PLACES.find(([c]) => c === club.code) || [0, club.code])[1];
   const members = clubMembers(id), shown = Math.min(members.length, S.ui.clubShown || CLUB_MEMBERS_PAGE);
   const { up, all } = clubSessions(id);
-  const off = Math.max(minOff(), Math.min(S.ui.clubMonth || 0, maxOff(all)));
-  const cal = clubCalendar(all, off);
+  const off = Math.max(minOff(all), Math.min(S.ui.clubMonth || 0, maxOff(all)));
+  const cal = clubCalendarFull(all, off, S.ui.clubDay);
   const thisMonth = all.filter((x) => monthIdx(dayOf(x.ago)) === monthIdx(new Date())).length;
   const next = up[0] || null, rest = up.slice(1);
   const stat = (x) => (x.live ? chip('Happening now', 'ok') : x.done ? chip('Done') : chip('Scheduled', 'solid'));
@@ -1393,11 +1456,11 @@ function viewClub() {
         ${nextCard}
         <section class="card stack"><div class="between"><h2>Upcoming sessions</h2><span class="small muted">${num(up.length)}</span></div>
           ${rest.length ? `<div>${rest.map(sessionRow).join('')}</div>` : next ? '<p class="small muted" style="margin:0">That\'s the only one scheduled so far.</p>' : '<div class="empty">No upcoming sessions.</div>'}</section>
-        <section class="card stack"><div class="cal-head"><h2>Calendar</h2><div class="row"><button class="btn xs" data-act="clubMonth" data-v="${off - 1}" aria-label="Previous month" ${off <= minOff() ? 'disabled' : ''}>${I.back}</button><b aria-live="polite">${cal.title}</b><button class="btn xs" data-act="clubMonth" data-v="${off + 1}" aria-label="Next month" ${off >= maxOff(all) ? 'disabled' : ''}>${I.fwd}</button></div></div>
+        <section class="card stack cal-section" aria-label="Calendar"><div class="cal-head"><h2>${esc(cal.title)}</h2><div class="row" style="gap:4px"><button class="btn xs icon-btn" data-act="clubMonth" data-v="${off - 1}" aria-label="Previous month" ${off <= minOff(all) ? 'disabled' : ''}>${I.back}</button><button class="btn xs" data-act="clubToday">Today</button><button class="btn xs icon-btn" data-act="clubMonth" data-v="${off + 1}" aria-label="Next month" ${off >= maxOff(all) ? 'disabled' : ''}>${I.fwd}</button></div></div>
           ${cal.grid}
-          <div class="cal-key" aria-hidden="true"><span><i></i>Upcoming</span><span><i class="done"></i>Done</span></div>
-          ${cal.inMonth.length ? `<div>${cal.inMonth.map(sessionRow).join('')}</div>` : `<div class="empty">No sessions in ${esc(cal.title)}.</div>`}
-          <span class="hint">Done sessions from the last three months stay on the calendar.</span></section>
+          ${cal.legend}
+          ${cal.list}
+          <span class="hint">Every session of this club, upcoming and done. Done sessions keep their session page for three months.</span></section>
       </div>
       <aside class="stack" style="gap:20px">
         <section class="card stack"><div class="between"><h2>Members</h2><span class="small muted">${num(members.length)}</span></div>
@@ -1408,7 +1471,7 @@ function viewClub() {
   </main>`;
 }
 // The calendar reaches back three months and forward to the last upcoming session.
-const minOff = () => monthIdx(dayOf(WINDOW_DAYS)) - monthIdx(new Date());
+const minOff = (all) => Math.min(0, ...all.map((x) => monthIdx(dayOf(x.ago)) - monthIdx(new Date())));
 const maxOff = (all) => Math.max(0, ...all.filter((x) => !x.done).map((x) => monthIdx(dayOf(x.ago)) - monthIdx(new Date())));
 
 // ---------- P-COMPARE ----------
@@ -2194,6 +2257,8 @@ const ACT = {
   openClub: (el) => { S.ui.clubMonth = 0; S.ui.clubShown = CLUB_MEMBERS_PAGE; go('club', el.dataset.id); },
   clubMore: () => { S.ui.clubShown = (S.ui.clubShown || CLUB_MEMBERS_PAGE) + CLUB_MEMBERS_PAGE; render(); },
   clubMonth: (el) => { S.ui.clubMonth = +el.dataset.v; render(); },
+  clubDay: (el) => { const t = +el.dataset.k; S.ui.clubDay = S.ui.clubDay === t ? null : t; render(); },
+  clubToday: () => { S.ui.clubMonth = 0; S.ui.clubDay = new Date().setHours(0, 0, 0, 0); render(); },
   // Join this club opens the club's current invite link (/register/[clubId]); regenerating the invite code changes that link, not this page.
   clubJoin: (el) => (S.me ? ACT.openJoin(el) : ACT.openRegister(el)),
   shareClub: (el) => {

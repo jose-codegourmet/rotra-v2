@@ -233,6 +233,7 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
               <PlayerClubsCard
                 clubs={(clubs.data ?? []).map((club) => ({
                   ...club,
+                  clubPageHref: `/clubs/${encodeURIComponent(club.id)}`,
                   reportHref: `mailto:${REPORT_PROBLEM_EMAIL}?subject=${encodeURIComponent(`Problem with ${club.name}`)}&body=${encodeURIComponent(`Club: ${club.name}\nMy ROTRA player ID: ${player.rtrId}\n\nWhat went wrong:\n`)}`,
                 }))}
                 onLeave={(id) => {

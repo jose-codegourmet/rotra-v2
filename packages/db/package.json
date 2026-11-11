@@ -56,7 +56,8 @@
     "./auth/supabase-provider-admin": "./src/auth/supabase-provider-admin.ts",
     "./service/request": "./src/service/request.ts",
     "./admin/password-resets": "./src/admin/password-resets.ts",
-    "./admin/sales": "./src/admin/sales.ts"
+    "./admin/sales": "./src/admin/sales.ts",
+    "./admin/profile-characters": "./src/admin/profile-characters.ts"
   },
   "scripts": {
     "db:generate": "prisma generate",

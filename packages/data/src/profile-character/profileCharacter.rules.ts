@@ -62,3 +62,20 @@ export const profileCharacterDeletedToast = (c: Pick<ProfileCharacter, 'number'>
 /** Upload order, oldest first: what players and Admin see. */
 export const inUploadOrder = <T extends Pick<ProfileCharacter, 'uploadedAt'>>(list: readonly T[]) =>
   [...list].sort((a, b) => a.uploadedAt - b.uploadedAt)
+
+/**
+ * A library id as one URL path segment. The first seeded character's id is '' (an empty segment
+ * would collapse the path), so it travels as `_`, which no id can be (ids are '', a–z or a UUID).
+ */
+export const profileCharacterPathSegment = (id: string) =>
+  id === '' ? '_' : encodeURIComponent(id)
+
+/** The id a Route Handler's `[id]` segment names (the reverse of profileCharacterPathSegment). */
+export const profileCharacterIdOfSegment = (segment: string) => (segment === '_' ? '' : segment)
+
+/**
+ * Real mode: every app that shows player pictures serves a library image at this path, hidden and
+ * deleted images included, so a `character:<id>` resolves on screens that never loaded the list.
+ */
+export const profileCharacterImagePath = (id: string) =>
+  `/api/profile-characters/${profileCharacterPathSegment(id)}/image`

@@ -506,6 +506,18 @@ button.qf:hover .avatar { box-shadow: 0 0 0 2px var(--accent); }
 /* #735 (proposed): over capacity (25/24) shows the count in the warning colour. */
 .roster-sum.over .sm-top b { color: var(--warn); }
 .rv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: 10px; }
+/* Owner comment, November 11, 2026 ("grid view doesn't feel like grid view for mobile"): on phones the grid is two compact
+   columns with the picture on top, instead of one column of wide cards. */
+@media (max-width: 640px) {
+  .rv-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .rv-grid .rv-card { padding: 10px; gap: 6px; align-items: stretch; text-align: center; }
+  .rv-grid .rv-top { flex-direction: column; align-items: center; gap: 6px; position: relative; }
+  .rv-grid .rv-top .face-btn .avatar { width: 56px; height: 56px; font-size: 18px; }
+  .rv-grid .rv-top .main { align-items: center; }
+  .rv-grid .rv-top > button:last-child:not(.face-btn) { position: absolute; top: -4px; right: -4px; }
+  .rv-grid .rv-meta { justify-content: center; flex-wrap: wrap; gap: 6px; }
+  .rv-grid .rv-pres { justify-content: center; }
+}
 .rv-card { display: flex; flex-direction: column; gap: 8px; min-width: 0; padding: 12px; border-radius: var(--r); border: 1px solid var(--border); background: var(--surface); box-shadow: var(--shadow); }
 .rv-top { display: flex; align-items: flex-start; gap: 10px; min-width: 0; }
 .rv-top .main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }

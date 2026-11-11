@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 20 · IN PROGRESS: 5 · IN MOCK APP: 106 · CANCELLED: 1 · MOCKUP ONLY: 4
+NEW: 21 · IN PROGRESS: 5 · IN MOCK APP: 106 · CANCELLED: 1 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -309,6 +309,7 @@ NEW: 20 · IN PROGRESS: 5 · IN MOCK APP: 106 · CANCELLED: 1 · MOCKUP ONLY: 4
 | [2026-11-11-queue-join-request-slot-or-waitlist](2026-11-11-queue-join-request-slot-or-waitlist.md) | Join request: the player picks Join a slot or Be waitlisted, and can join from the waitlist | join-request-form, join-request-card, join-requests-panel | IN MOCK APP — #706 |
 | [2026-11-11-queue-match-requests-live-only](2026-11-11-queue-match-requests-live-only.md) | Requests: join requests before Start, match requests after; the live console shows Match requests at the upper right | requests-panel, tabs | NEW |
 | [2026-11-11-queue-participant-profile-tap](2026-11-11-queue-participant-profile-tap.md) | Tap a participant on the session page to open their profile (#731, proposed) | participant-tile, player-profile-sheet (new public variant), private-profile-card (new), avatar | NEW |
+| [2026-11-11-queue-roster-grid-mobile](2026-11-11-queue-roster-grid-mobile.md) | Roster and levels › Grid view on phones: two compact columns | roster-card, roster-grid | NEW |
 | [2026-11-11-queue-roster-waitlist-overfill](2026-11-11-queue-roster-waitlist-overfill.md) | Admitted players can step down to the waitlist; Queue Master can overfill the roster (#735, proposed) | roster-card, roster-row, player-pool-card, slot-meter (roster summary), confirm-sheet, my-night-card | NEW |
 | [2026-11-11-queue-set-games-played](2026-11-11-queue-set-games-played.md) | Queue Master can set games played, for one player or everyone | set-games-sheet, player-pool-card, confirm-sheet, count-stepper, button | IN PROGRESS — #717 |
 | [2026-11-11-queue-share-club-invite-copy-link](2026-11-11-queue-share-club-invite-copy-link.md) | Copy invite link on the Share club invite sheet | club-invite-card, share-card | IN MOCK APP — #708 |

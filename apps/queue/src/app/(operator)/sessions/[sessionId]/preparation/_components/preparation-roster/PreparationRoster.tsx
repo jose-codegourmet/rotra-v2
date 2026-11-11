@@ -3,7 +3,7 @@
 import { registeredCity } from '@rotra/data/club-player/fetchers'
 import { guestRegistrationUrl } from '@rotra/data/club-player/registration-url'
 import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
-import { selfCheckInMark } from '@rotra/data/public-session/rules'
+import { selfCheckInMark, tonightStatus } from '@rotra/data/public-session/rules'
 import { expectedGames, slotCapacity } from '@rotra/data/queue-session/queueSession.rules'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionPayments } from '@rotra/data/session-payment/useSessionPayments'
@@ -158,6 +158,9 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
   const overfillEntry = entries.find((w) => w.id === overfillWaiter)
   const giveSlotTo = (waitlistId: string) => giveSlot.mutate({ sessionId, waitlistId }, options)
   const profile = profileId ? byClubPlayer(profileId) : undefined
+  // D-PARTICIPANT-PROFILE: on this roster, the badge reads the session level and Tonight shows
+  // Free or Away (no matches before the start).
+  const profileEntry = profile ? rosterList.find((r) => r.clubPlayerId === profile.id) : undefined
   const openProfileFromRoster = (rosterId: string) => {
     const r = rosterList.find((r) => r.id === rosterId)
     if (r) setProfileId(r.clubPlayerId)
@@ -272,6 +275,8 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
           identity={profile.identity}
           nickname={profile.nickname}
           level={profile.suggestion}
+          tonightLevel={profileEntry?.level}
+          tonight={profileEntry ? tonightStatus(profileEntry, [], []) : null}
           registeredCity={registeredCity(profile.rtrId)}
           rtrId={profile.rtrId}
           addedLabel={longDateLabel(profile.addedAt)}

@@ -31,7 +31,7 @@ import { EmptyState } from '@rotra/ui/empty-state'
 import { JoinRequestCard, type JoinRequestCardProps } from '@rotra/ui/join-request-card'
 import { Notice } from '@rotra/ui/notice'
 import { PublicAccountBar } from '@rotra/ui/public-account-bar'
-import { PublicParticipants } from '@rotra/ui/public-participants'
+import { type PublicParticipant, PublicParticipants } from '@rotra/ui/public-participants'
 import { PublicRefreshBar } from '@rotra/ui/public-refresh-bar'
 import {
   PublicResultsSection,
@@ -49,6 +49,7 @@ import { JoinRequestSheet } from '@/app/(public)/s/[slug]/_components/join-reque
 import { MatchRequest } from '@/app/(public)/s/[slug]/_components/match-request/MatchRequest'
 import { useRequestMatchAction } from '@/app/(public)/s/[slug]/_components/match-request/useRequestMatchAction'
 import { MyNight } from '@/app/(public)/s/[slug]/_components/my-night/MyNight'
+import { ParticipantProfile } from '@/app/(public)/s/[slug]/_components/participant-profile/ParticipantProfile'
 import { SessionInviteSheet } from '@/app/(public)/s/[slug]/_components/session-invite-sheet/SessionInviteSheet'
 
 export type PublicSessionProps = {
@@ -360,6 +361,8 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
   const [joinOpen, setJoinOpen] = useState(openJoin && viewer === 'visitor')
   const [inviteOpen, setInviteOpen] = useState(false)
   const [matchRequestOpen, setMatchRequestOpen] = useState(false)
+  /** The tapped participant or waitlist tile (#731); null while no profile card is open */
+  const [profileOf, setProfileOf] = useState<PublicParticipant | null>(null)
   const requestMatch = useRequestMatchAction(slug, viewerAccount?.id, () =>
     setMatchRequestOpen(true),
   )
@@ -514,18 +517,20 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
     (signedInPage.isError || signedInPage.fetchStatus === 'paused')
   const sessionOpen = p.status === 'prepared' || p.status === 'active'
   const uncapped = !!signedRead || access?.fullRoster === true
-  // Registered players only, for a signed-in viewer only: the Player app's profile, new tab.
+  // #731: any signed-in Player can open a participant's profile card (mock: the signed-in read;
+  // real: the Player app's access read, which says who each participant is).
+  const profileViewerId = signedRead ? (viewerAccount?.id ?? null) : (realPlayer?.playerId ?? null)
+  // Registered players only, for a signed-in viewer only: the Player app's profile for the card's
+  // Open ROTRA profile, new tab.
   const tile = (x: PublicSessionParticipant, i: number) => ({
     id: String(i),
     ...x,
     href:
-      uncapped && x.rtrId && x.masked === false && playerBase
+      profileViewerId && x.rtrId && x.masked === false && playerBase
         ? `${playerBase}/find/${encodeURIComponent(x.rtrId)}`
         : null,
   })
-  const participants = (
-    access?.fullRoster && !signedRead ? access.participants : p.participants
-  ).map(tile)
+  const participants = (access && !signedRead ? access.participants : p.participants).map(tile)
   const waitlist = p.waitlist.map(tile)
 
   return (
@@ -656,11 +661,19 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
                 p.acceptJoinRequests && (p.status === 'prepared' || p.status === 'active')
               }
               onRequestToJoin={signedIn ? signedIn.onJoin : () => setJoinOpen(true)}
+              onOpenParticipant={profileViewerId ? setProfileOf : undefined}
               disabled={offline || !!signedIn?.busy}
             />
           </TabsContent>
         </Tabs>
         {p.status === 'completed' ? <PublicResultsSection published={publishedSlides(p)} /> : null}
+        {profileViewerId ? (
+          <ParticipantProfile
+            participant={profileOf}
+            viewerPlayerId={profileViewerId}
+            onClose={() => setProfileOf(null)}
+          />
+        ) : null}
         {signedIn &&
         viewerAccount &&
         sessionOpen &&

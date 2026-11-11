@@ -1,5 +1,5 @@
 import 'server-only'
-import { WINDOW_DAYS } from '@rotra/data/player/rules'
+import { recentGameStats, WINDOW_DAYS } from '@rotra/data/player/rules'
 import { awardBaseline, createResultSnapshot } from '@rotra/data/session-result/sessionResult.rules'
 import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
@@ -620,4 +620,18 @@ export async function readLeaderboard(limit = 50) {
     recentCount: r.recentStandardMatchCount,
     state: r.state,
   }))
+}
+
+/**
+ * Stats · last 90 days on the session page's participant profile card (#731), by RTR ID: games,
+ * wins, losses and win rate from the public match history over the rank window; null without
+ * games. Always private (#715) has no column yet, so no profile is refused here.
+ */
+export async function readRecentGameStatsByRtrId(rtrId: string) {
+  const allocation = await prisma.playerIdAllocation.findUnique({
+    where: { rtrId: rtrId.trim().toUpperCase() },
+    select: { playerId: true },
+  })
+  if (!allocation) throw new ServiceError('not_found')
+  return recentGameStats(await readPlayerMatchHistory(allocation.playerId), Date.now())
 }

@@ -402,10 +402,39 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
     const roster = await liveRoster(tx, session.id)
     const linked = await tx.clubPlayer.findMany({
       where: { id: { in: roster.map((entry) => entry.clubPlayerId) } },
-      select: { id: true, playerId: true, player: { select: { avatarRef: true } } },
+      select: {
+        id: true,
+        playerId: true,
+        player: {
+          select: {
+            avatarRef: true,
+            nickname: true,
+            profileState: true,
+            idAllocation: { select: { rtrId: true } },
+          },
+        },
+      },
     })
     const fullRoster = linked.some((entry) => entry.playerId === context.playerId)
     const pictures = new Map(linked.map((entry) => [entry.id, entry.player?.avatarRef ?? null]))
+    const people = new Map(linked.map((entry) => [entry.id, entry]))
+    /**
+     * D-2026-11-09-02 for a signed-in Player, #731: a registered (claimed) player's full name,
+     * nickname and RTR ID, and which card the tile opens; guests and unclaimed profiles stay
+     * masked. Always private (#715) has no column yet, so it reads as not set here.
+     */
+    const person = (entry: (typeof roster)[number]) => {
+      const club = people.get(entry.clubPlayerId)
+      const registered = !!club?.playerId && club.player?.profileState === 'claimed'
+      return {
+        name: registered ? entry.nameSnapshot : maskPublicName(entry.nameSnapshot),
+        masked: !registered,
+        nickname: registered ? (club?.player?.nickname ?? null) : null,
+        rtrId: registered ? (club?.player?.idAllocation?.rtrId ?? null) : null,
+        isViewer: !!club?.playerId && club.playerId === context.playerId,
+        profile: registered ? ('registered' as const) : ('guest' as const),
+      }
+    }
     const byId = new Map(roster.map((entry) => [entry.id, entry]))
     // Only waiting lineups. No presence, court holds, games, scores, contacts or operator notes.
     const matches = await tx.match.findMany({
@@ -441,7 +470,7 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
       ...standing,
       fullRoster,
       participants: (fullRoster ? roster : roster.slice(0, 12)).map((entry) => ({
-        name: maskPublicName(entry.nameSnapshot),
+        ...person(entry),
         pictureUrl: pictures.get(entry.clubPlayerId) ?? null,
         ...publicLevel(levelCodeFor(entry.skillLevelId)),
       })),

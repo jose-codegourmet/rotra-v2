@@ -86,7 +86,10 @@ export const Light: Story = { globals: { theme: 'light' } }
 
 export const ConfirmedParticipant: Story = { args: { uncapped: true } }
 
-/** Signed-in view: registered tiles show full name, nickname and a profile link; guest and unclaimed stay masked. */
+/**
+ * Signed-in view: registered tiles show full name and nickname; guest and unclaimed stay masked.
+ * Every tile is a button that opens its profile card (#731), with the hint above the grid.
+ */
 const signedIn = participants.map((p, i) => {
   const registered = i % 3 !== 2
   return {
@@ -94,18 +97,25 @@ const signedIn = participants.map((p, i) => {
     name: registered ? (clubPlayers[i]?.fullName ?? p.name) : p.name,
     nickname: registered ? 'Nick' : undefined,
     masked: !registered,
-    href: registered ? `/player/find/RTR-${String(i + 1).padStart(5, '0')}` : undefined,
+    profile: registered ? ('registered' as const) : ('guest' as const),
   }
 })
 export const VisitorCapped: Story = { args: { participants: participants.slice(0, 18) } }
 export const SignedInUncappedMixed: Story = {
-  args: { participants: signedIn.slice(0, 18), waitlist: [], uncapped: true, participantCount: 18 },
+  args: {
+    participants: signedIn.slice(0, 18),
+    waitlist: [],
+    uncapped: true,
+    participantCount: 18,
+    onOpenParticipant: fn(),
+  },
 }
 export const ViewerConfirmed: Story = {
   args: {
     participants: signedIn.slice(0, 6).map((p, i) => ({ ...p, isViewer: i === 1 })),
     waitlist: [],
     uncapped: true,
+    onOpenParticipant: fn(),
   },
 }
 export const ViewerWaitlisted: Story = {
@@ -113,16 +123,23 @@ export const ViewerWaitlisted: Story = {
     participants: signedIn.slice(0, 3),
     waitlist: signedIn.slice(3, 6).map((p, i) => ({ ...p, isViewer: i === 1 })),
     uncapped: true,
+    onOpenParticipant: fn(),
   },
 }
 export const ViewerNotInSession: Story = {
-  args: { participants: signedIn.slice(0, 6), waitlist: signedIn.slice(6, 8), uncapped: true },
+  args: {
+    participants: signedIn.slice(0, 6),
+    waitlist: signedIn.slice(6, 8),
+    uncapped: true,
+    onOpenParticipant: fn(),
+  },
 }
 export const SignedInLight: Story = {
   args: {
     participants: signedIn.slice(0, 6).map((p, i) => ({ ...p, isViewer: i === 1 })),
     waitlist: signedIn.slice(6, 8),
     uncapped: true,
+    onOpenParticipant: fn(),
   },
   globals: { theme: 'light' },
 }

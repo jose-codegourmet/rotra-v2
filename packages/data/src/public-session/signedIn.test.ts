@@ -4,7 +4,7 @@ import { JOSE_PLAYER_ID } from '../fixtures/players'
 import { setMockLatencyEnabled } from '../mock/latency'
 import { mockStore } from '../mock/store'
 import type { SessionCostEstimate } from '../session-cost/sessionCost.types'
-import { getMyNight, getPublicSession, getSignedInSession } from './fetchers'
+import { getMyNight, getParticipantStats, getPublicSession, getSignedInSession } from './fetchers'
 import { canRefreshNow, myMatchLabel, refreshAvailableAt } from './publicSession.rules'
 
 let restoreLatency: () => void
@@ -130,5 +130,43 @@ describe('Public session › refresh throttle', () => {
   it('words who the player is with', () => {
     expect(myMatchLabel(['A'], ['B', 'C'])).toBe('with A vs B, C')
     expect(myMatchLabel([], ['B', 'C'])).toBe('vs B, C')
+  })
+})
+
+describe('Public session › participant profile cards (#731)', () => {
+  it('says which card each tile opens and masks always-private players, picture kept', async () => {
+    const page = await getSignedInSession(slug, JOSE_PLAYER_ID)
+    const all = [...page.participants, ...page.waitlist]
+    expect(all.every((p) => p.profile !== undefined)).toBe(true)
+    const priv = page.participants.filter((p) => p.profile === 'private')
+    expect(priv.length).toBeGreaterThan(0)
+    for (const p of priv) {
+      expect(p).toMatchObject({ masked: true, rtrId: null, nickname: null })
+      expect(p.name).toContain('***')
+      expect(p.pictureUrl).toBeTruthy()
+      expect(p.tonight).toBeUndefined()
+    }
+    expect(page.participants.find((p) => p.name.startsWith('W***'))?.profile).toBe('guest')
+    expect(page.participants.find((p) => p.isViewer)?.profile).toBe('registered')
+    expect(page.participants.find((p) => p.isViewer)?.tonight).toBeDefined()
+    expect(page.waitlist.every((p) => p.tonight === undefined)).toBe(true)
+  })
+
+  it('keeps the visitor version without profile kinds', async () => {
+    const page = await getPublicSession(slug)
+    expect(page.participants.every((p) => p.profile === undefined)).toBe(true)
+  })
+
+  it('reads stats for a registered participant and refuses an always-private one', async () => {
+    const state = mockStore.getSnapshot()
+    const jose = state.players.find((p) => p.id === JOSE_PLAYER_ID)
+    const stats = await getParticipantStats(jose?.rtrId ?? '', JOSE_PLAYER_ID)
+    expect(stats === null || stats.games === stats.wins + stats.losses).toBe(true)
+    const hidden = state.playerProfiles.find((p) => p.profileAlwaysPrivate)
+    await expect(getParticipantStats(hidden?.rtrId ?? '', JOSE_PLAYER_ID)).rejects.toThrow()
+    // The player themselves still reads their own stats.
+    await expect(
+      getParticipantStats(hidden?.rtrId ?? '', hidden?.playerId ?? ''),
+    ).resolves.toBeDefined()
   })
 })

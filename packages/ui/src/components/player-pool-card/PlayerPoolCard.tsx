@@ -55,6 +55,11 @@ export type PlayerPoolCardProps = {
    * the card. The container blocks it with a toast while the player is in a match.
    */
   onStepDown?: () => void
+  /**
+   * Opens the player's profile (D-PARTICIPANT-PROFILE): the picture becomes a button named
+   * “View NAME's profile”. Tapping it never selects the card.
+   */
+  onOpenProfile?: () => void
   className?: string
 }
 
@@ -94,6 +99,7 @@ export function PlayerPoolCard({
   onPresentChange,
   onSetGames,
   onStepDown,
+  onOpenProfile,
   className,
 }: PlayerPoolCardProps) {
   const state = status.kind === 'playing' ? 'playing' : present ? 'available' : 'away'
@@ -131,12 +137,30 @@ export function PlayerPoolCard({
         </span>
       ) : null}
       <div className="flex min-w-0 items-center gap-2">
-        <Avatar
-          name={name}
-          src={photoUrl}
-          size={40}
-          className={cn(state === 'away' && 'opacity-55 grayscale')}
-        />
+        {onOpenProfile ? (
+          // The picture button sits inside the card: stop its clicks and keys from selecting the card.
+          // biome-ignore lint/a11y/noStaticElementInteractions: a plain stop-propagation boundary around the button
+          <span
+            className="flex-none"
+            onClick={(event) => event.stopPropagation()}
+            onKeyDown={(event) => event.stopPropagation()}
+          >
+            <Avatar
+              name={name}
+              src={photoUrl}
+              size={40}
+              onClick={onOpenProfile}
+              className={cn(state === 'away' && 'opacity-55 grayscale')}
+            />
+          </span>
+        ) : (
+          <Avatar
+            name={name}
+            src={photoUrl}
+            size={40}
+            className={cn(state === 'away' && 'opacity-55 grayscale')}
+          />
+        )}
         <div className="min-w-0 flex-1">
           <div className="text-[13px] leading-tight font-bold [overflow-wrap:anywhere]">{name}</div>
           <div className="text-[11px] leading-[1.3] text-fg2">{levelLabel(level)}</div>

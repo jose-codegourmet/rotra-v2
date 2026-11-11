@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { fn } from 'storybook/test'
 import { PublicParticipantTile } from './PublicParticipantTile'
 
 const meta = {
@@ -22,11 +23,13 @@ export const Plain: Story = {}
 export const Nickname: Story = {
   args: { name: 'Mikee Abellana', nickname: 'Mik', masked: false },
 }
-export const Linked: Story = {
-  args: { name: 'Mikee Abellana', nickname: 'Mik', masked: false, href: '/player/find/RTR-00123' },
+/** Signed-in viewer (#731): a button named “NAME · view profile”; hover and focus ring the picture. */
+export const OpensProfile: Story = {
+  args: { name: 'Mikee Abellana', nickname: 'Mik', masked: false, onOpen: fn() },
 }
-export const MaskedIgnoresLink: Story = {
-  args: { href: '/player/find/RTR-00123', nickname: 'Mik' },
+/** Masked tiles open too (always-private and guest cards); the nickname stays hidden. */
+export const MaskedOpensCard: Story = {
+  args: { nickname: 'Mik', onOpen: fn() },
 }
 export const You: Story = {
   args: {
@@ -34,14 +37,14 @@ export const You: Story = {
     nickname: 'Mik',
     masked: false,
     isViewer: true,
-    href: '/player/find/RTR-00123',
+    onOpen: fn(),
   },
 }
 export const WaitlistBadge: Story = {
   args: {
     name: 'Mikee Abellana',
     masked: false,
-    href: '/player/find/RTR-00123',
+    onOpen: fn(),
     waitlistPosition: 3,
   },
 }
@@ -50,7 +53,7 @@ export const WaitlistYou: Story = {
     name: 'Mikee Abellana',
     masked: false,
     isViewer: true,
-    href: '/player/find/RTR-00123',
+    onOpen: fn(),
     waitlistPosition: 3,
   },
 }
@@ -59,10 +62,10 @@ export const LongNames: Story = {
     name: 'Maria Cristina Bautista Villareal de los Reyes',
     nickname: 'Mariacristinabautistavillarealdelosreyes',
     masked: false,
-    href: '/player/find/RTR-00123',
+    onOpen: fn(),
   },
 }
 export const Light: Story = {
-  args: { name: 'Mikee Abellana', masked: false, isViewer: true, href: '/player/find/RTR-00123' },
+  args: { name: 'Mikee Abellana', masked: false, isViewer: true, onOpen: fn() },
   globals: { theme: 'light' },
 }

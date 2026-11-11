@@ -1,4 +1,5 @@
 import { getConnectivity } from '../connectivity/connectivity'
+import { PLAYER_FIXTURE_NOW } from '../fixtures/playerGames'
 import portraits from '../fixtures/playerPortraits.json'
 import {
   computeStandings,
@@ -13,6 +14,8 @@ import { requireOnline } from '../mock/bridge'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, mockStore } from '../mock/store'
+import { recentGameStats } from '../player/player.rules'
+import { playerProjection } from '../player/projection'
 import { slotCapacity } from '../queue-session/queueSession.rules'
 import { RealRequestError } from '../real/client'
 import { isRealDataMode } from '../real/mode'
@@ -23,6 +26,7 @@ import {
 } from '../real/public-session'
 import { sessionCostIn } from '../session-cost/fetchers'
 import { submitJoinRequest } from '../session-roster/mutations'
+import { playerOrigin } from './context'
 import {
   linkedClubPlayerIds,
   maskPublicName,
@@ -32,6 +36,7 @@ import {
   publicLevel,
   publicSkillMix,
   selfCheckInMark,
+  tonightStatus,
 } from './publicSession.rules'
 import type {
   MatchRequestOptions,
@@ -39,6 +44,9 @@ import type {
   MyNight,
   MyNightMatch,
   MyNightStage,
+  ParticipantProfileKind,
+  ParticipantStats,
+  ParticipantTonight,
   PlayerSessionAccess,
   PublicCourtNow,
   PublicMatchPlayer,
@@ -143,21 +151,49 @@ function publicPerson(
   const p = state.clubPlayers.find((x) => x.id === clubPlayerId)
   const hasRotraProfile = p?.identity === 'registered' || p?.identity === 'unclaimed'
   const registered = p?.identity === 'registered' && !!p.playerId
-  const showFull = !!viewer && registered
+  const isViewer = !!viewer && !!p?.playerId && p.playerId === viewer.playerId
+  // #715 (mock flag) for #731: always private is masked for everyone but the player themselves;
+  // their picture stays public.
+  const alwaysPrivate =
+    registered &&
+    !!state.playerProfiles.find((x) => x.playerId === p?.playerId)?.profileAlwaysPrivate
+  const showFull = !!viewer && registered && (!alwaysPrivate || isViewer)
+  const profile: ParticipantProfileKind = showFull
+    ? 'registered'
+    : registered && alwaysPrivate
+      ? 'private'
+      : 'guest'
   return {
     name: showFull ? names.fullName : maskPublicName(names.fullName),
     masked: !showFull,
     nickname: showFull ? names.nickname : null,
     rtrId: showFull ? (state.players.find((x) => x.id === p?.playerId)?.rtrId ?? null) : null,
     pictureUrl: hasRotraProfile && p?.playerId ? (pictures[p.playerId] ?? null) : null,
-    isViewer: !!viewer && !!p?.playerId && p.playerId === viewer.playerId,
+    isViewer,
+    profile,
   }
+}
+
+/** The Tonight line for one roster entry (#731): prepared and live sessions only. */
+function tonightOf(
+  state: MockState,
+  session: MockState['sessions'][number],
+  entry: MockState['roster'][number],
+): ParticipantTonight | undefined {
+  if (session.state !== 'prepared' && session.state !== 'active' && session.state !== 'finalizing')
+    return undefined
+  return tonightStatus(
+    entry,
+    state.matches.filter((m) => m.sessionId === session.id),
+    state.courts.filter((c) => c.sessionId === session.id),
+  )
 }
 
 function participantOf(
   person: ReturnType<typeof publicPerson>,
   level: Parameters<typeof publicLevel>[0],
   signedIn: boolean,
+  tonight?: ParticipantTonight,
 ): PublicSessionParticipant {
   const base = { name: person.name, pictureUrl: person.pictureUrl, ...publicLevel(level) }
   return signedIn
@@ -167,6 +203,9 @@ function participantOf(
         nickname: person.nickname,
         rtrId: person.rtrId,
         isViewer: person.isViewer,
+        profile: person.profile,
+        // Always-private and guest cards show no status; only the full profile card does.
+        ...(tonight && person.profile === 'registered' ? { tonight } : {}),
       }
     : base
 }
@@ -299,6 +338,7 @@ function project(
         ),
         r.level,
         signedIn,
+        signedIn ? tonightOf(state, s, r) : undefined,
       ),
     ),
     skillMix: publicSkillMix(roster.map((r) => r.level)),
@@ -638,6 +678,44 @@ export async function getMyJoinRequest(slug: string): Promise<MyJoinRequest | nu
     waitlistPosition: index >= 0 ? index + 1 : null,
     placement: r.placement,
   }
+}
+
+/**
+ * Stats · last 90 days for the participant profile card (#731), by the RTR ID the signed-in read
+ * gave: games, wins, losses and win rate over the rank window, or null ("No games yet"). Signed-in
+ * Players only. An always-private player's stats are refused to everyone but themselves. Real mode
+ * reads the Player app's `/api/rtr-ids/<RTR>/stats` with the Player cookie (same-site, #687).
+ */
+export async function getParticipantStats(
+  rtrId: string,
+  viewerPlayerId: string | null,
+  signal?: AbortSignal,
+): Promise<ParticipantStats | null> {
+  if (isRealDataMode()) {
+    const origin = playerOrigin(location.origin)
+    if (!origin) throw new MockError('retryable', "Couldn't load these stats. Try again.")
+    const response = await fetch(`${origin}/api/rtr-ids/${encodeURIComponent(rtrId)}/stats`, {
+      credentials: 'include',
+      cache: 'no-store',
+      signal,
+    })
+    if (response.status === 404) return null
+    if (response.status === 401 || response.status === 403)
+      throw new MockError('permission', 'Sign in with ROTRA Player to see this.')
+    if (!response.ok) throw new MockError('retryable', "Couldn't load these stats. Try again.")
+    return ((await response.json()) as { stats: ParticipantStats | null }).stats
+  }
+  await delay()
+  const { state } = serverState()
+  if (!viewerPlayerId) throw new MockError('permission', 'Sign in with ROTRA Player to see this.')
+  requireSignedInPlayer(state, viewerPlayerId)
+  const player = state.players.find((p) => p.rtrId === rtrId.trim().toUpperCase())
+  if (!player) return null
+  const profile = state.playerProfiles.find((p) => p.playerId === player.id)
+  if (profile?.profileAlwaysPrivate && player.id !== viewerPlayerId)
+    throw new MockError('permission', 'This player keeps their profile private.')
+  // Mock histories are dated from the fixture clock, like rank.
+  return recentGameStats(playerProjection().games[player.id] ?? [], PLAYER_FIXTURE_NOW)
 }
 
 /** Mock server projection, identity supplied only by the Player-hosted mock session route. */

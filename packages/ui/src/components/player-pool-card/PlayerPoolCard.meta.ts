@@ -13,6 +13,7 @@ export const playerPoolCardMeta = {
     'Pass waitMinutes only for available players (present and off court); playing and away cards show no wait.',
     'For the preparation roster use RosterRow; for saved players use SavedPlayerCard.',
     'Pass onSetGames to show the ghost pencil button (Set games played…, D-SET-GAMES); games is the adjusted count from gamesPlayed() in the match rules.',
+    'Pass onOpenProfile to make the picture a button (“View NAME’s profile”) that opens the player profile card (D-PARTICIPANT-PROFILE); the card itself still selects the player for a match.',
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',
@@ -22,6 +23,6 @@ export const playerPoolCardMeta = {
     'docs/screens/product/modules/queue/session-console.md#q-pool--players-view',
     'docs/business_logic/product/queue/modules/players/README.md#presence',
   ],
-  variants: ['available', 'playing', 'away', 'with Set games played'],
+  variants: ['available', 'playing', 'away', 'with Set games played', 'with profile button'],
   related: ['PlayerPoolToolbar', 'SelectionBar', 'SetGamesSheet', 'RosterRow', 'Switch', 'Avatar'],
 } satisfies ComponentMeta

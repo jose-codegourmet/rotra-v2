@@ -98,7 +98,7 @@ Prisma column); the Checked in themselves mark has no server clearing rules yet.
 | Requests · N with Join and Match tabs; Add to queue / Decline; drop-out notices; ROTRA-player join cards | implemented (mock app only) | commit `e64678bf` | #616 |
 | Checked in themselves / Left mark on roster rows, cards and live Players cards | implemented (mock app only) | commit `d7c92168` | #617 |
 | Request formats per session (default option A), `requestFormats` | implemented (mock app only) | commit `3abfba67`; defaults decided 2026-11-10 ([D-2026-11-09-11](../decisions.md#d-2026-11-09-11)) | #618 |
-| Games played override (Set games played, one player or all; `session_players.games_adjustment`) | in progress (mock app + real-mode services; migration `20261111000300_roster_games_adjustment` drafted, **pending**, not applied) | [mockup log](../../mockup-changes/2026-11-11-queue-set-games-played.md) | #717 |
+| Games played override (Set games played, one player or all; `session_players.games_adjustment`) | in progress (mock app + real-mode services; migration `20261111000300_roster_games_adjustment` applied 2026-11-11) | [mockup log](../../mockup-changes/2026-11-11-queue-set-games-played.md) | #717 |
 | Join request: Join a slot / Be waitlisted choice, full-slots rule before start, Join from waitlist (`placement`) | in progress (mock app + real-mode services; migration `20261111000200` applied 2026-11-11) | [D-2026-11-11-02](../decisions.md#d-2026-11-11-02); [mockup log](../../mockup-changes/2026-11-11-queue-join-request-slot-or-waitlist.md) | #706 |
 
 ### Obvious Queue bugs (#466, 2026-11-07)

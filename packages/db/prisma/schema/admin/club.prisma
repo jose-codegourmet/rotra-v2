@@ -29,6 +29,10 @@ model Club {
   courtRules              String?        @map("court_rules")
   /// null = built-in post template.
   postTemplate            String?        @map("post_template")
+  /// The one active club invite code for `/register/[clubId]?k=<code>` (D-2026-11-09-08): uppercase
+  /// letters and digits, 8–16 characters (CHECK in SQL), unique. Regenerate overwrites it; null =
+  /// no link yet.
+  inviteCode              String?        @unique @map("invite_code")
   /// Idempotency key of the Add club command.
   sourceCommandId         String         @unique @map("source_command_id") @db.Uuid
   createdAt               DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)

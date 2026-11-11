@@ -2,8 +2,9 @@
 -- is invented; phones use the 555 range. IDs are fixed, so a rebuild + seed always gives the same
 -- relationships. Run through `scripts/disposable-db.sh seed`, never against a shared project.
 --
--- Covers: two clubs (paid and free/tester), same-name players and guests, claimed/unclaimed profiles
--- with private contacts, RTR IDs, a claim link, a pending contact change, sessions in prepared /
+-- Covers: two clubs (paid and free/tester) with invite codes, same-name players and guests, claimed
+-- profiles with private contacts, RTR IDs, visibility and banner choices, a club-only unclaimed
+-- profile (D-2026-11-11-03: no players row, no RTR ID), a pending contact change, sessions in prepared /
 -- active / completed / invalid states, a demoted waitlist entry, a join request, a device stream with
 -- a gap and an open conflict, decided and active matches with holds, costs and payment marks, a
 -- finalization with facts, a snapshot, projection work, current rank, a guest-history attribution,
@@ -24,13 +25,13 @@ INSERT INTO admin_accounts (id, auth_provider, auth_subject, display_name, updat
 -- Clubs: A is paid, B is a free tester club with no prices ---------------------------------------
 INSERT INTO clubs (id, name, name_key, founding_location_code_id, founding_address, license_pricing,
   license_monthly_minor, license_yearly_minor, default_players_per_court, default_entrance_fee_minor,
-  source_command_id, updated_at) VALUES
+  source_command_id, invite_code, updated_at) VALUES
   ('c1000000-0000-4000-8000-00000000000a', 'Fictional Shuttle Club', 'fictional shuttle club',
    '10c00000-0000-4000-8000-000000000001', '1 Sample Street, Cebu City', 'paid', 150000, 1500000, 8, 5000,
-   'c0de0000-0000-4000-8000-0000000000a1', now()),
+   'c0de0000-0000-4000-8000-0000000000a1', 'FICTAAAA01', now()),
   ('c1000000-0000-4000-8000-00000000000b', 'Tester Badminton Club', 'tester badminton club',
    '10c00000-0000-4000-8000-000000000002', '2 Example Avenue, Manila', 'free', NULL, NULL, 6, NULL,
-   'c0de0000-0000-4000-8000-0000000000b1', now());
+   'c0de0000-0000-4000-8000-0000000000b1', 'FICTBBBB01', now());
 
 INSERT INTO club_accounts (club_id, username, auth_provider, auth_subject, provisioned_at, updated_at) VALUES
   ('c1000000-0000-4000-8000-00000000000a', 'fictional-shuttle', 'supabase', 'a0000000-0000-4000-8000-0000000000c1', '2026-10-01T00:00:00Z', now()),
@@ -70,15 +71,16 @@ INSERT INTO admin_audit_events (id, actor_admin_id, action, target_type, target_
    'c1000000-0000-4000-8000-00000000000a', 'c0de0000-0000-4000-8000-0000000000a3', '2026-10-03T00:00:00Z',
    '{"plan": "yearly", "amountMinor": 1500000}');
 
--- Players: two "Juan Dela Cruz" (one claimed, one not) and a claimed "Maria Santos" ----------------
-INSERT INTO players (id, full_name, nickname, profile_state, hide_phone_from_clubs, updated_at) VALUES
-  ('91000000-0000-4000-8000-000000000001', 'Juan Dela Cruz', 'Juan', 'claimed', false, now()),
-  ('91000000-0000-4000-8000-000000000002', 'Juan Dela Cruz', NULL, 'unclaimed', false, now()),
-  ('91000000-0000-4000-8000-000000000003', 'Maria Santos', 'Mars', 'claimed', true, now());
+-- Players: a claimed "Juan Dela Cruz" (public, with a banner) and a claimed "Maria Santos" (private,
+-- hidden from Player Information). The second, unclaimed "Juan Dela Cruz" is club A's own record
+-- (club_players a2 below) and has no players row.
+INSERT INTO players (id, full_name, nickname, profile_state, hide_phone_from_clubs, profile_visibility,
+  hidden_from_directory, banner_id, updated_at) VALUES
+  ('91000000-0000-4000-8000-000000000001', 'Juan Dela Cruz', 'Juan', 'claimed', false, 'public', false, 'night', now()),
+  ('91000000-0000-4000-8000-000000000003', 'Maria Santos', 'Mars', 'claimed', true, 'private', true, NULL, now());
 
 INSERT INTO player_private_contacts (player_id, phone_e164, email, updated_at) VALUES
   ('91000000-0000-4000-8000-000000000001', '+639175550101', 'juan.fictional@example.com', now()),
-  ('91000000-0000-4000-8000-000000000002', '+639175550102', NULL, now()),
   ('91000000-0000-4000-8000-000000000003', '+639175550103', 'maria.fictional@example.com', now());
 
 INSERT INTO player_accounts (player_id, auth_provider, auth_subject, claimed_at, contact_sync_version, updated_at) VALUES
@@ -89,28 +91,23 @@ INSERT INTO player_social_links (id, player_id, provider, url, updated_at) VALUE
   ('5c000000-0000-4000-8000-000000000001', '91000000-0000-4000-8000-000000000001', 'facebook', 'https://example.com/juan-fictional', now());
 
 INSERT INTO player_id_counters (location_code_id, sync_date, last_sequence) VALUES
-  ('10c00000-0000-4000-8000-000000000001', '2026-10-09', 2),
+  ('10c00000-0000-4000-8000-000000000001', '2026-10-09', 1),
   ('10c00000-0000-4000-8000-000000000002', '2026-10-09', 1);
 
 INSERT INTO player_id_allocations (player_id, rtr_id, creating_club_id, location_code_id, country_code, city_code, sync_date, sequence) VALUES
   ('91000000-0000-4000-8000-000000000001', 'RTR-PH-CEB-100926-0001', 'c1000000-0000-4000-8000-00000000000a', '10c00000-0000-4000-8000-000000000001', 'PH', 'CEB', '2026-10-09', 1),
-  ('91000000-0000-4000-8000-000000000002', 'RTR-PH-CEB-100926-0002', 'c1000000-0000-4000-8000-00000000000a', '10c00000-0000-4000-8000-000000000001', 'PH', 'CEB', '2026-10-09', 2),
   ('91000000-0000-4000-8000-000000000003', 'RTR-PH-MNL-100926-0001', 'c1000000-0000-4000-8000-00000000000b', '10c00000-0000-4000-8000-000000000002', 'PH', 'MNL', '2026-10-09', 1);
-
-INSERT INTO player_claim_links (id, player_id, issuing_club_id, token_digest, issued_at, expires_at, updated_at) VALUES
-  ('c7000000-0000-4000-8000-000000000002', '91000000-0000-4000-8000-000000000002', 'c1000000-0000-4000-8000-00000000000a',
-   sha256('fictional-claim-token-0002'::bytea), '2026-10-20T00:00:00Z', '2026-11-20T00:00:00Z', now());
 
 INSERT INTO player_contact_change_requests (id, player_id, field, source, proposed_value, original_value,
   original_contact_revision, requested_at, source_command_id, updated_at) VALUES
   ('cc000000-0000-4000-8000-000000000001', '91000000-0000-4000-8000-000000000001', 'phone', 'app', '+639175550111',
    '+639175550101', 1, '2026-10-25T00:00:00Z', 'c0de0000-0000-4000-8000-0000000000d1', now());
 
--- Club players: club A has a linked Juan, the unclaimed Juan, and a same-name guest; club B also
--- knows the claimed Juan (cross-club link) ---------------------------------------------------------
+-- Club players: club A has a linked Juan, its own club-only unclaimed Juan (phone in private intake,
+-- no players row), and a same-name guest; club B also knows the claimed Juan (cross-club link) ------
 INSERT INTO club_players (id, club_id, player_id, display_name, nickname, added_at, updated_at) VALUES
   ('cb000000-0000-4000-8000-0000000000a1', 'c1000000-0000-4000-8000-00000000000a', '91000000-0000-4000-8000-000000000001', 'Juan Dela Cruz', 'Juan', '2026-10-09T00:00:00Z', now()),
-  ('cb000000-0000-4000-8000-0000000000a2', 'c1000000-0000-4000-8000-00000000000a', '91000000-0000-4000-8000-000000000002', 'Juan Dela Cruz', NULL, '2026-10-09T00:00:00Z', now()),
+  ('cb000000-0000-4000-8000-0000000000a2', 'c1000000-0000-4000-8000-00000000000a', NULL, 'Juan Dela Cruz', NULL, '2026-10-09T00:00:00Z', now()),
   ('cb000000-0000-4000-8000-0000000000a3', 'c1000000-0000-4000-8000-00000000000a', NULL, 'Juan Dela Cruz', 'JD', '2026-10-15T00:00:00Z', now()),
   ('cb000000-0000-4000-8000-0000000000a4', 'c1000000-0000-4000-8000-00000000000a', NULL, 'Ana Reyes', NULL, '2026-10-15T00:00:00Z', now()),
   ('cb000000-0000-4000-8000-0000000000a5', 'c1000000-0000-4000-8000-00000000000a', NULL, 'Ben Cruz', NULL, '2026-10-28T00:00:00Z', now()),
@@ -118,6 +115,7 @@ INSERT INTO club_players (id, club_id, player_id, display_name, nickname, added_
   ('cb000000-0000-4000-8000-0000000000b2', 'c1000000-0000-4000-8000-00000000000b', '91000000-0000-4000-8000-000000000003', 'Maria Santos', 'Mars', '2026-10-12T00:00:00Z', now());
 
 INSERT INTO club_player_private_inputs (club_player_id, club_id, phone_e164, captured_at, updated_at) VALUES
+  ('cb000000-0000-4000-8000-0000000000a2', 'c1000000-0000-4000-8000-00000000000a', '+639175550102', '2026-10-09T00:00:00Z', now()),
   ('cb000000-0000-4000-8000-0000000000a5', 'c1000000-0000-4000-8000-00000000000a', '+639175550199', '2026-10-28T00:00:00Z', now());
 
 INSERT INTO club_venues (id, club_id, name, address, court_fee_per_court_hour_minor, entrance_fee_minor, updated_at) VALUES
@@ -162,7 +160,7 @@ INSERT INTO devices (id, club_id, label, registered_at, updated_at) VALUES
 INSERT INTO session_players (id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present,
   present_changed_at, skill_level_id, confirmed_at, joined_at, updated_at) VALUES
   ('e1000000-0000-4000-8000-0000000a1001', 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a1', 'cb000000-0000-4000-8000-0000000000a1', '91000000-0000-4000-8000-000000000001', 'Juan Dela Cruz', true, '2026-10-20T10:05:00Z', 4, '2026-10-19T00:00:01Z', '2026-10-19T00:00:01Z', now()),
-  ('e1000000-0000-4000-8000-0000000a1002', 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a1', 'cb000000-0000-4000-8000-0000000000a2', '91000000-0000-4000-8000-000000000002', 'Juan Dela Cruz', true, '2026-10-20T10:05:00Z', 3, '2026-10-19T00:00:02Z', '2026-10-19T00:00:02Z', now()),
+  ('e1000000-0000-4000-8000-0000000a1002', 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a1', 'cb000000-0000-4000-8000-0000000000a2', NULL, 'Juan Dela Cruz', true, '2026-10-20T10:05:00Z', 3, '2026-10-19T00:00:02Z', '2026-10-19T00:00:02Z', now()),
   ('e1000000-0000-4000-8000-0000000a1003', 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a1', 'cb000000-0000-4000-8000-0000000000a3', NULL, 'Juan Dela Cruz', true, '2026-10-20T10:05:00Z', 4, '2026-10-19T00:00:03Z', '2026-10-19T00:00:03Z', now()),
   ('e1000000-0000-4000-8000-0000000a1004', 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a1', 'cb000000-0000-4000-8000-0000000000a4', NULL, 'Ana Reyes', true, '2026-10-20T10:05:00Z', 3, '2026-10-19T00:00:04Z', '2026-10-19T00:00:04Z', now()),
   ('e1000000-0000-4000-8000-0000000a2001', 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a2', 'cb000000-0000-4000-8000-0000000000a1', '91000000-0000-4000-8000-000000000001', 'Juan Dela Cruz', true, '2026-10-30T10:02:00Z', 4, '2026-10-29T00:00:01Z', '2026-10-29T00:00:01Z', now()),
@@ -265,7 +263,7 @@ INSERT INTO player_match_facts (id, club_id, session_id, match_id, session_playe
   played_at, format, team, winning_team, full_participation, standard_match, skill_level_snapshot_id,
   partner_entry_ids, opponent_entry_ids, fact_version) VALUES
   ('fa000000-0000-4000-8000-0000000a1001', 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a1', '3a000000-0000-4000-8000-0000000a1001', 'e1000000-0000-4000-8000-0000000a1001', 'cb000000-0000-4000-8000-0000000000a1', '91000000-0000-4000-8000-000000000001', '2026-10-20T10:35:00Z', 'doubles', 'A', 'A', true, true, 4, ARRAY['e1000000-0000-4000-8000-0000000a1002']::uuid[], ARRAY['e1000000-0000-4000-8000-0000000a1003', 'e1000000-0000-4000-8000-0000000a1004']::uuid[], 1),
-  ('fa000000-0000-4000-8000-0000000a1002', 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a1', '3a000000-0000-4000-8000-0000000a1001', 'e1000000-0000-4000-8000-0000000a1002', 'cb000000-0000-4000-8000-0000000000a2', '91000000-0000-4000-8000-000000000002', '2026-10-20T10:35:00Z', 'doubles', 'A', 'A', true, true, 3, ARRAY['e1000000-0000-4000-8000-0000000a1001']::uuid[], ARRAY['e1000000-0000-4000-8000-0000000a1003', 'e1000000-0000-4000-8000-0000000a1004']::uuid[], 1),
+  ('fa000000-0000-4000-8000-0000000a1002', 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a1', '3a000000-0000-4000-8000-0000000a1001', 'e1000000-0000-4000-8000-0000000a1002', 'cb000000-0000-4000-8000-0000000000a2', NULL, '2026-10-20T10:35:00Z', 'doubles', 'A', 'A', true, true, 3, ARRAY['e1000000-0000-4000-8000-0000000a1001']::uuid[], ARRAY['e1000000-0000-4000-8000-0000000a1003', 'e1000000-0000-4000-8000-0000000a1004']::uuid[], 1),
   ('fa000000-0000-4000-8000-0000000a1003', 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a1', '3a000000-0000-4000-8000-0000000a1001', 'e1000000-0000-4000-8000-0000000a1003', 'cb000000-0000-4000-8000-0000000000a3', NULL, '2026-10-20T10:35:00Z', 'doubles', 'B', 'A', true, true, 4, ARRAY['e1000000-0000-4000-8000-0000000a1004']::uuid[], ARRAY['e1000000-0000-4000-8000-0000000a1001', 'e1000000-0000-4000-8000-0000000a1002']::uuid[], 1),
   ('fa000000-0000-4000-8000-0000000a1004', 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a1', '3a000000-0000-4000-8000-0000000a1001', 'e1000000-0000-4000-8000-0000000a1004', 'cb000000-0000-4000-8000-0000000000a4', NULL, '2026-10-20T10:35:00Z', 'doubles', 'B', 'A', true, true, 3, ARRAY['e1000000-0000-4000-8000-0000000a1003']::uuid[], ARRAY['e1000000-0000-4000-8000-0000000a1001', 'e1000000-0000-4000-8000-0000000a1002']::uuid[], 1);
 
@@ -280,15 +278,16 @@ INSERT INTO session_result_snapshots (id, club_id, session_id, version, calculat
   ('55000000-0000-4000-8000-0000000000a1', 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a1', 1, 'prototype-reference',
    '[{"position": 1, "name": "Juan Dela Cruz", "wins": 1, "losses": 0}]', '{"mvp": null}', '{"player": "Ana Reyes"}', '{}', '2026-10-20T13:08:00Z');
 
--- Guest history: club A's same-name guest is confirmed as the unclaimed Juan (facts untouched).
+-- Guest history: club A's same-name guest is confirmed as the registered Maria (facts untouched).
+-- An attribution can only target a registered player: unclaimed profiles have no players row.
 INSERT INTO player_history_attributions (id, club_id, club_player_id, player_id, confirmed_at, confirmation_evidence, source_command_id) VALUES
-  ('a8000000-0000-4000-8000-0000000000a3', 'c1000000-0000-4000-8000-00000000000a', 'cb000000-0000-4000-8000-0000000000a3', '91000000-0000-4000-8000-000000000002',
+  ('a8000000-0000-4000-8000-0000000000a3', 'c1000000-0000-4000-8000-00000000000a', 'cb000000-0000-4000-8000-0000000000a3', '91000000-0000-4000-8000-000000000003',
    '2026-10-28T00:00:00Z', '{"check": "rtr-id", "reviewedBy": "club"}', 'c0de0000-0000-4000-8000-0000000000a8');
 
 INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, target_player_id, status, completed_at, updated_at) VALUES
   ('b0000000-0000-4000-8000-000000000001', 'player_rank', 1, 'finalization', '5e000000-0000-4000-8000-0000000000a1', '91000000-0000-4000-8000-000000000001', 'done', '2026-10-20T13:09:00Z', now());
 INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_attribution_id, target_player_id, updated_at) VALUES
-  ('b0000000-0000-4000-8000-000000000002', 'player_history', 1, 'attribution', 'a8000000-0000-4000-8000-0000000000a3', '91000000-0000-4000-8000-000000000002', now());
+  ('b0000000-0000-4000-8000-000000000002', 'player_history', 1, 'attribution', 'a8000000-0000-4000-8000-0000000000a3', '91000000-0000-4000-8000-000000000003', now());
 INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_assessment_id, updated_at) VALUES
   ('b0000000-0000-4000-8000-000000000003', 'player_rank', 1, 'assessment', 'a5000000-0000-4000-8000-0000000a3001', now());
 

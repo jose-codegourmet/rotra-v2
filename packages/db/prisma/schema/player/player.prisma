@@ -9,6 +9,17 @@ enum PlayerProfileState {
   @@map("player_profile_state")
 }
 
+/// Who can see a profile (D-2026-11-11-11). `private`: masked for visitors who are not signed in.
+/// `always_private`: name, level and games masked for everyone but the player (and the Queue Master
+/// of a session they join); the picture and banner stay public.
+enum ProfileVisibility {
+  public
+  private
+  always_private
+
+  @@map("profile_visibility")
+}
+
 model Player {
   id                   String             @id @default(uuid(7)) @db.Uuid
   fullName             String             @map("full_name")
@@ -16,6 +27,14 @@ model Player {
   avatarRef            String?            @map("avatar_ref")
   profileState         PlayerProfileState @default(unclaimed) @map("profile_state")
   hidePhoneFromClubs   Boolean            @default(false) @map("hide_phone_from_clubs")
+  /// New registrations default to private; the player raises or lowers it in Privacy and contact.
+  profileVisibility    ProfileVisibility  @default(private) @map("profile_visibility")
+  /// Hide from Player Information: left out of Queue's Add player search, RTR ID search and public
+  /// club member lists. Saved players, Admin and the public session page are unaffected.
+  hiddenFromDirectory  Boolean            @default(false) @map("hidden_from_directory")
+  /// The chosen profile banner (`profile_banners.id`); null = the default banner. A hidden or deleted
+  /// banner still resolves for players who already use it.
+  bannerId             String?            @map("banner_id")
   /// Optional self-reported snapshot; not rating credit.
   experienceMonths     Int?               @map("experience_months")
   experienceRecordedAt DateTime?          @map("experience_recorded_at") @db.Timestamptz(6)
@@ -26,6 +45,7 @@ model Player {
   updatedAt            DateTime           @updatedAt @map("updated_at") @db.Timestamptz(6)
   revision             BigInt             @default(1)
 
+  banner                ProfileBanner?               @relation(fields: [bannerId], references: [id], onDelete: Restrict)
   privateContact        PlayerPrivateContact?
   account               PlayerAccount?
   socialLinks           PlayerSocialLink[]
@@ -46,6 +66,7 @@ model Player {
   projectionJobs ProjectionJob[]            @relation("ProjectionJobTarget")
 
   @@index([fullName])
+  @@index([bannerId])
   @@map("players")
 }
 

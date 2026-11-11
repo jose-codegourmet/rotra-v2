@@ -319,3 +319,19 @@ CHECK (`data:image/%` or `https://%`), nullable `deleted_at` (soft delete; no ro
 Seeds the 24 mock characters with the same ids. No FKs: `players.avatar_ref` stores
 `character:<id>` as text. RLS enabled; no anon/authenticated/PUBLIC grants. Not applied yet; the
 public Storage bucket `profile-characters` is created by hand.
+
+## P08.1 — Visibility, hide flag, profile banners, club invite code, club-only unclaimed profiles
+
+`20261112000100_round2_profiles_banners_invites` (transactional: `BEGIN` … `COMMIT`, with the
+backfill guard run first on its own). Adds enum `profile_visibility` and `players.profile_visibility`
+(not null, default `private`; existing rows backfilled to `public`), `players.hidden_from_directory`
+(boolean, default false), `players.banner_id` (text, nullable, FK → `profile_banners.id` RESTRICT,
+indexed); table `profile_banners` like `profile_characters` (PK `id` `^[a-z]{1,24}$` or UUID, unique
+`number` > 0, index `(uploaded_at, number)`, image CHECK `''`/`data:image/%`/`https://%`, RLS, no
+anon/authenticated/PUBLIC grants) seeded with `court`, `night`, `dusk`, `ember`, `sun`, `stripe`;
+`clubs.invite_code` (text, nullable, unique, CHECK `^[A-Z0-9]{8,16}$`, existing clubs backfilled with
+10 characters). Data: unclaimed `players` rows linked from club records are moved onto those records
+(phone → private intake, nickname), their invite links deleted, RTR allocations released with the
+append-only trigger disabled for that statement, and the rows deleted; rows with immutable game,
+assessment, attribution, projection, rank, account or request references refuse the migration.
+See the migration's README.

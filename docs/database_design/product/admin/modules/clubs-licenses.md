@@ -83,7 +83,7 @@ server as `<club UUID>/<random UUID>.png`. No application schema migration is re
 
 ### Club invite code ([D-2026-11-09-08](../../../../mvp/decisions.md#d-2026-11-09-08))
 
-A `club_invite_codes`-style table (or one nullable column on `clubs`) holds one active code per club for the link `/register/[clubId]?k=<code>`. **Regenerate link** replaces the code, so the old link and its QR images stop working. Joining through the link adds the player to the club's Saved players and leaves existing members untouched.
+**Built** (migration `20261112000100_round2_profiles_banners_invites`, P08.1): one column, `clubs.invite_code` (Prisma `Club.inviteCode`), text, nullable, **unique**, CHECK `^[A-Z0-9]{8,16}$` (uppercase letters and digits; the mock generates 8 characters from `ABCDEFGHJKMNPQRSTUVWXYZ23456789`). One column was chosen over a `club_invite_codes` table because a club has exactly one active code for the link `/register/[clubId]?k=<code>`: **Regenerate link** overwrites the value, so the old link and its QR images stop working and no history is kept; null means the club has no link yet. The migration backfilled every existing club with a random 10-character code. Joining through the link adds the player to the club's Saved players and leaves existing members untouched; checking `?k=` against the column in real mode is service work that follows.
 
 Replacements use new paths, preventing stale CDN images. Previous objects are retained because
 historical result snapshots can reference them. A known rejected database write removes only its

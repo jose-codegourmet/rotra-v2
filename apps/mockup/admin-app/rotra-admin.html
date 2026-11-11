@@ -409,8 +409,14 @@ body:has(.player-select:checked) .shell-main { padding-bottom: 120px; }
 .pic-file { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 .pic-up:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
 /* A-CHARACTERS: a plain grid of the uploaded character images */
-.ch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 12px; }
-.ch-item { position: relative; }
+.ch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+/* Owner comment, November 11, 2026: every character and banner is a card: image, name, Shown/Hidden chip, Hide/Show and Delete. */
+.ch-item { position: relative; display: flex; flex-direction: column; gap: 10px; padding: 10px; }
+.ch-item.off { border-style: dashed; }
+.ch-item.off .ch-img { opacity: .4; }
+.ch-foot { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.ch-cap { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; }
+.ch-cap .ch-name { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ch-img { display: block; width: 100%; aspect-ratio: 1; padding: 0; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; background: var(--elev); cursor: pointer; transition: opacity .15s; }
 .ch-img svg, .ch-img img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .ch-img[aria-pressed="false"] { opacity: .25; }
@@ -424,7 +430,6 @@ body:has(.player-select:checked) .shell-main { padding-bottom: 120px; }
 /* A-BANNERS (owner comment, November 11, 2026): the profile banners players pick, managed like the characters. Wide tiles, 3:1. */
 .bn-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; }
 .bn-grid .ch-img { aspect-ratio: 3 / 1; border-radius: var(--r); }
-.bn-grid .ch-name { display: block; margin-top: 4px; font-size: 12px; color: var(--fg2); }
 .bn-court { background: linear-gradient(135deg, var(--accent-dim), var(--accent) 55%, var(--accent-subtle)); }
 .bn-night { background: linear-gradient(135deg, var(--elev), var(--overlay) 60%, var(--border-strong)); }
 .bn-dusk { background: linear-gradient(135deg, var(--overlay), var(--accent-dim)); }
@@ -1487,8 +1492,10 @@ function viewFlags() {
 // ---------- A-CHARACTERS ----------
 function viewChars() {
   const all = S.chars, shown = activeChars().length, hidden = all.length - shown;
-  const item = (c) => `<div class="ch-item"><button type="button" class="ch-img" data-act="charToggle" data-id="${c.id}" aria-pressed="${c.active}" aria-label="${esc(charName(c))}, ${c.active ? 'shown' : 'hidden'}" title="${c.active ? 'Shown to players. Click to hide.' : 'Hidden from players. Click to show.'}">${charArt(c)}</button>
-    <button type="button" class="ch-del" data-act="charDelete" data-id="${c.id}" aria-label="Delete ${esc(charName(c))}" title="Delete">${I.xs}</button></div>`;
+  // Owner comment, November 11, 2026 ("can these be cards"): each image is a card with its name, a Shown / Hidden chip, and Hide / Show and Delete buttons.
+  const item = (c) => `<article class="card ch-item${c.active ? '' : ' off'}" aria-label="${esc(charName(c))}, ${c.active ? 'shown' : 'hidden'}"><button type="button" class="ch-img" data-act="charToggle" data-id="${c.id}" aria-pressed="${c.active}" aria-label="${c.active ? 'Hide' : 'Show'} ${esc(charName(c))}" title="${c.active ? 'Shown to players. Click to hide.' : 'Hidden from players. Click to show.'}">${charArt(c)}</button>
+    <div class="ch-foot"><div class="ch-cap"><b class="ch-name">${esc(charName(c))}</b>${chip(c.active ? 'Shown' : 'Hidden', c.active ? 'ok' : '')}</div>
+    <div class="row"><button type="button" class="btn xs" data-act="charToggle" data-id="${c.id}">${c.active ? 'Hide' : 'Show'}</button><button type="button" class="btn xs ghost" data-act="charDelete" data-id="${c.id}" aria-label="Delete ${esc(charName(c))}">Delete</button></div></div></article>`;
   return shell(`<div class="page-head"><h1>Profile characters</h1><p class="muted">Players see the shown images, ${CHAR_PLAYER_PAGE} per page. Click an image to hide or show it. ${shown} shown${hidden ? ` · ${hidden} hidden` : ''}.</p></div>
     <label class="ch-drop" for="char-file" data-drop="chars"><input id="char-file" type="file" multiple accept="image/png,image/jpeg,image/webp" data-change="charFiles"><b>Drag images here to upload</b><span class="small">or click to choose · PNG, JPG or WebP, up to 1 MB each</span></label>
     <section class="ch-grid" aria-label="Character images">${all.map(item).join('')}</section>`);
@@ -1497,9 +1504,9 @@ function viewChars() {
 // ---------- A-BANNERS (owner comment, November 11, 2026) ----------
 function viewBanners() {
   const all = S.banners, shown = activeBanners().length, hidden = all.length - shown;
-  const item = (b) => `<div class="ch-item"><button type="button" class="ch-img" data-act="bannerToggle" data-id="${b.id}" aria-pressed="${b.active}" aria-label="${esc(bannerName(b))}, ${b.active ? 'shown' : 'hidden'}" title="${b.active ? 'Shown to players. Click to hide.' : 'Hidden from players. Click to show.'}">${bannerArt(b)}</button>
-    <span class="ch-name">${esc(bannerName(b))}</span>
-    <button type="button" class="ch-del" data-act="bannerDelete" data-id="${b.id}" aria-label="Delete ${esc(bannerName(b))}" title="Delete">${I.xs}</button></div>`;
+  const item = (b) => `<article class="card ch-item${b.active ? '' : ' off'}" aria-label="${esc(bannerName(b))}, ${b.active ? 'shown' : 'hidden'}"><button type="button" class="ch-img" data-act="bannerToggle" data-id="${b.id}" aria-pressed="${b.active}" aria-label="${b.active ? 'Hide' : 'Show'} ${esc(bannerName(b))}" title="${b.active ? 'Shown to players. Click to hide.' : 'Hidden from players. Click to show.'}">${bannerArt(b)}</button>
+    <div class="ch-foot"><div class="ch-cap"><b class="ch-name">${esc(bannerName(b))}</b>${chip(b.active ? 'Shown' : 'Hidden', b.active ? 'ok' : '')}</div>
+    <div class="row"><button type="button" class="btn xs" data-act="bannerToggle" data-id="${b.id}">${b.active ? 'Hide' : 'Show'}</button><button type="button" class="btn xs ghost" data-act="bannerDelete" data-id="${b.id}" aria-label="Delete ${esc(bannerName(b))}">Delete</button></div></div></article>`;
   return shell(`<div class="page-head"><h1>Profile banners</h1><p class="muted">The strip across the top of a player's profile card, like a Discord banner. Players pick one of the shown banners from Edit profile; they can't upload their own. Click a banner to hide or show it. ${shown} shown${hidden ? ` · ${hidden} hidden` : ''}.</p></div>
     <label class="ch-drop" for="banner-file" data-drop="banners"><input id="banner-file" type="file" multiple accept="image/png,image/jpeg,image/webp" data-change="bannerFiles"><b>Drag banners here to upload</b><span class="small">or click to choose · PNG, JPG or WebP, up to 2 MB each · cropped to 3:1</span></label>
     <section class="bn-grid" aria-label="Banner images">${all.map(item).join('')}</section>`);

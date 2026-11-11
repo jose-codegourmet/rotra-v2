@@ -65,6 +65,8 @@ export const NotPresent: Story = { args: rowAt(11) }
 export const NotPaid: Story = { args: { ...rowAt(0), paid: false } }
 export const Guest: Story = { args: { ...rowAt(0), identity: 'guest' } }
 export const Locked: Story = { args: { ...rowAt(0), levelLocked: true } }
+/** Before Start session: no Present band or switch. */
+export const BeforeStart: Story = { args: { ...rowAt(0), showPresence: false } }
 export const ReadOnly: Story = { args: { ...rowAt(0), levelLocked: true, readOnly: true } }
 export const ReadOnlyAway: Story = {
   args: { ...rowAt(11), levelLocked: true, readOnly: true, paid: false },

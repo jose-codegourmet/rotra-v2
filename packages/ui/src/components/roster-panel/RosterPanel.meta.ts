@@ -6,7 +6,7 @@ export const rosterPanelMeta = {
     'The preparation "Roster and levels" panel: Mark all present / absent and Add player, the SlotMeter, the missing-level warning, level tabs with counts, Group by, the icon List | Grid toggle ("List view" / "Grid view"), and one RosterRow or RosterCard per confirmed slot.',
   usage: [
     'A player presencePending flag passes Saving presence… through RosterRow and RosterCard without disabling switches or the roster.',
-    'Active Session settings passes readOnly to show locked levels and presence text; only Add player remains available.',
+    'showPresence=false (before Start session) hides every Present switch and Mark all present / absent. Active Session settings passes readOnly to show locked levels and presence text; only Add player remains available.',
     'Use for the Roster and levels tab of a prepared Queue Session (Q-PREPARE).',
     'Mark all present shows only while someone is not present; Mark all absent only while someone is present.',
     'Level tabs are All, Advanced, Intermediate, Beginner, and No level only while someone has none. Group by Skill group is offered on All only.',

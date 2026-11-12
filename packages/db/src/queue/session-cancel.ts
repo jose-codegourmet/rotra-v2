@@ -29,7 +29,7 @@ export async function cancelSession(
     return await prisma.$transaction(async (tx) => {
       const session = await lockSession(tx, context, sessionId)
       if (session.state === 'cancelled') return sessionDto(session)
-      await requireSessionAccess(context, session)
+      await requireSessionAccess(context, session, tx)
       const blocker = cancelBlocker(session)
       // Started meanwhile (or otherwise past prepared): nothing changes.
       if (blocker) throw new ServiceError('conflict', { state: blocker })

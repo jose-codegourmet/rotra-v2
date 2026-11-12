@@ -204,7 +204,7 @@ export async function enrollStream(
 ) {
   return prisma.$transaction(async (tx) => {
     const session = await lockSession(tx, context, input.sessionId)
-    await requireSessionAccess(context, session)
+    await requireSessionAccess(context, session, tx)
     if (!['prepared', 'active'].includes(session.state))
       throw new ServiceError('invalid', { state: 'This session can no longer be downloaded.' })
     await requireDevice(tx, context, input.deviceId)
@@ -604,7 +604,7 @@ export async function resolveConflict(
 ) {
   return prisma.$transaction(async (tx) => {
     const session = await lockSession(tx, context, input.sessionId)
-    await requireSessionAccess(context, session)
+    await requireSessionAccess(context, session, tx)
     if (session.state === 'completed' || session.state === 'invalid')
       throw new ServiceError('invalid', { state: 'This session is closed.' })
     const conflict = await tx.syncConflict.findUnique({ where: { id: input.conflictId } })

@@ -394,7 +394,7 @@ export async function finalizeSession(
         const existing = await tx.sessionFinalization.findUnique({ where: { sessionId } })
         if (existing)
           return { status: await statusDto(tx, existing), warnings: { belowMinimum: [] } }
-        await requireSessionAccess(context, session)
+        await requireSessionAccess(context, session, tx)
         if (session.state !== 'active')
           throw new ServiceError('invalid', { state: 'Only a running session can be finished.' })
         const now = new Date()
@@ -565,7 +565,7 @@ export async function invalidateSession(
       return { state: 'invalid' as const, invalidReason: session.invalidReason }
     if (session.state === 'completed' || session.state === 'finalizing')
       throw new ServiceError('invalid', { state: 'A finished session can’t be marked invalid.' })
-    await requireSessionAccess(context, session)
+    await requireSessionAccess(context, session, tx)
     if (await tx.match.count({ where: { sessionId, state: 'active' } }))
       throw new ServiceError('conflict', {
         matches: 'Finish or mark invalid every active match first.',

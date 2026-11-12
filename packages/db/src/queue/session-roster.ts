@@ -37,7 +37,7 @@ async function rosterCommand<T>(
   try {
     return await prisma.$transaction(async (tx) => {
       const session = await lockSession(tx, context, sessionId)
-      await requireSessionAccess(context, session)
+      await requireSessionAccess(context, session, tx)
       requireState(session, ['prepared', 'active'], 'This session is closed.')
       const result = await change(tx, session)
       // A match request naming anyone who stopped being present, or left the roster, closes.

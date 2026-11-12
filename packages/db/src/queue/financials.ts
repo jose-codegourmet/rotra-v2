@@ -429,7 +429,7 @@ export async function setPaid(
 ) {
   return prisma.$transaction(async (tx) => {
     const session = await lockSession(tx, context, sessionId)
-    await requireSessionAccess(context, session)
+    await requireSessionAccess(context, session, tx)
     requirePaymentsOpen(session)
     const entry = await tx.sessionPlayer.findUnique({ where: { id: input.sessionPlayerId } })
     if (!entry || entry.sessionId !== sessionId) throw new ServiceError('not_found')
@@ -457,7 +457,7 @@ export async function setPaymentMarks(
   }
   return prisma.$transaction(async (tx) => {
     const session = await lockSession(tx, context, sessionId)
-    await requireSessionAccess(context, session)
+    await requireSessionAccess(context, session, tx)
     requirePaymentsOpen(session)
     const { estimate } = await estimateFor(tx, session)
     const amountMinor = amountDuePerHead(estimate)
@@ -491,7 +491,7 @@ export async function setPaymentAmount(
   const amountMinor = centavos(input.amountMinor, 'amount', { allowNull: false }) ?? 0
   return prisma.$transaction(async (tx) => {
     const session = await lockSession(tx, context, sessionId)
-    await requireSessionAccess(context, session)
+    await requireSessionAccess(context, session, tx)
     requirePaymentsOpen(session)
     const entry = await tx.sessionPlayer.findUnique({
       where: { sessionId_clubPlayerId: { sessionId, clubPlayerId: input.clubPlayerId } },
@@ -534,7 +534,7 @@ export async function markAllPaid(
   if (!UUID.test(input.operationId)) throw new ServiceError('invalid')
   return prisma.$transaction(async (tx) => {
     const session = await lockSession(tx, context, sessionId)
-    await requireSessionAccess(context, session)
+    await requireSessionAccess(context, session, tx)
     requirePaymentsOpen(session)
     const roster = await liveRoster(tx, sessionId)
     const { estimate } = await estimateFor(tx, session)

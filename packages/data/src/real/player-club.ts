@@ -1,10 +1,19 @@
-import type { MyClub } from '../player-club/fetchers'
+import type { PlayerClub } from '../player-club/fetchers'
 import { realRequest } from './client'
 
-// ---------- Your clubs (P-OWN-PROFILE), Join club and Leave club ----------
+// ---------- Clubs card (P-PROFILE, #766), Join club and Leave club ----------
 
+/** The signed-in player's own clubs, with how they joined. Private. */
 export async function realGetMyClubs(signal?: AbortSignal) {
-  const { clubs } = await realRequest<{ clubs: MyClub[] }>('/api/me/clubs', { signal })
+  const { clubs } = await realRequest<{ clubs: PlayerClub[] }>('/api/me/clubs', { signal })
+  return clubs
+}
+/** Another player's clubs (public read): id, name, initials and logo only, never how they joined. */
+export async function realGetPlayerClubs(playerId: string, signal?: AbortSignal) {
+  const { clubs } = await realRequest<{ clubs: PlayerClub[] }>(
+    `/api/players/${encodeURIComponent(playerId)}/clubs`,
+    { signal },
+  )
   return clubs
 }
 /** Join club through a club invite link; the server checks `inviteCode` (the link's `k`, #712). */

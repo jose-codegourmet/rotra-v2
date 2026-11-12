@@ -7,6 +7,7 @@ import {
   upcomingSessions,
 } from '@rotra/data/club-page/rules'
 import { useClubPage } from '@rotra/data/club-page/useClubPage'
+import { useLeaveClub } from '@rotra/data/player-club/useLeaveClub'
 import { useThrottledRefresh } from '@rotra/data/refresh/useThrottledRefresh'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
@@ -15,6 +16,7 @@ import { ClubMemberGrid } from '@rotra/ui/club-member-grid'
 import { ClubNextUpCard } from '@rotra/ui/club-next-up-card'
 import { ClubPageHero } from '@rotra/ui/club-page-hero'
 import { ClubSessionList } from '@rotra/ui/club-session-list'
+import { ConfirmSheet } from '@rotra/ui/confirm-sheet'
 import { ErrorState } from '@rotra/ui/error-state'
 import { levelLabel } from '@rotra/ui/level-pill'
 import { PullToRefresh } from '@rotra/ui/pull-to-refresh'
@@ -74,6 +76,8 @@ export function ClubPage({ clubId }: { clubId: string }) {
   const [monthOffset, setMonthOffset] = useState(0)
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
   const [openKey, setOpenKey] = useState<string | null>(null)
+  const leaveClub = useLeaveClub()
+  const [leaving, setLeaving] = useState(false)
   if (page.data === null) notFound()
   if (!page.data)
     return page.isError ? (
@@ -90,7 +94,7 @@ export function ClubPage({ clubId }: { clubId: string }) {
     ) : (
       <Loading />
     )
-  const { club, members, sessions, signedIn } = page.data
+  const { club, members, sessions, signedIn, viewerIsMember } = page.data
   const now = Date.now()
   const upcoming = upcomingSessions(sessions)
   const next = upcoming[0] ?? null
@@ -122,7 +126,7 @@ export function ClubPage({ clubId }: { clubId: string }) {
       throttled={!refreshing.canRefresh}
       refreshing={refreshing.isRefreshing}
       updatedLabel={updatedLabel}
-      disabled={openKey !== null}
+      disabled={openKey !== null || leaving}
     >
       <main className="mx-auto flex w-full max-w-[1180px] flex-col gap-5 px-4 pt-5 pb-[120px]">
         <div className="flex flex-col gap-1.5">
@@ -143,6 +147,33 @@ export function ClubPage({ clubId }: { clubId: string }) {
           monthDone={month.done}
           joinHref={club.joinHref}
           onShare={() => void copyClubPageLink(club.id)}
+          onLeave={
+            signedIn && viewerIsMember
+              ? () => {
+                  leaveClub.reset()
+                  setLeaving(true)
+                }
+              : undefined
+          }
+        />
+        <ConfirmSheet
+          open={leaving}
+          onOpenChange={setLeaving}
+          title={`Leave ${club.name}?`}
+          consequence="You're removed from the club's saved players. Your past games stay."
+          confirmLabel="Leave club"
+          backLabel="Cancel"
+          isPending={leaveClub.isPending}
+          error={leaveClub.error?.message}
+          onConfirm={() =>
+            leaveClub.mutate(club.id, {
+              onSuccess: () => {
+                setLeaving(false)
+                toast(`You left ${club.name}`)
+              },
+              onError: (error) => toast.error(error.message),
+            })
+          }
         />
         <div className="grid grid-cols-1 items-start gap-5 min-[920px]:grid-cols-[minmax(0,1fr)_380px]">
           <div className="flex min-w-0 flex-col gap-5">

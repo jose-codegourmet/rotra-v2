@@ -8,7 +8,7 @@ import {
   useGuestRegistrationClub,
 } from '@rotra/data/player-account/useGuestRegistration'
 import { useJoinClub } from '@rotra/data/player-club/useJoinClub'
-import { useMyClubs } from '@rotra/data/player-club/useMyClubs'
+import { usePlayerClubs } from '@rotra/data/player-club/usePlayerClubs'
 import { consumeSessionReturn, rememberSessionReturn } from '@rotra/data/public-session/context'
 import { AccountLinkStatus } from '@rotra/ui/account-link-status'
 import { LinkPage } from '@rotra/ui/account-link-status/link-page'
@@ -38,7 +38,7 @@ export function GuestRegistration({
     rememberSessionReturn(returnTo)
   }, [returnTo])
   const session = useSession('player')
-  const myClubs = useMyClubs(session.data?.account.id ?? null)
+  const myClubs = usePlayerClubs(session.data?.account.id ?? null)
   const join = useJoinClub()
   const club = useGuestRegistrationClub(clubId, sessionSlug, inviteCode)
   const registration = useGuestRegistration(clubId, sessionSlug, inviteCode)

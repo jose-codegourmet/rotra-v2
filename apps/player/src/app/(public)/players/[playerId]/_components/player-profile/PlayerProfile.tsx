@@ -13,13 +13,11 @@ import { usePlayerProfile } from '@rotra/data/player/usePlayerProfile'
 import { usePlayerRank } from '@rotra/data/player/usePlayerRank'
 import { PROFILE_LOGIN_MESSAGE, PROFILE_PRIVATE_MESSAGE } from '@rotra/data/player/visibility'
 import { useMyAccount } from '@rotra/data/player-account/useMyAccount'
-import { useLeaveClub } from '@rotra/data/player-club/useLeaveClub'
-import { useMyClubs } from '@rotra/data/player-club/useMyClubs'
+import { usePlayerClubs } from '@rotra/data/player-club/usePlayerClubs'
 import { useRankingSettings } from '@rotra/data/ranking-settings'
 import { useThrottledRefresh } from '@rotra/data/refresh/useThrottledRefresh'
 import { AccountPanel } from '@rotra/ui/account-panel'
 import { Button } from '@rotra/ui/button'
-import { ConfirmSheet } from '@rotra/ui/confirm-sheet'
 import { ContactRequestStatus } from '@rotra/ui/contact-request-status'
 import { EligibilityCard } from '@rotra/ui/eligibility-card'
 import { ErrorState } from '@rotra/ui/error-state'
@@ -38,7 +36,6 @@ import { SharedRankCard } from '@rotra/ui/shared-rank-card'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { toast } from '@rotra/ui/toaster'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
 import { copyPlayerId } from '@/app/_components/copy-player-id/copyPlayerId'
 import { pictureSrc } from '@/app/_components/profile-picture/pictureSrc'
 import { useProfilePictureSheet } from '@/app/_components/profile-picture/useProfilePictureSheet'
@@ -57,8 +54,6 @@ function finishedAgo(finishedAt: string) {
     : format.format(-Math.round(hours / 24), 'day')
 }
 
-const REPORT_PROBLEM_EMAIL = 'support@rotra.example'
-
 export function PlayerProfile({ playerId }: { playerId: string }) {
   const profile = usePlayerProfile(playerId),
     rank = usePlayerRank(playerId),
@@ -75,7 +70,8 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
   const myAccount = useMyAccount(isOwn ? playerId : null),
     contactRequest = useMyContactChangeRequest(isOwn ? playerId : null),
     signOut = useSignOut('player')
-  const clubs = useMyClubs(isOwn ? playerId : null)
+  // Clubs show on every readable profile (#766); the read applies the profile's access rule.
+  const clubs = usePlayerClubs(playerId)
   const mySessions = useMySessions(isOwn ? playerId : null)
   // Own profile only: pull down (or come back to the tab) refreshes My sessions, recent games and
   // the rank, once every 10 seconds (mockup change 2026-11-12). A visitor's page has no pull.
@@ -83,9 +79,6 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
     () => Promise.all([mySessions.refetch(), games.refetch(), rank.refetch()]),
     { refreshOnReturn: isOwn },
   )
-  const leaveClub = useLeaveClub()
-  const [leaving, setLeaving] = useState<string | null>(null)
-  const leavingClub = clubs.data?.find((c) => c.id === leaving)
   const player = profile.data,
     current = rank.data
   const sharing = usePlayerShareSheet(isOwn ? playerId : null)
@@ -217,7 +210,7 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
       offline={offline}
       refreshing={refreshing.isRefreshing}
       updatedLabel={updatedLabel}
-      disabled={!isOwn || leaving !== null}
+      disabled={!isOwn}
     >
       <ProfileLayout
         side={
@@ -267,50 +260,22 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
                 onSignOut={leaveSignedOut}
               />
             ) : null}
-            {isOwn ? (
-              clubs.isPending ? (
-                <Skeleton className="h-36" />
-              ) : clubs.isError ? (
-                <ErrorState
-                  title="Couldn't load your clubs."
-                  onRetry={() => void clubs.refetch()}
-                />
-              ) : (
-                <PlayerClubsCard
-                  clubs={(clubs.data ?? []).map((club) => ({
-                    ...club,
-                    clubPageHref: `/clubs/${encodeURIComponent(club.id)}`,
-                    reportHref: `mailto:${REPORT_PROBLEM_EMAIL}?subject=${encodeURIComponent(`Problem with ${club.name}`)}&body=${encodeURIComponent(`Club: ${club.name}\nMy ROTRA player ID: ${player.rtrId}\n\nWhat went wrong:\n`)}`,
-                  }))}
-                  onLeave={(id) => {
-                    leaveClub.reset()
-                    setLeaving(id)
-                  }}
-                />
-              )
-            ) : null}
-            <ConfirmSheet
-              open={!!leavingClub}
-              onOpenChange={(next) => {
-                if (!next) setLeaving(null)
-              }}
-              title={`Leave ${leavingClub?.name ?? ''}?`}
-              consequence="You're removed from the club's saved players. Your past games stay."
-              confirmLabel="Leave club"
-              backLabel="Cancel"
-              isPending={leaveClub.isPending}
-              error={leaveClub.error?.message}
-              onConfirm={() => {
-                if (leavingClub)
-                  leaveClub.mutate(leavingClub.id, {
-                    onSuccess: () => {
-                      setLeaving(null)
-                      toast(`You left ${leavingClub.name}`)
-                    },
-                    onError: (error) => toast.error(error.message),
-                  })
-              }}
-            />
+            {clubs.isPending ? (
+              <Skeleton className="h-36" />
+            ) : clubs.isError ? (
+              <ErrorState
+                title={isOwn ? "Couldn't load your clubs." : "Couldn't load the clubs."}
+                onRetry={() => void clubs.refetch()}
+              />
+            ) : (
+              <PlayerClubsCard
+                isOwn={isOwn}
+                clubs={(clubs.data ?? []).map((club) => ({
+                  ...club,
+                  clubPageHref: `/clubs/${encodeURIComponent(club.id)}`,
+                }))}
+              />
+            )}
           </>
         }
         main={

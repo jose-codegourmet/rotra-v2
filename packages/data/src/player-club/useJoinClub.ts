@@ -8,6 +8,6 @@ export function useJoinClub() {
     mutationFn: joinClub,
     networkMode: 'always',
     onSuccess: (result) =>
-      client.invalidateQueries({ queryKey: playerClubKeys.mine(result.playerId) }),
+      client.invalidateQueries({ queryKey: playerClubKeys.player(result.playerId) }),
   })
 }

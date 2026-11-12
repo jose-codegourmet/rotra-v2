@@ -48,6 +48,8 @@ export type ClubPage = {
   }
   /** Whether the viewer is signed in with ROTRA (signed out: every name is masked) */
   signedIn: boolean
+  /** The signed-in viewer is a current member (a club player row not removed): Leave club shows (#766) */
+  viewerIsMember: boolean
   /** Registered members listed, sorted by the name shown; the count equals this list */
   members: ClubPageMember[]
   /** Every session of the club, oldest first */

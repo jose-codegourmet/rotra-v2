@@ -420,7 +420,7 @@
     "./public-session/useParticipantStats": "./src/public-session/useParticipantStats.ts",
     "./player-club/useJoinClub": "./src/player-club/useJoinClub.ts",
     "./player-club/useLeaveClub": "./src/player-club/useLeaveClub.ts",
-    "./player-club/useMyClubs": "./src/player-club/useMyClubs.ts",
+    "./player-club/usePlayerClubs": "./src/player-club/usePlayerClubs.ts",
     "./club-page/types": "./src/club-page/clubPage.types.ts",
     "./club-page/rules": "./src/club-page/clubPage.rules.ts",
     "./club-page/fetchers": "./src/club-page/fetchers.ts",

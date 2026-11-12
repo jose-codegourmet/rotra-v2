@@ -1,12 +1,13 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
-// rotra-admin.html .logo (36 px, radius 10), .logo.lg (56 px, radius 14) and .logo.acc.
+// rotra-admin.html .logo (36 px, radius 10), md (40 px: Player clubs card rows, #766), .logo.lg (56 px, radius 14) and .logo.acc.
 export const clubLogoVariants = cva(
   'grid flex-none place-items-center overflow-hidden border font-extrabold tracking-[0.5px] select-none',
   {
     variants: {
       size: {
         sm: 'size-9 rounded-[10px] text-xs',
+        md: 'size-10 rounded-[10px] text-xs',
         lg: 'size-14 rounded-[14px] text-[17px]',
       },
       tone: {

@@ -38,6 +38,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-11-02](#d-2026-11-11-02) | Join request: the player picks Join a slot or Be waitlisted, and can join from the waitlist | approved | in progress (mock app + real-mode services; migration applied 2026-11-11) | #706 | [Queue](workstreams/queue.md) |
 | [D-2026-11-11-03](#d-2026-11-11-03) | Guests and unclaimed profiles stay in their club | approved | in progress on Epic P08 (migration and services built, #749, #757; real-mode marker and history attribution still open) | #749, #757 | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
 | [D-2026-11-12-01](#d-2026-11-12-01) | Answers to the leftover questions of the November 11 round | approved 2026-11-12 | in progress on Epic P08, #748 | #748, #749–#759 | [Queue](workstreams/queue.md), [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
+| [D-2026-11-12-04](#d-2026-11-12-04) | Clubs on every readable profile; Leave club on the club page; no Report a problem | approved 2026-11-12 | in progress (#766) | #766 | [Player](workstreams/player.md) |
 
 ## Status conventions
 
@@ -336,6 +337,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - **Ranking risk accepted.** A club that adds a player can record games that count toward that player's shared rank. This is accepted for v1. The protection is Report a problem, plus Admin marking that club's sessions invalid.
   - **Linking a guest who shares a session with the saved player** (owner, November 10, 2026): the link is refused, and the Queue Master removes one of the two slots first. No ranking or payment surprises.
   - **Names for the three invites:** **Registration invite** (per guest, already exists), **Club invite link** and **Session invite** (see [D-2026-11-09-08](#d-2026-11-09-08)).
+- **Amended by:** [D-2026-11-12-04](#d-2026-11-12-04) (the Your clubs card becomes a Clubs card on every readable profile; Leave club moves to the club page; Report a problem is removed).
 - **References:** [registration screens](../screens/product/modules/player-information/access-registration.md), [identity module](../business_logic/product/player-information/modules/identity/README.md), [product terms](../product-terms.md) (Registration invite, Unclaimed profile, RTR ID).
 
 <a id="d-2026-11-09-07"></a>
@@ -677,3 +679,18 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - Drop-out notices are not closed at Start.
 - **Amends:** [D-2026-11-09-07](#d-2026-11-09-07) (three levels), [D-2026-11-09-08](#d-2026-11-09-08) (invite code), [D-2026-11-11-03](#d-2026-11-11-03) (risk accepted, Admin listing), [D-2026-11-11-11](#d-2026-11-11-11) (leftovers answered).
 - **References:** [mockup logs dated 2026-11-11](../mockup-changes/README.md), [identity database design](../database_design/product/player-information/modules/identity.md), migrations `20261112000100_round2_profiles_banners_invites` and `20261112000200`, [real-mode ticket status](README.md).
+
+<a id="d-2026-11-12-04"></a>
+### D-2026-11-12-04 — Clubs on every readable profile; Leave club on the club page; no Report a problem (#766)
+- **Decision status:** approved (owner's words logged in #766, November 12, 2026; open points decided by the implementing agent, to be confirmed by the owner)
+- **Implementation status:** in progress — built in the mockup, the mock app and real-mode source on #766; not run against a database.
+- **Ticket:** [#766](https://github.com/jose-codegourmet/rotra-v2/issues/766)
+- **Roadmap:** MVP — [Player](workstreams/player.md)
+- **Decision:**
+  - **Clubs card:** headed **Your clubs** on the own profile and **Clubs** on another player's. Each club is one row that links to the club page (`/clubs/[clubId]`): a 40 px club logo, then the club name in bold; on the own profile only, the muted “Joined via club link” / “Joined via session link” / “Added by the club” line under the name; a chevron at the right. The **Club page**, **Leave club** and **Report a problem** buttons and the “Report a problem opens your email app.” hint are removed. Empty: own “You're not in any club's saved players yet.”; another player's “No clubs yet.”
+  - **Another player's clubs:** a public read of that player's current `club_players` rows (club id, name, initials, logo). Visible whenever the profile itself is readable for that viewer, under the same rules as the profile read: a public profile for anyone, signed out included; a private profile with the same sign-in requirement as the profile; an always-private profile shows the private card, which hides everything (the read returns no clubs). How a player joined never leaves the server for anyone but that player.
+  - **Profile page:** the clubs card shows for every readable profile, own and others, in the left column; the profile no longer offers Leave club.
+  - **Leave club on the club page:** for a signed-in viewer who is a current member, the club page hero shows **Leave club** (secondary button) in place of **Join this club**, next to Share club page. It opens the existing confirm sheet unchanged (“Leave <club>?”, “You're removed from the club's saved players. Your past games stay.”, **Cancel** / **Leave club**); on success the toast is “You left <club>” and Join this club returns. The club page read adds `viewerIsMember`.
+  - **Report a problem** is removed from the Player app, with its email link and the placeholder support address.
+- **Amends:** [D-2026-11-09-06](#d-2026-11-09-06) (Your clubs card, Report a problem).
+- **References:** [mockup log](../mockup-changes/2026-11-12-player-profile-clubs-box.md), [profile screen](../screens/product/modules/player-information/profile.md), [club page screen](../screens/product/modules/player-information/club-page.md), [identity module](../business_logic/product/player-information/modules/identity/README.md).

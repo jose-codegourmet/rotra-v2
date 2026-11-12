@@ -25,6 +25,11 @@ export type ClubPageHeroProps = {
   /** The club's current invite link (`/register/<clubId>?k=<code>`) */
   joinHref: string
   onShare: () => void
+  /**
+   * Set for a signed-in viewer who is a current member (#766): Leave club shows in place of Join this
+   * club; the container opens the Leave confirm sheet.
+   */
+  onLeave?: () => void
 }
 
 const num = (n: number) => n.toLocaleString('en-US')
@@ -60,7 +65,8 @@ function StatCard({
 
 /**
  * P-CLUB-PAGE hero: the club mark and name side by side (no banner: banners are a player-profile
- * thing only), a chip row, Join this club and Share club page, and three stat cards.
+ * thing only), a chip row, Join this club (Leave club for a member) and Share club page, and three
+ * stat cards.
  */
 export function ClubPageHero({
   name,
@@ -75,6 +81,7 @@ export function ClubPageHero({
   monthDone,
   joinHref,
   onShare,
+  onLeave,
 }: ClubPageHeroProps) {
   return (
     <Card asChild>
@@ -102,9 +109,13 @@ export function ClubPageHero({
           </div>
         </div>
         <div className="flex flex-wrap gap-2 min-[920px]:absolute min-[920px]:top-4 min-[920px]:right-4">
-          <Button variant="primary" asChild>
-            <a href={joinHref}>Join this club</a>
-          </Button>
+          {onLeave ? (
+            <Button onClick={onLeave}>Leave club</Button>
+          ) : (
+            <Button variant="primary" asChild>
+              <a href={joinHref}>Join this club</a>
+            </Button>
+          )}
           <Button onClick={onShare}>
             <Icon name="share" />
             Share club page

@@ -92,6 +92,9 @@ export async function getClubPage(clubId: string, signal?: AbortSignal): Promise
       joinHref: clubJoinHref(club.id, club.inviteCode),
     },
     signedIn: !!viewerId,
+    viewerIsMember:
+      !!viewerId &&
+      state.clubPlayers.some((p) => p.clubId === clubId && p.playerId === viewerId && !p.removedAt),
     members,
     sessions,
   }

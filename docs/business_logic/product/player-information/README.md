@@ -28,7 +28,7 @@ World discovery is v2 and has no further requirements here.
 
 ## Public club page (#737, epic P07)
 
-A club has a public page in the Player app at `/clubs/[clubId]`, opened from **Your clubs** on a player's own profile ([D-2026-11-11-11](../../../mvp/decisions.md#d-2026-11-11-11)). Epic **P07**; the MVP timing is not decided (the scope freeze D-04 still governs the real-app order).
+A club has a public page in the Player app at `/clubs/[clubId]`, opened from the clubs card on any readable player profile ([D-2026-11-11-11](../../../mvp/decisions.md#d-2026-11-11-11), [D-2026-11-12-04](../../../mvp/decisions.md#d-2026-11-12-04)). A signed-in member leaves the club from its club page. Epic **P07**; the MVP timing is not decided (the scope freeze D-04 still governs the real-app order).
 
 - **What it shows.** A club header (the club's mark and name, city, member count, whether a session is happening or the next one is scheduled, **Join this club**, **Share club page**), stat cards, a **Next up** card for the soonest session, **Upcoming sessions**, a month **Calendar** with the club's complete schedule, and **Members**. **No banner**: banners belong to player profiles only.
 - **Members are registered members only.** Guests and unclaimed profiles never appear. Names are masked for visitors exactly as on the public session page and the rows don't open; signed-in players see names and open the player profile dialog. An always-private member shows a masked name with their picture; a member who turned on **Hide from Player Information** is not listed. The member count equals the members listed.

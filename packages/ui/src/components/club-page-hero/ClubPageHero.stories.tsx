@@ -41,6 +41,8 @@ export const NothingScheduled: Story = {
     monthDone: 0,
   },
 }
+export const Member: Story = { args: { onLeave: fn() } }
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
 export const ScheduledLight: Story = { globals: { theme: 'light' } }
 export const PlayingNowLight: Story = { ...PlayingNow, globals: { theme: 'light' } }
+export const MemberLight: Story = { ...Member, globals: { theme: 'light' } }

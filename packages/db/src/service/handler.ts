@@ -68,6 +68,7 @@ export const PUBLIC_READS = [
   'public-session.page',
   'player.public-profile',
   'player.match-history',
+  'player.public-clubs',
   'leaderboard.list',
   'ranking.settings',
   'profile-character.shown',

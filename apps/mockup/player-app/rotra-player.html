@@ -865,7 +865,6 @@ const MY_SESSIONS = [
 // Finished sessions shown in My sessions (ids from MIGS_SESSIONS). `published` is false until the Queue Master publishes the results (D-2026-11-09-08).
 const MY_FINISHED = ['m1', 'm2'];
 const VIA = { club_link: 'Joined via club link', session_link: 'Joined via session link', added_by_club: 'Added by the club' };
-const SUPPORT_EMAIL = 'support@rotra.example'; // placeholder: the owner supplies the real address before the real-app ticket ships
 const PLACES = [['CEB', 'Cebu City'], ['LAP', 'Lapu-Lapu'], ['MDE', 'Mandaue'], ['MNL', 'Manila'], ['DVO', 'Davao'], ['ILO', 'Iloilo'], ['BCD', 'Bacolod'], ['TAG', 'Tagbilaran']];
 const seedClubs = () => [{ id: 'c1', via: 'club_link' }, { id: 'c2', via: 'added_by_club' }];
 function seedAccounts() {
@@ -1304,7 +1303,7 @@ function viewProfile() {
           <span class="hint">Shows the city and date this profile was first created. It isn't where ${own ? 'you live or which club you play for' : 'this player lives or which club they play for'}.</span></div>
         ${own ? `<div class="acts"><button class="btn sm" data-act="openEdit">${I.edit} Edit profile</button><button class="btn sm" data-act="go" data-to="id">${I.qr} My player ID</button><button class="btn sm" data-act="openShare" data-kind="profile">${I.share} Share profile</button></div>` : `<div class="acts"><button class="btn sm primary" data-act="openCompare" data-id="${p.id}">${I.versus} Compare with ${S.me ? 'me' : 'my results'}</button></div>`}
       </section>
-      ${own ? privatePanel(p) + clubsPanel(p) : ''}
+      ${own ? privatePanel(p) : ''}${clubsPanel(p, own)}
     </aside>
     <div class="stack" style="gap:20px">
       ${!S.online && own ? notice('warn', 'Saved copy. Your rank and games may have changed since this device was last online.') : ''}
@@ -1380,15 +1379,19 @@ function mySessionsCard() {
   }).join('')}</div>` : '<div class="empty">No upcoming sessions. Sessions you join from a club\'s session link show here.</div>'}
     ${done.length ? `<span class="label">Finished</span><div>${done.map((s) => `<div class="srow"><span class="main"><b>${esc(s.title)}</b><span class="small muted">${fmtDay(s.ago)} · ${esc(s.club)}</span></span>${s.published ? `<button class="btn xs" data-act="openShare" data-kind="result" data-sid="${s.id}">${I.share} Share result</button>` : '<span class="small muted srow-note">Results not shared yet by the club.</span>'}</div>`).join('')}</div>` : ''}</section>`;
 }
-// Your clubs: own profile only. Leaving removes the player from the club's saved players; past games stay.
-function clubsPanel(p) {
-  const list = p.clubs || [];
-  return `<section class="card stack"><h3>Your clubs</h3>${list.length ? `<div>${list.map((c) => {
+// Clubs card (#766, November 12, 2026): on every readable profile. "Your clubs" on the own profile, "Clubs" on another player's.
+// Each club is one row that opens the club page: logo, then name; the joined-via line shows on the own profile only.
+// Leave club lives on the club page; Report a problem is gone.
+function clubsOf(p) {
+  if (S.accounts[p.id]) return (S.accounts[p.id].clubs || []);
+  return [{ id: CLUB_IDS[hashStr(`club-${p.id}`) % CLUB_IDS.length] }];
+}
+function clubsPanel(p, own) {
+  const list = clubsOf(p).filter((c) => CLUB_DIR[c.id]);
+  return `<section class="card stack"><h3>${own ? 'Your clubs' : 'Clubs'}</h3>${list.length ? `<div>${list.map((c) => {
     const club = CLUB_DIR[c.id];
-    const mail = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(`Problem with ${club.name}`)}&body=${encodeURIComponent(`Club: ${club.name}\nMy ROTRA player ID: ${p.rtr}\n\nWhat went wrong:\n`)}`;
-    return `<div class="crow">${avatar({ name: club.name })}<div class="main"><b>${esc(club.name)}</b><span class="small muted">${VIA[c.via]}</span>
-      <div class="btns"><button class="btn xs" data-act="openClub" data-id="${c.id}">Club page</button><button class="btn xs" data-act="openLeaveClub" data-id="${c.id}">Leave club</button><a class="btn xs" href="${mail}">Report a problem</a></div></div></div>`;
-  }).join('')}</div><span class="hint">Report a problem opens your email app.</span>` : '<div class="empty">You\'re not in any club\'s saved players yet.</div>'}</section>`;
+    return `<button type="button" class="crow mbtn" data-act="openClub" data-id="${c.id}">${avatar({ name: club.name })}<span class="main"><b>${esc(club.name)}</b>${own && c.via ? `<span class="small muted">${VIA[c.via]}</span>` : ''}</span><span class="muted" aria-hidden="true">${I.fwd}</span></button>`;
+  }).join('')}</div>` : `<div class="empty">${own ? 'You\'re not in any club\'s saved players yet.' : 'No clubs yet.'}</div>`}</section>`;
 }
 
 // ---------- P-CLUB-PAGE (public club page, epic P07, proposed #737) ----------
@@ -1491,7 +1494,7 @@ function viewClub() {
     <section class="card hero club-hero">
       <div class="who">${avatar({ name: club.name }, 'xxl')}<div style="min-width:0" class="stack tight"><h1>${esc(club.name)}</h1>
         <div class="club-meta">${chip(`${I.pin || ''}${esc(city)}`)}${chip(`${num(members.length)} member${members.length === 1 ? '' : 's'}`)}${next ? chip(next.live ? 'Playing now' : `Next ${fmtDay(next.ago)}`, next.live ? 'ok' : '') : ''}</div></div></div>
-      <div class="club-acts"><button class="btn primary" data-act="clubJoin" data-club="${id}">Join this club</button><button class="btn" data-act="shareClub" data-club="${id}">${I.share} Share club page</button></div>
+      <div class="club-acts">${S.me && clubsOf({ id: S.me }).some((c) => c.id === id) ? `<button class="btn" data-act="openLeaveClub" data-id="${id}">Leave club</button>` : `<button class="btn primary" data-act="clubJoin" data-club="${id}">Join this club</button>`}<button class="btn" data-act="shareClub" data-club="${id}">${I.share} Share club page</button></div>
       ${(() => {
         // Owner comment, November 11, 2026 ("cards can be redesigned better"): icon, number, label and a one-line detail per card.
         const doneMonth = all.filter((x) => x.done && monthIdx(dayOf(x.ago)) === monthIdx(new Date())).length, toCome = thisMonth - doneMonth;

@@ -248,6 +248,8 @@ export const ICONS = {
   },
   'x-small': { size: 16, strokeWidth: 2.6, body: <path d="M7 7l10 10M17 7 7 17" /> },
   back: { size: 16, strokeWidth: 2.4, body: <path d="m15 6-6 6 6 6" /> },
+  /** The prototype's I.fwd: a row chevron that opens a page (Player clubs card, #766) */
+  forward: { size: 16, strokeWidth: 2.4, body: <path d="m9 6 6 6-6 6" /> },
   arrow: { size: 18, strokeWidth: 2.2, body: <path d="M5 12h14M13 6l6 6-6 6" /> },
   play: { size: 16, strokeWidth: 0, filled: true, body: <path d="M7 4.5v15l13-7.5z" /> },
   pause: {

@@ -24,6 +24,7 @@ const sampleLogo =
   'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64"/></svg>'
 
 export const Small: Story = {}
+export const Medium: Story = { args: { size: 'md' } }
 export const Large: Story = { args: { size: 'lg' } }
 export const Accent: Story = {
   args: { initials: adminClubRows[0]?.initials ?? 'LS', tone: 'accent' },

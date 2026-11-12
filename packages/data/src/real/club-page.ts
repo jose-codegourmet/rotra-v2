@@ -13,6 +13,7 @@ type ClubPageDto = {
     inviteCode: string | null
   }
   signedIn: boolean
+  viewerIsMember: boolean
   members: ClubPageMember[]
   sessions: {
     id: string
@@ -47,6 +48,7 @@ export async function realGetClubPage(
         joinHref: clubJoinHref(page.club.id, page.club.inviteCode),
       },
       signedIn: page.signedIn,
+      viewerIsMember: page.viewerIsMember,
       members: page.members,
       sessions: page.sessions.map(({ slug, ...s }) => ({
         ...s,

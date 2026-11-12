@@ -22,6 +22,8 @@ export type ClubPageDto = {
     inviteCode: string | null
   }
   signedIn: boolean
+  /** The signed-in viewer has a current (not removed) row in this club: Leave club (#766) */
+  viewerIsMember: boolean
   members: ClubPageMember[]
   sessions: {
     id: string
@@ -76,7 +78,7 @@ export async function readClubPage(clubId: string, viewerId: string | null): Pro
     },
   })
   if (!club) throw new ServiceError('not_found')
-  const [rows, sessions] = await Promise.all([
+  const [rows, sessions, viewerRow] = await Promise.all([
     prisma.clubPlayer.findMany({
       where: {
         clubId,
@@ -107,6 +109,12 @@ export async function readClubPage(clubId: string, viewerId: string | null): Pro
         publication: { select: { state: true } },
       },
     }),
+    viewerId
+      ? prisma.clubPlayer.findFirst({
+          where: { clubId, playerId: viewerId, removedAt: null },
+          select: { id: true },
+        })
+      : null,
   ])
   const now = Date.now()
   const members = rows
@@ -139,6 +147,7 @@ export async function readClubPage(clubId: string, viewerId: string | null): Pro
       inviteCode: club.inviteCode,
     },
     signedIn: !!viewerId,
+    viewerIsMember: !!viewerRow,
     members,
     sessions: sessions.flatMap((s) => {
       const status = clubSessionStatus(s.state)

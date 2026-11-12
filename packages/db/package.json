@@ -50,6 +50,7 @@
     "./player/compare": "./src/player/compare.ts",
     "./player/leaderboard": "./src/player/leaderboard.ts",
     "./player/my-clubs": "./src/player/my-clubs.ts",
+    "./player/player-clubs": "./src/player/player-clubs.ts",
     "./player/club-page": "./src/player/club-page.ts",
     "./player/my-sessions": "./src/player/my-sessions.ts",
     "./queue/results": "./src/queue/results.ts",

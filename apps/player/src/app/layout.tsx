@@ -1,4 +1,5 @@
 import { getThemeScript } from '@rotra/ui/theme-provider/script'
+import { Analytics } from '@vercel/analytics/next'
 import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
 import { PlayerShell } from '@/app/_components/player-shell/PlayerShell'
@@ -24,6 +25,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <AppProviders>
           <PlayerShell>{children}</PlayerShell>
         </AppProviders>
+        <Analytics />
       </body>
     </html>
   )

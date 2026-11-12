@@ -1,4 +1,5 @@
 'use client'
+import { useAdminConnectivity } from '@rotra/data/admin-account/use-admin-connectivity'
 import { MockError } from '@rotra/data/mock/errors'
 import { reviewPasswordReset } from '@rotra/data/password-reset/fetchers'
 import type { ReviewPasswordResetInput } from '@rotra/data/password-reset/types'
@@ -6,7 +7,9 @@ import {
   passwordResetKeys,
   usePasswordResetRequests,
 } from '@rotra/data/password-reset/usePasswordResetRequests'
+import { useThrottledRefresh } from '@rotra/data/refresh/useThrottledRefresh'
 import { PasswordResetRequests } from '@rotra/ui/password-reset-requests'
+import { PullToRefresh } from '@rotra/ui/pull-to-refresh'
 import { Toaster, toast } from '@rotra/ui/toaster'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
@@ -16,6 +19,9 @@ export function PasswordResetRequestsPage() {
   const [page, setPage] = useState(1)
   const [link, setLink] = useState<{ requestId: string; url: string }>()
   const query = usePasswordResetRequests(page)
+  const { offline } = useAdminConnectivity()
+  // The inbox: pull down (or come back to the tab) refreshes it, once every 10 seconds (mockup change 2026-11-12).
+  const refreshing = useThrottledRefresh(() => query.refetch(), { refreshOnReturn: true })
   const cache = useQueryClient()
   const mutation = useMutation({
     mutationFn: async (input: ReviewPasswordResetInput) => {
@@ -41,7 +47,21 @@ export function PasswordResetRequestsPage() {
   const denied = useDenyOnPermissionError(query.error, accessError)
   if (denied) return null
   return (
-    <>
+    <PullToRefresh
+      onRefresh={refreshing.refresh}
+      throttled={!refreshing.canRefresh}
+      offline={offline}
+      refreshing={refreshing.isRefreshing}
+      updatedLabel={
+        query.dataUpdatedAt
+          ? new Date(query.dataUpdatedAt).toLocaleTimeString([], {
+              hour: 'numeric',
+              minute: '2-digit',
+            })
+          : undefined
+      }
+      disabled={mutation.isPending}
+    >
       <Toaster />
       <PasswordResetRequests
         data={query.data}
@@ -66,6 +86,6 @@ export function PasswordResetRequestsPage() {
           )
         }}
       />
-    </>
+    </PullToRefresh>
   )
 }

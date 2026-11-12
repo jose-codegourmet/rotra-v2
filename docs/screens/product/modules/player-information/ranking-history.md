@@ -18,6 +18,8 @@ Eligibility help states the configured recent completed standard-match threshold
 
 States: loading, no eligible players, fetch failure, refresh in progress, stale/cached data, and a profile not appearing due to eligibility. Never populate empty standings with demo people or treat ineligible as last place.
 
+Refresh in progress is reached by pulling the page down from its top (touch) or by coming back to the tab, once every 10 seconds, with the session page's `pull-to-refresh` pill (**Pull to refresh** → **Release to refresh** → **Refreshing…** → **Updated 7:42 PM**; **Refresh again in a few seconds** inside the lock; **You're offline. Reconnect and try again.** offline). It refetches the list, the signed-in player's own position and the match requirement; no polling ([November 12, 2026 mockup change](../../../../mockup-changes/2026-11-12-player-pull-to-refresh.md)).
+
 ## P-RANK-DETAIL — Explain the shared rank
 
 Explain the two inputs in plain language:

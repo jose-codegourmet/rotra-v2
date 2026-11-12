@@ -1,6 +1,8 @@
 'use client'
 
+import { useAdminConnectivity } from '@rotra/data/admin-account/use-admin-connectivity'
 import { useClubNameRequests } from '@rotra/data/club/useClubNameRequests'
+import { useThrottledRefresh } from '@rotra/data/refresh/useThrottledRefresh'
 import { ActivityLog } from '@rotra/ui/activity-log'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
@@ -10,6 +12,7 @@ import { ErrorState } from '@rotra/ui/error-state'
 import { ListRow } from '@rotra/ui/list-row'
 import { requestAgo } from '@rotra/ui/name-change-request-card/helpers'
 import { PageHeader } from '@rotra/ui/page-header'
+import { PullToRefresh } from '@rotra/ui/pull-to-refresh'
 import { Skeleton } from '@rotra/ui/skeleton'
 import Link from 'next/link'
 import { type ReactNode, useId, useMemo } from 'react'
@@ -23,6 +26,9 @@ import { useDenyOnPermissionError } from '../../../../_components/admin-workspac
  */
 export function ClubNameRequests() {
   const query = useClubNameRequests()
+  const { offline } = useAdminConnectivity()
+  // The inbox: pull down (or come back to the tab) refreshes it, once every 10 seconds (mockup change 2026-11-12).
+  const refreshing = useThrottledRefresh(() => query.refetch(), { refreshOnReturn: true })
   const requests = query.data
   const denied = useDenyOnPermissionError(query.error)
   const decidedHeadingId = useId()
@@ -100,7 +106,13 @@ export function ClubNameRequests() {
   }
 
   return (
-    <>
+    <PullToRefresh
+      onRefresh={refreshing.refresh}
+      throttled={!refreshing.canRefresh}
+      offline={offline}
+      refreshing={refreshing.isRefreshing}
+      updatedLabel={updatedAt(query.dataUpdatedAt)}
+    >
       <PageHeader
         title="Club name changes"
         description="Clubs request a new name from Club settings. It takes effect only when you approve it. Logos don't need approval."
@@ -118,6 +130,9 @@ export function ClubNameRequests() {
           </section>
         </Card>
       ) : null}
-    </>
+    </PullToRefresh>
   )
 }
+
+const updatedAt = (at: number) =>
+  at ? new Date(at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : undefined

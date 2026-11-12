@@ -6,7 +6,7 @@
 
 ## P-CLUB-PAGE — A club's public page
 
-Public, served per request, never indexed, never static. **Your clubs** on My profile has a **Club page** button per club; the Prototype menu lists club pages (visitors have no other way in yet). An unknown club id is not found. Two columns from 920 px; on phones everything stacks.
+Public, served per request, never indexed, never static. Pulling the page down from its top (touch), or coming back to the tab, refreshes its data once every 10 seconds with the session page's `pull-to-refresh` pill; nothing while the member profile sheet is open ([November 12, 2026 mockup change](../../../../mockup-changes/2026-11-12-player-pull-to-refresh.md)). **Your clubs** on My profile has a **Club page** button per club; the Prototype menu lists club pages (visitors have no other way in yet). An unknown club id is not found. Two columns from 920 px; on phones everything stacks.
 
 - **Hero card**, no banner strip (banners are a player-profile thing only): the club mark (the club's initials in a circle, the fixtures have no club picture) and the club name side by side; a chip row (city, for example **Cebu City**; **320 members**; and **Playing now** or **Next Thu, Nov 13**); **Join this club** (primary) and **Share club page** (top right on wide screens, stacked on phones).
 - **Stat cards** (one per row on phones): a round accent icon, the number with its label and a one-line detail on the right. **Registered members** · **N shown below** / **None yet**; **Upcoming sessions** · **Next DATE** / **One is happening now** / **Nothing scheduled**; **Sessions this month** · **N done · N to come**.

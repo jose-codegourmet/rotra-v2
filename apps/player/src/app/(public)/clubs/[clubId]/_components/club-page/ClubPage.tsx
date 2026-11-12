@@ -7,6 +7,7 @@ import {
   upcomingSessions,
 } from '@rotra/data/club-page/rules'
 import { useClubPage } from '@rotra/data/club-page/useClubPage'
+import { useThrottledRefresh } from '@rotra/data/refresh/useThrottledRefresh'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { ClubCalendar } from '@rotra/ui/club-calendar'
@@ -16,6 +17,7 @@ import { ClubPageHero } from '@rotra/ui/club-page-hero'
 import { ClubSessionList } from '@rotra/ui/club-session-list'
 import { ErrorState } from '@rotra/ui/error-state'
 import { levelLabel } from '@rotra/ui/level-pill'
+import { PullToRefresh } from '@rotra/ui/pull-to-refresh'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { toast } from '@rotra/ui/toaster'
 import { notFound, useRouter } from 'next/navigation'
@@ -66,6 +68,8 @@ function Loading() {
 export function ClubPage({ clubId }: { clubId: string }) {
   const router = useRouter()
   const page = useClubPage(clubId)
+  // Pull down (or come back to the tab) to refresh the next session and calendar, once every 10 seconds.
+  const refreshing = useThrottledRefresh(() => page.refetch(), { refreshOnReturn: true })
   const [shown, setShown] = useState(CLUB_MEMBERS_PAGE)
   const [monthOffset, setMonthOffset] = useState(0)
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
@@ -109,70 +113,81 @@ export function ClubPage({ clubId }: { clubId: string }) {
     live: s.status === 'live',
     href: s.href ?? '#',
   })
+  const updatedLabel = page.dataUpdatedAt
+    ? new Date(page.dataUpdatedAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+    : undefined
   return (
-    <main className="mx-auto flex w-full max-w-[1180px] flex-col gap-5 px-4 pt-5 pb-[120px]">
-      <div className="flex flex-col gap-1.5">
-        <Button size="sm" variant="ghost" className="self-start" onClick={() => router.push('/')}>
-          ← Leaderboard
-        </Button>
-      </div>
-      <ClubPageHero
-        name={club.name}
-        initials={club.initials}
-        logoUrl={club.logoUrl}
-        city={club.city}
-        memberCount={members.length}
-        membersShown={visible.length}
-        upcomingCount={upcoming.length}
-        next={next ? { live: next.status === 'live', startsAt: next.startsAt } : null}
-        monthCount={month.count}
-        monthDone={month.done}
-        joinHref={club.joinHref}
-        onShare={() => void copyClubPageLink(club.id)}
-      />
-      <div className="grid grid-cols-1 items-start gap-5 min-[920px]:grid-cols-[minmax(0,1fr)_380px]">
-        <div className="flex min-w-0 flex-col gap-5">
-          {next ? <ClubNextUpCard {...row(next)} /> : null}
-          <ClubSessionList upcomingCount={upcoming.length} rest={upcoming.slice(1).map(row)} />
-          <ClubCalendar
-            sessions={sessions}
-            referenceDate={referenceDate}
-            today={now}
-            selectedDate={selectedDay}
-            canMovePrevious={range.current + offset > range.min}
-            canMoveNext={range.current + offset < range.max}
-            onMove={(direction) => setMonthOffset(offset + direction)}
-            onToday={() => {
-              setMonthOffset(0)
-              setSelectedDay(new Date(now).setHours(0, 0, 0, 0))
-            }}
-            onSelectDay={(date) => {
-              setSelectedDay(date)
-              if (date !== null) setMonthOffset(monthIndex(date) - range.current)
-            }}
-          />
+    <PullToRefresh
+      onRefresh={refreshing.refresh}
+      throttled={!refreshing.canRefresh}
+      refreshing={refreshing.isRefreshing}
+      updatedLabel={updatedLabel}
+      disabled={openKey !== null}
+    >
+      <main className="mx-auto flex w-full max-w-[1180px] flex-col gap-5 px-4 pt-5 pb-[120px]">
+        <div className="flex flex-col gap-1.5">
+          <Button size="sm" variant="ghost" className="self-start" onClick={() => router.push('/')}>
+            ← Leaderboard
+          </Button>
         </div>
-        <aside className="flex min-w-0 flex-col gap-5">
-          <ClubMemberGrid
-            members={visible.map((m) => ({
-              key: m.key,
-              name: m.name,
-              picture: picture(m),
-              caption: m.isYou ? 'You' : levelLabel(m.level),
-              openable: signedIn && !m.masked,
-            }))}
-            totalCount={members.length}
-            signedIn={signedIn}
-            onShowMore={() => setShown((n) => n + CLUB_MEMBERS_PAGE)}
-            seeAllHref={`/clubs/${encodeURIComponent(club.id)}/members`}
-            onOpen={setOpenKey}
-          />
-        </aside>
-      </div>
-      <MemberProfile
-        member={members.find((m) => m.key === openKey) ?? null}
-        onClose={() => setOpenKey(null)}
-      />
-    </main>
+        <ClubPageHero
+          name={club.name}
+          initials={club.initials}
+          logoUrl={club.logoUrl}
+          city={club.city}
+          memberCount={members.length}
+          membersShown={visible.length}
+          upcomingCount={upcoming.length}
+          next={next ? { live: next.status === 'live', startsAt: next.startsAt } : null}
+          monthCount={month.count}
+          monthDone={month.done}
+          joinHref={club.joinHref}
+          onShare={() => void copyClubPageLink(club.id)}
+        />
+        <div className="grid grid-cols-1 items-start gap-5 min-[920px]:grid-cols-[minmax(0,1fr)_380px]">
+          <div className="flex min-w-0 flex-col gap-5">
+            {next ? <ClubNextUpCard {...row(next)} /> : null}
+            <ClubSessionList upcomingCount={upcoming.length} rest={upcoming.slice(1).map(row)} />
+            <ClubCalendar
+              sessions={sessions}
+              referenceDate={referenceDate}
+              today={now}
+              selectedDate={selectedDay}
+              canMovePrevious={range.current + offset > range.min}
+              canMoveNext={range.current + offset < range.max}
+              onMove={(direction) => setMonthOffset(offset + direction)}
+              onToday={() => {
+                setMonthOffset(0)
+                setSelectedDay(new Date(now).setHours(0, 0, 0, 0))
+              }}
+              onSelectDay={(date) => {
+                setSelectedDay(date)
+                if (date !== null) setMonthOffset(monthIndex(date) - range.current)
+              }}
+            />
+          </div>
+          <aside className="flex min-w-0 flex-col gap-5">
+            <ClubMemberGrid
+              members={visible.map((m) => ({
+                key: m.key,
+                name: m.name,
+                picture: picture(m),
+                caption: m.isYou ? 'You' : levelLabel(m.level),
+                openable: signedIn && !m.masked,
+              }))}
+              totalCount={members.length}
+              signedIn={signedIn}
+              onShowMore={() => setShown((n) => n + CLUB_MEMBERS_PAGE)}
+              seeAllHref={`/clubs/${encodeURIComponent(club.id)}/members`}
+              onOpen={setOpenKey}
+            />
+          </aside>
+        </div>
+        <MemberProfile
+          member={members.find((m) => m.key === openKey) ?? null}
+          onClose={() => setOpenKey(null)}
+        />
+      </main>
+    </PullToRefresh>
   )
 }

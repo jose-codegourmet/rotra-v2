@@ -169,6 +169,7 @@
     "./progress-bar": "./src/components/progress-bar/ProgressBar.tsx",
     "./public-participant-tile": "./src/components/public-participant-tile/PublicParticipantTile.tsx",
     "./public-refresh-bar": "./src/components/public-refresh-bar/PublicRefreshBar.tsx",
+    "./pull-to-refresh": "./src/components/pull-to-refresh/PullToRefresh.tsx",
     "./queue-search-field": "./src/components/queue-search-field/QueueSearchField.tsx",
     "./queue-grid": "./src/components/queue-grid/QueueGrid.tsx",
     "./rank-explanation": "./src/components/rank-explanation/RankExplanation.tsx",

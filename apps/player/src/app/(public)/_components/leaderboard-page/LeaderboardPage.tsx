@@ -8,6 +8,7 @@ import { PLAYING_LEVELS } from '@rotra/data/player/types'
 import { usePlayerProfile } from '@rotra/data/player/usePlayerProfile'
 import { usePlayerRank } from '@rotra/data/player/usePlayerRank'
 import { useRankingSettings } from '@rotra/data/ranking-settings'
+import { useThrottledRefresh } from '@rotra/data/refresh/useThrottledRefresh'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { ErrorState } from '@rotra/ui/error-state'
@@ -20,6 +21,7 @@ import { MyPositionCard } from '@rotra/ui/my-position-card'
 import { Notice } from '@rotra/ui/notice'
 import { PageHeader } from '@rotra/ui/page-header'
 import { PhotoViewer } from '@rotra/ui/photo-viewer'
+import { PullToRefresh } from '@rotra/ui/pull-to-refresh'
 import { type PodiumEntry, TopThreePodium } from '@rotra/ui/top-three-podium'
 import { type InfiniteData, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
@@ -54,6 +56,11 @@ export function LeaderboardPage() {
   const total = board.data?.pages[0]?.total ?? 0
   const nameSearch = Boolean(query.trim()) && !/^RTR-/i.test(query.trim())
   const active = nameSearch ? search : board
+  // Pull down (or come back to the tab) to refresh the list, once every 10 seconds (mockup change 2026-11-12).
+  const refreshing = useThrottledRefresh(
+    () => Promise.all([active.refetch(), position.refetch(), settings.refetch()]),
+    { refreshOnReturn: true },
+  )
   const loading =
     dev.leaderboardScenario === 'loading' ||
     (active.isPending && !active.data) ||
@@ -159,143 +166,153 @@ export function LeaderboardPage() {
     isMe: entry.id === account?.id,
   }))
   return (
-    <main className="mx-auto flex max-w-[920px] flex-col gap-5 px-[max(16px,env(safe-area-inset-left,0px))] pt-5 pb-[120px]">
-      <PageHeader
-        eyebrow="Overall ROTRA ranking"
-        className="[&>div>div:first-child]:text-xs [&>div>div:first-child]:font-semibold [&>div>div:first-child]:tracking-[0.6px] [&>div>div:first-child]:text-fg2 [&>div>div:first-child]:uppercase"
-        title="Leaderboard"
-        description="One list across every club. Singles and doubles share one rank."
-      />
-      {podium ? (
-        <TopThreePodium
-          entries={podiumEntries as [PodiumEntry, PodiumEntry, PodiumEntry]}
-          totalPlayers={total}
-          onSelect={(i) => {
-            const entry = entries[i]
-            if (entry) openProfile(entry.id)
-          }}
+    <PullToRefresh
+      onRefresh={refreshing.refresh}
+      throttled={!refreshing.canRefresh}
+      offline={dev.offline}
+      refreshing={refreshing.isRefreshing}
+      updatedLabel={savedAt ?? undefined}
+    >
+      <main className="mx-auto flex max-w-[920px] flex-col gap-5 px-[max(16px,env(safe-area-inset-left,0px))] pt-5 pb-[120px]">
+        <PageHeader
+          eyebrow="Overall ROTRA ranking"
+          className="[&>div>div:first-child]:text-xs [&>div>div:first-child]:font-semibold [&>div>div:first-child]:tracking-[0.6px] [&>div>div:first-child]:text-fg2 [&>div>div:first-child]:uppercase"
+          title="Leaderboard"
+          description="One list across every club. Singles and doubles share one rank."
         />
-      ) : null}
-      {account && own.data && requirement !== undefined ? (
-        <MyPositionCard
-          fullName={own.data.fullName}
-          picture={{
-            src: ownProfile.data
-              ? pictureSrc(ownProfile.data.picture, account.id, ownProfile.data.fullName)
-              : undefined,
-          }}
-          levelLabel={
-            own.data.levelIndex === null
-              ? undefined
-              : levelLabel(PLAYING_LEVELS[own.data.levelIndex] ?? '')
-          }
-          position={own.data.position === null ? undefined : (position.data ?? own.data.position)}
-          onViewPicture={(() => {
-            const src = ownProfile.data
-              ? pictureSrc(ownProfile.data.picture, account.id, ownProfile.data.fullName)
-              : undefined
-            return src
-              ? () =>
-                  photo.show({
-                    src,
-                    name: own.data?.fullName ?? ownProfile.data?.fullName ?? 'You',
-                  })
-              : undefined
-          })()}
-          onShowMyRow={() => {
-            setQuery('')
-            setJumpToMe(true)
-          }}
-          onOpenProfile={() => openProfile(account.id)}
-          status={notListedStatus}
-        />
-      ) : null}
-      <Card className="flex flex-col gap-4">
-        <LeaderboardSearch
-          value={query}
-          onChange={changeQuery}
-          onFindId={(id) => router.push(`/find/${encodeURIComponent(id.trim().toUpperCase())}`)}
-        />
-        {dev.offline && active.data && savedAt && !failed ? (
-          <Notice tone="warn">
-            Saved copy from {savedAt}. Positions may have changed since then.
-          </Notice>
+        {podium ? (
+          <TopThreePodium
+            entries={podiumEntries as [PodiumEntry, PodiumEntry, PodiumEntry]}
+            totalPlayers={total}
+            onSelect={(i) => {
+              const entry = entries[i]
+              if (entry) openProfile(entry.id)
+            }}
+          />
         ) : null}
-        {failed ? (
-          <ErrorState
-            title="Couldn't load the leaderboard."
-            onRetry={retry}
-            retrying={active.isFetching}
-          >
-            Check your connection, then try again.
-          </ErrorState>
-        ) : loading ? (
-          <LeaderboardList loading />
-        ) : empty ? (
-          <p className="py-5 text-center text-sm text-fg2" role="status">
-            No players qualify for the leaderboard yet. Players appear after {requirement} standard
-            matches in the last three months.
-          </p>
-        ) : nameSearch && search.data?.total === 0 ? (
-          <p className="py-5 text-center text-sm text-fg2" aria-live="polite">
-            No one on the leaderboard matches “{query.trim()}”. Players below the match requirement
-            aren't listed here.
-          </p>
-        ) : (
-          <>
-            {nameSearch && search.data ? (
-              <p className="text-sm text-fg2" aria-live="polite">
-                {search.data.total} {search.data.total === 1 ? 'player matches' : 'players match'} “
-                {query.trim()}”.{search.data.total > 50 ? ' Showing the first 50.' : ''}
-              </p>
-            ) : null}
-            <LeaderboardList
-              busy={active.isFetching}
-              shown={nameSearch ? undefined : entries.length}
-              total={nameSearch ? undefined : total}
-              onShowMore={
-                board.hasNextPage
-                  ? () => {
-                      if (!board.isFetching) void board.fetchNextPage()
-                    }
-                  : undefined
-              }
+        {account && own.data && requirement !== undefined ? (
+          <MyPositionCard
+            fullName={own.data.fullName}
+            picture={{
+              src: ownProfile.data
+                ? pictureSrc(ownProfile.data.picture, account.id, ownProfile.data.fullName)
+                : undefined,
+            }}
+            levelLabel={
+              own.data.levelIndex === null
+                ? undefined
+                : levelLabel(PLAYING_LEVELS[own.data.levelIndex] ?? '')
+            }
+            position={own.data.position === null ? undefined : (position.data ?? own.data.position)}
+            onViewPicture={(() => {
+              const src = ownProfile.data
+                ? pictureSrc(ownProfile.data.picture, account.id, ownProfile.data.fullName)
+                : undefined
+              return src
+                ? () =>
+                    photo.show({
+                      src,
+                      name: own.data?.fullName ?? ownProfile.data?.fullName ?? 'You',
+                    })
+                : undefined
+            })()}
+            onShowMyRow={() => {
+              setQuery('')
+              setJumpToMe(true)
+            }}
+            onOpenProfile={() => openProfile(account.id)}
+            status={notListedStatus}
+          />
+        ) : null}
+        <Card className="flex flex-col gap-4">
+          <LeaderboardSearch
+            value={query}
+            onChange={changeQuery}
+            onFindId={(id) => router.push(`/find/${encodeURIComponent(id.trim().toUpperCase())}`)}
+          />
+          {dev.offline && active.data && savedAt && !failed ? (
+            <Notice tone="warn">
+              Saved copy from {savedAt}. Positions may have changed since then.
+            </Notice>
+          ) : null}
+          {failed ? (
+            <ErrorState
+              title="Couldn't load the leaderboard."
+              onRetry={retry}
+              retrying={active.isFetching}
             >
-              {shownEntries.map((entry) => (
-                <LeaderboardRow
-                  key={entry.id}
-                  id={`leaderboard-${entry.id}`}
-                  position={entry.position}
-                  masked={'masked' in entry && !!entry.masked}
-                  fullName={entry.fullName}
-                  nickname={entry.nickname}
-                  picture={{ src: pictureSrc(entry.pictureUrl, entry.id, entry.fullName) }}
-                  levelLabel={
-                    'levelHidden' in entry && entry.levelHidden
-                      ? ''
-                      : levelLabel(entry.playingLevel)
-                  }
-                  isMe={entry.id === account?.id}
-                  variant={entry.position <= 3 ? `medal-${entry.position as 1 | 2 | 3}` : undefined}
-                  onSelect={() => openProfile(entry.id)}
-                />
-              ))}
-            </LeaderboardList>
-          </>
-        )}
-        {dev.offline && active.data && !failed ? (
-          <Button size="sm" className="self-start" onClick={retry}>
-            Try again
-          </Button>
+              Check your connection, then try again.
+            </ErrorState>
+          ) : loading ? (
+            <LeaderboardList loading />
+          ) : empty ? (
+            <p className="py-5 text-center text-sm text-fg2" role="status">
+              No players qualify for the leaderboard yet. Players appear after {requirement}{' '}
+              standard matches in the last three months.
+            </p>
+          ) : nameSearch && search.data?.total === 0 ? (
+            <p className="py-5 text-center text-sm text-fg2" aria-live="polite">
+              No one on the leaderboard matches “{query.trim()}”. Players below the match
+              requirement aren't listed here.
+            </p>
+          ) : (
+            <>
+              {nameSearch && search.data ? (
+                <p className="text-sm text-fg2" aria-live="polite">
+                  {search.data.total} {search.data.total === 1 ? 'player matches' : 'players match'}{' '}
+                  “{query.trim()}”.{search.data.total > 50 ? ' Showing the first 50.' : ''}
+                </p>
+              ) : null}
+              <LeaderboardList
+                busy={active.isFetching}
+                shown={nameSearch ? undefined : entries.length}
+                total={nameSearch ? undefined : total}
+                onShowMore={
+                  board.hasNextPage
+                    ? () => {
+                        if (!board.isFetching) void board.fetchNextPage()
+                      }
+                    : undefined
+                }
+              >
+                {shownEntries.map((entry) => (
+                  <LeaderboardRow
+                    key={entry.id}
+                    id={`leaderboard-${entry.id}`}
+                    position={entry.position}
+                    masked={'masked' in entry && !!entry.masked}
+                    fullName={entry.fullName}
+                    nickname={entry.nickname}
+                    picture={{ src: pictureSrc(entry.pictureUrl, entry.id, entry.fullName) }}
+                    levelLabel={
+                      'levelHidden' in entry && entry.levelHidden
+                        ? ''
+                        : levelLabel(entry.playingLevel)
+                    }
+                    isMe={entry.id === account?.id}
+                    variant={
+                      entry.position <= 3 ? `medal-${entry.position as 1 | 2 | 3}` : undefined
+                    }
+                    onSelect={() => openProfile(entry.id)}
+                  />
+                ))}
+              </LeaderboardList>
+            </>
+          )}
+          {dev.offline && active.data && !failed ? (
+            <Button size="sm" className="self-start" onClick={retry}>
+              Try again
+            </Button>
+          ) : null}
+        </Card>
+        {settings.data ? (
+          <LeaderboardRulesCard
+            matchRequirement={settings.data.matchRequirement}
+            onOpenRankDetail={() => router.push('/rank')}
+          />
         ) : null}
-      </Card>
-      {settings.data ? (
-        <LeaderboardRulesCard
-          matchRequirement={settings.data.matchRequirement}
-          onOpenRankDetail={() => router.push('/rank')}
-        />
-      ) : null}
-      {photo.viewerProps ? <PhotoViewer {...photo.viewerProps} /> : null}
-    </main>
+        {photo.viewerProps ? <PhotoViewer {...photo.viewerProps} /> : null}
+      </main>
+    </PullToRefresh>
   )
 }

@@ -1,12 +1,15 @@
 'use client'
 
+import { useAdminConnectivity } from '@rotra/data/admin-account/use-admin-connectivity'
 import type { ContactRequestFilter } from '@rotra/data/contact-change-request/types'
 import { useContactRequests } from '@rotra/data/contact-change-request/useContactRequests'
+import { useThrottledRefresh } from '@rotra/data/refresh/useThrottledRefresh'
 import { Card } from '@rotra/ui/card'
 import { DataTable } from '@rotra/ui/data-table'
 import { EmptyState } from '@rotra/ui/empty-state'
 import { ErrorState } from '@rotra/ui/error-state'
 import { PageHeader } from '@rotra/ui/page-header'
+import { PullToRefresh } from '@rotra/ui/pull-to-refresh'
 import { SegmentedControl } from '@rotra/ui/segmented-control'
 import { usePathname, useRouter } from 'next/navigation'
 import { useMemo, useState } from 'react'
@@ -38,6 +41,9 @@ export function ContactRequestsPage({ status: initialStatus }: { status: Contact
   const [status, setStatus] = useState(initialStatus)
   // keepPreviousData: the last rows stay on screen while another filter loads.
   const list = useContactRequests({ status })
+  const { offline } = useAdminConnectivity()
+  // The inbox: pull down (or come back to the tab) refreshes it, once every 10 seconds (mockup change 2026-11-12).
+  const refreshing = useThrottledRefresh(() => list.refetch(), { refreshOnReturn: true })
   const denied = useDenyOnPermissionError(list.error)
   const query = listQuery(status)
   const columns = useMemo(
@@ -55,7 +61,13 @@ export function ContactRequestsPage({ status: initialStatus }: { status: Contact
   if (denied) return null
 
   return (
-    <>
+    <PullToRefresh
+      onRefresh={refreshing.refresh}
+      throttled={!refreshing.canRefresh}
+      offline={offline}
+      refreshing={refreshing.isRefreshing}
+      updatedLabel={updatedAt(list.dataUpdatedAt)}
+    >
       <PageHeader
         title="Contact changes"
         description="Players ask to change the phone number or email they sign in with. Nothing changes until you approve it and the change is applied."
@@ -104,6 +116,9 @@ export function ContactRequestsPage({ status: initialStatus }: { status: Contact
           />
         </section>
       </Card>
-    </>
+    </PullToRefresh>
   )
 }
+
+const updatedAt = (at: number) =>
+  at ? new Date(at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : undefined

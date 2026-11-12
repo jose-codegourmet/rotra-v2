@@ -22,9 +22,12 @@ import { assertE2eEnv } from './guard.ts'
 
 const env = process.env
 // `next dev` runs a CLI parent that forks the request-serving child; only the child gets the clock.
-const isNextCli = /[\\/]next[\\/]dist[\\/]bin[\\/]next$/.test(process.argv[1] ?? '')
+// `next start` serves from the CLI process itself, so it keeps the clock. `next build` runs with
+// ROTRA_E2E_CLOCK=0 (see playwright.config.ts), so it never gets one.
+const isNextDevCli =
+  /[\\/]next[\\/]dist[\\/]bin[\\/]next$/.test(process.argv[1] ?? '') && process.argv[2] === 'dev'
 
-if (env.ROTRA_E2E_CLOCK === '1' && !isNextCli && !globalThis.__rotraE2eClock) {
+if (env.ROTRA_E2E_CLOCK === '1' && !isNextDevCli && !globalThis.__rotraE2eClock) {
   assertE2eEnv(env)
   const port = Number(env.ROTRA_E2E_CLOCK_PORT)
   const stateFile = env.ROTRA_E2E_CLOCK_STATE

@@ -9,6 +9,9 @@ real-life disruptions happen. Decision: [D-2026-11-12-05](mvp/decisions.md#d-202
   guard (`apps/e2e/src/guard.ts`) refuses anything else. Never a hosted project.
 - The server test clock loads only through the e2e runner, only with `ROTRA_E2E_CLOCK=1`, and never
   runs earlier than real time.
+- The apps run **built** (`next build` + `next start`, into `.next-e2e`), locally and on GitHub, so
+  the suite tests what ships. Each run builds first (a few minutes). `E2E_DEV=1` runs `next dev`
+  instead, for fast restarts while writing a test.
 - Not part of `make check`. Run it on demand. Offline mode is not covered.
 
 ## Pass rules
@@ -26,6 +29,7 @@ make e2e-ui                                  # Playwright UI mode, watch mode on
 make e2e-down                                # stop the local stack
 E2E_SEEDS=5 make e2e                         # number of random seeds for REG-09
 E2E_SEED=2189437517 make e2e E2E_ARGS="-g REG-09"   # replay one seed
+E2E_DEV=1 make e2e E2E_ARGS="-g REG-01"      # next dev instead of the built apps
 ```
 
 ## Watch a scenario

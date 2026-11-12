@@ -8,7 +8,9 @@ import { APPS, type AppName, appServerEnv, appUrl, e2eEnv, readStackKeys } from 
  *   sim  API-only simulations, one worker, in order (the server clock is global)
  *   ui   Chromium
  * Pick with `--project sim|ui` or E2E_SUITE=sim|ui. Both depend on `setup`, which seeds once.
- * Locally the apps run `next dev`; with CI=true they run `next build` + `next start`.
+ * The apps run built (`next build` + `next start`, into their own `.next-e2e`), locally and on CI,
+ * so the suite tests what ships. E2E_DEV=1 runs `next dev` instead for fast restarts while writing
+ * a test (ignored on CI).
  */
 const keys = readStackKeys()
 const env = e2eEnv(keys)
@@ -19,6 +21,7 @@ Object.assign(process.env, env)
 const ci = process.env.CI === 'true'
 const suite = process.env.E2E_SUITE
 const watch = process.env.E2E_WATCH === '1'
+const dev = process.env.E2E_DEV === '1' && !ci
 
 function webServer(app: AppName) {
   const { dir, port } = APPS[app]
@@ -27,11 +30,14 @@ function webServer(app: AppName) {
   return {
     name: app,
     cwd: `../../${dir}`,
-    command: ci ? `${next} build && ${next} start ${host}` : `${next} dev ${host}`,
+    // The build never gets the test clock; `next start` does (src/server-clock.mjs).
+    command: dev
+      ? `${next} dev ${host}`
+      : `ROTRA_E2E_CLOCK=0 ${next} build && ${next} start ${host}`,
     url: `${appUrl(app)}/api/auth/session`,
     env: appServerEnv(keys, app),
     reuseExistingServer: false,
-    timeout: ci ? 600_000 : 180_000,
+    timeout: dev ? 180_000 : 600_000,
     stdout: 'pipe' as const,
     stderr: 'pipe' as const,
   }

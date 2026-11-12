@@ -3,7 +3,7 @@
 > **Entry point for AI coding agents.** Read this file completely; it is deliberately short. Everything
 > else is loaded **on demand** through the routing table in §3. Don't read the whole `docs/` tree.
 
-**Last verified:** 2026-11-08 · **Budget:** under 200 lines.
+**Last verified:** 2026-11-12 · **Budget:** under 200 lines.
 
 ---
 
@@ -68,6 +68,7 @@ Status: [docs/mvp/README.md](docs/mvp/README.md). Keep UI/hook contracts stable.
 ```text
 apps/                     queue · player · admin (Next.js 16); each has its own AGENTS.md for Next 16 docs
 apps/mockup/             canonical editable HTML prototypes and notes
+apps/e2e/                Playwright regression suite (real mode, local Supabase only)
 packages/
   ui/                     every visual component and form + the one Storybook (see its AGENTS.md)
   data/                   types, fixtures, mock store, fetchers, query keys, hooks
@@ -119,6 +120,7 @@ email-templates/          auth email HTML, pasted into the Supabase dashboard by
 | A **layout / UI change** request | [mockup-changes/README.md](docs/mockup-changes/README.md) → the app's mockup → its business module + database design |
 | Turning **mockup changes into tickets** | [mockup-changes/README.md](docs/mockup-changes/README.md) → [ways-of-working.md](docs/ways-of-working.md) §3 |
 | **MVP scope, status, or decisions** | [mvp/README.md](docs/mvp/README.md) → the workstream page → [mvp/decisions.md](docs/mvp/decisions.md) |
+| **Regression / e2e suite** | [regression.md](docs/regression.md) |
 | **Two docs disagree** | [ways-of-working.md](docs/ways-of-working.md) §2 |
 
 **Rule:** if a file you loaded didn't change what you wrote, you didn't need it.
@@ -148,6 +150,7 @@ nvm use && pnpm lint                         # Biome
 nvm use && pnpm type-check
 nvm use && pnpm build
 make check                                   # lint, type-check, build, decided-math tests; errors only
+make e2e                                     # regression suite on a local Supabase; on demand only
 ```
 
 ---
@@ -175,6 +178,8 @@ it's done and merged, check the issue is closed and close it yourself (`gh issue
   `GIT_SEQUENCE_EDITOR=: git rebase -i --autosquash <base>`. One commit = one ticket.
 - **Tests, for now:** no new screen, component or Storybook tests. The decided-math tests stay in
   `make check`. Testing switches back on when Supabase/Prisma is connected or real clubs use the app.
+  Exception: the e2e regression suite (`apps/e2e`, [regression.md](docs/regression.md)) runs on
+  demand, never in `make check`.
 - **Browser click-throughs, screenshots, Storybook visual checks:** only at the end of a batch, or when
   the owner asks.
 - **Agent tiers:** medium by default; light for checks and mechanical edits; careful/heavy only when

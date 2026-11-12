@@ -38,7 +38,7 @@ export const You: Story = {
       registeredCity: 'Cebu City',
       rtrId: 'RTR-PH-CEB-040226-0001',
       stats: { games: 12, wins: 8, losses: 4 },
-      banner: 'dusk',
+      bannerKey: 'dusk',
     },
   },
 }
@@ -54,7 +54,7 @@ export const NoGames: Story = {
       registeredCity: null,
       rtrId: null,
       stats: { games: 0, wins: 0, losses: 0 },
-      banner: 'stripe',
+      bannerKey: 'stripe',
     },
   },
 }
@@ -63,3 +63,15 @@ export const Private: Story = { args: { profile: { kind: 'private', name: 'M*** 
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
 export const PublicLight: Story = { globals: { theme: 'light' } }
 export const PrivateLight: Story = { ...Private, globals: { theme: 'light' } }
+
+export const UploadedBanner: Story = {
+  args: {
+    profile: {
+      ...meta.args.profile,
+      bannerKey: 'uploaded',
+      bannerImageUrl: `data:image/svg+xml;utf8,${encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400"><rect width="1000" height="400" fill="hsl(210 50% 45%)"/></svg>',
+      )}`,
+    },
+  },
+}

@@ -51,6 +51,7 @@ model PlayerContactChangeRequest {
   reviewedAt              DateTime?           @map("reviewed_at") @db.Timestamptz(6)
   approvedAt              DateTime?           @map("approved_at") @db.Timestamptz(6)
   rejectedAt              DateTime?           @map("rejected_at") @db.Timestamptz(6)
+  supersededAt            DateTime?           @map("superseded_at") @db.Timestamptz(6)
   /// Set on approval and kept by every retry, so a retry never creates a second provider change.
   providerOperationRef    String?             @unique @map("provider_operation_ref") @db.Uuid
   applicationAttempts     Int                 @default(0) @map("application_attempts")

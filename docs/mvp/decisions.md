@@ -472,7 +472,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 <a id="d-2026-11-09-14"></a>
 ### D-2026-11-09-14 — Admin edits everything on a player, with a beta-only password field
 - **Decision status:** approved by the owner for **MVP or beta only** (November 9, 2026): "since admin, you should be able to edit everything. also password (for now) wrap it with *(for mvp or beta only)*". It conflicts with [D-2026-11-07-01](#d-2026-11-07-01); the owner confirmed D-2026-11-09-14 over D-2026-11-07-01 on 2026-11-10 (Jose). End date: not set (the owner has no timeline).
-- **Implementation status:** in progress — in the mock app (A07.4 picture section, A07.5 full Edit player form, A07.6 Admin edits everything, A07.7 wiring); real mode not started (needs a full-form PATCH and an admin-set password through Supabase).
+- **Implementation status:** in progress — in the mock app (A07.4 picture section, A07.5 full Edit player form, A07.6 Admin edits everything, A07.7 wiring); registered Player full-form PATCH and an admin-set password implemented in source; club-only edit is outside real-mode scope.
 - **Ticket:** #647, #648, #649, #650
 - **Roadmap:** MVP or beta — [Admin](workstreams/admin.md)
 - **Amends:** [D-2026-11-07-01](#d-2026-11-07-01) for the beta only.
@@ -480,6 +480,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - **Admin › Players › Edit** can change the player's picture ([D-2026-11-09-13](#d-2026-11-09-13)), name, nickname, playing style, experience, playing since, the four social links, Private profile, Hide phone from clubs, and phone and email (checked for format and uniqueness). A reason is required, and the change is written to the player's Activity log.
   - **Read-only:** RTR ID, created-by club, registered/unclaimed status, rank, level and match history (ranking math is not editable by Admin).
   - **Password.** The field is labelled **Password *(for MVP or beta only)***. The admin types a new password (at least 8 characters); empty leaves it unchanged; it is not available for unclaimed players. Only that it was set, and by whom, is recorded, never the password.
+- **Real-mode scope and failure handling (owner, 2026-11-12):** implement this form for registered Player profiles first. If the login email or password cannot be confirmed, keep the other changes and report the Auth failure. Email updates must remain recoverable and cannot be called applied until the provider and the saved contact agree.
 - **Conflict resolved (2026-11-10):** [D-2026-11-07-01](#d-2026-11-07-01) says "the Admin never sees" a player's password; the owner confirmed this decision over it. The field keeps the label "Password *(for MVP or beta only)*" until an end date is set; no end date is set yet.
 - **Open contact-change requests (decided 2026-11-10, Option A):** on a direct Admin phone or email edit, the open request for that field is marked "Superseded by an Admin edit" (stored as rejected plus `supersededAt`), logged in the Activity log, and can no longer be approved or applied.
 - **Picture change (2026-11-10):** an Admin save makes the old picture the previous picture on any picture change (photo, character or initials), as the Admin mockup does. Known gap: when the old picture was initials, no "Previous picture" row shows (the mockup shows one).

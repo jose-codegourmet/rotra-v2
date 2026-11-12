@@ -64,7 +64,9 @@ export function usePlayerEdit(
               id: player.id,
               revision: player.revision,
             })
-            toast.success(result.message)
+            if (result.warnings?.length)
+              toast.error(`${result.message} ${result.warnings.join(' ')}`)
+            else toast.success(result.message)
             onDone()
           } catch (failure) {
             if (failure instanceof MockError && failure.kind === 'offline')

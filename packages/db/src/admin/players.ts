@@ -5,7 +5,8 @@ import type { AdminPlayer } from '@rotra/data/admin-player/types'
 import type { PlayerSessionRecord } from '@rotra/data/player/types'
 import type { AdminContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
-import { readPlayerMatchHistory } from '../player/projections'
+import { currentExperienceMonths, playingStyle } from '../player/profile'
+import { readClubPlayerMatchHistory, readPlayerMatchHistory } from '../player/projections'
 import { requireAdmin, requireRevision } from '../service/authorize'
 import { ServiceError } from '../service/errors'
 import { recordAudit } from './audit'
@@ -183,6 +184,50 @@ export async function readAdminPlayerDirectory(
   return [...rows, ...clubOnly]
 }
 
+/** Current edit values, behind the same Admin boundary as the directory. */
+export async function readAdminPlayerEdit(context: AdminContext, playerId: string) {
+  requireAdmin(context)
+  const [row] = await readAdminPlayerDirectory(context, playerId)
+  if (!row) throw new ServiceError('not_found')
+  const player = await prisma.player.findUnique({
+    where: { id: playerId },
+    select: {
+      avatarPreviousRef: true,
+      fullName: true,
+      nickname: true,
+      personalDetails: true,
+      experienceMonths: true,
+      experienceRecordedAt: true,
+      profileVisibility: true,
+      privateContact: { select: { playerId: true } },
+      socialLinks: { select: { provider: true, url: true } },
+    },
+  })
+  const months = player
+    ? currentExperienceMonths(player.experienceMonths, player.experienceRecordedAt)
+    : null
+  const socialLinks = { facebook: '', instagram: '', youtube: '', linkedin: '' }
+  for (const link of player?.socialLinks ?? []) socialLinks[link.provider] = link.url
+  const passwordEvent = await prisma.adminAuditEvent.findFirst({
+    where: { targetType: 'player', targetId: playerId, action: 'player.password_set' },
+    orderBy: [{ occurredAt: 'desc' }, { id: 'desc' }],
+    select: { occurredAt: true },
+  })
+  return {
+    ...row,
+    name: player?.fullName ?? row.name,
+    nickname: player ? player.nickname : row.nickname,
+    playingStyle: player ? playingStyle(player.personalDetails) : '',
+    experienceYears: months == null ? null : Math.floor(months / 12),
+    experienceMonths: months == null ? null : months % 12,
+    socialLinks,
+    profilePrivate: player ? player.profileVisibility !== 'public' : false,
+    previousPicture: player?.avatarPreviousRef ?? null,
+    hasAccount: Boolean(player?.privateContact) || !player,
+    passwordSetAt: passwordEvent?.occurredAt.toISOString() ?? null,
+  }
+}
+
 /** Reuses the canonical read-only history projection, behind the Admin account boundary. */
 export async function readAdminPlayerGames(
   context: AdminContext,
@@ -194,8 +239,13 @@ export async function readAdminPlayerGames(
     where: { playerId },
     select: { playerId: true },
   })
-  if (!player) throw new ServiceError('not_found')
-  const sessions = await readPlayerMatchHistory(playerId)
+  let sessions: Awaited<ReturnType<typeof readPlayerMatchHistory>>
+  if (player) sessions = await readPlayerMatchHistory(playerId)
+  else {
+    const [clubOnly] = await readClubOnlyRecords(playerId)
+    if (!clubOnly?.createdByClubId) throw new ServiceError('not_found')
+    sessions = await readClubPlayerMatchHistory(clubOnly.createdByClubId, playerId)
+  }
   return sessions.flatMap((s) =>
     s.finishedAt
       ? [

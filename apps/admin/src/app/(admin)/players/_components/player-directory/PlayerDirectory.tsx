@@ -1,14 +1,13 @@
 'use client'
 import { useAdminConnectivity } from '@rotra/data/admin-account/use-admin-connectivity'
 import type { AdminPlayerListParams } from '@rotra/data/admin-player/types'
-import { useAdminPlayer } from '@rotra/data/admin-player/useAdminPlayer'
+import { useAdminPlayer, useAdminPlayerProfile } from '@rotra/data/admin-player/useAdminPlayer'
 import { useAdminPlayerGames } from '@rotra/data/admin-player/useAdminPlayerGames'
 import { useAdminPlayerMutations } from '@rotra/data/admin-player/useAdminPlayerMutations'
 import { useAdminPlayers } from '@rotra/data/admin-player/useAdminPlayers'
 import { appOrigin } from '@rotra/data/app-origins'
 import { useAdminClubs } from '@rotra/data/club/useAdminClubs'
 import { useContactRequests } from '@rotra/data/contact-change-request/useContactRequests'
-import { usePlayerProfile } from '@rotra/data/player/usePlayerProfile'
 import { AdminPlayerCard } from '@rotra/ui/admin-player-card'
 import { AdminPlayerFilters } from '@rotra/ui/admin-player-filters'
 import { AdminPlayerQuickView } from '@rotra/ui/admin-player-quick-view'
@@ -75,7 +74,7 @@ export function PlayerDirectory() {
   const peek = search.get('peek') ?? '',
     playerQuery = useAdminPlayer(peek, { enabled: !!peek }),
     games = useAdminPlayerGames(peek),
-    profile = usePlayerProfile(peek),
+    profile = useAdminPlayerProfile(peek),
     requests = useContactRequests({ playerId: peek }),
     edit = usePlayerEdit(peek, {
       enabled: !!peek,

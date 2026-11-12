@@ -28,6 +28,7 @@
     "./admin/audit": "./src/admin/audit.ts",
     "./admin/club-logo": "./src/admin/club-logo.ts",
     "./admin/players": "./src/admin/players.ts",
+    "./admin/player-edit": "./src/admin/player-edit.ts",
     "./admin/clubs": "./src/admin/clubs.ts",
     "./admin/club-invite": "./src/admin/club-invite.ts",
     "./admin/licenses": "./src/admin/licenses.ts",

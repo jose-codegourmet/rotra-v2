@@ -10,6 +10,7 @@ import { effectiveRankingVersion } from '../ranking-settings/rankingSettings.rul
 import {
   realGetAdminPlayer,
   realGetAdminPlayerGames,
+  realGetAdminPlayerSocialLinks,
   realGetAdminPlayersByIds,
   realListAdminPlayers,
 } from '../real/admin-players'
@@ -183,6 +184,16 @@ export async function getAdminPlayer(
   }
 }
 
+/** Profile fields for Admin Quick view, including private profiles; null for club-only records. */
+export async function getAdminPlayerProfile(id: string, signal?: AbortSignal) {
+  if (isRealDataMode()) return realGetAdminPlayerSocialLinks(id, signal)
+  if ((await getAdminSession()).kind !== 'owner')
+    throw new MockError('permission', 'Only ROTRA Admin can view player management.')
+  await delay(400, signal)
+  const profile = readMockState().playerProfiles.find((entry) => entry.playerId === id)
+  return profile ? { socialLinks: profile.socialLinks } : null
+}
+
 const EMPTY_LINKS = { facebook: '', instagram: '', youtube: '', linkedin: '' }
 
 /**
@@ -214,20 +225,9 @@ export async function getAdminPlayerEdit(
   signal?: AbortSignal,
 ): Promise<AdminPlayerEdit | null> {
   if (isRealDataMode()) {
-    const player = await realGetAdminPlayer(id, signal)
-    if (!player) return null
-    const { samePlayers: _same, ...row } = player
-    return {
-      ...row,
-      playingStyle: '',
-      experienceYears: null,
-      experienceMonths: null,
-      socialLinks: { ...EMPTY_LINKS },
-      profilePrivate: false,
-      previousPicture: null,
-      hasAccount: row.phone !== undefined || row.email !== undefined,
-      passwordSetAt: null,
-    }
+    const result = await realGetAdminPlayerSocialLinks(id, signal)
+    if (!result) return null
+    return { ...result.edit, revision: Number(result.edit.revision) }
   }
   if ((await getAdminSession()).kind !== 'owner')
     throw new MockError('permission', 'Only ROTRA Admin can view player management.')

@@ -60,7 +60,7 @@ export const adminPlayerPictureField = z
   .refine(
     (value) =>
       value === null ||
-      /^character:.+/.test(value) ||
+      /^character:/.test(value) ||
       value.startsWith('data:image/') ||
       value.startsWith('https://'),
     'Choose a profile picture.',

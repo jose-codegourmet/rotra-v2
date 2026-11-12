@@ -39,7 +39,11 @@ export function useAdminWorkspaceAccess() {
   return useContext(AdminWorkspaceAccess)
 }
 
-const isPermissionError = isPermissionRefusal
+const isPermissionError = (error: unknown) =>
+  isPermissionRefusal(error) &&
+  (!(typeof error === 'object' && error !== null && 'status' in error) ||
+    error.status === 401 ||
+    error.status === 403)
 
 /**
  * A privileged read refused with a permission error replaces the whole workspace with the access

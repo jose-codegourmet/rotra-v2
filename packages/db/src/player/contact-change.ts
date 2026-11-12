@@ -65,6 +65,7 @@ function ownRequestDto(request: PlayerContactChangeRequest) {
     requestedAt: toIso(request.requestedAt),
     appliedAt: toIsoOrNull(request.appliedAt),
     rejectedAt: toIsoOrNull(request.rejectedAt),
+    supersededAt: toIsoOrNull(request.supersededAt),
   }
 }
 
@@ -342,6 +343,7 @@ export async function readAdminContactChangeRequests(
       approvedAt: toIsoOrNull(row.approvedAt),
       appliedAt: toIsoOrNull(row.appliedAt),
       decidedAt: toIsoOrNull(row.rejectedAt),
+      supersededAt: toIsoOrNull(row.supersededAt),
       failureCode: row.failureCode,
       player: {
         id: row.player.id,
@@ -415,6 +417,14 @@ export async function reviewContactChange(
         })
         return adminRequestDto(rejected)
       }
+      // Serialize approval with an Admin email edit before either may contact the provider.
+      await tx.$queryRaw`SELECT "id" FROM "players" WHERE "id" = ${request.playerId}::uuid FOR UPDATE`
+      const adminEdit = await tx.adminPlayerEmailEdit.findFirst({
+        where: { playerId: request.playerId, state: 'pending' },
+        select: { id: true },
+      })
+      if (adminEdit)
+        throw new ServiceError('conflict', { request: 'Resolve the Admin email change first.' })
       const contact = await tx.playerPrivateContact.findUniqueOrThrow({
         where: { playerId: request.playerId },
       })
@@ -422,6 +432,19 @@ export async function reviewContactChange(
         throw new ServiceError('conflict', {
           request: 'The player’s contacts changed since this request.',
         })
+      if (request.field === 'email') {
+        await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${`rotra-admin-email:${request.proposedValue.toLowerCase()}`}, 0))`
+        const reserved = await tx.adminPlayerEmailEdit.findFirst({
+          where: {
+            proposedEmail: request.proposedValue,
+            state: 'pending',
+            playerId: { not: request.playerId },
+          },
+          select: { id: true },
+        })
+        if (reserved)
+          throw new ServiceError('conflict', { value: 'This contact is used by another player.' })
+      }
       if (await collides(tx, request.playerId, request.field, request.proposedValue))
         throw new ServiceError('conflict', { value: 'This contact is used by another player.' })
       const approved = await tx.playerContactChangeRequest.update({

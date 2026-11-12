@@ -8,6 +8,7 @@ export const clubMemberProfileSheetMeta = {
     'Open from ClubMemberGrid or ClubMemberList; a member tap opens this dialog and never leaves the page.',
     'Pass kind "private" for a masked member: picture and banner, the masked name, the Private profile chip and the explanation; no Open full profile.',
     'onViewPhoto (public members with a picture) makes the big picture the Avatar view button (“View full photo of NAME”, zoom-in cursor, focus ring) that opens PhotoViewer (#716); initials never open anything.',
+    'bannerKey and bannerImageUrl render the resolved profile banner; an uploaded image takes precedence.',
     'The banner header is self-contained here for now; the Queue participant profile builds the same card in parallel and the two are unified later.',
   ],
   prototype: {

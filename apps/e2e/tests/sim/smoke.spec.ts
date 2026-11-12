@@ -1,8 +1,11 @@
 import { randomUUID } from 'node:crypto'
 import { expect, test } from '@playwright/test'
 import { readAccounts } from '../../src/accounts.ts'
+import { busyWindows, ensureVenue, firstFreeStart } from '../../src/api/schedule.ts'
 import { asAdmin, asQueueMaster } from '../../src/api/sign-in.ts'
 import { readClock, resetClock, setClock } from '../../src/clock.ts'
+import { QueueMasterApi } from '../../src/sim/api.ts'
+import { finishRunningSessions } from '../../src/sim/engine.ts'
 
 type Session = { id: string; state: string; revision: string; startedAt: string | null }
 type Summary = { session: Session; rosterCount: number; presentCount: number }
@@ -26,10 +29,14 @@ test('admin and Queue Master sign in; a Queue Session starts and the server cloc
   const qmSession = await qm.get<{ account: { id: string } }>('/api/auth/session')
   expect(qmSession.account.id).toBe(accounts.club.clubId)
 
-  const venueId = randomUUID()
-  await qm.post('/api/venues', { id: venueId, name: 'E2E Hall', address: '1 Test Street' })
-
-  const now = (await readClock('queue')).nowMs
+  // Re-runs share the database: reuse the venue, finish a session an earlier run left live, and
+  // start in a window no earlier session takes (the clock moves there, forward only).
+  const venueId = await ensureVenue(qm, 'E2E Hall')
+  await finishRunningSessions(new QueueMasterApi(qm))
+  const realStart = (await readClock('queue')).nowMs + MINUTE
+  const start = firstFreeStart(await busyWindows(qm), realStart, 3 * 60 * MINUTE)
+  if (start > realStart) await setClock(start - MINUTE)
+  const now = start - MINUTE
   const created = await qm.post<{ firstSessionId: string; created: number }>('/api/sessions', {
     commandId: randomUUID(),
     input: {

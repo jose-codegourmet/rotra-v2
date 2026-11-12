@@ -1,15 +1,49 @@
 import { randomUUID } from 'node:crypto'
-import { expect, type Page } from '@playwright/test'
+import { expect, type Page, type Response } from '@playwright/test'
+import { busyWindows, ensureVenue, overlaps } from '../api/schedule.ts'
 import { asQueueMaster } from '../api/sign-in.ts'
 import { appUrl } from '../stack.ts'
+import { jumpTo, MINUTE } from './time.ts'
 
 const exact = { exact: true } as const
 
-/** A venue for the session form's picker (venues are not under test here). */
+/** A venue for the session form's picker (venues are not under test here); reused on re-runs. */
 export async function seedVenue(name: string) {
   const api = await asQueueMaster()
-  await api.post('/api/venues', { id: randomUUID(), name, address: '1 Test Street' })
+  await ensureVenue(api, name)
   await api.dispose()
+}
+
+const DAY = 24 * 60 * MINUTE
+const MANILA = 8 * 60 * MINUTE
+
+/** The session form's default date (tomorrow, Asia/Manila) at START:00 to END:00 PM, seen at `nowMs`. */
+function tomorrowSlot(nowMs: number, slot: { startHour: number; endHour: number }) {
+  const local = new Date(nowMs + MANILA)
+  const day = Date.UTC(local.getUTCFullYear(), local.getUTCMonth(), local.getUTCDate() + 1)
+  return {
+    startMs: day + (12 + slot.startHour) * 60 * MINUTE - MANILA,
+    endMs: day + (12 + slot.endHour) * 60 * MINUTE - MANILA,
+  }
+}
+
+/**
+ * Re-runs never reseed the database, and a finished session keeps its time (it still clashes).
+ * Before Create session: moves the server clocks and `pages`' browser clocks whole days ahead
+ * until the form's tomorrow at `slot` clashes with no earlier session. No move when it is free.
+ */
+export async function moveToFreeDay(slot: { startHour: number; endHour: number }, pages: Page[]) {
+  const api = await asQueueMaster()
+  const busy = await busyWindows(api)
+  await api.dispose()
+  const now = Date.now()
+  for (let days = 0; days < 366; days++) {
+    const at = now + days * DAY
+    if (overlaps(busy, tomorrowSlot(at, slot))) continue
+    if (days) await jumpTo(at, pages)
+    return
+  }
+  throw new Error('[e2e] No free day for the session in the next year.')
 }
 
 /** Picks HOUR:00 PM in the session form's Starts or Ends time dialog. */
@@ -86,6 +120,9 @@ export async function addSavedPlayers(page: Page, names: string[], level = 'Inte
   }
   await sheet.getByRole('button', { name: 'Done', ...exact }).click()
   await expect(sheet).toBeHidden()
+  // Roster adds save in one batch about 800 ms after the last tap. Leaving the page before then
+  // (Start session navigates) drops them, so let the batch go out first, as setPresent does.
+  await page.waitForTimeout(2_500)
 }
 
 export type SessionTimes = { startMs: number; endMs: number; state: string }
@@ -113,7 +150,8 @@ export async function startSession(page: Page, sessionId: string) {
     .getByRole('button', { name: 'Start session', ...exact })
     .click()
   await page.waitForURL(new RegExp(`/sessions/${sessionId}$`), { timeout: 30_000 })
-  await expect(page.getByText('Live session')).toBeVisible()
+  // The console's own label (the app nav can also show a Live session link).
+  await expect(page.getByRole('main').getByText('Live session', exact)).toBeVisible()
 }
 
 export const consoleTab = (page: Page, name: 'Session' | 'Queue' | 'Players' | 'Leaderboard') =>
@@ -170,8 +208,33 @@ export async function generateAndAddAll(page: Page, count: 2 | 3 | 4 | 6) {
   const added = Number((await addAll.textContent())?.replace(/\D+/g, ''))
   await addAll.click()
   const review = page.getByRole('dialog', { name: 'Add selected to Main Queue?' })
-  await review.getByRole('button', { name: 'Add to Main Queue', ...exact }).click()
-  await expect(review).toBeHidden({ timeout: 30_000 })
+  // Keep what the add sends, so a failure says what the server answered (known defects match it).
+  const refused: string[] = []
+  const saved: string[] = []
+  const onResponse = async (response: Response) => {
+    const request = response.request()
+    if (request.method() !== 'POST' || !/\/api\/sessions\/[^/]+\/matches$/.test(response.url()))
+      return
+    const line = `POST ${new URL(response.url()).pathname} -> ${response.status()}`
+    if (response.status() < 400) saved.push(line)
+    else refused.push(`${line} ${await response.text().catch(() => '')}`)
+  }
+  page.on('response', onResponse)
+  try {
+    await review.getByRole('button', { name: 'Add to Main Queue', ...exact }).click()
+    await expect(review).toBeHidden({ timeout: 30_000 })
+  } catch (error) {
+    const sheet = (await review.innerText().catch(() => '')).replace(/\s+/g, ' ')
+    if (refused.length)
+      throw new Error(`Add to Main Queue refused: ${refused.join('; ')}; the sheet says: ${sheet}`)
+    if (saved.length && sheet.includes('Adding reviewed drafts'))
+      throw new Error(
+        `Add to Main Queue: ${saved.join('; ')} but the sheet stays on "Adding reviewed drafts… Please wait." (${sheet})`,
+      )
+    throw error
+  } finally {
+    page.off('response', onResponse)
+  }
   return added
 }
 
@@ -305,16 +368,26 @@ async function abandonSession(sessionId: string) {
       return
     }
     if (session.state !== 'active') return
+    // Manual Queue first, so nothing refills a court. An On court match must go back to the queue:
+    // marking the session invalid keeps its players' active holds, and the next session that puts
+    // them in a match then gets 409 "This changed since you loaded it" (unique
+    // active_player_holds_player_id_key). The sims' finishSession does the same.
+    await api.send('PATCH', `/api/sessions/${sessionId}/court-fill`, { mode: 'manual' })
     const { matches } = await api.get<{ matches: { id: string; state: string }[] }>(
       `/api/sessions/${sessionId}/matches`,
     )
+    for (const match of matches.filter((m) => m.state === 'on_court'))
+      await api.call('POST', `/api/sessions/${sessionId}/matches/${match.id}/send-back`, {
+        operationId: randomUUID(),
+      })
     for (const match of matches.filter((m) => m.state === 'active'))
       await api.send('POST', `/api/sessions/${sessionId}/matches/${match.id}/invalid`, {
         operationId: randomUUID(),
       })
     await api.send('POST', `/api/sessions/${sessionId}/invalid`, { reason: 'E2E cleanup' })
-  } catch {
-    // Best effort only.
+  } catch (error) {
+    // Best effort only, but say so: a session left half cleaned up breaks the next journeys.
+    console.warn(`[e2e] cleanup of session ${sessionId} failed: ${String(error)}`)
   } finally {
     await api.dispose()
   }

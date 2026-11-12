@@ -13,9 +13,10 @@ import {
 import { advance, MINUTE } from '../../src/ui/time.ts'
 
 test.use({ actionTimeout: 15_000 })
+// Clean up on the journey's own virtual time first (court actions follow the server clock).
 test.afterEach(async () => {
-  await resetClock()
   await abandonCreatedSessions()
+  await resetClock()
 })
 
 /**
@@ -24,12 +25,6 @@ test.afterEach(async () => {
  */
 test('UI-12 injury On court: Start match waits for a replacement', async ({ browser }) => {
   test.setTimeout(300_000)
-  // DEFECT (app): with nine rostered players, Generate matches › Add all 2 › Add to Main Queue is
-  // refused: POST /api/sessions/:id/matches answers 409 and the review sheet shows "This changed
-  // since you loaded it. Refresh and try again." It repeats after a page reload. UI-01 (eight
-  // players, same steps) adds them fine. Evidence: the run's trace (PATCH court-fill 200, then
-  // POST /matches 409) and screenshot of the open "Add selected to Main Queue?" sheet.
-  test.fail()
   // Nine present: a match on each court leaves one player free to come in.
   const { qm, roster } = await liveSession(browser, {
     title: 'UI-12 Injury',

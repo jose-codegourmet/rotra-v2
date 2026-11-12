@@ -50,6 +50,8 @@ E2E_WATCH=1 make e2e E2E_ARGS="--project sim -g REG-01"            # then: make 
 E2E_WATCH=0 make e2e-ui                      # UI mode without the browser
 ```
 
+In `make e2e-ui` you can re-run tests freely; to start from a clean database, close UI mode and run it again (prepare reseeds).
+
 Off by default for `make e2e` and CI: no browser starts. A watched run takes about 2.5 times as
 long (REG-01: about 56 s against 21 s) and its trace is 50-180 MB.
 
@@ -134,18 +136,30 @@ Browser (`tests/ui`):
 - **UI-17** Request a match: added to the queue, then a second one declined.
 - **UI-17 "I'm here"** (`test.fixme`).
 
-## Known app defects (marked test.fail)
+## Known app defects (marked [known bug: …])
 
-Fixes are the owner's. Remove `test.fail` once a fix lands.
+Fixes are the owner's. A test whose title ends in `[known bug: …]` wraps only the steps that hit
+that bug in `knownDefect` (`apps/e2e/src/known-defect.ts`), with a pattern for that exact failure.
+It passes (as an expected failure) only when that exact bug happens. Any other error, including
+one in the steps before the bug, is an ordinary red failure. When the bug no longer happens, the
+test runs on and shows a `defect-fixed` annotation: remove the wrapper and the title suffix then.
 
 - **REG-DEF-01:** Session done returns 500 when a match is On court and never started.
   `finalization.ts` `dropUnstarted` sets `released_at` without `release_operation_id`, which breaks
-  `match_court_usage_release_check`.
+  `match_court_usage_release_check`. UI-08 hits the same bug in the browser: round 3 plans a
+  second match that never starts, and Session done's POST finalization returns 500.
 - **REG-09 #3:** Longest Wait breaks ties by roster order, not games played. Seed 2189437517, Small,
   spread 3.
-- **UI-08 / UI-12:** Add to Main Queue returns 409 "This changed since you loaded it" with 9 rostered
-  players. Trace: PATCH court-fill 200, then POST matches 409. Cause not confirmed.
-- **UI-17:** Send request closes the sheet with no POST sent. Cause (app or test) not confirmed.
+- **Not a defect:** sheets that stayed on screen after closing (UI-08, UI-17) were the tests: with
+  the browser clock installed, close animations never finished. The UI tests now use reduced
+  motion, as watch mode does.
+- **Finding, no test:** marking a session invalid keeps the active player holds of its On court
+  matches. The next session that puts those players in a match gets 409 "This changed since you
+  loaded it" (unique `active_player_holds_player_id_key`). This was the earlier UI-08 / UI-12 409:
+  the UI cleanup left On court matches behind. It now sends them back before marking the session
+  invalid, as the sims' `finishSession` does.
+- **UI-17 Send request** (no POST sent) did not reproduce on the built apps; UI-17 runs as an
+  ordinary test.
 - **UI-17 "I'm here"** (`test.fixme`): self check-in has no real route.
 
 ### Match-request defects

@@ -7,7 +7,13 @@ import { type AppName, appUrl } from '../stack.ts'
  * time (it keeps ticking); `jumpTo` in ./time.ts moves it with the server clocks.
  */
 export async function rolePage(browser: Browser) {
-  const context = await browser.newContext({ baseURL: appUrl('queue'), timezoneId: 'Asia/Manila' })
+  // Reduced motion: with the installed clock, sheet close animations never finish, so a closed
+  // sheet stays on screen (the same reason watch mode sets it).
+  const context = await browser.newContext({
+    baseURL: appUrl('queue'),
+    timezoneId: 'Asia/Manila',
+    reducedMotion: 'reduce',
+  })
   await context.clock.install()
   return context.newPage()
 }

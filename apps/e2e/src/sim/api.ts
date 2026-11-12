@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import type { ApiReply, AppClient } from '../api/client.ts'
+import { busyWindows, ensureVenue } from '../api/schedule.ts'
 import type {
   Match,
   MatchLineup,
@@ -155,10 +156,14 @@ export class QueueMasterApi {
 
   // ---------- Preparation ----------
 
-  async addVenue(name: string) {
-    const id = randomUUID()
-    await this.client.post('/api/venues', { id, name, address: '1 Test Street' })
-    return id
+  /** The venue called `name`, reused when an earlier run created it (venue names are unique). */
+  addVenue(name: string) {
+    return ensureVenue(this.client, name)
+  }
+
+  /** Planned windows of the club's sessions that still count for the time clash rule. */
+  busyWindows() {
+    return busyWindows(this.client)
   }
 
   async createSession(input: CreateSessionInput) {

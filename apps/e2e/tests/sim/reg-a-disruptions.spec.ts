@@ -1,4 +1,5 @@
 import { test } from '@playwright/test'
+import { knownDefect } from '../../src/known-defect.ts'
 import { eating, injured, invalidMatches, late, subbed, tired } from '../../src/sim/disruptions.ts'
 import { matchRequests } from '../../src/sim/requests.ts'
 import { config, seedCount, seedFor, simulate } from '../../src/sim/run.ts'
@@ -147,27 +148,35 @@ const LONGEST_WAIT_TIES =
 for (let i = 0; i < seedCount(); i++) {
   const strategy = ROTATION[i % ROTATION.length] as StrategyName
   const shape = MIX_SHAPES[i % MIX_SHAPES.length] as (typeof MIX_SHAPES)[number]
-  test(`REG-09 random mix #${i + 1} (${strategy}, ${shape.name})${i === 2 ? '' : ' with match requests'}`, async () => {
-    test.fail(!process.env.E2E_SEED && i === 2, LONGEST_WAIT_TIES)
+  const tie = !process.env.E2E_SEED && i === 2
+  test(`REG-09 random mix #${i + 1} (${strategy}, ${shape.name})${i === 2 ? '' : ' with match requests'}${tie ? ' [known bug: Longest Wait spread 3]' : ''}`, async () => {
     const end = shape.hours * 60
-    await simulate(
-      config({
-        id: `REG-09.${i + 1}`,
-        scenario: 'random mix',
-        shape,
-        strategy,
-        seed: seedFor('REG-09 random mix', i),
-        plugins: [
-          late({ fraction: [0.1, 0.3], minutes: [1, 90] }),
-          injured({ fraction: [0.01, 0.1], window: [5, end - 10] }),
-          subbed({ fraction: [0.01, 0.1], window: [5, end - 10] }),
-          tired({ fraction: [0.01, 0.15], window: [10, end - 30] }),
-          eating({ count: [1, 3], duration: [10, 90] }),
-          invalidMatches({ count: 1, window: [10, end - 20] }),
-          // #3 keeps the Longest Wait finding's exact run (requests would change its schedule).
-          ...(i === 2 ? [] : [matchRequests()]),
-        ],
-      }),
+    const defect = {
+      id: `REG-09 #${i + 1}`,
+      bug: LONGEST_WAIT_TIES,
+      match: /fairness: games of players present the whole session spread \d+ \(> 2\)/,
+      when: tie,
+    }
+    await knownDefect(defect, () =>
+      simulate(
+        config({
+          id: `REG-09.${i + 1}`,
+          scenario: 'random mix',
+          shape,
+          strategy,
+          seed: seedFor('REG-09 random mix', i),
+          plugins: [
+            late({ fraction: [0.1, 0.3], minutes: [1, 90] }),
+            injured({ fraction: [0.01, 0.1], window: [5, end - 10] }),
+            subbed({ fraction: [0.01, 0.1], window: [5, end - 10] }),
+            tired({ fraction: [0.01, 0.15], window: [10, end - 30] }),
+            eating({ count: [1, 3], duration: [10, 90] }),
+            invalidMatches({ count: 1, window: [10, end - 20] }),
+            // #3 keeps the Longest Wait finding's exact run (requests would change its schedule).
+            ...(i === 2 ? [] : [matchRequests()]),
+          ],
+        }),
+      ),
     )
   })
 }

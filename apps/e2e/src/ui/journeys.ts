@@ -3,6 +3,7 @@ import { readAccounts } from '../accounts.ts'
 import {
   addSavedPlayers,
   createSession,
+  moveToFreeDay,
   seedVenue,
   sessionLink,
   sessionTimes,
@@ -24,7 +25,8 @@ export type LiveSession = {
 
 /**
  * A Queue Master in their own browser context with a started Queue Session: created through the
- * session form (2 courts, doubles, tomorrow in `slot`), `rosterSize` saved players added, the clocks
+ * session form (2 courts, doubles, tomorrow in `slot`; days later when an earlier run took that
+ * slot), `rosterSize` saved players added, the clocks
  * moved to two minutes before the planned start, started, and `present` of them marked present.
  * `others` are role pages whose browser clocks move along.
  */
@@ -43,6 +45,7 @@ export async function liveSession(
   await seedVenue(venue)
   const qm = await rolePage(browser)
   await signInQueueMaster(qm)
+  await moveToFreeDay(options.slot, [qm, ...(options.others ?? [])])
   const sessionId = await createSession(qm, options.title, venue, options.slot)
   await addSavedPlayers(
     qm,

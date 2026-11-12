@@ -5,9 +5,10 @@ import { abandonCreatedSessions, consoleTab } from '../../src/ui/queue.ts'
 import { rolePage, signInPlayer } from '../../src/ui/sign-in.ts'
 
 test.use({ actionTimeout: 15_000 })
+// Clean up on the journey's own virtual time first (court actions follow the server clock).
 test.afterEach(async () => {
-  await resetClock()
   await abandonCreatedSessions()
+  await resetClock()
 })
 
 const myNight = (page: Page) => page.getByRole('region', { name: 'My night' })
@@ -43,11 +44,6 @@ test('UI-17 Request a match: added to the queue, then a second one declined', as
   browser,
 }) => {
   test.setTimeout(300_000)
-  // DEFECT (app, real mode): on the session page My night shows Request a match (the sheet opens,
-  // formats and present players load from the Player app), but Send request closes the sheet and
-  // My night never shows "Match request sent · the QM decides"; the run's trace has no
-  // POST /api/public-sessions/:slug/match-request reaching the Player app.
-  test.fail()
   const player = await rolePage(browser)
   await signInPlayer(player, 1)
   // Everyone present, the requester included (the Queue Master marks presence; see UI-17 I'm here).
@@ -71,7 +67,9 @@ test('UI-17 Request a match: added to the queue, then a second one declined', as
   await expect(requests.getByText(/asks for a .* match/)).toBeVisible()
   await requests.getByRole('button', { name: 'Add to queue', exact: true }).click()
   await expect(qm.getByText('Match added to the queue')).toBeVisible({ timeout: 30_000 })
-  await qm.keyboard.press('Escape')
+  // The Requests sheet is modal (it hides the console tabs) and stays open after Add to queue.
+  await requests.getByRole('button', { name: 'Done', exact: true }).click()
+  await expect(requests).toBeHidden()
   await expect(consoleTab(qm, 'Queue')).toHaveAccessibleName(/^Queue 1 waiting/)
 
   await player.reload()

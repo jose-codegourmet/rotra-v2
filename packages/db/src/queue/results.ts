@@ -163,7 +163,7 @@ export async function publishResults(
   const slides = validSlides(input.slides, includeOffDay)
   return prisma.$transaction(async (tx) => {
     const session = await lockSession(tx, context, sessionId)
-    await requireSessionAccess(context, session)
+    await requireSessionAccess(context, session, tx)
     const done = await tx.sessionPublicationEvent.findUnique({
       where: { sourceCommandId: input.commandId },
     })
@@ -231,8 +231,8 @@ export async function publishResults(
  * Public results for a session page (`public-session.page`): only the stored public copy of a
  * `published` row. Never reads the private snapshot.
  */
-export async function readPublishedResults(sessionId: string) {
-  const pub = await prisma.sessionPublication.findUnique({
+export async function readPublishedResults(sessionId: string, db: Tx | typeof prisma = prisma) {
+  const pub = await db.sessionPublication.findUnique({
     where: { sessionId },
     select: { state: true, publicResults: true },
   })
@@ -261,7 +261,7 @@ export async function requestResultExport(
     throw new ServiceError('invalid', { format: 'Choose story or feed.' })
   return prisma.$transaction(async (tx) => {
     const session = await lockSession(tx, context, sessionId)
-    await requireSessionAccess(context, session)
+    await requireSessionAccess(context, session, tx)
     const done = await tx.resultExport.findUnique({ where: { sourceCommandId: input.commandId } })
     if (done) return { id: done.id, frameCount: done.frameCount, ready: !!done.assetRef }
     if (session.state !== 'completed')

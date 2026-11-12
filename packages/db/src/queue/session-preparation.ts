@@ -525,7 +525,7 @@ export async function addCourt(
 ) {
   return prisma.$transaction(async (tx) => {
     let session = await lockSession(tx, context, sessionId)
-    await requireSessionAccess(context, session)
+    await requireSessionAccess(context, session, tx)
     requireState(
       session,
       ['prepared', 'active'],
@@ -591,7 +591,7 @@ export async function updateCourt(
 ) {
   return prisma.$transaction(async (tx) => {
     let session = await lockSession(tx, context, sessionId)
-    await requireSessionAccess(context, session)
+    await requireSessionAccess(context, session, tx)
     requireState(
       session,
       ['prepared', 'active'],
@@ -648,7 +648,7 @@ export async function openCourtsEarly(
 ) {
   return prisma.$transaction(async (tx) => {
     const session = await lockSession(tx, context, sessionId)
-    await requireSessionAccess(context, session)
+    await requireSessionAccess(context, session, tx)
     requireState(session, ['active'], 'Courts open early only during the session.')
     const now = Date.now()
     let courts = (await liveCourts(tx, sessionId)).filter((c) => notOpenYet(c, now))
@@ -684,7 +684,7 @@ export async function openCourtsEarly(
 export async function undoCourtEarlyOpen(context: ClubContext, sessionId: string, courtId: string) {
   return prisma.$transaction(async (tx) => {
     const session = await lockSession(tx, context, sessionId)
-    await requireSessionAccess(context, session)
+    await requireSessionAccess(context, session, tx)
     requireState(session, ['active'], 'Courts open early only during the session.')
     const now = Date.now()
     const court = await requireLiveCourt(tx, sessionId, courtId)
@@ -712,7 +712,7 @@ export async function undoCourtEarlyOpen(context: ClubContext, sessionId: string
 export async function removeCourt(context: ClubContext, sessionId: string, courtId: string) {
   return prisma.$transaction(async (tx) => {
     let session = await lockSession(tx, context, sessionId)
-    await requireSessionAccess(context, session)
+    await requireSessionAccess(context, session, tx)
     requireState(
       session,
       ['prepared', 'active'],
@@ -760,7 +760,7 @@ async function applySessionEnd(
   try {
     return await prisma.$transaction(async (tx) => {
       let session: QueueSession = await lockSession(tx, context, sessionId)
-      await requireSessionAccess(context, session)
+      await requireSessionAccess(context, session, tx)
       requireState(
         session,
         ['prepared', 'active'],
@@ -824,7 +824,7 @@ export async function setAcceptJoinRequests(
 ) {
   return prisma.$transaction(async (tx) => {
     const session = await lockSession(tx, context, sessionId)
-    await requireSessionAccess(context, session)
+    await requireSessionAccess(context, session, tx)
     const updated = await tx.queueSession.update({
       where: { id: sessionId },
       data: { acceptJoinRequests: accept, revision: { increment: 1 } },
@@ -841,7 +841,7 @@ export async function setAlwaysRequireRequest(
 ) {
   return prisma.$transaction(async (tx) => {
     const session = await lockSession(tx, context, sessionId)
-    await requireSessionAccess(context, session)
+    await requireSessionAccess(context, session, tx)
     const updated = await tx.queueSession.update({
       where: { id: sessionId },
       data: { alwaysRequireRequest: always, revision: { increment: 1 } },

@@ -6,6 +6,7 @@ import type {
   PlayerContext,
 } from '../auth/account-context'
 import { prisma } from '../client/prisma'
+import type { Prisma } from '../generated/prisma/client'
 import { denyScope, ServiceError } from './errors'
 
 /** The signed-in club may act only on its own club ID. */
@@ -30,9 +31,17 @@ export function requireAdmin(context: AccountContext): AdminContext {
 /**
  * Club entitlement from the server-owned `club_entitlements` projection, checked against server time.
  * The active-session completion exception is decided by the session services, not here.
+ *
+ * Inside an interactive transaction pass `tx` as `db`: on Vercel the pool holds one connection
+ * (#777), so a query on the shared client while a transaction owns it would wait for a connection
+ * that never frees up and time out.
  */
-export async function requireClubEntitlement(context: ClubContext, now = new Date()) {
-  const entitlement = await prisma.clubEntitlement.findUnique({
+export async function requireClubEntitlement(
+  context: ClubContext,
+  now = new Date(),
+  db: Prisma.TransactionClient = prisma,
+) {
+  const entitlement = await db.clubEntitlement.findUnique({
     where: { clubId: context.clubId },
     select: { effectiveAccessEndsAt: true, effectiveTermId: true },
   })

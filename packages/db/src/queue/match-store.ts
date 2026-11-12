@@ -187,7 +187,7 @@ export async function matchCommand<T>(
   try {
     return await prisma.$transaction(async (tx) => {
       const session = await lockSession(tx, context, sessionId)
-      await requireSessionAccess(context, session)
+      await requireSessionAccess(context, session, tx)
       requireState(session, options.states ?? ['active'], 'Start the session first.')
       if (options.expectedQueueRevision !== undefined)
         requireRevision(session.queueRevision, options.expectedQueueRevision)

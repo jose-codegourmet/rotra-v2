@@ -40,9 +40,14 @@ export function touchSession(tx: Tx, session: QueueSession) {
  * Club access for preparation writes. An active session may keep running after expiry (the
  * active-session completion exception), but only under the term that authorized its start.
  */
-export async function requireSessionAccess(context: ClubContext, session: QueueSession) {
+/** Inside a transaction pass `tx`, so the entitlement read shares its connection (see authorize). */
+export async function requireSessionAccess(
+  context: ClubContext,
+  session: QueueSession,
+  db?: Prisma.TransactionClient,
+) {
   if (session.state === 'active' && session.startLicenseTermId) return
-  await requireClubEntitlement(context)
+  await requireClubEntitlement(context, new Date(), db)
 }
 
 export function requireState(

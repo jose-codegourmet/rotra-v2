@@ -518,7 +518,7 @@ export async function declineMatchRequest(
 ) {
   return prisma.$transaction(async (tx) => {
     const session = await lockSession(tx, context, sessionId)
-    await requireSessionAccess(context, session)
+    await requireSessionAccess(context, session, tx)
     const row = await openRequestIn(tx, session, input.requestId)
     requireOpen(row)
     await tx.sessionMatchRequest.update({

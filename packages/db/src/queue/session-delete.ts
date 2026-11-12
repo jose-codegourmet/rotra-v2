@@ -22,7 +22,7 @@ export async function deleteSession(context: ClubContext, sessionId: string) {
   try {
     return await prisma.$transaction(async (tx) => {
       const session = await lockSession(tx, context, sessionId)
-      await requireSessionAccess(context, session)
+      await requireSessionAccess(context, session, tx)
       requireState(session, ['prepared'], 'Only a session that has not started can be deleted.')
       const confirmed = (await liveRoster(tx, sessionId)).length
       if (confirmed)

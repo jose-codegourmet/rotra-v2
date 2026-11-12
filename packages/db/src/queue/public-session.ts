@@ -187,7 +187,7 @@ export async function readPublicSession(slug: string) {
       alwaysRequireRequest: session.alwaysRequireRequest,
       lastSyncedAt: session.updatedAt.getTime(),
       hasPendingChanges: streams.some((s) => s.highestReceivedSeq > s.contiguousSequence),
-      results: session.state === 'completed' ? await readPublishedResults(session.id) : null,
+      results: session.state === 'completed' ? await readPublishedResults(session.id, tx) : null,
     }
   })
 }

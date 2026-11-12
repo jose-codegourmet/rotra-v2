@@ -8,6 +8,7 @@ import { Engine } from './engine.ts'
 import { evaluate, report } from './outcome.ts'
 import { hashSeed } from './prng.ts'
 import { SHAPES, type SimConfig, type StrategyName } from './scenario.ts'
+import { Watcher, watching } from './watch.ts'
 
 /** A run's seed: E2E_SEED pins every run (to replay a failure); otherwise stable per test. */
 export function seedFor(label: string, index = 0) {
@@ -37,12 +38,17 @@ export function config(
 export async function simulate(cfg: SimConfig, testInfo: TestInfo = test.info()) {
   const started = Date.now()
   const client = await asQueueMaster()
-  const engine = new Engine(cfg, new QueueMasterApi(client))
+  const watcher = watching() ? await Watcher.open(testInfo) : undefined
+  const engine = new Engine(
+    watcher ? { ...cfg, plugins: [...(cfg.plugins ?? []), watcher.plugin()] } : cfg,
+    new QueueMasterApi(client),
+  )
   console.log(
     `[sim] ${cfg.id} ${cfg.scenario} · seed=${cfg.seed} shape=${cfg.shape.name} strategy=${cfg.strategy}`,
   )
   try {
     await engine.run()
+    await watcher?.showRecord(engine)
   } catch (error) {
     engine.lines.push(
       `ERROR ${error instanceof Error ? (error.stack ?? error.message) : String(error)}`,
@@ -55,6 +61,7 @@ export async function simulate(cfg: SimConfig, testInfo: TestInfo = test.info())
   } finally {
     await engine.abandon()
     await client.dispose()
+    await watcher?.dispose()
   }
   const outcome = evaluate(engine)
   const failures = [...engine.failures, ...outcome.failures]

@@ -90,6 +90,8 @@ export type SimPlugin = {
   /** Before Start match on an On court match; return false to leave it unstarted this step. */
   beforeStart?: (engine: Engine, match: Match) => Promise<boolean | undefined>
   afterStep?: (engine: Engine) => Promise<void> | void
+  /** After the Session done review is read, before Session done is confirmed. */
+  beforeDone?: (engine: Engine) => Promise<void> | void
   /** Final checks after Session done (add failures through engine.fail). */
   finish?: (engine: Engine) => Promise<void> | void
 }

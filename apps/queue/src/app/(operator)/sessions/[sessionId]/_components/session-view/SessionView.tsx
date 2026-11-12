@@ -1,5 +1,6 @@
 'use client'
 
+import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import {
   activeMatchFor,
   countedGames,
@@ -44,6 +45,7 @@ import type { CourtPlayer } from '@rotra/ui/court-drawing'
 import { CourtFillSwitch } from '@rotra/ui/court-fill-switch'
 import type { MatchCardPlayer } from '@rotra/ui/match-card'
 import { formatTime } from '@rotra/ui/now-card/helpers'
+import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { ShortOnPlayersBanner } from '@rotra/ui/short-on-players-banner'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { toast } from '@rotra/ui/toaster'
@@ -123,6 +125,7 @@ export function SessionView({
   const session = useQueueSession(sessionId)
   const roster = useSessionRoster(sessionId)
   const matches = useSessionMatches(sessionId)
+  const clubPlayers = useClubPlayers()
   const removeCourt = useRemoveCourt()
   const removeWaitingMatch = useRemoveWaitingMatch()
   const openCourtEarly = useOpenCourtEarly()
@@ -198,11 +201,20 @@ export function SessionView({
   }
   const player = (id: string): CourtPlayer => {
     const p: SessionPlayer | undefined = byId(id)
+    // The face is the saved player's own picture (or character), like the Queue tab and Next match
+    const clubPlayer = p && clubPlayers.data?.players.find((item) => item.id === p.clubPlayerId)
     return {
       id,
       name: p?.nameSnapshot ?? 'Player',
       shortName: p ? shortName(p) : 'Player',
       level: p?.level ?? null,
+      photoUrl: clubPlayer
+        ? profilePictureSrc(
+            clubPlayer.picture,
+            clubPlayer.playerId ?? clubPlayer.id,
+            clubPlayer.pictureName ?? clubPlayer.fullName,
+          )
+        : undefined,
     }
   }
   /** A court face: the game badge shows the player's counted games this session */

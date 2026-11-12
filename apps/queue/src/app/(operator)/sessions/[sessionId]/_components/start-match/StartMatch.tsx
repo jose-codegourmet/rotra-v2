@@ -1,5 +1,6 @@
 'use client'
 
+import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import {
   countedGames,
   courtOpen,
@@ -24,6 +25,7 @@ import type { SessionPlayer } from '@rotra/data/session-roster/types'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { type ChooseMatchRow, ChooseMatchSheet } from '@rotra/ui/choose-match-sheet'
 import { formatTime } from '@rotra/ui/now-card/helpers'
+import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { StartMatchSheet } from '@rotra/ui/start-match-sheet'
 import type { SwapSlot } from '@rotra/ui/swap-sides-area'
 import type { TeamLineupPlayer } from '@rotra/ui/team-lineup'
@@ -238,6 +240,18 @@ function OpenStartMatch({
   const placing = useRef(false)
 
   const byId = (id: string) => ctx.roster.find((p) => p.id === id)
+  const clubPlayers = useClubPlayers()
+  /** The face is the saved player's own picture (or character), like the Queue tab */
+  const photoOf = (p: SessionPlayer | undefined) => {
+    const clubPlayer = p && clubPlayers.data?.players.find((item) => item.id === p.clubPlayerId)
+    return clubPlayer
+      ? profilePictureSrc(
+          clubPlayer.picture,
+          clubPlayer.playerId ?? clubPlayer.id,
+          clubPlayer.pictureName ?? clubPlayer.fullName,
+        )
+      : undefined
+  }
   const player = (id: string): TeamLineupPlayer => {
     const p: SessionPlayer | undefined = byId(id)
     return {
@@ -246,6 +260,7 @@ function OpenStartMatch({
       shortName: p ? shortName(p) : 'Player',
       level: p?.level ?? null,
       games: countedGames(id, ctx.matches),
+      photoUrl: photoOf(p),
     }
   }
   const free = freeCourts(ctx.courts, ctx.matches, ctx.now).map((c) => ({

@@ -1,5 +1,6 @@
 'use client'
 
+import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import {
   AUTO_QUEUE_MODES,
   autoQueueDraftConflict,
@@ -25,6 +26,7 @@ import {
   type QueueWorkspace,
 } from '@rotra/ui/auto-queue-workspace'
 import type { BaggingPlayer } from '@rotra/ui/bagging-pairs-card'
+import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { toast } from '@rotra/ui/toaster'
 import { type ReactNode, useRef, useState } from 'react'
@@ -52,6 +54,22 @@ export function AutoQueue({ sessionId, workspace, onWorkspaceChange, mainQueue }
   const session = useQueueSession(sessionId),
     roster = useSessionRoster(sessionId),
     matches = useSessionMatches(sessionId)
+  const clubPlayers = useClubPlayers()
+  /** The face is the saved player's own picture (or character), like the Queue tab */
+  const photoOf = (p: SessionPlayer | undefined) => {
+    const clubPlayer = p && clubPlayers.data?.players.find((item) => item.id === p.clubPlayerId)
+    return clubPlayer
+      ? profilePictureSrc(
+          clubPlayer.picture,
+          clubPlayer.playerId ?? clubPlayer.id,
+          clubPlayer.pictureName ?? clubPlayer.fullName,
+        )
+      : undefined
+  }
+  const face = (p: SessionPlayer | undefined, id: string): BaggingPlayer => ({
+    ...baggingPlayer(p, id),
+    photoUrl: photoOf(p),
+  })
   const drafts = useAutoQueueDrafts(sessionId)
   const edit = useEditAutoQueueDrafts(),
     generate = useGenerateAutoQueueDrafts(),
@@ -80,6 +98,7 @@ export function AutoQueue({ sessionId, workspace, onWorkspaceChange, mainQueue }
         name: p ? shortName(p) : 'Player',
         fullName: p?.nameSnapshot,
         level: p?.level ?? null,
+        photoUrl: photoOf(p),
         ...autoQueuePlayerCounts(id, ctx, lineups),
       }
     }
@@ -147,11 +166,11 @@ export function AutoQueue({ sessionId, workspace, onWorkspaceChange, mainQueue }
   const bagging: AutoQueueBaggingProps | undefined = s.allowDoubles
     ? {
         enabled: state.bagging.enabled,
-        players: ctx.roster.filter((p) => p.present).map((p) => baggingPlayer(p, p.id)),
+        players: ctx.roster.filter((p) => p.present).map((p) => face(p, p.id)),
         pairs: state.bagging.pairs.map((pair) => ({
           id: pair.id,
-          a: baggingPlayer(rosterPlayer(pair.a), pair.a),
-          b: baggingPlayer(rosterPlayer(pair.b), pair.b),
+          a: face(rosterPlayer(pair.a), pair.a),
+          b: face(rosterPlayer(pair.b), pair.b),
           games: pair.games,
         })),
         onEnabledChange: async (enabled) => {

@@ -1,5 +1,6 @@
 'use client'
 
+import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import { countedGames, shortName } from '@rotra/data/match/match.rules'
 import { generateMatches } from '@rotra/data/match/queue.rules'
 import type { Match, MatchLineup } from '@rotra/data/match/types'
@@ -9,6 +10,7 @@ import type { QueueSession } from '@rotra/data/queue-session/types'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import type { SessionPlayer } from '@rotra/data/session-roster/types'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
+import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { type SuggestedLineup, SuggestedMatchSheet } from '@rotra/ui/suggested-match-sheet'
 import type { SwapSlot } from '@rotra/ui/swap-sides-area'
 import type { TeamLineupPlayer } from '@rotra/ui/team-lineup'
@@ -96,6 +98,18 @@ function OpenSuggestMatch({
   const adding = useRef(false)
 
   const byId = (id: string) => roster.find((p) => p.id === id)
+  const clubPlayers = useClubPlayers()
+  /** The face is the saved player's own picture (or character), like the Queue tab */
+  const photoOf = (p: SessionPlayer | undefined) => {
+    const clubPlayer = p && clubPlayers.data?.players.find((item) => item.id === p.clubPlayerId)
+    return clubPlayer
+      ? profilePictureSrc(
+          clubPlayer.picture,
+          clubPlayer.playerId ?? clubPlayer.id,
+          clubPlayer.pictureName ?? clubPlayer.fullName,
+        )
+      : undefined
+  }
   const player = (id: string): TeamLineupPlayer => {
     const p = byId(id)
     return {
@@ -104,6 +118,7 @@ function OpenSuggestMatch({
       shortName: p ? shortName(p) : 'Player',
       level: p?.level ?? null,
       games: countedGames(id, matches),
+      photoUrl: photoOf(p),
     }
   }
   const lineup = suggestion.lineup

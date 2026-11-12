@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "e2e": "node src/scripts/prepare.ts && playwright test",
-    "e2e:ui": "node src/scripts/prepare.ts && playwright test --ui",
+    "e2e:ui": "node src/scripts/prepare.ts && E2E_WATCH=${E2E_WATCH:-1} playwright test --ui",
     "e2e:prepare": "node src/scripts/prepare.ts",
     "e2e:report": "playwright show-report playwright-report",
     "lint": "biome check .",

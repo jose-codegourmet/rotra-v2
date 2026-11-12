@@ -605,6 +605,7 @@ export class Engine {
           .map((p) => `${this.name(p.sessionPlayerId)}=${p.games}`)
           .join(' ') || 'none'),
     )
+    for (const plugin of this.plugins) await plugin.beforeDone?.(this)
     let status = await this.api.finalize(this.sessionId)
     for (let i = 0; i < 40 && status.state !== 'done'; i++) {
       if (status.state === 'failed') break

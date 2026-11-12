@@ -18,6 +18,7 @@ Object.assign(process.env, env)
 
 const ci = process.env.CI === 'true'
 const suite = process.env.E2E_SUITE
+const watch = process.env.E2E_WATCH === '1'
 
 function webServer(app: AppName) {
   const { dir, port } = APPS[app]
@@ -43,6 +44,8 @@ const projects: Project[] = [
     testDir: './tests/sim',
     dependencies: ['setup'],
     fullyParallel: false,
+    // Watch mode (src/sim/watch.ts): keep the trace (with the watching browser in it) every run.
+    ...(watch ? { use: { trace: 'on', video: 'on' } } : {}),
   },
   {
     name: 'ui',

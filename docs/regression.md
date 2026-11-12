@@ -22,11 +22,32 @@ real-life disruptions happen. Decision: [D-2026-11-12-05](mvp/decisions.md#d-202
 ```bash
 make e2e                                     # start or reuse local Supabase, reseed, run all
 make e2e E2E_ARGS="--project sim -g REG-08"  # one project, one scenario
-make e2e-ui                                  # Playwright UI mode
+make e2e-ui                                  # Playwright UI mode, watch mode on
 make e2e-down                                # stop the local stack
 E2E_SEEDS=5 make e2e                         # number of random seeds for REG-09
 E2E_SEED=2189437517 make e2e E2E_ARGS="-g REG-09"   # replay one seed
 ```
+
+## Watch a scenario
+
+The `sim` scenarios drive the Queue app through its Route Handlers and never open a page. With
+`E2E_WATCH=1` (`src/sim/watch.ts`) a Queue Master browser follows along: it signs in on the Queue
+sign-in screen, opens the live session console (`/sessions/{id}`) and, after every virtual minute
+in which something happened, reloads it inside a step named after the events, for example
+`t=38m · #7 Court 4 Match done · Team B wins · ...`. The browser clock follows the server clock.
+At the end it opens the Session done review sheet (nothing is confirmed there), then the session
+record and results after Session done. Watch mode turns on `trace` and `video` for `sim`; the
+video is attached to the test as `watch-video`.
+
+```bash
+make e2e-ui                                  # UI mode: E2E_WATCH=1 unless you set it
+E2E_WATCH=1 make e2e E2E_ARGS="--project sim -g REG-01 --headed"   # a real window
+E2E_WATCH=1 make e2e E2E_ARGS="--project sim -g REG-01"            # then: make e2e-report
+E2E_WATCH=0 make e2e-ui                      # UI mode without the browser
+```
+
+Off by default for `make e2e` and CI: no browser starts. A watched run takes about 2.5 times as
+long (REG-01: about 56 s against 21 s) and its trace is 50-180 MB.
 
 ## Prerequisites
 

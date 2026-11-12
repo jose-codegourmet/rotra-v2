@@ -11,6 +11,7 @@ export const adminPlayerKeys = {
   games: (id: string) => [...adminPlayerKeys.all, 'games', id] as const,
   details: () => [...adminPlayerKeys.all, 'detail'] as const,
   detail: (id: string) => [...adminPlayerKeys.details(), id] as const,
+  profile: (id: string) => [...adminPlayerKeys.all, 'profile', id] as const,
   /** A-PLAYER-EDIT's read (profile and account fields) */
   edit: (id: string) => [...adminPlayerKeys.all, 'edit', id] as const,
 }

@@ -104,11 +104,6 @@ export function addMatch(input: MatchLineup & { sessionId: string }) {
   )
 }
 export function makeMatch(input: { sessionId: string; selection: string[]; lineup?: MatchLineup }) {
-  if (isRealDataMode() && input.lineup)
-    throw new MockError(
-      'permission',
-      'Confirming an arranged lineup is not available in real mode.',
-    )
   return dispatch('queue.make', input, () =>
     change(input.sessionId, (s) => {
       const plan = formatForSelection(input.selection.length, sessionIn(s, input.sessionId))

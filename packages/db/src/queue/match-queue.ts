@@ -237,10 +237,15 @@ export async function addManualMatch(
 }
 
 /** Q-QUEUE · Make match from a selection of 2, 3, 4, 6, 8 or 10 players. */
+/**
+ * Make match: the selection decides the format; the operator confirms the teams in pick order or
+ * after Arrange to balance, so `lineup` (when sent) must be those same players in that format.
+ * Without a lineup the teams are balanced by level.
+ */
 export async function makeMatch(
   context: ClubContext,
   sessionId: string,
-  input: { operationId: string; selection: string[] },
+  input: { operationId: string; selection: string[]; lineup?: MatchLineup },
   options: AutoFillOptions = {},
 ) {
   let autoPlaced: AutoPlaced = []
@@ -252,10 +257,24 @@ export async function makeMatch(
     const selected = input.selection.map((id) => ctx.roster.find((p) => p.id === id))
     if (selected.some((p) => !p))
       throw new ServiceError('invalid', { selection: 'Player not available.' })
-    const lineup = balanceTeams(
-      selected.filter((p): p is NonNullable<typeof p> => !!p),
-      plan.format,
+    const arranged = input.lineup ? [...input.lineup.teamA, ...input.lineup.teamB] : null
+    if (
+      input.lineup &&
+      arranged &&
+      (input.lineup.format !== plan.format ||
+        arranged.length !== input.selection.length ||
+        new Set(arranged).size !== arranged.length ||
+        arranged.some((id) => !input.selection.includes(id)))
     )
+      throw new ServiceError('invalid', {
+        lineup: 'The lineup no longer matches the selected players.',
+      })
+    const lineup =
+      input.lineup ??
+      balanceTeams(
+        selected.filter((p): p is NonNullable<typeof p> => !!p),
+        plan.format,
+      )
     const row = await appendMatch(tx, session, new Set(roster.map((r) => r.id)), lineup, {
       operationId: input.operationId,
       origin: 'manual',

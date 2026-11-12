@@ -25,7 +25,8 @@ export async function GET(
 
 /**
  * Q-QUEUE › add one waiting match, keyed on the client's `operationId`. `source` picks the
- * command: `selection` (Make match), `suggested` (an accepted suggestion; both revisions it was
+ * command: `selection` (Make match, with the confirmed `lineup` when the operator arranged the
+ * teams), `suggested` (an accepted suggestion; both revisions it was
  * computed against are required), `auto` (reviewed Auto queue drafts, each keyed on its own
  * `operationId`; both revisions they were checked against are required), or a manual lineup (the
  * default).
@@ -42,7 +43,14 @@ export async function POST(
       const selection = Array.isArray(body.selection)
         ? body.selection.filter((id): id is string => typeof id === 'string')
         : []
-      return { status: 201, body: await makeMatch(club, sessionId, { operationId, selection }) }
+      return {
+        status: 201,
+        body: await makeMatch(club, sessionId, {
+          operationId,
+          selection,
+          lineup: body.lineup == null ? undefined : lineupOf(body.lineup),
+        }),
+      }
     }
     if (body.source === 'auto')
       return {

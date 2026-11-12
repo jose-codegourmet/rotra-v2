@@ -1,0 +1,18 @@
+// Private, recoverable provider-side email changes started from Admin Edit.
+model AdminPlayerEmailEdit {
+  id              String   @id @default(uuid(7)) @db.Uuid
+  playerId        String   @map("player_id") @db.Uuid
+  adminId         String   @map("admin_id") @db.Uuid
+  originalEmail   String?  @map("original_email")
+  proposedEmail   String   @map("proposed_email")
+  contactRevision BigInt   @map("contact_revision")
+  state           String   @default("pending")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  player Player @relation(fields: [playerId], references: [id], onDelete: Restrict)
+  admin AdminAccount @relation(fields: [adminId], references: [id], onDelete: Restrict)
+
+  @@index([playerId, createdAt(sort: Desc)])
+  @@map("admin_player_email_edits")
+}

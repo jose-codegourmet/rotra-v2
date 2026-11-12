@@ -84,3 +84,10 @@ export async function generatePlayerRecoveryToken(subject: string, email: string
   if (data.user.id !== subject) throw new ProviderError('provider_conflict')
   return data.properties.hashed_token
 }
+
+/** Server-only beta Admin password change; a timeout leaves the outcome unconfirmed. */
+export async function setPlayerPasswordByAdmin(subject: string, password: string) {
+  if (password.length < 8) throw new ProviderError('provider_rejected')
+  const { data, error } = await adminClient(15000).auth.admin.updateUserById(subject, { password })
+  if (error || data.user?.id !== subject) throw failure(error?.status)
+}

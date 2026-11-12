@@ -174,7 +174,7 @@ async function adminChangeNoteOf(db: Db, playerId: string) {
     where: {
       targetType: 'player',
       targetId: playerId,
-      action: 'player.profile_updated',
+      action: { in: ['player.profile_updated', 'player.password_set'] },
       occurredAt: { gte: account.claimedAt },
     },
     orderBy: [{ occurredAt: 'desc' }, { id: 'desc' }],

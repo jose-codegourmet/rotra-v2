@@ -11,7 +11,7 @@ import { normalizeContact } from '../contact-change-request/contactChangeRequest
 import { supersedeOpenContactRequests } from '../contact-change-request/fetchers'
 import { adminAccount } from '../fixtures/adminAccounts'
 import { checkMockSave } from '../mock/bridge'
-import { MockError, NotConnectedError } from '../mock/errors'
+import { MockError } from '../mock/errors'
 import { type MockState, readMockState } from '../mock/store'
 import { realUpdateAdminPlayer } from '../real/admin-players'
 import { isRealDataMode } from '../real/mode'
@@ -343,17 +343,7 @@ async function realEditAdminPlayer(input: AdminPlayerEditInput): Promise<AdminPl
   if (changed.length && !form.reason.trim()) errors.reason ??= ADMIN_PLAYER_REASON_REQUIRED
   if (Object.keys(errors).length || !parsed.success) throw editErrors(errors)
   if (!changed.length) return editResult(edit, [])
-  if (changed.some((field) => field !== 'name' && field !== 'nickname'))
-    throw new NotConnectedError()
-  const player = await realUpdateAdminPlayer({
-    id: input.id,
-    revision: input.revision,
-    name: parsed.data.name,
-    nickname: parsed.data.nickname,
-    picture: '',
-    reason: parsed.data.reason,
-  })
-  return editResult(player, changed)
+  return realUpdateAdminPlayer(input)
 }
 export async function changeAdminPlayers(input: {
   ids: string[]

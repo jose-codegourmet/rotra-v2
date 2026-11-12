@@ -46,6 +46,7 @@ type WireOwnRequest = {
   proposedValue: string
   status: Exclude<ContactChangeStatus, 'approved' | 'applying' | 'failed'> | 'approved_pending'
   requestedAt: string
+  supersededAt: string | null
 }
 
 function ownOf(request: WireOwnRequest): ContactChangeRequest {
@@ -58,6 +59,7 @@ function ownOf(request: WireOwnRequest): ContactChangeRequest {
     // The player sees "Approved, being set up" until it is applied; review detail stays Admin's.
     status: request.status === 'approved_pending' ? 'approved' : request.status,
     requestedAt: Date.parse(request.requestedAt),
+    supersededAt: msOrUndefined(request.supersededAt),
   }
 }
 
@@ -129,6 +131,7 @@ type WireAdminRequest = {
   approvedAt: string | null
   appliedAt: string | null
   decidedAt: string | null
+  supersededAt: string | null
   failureCode: string | null
   player: ContactRequestPlayer
   checks: ContactCheck[] | null
@@ -147,6 +150,7 @@ function detailOf(wire: WireAdminRequest): AdminContactRequestDetail {
     approvedAt: msOrUndefined(wire.approvedAt),
     appliedAt: msOrUndefined(wire.appliedAt),
     decidedAt: msOrUndefined(wire.decidedAt),
+    supersededAt: msOrUndefined(wire.supersededAt),
     // Every stored failure code is an application failure; the code itself is not shown.
     error: wire.status === 'failed' ? PROVIDER_ERROR : undefined,
     // The database keeps a contact revision server-side; the client only needs the original value.

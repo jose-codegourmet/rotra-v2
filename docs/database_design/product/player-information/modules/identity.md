@@ -10,7 +10,7 @@
 |---|---|
 | `id` | UUID PK, independent of authentication subject |
 | `full_name`, `nickname`, `avatar_ref` | Public/permitted display data; nickname/avatar optional |
-| `avatar_previous_ref` | Nullable; the previous uploaded photo, next to the current `avatar_ref`. Never a character or initials; only current and previous files are kept ([D-2026-11-09-10](../../../../mvp/decisions.md#d-2026-11-09-10)) |
+| `avatar_previous_ref` | Nullable; stores the previous picture reference for an Admin edit, including a character. The previous initials remain unrepresented (the known Admin mockup gap); superseded uploaded photos are removed after a successful save ([D-2026-11-09-14](../../../../mvp/decisions.md#d-2026-11-09-14)). The Player picker retains its separate current-and-previous-photo rule |
 | `profile_state` | Unclaimed/claimed; no login is required for unclaimed identity |
 | `hide_phone_from_clubs` | Privacy preference |
 | `profile_visibility` | **Built** (`20261112000100_round2_profiles_banners_invites`). Enum `profile_visibility`: `public` · `private` · `always_private`, not null, **default `private`** for new rows (Prisma `Player.profileVisibility`). `private` hides the profile from visitors who are not signed in; `always_private` hides name, level and games from everyone but the player (and the Queue Master of a session they join), while `avatar_ref` and `banner_id` stay public ([D-2026-11-09-07](../../../../mvp/decisions.md#d-2026-11-09-07), [D-2026-11-11-11](../../../../mvp/decisions.md#d-2026-11-11-11)). There was no stored `profile_private` boolean before (the Private switch was mock-only), so the migration backfilled every existing row to `public` and dropped nothing |

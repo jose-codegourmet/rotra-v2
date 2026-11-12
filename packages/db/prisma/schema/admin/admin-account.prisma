@@ -18,6 +18,7 @@ model AdminAccount {
   updatedSettings         AdminSetting[]
   passwordResetRequests   PlayerPasswordResetRequest[]
   auditEvents             AdminAuditEvent[]
+  playerEmailEdits        AdminPlayerEmailEdit[]
   submittedContactChanges PlayerContactChangeRequest[] @relation("ContactChangeSubmittedBy")
   reviewedContactChanges  PlayerContactChangeRequest[] @relation("ContactChangeReviewedBy")
 

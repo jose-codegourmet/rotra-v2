@@ -1,0 +1,93 @@
+# Manual regression run: the three apps in REAL data mode against a throwaway local Supabase stack
+# started on the runner (`supabase start`). It uses NO secrets and NO environment: nothing here
+# reaches a hosted Supabase project or Vercel. Same steps as `make e2e`, without nvm.
+name: Regression
+
+on:
+  workflow_dispatch:
+    inputs:
+      suite:
+        description: Which Playwright projects to run
+        type: choice
+        options: [all, sim, ui]
+        default: all
+      seeds:
+        description: Number of simulation seeds (E2E_SEEDS)
+        type: string
+        default: '5'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: regression
+  cancel-in-progress: false
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      CI: 'true'
+      E2E_SEEDS: ${{ inputs.seeds }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # packages/db has no postinstall; the apps' `next build` needs the Prisma client.
+      - run: pnpm --filter @rotra/db db:generate
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.34.3
+
+      - name: Ensure psql
+        run: command -v psql || (sudo apt-get update && sudo apt-get install -y postgresql-client)
+
+      - name: Install Chromium
+        if: inputs.suite != 'sim'
+        run: pnpm --filter @rotra/e2e exec playwright install --with-deps chromium
+
+      # `make e2e` = `pnpm --filter @rotra/e2e e2e` (prepare + playwright test) behind nvm.
+      # CI=true makes the Playwright web servers run `next build` + `next start`.
+      - name: Run regression
+        env:
+          SUITE: ${{ inputs.suite }}
+        run: |
+          if [ "$SUITE" = "all" ]; then
+            pnpm --filter @rotra/e2e e2e
+          else
+            pnpm --filter @rotra/e2e e2e --project "$SUITE"
+          fi
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: apps/e2e/playwright-report
+          retention-days: 14
+          if-no-files-found: ignore
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: apps/e2e/test-results
+          retention-days: 14
+          if-no-files-found: ignore
+
+      - name: Stop local Supabase
+        if: always()
+        run: supabase stop --no-backup || true

@@ -6,12 +6,23 @@ import { PrismaClient } from '../generated/prisma/client'
  * The one server-only runtime client. Uses the pooled runtime connection, never the migration
  * connection. `server-only` makes any client-bundle import fail the build.
  */
+/**
+ * On Vercel every function instance has its own pool, and a traffic burst starts hundreds of
+ * instances at once. Five connections each ran the Supabase pooler past its client limit
+ * (EMAXCONN, November 12, 2026), so serverless defaults to one connection, closed after a short
+ * idle. DATABASE_POOL_MAX / DATABASE_IDLE_TIMEOUT_MS still win when set.
+ */
+const serverless = process.env.VERCEL === '1'
+
 function createClient() {
   const connectionString = process.env.DATABASE_URL
   if (!connectionString) throw new Error('DATABASE_URL is not set')
   const adapter = new PrismaPg({
     connectionString,
-    max: Number(process.env.DATABASE_POOL_MAX ?? 5),
+    max: Number(process.env.DATABASE_POOL_MAX ?? (serverless ? 1 : 5)),
+    idleTimeoutMillis: Number(
+      process.env.DATABASE_IDLE_TIMEOUT_MS ?? (serverless ? 5_000 : 10_000),
+    ),
     statement_timeout: Number(process.env.DATABASE_STATEMENT_TIMEOUT_MS ?? 10_000),
   })
   return new PrismaClient({

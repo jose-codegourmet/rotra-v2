@@ -1,5 +1,6 @@
 import { readAccounts } from '../accounts.ts'
 import { ApiError } from '../api/client.ts'
+import { firstFreeStart } from '../api/schedule.ts'
 import { readClock, setClock } from '../clock.ts'
 import type { DoneReview, QueueMasterApi, QueueRead, SessionRead, StandingRow } from './api.ts'
 import { createRng, type Rng } from './prng.ts'
@@ -251,7 +252,12 @@ export class Engine {
     const shape = cfg.shape
     await finishRunningSessions(api)
     const base = (await readClock('queue')).nowMs
-    this.startAt = Math.ceil((base + 5 * MINUTE) / MINUTE) * MINUTE
+    // Clear of every session earlier runs left on this database (re-runs never reseed it).
+    this.startAt = firstFreeStart(
+      await api.busyWindows(),
+      base + 5 * MINUTE,
+      shape.hours * 60 * MINUTE + MINUTE,
+    )
     this.endAt = this.startAt + shape.hours * 60 * MINUTE
     this.sessionMinutes = shape.hours * 60
     const venueId = await api.addVenue(`Sim Hall ${cfg.id} ${cfg.seed}`)

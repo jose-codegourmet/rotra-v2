@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, type Page, test } from '@playwright/test'
 import { readAccounts } from '../../src/accounts.ts'
 import { resetClock } from '../../src/clock.ts'
 import { appUrl } from '../../src/stack.ts'
@@ -9,6 +9,7 @@ import {
   gamesPlayed,
   generateAndAddAll,
   matchDoneOn,
+  moveToFreeDay,
   seedVenue,
   sessionDone,
   sessionTimes,
@@ -21,9 +22,10 @@ import { rolePage, signInAdmin, signInPlayer, signInQueueMaster } from '../../sr
 import { advance, jumpTo, MINUTE } from '../../src/ui/time.ts'
 
 test.use({ actionTimeout: 15_000 })
+// Clean up on the journey's own virtual time first (court actions follow the server clock).
 test.afterEach(async () => {
-  await resetClock()
   await abandonCreatedSessions()
+  await resetClock()
 })
 
 const COURTS = ['Court 1', 'Court 2']
@@ -38,6 +40,11 @@ test('UI-01 a club night from Admin to Session done to the Player history', asyn
   const accounts = readAccounts()
   const players = accounts.players.slice(0, 8)
   const names = players.map((player) => player.fullName)
+  // Re-runs share the database: this run's own title, and Player 1's games before tonight.
+  const title = `UI-01 Club Night ${Date.now().toString(36)}`
+  const player = await rolePage(browser)
+  await signInPlayer(player, 1)
+  const before = await countedGames(player, players[0]?.playerId as string)
 
   // Admin sees the e2e test club.
   const admin = await rolePage(browser)
@@ -52,7 +59,9 @@ test('UI-01 a club night from Admin to Session done to the Player history', asyn
   await seedVenue(venue)
   const qm = await rolePage(browser)
   await signInQueueMaster(qm)
-  const sessionId = await createSession(qm, 'UI-01 Club Night', venue, { startHour: 7, endHour: 8 })
+  const slot = { startHour: 7, endHour: 8 }
+  await moveToFreeDay(slot, [qm])
+  const sessionId = await createSession(qm, title, venue, slot)
   await addSavedPlayers(qm, names)
   await expect(qm.getByRole('tab', { name: 'Roster and levels 8/16' })).toBeVisible()
 
@@ -88,15 +97,23 @@ test('UI-01 a club night from Admin to Session done to the Player history', asyn
   await sessionDone(qm)
   await expect.poll(async () => (await sessionTimes(sessionId)).state).toBe('completed')
 
-  // The registered Player sees the session and their games in Player Information.
-  const player = await rolePage(browser)
-  await signInPlayer(player, 1)
+  // The registered Player sees the session and tonight's games on top of the earlier ones.
   await player.goto(`${appUrl('player')}/players/${players[0]?.playerId}`)
   const mySessions = player.locator('section', {
     has: player.getByRole('heading', { name: 'My sessions', exact: true }),
   })
-  await expect(mySessions.getByText('UI-01 Club Night')).toBeVisible({ timeout: 30_000 })
+  await expect(mySessions.getByText(title)).toBeVisible({ timeout: 30_000 })
   await expect(
-    player.getByRole('button', { name: `All games (${firstGames})`, exact: true }),
+    player.getByRole('button', { name: `All games (${before + firstGames})`, exact: true }),
   ).toBeVisible()
 })
+
+/** Player Information › Recent games: the `All games (N)` count, 0 when no game is recorded. */
+async function countedGames(page: Page, playerId: string) {
+  await page.goto(`${appUrl('player')}/players/${playerId}`)
+  const all = page.getByRole('button', { name: /^All games \(\d+\)$/ })
+  const none = page.getByText('No recorded games yet.', { exact: true })
+  await expect(all.or(none)).toBeVisible({ timeout: 30_000 })
+  if (await none.isVisible()) return 0
+  return Number(/\((\d+)\)/.exec((await all.textContent()) ?? '')?.[1])
+}

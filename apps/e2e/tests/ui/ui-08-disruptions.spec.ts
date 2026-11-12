@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { resetClock } from '../../src/clock.ts'
+import { knownDefect } from '../../src/known-defect.ts'
 import { liveSession } from '../../src/ui/journeys.ts'
 import {
   abandonCreatedSessions,
@@ -20,12 +21,20 @@ import {
 import { advance, jumpTo, MINUTE } from '../../src/ui/time.ts'
 
 test.use({ actionTimeout: 15_000 })
+// Clean up on the journey's own virtual time first (court actions follow the server clock).
 test.afterEach(async () => {
-  await resetClock()
   await abandonCreatedSessions()
+  await resetClock()
 })
 
 const COURTS = ['Court 1', 'Court 2']
+
+/** REG-DEF-01 in the browser: Session done with a planned match that never started returns 500. */
+const SESSION_DONE_500 = {
+  id: 'UI-08',
+  bug: 'Session done returns 500 with a match that never started (REG-DEF-01)',
+  match: /^Session done: POST …\/finalization -> 500$/,
+}
 const GAME = 12 * MINUTE
 
 /**
@@ -34,16 +43,10 @@ const GAME = 12 * MINUTE
  * then Present off) and one player eating (Present off, then on again). Session done's review
  * lists exactly the players below the minimum.
  */
-test('UI-08 late player, injury and a meal break; Session done lists the shortfalls', async ({
+test('UI-08 late player, injury and a meal break; Session done lists the shortfalls [known bug: Session done 500]', async ({
   browser,
 }) => {
   test.setTimeout(480_000)
-  // DEFECT (app): with nine rostered players, Generate matches › Add all 2 › Add to Main Queue is
-  // refused: POST /api/sessions/:id/matches answers 409 and the review sheet shows "This changed
-  // since you loaded it. Refresh and try again." It repeats after a page reload. UI-01 (eight
-  // players, same steps) adds them fine. Evidence: the run's trace (PATCH court-fill 200, then
-  // POST /matches 409) and screenshot of the open "Add selected to Main Queue?" sheet.
-  test.fail()
   const live = await liveSession(browser, {
     title: 'UI-08 Disruptions',
     rosterSize: 9,
@@ -55,9 +58,10 @@ test('UI-08 late player, injury and a meal break; Session done lists the shortfa
   const late = names[8] as string
   await turnOnAutoQueue(qm)
 
-  // Generate `count` matches, add them; Auto Queue puts them on free courts; start each one.
+  // Generate `pick` matches, add them; Auto Queue puts what it can on free courts; start `count`.
+  // Drafts are planned games, so with too few free players some stay waiting for a later round.
   const round = async (pick: 2, count: number = pick) => {
-    expect(await generateAndAddAll(qm, pick)).toBe(count)
+    expect(await generateAndAddAll(qm, pick)).toBeGreaterThanOrEqual(count)
     await consoleTab(qm, 'Session').click()
     const started: string[] = []
     for (const label of COURTS) {
@@ -128,7 +132,18 @@ test('UI-08 late player, injury and a meal break; Session done lists the shortfa
 
   await jumpTo(Math.max(now, endMs) + MINUTE, [qm])
   await qm.reload()
-  const listed = await sessionDone(qm)
-  expect(listed.map((line) => line.replace(/\s+/g, ' ')).sort()).toEqual(expected.sort())
+  // Round 3 planned a second match that never started; Session done must drop it.
+  await knownDefect(SESSION_DONE_500, async () => {
+    const finalization = qm.waitForResponse(
+      (response) =>
+        response.request().method() === 'POST' &&
+        new URL(response.url()).pathname.endsWith('/finalization'),
+    )
+    const listed = await sessionDone(qm)
+    expect(listed.map((line) => line.replace(/\s+/g, ' ')).sort()).toEqual(expected.sort())
+    const response = await finalization
+    if (response.status() >= 500)
+      throw new Error(`Session done: POST …/finalization -> ${response.status()}`)
+  })
   await expect.poll(async () => (await sessionTimes(live.sessionId)).state).toBe('completed')
 })

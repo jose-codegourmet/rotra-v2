@@ -1,4 +1,4 @@
-import type { AdminPlayerEditValues } from '@rotra/schema/admin-player'
+import { type AdminPlayerEditValues, adminPlayerEditSchemaFor } from '@rotra/schema/admin-player'
 import { phoneField } from '@rotra/schema/phone'
 import { plainIdentity } from '../club/club.rules'
 import { PLAYING_LEVELS } from '../player/player.types'
@@ -169,4 +169,12 @@ export function adminPlayerEditedSummary(
   reason: string,
 ): string {
   return `Edited ${name}: ${changed.join(', ')}. Reason: ${reason}`
+}
+
+/** Validate an Admin edit at a service boundary using the shared form rules. */
+export function validateAdminPlayerEdit(
+  player: { claimed: boolean; hasAccount: boolean },
+  values: unknown,
+) {
+  return adminPlayerEditSchemaFor(player).safeParse(values)
 }

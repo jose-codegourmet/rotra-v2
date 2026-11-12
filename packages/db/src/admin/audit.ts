@@ -73,6 +73,7 @@ const UI_ACTION: Record<string, string> = {
   'player.contact_change_rejected': 'contact_change_declined',
   'player.contact_change_applied': 'contact_change_applied',
   'player.profile_updated': 'player_updated',
+  'player.password_set': 'player_updated',
 }
 
 const CONTACT_ACTIONS = [
@@ -134,9 +135,36 @@ export async function readAuditEvents(
     },
   })
   const summarize = await summarizer(events)
+  const emitted = new Set<string>()
   return events.flatMap((event) => {
     const action = UI_ACTION[event.action]
-    const summary = action ? summarize(event) : null
+    const metadata = metadataOf(event.metadata)
+    const operationId = str(metadata.operationId)
+    if (operationId && emitted.has(operationId)) return []
+    let summary = action ? summarize(event) : null
+    if (operationId) {
+      emitted.add(operationId)
+      const parts = events.filter(
+        (item) => str(metadataOf(item.metadata).operationId) === operationId,
+      )
+      const fields = [
+        ...new Set(
+          parts.flatMap((item) => {
+            const changed = metadataOf(item.metadata).changed
+            return Array.isArray(changed)
+              ? changed.filter((field): field is string => typeof field === 'string')
+              : []
+          }),
+        ),
+      ]
+      const named = parts
+        .map((item) => metadataOf(item.metadata))
+        .find((item) => str(metadataOf(item.after).name) || str(item.name))
+      const name = named ? (str(metadataOf(named.after).name) ?? str(named.name)) : null
+      const reason = parts.map((item) => str(metadataOf(item.metadata).reason)).find(Boolean)
+      if (name && reason && fields.length)
+        summary = `Edited ${name}: ${fields.join(', ')}. Reason: ${reason}`
+    }
     if (!action || !summary) return []
     return [
       {
@@ -303,7 +331,18 @@ async function summarizer(events: ReadEvent[]) {
         if (metadata.field !== 'email' || !name || !reason) return null
         return `Email change for ${name} entered by ROTRA Admin. Reason: ${reason}`
       }
+      case 'player.password_set': {
+        const reason = str(metadata.reason)
+        return reason ? `Password set by ROTRA Admin. Reason: ${reason}` : null
+      }
       case 'player.profile_updated': {
+        const fields = Array.isArray(metadata.changed)
+          ? metadata.changed.filter((field): field is string => typeof field === 'string')
+          : []
+        const name = str(metadataOf(metadata.after).name)
+        const editReason = str(metadata.reason)
+        if (fields.length && name && editReason)
+          return `Edited ${name}: ${fields.join(', ')}. Reason: ${editReason}`
         // The mock's line, from the stored name/nickname pair (a photo link is never saved here).
         const identity = (value: unknown) => {
           const side = metadataOf(value)

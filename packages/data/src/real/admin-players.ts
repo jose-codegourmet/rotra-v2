@@ -1,7 +1,9 @@
-import type { AdminPlayerProfilePatchValues } from '@rotra/schema/admin-player'
+import type { AdminPlayerEditValues } from '@rotra/schema/admin-player'
 import type {
   AdminPlayer,
   AdminPlayerDetail,
+  AdminPlayerEdit,
+  AdminPlayerEditResult,
   AdminPlayerListParams,
 } from '../admin-player/adminPlayer.types'
 import { selectAdminPlayers } from '../admin-player/management.rules'
@@ -50,6 +52,7 @@ export async function realGetAdminPlayerSocialLinks(id: string, signal?: AbortSi
   try {
     return await realRequest<{
       socialLinks: import('../player/player.types').PlayerProfile['socialLinks']
+      edit: Omit<AdminPlayerEdit, 'revision'> & { revision: string }
     }>(`/api/players/${encodeURIComponent(id)}`, { signal })
   } catch (error) {
     if (error instanceof RealRequestError && error.status === 404) return null
@@ -66,30 +69,25 @@ export async function realGetAdminPlayerGames(id: string, signal?: AbortSignal) 
   ).games
 }
 
-/** A-PLAYER Edit profile: name and nickname under the loaded revision; a stale form is a conflict. */
+/** Full Admin edit, returning only fields that were actually saved and any Auth warnings. */
 export async function realUpdateAdminPlayer(
-  input: AdminPlayerProfilePatchValues & { id: string; revision: number },
-) {
+  input: AdminPlayerEditValues & { id: string; revision: number },
+): Promise<AdminPlayerEditResult> {
   try {
-    const { player } = await realRequest<{ player: WireAdminPlayer }>(
-      `/api/players/${encodeURIComponent(input.id)}`,
-      {
-        method: 'PATCH',
-        body: {
-          revision: String(input.revision),
-          name: input.name,
-          nickname: input.nickname,
-          picture: input.picture,
-          reason: input.reason,
-        },
-      },
-    )
-    return playerOf(player)
+    const { id, revision, ...values } = input
+    const result = await realRequest<
+      Omit<AdminPlayerEditResult, 'player'> & { player: WireAdminPlayer }
+    >(`/api/players/${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      body: { revision: String(revision), values },
+    })
+    return { ...result, player: playerOf(result.player) }
   } catch (error) {
     if (error instanceof RealRequestError && error.status === 409)
       throw new MockError(
         'conflict',
         'This player changed since you opened the form. Reload before editing.',
+        error.fieldErrors,
       )
     throw error
   }

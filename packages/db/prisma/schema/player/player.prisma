@@ -25,6 +25,8 @@ model Player {
   fullName             String             @map("full_name")
   nickname             String?
   avatarRef            String?            @map("avatar_ref")
+  /// Picture before the most recent Admin picture change.
+  avatarPreviousRef    String?            @map("avatar_previous_ref")
   profileState         PlayerProfileState @default(unclaimed) @map("profile_state")
   hidePhoneFromClubs   Boolean            @default(false) @map("hide_phone_from_clubs")
   /// New registrations default to private; the player raises or lowers it in Privacy and contact.
@@ -53,6 +55,7 @@ model Player {
   idAllocation          PlayerIdAllocation?
   passwordResetRequests PlayerPasswordResetRequest[]
   contactChanges        PlayerContactChangeRequest[]
+  adminEmailEdits       AdminPlayerEmailEdit[]
   clubPlayers           ClubPlayer[]
   resolvedInputs        ClubPlayerPrivateInput[]     @relation("ClubPlayerInputResolved")
   rosterEntries         SessionPlayer[]              @relation("SessionPlayerAtEntry")

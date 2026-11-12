@@ -173,6 +173,8 @@ export type AdminPlayerEditResult = {
   /** Empty = "Nothing changed." (nothing saved, no Activity log entry, no revision bump) */
   changed: AdminPlayerChangedField[]
   passwordSet: boolean
+  /** Provider changes that could not be confirmed; other listed changes were saved. */
+  warnings?: string[]
   /** 'Nothing changed.' or 'Saved <name>: <fields>.' (+ ' Give the new password to the player yourself.') */
   message: string
 }

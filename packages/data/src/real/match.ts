@@ -184,11 +184,17 @@ export async function realAddMatch(
 export async function realMakeMatch(input: {
   sessionId: string
   selection: string[]
+  lineup?: MatchLineup
   operationId?: string
 }) {
   const read = await lastRead(input.sessionId)
   const done = await fillCommand<WireMatch>(input.sessionId, '/matches', {
-    body: { source: 'selection', operationId: opId(input), selection: input.selection },
+    body: {
+      source: 'selection',
+      operationId: opId(input),
+      selection: input.selection,
+      lineup: input.lineup,
+    },
   })
   const match = matchOf(done.result)
   const position = shownWaiting(read).filter((m) => m.id !== match.id).length + 1

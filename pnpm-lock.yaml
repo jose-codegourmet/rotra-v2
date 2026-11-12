@@ -198,6 +198,9 @@ importers:
       '@tanstack/react-query-devtools':
         specifier: ^5.0.0
         version: 5.105.0(@tanstack/react-query@5.105.0(@types/react@19.2.14)(react@19.2.9))(@types/react@19.2.14)(csstype@3.2.3)(react@19.2.9)
+      '@vercel/analytics':
+        specifier: ^2.0.1
+        version: 2.0.1(next@16.4.3(@opentelemetry/api@1.10.0)(@playwright/test@1.64.1)(@types/node@24.12.3)(react-dom@19.2.9(react@19.2.9))(react@19.2.9))(react@19.2.9)
       '@vercel/otel':
         specifier: ^2.3.0
         version: 2.3.0(@opentelemetry/api-logs@0.223.1)(@opentelemetry/api@1.10.0)(@opentelemetry/instrumentation@0.223.1(@opentelemetry/api@1.10.0))(@opentelemetry/resources@2.12.1(@opentelemetry/api@1.10.0))(@opentelemetry/sdk-logs@0.223.1(@opentelemetry/api@1.10.0))(@opentelemetry/sdk-metrics@2.12.1(@opentelemetry/api@1.10.0))(@opentelemetry/sdk-trace-base@2.12.0(@opentelemetry/api@1.10.0))
@@ -2884,6 +2887,35 @@ packages:
   '@types/use-sync-external-store@0.0.6':
     resolution: {integrity: sha512-zFDAD+tlpf2r4asuHEj0XH6pY6i0g5NeAHPn+15wk3BV6JA69eERFXC1gyGThDkVa1zCyKr5jox1+2LbV/AMLg==}
 
+  '@vercel/analytics@2.0.1':
+    resolution: {integrity: sha512-MTQG6V9qQrt1tsDeF+2Uoo5aPjqbVPys1xvnIftXSJYG2SrwXRHnqEvVoYID7BTruDz4lCd2Z7rM1BdkUehk2g==}
+    peerDependencies:
+      '@remix-run/react': ^2
+      '@sveltejs/kit': ^1 || ^2
+      next: '>= 13'
+      nuxt: '>= 3'
+      react: ^18 || ^19 || ^19.0.0-rc
+      svelte: '>= 4'
+      vue: ^3
+      vue-router: ^4
+    peerDependenciesMeta:
+      '@remix-run/react':
+        optional: true
+      '@sveltejs/kit':
+        optional: true
+      next:
+        optional: true
+      nuxt:
+        optional: true
+      react:
+        optional: true
+      svelte:
+        optional: true
+      vue:
+        optional: true
+      vue-router:
+        optional: true
+
   '@vercel/otel@2.3.0':
     resolution: {integrity: sha512-A9OSxGMeemIE2rUzw2zlj9dFXDCp54tzuY6kvKixR+WcxMDPSB/xVV4TDHkGqUXsHbKARR8aeenJm+Or/NSnTA==}
     engines: {node: ^18.19.0 || >=20.6.0}
@@ -3452,6 +3484,7 @@ packages:
   git-raw-commits@5.0.1:
     resolution: {integrity: sha512-Y+csSm2GD/PCSh6Isd/WiMjNAydu0VBiG9J7EdQsNA5P9uXvLayqjmTsNlK5Gs9IhblFZqOU0yid5Il5JPoLiQ==}
     engines: {node: '>=18'}
+    deprecated: Deprecated and no longer maintained. Use @conventional-changelog/git-client instead.
     hasBin: true
 
   glob@13.0.6:
@@ -6860,6 +6893,11 @@ snapshots:
   '@types/resolve@1.20.6': {}
 
   '@types/use-sync-external-store@0.0.6': {}
+
+  '@vercel/analytics@2.0.1(next@16.4.3(@opentelemetry/api@1.10.0)(@playwright/test@1.64.1)(@types/node@24.12.3)(react-dom@19.2.9(react@19.2.9))(react@19.2.9))(react@19.2.9)':
+    optionalDependencies:
+      next: 16.4.3(@opentelemetry/api@1.10.0)(@playwright/test@1.64.1)(@types/node@24.12.3)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)
+      react: 19.2.9
 
   '@vercel/otel@2.3.0(@opentelemetry/api-logs@0.223.1)(@opentelemetry/api@1.10.0)(@opentelemetry/instrumentation@0.223.1(@opentelemetry/api@1.10.0))(@opentelemetry/resources@2.12.1(@opentelemetry/api@1.10.0))(@opentelemetry/sdk-logs@0.223.1(@opentelemetry/api@1.10.0))(@opentelemetry/sdk-metrics@2.12.1(@opentelemetry/api@1.10.0))(@opentelemetry/sdk-trace-base@2.12.0(@opentelemetry/api@1.10.0))':
     dependencies:

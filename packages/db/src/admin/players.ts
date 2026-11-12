@@ -6,7 +6,7 @@ import type { PlayerSessionRecord } from '@rotra/data/player/types'
 import type { AdminContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
 import { currentExperienceMonths, playingStyle } from '../player/profile'
-import { readPlayerMatchHistory } from '../player/projections'
+import { readClubPlayerMatchHistory, readPlayerMatchHistory } from '../player/projections'
 import { requireAdmin, requireRevision } from '../service/authorize'
 import { ServiceError } from '../service/errors'
 import { recordAudit } from './audit'
@@ -239,8 +239,13 @@ export async function readAdminPlayerGames(
     where: { playerId },
     select: { playerId: true },
   })
-  if (!player) throw new ServiceError('not_found')
-  const sessions = await readPlayerMatchHistory(playerId)
+  let sessions: Awaited<ReturnType<typeof readPlayerMatchHistory>>
+  if (player) sessions = await readPlayerMatchHistory(playerId)
+  else {
+    const [clubOnly] = await readClubOnlyRecords(playerId)
+    if (!clubOnly?.createdByClubId) throw new ServiceError('not_found')
+    sessions = await readClubPlayerMatchHistory(clubOnly.createdByClubId, playerId)
+  }
   return sessions.flatMap((s) =>
     s.finishedAt
       ? [

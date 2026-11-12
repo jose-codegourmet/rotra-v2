@@ -474,54 +474,67 @@ export async function confirmHistoryAttribution(
  * P-HISTORY public read (`player.match-history`): valid finalized sessions only, grouped by
  * session, with each game's counting status. No costs, levels, Off Day or private identity.
  */
+async function historyFromFacts(tx: Tx, facts: PlayerMatchFact[]) {
+  const sessionIds = [...new Set(facts.map((f) => f.sessionId))]
+  const [sessions, entries] = await Promise.all([
+    tx.queueSession.findMany({
+      where: { id: { in: sessionIds }, state: 'completed' },
+      select: {
+        id: true,
+        title: true,
+        finalizedAt: true,
+        publicSlug: true,
+        club: { select: { name: true } },
+        publication: { select: { publishedAt: true } },
+      },
+    }),
+    tx.sessionPlayer.findMany({
+      where: { sessionId: { in: sessionIds } },
+      select: { id: true, nameSnapshot: true },
+    }),
+  ])
+  const names = new Map(entries.map((e) => [e.id, e.nameSnapshot]))
+  return sessions
+    .map((s) => ({
+      id: s.id,
+      title: s.title,
+      clubName: s.club.name,
+      finishedAt: toIsoOrNull(s.finalizedAt),
+      sessionPageUrl: s.publication?.publishedAt ? `/s/${s.publicSlug}` : null,
+      games: facts
+        .filter((f) => f.sessionId === s.id)
+        .map((f) => ({
+          id: f.matchId,
+          format: f.format,
+          partners: f.partnerEntryIds.map((id) => names.get(id) ?? ''),
+          opponents: f.opponentEntryIds.map((id) => names.get(id) ?? ''),
+          counting: !f.fullParticipation ? 'partial' : f.standardMatch ? 'counted' : 'fun',
+          result: f.team === f.winningTeam ? 'won' : 'lost',
+          score:
+            f.teamAScore == null || f.teamBScore == null
+              ? null
+              : f.team === 'A'
+                ? `${f.teamAScore}–${f.teamBScore}`
+                : `${f.teamBScore}–${f.teamAScore}`,
+        })),
+    }))
+    .sort((a, b) => (b.finishedAt ?? '').localeCompare(a.finishedAt ?? ''))
+}
+
 export async function readPlayerMatchHistory(playerId: string) {
   if (!UUID.test(playerId)) return []
+  return prisma.$transaction(async (tx) => historyFromFacts(tx, await playerFacts(tx, playerId)))
+}
+
+/** Admin history for a club-only unclaimed record, scoped to that club's existing match facts. */
+export async function readClubPlayerMatchHistory(clubId: string, clubPlayerId: string) {
+  if (!UUID.test(clubId) || !UUID.test(clubPlayerId)) return []
   return prisma.$transaction(async (tx) => {
-    const facts = await playerFacts(tx, playerId)
-    const sessionIds = [...new Set(facts.map((f) => f.sessionId))]
-    const [sessions, entries] = await Promise.all([
-      tx.queueSession.findMany({
-        where: { id: { in: sessionIds }, state: 'completed' },
-        select: {
-          id: true,
-          title: true,
-          finalizedAt: true,
-          publicSlug: true,
-          club: { select: { name: true } },
-          publication: { select: { publishedAt: true } },
-        },
-      }),
-      tx.sessionPlayer.findMany({
-        where: { sessionId: { in: sessionIds } },
-        select: { id: true, nameSnapshot: true },
-      }),
-    ])
-    const names = new Map(entries.map((e) => [e.id, e.nameSnapshot]))
-    return sessions
-      .map((s) => ({
-        id: s.id,
-        title: s.title,
-        clubName: s.club.name,
-        finishedAt: toIsoOrNull(s.finalizedAt),
-        sessionPageUrl: s.publication?.publishedAt ? `/s/${s.publicSlug}` : null,
-        games: facts
-          .filter((f) => f.sessionId === s.id)
-          .map((f) => ({
-            id: f.matchId,
-            format: f.format,
-            partners: f.partnerEntryIds.map((id) => names.get(id) ?? ''),
-            opponents: f.opponentEntryIds.map((id) => names.get(id) ?? ''),
-            counting: !f.fullParticipation ? 'partial' : f.standardMatch ? 'counted' : 'fun',
-            result: f.team === f.winningTeam ? 'won' : 'lost',
-            score:
-              f.teamAScore == null || f.teamBScore == null
-                ? null
-                : f.team === 'A'
-                  ? `${f.teamAScore}–${f.teamBScore}`
-                  : `${f.teamBScore}–${f.teamAScore}`,
-          })),
-      }))
-      .sort((a, b) => (b.finishedAt ?? '').localeCompare(a.finishedAt ?? ''))
+    const facts = await tx.playerMatchFact.findMany({
+      where: { clubId, clubPlayerId },
+      orderBy: [{ playedAt: 'desc' }, { matchId: 'asc' }],
+    })
+    return historyFromFacts(tx, facts)
   })
 }
 

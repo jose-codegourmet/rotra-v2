@@ -1,5 +1,6 @@
 'use client'
 
+import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import {
   countedGames,
   courtNames,
@@ -25,6 +26,7 @@ import type {
   MatchResultFormValues,
 } from '@rotra/ui/forms/match-result-form/schema'
 import { InvalidMatchSheet } from '@rotra/ui/invalid-match-sheet'
+import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import {
   type SubstitutionCredit,
   type SubstitutionPlayer,
@@ -166,6 +168,18 @@ function OpenActiveMatch({
   const committing = useRef(false)
 
   const byId = (id: string) => roster.find((p) => p.id === id)
+  const clubPlayers = useClubPlayers()
+  /** The face is the saved player's own picture (or character), like the Queue tab */
+  const photoOf = (p: SessionPlayer | undefined) => {
+    const clubPlayer = p && clubPlayers.data?.players.find((item) => item.id === p.clubPlayerId)
+    return clubPlayer
+      ? profilePictureSrc(
+          clubPlayer.picture,
+          clubPlayer.playerId ?? clubPlayer.id,
+          clubPlayer.pictureName ?? clubPlayer.fullName,
+        )
+      : undefined
+  }
   const player = (id: string): TeamLineupPlayer => {
     const p = byId(id)
     return {
@@ -174,6 +188,7 @@ function OpenActiveMatch({
       shortName: p ? shortName(p) : 'Player',
       level: p?.level ?? null,
       games: countedGames(id, matches),
+      photoUrl: photoOf(p),
     }
   }
   const substitutionPlayer = (p: SessionPlayer): SubstitutionPlayer => ({

@@ -1,5 +1,6 @@
 'use client'
 
+import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import {
   countedGames,
   courtNames,
@@ -28,6 +29,7 @@ import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { MoveMatchSheet } from '@rotra/ui/move-match-sheet'
 import { formatWhen } from '@rotra/ui/now-card/helpers'
 import { OnCourtSheet } from '@rotra/ui/on-court-sheet'
+import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { ReplacePlayerSheet } from '@rotra/ui/replace-player-sheet'
 import { SwapMatchSheet } from '@rotra/ui/swap-match-sheet'
 import type { TeamLineupPlayer } from '@rotra/ui/team-lineup'
@@ -159,6 +161,18 @@ function OpenOnCourt({ session, match, ctx, swapFirst, onClose, onRefresh }: Ope
   const acting = useRef(false)
 
   const byId = (id: string) => ctx.roster.find((p) => p.id === id)
+  const clubPlayers = useClubPlayers()
+  /** The face is the saved player's own picture (or character), like the Queue tab */
+  const photoOf = (p: SessionPlayer | undefined) => {
+    const clubPlayer = p && clubPlayers.data?.players.find((item) => item.id === p.clubPlayerId)
+    return clubPlayer
+      ? profilePictureSrc(
+          clubPlayer.picture,
+          clubPlayer.playerId ?? clubPlayer.id,
+          clubPlayer.pictureName ?? clubPlayer.fullName,
+        )
+      : undefined
+  }
   const player = (id: string): TeamLineupPlayer => {
     const p: SessionPlayer | undefined = byId(id)
     return {
@@ -167,6 +181,7 @@ function OpenOnCourt({ session, match, ctx, swapFirst, onClose, onRefresh }: Ope
       shortName: p ? shortName(p) : 'Player',
       level: p?.level ?? null,
       games: countedGames(id, ctx.matches),
+      photoUrl: photoOf(p),
     }
   }
   const names = (ids: string[]) => listNames(ids.map((id) => player(id).shortName))
@@ -311,6 +326,7 @@ function OpenOnCourt({ session, match, ctx, swapFirst, onClose, onRefresh }: Ope
       id,
       name: p?.nameSnapshot ?? 'Player',
       shortName: p ? shortName(p) : 'Player',
+      photoUrl: photoOf(p),
       games: countedGames(id, ctx.matches),
       waitMinutes: p ? waitMinutes(p, ctx.matches, session.startedAt, now) : 0,
     }

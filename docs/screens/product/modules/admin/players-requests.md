@@ -57,7 +57,7 @@ Decided (owner, 2026-11-10): the password field is confirmed over [D-2026-11-07-
 
 ## A-CONTACT-REQUESTS — Review list
 
-Rows: player/ID, requested field, request time, review/application status, and next permitted action. Proposed filters mirror actual Pending, Approved/applying, Applied, and Failed/needs-attention states. Rejected/not-approved representation awaits final policy but must not appear Applied.
+Rows: player/ID, requested field, request time, review/application status, and next permitted action. Proposed filters mirror actual Pending, Approved/applying, Applied, and Failed/needs-attention states. Pulling the list down from its top (touch), or coming back to the tab, refreshes it once every 10 seconds with the session page's `pull-to-refresh` pill ([November 12, 2026 mockup change](../../../../mockup-changes/2026-11-12-admin-pull-to-refresh.md)); the same applies to Club names and Password resets. Rejected/not-approved representation awaits final policy but must not appear Applied.
 
 Open review against the correct permanent ID, not a name-only match. Repeated requests for the same field need defined conflict behavior; flag them instead of processing stale values blindly.
 

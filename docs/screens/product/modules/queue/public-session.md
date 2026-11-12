@@ -92,6 +92,8 @@ Decisions [D-2026-11-09-02](../../../../mvp/decisions.md#d-2026-11-09-02), [-03]
 
 **Refresh bar** (`/s/<slug>` only, under the hero): “Updated 7:42 PM · Refresh”, adding “· Venue changes haven't synced yet” when the server knows the venue has unsynced changes. **Refresh** is disabled for 10 s after a tap (tooltip/aria “Refresh again in a few seconds”). Only data refreshes, rendered in place; no polling, no Realtime.
 
+**Pull to refresh** (mockup change November 12, 2026, [log](../../../../mockup-changes/2026-11-12-queue-pull-to-refresh.md)): pulling the page down from its top (touch) slides a pill from under the top bar, **Pull to refresh** → **Release to refresh** past the arm point → **Refreshing…** → **Updated 7:42 PM** for a moment. It runs the same refresh as the button and shares its 10 s lock: inside the lock a full pull reads **Refresh again in a few seconds**; offline, **You're offline. Reconnect and try again.** Coming back to the tab refreshes too. A short pull, a pull that starts while scrolled, or a pull while a sheet is open does nothing. For everyone who opened the session link; the Queue Master's preview has no pull. Component: `pull-to-refresh`.
+
 **My night card** (confirmed signed-in Player; above the Details / Participants tabs, under the join area; label “My night”):
 - Before start: “Confirmed · starts DATE, TIME” and **I can't make it** → drop-out notice, line “Told the QM you can't make it”; the slot stays until the QM removes them.
 - Live, not present: one large full-width **I'm here** (≥44 px). After a tap, Present is set and the card shows “Checked in” (or “Checked in · the QM will see it when their device syncs” when offline). After **I'm leaving**: “You've left · tap I'm here if you come back” with **I'm here**.

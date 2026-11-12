@@ -448,6 +448,19 @@ body:has(.player-select:checked) .shell-main { padding-bottom: 120px; }
 .viewer-img { width: min(100%, 640px, calc(100dvh - 128px)); aspect-ratio: 1; border-radius: 12px; overflow: hidden; }
 .viewer-img img, .viewer-img svg { width: 100%; height: 100%; display: block; object-fit: contain; }
 @media (prefers-reduced-motion: reduce) { .viewer { animation: none !important; } }
+
+/* Pull to refresh (mockup change 2026-11-12; D-2026-11-09-04). A pill slides down from under the top bar while the page is pulled past its top. */
+#ptr { position: fixed; left: 50%; top: 64px; z-index: 19; display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px 6px 10px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow); color: var(--fg2); font-size: 13px; font-weight: 600; white-space: nowrap; pointer-events: none; opacity: 0; transform: translate(-50%, -140%); transition: opacity .15s, transform .15s; }
+#ptr.pulling { transition: none; }
+#ptr.show { opacity: 1; }
+#ptr i { display: inline-block; width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--border-strong); border-top-color: var(--accent); transition: transform .15s; }
+#ptr.armed i { transform: rotate(180deg); border-top-color: var(--accent); }
+#ptr.busy i { animation: ptr-spin .8s linear infinite; }
+#ptr.done { color: var(--accent); } #ptr.done i { border-color: var(--accent); }
+#ptr.wait, #ptr.off { color: var(--fg2); } #ptr.wait i, #ptr.off i { border-top-color: var(--border-strong); }
+@keyframes ptr-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { #ptr { transition: none; } #ptr.busy i { animation-duration: 3s; } }
+html { overscroll-behavior-y: contain; }
 </style>
 
 <div id="app"></div>
@@ -2405,5 +2418,71 @@ function render() {
 }
 prototypeRouter = window.mountPrototypeRouter?.({ read: prototypePath, apply: applyPrototypeRoute, render, home: '/admin', dirty: () => S.screen === 'config' && cfgDirty(), });
 if (!prototypeRouter) render();
+// ---------- Pull to refresh (mockup change 2026-11-12; D-2026-11-09-04: "pull down or tap Refresh, at most once every 10 seconds") ----------
+// Touch only, from the top of the page. Only data refreshes, rendered in place; no polling. Coming back to the tab refreshes too, through the same lock.
+// The request inboxes: Contact changes, Club names, Password resets. Once every 10 seconds, like the session page.
+function ptrConfig() {
+  if (!S.me || S.denied || !['contacts', 'names', 'passwords'].includes(S.screen) || S.ui.sheet) return null;
+  return {
+    state: () => !S.online ? 'off' : (S.ui.refreshedAt && Date.now() - S.ui.refreshedAt < 10000) ? 'wait' : 'ok',
+    refresh: () => { S.ui.refreshedAt = Date.now(); return new Promise((r) => setTimeout(() => { render(); r(); }, 650)); },
+    at: () => S.ui.refreshedAt || Date.now(),
+  };
+}
+const PTR = { el: null, y0: null, dist: 0, busy: false, hideT: null };
+const PTR_ARM = 64, PTR_MAX = 96;
+const PTR_COPY = { pull: 'Pull to refresh', armed: 'Release to refresh', busy: 'Refreshing…', wait: 'Refresh again in a few seconds', off: 'You\u2019re offline. Reconnect and try again.' };
+function ptrEl() {
+  if (!PTR.el) { const d = document.createElement('div'); d.id = 'ptr'; d.setAttribute('role', 'status'); d.setAttribute('aria-live', 'polite'); d.innerHTML = '<i aria-hidden="true"></i><span></span>'; document.body.appendChild(d); PTR.el = d; }
+  return PTR.el;
+}
+function ptrSet(cls, text, dist) {
+  const el = ptrEl(); clearTimeout(PTR.hideT);
+  // Rest just under the sticky top bar; while hidden it sits behind the bar.
+  const bar = document.querySelector('.top'); el.style.top = `${Math.round(bar ? bar.getBoundingClientRect().bottom : 56) + 8}px`;
+  el.className = `show ${cls}`; el.querySelector('span').textContent = text;
+  const y = dist === undefined ? 0 : Math.min(dist, PTR_MAX) - PTR_MAX;
+  el.style.transform = `translate(-50%, ${dist === undefined ? 0 : y}px)`;
+}
+function ptrHide(after = 0) { clearTimeout(PTR.hideT); PTR.hideT = setTimeout(() => { if (PTR.el) { PTR.el.className = ''; PTR.el.style.transform = ''; } }, after); }
+function ptrLabel(c, dist) {
+  const st = c.state();
+  if (st !== 'ok') return [`pulling ${st}`, PTR_COPY[st]];
+  return dist >= PTR_ARM ? ['pulling armed', PTR_COPY.armed] : ['pulling', PTR_COPY.pull];
+}
+async function ptrRun(c, cause) {
+  if (PTR.busy || c.state() !== 'ok') return;
+  PTR.busy = true; ptrSet('busy', PTR_COPY.busy);
+  try { await c.refresh(); } finally { PTR.busy = false; }
+  if (cause === 'pull' || cause === 'visible') { ptrSet('done', `Updated ${fmtTime(c.at())}`); ptrHide(1400); }
+}
+document.addEventListener('touchstart', (e) => {
+  if (PTR.busy || e.touches.length > 1 || window.scrollY > 0 || !ptrConfig()) { PTR.y0 = null; return; }
+  PTR.y0 = e.touches[0].clientY; PTR.dist = 0;
+}, { passive: true });
+document.addEventListener('touchmove', (e) => {
+  if (PTR.y0 === null) return;
+  const c = ptrConfig(); if (!c) { PTR.y0 = null; return; }
+  const dy = e.touches[0].clientY - PTR.y0;
+  if (dy <= 0 && !PTR.dist) { PTR.y0 = null; return; }
+  if (window.scrollY > 0) { PTR.y0 = null; ptrHide(); return; }
+  if (e.cancelable) e.preventDefault();
+  PTR.dist = Math.max(0, dy * 0.55);
+  const [cls, text] = ptrLabel(c, PTR.dist);
+  ptrSet(cls, text, PTR.dist);
+}, { passive: false });
+document.addEventListener('touchend', () => {
+  if (PTR.y0 === null) return;
+  const c = ptrConfig(), dist = PTR.dist; PTR.y0 = null; PTR.dist = 0;
+  if (!c || !dist) return;
+  if (dist >= PTR_ARM && c.state() === 'ok') { ptrRun(c, 'pull'); return; }
+  if (dist >= PTR_ARM && c.state() !== 'ok') { ptrSet(c.state(), PTR_COPY[c.state()]); ptrHide(1600); return; }
+  ptrHide();
+});
+document.addEventListener('touchcancel', () => { PTR.y0 = null; PTR.dist = 0; ptrHide(); });
+// Coming back to the tab refreshes the data (same lock; nothing shows if it was refreshed in the last 10 seconds).
+document.addEventListener('visibilitychange', () => { if (document.hidden) return; const c = ptrConfig(); if (c && c.state() === 'ok') ptrRun(c, 'visible'); });
+
 })();
+
 </script>

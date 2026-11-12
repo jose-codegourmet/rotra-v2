@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-IN PROGRESS: 5 · IN MOCK APP: 127 · CANCELLED: 2 · MOCKUP ONLY: 4
+NEW: 3 · IN PROGRESS: 5 · IN MOCK APP: 127 · CANCELLED: 2 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -316,4 +316,7 @@ IN PROGRESS: 5 · IN MOCK APP: 127 · CANCELLED: 2 · MOCKUP ONLY: 4
 | [2026-11-11-queue-share-club-invite-copy-link](2026-11-11-queue-share-club-invite-copy-link.md) | Copy invite link on the Share club invite sheet | club-invite-card, share-card | IN MOCK APP — #708 |
 | [2026-11-11-queue-start-session-online-only](2026-11-11-queue-start-session-online-only.md) | Start session is online only | start-session-sheet, start-session-bar | IN MOCK APP — #721 |
 | [2026-11-11-queue-tab-focus-border](2026-11-11-queue-tab-focus-border.md) | Tabs: no thick focus border after a tap or click; thin ring for the keyboard (#736, proposed) | tabs | IN MOCK APP — #736 |
+| [2026-11-12-admin-pull-to-refresh](2026-11-12-admin-pull-to-refresh.md) | The request inboxes refresh when pulled down | pull-to-refresh (shared with the Queue log), data-table, list-row, password-reset-requests | NEW |
+| [2026-11-12-player-pull-to-refresh](2026-11-12-player-pull-to-refresh.md) | The leaderboard, a club's page and the own profile refresh when pulled down | pull-to-refresh (shared with the Queue log), leaderboard-list, club-next-up-card, club-calendar, my-sessions-card | NEW |
+| [2026-11-12-queue-pull-to-refresh](2026-11-12-queue-pull-to-refresh.md) | The session page refreshes when pulled down, and when the tab comes back | pull-to-refresh (new), public-refresh-bar | NEW |
 <!-- status-index:end -->

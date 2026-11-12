@@ -21,7 +21,7 @@ Proposed navigation:
 - Clubs and licenses.
 - Players.
 - Sales (owner request, November 8, 2026).
-- Requests: Contact changes, Club names, Password resets (#491).
+- Requests: Contact changes, Club names, Password resets (#491). Each inbox refreshes on a pull down from the top or when the tab comes back, once every 10 seconds ([November 12, 2026 mockup change](../../../../mockup-changes/2026-11-12-admin-pull-to-refresh.md)).
 - Ranking configuration.
 - Feature flags.
 - Profile characters (A-CHARACTERS, owner request, November 9, 2026; `/settings/profile-characters`).

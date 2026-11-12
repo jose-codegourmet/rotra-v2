@@ -40,6 +40,7 @@ import {
 import { type PublicSessionCourtNow, PublicSessionDetails } from '@rotra/ui/public-session-details'
 import { PublicSessionHero } from '@rotra/ui/public-session-hero'
 import { PublicSessionQueue } from '@rotra/ui/public-session-queue'
+import { PullToRefresh } from '@rotra/ui/pull-to-refresh'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { Tabs, TabsContent } from '@rotra/ui/tabs'
 import { toast } from '@rotra/ui/toaster'
@@ -543,191 +544,201 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
   return (
     <>
       {bar}
-      <main className="mx-auto flex max-w-[760px] flex-col gap-5 px-[max(16px,env(safe-area-inset-left,0px))] pt-5 pb-[120px]">
-        <PublicSessionHero
-          dateLine={`${date(p.start)} · ${time(p.start)}–${time(p.end)}`}
-          title={p.title}
-          clubName={p.club.name}
-          clubInitials={p.club.initials}
-          clubLogoUrl={p.club.logoUrl}
-          state={HERO_STATE[p.status]}
-        />
-        {signedRead ? (
-          <PublicRefreshBar
-            updatedLabel={time(refreshing.lastRefreshedAt ?? p.lastSyncedAt)}
-            hasPendingChanges={p.hasPendingChanges}
-            refreshThrottled={!refreshing.canRefresh}
-            offline={offline}
-            onRefresh={() => void refreshing.refresh()}
-          />
-        ) : null}
-        {p.status === 'cancelled' ? (
-          <Notice tone="warn" title="This session is cancelled.">
-            {cancelWhy ? `${cancelWhy}.` : null}
-          </Notice>
-        ) : card ? (
-          <JoinRequestCard {...card} />
-        ) : null}
-        {nightPending ? (
-          nightFailed ? (
-            <Notice tone="error">
-              Couldn't check Player access.{' '}
-              <Button
-                onClick={() => {
-                  void night.refetch()
-                  void signedInPage.refetch()
-                }}
-              >
-                Retry
-              </Button>
-            </Notice>
-          ) : (
-            <Skeleton label="Loading your night" className="h-24 rounded-lg" />
-          )
-        ) : null}
-        {signedIn && night.data ? (
-          <MyNight
-            slug={slug}
-            night={night.data}
-            sessionOpen={sessionOpen}
-            acceptJoinRequests={p.acceptJoinRequests}
-            offline={offline}
-            startsLabel={`${new Date(p.start).toLocaleDateString([], { month: 'short', day: 'numeric' })}, ${time(p.start)}`}
-            matchHistoryHref={
-              playerBase
-                ? `${playerBase}/players/${encodeURIComponent(night.data.playerId)}/games`
-                : null
-            }
-            onInvite={() => setInviteOpen(true)}
-            onRequestMatch={requestMatch}
-          />
-        ) : null}
-        <Tabs
-          aria-label="Session page"
-          value={tab}
-          onChange={changeTab}
-          items={[
-            { value: 'details', label: 'Details' },
-            {
-              value: 'participants',
-              label: `Participants · ${p.participantCount ?? p.participants.length}`,
-            },
-          ]}
-        >
-          <TabsContent value="details">
-            <PublicSessionDetails
-              when={`${date(p.start)}, ${time(p.start)}–${time(p.end)} (${duration(p.start, p.end)})`}
-              venueName={p.venue.name}
-              venueAddress={p.venue.address}
-              courtLabels={p.courts}
-              formats={p.formats}
-              modeLabel={mode.label}
-              modeDescription={mode.text}
-              minimumGames={p.minimum}
-              amountDuePerPlayer={p.amountDuePerPlayer}
-              notes={p.notes}
-              lastUpdatedLabel={time(p.lastSyncedAt)}
-              hasPendingChanges={p.hasPendingChanges}
-              courtsNow={signedRead ? courtsNowProps(signedRead.courtsNow) : undefined}
-              queueSlot={
-                viewer === 'visitor' ? (
-                  signedRead && viewerAccount ? (
-                    <PublicSessionQueue
-                      access={queueAccess(viewerAccount.id, signedRead.queue)}
-                      onRetry={() => void signedInPage.refetch()}
-                    />
-                  ) : viewerAccount ? (
-                    <PublicSessionQueue
-                      access={null}
-                      checking={!signedReadFailed}
-                      failed={signedReadFailed}
-                      onRetry={() => void signedInPage.refetch()}
-                    />
-                  ) : (
-                    <PublicSessionQueue
-                      access={access ?? null}
-                      loginHref={loginHref}
-                      checking={playerAccess.isPending}
-                      failed={playerAccess.isError}
-                      onRetry={() => void playerAccess.refetch()}
-                    />
-                  )
-                ) : undefined
-              }
-            />
-          </TabsContent>
-          <TabsContent value="participants">
-            <PublicParticipants
-              participants={participants}
-              participantCount={p.participantCount ?? p.participants.length}
-              uncapped={uncapped}
-              waitlist={waitlist}
-              openSlots={p.openSlots}
-              finished={p.status === 'completed' || p.status === 'invalid'}
-              acceptJoinRequests={p.acceptJoinRequests && p.status === 'prepared'}
-              onRequestToJoin={signedIn ? signedIn.onJoin : () => setJoinOpen(true)}
-              onOpenParticipant={profileViewerId ? setProfileOf : undefined}
-              disabled={offline || !!signedIn?.busy}
-            />
-          </TabsContent>
-        </Tabs>
-        {p.status === 'completed' ? <PublicResultsSection published={publishedSlides(p)} /> : null}
-        {profileViewerId ? (
-          <ParticipantProfile
-            participant={profileOf}
-            viewerPlayerId={profileViewerId}
-            onClose={() => setProfileOf(null)}
-          />
-        ) : null}
-        {signedIn &&
-        viewerAccount &&
-        sessionOpen &&
-        p.acceptJoinRequests &&
-        night.data?.canInvite ? (
-          <SessionInviteSheet
-            slug={slug}
-            playerId={viewerAccount.id}
-            open={inviteOpen}
-            onOpenChange={setInviteOpen}
-            inviterName={viewerAccount.name}
+      <PullToRefresh
+        onRefresh={refreshing.refresh}
+        throttled={!refreshing.canRefresh}
+        offline={offline}
+        refreshing={refreshing.isRefreshing}
+        updatedLabel={time(refreshing.lastRefreshedAt ?? p.lastSyncedAt)}
+      >
+        <main className="mx-auto flex max-w-[760px] flex-col gap-5 px-[max(16px,env(safe-area-inset-left,0px))] pt-5 pb-[120px]">
+          <PublicSessionHero
+            dateLine={`${date(p.start)} · ${time(p.start)}–${time(p.end)}`}
+            title={p.title}
             clubName={p.club.name}
             clubInitials={p.club.initials}
             clubLogoUrl={p.club.logoUrl}
-            sessionTitle={p.title}
-            dateLabel={date(p.start)}
-            timeLabel={`${time(p.start)}–${time(p.end)}`}
-            venueName={p.venue.name}
-            waitlistOpen={p.openSlots === 0}
+            state={HERO_STATE[p.status]}
           />
-        ) : null}
-        {signedIn && viewerAccount && sessionOpen && night.data?.stage === 'live-present' ? (
-          <MatchRequest
+          {signedRead ? (
+            <PublicRefreshBar
+              updatedLabel={time(refreshing.lastRefreshedAt ?? p.lastSyncedAt)}
+              hasPendingChanges={p.hasPendingChanges}
+              refreshThrottled={!refreshing.canRefresh}
+              offline={offline}
+              onRefresh={() => void refreshing.refresh()}
+            />
+          ) : null}
+          {p.status === 'cancelled' ? (
+            <Notice tone="warn" title="This session is cancelled.">
+              {cancelWhy ? `${cancelWhy}.` : null}
+            </Notice>
+          ) : card ? (
+            <JoinRequestCard {...card} />
+          ) : null}
+          {nightPending ? (
+            nightFailed ? (
+              <Notice tone="error">
+                Couldn't check Player access.{' '}
+                <Button
+                  onClick={() => {
+                    void night.refetch()
+                    void signedInPage.refetch()
+                  }}
+                >
+                  Retry
+                </Button>
+              </Notice>
+            ) : (
+              <Skeleton label="Loading your night" className="h-24 rounded-lg" />
+            )
+          ) : null}
+          {signedIn && night.data ? (
+            <MyNight
+              slug={slug}
+              night={night.data}
+              sessionOpen={sessionOpen}
+              acceptJoinRequests={p.acceptJoinRequests}
+              offline={offline}
+              startsLabel={`${new Date(p.start).toLocaleDateString([], { month: 'short', day: 'numeric' })}, ${time(p.start)}`}
+              matchHistoryHref={
+                playerBase
+                  ? `${playerBase}/players/${encodeURIComponent(night.data.playerId)}/games`
+                  : null
+              }
+              onInvite={() => setInviteOpen(true)}
+              onRequestMatch={requestMatch}
+            />
+          ) : null}
+          <Tabs
+            aria-label="Session page"
+            value={tab}
+            onChange={changeTab}
+            items={[
+              { value: 'details', label: 'Details' },
+              {
+                value: 'participants',
+                label: `Participants · ${p.participantCount ?? p.participants.length}`,
+              },
+            ]}
+          >
+            <TabsContent value="details">
+              <PublicSessionDetails
+                when={`${date(p.start)}, ${time(p.start)}–${time(p.end)} (${duration(p.start, p.end)})`}
+                venueName={p.venue.name}
+                venueAddress={p.venue.address}
+                courtLabels={p.courts}
+                formats={p.formats}
+                modeLabel={mode.label}
+                modeDescription={mode.text}
+                minimumGames={p.minimum}
+                amountDuePerPlayer={p.amountDuePerPlayer}
+                notes={p.notes}
+                lastUpdatedLabel={time(p.lastSyncedAt)}
+                hasPendingChanges={p.hasPendingChanges}
+                courtsNow={signedRead ? courtsNowProps(signedRead.courtsNow) : undefined}
+                queueSlot={
+                  viewer === 'visitor' ? (
+                    signedRead && viewerAccount ? (
+                      <PublicSessionQueue
+                        access={queueAccess(viewerAccount.id, signedRead.queue)}
+                        onRetry={() => void signedInPage.refetch()}
+                      />
+                    ) : viewerAccount ? (
+                      <PublicSessionQueue
+                        access={null}
+                        checking={!signedReadFailed}
+                        failed={signedReadFailed}
+                        onRetry={() => void signedInPage.refetch()}
+                      />
+                    ) : (
+                      <PublicSessionQueue
+                        access={access ?? null}
+                        loginHref={loginHref}
+                        checking={playerAccess.isPending}
+                        failed={playerAccess.isError}
+                        onRetry={() => void playerAccess.refetch()}
+                      />
+                    )
+                  ) : undefined
+                }
+              />
+            </TabsContent>
+            <TabsContent value="participants">
+              <PublicParticipants
+                participants={participants}
+                participantCount={p.participantCount ?? p.participants.length}
+                uncapped={uncapped}
+                waitlist={waitlist}
+                openSlots={p.openSlots}
+                finished={p.status === 'completed' || p.status === 'invalid'}
+                acceptJoinRequests={p.acceptJoinRequests && p.status === 'prepared'}
+                onRequestToJoin={signedIn ? signedIn.onJoin : () => setJoinOpen(true)}
+                onOpenParticipant={profileViewerId ? setProfileOf : undefined}
+                disabled={offline || !!signedIn?.busy}
+              />
+            </TabsContent>
+          </Tabs>
+          {p.status === 'completed' ? (
+            <PublicResultsSection published={publishedSlides(p)} />
+          ) : null}
+          {profileViewerId ? (
+            <ParticipantProfile
+              participant={profileOf}
+              viewerPlayerId={profileViewerId}
+              onClose={() => setProfileOf(null)}
+            />
+          ) : null}
+          {signedIn &&
+          viewerAccount &&
+          sessionOpen &&
+          p.acceptJoinRequests &&
+          night.data?.canInvite ? (
+            <SessionInviteSheet
+              slug={slug}
+              playerId={viewerAccount.id}
+              open={inviteOpen}
+              onOpenChange={setInviteOpen}
+              inviterName={viewerAccount.name}
+              clubName={p.club.name}
+              clubInitials={p.club.initials}
+              clubLogoUrl={p.club.logoUrl}
+              sessionTitle={p.title}
+              dateLabel={date(p.start)}
+              timeLabel={`${time(p.start)}–${time(p.end)}`}
+              venueName={p.venue.name}
+              waitlistOpen={p.openSlots === 0}
+            />
+          ) : null}
+          {signedIn && viewerAccount && sessionOpen && night.data?.stage === 'live-present' ? (
+            <MatchRequest
+              slug={slug}
+              viewer={{ id: viewerAccount.id, name: viewerAccount.name }}
+              open={matchRequestOpen}
+              onOpenChange={setMatchRequestOpen}
+            />
+          ) : null}
+          <JoinRequestSheet
             slug={slug}
-            viewer={{ id: viewerAccount.id, name: viewerAccount.name }}
-            open={matchRequestOpen}
-            onOpenChange={setMatchRequestOpen}
+            sessionLine={`${p.title} · ${date(p.start)}, ${time(p.start)} · ${p.venue.name}`}
+            // A signed-in Player joins with the card's one tap, never the guest form (#687).
+            // While real mode checks the Player sign-in (back from the login with ?join=1), the guest
+            // form must not flash open first.
+            open={joinOpen && !signedIn && !realPlayerChecking}
+            onOpenChange={setJoinOpen}
+            returned={openJoin && viewer === 'visitor'}
+            showPlayerLogin={viewer === 'visitor' && !signedIn}
+            clubName={p.club.name}
+            slotsFull={slotsFull}
+            // Real mode only: the mock Player app keeps its own store (#689).
+            registerHref={
+              joinOpen && isRealDataMode() && p.club.id && typeof location !== 'undefined'
+                ? playerRegisterUrl(p.club.id, location.href)
+                : undefined
+            }
           />
-        ) : null}
-        <JoinRequestSheet
-          slug={slug}
-          sessionLine={`${p.title} · ${date(p.start)}, ${time(p.start)} · ${p.venue.name}`}
-          // A signed-in Player joins with the card's one tap, never the guest form (#687).
-          // While real mode checks the Player sign-in (back from the login with ?join=1), the guest
-          // form must not flash open first.
-          open={joinOpen && !signedIn && !realPlayerChecking}
-          onOpenChange={setJoinOpen}
-          returned={openJoin && viewer === 'visitor'}
-          showPlayerLogin={viewer === 'visitor' && !signedIn}
-          clubName={p.club.name}
-          slotsFull={slotsFull}
-          // Real mode only: the mock Player app keeps its own store (#689).
-          registerHref={
-            joinOpen && isRealDataMode() && p.club.id && typeof location !== 'undefined'
-              ? playerRegisterUrl(p.club.id, location.href)
-              : undefined
-          }
-        />
-      </main>
+        </main>
+      </PullToRefresh>
     </>
   )
 }

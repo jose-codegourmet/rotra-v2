@@ -16,6 +16,7 @@ import { useMyAccount } from '@rotra/data/player-account/useMyAccount'
 import { useLeaveClub } from '@rotra/data/player-club/useLeaveClub'
 import { useMyClubs } from '@rotra/data/player-club/useMyClubs'
 import { useRankingSettings } from '@rotra/data/ranking-settings'
+import { useThrottledRefresh } from '@rotra/data/refresh/useThrottledRefresh'
 import { AccountPanel } from '@rotra/ui/account-panel'
 import { Button } from '@rotra/ui/button'
 import { ConfirmSheet } from '@rotra/ui/confirm-sheet'
@@ -31,6 +32,7 @@ import { PlayerClubsCard } from '@rotra/ui/player-clubs-card'
 import { PlayerIdentityCard } from '@rotra/ui/player-identity-card'
 import { ProfileLayout } from '@rotra/ui/profile-layout'
 import { ProfileNotFound } from '@rotra/ui/profile-not-found'
+import { PullToRefresh } from '@rotra/ui/pull-to-refresh'
 import { RecentGamesCard } from '@rotra/ui/recent-games-card'
 import { SharedRankCard } from '@rotra/ui/shared-rank-card'
 import { Skeleton } from '@rotra/ui/skeleton'
@@ -75,6 +77,12 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
     signOut = useSignOut('player')
   const clubs = useMyClubs(isOwn ? playerId : null)
   const mySessions = useMySessions(isOwn ? playerId : null)
+  // Own profile only: pull down (or come back to the tab) refreshes My sessions, recent games and
+  // the rank, once every 10 seconds (mockup change 2026-11-12). A visitor's page has no pull.
+  const refreshing = useThrottledRefresh(
+    () => Promise.all([mySessions.refetch(), games.refetch(), rank.refetch()]),
+    { refreshOnReturn: isOwn },
+  )
   const leaveClub = useLeaveClub()
   const [leaving, setLeaving] = useState<string | null>(null)
   const leavingClub = clubs.data?.find((c) => c.id === leaving)
@@ -196,168 +204,186 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
     })
   const picture = pictureSrc(player.picture, player.playerId, player.fullName) ?? null
   const missingDetails = isOwn && (!player.playingStyle || !player.experienceYears)
+  const updatedLabel = mySessions.dataUpdatedAt
+    ? new Date(mySessions.dataUpdatedAt).toLocaleTimeString([], {
+        hour: 'numeric',
+        minute: '2-digit',
+      })
+    : undefined
   return (
-    <ProfileLayout
-      side={
-        <>
-          <PlayerIdentityCard
-            profile={{ ...player, picture }}
-            isOwn={isOwn}
-            bannerKey={player.bannerKey}
-            bannerImageUrl={player.bannerImageUrl}
-            idElementId={idElementId}
-            onCopyId={() => void copyPlayerId(player.rtrId, idElementId)}
-            onViewPicture={
-              picture ? () => photo.show({ src: picture, name: player.fullName }) : undefined
-            }
-            onChangePicture={pictureEditor.openSheet}
-            compareSignedIn={Boolean(session.data)}
-            onCompare={
-              session.isPending || session.isError
-                ? undefined
-                : () => {
-                    const path = `/players/${encodeURIComponent(playerId)}/compare`
-                    if (!session.data) {
-                      toast('Sign in to compare')
-                      router.push(`/login?returnTo=${encodeURIComponent(path)}`)
-                    } else router.push(path)
-                  }
-            }
-            onEdit={() => router.push('/profile/edit')}
-            onOpenPlayerId={() => router.push('/profile/player-id')}
-            onShare={isOwn ? sharing.openProfile : undefined}
-          />
-          {pictureEditor.sheet}
-          {photo.viewerProps ? <PhotoViewer {...photo.viewerProps} /> : null}
-          {sharing.sheet}
-          {isOwn && myAccount.data ? (
-            <AccountPanel
-              phone={myAccount.data.phone}
-              email={myAccount.data.email}
-              phoneHidden={myAccount.data.phoneHidden}
-              requestSlot={
-                contactRequest.data &&
-                OPEN_CONTACT_CHANGE_STATUSES.includes(contactRequest.data.status) ? (
-                  <ContactRequestStatus request={contactRequest.data} variant="compact" />
-                ) : null
+    <PullToRefresh
+      onRefresh={refreshing.refresh}
+      throttled={!refreshing.canRefresh}
+      offline={offline}
+      refreshing={refreshing.isRefreshing}
+      updatedLabel={updatedLabel}
+      disabled={!isOwn || leaving !== null}
+    >
+      <ProfileLayout
+        side={
+          <>
+            <PlayerIdentityCard
+              profile={{ ...player, picture }}
+              isOwn={isOwn}
+              bannerKey={player.bannerKey}
+              bannerImageUrl={player.bannerImageUrl}
+              idElementId={idElementId}
+              onCopyId={() => void copyPlayerId(player.rtrId, idElementId)}
+              onViewPicture={
+                picture ? () => photo.show({ src: picture, name: player.fullName }) : undefined
               }
-              onOpenPrivacy={() => router.push('/profile/privacy-and-contact')}
-              onSignOut={leaveSignedOut}
+              onChangePicture={pictureEditor.openSheet}
+              compareSignedIn={Boolean(session.data)}
+              onCompare={
+                session.isPending || session.isError
+                  ? undefined
+                  : () => {
+                      const path = `/players/${encodeURIComponent(playerId)}/compare`
+                      if (!session.data) {
+                        toast('Sign in to compare')
+                        router.push(`/login?returnTo=${encodeURIComponent(path)}`)
+                      } else router.push(path)
+                    }
+              }
+              onEdit={() => router.push('/profile/edit')}
+              onOpenPlayerId={() => router.push('/profile/player-id')}
+              onShare={isOwn ? sharing.openProfile : undefined}
             />
-          ) : null}
-          {isOwn ? (
-            clubs.isPending ? (
-              <Skeleton className="h-36" />
-            ) : clubs.isError ? (
-              <ErrorState title="Couldn't load your clubs." onRetry={() => void clubs.refetch()} />
-            ) : (
-              <PlayerClubsCard
-                clubs={(clubs.data ?? []).map((club) => ({
-                  ...club,
-                  clubPageHref: `/clubs/${encodeURIComponent(club.id)}`,
-                  reportHref: `mailto:${REPORT_PROBLEM_EMAIL}?subject=${encodeURIComponent(`Problem with ${club.name}`)}&body=${encodeURIComponent(`Club: ${club.name}\nMy ROTRA player ID: ${player.rtrId}\n\nWhat went wrong:\n`)}`,
-                }))}
-                onLeave={(id) => {
-                  leaveClub.reset()
-                  setLeaving(id)
-                }}
+            {pictureEditor.sheet}
+            {photo.viewerProps ? <PhotoViewer {...photo.viewerProps} /> : null}
+            {sharing.sheet}
+            {isOwn && myAccount.data ? (
+              <AccountPanel
+                phone={myAccount.data.phone}
+                email={myAccount.data.email}
+                phoneHidden={myAccount.data.phoneHidden}
+                requestSlot={
+                  contactRequest.data &&
+                  OPEN_CONTACT_CHANGE_STATUSES.includes(contactRequest.data.status) ? (
+                    <ContactRequestStatus request={contactRequest.data} variant="compact" />
+                  ) : null
+                }
+                onOpenPrivacy={() => router.push('/profile/privacy-and-contact')}
+                onSignOut={leaveSignedOut}
               />
-            )
-          ) : null}
-          <ConfirmSheet
-            open={!!leavingClub}
-            onOpenChange={(next) => {
-              if (!next) setLeaving(null)
-            }}
-            title={`Leave ${leavingClub?.name ?? ''}?`}
-            consequence="You're removed from the club's saved players. Your past games stay."
-            confirmLabel="Leave club"
-            backLabel="Cancel"
-            isPending={leaveClub.isPending}
-            error={leaveClub.error?.message}
-            onConfirm={() => {
-              if (leavingClub)
-                leaveClub.mutate(leavingClub.id, {
-                  onSuccess: () => {
-                    setLeaving(null)
-                    toast(`You left ${leavingClub.name}`)
-                  },
-                  onError: (error) => toast.error(error.message),
-                })
-            }}
-          />
-        </>
-      }
-      main={
-        <>
-          {offline && isOwn ? (
-            <Notice tone="warn">
-              Saved copy. Your rank and games may have changed since this device was last online.
-            </Notice>
-          ) : null}
-          {failed && !offline ? (
-            <ErrorState title="Couldn't refresh the profile." onRetry={retry}>
-              Showing the last saved copy.
-            </ErrorState>
-          ) : null}
-          {current.updatePending ? (
-            <Notice tone="warn" title={`Updating from ${current.updatePending.sessionTitle}.`}>
-              {current.updatePending.clubName} finished the session{' '}
-              {finishedAgo(current.updatePending.finishedAt)}. This is {isOwn ? 'your' : 'the'} last
-              calculated rank until the update is ready.
-            </Notice>
-          ) : null}
-          {missingDetails ? (
-            <Notice
-              tone="info"
-              action={
-                <Button size="xs" onClick={() => router.push('/profile/edit')}>
-                  Add details
-                </Button>
-              }
-            >
-              Add your playing style and experience so clubs know your game. It's optional.
-            </Notice>
-          ) : null}
-          <SharedRankCard
-            level={current.levelIndex === null ? null : current.levelIndex + 1}
-            levelLabel={levelLabel}
-            position={current.position}
-            status={label}
-            sentence={sentence}
-            subject={subject}
-            onShare={isOwn && current.levelIndex !== null ? sharing.openRank : undefined}
-            onOpenRankDetail={() => router.push(`/players/${playerId}/rank`)}
-          />
-          <EligibilityCard
-            recentCount={current.recentCount}
-            matchRequirement={requirement}
-            needsReassessment={current.state === 'needs_reassessment'}
-            sentence={eligibility}
-          />
-          {isOwn ? (
-            mySessions.isPending ? (
-              <Skeleton className="h-40" />
-            ) : mySessions.isError ? (
-              <ErrorState
-                title="Couldn't load your sessions."
-                onRetry={() => void mySessions.refetch()}
-              />
-            ) : (
-              <MySessionsCard
-                sessions={mySessions.data?.sessions ?? []}
-                finished={mySessions.data?.finished}
-                onShareResult={sharing.openResult}
-              />
-            )
-          ) : null}
-          <RecentGamesCard
-            sessions={games.data}
-            onOpenAll={() => router.push(`/players/${playerId}/games`)}
-          />
-          <PlayerAboutCard profile={player} isOwn={isOwn} />
-        </>
-      }
-    />
+            ) : null}
+            {isOwn ? (
+              clubs.isPending ? (
+                <Skeleton className="h-36" />
+              ) : clubs.isError ? (
+                <ErrorState
+                  title="Couldn't load your clubs."
+                  onRetry={() => void clubs.refetch()}
+                />
+              ) : (
+                <PlayerClubsCard
+                  clubs={(clubs.data ?? []).map((club) => ({
+                    ...club,
+                    clubPageHref: `/clubs/${encodeURIComponent(club.id)}`,
+                    reportHref: `mailto:${REPORT_PROBLEM_EMAIL}?subject=${encodeURIComponent(`Problem with ${club.name}`)}&body=${encodeURIComponent(`Club: ${club.name}\nMy ROTRA player ID: ${player.rtrId}\n\nWhat went wrong:\n`)}`,
+                  }))}
+                  onLeave={(id) => {
+                    leaveClub.reset()
+                    setLeaving(id)
+                  }}
+                />
+              )
+            ) : null}
+            <ConfirmSheet
+              open={!!leavingClub}
+              onOpenChange={(next) => {
+                if (!next) setLeaving(null)
+              }}
+              title={`Leave ${leavingClub?.name ?? ''}?`}
+              consequence="You're removed from the club's saved players. Your past games stay."
+              confirmLabel="Leave club"
+              backLabel="Cancel"
+              isPending={leaveClub.isPending}
+              error={leaveClub.error?.message}
+              onConfirm={() => {
+                if (leavingClub)
+                  leaveClub.mutate(leavingClub.id, {
+                    onSuccess: () => {
+                      setLeaving(null)
+                      toast(`You left ${leavingClub.name}`)
+                    },
+                    onError: (error) => toast.error(error.message),
+                  })
+              }}
+            />
+          </>
+        }
+        main={
+          <>
+            {offline && isOwn ? (
+              <Notice tone="warn">
+                Saved copy. Your rank and games may have changed since this device was last online.
+              </Notice>
+            ) : null}
+            {failed && !offline ? (
+              <ErrorState title="Couldn't refresh the profile." onRetry={retry}>
+                Showing the last saved copy.
+              </ErrorState>
+            ) : null}
+            {current.updatePending ? (
+              <Notice tone="warn" title={`Updating from ${current.updatePending.sessionTitle}.`}>
+                {current.updatePending.clubName} finished the session{' '}
+                {finishedAgo(current.updatePending.finishedAt)}. This is {isOwn ? 'your' : 'the'}{' '}
+                last calculated rank until the update is ready.
+              </Notice>
+            ) : null}
+            {missingDetails ? (
+              <Notice
+                tone="info"
+                action={
+                  <Button size="xs" onClick={() => router.push('/profile/edit')}>
+                    Add details
+                  </Button>
+                }
+              >
+                Add your playing style and experience so clubs know your game. It's optional.
+              </Notice>
+            ) : null}
+            <SharedRankCard
+              level={current.levelIndex === null ? null : current.levelIndex + 1}
+              levelLabel={levelLabel}
+              position={current.position}
+              status={label}
+              sentence={sentence}
+              subject={subject}
+              onShare={isOwn && current.levelIndex !== null ? sharing.openRank : undefined}
+              onOpenRankDetail={() => router.push(`/players/${playerId}/rank`)}
+            />
+            <EligibilityCard
+              recentCount={current.recentCount}
+              matchRequirement={requirement}
+              needsReassessment={current.state === 'needs_reassessment'}
+              sentence={eligibility}
+            />
+            {isOwn ? (
+              mySessions.isPending ? (
+                <Skeleton className="h-40" />
+              ) : mySessions.isError ? (
+                <ErrorState
+                  title="Couldn't load your sessions."
+                  onRetry={() => void mySessions.refetch()}
+                />
+              ) : (
+                <MySessionsCard
+                  sessions={mySessions.data?.sessions ?? []}
+                  finished={mySessions.data?.finished}
+                  onShareResult={sharing.openResult}
+                />
+              )
+            ) : null}
+            <RecentGamesCard
+              sessions={games.data}
+              onOpenAll={() => router.push(`/players/${playerId}/games`)}
+            />
+            <PlayerAboutCard profile={player} isOwn={isOwn} />
+          </>
+        }
+      />
+    </PullToRefresh>
   )
 }

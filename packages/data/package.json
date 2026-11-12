@@ -284,6 +284,7 @@
     "./public-session/useMyNight": "./src/public-session/useMyNight.ts",
     "./public-session/useMatchRequestOptions": "./src/public-session/useMatchRequestOptions.ts",
     "./public-session/useRefreshSession": "./src/public-session/useRefreshSession.ts",
+    "./refresh/useThrottledRefresh": "./src/refresh/useThrottledRefresh.ts",
     "./fixtures/financials": "./src/fixtures/financials.ts",
     "./inventory/types": "./src/inventory/inventory.types.ts",
     "./fixtures/inventory": "./src/fixtures/inventory.ts",

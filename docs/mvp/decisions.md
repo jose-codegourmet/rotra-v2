@@ -277,7 +277,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 <a id="d-2026-11-09-04"></a>
 ### D-2026-11-09-04 — The player's live view: My night, Courts now, own standing, refresh only
 - **Decision status:** approved (owner discussion, November 9, 2026)
-- **Implementation status:** not started — mockups updated November 9, 2026 (`NEW` logs dated 2026-11-09 in [mockup-changes](../mockup-changes/README.md))
+- **Implementation status:** in progress — mockups updated November 9, 2026 (`NEW` logs dated 2026-11-09 in [mockup-changes](../mockup-changes/README.md)); the Refresh button, the pull down and the tab-return refresh are in the mockup and the mock app (November 12, 2026, [log](../mockup-changes/2026-11-12-queue-pull-to-refresh.md); the same pull also covers the Player app's leaderboard, club page and My sessions, and the Admin request inboxes)
 - **Ticket:** needed
 - **Roadmap:** MVP (owner, November 9, 2026: added to the scope frozen by [D-2026-11-07-04](#d-2026-11-07-04)) — [Queue](workstreams/queue.md), [Player](workstreams/player.md)
 - **Decision:**

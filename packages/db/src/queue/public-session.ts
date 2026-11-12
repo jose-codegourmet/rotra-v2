@@ -1,7 +1,16 @@
 import 'server-only'
 import { createHmac, timingSafeEqual } from 'node:crypto'
+import { computeStandings, courtNames, holdsCourt } from '@rotra/data/match/match.rules'
+import type { Match } from '@rotra/data/match/types'
 import { resolveProfileBanner } from '@rotra/data/profile-banner/rules'
-import { maskPublicName, publicLevel, publicSkillMix } from '@rotra/data/public-session/rules'
+import {
+  maskPublicName,
+  myMatchLabel,
+  publicFirstName,
+  publicLevel,
+  publicSkillMix,
+} from '@rotra/data/public-session/rules'
+import type { MyNightStage } from '@rotra/data/public-session/types'
 import { readShownProfileBanners } from '../admin/profile-banners'
 import { type ClubContext, loadAccountContext, type PlayerContext } from '../auth/account-context'
 import { MOCK_COOKIE_PREFIX } from '../auth/data-mode'
@@ -9,6 +18,9 @@ import { type CookieAdapter, verifySubject } from '../auth/supabase'
 import { prisma } from '../client/prisma'
 import type { JoinRequestPlacement, QueueSession, StatedBand } from '../generated/prisma/client'
 import { ServiceError } from '../service/errors'
+import { closeStaleMatchRequests } from './match-request-store'
+import { peopleFor, readMyMatchRequest } from './match-requests'
+import { matchContext } from './match-store'
 import { readPublishedResults } from './results'
 import { placeClubMember, stepDownIn } from './session-roster'
 import {
@@ -529,6 +541,125 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
   })
 }
 
+/**
+ * Q-PUBLIC-JOIN › My night (D-2026-11-09-09) in real mode: the signed-in Player's own night in the
+ * `MyNight` shape (`@rotra/data/public-session/types`), epoch-ms `startsAt`. Own standing only:
+ * their status and stage, counted games, wins and losses, the minimum, the first waiting match with
+ * them in it and the match holding a court with them in it (faces by the signed-in name rule, first
+ * name only), their latest join request and open match request, and club membership. Self check-in
+ * marks, drop-out notices and Session invites are not real yet, so `checkedIn`, `hasLeft`,
+ * `cantMakeItSent` and `canInvite` read false and `inviteCode` null. Never another player's results
+ * or positions, presence of others, contacts or operator notes.
+ */
+export async function readMyNight(context: PlayerContext, slug: string) {
+  const found = await prisma.queueSession.findUnique({
+    where: { publicSlug: slug },
+    select: { id: true, publication: { select: { state: true } } },
+  })
+  if (!found || found.publication?.state === 'deleted') throw new ServiceError('not_found')
+  const night = await prisma.$transaction(async (tx) => {
+    const session = await tx.queueSession.findUniqueOrThrow({ where: { id: found.id } })
+    const { waitlistClubPlayerId: _, ...standing } = await playerStanding(
+      tx,
+      context.playerId,
+      session.id,
+    )
+    const { ctx, roster } = await matchContext(tx, session)
+    const own = await tx.sessionPlayer.findFirst({
+      where: {
+        sessionId: session.id,
+        releasedAt: null,
+        clubPlayer: { playerId: context.playerId },
+      },
+      select: { id: true },
+    })
+    const row = own ? (ctx.roster.find((r) => r.id === own.id) ?? null) : null
+    const waitlisted = !row && standing.waitlistPosition !== null
+    const takesPart =
+      session.state === 'prepared' || session.state === 'active' || session.state === 'finalizing'
+    const isLive = session.state === 'active' || session.state === 'finalizing'
+    const status = row ? 'confirmed' : waitlisted ? 'waitlisted' : 'none'
+    let stage: MyNightStage | null = null
+    if (status === 'waitlisted') stage = takesPart ? 'waitlisted' : null
+    else if (row) {
+      if (session.state === 'prepared') stage = 'before-start'
+      else if (isLive) stage = row.present ? 'live-present' : 'live-not-present'
+      else if (session.state === 'completed') stage = 'finished'
+    }
+    const people = row ? await peopleFor(tx, roster, context.playerId) : new Map()
+    const levels = new Map(ctx.roster.map((r) => [r.id, r.level ?? null]))
+    const face = (id: string) => {
+      const person = people.get(id)
+      return {
+        name: publicFirstName(person?.name ?? ''),
+        level: levels.get(id) ?? null,
+        pictureUrl: person?.pictureUrl ?? null,
+        masked: person?.masked ?? true,
+        isViewer: person?.isViewer ?? false,
+      }
+    }
+    const mine = (match: Match, rosterId: string) => {
+      const mineA = match.teamA.includes(rosterId)
+      const partners = (mineA ? match.teamA : match.teamB).filter((id) => id !== rosterId).map(face)
+      const opponents = (mineA ? match.teamB : match.teamA).map(face)
+      return {
+        partners,
+        opponents,
+        matchLabel: myMatchLabel(
+          partners.map((p) => p.name),
+          opponents.map((p) => p.name),
+        ),
+      }
+    }
+    const result = row
+      ? computeStandings(ctx.roster, ctx.matches).find((r) => r.playerId === row.id)
+      : undefined
+    const queued = row
+      ? ctx.matches
+          .filter((m) => m.state === 'waiting')
+          .sort((a, b) => a.queuePosition - b.queuePosition)
+      : []
+    const queueIndex = row ? queued.findIndex((m) => [...m.teamA, ...m.teamB].includes(row.id)) : -1
+    const queuedMatch = queued[queueIndex]
+    const held =
+      row && isLive
+        ? ctx.matches.find((m) => holdsCourt(m) && [...m.teamA, ...m.teamB].includes(row.id))
+        : undefined
+    return {
+      playerId: context.playerId,
+      status,
+      stage,
+      waitlistPosition: standing.waitlistPosition,
+      startsAt: session.scheduledStartAt.getTime(),
+      present: row?.present ?? false,
+      checkedIn: false,
+      hasLeft: false,
+      cantMakeItSent: false,
+      offline: false,
+      games: result?.games ?? 0,
+      won: result?.wins ?? 0,
+      lost: result?.losses ?? 0,
+      minimum: session.minimumGames,
+      inQueue:
+        row && queuedMatch ? { position: queueIndex + 1, ...mine(queuedMatch, row.id) } : null,
+      onCourt:
+        row && held
+          ? {
+              courtLabel: courtNames(held, ctx.courts),
+              started: held.state === 'active',
+              ...mine(held, row.id),
+            }
+          : null,
+      joinRequest: standing.joinRequest,
+      isClubMember: !!(await memberOf(tx, session.clubId, context.playerId)),
+      canInvite: false,
+      inviteCode: null,
+    }
+  })
+  const { matchRequest } = await readMyMatchRequest(context, slug)
+  return { ...night, matchRequest }
+}
+
 /** The Player's latest club level as a stated band, for a one-tap request; `unsure` without one. */
 async function bandFor(tx: Tx, clubId: string, playerId: string): Promise<StatedBand> {
   const last = await tx.sessionPlayer.findFirst({
@@ -735,6 +866,7 @@ export async function movePlayerToWaitlist(
         { operationId: input.operationId, rosterId: entry.id },
         () => "You're in a match. Ask the Queue Master to finish or remove it first.",
       )
+      await closeStaleMatchRequests(tx, session.id)
       await recomputeMinimum(tx, await touchSession(tx, session))
       return { clubPlayerId: moved.clubPlayerId, message: 'You moved to the waitlist' }
     })

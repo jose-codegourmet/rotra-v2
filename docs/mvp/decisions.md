@@ -41,6 +41,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-12-02](#d-2026-11-12-02) | Club members join upcoming sessions right away; the Always require a request switch | approved 2026-11-12 (open points to be confirmed by the owner) | in progress (#764; migration applied 2026-11-12) | #764 | [Queue](workstreams/queue.md) |
 | [D-2026-11-12-03](#d-2026-11-12-03) | Profile banner: 5:2, nothing overlaps it, banner dialog | approved 2026-11-12 (open points to be confirmed by the owner) | in the mockups and the mock app (#765); real mode shares the same services | #765 | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 | [D-2026-11-12-04](#d-2026-11-12-04) | Clubs on every readable profile; Leave club on the club page; no Report a problem | approved 2026-11-12 | in progress (#766) | #766 | [Player](workstreams/player.md) |
+| [D-2026-11-12-05](#d-2026-11-12-05) | Playwright regression suite on a throwaway local Supabase | approved 2026-11-12 | in progress (feat/e2e-regression) | none | [Queue](workstreams/queue.md) |
 
 ## Status conventions
 
@@ -731,3 +732,26 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - **Report a problem** is removed from the Player app, with its email link and the placeholder support address.
 - **Amends:** [D-2026-11-09-06](#d-2026-11-09-06) (Your clubs card, Report a problem).
 - **References:** [mockup log](../mockup-changes/2026-11-12-player-profile-clubs-box.md), [profile screen](../screens/product/modules/player-information/profile.md), [club page screen](../screens/product/modules/player-information/club-page.md), [identity module](../business_logic/product/player-information/modules/identity/README.md).
+
+<a id="d-2026-11-12-05"></a>
+### D-2026-11-12-05 — Playwright regression suite on a throwaway local Supabase
+- **Decision status:** approved by the owner, November 12, 2026.
+- **Implementation status:** in progress on branch `feat/e2e-regression`.
+- **Ticket:** none
+- **Roadmap:** MVP — Queue (verification).
+- **Decision:**
+  - **Dependency:** `@playwright/test` 1.64.1 is the only new dependency. It lives in `apps/e2e` (`@rotra/e2e`).
+  - **What runs:** the three apps in real mode on ports 9100, 9101 and 9102, against a local Supabase (`supabase start`, database `rotra_disposable_e2e`). Never a hosted project.
+  - **Guardrails:** `src/guard.ts` refuses any database that is not `127.0.0.1:54322/rotra_disposable_e2e`, and any Supabase URL that is not `http://127.0.0.1:54321`. Explicit env on the app servers beats `.env` files. Nothing uses `--linked`.
+  - **Test clock:** the server test clock is loaded only by the e2e runner, through `NODE_OPTIONS`, and only when `ROTRA_E2E_CLOCK=1` and the guard passes. It never runs earlier than real time.
+  - **Pass rule:** every player reaches floor(minimum × minutes Present ÷ session minutes) counted games.
+  - **Fairness:** players Present for the whole session differ by at most 2 games.
+  - **Done review:** the below-minimum list at Session done must match the expected list.
+  - **Excluded:** offline mode.
+  - **Not in `make check`.** It runs on demand: `make e2e` locally, or the manual GitHub workflow "Regression" (`workflow_dispatch`, inputs `suite` = all | sim | ui and `seeds`, no secrets).
+  - **App defects:** fixes for app defects the suite finds are the owner's. The suite marks them `test.fail`.
+- **Related product changes in this branch:**
+  - Real-mode match requests (migration `20261112000400_session_match_requests`).
+  - Real-mode My night read (`/api/public-sessions/[slug]/my-night`).
+  - Cross-app origins from `NEXT_PUBLIC_ROTRA_QUEUE_URL`, `NEXT_PUBLIC_ROTRA_PLAYER_URL` and `NEXT_PUBLIC_ROTRA_ADMIN_URL`. Unset in production, so behaviour is unchanged.
+- **References:** [regression suite](../regression.md), `apps/e2e`, `.github/workflows/regression.yml`, `Makefile` (`e2e`, `e2e-ui`, `e2e-down`).

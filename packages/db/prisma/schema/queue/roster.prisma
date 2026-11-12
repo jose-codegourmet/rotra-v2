@@ -54,6 +54,9 @@ model SessionPlayer {
   participations MatchParticipation[]
   activeHold     ActivePlayerHold?
 
+  matchRequests     SessionMatchRequest[]     @relation("MatchRequestRequester")
+  matchRequestSpots SessionMatchRequestSpot[] @relation("MatchRequestSpot")
+
   paymentMark SessionPaymentMark?
 
   facts   PlayerMatchFact[]

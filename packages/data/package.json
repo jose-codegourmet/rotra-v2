@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./app-origins": "./src/app-origins.ts",
     "./club-player/linkGuest": "./src/club-player/linkGuest.ts",
     "./club-player/picture-rules": "./src/club-player/clubPlayerPicture.rules.ts",
     "./club-player/registration-url": "./src/club-player/registrationUrl.ts",

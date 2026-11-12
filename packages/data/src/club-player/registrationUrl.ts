@@ -1,3 +1,5 @@
+import { appOrigin } from '../app-origins'
+
 /**
  * The plain `/register/<clubId>`: the base of the club invite link. On its own it is refused in
  * real mode (#712); print `clubInviteUrl` wherever a link is shared. A club identifies the
@@ -19,7 +21,5 @@ export function clubInviteUrl(clubId: string, code?: string | null) {
 }
 
 function registrationOrigin() {
-  return typeof location !== 'undefined' && location.hostname === 'localhost'
-    ? 'http://localhost:9001'
-    : 'https://player.rotra.club'
+  return appOrigin('player')
 }

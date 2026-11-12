@@ -4,6 +4,7 @@ import type { AdminPlayer } from '@rotra/data/admin-player/types'
 import { useAdminPlayerProfile } from '@rotra/data/admin-player/useAdminPlayer'
 import { useAdminPlayerGames } from '@rotra/data/admin-player/useAdminPlayerGames'
 import { useAdminPlayerMutations } from '@rotra/data/admin-player/useAdminPlayerMutations'
+import { appOrigin } from '@rotra/data/app-origins'
 import { AdminPlayerActions } from '@rotra/ui/admin-player-actions'
 import { AdminPlayerChangeForm } from '@rotra/ui/admin-player-change-form'
 import { AdminPlayerQuickView } from '@rotra/ui/admin-player-quick-view'
@@ -49,10 +50,7 @@ export function PlayerManagementActions({ player }: { player: AdminPlayer }) {
           else if (action === 'link')
             mutations.link.mutate(player.id, {
               onSuccess: (link) => {
-                const base =
-                  typeof location !== 'undefined' && location.hostname === 'localhost'
-                    ? 'http://localhost:9001'
-                    : 'https://player.rotra.club'
+                const base = appOrigin('player')
                 void copy(
                   `${base}/claim/${link.token}`,
                   `Registration link copied · expires ${new Date(link.expiresAt).toLocaleDateString('en-PH', { timeZone: 'Asia/Manila' })}`,

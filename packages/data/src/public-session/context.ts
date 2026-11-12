@@ -1,6 +1,12 @@
-/** Canonical same-site deployment plus local development; no wildcard preview origins. */
-export const QUEUE_ORIGINS = ['https://queue.rotra.club', 'http://localhost:9000']
-export const PLAYER_ORIGINS = ['https://player.rotra.club', 'http://localhost:9001']
+import { pairedQueuePlayerOrigins } from '../app-origins'
+
+/**
+ * Canonical same-site deployment plus local development (and a configured pair, see app-origins);
+ * no wildcard preview origins.
+ */
+const PAIRED = pairedQueuePlayerOrigins()
+export const QUEUE_ORIGINS = PAIRED.queue
+export const PLAYER_ORIGINS = PAIRED.player
 
 /** Only a public session and its three UI parameters (join, tab, invite) may cross the app boundary. */
 export function queueSessionUrl(value: string | undefined): string | null {

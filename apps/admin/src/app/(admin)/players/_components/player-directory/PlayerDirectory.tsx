@@ -5,6 +5,7 @@ import { useAdminPlayer, useAdminPlayerProfile } from '@rotra/data/admin-player/
 import { useAdminPlayerGames } from '@rotra/data/admin-player/useAdminPlayerGames'
 import { useAdminPlayerMutations } from '@rotra/data/admin-player/useAdminPlayerMutations'
 import { useAdminPlayers } from '@rotra/data/admin-player/useAdminPlayers'
+import { appOrigin } from '@rotra/data/app-origins'
 import { useAdminClubs } from '@rotra/data/club/useAdminClubs'
 import { useContactRequests } from '@rotra/data/contact-change-request/useContactRequests'
 import { AdminPlayerCard } from '@rotra/ui/admin-player-card'
@@ -280,10 +281,7 @@ export function PlayerDirectory() {
                 mutations.link.reset()
                 mutations.link.mutate(player.id, {
                   onSuccess: (link) => {
-                    const base =
-                      location.hostname === 'localhost'
-                        ? 'http://localhost:9001'
-                        : 'https://player.rotra.club'
+                    const base = appOrigin('player')
                     setRegistration({ playerId: peek, url: `${base}/claim/${link.token}` })
                   },
                 })

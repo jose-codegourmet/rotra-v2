@@ -8,6 +8,7 @@ import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
 import { ServiceError } from '../service/errors'
 import { sessionDto } from './dto'
+import { closeSessionMatchRequests } from './match-request-store'
 import { lockSession, mapDatabaseError, requireSessionAccess } from './session-store'
 
 /**
@@ -37,6 +38,7 @@ export async function cancelSession(
         where: { clubId: context.clubId, sessionId, status: 'pending' },
         data: { status: 'closed', decidedAt: now },
       })
+      await closeSessionMatchRequests(tx, sessionId, now)
       await tx.clubSessionReservation.deleteMany({ where: { clubId: context.clubId, sessionId } })
       const updated = await tx.queueSession.update({
         where: { id: sessionId },

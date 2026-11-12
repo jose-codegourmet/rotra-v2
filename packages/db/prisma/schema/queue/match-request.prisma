@@ -1,0 +1,74 @@
+// Match requests from present, signed-in Players (D-2026-11-09-05; queue/modules/matches-queue.md).
+// A request names roster entries of the same session; the Queue Master adds it to the Main Queue
+// (a waiting match) or declines it. It closes by itself when anyone named stops being present, and
+// when the session finishes or is marked invalid. Database: one open request per requester
+// (partial unique), status/decision coherence (CHECKs in SQL). Commands: format allowed by the
+// session's request_formats, named players present and distinct, spots fitted to the format.
+
+enum MatchRequestStatus {
+  open
+  /// The Queue Master's Add to queue made a waiting match (match_id set).
+  added
+  declined
+  /// The requester's own Cancel.
+  cancelled
+  /// Closed by itself: someone named stopped being present, or the session ended. Never reopens.
+  closed
+
+  @@map("match_request_status")
+}
+
+/// Which side of the requester a spot is on.
+enum MatchRequestSide {
+  partner
+  opponent
+
+  @@map("match_request_side")
+}
+
+model SessionMatchRequest {
+  id              String             @id @db.Uuid
+  clubId          String             @map("club_id") @db.Uuid
+  sessionId       String             @map("session_id") @db.Uuid
+  /// The requester's roster entry.
+  sessionPlayerId String             @map("session_player_id") @db.Uuid
+  format          MatchFormat
+  status          MatchRequestStatus @default(open)
+  requestedAt     DateTime           @map("requested_at") @db.Timestamptz(6)
+  /// Set ⇔ status <> open.
+  decidedAt       DateTime?          @map("decided_at") @db.Timestamptz(6)
+  /// The waiting match Add to queue made; set ⇔ status = added.
+  matchId         String?            @map("match_id") @db.Uuid
+  createdAt       DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime           @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision        BigInt             @default(1)
+
+  session   QueueSession              @relation(fields: [clubId, sessionId], references: [clubId, id], onDelete: Restrict)
+  requester SessionPlayer             @relation("MatchRequestRequester", fields: [clubId, sessionId, sessionPlayerId], references: [clubId, sessionId, id], onDelete: Restrict)
+  match     Match?                    @relation(fields: [clubId, sessionId, matchId], references: [clubId, sessionId, id], onDelete: Restrict)
+  spots     SessionMatchRequestSpot[]
+
+  @@unique([clubId, sessionId, id])
+  @@index([sessionId, status, requestedAt])
+  @@index([clubId, sessionId, sessionPlayerId])
+  @@map("session_match_requests")
+}
+
+/// One partner or opponent spot of a request, in the format's order. A null roster entry is
+/// "Anyone": Add to queue fills it from present players with the fewest games.
+model SessionMatchRequestSpot {
+  requestId       String           @map("request_id") @db.Uuid
+  clubId          String           @map("club_id") @db.Uuid
+  sessionId       String           @map("session_id") @db.Uuid
+  side            MatchRequestSide
+  /// 0-based position on its side.
+  slotNo          Int              @map("slot_no") @db.SmallInt
+  sessionPlayerId String?          @map("session_player_id") @db.Uuid
+
+  request SessionMatchRequest @relation(fields: [clubId, sessionId, requestId], references: [clubId, sessionId, id], onDelete: Cascade)
+  entry   SessionPlayer?      @relation("MatchRequestSpot", fields: [clubId, sessionId, sessionPlayerId], references: [clubId, sessionId, id], onDelete: Restrict)
+
+  @@id([requestId, side, slotNo])
+  @@index([clubId, sessionId, sessionPlayerId])
+  @@map("session_match_request_spots")
+}

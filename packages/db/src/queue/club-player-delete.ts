@@ -4,6 +4,7 @@ import { prisma } from '../client/prisma'
 import type { Prisma } from '../generated/prisma/client'
 import { requireClubEntitlement } from '../service/authorize'
 import { ServiceError } from '../service/errors'
+import { closeStaleMatchRequests } from './match-request-store'
 
 type Tx = Prisma.TransactionClient
 
@@ -88,6 +89,7 @@ export async function deleteClubPlayer(context: ClubContext, clubPlayerId: strin
         where: { id: entry.id },
         data: { present: false, presentChangedAt: now, revision: { increment: 1 } },
       })
+      await closeStaleMatchRequests(tx, entry.sessionId, now)
     }
     await tx.sessionPlayer.updateMany({
       where: {

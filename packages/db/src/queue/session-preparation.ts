@@ -14,8 +14,9 @@ import { prisma } from '../client/prisma'
 import type { QueueSession, SessionCourt, SessionMode } from '../generated/prisma/client'
 import { requireClubEntitlement, requireRevision } from '../service/authorize'
 import { ServiceError } from '../service/errors'
-import { courtDto, sessionDto } from './dto'
+import { courtDto, requestFormatsInput, sessionDto } from './dto'
 import { autoFillCourts } from './match-control'
+import { liveOpenRequests } from './match-request-store'
 import {
   derivedId,
   liveCourts,
@@ -45,6 +46,11 @@ export type QueueSessionInput = {
   minimumIsCalculated: boolean
   expectedPlayers: number | null
   playersPerCourt?: number
+  /**
+   * Players can request (D-2026-11-09-05): `RequestFormats` switches or a list of formats. Left out
+   * on create, the prototype default (2 v 2, plus 1 v 1 when singles is on); on edit, unchanged.
+   */
+  requestFormats?: unknown
   /**
    * `id` keeps an existing court on edit; courts left out are removed. `startsAt` is the planned
    * start (null or the session start = follows the session start).
@@ -247,6 +253,9 @@ export async function createQueueSession(
             minimumIsCalculated: input.minimumIsCalculated,
             playersPerCourt,
             expectedPlayers: input.expectedPlayers,
+            requestFormats:
+              requestFormatsInput(input.requestFormats) ??
+              (input.allowSingles ? ['doubles', 'singles'] : ['doubles']),
             seriesId,
             publicSlug: `${publicSlugFor(id)}${id.slice(0, 4)}`,
             sourceCommandId: await derivedId(commandId, `session:${index}`),
@@ -331,6 +340,9 @@ export async function updateQueueSession(
           minimumIsCalculated: input.minimumIsCalculated,
           expectedPlayers: input.expectedPlayers,
           playersPerCourt,
+          ...(requestFormatsInput(input.requestFormats)
+            ? { requestFormats: requestFormatsInput(input.requestFormats) }
+            : {}),
           revision: { increment: 1 },
         },
       })
@@ -883,5 +895,10 @@ export async function readQueueSession(context: ClubContext, sessionId: string) 
   })
   if (!session) throw new ServiceError('not_found')
   await requireSessionAccess(context, session)
-  return prisma.$transaction((tx) => sessionSummaryDto(tx, session))
+  return prisma.$transaction(async (tx) => {
+    const summary = await sessionSummaryDto(tx, session)
+    // Live: Match requests · N, the open match requests whose named players are all present.
+    if (session.state !== 'active') return summary
+    return { ...summary, requestCount: (await liveOpenRequests(tx, session.id)).length }
+  })
 }

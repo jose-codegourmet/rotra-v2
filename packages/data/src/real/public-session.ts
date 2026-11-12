@@ -1,13 +1,14 @@
 import { playerOrigin } from '../public-session/context'
 import type {
   MyJoinRequest,
+  MyNight,
   PublicSessionPage,
   SendJoinRequestInput,
 } from '../public-session/publicSession.types'
 import type { JoinRequestPlacement } from '../session-roster/sessionRoster.types'
 import { saveToastText } from '../sync/fetchers'
 import type { SaveOutcome } from '../sync/sync.types'
-import { realRequest } from './client'
+import { msOf, realRequest } from './client'
 
 // ---------- Public session (Q-PUBLIC-*), no account ----------
 
@@ -108,4 +109,22 @@ export async function realSignOutOnSessionPage(slug: string) {
     credentials: 'include',
   })
   return null
+}
+
+/**
+ * **My night** (D-2026-11-09-09): the signed-in Player's own night, a credentialed read on the
+ * Player origin like the access read.
+ */
+export async function realGetMyNight(slug: string): Promise<MyNight> {
+  const origin = typeof location === 'undefined' ? null : playerOrigin(location.origin)
+  if (!origin) throw new Error('Sign in with ROTRA Player to see your night.')
+  const wire = await realRequest<
+    Omit<MyNight, 'matchRequest'> & {
+      matchRequest: (Omit<NonNullable<MyNight['matchRequest']>, 'at'> & { at: string }) | null
+    }
+  >(`${origin}${base(slug)}/my-night`, { credentials: 'include' })
+  return {
+    ...wire,
+    matchRequest: wire.matchRequest && { ...wire.matchRequest, at: msOf(wire.matchRequest.at) },
+  }
 }

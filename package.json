@@ -9,6 +9,7 @@
     "type-check": "turbo type-check",
     "test": "turbo test",
     "mockups": "pnpm --filter @rotra/mockups dev",
+    "e2e": "pnpm --filter @rotra/e2e e2e",
     "storybook": "pnpm --filter @rotra/ui storybook",
     "format": "biome format --write .",
     "env:vercel": "node scripts/sync-vercel-env.mjs",

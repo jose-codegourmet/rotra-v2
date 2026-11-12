@@ -20,9 +20,11 @@ import { isAlwaysPrivatePlayer, PROFILE_PRIVATE_MESSAGE } from '../player/visibi
 import { resolveMockProfileBanner } from '../profile-banner/fetchers'
 import { slotCapacity } from '../queue-session/queueSession.rules'
 import { RealRequestError } from '../real/client'
+import { realGetMatchRequestOptions } from '../real/match-request'
 import { isRealDataMode } from '../real/mode'
 import {
   realGetMyJoinRequest,
+  realGetMyNight,
   realGetPublicSession,
   realSendJoinRequest,
 } from '../real/public-session'
@@ -475,10 +477,12 @@ function myMatchOf(state: MockState, match: Match, rosterId: string, viewer: Vie
  * The small personal part (D-2026-11-09-09): this Player's own night. Matches, queue and standing
  * come from the last synced state; the Player's own writes (check-in marks, notices, requests, invite
  * code) are server-side facts, so they read straight from the store. Only the viewer's own
- * standing: never another player's results or positions. Mock only (NotConnectedError in real mode).
+ * standing: never another player's results or positions. Real mode reads the Player app's My night.
  * Works offline (owner, 2026-11-10): `offline` is true, so a check-in shows the sync line.
  */
 export async function getMyNight(slug: string, playerId: string): Promise<MyNight> {
+  // Real mode: the Player app's own read (its sign-in says who); `playerId` only keys the cache.
+  if (isRealDataMode()) return realGetMyNight(slug)
   await delay()
   const { state } = serverState()
   requireSignedInPlayer(state, playerId)
@@ -595,12 +599,14 @@ export async function getMyNight(slug: string, playerId: string): Promise<MyNigh
  * present players other than the viewer with games, level, court and waiting time, for the sheet
  * and its picker. Present players only; the viewer's own roster id is `viewerRosterId`. Names follow
  * the signed-in rule. Presence is a server fact (live store); matches come from the last synced
- * state like the rest of the projection. Mock only (NotConnectedError in real mode).
+ * state like the rest of the projection. Real mode reads it from the Player app (the signed-in
+ * Player's own cookie; roster players only).
  */
 export async function getMatchRequestOptions(
   slug: string,
   playerId: string,
 ): Promise<MatchRequestOptions> {
+  if (isRealDataMode()) return realGetMatchRequestOptions(slug)
   await delay()
   requireOnline()
   const { state } = serverState()

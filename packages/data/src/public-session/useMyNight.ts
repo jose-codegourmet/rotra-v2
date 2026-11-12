@@ -10,7 +10,7 @@ import { publicSessionKeys } from './queryKeys'
  * `matchRequest` (open when non-null), `canInvite` and `startsAt` map onto its props one to one.
  * `joinRequest` drives the join card (pending, confirmed, declined). Own standing only. Every
  * player write refetches it with the other queries; it also refetches when the tab regains focus.
- * Mock mode only for now.
+ * Real mode reads it from the Player app (the Player's own sign-in), like the access read.
  */
 export function useMyNight(slug: string, playerId: string | null | undefined) {
   return useQuery({

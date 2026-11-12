@@ -115,7 +115,7 @@ export async function queueCommand<T>(
  * server put On court in the same transaction (`autoPlaced`, empty in Manual Queue). Automatic
  * placements bump the queue revision again, so the next refetch brings the screen up to date.
  */
-async function fillCommand<T>(
+export async function fillCommand<T>(
   sessionId: string,
   path: string,
   options: { method?: 'POST' | 'PATCH' | 'DELETE'; body: unknown },
@@ -135,7 +135,7 @@ async function fillCommand<T>(
 }
 
 /** The toast tail for Auto Queue placements: " · Match 5 on Court 2 · getting ready". */
-async function autoNote(
+export async function autoNote(
   sessionId: string,
   placed: Match[],
   courts?: Awaited<ReturnType<typeof realGetQueueSession>>['courts'],

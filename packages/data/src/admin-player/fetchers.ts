@@ -10,6 +10,7 @@ import { effectiveRankingVersion } from '../ranking-settings/rankingSettings.rul
 import {
   realGetAdminPlayer,
   realGetAdminPlayerGames,
+  realGetAdminPlayerSocialLinks,
   realGetAdminPlayersByIds,
   realListAdminPlayers,
 } from '../real/admin-players'
@@ -181,6 +182,16 @@ export async function getAdminPlayer(
       .filter((entry) => entry.id !== id && entry.name === player.name)
       .map((entry) => ({ id: entry.id, name: entry.name, rtrId: entry.rtrId })),
   }
+}
+
+/** Profile fields for Admin Quick view, including private profiles; null for club-only records. */
+export async function getAdminPlayerProfile(id: string, signal?: AbortSignal) {
+  if (isRealDataMode()) return realGetAdminPlayerSocialLinks(id, signal)
+  if ((await getAdminSession()).kind !== 'owner')
+    throw new MockError('permission', 'Only ROTRA Admin can view player management.')
+  await delay(400, signal)
+  const profile = readMockState().playerProfiles.find((entry) => entry.playerId === id)
+  return profile ? { socialLinks: profile.socialLinks } : null
 }
 
 const EMPTY_LINKS = { facebook: '', instagram: '', youtube: '', linkedin: '' }

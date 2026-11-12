@@ -45,6 +45,18 @@ export async function realGetAdminPlayersByIds(ids: string[], signal?: AbortSign
   return (await directory(signal)).filter((p) => selected.has(p.id))
 }
 
+/** Admin Quick view profile fields; a club-only record has no public player profile. */
+export async function realGetAdminPlayerSocialLinks(id: string, signal?: AbortSignal) {
+  try {
+    return await realRequest<{
+      socialLinks: import('../player/player.types').PlayerProfile['socialLinks']
+    }>(`/api/players/${encodeURIComponent(id)}`, { signal })
+  } catch (error) {
+    if (error instanceof RealRequestError && error.status === 404) return null
+    throw error
+  }
+}
+
 export async function realGetAdminPlayerGames(id: string, signal?: AbortSignal) {
   return (
     await realRequest<{ games: PlayerSessionRecord[] }>(

@@ -8,7 +8,6 @@ import { type ClubMemberProfile, ClubMemberProfileSheet } from '@rotra/ui/club-m
 import { usePhotoViewer } from '@rotra/ui/hooks/use-photo-viewer'
 import { levelLabel } from '@rotra/ui/level-pill'
 import { PhotoViewer } from '@rotra/ui/photo-viewer'
-import { PROFILE_BANNERS } from '@rotra/ui/profile-banner'
 import { useRouter } from 'next/navigation'
 import { pictureSrc } from '@/app/_components/profile-picture/pictureSrc'
 
@@ -47,8 +46,8 @@ export function MemberProfile({
       name: member.name,
       nickname: member.nickname,
       picture,
-      // One of the six predefined banners only; an uploaded banner image has no place in this union.
-      banner: PROFILE_BANNERS.find((b) => b.key === profile.data?.bannerKey)?.key,
+      bannerKey: profile.data?.bannerKey,
+      bannerImageUrl: profile.data?.bannerImageUrl,
       levelLabel: member.level ? levelLabel(member.level) : null,
       position: rank.data?.position ?? null,
       isYou: member.isYou,

@@ -3,23 +3,11 @@
 import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
 import { Chip } from '@rotra/ui/chip'
-import { cn } from '@rotra/ui/cn'
 import { KeyValueList } from '@rotra/ui/key-value-list'
+import { ProfileBanner } from '@rotra/ui/profile-banner'
 import { Sheet } from '@rotra/ui/sheet'
 import { Skeleton } from '@rotra/ui/skeleton'
 import type { ReactNode } from 'react'
-
-/** The predefined profile banners (rotra-player.html .bn-*); tokens only. */
-export type ClubMemberBanner = 'court' | 'night' | 'dusk' | 'ember' | 'sun' | 'stripe'
-
-const BANNER: Record<ClubMemberBanner, string> = {
-  court: 'bg-[linear-gradient(135deg,var(--accent-dim),var(--accent)_55%,var(--accent-subtle))]',
-  night: 'bg-[linear-gradient(135deg,var(--elev),var(--overlay)_60%,var(--border-strong))]',
-  dusk: 'bg-[linear-gradient(135deg,var(--overlay),var(--accent-dim))]',
-  ember: 'bg-[linear-gradient(135deg,var(--error),var(--warn))]',
-  sun: 'bg-[linear-gradient(135deg,var(--warn),var(--accent))]',
-  stripe: 'bg-[repeating-linear-gradient(135deg,var(--accent-dim)_0_14px,var(--elev)_14px_28px)]',
-}
 
 export type ClubMemberProfile =
   | {
@@ -37,7 +25,8 @@ export type ClubMemberProfile =
       rtrId: string | null
       /** Counted games in the last 90 days; null while unknown */
       stats: { games: number; wins: number; losses: number } | null
-      banner?: ClubMemberBanner
+      bannerKey?: string | null
+      bannerImageUrl?: string | null
     }
   | {
       /** Masked: visitors, or an always-private player for everyone but themself */
@@ -45,7 +34,8 @@ export type ClubMemberProfile =
       /** The masked name ("J*** D***") */
       name: string
       picture?: string | null
-      banner?: ClubMemberBanner
+      bannerKey?: string | null
+      bannerImageUrl?: string | null
     }
 
 export type ClubMemberProfileSheetProps = {
@@ -82,10 +72,13 @@ export function ClubMemberProfileSheet({
   onViewPhoto,
 }: ClubMemberProfileSheetProps) {
   const isPublic = profile.kind === 'public'
-  const banner = isPublic ? (profile.banner ?? 'court') : 'court'
   const head = (
     <>
-      <div aria-hidden className={cn('h-[84px]', BANNER[banner])} />
+      <ProfileBanner
+        bannerKey={isPublic ? profile.bannerKey : null}
+        imageUrl={isPublic ? profile.bannerImageUrl : null}
+        className="h-[84px]"
+      />
       <div className="absolute top-11 left-5">
         <Avatar
           name={profile.name}

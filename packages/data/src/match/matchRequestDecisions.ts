@@ -1,25 +1,22 @@
-import { closeStaleMatchRequests, namedIn } from '../match-request/matchRequest.rules'
+import {
+  closeStaleMatchRequests,
+  notEnoughToFillText,
+  requestLineup,
+} from '../match-request/matchRequest.rules'
 import { MockError } from '../mock/errors'
 import type { MockState } from '../mock/store'
 import { queueMutation } from '../mock/transaction'
 import { autoFillCourts, autoFillNote } from '../queue-session/courtFill'
+import { realAddMatchRequestToQueue, realDeclineMatchRequest } from '../real/match-request'
 import { isRealDataMode } from '../real/mode'
-import {
-  FORMAT_LABELS,
-  FORMAT_TEAM_SIZES,
-  gamesPlayedFor,
-  queuedCount,
-  shortName,
-} from './match.rules'
+import { FORMAT_LABELS, shortName } from './match.rules'
 import type { MatchFormat } from './match.types'
 import { append, requireLive } from './queue.mutations'
 
 /**
- * Queue Master decisions on Requests › Match (Q18.12, D-2026-11-09-05). Mock only; real mode
- * refuses truthfully.
+ * Queue Master decisions on Requests › Match (Q18.12, D-2026-11-09-05). Real mode sends them to the
+ * session's match-request routes, which apply the same rules (`requestLineup`).
  */
-
-const NOT_REAL = 'This request action is not available in real mode yet.'
 
 /** The pill wording a request card reads (“2 v 2”), the prototype's REQ_LABEL. */
 export const REQUEST_FORMAT_PILL: Record<MatchFormat, string> = {
@@ -61,32 +58,16 @@ const rosterRow = (s: MockState, sessionId: string, id: string) =>
  * enough present players to fill this FORMAT match” when the spots can't be filled.
  */
 export function addMatchRequestToQueue(input: { sessionId: string; requestId: string }) {
-  if (isRealDataMode()) throw new MockError('permission', NOT_REAL)
+  if (isRealDataMode()) return realAddMatchRequestToQueue(input)
   return queueMutation({ area: 'Queue', sessionId: input.sessionId }, (s) => {
     requireLive(s, input.sessionId)
     const r = openRequest(s, input.sessionId, input.requestId)
-    const [na, nb] = FORMAT_TEAM_SIZES[r.format]
-    const named = new Set(namedIn(r))
-    const need = na + nb - named.size
-    const matches = s.matches.filter((m) => m.sessionId === input.sessionId)
-    const roster = s.roster.filter((p) => p.sessionId === input.sessionId)
-    const load = (id: string) => gamesPlayedFor(id, { roster, matches }) + queuedCount(id, matches)
-    const fill = roster
-      .filter((p) => p.present && !named.has(p.id))
-      .map((p) => p.id)
-      .sort((a, b) => load(a) - load(b))
-      .slice(0, need)
-    if (fill.length < need)
-      fail(
-        `Not enough present players to fill this ${FORMAT_LABELS[r.format].toLowerCase()} match`,
-        'conflict',
-      )
-    const teamA = [
-      r.pid,
-      ...Array.from({ length: na - 1 }, (_, i) => r.partners[i] ?? (fill.shift() as string)),
-    ]
-    const teamB = Array.from({ length: nb }, (_, i) => r.opponents[i] ?? (fill.shift() as string))
-    const match = append(s, input.sessionId, { format: r.format, teamA, teamB }, 'manual', true)
+    const lineup = requestLineup(r, {
+      roster: s.roster.filter((p) => p.sessionId === input.sessionId),
+      matches: s.matches.filter((m) => m.sessionId === input.sessionId),
+    })
+    if (!lineup) fail(notEnoughToFillText(FORMAT_LABELS[r.format]), 'conflict')
+    const match = append(s, input.sessionId, lineup, 'manual', true)
     r.status = 'added'
     r.matchId = match.id
     r.decidedAt = Date.now()
@@ -99,7 +80,7 @@ export function addMatchRequestToQueue(input: { sessionId: string; requestId: st
 
 /** **Decline**: the request closes as declined; nothing is queued. */
 export function declineMatchRequest(input: { sessionId: string; requestId: string }) {
-  if (isRealDataMode()) throw new MockError('permission', NOT_REAL)
+  if (isRealDataMode()) return realDeclineMatchRequest(input)
   return queueMutation({ area: 'Queue', sessionId: input.sessionId }, (s) => {
     const r = openRequest(s, input.sessionId, input.requestId)
     r.status = 'declined'

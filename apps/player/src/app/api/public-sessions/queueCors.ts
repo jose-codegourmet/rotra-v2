@@ -1,3 +1,4 @@
+import { configuredOrigin } from '@rotra/data/app-origins'
 import { PLAYER_ORIGINS, QUEUE_ORIGINS } from '@rotra/data/public-session/context'
 
 /**
@@ -9,8 +10,10 @@ export function queueCorsHeaders(request: Request) {
   const origin = request.headers.get('Origin')
   const pair = origin ? QUEUE_ORIGINS.indexOf(origin) : -1
   const headers = new Headers({ 'Cache-Control': 'private, no-store', Vary: 'Origin, Cookie' })
-  if (pair < 0 || new URL(request.url).origin !== PLAYER_ORIGINS[pair])
-    return { headers, ok: false }
+  // This app's own origin: the configured one when set (a dev server reports request.url as
+  // localhost even when it serves 127.0.0.1), else the request's.
+  const self = configuredOrigin('player') ?? new URL(request.url).origin
+  if (pair < 0 || self !== PLAYER_ORIGINS[pair]) return { headers, ok: false }
   headers.set('Access-Control-Allow-Origin', origin as string)
   headers.set('Access-Control-Allow-Credentials', 'true')
   return { headers, ok: true }

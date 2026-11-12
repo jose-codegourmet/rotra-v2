@@ -3,7 +3,8 @@ import { useQuery } from '@tanstack/react-query'
 import { getSessionRequests } from './fetchers'
 import { matchRequestKeys } from './queryKeys'
 /**
- * Q-REQUESTS, the Queue Master's side of the player-facing requests (Q18). Mock only for now.
+ * Q-REQUESTS, the Queue Master's side of the player-facing requests (Q18). Real mode: match
+ * requests only (join requests stay on `useSessionRoster` there).
  *
  * `data: SessionRequests`:
  * - `counts.total`: pending join requests + open drop-out notices + open match requests. No tabs

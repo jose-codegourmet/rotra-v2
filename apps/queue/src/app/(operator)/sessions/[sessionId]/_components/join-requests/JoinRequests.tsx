@@ -101,7 +101,8 @@ export function JoinRequests({ sessionId, variant = 'card', className }: JoinReq
 
   const capacity = s ? slotCapacity(s.courts.length, s.playersPerCourt) : 0
   const slotsFull = (roster.data?.roster.length ?? 0) >= capacity
-  // Real mode has no Requests read yet; its refusal must not hide the guest requests that do work.
+  // Real mode's Requests read carries match requests only; its refusal must not hide the join
+  // requests, which come from the roster read there.
   const requestsError = real ? null : requests.error
 
   // D-2026-11-11-02: a Join from waitlist request names the player's current place.
@@ -135,8 +136,8 @@ export function JoinRequests({ sessionId, variant = 'card', className }: JoinReq
     }
   }
 
-  // Real mode has no Requests read yet: a signed-in Player's request carries their account on the
-  // roster read (#687), and Saved players says whether they're already in the club (#694).
+  // Real mode's Requests read has no join requests: a signed-in Player's request carries their
+  // account on the roster read (#687), and Saved players says whether they're already in the club (#694).
   if (real)
     for (const r of joinRequests)
       if (r.playerId && !requestDetails[r.id]?.account)

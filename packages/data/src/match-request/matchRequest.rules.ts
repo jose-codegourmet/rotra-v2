@@ -1,11 +1,12 @@
-import { FORMAT_TEAM_SIZES } from '../match/match.rules'
-import type { MatchFormat } from '../match/match.types'
+import { FORMAT_TEAM_SIZES, gamesPlayedFor, queuedCount } from '../match/match.rules'
+import type { Match, MatchFormat, MatchLineup } from '../match/match.types'
 import type { MockState } from '../mock/store'
 import {
   prototypeDefaultRequestFormats,
   type QueueSession,
   type RequestFormats,
 } from '../queue-session/queueSession.types'
+import type { SessionPlayer } from '../session-roster/sessionRoster.types'
 import type { MatchRequest } from './matchRequest.types'
 
 /** Toast when the session allows no format (prototype `openMatchReq`). */
@@ -73,3 +74,35 @@ export function hasStaleMatchRequests(state: MockState, sessionId: string) {
       r.sessionId === sessionId && r.status === 'open' && namedIn(r).some((id) => !present.has(id)),
   )
 }
+
+/**
+ * **Add to queue**'s lineup (D-2026-11-09-05): the requester on team A, named spots kept, every
+ * Anyone spot filled from present players the request does not name, fewest games (played +
+ * queued) first, the same rule for every format size. Null when the present players can't fill
+ * the spots. Shared by the mock and the real service, so both pick the same players.
+ */
+export function requestLineup(
+  r: Pick<MatchRequest, 'pid' | 'format' | 'partners' | 'opponents'>,
+  ctx: { roster: SessionPlayer[]; matches: Match[] },
+): MatchLineup | null {
+  const [na, nb] = FORMAT_TEAM_SIZES[r.format]
+  const named = new Set(namedIn(r))
+  const need = na + nb - named.size
+  const load = (id: string) => gamesPlayedFor(id, ctx) + queuedCount(id, ctx.matches)
+  const fill = ctx.roster
+    .filter((p) => p.present && !named.has(p.id))
+    .map((p) => p.id)
+    .sort((a, b) => load(a) - load(b))
+    .slice(0, need)
+  if (fill.length < need) return null
+  const teamA = [
+    r.pid,
+    ...Array.from({ length: na - 1 }, (_, i) => r.partners[i] ?? (fill.shift() as string)),
+  ]
+  const teamB = Array.from({ length: nb }, (_, i) => r.opponents[i] ?? (fill.shift() as string))
+  return { format: r.format, teamA, teamB }
+}
+
+/** Add to queue's refusal when the Anyone spots can't be filled. */
+export const notEnoughToFillText = (formatLabel: string) =>
+  `Not enough present players to fill this ${formatLabel.toLowerCase()} match`

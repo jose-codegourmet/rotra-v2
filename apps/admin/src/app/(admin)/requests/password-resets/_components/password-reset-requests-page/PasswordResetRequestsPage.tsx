@@ -1,5 +1,6 @@
 'use client'
 import { useAdminConnectivity } from '@rotra/data/admin-account/use-admin-connectivity'
+import { appOrigin } from '@rotra/data/app-origins'
 import { MockError } from '@rotra/data/mock/errors'
 import { reviewPasswordReset } from '@rotra/data/password-reset/fetchers'
 import type { ReviewPasswordResetInput } from '@rotra/data/password-reset/types'
@@ -30,7 +31,7 @@ export function PasswordResetRequestsPage() {
       if (result.token)
         setLink({
           requestId: input.id,
-          url: `${location.hostname === 'localhost' ? 'http://localhost:9001' : 'https://player.rotra.club'}/reset-password/${encodeURIComponent(result.token)}`,
+          url: `${appOrigin('player')}/reset-password/${encodeURIComponent(result.token)}`,
         })
       // Never return the token to the mutation cache.
     },

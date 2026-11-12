@@ -11,6 +11,12 @@ import {
 } from '../public-session/publicSession.rules'
 import type { PlayerSessionInput } from '../public-session/publicSession.types'
 import {
+  realCancelMatchRequest,
+  realGetSessionRequests,
+  realSendMatchRequest,
+} from '../real/match-request'
+import { isRealDataMode } from '../real/mode'
+import {
   allowedRequestFormats,
   closeStaleMatchRequests,
   FORMAT_NOT_ALLOWED_TEXT,
@@ -45,9 +51,10 @@ export function sweepStaleMatchRequests(sessionId: string) {
  * Refused with “This session isn't taking match requests” when the session allows no format, and
  * with the disabled pill's text for a format it does not allow. Spots are fitted to the format
  * (missing ones are Anyone); every named player must be present on the roster, once. One open
- * request per player.
+ * request per player. Real mode sends it to the Player app, which applies the same rules.
  */
 export function sendMatchRequest(slug: string, input: SendMatchRequestInput) {
+  if (isRealDataMode()) return realSendMatchRequest(slug, input)
   return playerWrite(
     slug,
     (s, session) => {
@@ -97,6 +104,7 @@ export function sendMatchRequest(slug: string, input: SendMatchRequestInput) {
 
 /** The player's **Cancel** on their open match request; it becomes `cancelled`. */
 export function cancelMatchRequest(slug: string, input: PlayerSessionInput) {
+  if (isRealDataMode()) return realCancelMatchRequest(slug)
   return playerWrite(
     slug,
     (s, session) => {
@@ -225,8 +233,12 @@ export function sessionRequests(state: MockState, sessionId: string): SessionReq
   }
 }
 
-/** Q-REQUESTS (QM side): mock only; real mode has no route yet and refuses truthfully. */
+/**
+ * Q-REQUESTS (QM side). Real mode reads the session's Requests route: open match requests; join
+ * requests stay on the roster read there, so `join` and `dropOuts` come back empty.
+ */
 export async function getSessionRequests(sessionId: string): Promise<SessionRequests> {
+  if (isRealDataMode()) return realGetSessionRequests(sessionId)
   await delay()
   sweepStaleMatchRequests(sessionId)
   return sessionRequests(readMockState(), sessionId)

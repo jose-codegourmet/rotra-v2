@@ -1,4 +1,7 @@
 import 'server-only'
+import type { MatchFormat } from '@rotra/data/match/types'
+import { REQUEST_FORMAT_ORDER } from '@rotra/data/match-request/rules'
+import type { RequestFormats } from '@rotra/data/queue-session/types'
 import type {
   QueueSession,
   SessionCourt,
@@ -8,6 +11,29 @@ import type {
 } from '../generated/prisma/client'
 import { toDecimalString, toIso, toIsoOrNull } from '../service/serialize'
 import { levelCodeFor } from './session-store'
+
+/** The stored Players can request list as the `RequestFormats` switches every format has. */
+export const requestFormatsRecord = (formats: readonly MatchFormat[]) =>
+  Object.fromEntries(
+    REQUEST_FORMAT_ORDER.map((format) => [format, formats.includes(format)]),
+  ) as RequestFormats
+
+/**
+ * Players can request from a request body: the `RequestFormats` switches (or a list of formats).
+ * `undefined` when the body leaves it out or sends something malformed (the stored set stays).
+ */
+export function requestFormatsInput(value: unknown): MatchFormat[] | undefined {
+  if (value === undefined || value === null) return undefined
+  if (Array.isArray(value)) {
+    if (value.every((f) => REQUEST_FORMAT_ORDER.includes(f as MatchFormat)))
+      return REQUEST_FORMAT_ORDER.filter((f) => value.includes(f))
+  } else if (typeof value === 'object') {
+    const record = value as Record<string, unknown>
+    if (Object.values(record).every((on) => typeof on === 'boolean'))
+      return REQUEST_FORMAT_ORDER.filter((f) => record[f] === true)
+  }
+  return undefined
+}
 
 /** Club-only session view. No cost, payment or private intake fields. */
 export function sessionDto(session: QueueSession) {
@@ -41,6 +67,8 @@ export function sessionDto(session: QueueSession) {
     alwaysRequireRequest: session.alwaysRequireRequest,
     /** Manual Queue | Auto Queue (default manual). */
     courtFillMode: session.courtFillMode,
+    /** Players can request (D-2026-11-09-05): one switch per format */
+    requestFormats: requestFormatsRecord(session.requestFormats),
     revision: toDecimalString(session.revision),
   }
 }

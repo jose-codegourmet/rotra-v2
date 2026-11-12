@@ -4,6 +4,7 @@ import { prisma } from '../client/prisma'
 import type { Prisma, ProjectionKind, SessionFinalization } from '../generated/prisma/client'
 import { ServiceError } from '../service/errors'
 import { toIso, toIsoOrNull } from '../service/serialize'
+import { closeSessionMatchRequests } from './match-request-store'
 import { lockSession, mapDatabaseError, requireSessionAccess, type Tx } from './session-store'
 import { sessionCompleteness } from './sync'
 
@@ -454,6 +455,8 @@ export async function finalizeSession(
           ),
         })
         await dropUnstarted(tx, sessionId, now)
+        // Finishing closes every open match request (kept on the record, hidden).
+        await closeSessionMatchRequests(tx, sessionId, now)
         await tx.queueSession.update({
           where: { id: sessionId },
           data: { state: 'completed', finalizedAt: now, revision: { increment: 1 } },
@@ -571,6 +574,7 @@ export async function invalidateSession(
       where: { sessionId, state: 'waiting', removedAt: null },
       data: { removedAt: new Date(), queuePosition: null },
     })
+    await closeSessionMatchRequests(tx, sessionId)
     await tx.queueSession.update({
       where: { id: sessionId },
       data: { state: 'invalid', invalidReason: reason, revision: { increment: 1 } },

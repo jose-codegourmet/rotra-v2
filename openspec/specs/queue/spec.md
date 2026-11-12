@@ -6,8 +6,14 @@ Record the mock Queue behavior built by epic Q18 (#586): the Requests sheet (#61
 the Checked in themselves mark (#617) and the match request formats (#618). This
 specification describes this branch's implementation on mock data; the business docs
 remain authoritative for product behavior and `apps/mockup/queue-app/rotra-queue.html`
-for appearance and copy. Real mode does not read or decide requests and does not
-persist `requestFormats` (there is no Prisma column).
+for appearance and copy. Real mode (November 12, 2026) persists `requestFormats`
+(`queue_sessions.request_formats`) and runs match requests on the server with the same
+rules: the Player app's `…/match-request` routes send, cancel and read them, the Queue
+app's `GET …/requests` reads them with the live session read's `requestCount`, and
+`POST …/match-requests/{id}/add` / `…/decline` decide them (Add to queue then runs Auto
+Queue like any add). They close by themselves when anyone named stops being present and
+when the session finishes, is marked invalid or is cancelled. In real mode the Requests
+read carries match requests only; join requests come from the roster read.
 
 ## Requirements
 

@@ -112,7 +112,7 @@ async function writeLineup(
  * Appends one waiting match with the next immutable match number. Repeat-safe on the operation:
  * a retry returns the stored match and never renumbers or duplicates it.
  */
-async function appendMatch(
+export async function appendMatch(
   tx: Tx,
   session: QueueSession,
   rosterIds: Set<string>,

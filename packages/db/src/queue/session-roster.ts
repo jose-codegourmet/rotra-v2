@@ -5,6 +5,7 @@ import type { ClubPlayer, QueueSession, SessionWaitlistEntry } from '../generate
 import { ServiceError } from '../service/errors'
 import { joinRequestDto, rosterEntryDto, waitlistDto } from './dto'
 import { countedGamesByEntry } from './finalization'
+import { closeStaleMatchRequests } from './match-request-store'
 import {
   assessEntry,
   capacityOf,
@@ -39,6 +40,8 @@ async function rosterCommand<T>(
       await requireSessionAccess(context, session)
       requireState(session, ['prepared', 'active'], 'This session is closed.')
       const result = await change(tx, session)
+      // A match request naming anyone who stopped being present, or left the roster, closes.
+      await closeStaleMatchRequests(tx, session.id)
       await recomputeMinimum(tx, await touchSession(tx, session))
       return result
     })

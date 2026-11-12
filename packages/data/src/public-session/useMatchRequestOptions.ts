@@ -7,7 +7,7 @@ import { publicSessionKeys } from './queryKeys'
  * no match requests), `data.minimum`, and `data.players`, the present players other than the viewer
  * (`id` is the roster row id a request names; `games`, `level`, `playingOn`, `restMinutes` feed the
  * sheet and its picker). Enabled only when `enabled` is true (the sheet is open). Every player write
- * refetches it with the other queries. Mock mode only for now.
+ * refetches it with the other queries. Real mode reads it from the Player app.
  */
 export function useMatchRequestOptions(
   slug: string,

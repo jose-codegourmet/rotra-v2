@@ -61,7 +61,8 @@
     "./admin/password-resets": "./src/admin/password-resets.ts",
     "./admin/sales": "./src/admin/sales.ts",
     "./admin/profile-characters": "./src/admin/profile-characters.ts",
-    "./admin/profile-banners": "./src/admin/profile-banners.ts"
+    "./admin/profile-banners": "./src/admin/profile-banners.ts",
+    "./queue/match-requests": "./src/queue/match-requests.ts"
   },
   "scripts": {
     "db:generate": "prisma generate",

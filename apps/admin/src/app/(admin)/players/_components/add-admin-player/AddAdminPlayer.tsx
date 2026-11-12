@@ -1,6 +1,7 @@
 'use client'
 import { useAdminConnectivity } from '@rotra/data/admin-account/use-admin-connectivity'
 import { useAdminPlayerMutations } from '@rotra/data/admin-player/useAdminPlayerMutations'
+import { appOrigin } from '@rotra/data/app-origins'
 import { useAdminClubs } from '@rotra/data/club/useAdminClubs'
 import { foundingCities } from '@rotra/data/fixtures/founding-cities'
 import { AdminAddPlayerForm } from '@rotra/ui/admin-add-player-form'
@@ -49,10 +50,7 @@ export function AddAdminPlayer({ onCreated }: { onCreated: () => void }) {
                     onClick: () => {
                       mutations.link.mutate(player.id, {
                         onSuccess: (result) => {
-                          const base =
-                            location.hostname === 'localhost'
-                              ? 'http://localhost:9001'
-                              : 'https://player.rotra.club'
+                          const base = appOrigin('player')
                           const url = `${base}/claim/${result.token}`
                           void (async () => {
                             try {

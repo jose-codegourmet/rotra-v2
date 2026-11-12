@@ -1,3 +1,4 @@
+import { appOrigin } from '../app-origins'
 import { getSession } from '../auth/fetchers'
 import { JOSE_PLAYER_ID } from '../fixtures/players'
 import { requireOnline } from '../mock/bridge'
@@ -9,9 +10,7 @@ import { realGetMySessions } from '../real/my-sessions'
 import { playerProjection } from './projection'
 /** The ROTRA Queue app's origin, as seen from the Player app (localhost in local work). */
 export function queueAppOrigin() {
-  return typeof location !== 'undefined' && location.hostname === 'localhost'
-    ? 'http://localhost:9000'
-    : 'https://queue.rotra.club'
+  return appOrigin('queue')
 }
 /** A public session page on the Queue app, for links the Player app renders. */
 export const queueSessionUrl = (slug: string) => `${queueAppOrigin()}/s/${encodeURIComponent(slug)}`

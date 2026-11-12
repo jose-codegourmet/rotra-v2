@@ -1,3 +1,4 @@
+import { appOrigin } from '../app-origins'
 import type { MockSession, SignInInput } from '../auth/auth.types'
 import { clubInitials } from '../club/club.rules'
 import type { Club } from '../club/club.types'
@@ -351,6 +352,8 @@ export type WireSessionSummary = {
   courtsInUse: number
   gamesPlayed: number
   queuedCount: number
+  /** The single-session read of a live session: open match requests (Match requests · N) */
+  requestCount?: number
 }
 
 export const courtOf = (court: WireCourt): SessionCourt => ({
@@ -399,6 +402,7 @@ export async function realGetQueueSession(id: string) {
   const download = await deviceDownloadOf(id)
   return {
     ...summaryOf(wire, download !== null),
+    ...(wire.requestCount === undefined ? {} : { requestCount: wire.requestCount }),
     courts: wire.courts.map(courtOf),
     downloadState: (isDownloading(id)
       ? 'downloading'
@@ -575,9 +579,7 @@ export async function realGetClubPlayers(): Promise<ClubPlayerView[]> {
 
 /** The ROTRA Player app's origin, as seen from the Queue app (localhost in local work). */
 export function playerAppOrigin() {
-  return typeof location !== 'undefined' && location.hostname === 'localhost'
-    ? 'http://localhost:9001'
-    : 'https://player.rotra.club'
+  return appOrigin('player')
 }
 
 /**

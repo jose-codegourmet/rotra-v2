@@ -288,14 +288,13 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
   const playerAccess = usePlayerSessionAccess(slug, viewer === 'visitor')
   // The signed-in Player on the visitor's own page. Mock mode reads the mock Player sign-in. Real
   // mode has no Player session in this app: the Player app's access read (below) says who is
-  // signed in, for the join card only (#687); the other signed-in reads are mock only.
+  // signed in, for the join card (#687) and My night; the other signed-in reads are mock only.
   const playerSession = useSession('player')
   const viewerAccount =
     viewer === 'visitor' && !isRealDataMode() && playerSession.data?.account.audience === 'player'
       ? playerSession.data.account
       : null
   const signedInPage = useSignedInPublicSession(slug, viewerAccount?.id)
-  const night = useMyNight(slug, viewerAccount?.id)
   const joinAsPlayer = useJoinAsPlayer(slug)
   const cancelMyRequest = useCancelMyJoinRequest(slug)
   const refreshing = useRefreshSession(slug)
@@ -313,6 +312,13 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
   const realPlayer = viewer === 'visitor' && isRealDataMode() && access ? access : null
   // Until that check answers, a signed-in Player must not see the guest card first.
   const realPlayerChecking = viewer === 'visitor' && isRealDataMode() && playerAccess.isPending
+  // My night: mock from the mock Player session; real from the Player app's own read (its sign-in).
+  const nightViewer = viewerAccount
+    ? { id: viewerAccount.id, name: viewerAccount.name }
+    : realPlayer
+      ? { id: realPlayer.playerId, name: realPlayer.name }
+      : null
+  const night = useMyNight(slug, nightViewer?.id)
   const [tab, setTab] = useState('details')
   // The signed-in card's Join a slot / Be waitlisted choice (D-2026-11-11-02)
   const [placement, setPlacement] =
@@ -378,8 +384,11 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
   const [matchRequestOpen, setMatchRequestOpen] = useState(false)
   /** The tapped participant or waitlist tile (#731); null while no profile card is open */
   const [profileOf, setProfileOf] = useState<PublicParticipant | null>(null)
-  const requestMatch = useRequestMatchAction(slug, viewerAccount?.id, () =>
-    setMatchRequestOpen(true),
+  // Real mode reads the options only for a present Player (the read refuses anyone off the roster).
+  const requestMatch = useRequestMatchAction(
+    slug,
+    viewerAccount?.id ?? (night.data?.stage === 'live-present' ? nightViewer?.id : undefined),
+    () => setMatchRequestOpen(true),
   )
 
   // The account bar (#693): the signed-in Player (mock: the Player session; real: the Player app's
@@ -722,10 +731,10 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
               waitlistOpen={p.openSlots === 0}
             />
           ) : null}
-          {signedIn && viewerAccount && sessionOpen && night.data?.stage === 'live-present' ? (
+          {signedIn && nightViewer && sessionOpen && night.data?.stage === 'live-present' ? (
             <MatchRequest
               slug={slug}
-              viewer={{ id: viewerAccount.id, name: viewerAccount.name }}
+              viewer={nightViewer}
               open={matchRequestOpen}
               onOpenChange={setMatchRequestOpen}
             />

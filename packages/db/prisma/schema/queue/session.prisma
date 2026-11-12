@@ -73,6 +73,10 @@ model QueueSession {
   alwaysRequireRequest Boolean           @default(false) @map("always_require_request")
   /// auto places the next eligible match on_court; it never starts a match.
   courtFillMode        CourtFillMode     @default(manual) @map("court_fill_mode")
+  /// Players can request (D-2026-11-09-05): the formats a signed-in Player may ask for with Request
+  /// a match, in any order; empty = the session takes no match requests. New sessions get the
+  /// prototype default (2 v 2, plus 1 v 1 when singles is on) from the create command.
+  requestFormats       MatchFormat[]     @default([doubles]) @map("request_formats")
   /// Idempotency key of the create command.
   sourceCommandId      String            @unique @map("source_command_id") @db.Uuid
   createdAt            DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
@@ -91,6 +95,7 @@ model QueueSession {
   deviceSessionStreams DeviceSessionStream[]
   syncConflicts        SyncConflict[]
   matches              Match[]
+  matchRequests        SessionMatchRequest[]
 
   costEstimate SessionCostEstimate?
 

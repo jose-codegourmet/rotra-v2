@@ -336,3 +336,21 @@ anon/authenticated/PUBLIC grants) seeded with `court`, `night`, `dusk`, `ember`,
 append-only trigger disabled for that statement, and the rows deleted; rows with immutable game,
 assessment, attribution, projection, rank, account or request references refuse the migration.
 See the migration's README.
+
+## Match requests and Players can request (D-2026-11-09-05)
+
+`20261112000400_session_match_requests` (additive). `queue_sessions.request_formats`
+(`match_format[]`, default `{doubles}`; existing sessions backfilled with `{doubles}` plus `singles`
+when `allow_singles`). Enums `match_request_status` (`open`, `added`, `declined`, `cancelled`,
+`closed`) and `match_request_side` (`partner`, `opponent`).
+
+| Table | Keys and uniques | Checks and triggers | Scoped FKs |
+|---|---|---|---|
+| `session_match_requests` | PK `id` (the client's request id); unique `(club_id, session_id, id)`; partial unique `(session_id, session_player_id) WHERE status = 'open'`; index `(session_id, status, requested_at)`, `(club_id, session_id, session_player_id)` | `decided_at` set ⇔ status ≠ `open`; `match_id` set ⇔ status = `added` | `(club_id, session_id)` → `queue_sessions`; `(club_id, session_id, session_player_id)` → `session_players`; `(club_id, session_id, match_id)` → `matches` (RESTRICT) |
+| `session_match_request_spots` | PK `(request_id, side, slot_no)`; partial unique `(request_id, session_player_id) WHERE session_player_id IS NOT NULL`; index `(club_id, session_id, session_player_id)` | `slot_no >= 0`; null `session_player_id` = Anyone | `(club_id, session_id, request_id)` → `session_match_requests` (CASCADE); `(club_id, session_id, session_player_id)` → `session_players` (RESTRICT) |
+
+Both tables: RLS enabled; no anon/authenticated/PUBLIC grants. Spot counts per format, the format
+allowed by `request_formats`, presence of every named player and the auto-close (anyone named not
+present, or released; the session finished, invalid or cancelled) are command rules in
+`packages/db/src/queue/match-requests.ts` and `match-request-store.ts`. Checked on a disposable
+database (`scripts/disposable-db.sh all`: no drift, 70/70 checks); not applied to the shared one.

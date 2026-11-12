@@ -81,7 +81,20 @@ Business source: [matches](../../../../business_logic/product/queue/modules/matc
 
 ## `match_requests`
 
-Player-side **Request a match** ([D-2026-11-09-05](../../../../mvp/decisions.md#d-2026-11-09-05)). `id`, `club_id`, `session_id`, `session_player_id` (the requester, scoped FKs), `player_id` (authenticated Player, linked to the unreleased slot), `format` (any of the six request formats; the session's `request_formats` must allow it at send time), `partner_session_player_ids` (ordered array, one entry per partner spot the format needs, null = Anyone; was a single nullable `partner_session_player_id` until November 9, 2026), `opponent_session_player_ids` (0–2 scoped refs; a join table if arrays are avoided), `status` (`open`, `added`, `declined`, `cancelled`, `closed`), `created_at`, `decided_at`, `decided_by_device`, `match_id` (nullable FK set when the QM's **Add to queue** creates the waiting match: `added`, named spots kept, “Anyone” spots filled from present players with the fewest games; **Decline** sets `declined`; the player's Cancel sets `cancelled`). Partial unique `(session_player_id) WHERE status = 'open'`. A request becomes `closed` when anyone named stops being present or when the session ends; the server does not judge fairness. QM decisions are ordinary club sync operations; the open-request count travels with the QM's existing refresh ([D-2026-11-09-05](../../../../mvp/decisions.md#d-2026-11-09-05)).
+**Built (November 12, 2026, migration `20261112000400_session_match_requests`)** as
+`session_match_requests` (`id` = the client's request id, `club_id`, `session_id`,
+`session_player_id` the requester, `format`, `status` `match_request_status`, `requested_at`,
+`decided_at`, `match_id`, `created_at`, `updated_at`, `revision`) and
+`session_match_request_spots` (`request_id`, `club_id`, `session_id`, `side` `partner` |
+`opponent`, `slot_no` 0-based, `session_player_id` nullable = Anyone; PK `(request_id, side,
+slot_no)`), the join table instead of arrays. All references are scoped `(club_id, session_id, …)`
+FKs. CHECKs: `decided_at` set ⇔ status ≠ `open`; `match_id` set ⇔ status = `added`; `slot_no >= 0`.
+Partial uniques: one open request per `(session_id, session_player_id)`; a player named once per
+request. Differences from the proposal below: no `player_id` (the requester's roster entry carries
+the account link) and no `decided_by_device` (decisions are online commands for now, not sync
+operations). The command rules and the auto-close are in `packages/db/src/queue/match-requests.ts`.
+
+Proposal (November 9, 2026). Player-side **Request a match** ([D-2026-11-09-05](../../../../mvp/decisions.md#d-2026-11-09-05)). `id`, `club_id`, `session_id`, `session_player_id` (the requester, scoped FKs), `player_id` (authenticated Player, linked to the unreleased slot), `format` (any of the six request formats; the session's `request_formats` must allow it at send time), `partner_session_player_ids` (ordered array, one entry per partner spot the format needs, null = Anyone; was a single nullable `partner_session_player_id` until November 9, 2026), `opponent_session_player_ids` (0–2 scoped refs; a join table if arrays are avoided), `status` (`open`, `added`, `declined`, `cancelled`, `closed`), `created_at`, `decided_at`, `decided_by_device`, `match_id` (nullable FK set when the QM's **Add to queue** creates the waiting match: `added`, named spots kept, “Anyone” spots filled from present players with the fewest games; **Decline** sets `declined`; the player's Cancel sets `cancelled`). Partial unique `(session_player_id) WHERE status = 'open'`. A request becomes `closed` when anyone named stops being present or when the session ends; the server does not judge fairness. QM decisions are ordinary club sync operations; the open-request count travels with the QM's existing refresh ([D-2026-11-09-05](../../../../mvp/decisions.md#d-2026-11-09-05)).
 
 ## Auto Queue handoff (October 31, 2026)
 

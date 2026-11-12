@@ -70,12 +70,14 @@ model Match {
   updatedAt         DateTime    @updatedAt @map("updated_at") @db.Timestamptz(6)
   revision          BigInt      @default(1)
 
-  session        QueueSession         @relation(fields: [clubId, sessionId], references: [clubId, id], onDelete: Restrict)
+  session        QueueSession          @relation(fields: [clubId, sessionId], references: [clubId, id], onDelete: Restrict)
   participations MatchParticipation[]
   courtUsage     MatchCourtUsage[]
   courtHolds     ActiveCourtHold[]
   playerHolds    ActivePlayerHold[]
   decision       MatchDecision?
+  /// The match request Add to queue made this match from, if any.
+  matchRequests  SessionMatchRequest[]
 
   @@unique([clubId, sessionId, id])
   @@unique([sessionId, matchNo])

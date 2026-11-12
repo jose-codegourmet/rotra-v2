@@ -31,6 +31,12 @@ export type QueueSession = {
   seriesId: string | null
   publicSlug: string
   acceptJoinRequests: boolean
+  /**
+   * **Always require a request** (D-2026-11-12-02, #764): when true, club members send a join request
+   * like everyone else; when false (the default) a club member joins an upcoming session right away.
+   * Read as false while `acceptJoinRequests` is off.
+   */
+  alwaysRequireRequest: boolean
   /** Missing means `manual` (the default). */
   courtFillMode?: CourtFillMode
   /**

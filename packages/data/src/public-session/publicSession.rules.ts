@@ -108,6 +108,29 @@ export function linkedClubPlayerIds(state: MockState, clubId: string, playerId: 
   )
 }
 
+/**
+ * Club member (D-2026-11-12-02, #764): the Player's current saved record in the session's club
+ * (`club_players.player_id = player`, not removed) that has a playing level. Guests and unclaimed
+ * profiles are never members. Null when the Player is not saved in this club, or the record has no
+ * level yet (then they send a request like a non-member, so the Queue Master sets the level).
+ */
+export function memberClubPlayer(state: MockState, clubId: string, playerId: string) {
+  return (
+    state.clubPlayers.find(
+      (p) => p.clubId === clubId && p.playerId === playerId && !p.removedAt && !!p.playingLevel,
+    ) ?? null
+  )
+}
+
+/**
+ * Members join right away (D-2026-11-12-02): an upcoming (`prepared`) session with Accept join
+ * requests on and Always require a request off. Nothing changes after Start (join requests are
+ * closed then, D-2026-11-11-11).
+ */
+export const membersJoinDirectly = (
+  session: Pick<QueueSession, 'state' | 'acceptJoinRequests' | 'alwaysRequireRequest'>,
+) => session.state === 'prepared' && session.acceptJoinRequests && !session.alwaysRequireRequest
+
 /** The signed-in Player's roster row and waitlist entry in this session, if any. */
 export function playerSlot(
   state: MockState,

@@ -139,6 +139,11 @@ export type PublicSessionPage = {
   slotBudget: number
   acceptJoinRequests: boolean
   /**
+   * **Always require a request** (D-2026-11-12-02): true when club members must send a join request
+   * too. Missing reads as false (members join upcoming sessions right away).
+   */
+  alwaysRequireRequest?: boolean
+  /**
    * Payment per player in centavos (Details › Payment): the custom amount or the break-even share;
    * 0 reads “Free”; null (or missing) means no estimate is saved, so the row is omitted.
    */
@@ -267,6 +272,8 @@ export type MyNight = {
     partners: (PublicMatchPlayer | null)[]
     opponents: (PublicMatchPlayer | null)[]
   } | null
+  /** Same as `PlayerSessionAccess.isClubMember` (D-2026-11-12-02), for the mock-mode join card */
+  isClubMember: boolean
   /** Invite shows only while Prepared, requests are on, and the Player has a slot or waitlist place */
   canInvite: boolean
   /** The Player's Session invite code if one was made already; read-only here, `useSessionInviteCode` makes it */
@@ -307,6 +314,13 @@ export type PlayerSessionAccess = {
   inSession: boolean
   /** 1-based place on the waitlist while waitlisted (Join from waitlist, D-2026-11-11-02); null otherwise */
   waitlistPosition?: number | null
+  /**
+   * A club member (D-2026-11-12-02): linked to one of the session club's current saved player
+   * records, with a playing level on it. Members join an upcoming session right away unless the
+   * session always requires a request. A record without a level reads false here (the Player
+   * sends a request and the Queue Master sets the level).
+   */
+  isClubMember: boolean
   /** The Player's latest request for this session (any status), or null */
   joinRequest: MyJoinRequest | null
   fullRoster: boolean

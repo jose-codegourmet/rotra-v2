@@ -23,6 +23,7 @@ import { flushSessionPresence } from '@rotra/data/session-roster/flushSessionPre
 import { flushSessionRoster } from '@rotra/data/session-roster/flushSessionRoster'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { useSetAcceptJoinRequests } from '@rotra/data/session-roster/useSetAcceptJoinRequests'
+import { useSetAlwaysRequireRequest } from '@rotra/data/session-roster/useSetAlwaysRequireRequest'
 import { courtNextDay } from '@rotra/schema/court-window'
 import { formatPeso } from '@rotra/schema/money'
 import { Breadcrumb } from '@rotra/ui/breadcrumb'
@@ -99,6 +100,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
   const remove = useDeleteSession()
   const cancel = useCancelSession()
   const setAcceptJoinRequests = useSetAcceptJoinRequests()
+  const setAlwaysRequireRequest = useSetAlwaysRequireRequest()
   // The selected tab lives in the URL (?tab=); missing or unknown values fall back to Overview.
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -476,12 +478,22 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
                 link={sessionLink}
                 pendingCount={pendingRequests}
                 acceptJoinRequests={s.acceptJoinRequests}
+                alwaysRequireRequest={s.alwaysRequireRequest ?? false}
                 onCopyLink={() => void copyLink()}
                 onOpenAsGuest={() => router.push(publicHref)}
                 onPreviewPublicPage={() => router.push(`/sessions/${sessionId}/public-page`)}
                 onAcceptJoinRequestsChange={(accept) =>
                   setAcceptJoinRequests.mutate(
                     { sessionId, accept },
+                    {
+                      onSuccess: (result) => toast(result.message),
+                      onError: (error) => toast.error(errorMessage(error)),
+                    },
+                  )
+                }
+                onAlwaysRequireRequestChange={(always) =>
+                  setAlwaysRequireRequest.mutate(
+                    { sessionId, always },
                     {
                       onSuccess: (result) => toast(result.message),
                       onError: (error) => toast.error(errorMessage(error)),

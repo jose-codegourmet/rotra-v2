@@ -107,6 +107,8 @@ type SignedInViewer = {
   /** Waitlisted: their 1-based place, for the Confirmed · waitlist #N card and Join from waitlist */
   waitlistPosition: number | null
   onJoinFromWaitlist: () => void
+  /** A club member (D-2026-11-12-02): Join as NAME on an upcoming session unless it requires a request */
+  member: boolean
 }
 
 /** The signed-in Player's ID: the mock session's account, or the Player app's access read. */
@@ -179,6 +181,10 @@ function joinCardProps(
         signedInName: signedIn.name,
         placement: signedIn.placement,
         onPlacementChange: signedIn.onPlacementChange,
+        // D-2026-11-12-02: a club member joins an upcoming session right away; the same onJoin
+        // sends, and the server places them instead of writing a request.
+        member: signedIn.member && page.status === 'prepared' && !page.alwaysRequireRequest,
+        clubName: page.club.name,
       }
     : { onRequestToJoin, disabled: offline }
   return page.openSlots > 0
@@ -222,6 +228,7 @@ function queueAccess(playerId: string, queue: PublicQueuedMatch[]): PlayerSessio
     playerId,
     name: '',
     inSession: true,
+    isClubMember: false,
     joinRequest: null,
     fullRoster: true,
     participants: [],
@@ -473,6 +480,11 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
         onPlacementChange: setPlacement,
         onJoin: () => sendAsPlayer(signedInAs, chosenPlacement),
         onJoinFromWaitlist: () => sendAsPlayer(signedInAs, 'from_waitlist'),
+        // Mock: the personal read; real: the Player app's access read (#687).
+        member:
+          realPlayer && !viewerAccount
+            ? realPlayer.isClubMember
+            : (night.data?.isClubMember ?? false),
         waitlistPosition:
           realPlayer && !viewerAccount
             ? (realPlayer.waitlistPosition ?? null)

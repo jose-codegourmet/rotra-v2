@@ -5,6 +5,7 @@ import {
   type QueueSessionInput,
   readQueueSession,
   setAcceptJoinRequests,
+  setAlwaysRequireRequest,
   updateQueueSession,
 } from '@rotra/db/queue/session-preparation'
 import { ServiceError } from '@rotra/db/service/errors'
@@ -21,7 +22,8 @@ export async function GET(_request: Request, ctx: RouteContext<'/api/sessions/[s
 }
 
 /**
- * `{ acceptJoinRequests }` turns the session link's join requests on or off. `{ commandId,
+ * `{ acceptJoinRequests }` turns the session link's join requests on or off; `{ alwaysRequireRequest }`
+ * makes club members send a request too (D-2026-11-12-02). `{ commandId,
  * expectedRevision, input }` saves Edit preparation (prepared only, at the displayed revision); when
  * `input.costEstimate` is present the estimate is saved against the one in effect (null deletes it).
  */
@@ -31,6 +33,8 @@ export async function PATCH(request: Request, ctx: RouteContext<'/api/sessions/[
     const body = await readJsonBody(request)
     if (typeof body.acceptJoinRequests === 'boolean')
       return { body: await setAcceptJoinRequests(club, sessionId, body.acceptJoinRequests) }
+    if (typeof body.alwaysRequireRequest === 'boolean')
+      return { body: await setAlwaysRequireRequest(club, sessionId, body.alwaysRequireRequest) }
     const commandId = text(body.commandId)
     if (!commandId || !body.input || typeof body.input !== 'object')
       throw new ServiceError('invalid')

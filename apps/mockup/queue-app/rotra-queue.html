@@ -3297,11 +3297,12 @@ function mergePlayer(fromId, toId) {
 const BAND_CHOICES = [['Beginner', 'Beginner'], ['Intermediate', 'Intermediate'], ['Advanced', 'Advanced'], ['unsure', 'Not sure']];
 const bandMid = (band) => { const ix = LEVELS.map((l, i) => [l, i]).filter(([l]) => l.band.startsWith(band)).map(([, i]) => i); return ix.length ? ix[Math.floor(ix.length / 2)] : null; };
 function linkCard(s) {
-  const n = pendingReqs(s).length, on = s.acceptReq !== false;
+  const n = pendingReqs(s).length, on = s.acceptReq !== false, always = on && s.alwaysReq === true;
   return `<section class="card stack" id="session-link"><div class="between"><div><h2>Session link</h2><p class="small muted">Share it in your Facebook post or group chat. Anyone with it sees the public page; guests can send a join request, and nobody gets a slot until you confirm them.</p></div>${n ? chip(`${n} join request${n > 1 ? 's' : ''}`, 'warn') : ''}</div>
     <div class="invite-link"><input class="input" id="session-link-in" readonly value="${sessionLink(s)}" aria-label="Session link"><button class="btn sm primary" data-act="copyLink">Copy link</button></div>
     <div class="row acts"><button class="btn sm" data-act="openGuest">Open as a guest</button><button class="btn sm" data-act="go" data-to="public">Preview public page</button></div>
     <div class="li" style="padding:0"><div class="main"><b>Accept join requests</b><p class="small muted">${on ? 'Guests can request a slot from the public page.' : 'The public page says to contact the Queue Master instead.'}</p></div>${sw(on, 'toggleAcceptReq', '', 'Accept join requests')}</div>
+    <div class="li" style="padding:0"><div class="main"><b>Always require a request</b><p class="small muted">${always ? 'Club members send a join request too, like everyone else.' : 'Club members join upcoming sessions right away; guests still send a request.'}</p></div>${sw(always, 'toggleAlwaysReq', on ? '' : 'disabled', 'Always require a request')}</div>
   </section>`;
 }
 function requestsPanel(s, inSheet) {
@@ -3379,6 +3380,11 @@ const slotsFullFor = (s) => s.status !== 'active' && !openSlots(s);
 const WANT_TEXT = { slot: 'Asks for a slot', waitlist: 'Asks to be waitlisted', fromWaitlist: 'Asks for a slot from the waitlist' };
 // The signed-in card's choice; falls back to the waitlist when every slot is taken.
 const pubWantOf = (s) => (S.ui.pubWant === 'waitlist' || slotsFullFor(s) ? 'waitlist' : 'slot');
+// #764 (owner decision, November 12, 2026): a club member (a registered player in this club's saved players) joins an
+// upcoming (prepared) session right away while Accept join requests is on and Always require a request is off. Guests,
+// non-members and everyone once the session has started still send a request. A saved record without a level sends a
+// request too, so the Queue Master sets the level.
+const memberJoinOk = (s, v) => s.status === 'prepared' && s.acceptReq !== false && s.alwaysReq !== true && !!v && saved().some((x) => x.id === v.id && x.identity === 'registered' && x.sugg != null);
 function wantField(s, want, act, err) {
   const full = slotsFullFor(s);
   return `<div class="field"><span>How do you want to join?</span><div class="seg" role="group" aria-label="How do you want to join?">${WANT_CHOICES.map(([v, l]) => `<button aria-pressed="${want === v}" ${act} data-v="${v}" ${v === 'slot' && full ? 'disabled title="All slots are taken"' : ''}>${l}</button>`).join('')}</div>${err ? `<span class="err">${esc(err)}</span>` : `<span class="hint">${full ? 'All slots are taken, so you join the waitlist. The Queue Master gives slots as they open.' : 'A slot is yours once the Queue Master confirms. The waitlist keeps your place until a slot opens.'}</span>`}</div>`;
@@ -3407,9 +3413,9 @@ function joinCard(s) {
     if (s.acceptReq === false) return '<section class="card join-card"><p class="small muted">This session isn\'t taking requests online. Contact the Queue Master to play.</p></section>';
     return `<section class="card stack join-card"><div class="jc-top"><h2>Want to play?</h2>${slots}</div>
     ${s.roster.length ? skillMix(s.roster) : ''}
-    <p class="small muted">${s.status === 'active' ? 'The Queue Master can admit additional players. ' : open ? '' : 'Confirmed players join the waitlist. '}One tap sends your request and the Queue Master confirms it.</p>
+    <p class="small muted">${s.status === 'active' ? 'The Queue Master can admit additional players. ' : open ? '' : 'Confirmed players join the waitlist. '}${memberJoinOk(s, v) ? `You're a member of ${esc(S.club.name)}, so you get your place right away.` : 'One tap sends your request and the Queue Master confirms it.'}</p>
     ${wantField(s, pubWantOf(s), 'data-act="pubWant"')}
-    <button class="btn primary jc-btn" data-act="sendPlayerJoin">Request to join as ${esc(v.name)}</button></section>`;
+    ${memberJoinOk(s, v) ? `<button class="btn primary jc-btn" data-act="memberJoin">${pubWantOf(s) === 'waitlist' ? 'Join the waitlist as' : 'Join as'} ${esc(v.name)}</button>` : `<button class="btn primary jc-btn" data-act="sendPlayerJoin">Request to join as ${esc(v.name)}</button>`}</section>`;
   }
   const mine = pubAs().kind === 'guest' && S.ui.guestReq && S.ui.guestReq.sid === s.id ? (s.requests || []).find((r) => r.id === S.ui.guestReq.id) : null;
   if (mine) {
@@ -5450,6 +5456,8 @@ const ACT = {
   openGuest: (d) => { go('public', d.id); S.ui.guest = true; render(); },
   toggleReqFormat: (d) => { const dr = S.ui.draft; dr.reqFormats = { ...reqDefaults(dr), ...(dr.reqFormats || {}) }; dr.reqFormats[d.k] = !dr.reqFormats[d.k]; render(); },
   toggleAcceptReq: () => { const s = cur(); s.acceptReq = s.acceptReq === false; save(); render(); toast(s.acceptReq ? 'Join requests are on' : 'Join requests are off'); },
+  // #764: Always require a request. Off by default; disabled (and read as off) while Accept join requests is off.
+  toggleAlwaysReq: () => { const s = cur(); if (s.acceptReq === false) return; s.alwaysReq = s.alwaysReq !== true; save(); render(); toast(s.alwaysReq ? 'Members must request now' : 'Members can join right away'); },
   openJoin: () => openSheet({ type: 'join', band: null, how: 'guest', want: slotsFullFor(cur()) ? 'waitlist' : 'slot' }),
   // #706: the signed-in card's Join a slot / Be waitlisted choice.
   pubWant: (d) => { S.ui.pubWant = d.v; render(); },
@@ -5467,6 +5475,15 @@ const ACT = {
   pubSignOut: () => { S.ui.courtMenu = null; S.ui.pubAs = { kind: 'visitor', key: 'visitor', sid: S.currentId }; save(); render(); toast('Signed out'); },
   pubMyProfile: (d) => { S.ui.courtMenu = null; render(); window.open(`/player/find/${encodeURIComponent(d.id)}`, '_blank', 'noopener'); },
   protoSignIn: () => { const how = S.ui.sheet?.how; setPubAs('newplayer'); const v = pubViewer(); toast(v ? `${how === 'register' ? 'Registered' : 'Logged in'} as ${v.name} · your request is ready to send` : 'Signed in'); },
+  // #764: a club member's direct join on an upcoming session. No request: the same roster row (or waitlist place when every
+  // slot is taken, or Be waitlisted) the Queue Master's confirm would write, with the saved level. Goes straight to the server.
+  memberJoin: () => {
+    const s = cur(), v = pubViewer();
+    if (!memberJoinOk(s, v) || R(s, v.id) || (s.waitlist || []).some((w) => w.pid === v.id)) return;
+    const want = pubWantOf(s), lv = saved().find((x) => x.id === v.id).sugg;
+    if (want === 'waitlist' || slotsFullFor(s)) { s.waitlist = [...(s.waitlist || []), { pid: v.id, level: +lv, at: Date.now() }]; save(); render(); toast('You\'re on the waitlist'); return; }
+    s.roster.push({ pid: v.id, level: +lv, present: false, locked: false, presentAt: Date.now() }); save(); render(); toast('You\'re in');
+  },
   // D-2026-11-09-02: one-tap join for a signed-in player; the request carries the account, one open request per account.
   sendPlayerJoin: () => {
     const s = cur(), v = pubViewer();

@@ -392,7 +392,7 @@ rows. Approve, Retry application and Check status run in real mode since #575 (`
 writes saved data through `packages/data/src/real/session-live.ts`: Start session
 (`POST /api/sessions/[sessionId]/start`, sending the session revision it just read; a retry returns the
 active session), Edit preparation (`PATCH /api/sessions/[sessionId]` with `commandId`, `expectedRevision`
-and the input, then the cost estimate), the join-requests switch (`PATCH` with `acceptJoinRequests`),
+and the input, then the cost estimate), the join-requests switches (`PATCH` with `acceptJoinRequests` or `alwaysRequireRequest`),
 Add/Remove court (`POST …/courts`, `DELETE …/courts/[courtId]`), Extend (`POST …/extend`), presence
 (`POST …/presence`, `{ all }` or `{ changes }`), Remove from roster (`DELETE …/roster/[rosterId]`), the
 waitlist (`POST …/waitlist/[waitlistId]/slot`, `POST …/waitlist/fill`, `DELETE …/waitlist/[waitlistId]`)

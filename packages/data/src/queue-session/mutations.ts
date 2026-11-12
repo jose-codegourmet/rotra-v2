@@ -159,6 +159,7 @@ export function createQueueSession(input: QueueSessionInput) {
         seriesId,
         publicSlug: publicSlugFor(id),
         acceptJoinRequests: true,
+        alwaysRequireRequest: false,
         requestFormats: input.requestFormats ?? prototypeDefaultRequestFormats(input),
       }
       state.sessions.push(s)

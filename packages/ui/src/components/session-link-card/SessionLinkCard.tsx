@@ -15,28 +15,40 @@ export type SessionLinkCardProps = {
   pendingCount: number
   /** The session's Accept join requests setting */
   acceptJoinRequests: boolean
+  /**
+   * The session's Always require a request setting (D-2026-11-12-02): on, club members send a join
+   * request like everyone else; off (default), members join an upcoming session right away. Disabled
+   * and read as off while Accept join requests is off.
+   */
+  alwaysRequireRequest: boolean
   onCopyLink: () => void
   onOpenAsGuest: () => void
   onPreviewPublicPage: () => void
   onAcceptJoinRequestsChange: (accept: boolean) => void
+  onAlwaysRequireRequestChange: (always: boolean) => void
   className?: string
 }
 
 /**
  * Preparation › Overview › Session link: the public link with Copy link, Open as a guest and
- * Preview public page, a "N join requests" chip while any wait, and the Accept join requests switch.
+ * Preview public page, a "N join requests" chip while any wait, the Accept join requests switch and,
+ * under it, the Always require a request switch (D-2026-11-12-02).
  */
 export function SessionLinkCard({
   link,
   pendingCount,
   acceptJoinRequests,
+  alwaysRequireRequest,
   onCopyLink,
   onOpenAsGuest,
   onPreviewPublicPage,
   onAcceptJoinRequestsChange,
+  onAlwaysRequireRequestChange,
   className,
 }: SessionLinkCardProps) {
   const id = useId()
+  // Read as off while Accept join requests is off (and on sessions saved before the setting).
+  const always = acceptJoinRequests && alwaysRequireRequest === true
   return (
     <Card asChild className={className}>
       <section id="session-link" aria-labelledby={`${id}-h`} className="flex flex-col gap-3">
@@ -96,6 +108,22 @@ export function SessionLinkCard({
             checked={acceptJoinRequests}
             onChange={onAcceptJoinRequestsChange}
             aria-label="Accept join requests"
+          />
+        </div>
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="flex min-w-0 flex-1 flex-col">
+            <b className="font-semibold">Always require a request</b>
+            <p className="m-0 text-[13px] text-fg2">
+              {always
+                ? 'Club members send a join request too, like everyone else.'
+                : 'Club members join upcoming sessions right away; guests still send a request.'}
+            </p>
+          </span>
+          <Switch
+            checked={always}
+            disabled={!acceptJoinRequests}
+            onChange={onAlwaysRequireRequestChange}
+            aria-label="Always require a request"
           />
         </div>
       </section>

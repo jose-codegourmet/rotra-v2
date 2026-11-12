@@ -122,6 +122,26 @@ async function place(
 }
 
 /**
+ * A club member's direct join from the session page (D-2026-11-12-02, #764): the same placement a
+ * confirmed join request gets (`place`: a slot while one is open and `toWaitlist` is false, else the
+ * waitlist), with the member's saved level as the admission's assessment, so Queue's sync, revisions
+ * and roster counts see it exactly like a confirmed request. The caller holds the session lock and
+ * bumps the revision. No join request row is written.
+ */
+export function placeClubMember(
+  tx: Tx,
+  context: ClubContext,
+  session: QueueSession,
+  clubPlayer: ClubPlayer,
+  skillLevelId: number,
+  operationId: string,
+  now: Date,
+  toWaitlist: boolean,
+) {
+  return place(tx, context, session, clubPlayer, skillLevelId, operationId, now, toWaitlist)
+}
+
+/**
  * Adds a saved club player to the session (Q-ROSTER · Saved players). An unclaimed profile is the
  * club's own record, so no identity check applies (D-2026-11-11-03).
  */

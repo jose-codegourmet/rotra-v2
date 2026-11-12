@@ -103,6 +103,15 @@ export async function realSetAcceptJoinRequests(input: { sessionId: string; acce
   return accepted(null, `Join requests are ${input.accept ? 'on' : 'off'}`)
 }
 
+/** Always require a request (D-2026-11-12-02): the same PATCH as Accept join requests. */
+export async function realSetAlwaysRequireRequest(input: { sessionId: string; always: boolean }) {
+  await realRequest<WireSession>(sessionPath(input.sessionId), {
+    method: 'PATCH',
+    body: { alwaysRequireRequest: input.always },
+  })
+  return accepted(null, input.always ? 'Members must request now' : 'Members can join right away')
+}
+
 // ---------- Courts and time ----------
 
 type WireCourt = {

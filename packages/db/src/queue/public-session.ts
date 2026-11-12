@@ -3,14 +3,14 @@ import { createHmac, timingSafeEqual } from 'node:crypto'
 import { resolveProfileBanner } from '@rotra/data/profile-banner/rules'
 import { maskPublicName, publicLevel, publicSkillMix } from '@rotra/data/public-session/rules'
 import { readShownProfileBanners } from '../admin/profile-banners'
-import { loadAccountContext, type PlayerContext } from '../auth/account-context'
+import { type ClubContext, loadAccountContext, type PlayerContext } from '../auth/account-context'
 import { MOCK_COOKIE_PREFIX } from '../auth/data-mode'
 import { type CookieAdapter, verifySubject } from '../auth/supabase'
 import { prisma } from '../client/prisma'
 import type { JoinRequestPlacement, QueueSession, StatedBand } from '../generated/prisma/client'
 import { ServiceError } from '../service/errors'
 import { readPublishedResults } from './results'
-import { stepDownIn } from './session-roster'
+import { placeClubMember, stepDownIn } from './session-roster'
 import {
   capacityOf,
   derivedId,
@@ -172,6 +172,7 @@ export async function readPublicSession(slug: string) {
       openSlots: Math.max(0, capacity - roster.length),
       slotBudget: capacity,
       acceptJoinRequests: session.acceptJoinRequests && TAKES_REQUESTS.includes(session.state),
+      alwaysRequireRequest: session.alwaysRequireRequest,
       lastSyncedAt: session.updatedAt.getTime(),
       hasPendingChanges: streams.some((s) => s.highestReceivedSeq > s.contiguousSequence),
       results: session.state === 'completed' ? await readPublishedResults(session.id) : null,
@@ -397,11 +398,29 @@ async function playerStanding(tx: Tx, playerId: string, sessionId: string) {
   }
 }
 
+/**
+ * Club member (D-2026-11-12-02, #764): the Player's current saved record in this club
+ * (`club_players.player_id = player`, `removed_at IS NULL`) and its playing level, the latest club
+ * assessment of that record. Null when the Player is not saved in the club, or the record has no
+ * level yet (the Player then sends a request like a non-member, so the Queue Master sets the level).
+ * Guests and unclaimed profiles have no `player_id`, so they are never members.
+ */
+async function memberOf(tx: Tx, clubId: string, playerId: string) {
+  const clubPlayer = await tx.clubPlayer.findFirst({ where: { clubId, playerId, removedAt: null } })
+  if (!clubPlayer) return null
+  const level = await tx.clubAssessment.findFirst({
+    where: { clubId, clubPlayerId: clubPlayer.id },
+    orderBy: [{ assessedAt: 'desc' }, { id: 'desc' }],
+    select: { skillLevelId: true },
+  })
+  return level ? { clubPlayer, skillLevelId: level.skillLevelId } : null
+}
+
 /** #569: authenticated Player only. Eligibility is the current roster link, never a browser ID. */
 export async function readPlayerSessionAccess(context: PlayerContext, slug: string) {
   const session = await prisma.queueSession.findUnique({
     where: { publicSlug: slug },
-    select: { id: true, publication: { select: { state: true } } },
+    select: { id: true, clubId: true, publication: { select: { state: true } } },
   })
   if (!session || session.publication?.state === 'deleted') throw new ServiceError('not_found')
   return prisma.$transaction(async (tx) => {
@@ -492,6 +511,8 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
     return {
       playerId: context.playerId,
       ...standing,
+      // D-2026-11-12-02: whether the join card offers Join as NAME instead of a request
+      isClubMember: !!(await memberOf(tx, session.clubId, context.playerId)),
       fullRoster,
       participants: (fullRoster ? roster : roster.slice(0, 12)).map((entry) => ({
         ...person(entry),
@@ -524,6 +545,13 @@ async function bandFor(tx: Tx, clubId: string, playerId: string): Promise<Stated
  * request carries the account (`player_id`) and the profile's name; no phone. Same session rules
  * and cap as a guest's request. Refused while the Player's earlier request is pending (also the
  * partial unique index) or once they hold a slot or a waitlist place. Never reserves a slot.
+ *
+ * **Join as NAME** (D-2026-11-12-02, #764): a club member on a prepared session, while Accept join
+ * requests is on and Always require a request is off, is placed right away through the confirm
+ * path's placement (`placeClubMember`): a `session_players` row with their saved level (not
+ * present), or a `session_waitlist` row at the end when they chose Be waitlisted or every slot is
+ * taken. No `session_join_requests` row; the session revision bumps like any roster change.
+ * Replies `{ requestId: null, clubPlayerId, message }` with “You're in” / “You're on the waitlist”.
  */
 export async function joinSessionAsPlayer(
   context: PlayerContext,
@@ -536,22 +564,47 @@ export async function joinSessionAsPlayer(
   if (!PLACEMENTS.includes(placement))
     throw new ServiceError('invalid', { placement: 'Pick Join a slot or Be waitlisted.' })
   const requestId = crypto.randomUUID()
+  let joined: { clubPlayerId: string; waitlisted: boolean } | null = null
   try {
     await prisma.$transaction(async (tx) => {
-      const rows = await tx.$queryRaw<{ state: string; accept: boolean }[]>`
-        SELECT "state"::text AS state, "accept_join_requests" AS accept FROM "queue_sessions"
-        WHERE "id" = ${session.id}::uuid FOR UPDATE`
-      const current = rows[0]
-      if (current?.state === 'cancelled')
+      const current = await lockSession(tx, { clubId: session.clubId }, session.id)
+      if (current.state === 'cancelled')
         throw new ServiceError('forbidden', { request: 'This session is cancelled.' })
-      if (current?.state === 'active')
+      if (current.state === 'active')
         throw new ServiceError('forbidden', { request: JOIN_REQUESTS_STARTED })
-      if (!current || current.state !== 'prepared' || !current.accept)
+      if (current.state !== 'prepared' || !current.acceptJoinRequests)
         throw new ServiceError('forbidden', { request: 'This session is not taking requests.' })
       const standing = await playerStanding(tx, context.playerId, session.id)
       if (standing.joinRequest?.status === 'pending')
         throw new ServiceError('conflict', { request: 'Your request is already sent.' })
-      const full = await slotsFull(tx, session)
+      const full = await slotsFull(tx, current)
+      // D-2026-11-12-02: a club member joins right away (Join from waitlist stays a request).
+      const member =
+        placement !== 'from_waitlist' && !current.alwaysRequireRequest
+          ? await memberOf(tx, session.clubId, context.playerId)
+          : null
+      if (member) {
+        if (standing.inSession)
+          throw new ServiceError('conflict', { request: "You're already in this session." })
+        const asClub: ClubContext = {
+          kind: 'club',
+          subject: context.subject,
+          clubId: session.clubId,
+        }
+        const placed = await placeClubMember(
+          tx,
+          asClub,
+          current,
+          member.clubPlayer,
+          member.skillLevelId,
+          requestId,
+          new Date(),
+          placement === 'waitlist' || full,
+        )
+        await recomputeMinimum(tx, await touchSession(tx, current))
+        joined = { clubPlayerId: member.clubPlayer.id, waitlisted: !!placed.waitlist }
+        return
+      }
       // D-2026-11-11-02: Join from waitlist, only for a waitlisted Player while a slot is open.
       if (placement === 'from_waitlist') {
         if (!standing.waitlistClubPlayerId)
@@ -602,6 +655,14 @@ export async function joinSessionAsPlayer(
       throw new ServiceError('conflict', { request: 'Your request is already sent.' })
     throw error
   }
+  // The transaction callback assigned it, which TypeScript's narrowing does not track.
+  const done = joined as { clubPlayerId: string; waitlisted: boolean } | null
+  if (done)
+    return {
+      requestId: null,
+      clubPlayerId: done.clubPlayerId,
+      message: done.waitlisted ? "You're on the waitlist" : "You're in",
+    }
   return { requestId, message: placement === 'from_waitlist' ? 'Slot requested' : 'Request sent' }
 }
 

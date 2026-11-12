@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-IN PROGRESS: 5 · IN MOCK APP: 133 · CANCELLED: 2 · MOCKUP ONLY: 4
+IN PROGRESS: 5 · IN MOCK APP: 134 · CANCELLED: 2 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -321,5 +321,6 @@ IN PROGRESS: 5 · IN MOCK APP: 133 · CANCELLED: 2 · MOCKUP ONLY: 4
 | [2026-11-12-player-profile-banner-layout-dialog](2026-11-12-player-profile-banner-layout-dialog.md) | Player profile banner: 5:2, nothing overlaps it, banner pencil and a banner dialog | profile-hero, player-identity-card, edit-profile-form, banner-sheet (new; replaces banner-picker) | IN MOCK APP — #765 |
 | [2026-11-12-player-profile-clubs-box](2026-11-12-player-profile-clubs-box.md) | Clubs on every readable profile as logo-and-name links; Leave club on the club page; no Report a problem | player-clubs-card, club-page-hero | IN MOCK APP — #766 |
 | [2026-11-12-player-pull-to-refresh](2026-11-12-player-pull-to-refresh.md) | The leaderboard, a club's page and the own profile refresh when pulled down | pull-to-refresh (shared with the Queue log), leaderboard-list, club-next-up-card, club-calendar, my-sessions-card | IN MOCK APP — PR #763 |
+| [2026-11-12-queue-member-join](2026-11-12-queue-member-join.md) | Club members join upcoming sessions right away; Always require a request | session-link-card, join-request-card | IN MOCK APP — #764 |
 | [2026-11-12-queue-pull-to-refresh](2026-11-12-queue-pull-to-refresh.md) | The session page refreshes when pulled down, and when the tab comes back | pull-to-refresh (new), public-refresh-bar | IN MOCK APP — PR #763 |
 <!-- status-index:end -->

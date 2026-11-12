@@ -28,6 +28,7 @@ import {
   realDeclineJoinRequest,
   realRemoveRosterPlayer,
   realSetAcceptJoinRequests,
+  realSetAlwaysRequireRequest,
 } from '../real/session-live'
 import {
   inUnfinishedMatch,
@@ -606,6 +607,21 @@ export function setAcceptJoinRequests(input: { sessionId: string; accept: boolea
   return rosterMutation(input.sessionId, (s) => {
     sessionIn(s, input.sessionId).acceptJoinRequests = input.accept
     return { data: null, text: `Join requests are ${input.accept ? 'on' : 'off'}` }
+  })
+}
+/** The toasts of the Always require a request switch (D-2026-11-12-02). */
+export const alwaysRequireRequestToast = (always: boolean) =>
+  always ? 'Members must request now' : 'Members can join right away'
+/**
+ * **Always require a request** (D-2026-11-12-02, #764): on, club members send a join request like
+ * everyone else; off (the default), a member joins an upcoming session right away. Same path as
+ * `setAcceptJoinRequests`: a roster command that works offline on a downloaded session and syncs.
+ */
+export function setAlwaysRequireRequest(input: { sessionId: string; always: boolean }) {
+  if (isRealDataMode()) return realSetAlwaysRequireRequest(input)
+  return rosterMutation(input.sessionId, (s) => {
+    sessionIn(s, input.sessionId).alwaysRequireRequest = input.always
+    return { data: null, text: alwaysRequireRequestToast(input.always) }
   })
 }
 const samples = [

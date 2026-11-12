@@ -32,50 +32,52 @@ enum SessionMode {
 }
 
 model QueueSession {
-  id                  String            @id @db.Uuid
-  clubId              String            @map("club_id") @db.Uuid
-  title               String
-  notes               String?
-  scheduledStartAt    DateTime          @map("scheduled_start_at") @db.Timestamptz(6)
-  scheduledEndAt      DateTime          @map("scheduled_end_at") @db.Timestamptz(6)
+  id                   String            @id @db.Uuid
+  clubId               String            @map("club_id") @db.Uuid
+  title                String
+  notes                String?
+  scheduledStartAt     DateTime          @map("scheduled_start_at") @db.Timestamptz(6)
+  scheduledEndAt       DateTime          @map("scheduled_end_at") @db.Timestamptz(6)
   /// Null for sessions made before the venue list existed.
-  venueId             String?           @map("venue_id") @db.Uuid
-  venueName           String?           @map("venue_name")
-  venueAddress        String?           @map("venue_address")
-  state               QueueSessionState @default(prepared)
+  venueId              String?           @map("venue_id") @db.Uuid
+  venueName            String?           @map("venue_name")
+  venueAddress         String?           @map("venue_address")
+  state                QueueSessionState @default(prepared)
   /// Required when state = invalid.
-  invalidReason       String?           @map("invalid_reason")
+  invalidReason        String?           @map("invalid_reason")
   /// Set ⇔ state = cancelled.
-  cancelledAt         DateTime?         @map("cancelled_at") @db.Timestamptz(6)
+  cancelledAt          DateTime?         @map("cancelled_at") @db.Timestamptz(6)
   /// Optional, up to 120 characters; only when cancelled.
-  cancelReason        String?           @map("cancel_reason")
-  sessionMode         SessionMode       @default(fair) @map("session_mode")
-  allowSingles        Boolean           @default(true) @map("allow_singles")
-  allowDoubles        Boolean           @default(true) @map("allow_doubles")
+  cancelReason         String?           @map("cancel_reason")
+  sessionMode          SessionMode       @default(fair) @map("session_mode")
+  allowSingles         Boolean           @default(true) @map("allow_singles")
+  allowDoubles         Boolean           @default(true) @map("allow_doubles")
   /// Target, not a closure constraint.
-  minimumGames        Int               @default(0) @map("minimum_games")
+  minimumGames         Int               @default(0) @map("minimum_games")
   /// While true and prepared, the server recomputes minimum_games. Frozen at start.
-  minimumIsCalculated Boolean           @default(true) @map("minimum_is_calculated")
+  minimumIsCalculated  Boolean           @default(true) @map("minimum_is_calculated")
   /// Slots = players_per_court × non-removed courts.
-  playersPerCourt     Int               @map("players_per_court") @db.SmallInt
+  playersPerCourt      Int               @map("players_per_court") @db.SmallInt
   /// Used before the roster has players.
-  expectedPlayers     Int?              @map("expected_players")
-  queueRevision       BigInt            @default(1) @map("queue_revision")
-  startedAt           DateTime?         @map("started_at") @db.Timestamptz(6)
-  finalizedAt         DateTime?         @map("finalized_at") @db.Timestamptz(6)
+  expectedPlayers      Int?              @map("expected_players")
+  queueRevision        BigInt            @default(1) @map("queue_revision")
+  startedAt            DateTime?         @map("started_at") @db.Timestamptz(6)
+  finalizedAt          DateTime?         @map("finalized_at") @db.Timestamptz(6)
   /// Shared by sessions created together as a repeating series; each stays independent.
-  seriesId            String?           @map("series_id") @db.Uuid
+  seriesId             String?           @map("series_id") @db.Uuid
   /// The license term that authorized start, from the same club.
-  startLicenseTermId  String?           @map("start_license_term_id") @db.Uuid
-  publicSlug          String            @unique @map("public_slug")
-  acceptJoinRequests  Boolean           @default(true) @map("accept_join_requests")
+  startLicenseTermId   String?           @map("start_license_term_id") @db.Uuid
+  publicSlug           String            @unique @map("public_slug")
+  acceptJoinRequests   Boolean           @default(true) @map("accept_join_requests")
+  /// Always require a request (D-2026-11-12-02): true = club members send a join request too; false (default) = members join an upcoming session right away. Read as false while accept_join_requests is false.
+  alwaysRequireRequest Boolean           @default(false) @map("always_require_request")
   /// auto places the next eligible match on_court; it never starts a match.
-  courtFillMode       CourtFillMode     @default(manual) @map("court_fill_mode")
+  courtFillMode        CourtFillMode     @default(manual) @map("court_fill_mode")
   /// Idempotency key of the create command.
-  sourceCommandId     String            @unique @map("source_command_id") @db.Uuid
-  createdAt           DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt           DateTime          @updatedAt @map("updated_at") @db.Timestamptz(6)
-  revision            BigInt            @default(1)
+  sourceCommandId      String            @unique @map("source_command_id") @db.Uuid
+  createdAt            DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt            DateTime          @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision             BigInt            @default(1)
 
   club                 Club                    @relation(fields: [clubId], references: [id], onDelete: Restrict)
   venue                ClubVenue?              @relation(fields: [clubId, venueId], references: [clubId, id], onDelete: Restrict)

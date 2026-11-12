@@ -12,6 +12,7 @@ import {
 } from '../real/public-session'
 import {
   JOIN_REQUESTS_STARTED_ERROR,
+  place,
   SLOTS_FULL_ERROR,
   settleRoster,
   slotsFull,
@@ -19,7 +20,12 @@ import {
 } from '../session-roster/mutations'
 import { SELF_STEP_DOWN_BLOCKED } from '../session-roster/sessionRoster.rules'
 import type { SaveOutcome } from '../sync/sync.types'
-import { makeInviteCode, playerSlot } from './publicSession.rules'
+import {
+  makeInviteCode,
+  memberClubPlayer,
+  membersJoinDirectly,
+  playerSlot,
+} from './publicSession.rules'
 import type { JoinAsPlayerInput, PlayerSessionInput } from './publicSession.types'
 
 /**
@@ -65,16 +71,27 @@ function requireRosterRow(state: MockState, session: MockState['sessions'][numbe
   return row
 }
 
+/** The toast of a member's direct join (D-2026-11-12-02). */
+export const MEMBER_JOINED_TOAST = "You're in"
+export const MEMBER_WAITLISTED_TOAST = "You're on the waitlist"
+
 /**
  * **Request to join as NAME** (D-2026-11-09-02): one tap, no form; the request carries the account.
  * Refused when requests are off or the session has finished, when the Player already has a slot or
  * a waitlist place, or while their earlier request is still pending (one open per account). An
  * `inviteCode` from `?invite=` that belongs to this session becomes “Invited by NAME”.
+ *
+ * **Join as NAME** (D-2026-11-12-02, #764): a club member on an upcoming session, while Accept join
+ * requests is on and Always require a request is off, gets their place right away: the same roster
+ * row the Queue Master's confirm writes (their saved level, not present), or the waitlist place when
+ * they chose Be waitlisted or every slot is taken. No join request row. The toast says “You're in”
+ * or “You're on the waitlist”.
  */
 export function joinAsPlayer(slug: string, input: JoinAsPlayerInput) {
   // Real mode (#687): the Player app knows who is signed in; no playerId or invite code is sent.
   if (isRealDataMode()) return realJoinAsPlayer(slug, input.placement ?? 'slot')
   const placement = input.placement ?? 'slot'
+  let directJoin: 'slot' | 'waitlist' | null = null
   return playerWrite(
     slug,
     (s, session) => {
@@ -92,6 +109,19 @@ export function joinAsPlayer(slug: string, input: JoinAsPlayerInput) {
         )
       )
         fail('Your request is already sent.', 'conflict')
+      // D-2026-11-12-02: a club member joins an upcoming session right away (slot or waitlist).
+      const member =
+        placement !== 'from_waitlist' && membersJoinDirectly(session)
+          ? memberClubPlayer(s, session.clubId, input.playerId)
+          : null
+      if (member?.playingLevel) {
+        if (slot.roster || slot.waitlist) fail("You're already in this session.", 'conflict')
+        const toWaitlist = placement === 'waitlist' || slotsFull(s, session.id)
+        const placed = place(s, session.id, member, member.playingLevel, Date.now(), toWaitlist)
+        settleRoster(s, session.id, null)
+        directJoin = placed.waitlistPosition ? 'waitlist' : 'slot'
+        return { requestId: null, clubPlayerId: member.id }
+      }
       // D-2026-11-11-02: Join from waitlist. Only a waitlisted Player, only while a slot is open;
       // the Queue Master still confirms (Give slot / Admit player).
       if (placement === 'from_waitlist') {
@@ -150,7 +180,14 @@ export function joinAsPlayer(slug: string, input: JoinAsPlayerInput) {
       })
       return { requestId: id }
     },
-    placement === 'from_waitlist' ? 'Slot requested' : 'Request sent',
+    () =>
+      directJoin === 'slot'
+        ? MEMBER_JOINED_TOAST
+        : directJoin === 'waitlist'
+          ? MEMBER_WAITLISTED_TOAST
+          : placement === 'from_waitlist'
+            ? 'Slot requested'
+            : 'Request sent',
   )
 }
 

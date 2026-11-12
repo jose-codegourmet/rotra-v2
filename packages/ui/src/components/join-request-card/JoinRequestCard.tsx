@@ -48,6 +48,16 @@ type AvailabilityProps = {
    */
   placement?: Extract<JoinRequestPlacement, 'slot' | 'waitlist'>
   onPlacementChange?: (placement: Extract<JoinRequestPlacement, 'slot' | 'waitlist'>) => void
+  /**
+   * D-2026-11-12-02: the signed-in Player is a club member on an upcoming session that lets members
+   * join right away (Accept join requests on, Always require a request off). The card says
+   * "You're a member of CLUB, so you get your place right away." and the button reads
+   * "Join as NAME" (slot) or "Join the waitlist as NAME" (Be waitlisted, or every slot taken);
+   * onRequestToJoin then joins directly instead of sending a request. Needs signedInName.
+   */
+  member?: boolean
+  /** The club's name for the member sentence */
+  clubName?: string
 }
 
 export const PLACEMENT_LABEL = 'How do you want to join?'
@@ -205,6 +215,9 @@ export function JoinRequestCard(props: JoinRequestCardProps) {
     // D-2026-11-11-02: Join a slot is unavailable while every slot is taken before start. During
     // play the Queue Master can admit additional players, so the "active" variant never disables it.
     const full = props.variant === 'full'
+    // D-2026-11-12-02: a club member gets their place right away; no request copy.
+    const member = !!props.signedInName && !!props.member && props.variant !== 'active'
+    const waitlisting = full || props.placement === 'waitlist'
     return (
       <Card asChild className={cardClass}>
         <section aria-labelledby={headingId}>
@@ -228,9 +241,11 @@ export function JoinRequestCard(props: JoinRequestCardProps) {
               : props.variant === 'full'
                 ? 'Confirmed guests join the waitlist. '
                 : ''}
-            {props.signedInName
-              ? 'One tap sends your request and the Queue Master confirms it.'
-              : 'Send a quick request and the Queue Master confirms it.'}
+            {member
+              ? `You're a member of ${props.clubName ?? 'this club'}, so you get your place right away.`
+              : props.signedInName
+                ? 'One tap sends your request and the Queue Master confirms it.'
+                : 'Send a quick request and the Queue Master confirms it.'}
           </p>
           {props.signedInName && props.onPlacementChange ? (
             <div className="flex min-w-0 flex-col gap-1.5">
@@ -261,7 +276,11 @@ export function JoinRequestCard(props: JoinRequestCardProps) {
             disabled={props.disabled}
             className="min-h-11 w-full"
           >
-            {props.signedInName ? `Request to join as ${props.signedInName}` : 'Request to join'}
+            {member
+              ? `${waitlisting ? 'Join the waitlist as' : 'Join as'} ${props.signedInName}`
+              : props.signedInName
+                ? `Request to join as ${props.signedInName}`
+                : 'Request to join'}
           </Button>
         </section>
       </Card>

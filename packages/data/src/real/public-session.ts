@@ -73,7 +73,8 @@ async function playerSessionWrite(
   action: 'join' | 'cancel',
   body: Record<string, unknown> = {},
 ) {
-  const done = await playerPost<{ requestId: string; message: string }>(slug, action, body)
+  // A club member's direct join (D-2026-11-12-02) writes no request: `requestId` is null then.
+  const done = await playerPost<{ requestId: string | null; message: string }>(slug, action, body)
   return { savedOffline: false, message: done.message, data: { requestId: done.requestId } }
 }
 

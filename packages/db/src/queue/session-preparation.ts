@@ -821,6 +821,23 @@ export async function setAcceptJoinRequests(
   })
 }
 
+/** Always require a request (D-2026-11-12-02, #764): the same write path as Accept join requests. */
+export async function setAlwaysRequireRequest(
+  context: ClubContext,
+  sessionId: string,
+  always: boolean,
+) {
+  return prisma.$transaction(async (tx) => {
+    const session = await lockSession(tx, context, sessionId)
+    await requireSessionAccess(context, session)
+    const updated = await tx.queueSession.update({
+      where: { id: sessionId },
+      data: { alwaysRequireRequest: always, revision: { increment: 1 } },
+    })
+    return sessionDto(updated)
+  })
+}
+
 /** Q-HOME / Q-SESSION counts read the club-scoped persisted match and court-hold rows. */
 async function sessionSummaryDto(tx: Tx, session: QueueSession) {
   const [courts, roster, waitlistCount, courtsInUse, gamesPlayed, queuedCount] = await Promise.all([

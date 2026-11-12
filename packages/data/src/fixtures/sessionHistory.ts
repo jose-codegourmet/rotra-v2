@@ -159,6 +159,7 @@ export function simulateHistory(spec: SessionHistorySpec, now = Date.now()): Ses
     seriesId: null,
     publicSlug: publicSlugFor(spec.id),
     acceptJoinRequests: true,
+    alwaysRequireRequest: false,
   }
   const games: Record<string, number> = {},
     free: Record<string, number> = {},

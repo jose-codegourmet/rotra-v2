@@ -35,6 +35,7 @@ const wireSession = (id: string, state = 'active') => ({
     seriesId: null,
     publicSlug: 'friday',
     acceptJoinRequests: false,
+    alwaysRequireRequest: false,
     revision: '4',
   },
   courts: [{ id: 'ct-1', sessionId: id, label: 'Court 1', openUntil: null, removedAt: null }],

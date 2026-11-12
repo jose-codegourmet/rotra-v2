@@ -124,6 +124,41 @@ export const SignedInChoiceFull: Story = {
   },
 }
 export const SignedInChoiceFullLight: Story = { ...SignedInChoiceFull, globals: { theme: 'light' } }
+/** D-2026-11-12-02: a club member on an upcoming session joins right away (Join as NAME). */
+export const SignedInMember: Story = {
+  args: {
+    variant: 'open',
+    openSlots,
+    capacity,
+    signedInName: 'Jamie Cruz',
+    member: true,
+    clubName: 'Lahug Smash Club',
+    placement: 'slot',
+    onPlacementChange: fn(),
+    onRequestToJoin: fn(),
+  },
+}
+export const SignedInMemberLight: Story = { ...SignedInMember, globals: { theme: 'light' } }
+/** The member chose Be waitlisted: Join the waitlist as NAME. */
+export const SignedInMemberWaitlist: Story = {
+  args: { ...SignedInMember.args, variant: 'open', openSlots, capacity, placement: 'waitlist' },
+}
+/** Every slot is taken: the member goes straight onto the waitlist. */
+export const SignedInMemberFull: Story = {
+  args: {
+    variant: 'full',
+    signedInName: 'Jamie Cruz',
+    member: true,
+    clubName: 'Lahug Smash Club',
+    placement: 'waitlist',
+    onPlacementChange: fn(),
+    onRequestToJoin: fn(),
+  },
+}
+export const SignedInMemberPhone: Story = {
+  ...SignedInMember,
+  globals: { viewport: { value: 'phone' } },
+}
 /** A waitlist request waiting for the Queue Master. */
 export const SignedInSentWaitlist: Story = {
   args: { variant: 'sent', name: 'Jamie Cruz', placement: 'waitlist', onCancelRequest: fn() },

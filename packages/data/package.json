@@ -173,6 +173,7 @@
     "./match/useDeclineMatchRequest": "./src/match/useDeclineMatchRequest.ts",
     "./session-roster/useDeclineJoinRequest": "./src/session-roster/useDeclineJoinRequest.ts",
     "./session-roster/useSetAcceptJoinRequests": "./src/session-roster/useSetAcceptJoinRequests.ts",
+    "./session-roster/useSetAlwaysRequireRequest": "./src/session-roster/useSetAlwaysRequireRequest.ts",
     "./session-roster/useAddSampleJoinRequest": "./src/session-roster/useAddSampleJoinRequest.ts",
     "./session-roster/usePlayerDirectorySearch": "./src/session-roster/usePlayerDirectorySearch.ts",
     "./session-roster/sessionRoster.rules": "./src/session-roster/sessionRoster.rules.ts",

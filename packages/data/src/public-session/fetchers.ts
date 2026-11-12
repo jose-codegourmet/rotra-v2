@@ -32,6 +32,7 @@ import { playerOrigin } from './context'
 import {
   linkedClubPlayerIds,
   maskPublicName,
+  memberClubPlayer,
   myMatchLabel,
   playerSlot,
   publicFirstName,
@@ -375,6 +376,7 @@ function project(
     openSlots: Math.max(0, capacity - roster.length),
     slotBudget: capacity,
     acceptJoinRequests: s.acceptJoinRequests,
+    alwaysRequireRequest: s.alwaysRequireRequest,
     amountDuePerPlayer: sessionCostIn(state, s.id)?.estimate.perHead ?? null,
     lastSyncedAt: sync.lastSyncedAt,
     hasPendingChanges: sync.hasPendingChanges,
@@ -579,6 +581,7 @@ export async function getMyNight(slug: string, playerId: string): Promise<MyNigh
           ),
         }
       : null,
+    isClubMember: !!memberClubPlayer(state, session.clubId, playerId),
     canInvite:
       session.state === 'prepared' && session.acceptJoinRequests && (!!row || !!slot.waitlist),
     inviteCode:
@@ -764,6 +767,7 @@ export function mockPlayerSessionAccess(slug: string, playerId: string): PlayerS
   return {
     ...sessionPageAccountOf(state, playerId),
     inSession: !!slot.roster || !!slot.waitlist,
+    isClubMember: !!memberClubPlayer(state, session.clubId, playerId),
     waitlistPosition: slot.waitlist
       ? waitlist.findIndex((w) => w.id === slot.waitlist?.id) + 1 || null
       : null,

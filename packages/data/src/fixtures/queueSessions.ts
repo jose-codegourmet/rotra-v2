@@ -55,6 +55,7 @@ export function createQueueFixtures(now = Date.now()) {
     seriesId: null,
     publicSlug: publicSlugFor('s-tonight'),
     acceptJoinRequests: true,
+    alwaysRequireRequest: false,
   }
   const history = createSessionHistoryFixtures(now)
   const sessions: QueueSession[] = [tonight, ...history.sessions]

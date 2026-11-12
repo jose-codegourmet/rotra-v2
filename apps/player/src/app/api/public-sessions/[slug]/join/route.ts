@@ -15,7 +15,8 @@ export const OPTIONS = preflight
 /**
  * Q-PUBLIC-JOIN · **Request to join as NAME** (D-2026-11-09-02) from the Queue session page. The
  * body's `placement` (D-2026-11-11-02) is slot (default), waitlist, or from_waitlist for a waitlisted
- * Player's **Join from waitlist**.
+ * Player's **Join from waitlist**. A club member on an upcoming session that does not always require
+ * a request is placed right away (D-2026-11-12-02): the reply then carries `requestId: null`.
  */
 export async function POST(
   request: Request,

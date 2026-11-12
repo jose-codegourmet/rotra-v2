@@ -53,6 +53,9 @@ importers:
       '@tanstack/react-query-devtools':
         specifier: ^5.0.0
         version: 5.105.0(@tanstack/react-query@5.105.0(@types/react@19.2.14)(react@19.2.9))(@types/react@19.2.14)(csstype@3.2.3)(react@19.2.9)
+      '@vercel/analytics':
+        specifier: ^2.0.1
+        version: 2.0.1(next@16.4.3(@opentelemetry/api@1.10.0)(@playwright/test@1.64.1)(@types/node@24.12.3)(react-dom@19.2.9(react@19.2.9))(react@19.2.9))(react@19.2.9)
       '@vercel/otel':
         specifier: ^2.3.0
         version: 2.3.0(@opentelemetry/api-logs@0.223.1)(@opentelemetry/api@1.10.0)(@opentelemetry/instrumentation@0.223.1(@opentelemetry/api@1.10.0))(@opentelemetry/resources@2.12.1(@opentelemetry/api@1.10.0))(@opentelemetry/sdk-logs@0.223.1(@opentelemetry/api@1.10.0))(@opentelemetry/sdk-metrics@2.12.1(@opentelemetry/api@1.10.0))(@opentelemetry/sdk-trace-base@2.12.0(@opentelemetry/api@1.10.0))
@@ -134,6 +137,9 @@ importers:
       '@tanstack/react-query-devtools':
         specifier: ^5.0.0
         version: 5.105.0(@tanstack/react-query@5.105.0(@types/react@19.2.14)(react@19.2.9))(@types/react@19.2.14)(csstype@3.2.3)(react@19.2.9)
+      '@vercel/analytics':
+        specifier: ^2.0.1
+        version: 2.0.1(next@16.4.3(@opentelemetry/api@1.10.0)(@playwright/test@1.64.1)(@types/node@24.12.3)(react-dom@19.2.9(react@19.2.9))(react@19.2.9))(react@19.2.9)
       '@vercel/otel':
         specifier: ^2.3.0
         version: 2.3.0(@opentelemetry/api-logs@0.223.1)(@opentelemetry/api@1.10.0)(@opentelemetry/instrumentation@0.223.1(@opentelemetry/api@1.10.0))(@opentelemetry/resources@2.12.1(@opentelemetry/api@1.10.0))(@opentelemetry/sdk-logs@0.223.1(@opentelemetry/api@1.10.0))(@opentelemetry/sdk-metrics@2.12.1(@opentelemetry/api@1.10.0))(@opentelemetry/sdk-trace-base@2.12.0(@opentelemetry/api@1.10.0))

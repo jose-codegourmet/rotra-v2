@@ -20,6 +20,7 @@
     "@rotra/ui": "workspace:*",
     "@tanstack/react-query": "^5.0.0",
     "@tanstack/react-query-devtools": "^5.0.0",
+    "@vercel/analytics": "^2.0.1",
     "@vercel/otel": "^2.3.0",
     "next": "16.4.3",
     "react": "~19.2.9",

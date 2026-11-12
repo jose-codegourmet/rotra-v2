@@ -1,4 +1,5 @@
 import { getThemeScript } from '@rotra/ui/theme-provider/script'
+import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import type { ReactNode } from 'react'
 import { AppProviders } from '@/providers/AppProviders'
@@ -30,6 +31,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       </head>
       <body>
         <AppProviders>{children}</AppProviders>
+        <Analytics />
       </body>
     </html>
   )

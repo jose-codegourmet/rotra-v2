@@ -1,6 +1,6 @@
 # The session page refreshes when pulled down, and when the tab comes back
 
-Status: NEW
+Status: IN MOCK APP — PR #763
 Date: 2026-11-12
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Public session page › pull down from the top (#ptr)
@@ -39,4 +39,4 @@ Superseded by: none
 - Screen docs: public-session.md — Refresh bar paragraph now covers the pull and the tab return
 
 ## Real app work
-- Built in the same branch as this log (`claude/friendly-darwin-oiae5f`), not through a ticket: `pull-to-refresh` in `@rotra/ui` with stories and `.meta.ts`; `useThrottledRefresh` in `@rotra/data` (the public page's `useRefreshSession` now wraps it); `PublicSession` wrapped for every viewer of `/s/<slug>`. Set `IN MOCK APP — PR #<m>` when it merges. Do not ticket.
+- Built in the same branch as this log (`claude/friendly-darwin-oiae5f`), not through a ticket: `pull-to-refresh` in `@rotra/ui` with stories and `.meta.ts`; `useThrottledRefresh` in `@rotra/data` (the public page's `useRefreshSession` now wraps it); `PublicSession` wrapped for every viewer of `/s/<slug>`. Merged through PR #763.

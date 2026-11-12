@@ -1,6 +1,6 @@
 # The request inboxes refresh when pulled down
 
-Status: NEW
+Status: IN MOCK APP — PR #763
 Date: 2026-11-12
 App: admin
 Mockup: apps/mockup/admin-app/rotra-admin.html › Requests › Contact changes, Club names, Password resets › pull down from the top (#ptr)
@@ -38,4 +38,4 @@ Superseded by: none
 - Screen docs: players-requests.md (A-CONTACT-REQUESTS, A-PASSWORD-REQUESTS), access-navigation.md (Requests)
 
 ## Real app work
-- Built in the same branch as this log (`claude/friendly-darwin-oiae5f`), not through a ticket: `ContactRequestsPage`, `ClubNameRequests` and `PasswordResetRequestsPage` wrapped in `PullToRefresh` with `useThrottledRefresh` (`refreshOnReturn`). Set `IN MOCK APP — PR #<m>` when it merges. Do not ticket.
+- Built in the same branch as this log (`claude/friendly-darwin-oiae5f`), not through a ticket: `ContactRequestsPage`, `ClubNameRequests` and `PasswordResetRequestsPage` wrapped in `PullToRefresh` with `useThrottledRefresh` (`refreshOnReturn`). Merged through PR #763.

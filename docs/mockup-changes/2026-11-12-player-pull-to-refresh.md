@@ -1,6 +1,6 @@
 # The leaderboard, a club's page and the own profile refresh when pulled down
 
-Status: NEW
+Status: IN MOCK APP — PR #763
 Date: 2026-11-12
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › Leaderboard, Club page, Own profile (My sessions) › pull down from the top (#ptr)
@@ -38,4 +38,4 @@ Superseded by: none
 - Screen docs: ranking-history.md (P-LEADERBOARD states), club-page.md (P-CLUB-PAGE), profile.md (My sessions)
 
 ## Real app work
-- Built in the same branch as this log (`claude/friendly-darwin-oiae5f`), not through a ticket: `LeaderboardPage`, `ClubPage` and `PlayerProfile` (own only) wrapped in `PullToRefresh` with `useThrottledRefresh` (`refreshOnReturn`). Set `IN MOCK APP — PR #<m>` when it merges. Do not ticket.
+- Built in the same branch as this log (`claude/friendly-darwin-oiae5f`), not through a ticket: `LeaderboardPage`, `ClubPage` and `PlayerProfile` (own only) wrapped in `PullToRefresh` with `useThrottledRefresh` (`refreshOnReturn`). Merged through PR #763.

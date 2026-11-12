@@ -131,7 +131,8 @@ The characters a player can pick are the images the platform owner shows in Admi
 Every profile has a **banner**: the strip across the top of the profile card, public like the picture, in the same way for the player's own profile and for another player's, and for every visibility level including Always private.
 
 - **Predefined banners only.** A player picks one of the banners the platform owner shows in Admin › Settings › Profile banners, managed like the profile characters. There is **no upload and no remove** for players; the default is **Court**, or the first shown banner when Court is hidden or deleted (owner, November 12, 2026). A player keeps a banner that Admin later hides or deletes.
-- Picking a banner applies at once; there is nothing to save separately (confirmation toast **Banner updated**) and no file is stored for the player.
+- A player picks a banner in the **Profile banner** dialog, opened from the banner pencil on their own profile card or the Edit profile preview, the same as the profile picture: the pick is a draft until **Done**, which saves it (toast **Banner updated**); cancelling discards it. It is outside Edit profile's Save changes, and no file is stored for the player ([D-2026-11-12-03](../../../../../mvp/decisions.md#d-2026-11-12-03)).
+- The banner shows at **5:2** and nothing overlaps it; only the owner's banner pencil sits on it. Admin uploads are cropped to 5:2.
 - Banners are drawn from the theme tokens in the prototype, so both themes hold up.
 
 **Avatars are circles.** The big profile picture and every other avatar shown anywhere in ROTRA are circles (owner comments, November 11, 2026); no rounded-square avatar remains.

@@ -31,7 +31,7 @@ export const Interactive: Story = {
 
 const bannerCopy = {
   title: 'Drag banners here to upload',
-  hint: 'or click to choose · PNG, JPG or WebP, up to 2 MB each · cropped to 3:1',
+  hint: 'or click to choose · PNG, JPG or WebP, up to 2 MB each · cropped to 5:2',
 }
 export const BannerCopy: Story = { args: bannerCopy }
 export const BannerCopyLight: Story = { args: bannerCopy, globals: { theme: 'light' } }

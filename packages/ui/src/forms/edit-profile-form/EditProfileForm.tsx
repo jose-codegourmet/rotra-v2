@@ -1,7 +1,6 @@
 'use client'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { formatPhoneForDisplay } from '@rotra/schema/phone'
-import { type BannerOption, BannerPicker } from '@rotra/ui/banner-picker'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { useSubmitOnce } from '@rotra/ui/hooks/use-submit-once'
@@ -68,14 +67,10 @@ export type EditProfileFormProps = {
   /** The saved banner when it is an Admin upload; wins over bannerKey in the preview */
   bannerImageUrl?: string | null
   /**
-   * A banner swatch was picked. Applies at once, outside Save changes; the container saves it and
-   * shows the toast “Banner updated”. The Banner swatches show only when this is passed.
+   * The banner pencil on the Name preview: opens the Profile banner dialog (BannerSheet). Saved
+   * outside the draft and Save changes; the pencil shows only when this is passed.
    */
-  onBannerChange?: (key: string) => void
-  /** The banners shown to players (Admin › Profile banners); defaults to the six predefined ones */
-  banners?: BannerOption[]
-  /** While a banner saves, or offline */
-  bannerDisabled?: boolean
+  onChangeBanner?: () => void
 }
 /** P-EDIT-PROFILE: one shared draft across four sections and one Save changes. */
 export function EditProfileForm({
@@ -93,9 +88,7 @@ export function EditProfileForm({
   onChangePicture,
   bannerKey,
   bannerImageUrl,
-  onBannerChange,
-  banners,
-  bannerDisabled,
+  onChangeBanner,
 }: EditProfileFormProps) {
   const form = useForm<EditProfileValues>({
     resolver: zodResolver(editProfileSchema),
@@ -179,20 +172,13 @@ export function EditProfileForm({
                   bannerKey={bannerKey}
                   bannerImageUrl={bannerImageUrl}
                   onChangePicture={onChangePicture ?? (() => {})}
+                  onChangeBanner={onChangeBanner}
                 >
                   <p className="m-0 text-xs text-fg2">
-                    This is how the top of your profile card looks. Tap the pencil to change your
-                    picture; pick a banner below.
+                    This is how the top of your profile card looks. Tap a pencil to change your
+                    picture or banner.
                   </p>
                 </ProfileHero>
-                {onBannerChange ? (
-                  <BannerPicker
-                    value={bannerKey}
-                    onChange={onBannerChange}
-                    options={banners}
-                    disabled={bannerDisabled}
-                  />
-                ) : null}
               </>
             ) : null}
             {section.id === 'account' ? (

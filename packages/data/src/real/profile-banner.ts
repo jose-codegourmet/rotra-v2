@@ -36,7 +36,7 @@ export async function realListProfileBanners(signal?: AbortSignal) {
   return banners.map(bannerOf)
 }
 
-/** Saves one cropped 3:1 image (a data URL) under a client UUID, so a retry returns the saved row. */
+/** Saves one cropped 5:2 image (a data URL) under a client UUID, so a retry returns the saved row. */
 export async function realAddProfileBanner(image: string) {
   const { banner } = await realRequest<{ banner: WireBanner }>('/api/profile-banners', {
     method: 'POST',

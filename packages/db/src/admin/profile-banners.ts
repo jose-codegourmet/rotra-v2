@@ -103,7 +103,7 @@ export async function resolvePlayerBanner(
 
 /**
  * Never trust the data: URL label alone: the bytes must be the image type it names, and a PNG must
- * already be the 3:1 crop the browser makes.
+ * already be the 5:2 crop the browser makes.
  */
 function readImage(value: unknown): { bytes: Buffer; type: ImageType } {
   const invalid = () => new ServiceError('invalid', { image: "That image couldn't be read." })
@@ -120,7 +120,7 @@ function readImage(value: unknown): { bytes: Buffer; type: ImageType } {
     type === 'image/png'
       ? bytes.subarray(0, 8).equals(Buffer.from('89504e470d0a1a0a', 'hex')) &&
         bytes.toString('ascii', 12, 16) === 'IHDR' &&
-        bytes.readUInt32BE(16) === bytes.readUInt32BE(20) * 3
+        bytes.readUInt32BE(16) * 2 === bytes.readUInt32BE(20) * 5
       : type === 'image/jpeg'
         ? bytes[0] === 255 && bytes[1] === 216 && bytes[2] === 255
         : bytes.toString('ascii', 0, 4) === 'RIFF' && bytes.toString('ascii', 8, 12) === 'WEBP'
@@ -139,7 +139,7 @@ function storageBucket() {
 
 /**
  * A-BANNERS › upload, one banner per call. The browser has already checked the file (PNG, JPG or
- * WebP, up to 2 MB) and cropped it to a centred 3:1; the server checks the bytes again. `id` is a
+ * WebP, up to 2 MB) and cropped it to a centred 5:2; the server checks the bytes again. `id` is a
  * UUID the client chose, so a retry after a lost reply returns the saved row instead of a second
  * banner. The image goes to `profile-banners/<id>.<ext>` and is saved shown, after the last banner.
  */

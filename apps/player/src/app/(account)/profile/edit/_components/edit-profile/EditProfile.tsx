@@ -1,11 +1,8 @@
 'use client'
 import { MockError } from '@rotra/data/mock/errors'
 import { usePlayerProfile } from '@rotra/data/player/usePlayerProfile'
-import { useSetMyProfileBanner } from '@rotra/data/player/useSetMyProfileBanner'
 import { useUpdateMyProfile } from '@rotra/data/player/useUpdateMyProfile'
 import { useMyAccount } from '@rotra/data/player-account/useMyAccount'
-import { profileBannerName } from '@rotra/data/profile-banner/rules'
-import { useShownProfileBanners } from '@rotra/data/profile-banner/useShownProfileBanners'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { ConfirmSheet } from '@rotra/ui/confirm-sheet'
@@ -18,6 +15,7 @@ import { Skeleton } from '@rotra/ui/skeleton'
 import { toast } from '@rotra/ui/toaster'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useBannerSheet } from '@/app/_components/profile-banner/useBannerSheet'
 import { pictureSrc } from '@/app/_components/profile-picture/pictureSrc'
 import { useProfilePictureSheet } from '@/app/_components/profile-picture/useProfilePictureSheet'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
@@ -42,9 +40,8 @@ export function EditProfile() {
   const profile = usePlayerProfile(playerId)
   const myAccount = useMyAccount(account ? playerId : null)
   const update = useUpdateMyProfile()
-  const banners = useShownProfileBanners()
-  const setBanner = useSetMyProfileBanner()
   const pictureEditor = useProfilePictureSheet(profile.data)
+  const bannerEditor = useBannerSheet(profile.data)
   // Opens over the edit page, so the profile draft stays.
   const contactChange = useContactChangeSheet(account ? playerId : null)
   const router = useRouter()
@@ -162,18 +159,7 @@ export function EditProfile() {
         onChangePicture={pictureEditor.openSheet}
         bannerKey={profile.data.bannerKey}
         bannerImageUrl={profile.data.bannerImageUrl}
-        banners={banners.data?.map((banner) => ({
-          key: banner.id,
-          name: profileBannerName(banner),
-          imageUrl: banner.image || null,
-        }))}
-        bannerDisabled={setBanner.isPending || !banners.data}
-        onBannerChange={(bannerId) =>
-          setBanner.mutate(bannerId, {
-            onSuccess: () => toast('Banner updated'),
-            onError: (error) => toast.error(error.message),
-          })
-        }
+        onChangeBanner={bannerEditor.openSheet}
         account={{
           phone: myAccount.data.phone,
           email: myAccount.data.email,
@@ -218,6 +204,7 @@ export function EditProfile() {
       />
       {contactChange.sheet}
       {pictureEditor.sheet}
+      {bannerEditor.sheet}
     </main>
   )
 }

@@ -8,7 +8,7 @@ export const imageDropZoneMeta = {
     'onFiles gets File[] exactly as chosen. It does not crop, check size or type, or store anything; the data layer does (A07.2).',
     'Pass a unique id so the label can reach the file input when more than one zone is on a page.',
     'The border turns accent while files are dragged over; disabled (offline) dims it and ignores drops.',
-    'Copy defaults to the characters page: "Drag images here to upload" / "or click to choose · PNG, JPG or WebP, up to 1 MB each". Profile banners passes title and hint ("Drag banners here to upload" / "… up to 2 MB each · cropped to 3:1").',
+    'Copy defaults to the characters page: "Drag images here to upload" / "or click to choose · PNG, JPG or WebP, up to 1 MB each". Profile banners passes title and hint ("Drag banners here to upload" / "… up to 2 MB each · cropped to 5:2").',
     'Show UploadProgress right under it while files are added.',
   ],
   prototype: {

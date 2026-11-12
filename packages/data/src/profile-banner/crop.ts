@@ -1,9 +1,11 @@
-/** Output size of the saved 3:1 banner (rotra-admin.html cropToWide). */
-const WIDTH = 600
-const HEIGHT = 200
+/** Output size of the saved 5:2 banner (rotra-admin.html cropToWide, #765). */
+const WIDTH = 1000
+const HEIGHT = 400
+/** Width over height: 5:2, the ratio of the owner's banner photo (D-2026-11-12-03). */
+const RATIO = WIDTH / HEIGHT
 
 /**
- * Centred 3:1 crop of an image file, scaled to 600 × 200 and returned as a data URL (PNG stays PNG,
+ * Centred 5:2 crop of an image file, scaled to 1000 × 400 and returned as a data URL (PNG stays PNG,
  * everything else becomes JPEG at 0.86). Browser only; rejects with Error('unreadable') when the
  * file is not a decodable image.
  */
@@ -12,8 +14,8 @@ export function cropProfileBannerToWide(file: Blob): Promise<string> {
     const url = URL.createObjectURL(file)
     const img = new Image()
     img.onload = () => {
-      const width = Math.min(img.naturalWidth, img.naturalHeight * 3)
-      const height = width / 3
+      const width = Math.min(img.naturalWidth, img.naturalHeight * RATIO)
+      const height = width / RATIO
       const canvas = document.createElement('canvas')
       canvas.width = WIDTH
       canvas.height = HEIGHT

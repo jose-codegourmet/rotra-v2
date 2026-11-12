@@ -28,9 +28,13 @@ type Story = StoryObj<typeof meta>
 /** Someone else's profile: no pencil, no chip */
 export const SomeoneElse: Story = {}
 export const SomeoneElseLight: Story = { globals: { theme: 'light' } }
-/** Your own profile: the pencil on the picture and the This is you chip */
+/** Your own profile: the pencils on the picture and the banner, and the This is you chip */
 export const Own: Story = {
-  args: { onChangePicture: fn(), badges: <Chip tone="accent">This is you</Chip> },
+  args: {
+    onChangePicture: fn(),
+    onChangeBanner: fn(),
+    badges: <Chip tone="accent">This is you</Chip>,
+  },
 }
 /** The big picture opens the full photo (PhotoViewer, #716); initials stay inert */
 export const ViewablePicture: Story = { args: { onViewPicture: fn() } }
@@ -58,22 +62,24 @@ export const StripeBanner: Story = { args: { bannerKey: 'stripe' } }
 export const UploadedBanner: Story = {
   args: {
     bannerImageUrl: `data:image/svg+xml;utf8,${encodeURIComponent(
-      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200"><rect width="600" height="200" fill="hsl(210 50% 45%)"/></svg>',
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400"><rect width="1000" height="400" fill="hsl(210 50% 45%)"/></svg>',
     )}`,
   },
 }
-/** Edit profile › Name preview: bold name, pencil, helper line under it */
+/** Edit profile › Name preview: bold name, both pencils, helper line under it */
 export const Preview: Story = {
   args: {
     placement: 'preview',
     onChangePicture: fn(),
+    onChangeBanner: fn(),
     children: (
       <p className="m-0 text-xs text-fg2">
-        This is how the top of your profile card looks. Tap the pencil to change your picture; pick
-        a banner below.
+        This is how the top of your profile card looks. Tap a pencil to change your picture or
+        banner.
       </p>
     ),
   },
   decorators: [(Story) => <div className="pt-4">{Story()}</div>],
 }
+export const PreviewLight: Story = { ...Preview, globals: { theme: 'light' } }
 export const Phone: Story = { ...Own, globals: { viewport: { value: 'phone' } } }

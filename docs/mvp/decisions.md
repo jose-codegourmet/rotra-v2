@@ -38,6 +38,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-11-02](#d-2026-11-11-02) | Join request: the player picks Join a slot or Be waitlisted, and can join from the waitlist | approved | in progress (mock app + real-mode services; migration applied 2026-11-11) | #706 | [Queue](workstreams/queue.md) |
 | [D-2026-11-11-03](#d-2026-11-11-03) | Guests and unclaimed profiles stay in their club | approved | in progress on Epic P08 (migration and services built, #749, #757; real-mode marker and history attribution still open) | #749, #757 | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
 | [D-2026-11-12-01](#d-2026-11-12-01) | Answers to the leftover questions of the November 11 round | approved 2026-11-12 | in progress on Epic P08, #748 | #748, #749–#759 | [Queue](workstreams/queue.md), [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
+| [D-2026-11-12-03](#d-2026-11-12-03) | Profile banner: 5:2, nothing overlaps it, banner dialog | approved 2026-11-12 (open points to be confirmed by the owner) | in the mockups and the mock app (#765); real mode shares the same services | #765 | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 | [D-2026-11-12-04](#d-2026-11-12-04) | Clubs on every readable profile; Leave club on the club page; no Report a problem | approved 2026-11-12 | in progress (#766) | #766 | [Player](workstreams/player.md) |
 
 ## Status conventions
@@ -680,6 +681,21 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 - **Amends:** [D-2026-11-09-07](#d-2026-11-09-07) (three levels), [D-2026-11-09-08](#d-2026-11-09-08) (invite code), [D-2026-11-11-03](#d-2026-11-11-03) (risk accepted, Admin listing), [D-2026-11-11-11](#d-2026-11-11-11) (leftovers answered).
 - **References:** [mockup logs dated 2026-11-11](../mockup-changes/README.md), [identity database design](../database_design/product/player-information/modules/identity.md), migrations `20261112000100_round2_profiles_banners_invites` and `20261112000200`, [real-mode ticket status](README.md).
 
+<a id="d-2026-11-12-03"></a>
+### D-2026-11-12-03 — Profile banner: 5:2, nothing overlaps it, banner dialog (#765)
+- **Decision status:** approved (owner's words logged in #765, November 12, 2026; open points decided by the implementing agent, to be confirmed by the owner)
+- **Implementation status:** in the mockups and the mock app (#765). The banner save and the Admin upload go through the existing services (the server's PNG ratio check now expects 5:2), so real mode follows; not run against a production database.
+- **Ticket:** [#765](https://github.com/jose-codegourmet/rotra-v2/issues/765)
+- **Roadmap:** MVP — [Player](workstreams/player.md), [Admin](workstreams/admin.md)
+- **Decision:** the owner asked that nothing overlap the banner, that it use the 5:2 ratio of his banner photo (2560 × 1024), that the edit-banner control sit on the banner (top-right, "if possible"), and that the banner picker be a dialog with the same behaviour as the profile picture, on the profile and on Edit profile. The open points, as built:
+  - **Layout of the profile hero:** the banner sits at the top, edge to edge, at 5:2 with no fixed height. Below it, a row with the 88 px circular picture (left, with its pencil) and the name, nickname and badges to its right, 14 px apart. No negative margin and no surface ring: nothing overlaps the banner. The profile card and the Edit profile preview both use it.
+  - **Banner pencil:** a 34 px round accent button (the same as the picture pencil) in the banner's top-right corner, inset 10 px, “Change banner”. Only the own profile and the Edit profile preview show it; another player's profile never does. It is the one approved exception to “nothing on the banner”.
+  - **Compact profile cards** (the profile dialog, the Queue participant card, the private profile card, the player profile sheet) keep their small banner strip; only the profile hero changes.
+  - **Admin uploads move to 5:2 too:** uploads are centre-cropped to 5:2 and saved at 1000 × 400; the A-BANNERS copy says “cropped to 5:2” and its tiles are 5:2. Earlier 3:1 uploads keep working, centre-cropped to fill.
+  - **Banner dialog:** **Profile banner**, a grid of 5:2 tiles (2 across on phones, 3 from 640 px) with the draft outlined, the line “Public. Pick one of ROTRA's banners; your own images can't be uploaded.”, and **Cancel** / **Done**. Done is disabled until the pick changes and while saving; it saves with the toast “Banner updated”. Cancel or dismissing discards the draft.
+  - **Edit profile:** the inline banner swatches are gone; the preview's banner pencil opens the same dialog. Helper text: “This is how the top of your profile card looks. Tap a pencil to change your picture or banner.”
+- **Amends:** [D-2026-11-12-01](#d-2026-11-12-01) (profile banners) and the #751 design (ProfileHero's overlapping picture, the inline banner picker, 3:1 Admin crop). The D-2026-11-12-01 leftover “The Edit profile banner swatches cannot show a banner Admin later hid” now applies to the dialog.
+- **References:** [mockup log 2026-11-12-player-profile-banner-layout-dialog](../mockup-changes/2026-11-12-player-profile-banner-layout-dialog.md), [mockup log 2026-11-12-admin-banner-crop-5-2](../mockup-changes/2026-11-12-admin-banner-crop-5-2.md), [profile screen doc](../screens/product/modules/player-information/profile.md#profile-banner).
 <a id="d-2026-11-12-04"></a>
 ### D-2026-11-12-04 — Clubs on every readable profile; Leave club on the club page; no Report a problem (#766)
 - **Decision status:** approved (owner's words logged in #766, November 12, 2026; open points decided by the implementing agent, to be confirmed by the owner)

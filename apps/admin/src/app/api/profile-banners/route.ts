@@ -17,7 +17,7 @@ export async function GET() {
 
 /**
  * A-BANNERS › upload one banner: `{ id, image }`, where `id` is a client UUID (a retry returns the
- * saved row) and `image` the browser's 3:1 crop as a PNG, JPEG or WebP data URL up to 2 MB.
+ * saved row) and `image` the browser's 5:2 crop as a PNG, JPEG or WebP data URL up to 2 MB.
  */
 export async function POST(request: Request) {
   return handleAccountRequest('admin', routeCookieAdapter(await cookies()), async (admin) => {

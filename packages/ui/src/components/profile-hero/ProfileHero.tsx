@@ -5,6 +5,10 @@ import { ProfileBanner } from '@rotra/ui/profile-banner'
 import type { ReactNode } from 'react'
 import { type ProfileHeroVariants, profileHeroBannerVariants } from './ProfileHero.variants'
 
+/** The 34 px round accent pencil, on the picture and on the banner. */
+const PENCIL =
+  'absolute grid size-[34px] cursor-pointer place-items-center rounded-full border-2 border-surface bg-accent p-0 text-on-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent'
+
 export type ProfileHeroProps = ProfileHeroVariants & {
   /** Full name: the heading, and the initials when there is no picture */
   name: string
@@ -20,6 +24,11 @@ export type ProfileHeroProps = ProfileHeroVariants & {
   onViewPicture?: () => void
   /** The pencil on the picture (own profile, Edit profile preview); hidden when missing */
   onChangePicture?: () => void
+  /**
+   * The pencil in the banner's top-right corner (own profile, Edit profile preview): opens the
+   * Profile banner dialog. Hidden when missing; never on someone else's profile.
+   */
+  onChangeBanner?: () => void
   /** Under the name and nickname, e.g. the This is you chip */
   badges?: ReactNode
   /** Under the picture row, e.g. the Edit profile preview's helper line */
@@ -28,10 +37,10 @@ export type ProfileHeroProps = ProfileHeroVariants & {
 }
 
 /**
- * The top of the profile card (P-PROFILE, P-PUBLIC-PROFILE): a Profile banner strip edge to edge,
- * the 88 px circular picture overlapping its bottom edge with a surface-coloured ring, and the name
- * and nickname beside it. Edit profile › Name uses the same hero as a live preview
- * (placement="preview"). Put it first in a p-4 Card.
+ * The top of the profile card (P-PROFILE, P-PUBLIC-PROFILE): a 5:2 Profile banner edge to edge with
+ * nothing on it but the banner pencil (own profile), then a row with the 88 px circular picture and
+ * the name and nickname beside it (#765: nothing overlaps the banner). Edit profile › Name uses the
+ * same hero as a live preview (placement="preview"). Put it first in a p-4 Card.
  */
 export function ProfileHero({
   name,
@@ -41,6 +50,7 @@ export function ProfileHero({
   bannerImageUrl,
   onViewPicture,
   onChangePicture,
+  onChangeBanner,
   badges,
   children,
   placement = 'card',
@@ -54,19 +64,31 @@ export function ProfileHero({
       aria-label={preview ? 'Profile card preview' : undefined}
       className={cn('flex min-w-0 flex-col gap-3.5', className)}
     >
-      <ProfileBanner
-        bannerKey={bannerKey}
-        imageUrl={bannerImageUrl}
-        className={profileHeroBannerVariants({ placement })}
-      />
-      <div className="-mt-11 flex min-w-0 items-end gap-3.5">
+      <div className={profileHeroBannerVariants({ placement })}>
+        <ProfileBanner
+          bannerKey={bannerKey}
+          imageUrl={bannerImageUrl}
+          className="aspect-[5/2] w-full"
+        />
+        {onChangeBanner ? (
+          <button
+            type="button"
+            aria-label="Change banner"
+            title="Change banner"
+            onClick={onChangeBanner}
+            className={cn(PENCIL, 'top-2.5 right-2.5')}
+          >
+            <Icon name="edit" className="size-4" />
+          </button>
+        ) : null}
+      </div>
+      <div className="flex min-w-0 items-center gap-3.5">
         <span className="relative block flex-none">
           <Avatar
             name={name}
             src={pictureSrc ?? undefined}
             size={88}
             tone={pictureSrc ? 'neutral' : 'accent'}
-            className="shadow-[0_0_0_5px_var(--surface)]"
             onView={onViewPicture}
           />
           {onChangePicture ? (
@@ -75,7 +97,7 @@ export function ProfileHero({
               aria-label="Change profile picture"
               title="Change profile picture"
               onClick={onChangePicture}
-              className="absolute -right-1.5 -bottom-1.5 grid size-[34px] cursor-pointer place-items-center rounded-full border-2 border-surface bg-accent p-0 text-on-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              className={cn(PENCIL, '-right-1.5 -bottom-1.5')}
             >
               <Icon name="edit" className="size-4" />
             </button>

@@ -83,7 +83,7 @@ function find(draft: { profileBanners: ProfileBanner[] }, id: string) {
 
 /**
  * A-BANNERS › upload (several files at once). Each file is checked (PNG, JPG or WebP, up to 2 MB),
- * cropped to a centred 3:1 in the browser and saved shown, after the last banner. Rejected files are
+ * cropped to a centred 5:2 in the browser and saved shown, after the last banner. Rejected files are
  * listed in `notAdded`/`notAddedMessage`; they never fail the batch. `onProgress(done, total)` runs
  * after each file (the Uploading N of M bar). Offline → MockError('offline'), nothing saved. Real
  * mode saves one banner per request, in order; one the server can't read is listed as unreadable,

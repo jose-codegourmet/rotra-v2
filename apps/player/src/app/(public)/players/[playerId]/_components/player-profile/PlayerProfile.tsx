@@ -37,6 +37,7 @@ import { Skeleton } from '@rotra/ui/skeleton'
 import { toast } from '@rotra/ui/toaster'
 import { useRouter } from 'next/navigation'
 import { copyPlayerId } from '@/app/_components/copy-player-id/copyPlayerId'
+import { useBannerSheet } from '@/app/_components/profile-banner/useBannerSheet'
 import { pictureSrc } from '@/app/_components/profile-picture/pictureSrc'
 import { useProfilePictureSheet } from '@/app/_components/profile-picture/useProfilePictureSheet'
 import { usePlayerShareSheet } from '@/app/_components/share/usePlayerShareSheet'
@@ -83,6 +84,7 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
     current = rank.data
   const sharing = usePlayerShareSheet(isOwn ? playerId : null)
   const pictureEditor = useProfilePictureSheet(isOwn ? player : null)
+  const bannerEditor = useBannerSheet(isOwn ? player : null)
   const photo = usePhotoViewer()
   const failed = profile.isError || rank.isError || games.isError || settings.isError
   const retry = () => {
@@ -226,6 +228,7 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
                 picture ? () => photo.show({ src: picture, name: player.fullName }) : undefined
               }
               onChangePicture={pictureEditor.openSheet}
+              onChangeBanner={bannerEditor.openSheet}
               compareSignedIn={Boolean(session.data)}
               onCompare={
                 session.isPending || session.isError
@@ -243,6 +246,7 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
               onShare={isOwn ? sharing.openProfile : undefined}
             />
             {pictureEditor.sheet}
+            {bannerEditor.sheet}
             {photo.viewerProps ? <PhotoViewer {...photo.viewerProps} /> : null}
             {sharing.sheet}
             {isOwn && myAccount.data ? (

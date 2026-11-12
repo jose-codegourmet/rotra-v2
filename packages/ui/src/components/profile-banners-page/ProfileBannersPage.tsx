@@ -30,7 +30,7 @@ export type ProfileBannerTile = {
   name: string
   /** false = hidden from players (dimmed) */
   shown: boolean
-  /** An uploaded 3:1 image */
+  /** An uploaded 5:2 image */
   imageUrl?: string | null
   /** A seeded banner drawn from theme tokens (court, night, dusk, ember, sun, stripe) */
   bannerKey?: string | null
@@ -39,7 +39,7 @@ export type ProfileBannerTile = {
 export type ProfileBannersPageProps = {
   /** In upload order; the page never reorders */
   banners: ProfileBannerTile[]
-  /** Dropped or chosen files, unchecked: type, size and the 3:1 crop belong to the container */
+  /** Dropped or chosen files, unchecked: type, size and the 5:2 crop belong to the container */
   onFiles: (files: File[]) => void
   /** Click a tile: the container hides or shows it, or refuses below the minimum */
   onToggle: (id: string) => void
@@ -53,7 +53,7 @@ export type ProfileBannersPageProps = {
 
 /**
  * A-BANNERS (Admin › Settings › Profile banners), built like Profile characters: the header and
- * helper line with the shown and hidden counts, the drop zone, the upload progress, then the 3:1
+ * helper line with the shown and hidden counts, the drop zone, the upload progress, then the 5:2
  * banner tiles with their names. Toasts, the minimum rule and the save belong to the container.
  */
 export function ProfileBannersPage({
@@ -77,7 +77,7 @@ export function ProfileBannersPage({
         onFiles={onFiles}
         disabled={disabled}
         title="Drag banners here to upload"
-        hint="or click to choose · PNG, JPG or WebP, up to 2 MB each · cropped to 3:1"
+        hint="or click to choose · PNG, JPG or WebP, up to 2 MB each · cropped to 5:2"
       />
       {upload ? <UploadProgress done={upload.done} total={upload.total} /> : null}
       <CharacterGrid

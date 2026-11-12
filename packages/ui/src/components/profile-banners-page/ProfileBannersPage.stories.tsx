@@ -6,7 +6,7 @@ import { ProfileBannersPage, type ProfileBannerTile } from './ProfileBannersPage
 
 // The six seeded banners (drawn from tokens) plus one upload.
 const uploaded = `data:image/svg+xml;utf8,${encodeURIComponent(
-  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200"><rect width="600" height="200" fill="hsl(210 50% 45%)"/><circle cx="480" cy="60" r="90" fill="hsl(210 50% 65%)"/></svg>',
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400"><rect width="1000" height="400" fill="hsl(210 50% 45%)"/><circle cx="800" cy="120" r="180" fill="hsl(210 50% 65%)"/></svg>',
 )}`
 const seeded: ProfileBannerTile[] = PROFILE_BANNERS.map((banner, i) => ({
   id: `bn${i + 1}`,

@@ -11,7 +11,7 @@
 export type ProfileBanner = {
   /** A seeded key (court, night, dusk, ember, sun, stripe) or an uploaded UUID */
   id: string
-  /** '' for a seeded banner the apps draw from theme tokens by id; else the 3:1 image URL or data URL */
+  /** '' for a seeded banner the apps draw from theme tokens by id; else the 5:2 image URL or data URL */
   image: string
   /** Shown to players in the picker; hidden banners stay in the library, dimmed in Admin */
   shown: boolean

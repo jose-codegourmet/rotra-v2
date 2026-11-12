@@ -154,7 +154,7 @@
     "./profile-banner-card": "./src/components/profile-banner-card/ProfileBannerCard.tsx",
     "./profile-banner": "./src/components/profile-banner/ProfileBanner.tsx",
     "./profile-hero": "./src/components/profile-hero/ProfileHero.tsx",
-    "./banner-picker": "./src/components/banner-picker/BannerPicker.tsx",
+    "./banner-sheet": "./src/components/banner-sheet/BannerSheet.tsx",
     "./radio-choice-list": "./src/components/radio-choice-list/RadioChoiceList.tsx",
     "./profile-visibility-control": "./src/components/profile-visibility-control/ProfileVisibilityControl.tsx",
     "./player-information-card": "./src/components/player-information-card/PlayerInformationCard.tsx",

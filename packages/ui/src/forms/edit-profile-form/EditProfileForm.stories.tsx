@@ -20,7 +20,7 @@ const meta = {
     pictureName: jose.fullName,
     onChangePicture: fn(),
     bannerKey: 'court',
-    onBannerChange: fn(),
+    onChangeBanner: fn(),
     onRequestContactChange: fn(),
     onOpenPhonePrivacy: fn(),
   },
@@ -46,10 +46,10 @@ export const PreviewUpdatesAsTyped: Story = {
     await userEvent.type(nickname, 'Smash King')
   },
 }
-/** A banner is saving: the swatches are disabled */
-export const BannerSaving: Story = { args: { bannerKey: 'ember', bannerDisabled: true } }
-/** Without onBannerChange the Banner swatches are left out */
-export const WithoutBannerPicker: Story = { args: { onBannerChange: undefined } }
+/** The Ember banner in the preview, light theme */
+export const EmberBannerLight: Story = { args: { bannerKey: 'ember' }, globals: { theme: 'light' } }
+/** Without onChangeBanner the banner pencil is left out */
+export const WithoutBannerPencil: Story = { args: { onChangeBanner: undefined } }
 export const PlayingStyleSection: Story = { play: openSection('Playing style') }
 export const LinksSection: Story = { play: openSection('Links') }
 export const LinksSectionLight: Story = {

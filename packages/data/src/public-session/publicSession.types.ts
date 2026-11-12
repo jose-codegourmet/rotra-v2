@@ -38,7 +38,7 @@ export type PublicSessionParticipant = {
    * unclaimed profiles, who get the default gradient.
    */
   bannerKey?: string | null
-  /** The resolved banner's uploaded 3:1 image; null for a banner drawn from theme tokens */
+  /** The resolved banner's uploaded 5:2 image; null for a banner drawn from theme tokens */
   bannerImageUrl?: string | null
   skillGroup: 'beginner' | 'intermediate' | 'advanced' | null
   /** Full playing level for the avatar hover label, or null when unrated. */

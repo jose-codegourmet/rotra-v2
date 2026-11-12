@@ -89,7 +89,7 @@ export type PlayerProfile = {
    * shown, else the first shown banner (resolveProfileBanner). Set on every profile read.
    */
   bannerKey?: string
-  /** The resolved banner's uploaded 3:1 image; null for a seeded banner drawn from theme tokens */
+  /** The resolved banner's uploaded 5:2 image; null for a seeded banner drawn from theme tokens */
   bannerImageUrl?: string | null
   playingStyle: string
   experienceYears: number | null

@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-IN PROGRESS: 5 · IN MOCK APP: 131 · CANCELLED: 2 · MOCKUP ONLY: 4
+IN PROGRESS: 5 · IN MOCK APP: 133 · CANCELLED: 2 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -316,7 +316,9 @@ IN PROGRESS: 5 · IN MOCK APP: 131 · CANCELLED: 2 · MOCKUP ONLY: 4
 | [2026-11-11-queue-share-club-invite-copy-link](2026-11-11-queue-share-club-invite-copy-link.md) | Copy invite link on the Share club invite sheet | club-invite-card, share-card | IN MOCK APP — #708 |
 | [2026-11-11-queue-start-session-online-only](2026-11-11-queue-start-session-online-only.md) | Start session is online only | start-session-sheet, start-session-bar | IN MOCK APP — #721 |
 | [2026-11-11-queue-tab-focus-border](2026-11-11-queue-tab-focus-border.md) | Tabs: no thick focus border after a tap or click; thin ring for the keyboard (#736, proposed) | tabs | IN MOCK APP — #736 |
+| [2026-11-12-admin-banner-crop-5-2](2026-11-12-admin-banner-crop-5-2.md) | Admin › Profile banners: uploads cropped to 5:2, tiles 5:2 | profile-banners-page, character-grid, image-drop-zone | IN MOCK APP — #765 |
 | [2026-11-12-admin-pull-to-refresh](2026-11-12-admin-pull-to-refresh.md) | The request inboxes refresh when pulled down | pull-to-refresh (shared with the Queue log), data-table, list-row, password-reset-requests | IN MOCK APP — PR #763 |
+| [2026-11-12-player-profile-banner-layout-dialog](2026-11-12-player-profile-banner-layout-dialog.md) | Player profile banner: 5:2, nothing overlaps it, banner pencil and a banner dialog | profile-hero, player-identity-card, edit-profile-form, banner-sheet (new; replaces banner-picker) | IN MOCK APP — #765 |
 | [2026-11-12-player-profile-clubs-box](2026-11-12-player-profile-clubs-box.md) | Clubs on every readable profile as logo-and-name links; Leave club on the club page; no Report a problem | player-clubs-card, club-page-hero | IN MOCK APP — #766 |
 | [2026-11-12-player-pull-to-refresh](2026-11-12-player-pull-to-refresh.md) | The leaderboard, a club's page and the own profile refresh when pulled down | pull-to-refresh (shared with the Queue log), leaderboard-list, club-next-up-card, club-calendar, my-sessions-card | IN MOCK APP — PR #763 |
 | [2026-11-12-queue-pull-to-refresh](2026-11-12-queue-pull-to-refresh.md) | The session page refreshes when pulled down, and when the tab comes back | pull-to-refresh (new), public-refresh-bar | IN MOCK APP — PR #763 |

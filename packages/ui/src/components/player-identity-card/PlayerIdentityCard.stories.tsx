@@ -14,6 +14,7 @@ const meta = {
     onCopyId: () => {},
     onEdit: () => {},
     onChangePicture: () => {},
+    onChangeBanner: () => {},
     onOpenPlayerId: () => {},
     onShare: () => {},
     onCompare: () => {},

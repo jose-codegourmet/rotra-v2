@@ -431,9 +431,13 @@ a.srow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
   .prof > .side { position: sticky; top: calc(var(--top-h) + 16px + env(safe-area-inset-top, 0px)); }
 }
 .hero { display: flex; flex-direction: column; gap: 14px; }
-/* Owner comment, November 11, 2026: the profile hero carries a public banner like Discord, with the picture overlapping it. */
+/* Owner comment, November 11, 2026: the profile hero carries a public banner like Discord. */
+/* #765 (owner, November 12, 2026): nothing overlaps the banner; it is 5:2, the ratio of the owner's banner photo. Only the banner pencil sits on it (own profile, Edit profile). */
 .card.hero { padding-top: 0; overflow: hidden; }
-.hero-banner { height: 96px; margin: 0 -16px; }
+.hero-top { position: relative; margin: 0 -16px; }
+.hero-banner { aspect-ratio: 5 / 2; width: 100%; }
+.hero-top .bn-cam { position: absolute; top: 10px; right: 10px; width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--surface); background: var(--accent); color: var(--on-accent); display: grid; place-items: center; cursor: pointer; padding: 0; }
+.bn-cam svg { width: 16px; height: 16px; }
 /* Predefined banners only (owner comment, November 11, 2026). Each is built from the theme tokens so both themes hold up. */
 .bn-court { background: linear-gradient(135deg, var(--accent-dim), var(--accent) 55%, var(--accent-subtle)); }
 .bn-night { background: linear-gradient(135deg, var(--elev), var(--overlay) 60%, var(--border-strong)); }
@@ -441,16 +445,17 @@ a.srow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .bn-ember { background: linear-gradient(135deg, var(--error), var(--warn)); }
 .bn-sun { background: linear-gradient(135deg, var(--warn), var(--accent)); }
 .bn-stripe { background: repeating-linear-gradient(135deg, var(--accent-dim) 0 14px, var(--elev) 14px 28px); }
-.banner-pick { display: flex; flex-wrap: wrap; gap: 8px; }
-.banner-opt { width: 84px; height: 36px; border-radius: var(--r-sm); border: 2px solid var(--border); padding: 0; cursor: pointer; }
+/* #765: the banner picker is a dialog like Profile picture: 5:2 tiles, 2 across on phones, 3 from 640 px. */
+.banner-pick { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+@media (min-width: 640px) { .banner-pick { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.banner-opt { width: 100%; aspect-ratio: 5 / 2; border-radius: var(--r-sm); border: 2px solid var(--border); padding: 0; cursor: pointer; }
 .banner-opt[aria-checked="true"] { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-subtle); }
 .banner-opt:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.hero .who { display: flex; gap: 14px; align-items: flex-end; min-width: 0; margin-top: -44px; }
-.hero .who .avatar.xxl { box-shadow: 0 0 0 5px var(--surface); }
+.hero .who { display: flex; gap: 14px; align-items: center; min-width: 0; }
 .hero .who h1 { margin: 0; }
 /* Edit profile › Name: the top of the panel mirrors the profile card (owner comment, November 11, 2026). */
-.edit-hero .hero-banner { margin-top: -16px; border-radius: var(--r) var(--r) 0 0; }
-.edit-hero .who { align-items: flex-end; }
+.edit-hero .hero-top { margin-top: -16px; border-radius: var(--r) var(--r) 0 0; overflow: hidden; }
+.edit-hero .who { align-items: center; }
 .hero h1 { overflow-wrap: anywhere; }
 .avatar.xxl { width: 88px; height: 88px; border-radius: 50%; font-size: 30px; font-weight: 800; background: var(--accent); color: var(--on-accent); } /* circle: owner comment, November 11, 2026 */
 .avatar.xxl.photo { background: var(--elev); }
@@ -1296,7 +1301,7 @@ function viewProfile() {
   return `<main class="wrap"><div class="prof">
     <aside class="side stack">
       <section class="card hero">
-        <div class="hero-banner bn-${esc(bannerOf(p))}" aria-hidden="true"></div>
+        <div class="hero-top"><div class="hero-banner bn-${esc(bannerOf(p))}" aria-hidden="true"></div>${own ? `<button type="button" class="bn-cam" data-act="openBanner" aria-label="Change banner" title="Change banner">${I.edit}</button>` : ''}</div>
         <div class="who">${own ? `<span class="av-edit">${avatar(p, 'xxl', true)}<button type="button" class="av-cam" data-act="openAvatar" aria-label="Change profile picture" title="Change profile picture">${I.edit}</button></span>` : avatar(p, 'xxl', true)}<div style="min-width:0" class="stack tight"><h1>${esc(p.name)}</h1>${p.nick ? `<p class="muted">“${esc(p.nick)}”</p>` : ''}${own ? `<div class="row">${chip('This is you', 'ok')}</div>` : ''}</div></div>
         <div class="stack tight"><span class="label">Player ID</span>
           <div class="rtr-line"><code id="rtr-${p.id}">${esc(p.rtr)}</code><button class="btn xs" data-act="copyId" data-id="${p.id}" aria-label="Copy player ID">${I.copy} Copy</button></div>
@@ -1860,13 +1865,10 @@ function viewEdit() {
       <div class="row"><button type="button" class="btn sm" data-act="openRequest">Request a phone or email change</button><button type="button" class="btn sm ghost" data-act="go" data-to="account">Phone privacy</button></div>
       <p class="hint">Rank, club levels and game results come from clubs and can't be changed by players.</p>`
     : (tab.id === 'basics' ? `<div class="hero edit-hero" aria-label="Profile card preview">
-        <div class="hero-banner bn-${esc(bannerOf(p))}" aria-hidden="true"></div>
+        <div class="hero-top"><div class="hero-banner bn-${esc(bannerOf(p))}" aria-hidden="true"></div><button type="button" class="bn-cam" data-act="openBanner" aria-label="Change banner" title="Change banner">${I.edit}</button></div>
         <div class="who"><span class="av-edit">${avatar(p, 'xxl', true)}<button type="button" class="av-cam" data-act="openAvatar" aria-label="Change profile picture" title="Change profile picture">${I.edit}</button></span><div style="min-width:0" class="stack tight"><b style="font-size:20px">${esc((d.name || '').trim() || p.name)}</b>${(d.nick || '').trim() ? `<span class="muted">“${esc(d.nick.trim())}”</span>` : ''}</div></div>
-        <p class="hint" style="margin:0">This is how the top of your profile card looks. Tap the pencil to change your picture; pick a banner below.</p>
-      </div>
-      <div class="stack tight"><span class="label">Banner</span>
-        <div class="banner-pick" role="radiogroup" aria-label="Profile banner">${BANNERS.map(([k, l]) => `<button type="button" class="banner-opt bn-${k}" role="radio" aria-checked="${bannerOf(p) === k}" data-act="setBanner" data-v="${k}" aria-label="${l}" title="${l}"></button>`).join('')}</div>
-        <span class="hint">Selected: ${esc(BANNERS.find(([k]) => k === bannerOf(p))[1])} · Public. Pick one of ROTRA's banners; your own images can't be uploaded.</span></div>` : '') + tab.body('ui.edit', d, e, 'ed');
+        <p class="hint" style="margin:0">This is how the top of your profile card looks. Tap a pencil to change your picture or banner.</p>
+      </div>` : '') + tab.body('ui.edit', d, e, 'ed');
   return `<main class="wrap mid">
     <div class="page-head">${backBtn('cancelEdit', 'My profile')}<h1>Edit profile</h1>
       <p class="muted">Fields marked public appear on your profile for anyone to see.</p></div>
@@ -2197,6 +2199,7 @@ function sheetWrap(title, body, foot, wide = false) {
     <div class="sb">${body}</div>${foot ? `<footer>${foot}</footer>` : ''}</div>`;
 }
 let avatarDraft = null;
+let bannerDraft = null;
 // The character library is managed by the platform owner in the Admin app (Profile characters): only active characters, in the order set there.
 // The prototype stands in for that list with 24 seeded faces, shown 8 to a page (owner request, November 9, 2026).
 const FACES = ['', ...'abcdefghijklmnopqrstuvw'.split('')];
@@ -2240,6 +2243,14 @@ const SHEETS = {
         <nav class="pager" aria-label="Character pages"><button type="button" class="btn sm" data-act="avPage" data-v="${cur - 1}" ${cur === 0 ? 'disabled' : ''}>${I.back} Previous</button><span class="small muted" aria-live="polite">Page ${cur + 1} of ${pages}</span><button type="button" class="btn sm" data-act="avPage" data-v="${cur + 1}" ${cur >= pages - 1 ? 'disabled' : ''}>Next ${I.fwd}</button></nav></div>`;
       })()}
       <p class="hint">Only your current and previous photo are kept. Changes are saved only when you click Done. WebP, GIF, PNG, HEIC/HEIF and JPEG. Keep it to a clear picture of you; the club's Queue Master can ask you to change it.</p></div>`, '<button class="btn primary" data-act="saveAvatar">Done</button>');
+  },
+  // #765: Profile banner dialog, the same behaviour as Profile picture (draft, Done saves, Cancel or dismiss discards).
+  banner: () => {
+    const me = S.accounts[S.me], cur = bannerDraft || bannerOf(me);
+    return sheetWrap('Profile banner', `<div class="stack">
+      <div class="banner-pick" role="radiogroup" aria-label="Profile banner">${BANNERS.map(([k, l]) => `<button type="button" class="banner-opt bn-${k}" role="radio" aria-checked="${cur === k}" data-act="pickBanner" data-v="${k}" aria-label="${l}" title="${l}"></button>`).join('')}</div>
+      <p class="hint">Public. Pick one of ROTRA's banners; your own images can't be uploaded.</p></div>`,
+      `<button class="btn" data-act="closeSheet">Cancel</button><button class="btn primary" data-act="setBanner" ${cur === bannerOf(me) ? 'disabled' : ''}>Done</button>`);
   },
   share: (sh) => {
     const m = shareModel(sh), fmt = sh.fmt === 'story' ? 'story' : 'post';
@@ -2393,7 +2404,7 @@ const ACT = {
     render();
   },
   openDemo: () => { S.ui.resetArmed = false; S.ui.sheet = { type: 'demo' }; render(); },
-  closeSheet: () => { if (avatarDraft?.photoUrl?.startsWith('blob:')) URL.revokeObjectURL(avatarDraft.photoUrl); avatarDraft = null; S.ui.sheet = null; S.ui.pendingGo = null; render(); },
+  closeSheet: () => { if (avatarDraft?.photoUrl?.startsWith('blob:')) URL.revokeObjectURL(avatarDraft.photoUrl); avatarDraft = null; bannerDraft = null; S.ui.sheet = null; S.ui.pendingGo = null; render(); },
   showMore: () => { S.shown += 25; render(); },
   jumpMe: (el) => {
     S.q = ''; S.shown = Math.max(S.shown, Math.ceil(+el.dataset.pos / 25) * 25); render();
@@ -2472,8 +2483,10 @@ const ACT = {
   setFace: (el) => { const d = avatarDraft; if (d.photoUrl?.startsWith('blob:')) URL.revokeObjectURL(d.photoUrl); else if (d.photoUrl && !d.width) d.photoPrevUrl = d.photoUrl; Object.assign(d, { photo: true, photoUrl: '', face: el.dataset.v, width: 0, crop: null }); render(); },
   useInitials: () => { const d = avatarDraft; if (d.photoUrl?.startsWith('blob:')) URL.revokeObjectURL(d.photoUrl); else if (d.photoUrl && !d.width) d.photoPrevUrl = d.photoUrl; Object.assign(d, { photo: false, photoUrl: '', width: 0, crop: null }); render(); },
   removePhoto: () => ACT.useInitials(),
-  // Owner comment, November 11, 2026: banners are predefined only; picking one applies at once.
-  setBanner: (el) => { const me = S.me && S.accounts[S.me]; if (!me || !BANNERS.some(([k]) => k === el.dataset.v)) return; me.banner = el.dataset.v; render(); toast('Banner updated'); },
+  // Owner comment, November 11, 2026: banners are predefined only. #765 (November 12, 2026): picked in a dialog like Profile picture; Done applies, dismissing discards.
+  openBanner: () => { const me = S.me && S.accounts[S.me]; if (!me) return; bannerDraft = bannerOf(me); S.ui.sheet = { type: 'banner' }; render(); },
+  pickBanner: (el) => { if (!BANNERS.some(([k]) => k === el.dataset.v)) return; bannerDraft = el.dataset.v; render(); },
+  setBanner: () => { const me = S.me && S.accounts[S.me]; if (!me || !BANNERS.some(([k]) => k === bannerDraft)) return; const changed = bannerDraft !== bannerOf(me); me.banner = bannerDraft; ACT.closeSheet(); if (changed) toast('Banner updated'); },
   usePrevious: () => { const d = avatarDraft; if (!d.photoPrevUrl) return; const cur = d.photoUrl; Object.assign(d, { photo: true, photoUrl: d.photoPrevUrl, photoPrevUrl: cur || '', width: 0, crop: null }); render(); },
   saveAvatar: async () => {
     const a = avatarDraft;

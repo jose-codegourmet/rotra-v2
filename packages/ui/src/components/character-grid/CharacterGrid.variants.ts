@@ -1,6 +1,6 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
-/** character: square images, 88 px minimum (.ch-grid). banner: wide 3:1 tiles, 210 px minimum (.bn-grid). */
+/** character: square images, 88 px minimum (.ch-grid). banner: wide 5:2 tiles, 210 px minimum (.bn-grid). */
 export const characterGridVariants = cva('grid gap-3', {
   variants: {
     variant: {
@@ -17,7 +17,7 @@ export const characterGridTileVariants = cva(
     variants: {
       variant: {
         character: 'aspect-square rounded-[14px]',
-        banner: 'aspect-[3/1] rounded-lg',
+        banner: 'aspect-[5/2] rounded-lg',
       },
     },
     defaultVariants: { variant: 'character' },

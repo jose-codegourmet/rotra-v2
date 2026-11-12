@@ -52,9 +52,9 @@ export type ProfileBannerProps = {
 }
 
 /**
- * The banner art alone: a predefined token gradient or an uploaded 3:1 image. Decorative
- * (aria-hidden); the parent sets its size. Used by ProfileHero, BannerPicker swatches and the Admin
- * banners grid.
+ * The banner art alone: a predefined token gradient or an uploaded 5:2 image (older 3:1 uploads are
+ * centre-cropped to fill). Decorative (aria-hidden); the parent sets its size. Used by ProfileHero,
+ * BannerSheet tiles and the Admin banners grid.
  */
 export function ProfileBanner({ bannerKey, imageUrl, className }: ProfileBannerProps) {
   if (imageUrl)

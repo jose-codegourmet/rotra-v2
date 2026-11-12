@@ -16,6 +16,8 @@ export type PlayerIdentityCardProps = {
   onViewPicture?: () => void
   /** Owner only: opens Profile picture */
   onChangePicture?: () => void
+  /** Owner only: the banner pencil, opens the Profile banner dialog */
+  onChangeBanner?: () => void
   /** Owner only: opens My player ID */
   onOpenPlayerId?: () => void
   /** Owner only: opens the Share profile sheet */
@@ -36,6 +38,7 @@ export function PlayerIdentityCard({
   onEdit,
   onViewPicture,
   onChangePicture,
+  onChangeBanner,
   onOpenPlayerId,
   onShare,
   onCompare,
@@ -54,6 +57,7 @@ export function PlayerIdentityCard({
           bannerImageUrl={bannerImageUrl}
           onViewPicture={onViewPicture}
           onChangePicture={isOwn ? (onChangePicture ?? (() => {})) : undefined}
+          onChangeBanner={isOwn ? onChangeBanner : undefined}
           badges={isOwn ? <Chip tone="accent">This is you</Chip> : undefined}
         />
         <div className="flex flex-col gap-2">

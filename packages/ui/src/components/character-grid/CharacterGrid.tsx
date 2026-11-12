@@ -39,7 +39,7 @@ export type CharacterGridProps = CharacterGridVariants & {
 
 /**
  * The prototype's .ch-grid (Admin › Settings › Profile characters): square character images, 88 px
- * minimum, 12 px gap. variant="banner" is .bn-grid (Profile banners): wide 3:1 tiles, 210 px minimum,
+ * minimum, 12 px gap. variant="banner" is .bn-grid (Profile banners): wide 5:2 tiles, 210 px minimum,
  * each with its name under it. Pressing a tile shows or hides it; the small × on its corner deletes
  * it. Characters have no names; the label is their stored number ("Character 3, hidden").
  */

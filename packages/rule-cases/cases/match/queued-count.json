@@ -1,0 +1,73 @@
+{
+  "rule": "match/queued-count",
+  "version": 1,
+  "cases": [
+    {
+      "name": "Catch Up › prioritizes lagging players and allows above-target fillers without changing played games (autoQueue)",
+      "input": {
+        "args": [
+          "s-tonight-player-4",
+          [
+            {
+              "id": "catch-1",
+              "sessionId": "s-tonight",
+              "matchNo": 5,
+              "state": "completed",
+              "format": "doubles",
+              "queuePosition": 5,
+              "origin": "manual",
+              "manualProtected": true,
+              "teamA": [
+                "s-tonight-player-1",
+                "s-tonight-player-2"
+              ],
+              "teamB": [
+                "s-tonight-player-3",
+                "s-tonight-player-4"
+              ],
+              "courtIds": [],
+              "startedAt": 1799998200000,
+              "endedAt": 1799999400000,
+              "substitutions": [],
+              "decision": {
+                "kind": "completed",
+                "winningTeam": "A",
+                "teamAScore": 21,
+                "teamBScore": 17,
+                "confirmedAt": 1799999400000
+              }
+            },
+            {
+              "id": "catch-2",
+              "sessionId": "s-tonight",
+              "matchNo": 5,
+              "state": "completed",
+              "format": "singles",
+              "queuePosition": 5,
+              "origin": "manual",
+              "manualProtected": true,
+              "teamA": [
+                "s-tonight-player-3"
+              ],
+              "teamB": [
+                "s-tonight-player-4"
+              ],
+              "courtIds": [],
+              "startedAt": 1799998200000,
+              "endedAt": 1799999400000,
+              "substitutions": [],
+              "decision": {
+                "kind": "completed",
+                "winningTeam": "A",
+                "teamAScore": 21,
+                "teamBScore": 17,
+                "confirmedAt": 1799999400000
+              }
+            }
+          ]
+        ]
+      },
+      "expected": 0
+    }
+  ]
+}

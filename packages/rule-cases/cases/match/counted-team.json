@@ -1,0 +1,124 @@
+{
+  "rule": "match/counted-team",
+  "version": 1,
+  "cases": [
+    {
+      "name": "prototype reference awards › uses the level-index expected win chance and needs two counted games for MVP (sessionResult)",
+      "input": {
+        "args": [
+          {
+            "id": "e1468fa1-eb85-4ab4-865f-39f4cc480696",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": [
+              "Zoe"
+            ],
+            "teamB": [
+              "Amy"
+            ],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          },
+          "Ben"
+        ]
+      },
+      "expected": null
+    },
+    {
+      "name": "prototype reference awards › never fills Most Improved or Off Day without a five-session baseline (sessionResult)",
+      "input": {
+        "args": [
+          {
+            "id": "0a745b91-5b5d-410c-bb31-9ad218be14e0",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": [
+              "Zoe"
+            ],
+            "teamB": [
+              "Amy"
+            ],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          },
+          "Eve"
+        ]
+      },
+      "expected": null
+    },
+    {
+      "name": "substitution game credit › gives the outgoing player the game with the side they played on (match)",
+      "input": {
+        "args": [
+          {
+            "id": "b6466ee5-6959-491a-af35-c0b47087fdbe",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": [
+              "Zoe",
+              "Amy"
+            ],
+            "teamB": [
+              "Ben",
+              "Dan"
+            ],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1,
+            "substitutions": [
+              {
+                "outId": "Eve",
+                "inId": "Zoe",
+                "team": "A",
+                "at": 0,
+                "creditTo": "outgoing"
+              }
+            ],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          },
+          "Eve"
+        ]
+      },
+      "expected": "A"
+    }
+  ]
+}

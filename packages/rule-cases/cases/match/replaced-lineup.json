@@ -1,0 +1,52 @@
+{
+  "rule": "match/replaced-lineup",
+  "version": 1,
+  "cases": [
+    {
+      "name": "On court actions › replaces a player with a present player who is not busy (match)",
+      "input": {
+        "args": [
+          {
+            "id": "placed",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "on_court",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": [
+              "Migs",
+              "Amy"
+            ],
+            "teamB": [
+              "Ben",
+              "Dan"
+            ],
+            "courtIds": [
+              "c1"
+            ],
+            "startedAt": null,
+            "endedAt": null,
+            "substitutions": [],
+            "decision": null,
+            "placedAt": 0
+          },
+          "Amy",
+          "Gus"
+        ]
+      },
+      "expected": {
+        "format": "doubles",
+        "teamA": [
+          "Migs",
+          "Gus"
+        ],
+        "teamB": [
+          "Ben",
+          "Dan"
+        ]
+      }
+    }
+  ]
+}

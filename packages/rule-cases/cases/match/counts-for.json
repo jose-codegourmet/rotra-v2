@@ -1,0 +1,555 @@
+{
+  "rule": "match/counts-for",
+  "version": 1,
+  "cases": [
+    {
+      "name": "substitution game credit › gives nobody the game by default (match) #1",
+      "input": {
+        "args": [
+          {
+            "id": "e6b7a113-3c7a-4156-a994-0e4b185ceedf",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": [
+              "Zoe",
+              "Amy"
+            ],
+            "teamB": [
+              "Ben",
+              "Dan"
+            ],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1,
+            "substitutions": [
+              {
+                "outId": "Eve",
+                "inId": "Zoe",
+                "team": "A",
+                "at": 0
+              }
+            ],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          },
+          "Zoe"
+        ]
+      },
+      "expected": false
+    },
+    {
+      "name": "substitution game credit › gives nobody the game by default (match) #2",
+      "input": {
+        "args": [
+          {
+            "id": "e6b7a113-3c7a-4156-a994-0e4b185ceedf",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": [
+              "Zoe",
+              "Amy"
+            ],
+            "teamB": [
+              "Ben",
+              "Dan"
+            ],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1,
+            "substitutions": [
+              {
+                "outId": "Eve",
+                "inId": "Zoe",
+                "team": "A",
+                "at": 0
+              }
+            ],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          },
+          "Eve"
+        ]
+      },
+      "expected": false
+    },
+    {
+      "name": "substitution game credit › gives nobody the game by default (match) #3",
+      "input": {
+        "args": [
+          {
+            "id": "e6b7a113-3c7a-4156-a994-0e4b185ceedf",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": [
+              "Zoe",
+              "Amy"
+            ],
+            "teamB": [
+              "Ben",
+              "Dan"
+            ],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1,
+            "substitutions": [
+              {
+                "outId": "Eve",
+                "inId": "Zoe",
+                "team": "A",
+                "at": 0
+              }
+            ],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          },
+          "Amy"
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "substitution game credit › gives nobody the game by default (match) #4",
+      "input": {
+        "args": [
+          {
+            "id": "c2b3a0a0-b107-4911-a4a5-1124a7ef61b1",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": [
+              "Zoe",
+              "Amy"
+            ],
+            "teamB": [
+              "Ben",
+              "Dan"
+            ],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1,
+            "substitutions": [
+              {
+                "outId": "Eve",
+                "inId": "Zoe",
+                "team": "A",
+                "at": 0,
+                "creditTo": "none"
+              }
+            ],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          },
+          "Zoe"
+        ]
+      },
+      "expected": false
+    },
+    {
+      "name": "substitution game credit › gives nobody the game by default (match) #5",
+      "input": {
+        "args": [
+          {
+            "id": "c2b3a0a0-b107-4911-a4a5-1124a7ef61b1",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": [
+              "Zoe",
+              "Amy"
+            ],
+            "teamB": [
+              "Ben",
+              "Dan"
+            ],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1,
+            "substitutions": [
+              {
+                "outId": "Eve",
+                "inId": "Zoe",
+                "team": "A",
+                "at": 0,
+                "creditTo": "none"
+              }
+            ],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          },
+          "Eve"
+        ]
+      },
+      "expected": false
+    },
+    {
+      "name": "substitution game credit › gives nobody the game by default (match) #6",
+      "input": {
+        "args": [
+          {
+            "id": "c2b3a0a0-b107-4911-a4a5-1124a7ef61b1",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": [
+              "Zoe",
+              "Amy"
+            ],
+            "teamB": [
+              "Ben",
+              "Dan"
+            ],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1,
+            "substitutions": [
+              {
+                "outId": "Eve",
+                "inId": "Zoe",
+                "team": "A",
+                "at": 0,
+                "creditTo": "none"
+              }
+            ],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          },
+          "Amy"
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "substitution game credit › gives the incoming player the game, the win and minimum credit (match) #1",
+      "input": {
+        "args": [
+          {
+            "id": "7c38aed7-afd1-42d8-87ff-bd1f6dcfbcbb",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": [
+              "Zoe",
+              "Amy"
+            ],
+            "teamB": [
+              "Ben",
+              "Dan"
+            ],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1,
+            "substitutions": [
+              {
+                "outId": "Eve",
+                "inId": "Zoe",
+                "team": "A",
+                "at": 0,
+                "creditTo": "incoming"
+              }
+            ],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          },
+          "Zoe"
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "substitution game credit › gives the incoming player the game, the win and minimum credit (match) #2",
+      "input": {
+        "args": [
+          {
+            "id": "7c38aed7-afd1-42d8-87ff-bd1f6dcfbcbb",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": [
+              "Zoe",
+              "Amy"
+            ],
+            "teamB": [
+              "Ben",
+              "Dan"
+            ],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1,
+            "substitutions": [
+              {
+                "outId": "Eve",
+                "inId": "Zoe",
+                "team": "A",
+                "at": 0,
+                "creditTo": "incoming"
+              }
+            ],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          },
+          "Eve"
+        ]
+      },
+      "expected": false
+    },
+    {
+      "name": "substitution game credit › gives the outgoing player the game with the side they played on (match) #1",
+      "input": {
+        "args": [
+          {
+            "id": "b6466ee5-6959-491a-af35-c0b47087fdbe",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": [
+              "Zoe",
+              "Amy"
+            ],
+            "teamB": [
+              "Ben",
+              "Dan"
+            ],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1,
+            "substitutions": [
+              {
+                "outId": "Eve",
+                "inId": "Zoe",
+                "team": "A",
+                "at": 0,
+                "creditTo": "outgoing"
+              }
+            ],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          },
+          "Eve"
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "substitution game credit › gives the outgoing player the game with the side they played on (match) #2",
+      "input": {
+        "args": [
+          {
+            "id": "b6466ee5-6959-491a-af35-c0b47087fdbe",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": [
+              "Zoe",
+              "Amy"
+            ],
+            "teamB": [
+              "Ben",
+              "Dan"
+            ],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1,
+            "substitutions": [
+              {
+                "outId": "Eve",
+                "inId": "Zoe",
+                "team": "A",
+                "at": 0,
+                "creditTo": "outgoing"
+              }
+            ],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          },
+          "Zoe"
+        ]
+      },
+      "expected": false
+    },
+    {
+      "name": "substitution game credit › gives nobody anything from an invalid match (match) #1",
+      "input": {
+        "args": [
+          {
+            "id": "27ce5522-9cde-4070-9361-ffdf74049738",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "invalid",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": [
+              "Zoe",
+              "Amy"
+            ],
+            "teamB": [
+              "Ben",
+              "Dan"
+            ],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1,
+            "substitutions": [
+              {
+                "outId": "Eve",
+                "inId": "Zoe",
+                "team": "A",
+                "at": 0,
+                "creditTo": "incoming"
+              }
+            ],
+            "decision": {
+              "kind": "invalid",
+              "winningTeam": null,
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          },
+          "Zoe"
+        ]
+      },
+      "expected": false
+    },
+    {
+      "name": "substitution game credit › gives nobody anything from an invalid match (match) #2",
+      "input": {
+        "args": [
+          {
+            "id": "27ce5522-9cde-4070-9361-ffdf74049738",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "invalid",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": [
+              "Zoe",
+              "Amy"
+            ],
+            "teamB": [
+              "Ben",
+              "Dan"
+            ],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1,
+            "substitutions": [
+              {
+                "outId": "Eve",
+                "inId": "Zoe",
+                "team": "A",
+                "at": 0,
+                "creditTo": "incoming"
+              }
+            ],
+            "decision": {
+              "kind": "invalid",
+              "winningTeam": null,
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          },
+          "Amy"
+        ]
+      },
+      "expected": false
+    }
+  ]
+}

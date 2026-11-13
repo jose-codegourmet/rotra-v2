@@ -1,0 +1,54 @@
+{
+  "rule": "match/counted-games",
+  "version": 1,
+  "cases": [
+    {
+      "name": "substitution game credit › gives the incoming player the game, the win and minimum credit (match)",
+      "input": {
+        "args": [
+          "Zoe",
+          [
+            {
+              "id": "7c38aed7-afd1-42d8-87ff-bd1f6dcfbcbb",
+              "sessionId": "s",
+              "matchNo": 1,
+              "state": "completed",
+              "format": "doubles",
+              "queuePosition": 1,
+              "origin": "manual",
+              "manualProtected": true,
+              "teamA": [
+                "Zoe",
+                "Amy"
+              ],
+              "teamB": [
+                "Ben",
+                "Dan"
+              ],
+              "courtIds": [],
+              "startedAt": 0,
+              "endedAt": 1,
+              "substitutions": [
+                {
+                  "outId": "Eve",
+                  "inId": "Zoe",
+                  "team": "A",
+                  "at": 0,
+                  "creditTo": "incoming"
+                }
+              ],
+              "decision": {
+                "kind": "completed",
+                "winningTeam": "A",
+                "teamAScore": null,
+                "teamBScore": null,
+                "confirmedAt": 1
+              }
+            }
+          ]
+        ]
+      },
+      "expected": 1
+    }
+  ]
+}

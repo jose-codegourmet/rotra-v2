@@ -1,0 +1,855 @@
+{
+  "rule": "match/not-enough-free-players",
+  "version": 1,
+  "cases": [
+    {
+      "name": "Short on players › \"Not enough free players.\" below the smallest standard match (autoFill) #1",
+      "input": {
+        "args": [
+          {
+            "allowDoubles": true,
+            "allowSingles": false
+          },
+          {
+            "roster": [
+              {
+                "id": "s-tonight-player-1",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "c3e0d1c0-f087-5514-8c94-7ce61c54ed3f",
+                "nameSnapshot": "Jose",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 1794536408195,
+                "level": "intermediate_low",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008181
+              },
+              {
+                "id": "s-tonight-player-2",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "62dc8cc2-6673-5356-b659-51e1fa5d533c",
+                "nameSnapshot": "Aaron",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 1794536408195,
+                "level": "intermediate_high",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008182
+              },
+              {
+                "id": "s-tonight-player-3",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "81477e7c-8d55-5b0c-a9a4-b77f54652a0e",
+                "nameSnapshot": "Raymark",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 1794536408195,
+                "level": "intermediate_high",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008183
+              },
+              {
+                "id": "s-tonight-player-4",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "86107d84-f50e-5903-8107-12a51cb04f5f",
+                "nameSnapshot": "Mikee Abellana",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 1794536408195,
+                "level": "intermediate_mid",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008184
+              },
+              {
+                "id": "s-tonight-player-5",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "a81bdb0d-e70c-5c8d-9581-da1ef734d0ba",
+                "nameSnapshot": "Gab",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 1794536408195,
+                "level": "advanced_mid",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008185
+              },
+              {
+                "id": "s-tonight-player-6",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "84fd1240-17b2-5e17-8647-d8dc7d4f4b64",
+                "nameSnapshot": "Dexter",
+                "nicknameSnapshot": null,
+                "present": false,
+                "presentChangedAt": 1794536408195,
+                "level": "intermediate_mid",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008186
+              },
+              {
+                "id": "s-tonight-player-7",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "a8e95e02-f2d7-574d-97c7-26ee8abe0bc0",
+                "nameSnapshot": "Dalton",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 1794536408195,
+                "level": "intermediate_mid",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008187
+              },
+              {
+                "id": "s-tonight-player-8",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "04e75a8d-2abd-5f74-bb29-50234babc853",
+                "nameSnapshot": "Joeriz",
+                "nicknameSnapshot": null,
+                "present": false,
+                "presentChangedAt": 1794536408195,
+                "level": "intermediate_low",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008188
+              },
+              {
+                "id": "s-tonight-player-9",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "c927b4df-93eb-5e9a-a042-d6db900e2788",
+                "nameSnapshot": "Albion",
+                "nicknameSnapshot": null,
+                "present": false,
+                "presentChangedAt": 1794536408195,
+                "level": "intermediate_mid",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008189
+              },
+              {
+                "id": "s-tonight-player-10",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "af53ebbc-d70a-5d2b-9a2f-d4eea6b2e2af",
+                "nameSnapshot": "Vince",
+                "nicknameSnapshot": null,
+                "present": false,
+                "presentChangedAt": 1794536408195,
+                "level": "intermediate_mid",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008190
+              },
+              {
+                "id": "s-tonight-player-11",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "d566cf90-560d-59a0-8a25-8aad6f9f4a2f",
+                "nameSnapshot": "Karl",
+                "nicknameSnapshot": null,
+                "present": false,
+                "presentChangedAt": 1794536408195,
+                "level": "advanced_mid",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008191
+              },
+              {
+                "id": "s-tonight-player-12",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "1a31f9b1-a7b8-5f8a-b2ed-28bc867e14d1",
+                "nameSnapshot": "Klod",
+                "nicknameSnapshot": null,
+                "present": false,
+                "presentChangedAt": 1794536408195,
+                "level": "intermediate_low",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008192
+              },
+              {
+                "id": "s-tonight-player-13",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "0cdbe83b-71ae-5b60-9904-5bbc97cc5d65",
+                "nameSnapshot": "Jasper",
+                "nicknameSnapshot": null,
+                "present": false,
+                "presentChangedAt": 1794538808195,
+                "level": "intermediate_mid",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008193,
+                "selfCheckedInAt": 1794538808195
+              },
+              {
+                "id": "s-tonight-player-14",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "54cd5564-f545-59b2-a4c2-b2b010437774",
+                "nameSnapshot": "Emji",
+                "nicknameSnapshot": null,
+                "present": false,
+                "presentChangedAt": 1794536408195,
+                "level": "advanced_mid",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008194
+              },
+              {
+                "id": "s-tonight-player-15",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "7c577815-7bfd-5391-9a3a-c85a7016f0ff",
+                "nameSnapshot": "Kenji",
+                "nicknameSnapshot": null,
+                "present": false,
+                "presentChangedAt": 1794536408195,
+                "level": "advanced_mid",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008195
+              },
+              {
+                "id": "s-tonight-player-16",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "39ca913f-d4cd-540b-8e1e-a377ea21b1de",
+                "nameSnapshot": "Kenjie",
+                "nicknameSnapshot": null,
+                "present": false,
+                "presentChangedAt": 1794536408195,
+                "level": "advanced_mid",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008196
+              },
+              {
+                "id": "s-tonight-player-17",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "9e27a818-8022-5655-a8d6-3d2bf362db34",
+                "nameSnapshot": "Maria Steph",
+                "nicknameSnapshot": "Atty Steph",
+                "present": false,
+                "presentChangedAt": 1794536408195,
+                "level": "intermediate_low",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008197
+              }
+            ],
+            "courts": [
+              {
+                "id": "s-tonight-court-1",
+                "sessionId": "s-tonight",
+                "label": "Court 1",
+                "startsAt": 1794536408195,
+                "openUntil": null,
+                "removedAt": null
+              },
+              {
+                "id": "s-tonight-court-2",
+                "sessionId": "s-tonight",
+                "label": "Court 2",
+                "startsAt": 1794536408195,
+                "openUntil": null,
+                "removedAt": null
+              },
+              {
+                "id": "s-tonight-court-3",
+                "sessionId": "s-tonight",
+                "label": "Court 3",
+                "startsAt": 1794536408195,
+                "openUntil": 1794539948195,
+                "removedAt": null
+              },
+              {
+                "id": "s-tonight-court-4",
+                "sessionId": "s-tonight",
+                "label": "Court 4",
+                "startsAt": 1794536408195,
+                "openUntil": null,
+                "removedAt": null
+              }
+            ],
+            "matches": [
+              {
+                "id": "console-match-1",
+                "sessionId": "s-tonight",
+                "matchNo": 1,
+                "state": "active",
+                "format": "doubles",
+                "queuePosition": 1,
+                "origin": "manual",
+                "manualProtected": true,
+                "teamA": [
+                  "s-tonight-player-1",
+                  "s-tonight-player-2"
+                ],
+                "teamB": [
+                  "s-tonight-player-3",
+                  "s-tonight-player-4"
+                ],
+                "courtIds": [
+                  "s-tonight-court-1"
+                ],
+                "startedAt": 1794538208195,
+                "endedAt": null,
+                "substitutions": [],
+                "decision": null
+              }
+            ],
+            "now": 1794540008195
+          }
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "Short on players › \"Not enough free players.\" below the smallest standard match (autoFill) #2",
+      "input": {
+        "args": [
+          {
+            "allowDoubles": true,
+            "allowSingles": true
+          },
+          {
+            "roster": [
+              {
+                "id": "s-tonight-player-1",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "c3e0d1c0-f087-5514-8c94-7ce61c54ed3f",
+                "nameSnapshot": "Jose",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 1794536408195,
+                "level": "intermediate_low",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008181
+              },
+              {
+                "id": "s-tonight-player-2",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "62dc8cc2-6673-5356-b659-51e1fa5d533c",
+                "nameSnapshot": "Aaron",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 1794536408195,
+                "level": "intermediate_high",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008182
+              },
+              {
+                "id": "s-tonight-player-3",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "81477e7c-8d55-5b0c-a9a4-b77f54652a0e",
+                "nameSnapshot": "Raymark",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 1794536408195,
+                "level": "intermediate_high",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008183
+              },
+              {
+                "id": "s-tonight-player-4",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "86107d84-f50e-5903-8107-12a51cb04f5f",
+                "nameSnapshot": "Mikee Abellana",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 1794536408195,
+                "level": "intermediate_mid",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008184
+              },
+              {
+                "id": "s-tonight-player-5",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "a81bdb0d-e70c-5c8d-9581-da1ef734d0ba",
+                "nameSnapshot": "Gab",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 1794536408195,
+                "level": "advanced_mid",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008185
+              },
+              {
+                "id": "s-tonight-player-6",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "84fd1240-17b2-5e17-8647-d8dc7d4f4b64",
+                "nameSnapshot": "Dexter",
+                "nicknameSnapshot": null,
+                "present": false,
+                "presentChangedAt": 1794536408195,
+                "level": "intermediate_mid",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008186
+              },
+              {
+                "id": "s-tonight-player-7",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "a8e95e02-f2d7-574d-97c7-26ee8abe0bc0",
+                "nameSnapshot": "Dalton",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 1794536408195,
+                "level": "intermediate_mid",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008187
+              },
+              {
+                "id": "s-tonight-player-8",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "04e75a8d-2abd-5f74-bb29-50234babc853",
+                "nameSnapshot": "Joeriz",
+                "nicknameSnapshot": null,
+                "present": false,
+                "presentChangedAt": 1794536408195,
+                "level": "intermediate_low",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008188
+              },
+              {
+                "id": "s-tonight-player-9",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "c927b4df-93eb-5e9a-a042-d6db900e2788",
+                "nameSnapshot": "Albion",
+                "nicknameSnapshot": null,
+                "present": false,
+                "presentChangedAt": 1794536408195,
+                "level": "intermediate_mid",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008189
+              },
+              {
+                "id": "s-tonight-player-10",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "af53ebbc-d70a-5d2b-9a2f-d4eea6b2e2af",
+                "nameSnapshot": "Vince",
+                "nicknameSnapshot": null,
+                "present": false,
+                "presentChangedAt": 1794536408195,
+                "level": "intermediate_mid",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008190
+              },
+              {
+                "id": "s-tonight-player-11",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "d566cf90-560d-59a0-8a25-8aad6f9f4a2f",
+                "nameSnapshot": "Karl",
+                "nicknameSnapshot": null,
+                "present": false,
+                "presentChangedAt": 1794536408195,
+                "level": "advanced_mid",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008191
+              },
+              {
+                "id": "s-tonight-player-12",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "1a31f9b1-a7b8-5f8a-b2ed-28bc867e14d1",
+                "nameSnapshot": "Klod",
+                "nicknameSnapshot": null,
+                "present": false,
+                "presentChangedAt": 1794536408195,
+                "level": "intermediate_low",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008192
+              },
+              {
+                "id": "s-tonight-player-13",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "0cdbe83b-71ae-5b60-9904-5bbc97cc5d65",
+                "nameSnapshot": "Jasper",
+                "nicknameSnapshot": null,
+                "present": false,
+                "presentChangedAt": 1794538808195,
+                "level": "intermediate_mid",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008193,
+                "selfCheckedInAt": 1794538808195
+              },
+              {
+                "id": "s-tonight-player-14",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "54cd5564-f545-59b2-a4c2-b2b010437774",
+                "nameSnapshot": "Emji",
+                "nicknameSnapshot": null,
+                "present": false,
+                "presentChangedAt": 1794536408195,
+                "level": "advanced_mid",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008194
+              },
+              {
+                "id": "s-tonight-player-15",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "7c577815-7bfd-5391-9a3a-c85a7016f0ff",
+                "nameSnapshot": "Kenji",
+                "nicknameSnapshot": null,
+                "present": false,
+                "presentChangedAt": 1794536408195,
+                "level": "advanced_mid",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008195
+              },
+              {
+                "id": "s-tonight-player-16",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "39ca913f-d4cd-540b-8e1e-a377ea21b1de",
+                "nameSnapshot": "Kenjie",
+                "nicknameSnapshot": null,
+                "present": false,
+                "presentChangedAt": 1794536408195,
+                "level": "advanced_mid",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008196
+              },
+              {
+                "id": "s-tonight-player-17",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "9e27a818-8022-5655-a8d6-3d2bf362db34",
+                "nameSnapshot": "Maria Steph",
+                "nicknameSnapshot": "Atty Steph",
+                "present": false,
+                "presentChangedAt": 1794536408195,
+                "level": "intermediate_low",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008197
+              }
+            ],
+            "courts": [
+              {
+                "id": "s-tonight-court-1",
+                "sessionId": "s-tonight",
+                "label": "Court 1",
+                "startsAt": 1794536408195,
+                "openUntil": null,
+                "removedAt": null
+              },
+              {
+                "id": "s-tonight-court-2",
+                "sessionId": "s-tonight",
+                "label": "Court 2",
+                "startsAt": 1794536408195,
+                "openUntil": null,
+                "removedAt": null
+              },
+              {
+                "id": "s-tonight-court-3",
+                "sessionId": "s-tonight",
+                "label": "Court 3",
+                "startsAt": 1794536408195,
+                "openUntil": 1794539948195,
+                "removedAt": null
+              },
+              {
+                "id": "s-tonight-court-4",
+                "sessionId": "s-tonight",
+                "label": "Court 4",
+                "startsAt": 1794536408195,
+                "openUntil": null,
+                "removedAt": null
+              }
+            ],
+            "matches": [
+              {
+                "id": "console-match-1",
+                "sessionId": "s-tonight",
+                "matchNo": 1,
+                "state": "active",
+                "format": "doubles",
+                "queuePosition": 1,
+                "origin": "manual",
+                "manualProtected": true,
+                "teamA": [
+                  "s-tonight-player-1",
+                  "s-tonight-player-2"
+                ],
+                "teamB": [
+                  "s-tonight-player-3",
+                  "s-tonight-player-4"
+                ],
+                "courtIds": [
+                  "s-tonight-court-1"
+                ],
+                "startedAt": 1794538208195,
+                "endedAt": null,
+                "substitutions": [],
+                "decision": null
+              }
+            ],
+            "now": 1794540008195
+          }
+        ]
+      },
+      "expected": false
+    },
+    {
+      "name": "Short on players › \"Not enough free players.\" below the smallest standard match (autoFill) #3",
+      "input": {
+        "args": [
+          {
+            "allowDoubles": true,
+            "allowSingles": false
+          },
+          {
+            "roster": [
+              {
+                "id": "s-tonight-player-1",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "c3e0d1c0-f087-5514-8c94-7ce61c54ed3f",
+                "nameSnapshot": "Jose",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 1794536408195,
+                "level": "intermediate_low",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008181
+              },
+              {
+                "id": "s-tonight-player-2",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "62dc8cc2-6673-5356-b659-51e1fa5d533c",
+                "nameSnapshot": "Aaron",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 1794536408195,
+                "level": "intermediate_high",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008182
+              },
+              {
+                "id": "s-tonight-player-3",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "81477e7c-8d55-5b0c-a9a4-b77f54652a0e",
+                "nameSnapshot": "Raymark",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 1794536408195,
+                "level": "intermediate_high",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008183
+              },
+              {
+                "id": "s-tonight-player-4",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "86107d84-f50e-5903-8107-12a51cb04f5f",
+                "nameSnapshot": "Mikee Abellana",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 1794536408195,
+                "level": "intermediate_mid",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008184
+              },
+              {
+                "id": "s-tonight-player-5",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "a81bdb0d-e70c-5c8d-9581-da1ef734d0ba",
+                "nameSnapshot": "Gab",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 1794536408195,
+                "level": "advanced_mid",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008185
+              },
+              {
+                "id": "s-tonight-player-6",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "84fd1240-17b2-5e17-8647-d8dc7d4f4b64",
+                "nameSnapshot": "Dexter",
+                "nicknameSnapshot": null,
+                "present": false,
+                "presentChangedAt": 1794536408195,
+                "level": "intermediate_mid",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008186
+              },
+              {
+                "id": "s-tonight-player-7",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "a8e95e02-f2d7-574d-97c7-26ee8abe0bc0",
+                "nameSnapshot": "Dalton",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 1794536408195,
+                "level": "intermediate_mid",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008187
+              },
+              {
+                "id": "s-tonight-player-8",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "04e75a8d-2abd-5f74-bb29-50234babc853",
+                "nameSnapshot": "Joeriz",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 1794536408195,
+                "level": "intermediate_low",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008188
+              },
+              {
+                "id": "s-tonight-player-9",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "c927b4df-93eb-5e9a-a042-d6db900e2788",
+                "nameSnapshot": "Albion",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 1794536408195,
+                "level": "intermediate_mid",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008189
+              },
+              {
+                "id": "s-tonight-player-10",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "af53ebbc-d70a-5d2b-9a2f-d4eea6b2e2af",
+                "nameSnapshot": "Vince",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 1794536408195,
+                "level": "intermediate_mid",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008190
+              },
+              {
+                "id": "s-tonight-player-11",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "d566cf90-560d-59a0-8a25-8aad6f9f4a2f",
+                "nameSnapshot": "Karl",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 1794536408195,
+                "level": "advanced_mid",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008191
+              },
+              {
+                "id": "s-tonight-player-12",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "1a31f9b1-a7b8-5f8a-b2ed-28bc867e14d1",
+                "nameSnapshot": "Klod",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 1794536408195,
+                "level": "intermediate_low",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008192
+              },
+              {
+                "id": "s-tonight-player-13",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "0cdbe83b-71ae-5b60-9904-5bbc97cc5d65",
+                "nameSnapshot": "Jasper",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 1794538808195,
+                "level": "intermediate_mid",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008193,
+                "selfCheckedInAt": 1794538808195
+              },
+              {
+                "id": "s-tonight-player-14",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "54cd5564-f545-59b2-a4c2-b2b010437774",
+                "nameSnapshot": "Emji",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 1794536408195,
+                "level": "advanced_mid",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008194
+              },
+              {
+                "id": "s-tonight-player-15",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "7c577815-7bfd-5391-9a3a-c85a7016f0ff",
+                "nameSnapshot": "Kenji",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 1794536408195,
+                "level": "advanced_mid",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008195
+              },
+              {
+                "id": "s-tonight-player-16",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "39ca913f-d4cd-540b-8e1e-a377ea21b1de",
+                "nameSnapshot": "Kenjie",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 1794536408195,
+                "level": "advanced_mid",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008196
+              },
+              {
+                "id": "s-tonight-player-17",
+                "sessionId": "s-tonight",
+                "clubPlayerId": "9e27a818-8022-5655-a8d6-3d2bf362db34",
+                "nameSnapshot": "Maria Steph",
+                "nicknameSnapshot": "Atty Steph",
+                "present": true,
+                "presentChangedAt": 1794536408195,
+                "level": "intermediate_low",
+                "levelLockedAt": 1794536408195,
+                "confirmedAt": 1794540008197
+              }
+            ],
+            "courts": [
+              {
+                "id": "s-tonight-court-1",
+                "sessionId": "s-tonight",
+                "label": "Court 1",
+                "startsAt": 1794536408195,
+                "openUntil": null,
+                "removedAt": null
+              },
+              {
+                "id": "s-tonight-court-2",
+                "sessionId": "s-tonight",
+                "label": "Court 2",
+                "startsAt": 1794536408195,
+                "openUntil": null,
+                "removedAt": null
+              },
+              {
+                "id": "s-tonight-court-3",
+                "sessionId": "s-tonight",
+                "label": "Court 3",
+                "startsAt": 1794536408195,
+                "openUntil": 1794539948195,
+                "removedAt": null
+              },
+              {
+                "id": "s-tonight-court-4",
+                "sessionId": "s-tonight",
+                "label": "Court 4",
+                "startsAt": 1794536408195,
+                "openUntil": null,
+                "removedAt": null
+              }
+            ],
+            "matches": [
+              {
+                "id": "console-match-1",
+                "sessionId": "s-tonight",
+                "matchNo": 1,
+                "state": "active",
+                "format": "doubles",
+                "queuePosition": 1,
+                "origin": "manual",
+                "manualProtected": true,
+                "teamA": [
+                  "s-tonight-player-1",
+                  "s-tonight-player-2"
+                ],
+                "teamB": [
+                  "s-tonight-player-3",
+                  "s-tonight-player-4"
+                ],
+                "courtIds": [
+                  "s-tonight-court-1"
+                ],
+                "startedAt": 1794538208195,
+                "endedAt": null,
+                "substitutions": [],
+                "decision": null
+              }
+            ],
+            "now": 1794540008195
+          }
+        ]
+      },
+      "expected": false
+    }
+  ]
+}

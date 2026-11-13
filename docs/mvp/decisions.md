@@ -806,4 +806,12 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - **Which rules.** Only rules the server enforces (cost, payments, minimum games, queue generation and fills, results and standings, ranking settings, licenses, money/phone/court-window parsing). Rules that only shape the UI stay as they are.
   - **Change rule.** A rule change edits its case file first, so both sides fail until both are fixed. A money or ranking case changes only with the owner's sign-off ([stop and ask](../ways-of-working.md#10-stop-and-ask)); the #247 ranking constants are still open.
   - **First step.** Move the existing decided-math cases out of a few `*.rules.test.ts` files into JSON without changing what they test, and prove Vitest still passes.
+  - **Case-file conventions (settled by the team, November 13, 2026; see [#789](https://github.com/jose-codegourmet/rotra-v2/issues/789)).** Both runners implement exactly these; the full rules are in `case.schema.json`.
+    - `{"$constant": n}` is an `rng` function that always returns `n`. A seeded sequence (`$sequence`) is added only when a rule needs it; none does today.
+    - `{"$undefined": true}` and JSON `null` are **different** inputs, because TypeScript treats them differently. The Go runner must check for the `$undefined` tag before `encoding/json` folds both into nil: `$undefined` becomes an absent argument, and `null` stays an explicit null.
+    - `{"$number": "NaN" | "Infinity" | "-Infinity"}` carries the non-finite numbers JSON can't.
+    - A list length is an array of `{}` (`toHaveLength(6)` → six `{}`). We keep it instead of a `$length` tag so there is one fewer convention to implement twice.
+    - `expected` is a subset match, so an extra key in a result is not caught. This is intentional.
+    - **Court-window boundary for #791.** Only `sessionWindowError`, `courtWindowError` and `courtTimeOnSession` (fixed epoch ms) are in JSON. `courtWindowPreview`, `courtNextDay`, `instantOnDate`, `clockTimeFrom` and the locale-formatted `courtAfterSessionEndError` copy stay in TypeScript until the club time zone (T6, Asia/Manila) exists.
+    - Money and ranking cases are not restructured without the owner's sign-off, as before.
 - **References:** [D-2026-11-13-01](#d-2026-11-13-01) (B-02), [backend proposal](../backend/decisions/2026-11-13-go-railway-backend/01-proposal.md#the-biggest-cost-two-copies-of-the-rules-b-02), [architecture §2–3](../architecture.md#2-the-shape-of-the-system) (new packages need a decision).

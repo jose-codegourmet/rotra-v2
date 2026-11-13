@@ -2,6 +2,8 @@
 
 import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import {
+  activeMatchFor,
+  allPlayers,
   countedGames,
   courtNames,
   shortName,
@@ -11,6 +13,7 @@ import {
 import type { Match } from '@rotra/data/match/types'
 import { useCompleteMatch } from '@rotra/data/match/useCompleteMatch'
 import { useInvalidateMatch } from '@rotra/data/match/useInvalidateMatch'
+import { useReplacePlayer } from '@rotra/data/match/useReplacePlayer'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { useSubstitutePlayer } from '@rotra/data/match/useSubstitutePlayer'
 import { MockError } from '@rotra/data/mock/errors'
@@ -26,12 +29,15 @@ import type {
   MatchResultFormValues,
 } from '@rotra/ui/forms/match-result-form/schema'
 import { InvalidMatchSheet } from '@rotra/ui/invalid-match-sheet'
+import { PlayerActionSheet } from '@rotra/ui/player-action-sheet'
 import { profilePictureSrc } from '@rotra/ui/profile-picture'
+import { ReplacePlayerSheet } from '@rotra/ui/replace-player-sheet'
 import {
   type SubstitutionCredit,
   type SubstitutionPlayer,
   SubstitutionSheet,
 } from '@rotra/ui/substitution-sheet'
+import { pickerPlayer, type SwapPickerPlayer } from '@rotra/ui/swap-picker-sheet'
 import type { TeamLineupPlayer } from '@rotra/ui/team-lineup'
 import { toast } from '@rotra/ui/toaster'
 import { useEffect, useRef, useState } from 'react'
@@ -64,6 +70,10 @@ type Step =
       operationId: string
     }
   | { kind: 'invalid'; operationId: string }
+  /** A player was tapped: "Change NAME?" (Substitute or Replace) */
+  | { kind: 'player'; playerId: string }
+  /** Replace during play: fixes a mistake; one operation per pair of players */
+  | { kind: 'replace'; outId: string | null; inId: string | null; operationId: string }
 
 const errorMessage = (error: unknown) =>
   error instanceof Error ? error.message : 'Something went wrong. Try again.'
@@ -161,6 +171,8 @@ function OpenActiveMatch({
   const completeMatch = useCompleteMatch()
   const invalidateMatch = useInvalidateMatch()
   const substitutePlayer = useSubstitutePlayer()
+  const replacePlayer = useReplacePlayer()
+  const [message, setMessage] = useState<string | undefined>()
   const [step, setStep] = useState<Step>({ kind: 'active' })
   const [error, setError] = useState<string | undefined>()
   const [profileId, setProfileId] = useState<string | null>(null)
@@ -194,6 +206,7 @@ function OpenActiveMatch({
   const substitutionPlayer = (p: SessionPlayer): SubstitutionPlayer => ({
     id: p.id,
     name: p.nameSnapshot,
+    photoUrl: photoOf(p),
     level: p.level,
     games: countedGames(p.id, matches),
     restMinutes: waitMinutes(p, matches, session.startedAt, now),
@@ -213,6 +226,7 @@ function OpenActiveMatch({
 
   const go = (next: Step) => {
     setError(undefined)
+    setMessage(undefined)
     setStep(next)
   }
   const close = () => {
@@ -229,7 +243,11 @@ function OpenActiveMatch({
     if (clubPlayerId) setProfileId(clubPlayerId)
   }
 
-  const pending = completeMatch.isPending || invalidateMatch.isPending || substitutePlayer.isPending
+  const pending =
+    completeMatch.isPending ||
+    invalidateMatch.isPending ||
+    substitutePlayer.isPending ||
+    replacePlayer.isPending
   const begin = () => {
     if (committing.current || pending) return false
     committing.current = true
@@ -312,6 +330,63 @@ function OpenActiveMatch({
     )
   }
 
+  /** Replace during play: the owner rechecks; the replacement is recorded as having played the whole game */
+  const onConfirmReplace = () => {
+    if (step.kind !== 'replace' || !step.outId || !step.inId || !begin()) return
+    replacePlayer.mutate(
+      { matchId: match.id, outId: step.outId, inId: step.inId, operationId: step.operationId },
+      {
+        onSuccess: (result) => {
+          toast(result.message)
+          go({ kind: 'active' })
+        },
+        onError: (err) => {
+          if (isRecheckFailure(err)) {
+            setMessage('Something changed. Review the match again.')
+            onRefresh()
+          } else onFailure(err)
+        },
+        onSettled,
+      },
+    )
+  }
+
+  /** Where everyone else is, for the picker's All players: away, on court, playing or free */
+  const pickerOthers = (free: SessionPlayer[]): SwapPickerPlayer[] =>
+    roster
+      .filter(
+        (p) =>
+          p.sessionId === match.sessionId &&
+          !allPlayers(match).includes(p.id) &&
+          !free.some((f) => f.id === p.id),
+      )
+      .map((p) => {
+        const busy = activeMatchFor(p.id, matches)
+        return pickerPlayer(
+          { ...substitutionPlayer(p), shortName: shortName(p), photoUrl: photoOf(p) },
+          busy ? (busy.state === 'on_court' ? 'on-court' : 'playing') : 'away',
+        )
+      })
+  const pickerInMatch = (): (SubstitutionPlayer & { team: 'A' | 'B'; shortName: string })[] =>
+    [
+      ...match.teamA.map((id) => ({ id, team: 'A' as const })),
+      ...match.teamB.map((id) => ({ id, team: 'B' as const })),
+    ].map(({ id, team }) => {
+      const p = byId(id)
+      return p
+        ? { ...substitutionPlayer(p), shortName: shortName(p), photoUrl: photoOf(p), team }
+        : {
+            id,
+            name: 'Player',
+            shortName: 'Player',
+            level: null,
+            games: countedGames(id, matches),
+            team,
+          }
+    })
+  const pickerCandidates = (free: SessionPlayer[]) =>
+    free.map((p) => ({ ...substitutionPlayer(p), shortName: shortName(p), photoUrl: photoOf(p) }))
+
   /** Review result passed validation: the confirm step, with what was entered kept for Back to result */
   const onReviewResult = (values: MatchResultFormValues) =>
     go({ kind: 'review', values, operationId: newOperationId() })
@@ -370,16 +445,9 @@ function OpenActiveMatch({
     )
 
   if (step.kind === 'substitute' || step.kind === 'confirm-sub') {
-    const inMatch: (SubstitutionPlayer & { team: 'A' | 'B' })[] = [
-      ...match.teamA.map((id) => ({ id, team: 'A' as const })),
-      ...match.teamB.map((id) => ({ id, team: 'B' as const })),
-    ].map(({ id, team }) => {
-      const p = byId(id)
-      return p
-        ? { ...substitutionPlayer(p), team }
-        : { id, name: 'Player', level: null, games: countedGames(id, matches), team }
-    })
-    const candidates = substitutionCandidates(match, roster, matches).map(substitutionPlayer)
+    const free = substitutionCandidates(match, roster, matches)
+    const inMatch = pickerInMatch()
+    const candidates = pickerCandidates(free)
     const picked =
       step.kind === 'substitute'
         ? step
@@ -392,6 +460,7 @@ function OpenActiveMatch({
           matchNo={match.matchNo}
           inMatch={inMatch}
           candidates={candidates}
+          others={pickerOthers(free)}
           minimumGames={session.minimumGames}
           step={step.kind === 'confirm-sub' ? 'confirm' : 'pick'}
           outId={picked.outId}
@@ -428,6 +497,75 @@ function OpenActiveMatch({
           }}
           onConfirm={onConfirmSubstitution}
           isPending={substitutePlayer.isPending}
+          error={error}
+        />
+        {profile}
+      </>
+    )
+  }
+
+  if (step.kind === 'player') {
+    const tapped = byId(step.playerId)
+    const team = match.teamA.includes(step.playerId) ? ('A' as const) : ('B' as const)
+    return (
+      <>
+        <PlayerActionSheet
+          open
+          onOpenChange={onOpenChange}
+          name={tapped?.nameSnapshot ?? 'Player'}
+          photoUrl={photoOf(tapped)}
+          team={team}
+          matchNo={match.matchNo}
+          onSubstitute={() =>
+            go({ kind: 'substitute', outId: step.playerId, inId: null, creditTo: 'nobody' })
+          }
+          onReplace={() =>
+            go({
+              kind: 'replace',
+              outId: step.playerId,
+              inId: null,
+              operationId: newOperationId(),
+            })
+          }
+          onViewProfile={() => openProfile(step.playerId)}
+          onBack={() => go({ kind: 'active' })}
+        />
+        {profile}
+      </>
+    )
+  }
+
+  if (step.kind === 'replace') {
+    const free = substitutionCandidates(match, roster, matches)
+    // A different pair of players is a different replacement: it gets its own operation.
+    const pick = (outId: string | null, inId: string | null) =>
+      go({
+        kind: 'replace',
+        outId,
+        inId,
+        operationId:
+          outId === step.outId && inId === step.inId ? step.operationId : newOperationId(),
+      })
+    return (
+      <>
+        <ReplacePlayerSheet
+          open
+          playing
+          matchNo={match.matchNo}
+          inMatch={pickerInMatch()}
+          candidates={pickerCandidates(free)}
+          others={pickerOthers(free)}
+          minimumGames={session.minimumGames}
+          outId={step.outId}
+          inId={step.inId}
+          onPickOut={(outId) => pick(outId, step.inId)}
+          onPickIn={(inId) => pick(step.outId, inId)}
+          onBack={() => {
+            if (!committing.current) go({ kind: 'active' })
+          }}
+          onConfirm={onConfirmReplace}
+          isPending={replacePlayer.isPending}
+          message={message}
           error={error}
         />
         {profile}
@@ -472,9 +610,8 @@ function OpenActiveMatch({
         teamB={teamB}
         minimumGames={session.minimumGames}
         substitutions={substitutions}
-        onSelectPlayer={openProfile}
+        onSelectPlayer={(playerId) => go({ kind: 'player', playerId })}
         onMarkInvalid={() => go({ kind: 'invalid', operationId: newOperationId() })}
-        onSubstitute={() => go({ kind: 'substitute', outId: null, inId: null, creditTo: 'nobody' })}
         onMatchDone={() => go({ kind: 'result', input: {} })}
       />
       {profile}

@@ -22,6 +22,8 @@ type CourtCardBase = {
    * enabled; the court sheet keeps a used start fixed and the match is not touched)
    */
   onEdit?: () => void
+  /** ⋯ menu: "Change court label" (free and busy courts); opens the CourtLabelForm dialog */
+  onChangeLabel?: () => void
   /** ⋯ menu: Undo early open, back to Not open yet; disabled while a match is on the court */
   onUndoEarlyOpen?: () => void
   className?: string
@@ -85,6 +87,11 @@ export type CourtCardNextMatch = {
 
 export type CourtCardFreeProps = CourtCardBase & {
   variant: 'free'
+  /**
+   * Whole minutes since the court became free (the last match on it ended, or it opened): the chip
+   * reads "Free · N min", amber from 10, red from 16. Omit or null for a plain "Free".
+   */
+  freeMinutes?: number | null
   notOpen?: boolean
   removed?: boolean
   /** The session's last court: Remove is disabled with "A session needs at least one court" */
@@ -118,6 +125,8 @@ export type CourtCardReadOnlyProps = {
   teamB?: CourtPlayer[]
   /** Formatted start time, supplied by the caller. */
   startedLabel?: string
+  /** Free only: "Free · N min" (see CourtCardFreeProps.freeMinutes) */
+  freeMinutes?: number | null
   className?: string
 }
 
@@ -154,6 +163,7 @@ function CourtMenu({
   isLastCourt = false,
   onSwap,
   swapWith,
+  onChangeLabel,
   onEdit,
   onUndoEarlyOpen,
   onRemove,
@@ -163,6 +173,7 @@ function CourtMenu({
   isLastCourt?: boolean
   onSwap?: () => void
   swapWith?: CourtCardSwapMatch | null
+  onChangeLabel?: () => void
   onEdit?: () => void
   onUndoEarlyOpen?: () => void
   onRemove?: () => void
@@ -178,6 +189,7 @@ function CourtMenu({
             disabledReason: 'No other waiting match is ready',
           },
     )
+  if (onChangeLabel) items.push({ label: 'Change court label', onSelect: onChangeLabel })
   if (onEdit) items.push({ label: busy ? 'Change time' : 'Edit', onSelect: onEdit })
   if (onUndoEarlyOpen)
     items.push({
@@ -197,6 +209,19 @@ function CourtMenu({
           : undefined,
     })
   return items.length ? <OverflowMenu label={`More for ${label}`} items={items} /> : null
+}
+
+/**
+ * The free court chip (the prototype's freeChip): "Free · N min", coloured like waiting players
+ * (neutral under 10 min, warn from 10, error from 16); plain "Free" when the minutes are unknown.
+ */
+export function FreeCourtChip({ minutes }: { minutes?: number | null }) {
+  if (minutes == null) return <Chip>Free</Chip>
+  return (
+    <Chip tone={minutes >= 16 ? 'error' : minutes >= 10 ? 'warn' : 'neutral'}>
+      Free · {minutes} min
+    </Chip>
+  )
 }
 
 /** Prototype listNames(): "Mikee and Dexter", "Mikee, Dexter and Jose" */
@@ -226,6 +251,7 @@ function ReadOnlyCourtCard({
   teamA = [],
   teamB = [],
   startedLabel,
+  freeMinutes,
   className,
 }: CourtCardReadOnlyProps) {
   const chip =
@@ -240,9 +266,13 @@ function ReadOnlyCourtCard({
     >
       <div className="flex items-center justify-between gap-2">
         <h3 className="text-base">{label}</h3>
-        <Chip tone={state === 'playing' ? 'accent' : undefined}>
-          {merged && state !== 'free' ? `Merged · ${chip}` : chip}
-        </Chip>
+        {state === 'free' ? (
+          <FreeCourtChip minutes={freeMinutes} />
+        ) : (
+          <Chip tone={state === 'playing' ? 'accent' : undefined}>
+            {merged ? `Merged · ${chip}` : chip}
+          </Chip>
+        )}
       </div>
       <CourtDrawing courts={merged ? 2 : 1} free={state === 'free'} teamA={teamA} teamB={teamB} />
       {state === 'playing' && startedLabel ? (
@@ -315,6 +345,7 @@ function PlayingCourtCard({
   substitutions = 0,
   onOpenMatch,
   openedEarly = false,
+  onChangeLabel,
   onEdit,
   onUndoEarlyOpen,
   onRemove,
@@ -329,7 +360,7 @@ function PlayingCourtCard({
         {...{ label, untilLabel, startLabel, bookingEnded, openedEarly, merged }}
         {...{ teamA, teamB, onOpenProfile }}
         chip={<Chip tone="accent">{merged ? 'Merged · Playing' : 'Playing'}</Chip>}
-        menu={<CourtMenu busy {...{ label, onEdit, onUndoEarlyOpen, onRemove }} />}
+        menu={<CourtMenu busy {...{ label, onChangeLabel, onEdit, onUndoEarlyOpen, onRemove }} />}
       />
       <p className="text-[13px] text-fg2">
         {formatLabel} · Match {matchNo} · {minutes} min
@@ -365,6 +396,7 @@ function GettingReadyCourtCard({
   onSwap,
   swapWith,
   openedEarly = false,
+  onChangeLabel,
   onEdit,
   onUndoEarlyOpen,
   onRemove,
@@ -380,7 +412,10 @@ function GettingReadyCourtCard({
         {...{ teamA, teamB, onOpenProfile }}
         chip={<Chip>{merged ? 'Merged · Getting ready' : 'Getting ready'}</Chip>}
         menu={
-          <CourtMenu busy {...{ label, onSwap, swapWith, onEdit, onUndoEarlyOpen, onRemove }} />
+          <CourtMenu
+            busy
+            {...{ label, onSwap, swapWith, onChangeLabel, onEdit, onUndoEarlyOpen, onRemove }}
+          />
         }
       />
       <p className="text-[13px] text-fg2">
@@ -423,10 +458,12 @@ function FreeCourtCard({
   bookingEnded = false,
   notOpen = false,
   removed = false,
+  freeMinutes,
   isLastCourt = false,
   onRemove,
   onStartAnyway,
   openedEarly = false,
+  onChangeLabel,
   onEdit,
   onUndoEarlyOpen,
   next,
@@ -447,11 +484,15 @@ function FreeCourtCard({
           <TimeLine {...{ startLabel, untilLabel, bookingEnded, openedEarly }} />
         </div>
         <div className="flex flex-nowrap items-center gap-1.5">
-          <Chip>{removed ? 'Removed' : notOpen ? 'Not open yet' : 'Free'}</Chip>
+          {removed || notOpen ? (
+            <Chip>{removed ? 'Removed' : 'Not open yet'}</Chip>
+          ) : (
+            <FreeCourtChip minutes={freeMinutes} />
+          )}
           {removed ? null : (
             <CourtMenu
               busy={false}
-              {...{ label, isLastCourt, onEdit, onUndoEarlyOpen, onRemove }}
+              {...{ label, isLastCourt, onChangeLabel, onEdit, onUndoEarlyOpen, onRemove }}
             />
           )}
         </div>

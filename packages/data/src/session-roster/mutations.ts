@@ -316,6 +316,52 @@ export async function stepDownToWaitlist(input: StepDownInput) {
     rosterMutation(input.sessionId, (s) => stepDownChange(s, input)),
   )
 }
+const NO_SHOW_NOT_REAL = 'No show (cancelled) is not available in real mode yet.'
+/**
+ * No show (cancelled) on the live Players view: an away player with no games and in no match comes
+ * off tonight's roster and their slot opens. Refused with "Remove NAME from their match first." when
+ * they were put in a match meanwhile. Mock only for now (the owner's open questions on fees, history
+ * and before-Start use are unanswered).
+ */
+export async function markNoShow(input: { sessionId: string; rosterId: string }) {
+  if (isRealDataMode()) fail(NO_SHOW_NOT_REAL)
+  return rosterMutation(input.sessionId, (s) => {
+    if (sessionIn(s, input.sessionId).state !== 'active') fail('This session is not live.')
+    const p = row(s, input.rosterId, input.sessionId)
+    const matches = s.matches.filter((m) => m.sessionId === input.sessionId)
+    if (inUnfinishedMatch(p.id, matches))
+      throw new MockError('conflict', `Remove ${shortName(p)} from their match first.`)
+    if (p.present || gamesPlayed(p, matches) > 0)
+      fail(`${shortName(p)} is here or has played tonight.`)
+    s.roster = s.roster.filter((r) => r.id !== p.id)
+    s.noShows = [...(s.noShows ?? []), { ...p, noShowAt: Date.now() }]
+    const count = s.roster.filter((r) => r.sessionId === input.sessionId).length
+    return {
+      data: null,
+      text: `${p.nameSnapshot} marked No show (cancelled) · ${count}/${capacity(s, input.sessionId)}`,
+    }
+  })
+}
+/** Back to roster: a No show (cancelled) player takes a free slot again; refused while the roster is full. */
+export async function undoNoShow(input: { sessionId: string; rosterId: string }) {
+  if (isRealDataMode()) fail(NO_SHOW_NOT_REAL)
+  return rosterMutation(input.sessionId, (s) => {
+    const x = (s.noShows ?? []).find(
+      (n) => n.id === input.rosterId && n.sessionId === input.sessionId,
+    )
+    if (!x) fail('Player not available.')
+    const count = s.roster.filter((r) => r.sessionId === input.sessionId).length
+    if (count >= capacity(s, input.sessionId))
+      throw new MockError('conflict', 'The roster is full. Free a slot to bring someone back.')
+    const { noShowAt: _noShowAt, ...back } = x
+    s.noShows = (s.noShows ?? []).filter((n) => n !== x)
+    s.roster.push(back)
+    return {
+      data: null,
+      text: `${x.nameSnapshot} back on the roster · ${count + 1}/${capacity(s, input.sessionId)}`,
+    }
+  })
+}
 export async function setPresence(input: {
   sessionId: string
   rosterId: string

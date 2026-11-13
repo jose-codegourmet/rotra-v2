@@ -241,6 +241,31 @@ export const ICONS = {
       </>
     ),
   },
+  // The Playing match's "Change NAME?" choices (SHEETS.playerAction): Substitute (swap arrows) and
+  // Replace (a circular arrow with a check).
+  substitute: {
+    size: 34,
+    strokeWidth: 2.2,
+    body: (
+      <>
+        <path d="M7 4 3 8l4 4" />
+        <path d="M3 8h13a4 4 0 0 1 4 4" />
+        <path d="m17 20 4-4-4-4" />
+        <path d="M21 16H8a4 4 0 0 1-4-4" />
+      </>
+    ),
+  },
+  replace: {
+    size: 34,
+    strokeWidth: 2.2,
+    body: (
+      <>
+        <path d="M3 12a9 9 0 1 0 3-6.7" />
+        <path d="M3 4v5h5" />
+        <path d="m9 12 2 2 4-4" />
+      </>
+    ),
+  },
   up: { size: 16, strokeWidth: 2.4, body: <path d="m6 15 6-6 6 6" /> },
   down: { size: 16, strokeWidth: 2.4, body: <path d="m6 9 6 6 6-6" /> },
   x: { size: 18, strokeWidth: 2.4, body: <path d="M6 6l12 12M18 6 6 18" /> },

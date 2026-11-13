@@ -4,6 +4,7 @@ import portraits from '../fixtures/playerPortraits.json'
 import {
   computeStandings,
   countedGames,
+  courtFreeSince,
   courtNames,
   holdsCourt,
   waitMinutes,
@@ -278,6 +279,11 @@ function projectCourtsNow(
         teamA: [],
         teamB: [],
         startedAt: null,
+        freeSince:
+          courtFreeSince(
+            court.id,
+            state.matches.filter((m) => m.sessionId === session.id),
+          ) ?? session.startedAt,
       })
       continue
     }
@@ -292,6 +298,7 @@ function projectCourtsNow(
       teamA: match.teamA.map((id) => matchPlayerOf(state, id, viewer)),
       teamB: match.teamB.map((id) => matchPlayerOf(state, id, viewer)),
       startedAt: match.state === 'active' ? match.startedAt : null,
+      freeSince: null,
     })
   }
   return entries

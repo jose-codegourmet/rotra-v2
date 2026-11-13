@@ -354,6 +354,9 @@ describe('On court actions', () => {
     expect(canReplacePlayer(placed, 'Amy', 'Hal', ctx)).toBe(false)
     expect(canReplacePlayer(placed, 'Amy', 'Ben', ctx)).toBe(false)
     expect(canReplacePlayer(placed, 'Gus', 'Hal', ctx)).toBe(false)
+    // Replace during play fixes a mistake (2026-11-13); a finished match can't be changed.
+    expect(canReplacePlayer({ ...placed, state: 'active' }, 'Amy', 'Gus', ctx)).toBe(true)
+    expect(canReplacePlayer({ ...placed, state: 'completed' }, 'Amy', 'Gus', ctx)).toBe(false)
     expect(replacedLineup(placed, 'Amy', 'Gus')).toEqual({
       format: 'doubles',
       teamA: ['Migs', 'Gus'],

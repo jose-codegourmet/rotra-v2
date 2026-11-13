@@ -161,7 +161,7 @@ export function replacePlayer(input: {
       m.teamB = lineup.teamB
       m.origin = 'manual'
       m.manualProtected = true
-      return `Match ${m.matchNo}: ${shortName(incoming)} in for ${shortName(out)} · lineup changed`
+      return `Match ${m.matchNo}: ${shortName(incoming)} in for ${shortName(out)} · ${m.state === 'active' ? 'replaced (mistake fixed)' : 'lineup changed'}`
     }),
   )
 }

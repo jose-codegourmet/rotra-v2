@@ -29,7 +29,6 @@ const meta = {
   component: ReplacePlayerSheet,
   args: {
     open: true,
-    onOpenChange: fn(),
     matchNo: 3,
     inMatch,
     candidates,
@@ -80,3 +79,7 @@ export const Phone: Story = {
   globals: { viewport: { value: 'phone' } },
 }
 export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }
+/** During play Replace fixes a mistake: the notice replaces the lineup-change line */
+export const Playing: Story = {
+  args: { playing: true, outId: inMatch[0]?.id ?? null, inId: candidates[0]?.id ?? null },
+}

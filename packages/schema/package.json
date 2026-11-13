@@ -16,6 +16,7 @@
     "./club-price": "./src/club-price.ts",
     "./ranking-settings": "./src/ranking-settings.ts",
     "./court-window": "./src/court-window.ts",
+    "./court-label": "./src/court-label.ts",
     "./admin-player": "./src/admin-player.ts"
   },
   "scripts": {

@@ -48,3 +48,12 @@ export async function getSessionRoster(sessionId: string) {
       }),
   }
 }
+
+/** No show (cancelled) players of a live session, oldest first; none in real mode yet. */
+export async function getSessionNoShows(sessionId: string) {
+  if (isRealDataMode()) return []
+  await delay()
+  return (readMockState().noShows ?? [])
+    .filter((n) => n.sessionId === sessionId)
+    .sort((a, b) => a.noShowAt - b.noShowAt)
+}

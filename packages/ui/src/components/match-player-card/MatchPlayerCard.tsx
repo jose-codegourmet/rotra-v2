@@ -25,6 +25,8 @@ export type MatchPlayerCardProps = {
    * hint to the accessible name. The wrapper owns the drag, the keys and the tooltip.
    */
   swappable?: boolean
+  /** What a tap does, ending the accessible name: "View profile" by default ("Substitute or replace" on a Playing match) */
+  actionLabel?: string
   ref?: Ref<HTMLButtonElement>
   className?: string
 }
@@ -44,6 +46,7 @@ export function MatchPlayerCard({
   team,
   onClick,
   swappable = false,
+  actionLabel = 'View profile',
   ref,
   className,
 }: MatchPlayerCardProps) {
@@ -53,7 +56,7 @@ export function MatchPlayerCard({
       ref={ref}
       type="button"
       onClick={onClick}
-      aria-label={`${name}, ${levelLabel(level)}, ${games} of ${minimumGames} games. View profile${swappable ? '. Left or right arrow switches sides' : ''}`}
+      aria-label={`${name}, ${levelLabel(level)}, ${games} of ${minimumGames} games. ${actionLabel}${swappable ? '. Left or right arrow switches sides' : ''}`}
       data-player-id={id}
       data-team={team}
       className={cn(

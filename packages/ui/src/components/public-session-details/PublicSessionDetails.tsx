@@ -21,6 +21,8 @@ export type PublicSessionCourtNow = {
   teamB: CourtPlayer[]
   /** "9:16 PM"; omit while getting ready and when free */
   startedLabel?: string
+  /** Free: "Free · N min", minutes since the last match on it ended (or the session started) */
+  freeMinutes?: number | null
 }
 
 export type PublicSessionDetailsProps = {
@@ -165,6 +167,7 @@ export function PublicSessionDetails({
                 teamA={court.teamA}
                 teamB={court.teamB}
                 startedLabel={court.startedLabel}
+                freeMinutes={court.freeMinutes}
               />
             ))}
           </div>

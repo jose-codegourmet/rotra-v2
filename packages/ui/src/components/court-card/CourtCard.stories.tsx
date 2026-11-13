@@ -131,6 +131,7 @@ function free(
     label: court.label,
     untilLabel: untilOf(court),
     bookingEnded: Date.now() >= (court.openUntil ?? session.scheduledEndAt),
+    onChangeLabel: fn(),
     onEdit: fn(),
     onRemove: fn(),
     onPutOnCourt: fn(),
@@ -172,6 +173,16 @@ export const WithSubstitutions: Story = {
 export const FreeWithNextEligible: Story = { args: free(courtAt(1), [ready, absent]) }
 export const FreeWithSkippedFirst: Story = { args: free(courtAt(1), [playing, blocked, ready]) }
 export const FreeNoneReady: Story = { args: free(courtAt(1), [playing, blocked]) }
+/** Free · N min: minutes since the last match on the court ended (neutral, then warn from 10, error from 16) */
+export const FreeJustFreed: Story = { args: free(courtAt(1), [playing, ready], { freeMinutes: 0 }) }
+export const FreeTenMinutes: Story = { args: free(courtAt(1), [playing, ready], { freeMinutes: 12 }) }
+export const FreeSixteenMinutes: Story = {
+  args: free(courtAt(1), [playing, ready], { freeMinutes: 18 }),
+}
+export const FreeSixteenMinutesLight: Story = {
+  ...FreeSixteenMinutes,
+  globals: { theme: 'light' },
+}
 export const QueueEmpty: Story = { args: free(courtAt(1), [playing]) }
 /** Short on players: too few free players for the smallest standard match */
 export const NotEnoughFreePlayers: Story = {

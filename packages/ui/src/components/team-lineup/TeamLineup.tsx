@@ -32,6 +32,8 @@ export type TeamLineupProps = {
    * other team or moved across with ← / →. Reports the two slots; the owner changes the lineup.
    */
   onSwap?: (from: SwapSlot, to: SwapSlot) => void
+  /** What tapping a player does, for the cards' accessible names; "View profile" by default */
+  playerActionLabel?: string
   className?: string
 }
 
@@ -41,12 +43,14 @@ function Team({
   minimumGames,
   onSelectPlayer,
   swappable,
+  actionLabel,
 }: {
   team: MatchLineupTeam
   players: TeamLineupPlayer[]
   minimumGames: number
   onSelectPlayer: TeamLineupProps['onSelectPlayer']
   swappable: boolean
+  actionLabel?: string
 }) {
   const label = `Team ${team}`
   return (
@@ -65,6 +69,7 @@ function Team({
             team={team}
             onClick={() => onSelectPlayer(p.id, team)}
             swappable={swappable}
+            actionLabel={actionLabel}
           />
         )
         return swappable ? (
@@ -92,6 +97,7 @@ export function TeamLineup({
   minimumGames,
   onSelectPlayer,
   onSwap,
+  playerActionLabel,
   className,
 }: TeamLineupProps) {
   const swappable = !!onSwap
@@ -108,6 +114,7 @@ export function TeamLineup({
         minimumGames={minimumGames}
         onSelectPlayer={onSelectPlayer}
         swappable={swappable}
+        actionLabel={playerActionLabel}
       />
       <span className="text-center text-[11px] font-extrabold tracking-[1px] text-fg3">VS</span>
       <Team
@@ -116,6 +123,7 @@ export function TeamLineup({
         minimumGames={minimumGames}
         onSelectPlayer={onSelectPlayer}
         swappable={swappable}
+        actionLabel={playerActionLabel}
       />
     </div>
   )

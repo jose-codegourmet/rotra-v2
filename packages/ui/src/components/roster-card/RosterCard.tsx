@@ -11,7 +11,7 @@ import { IdentityChip } from '@rotra/ui/identity-chip'
 import type { Identity } from '@rotra/ui/identity-chip/variants'
 import { LevelDiffIndicator } from '@rotra/ui/level-diff-indicator'
 import { levelLabel } from '@rotra/ui/level-pill'
-import { LevelSelect } from '@rotra/ui/level-select'
+import { LevelSelectMenu } from '@rotra/ui/level-select-menu'
 import { Switch } from '@rotra/ui/switch'
 import { useId } from 'react'
 
@@ -177,8 +177,9 @@ export function RosterCard({
         ) : null}
         <div
           className={cn(
-            'flex min-w-0 flex-col gap-1 rounded-md border px-2.5 py-2',
-            LEVEL_BLOCK[band],
+            'flex min-w-0 flex-col gap-1',
+            // Before Start the coloured LevelSelectMenu is the block (the prototype's .rv-lv:has(.lvm)).
+            afterStart && cn('rounded-md border px-2.5 py-2', LEVEL_BLOCK[band]),
           )}
         >
           {afterStart ? (
@@ -186,10 +187,9 @@ export function RosterCard({
               {level ? levelLabel(level) : 'No level'} · Fixed after start
             </span>
           ) : (
-            <LevelSelect
+            <LevelSelectMenu
               value={level}
               onChange={onLevelChange}
-              missing={level === null}
               aria-label={`Level for ${name} at this club`}
               aria-describedby={diffId}
             />

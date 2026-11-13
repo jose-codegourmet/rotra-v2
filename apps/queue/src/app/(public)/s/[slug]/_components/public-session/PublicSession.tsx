@@ -2,6 +2,7 @@
 
 import { useSession } from '@rotra/data/auth/use-session'
 import { useConnectivity } from '@rotra/data/connectivity/useConnectivity'
+import { freeCourtMinutes } from '@rotra/data/match/match.rules'
 import { isPermissionRefusal } from '@rotra/data/mock/errors'
 import { playerLoginUrl, playerOrigin, playerRegisterUrl } from '@rotra/data/public-session/context'
 import { usePlayerSessionAccess } from '@rotra/data/public-session/player-access'
@@ -199,7 +200,7 @@ function joinCardProps(
 }
 
 /** Courts now entries as the Details component's props (read-only court cards). */
-function courtsNowProps(courts: PublicCourtNow[]): PublicSessionCourtNow[] {
+function courtsNowProps(courts: PublicCourtNow[], now = Date.now()): PublicSessionCourtNow[] {
   const faces = (side: 'a' | 'b', court: PublicCourtNow) =>
     (side === 'a' ? court.teamA : court.teamB).map((player, i) => ({
       id: `${court.id}-${side}-${i}`,
@@ -216,6 +217,7 @@ function courtsNowProps(courts: PublicCourtNow[]): PublicSessionCourtNow[] {
     teamA: faces('a', court),
     teamB: faces('b', court),
     startedLabel: court.startedAt ? time(court.startedAt) : undefined,
+    freeMinutes: court.status === 'free' ? freeCourtMinutes(court.freeSince, now) : null,
   }))
 }
 

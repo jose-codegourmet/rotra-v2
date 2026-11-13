@@ -21,6 +21,7 @@ import {
 } from '@rotra/data/match/queue.rules'
 import { useMakeMatch } from '@rotra/data/match/useMakeMatch'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
+import { isRealDataMode } from '@rotra/data/real/mode'
 import { PLAYING_LEVELS } from '@rotra/data/player/types'
 import { selfCheckInMark } from '@rotra/data/public-session/rules'
 import { slotCapacity } from '@rotra/data/queue-session/queueSession.rules'
@@ -36,11 +37,19 @@ import { useRemoveFromWaitlist } from '@rotra/data/session-roster/useRemoveFromW
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { useSetGamesPlayed } from '@rotra/data/session-roster/useSetGamesPlayed'
 import { useSetPresenceMany } from '@rotra/data/session-roster/useSetPresenceMany'
+import {
+  useMarkNoShow,
+  useSessionNoShows,
+  useUndoNoShow,
+} from '@rotra/data/session-roster/useNoShow'
 import { useStepDownToWaitlist } from '@rotra/data/session-roster/useStepDownToWaitlist'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
+import { Avatar } from '@rotra/ui/avatar'
 import { ConfirmMakeMatchSheet } from '@rotra/ui/confirm-make-match-sheet'
+import { ConfirmSheet } from '@rotra/ui/confirm-sheet'
 import { EmptyState } from '@rotra/ui/empty-state'
+import { NoShowPanel } from '@rotra/ui/no-show-panel'
 import { PlayerPoolCard, type PlayerPoolCardStatus } from '@rotra/ui/player-pool-card'
 import {
   type PlayerPoolShow,
@@ -138,6 +147,12 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
   const removeFromWaitlist = useRemoveFromWaitlist()
   const setGamesPlayed = useSetGamesPlayed()
   const stepDown = useStepDownToWaitlist()
+  const noShows = useSessionNoShows(sessionId)
+  const markNoShow = useMarkNoShow()
+  const undoNoShow = useUndoNoShow()
+  /** The roster id whose "Mark NAME as No show?" confirmation is open */
+  const [noShowFor, setNoShowFor] = useState<string | null>(null)
+  const [noShowError, setNoShowError] = useState<string | undefined>()
   const steppingDown = useRef(new Set<string>())
   /** Admit player on a full roster waits for D-OVERFILL (#735) */
   const [overfillWaiter, setOverfillWaiter] = useState<string | null>(null)
@@ -282,6 +297,25 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
       { ...options, onSettled: () => steppingDown.current.delete(player.id) },
     )
   }
+  const noShowTarget = rosterList.find((p) => p.id === noShowFor)
+  const noShowList = noShows.data ?? []
+  const confirmNoShow = (player: SessionPlayer) => {
+    setNoShowError(undefined)
+    markNoShow.mutate(
+      { sessionId, rosterId: player.id },
+      {
+        onSuccess: (result) => {
+          setNoShowFor(null)
+          setPicked((prev) => prev.filter((id) => id !== player.id))
+          toast(result.message)
+        },
+        onError: (error) => {
+          setNoShowFor(null)
+          toast(errorMessage(error))
+        },
+      },
+    )
+  }
   const openProfileFromWaitlist = (waitlistId: string) => {
     const w = waitlist.find((w) => w.id === waitlistId)
     if (w) onOpenProfile(w.clubPlayerId)
@@ -368,6 +402,21 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
                 onStepDown={() => {
                   void setPresence.flush().then(() => stepDownPlayer(row.player))
                 }}
+                // No show (cancelled): away, no games and in no match (mock only for now).
+                onNoShow={
+                  !isRealDataMode() &&
+                  s.state === 'active' &&
+                  !row.player.present &&
+                  row.games === 0 &&
+                  !row.playing
+                    ? () => {
+                        void setPresence.flush().then(() => {
+                          setNoShowError(undefined)
+                          setNoShowFor(row.player.id)
+                        })
+                      }
+                    : undefined
+                }
                 onPresentChange={(present) => {
                   if (!setPresence.pending.size || held?.filter !== show)
                     setHeld({ filter: show, ids: shown.map((r) => r.player.id) })
@@ -401,6 +450,23 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
           }}
         />
       ) : null}
+      <NoShowPanel
+        entries={noShowList.map((x) => ({
+          id: x.id,
+          name: x.nameSnapshot,
+          photoUrl: photoFor(x),
+          markedLabel: time(x.noShowAt),
+        }))}
+        full={full}
+        isPending={undoNoShow.isPending}
+        onBackToRoster={(id) => {
+          if (!undoNoShow.isPending) undoNoShow.mutate({ sessionId, rosterId: id }, options)
+        }}
+        onOpenProfile={(id) => {
+          const x = noShowList.find((n) => n.id === id)
+          if (x) onOpenProfile(x.clubPlayerId)
+        }}
+      />
       {waitlist.length || full ? (
         <WaitlistPanel
           live
@@ -530,6 +596,37 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
           if (overfillEntry) giveSlotTo(overfillEntry.id)
         }}
       />
+      {noShowTarget ? (
+        <ConfirmSheet
+          open
+          onOpenChange={(open) => {
+            if (!open) setNoShowFor(null)
+          }}
+          title={`Mark ${noShowTarget.nameSnapshot} as No show?`}
+          summary={
+            <div className="flex flex-nowrap items-center gap-3">
+              <Avatar name={noShowTarget.nameSnapshot} src={photoFor(noShowTarget)} />
+              <div>
+                <b>{noShowTarget.nameSnapshot}</b>
+                <p className="text-[13px] text-fg2">Away · no games tonight</p>
+              </div>
+            </div>
+          }
+          consequence={
+            <>
+              They come off tonight's roster as <b>No show (cancelled)</b> and their slot opens
+              {waitlist.length ? ' for the waitlist' : ''}. You can bring them back while a slot is
+              free.
+            </>
+          }
+          backLabel="Cancel"
+          confirmLabel="Mark No show"
+          destructive
+          isPending={markNoShow.isPending}
+          error={noShowError}
+          onConfirm={() => confirmNoShow(noShowTarget)}
+        />
+      ) : null}
       <AddPlayer sessionId={sessionId} open={addOpen} onOpenChange={setAddOpen} />
     </div>
   )

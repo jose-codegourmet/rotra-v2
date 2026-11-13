@@ -24,8 +24,17 @@ describe('Auto Queue generation', () => {
     const input = scenario()
     input.ctx.roster = input.ctx.roster.map((p, i) => ({ ...p, present: i < 5 }))
     const available = generateAutoQueueMatches({ ...input, mode: 'available', limit: 2 })
-    expect(available.error).toBe('Made 0 of 2: not enough free players for another match.')
-    const ahead = generateAutoQueueMatches({ ...input, mode: 'ahead', limit: 2 })
+    // D-2026-11-13-07: the present player already in a waiting match is left out and said so.
+    expect(available.error).toBe(
+      'Made 0 of 2: not enough free players for another match · 1 player is already in the Main Queue',
+    )
+    // Queued players stay out of Plan Ahead too; with an empty Main Queue it reaches the players in play.
+    const ahead = generateAutoQueueMatches({
+      ...input,
+      ctx: { ...input.ctx, matches: input.ctx.matches.filter((m) => m.state !== 'waiting') },
+      mode: 'ahead',
+      limit: 2,
+    })
     expect(ahead.error).toBeNull()
     expect(ahead.matches.flatMap(allPlayers)).toContain(input.ctx.roster[4]?.id)
   })
@@ -80,6 +89,36 @@ describe('Auto Queue generation', () => {
       retained: first.matches,
     })
     expect(allPlayers(next.matches[0]!)).not.toEqual(allPlayers(first.matches[0]!))
+  })
+  it('never counts players already in the Main Queue and says how many were left out (D-2026-11-13-07)', () => {
+    const input = scenario()
+    const players = input.ctx.roster.slice(0, 6).map((p) => ({ ...p, present: true }))
+    input.ctx.roster = players
+    const waiting = input.ctx.matches.find((m) => m.state === 'waiting')!
+    input.ctx.matches = [
+      {
+        ...waiting,
+        format: 'singles',
+        teamA: [players[0]!.id],
+        teamB: [players[1]!.id],
+        substitutions: [],
+      },
+    ]
+    for (const mode of ['available', 'ahead', 'wait', 'fewest'] as const) {
+      const result = generateAutoQueueMatches({ ...input, mode, limit: 2 })
+      const used = result.matches.flatMap(allPlayers)
+      expect(used).not.toContain(players[0]!.id)
+      expect(used).not.toContain(players[1]!.id)
+    }
+    input.session.allowSingles = false
+    const short = generateAutoQueueMatches({ ...input, mode: 'available', limit: 2 })
+    expect(short.matches).toHaveLength(2)
+    expect(short.stopReason).toBe('Made 2 of 2 matches.')
+    input.ctx.roster = players.slice(0, 5)
+    const none = generateAutoQueueMatches({ ...input, mode: 'available', limit: 2 })
+    expect(none.error).toBe(
+      'Made 0 of 2: not enough free players for another match · 2 players are already in the Main Queue',
+    )
   })
   it('fails clearly when both formats are disabled', () => {
     const input = scenario()

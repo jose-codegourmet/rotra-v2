@@ -25,7 +25,7 @@ export const rosterCardMeta = {
   related: [
     'RosterPanel',
     'RosterRow',
-    'LevelSelect',
+    'LevelSelectMenu',
     'LevelDiffIndicator',
     'IdentityChip',
     'Switch',

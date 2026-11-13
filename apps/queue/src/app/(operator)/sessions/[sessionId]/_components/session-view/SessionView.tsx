@@ -4,10 +4,12 @@ import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import {
   activeMatchFor,
   countedGames,
+  courtFreeSince,
   courtMatches,
   courtOpen,
   courtsNeeded,
   FORMAT_LABELS,
+  freeCourtMinutes,
   freeCourts,
   isBookingEnded,
   type MatchContext,
@@ -34,6 +36,7 @@ import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useRemoveCourt } from '@rotra/data/queue-session/useRemoveCourt'
 import { useSetCourtFillMode } from '@rotra/data/queue-session/useSetCourtFillMode'
 import { useUndoCourtEarlyOpen } from '@rotra/data/queue-session/useUndoCourtEarlyOpen'
+import { useUpdateCourt } from '@rotra/data/queue-session/useUpdateCourt'
 import type { SessionPlayer } from '@rotra/data/session-roster/types'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { courtNextDay } from '@rotra/schema/court-window'
@@ -43,6 +46,7 @@ import { ConfirmSheet } from '@rotra/ui/confirm-sheet'
 import { CourtCard, type CourtCardProps } from '@rotra/ui/court-card'
 import type { CourtPlayer } from '@rotra/ui/court-drawing'
 import { CourtFillSwitch } from '@rotra/ui/court-fill-switch'
+import { CourtLabelForm } from '@rotra/ui/forms/court-label-form'
 import type { MatchCardPlayer } from '@rotra/ui/match-card'
 import { formatTime } from '@rotra/ui/now-card/helpers'
 import { profilePictureSrc } from '@rotra/ui/profile-picture'
@@ -135,6 +139,7 @@ export function SessionView({
   const startMatch = useStartMatch()
   const setCourtFill = useSetCourtFillMode()
   const fillOpened = useFillOpenedCourts()
+  const updateCourt = useUpdateCourt()
   // One placement or start per tap: a second tap can land before isPending reaches this render.
   const committing = useRef(false)
   /** The On court match whose sheet is open (Open match on a Getting ready card) */
@@ -144,6 +149,9 @@ export function SessionView({
   /** The Start anyway confirmation: one court, or every not-open court (Open all courts now) */
   const [opening, setOpening] = useState<{ courtId: string | null } | null>(null)
   const [openError, setOpenError] = useState<string | undefined>()
+  /** The court whose Change court label dialog is open (⋯ menu) */
+  const [labelCourtId, setLabelCourtId] = useState<string | null>(null)
+  const [labelError, setLabelError] = useState<string | undefined>()
   /** Courts seen open on the last refresh: a court newly open gets Auto Queue's fill (console refresh) */
   const seenOpen = useRef<Set<string> | null>(null)
   const sessionData = session.data
@@ -287,7 +295,39 @@ export function SessionView({
     if (undoEarlyOpen.isPending) return
     undoEarlyOpen.mutate({ sessionId, courtId: c.id }, options)
   }
+  /** Change court label: only the label changes; the court's start and end stay as they are. */
+  const onSaveLabel = (c: SessionCourt, label: string) => {
+    if (updateCourt.isPending) return
+    if (label === c.label) {
+      setLabelCourtId(null)
+      toast('Court label unchanged')
+      return
+    }
+    setLabelError(undefined)
+    updateCourt.mutate(
+      {
+        sessionId,
+        courtId: c.id,
+        label,
+        startsAt: c.startsAt ?? s.startedAt ?? s.scheduledStartAt,
+        openUntil: c.openUntil,
+      },
+      {
+        onSuccess: () => {
+          setLabelCourtId(null)
+          toast(`${c.label} is now ${label}`)
+        },
+        onError: (error: unknown) =>
+          setLabelError(error instanceof Error ? error.message : 'Something went wrong. Try again.'),
+      },
+    )
+  }
+  const labelCourt = courts.find((c) => c.id === labelCourtId)
   const menuFor = (c: SessionCourt) => ({
+    onChangeLabel: () => {
+      setLabelError(undefined)
+      setLabelCourtId(c.id)
+    },
     openedEarly: openedEarly(c, now),
     onEdit: onEditCourt ? () => onEditCourt(c.id) : undefined,
     onUndoEarlyOpen: live && openedEarly(c, now) ? () => onUndoEarlyOpen(c) : undefined,
@@ -384,6 +424,14 @@ export function SessionView({
       untilLabel: untilLabel(c),
       startLabel: startLabel(c),
       notOpen: !courtOpen(c, now),
+      // "Free · N min": since the last match on it ended, or since the court opened / the session started.
+      freeMinutes: live
+        ? freeCourtMinutes(
+            courtFreeSince(c.id, ctx.matches, now) ??
+              Math.max(c.openedEarlyAt ?? c.startsAt ?? 0, s.startedAt ?? 0),
+            now,
+          )
+        : null,
       onStartAnyway: live && !courtOpen(c, now) ? () => startAnyway(c.id) : undefined,
       bookingEnded: isBookingEnded(c, s.scheduledEndAt, now),
       isLastCourt: courts.length <= 1,
@@ -477,6 +525,22 @@ export function SessionView({
         isPending={openCourtEarly.isPending || openAllCourtsEarly.isPending}
         error={openError}
       />
+      {labelCourt ? (
+        <CourtLabelForm
+          key={labelCourt.id}
+          open
+          onOpenChange={(next) => {
+            if (!next) setLabelCourtId(null)
+          }}
+          currentLabel={labelCourt.label}
+          otherLabels={courts
+            .filter((c) => c.id !== labelCourt.id && !c.removedAt)
+            .map((c) => c.label)}
+          onSubmit={({ label }) => onSaveLabel(labelCourt, label)}
+          isPending={updateCourt.isPending}
+          serverError={labelError}
+        />
+      ) : null}
       <OnCourt
         sessionId={sessionId}
         now={now}

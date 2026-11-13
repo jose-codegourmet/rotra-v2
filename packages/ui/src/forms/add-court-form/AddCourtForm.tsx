@@ -1,6 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { COURT_LABEL_MAX } from '@rotra/schema/court-label'
 import { courtNextDay, courtWindowPreview } from '@rotra/schema/court-window'
 import { Button } from '@rotra/ui/button'
 import { ChoiceGroup } from '@rotra/ui/choice-group'
@@ -17,7 +18,6 @@ import { addCourtFormDefaultValues, toTimeInput } from './AddCourtForm.defaultVa
 import {
   type AddCourtFormInput,
   type AddCourtFormValues,
-  COURT_LABEL_MAX,
   makeAddCourtSchema,
   type OpenUntilMode,
   timeOnSession,

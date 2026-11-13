@@ -4,10 +4,10 @@ import {
   courtTimeOnSession,
   courtWindowError,
 } from '@rotra/schema/court-window'
+import { COURT_LABEL_MAX, COURT_LABEL_TOO_LONG } from '@rotra/schema/court-label'
 import { timeField } from '@rotra/schema/date'
 import { z } from 'zod'
 
-export const COURT_LABEL_MAX = 40
 export const CLOSING_TIME_ERROR = 'Choose a closing time.'
 export const afterSessionEndError = courtAfterSessionEndError
 
@@ -47,7 +47,7 @@ export function makeAddCourtSchema({
       label: z
         .string()
         .trim()
-        .max(COURT_LABEL_MAX)
+        .max(COURT_LABEL_MAX, COURT_LABEL_TOO_LONG)
         .transform((value) => value || fallbackLabel),
       startTime: z.string().default(''),
       mode: z.enum(['end', 'time']),

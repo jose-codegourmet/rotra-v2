@@ -30,6 +30,12 @@ export type SessionPlayer = {
    */
   gamesAdjustment?: number
 }
+/**
+ * No show (cancelled): a live roster player who was away, played no games and was in no match,
+ * taken off tonight's roster at `noShowAt`; their slot opens. Back to roster restores the row while
+ * a slot is free. The database proposes `session_players.no_show_at`; the mock keeps the row aside.
+ */
+export type SessionNoShow = SessionPlayer & { noShowAt: number }
 export type SessionWaitlistEntry = {
   id: string
   sessionId: string

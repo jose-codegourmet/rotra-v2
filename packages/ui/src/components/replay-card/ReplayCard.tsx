@@ -1,6 +1,7 @@
 import { Card } from '@rotra/ui/card'
 import { Chip } from '@rotra/ui/chip'
 import { cn } from '@rotra/ui/cn'
+import { FreeCourtChip } from '@rotra/ui/court-card'
 import { CourtDrawing, type CourtPlayer } from '@rotra/ui/court-drawing'
 import { Icon } from '@rotra/ui/icon'
 import { IconButton } from '@rotra/ui/icon-button'
@@ -21,6 +22,8 @@ export type ReplayCourt = {
   label: string
   /** null when the court was free at this moment */
   match: ReplayCourtMatch | null
+  /** Free: whole minutes since the last match on it ended, at this moment ("Free · N min"); null before any match */
+  freeMinutes?: number | null
 }
 
 export type ReplayCardProps = {
@@ -82,7 +85,7 @@ export function ReplayCard({
                   #{court.match.number} · {court.match.minutesIn} min
                 </Chip>
               ) : (
-                <Chip>Free</Chip>
+                <FreeCourtChip minutes={court.freeMinutes} />
               )}
             </div>
             {court.match ? (

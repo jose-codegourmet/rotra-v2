@@ -2,6 +2,8 @@
 
 import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import {
+  activeMatchFor,
+  allPlayers,
   countedGames,
   courtNames,
   courtsNeeded,
@@ -31,6 +33,7 @@ import { formatWhen } from '@rotra/ui/now-card/helpers'
 import { OnCourtSheet } from '@rotra/ui/on-court-sheet'
 import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { ReplacePlayerSheet } from '@rotra/ui/replace-player-sheet'
+import { pickerPlayer, type SwapPickerPlayer } from '@rotra/ui/swap-picker-sheet'
 import { SwapMatchSheet } from '@rotra/ui/swap-match-sheet'
 import type { TeamLineupPlayer } from '@rotra/ui/team-lineup'
 import { toast } from '@rotra/ui/toaster'
@@ -318,7 +321,27 @@ function OpenOnCourt({ session, match, ctx, swapFirst, onClose, onRefresh }: Ope
       level: p?.level ?? null,
       games: countedGames(id, ctx.matches),
       restMinutes: p ? waitMinutes(p, ctx.matches, session.startedAt, now) : 0,
+      shortName: p ? shortName(p) : 'Player',
+      photoUrl: photoOf(p),
     }
+  }
+  /** Everyone else on tonight's roster for the picker's All players: away, on court or playing */
+  const replaceOthers = (): SwapPickerPlayer[] => {
+    const free = substitutionCandidates(match, ctx.roster, ctx.matches)
+    return ctx.roster
+      .filter(
+        (p) =>
+          p.sessionId === match.sessionId &&
+          !allPlayers(match).includes(p.id) &&
+          !free.some((f) => f.id === p.id),
+      )
+      .map((p) => {
+        const busy = activeMatchFor(p.id, ctx.matches)
+        return pickerPlayer(
+          replaceTile(p.id),
+          busy ? (busy.state === 'on_court' ? 'on-court' : 'playing') : 'away',
+        )
+      })
   }
   const swapFace = (id: string) => {
     const p = byId(id)
@@ -391,9 +414,6 @@ function OpenOnCourt({ session, match, ctx, swapFirst, onClose, onRefresh }: Ope
       {shown === 'replace' ? (
         <ReplacePlayerSheet
           open
-          onOpenChange={(open) => {
-            if (!open) backToMatch()
-          }}
           matchNo={match.matchNo}
           inMatch={[
             ...match.teamA.map((id) => ({
@@ -410,6 +430,7 @@ function OpenOnCourt({ session, match, ctx, swapFirst, onClose, onRefresh }: Ope
           candidates={substitutionCandidates(match, ctx.roster, ctx.matches).map((p) =>
             replaceTile(p.id),
           )}
+          others={replaceOthers()}
           minimumGames={session.minimumGames}
           outId={outId}
           inId={inId}

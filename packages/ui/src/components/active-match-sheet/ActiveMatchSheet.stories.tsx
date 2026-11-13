@@ -18,7 +18,6 @@ const propsFor = (m: ActiveMatchFixture): ActiveMatchSheetProps => ({
   substitutions: m.substitutions,
   onSelectPlayer: fn(),
   onMarkInvalid: fn(),
-  onSubstitute: fn(),
   onMatchDone: fn(),
 })
 

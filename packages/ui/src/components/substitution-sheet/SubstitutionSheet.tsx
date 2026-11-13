@@ -7,8 +7,11 @@ import { ConfirmSheet } from '@rotra/ui/confirm-sheet'
 import { KeyValueList } from '@rotra/ui/key-value-list'
 import { levelLabel } from '@rotra/ui/level-pill'
 import { Notice } from '@rotra/ui/notice'
-import { PlayerTile } from '@rotra/ui/player-tile'
-import { Sheet } from '@rotra/ui/sheet'
+import {
+  pickerPlayer,
+  type SwapPickerPlayer,
+  SwapPickerSheet,
+} from '@rotra/ui/swap-picker-sheet'
 import { type ReactNode, useState } from 'react'
 
 /** One player as the substitution tiles draw them. */
@@ -16,6 +19,8 @@ export type SubstitutionPlayer = {
   /** The SessionPlayer id */
   id: string
   name: string
+  /** Nickname or first name under the picker tile; the first name when omitted */
+  shortName?: string
   photoUrl?: string
   /** The level locked for this session; null when none was set */
   level: PlayingLevel | null
@@ -36,8 +41,10 @@ export type SubstitutionSheetProps = {
   matchNo: number
   /** Everyone in the match, Team A first, each with their team; the "Who's coming off?" tiles */
   inMatch: (SubstitutionPlayer & { team: 'A' | 'B' })[]
-  /** Present players not in this match and not playing elsewhere; the "Replacement" tiles */
+  /** Present players not in this match and not playing elsewhere: Suggested and the top of All players */
   candidates: SubstitutionPlayer[]
+  /** Everyone else on tonight's roster (away, on court or playing): greyed out in All players */
+  others?: SwapPickerPlayer[]
   /** The session's minimum games */
   minimumGames: number
   /** When Start match was confirmed (ms since epoch); "Started M min ago" */
@@ -57,7 +64,7 @@ export type SubstitutionSheetProps = {
   onPickCredit?: (credit: SubstitutionCredit) => void
   /** Review substitution: both chosen, move to the confirm step */
   onReview: () => void
-  /** Back on the pick step: returns to the Active match sheet without changing anything */
+  /** The picker's × ("Back to match N") and backdrop: return to the Active match sheet without changing anything */
   onBack: () => void
   /** Back on the confirm step: returns to the pick step with the choice kept */
   onBackToPick: () => void
@@ -84,8 +91,8 @@ function creditWarning(creditTo: SubstitutionCredit, outName: string, inName: st
 }
 
 /**
- * Q-SUBSTITUTE in two sheet steps. Pick: "Who's coming off?" tiles (noting Team A or B),
- * "Replacement" tiles for present players who are free, or "No present player is free right now.",
+ * Q-SUBSTITUTE in two steps. Pick, in the SwapPickerSheet: "Who's coming off?" tiles (noting Team A
+ * or B), Suggested (with All players behind Other), or "No present player is free right now.",
  * and "Who gets this game?" (Nobody by default, the incoming player, or the outgoing player) with
  * "Started M min ago". Review substitution needs both players. Confirm (D-SUBSTITUTE): Out, In with
  * level, Team, Gets this game, and the credit warning, with Back and Confirm substitution. The owner
@@ -97,6 +104,7 @@ export function SubstitutionSheet({
   matchNo,
   inMatch,
   candidates,
+  others = [],
   minimumGames,
   startedAt,
   now,
@@ -162,96 +170,62 @@ export function SubstitutionSheet({
     )
   }
 
+  const firstName = (name: string) => name.split(' ')[0] ?? name
   return (
-    <Sheet
+    <SwapPickerSheet
       open={open}
-      onOpenChange={onOpenChange}
+      matchNo={matchNo}
       title={`Substitute in match ${matchNo}`}
-      footer={
-        <>
-          <Button onClick={onBack}>Back</Button>
-          <Button variant="primary" disabled={!out || !incoming} onClick={onReview}>
-            Review substitution
-          </Button>
-        </>
-      }
-    >
-      <fieldset
-        aria-label="Who's coming off?"
-        className="m-0 flex min-w-0 flex-col gap-1.5 border-0 p-0"
-      >
-        <span className="text-[13px] font-semibold text-fg2">Who's coming off?</span>
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,128px),1fr))] gap-2.5">
-          {inMatch.map((p) => (
-            <PlayerTile
-              key={p.id}
-              name={p.name}
-              photoUrl={p.photoUrl}
-              level={p.level}
-              games={p.games}
-              minimumGames={minimumGames}
-              status={{ kind: 'note', text: `Team ${p.team}` }}
-              pressed={p.id === outId}
-              onClick={() => onPickOut(p.id)}
-            />
-          ))}
-        </div>
-      </fieldset>
-      <fieldset aria-label="Replacement" className="m-0 flex min-w-0 flex-col gap-1.5 border-0 p-0">
-        <span className="text-[13px] font-semibold text-fg2">Replacement</span>
-        {candidates.length ? (
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,128px),1fr))] gap-2.5">
-            {candidates.map((p) => (
-              <PlayerTile
-                key={p.id}
-                name={p.name}
-                photoUrl={p.photoUrl}
-                level={p.level}
-                games={p.games}
-                minimumGames={minimumGames}
-                status={{ kind: 'resting', minutes: p.restMinutes ?? 0 }}
-                pressed={p.id === inId}
-                onClick={() => onPickIn(p.id)}
-              />
-            ))}
-          </div>
-        ) : (
-          <p className="m-0 text-[13px] text-fg2">No present player is free right now.</p>
-        )}
-      </fieldset>
-      <fieldset
-        aria-label="Who gets this game?"
-        className="m-0 flex min-w-0 flex-col gap-1.5 border-0 p-0"
-      >
-        <span className="text-[13px] font-semibold text-fg2">Who gets this game?</span>
-        <ChoiceGroup
-          type="single"
+      outLabel="Who's coming off?"
+      inMatch={inMatch.map((p) => ({ ...pickerPlayer(p, 'playing'), team: p.team }))}
+      players={[...candidates.map((p) => pickerPlayer(p)), ...others]}
+      minimumGames={minimumGames}
+      outId={outId}
+      inId={inId}
+      onPickOut={onPickOut}
+      onPickIn={onPickIn}
+      onBack={onBack}
+      error={error}
+      extra={
+        <fieldset
           aria-label="Who gets this game?"
-          value={creditTo}
-          onChange={(value) => {
-            if (isCredit(value)) setCredit(value)
-          }}
-          choices={[
-            { value: 'nobody', title: 'Nobody', description: 'Usual' },
-            {
-              value: 'incoming',
-              title: incoming ? `${incoming.name} (coming in)` : 'Player coming in',
-              description: 'Counts as a full game for them',
-              disabled: !incoming,
-            },
-            {
-              value: 'outgoing',
-              title: out ? `${out.name} (going off)` : 'Player going off',
-              description: 'Counts as a full game for them',
-              disabled: !out,
-            },
-          ]}
-        />
-        <p className="m-0 text-[13px] text-fg2">
-          Started {minutesAgo} min ago. At most one person gets this game; it never counts toward
-          long-term rank.
-        </p>
-      </fieldset>
-    </Sheet>
+          className="m-0 flex min-w-0 flex-col gap-1.5 border-0 p-0"
+        >
+          <span className="text-[13px] font-semibold text-fg2">Who gets this game?</span>
+          <ChoiceGroup
+            type="single"
+            aria-label="Who gets this game?"
+            value={creditTo}
+            onChange={(value) => {
+              if (isCredit(value)) setCredit(value)
+            }}
+            choices={[
+              { value: 'nobody', title: 'Nobody', description: 'Usual' },
+              {
+                value: 'incoming',
+                title: incoming ? `${firstName(incoming.name)} (coming in)` : 'Player coming in',
+                description: 'Counts as a full game for them',
+                disabled: !incoming,
+              },
+              {
+                value: 'outgoing',
+                title: out ? `${firstName(out.name)} (going off)` : 'Player going off',
+                description: 'Counts as a full game for them',
+                disabled: !out,
+              },
+            ]}
+          />
+          <p className="m-0 text-[13px] text-fg2">
+            Started {minutesAgo} min ago. At most one person gets this game; it never counts toward
+            long-term rank.
+          </p>
+        </fieldset>
+      }
+      action={
+        <Button variant="primary" disabled={!out || !incoming} onClick={onReview}>
+          Review substitution
+        </Button>
+      }
+    />
   )
 }

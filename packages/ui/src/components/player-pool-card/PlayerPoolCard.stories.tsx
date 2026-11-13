@@ -63,6 +63,9 @@ export const Available: Story = {}
 export const Playing: Story = { args: playing }
 /** Not present: greyed picture, "Away", Present switch off */
 export const Away: Story = { args: away }
+/** Away, no games, in no match: No show (cancelled) next to Move to waitlist */
+export const AwayNoShow: Story = { args: { ...away, games: 0, onStepDown: fn(), onNoShow: fn() } }
+export const AwayNoShowLight: Story = { ...AwayNoShow, globals: { theme: 'light' } }
 /** Present and already in a waiting match */
 export const Queued: Story = { args: queued }
 /** Picked for the next match: accent ring and the pick-order badge */

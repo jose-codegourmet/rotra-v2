@@ -158,6 +158,7 @@
     "./session-roster/useSetAllPresence": "./src/session-roster/useSetAllPresence.ts",
     "./session-roster/useGiveSlot": "./src/session-roster/useGiveSlot.ts",
     "./session-roster/useStepDownToWaitlist": "./src/session-roster/useStepDownToWaitlist.ts",
+    "./session-roster/useNoShow": "./src/session-roster/useNoShow.ts",
     "./session-roster/useFillOpenSlots": "./src/session-roster/useFillOpenSlots.ts",
     "./session-roster/useRemoveFromWaitlist": "./src/session-roster/useRemoveFromWaitlist.ts",
     "./session-roster/useSubmitJoinRequest": "./src/session-roster/useSubmitJoinRequest.ts",

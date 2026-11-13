@@ -7,7 +7,7 @@ export const substitutionSheetMeta = {
   usage: [
     'Open it from Substitute player on the Active match sheet. The container holds the step, the two players and the credit choice, builds the candidate list with substitutionCandidates() from the match rules, and runs useSubstitutePlayer on Confirm substitution.',
     'Pass candidates as an empty list when nobody is free: the sheet shows "No present player is free right now." and Review substitution stays disabled. Incoming and outgoing credit cards stay disabled until that player is chosen.',
-    'Back on the pick step returns to the Active match sheet; Back on the confirm step returns to the pick step with the players and credit kept. Success returns to Q-ACTIVE-MATCH with the "Nathan in for Raymark" toast.',
+    'The pick step is a SwapPickerSheet: its × ("Back to match N") and backdrop return to the Active match sheet; open it from Substitute in PlayerActionSheet with that player already coming off; Back on the confirm step returns to the pick step with the players and credit kept. Success returns to Q-ACTIVE-MATCH with the "Nathan in for Raymark" toast.',
     'Not for swapping players before Start match: that is lineup editing on the Match queue or Replace player on Q-ON-COURT, not a substitution.',
   ],
   prototype: {
@@ -21,7 +21,7 @@ export const substitutionSheetMeta = {
   ],
   related: [
     'ActiveMatchSheet',
-    'PlayerTile',
+    'SwapPickerSheet',
     'PlayerPickerSheet',
     'ConfirmSheet',
     'ChoiceGroup',

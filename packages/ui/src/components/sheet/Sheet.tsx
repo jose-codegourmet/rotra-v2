@@ -31,6 +31,10 @@ export type SheetProps = {
   className?: string
   /** Classes for the body (.sb), e.g. `p-0` for a card that runs edge to edge (D-PARTICIPANT-PROFILE) */
   bodyClassName?: string
+  /** Classes for the header, e.g. a floating × with a screen-reader-only title (the player picker) */
+  headerClassName?: string
+  /** The header close button's accessible name; "Close" by default (e.g. "Back to match 4") */
+  closeLabel?: string
 }
 
 // Durations and easing from the prototypes: scrim fades in 0.15 s; the sheet pops in 0.16 s
@@ -56,6 +60,8 @@ export function Sheet({
   returnFocusRef,
   className,
   bodyClassName,
+  headerClassName,
+  closeLabel = 'Close',
 }: SheetProps) {
   const phone = useMediaQuery(PHONE_QUERY)
   const full = Boolean(fullscreen && phone && !side)
@@ -147,13 +153,18 @@ export function Sheet({
                   className,
                 )}
               >
-                <header className="flex shrink-0 items-start justify-between gap-3 px-5 pt-[18px] pb-1.5">
+                <header
+                  className={cn(
+                    'flex shrink-0 items-start justify-between gap-3 px-5 pt-[18px] pb-1.5',
+                    headerClassName,
+                  )}
+                >
                   <Dialog.Title ref={titleRef} tabIndex={-1} className="focus:outline-none">
                     {title}
                   </Dialog.Title>
                   {hideClose ? null : (
                     <Dialog.Close asChild>
-                      <IconButton variant="ghost" size="xs" label="Close">
+                      <IconButton variant="ghost" size="xs" label={closeLabel}>
                         <Icon name="x" />
                       </IconButton>
                     </Dialog.Close>

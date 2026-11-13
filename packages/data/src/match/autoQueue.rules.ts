@@ -253,12 +253,20 @@ export function generateAutoQueueMatches({
   error: string | null
   remainingShortfall?: number
 } {
-  const players = ctx.roster.filter(
+  const pool = ctx.roster.filter(
     (p) =>
       p.sessionId === session.id &&
       p.present &&
       (mode === 'ahead' || !activeMatchFor(p.id, ctx.matches)),
   )
+  // D-2026-11-13-07: a player already in a waiting match in the Main Queue is never available.
+  const players = pool.filter((p) => !queuedCount(p.id, ctx.matches))
+  const inQueue = pool.length - players.length
+  /** Appended when the batch is short and queued players were left out. */
+  const queuedNote = (text: string, made: number) =>
+    made < limit && inQueue
+      ? `${text.replace(/\.$/, '')} · ${inQueue} player${inQueue === 1 ? ' is' : 's are'} already in the Main Queue`
+      : text
   if (!session.allowSingles && !session.allowDoubles)
     return {
       matches: [],
@@ -311,7 +319,10 @@ export function generateAutoQueueMatches({
       return {
         matches: [],
         stopReason: '',
-        error: `Made 0 of ${limit}: not enough ${mode === 'ahead' ? 'present' : 'free'} players for another match.`,
+        error: queuedNote(
+          `Made 0 of ${limit}: not enough ${mode === 'ahead' ? 'present' : 'free'} players for another match.`,
+          0,
+        ),
       }
     const sorted = [...players].sort((a, b) => {
       const wait =
@@ -365,12 +376,15 @@ export function generateAutoQueueMatches({
       stopReason = `Everyone available reaches ${target} game${target === 1 ? '' : 's'} with these matches.`
     return {
       matches,
-      stopReason: `${stopReason}${remainingShortfall > 0 ? ` ${remainingShortfall} more game${remainingShortfall === 1 ? ' is' : 's are'} still needed to reach ${target}.` : ''}`,
+      stopReason: queuedNote(
+        `${stopReason}${remainingShortfall > 0 ? ` ${remainingShortfall} more game${remainingShortfall === 1 ? ' is' : 's are'} still needed to reach ${target}.` : ''}`,
+        matches.length,
+      ),
       remainingShortfall,
       error: null,
     }
   }
-  return { matches, stopReason, error: null }
+  return { matches, stopReason: queuedNote(stopReason, matches.length), error: null }
 }
 
 /** Revalidate source facts without silently replacing a selected lineup. Courts are claimed only by Start match. */

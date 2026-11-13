@@ -253,6 +253,8 @@ describe('complete flexible Queue Session rules', () => {
   it('accepts a Plan Ahead dependency without claiming another court', async () => {
     mockStore.update((s) => {
       s.roster = s.roster.map((p, i) => ({ ...p, present: i < 5 }))
+      // D-2026-11-13-07: queued players are never available, so keep the Main Queue empty here.
+      s.matches = s.matches.filter((m) => m.state !== 'waiting')
     })
     const drafts = await generate('ahead')
     const before = readMockState().matches.filter((m) => m.state === 'active')

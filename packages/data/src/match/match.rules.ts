@@ -50,6 +50,21 @@ export const freeCourts = (courts: SessionCourt[], matches: Match[], now = Date.
       courtOpen(c, now) &&
       !matches.some((m) => holdsCourt(m) && m.courtIds.includes(c.id)),
   )
+/**
+ * When a free court became free (the prototype's freeSince): the latest end of a match that started
+ * on it by `now`, or null when nothing has played there yet (the caller falls back to the court's
+ * opening time). A match still on the court has no end.
+ */
+export function courtFreeSince(courtId: string, matches: Match[], now = Date.now()) {
+  const ends = matches
+    .filter((m) => m.courtIds.includes(courtId) && m.startedAt != null && m.startedAt <= now)
+    .map((m) => m.endedAt ?? Number.POSITIVE_INFINITY)
+    .filter((end) => end <= now)
+  return ends.length ? Math.max(...ends) : null
+}
+/** Whole minutes a court has been free ("Free · N min"); null when unknown or not yet free. */
+export const freeCourtMinutes = (since: number | null | undefined, now = Date.now()) =>
+  since == null || since > now ? null : Math.max(0, Math.floor((now - since) / 60000))
 export const queuedCount = (id: string, matches: Match[]) =>
   matches.filter((m) => m.state === 'waiting' && allPlayers(m).includes(id)).length
 export const isBookingEnded = (court: SessionCourt, sessionEnd: number, now: number) =>
@@ -420,9 +435,13 @@ export function canMoveCourt(m: Match, courtIds: string[], ctx: MatchContext) {
  * Replace player (Q-ON-COURT): a plain lineup change on an On court match, never a substitution.
  * The incoming player is present, not in this match and not busy elsewhere (On court or Playing).
  */
+/**
+ * Replace player: On court (a lineup change) or Playing (fixes a mistake, 2026-11-13: the
+ * replacement is recorded as having played the whole game; no substitution, no credit choice).
+ */
 export function canReplacePlayer(m: Match, outId: string, inId: string, ctx: MatchContext) {
   return (
-    m.state === 'on_court' &&
+    (m.state === 'on_court' || m.state === 'active') &&
     allPlayers(m).includes(outId) &&
     substitutionCandidates(m, ctx.roster, ctx.matches).some((p) => p.id === inId)
   )

@@ -56,6 +56,11 @@ export type PlayerPoolCardProps = {
    */
   onStepDown?: () => void
   /**
+   * No show (cancelled): a ghost button in error colour next to Move to waitlist. Pass it only for a
+   * live player who is away, has played no games and is in no match; it opens the confirmation.
+   */
+  onNoShow?: () => void
+  /**
    * Opens the player's profile (D-PARTICIPANT-PROFILE): the picture becomes a button named
    * “View NAME's profile”. Tapping it never selects the card.
    */
@@ -99,6 +104,7 @@ export function PlayerPoolCard({
   onPresentChange,
   onSetGames,
   onStepDown,
+  onNoShow,
   onOpenProfile,
   className,
 }: PlayerPoolCardProps) {
@@ -236,7 +242,7 @@ export function PlayerPoolCard({
         </span>
       ) : null}
       {presencePending ? <span className="text-[11px] text-fg2">Saving presence…</span> : null}
-      {onStepDown ? (
+      {onStepDown || onNoShow ? (
         // The button sits inside the card: stop its clicks and keys from reaching the card's selection.
         // biome-ignore lint/a11y/noStaticElementInteractions: a plain stop-propagation boundary around the button
         <span
@@ -244,9 +250,22 @@ export function PlayerPoolCard({
           onClick={(event) => event.stopPropagation()}
           onKeyDown={(event) => event.stopPropagation()}
         >
-          <Button size="xs" aria-label={`Move ${name} to the waitlist`} onClick={onStepDown}>
-            Move to waitlist
-          </Button>
+          {onStepDown ? (
+            <Button size="xs" aria-label={`Move ${name} to the waitlist`} onClick={onStepDown}>
+              Move to waitlist
+            </Button>
+          ) : null}
+          {onNoShow ? (
+            <Button
+              size="xs"
+              variant="ghost"
+              className="text-error"
+              aria-label={`Mark ${name} as No show (cancelled)`}
+              onClick={onNoShow}
+            >
+              No show (cancelled)
+            </Button>
+          ) : null}
         </span>
       ) : null}
       {/* biome-ignore lint/a11y/useSemanticElements: a group/region div; a fieldset or section would change the drawn layout */}

@@ -63,6 +63,7 @@
   --color-lv-int: var(--lv-int);
   --color-lv-adv: var(--lv-adv);
   --color-lv-none: var(--lv-none);
+  --color-on-level: var(--on-level);
   --color-court: var(--court);
   --color-court-line: var(--court-line);
   --color-court-free: var(--court-free);
@@ -167,6 +168,8 @@
   --lv-int: #ffd23f;
   --lv-adv: #ff5a5f;
   --lv-none: var(--border-strong);
+  /* Text on a filled level colour (the level select menu's chosen option); the same in both themes. */
+  --on-level: #0b0b0c;
 
   /* Named here because the prototypes hardcode them inline (same in both themes). */
   --shadow-sheet: 0 24px 60px rgba(0, 0, 0, 0.45); /* .sheet */

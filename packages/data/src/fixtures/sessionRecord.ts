@@ -1,4 +1,4 @@
-import { computeStandings } from '../match/match.rules'
+import { computeStandings, courtFreeSince, freeCourtMinutes } from '../match/match.rules'
 import type { Match } from '../match/match.types'
 import type { PlayingLevel } from '../player/player.types'
 import { shortName } from '../session-roster/sessionRoster.rules'
@@ -19,6 +19,8 @@ export type ReplayPlayer = {
 export type ReplayCourtMoment = {
   label: string
   match: { number: number; minutesIn: number; teamA: ReplayPlayer[]; teamB: ReplayPlayer[] } | null
+  /** Free: minutes since the last match on it ended ("Free · N min"); null before any match */
+  freeMinutes: number | null
 }
 
 /** The replay card's inputs at one time: the courts, and the summary line under the bar. */
@@ -92,6 +94,7 @@ export function createSessionRecordFixtures(now = Date.now()) {
               teamB: m.teamB.map(playerOf),
             }
           : null,
+        freeMinutes: m ? null : freeCourtMinutes(courtFreeSince(c.id, matches, t), t),
       }
     })
 

@@ -35,12 +35,10 @@ export type ActiveMatchSheetProps = {
   minimumGames: number
   /** Every substitution made so far, oldest first */
   substitutions?: ActiveMatchSubstitution[]
-  /** Opens the player's profile */
+  /** A player was tapped: opens "Change NAME?" (Substitute or Replace, PlayerActionSheet) */
   onSelectPlayer: (playerId: string, team: MatchLineupTeam) => void
   /** Opens Mark match invalid? (Q-INVALID-MATCH) */
   onMarkInvalid: () => void
-  /** Opens Substitute in match N (Q-SUBSTITUTE) */
-  onSubstitute: () => void
   /** Opens Match N result (Q-MATCH-DONE) */
   onMatchDone: () => void
 }
@@ -68,9 +66,10 @@ function substitutionLine(s: ActiveMatchSubstitution) {
 
 /**
  * Q-ACTIVE-MATCH: the in-game control sheet for a match on court. "Match N · Court X", the format
- * with the start time and minutes in, Team A VS Team B (no swapping once started), one line per
- * substitution (credit or neither), and the reminder that closing the sheet does not end the game.
- * Footer: Mark invalid (destructive), Substitute player, and the primary Match done. No level
+ * with the start time and minutes in, Team A VS Team B (no swapping once started; tapping a player
+ * opens Substitute or Replace), one line per substitution (credit or neither), and the reminder that
+ * closing the sheet does not end the game. Footer: Mark invalid (destructive) and the primary Match
+ * done. No level
  * edits, past-result changes, reset or point-by-point scoring.
  */
 export function ActiveMatchSheet({
@@ -87,7 +86,6 @@ export function ActiveMatchSheet({
   substitutions = [],
   onSelectPlayer,
   onMarkInvalid,
-  onSubstitute,
   onMatchDone,
 }: ActiveMatchSheetProps) {
   const minutesIn = Math.max(0, Math.round(((now ?? Date.now()) - startedAt) / 60000))
@@ -101,7 +99,6 @@ export function ActiveMatchSheet({
           <Button variant="danger" onClick={onMarkInvalid}>
             Mark invalid
           </Button>
-          <Button onClick={onSubstitute}>Substitute player</Button>
           <Button variant="primary" onClick={onMatchDone}>
             Match done
           </Button>
@@ -116,7 +113,9 @@ export function ActiveMatchSheet({
         teamB={teamB}
         minimumGames={minimumGames}
         onSelectPlayer={onSelectPlayer}
+        playerActionLabel="Substitute or replace"
       />
+      <p className="m-0 text-[13px] text-fg2">Tap a player to substitute or replace them.</p>
       {substitutions.map((s, index) => (
         <p key={`${s.outName}-${s.inName}-${index}`} className="m-0 text-[13px] text-fg2">
           Substitution: {substitutionLine(s)}.

@@ -187,6 +187,11 @@ export type PublicCourtNow = {
   teamB: PublicMatchPlayer[]
   /** “Started 9:16 PM”; null while getting ready (“Waiting to start”) and when free. No score. */
   startedAt: number | null
+  /**
+   * Free only: when it became free (the last match on it ended, or the session started), for
+   * “Free · N min”; null otherwise.
+   */
+  freeSince: number | null
 }
 
 /** One waiting match of the read-only Queue: faces and first names, up to five per side. */

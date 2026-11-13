@@ -61,6 +61,7 @@ import type {
   DropOutNotice,
   SessionInviteCode,
   SessionJoinRequest,
+  SessionNoShow,
   SessionPlayer,
   SessionWaitlistEntry,
 } from '../session-roster/sessionRoster.types'
@@ -107,6 +108,8 @@ export type MockState = {
   courts: SessionCourt[]
   roster: SessionPlayer[]
   waitlist: SessionWaitlistEntry[]
+  /** No show (cancelled) rows taken off live rosters; missing in older saved states */
+  noShows?: SessionNoShow[]
   joinRequests: SessionJoinRequest[]
   /** Player-side I can't make it (D-2026-11-09-03), in every state; closed ones stay, hidden */
   dropOutNotices: DropOutNotice[]

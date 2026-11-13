@@ -1,0 +1,33 @@
+{
+  "rule": "profile-banner/profile-banner-name",
+  "version": 1,
+  "cases": [
+    {
+      "name": "default banner › carries an uploaded banner image (profileBanner) #1",
+      "input": {
+        "args": [
+          {
+            "id": "0b4c7a1e-2f3d-4e5a-8b6c-7d8e9f0a1b2c",
+            "image": "https://example.test/b.webp",
+            "shown": true,
+            "uploadedAt": 1,
+            "number": 7
+          }
+        ]
+      },
+      "expected": "Banner 7"
+    },
+    {
+      "name": "default banner › carries an uploaded banner image (profileBanner) #2",
+      "input": {
+        "args": [
+          {
+            "id": "dusk",
+            "number": 3
+          }
+        ]
+      },
+      "expected": "Dusk"
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "rule": "match/counted-team",
+  "version": 1,
+  "cases": [
+    {
+      "name": "prototype reference awards › uses the level-index expected win chance and needs two counted games for MVP (sessionResult)",
+      "input": {
+        "args": [
+          {
+            "id": "c3e14550-a77c-4d0f-ba4b-43bf417b5aff",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["Zoe"],
+            "teamB": ["Amy"],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          },
+          "Ben"
+        ]
+      },
+      "expected": null
+    },
+    {
+      "name": "prototype reference awards › never fills Most Improved or Off Day without a five-session baseline (sessionResult)",
+      "input": {
+        "args": [
+          {
+            "id": "59d9468d-2f62-4610-b63d-c2c4009100ad",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["Zoe"],
+            "teamB": ["Amy"],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          },
+          "Eve"
+        ]
+      },
+      "expected": null
+    },
+    {
+      "name": "substitution game credit › gives the outgoing player the game with the side they played on (match)",
+      "input": {
+        "args": [
+          {
+            "id": "02da806c-89d8-4c97-9bfb-2ba3f863f890",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["Zoe", "Amy"],
+            "teamB": ["Ben", "Dan"],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1,
+            "substitutions": [
+              {
+                "outId": "Eve",
+                "inId": "Zoe",
+                "team": "A",
+                "at": 0,
+                "creditTo": "outgoing"
+              }
+            ],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          },
+          "Eve"
+        ]
+      },
+      "expected": "A"
+    }
+  ]
+}

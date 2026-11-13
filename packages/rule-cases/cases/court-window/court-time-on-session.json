@@ -1,0 +1,27 @@
+{
+  "rule": "court-window/court-time-on-session",
+  "version": 1,
+  "cases": [
+    {
+      "name": "court window preview › snaps a start in the session start minute to the actual start (court-window.test)",
+      "input": {
+        "args": [1793505994567, 1793505960000]
+      },
+      "expected": 1793505994567
+    },
+    {
+      "name": "court window preview › leaves any other instant as it is, on whatever day it carries (court-window.test) #1",
+      "input": {
+        "args": [1793541600000, 1793541540000]
+      },
+      "expected": 1793541540000
+    },
+    {
+      "name": "court window preview › leaves any other instant as it is, on whatever day it carries (court-window.test) #2",
+      "input": {
+        "args": [1793541600000, 1793550600000]
+      },
+      "expected": 1793550600000
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "rule": "license/term-end",
+  "version": 1,
+  "cases": [
+    {
+      "name": "termEnd (rotra-admin.html termEnd()) › adds one month or twelve, less a day (license) #1",
+      "input": {
+        "args": ["2026-10-03", "Monthly"]
+      },
+      "expected": "2026-11-02"
+    },
+    {
+      "name": "termEnd (rotra-admin.html termEnd()) › adds one month or twelve, less a day (license) #2",
+      "input": {
+        "args": ["2026-02-01", "Monthly"]
+      },
+      "expected": "2026-02-28"
+    },
+    {
+      "name": "termEnd (rotra-admin.html termEnd()) › adds one month or twelve, less a day (license) #3",
+      "input": {
+        "args": ["2026-04-01", "Yearly"]
+      },
+      "expected": "2027-03-31"
+    },
+    {
+      "name": "termEnd (rotra-admin.html termEnd()) › adds one month or twelve, less a day (license) #4",
+      "input": {
+        "args": ["2026-02-15", "Yearly"]
+      },
+      "expected": "2027-02-14"
+    },
+    {
+      "name": "termEnd (rotra-admin.html termEnd()) › clamps to month end before taking the day off (license) #1",
+      "input": {
+        "args": ["2026-01-31", "Monthly"]
+      },
+      "expected": "2026-02-27"
+    },
+    {
+      "name": "termEnd (rotra-admin.html termEnd()) › clamps to month end before taking the day off (license) #2",
+      "input": {
+        "args": ["2028-02-29", "Yearly"]
+      },
+      "expected": "2029-02-27"
+    }
+  ]
+}

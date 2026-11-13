@@ -1,0 +1,939 @@
+{
+  "rule": "session-cost/estimate-session-cost",
+  "version": 1,
+  "cases": [
+    {
+      "name": "session cost estimates in centavos › matches tonight: courts + shuttles + entrance, custom fee and profit (sessionCost)",
+      "input": {
+        "args": [
+          {
+            "courtFeePerCourtHour": 35000,
+            "entranceFeePerHead": 6000,
+            "paymentMode": "custom",
+            "customFeePerHead": 90000,
+            "shuttles": [
+              {
+                "inventoryItemId": "inv1",
+                "tubes": 4
+              },
+              {
+                "inventoryItemId": "inv2",
+                "tubes": 2
+              }
+            ]
+          },
+          {
+            "courts": 3,
+            "durationMinutes": 180,
+            "players": 14,
+            "inventory": [
+              {
+                "id": "inv1",
+                "clubId": "club",
+                "name": "inv1",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 12,
+                "unitCostMinor": 145000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv2",
+                "clubId": "club",
+                "name": "inv2",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 6,
+                "unitCostMinor": 115000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv3",
+                "clubId": "club",
+                "name": "inv3",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 2,
+                "unitCostMinor": 125000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv4",
+                "clubId": "club",
+                "name": "inv4",
+                "category": "equipment",
+                "unit": "tube",
+                "stock": 24,
+                "unitCostMinor": 8000,
+                "currency": "PHP"
+              }
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "players": 14,
+        "court": 315000,
+        "shuttle": 810000,
+        "entrance": 84000,
+        "entranceFeePerHead": 6000,
+        "total": 1209000,
+        "breakEven": 86400,
+        "perHead": 90000,
+        "isCustom": true,
+        "collect": 1260000,
+        "result": {
+          "kind": "profit",
+          "amount": 51000
+        }
+      }
+    },
+    {
+      "name": "session cost estimates in centavos › matches Thursday Open Play with the custom 700 fee (sessionCost)",
+      "input": {
+        "args": [
+          {
+            "courtFeePerCourtHour": 35000,
+            "entranceFeePerHead": 6000,
+            "paymentMode": "custom",
+            "customFeePerHead": 70000,
+            "shuttles": [
+              {
+                "inventoryItemId": "inv1",
+                "tubes": 4
+              },
+              {
+                "inventoryItemId": "inv2",
+                "tubes": 2
+              }
+            ]
+          },
+          {
+            "courts": 3,
+            "durationMinutes": 180,
+            "players": 18,
+            "inventory": [
+              {
+                "id": "inv1",
+                "clubId": "club",
+                "name": "inv1",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 12,
+                "unitCostMinor": 145000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv2",
+                "clubId": "club",
+                "name": "inv2",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 6,
+                "unitCostMinor": 115000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv3",
+                "clubId": "club",
+                "name": "inv3",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 2,
+                "unitCostMinor": 125000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv4",
+                "clubId": "club",
+                "name": "inv4",
+                "category": "equipment",
+                "unit": "tube",
+                "stock": 24,
+                "unitCostMinor": 8000,
+                "currency": "PHP"
+              }
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "total": 1233000,
+        "perHead": 70000,
+        "collect": 1260000,
+        "result": {
+          "kind": "profit",
+          "amount": 27000
+        }
+      }
+    },
+    {
+      "name": "session cost estimates in centavos › rounds break-even UP to a whole peso, displaying the surplus (sessionCost)",
+      "input": {
+        "args": [
+          {
+            "courtFeePerCourtHour": 35000,
+            "entranceFeePerHead": 6000,
+            "paymentMode": "break_even",
+            "customFeePerHead": 90000,
+            "shuttles": [
+              {
+                "inventoryItemId": "inv1",
+                "tubes": 4
+              },
+              {
+                "inventoryItemId": "inv2",
+                "tubes": 2
+              }
+            ]
+          },
+          {
+            "courts": 3,
+            "durationMinutes": 180,
+            "players": 14,
+            "inventory": [
+              {
+                "id": "inv1",
+                "clubId": "club",
+                "name": "inv1",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 12,
+                "unitCostMinor": 145000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv2",
+                "clubId": "club",
+                "name": "inv2",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 6,
+                "unitCostMinor": 115000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv3",
+                "clubId": "club",
+                "name": "inv3",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 2,
+                "unitCostMinor": 125000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv4",
+                "clubId": "club",
+                "name": "inv4",
+                "category": "equipment",
+                "unit": "tube",
+                "stock": 24,
+                "unitCostMinor": 8000,
+                "currency": "PHP"
+              }
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "breakEven": 86400,
+        "perHead": 86400,
+        "collect": 1209600,
+        "result": {
+          "kind": "breaks_even",
+          "amount": 600
+        }
+      }
+    },
+    {
+      "name": "session cost estimates in centavos › shows a custom loss, exact break-even, and zero custom payment (sessionCost) #1",
+      "input": {
+        "args": [
+          {
+            "courtFeePerCourtHour": 35000,
+            "entranceFeePerHead": 6000,
+            "paymentMode": "custom",
+            "customFeePerHead": 80000,
+            "shuttles": [
+              {
+                "inventoryItemId": "inv1",
+                "tubes": 4
+              },
+              {
+                "inventoryItemId": "inv2",
+                "tubes": 2
+              }
+            ]
+          },
+          {
+            "courts": 3,
+            "durationMinutes": 180,
+            "players": 14,
+            "inventory": [
+              {
+                "id": "inv1",
+                "clubId": "club",
+                "name": "inv1",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 12,
+                "unitCostMinor": 145000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv2",
+                "clubId": "club",
+                "name": "inv2",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 6,
+                "unitCostMinor": 115000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv3",
+                "clubId": "club",
+                "name": "inv3",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 2,
+                "unitCostMinor": 125000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv4",
+                "clubId": "club",
+                "name": "inv4",
+                "category": "equipment",
+                "unit": "tube",
+                "stock": 24,
+                "unitCostMinor": 8000,
+                "currency": "PHP"
+              }
+            ]
+          }
+        ],
+        "select": "result"
+      },
+      "expected": {
+        "kind": "loss",
+        "amount": 89000
+      }
+    },
+    {
+      "name": "session cost estimates in centavos › shows a custom loss, exact break-even, and zero custom payment (sessionCost) #2",
+      "input": {
+        "args": [
+          {
+            "courtFeePerCourtHour": 35000,
+            "entranceFeePerHead": 6000,
+            "paymentMode": "custom",
+            "customFeePerHead": 68500,
+            "shuttles": [
+              {
+                "inventoryItemId": "inv1",
+                "tubes": 4
+              },
+              {
+                "inventoryItemId": "inv2",
+                "tubes": 2
+              }
+            ]
+          },
+          {
+            "courts": 3,
+            "durationMinutes": 180,
+            "players": 18,
+            "inventory": [
+              {
+                "id": "inv1",
+                "clubId": "club",
+                "name": "inv1",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 12,
+                "unitCostMinor": 145000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv2",
+                "clubId": "club",
+                "name": "inv2",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 6,
+                "unitCostMinor": 115000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv3",
+                "clubId": "club",
+                "name": "inv3",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 2,
+                "unitCostMinor": 125000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv4",
+                "clubId": "club",
+                "name": "inv4",
+                "category": "equipment",
+                "unit": "tube",
+                "stock": 24,
+                "unitCostMinor": 8000,
+                "currency": "PHP"
+              }
+            ]
+          }
+        ],
+        "select": "result"
+      },
+      "expected": {
+        "kind": "breaks_even",
+        "amount": 0
+      }
+    },
+    {
+      "name": "session cost estimates in centavos › shows a custom loss, exact break-even, and zero custom payment (sessionCost) #3",
+      "input": {
+        "args": [
+          {
+            "courtFeePerCourtHour": 35000,
+            "entranceFeePerHead": 6000,
+            "paymentMode": "custom",
+            "customFeePerHead": 0,
+            "shuttles": [
+              {
+                "inventoryItemId": "inv1",
+                "tubes": 4
+              },
+              {
+                "inventoryItemId": "inv2",
+                "tubes": 2
+              }
+            ]
+          },
+          {
+            "courts": 3,
+            "durationMinutes": 180,
+            "players": 14,
+            "inventory": [
+              {
+                "id": "inv1",
+                "clubId": "club",
+                "name": "inv1",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 12,
+                "unitCostMinor": 145000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv2",
+                "clubId": "club",
+                "name": "inv2",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 6,
+                "unitCostMinor": 115000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv3",
+                "clubId": "club",
+                "name": "inv3",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 2,
+                "unitCostMinor": 125000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv4",
+                "clubId": "club",
+                "name": "inv4",
+                "category": "equipment",
+                "unit": "tube",
+                "stock": 24,
+                "unitCostMinor": 8000,
+                "currency": "PHP"
+              }
+            ]
+          }
+        ],
+        "select": "result"
+      },
+      "expected": {
+        "kind": "loss",
+        "amount": 1209000
+      }
+    },
+    {
+      "name": "session cost estimates in centavos › uses at least one player and handles no costs (sessionCost)",
+      "input": {
+        "args": [
+          {
+            "courtFeePerCourtHour": null,
+            "entranceFeePerHead": null,
+            "shuttles": [],
+            "paymentMode": "break_even",
+            "customFeePerHead": null
+          },
+          {
+            "courts": 3,
+            "durationMinutes": 180,
+            "players": 0,
+            "inventory": [
+              {
+                "id": "inv1",
+                "clubId": "club",
+                "name": "inv1",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 12,
+                "unitCostMinor": 145000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv2",
+                "clubId": "club",
+                "name": "inv2",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 6,
+                "unitCostMinor": 115000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv3",
+                "clubId": "club",
+                "name": "inv3",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 2,
+                "unitCostMinor": 125000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv4",
+                "clubId": "club",
+                "name": "inv4",
+                "category": "equipment",
+                "unit": "tube",
+                "stock": 24,
+                "unitCostMinor": 8000,
+                "currency": "PHP"
+              }
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "players": 1,
+        "total": 0,
+        "perHead": 0,
+        "result": {
+          "kind": "no_costs",
+          "amount": 0
+        }
+      }
+    },
+    {
+      "name": "session cost estimates in centavos › uses current prices and allows more tubes than stock (sessionCost)",
+      "input": {
+        "args": [
+          {
+            "courtFeePerCourtHour": 35000,
+            "entranceFeePerHead": 6000,
+            "paymentMode": "custom",
+            "customFeePerHead": 90000,
+            "shuttles": [
+              {
+                "inventoryItemId": "inv1",
+                "tubes": 4
+              },
+              {
+                "inventoryItemId": "inv2",
+                "tubes": 2
+              }
+            ]
+          },
+          {
+            "courts": 3,
+            "durationMinutes": 180,
+            "players": 14,
+            "inventory": [
+              {
+                "id": "inv1",
+                "clubId": "club",
+                "name": "inv1",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 12,
+                "unitCostMinor": 150000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv2",
+                "clubId": "club",
+                "name": "inv2",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 6,
+                "unitCostMinor": 115000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv3",
+                "clubId": "club",
+                "name": "inv3",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 2,
+                "unitCostMinor": 125000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv4",
+                "clubId": "club",
+                "name": "inv4",
+                "category": "equipment",
+                "unit": "tube",
+                "stock": 24,
+                "unitCostMinor": 8000,
+                "currency": "PHP"
+              }
+            ]
+          }
+        ],
+        "select": "total"
+      },
+      "expected": 1229000
+    },
+    {
+      "name": "session cost estimates in centavos › uses current prices and allows more tubes than stock (derived, sessionCost) #1",
+      "input": {
+        "args": [
+          {
+            "courtFeePerCourtHour": null,
+            "entranceFeePerHead": null,
+            "shuttles": [
+              {
+                "inventoryItemId": "inv3",
+                "tubes": 10
+              }
+            ],
+            "paymentMode": "break_even",
+            "customFeePerHead": null
+          },
+          {
+            "courts": 3,
+            "durationMinutes": 180,
+            "players": 14,
+            "inventory": [
+              {
+                "id": "inv1",
+                "clubId": "club",
+                "name": "inv1",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 12,
+                "unitCostMinor": 145000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv2",
+                "clubId": "club",
+                "name": "inv2",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 6,
+                "unitCostMinor": 115000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv3",
+                "clubId": "club",
+                "name": "inv3",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 2,
+                "unitCostMinor": 125000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv4",
+                "clubId": "club",
+                "name": "inv4",
+                "category": "equipment",
+                "unit": "tube",
+                "stock": 24,
+                "unitCostMinor": 8000,
+                "currency": "PHP"
+              }
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "players": 14,
+        "court": 0,
+        "shuttle": 1250000,
+        "entrance": 0,
+        "entranceFeePerHead": 0,
+        "total": 1250000,
+        "breakEven": 89300,
+        "perHead": 89300,
+        "isCustom": false,
+        "collect": 1250200,
+        "result": {
+          "kind": "breaks_even",
+          "amount": 200
+        }
+      }
+    },
+    {
+      "name": "session cost estimates in centavos › uses current prices and allows more tubes than stock (derived, sessionCost) #2",
+      "input": {
+        "args": [
+          {
+            "courtFeePerCourtHour": 35000,
+            "entranceFeePerHead": 6000,
+            "paymentMode": "custom",
+            "customFeePerHead": 90000,
+            "shuttles": [
+              {
+                "inventoryItemId": "inv1",
+                "tubes": 4
+              },
+              {
+                "inventoryItemId": "inv2",
+                "tubes": 2
+              }
+            ]
+          },
+          {
+            "courts": 3,
+            "durationMinutes": 180,
+            "players": 14,
+            "inventory": [
+              {
+                "id": "inv1",
+                "clubId": "club",
+                "name": "inv1",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 12,
+                "unitCostMinor": 150000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv2",
+                "clubId": "club",
+                "name": "inv2",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 6,
+                "unitCostMinor": 115000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv3",
+                "clubId": "club",
+                "name": "inv3",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 2,
+                "unitCostMinor": 125000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv4",
+                "clubId": "club",
+                "name": "inv4",
+                "category": "equipment",
+                "unit": "tube",
+                "stock": 24,
+                "unitCostMinor": 8000,
+                "currency": "PHP"
+              }
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "players": 14,
+        "court": 315000,
+        "shuttle": 830000,
+        "entrance": 84000,
+        "entranceFeePerHead": 6000,
+        "total": 1229000,
+        "breakEven": 87800,
+        "perHead": 90000,
+        "isCustom": true,
+        "collect": 1260000,
+        "result": {
+          "kind": "profit",
+          "amount": 31000
+        }
+      }
+    },
+    {
+      "name": "session cost estimates in centavos › rounds fractional court costs to the nearest centavo, including half-centavos (derived, sessionCost) #1",
+      "input": {
+        "args": [
+          {
+            "courtFeePerCourtHour": 100,
+            "entranceFeePerHead": null,
+            "shuttles": [],
+            "paymentMode": "break_even",
+            "customFeePerHead": null
+          },
+          {
+            "courts": 1,
+            "durationMinutes": 1,
+            "players": 14,
+            "inventory": [
+              {
+                "id": "inv1",
+                "clubId": "club",
+                "name": "inv1",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 12,
+                "unitCostMinor": 145000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv2",
+                "clubId": "club",
+                "name": "inv2",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 6,
+                "unitCostMinor": 115000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv3",
+                "clubId": "club",
+                "name": "inv3",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 2,
+                "unitCostMinor": 125000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv4",
+                "clubId": "club",
+                "name": "inv4",
+                "category": "equipment",
+                "unit": "tube",
+                "stock": 24,
+                "unitCostMinor": 8000,
+                "currency": "PHP"
+              }
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "players": 14,
+        "court": 2,
+        "shuttle": 0,
+        "entrance": 0,
+        "entranceFeePerHead": 0,
+        "total": 2,
+        "breakEven": 100,
+        "perHead": 100,
+        "isCustom": false,
+        "collect": 1400,
+        "result": {
+          "kind": "breaks_even",
+          "amount": 1398
+        }
+      }
+    },
+    {
+      "name": "session cost estimates in centavos › rounds fractional court costs to the nearest centavo, including half-centavos (derived, sessionCost) #2",
+      "input": {
+        "args": [
+          {
+            "courtFeePerCourtHour": 101,
+            "entranceFeePerHead": null,
+            "shuttles": [],
+            "paymentMode": "break_even",
+            "customFeePerHead": null
+          },
+          {
+            "courts": 1,
+            "durationMinutes": 30,
+            "players": 14,
+            "inventory": [
+              {
+                "id": "inv1",
+                "clubId": "club",
+                "name": "inv1",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 12,
+                "unitCostMinor": 145000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv2",
+                "clubId": "club",
+                "name": "inv2",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 6,
+                "unitCostMinor": 115000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv3",
+                "clubId": "club",
+                "name": "inv3",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 2,
+                "unitCostMinor": 125000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv4",
+                "clubId": "club",
+                "name": "inv4",
+                "category": "equipment",
+                "unit": "tube",
+                "stock": 24,
+                "unitCostMinor": 8000,
+                "currency": "PHP"
+              }
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "players": 14,
+        "court": 51,
+        "shuttle": 0,
+        "entrance": 0,
+        "entranceFeePerHead": 0,
+        "total": 51,
+        "breakEven": 100,
+        "perHead": 100,
+        "isCustom": false,
+        "collect": 1400,
+        "result": {
+          "kind": "breaks_even",
+          "amount": 1349
+        }
+      }
+    }
+  ]
+}

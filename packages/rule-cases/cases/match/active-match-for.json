@@ -1,0 +1,140 @@
+{
+  "rule": "match/active-match-for",
+  "version": 1,
+  "cases": [
+    {
+      "name": "On court matches › hold their court and make their players busy (match)",
+      "input": {
+        "args": [
+          "Migs",
+          [
+            {
+              "id": "placed",
+              "sessionId": "s",
+              "matchNo": 1,
+              "state": "on_court",
+              "format": "doubles",
+              "queuePosition": 1,
+              "origin": "manual",
+              "manualProtected": true,
+              "teamA": ["Migs", "Amy"],
+              "teamB": ["Ben", "Dan"],
+              "courtIds": ["c1"],
+              "startedAt": null,
+              "endedAt": null,
+              "substitutions": [],
+              "decision": null,
+              "placedAt": 0
+            },
+            {
+              "id": "next",
+              "sessionId": "s",
+              "matchNo": 1,
+              "state": "waiting",
+              "format": "doubles",
+              "queuePosition": 1,
+              "origin": "manual",
+              "manualProtected": true,
+              "teamA": ["Migs", "Eve"],
+              "teamB": ["Fay", "Gus"],
+              "courtIds": [],
+              "startedAt": null,
+              "endedAt": null,
+              "substitutions": [],
+              "decision": null,
+              "placedAt": null
+            },
+            {
+              "id": "free",
+              "sessionId": "s",
+              "matchNo": 1,
+              "state": "waiting",
+              "format": "doubles",
+              "queuePosition": 1,
+              "origin": "manual",
+              "manualProtected": true,
+              "teamA": ["Eve", "Fay"],
+              "teamB": ["Gus", "Hal"],
+              "courtIds": [],
+              "startedAt": null,
+              "endedAt": null,
+              "substitutions": [],
+              "decision": null,
+              "placedAt": null
+            }
+          ]
+        ],
+        "select": "id"
+      },
+      "expected": "placed"
+    },
+    {
+      "name": "On court matches › hold their court and make their players busy (undefined, match)",
+      "input": {
+        "args": [
+          "Migs",
+          [
+            {
+              "id": "placed",
+              "sessionId": "s",
+              "matchNo": 1,
+              "state": "on_court",
+              "format": "doubles",
+              "queuePosition": 1,
+              "origin": "manual",
+              "manualProtected": true,
+              "teamA": ["Migs", "Amy"],
+              "teamB": ["Ben", "Dan"],
+              "courtIds": ["c1"],
+              "startedAt": null,
+              "endedAt": null,
+              "substitutions": [],
+              "decision": null,
+              "placedAt": 0
+            },
+            {
+              "id": "next",
+              "sessionId": "s",
+              "matchNo": 1,
+              "state": "waiting",
+              "format": "doubles",
+              "queuePosition": 1,
+              "origin": "manual",
+              "manualProtected": true,
+              "teamA": ["Migs", "Eve"],
+              "teamB": ["Fay", "Gus"],
+              "courtIds": [],
+              "startedAt": null,
+              "endedAt": null,
+              "substitutions": [],
+              "decision": null,
+              "placedAt": null
+            },
+            {
+              "id": "free",
+              "sessionId": "s",
+              "matchNo": 1,
+              "state": "waiting",
+              "format": "doubles",
+              "queuePosition": 1,
+              "origin": "manual",
+              "manualProtected": true,
+              "teamA": ["Eve", "Fay"],
+              "teamB": ["Gus", "Hal"],
+              "courtIds": [],
+              "startedAt": null,
+              "endedAt": null,
+              "substitutions": [],
+              "decision": null,
+              "placedAt": null
+            }
+          ],
+          "placed"
+        ]
+      },
+      "expected": {
+        "$undefined": true
+      }
+    }
+  ]
+}

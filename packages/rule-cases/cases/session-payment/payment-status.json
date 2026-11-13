@@ -1,0 +1,180 @@
+{
+  "rule": "session-payment/payment-status",
+  "version": 1,
+  "cases": [
+    {
+      "name": "payment status (#479) › compares the amount received with the current amount due (sessionPayment) #1",
+      "input": {
+        "args": [
+          {
+            "$undefined": true
+          },
+          70000
+        ]
+      },
+      "expected": {
+        "kind": "unpaid"
+      }
+    },
+    {
+      "name": "payment status (#479) › compares the amount received with the current amount due (sessionPayment) #2",
+      "input": {
+        "args": [
+          {
+            "amountMinor": 0
+          },
+          70000
+        ]
+      },
+      "expected": {
+        "kind": "unpaid"
+      }
+    },
+    {
+      "name": "payment status (#479) › compares the amount received with the current amount due (sessionPayment) #3",
+      "input": {
+        "args": [
+          {
+            "amountMinor": 70000
+          },
+          70000
+        ]
+      },
+      "expected": {
+        "kind": "paid"
+      }
+    },
+    {
+      "name": "payment status (#479) › compares the amount received with the current amount due (sessionPayment) #4",
+      "input": {
+        "args": [
+          {
+            "amountMinor": 50000
+          },
+          70000
+        ]
+      },
+      "expected": {
+        "kind": "partial",
+        "left": 20000
+      }
+    },
+    {
+      "name": "payment status (#479) › compares the amount received with the current amount due (sessionPayment) #5",
+      "input": {
+        "args": [
+          {
+            "amountMinor": 80000
+          },
+          70000
+        ]
+      },
+      "expected": {
+        "kind": "reimburse",
+        "toReturn": 10000
+      }
+    },
+    {
+      "name": "payment status (#479) › re-derives after a price change without touching the amount received (sessionPayment) #1",
+      "input": {
+        "args": [
+          {
+            "amountMinor": 59700
+          },
+          55000
+        ]
+      },
+      "expected": {
+        "kind": "reimburse",
+        "toReturn": 4700
+      }
+    },
+    {
+      "name": "payment status (#479) › re-derives after a price change without touching the amount received (sessionPayment) #2",
+      "input": {
+        "args": [
+          {
+            "amountMinor": 59700
+          },
+          65000
+        ]
+      },
+      "expected": {
+        "kind": "partial",
+        "left": 5300
+      }
+    },
+    {
+      "name": "payment status (#479) › counts a legacy mark with no amount as paid at the current due (sessionPayment)",
+      "input": {
+        "args": [
+          {
+            "amountMinor": null
+          },
+          70000
+        ]
+      },
+      "expected": {
+        "kind": "paid"
+      }
+    },
+    {
+      "name": "payment status (#479) › treats any mark as paid when no fee is set (sessionPayment) #1",
+      "input": {
+        "args": [
+          {
+            "amountMinor": 30000
+          },
+          null
+        ]
+      },
+      "expected": {
+        "kind": "paid"
+      }
+    },
+    {
+      "name": "payment status (#479) › treats any mark as paid when no fee is set (sessionPayment) #2",
+      "input": {
+        "args": [
+          {
+            "$undefined": true
+          },
+          null
+        ]
+      },
+      "expected": {
+        "kind": "unpaid"
+      }
+    },
+    {
+      "name": "payment status (#479) › re-derives after a price change without touching the amount received (derived, sessionPayment) #1",
+      "input": {
+        "args": [
+          {
+            "amountMinor": 59700
+          },
+          55000
+        ]
+      },
+      "expected": {
+        "kind": "reimburse",
+        "toReturn": 4700
+      }
+    },
+    {
+      "name": "payment status (#479) › re-derives after a price change without touching the amount received (derived, sessionPayment) #2",
+      "input": {
+        "args": [
+          {
+            "amountMinor": 59700
+          },
+          65000
+        ]
+      },
+      "expected": {
+        "kind": "partial",
+        "left": 5300
+      }
+    }
+  ]
+}

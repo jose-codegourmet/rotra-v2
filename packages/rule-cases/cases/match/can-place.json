@@ -1,0 +1,916 @@
+{
+  "rule": "match/can-place",
+  "version": 1,
+  "cases": [
+    {
+      "name": "Put on court and Start match › places a ready waiting match only on a free court (match) #1",
+      "input": {
+        "args": [
+          {
+            "id": "free",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "waiting",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["Eve", "Fay"],
+            "teamB": ["Gus", "Hal"],
+            "courtIds": [],
+            "startedAt": null,
+            "endedAt": null,
+            "substitutions": [],
+            "decision": null,
+            "placedAt": null
+          },
+          ["c2"],
+          {
+            "roster": [
+              {
+                "id": "Migs",
+                "sessionId": "s",
+                "clubPlayerId": "Migs",
+                "nameSnapshot": "Migs",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              },
+              {
+                "id": "Amy",
+                "sessionId": "s",
+                "clubPlayerId": "Amy",
+                "nameSnapshot": "Amy",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              },
+              {
+                "id": "Ben",
+                "sessionId": "s",
+                "clubPlayerId": "Ben",
+                "nameSnapshot": "Ben",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              },
+              {
+                "id": "Dan",
+                "sessionId": "s",
+                "clubPlayerId": "Dan",
+                "nameSnapshot": "Dan",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              },
+              {
+                "id": "Eve",
+                "sessionId": "s",
+                "clubPlayerId": "Eve",
+                "nameSnapshot": "Eve",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              },
+              {
+                "id": "Fay",
+                "sessionId": "s",
+                "clubPlayerId": "Fay",
+                "nameSnapshot": "Fay",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              },
+              {
+                "id": "Gus",
+                "sessionId": "s",
+                "clubPlayerId": "Gus",
+                "nameSnapshot": "Gus",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              },
+              {
+                "id": "Hal",
+                "sessionId": "s",
+                "clubPlayerId": "Hal",
+                "nameSnapshot": "Hal",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              }
+            ],
+            "matches": [
+              {
+                "id": "placed",
+                "sessionId": "s",
+                "matchNo": 1,
+                "state": "on_court",
+                "format": "doubles",
+                "queuePosition": 1,
+                "origin": "manual",
+                "manualProtected": true,
+                "teamA": ["Migs", "Amy"],
+                "teamB": ["Ben", "Dan"],
+                "courtIds": ["c1"],
+                "startedAt": null,
+                "endedAt": null,
+                "substitutions": [],
+                "decision": null,
+                "placedAt": 0
+              },
+              {
+                "id": "free",
+                "sessionId": "s",
+                "matchNo": 1,
+                "state": "waiting",
+                "format": "doubles",
+                "queuePosition": 1,
+                "origin": "manual",
+                "manualProtected": true,
+                "teamA": ["Eve", "Fay"],
+                "teamB": ["Gus", "Hal"],
+                "courtIds": [],
+                "startedAt": null,
+                "endedAt": null,
+                "substitutions": [],
+                "decision": null,
+                "placedAt": null
+              }
+            ],
+            "courts": [
+              {
+                "id": "c1",
+                "sessionId": "s",
+                "label": "Court 1",
+                "openUntil": null,
+                "removedAt": null
+              },
+              {
+                "id": "c2",
+                "sessionId": "s",
+                "label": "Court 2",
+                "openUntil": null,
+                "removedAt": null
+              }
+            ],
+            "now": 1
+          }
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "Put on court and Start match › places a ready waiting match only on a free court (match) #2",
+      "input": {
+        "args": [
+          {
+            "id": "free",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "waiting",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["Eve", "Fay"],
+            "teamB": ["Gus", "Hal"],
+            "courtIds": [],
+            "startedAt": null,
+            "endedAt": null,
+            "substitutions": [],
+            "decision": null,
+            "placedAt": null
+          },
+          ["c1"],
+          {
+            "roster": [
+              {
+                "id": "Migs",
+                "sessionId": "s",
+                "clubPlayerId": "Migs",
+                "nameSnapshot": "Migs",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              },
+              {
+                "id": "Amy",
+                "sessionId": "s",
+                "clubPlayerId": "Amy",
+                "nameSnapshot": "Amy",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              },
+              {
+                "id": "Ben",
+                "sessionId": "s",
+                "clubPlayerId": "Ben",
+                "nameSnapshot": "Ben",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              },
+              {
+                "id": "Dan",
+                "sessionId": "s",
+                "clubPlayerId": "Dan",
+                "nameSnapshot": "Dan",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              },
+              {
+                "id": "Eve",
+                "sessionId": "s",
+                "clubPlayerId": "Eve",
+                "nameSnapshot": "Eve",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              },
+              {
+                "id": "Fay",
+                "sessionId": "s",
+                "clubPlayerId": "Fay",
+                "nameSnapshot": "Fay",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              },
+              {
+                "id": "Gus",
+                "sessionId": "s",
+                "clubPlayerId": "Gus",
+                "nameSnapshot": "Gus",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              },
+              {
+                "id": "Hal",
+                "sessionId": "s",
+                "clubPlayerId": "Hal",
+                "nameSnapshot": "Hal",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              }
+            ],
+            "matches": [
+              {
+                "id": "placed",
+                "sessionId": "s",
+                "matchNo": 1,
+                "state": "on_court",
+                "format": "doubles",
+                "queuePosition": 1,
+                "origin": "manual",
+                "manualProtected": true,
+                "teamA": ["Migs", "Amy"],
+                "teamB": ["Ben", "Dan"],
+                "courtIds": ["c1"],
+                "startedAt": null,
+                "endedAt": null,
+                "substitutions": [],
+                "decision": null,
+                "placedAt": 0
+              },
+              {
+                "id": "free",
+                "sessionId": "s",
+                "matchNo": 1,
+                "state": "waiting",
+                "format": "doubles",
+                "queuePosition": 1,
+                "origin": "manual",
+                "manualProtected": true,
+                "teamA": ["Eve", "Fay"],
+                "teamB": ["Gus", "Hal"],
+                "courtIds": [],
+                "startedAt": null,
+                "endedAt": null,
+                "substitutions": [],
+                "decision": null,
+                "placedAt": null
+              }
+            ],
+            "courts": [
+              {
+                "id": "c1",
+                "sessionId": "s",
+                "label": "Court 1",
+                "openUntil": null,
+                "removedAt": null
+              },
+              {
+                "id": "c2",
+                "sessionId": "s",
+                "label": "Court 2",
+                "openUntil": null,
+                "removedAt": null
+              }
+            ],
+            "now": 1
+          }
+        ]
+      },
+      "expected": false
+    },
+    {
+      "name": "Put on court and Start match › places a ready waiting match only on a free court (match) #3",
+      "input": {
+        "args": [
+          {
+            "id": "free",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "waiting",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["Eve", "Fay"],
+            "teamB": ["Gus", "Hal"],
+            "courtIds": [],
+            "startedAt": null,
+            "endedAt": null,
+            "substitutions": [],
+            "decision": null,
+            "placedAt": null
+          },
+          [],
+          {
+            "roster": [
+              {
+                "id": "Migs",
+                "sessionId": "s",
+                "clubPlayerId": "Migs",
+                "nameSnapshot": "Migs",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              },
+              {
+                "id": "Amy",
+                "sessionId": "s",
+                "clubPlayerId": "Amy",
+                "nameSnapshot": "Amy",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              },
+              {
+                "id": "Ben",
+                "sessionId": "s",
+                "clubPlayerId": "Ben",
+                "nameSnapshot": "Ben",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              },
+              {
+                "id": "Dan",
+                "sessionId": "s",
+                "clubPlayerId": "Dan",
+                "nameSnapshot": "Dan",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              },
+              {
+                "id": "Eve",
+                "sessionId": "s",
+                "clubPlayerId": "Eve",
+                "nameSnapshot": "Eve",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              },
+              {
+                "id": "Fay",
+                "sessionId": "s",
+                "clubPlayerId": "Fay",
+                "nameSnapshot": "Fay",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              },
+              {
+                "id": "Gus",
+                "sessionId": "s",
+                "clubPlayerId": "Gus",
+                "nameSnapshot": "Gus",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              },
+              {
+                "id": "Hal",
+                "sessionId": "s",
+                "clubPlayerId": "Hal",
+                "nameSnapshot": "Hal",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              }
+            ],
+            "matches": [
+              {
+                "id": "placed",
+                "sessionId": "s",
+                "matchNo": 1,
+                "state": "on_court",
+                "format": "doubles",
+                "queuePosition": 1,
+                "origin": "manual",
+                "manualProtected": true,
+                "teamA": ["Migs", "Amy"],
+                "teamB": ["Ben", "Dan"],
+                "courtIds": ["c1"],
+                "startedAt": null,
+                "endedAt": null,
+                "substitutions": [],
+                "decision": null,
+                "placedAt": 0
+              },
+              {
+                "id": "free",
+                "sessionId": "s",
+                "matchNo": 1,
+                "state": "waiting",
+                "format": "doubles",
+                "queuePosition": 1,
+                "origin": "manual",
+                "manualProtected": true,
+                "teamA": ["Eve", "Fay"],
+                "teamB": ["Gus", "Hal"],
+                "courtIds": [],
+                "startedAt": null,
+                "endedAt": null,
+                "substitutions": [],
+                "decision": null,
+                "placedAt": null
+              }
+            ],
+            "courts": [
+              {
+                "id": "c1",
+                "sessionId": "s",
+                "label": "Court 1",
+                "openUntil": null,
+                "removedAt": null
+              },
+              {
+                "id": "c2",
+                "sessionId": "s",
+                "label": "Court 2",
+                "openUntil": null,
+                "removedAt": null
+              }
+            ],
+            "now": 1
+          }
+        ]
+      },
+      "expected": false
+    },
+    {
+      "name": "Put on court and Start match › places a ready waiting match only on a free court (match) #4",
+      "input": {
+        "args": [
+          {
+            "id": "placed",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "on_court",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["Migs", "Amy"],
+            "teamB": ["Ben", "Dan"],
+            "courtIds": ["c1"],
+            "startedAt": null,
+            "endedAt": null,
+            "substitutions": [],
+            "decision": null,
+            "placedAt": 0
+          },
+          ["c2"],
+          {
+            "roster": [
+              {
+                "id": "Migs",
+                "sessionId": "s",
+                "clubPlayerId": "Migs",
+                "nameSnapshot": "Migs",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              },
+              {
+                "id": "Amy",
+                "sessionId": "s",
+                "clubPlayerId": "Amy",
+                "nameSnapshot": "Amy",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              },
+              {
+                "id": "Ben",
+                "sessionId": "s",
+                "clubPlayerId": "Ben",
+                "nameSnapshot": "Ben",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              },
+              {
+                "id": "Dan",
+                "sessionId": "s",
+                "clubPlayerId": "Dan",
+                "nameSnapshot": "Dan",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              },
+              {
+                "id": "Eve",
+                "sessionId": "s",
+                "clubPlayerId": "Eve",
+                "nameSnapshot": "Eve",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              },
+              {
+                "id": "Fay",
+                "sessionId": "s",
+                "clubPlayerId": "Fay",
+                "nameSnapshot": "Fay",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              },
+              {
+                "id": "Gus",
+                "sessionId": "s",
+                "clubPlayerId": "Gus",
+                "nameSnapshot": "Gus",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              },
+              {
+                "id": "Hal",
+                "sessionId": "s",
+                "clubPlayerId": "Hal",
+                "nameSnapshot": "Hal",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              }
+            ],
+            "matches": [
+              {
+                "id": "placed",
+                "sessionId": "s",
+                "matchNo": 1,
+                "state": "on_court",
+                "format": "doubles",
+                "queuePosition": 1,
+                "origin": "manual",
+                "manualProtected": true,
+                "teamA": ["Migs", "Amy"],
+                "teamB": ["Ben", "Dan"],
+                "courtIds": ["c1"],
+                "startedAt": null,
+                "endedAt": null,
+                "substitutions": [],
+                "decision": null,
+                "placedAt": 0
+              },
+              {
+                "id": "free",
+                "sessionId": "s",
+                "matchNo": 1,
+                "state": "waiting",
+                "format": "doubles",
+                "queuePosition": 1,
+                "origin": "manual",
+                "manualProtected": true,
+                "teamA": ["Eve", "Fay"],
+                "teamB": ["Gus", "Hal"],
+                "courtIds": [],
+                "startedAt": null,
+                "endedAt": null,
+                "substitutions": [],
+                "decision": null,
+                "placedAt": null
+              }
+            ],
+            "courts": [
+              {
+                "id": "c1",
+                "sessionId": "s",
+                "label": "Court 1",
+                "openUntil": null,
+                "removedAt": null
+              },
+              {
+                "id": "c2",
+                "sessionId": "s",
+                "label": "Court 2",
+                "openUntil": null,
+                "removedAt": null
+              }
+            ],
+            "now": 1
+          }
+        ]
+      },
+      "expected": false
+    },
+    {
+      "name": "Put on court and Start match › refuses a second placement of a busy player (match)",
+      "input": {
+        "args": [
+          {
+            "id": "busy",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "waiting",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["Migs", "Eve"],
+            "teamB": ["Fay", "Gus"],
+            "courtIds": [],
+            "startedAt": null,
+            "endedAt": null,
+            "substitutions": [],
+            "decision": null,
+            "placedAt": null
+          },
+          ["c2"],
+          {
+            "roster": [
+              {
+                "id": "Migs",
+                "sessionId": "s",
+                "clubPlayerId": "Migs",
+                "nameSnapshot": "Migs",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              },
+              {
+                "id": "Amy",
+                "sessionId": "s",
+                "clubPlayerId": "Amy",
+                "nameSnapshot": "Amy",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              },
+              {
+                "id": "Ben",
+                "sessionId": "s",
+                "clubPlayerId": "Ben",
+                "nameSnapshot": "Ben",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              },
+              {
+                "id": "Dan",
+                "sessionId": "s",
+                "clubPlayerId": "Dan",
+                "nameSnapshot": "Dan",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              },
+              {
+                "id": "Eve",
+                "sessionId": "s",
+                "clubPlayerId": "Eve",
+                "nameSnapshot": "Eve",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              },
+              {
+                "id": "Fay",
+                "sessionId": "s",
+                "clubPlayerId": "Fay",
+                "nameSnapshot": "Fay",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              },
+              {
+                "id": "Gus",
+                "sessionId": "s",
+                "clubPlayerId": "Gus",
+                "nameSnapshot": "Gus",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              },
+              {
+                "id": "Hal",
+                "sessionId": "s",
+                "clubPlayerId": "Hal",
+                "nameSnapshot": "Hal",
+                "nicknameSnapshot": null,
+                "present": true,
+                "presentChangedAt": 0,
+                "level": "intermediate_mid",
+                "levelLockedAt": 0,
+                "confirmedAt": 0
+              }
+            ],
+            "matches": [
+              {
+                "id": "placed",
+                "sessionId": "s",
+                "matchNo": 1,
+                "state": "on_court",
+                "format": "doubles",
+                "queuePosition": 1,
+                "origin": "manual",
+                "manualProtected": true,
+                "teamA": ["Migs", "Amy"],
+                "teamB": ["Ben", "Dan"],
+                "courtIds": ["c1"],
+                "startedAt": null,
+                "endedAt": null,
+                "substitutions": [],
+                "decision": null,
+                "placedAt": 0
+              },
+              {
+                "id": "busy",
+                "sessionId": "s",
+                "matchNo": 1,
+                "state": "waiting",
+                "format": "doubles",
+                "queuePosition": 1,
+                "origin": "manual",
+                "manualProtected": true,
+                "teamA": ["Migs", "Eve"],
+                "teamB": ["Fay", "Gus"],
+                "courtIds": [],
+                "startedAt": null,
+                "endedAt": null,
+                "substitutions": [],
+                "decision": null,
+                "placedAt": null
+              }
+            ],
+            "courts": [
+              {
+                "id": "c1",
+                "sessionId": "s",
+                "label": "Court 1",
+                "openUntil": null,
+                "removedAt": null
+              },
+              {
+                "id": "c2",
+                "sessionId": "s",
+                "label": "Court 2",
+                "openUntil": null,
+                "removedAt": null
+              }
+            ],
+            "now": 1
+          }
+        ]
+      },
+      "expected": false
+    }
+  ]
+}

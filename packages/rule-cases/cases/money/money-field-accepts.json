@@ -1,0 +1,105 @@
+{
+  "rule": "money/money-field-accepts",
+  "version": 1,
+  "cases": [
+    {
+      "name": "rejects invalid or unsafe amount ''",
+      "input": {
+        "args": [""]
+      },
+      "expected": false
+    },
+    {
+      "name": "rejects invalid or unsafe amount ' '",
+      "input": {
+        "args": [" "]
+      },
+      "expected": false
+    },
+    {
+      "name": "rejects invalid or unsafe amount '-1'",
+      "input": {
+        "args": ["-1"]
+      },
+      "expected": false
+    },
+    {
+      "name": "rejects invalid or unsafe amount '1.001'",
+      "input": {
+        "args": ["1.001"]
+      },
+      "expected": false
+    },
+    {
+      "name": "rejects invalid or unsafe amount '1,23'",
+      "input": {
+        "args": ["1,23"]
+      },
+      "expected": false
+    },
+    {
+      "name": "rejects invalid or unsafe amount '1e3'",
+      "input": {
+        "args": ["1e3"]
+      },
+      "expected": false
+    },
+    {
+      "name": "rejects invalid or unsafe amount 'NaN'",
+      "input": {
+        "args": ["NaN"]
+      },
+      "expected": false
+    },
+    {
+      "name": "rejects invalid or unsafe amount '90071992547409.92'",
+      "input": {
+        "args": ["90071992547409.92"]
+      },
+      "expected": false
+    },
+    {
+      "name": "rejects invalid or unsafe amount -1",
+      "input": {
+        "args": [-1]
+      },
+      "expected": false
+    },
+    {
+      "name": "rejects invalid or unsafe amount 0.29",
+      "input": {
+        "args": [0.29]
+      },
+      "expected": false
+    },
+    {
+      "name": "rejects invalid or unsafe amount 9007199254740992",
+      "input": {
+        "args": [9007199254740992]
+      },
+      "expected": false
+    },
+    {
+      "name": "rejects Infinity",
+      "input": {
+        "args": [
+          {
+            "$number": "Infinity"
+          }
+        ]
+      },
+      "expected": false
+    },
+    {
+      "name": "rejects NaN",
+      "input": {
+        "args": [
+          {
+            "$number": "NaN"
+          }
+        ]
+      },
+      "expected": false
+    }
+  ]
+}

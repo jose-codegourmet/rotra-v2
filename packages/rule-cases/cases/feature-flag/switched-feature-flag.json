@@ -1,0 +1,90 @@
+{
+  "rule": "feature-flag/switched-feature-flag",
+  "version": 1,
+  "cases": [
+    {
+      "name": "switchedFeatureFlag › saves the value with the next revision and this change, and never changes the key (featureFlag) #1",
+      "input": {
+        "args": [
+          {
+            "key": "session_cost_estimate",
+            "name": "Session cost estimate",
+            "description": "Shows the estimated cost per player before the session starts.",
+            "on": false,
+            "revision": 1,
+            "createdAt": "2026-10-29T19:52:00+08:00",
+            "createdByEmail": "owner@rotra.example",
+            "changedAt": "2026-10-29T19:52:00+08:00",
+            "changedByEmail": "owner@rotra.example"
+          },
+          true,
+          {
+            "email": "other@rotra.example",
+            "at": "2026-10-30T08:00:00+08:00"
+          }
+        ]
+      },
+      "expected": {
+        "key": "session_cost_estimate",
+        "name": "Session cost estimate",
+        "description": "Shows the estimated cost per player before the session starts.",
+        "on": true,
+        "revision": 2,
+        "createdAt": "2026-10-29T19:52:00+08:00",
+        "createdByEmail": "owner@rotra.example",
+        "changedAt": "2026-10-30T08:00:00+08:00",
+        "changedByEmail": "other@rotra.example"
+      }
+    },
+    {
+      "name": "switchedFeatureFlag › saves the value with the next revision and this change, and never changes the key (featureFlag) #2",
+      "input": {
+        "args": [
+          {
+            "key": "session_cost_estimate",
+            "name": "Session cost estimate",
+            "description": "Shows the estimated cost per player before the session starts.",
+            "on": false,
+            "revision": 1,
+            "createdAt": "2026-10-29T19:52:00+08:00",
+            "createdByEmail": "owner@rotra.example",
+            "changedAt": "2026-10-29T19:52:00+08:00",
+            "changedByEmail": "owner@rotra.example"
+          },
+          true,
+          {
+            "email": "other@rotra.example",
+            "at": "2026-10-30T08:00:00+08:00"
+          }
+        ],
+        "select": "key"
+      },
+      "expected": "session_cost_estimate"
+    },
+    {
+      "name": "switchedFeatureFlag › saves the value with the next revision and this change, and never changes the key (featureFlag) #3",
+      "input": {
+        "args": [
+          {
+            "key": "session_cost_estimate",
+            "name": "Session cost estimate",
+            "description": "Shows the estimated cost per player before the session starts.",
+            "on": false,
+            "revision": 1,
+            "createdAt": "2026-10-29T19:52:00+08:00",
+            "createdByEmail": "owner@rotra.example",
+            "changedAt": "2026-10-29T19:52:00+08:00",
+            "changedByEmail": "owner@rotra.example"
+          },
+          true,
+          {
+            "email": "other@rotra.example",
+            "at": "2026-10-30T08:00:00+08:00"
+          }
+        ],
+        "select": "createdAt"
+      },
+      "expected": "2026-10-29T19:52:00+08:00"
+    }
+  ]
+}

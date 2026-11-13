@@ -1,0 +1,18 @@
+{
+  "rule": "session-payment/received-amount",
+  "version": 1,
+  "cases": [
+    {
+      "name": "payment status (#479) › counts a legacy mark with no amount as paid at the current due (sessionPayment)",
+      "input": {
+        "args": [
+          {
+            "amountMinor": null
+          },
+          70000
+        ]
+      },
+      "expected": 70000
+    }
+  ]
+}

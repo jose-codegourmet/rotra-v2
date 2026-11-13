@@ -1,0 +1,132 @@
+{
+  "rule": "session-result/award-baseline",
+  "version": 1,
+  "cases": [
+    {
+      "name": "Most Improved and Off Day baseline › uses full games only: a credited substitute game never changes it (sessionResult)",
+      "input": {
+        "args": [
+          ["club-Amy"],
+          [
+            {
+              "clubPlayerId": "club-Amy",
+              "sessionId": "s1"
+            },
+            {
+              "clubPlayerId": "club-Amy",
+              "sessionId": "s2"
+            },
+            {
+              "clubPlayerId": "club-Amy",
+              "sessionId": "s3"
+            },
+            {
+              "clubPlayerId": "club-Amy",
+              "sessionId": "s4"
+            },
+            {
+              "clubPlayerId": "club-Amy",
+              "sessionId": "s5"
+            }
+          ],
+          [
+            {
+              "clubPlayerId": "club-Amy",
+              "sessionId": "s1",
+              "fullParticipation": true,
+              "team": "A",
+              "winningTeam": "A"
+            },
+            {
+              "clubPlayerId": "club-Amy",
+              "sessionId": "s2",
+              "fullParticipation": true,
+              "team": "A",
+              "winningTeam": "A"
+            },
+            {
+              "clubPlayerId": "club-Amy",
+              "sessionId": "s3",
+              "fullParticipation": true,
+              "team": "A",
+              "winningTeam": "B"
+            },
+            {
+              "clubPlayerId": "club-Amy",
+              "sessionId": "s4",
+              "fullParticipation": true,
+              "team": "A",
+              "winningTeam": "A"
+            },
+            {
+              "clubPlayerId": "club-Amy",
+              "sessionId": "s5",
+              "fullParticipation": false,
+              "team": "A",
+              "winningTeam": "B"
+            },
+            {
+              "clubPlayerId": "club-Amy",
+              "sessionId": "s5",
+              "fullParticipation": false,
+              "team": "A",
+              "winningTeam": "B"
+            }
+          ]
+        ],
+        "select": "0"
+      },
+      "expected": {
+        "clubPlayerId": "club-Amy",
+        "priorSessions": 5,
+        "baselineWinRate": 0.75
+      }
+    },
+    {
+      "name": "Most Improved and Off Day baseline › has no rate without a full game and ignores sessions not in the player history (sessionResult)",
+      "input": {
+        "args": [
+          ["club-Amy"],
+          [
+            {
+              "clubPlayerId": "club-Amy",
+              "sessionId": "s1"
+            },
+            {
+              "clubPlayerId": "club-Amy",
+              "sessionId": "s2"
+            },
+            {
+              "clubPlayerId": "club-Amy",
+              "sessionId": "s3"
+            },
+            {
+              "clubPlayerId": "club-Amy",
+              "sessionId": "s4"
+            },
+            {
+              "clubPlayerId": "club-Amy",
+              "sessionId": "s5"
+            }
+          ],
+          [
+            {
+              "clubPlayerId": "club-Amy",
+              "sessionId": "s9",
+              "fullParticipation": true,
+              "team": "A",
+              "winningTeam": "A"
+            }
+          ]
+        ]
+      },
+      "expected": [
+        {
+          "clubPlayerId": "club-Amy",
+          "priorSessions": 5,
+          "baselineWinRate": null
+        }
+      ]
+    }
+  ]
+}

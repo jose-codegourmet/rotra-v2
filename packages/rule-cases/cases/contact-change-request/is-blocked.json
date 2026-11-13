@@ -1,0 +1,80 @@
+{
+  "rule": "contact-change-request/is-blocked",
+  "version": 1,
+  "cases": [
+    {
+      "name": "checks before approving (rotra-admin.html checks()) › r1 passes every check (contactChangeRequest)",
+      "input": {
+        "args": [
+          "pending",
+          [
+            {
+              "kind": "linked-elsewhere",
+              "ok": true
+            },
+            {
+              "kind": "newer-request",
+              "ok": true
+            },
+            {
+              "kind": "original-changed",
+              "ok": true
+            },
+            {
+              "kind": "in-progress",
+              "ok": true
+            }
+          ]
+        ]
+      },
+      "expected": false
+    },
+    {
+      "name": "checks before approving (rotra-admin.html checks()) › r2 is blocked: the number is linked to another player (Jose), named by name and RTR ID (contactChangeRequest)",
+      "input": {
+        "args": [
+          "pending",
+          [
+            {
+              "kind": "linked-elsewhere",
+              "ok": false,
+              "otherPlayer": {
+                "id": "2c7f6a7b-eed9-5051-9426-6dbce5133fbc",
+                "fullName": "Jose",
+                "rtrId": "RTR-PH-CEB-031526-0001"
+              }
+            },
+            {
+              "kind": "newer-request",
+              "ok": true
+            },
+            {
+              "kind": "original-changed",
+              "ok": true
+            },
+            {
+              "kind": "in-progress",
+              "ok": true
+            }
+          ]
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "next action (rotra-admin.html nextAction()) › only a pending request can be blocked (contactChangeRequest)",
+      "input": {
+        "args": [
+          "failed",
+          [
+            {
+              "kind": "in-progress",
+              "ok": false
+            }
+          ]
+        ]
+      },
+      "expected": false
+    }
+  ]
+}

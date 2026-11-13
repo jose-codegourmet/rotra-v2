@@ -1,0 +1,30 @@
+{
+  "rule": "feature-flag/feature-flag-added-summary",
+  "version": 1,
+  "cases": [
+    {
+      "name": "audit summaries › match the prototype log lines (featureFlag) #1",
+      "input": {
+        "args": [
+          {
+            "key": "abc",
+            "on": false
+          }
+        ]
+      },
+      "expected": "Added feature flag abc (off)."
+    },
+    {
+      "name": "audit summaries › match the prototype log lines (featureFlag) #2",
+      "input": {
+        "args": [
+          {
+            "key": "abc",
+            "on": true
+          }
+        ]
+      },
+      "expected": "Added feature flag abc (on)."
+    }
+  ]
+}

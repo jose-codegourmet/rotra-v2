@@ -1,0 +1,41 @@
+{
+  "rule": "money/format-peso",
+  "version": 1,
+  "cases": [
+    {
+      "name": "150000 centavos → ₱1,500",
+      "input": {
+        "args": [150000]
+      },
+      "expected": "₱1,500"
+    },
+    {
+      "name": "150050 centavos → ₱1,500.50",
+      "input": {
+        "args": [150050]
+      },
+      "expected": "₱1,500.50"
+    },
+    {
+      "name": "35000 centavos → ₱350",
+      "input": {
+        "args": [35000]
+      },
+      "expected": "₱350"
+    },
+    {
+      "name": "5 centavos → ₱0.05",
+      "input": {
+        "args": [5]
+      },
+      "expected": "₱0.05"
+    },
+    {
+      "name": "0 centavos → ₱0",
+      "input": {
+        "args": [0]
+      },
+      "expected": "₱0"
+    }
+  ]
+}

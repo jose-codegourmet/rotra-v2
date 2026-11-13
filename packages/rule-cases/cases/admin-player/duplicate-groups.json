@@ -1,0 +1,105 @@
+{
+  "rule": "admin-player/duplicate-groups",
+  "version": 1,
+  "cases": [
+    {
+      "name": "Admin player management rules › groups overlapping normalized name and contact matches without disclosing values (management) #1",
+      "input": {
+        "args": [
+          [
+            {
+              "id": "a",
+              "name": " Alex   Reyes ",
+              "phone": "09171234567"
+            },
+            {
+              "id": "b",
+              "name": "alex reyes",
+              "email": "demo@example.com"
+            },
+            {
+              "id": "c",
+              "name": "Different",
+              "email": " DEMO@example.com "
+            }
+          ]
+        ]
+      },
+      "expected": [{}]
+    },
+    {
+      "name": "Admin player management rules › groups overlapping normalized name and contact matches without disclosing values (derived, management)",
+      "input": {
+        "args": [
+          [
+            {
+              "id": "a",
+              "name": " Alex   Reyes ",
+              "phone": "09171234567"
+            },
+            {
+              "id": "b",
+              "name": "alex reyes",
+              "email": "demo@example.com"
+            },
+            {
+              "id": "c",
+              "name": "Different",
+              "email": " DEMO@example.com "
+            }
+          ]
+        ]
+      },
+      "expected": [
+        {
+          "ids": ["b", "c", "a"],
+          "reasons": ["Same email", "Same name"]
+        }
+      ]
+    },
+    {
+      "name": "Admin player management rules › groups overlapping normalized name and contact matches without disclosing values (management) #2",
+      "input": {
+        "args": [
+          [
+            {
+              "id": "a",
+              "name": " Alex   Reyes ",
+              "phone": "09171234567"
+            },
+            {
+              "id": "b",
+              "name": "alex reyes",
+              "email": "demo@example.com"
+            },
+            {
+              "id": "c",
+              "name": "Different",
+              "email": " DEMO@example.com "
+            }
+          ]
+        ],
+        "select": "0.reasons"
+      },
+      "expected": ["Same email", "Same name"]
+    },
+    {
+      "name": "Admin player management rules › groups overlapping normalized name and contact matches without disclosing values (management) #3",
+      "input": {
+        "args": [
+          [
+            {
+              "id": "a",
+              "name": "A"
+            },
+            {
+              "id": "b",
+              "name": "B"
+            }
+          ]
+        ]
+      },
+      "expected": []
+    }
+  ]
+}

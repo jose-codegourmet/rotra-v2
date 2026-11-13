@@ -1,0 +1,34 @@
+{
+  "rule": "feature-flag/new-feature-flag",
+  "version": 1,
+  "cases": [
+    {
+      "name": "newFeatureFlag › starts at revision 1 and counts adding as the first change (featureFlag)",
+      "input": {
+        "args": [
+          {
+            "name": "Session cost estimate",
+            "key": "session_cost_estimate",
+            "description": "Shows the estimated cost per player before the session starts.",
+            "on": true
+          },
+          {
+            "email": "owner@rotra.example",
+            "at": "2026-10-29T19:52:00+08:00"
+          }
+        ]
+      },
+      "expected": {
+        "name": "Session cost estimate",
+        "key": "session_cost_estimate",
+        "description": "Shows the estimated cost per player before the session starts.",
+        "on": true,
+        "revision": 1,
+        "createdAt": "2026-10-29T19:52:00+08:00",
+        "createdByEmail": "owner@rotra.example",
+        "changedAt": "2026-10-29T19:52:00+08:00",
+        "changedByEmail": "owner@rotra.example"
+      }
+    }
+  ]
+}

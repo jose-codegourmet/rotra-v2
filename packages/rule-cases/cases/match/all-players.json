@@ -1,0 +1,32 @@
+{
+  "rule": "match/all-players",
+  "version": 1,
+  "cases": [
+    {
+      "name": "Auto Queue generation › distinguishes longest wait from fewest completed games with stable ties (autoQueue) #1",
+      "input": {
+        "args": [
+          {
+            "format": "singles",
+            "teamA": ["s-tonight-player-1"],
+            "teamB": ["s-tonight-player-2"]
+          }
+        ]
+      },
+      "expected": ["s-tonight-player-1", "s-tonight-player-2"]
+    },
+    {
+      "name": "Auto Queue generation › distinguishes longest wait from fewest completed games with stable ties (autoQueue) #2",
+      "input": {
+        "args": [
+          {
+            "format": "singles",
+            "teamA": ["s-tonight-player-3"],
+            "teamB": ["s-tonight-player-4"]
+          }
+        ]
+      },
+      "expected": ["s-tonight-player-3", "s-tonight-player-4"]
+    }
+  ]
+}

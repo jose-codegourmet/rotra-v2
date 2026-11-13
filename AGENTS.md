@@ -73,6 +73,7 @@ packages/
   ui/                     every visual component and form + the one Storybook (see its AGENTS.md)
   data/                   types, fixtures, mock store, fetchers, query keys, hooks
   schema/                 shared Zod fields (email, phone, date, money, password)
+  rule-cases/             shared JSON test cases for server-enforced rules (no code; Vitest and Go read them)
   config/                 tsconfig + Tailwind 4 tokens (theme.css; see its AGENTS.md)
   db/                     Prisma schema + server services (real mode)
 docs/

@@ -1,0 +1,2207 @@
+{
+  "rule": "sales/platform-sales-report",
+  "version": 1,
+  "cases": [
+    {
+      "name": "platformSalesReport › counts payments on the day paid, in integer centavos (derived, sales)",
+      "input": {
+        "args": [
+          {
+            "today": "2026-11-08",
+            "clubs": [
+              {
+                "id": "a",
+                "name": "Alpha Club",
+                "pricing": "paid",
+                "monthlyListMinor": 150000
+              },
+              {
+                "id": "b",
+                "name": "Beta Club",
+                "pricing": "free",
+                "monthlyListMinor": 100000
+              }
+            ],
+            "payments": [
+              {
+                "termId": "T3",
+                "clubId": "a",
+                "plan": "Monthly",
+                "paidOn": "2026-11-03",
+                "amountMinor": 150000,
+                "startsAt": "2026-11-03"
+              },
+              {
+                "termId": "T2",
+                "clubId": "a",
+                "plan": "Monthly",
+                "paidOn": "2026-10-03",
+                "amountMinor": 150000,
+                "startsAt": "2026-10-03"
+              },
+              {
+                "termId": "T1",
+                "clubId": "a",
+                "plan": "Yearly",
+                "paidOn": "2026-08-01",
+                "amountMinor": 1500000,
+                "startsAt": "2024-01-01"
+              },
+              {
+                "termId": "T4",
+                "clubId": "b",
+                "plan": "Monthly",
+                "paidOn": "2026-11-01",
+                "amountMinor": 0,
+                "startsAt": "2026-11-01"
+              }
+            ],
+            "sessions": [
+              {
+                "clubId": "a",
+                "startedOn": "2026-11-08",
+                "matches": 10
+              },
+              {
+                "clubId": "a",
+                "startedOn": "2026-11-02",
+                "matches": 12
+              },
+              {
+                "clubId": "a",
+                "startedOn": "2026-10-30",
+                "matches": 9
+              },
+              {
+                "clubId": "b",
+                "startedOn": "2026-11-05",
+                "matches": 20
+              }
+            ]
+          },
+          "7d"
+        ]
+      },
+      "expected": {
+        "period": "7d",
+        "bucketUnit": "day",
+        "today": "2026-11-08",
+        "from": "2026-11-02",
+        "to": "2026-11-08",
+        "revenue": {
+          "value": {
+            "amountMinor": 150000,
+            "currency": "PHP"
+          },
+          "previous": {
+            "amountMinor": 0,
+            "currency": "PHP"
+          },
+          "change": {
+            "kind": "new"
+          },
+          "buckets": [
+            {
+              "start": "2026-11-02",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-11-03",
+              "value": {
+                "amountMinor": 150000,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-11-04",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-11-05",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-11-06",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-11-07",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-11-08",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            }
+          ]
+        },
+        "sessionsStarted": {
+          "value": 3,
+          "previous": 1,
+          "change": {
+            "kind": "change",
+            "percent": 200
+          },
+          "buckets": [
+            {
+              "start": "2026-11-02",
+              "value": 1
+            },
+            {
+              "start": "2026-11-03",
+              "value": 0
+            },
+            {
+              "start": "2026-11-04",
+              "value": 0
+            },
+            {
+              "start": "2026-11-05",
+              "value": 1
+            },
+            {
+              "start": "2026-11-06",
+              "value": 0
+            },
+            {
+              "start": "2026-11-07",
+              "value": 0
+            },
+            {
+              "start": "2026-11-08",
+              "value": 1
+            }
+          ]
+        },
+        "matchesPlayed": {
+          "value": 42,
+          "previous": 9,
+          "change": {
+            "kind": "change",
+            "percent": 367
+          },
+          "buckets": [
+            {
+              "start": "2026-11-02",
+              "value": 12
+            },
+            {
+              "start": "2026-11-03",
+              "value": 0
+            },
+            {
+              "start": "2026-11-04",
+              "value": 0
+            },
+            {
+              "start": "2026-11-05",
+              "value": 20
+            },
+            {
+              "start": "2026-11-06",
+              "value": 0
+            },
+            {
+              "start": "2026-11-07",
+              "value": 0
+            },
+            {
+              "start": "2026-11-08",
+              "value": 10
+            }
+          ]
+        },
+        "revenueByPlan": [
+          {
+            "plan": "Monthly",
+            "total": {
+              "amountMinor": 150000,
+              "currency": "PHP"
+            },
+            "payments": 1
+          },
+          {
+            "plan": "Yearly",
+            "total": {
+              "amountMinor": 0,
+              "currency": "PHP"
+            },
+            "payments": 0
+          }
+        ],
+        "recentPayments": [
+          {
+            "termId": "T3",
+            "clubId": "a",
+            "clubName": "Alpha Club",
+            "plan": "Monthly",
+            "paidOn": "2026-11-03",
+            "amount": {
+              "amountMinor": 150000,
+              "currency": "PHP"
+            }
+          }
+        ],
+        "mostActiveClubs": [
+          {
+            "clubId": "a",
+            "clubName": "Alpha Club",
+            "sessions": 2,
+            "matches": 22,
+            "paid": {
+              "amountMinor": 150000,
+              "currency": "PHP"
+            }
+          },
+          {
+            "clubId": "b",
+            "clubName": "Beta Club",
+            "sessions": 1,
+            "matches": 20,
+            "paid": {
+              "amountMinor": 0,
+              "currency": "PHP"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "platformSalesReport › counts free clubs in sessions and matches with ₱0 revenue (sales) #1",
+      "input": {
+        "args": [
+          {
+            "today": "2026-11-08",
+            "clubs": [
+              {
+                "id": "a",
+                "name": "Alpha Club",
+                "pricing": "paid",
+                "monthlyListMinor": 150000
+              },
+              {
+                "id": "b",
+                "name": "Beta Club",
+                "pricing": "free",
+                "monthlyListMinor": 100000
+              }
+            ],
+            "payments": [
+              {
+                "termId": "T3",
+                "clubId": "a",
+                "plan": "Monthly",
+                "paidOn": "2026-11-03",
+                "amountMinor": 150000,
+                "startsAt": "2026-11-03"
+              },
+              {
+                "termId": "T2",
+                "clubId": "a",
+                "plan": "Monthly",
+                "paidOn": "2026-10-03",
+                "amountMinor": 150000,
+                "startsAt": "2026-10-03"
+              },
+              {
+                "termId": "T1",
+                "clubId": "a",
+                "plan": "Yearly",
+                "paidOn": "2026-08-01",
+                "amountMinor": 1500000,
+                "startsAt": "2024-01-01"
+              },
+              {
+                "termId": "T4",
+                "clubId": "b",
+                "plan": "Monthly",
+                "paidOn": "2026-11-01",
+                "amountMinor": 0,
+                "startsAt": "2026-11-01"
+              }
+            ],
+            "sessions": [
+              {
+                "clubId": "a",
+                "startedOn": "2026-11-08",
+                "matches": 10
+              },
+              {
+                "clubId": "a",
+                "startedOn": "2026-11-02",
+                "matches": 12
+              },
+              {
+                "clubId": "a",
+                "startedOn": "2026-10-30",
+                "matches": 9
+              },
+              {
+                "clubId": "b",
+                "startedOn": "2026-11-05",
+                "matches": 20
+              }
+            ]
+          },
+          "7d"
+        ],
+        "select": "matchesPlayed.value"
+      },
+      "expected": 42
+    },
+    {
+      "name": "platformSalesReport › counts free clubs in sessions and matches with ₱0 revenue (sales) #2",
+      "input": {
+        "args": [
+          {
+            "today": "2026-11-08",
+            "clubs": [
+              {
+                "id": "a",
+                "name": "Alpha Club",
+                "pricing": "paid",
+                "monthlyListMinor": 150000
+              },
+              {
+                "id": "b",
+                "name": "Beta Club",
+                "pricing": "free",
+                "monthlyListMinor": 100000
+              }
+            ],
+            "payments": [
+              {
+                "termId": "T3",
+                "clubId": "a",
+                "plan": "Monthly",
+                "paidOn": "2026-11-03",
+                "amountMinor": 150000,
+                "startsAt": "2026-11-03"
+              },
+              {
+                "termId": "T2",
+                "clubId": "a",
+                "plan": "Monthly",
+                "paidOn": "2026-10-03",
+                "amountMinor": 150000,
+                "startsAt": "2026-10-03"
+              },
+              {
+                "termId": "T1",
+                "clubId": "a",
+                "plan": "Yearly",
+                "paidOn": "2026-08-01",
+                "amountMinor": 1500000,
+                "startsAt": "2024-01-01"
+              },
+              {
+                "termId": "T4",
+                "clubId": "b",
+                "plan": "Monthly",
+                "paidOn": "2026-11-01",
+                "amountMinor": 0,
+                "startsAt": "2026-11-01"
+              }
+            ],
+            "sessions": [
+              {
+                "clubId": "a",
+                "startedOn": "2026-11-08",
+                "matches": 10
+              },
+              {
+                "clubId": "a",
+                "startedOn": "2026-11-02",
+                "matches": 12
+              },
+              {
+                "clubId": "a",
+                "startedOn": "2026-10-30",
+                "matches": 9
+              },
+              {
+                "clubId": "b",
+                "startedOn": "2026-11-05",
+                "matches": 20
+              }
+            ]
+          },
+          "7d"
+        ],
+        "select": "mostActiveClubs"
+      },
+      "expected": [
+        {
+          "clubId": "a",
+          "clubName": "Alpha Club",
+          "sessions": 2,
+          "matches": 22,
+          "paid": {
+            "amountMinor": 150000,
+            "currency": "PHP"
+          }
+        },
+        {
+          "clubId": "b",
+          "clubName": "Beta Club",
+          "sessions": 1,
+          "matches": 20,
+          "paid": {
+            "amountMinor": 0,
+            "currency": "PHP"
+          }
+        }
+      ]
+    },
+    {
+      "name": "platformSalesReport › compares with the period before on the same bars (derived, sales)",
+      "input": {
+        "args": [
+          {
+            "today": "2026-11-08",
+            "clubs": [
+              {
+                "id": "a",
+                "name": "Alpha Club",
+                "pricing": "paid",
+                "monthlyListMinor": 150000
+              },
+              {
+                "id": "b",
+                "name": "Beta Club",
+                "pricing": "free",
+                "monthlyListMinor": 100000
+              }
+            ],
+            "payments": [
+              {
+                "termId": "T3",
+                "clubId": "a",
+                "plan": "Monthly",
+                "paidOn": "2026-11-03",
+                "amountMinor": 150000,
+                "startsAt": "2026-11-03"
+              },
+              {
+                "termId": "T2",
+                "clubId": "a",
+                "plan": "Monthly",
+                "paidOn": "2026-10-03",
+                "amountMinor": 150000,
+                "startsAt": "2026-10-03"
+              },
+              {
+                "termId": "T1",
+                "clubId": "a",
+                "plan": "Yearly",
+                "paidOn": "2026-08-01",
+                "amountMinor": 1500000,
+                "startsAt": "2024-01-01"
+              },
+              {
+                "termId": "T4",
+                "clubId": "b",
+                "plan": "Monthly",
+                "paidOn": "2026-11-01",
+                "amountMinor": 0,
+                "startsAt": "2026-11-01"
+              }
+            ],
+            "sessions": [
+              {
+                "clubId": "a",
+                "startedOn": "2026-11-08",
+                "matches": 10
+              },
+              {
+                "clubId": "a",
+                "startedOn": "2026-11-02",
+                "matches": 12
+              },
+              {
+                "clubId": "a",
+                "startedOn": "2026-10-30",
+                "matches": 9
+              },
+              {
+                "clubId": "b",
+                "startedOn": "2026-11-05",
+                "matches": 20
+              }
+            ]
+          },
+          "30d"
+        ]
+      },
+      "expected": {
+        "period": "30d",
+        "bucketUnit": "day",
+        "today": "2026-11-08",
+        "from": "2026-10-10",
+        "to": "2026-11-08",
+        "revenue": {
+          "value": {
+            "amountMinor": 150000,
+            "currency": "PHP"
+          },
+          "previous": {
+            "amountMinor": 150000,
+            "currency": "PHP"
+          },
+          "change": {
+            "kind": "change",
+            "percent": 0
+          },
+          "buckets": [
+            {
+              "start": "2026-10-10",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-11",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-12",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-13",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-14",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-15",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-16",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-17",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-18",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-19",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-20",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-21",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-22",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-23",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-24",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-25",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-26",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-27",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-28",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-29",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-30",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-31",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-11-01",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-11-02",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-11-03",
+              "value": {
+                "amountMinor": 150000,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-11-04",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-11-05",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-11-06",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-11-07",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-11-08",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            }
+          ]
+        },
+        "sessionsStarted": {
+          "value": 4,
+          "previous": 0,
+          "change": {
+            "kind": "new"
+          },
+          "buckets": [
+            {
+              "start": "2026-10-10",
+              "value": 0
+            },
+            {
+              "start": "2026-10-11",
+              "value": 0
+            },
+            {
+              "start": "2026-10-12",
+              "value": 0
+            },
+            {
+              "start": "2026-10-13",
+              "value": 0
+            },
+            {
+              "start": "2026-10-14",
+              "value": 0
+            },
+            {
+              "start": "2026-10-15",
+              "value": 0
+            },
+            {
+              "start": "2026-10-16",
+              "value": 0
+            },
+            {
+              "start": "2026-10-17",
+              "value": 0
+            },
+            {
+              "start": "2026-10-18",
+              "value": 0
+            },
+            {
+              "start": "2026-10-19",
+              "value": 0
+            },
+            {
+              "start": "2026-10-20",
+              "value": 0
+            },
+            {
+              "start": "2026-10-21",
+              "value": 0
+            },
+            {
+              "start": "2026-10-22",
+              "value": 0
+            },
+            {
+              "start": "2026-10-23",
+              "value": 0
+            },
+            {
+              "start": "2026-10-24",
+              "value": 0
+            },
+            {
+              "start": "2026-10-25",
+              "value": 0
+            },
+            {
+              "start": "2026-10-26",
+              "value": 0
+            },
+            {
+              "start": "2026-10-27",
+              "value": 0
+            },
+            {
+              "start": "2026-10-28",
+              "value": 0
+            },
+            {
+              "start": "2026-10-29",
+              "value": 0
+            },
+            {
+              "start": "2026-10-30",
+              "value": 1
+            },
+            {
+              "start": "2026-10-31",
+              "value": 0
+            },
+            {
+              "start": "2026-11-01",
+              "value": 0
+            },
+            {
+              "start": "2026-11-02",
+              "value": 1
+            },
+            {
+              "start": "2026-11-03",
+              "value": 0
+            },
+            {
+              "start": "2026-11-04",
+              "value": 0
+            },
+            {
+              "start": "2026-11-05",
+              "value": 1
+            },
+            {
+              "start": "2026-11-06",
+              "value": 0
+            },
+            {
+              "start": "2026-11-07",
+              "value": 0
+            },
+            {
+              "start": "2026-11-08",
+              "value": 1
+            }
+          ]
+        },
+        "matchesPlayed": {
+          "value": 51,
+          "previous": 0,
+          "change": {
+            "kind": "new"
+          },
+          "buckets": [
+            {
+              "start": "2026-10-10",
+              "value": 0
+            },
+            {
+              "start": "2026-10-11",
+              "value": 0
+            },
+            {
+              "start": "2026-10-12",
+              "value": 0
+            },
+            {
+              "start": "2026-10-13",
+              "value": 0
+            },
+            {
+              "start": "2026-10-14",
+              "value": 0
+            },
+            {
+              "start": "2026-10-15",
+              "value": 0
+            },
+            {
+              "start": "2026-10-16",
+              "value": 0
+            },
+            {
+              "start": "2026-10-17",
+              "value": 0
+            },
+            {
+              "start": "2026-10-18",
+              "value": 0
+            },
+            {
+              "start": "2026-10-19",
+              "value": 0
+            },
+            {
+              "start": "2026-10-20",
+              "value": 0
+            },
+            {
+              "start": "2026-10-21",
+              "value": 0
+            },
+            {
+              "start": "2026-10-22",
+              "value": 0
+            },
+            {
+              "start": "2026-10-23",
+              "value": 0
+            },
+            {
+              "start": "2026-10-24",
+              "value": 0
+            },
+            {
+              "start": "2026-10-25",
+              "value": 0
+            },
+            {
+              "start": "2026-10-26",
+              "value": 0
+            },
+            {
+              "start": "2026-10-27",
+              "value": 0
+            },
+            {
+              "start": "2026-10-28",
+              "value": 0
+            },
+            {
+              "start": "2026-10-29",
+              "value": 0
+            },
+            {
+              "start": "2026-10-30",
+              "value": 9
+            },
+            {
+              "start": "2026-10-31",
+              "value": 0
+            },
+            {
+              "start": "2026-11-01",
+              "value": 0
+            },
+            {
+              "start": "2026-11-02",
+              "value": 12
+            },
+            {
+              "start": "2026-11-03",
+              "value": 0
+            },
+            {
+              "start": "2026-11-04",
+              "value": 0
+            },
+            {
+              "start": "2026-11-05",
+              "value": 20
+            },
+            {
+              "start": "2026-11-06",
+              "value": 0
+            },
+            {
+              "start": "2026-11-07",
+              "value": 0
+            },
+            {
+              "start": "2026-11-08",
+              "value": 10
+            }
+          ]
+        },
+        "revenueByPlan": [
+          {
+            "plan": "Monthly",
+            "total": {
+              "amountMinor": 150000,
+              "currency": "PHP"
+            },
+            "payments": 2
+          },
+          {
+            "plan": "Yearly",
+            "total": {
+              "amountMinor": 0,
+              "currency": "PHP"
+            },
+            "payments": 0
+          }
+        ],
+        "recentPayments": [
+          {
+            "termId": "T3",
+            "clubId": "a",
+            "clubName": "Alpha Club",
+            "plan": "Monthly",
+            "paidOn": "2026-11-03",
+            "amount": {
+              "amountMinor": 150000,
+              "currency": "PHP"
+            }
+          },
+          {
+            "termId": "T4",
+            "clubId": "b",
+            "clubName": "Beta Club",
+            "plan": "Monthly",
+            "paidOn": "2026-11-01",
+            "amount": {
+              "amountMinor": 0,
+              "currency": "PHP"
+            }
+          }
+        ],
+        "mostActiveClubs": [
+          {
+            "clubId": "a",
+            "clubName": "Alpha Club",
+            "sessions": 3,
+            "matches": 31,
+            "paid": {
+              "amountMinor": 150000,
+              "currency": "PHP"
+            }
+          },
+          {
+            "clubId": "b",
+            "clubName": "Beta Club",
+            "sessions": 1,
+            "matches": 20,
+            "paid": {
+              "amountMinor": 0,
+              "currency": "PHP"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "platformSalesReport › groups 12 months by the month paid and totals by plan (sales)",
+      "input": {
+        "args": [
+          {
+            "today": "2026-11-08",
+            "clubs": [
+              {
+                "id": "a",
+                "name": "Alpha Club",
+                "pricing": "paid",
+                "monthlyListMinor": 150000
+              },
+              {
+                "id": "b",
+                "name": "Beta Club",
+                "pricing": "free",
+                "monthlyListMinor": 100000
+              }
+            ],
+            "payments": [
+              {
+                "termId": "T3",
+                "clubId": "a",
+                "plan": "Monthly",
+                "paidOn": "2026-11-03",
+                "amountMinor": 150000,
+                "startsAt": "2026-11-03"
+              },
+              {
+                "termId": "T2",
+                "clubId": "a",
+                "plan": "Monthly",
+                "paidOn": "2026-10-03",
+                "amountMinor": 150000,
+                "startsAt": "2026-10-03"
+              },
+              {
+                "termId": "T1",
+                "clubId": "a",
+                "plan": "Yearly",
+                "paidOn": "2026-08-01",
+                "amountMinor": 1500000,
+                "startsAt": "2024-01-01"
+              },
+              {
+                "termId": "T4",
+                "clubId": "b",
+                "plan": "Monthly",
+                "paidOn": "2026-11-01",
+                "amountMinor": 0,
+                "startsAt": "2026-11-01"
+              }
+            ],
+            "sessions": [
+              {
+                "clubId": "a",
+                "startedOn": "2026-11-08",
+                "matches": 10
+              },
+              {
+                "clubId": "a",
+                "startedOn": "2026-11-02",
+                "matches": 12
+              },
+              {
+                "clubId": "a",
+                "startedOn": "2026-10-30",
+                "matches": 9
+              },
+              {
+                "clubId": "b",
+                "startedOn": "2026-11-05",
+                "matches": 20
+              }
+            ]
+          },
+          "12m"
+        ],
+        "select": "bucketUnit"
+      },
+      "expected": "month"
+    },
+    {
+      "name": "platformSalesReport › groups 12 months by the month paid and totals by plan (derived, sales)",
+      "input": {
+        "args": [
+          {
+            "today": "2026-11-08",
+            "clubs": [
+              {
+                "id": "a",
+                "name": "Alpha Club",
+                "pricing": "paid",
+                "monthlyListMinor": 150000
+              },
+              {
+                "id": "b",
+                "name": "Beta Club",
+                "pricing": "free",
+                "monthlyListMinor": 100000
+              }
+            ],
+            "payments": [
+              {
+                "termId": "T3",
+                "clubId": "a",
+                "plan": "Monthly",
+                "paidOn": "2026-11-03",
+                "amountMinor": 150000,
+                "startsAt": "2026-11-03"
+              },
+              {
+                "termId": "T2",
+                "clubId": "a",
+                "plan": "Monthly",
+                "paidOn": "2026-10-03",
+                "amountMinor": 150000,
+                "startsAt": "2026-10-03"
+              },
+              {
+                "termId": "T1",
+                "clubId": "a",
+                "plan": "Yearly",
+                "paidOn": "2026-08-01",
+                "amountMinor": 1500000,
+                "startsAt": "2024-01-01"
+              },
+              {
+                "termId": "T4",
+                "clubId": "b",
+                "plan": "Monthly",
+                "paidOn": "2026-11-01",
+                "amountMinor": 0,
+                "startsAt": "2026-11-01"
+              }
+            ],
+            "sessions": [
+              {
+                "clubId": "a",
+                "startedOn": "2026-11-08",
+                "matches": 10
+              },
+              {
+                "clubId": "a",
+                "startedOn": "2026-11-02",
+                "matches": 12
+              },
+              {
+                "clubId": "a",
+                "startedOn": "2026-10-30",
+                "matches": 9
+              },
+              {
+                "clubId": "b",
+                "startedOn": "2026-11-05",
+                "matches": 20
+              }
+            ]
+          },
+          "12m"
+        ]
+      },
+      "expected": {
+        "period": "12m",
+        "bucketUnit": "month",
+        "today": "2026-11-08",
+        "from": "2025-12-01",
+        "to": "2026-11-08",
+        "revenue": {
+          "value": {
+            "amountMinor": 1800000,
+            "currency": "PHP"
+          },
+          "previous": {
+            "amountMinor": 0,
+            "currency": "PHP"
+          },
+          "change": {
+            "kind": "new"
+          },
+          "buckets": [
+            {
+              "start": "2025-12-01",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-01-01",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-02-01",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-03-01",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-04-01",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-05-01",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-06-01",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-07-01",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-08-01",
+              "value": {
+                "amountMinor": 1500000,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-09-01",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-01",
+              "value": {
+                "amountMinor": 150000,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-11-01",
+              "value": {
+                "amountMinor": 150000,
+                "currency": "PHP"
+              }
+            }
+          ]
+        },
+        "sessionsStarted": {
+          "value": 4,
+          "previous": 0,
+          "change": {
+            "kind": "new"
+          },
+          "buckets": [
+            {
+              "start": "2025-12-01",
+              "value": 0
+            },
+            {
+              "start": "2026-01-01",
+              "value": 0
+            },
+            {
+              "start": "2026-02-01",
+              "value": 0
+            },
+            {
+              "start": "2026-03-01",
+              "value": 0
+            },
+            {
+              "start": "2026-04-01",
+              "value": 0
+            },
+            {
+              "start": "2026-05-01",
+              "value": 0
+            },
+            {
+              "start": "2026-06-01",
+              "value": 0
+            },
+            {
+              "start": "2026-07-01",
+              "value": 0
+            },
+            {
+              "start": "2026-08-01",
+              "value": 0
+            },
+            {
+              "start": "2026-09-01",
+              "value": 0
+            },
+            {
+              "start": "2026-10-01",
+              "value": 1
+            },
+            {
+              "start": "2026-11-01",
+              "value": 3
+            }
+          ]
+        },
+        "matchesPlayed": {
+          "value": 51,
+          "previous": 0,
+          "change": {
+            "kind": "new"
+          },
+          "buckets": [
+            {
+              "start": "2025-12-01",
+              "value": 0
+            },
+            {
+              "start": "2026-01-01",
+              "value": 0
+            },
+            {
+              "start": "2026-02-01",
+              "value": 0
+            },
+            {
+              "start": "2026-03-01",
+              "value": 0
+            },
+            {
+              "start": "2026-04-01",
+              "value": 0
+            },
+            {
+              "start": "2026-05-01",
+              "value": 0
+            },
+            {
+              "start": "2026-06-01",
+              "value": 0
+            },
+            {
+              "start": "2026-07-01",
+              "value": 0
+            },
+            {
+              "start": "2026-08-01",
+              "value": 0
+            },
+            {
+              "start": "2026-09-01",
+              "value": 0
+            },
+            {
+              "start": "2026-10-01",
+              "value": 9
+            },
+            {
+              "start": "2026-11-01",
+              "value": 42
+            }
+          ]
+        },
+        "revenueByPlan": [
+          {
+            "plan": "Monthly",
+            "total": {
+              "amountMinor": 300000,
+              "currency": "PHP"
+            },
+            "payments": 3
+          },
+          {
+            "plan": "Yearly",
+            "total": {
+              "amountMinor": 1500000,
+              "currency": "PHP"
+            },
+            "payments": 1
+          }
+        ],
+        "recentPayments": [
+          {
+            "termId": "T3",
+            "clubId": "a",
+            "clubName": "Alpha Club",
+            "plan": "Monthly",
+            "paidOn": "2026-11-03",
+            "amount": {
+              "amountMinor": 150000,
+              "currency": "PHP"
+            }
+          },
+          {
+            "termId": "T4",
+            "clubId": "b",
+            "clubName": "Beta Club",
+            "plan": "Monthly",
+            "paidOn": "2026-11-01",
+            "amount": {
+              "amountMinor": 0,
+              "currency": "PHP"
+            }
+          },
+          {
+            "termId": "T2",
+            "clubId": "a",
+            "clubName": "Alpha Club",
+            "plan": "Monthly",
+            "paidOn": "2026-10-03",
+            "amount": {
+              "amountMinor": 150000,
+              "currency": "PHP"
+            }
+          },
+          {
+            "termId": "T1",
+            "clubId": "a",
+            "clubName": "Alpha Club",
+            "plan": "Yearly",
+            "paidOn": "2026-08-01",
+            "amount": {
+              "amountMinor": 1500000,
+              "currency": "PHP"
+            }
+          }
+        ],
+        "mostActiveClubs": [
+          {
+            "clubId": "a",
+            "clubName": "Alpha Club",
+            "sessions": 3,
+            "matches": 31,
+            "paid": {
+              "amountMinor": 1800000,
+              "currency": "PHP"
+            }
+          },
+          {
+            "clubId": "b",
+            "clubName": "Beta Club",
+            "sessions": 1,
+            "matches": 20,
+            "paid": {
+              "amountMinor": 0,
+              "currency": "PHP"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "platformSalesReport › says there is not enough history when the earlier period starts before the first license (derived, sales)",
+      "input": {
+        "args": [
+          {
+            "today": "2026-11-08",
+            "clubs": [
+              {
+                "id": "a",
+                "name": "Alpha Club",
+                "pricing": "paid",
+                "monthlyListMinor": 150000
+              },
+              {
+                "id": "b",
+                "name": "Beta Club",
+                "pricing": "free",
+                "monthlyListMinor": 100000
+              }
+            ],
+            "payments": [
+              {
+                "termId": "T3",
+                "clubId": "a",
+                "plan": "Monthly",
+                "paidOn": "2026-11-03",
+                "amountMinor": 150000,
+                "startsAt": "2026-11-03"
+              },
+              {
+                "termId": "T2",
+                "clubId": "a",
+                "plan": "Monthly",
+                "paidOn": "2026-10-03",
+                "amountMinor": 150000,
+                "startsAt": "2026-10-03"
+              },
+              {
+                "termId": "T4",
+                "clubId": "b",
+                "plan": "Monthly",
+                "paidOn": "2026-11-01",
+                "amountMinor": 0,
+                "startsAt": "2026-11-01"
+              }
+            ],
+            "sessions": [
+              {
+                "clubId": "a",
+                "startedOn": "2026-11-08",
+                "matches": 10
+              },
+              {
+                "clubId": "a",
+                "startedOn": "2026-11-02",
+                "matches": 12
+              },
+              {
+                "clubId": "a",
+                "startedOn": "2026-10-30",
+                "matches": 9
+              },
+              {
+                "clubId": "b",
+                "startedOn": "2026-11-05",
+                "matches": 20
+              }
+            ]
+          },
+          "30d"
+        ]
+      },
+      "expected": {
+        "period": "30d",
+        "bucketUnit": "day",
+        "today": "2026-11-08",
+        "from": "2026-10-10",
+        "to": "2026-11-08",
+        "revenue": {
+          "value": {
+            "amountMinor": 150000,
+            "currency": "PHP"
+          },
+          "previous": {
+            "amountMinor": 150000,
+            "currency": "PHP"
+          },
+          "change": {
+            "kind": "no-history"
+          },
+          "buckets": [
+            {
+              "start": "2026-10-10",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-11",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-12",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-13",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-14",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-15",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-16",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-17",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-18",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-19",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-20",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-21",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-22",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-23",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-24",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-25",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-26",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-27",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-28",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-29",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-30",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-10-31",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-11-01",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-11-02",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-11-03",
+              "value": {
+                "amountMinor": 150000,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-11-04",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-11-05",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-11-06",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-11-07",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            },
+            {
+              "start": "2026-11-08",
+              "value": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              }
+            }
+          ]
+        },
+        "sessionsStarted": {
+          "value": 4,
+          "previous": 0,
+          "change": {
+            "kind": "no-history"
+          },
+          "buckets": [
+            {
+              "start": "2026-10-10",
+              "value": 0
+            },
+            {
+              "start": "2026-10-11",
+              "value": 0
+            },
+            {
+              "start": "2026-10-12",
+              "value": 0
+            },
+            {
+              "start": "2026-10-13",
+              "value": 0
+            },
+            {
+              "start": "2026-10-14",
+              "value": 0
+            },
+            {
+              "start": "2026-10-15",
+              "value": 0
+            },
+            {
+              "start": "2026-10-16",
+              "value": 0
+            },
+            {
+              "start": "2026-10-17",
+              "value": 0
+            },
+            {
+              "start": "2026-10-18",
+              "value": 0
+            },
+            {
+              "start": "2026-10-19",
+              "value": 0
+            },
+            {
+              "start": "2026-10-20",
+              "value": 0
+            },
+            {
+              "start": "2026-10-21",
+              "value": 0
+            },
+            {
+              "start": "2026-10-22",
+              "value": 0
+            },
+            {
+              "start": "2026-10-23",
+              "value": 0
+            },
+            {
+              "start": "2026-10-24",
+              "value": 0
+            },
+            {
+              "start": "2026-10-25",
+              "value": 0
+            },
+            {
+              "start": "2026-10-26",
+              "value": 0
+            },
+            {
+              "start": "2026-10-27",
+              "value": 0
+            },
+            {
+              "start": "2026-10-28",
+              "value": 0
+            },
+            {
+              "start": "2026-10-29",
+              "value": 0
+            },
+            {
+              "start": "2026-10-30",
+              "value": 1
+            },
+            {
+              "start": "2026-10-31",
+              "value": 0
+            },
+            {
+              "start": "2026-11-01",
+              "value": 0
+            },
+            {
+              "start": "2026-11-02",
+              "value": 1
+            },
+            {
+              "start": "2026-11-03",
+              "value": 0
+            },
+            {
+              "start": "2026-11-04",
+              "value": 0
+            },
+            {
+              "start": "2026-11-05",
+              "value": 1
+            },
+            {
+              "start": "2026-11-06",
+              "value": 0
+            },
+            {
+              "start": "2026-11-07",
+              "value": 0
+            },
+            {
+              "start": "2026-11-08",
+              "value": 1
+            }
+          ]
+        },
+        "matchesPlayed": {
+          "value": 51,
+          "previous": 0,
+          "change": {
+            "kind": "no-history"
+          },
+          "buckets": [
+            {
+              "start": "2026-10-10",
+              "value": 0
+            },
+            {
+              "start": "2026-10-11",
+              "value": 0
+            },
+            {
+              "start": "2026-10-12",
+              "value": 0
+            },
+            {
+              "start": "2026-10-13",
+              "value": 0
+            },
+            {
+              "start": "2026-10-14",
+              "value": 0
+            },
+            {
+              "start": "2026-10-15",
+              "value": 0
+            },
+            {
+              "start": "2026-10-16",
+              "value": 0
+            },
+            {
+              "start": "2026-10-17",
+              "value": 0
+            },
+            {
+              "start": "2026-10-18",
+              "value": 0
+            },
+            {
+              "start": "2026-10-19",
+              "value": 0
+            },
+            {
+              "start": "2026-10-20",
+              "value": 0
+            },
+            {
+              "start": "2026-10-21",
+              "value": 0
+            },
+            {
+              "start": "2026-10-22",
+              "value": 0
+            },
+            {
+              "start": "2026-10-23",
+              "value": 0
+            },
+            {
+              "start": "2026-10-24",
+              "value": 0
+            },
+            {
+              "start": "2026-10-25",
+              "value": 0
+            },
+            {
+              "start": "2026-10-26",
+              "value": 0
+            },
+            {
+              "start": "2026-10-27",
+              "value": 0
+            },
+            {
+              "start": "2026-10-28",
+              "value": 0
+            },
+            {
+              "start": "2026-10-29",
+              "value": 0
+            },
+            {
+              "start": "2026-10-30",
+              "value": 9
+            },
+            {
+              "start": "2026-10-31",
+              "value": 0
+            },
+            {
+              "start": "2026-11-01",
+              "value": 0
+            },
+            {
+              "start": "2026-11-02",
+              "value": 12
+            },
+            {
+              "start": "2026-11-03",
+              "value": 0
+            },
+            {
+              "start": "2026-11-04",
+              "value": 0
+            },
+            {
+              "start": "2026-11-05",
+              "value": 20
+            },
+            {
+              "start": "2026-11-06",
+              "value": 0
+            },
+            {
+              "start": "2026-11-07",
+              "value": 0
+            },
+            {
+              "start": "2026-11-08",
+              "value": 10
+            }
+          ]
+        },
+        "revenueByPlan": [
+          {
+            "plan": "Monthly",
+            "total": {
+              "amountMinor": 150000,
+              "currency": "PHP"
+            },
+            "payments": 2
+          },
+          {
+            "plan": "Yearly",
+            "total": {
+              "amountMinor": 0,
+              "currency": "PHP"
+            },
+            "payments": 0
+          }
+        ],
+        "recentPayments": [
+          {
+            "termId": "T3",
+            "clubId": "a",
+            "clubName": "Alpha Club",
+            "plan": "Monthly",
+            "paidOn": "2026-11-03",
+            "amount": {
+              "amountMinor": 150000,
+              "currency": "PHP"
+            }
+          },
+          {
+            "termId": "T4",
+            "clubId": "b",
+            "clubName": "Beta Club",
+            "plan": "Monthly",
+            "paidOn": "2026-11-01",
+            "amount": {
+              "amountMinor": 0,
+              "currency": "PHP"
+            }
+          }
+        ],
+        "mostActiveClubs": [
+          {
+            "clubId": "a",
+            "clubName": "Alpha Club",
+            "sessions": 3,
+            "matches": 31,
+            "paid": {
+              "amountMinor": 150000,
+              "currency": "PHP"
+            }
+          },
+          {
+            "clubId": "b",
+            "clubName": "Beta Club",
+            "sessions": 1,
+            "matches": 20,
+            "paid": {
+              "amountMinor": 0,
+              "currency": "PHP"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

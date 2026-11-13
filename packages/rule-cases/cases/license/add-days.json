@@ -1,0 +1,13 @@
+{
+  "rule": "license/add-days",
+  "version": 1,
+  "cases": [
+    {
+      "name": "platformSalesReport › counts payments on the day paid, in integer centavos (sales)",
+      "input": {
+        "args": ["2026-11-08", -6]
+      },
+      "expected": "2026-11-02"
+    }
+  ]
+}

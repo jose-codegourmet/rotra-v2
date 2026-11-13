@@ -1,0 +1,48 @@
+{
+  "rule": "phone/phone-field-accepts",
+  "version": 1,
+  "cases": [
+    {
+      "name": "rejects '' without guessing a country or truncating",
+      "input": {
+        "args": [""]
+      },
+      "expected": false
+    },
+    {
+      "name": "rejects '9175550142' without guessing a country or truncating",
+      "input": {
+        "args": ["9175550142"]
+      },
+      "expected": false
+    },
+    {
+      "name": "rejects '+1 917 555 0142' without guessing a country or truncating",
+      "input": {
+        "args": ["+1 917 555 0142"]
+      },
+      "expected": false
+    },
+    {
+      "name": "rejects '0917555014' without guessing a country or truncating",
+      "input": {
+        "args": ["0917555014"]
+      },
+      "expected": false
+    },
+    {
+      "name": "rejects '091755501422' without guessing a country or truncating",
+      "input": {
+        "args": ["091755501422"]
+      },
+      "expected": false
+    },
+    {
+      "name": "rejects 'text09175550142' without guessing a country or truncating",
+      "input": {
+        "args": ["text09175550142"]
+      },
+      "expected": false
+    }
+  ]
+}

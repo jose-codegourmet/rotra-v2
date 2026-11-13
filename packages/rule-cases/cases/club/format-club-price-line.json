@@ -1,0 +1,327 @@
+{
+  "rule": "club/format-club-price-line",
+  "version": 1,
+  "cases": [
+    {
+      "name": "club price rules (rotra-admin.html savePct / priceLine / amountText) › formats a paid price as one line with the saving (club) #1",
+      "input": {
+        "args": [
+          {
+            "licensePricing": "paid",
+            "licenseMonthlyMinor": 150000,
+            "licenseYearlyMinor": 1500000
+          }
+        ]
+      },
+      "expected": "₱1,500 a month · ₱15,000 a year (17% off)"
+    },
+    {
+      "name": "club price rules (rotra-admin.html savePct / priceLine / amountText) › formats a paid price as one line with the saving (club) #2",
+      "input": {
+        "args": [
+          {
+            "licensePricing": "paid",
+            "licenseMonthlyMinor": 180000,
+            "licenseYearlyMinor": 1800000
+          }
+        ]
+      },
+      "expected": "₱1,800 a month · ₱18,000 a year (17% off)"
+    },
+    {
+      "name": "club price rules (rotra-admin.html savePct / priceLine / amountText) › leaves the saving out when there is none (club)",
+      "input": {
+        "args": [
+          {
+            "licensePricing": "paid",
+            "licenseMonthlyMinor": 150000,
+            "licenseYearlyMinor": 1800000
+          }
+        ]
+      },
+      "expected": "₱1,500 a month · ₱18,000 a year"
+    },
+    {
+      "name": "club price rules (rotra-admin.html savePct / priceLine / amountText) › shows a free club as a tester club, whatever amounts it kept (club) #1",
+      "input": {
+        "args": [
+          {
+            "licensePricing": "free",
+            "licenseMonthlyMinor": 100000,
+            "licenseYearlyMinor": 1000000
+          }
+        ]
+      },
+      "expected": "Free (tester club)"
+    },
+    {
+      "name": "club price rules (rotra-admin.html savePct / priceLine / amountText) › shows a free club as a tester club, whatever amounts it kept (club) #2",
+      "input": {
+        "args": [
+          {
+            "licensePricing": "free",
+            "licenseMonthlyMinor": 0,
+            "licenseYearlyMinor": 0
+          }
+        ]
+      },
+      "expected": "Free (tester club)"
+    },
+    {
+      "name": "club price rules (rotra-admin.html savePct / priceLine / amountText) › formats every seeded club price from SEED_PRICE (derived, club) #1",
+      "input": {
+        "args": [
+          {
+            "id": "6cd364d4-0e3a-5c3d-9e75-2116cc845714",
+            "name": "Lahug Smash Club",
+            "initials": "LS",
+            "foundingAddress": "Salinas Dr, Lahug, Cebu City",
+            "city": "Cebu City",
+            "locationCode": "PH-CEB",
+            "licensePricing": "paid",
+            "licenseMonthlyMinor": 150000,
+            "licenseYearlyMinor": 1500000,
+            "currency": "PHP",
+            "logoUrl": null,
+            "logoPreviousUrl": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGP4z8DwHwAFAAH/q842iQAAAABJRU5ErkJggg==",
+            "inviteCode": "K7M2QX9P",
+            "selfCheckInEnabled": true,
+            "description": "Friendly open play for all levels in Lahug. Bring your racket; shuttles are on us.",
+            "courtRules": null,
+            "postTemplate": null,
+            "defaultPlayersPerCourt": 8,
+            "defaultEntranceFeeMinor": null,
+            "cityCode": "PH-CEB",
+            "username": "lahug.smash",
+            "pendingNameChange": null
+          }
+        ]
+      },
+      "expected": "₱1,500 a month · ₱15,000 a year (17% off)"
+    },
+    {
+      "name": "club price rules (rotra-admin.html savePct / priceLine / amountText) › formats every seeded club price from SEED_PRICE (derived, club) #2",
+      "input": {
+        "args": [
+          {
+            "id": "3f8ad2ed-5978-5a6a-b3ba-10efdf750f53",
+            "name": "IT Park Badminton Club",
+            "initials": "IP",
+            "foundingAddress": "Geonzon St, IT Park, Cebu City",
+            "city": "Cebu City",
+            "locationCode": "PH-CEB",
+            "licensePricing": "paid",
+            "licenseMonthlyMinor": 150000,
+            "licenseYearlyMinor": 1500000,
+            "currency": "PHP",
+            "logoUrl": null,
+            "logoPreviousUrl": null,
+            "inviteCode": "T4NB8WZ3",
+            "selfCheckInEnabled": true,
+            "description": "",
+            "courtRules": null,
+            "postTemplate": null,
+            "defaultPlayersPerCourt": 8,
+            "defaultEntranceFeeMinor": null,
+            "cityCode": "PH-CEB",
+            "username": "itpark.badminton",
+            "pendingNameChange": null
+          }
+        ]
+      },
+      "expected": "₱1,500 a month · ₱15,000 a year (17% off)"
+    },
+    {
+      "name": "club price rules (rotra-admin.html savePct / priceLine / amountText) › formats every seeded club price from SEED_PRICE (derived, club) #3",
+      "input": {
+        "args": [
+          {
+            "id": "cb70bf6e-65ab-5aba-a0b2-bb35a3c204b0",
+            "name": "Matina Smash Club",
+            "initials": "MS",
+            "foundingAddress": "MacArthur Hwy, Matina, Davao City",
+            "city": "Davao City",
+            "locationCode": "PH-DVO",
+            "licensePricing": "paid",
+            "licenseMonthlyMinor": 120000,
+            "licenseYearlyMinor": 1200000,
+            "currency": "PHP",
+            "logoUrl": null,
+            "logoPreviousUrl": null,
+            "inviteCode": "D9HX5RC2",
+            "selfCheckInEnabled": true,
+            "description": "",
+            "courtRules": null,
+            "postTemplate": null,
+            "defaultPlayersPerCourt": 8,
+            "defaultEntranceFeeMinor": null,
+            "cityCode": "PH-DVO",
+            "username": "matina.smash",
+            "pendingNameChange": null
+          }
+        ]
+      },
+      "expected": "₱1,200 a month · ₱12,000 a year (17% off)"
+    },
+    {
+      "name": "club price rules (rotra-admin.html savePct / priceLine / amountText) › formats every seeded club price from SEED_PRICE (derived, club) #4",
+      "input": {
+        "args": [
+          {
+            "id": "6982df14-0798-5005-902d-06463d401125",
+            "name": "Sampaloc Shuttle Club",
+            "initials": "SS",
+            "foundingAddress": "Dapitan St, Sampaloc, Manila",
+            "city": "Manila",
+            "locationCode": "PH-MNL",
+            "licensePricing": "paid",
+            "licenseMonthlyMinor": 180000,
+            "licenseYearlyMinor": 1800000,
+            "currency": "PHP",
+            "logoUrl": null,
+            "logoPreviousUrl": null,
+            "inviteCode": "P3GV7LA6",
+            "selfCheckInEnabled": true,
+            "description": "",
+            "courtRules": null,
+            "postTemplate": null,
+            "defaultPlayersPerCourt": 8,
+            "defaultEntranceFeeMinor": null,
+            "cityCode": "PH-MNL",
+            "username": "sampaloc.shuttle",
+            "pendingNameChange": null
+          }
+        ]
+      },
+      "expected": "₱1,800 a month · ₱18,000 a year (17% off)"
+    },
+    {
+      "name": "club price rules (rotra-admin.html savePct / priceLine / amountText) › formats every seeded club price from SEED_PRICE (derived, club) #5",
+      "input": {
+        "args": [
+          {
+            "id": "7b6d347f-8a84-5163-91e0-b727edb9c555",
+            "name": "Talamban Racket Club",
+            "initials": "TR",
+            "foundingAddress": "Gov. M. Cuenco Ave, Talamban, Cebu City",
+            "city": "Cebu City",
+            "locationCode": "PH-CEB",
+            "licensePricing": "paid",
+            "licenseMonthlyMinor": 150000,
+            "licenseYearlyMinor": 1500000,
+            "currency": "PHP",
+            "logoUrl": null,
+            "logoPreviousUrl": null,
+            "inviteCode": "W8ZJ2KE4",
+            "selfCheckInEnabled": true,
+            "description": "",
+            "courtRules": null,
+            "postTemplate": null,
+            "defaultPlayersPerCourt": 8,
+            "defaultEntranceFeeMinor": null,
+            "cityCode": "PH-CEB",
+            "username": "talamban.racket",
+            "pendingNameChange": null
+          }
+        ]
+      },
+      "expected": "₱1,500 a month · ₱15,000 a year (17% off)"
+    },
+    {
+      "name": "club price rules (rotra-admin.html savePct / priceLine / amountText) › formats every seeded club price from SEED_PRICE (derived, club) #6",
+      "input": {
+        "args": [
+          {
+            "id": "bd873ef5-db5a-51e9-8736-5563ce4408bc",
+            "name": "Bacolod Rally House",
+            "initials": "BR",
+            "foundingAddress": "Lacson St, Bacolod City",
+            "city": "Bacolod City",
+            "locationCode": "PH-BCD",
+            "licensePricing": "paid",
+            "licenseMonthlyMinor": 150000,
+            "licenseYearlyMinor": 1500000,
+            "currency": "PHP",
+            "logoUrl": null,
+            "logoPreviousUrl": null,
+            "inviteCode": "F5QY9MB7",
+            "selfCheckInEnabled": true,
+            "description": "",
+            "courtRules": null,
+            "postTemplate": null,
+            "defaultPlayersPerCourt": 8,
+            "defaultEntranceFeeMinor": null,
+            "cityCode": "PH-BCD",
+            "username": "bacolod.rally",
+            "pendingNameChange": null
+          }
+        ]
+      },
+      "expected": "₱1,500 a month · ₱15,000 a year (17% off)"
+    },
+    {
+      "name": "club price rules (rotra-admin.html savePct / priceLine / amountText) › formats every seeded club price from SEED_PRICE (derived, club) #7",
+      "input": {
+        "args": [
+          {
+            "id": "eaa3137d-43e3-569f-82ad-015a9171db19",
+            "name": "Molo Shuttle Club",
+            "initials": "MO",
+            "foundingAddress": "Molo Plaza, Iloilo City",
+            "city": "Iloilo City",
+            "locationCode": "PH-ILO",
+            "licensePricing": "paid",
+            "licenseMonthlyMinor": 150000,
+            "licenseYearlyMinor": 1500000,
+            "currency": "PHP",
+            "logoUrl": null,
+            "logoPreviousUrl": null,
+            "inviteCode": "C2TR6XN8",
+            "selfCheckInEnabled": true,
+            "description": "",
+            "courtRules": null,
+            "postTemplate": null,
+            "defaultPlayersPerCourt": 8,
+            "defaultEntranceFeeMinor": null,
+            "cityCode": "PH-ILO",
+            "username": "molo.shuttle",
+            "pendingNameChange": null
+          }
+        ]
+      },
+      "expected": "₱1,500 a month · ₱15,000 a year (17% off)"
+    },
+    {
+      "name": "club price rules (rotra-admin.html savePct / priceLine / amountText) › formats every seeded club price from SEED_PRICE (derived, club) #8",
+      "input": {
+        "args": [
+          {
+            "id": "984d9c34-26ab-5b06-bcbf-b3ecbc606cbc",
+            "name": "Tagbilaran Badminton Circle",
+            "initials": "TB",
+            "foundingAddress": "CPG Ave, Tagbilaran City",
+            "city": "Tagbilaran City",
+            "locationCode": "PH-TAG",
+            "licensePricing": "free",
+            "licenseMonthlyMinor": 100000,
+            "licenseYearlyMinor": 1000000,
+            "currency": "PHP",
+            "logoUrl": null,
+            "logoPreviousUrl": null,
+            "inviteCode": "H6LD3VS5",
+            "selfCheckInEnabled": true,
+            "description": "",
+            "courtRules": null,
+            "postTemplate": null,
+            "defaultPlayersPerCourt": 8,
+            "defaultEntranceFeeMinor": null,
+            "cityCode": "PH-TAG",
+            "username": "tagbilaran.circle",
+            "pendingNameChange": null
+          }
+        ]
+      },
+      "expected": "Free (tester club)"
+    }
+  ]
+}

@@ -1,0 +1,130 @@
+{
+  "rule": "club/build-post-values",
+  "version": 1,
+  "cases": [
+    {
+      "name": "Facebook post court times and join line (#730) › puts each court time on its line, falling back to the session time (club)",
+      "input": {
+        "args": [
+          {
+            "club": {
+              "name": "Club",
+              "description": "",
+              "courtRules": null
+            },
+            "session": {
+              "title": "Night",
+              "scheduledStartAt": 1794396600000,
+              "scheduledEndAt": 1794407400000,
+              "venueName": "Hall",
+              "venueAddress": ""
+            },
+            "roster": [],
+            "waitlist": [],
+            "openSlots": 0,
+            "mode": "fair",
+            "minimum": 3,
+            "joinUrl": "https://x.test/s/abc123",
+            "courts": [
+              {
+                "label": "Court 1"
+              },
+              {
+                "label": "Court 2",
+                "startsAt": 1794398400000,
+                "openUntil": 1794403800000
+              },
+              {
+                "label": "Court 3",
+                "openUntil": 1794497400000
+              }
+            ]
+          }
+        ],
+        "select": "courts"
+      },
+      "expected": "Court 1 · 7:30 PM–10:30 PM\nCourt 2 · 8:00 PM–9:30 PM\nCourt 3 · 7:30 PM–11:30 PM · next day"
+    },
+    {
+      "name": "Facebook post court times and join line (#730) › fills the join line and appends it when a saved template lacks the key (club)",
+      "input": {
+        "args": [
+          {
+            "club": {
+              "name": "Club",
+              "description": "",
+              "courtRules": null
+            },
+            "session": {
+              "title": "Night",
+              "scheduledStartAt": 1794396600000,
+              "scheduledEndAt": 1794407400000,
+              "venueName": "Hall",
+              "venueAddress": ""
+            },
+            "roster": [],
+            "waitlist": [],
+            "openSlots": 0,
+            "mode": "fair",
+            "minimum": 3,
+            "joinUrl": "https://x.test/s/abc123",
+            "courts": []
+          }
+        ],
+        "select": "join_link"
+      },
+      "expected": "To join and see the full roster, open this link: https://x.test/s/abc123"
+    },
+    {
+      "name": "Facebook post court times and join line (#730) › fills the join line and appends it when a saved template lacks the key (derived, club)",
+      "input": {
+        "args": [
+          {
+            "club": {
+              "name": "Club",
+              "description": "",
+              "courtRules": null
+            },
+            "session": {
+              "title": "Night",
+              "scheduledStartAt": 1794396600000,
+              "scheduledEndAt": 1794407400000,
+              "venueName": "Hall",
+              "venueAddress": ""
+            },
+            "roster": [],
+            "waitlist": [],
+            "openSlots": 0,
+            "mode": "fair",
+            "minimum": 3,
+            "joinUrl": "https://x.test/s/abc123",
+            "courts": []
+          }
+        ]
+      },
+      "expected": {
+        "club_name": "Club",
+        "club_description": "",
+        "title": "Night",
+        "day": "Wednesday",
+        "date": "November 11, 2026",
+        "where": "Hall",
+        "when": "Wednesday, November 11 · 7:30 PM–10:30 PM",
+        "x_courts": "0",
+        "court_count": "0",
+        "courts": "",
+        "tube_count": "0",
+        "x_tubes": "To be announced",
+        "player_count": "0",
+        "players": "No players yet",
+        "waitlist": "None yet. 0 slots left.",
+        "mode": "Fair (Mainly level-matched games, roughly 10% easy games)",
+        "minimum": "3 games per player",
+        "fee_per_head": "Free",
+        "entrance_fee": "None",
+        "court_rules": "Court rules:\n• Non-marking shoes only\n• Be ready within 2 minutes when your match is called\n• Winner-only scoring is fine; tell the Queue Master the result",
+        "join_link": "To join and see the full roster, open this link: https://x.test/s/abc123"
+      }
+    }
+  ]
+}

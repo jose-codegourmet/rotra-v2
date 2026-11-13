@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rotra.club/schemas/rule-case-file.json",
+  "title": "ROTRA rule case file",
+  "description": "One file per rule at cases/<area>/<rule>.json. `rule` is `<area>/<rule>` and names one exported rule function. Each case calls the rule with `input.args` (JSON array, positional arguments). If `input.select` is set, it is a dot-separated path into the result (object keys, array indexes) and `expected` is compared with the value at that path; otherwise with the whole result. Comparison is a deep subset match: every key in `expected` must be present and equal, arrays must have the same length and each element is matched the same way, and numbers and strings compare exactly. Money is integer minor units (centavos). Ids are strings. JSON has no Date, undefined, NaN, Infinity or functions, so inside `input.args` (and inside `expected`, which the runner decodes the same way) these are tagged values: `{\"$date\": \"<ISO 8601 UTC>\"}` is a Date (a `time.Time` in Go), `{\"$undefined\": true}` is undefined (nil), `{\"$number\": \"NaN\" | \"Infinity\" | \"-Infinity\"}` is that number, and `{\"$constant\": <n>}` is a random-number function (`rng`) that always returns n. A result that is a Map or Set is written as `{\"$map\": [[key, value], ...]}` or `{\"$set\": [item, ...]}` in `expected`, in insertion order. Plain instants stay epoch milliseconds. A list length is written as an array of that many `{}` (an empty object matches any object).",
+  "type": "object",
+  "required": ["rule", "version", "cases"],
+  "additionalProperties": false,
+  "properties": {
+    "rule": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*/[a-z0-9]+(-[a-z0-9]+)*$" },
+    "version": { "type": "integer", "minimum": 1 },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["name", "input", "expected"],
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "input": {
+            "type": "object",
+            "required": ["args"],
+            "additionalProperties": false,
+            "properties": {
+              "args": { "type": "array" },
+              "select": { "type": "string", "minLength": 1 }
+            }
+          },
+          "expected": {}
+        }
+      }
+    }
+  }
+}

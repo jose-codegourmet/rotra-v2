@@ -1,0 +1,72 @@
+{
+  "rule": "ranking-settings/effective-ranking-version",
+  "version": 1,
+  "cases": [
+    {
+      "name": "versions › the newest version is in effect, whatever the order (rankingSettings) #1",
+      "input": {
+        "args": [
+          [
+            {
+              "version": 1,
+              "assessmentWeightBp": 7000,
+              "performanceWeightBp": 3000,
+              "recentStandardMatchThreshold": 10,
+              "effectiveAt": "2026-01-05T09:00:00+08:00",
+              "createdByEmail": "owner@rotra.example"
+            },
+            {
+              "version": 2,
+              "assessmentWeightBp": 7000,
+              "performanceWeightBp": 3000,
+              "recentStandardMatchThreshold": 12,
+              "effectiveAt": "2026-01-05T09:00:00+08:00",
+              "createdByEmail": "owner@rotra.example"
+            }
+          ]
+        ]
+      },
+      "expected": {
+        "version": 2,
+        "assessmentWeightBp": 7000,
+        "performanceWeightBp": 3000,
+        "recentStandardMatchThreshold": 12,
+        "effectiveAt": "2026-01-05T09:00:00+08:00",
+        "createdByEmail": "owner@rotra.example"
+      }
+    },
+    {
+      "name": "versions › the newest version is in effect, whatever the order (rankingSettings) #2",
+      "input": {
+        "args": [
+          [
+            {
+              "version": 2,
+              "assessmentWeightBp": 7000,
+              "performanceWeightBp": 3000,
+              "recentStandardMatchThreshold": 12,
+              "effectiveAt": "2026-01-05T09:00:00+08:00",
+              "createdByEmail": "owner@rotra.example"
+            },
+            {
+              "version": 1,
+              "assessmentWeightBp": 7000,
+              "performanceWeightBp": 3000,
+              "recentStandardMatchThreshold": 10,
+              "effectiveAt": "2026-01-05T09:00:00+08:00",
+              "createdByEmail": "owner@rotra.example"
+            }
+          ]
+        ]
+      },
+      "expected": {
+        "version": 2,
+        "assessmentWeightBp": 7000,
+        "performanceWeightBp": 3000,
+        "recentStandardMatchThreshold": 12,
+        "effectiveAt": "2026-01-05T09:00:00+08:00",
+        "createdByEmail": "owner@rotra.example"
+      }
+    }
+  ]
+}

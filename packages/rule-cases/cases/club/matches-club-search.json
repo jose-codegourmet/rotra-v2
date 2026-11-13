@@ -1,0 +1,136 @@
+{
+  "rule": "club/matches-club-search",
+  "version": 1,
+  "cases": [
+    {
+      "name": "club identity rules › searches name, username, city, code and earlier names (club) #1",
+      "input": {
+        "args": [
+          {
+            "name": "Lahug Smashers",
+            "username": "lahug.smash",
+            "city": "Cebu City",
+            "cityCode": "PH-CEB",
+            "earlierNames": ["Lahug Smash Club"]
+          },
+          {
+            "$undefined": true
+          }
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "club identity rules › searches name, username, city, code and earlier names (club) #2",
+      "input": {
+        "args": [
+          {
+            "name": "Lahug Smashers",
+            "username": "lahug.smash",
+            "city": "Cebu City",
+            "cityCode": "PH-CEB",
+            "earlierNames": ["Lahug Smash Club"]
+          },
+          "  "
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "club identity rules › searches name, username, city, code and earlier names (club) #3",
+      "input": {
+        "args": [
+          {
+            "name": "Lahug Smashers",
+            "username": "lahug.smash",
+            "city": "Cebu City",
+            "cityCode": "PH-CEB",
+            "earlierNames": ["Lahug Smash Club"]
+          },
+          "SMASHERS"
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "club identity rules › searches name, username, city, code and earlier names (club) #4",
+      "input": {
+        "args": [
+          {
+            "name": "Lahug Smashers",
+            "username": "lahug.smash",
+            "city": "Cebu City",
+            "cityCode": "PH-CEB",
+            "earlierNames": ["Lahug Smash Club"]
+          },
+          "lahug.smash"
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "club identity rules › searches name, username, city, code and earlier names (club) #5",
+      "input": {
+        "args": [
+          {
+            "name": "Lahug Smashers",
+            "username": "lahug.smash",
+            "city": "Cebu City",
+            "cityCode": "PH-CEB",
+            "earlierNames": ["Lahug Smash Club"]
+          },
+          "cebú"
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "club identity rules › searches name, username, city, code and earlier names (club) #6",
+      "input": {
+        "args": [
+          {
+            "name": "Lahug Smashers",
+            "username": "lahug.smash",
+            "city": "Cebu City",
+            "cityCode": "PH-CEB",
+            "earlierNames": ["Lahug Smash Club"]
+          },
+          "ph-ceb"
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "club identity rules › searches name, username, city, code and earlier names (club) #7",
+      "input": {
+        "args": [
+          {
+            "name": "Lahug Smashers",
+            "username": "lahug.smash",
+            "city": "Cebu City",
+            "cityCode": "PH-CEB",
+            "earlierNames": ["Lahug Smash Club"]
+          },
+          "smash club"
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "club identity rules › searches name, username, city, code and earlier names (club) #8",
+      "input": {
+        "args": [
+          {
+            "name": "Lahug Smashers",
+            "username": "lahug.smash",
+            "city": "Cebu City",
+            "cityCode": "PH-CEB",
+            "earlierNames": ["Lahug Smash Club"]
+          },
+          "manila"
+        ]
+      },
+      "expected": false
+    }
+  ]
+}

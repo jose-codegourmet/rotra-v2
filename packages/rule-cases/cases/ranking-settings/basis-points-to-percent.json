@@ -1,0 +1,720 @@
+{
+  "rule": "ranking-settings/basis-points-to-percent",
+  "version": 1,
+  "cases": [
+    {
+      "name": "table row (rankingSettings) #1",
+      "input": {
+        "args": [7000]
+      },
+      "expected": 70
+    },
+    {
+      "name": "table row (rankingSettings) #2",
+      "input": {
+        "args": [3000]
+      },
+      "expected": 30
+    },
+    {
+      "name": "table row (rankingSettings) #3",
+      "input": {
+        "args": [0]
+      },
+      "expected": 0
+    },
+    {
+      "name": "table row (rankingSettings) #4",
+      "input": {
+        "args": [10000]
+      },
+      "expected": 100
+    },
+    {
+      "name": "table row (rankingSettings) #5",
+      "input": {
+        "args": [7050]
+      },
+      "expected": 70.5
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #1",
+      "input": {
+        "args": [100]
+      },
+      "expected": 1
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #2",
+      "input": {
+        "args": [200]
+      },
+      "expected": 2
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #3",
+      "input": {
+        "args": [300]
+      },
+      "expected": 3
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #4",
+      "input": {
+        "args": [400]
+      },
+      "expected": 4
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #5",
+      "input": {
+        "args": [500]
+      },
+      "expected": 5
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #6",
+      "input": {
+        "args": [600]
+      },
+      "expected": 6
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #7",
+      "input": {
+        "args": [700]
+      },
+      "expected": 7
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #8",
+      "input": {
+        "args": [800]
+      },
+      "expected": 8
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #9",
+      "input": {
+        "args": [900]
+      },
+      "expected": 9
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #10",
+      "input": {
+        "args": [1000]
+      },
+      "expected": 10
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #11",
+      "input": {
+        "args": [1100]
+      },
+      "expected": 11
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #12",
+      "input": {
+        "args": [1200]
+      },
+      "expected": 12
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #13",
+      "input": {
+        "args": [1300]
+      },
+      "expected": 13
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #14",
+      "input": {
+        "args": [1400]
+      },
+      "expected": 14
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #15",
+      "input": {
+        "args": [1500]
+      },
+      "expected": 15
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #16",
+      "input": {
+        "args": [1600]
+      },
+      "expected": 16
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #17",
+      "input": {
+        "args": [1700]
+      },
+      "expected": 17
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #18",
+      "input": {
+        "args": [1800]
+      },
+      "expected": 18
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #19",
+      "input": {
+        "args": [1900]
+      },
+      "expected": 19
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #20",
+      "input": {
+        "args": [2000]
+      },
+      "expected": 20
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #21",
+      "input": {
+        "args": [2100]
+      },
+      "expected": 21
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #22",
+      "input": {
+        "args": [2200]
+      },
+      "expected": 22
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #23",
+      "input": {
+        "args": [2300]
+      },
+      "expected": 23
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #24",
+      "input": {
+        "args": [2400]
+      },
+      "expected": 24
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #25",
+      "input": {
+        "args": [2500]
+      },
+      "expected": 25
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #26",
+      "input": {
+        "args": [2600]
+      },
+      "expected": 26
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #27",
+      "input": {
+        "args": [2700]
+      },
+      "expected": 27
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #28",
+      "input": {
+        "args": [2800]
+      },
+      "expected": 28
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #29",
+      "input": {
+        "args": [2900]
+      },
+      "expected": 29
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #30",
+      "input": {
+        "args": [3100]
+      },
+      "expected": 31
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #31",
+      "input": {
+        "args": [3200]
+      },
+      "expected": 32
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #32",
+      "input": {
+        "args": [3300]
+      },
+      "expected": 33
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #33",
+      "input": {
+        "args": [3400]
+      },
+      "expected": 34
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #34",
+      "input": {
+        "args": [3500]
+      },
+      "expected": 35
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #35",
+      "input": {
+        "args": [3600]
+      },
+      "expected": 36
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #36",
+      "input": {
+        "args": [3700]
+      },
+      "expected": 37
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #37",
+      "input": {
+        "args": [3800]
+      },
+      "expected": 38
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #38",
+      "input": {
+        "args": [3900]
+      },
+      "expected": 39
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #39",
+      "input": {
+        "args": [4000]
+      },
+      "expected": 40
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #40",
+      "input": {
+        "args": [4100]
+      },
+      "expected": 41
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #41",
+      "input": {
+        "args": [4200]
+      },
+      "expected": 42
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #42",
+      "input": {
+        "args": [4300]
+      },
+      "expected": 43
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #43",
+      "input": {
+        "args": [4400]
+      },
+      "expected": 44
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #44",
+      "input": {
+        "args": [4500]
+      },
+      "expected": 45
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #45",
+      "input": {
+        "args": [4600]
+      },
+      "expected": 46
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #46",
+      "input": {
+        "args": [4700]
+      },
+      "expected": 47
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #47",
+      "input": {
+        "args": [4800]
+      },
+      "expected": 48
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #48",
+      "input": {
+        "args": [4900]
+      },
+      "expected": 49
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #49",
+      "input": {
+        "args": [5000]
+      },
+      "expected": 50
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #50",
+      "input": {
+        "args": [5100]
+      },
+      "expected": 51
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #51",
+      "input": {
+        "args": [5200]
+      },
+      "expected": 52
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #52",
+      "input": {
+        "args": [5300]
+      },
+      "expected": 53
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #53",
+      "input": {
+        "args": [5400]
+      },
+      "expected": 54
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #54",
+      "input": {
+        "args": [5500]
+      },
+      "expected": 55
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #55",
+      "input": {
+        "args": [5600]
+      },
+      "expected": 56
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #56",
+      "input": {
+        "args": [5700]
+      },
+      "expected": 57
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #57",
+      "input": {
+        "args": [5800]
+      },
+      "expected": 58
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #58",
+      "input": {
+        "args": [5900]
+      },
+      "expected": 59
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #59",
+      "input": {
+        "args": [6000]
+      },
+      "expected": 60
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #60",
+      "input": {
+        "args": [6100]
+      },
+      "expected": 61
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #61",
+      "input": {
+        "args": [6200]
+      },
+      "expected": 62
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #62",
+      "input": {
+        "args": [6300]
+      },
+      "expected": 63
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #63",
+      "input": {
+        "args": [6400]
+      },
+      "expected": 64
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #64",
+      "input": {
+        "args": [6500]
+      },
+      "expected": 65
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #65",
+      "input": {
+        "args": [6600]
+      },
+      "expected": 66
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #66",
+      "input": {
+        "args": [6700]
+      },
+      "expected": 67
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #67",
+      "input": {
+        "args": [6800]
+      },
+      "expected": 68
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #68",
+      "input": {
+        "args": [6900]
+      },
+      "expected": 69
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #69",
+      "input": {
+        "args": [7100]
+      },
+      "expected": 71
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #70",
+      "input": {
+        "args": [7200]
+      },
+      "expected": 72
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #71",
+      "input": {
+        "args": [7300]
+      },
+      "expected": 73
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #72",
+      "input": {
+        "args": [7400]
+      },
+      "expected": 74
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #73",
+      "input": {
+        "args": [7500]
+      },
+      "expected": 75
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #74",
+      "input": {
+        "args": [7600]
+      },
+      "expected": 76
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #75",
+      "input": {
+        "args": [7700]
+      },
+      "expected": 77
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #76",
+      "input": {
+        "args": [7800]
+      },
+      "expected": 78
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #77",
+      "input": {
+        "args": [7900]
+      },
+      "expected": 79
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #78",
+      "input": {
+        "args": [8000]
+      },
+      "expected": 80
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #79",
+      "input": {
+        "args": [8100]
+      },
+      "expected": 81
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #80",
+      "input": {
+        "args": [8200]
+      },
+      "expected": 82
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #81",
+      "input": {
+        "args": [8300]
+      },
+      "expected": 83
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #82",
+      "input": {
+        "args": [8400]
+      },
+      "expected": 84
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #83",
+      "input": {
+        "args": [8500]
+      },
+      "expected": 85
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #84",
+      "input": {
+        "args": [8600]
+      },
+      "expected": 86
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #85",
+      "input": {
+        "args": [8700]
+      },
+      "expected": 87
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #86",
+      "input": {
+        "args": [8800]
+      },
+      "expected": 88
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #87",
+      "input": {
+        "args": [8900]
+      },
+      "expected": 89
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #88",
+      "input": {
+        "args": [9000]
+      },
+      "expected": 90
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #89",
+      "input": {
+        "args": [9100]
+      },
+      "expected": 91
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #90",
+      "input": {
+        "args": [9200]
+      },
+      "expected": 92
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #91",
+      "input": {
+        "args": [9300]
+      },
+      "expected": 93
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #92",
+      "input": {
+        "args": [9400]
+      },
+      "expected": 94
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #93",
+      "input": {
+        "args": [9500]
+      },
+      "expected": 95
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #94",
+      "input": {
+        "args": [9600]
+      },
+      "expected": 96
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #95",
+      "input": {
+        "args": [9700]
+      },
+      "expected": 97
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #96",
+      "input": {
+        "args": [9800]
+      },
+      "expected": 98
+    },
+    {
+      "name": "basis points › round-trips every whole percentage (rankingSettings) #97",
+      "input": {
+        "args": [9900]
+      },
+      "expected": 99
+    }
+  ]
+}

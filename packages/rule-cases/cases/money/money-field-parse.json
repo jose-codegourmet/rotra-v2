@@ -1,0 +1,62 @@
+{
+  "rule": "money/money-field-parse",
+  "version": 1,
+  "cases": [
+    {
+      "name": "converts '0' pesos exactly",
+      "input": {
+        "args": ["0"]
+      },
+      "expected": 0
+    },
+    {
+      "name": "converts '0.29' pesos exactly",
+      "input": {
+        "args": ["0.29"]
+      },
+      "expected": 29
+    },
+    {
+      "name": "converts '1.01' pesos exactly",
+      "input": {
+        "args": ["1.01"]
+      },
+      "expected": 101
+    },
+    {
+      "name": "converts '350' pesos exactly",
+      "input": {
+        "args": ["350"]
+      },
+      "expected": 35000
+    },
+    {
+      "name": "converts '1,234.50' pesos exactly",
+      "input": {
+        "args": ["1,234.50"]
+      },
+      "expected": 123450
+    },
+    {
+      "name": "converts '90071992547409.91' pesos exactly",
+      "input": {
+        "args": ["90071992547409.91"]
+      },
+      "expected": 9007199254740991
+    },
+    {
+      "name": "preserves numeric centavos 35000",
+      "input": {
+        "args": [35000]
+      },
+      "expected": 35000
+    },
+    {
+      "name": "preserves numeric centavos 0",
+      "input": {
+        "args": [0]
+      },
+      "expected": 0
+    }
+  ]
+}

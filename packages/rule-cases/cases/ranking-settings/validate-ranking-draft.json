@@ -1,0 +1,298 @@
+{
+  "rule": "ranking-settings/validate-ranking-draft",
+  "version": 1,
+  "cases": [
+    {
+      "name": "basis points › rounds float noise to whole basis points (rankingSettings) #1",
+      "input": {
+        "args": [
+          {
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10
+          }
+        ]
+      },
+      "expected": {}
+    },
+    {
+      "name": "basis points › rounds float noise to whole basis points (rankingSettings) #2",
+      "input": {
+        "args": [
+          {
+            "assessmentWeightBp": 10000,
+            "performanceWeightBp": 0,
+            "recentStandardMatchThreshold": 10
+          }
+        ]
+      },
+      "expected": {}
+    },
+    {
+      "name": "basis points › rounds float noise to whole basis points (rankingSettings) #3",
+      "input": {
+        "args": [
+          {
+            "assessmentWeightBp": 0,
+            "performanceWeightBp": 10000,
+            "recentStandardMatchThreshold": 10
+          }
+        ]
+      },
+      "expected": {}
+    },
+    {
+      "name": "basis points › rounds float noise to whole basis points (rankingSettings) #4",
+      "input": {
+        "args": [
+          {
+            "assessmentWeightBp": 7050,
+            "performanceWeightBp": 2950,
+            "recentStandardMatchThreshold": 10
+          }
+        ]
+      },
+      "expected": {}
+    },
+    {
+      "name": "validateRankingDraft › rejects 70 / 40 on the total only (rankingSettings) #1",
+      "input": {
+        "args": [
+          {
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 4000,
+            "recentStandardMatchThreshold": 10
+          }
+        ]
+      },
+      "expected": {
+        "total": "The two weights add up to 110%. They must total exactly 100%."
+      }
+    },
+    {
+      "name": "validateRankingDraft › rejects 70 / 40 on the total only (rankingSettings) #2",
+      "input": {
+        "args": [
+          {
+            "assessmentWeightBp": -1,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10
+          }
+        ]
+      },
+      "expected": {
+        "assessmentWeightBp": "Use a whole number from 0 to 100."
+      }
+    },
+    {
+      "name": "validateRankingDraft › rejects 70 / 40 on the total only (rankingSettings) #3",
+      "input": {
+        "args": [
+          {
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": -1,
+            "recentStandardMatchThreshold": 10
+          }
+        ]
+      },
+      "expected": {
+        "performanceWeightBp": "Use a whole number from 0 to 100."
+      }
+    },
+    {
+      "name": "validateRankingDraft › rejects 70 / 40 on the total only (rankingSettings) #4",
+      "input": {
+        "args": [
+          {
+            "assessmentWeightBp": 10001,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10
+          }
+        ]
+      },
+      "expected": {
+        "assessmentWeightBp": "Use a whole number from 0 to 100."
+      }
+    },
+    {
+      "name": "validateRankingDraft › rejects 70 / 40 on the total only (rankingSettings) #5",
+      "input": {
+        "args": [
+          {
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 10001,
+            "recentStandardMatchThreshold": 10
+          }
+        ]
+      },
+      "expected": {
+        "performanceWeightBp": "Use a whole number from 0 to 100."
+      }
+    },
+    {
+      "name": "validateRankingDraft › rejects 70 / 40 on the total only (rankingSettings) #6",
+      "input": {
+        "args": [
+          {
+            "assessmentWeightBp": 70.5,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10
+          }
+        ]
+      },
+      "expected": {
+        "assessmentWeightBp": "Use a whole number from 0 to 100."
+      }
+    },
+    {
+      "name": "validateRankingDraft › rejects 70 / 40 on the total only (rankingSettings) #7",
+      "input": {
+        "args": [
+          {
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 70.5,
+            "recentStandardMatchThreshold": 10
+          }
+        ]
+      },
+      "expected": {
+        "performanceWeightBp": "Use a whole number from 0 to 100."
+      }
+    },
+    {
+      "name": "validateRankingDraft › rejects 70 / 40 on the total only (rankingSettings) #8",
+      "input": {
+        "args": [
+          {
+            "assessmentWeightBp": {
+              "$number": "NaN"
+            },
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10
+          }
+        ]
+      },
+      "expected": {
+        "assessmentWeightBp": "Use a whole number from 0 to 100."
+      }
+    },
+    {
+      "name": "validateRankingDraft › rejects 70 / 40 on the total only (rankingSettings) #9",
+      "input": {
+        "args": [
+          {
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": {
+              "$number": "NaN"
+            },
+            "recentStandardMatchThreshold": 10
+          }
+        ]
+      },
+      "expected": {
+        "performanceWeightBp": "Use a whole number from 0 to 100."
+      }
+    },
+    {
+      "name": "validateRankingDraft › rejects 70 / 40 on the total only (rankingSettings) #10",
+      "input": {
+        "args": [
+          {
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 1
+          }
+        ]
+      },
+      "expected": {}
+    },
+    {
+      "name": "validateRankingDraft › rejects 70 / 40 on the total only (rankingSettings) #11",
+      "input": {
+        "args": [
+          {
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 40
+          }
+        ]
+      },
+      "expected": {}
+    },
+    {
+      "name": "validateRankingDraft › rejects 70 / 40 on the total only (rankingSettings) #12",
+      "input": {
+        "args": [
+          {
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 0
+          }
+        ]
+      },
+      "expected": {
+        "recentStandardMatchThreshold": "Use a whole number from 1 to 40."
+      }
+    },
+    {
+      "name": "validateRankingDraft › rejects 70 / 40 on the total only (rankingSettings) #13",
+      "input": {
+        "args": [
+          {
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": -1
+          }
+        ]
+      },
+      "expected": {
+        "recentStandardMatchThreshold": "Use a whole number from 1 to 40."
+      }
+    },
+    {
+      "name": "validateRankingDraft › rejects 70 / 40 on the total only (rankingSettings) #14",
+      "input": {
+        "args": [
+          {
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 2.5
+          }
+        ]
+      },
+      "expected": {
+        "recentStandardMatchThreshold": "Use a whole number from 1 to 40."
+      }
+    },
+    {
+      "name": "validateRankingDraft › rejects 70 / 40 on the total only (rankingSettings) #15",
+      "input": {
+        "args": [
+          {
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 41
+          }
+        ]
+      },
+      "expected": {
+        "recentStandardMatchThreshold": "Use a whole number from 1 to 40."
+      }
+    },
+    {
+      "name": "validateRankingDraft › rejects 70 / 40 on the total only (rankingSettings) #16",
+      "input": {
+        "args": [
+          {
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 100
+          }
+        ]
+      },
+      "expected": {
+        "recentStandardMatchThreshold": "Use a whole number from 1 to 40."
+      }
+    }
+  ]
+}

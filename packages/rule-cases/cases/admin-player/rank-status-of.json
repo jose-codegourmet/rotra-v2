@@ -1,0 +1,44 @@
+{
+  "rule": "admin-player/rank-status-of",
+  "version": 1,
+  "cases": [
+    {
+      "name": "rank status (rotra-admin.html rankOf) › no level is no rank yet (adminPlayer)",
+      "input": {
+        "args": [null, 30, 10]
+      },
+      "expected": {
+        "kind": "none",
+        "text": "No rank yet"
+      }
+    },
+    {
+      "name": "rank status (rotra-admin.html rankOf) › below the requirement names the level and the count (adminPlayer)",
+      "input": {
+        "args": [3, 9, 10]
+      },
+      "expected": {
+        "kind": "below",
+        "text": "Intermediate Low · 9 of 10 recent matches"
+      }
+    },
+    {
+      "name": "rank status (rotra-admin.html rankOf) › meeting the requirement is on the leaderboard (adminPlayer)",
+      "input": {
+        "args": [8, 10, 10]
+      },
+      "expected": {
+        "kind": "board",
+        "text": "Advanced High · on the overall leaderboard"
+      }
+    },
+    {
+      "name": "rank status (rotra-admin.html rankOf) › an unknown level index is no rank yet (adminPlayer)",
+      "input": {
+        "args": [9, 12, 10],
+        "select": "kind"
+      },
+      "expected": "none"
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "rule": "license/license-audit-summary",
+  "version": 1,
+  "cases": [
+    {
+      "name": "amounts › records a free term as Free in the record (license)",
+      "input": {
+        "args": [
+          "Activated",
+          {
+            "id": "2026-10-27-Monthly",
+            "clubId": "club",
+            "plan": "Monthly",
+            "startsAt": "2026-10-27",
+            "endsAt": "2026-11-26",
+            "amountMinor": 0,
+            "currency": "PHP",
+            "paidOn": "2026-10-27",
+            "paymentReference": "",
+            "activatedAt": "2026-10-27T09:00:00+08:00",
+            "activatedByEmail": "owner@rotra.example",
+            "sourceCommandId": "cmd-2026-10-27"
+          }
+        ]
+      },
+      "expected": "Activated license: Monthly, Oct 27 – Nov 26, 2026 · Free."
+    },
+    {
+      "name": "amounts › writes the record line with the reference and the retention sentence (license) #1",
+      "input": {
+        "args": [
+          "Renewed",
+          {
+            "id": "2026-10-03-Monthly",
+            "clubId": "club",
+            "plan": "Monthly",
+            "startsAt": "2026-10-03",
+            "endsAt": "2026-11-02",
+            "amountMinor": 150000,
+            "currency": "PHP",
+            "paidOn": "2026-10-03",
+            "paymentReference": "LIC-0009",
+            "activatedAt": "2026-10-03T09:00:00+08:00",
+            "activatedByEmail": "owner@rotra.example",
+            "sourceCommandId": "cmd-2026-10-03"
+          }
+        ]
+      },
+      "expected": "Renewed license: Monthly, Oct 3 – Nov 2, 2026 · ₱1,500 · LIC-0009."
+    },
+    {
+      "name": "amounts › writes the record line with the reference and the retention sentence (license) #2",
+      "input": {
+        "args": [
+          "Renewed",
+          {
+            "id": "2026-10-03-Monthly",
+            "clubId": "club",
+            "plan": "Monthly",
+            "startsAt": "2026-10-03",
+            "endsAt": "2026-11-02",
+            "amountMinor": 150000,
+            "currency": "PHP",
+            "paidOn": "2026-10-03",
+            "paymentReference": "LIC-0009",
+            "activatedAt": "2026-10-03T09:00:00+08:00",
+            "activatedByEmail": "owner@rotra.example",
+            "sourceCommandId": "cmd-2026-10-03"
+          },
+          " Public pages restored; deletion countdown from Oct 1, 2026 cancelled."
+        ]
+      },
+      "expected": "Renewed license: Monthly, Oct 3 – Nov 2, 2026 · ₱1,500 · LIC-0009. Public pages restored; deletion countdown from Oct 1, 2026 cancelled."
+    }
+  ]
+}

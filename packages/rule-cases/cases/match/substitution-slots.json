@@ -1,0 +1,54 @@
+{
+  "rule": "match/substitution-slots",
+  "version": 1,
+  "cases": [
+    {
+      "name": "substitution game credit › keeps one person per team slot: a later choice replaces the earlier one (match)",
+      "input": {
+        "args": [
+          [
+            {
+              "outId": "Eve",
+              "inId": "Zoe",
+              "team": "A",
+              "at": 0,
+              "creditTo": "incoming"
+            },
+            {
+              "outId": "Zoe",
+              "inId": "Ben",
+              "team": "A",
+              "at": 1,
+              "creditTo": "outgoing"
+            }
+          ]
+        ]
+      },
+      "expected": [0, 0]
+    },
+    {
+      "name": "substitution game credit › keeps one person per team slot: a later choice replaces the earlier one (derived, match)",
+      "input": {
+        "args": [
+          [
+            {
+              "outId": "Eve",
+              "inId": "Zoe",
+              "team": "A",
+              "at": 0,
+              "creditTo": "incoming"
+            },
+            {
+              "outId": "Zoe",
+              "inId": "Ben",
+              "team": "A",
+              "at": 1,
+              "creditTo": "outgoing"
+            }
+          ]
+        ]
+      },
+      "expected": [0, 0]
+    }
+  ]
+}

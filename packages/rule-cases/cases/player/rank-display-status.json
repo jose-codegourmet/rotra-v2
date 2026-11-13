@@ -1,0 +1,102 @@
+{
+  "rule": "player/rank-display-status",
+  "version": 1,
+  "cases": [
+    {
+      "name": "prototype ranking eligibility rules › reassessment removes placement even with old games and a stale position (player)",
+      "input": {
+        "args": [
+          {
+            "level": 5,
+            "state": "needs_reassessment",
+            "updatePending": null,
+            "position": 128,
+            "recentCount": 9,
+            "matchRequirement": 10
+          }
+        ]
+      },
+      "expected": "needs-reassessment"
+    },
+    {
+      "name": "prototype ranking eligibility rules › missing level is not calculated, never Beginner (player)",
+      "input": {
+        "args": [
+          {
+            "level": null,
+            "state": "established",
+            "updatePending": null,
+            "position": 1,
+            "recentCount": 9,
+            "matchRequirement": 10
+          }
+        ]
+      },
+      "expected": "not-calculated"
+    },
+    {
+      "name": "prototype ranking eligibility rules › preserves prototype status precedence (player) #1",
+      "input": {
+        "args": [
+          {
+            "level": 5,
+            "state": "established",
+            "updatePending": {},
+            "position": 128,
+            "recentCount": 9,
+            "matchRequirement": 10
+          }
+        ]
+      },
+      "expected": "updating"
+    },
+    {
+      "name": "prototype ranking eligibility rules › preserves prototype status precedence (player) #2",
+      "input": {
+        "args": [
+          {
+            "level": 5,
+            "state": "established",
+            "updatePending": null,
+            "position": 128,
+            "recentCount": 9,
+            "matchRequirement": 10
+          }
+        ]
+      },
+      "expected": "on-leaderboard"
+    },
+    {
+      "name": "prototype ranking eligibility rules › preserves prototype status precedence (player) #3",
+      "input": {
+        "args": [
+          {
+            "level": 5,
+            "state": "established",
+            "updatePending": null,
+            "position": null,
+            "recentCount": 12,
+            "matchRequirement": 10
+          }
+        ]
+      },
+      "expected": "qualifies"
+    },
+    {
+      "name": "prototype ranking eligibility rules › preserves prototype status precedence (player) #4",
+      "input": {
+        "args": [
+          {
+            "level": 5,
+            "state": "established",
+            "updatePending": null,
+            "position": null,
+            "recentCount": 9,
+            "matchRequirement": 10
+          }
+        ]
+      },
+      "expected": "provisional"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "rule": "ranking-settings/ranking-settings-of",
+  "version": 1,
+  "cases": [
+    {
+      "name": "versions › maps a version to the reader shape (rankingSettings)",
+      "input": {
+        "args": [
+          {
+            "version": 1,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "effectiveAt": "2026-01-05T09:00:00+08:00",
+            "createdByEmail": "owner@rotra.example"
+          }
+        ]
+      },
+      "expected": {
+        "assessmentWeightPercent": 70,
+        "matchRequirement": 10
+      }
+    }
+  ]
+}

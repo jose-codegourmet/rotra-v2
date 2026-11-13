@@ -1,0 +1,63 @@
+{
+  "rule": "sales/sales-change",
+  "version": 1,
+  "cases": [
+    {
+      "name": "salesChange › follows the prototype chip (sales) #1",
+      "input": {
+        "args": [5, 5, false]
+      },
+      "expected": {
+        "kind": "no-history"
+      }
+    },
+    {
+      "name": "salesChange › follows the prototype chip (sales) #2",
+      "input": {
+        "args": [0, 0, true]
+      },
+      "expected": {
+        "kind": "no-change"
+      }
+    },
+    {
+      "name": "salesChange › follows the prototype chip (sales) #3",
+      "input": {
+        "args": [3, 0, true]
+      },
+      "expected": {
+        "kind": "new"
+      }
+    },
+    {
+      "name": "salesChange › follows the prototype chip (sales) #4",
+      "input": {
+        "args": [150, 100, true]
+      },
+      "expected": {
+        "kind": "change",
+        "percent": 50
+      }
+    },
+    {
+      "name": "salesChange › follows the prototype chip (sales) #5",
+      "input": {
+        "args": [50, 100, true]
+      },
+      "expected": {
+        "kind": "change",
+        "percent": -50
+      }
+    },
+    {
+      "name": "salesChange › follows the prototype chip (sales) #6",
+      "input": {
+        "args": [100, 100, true]
+      },
+      "expected": {
+        "kind": "change",
+        "percent": 0
+      }
+    }
+  ]
+}

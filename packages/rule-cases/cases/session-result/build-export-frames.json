@@ -1,0 +1,229 @@
+{
+  "rule": "session-result/build-export-frames",
+  "version": 1,
+  "cases": [
+    {
+      "name": "export frames › adds Awards and only includes Off Day when chosen (sessionResult) #1",
+      "input": {
+        "args": [
+          {
+            "standings": [
+              {
+                "position": 1,
+                "sessionPlayerId": "Player 1",
+                "clubPlayerId": "Player 1",
+                "name": "Player 1",
+                "wins": 1,
+                "losses": 0,
+                "games": 1
+              },
+              {
+                "position": 2,
+                "sessionPlayerId": "Player 2",
+                "clubPlayerId": "Player 2",
+                "name": "Player 2",
+                "wins": 1,
+                "losses": 0,
+                "games": 1
+              },
+              {
+                "position": 3,
+                "sessionPlayerId": "Player 3",
+                "clubPlayerId": "Player 3",
+                "name": "Player 3",
+                "wins": 1,
+                "losses": 0,
+                "games": 1
+              }
+            ],
+            "awards": {
+              "mvp": {
+                "sessionPlayerId": "x",
+                "clubPlayerId": "x",
+                "playerId": null,
+                "games": 2,
+                "score": 1,
+                "name": "Player 1"
+              },
+              "mostImproved": null,
+              "offDay": [
+                {
+                  "sessionPlayerId": "x",
+                  "clubPlayerId": "x",
+                  "playerId": null,
+                  "games": 2,
+                  "score": 1,
+                  "name": "Player 3",
+                  "priorSessions": 5,
+                  "baselineWinRate": 0.8,
+                  "winRate": 0,
+                  "delta": -0.8
+                }
+              ]
+            }
+          },
+          {
+            "slides": ["standings", "awards"],
+            "includeOffDay": false
+          },
+          "story"
+        ]
+      },
+      "expected": [
+        {
+          "title": "Standings",
+          "rows": ["Player 1", "Player 2", "Player 3"]
+        },
+        {
+          "title": "Awards",
+          "rows": ["MVP · Player 1"]
+        }
+      ]
+    },
+    {
+      "name": "export frames › adds Awards and only includes Off Day when chosen (sessionResult) #2",
+      "input": {
+        "args": [
+          {
+            "standings": [
+              {
+                "position": 1,
+                "sessionPlayerId": "Player 1",
+                "clubPlayerId": "Player 1",
+                "name": "Player 1",
+                "wins": 1,
+                "losses": 0,
+                "games": 1
+              },
+              {
+                "position": 2,
+                "sessionPlayerId": "Player 2",
+                "clubPlayerId": "Player 2",
+                "name": "Player 2",
+                "wins": 1,
+                "losses": 0,
+                "games": 1
+              },
+              {
+                "position": 3,
+                "sessionPlayerId": "Player 3",
+                "clubPlayerId": "Player 3",
+                "name": "Player 3",
+                "wins": 1,
+                "losses": 0,
+                "games": 1
+              }
+            ],
+            "awards": {
+              "mvp": null,
+              "mostImproved": null,
+              "offDay": [
+                {
+                  "sessionPlayerId": "x",
+                  "clubPlayerId": "x",
+                  "playerId": null,
+                  "games": 2,
+                  "score": 1,
+                  "name": "Player 3",
+                  "priorSessions": 5,
+                  "baselineWinRate": 0.8,
+                  "winRate": 0,
+                  "delta": -0.8
+                }
+              ]
+            }
+          },
+          {
+            "slides": ["awards"],
+            "includeOffDay": false
+          },
+          "feed"
+        ]
+      },
+      "expected": [
+        {
+          "title": "Awards",
+          "rows": ["MVP · none"]
+        }
+      ]
+    },
+    {
+      "name": "export frames › adds Awards and only includes Off Day when chosen (derived, sessionResult) #2",
+      "input": {
+        "args": [
+          {
+            "standings": [
+              {
+                "position": 1,
+                "sessionPlayerId": "Player 1",
+                "clubPlayerId": "Player 1",
+                "name": "Player 1",
+                "wins": 1,
+                "losses": 0,
+                "games": 1
+              },
+              {
+                "position": 2,
+                "sessionPlayerId": "Player 2",
+                "clubPlayerId": "Player 2",
+                "name": "Player 2",
+                "wins": 1,
+                "losses": 0,
+                "games": 1
+              },
+              {
+                "position": 3,
+                "sessionPlayerId": "Player 3",
+                "clubPlayerId": "Player 3",
+                "name": "Player 3",
+                "wins": 1,
+                "losses": 0,
+                "games": 1
+              }
+            ],
+            "awards": {
+              "mvp": {
+                "sessionPlayerId": "x",
+                "clubPlayerId": "x",
+                "playerId": null,
+                "games": 2,
+                "score": 1,
+                "name": "Player 1"
+              },
+              "mostImproved": null,
+              "offDay": [
+                {
+                  "sessionPlayerId": "x",
+                  "clubPlayerId": "x",
+                  "playerId": null,
+                  "games": 2,
+                  "score": 1,
+                  "name": "Player 3",
+                  "priorSessions": 5,
+                  "baselineWinRate": 0.8,
+                  "winRate": 0,
+                  "delta": -0.8
+                }
+              ]
+            }
+          },
+          {
+            "slides": ["awards"],
+            "includeOffDay": true
+          },
+          "feed"
+        ]
+      },
+      "expected": [
+        {
+          "title": "Awards",
+          "rows": ["MVP · Player 1"]
+        },
+        {
+          "title": "Off Day",
+          "rows": ["Player 3"]
+        }
+      ]
+    }
+  ]
+}

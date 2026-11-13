@@ -1,0 +1,34 @@
+{
+  "rule": "club/club-initials",
+  "version": 1,
+  "cases": [
+    {
+      "name": "club identity rules › takes the first letters of the first two words (club) #1",
+      "input": {
+        "args": ["Lahug Smashers"]
+      },
+      "expected": "LS"
+    },
+    {
+      "name": "club identity rules › takes the first letters of the first two words (club) #2",
+      "input": {
+        "args": ["  sampaloc   shuttle collective "]
+      },
+      "expected": "SS"
+    },
+    {
+      "name": "club identity rules › takes the first letters of the first two words (club) #3",
+      "input": {
+        "args": ["Molo"]
+      },
+      "expected": "M"
+    },
+    {
+      "name": "club identity rules › takes the first letters of the first two words (club) #4",
+      "input": {
+        "args": ["   "]
+      },
+      "expected": "C"
+    }
+  ]
+}

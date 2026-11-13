@@ -1,0 +1,34 @@
+{
+  "rule": "phone/phone-field-parse",
+  "version": 1,
+  "cases": [
+    {
+      "name": "normalizes '0917 555 0142' to E.164",
+      "input": {
+        "args": ["0917 555 0142"]
+      },
+      "expected": "+639175550142"
+    },
+    {
+      "name": "normalizes '+63 917 555 0142' to E.164",
+      "input": {
+        "args": ["+63 917 555 0142"]
+      },
+      "expected": "+639175550142"
+    },
+    {
+      "name": "normalizes '639175550142' to E.164",
+      "input": {
+        "args": ["639175550142"]
+      },
+      "expected": "+639175550142"
+    },
+    {
+      "name": "normalizes '0917-555-0142' to E.164",
+      "input": {
+        "args": ["0917-555-0142"]
+      },
+      "expected": "+639175550142"
+    }
+  ]
+}

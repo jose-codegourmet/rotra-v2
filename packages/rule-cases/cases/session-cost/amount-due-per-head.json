@@ -1,0 +1,37 @@
+{
+  "rule": "session-cost/amount-due-per-head",
+  "version": 1,
+  "cases": [
+    {
+      "name": "session cost estimates in centavos › uses at least one player and handles no costs (sessionCost) #1",
+      "input": {
+        "args": [null]
+      },
+      "expected": null
+    },
+    {
+      "name": "session cost estimates in centavos › uses at least one player and handles no costs (sessionCost) #2",
+      "input": {
+        "args": [
+          {
+            "players": 14,
+            "court": 0,
+            "shuttle": 0,
+            "entrance": 0,
+            "entranceFeePerHead": 0,
+            "total": 0,
+            "breakEven": 0,
+            "perHead": 0,
+            "isCustom": false,
+            "collect": 0,
+            "result": {
+              "kind": "no_costs",
+              "amount": 0
+            }
+          }
+        ]
+      },
+      "expected": 0
+    }
+  ]
+}

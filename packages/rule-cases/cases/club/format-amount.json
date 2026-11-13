@@ -1,0 +1,34 @@
+{
+  "rule": "club/format-amount",
+  "version": 1,
+  "cases": [
+    {
+      "name": "club price rules (rotra-admin.html savePct / priceLine / amountText) › shows a recorded ₱0 amount as Free and other amounts in pesos (club) #1",
+      "input": {
+        "args": [0]
+      },
+      "expected": "Free"
+    },
+    {
+      "name": "club price rules (rotra-admin.html savePct / priceLine / amountText) › shows a recorded ₱0 amount as Free and other amounts in pesos (club) #2",
+      "input": {
+        "args": [150000]
+      },
+      "expected": "₱1,500"
+    },
+    {
+      "name": "club price rules (rotra-admin.html savePct / priceLine / amountText) › shows a recorded ₱0 amount as Free and other amounts in pesos (club) #3",
+      "input": {
+        "args": [1500000]
+      },
+      "expected": "₱15,000"
+    },
+    {
+      "name": "club price rules (rotra-admin.html savePct / priceLine / amountText) › shows a recorded ₱0 amount as Free and other amounts in pesos (club) #4",
+      "input": {
+        "args": [150050]
+      },
+      "expected": "₱1,500.50"
+    }
+  ]
+}

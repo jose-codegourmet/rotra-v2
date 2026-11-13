@@ -1,0 +1,27 @@
+{
+  "rule": "club/plain-identity",
+  "version": 1,
+  "cases": [
+    {
+      "name": "club identity rules › compares names and usernames ignoring case, accents and outer spaces (club) #1",
+      "input": {
+        "args": [" Lahúg Smash CLUB "]
+      },
+      "expected": "lahug smash club"
+    },
+    {
+      "name": "club identity rules › compares names and usernames ignoring case, accents and outer spaces (club) #2",
+      "input": {
+        "args": ["LAHUG.SMASH"]
+      },
+      "expected": "lahug.smash"
+    },
+    {
+      "name": "club identity rules › compares names and usernames ignoring case, accents and outer spaces (club) #3",
+      "input": {
+        "args": ["Iñigo"]
+      },
+      "expected": "inigo"
+    }
+  ]
+}

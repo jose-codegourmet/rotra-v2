@@ -1,0 +1,260 @@
+{
+  "rule": "license/license-effects",
+  "version": 1,
+  "cases": [
+    {
+      "name": "D-LICENSE effects (rotra-admin.html licEffects()) › lists what a renewal of an active club does (license)",
+      "input": {
+        "args": [
+          {
+            "id": "6982df14-0798-5005-902d-06463d401125",
+            "name": "Sampaloc Shuttle Club",
+            "initials": "SS",
+            "foundingAddress": "Dapitan St, Sampaloc, Manila",
+            "city": "Manila",
+            "locationCode": "PH-MNL",
+            "licensePricing": "paid",
+            "licenseMonthlyMinor": 180000,
+            "licenseYearlyMinor": 1800000,
+            "currency": "PHP",
+            "logoUrl": null,
+            "logoPreviousUrl": null,
+            "inviteCode": "P3GV7LA6",
+            "selfCheckInEnabled": true,
+            "description": "",
+            "courtRules": null,
+            "postTemplate": null,
+            "defaultPlayersPerCourt": 8,
+            "defaultEntranceFeeMinor": null,
+            "cityCode": "PH-MNL",
+            "username": "sampaloc.shuttle",
+            "pendingNameChange": null
+          },
+          {
+            "state": "active",
+            "plan": "Monthly",
+            "until": "2026-11-09",
+            "days": 13
+          },
+          {
+            "k": "none"
+          },
+          {
+            "plan": "Monthly",
+            "startsOn": "2026-11-10"
+          },
+          "2026-10-27"
+        ]
+      },
+      "expected": [
+        "Sampaloc Shuttle Club can use the Queue app from Nov 10, 2026 to Dec 9, 2026.",
+        "Still one active session at a time.",
+        "Adds a payment record the club sees in Club settings."
+      ]
+    },
+    {
+      "name": "D-LICENSE effects (rotra-admin.html licEffects()) › says an expired club gets its stale pages back (license)",
+      "input": {
+        "args": [
+          {
+            "id": "7b6d347f-8a84-5163-91e0-b727edb9c555",
+            "name": "Talamban Racket Club",
+            "initials": "TR",
+            "foundingAddress": "Gov. M. Cuenco Ave, Talamban, Cebu City",
+            "city": "Cebu City",
+            "locationCode": "PH-CEB",
+            "licensePricing": "paid",
+            "licenseMonthlyMinor": 150000,
+            "licenseYearlyMinor": 1500000,
+            "currency": "PHP",
+            "logoUrl": null,
+            "logoPreviousUrl": null,
+            "inviteCode": "W8ZJ2KE4",
+            "selfCheckInEnabled": true,
+            "description": "",
+            "courtRules": null,
+            "postTemplate": null,
+            "defaultPlayersPerCourt": 8,
+            "defaultEntranceFeeMinor": null,
+            "cityCode": "PH-CEB",
+            "username": "talamban.racket",
+            "pendingNameChange": null
+          },
+          {
+            "state": "expired",
+            "plan": "Monthly",
+            "ended": "2026-09-30",
+            "since": "2026-10-01",
+            "next": null
+          },
+          {
+            "k": "stale",
+            "deleteOn": "2027-04-01",
+            "since": "2026-10-01",
+            "left": 156,
+            "elapsed": 26,
+            "total": 182
+          },
+          {
+            "plan": "Monthly",
+            "startsOn": "2026-10-27"
+          },
+          "2026-10-27"
+        ],
+        "select": "1"
+      },
+      "expected": "Restores the club's stale public pages and cancels the deletion scheduled for Apr 1, 2027."
+    },
+    {
+      "name": "D-LICENSE effects (rotra-admin.html licEffects()) › says a failed retry is cancelled, deleted pages stay deleted and a later start waits (license) #1",
+      "input": {
+        "args": [
+          {
+            "id": "bd873ef5-db5a-51e9-8736-5563ce4408bc",
+            "name": "Bacolod Rally House",
+            "initials": "BR",
+            "foundingAddress": "Lacson St, Bacolod City",
+            "city": "Bacolod City",
+            "locationCode": "PH-BCD",
+            "licensePricing": "paid",
+            "licenseMonthlyMinor": 150000,
+            "licenseYearlyMinor": 1500000,
+            "currency": "PHP",
+            "logoUrl": null,
+            "logoPreviousUrl": null,
+            "inviteCode": "F5QY9MB7",
+            "selfCheckInEnabled": true,
+            "description": "",
+            "courtRules": null,
+            "postTemplate": null,
+            "defaultPlayersPerCourt": 8,
+            "defaultEntranceFeeMinor": null,
+            "cityCode": "PH-BCD",
+            "username": "bacolod.rally",
+            "pendingNameChange": null
+          },
+          {
+            "state": "expired",
+            "plan": "Monthly",
+            "ended": "2026-04-19",
+            "since": "2026-04-20",
+            "next": null
+          },
+          {
+            "k": "failed",
+            "deleteOn": "2026-10-20",
+            "failedOn": "2026-10-20",
+            "since": "2026-04-20"
+          },
+          {
+            "plan": "Monthly",
+            "startsOn": "2026-10-27"
+          },
+          "2026-10-27"
+        ],
+        "select": "1"
+      },
+      "expected": "Restores the club's stale public pages and cancels the pending deletion retry."
+    },
+    {
+      "name": "D-LICENSE effects (rotra-admin.html licEffects()) › says a failed retry is cancelled, deleted pages stay deleted and a later start waits (license) #2",
+      "input": {
+        "args": [
+          {
+            "id": "bd873ef5-db5a-51e9-8736-5563ce4408bc",
+            "name": "Bacolod Rally House",
+            "initials": "BR",
+            "foundingAddress": "Lacson St, Bacolod City",
+            "city": "Bacolod City",
+            "locationCode": "PH-BCD",
+            "licensePricing": "paid",
+            "licenseMonthlyMinor": 150000,
+            "licenseYearlyMinor": 1500000,
+            "currency": "PHP",
+            "logoUrl": null,
+            "logoPreviousUrl": null,
+            "inviteCode": "F5QY9MB7",
+            "selfCheckInEnabled": true,
+            "description": "",
+            "courtRules": null,
+            "postTemplate": null,
+            "defaultPlayersPerCourt": 8,
+            "defaultEntranceFeeMinor": null,
+            "cityCode": "PH-BCD",
+            "username": "bacolod.rally",
+            "pendingNameChange": null
+          },
+          {
+            "state": "expired",
+            "plan": "Monthly",
+            "ended": "2026-04-19",
+            "since": "2026-04-20",
+            "next": null
+          },
+          {
+            "k": "failed",
+            "deleteOn": "2026-10-20",
+            "failedOn": "2026-10-20",
+            "since": "2026-04-20"
+          },
+          {
+            "plan": "Monthly",
+            "startsOn": "2026-11-01"
+          },
+          "2026-10-27"
+        ],
+        "select": "1"
+      },
+      "expected": "Until Nov 1, 2026 the club stays expired and its public pages stay stale."
+    },
+    {
+      "name": "D-LICENSE effects (rotra-admin.html licEffects()) › says a failed retry is cancelled, deleted pages stay deleted and a later start waits (license) #3",
+      "input": {
+        "args": [
+          {
+            "id": "eaa3137d-43e3-569f-82ad-015a9171db19",
+            "name": "Molo Shuttle Club",
+            "initials": "MO",
+            "foundingAddress": "Molo Plaza, Iloilo City",
+            "city": "Iloilo City",
+            "locationCode": "PH-ILO",
+            "licensePricing": "paid",
+            "licenseMonthlyMinor": 150000,
+            "licenseYearlyMinor": 1500000,
+            "currency": "PHP",
+            "logoUrl": null,
+            "logoPreviousUrl": null,
+            "inviteCode": "C2TR6XN8",
+            "selfCheckInEnabled": true,
+            "description": "",
+            "courtRules": null,
+            "postTemplate": null,
+            "defaultPlayersPerCourt": 8,
+            "defaultEntranceFeeMinor": null,
+            "cityCode": "PH-ILO",
+            "username": "molo.shuttle",
+            "pendingNameChange": null
+          },
+          {
+            "state": "expired",
+            "plan": "Monthly",
+            "ended": "2026-03-31",
+            "since": "2026-04-01",
+            "next": null
+          },
+          {
+            "k": "deleted",
+            "on": "2026-10-01"
+          },
+          {
+            "plan": "Monthly",
+            "startsOn": "2026-10-27"
+          },
+          "2026-10-27"
+        ],
+        "select": "1"
+      },
+      "expected": "The public pages deleted on Oct 1, 2026 don't come back. Player match history and ranks were kept."
+    }
+  ]
+}

@@ -1,3 +1,8 @@
+import {
+  courtTimeOnSession,
+  courtWindowError,
+  sessionWindowError,
+} from '@rotra/schema/court-window'
 import { formatPeso, moneyField } from '@rotra/schema/money'
 import { formatPhoneForDisplay, phoneField } from '@rotra/schema/phone'
 import { describe, expect, it } from 'vitest'
@@ -32,6 +37,17 @@ const rules: Record<string, Rule> = {
   ...registry('session-cost', sessionCost),
   ...registry('session-payment', sessionPayment),
   ...registry('session-result', sessionResult),
+  'court-window/session-window-error': (start, end) =>
+    sessionWindowError(start as number, end as number),
+  'court-window/court-window-error': (start, end, sessionStart, sessionEnd) =>
+    courtWindowError(
+      start as number,
+      end as number | null,
+      sessionStart as number,
+      sessionEnd as number,
+    ),
+  'court-window/court-time-on-session': (sessionStartsAt, at) =>
+    courtTimeOnSession(sessionStartsAt as number, at as number),
   'money/money-field-parse': (value) => moneyField.parse(value),
   'money/money-field-accepts': (value) => moneyField.safeParse(value).success,
   'money/format-peso': (minor) => formatPeso(minor as number),
@@ -57,6 +73,20 @@ const caseFiles = import.meta.glob('../../rule-cases/cases/**/*.json', {
   import: 'default',
 })
 const files = Object.keys(caseFiles).sort()
+
+/** Turns the tagged values of case.schema.json back into Date, undefined, non-finite numbers and `rng`. */
+function decode(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(decode)
+  if (value && typeof value === 'object') {
+    const tagged = value as Record<string, unknown>
+    if ('$date' in tagged) return new Date(tagged.$date as string)
+    if ('$undefined' in tagged) return undefined
+    if ('$number' in tagged) return Number(tagged.$number)
+    if ('$constant' in tagged) return () => tagged.$constant
+    return Object.fromEntries(Object.entries(tagged).map(([key, item]) => [key, decode(item)]))
+  }
+  return value
+}
 
 /** Every key in `expected` is present and equal in `actual`; arrays match in length and per element. */
 function subsetMismatch(expected: unknown, actual: unknown, at = 'result'): string | null {
@@ -95,7 +125,7 @@ describe('shared rule cases', () => {
       for (const item of data.cases) {
         it(item.name, () => {
           const result = select(
-            rules[data.rule]?.(...structuredClone(item.input.args)),
+            rules[data.rule]?.(...(decode(item.input.args) as unknown[])),
             item.input.select,
           )
           expect(subsetMismatch(item.expected, result)).toBeNull()

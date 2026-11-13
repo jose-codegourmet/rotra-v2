@@ -1,6 +1,6 @@
 # Roster: “Checked in themselves” mark, and the club setting Players can check themselves in
 
-Status: IN PROGRESS — #586
+Status: IN MOCK APP — #586
 Date: 2026-11-09
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Roster and levels rows and cards, Live session › Players cards; Club settings › Session defaults
@@ -37,7 +37,7 @@ Superseded by: none
 - Screen docs: docs/screens/product/modules/queue/players-roster.md — self check-in mark; docs/screens/product/modules/queue/access-home.md — Session defaults switch; docs/product-terms.md — Self check-in
 
 ## Built so far
-- #617 (roster rows and cards, live Players cards): the Checked in themselves / Left mark is in the mock app. The club setting **Players can check themselves in** belongs to epic Q19 (#587, open), so this log stays `IN PROGRESS` until Q19 is done.
+- #617 (roster rows and cards, live Players cards): the Checked in themselves / Left mark is in the mock app. The club setting **Players can check themselves in** belonged to epic Q19 (#587); Q19 is closed and the setting is in the mock app (Club settings › Session defaults, My night card).
 
 ## Real app work
 - Roster and pool components read `selfCheckedInAt` / `leftAt`; presence writes clear them server-side; a `clubs.self_check_in_enabled` setting read by the Player-side I'm here guard.

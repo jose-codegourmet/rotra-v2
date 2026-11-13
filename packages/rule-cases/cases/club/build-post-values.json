@@ -1,0 +1,79 @@
+{
+  "rule": "club/build-post-values",
+  "version": 1,
+  "cases": [
+    {
+      "name": "Facebook post court times and join line (#730) › puts each court time on its line, falling back to the session time (club)",
+      "input": {
+        "args": [
+          {
+            "club": {
+              "name": "Club",
+              "description": "",
+              "courtRules": null
+            },
+            "session": {
+              "title": "Night",
+              "scheduledStartAt": 1794396600000,
+              "scheduledEndAt": 1794407400000,
+              "venueName": "Hall",
+              "venueAddress": ""
+            },
+            "roster": [],
+            "waitlist": [],
+            "openSlots": 0,
+            "mode": "fair",
+            "minimum": 3,
+            "joinUrl": "https://x.test/s/abc123",
+            "courts": [
+              {
+                "label": "Court 1"
+              },
+              {
+                "label": "Court 2",
+                "startsAt": 1794398400000,
+                "openUntil": 1794403800000
+              },
+              {
+                "label": "Court 3",
+                "openUntil": 1794497400000
+              }
+            ]
+          }
+        ],
+        "select": "courts"
+      },
+      "expected": "Court 1 · 7:30 PM–10:30 PM\nCourt 2 · 8:00 PM–9:30 PM\nCourt 3 · 7:30 PM–11:30 PM · next day"
+    },
+    {
+      "name": "Facebook post court times and join line (#730) › fills the join line and appends it when a saved template lacks the key (club)",
+      "input": {
+        "args": [
+          {
+            "club": {
+              "name": "Club",
+              "description": "",
+              "courtRules": null
+            },
+            "session": {
+              "title": "Night",
+              "scheduledStartAt": 1794396600000,
+              "scheduledEndAt": 1794407400000,
+              "venueName": "Hall",
+              "venueAddress": ""
+            },
+            "roster": [],
+            "waitlist": [],
+            "openSlots": 0,
+            "mode": "fair",
+            "minimum": 3,
+            "joinUrl": "https://x.test/s/abc123",
+            "courts": []
+          }
+        ],
+        "select": "join_link"
+      },
+      "expected": "To join and see the full roster, open this link: https://x.test/s/abc123"
+    }
+  ]
+}

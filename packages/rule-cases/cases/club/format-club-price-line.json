@@ -1,0 +1,71 @@
+{
+  "rule": "club/format-club-price-line",
+  "version": 1,
+  "cases": [
+    {
+      "name": "club price rules (rotra-admin.html savePct / priceLine / amountText) › formats a paid price as one line with the saving (club) #1",
+      "input": {
+        "args": [
+          {
+            "licensePricing": "paid",
+            "licenseMonthlyMinor": 150000,
+            "licenseYearlyMinor": 1500000
+          }
+        ]
+      },
+      "expected": "₱1,500 a month · ₱15,000 a year (17% off)"
+    },
+    {
+      "name": "club price rules (rotra-admin.html savePct / priceLine / amountText) › formats a paid price as one line with the saving (club) #2",
+      "input": {
+        "args": [
+          {
+            "licensePricing": "paid",
+            "licenseMonthlyMinor": 180000,
+            "licenseYearlyMinor": 1800000
+          }
+        ]
+      },
+      "expected": "₱1,800 a month · ₱18,000 a year (17% off)"
+    },
+    {
+      "name": "club price rules (rotra-admin.html savePct / priceLine / amountText) › leaves the saving out when there is none (club)",
+      "input": {
+        "args": [
+          {
+            "licensePricing": "paid",
+            "licenseMonthlyMinor": 150000,
+            "licenseYearlyMinor": 1800000
+          }
+        ]
+      },
+      "expected": "₱1,500 a month · ₱18,000 a year"
+    },
+    {
+      "name": "club price rules (rotra-admin.html savePct / priceLine / amountText) › shows a free club as a tester club, whatever amounts it kept (club) #1",
+      "input": {
+        "args": [
+          {
+            "licensePricing": "free",
+            "licenseMonthlyMinor": 100000,
+            "licenseYearlyMinor": 1000000
+          }
+        ]
+      },
+      "expected": "Free (tester club)"
+    },
+    {
+      "name": "club price rules (rotra-admin.html savePct / priceLine / amountText) › shows a free club as a tester club, whatever amounts it kept (club) #2",
+      "input": {
+        "args": [
+          {
+            "licensePricing": "free",
+            "licenseMonthlyMinor": 0,
+            "licenseYearlyMinor": 0
+          }
+        ]
+      },
+      "expected": "Free (tester club)"
+    }
+  ]
+}

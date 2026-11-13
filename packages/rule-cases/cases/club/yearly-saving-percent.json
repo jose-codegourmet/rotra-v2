@@ -1,0 +1,71 @@
+{
+  "rule": "club/yearly-saving-percent",
+  "version": 1,
+  "cases": [
+    {
+      "name": "club price rules (rotra-admin.html savePct / priceLine / amountText) › rounds the yearly saving over twelve months to a whole percent (club) #1",
+      "input": {
+        "args": [
+          {
+            "licensePricing": "paid",
+            "licenseMonthlyMinor": 150000,
+            "licenseYearlyMinor": 1500000
+          }
+        ]
+      },
+      "expected": 17
+    },
+    {
+      "name": "club price rules (rotra-admin.html savePct / priceLine / amountText) › rounds the yearly saving over twelve months to a whole percent (club) #2",
+      "input": {
+        "args": [
+          {
+            "licensePricing": "paid",
+            "licenseMonthlyMinor": 120000,
+            "licenseYearlyMinor": 1200000
+          }
+        ]
+      },
+      "expected": 17
+    },
+    {
+      "name": "club price rules (rotra-admin.html savePct / priceLine / amountText) › rounds the yearly saving over twelve months to a whole percent (club) #3",
+      "input": {
+        "args": [
+          {
+            "licensePricing": "paid",
+            "licenseMonthlyMinor": 100000,
+            "licenseYearlyMinor": 600000
+          }
+        ]
+      },
+      "expected": 50
+    },
+    {
+      "name": "club price rules (rotra-admin.html savePct / priceLine / amountText) › rounds the yearly saving over twelve months to a whole percent (club) #4",
+      "input": {
+        "args": [
+          {
+            "licensePricing": "paid",
+            "licenseMonthlyMinor": 150000,
+            "licenseYearlyMinor": 1800000
+          }
+        ]
+      },
+      "expected": 0
+    },
+    {
+      "name": "club price rules (rotra-admin.html savePct / priceLine / amountText) › rounds the yearly saving over twelve months to a whole percent (club) #5",
+      "input": {
+        "args": [
+          {
+            "licensePricing": "free",
+            "licenseMonthlyMinor": 0,
+            "licenseYearlyMinor": 0
+          }
+        ]
+      },
+      "expected": 0
+    }
+  ]
+}

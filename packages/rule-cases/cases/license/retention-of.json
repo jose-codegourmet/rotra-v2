@@ -1,0 +1,1002 @@
+{
+  "rule": "license/retention-of",
+  "version": 1,
+  "cases": [
+    {
+      "name": "retentionOf (rotra-admin.html retention()) › counts six months from the first unlicensed day (license)",
+      "input": {
+        "args": [
+          [
+            {
+              "id": "2026-09-01-Monthly",
+              "clubId": "club",
+              "plan": "Monthly",
+              "startsAt": "2026-09-01",
+              "endsAt": "2026-09-30",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-09-01",
+              "paymentReference": "",
+              "activatedAt": "2026-09-01T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "cmd-2026-09-01"
+            }
+          ],
+          {
+            "cycles": [],
+            "failedOn": null,
+            "deletedOn": null
+          },
+          "2026-10-27"
+        ]
+      },
+      "expected": {
+        "k": "stale",
+        "deleteOn": "2027-04-01",
+        "since": "2026-10-01",
+        "left": 156,
+        "elapsed": 26,
+        "total": 182
+      }
+    },
+    {
+      "name": "retentionOf (rotra-admin.html retention()) › measures continuous expiry from the terms, never from anything else (license)",
+      "input": {
+        "args": [
+          [
+            {
+              "id": "2026-09-01-Monthly",
+              "clubId": "club",
+              "plan": "Monthly",
+              "startsAt": "2026-09-01",
+              "endsAt": "2026-09-30",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-09-01",
+              "paymentReference": "",
+              "activatedAt": "2026-09-01T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "cmd-2026-09-01"
+            },
+            {
+              "id": "2026-10-01-Monthly",
+              "clubId": "club",
+              "plan": "Monthly",
+              "startsAt": "2026-10-01",
+              "endsAt": "2026-10-20",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-10-01",
+              "paymentReference": "",
+              "activatedAt": "2026-10-01T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "cmd-2026-10-01"
+            }
+          ],
+          {
+            "cycles": [],
+            "failedOn": null,
+            "deletedOn": null
+          },
+          "2026-10-27"
+        ]
+      },
+      "expected": {
+        "k": "stale",
+        "since": "2026-10-21",
+        "deleteOn": "2027-04-21"
+      }
+    },
+    {
+      "name": "retentionOf (rotra-admin.html retention()) › is due once the delete day is reached, and deleted only once deletion finished (license) #1",
+      "input": {
+        "args": [
+          [
+            {
+              "id": "2026-09-01-Monthly",
+              "clubId": "club",
+              "plan": "Monthly",
+              "startsAt": "2026-09-01",
+              "endsAt": "2026-09-30",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-09-01",
+              "paymentReference": "",
+              "activatedAt": "2026-09-01T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "cmd-2026-09-01"
+            }
+          ],
+          {
+            "cycles": [],
+            "failedOn": null,
+            "deletedOn": null
+          },
+          "2027-04-01"
+        ]
+      },
+      "expected": {
+        "k": "due",
+        "deleteOn": "2027-04-01",
+        "since": "2026-10-01"
+      }
+    },
+    {
+      "name": "retentionOf (rotra-admin.html retention()) › is due once the delete day is reached, and deleted only once deletion finished (license) #2",
+      "input": {
+        "args": [
+          [
+            {
+              "id": "2026-09-01-Monthly",
+              "clubId": "club",
+              "plan": "Monthly",
+              "startsAt": "2026-09-01",
+              "endsAt": "2026-09-30",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-09-01",
+              "paymentReference": "",
+              "activatedAt": "2026-09-01T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "cmd-2026-09-01"
+            }
+          ],
+          {
+            "cycles": [],
+            "failedOn": null,
+            "deletedOn": "2027-04-02"
+          },
+          "2027-04-05"
+        ]
+      },
+      "expected": {
+        "k": "deleted",
+        "on": "2027-04-02"
+      }
+    },
+    {
+      "name": "retentionOf (rotra-admin.html retention()) › reports a failed deletion for the current expiry (license)",
+      "input": {
+        "args": [
+          [
+            {
+              "id": "2026-09-01-Monthly",
+              "clubId": "club",
+              "plan": "Monthly",
+              "startsAt": "2026-09-01",
+              "endsAt": "2026-09-30",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-09-01",
+              "paymentReference": "",
+              "activatedAt": "2026-09-01T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "cmd-2026-09-01"
+            }
+          ],
+          {
+            "cycles": [],
+            "failedOn": "2027-04-01",
+            "deletedOn": null
+          },
+          "2027-04-03"
+        ]
+      },
+      "expected": {
+        "k": "failed",
+        "deleteOn": "2027-04-01",
+        "failedOn": "2027-04-01",
+        "since": "2026-10-01"
+      }
+    },
+    {
+      "name": "retentionOf (rotra-admin.html retention()) › renewing before deletion cancels the countdown; a later expiry starts a new one (license) #1",
+      "input": {
+        "args": [
+          [
+            {
+              "id": "2026-09-01-Monthly",
+              "clubId": "club",
+              "plan": "Monthly",
+              "startsAt": "2026-09-01",
+              "endsAt": "2026-09-30",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-09-01",
+              "paymentReference": "",
+              "activatedAt": "2026-09-01T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "cmd-2026-09-01"
+            },
+            {
+              "id": "2026-10-27-Monthly",
+              "clubId": "club",
+              "plan": "Monthly",
+              "startsAt": "2026-10-27",
+              "endsAt": "2026-11-26",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-10-27",
+              "paymentReference": "",
+              "activatedAt": "2026-10-27T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "cmd-2026-10-27"
+            }
+          ],
+          {
+            "cycles": [
+              {
+                "expired": "2026-10-01",
+                "cancelled": "2026-10-27"
+              }
+            ],
+            "failedOn": null,
+            "deletedOn": null
+          },
+          "2026-10-27"
+        ]
+      },
+      "expected": {
+        "k": "restored",
+        "cycle": {
+          "expired": "2026-10-01",
+          "cancelled": "2026-10-27"
+        }
+      }
+    },
+    {
+      "name": "retentionOf (rotra-admin.html retention()) › renewing before deletion cancels the countdown; a later expiry starts a new one (license) #2",
+      "input": {
+        "args": [
+          [
+            {
+              "id": "2026-09-01-Monthly",
+              "clubId": "club",
+              "plan": "Monthly",
+              "startsAt": "2026-09-01",
+              "endsAt": "2026-09-30",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-09-01",
+              "paymentReference": "",
+              "activatedAt": "2026-09-01T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "cmd-2026-09-01"
+            },
+            {
+              "id": "2026-10-27-Monthly",
+              "clubId": "club",
+              "plan": "Monthly",
+              "startsAt": "2026-10-27",
+              "endsAt": "2026-11-26",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-10-27",
+              "paymentReference": "",
+              "activatedAt": "2026-10-27T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "cmd-2026-10-27"
+            }
+          ],
+          {
+            "cycles": [
+              {
+                "expired": "2026-10-01",
+                "cancelled": "2026-10-27"
+              }
+            ],
+            "failedOn": null,
+            "deletedOn": null
+          },
+          "2026-12-01"
+        ]
+      },
+      "expected": {
+        "k": "stale",
+        "deleteOn": "2027-05-27",
+        "since": "2026-11-27",
+        "left": 177,
+        "elapsed": 4,
+        "total": 181
+      }
+    },
+    {
+      "name": "retentionOf (rotra-admin.html retention()) › does not carry a failed deletion into a later expiry (license)",
+      "input": {
+        "args": [
+          [
+            {
+              "id": "2026-09-01-Monthly",
+              "clubId": "club",
+              "plan": "Monthly",
+              "startsAt": "2026-09-01",
+              "endsAt": "2026-09-30",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-09-01",
+              "paymentReference": "",
+              "activatedAt": "2026-09-01T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "cmd-2026-09-01"
+            },
+            {
+              "id": "2026-10-27-Monthly",
+              "clubId": "club",
+              "plan": "Monthly",
+              "startsAt": "2026-10-27",
+              "endsAt": "2026-11-26",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-10-27",
+              "paymentReference": "",
+              "activatedAt": "2026-10-27T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "cmd-2026-10-27"
+            }
+          ],
+          {
+            "cycles": [],
+            "failedOn": "2026-10-20",
+            "deletedOn": null
+          },
+          "2026-12-01"
+        ]
+      },
+      "expected": {
+        "k": "stale"
+      }
+    },
+    {
+      "name": "the A02 fixtures at 2026-10-27 › match the access and retention the stories were written against (license) #1",
+      "input": {
+        "args": [
+          [
+            {
+              "id": "LIC-0004",
+              "clubId": "6cd364d4-0e3a-5c3d-9e75-2116cc845714",
+              "plan": "Yearly",
+              "startsAt": "2026-04-01",
+              "endsAt": "2027-03-31",
+              "amountMinor": 1500000,
+              "currency": "PHP",
+              "paidOn": "2026-04-01",
+              "paymentReference": "LIC-0004",
+              "activatedAt": "2026-04-01T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "seed-LIC-0004"
+            },
+            {
+              "id": "LIC-0003",
+              "clubId": "6cd364d4-0e3a-5c3d-9e75-2116cc845714",
+              "plan": "Monthly",
+              "startsAt": "2026-03-01",
+              "endsAt": "2026-03-31",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-03-02",
+              "paymentReference": "LIC-0003",
+              "activatedAt": "2026-03-02T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "seed-LIC-0003"
+            },
+            {
+              "id": "LIC-0002",
+              "clubId": "6cd364d4-0e3a-5c3d-9e75-2116cc845714",
+              "plan": "Monthly",
+              "startsAt": "2026-02-01",
+              "endsAt": "2026-02-28",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-02-01",
+              "paymentReference": "LIC-0002",
+              "activatedAt": "2026-02-01T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "seed-LIC-0002"
+            },
+            {
+              "id": "LIC-0001",
+              "clubId": "6cd364d4-0e3a-5c3d-9e75-2116cc845714",
+              "plan": "Monthly",
+              "startsAt": "2026-01-05",
+              "endsAt": "2026-01-31",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-01-05",
+              "paymentReference": "LIC-0001",
+              "activatedAt": "2026-01-05T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "seed-LIC-0001"
+            }
+          ],
+          {
+            "clubId": "6cd364d4-0e3a-5c3d-9e75-2116cc845714",
+            "cycles": [],
+            "failedOn": null,
+            "deletedOn": null
+          },
+          "2026-10-27"
+        ]
+      },
+      "expected": {
+        "k": "none"
+      }
+    },
+    {
+      "name": "the A02 fixtures at 2026-10-27 › match the access and retention the stories were written against (license) #2",
+      "input": {
+        "args": [
+          [
+            {
+              "id": "LIC-0009",
+              "clubId": "3f8ad2ed-5978-5a6a-b3ba-10efdf750f53",
+              "plan": "Monthly",
+              "startsAt": "2026-10-03",
+              "endsAt": "2026-11-02",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-10-03",
+              "paymentReference": "LIC-0009",
+              "activatedAt": "2026-10-03T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "seed-LIC-0009"
+            },
+            {
+              "id": "LIC-0008",
+              "clubId": "3f8ad2ed-5978-5a6a-b3ba-10efdf750f53",
+              "plan": "Monthly",
+              "startsAt": "2026-09-03",
+              "endsAt": "2026-10-02",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-09-03",
+              "paymentReference": "LIC-0008",
+              "activatedAt": "2026-09-03T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "seed-LIC-0008"
+            },
+            {
+              "id": "LIC-0007",
+              "clubId": "3f8ad2ed-5978-5a6a-b3ba-10efdf750f53",
+              "plan": "Monthly",
+              "startsAt": "2026-08-03",
+              "endsAt": "2026-09-02",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-08-03",
+              "paymentReference": "LIC-0007",
+              "activatedAt": "2026-08-03T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "seed-LIC-0007"
+            },
+            {
+              "id": "LIC-0006",
+              "clubId": "3f8ad2ed-5978-5a6a-b3ba-10efdf750f53",
+              "plan": "Monthly",
+              "startsAt": "2026-06-01",
+              "endsAt": "2026-06-30",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-06-01",
+              "paymentReference": "LIC-0006",
+              "activatedAt": "2026-06-01T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "seed-LIC-0006"
+            },
+            {
+              "id": "LIC-0005",
+              "clubId": "3f8ad2ed-5978-5a6a-b3ba-10efdf750f53",
+              "plan": "Monthly",
+              "startsAt": "2026-05-01",
+              "endsAt": "2026-05-31",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-05-01",
+              "paymentReference": "LIC-0005",
+              "activatedAt": "2026-05-01T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "seed-LIC-0005"
+            }
+          ],
+          {
+            "clubId": "3f8ad2ed-5978-5a6a-b3ba-10efdf750f53",
+            "cycles": [
+              {
+                "expired": "2026-07-01",
+                "cancelled": "2026-08-03"
+              }
+            ],
+            "failedOn": null,
+            "deletedOn": null
+          },
+          "2026-10-27"
+        ]
+      },
+      "expected": {
+        "k": "restored",
+        "cycle": {
+          "expired": "2026-07-01",
+          "cancelled": "2026-08-03"
+        }
+      }
+    },
+    {
+      "name": "the A02 fixtures at 2026-10-27 › match the access and retention the stories were written against (license) #3",
+      "input": {
+        "args": [
+          [
+            {
+              "id": "LIC-0010",
+              "clubId": "cb70bf6e-65ab-5aba-a0b2-bb35a3c204b0",
+              "plan": "Yearly",
+              "startsAt": "2026-02-15",
+              "endsAt": "2027-02-14",
+              "amountMinor": 1500000,
+              "currency": "PHP",
+              "paidOn": "2026-02-14",
+              "paymentReference": "LIC-0010",
+              "activatedAt": "2026-02-14T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "seed-LIC-0010"
+            }
+          ],
+          {
+            "clubId": "cb70bf6e-65ab-5aba-a0b2-bb35a3c204b0",
+            "cycles": [],
+            "failedOn": null,
+            "deletedOn": null
+          },
+          "2026-10-27"
+        ]
+      },
+      "expected": {
+        "k": "none"
+      }
+    },
+    {
+      "name": "the A02 fixtures at 2026-10-27 › match the access and retention the stories were written against (license) #4",
+      "input": {
+        "args": [
+          [
+            {
+              "id": "LIC-0014",
+              "clubId": "6982df14-0798-5005-902d-06463d401125",
+              "plan": "Monthly",
+              "startsAt": "2026-10-10",
+              "endsAt": "2026-11-09",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-10-10",
+              "paymentReference": "LIC-0014",
+              "activatedAt": "2026-10-10T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "seed-LIC-0014"
+            },
+            {
+              "id": "LIC-0013",
+              "clubId": "6982df14-0798-5005-902d-06463d401125",
+              "plan": "Monthly",
+              "startsAt": "2026-09-10",
+              "endsAt": "2026-10-09",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-09-10",
+              "paymentReference": "LIC-0013",
+              "activatedAt": "2026-09-10T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "seed-LIC-0013"
+            },
+            {
+              "id": "LIC-0012",
+              "clubId": "6982df14-0798-5005-902d-06463d401125",
+              "plan": "Monthly",
+              "startsAt": "2026-08-10",
+              "endsAt": "2026-09-09",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-08-08",
+              "paymentReference": "LIC-0012",
+              "activatedAt": "2026-08-08T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "seed-LIC-0012"
+            },
+            {
+              "id": "LIC-0011",
+              "clubId": "6982df14-0798-5005-902d-06463d401125",
+              "plan": "Monthly",
+              "startsAt": "2026-07-10",
+              "endsAt": "2026-08-09",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-07-10",
+              "paymentReference": "LIC-0011",
+              "activatedAt": "2026-07-10T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "seed-LIC-0011"
+            }
+          ],
+          {
+            "clubId": "6982df14-0798-5005-902d-06463d401125",
+            "cycles": [],
+            "failedOn": null,
+            "deletedOn": null
+          },
+          "2026-10-27"
+        ]
+      },
+      "expected": {
+        "k": "none"
+      }
+    },
+    {
+      "name": "the A02 fixtures at 2026-10-27 › match the access and retention the stories were written against (license) #5",
+      "input": {
+        "args": [
+          [
+            {
+              "id": "LIC-0017",
+              "clubId": "7b6d347f-8a84-5163-91e0-b727edb9c555",
+              "plan": "Monthly",
+              "startsAt": "2026-09-01",
+              "endsAt": "2026-09-30",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-09-01",
+              "paymentReference": "LIC-0017",
+              "activatedAt": "2026-09-01T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "seed-LIC-0017"
+            },
+            {
+              "id": "LIC-0016",
+              "clubId": "7b6d347f-8a84-5163-91e0-b727edb9c555",
+              "plan": "Monthly",
+              "startsAt": "2026-08-01",
+              "endsAt": "2026-08-31",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-08-01",
+              "paymentReference": "LIC-0016",
+              "activatedAt": "2026-08-01T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "seed-LIC-0016"
+            },
+            {
+              "id": "LIC-0015",
+              "clubId": "7b6d347f-8a84-5163-91e0-b727edb9c555",
+              "plan": "Monthly",
+              "startsAt": "2026-06-01",
+              "endsAt": "2026-07-31",
+              "amountMinor": 300000,
+              "currency": "PHP",
+              "paidOn": "2026-06-01",
+              "paymentReference": "LIC-0015",
+              "activatedAt": "2026-06-01T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "seed-LIC-0015"
+            }
+          ],
+          {
+            "clubId": "7b6d347f-8a84-5163-91e0-b727edb9c555",
+            "cycles": [],
+            "failedOn": null,
+            "deletedOn": null
+          },
+          "2026-10-27"
+        ]
+      },
+      "expected": {
+        "k": "stale",
+        "deleteOn": "2027-04-01",
+        "since": "2026-10-01",
+        "left": 156,
+        "elapsed": 26,
+        "total": 182
+      }
+    },
+    {
+      "name": "the A02 fixtures at 2026-10-27 › match the access and retention the stories were written against (license) #6",
+      "input": {
+        "args": [
+          [
+            {
+              "id": "LIC-0020",
+              "clubId": "bd873ef5-db5a-51e9-8736-5563ce4408bc",
+              "plan": "Monthly",
+              "startsAt": "2026-03-20",
+              "endsAt": "2026-04-19",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-03-20",
+              "paymentReference": "LIC-0020",
+              "activatedAt": "2026-03-20T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "seed-LIC-0020"
+            },
+            {
+              "id": "LIC-0019",
+              "clubId": "bd873ef5-db5a-51e9-8736-5563ce4408bc",
+              "plan": "Monthly",
+              "startsAt": "2026-01-20",
+              "endsAt": "2026-03-19",
+              "amountMinor": 300000,
+              "currency": "PHP",
+              "paidOn": "2026-01-20",
+              "paymentReference": "LIC-0019",
+              "activatedAt": "2026-01-20T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "seed-LIC-0019"
+            }
+          ],
+          {
+            "clubId": "bd873ef5-db5a-51e9-8736-5563ce4408bc",
+            "cycles": [],
+            "failedOn": "2026-10-20",
+            "deletedOn": null
+          },
+          "2026-10-27"
+        ]
+      },
+      "expected": {
+        "k": "failed",
+        "deleteOn": "2026-10-20",
+        "failedOn": "2026-10-20",
+        "since": "2026-04-20"
+      }
+    },
+    {
+      "name": "the A02 fixtures at 2026-10-27 › match the access and retention the stories were written against (license) #7",
+      "input": {
+        "args": [
+          [
+            {
+              "id": "LIC-0021",
+              "clubId": "eaa3137d-43e3-569f-82ad-015a9171db19",
+              "plan": "Monthly",
+              "startsAt": "2025-11-05",
+              "endsAt": "2026-03-31",
+              "amountMinor": 750000,
+              "currency": "PHP",
+              "paidOn": "2025-11-05",
+              "paymentReference": "LIC-0021",
+              "activatedAt": "2025-11-05T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "seed-LIC-0021"
+            }
+          ],
+          {
+            "clubId": "eaa3137d-43e3-569f-82ad-015a9171db19",
+            "cycles": [],
+            "failedOn": null,
+            "deletedOn": "2026-10-01"
+          },
+          "2026-10-27"
+        ]
+      },
+      "expected": {
+        "k": "deleted",
+        "on": "2026-10-01"
+      }
+    },
+    {
+      "name": "the A02 fixtures at 2026-10-27 › match the access and retention the stories were written against (license) #8",
+      "input": {
+        "args": [
+          [],
+          {
+            "clubId": "984d9c34-26ab-5b06-bcbf-b3ecbc606cbc",
+            "cycles": [],
+            "failedOn": null,
+            "deletedOn": null
+          },
+          "2026-10-27"
+        ]
+      },
+      "expected": {
+        "k": "none"
+      }
+    },
+    {
+      "name": "the A02 fixtures at 2026-10-27 › give the acceptance states (license) #1",
+      "input": {
+        "args": [
+          [
+            {
+              "id": "LIC-0009",
+              "clubId": "3f8ad2ed-5978-5a6a-b3ba-10efdf750f53",
+              "plan": "Monthly",
+              "startsAt": "2026-10-03",
+              "endsAt": "2026-11-02",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-10-03",
+              "paymentReference": "LIC-0009",
+              "activatedAt": "2026-10-03T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "seed-LIC-0009"
+            },
+            {
+              "id": "LIC-0008",
+              "clubId": "3f8ad2ed-5978-5a6a-b3ba-10efdf750f53",
+              "plan": "Monthly",
+              "startsAt": "2026-09-03",
+              "endsAt": "2026-10-02",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-09-03",
+              "paymentReference": "LIC-0008",
+              "activatedAt": "2026-09-03T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "seed-LIC-0008"
+            },
+            {
+              "id": "LIC-0007",
+              "clubId": "3f8ad2ed-5978-5a6a-b3ba-10efdf750f53",
+              "plan": "Monthly",
+              "startsAt": "2026-08-03",
+              "endsAt": "2026-09-02",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-08-03",
+              "paymentReference": "LIC-0007",
+              "activatedAt": "2026-08-03T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "seed-LIC-0007"
+            },
+            {
+              "id": "LIC-0006",
+              "clubId": "3f8ad2ed-5978-5a6a-b3ba-10efdf750f53",
+              "plan": "Monthly",
+              "startsAt": "2026-06-01",
+              "endsAt": "2026-06-30",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-06-01",
+              "paymentReference": "LIC-0006",
+              "activatedAt": "2026-06-01T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "seed-LIC-0006"
+            },
+            {
+              "id": "LIC-0005",
+              "clubId": "3f8ad2ed-5978-5a6a-b3ba-10efdf750f53",
+              "plan": "Monthly",
+              "startsAt": "2026-05-01",
+              "endsAt": "2026-05-31",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-05-01",
+              "paymentReference": "LIC-0005",
+              "activatedAt": "2026-05-01T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "seed-LIC-0005"
+            }
+          ],
+          {
+            "clubId": "3f8ad2ed-5978-5a6a-b3ba-10efdf750f53",
+            "cycles": [
+              {
+                "expired": "2026-07-01",
+                "cancelled": "2026-08-03"
+              }
+            ],
+            "failedOn": null,
+            "deletedOn": null
+          },
+          "2026-10-27"
+        ]
+      },
+      "expected": {
+        "k": "restored"
+      }
+    },
+    {
+      "name": "the A02 fixtures at 2026-10-27 › give the acceptance states (license) #2",
+      "input": {
+        "args": [
+          [
+            {
+              "id": "LIC-0017",
+              "clubId": "7b6d347f-8a84-5163-91e0-b727edb9c555",
+              "plan": "Monthly",
+              "startsAt": "2026-09-01",
+              "endsAt": "2026-09-30",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-09-01",
+              "paymentReference": "LIC-0017",
+              "activatedAt": "2026-09-01T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "seed-LIC-0017"
+            },
+            {
+              "id": "LIC-0016",
+              "clubId": "7b6d347f-8a84-5163-91e0-b727edb9c555",
+              "plan": "Monthly",
+              "startsAt": "2026-08-01",
+              "endsAt": "2026-08-31",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-08-01",
+              "paymentReference": "LIC-0016",
+              "activatedAt": "2026-08-01T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "seed-LIC-0016"
+            },
+            {
+              "id": "LIC-0015",
+              "clubId": "7b6d347f-8a84-5163-91e0-b727edb9c555",
+              "plan": "Monthly",
+              "startsAt": "2026-06-01",
+              "endsAt": "2026-07-31",
+              "amountMinor": 300000,
+              "currency": "PHP",
+              "paidOn": "2026-06-01",
+              "paymentReference": "LIC-0015",
+              "activatedAt": "2026-06-01T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "seed-LIC-0015"
+            }
+          ],
+          {
+            "clubId": "7b6d347f-8a84-5163-91e0-b727edb9c555",
+            "cycles": [],
+            "failedOn": null,
+            "deletedOn": null
+          },
+          "2026-10-27"
+        ]
+      },
+      "expected": {
+        "k": "stale",
+        "deleteOn": "2027-04-01"
+      }
+    },
+    {
+      "name": "the A02 fixtures at 2026-10-27 › give the acceptance states (license) #3",
+      "input": {
+        "args": [
+          [
+            {
+              "id": "LIC-0020",
+              "clubId": "bd873ef5-db5a-51e9-8736-5563ce4408bc",
+              "plan": "Monthly",
+              "startsAt": "2026-03-20",
+              "endsAt": "2026-04-19",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-03-20",
+              "paymentReference": "LIC-0020",
+              "activatedAt": "2026-03-20T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "seed-LIC-0020"
+            },
+            {
+              "id": "LIC-0019",
+              "clubId": "bd873ef5-db5a-51e9-8736-5563ce4408bc",
+              "plan": "Monthly",
+              "startsAt": "2026-01-20",
+              "endsAt": "2026-03-19",
+              "amountMinor": 300000,
+              "currency": "PHP",
+              "paidOn": "2026-01-20",
+              "paymentReference": "LIC-0019",
+              "activatedAt": "2026-01-20T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "seed-LIC-0019"
+            }
+          ],
+          {
+            "clubId": "bd873ef5-db5a-51e9-8736-5563ce4408bc",
+            "cycles": [],
+            "failedOn": "2026-10-20",
+            "deletedOn": null
+          },
+          "2026-10-27"
+        ]
+      },
+      "expected": {
+        "k": "failed"
+      }
+    }
+  ]
+}

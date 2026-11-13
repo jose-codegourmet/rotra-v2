@@ -1,0 +1,223 @@
+{
+  "rule": "license/default-license-draft",
+  "version": 1,
+  "cases": [
+    {
+      "name": "defaultLicenseDraft (rotra-admin.html licStart()) › renews an active club from the day after access ends, at the latest plan and price (license)",
+      "input": {
+        "args": [
+          {
+            "id": "6cd364d4-0e3a-5c3d-9e75-2116cc845714",
+            "name": "Lahug Smash Club",
+            "initials": "LS",
+            "foundingAddress": "Salinas Dr, Lahug, Cebu City",
+            "city": "Cebu City",
+            "locationCode": "PH-CEB",
+            "licensePricing": "paid",
+            "licenseMonthlyMinor": 150000,
+            "licenseYearlyMinor": 1500000,
+            "currency": "PHP",
+            "logoUrl": null,
+            "logoPreviousUrl": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGP4z8DwHwAFAAH/q842iQAAAABJRU5ErkJggg==",
+            "inviteCode": "K7M2QX9P",
+            "selfCheckInEnabled": true,
+            "description": "Friendly open play for all levels in Lahug. Bring your racket; shuttles are on us.",
+            "courtRules": null,
+            "postTemplate": null,
+            "defaultPlayersPerCourt": 8,
+            "defaultEntranceFeeMinor": null,
+            "cityCode": "PH-CEB",
+            "username": "lahug.smash",
+            "pendingNameChange": null
+          },
+          [
+            {
+              "id": "LIC-0004",
+              "clubId": "6cd364d4-0e3a-5c3d-9e75-2116cc845714",
+              "plan": "Yearly",
+              "startsAt": "2026-04-01",
+              "endsAt": "2027-03-31",
+              "amountMinor": 1500000,
+              "currency": "PHP",
+              "paidOn": "2026-04-01",
+              "paymentReference": "LIC-0004",
+              "activatedAt": "2026-04-01T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "seed-LIC-0004"
+            },
+            {
+              "id": "LIC-0003",
+              "clubId": "6cd364d4-0e3a-5c3d-9e75-2116cc845714",
+              "plan": "Monthly",
+              "startsAt": "2026-03-01",
+              "endsAt": "2026-03-31",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-03-02",
+              "paymentReference": "LIC-0003",
+              "activatedAt": "2026-03-02T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "seed-LIC-0003"
+            },
+            {
+              "id": "LIC-0002",
+              "clubId": "6cd364d4-0e3a-5c3d-9e75-2116cc845714",
+              "plan": "Monthly",
+              "startsAt": "2026-02-01",
+              "endsAt": "2026-02-28",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-02-01",
+              "paymentReference": "LIC-0002",
+              "activatedAt": "2026-02-01T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "seed-LIC-0002"
+            },
+            {
+              "id": "LIC-0001",
+              "clubId": "6cd364d4-0e3a-5c3d-9e75-2116cc845714",
+              "plan": "Monthly",
+              "startsAt": "2026-01-05",
+              "endsAt": "2026-01-31",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-01-05",
+              "paymentReference": "LIC-0001",
+              "activatedAt": "2026-01-05T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "seed-LIC-0001"
+            }
+          ],
+          "2026-10-27"
+        ]
+      },
+      "expected": {
+        "plan": "Yearly",
+        "startsOn": "2027-04-01",
+        "paidOn": "2026-10-27",
+        "amountMinor": 1500000,
+        "reference": ""
+      }
+    },
+    {
+      "name": "defaultLicenseDraft (rotra-admin.html licStart()) › starts an expired club today (license)",
+      "input": {
+        "args": [
+          {
+            "id": "7b6d347f-8a84-5163-91e0-b727edb9c555",
+            "name": "Talamban Racket Club",
+            "initials": "TR",
+            "foundingAddress": "Gov. M. Cuenco Ave, Talamban, Cebu City",
+            "city": "Cebu City",
+            "locationCode": "PH-CEB",
+            "licensePricing": "paid",
+            "licenseMonthlyMinor": 150000,
+            "licenseYearlyMinor": 1500000,
+            "currency": "PHP",
+            "logoUrl": null,
+            "logoPreviousUrl": null,
+            "inviteCode": "W8ZJ2KE4",
+            "selfCheckInEnabled": true,
+            "description": "",
+            "courtRules": null,
+            "postTemplate": null,
+            "defaultPlayersPerCourt": 8,
+            "defaultEntranceFeeMinor": null,
+            "cityCode": "PH-CEB",
+            "username": "talamban.racket",
+            "pendingNameChange": null
+          },
+          [
+            {
+              "id": "LIC-0017",
+              "clubId": "7b6d347f-8a84-5163-91e0-b727edb9c555",
+              "plan": "Monthly",
+              "startsAt": "2026-09-01",
+              "endsAt": "2026-09-30",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-09-01",
+              "paymentReference": "LIC-0017",
+              "activatedAt": "2026-09-01T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "seed-LIC-0017"
+            },
+            {
+              "id": "LIC-0016",
+              "clubId": "7b6d347f-8a84-5163-91e0-b727edb9c555",
+              "plan": "Monthly",
+              "startsAt": "2026-08-01",
+              "endsAt": "2026-08-31",
+              "amountMinor": 150000,
+              "currency": "PHP",
+              "paidOn": "2026-08-01",
+              "paymentReference": "LIC-0016",
+              "activatedAt": "2026-08-01T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "seed-LIC-0016"
+            },
+            {
+              "id": "LIC-0015",
+              "clubId": "7b6d347f-8a84-5163-91e0-b727edb9c555",
+              "plan": "Monthly",
+              "startsAt": "2026-06-01",
+              "endsAt": "2026-07-31",
+              "amountMinor": 300000,
+              "currency": "PHP",
+              "paidOn": "2026-06-01",
+              "paymentReference": "LIC-0015",
+              "activatedAt": "2026-06-01T09:00:00+08:00",
+              "activatedByEmail": "owner@rotra.example",
+              "sourceCommandId": "seed-LIC-0015"
+            }
+          ],
+          "2026-10-27"
+        ]
+      },
+      "expected": {
+        "plan": "Monthly",
+        "startsOn": "2026-10-27",
+        "amountMinor": 150000
+      }
+    },
+    {
+      "name": "defaultLicenseDraft (rotra-admin.html licStart()) › leaves the plan and amount empty for a paid club never licensed, and 0 for a free one (license) #1",
+      "input": {
+        "args": [
+          {
+            "licensePricing": "paid",
+            "licenseMonthlyMinor": 150000,
+            "licenseYearlyMinor": 1500000
+          },
+          [],
+          "2026-10-27"
+        ]
+      },
+      "expected": {
+        "plan": null,
+        "startsOn": "2026-10-27",
+        "paidOn": "2026-10-27",
+        "amountMinor": null,
+        "reference": ""
+      }
+    },
+    {
+      "name": "defaultLicenseDraft (rotra-admin.html licStart()) › leaves the plan and amount empty for a paid club never licensed, and 0 for a free one (license) #2",
+      "input": {
+        "args": [
+          {
+            "licensePricing": "free",
+            "licenseMonthlyMinor": 150000,
+            "licenseYearlyMinor": 1500000
+          },
+          [],
+          "2026-10-27"
+        ]
+      },
+      "expected": {
+        "plan": null,
+        "amountMinor": 0
+      }
+    }
+  ]
+}

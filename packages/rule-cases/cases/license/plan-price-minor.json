@@ -1,0 +1,48 @@
+{
+  "rule": "license/plan-price-minor",
+  "version": 1,
+  "cases": [
+    {
+      "name": "amounts › uses the club's price for the plan, and 0 for a free club (license) #1",
+      "input": {
+        "args": [
+          {
+            "licensePricing": "paid",
+            "licenseMonthlyMinor": 150000,
+            "licenseYearlyMinor": 1500000
+          },
+          "Monthly"
+        ]
+      },
+      "expected": 150000
+    },
+    {
+      "name": "amounts › uses the club's price for the plan, and 0 for a free club (license) #2",
+      "input": {
+        "args": [
+          {
+            "licensePricing": "paid",
+            "licenseMonthlyMinor": 150000,
+            "licenseYearlyMinor": 1500000
+          },
+          "Yearly"
+        ]
+      },
+      "expected": 1500000
+    },
+    {
+      "name": "amounts › uses the club's price for the plan, and 0 for a free club (license) #3",
+      "input": {
+        "args": [
+          {
+            "licensePricing": "free",
+            "licenseMonthlyMinor": 150000,
+            "licenseYearlyMinor": 1500000
+          },
+          "Yearly"
+        ]
+      },
+      "expected": 0
+    }
+  ]
+}

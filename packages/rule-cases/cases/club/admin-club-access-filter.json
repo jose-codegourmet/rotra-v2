@@ -1,0 +1,59 @@
+{
+  "rule": "club/admin-club-access-filter",
+  "version": 1,
+  "cases": [
+    {
+      "name": "club identity rules › counts a scheduled license as no license in the directory filter (club) #1",
+      "input": {
+        "args": [
+          {
+            "state": "active",
+            "plan": "Yearly",
+            "until": "2027-03-31",
+            "days": 153
+          }
+        ]
+      },
+      "expected": "active"
+    },
+    {
+      "name": "club identity rules › counts a scheduled license as no license in the directory filter (club) #2",
+      "input": {
+        "args": [
+          {
+            "state": "expired",
+            "plan": "Monthly",
+            "ended": "2026-09-30",
+            "since": "2026-10-01",
+            "next": null
+          }
+        ]
+      },
+      "expected": "expired"
+    },
+    {
+      "name": "club identity rules › counts a scheduled license as no license in the directory filter (club) #3",
+      "input": {
+        "args": [
+          {
+            "state": "scheduled",
+            "plan": "Monthly",
+            "starts": "2026-11-15"
+          }
+        ]
+      },
+      "expected": "none"
+    },
+    {
+      "name": "club identity rules › counts a scheduled license as no license in the directory filter (club) #4",
+      "input": {
+        "args": [
+          {
+            "state": "none"
+          }
+        ]
+      },
+      "expected": "none"
+    }
+  ]
+}

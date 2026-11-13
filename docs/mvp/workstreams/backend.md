@@ -37,7 +37,7 @@ real-mode switch; scheduled jobs; decision gates #243–#248 under [F07 #241](ht
 - [ ] Scheduler for license-lapse refresh, retention sweep and ageing jobs ([D-2026-11-08-04](../decisions.md#d-2026-11-08-04)): **parked, not for MVP** ([D-2026-11-11-10](../decisions.md#d-2026-11-11-10)); license state, ageing and eligibility are computed on read. Tickets: #545, #546, #547 (parked).
 - [x] Decision gates answered November 11, 2026 ([D-2026-11-11-04](../decisions.md#d-2026-11-11-04) to [D-10](../decisions.md#d-2026-11-11-10)): #243 closed as overtaken; #244, #245, #247, #248 unblocked and carry only their remaining implementation items; #246 stays as before.
 - [ ] RLS / `anon` grant fix. Ticket: #387.
-- [ ] Go API on Railway ([D-2026-11-13-01](../decisions.md#d-2026-11-13-01)): epic and tickets needed; built side by side in a second Vercel project, shipped when ready (B-10). First ticket: the rule-cases package, in progress: package and 403 cases written, Vitest runner in a second PR ([D-2026-11-13-02](../decisions.md#d-2026-11-13-02)). Ticket: needed.
+- [ ] Go API on Railway ([D-2026-11-13-01](../decisions.md#d-2026-11-13-01)): epic #788; built side by side in a second Vercel project, shipped when ready (B-10). First ticket: the rule-cases package, in progress: package and 403 cases written, Vitest runner in a second PR ([D-2026-11-13-02](../decisions.md#d-2026-11-13-02)). Tickets: #789, #790; follow-ups #791, #792.
 
 ## Related decisions
 

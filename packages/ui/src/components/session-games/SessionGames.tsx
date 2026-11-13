@@ -1,9 +1,26 @@
 import type { PlayerSessionRecord } from '@rotra/data/player/types'
 import { Button } from '@rotra/ui/button'
-import { GameRow } from '@rotra/ui/game-row'
+import { GameRow, type GameRowPlayer, type GameRowProps } from '@rotra/ui/game-row'
 import { Icon } from '@rotra/ui/icon'
-export type SessionGamesProps = { session: PlayerSessionRecord }
-export function SessionGames({ session }: SessionGamesProps) {
+import type { ReactNode } from 'react'
+export type SessionGamesProps = {
+  session: PlayerSessionRecord
+  /** The profile owner, drawn first on every court */
+  me?: GameRowProps['me']
+  /** Opens a face's profile card */
+  onOpenPlayer?: (player: GameRowPlayer) => void
+  /** Your own games: the share icon on each court (Share game) */
+  onShareGame?: (gameId: string) => void
+  /** Between the session head and the games: the Share performance / result / games row */
+  actions?: ReactNode
+}
+export function SessionGames({
+  session,
+  me,
+  onOpenPlayer,
+  onShareGame,
+  actions,
+}: SessionGamesProps) {
   return (
     <section className="flex flex-col gap-1">
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-2 border-b border-border pb-1">
@@ -29,9 +46,16 @@ export function SessionGames({ session }: SessionGamesProps) {
           <span className="text-[13px] text-fg2">Session page no longer available</span>
         )}
       </div>
+      {actions}
       <div>
         {session.games.map((game) => (
-          <GameRow key={game.id} game={game} />
+          <GameRow
+            key={game.id}
+            game={game}
+            me={me}
+            onOpenPlayer={onOpenPlayer}
+            onShare={onShareGame ? () => onShareGame(game.id) : undefined}
+          />
         ))}
       </div>
     </section>

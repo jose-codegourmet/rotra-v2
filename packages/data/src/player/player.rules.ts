@@ -109,3 +109,54 @@ export function recentGameStats(
     winRate: Math.round((wins / games.length) * 100),
   }
 }
+
+/** Club nights are in the Philippines; weekdays and the calendar year are read in Manila time. */
+const MANILA = 'Asia/Manila'
+const WEEKDAY_INDEX: Record<string, number> = {
+  Sun: 0,
+  Mon: 1,
+  Tue: 2,
+  Wed: 3,
+  Thu: 4,
+  Fri: 5,
+  Sat: 6,
+}
+/** Day of the week a session finished, Sunday 0 to Saturday 6, in Manila time. */
+export function sessionWeekday(finishedAt: string | Date): number {
+  const day = new Intl.DateTimeFormat('en-US', { weekday: 'short', timeZone: MANILA }).format(
+    new Date(finishedAt),
+  )
+  return WEEKDAY_INDEX[day] ?? 0
+}
+/** The calendar year a date falls in, in Manila time. */
+export function manilaYear(at: string | Date | number): number {
+  return Number(
+    new Intl.DateTimeFormat('en-US', { year: 'numeric', timeZone: MANILA }).format(new Date(at)),
+  )
+}
+export type WeekdayRecord = { wins: number; losses: number }
+/**
+ * Weekly performance (2026-11-13 log, P-MATCH-HISTORY and the profile): counted singles and doubles
+ * wins and losses per weekday, Sunday first, over sessions that finished in `year` (the same
+ * January 1 reset as Latest stats, D-2026-11-13-03). Fun and partial games never count.
+ */
+export function weeklyPerformance(
+  sessions: readonly {
+    finishedAt: string
+    games: readonly { counting: string; result: string }[]
+  }[],
+  year: number,
+): WeekdayRecord[] {
+  const days = Array.from({ length: 7 }, () => ({ wins: 0, losses: 0 }))
+  for (const session of sessions) {
+    if (manilaYear(session.finishedAt) !== year) continue
+    const day = days[sessionWeekday(session.finishedAt)]
+    if (!day) continue
+    for (const game of session.games) {
+      if (game.counting !== 'counted') continue
+      if (game.result === 'won') day.wins++
+      else day.losses++
+    }
+  }
+  return days
+}

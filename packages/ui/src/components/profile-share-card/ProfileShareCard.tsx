@@ -83,7 +83,8 @@ export function ProfileShareCard({
               <b
                 data-qr-text
                 className={cn(
-                  'text-[22px] leading-[1.1] font-extrabold',
+                  'leading-[1.1] font-extrabold',
+                  format === 'square' ? 'text-[22px]' : 'text-[28px]',
                   levelLabel ? 'text-share-accent' : 'text-share-fg',
                 )}
               >
@@ -100,14 +101,20 @@ export function ProfileShareCard({
                     </span>
                     <b
                       data-qr-text
-                      className="font-mono text-[36px] leading-none font-bold text-share-accent"
+                      className={cn(
+                        'font-mono leading-none font-bold text-share-accent',
+                        format === 'square' ? 'text-[36px]' : 'text-[52px]',
+                      )}
                     >
                       #{position.toLocaleString('en-PH')}
                     </b>
                   </div>
                 ) : null}
                 {wins === null ? (
-                  <b data-qr-text className="text-[15px] text-share-fg">
+                  <b
+                    data-qr-text
+                    className={cn('text-share-fg', format === 'square' ? 'text-[15px]' : 'text-lg')}
+                  >
                     No games yet
                   </b>
                 ) : (
@@ -120,11 +127,20 @@ export function ProfileShareCard({
                     </span>
                     <b
                       data-qr-text
-                      className="font-mono text-[20px] leading-[1.1] font-bold text-share-fg"
+                      className={cn(
+                        'font-mono leading-[1.1] font-bold text-share-fg',
+                        format === 'square' ? 'text-[20px]' : 'text-[28px]',
+                      )}
                     >
                       {wins}
                     </b>
-                    <span data-qr-text className="text-[10px] text-share-muted">
+                    <span
+                      data-qr-text
+                      className={cn(
+                        'text-share-muted',
+                        format === 'square' ? 'text-[10px]' : 'text-xs',
+                      )}
+                    >
                       Wins
                     </span>
                   </div>

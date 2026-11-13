@@ -23,6 +23,8 @@ export type PrivateProfileCardProps = {
   bannerKey?: string | null
   /** An Admin-uploaded banner image; wins over bannerKey */
   bannerImageUrl?: string | null
+  /** Replaces the section text (game courts: “This player played as a guest …”) */
+  text?: string
 }
 
 const COPY = {
@@ -52,6 +54,7 @@ export function PrivateProfileCard({
   onPhotoClick,
   bannerKey,
   bannerImageUrl,
+  text,
 }: PrivateProfileCardProps) {
   const copy = COPY[variant]
   return (
@@ -72,7 +75,7 @@ export function PrivateProfileCard({
         chips={<Chip>{copy.chip}</Chip>}
       >
         <ProfileCardSection label={copy.label}>
-          <p className="m-0 text-fg2">{copy.text}</p>
+          <p className="m-0 text-fg2">{text ?? copy.text}</p>
         </ProfileCardSection>
       </ProfileBannerCard>
     </Sheet>

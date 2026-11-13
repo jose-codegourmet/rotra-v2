@@ -8,7 +8,7 @@ import { delay } from '../mock/latency'
 import { mockStore, readMockState } from '../mock/store'
 import { isProfileBannerShown, resolveMockProfileBanner } from '../profile-banner/fetchers'
 import { PROFILE_BANNER_NOT_PICKABLE } from '../profile-banner/profileBanner.rules'
-import { isProfileCharacterShown } from '../profile-character/fetchers'
+import { isProfileCharacterShown, profileCharacterImage } from '../profile-character/fetchers'
 import { isRealDataMode } from '../real/mode'
 import {
   realFindPlayerByRtrId,
@@ -22,7 +22,12 @@ import {
 } from '../real/player'
 import { mockPhotoReference } from './photo'
 import { characterPictureReference, type PlayerPictureChoice } from './picture'
-import type { PlayerProfile, PlayerRank, PlayerSessionRecord } from './player.types'
+import type {
+  PlayerGamePlayer,
+  PlayerProfile,
+  PlayerRank,
+  PlayerSessionRecord,
+} from './player.types'
 import { playerProjection } from './projection'
 import { isPrivatePlayer, PROFILE_PRIVATE_MESSAGE, requireProfileAccess } from './visibility'
 
@@ -42,7 +47,26 @@ export async function getPlayerGames(
   if (isRealDataMode()) return realGetPlayerGames(playerId, signal)
   await playerRequest(signal)
   await requireProfileAccess(playerId)
-  return playerProjection().games[playerId] ?? []
+  return (playerProjection().games[playerId] ?? []).map((session) => ({
+    ...session,
+    games: session.games.map((game) => ({
+      ...game,
+      partnerPlayers: game.partners.map(gamePlayer),
+      opponentPlayers: game.opponents.map(gamePlayer),
+    })),
+  }))
+}
+/** A face on a game court: a ROTRA profile by full name or nickname, else a guest (no playerId). */
+function gamePlayer(name: string): PlayerGamePlayer {
+  const profile = readMockState().playerProfiles.find(
+    (p) => p.fullName === name || p.nickname === name,
+  )
+  if (!profile) return { name, picture: null, playerId: null }
+  return {
+    name,
+    picture: profileCharacterImage(profile.picture) ?? profile.picture ?? null,
+    playerId: profile.playerId,
+  }
 }
 export async function findPlayerByRtrId(
   rtrId: string,

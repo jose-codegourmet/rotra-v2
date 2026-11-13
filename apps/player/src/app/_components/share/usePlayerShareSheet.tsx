@@ -7,8 +7,10 @@ import { levelLabel } from '@rotra/ui/level-pill'
 import { Notice } from '@rotra/ui/notice'
 import { PlayerShareSheet } from '@rotra/ui/player-share-sheet'
 import { ProfileShareCard } from '@rotra/ui/profile-share-card'
+import { GameShareCard } from '@rotra/ui/game-share-card'
 import { RankShareCard } from '@rotra/ui/rank-share-card'
 import { SessionGamesShareCard } from '@rotra/ui/session-games-share-card'
+import { SessionPerformanceShareCard } from '@rotra/ui/session-performance-share-card'
 import { SessionResultShareCard } from '@rotra/ui/session-result-share-card'
 import { SHARE_FORMATS, type ShareFormat } from '@rotra/ui/share-card/helpers'
 import { Skeleton } from '@rotra/ui/skeleton'
@@ -16,7 +18,12 @@ import { toast } from '@rotra/ui/toaster'
 import { useState } from 'react'
 import { pictureSrc } from '../profile-picture/pictureSrc'
 
-type Selection = { kind: 'rank' | 'result' | 'games' | 'profile'; sessionId?: string }
+type Selection = {
+  kind: 'rank' | 'result' | 'games' | 'perf' | 'game' | 'profile'
+  sessionId?: string
+  /** Share game: the one game */
+  gameId?: string
+}
 export function usePlayerShareSheet(playerId: string | null) {
   const [selection, setSelection] = useState<Selection | null>(null)
   const data = usePlayerShareData(
@@ -69,7 +76,11 @@ export function usePlayerShareSheet(playerId: string | null) {
         ? 'Share rank'
         : selection?.kind === 'result'
           ? 'Share result'
-          : 'Share games'
+          : selection?.kind === 'perf'
+            ? 'Share performance'
+            : selection?.kind === 'game'
+              ? 'Share game'
+              : 'Share games'
   const active = selection?.kind === 'profile' ? profileData : data
   const sheet = (
     <PlayerShareSheet
@@ -109,46 +120,60 @@ export function usePlayerShareSheet(playerId: string | null) {
         ) : (
           <Notice>No share card is available.</Notice>
         )
-      ) : value?.kind === 'not-shared' ? (
-        <Notice>{value.message}</Notice>
-      ) : value?.kind === 'rank' ? (
-        <RankShareCard
-          {...common}
-          level={(value.rank.levelIndex ?? 0) + 1}
-          levelLabel={levelLabel(PLAYING_LEVELS[value.rank.levelIndex ?? 0] ?? null)}
-          position={value.rank.position}
-        />
       ) : value?.kind === 'session' ? (
-        selection?.kind === 'result' ? (
-          <SessionResultShareCard
-            {...common}
-            title={value.session.title}
-            clubName={value.session.clubName}
-            dateLabel={new Date(value.session.finishedAt).toLocaleDateString('en-PH', {
+        (() => {
+          const session = {
+            title: value.session.title,
+            clubName: value.session.clubName,
+            dateLabel: new Date(value.session.finishedAt).toLocaleDateString('en-PH', {
               timeZone: 'Asia/Manila',
               month: 'short',
               day: 'numeric',
-            })}
-            wins={value.wins}
-            losses={value.losses}
-            games={value.session.games.length}
-            position={value.position}
-          />
-        ) : (
-          <SessionGamesShareCard
-            {...common}
-            title={value.session.title}
-            clubName={value.session.clubName}
-            dateLabel={new Date(value.session.finishedAt).toLocaleDateString('en-PH', {
-              timeZone: 'Asia/Manila',
-              month: 'short',
-              day: 'numeric',
-            })}
-            wins={value.wins}
-            losses={value.losses}
-            games={value.session.games}
-          />
-        )
+            }),
+          }
+          if (selection?.kind === 'result')
+            // Share result still waits for the club (D-2026-11-13-06).
+            return value.published ? (
+              <SessionResultShareCard
+                {...common}
+                {...session}
+                wins={value.wins}
+                losses={value.losses}
+                games={value.session.games.length}
+                position={value.position}
+              />
+            ) : (
+              <Notice>Results not shared yet by the club.</Notice>
+            )
+          if (selection?.kind === 'perf')
+            return (
+              <SessionPerformanceShareCard
+                {...common}
+                {...session}
+                wins={value.countedWins}
+                losses={value.countedLosses}
+                games={value.totalGames}
+                position={value.published ? value.position : null}
+              />
+            )
+          if (selection?.kind === 'game') {
+            const game = value.session.games.find((g) => g.id === selection.gameId)
+            return game ? (
+              <GameShareCard {...common} {...session} game={game} />
+            ) : (
+              <Notice>No share card is available.</Notice>
+            )
+          }
+          return (
+            <SessionGamesShareCard
+              {...common}
+              {...session}
+              wins={value.wins}
+              losses={value.losses}
+              games={value.session.games}
+            />
+          )
+        })()
       ) : (
         <Notice>No share card is available.</Notice>
       )}
@@ -160,5 +185,8 @@ export function usePlayerShareSheet(playerId: string | null) {
     openRank: () => setSelection({ kind: 'rank' }),
     openResult: (sessionId: string) => setSelection({ kind: 'result', sessionId }),
     openGames: (sessionId: string) => setSelection({ kind: 'games', sessionId }),
+    openPerformance: (sessionId: string) => setSelection({ kind: 'perf', sessionId }),
+    openGame: (sessionId: string, gameId: string) =>
+      setSelection({ kind: 'game', sessionId, gameId }),
   }
 }

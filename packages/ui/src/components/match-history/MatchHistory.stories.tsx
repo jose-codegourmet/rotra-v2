@@ -36,3 +36,28 @@ export const Processing: Story = {
     ],
   },
 }
+/** Your own Games page: Share performance and Share games on every session, Share result once published. */
+export const OwnHistory: Story = {
+  ...Counted,
+  args: {
+    ...Counted.args,
+    me: { name: 'Jose Buctuanon', label: 'You', playerId: 'jose' },
+    onOpenPlayer: () => {},
+    publication: { [JOSE_SESSIONS[0]?.id ?? '']: true },
+    onSharePerformance: () => {},
+    onShareResult: () => {},
+    onShareGames: () => {},
+    onShareGame: () => {},
+  },
+  globals: { theme: 'dark' },
+}
+export const OwnHistoryLight: Story = { ...OwnHistory, globals: { theme: 'light' } }
+/** The Weekly performance filter matched nothing. */
+export const FilterNoMatch: Story = {
+  ...Counted,
+  args: { ...Counted.args, gameFilter: () => false },
+}
+export const Phone: Story = {
+  ...OwnHistory,
+  globals: { theme: 'dark', viewport: { value: 'phone' } },
+}

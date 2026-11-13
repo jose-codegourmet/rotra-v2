@@ -40,10 +40,18 @@ export async function getPlayerShareData(
     return rank?.levelIndex != null ? { kind: 'rank' as const, profile, rank, link } : null
   const session = history.find((s) => s.id === sessionId)
   if (!session) return null
+  // Totals for Share performance: every game played; Won and Lost count singles and doubles only.
+  const counted = session.games.filter((g) => g.counting === 'counted')
+  const countedWins = counted.filter((g) => g.result === 'won').length
+  const totals = {
+    totalGames: session.games.length,
+    countedWins,
+    countedLosses: counted.length - countedWins,
+  }
   if (isRealDataMode()) {
     const saved = await realGetMyShareSession(sessionId, signal)
-    if (!saved.published)
-      return { kind: 'not-shared' as const, message: 'Results not shared yet by the club.' }
+    // Own games are shareable before the club publishes (D-2026-11-13-06); until then the server
+    // returns no people, so names are masked and there are no pictures.
     const real = (name: string, from?: PlayerShareParticipant): PlayerShareParticipant =>
       from
         ? { name: from.name, picture: profileCharacterImage(from.picture) ?? from.picture }
@@ -67,15 +75,16 @@ export async function getPlayerShareData(
       kind: 'session' as const,
       profile,
       session: { ...session, games },
-      position: saved.position,
+      published: saved.published,
+      position: saved.published ? saved.position : null,
       wins,
       losses: games.length - wins,
+      ...totals,
       link,
     }
   }
   const publication = readMockState().publications[sessionId]
-  if (!publication?.publishedSlides.includes('standings'))
-    return { kind: 'not-shared' as const, message: 'Results not shared yet by the club.' }
+  const published = !!publication?.publishedSlides.includes('standings')
   const games: PlayerShareGame[] = session.games
     .filter((game) => game.counting !== 'partial')
     .map((game) => {
@@ -96,17 +105,20 @@ export async function getPlayerShareData(
       .clubPlayers.filter((p) => p.playerId === playerId)
       .map((p) => p.id),
   )
-  const position =
-    snapshot?.standings.find((s) => clubIds.has(s.clubPlayerId))?.position ??
-    SAMPLE_SESSION_POSITIONS[sessionId] ??
-    null
+  const position = published
+    ? (snapshot?.standings.find((s) => clubIds.has(s.clubPlayerId))?.position ??
+      SAMPLE_SESSION_POSITIONS[sessionId] ??
+      null)
+    : null
   return {
     kind: 'session' as const,
     profile,
     session: { ...session, games },
+    published,
     position,
     wins,
     losses: games.length - wins,
+    ...totals,
     link,
   }
 }

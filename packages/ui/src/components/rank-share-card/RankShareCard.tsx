@@ -79,7 +79,14 @@ export function RankShareCard({
                   format === 'square' ? 'flex-row justify-between gap-3' : 'flex-col gap-4',
                 )}
               >
-                <b data-qr-text className="text-[22px] font-extrabold text-share-accent">
+                {/* Story and Facebook post are set larger (share cards fill log). */}
+                <b
+                  data-qr-text
+                  className={cn(
+                    'font-extrabold text-share-accent',
+                    format === 'square' ? 'text-[22px]' : 'text-[28px]',
+                  )}
+                >
                   {levelLabel}
                 </b>
                 <div className="text-left">
@@ -90,7 +97,10 @@ export function RankShareCard({
                     data-qr-text
                     className={
                       position
-                        ? 'block font-mono text-[36px] leading-none text-share-accent'
+                        ? cn(
+                            'block font-mono leading-none text-share-accent',
+                            format === 'square' ? 'text-[36px]' : 'text-[52px]',
+                          )
                         : 'block text-xl text-share-fg'
                     }
                   >

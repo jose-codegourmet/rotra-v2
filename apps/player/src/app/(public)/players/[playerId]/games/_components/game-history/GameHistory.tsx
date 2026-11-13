@@ -1,16 +1,26 @@
 'use client'
+import { manilaYear, sessionWeekday, weeklyPerformance } from '@rotra/data/player/rules'
+import type { PlayerGame, PlayerSessionRecord } from '@rotra/data/player/types'
 import { useMySessions } from '@rotra/data/player/useMySessions'
 import { usePlayerGames } from '@rotra/data/player/usePlayerGames'
+import { usePlayerProfile } from '@rotra/data/player/usePlayerProfile'
 import { usePlayerRank } from '@rotra/data/player/usePlayerRank'
 import { PROFILE_LOGIN_MESSAGE } from '@rotra/data/player/visibility'
 import { Button } from '@rotra/ui/button'
 import { ErrorState } from '@rotra/ui/error-state'
+import type { GameRowPlayer } from '@rotra/ui/game-row'
 import { MatchHistory } from '@rotra/ui/match-history'
 import { Notice } from '@rotra/ui/notice'
 import { PageHeader } from '@rotra/ui/page-header'
 import { ProfileNotFound } from '@rotra/ui/profile-not-found'
+import {
+  WeeklyPerformanceChart,
+  type WeeklyPerformanceFilter,
+} from '@rotra/ui/weekly-performance-chart'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { GamePlayerProfile } from '@/app/_components/game-player-profile/GamePlayerProfile'
+import { pictureSrc } from '@/app/_components/profile-picture/pictureSrc'
 import { usePlayerShareSheet } from '@/app/_components/share/usePlayerShareSheet'
 import { useAppSelector } from '@/store/hooks'
 import { selectAccount } from '@/store/slices/authSlice'
@@ -21,6 +31,11 @@ export function GameHistory({ playerId }: { playerId: string }) {
     games = usePlayerGames(playerId),
     router = useRouter()
   const [activeTab, setActiveTab] = useState<'counted' | 'other'>('counted')
+  // Weekly performance bar filter and the page of sessions; both reset to page 1 (2026-11-13 logs).
+  const [filter, setFilter] = useState<WeeklyPerformanceFilter | null>(null)
+  const [page, setPage] = useState(1)
+  const [openPlayer, setOpenPlayer] = useState<GameRowPlayer | null>(null)
+  const profile = usePlayerProfile(playerId)
   const player = rank.data
   const account = useAppSelector(selectAccount),
     { offline } = useAppSelector(selectDev)
@@ -64,6 +79,14 @@ export function GameHistory({ playerId }: { playerId: string }) {
       </main>
     )
   if (!player || !games.data) return <Loading />
+  const own = account?.id === playerId
+  const year = manilaYear(Date.now())
+  const gameFilter = filter
+    ? (session: PlayerSessionRecord, game: PlayerGame) =>
+        manilaYear(session.finishedAt) === year &&
+        sessionWeekday(session.finishedAt) === filter.day &&
+        game.result === filter.result
+    : null
   const notices: string[] = []
   if (player.state === 'needs_reassessment')
     notices.push(
@@ -93,14 +116,46 @@ export function GameHistory({ playerId }: { playerId: string }) {
           Saved copy. Your rank and games may have changed since this device was last online.
         </Notice>
       ) : null}
+      <WeeklyPerformanceChart
+        days={weeklyPerformance(games.data, year)}
+        year={year}
+        filter={filter}
+        onFilterChange={(next) => {
+          setFilter(next)
+          setPage(1)
+          // Tapping a bar on Fun and partial switches to Singles and doubles and filters there.
+          if (next) setActiveTab('counted')
+        }}
+      />
       <MatchHistory
         sessions={games.data}
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={(tab) => {
+          setActiveTab(tab)
+          setFilter(null)
+          setPage(1)
+        }}
         notices={notices}
-        publication={account?.id === playerId ? (mySessions.data?.publication ?? {}) : undefined}
-        onShareResult={account?.id === playerId ? sharing.openResult : undefined}
-        onShareGames={account?.id === playerId ? sharing.openGames : undefined}
+        page={page}
+        onPageChange={setPage}
+        gameFilter={gameFilter}
+        me={{
+          name: player.fullName,
+          label: own ? 'You' : (player.fullName.split(/\s+/)[0] ?? player.fullName),
+          picture: pictureSrc(profile.data?.picture, playerId, player.fullName) ?? null,
+          playerId,
+        }}
+        onOpenPlayer={setOpenPlayer}
+        publication={own ? (mySessions.data?.publication ?? {}) : undefined}
+        onSharePerformance={own ? sharing.openPerformance : undefined}
+        onShareResult={own ? sharing.openResult : undefined}
+        onShareGames={own ? sharing.openGames : undefined}
+        onShareGame={own ? sharing.openGame : undefined}
+      />
+      <GamePlayerProfile
+        player={openPlayer}
+        viewerId={account?.id}
+        onClose={() => setOpenPlayer(null)}
       />
       {sharing.sheet}
     </main>

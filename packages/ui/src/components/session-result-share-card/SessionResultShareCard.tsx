@@ -79,30 +79,50 @@ export function SessionResultShareCard({
             <div
               className={cn(
                 'flex flex-1 flex-col justify-center text-left',
-                format === 'square' ? 'gap-2' : 'gap-3',
+                format === 'square' ? 'gap-2' : 'gap-3.5',
               )}
             >
+              {/* Story and Facebook post fill the free space, set larger (share cards fill log). */}
               <h3
                 data-qr-text
                 className={cn(
-                  'text-[22px] font-extrabold text-share-fg',
-                  format === 'square' && 'truncate',
+                  'leading-[1.15] font-extrabold text-share-fg',
+                  format === 'square' ? 'truncate text-[22px]' : 'text-[26px]',
                 )}
               >
                 {title}
               </h3>
-              <p data-qr-text className="text-[13px] text-share-muted">
+              <p
+                data-qr-text
+                className={cn('text-share-muted', format === 'square' ? 'text-[13px]' : 'text-sm')}
+              >
                 {dateLabel} · {clubName}
               </p>
               <div className="flex items-baseline gap-2">
-                <b data-qr-text className="font-mono text-[40px] leading-none text-share-accent">
+                <b
+                  data-qr-text
+                  className={cn(
+                    'font-mono leading-none text-share-accent',
+                    format === 'story'
+                      ? 'text-[64px]'
+                      : format === 'post'
+                        ? 'text-[56px]'
+                        : 'text-[40px]',
+                  )}
+                >
                   {position ? `#${position}` : 'No position'}
                 </b>
-                <span data-qr-text className="text-sm text-share-muted">
+                <span
+                  data-qr-text
+                  className={cn('text-share-muted', format === 'square' ? 'text-sm' : 'text-[15px]')}
+                >
                   in Standings
                 </span>
               </div>
-              <b data-qr-text className="text-[15px] text-share-fg">
+              <b
+                data-qr-text
+                className={cn('text-share-fg', format === 'square' ? 'text-[15px]' : 'text-lg')}
+              >
                 {games} {games === 1 ? 'game' : 'games'} · {wins}–{losses}
               </b>
             </div>

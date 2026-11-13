@@ -31,7 +31,16 @@ export type PlayerGame = {
   result: 'won' | 'lost'
   score: string | null
   note?: string
+  /**
+   * Faces on the game court (2026-11-13 game row log), in the order of `partners` / `opponents`.
+   * `playerId` is null for a guest or someone with no ROTRA profile. Missing when the source has no
+   * per-player detail (real mode for now): the court then draws names only.
+   */
+  partnerPlayers?: PlayerGamePlayer[]
+  opponentPlayers?: PlayerGamePlayer[]
 }
+/** One person on a game court: the picture follows the profile privacy rules (null when masked). */
+export type PlayerGamePlayer = PlayerShareParticipant & { playerId?: string | null }
 export type PlayerSessionRecord = {
   id: string
   title: string

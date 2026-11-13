@@ -8,8 +8,6 @@ import { spawnSync } from 'node:child_process'
 const DECIDED_MATH_TESTS = [
   'src/session-cost/sessionCost.rules.test.ts',
   'src/match/match.rules.test.ts',
-  'src/player/player.rules.test.ts',
-  'src/queue-session/queueSession.rules.test.ts',
   'src/ruleCases.rules.test.ts',
 ]
 

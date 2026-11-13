@@ -12,6 +12,7 @@ const DECIDED_MATH_TESTS = [
   'src/session-result/sessionResult.rules.test.ts',
   'src/player/player.rules.test.ts',
   'src/queue-session/queueSession.rules.test.ts',
+  'src/ruleCases.rules.test.ts',
 ]
 
 const STEPS = [

@@ -88,6 +88,17 @@ function decode(value: unknown): unknown {
   return value
 }
 
+/** Writes a Map or Set result in the tagged form of case.schema.json so it can be compared with JSON. */
+function encodeResult(value: unknown): unknown {
+  if (value instanceof Map)
+    return { $map: [...value].map(([key, item]) => [encodeResult(key), encodeResult(item)]) }
+  if (value instanceof Set) return { $set: [...value].map(encodeResult) }
+  if (Array.isArray(value)) return value.map(encodeResult)
+  if (value && typeof value === 'object' && !(value instanceof Date))
+    return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, encodeResult(item)]))
+  return value
+}
+
 /** Every key in `expected` is present and equal in `actual`; arrays match in length and per element. */
 function subsetMismatch(expected: unknown, actual: unknown, at = 'result'): string | null {
   if (Array.isArray(expected)) {
@@ -128,7 +139,7 @@ describe('shared rule cases', () => {
             rules[data.rule]?.(...(decode(item.input.args) as unknown[])),
             item.input.select,
           )
-          expect(subsetMismatch(decode(item.expected), result)).toBeNull()
+          expect(subsetMismatch(decode(item.expected), encodeResult(result))).toBeNull()
         })
       }
     })

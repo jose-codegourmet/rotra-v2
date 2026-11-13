@@ -65,6 +65,70 @@
         ]
       },
       "expected": "To join and see the full roster, open this link: https://x.test/s/abc123\nBye"
+    },
+    {
+      "name": "Facebook post court times and join line (#730) › fills the join line and appends it when a saved template lacks the key (derived, club) #1",
+      "input": {
+        "args": [
+          "Hi {{ title }}\n",
+          {
+            "club_name": "Club",
+            "club_description": "",
+            "title": "Night",
+            "day": "Wednesday",
+            "date": "November 11, 2026",
+            "where": "Hall",
+            "when": "Wednesday, November 11 · 7:30 PM–10:30 PM",
+            "x_courts": "0",
+            "court_count": "0",
+            "courts": "",
+            "tube_count": "0",
+            "x_tubes": "To be announced",
+            "player_count": "0",
+            "players": "No players yet",
+            "waitlist": "None yet. 0 slots left.",
+            "mode": "Fair (Mainly level-matched games, roughly 10% easy games)",
+            "minimum": "3 games per player",
+            "fee_per_head": "Free",
+            "entrance_fee": "None",
+            "court_rules": "Court rules:\n• Non-marking shoes only\n• Be ready within 2 minutes when your match is called\n• Winner-only scoring is fine; tell the Queue Master the result",
+            "join_link": "To join and see the full roster, open this link: https://x.test/s/abc123"
+          }
+        ]
+      },
+      "expected": "Hi Night\n\nTo join and see the full roster, open this link: https://x.test/s/abc123"
+    },
+    {
+      "name": "Facebook post court times and join line (#730) › fills the join line and appends it when a saved template lacks the key (derived, club) #2",
+      "input": {
+        "args": [
+          "{{ join_link }}\nBye",
+          {
+            "club_name": "Club",
+            "club_description": "",
+            "title": "Night",
+            "day": "Wednesday",
+            "date": "November 11, 2026",
+            "where": "Hall",
+            "when": "Wednesday, November 11 · 7:30 PM–10:30 PM",
+            "x_courts": "0",
+            "court_count": "0",
+            "courts": "",
+            "tube_count": "0",
+            "x_tubes": "To be announced",
+            "player_count": "0",
+            "players": "No players yet",
+            "waitlist": "None yet. 0 slots left.",
+            "mode": "Fair (Mainly level-matched games, roughly 10% easy games)",
+            "minimum": "3 games per player",
+            "fee_per_head": "Free",
+            "entrance_fee": "None",
+            "court_rules": "Court rules:\n• Non-marking shoes only\n• Be ready within 2 minutes when your match is called\n• Winner-only scoring is fine; tell the Queue Master the result",
+            "join_link": "To join and see the full roster, open this link: https://x.test/s/abc123"
+          }
+        ]
+      },
+      "expected": "To join and see the full roster, open this link: https://x.test/s/abc123\nBye"
     }
   ]
 }

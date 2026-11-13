@@ -1,0 +1,83 @@
+{
+  "rule": "admin-player/level-band-of",
+  "version": 1,
+  "cases": [
+    {
+      "name": "Admin player management rules › maps the nine levels and keeps unranked outside the bands (derived, management) #1",
+      "input": {
+        "args": [0]
+      },
+      "expected": "beginner"
+    },
+    {
+      "name": "Admin player management rules › maps the nine levels and keeps unranked outside the bands (derived, management) #2",
+      "input": {
+        "args": [1]
+      },
+      "expected": "beginner"
+    },
+    {
+      "name": "Admin player management rules › maps the nine levels and keeps unranked outside the bands (derived, management) #3",
+      "input": {
+        "args": [2]
+      },
+      "expected": "beginner"
+    },
+    {
+      "name": "Admin player management rules › maps the nine levels and keeps unranked outside the bands (derived, management) #4",
+      "input": {
+        "args": [3]
+      },
+      "expected": "intermediate"
+    },
+    {
+      "name": "Admin player management rules › maps the nine levels and keeps unranked outside the bands (derived, management) #5",
+      "input": {
+        "args": [4]
+      },
+      "expected": "intermediate"
+    },
+    {
+      "name": "Admin player management rules › maps the nine levels and keeps unranked outside the bands (derived, management) #6",
+      "input": {
+        "args": [5]
+      },
+      "expected": "intermediate"
+    },
+    {
+      "name": "Admin player management rules › maps the nine levels and keeps unranked outside the bands (derived, management) #7",
+      "input": {
+        "args": [6]
+      },
+      "expected": "advanced"
+    },
+    {
+      "name": "Admin player management rules › maps the nine levels and keeps unranked outside the bands (derived, management) #8",
+      "input": {
+        "args": [7]
+      },
+      "expected": "advanced"
+    },
+    {
+      "name": "Admin player management rules › maps the nine levels and keeps unranked outside the bands (derived, management) #9",
+      "input": {
+        "args": [8]
+      },
+      "expected": "advanced"
+    },
+    {
+      "name": "Admin player management rules › maps the nine levels and keeps unranked outside the bands (management) #1",
+      "input": {
+        "args": [null]
+      },
+      "expected": null
+    },
+    {
+      "name": "Admin player management rules › maps the nine levels and keeps unranked outside the bands (management) #2",
+      "input": {
+        "args": [9]
+      },
+      "expected": null
+    }
+  ]
+}

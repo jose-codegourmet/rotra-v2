@@ -1,0 +1,34 @@
+{
+  "rule": "court-window/court-window-error",
+  "version": 1,
+  "cases": [
+    {
+      "name": "court window rules on full instants › accepts a court that opens the next day within an overnight session (court-window.test)",
+      "input": {
+        "args": [1793550600000, 1793554200000, 1793541600000, 1793556000000]
+      },
+      "expected": null
+    },
+    {
+      "name": "court window rules on full instants › rejects a start before the session start, even at the same clock time on another day (court-window.test)",
+      "input": {
+        "args": [1793545200000, null, 1793631600000, 1793646000000]
+      },
+      "expected": "Choose a planned start within the session."
+    },
+    {
+      "name": "court window rules on full instants › rejects a start at or after the session end (court-window.test)",
+      "input": {
+        "args": [1793556000000, null, 1793541600000, 1793556000000]
+      },
+      "expected": "Choose a planned start within the session."
+    },
+    {
+      "name": "court window rules on full instants › rejects an end at or before its start (court-window.test)",
+      "input": {
+        "args": [1793545200000, 1793545200000, 1793541600000, 1793556000000]
+      },
+      "expected": "Choose an end after the planned start."
+    }
+  ]
+}

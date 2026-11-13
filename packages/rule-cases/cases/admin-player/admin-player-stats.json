@@ -1,0 +1,20 @@
+{
+  "rule": "admin-player/admin-player-stats",
+  "version": 1,
+  "cases": [
+    {
+      "name": "Admin player management rules › applies inclusive creation dates, place and archive before paging and counts (derived, management)",
+      "input": {
+        "args": [[]]
+      },
+      "expected": {
+        "advanced": 0,
+        "intermediate": 0,
+        "beginner": 0,
+        "noRank": 0,
+        "registered": 0,
+        "unclaimed": 0
+      }
+    }
+  ]
+}

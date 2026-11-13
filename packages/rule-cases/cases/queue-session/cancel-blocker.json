@@ -1,0 +1,72 @@
+{
+  "rule": "queue-session/cancel-blocker",
+  "version": 1,
+  "cases": [
+    {
+      "name": "Cancel session › runs only before Start session; an already cancelled session is a repeat, not a blocker (queueSession) #1",
+      "input": {
+        "args": [
+          {
+            "state": "prepared"
+          }
+        ]
+      },
+      "expected": null
+    },
+    {
+      "name": "Cancel session › runs only before Start session; an already cancelled session is a repeat, not a blocker (queueSession) #2",
+      "input": {
+        "args": [
+          {
+            "state": "cancelled"
+          }
+        ]
+      },
+      "expected": null
+    },
+    {
+      "name": "Cancel session › runs only before Start session; an already cancelled session is a repeat, not a blocker (queueSession) #3",
+      "input": {
+        "args": [
+          {
+            "state": "active"
+          }
+        ]
+      },
+      "expected": "Only a session that has not started can be cancelled."
+    },
+    {
+      "name": "Cancel session › runs only before Start session; an already cancelled session is a repeat, not a blocker (queueSession) #4",
+      "input": {
+        "args": [
+          {
+            "state": "finalizing"
+          }
+        ]
+      },
+      "expected": "Only a session that has not started can be cancelled."
+    },
+    {
+      "name": "Cancel session › runs only before Start session; an already cancelled session is a repeat, not a blocker (queueSession) #5",
+      "input": {
+        "args": [
+          {
+            "state": "completed"
+          }
+        ]
+      },
+      "expected": "Only a session that has not started can be cancelled."
+    },
+    {
+      "name": "Cancel session › runs only before Start session; an already cancelled session is a repeat, not a blocker (queueSession) #6",
+      "input": {
+        "args": [
+          {
+            "state": "invalid"
+          }
+        ]
+      },
+      "expected": "Only a session that has not started can be cancelled."
+    }
+  ]
+}

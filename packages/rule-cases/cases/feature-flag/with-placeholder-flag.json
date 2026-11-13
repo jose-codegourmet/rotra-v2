@@ -1,0 +1,150 @@
+{
+  "rule": "feature-flag/with-placeholder-flag",
+  "version": 1,
+  "cases": [
+    {
+      "name": "withPlaceholderFlag › adds the placeholder at the top and removes it again (derived, featureFlag)",
+      "input": {
+        "args": [
+          [
+            {
+              "key": "session_cost_estimate",
+              "name": "Session cost estimate",
+              "description": "Shows the estimated cost per player before the session starts.",
+              "on": false,
+              "revision": 1,
+              "createdAt": "2026-10-29T19:52:00+08:00",
+              "createdByEmail": "owner@rotra.example",
+              "changedAt": "2026-10-29T19:52:00+08:00",
+              "changedByEmail": "owner@rotra.example"
+            }
+          ],
+          {
+            "key": "placeholder",
+            "name": "Placeholder flag",
+            "description": "Shows how a defined flag will look in Admin. It is not a real flag and controls nothing.",
+            "on": false,
+            "revision": 1,
+            "createdAt": "2026-10-29T19:52:00+08:00",
+            "createdByEmail": "owner@rotra.example"
+          },
+          true
+        ]
+      },
+      "expected": [
+        {
+          "key": "placeholder",
+          "name": "Placeholder flag",
+          "description": "Shows how a defined flag will look in Admin. It is not a real flag and controls nothing.",
+          "on": false,
+          "revision": 1,
+          "createdAt": "2026-10-29T19:52:00+08:00",
+          "createdByEmail": "owner@rotra.example"
+        },
+        {
+          "key": "session_cost_estimate",
+          "name": "Session cost estimate",
+          "description": "Shows the estimated cost per player before the session starts.",
+          "on": false,
+          "revision": 1,
+          "createdAt": "2026-10-29T19:52:00+08:00",
+          "createdByEmail": "owner@rotra.example",
+          "changedAt": "2026-10-29T19:52:00+08:00",
+          "changedByEmail": "owner@rotra.example"
+        }
+      ]
+    },
+    {
+      "name": "withPlaceholderFlag › adds the placeholder at the top and removes it again (featureFlag) #1",
+      "input": {
+        "args": [
+          [
+            {
+              "key": "placeholder",
+              "name": "Placeholder flag",
+              "description": "Shows how a defined flag will look in Admin. It is not a real flag and controls nothing.",
+              "on": false,
+              "revision": 1,
+              "createdAt": "2026-10-29T19:52:00+08:00",
+              "createdByEmail": "owner@rotra.example"
+            },
+            {
+              "key": "session_cost_estimate",
+              "name": "Session cost estimate",
+              "description": "Shows the estimated cost per player before the session starts.",
+              "on": false,
+              "revision": 1,
+              "createdAt": "2026-10-29T19:52:00+08:00",
+              "createdByEmail": "owner@rotra.example",
+              "changedAt": "2026-10-29T19:52:00+08:00",
+              "changedByEmail": "owner@rotra.example"
+            }
+          ],
+          {
+            "key": "placeholder",
+            "name": "Placeholder flag",
+            "description": "Shows how a defined flag will look in Admin. It is not a real flag and controls nothing.",
+            "on": false,
+            "revision": 1,
+            "createdAt": "2026-10-29T19:52:00+08:00",
+            "createdByEmail": "owner@rotra.example"
+          },
+          true
+        ]
+      },
+      "expected": [{}, {}]
+    },
+    {
+      "name": "withPlaceholderFlag › adds the placeholder at the top and removes it again (featureFlag) #2",
+      "input": {
+        "args": [
+          [
+            {
+              "key": "placeholder",
+              "name": "Placeholder flag",
+              "description": "Shows how a defined flag will look in Admin. It is not a real flag and controls nothing.",
+              "on": false,
+              "revision": 1,
+              "createdAt": "2026-10-29T19:52:00+08:00",
+              "createdByEmail": "owner@rotra.example"
+            },
+            {
+              "key": "session_cost_estimate",
+              "name": "Session cost estimate",
+              "description": "Shows the estimated cost per player before the session starts.",
+              "on": false,
+              "revision": 1,
+              "createdAt": "2026-10-29T19:52:00+08:00",
+              "createdByEmail": "owner@rotra.example",
+              "changedAt": "2026-10-29T19:52:00+08:00",
+              "changedByEmail": "owner@rotra.example"
+            }
+          ],
+          {
+            "key": "placeholder",
+            "name": "Placeholder flag",
+            "description": "Shows how a defined flag will look in Admin. It is not a real flag and controls nothing.",
+            "on": false,
+            "revision": 1,
+            "createdAt": "2026-10-29T19:52:00+08:00",
+            "createdByEmail": "owner@rotra.example"
+          },
+          false
+        ]
+      },
+      "expected": [
+        {
+          "key": "session_cost_estimate",
+          "name": "Session cost estimate",
+          "description": "Shows the estimated cost per player before the session starts.",
+          "on": false,
+          "revision": 1,
+          "createdAt": "2026-10-29T19:52:00+08:00",
+          "createdByEmail": "owner@rotra.example",
+          "changedAt": "2026-10-29T19:52:00+08:00",
+          "changedByEmail": "owner@rotra.example"
+        }
+      ]
+    }
+  ]
+}

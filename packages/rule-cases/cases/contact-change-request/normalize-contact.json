@@ -1,0 +1,39 @@
+{
+  "rule": "contact-change-request/normalize-contact",
+  "version": 1,
+  "cases": [
+    {
+      "name": "contact normalization › compares phones as E.164 and emails without case (contactChangeRequest) #1",
+      "input": {
+        "args": ["phone", "+63 917 555 0142"]
+      },
+      "expected": "+639175550142"
+    },
+    {
+      "name": "contact normalization › compares phones as E.164 and emails without case (contactChangeRequest) #2",
+      "input": {
+        "args": ["phone", "0917 555 0142"]
+      },
+      "expected": "+639175550142"
+    },
+    {
+      "name": "contact normalization › compares phones as E.164 and emails without case (contactChangeRequest) #3",
+      "input": {
+        "args": ["email", " Jose@Example.com "]
+      },
+      "expected": "jose@example.com"
+    },
+    {
+      "name": "contact normalization › compares phones as E.164 and emails without case (contactChangeRequest) #4",
+      "input": {
+        "args": [
+          "email",
+          {
+            "$undefined": true
+          }
+        ]
+      },
+      "expected": ""
+    }
+  ]
+}

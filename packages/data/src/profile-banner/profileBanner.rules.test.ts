@@ -10,8 +10,6 @@ import {
   PROFILE_BANNER_DELETE_REFUSAL,
   PROFILE_BANNER_HIDE_REFUSAL,
   PROFILE_BANNER_MIN_SHOWN,
-  profileBannerBelowMinimum,
-  profileBannerName,
   resolveProfileBanner,
 } from './profileBanner.rules'
 import type { ProfileBanner } from './profileBanner.types'
@@ -29,19 +27,6 @@ describe('minimum shown banners', () => {
     expect(PROFILE_BANNER_DELETE_REFUSAL).toBe(
       'Keep at least 2 banners shown. Upload or show another one first.',
     )
-  })
-
-  it('refuses hiding or deleting a shown banner only at the minimum', () => {
-    const three = library(['court', 'night', 'dusk'])
-    const two = library(['court', 'night'])
-    expect(profileBannerBelowMinimum(three[0] as ProfileBanner, three)).toBe(false)
-    expect(profileBannerBelowMinimum(two[0] as ProfileBanner, two)).toBe(true)
-  })
-
-  it('always lets a hidden banner go', () => {
-    const two = library(['court', 'night'])
-    const hidden = two.find((b) => b.id === 'sun') as ProfileBanner
-    expect(profileBannerBelowMinimum(hidden, two)).toBe(false)
   })
 })
 
@@ -88,8 +73,6 @@ describe('default banner', () => {
       bannerKey: upload.id,
       bannerImageUrl: 'https://example.test/b.webp',
     })
-    expect(profileBannerName(upload)).toBe('Banner 7')
-    expect(profileBannerName({ id: 'dusk', number: 3 })).toBe('Dusk')
   })
 })
 

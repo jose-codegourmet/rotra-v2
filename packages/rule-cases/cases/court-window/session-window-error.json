@@ -1,0 +1,53 @@
+{
+  "rule": "court-window/session-window-error",
+  "version": 1,
+  "cases": [
+    {
+      "name": "session window › needs an end after the start (court-window.test) #1",
+      "input": {
+        "args": [1793527200000, 1793527200000]
+      },
+      "expected": "Choose an end after the start."
+    },
+    {
+      "name": "session window › needs an end after the start (court-window.test) #2",
+      "input": {
+        "args": [1793527200000, 1793523600000]
+      },
+      "expected": "Choose an end after the start."
+    },
+    {
+      "name": "session window › allows up to 24 hours and no more (court-window.test) #1",
+      "input": {
+        "args": [1793527200000, 1793613600000]
+      },
+      "expected": null
+    },
+    {
+      "name": "session window › allows up to 24 hours and no more (court-window.test) #2",
+      "input": {
+        "args": [1793527200000, 1793613660000]
+      },
+      "expected": "Choose an end after the start."
+    },
+    {
+      "name": "session window › accepts an overnight session given as instants (court-window.test)",
+      "input": {
+        "args": [1793541600000, 1793556000000]
+      },
+      "expected": null
+    },
+    {
+      "name": "session window › rejects invalid instants (court-window.test)",
+      "input": {
+        "args": [
+          {
+            "$number": "NaN"
+          },
+          1793527200000
+        ]
+      },
+      "expected": "Enter a date and time."
+    }
+  ]
+}

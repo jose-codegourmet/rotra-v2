@@ -1,0 +1,182 @@
+{
+  "rule": "admin-player/matches-admin-player-search",
+  "version": 1,
+  "cases": [
+    {
+      "name": "privileged search (rotra-admin.html playerMatches) › an empty query matches everyone (adminPlayer)",
+      "input": {
+        "args": [
+          {
+            "name": "Jose",
+            "nickname": null,
+            "rtrId": "RTR-PH-CEB-031526-0001",
+            "phone": "+639175550142",
+            "email": "jose@example.com"
+          },
+          "  "
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "privileged search (rotra-admin.html playerMatches) › matches name, RTR ID and email, ignoring case and accents (adminPlayer) #1",
+      "input": {
+        "args": [
+          {
+            "name": "Jose",
+            "nickname": null,
+            "rtrId": "RTR-PH-CEB-031526-0001",
+            "phone": "+639175550142",
+            "email": "jose@example.com"
+          },
+          "JOSÉ"
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "privileged search (rotra-admin.html playerMatches) › matches name, RTR ID and email, ignoring case and accents (adminPlayer) #2",
+      "input": {
+        "args": [
+          {
+            "name": "Jose",
+            "nickname": null,
+            "rtrId": "RTR-PH-CEB-031526-0001",
+            "phone": "+639175550142",
+            "email": "jose@example.com"
+          },
+          "rtr-ph-ceb-031526-0001"
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "privileged search (rotra-admin.html playerMatches) › matches name, RTR ID and email, ignoring case and accents (adminPlayer) #3",
+      "input": {
+        "args": [
+          {
+            "name": "Jose",
+            "nickname": null,
+            "rtrId": "RTR-PH-CEB-031526-0001",
+            "phone": "+639175550142",
+            "email": "jose@example.com"
+          },
+          "jose@example"
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "privileged search (rotra-admin.html playerMatches) › matches the nickname (adminPlayer)",
+      "input": {
+        "args": [
+          {
+            "name": "Maria Steph",
+            "nickname": "Atty Steph",
+            "rtrId": "RTR-PH-CEB-061126-0105"
+          },
+          "atty"
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "privileged search (rotra-admin.html playerMatches) › a local 0917 number finds the +63 phone (adminPlayer) #1",
+      "input": {
+        "args": [
+          {
+            "name": "Jose",
+            "nickname": null,
+            "rtrId": "RTR-PH-CEB-031526-0001",
+            "phone": "+639175550142",
+            "email": "jose@example.com"
+          },
+          "0917 555 0142"
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "privileged search (rotra-admin.html playerMatches) › a local 0917 number finds the +63 phone (adminPlayer) #2",
+      "input": {
+        "args": [
+          {
+            "name": "Jose",
+            "nickname": null,
+            "rtrId": "RTR-PH-CEB-031526-0001",
+            "phone": "+639175550142",
+            "email": "jose@example.com"
+          },
+          "+63 917 555 0142"
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "privileged search (rotra-admin.html playerMatches) › a local 0917 number finds the +63 phone (adminPlayer) #3",
+      "input": {
+        "args": [
+          {
+            "name": "Jose",
+            "nickname": null,
+            "rtrId": "RTR-PH-CEB-031526-0001",
+            "phone": "+639175550142",
+            "email": "jose@example.com"
+          },
+          "0142"
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "privileged search (rotra-admin.html playerMatches) › fewer than four digits never searches phones (adminPlayer) #1",
+      "input": {
+        "args": [
+          {
+            "name": "Jose",
+            "nickname": null,
+            "rtrId": "RTR-PH-CEB-031526-0001",
+            "phone": "+639175550142",
+            "email": "jose@example.com"
+          },
+          "142"
+        ]
+      },
+      "expected": false
+    },
+    {
+      "name": "privileged search (rotra-admin.html playerMatches) › fewer than four digits never searches phones (adminPlayer) #2",
+      "input": {
+        "args": [
+          {
+            "name": "Jose",
+            "nickname": null,
+            "rtrId": "RTR-X",
+            "phone": "+639175550142",
+            "email": "jose@example.com"
+          },
+          "917"
+        ]
+      },
+      "expected": false
+    },
+    {
+      "name": "privileged search (rotra-admin.html playerMatches) › a player without a phone is not matched by digits (adminPlayer)",
+      "input": {
+        "args": [
+          {
+            "name": "Jose",
+            "nickname": null,
+            "rtrId": "RTR-PH-CEB-031526-0001",
+            "phone": {
+              "$undefined": true
+            },
+            "email": "jose@example.com"
+          },
+          "0917 555 0142"
+        ]
+      },
+      "expected": false
+    }
+  ]
+}

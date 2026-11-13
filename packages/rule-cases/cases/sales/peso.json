@@ -1,0 +1,106 @@
+{
+  "rule": "sales/peso",
+  "version": 1,
+  "cases": [
+    {
+      "name": "platformSalesReport › counts payments on the day paid, in integer centavos (derived, sales)",
+      "input": {
+        "args": [150000]
+      },
+      "expected": {
+        "amountMinor": 150000,
+        "currency": "PHP"
+      }
+    },
+    {
+      "name": "platformSalesReport › groups 12 months by the month paid and totals by plan (derived, sales) #1",
+      "input": {
+        "args": [1800000]
+      },
+      "expected": {
+        "amountMinor": 1800000,
+        "currency": "PHP"
+      }
+    },
+    {
+      "name": "platformSalesReport › groups 12 months by the month paid and totals by plan (derived, sales) #2",
+      "input": {
+        "args": [1500000]
+      },
+      "expected": {
+        "amountMinor": 1500000,
+        "currency": "PHP"
+      }
+    },
+    {
+      "name": "platformSalesReport › groups 12 months by the month paid and totals by plan (derived, sales) #3",
+      "input": {
+        "args": [300000]
+      },
+      "expected": {
+        "amountMinor": 300000,
+        "currency": "PHP"
+      }
+    },
+    {
+      "name": "clubSalesReport › estimates cost from the configured cost per session (derived, sales) #1",
+      "input": {
+        "args": [1500]
+      },
+      "expected": {
+        "amountMinor": 1500,
+        "currency": "PHP"
+      }
+    },
+    {
+      "name": "clubSalesReport › estimates cost from the configured cost per session (derived, sales) #2",
+      "input": {
+        "args": [75000]
+      },
+      "expected": {
+        "amountMinor": 75000,
+        "currency": "PHP"
+      }
+    },
+    {
+      "name": "clubSalesReport › estimates cost from the configured cost per session (derived, sales) #3",
+      "input": {
+        "args": [3000]
+      },
+      "expected": {
+        "amountMinor": 3000,
+        "currency": "PHP"
+      }
+    },
+    {
+      "name": "clubSalesReport › estimates cost from the configured cost per session (derived, sales) #4",
+      "input": {
+        "args": [147000]
+      },
+      "expected": {
+        "amountMinor": 147000,
+        "currency": "PHP"
+      }
+    },
+    {
+      "name": "clubSalesReport › estimates cost from the configured cost per session (derived, sales) #5",
+      "input": {
+        "args": [600000]
+      },
+      "expected": {
+        "amountMinor": 600000,
+        "currency": "PHP"
+      }
+    },
+    {
+      "name": "clubSalesReport › shows a negative left over for a tester club (derived, sales)",
+      "input": {
+        "args": [-1500]
+      },
+      "expected": {
+        "amountMinor": -1500,
+        "currency": "PHP"
+      }
+    }
+  ]
+}

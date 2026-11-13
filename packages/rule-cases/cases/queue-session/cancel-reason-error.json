@@ -1,0 +1,33 @@
+{
+  "rule": "queue-session/cancel-reason-error",
+  "version": 1,
+  "cases": [
+    {
+      "name": "Cancel session › trims the optional reason and caps it at 120 characters (queueSession) #1",
+      "input": {
+        "args": [
+          "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        ]
+      },
+      "expected": null
+    },
+    {
+      "name": "Cancel session › trims the optional reason and caps it at 120 characters (queueSession) #2",
+      "input": {
+        "args": [
+          " xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx "
+        ]
+      },
+      "expected": null
+    },
+    {
+      "name": "Cancel session › trims the optional reason and caps it at 120 characters (derived, queueSession)",
+      "input": {
+        "args": [
+          "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        ]
+      },
+      "expected": "Keep the reason to 120 characters."
+    }
+  ]
+}

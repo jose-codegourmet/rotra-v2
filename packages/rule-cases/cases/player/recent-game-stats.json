@@ -1,0 +1,620 @@
+{
+  "rule": "player/recent-game-stats",
+  "version": 1,
+  "cases": [
+    {
+      "name": "Stats · last 90 days (#731) › counts every game inside the rank window, wins and losses, and a whole-percent rate (player) #1",
+      "input": {
+        "args": [
+          [
+            {
+              "id": "stats-s0",
+              "title": "Sunday Night Queue",
+              "clubName": "Lahug Smash Club",
+              "finishedAt": "2026-10-22T04:00:00.000Z",
+              "sessionPageUrl": null,
+              "games": [
+                {
+                  "id": "stats-0-0",
+                  "format": "doubles",
+                  "partners": ["Andrew"],
+                  "opponents": ["Ezzy", "Gretchen"],
+                  "result": "lost",
+                  "score": "12–21",
+                  "counting": "counted",
+                  "note": ""
+                },
+                {
+                  "id": "stats-0-1",
+                  "format": "doubles",
+                  "partners": ["Trixie"],
+                  "opponents": ["Shadow", "Ley"],
+                  "result": "won",
+                  "score": "21–11",
+                  "counting": "counted",
+                  "note": ""
+                },
+                {
+                  "id": "stats-0-2",
+                  "format": "singles",
+                  "partners": [],
+                  "opponents": ["PJ Perez"],
+                  "result": "lost",
+                  "score": "10–21",
+                  "counting": "counted",
+                  "note": ""
+                },
+                {
+                  "id": "stats-0-3",
+                  "format": "doubles",
+                  "partners": ["PJ Perez"],
+                  "opponents": ["Camill", "Dexter Opalla"],
+                  "result": "won",
+                  "score": "21–9",
+                  "counting": "counted",
+                  "note": ""
+                },
+                {
+                  "id": "stats-fun",
+                  "format": "fun_4v4",
+                  "partners": ["Albion", "Rhyco", "Emman"],
+                  "opponents": ["Shadow", "Ezzy", "Camill", "PJ Perez"],
+                  "result": "lost",
+                  "score": "18–21",
+                  "counting": "fun",
+                  "note": ""
+                }
+              ]
+            },
+            {
+              "id": "stats-s1",
+              "title": "Saturday Morning Rally",
+              "clubName": "Mandaue Shuttle Society",
+              "finishedAt": "2026-10-15T04:00:00.000Z",
+              "sessionPageUrl": null,
+              "games": [
+                {
+                  "id": "stats-1-0",
+                  "format": "doubles",
+                  "partners": ["Tricia"],
+                  "opponents": ["Ley", "Iovanni"],
+                  "result": "lost",
+                  "score": "10–21",
+                  "counting": "counted",
+                  "note": ""
+                },
+                {
+                  "id": "stats-1-1",
+                  "format": "singles",
+                  "partners": [],
+                  "opponents": ["Gretchen"],
+                  "result": "won",
+                  "score": "21–11",
+                  "counting": "counted",
+                  "note": ""
+                },
+                {
+                  "id": "stats-1-2",
+                  "format": "doubles",
+                  "partners": ["Joeriz"],
+                  "opponents": ["Dexter Opalla", "Tirby"],
+                  "result": "lost",
+                  "score": "19–21",
+                  "counting": "counted",
+                  "note": ""
+                }
+              ]
+            },
+            {
+              "id": "stats-s2",
+              "title": "Wednesday Ladder Night",
+              "clubName": "Talamban Racket Club",
+              "finishedAt": "2026-10-11T04:00:00.000Z",
+              "sessionPageUrl": null,
+              "games": [
+                {
+                  "id": "stats-2-0",
+                  "format": "doubles",
+                  "partners": ["Robert"],
+                  "opponents": ["Emji", "Gretchen"],
+                  "result": "won",
+                  "score": null,
+                  "counting": "counted",
+                  "note": ""
+                },
+                {
+                  "id": "stats-2-1",
+                  "format": "doubles",
+                  "partners": ["Dhin"],
+                  "opponents": ["Klent", "Ley"],
+                  "result": "won",
+                  "score": null,
+                  "counting": "counted",
+                  "note": ""
+                },
+                {
+                  "id": "stats-2-2",
+                  "format": "doubles",
+                  "partners": ["Neil"],
+                  "opponents": ["Raymark", "Sam"],
+                  "result": "lost",
+                  "score": "12–21",
+                  "counting": "counted",
+                  "note": ""
+                },
+                {
+                  "id": "stats-2-3",
+                  "format": "doubles",
+                  "partners": ["Iovanni"],
+                  "opponents": ["Nathan", "Jay"],
+                  "result": "won",
+                  "score": "21–11",
+                  "counting": "counted",
+                  "note": ""
+                }
+              ]
+            },
+            {
+              "id": "stats-s3",
+              "title": "Lunch Break Doubles",
+              "clubName": "IT Park Badminton Club",
+              "finishedAt": "2026-10-08T04:00:00.000Z",
+              "sessionPageUrl": null,
+              "games": [
+                {
+                  "id": "stats-3-0",
+                  "format": "doubles",
+                  "partners": ["Dexter Opalla"],
+                  "opponents": ["Santino", "Klod"],
+                  "result": "won",
+                  "score": "21–16",
+                  "counting": "counted",
+                  "note": ""
+                }
+              ]
+            }
+          ],
+          {
+            "$date": "2026-10-27T04:00:00.000Z"
+          }
+        ],
+        "select": "games"
+      },
+      "expected": 13
+    },
+    {
+      "name": "Stats · last 90 days (#731) › counts every game inside the rank window, wins and losses, and a whole-percent rate (player) #2",
+      "input": {
+        "args": [
+          [
+            {
+              "id": "stats-s0",
+              "title": "Sunday Night Queue",
+              "clubName": "Lahug Smash Club",
+              "finishedAt": "2026-10-22T04:00:00.000Z",
+              "sessionPageUrl": null,
+              "games": [
+                {
+                  "id": "stats-0-0",
+                  "format": "doubles",
+                  "partners": ["Andrew"],
+                  "opponents": ["Ezzy", "Gretchen"],
+                  "result": "lost",
+                  "score": "12–21",
+                  "counting": "counted",
+                  "note": ""
+                },
+                {
+                  "id": "stats-0-1",
+                  "format": "doubles",
+                  "partners": ["Trixie"],
+                  "opponents": ["Shadow", "Ley"],
+                  "result": "won",
+                  "score": "21–11",
+                  "counting": "counted",
+                  "note": ""
+                },
+                {
+                  "id": "stats-0-2",
+                  "format": "singles",
+                  "partners": [],
+                  "opponents": ["PJ Perez"],
+                  "result": "lost",
+                  "score": "10–21",
+                  "counting": "counted",
+                  "note": ""
+                },
+                {
+                  "id": "stats-0-3",
+                  "format": "doubles",
+                  "partners": ["PJ Perez"],
+                  "opponents": ["Camill", "Dexter Opalla"],
+                  "result": "won",
+                  "score": "21–9",
+                  "counting": "counted",
+                  "note": ""
+                },
+                {
+                  "id": "stats-fun",
+                  "format": "fun_4v4",
+                  "partners": ["Albion", "Rhyco", "Emman"],
+                  "opponents": ["Shadow", "Ezzy", "Camill", "PJ Perez"],
+                  "result": "lost",
+                  "score": "18–21",
+                  "counting": "fun",
+                  "note": ""
+                }
+              ]
+            },
+            {
+              "id": "stats-s1",
+              "title": "Saturday Morning Rally",
+              "clubName": "Mandaue Shuttle Society",
+              "finishedAt": "2026-10-15T04:00:00.000Z",
+              "sessionPageUrl": null,
+              "games": [
+                {
+                  "id": "stats-1-0",
+                  "format": "doubles",
+                  "partners": ["Tricia"],
+                  "opponents": ["Ley", "Iovanni"],
+                  "result": "lost",
+                  "score": "10–21",
+                  "counting": "counted",
+                  "note": ""
+                },
+                {
+                  "id": "stats-1-1",
+                  "format": "singles",
+                  "partners": [],
+                  "opponents": ["Gretchen"],
+                  "result": "won",
+                  "score": "21–11",
+                  "counting": "counted",
+                  "note": ""
+                },
+                {
+                  "id": "stats-1-2",
+                  "format": "doubles",
+                  "partners": ["Joeriz"],
+                  "opponents": ["Dexter Opalla", "Tirby"],
+                  "result": "lost",
+                  "score": "19–21",
+                  "counting": "counted",
+                  "note": ""
+                }
+              ]
+            },
+            {
+              "id": "stats-s2",
+              "title": "Wednesday Ladder Night",
+              "clubName": "Talamban Racket Club",
+              "finishedAt": "2026-10-11T04:00:00.000Z",
+              "sessionPageUrl": null,
+              "games": [
+                {
+                  "id": "stats-2-0",
+                  "format": "doubles",
+                  "partners": ["Robert"],
+                  "opponents": ["Emji", "Gretchen"],
+                  "result": "won",
+                  "score": null,
+                  "counting": "counted",
+                  "note": ""
+                },
+                {
+                  "id": "stats-2-1",
+                  "format": "doubles",
+                  "partners": ["Dhin"],
+                  "opponents": ["Klent", "Ley"],
+                  "result": "won",
+                  "score": null,
+                  "counting": "counted",
+                  "note": ""
+                },
+                {
+                  "id": "stats-2-2",
+                  "format": "doubles",
+                  "partners": ["Neil"],
+                  "opponents": ["Raymark", "Sam"],
+                  "result": "lost",
+                  "score": "12–21",
+                  "counting": "counted",
+                  "note": ""
+                },
+                {
+                  "id": "stats-2-3",
+                  "format": "doubles",
+                  "partners": ["Iovanni"],
+                  "opponents": ["Nathan", "Jay"],
+                  "result": "won",
+                  "score": "21–11",
+                  "counting": "counted",
+                  "note": ""
+                }
+              ]
+            },
+            {
+              "id": "stats-s3",
+              "title": "Lunch Break Doubles",
+              "clubName": "IT Park Badminton Club",
+              "finishedAt": "2026-10-08T04:00:00.000Z",
+              "sessionPageUrl": null,
+              "games": [
+                {
+                  "id": "stats-3-0",
+                  "format": "doubles",
+                  "partners": ["Dexter Opalla"],
+                  "opponents": ["Santino", "Klod"],
+                  "result": "won",
+                  "score": "21–16",
+                  "counting": "counted",
+                  "note": ""
+                }
+              ]
+            }
+          ],
+          {
+            "$date": "2026-10-27T04:00:00.000Z"
+          }
+        ],
+        "select": "wins"
+      },
+      "expected": 7
+    },
+    {
+      "name": "Stats · last 90 days (#731) › counts every game inside the rank window, wins and losses, and a whole-percent rate (player) #3",
+      "input": {
+        "args": [
+          [
+            {
+              "id": "stats-s0",
+              "title": "Sunday Night Queue",
+              "clubName": "Lahug Smash Club",
+              "finishedAt": "2026-10-22T04:00:00.000Z",
+              "sessionPageUrl": null,
+              "games": [
+                {
+                  "id": "stats-0-0",
+                  "format": "doubles",
+                  "partners": ["Andrew"],
+                  "opponents": ["Ezzy", "Gretchen"],
+                  "result": "lost",
+                  "score": "12–21",
+                  "counting": "counted",
+                  "note": ""
+                },
+                {
+                  "id": "stats-0-1",
+                  "format": "doubles",
+                  "partners": ["Trixie"],
+                  "opponents": ["Shadow", "Ley"],
+                  "result": "won",
+                  "score": "21–11",
+                  "counting": "counted",
+                  "note": ""
+                },
+                {
+                  "id": "stats-0-2",
+                  "format": "singles",
+                  "partners": [],
+                  "opponents": ["PJ Perez"],
+                  "result": "lost",
+                  "score": "10–21",
+                  "counting": "counted",
+                  "note": ""
+                },
+                {
+                  "id": "stats-0-3",
+                  "format": "doubles",
+                  "partners": ["PJ Perez"],
+                  "opponents": ["Camill", "Dexter Opalla"],
+                  "result": "won",
+                  "score": "21–9",
+                  "counting": "counted",
+                  "note": ""
+                },
+                {
+                  "id": "stats-fun",
+                  "format": "fun_4v4",
+                  "partners": ["Albion", "Rhyco", "Emman"],
+                  "opponents": ["Shadow", "Ezzy", "Camill", "PJ Perez"],
+                  "result": "lost",
+                  "score": "18–21",
+                  "counting": "fun",
+                  "note": ""
+                }
+              ]
+            },
+            {
+              "id": "stats-s1",
+              "title": "Saturday Morning Rally",
+              "clubName": "Mandaue Shuttle Society",
+              "finishedAt": "2026-10-15T04:00:00.000Z",
+              "sessionPageUrl": null,
+              "games": [
+                {
+                  "id": "stats-1-0",
+                  "format": "doubles",
+                  "partners": ["Tricia"],
+                  "opponents": ["Ley", "Iovanni"],
+                  "result": "lost",
+                  "score": "10–21",
+                  "counting": "counted",
+                  "note": ""
+                },
+                {
+                  "id": "stats-1-1",
+                  "format": "singles",
+                  "partners": [],
+                  "opponents": ["Gretchen"],
+                  "result": "won",
+                  "score": "21–11",
+                  "counting": "counted",
+                  "note": ""
+                },
+                {
+                  "id": "stats-1-2",
+                  "format": "doubles",
+                  "partners": ["Joeriz"],
+                  "opponents": ["Dexter Opalla", "Tirby"],
+                  "result": "lost",
+                  "score": "19–21",
+                  "counting": "counted",
+                  "note": ""
+                }
+              ]
+            },
+            {
+              "id": "stats-s2",
+              "title": "Wednesday Ladder Night",
+              "clubName": "Talamban Racket Club",
+              "finishedAt": "2026-10-11T04:00:00.000Z",
+              "sessionPageUrl": null,
+              "games": [
+                {
+                  "id": "stats-2-0",
+                  "format": "doubles",
+                  "partners": ["Robert"],
+                  "opponents": ["Emji", "Gretchen"],
+                  "result": "won",
+                  "score": null,
+                  "counting": "counted",
+                  "note": ""
+                },
+                {
+                  "id": "stats-2-1",
+                  "format": "doubles",
+                  "partners": ["Dhin"],
+                  "opponents": ["Klent", "Ley"],
+                  "result": "won",
+                  "score": null,
+                  "counting": "counted",
+                  "note": ""
+                },
+                {
+                  "id": "stats-2-2",
+                  "format": "doubles",
+                  "partners": ["Neil"],
+                  "opponents": ["Raymark", "Sam"],
+                  "result": "lost",
+                  "score": "12–21",
+                  "counting": "counted",
+                  "note": ""
+                },
+                {
+                  "id": "stats-2-3",
+                  "format": "doubles",
+                  "partners": ["Iovanni"],
+                  "opponents": ["Nathan", "Jay"],
+                  "result": "won",
+                  "score": "21–11",
+                  "counting": "counted",
+                  "note": ""
+                }
+              ]
+            },
+            {
+              "id": "stats-s3",
+              "title": "Lunch Break Doubles",
+              "clubName": "IT Park Badminton Club",
+              "finishedAt": "2026-10-08T04:00:00.000Z",
+              "sessionPageUrl": null,
+              "games": [
+                {
+                  "id": "stats-3-0",
+                  "format": "doubles",
+                  "partners": ["Dexter Opalla"],
+                  "opponents": ["Santino", "Klod"],
+                  "result": "won",
+                  "score": "21–16",
+                  "counting": "counted",
+                  "note": ""
+                }
+              ]
+            }
+          ],
+          {
+            "$date": "2026-10-27T04:00:00.000Z"
+          }
+        ],
+        "select": "winRate"
+      },
+      "expected": 54
+    },
+    {
+      "name": "Stats · last 90 days (#731) › is null without games in the window (\"No games yet\") (player) #1",
+      "input": {
+        "args": [
+          [],
+          {
+            "$date": "2026-10-27T04:00:00.000Z"
+          }
+        ]
+      },
+      "expected": null
+    },
+    {
+      "name": "Stats · last 90 days (#731) › is null without games in the window (\"No games yet\") (player) #2",
+      "input": {
+        "args": [
+          [
+            {
+              "id": "old-s0",
+              "title": "Saturday Morning Rally",
+              "clubName": "Mandaue Shuttle Society",
+              "finishedAt": "2026-06-29T04:00:00.000Z",
+              "sessionPageUrl": null,
+              "games": [
+                {
+                  "id": "old-0-0",
+                  "format": "doubles",
+                  "partners": ["Gretchen"],
+                  "opponents": ["Tricia", "Iovanni"],
+                  "result": "lost",
+                  "score": "16–21",
+                  "counting": "counted",
+                  "note": ""
+                },
+                {
+                  "id": "old-0-1",
+                  "format": "doubles",
+                  "partners": ["Dexter Opalla"],
+                  "opponents": ["Natnat", "Neil"],
+                  "result": "won",
+                  "score": "21–16",
+                  "counting": "counted",
+                  "note": ""
+                },
+                {
+                  "id": "old-0-2",
+                  "format": "singles",
+                  "partners": [],
+                  "opponents": ["Edrian"],
+                  "result": "won",
+                  "score": "21–18",
+                  "counting": "counted",
+                  "note": ""
+                },
+                {
+                  "id": "old-fun",
+                  "format": "fun_4v4",
+                  "partners": ["Joeriz", "Natnat", "Tricia"],
+                  "opponents": ["David", "Edrian", "Russel", "CJ"],
+                  "result": "lost",
+                  "score": "18–21",
+                  "counting": "fun",
+                  "note": ""
+                }
+              ]
+            }
+          ],
+          {
+            "$date": "2026-10-27T04:00:00.000Z"
+          }
+        ]
+      },
+      "expected": null
+    }
+  ]
+}

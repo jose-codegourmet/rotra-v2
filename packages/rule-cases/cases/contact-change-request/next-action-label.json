@@ -1,0 +1,48 @@
+{
+  "rule": "contact-change-request/next-action-label",
+  "version": 1,
+  "cases": [
+    {
+      "name": "checks before approving (rotra-admin.html checks()) › flags another change for the same player still being applied (contactChangeRequest) #1",
+      "input": {
+        "args": ["pending", false]
+      },
+      "expected": "Review"
+    },
+    {
+      "name": "checks before approving (rotra-admin.html checks()) › flags another change for the same player still being applied (contactChangeRequest) #2",
+      "input": {
+        "args": ["pending", true]
+      },
+      "expected": "Review · blocked"
+    },
+    {
+      "name": "checks before approving (rotra-admin.html checks()) › flags another change for the same player still being applied (contactChangeRequest) #3",
+      "input": {
+        "args": ["applying", false]
+      },
+      "expected": "Check status"
+    },
+    {
+      "name": "checks before approving (rotra-admin.html checks()) › flags another change for the same player still being applied (contactChangeRequest) #4",
+      "input": {
+        "args": ["failed", false]
+      },
+      "expected": "Retry application"
+    },
+    {
+      "name": "checks before approving (rotra-admin.html checks()) › flags another change for the same player still being applied (contactChangeRequest) #5",
+      "input": {
+        "args": ["applied", false]
+      },
+      "expected": "View"
+    },
+    {
+      "name": "checks before approving (rotra-admin.html checks()) › flags another change for the same player still being applied (contactChangeRequest) #6",
+      "input": {
+        "args": ["rejected", false]
+      },
+      "expected": "View"
+    }
+  ]
+}

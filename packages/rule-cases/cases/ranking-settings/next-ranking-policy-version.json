@@ -34,6 +34,39 @@
         "effectiveAt": "2026-10-29T19:52:00+08:00",
         "createdByEmail": "owner@rotra.example"
       }
+    },
+    {
+      "name": "versions › appends version + 1 with the Manila time, leaving the old version untouched (derived, rankingSettings)",
+      "input": {
+        "args": [
+          {
+            "version": 1,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "effectiveAt": "2026-01-05T09:00:00+08:00",
+            "createdByEmail": "owner@rotra.example"
+          },
+          {
+            "assessmentWeightBp": 6000,
+            "performanceWeightBp": 4000,
+            "recentStandardMatchThreshold": 12,
+            "changeNote": "  "
+          },
+          {
+            "createdByEmail": "owner@rotra.example",
+            "at": 1793274720000
+          }
+        ]
+      },
+      "expected": {
+        "version": 2,
+        "assessmentWeightBp": 6000,
+        "performanceWeightBp": 4000,
+        "recentStandardMatchThreshold": 12,
+        "effectiveAt": "2026-10-29T19:52:00+08:00",
+        "createdByEmail": "owner@rotra.example"
+      }
     }
   ]
 }

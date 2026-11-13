@@ -1,0 +1,202 @@
+{
+  "rule": "admin-player/same-name-groups",
+  "version": 1,
+  "cases": [
+    {
+      "name": "same-name detection › flags exact duplicates only (test-only twins) (adminPlayer)",
+      "input": {
+        "args": [
+          [
+            {
+              "name": "Carlo Medina"
+            },
+            {
+              "name": "Jose"
+            },
+            {
+              "name": "Carlo Medina"
+            },
+            {
+              "name": "carlo medina"
+            }
+          ]
+        ]
+      },
+      "expected": [
+        {
+          "name": "Carlo Medina",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "name": "same-name detection › the real pool has no shared names (adminPlayer)",
+      "input": {
+        "args": [
+          [
+            {
+              "name": "Jose"
+            },
+            {
+              "name": "Aaron"
+            },
+            {
+              "name": "Raymark"
+            },
+            {
+              "name": "Mikee Abellana"
+            },
+            {
+              "name": "Gab"
+            },
+            {
+              "name": "Dexter"
+            },
+            {
+              "name": "Dalton"
+            },
+            {
+              "name": "Albion"
+            },
+            {
+              "name": "Vince"
+            },
+            {
+              "name": "Karl"
+            },
+            {
+              "name": "Jasper"
+            },
+            {
+              "name": "Emji"
+            },
+            {
+              "name": "Santino"
+            },
+            {
+              "name": "Andrew"
+            },
+            {
+              "name": "Derrick"
+            },
+            {
+              "name": "Trixie"
+            },
+            {
+              "name": "Gretchen"
+            },
+            {
+              "name": "Jess"
+            },
+            {
+              "name": "Natnat"
+            },
+            {
+              "name": "Dhin"
+            },
+            {
+              "name": "Maria Steph"
+            },
+            {
+              "name": "Jay"
+            },
+            {
+              "name": "Iovanni"
+            },
+            {
+              "name": "Troy"
+            },
+            {
+              "name": "Neil"
+            },
+            {
+              "name": "Mark"
+            },
+            {
+              "name": "Tracy"
+            },
+            {
+              "name": "Tirby"
+            },
+            {
+              "name": "Lalai"
+            },
+            {
+              "name": "CJ"
+            },
+            {
+              "name": "Emman"
+            },
+            {
+              "name": "Rhyco"
+            },
+            {
+              "name": "Anton"
+            },
+            {
+              "name": "Edrian"
+            },
+            {
+              "name": "Ezzy"
+            },
+            {
+              "name": "Klent"
+            },
+            {
+              "name": "Chase"
+            },
+            {
+              "name": "David"
+            },
+            {
+              "name": "Shadow"
+            },
+            {
+              "name": "Dexter Opalla"
+            },
+            {
+              "name": "Dian Tan"
+            },
+            {
+              "name": "Tricia"
+            },
+            {
+              "name": "PJ Perez"
+            },
+            {
+              "name": "Camill"
+            },
+            {
+              "name": "Ley"
+            },
+            {
+              "name": "Sam"
+            },
+            {
+              "name": "Robert"
+            },
+            {
+              "name": "Joeriz"
+            },
+            {
+              "name": "Klod"
+            },
+            {
+              "name": "Russel"
+            },
+            {
+              "name": "Nathan"
+            },
+            {
+              "name": "Kenji"
+            },
+            {
+              "name": "Kenjie"
+            }
+          ]
+        ]
+      },
+      "expected": []
+    }
+  ]
+}

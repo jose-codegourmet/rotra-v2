@@ -1,0 +1,48 @@
+{
+  "rule": "club-player/saved-player-week-start",
+  "version": 1,
+  "cases": [
+    {
+      "name": "Saved player statistics › includes Monday midnight and now, excludes missing, invalid, past and future dates (savedPlayerStats) #1",
+      "input": {
+        "args": [1792943999999]
+      },
+      "expected": 1792339200000
+    },
+    {
+      "name": "Saved player statistics › includes Monday midnight and now, excludes missing, invalid, past and future dates (savedPlayerStats) #2",
+      "input": {
+        "args": [1792944000000]
+      },
+      "expected": 1792944000000
+    },
+    {
+      "name": "Saved player statistics › includes Monday midnight and now, excludes missing, invalid, past and future dates (savedPlayerStats) #3",
+      "input": {
+        "args": [1793548799999]
+      },
+      "expected": 1792944000000
+    },
+    {
+      "name": "Saved player statistics › includes Monday midnight and now, excludes missing, invalid, past and future dates (savedPlayerStats) #4",
+      "input": {
+        "args": [1793548800000]
+      },
+      "expected": 1793548800000
+    },
+    {
+      "name": "Saved player statistics › includes Monday midnight and now, excludes missing, invalid, past and future dates (savedPlayerStats) #5",
+      "input": {
+        "args": [1798776000000]
+      },
+      "expected": 1798387200000
+    },
+    {
+      "name": "Saved player statistics › includes Monday midnight and now, excludes missing, invalid, past and future dates (savedPlayerStats) #6",
+      "input": {
+        "args": [1835496000000]
+      },
+      "expected": 1835280000000
+    }
+  ]
+}

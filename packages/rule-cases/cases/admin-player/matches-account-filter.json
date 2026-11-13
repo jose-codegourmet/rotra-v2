@@ -1,0 +1,34 @@
+{
+  "rule": "admin-player/matches-account-filter",
+  "version": 1,
+  "cases": [
+    {
+      "name": "account filter › splits registered and unclaimed (adminPlayer) #1",
+      "input": {
+        "args": [true]
+      },
+      "expected": true
+    },
+    {
+      "name": "account filter › splits registered and unclaimed (adminPlayer) #2",
+      "input": {
+        "args": [true, "registered"]
+      },
+      "expected": true
+    },
+    {
+      "name": "account filter › splits registered and unclaimed (adminPlayer) #3",
+      "input": {
+        "args": [true, "unclaimed"]
+      },
+      "expected": false
+    },
+    {
+      "name": "account filter › splits registered and unclaimed (adminPlayer) #4",
+      "input": {
+        "args": [false, "unclaimed"]
+      },
+      "expected": true
+    }
+  ]
+}

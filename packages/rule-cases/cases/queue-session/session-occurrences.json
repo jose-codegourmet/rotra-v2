@@ -1,0 +1,56 @@
+{
+  "rule": "queue-session/session-occurrences",
+  "version": 1,
+  "cases": [
+    {
+      "name": "clashes › lets a new session take the time of a cancelled one (queueSession) #1",
+      "input": {
+        "args": [
+          {
+            "scheduledStartAt": 1795172400000,
+            "scheduledEndAt": 1795179600000,
+            "venueId": "venue-1"
+          },
+          [
+            {
+              "id": "other",
+              "title": "Friday Night",
+              "state": "cancelled",
+              "venueId": "venue-1",
+              "venueName": "Lahug Courts",
+              "scheduledStartAt": 1795172400000,
+              "scheduledEndAt": 1795183200000
+            }
+          ]
+        ],
+        "select": "0.clash"
+      },
+      "expected": null
+    },
+    {
+      "name": "clashes › lets a new session take the time of a cancelled one (queueSession) #2",
+      "input": {
+        "args": [
+          {
+            "scheduledStartAt": 1795172400000,
+            "scheduledEndAt": 1795179600000,
+            "venueId": "venue-1"
+          },
+          [
+            {
+              "id": "other",
+              "title": "Friday Night",
+              "state": "prepared",
+              "venueId": "venue-1",
+              "venueName": "Lahug Courts",
+              "scheduledStartAt": 1795172400000,
+              "scheduledEndAt": 1795183200000
+            }
+          ]
+        ],
+        "select": "0.clash.kind"
+      },
+      "expected": "venue"
+    }
+  ]
+}

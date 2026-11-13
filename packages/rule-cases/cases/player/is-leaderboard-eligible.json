@@ -1,0 +1,20 @@
+{
+  "rule": "player/is-leaderboard-eligible",
+  "version": 1,
+  "cases": [
+    {
+      "name": "prototype ranking eligibility rules › nine standard plus twenty fun games cannot meet ten (player)",
+      "input": {
+        "args": [9, 10, "established"]
+      },
+      "expected": false
+    },
+    {
+      "name": "prototype ranking eligibility rules › reassessment removes placement even with old games and a stale position (player)",
+      "input": {
+        "args": [0, 10, "needs_reassessment"]
+      },
+      "expected": false
+    }
+  ]
+}

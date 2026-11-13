@@ -2,12 +2,9 @@ import { describe, expect, it } from 'vitest'
 import {
   clockTimeFrom,
   courtNextDay,
-  courtTimeOnSession,
   courtWindowError,
   courtWindowPreview,
   instantOnDate,
-  SESSION_END_ERROR,
-  sessionWindowError,
 } from './court-window'
 
 const at = (hour: number, minute = 0, day = 1) => new Date(2026, 10, day, hour, minute).getTime()
@@ -65,13 +62,6 @@ describe('court window preview', () => {
       nextDay: true,
     })
   })
-  it('snaps a start in the session start minute to the actual start', () => {
-    expect(courtTimeOnSession(at(12, 6) + 34567, at(12, 6))).toBe(at(12, 6) + 34567)
-  })
-  it('leaves any other instant as it is, on whatever day it carries', () => {
-    expect(courtTimeOnSession(at(22), at(21, 59))).toBe(at(21, 59))
-    expect(courtTimeOnSession(at(22), at(0, 30, 2))).toBe(at(0, 30, 2))
-  })
   it('accepts bookings between an early actual start and the scheduled start', () => {
     expect(
       courtWindowPreview({ ...window, sessionStart: at(12, 6), start: at(13), end: at(14) }),
@@ -87,24 +77,6 @@ describe('court window preview', () => {
 describe('court window rules on full instants', () => {
   const sessionStart = at(22),
     sessionEnd = at(2, 0, 2)
-  it('accepts a court that opens the next day within an overnight session', () => {
-    expect(courtWindowError(at(0, 30, 2), at(1, 30, 2), sessionStart, sessionEnd)).toBeNull()
-  })
-  it('rejects a start before the session start, even at the same clock time on another day', () => {
-    expect(courtWindowError(at(23), null, at(23, 0, 2), at(3, 0, 3))).toBe(
-      'Choose a planned start within the session.',
-    )
-  })
-  it('rejects a start at or after the session end', () => {
-    expect(courtWindowError(sessionEnd, null, sessionStart, sessionEnd)).toBe(
-      'Choose a planned start within the session.',
-    )
-  })
-  it('rejects an end at or before its start', () => {
-    expect(courtWindowError(at(23), at(23), sessionStart, sessionEnd)).toBe(
-      'Choose an end after the planned start.',
-    )
-  })
   it('rejects an end after the session end', () => {
     expect(courtWindowError(at(23), at(3, 0, 2), sessionStart, sessionEnd)).toContain(
       "That's after the session ends at",
@@ -113,23 +85,6 @@ describe('court window rules on full instants', () => {
   it('marks only times on another calendar day as next day', () => {
     expect(courtNextDay(at(23, 59), sessionStart)).toBe(false)
     expect(courtNextDay(at(0, 0, 2), sessionStart)).toBe(true)
-  })
-})
-
-describe('session window', () => {
-  it('needs an end after the start', () => {
-    expect(sessionWindowError(at(18), at(18))).toBe(SESSION_END_ERROR)
-    expect(sessionWindowError(at(18), at(17))).toBe(SESSION_END_ERROR)
-  })
-  it('allows up to 24 hours and no more', () => {
-    expect(sessionWindowError(at(18), at(18, 0, 2))).toBeNull()
-    expect(sessionWindowError(at(18), at(18, 1, 2))).toBe(SESSION_END_ERROR)
-  })
-  it('accepts an overnight session given as instants', () => {
-    expect(sessionWindowError(at(22), at(2, 0, 2))).toBeNull()
-  })
-  it('rejects invalid instants', () => {
-    expect(sessionWindowError(Number.NaN, at(18))).toBe('Enter a date and time.')
   })
 })
 

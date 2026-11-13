@@ -1,0 +1,64 @@
+{
+  "rule": "player/order-leaderboard",
+  "version": 1,
+  "cases": [
+    {
+      "name": "prototype ranking eligibility rules › reassessment removes placement even with old games and a stale position (player)",
+      "input": {
+        "args": [
+          [
+            {
+              "level": 5,
+              "state": "needs_reassessment",
+              "updatePending": null,
+              "position": null,
+              "recentCount": 14,
+              "matchRequirement": 10,
+              "levelIndex": 5
+            }
+          ],
+          10
+        ]
+      },
+      "expected": []
+    },
+    {
+      "name": "prototype ranking eligibility rules › raising the requirement to twelve removes eleven (player) #1",
+      "input": {
+        "args": [
+          [
+            {
+              "levelIndex": 5,
+              "state": "established",
+              "recentCount": 11
+            }
+          ],
+          10
+        ]
+      },
+      "expected": [
+        {
+          "levelIndex": 5,
+          "state": "established",
+          "recentCount": 11
+        }
+      ]
+    },
+    {
+      "name": "prototype ranking eligibility rules › raising the requirement to twelve removes eleven (player) #2",
+      "input": {
+        "args": [
+          [
+            {
+              "levelIndex": 5,
+              "state": "established",
+              "recentCount": 11
+            }
+          ],
+          12
+        ]
+      },
+      "expected": []
+    }
+  ]
+}

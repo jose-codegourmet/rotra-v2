@@ -1,0 +1,28 @@
+{
+  "rule": "license/manila-today",
+  "version": 1,
+  "cases": [
+    {
+      "name": "dates (rotra-admin.html addMonths / diffDays) › reads today in Manila (license) #1",
+      "input": {
+        "args": [
+          {
+            "$date": "2026-10-27T16:30:00.000Z"
+          }
+        ]
+      },
+      "expected": "2026-10-28"
+    },
+    {
+      "name": "dates (rotra-admin.html addMonths / diffDays) › reads today in Manila (license) #2",
+      "input": {
+        "args": [
+          {
+            "$date": "2026-10-27T15:59:00.000Z"
+          }
+        ]
+      },
+      "expected": "2026-10-27"
+    }
+  ]
+}

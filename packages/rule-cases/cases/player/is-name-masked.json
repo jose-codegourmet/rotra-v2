@@ -1,0 +1,124 @@
+{
+  "rule": "player/is-name-masked",
+  "version": 1,
+  "cases": [
+    {
+      "name": "Profile visibility › name masking (D-2026-11-12-01) › never masks a public profile (visibility) #1",
+      "input": {
+        "args": [
+          "public",
+          {
+            "signedIn": false,
+            "isSelf": false
+          }
+        ]
+      },
+      "expected": false
+    },
+    {
+      "name": "Profile visibility › name masking (D-2026-11-12-01) › never masks a public profile (visibility) #2",
+      "input": {
+        "args": [
+          "public",
+          {
+            "signedIn": true,
+            "isSelf": false
+          }
+        ]
+      },
+      "expected": false
+    },
+    {
+      "name": "Profile visibility › name masking (D-2026-11-12-01) › masks a private profile for visitors only (visibility) #1",
+      "input": {
+        "args": [
+          "private",
+          {
+            "signedIn": false,
+            "isSelf": false
+          }
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "Profile visibility › name masking (D-2026-11-12-01) › masks a private profile for visitors only (visibility) #2",
+      "input": {
+        "args": [
+          "private",
+          {
+            "signedIn": true,
+            "isSelf": false
+          }
+        ]
+      },
+      "expected": false
+    },
+    {
+      "name": "Profile visibility › name masking (D-2026-11-12-01) › masks a private profile for visitors only (visibility) #3",
+      "input": {
+        "args": [
+          "private",
+          {
+            "signedIn": true,
+            "isSelf": true
+          }
+        ]
+      },
+      "expected": false
+    },
+    {
+      "name": "Profile visibility › name masking (D-2026-11-12-01) › masks an always-private profile for everyone but the player and their Queue Master (visibility) #1",
+      "input": {
+        "args": [
+          "always_private",
+          {
+            "signedIn": false,
+            "isSelf": false
+          }
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "Profile visibility › name masking (D-2026-11-12-01) › masks an always-private profile for everyone but the player and their Queue Master (visibility) #2",
+      "input": {
+        "args": [
+          "always_private",
+          {
+            "signedIn": true,
+            "isSelf": false
+          }
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "Profile visibility › name masking (D-2026-11-12-01) › masks an always-private profile for everyone but the player and their Queue Master (visibility) #3",
+      "input": {
+        "args": [
+          "always_private",
+          {
+            "signedIn": true,
+            "isSelf": true
+          }
+        ]
+      },
+      "expected": false
+    },
+    {
+      "name": "Profile visibility › name masking (D-2026-11-12-01) › masks an always-private profile for everyone but the player and their Queue Master (visibility) #4",
+      "input": {
+        "args": [
+          "always_private",
+          {
+            "signedIn": false,
+            "isSelf": false,
+            "queueMaster": true
+          }
+        ]
+      },
+      "expected": false
+    }
+  ]
+}

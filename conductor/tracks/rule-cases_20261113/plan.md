@@ -17,7 +17,7 @@ JSON files land in the backend PR; the Vitest switch is a separate frontend PR (
 
 Ticket: needed
 
-- [ ] **2.1** Session cost and payments
+- [x] **2.1** Session cost and payments
 - [ ] **2.2** Match, auto-queue and auto-fill rules
 - [ ] **2.3** Session result and ranking settings
 - [ ] **2.4** License and club rules

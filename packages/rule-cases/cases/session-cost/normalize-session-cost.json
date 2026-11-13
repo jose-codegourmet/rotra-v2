@@ -1,0 +1,61 @@
+{
+  "rule": "session-cost/normalize-session-cost",
+  "version": 1,
+  "cases": [
+    {
+      "name": "session cost estimates in centavos › drops empty and zero-tube lines and saves no estimate for untouched optional fields (sessionCost) #1",
+      "input": {
+        "args": [
+          {
+            "courtFeePerCourtHour": null,
+            "entranceFeePerHead": null,
+            "shuttles": [],
+            "paymentMode": "break_even",
+            "customFeePerHead": null
+          }
+        ]
+      },
+      "expected": null
+    },
+    {
+      "name": "session cost estimates in centavos › drops empty and zero-tube lines and saves no estimate for untouched optional fields (sessionCost) #2",
+      "input": {
+        "args": [
+          {
+            "courtFeePerCourtHour": null,
+            "entranceFeePerHead": null,
+            "shuttles": [
+              {
+                "inventoryItemId": "",
+                "tubes": 2
+              },
+              {
+                "inventoryItemId": "inv1",
+                "tubes": 0
+              }
+            ],
+            "paymentMode": "break_even",
+            "customFeePerHead": null
+          }
+        ]
+      },
+      "expected": null
+    },
+    {
+      "name": "session cost estimates in centavos › drops empty and zero-tube lines and saves no estimate for untouched optional fields (sessionCost) #3",
+      "input": {
+        "args": [
+          {
+            "courtFeePerCourtHour": 0,
+            "entranceFeePerHead": null,
+            "shuttles": [],
+            "paymentMode": "break_even",
+            "customFeePerHead": null
+          }
+        ],
+        "select": "courtFeePerCourtHour"
+      },
+      "expected": 0
+    }
+  ]
+}

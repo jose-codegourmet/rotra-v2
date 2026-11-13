@@ -1,0 +1,107 @@
+{
+  "rule": "session-payment/payment-totals",
+  "version": 1,
+  "cases": [
+    {
+      "name": "payment totals › uses the received amounts while calculating remaining dues at the current fee (sessionPayment)",
+      "input": {
+        "args": [
+          {
+            "marks": [
+              {
+                "amountMinor": 70000
+              },
+              {
+                "amountMinor": 65000
+              }
+            ],
+            "total": 3,
+            "amountDue": 70000,
+            "cost": 200000
+          }
+        ]
+      },
+      "expected": {
+        "paid": 1,
+        "partial": 1,
+        "total": 3,
+        "collected": 135000,
+        "stillDue": 75000,
+        "toReimburse": 0,
+        "againstCosts": -65000,
+        "cost": 200000
+      }
+    },
+    {
+      "name": "payment totals › counts overpayments as paid and totals what to reimburse (sessionPayment)",
+      "input": {
+        "args": [
+          {
+            "marks": [
+              {
+                "amountMinor": 80000
+              },
+              {
+                "amountMinor": null
+              }
+            ],
+            "total": 2,
+            "amountDue": 70000,
+            "cost": null
+          }
+        ]
+      },
+      "expected": {
+        "paid": 2,
+        "partial": 0,
+        "collected": 150000,
+        "stillDue": 0,
+        "toReimburse": 10000
+      }
+    },
+    {
+      "name": "payment totals › keeps no-fee and no-estimate totals unknown (sessionPayment)",
+      "input": {
+        "args": [
+          {
+            "marks": [],
+            "total": 3,
+            "amountDue": null,
+            "cost": null
+          }
+        ]
+      },
+      "expected": {
+        "paid": 0,
+        "partial": 0,
+        "total": 3,
+        "collected": 0,
+        "stillDue": null,
+        "toReimburse": 0,
+        "againstCosts": null,
+        "cost": null
+      }
+    },
+    {
+      "name": "payment totals › handles all paid and a collection surplus (sessionPayment)",
+      "input": {
+        "args": [
+          {
+            "marks": [
+              {
+                "amountMinor": 70000
+              }
+            ],
+            "total": 1,
+            "amountDue": 70000,
+            "cost": 65000
+          }
+        ]
+      },
+      "expected": {
+        "stillDue": 0,
+        "againstCosts": 5000
+      }
+    }
+  ]
+}

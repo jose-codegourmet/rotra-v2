@@ -1,0 +1,151 @@
+{
+  "rule": "session-cost/default-shuttle-plan",
+  "version": 1,
+  "cases": [
+    {
+      "name": "session cost estimates in centavos › suggests the first shuttlecock item, rounded and at least one tube (sessionCost) #1",
+      "input": {
+        "args": [
+          {
+            "courts": 3,
+            "durationMinutes": 180,
+            "players": 14,
+            "inventory": [
+              {
+                "id": "inv1",
+                "clubId": "club",
+                "name": "inv1",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 12,
+                "unitCostMinor": 145000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv2",
+                "clubId": "club",
+                "name": "inv2",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 6,
+                "unitCostMinor": 115000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv3",
+                "clubId": "club",
+                "name": "inv3",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 2,
+                "unitCostMinor": 125000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv4",
+                "clubId": "club",
+                "name": "inv4",
+                "category": "equipment",
+                "unit": "tube",
+                "stock": 24,
+                "unitCostMinor": 8000,
+                "currency": "PHP"
+              }
+            ]
+          }
+        ]
+      },
+      "expected": [
+        {
+          "inventoryItemId": "inv1",
+          "tubes": 6
+        }
+      ]
+    },
+    {
+      "name": "session cost estimates in centavos › suggests the first shuttlecock item, rounded and at least one tube (sessionCost) #2",
+      "input": {
+        "args": [
+          {
+            "courts": 1,
+            "durationMinutes": 30,
+            "players": 14,
+            "inventory": [
+              {
+                "id": "inv1",
+                "clubId": "club",
+                "name": "inv1",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 12,
+                "unitCostMinor": 145000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv2",
+                "clubId": "club",
+                "name": "inv2",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 6,
+                "unitCostMinor": 115000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv3",
+                "clubId": "club",
+                "name": "inv3",
+                "category": "shuttlecocks",
+                "unit": "tube",
+                "stock": 2,
+                "unitCostMinor": 125000,
+                "currency": "PHP"
+              },
+              {
+                "id": "inv4",
+                "clubId": "club",
+                "name": "inv4",
+                "category": "equipment",
+                "unit": "tube",
+                "stock": 24,
+                "unitCostMinor": 8000,
+                "currency": "PHP"
+              }
+            ]
+          }
+        ]
+      },
+      "expected": [
+        {
+          "inventoryItemId": "inv1",
+          "tubes": 1
+        }
+      ]
+    },
+    {
+      "name": "session cost estimates in centavos › suggests the first shuttlecock item, rounded and at least one tube (sessionCost) #3",
+      "input": {
+        "args": [
+          {
+            "courts": 3,
+            "durationMinutes": 180,
+            "players": 14,
+            "inventory": [
+              {
+                "id": "inv4",
+                "clubId": "club",
+                "name": "inv4",
+                "category": "equipment",
+                "unit": "tube",
+                "stock": 24,
+                "unitCostMinor": 8000,
+                "currency": "PHP"
+              }
+            ]
+          }
+        ]
+      },
+      "expected": []
+    }
+  ]
+}

@@ -128,7 +128,7 @@ describe('shared rule cases', () => {
             rules[data.rule]?.(...(decode(item.input.args) as unknown[])),
             item.input.select,
           )
-          expect(subsetMismatch(item.expected, result)).toBeNull()
+          expect(subsetMismatch(decode(item.expected), result)).toBeNull()
         })
       }
     })

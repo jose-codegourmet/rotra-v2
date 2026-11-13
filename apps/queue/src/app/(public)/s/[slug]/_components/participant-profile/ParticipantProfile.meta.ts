@@ -3,7 +3,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const participantProfileMeta = {
   name: 'ParticipantProfile',
   description:
-    'The session page’s participant card container (#731, D-PARTICIPANT-PROFILE): ParticipantProfileSheet with useParticipantStats (Stats · YEAR) for a registered participant, with Share profile (PlayerShareSheet + ProfileShareCard, the Profile link), or PrivateProfileCard (private / guest) for a masked one.',
+    'The session page’s participant card container (#731, D-PARTICIPANT-PROFILE): ParticipantProfileSheet with useParticipantStats (Stats · YEAR) for a registered participant, with Share profile (ShareDialog + WinRateShareCard: picture, display name, RTR ID, Win rate · YEAR; the Profile link), or PrivateProfileCard (private / guest) for a masked one.',
   usage: [
     'Mounted once by PublicSession for a signed-in Player; PublicParticipants onOpenParticipant, the Courts now faces and the Queue faces set the tapped entry. Visitors never mount it.',
     'The entry’s profile kind decides the card: registered (and the viewer’s own tile) the full card, private the always-private card, guest the Not on ROTRA yet card. Stats are read only for the full card.',

@@ -24,6 +24,7 @@ import { Notice } from '@rotra/ui/notice'
 import { formatWhen } from '@rotra/ui/now-card/helpers'
 import { OverdueBanner, sessionEndStatus } from '@rotra/ui/overdue-banner'
 import { PageHeader } from '@rotra/ui/page-header'
+import { SessionTitleLink } from '@rotra/ui/session-title-link'
 import { Sheet } from '@rotra/ui/sheet'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { type TabItem, Tabs, TabsContent } from '@rotra/ui/tabs'
@@ -294,7 +295,8 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
               <Chip>Min {s.minimumGames} games</Chip>
             </span>
           }
-          title={s.title}
+          // 2026-11-13-queue-session-title-link: the title opens the public page in a new tab.
+          title={<SessionTitleLink title={s.title} href={`/sessions/${sessionId}/public-page`} />}
           description={
             <>
               {s.venueName} · Started {formatWhen(s.startedAt ?? s.scheduledStartAt, now)} · Ends{' '}

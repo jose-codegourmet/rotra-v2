@@ -48,6 +48,8 @@ export type ShareImagePickerProps = {
   countUnit?: { one: string; other: string }
   /** Left of the count, which then sits on the right (Share leaderboard's size switch) */
   toolbar?: ReactNode
+  /** The image the carousel opens centred on (Share leaderboard: the one with your row) */
+  startAt?: string
   /** Ids picked first; every image when left out */
   initialPicked?: string[]
   /** Overrides the browser's Web Share check (stories and tests) */
@@ -77,6 +79,7 @@ export function ShareImagePicker({
   countUnit,
   toolbar,
   initialPicked,
+  startAt,
   webShare,
   onDownloaded,
   onShared,
@@ -156,6 +159,17 @@ export function ShareImagePicker({
     observer.observe(el)
     return () => observer.disconnect()
   }, [sync, idsKey])
+
+  // Opens centred on `startAt` (once per set of images).
+  // biome-ignore lint/correctness/useExhaustiveDependencies: only when the set of images changes
+  useEffect(() => {
+    const el = stripRef.current
+    const index = startAt ? items.findIndex((item) => item.id === startAt) : -1
+    const child = index > 0 ? (el?.children[index] as HTMLElement | undefined) : undefined
+    if (!el || !child) return
+    el.scrollLeft = child.offsetLeft + child.offsetWidth / 2 - el.clientWidth / 2
+    sync()
+  }, [idsKey, startAt])
 
   // Mouse drag scrolls the strip; touch scrolls natively.
   const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {

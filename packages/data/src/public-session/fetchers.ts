@@ -20,6 +20,7 @@ import { playerProjection } from '../player/projection'
 import { isAlwaysPrivatePlayer, PROFILE_PRIVATE_MESSAGE } from '../player/visibility'
 import { resolveMockProfileBanner } from '../profile-banner/fetchers'
 import { slotCapacity } from '../queue-session/queueSession.rules'
+import { sessionRecordHistory } from '../queue-session/sessionRecord.rules'
 import { RealRequestError } from '../real/client'
 import { realGetMatchRequestOptions } from '../real/match-request'
 import { isRealDataMode } from '../real/mode'
@@ -55,6 +56,7 @@ import type {
   ParticipantTonight,
   PlayerSessionAccess,
   PublicCourtNow,
+  PublicMatchHistory,
   PublicMatchPlayer,
   PublicQueuedMatch,
   PublicSessionPage,
@@ -106,38 +108,84 @@ function sessionBySlug(state: MockState, slug: string) {
 /** The signed-in viewer: the authenticated Player profile the version is built for. */
 type Viewer = { playerId: string }
 
-/** Only the published slides; Off Day only when that publication explicitly included it. */
+/**
+ * Only the published slides; Off Day only when that publication explicitly included it. Names and
+ * pictures follow the page's masking rule (2026-11-13-queue-awards-faces-share), like every other
+ * face on the page; award lines carry the winner's standing tonight.
+ */
 function publishedResults(
   state: MockState,
   sessionId: string,
+  viewer: Viewer | null,
   viewerClubPlayerIds?: ReadonlySet<string>,
 ): PublicSessionResults | null {
   const publication = state.publications[sessionId],
     snapshot = state.resultSnapshots[sessionId]
   if (!publication || !snapshot) return null
+  const roster = state.roster
+    .filter((r) => r.sessionId === sessionId)
+    .sort((a, b) => a.confirmedAt - b.confirmedAt)
+  const face = (sessionPlayerId: string, clubPlayerId: string, fallbackName: string) => {
+    const index = roster.findIndex((r) => r.id === sessionPlayerId)
+    const entry = roster[index]
+    const person = publicPerson(
+      state,
+      clubPlayerId,
+      {
+        fullName: entry?.nameSnapshot ?? fallbackName,
+        nickname: entry?.nicknameSnapshot ?? null,
+      },
+      viewer,
+    )
+    return {
+      name: person.name,
+      pictureUrl: person.pictureUrl,
+      masked: person.masked,
+      ...(viewer && index >= 0 ? { participant: index } : {}),
+      ...(viewer ? { isViewer: person.isViewer } : {}),
+    }
+  }
+  const standingOf = (sessionPlayerId: string) => {
+    const row = snapshot.standings.find((r) => r.sessionPlayerId === sessionPlayerId)
+    return row
+      ? {
+          position: row.position,
+          of: snapshot.standings.length,
+          wins: row.wins,
+          losses: row.losses,
+        }
+      : null
+  }
+  const winner = (row: { sessionPlayerId: string; clubPlayerId: string; name: string }) => ({
+    ...face(row.sessionPlayerId, row.clubPlayerId, row.name),
+    standing: standingOf(row.sessionPlayerId),
+  })
   const results: PublicSessionResults = {}
   if (publication.publishedSlides.includes('standings'))
-    results.standings = snapshot.standings.map((r) => ({
-      position: r.position,
-      name: r.name,
-      wins: r.wins,
-      losses: r.losses,
-      games: r.games,
-      ...(viewerClubPlayerIds ? { isViewer: viewerClubPlayerIds.has(r.clubPlayerId) } : {}),
-    }))
+    results.standings = snapshot.standings.map((r) => {
+      const { isViewer: _viewer, ...person } = face(r.sessionPlayerId, r.clubPlayerId, r.name)
+      return {
+        ...person,
+        position: r.position,
+        wins: r.wins,
+        losses: r.losses,
+        games: r.games,
+        ...(viewerClubPlayerIds ? { isViewer: viewerClubPlayerIds.has(r.clubPlayerId) } : {}),
+      }
+    })
   if (publication.publishedSlides.includes('awards'))
     results.awards = {
-      mvp: snapshot.awards.mvp ? { name: snapshot.awards.mvp.name } : null,
+      mvp: snapshot.awards.mvp ? winner(snapshot.awards.mvp) : null,
       mostImproved: snapshot.awards.mostImproved
         ? {
-            name: snapshot.awards.mostImproved.name,
+            ...winner(snapshot.awards.mostImproved),
             priorSessions: snapshot.awards.mostImproved.priorSessions,
           }
         : null,
     }
   if (publication.includeOffDay)
     results.offDay = snapshot.awards.offDay.map((x) => ({
-      name: x.name,
+      ...winner(x),
       priorSessions: x.priorSessions,
     }))
   return results
@@ -400,7 +448,7 @@ function project(
     amountDuePerPlayer: sessionCostIn(state, s.id)?.estimate.perHead ?? null,
     lastSyncedAt: sync.lastSyncedAt,
     hasPendingChanges: sync.hasPendingChanges,
-    results: status === 'completed' ? publishedResults(state, s.id, viewerIds) : null,
+    results: status === 'completed' ? publishedResults(state, s.id, viewer, viewerIds) : null,
     ...(status === 'completed' ? { resultsPublished: state.publications[s.id] !== undefined } : {}),
   }
 }
@@ -472,6 +520,54 @@ export async function getSignedInSession(
     audience: 'signed-in',
     courtsNow: projectCourtsNow(state, session, viewer),
     queue: projectQueue(state, session, viewer),
+    history: session.state === 'completed' ? projectHistory(state, session, viewer) : null,
+  }
+}
+
+/**
+ * A finished session's Match history (2026-11-13 finished session and match history courts logs):
+ * every finished or invalid match, newest first, with the replay bounds. Until the club shares the
+ * results, only the viewer's own matches (the same rule as their own standing only).
+ */
+function projectHistory(
+  state: MockState,
+  session: MockState['sessions'][number],
+  viewer: Viewer,
+): PublicMatchHistory {
+  const matches = state.matches.filter((m) => m.sessionId === session.id)
+  const record = sessionRecordHistory({
+    fallbackStart: session.startedAt ?? session.scheduledStartAt,
+    courts: state.courts.filter((c) => c.sessionId === session.id),
+    roster: state.roster.filter((r) => r.sessionId === session.id),
+    matches,
+  })
+  const shared = state.publications[session.id] !== undefined
+  const all = record.matches
+    .map((m) => ({
+      id: m.id,
+      number: m.number,
+      format: matches.find((x) => x.id === m.id)?.format ?? 'doubles',
+      courtLabels: m.courtLabels,
+      startedAt: m.startedAt,
+      endedAt: m.endedAt,
+      replayEndAt: m.replayEndAt,
+      teamA: m.teamA.map((p) => matchPlayerOf(state, p.id, viewer)),
+      teamB: m.teamB.map((p) => matchPlayerOf(state, p.id, viewer)),
+      winningTeam: m.winningTeam,
+      teamAScore: m.teamAScore,
+      teamBScore: m.teamBScore,
+      invalid: m.invalid,
+    }))
+    .sort((a, b) => b.number - a.number)
+  return {
+    shared,
+    total: all.length,
+    matches: shared
+      ? all
+      : all.filter((m) => [...m.teamA, ...m.teamB].some((p) => p.isViewer === true)),
+    courtLabels: shared ? record.courtLabels : [],
+    from: record.from,
+    to: record.to,
   }
 }
 

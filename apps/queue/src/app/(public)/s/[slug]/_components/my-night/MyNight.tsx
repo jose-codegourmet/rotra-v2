@@ -14,8 +14,6 @@ export type MyNightProps = {
   night: MyNightData
   /** "Nov 9, 7:30 PM": the session's start, for "Confirmed · starts DATE, TIME" */
   startsLabel: string
-  /** The Player app's match history (P-MATCH-HISTORY); null until the origin is known */
-  matchHistoryHref?: string | null
   /** The session is prepared or live; once it finishes or is cancelled, open requests and notices are hidden (kept in state) */
   sessionOpen: boolean
   /** The club takes join requests online; Invite is hidden when it does not */
@@ -46,7 +44,6 @@ export function MyNight({
   slug,
   night,
   startsLabel,
-  matchHistoryHref,
   sessionOpen,
   acceptJoinRequests,
   offline = false,
@@ -94,7 +91,6 @@ export function MyNight({
       courtLabel={night.onCourt?.courtLabel}
       matchRequestOpen={sessionOpen && night.matchRequest !== null}
       canInvite={sessionOpen && acceptJoinRequests && night.canInvite}
-      matchHistoryHref={matchHistoryHref ?? undefined}
       pending={pending}
       onCheckIn={run(checkIn)}
       onLeave={run(leave)}

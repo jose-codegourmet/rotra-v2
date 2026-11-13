@@ -1,6 +1,7 @@
 'use client'
 
 import { useClub } from '@rotra/data/club'
+import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import { DEMO_CLUB_ID } from '@rotra/data/fixtures/clubs'
 import { isPermissionRefusal } from '@rotra/data/mock/errors'
 import { useFinalizationStatus } from '@rotra/data/queue-session/useFinalizationStatus'
@@ -9,11 +10,14 @@ import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionRecord } from '@rotra/data/queue-session/useSessionRecord'
 import { useSessionPublication } from '@rotra/data/session-result/useSessionPublication'
 import { useSessionResults } from '@rotra/data/session-result/useSessionResults'
+import { AwardShareCard } from '@rotra/ui/award-share-card'
 import { AwardsSlide } from '@rotra/ui/awards-slide'
 import { Breadcrumb } from '@rotra/ui/breadcrumb'
 import { ErrorState } from '@rotra/ui/error-state'
 import { OffDaySlide } from '@rotra/ui/off-day-slide'
+import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { ResultsHeader } from '@rotra/ui/results-header'
+import { ShareDialog } from '@rotra/ui/share-dialog'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { StandingsSlide } from '@rotra/ui/standings-slide'
 import { type TabItem, Tabs, TabsContent } from '@rotra/ui/tabs'
@@ -68,6 +72,9 @@ export function SessionResults({ sessionId }: SessionResultsProps) {
   const [slide, setSlide] = useState('standings')
   const [publishOpen, setPublishOpen] = useState(false)
   const [exportOpen, setExportOpen] = useState(false)
+  // 2026-11-13-queue-awards-faces-share: Share on an award opens Share MVP / Share Most Improved.
+  const [sharingAward, setSharingAward] = useState<'mvp' | 'mostImproved' | null>(null)
+  const clubPlayers = useClubPlayers()
 
   if (isPermission(session)) notFound()
 
@@ -130,6 +137,34 @@ export function SessionResults({ sessionId }: SessionResultsProps) {
       }
     : null
   const pub = publication.data ?? null
+  /** The saved player's own picture (or character), like the Queue tab */
+  const pictureOf = (clubPlayerId: string) => {
+    const p = clubPlayers.data?.players.find((x) => x.id === clubPlayerId)
+    return p
+      ? (profilePictureSrc(p.picture, p.playerId ?? p.id, p.pictureName ?? p.fullName) ?? null)
+      : null
+  }
+  const winner = (row: { name: string; clubPlayerId: string }) => ({
+    name: row.name,
+    pictureUrl: pictureOf(row.clubPlayerId),
+  })
+  const sharedAward =
+    snapshot && sharingAward
+      ? sharingAward === 'mvp'
+        ? snapshot.awards.mvp
+        : snapshot.awards.mostImproved
+      : null
+  const sharedStanding = sharedAward
+    ? snapshot?.standings.find((row) => row.sessionPlayerId === sharedAward.sessionPlayerId)
+    : undefined
+  const copySessionLink = async (link: string) => {
+    try {
+      await navigator.clipboard.writeText(link)
+      toast('Link copied')
+    } catch {
+      toast.error("Couldn't copy the link. Copy it from the field.")
+    }
+  }
 
   return (
     <main className="flex flex-col gap-5 px-page pt-5 pb-[170px]">
@@ -138,6 +173,7 @@ export function SessionResults({ sessionId }: SessionResultsProps) {
         <>
           <ResultsHeader
             title={s.title}
+            titleHref={`/sessions/${sessionId}/public-page`}
             date={date(s.scheduledStartAt)}
             venue={s.venueName}
             gameCount={r.games}
@@ -155,9 +191,17 @@ export function SessionResults({ sessionId }: SessionResultsProps) {
             <TabsContent value="awards">
               <AwardsSlide
                 {...frame}
-                mvp={snapshot.awards.mvp}
-                mostImproved={snapshot.awards.mostImproved}
+                mvp={snapshot.awards.mvp ? winner(snapshot.awards.mvp) : null}
+                mostImproved={
+                  snapshot.awards.mostImproved
+                    ? {
+                        ...winner(snapshot.awards.mostImproved),
+                        priorSessions: snapshot.awards.mostImproved.priorSessions,
+                      }
+                    : null
+                }
                 showFormulaNote={snapshot.calculationVersion === 'prototype-reference'}
+                onShare={setSharingAward}
               />
             </TabsContent>
             <TabsContent value="off-day">
@@ -192,6 +236,45 @@ export function SessionResults({ sessionId }: SessionResultsProps) {
           <Skeleton className="h-96 rounded-lg" />
         </div>
       )}
+      {ready && frame && sharedAward ? (
+        <ShareDialog
+          open
+          onOpenChange={(open) => {
+            if (!open) setSharingAward(null)
+          }}
+          title={sharingAward === 'mvp' ? 'Share MVP' : 'Share Most Improved'}
+        >
+          <AwardShareCard
+            kind="award"
+            entry={{
+              award: sharingAward === 'mvp' ? 'MVP' : 'Most Improved',
+              ...winner(sharedAward),
+              standing: sharedStanding
+                ? {
+                    position: sharedStanding.position,
+                    of: snapshot.standings.length,
+                    wins: sharedStanding.wins,
+                    losses: sharedStanding.losses,
+                  }
+                : null,
+            }}
+            reason={
+              sharingAward === 'mvp' || !snapshot.awards.mostImproved
+                ? 'Won more than expected for their level, partners and opponents.'
+                : `Played above their last ${snapshot.awards.mostImproved.priorSessions} sessions at this club.`
+            }
+            sessionTitle={s.title}
+            dateLabel={date(s.scheduledStartAt)}
+            club={frame.club}
+            link={`${location.origin}/s/${encodeURIComponent(s.publicSlug)}`}
+            onCopy={() =>
+              void copySessionLink(`${location.origin}/s/${encodeURIComponent(s.publicSlug)}`)
+            }
+            onError={(message) => toast.error(message)}
+            onDownloaded={(item) => toast(`${item.label} image downloaded`)}
+          />
+        </ShareDialog>
+      ) : null}
       <PublishResultsSheet sessionId={sessionId} open={publishOpen} onOpenChange={setPublishOpen} />
       <ExportImagesSheetContainer
         sessionId={sessionId}

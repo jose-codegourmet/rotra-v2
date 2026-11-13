@@ -9,6 +9,7 @@ export const playerDirectoryMeta = {
     'Only privileged Admin search matches phone or email. Duplicate notices disclose match reasons, never contact values. Duplicate groups stay on the same page.',
     'Unclaimed profiles may be created explicitly. Records without a creator club display Created by Admin. Mutations are in-memory mocks and disabled offline.',
     'Rows and cards open quick view. Profile and history links preserve directory context. Loading, empty, error and permission states use shared components.',
+    'Quick view › Share profile (2026-11-13-profile-card-open-share) replaces the panel with ShareDialog + ProfileShareCard (the ROTRA profile link); its footer Back returns to the Quick view.',
   ],
   docs: ['docs/screens/product/modules/admin/players-requests.md'],
   related: [

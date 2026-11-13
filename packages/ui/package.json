@@ -464,7 +464,17 @@
     "./share-image": "./src/components/share-image/ShareImage.tsx",
     "./share-image-picker": "./src/components/share-image-picker/ShareImagePicker.tsx",
     "./share-image-viewer": "./src/components/share-image-viewer/ShareImageViewer.tsx",
-    "./share-dialog": "./src/components/share-dialog/ShareDialog.tsx"
+    "./share-dialog": "./src/components/share-dialog/ShareDialog.tsx",
+    "./session-title-link": "./src/components/session-title-link/SessionTitleLink.tsx",
+    "./match-court": "./src/components/match-court/MatchCourt.tsx",
+    "./public-match-history": "./src/components/public-match-history/PublicMatchHistory.tsx",
+    "./session-standings": "./src/components/session-standings/SessionStandings.tsx",
+    "./leaderboard-share-card": "./src/components/leaderboard-share-card/LeaderboardShareCard.tsx",
+    "./award-share-card": "./src/components/award-share-card/AwardShareCard.tsx",
+    "./award-card": "./src/components/award-card/AwardCard.tsx",
+    "./public-awards": "./src/components/public-awards/PublicAwards.tsx",
+    "./win-rate-share-card": "./src/components/win-rate-share-card/WinRateShareCard.tsx",
+    "./pixel-fire": "./src/components/top-three-podium/pixel-fire/PixelFire.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

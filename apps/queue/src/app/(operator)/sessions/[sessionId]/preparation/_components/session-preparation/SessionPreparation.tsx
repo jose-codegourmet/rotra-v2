@@ -34,13 +34,13 @@ import { DeleteSessionSheet } from '@rotra/ui/delete-session-sheet'
 import { DeviceDownloadCard } from '@rotra/ui/device-download-card'
 import { formatMinutes } from '@rotra/ui/forms/session-setup-form/helpers'
 import { Icon } from '@rotra/ui/icon'
-import { IconButton } from '@rotra/ui/icon-button'
 import { Notice } from '@rotra/ui/notice'
 import { OverflowMenu, type OverflowMenuItem } from '@rotra/ui/overflow-menu'
 import { PageHeader } from '@rotra/ui/page-header'
 import { SessionJoinQr } from '@rotra/ui/session-join-qr'
 import { SessionLinkCard } from '@rotra/ui/session-link-card'
 import { SessionSetupCard } from '@rotra/ui/session-setup-card'
+import { SessionTitleLink } from '@rotra/ui/session-title-link'
 import { Sheet } from '@rotra/ui/sheet'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { StartSessionBar } from '@rotra/ui/start-session-bar'
@@ -277,19 +277,13 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
               {live ? 'Session settings' : 'Preparation'}
             </span>
           }
-          title={s.title}
+          // 2026-11-13-queue-session-title-link: the title opens the public page in a new tab.
+          title={<SessionTitleLink title={s.title} href={`/sessions/${sessionId}/public-page`} />}
           titleAction={
-            <div className="flex items-center gap-1">
-              <IconButton label="Open public page" variant="ghost" size="sm" asChild>
-                <Link href={`/sessions/${sessionId}/public-page`}>
-                  <Icon name="external" />
-                </Link>
-              </IconButton>
-              {/* The session-ending actions, apart from the everyday ones (owner, November 10, 2026). */}
-              {sessionMenu.length ? (
-                <OverflowMenu label="More for this session" triggerSize="sm" items={sessionMenu} />
-              ) : null}
-            </div>
+            // The session-ending actions, apart from the everyday ones (owner, November 10, 2026).
+            sessionMenu.length ? (
+              <OverflowMenu label="More for this session" triggerSize="sm" items={sessionMenu} />
+            ) : undefined
           }
           description={`${date(s.scheduledStartAt)} · ${time(s.scheduledStartAt)}–${time(s.scheduledEndAt)} · ${s.venueName}`}
           actions={

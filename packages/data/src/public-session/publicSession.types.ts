@@ -82,23 +82,45 @@ export type PublicSkillMix = {
   unrated: number
 }
 /** A published standings row: position and counts only, no internal ids. */
-export type PublicStandingRow = {
+export type PublicStandingRow = PublicResultFace & {
   position: number
-  name: string
   wins: number
   losses: number
   games: number
   /** Signed-in version only: the viewer's own standing row (accent-subtle highlight). */
   isViewer?: boolean
 }
+/**
+ * A face on the finished page's results (2026-11-13 finished session and awards logs): the picture
+ * and the name follow the page's masking rule; `participant` points at the signed-in read's
+ * `participants`, so the face opens the profile card. Older wire shapes carry only `name`.
+ */
+export type PublicResultFace = {
+  /** Per the page's name rule: full for a registered player to a signed-in viewer, else masked */
+  name: string
+  pictureUrl?: string | null
+  /** True when `name` is masked */
+  masked?: boolean
+  /** Signed-in version only: index in the same read's `participants` */
+  participant?: number
+}
+/** The player's standing in this session (“#N of M · W won · L lost”). */
+export type PublicStanding = { position: number; of: number; wins: number; losses: number }
+/** An award winner (MVP, Most Improved or an Off Day line) with their standing tonight. */
+export type PublicAwardWinner = PublicResultFace & {
+  /** Null or missing without a counted game */
+  standing?: PublicStanding | null
+  /** Signed-in version only: the viewer themselves */
+  isViewer?: boolean
+}
 /** One Off Day name, present only when the publication explicitly included Off Day. */
-export type PublicOffDayRow = { name: string; priorSessions: number }
+export type PublicOffDayRow = PublicAwardWinner & { priorSessions: number }
 /** Only the published slides; each key is absent when that slide was not published. */
 export type PublicSessionResults = {
   standings?: PublicStandingRow[]
   awards?: {
-    mvp: { name: string } | null
-    mostImproved: { name: string; priorSessions: number } | null
+    mvp: PublicAwardWinner | null
+    mostImproved: (PublicAwardWinner & { priorSessions: number }) | null
   }
   offDay?: PublicOffDayRow[]
 }
@@ -222,6 +244,46 @@ export type SignedInPublicSession = PublicSessionPage & {
   courtsNow: PublicCourtNow[]
   /** Waiting matches in queue order; empty reads “No matches queued yet.” */
   queue: PublicQueuedMatch[]
+  /** Finished sessions only: the Match history; null or missing on every other state */
+  history?: PublicMatchHistory | null
+}
+
+/**
+ * One match of a finished session's **Match history** (2026-11-13 finished session and match
+ * history courts logs): faces per the page's name rule, the result, and the replay's times.
+ */
+export type PublicHistoryMatch = {
+  id: string
+  /** “#N” */
+  number: number
+  format: MatchFormat
+  /** Every court the match used (two for a 5v5), for the replay */
+  courtLabels: string[]
+  startedAt: number
+  endedAt: number
+  /** The end the replay uses (the prototype's mEnd) */
+  replayEndAt: number
+  teamA: PublicMatchPlayer[]
+  teamB: PublicMatchPlayer[]
+  winningTeam: 'A' | 'B' | null
+  teamAScore: number | null
+  teamBScore: number | null
+  invalid: boolean
+}
+/**
+ * A finished session's match history for a signed-in viewer. Until the club shares the results
+ * (`shared` false) only the viewer's own matches are listed; `total` still counts every match.
+ */
+export type PublicMatchHistory = {
+  shared: boolean
+  /** Every finished or invalid match of the session */
+  total: number
+  /** Newest first; only the viewer's own until `shared` */
+  matches: PublicHistoryMatch[]
+  /** For the replay (meaningful when shared): every court, the first start and the last end */
+  courtLabels: string[]
+  from: number
+  to: number
 }
 
 /** The stage the My night card shows; same values as `MyNightCard`'s `stage` prop. */

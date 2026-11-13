@@ -94,6 +94,7 @@ export function CancelledSessionRecord({ sessionId }: { sessionId: string }) {
       <SessionRecordHeader
         state="cancelled"
         title={s.title}
+        titleHref={`/sessions/${sessionId}/public-page`}
         when={`${date(s.scheduledStartAt)} · ${time(s.scheduledStartAt)}–${time(s.scheduledEndAt)}`}
         venue={s.venueName}
         cancelledWhen={s.cancelledAt ? cancelledWhen(s.cancelledAt) : undefined}

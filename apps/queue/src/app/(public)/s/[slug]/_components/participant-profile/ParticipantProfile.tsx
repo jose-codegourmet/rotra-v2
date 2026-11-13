@@ -6,11 +6,11 @@ import { useParticipantStats } from '@rotra/data/public-session/useParticipantSt
 import { usePhotoViewer } from '@rotra/ui/hooks/use-photo-viewer'
 import { ParticipantProfileSheet } from '@rotra/ui/participant-profile-sheet'
 import { PhotoViewer } from '@rotra/ui/photo-viewer'
-import { PlayerShareSheet } from '@rotra/ui/player-share-sheet'
 import { PrivateProfileCard } from '@rotra/ui/private-profile-card'
-import { ProfileShareCard } from '@rotra/ui/profile-share-card'
 import type { PublicParticipant } from '@rotra/ui/public-participants'
+import { ShareDialog } from '@rotra/ui/share-dialog'
 import { toast } from '@rotra/ui/toaster'
+import { WinRateShareCard } from '@rotra/ui/win-rate-share-card'
 import { useState } from 'react'
 
 export type ParticipantProfileProps = {
@@ -95,30 +95,27 @@ export function ParticipantProfile({
         profileHref={participant.href}
         onShare={link ? () => setSharing(true) : undefined}
       />
-      {/* Share profile: the standard share dialog for this player; closing it returns to the card. */}
-      <PlayerShareSheet
+      {/* Share profile (2026-11-13-profile-card-open-share): the standard share dialog with Queue's
+          win-rate image for this player; closing it returns to the card. */}
+      <ShareDialog
         open={sharing}
         onOpenChange={(open) => {
           if (!open) setSharing(false)
         }}
         title="Share profile"
       >
-        <ProfileShareCard
+        <WinRateShareCard
           link={link}
-          name={participant.name}
-          nickname={participant.nickname}
+          name={participant.nickname || participant.name}
+          rtrId={participant.rtrId ?? null}
           picture={participant.pictureUrl ?? null}
-          levelLabel={participant.levelLabel ?? null}
-          position={null}
-          wins={stats.data?.wins ?? null}
+          year={statsYear(Date.now())}
+          stats={stats.data ?? null}
           onCopy={() => void copyLink()}
           onError={(message) => toast.error(message)}
-          onShared={() => toast('Share sheet opened')}
-          onDownloaded={(format) =>
-            toast(format === 'story' ? 'Story image downloaded' : 'Post image downloaded')
-          }
+          onDownloaded={(item) => toast(`${item.label} image downloaded`)}
         />
-      </PlayerShareSheet>
+      </ShareDialog>
       {viewer}
     </>
   )

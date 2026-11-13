@@ -35,3 +35,9 @@ export const LongNames: Story = {
   },
   globals: { viewport: { value: 'phone' } },
 }
+/** 2026-11-13-queue-awards-faces-share: faces left of the text and Share on each award. */
+export const WithShare: Story = { args: { onShare: () => {} }, globals: { theme: 'dark' } }
+export const WithSharePhone: Story = {
+  args: { onShare: () => {} },
+  globals: { theme: 'light', viewport: { value: 'phone' } },
+}

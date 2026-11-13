@@ -2,6 +2,7 @@ import { Card } from '@rotra/ui/card'
 import { Chip } from '@rotra/ui/chip'
 import { cn } from '@rotra/ui/cn'
 import { Notice } from '@rotra/ui/notice'
+import { SessionTitleLink } from '@rotra/ui/session-title-link'
 import { sessionRecordHeaderVariants } from './SessionRecordHeader.variants'
 
 export type SessionRecordTotals = {
@@ -26,6 +27,8 @@ export type CancelledSessionRecordTotals = {
 
 type SessionRecordHeaderBase = {
   title: string
+  /** The public page (`/sessions/<id>/public-page`): the title becomes a new-tab link (SessionTitleLink) */
+  titleHref?: string
   /** "Thu, Oct 23 · 7:00 PM–10:00 PM" (date · start–end), already formatted */
   when: string
   venue: string
@@ -68,7 +71,7 @@ function paidCopy(n: number): string {
  * "Session record · read-only", the title, date · time · venue, the state chips and the totals tiles.
  */
 export function SessionRecordHeader(props: SessionRecordHeaderProps) {
-  const { title, when, venue, state, className } = props
+  const { title, titleHref, when, venue, state, className } = props
   const invalid = state === 'invalid'
   const cancelled = state === 'cancelled'
   const tiles = cancelled
@@ -102,7 +105,9 @@ export function SessionRecordHeader(props: SessionRecordHeaderProps) {
     <header data-state={state} className={cn(sessionRecordHeaderVariants({ state }), className)}>
       <div className="flex min-w-0 flex-col gap-1.5">
         <span className={LABEL}>Session record · read-only</span>
-        <h1 className="[overflow-wrap:anywhere]">{title}</h1>
+        <h1 className="[overflow-wrap:anywhere]">
+          {titleHref ? <SessionTitleLink title={title} href={titleHref} /> : title}
+        </h1>
         <p className="m-0 text-[13px] text-fg2 [overflow-wrap:anywhere]">
           {when} · {venue}
         </p>

@@ -95,6 +95,7 @@ function FinishedSessionRecord({ sessionId }: SessionRecordProps) {
       {r ? (
         <SessionRecordHeader
           title={r.title}
+          titleHref={`/sessions/${sessionId}/public-page`}
           when={when}
           venue={r.venueName}
           state={r.state}

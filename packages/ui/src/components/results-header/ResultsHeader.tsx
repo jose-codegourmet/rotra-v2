@@ -2,9 +2,12 @@ import { Button } from '@rotra/ui/button'
 import { Chip } from '@rotra/ui/chip'
 import { cn } from '@rotra/ui/cn'
 import { Icon } from '@rotra/ui/icon'
+import { SessionTitleLink } from '@rotra/ui/session-title-link'
 
 export type ResultsHeaderProps = {
   title: string
+  /** The public page (`/sessions/<id>/public-page`): the title becomes a new-tab link (SessionTitleLink) */
+  titleHref?: string
   /** Already formatted, e.g. "Thu, Oct 23" */
   date: string
   venue: string
@@ -31,6 +34,7 @@ const LABEL = 'text-xs font-semibold tracking-[0.5px] text-fg2 uppercase'
  */
 export function ResultsHeader({
   title,
+  titleHref,
   date,
   venue,
   gameCount,
@@ -47,7 +51,9 @@ export function ResultsHeader({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex min-w-0 flex-col gap-1.5">
           <span className={LABEL}>Session results · private</span>
-          <h1 className="[overflow-wrap:anywhere]">{title}</h1>
+          <h1 className="[overflow-wrap:anywhere]">
+            {titleHref ? <SessionTitleLink title={title} href={titleHref} /> : title}
+          </h1>
           <p className="m-0 text-[13px] text-fg2 [overflow-wrap:anywhere]">
             {date} · {venue} · {gameCount} game{gameCount === 1 ? '' : 's'}
           </p>

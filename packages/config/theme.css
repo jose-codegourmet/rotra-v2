@@ -89,6 +89,8 @@
   --color-share-fg: var(--share-fg);
   --color-share-muted: var(--share-muted);
   --color-share-accent: var(--share-accent);
+  /* Losses in the leaderboard share images (2026-11-13-share-leaderboard, the prototype's .lbs-wl .l). */
+  --color-share-loss: var(--share-loss);
   /* Share dialog: the eye button over an image (.sh-eye), the same in both themes. */
   --color-share-eye: var(--share-eye);
   /* The ROTRA logo artwork's own colours (docs/branding/materials/logo): Dark BG and Light BG files. */
@@ -153,6 +155,7 @@
   --share-fg: #f0f0f2;
   --share-muted: #9090a0;
   --share-accent: #00ff88;
+  --share-loss: #ff5a5a;
   --share-glow: rgba(0, 255, 136, 0.16);
   --share-eye: rgba(0, 0, 0, 0.62);
   /* ROTRA logo artwork colours; the theme picks the Dark or Light file, the colours never change. */

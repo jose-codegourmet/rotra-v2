@@ -26,11 +26,11 @@ import { PageHeader } from '@rotra/ui/page-header'
 import { PhotoViewer } from '@rotra/ui/photo-viewer'
 import { levelLabel } from '@rotra/ui/level-pill'
 import { PlayerPagination } from '@rotra/ui/player-pagination'
-import { PlayerShareSheet } from '@rotra/ui/player-share-sheet'
 import { profileStats } from '@rotra/ui/profile-banner-card'
 import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { ProfileShareCard } from '@rotra/ui/profile-share-card'
 import { SameNameNotice } from '@rotra/ui/same-name-notice'
+import { ShareDialog } from '@rotra/ui/share-dialog'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { toast } from '@rotra/ui/toaster'
 import { useQueryClient } from '@tanstack/react-query'
@@ -337,12 +337,14 @@ export function PlayerDirectory() {
         }}
       />
       {playerQuery.data?.rtrId ? (
-        <PlayerShareSheet
+        <ShareDialog
           open={sharing}
           onOpenChange={(open) => {
             if (!open) setSharingId(null)
           }}
           title="Share profile"
+          // 2026-11-13-profile-card-open-share: Back returns to the Quick view.
+          footer={<Button onClick={() => setSharingId(null)}>Back</Button>}
         >
           <ProfileShareCard
             link={rotraProfileUrl(playerQuery.data.rtrId)}
@@ -379,7 +381,7 @@ export function PlayerDirectory() {
               toast(format === 'story' ? 'Story image downloaded' : 'Post image downloaded')
             }
           />
-        </PlayerShareSheet>
+        </ShareDialog>
       ) : null}
       {photo.viewerProps ? <PhotoViewer {...photo.viewerProps} /> : null}
     </div>

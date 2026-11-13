@@ -5,7 +5,8 @@ export const awardsSlideMeta = {
   description:
     'Slide 2 of the session results: MVP and Most Improved cards inside the result slide frame, each with its reason line or the copy for when no one qualifies, plus the "Prototype formula" footnote.',
   usage: [
-    'Use for the Awards tab of the private results view, on the public session page when Awards are published, and as the reference for the awards image frame.',
+    'Use for the Awards tab of the private results view and as the reference for the awards image frame; the session page uses PublicAwards.',
+    'Pass the winners’ pictures and `onShare` on the Queue Master’s results: Share opens the award share dialog (AwardShareCard).',
     'Pass mvp or mostImproved as null when the award maths (Q08.4) names no one; never fill an award with the best available player.',
     'showFormulaNote stays true until the award maths is decided (business open decision).',
   ],

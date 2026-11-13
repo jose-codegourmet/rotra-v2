@@ -25,7 +25,7 @@ A match moves through these steps (owner decision, November 6, 2026):
 |---|---|---|---|---|
 | Waiting | In the queue, no court | Yes (edit lineup) | Yes (edit lineup) | — |
 | On court | Placed on a court, not started yet | Yes | Yes: a plain lineup change (see [Substitutions](#substitutions)) | **Getting ready** |
-| Playing | Started with **Start match** | No | Only through **Substitute**, with the game-credit choice | **Playing** |
+| Playing | Started with **Start match** | No | **Replace player** to fix a mistake (no substitution recorded), or **Substitute** with the game-credit choice | **Playing** |
 | Done / Invalid | Permanent outcome | No | No | — |
 
 The buttons stay **Start match** and **Match done**.
@@ -76,6 +76,8 @@ Completion frees the occupied court(s). The permanent result can remain locally 
 The operator may change lineups before a start (by editing the waiting match, or by replacing a player while the match is On court) or substitute players during a game.
 
 **Before Start match.** Replacing a player in a Waiting or On court match is a plain lineup change. The replacement is a full participant if they play the whole match. It is not recorded as a substitution and never asks who gets the game.
+
+**Replace during play: fixing a mistake (owner, November 13, 2026; [log](../../../../../mockup-changes/2026-11-13-queue-replace-during-play.md)).** A Playing match also has **Replace player**, for when the Queue Master put the wrong player in. It is a correction, not a substitution: the replacement is recorded as having played the whole game, the player taken out gets nothing from it, and nothing is recorded as a substitution or asks who gets the game. Same candidates as a substitution (present, not in this match, not busy). The rule the owner gave: **replace** is when the QM makes a mistake; **substitute** is when a player really needs a sub.
 
 **During play.** A substitution in a Playing match picks the player coming off, then a replacement who is present, not in this match, and not busy elsewhere. The replacement joins the same team. A match can have more than one substitution, and each is recorded and shown on the match.
 

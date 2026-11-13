@@ -453,6 +453,17 @@ a.srow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .banner-opt:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .hero .who { display: flex; gap: 14px; align-items: center; min-width: 0; }
 .hero .who h1 { margin: 0; }
+/* Owner, November 13, 2026 ("profile page card is inconsistent with the public profile dialog"): the profile card's top matches the
+   profile dialog — the top half of the banner as a 5:1 strip, the picture centred on its bottom edge with a surface ring, and the
+   name under the picture (nickname first, full name under it when there is one). */
+.p-hero .hero-banner { aspect-ratio: 5 / 1; background-size: 100% 200%; background-position: top; }
+.p-hero .who { flex-direction: column; align-items: flex-start; gap: 10px; margin-top: -56px; position: relative; z-index: 1; }
+.p-hero .who .avatar.xxl { box-shadow: 0 0 0 5px var(--surface); }
+.p-hero .who h1 { font-size: 24px; }
+.p-hero .p-name { gap: 2px; }
+/* Artifact comment, same day ("one row each button"): the card's actions stack, one full-width button per row. */
+.p-hero .acts { grid-template-columns: minmax(0, 1fr); }
+.p-hero .acts .btn { justify-content: center; }
 /* Edit profile › Name: the top of the panel mirrors the profile card (owner comment, November 11, 2026). */
 .edit-hero .hero-top { margin-top: -16px; border-radius: var(--r) var(--r) 0 0; overflow: hidden; }
 .edit-hero .who { align-items: center; }
@@ -525,6 +536,145 @@ a.srow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .sh-card { --qc-bg: #0b0b0c; --qc-fg: #f0f0f2; --qc-dim: #9090a0; --qc-accent: #00ff88; --qc-cell: rgba(255, 255, 255, 0.1); width: min(100%, 320px); display: flex; flex-direction: column; gap: 12px; padding: 20px; border-radius: 20px; background: radial-gradient(120% 70% at 50% 0%, rgba(0, 255, 136, 0.16), transparent 60%), var(--qc-bg); color: var(--qc-fg); text-align: left; box-sizing: border-box; overflow: hidden; }
 .sh-card.post { aspect-ratio: 4 / 5; }
 .sh-card.story { aspect-ratio: 9 / 16; width: min(100%, 270px); }
+.sh-card.square { aspect-ratio: 1 / 1; }
+/* Share dialog: three size tiles (each a scaled-down live card), an OR divider and a copy field with the icon inside. */
+.sh-tiles { display: flex; gap: 12px; justify-content: center; align-items: flex-end; width: 100%; overflow-x: auto; padding: 4px 2px 6px; }
+.sh-tile { flex: none; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px; border: 2px solid transparent; border-radius: 14px; background: none; color: inherit; font: inherit; cursor: pointer; }
+.sh-tile:hover { background: var(--elev); }
+.sh-tile.on { border-color: var(--accent); background: var(--accent-subtle); }
+.sh-tile:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.sh-tile > b { font-size: 13px; }
+.sh-thumb { display: block; position: relative; overflow: hidden; border-radius: 10px; pointer-events: none; }
+.sh-thumb.story { width: 113px; height: 200px; } .sh-thumb.post { width: 160px; height: 200px; } .sh-thumb.square { width: 160px; height: 160px; }
+.sh-scale { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+.sh-thumb.story .sh-scale { transform: scale(.4167); } .sh-thumb.post .sh-scale, .sh-thumb.square .sh-scale { transform: scale(.5); }
+.sh-thumb .sh-card, .sh-img .sh-card, .sh-view-in .sh-card { width: 320px; } .sh-thumb.story .sh-card, .sh-img .sh-card.story, .sh-view-in .sh-card.story { width: 270px; }
+.sh-acts { justify-content: center; }
+.rk-card { gap: 12px; }
+.rk-compact { display: flex; align-items: stretch; justify-content: space-between; gap: 12px; }
+.rk-c-lv { display: flex; flex-direction: column; gap: 4px; min-width: 0; justify-content: center; }
+.rk-c-pos { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 0; padding: 6px 12px; border: 1px solid var(--border); border-radius: var(--r); background: var(--bg); color: inherit; font: inherit; cursor: pointer; }
+.rk-c-pos:hover { border-color: var(--accent); }
+.rk-c-pos b { font-family: var(--mono); font-size: 30px; line-height: 1; font-weight: 600; color: var(--accent); }
+.rk-c-foot { display: flex; align-items: center; justify-content: space-between; gap: 6px 12px; flex-wrap: wrap; padding-top: 10px; border-top: 1px solid var(--border); }
+.rk-lv { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px 12px; flex-wrap: wrap; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+.rk-lvl { font-size: 20px; font-weight: 800; } .rk-lvl.dim { color: var(--fg2); }
+.rk-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.rk-head > div { display: flex; flex-direction: column; gap: 0; }
+.rk-head b { font-family: var(--mono); font-size: 40px; line-height: 1; font-weight: 600; color: var(--accent); }
+.rk-near { border: 1px solid var(--border); border-radius: var(--r); padding: 4px; }
+.lb-row.cur { background: var(--accent-subtle); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 55%, transparent); }
+.lb-row.flash { animation: rkflash 1.6s ease-out; }
+@keyframes rkflash { 0%, 40% { background: color-mix(in srgb, var(--accent) 30%, transparent); } }
+.wp-sum { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.wp-sum > div { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: var(--r-sm); background: var(--elev); min-width: 0; }
+.wp-sum b { font-size: 18px; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wp-sum .w { color: var(--accent); } .wp-sum .l { color: var(--error); }
+.wp-sum .hl { background: var(--accent-subtle); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent); } .wp-sum .hl b { color: var(--accent); }
+.wp-chart { position: relative; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; padding-top: 4px; }
+.wp-col { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; padding: 6px 2px 8px; border-radius: 10px; }
+.wp-col.best { background: linear-gradient(180deg, transparent, var(--accent-subtle)); }
+.wp-plot { width: 100%; height: 166px; padding-top: 16px; display: flex; align-items: flex-end; justify-content: center; gap: 3px; border-bottom: 1px solid var(--border-strong);
+  background: repeating-linear-gradient(0deg, var(--border) 0 1px, transparent 1px 25%); }
+.wp-b { position: relative; width: 44%; max-width: 28px; padding: 0; border: 0; border-radius: 5px 5px 0 0; cursor: pointer; transition: opacity .12s, filter .12s; }
+.wp-b.w { background: var(--accent); } .wp-b.l { background: var(--error); }
+.wp-b:disabled { cursor: default; opacity: .35; }
+.wp-b:hover:not(:disabled) { filter: brightness(1.15); }
+.wp-b.dim { opacity: .3; }
+.wp-b.on { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--fg); }
+.wp-b:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+.wp-v { position: absolute; bottom: calc(100% + 2px); left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: 800; }
+.wp-b.w .wp-v { color: var(--accent); } .wp-b.l .wp-v { color: var(--error); }
+.wp-b:disabled .wp-v { display: none; }
+.wp-rate { padding: 1px 6px; border-radius: 999px; font-size: 11px; font-weight: 800; background: var(--elev); color: var(--fg); white-space: nowrap; }
+.wp-col.none .wp-rate { background: none; color: var(--fg3); }
+.wp-col.best .wp-rate { background: var(--accent); color: var(--on-accent); }
+.wp-day { font-size: 12px; font-weight: 800; letter-spacing: .6px; text-transform: uppercase; color: var(--fg2); }
+.wp-col.best .wp-day { color: var(--accent); }
+.wp-b.ro { cursor: default; }
+.wp-vis { gap: 6px; background: transparent; font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
+.wp-vis:hover { border-color: var(--accent); }
+.setting.set-flash { border-radius: var(--r-sm); animation: setflash 2.2s ease-out; }
+@keyframes setflash { 0%, 50% { background: var(--accent-subtle); box-shadow: 0 0 0 2px var(--accent); } 100% { background: transparent; box-shadow: 0 0 0 2px transparent; } } .wp-vis i { width: 7px; height: 7px; border-radius: 50%; background: var(--fg3); }
+.wp-vis.pub { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 45%, transparent); } .wp-vis.pub i { background: var(--accent); }
+.prof .wp-plot { height: 136px; }
+.wp-filter { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 8px 12px; border-radius: var(--r-sm); background: var(--elev); font-size: 14px; }
+.wp-legend { display: flex; gap: 6px 16px; flex-wrap: wrap; font-size: 12px; color: var(--fg2); }
+.wp-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+.wp-legend i.w { background: var(--accent); } .wp-legend i.l { background: var(--error); }
+@media (max-width: 480px) { .wp-sum { grid-template-columns: repeat(2, minmax(0, 1fr)); } .wp-chart { gap: 2px; } .wp-plot { height: 136px; gap: 2px; } .wp-b { width: 44%; } .wp-rate { font-size: 9px; padding: 0 4px; } .wp-v { font-size: 9px; } .wp-day { font-size: 10px; } }
+.gm { display: flex; flex-direction: column; gap: 6px; padding: 12px 0; }
+.gm + .gm, .sess-head + .gm { border-top: 1px solid var(--border); }
+/* Owner artifact comment, same day: a taller court, with the format, score and result in the middle, on the net. */
+.gm-court { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; min-height: 132px; padding-top: 10px; border-radius: 8px; overflow: hidden; }
+.gm-svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.gm-side { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-evenly; gap: 6px; padding: 12px 4px; min-width: 0; }
+.gm-pl { display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 0; max-width: 84px; padding: 2px; border: 0; border-radius: 8px; background: none; color: #fff; font: inherit; cursor: pointer; }
+.gm-pl .avatar { width: 46px; height: 46px; font-size: 14px; box-shadow: 0 0 0 2px rgba(255, 255, 255, .9); }
+.gm-pl.won .avatar { box-shadow: 0 0 0 3px var(--accent); }
+.gm-pl:hover .avatar, .gm-pl:focus-visible .avatar { box-shadow: 0 0 0 3px var(--accent), 0 0 0 5px rgba(255, 255, 255, .5); }
+.gm-pl b { font-size: 12px; font-weight: 700; line-height: 1.3; padding: 0 7px; border-radius: 999px; background: rgba(0, 0, 0, .72); color: #fff; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gm-res { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 10px 14px; margin: 0 4px; border-radius: 12px; background: rgba(0, 0, 0, .78); color: #fff; text-align: center; min-width: 96px; }
+/* Artifact comment, same day ("find a way for the center to be readable and not cramped"): the centre keeps only the score and the result;
+   the format is a pill in the top-left corner and Share an icon in the top-right corner. */
+.gm-fmt { position: absolute; z-index: 2; top: 8px; left: 8px; padding: 1px 8px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: .5px; text-transform: uppercase; background: rgba(0, 0, 0, .72); color: rgba(255, 255, 255, .85); }
+.gm-score { font-family: var(--mono); font-size: 22px; font-weight: 700; line-height: 1; white-space: nowrap; }
+.gm-share { position: absolute; z-index: 2; top: 6px; right: 6px; display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 50%; background: rgba(0, 0, 0, .72); color: #fff; cursor: pointer; }
+.gm-share:hover { background: rgba(0, 0, 0, .9); box-shadow: 0 0 0 2px var(--accent); }
+.gm-share svg { width: 14px; height: 14px; }
+.gm-noscore { font-size: 13px; font-weight: 600; color: rgba(255, 255, 255, .8); white-space: nowrap; }
+.gm-note { color: var(--warn); }
+@media (max-width: 480px) { .gm-court { min-height: 100px; } .gm-pl .avatar { width: 36px; height: 36px; font-size: 12px; } .gm-pl { max-width: 56px; } .gm-res { min-width: 0; padding: 8px 8px; margin: 0 2px; } .gm-score { font-size: 17px; } .gm-noscore { font-size: 11px; } }
+.rg-item + .rg-item { border-top: 1px solid var(--border); }
+.rg-item .game { padding-bottom: 2px; }
+.rg-src { margin: -4px 0 10px; }
+/* Owner artifact comment, November 13, 2026: share dialogs are big; the images show at full size (readable, not scaled down);
+   tapping an image picks it (several can be picked, then Download picked), and an eye icon on hover opens it full screen. */
+/* Artifact comment, same day: a compact, narrower dialog; the images sit in a carousel (drag or swipe, scroll-snapping, each
+   image still clickable) with a fade mask on a side when more images are hidden that way. */
+.sheet.sh-dlg { width: min(680px, calc(100vw - 32px)); }
+@media (max-width: 640px) { .sheet.sh-dlg { width: 100%; } }
+.sh-dlg .sh-tiles { width: 100%; flex-wrap: nowrap; justify-content: flex-start; align-items: flex-start; gap: 20px; padding: 12px 24px 6px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scroll-padding-inline: 24px; scrollbar-width: none; cursor: grab; -webkit-user-select: none; user-select: none; }
+.sh-dlg .sh-tiles::-webkit-scrollbar { display: none; }
+.sh-dlg .sh-tiles.dragging { scroll-snap-type: none; cursor: grabbing; }
+.sh-dlg .sh-tiles.dragging * { pointer-events: none; }
+.sh-dlg .sh-pick { flex: none; scroll-snap-align: center; }
+.sh-dlg .sh-tiles img, .sh-dlg .sh-tiles svg { -webkit-user-drag: none; }
+.sh-dlg .sh-tiles.mask-l { -webkit-mask-image: linear-gradient(90deg, transparent, #000 64px); mask-image: linear-gradient(90deg, transparent, #000 64px); }
+.sh-dlg .sh-tiles.mask-r { -webkit-mask-image: linear-gradient(270deg, transparent, #000 64px); mask-image: linear-gradient(270deg, transparent, #000 64px); }
+.sh-dlg .sh-tiles.mask-l.mask-r { -webkit-mask-image: linear-gradient(90deg, transparent, #000 64px, #000 calc(100% - 64px), transparent); mask-image: linear-gradient(90deg, transparent, #000 64px, #000 calc(100% - 64px), transparent); }
+.sh-car-nav { display: flex; justify-content: center; gap: 6px; }
+.sh-car-nav i { width: 7px; height: 7px; border-radius: 50%; background: var(--border-strong); }
+.sh-car-nav i.on { background: var(--accent); width: 18px; border-radius: 999px; }
+.sh-pick { position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.sh-img { position: relative; display: block; padding: 0; border: 3px solid transparent; border-radius: 23px; background: none; color: inherit; font: inherit; cursor: pointer; line-height: normal; text-align: left; }
+.sh-img.on { border-color: var(--accent); }
+.sh-img:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.sh-chk { position: absolute; top: -11px; left: -11px; z-index: 2; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; border: 3px solid var(--surface); background: var(--overlay); color: transparent; font-size: 15px; font-weight: 800; font-style: normal; }
+.sh-img.on .sh-chk { background: var(--accent); color: var(--on-accent); }
+.sh-eye { position: absolute; top: 15px; right: 15px; z-index: 3; width: 40px; height: 40px; border-radius: 50%; border: 0; padding: 0; display: grid; place-items: center; background: rgba(0, 0, 0, .62); color: #fff; cursor: pointer; opacity: 0; transition: opacity .12s; }
+.sh-pick:hover .sh-eye, .sh-eye:focus-visible { opacity: 1; }
+@media (hover: none) { .sh-eye { opacity: 1; } }
+.sh-cap { display: flex; flex-direction: column; align-items: center; } .sh-cap b { font-size: 14px; }
+.sh-pickbar { width: 100%; display: flex; justify-content: center; align-items: center; gap: 8px 16px; flex-wrap: wrap; }
+.sh-linkish { border: 0; background: none; padding: 0; color: var(--accent); font: inherit; font-weight: 600; cursor: pointer; }
+.sh-view { position: fixed; inset: 0; z-index: 70; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 60px 16px 20px; background: rgba(0, 0, 0, .94); cursor: zoom-out; animation: fade .15s; }
+.sh-view-x { position: absolute; top: calc(12px + env(safe-area-inset-top, 0px)); right: 12px; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; padding: 0; border: 1px solid rgba(255, 255, 255, .3); background: rgba(255, 255, 255, .08); color: #fff; cursor: pointer; }
+.sh-view-fit { position: relative; flex: none; cursor: default; }
+.sh-view-fit > .sh-view-in { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+.sh-view-bar { display: flex; align-items: center; gap: 12px; color: #fff; cursor: default; }
+
+.or-div { width: 100%; display: flex; align-items: center; gap: 14px; margin: 6px 0; }
+.or-div::before, .or-div::after { content: ''; flex: 1; height: 1px; background: var(--border-strong); }
+.or-div span { font-size: 18px; font-weight: 800; letter-spacing: 2px; color: var(--fg2); }
+.copy-field { width: 100%; display: flex; flex-direction: column; gap: 6px; text-align: left; }
+.cf-box { position: relative; }
+.cf-box input { width: 100%; box-sizing: border-box; min-height: 44px; padding: 0 48px 0 14px; border-radius: var(--r-sm); border: 1px solid var(--border-strong); background: var(--bg); color: inherit; font: 13px var(--mono); text-overflow: ellipsis; }
+.cf-box input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.cf-btn { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 34px; height: 34px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--fg2); cursor: pointer; }
+.cf-btn:hover { background: var(--elev); color: var(--fg); }
+.cf-btn:focus-visible { outline: 2px solid var(--accent); }
+.cf-btn svg { width: 18px; height: 18px; }
 .sh-top { display: flex; align-items: center; gap: 12px; }
 .sh-top b { display: block; font-size: 16px; line-height: 1.2; }
 .sh-top div span { font-size: 12px; color: var(--qc-dim); }
@@ -598,6 +748,36 @@ a.srow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .sh-stats .g div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .sh-stats .g b { font: 700 20px/1.1 var(--mono); color: var(--qc-fg); }
 .sh-stats .g em { font-style: normal; font-size: 10px; color: var(--qc-dim); }
+/* Artifact comment, November 13, 2026 ("so much white space in Facebook post and story"): on the taller sizes the middle of the card
+   sits in the centre of the free space and everything is set larger, so short cards fill the image. */
+.sh-card.post .sh-mid, .sh-card.story .sh-mid { justify-content: safe center; gap: 14px; }
+.sh-card.games .sh-mid { gap: 8px; }
+/* One shared game: the match is the hero — bigger faces, names and score. */
+.sh-card.one .sh-mid { gap: 12px; }
+.sh-card.one:not(.square) .sh-mid h3 { font-size: 22px; }
+.sh-card.one .sh-gl { grid-template-columns: minmax(0, 1fr) 92px minmax(0, 1fr); min-height: 96px; padding: 10px 0; border-top: 1px solid var(--qc-cell); }
+.sh-card.one .sh-faces .avatar { width: 44px; height: 44px; min-width: 44px; font-size: 13px; margin-right: -8px; }
+.sh-card.one .sh-team .names { font-size: 12px; line-height: 15px; color: var(--qc-fg); }
+.sh-card.one .sh-score b { font-size: 30px; }
+.sh-card.one .sh-score span { font-size: 11px; }
+.sh-card.one .sh-stat { font-size: 16px; }
+.sh-card.story.one .sh-gl { grid-template-columns: minmax(0, 1fr) 72px minmax(0, 1fr); }
+.sh-card.story.one .sh-faces .avatar { width: 34px; height: 34px; min-width: 34px; font-size: 11px; margin-right: -6px; }
+.sh-card.story.one .sh-score b { font-size: 24px; }
+.sh-card.post:not(.games) .sh-mid h3, .sh-card.story:not(.games) .sh-mid h3 { font-size: 26px; }
+.sh-card.post .sh-mid p, .sh-card.story .sh-mid p { font-size: 14px; }
+.sh-card.post .sh-big b, .sh-card.story .sh-big b { font-size: 64px; }
+.sh-card.post .sh-big span, .sh-card.story .sh-big span { font-size: 15px; }
+.sh-card.post .sh-pos b, .sh-card.story .sh-pos b { font-size: 52px; }
+.sh-card.post .sh-lv, .sh-card.story .sh-lv { font-size: 28px; }
+.sh-card.post .sh-stat, .sh-card.story .sh-stat { font-size: 18px; }
+.sh-card.post .sh-stats .g b, .sh-card.story .sh-stats .g b { font-size: 28px; }
+.sh-card.post .sh-stats .g em, .sh-card.story .sh-stats .g em { font-size: 12px; }
+.sh-card.story .sh-stats .g { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 14px; }
+.sh-card.square .sh-stats .g, .sh-card.post .sh-stats .g { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
+.sh-card.post .sh-big b { font-size: 56px; }
+.sh-card.post .sh-mid { gap: 12px; }
+
 .sh-link { width: 100%; display: flex; flex-direction: column; gap: 6px; text-align: left; }
 .rtr-line input { flex: 1; min-width: 0; border: 0; background: none; color: inherit; font: 13px var(--mono); padding: 0; text-overflow: ellipsis; }
 .rtr-line input:focus { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
@@ -638,6 +818,13 @@ button.crow.mbtn:focus-visible { outline: 2px solid var(--accent); outline-offse
 .dblk { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 52px; height: 52px; flex: none; border-radius: var(--r-sm); border: 1px solid var(--border); background: var(--surface); }
 .dblk b { font-size: 18px; line-height: 1; }
 .dblk span { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--fg2); margin-top: 2px; }
+/* Latest sessions card and the session's matches dialog (owner, November 13, 2026). */
+.ls-row .dblk { width: 46px; height: 46px; }
+.ls-rec { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex: none; text-align: right; }
+.ls-rec b { font-size: 14px; } .ls-rec .w { color: var(--accent); } .ls-rec .l { color: var(--error); }
+.ls-rec.big b { font-size: 18px; }
+.ls-head { display: flex; align-items: center; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+.ls-head .main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .urow { display: flex; align-items: center; gap: 12px; padding: 10px 0; color: inherit; text-decoration: none; min-width: 0; }
 .urow + .urow { border-top: 1px solid var(--border); }
 .urow .main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
@@ -653,6 +840,40 @@ a.urow:hover .main b, a.urow:focus-visible .main b { color: var(--accent); }
 .pp-body { padding: 52px 20px 20px; display: flex; flex-direction: column; gap: 12px; }
 .pp-name { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; }
 .pp-name b { font-size: 20px; font-weight: 800; letter-spacing: -.2px; }
+/* Owner comment, November 13, 2026: a profile card has no title bar. The banner starts at the card's top edge and runs down to the middle of the
+   picture; the close × floats on the banner. The dialog keeps its name for screen readers in a visually hidden heading. Name block: the nickname
+   (or the full name), the full name under it when there is a nickname, then a small button that copies the ROTRA ID. */
+.sheet:has(.pp-card) { overflow: hidden; }
+.sheet:has(.pp-card) > header { position: absolute; top: 10px; right: 10px; z-index: 2; padding: 0; }
+.sheet:has(.pp-card) > header h2 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.sheet:has(.pp-card) > header .icon-btn { box-sizing: border-box; width: 30px; height: 30px; min-width: 0; min-height: 0; aspect-ratio: 1; flex: none; padding: 0; display: grid; place-items: center; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--fg) 16%, transparent); background: color-mix(in srgb, var(--surface) 62%, transparent); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); color: var(--fg); box-shadow: none; transition: background .12s; }
+/* Fourth pass, November 13, 2026 ("unproportioned and badly designed close button"): a true 30 px circle (the base .icon-btn min-width made it 36 × 32), frosted over the banner, 14 px icon. */
+.sheet:has(.pp-card) > header .icon-btn:hover, .sheet:has(.qv-card) > header .icon-btn:hover { background: color-mix(in srgb, var(--surface) 85%, transparent); }
+.sheet:has(.pp-card) > header, .sheet:has(.qv-card) > header { top: 12px; right: 12px; }
+.sheet:has(.pp-card) > header .icon-btn svg, .sheet:has(.qv-card) > header .icon-btn svg { width: 14px; height: 14px; }
+/* Third pass, November 13, 2026 ("maybe crop the banner in half, from top to middle"): the card shows the top half of the 5:2 banner, a 5:1 strip. */
+.pp-card .pp-banner { height: auto; aspect-ratio: 5 / 1; }
+.sheet .pp-card .pp-banner { background-size: 100% 200%; background-position: center top; }
+.pp-card .pp-avatar { position: relative; top: auto; left: auto; width: max-content; margin: -32px 0 0 20px; z-index: 1; }
+.pp-card .pp-body { padding-top: 12px; }
+.pp-card .pp-avatar:has(.pp-pill) + .pp-body { padding-top: 20px; }
+.pp-card .pp-name { flex-direction: column; align-items: flex-start; gap: 2px; }
+.pp-full { font-size: 14px; color: var(--fg2); }
+.pp-nm { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+.pp-ext { display: inline-grid; place-items: center; width: 28px; height: 28px; flex: none; border-radius: 8px; color: var(--fg2); text-decoration: none; }
+.pp-ext:hover { color: var(--accent); background: var(--elev); }
+.pp-ext svg { width: 16px; height: 16px; }
+.sheet:has(.pp-card) footer a.btn { text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.sheet:has(.pp-card) footer .btn svg { width: 16px; height: 16px; flex: none; }
+/* Owner, November 13, 2026: hovering (or focusing) a profile card's picture shows an eye: it opens the full photo. Only pictures that open a photo get it. */
+.pp-avatar .photo-btn { position: relative; border-radius: 50%; }
+.pp-avatar .photo-btn::before { content: ''; position: absolute; inset: 0; border-radius: 50%; background: color-mix(in srgb, var(--bg) 55%, transparent); opacity: 0; transition: opacity .15s; pointer-events: none; z-index: 1; }
+.pp-avatar .photo-btn::after { content: ''; position: absolute; left: 50%; top: 50%; width: 26px; height: 26px; transform: translate(-50%, -50%); background: var(--fg); -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E") center / contain no-repeat; opacity: 0; transition: opacity .15s; pointer-events: none; z-index: 2; }
+.pp-avatar .photo-btn:hover::before, .pp-avatar .photo-btn:focus-visible::before, .pp-avatar .photo-btn:hover::after, .pp-avatar .photo-btn:focus-visible::after { opacity: 1; }
+/* Second pass, November 13, 2026: the RTR ID button is tiny. 5:2 banner (the ratio of the owner's 2000 × 800 sample); the picture sits on its bottom edge, half over it. */
+.pp-rtr { margin-top: 4px; min-height: 22px; height: 22px; padding: 0 6px; gap: 4px; border-radius: 6px; font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: .2px; color: var(--fg2); }
+.pp-rtr:hover { color: var(--fg); }
+.pp-rtr svg { width: 12px; height: 12px; flex: none; }
 .pp-sec { border: 1px solid var(--border); border-radius: var(--r); background: var(--bg); padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
 .pp-sec .label { font-size: 11px; letter-spacing: .6px; text-transform: uppercase; color: var(--fg2); font-weight: 700; }
 .pp-sec .kv { margin: 0; }
@@ -660,6 +881,32 @@ a.urow:hover .main b, a.urow:focus-visible .main b { color: var(--accent); }
 .pp-stats > div { border: 1px solid var(--border); border-radius: var(--r); padding: 10px 12px; background: var(--surface); }
 .pp-stats dt { font-size: 12px; color: var(--fg2); font-weight: 600; }
 .pp-stats dd { margin: 2px 0 0; font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; }
+/* Owner comment, November 13, 2026 ("should be latest stats · redesign the cards and counter here, they look so bland"): Latest stats with the year
+   as a chip; four plain counters. */
+.pp-sec-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.pp-yr { font-size: 11px; font-weight: 700; color: var(--fg2); border: 1px solid var(--border-strong); border-radius: 999px; padding: 1px 8px; font-variant-numeric: tabular-nums; }
+.pp-st { display: block; }
+.pp-cnt { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 0; }
+.pp-cnt > div { padding: 2px 0 2px 14px; border-left: 1px solid var(--border); }
+.pp-cnt > div:first-child { padding-left: 0; border-left: 0; }
+.pp-cnt .r dd { color: var(--accent); }
+/* Owner, same day: "I personally hate the round progress bar" — no ring; Win rate is the first counter, the only one in colour. */
+/* Simplified the same day ("doing too much, maybe simplify it a little bit"): the ring keeps the colour; the counters are plain numbers with hairline dividers; no boxes, coloured edges or bar. */
+.pp-cnt dt { font-size: 10px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: var(--fg2); }
+.pp-cnt dd { margin: 6px 0 0; font-size: 22px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+/* Owner, same day: the stats box takes the leaderboard podium's look: a green 8 px grid over the card, lit from below. */
+.pp-sec.pp-split { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 7fr); gap: 0; padding: 14px 16px; }
+.pp-wrbox { display: flex; flex-direction: column; justify-content: space-between; gap: 8px; padding-right: 16px; border-right: 1px solid color-mix(in srgb, var(--accent) 25%, var(--border)); }
+.pp-wr { display: flex; align-items: flex-end; gap: 4px; min-height: 30px; }
+.pp-wr > span { font-size: 32px; font-weight: 800; line-height: .9; letter-spacing: -.5px; color: var(--accent); }
+.pp-right { display: flex; flex-direction: column; gap: 12px; padding-left: 16px; min-width: 0; }
+@media (max-width: 420px) { .pp-wr { flex-direction: column-reverse; align-items: flex-start; gap: 2px; } .pp-wr > span { font-size: 24px; } .pp-fire { max-height: 40px; max-width: 33px; } .pp-wrbox { padding-right: 12px; } .pp-right { padding-left: 12px; } }
+.pp-sec:has(.pp-cnt) { position: relative; overflow: hidden; border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+  background: radial-gradient(120% 90% at 0% 100%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 65%),
+    repeating-linear-gradient(0deg, color-mix(in srgb, var(--accent) 7%, transparent) 0 1px, transparent 1px 8px),
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--accent) 7%, transparent) 0 1px, transparent 1px 8px), var(--surface); }
+.pp-fire { display: block; image-rendering: pixelated; margin-bottom: -2px; }
+@media (max-width: 420px) { .pp-cnt > div { padding-left: 10px; } .pp-cnt dd { font-size: 19px; } }
 /* P-CLUB-MEMBERS: contacts-style list like Queue › Saved players (owner comment, November 11, 2026). */
 .sp-filters { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
 @media (min-width: 720px) { .sp-filters { grid-template-columns: minmax(0, 1fr) auto; align-items: end; } }
@@ -735,6 +982,25 @@ a.cal-card:hover { border-color: var(--border-strong); background: var(--elev); 
 @keyframes ptr-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { #ptr { transition: none; } #ptr.busy i { animation-duration: 3s; } }
 html { overscroll-behavior-y: contain; }
+
+/* ROTRA logo (owner, November 13, 2026): the theme picks the Dark or Light artwork. */
+.rlogo { display: inline-flex; align-items: center; line-height: 0; flex: none; }
+.rlogo svg { display: block; height: 100%; width: auto; }
+.rlogo .lg-l { display: none; }
+.rlogo.rlogo-fixed .lg-d { display: block; }
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) .rlogo:not(.rlogo-fixed) .lg-l { display: block; } :root:not([data-theme="dark"]) .rlogo:not(.rlogo-fixed) .lg-d { display: none; } }
+:root[data-theme="light"] .rlogo:not(.rlogo-fixed) .lg-l { display: block; }
+:root[data-theme="light"] .rlogo:not(.rlogo-fixed) .lg-d { display: none; }
+.rlogo-resp .rl-full, .rlogo-resp .rl-mini { height: 100%; display: inline-flex; }
+.rlogo-resp .rl-mini { display: none; }
+@media (max-width: 420px) { .rlogo-resp .rl-full { display: none; } .rlogo-resp .rl-mini { display: inline-flex; } }
+
+.brand:has(.rlogo) { align-items: center; }
+.brand-logo { height: 26px; }
+.mark:has(.rlogo) { display: flex; align-items: center; gap: 10px; }
+.mark-logo { height: 52px; }
+.foot-logo { height: 20px; }
+.qc-logo { height: 18px; }
 </style>
 
 <div id="app"></div>
@@ -753,6 +1019,9 @@ const LEVELS = TIERS.flatMap(([tier], t) => STEPS.map((step) => ({ tier: t, step
 const OLD_SIZES = [3, 3, 3, 4, 4, 4, 5, 5, 5];
 const foldOldLevel = (old) => { let c = 0; for (let k = 0; k < OLD_SIZES.length; k++) { c += OLD_SIZES[k]; if (old < c) return k; } return OLD_SIZES.length - 1; };
 const WINDOW_DAYS = 90; // "the last three months"; exact window boundaries are an open decision
+// Owner comment, November 13, 2026: profile stats (the profile card and Share profile) count the calendar year and reset on January 1.
+// The rank still uses WINDOW_DAYS. `ago` is days back from today, so this year's sessions are the ones no older than today's day of the year.
+const YEAR_DAYS = () => { const n = new Date(); return Math.floor((n - new Date(n.getFullYear(), 0, 1)) / 864e5); };
 const SOCIAL = {
   facebook: { label: 'Facebook', hosts: ['facebook.com', 'fb.com'], eg: 'https://facebook.com/yourname' },
   instagram: { label: 'Instagram', hosts: ['instagram.com'], eg: 'https://instagram.com/yourname' },
@@ -986,6 +1255,12 @@ const later = (ms, fn) => setTimeout(() => { fn(); render(); }, ms);
 
 // ---------- Icons ----------
 const svg = (body, w = 16, sw = 2.2) => `<svg width="${w}" height="${w}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
+// Owner, November 13, 2026: the real ROTRA logos (docs/branding/materials/logo). Full = symbol + wordmark, Mini = symbol only;
+// Dark is for dark backgrounds, Light for light ones. rotraLogo() carries both and the theme shows the right one; fixed-dark surfaces
+// (share images, the Session QR card) use the Dark version only.
+const LOGO = {"fullD": "<svg class=\"lg-d\" aria-hidden=\"true\" focusable=\"false\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 324.21 120.56\"><g opacity=\".2\"><path fill=\"#71c173\" d=\"M60.29,120.46C27.08,120.46.07,93.44.07,60.23S27.08.01,60.29.01s60.22,27.02,60.22,60.22-27.02,60.22-60.22,60.22ZM60.29,4.83C29.74,4.83,4.88,29.68,4.88,60.23s24.85,55.4,55.4,55.4,55.4-24.85,55.4-55.4S90.84,4.83,60.29,4.83Z\"/></g><g opacity=\".4\"><path fill=\"#71c173\" d=\"M60.29,107.61c-26.12,0-47.37-21.25-47.37-47.37S34.17,12.86,60.29,12.86s47.37,21.25,47.37,47.37-21.25,47.37-47.37,47.37ZM60.29,17.68c-23.47,0-42.56,19.09-42.56,42.56s19.09,42.56,42.56,42.56,42.56-19.09,42.56-42.56-19.09-42.56-42.56-42.56Z\"/></g><path fill=\"#71c173\" d=\"M60.29,94.76c-19.04,0-34.53-15.49-34.53-34.53s15.49-34.53,34.53-34.53,34.53,15.49,34.53,34.53-15.49,34.53-34.53,34.53ZM60.29,30.52c-16.38,0-29.71,13.33-29.71,29.71s13.33,29.71,29.71,29.71,29.71-13.33,29.71-29.71-13.33-29.71-29.71-29.71Z\"/><circle fill=\"#71c173\" cx=\"105.26\" cy=\"60.23\" r=\"6.42\"/><path fill=\"#fff\" d=\"M143.95,81.51V31.47h19.1c11.36,0,18,5.75,18,15.61,0,6.71-3.15,11.5-9.04,13.9l9.51,20.54h-9.58l-8.49-18.69h-10.75v18.69h-8.76ZM152.71,55.08h10.34c5.54,0,8.83-2.94,8.83-8.01s-3.29-7.8-8.83-7.8h-10.34v15.81Z\"/><path fill=\"#fff\" d=\"M202.28,46.73c10.47,0,18.07,7.26,18.07,17.8s-7.6,17.8-18.07,17.8-18.07-7.26-18.07-17.8,7.6-17.8,18.07-17.8ZM202.28,74.87c5.75,0,9.72-4.18,9.72-10.34s-3.97-10.34-9.72-10.34-9.72,4.17-9.72,10.34,3.97,10.34,9.72,10.34Z\"/><path fill=\"#fff\" d=\"M229.8,81.51v-26.83h-6.5v-6.98h6.5v-10.54h8.35v10.54h6.57v6.98h-6.57v26.83h-8.35Z\"/><path fill=\"#fff\" d=\"M271.14,55.29h-3.08c-6.02,0-9.79,3.22-9.79,9.79v16.43h-8.35v-33.75h7.87l.48,4.93c1.44-3.35,4.66-5.61,9.17-5.61,1.16,0,2.33.14,3.7.48v7.73Z\"/><path fill=\"#fff\" d=\"M273.95,71.85c0-6.23,4.52-10.13,12.53-10.75l10.13-.75v-.75c0-4.59-2.74-6.43-6.98-6.43-4.93,0-7.67,2.05-7.67,5.61h-7.12c0-7.32,6.02-12.12,15.2-12.12s14.72,4.93,14.72,14.31v20.54h-7.32l-.62-5c-1.44,3.49-6.02,5.89-11.29,5.89-7.19,0-11.57-4.17-11.57-10.54ZM296.68,67.82v-1.78l-7.05.55c-5.2.48-7.19,2.19-7.19,4.93,0,3.08,2.05,4.59,5.82,4.59,5.13,0,8.42-3.08,8.42-8.28Z\"/><path fill=\"#fff\" d=\"M313.04,76.92c0-3.01,2.53-5.48,5.54-5.48s5.54,2.46,5.54,5.48-2.53,5.41-5.54,5.41-5.54-2.46-5.54-5.41Z\"/></svg>", "fullL": "<svg class=\"lg-l\" aria-hidden=\"true\" focusable=\"false\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 321.79 120.89\"><path fill=\"#83ae87\" d=\"M60.38.02C27.09.02,0,27.1,0,60.4s27.09,60.38,60.38,60.38,60.38-27.09,60.38-60.38S93.68.02,60.38.02ZM114.58,60.4c0,29.88-24.31,54.19-54.19,54.19S6.19,90.28,6.19,60.4,30.5,6.2,60.38,6.2s54.19,24.31,54.19,54.19Z\"/><path fill=\"#518757\" d=\"M60.38,12.75c-26.27,0-47.65,21.38-47.65,47.65s21.38,47.65,47.65,47.65,47.65-21.38,47.65-47.65S86.66,12.75,60.38,12.75ZM101.85,60.4c0,22.86-18.6,41.46-41.46,41.46s-41.46-18.6-41.46-41.46S37.52,18.93,60.38,18.93s41.46,18.6,41.46,41.46Z\"/><path fill=\"#2d6e36\" d=\"M60.38,25.48c-19.25,0-34.92,15.67-34.92,34.92s15.67,34.92,34.92,34.92,34.92-15.67,34.92-34.92-15.67-34.92-34.92-34.92ZM89.11,60.4c0,15.84-12.89,28.73-28.73,28.73s-28.73-12.89-28.73-28.73,12.89-28.73,28.73-28.73,28.73,12.89,28.73,28.73Z\"/><circle fill=\"#2d6e36\" cx=\"104.94\" cy=\"60.4\" r=\"7.07\"/><path d=\"M143.14,81.26V31.68h18.92c11.26,0,17.84,5.7,17.84,15.46,0,6.65-3.12,11.39-8.95,13.77l9.43,20.35h-9.5l-8.41-18.52h-10.65v18.52h-8.68ZM151.82,55.08h10.24c5.49,0,8.75-2.92,8.75-7.94s-3.26-7.73-8.75-7.73h-10.24v15.67Z\"/><path d=\"M200.93,46.81c10.38,0,17.91,7.19,17.91,17.63s-7.53,17.63-17.91,17.63-17.91-7.19-17.91-17.63,7.53-17.63,17.91-17.63ZM200.93,74.68c5.7,0,9.63-4.14,9.63-10.24s-3.93-10.24-9.63-10.24-9.63,4.14-9.63,10.24,3.93,10.24,9.63,10.24Z\"/><path d=\"M228.21,81.26v-26.59h-6.44v-6.92h6.44v-10.45h8.28v10.45h6.51v6.92h-6.51v26.59h-8.28Z\"/><path d=\"M269.17,55.29h-3.05c-5.97,0-9.7,3.19-9.7,9.7v16.28h-8.27v-33.44h7.8l.47,4.88c1.42-3.32,4.61-5.56,9.09-5.56,1.15,0,2.31.14,3.66.47v7.66Z\"/><path d=\"M271.96,71.7c0-6.17,4.48-10.04,12.41-10.65l10.04-.75v-.75c0-4.54-2.71-6.38-6.92-6.38-4.88,0-7.6,2.04-7.6,5.56h-7.05c0-7.26,5.97-12.01,15.06-12.01s14.58,4.88,14.58,14.18v20.35h-7.26l-.61-4.95c-1.42,3.46-5.97,5.83-11.19,5.83-7.12,0-11.46-4.14-11.46-10.45ZM294.48,67.7v-1.76l-6.99.54c-5.15.47-7.12,2.17-7.12,4.88,0,3.05,2.03,4.54,5.76,4.54,5.09,0,8.34-3.05,8.34-8.21Z\"/><path d=\"M310.69,76.72c0-2.98,2.51-5.43,5.49-5.43s5.49,2.44,5.49,5.43-2.51,5.36-5.49,5.36-5.49-2.44-5.49-5.36Z\"/></svg>", "miniD": "<svg class=\"lg-d\" aria-hidden=\"true\" focusable=\"false\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 120.49 120.48\"><g opacity=\".2\"><path fill=\"#71c173\" d=\"M60.26,120.47C27.05,120.47.04,93.45.04,60.25S27.05.02,60.26.02s60.22,27.02,60.22,60.22-27.02,60.22-60.22,60.22ZM60.26,4.84C29.71,4.84,4.86,29.7,4.86,60.25s24.85,55.4,55.4,55.4,55.4-24.85,55.4-55.4S90.81,4.84,60.26,4.84Z\"/></g><g opacity=\".4\"><path fill=\"#71c173\" d=\"M60.26,107.62c-26.12,0-47.37-21.25-47.37-47.37S34.14,12.87,60.26,12.87s47.37,21.25,47.37,47.37-21.25,47.37-47.37,47.37ZM60.26,17.69c-23.47,0-42.56,19.09-42.56,42.56s19.09,42.56,42.56,42.56,42.56-19.09,42.56-42.56-19.09-42.56-42.56-42.56Z\"/></g><path fill=\"#71c173\" d=\"M60.26,94.77c-19.04,0-34.53-15.49-34.53-34.53s15.49-34.53,34.53-34.53,34.53,15.49,34.53,34.53-15.49,34.53-34.53,34.53ZM60.26,30.54c-16.38,0-29.71,13.33-29.71,29.71s13.33,29.71,29.71,29.71,29.71-13.33,29.71-29.71-13.33-29.71-29.71-29.71Z\"/><circle fill=\"#71c173\" cx=\"105.23\" cy=\"60.25\" r=\"6.42\"/></svg>", "miniL": "<svg class=\"lg-l\" aria-hidden=\"true\" focusable=\"false\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 120.84 120.79\"><path fill=\"#83ae87\" d=\"M60.42,0C27.12,0,.04,27.09.04,60.39s27.09,60.38,60.38,60.38,60.38-27.09,60.38-60.38S93.71,0,60.42,0ZM114.61,60.39c0,29.88-24.31,54.19-54.19,54.19S6.22,90.27,6.22,60.39,30.53,6.19,60.42,6.19s54.19,24.31,54.19,54.19Z\"/><path fill=\"#518757\" d=\"M60.42,12.73c-26.27,0-47.65,21.38-47.65,47.65s21.38,47.65,47.65,47.65,47.65-21.38,47.65-47.65S86.69,12.73,60.42,12.73ZM101.88,60.39c0,22.86-18.6,41.46-41.46,41.46s-41.46-18.6-41.46-41.46S37.55,18.92,60.42,18.92s41.46,18.6,41.46,41.46Z\"/><path fill=\"#2d6e36\" d=\"M60.42,25.46c-19.25,0-34.92,15.67-34.92,34.92s15.67,34.92,34.92,34.92,34.92-15.67,34.92-34.92-15.67-34.92-34.92-34.92ZM89.15,60.39c0,15.84-12.89,28.73-28.73,28.73s-28.73-12.89-28.73-28.73,12.89-28.73,28.73-28.73,28.73,12.89,28.73,28.73Z\"/><circle fill=\"#2d6e36\" cx=\"104.97\" cy=\"60.39\" r=\"7.07\"/></svg>"};
+const rotraLogo = (kind = 'full', cls = '') => `<span class="rlogo rlogo-${kind}${cls ? ` ${cls}` : ''}" role="img" aria-label="ROTRA">${kind === 'mini' ? LOGO.miniD + LOGO.miniL : kind === 'resp' ? `<span class="rl-full">${LOGO.fullD}${LOGO.fullL}</span><span class="rl-mini">${LOGO.miniD}${LOGO.miniL}</span>` : LOGO.fullD + LOGO.fullL}</span>`;
+const rotraLogoDark = (cls = '') => `<span class="rlogo rlogo-full rlogo-fixed${cls ? ` ${cls}` : ''}" role="img" aria-label="ROTRA">${LOGO.fullD}</span>`;
 const I = {
   sun: svg('<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'),
   moon: svg('<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>'),
@@ -1067,28 +1342,90 @@ function ladder(level, stale = false) {
   }).join('')}</div>`;
 }
 const people = (names) => listNames(names.map(esc));
-function gameRow(g) {
-  const res = g.kind === 'partial' ? '<span class="res X" aria-label="Not counted">–</span>' : `<span class="res ${g.res}" aria-label="${g.res === 'W' ? 'Won' : 'Lost'}">${g.res}</span>`;
-  const score = g.score ? `<span class="score" aria-label="Score ${g.score}">${g.score}</span>` : '<span class="score none">Winner recorded; score not entered</span>';
-  return `<div class="game">${res}<div class="main"><b>${esc(g.fmt)}</b>${g.partner.length ? ` <span class="muted">with ${people(g.partner)}</span>` : ''}
-    <div class="small muted">vs ${people(g.opp)}</div>${g.note ? `<div class="small" style="color:var(--warn)">${esc(g.note)} · not counted</div>` : ''}</div>${score}</div>`;
+// Owner, November 13, 2026 ("this looks so bad · show the avatars and names of their opponents · maybe show it like a badminton court"):
+// a game is a small court, the player's side on the left (them and their partner), the opponents on the right, faces and first names;
+// the winning side lit; the result and the score beside it. `who` is the profile the games belong to.
+// Artifact comment, same day ("make the courts similar to how the courts look like in the queue app"): the Queue court art —
+// solid court green, white lines, a dashed net — with faces ringed in white and names on dark pills.
+const gmCourtSVG = () => `<svg class="gm-svg" viewBox="0 0 134 61" preserveAspectRatio="none" aria-hidden="true"><rect width="134" height="61" fill="var(--court)"/><g fill="none" stroke="var(--court-line)" stroke-width="1.5" vector-effect="non-scaling-stroke"><rect x="0.75" y="0.75" width="132.5" height="59.5" vector-effect="non-scaling-stroke"/><path d="M0 4.6H134M0 56.4H134M7.6 0V61M126.4 0V61M47.2 0V61M86.8 0V61M0 30.5H47.2M86.8 30.5H134" vector-effect="non-scaling-stroke"/></g><path d="M67 0V61" stroke="var(--court-line)" stroke-width="3" stroke-dasharray="4 3" vector-effect="non-scaling-stroke"/></svg>`;
+const idByName = (n) => { const a = Object.keys(S.accounts).find((k) => S.accounts[k].name === n); if (a) return a; const i = BASE.findIndex((e) => e.name === n); return i >= 0 ? `b${i}` : null; };
+function gameRow(g, who, ctx = null) {
+  const won = g.res === 'W', partial = g.kind === 'partial';
+  // Artifact comment, same day ("since there are avatars they should open a dialog"): every face opens the profile card.
+  const face = (q, label, lit) => { const id = q.real ? q.id : '', a = id ? `data-id="${esc(id)}"` : `data-name="${esc(q.name)}"`; return `<button type="button" class="gm-pl${lit ? ' won' : ''}" data-act="openProfileCard" ${a} aria-label="${esc(q.name)}. View profile">${avatar(q.real ? q.p : q)}<b>${esc(label)}</b></button>`; };
+  const other = (n) => { const id = idByName(n); return id ? { real: true, id, name: n, p: profileOf(id) } : { id: `x-${n}`, name: n, photo: hashStr(n) % 4 !== 0 }; };
+  const meLabel = who ? (who.id === S.me ? 'You' : firstName(who)) : 'Player';
+  const mine = [who ? face({ real: true, id: who.id, name: who.name, p: who }, meLabel, won && !partial) : '', ...g.partner.map((n) => face(other(n), n.split(' ')[0], won && !partial))].join('');
+  const theirs = g.opp.map((n) => face(other(n), n.split(' ')[0], !won && !partial)).join('');
+  const res = partial ? '<span class="chip">Not counted</span>' : `<span class="chip ${won ? 'ok' : 'bad'}">${won ? 'Won' : 'Lost'}</span>`;
+  const score = g.score ? `<span class="gm-score tnum" aria-label="Score ${g.score}">${g.score}</span>` : '<span class="gm-noscore" title="Winner recorded; score not entered">No score</span>';
+  return `<div class="gm${partial ? ' partial' : ''}"><div class="gm-court ${won ? 'w-left' : 'w-right'}" role="group" aria-label="${esc(g.fmt)}: ${esc(meLabel)}${g.partner.length ? ` and ${esc(g.partner.join(' and '))}` : ''} versus ${esc(g.opp.join(' and '))}">${gmCourtSVG()}<div class="gm-side">${mine}</div><span class="gm-fmt">${esc(g.fmt)}</span>${ctx && !partial ? `<button type="button" class="gm-share" data-act="openShare" data-kind="game" data-sid="${esc(ctx.sid)}" data-gi="${ctx.gi}" aria-label="Share this game" title="Share this game">${I.share}</button>` : ''}<div class="gm-res">${score}${res}</div><div class="gm-side">${theirs}</div></div>${g.note ? `<div class="gm-note small">${esc(g.note)} · not counted</div>` : ''}</div>`;
 }
-function sessionBlock(s, kinds, own = false) {
-  const games = s.games.filter((g) => kinds.includes(g.kind));
+// Owner, November 13, 2026: "in profile it should show latest sessions joined · when they click on the session then they will see their matches from there".
+// Replaces the Latest matches card: the four latest sessions this player played in, newest first; a row opens that session's matches in a dialog.
+const sessRecord = (s) => { const c = s.games.filter((g) => g.kind === 'counted'), w = c.filter((g) => g.res === 'W').length; return { w, l: c.length - w, n: s.games.length }; };
+const sessDate = (ago) => { const d = dayOf(ago); return `<span class="dblk" aria-hidden="true"><b>${d.getDate()}</b><span>${d.toLocaleDateString([], { month: 'short' })}</span></span>`; };
+// Artifact comment, November 13, 2026: the profile shows Recent sessions and Recent games, three items each, and every profile has a
+// Sessions page (/players/<id>/sessions) with every session the player joined.
+const sessListOf = (p) => p.sessions.filter((x) => x.ago >= 0 && x.games.length).sort((a, b) => a.ago - b.ago);
+const sessRow = (p) => (x) => { const r = sessRecord(x); return `<button type="button" class="crow mbtn ls-row" data-act="openSessionGames" data-id="${esc(p.id)}" data-sid="${esc(x.id)}" aria-label="${esc(x.title)}, ${fmtDay(x.ago)}, ${esc(x.club)}, ${r.w} won ${r.l} lost. See the matches">${sessDate(x.ago)}<span class="main"><b>${esc(x.title)}</b><span class="small muted">${fmtDay(x.ago)} · ${esc(x.club)}</span></span><span class="ls-rec"><b class="tnum"><span class="w">${r.w}W</span> · <span class="l">${r.l}L</span></b><span class="small muted">${r.n} ${r.n === 1 ? 'match' : 'matches'}</span></span><span class="muted" aria-hidden="true">${I.fwd}</span></button>`; };
+function latestSessionsCard(p) {
+  const list = sessListOf(p);
+  return `<section class="card stack"><div class="between"><h2>Recent sessions</h2>${list.length ? `<button class="btn xs" data-act="openSessions" data-id="${esc(p.id)}">All sessions (${list.length})</button>` : ''}</div>
+        ${list.length ? `<div>${list.slice(0, 3).map(sessRow(p)).join('')}</div>` : '<div class="empty">No sessions joined yet.</div>'}
+      </section>`;
+}
+function recentGamesCard(p) {
+  const games = sessListOf(p).flatMap((s) => s.games.slice().reverse().map((g) => ({ g, s })));
+  const total = p.sessions.reduce((n, s) => n + s.games.length, 0);
+  return `<section class="card stack"><div class="between"><h2>Recent games</h2>${games.length ? `<button class="btn xs" data-act="openHistory" data-id="${esc(p.id)}">All games (${total})</button>` : ''}</div>
+        ${games.length ? `<div class="rg-list">${games.slice(0, 3).map(({ g, s }) => `<div class="rg-item">${gameRow(g, p, p.id === S.me ? { sid: s.id, gi: s.games.indexOf(g) } : null)}<p class="small muted rg-src">${esc(s.title)} · ${fmtDay(s.ago)} · ${esc(s.club)}</p></div>`).join('')}</div>` : '<div class="empty">No games recorded yet.</div>'}
+      </section>`;
+}
+function viewSessions() {
+  const p = profileOf(S.viewId);
+  if (!p) return viewNotFound();
+  if (hiddenFromViewer(p)) return viewPrivateGate(p);
+  const list = sessListOf(p);
+  return `<main class="wrap mid">
+    <div class="page-head">${backBtn('openProfile', p.name, p.id)}<span class="label">${esc(p.name)}</span><h1>Sessions</h1>
+      <p class="muted">Every club session ${p.id === S.me ? 'you' : firstName(p)} played in, newest first. Tap one to see the matches.</p></div>
+    <section class="card stack">${list.length ? `<div>${list.map(sessRow(p)).join('')}</div>` : '<div class="empty">No sessions joined yet.</div>'}</section>
+  </main>`;
+}
+function sessionBlock(s, kinds, own = false, who = null, gf = null) {
+  const games = s.games.filter((g) => kinds.includes(g.kind) && (!gf || gf(g)));
   if (!games.length) return '';
   return `<section class="sess"><div class="sess-head"><div style="min-width:0"><h3>${esc(s.title)}</h3><p class="small muted">${fmtDay(s.ago)} · ${esc(s.club)}</p></div>
     ${s.pageGone ? '<span class="small muted">Session page no longer available</span>' : `<button class="btn xs ghost" data-act="sessionPage" data-title="${esc(s.title)}">Session page ${I.ext}</button>`}</div>
     ${own && kinds.includes('counted') ? shareRow(s) : ''}
-    ${games.map(gameRow).join('')}</section>`;
+    ${games.map((g) => gameRow(g, who, own ? { sid: s.id, gi: s.games.indexOf(g) } : null)).join('')}</section>`;
 }
 // Share result / Share games on a session of the signed-in player's own history. Only after the Queue Master publishes (D-2026-11-09-08).
 function shareRow(s) {
-  if (s.published === true) return `<div class="row sess-share"><button class="btn xs" data-act="openShare" data-kind="result" data-sid="${s.id}">${I.share} Share result</button><button class="btn xs" data-act="openShare" data-kind="games" data-sid="${s.id}">${I.share} Share games</button></div>`;
-  if (s.published === false) return '<p class="small muted sess-share">Results not shared yet by the club.</p>';
-  return '';
+  if (s.published === true) return `<div class="row sess-share"><button class="btn xs" data-act="openShare" data-kind="perf" data-sid="${s.id}">${I.share} Share performance</button><button class="btn xs" data-act="openShare" data-kind="result" data-sid="${s.id}">${I.share} Share result</button><button class="btn xs" data-act="openShare" data-kind="games" data-sid="${s.id}">${I.share} Share games</button></div>`;
+  // Owner artifact comment, November 13, 2026 ("since it's your profile you can share your own games"): your own games can be shared
+  // before the club publishes; only Share result (your place in the Standings) waits for the club.
+  // Artifact comment, same day ("add share session performance"): Share performance shares your night in one card.
+  return `<div class="row sess-share"><button class="btn xs" data-act="openShare" data-kind="perf" data-sid="${s.id}">${I.share} Share performance</button><button class="btn xs" data-act="openShare" data-kind="games" data-sid="${s.id}">${I.share} Share games</button>${s.published === false ? '<span class="small muted">Share result opens once the club shares the Standings.</span>' : ''}</div>`;
 }
-function eligibility(p, own) {
+// Artifact comment, November 13, 2026: once a player qualifies, the profile shows their leaderboard ranking instead of the eligibility
+// card: the overall position, the players around them on the leaderboard (two above, two below), and the qualifying count as one line.
+// Artifact comment, same day ("no need to put this here", on the Shared rank card): the profile no longer has a separate Shared rank card.
+// The rank label, Share rank and How this rank works move into the head of the ranking / eligibility card; the ladder lives on the rank page.
+const rankHead = (p, own, st) => `<div class="rk-lv"><div class="stack tight"><span class="label">Shared rank</span><div class="row" style="gap:8px"><b class="rk-lvl${p.level == null ? ' dim' : ''}">${lvLabel(p.level)}</b>${st ? st.chips : ''}</div></div><div class="row">${own && p.level != null ? `<button class="btn xs" data-act="openShare" data-kind="rank">${I.share} Share</button>` : ''}<button class="btn xs ghost" data-act="openRank" data-id="${esc(p.id)}">How this rank works</button></div></div>`;
+function rankingCard(p, own, pos, st) {
+  // Artifact comment, same day ("I just want the leaderboard ranking but just her information · I expect it to be compact"): only this
+  // player's rank and position, no neighbouring rows, in a compact card.
+  const n = boardList().length, t = T();
+  return `<section class="card stack rk-card"><div class="between"><h2>Leaderboard ranking</h2>${chip('Qualifies', 'ok')}</div>
+    <div class="rk-compact"><div class="rk-c-lv"><span class="label">Shared rank</span><b class="rk-lvl${p.level == null ? ' dim' : ''}">${lvLabel(p.level)}</b>${st && st.chips ? `<div class="row" style="gap:6px">${st.chips}</div>` : ''}</div>
+      <button type="button" class="rk-c-pos" data-act="seeOnBoard" data-id="${esc(p.id)}" aria-label="Overall number ${num(pos)} of ${num(n)}. See on the leaderboard"><span class="label">Overall</span><b class="tnum">#${num(pos)}</b><span class="small muted">of ${num(n)}</span></button></div>
+    <div class="rk-c-foot"><span class="small muted">${p.recent} of ${t} standard matches · last three months</span><div class="row" style="gap:6px">${own && p.level != null ? `<button class="btn xs" data-act="openShare" data-kind="rank">${I.share} Share</button>` : ''}<button class="btn xs ghost" data-act="openRank" data-id="${esc(p.id)}">How this rank works</button></div></div></section>`;
+}
+function eligibility(p, own, st) {
   const t = T(), pct = Math.min(100, Math.round((p.recent / t) * 100));
+  { const pos = p.recent >= t && p.state !== 'reassess' ? positionOf(p.id) : null; if (pos) return rankingCard(p, own, pos, st); }
   const older = countedAll(p.sessions) - p.recent;
   const you = own ? 'you' : firstName(p);
   let text;
@@ -1096,6 +1433,7 @@ function eligibility(p, own) {
   else if (p.recent >= t) text = `${own ? 'You meet' : 'Meets'} the requirement of ${t} completed singles or doubles matches in the last three months. Falling below it removes the leaderboard position, though the rank stays visible.`;
   else text = `${t - p.recent} more standard ${t - p.recent === 1 ? 'match' : 'matches'} in the next few weeks would put ${you} on the leaderboard. Older matches drop out of the count as they pass three months.`;
   return `<section class="card stack"><div class="between"><h2>Leaderboard eligibility</h2>${p.recent >= t && p.state !== 'reassess' ? chip('Qualifies', 'ok') : chip('Not yet', p.state === 'reassess' ? 'warn' : '')}</div>
+    ${rankHead(p, own, st)}${st && st.text ? `<p class="small muted">${st.text}</p>` : ''}
     <div class="between" style="align-items:baseline"><span class="big-count">${p.recent} <span class="muted" style="font-size:15px">of ${t}</span></span><span class="small muted">standard matches · last three months</span></div>
     <div class="prog ${p.state === 'reassess' ? 'warn' : ''}" role="progressbar" aria-valuemin="0" aria-valuemax="${t}" aria-valuenow="${Math.min(p.recent, t)}" aria-label="Standard matches in the last three months"><i style="width:${pct}%"></i></div>
     <p class="small muted">${text}</p>
@@ -1105,9 +1443,9 @@ function eligibility(p, own) {
 // ---------- Top bar ----------
 function topBar() {
   const me = S.me && S.accounts[S.me];
-  const mine = me && ((['profile', 'rank', 'history'].includes(S.screen) && S.viewId === S.me) || ['edit', 'id', 'account'].includes(S.screen));
+  const mine = me && ((['profile', 'rank', 'history', 'sessions'].includes(S.screen) && S.viewId === S.me) || ['edit', 'id', 'account'].includes(S.screen));
   return `<header class="top"><div class="top-in">
-    <button class="brand" data-act="go" data-to="board" aria-label="ROTRA Players, open the leaderboard"><span style="color:inherit;font-size:inherit;font-weight:inherit;letter-spacing:inherit">ROTR<b>A</b></span><span>Players</span></button>
+    <button class="brand" data-act="go" data-to="board" aria-label="ROTRA Players, open the leaderboard">${rotraLogo('resp', 'brand-logo')}<span>Players</span></button>
     <nav class="nav" aria-label="Main">
       <button data-act="go" data-to="board" ${S.screen === 'board' ? 'aria-current="page"' : ''}>Leaderboard</button>
       ${me ? `<button data-act="openProfile" data-id="${me.id}" ${mine ? 'aria-current="page"' : ''}>My profile</button>` : `<button data-act="go" data-to="login" ${['login', 'forgot', 'reset'].includes(S.screen) ? 'aria-current="page"' : ''}>Sign in</button>`}
@@ -1135,7 +1473,7 @@ function lbRow(e, pos) {
     return `<div class="lb-row${medal ? ` podium p${pos}` : ''}" id="row-${e.id}" aria-disabled="true"><span class="lb-pos">${num(pos)}</span>${avatar(m)}
     <span class="lb-name"><b>${esc(m.name)}</b></span><span class="lb-lv">${lvLabel(e.level)}</span></div>`;
   }
-  return `<button class="lb-row${me ? ' me' : ''}${medal ? ` podium p${pos}` : ''}" id="row-${e.id}" data-act="openProfile" data-id="${e.id}" aria-label="${medal ? `${medal[0].toUpperCase()}${medal.slice(1)} place` : `Number ${pos}`}, ${esc(e.name)}${me ? ' (you)' : ''}, ${lvLabel(e.level)}">
+  return `<button class="lb-row${me ? ' me' : ''}${medal ? ` podium p${pos}` : ''}" id="row-${e.id}" data-act="openProfileCard" data-id="${e.id}" aria-label="${medal ? `${medal[0].toUpperCase()}${medal.slice(1)} place` : `Number ${pos}`}, ${esc(e.name)}${me ? ' (you)' : ''}, ${lvLabel(e.level)}">
     <span class="lb-pos">${num(pos)}</span>${avatar(e)}
     <span class="lb-name"><b>${esc(e.name)}</b>${e.nick ? `<span class="small muted">“${esc(e.nick)}”</span>` : ''}${me ? chip('You', 'ok') : ''}</span>
     <span class="lb-lv">${lvLabel(e.level)}</span></button>`;
@@ -1208,7 +1546,7 @@ function podium(list) {
       <span class="pod-who">${i === 0 ? '<canvas class="fire" id="fire" width="48" height="40" aria-hidden="true"></canvas>' : ''}${avatar(maskedView(e), 'pod-av')}
         <b class="pod-name">${esc(maskName(e.name))}</b><span class="pod-lv">${lvLabel(e.level)}</span></span>
       <span class="pod-step" aria-hidden="true"><b>${i + 1}</b><small>${short[i]}</small></span></div>` : `
-    <button class="pod p${i + 1}${e.id === S.me ? ' me' : ''}" data-act="openProfile" data-id="${e.id}" aria-label="${place[i]} place, ${esc(e.name)}${e.id === S.me ? ' (you)' : ''}, ${lvLabel(e.level)}">
+    <button class="pod p${i + 1}${e.id === S.me ? ' me' : ''}" data-act="openProfileCard" data-id="${e.id}" aria-label="${place[i]} place, ${esc(e.name)}${e.id === S.me ? ' (you)' : ''}, ${lvLabel(e.level)}">
       <span class="pod-who">${i === 0 ? '<canvas class="fire" id="fire" width="48" height="40" aria-hidden="true"></canvas>' : ''}${avatar(e, 'pod-av')}
         <b class="pod-name">${esc(e.name)}</b>${e.nick ? `<span class="small muted">“${esc(e.nick)}”</span>` : ''}<span class="pod-lv">${lvLabel(e.level)}</span></span>
       <span class="pod-step" aria-hidden="true"><b>${i + 1}</b><small>${short[i]}</small></span></button>`).join('')}</div></section>`;
@@ -1300,13 +1638,13 @@ function viewProfile() {
   const missing = own && (!p.style || !p.expY);
   return `<main class="wrap"><div class="prof">
     <aside class="side stack">
-      <section class="card hero">
+      <section class="card hero p-hero">
         <div class="hero-top"><div class="hero-banner bn-${esc(bannerOf(p))}" aria-hidden="true"></div>${own ? `<button type="button" class="bn-cam" data-act="openBanner" aria-label="Change banner" title="Change banner">${I.edit}</button>` : ''}</div>
-        <div class="who">${own ? `<span class="av-edit">${avatar(p, 'xxl', true)}<button type="button" class="av-cam" data-act="openAvatar" aria-label="Change profile picture" title="Change profile picture">${I.edit}</button></span>` : avatar(p, 'xxl', true)}<div style="min-width:0" class="stack tight"><h1>${esc(p.name)}</h1>${p.nick ? `<p class="muted">“${esc(p.nick)}”</p>` : ''}${own ? `<div class="row">${chip('This is you', 'ok')}</div>` : ''}</div></div>
+        <div class="who">${own ? `<span class="av-edit">${avatar(p, 'xxl', true)}<button type="button" class="av-cam" data-act="openAvatar" aria-label="Change profile picture" title="Change profile picture">${I.edit}</button></span>` : avatar(p, 'xxl', true)}<div style="min-width:0" class="stack tight p-name"><h1>${esc(p.nick || p.name)}</h1>${p.nick ? `<p class="muted">${esc(p.name)}</p>` : ''}${own ? `<div class="row">${chip('This is you', 'ok')}</div>` : ''}</div></div>
         <div class="stack tight"><span class="label">Player ID</span>
           <div class="rtr-line"><code id="rtr-${p.id}">${esc(p.rtr)}</code><button class="btn xs" data-act="copyId" data-id="${p.id}" aria-label="Copy player ID">${I.copy} Copy</button></div>
           <span class="hint">Shows the city and date this profile was first created. It isn't where ${own ? 'you live or which club you play for' : 'this player lives or which club they play for'}.</span></div>
-        ${own ? `<div class="acts"><button class="btn sm" data-act="openEdit">${I.edit} Edit profile</button><button class="btn sm" data-act="go" data-to="id">${I.qr} My player ID</button><button class="btn sm" data-act="openShare" data-kind="profile">${I.share} Share profile</button></div>` : `<div class="acts"><button class="btn sm primary" data-act="openCompare" data-id="${p.id}">${I.versus} Compare with ${S.me ? 'me' : 'my results'}</button></div>`}
+        ${own ? `<div class="acts"><button class="btn sm" data-act="openEdit">${I.edit} Edit profile</button><button class="btn sm" data-act="go" data-to="id">${I.qr} My player ID</button><button class="btn sm" data-act="openShare" data-kind="profile">${I.share} Share profile</button></div>` : `<div class="acts"><button class="btn sm primary" data-act="openCompare" data-id="${p.id}">${I.versus} Compare with ${S.me ? 'me' : 'my results'}</button><button class="btn sm" data-act="openShare" data-kind="profile" data-pid="${p.id}">${I.share} Share profile</button></div>`}
       </section>
       ${own ? privatePanel(p) : ''}${clubsPanel(p, own)}
     </aside>
@@ -1314,19 +1652,11 @@ function viewProfile() {
       ${!S.online && own ? notice('warn', 'Saved copy. Your rank and games may have changed since this device was last online.') : ''}
       ${p.state === 'processing' ? notice('warn', `<b>Updating from Sunday Night Queue.</b> Lahug Smash Club finished the session last night. This is ${own ? 'your' : 'the'} last calculated rank until the update is ready.`) : ''}
       ${missing ? notice('', `Add your playing style and experience so clubs know your game. It's optional. <button class="btn xs" data-act="openEdit" style="margin-left:4px">Add details</button>`) : ''}
-      <section class="card stack">
-        <div class="between"><span class="label">Shared rank</span><div class="row">${own && p.level != null ? `<button class="btn xs" data-act="openShare" data-kind="rank">${I.share} Share</button>` : ''}<button class="btn xs ghost" data-act="openRank" data-id="${p.id}">How this rank works</button></div></div>
-        <div class="rank-main"><div class="stack tight"><div class="rank-label${p.level == null ? ' dim' : ''}">${lvLabel(p.level)}</div><div class="row">${st.chips}</div></div>
-          ${pos ? `<div class="rank-pos"><span class="label">Overall</span><b>#${num(pos)}</b></div>` : `<div class="rank-pos none"><span class="label">Overall</span><b>No position</b></div>`}</div>
-        ${ladder(p.level, st.stale)}
-        <p class="small muted">${st.text}</p>
-        <p class="small muted">Clubs can still place ${own ? 'you' : firstName(p)} at a different level for their own sessions.</p>
-      </section>
-      ${eligibility(p, own)}
+      ${eligibility(p, own, st)}
+      ${weeklyPerf(p, true)}
       ${own ? mySessionsCard() : ''}
-      <section class="card stack"><div class="between"><h2>Recent games</h2>${games.length ? `<button class="btn xs" data-act="openHistory" data-id="${p.id}">All games (${games.length})</button>` : ''}</div>
-        ${games.length ? `<div>${games.slice(0, 3).map(({ g, s }) => gameRow({ ...g, note: '' }).replace('<div class="small muted">vs', `<div class="small muted">${fmtDay(s.ago)} · ${esc(s.club)}</div><div class="small muted">vs`)).join('')}</div>` : '<div class="empty">No recorded games yet.</div>'}
-      </section>
+      ${latestSessionsCard(p)}
+      ${recentGamesCard(p)}
       <section class="card stack"><h2>About</h2>
         <div class="stack tight"><span class="label">Playing style</span><p>${p.style ? esc(p.style) : `<span class="muted">${own ? 'You haven\'t' : 'This player hasn\'t'} added a playing style yet.</span>`}</p></div>
         <div class="stack tight"><span class="label">Experience</span><p>${expText(p) || '<span class="muted">Not added</span>'}</p>${expText(p) ? '<span class="hint">Self-reported. Clubs may use it for a first assessment; it doesn\'t add rank points.</span>' : ''}</div>
@@ -1395,7 +1725,7 @@ function clubsPanel(p, own) {
   const list = clubsOf(p).filter((c) => CLUB_DIR[c.id]);
   return `<section class="card stack"><h3>${own ? 'Your clubs' : 'Clubs'}</h3>${list.length ? `<div>${list.map((c) => {
     const club = CLUB_DIR[c.id];
-    return `<button type="button" class="crow mbtn" data-act="openClub" data-id="${c.id}">${avatar({ name: club.name })}<span class="main"><b>${esc(club.name)}</b>${own && c.via ? `<span class="small muted">${VIA[c.via]}</span>` : ''}</span><span class="muted" aria-hidden="true">${I.fwd}</span></button>`;
+    return `<button type="button" class="crow mbtn" data-act="openClubCard" data-id="${c.id}">${avatar({ name: club.name })}<span class="main"><b>${esc(club.name)}</b>${own && c.via ? `<span class="small muted">${VIA[c.via]}</span>` : ''}</span><span class="muted" aria-hidden="true">${I.fwd}</span></button>`;
   }).join('')}</div>` : `<div class="empty">${own ? 'You\'re not in any club\'s saved players yet.' : 'No clubs yet.'}</div>`}</section>`;
 }
 
@@ -1691,23 +2021,60 @@ function viewRank() {
 }
 
 // ---------- P-MATCH-HISTORY ----------
+// Owner artifact comment, November 13, 2026: weekly performance for the whole year — one stacked bar per weekday (Sunday to Saturday),
+// wins at the bottom in the accent, losses on top in the error colour, bar height = games played that weekday; counted games only.
+// Artifact comment, same day: the profile shows the same chart read-only (ro): bars can't be tapped, a See all games button opens
+// the Games page, and on your own profile a chip says who can see it.
+function weeklyPerf(p, ro = false) {
+  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'], agg = days.map(() => ({ w: 0, l: 0 }));
+  p.sessions.filter((s) => s.ago >= 0 && s.ago <= YEAR_DAYS()).forEach((s) => { const d = dayOf(s.ago).getDay(); s.games.filter((g) => g.kind === 'counted').forEach((g) => { agg[d][g.res === 'W' ? 'w' : 'l'] += 1; }); });
+  const max = Math.max(1, ...agg.map((a) => a.w + a.l)), tw = agg.reduce((n, a) => n + a.w, 0), tl = agg.reduce((n, a) => n + a.l, 0);
+  if (!tw && !tl) return '';
+  if (p.hideWeekly && p.id !== S.me) return ''; // the player turned it off (Privacy and contact)
+  const best = agg.reduce((b, a, i) => (a.w + a.l >= 3 && (b < 0 || a.w / (a.w + a.l) > agg[b].w / (agg[b].w + agg[b].l)) ? i : b), -1);
+  // Artifact comment, same day: wins and losses as two bars side by side; tapping a bar filters the games below to that weekday's
+  // wins (green) or losses (red); tapping it again, or Clear, shows every game.
+  const maxv = Math.max(1, ...agg.map((a) => Math.max(a.w, a.l))), f = ro ? null : S.ui.wpf;
+  const bar = (i, res, v) => { const on = f && f.day === i && f.res === res, dim = f && !on;
+    if (ro) return `<span class="wp-b ro ${res === 'W' ? 'w' : 'l'}" style="height:${Math.max(Math.round((v / maxv) * 100), v ? 6 : 2)}%" aria-hidden="true"><span class="wp-v tnum">${v || ''}</span></span>`;
+    return `<button type="button" class="wp-b ${res === 'W' ? 'w' : 'l'}${on ? ' on' : ''}${dim ? ' dim' : ''}" style="height:${Math.max(Math.round((v / maxv) * 100), v ? 6 : 2)}%" data-act="wpFilter" data-day="${i}" data-res="${res}" aria-pressed="${!!on}" aria-label="${days[i]}: ${v} ${res === 'W' ? (v === 1 ? 'win' : 'wins') : (v === 1 ? 'loss' : 'losses')}. Show ${res === 'W' ? 'these wins' : 'these losses'}" ${v ? '' : 'disabled'}><span class="wp-v tnum">${v}</span></button>`; };
+  const col = (a, i) => { const n = a.w + a.l, rate = n ? Math.round((a.w / n) * 100) : null;
+    return `<div class="wp-col${i === best ? ' best' : ''}${n ? '' : ' none'}" role="listitem" aria-label="${days[i]}: ${n ? `${a.w} won, ${a.l} lost, ${rate}% win rate` : 'no games'}">
+      <span class="wp-rate tnum">${n ? `${rate}%` : '—'}</span><div class="wp-plot">${bar(i, 'W', a.w)}${bar(i, 'L', a.l)}</div>
+      <b class="wp-day">${days[i].slice(0, 3)}</b></div>`; };
+  const n = tw + tl, rate = Math.round((tw / n) * 100);
+  // Artifact comment, same day ("design could be improved"): summary tiles on top, a plotted area with guide lines, rounded split bars
+  // with the win rate on top, the best day lifted on an accent column.
+  const own = p.id === S.me, vis = p.hideWeekly ? ['Hidden', 'Only you can see this. Turn it back on in Privacy and contact.'] : p.alwaysPrivate ? ['Only you', 'Only you can see this. Your profile is always private.'] : p.profilePrivate ? ['Signed-in players', 'Players signed in to ROTRA can see this on your profile.'] : ['Public', 'Anyone who opens your profile can see this.'];
+  return `<section class="card stack wp${ro ? ' wp-ro' : ''}"><div class="between"><h2>${new Date().getFullYear()} Weekly Performance</h2><div class="row" style="gap:6px">${own ? `<button type="button" class="chip wp-vis${vis[0] === 'Public' ? ' pub' : ''}" data-act="goSetting" data-k="sw-weekly" title="${vis[1]} Change it in Privacy and contact." aria-label="Visibility: ${vis[0]}. ${vis[1]} Change it in Privacy and contact"><i aria-hidden="true"></i>${vis[0]}</button>` : ''}</div></div>
+    <div class="wp-sum"><div><span class="label">Games</span><b class="tnum">${n}</b></div><div><span class="label">Record</span><b class="tnum"><span class="w">${tw}W</span> <span class="l">${tl}L</span></b></div><div><span class="label">Win rate</span><b class="tnum">${rate}%</b></div><div class="${best >= 0 ? 'hl' : ''}"><span class="label">Best day</span><b>${best >= 0 ? days[best] : '—'}</b></div></div>
+    <div class="wp-chart" role="list" aria-label="Wins and losses by day of the week">${agg.map(col).join('')}</div>
+    <div class="wp-legend"><span><i class="w"></i>Won</span><span><i class="l"></i>Lost</span><span class="muted">${ro ? 'Singles and doubles this year' : 'Tap a bar to see those games · counted games this year'}</span></div>
+    ${ro ? `<button class="btn sm" data-act="openHistory" data-id="${esc(p.id)}" style="align-self:flex-start">See all games ${I.fwd}</button>` : ''}
+    ${f ? `<div class="wp-filter" role="status">Showing <b>${days[f.day]} ${f.res === 'W' ? 'wins' : 'losses'}</b> <button type="button" class="btn xs" data-act="wpFilter" data-clear="1">Clear</button></div>` : ''}</section>`;
+}
 function viewHistory() {
   const p = profileOf(S.viewId);
   if (!p) return viewNotFound();
   if (hiddenFromViewer(p)) return viewPrivateGate(p);
   const tab = S.ui.hist;
   const kinds = tab === 'counted' ? ['counted'] : ['fun', 'partial'];
-  const blocks = p.sessions.map((s) => sessionBlock(s, kinds, p.id === S.me)).filter(Boolean);
+  const f = tab === 'counted' && S.ui.wpf ? S.ui.wpf : null;
+  const blocks = p.sessions.filter((s) => !f || (s.ago >= 0 && s.ago <= YEAR_DAYS() && dayOf(s.ago).getDay() === f.day)).map((s) => sessionBlock(s, kinds, p.id === S.me, p, f ? (g) => g.res === f.res : null)).filter(Boolean);
   const nC = countedAll(p.sessions), nF = p.sessions.reduce((n, s) => n + s.games.filter((g) => g.kind !== 'counted').length, 0);
   return `<main class="wrap mid">
     <div class="page-head">${backBtn('openProfile', p.name, p.id)}<span class="label">${esc(p.name)}</span><h1>Games</h1>
       <p class="muted">Official results from finished club sessions. Results are final and can't be edited.</p></div>
+    ${weeklyPerf(p)}
     <div class="tabs" role="tablist" aria-label="Game type">
       <button role="tab" aria-selected="${tab === 'counted'}" data-act="histTab" data-v="counted">Singles and doubles ${chip(nC, 'solid')}</button>
       <button role="tab" aria-selected="${tab !== 'counted'}" data-act="histTab" data-v="other">Fun and partial ${chip(nF, 'solid')}</button></div>
     ${tab !== 'counted' ? notice('', 'These games are kept in the record but don\'t count toward rank or the leaderboard.') : p.state === 'reassess' ? notice('warn', 'None of these games are from the last three months, so they no longer count toward the leaderboard.') : ''}
     ${p.state === 'processing' && tab === 'counted' ? notice('warn', 'Sunday Night Queue games are in, but the rank update from them is still processing.') : ''}
-    <section class="card stack" style="gap:22px">${blocks.length ? blocks.join('') : `<div class="empty">${tab === 'counted' ? 'No recorded singles or doubles games yet.' : 'No fun or partial games.'}</div>`}</section>
+    ${(() => { /* Artifact comment, same day: three sessions per page, newest first. */
+      const per = 3, pages = Math.max(1, Math.ceil(blocks.length / per)), pg = Math.min(Math.max(0, S.ui.histPage || 0), pages - 1);
+      return `<section class="card stack" style="gap:22px">${blocks.length ? blocks.slice(pg * per, (pg + 1) * per).join('') : `<div class="empty">${f ? 'No games match this filter.' : tab === 'counted' ? 'No recorded singles or doubles games yet.' : 'No fun or partial games.'}</div>`}
+        ${pages > 1 ? `<nav class="pager" aria-label="Session pages"><button type="button" class="btn sm" data-act="histPage" data-v="${pg - 1}" ${pg === 0 ? 'disabled' : ''}>${I.back} Newer</button><span class="small muted" aria-live="polite">Page ${pg + 1} of ${pages} · ${blocks.length} sessions</span><button type="button" class="btn sm" data-act="histPage" data-v="${pg + 1}" ${pg >= pages - 1 ? 'disabled' : ''}>Older ${I.fwd}</button></nav>` : ''}</section>`; })()}
   </main>`;
 }
 
@@ -1793,6 +2160,16 @@ function viewAccount() {
       <p class="small" aria-live="polite">${S.ui.profilePending ? 'Saving…' : esc(`Saved: your profile is ${VIS_LABEL[vis]}.`)}</p>
       ${S.ui.profileErr ? notice('bad', esc(S.ui.profileErr)) : ''}
     </section>
+    <section class="card stack"><h2>Stats on your profile</h2>
+      <p class="small muted" style="margin:0">Both are on unless you turn them off. Turning one off hides it from everyone else; you still see it on your own profile.</p>
+      <div class="setting"><div class="main stack tight"><label for="sw-stats" style="font-weight:700">Show my profile stats</label>
+        <p class="small muted">Latest stats on your profile card: win rate, games, wins and losses this year.</p></div>
+        ${sw(!p.hideStats, 'toggleStatsVis', 'Show my profile stats', 'id="sw-stats"')}</div>
+      <div class="setting"><div class="main stack tight"><label for="sw-weekly" style="font-weight:700">Show my weekly performance</label>
+        <p class="small muted">The wins and losses by day of the week chart on your profile and your Games page.</p></div>
+        ${sw(!p.hideWeekly, 'toggleWeeklyVis', 'Show my weekly performance', 'id="sw-weekly"')}</div>
+      <p class="small" aria-live="polite">${esc(`Saved: profile stats ${p.hideStats ? 'hidden' : 'shown'}, weekly performance ${p.hideWeekly ? 'hidden' : 'shown'}.`)}</p>
+    </section>
     <section class="card stack"><h2>Player Information</h2>
       <div class="setting"><div class="main stack tight"><label for="sw-dir" style="font-weight:700">Hide me from Player Information</label>
         <p class="small muted">Clubs can't find you in the Player Information search or by RTR ID. Clubs that already saved you can still add you. You join sessions yourself.</p></div>
@@ -1844,7 +2221,9 @@ function personalFields(base, d, e, pre) {
 // one draft and one Save, so switching sections never loses edits.
 // Predefined profile banners (owner comment, November 11, 2026): players pick one; nothing is uploaded.
 const BANNERS = [['court', 'Court'], ['night', 'Night'], ['dusk', 'Dusk'], ['ember', 'Ember'], ['sun', 'Sun'], ['stripe', 'Stripe']];
-const bannerOf = (p) => BANNERS.some(([k]) => k === p.banner) ? p.banner : 'court';
+// Owner comment, November 13, 2026: the default banner is the one Admin › Profile banners marks Default (Court in this prototype).
+const DEFAULT_BANNER = 'court';
+const bannerOf = (p) => BANNERS.some(([k]) => k === p.banner) ? p.banner : DEFAULT_BANNER;
 const EDIT_TABS = [
   { id: 'basics', label: 'Name', intro: 'How you appear on the leaderboard and your profile.', keys: ['name', 'nick'], body: fieldsBasics },
   { id: 'game', label: 'Playing style', intro: 'Help clubs and other players know your game.', keys: ['style', 'expY', 'expM', 'sinceM', 'sinceY'], body: fieldsGame },
@@ -1891,7 +2270,7 @@ function viewEdit() {
 function viewLogin() {
   const L = S.ui.login;
   return `<main class="login"><form class="card" data-form="login" novalidate>
-    <div class="stack tight"><div class="mark">ROTR<b>A</b></div><p class="muted">Your player profile.</p></div>
+    <div class="stack tight"><div class="mark">${rotraLogo('full', 'mark-logo')}</div><p class="muted">Your player profile.</p></div>
     <h1 style="font-size:22px">Sign in</h1>
     ${L.note ? notice('ok', esc(L.note)) : ''}
     ${L.err ? notice('bad', esc(L.err)) : ''}
@@ -2028,22 +2407,45 @@ function viewNotFound() {
 const SHARE_MASKED = new Set(['Kat Lim', 'Rafa Aquino', 'Ian Co', 'Pia Tan']); // prototype: private profile or guest
 const shareName = (n) => (SHARE_MASKED.has(n) ? maskName(n) : n);
 const profileLink = (id) => `${/^https?:/.test(location.origin) ? location.origin : 'https://rotra.example'}/player/players/${id}`;
-const SHARE_GAME_LIMIT = { post: 3, story: 4 };
+const SHARE_GAME_LIMIT = { post: 3, story: 4, square: 2 };
+// Owner, November 13, 2026: every Share opens this dialog with all three sizes — Story (9:16), Facebook post (4:5) and Square (1:1, Instagram) —
+// then a big OR, then the link in one field with the copy icon inside it.
+const SHARE_FMTS = [['story', 'Story', '9:16 · Facebook and Instagram stories'], ['post', 'Facebook post', '4:5 · Facebook feed'], ['square', 'Square', '1:1 · Instagram feed']];
+// Owner artifact comment, November 13, 2026: big share dialogs with full-size images, pick several, eye icon opens full screen.
+const SH_SIZE = { story: [270, 480], post: [320, 400], square: [320, 320] };
+const shPick = (o) => `<div class="sh-pick"><button type="button" class="sh-img${o.on ? ' on' : ''}" ${o.pick} aria-pressed="${o.on}" aria-label="${o.label}${o.hint ? `, ${o.hint}` : ''}. ${o.on ? 'Picked' : 'Not picked'}">${o.card}<i class="sh-chk" aria-hidden="true">✓</i></button><button type="button" class="sh-eye" ${o.view} aria-label="View ${o.label} full screen" title="View full screen"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button><span class="sh-cap"><b>${o.label}</b>${o.hint ? `<span class="small muted">${o.hint}</span>` : ''}</span></div>`;
+const shViewer = (o) => { const [w, h] = SH_SIZE[o.fmt], s = Math.max(0.5, Math.min((innerWidth - 32) / w, (innerHeight - 160) / h, 2.4));
+  return `<div class="sh-view" role="dialog" aria-modal="true" aria-label="${o.label}, full screen" ${o.close}><button type="button" class="sh-view-x" ${o.close} aria-label="Close full screen"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button><div class="sh-view-fit" style="width:${Math.round(w * s)}px;height:${Math.round(h * s)}px"><div class="sh-view-in" style="transform:scale(${s.toFixed(3)})">${o.card}</div></div><div class="sh-view-bar"><b>${o.label}</b><button type="button" class="btn primary" ${o.dl}>Download</button></div></div>`; };
+// Share carousel (artifact comment, November 13, 2026): mouse drag scrolls the strip (touch scrolls natively), a drag never counts as
+// a click, the strip keeps its position when the dialog re-renders, and the fade masks show only on a side with hidden images.
+const SHCAR = { x: 0, drag: null, moved: false };
+const shCarSync = (el) => { const max = el.scrollWidth - el.clientWidth - 2; el.classList.toggle('mask-l', el.scrollLeft > 2); el.classList.toggle('mask-r', el.scrollLeft < max); const nav = el.parentElement.querySelector('.sh-car-nav'); if (nav) { const items = [...el.querySelectorAll('.sh-pick')], mid = el.scrollLeft + el.clientWidth / 2; let best = 0, bd = Infinity; items.forEach((it, i) => { const d = Math.abs(it.offsetLeft + it.offsetWidth / 2 - mid); if (d < bd) { bd = d; best = i; } }); [...nav.children].forEach((d, i) => d.classList.toggle('on', i === best)); } };
+const shCarInit = () => { const cars = document.querySelectorAll('.sh-dlg .sh-tiles'); if (!cars.length) { SHCAR.x = 0; return; } cars.forEach((el) => { if (!el.dataset.car) { el.dataset.car = '1'; const nav = document.createElement('div'); nav.className = 'sh-car-nav'; nav.setAttribute('aria-hidden', 'true'); nav.innerHTML = [...el.querySelectorAll('.sh-pick')].map(() => '<i></i>').join(''); el.after(nav); el.scrollLeft = SHCAR.x; } shCarSync(el); }); };
+new MutationObserver(shCarInit).observe(document.body, { childList: true, subtree: true });
+document.addEventListener('scroll', (e) => { const el = e.target; if (el instanceof Element && el.matches('.sh-dlg .sh-tiles')) { SHCAR.x = el.scrollLeft; shCarSync(el); } }, true);
+document.addEventListener('pointerdown', (e) => { const el = e.target.closest && e.target.closest('.sh-dlg .sh-tiles'); if (!el || e.pointerType !== 'mouse' || e.button !== 0 || e.target.closest('.sh-eye')) return; SHCAR.drag = { el, x: e.clientX, left: el.scrollLeft }; SHCAR.moved = false; }, true);
+document.addEventListener('pointermove', (e) => { const d = SHCAR.drag; if (!d) return; const dx = e.clientX - d.x; if (!SHCAR.moved && Math.abs(dx) > 6) { SHCAR.moved = true; d.el.classList.add('dragging'); } if (SHCAR.moved) d.el.scrollLeft = d.left - dx; }, true);
+document.addEventListener('pointerup', () => { const d = SHCAR.drag; if (!d) return; SHCAR.drag = null; if (SHCAR.moved) { d.el.classList.remove('dragging'); setTimeout(() => { SHCAR.moved = false; }, 0); } }, true);
+document.addEventListener('click', (e) => { if (SHCAR.moved && e.target.closest && e.target.closest('.sh-dlg .sh-tiles')) { e.preventDefault(); e.stopImmediatePropagation(); SHCAR.moved = false; } }, true);
+const shareFmtOf = (sh) => (SHARE_FMTS.some(([k]) => k === sh.fmt) ? sh.fmt : 'post');
+const copyField = (id, value, label, act) => `<div class="copy-field"><label class="label" for="${id}">${label}</label><div class="cf-box"><input id="${id}" readonly value="${esc(value)}" onfocus="this.select()"><button type="button" class="cf-btn" data-act="${act}" aria-label="Copy ${label.toLowerCase()}" title="Copy">${I.copy}</button></div></div>`;
 const sharePerson = (name) => ({ id: name, name: shareName(name), photo: !SHARE_MASKED.has(name) });
 function shareModel(sh) {
-  if (!S.me) return null;
-  const p = profileOf(S.me), s = sh.sid ? migsSessions().find((x) => x.id === sh.sid) : null;
+  // Owner, November 13, 2026: Share profile also opens from another player's profile card (sh.pid).
+  const other = sh.kind === 'profile' && sh.pid;
+  if (!S.me && !other) return null;
+  const p = profileOf(other || S.me), s = sh.sid ? migsSessions().find((x) => x.id === sh.sid) : null;
   const top = { p, title: p.name, sub: p.nick ? `“${p.nick}”` : 'ROTRA player' };
   const link = profileLink(p.id);
   // Proposed (#738): Share profile, own profile only. Always available: no level shows "Not ranked yet", no games shows "No games yet".
   // Owner comment, November 11, 2026: show the ranking when there is one, and the number of wins.
   if (sh.kind === 'profile') {
     const pos = positionOf(p.id);
-    const gs = p.sessions.filter((x) => x.ago <= WINDOW_DAYS).flatMap((x) => x.games.filter((g) => g.kind === 'counted'));
+    const gs = p.sessions.filter((x) => x.ago <= YEAR_DAYS()).flatMap((x) => x.games.filter((g) => g.kind === 'counted'));
     const w = gs.filter((g) => g.res === 'W').length;
     return { kind: 'profile', title: 'Share profile', top, link, blocks: [
       { t: 'rank', label: p.level == null ? 'Not ranked yet' : lvLabel(p.level), pos, hidePos: pos == null, dim: p.level == null },
-      gs.length ? { t: 'stats', note: 'Last 90 days', items: [['Wins', String(w)]] } : { t: 'stat', text: 'No games yet' },
+      gs.length ? { t: 'stats', note: `In ${new Date().getFullYear()}`, items: [['Wins', String(w)]] } : { t: 'stat', text: 'No games yet this year' },
     ] };
   }
   if (sh.kind === 'rank') {
@@ -2051,7 +2453,17 @@ function shareModel(sh) {
     const pos = positionOf(p.id);
     return { kind: 'rank', title: 'Share rank', top, link, blocks: [{ t: 'rank', label: lvLabel(p.level), pos }, { t: 'ladder', level: p.level }] };
   }
-  if (!s || s.published !== true) return null;
+  if (!s || (sh.kind === 'result' && s.published !== true)) return null;
+  if (sh.kind === 'perf') {
+    const c = s.games.filter((g) => g.kind === 'counted'), w = c.filter((g) => g.res === 'W').length, l = c.length - w, rate = c.length ? Math.round((w / c.length) * 100) : 0;
+    return { kind: 'perf', title: 'Share performance', top, link, blocks: [{ t: 'h', text: s.title }, { t: 'p', text: `${fmtDay(s.ago)} · ${s.club}` },
+      { t: 'big', value: `${w}–${l}`, label: c.length ? `${rate}% won` : 'No counted games' },
+      { t: 'stats', note: 'My session', items: [['Games', String(s.games.length)], ['Won', String(w)], ['Lost', String(l)], ...(s.published === true && s.pos ? [['Standing', `#${s.pos}`]] : [])] }] };
+  }
+  if (sh.kind === 'game') {
+    const g = s.games[+sh.gi]; if (!g) return null;
+    return { kind: 'games', one: true, title: 'Share game', top, link, blocks: [{ t: 'h', text: s.title }, { t: 'p', text: `${fmtDay(s.ago)} · ${s.club}` }, { t: 'lines', lines: [{ res: g.res, score: g.score, mine: [p, ...g.partner.map(sharePerson)], theirs: g.opp.map(sharePerson), mineLabel: [p.name, ...g.partner.map(shareName)].map((n) => n.split(' ')[0]).join(' + '), theirsLabel: g.opp.map((n) => shareName(n).split(' ')[0]).join(' + ') }] }, { t: 'stat', text: `${g.fmt} · ${g.res === 'W' ? 'Won' : 'Lost'}${g.score ? ` ${g.score}` : ''}` }] };
+  }
   const gs = s.games.filter((g) => g.kind !== 'partial'), w = gs.filter((g) => g.res === 'W').length, l = gs.length - w;
   const head = [{ t: 'h', text: s.title }, { t: 'p', text: `${fmtDay(s.ago)} · ${s.club}` }];
   if (sh.kind === 'result') return { kind: 'result', title: 'Share result', top, link, blocks: [...head, { t: 'big', value: `#${s.pos}`, label: 'in Standings' }, { t: 'stat', text: `${gs.length} ${gs.length === 1 ? 'game' : 'games'} · ${w}–${l}` }] };
@@ -2080,10 +2492,10 @@ function shareCardHTML(m, fmt) {
     const limit = SHARE_GAME_LIMIT[fmt];
     return `<div class="sh-lines">${b.lines.slice(0, limit).map((g) => `<div class="sh-gl">${team(g.mine, g.mineLabel, g.res === 'W')}<div class="sh-score${g.res === 'W' ? ' win' : ''}"><b>${esc(g.score || '—')}</b><span>${g.score ? g.res === 'W' ? 'Won' : 'Lost' : 'Winner recorded'}</span></div>${team(g.theirs, g.theirsLabel, g.res === 'L')}</div>`).join('')}</div>${b.lines.length > limit ? `<span class="sh-more">+${b.lines.length - limit} more games</span>` : ''}`;
   };
-  return `<div class="sh-card ${fmt} ${m.kind}" role="group" aria-label="Share image preview">
+  return `<div class="sh-card ${fmt} ${m.kind}${m.one ? ' one' : ''}" role="group" aria-label="Share image preview">
     <div class="sh-top"><span class="sh-av">${av}</span><div><b>${esc(m.top.title)}</b><span>${esc(m.top.sub)}</span></div></div>
     <div class="sh-mid">${m.blocks.map(blk).join('')}</div>
-    <div class="sh-foot"><div><span class="w">ROTR<b>A</b></span><span class="tag">Run the game.</span></div><div class="sh-code" role="img" aria-label="QR code that opens your profile">${qrSVG(m.link) || ''}</div></div></div>`;
+    <div class="sh-foot"><div>${rotraLogoDark('foot-logo')}</div></div></div>`;
 }
 const loadImg = (src) => new Promise((res) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = src; });
 async function shareAvatar(p) {
@@ -2093,9 +2505,9 @@ async function shareAvatar(p) {
 }
 // Draws the card at 1080 x 1350 (Post) or 1080 x 1920 (Story). Sizes are in the preview's CSS pixels, scaled up.
 async function drawShareCard(m, fmt) {
-  const story = fmt === 'story', cw = story ? 270 : 320, ch = story ? 480 : 400, k = 1080 / cw, pad = 20;
+  const story = fmt === 'story', square = fmt === 'square', cw = story ? 270 : 320, ch = story ? 480 : square ? 320 : 400, k = 1080 / cw, pad = 20;
   const FG = '#f0f0f2', DIM = '#9090a0', ACC = '#00ff88', CELL = 'rgba(255,255,255,0.1)', SANS = 'system-ui, -apple-system, "Segoe UI", sans-serif', MONO = 'ui-monospace, Menlo, Consolas, monospace';
-  const c = document.createElement('canvas'); c.width = 1080; c.height = story ? 1920 : 1350;
+  const c = document.createElement('canvas'); c.width = 1080; c.height = story ? 1920 : square ? 1080 : 1350;
   const x = c.getContext('2d'); x.scale(k, k);
   const rr = (X, Y, w, h, r) => { x.beginPath(); x.roundRect ? x.roundRect(X, Y, w, h, r) : x.rect(X, Y, w, h); };
   const font = (wt, sz, fam = SANS) => { x.font = `${wt} ${sz}px ${fam}`; };
@@ -2177,17 +2589,11 @@ async function drawShareCard(m, fmt) {
 
     }
   }
-  // footer: ROTRA mark, tagline, small corner QR that opens the profile
+  // footer: ROTRA mark and tagline (owner, November 13, 2026: no QR on share images; only the Session and club invites keep one)
   const fy = ch - pad;
   font(800, 13); try { x.letterSpacing = '1.3px'; } catch (e) { /* older browsers: no letter spacing */ }
-  x.fillStyle = FG; x.fillText('ROTR', pad, fy - 16); const rw = x.measureText('ROTR').width; x.fillStyle = ACC; x.fillText('A', pad + rw, fy - 16);
+  x.fillStyle = FG; x.fillText('ROTR', pad, fy - 4); const rw = x.measureText('ROTR').width; x.fillStyle = ACC; x.fillText('A', pad + rw, fy - 4);
   try { x.letterSpacing = '0px'; } catch (e) { /* ignore */ }
-  font(400, 11); x.fillStyle = DIM; x.fillText('Run the game.', pad, fy - 2);
-  let q = null;
-  try { if (typeof qrcode === 'function') { q = qrcode(0, 'M'); q.addData(m.link); q.make(); } } catch (e) { q = null; }
-  const qs = 64, qx = cw - pad - qs, qy = ch - pad - qs;
-  rr(qx, qy, qs, qs, 8); x.fillStyle = '#fff'; x.fill();
-  if (q) { const n = q.getModuleCount(), cell = qs / (n + 4); x.fillStyle = '#000'; for (let r = 0; r < n; r++) for (let cc = 0; cc < n; cc++) if (q.isDark(r, cc)) x.fillRect(qx + (cc + 2) * cell, qy + (r + 2) * cell, cell + 0.2, cell + 0.2); }
   x.restore();
   return c;
 }
@@ -2204,27 +2610,101 @@ let bannerDraft = null;
 // The prototype stands in for that list with 24 seeded faces, shown 8 to a page (owner request, November 9, 2026).
 const FACES = ['', ...'abcdefghijklmnopqrstuvw'.split('')];
 const FACE_PAGE = 15; // Owner comment, November 11, 2026: 5 in a row, 3 rows, big circles.
+// Owner comment, November 13, 2026: the profile stats block, the same in Queue, Player and Admin. Counts the calendar year; resets on January 1.
+// Owner, November 13, 2026: "I dont like the progress bar for win rate · just 78% (put fire here) · bigger the fire bigger percent".
+// A small pixel fire beside the win rate, drawn like the fire behind #1 on the Player leaderboard podium: its size and heat grow with the rate.
+const PPF = { raf: 0, last: 0, pal: null, key: '' };
+function ppFirePal() {
+  const cs = getComputedStyle(document.documentElement), acc = cs.getPropertyValue('--accent').trim(), bg = cs.getPropertyValue('--bg').trim(), key = acc + bg;
+  if (key === PPF.key) return PPF.pal;
+  const rgb = (v) => { const m = /^#([0-9a-f]{6})$/i.exec(v); return m ? [0, 2, 4].map((k) => parseInt(m[1].slice(k, k + 2), 16)) : null; };
+  const [r, g, b] = rgb(acc) || [0, 255, 136], bb = rgb(bg) || [0, 0, 0], dark = bb[0] + bb[1] + bb[2] < 384;
+  const mix = (c, t, to) => Math.round(c + (to - c) * t);
+  PPF.pal = Array.from({ length: 37 }, (_, i) => { const t = i / 36; if (!i) return [0, 0, 0, 0];
+    const base = t < 0.55 ? [r, g, b].map((c) => mix(c * 0.35, t / 0.55, c)) : [r, g, b].map((c) => mix(c, ((t - 0.55) / 0.45) * (dark ? 0.75 : 0.35), 255));
+    return [...base, t < 0.12 ? 0 : Math.round(255 * Math.min(1, (t - 0.12) * 2.2))]; });
+  PPF.key = key; return PPF.pal;
+}
+function ppFireStep(c) {
+  const w = c.width, h = c.height, heat = +c.dataset.heat;
+  if (!c._buf) { c._buf = new Uint8Array(w * h); for (let x = 0; x < w; x++) { const d = Math.abs(x - (w - 1) / 2) / (w / 2); c._buf[(h - 1) * w + x] = d < 0.55 ? heat : d < 0.9 ? Math.round(heat * (1 - (d - 0.55) / 0.35)) : 0; } }
+  const buf = c._buf;
+  for (let x = 0; x < w; x++) for (let y = 1; y < h; y++) { const src = y * w + x, v = buf[src]; if (!v) { buf[src - w] = 0; continue; } const rnd = Math.floor(Math.random() * 3), dst = src - rnd + 1 - w; if (dst >= 0) buf[dst] = Math.max(0, v - (rnd & 1) - (Math.random() < 0.5 ? 1 : 0)); }
+}
+function ppFireDraw(c) {
+  const ctx = c.getContext('2d'), pal = ppFirePal(), w = c.width, img = ctx.createImageData(w, c.height);
+  c._buf.forEach((v, i) => { const p = pal[Math.min(36, v)] || pal[0], x = i % w, side = Math.max(0, 1 - ((x - (w - 1) / 2) / (w * 0.5)) ** 2); img.data.set([p[0], p[1], p[2], Math.round(p[3] * side)], i * 4); });
+  ctx.putImageData(img, 0, 0);
+}
+function ppFireTick(ts) {
+  const list = document.querySelectorAll('canvas.pp-fire');
+  if (!list.length) { PPF.raf = 0; return; }
+  if (ts - PPF.last > 70) { list.forEach((c) => { if (!c._buf) for (let i = 0; i < 30; i++) ppFireStep(c); ppFireStep(c); ppFireDraw(c); }); PPF.last = ts; }
+  PPF.raf = requestAnimationFrame(ppFireTick);
+}
+function ppFireStart() {
+  const list = document.querySelectorAll('canvas.pp-fire');
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { list.forEach((c) => { if (!c._buf) for (let i = 0; i < 40; i++) ppFireStep(c); ppFireDraw(c); }); return; }
+  if (list.length && !PPF.raf) PPF.raf = requestAnimationFrame(ppFireTick);
+}
+// 0% shows no fire; 1–100% grows from a 16 px ember to a 52 px flame, and burns hotter (taller tongues) as the rate rises.
+const ppFire = (rate) => { if (!rate) return ''; setTimeout(ppFireStart); const h = Math.round(16 + (rate / 100) * 36); return `<canvas class="pp-fire" width="18" height="22" data-heat="${Math.round(16 + (rate / 100) * 20)}" style="height:${h}px;width:${Math.round(h * 0.82)}px" aria-hidden="true"></canvas>`; };
+const ppStatsBlock = (games, wins) => { const yr = new Date().getFullYear(), head = `<div class="pp-sec-head"><span class="label">Latest stats</span><span class="pp-yr" title="Counts ${yr} so far; starts again on January 1">${yr}</span></div>`;
+  if (!games) return `<div class="pp-sec">${head}<p class="muted" style="margin:0">No games yet this year</p></div>`;
+  const l = games - wins, rate = Math.round((wins / games) * 100);
+  // Owner, same day: win rate gets its own area on the left (about 30%); the right 70% holds "Latest stats · year" over Games, Wins, Losses.
+  return `<div class="pp-sec pp-split"><div class="pp-wrbox"><span class="label">Win rate</span><div class="pp-wr"><span class="tnum">${rate}%</span>${ppFire(rate)}</div></div><div class="pp-right">${head}<dl class="pp-cnt"><div class="g"><dt>Games</dt><dd>${games}</dd></div><div class="w"><dt>Wins</dt><dd>${wins}</dd></div><div class="l"><dt>Losses</dt><dd>${l}</dd></div></dl></div></div>`; };
+const SHEETS_SESSION = (sh) => {
+  const p = profileOf(sh.id), x = p && p.sessions.find((y) => y.id === sh.sid);
+  if (!x) return sheetWrap('Session', '<div class="empty">This session could not be found.</div>', '<button class="btn" data-act="closeSheet" data-autofocus>Close</button>');
+  const r = sessRecord(x), who = p.id === S.me ? 'Your' : `${esc(p.nick || p.name)}'s`;
+  return sheetWrap(esc(x.title), `<div class="ls-head">${sessDate(x.ago)}<div class="main"><b>${fmtDay(x.ago)}</b><span class="small muted">${esc(x.club)}</span></div><span class="ls-rec big"><b class="tnum"><span class="w">${r.w}W</span> · <span class="l">${r.l}L</span></b><span class="small muted">counted</span></span></div>
+    <div><span class="label">${who} matches · ${r.n}</span>${x.games.map((g, gi) => gameRow(g.kind === 'fun' ? { ...g, note: 'Fun game' } : g, p, p.id === S.me ? { sid: x.id, gi } : null)).join('')}</div>`,
+    `<button class="btn" data-act="closeSheet" data-autofocus>Close</button>${p.id === S.me ? `<button class="btn" data-act="openShare" data-kind="perf" data-sid="${esc(x.id)}">${I.share} Share performance</button>` : ''}${x.pageGone ? '' : `<button class="btn primary" data-act="sessionPage" data-title="${esc(x.title)}">Session page ${I.ext}</button>`}`);
+};
 const SHEETS = {
+  sessionGames: SHEETS_SESSION,
+  // Owner, November 13, 2026: a club profile dialog in the same style as the player card (banner strip, logo over it, name block, About).
+  // Opened from the Clubs card on a profile; Open club page goes to the club page.
+  clubCard: (sh) => {
+    const club = CLUB_DIR[sh.id];
+    if (!club) return sheetWrap('Club', '<div class="empty">This club could not be found.</div>', '<button class="btn" data-act="closeSheet" data-autofocus>Close</button>');
+    const members = clubMembers(sh.id).length, ses = clubSessions(sh.id), live = ses.up.find((x) => x.live), next = ses.up.filter((x) => !x.live).sort((a, b) => b.ago - a.ago)[0];
+    const city = (PLACES.find(([c]) => c === club.code) || [])[1], mine = !!S.me && (S.accounts[S.me]?.clubs || []).some((c) => c.id === sh.id);
+    return sheetWrap(esc(club.name), `<div class="pp-card"><div class="pp-banner bn-${DEFAULT_BANNER}" aria-hidden="true"></div>
+        <div class="pp-avatar">${avatar({ name: club.name }, 'xl')}</div><div class="pp-body">
+        <div class="pp-name"><b>${esc(club.name)}</b>${city ? `<span class="pp-full">${esc(city)}</span>` : ''}</div>
+        <div class="row" style="gap:8px">${chip(`${num(members)} member${members === 1 ? '' : 's'}`)}${mine ? chip('Your club', 'ok') : ''}${live ? chip('Happening now', 'ok') : ''}</div>
+        <div class="pp-sec"><span class="label">About</span><dl class="kv"><dt>Based in</dt><dd>${city ? esc(city) : '—'}</dd><dt>Members</dt><dd>${num(members)}</dd><dt>Next up</dt><dd>${live ? `${esc(live.title)} · happening now` : next ? `${esc(next.title)} · ${fmtDay(next.ago)}` : 'Nothing scheduled'}</dd></dl></div>
+      </div></div>`,
+      `<button class="btn" data-act="closeSheet" data-autofocus>Close</button><button class="btn primary" data-act="openClub" data-id="${esc(sh.id)}">Open club page</button>`);
+  },
   // Owner comment, November 11, 2026: clicking a member opens a profile dialog (the same banner card as the Queue app) instead of leaving the page.
   profileCard: (sh) => {
-    const p = profileOf(sh.id);
+    const p = sh.id ? profileOf(sh.id) : null;
+    // A game opponent with no ROTRA profile in this prototype (guest or unclaimed): a limited card, like the Queue guest card.
+    if (!p && sh.name) { const q = { id: `x-${sh.name}`, name: sh.name, photo: hashStr(sh.name) % 4 !== 0 }; return sheetWrap(esc(sh.name), `<div class="pp-card"><div class="pp-banner bn-${esc(DEFAULT_BANNER)}" aria-hidden="true"></div><div class="pp-avatar">${avatar(q, 'xl')}</div><div class="pp-body"><div class="pp-name"><b>${esc(sh.name)}</b></div><div class="row" style="gap:8px">${chip('Not on ROTRA yet')}</div>
+        <div class="pp-sec"><span class="label">Guest</span><p class="muted" style="margin:0">This player played as a guest and hasn't registered with ROTRA yet, so there's no profile to show.</p></div></div></div>`, '<button class="btn" data-act="closeSheet" data-autofocus>Close</button>'); }
     if (!p) return sheetWrap('Profile', '<div class="empty">This player could not be found.</div>', '<button class="btn" data-act="closeSheet" data-autofocus>Close</button>');
     const hid = hiddenFromViewer(p), m = hid ? maskedView(p) : p;
-    const head = `<div class="pp-banner bn-${esc(hid ? 'court' : bannerOf(p))}" aria-hidden="true"></div>
+    const head = `<div class="pp-banner bn-${esc(bannerOf(p))}" aria-hidden="true"></div>
         <div class="pp-avatar">${!hid && (p.photoUrl || p.photo) ? `<button type="button" class="photo-btn" data-act="viewPhoto" data-id="${esc(p.id)}" aria-label="View full photo of ${esc(p.name)}">${avatar(m, 'xl')}</button>` : avatar(m, 'xl')}</div>`;
     if (hid) return sheetWrap(esc(m.name), `<div class="pp-card">${head}<div class="pp-body"><div class="pp-name"><b>${esc(m.name)}</b></div><div class="row" style="gap:8px">${chip('Private profile')}</div>
         <div class="pp-sec"><span class="label">Private</span><p class="muted" style="margin:0">This player has chosen to keep their ROTRA profile private. You can see their picture and banner; their name, level and games stay between them and their clubs.</p></div></div></div>`,
       '<button class="btn" data-act="closeSheet" data-autofocus>Close</button>');
-    const gs = p.sessions.filter((x) => x.ago <= WINDOW_DAYS).flatMap((x) => x.games.filter((g) => g.kind === 'counted'));
+    const gs = p.sessions.filter((x) => x.ago <= YEAR_DAYS()).flatMap((x) => x.games.filter((g) => g.kind === 'counted'));
     const w = gs.filter((g) => g.res === 'W').length, l = gs.length - w, pos = positionOf(p.id);
     const code = (p.rtr || '').split('-')[2], city = (PLACES.find(([c]) => c === code) || [])[1];
-    return sheetWrap(esc(p.name), `<div class="pp-card">${head}<div class="pp-body">
-        <div class="pp-name"><b>${esc(p.name)}</b>${p.nick ? `<span class="muted">“${esc(p.nick)}”</span>` : ''}</div>
+    // Owner comment, November 13, 2026: named by the nickname, else the full name.
+    return sheetWrap(esc(p.nick || p.name), `<div class="pp-card">${head}<div class="pp-body">
+        <div class="pp-name"><span class="pp-nm"><b>${esc(p.nick || p.name)}</b><a class="pp-ext" href="${esc(profileLink(p.id))}" data-act="openProfile" data-id="${esc(p.id)}" aria-label="Open ${esc(p.nick || p.name)}'s ROTRA profile" title="Open ROTRA profile">${I.fwd}</a></span>${p.nick ? `<span class="pp-full">${esc(p.name)}</span>` : ''}${p.rtr ? `<button type="button" class="btn xs pp-rtr" data-act="copyRtr" data-v="${esc(p.rtr)}" aria-label="Copy player ID ${esc(p.rtr)}" title="Copy player ID">${esc(p.rtr)}${I.copy}</button>` : ''}</div>
         <div class="row" style="gap:8px">${chip(p.level == null ? 'Not ranked yet' : lvLabel(p.level), p.level == null ? '' : 'ok')}${pos ? chip(`#${num(pos)} overall`) : ''}${p.id === S.me ? chip('You', 'ok') : ''}</div>
-        <div class="pp-sec"><span class="label">About</span><dl class="kv"><dt>Registered in</dt><dd>${city ? esc(city) : '—'}</dd><dt>RTR ID</dt><dd><code>${esc(p.rtr || '—')}</code></dd></dl></div>
-        <div class="pp-sec"><span class="label">Stats · last 90 days</span>${gs.length ? `<dl class="pp-stats"><div><dt>Games</dt><dd>${gs.length}</dd></div><div><dt>Wins</dt><dd>${w}</dd></div><div><dt>Losses</dt><dd>${l}</dd></div><div><dt>Win rate</dt><dd>${Math.round((w / gs.length) * 100)}%</dd></div></dl>` : '<p class="muted" style="margin:0">No games yet</p>'}</div>
+        <div class="pp-sec"><span class="label">About</span><dl class="kv"><dt>Registered in</dt><dd>${city ? esc(city) : '—'}</dd></dl></div>
+        ${p.hideStats && p.id !== S.me ? '' : ppStatsBlock(gs.length, w)}
       </div></div>`,
-      `<button class="btn" data-act="closeSheet" data-autofocus>Close</button><button class="btn primary" data-act="openProfile" data-id="${esc(p.id)}">Open full profile</button>`);
+      // Owner, November 13, 2026: Share profile in the card. Inside ROTRA Player the profile opens in the same tab (only Queue,
+      // a different app, opens it in a new tab).
+      `<button class="btn" data-act="closeSheet" data-autofocus>Close</button><button class="btn" data-act="openShare" data-kind="profile" data-pid="${esc(p.id)}">${I.share} Share profile</button><button class="btn primary" data-act="openProfile" data-id="${esc(p.id)}">Open ROTRA profile</button>`);
   },
   avatar: () => {
     const a = avatarDraft || S.accounts[S.me], p = { ...profileOf(S.me), ...a };
@@ -2253,15 +2733,19 @@ const SHEETS = {
       `<button class="btn" data-act="closeSheet">Cancel</button><button class="btn primary" data-act="setBanner" ${cur === bannerOf(me) ? 'disabled' : ''}>Done</button>`);
   },
   share: (sh) => {
-    const m = shareModel(sh), fmt = sh.fmt === 'story' ? 'story' : 'post';
+    const m = shareModel(sh), fmt = shareFmtOf(sh);
     if (!m) return sheetWrap('Share', '<p class="muted">There is nothing to share here yet.</p>', '<button class="btn" data-act="closeSheet">Close</button>');
+    const pick = Array.isArray(sh.pick) ? sh.pick : SHARE_FMTS.map(([k]) => k), n = pick.length;
+    const tile = ([k, l, hint]) => shPick({ on: pick.includes(k), label: l, hint, card: shareCardHTML(m, k), pick: `data-act="shareFmt" data-v="${k}"`, view: `data-act="shareView" data-v="${k}"` });
+    const vw = SHARE_FMTS.find(([k]) => k === sh.shv);
     return sheetWrap(m.title, `<div class="stack sh-wrap">
-      <div class="seg" role="group" aria-label="Image format">${[['post', 'Post'], ['story', 'Story']].map(([k, l]) => `<button aria-pressed="${fmt === k}" data-act="shareFmt" data-v="${k}">${l}</button>`).join('')}</div>
-      ${shareCardHTML(m, fmt)}
-      <p class="small muted">The QR opens your profile. Private profiles ask visitors to log in. ${fmt === 'story' ? 'Story size (9:16) for Facebook and Instagram stories.' : 'Post size (4:5) for Facebook and Instagram feeds.'}</p>
-      ${m.kind === 'profile' ? `<div class="sh-link"><label class="label" for="sh-link">Profile link</label><div class="rtr-line"><input id="sh-link" readonly value="${esc(m.link)}" onfocus="this.select()"><button class="btn xs" data-act="copyShareLink" aria-label="Copy profile link">${I.copy} Copy</button></div></div>` : ''}</div>`,
-    m.kind === 'profile' ? '<button class="btn" data-act="downloadShare">Download image</button><button class="btn primary" data-act="shareNative">Share</button>'
-      : `<button class="btn" data-act="copyShareLink">${I.copy} Copy link</button>${navigator.share ? '<button class="btn primary" data-act="shareNative">Share</button>' : '<button class="btn primary" data-act="downloadShare">Download image</button>'}`);
+      <div class="sh-pickbar"><span class="small muted">Tap an image to pick it. ${n} of ${SHARE_FMTS.length} picked · <button type="button" class="sh-linkish" data-act="shareAllPick">${n === SHARE_FMTS.length ? 'Clear' : 'Pick all'}</button></span></div>
+      <div class="sh-tiles" role="group" aria-label="Images">${SHARE_FMTS.map(tile).join('')}</div>
+      <div class="row sh-acts"><button class="btn" data-act="downloadShare" ${n ? '' : 'disabled'}>Download ${n || ''} ${n === 1 ? 'image' : 'images'}</button>${navigator.share ? `<button class="btn primary" data-act="shareNative" ${n ? '' : 'disabled'}>Share</button>` : ''}</div>
+      <div class="or-div" role="separator"><span>OR</span></div>
+      ${copyField('sh-link', m.link, m.kind === 'profile' ? 'Profile link' : 'Link', 'copyShareLink')}</div>`,
+      '<button class="btn" data-act="closeSheet" data-autofocus>Close</button>', true).replace('class="sheet wide"', 'class="sheet wide sh-dlg"')
+      + (vw ? shViewer({ fmt: vw[0], label: vw[1], card: shareCardHTML(m, vw[0]), close: 'data-act="shareViewClose"', dl: `data-act="downloadShare" data-v="${vw[0]}"` }) : '');
   },
   // Proposed (#716): full-photo viewer. Nothing opens for initials or for a picture masked for this viewer.
   photo: (sh) => {
@@ -2371,7 +2855,10 @@ const ACT = {
   goBoard: () => go('board'),
   goLogin: () => go('login'),
   openProfile: (el) => go('profile', el.dataset.id),
-  openProfileCard: (el) => { S.ui.sheet = { type: 'profileCard', id: el.dataset.id }; render(); },
+  // Artifact comment, November 13, 2026: leaderboard rows and the podium open this card first; its Open full profile goes to the profile page.
+  openClubCard: (el) => { S.ui.sheet = { type: 'clubCard', id: el.dataset.id }; render(); },
+  openSessionGames: (el) => { S.ui.sheet = { type: 'sessionGames', id: el.dataset.id, sid: el.dataset.sid }; render(); },
+  openProfileCard: (el) => { S.ui.sheet = { type: 'profileCard', id: el.dataset.id || null, name: el.dataset.name || null }; render(); },
   gateLogin: () => { S.ui.after = { to: S.screen, id: S.viewId }; go('login'); },
   openCompare: (el) => { if (!S.me) { S.ui.after = { to: 'compare', id: el.dataset.id }; toast('Sign in to compare'); go('login'); return; } S.ui.cmpPage = 0; S.ui.cmpFilter = 'all'; go('compare', el.dataset.id); },
   cmpFilter: (el) => { S.ui.cmpFilter = el.dataset.v; S.ui.cmpPage = 0; render(); },
@@ -2394,8 +2881,12 @@ const ACT = {
     const link = `${/^https?:/.test(location.origin) ? location.origin : 'https://rotra.example'}/player/clubs/${el.dataset.club}`;
     try { navigator.clipboard.writeText(link).then(() => toast('Club page link copied'), () => toast(`Couldn't copy. The club page link is ${link}`)); } catch (e) { toast(`Couldn't copy. The club page link is ${link}`); }
   },
-  openHistory: (el) => { S.ui.hist = 'counted'; go('history', el.dataset.id); },
-  histTab: (el) => { S.ui.hist = el.dataset.v; render(); },
+  seeOnBoard: (el) => { const id = el.dataset.id, pos = positionOf(id) || 1; go('board'); S.q = ''; S.shown = Math.max(S.shown, Math.ceil(pos / 25) * 25); render(); setTimeout(() => { const r = document.getElementById(`row-${id}`); if (r) { r.scrollIntoView({ block: 'center' }); r.classList.add('flash'); setTimeout(() => r.classList.remove('flash'), 1600); } }, 60); },
+  openHistory: (el) => { S.ui.hist = 'counted'; S.ui.wpf = null; S.ui.histPage = 0; go('history', el.dataset.id); },
+  openSessions: (el) => go('sessions', el.dataset.id),
+  histTab: (el) => { S.ui.hist = el.dataset.v; S.ui.wpf = null; S.ui.histPage = 0; render(); },
+  histPage: (el) => { S.ui.histPage = +el.dataset.v; render(); document.querySelector('main section.card.stack[style*="gap:22px"]')?.scrollIntoView({ block: 'start' }); },
+  wpFilter: (el) => { S.ui.histPage = 0; S.ui.hist = 'counted'; if (el.dataset.clear) S.ui.wpf = null; else { const day = +el.dataset.day, res = el.dataset.res; S.ui.wpf = S.ui.wpf && S.ui.wpf.day === day && S.ui.wpf.res === res ? null : { day, res }; } render(); if (S.ui.wpf) setTimeout(() => document.querySelector('.wp-filter')?.scrollIntoView({ block: 'nearest' }), 0); },
   editTab: (el) => { S.ui.editTab = el.dataset.v; render(); },
   toggleTheme: () => {
     const t = isDark() ? 'light' : 'dark';
@@ -2412,27 +2903,31 @@ const ACT = {
     if (row) { row.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); row.focus({ preventScroll: true }); }
   },
   retryBoard: () => { S.board = 'loading'; render(); later(900, () => { S.board = S.online ? 'ok' : 'error'; }); },
-  openShare: (el) => { S.ui.sheet = { type: 'share', kind: el.dataset.kind, sid: el.dataset.sid || null, fmt: 'post' }; render(); },
-  shareFmt: (el) => { if (S.ui.sheet?.type === 'share') { S.ui.sheet.fmt = el.dataset.v; render(); } },
+  openShare: (el) => { S.ui.sheet = { type: 'share', kind: el.dataset.kind, sid: el.dataset.sid || null, gi: el.dataset.gi ?? null, pid: el.dataset.pid || null, fmt: 'post' }; render(); },
+  shareFmt: (el) => { const sh = S.ui.sheet; if (sh?.type !== 'share') return; const v = el.dataset.v, cur = Array.isArray(sh.pick) ? sh.pick : SHARE_FMTS.map(([k]) => k); sh.pick = cur.includes(v) ? cur.filter((x) => x !== v) : SHARE_FMTS.map(([k]) => k).filter((k) => k === v || cur.includes(k)); render(); },
+  shareAllPick: () => { const sh = S.ui.sheet; if (sh?.type !== 'share') return; const cur = Array.isArray(sh.pick) ? sh.pick : SHARE_FMTS.map(([k]) => k); sh.pick = cur.length === SHARE_FMTS.length ? [] : SHARE_FMTS.map(([k]) => k); render(); },
+  shareView: (el) => { if (S.ui.sheet?.type === 'share') { S.ui.sheet.shv = el.dataset.v; render(); } },
+  shareViewClose: () => { if (S.ui.sheet) { S.ui.sheet.shv = null; render(); } },
   copyShareLink: () => {
-    const link = profileLink(S.me);
+    const link = profileLink(S.ui.sheet?.pid || S.me);
     try { navigator.clipboard.writeText(link).then(() => toast('Link copied'), () => toast(`Couldn't copy. Your profile link is ${link}`)); } catch (e) { toast(`Couldn't copy. Your profile link is ${link}`); }
   },
   shareNative: () => toast('Share sheet opened'),
-  downloadShare: () => {
+  downloadShare: (el) => {
     const sh = S.ui.sheet, m = sh && sh.type === 'share' ? shareModel(sh) : null;
     if (!m) return;
-    const fmt = sh.fmt === 'story' ? 'story' : 'post';
-    drawShareCard(m, fmt).then((c) => c.toBlob((b) => {
+    const list = el?.dataset?.v ? [el.dataset.v] : (Array.isArray(sh.pick) ? sh.pick : SHARE_FMTS.map(([k]) => k));
+    list.forEach((fmt, i) => setTimeout(() => drawShareCard(m, fmt).then((c) => c.toBlob((b) => {
       if (!b) { toast('Couldn\'t make the image. Try again.'); return; }
       const a = document.createElement('a');
       a.href = URL.createObjectURL(b); a.download = `rotra-${m.kind}-${fmt}.png`;
       document.body.append(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-      toast(`${fmt === 'story' ? 'Story' : 'Post'} image downloaded`);
-    }, 'image/png'));
+      toast(`${SHARE_FMTS.find(([k]) => k === fmt)[1]} image downloaded`);
+    }, 'image/png')), i * 400));
   },
   sessionPage: (el) => toast(`Opens the public page for ${el.dataset.title} (see the Queue prototype)`),
+  copyRtr: (el) => copyText(el.dataset.v, el),
   copyId: (el) => { const p = profileOf(el.dataset.id); copyText(p.rtr, document.getElementById(el.dataset.big ? 'rtr-big' : `rtr-${p.id}`)); },
   signOut: () => { S.me = null; S.ui.sheet = null; S.ui.edit = null; go('board'); toast('Signed out'); },
   demoSignIn: () => { S.ui.sheet = null; signIn('u1'); },
@@ -2440,6 +2935,11 @@ const ACT = {
   cancelEdit: () => go('profile', S.me),
   discard: () => { const g = S.ui.pendingGo || { to: 'profile', id: S.me }; S.ui.edit = null; S.ui.editOrig = null; S.ui.editErr = {}; S.ui.editFail = ''; S.ui.pendingGo = null; S.ui.sheet = null; go(g.to, g.id); },
   toggleShow: (el) => { const o = S.ui[el.dataset.k]; o.show = !o.show; render(); },
+  // Artifact comment, November 13, 2026: two switches, on by default, for the profile stats and the weekly performance chart.
+  // Artifact comment, same day: tapping the visibility chip opens Privacy and contact with that switch highlighted.
+  goSetting: (el) => { const k = el.dataset.k; go('account'); setTimeout(() => { const sw = document.getElementById(k), row = sw?.closest('.setting'); if (!row) return; row.scrollIntoView({ block: 'center' }); row.classList.add('set-flash'); sw.focus({ preventScroll: true }); setTimeout(() => row.classList.remove('set-flash'), 2200); }, 60); },
+  toggleStatsVis: () => { const a = S.accounts[S.me]; a.hideStats = !a.hideStats; render(); toast(a.hideStats ? 'Profile stats hidden from others' : 'Profile stats shown'); },
+  toggleWeeklyVis: () => { const a = S.accounts[S.me]; a.hideWeekly = !a.hideWeekly; render(); toast(a.hideWeekly ? 'Weekly performance hidden from others' : 'Weekly performance shown'); },
   togglePrivacy: () => {
     const a = S.accounts[S.me];
     const want = !a.phoneHidden;
@@ -2816,6 +3316,7 @@ document.addEventListener('change', (ev) => {
   if ((ev.target.dataset.bind || '').startsWith('ui.edit.')) render();
 });
 document.addEventListener('keydown', (ev) => {
+  if (ev.key === 'Escape' && S.ui.sheet?.shv) { ACT.shareViewClose(); return; }
   if (ev.key === 'Escape' && S.ui.sheet) { ACT.closeSheet(); }
 });
 
@@ -2825,7 +3326,7 @@ let prototypeToken = 'demo';
 const playerPaths = { board: '', login: '/login', forgot: '/forgot-password', edit: '/profile/edit', id: '/profile/player-id', account: '/profile/privacy-and-contact' };
 function prototypePath() {
   let path = playerPaths[S.screen];
-  if (['profile', 'history', 'rank'].includes(S.screen)) path = S.viewId ? `/players/${encodeURIComponent(S.viewId)}${S.screen === 'history' ? '/games' : S.screen === 'rank' ? '/rank' : ''}` : '/rank';
+  if (['profile', 'history', 'rank', 'sessions'].includes(S.screen)) path = S.viewId ? `/players/${encodeURIComponent(S.viewId)}${S.screen === 'history' ? '/games' : S.screen === 'rank' ? '/rank' : S.screen === 'sessions' ? '/sessions' : ''}` : '/rank';
   if (S.screen === 'club') path = `/clubs/${encodeURIComponent(S.viewId)}`;
   if (S.screen === 'clubMembers') path = `/clubs/${encodeURIComponent(S.viewId)}/members`;
   if (S.screen === 'notfound') path = `/find/${encodeURIComponent(S.ui.findId || S.viewId || 'unknown')}`;
@@ -2845,14 +3346,14 @@ function applyPrototypeRoute(url) {
   const path = url.pathname.slice('/player'.length);
   const direct = Object.entries(playerPaths).find(([, value]) => value === path);
   let screen = direct?.[0], id = null;
-  const profile = path.match(/^\/players\/([^/]+)(?:\/(rank|games))?$/);
+  const profile = path.match(/^\/players\/([^/]+)(?:\/(rank|games|sessions))?$/);
   const token = path.match(/^\/(claim|reset-password)\/([^/]+)$/);
   const find = path.match(/^\/find\/([^/]+)$/);
   const clubMembersPage = path.match(/^\/clubs\/([^/]+)\/members$/);
   if (clubMembersPage) { id = decodeURIComponent(clubMembersPage[1]); if (!CLUB_DIR[id]) return false; screen = 'clubMembers'; S.ui.cm = { q: '', band: 'all' }; }
   const clubPage = path.match(/^\/clubs\/([^/]+)$/);
   if (clubPage) { id = decodeURIComponent(clubPage[1]); if (!CLUB_DIR[id]) return false; screen = 'club'; S.ui.clubMonth = 0; S.ui.clubShown = CLUB_MEMBERS_PAGE; }
-  if (profile) { screen = profile[2] === 'games' ? 'history' : profile[2] === 'rank' ? 'rank' : 'profile'; id = decodeURIComponent(profile[1]); if (!Object.hasOwn(S.accounts, id) && !BASE.some((p) => p.id === id)) return false; }
+  if (profile) { screen = profile[2] === 'games' ? 'history' : profile[2] === 'rank' ? 'rank' : profile[2] === 'sessions' ? 'sessions' : 'profile'; id = decodeURIComponent(profile[1]); if (!Object.hasOwn(S.accounts, id) && !BASE.some((p) => p.id === id)) return false; }
   if (path === '/rank') screen = 'rank';
   if (find) {
     const rtr = decodeURIComponent(find[1]).toUpperCase();
@@ -2892,7 +3393,7 @@ function render() {
   const focusId = a && a.id && a !== document.body ? a.id : null;
   let sel = null;
   try { sel = a && typeof a.selectionStart === 'number' ? a.selectionStart : null; } catch (e) { sel = null; }
-  const views = { register: () => viewClaim(true), registerDone: viewRegisterDone, joinClub: viewJoinClub, board: viewBoard, profile: viewProfile, club: viewClub, clubMembers: viewClubMembers, rank: viewRank, history: viewHistory, compare: viewCompare, id: viewId, account: viewAccount, edit: viewEdit, login: viewLogin, forgot: viewForgot, reset: viewReset, claim: viewClaim, claimDone: viewClaimDone, notfound: viewNotFound };
+  const views = { register: () => viewClaim(true), registerDone: viewRegisterDone, joinClub: viewJoinClub, board: viewBoard, profile: viewProfile, club: viewClub, clubMembers: viewClubMembers, rank: viewRank, sessions: viewSessions, history: viewHistory, compare: viewCompare, id: viewId, account: viewAccount, edit: viewEdit, login: viewLogin, forgot: viewForgot, reset: viewReset, claim: viewClaim, claimDone: viewClaimDone, notfound: viewNotFound };
   const sh = S.ui.sheet;
   document.getElementById('app').innerHTML = topBar() + (views[S.screen] || viewBoard)() + (sh ? SHEETS[sh.type](sh) : '');
   document.body.style.overflow = sh ? 'hidden' : '';

@@ -44,6 +44,10 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-12-05](#d-2026-11-12-05) | Playwright regression suite on a throwaway local Supabase | approved 2026-11-12 | in progress (feat/e2e-regression) | none | [Queue](workstreams/queue.md) |
 | [D-2026-11-13-01](#d-2026-11-13-01) | Go API on Railway: API, database, sign-in and pictures off Vercel functions and Supabase; live updates | approved 2026-11-13 (B-01 to B-19) | not started | needed | [Backend](workstreams/backend.md) |
 | [D-2026-11-13-02](#d-2026-11-13-02) | Shared rule-cases package `@rotra/rule-cases` | approved 2026-11-13 | not started | needed | [Backend](workstreams/backend.md) |
+| [D-2026-11-13-03](#d-2026-11-13-03) | Stats on every profile dialog; Admin sets the default banner | approved 2026-11-13 | mockup only | needed | [Admin](workstreams/admin.md) |
+| [D-2026-11-13-04](#d-2026-11-13-04) | Profile card layout and display name (nickname first) | approved 2026-11-13 | mockup only | needed | [Player](workstreams/player.md) |
+| [D-2026-11-13-05](#d-2026-11-13-05) | Finished session page (Match history, Leaderboard tab); club profile cards | approved 2026-11-13 | mockup only | needed | [Queue](workstreams/queue.md) |
+| [D-2026-11-13-06](#d-2026-11-13-06) | Sharing widened: any public profile, leaderboard, awards and Off Day; no QR on share images | approved 2026-11-13 | mockup only | needed | [Player](workstreams/player.md) |
 
 ## Status conventions
 
@@ -807,3 +811,61 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - **Change rule.** A rule change edits its case file first, so both sides fail until both are fixed. A money or ranking case changes only with the owner's sign-off ([stop and ask](../ways-of-working.md#10-stop-and-ask)); the #247 ranking constants are still open.
   - **First step.** Move the existing decided-math cases out of a few `*.rules.test.ts` files into JSON without changing what they test, and prove Vitest still passes.
 - **References:** [D-2026-11-13-01](#d-2026-11-13-01) (B-02), [backend proposal](../backend/decisions/2026-11-13-go-railway-backend/01-proposal.md#the-biggest-cost-two-copies-of-the-rules-b-02), [architecture §2–3](../architecture.md#2-the-shape-of-the-system) (new packages need a decision).
+
+<a id="d-2026-11-13-03"></a>
+### D-2026-11-13-03 — Stats on every profile dialog; Admin sets the default banner
+- **Decision status:** approved (owner, November 13, 2026: “Queue app should see the Profile with standings ( win rate and statistics ) same with admin app · and the default banner image should be controllable via admin control”)
+- **Implementation status:** mockup only — built in the three mockups on November 13, 2026; no ticket yet.
+- **Ticket:** needed
+- **Roadmap:** MVP — [Admin](workstreams/admin.md), [Queue](workstreams/queue.md)
+- **Decision:**
+  - **Stats everywhere.** The Queue Master's profile dialog (Saved players, roster, courts, matches) gets the same **Stats** block as the session-page participant card and the Player profile card: Games, Wins, Losses, Win rate, or “No games yet this year”. Admin › Players › Quick view gets it too, from the same games as its History list.
+  - **Stats reset every year** (owner, same day: “can we make the stats to only reset every year”). Every profile stats block (Queue profile dialog and participant card, Player profile card, Admin Quick view) and the Share profile wins count **this calendar year**, from January 1 (Asia/Manila), and start again at zero on January 1. The label reads **Latest stats** with the current year as a chip (renamed and redesigned the same day: four plain counters — Win rate, Games, Wins, Losses — on the leaderboard podium's green grid, with a small pixel fire beside the win rate that grows with it; no ring and no bar; win rate on the left 30%, the rest on the right 70%), the Share card **In 2026**, and the empty state “No games yet this year”. Was the last 90 days. **The rank is unchanged**: it keeps its 90-day window for the 10-game requirement and the rating.
+  - **Real banners on every card.** Both Queue profile cards and Admin Quick view show the player's own banner. Guests, unclaimed profiles and players who haven't picked one show the default banner. An always-private player's banner stays public, as the identity rules already say (the Player card had shown Court for them).
+  - **Admin Quick view** opens with the same banner card as the other apps: the banner, the overlapping picture, then the name and the rank and account chips; the ID/Phone/Email/Socials list, History and the footer stay.
+  - **Default banner.** Admin › Settings › Profile banners marks one shown banner **Default** (Court at first). Any other shown banner has **Make default**; the change applies to everyone without a pick at once, with an Undo toast and a Record of actions entry. The default can't be hidden or deleted (“This is the default banner. Make another banner the default first.”).
+- **Amends:** [D-2026-11-12-01](#d-2026-11-12-01) (the default was Court, or the first shown banner when Court is hidden or deleted).
+- **References:** mockup logs [queue](../mockup-changes/2026-11-13-queue-profile-stats-banner.md), [admin](../mockup-changes/2026-11-13-admin-default-banner-quick-view.md), [player](../mockup-changes/2026-11-13-player-default-banner.md).
+
+<a id="d-2026-11-13-04"></a>
+### D-2026-11-13-04 — Profile card layout and display name (nickname first)
+- **Decision status:** approved (owner, November 13, 2026: “I want to add consistency to how names should be displayed · Nickname · if not then go with Full Name”; card: “no black background · banner starts from the edge or top of the card down to the half of the avatar · it should show the name in this order: Nickname (or full name) · fullname (if there is nickname) · copy rotra id, small button”). Scope answered by the owner: profile cards first; “no black background” means the dark title bar above the banner.
+- **Implementation status:** mockup only — built in the three mockups on November 13, 2026; no ticket yet.
+- **Ticket:** needed
+- **Roadmap:** MVP — [Player](workstreams/player.md), [Queue](workstreams/queue.md), [Admin](workstreams/admin.md)
+- **Decision:**
+  - **Display name.** A player is named by their **nickname**, else their **full name**. Applied now to every profile card: Queue's profile dialog and session-page participant card, the Player profile card, and Admin › Players › Quick view (and the dialog's accessible name). Lists, court tiles, the leaderboard, payments and toasts keep today's naming until a later pass applies the same rule there.
+  - **No title bar.** The profile card has no dark header row. The banner starts at the card's top edge (the panel's top edge in Admin) and runs down to the middle of the picture; the close **×** floats on the banner's top-right corner on a translucent round background. The heading stays for screen readers, visually hidden.
+  - **Name block, in order:** the display name in bold; the full name under it in muted text, only when there is a nickname; a small monospace button with the RTR ID and a copy icon (accessible name “Copy RTR ID <id>”; toast “RTR ID copied”, “Player ID copied” in the Player app, which calls it the player ID). No button when the player has no RTR ID (guests, unclaimed club records).
+  - **RTR ID rows removed** from the card's **About** box (Queue, Player) and from Admin Quick view's details list, since the button now carries it. The old nickname-in-quotes beside the name is gone.
+  - **Masked cards** (always private, guest, not on ROTRA yet) are unchanged apart from the banner reaching the top: masked name only, no full name, no RTR ID.
+  - **Second pass, same day** (owner, with screenshots: “rotra Id needs to be tiny · the close button looks bad · the banners should follow the aspect ratio of the image I uploaded · and I'd rather put the status in the avatar like below the avatar like pill or label and when they hover it shows what it is (show a tooltip)”):
+    - **Banner:** the images stay 5:2 (the owner's 2000 × 800 sample; the ratio Admin crops uploads to), but a profile card shows only the **top half** of the 5:2 banner (a 5:1 strip, owner, same day: “crop the banner in half, from top to middle”), full card width; the picture is centred on the strip's bottom edge.
+    - **Close ×:** a true **30 px circle**, 12 px in from the corner: frosted (surface at 62% with an 8 px backdrop blur), a hairline border (`--fg` at 16%), no shadow, a 14 px icon; hover raises the surface to 85%. (Fourth pass, same day: “unproportioned and badly designed close button”; the base icon-button minimum width had made it a 36 × 32 oval.)
+    - **RTR ID button is tiny:** 22 px tall, 11 px monospace in the muted colour, 12 px copy icon.
+    - **Eye on the picture:** hovering or focusing a picture that opens the full photo dims it and shows an eye icon.
+    - **Tonight status** (Queue cards only) leaves the body and becomes a **pill on the bottom edge of the picture**: a coloured dot and a short label — **Playing in Court N**, **Waiting in Court N** (on court, getting ready), **Queued #N**, **Free · N min** (the wait, in the accent under 10 minutes, amber from 10, red from 16, as on the queue tiles; owner, same day) or **Away**; hovering or focusing it shows a tooltip with the full line (“Tonight · Playing · Court 4”), which is also its accessible name. No pill when the player isn't on tonight's roster, and none unless the session is live (not before Start, not after Session done; owner, same day).
+- **References:** [mockup log](../mockup-changes/2026-11-13-profile-card-name-layout.md), [product terms › Display name](../product-terms.md), [D-PARTICIPANT-PROFILE](../screens/product/dialogs.md#d-participant-profile--participant-profile-card).
+
+<a id="d-2026-11-13-05"></a>
+### D-2026-11-13-05 — Finished session page (Match history, Leaderboard tab); club profile cards
+- **Decision status:** approved (owner, November 13, 2026). The visibility rule for match history before publication was chosen by the implementing agent to match **Own standing only**; to be confirmed by the owner.
+- **Implementation status:** mockup only — built in the mockups on November 13, 2026; no ticket yet.
+- **Ticket:** needed
+- **Roadmap:** MVP — [Queue](workstreams/queue.md), [Player](workstreams/player.md), [Admin](workstreams/admin.md)
+- **Decision:**
+  - **Finished session page** (“I don't think Queue should be in there since it is already Finished · it should show the Match history instead”; “since the match is finished it should show a tab called leaderboard · should show the leader board and your position”): the Queue section is replaced by **Match history** (every completed and invalid match, newest first); a **Leaderboard** tab, shown only once the club shares the Standings, has the viewer's position and the session standings. Until the club shares the results, a signed-in player sees only their own matches and record; visitors are asked to log in.
+  - **Club profile cards** (“since players have player profile dialogs, clubs should also have Club Profile Dialogs · same style too”): a club card in the player card's style, opened from the Queue session page's organizer line, a Player profile's Clubs card and Admin's Clubs and licenses list. Asked and answered the same day: it **does carry a banner strip** (the Admin default banner; clubs choose none yet) — an exception to the November 11 “no banners” comment, which stays true for the club page itself.
+- **References:** mockup logs [finished session page](../mockup-changes/2026-11-13-queue-finished-session-page.md) and [club profile card](../mockup-changes/2026-11-13-club-profile-card.md); [D-CLUB-PROFILE](../screens/product/dialogs.md#d-club-profile--club-profile-card).
+
+### D-2026-11-13-06 — Sharing widened: any public profile, leaderboard, awards and Off Day; no QR on share images
+- **Decision status:** approved (owner, November 13, 2026, in chat and artifact comments).
+- **Implementation status:** mockup only — built in the mockups on November 13, 2026; no ticket yet.
+- **Ticket:** needed
+- **Roadmap:** MVP — [Player](workstreams/player.md), [Queue](workstreams/queue.md), [Admin](workstreams/admin.md)
+- **Decision:**
+  - **Share profile is not own-profile only any more** (amends [D-2026-11-11-11](#d-2026-11-11-11) / #738): the profile card (Queue, Player, Admin quick view) and another player's public profile page (“there should be share profile button”) have **Share profile**. Private profiles show no share (the gate stays).
+  - **More things can be shared** with the standard share dialog: the session leaderboard (split into several images, pick which), each award, all awards, and a shared Off Day (all and per player). Off Day is still shared only after the club publishes it.
+  - **Your own games can be shared before the club publishes** (amends [D-2026-11-09-08](#d-2026-11-09-08); owner: “since it's your profile you can share your own games”): on your own Games page every session has **Share games**, and each counted game has its own share icon (**Share game**). Only **Share result** (your place in the Standings) still waits for the club to share the results.
+  - **Share images carry no QR and no grid background**, except the Session QR (Invite Session) and the club invite. The link field under **OR** is how people open the page.
+- **References:** mockup logs [profile card open/share](../mockup-changes/2026-11-13-profile-card-open-share.md), [share leaderboard](../mockup-changes/2026-11-13-share-leaderboard.md), [awards](../mockup-changes/2026-11-13-queue-awards-faces-share.md), [no grid, no QR](../mockup-changes/2026-11-13-share-images-no-grid-no-qr.md).

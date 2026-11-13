@@ -35,7 +35,7 @@ A dedicated page is accessible to anyone with its link, without login. The suppl
 - Header: date and time, session title, club as **Organizer**, and **Happening now** or **Finished**.
 - **Details:** date, time and duration, venue and address, number and labels of courts, enabled singles/doubles formats, mode with its description, minimum games per player, and notes. A footer says slots are confirmed with the Queue Master directly and shows when the page was last updated, adding that recent venue changes have not synced when that is the case.
 - **Participants · N:** each player's picture (or initials) and name, with "Has a ROTRA profile" for registered and unclaimed players. No levels, presence, contacts, or identity checks. A signed-in ROTRA player can tap a participant to open that player's profile card ([Players › Public participant names](modules/players/README.md#public-participant-names), [D-2026-11-11-11](../../../mvp/decisions.md#d-2026-11-11-11)).
-- **Results** (finished sessions only): the published slides, or "Results for this session have not been shared."
+- **Results** (finished sessions only): the published slides, or "Results for this session have not been shared." Finished sessions show **Match history** instead of the Queue and a **Leaderboard** tab with the viewer's position (November 13, 2026).
 
 Financial estimates never appear on the public page.
 

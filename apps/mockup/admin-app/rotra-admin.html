@@ -201,6 +201,141 @@ button.brand { display: flex; align-items: baseline; gap: 8px; background: none;
 .sl-row { padding: 8px 0; border-top: 1px solid var(--border); gap: 10px; align-items: baseline; }
 .sl-row:first-child { border-top: 0; }
 .qv { gap: 12px; }
+/* Owner comment, November 13, 2026: Quick view uses the same banner profile card and Stats block as the Queue and Player profile dialogs.
+   No title bar and no card box: the banner starts at the panel's top edge and runs down to the middle of the picture; the × floats on it.
+   Name block: the nickname (or the full name), the full name under it when there is a nickname, then a small Copy RTR ID button. */
+.sheet:has(.qv-card) > header { position: absolute; top: 10px; right: 10px; z-index: 2; padding: 0; }
+.sheet:has(.qv-card) > header h2 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.sheet:has(.qv-card) > header .icon-btn { box-sizing: border-box; width: 30px; height: 30px; min-width: 0; min-height: 0; aspect-ratio: 1; flex: none; padding: 0; display: grid; place-items: center; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--fg) 16%, transparent); background: color-mix(in srgb, var(--surface) 62%, transparent); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); color: var(--fg); box-shadow: none; transition: background .12s; }
+/* Fourth pass, November 13, 2026 ("unproportioned and badly designed close button"): a true 30 px circle (the base .icon-btn min-width made it 36 × 32), frosted over the banner, 14 px icon. */
+.sheet:has(.pp-card) > header .icon-btn:hover, .sheet:has(.qv-card) > header .icon-btn:hover { background: color-mix(in srgb, var(--surface) 85%, transparent); }
+.sheet:has(.pp-card) > header, .sheet:has(.qv-card) > header { top: 12px; right: 12px; }
+.sheet:has(.pp-card) > header .icon-btn svg, .sheet:has(.qv-card) > header .icon-btn svg { width: 14px; height: 14px; }
+.sheet:has(.qv-card) .sb { padding-top: 0; }
+.qv-card { position: relative; margin: 0 -20px; }
+/* Third pass, November 13, 2026: the top half of the 5:2 banner, a 5:1 strip (uploads crop from the top; drawn banners stretch to twice the strip's height). */
+.qv-banner { aspect-ratio: 5 / 1; overflow: hidden; }
+.qv-banner > img { object-position: center top; }
+.qv-banner > span { background-size: 100% 200%; background-position: center top; }
+.qv-banner > * { display: block; width: 100%; height: 100%; object-fit: cover; }
+.qv-av { position: relative; width: max-content; margin: -36px 0 0 20px; z-index: 1; }
+.qv-av .avatar { width: 72px; height: 72px; font-size: 22px; box-shadow: 0 0 0 5px var(--surface); }
+.qv-av .logo { width: 72px; height: 72px; font-size: 22px; border-radius: 50%; box-shadow: 0 0 0 5px var(--surface); }
+.qv-card .qv-id { padding: 10px 20px 0; gap: 2px; }
+.qv-card .qv-id .row { margin-top: 6px; }
+.pp-full { font-size: 14px; color: var(--fg2); }
+/* Owner, November 13, 2026: a new-tab icon right of the name, and Share profile (the same share dialog as Queue and Player). */
+.pp-nm { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+.pp-ext { display: inline-grid; place-items: center; width: 28px; height: 28px; flex: none; border-radius: 8px; color: var(--fg2); text-decoration: none; }
+.pp-ext:hover { color: var(--accent); background: var(--elev); }
+.pp-ext svg { width: 16px; height: 16px; }
+.sh-wrap { align-items: center; text-align: center; }
+.sh-tiles { display: flex; gap: 12px; justify-content: center; align-items: flex-end; width: 100%; overflow-x: auto; padding: 4px 2px 6px; }
+.sh-tile { flex: none; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px; border: 2px solid transparent; border-radius: 14px; background: none; color: inherit; font: inherit; cursor: pointer; }
+.sh-tile:hover { background: var(--elev); } .sh-tile.on { border-color: var(--accent); background: var(--accent-subtle); }
+.sh-tile:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; } .sh-tile > b { font-size: 13px; }
+.sh-thumb { display: block; position: relative; overflow: hidden; border-radius: 10px; pointer-events: none; }
+.sh-thumb.story { width: 113px; height: 200px; } .sh-thumb.post { width: 160px; height: 200px; } .sh-thumb.square { width: 160px; height: 160px; }
+.sh-scale { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+.sh-thumb.story .sh-scale { transform: scale(.4167); } .sh-thumb.post .sh-scale, .sh-thumb.square .sh-scale { transform: scale(.5); }
+.sh-acts { justify-content: center; }
+/* Owner artifact comment, November 13, 2026: share dialogs are big; the images show at full size (readable, not scaled down);
+   tapping an image picks it (several can be picked, then Download picked), and an eye icon on hover opens it full screen. */
+/* Artifact comment, same day: a compact, narrower dialog; the images sit in a carousel (drag or swipe, scroll-snapping, each
+   image still clickable) with a fade mask on a side when more images are hidden that way. */
+.sheet.sh-dlg { width: min(680px, calc(100vw - 32px)); }
+@media (max-width: 640px) { .sheet.sh-dlg { width: 100%; } }
+.sh-dlg .sh-tiles { width: 100%; flex-wrap: nowrap; justify-content: flex-start; align-items: flex-start; gap: 20px; padding: 12px 24px 6px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scroll-padding-inline: 24px; scrollbar-width: none; cursor: grab; -webkit-user-select: none; user-select: none; }
+.sh-dlg .sh-tiles::-webkit-scrollbar { display: none; }
+.sh-dlg .sh-tiles.dragging { scroll-snap-type: none; cursor: grabbing; }
+.sh-dlg .sh-tiles.dragging * { pointer-events: none; }
+.sh-dlg .sh-pick { flex: none; scroll-snap-align: center; }
+.sh-dlg .sh-tiles img, .sh-dlg .sh-tiles svg { -webkit-user-drag: none; }
+.sh-dlg .sh-tiles.mask-l { -webkit-mask-image: linear-gradient(90deg, transparent, #000 64px); mask-image: linear-gradient(90deg, transparent, #000 64px); }
+.sh-dlg .sh-tiles.mask-r { -webkit-mask-image: linear-gradient(270deg, transparent, #000 64px); mask-image: linear-gradient(270deg, transparent, #000 64px); }
+.sh-dlg .sh-tiles.mask-l.mask-r { -webkit-mask-image: linear-gradient(90deg, transparent, #000 64px, #000 calc(100% - 64px), transparent); mask-image: linear-gradient(90deg, transparent, #000 64px, #000 calc(100% - 64px), transparent); }
+.sh-car-nav { display: flex; justify-content: center; gap: 6px; }
+.sh-car-nav i { width: 7px; height: 7px; border-radius: 50%; background: var(--border-strong); }
+.sh-car-nav i.on { background: var(--accent); width: 18px; border-radius: 999px; }
+.sh-pick { position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.sh-img { position: relative; display: block; padding: 0; border: 3px solid transparent; border-radius: 23px; background: none; color: inherit; font: inherit; cursor: pointer; line-height: normal; text-align: left; }
+.sh-img.on { border-color: var(--accent); }
+.sh-img:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.sh-chk { position: absolute; top: -11px; left: -11px; z-index: 2; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; border: 3px solid var(--surface); background: var(--overlay); color: transparent; font-size: 15px; font-weight: 800; font-style: normal; }
+.sh-img.on .sh-chk { background: var(--accent); color: var(--on-accent); }
+.sh-eye { position: absolute; top: 15px; right: 15px; z-index: 3; width: 40px; height: 40px; border-radius: 50%; border: 0; padding: 0; display: grid; place-items: center; background: rgba(0, 0, 0, .62); color: #fff; cursor: pointer; opacity: 0; transition: opacity .12s; }
+.sh-pick:hover .sh-eye, .sh-eye:focus-visible { opacity: 1; }
+@media (hover: none) { .sh-eye { opacity: 1; } }
+.sh-cap { display: flex; flex-direction: column; align-items: center; } .sh-cap b { font-size: 14px; }
+.sh-pickbar { width: 100%; display: flex; justify-content: center; align-items: center; gap: 8px 16px; flex-wrap: wrap; }
+.sh-linkish { border: 0; background: none; padding: 0; color: var(--accent); font: inherit; font-weight: 600; cursor: pointer; }
+.sh-view { position: fixed; inset: 0; z-index: 70; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 60px 16px 20px; background: rgba(0, 0, 0, .94); cursor: zoom-out; animation: fade .15s; }
+.sh-view-x { position: absolute; top: calc(12px + env(safe-area-inset-top, 0px)); right: 12px; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; padding: 0; border: 1px solid rgba(255, 255, 255, .3); background: rgba(255, 255, 255, .08); color: #fff; cursor: pointer; }
+.sh-view-fit { position: relative; flex: none; cursor: default; }
+.sh-view-fit > .sh-view-in { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+.sh-view-bar { display: flex; align-items: center; gap: 12px; color: #fff; cursor: default; }
+
+.or-div { width: 100%; display: flex; align-items: center; gap: 14px; margin: 6px 0; }
+.or-div::before, .or-div::after { content: ''; flex: 1; height: 1px; background: var(--border-strong); }
+.or-div span { font-size: 18px; font-weight: 800; letter-spacing: 2px; color: var(--fg2); }
+.copy-field { width: 100%; display: flex; flex-direction: column; gap: 6px; text-align: left; }
+.cf-box { position: relative; }
+.cf-box input { width: 100%; box-sizing: border-box; min-height: 44px; padding: 0 48px 0 14px; border-radius: var(--r-sm); border: 1px solid var(--border-strong); background: var(--bg); color: inherit; font: 13px var(--mono); text-overflow: ellipsis; }
+.cf-box input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.cf-btn { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 34px; height: 34px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--fg2); cursor: pointer; }
+.cf-btn:hover { background: var(--elev); color: var(--fg); } .cf-btn:focus-visible { outline: 2px solid var(--accent); }
+.qs-card { --qc-bg: #0b0b0c; --qc-fg: #f0f0f2; --qc-dim: #9090a0; --qc-acc: #00ff88; width: 320px; display: flex; flex-direction: column; gap: 14px; padding: 20px; box-sizing: border-box; border-radius: 20px; text-align: left; color: var(--qc-fg);
+  background: radial-gradient(120% 70% at 50% 100%, rgba(0, 255, 136, .18), transparent 70%), var(--qc-bg); } /* Owner, November 13, 2026: no grid on share images. */
+.qs-card.post { height: 400px; } .qs-card.square { height: 320px; } .qs-card.story { width: 270px; height: 480px; }
+.qs-top { display: flex; align-items: center; gap: 12px; } .qs-top .avatar { width: 52px; height: 52px; box-shadow: 0 0 0 2px var(--qc-acc); }
+.qs-top b { display: block; font-size: 16px; } .qs-top span { font-size: 12px; color: var(--qc-dim); }
+.qs-mid { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 8px; }
+.qs-lbl { font-size: 13px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: var(--qc-dim); }
+.qs-pos { font-size: 64px; font-weight: 800; line-height: .9; color: var(--qc-acc); } .qs-pos em { font-style: normal; font-size: 18px; color: var(--qc-dim); margin-left: 8px; }
+.qs-card.square .qs-pos { font-size: 52px; }
+.qs-rec { display: flex; gap: 14px; font-size: 13px; color: var(--qc-dim); } .qs-rec b { font-size: 20px; color: var(--qc-fg); }
+.qs-date { font-size: 12px; color: var(--qc-dim); }
+.qs-foot { display: flex; align-items: baseline; justify-content: space-between; font-size: 11px; color: var(--qc-dim); } .qs-foot .w { font-size: 16px; font-weight: 800; letter-spacing: 2px; color: var(--qc-fg); } .qs-foot .w b { color: var(--qc-acc); }
+/* Owner, November 13, 2026: hovering (or focusing) a profile card's picture shows an eye: it opens the full photo. Only pictures that open a photo get it. */
+.qv-av .av-open { position: relative; border-radius: 50%; }
+.qv-av .av-open::before { content: ''; position: absolute; inset: 0; border-radius: 50%; background: color-mix(in srgb, var(--bg) 55%, transparent); opacity: 0; transition: opacity .15s; pointer-events: none; z-index: 1; }
+.qv-av .av-open::after { content: ''; position: absolute; left: 50%; top: 50%; width: 26px; height: 26px; transform: translate(-50%, -50%); background: var(--fg); -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E") center / contain no-repeat; opacity: 0; transition: opacity .15s; pointer-events: none; z-index: 2; }
+.qv-av .av-open:hover::before, .qv-av .av-open:focus-visible::before, .qv-av .av-open:hover::after, .qv-av .av-open:focus-visible::after { opacity: 1; }
+.pp-rtr { align-self: flex-start; margin-top: 4px; min-height: 22px; height: 22px; padding: 0 6px; gap: 4px; border-radius: 6px; font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: .2px; color: var(--fg2); }
+.pp-rtr:hover { color: var(--fg); }
+.pp-rtr svg { width: 12px; height: 12px; flex: none; }
+.pp-sec { border: 1px solid var(--border); border-radius: var(--r); background: var(--bg); padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.pp-sec .label { font-size: 11px; letter-spacing: .6px; text-transform: uppercase; color: var(--fg2); font-weight: 700; }
+.pp-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 0; }
+.pp-stats > div { border: 1px solid var(--border); border-radius: var(--r); padding: 10px 12px; background: var(--surface); }
+.pp-stats dt { font-size: 12px; color: var(--fg2); font-weight: 600; }
+.pp-stats dd { margin: 2px 0 0; font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; }
+/* Owner comment, November 13, 2026 ("should be latest stats · redesign the cards and counter here, they look so bland"): Latest stats with the year
+   as a chip; four plain counters. */
+.pp-sec-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.pp-yr { font-size: 11px; font-weight: 700; color: var(--fg2); border: 1px solid var(--border-strong); border-radius: 999px; padding: 1px 8px; font-variant-numeric: tabular-nums; }
+.pp-st { display: block; }
+.pp-cnt { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 0; }
+.pp-cnt > div { padding: 2px 0 2px 14px; border-left: 1px solid var(--border); }
+.pp-cnt > div:first-child { padding-left: 0; border-left: 0; }
+.pp-cnt .r dd { color: var(--accent); }
+/* Owner, same day: "I personally hate the round progress bar" — no ring; Win rate is the first counter, the only one in colour. */
+/* Simplified the same day ("doing too much, maybe simplify it a little bit"): the ring keeps the colour; the counters are plain numbers with hairline dividers; no boxes, coloured edges or bar. */
+.pp-cnt dt { font-size: 10px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: var(--fg2); }
+.pp-cnt dd { margin: 6px 0 0; font-size: 22px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+/* Owner, same day: the stats box takes the leaderboard podium's look: a green 8 px grid over the card, lit from below. */
+.pp-sec.pp-split { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 7fr); gap: 0; padding: 14px 16px; }
+.pp-wrbox { display: flex; flex-direction: column; justify-content: space-between; gap: 8px; padding-right: 16px; border-right: 1px solid color-mix(in srgb, var(--accent) 25%, var(--border)); }
+.pp-wr { display: flex; align-items: flex-end; gap: 4px; min-height: 30px; }
+.pp-wr > span { font-size: 32px; font-weight: 800; line-height: .9; letter-spacing: -.5px; color: var(--accent); }
+.pp-right { display: flex; flex-direction: column; gap: 12px; padding-left: 16px; min-width: 0; }
+@media (max-width: 420px) { .pp-wr { flex-direction: column-reverse; align-items: flex-start; gap: 2px; } .pp-wr > span { font-size: 24px; } .pp-fire { max-height: 40px; max-width: 33px; } .pp-wrbox { padding-right: 12px; } .pp-right { padding-left: 12px; } }
+.pp-sec:has(.pp-cnt) { position: relative; overflow: hidden; border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+  background: radial-gradient(120% 90% at 0% 100%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 65%),
+    repeating-linear-gradient(0deg, color-mix(in srgb, var(--accent) 7%, transparent) 0 1px, transparent 1px 8px),
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--accent) 7%, transparent) 0 1px, transparent 1px 8px), var(--surface); }
+.pp-fire { display: block; image-rendering: pixelated; margin-bottom: -2px; }
+@media (max-width: 420px) { .pp-cnt > div { padding-left: 10px; } .pp-cnt dd { font-size: 19px; } }
 .qv-hero { display: flex; gap: 12px; align-items: center; padding: 12px; border-radius: var(--r); background: var(--elev); }
 .qv-hero.claimed { background: linear-gradient(135deg, var(--accent-subtle), transparent 70%), var(--elev); }
 .qv-id { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
@@ -427,6 +562,9 @@ body:has(.player-select:checked) .shell-main { padding-bottom: 120px; }
 .bn-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; }
 .bn-grid .ch-img { aspect-ratio: 5 / 2; border-radius: var(--r); }
 .bn-grid .ch-name { display: block; margin-top: 4px; font-size: 12px; color: var(--fg2); }
+/* Owner comment, November 13, 2026: one shown banner is the Default, used on every profile that hasn't picked one. */
+.bn-grid .bn-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px; min-height: 26px; }
+.bn-grid .bn-meta .ch-name { margin-top: 0; }
 .bn-court { background: linear-gradient(135deg, var(--accent-dim), var(--accent) 55%, var(--accent-subtle)); }
 .bn-night { background: linear-gradient(135deg, var(--elev), var(--overlay) 60%, var(--border-strong)); }
 .bn-dusk { background: linear-gradient(135deg, var(--overlay), var(--accent-dim)); }
@@ -461,6 +599,25 @@ body:has(.player-select:checked) .shell-main { padding-bottom: 120px; }
 @keyframes ptr-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { #ptr { transition: none; } #ptr.busy i { animation-duration: 3s; } }
 html { overscroll-behavior-y: contain; }
+
+/* ROTRA logo (owner, November 13, 2026): the theme picks the Dark or Light artwork. */
+.rlogo { display: inline-flex; align-items: center; line-height: 0; flex: none; }
+.rlogo svg { display: block; height: 100%; width: auto; }
+.rlogo .lg-l { display: none; }
+.rlogo.rlogo-fixed .lg-d { display: block; }
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) .rlogo:not(.rlogo-fixed) .lg-l { display: block; } :root:not([data-theme="dark"]) .rlogo:not(.rlogo-fixed) .lg-d { display: none; } }
+:root[data-theme="light"] .rlogo:not(.rlogo-fixed) .lg-l { display: block; }
+:root[data-theme="light"] .rlogo:not(.rlogo-fixed) .lg-d { display: none; }
+.rlogo-resp .rl-full, .rlogo-resp .rl-mini { height: 100%; display: inline-flex; }
+.rlogo-resp .rl-mini { display: none; }
+@media (max-width: 420px) { .rlogo-resp .rl-full { display: none; } .rlogo-resp .rl-mini { display: inline-flex; } }
+
+.brand:has(.rlogo) { align-items: center; }
+.brand-logo { height: 26px; }
+.mark:has(.rlogo) { display: flex; align-items: center; gap: 10px; }
+.mark-logo { height: 52px; }
+.foot-logo { height: 20px; }
+.qc-logo { height: 18px; }
 </style>
 
 <div id="app"></div>
@@ -676,6 +833,10 @@ function seedBanners() {
 const bannerName = (b) => b.name || `Banner ${b.n}`;
 const bannerArt = (b) => (b.img ? `<img src="${b.img}" alt="">` : `<span class="bn-${b.key}" style="display:block;width:100%;height:100%" aria-hidden="true"></span>`);
 const activeBanners = () => S.banners.filter((b) => b.active);
+// Owner comment, November 13, 2026: Admin picks the default banner. It is always a shown banner; if it is somehow missing, the first shown one stands in.
+const defaultBanner = () => S.banners.find((b) => b.id === S.defaultBanner && b.active) || activeBanners()[0];
+// A registered player's own pick (the prototype draws one from the player ID); unclaimed records and players who haven't picked show the default.
+const playerBanner = (p) => { if (!p.claimed) return defaultBanner(); const h = hashStr(`${p.id}-bn`) % 8, pick = h < BANNER_SEEDS.length ? S.banners.find((b) => b.key === BANNER_SEEDS[h][0]) : null; return pick || defaultBanner(); };
 
 function freshState() {
   return {
@@ -684,7 +845,7 @@ function freshState() {
     config: [{ v: 1, assess: 70, perf: 30, threshold: 10, at: ymdT('2026-01-05') + 9 * H, by: OWNER }],
     flags: [],
     chars: seedChars(),
-    banners: seedBanners(),
+    banners: seedBanners(), defaultBanner: 'bn1',
     demo: { timeoutNext: false, failApply: false, failConfig: false, conflictConfig: false },
     ui: freshUi(),
   };
@@ -705,6 +866,7 @@ if (!S || S.v !== 1) S = freshState();
 // Saves from before the character library get the built-in characters.
 if (!Array.isArray(S.chars)) S.chars = seedChars();
 if (!Array.isArray(S.banners)) S.banners = seedBanners();
+if (!S.defaultBanner) S.defaultBanner = 'bn1';
 S.clubs.forEach((c) => { if (!c.price) { const p = SEED_PRICE[c.id] || [1500, 15000]; c.price = { monthly: p[0], yearly: p[1] }; } });
 Object.assign(S.ui, { sheet: null, pendingGo: null, resetArmed: false, nav: false, upload: null });
 S.ui.login.pending = false;
@@ -737,7 +899,15 @@ function log(t, id, text) { S.log.unshift({ at: Date.now(), actor: OWNER, t, id,
 
 // ---------- Icons ----------
 const svg = (body, w = 16, sw = 2.2) => `<svg width="${w}" height="${w}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
+// Owner, November 13, 2026: the real ROTRA logos (docs/branding/materials/logo). Full = symbol + wordmark, Mini = symbol only;
+// Dark is for dark backgrounds, Light for light ones. rotraLogo() carries both and the theme shows the right one; fixed-dark surfaces
+// (share images, the Session QR card) use the Dark version only.
+const LOGO = {"fullD": "<svg class=\"lg-d\" aria-hidden=\"true\" focusable=\"false\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 324.21 120.56\"><g opacity=\".2\"><path fill=\"#71c173\" d=\"M60.29,120.46C27.08,120.46.07,93.44.07,60.23S27.08.01,60.29.01s60.22,27.02,60.22,60.22-27.02,60.22-60.22,60.22ZM60.29,4.83C29.74,4.83,4.88,29.68,4.88,60.23s24.85,55.4,55.4,55.4,55.4-24.85,55.4-55.4S90.84,4.83,60.29,4.83Z\"/></g><g opacity=\".4\"><path fill=\"#71c173\" d=\"M60.29,107.61c-26.12,0-47.37-21.25-47.37-47.37S34.17,12.86,60.29,12.86s47.37,21.25,47.37,47.37-21.25,47.37-47.37,47.37ZM60.29,17.68c-23.47,0-42.56,19.09-42.56,42.56s19.09,42.56,42.56,42.56,42.56-19.09,42.56-42.56-19.09-42.56-42.56-42.56Z\"/></g><path fill=\"#71c173\" d=\"M60.29,94.76c-19.04,0-34.53-15.49-34.53-34.53s15.49-34.53,34.53-34.53,34.53,15.49,34.53,34.53-15.49,34.53-34.53,34.53ZM60.29,30.52c-16.38,0-29.71,13.33-29.71,29.71s13.33,29.71,29.71,29.71,29.71-13.33,29.71-29.71-13.33-29.71-29.71-29.71Z\"/><circle fill=\"#71c173\" cx=\"105.26\" cy=\"60.23\" r=\"6.42\"/><path fill=\"#fff\" d=\"M143.95,81.51V31.47h19.1c11.36,0,18,5.75,18,15.61,0,6.71-3.15,11.5-9.04,13.9l9.51,20.54h-9.58l-8.49-18.69h-10.75v18.69h-8.76ZM152.71,55.08h10.34c5.54,0,8.83-2.94,8.83-8.01s-3.29-7.8-8.83-7.8h-10.34v15.81Z\"/><path fill=\"#fff\" d=\"M202.28,46.73c10.47,0,18.07,7.26,18.07,17.8s-7.6,17.8-18.07,17.8-18.07-7.26-18.07-17.8,7.6-17.8,18.07-17.8ZM202.28,74.87c5.75,0,9.72-4.18,9.72-10.34s-3.97-10.34-9.72-10.34-9.72,4.17-9.72,10.34,3.97,10.34,9.72,10.34Z\"/><path fill=\"#fff\" d=\"M229.8,81.51v-26.83h-6.5v-6.98h6.5v-10.54h8.35v10.54h6.57v6.98h-6.57v26.83h-8.35Z\"/><path fill=\"#fff\" d=\"M271.14,55.29h-3.08c-6.02,0-9.79,3.22-9.79,9.79v16.43h-8.35v-33.75h7.87l.48,4.93c1.44-3.35,4.66-5.61,9.17-5.61,1.16,0,2.33.14,3.7.48v7.73Z\"/><path fill=\"#fff\" d=\"M273.95,71.85c0-6.23,4.52-10.13,12.53-10.75l10.13-.75v-.75c0-4.59-2.74-6.43-6.98-6.43-4.93,0-7.67,2.05-7.67,5.61h-7.12c0-7.32,6.02-12.12,15.2-12.12s14.72,4.93,14.72,14.31v20.54h-7.32l-.62-5c-1.44,3.49-6.02,5.89-11.29,5.89-7.19,0-11.57-4.17-11.57-10.54ZM296.68,67.82v-1.78l-7.05.55c-5.2.48-7.19,2.19-7.19,4.93,0,3.08,2.05,4.59,5.82,4.59,5.13,0,8.42-3.08,8.42-8.28Z\"/><path fill=\"#fff\" d=\"M313.04,76.92c0-3.01,2.53-5.48,5.54-5.48s5.54,2.46,5.54,5.48-2.53,5.41-5.54,5.41-5.54-2.46-5.54-5.41Z\"/></svg>", "fullL": "<svg class=\"lg-l\" aria-hidden=\"true\" focusable=\"false\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 321.79 120.89\"><path fill=\"#83ae87\" d=\"M60.38.02C27.09.02,0,27.1,0,60.4s27.09,60.38,60.38,60.38,60.38-27.09,60.38-60.38S93.68.02,60.38.02ZM114.58,60.4c0,29.88-24.31,54.19-54.19,54.19S6.19,90.28,6.19,60.4,30.5,6.2,60.38,6.2s54.19,24.31,54.19,54.19Z\"/><path fill=\"#518757\" d=\"M60.38,12.75c-26.27,0-47.65,21.38-47.65,47.65s21.38,47.65,47.65,47.65,47.65-21.38,47.65-47.65S86.66,12.75,60.38,12.75ZM101.85,60.4c0,22.86-18.6,41.46-41.46,41.46s-41.46-18.6-41.46-41.46S37.52,18.93,60.38,18.93s41.46,18.6,41.46,41.46Z\"/><path fill=\"#2d6e36\" d=\"M60.38,25.48c-19.25,0-34.92,15.67-34.92,34.92s15.67,34.92,34.92,34.92,34.92-15.67,34.92-34.92-15.67-34.92-34.92-34.92ZM89.11,60.4c0,15.84-12.89,28.73-28.73,28.73s-28.73-12.89-28.73-28.73,12.89-28.73,28.73-28.73,28.73,12.89,28.73,28.73Z\"/><circle fill=\"#2d6e36\" cx=\"104.94\" cy=\"60.4\" r=\"7.07\"/><path d=\"M143.14,81.26V31.68h18.92c11.26,0,17.84,5.7,17.84,15.46,0,6.65-3.12,11.39-8.95,13.77l9.43,20.35h-9.5l-8.41-18.52h-10.65v18.52h-8.68ZM151.82,55.08h10.24c5.49,0,8.75-2.92,8.75-7.94s-3.26-7.73-8.75-7.73h-10.24v15.67Z\"/><path d=\"M200.93,46.81c10.38,0,17.91,7.19,17.91,17.63s-7.53,17.63-17.91,17.63-17.91-7.19-17.91-17.63,7.53-17.63,17.91-17.63ZM200.93,74.68c5.7,0,9.63-4.14,9.63-10.24s-3.93-10.24-9.63-10.24-9.63,4.14-9.63,10.24,3.93,10.24,9.63,10.24Z\"/><path d=\"M228.21,81.26v-26.59h-6.44v-6.92h6.44v-10.45h8.28v10.45h6.51v6.92h-6.51v26.59h-8.28Z\"/><path d=\"M269.17,55.29h-3.05c-5.97,0-9.7,3.19-9.7,9.7v16.28h-8.27v-33.44h7.8l.47,4.88c1.42-3.32,4.61-5.56,9.09-5.56,1.15,0,2.31.14,3.66.47v7.66Z\"/><path d=\"M271.96,71.7c0-6.17,4.48-10.04,12.41-10.65l10.04-.75v-.75c0-4.54-2.71-6.38-6.92-6.38-4.88,0-7.6,2.04-7.6,5.56h-7.05c0-7.26,5.97-12.01,15.06-12.01s14.58,4.88,14.58,14.18v20.35h-7.26l-.61-4.95c-1.42,3.46-5.97,5.83-11.19,5.83-7.12,0-11.46-4.14-11.46-10.45ZM294.48,67.7v-1.76l-6.99.54c-5.15.47-7.12,2.17-7.12,4.88,0,3.05,2.03,4.54,5.76,4.54,5.09,0,8.34-3.05,8.34-8.21Z\"/><path d=\"M310.69,76.72c0-2.98,2.51-5.43,5.49-5.43s5.49,2.44,5.49,5.43-2.51,5.36-5.49,5.36-5.49-2.44-5.49-5.36Z\"/></svg>", "miniD": "<svg class=\"lg-d\" aria-hidden=\"true\" focusable=\"false\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 120.49 120.48\"><g opacity=\".2\"><path fill=\"#71c173\" d=\"M60.26,120.47C27.05,120.47.04,93.45.04,60.25S27.05.02,60.26.02s60.22,27.02,60.22,60.22-27.02,60.22-60.22,60.22ZM60.26,4.84C29.71,4.84,4.86,29.7,4.86,60.25s24.85,55.4,55.4,55.4,55.4-24.85,55.4-55.4S90.81,4.84,60.26,4.84Z\"/></g><g opacity=\".4\"><path fill=\"#71c173\" d=\"M60.26,107.62c-26.12,0-47.37-21.25-47.37-47.37S34.14,12.87,60.26,12.87s47.37,21.25,47.37,47.37-21.25,47.37-47.37,47.37ZM60.26,17.69c-23.47,0-42.56,19.09-42.56,42.56s19.09,42.56,42.56,42.56,42.56-19.09,42.56-42.56-19.09-42.56-42.56-42.56Z\"/></g><path fill=\"#71c173\" d=\"M60.26,94.77c-19.04,0-34.53-15.49-34.53-34.53s15.49-34.53,34.53-34.53,34.53,15.49,34.53,34.53-15.49,34.53-34.53,34.53ZM60.26,30.54c-16.38,0-29.71,13.33-29.71,29.71s13.33,29.71,29.71,29.71,29.71-13.33,29.71-29.71-13.33-29.71-29.71-29.71Z\"/><circle fill=\"#71c173\" cx=\"105.23\" cy=\"60.25\" r=\"6.42\"/></svg>", "miniL": "<svg class=\"lg-l\" aria-hidden=\"true\" focusable=\"false\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 120.84 120.79\"><path fill=\"#83ae87\" d=\"M60.42,0C27.12,0,.04,27.09.04,60.39s27.09,60.38,60.38,60.38,60.38-27.09,60.38-60.38S93.71,0,60.42,0ZM114.61,60.39c0,29.88-24.31,54.19-54.19,54.19S6.22,90.27,6.22,60.39,30.53,6.19,60.42,6.19s54.19,24.31,54.19,54.19Z\"/><path fill=\"#518757\" d=\"M60.42,12.73c-26.27,0-47.65,21.38-47.65,47.65s21.38,47.65,47.65,47.65,47.65-21.38,47.65-47.65S86.69,12.73,60.42,12.73ZM101.88,60.39c0,22.86-18.6,41.46-41.46,41.46s-41.46-18.6-41.46-41.46S37.55,18.92,60.42,18.92s41.46,18.6,41.46,41.46Z\"/><path fill=\"#2d6e36\" d=\"M60.42,25.46c-19.25,0-34.92,15.67-34.92,34.92s15.67,34.92,34.92,34.92,34.92-15.67,34.92-34.92-15.67-34.92-34.92-34.92ZM89.15,60.39c0,15.84-12.89,28.73-28.73,28.73s-28.73-12.89-28.73-28.73,12.89-28.73,28.73-28.73,28.73,12.89,28.73,28.73Z\"/><circle fill=\"#2d6e36\" cx=\"104.97\" cy=\"60.39\" r=\"7.07\"/></svg>"};
+const rotraLogo = (kind = 'full', cls = '') => `<span class="rlogo rlogo-${kind}${cls ? ` ${cls}` : ''}" role="img" aria-label="ROTRA">${kind === 'mini' ? LOGO.miniD + LOGO.miniL : kind === 'resp' ? `<span class="rl-full">${LOGO.fullD}${LOGO.fullL}</span><span class="rl-mini">${LOGO.miniD}${LOGO.miniL}</span>` : LOGO.fullD + LOGO.fullL}</span>`;
+const rotraLogoDark = (cls = '') => `<span class="rlogo rlogo-full rlogo-fixed${cls ? ` ${cls}` : ''}" role="img" aria-label="ROTRA">${LOGO.fullD}</span>`;
 const I = {
+  ext: svg('<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>', 16, 2),
+  share: svg('<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="m8.2 10.8 7.6-3.6M8.2 13.2l7.6 3.6"/>', 16, 2),
   sun: svg('<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'),
   moon: svg('<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>'),
   alert: svg('<path d="M12 3 2 21h20L12 3z"/><path d="M12 10v5M12 18h.01"/>'),
@@ -921,7 +1091,7 @@ function topBar() {
   const shell = S.me && !S.denied;
   return `<header class="top"><div class="top-in">
     ${shell ? `<button class="btn xs ghost icon-btn burger" data-act="toggleNav" aria-label="Menu" aria-expanded="${!!S.ui.nav}" aria-controls="app-nav">${I.menu}</button>` : ''}
-    <button class="brand" data-act="go" data-to="clubs" aria-label="ROTRA Admin, open clubs"><span>ROTR<b>A</b></span><span class="sub">Admin</span></button>
+    <button class="brand" data-act="go" data-to="clubs" aria-label="ROTRA Admin, open clubs">${rotraLogo('resp', 'brand-logo')}<span class="sub">Admin</span></button>
     <div class="grow"></div>
     ${shell ? `<span class="acct" title="Signed in as ${OWNER}">${I.user}<span>${OWNER}</span></span>` : ''}
     <button class="btn xs ghost icon-btn" data-act="toggleTheme" aria-label="Switch to ${isDark() ? 'light' : 'dark'} mode" title="${isDark() ? 'Light' : 'Dark'} mode">${isDark() ? I.sun : I.moon}</button>
@@ -954,7 +1124,7 @@ const shell = (html) => `<div class="shell ${S.ui.nav ? 'nav-open' : ''}">${rail
 function viewLogin() {
   const L = S.ui.login;
   return `<main class="login"><form class="card" data-form="login" novalidate>
-    <div class="mark"><span>ROTR<b>A</b></span><em>Admin</em></div>
+    <div class="mark">${rotraLogo('full', 'mark-logo')}<em>Admin</em></div>
     <div class="stack tight"><h1>Sign in</h1><p class="muted">Mock sign-in for this prototype. Any email and password work, and nothing is checked or sent.</p></div>
     ${S.ended ? notice('warn', '<b>Your Admin session ended.</b> Sign in again to continue.') : ''}
     <label class="field" for="login-email"><span>Email</span><input class="input" id="login-email" type="email" inputmode="email" autocomplete="off" data-bind="ui.login.email" value="${esc(L.email || OWNER)}"></label>
@@ -980,8 +1150,8 @@ function viewClubs() {
   const body = rows.map((c) => {
     const a = access(c);
     const until = a.state === 'active' ? fmtYmd(a.until) : a.state === 'expired' ? `Ended ${fmtYmd(a.ended)}` : a.state === 'scheduled' ? `From ${fmtYmd(a.starts)}` : '—';
-    return `<tr class="click" data-act="openClub" data-id="${c.id}">
-      <td class="lead" data-label="Club"><div class="who">${logo(c)}<div class="main"><button class="link" data-act="openClub" data-id="${c.id}">${esc(c.name)}</button><span class="small muted mono">${esc(c.username)}</span>${c.live ? `<span class="small live"><i></i>Running: ${esc(c.live.title)}</span>` : ''}${c.nameRequest ? `<span>${chip('Name change requested', 'warn')}</span>` : ''}</div></div></td>
+    return `<tr class="click" data-act="openClubCard" data-id="${c.id}">
+      <td class="lead" data-label="Club"><div class="who">${logo(c)}<div class="main"><button class="link" data-act="openClubCard" data-id="${c.id}">${esc(c.name)}</button><span class="small muted mono">${esc(c.username)}</span>${c.live ? `<span class="small live"><i></i>Running: ${esc(c.live.title)}</span>` : ''}${c.nameRequest ? `<span>${chip('Name change requested', 'warn')}</span>` : ''}</div></div></td>
       <td data-label="Founded in">${esc(c.city)} <span class="small muted mono">${c.code}</span></td>
       <td data-label="Price" class="nw">${c.price.free ? chip('Free · tester', 'ok') : `${peso(c.price.monthly)}<span class="small muted"> /mo</span>`}</td>
       <td data-label="Plan">${a.plan || '—'}</td>
@@ -1284,6 +1454,63 @@ function historyOf(p, n = 8) {
   return out;
 }
 const histRow = (x) => `<div class="between sl-row"><div><b>${esc(x.title)}</b><span class="small muted"> · ${esc(x.club)} · ${fmtYmd(x.ymd)}</span></div><span class="tnum nw">${x.won}–${x.games - x.won}</span></div>`;
+// Owner comment, November 13, 2026: the profile stats block, the same in Queue, Player and Admin. Counts the calendar year; resets on January 1.
+// Owner, November 13, 2026: "I dont like the progress bar for win rate · just 78% (put fire here) · bigger the fire bigger percent".
+// A small pixel fire beside the win rate, drawn like the fire behind #1 on the Player leaderboard podium: its size and heat grow with the rate.
+const PPF = { raf: 0, last: 0, pal: null, key: '' };
+function ppFirePal() {
+  const cs = getComputedStyle(document.documentElement), acc = cs.getPropertyValue('--accent').trim(), bg = cs.getPropertyValue('--bg').trim(), key = acc + bg;
+  if (key === PPF.key) return PPF.pal;
+  const rgb = (v) => { const m = /^#([0-9a-f]{6})$/i.exec(v); return m ? [0, 2, 4].map((k) => parseInt(m[1].slice(k, k + 2), 16)) : null; };
+  const [r, g, b] = rgb(acc) || [0, 255, 136], bb = rgb(bg) || [0, 0, 0], dark = bb[0] + bb[1] + bb[2] < 384;
+  const mix = (c, t, to) => Math.round(c + (to - c) * t);
+  PPF.pal = Array.from({ length: 37 }, (_, i) => { const t = i / 36; if (!i) return [0, 0, 0, 0];
+    const base = t < 0.55 ? [r, g, b].map((c) => mix(c * 0.35, t / 0.55, c)) : [r, g, b].map((c) => mix(c, ((t - 0.55) / 0.45) * (dark ? 0.75 : 0.35), 255));
+    return [...base, t < 0.12 ? 0 : Math.round(255 * Math.min(1, (t - 0.12) * 2.2))]; });
+  PPF.key = key; return PPF.pal;
+}
+function ppFireStep(c) {
+  const w = c.width, h = c.height, heat = +c.dataset.heat;
+  if (!c._buf) { c._buf = new Uint8Array(w * h); for (let x = 0; x < w; x++) { const d = Math.abs(x - (w - 1) / 2) / (w / 2); c._buf[(h - 1) * w + x] = d < 0.55 ? heat : d < 0.9 ? Math.round(heat * (1 - (d - 0.55) / 0.35)) : 0; } }
+  const buf = c._buf;
+  for (let x = 0; x < w; x++) for (let y = 1; y < h; y++) { const src = y * w + x, v = buf[src]; if (!v) { buf[src - w] = 0; continue; } const rnd = Math.floor(Math.random() * 3), dst = src - rnd + 1 - w; if (dst >= 0) buf[dst] = Math.max(0, v - (rnd & 1) - (Math.random() < 0.5 ? 1 : 0)); }
+}
+function ppFireDraw(c) {
+  const ctx = c.getContext('2d'), pal = ppFirePal(), w = c.width, img = ctx.createImageData(w, c.height);
+  c._buf.forEach((v, i) => { const p = pal[Math.min(36, v)] || pal[0], x = i % w, side = Math.max(0, 1 - ((x - (w - 1) / 2) / (w * 0.5)) ** 2); img.data.set([p[0], p[1], p[2], Math.round(p[3] * side)], i * 4); });
+  ctx.putImageData(img, 0, 0);
+}
+function ppFireTick(ts) {
+  const list = document.querySelectorAll('canvas.pp-fire');
+  if (!list.length) { PPF.raf = 0; return; }
+  if (ts - PPF.last > 70) { list.forEach((c) => { if (!c._buf) for (let i = 0; i < 30; i++) ppFireStep(c); ppFireStep(c); ppFireDraw(c); }); PPF.last = ts; }
+  PPF.raf = requestAnimationFrame(ppFireTick);
+}
+function ppFireStart() {
+  const list = document.querySelectorAll('canvas.pp-fire');
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { list.forEach((c) => { if (!c._buf) for (let i = 0; i < 40; i++) ppFireStep(c); ppFireDraw(c); }); return; }
+  if (list.length && !PPF.raf) PPF.raf = requestAnimationFrame(ppFireTick);
+}
+// 0% shows no fire; 1–100% grows from a 16 px ember to a 52 px flame, and burns hotter (taller tongues) as the rate rises.
+const ppFire = (rate) => { if (!rate) return ''; setTimeout(ppFireStart); const h = Math.round(16 + (rate / 100) * 36); return `<canvas class="pp-fire" width="18" height="22" data-heat="${Math.round(16 + (rate / 100) * 20)}" style="height:${h}px;width:${Math.round(h * 0.82)}px" aria-hidden="true"></canvas>`; };
+const ppStatsBlock = (games, wins) => { const yr = new Date().getFullYear(), head = `<div class="pp-sec-head"><span class="label">Latest stats</span><span class="pp-yr" title="Counts ${yr} so far; starts again on January 1">${yr}</span></div>`;
+  if (!games) return `<div class="pp-sec">${head}<p class="muted" style="margin:0">No games yet this year</p></div>`;
+  const l = games - wins, rate = Math.round((wins / games) * 100);
+  // Owner, same day: win rate gets its own area on the left (about 30%); the right 70% holds "Latest stats · year" over Games, Wins, Losses.
+  return `<div class="pp-sec pp-split"><div class="pp-wrbox"><span class="label">Win rate</span><div class="pp-wr"><span class="tnum">${rate}%</span>${ppFire(rate)}</div></div><div class="pp-right">${head}<dl class="pp-cnt"><div class="g"><dt>Games</dt><dd>${games}</dd></div><div class="w"><dt>Wins</dt><dd>${wins}</dd></div><div class="l"><dt>Losses</dt><dd>${l}</dd></div></dl></div></div>`; };
+// Owner, November 13, 2026: clubs get a profile dialog in the player card's style. In Admin it is the same right-hand panel as a player's
+// Quick view: the default banner, the club logo over it, name and username, access chip, then the club's details. Open club goes to the club page.
+function clubCardSheet(id) {
+  const c = S.clubs.find((x) => x.id === id); if (!c) return;
+  const a = access(c), until = a.state === 'active' ? fmtYmd(a.until) : a.state === 'expired' ? `Ended ${fmtYmd(a.ended)}` : a.state === 'scheduled' ? `From ${fmtYmd(a.starts)}` : '—';
+  const body = `<div class="stack qv"><div class="qv-card"><div class="qv-banner" aria-hidden="true">${bannerArt(defaultBanner())}</div><div class="qv-av">${logo(c, 'lg', true)}</div><div class="qv-id"><h2>${esc(c.name)}</h2><span class="pp-full mono">${esc(c.username)}</span><div class="row">${accessChip(a)}${c.live ? chip('Running now', 'ok') : ''}${c.price.free ? chip('Free · tester', 'ok') : ''}</div></div></div>
+    <dl class="kv qv-kv"><dt>Founded in</dt><dd>${esc(c.city)} <span class="small muted mono">${esc(c.code)}</span></dd><dt>Address</dt><dd>${esc(c.founding)}</dd><dt>Set up</dt><dd>${fmtYmd(c.setUp)}</dd><dt>Plan</dt><dd>${a.plan || '—'}</dd><dt>Until</dt><dd>${until}</dd><dt>Price</dt><dd>${c.price.free ? 'Free · tester' : `${peso(c.price.monthly)} a month · ${peso(c.price.yearly)} a year`}</dd></dl>
+    ${c.live ? `<section class="qv-sec"><h3>Running now</h3><p style="margin:0">${esc(c.live.title)}</p></section>` : ''}</div>`;
+  document.querySelectorAll('.scrim,.sheet').forEach((x) => x.remove());
+  document.body.insertAdjacentHTML('beforeend', sheetWrap('Club', body, `<button class="btn" data-act="closeSheet">Close</button><button class="btn primary" data-act="openClubFromCard" data-id="${c.id}">Open club</button>`));
+  document.querySelector('.sheet').classList.add('player-side-panel');
+  document.getElementById('sheet-title')?.focus();
+}
 function playerManagementSheet(action,id) {
   const p=playerOf(id), name=p?esc(p.name):'players';
   // Social links are written by the player on their own profile; the prototype draws a few from the name.
@@ -1291,13 +1518,15 @@ function playerManagementSheet(action,id) {
   const qv = () => {
     const rk = rankOf(p), soc = socialsOf(p);
     return `<div class="stack qv">
-      <div class="qv-hero${p.claimed ? ' claimed' : ''}">${avatar(p,'lg',true)}<div class="qv-id"><h2>${name}</h2><div class="row">${p.level == null ? chip('No rank yet') : chip(LEVELS[p.level], 'ok')}${p.claimed ? chip('Registered') : chip('Unclaimed')}</div></div></div>
+      <div class="qv-card"><div class="qv-banner" aria-hidden="true">${bannerArt(playerBanner(p))}</div><div class="qv-av">${avatar(p,'lg',true)}</div><div class="qv-id"><span class="pp-nm"><h2>${esc(p.nick || p.name)}</h2>${p.rtr ? `<a class="pp-ext" href="${esc(rotraProfileUrl(p))}" target="_blank" rel="noopener" aria-label="Open ${esc(p.nick || p.name)}'s ROTRA profile in a new tab" title="Open ROTRA profile in a new tab">${I.ext}</a>` : ''}</span>${p.nick ? `<span class="pp-full">${name}</span>` : ''}${p.rtr ? `<button type="button" class="btn xs pp-rtr" data-act="copyRtr" data-v="${esc(p.rtr)}" aria-label="Copy RTR ID ${esc(p.rtr)}" title="Copy RTR ID">${esc(p.rtr)}<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button>` : ''}<div class="row">${p.level == null ? chip('No rank yet') : chip(LEVELS[p.level], 'ok')}${p.claimed ? chip('Registered') : chip('Unclaimed')}</div></div></div>
       ${p.claimed ? '' : `<div class="qv-invite"><div><b>Not registered yet</b><span class="small muted">Send an invite so this player claims the profile.</span></div><button class="btn sm primary" data-act="pmSheet" data-v="Invite to ROTRA" data-id="${id}">Invite to ROTRA</button></div>`}
-      <dl class="kv qv-kv"><dt>ID</dt><dd><span class="mono">${esc(p.rtr)}</span> <button class="btn xs ghost" data-act="pmSheet" data-v="Copy RTR ID" data-id="${id}">Copy</button></dd><dt>Phone</dt><dd class="mono">${esc(p.phone || 'Not given')}</dd><dt>Email</dt><dd class="mono" style="overflow-wrap:anywhere">${esc(p.email || 'Not given')}</dd><dt>Socials</dt><dd class="qv-soc">${soc.length ? soc.map(([n, u]) => `<a class="chip" href="https://${esc(u)}" target="_blank" rel="noopener noreferrer" title="${esc(u)}">${n}</a>`).join('') : '<span class="muted">None added</span>'}</dd></dl>
+      <dl class="kv qv-kv"><dt>Phone</dt><dd class="mono">${esc(p.phone || 'Not given')}</dd><dt>Email</dt><dd class="mono" style="overflow-wrap:anywhere">${esc(p.email || 'Not given')}</dd><dt>Socials</dt><dd class="qv-soc">${soc.length ? soc.map(([n, u]) => `<a class="chip" href="https://${esc(u)}" target="_blank" rel="noopener noreferrer" title="${esc(u)}">${n}</a>`).join('') : '<span class="muted">None added</span>'}</dd></dl>
+      ${(() => { /* Owner, November 13, 2026: stats count the calendar year and reset on January 1. */ const yr = todayYmd().slice(0, 4), h = historyOf(p, 60).filter((x) => x.ymd.startsWith(yr)), games = h.reduce((n, x) => n + x.games, 0), wins = h.reduce((n, x) => n + x.won, 0);
+        return ppStatsBlock(games, wins); })()}
       <section class="qv-sec"><h3>History</h3><div class="list">${historyOf(p, 2).map(histRow).join('')}</div></section>
     </div>`;
   };
-  const qvFoot = `<button class="btn" data-act="pmSheet" data-v="Edit profile" data-id="${id}">Edit</button><button class="btn" data-act="openPlayerHistory" data-id="${id}">Full history</button><button class="btn primary" data-act="openPlayer" data-id="${id}">Full profile</button>`;
+  const qvFoot = `<button class="btn" data-act="pmSheet" data-v="Edit profile" data-id="${id}">Edit</button><button class="btn" data-act="openPlayerHistory" data-id="${id}">Full history</button>${p && p.rtr ? `<button class="btn" data-act="admShareProfile" data-id="${id}">${I.share} Share profile</button>` : ''}<button class="btn primary" data-act="openPlayer" data-id="${id}">Full profile</button>`;
   const editBody = () => {
     const so = socialOf(p), rk = rankOf(p);
     const ef = (id, label, value, o = {}) => `<label class="field" for="pe-${id}"><span>${label}</span>${o.area ? `<textarea class="input" id="pe-${id}" rows="3" maxlength="${o.max || 280}" ${o.ph ? `placeholder="${esc(o.ph)}"` : ''}>${esc(value)}</textarea>` : `<input class="input${o.mono ? ' mono' : ''}" id="pe-${id}" value="${esc(value)}" ${o.type ? `type="${o.type}"` : ''} ${o.im ? `inputmode="${o.im}"` : ''} ${o.ph ? `placeholder="${esc(o.ph)}"` : ''} autocomplete="off">`}${o.hint ? `<span class="hint">${o.hint}</span>` : ''}<span class="err" id="pe-${id}-err" hidden></span></label>`;
@@ -1515,16 +1744,59 @@ function viewChars() {
 // ---------- A-BANNERS (owner comment, November 11, 2026) ----------
 function viewBanners() {
   const all = S.banners, shown = activeBanners().length, hidden = all.length - shown;
-  const item = (b) => `<div class="ch-item"><button type="button" class="ch-img" data-act="bannerToggle" data-id="${b.id}" aria-pressed="${b.active}" aria-label="${esc(bannerName(b))}, ${b.active ? 'shown' : 'hidden'}" title="${b.active ? 'Shown to players. Click to hide.' : 'Hidden from players. Click to show.'}">${bannerArt(b)}</button>
-    <span class="ch-name">${esc(bannerName(b))}</span>
+  const def = defaultBanner();
+  const item = (b) => `<div class="ch-item"><button type="button" class="ch-img" data-act="bannerToggle" data-id="${b.id}" aria-pressed="${b.active}" aria-label="${esc(bannerName(b))}, ${b.active ? 'shown' : 'hidden'}${b === def ? ', default' : ''}" title="${b === def ? 'The default banner. Make another banner the default before hiding this one.' : b.active ? 'Shown to players. Click to hide.' : 'Hidden from players. Click to show.'}">${bannerArt(b)}</button>
+    <div class="bn-meta"><span class="ch-name">${esc(bannerName(b))}</span>${b === def ? chip('Default', 'ok') : b.active ? `<button type="button" class="btn xs ghost" data-act="bannerDefault" data-id="${b.id}">Make default</button>` : ''}</div>
     <button type="button" class="ch-del" data-act="bannerDelete" data-id="${b.id}" aria-label="Delete ${esc(bannerName(b))}" title="Delete">${I.xs}</button></div>`;
-  return shell(`<div class="page-head"><h1>Profile banners</h1><p class="muted">The strip across the top of a player's profile card, like a Discord banner. Players pick one of the shown banners from Edit profile; they can't upload their own. Click a banner to hide or show it. ${shown} shown${hidden ? ` · ${hidden} hidden` : ''}.</p></div>
+  return shell(`<div class="page-head"><h1>Profile banners</h1><p class="muted">The strip across the top of a player's profile card, like a Discord banner. Players pick one of the shown banners from Edit profile; they can't upload their own. The <b>Default</b> banner shows on every profile that hasn't picked one, and on guests and unclaimed profiles. Click a banner to hide or show it. ${shown} shown${hidden ? ` · ${hidden} hidden` : ''}.</p></div>
     <label class="ch-drop" for="banner-file" data-drop="banners"><input id="banner-file" type="file" multiple accept="image/png,image/jpeg,image/webp" data-change="bannerFiles"><b>Drag banners here to upload</b><span class="small">or click to choose · PNG, JPG or WebP, up to 2 MB each · cropped to 5:2</span></label>
     ${uploadProgress('banners')}
     <section class="bn-grid" aria-label="Banner images">${all.map(item).join('')}</section>`);
 }
 
 // ---------- Sheets ----------
+// Owner, November 13, 2026: Share profile from the quick view: Story, Facebook post and Square images, OR, then the profile link.
+const rotraProfileUrl = (p) => `${/^https?:/.test(location.origin) ? location.origin : 'https://rotra.example'}/player/find/${encodeURIComponent(p.rtr)}`;
+const SHARE_FMTS = [['story', 'Story', '9:16 · Facebook and Instagram stories'], ['post', 'Facebook post', '4:5 · Facebook feed'], ['square', 'Square', '1:1 · Instagram feed']];
+// Owner artifact comment, November 13, 2026: big share dialogs with full-size images, pick several, eye icon opens full screen.
+const SH_SIZE = { story: [270, 480], post: [320, 400], square: [320, 320] };
+const shPick = (o) => `<div class="sh-pick"><button type="button" class="sh-img${o.on ? ' on' : ''}" ${o.pick} aria-pressed="${o.on}" aria-label="${o.label}${o.hint ? `, ${o.hint}` : ''}. ${o.on ? 'Picked' : 'Not picked'}">${o.card}<i class="sh-chk" aria-hidden="true">✓</i></button><button type="button" class="sh-eye" ${o.view} aria-label="View ${o.label} full screen" title="View full screen"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button><span class="sh-cap"><b>${o.label}</b>${o.hint ? `<span class="small muted">${o.hint}</span>` : ''}</span></div>`;
+const shViewer = (o) => { const [w, h] = SH_SIZE[o.fmt], s = Math.max(0.5, Math.min((innerWidth - 32) / w, (innerHeight - 160) / h, 2.4));
+  return `<div class="sh-view" role="dialog" aria-modal="true" aria-label="${o.label}, full screen" ${o.close}><button type="button" class="sh-view-x" ${o.close} aria-label="Close full screen"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button><div class="sh-view-fit" style="width:${Math.round(w * s)}px;height:${Math.round(h * s)}px"><div class="sh-view-in" style="transform:scale(${s.toFixed(3)})">${o.card}</div></div><div class="sh-view-bar"><b>${o.label}</b><button type="button" class="btn primary" ${o.dl}>Download</button></div></div>`; };
+// Share carousel (artifact comment, November 13, 2026): mouse drag scrolls the strip (touch scrolls natively), a drag never counts as
+// a click, the strip keeps its position when the dialog re-renders, and the fade masks show only on a side with hidden images.
+const SHCAR = { x: 0, drag: null, moved: false };
+const shCarSync = (el) => { const max = el.scrollWidth - el.clientWidth - 2; el.classList.toggle('mask-l', el.scrollLeft > 2); el.classList.toggle('mask-r', el.scrollLeft < max); const nav = el.parentElement.querySelector('.sh-car-nav'); if (nav) { const items = [...el.querySelectorAll('.sh-pick')], mid = el.scrollLeft + el.clientWidth / 2; let best = 0, bd = Infinity; items.forEach((it, i) => { const d = Math.abs(it.offsetLeft + it.offsetWidth / 2 - mid); if (d < bd) { bd = d; best = i; } }); [...nav.children].forEach((d, i) => d.classList.toggle('on', i === best)); } };
+const shCarInit = () => { const cars = document.querySelectorAll('.sh-dlg .sh-tiles'); if (!cars.length) { SHCAR.x = 0; return; } cars.forEach((el) => { if (!el.dataset.car) { el.dataset.car = '1'; const nav = document.createElement('div'); nav.className = 'sh-car-nav'; nav.setAttribute('aria-hidden', 'true'); nav.innerHTML = [...el.querySelectorAll('.sh-pick')].map(() => '<i></i>').join(''); el.after(nav); el.scrollLeft = SHCAR.x; } shCarSync(el); }); };
+new MutationObserver(shCarInit).observe(document.body, { childList: true, subtree: true });
+document.addEventListener('scroll', (e) => { const el = e.target; if (el instanceof Element && el.matches('.sh-dlg .sh-tiles')) { SHCAR.x = el.scrollLeft; shCarSync(el); } }, true);
+document.addEventListener('pointerdown', (e) => { const el = e.target.closest && e.target.closest('.sh-dlg .sh-tiles'); if (!el || e.pointerType !== 'mouse' || e.button !== 0 || e.target.closest('.sh-eye')) return; SHCAR.drag = { el, x: e.clientX, left: el.scrollLeft }; SHCAR.moved = false; }, true);
+document.addEventListener('pointermove', (e) => { const d = SHCAR.drag; if (!d) return; const dx = e.clientX - d.x; if (!SHCAR.moved && Math.abs(dx) > 6) { SHCAR.moved = true; d.el.classList.add('dragging'); } if (SHCAR.moved) d.el.scrollLeft = d.left - dx; }, true);
+document.addEventListener('pointerup', () => { const d = SHCAR.drag; if (!d) return; SHCAR.drag = null; if (SHCAR.moved) { d.el.classList.remove('dragging'); setTimeout(() => { SHCAR.moved = false; }, 0); } }, true);
+document.addEventListener('click', (e) => { if (SHCAR.moved && e.target.closest && e.target.closest('.sh-dlg .sh-tiles')) { e.preventDefault(); e.stopImmediatePropagation(); SHCAR.moved = false; } }, true);
+let SHP = null; // the open Share profile dialog: { id, pick, shv }
+function shareProfileSheet(id, o = {}) {
+  SHP = { id, pick: Array.isArray(o.pick) ? o.pick : SHARE_FMTS.map(([k]) => k), shv: o.shv || null };
+  const pick = SHP.pick, n = pick.length;
+  const p = playerOf(id); if (!p) return;
+  const yr = todayYmd().slice(0, 4), h = historyOf(p, 60).filter((x) => x.ymd.startsWith(yr)), games = h.reduce((n, x) => n + x.games, 0), wins = h.reduce((n, x) => n + x.won, 0);
+  const card = (k) => `<div class="qs-card ${k}"><div class="qs-top">${avatar(p)}<div><b>${esc(p.nick || p.name)}</b><span>${esc(p.rtr)}</span></div></div>
+    <div class="qs-mid"><span class="qs-lbl">Win rate · ${yr}</span>${games ? `<b class="qs-pos">${Math.round((wins / games) * 100)}%</b><div class="qs-rec"><span><b>${games}</b> games</span><span><b>${wins}</b> W</span><span><b>${games - wins}</b> L</span></div>` : '<b class="qs-pos" style="font-size:28px">No games yet</b>'}</div>
+    <div class="qs-foot">${rotraLogoDark('foot-logo')}</div></div>`;
+  const tile = ([k, l, hint]) => shPick({ on: pick.includes(k), label: l, hint, card: card(k), pick: `data-act="admSharePick" data-v="${k}"`, view: `data-act="admShareView" data-v="${k}"` });
+  const vw = SHARE_FMTS.find(([k]) => k === SHP.shv);
+  const link = rotraProfileUrl(p);
+  const body = `<div class="stack sh-wrap"><div class="sh-pickbar"><span class="small muted">Tap an image to pick it; the eye shows it full screen. ${n} of ${SHARE_FMTS.length} picked · <button type="button" class="sh-linkish" data-act="admShareAll">${n === SHARE_FMTS.length ? 'Clear' : 'Pick all'}</button></span></div>
+    <div class="sh-tiles" role="group" aria-label="Images">${SHARE_FMTS.map(tile).join('')}</div>
+    <div class="row sh-acts"><button class="btn" data-act="admShareSave" ${n ? '' : 'disabled'}>Download ${n || ''} ${n === 1 ? 'image' : 'images'}</button></div>
+    <div class="or-div" role="separator"><span>OR</span></div>
+    <div class="copy-field"><label class="label" for="sh-link">Profile link</label><div class="cf-box"><input id="sh-link" readonly value="${esc(link)}" onfocus="this.select()"><button type="button" class="cf-btn" data-act="admShareCopy" data-v="${esc(link)}" aria-label="Copy profile link" title="Copy">${svg('<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>', 18, 2)}</button></div></div></div>`;
+  document.querySelectorAll('.scrim,.sheet,.sh-view').forEach((x) => x.remove());
+  document.body.insertAdjacentHTML('beforeend', sheetWrap('Share profile', body, `<button class="btn" data-act="pmSheet" data-v="Quick view" data-id="${esc(id)}">Back</button>`)
+    + (vw ? shViewer({ fmt: vw[0], label: vw[1], card: card(vw[0]), close: 'data-act="admShareViewClose"', dl: `data-act="admShareSave" data-v="${vw[0]}"` }) : ''));
+  document.querySelector('.sheet').classList.add('sh-sheet', 'sh-dlg');
+  document.getElementById('sheet-title')?.focus();
+}
 function sheetWrap(title, body, foot, closable = true) {
   return `<div class="scrim" data-act="closeSheet"></div><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
     <header><h2 id="sheet-title" tabindex="-1">${title}</h2>${closable ? `<button class="btn xs ghost icon-btn" data-act="closeSheet" aria-label="Close">${I.x}</button>` : ''}</header>
@@ -1906,6 +2178,8 @@ function toastUndo(text, undo) {
 
 const ACT = {
   go: (el) => go(el.dataset.to, undefined),
+  openClubCard: (el) => clubCardSheet(el.dataset.id),
+  openClubFromCard: (el) => { document.querySelectorAll('body > .scrim, body > .sheet').forEach((x) => x.remove()); S.ui.clubTab = 'overview'; go('club', el.dataset.id); },
   openClub: (el) => { S.ui.clubTab = 'overview'; go('club', el.dataset.id, el.dataset.anchor); },
   passwordVerify: () => { passwordDemo.verified = !passwordDemo.verified; render(); },
   passwordIssue: () => { if (!passwordDemo.verified || !S.online) return; passwordDemo.status = 'issued'; passwordDemo.verified = false; passwordDemo.link = true; render(); },
@@ -1937,6 +2211,14 @@ const ACT = {
     try { navigator.clipboard.writeText(input.value).then(done, () => { input.select(); done(); }); } catch (e) { input.select(); done(); }
   },
   plClear: () => { document.querySelectorAll('.player-select, [data-change="plSelectAll"]').forEach((x) => { x.checked = false; }); CHANGE.plCount(); },
+  admShareProfile: (el) => shareProfileSheet(el.dataset.id),
+  admSharePick: (el) => { if (!SHP) return; const all = SHARE_FMTS.map(([k]) => k), v = el.dataset.v; shareProfileSheet(SHP.id, { pick: SHP.pick.includes(v) ? SHP.pick.filter((x) => x !== v) : all.filter((k) => k === v || SHP.pick.includes(k)) }); },
+  admShareAll: () => { if (SHP) shareProfileSheet(SHP.id, { pick: SHP.pick.length === SHARE_FMTS.length ? [] : SHARE_FMTS.map(([k]) => k) }); },
+  admShareView: (el) => { if (SHP) shareProfileSheet(SHP.id, { pick: SHP.pick, shv: el.dataset.v }); },
+  admShareViewClose: () => { if (SHP) shareProfileSheet(SHP.id, { pick: SHP.pick }); },
+  admShareSave: (el) => { const list = el.dataset.v ? [el.dataset.v] : (SHP ? SHP.pick : []); toast(list.length === 1 ? `${SHARE_FMTS.find(([k]) => k === list[0])[1]} image downloaded` : `${list.length} images downloaded`); },
+  admShareCopy: (el) => { try { navigator.clipboard.writeText(el.dataset.v); } catch (e) { /* clipboard unavailable */ } toast('Link copied'); },
+  copyRtr: (el) => { try { navigator.clipboard.writeText(el.dataset.v); } catch (e) { /* clipboard unavailable */ } toast('RTR ID copied'); },
   pmSheet: (el) => playerManagementSheet(el.dataset.v, el.dataset.id),
   pmMenu: (el) => showPlayerActions(el, el.dataset.id),
   plAdv: () => { S.ui.playerAdv = !S.ui.playerAdv; render(); },
@@ -1958,7 +2240,7 @@ const ACT = {
   closePhoto: () => { document.querySelector('.viewer')?.remove(); if (PHOTO_FROM && document.contains(PHOTO_FROM)) PHOTO_FROM.focus(); PHOTO_FROM = null; },
   closeSheet: () => {
     // The player quick view and its sibling dialogs are added straight to the page, outside the sheet state; close them first.
-    if (document.querySelector('body > .sheet')) { PIC = null; document.querySelectorAll('body > .scrim, body > .sheet').forEach((x) => x.remove()); return; }
+    if (document.querySelector('body > .sheet')) { PIC = null; document.querySelectorAll('body > .scrim, body > .sheet, body > .sh-view').forEach((x) => x.remove()); SHP = null; return; }
     const sh = S.ui.sheet;
     if (!sh || sh.pending) return;
     if (sh.type === 'license') {
@@ -2235,6 +2517,7 @@ const ACT = {
   bannerToggle: (el) => {
     const b = S.banners.find((x) => x.id === el.dataset.id);
     if (!S.online) { toast(OFFLINE_ERR); return; }
+    if (b === defaultBanner()) { toast('This is the default banner. Make another banner the default first.'); return; }
     if (b.active && activeBanners().length <= BANNER_MIN_ACTIVE) { toast(`Keep at least ${BANNER_MIN_ACTIVE} banners shown, so players have a choice.`); return; }
     b.active = !b.active;
     log('banner', b.id, `${b.active ? 'Showed' : 'Hid'} ${bannerName(b)} in the player picker.`);
@@ -2244,11 +2527,21 @@ const ACT = {
   bannerDelete: (el) => {
     if (!S.online) { toast(OFFLINE_ERR); return; }
     const i = S.banners.findIndex((x) => x.id === el.dataset.id), b = S.banners[i];
+    if (b === defaultBanner()) { toast('This is the default banner. Make another banner the default first.'); return; }
     if (b.active && activeBanners().length <= BANNER_MIN_ACTIVE) { toast(`Keep at least ${BANNER_MIN_ACTIVE} banners shown. Upload or show another one first.`); return; }
     S.banners.splice(i, 1);
     log('banner', b.id, `Deleted ${bannerName(b)}. Players who use it keep it.`);
     render();
     toastUndo(`${bannerName(b)} deleted.`, () => { S.banners.splice(Math.min(i, S.banners.length), 0, b); log('banner', b.id, `Undid deleting ${bannerName(b)}.`); render(); });
+  },
+  bannerDefault: (el) => {
+    if (!S.online) { toast(OFFLINE_ERR); return; }
+    const b = S.banners.find((x) => x.id === el.dataset.id), was = defaultBanner();
+    if (!b || !b.active || b === was) return;
+    S.defaultBanner = b.id;
+    log('banner', b.id, `Made ${bannerName(b)} the default banner (was ${bannerName(was)}).`);
+    render();
+    toastUndo(`${bannerName(b)} is now the default banner.`, () => { S.defaultBanner = was.id; log('banner', was.id, `Undid the default banner change; ${bannerName(was)} is the default again.`); render(); });
   },
   // Prototype
   openDemo: () => { S.ui.sheet = { type: 'demo' }; S.ui.resetArmed = false; render(); },
@@ -2337,6 +2630,7 @@ document.addEventListener('dragover', (ev) => { const z = dropZone(ev); if (!z) 
 document.addEventListener('dragleave', (ev) => { const z = dropZone(ev); if (z && !z.contains(ev.relatedTarget)) z.classList.remove('over'); });
 document.addEventListener('drop', (ev) => { const z = dropZone(ev); if (!z) return; ev.preventDefault(); z.classList.remove('over'); (z.dataset.drop === 'banners' ? addBannerFiles : addCharFiles)(ev.dataTransfer && ev.dataTransfer.files); });
 document.addEventListener('keydown', (ev) => {
+  if (ev.key === 'Escape' && document.querySelector('.sh-view')) { ACT.admShareViewClose(); return; }
   if (ev.key === 'Escape' && document.querySelector('.viewer')) { ACT.closePhoto(); return; }
   if (ev.key === 'Escape') { if (S.ui.sheet || document.querySelector('body > .sheet')) ACT.closeSheet(); else if (S.ui.nav) ACT.toggleNav(); }
 });

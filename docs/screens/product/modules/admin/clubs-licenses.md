@@ -8,7 +8,7 @@
 
 Rows: club name/logo, fixed founding location, price (**₱x/mo**, or a **Free · tester** chip), license plan, access state, effective expiry, and active-session reference when one exists (under the club name). Search by supported club identity; filters for licensed/expired/pending are a proposed organization of actual access states, not a new approval workflow.
 
-Primary row action opens the club detail. **Add club** in the page header opens `A-ADD-CLUB`. No payment checkout, revenue chart, manager seat count, or transfer-owner control. There is no club application flow.
+Primary row action opens the **club profile card** as a right-hand panel ([D-CLUB-PROFILE](../../dialogs.md#d-club-profile--club-profile-card), November 13, 2026); its **Open club** opens the club detail. **Add club** in the page header opens `A-ADD-CLUB`. No payment checkout, revenue chart, manager seat count, or transfer-owner control. There is no club application flow.
 
 Empty state explains that no clubs are available and offers **Add club**.
 

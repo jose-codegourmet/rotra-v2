@@ -275,6 +275,21 @@
 
 ## 10. Logo Specification
 
+**Logo files (owner, November 13, 2026; supersedes the text-only wordmark below):** [`materials/logo/`](materials/logo/) holds the
+four approved SVGs. **Full** is the orbit symbol plus the “Rotra.” wordmark; **Mini** is the symbol alone. Use **Dark** on dark
+backgrounds and **Light** on light backgrounds.
+
+| File | Use |
+|---|---|
+| `ROTRA_FULL_DARK.svg` | App top bars and sign-in pages in the dark theme; every share image and the Session QR card (fixed dark) |
+| `ROTRA_FULL_LIGHT.svg` | App top bars and sign-in pages in the light theme |
+| `ROTRA_MINI_DARK.svg` | Top bars on phones (420 px and narrower), dark theme; favicon / small spaces on dark |
+| `ROTRA_MINI_LIGHT.svg` | Top bars on phones, light theme; small spaces on light |
+
+The logo carries its own greens (not `color-accent`). In UI copy the name stays **ROTRA** in capitals; the artwork is the only place
+“Rotra.” appears. Accessible name of the logo: “ROTRA”. Mockup log:
+[2026-11-13-rotra-logo](../mockup-changes/2026-11-13-rotra-logo.md).
+
 **Wordmark:** ROTRA
 - Font: Satoshi 700 or custom geometric sans
 - Tracking: -1px to -2px (tight)

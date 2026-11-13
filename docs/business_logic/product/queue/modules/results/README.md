@@ -79,7 +79,7 @@ The operator chooses when to publish, online only. The publish review states the
 
 Publishing needs at least one selection. The operator can publish again later to change the selection (**Update publication**). There is **no Unpublish**: republishing with a new selection is the only change after publication (decided November 11, 2026, [D-2026-11-11-09](../../../../../mvp/decisions.md#d-2026-11-11-09)).
 
-Published slides appear on the public session page below Details and Participants. Before publication the page says "Results for this session have not been shared."
+Published slides appear on the public session page: Standings on the **Leaderboard** tab (with the viewer's position), Awards and Off Day under Details, which also lists the session's **Match history** in place of the Queue (owner, November 13, 2026, [D-2026-11-13-05](../../../../../mvp/decisions.md#d-2026-11-13-05)). Until publication a signed-in player sees only their own record and matches. Before publication the page says "Results for this session have not been shared."
 
 Publishing does not delay profile, performance, or global leaderboard updates after valid finalization. Public session-page lifetime follows [license retention rules](../../../admin/modules/clubs-licenses/README.md): no time limit while the club is licensed. Public pages are **never indexed and never static**: served per request with `noindex, nofollow`, disallowed in `robots.txt`, no static generation or ISR ([D-2026-11-11-09](../../../../../mvp/decisions.md#d-2026-11-11-09)).
 

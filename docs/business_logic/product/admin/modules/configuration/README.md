@@ -43,5 +43,6 @@ Owner decision, November 11, 2026 ([D-2026-11-11-11](../../../../../mvp/decision
 - Each banner is **shown** or **hidden**; at least **2** stay shown, so players have a choice. Delete has a short Undo.
 - Six sample banners are seeded: Court, Night, Dusk, Ember, Sun and Stripe.
 - Players pick one of the shown banners in Edit profile. Hiding or deleting a banner never changes the banner of a player who already uses it.
+- **Default banner** ([D-2026-11-13-03](../../../../../mvp/decisions.md#d-2026-11-13-03), November 13, 2026): exactly one shown banner is the default (Court at first). It shows on every profile with no pick, and on guests and unclaimed profiles, in all three apps. **Make default** on another shown banner moves it at once (Undo toast, Record of actions). The default can't be hidden or deleted until another banner is made the default.
 - Every change is recorded in the Record of actions. Offline: no change.
 

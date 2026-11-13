@@ -43,7 +43,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-12-04](#d-2026-11-12-04) | Clubs on every readable profile; Leave club on the club page; no Report a problem | approved 2026-11-12 | in progress (#766) | #766 | [Player](workstreams/player.md) |
 | [D-2026-11-12-05](#d-2026-11-12-05) | Playwright regression suite on a throwaway local Supabase | approved 2026-11-12 | in progress (feat/e2e-regression) | none | [Queue](workstreams/queue.md) |
 | [D-2026-11-13-01](#d-2026-11-13-01) | Go API on Railway: API, database, sign-in and pictures off Vercel functions and Supabase; live updates | approved 2026-11-13 (B-01 to B-19) | not started | needed | [Backend](workstreams/backend.md) |
-| [D-2026-11-13-02](#d-2026-11-13-02) | Shared rule-cases package `@rotra/rule-cases` | approved 2026-11-13 | in progress (feat/rule-cases) | needed | [Backend](workstreams/backend.md) |
+| [D-2026-11-13-02](#d-2026-11-13-02) | Shared rule-cases package `@rotra/rule-cases` | approved 2026-11-13 | in progress (feat/rule-cases) | #789–#792 (epic #788) | [Backend](workstreams/backend.md) |
 
 ## Status conventions
 
@@ -796,7 +796,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 ### D-2026-11-13-02 — Shared rule-cases package `@rotra/rule-cases` (for the partner)
 - **Decision status:** approved (November 13, 2026; suggested for the partner, approved in the planning session as B-15 of [D-2026-11-13-01](#d-2026-11-13-01)).
 - **Implementation status:** in progress (package and cases on `feat/rule-cases`; the Vitest runner follows in the frontend PR)
-- **Ticket:** needed
+- **Ticket:** #789 (package and cases), #790 (Vitest runner), #791 (remaining cases), #792 (delete duplicated checks); epic #788
 - **Roadmap:** first ticket of the Go API epic (useful even before any Go code) — [Backend](workstreams/backend.md)
 - **Decision:**
   - **What it is.** A new package `packages/rule-cases` (`@rotra/rule-cases`). It holds **only test cases as JSON**: no code and no rules. The rules stay in `packages/data` and `packages/schema` (TypeScript, also used by the device offline).
@@ -806,4 +806,11 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - **Which rules.** Only rules the server enforces (cost, payments, minimum games, queue generation and fills, results and standings, ranking settings, licenses, money/phone/court-window parsing). Rules that only shape the UI stay as they are.
   - **Change rule.** A rule change edits its case file first, so both sides fail until both are fixed. A money or ranking case changes only with the owner's sign-off ([stop and ask](../ways-of-working.md#10-stop-and-ask)); the #247 ranking constants are still open.
   - **First step.** Move the existing decided-math cases out of a few `*.rules.test.ts` files into JSON without changing what they test, and prove Vitest still passes.
+  - **Owner answers to the first PR's open concerns (November 13, 2026).**
+    - **Comparison:** `expected` is a deep subset of the result (optionally at `input.select`); the Go runner compares the same way.
+    - **Dates:** a `Date` argument is a tagged value `{"$date": "<ISO 8601 UTC>"}`; plain instants stay epoch ms. Built in #791.
+    - **Court window:** split by zone. Zone-free rules move with fixed UTC instants; the device-local-time helpers stay in TypeScript until the club time zone (Asia/Manila, T6) is built. #791.
+    - **Checks that don't fit one call → expected** are rewritten in #791, Auto Queue first, before Auto Queue moves to Go.
+    - **Duplicated TypeScript checks** are deleted in their own PR, #792.
+    - **Shape check** runs on `node:test`, so the package adds no dependency.
 - **References:** [D-2026-11-13-01](#d-2026-11-13-01) (B-02), [backend proposal](../backend/decisions/2026-11-13-go-railway-backend/01-proposal.md#the-biggest-cost-two-copies-of-the-rules-b-02), [architecture §2–3](../architecture.md#2-the-shape-of-the-system) (new packages need a decision).

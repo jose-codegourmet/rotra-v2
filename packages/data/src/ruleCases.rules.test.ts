@@ -6,11 +6,21 @@ import {
 import { formatPeso, moneyField } from '@rotra/schema/money'
 import { formatPhoneForDisplay, phoneField } from '@rotra/schema/phone'
 import { describe, expect, it } from 'vitest'
+import * as adminPlayer from './admin-player/adminPlayer.rules'
+import * as management from './admin-player/management.rules'
 import * as club from './club/club.rules'
+import * as savedPlayerStats from './club-player/savedPlayerStats.rules'
+import * as contactChangeRequest from './contact-change-request/contactChangeRequest.rules'
+import * as featureFlag from './feature-flag/featureFlag.rules'
 import * as license from './license/license.rules'
 import * as autoQueue from './match/autoQueue.rules'
 import * as match from './match/match.rules'
+import * as player from './player/player.rules'
+import * as visibility from './player/visibility.rules'
+import * as profileBanner from './profile-banner/profileBanner.rules'
+import * as queueSession from './queue-session/queueSession.rules'
 import * as rankingSettings from './ranking-settings/rankingSettings.rules'
+import * as sales from './sales/sales.rules'
 import * as sessionCost from './session-cost/sessionCost.rules'
 import * as sessionPayment from './session-payment/sessionPayment.rules'
 import * as sessionResult from './session-result/sessionResult.rules'
@@ -30,10 +40,18 @@ const registry = (area: string, ...modules: object[]) =>
     ),
   )
 const rules: Record<string, Rule> = {
+  ...registry('admin-player', adminPlayer, management),
   ...registry('club', club),
+  ...registry('club-player', savedPlayerStats),
+  ...registry('contact-change-request', contactChangeRequest),
+  ...registry('feature-flag', featureFlag),
   ...registry('license', license),
   ...registry('match', match, autoQueue),
+  ...registry('player', player, visibility),
+  ...registry('profile-banner', profileBanner),
+  ...registry('queue-session', queueSession),
   ...registry('ranking-settings', rankingSettings),
+  ...registry('sales', sales),
   ...registry('session-cost', sessionCost),
   ...registry('session-payment', sessionPayment),
   ...registry('session-result', sessionResult),

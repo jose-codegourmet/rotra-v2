@@ -13,7 +13,9 @@
             "cityCode": "PH-CEB",
             "earlierNames": ["Lahug Smash Club"]
           },
-          null
+          {
+            "$undefined": true
+          }
         ]
       },
       "expected": true

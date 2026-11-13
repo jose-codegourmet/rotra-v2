@@ -7,7 +7,7 @@
       "input": {
         "args": [
           {
-            "id": "e6b7a113-3c7a-4156-a994-0e4b185ceedf",
+            "id": "1721406d-3166-455f-8535-49ece599ea56",
             "sessionId": "s",
             "matchNo": 1,
             "state": "completed",
@@ -25,7 +25,10 @@
                 "outId": "Eve",
                 "inId": "Zoe",
                 "team": "A",
-                "at": 0
+                "at": 0,
+                "creditTo": {
+                  "$undefined": true
+                }
               }
             ],
             "decision": {
@@ -46,7 +49,7 @@
       "input": {
         "args": [
           {
-            "id": "e6b7a113-3c7a-4156-a994-0e4b185ceedf",
+            "id": "1721406d-3166-455f-8535-49ece599ea56",
             "sessionId": "s",
             "matchNo": 1,
             "state": "completed",
@@ -64,7 +67,10 @@
                 "outId": "Eve",
                 "inId": "Zoe",
                 "team": "A",
-                "at": 0
+                "at": 0,
+                "creditTo": {
+                  "$undefined": true
+                }
               }
             ],
             "decision": {
@@ -85,7 +91,7 @@
       "input": {
         "args": [
           {
-            "id": "e6b7a113-3c7a-4156-a994-0e4b185ceedf",
+            "id": "1721406d-3166-455f-8535-49ece599ea56",
             "sessionId": "s",
             "matchNo": 1,
             "state": "completed",
@@ -103,7 +109,10 @@
                 "outId": "Eve",
                 "inId": "Zoe",
                 "team": "A",
-                "at": 0
+                "at": 0,
+                "creditTo": {
+                  "$undefined": true
+                }
               }
             ],
             "decision": {
@@ -124,7 +133,7 @@
       "input": {
         "args": [
           {
-            "id": "c2b3a0a0-b107-4911-a4a5-1124a7ef61b1",
+            "id": "f5fea16c-41a0-4bfe-9bd6-563e8c69c625",
             "sessionId": "s",
             "matchNo": 1,
             "state": "completed",
@@ -164,7 +173,7 @@
       "input": {
         "args": [
           {
-            "id": "c2b3a0a0-b107-4911-a4a5-1124a7ef61b1",
+            "id": "f5fea16c-41a0-4bfe-9bd6-563e8c69c625",
             "sessionId": "s",
             "matchNo": 1,
             "state": "completed",
@@ -204,7 +213,7 @@
       "input": {
         "args": [
           {
-            "id": "c2b3a0a0-b107-4911-a4a5-1124a7ef61b1",
+            "id": "f5fea16c-41a0-4bfe-9bd6-563e8c69c625",
             "sessionId": "s",
             "matchNo": 1,
             "state": "completed",
@@ -244,7 +253,7 @@
       "input": {
         "args": [
           {
-            "id": "7c38aed7-afd1-42d8-87ff-bd1f6dcfbcbb",
+            "id": "0e955370-5be5-4a1b-a9cb-4b4961ece6a3",
             "sessionId": "s",
             "matchNo": 1,
             "state": "completed",
@@ -284,7 +293,7 @@
       "input": {
         "args": [
           {
-            "id": "7c38aed7-afd1-42d8-87ff-bd1f6dcfbcbb",
+            "id": "0e955370-5be5-4a1b-a9cb-4b4961ece6a3",
             "sessionId": "s",
             "matchNo": 1,
             "state": "completed",
@@ -324,7 +333,7 @@
       "input": {
         "args": [
           {
-            "id": "b6466ee5-6959-491a-af35-c0b47087fdbe",
+            "id": "02da806c-89d8-4c97-9bfb-2ba3f863f890",
             "sessionId": "s",
             "matchNo": 1,
             "state": "completed",
@@ -364,7 +373,7 @@
       "input": {
         "args": [
           {
-            "id": "b6466ee5-6959-491a-af35-c0b47087fdbe",
+            "id": "02da806c-89d8-4c97-9bfb-2ba3f863f890",
             "sessionId": "s",
             "matchNo": 1,
             "state": "completed",
@@ -404,7 +413,7 @@
       "input": {
         "args": [
           {
-            "id": "27ce5522-9cde-4070-9361-ffdf74049738",
+            "id": "28637f25-dec9-4562-a4d3-244297e16475",
             "sessionId": "s",
             "matchNo": 1,
             "state": "invalid",
@@ -444,7 +453,7 @@
       "input": {
         "args": [
           {
-            "id": "27ce5522-9cde-4070-9361-ffdf74049738",
+            "id": "28637f25-dec9-4562-a4d3-244297e16475",
             "sessionId": "s",
             "matchNo": 1,
             "state": "invalid",

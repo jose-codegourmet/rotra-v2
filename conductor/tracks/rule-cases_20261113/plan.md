@@ -50,6 +50,19 @@ Counted by running the existing Vitest files with a recorder (it logged each rul
 
 Total in JSON: 403 cases in 66 files. The Vitest runner (`packages/data/src/ruleCases.rules.test.ts`) runs all 403 against the real rules; all pass.
 
+### Follow-up (#791): more cases
+
+Total now 437 cases in 70 files. The recorder now tags non-JSON args (`$date`, `$undefined`, `$number`, `$constant` for `rng`; see `case.schema.json`) and writes a list length as an array of `{}`. Before this, `undefined` arguments had been written as `null` (e.g. `paymentStatus(undefined, due)`); they are now exact.
+
+| Area | Assertions run | In JSON | Still in TypeScript |
+|---|---|---|---|
+| match (`autoQueue.rules`) | 36 | 20 (was 3) | 15 (`toContain`, `.not`, mutation checks, `Set` sizes) |
+| license | 77 | 66 (`manila-today` back, with `$date`) | 8 |
+| court-window | 37 | 13 (zone-free rules only: `sessionWindowError`, `courtWindowError`, `courtTimeOnSession`) | 24 (`courtWindowPreview`, `courtNextDay`, `instantOnDate`, `clockTimeFrom`, locale copy) |
+| match, session-result | 79, 39 | 61, 20 | 18, 18 |
+
+Duplicated TypeScript assertions are still in place (#792).
+
 ## Deviations log
 
 | Date | Task | Deviation | Reason | Resolution |

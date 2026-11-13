@@ -164,7 +164,9 @@
       "input": {
         "args": [
           {
-            "assessmentWeightBp": null,
+            "assessmentWeightBp": {
+              "$number": "NaN"
+            },
             "performanceWeightBp": 3000,
             "recentStandardMatchThreshold": 10
           }
@@ -180,7 +182,9 @@
         "args": [
           {
             "assessmentWeightBp": 7000,
-            "performanceWeightBp": null,
+            "performanceWeightBp": {
+              "$number": "NaN"
+            },
             "recentStandardMatchThreshold": 10
           }
         ]

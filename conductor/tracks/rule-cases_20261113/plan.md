@@ -69,7 +69,9 @@ The old assertions that compared two results or the inputs (no mutation of `inpu
 
 ### Follow-up (#792): duplicates deleted
 
-Deleted 269 assertion statements (every run of each was matched to a case by the recorder, including its line) from the old `*.rules.test.ts` files and `court-window.test.ts`, plus the `it`, `describe` and loops left empty. Kept: the derived-value, mutation and determinism checks, the time zone-dependent court-window checks, and the hand-written `money` and `phone` checks (they were written by hand, so there was no recorder run to prove them). The data package went from 1118 to 1003 tests, the runner from 553 cases; four failures in `autoQueue.mutations.test.ts`, `player/fetchers.test.ts` and `queue-session/fetchers.test.ts` also fail on the branch before this change.
+Now 530 cases in 77 files (50 more than before: the rule calls behind the remaining derived checks, `toBeUndefined` with `{"$undefined": true}`, error text, `Infinity`/`NaN` for money, and `Map`/`Set` results as `{"$map": …}` / `{"$set": …}`).
+
+Deleted from the old test files every assertion that now exists as a case: 269 statements matched by the recorder to their line, then the derived-value checks (about 50 more), the empty `it`/`describe`/loops, and the files left with no tests (`autoFill.rules.test.ts`, `sessionPayment.rules.test.ts`, `money.test.ts`, `phone.test.ts`). Kept in TypeScript, because they are not a property of one rule's output: "input is not mutated" (`expect(input.ctx).toEqual(before)`), a rule that throws, a constant (`DEFAULT_POST_TEMPLATE`), a fixture check, "no `notes` key" (subset matching can't say a key is absent), the relation between two calls, and the time zone-dependent court-window checks (waiting for T6). The data package went from 1118 to about 880 tests; four failures in `autoQueue.mutations.test.ts`, `player/fetchers.test.ts` and `queue-session/fetchers.test.ts` also fail on the branch before this change.
 
 ## Deviations log
 

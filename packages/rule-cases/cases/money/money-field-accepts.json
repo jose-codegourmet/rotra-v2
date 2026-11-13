@@ -78,6 +78,28 @@
         "args": [9007199254740992]
       },
       "expected": false
+    },
+    {
+      "name": "rejects Infinity",
+      "input": {
+        "args": [
+          {
+            "$number": "Infinity"
+          }
+        ]
+      },
+      "expected": false
+    },
+    {
+      "name": "rejects NaN",
+      "input": {
+        "args": [
+          {
+            "$number": "NaN"
+          }
+        ]
+      },
+      "expected": false
     }
   ]
 }

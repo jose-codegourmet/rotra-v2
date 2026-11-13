@@ -21,7 +21,7 @@ Ticket: needed
 - [x] **2.2** Match, auto-queue and auto-fill rules
 - [x] **2.3** Session result and ranking settings
 - [x] **2.4** License and club rules
-- [ ] **2.5** Money, phone and court-window parsing (`@rotra/schema`)
+- [x] **2.5** Money, phone and court-window parsing (`@rotra/schema`)
 
 ## Phase 3: Verify
 

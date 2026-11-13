@@ -1,0 +1,33 @@
+{
+  "rule": "phone/format-phone-for-display",
+  "version": 1,
+  "cases": [
+    {
+      "name": "groups '09175'",
+      "input": {
+        "args": [
+          "09175"
+        ]
+      },
+      "expected": "0917 5"
+    },
+    {
+      "name": "groups '+639175550142'",
+      "input": {
+        "args": [
+          "+639175550142"
+        ]
+      },
+      "expected": "+63 917 555 0142"
+    },
+    {
+      "name": "groups 'jose@example.com'",
+      "input": {
+        "args": [
+          "jose@example.com"
+        ]
+      },
+      "expected": "jose@example.com"
+    }
+  ]
+}

@@ -41,21 +41,33 @@ jobs:
           BEFORE: ${{ github.event.before }}
           AFTER: ${{ github.sha }}
         run: |
+          allowed='^(apps/api/|packages/rule-cases/|\.railway/|docs/|conductor/|\.github/workflows/backend\.yml$|[^/]+\.md$)'
+          backend='^(apps/api/|packages/rule-cases/|\.railway/|\.github/workflows/backend\.yml$)'
+          # A PR is squash-merged, so its whole diff is one change. A push may carry several commits:
+          # each commit that touches backend paths must be backend-only on its own.
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            range="origin/${BASE_REF}...HEAD"
+            changes="origin/${BASE_REF}...HEAD"
           elif [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
-            range="${AFTER}~1..${AFTER}"
+            changes="$AFTER"
           else
-            range="${BEFORE}..${AFTER}"
+            changes=$(git rev-list --reverse "${BEFORE}..${AFTER}")
           fi
-          outside=$(git diff --name-only "$range" | grep -Ev \
-            '^(apps/api/|packages/rule-cases/|\.railway/|docs/|conductor/|\.github/workflows/backend\.yml$|[^/]+\.md$)' || true)
-          if [ -n "$outside" ]; then
-            echo "::error::Backend changes must not include frontend files. Move these to a separate commit or PR:"
-            echo "$outside"
-            exit 1
-          fi
-          echo "Only backend files and docs changed."
+          failed=0
+          for change in $changes; do
+            case "$change" in
+              *...*) files=$(git diff --name-only "$change") ;;
+              *) files=$(git diff-tree --no-commit-id --name-only -r "$change") ;;
+            esac
+            echo "$files" | grep -Eq "$backend" || continue
+            outside=$(echo "$files" | grep -Ev "$allowed" || true)
+            if [ -n "$outside" ]; then
+              echo "::error::$change mixes backend and frontend files. Split it; outside the backend:"
+              echo "$outside"
+              failed=1
+            fi
+          done
+          [ "$failed" = 0 ] && echo "Backend changes contain only backend files and docs."
+          exit "$failed"
 
   go:
     needs: scope

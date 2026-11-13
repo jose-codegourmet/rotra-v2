@@ -8,8 +8,8 @@ Each phase becomes one ticket (or a few) under the Go API epic; link them here.
 
 Ticket: needed
 
-- [ ] **1.1** Create `packages/rule-cases` with `exports` and the case JSON Schema
-- [ ] **1.2** Add a Vitest check that every case file matches the schema
+- [x] **1.1** Create `packages/rule-cases` with `exports` and the case JSON Schema
+- [x] **1.2** Add a Vitest check that every case file matches the schema
 
 ## Phase 2: Move cases (no behavior change)
 

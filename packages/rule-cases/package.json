@@ -1,0 +1,13 @@
+{
+  "name": "@rotra/rule-cases",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Shared test cases (JSON only) for the rules the server enforces. No code, no rules.",
+  "exports": {
+    "./case.schema.json": "./case.schema.json",
+    "./*.json": "./cases/*.json"
+  },
+  "scripts": {
+    "test": "node --test"
+  }
+}

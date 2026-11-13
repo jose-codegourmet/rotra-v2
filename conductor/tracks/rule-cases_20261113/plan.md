@@ -67,7 +67,9 @@ Total now 437 cases in 70 files. The recorder now tags non-JSON args (`$date`, `
 
 The old assertions that compared two results or the inputs (no mutation of `input.ctx`, same result twice for the same input) stay in TypeScript: they are not a property of one output.
 
-Duplicated TypeScript assertions are still in place (#792).
+### Follow-up (#792): duplicates deleted
+
+Deleted 269 assertion statements (every run of each was matched to a case by the recorder, including its line) from the old `*.rules.test.ts` files and `court-window.test.ts`, plus the `it`, `describe` and loops left empty. Kept: the derived-value, mutation and determinism checks, the time zone-dependent court-window checks, and the hand-written `money` and `phone` checks (they were written by hand, so there was no recorder run to prove them). The data package went from 1118 to 1003 tests, the runner from 553 cases; four failures in `autoQueue.mutations.test.ts`, `player/fetchers.test.ts` and `queue-session/fetchers.test.ts` also fail on the branch before this change.
 
 ## Deviations log
 

@@ -79,12 +79,19 @@ export function SessionPerformanceShareCard({
             data-qr-text
             className={cn(
               'font-mono leading-none font-bold text-share-accent',
-              format === 'story' ? 'text-[64px]' : format === 'post' ? 'text-[56px]' : 'text-[40px]',
+              format === 'story'
+                ? 'text-[64px]'
+                : format === 'post'
+                  ? 'text-[56px]'
+                  : 'text-[40px]',
             )}
           >
             {wins}–{losses}
           </b>
-          <span data-qr-text className={cn('text-share-muted', tall ? 'text-[15px]' : 'text-[13px]')}>
+          <span
+            data-qr-text
+            className={cn('text-share-muted', tall ? 'text-[15px]' : 'text-[13px]')}
+          >
             {counted ? `${rate}% won` : 'No counted games'}
           </span>
         </div>

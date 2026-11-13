@@ -125,10 +125,9 @@ export function GameRow({ game, me, onOpenPlayer, onShare, dateLine }: GameRowPr
   const side = 'relative z-1 flex min-w-0 items-center justify-evenly gap-1.5 px-1 py-3'
   return (
     <div className="flex flex-col gap-1.5 border-t border-border py-3 first:border-t-0">
-      <div
-        role="group"
+      <fieldset
         aria-label={`${FORMATS[game.format]}: ${meLabel}${partners.length ? ` and ${partners.map((p) => p.name).join(' and ')}` : ''} versus ${opponents.map((p) => p.name).join(' and ')}`}
-        className="relative grid min-h-[132px] grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center overflow-hidden rounded-lg pt-2.5 max-[480px]:min-h-[100px]"
+        className="relative m-0 grid min-h-[132px] min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center overflow-hidden rounded-lg border-0 p-0 pt-2.5 max-[480px]:min-h-[100px]"
       >
         <CourtArt />
         <div className={side}>
@@ -158,10 +157,8 @@ export function GameRow({ game, me, onOpenPlayer, onShare, dateLine }: GameRowPr
         ) : null}
         <div className="relative z-1 mx-1 flex min-w-24 flex-col items-center justify-center gap-1.5 rounded-xl bg-court-level-label px-3.5 py-2.5 text-center text-on-photo max-[480px]:mx-0.5 max-[480px]:min-w-0 max-[480px]:px-2 max-[480px]:py-2">
           {game.score ? (
-            <span
-              aria-label={`Score ${game.score}`}
-              className="font-mono text-[22px] leading-none font-bold whitespace-nowrap tabular-nums max-[480px]:text-[17px]"
-            >
+            <span className="font-mono text-[22px] leading-none font-bold whitespace-nowrap tabular-nums max-[480px]:text-[17px]">
+              <span className="sr-only">Score </span>
               {game.score}
             </span>
           ) : (
@@ -181,7 +178,7 @@ export function GameRow({ game, me, onOpenPlayer, onShare, dateLine }: GameRowPr
         <div className={side}>
           {opponents.map((p) => face(p, firstName(p.name), !won && !partial, known))}
         </div>
-      </div>
+      </fieldset>
       {game.note ? <div className="text-[13px] text-warn">{game.note} · not counted</div> : null}
       {dateLine ? <p className="text-[13px] text-fg2">{dateLine}</p> : null}
     </div>

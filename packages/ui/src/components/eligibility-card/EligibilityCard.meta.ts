@@ -9,8 +9,17 @@ export const eligibilityCardMeta = {
     'rank adds the shared rank head (the profile no longer has a separate Shared rank card); onShare only on your own profile with a rank.',
     'rankText is the rank status line (rankStatus), e.g. the reassessment note.',
   ],
-  prototype: { file: 'apps/mockup/player-app/rotra-player.html', screen: 'eligibility(), rankHead()' },
+  prototype: {
+    file: 'apps/mockup/player-app/rotra-player.html',
+    screen: 'eligibility(), rankHead()',
+  },
   docs: ['docs/mockup-changes/2026-11-13-player-ranking-card.md'],
-  variants: ['qualifies', 'below threshold', 'needs reassessment', 'with rank head', 'not calculated'],
+  variants: [
+    'qualifies',
+    'below threshold',
+    'needs reassessment',
+    'with rank head',
+    'not calculated',
+  ],
   related: ['ProfileRankingCard', 'RankShareCard'],
 } satisfies ComponentMeta

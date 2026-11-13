@@ -1,10 +1,10 @@
+import { COURT_LABEL_MAX, COURT_LABEL_TOO_LONG } from '@rotra/schema/court-label'
 import {
   clockTimeFrom,
   courtAfterSessionEndError,
   courtTimeOnSession,
   courtWindowError,
 } from '@rotra/schema/court-window'
-import { COURT_LABEL_MAX, COURT_LABEL_TOO_LONG } from '@rotra/schema/court-label'
 import { timeField } from '@rotra/schema/date'
 import { z } from 'zod'
 

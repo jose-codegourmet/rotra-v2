@@ -114,7 +114,10 @@ export function SessionResultShareCard({
                 </b>
                 <span
                   data-qr-text
-                  className={cn('text-share-muted', format === 'square' ? 'text-sm' : 'text-[15px]')}
+                  className={cn(
+                    'text-share-muted',
+                    format === 'square' ? 'text-sm' : 'text-[15px]',
+                  )}
                 >
                   in Standings
                 </span>

@@ -318,7 +318,9 @@ export function SessionView({
           toast(`${c.label} is now ${label}`)
         },
         onError: (error: unknown) =>
-          setLabelError(error instanceof Error ? error.message : 'Something went wrong. Try again.'),
+          setLabelError(
+            error instanceof Error ? error.message : 'Something went wrong. Try again.',
+          ),
       },
     )
   }

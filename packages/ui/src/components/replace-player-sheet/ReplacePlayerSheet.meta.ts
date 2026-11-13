@@ -12,7 +12,8 @@ export const replacePlayerSheetMeta = {
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',
-    screen: 'SHEETS.replace (ACT.openReplace, ACT.pickPlayerAction, ACT.confirmReplace), swapPicker()',
+    screen:
+      'SHEETS.replace (ACT.openReplace, ACT.pickPlayerAction, ACT.confirmReplace), swapPicker()',
   },
   docs: [
     'docs/screens/product/modules/queue/match-control.md',

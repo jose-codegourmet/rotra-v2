@@ -1,10 +1,14 @@
 import { PLAYING_LEVELS } from '@rotra/data/player/types'
+import { Button } from '@rotra/ui/button'
+import { Notice } from '@rotra/ui/notice'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 import { fn, within } from 'storybook/test'
-import { Button } from '@rotra/ui/button'
-import { Notice } from '@rotra/ui/notice'
-import { type SwapPickerPlayer, SwapPickerSheet, type SwapPickerSheetProps } from './SwapPickerSheet'
+import {
+  type SwapPickerPlayer,
+  SwapPickerSheet,
+  type SwapPickerSheetProps,
+} from './SwapPickerSheet'
 
 const NAMES = [
   'Mikee Abellana',

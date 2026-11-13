@@ -2,8 +2,8 @@
 
 import type { PublicStandingRow } from '@rotra/data/public-session/types'
 import { LeaderboardShareCard } from '@rotra/ui/leaderboard-share-card'
-import { ShareDialog } from '@rotra/ui/share-dialog'
 import { SessionStandings } from '@rotra/ui/session-standings'
+import { ShareDialog } from '@rotra/ui/share-dialog'
 import { toast } from '@rotra/ui/toaster'
 import { useState } from 'react'
 

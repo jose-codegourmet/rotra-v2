@@ -136,10 +136,9 @@ function pillTone(tonight: ParticipantTonight) {
 function StatusPill({ tonight }: { tonight: ParticipantTonight }) {
   const tip = tonightText(tonight)
   return (
-    // biome-ignore lint/a11y/noNoninteractiveTabindex: focusable so keyboard users get the tooltip (the prototype's .pp-pill)
-    <span
-      role="note"
-      tabIndex={0}
+    // A button so keyboard users can focus it and get the tooltip (the prototype's .pp-pill).
+    <button
+      type="button"
       aria-label={tip}
       className={cn(
         'group/pill absolute -bottom-2.5 left-1/2 z-2 inline-flex -translate-x-1/2 cursor-default items-center gap-[5px] rounded-full border border-border-strong bg-surface py-0.5 pr-2 pl-1.5',
@@ -159,7 +158,7 @@ function StatusPill({ tonight }: { tonight: ParticipantTonight }) {
       >
         {tip}
       </span>
-    </span>
+    </button>
   )
 }
 
@@ -281,7 +280,9 @@ export function ProfileCardSection({
 function LatestStatsHead({ year }: { year: number }) {
   return (
     <div className="flex items-center justify-between gap-2">
-      <span className="text-[11px] font-bold tracking-[0.6px] text-fg2 uppercase">Latest stats</span>
+      <span className="text-[11px] font-bold tracking-[0.6px] text-fg2 uppercase">
+        Latest stats
+      </span>
       <span
         title={`Counts ${year} so far; starts again on January 1`}
         className="rounded-full border border-border-strong px-2 py-px text-[11px] font-bold text-fg2 tabular-nums"
@@ -324,7 +325,10 @@ export function ProfileLatestStats({ year, stats }: { year: number; stats: Parti
           <span className="text-[32px] leading-[0.9] font-extrabold tracking-[-0.5px] text-accent tabular-nums max-[420px]:text-2xl">
             {stats.winRate}%
           </span>
-          <StatsFire rate={stats.winRate} className="max-[420px]:max-h-10 max-[420px]:max-w-[33px]" />
+          <StatsFire
+            rate={stats.winRate}
+            className="max-[420px]:max-h-10 max-[420px]:max-w-[33px]"
+          />
         </div>
       </div>
       <div className="flex min-w-0 flex-col gap-3 pl-4 max-[420px]:pl-3">
@@ -427,12 +431,7 @@ export function ProfileBannerCard({
   return (
     <div className={cn('relative min-w-0', className)}>
       <ProfileBanner strip bannerKey={bannerKey} imageUrl={bannerImageUrl} />
-      <div
-        className={cn(
-          'relative z-1 ml-5 w-max',
-          pictureSize === 72 ? '-mt-9' : '-mt-8',
-        )}
-      >
+      <div className={cn('relative z-1 ml-5 w-max', pictureSize === 72 ? '-mt-9' : '-mt-8')}>
         {picture ?? (
           <Avatar
             name={name}

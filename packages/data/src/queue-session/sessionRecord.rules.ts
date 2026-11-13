@@ -92,9 +92,7 @@ export function sessionRecordHistory(input: {
     const next = played
       .filter(
         (x) =>
-          x !== m &&
-          (x.startedAt ?? 0) > start &&
-          x.courtIds.some((id) => m.courtIds.includes(id)),
+          x !== m && (x.startedAt ?? 0) > start && x.courtIds.some((id) => m.courtIds.includes(id)),
       )
       .map((x) => x.startedAt ?? start)
     return Math.min(start + REPLAY_FALLBACK_MATCH, ...next)

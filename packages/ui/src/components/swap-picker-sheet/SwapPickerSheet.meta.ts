@@ -19,6 +19,19 @@ export const swapPickerSheetMeta = {
     'docs/screens/product/modules/queue/match-control.md',
     'docs/mockup-changes/2026-11-13-queue-replace-during-play.md',
   ],
-  variants: ['compact', 'expanded', 'stacked (phone)', 'no free player', 'substitute', 'something changed'],
-  related: ['PlayerActionSheet', 'ActiveMatchSheet', 'SubstitutionSheet', 'ReplacePlayerSheet', 'Pager'],
+  variants: [
+    'compact',
+    'expanded',
+    'stacked (phone)',
+    'no free player',
+    'substitute',
+    'something changed',
+  ],
+  related: [
+    'PlayerActionSheet',
+    'ActiveMatchSheet',
+    'SubstitutionSheet',
+    'ReplacePlayerSheet',
+    'Pager',
+  ],
 } satisfies ComponentMeta

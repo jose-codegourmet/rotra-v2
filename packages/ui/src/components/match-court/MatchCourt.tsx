@@ -124,7 +124,7 @@ export function MatchCourt({
         {body}
       </button>
     ) : (
-      <span key={player.key} aria-label={player.name} className={base}>
+      <span key={player.key} className={base}>
         {body}
       </span>
     )
@@ -137,12 +137,11 @@ export function MatchCourt({
       data-now={now || undefined}
       className={cn('flex flex-col', invalid && '[&_[data-court]]:saturate-[.4]', className)}
     >
-      <div
-        role="group"
+      <fieldset
         data-court
         aria-label={`Match ${number}: ${names(left)} versus ${names(right)}`}
         className={cn(
-          'relative grid min-h-[132px] grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center overflow-hidden rounded-lg pt-3 transition-shadow motion-reduce:transition-none max-[480px]:min-h-[112px]',
+          'relative m-0 grid min-h-[132px] min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center overflow-hidden rounded-lg border-0 p-0 pt-3 transition-shadow motion-reduce:transition-none max-[480px]:min-h-[112px]',
           now &&
             'shadow-[0_0_0_3px_var(--accent),0_0_18px_2px_color-mix(in_srgb,var(--accent)_35%,transparent)]',
         )}
@@ -155,10 +154,8 @@ export function MatchCourt({
         <div className={side}>{left.map((p) => face(p, !invalid && leftWon))}</div>
         <div className="relative z-1 mx-1 flex min-w-24 flex-col items-center justify-center gap-1.5 rounded-xl bg-court-level-label px-3.5 py-2.5 text-center text-on-photo max-[480px]:mx-0.5 max-[480px]:min-w-0 max-[480px]:px-2 max-[480px]:py-2">
           {invalid ? null : score ? (
-            <span
-              aria-label={`Score ${score}`}
-              className="font-mono text-[22px] leading-none font-bold whitespace-nowrap tabular-nums max-[480px]:text-[17px]"
-            >
+            <span className="font-mono text-[22px] leading-none font-bold whitespace-nowrap tabular-nums max-[480px]:text-[17px]">
+              <span className="sr-only">Score </span>
               {score}
             </span>
           ) : (
@@ -180,7 +177,7 @@ export function MatchCourt({
           ) : null}
         </div>
         <div className={side}>{right.map((p) => face(p, !invalid && winner === 'right'))}</div>
-      </div>
+      </fieldset>
     </article>
   )
 }

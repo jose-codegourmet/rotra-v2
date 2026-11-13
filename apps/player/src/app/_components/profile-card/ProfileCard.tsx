@@ -1,7 +1,7 @@
 'use client'
 import { registeredCity } from '@rotra/data/club-player/fetchers'
-import type { PlayingLevel } from '@rotra/data/player/types'
 import { countYearCountedWins, statsYear } from '@rotra/data/player/rules'
+import type { PlayingLevel } from '@rotra/data/player/types'
 import { usePlayerGames } from '@rotra/data/player/usePlayerGames'
 import { usePlayerProfile } from '@rotra/data/player/usePlayerProfile'
 import { usePlayerRank } from '@rotra/data/player/usePlayerRank'

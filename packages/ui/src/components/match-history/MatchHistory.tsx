@@ -120,7 +120,8 @@ export function MatchHistory({
           .map((s) => ({
             ...s,
             games: s.games.filter(
-              (g) => (g.counting === 'counted') === (tab === 'counted') && (!filter || filter(s, g)),
+              (g) =>
+                (g.counting === 'counted') === (tab === 'counted') && (!filter || filter(s, g)),
             ),
           }))
           .filter((s) => s.games.length)
@@ -139,7 +140,10 @@ export function MatchHistory({
                 </Notice>
               ))
             )}
-            <Card ref={tab === activeTab ? listRef : undefined} className="flex flex-col gap-[22px]">
+            <Card
+              ref={tab === activeTab ? listRef : undefined}
+              className="flex flex-col gap-[22px]"
+            >
               {blocks.length ? (
                 blocks
                   .slice((current - 1) * PER_PAGE, current * PER_PAGE)

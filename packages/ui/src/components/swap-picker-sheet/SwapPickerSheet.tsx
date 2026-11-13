@@ -372,7 +372,9 @@ export function SwapPickerSheet({
         headerClassName="absolute top-3 right-3 z-[3] p-0 [&>h2]:sr-only"
         bodyClassName="px-5 pt-5 pb-4"
         className={
-          expanded ? 'w-[min(75vw,calc(100vw-24px))]' : 'min-[641px]:w-[min(620px,calc(100vw-24px))]'
+          expanded
+            ? 'w-[min(75vw,calc(100vw-24px))]'
+            : 'min-[641px]:w-[min(620px,calc(100vw-24px))]'
         }
       >
         <div

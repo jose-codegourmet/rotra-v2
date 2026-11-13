@@ -49,9 +49,7 @@ export function clubPlayerView(state: MockState, player: ClubPlayer) {
     fullName = own?.fullName || player.fullName,
     // The banner is public, like the picture; only a registered player has chosen one. Everyone else
     // (and a player with no pick) draws the default Admin sets (D-2026-11-13-03).
-    banner = resolveMockProfileBanner(
-      own && player.identity === 'registered' ? own.bannerId : null,
-    )
+    banner = resolveMockProfileBanner(own && player.identity === 'registered' ? own.bannerId : null)
   return {
     ...player,
     fullName,

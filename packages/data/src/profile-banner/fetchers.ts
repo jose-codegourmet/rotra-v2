@@ -18,6 +18,7 @@ import {
 } from '../real/profile-banner'
 import { cropProfileBannerToWide } from './crop'
 import {
+  defaultProfileBannerId,
   inBannerUploadOrder,
   PROFILE_BANNER_ALREADY_BACK,
   PROFILE_BANNER_DEFAULT_HIDDEN,
@@ -26,7 +27,6 @@ import {
   PROFILE_BANNER_DELETE_REFUSAL,
   PROFILE_BANNER_HIDE_REFUSAL,
   PROFILE_BANNER_MISSING,
-  defaultProfileBannerId,
   profileBannerBelowMinimum,
   profileBannerSummary,
   profileBannersAddedMessage,

@@ -155,7 +155,9 @@ export function ClubMemberProfileSheet({
         }
       >
         <ProfileCardSection label="About">
-          <KeyValueList items={[{ label: 'Registered in', value: profile.registeredCity ?? '—' }]} />
+          <KeyValueList
+            items={[{ label: 'Registered in', value: profile.registeredCity ?? '—' }]}
+          />
         </ProfileCardSection>
         {showStats ? (
           <ProfileStatsSection

@@ -21,11 +21,11 @@ import {
 } from '@rotra/data/match/queue.rules'
 import { useMakeMatch } from '@rotra/data/match/useMakeMatch'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
-import { isRealDataMode } from '@rotra/data/real/mode'
 import { PLAYING_LEVELS } from '@rotra/data/player/types'
 import { selfCheckInMark } from '@rotra/data/public-session/rules'
 import { slotCapacity } from '@rotra/data/queue-session/queueSession.rules'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
+import { isRealDataMode } from '@rotra/data/real/mode'
 import {
   inUnfinishedMatch,
   stepDownBlockedText,
@@ -33,19 +33,19 @@ import {
 import type { SessionPlayer } from '@rotra/data/session-roster/types'
 import { useFillOpenSlots } from '@rotra/data/session-roster/useFillOpenSlots'
 import { useGiveSlot } from '@rotra/data/session-roster/useGiveSlot'
-import { useRemoveFromWaitlist } from '@rotra/data/session-roster/useRemoveFromWaitlist'
-import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
-import { useSetGamesPlayed } from '@rotra/data/session-roster/useSetGamesPlayed'
-import { useSetPresenceMany } from '@rotra/data/session-roster/useSetPresenceMany'
 import {
   useMarkNoShow,
   useSessionNoShows,
   useUndoNoShow,
 } from '@rotra/data/session-roster/useNoShow'
+import { useRemoveFromWaitlist } from '@rotra/data/session-roster/useRemoveFromWaitlist'
+import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
+import { useSetGamesPlayed } from '@rotra/data/session-roster/useSetGamesPlayed'
+import { useSetPresenceMany } from '@rotra/data/session-roster/useSetPresenceMany'
 import { useStepDownToWaitlist } from '@rotra/data/session-roster/useStepDownToWaitlist'
+import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
-import { Avatar } from '@rotra/ui/avatar'
 import { ConfirmMakeMatchSheet } from '@rotra/ui/confirm-make-match-sheet'
 import { ConfirmSheet } from '@rotra/ui/confirm-sheet'
 import { EmptyState } from '@rotra/ui/empty-state'

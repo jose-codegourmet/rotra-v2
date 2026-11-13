@@ -128,12 +128,7 @@ export function ParticipantProfileSheet({
         <ProfileCardSection label="About">
           <KeyValueList items={[{ label: 'Registered in', value: registeredCity ?? '—' }]} />
         </ProfileCardSection>
-        <ProfileStatsSection
-          year={year}
-          stats={stats}
-          loading={statsLoading}
-          error={statsError}
-        />
+        <ProfileStatsSection year={year} stats={stats} loading={statsLoading} error={statsError} />
       </ProfileBannerCard>
     </Sheet>
   )

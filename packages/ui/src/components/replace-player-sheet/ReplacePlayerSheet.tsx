@@ -3,11 +3,7 @@
 import type { PlayingLevel } from '@rotra/data/player/types'
 import { Button } from '@rotra/ui/button'
 import { Notice } from '@rotra/ui/notice'
-import {
-  pickerPlayer,
-  type SwapPickerPlayer,
-  SwapPickerSheet,
-} from '@rotra/ui/swap-picker-sheet'
+import { pickerPlayer, type SwapPickerPlayer, SwapPickerSheet } from '@rotra/ui/swap-picker-sheet'
 import type { ReactNode } from 'react'
 
 /** One player as the Replace player tiles draw them. */
@@ -121,7 +117,12 @@ export function ReplacePlayerSheet({
         )
       }
       action={
-        <Button variant="primary" loading={isPending} disabled={!outId || !inId} onClick={onConfirm}>
+        <Button
+          variant="primary"
+          loading={isPending}
+          disabled={!outId || !inId}
+          onClick={onConfirm}
+        >
           Replace player
         </Button>
       }

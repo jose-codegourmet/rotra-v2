@@ -142,8 +142,7 @@ export function WeeklyPerformanceChart({
         </span>
       )
     const on = !!chosen && chosen.day === day && chosen.result === result
-    const word =
-      result === 'won' ? (value === 1 ? 'win' : 'wins') : value === 1 ? 'loss' : 'losses'
+    const word = result === 'won' ? (value === 1 ? 'win' : 'wins') : value === 1 ? 'loss' : 'losses'
     return (
       <button
         type="button"
@@ -180,7 +179,8 @@ export function WeeklyPerformanceChart({
         <div className={tile}>
           <span className={label}>Record</span>
           <b className="truncate text-lg font-extrabold tabular-nums">
-            <span className="text-accent">{wins}W</span> <span className="text-error">{losses}L</span>
+            <span className="text-accent">{wins}W</span>{' '}
+            <span className="text-error">{losses}L</span>
           </b>
         </div>
         <div className={tile}>
@@ -199,19 +199,17 @@ export function WeeklyPerformanceChart({
           </b>
         </div>
       </div>
-      <div
-        role="list"
+      <ul
         aria-label="Wins and losses by day of the week"
-        className="relative grid grid-cols-7 gap-1.5 pt-1 max-[480px]:gap-0.5"
+        className="relative m-0 grid list-none grid-cols-7 p-0 gap-1.5 pt-1 max-[480px]:gap-0.5"
       >
         {days.map((d, i) => {
           const n = d.wins + d.losses
           const dayRate = n ? Math.round((d.wins / n) * 100) : null
           const isBest = i === best
           return (
-            <div
+            <li
               key={DAYS[i]}
-              role="listitem"
               aria-label={`${DAYS[i]}: ${n ? `${d.wins} won, ${d.losses} lost, ${dayRate}% win rate` : 'no games'}`}
               className={cn(
                 'flex min-w-0 flex-col items-center gap-1.5 rounded-[10px] px-0.5 pt-1.5 pb-2',
@@ -243,10 +241,10 @@ export function WeeklyPerformanceChart({
               >
                 {DAYS[i]?.slice(0, 3)}
               </b>
-            </div>
+            </li>
           )
         })}
-      </div>
+      </ul>
       <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-fg2">
         <span>
           <i className="mr-1.5 inline-block size-2.5 rounded-[3px] bg-accent align-[-1px]" />

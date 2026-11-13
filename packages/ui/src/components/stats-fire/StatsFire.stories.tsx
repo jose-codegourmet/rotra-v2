@@ -5,9 +5,7 @@ const meta = {
   title: 'Shared/StatsFire',
   component: StatsFire,
   args: { rate: 62 },
-  decorators: [
-    (Story) => <div className="flex h-20 items-end bg-surface p-4">{Story()}</div>,
-  ],
+  decorators: [(Story) => <div className="flex h-20 items-end bg-surface p-4">{Story()}</div>],
 } satisfies Meta<typeof StatsFire>
 export default meta
 type Story = StoryObj<typeof meta>

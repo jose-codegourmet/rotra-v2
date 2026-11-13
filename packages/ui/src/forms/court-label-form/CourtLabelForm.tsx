@@ -88,7 +88,9 @@ export function CourtLabelForm({
           label="Court label"
           error={error}
           hint={
-            error ? undefined : 'Shows on the console, the public page and match history after sync.'
+            error
+              ? undefined
+              : 'Shows on the console, the public page and match history after sync.'
           }
         >
           <Controller

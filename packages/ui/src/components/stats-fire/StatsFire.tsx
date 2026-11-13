@@ -49,10 +49,7 @@ export function StatsFire({ rate, className }: { rate: number; className?: strin
           const random = Math.floor(Math.random() * 3)
           const destination = source - random + 1 - WIDTH
           if (destination >= 0)
-            buffer[destination] = Math.max(
-              0,
-              value - (random & 1) - (Math.random() < 0.5 ? 1 : 0),
-            )
+            buffer[destination] = Math.max(0, value - (random & 1) - (Math.random() < 0.5 ? 1 : 0))
         }
     }
     let palette: number[][] = firePalette(LEVELS) ?? []

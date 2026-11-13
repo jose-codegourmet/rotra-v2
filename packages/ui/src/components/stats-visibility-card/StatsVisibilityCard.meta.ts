@@ -19,5 +19,10 @@ export const statsVisibilityCardMeta = {
     'docs/screens/product/modules/player-information/identity-privacy.md',
   ],
   variants: ['both on', 'stats off', 'weekly off', 'saving', 'error', 'highlighted'],
-  related: ['PlayerInformationCard', 'ProfileVisibilityControl', 'WeeklyPerformanceChart', 'Switch'],
+  related: [
+    'PlayerInformationCard',
+    'ProfileVisibilityControl',
+    'WeeklyPerformanceChart',
+    'Switch',
+  ],
 } satisfies ComponentMeta

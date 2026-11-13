@@ -85,6 +85,7 @@ export function AwardShareCard(props: AwardShareCardProps) {
     const image =
       props.kind === 'award' ? (
         <ShareImage
+          key={format}
           format={format}
           headline={props.entry.name}
           subline={club.name}
@@ -132,6 +133,7 @@ export function AwardShareCard(props: AwardShareCardProps) {
         </ShareImage>
       ) : (
         <ShareImage
+          key={format}
           format={format}
           headline={club.name}
           subline={`${sessionTitle} · ${dateLabel}`}

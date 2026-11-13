@@ -7,11 +7,7 @@ import { ConfirmSheet } from '@rotra/ui/confirm-sheet'
 import { KeyValueList } from '@rotra/ui/key-value-list'
 import { levelLabel } from '@rotra/ui/level-pill'
 import { Notice } from '@rotra/ui/notice'
-import {
-  pickerPlayer,
-  type SwapPickerPlayer,
-  SwapPickerSheet,
-} from '@rotra/ui/swap-picker-sheet'
+import { pickerPlayer, type SwapPickerPlayer, SwapPickerSheet } from '@rotra/ui/swap-picker-sheet'
 import { type ReactNode, useState } from 'react'
 
 /** One player as the substitution tiles draw them. */

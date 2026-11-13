@@ -14,7 +14,8 @@ export const profileBannerCardMeta = {
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',
-    screen: 'SHEETS.profile and SHEETS.pubProfile (.pp-card, .pp-banner, .pp-name, .pp-rtr, .pp-pill)',
+    screen:
+      'SHEETS.profile and SHEETS.pubProfile (.pp-card, .pp-banner, .pp-name, .pp-rtr, .pp-pill)',
   },
   docs: [
     'docs/screens/product/dialogs.md#d-participant-profile--participant-profile-card',

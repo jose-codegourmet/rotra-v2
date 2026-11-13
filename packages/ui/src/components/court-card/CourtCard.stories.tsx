@@ -175,7 +175,9 @@ export const FreeWithSkippedFirst: Story = { args: free(courtAt(1), [playing, bl
 export const FreeNoneReady: Story = { args: free(courtAt(1), [playing, blocked]) }
 /** Free · N min: minutes since the last match on the court ended (neutral, then warn from 10, error from 16) */
 export const FreeJustFreed: Story = { args: free(courtAt(1), [playing, ready], { freeMinutes: 0 }) }
-export const FreeTenMinutes: Story = { args: free(courtAt(1), [playing, ready], { freeMinutes: 12 }) }
+export const FreeTenMinutes: Story = {
+  args: free(courtAt(1), [playing, ready], { freeMinutes: 12 }),
+}
 export const FreeSixteenMinutes: Story = {
   args: free(courtAt(1), [playing, ready], { freeMinutes: 18 }),
 }

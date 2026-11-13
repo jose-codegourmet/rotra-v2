@@ -122,7 +122,11 @@ export type ProfileSessionsCardProps = {
  * sessions the player played in, newest first, each a SessionRecordRow that opens the session's
  * matches dialog; **All sessions (N)** goes to the Sessions page. Empty: “No sessions joined yet.”
  */
-export function ProfileSessionsCard({ sessions, onOpenSession, onOpenAll }: ProfileSessionsCardProps) {
+export function ProfileSessionsCard({
+  sessions,
+  onOpenSession,
+  onOpenAll,
+}: ProfileSessionsCardProps) {
   const list = playedSessions(sessions)
   return (
     <Card asChild>

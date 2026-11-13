@@ -16,6 +16,11 @@ export type PublicSessionQueueProps = {
   checking?: boolean
   failed?: boolean
   onRetry: () => void
+  /**
+   * A signed-in ROTRA player: each face with a `participant` index is a button (“NAME. View
+   * profile”, accent ring on hover and focus) that opens that participant's profile card.
+   */
+  onOpenPlayer?: (participant: number) => void
 }
 
 type QueuedMatch = PlayerSessionAccess['queue'][number]
@@ -24,16 +29,48 @@ type QueuedPlayer = QueuedMatch['teamA'][number]
 /** First word only; a masked name ("Y*** Z***") stays masked ("Y***"). */
 const firstName = (name: string) => name.split(/\s+/).filter(Boolean)[0] ?? name
 
-function Side({ players }: { players: QueuedPlayer[] }) {
+function Side({
+  players,
+  onOpenPlayer,
+}: {
+  players: QueuedPlayer[]
+  onOpenPlayer?: (participant: number) => void
+}) {
   return (
     <ul className="m-0 flex list-none flex-wrap gap-x-3 gap-y-1 p-0 min-[641px]:flex-nowrap">
       {players.map((player, i) => {
         const name = firstName(player.name)
+        const participant = player.participant
+        const face = (
+          <>
+            <Avatar
+              name={name}
+              size={36}
+              className={cn(
+                'text-xs',
+                onOpenPlayer &&
+                  participant !== undefined &&
+                  'group-hover/qface:shadow-[0_0_0_2px_var(--accent)] group-focus-visible/qface:shadow-[0_0_0_2px_var(--accent)]',
+              )}
+            />
+            <span className="max-w-[52px] truncate text-xs font-semibold">{name}</span>
+          </>
+        )
         return (
           // biome-ignore lint/suspicious/noArrayIndexKey: a side is a fixed, ordered list of up to five
           <li key={i} className="flex w-[52px] min-w-0 flex-col items-center gap-px">
-            <Avatar name={name} size={36} className="text-xs" />
-            <span className="max-w-[52px] truncate text-xs font-semibold">{name}</span>
+            {onOpenPlayer && participant !== undefined ? (
+              <button
+                type="button"
+                aria-label={`${name}. View profile`}
+                onClick={() => onOpenPlayer(participant)}
+                className="group/qface m-0 flex min-w-0 cursor-pointer flex-col items-center gap-px rounded-md border-0 bg-transparent p-0 text-inherit focus-visible:outline-none"
+              >
+                {face}
+              </button>
+            ) : (
+              face
+            )}
           </li>
         )
       })}
@@ -42,7 +79,15 @@ function Side({ players }: { players: QueuedPlayer[] }) {
 }
 
 /** One queued match: position, Team A, VS, Team B. No format chip, no status line. */
-function QueueRow({ match, position }: { match: QueuedMatch; position: number }) {
+function QueueRow({
+  match,
+  position,
+  onOpenPlayer,
+}: {
+  match: QueuedMatch
+  position: number
+  onOpenPlayer?: (participant: number) => void
+}) {
   const next = position === 1
   return (
     <article
@@ -60,17 +105,23 @@ function QueueRow({ match, position }: { match: QueuedMatch; position: number })
         <span className="font-mono text-base font-bold">#{position}</span>
         {next ? <Chip tone="warn">Next</Chip> : null}
       </div>
-      <Side players={match.teamA} />
+      <Side players={match.teamA} onOpenPlayer={onOpenPlayer} />
       <div className="text-[11px] text-fg2 opacity-80 max-[640px]:text-left min-[641px]:text-center">
         VS
       </div>
-      <Side players={match.teamB} />
+      <Side players={match.teamB} onOpenPlayer={onOpenPlayer} />
     </article>
   )
 }
 
 /** #2 onward: scrolls vertically (max about 380 px) and fades at the bottom until scrolled to the end. */
-function RestOfQueue({ matches }: { matches: QueuedMatch[] }) {
+function RestOfQueue({
+  matches,
+  onOpenPlayer,
+}: {
+  matches: QueuedMatch[]
+  onOpenPlayer?: (participant: number) => void
+}) {
   const box = useRef<HTMLDivElement>(null)
   const [atEnd, setAtEnd] = useState(true)
   const sync = useCallback((el: HTMLElement) => {
@@ -102,7 +153,12 @@ function RestOfQueue({ matches }: { matches: QueuedMatch[] }) {
     >
       <div className="grid grid-cols-1 gap-2.5">
         {matches.map((match, i) => (
-          <QueueRow key={match.matchNo} match={match} position={i + 2} />
+          <QueueRow
+            key={match.matchNo}
+            match={match}
+            position={i + 2}
+            onOpenPlayer={onOpenPlayer}
+          />
         ))}
       </div>
     </div>
@@ -116,6 +172,7 @@ export function PublicSessionQueue({
   checking,
   failed,
   onRetry,
+  onOpenPlayer,
 }: PublicSessionQueueProps) {
   return (
     <section aria-label="Queue" className="mt-5 flex flex-col gap-3">
@@ -125,8 +182,10 @@ export function PublicSessionQueue({
           <p className="text-[13px] text-fg2">Read-only · Last synced queue</p>
           {access.queue[0] ? (
             <div className="flex flex-col gap-1.5">
-              <QueueRow match={access.queue[0]} position={1} />
-              {access.queue.length > 1 ? <RestOfQueue matches={access.queue.slice(1)} /> : null}
+              <QueueRow match={access.queue[0]} position={1} onOpenPlayer={onOpenPlayer} />
+              {access.queue.length > 1 ? (
+                <RestOfQueue matches={access.queue.slice(1)} onOpenPlayer={onOpenPlayer} />
+              ) : null}
             </div>
           ) : (
             <EmptyState title="No matches queued yet." />

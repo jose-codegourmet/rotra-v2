@@ -159,6 +159,7 @@
     "./player-pool-toolbar": "./src/components/player-pool-toolbar/PlayerPoolToolbar.tsx",
     "./player-profile-sheet": "./src/components/player-profile-sheet/PlayerProfileSheet.tsx",
     "./profile-banner-card": "./src/components/profile-banner-card/ProfileBannerCard.tsx",
+    "./club-profile-card": "./src/components/club-profile-card/ClubProfileCard.tsx",
     "./profile-banner": "./src/components/profile-banner/ProfileBanner.tsx",
     "./profile-hero": "./src/components/profile-hero/ProfileHero.tsx",
     "./banner-sheet": "./src/components/banner-sheet/BannerSheet.tsx",

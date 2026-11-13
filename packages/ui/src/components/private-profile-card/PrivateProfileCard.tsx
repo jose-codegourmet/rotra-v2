@@ -19,12 +19,17 @@ export type PrivateProfileCardProps = {
   photoUrl?: string
   /** Opens the full photo (#716), always-private players only */
   onPhotoClick?: () => void
-  /** The player's Profile banner key; missing draws the accent gradient */
+  /** The player's own resolved Profile banner (guests and unclaimed: the Admin default); missing draws Court */
   bannerKey?: string | null
   /** An Admin-uploaded banner image; wins over bannerKey */
   bannerImageUrl?: string | null
   /** Replaces the section text (game courts: “This player played as a guest …”) */
   text?: string
+  /**
+   * Who the private player shares their games with: the Queue Master (session page, default) or
+   * their clubs (Player app). The guest text says “played” instead of “is playing” in the Player app.
+   */
+  context?: 'queue' | 'player'
 }
 
 const COPY = {
@@ -38,6 +43,13 @@ const COPY = {
     label: 'Guest',
     text: "This player is playing as a guest and hasn't registered with ROTRA yet, so there's no profile to show. The club keeps their games for when they do.",
   },
+} as const
+
+const PLAYER_TEXT = {
+  private:
+    'This player has chosen to keep their ROTRA profile private. You can see their picture and banner; their name, level and games stay between them and their clubs.',
+  guest:
+    "This player played as a guest and hasn't registered with ROTRA yet, so there's no profile to show.",
 } as const
 
 /**
@@ -55,14 +67,16 @@ export function PrivateProfileCard({
   bannerKey,
   bannerImageUrl,
   text,
+  context = 'queue',
 }: PrivateProfileCardProps) {
   const copy = COPY[variant]
+  const sectionText = text ?? (context === 'player' ? PLAYER_TEXT[variant] : copy.text)
   return (
     <Sheet
       open={open}
       onOpenChange={onOpenChange}
       title={name}
-      bodyClassName="p-0"
+      headerless
       footer={<Button onClick={() => onOpenChange(false)}>Close</Button>}
     >
       <ProfileBannerCard
@@ -75,7 +89,7 @@ export function PrivateProfileCard({
         chips={<Chip>{copy.chip}</Chip>}
       >
         <ProfileCardSection label={copy.label}>
-          <p className="m-0 text-fg2">{text ?? copy.text}</p>
+          <p className="m-0 text-fg2">{sectionText}</p>
         </ProfileCardSection>
       </ProfileBannerCard>
     </Sheet>

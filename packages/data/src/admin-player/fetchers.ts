@@ -6,6 +6,7 @@ import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, readMockState } from '../mock/store'
 import type { Player } from '../player/player.types'
+import { resolveMockProfileBanner } from '../profile-banner/fetchers'
 import { effectiveRankingVersion } from '../ranking-settings/rankingSettings.rules'
 import {
   realGetAdminPlayer,
@@ -185,13 +186,23 @@ export async function getAdminPlayer(
 }
 
 /** Profile fields for Admin Quick view, including private profiles; null for club-only records. */
-export async function getAdminPlayerProfile(id: string, signal?: AbortSignal) {
+export async function getAdminPlayerProfile(
+  id: string,
+  signal?: AbortSignal,
+): Promise<{
+  socialLinks: import('../player/player.types').PlayerProfile['socialLinks']
+  /** The resolved Profile banner for Quick view (mock mode); missing draws the default */
+  bannerKey?: string
+  bannerImageUrl?: string | null
+} | null> {
   if (isRealDataMode()) return realGetAdminPlayerSocialLinks(id, signal)
   if ((await getAdminSession()).kind !== 'owner')
     throw new MockError('permission', 'Only ROTRA Admin can view player management.')
   await delay(400, signal)
   const profile = readMockState().playerProfiles.find((entry) => entry.playerId === id)
-  return profile ? { socialLinks: profile.socialLinks } : null
+  return profile
+    ? { socialLinks: profile.socialLinks, ...resolveMockProfileBanner(profile.bannerId) }
+    : null
 }
 
 const EMPTY_LINKS = { facebook: '', instagram: '', youtube: '', linkedin: '' }

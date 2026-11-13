@@ -13,6 +13,7 @@ const seeded: ProfileBannerTile[] = PROFILE_BANNERS.map((banner, i) => ({
   name: banner.name,
   bannerKey: banner.key,
   shown: true,
+  isDefault: banner.key === 'court',
 }))
 const withUpload: ProfileBannerTile[] = [
   ...seeded,
@@ -23,7 +24,7 @@ const someHidden = withUpload.map((banner, i) => ({ ...banner, shown: i % 3 !== 
 const meta = {
   title: 'Admin/ProfileBannersPage',
   component: ProfileBannersPage,
-  args: { banners: seeded, onFiles: fn(), onToggle: fn(), onDelete: fn() },
+  args: { banners: seeded, onFiles: fn(), onToggle: fn(), onDelete: fn(), onMakeDefault: fn() },
   decorators: [(Story) => <div className="flex max-w-[960px] flex-col gap-4">{Story()}</div>],
 } satisfies Meta<typeof ProfileBannersPage>
 export default meta

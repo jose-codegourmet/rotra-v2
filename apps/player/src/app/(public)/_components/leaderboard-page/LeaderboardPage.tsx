@@ -4,7 +4,7 @@ import { useLeaderboard } from '@rotra/data/leaderboard/useLeaderboard'
 import { useLeaderboardSearch } from '@rotra/data/leaderboard/useLeaderboardSearch'
 import { useMyLeaderboardPosition } from '@rotra/data/leaderboard/useMyLeaderboardPosition'
 import { rankDisplayStatus } from '@rotra/data/player/rules'
-import { PLAYING_LEVELS } from '@rotra/data/player/types'
+import { PLAYING_LEVELS, type PlayingLevel } from '@rotra/data/player/types'
 import { usePlayerProfile } from '@rotra/data/player/usePlayerProfile'
 import { usePlayerRank } from '@rotra/data/player/usePlayerRank'
 import { useRankingSettings } from '@rotra/data/ranking-settings'
@@ -26,6 +26,7 @@ import { type PodiumEntry, TopThreePodium } from '@rotra/ui/top-three-podium'
 import { type InfiniteData, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { ProfileCard, type ProfileCardPerson } from '@/app/_components/profile-card/ProfileCard'
 import { pictureSrc } from '@/app/_components/profile-picture/pictureSrc'
 import { useAppSelector } from '@/store/hooks'
 import { selectAccount } from '@/store/slices/authSlice'
@@ -52,6 +53,8 @@ export function LeaderboardPage() {
   const position = useMyLeaderboardPosition(account?.id)
   const ownProfile = usePlayerProfile(account?.id ?? '')
   const photo = usePhotoViewer()
+  // Artifact comment, 2026-11-13: a podium spot or a row opens the profile card first.
+  const [card, setCard] = useState<ProfileCardPerson | null>(null)
   const entries = board.data?.pages.flatMap((page) => page.entries) ?? []
   const total = board.data?.pages[0]?.total ?? 0
   const nameSearch = Boolean(query.trim()) && !/^RTR-/i.test(query.trim())
@@ -73,6 +76,24 @@ export function LeaderboardPage() {
   const podium = !loading && !failed && !empty && !nameSearch && total >= 3 && entries.length >= 3
   const shownEntries = nameSearch ? (search.data?.hits ?? []) : entries.slice(podium ? 3 : 0)
   const openProfile = (id: string) => router.push(`/players/${id}`)
+  const openCard = (entry: {
+    id: string
+    fullName: string
+    nickname: string | null
+    pictureUrl: string | null
+    playingLevel: PlayingLevel
+    masked?: boolean
+    levelHidden?: boolean
+  }) =>
+    setCard({
+      playerId: entry.id,
+      name: entry.fullName,
+      nickname: entry.nickname,
+      picture: entry.pictureUrl,
+      level: entry.levelHidden ? null : entry.playingLevel,
+      isYou: entry.id === account?.id,
+      masked: !!entry.masked,
+    })
   const changeQuery = (value: string) => {
     setQuery(value)
     setJumpToMe(false)
@@ -186,7 +207,7 @@ export function LeaderboardPage() {
             totalPlayers={total}
             onSelect={(i) => {
               const entry = entries[i]
-              if (entry) openProfile(entry.id)
+              if (entry) openCard(entry)
             }}
           />
         ) : null}
@@ -293,7 +314,7 @@ export function LeaderboardPage() {
                     variant={
                       entry.position <= 3 ? `medal-${entry.position as 1 | 2 | 3}` : undefined
                     }
-                    onSelect={() => openProfile(entry.id)}
+                    onSelect={() => openCard(entry)}
                   />
                 ))}
               </LeaderboardList>
@@ -312,6 +333,7 @@ export function LeaderboardPage() {
           />
         ) : null}
         {photo.viewerProps ? <PhotoViewer {...photo.viewerProps} /> : null}
+        <ProfileCard person={card} onClose={() => setCard(null)} />
       </main>
     </PullToRefresh>
   )

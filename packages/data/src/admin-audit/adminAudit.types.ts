@@ -44,6 +44,7 @@ export type AdminAuditAction =
   | 'profile_banner_hidden'
   | 'profile_banner_deleted'
   | 'profile_banner_restored'
+  | 'profile_banner_default'
 
 /**
  * One line of the Admin "Record of actions": who did what to which record, and when. Append-only;

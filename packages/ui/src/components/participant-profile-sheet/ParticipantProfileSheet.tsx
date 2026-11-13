@@ -2,16 +2,16 @@
 
 import type { ParticipantStats, ParticipantTonight } from '@rotra/data/public-session/types'
 import { Button } from '@rotra/ui/button'
+import { Icon } from '@rotra/ui/icon'
 import { IdentityChip } from '@rotra/ui/identity-chip'
 import { KeyValueList } from '@rotra/ui/key-value-list'
 import {
   ProfileBannerCard,
   ProfileCardSection,
   ProfileLevelBadge,
-  ProfileStatTiles,
+  ProfileStatsSection,
 } from '@rotra/ui/profile-banner-card'
 import { Sheet } from '@rotra/ui/sheet'
-import { Skeleton } from '@rotra/ui/skeleton'
 
 export type ParticipantProfileSheetProps = {
   open: boolean
@@ -22,31 +22,40 @@ export type ParticipantProfileSheetProps = {
   photoUrl?: string
   /** Opens the full photo (#716); without it the picture is not a button */
   onPhotoClick?: () => void
-  /** The player's Profile banner key; missing draws the accent gradient */
+  /** The player's resolved Profile banner key (the Admin default when they picked none) */
   bannerKey?: string | null
   /** An Admin-uploaded banner image; wins over bannerKey */
   bannerImageUrl?: string | null
   /** Full playing level for the badge, e.g. “Intermediate High”; null reads “No level yet” */
   levelLabel: string | null
-  /** The Tonight · line; null when the player is not on tonight's roster */
+  /** The status pill; pass it only while the session is live and the player is on its roster */
   tonight?: ParticipantTonight | null
   /** City the profile was first registered in (from the RTR ID) */
   registeredCity: string | null
+  /** The Copy RTR ID button under the name */
   rtrId: string | null
-  /** Stats · last 90 days; null is “No games yet” */
+  /** The calendar year the stats count (Stats · YEAR) */
+  year: number
+  /** Stats · YEAR; null is “No games yet this year” */
   stats: ParticipantStats | null
   /** While the stats read is loading */
   statsLoading?: boolean
-  /** The stats read failed: the section says so instead of “No games yet” */
+  /** The stats read failed: the section says so instead of “No games yet this year” */
   statsError?: boolean
-  /** The Player app's public profile (`/find/<RTR>`), opened in a new tab; hidden when missing */
+  /**
+   * The Player app's public profile (`/find/<RTR>`), opened in a new tab from the icon right of the
+   * name and from Open ROTRA profile; both hidden when missing
+   */
   profileHref?: string | null
+  /** Share profile in the footer (the share dialog); hidden when missing */
+  onShare?: () => void
 }
 
 /**
  * D-PARTICIPANT-PROFILE, full card: the session page's participant profile for a signed-in ROTRA
- * Player. Banner card with the Registered chip and level badge, the Tonight · line, boxed About
- * (Registered in, RTR ID) and Stats · last 90 days; footer Close and Open ROTRA profile.
+ * Player. Header-less banner card with the name block (display name, new-tab icon, full name, Copy
+ * RTR ID), the Registered chip and level badge, the status pill while live, boxed About (Registered
+ * in) and Stats · YEAR; footer Close, Share profile and Open ROTRA profile (new tab).
  */
 export function ParticipantProfileSheet({
   open,
@@ -61,24 +70,38 @@ export function ParticipantProfileSheet({
   tonight,
   registeredCity,
   rtrId,
+  year,
   stats,
   statsLoading = false,
   statsError = false,
   profileHref,
+  onShare,
 }: ParticipantProfileSheetProps) {
   return (
     <Sheet
       open={open}
       onOpenChange={onOpenChange}
-      title={name}
-      bodyClassName="p-0"
+      title={nickname || name}
+      headerless
       footer={
         <>
           <Button onClick={() => onOpenChange(false)}>Close</Button>
+          {rtrId && onShare ? (
+            <Button onClick={onShare}>
+              <Icon name="share" size={16} />
+              Share profile
+            </Button>
+          ) : null}
           {profileHref ? (
             <Button asChild variant="primary">
-              <a href={profileHref} target="_blank" rel="noopener noreferrer">
+              <a
+                href={profileHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Open ROTRA profile in a new tab"
+              >
                 Open ROTRA profile
+                <Icon name="external" size={16} />
               </a>
             </Button>
           ) : null}
@@ -88,6 +111,8 @@ export function ParticipantProfileSheet({
       <ProfileBannerCard
         name={name}
         nickname={nickname}
+        rtrId={rtrId}
+        profileLink={profileHref ? { href: profileHref, newTab: true } : null}
         photoUrl={photoUrl}
         onPhotoClick={onPhotoClick}
         bannerKey={bannerKey}
@@ -101,27 +126,14 @@ export function ParticipantProfileSheet({
         tonight={tonight}
       >
         <ProfileCardSection label="About">
-          <KeyValueList
-            items={[
-              { label: 'Registered in', value: registeredCity ?? '—' },
-              {
-                label: 'RTR ID',
-                value: rtrId ? <span className="font-mono text-[13px]">{rtrId}</span> : '—',
-              },
-            ]}
-          />
+          <KeyValueList items={[{ label: 'Registered in', value: registeredCity ?? '—' }]} />
         </ProfileCardSection>
-        <ProfileCardSection label="Stats · last 90 days">
-          {statsLoading ? (
-            <Skeleton label="Loading stats" className="h-[136px] rounded-lg" />
-          ) : statsError ? (
-            <p className="m-0 text-fg2">Couldn't load these stats. Try again later.</p>
-          ) : stats ? (
-            <ProfileStatTiles stats={stats} />
-          ) : (
-            <p className="m-0 text-fg2">No games yet</p>
-          )}
-        </ProfileCardSection>
+        <ProfileStatsSection
+          year={year}
+          stats={stats}
+          loading={statsLoading}
+          error={statsError}
+        />
       </ProfileBannerCard>
     </Sheet>
   )

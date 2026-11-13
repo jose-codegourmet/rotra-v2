@@ -32,6 +32,8 @@ export type CourtDrawingProps = {
   showLevels?: boolean
   /** Opens a player's profile */
   onOpenProfile?: (playerId: string) => void
+  /** Faces are named “NAME. View profile” (the public session page) instead of with their team */
+  plainProfileLabel?: boolean
   className?: string
 }
 
@@ -72,6 +74,7 @@ export function CourtDrawing({
   minimumGames,
   showLevels = false,
   onOpenProfile,
+  plainProfileLabel = false,
   className,
 }: CourtDrawingProps) {
   const height = COURT_H * courts
@@ -97,7 +100,11 @@ export function CourtDrawing({
                 photoUrl={p.photoUrl}
                 size={sizeFor(n)}
                 compact={n >= 4}
-                label={profileLabel(p, team, minimumGames)}
+                label={
+                  plainProfileLabel
+                    ? `${p.name}. View profile`
+                    : profileLabel(p, team, minimumGames)
+                }
                 onClick={() => onOpenProfile(p.id)}
                 className={courtFaceClass(n)}
               />

@@ -1,13 +1,16 @@
 'use client'
 
-import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
 import { Chip } from '@rotra/ui/chip'
+import { Icon } from '@rotra/ui/icon'
 import { KeyValueList } from '@rotra/ui/key-value-list'
-import { ProfileBanner } from '@rotra/ui/profile-banner'
+import {
+  ProfileBannerCard,
+  ProfileCardSection,
+  ProfileStatsSection,
+  profileStats,
+} from '@rotra/ui/profile-banner-card'
 import { Sheet } from '@rotra/ui/sheet'
-import { Skeleton } from '@rotra/ui/skeleton'
-import type { ReactNode } from 'react'
 
 export type ClubMemberProfile =
   | {
@@ -22,8 +25,9 @@ export type ClubMemberProfile =
       isYou: boolean
       /** City the profile was first registered in (from the RTR ID) */
       registeredCity: string | null
+      /** The Copy player ID button under the name */
       rtrId: string | null
-      /** Counted games in the last 90 days; null while unknown */
+      /** Counted games this calendar year; null while unknown */
       stats: { games: number; wins: number; losses: number } | null
       bannerKey?: string | null
       bannerImageUrl?: string | null
@@ -34,6 +38,7 @@ export type ClubMemberProfile =
       /** The masked name ("J*** D***") */
       name: string
       picture?: string | null
+      /** The player's own banner: the picture and banner stay public */
       bannerKey?: string | null
       bannerImageUrl?: string | null
     }
@@ -42,140 +47,116 @@ export type ClubMemberProfileSheetProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   profile: ClubMemberProfile
+  /** The calendar year the stats count (Stats · YEAR) */
+  year: number
   /** The stats are still loading */
   loading?: boolean
+  /** The profile page (`/players/<id>`): the forward icon right of the name */
+  profileHref: string
+  /** Open ROTRA profile and the name icon: in-app navigation, same tab (the card closes) */
   onOpenFullProfile: () => void
+  /** Share profile (the share dialog for this player); hidden when missing */
+  onShare?: () => void
   /** Opens the full photo; the picture is a button only when given and a photo is set */
   onViewPhoto?: () => void
 }
 
-function Section({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div className="flex flex-col gap-2 rounded-lg border border-border bg-bg px-3.5 py-3">
-      <span className="text-[11px] font-bold tracking-[0.6px] text-fg2 uppercase">{label}</span>
-      {children}
-    </div>
-  )
-}
-
 /**
- * The profile dialog a club member opens (P-CLUB-PAGE grid and P-CLUB-MEMBERS): a banner card with
- * the round picture, name and nickname, level, #N overall and You, then About and Stats · last 90
- * days. A masked member opens the private card instead. The banner header is self-contained here.
+ * The profile dialog in ROTRA Player (D-PARTICIPANT-PROFILE): club page members, the leaderboard.
+ * A header-less banner card with the round picture, the name block (display name with a forward
+ * arrow to the profile, full name, Copy player ID), level, #N overall and You, then About
+ * (Registered in) and Stats · YEAR. Footer Close, Share profile and Open ROTRA profile (same tab).
+ * A masked member opens the private card with their own banner.
  */
 export function ClubMemberProfileSheet({
   open,
   onOpenChange,
   profile,
+  year,
   loading = false,
+  profileHref,
   onOpenFullProfile,
+  onShare,
   onViewPhoto,
 }: ClubMemberProfileSheetProps) {
-  const isPublic = profile.kind === 'public'
-  const head = (
-    <>
-      <ProfileBanner
-        bannerKey={isPublic ? profile.bannerKey : null}
-        imageUrl={isPublic ? profile.bannerImageUrl : null}
-        className="h-[84px]"
-      />
-      <div className="absolute top-11 left-5">
-        <Avatar
+  if (profile.kind === 'private')
+    return (
+      <Sheet
+        open={open}
+        onOpenChange={onOpenChange}
+        title={profile.name}
+        headerless
+        footer={<Button onClick={() => onOpenChange(false)}>Close</Button>}
+      >
+        <ProfileBannerCard
           name={profile.name}
-          src={profile.picture ?? undefined}
-          size={64}
-          className="shadow-[0_0_0_5px_var(--surface)]"
-          onView={isPublic ? onViewPhoto : undefined}
-        />
-      </div>
-    </>
-  )
-  const name = (
-    <div className="flex flex-wrap items-baseline gap-2">
-      <b className="text-xl font-extrabold tracking-[-0.2px]">{profile.name}</b>
-      {isPublic && profile.nickname ? <span className="text-fg2">“{profile.nickname}”</span> : null}
-    </div>
-  )
-  const stats = isPublic ? profile.stats : null
+          photoUrl={profile.picture ?? undefined}
+          bannerKey={profile.bannerKey}
+          bannerImageUrl={profile.bannerImageUrl}
+          chips={<Chip>Private profile</Chip>}
+        >
+          <ProfileCardSection label="Private">
+            <p className="m-0 text-fg2">
+              This player has chosen to keep their ROTRA profile private. You can see their picture
+              and banner; their name, level and games stay between them and their clubs.
+            </p>
+          </ProfileCardSection>
+        </ProfileBannerCard>
+      </Sheet>
+    )
+  const stats = profile.stats
   return (
     <Sheet
       open={open}
       onOpenChange={onOpenChange}
-      title={profile.name}
+      title={profile.nickname || profile.name}
+      headerless
       footer={
         <>
           <Button onClick={() => onOpenChange(false)}>Close</Button>
-          {isPublic ? (
-            <Button variant="primary" onClick={onOpenFullProfile}>
-              Open full profile
+          {onShare ? (
+            <Button onClick={onShare}>
+              <Icon name="share" size={16} />
+              Share profile
             </Button>
           ) : null}
+          <Button variant="primary" onClick={onOpenFullProfile}>
+            Open ROTRA profile
+          </Button>
         </>
       }
     >
-      <div className="relative -mx-5 -mt-2.5">
-        {head}
-        <div className="flex flex-col gap-3 px-5 pt-[52px]">
-          {name}
-          {isPublic ? (
-            <>
-              <div className="flex flex-wrap gap-2">
-                <Chip tone={profile.levelLabel ? 'accent' : 'neutral'}>
-                  {profile.levelLabel ?? 'Not ranked yet'}
-                </Chip>
-                {profile.position ? (
-                  <Chip>#{profile.position.toLocaleString('en-US')} overall</Chip>
-                ) : null}
-                {profile.isYou ? <Chip tone="accent">You</Chip> : null}
-              </div>
-              <Section label="About">
-                <KeyValueList
-                  items={[
-                    { label: 'Registered in', value: profile.registeredCity ?? '—' },
-                    { label: 'RTR ID', value: <code>{profile.rtrId ?? '—'}</code> },
-                  ]}
-                />
-              </Section>
-              <Section label="Stats · last 90 days">
-                {loading ? (
-                  <Skeleton className="h-[132px]" />
-                ) : stats?.games ? (
-                  <dl className="m-0 grid grid-cols-2 gap-2">
-                    {[
-                      ['Games', stats.games],
-                      ['Wins', stats.wins],
-                      ['Losses', stats.losses],
-                      ['Win rate', `${Math.round((stats.wins / stats.games) * 100)}%`],
-                    ].map(([label, value]) => (
-                      <div
-                        key={label}
-                        className="rounded-lg border border-border bg-surface px-3 py-2.5"
-                      >
-                        <dt className="text-xs font-semibold text-fg2">{label}</dt>
-                        <dd className="m-0 mt-0.5 text-xl font-extrabold tabular-nums">{value}</dd>
-                      </div>
-                    ))}
-                  </dl>
-                ) : (
-                  <p className="m-0 text-fg2">No games yet</p>
-                )}
-              </Section>
-            </>
-          ) : (
-            <>
-              <div className="flex flex-wrap gap-2">
-                <Chip>Private profile</Chip>
-              </div>
-              <Section label="Private">
-                <p className="m-0 text-fg2">
-                  This player has chosen to keep their ROTRA profile private. You can see their
-                  picture and banner; their name, level and games stay between them and their clubs.
-                </p>
-              </Section>
-            </>
-          )}
-        </div>
-      </div>
+      <ProfileBannerCard
+        name={profile.name}
+        nickname={profile.nickname}
+        rtrId={profile.rtrId}
+        idLabel="player ID"
+        profileLink={{ href: profileHref, newTab: false, onNavigate: onOpenFullProfile }}
+        photoUrl={profile.picture ?? undefined}
+        onPhotoClick={onViewPhoto}
+        bannerKey={profile.bannerKey}
+        bannerImageUrl={profile.bannerImageUrl}
+        chips={
+          <>
+            <Chip tone={profile.levelLabel ? 'accent' : 'neutral'}>
+              {profile.levelLabel ?? 'Not ranked yet'}
+            </Chip>
+            {profile.position ? (
+              <Chip>#{profile.position.toLocaleString('en-US')} overall</Chip>
+            ) : null}
+            {profile.isYou ? <Chip tone="accent">You</Chip> : null}
+          </>
+        }
+      >
+        <ProfileCardSection label="About">
+          <KeyValueList items={[{ label: 'Registered in', value: profile.registeredCity ?? '—' }]} />
+        </ProfileCardSection>
+        <ProfileStatsSection
+          year={year}
+          loading={loading}
+          stats={stats ? profileStats(stats.games, stats.wins) : null}
+        />
+      </ProfileBannerCard>
     </Sheet>
   )
 }

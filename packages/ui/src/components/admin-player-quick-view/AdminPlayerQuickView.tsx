@@ -1,6 +1,7 @@
 'use client'
 import type { AdminPlayer } from '@rotra/data/admin-player/types'
 import type { PlayerProfile, PlayerSessionRecord } from '@rotra/data/player/types'
+import type { ParticipantStats } from '@rotra/data/public-session/types'
 import {
   AdminEditPlayerForm,
   type AdminEditPlayerFormProps,
@@ -12,8 +13,10 @@ import { Chip } from '@rotra/ui/chip'
 import { cn } from '@rotra/ui/cn'
 import { ErrorState } from '@rotra/ui/error-state'
 import { Field } from '@rotra/ui/field'
+import { Icon } from '@rotra/ui/icon'
 import { LEVEL_OPTION_GROUPS } from '@rotra/ui/level-select'
 import { Notice } from '@rotra/ui/notice'
+import { ProfileBannerCard, ProfileStatsSection } from '@rotra/ui/profile-banner-card'
 import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { Sheet } from '@rotra/ui/sheet'
 import { Skeleton } from '@rotra/ui/skeleton'
@@ -36,7 +39,8 @@ export type AdminPlayerQuickViewProps = {
   historyHref: string
   /** Retained for existing callers; directory actions belong outside the compact panel. */
   actions?: ReactNode
-  onCopyId: () => void
+  /** Retained for existing callers; the card's own Copy RTR ID button under the name copies now */
+  onCopyId?: () => void
   /** Actual links from this player's public profile; never generated from their name. */
   socialLinks?: PlayerProfile['socialLinks']
   /**
@@ -55,6 +59,18 @@ export type AdminPlayerQuickViewProps = {
    * picture preview. Esc closes the viewer only; this panel stays open behind it.
    */
   onViewPhoto?: (photo: { src: string; name: string }) => void
+  /** The player's resolved banner (the Admin default for no pick and unclaimed players) */
+  bannerKey?: string | null
+  bannerImageUrl?: string | null
+  /** The calendar year the stats count (Stats · YEAR) */
+  year?: number
+  /** Stats · YEAR from the same games as History; null is “No games yet this year” */
+  stats?: ParticipantStats | null
+  statsLoading?: boolean
+  /** The Player app's `/find/<RTR>` profile: the new-tab icon right of the name */
+  rotraProfileHref?: string | null
+  /** Share profile in the footer (between Full history and Full profile); registered players only */
+  onShare?: () => void
 }
 
 export function AdminPlayerQuickView(props: AdminPlayerQuickViewProps) {
@@ -73,7 +89,6 @@ function QuickViewPanel({
   onRetryGames,
   profileHref,
   historyHref,
-  onCopyId,
   socialLinks,
   edit,
   onInvite,
@@ -83,6 +98,13 @@ function QuickViewPanel({
   onCopyRegistrationLink,
   initialMode = 'view',
   onViewPhoto,
+  bannerKey,
+  bannerImageUrl,
+  year,
+  stats = null,
+  statsLoading = false,
+  rotraProfileHref,
+  onShare,
 }: AdminPlayerQuickViewProps) {
   const [mode, setMode] = useState(initialMode)
   const level =
@@ -101,6 +123,9 @@ function QuickViewPanel({
     return href && /^https?:\/\//i.test(href) ? [{ label, href }] : []
   })
   const back = () => setMode('view')
+  // Quick view (2026-11-13-admin-default-banner-quick-view): the banner profile card, edge to edge.
+  const card = mode === 'view' && !!p && !error
+  const photoSrc = p ? profilePictureSrc(p.picture, p.id, p.name) : undefined
   const hero = p ? (
     <div
       className={cn(
@@ -149,8 +174,15 @@ function QuickViewPanel({
         if (!value) onClose()
       }}
       side
+      headerless={card}
       title={
-        mode === 'edit' ? 'Edit profile' : mode === 'invite' ? 'Invite to ROTRA' : 'Quick view'
+        mode === 'edit'
+          ? 'Edit profile'
+          : mode === 'invite'
+            ? 'Invite to ROTRA'
+            : card && p
+              ? p.nickname || p.name
+              : 'Quick view'
       }
       dismissible={!edit?.isPending}
       hideClose={edit?.isPending}
@@ -167,6 +199,12 @@ function QuickViewPanel({
                   Full history
                 </Link>
               </Button>
+              {p.rtrId && onShare ? (
+                <Button onClick={onShare}>
+                  <Icon name="share" size={16} />
+                  Share profile
+                </Button>
+              ) : null}
               <Button asChild variant="primary">
                 <Link href={profileHref} aria-label="View full profile" onClick={onClose}>
                   Full profile
@@ -212,7 +250,7 @@ function QuickViewPanel({
         <Skeleton label="Loading player" />
       ) : (
         <>
-          {hero}
+          {card ? null : hero}
           {mode === 'edit' ? (
             edit ? (
               <AdminEditPlayerForm
@@ -252,7 +290,29 @@ function QuickViewPanel({
               </ul>
             </>
           ) : (
-            <>
+            <ProfileBannerCard
+              name={p.name}
+              nickname={p.nickname}
+              rtrId={p.rtrId}
+              profileLink={
+                p.rtrId && rotraProfileHref ? { href: rotraProfileHref, newTab: true } : null
+              }
+              photoUrl={photoSrc}
+              onPhotoClick={
+                photoSrc && onViewPhoto
+                  ? () => onViewPhoto({ src: photoSrc, name: p.name })
+                  : undefined
+              }
+              pictureSize={72}
+              bannerKey={bannerKey}
+              bannerImageUrl={bannerImageUrl}
+              chips={
+                <>
+                  <Chip tone={level ? 'accent' : 'neutral'}>{level ?? 'No rank yet'}</Chip>
+                  <Chip>{p.claimed ? 'Registered' : 'Unclaimed'}</Chip>
+                </>
+              }
+            >
               {!p.claimed ? (
                 <div className="flex flex-wrap items-center justify-between gap-2.5 rounded-lg border border-dashed border-border-strong px-3 py-2.5">
                   <div className="flex min-w-0 flex-col gap-0.5">
@@ -275,19 +335,6 @@ function QuickViewPanel({
                 </div>
               ) : null}
               <dl className="grid grid-cols-[max-content_minmax(0,1fr)] gap-x-4 gap-y-2 text-sm max-[420px]:grid-cols-1 max-[420px]:gap-y-0 [&>dt]:text-fg2 [&>dd]:min-w-0 [&>dd]:[overflow-wrap:anywhere] max-[420px]:[&>dd]:mb-2">
-                <dt>ID</dt>
-                <dd className="flex flex-wrap items-center gap-2">
-                  {p.rtrId ? (
-                    <>
-                      <span className="font-mono">{p.rtrId}</span>
-                      <Button size="xs" variant="ghost" onClick={onCopyId}>
-                        Copy
-                      </Button>
-                    </>
-                  ) : (
-                    <span className="text-fg2">Not registered yet</span>
-                  )}
-                </dd>
                 <dt>Phone</dt>
                 <dd className="font-mono">{p.phone || 'Not given'}</dd>
                 <dt>Email</dt>
@@ -311,6 +358,9 @@ function QuickViewPanel({
                   )}
                 </dd>
               </dl>
+              {year !== undefined ? (
+                <ProfileStatsSection year={year} stats={stats} loading={statsLoading} />
+              ) : null}
               <AdminPlayerHistory
                 variant="compact"
                 name={p.name}
@@ -325,7 +375,7 @@ function QuickViewPanel({
                 page={1}
                 onChange={() => {}}
               />
-            </>
+            </ProfileBannerCard>
           )}
         </>
       )}

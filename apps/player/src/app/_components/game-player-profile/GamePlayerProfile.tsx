@@ -1,5 +1,6 @@
 'use client'
 import { registeredCity } from '@rotra/data/club-player/fetchers'
+import { statsYear } from '@rotra/data/player/rules'
 import { PLAYING_LEVELS } from '@rotra/data/player/types'
 import { usePlayerGames } from '@rotra/data/player/usePlayerGames'
 import { usePlayerProfile } from '@rotra/data/player/usePlayerProfile'
@@ -85,7 +86,9 @@ export function GamePlayerProfile({
         open
         onOpenChange={close}
         profile={card}
+        year={statsYear(Date.now())}
         loading={!hidden && (games.isPending || profile.isPending)}
+        profileHref={`/players/${id}`}
         onOpenFullProfile={() => router.push(`/players/${id}`)}
         onViewPhoto={picture ? () => photo.show({ src: picture, name: player.name }) : undefined}
       />

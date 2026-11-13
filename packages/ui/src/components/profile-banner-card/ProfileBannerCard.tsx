@@ -1,24 +1,59 @@
+'use client'
+
 import type { ParticipantStats, ParticipantTonight } from '@rotra/data/public-session/types'
 import { Avatar } from '@rotra/ui/avatar'
+import { Button } from '@rotra/ui/button'
 import { Chip } from '@rotra/ui/chip'
 import { cn } from '@rotra/ui/cn'
+import { Icon } from '@rotra/ui/icon'
 import { ProfileBanner } from '@rotra/ui/profile-banner'
-import type { ReactNode } from 'react'
+import { Skeleton } from '@rotra/ui/skeleton'
+import { toast } from '@rotra/ui/toaster'
+import { type MouseEvent, type ReactNode, useRef } from 'react'
+
+/** Where the icon right of the name (and Open ROTRA profile) goes. */
+export type ProfileCardLink = {
+  /** The ROTRA profile: `/find/<RTR>` from Queue and Admin, `/players/<id>` inside Player */
+  href: string
+  /**
+   * true (Queue, Admin: another app): opens in a new tab, with the new-tab icon. false (inside the
+   * Player app): same tab, a forward arrow; pass onNavigate to route in the app.
+   */
+  newTab: boolean
+  /** Same-tab only: in-app navigation instead of a full page load (the card closes) */
+  onNavigate?: () => void
+}
 
 export type ProfileBannerCardProps = {
-  /** The name as this viewer may see it (masked on the private and guest cards) */
+  /** The full name as this viewer may see it (masked on the private and guest cards) */
   name: string
-  /** Shown in quotes beside the name */
+  /**
+   * With a nickname the card leads with it (the display name) and puts the full name under it in
+   * muted 14 px; without one the full name leads alone.
+   */
   nickname?: string | null
+  /** A muted line under the name when there is no nickname (the club card's city or username) */
+  subline?: ReactNode
+  /** The RTR ID: the tiny monospace Copy button under the name. None for guests and unclaimed records */
+  rtrId?: string | null
+  /** “RTR ID” (Queue, Admin) or “player ID” (Player): the Copy button's name and toast */
+  idLabel?: 'RTR ID' | 'player ID'
+  /** The icon right of the display name that opens the ROTRA profile; none when missing */
+  profileLink?: ProfileCardLink | null
   photoUrl?: string
   /**
    * Opens the full photo (PhotoViewer, D-PHOTO-VIEWER, #716). With a photo, the big picture becomes
-   * the Avatar view button named `photoLabel`; initials never open anything.
+   * the Avatar view button named `photoLabel`, with the eye on hover and focus; initials never open
+   * anything.
    */
   onPhotoClick?: () => void
   /** Accessible name of the photo button; defaults to “View full photo of NAME” */
   photoLabel?: string
-  /** The player's Profile banner key (court, night, dusk, ember, sun, stripe); without it or an image, the accent gradient */
+  /** Replaces the picture (the club card's round logo); give it the 5 px `--surface` ring yourself */
+  picture?: ReactNode
+  /** Picture size: 64 px (Queue and Player cards) or 72 px (Admin Quick view) */
+  pictureSize?: 64 | 72
+  /** The resolved Profile banner key (court, night, …); unknown or missing draws Court */
   bannerKey?: string | null
   /** An Admin-uploaded banner image; wins over bannerKey */
   bannerImageUrl?: string | null
@@ -26,35 +61,186 @@ export type ProfileBannerCardProps = {
   chips?: ReactNode
   /** The small muted identity line under the chips (Queue Master's card) */
   identityLine?: ReactNode
-  /** The Tonight · line; hidden when null or missing (not on tonight's roster) */
+  /**
+   * The status pill on the picture's bottom edge. Pass it only while the session is live: none on a
+   * prepared session, after Session done, or off the roster.
+   */
   tonight?: ParticipantTonight | null
   /** Boxed sections (ProfileCardSection) and anything that follows them */
   children?: ReactNode
   className?: string
 }
 
-/** “Playing · Court 2”, “On court · getting ready · Court 1”, “Queued · #3”, “Free”, “Away” */
+/** The pill's tooltip and accessible name: “Tonight · Playing · Court 2”, “Tonight · Free · waiting 12 min”. */
 export function tonightText(tonight: ParticipantTonight) {
   switch (tonight.kind) {
     case 'playing':
-      return `Playing · ${tonight.courtLabel}`
+      return `Tonight · Playing · ${tonight.courtLabel}`
     case 'getting-ready':
-      return `On court · getting ready · ${tonight.courtLabel}`
+      return `Tonight · On court · getting ready · ${tonight.courtLabel}`
     case 'queued':
-      return `Queued · #${tonight.position}`
+      return `Tonight · Queued · #${tonight.position}`
     case 'free':
-      return 'Free'
+      return tonight.restMinutes === undefined
+        ? 'Tonight · Free'
+        : `Tonight · Free · waiting ${tonight.restMinutes} min`
+    case 'away':
+      return 'Tonight · Away'
+  }
+}
+
+/** The pill's short label: Playing in Court N, Waiting in Court N, Queued #N, Free · N min, Away. */
+export function tonightPillLabel(tonight: ParticipantTonight) {
+  switch (tonight.kind) {
+    case 'playing':
+      return `Playing in ${tonight.courtLabel}`
+    case 'getting-ready':
+      return `Waiting in ${tonight.courtLabel}`
+    case 'queued':
+      return `Queued #${tonight.position}`
+    case 'free':
+      return tonight.restMinutes === undefined ? 'Free' : `Free · ${tonight.restMinutes} min`
     case 'away':
       return 'Away'
   }
 }
 
-const DOT: Record<ParticipantTonight['kind'], string> = {
-  playing: 'bg-accent',
-  'getting-ready': 'bg-warn',
-  queued: 'bg-fg2',
-  free: 'bg-fg2',
-  away: 'bg-border-strong',
+const ACCENT =
+  'border-[color-mix(in_srgb,var(--accent)_45%,var(--border-strong))] text-accent [&>i]:bg-accent'
+const WARN =
+  'border-[color-mix(in_srgb,var(--warn)_45%,var(--border-strong))] text-warn [&>i]:bg-warn'
+const ERROR =
+  'border-[color-mix(in_srgb,var(--error)_45%,var(--border-strong))] text-error [&>i]:bg-error'
+
+/** Live pills use the accent, getting ready the warning colour; Free is coloured like the queue tiles' wait. */
+function pillTone(tonight: ParticipantTonight) {
+  switch (tonight.kind) {
+    case 'playing':
+      return ACCENT
+    case 'getting-ready':
+      return WARN
+    case 'free': {
+      const mins = tonight.restMinutes
+      if (mins === undefined) return '[&>i]:bg-fg2'
+      return mins >= 16 ? ERROR : mins >= 10 ? WARN : ACCENT
+    }
+    case 'away':
+      return '[&>i]:bg-border-strong'
+    default:
+      return '[&>i]:bg-fg2'
+  }
+}
+
+/** The status pill centred on the picture's bottom edge; hover or focus shows the full line to its right. */
+function StatusPill({ tonight }: { tonight: ParticipantTonight }) {
+  const tip = tonightText(tonight)
+  return (
+    // biome-ignore lint/a11y/noNoninteractiveTabindex: focusable so keyboard users get the tooltip (the prototype's .pp-pill)
+    <span
+      role="note"
+      tabIndex={0}
+      aria-label={tip}
+      className={cn(
+        'group/pill absolute -bottom-2.5 left-1/2 z-2 inline-flex -translate-x-1/2 cursor-default items-center gap-[5px] rounded-full border border-border-strong bg-surface py-0.5 pr-2 pl-1.5',
+        'text-[11px] leading-4 font-bold whitespace-nowrap text-fg2',
+        'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent',
+        pillTone(tonight),
+      )}
+    >
+      <i aria-hidden className="size-2 flex-none rounded-full" />
+      {tonightPillLabel(tonight)}
+      <span
+        aria-hidden
+        className={cn(
+          'pointer-events-none absolute top-1/2 left-[calc(100%+8px)] -translate-y-1/2 rounded-lg bg-fg px-2.5 py-1.5 text-xs font-semibold text-bg shadow-sheet',
+          'opacity-0 transition-opacity duration-[120ms] group-hover/pill:opacity-100 group-focus-visible/pill:opacity-100 motion-reduce:transition-none',
+        )}
+      >
+        {tip}
+      </span>
+    </span>
+  )
+}
+
+/**
+ * The tiny monospace Copy button under the name: “Copy RTR ID <id>” → toast “RTR ID copied”
+ * (Queue, Admin), “Copy player ID <id>” → “Player ID copied” (Player). When the clipboard is refused
+ * the ID is selected instead: “ID selected. Copy it from your device menu.”
+ */
+export function ProfileIdCopyButton({
+  rtrId,
+  idLabel = 'RTR ID',
+}: {
+  rtrId: string
+  idLabel?: 'RTR ID' | 'player ID'
+}) {
+  const textRef = useRef<HTMLSpanElement>(null)
+  const copied = idLabel === 'RTR ID' ? 'RTR ID copied' : 'Player ID copied'
+  const fallback = () => {
+    const node = textRef.current
+    const selection = typeof window !== 'undefined' ? window.getSelection() : null
+    if (node && selection) {
+      const range = document.createRange()
+      range.selectNodeContents(node)
+      selection.removeAllRanges()
+      selection.addRange(range)
+    }
+    toast('ID selected. Copy it from your device menu.')
+  }
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(rtrId)
+      toast(copied)
+    } catch {
+      fallback()
+    }
+  }
+  return (
+    <Button
+      size="xs"
+      onClick={() => void copy()}
+      aria-label={`Copy ${idLabel} ${rtrId}`}
+      title={`Copy ${idLabel}`}
+      className="mt-1 h-[22px] min-h-[22px] gap-1 rounded-md px-1.5 font-mono text-[11px] font-medium tracking-[0.2px] text-fg2 hover:text-fg touch:min-h-[22px] touch:px-1.5 touch:text-[11px]"
+    >
+      <span ref={textRef}>{rtrId}</span>
+      <Icon name="copy" size={12} />
+    </Button>
+  )
+}
+
+/** The icon right of the display name: new tab (Queue, Admin) or a forward arrow (inside Player). */
+function NameLink({ link, displayName }: { link: ProfileCardLink; displayName: string }) {
+  const className =
+    'inline-grid size-7 flex-none place-items-center rounded-lg text-fg2 no-underline hover:bg-elev hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent'
+  if (link.newTab)
+    return (
+      <a
+        href={link.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={`Open ${displayName}'s ROTRA profile in a new tab`}
+        title="Open ROTRA profile in a new tab"
+        className={className}
+      >
+        <Icon name="external" size={16} />
+      </a>
+    )
+  return (
+    <a
+      href={link.href}
+      onClick={(event: MouseEvent<HTMLAnchorElement>) => {
+        if (!link.onNavigate || event.metaKey || event.ctrlKey || event.shiftKey) return
+        event.preventDefault()
+        link.onNavigate()
+      }}
+      aria-label={`Open ${displayName}'s ROTRA profile`}
+      title="Open ROTRA profile"
+      className={className}
+    >
+      <Icon name="forward" size={16} />
+    </a>
+  )
 }
 
 /** The level badge on the chip row: “Intermediate High”, “… tonight”, “… · suggestion”. */
@@ -90,7 +276,7 @@ export function ProfileCardSection({
   )
 }
 
-/** Stats · last 90 days as four tiles (Games, Wins, Losses, Win rate). */
+/** Stats · YEAR as four tiles (Games, Wins, Losses, Win rate). */
 export function ProfileStatTiles({ stats }: { stats: ParticipantStats }) {
   const tiles = [
     { label: 'Games', value: stats.games },
@@ -111,18 +297,64 @@ export function ProfileStatTiles({ stats }: { stats: ParticipantStats }) {
 }
 
 /**
- * The profile card (D-PARTICIPANT-PROFILE): a banner strip (the player's Profile banner, else the accent gradient), the big picture
- * overlapping its bottom edge with a surface-coloured ring, the name in bold with the nickname in
- * quotes, the chip row, an optional identity line, the Tonight · status line, then boxed sections.
- * Shared by the session page's participant cards and the Queue Master's player profile. Put it in a
- * Sheet with `bodyClassName="p-0"` so the banner runs edge to edge.
+ * The one stats block of every profile card (Queue cards, Player card, Admin Quick view): “Stats ·
+ * YEAR”, the current calendar year, reset on January 1. Four tiles, or “No games yet this year”.
+ */
+export function ProfileStatsSection({
+  year,
+  stats,
+  loading = false,
+  error = false,
+}: {
+  /** The calendar year counted (statsYear from @rotra/data/player/rules) */
+  year: number
+  /** null is “No games yet this year” */
+  stats: ParticipantStats | null
+  loading?: boolean
+  /** The read failed: says so instead of “No games yet this year” */
+  error?: boolean
+}) {
+  return (
+    <ProfileCardSection label={`Stats · ${year}`}>
+      {loading ? (
+        <Skeleton label="Loading stats" className="h-[136px] rounded-lg" />
+      ) : error ? (
+        <p className="m-0 text-fg2">Couldn't load these stats. Try again later.</p>
+      ) : stats && stats.games > 0 ? (
+        <ProfileStatTiles stats={stats} />
+      ) : (
+        <p className="m-0 text-fg2">No games yet this year</p>
+      )}
+    </ProfileCardSection>
+  )
+}
+
+/** Games and wins to the four tiles' numbers (win rate a whole percent); null without games. */
+export function profileStats(games: number, wins: number): ParticipantStats | null {
+  if (!games) return null
+  return { games, wins, losses: games - wins, winRate: Math.round((wins / games) * 100) }
+}
+
+/**
+ * The profile card (D-PARTICIPANT-PROFILE, D-CLUB-PROFILE, Admin Quick view): no title bar; the
+ * banner's top half as a 5:1 strip from the card's top edge, the round picture centred on its
+ * bottom edge (with the status pill while live), then the name block (display name with the profile
+ * icon, the full name under it when there is a nickname, the tiny Copy RTR ID button), the chip row,
+ * an optional identity line and boxed sections. Put it in a `headerless` Sheet so the banner runs to
+ * the top edge and the × floats on it.
  */
 export function ProfileBannerCard({
   name,
   nickname,
+  subline,
+  rtrId,
+  idLabel = 'RTR ID',
+  profileLink,
   photoUrl,
   onPhotoClick,
   photoLabel,
+  picture,
+  pictureSize = 64,
   bannerKey,
   bannerImageUrl,
   chips,
@@ -131,54 +363,53 @@ export function ProfileBannerCard({
   children,
   className,
 }: ProfileBannerCardProps) {
+  const displayName = nickname || name
+  const second = nickname ? name : subline
   return (
     <div className={cn('relative min-w-0', className)}>
-      {bannerKey || bannerImageUrl ? (
-        <ProfileBanner bannerKey={bannerKey} imageUrl={bannerImageUrl} className="h-[84px]" />
-      ) : (
-        <div
-          aria-hidden
-          className="h-[84px] bg-[linear-gradient(135deg,var(--accent-dim),var(--accent)_55%,var(--accent-subtle))]"
-        />
-      )}
-      <div className="absolute top-[44px] left-5">
-        <Avatar
-          name={name}
-          src={photoUrl}
-          size={64}
-          className="shadow-[0_0_0_5px_var(--surface)]"
-          onView={onPhotoClick}
-          viewLabel={photoLabel}
-        />
+      <ProfileBanner strip bannerKey={bannerKey} imageUrl={bannerImageUrl} />
+      <div
+        className={cn(
+          'relative z-1 ml-5 w-max',
+          pictureSize === 72 ? '-mt-9' : '-mt-8',
+        )}
+      >
+        {picture ?? (
+          <Avatar
+            name={name}
+            src={photoUrl}
+            size={64}
+            className={cn(
+              'shadow-[0_0_0_5px_var(--surface)]',
+              pictureSize === 72 && 'size-[72px] text-[22px]',
+            )}
+            onView={onPhotoClick}
+            viewLabel={photoLabel}
+            viewEye
+          />
+        )}
+        {tonight ? <StatusPill tonight={tonight} /> : null}
       </div>
-      <div className="flex min-w-0 flex-col gap-3 px-5 pt-[52px] pb-5">
-        <div className="flex min-w-0 flex-wrap items-baseline gap-2">
-          <b className="text-[20px] font-extrabold tracking-[-0.2px] [overflow-wrap:anywhere]">
-            {name}
-          </b>
-          {nickname ? (
-            <span className="text-fg2 [overflow-wrap:anywhere]">“{nickname}”</span>
+      <div
+        className={cn(
+          'flex min-w-0 flex-col gap-3 px-5 pb-5',
+          tonight ? 'pt-5' : pictureSize === 72 ? 'pt-2.5' : 'pt-3',
+        )}
+      >
+        <div className="flex min-w-0 flex-col items-start gap-0.5">
+          <span className="inline-flex max-w-full min-w-0 items-center gap-1.5">
+            <b className="text-[20px] font-extrabold tracking-[-0.2px] [overflow-wrap:anywhere]">
+              {displayName}
+            </b>
+            {profileLink ? <NameLink link={profileLink} displayName={displayName} /> : null}
+          </span>
+          {second ? (
+            <span className="text-sm text-fg2 [overflow-wrap:anywhere]">{second}</span>
           ) : null}
+          {rtrId ? <ProfileIdCopyButton rtrId={rtrId} idLabel={idLabel} /> : null}
         </div>
         {chips ? <div className="flex flex-wrap items-center gap-2">{chips}</div> : null}
         {identityLine ? <span className="text-[13px] text-fg2">{identityLine}</span> : null}
-        {tonight ? (
-          <div
-            className={cn(
-              'inline-flex items-center gap-2 text-[13px] font-semibold text-fg2',
-              tonight.kind === 'playing' && 'text-accent',
-            )}
-          >
-            <span
-              aria-hidden
-              className={cn(
-                'size-2.5 flex-none rounded-full shadow-[0_0_0_3px_var(--surface),0_0_0_4px_var(--border-strong)]',
-                DOT[tonight.kind],
-              )}
-            />
-            Tonight · {tonightText(tonight)}
-          </div>
-        ) : null}
         {children}
       </div>
     </div>

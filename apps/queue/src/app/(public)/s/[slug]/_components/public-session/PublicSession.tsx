@@ -51,6 +51,7 @@ import { JoinRequestSheet } from '@/app/(public)/s/[slug]/_components/join-reque
 import { MatchRequest } from '@/app/(public)/s/[slug]/_components/match-request/MatchRequest'
 import { useRequestMatchAction } from '@/app/(public)/s/[slug]/_components/match-request/useRequestMatchAction'
 import { MyNight } from '@/app/(public)/s/[slug]/_components/my-night/MyNight'
+import { ClubCard } from '@/app/(public)/s/[slug]/_components/club-card/ClubCard'
 import { ParticipantProfile } from '@/app/(public)/s/[slug]/_components/participant-profile/ParticipantProfile'
 import { SessionInviteSheet } from '@/app/(public)/s/[slug]/_components/session-invite-sheet/SessionInviteSheet'
 
@@ -199,11 +200,22 @@ function joinCardProps(
     : { variant: 'full', skillMix: page.skillMix, ...availability }
 }
 
+/** A Courts now face id that points at a participant: `participant:<index>` (see faceParticipant). */
+const FACE_PREFIX = 'participant:'
+
+/** The participants index a Courts now face id points at, or null for a face that opens nothing. */
+function faceParticipant(id: string) {
+  return id.startsWith(FACE_PREFIX) ? Number(id.slice(FACE_PREFIX.length)) : null
+}
+
 /** Courts now entries as the Details component's props (read-only court cards). */
 function courtsNowProps(courts: PublicCourtNow[], now = Date.now()): PublicSessionCourtNow[] {
   const faces = (side: 'a' | 'b', court: PublicCourtNow) =>
     (side === 'a' ? court.teamA : court.teamB).map((player, i) => ({
-      id: `${court.id}-${side}-${i}`,
+      id:
+        player.participant === undefined
+          ? `${court.id}-${side}-${i}`
+          : `${FACE_PREFIX}${player.participant}`,
       name: player.name,
       shortName: player.name,
       level: player.level,
@@ -224,7 +236,11 @@ function courtsNowProps(courts: PublicCourtNow[], now = Date.now()): PublicSessi
 /** The signed-in read's Queue in the shape PublicSessionQueue reads (faces and first names). */
 function queueAccess(playerId: string, queue: PublicQueuedMatch[]): PlayerSessionAccess {
   const side = (players: PublicQueuedMatch['teamA']) =>
-    players.map((player) => ({ name: player.name, level: player.level }))
+    players.map((player) => ({
+      name: player.name,
+      level: player.level,
+      participant: player.participant,
+    }))
   // Only the queue is read here; the join fields come from the signed-in read's own data.
   return {
     playerId,
@@ -386,6 +402,8 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
   const [matchRequestOpen, setMatchRequestOpen] = useState(false)
   /** The tapped participant or waitlist tile (#731); null while no profile card is open */
   const [profileOf, setProfileOf] = useState<PublicParticipant | null>(null)
+  // D-CLUB-PROFILE: the organizer line opens the club's profile card.
+  const [clubOpen, setClubOpen] = useState(false)
   // Real mode reads the options only for a present Player (the read refuses anyone off the roster).
   const requestMatch = useRequestMatchAction(
     slug,
@@ -563,6 +581,15 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
   })
   const participants = (access && !signedRead ? access.participants : p.participants).map(tile)
   const waitlist = p.waitlist.map(tile)
+  // 2026-11-13-queue-public-faces-profile: for a signed-in player the faces on Courts now and the
+  // Queue open the same profile card as the Participants tab.
+  const openFace =
+    profileViewerId && signedRead
+      ? (index: number | null) => {
+          const target = index === null ? undefined : participants[index]
+          if (target?.profile) setProfileOf(target)
+        }
+      : undefined
 
   return (
     <>
@@ -582,7 +609,15 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
             clubInitials={p.club.initials}
             clubLogoUrl={p.club.logoUrl}
             state={HERO_STATE[p.status]}
+            onOpenClub={p.club.id ? () => setClubOpen(true) : undefined}
           />
+          {p.club.id ? (
+            <ClubCard
+              open={clubOpen}
+              onClose={() => setClubOpen(false)}
+              club={{ ...p.club, id: p.club.id, logoUrl: p.club.logoUrl ?? null }}
+            />
+          ) : null}
           {signedRead ? (
             <PublicRefreshBar
               updatedLabel={time(refreshing.lastRefreshedAt ?? p.lastSyncedAt)}
@@ -660,12 +695,14 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
                 lastUpdatedLabel={time(p.lastSyncedAt)}
                 hasPendingChanges={p.hasPendingChanges}
                 courtsNow={signedRead ? courtsNowProps(signedRead.courtsNow) : undefined}
+                onOpenCourtPlayer={openFace ? (id) => openFace(faceParticipant(id)) : undefined}
                 queueSlot={
                   viewer === 'visitor' ? (
                     signedRead && viewerAccount ? (
                       <PublicSessionQueue
                         access={queueAccess(viewerAccount.id, signedRead.queue)}
                         onRetry={() => void signedInPage.refetch()}
+                        onOpenPlayer={openFace}
                       />
                     ) : viewerAccount ? (
                       <PublicSessionQueue

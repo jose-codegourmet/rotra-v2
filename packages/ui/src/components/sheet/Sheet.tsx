@@ -35,6 +35,12 @@ export type SheetProps = {
   headerClassName?: string
   /** The header close button's accessible name; "Close" by default (e.g. "Back to match 4") */
   closeLabel?: string
+  /**
+   * No title bar (the profile cards, 2026-11-13-profile-card-name-layout): the title stays in the DOM,
+   * visually hidden, so the dialog keeps its accessible name; the × floats at the top right as a
+   * frosted 30 px circle over the banner; the body has no padding so the card runs edge to edge.
+   */
+  headerless?: boolean
 }
 
 // Durations and easing from the prototypes: scrim fades in 0.15 s; the sheet pops in 0.16 s
@@ -62,6 +68,7 @@ export function Sheet({
   bodyClassName,
   headerClassName,
   closeLabel = 'Close',
+  headerless = false,
 }: SheetProps) {
   const phone = useMediaQuery(PHONE_QUERY)
   const full = Boolean(fullscreen && phone && !side)
@@ -138,6 +145,7 @@ export function Sheet({
                 transition={{ duration: reduced ? 0 : phone ? 0.18 : 0.16, ease: EASE_OUT }}
                 className={cn(
                   'fixed z-41 flex flex-col border border-border-strong bg-surface text-fg shadow-sheet',
+                  headerless && 'overflow-hidden',
                   side
                     ? 'inset-y-0 right-0 h-dvh w-full max-w-[560px] rounded-none'
                     : full
@@ -155,14 +163,32 @@ export function Sheet({
               >
                 <header
                   className={cn(
-                    'flex shrink-0 items-start justify-between gap-3 px-5 pt-[18px] pb-1.5',
+                    'flex shrink-0 items-start justify-between gap-3',
+                    headerless ? 'absolute top-3 right-3 z-2 p-0' : 'px-5 pt-[18px] pb-1.5',
                     headerClassName,
                   )}
                 >
-                  <Dialog.Title ref={titleRef} tabIndex={-1} className="focus:outline-none">
+                  <Dialog.Title
+                    ref={titleRef}
+                    tabIndex={-1}
+                    className={cn('focus:outline-none', headerless && 'sr-only')}
+                  >
                     {title}
                   </Dialog.Title>
-                  {hideClose ? null : (
+                  {hideClose ? null : headerless ? (
+                    <Dialog.Close
+                      aria-label="Close"
+                      title="Close"
+                      className={cn(
+                        'box-border grid aspect-square size-[30px] flex-none cursor-pointer place-items-center rounded-full p-0 text-fg',
+                        'border border-[color-mix(in_srgb,var(--fg)_16%,transparent)] bg-[color-mix(in_srgb,var(--surface)_62%,transparent)] backdrop-blur-[8px]',
+                        'transition-colors duration-[120ms] hover:bg-[color-mix(in_srgb,var(--surface)_85%,transparent)] motion-reduce:transition-none',
+                        'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent',
+                      )}
+                    >
+                      <Icon name="x" size={14} />
+                    </Dialog.Close>
+                  ) : (
                     <Dialog.Close asChild>
                       <IconButton variant="ghost" size="xs" label={closeLabel}>
                         <Icon name="x" />
@@ -174,6 +200,7 @@ export function Sheet({
                   className={cn(
                     'flex min-h-0 flex-col gap-3.5 overflow-y-auto px-5 pt-2.5 pb-4',
                     full && 'flex-1',
+                    headerless && 'p-0',
                     bodyClassName,
                   )}
                 >

@@ -63,6 +63,11 @@ const meta = {
     onRetry: () => {},
     onRetryGames: () => {},
     onCopyId: () => {},
+    bannerKey: 'night',
+    year: 2026,
+    stats: { games: 24, wins: 15, losses: 9, winRate: 63 },
+    rotraProfileHref: '#rotra-profile',
+    onShare: () => {},
     edit: editProps(registered),
     onInvite: () => {},
     onCopyRegistrationLink: () => {},
@@ -72,7 +77,11 @@ export default meta
 type Story = StoryObj<typeof meta>
 export const Default: Story = {}
 export const Light: Story = { globals: { theme: 'light' } }
-export const Unclaimed: Story = { args: { player: managementPlayer, socialLinks: undefined } }
+export const Unclaimed: Story = {
+  args: { player: managementPlayer, socialLinks: undefined, bannerKey: 'court', stats: null },
+}
+/** A registered player with no games this year. */
+export const NoGamesThisYear: Story = { args: { stats: null } }
 export const UnclaimedLight: Story = { ...Unclaimed, globals: { theme: 'light' } }
 export const Edit: Story = { args: { initialMode: 'edit' } }
 export const EditLight: Story = { ...Edit, globals: { theme: 'light' } }

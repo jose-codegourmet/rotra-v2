@@ -14,6 +14,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useMemo, useRef, useState } from 'react'
 import { useDenyOnPermissionError } from '../../../_components/admin-workspace-shell/AdminWorkspaceShell'
 import { AddClubSheet } from '../add-club-sheet/AddClubSheet'
+import { ClubCard } from '../club-card/ClubCard'
 import { clubDirectoryColumns } from './ClubDirectory.columns'
 
 /** The directory's search and filter as a query string ("q=PH-DVO&access=expired"); '' when unset. */
@@ -46,6 +47,8 @@ export function ClubDirectory({
   const [q, setQ] = useState(initialQ)
   const [access, setAccess] = useState(initialAccess)
   const [adding, setAdding] = useState(false)
+  // D-CLUB-PROFILE: a row or its name opens the club's profile card; Open club goes to the detail.
+  const [cardId, setCardId] = useState<string | null>(null)
   const list = useAdminClubs({ q: q.trim(), access })
   const denied = useDenyOnPermissionError(list.error)
   // Each keystroke is a new query; keep the last rows on screen until its answer arrives.
@@ -53,7 +56,8 @@ export function ClubDirectory({
   if (list.data) lastData.current = list.data
   const data = list.data ?? lastData.current
   const query = directoryQuery(q, access)
-  const columns = useMemo(() => clubDirectoryColumns((club) => clubHref(club.id, query)), [query])
+  const columns = useMemo(() => clubDirectoryColumns((club) => setCardId(club.id)), [])
+  const cardClub = cardId ? data?.clubs.find((club) => club.id === cardId) : undefined
 
   const update = (nextQ: string, nextAccess: AdminClubAccessFilter) => {
     setQ(nextQ)
@@ -106,7 +110,7 @@ export function ClubDirectory({
             columns={columns}
             data={data?.clubs ?? []}
             getRowId={(club) => club.id}
-            onRowClick={(club) => router.push(clubHref(club.id, query))}
+            onRowClick={(club) => setCardId(club.id)}
             loading={!data && !list.isError}
             error={
               list.isError ? (
@@ -151,6 +155,16 @@ export function ClubDirectory({
         </section>
       </Card>
       <AddClubSheet open={adding} onOpenChange={setAdding} />
+      {cardClub ? (
+        <ClubCard
+          club={cardClub}
+          onClose={() => setCardId(null)}
+          onOpenClub={() => {
+            setCardId(null)
+            router.push(clubHref(cardClub.id, query))
+          }}
+        />
+      ) : null}
     </>
   )
 }

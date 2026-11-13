@@ -5,7 +5,6 @@ import { ClubPriceTag } from '@rotra/ui/club-price-tag'
 import type { DataTableProps } from '@rotra/ui/data-table'
 import { LicenseAccessChip } from '@rotra/ui/license-access-chip'
 import { formatYmd } from '@rotra/ui/license-access-chip/variants'
-import Link from 'next/link'
 
 /** rotra-admin.html viewClubs() Until cell. */
 function untilLabel(access: ClubAccessState): string {
@@ -22,11 +21,11 @@ function untilLabel(access: ClubAccessState): string {
 }
 
 /**
- * A-CLUBS columns; `hrefOf` gives each club's detail URL (carrying the directory's search and filter).
+ * A-CLUBS columns; `openOf` opens a club's profile card (D-CLUB-PROFILE) from its name, like the row.
  * The prototype's directory has no sorting, so no header turns into a sort button.
  */
 export function clubDirectoryColumns(
-  hrefOf: (club: AdminClubListItem) => string,
+  openOf: (club: AdminClubListItem) => void,
 ): DataTableProps<AdminClubListItem>['columns'] {
   return [
     {
@@ -43,8 +42,7 @@ export function clubDirectoryColumns(
           username={row.original.username}
           runningSessionTitle={row.original.runningSessionTitle}
           hasNameRequest={row.original.nameRequest !== null}
-          href={hrefOf(row.original)}
-          linkComponent={Link}
+          onOpen={() => openOf(row.original)}
         />
       ),
     },

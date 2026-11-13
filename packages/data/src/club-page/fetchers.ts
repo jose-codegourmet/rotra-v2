@@ -3,6 +3,7 @@ import { requireOnline } from '../mock/bridge'
 import { delay } from '../mock/latency'
 import { readMockState } from '../mock/store'
 import { queueSessionUrl } from '../player/mySessions'
+import { resolveMockProfileBanner } from '../profile-banner/fetchers'
 import { realGetClubPage } from '../real/club-page'
 import { isRealDataMode } from '../real/mode'
 import {
@@ -57,6 +58,7 @@ export async function getClubPage(clubId: string, signal?: AbortSignal): Promise
             nickname: profile?.nickname ?? p.nickname,
             picture: profile?.picture ?? null,
             level: p.playingLevel,
+            ...resolveMockProfileBanner(profile?.bannerId),
           },
           visibility,
           viewerId,

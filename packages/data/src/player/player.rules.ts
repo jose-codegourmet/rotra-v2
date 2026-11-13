@@ -160,3 +160,70 @@ export function weeklyPerformance(
   }
   return days
 }
+
+const MANILA_OFFSET_MS = 8 * 3600000
+
+/** The calendar year the profile stats count (Asia/Manila), e.g. 2026 for “Stats · 2026”. */
+export function statsYear(now: Date | number) {
+  return new Date(Number(now) + MANILA_OFFSET_MS).getUTCFullYear()
+}
+
+/**
+ * January 1, 00:00 in Asia/Manila (UTC+8, no daylight saving) of the year `now` falls in: profile
+ * stats count from here and reset every January 1 (2026-11-13-player-default-banner). The rank keeps
+ * its own WINDOW_DAYS window.
+ */
+export function statsYearStart(now: Date | number) {
+  return Date.UTC(statsYear(now), 0, 1) - MANILA_OFFSET_MS
+}
+
+/**
+ * Stats · YEAR on every profile card (D-PARTICIPANT-PROFILE, Admin Quick view): games, wins, losses
+ * and win rate of the official history that finished this calendar year (Asia/Manila), up to `now`.
+ * Null without games (“No games yet this year”). No rating math.
+ */
+export function yearGameStats(
+  sessions: readonly {
+    finishedAt: string | null
+    games: readonly { result: string }[]
+  }[],
+  now: Date | number,
+): RecentGameStats | null {
+  const end = Number(now),
+    start = statsYearStart(now)
+  const games = sessions
+    .filter((s) => {
+      const at = s.finishedAt ? Date.parse(s.finishedAt) : Number.NaN
+      return at >= start && at <= end
+    })
+    .flatMap((s) => s.games)
+  if (!games.length) return null
+  const wins = games.filter((g) => g.result === 'won').length
+  return {
+    games: games.length,
+    wins,
+    losses: games.length - wins,
+    winRate: Math.round((wins / games.length) * 100),
+  }
+}
+
+/** Counted games and wins this calendar year (the profile card and Share profile “In YEAR”). */
+export function countYearCountedWins(
+  sessions: readonly PlayerSessionRecord[],
+  now: Date | number,
+): { games: number; wins: number } {
+  const end = Number(now),
+    start = statsYearStart(now)
+  let games = 0,
+    wins = 0
+  for (const session of sessions) {
+    const at = Date.parse(session.finishedAt)
+    if (at < start || at > end) continue
+    for (const game of session.games)
+      if (game.counting === 'counted') {
+        games += 1
+        if (game.result === 'won') wins += 1
+      }
+  }
+  return { games, wins }
+}

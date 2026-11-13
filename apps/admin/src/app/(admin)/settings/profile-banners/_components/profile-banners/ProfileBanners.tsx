@@ -1,7 +1,9 @@
 'use client'
 
 import {
+  defaultProfileBannerId,
   PROFILE_BANNER_UNDO_MS,
+  profileBannerDefaultToast,
   profileBannerDeletedToast,
   profileBannerName,
 } from '@rotra/data/profile-banner/rules'
@@ -9,6 +11,7 @@ import {
   useAddProfileBanners,
   useDeleteProfileBanner,
   useRestoreProfileBanner,
+  useSetDefaultProfileBanner,
   useSetProfileBannerShown,
 } from '@rotra/data/profile-banner/useProfileBannerMutations'
 import { useProfileBanners } from '@rotra/data/profile-banner/useProfileBanners'
@@ -24,7 +27,8 @@ import { ProfileBannersSkeleton } from './ProfileBannersSkeleton'
 /**
  * A-BANNERS: the platform owner's profile banner library, built like Profile characters. Click a
  * banner to hide or show it, × deletes it with a 6-second Undo, and the drop zone takes several
- * images at once with an Uploading N of M bar. At least 2 stay shown; a refusal and the offline
+ * images at once with an Uploading N of M bar. At least 2 stay shown; Make default moves the Default
+ * chip with a 6-second Undo, and the default can't be hidden or deleted. A refusal and the offline
  * error come back from the mutations as messages and show as toasts, with nothing changed.
  */
 export function ProfileBanners() {
@@ -33,6 +37,7 @@ export function ProfileBanners() {
   const setShown = useSetProfileBannerShown()
   const remove = useDeleteProfileBanner()
   const restore = useRestoreProfileBanner()
+  const makeDefault = useSetDefaultProfileBanner()
   const [upload, setUpload] = useState<{ done: number; total: number } | null>(null)
   const denied = useDenyOnPermissionError(banners.error)
 
@@ -80,6 +85,23 @@ export function ProfileBanners() {
     })
   }
 
+  // D-2026-11-13-03: Make default applies at once, with Undo back to the previous default.
+  const onMakeDefault = (id: string) => {
+    makeDefault.mutate(id, {
+      onSuccess: ({ banner, previousId }) =>
+        toast.success(profileBannerDefaultToast(banner), {
+          duration: PROFILE_BANNER_UNDO_MS,
+          action: {
+            label: 'Undo',
+            onClick: () =>
+              makeDefault.mutate(previousId, { onError: (error) => toast.error(error.message) }),
+          },
+        }),
+      onError: (error) => toast.error(error.message),
+    })
+  }
+  const defaultId = defaultProfileBannerId(list)
+
   if (banners.isError && !banners.data)
     return (
       <>
@@ -112,10 +134,12 @@ export function ProfileBanners() {
         shown: banner.shown,
         imageUrl: banner.image || null,
         bannerKey: banner.image ? null : banner.id,
+        isDefault: banner.id === defaultId,
       }))}
       onFiles={onFiles}
       onToggle={onToggle}
       onDelete={onDelete}
+      onMakeDefault={onMakeDefault}
       upload={upload}
     />
   )

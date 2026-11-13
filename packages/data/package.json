@@ -388,6 +388,8 @@
     "./feature-flag/useSetFeatureFlagValue": "./src/feature-flag/useSetFeatureFlagValue.ts",
     "./feature-flag/usePlaceholderFeatureFlag": "./src/feature-flag/usePlaceholderFeatureFlag.ts",
     "./club-player/useSavedPlayerStats": "./src/club-player/useSavedPlayerStats.ts",
+    "./club-player/profileStats": "./src/club-player/profileStats.ts",
+    "./club-player/useClubPlayerYearStats": "./src/club-player/useClubPlayerYearStats.ts",
     "./fixtures/saved-player-stats": "./src/fixtures/savedPlayerStats.ts",
     "./queue-session/useUpdateCourt": "./src/queue-session/useUpdateCourt.ts",
     "./match/auto-queue-types": "./src/match/autoQueue.types.ts",

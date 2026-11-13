@@ -1,6 +1,7 @@
 'use client'
 
 import { cn } from '@rotra/ui/cn'
+import { Icon } from '@rotra/ui/icon'
 import { useRef, useState } from 'react'
 import { type AvatarVariants, avatarVariants } from './Avatar.variants'
 
@@ -25,6 +26,11 @@ export type AvatarProps = AvatarVariants & {
   onView?: () => void
   /** Accessible name of the view button; defaults to "View full photo of <name>" */
   viewLabel?: string
+  /**
+   * With onView: on hover and keyboard focus the picture dims (`--bg` at 55%) under a 26 px eye
+   * (the profile cards' picture, 2026-11-13-profile-card-name-layout sixth pass).
+   */
+  viewEye?: boolean
   className?: string
 }
 
@@ -49,6 +55,7 @@ function AvatarFace({
   className,
   onView,
   viewLabel,
+  viewEye,
 }: Omit<AvatarProps, 'onClick'>) {
   const frozen = useRef<HTMLCanvasElement>(null)
   const [failed, setFailed] = useState(false)
@@ -107,9 +114,22 @@ function AvatarFace({
         'm-0 inline-flex flex-none cursor-zoom-in border-0 bg-transparent p-0 leading-none',
         'focus-visible:outline-none focus-visible:[&>span]:outline-2 focus-visible:[&>span]:outline-offset-2 focus-visible:[&>span]:outline-accent',
         shape === 'square' ? 'rounded-[14px]' : 'rounded-full',
+        viewEye && 'group/eye relative',
       )}
     >
       {picture}
+      {viewEye ? (
+        <span
+          aria-hidden
+          className={cn(
+            'pointer-events-none absolute inset-0 grid place-items-center bg-[color-mix(in_srgb,var(--bg)_55%,transparent)] text-fg opacity-0',
+            'transition-opacity duration-150 group-hover/eye:opacity-100 group-focus-visible/eye:opacity-100 motion-reduce:transition-none',
+            shape === 'square' ? 'rounded-[14px]' : 'rounded-full',
+          )}
+        >
+          <Icon name="eye" size={26} />
+        </span>
+      ) : null}
     </button>
   )
 }

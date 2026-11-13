@@ -48,6 +48,12 @@ export type ProfileBannerProps = {
   bannerKey?: string | null
   /** An uploaded banner (Admin library): wins over bannerKey, centred-cropped to fill */
   imageUrl?: string | null
+  /**
+   * The profile cards' strip (2026-11-13-profile-card-name-layout, third pass): only the top half of
+   * the 5:2 art, a full-width 5:1 strip. Drawn banners stretch to twice the strip's height from the
+   * top; uploaded images cover it from the top.
+   */
+  strip?: boolean
   className?: string
 }
 
@@ -56,13 +62,30 @@ export type ProfileBannerProps = {
  * centre-cropped to fill). Decorative (aria-hidden); the parent sets its size. Used by ProfileHero,
  * BannerSheet tiles and the Admin banners grid.
  */
-export function ProfileBanner({ bannerKey, imageUrl, className }: ProfileBannerProps) {
+export function ProfileBanner({ bannerKey, imageUrl, strip, className }: ProfileBannerProps) {
   if (imageUrl)
     return (
-      <span aria-hidden className={cn('block overflow-hidden bg-elev', className)}>
+      <span
+        aria-hidden
+        className={cn('block overflow-hidden bg-elev', strip && 'aspect-[5/1] w-full', className)}
+      >
         {/* biome-ignore lint/performance/noImgElement: banners are uploaded data or storage URLs, not optimised assets */}
-        <img src={imageUrl} alt="" className="block size-full object-cover" />
+        <img
+          src={imageUrl}
+          alt=""
+          className={cn('block size-full object-cover', strip && 'object-top')}
+        />
       </span>
     )
-  return <span aria-hidden className={cn('block', profileBannerClass(bannerKey), className)} />
+  return (
+    <span
+      aria-hidden
+      className={cn(
+        'block',
+        profileBannerClass(bannerKey),
+        strip && 'aspect-[5/1] w-full bg-[length:100%_200%] bg-top',
+        className,
+      )}
+    />
+  )
 }

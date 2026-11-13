@@ -19,6 +19,12 @@ export type CharacterGridItem = {
   label?: string
   /** Shown under the tile (banner names) */
   caption?: string
+  /** Beside the caption (Profile banners: the Default chip or Make default) */
+  captionAction?: ReactNode
+  /** The tile's tooltip; defaults to the shown/hidden hint */
+  title?: string
+  /** Added to the tile's accessible name, e.g. "default" */
+  labelSuffix?: string
   /** false = hidden from players (dimmed) */
   shown: boolean
   /** The stored "Character N" number; it never shifts when an earlier image is deleted */
@@ -61,11 +67,12 @@ export function CharacterGrid({
             <button
               type="button"
               aria-pressed={item.shown}
-              aria-label={`${label}, ${item.shown ? 'shown' : 'hidden'}`}
+              aria-label={`${label}, ${item.shown ? 'shown' : 'hidden'}${item.labelSuffix ? `, ${item.labelSuffix}` : ''}`}
               title={
-                item.shown
+                item.title ??
+                (item.shown
                   ? 'Shown to players. Click to hide.'
-                  : 'Hidden from players. Click to show.'
+                  : 'Hidden from players. Click to show.')
               }
               disabled={disabled}
               onClick={() => onToggle(item.id)}
@@ -83,7 +90,12 @@ export function CharacterGrid({
                 item.art
               )}
             </button>
-            {item.caption ? (
+            {item.caption && item.captionAction ? (
+              <div className="mt-1 flex min-w-0 flex-wrap items-center justify-between gap-1.5">
+                <span className="text-xs text-fg2 [overflow-wrap:anywhere]">{item.caption}</span>
+                {item.captionAction}
+              </div>
+            ) : item.caption ? (
               <span className="mt-1 block text-xs text-fg2 [overflow-wrap:anywhere]">
                 {item.caption}
               </span>

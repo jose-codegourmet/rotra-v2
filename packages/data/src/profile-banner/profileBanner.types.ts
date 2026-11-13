@@ -19,6 +19,12 @@ export type ProfileBanner = {
   uploadedAt: number
   /** Running upload number; Admin labels an upload "Banner <number>" */
   number: number
+  /**
+   * The default banner (proposed `profile_banners.is_default`, D-2026-11-13-03): drawn on every
+   * profile that hasn't picked one, and on guests and unclaimed profiles. At most one banner has it;
+   * missing reads as false (real mode has no column yet, so Court stays the default there).
+   */
+  isDefault?: boolean
 }
 
 /** What a profile card draws: the banner id (the ProfileBanner key) and its image, if uploaded. */

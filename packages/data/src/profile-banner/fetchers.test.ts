@@ -6,9 +6,14 @@ import {
   getShownProfileBanners,
   resolveMockProfileBanner,
   restoreProfileBanner,
+  setDefaultProfileBanner,
   setProfileBannerShown,
 } from './fetchers'
-import { PROFILE_BANNER_DELETE_REFUSAL, PROFILE_BANNER_HIDE_REFUSAL } from './profileBanner.rules'
+import {
+  PROFILE_BANNER_DEFAULT_REFUSAL,
+  PROFILE_BANNER_DELETE_REFUSAL,
+  PROFILE_BANNER_HIDE_REFUSAL,
+} from './profileBanner.rules'
 
 describe('Profile banners › mock mode', () => {
   let restoreLatency: () => void
@@ -35,7 +40,7 @@ describe('Profile banners › mock mode', () => {
     await expect(setProfileBannerShown({ id: 'night', shown: false })).rejects.toThrow(
       PROFILE_BANNER_HIDE_REFUSAL,
     )
-    await expect(deleteProfileBanner('court')).rejects.toThrow(PROFILE_BANNER_DELETE_REFUSAL)
+    await expect(deleteProfileBanner('night')).rejects.toThrow(PROFILE_BANNER_DELETE_REFUSAL)
     expect(
       readMockState()
         .profileBanners.filter((b) => b.shown)
@@ -46,13 +51,23 @@ describe('Profile banners › mock mode', () => {
     expect(readMockState().profileBanners.some((b) => b.id === 'sun')).toBe(false)
   })
 
-  it('defaults to the first shown banner once Court is deleted, and back to Court on Undo', async () => {
+  it('refuses hiding or deleting the default banner', async () => {
+    await expect(setProfileBannerShown({ id: 'court', shown: false })).rejects.toThrow(
+      PROFILE_BANNER_DEFAULT_REFUSAL,
+    )
+    await expect(deleteProfileBanner('court')).rejects.toThrow(PROFILE_BANNER_DEFAULT_REFUSAL)
+  })
+
+  it('draws the banner Admin made default, and Court again after Undo', async () => {
     expect(resolveMockProfileBanner(null).bannerKey).toBe('court')
+    const { previousId } = await setDefaultProfileBanner('dusk')
+    expect(previousId).toBe('court')
+    expect(resolveMockProfileBanner(null).bannerKey).toBe('dusk')
+    // The old default can now be deleted; a player who chose Court keeps it.
     const deleted = await deleteProfileBanner('court')
-    expect(resolveMockProfileBanner(null).bannerKey).toBe('night')
-    // A player who chose Court keeps it after the delete.
     expect(resolveMockProfileBanner('court').bannerKey).toBe('court')
     await restoreProfileBanner(deleted)
+    await setDefaultProfileBanner(previousId)
     expect(resolveMockProfileBanner(null).bannerKey).toBe('court')
   })
 })

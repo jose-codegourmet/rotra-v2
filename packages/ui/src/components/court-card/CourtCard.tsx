@@ -127,6 +127,8 @@ export type CourtCardReadOnlyProps = {
   startedLabel?: string
   /** Free only: "Free · N min" (see CourtCardFreeProps.freeMinutes) */
   freeMinutes?: number | null
+  /** The public page for a signed-in player: each face opens the profile card (“NAME. View profile”) */
+  onOpenProfile?: (playerId: string) => void
   className?: string
 }
 
@@ -252,6 +254,7 @@ function ReadOnlyCourtCard({
   teamB = [],
   startedLabel,
   freeMinutes,
+  onOpenProfile,
   className,
 }: CourtCardReadOnlyProps) {
   const chip =
@@ -274,7 +277,14 @@ function ReadOnlyCourtCard({
           </Chip>
         )}
       </div>
-      <CourtDrawing courts={merged ? 2 : 1} free={state === 'free'} teamA={teamA} teamB={teamB} />
+      <CourtDrawing
+        courts={merged ? 2 : 1}
+        free={state === 'free'}
+        teamA={teamA}
+        teamB={teamB}
+        onOpenProfile={onOpenProfile}
+        plainProfileLabel
+      />
       {state === 'playing' && startedLabel ? (
         <p className="text-[13px] text-fg2">Started {startedLabel}</p>
       ) : null}

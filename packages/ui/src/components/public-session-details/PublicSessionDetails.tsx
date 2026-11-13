@@ -56,6 +56,11 @@ export type PublicSessionDetailsProps = {
    * court cards). Omit for visitors; an empty array renders nothing.
    */
   courtsNow?: PublicSessionCourtNow[]
+  /**
+   * A signed-in ROTRA player: each Courts now face is a button that opens the profile card, called
+   * with the face's id (2026-11-13-queue-public-faces-profile). Omit for plain faces.
+   */
+  onOpenCourtPlayer?: (playerId: string) => void
   /** The read-only Queue (PublicSessionQueue), rendered after Courts now; the caller owns it */
   queueSlot?: ReactNode
   className?: string
@@ -87,6 +92,7 @@ export function PublicSessionDetails({
   lastUpdatedLabel,
   hasPendingChanges = false,
   courtsNow,
+  onOpenCourtPlayer,
   queueSlot,
   className,
 }: PublicSessionDetailsProps) {
@@ -168,6 +174,7 @@ export function PublicSessionDetails({
                 teamB={court.teamB}
                 startedLabel={court.startedLabel}
                 freeMinutes={court.freeMinutes}
+                onOpenProfile={onOpenCourtPlayer}
               />
             ))}
           </div>

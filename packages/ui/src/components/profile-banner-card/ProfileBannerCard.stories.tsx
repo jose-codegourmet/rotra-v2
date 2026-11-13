@@ -7,7 +7,7 @@ import {
   ProfileBannerCard,
   ProfileCardSection,
   ProfileLevelBadge,
-  ProfileStatTiles,
+  ProfileStatsSection,
 } from './ProfileBannerCard'
 
 const withPhoto = playerProfiles.find((p) => p.picture)
@@ -25,8 +25,11 @@ const meta = {
   args: {
     name: withPhoto?.fullName ?? 'Aaron',
     nickname: 'Ace',
+    rtrId: 'RTR-PH-CEB-040226-0007',
+    profileLink: { href: '/find/RTR-PH-CEB-040226-0007', newTab: true },
     photoUrl: withPhoto?.picture ?? undefined,
     onPhotoClick: fn(),
+    bannerKey: 'court',
     chips: (
       <>
         <IdentityChip identity="registered" />
@@ -37,16 +40,9 @@ const meta = {
     children: (
       <>
         <ProfileCardSection label="About">
-          <KeyValueList
-            items={[
-              { label: 'Registered in', value: 'Cebu City' },
-              { label: 'RTR ID', value: 'RTR-PH-CEB-040226-0007' },
-            ]}
-          />
+          <KeyValueList items={[{ label: 'Registered in', value: 'Cebu City' }]} />
         </ProfileCardSection>
-        <ProfileCardSection label="Stats · last 90 days">
-          <ProfileStatTiles stats={{ games: 42, wins: 25, losses: 17, winRate: 60 }} />
-        </ProfileCardSection>
+        <ProfileStatsSection year={2026} stats={{ games: 42, wins: 25, losses: 17, winRate: 60 }} />
       </>
     ),
   },
@@ -61,15 +57,35 @@ export const GettingReady: Story = {
   args: { tonight: { kind: 'getting-ready', courtLabel: 'Court 1 + Court 2' } },
 }
 export const Queued: Story = { args: { tonight: { kind: 'queued', position: 3 } } }
-export const Free: Story = { args: { tonight: { kind: 'free' } } }
+export const FreeShortWait: Story = { args: { tonight: { kind: 'free', restMinutes: 4 } } }
+export const FreeWaitWarn: Story = { args: { tonight: { kind: 'free', restMinutes: 12 } } }
+export const FreeWaitLong: Story = { args: { tonight: { kind: 'free', restMinutes: 18 } } }
 export const Away: Story = { args: { tonight: { kind: 'away' } } }
-/** Not on tonight's roster: no Tonight line. */
-export const NotTonight: Story = { args: { tonight: null } }
+/** Not live, or not on tonight's roster: no pill. */
+export const NoPill: Story = { args: { tonight: null } }
+/** No nickname: the full name leads alone. */
+export const NoNickname: Story = { args: { nickname: null } }
+/** Inside the Player app: a forward arrow, same tab. */
+export const PlayerApp: Story = {
+  args: {
+    idLabel: 'player ID',
+    profileLink: { href: '/players/p1', newTab: false, onNavigate: fn() },
+  },
+}
+/** Guests and unclaimed records: no RTR ID button, no profile icon. */
+export const NoRtrId: Story = { args: { rtrId: null, profileLink: null } }
 export const Initials: Story = { args: { photoUrl: undefined } }
+export const AdminSize: Story = { args: { pictureSize: 72, tonight: null } }
 export const LongName: Story = {
   args: {
     name: 'Maria Consolacion Villanueva-Bautista',
     nickname: 'The Unstoppable Shuttle Commander',
+  },
+}
+export const NoGamesThisYear: Story = {
+  args: {
+    tonight: null,
+    children: <ProfileStatsSection year={2026} stats={null} />,
   },
 }
 export const NightBanner: Story = { args: { bannerKey: 'night' } }

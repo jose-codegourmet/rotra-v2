@@ -4,7 +4,7 @@ import { getParticipantStats } from './fetchers'
 import { publicSessionKeys } from './queryKeys'
 
 /**
- * Stats · last 90 days on the session page's participant profile card (#731), for a signed-in
+ * Stats · YEAR (the calendar year) on the session page's participant profile card (#731), for a signed-in
  * Player. Enabled only while the card for a registered participant (with an RTR ID) is open.
  */
 export function useParticipantStats(

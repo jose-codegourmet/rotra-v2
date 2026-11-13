@@ -1,6 +1,8 @@
 'use client'
 
+import { Button } from '@rotra/ui/button'
 import { CharacterGrid } from '@rotra/ui/character-grid'
+import { Chip } from '@rotra/ui/chip'
 import { ImageDropZone } from '@rotra/ui/image-drop-zone'
 import { PageHeader } from '@rotra/ui/page-header'
 import { ProfileBanner } from '@rotra/ui/profile-banner'
@@ -34,6 +36,8 @@ export type ProfileBannerTile = {
   imageUrl?: string | null
   /** A seeded banner drawn from theme tokens (court, night, dusk, ember, sun, stripe) */
   bannerKey?: string | null
+  /** The default banner (D-2026-11-13-03): the green Default chip under it */
+  isDefault?: boolean
 }
 
 export type ProfileBannersPageProps = {
@@ -45,6 +49,11 @@ export type ProfileBannersPageProps = {
   onToggle: (id: string) => void
   /** × on a tile: the container deletes it with an Undo toast, or refuses below the minimum */
   onDelete: (id: string) => void
+  /**
+   * Make default on a shown banner that isn't the default: the container applies it at once with an
+   * Undo toast. Without it neither the Default chip nor Make default shows.
+   */
+  onMakeDefault?: (id: string) => void
   /** While a batch is added: files handled so far and in the batch */
   upload?: { done: number; total: number } | null
   /** Offline: nothing can be added, hidden, shown or deleted */
@@ -61,6 +70,7 @@ export function ProfileBannersPage({
   onFiles,
   onToggle,
   onDelete,
+  onMakeDefault,
   upload,
   disabled,
 }: ProfileBannersPageProps) {
@@ -70,7 +80,15 @@ export function ProfileBannersPage({
     <>
       <PageHeader
         title="Profile banners"
-        description={`The strip across the top of a player's profile card, like a Discord banner. Players pick one of the shown banners from Edit profile; they can't upload their own. Click a banner to hide or show it. ${shown} shown${hidden ? ` · ${hidden} hidden` : ''}.`}
+        description={
+          <>
+            The strip across the top of a player's profile card, like a Discord banner. Players pick
+            one of the shown banners from Edit profile; they can't upload their own. The{' '}
+            <b>Default</b> banner shows on every profile that hasn't picked one, and on guests and
+            unclaimed profiles. Click a banner to hide or show it. {shown} shown
+            {hidden ? ` · ${hidden} hidden` : ''}.
+          </>
+        }
       />
       <ImageDropZone
         id="banner-file"
@@ -91,6 +109,29 @@ export function ProfileBannersPage({
           shown: banner.shown,
           label: banner.name,
           caption: banner.name,
+          ...(onMakeDefault
+            ? {
+                captionAction: banner.isDefault ? (
+                  <Chip tone="accent">Default</Chip>
+                ) : banner.shown ? (
+                  <Button
+                    size="xs"
+                    variant="ghost"
+                    disabled={disabled}
+                    onClick={() => onMakeDefault(banner.id)}
+                  >
+                    Make default
+                  </Button>
+                ) : undefined,
+                ...(banner.isDefault
+                  ? {
+                      title:
+                        'The default banner. Make another banner the default before hiding this one.',
+                      labelSuffix: 'default',
+                    }
+                  : {}),
+              }
+            : {}),
           src: banner.imageUrl ?? undefined,
           art: <ProfileBanner bannerKey={banner.bannerKey} className="size-full" />,
         }))}

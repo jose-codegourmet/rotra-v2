@@ -3,13 +3,13 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const clubMemberProfileSheetMeta = {
   name: 'ClubMemberProfileSheet',
   description:
-    'The profile dialog a club member opens on the public club page and its Members page: a banner card (banner, round picture, name and nickname, level, #N overall, You), About (Registered in, RTR ID) and Stats · last 90 days, or the private card for a masked member.',
+    'The profile dialog in ROTRA Player (club page members, the leaderboard): a header-less ProfileBannerCard (banner strip, round picture, display name with a forward arrow, full name, Copy player ID, level, #N overall, You), About (Registered in) and Stats · YEAR; footer Close, Share profile, Open ROTRA profile (same tab). Masked members get the private card with their own banner.',
   usage: [
-    'Open from ClubMemberGrid or ClubMemberList; a member tap opens this dialog and never leaves the page.',
-    'Pass kind "private" for a masked member: picture and banner, the masked name, the Private profile chip and the explanation; no Open full profile.',
+    'Open from ClubMemberGrid, ClubMemberList, the leaderboard rows and the podium; a tap opens this dialog and never leaves the page.',
+    'Pass kind "private" for a masked member: picture and their own banner, the masked name, the Private profile chip and the explanation; Close only.',
+    'Inside ROTRA Player the profile opens in the same tab: onOpenFullProfile (the name arrow and Open ROTRA profile) navigates in the app; profileHref is the arrow link. onShare opens the Share profile dialog for this player.',
     'onViewPhoto (public members with a picture) makes the big picture the Avatar view button (“View full photo of NAME”, zoom-in cursor, focus ring) that opens PhotoViewer (#716); initials never open anything.',
     'bannerKey and bannerImageUrl render the resolved profile banner; an uploaded image takes precedence.',
-    'The banner header is self-contained here for now; the Queue participant profile builds the same card in parallel and the two are unified later.',
   ],
   prototype: {
     file: 'apps/mockup/player-app/rotra-player.html',
@@ -20,5 +20,5 @@ export const clubMemberProfileSheetMeta = {
     'docs/screens/product/modules/player-information/club-page.md',
   ],
   variants: ['public', 'private', 'no-games', 'loading'],
-  related: ['ClubMemberGrid', 'ClubMemberList', 'PlayerProfileSheet', 'PhotoViewer'],
+  related: ['ProfileBannerCard', 'ClubMemberGrid', 'ClubMemberList', 'PhotoViewer'],
 } satisfies ComponentMeta

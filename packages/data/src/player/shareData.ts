@@ -7,7 +7,7 @@ import { maskPublicName } from '../public-session/publicSession.rules'
 import { isRealDataMode } from '../real/mode'
 import { realGetMyShareSession } from '../real/my-sessions'
 import { getPlayerGames, getPlayerProfile, getPlayerRank } from './fetchers'
-import { countRecentCountedWins } from './player.rules'
+import { countYearCountedWins } from './player.rules'
 import type { PlayerShareGame, PlayerShareParticipant } from './player.types'
 import { isPrivatePlayer } from './visibility'
 
@@ -123,10 +123,12 @@ export async function getPlayerShareData(
   }
 }
 
-/** The own profile card: always available, even with no level, position or games. */
+/**
+ * The Share profile card: the own profile, or any profile the viewer may see (the profile card's
+ * Share profile, 2026-11-13-profile-card-open-share). A private profile is refused by the profile
+ * read itself. Always available, even with no level, position or games.
+ */
 export async function getPlayerProfileShareData(playerId: string, signal?: AbortSignal) {
-  if ((await getSession('player'))?.account.id !== playerId)
-    throw new MockError('permission', 'Sign in to share your profile.')
   const [profile, rank, history] = await Promise.all([
     getPlayerProfile(playerId, signal),
     getPlayerRank(playerId, signal),
@@ -134,7 +136,7 @@ export async function getPlayerProfileShareData(playerId: string, signal?: Abort
   ])
   if (!profile) return null
   const now = isRealDataMode() ? Date.now() : PLAYER_FIXTURE_NOW.getTime()
-  const recent = countRecentCountedWins(history, now)
+  const recent = countYearCountedWins(history, now)
   return {
     kind: 'profile' as const,
     profile,

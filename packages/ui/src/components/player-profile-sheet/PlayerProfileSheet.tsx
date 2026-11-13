@@ -1,7 +1,7 @@
 'use client'
 
 import type { PlayingLevel } from '@rotra/data/player/types'
-import type { ParticipantTonight } from '@rotra/data/public-session/types'
+import type { ParticipantStats, ParticipantTonight } from '@rotra/data/public-session/types'
 import { Button } from '@rotra/ui/button'
 import { IdentityChip } from '@rotra/ui/identity-chip'
 import type { Identity } from '@rotra/ui/identity-chip/variants'
@@ -11,6 +11,7 @@ import {
   ProfileBannerCard,
   ProfileCardSection,
   ProfileLevelBadge,
+  ProfileStatsSection,
 } from '@rotra/ui/profile-banner-card'
 import { JOINED_VIA_TEXT } from '@rotra/ui/saved-player-card'
 import { Sheet } from '@rotra/ui/sheet'
@@ -30,18 +31,25 @@ export type PlayerProfileSheetProps = {
    * falls back to the suggestion (“LEVEL · suggestion”), then “No level yet”.
    */
   tonightLevel?: PlayingLevel | null
-  /** The Tonight · line from the live session; hidden when not on tonight's roster */
+  /** The status pill; pass it only while the session is live and the player is on its roster */
   tonight?: ParticipantTonight | null
   /** Opens the full photo (#716); without it the picture is not a button */
   onPhotoClick?: () => void
-  /** The player's Profile banner key; missing draws the accent gradient */
+  /** The player's resolved Profile banner key (the Admin default for no pick, guests, unclaimed) */
   bannerKey?: string | null
   /** An Admin-uploaded banner image; wins over bannerKey */
   bannerImageUrl?: string | null
   /** City the profile was first registered in (from the RTR ID) */
   registeredCity: string | null
-  /** null: "Given when they register" for an unclaimed player (club-only until they register), else "None yet" */
+  /** The Copy RTR ID button under the name; none for guests and unclaimed records */
   rtrId: string | null
+  /** The Player app's `/find/<RTR>` profile: the new-tab icon right of the name; hidden when missing */
+  profileHref?: string | null
+  /** The calendar year the stats count (Stats · YEAR) */
+  year: number
+  /** Stats · YEAR; null is “No games yet this year” */
+  stats: ParticipantStats | null
+  statsLoading?: boolean
   /** Long date the club saved them, e.g. "October 3, 2026" */
   addedLabel: string
   sessionsHere: number
@@ -74,10 +82,11 @@ const STATUS: Record<Identity, string> = {
 }
 
 /**
- * A player's profile on operator screens, opened from any player picture: the banner profile card
- * (D-PARTICIPANT-PROFILE) with the identity chip and level badge, the identity line, the Tonight ·
- * line, boxed About and In your club, then the guest invite and the levels note. Never shows a
- * phone number.
+ * A player's profile on operator screens, opened from any player picture: the header-less banner
+ * profile card (D-PARTICIPANT-PROFILE) with the name block (display name, new-tab icon, full name,
+ * Copy RTR ID), the identity chip and level badge, the identity line, the status pill while live,
+ * boxed About, Stats · YEAR and In your club, then the guest invite and the levels note. Never shows
+ * a phone number.
  */
 export function PlayerProfileSheet({
   open,
@@ -94,6 +103,10 @@ export function PlayerProfileSheet({
   bannerImageUrl,
   registeredCity,
   rtrId,
+  profileHref,
+  year,
+  stats,
+  statsLoading = false,
   addedLabel,
   sessionsHere,
   phoneHidden,
@@ -133,8 +146,8 @@ export function PlayerProfileSheet({
     <Sheet
       open={open}
       onOpenChange={onOpenChange}
-      title={name}
-      bodyClassName="p-0"
+      title={nickname || name}
+      headerless
       footer={
         <>
           {backLabel ? (
@@ -162,6 +175,8 @@ export function PlayerProfileSheet({
       <ProfileBannerCard
         name={name}
         nickname={nickname}
+        rtrId={rtrId}
+        profileLink={rtrId && profileHref ? { href: profileHref, newTab: true } : null}
         photoUrl={photoUrl}
         onPhotoClick={onPhotoClick}
         bannerKey={bannerKey}
@@ -185,20 +200,11 @@ export function PlayerProfileSheet({
           <KeyValueList
             items={[
               { label: 'Registered in', value: registeredCity ?? 'Not registered yet' },
-              {
-                label: 'RTR ID',
-                value: rtrId ? (
-                  <span className="font-mono text-[13px]">{rtrId}</span>
-                ) : identity === 'unclaimed' ? (
-                  'Given when they register'
-                ) : (
-                  'None yet'
-                ),
-              },
               { label: 'Joined', value: JOINED_VIA_TEXT[joinedVia ?? 'club-added'] },
             ]}
           />
         </ProfileCardSection>
+        <ProfileStatsSection year={year} stats={stats} loading={statsLoading} />
         <ProfileCardSection label="In your club">
           <KeyValueList
             items={[

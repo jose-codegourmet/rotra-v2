@@ -41,6 +41,8 @@ export function projectMember(
     nickname: string | null
     picture: string | null
     level: PlayingLevel | null
+    bannerKey?: string | null
+    bannerImageUrl?: string | null
   },
   visibility: MemberVisibility,
   viewerId: string | null,
@@ -57,6 +59,10 @@ export function projectMember(
         level: row.level,
         isYou: false,
         masked: true,
+        // The picture and banner stay public (identity rules).
+        ...(row.bannerKey !== undefined
+          ? { bannerKey: row.bannerKey, bannerImageUrl: row.bannerImageUrl ?? null }
+          : {}),
       }
     : { ...row, isYou: isSelf, masked: false }
 }

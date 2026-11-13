@@ -36,6 +36,8 @@ import { SharedRankCard } from '@rotra/ui/shared-rank-card'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { toast } from '@rotra/ui/toaster'
 import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { ClubCard } from '@/app/_components/club-card/ClubCard'
 import { copyPlayerId } from '@/app/_components/copy-player-id/copyPlayerId'
 import { useBannerSheet } from '@/app/_components/profile-banner/useBannerSheet'
 import { pictureSrc } from '@/app/_components/profile-picture/pictureSrc'
@@ -73,6 +75,8 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
     signOut = useSignOut('player')
   // Clubs show on every readable profile (#766); the read applies the profile's access rule.
   const clubs = usePlayerClubs(playerId)
+  // D-CLUB-PROFILE: a Clubs card row opens the club's profile card.
+  const [clubCard, setClubCard] = useState<string | null>(null)
   const mySessions = useMySessions(isOwn ? playerId : null)
   // Own profile only: pull down (or come back to the tab) refreshes My sessions, recent games and
   // the rank, once every 10 seconds (mockup change 2026-11-12). A visitor's page has no pull.
@@ -248,6 +252,7 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
             {pictureEditor.sheet}
             {bannerEditor.sheet}
             {photo.viewerProps ? <PhotoViewer {...photo.viewerProps} /> : null}
+            <ClubCard clubId={clubCard} onClose={() => setClubCard(null)} />
             {sharing.sheet}
             {isOwn && myAccount.data ? (
               <AccountPanel
@@ -274,6 +279,7 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
             ) : (
               <PlayerClubsCard
                 isOwn={isOwn}
+                onOpenClub={setClubCard}
                 clubs={(clubs.data ?? []).map((club) => ({
                   ...club,
                   clubPageHref: `/clubs/${encodeURIComponent(club.id)}`,

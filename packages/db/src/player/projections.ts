@@ -1,5 +1,5 @@
 import 'server-only'
-import { recentGameStats, WINDOW_DAYS } from '@rotra/data/player/rules'
+import { WINDOW_DAYS, yearGameStats } from '@rotra/data/player/rules'
 import { awardBaseline, createResultSnapshot } from '@rotra/data/session-result/sessionResult.rules'
 import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
@@ -646,5 +646,5 @@ export async function readRecentGameStatsByRtrId(rtrId: string) {
     select: { playerId: true },
   })
   if (!allocation) throw new ServiceError('not_found')
-  return recentGameStats(await readPlayerMatchHistory(allocation.playerId), Date.now())
+  return yearGameStats(await readPlayerMatchHistory(allocation.playerId), Date.now())
 }

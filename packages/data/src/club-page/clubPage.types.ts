@@ -20,6 +20,13 @@ export type ClubPageMember = {
   /** The signed-in viewer's own row */
   isYou: boolean
   masked: boolean
+  /**
+   * The member's resolved Profile banner (public, like the picture, so masked rows keep it). Missing
+   * draws the default banner.
+   */
+  bannerKey?: string | null
+  /** The resolved banner's uploaded image; null for a banner drawn from theme tokens */
+  bannerImageUrl?: string | null
 }
 
 export type ClubPageSessionStatus = 'live' | 'scheduled' | 'done'

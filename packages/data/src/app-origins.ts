@@ -56,6 +56,14 @@ export function appOrigin(app: RotraApp): string {
 }
 
 /**
+ * A player's ROTRA profile in the Player app (`/find/<RTR>`), opened in a new tab from the Queue and
+ * Admin profile cards (2026-11-13-profile-card-open-share).
+ */
+export function rotraProfileUrl(rtrId: string): string {
+  return `${appOrigin('player')}/find/${encodeURIComponent(rtrId)}`
+}
+
+/**
  * The Queue and Player origins that may talk to each other (the public session page's credentialed
  * calls), as two lists paired by index: production, local, then the configured pair when both are
  * set.

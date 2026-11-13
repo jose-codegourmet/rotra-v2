@@ -47,8 +47,11 @@ export function clubPlayerView(state: MockState, player: ClubPlayer) {
       ? state.playerProfiles.find((p) => p.playerId === player.playerId)
       : undefined,
     fullName = own?.fullName || player.fullName,
-    // The banner is public, like the picture; only a registered player has chosen one.
-    banner = own && player.identity === 'registered' ? resolveMockProfileBanner(own.bannerId) : null
+    // The banner is public, like the picture; only a registered player has chosen one. Everyone else
+    // (and a player with no pick) draws the default Admin sets (D-2026-11-13-03).
+    banner = resolveMockProfileBanner(
+      own && player.identity === 'registered' ? own.bannerId : null,
+    )
   return {
     ...player,
     fullName,
@@ -60,9 +63,9 @@ export function clubPlayerView(state: MockState, player: ClubPlayer) {
     ).reference,
     joinedVia: joinedViaOf(player),
     pictureName: profile?.fullName ?? null,
-    /** The resolved Profile banner a registered player's card draws; null = the default gradient */
-    bannerKey: banner?.bannerKey ?? null,
-    bannerImageUrl: banner?.bannerImageUrl ?? null,
+    /** The resolved Profile banner the card draws (the default for guests, unclaimed and no pick) */
+    bannerKey: banner.bannerKey as string | null,
+    bannerImageUrl: banner.bannerImageUrl,
     displayName: fullName,
     rtrId: profile?.rtrId ?? null,
     suggestion: player.playingLevel,

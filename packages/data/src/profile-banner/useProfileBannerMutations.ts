@@ -5,6 +5,7 @@ import {
   addProfileBanners,
   deleteProfileBanner,
   restoreProfileBanner,
+  setDefaultProfileBanner,
   setProfileBannerShown,
 } from './fetchers'
 import type { ProfileBanner } from './profileBanner.types'
@@ -57,6 +58,20 @@ export function useRestoreProfileBanner() {
   return useMutation({
     mutationFn: (banner: ProfileBanner) => restoreProfileBanner(banner),
     onSettled: useSettled(),
+    ...options,
+  })
+}
+
+/**
+ * mutate(id) → `{ banner, previousId }` (A-BANNERS › Make default). Undo calls it again with
+ * `previousId`. Every profile that hasn't picked a banner, and guests and unclaimed profiles, then
+ * draw it, so every cached read is refreshed.
+ */
+export function useSetDefaultProfileBanner() {
+  const client = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => setDefaultProfileBanner(id),
+    onSettled: () => client.invalidateQueries(),
     ...options,
   })
 }

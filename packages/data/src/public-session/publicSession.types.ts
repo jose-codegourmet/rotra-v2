@@ -14,7 +14,8 @@ export type ParticipantTonight =
   | { kind: 'playing'; courtLabel: string }
   | { kind: 'getting-ready'; courtLabel: string }
   | { kind: 'queued'; position: number }
-  | { kind: 'free' }
+  /** restMinutes: minutes since their last match or check-in (the queue tiles' rest time) */
+  | { kind: 'free'; restMinutes?: number }
   | { kind: 'away' }
 
 /**
@@ -23,7 +24,7 @@ export type ParticipantTonight =
  */
 export type ParticipantProfileKind = 'registered' | 'private' | 'guest'
 
-/** Stats · last 90 days on the participant profile card; null is "No games yet". */
+/** Stats · YEAR (the current calendar year) on the profile cards; null is "No games yet this year". */
 export type ParticipantStats = { games: number; wins: number; losses: number; winRate: number }
 
 /** Public-safe participant or waitlist entry. */
@@ -171,6 +172,11 @@ export type PublicMatchPlayer = {
   masked: boolean
   /** The viewer's own face */
   isViewer?: boolean
+  /**
+   * Signed-in version only (2026-11-13-queue-public-faces-profile): this player's index in the same
+   * read's `participants`, so the face opens their profile card. Missing when they aren't listed.
+   */
+  participant?: number
 }
 
 /** One entry of **Courts now**; a match on merged courts is one entry (“Court 1 + Court 2”). */
@@ -333,8 +339,9 @@ export type PlayerSessionAccess = {
   queue: {
     matchNo: number
     format: MatchFormat
-    teamA: { name: string; level: PlayingLevel | null }[]
-    teamB: { name: string; level: PlayingLevel | null }[]
+    /** participant: index in the signed-in read's participants (the face opens their card) */
+    teamA: { name: string; level: PlayingLevel | null; participant?: number }[]
+    teamB: { name: string; level: PlayingLevel | null; participant?: number }[]
   }[]
 }
 

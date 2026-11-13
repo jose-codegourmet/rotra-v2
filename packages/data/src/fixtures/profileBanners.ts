@@ -1,6 +1,6 @@
 import type { ProfileBanner } from '../profile-banner/profileBanner.types'
 
-/** The six seeded banners (the `profile_banners` seed rows), all shown, in upload order. */
+/** The six seeded banners (the `profile_banners` seed rows), all shown, in upload order; Court is the default. */
 export const profileBanners: ProfileBanner[] = [
   'court',
   'night',
@@ -14,4 +14,5 @@ export const profileBanners: ProfileBanner[] = [
   shown: true,
   uploadedAt: Date.UTC(2026, 10, 11) + index,
   number: index + 1,
+  isDefault: id === 'court',
 }))

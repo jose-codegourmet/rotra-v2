@@ -1,8 +1,11 @@
 'use client'
 
+import { rotraProfileUrl } from '@rotra/data/app-origins'
 import { registeredCity } from '@rotra/data/club-player/fetchers'
 import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
+import { useClubPlayerYearStats } from '@rotra/data/club-player/useClubPlayerYearStats'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
+import { statsYear } from '@rotra/data/player/rules'
 import { tonightStatus } from '@rotra/data/public-session/rules'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
@@ -25,8 +28,8 @@ export type PlayerProfileProps = {
 /**
  * The player profile dialog shared by the console views: PlayerProfileSheet on useClubPlayers for
  * the saved player a court, queue card, pool card or leaderboard row points at, with the session's
- * roster level (“LEVEL tonight”) and the Tonight · line while the session is prepared or live
- * (D-PARTICIPANT-PROFILE). Renders nothing until the player is known.
+ * roster level (“LEVEL tonight”) while the session is prepared or live, the status pill while it is
+ * live, and Stats · YEAR (D-PARTICIPANT-PROFILE). Renders nothing until the player is known.
  */
 export function PlayerProfile({ clubPlayerId, onClose, backLabel, onBack }: PlayerProfileProps) {
   const { sessionId = '' } = useParams<{ sessionId?: string }>()
@@ -35,6 +38,7 @@ export function PlayerProfile({ clubPlayerId, onClose, backLabel, onBack }: Play
   const roster = useSessionRoster(sessionId)
   const matches = useSessionMatches(sessionId)
   const photo = usePhotoViewer()
+  const stats = useClubPlayerYearStats(clubPlayerId)
   const profile = clubPlayerId
     ? clubPlayers.data?.players.find((p) => p.id === clubPlayerId)
     : undefined
@@ -42,9 +46,10 @@ export function PlayerProfile({ clubPlayerId, onClose, backLabel, onBack }: Play
   const entry = roster.data?.roster.find((r) => r.clubPlayerId === profile.id)
   const state = session.data?.state
   const live = state === 'prepared' || state === 'active' || state === 'finalizing'
+  // The status pill shows only while the session is live (not prepared, not after Session done).
   const tonight =
-    entry && live && matches.data && session.data
-      ? tonightStatus(entry, matches.data, session.data.courts)
+    entry && state === 'active' && matches.data && session.data
+      ? tonightStatus(entry, matches.data, session.data.courts, session.data.startedAt)
       : null
   const photoUrl = profilePictureSrc(
     profile.picture,
@@ -72,6 +77,10 @@ export function PlayerProfile({ clubPlayerId, onClose, backLabel, onBack }: Play
         tonight={tonight}
         registeredCity={registeredCity(profile.rtrId)}
         rtrId={profile.rtrId}
+        profileHref={profile.rtrId ? rotraProfileUrl(profile.rtrId) : null}
+        year={statsYear(Date.now())}
+        stats={stats.data ?? null}
+        statsLoading={stats.isPending}
         addedLabel={longDateLabel(profile.addedAt)}
         sessionsHere={profile.sessionsHere}
         phoneHidden={profile.phoneHidden}

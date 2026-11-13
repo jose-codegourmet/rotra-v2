@@ -9,7 +9,10 @@ const meta = {
     open: true,
     onOpenChange: fn(),
     onOpenFullProfile: fn(),
+    onShare: fn(),
     onViewPhoto: fn(),
+    year: 2026,
+    profileHref: '/players/p1',
     profile: {
       kind: 'public',
       name: 'Maria Steph',
@@ -59,7 +62,9 @@ export const NoGames: Story = {
   },
 }
 export const Loading: Story = { args: { loading: true } }
-export const Private: Story = { args: { profile: { kind: 'private', name: 'M*** S***' } } }
+export const Private: Story = {
+  args: { profile: { kind: 'private', name: 'M*** S***', bannerKey: 'ember' } },
+}
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
 export const PublicLight: Story = { globals: { theme: 'light' } }
 export const PrivateLight: Story = { ...Private, globals: { theme: 'light' } }

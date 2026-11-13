@@ -20,9 +20,13 @@ import { cropProfileBannerToWide } from './crop'
 import {
   inBannerUploadOrder,
   PROFILE_BANNER_ALREADY_BACK,
+  PROFILE_BANNER_DEFAULT_HIDDEN,
+  PROFILE_BANNER_DEFAULT_REFUSAL,
+  PROFILE_BANNER_DEFAULT_UNAVAILABLE,
   PROFILE_BANNER_DELETE_REFUSAL,
   PROFILE_BANNER_HIDE_REFUSAL,
   PROFILE_BANNER_MISSING,
+  defaultProfileBannerId,
   profileBannerBelowMinimum,
   profileBannerSummary,
   profileBannersAddedMessage,
@@ -68,6 +72,16 @@ export function resolveMockProfileBanner(bannerId: string | null | undefined) {
     (id) => library.find((b) => b.id === id) ?? retainedBanners.get(id),
     inBannerUploadOrder(library.filter((b) => b.shown)),
   )
+}
+
+/**
+ * The default banner Admin picks (D-2026-11-13-03), for cards with no banner of their own (clubs).
+ * Real mode has no default column yet: Court.
+ */
+export function defaultProfileBanner() {
+  return isRealDataMode()
+    ? { bannerKey: 'court', bannerImageUrl: null as string | null }
+    : resolveMockProfileBanner(null)
 }
 
 /** Whether a player can newly pick this banner: it is in the library and shown. */
@@ -166,6 +180,8 @@ export function setProfileBannerShown(input: { id: string; shown: boolean }) {
     checkMockSave()
     const banner = find(draft, input.id)
     if (banner.shown === input.shown) return structuredClone(banner)
+    if (!input.shown && banner.id === defaultProfileBannerId(draft.profileBanners))
+      throw new MockError('conflict', PROFILE_BANNER_DEFAULT_REFUSAL)
     if (!input.shown && profileBannerBelowMinimum(banner, draft.profileBanners))
       throw new MockError('conflict', PROFILE_BANNER_HIDE_REFUSAL)
     banner.shown = input.shown
@@ -197,6 +213,8 @@ export function deleteProfileBanner(id: string) {
   return adminMutation(300, (draft) => {
     checkMockSave()
     const banner = find(draft, id)
+    if (banner.id === defaultProfileBannerId(draft.profileBanners))
+      throw new MockError('conflict', PROFILE_BANNER_DEFAULT_REFUSAL)
     if (profileBannerBelowMinimum(banner, draft.profileBanners))
       throw new MockError('conflict', PROFILE_BANNER_DELETE_REFUSAL)
     retainedBanners.set(banner.id, structuredClone(banner))
@@ -208,6 +226,35 @@ export function deleteProfileBanner(id: string) {
       summary: profileBannerSummary.deleted(banner),
     })
     return structuredClone(banner)
+  })
+}
+
+/**
+ * A-BANNERS › Make default (D-2026-11-13-03): applies at once; the banner must be shown. Resolves
+ * with `{ banner, previousId }` so Undo can make the previous default the default again. The same
+ * banner as now changes nothing. Real mode has no `profile_banners.is_default` column yet (needs a
+ * migration, ask first), so it rejects with PROFILE_BANNER_DEFAULT_UNAVAILABLE.
+ */
+export function setDefaultProfileBanner(id: string) {
+  if (isRealDataMode()) {
+    requireAdminOnline()
+    return Promise.reject(new MockError('conflict', PROFILE_BANNER_DEFAULT_UNAVAILABLE))
+  }
+  return adminMutation(300, (draft) => {
+    checkMockSave()
+    const banner = find(draft, id)
+    const previousId = defaultProfileBannerId(draft.profileBanners)
+    if (previousId === banner.id) return { banner: structuredClone(banner), previousId }
+    if (!banner.shown) throw new MockError('conflict', PROFILE_BANNER_DEFAULT_HIDDEN)
+    const previous = draft.profileBanners.find((b) => b.id === previousId)
+    for (const b of draft.profileBanners) b.isDefault = b.id === banner.id
+    appendAdminAudit(draft, {
+      action: 'profile_banner_default',
+      targetType: 'profile_banner',
+      targetId: banner.id,
+      summary: profileBannerSummary.madeDefault(banner, previous),
+    })
+    return { banner: structuredClone(banner), previousId }
   })
 }
 

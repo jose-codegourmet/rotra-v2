@@ -1,15 +1,18 @@
 'use client'
 
+import { rotraProfileUrl } from '@rotra/data/app-origins'
 import { registeredCity } from '@rotra/data/club-player/fetchers'
 import type { DeleteImpact } from '@rotra/data/club-player/types'
 import { useClubPlayerDetails } from '@rotra/data/club-player/useClubPlayerDetails'
 import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
+import { useClubPlayerYearStats } from '@rotra/data/club-player/useClubPlayerYearStats'
 import { useCreatePlayerInvite } from '@rotra/data/club-player/useCreatePlayerInvite'
 import { useDeleteClubPlayer } from '@rotra/data/club-player/useDeleteClubPlayer'
 import { useLinkGuestToSavedPlayer } from '@rotra/data/club-player/useLinkGuestToSavedPlayer'
 import { useSavedPlayerStats } from '@rotra/data/club-player/useSavedPlayerStats'
 import { useConnectivity } from '@rotra/data/connectivity/useConnectivity'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
+import { statsYear } from '@rotra/data/player/rules'
 import { useNowCard } from '@rotra/data/queue-session/useNowCard'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
@@ -159,6 +162,7 @@ export function SavedPlayers() {
     players.find((p) => p.id === id) ?? all.data?.players.find((p) => p.id === id)
   const photo = usePhotoViewer()
   const profile = byId(profileId)
+  const profileStats = useClubPlayerYearStats(profileId)
   const profilePhotoUrl = profile
     ? profilePictureSrc(
         profile.picture,
@@ -338,6 +342,10 @@ export function SavedPlayers() {
           level={profile.suggestion}
           registeredCity={registeredCity(profile.rtrId)}
           rtrId={profile.rtrId}
+          profileHref={profile.rtrId ? rotraProfileUrl(profile.rtrId) : null}
+          year={statsYear(Date.now())}
+          stats={profileStats.data ?? null}
+          statsLoading={profileStats.isPending}
           addedLabel={longDateLabel(profile.addedAt)}
           joinedVia={joinedViaProp(profile.joinedVia)}
           onLinkToSavedPlayer={

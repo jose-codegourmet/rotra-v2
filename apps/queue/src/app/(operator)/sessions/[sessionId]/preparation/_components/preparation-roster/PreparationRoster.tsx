@@ -1,11 +1,14 @@
 'use client'
 
+import { rotraProfileUrl } from '@rotra/data/app-origins'
 import { useClub } from '@rotra/data/club'
 import { registeredCity } from '@rotra/data/club-player/fetchers'
 import { clubInviteUrl } from '@rotra/data/club-player/registration-url'
 import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
+import { useClubPlayerYearStats } from '@rotra/data/club-player/useClubPlayerYearStats'
 import { DEMO_CLUB_ID } from '@rotra/data/fixtures/clubs'
-import { selfCheckInMark, tonightStatus } from '@rotra/data/public-session/rules'
+import { statsYear } from '@rotra/data/player/rules'
+import { selfCheckInMark } from '@rotra/data/public-session/rules'
 import { expectedGames, slotCapacity } from '@rotra/data/queue-session/queueSession.rules'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionPayments } from '@rotra/data/session-payment/useSessionPayments'
@@ -167,6 +170,7 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
   const giveSlotTo = (waitlistId: string) => giveSlot.mutate({ sessionId, waitlistId }, options)
   const photo = usePhotoViewer()
   const profile = profileId ? byClubPlayer(profileId) : undefined
+  const profileStats = useClubPlayerYearStats(profileId)
   const profilePhotoUrl = profile
     ? profilePictureSrc(
         profile.picture,
@@ -295,9 +299,13 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
           nickname={profile.nickname}
           level={profile.suggestion}
           tonightLevel={profileEntry?.level}
-          tonight={profileEntry ? tonightStatus(profileEntry, [], []) : null}
+          tonight={null}
           registeredCity={registeredCity(profile.rtrId)}
           rtrId={profile.rtrId}
+          profileHref={profile.rtrId ? rotraProfileUrl(profile.rtrId) : null}
+          year={statsYear(Date.now())}
+          stats={profileStats.data ?? null}
+          statsLoading={profileStats.isPending}
           addedLabel={longDateLabel(profile.addedAt)}
           sessionsHere={profile.sessionsHere}
           phoneHidden={profile.phoneHidden}

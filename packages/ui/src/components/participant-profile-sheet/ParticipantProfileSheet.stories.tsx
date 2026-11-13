@@ -20,7 +20,9 @@ const meta = {
     tonight: { kind: 'playing', courtLabel: 'Court 2' },
     registeredCity: 'Cebu City',
     rtrId: withPhoto?.rtrId ?? 'RTR-PH-CEB-040226-0007',
+    year: 2026,
     stats: { games: 42, wins: 25, losses: 17, winRate: 60 },
+    onShare: fn(),
     profileHref: `/player/find/${withPhoto?.rtrId ?? 'RTR-PH-CEB-040226-0007'}`,
   },
 } satisfies Meta<typeof ParticipantProfileSheet>
@@ -46,10 +48,10 @@ export const GettingReady: Story = {
 }
 export const Queued: Story = { args: { tonight: { kind: 'queued', position: 2 } } }
 export const Away: Story = { args: { tonight: { kind: 'away' } } }
-/** On the waitlist, or not in this session: no Tonight line. */
+/** On the waitlist, not in this session, or the session isn't live: no pill. */
 export const NotOnRoster: Story = { args: { tonight: null } }
 export const NoLevelYet: Story = { args: { levelLabel: null } }
 /** The viewer's own tile opens their full card, always-private or not. */
-export const OwnProfile: Story = { args: { tonight: { kind: 'free' } } }
+export const OwnProfile: Story = { args: { tonight: { kind: 'free', restMinutes: 11 } } }
 export const Light: Story = { globals: { theme: 'light' } }
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }

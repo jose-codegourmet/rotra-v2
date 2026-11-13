@@ -37,6 +37,26 @@ export const PROFILE_BANNER_HIDE_REFUSAL = `Keep at least ${PROFILE_BANNER_MIN_S
 export const PROFILE_BANNER_DELETE_REFUSAL = `Keep at least ${PROFILE_BANNER_MIN_SHOWN} banners shown. Upload or show another one first.`
 export const PROFILE_BANNER_MISSING = 'This banner is no longer in the library. Reload the list.'
 export const PROFILE_BANNER_ALREADY_BACK = 'This banner is already back in the library.'
+/** Hiding or deleting the default banner (A-BANNERS, D-2026-11-13-03). */
+export const PROFILE_BANNER_DEFAULT_REFUSAL =
+  'This is the default banner. Make another banner the default first.'
+/** The default tile's title (hover). */
+export const PROFILE_BANNER_DEFAULT_TITLE =
+  'The default banner. Make another banner the default before hiding this one.'
+/** Make default with nothing to change, or a hidden banner. */
+export const PROFILE_BANNER_DEFAULT_HIDDEN = 'Show this banner before making it the default.'
+/** Real mode: no `profile_banners.is_default` column yet. */
+export const PROFILE_BANNER_DEFAULT_UNAVAILABLE =
+  "Making a banner the default isn't available yet."
+
+/** The library's default banner: the one marked Default, else Court (the seed default). */
+export const defaultProfileBannerId = (
+  banners: readonly Pick<ProfileBanner, 'id' | 'isDefault'>[],
+) => banners.find((b) => b.isDefault)?.id ?? DEFAULT_PROFILE_BANNER_ID
+
+/** “Dusk is now the default banner.” (shown with Undo) */
+export const profileBannerDefaultToast = (b: Named) =>
+  `${profileBannerName(b)} is now the default banner.`
 /** A player picked a banner that is hidden, deleted or unknown. */
 export const PROFILE_BANNER_NOT_PICKABLE = 'Choose a banner.'
 
@@ -73,6 +93,8 @@ export const profileBannerSummary = {
   hidden: (b: Named) => `Hid ${profileBannerName(b)} in the player picker.`,
   deleted: (b: Named) => `Deleted ${profileBannerName(b)}. Players who use it keep it.`,
   restored: (b: Named) => `Undid deleting ${profileBannerName(b)}.`,
+  madeDefault: (b: Named, was: Named | undefined) =>
+    `Made ${profileBannerName(b)} the default banner (was ${was ? profileBannerName(was) : 'Court'}).`,
 }
 
 /** Delete toast text with its Undo button (toastUndo) */
@@ -90,18 +112,19 @@ const resolved = (banner: Pick<ProfileBanner, 'id' | 'image'>): ResolvedProfileB
 
 /**
  * The banner a profile card draws. A chosen banner the library still knows (hidden and deleted ones
- * included, passed through `find`) is kept. Otherwise (null, or an id nobody knows) the default:
- * Court while it is shown, else the first shown banner in upload order (owner, 2026-11-12). With no
- * banner shown at all, Court.
+ * included, passed through `find`) is kept. Otherwise (null, or an id nobody knows) the default: the
+ * shown banner Admin marked Default (D-2026-11-13-03), else Court while it is shown, else the first
+ * shown banner in upload order (owner, 2026-11-12). With no banner shown at all, Court.
  */
 export function resolveProfileBanner(
   bannerId: string | null | undefined,
   find: (id: string) => Pick<ProfileBanner, 'id' | 'image'> | undefined,
-  shownInOrder: readonly Pick<ProfileBanner, 'id' | 'image'>[],
+  shownInOrder: readonly Pick<ProfileBanner, 'id' | 'image' | 'isDefault'>[],
 ): ResolvedProfileBanner {
   const chosen = bannerId ? find(bannerId) : undefined
   if (chosen) return resolved(chosen)
   const fallback =
+    shownInOrder.find((b) => b.isDefault) ??
     shownInOrder.find((b) => b.id === DEFAULT_PROFILE_BANNER_ID) ??
     shownInOrder[0] ??
     ({ id: DEFAULT_PROFILE_BANNER_ID, image: '' } as const)

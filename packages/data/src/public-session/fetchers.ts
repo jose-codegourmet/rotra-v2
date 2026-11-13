@@ -15,7 +15,7 @@ import { requireOnline } from '../mock/bridge'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, mockStore } from '../mock/store'
-import { recentGameStats } from '../player/player.rules'
+import { yearGameStats } from '../player/player.rules'
 import { playerProjection } from '../player/projection'
 import { isAlwaysPrivatePlayer, PROFILE_PRIVATE_MESSAGE } from '../player/visibility'
 import { resolveMockProfileBanner } from '../profile-banner/fetchers'
@@ -166,12 +166,12 @@ function publicPerson(
     state.playerProfiles.find((x) => x.playerId === p.playerId)?.profileVisibility ===
       'always_private'
   const showFull = !!viewer && registered && (!alwaysPrivate || isViewer)
-  const banner =
+  // Guests and unclaimed profiles draw the default banner Admin picks (2026-11-13-queue-profile-stats-banner).
+  const banner = resolveMockProfileBanner(
     registered && p?.playerId
-      ? resolveMockProfileBanner(
-          state.playerProfiles.find((x) => x.playerId === p.playerId)?.bannerId,
-        )
-      : null
+      ? state.playerProfiles.find((x) => x.playerId === p.playerId)?.bannerId
+      : null,
+  )
   const profile: ParticipantProfileKind = showFull
     ? 'registered'
     : registered && alwaysPrivate
@@ -185,23 +185,26 @@ function publicPerson(
     pictureUrl: hasRotraProfile && p?.playerId ? (pictures[p.playerId] ?? null) : null,
     isViewer,
     profile,
-    bannerKey: banner?.bannerKey ?? null,
-    bannerImageUrl: banner?.bannerImageUrl ?? null,
+    bannerKey: banner.bannerKey,
+    bannerImageUrl: banner.bannerImageUrl,
   }
 }
 
-/** The Tonight line for one roster entry (#731): prepared and live sessions only. */
+/**
+ * The status pill for one roster entry (#731, 2026-11-13-profile-card-name-layout): live sessions
+ * only, so no pill on a prepared session or after Session done.
+ */
 function tonightOf(
   state: MockState,
   session: MockState['sessions'][number],
   entry: MockState['roster'][number],
 ): ParticipantTonight | undefined {
-  if (session.state !== 'prepared' && session.state !== 'active' && session.state !== 'finalizing')
-    return undefined
+  if (session.state !== 'active') return undefined
   return tonightStatus(
     entry,
     state.matches.filter((m) => m.sessionId === session.id),
     state.courts.filter((c) => c.sessionId === session.id),
+    session.startedAt,
   )
 }
 
@@ -241,12 +244,20 @@ function matchPlayerOf(
     { fullName: r?.nameSnapshot ?? '', nickname: r?.nicknameSnapshot ?? null },
     viewer,
   )
+  // The signed-in read lists the roster in confirmation order; the face points at its entry.
+  const participant = r
+    ? state.roster
+        .filter((x) => x.sessionId === r.sessionId)
+        .sort((a, b) => a.confirmedAt - b.confirmedAt)
+        .findIndex((x) => x.id === r.id)
+    : -1
   return {
     name: publicFirstName(person.name),
     level: r?.level ?? null,
     pictureUrl: person.pictureUrl,
     masked: person.masked,
     ...(viewer ? { isViewer: person.isViewer } : {}),
+    ...(viewer && participant >= 0 ? { participant } : {}),
   }
 }
 
@@ -711,7 +722,7 @@ export async function getMyJoinRequest(slug: string): Promise<MyJoinRequest | nu
 }
 
 /**
- * Stats · last 90 days for the participant profile card (#731), by the RTR ID the signed-in read
+ * Stats · YEAR (the calendar year) for the participant profile card (#731), by the RTR ID the signed-in read
  * gave: games, wins, losses and win rate over the rank window, or null ("No games yet"). Signed-in
  * Players only. An always-private player's stats are refused to everyone but themselves. Real mode
  * reads the Player app's `/api/rtr-ids/<RTR>/stats` with the Player cookie (same-site, #687).
@@ -744,7 +755,7 @@ export async function getParticipantStats(
   if (player.id !== viewerPlayerId && isAlwaysPrivatePlayer(player.id))
     throw new MockError('permission', PROFILE_PRIVATE_MESSAGE)
   // Mock histories are dated from the fixture clock, like rank.
-  return recentGameStats(playerProjection().games[player.id] ?? [], PLAYER_FIXTURE_NOW)
+  return yearGameStats(playerProjection().games[player.id] ?? [], PLAYER_FIXTURE_NOW)
 }
 
 /** Mock server projection, identity supplied only by the Player-hosted mock session route. */

@@ -1,4 +1,4 @@
-import { allPlayers, courtNames, holdsCourt } from '../match/match.rules'
+import { allPlayers, courtNames, holdsCourt, waitMinutes } from '../match/match.rules'
 import type { Match } from '../match/match.types'
 import type { SelfCheckInMark } from '../match-request/matchRequest.types'
 import type { MockState } from '../mock/store'
@@ -191,9 +191,12 @@ export function canRefreshNow(lastRefreshedAt: number | null, now = Date.now()):
  * match's place in the queue), or Free. Same order as the Players view's status.
  */
 export function tonightStatus(
-  entry: Pick<SessionPlayer, 'id' | 'present'>,
+  entry: SessionPlayer,
   matches: Match[],
   courts: SessionCourt[],
+  /** The session's start; with it a Free player carries their rest time (the pill's Free · N min) */
+  startedAt?: number | null,
+  now = Date.now(),
 ): ParticipantTonight {
   const busy = matches.find((m) => holdsCourt(m) && allPlayers(m).includes(entry.id))
   if (busy) {
@@ -207,5 +210,8 @@ export function tonightStatus(
     .filter((m) => m.state === 'waiting')
     .sort((a, b) => a.queuePosition - b.queuePosition)
     .findIndex((m) => allPlayers(m).includes(entry.id))
-  return position >= 0 ? { kind: 'queued', position: position + 1 } : { kind: 'free' }
+  if (position >= 0) return { kind: 'queued', position: position + 1 }
+  return startedAt === undefined
+    ? { kind: 'free' }
+    : { kind: 'free', restMinutes: waitMinutes(entry, matches, startedAt, now) }
 }

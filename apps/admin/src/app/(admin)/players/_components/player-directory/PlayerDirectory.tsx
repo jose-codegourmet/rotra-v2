@@ -5,9 +5,12 @@ import { useAdminPlayer, useAdminPlayerProfile } from '@rotra/data/admin-player/
 import { useAdminPlayerGames } from '@rotra/data/admin-player/useAdminPlayerGames'
 import { useAdminPlayerMutations } from '@rotra/data/admin-player/useAdminPlayerMutations'
 import { useAdminPlayers } from '@rotra/data/admin-player/useAdminPlayers'
-import { appOrigin } from '@rotra/data/app-origins'
+import { appOrigin, rotraProfileUrl } from '@rotra/data/app-origins'
 import { useAdminClubs } from '@rotra/data/club/useAdminClubs'
 import { useContactRequests } from '@rotra/data/contact-change-request/useContactRequests'
+import { countYearCountedWins, statsYear } from '@rotra/data/player/rules'
+import { PLAYING_LEVELS } from '@rotra/data/player/types'
+import { defaultProfileBanner } from '@rotra/data/profile-banner/fetchers'
 import { AdminPlayerCard } from '@rotra/ui/admin-player-card'
 import { AdminPlayerFilters } from '@rotra/ui/admin-player-filters'
 import { AdminPlayerQuickView } from '@rotra/ui/admin-player-quick-view'
@@ -21,7 +24,12 @@ import { ErrorState } from '@rotra/ui/error-state'
 import { usePhotoViewer } from '@rotra/ui/hooks/use-photo-viewer'
 import { PageHeader } from '@rotra/ui/page-header'
 import { PhotoViewer } from '@rotra/ui/photo-viewer'
+import { levelLabel } from '@rotra/ui/level-pill'
 import { PlayerPagination } from '@rotra/ui/player-pagination'
+import { PlayerShareSheet } from '@rotra/ui/player-share-sheet'
+import { profileStats } from '@rotra/ui/profile-banner-card'
+import { profilePictureSrc } from '@rotra/ui/profile-picture'
+import { ProfileShareCard } from '@rotra/ui/profile-share-card'
 import { SameNameNotice } from '@rotra/ui/same-name-notice'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { toast } from '@rotra/ui/toaster'
@@ -85,6 +93,10 @@ export function PlayerDirectory() {
         closePeek()
       },
     })
+  // Share profile from Quick view (2026-11-13-profile-card-open-share): the share dialog replaces the
+  // panel; closing it brings Quick view back.
+  const [sharingId, setSharingId] = useState<string | null>(null)
+  const sharing = !!peek && sharingId === peek
   const denied = useDenyOnPermissionError(
     list.error,
     clubs.error,
@@ -251,8 +263,22 @@ export function PlayerDirectory() {
         actions={
           playerQuery.data ? <PlayerManagementActions player={playerQuery.data} /> : undefined
         }
-        open={!!peek}
+        open={!!peek && !sharing}
         onClose={closePeek}
+        bannerKey={profile.data?.bannerKey ?? defaultProfileBanner().bannerKey}
+        bannerImageUrl={
+          profile.data?.bannerKey
+            ? profile.data.bannerImageUrl
+            : defaultProfileBanner().bannerImageUrl
+        }
+        year={statsYear(Date.now())}
+        stats={(() => {
+          const year = countYearCountedWins(games.data ?? [], Date.now())
+          return profileStats(year.games, year.wins)
+        })()}
+        statsLoading={games.isPending}
+        rotraProfileHref={playerQuery.data?.rtrId ? rotraProfileUrl(playerQuery.data.rtrId) : null}
+        onShare={() => setSharingId(peek)}
         player={playerQuery.data === null ? null : profile.isPending ? undefined : playerQuery.data}
         error={playerQuery.isError || profile.isError}
         onRetry={() => {
@@ -310,6 +336,51 @@ export function PlayerDirectory() {
             )
         }}
       />
+      {playerQuery.data?.rtrId ? (
+        <PlayerShareSheet
+          open={sharing}
+          onOpenChange={(open) => {
+            if (!open) setSharingId(null)
+          }}
+          title="Share profile"
+        >
+          <ProfileShareCard
+            link={rotraProfileUrl(playerQuery.data.rtrId)}
+            name={playerQuery.data.name}
+            nickname={playerQuery.data.nickname}
+            picture={
+              profilePictureSrc(
+                playerQuery.data.picture,
+                playerQuery.data.id,
+                playerQuery.data.name,
+              ) ?? null
+            }
+            levelLabel={
+              playerQuery.data.levelIndex === null
+                ? null
+                : levelLabel(PLAYING_LEVELS[playerQuery.data.levelIndex] ?? null)
+            }
+            position={null}
+            wins={(() => {
+              const year = countYearCountedWins(games.data ?? [], Date.now())
+              return year.games ? year.wins : null
+            })()}
+            onCopy={() => {
+              const value = playerQuery.data?.rtrId ? rotraProfileUrl(playerQuery.data.rtrId) : ''
+              void Promise.resolve()
+                .then(() => navigator.clipboard.writeText(value))
+                .then(
+                  () => toast.success('Link copied'),
+                  () => setCopyValue(value),
+                )
+            }}
+            onError={(message) => toast.error(message)}
+            onDownloaded={(format) =>
+              toast(format === 'story' ? 'Story image downloaded' : 'Post image downloaded')
+            }
+          />
+        </PlayerShareSheet>
+      ) : null}
       {photo.viewerProps ? <PhotoViewer {...photo.viewerProps} /> : null}
     </div>
   )

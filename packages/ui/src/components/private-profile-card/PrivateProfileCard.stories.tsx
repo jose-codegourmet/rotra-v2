@@ -35,3 +35,5 @@ export const GuestLight: Story = {
   globals: { theme: 'light' },
 }
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
+/** The Player app's wording (club members, leaderboard). */
+export const PlayerApp: Story = { args: { context: 'player', bannerKey: 'dusk' } }

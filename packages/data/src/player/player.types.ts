@@ -79,6 +79,17 @@ export type PlayerProfile = {
    * › Player Information search, RTR ID search and public club member lists. Default false.
    */
   hiddenFromDirectory?: boolean
+  /**
+   * Privacy and contact › Show my profile stats (2026-11-13-player-stats-visibility, proposed
+   * `players.show_profile_stats`). Unset or true shows Latest stats on the profile card to others;
+   * false hides it from everyone but the player. Mock only for now: real mode has no column yet.
+   */
+  showProfileStats?: boolean
+  /**
+   * Privacy and contact › Show my weekly performance (proposed `players.show_weekly_performance`).
+   * Unset or true shows the Weekly Performance chart (profile, Games page) to others. Mock only.
+   */
+  showWeeklyPerformance?: boolean
   /** Shown only on the signed-in player account, not public profile cards. */
   adminChangeNote?: string
   playerId: string

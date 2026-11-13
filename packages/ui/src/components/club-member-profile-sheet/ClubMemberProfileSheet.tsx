@@ -47,10 +47,15 @@ export type ClubMemberProfileSheetProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   profile: ClubMemberProfile
-  /** The calendar year the stats count (Stats · YEAR) */
+  /** The calendar year the stats count (Latest stats) */
   year: number
   /** The stats are still loading */
   loading?: boolean
+  /**
+   * false when the player turned off Show my profile stats (2026-11-13-player-stats-visibility) and
+   * the viewer is someone else: Latest stats is left out. Default true.
+   */
+  showStats?: boolean
   /** The profile page (`/players/<id>`): the forward icon right of the name */
   profileHref: string
   /** Open ROTRA profile and the name icon: in-app navigation, same tab (the card closes) */
@@ -65,7 +70,7 @@ export type ClubMemberProfileSheetProps = {
  * The profile dialog in ROTRA Player (D-PARTICIPANT-PROFILE): club page members, the leaderboard.
  * A header-less banner card with the round picture, the name block (display name with a forward
  * arrow to the profile, full name, Copy player ID), level, #N overall and You, then About
- * (Registered in) and Stats · YEAR. Footer Close, Share profile and Open ROTRA profile (same tab).
+ * (Registered in) and Latest stats. Footer Close, Share profile and Open ROTRA profile (same tab).
  * A masked member opens the private card with their own banner.
  */
 export function ClubMemberProfileSheet({
@@ -74,6 +79,7 @@ export function ClubMemberProfileSheet({
   profile,
   year,
   loading = false,
+  showStats = true,
   profileHref,
   onOpenFullProfile,
   onShare,
@@ -151,11 +157,13 @@ export function ClubMemberProfileSheet({
         <ProfileCardSection label="About">
           <KeyValueList items={[{ label: 'Registered in', value: profile.registeredCity ?? '—' }]} />
         </ProfileCardSection>
-        <ProfileStatsSection
-          year={year}
-          loading={loading}
-          stats={stats ? profileStats(stats.games, stats.wins) : null}
-        />
+        {showStats ? (
+          <ProfileStatsSection
+            year={year}
+            loading={loading}
+            stats={stats ? profileStats(stats.games, stats.wins) : null}
+          />
+        ) : null}
       </ProfileBannerCard>
     </Sheet>
   )

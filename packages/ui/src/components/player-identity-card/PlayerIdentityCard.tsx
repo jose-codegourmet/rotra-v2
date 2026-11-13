@@ -20,7 +20,7 @@ export type PlayerIdentityCardProps = {
   onChangeBanner?: () => void
   /** Owner only: opens My player ID */
   onOpenPlayerId?: () => void
-  /** Owner only: opens the Share profile sheet */
+  /** Opens the Share profile sheet: the owner's, or this player's on someone else's profile */
   onShare?: () => void
   /** Public profile: open the comparison (or sign-in). */
   onCompare?: () => void
@@ -73,8 +73,9 @@ export function PlayerIdentityCard({
             .
           </p>
         </div>
+        {/* One full-width button per row (2026-11-13-player-profile-hero-like-card, pass 2). */}
         {isOwn ? (
-          <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,140px),1fr))] gap-2">
+          <div className="grid grid-cols-1 gap-2">
             <Button size="sm" onClick={onEdit}>
               <Icon name="edit" /> Edit profile
             </Button>
@@ -87,10 +88,19 @@ export function PlayerIdentityCard({
               </Button>
             ) : null}
           </div>
-        ) : onCompare ? (
-          <Button size="sm" variant="primary" onClick={onCompare}>
-            <Icon name="versus" /> Compare with {compareSignedIn ? 'me' : 'my results'}
-          </Button>
+        ) : onCompare || onShare ? (
+          <div className="grid grid-cols-1 gap-2">
+            {onCompare ? (
+              <Button size="sm" variant="primary" onClick={onCompare}>
+                <Icon name="versus" /> Compare with {compareSignedIn ? 'me' : 'my results'}
+              </Button>
+            ) : null}
+            {onShare ? (
+              <Button size="sm" onClick={onShare}>
+                <Icon name="share" /> Share profile
+              </Button>
+            ) : null}
+          </div>
         ) : null}
       </section>
     </Card>

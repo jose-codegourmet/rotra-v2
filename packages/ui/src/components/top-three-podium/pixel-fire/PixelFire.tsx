@@ -1,4 +1,5 @@
 'use client'
+import { firePalette } from '@rotra/ui/fire-palette'
 import { useMediaQuery } from '@rotra/ui/hooks/use-media-query'
 import { useEffect, useRef } from 'react'
 import '../TopThreePodium.css'
@@ -42,29 +43,7 @@ export function PixelFire() {
     }
     let palette: number[][] = []
     const updatePalette = () => {
-      const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()
-      const matched = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(accent)?.[1]
-      if (!matched) return
-      const hex =
-        matched.length === 3
-          ? matched
-              .split('')
-              .map((digit) => digit + digit)
-              .join('')
-          : matched
-      const channels = [0, 2, 4].map((offset) => Number.parseInt(hex.slice(offset, offset + 2), 16))
-      const dark = document.documentElement.dataset.theme !== 'light'
-      const mix = (channel: number, amount: number, target: number) =>
-        Math.round(channel + (target - channel) * amount)
-      palette = Array.from({ length: HEAT + 1 }, (_, index) => {
-        const t = index / HEAT
-        if (!index) return [0, 0, 0, 0]
-        const colour =
-          t < 0.55
-            ? channels.map((c) => mix(c * 0.35, t / 0.55, c))
-            : channels.map((c) => mix(c, ((t - 0.55) / 0.45) * (dark ? 0.75 : 0.35), 255))
-        return [...colour, t < 0.12 ? 0 : Math.round(255 * Math.min(1, (t - 0.12) * 2.2))]
-      })
+      palette = firePalette(HEAT) ?? palette
     }
     const draw = () => {
       const frame = context.createImageData(WIDTH, HEIGHT)

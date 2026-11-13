@@ -62,6 +62,8 @@ export const NoGames: Story = {
   },
 }
 export const Loading: Story = { args: { loading: true } }
+/** The player turned off Show my profile stats: no Latest stats for others */
+export const StatsHidden: Story = { args: { showStats: false } }
 export const Private: Story = {
   args: { profile: { kind: 'private', name: 'M*** S***', bannerKey: 'ember' } },
 }

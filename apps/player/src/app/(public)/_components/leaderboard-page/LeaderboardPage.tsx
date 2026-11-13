@@ -38,13 +38,18 @@ function levelLabel(value: string) {
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ')
 }
-export function LeaderboardPage() {
+/**
+ * `focusPlayerId` (`/?player=<id>`, the profile's Overall box; 2026-11-13-player-ranking-card): the
+ * list loads pages until that row is there, scrolls it to the middle and flashes it.
+ */
+export function LeaderboardPage({ focusPlayerId }: { focusPlayerId?: string } = {}) {
   const router = useRouter(),
     client = useQueryClient()
   const account = useAppSelector(selectAccount),
     dev = useAppSelector(selectDev)
   const [query, setQuery] = useState(''),
-    [jumpToMe, setJumpToMe] = useState(false),
+    [jumpTo, setJumpTo] = useState<string | null>(focusPlayerId ?? null),
+    [flashId, setFlashId] = useState<string | null>(null),
     [offlineRetry, setOfflineRetry] = useState(false)
   const board = useLeaderboard(),
     search = useLeaderboardSearch(query)
@@ -96,7 +101,7 @@ export function LeaderboardPage() {
     })
   const changeQuery = (value: string) => {
     setQuery(value)
-    setJumpToMe(false)
+    setJumpTo(null)
     setOfflineRetry(false)
     client.setQueryData<InfiniteData<NonNullable<typeof board.data>['pages'][number]>>(
       leaderboardKeys.pages(),
@@ -106,20 +111,28 @@ export function LeaderboardPage() {
     )
   }
   useEffect(() => {
-    if (!jumpToMe || !account || nameSearch) return
-    const row = document.getElementById(`leaderboard-${account.id}`)
+    if (!flashId) return
+    const timer = setTimeout(() => setFlashId(null), 1600)
+    return () => clearTimeout(timer)
+  }, [flashId])
+  useEffect(() => {
+    if (!jumpTo || nameSearch) return
+    const row = document.getElementById(`leaderboard-${jumpTo}`)
     if (row) {
       row.scrollIntoView({
         block: 'center',
         behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
       })
       row.focus({ preventScroll: true })
-      setJumpToMe(false)
+      // A jump from a profile flashes the row (the prototype's seeOnBoard).
+      if (jumpTo !== account?.id || focusPlayerId === jumpTo) setFlashId(jumpTo)
+      setJumpTo(null)
     } else if (board.hasNextPage && !board.isFetching && !board.isError) void board.fetchNextPage()
-    else if (!board.hasNextPage || board.isError) setJumpToMe(false)
+    else if (!board.hasNextPage || board.isError) setJumpTo(null)
   }, [
-    jumpToMe,
+    jumpTo,
     account,
+    focusPlayerId,
     nameSearch,
     board.hasNextPage,
     board.isFetching,
@@ -239,7 +252,7 @@ export function LeaderboardPage() {
             })()}
             onShowMyRow={() => {
               setQuery('')
-              setJumpToMe(true)
+              if (account) setJumpTo(account.id)
             }}
             onOpenProfile={() => openProfile(account.id)}
             status={notListedStatus}
@@ -311,6 +324,7 @@ export function LeaderboardPage() {
                         : levelLabel(entry.playingLevel)
                     }
                     isMe={entry.id === account?.id}
+                    flash={entry.id === flashId}
                     variant={
                       entry.position <= 3 ? `medal-${entry.position as 1 | 2 | 3}` : undefined
                     }

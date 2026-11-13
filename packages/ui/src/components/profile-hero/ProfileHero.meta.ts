@@ -3,10 +3,10 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const profileHeroMeta = {
   name: 'ProfileHero',
   description:
-    'The top of the Player profile card: a 5:2 Profile banner edge to edge with nothing on it but the banner pencil on your own, then the 88 px circular picture (pencil on your own) with the name and nickname beside it. Nothing overlaps the banner (#765).',
+    'The top of the Player profile card, the same top as the profile dialog (2026-11-13-player-profile-hero-like-card): the top half of the Profile banner as a 5:1 strip, the 88 px picture with a surface ring centred on its bottom edge, then the display name (nickname first) with the full name under it. Edit profile keeps the 5:2 preview.',
   usage: [
-    'placement="card" (default): first child of the profile card (PlayerIdentityCard); the Card needs pt-0 and overflow-hidden so the banner runs from the top edge.',
-    'placement="preview": Edit profile › Name, under the section intro; the name is bold text, not a heading, and updates as the player types.',
+    'placement="card" (default): first child of the profile card (PlayerIdentityCard); the Card needs pt-0 and overflow-hidden so the banner runs from the top edge. The heading is the nickname, else the full name; with a nickname the full name follows in muted text.',
+    'placement="preview": Edit profile › Name, under the section intro (unchanged: 5:2 banner, picture beside the name, nickname in quotes); the name is bold text, not a heading, and updates as the player types.',
     'bannerKey picks one of the six predefined banners (missing or unknown = Court); bannerImageUrl shows an Admin-uploaded banner and wins.',
     'onViewPicture makes a real picture the Avatar view button (“View full photo of NAME”) that opens PhotoViewer (#716); initials never open anything.',
     'onChangePicture adds the pencil (“Change profile picture”); leave it out on someone else’s profile.',
@@ -19,6 +19,7 @@ export const profileHeroMeta = {
       'Player profile (own and public) › profile card (.card.hero); Edit profile › Name (.edit-hero); .hero-top, .bn-cam',
   },
   docs: [
+    'docs/mockup-changes/2026-11-13-player-profile-hero-like-card.md',
     'docs/mockup-changes/2026-11-11-player-profile-banner.md',
     'docs/mockup-changes/2026-11-12-player-profile-banner-layout-dialog.md',
     'docs/screens/product/modules/player-information/profile.md',

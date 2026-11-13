@@ -1,9 +1,11 @@
 'use client'
 import { useSignOut } from '@rotra/data/auth/use-sign-out'
+import { usePlayerProfile } from '@rotra/data/player/usePlayerProfile'
 import { useMyAccount } from '@rotra/data/player-account/useMyAccount'
 import { useSetHiddenFromDirectory } from '@rotra/data/player-account/useSetHiddenFromDirectory'
 import { useSetPhonePrivacy } from '@rotra/data/player-account/useSetPhonePrivacy'
 import { useSetProfileVisibility } from '@rotra/data/player-account/useSetProfileVisibility'
+import { useSetStatsVisibility } from '@rotra/data/player-account/useSetStatsVisibility'
 import { Button } from '@rotra/ui/button'
 import { ContactDetailsCard } from '@rotra/ui/contact-details-card'
 import { ContactRequestStatus } from '@rotra/ui/contact-request-status'
@@ -16,6 +18,7 @@ import {
   profileVisibilityWord,
 } from '@rotra/ui/profile-visibility-control'
 import { SignOutCard } from '@rotra/ui/sign-out-card'
+import { StatsVisibilityCard, type StatsVisibilityKey } from '@rotra/ui/stats-visibility-card'
 import { toast } from '@rotra/ui/toaster'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -25,7 +28,12 @@ import { useContactChangeSheet } from '../../../_components/contact-change-sheet
 import { useRequireSignedIn } from '../../../_components/require-signed-in/useRequireSignedIn'
 import Loading from '../../loading'
 
-export function PrivacyAndContact() {
+export function PrivacyAndContact({
+  highlight = null,
+}: {
+  /** The row to scroll to and flash (the weekly chart's chip opens `weekly`) */
+  highlight?: StatsVisibilityKey | null
+} = {}) {
   const signedOut = useRequireSignedIn()
   const account = useAppSelector(selectAccount)
   // A different player's private data is never requested: only the signed-in id is passed.
@@ -34,6 +42,11 @@ export function PrivacyAndContact() {
   const setVisibility = useSetProfileVisibility()
   const setHidden = useSetHiddenFromDirectory()
   const setPrivacy = useSetPhonePrivacy()
+  // Stats on your profile lives on the public profile (both switches default on).
+  const profile = usePlayerProfile(playerId ?? '')
+  const setStats = useSetStatsVisibility()
+  const [statsPending, setStatsPending] = useState<StatsVisibilityKey | null>(null)
+  const [statsError, setStatsError] = useState<string>()
   const signOut = useSignOut('player')
   const contactChange = useContactChangeSheet(playerId)
   const [privacyError, setPrivacyError] = useState<string>()
@@ -88,6 +101,38 @@ export function PrivacyAndContact() {
                 setVisibilityError(error.message)
                 toast.error(error.message)
               },
+            },
+          )
+        }}
+      />
+      <StatsVisibilityCard
+        showProfileStats={profile.data?.showProfileStats !== false}
+        showWeeklyPerformance={profile.data?.showWeeklyPerformance !== false}
+        pending={statsPending}
+        error={statsError}
+        highlight={profile.data ? highlight : null}
+        onToggle={(key, next) => {
+          if (setStats.isPending) return
+          setStatsError(undefined)
+          setStatsPending(key)
+          setStats.mutate(
+            key === 'stats' ? { showProfileStats: next } : { showWeeklyPerformance: next },
+            {
+              onSuccess: () =>
+                toast(
+                  key === 'stats'
+                    ? next
+                      ? 'Profile stats shown'
+                      : 'Profile stats hidden from others'
+                    : next
+                      ? 'Weekly performance shown'
+                      : 'Weekly performance hidden from others',
+                ),
+              onError: (error) => {
+                setStatsError(error.message)
+                toast.error(error.message)
+              },
+              onSettled: () => setStatsPending(null),
             },
           )
         }}

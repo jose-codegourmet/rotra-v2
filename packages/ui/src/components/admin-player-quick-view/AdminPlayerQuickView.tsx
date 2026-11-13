@@ -62,9 +62,9 @@ export type AdminPlayerQuickViewProps = {
   /** The player's resolved banner (the Admin default for no pick and unclaimed players) */
   bannerKey?: string | null
   bannerImageUrl?: string | null
-  /** The calendar year the stats count (Stats · YEAR) */
+  /** The calendar year the stats count (Latest stats) */
   year?: number
-  /** Stats · YEAR from the same games as History; null is “No games yet this year” */
+  /** Latest stats from the same games as History; null is “No games yet this year” */
   stats?: ParticipantStats | null
   statsLoading?: boolean
   /** The Player app's `/find/<RTR>` profile: the new-tab icon right of the name */

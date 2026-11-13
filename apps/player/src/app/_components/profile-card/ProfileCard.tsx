@@ -93,6 +93,8 @@ export function ProfileCard({
         profile={card}
         year={statsYear(Date.now())}
         loading={named && (games.isPending || profile.isPending)}
+        // Show my profile stats off hides Latest stats from everyone but the player.
+        showStats={person.isYou || profile.data?.showProfileStats !== false}
         profileHref={href}
         onOpenFullProfile={() => {
           if (!named) return

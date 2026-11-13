@@ -8,6 +8,7 @@ import { cn } from '@rotra/ui/cn'
 import { Icon } from '@rotra/ui/icon'
 import { ProfileBanner } from '@rotra/ui/profile-banner'
 import { Skeleton } from '@rotra/ui/skeleton'
+import { StatsFire } from '@rotra/ui/stats-fire'
 import { toast } from '@rotra/ui/toaster'
 import { type MouseEvent, type ReactNode, useRef } from 'react'
 
@@ -276,29 +277,83 @@ export function ProfileCardSection({
   )
 }
 
-/** Stats · YEAR as four tiles (Games, Wins, Losses, Win rate). */
-export function ProfileStatTiles({ stats }: { stats: ParticipantStats }) {
-  const tiles = [
-    { label: 'Games', value: stats.games },
-    { label: 'Wins', value: stats.wins },
-    { label: 'Losses', value: stats.losses },
-    { label: 'Win rate', value: `${stats.winRate}%` },
-  ]
+/** “Latest stats” with the year as a small outlined chip on the right (tooltip on the chip). */
+function LatestStatsHead({ year }: { year: number }) {
   return (
-    <dl className="m-0 grid grid-cols-2 gap-2">
-      {tiles.map((tile) => (
-        <div key={tile.label} className="rounded-lg border border-border bg-surface px-3 py-2.5">
-          <dt className="text-xs font-semibold text-fg2">{tile.label}</dt>
-          <dd className="m-0 mt-0.5 text-[20px] font-extrabold tabular-nums">{tile.value}</dd>
-        </div>
-      ))}
-    </dl>
+    <div className="flex items-center justify-between gap-2">
+      <span className="text-[11px] font-bold tracking-[0.6px] text-fg2 uppercase">Latest stats</span>
+      <span
+        title={`Counts ${year} so far; starts again on January 1`}
+        className="rounded-full border border-border-strong px-2 py-px text-[11px] font-bold text-fg2 tabular-nums"
+      >
+        {year}
+      </span>
+    </div>
   )
 }
 
 /**
- * The one stats block of every profile card (Queue cards, Player card, Admin Quick view): “Stats ·
- * YEAR”, the current calendar year, reset on January 1. Four tiles, or “No games yet this year”.
+ * Latest stats with games (2026-11-13-profile-stats-redesign): a box on the podium's look (an 8 px
+ * accent grid at 7% over the surface, a soft accent glow from the bottom left, an accent-tinted
+ * border) split 30 / 70. Left: “Win rate” over the percentage in 32 px accent with the pixel fire
+ * beside it (above it, capped at 40 px, under 420 px). Right: “Latest stats” and the year chip,
+ * then Games, Wins, Losses as plain counters with hairline dividers.
+ */
+export function ProfileLatestStats({ year, stats }: { year: number; stats: ParticipantStats }) {
+  const counters = [
+    { label: 'Games', value: stats.games },
+    { label: 'Wins', value: stats.wins },
+    { label: 'Losses', value: stats.losses },
+  ]
+  return (
+    <section
+      aria-label="Latest stats"
+      className={cn(
+        'relative grid min-w-0 grid-cols-[minmax(0,3fr)_minmax(0,7fr)] overflow-hidden rounded-lg border px-4 py-3.5',
+        'border-[color-mix(in_srgb,var(--accent)_35%,var(--border))]',
+        'bg-[radial-gradient(120%_90%_at_0%_100%,color-mix(in_srgb,var(--accent)_16%,transparent),transparent_65%),repeating-linear-gradient(0deg,color-mix(in_srgb,var(--accent)_7%,transparent)_0_1px,transparent_1px_8px),repeating-linear-gradient(90deg,color-mix(in_srgb,var(--accent)_7%,transparent)_0_1px,transparent_1px_8px),var(--surface)]',
+      )}
+    >
+      <div className="flex flex-col justify-between gap-2 border-r border-[color-mix(in_srgb,var(--accent)_25%,var(--border))] pr-4 max-[420px]:pr-3">
+        <span className="text-[11px] font-bold tracking-[0.6px] text-fg2 uppercase">Win rate</span>
+        <div
+          role="img"
+          aria-label={`Win rate ${stats.winRate}%`}
+          className="flex min-h-[30px] items-end gap-1 max-[420px]:flex-col-reverse max-[420px]:items-start max-[420px]:gap-0.5"
+        >
+          <span className="text-[32px] leading-[0.9] font-extrabold tracking-[-0.5px] text-accent tabular-nums max-[420px]:text-2xl">
+            {stats.winRate}%
+          </span>
+          <StatsFire rate={stats.winRate} className="max-[420px]:max-h-10 max-[420px]:max-w-[33px]" />
+        </div>
+      </div>
+      <div className="flex min-w-0 flex-col gap-3 pl-4 max-[420px]:pl-3">
+        <LatestStatsHead year={year} />
+        <dl className="m-0 grid grid-cols-3 gap-2">
+          {counters.map((counter) => (
+            <div
+              key={counter.label}
+              className="border-l border-border py-0.5 pl-3.5 first:border-l-0 first:pl-0 max-[420px]:pl-2.5"
+            >
+              <dt className="text-[10px] font-bold tracking-[0.5px] text-fg2 uppercase">
+                {counter.label}
+              </dt>
+              <dd className="m-0 mt-1.5 text-[22px] leading-none font-extrabold tabular-nums max-[420px]:text-[19px]">
+                {counter.value}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </section>
+  )
+}
+
+/**
+ * The one stats block of every profile card (Queue cards, Player card, Admin Quick view): Latest
+ * stats, the current calendar year, reset on January 1 (2026-11-13-profile-stats-redesign). With
+ * games, the win rate and its pixel fire beside Games, Wins and Losses on the podium grid; else
+ * “No games yet this year”.
  */
 export function ProfileStatsSection({
   year,
@@ -306,7 +361,7 @@ export function ProfileStatsSection({
   loading = false,
   error = false,
 }: {
-  /** The calendar year counted (statsYear from @rotra/data/player/rules) */
+  /** The calendar year counted (statsYear from @rotra/data/player/rules), on the year chip */
   year: number
   /** null is “No games yet this year” */
   stats: ParticipantStats | null
@@ -314,22 +369,26 @@ export function ProfileStatsSection({
   /** The read failed: says so instead of “No games yet this year” */
   error?: boolean
 }) {
+  if (!loading && !error && stats && stats.games > 0)
+    return <ProfileLatestStats year={year} stats={stats} />
   return (
-    <ProfileCardSection label={`Stats · ${year}`}>
+    <section
+      aria-label="Latest stats"
+      className="flex min-w-0 flex-col gap-2 rounded-lg border border-border bg-bg px-3.5 py-3"
+    >
+      <LatestStatsHead year={year} />
       {loading ? (
-        <Skeleton label="Loading stats" className="h-[136px] rounded-lg" />
+        <Skeleton label="Loading stats" className="h-[72px] rounded-lg" />
       ) : error ? (
         <p className="m-0 text-fg2">Couldn't load these stats. Try again later.</p>
-      ) : stats && stats.games > 0 ? (
-        <ProfileStatTiles stats={stats} />
       ) : (
         <p className="m-0 text-fg2">No games yet this year</p>
       )}
-    </ProfileCardSection>
+    </section>
   )
 }
 
-/** Games and wins to the four tiles' numbers (win rate a whole percent); null without games. */
+/** Games and wins to the Latest stats numbers (win rate a whole percent); null without games. */
 export function profileStats(games: number, wins: number): ParticipantStats | null {
   if (!games) return null
   return { games, wins, losses: games - wins, winRate: Math.round((wins / games) * 100) }

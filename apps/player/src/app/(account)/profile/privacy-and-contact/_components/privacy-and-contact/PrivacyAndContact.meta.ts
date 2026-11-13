@@ -6,6 +6,7 @@ export const privacyAndContactMeta = {
   usage: [
     'Signed-out visitors never reach it: proxy.ts sends /profile/* to sign-in with returnTo.',
     'The switch shows only the saved value; a failed save keeps it and shows the error in the card and as a toast.',
+    'Stats on your profile (StatsVisibilityCard, useSetStatsVisibility) sits under Profile visibility; its values come from the public profile (unset = on). `?highlight=weekly` (the weekly chart’s chip) scrolls to and flashes Show my weekly performance. Real mode refuses the save until the columns exist.',
     'Request a change opens P-CONTACT-REQUEST through useContactChangeSheet, shared with Edit profile.',
   ],
   prototype: {

@@ -3,7 +3,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const participantProfileSheetMeta = {
   name: 'ParticipantProfileSheet',
   description:
-    'The session page’s participant profile card for a signed-in ROTRA Player (D-PARTICIPANT-PROFILE, #731): a header-less ProfileBannerCard with the name block (display name, new-tab icon, full name, Copy RTR ID), the Registered chip and a level badge, the status pill while live, boxed About (Registered in) and Stats · YEAR as four tiles or “No games yet this year”. Footer Close, Share profile and Open ROTRA profile (new tab).',
+    'The session page’s participant profile card for a signed-in ROTRA Player (D-PARTICIPANT-PROFILE, #731): a header-less ProfileBannerCard with the name block (display name, new-tab icon, full name, Copy RTR ID), the Registered chip and a level badge, the status pill while live, boxed About (Registered in) and Latest stats (the win rate with its fire, Games, Wins, Losses) or “No games yet this year”. Footer Close, Share profile and Open ROTRA profile (new tab).',
   usage: [
     'Opened from a registered participant’s or waitlist tile on the public session page (PublicParticipants onOpenParticipant), and from the viewer’s own tile whatever their visibility. Never for visitors.',
     'Public fields only: no phone, contacts or club-private rows (those belong to PlayerProfileSheet on operator screens).',

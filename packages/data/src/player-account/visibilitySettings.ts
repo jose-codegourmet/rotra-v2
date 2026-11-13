@@ -4,7 +4,7 @@ import { checkMockSave } from '../mock/bridge'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { mockStore, readMockState } from '../mock/store'
-import type { ProfileVisibility } from '../player/player.types'
+import type { PlayerProfile, ProfileVisibility } from '../player/player.types'
 import { isRealDataMode } from '../real/mode'
 import { realSetHiddenFromDirectory, realSetProfileVisibility } from '../real/player'
 import type { MyAccount } from './playerAccount.types'
@@ -89,5 +89,36 @@ export async function setHiddenFromDirectory(input: {
     saved = myAccountOf(draft, session.account.id)
   })
   if (!saved) throw new Error('Player Information save produced no result.')
+  return saved
+}
+
+/** The two switches of Privacy and contact › Stats on your profile; leave one out to keep it. */
+export type StatsVisibilityInput = { showProfileStats?: boolean; showWeeklyPerformance?: boolean }
+
+/**
+ * P-PROFILE-PRIVACY › Stats on your profile (2026-11-13-player-stats-visibility): Show my profile
+ * stats and Show my weekly performance, both on by default. Returns the saved public profile.
+ * Real mode has no columns yet (proposed `show_profile_stats`, `show_weekly_performance`; the
+ * migration waits for the owner), so it refuses the save and every profile reads as shown.
+ */
+export async function setStatsVisibility(input: StatsVisibilityInput): Promise<PlayerProfile> {
+  if (isRealDataMode())
+    throw new MockError('retryable', "Couldn't save: this setting isn't available yet.")
+  await delay(600)
+  const session = await getSession('player')
+  if (!session) throw new MockError('permission', 'Sign in to change who sees your stats.')
+  if (getConnectivity() === 'offline')
+    throw new MockError('offline', "Couldn't save because you're offline. Nothing changed.")
+  checkMockSave()
+  let saved: PlayerProfile | null = null
+  mockStore.update((draft) => {
+    const profile = draft.playerProfiles.find((p) => p.playerId === session.account.id)
+    if (!profile) throw new MockError('permission', 'Sign in to change who sees your stats.')
+    if (input.showProfileStats !== undefined) profile.showProfileStats = input.showProfileStats
+    if (input.showWeeklyPerformance !== undefined)
+      profile.showWeeklyPerformance = input.showWeeklyPerformance
+    saved = { ...profile }
+  })
+  if (!saved) throw new Error('Stats visibility save produced no result.')
   return saved
 }

@@ -120,6 +120,31 @@
       opacity: 0.3;
     }
   }
+
+  /* The leaderboard row a profile's Overall box jumps to (the prototype's .lb-row.flash). */
+  --animate-row-flash: row-flash 1.6s ease-out;
+
+  @keyframes row-flash {
+    0%,
+    40% {
+      background-color: color-mix(in srgb, var(--accent) 30%, transparent);
+    }
+  }
+
+  /* The Privacy and contact setting the weekly chart's chip opens (the prototype's .set-flash). */
+  --animate-setting-flash: setting-flash 2.2s ease-out;
+
+  @keyframes setting-flash {
+    0%,
+    50% {
+      background-color: var(--accent-subtle);
+      box-shadow: 0 0 0 2px var(--accent);
+    }
+    100% {
+      background-color: transparent;
+      box-shadow: 0 0 0 2px transparent;
+    }
+  }
 }
 
 :root {

@@ -18,14 +18,16 @@ export type ProfileShareCardProps = Pick<
   levelLabel: string | null
   /** The overall leaderboard position; hidden when there is none. */
   position: number | null
-  /** Counted wins in the last 90 days; null shows "No games yet". */
+  /** Counted wins this calendar year; null shows "No games yet this year". */
   wins: number | null
+  /** The calendar year the wins count (“In YEAR”); defaults to the current year */
+  year?: number
   onCopy: () => void
 }
 
 /**
  * P-OWN-PROFILE's Share profile: the Story, Facebook post and Square images (picture, level, overall
- * position, last 90 days wins; no QR), picked and downloaded or shared, then OR and the Profile link.
+ * position, wins this calendar year “In YEAR”; no QR), picked and downloaded or shared, then OR and the Profile link.
  * `initialFormat` is kept for older callers and ignored: every size starts picked.
  */
 export function ProfileShareCard({
@@ -36,6 +38,7 @@ export function ProfileShareCard({
   levelLabel,
   position,
   wins,
+  year = new Date().getFullYear(),
   onCopy,
   webShare,
   onShared,
@@ -115,7 +118,7 @@ export function ProfileShareCard({
                     data-qr-text
                     className={cn('text-share-fg', format === 'square' ? 'text-[15px]' : 'text-lg')}
                   >
-                    No games yet
+                    No games yet this year
                   </b>
                 ) : (
                   <div className="flex flex-col gap-0.5">
@@ -123,7 +126,7 @@ export function ProfileShareCard({
                       data-qr-text
                       className="text-[11px] font-semibold tracking-[0.5px] text-share-muted uppercase"
                     >
-                      Last 90 days
+                      In {year}
                     </span>
                     <b
                       data-qr-text

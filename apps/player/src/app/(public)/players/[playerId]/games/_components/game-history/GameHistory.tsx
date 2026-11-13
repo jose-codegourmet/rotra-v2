@@ -116,17 +116,20 @@ export function GameHistory({ playerId }: { playerId: string }) {
           Saved copy. Your rank and games may have changed since this device was last online.
         </Notice>
       ) : null}
-      <WeeklyPerformanceChart
-        days={weeklyPerformance(games.data, year)}
-        year={year}
-        filter={filter}
-        onFilterChange={(next) => {
-          setFilter(next)
-          setPage(1)
-          // Tapping a bar on Fun and partial switches to Singles and doubles and filters there.
-          if (next) setActiveTab('counted')
-        }}
-      />
+      {/* Show my weekly performance off hides the chart from everyone but the player. */}
+      {own || profile.data?.showWeeklyPerformance !== false ? (
+        <WeeklyPerformanceChart
+          days={weeklyPerformance(games.data, year)}
+          year={year}
+          filter={filter}
+          onFilterChange={(next) => {
+            setFilter(next)
+            setPage(1)
+            // Tapping a bar on Fun and partial switches to Singles and doubles and filters there.
+            if (next) setActiveTab('counted')
+          }}
+        />
+      ) : null}
       <MatchHistory
         sessions={games.data}
         activeTab={activeTab}

@@ -9,3 +9,6 @@ export default meta
 type Story = StoryObj<typeof meta>
 export const Games: Story = { args: { sessions: JOSE_SESSIONS, onOpenAll: () => {} } }
 export const Empty: Story = { args: { sessions: [], onOpenAll: () => {} } }
+export const GamesLight: Story = { ...Games, globals: { theme: 'light' } }
+export const EmptyLight: Story = { ...Empty, globals: { theme: 'light' } }
+export const Phone: Story = { ...Games, globals: { viewport: { value: 'phone' } } }

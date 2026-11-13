@@ -12,6 +12,8 @@ export type LeaderboardRowProps = LeaderboardRowVariants & {
   picture?: Pick<AvatarProps, 'src' | 'initials'>
   isMe?: boolean
   masked?: boolean
+  /** Opened from a profile's Overall box: an accent wash that fades out (about 1.6 s) */
+  flash?: boolean
   onSelect: () => void
 }
 
@@ -44,6 +46,7 @@ export function LeaderboardRow({
   variant,
   onSelect,
   masked = false,
+  flash = false,
 }: LeaderboardRowProps) {
   const rowVariant = variant ?? (isMe ? 'me' : 'default')
   const medal = rowVariant.startsWith('medal-')
@@ -61,6 +64,7 @@ export function LeaderboardRow({
         leaderboardRowVariants({ variant: masked ? 'masked' : rowVariant }),
         'group/leaderboard-row',
         rowVariant !== 'me' && 'shadow-[0_-1px_0_var(--border)] first:shadow-none',
+        flash && 'animate-row-flash motion-reduce:animate-none',
       )}
     >
       <span

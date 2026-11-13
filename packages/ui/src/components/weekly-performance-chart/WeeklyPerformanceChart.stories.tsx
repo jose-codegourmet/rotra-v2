@@ -1,7 +1,10 @@
-import { Chip } from '@rotra/ui/chip'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
-import { WeeklyPerformanceChart, type WeeklyPerformanceFilter } from './WeeklyPerformanceChart'
+import {
+  WeeklyPerformanceChart,
+  type WeeklyPerformanceFilter,
+  WeeklyVisibilityChip,
+} from './WeeklyPerformanceChart'
 
 const days = [
   { wins: 6, losses: 3 },
@@ -43,12 +46,21 @@ export const ProfileReadOnly: Story = {
   args: {
     readOnly: true,
     onSeeAllGames: () => {},
-    visibility: <Chip tone="accent">Public</Chip>,
+    visibility: <WeeklyVisibilityChip visibility="public" onOpenSetting={() => {}} />,
   },
   globals: { theme: 'dark' },
 }
 export const ProfileReadOnlyLight: Story = {
   args: { readOnly: true, onSeeAllGames: () => {} },
+  globals: { theme: 'light' },
+}
+/** Show my weekly performance is off: only you see it, the chip reads Hidden */
+export const ProfileHidden: Story = {
+  args: {
+    readOnly: true,
+    onSeeAllGames: () => {},
+    visibility: <WeeklyVisibilityChip visibility="hidden" onOpenSetting={() => {}} />,
+  },
   globals: { theme: 'light' },
 }
 export const Phone: Story = { globals: { theme: 'dark', viewport: { value: 'phone' } } }

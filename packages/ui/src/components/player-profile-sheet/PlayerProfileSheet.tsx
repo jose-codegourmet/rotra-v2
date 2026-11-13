@@ -45,9 +45,9 @@ export type PlayerProfileSheetProps = {
   rtrId: string | null
   /** The Player app's `/find/<RTR>` profile: the new-tab icon right of the name; hidden when missing */
   profileHref?: string | null
-  /** The calendar year the stats count (Stats · YEAR) */
+  /** The calendar year the stats count (Latest stats) */
   year: number
-  /** Stats · YEAR; null is “No games yet this year” */
+  /** Latest stats; null is “No games yet this year” */
   stats: ParticipantStats | null
   statsLoading?: boolean
   /** Long date the club saved them, e.g. "October 3, 2026" */
@@ -85,7 +85,7 @@ const STATUS: Record<Identity, string> = {
  * A player's profile on operator screens, opened from any player picture: the header-less banner
  * profile card (D-PARTICIPANT-PROFILE) with the name block (display name, new-tab icon, full name,
  * Copy RTR ID), the identity chip and level badge, the identity line, the status pill while live,
- * boxed About, Stats · YEAR and In your club, then the guest invite and the levels note. Never shows
+ * boxed About, Latest stats and In your club, then the guest invite and the levels note. Never shows
  * a phone number.
  */
 export function PlayerProfileSheet({

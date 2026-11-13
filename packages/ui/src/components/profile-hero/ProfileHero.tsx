@@ -10,9 +10,12 @@ const PENCIL =
   'absolute grid size-[34px] cursor-pointer place-items-center rounded-full border-2 border-surface bg-accent p-0 text-on-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent'
 
 export type ProfileHeroProps = ProfileHeroVariants & {
-  /** Full name: the heading, and the initials when there is no picture */
+  /** Full name: the initials when there is no picture; under the nickname on the profile card */
   name: string
-  /** Shown in quotes under the name */
+  /**
+   * Profile card: the display name (heading) with the full name under it. Edit profile preview:
+   * shown in quotes under the name.
+   */
   nickname?: string | null
   /** Photo or character image URL; initials on the accent fill when missing */
   pictureSrc?: string | null
@@ -36,11 +39,28 @@ export type ProfileHeroProps = ProfileHeroVariants & {
   className?: string
 }
 
+function PicturePencil({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      aria-label="Change profile picture"
+      title="Change profile picture"
+      onClick={onClick}
+      className={cn(PENCIL, '-right-1.5 -bottom-1.5')}
+    >
+      <Icon name="edit" className="size-4" />
+    </button>
+  )
+}
+
 /**
- * The top of the profile card (P-PROFILE, P-PUBLIC-PROFILE): a 5:2 Profile banner edge to edge with
- * nothing on it but the banner pencil (own profile), then a row with the 88 px circular picture and
- * the name and nickname beside it (#765: nothing overlaps the banner). Edit profile › Name uses the
- * same hero as a live preview (placement="preview"). Put it first in a p-4 Card.
+ * The top of the profile card (P-PROFILE, P-PUBLIC-PROFILE), the same top as the profile dialog
+ * (2026-11-13-player-profile-hero-like-card): the top half of the Profile banner as a 5:1 strip
+ * edge to edge (the banner pencil top right on your own), the 88 px picture with a surface ring
+ * centred on the strip's bottom edge (its pencil on your own), then the display name (nickname
+ * first) with the full name under it when there is a nickname, then the badges. Edit profile › Name
+ * keeps the earlier hero as a live preview (placement="preview": 5:2 banner, the picture beside the
+ * name, the nickname in quotes). Put it first in a p-4 Card with pt-0.
  */
 export function ProfileHero({
   name,
@@ -59,9 +79,50 @@ export function ProfileHero({
   const preview = placement === 'preview'
   // The Edit profile preview is a named group; the profile card is plain layout.
   const Wrapper = preview ? 'section' : 'div'
+  const bannerPencil = onChangeBanner ? (
+    <button
+      type="button"
+      aria-label="Change banner"
+      title="Change banner"
+      onClick={onChangeBanner}
+      className={cn(PENCIL, 'top-2.5 right-2.5')}
+    >
+      <Icon name="edit" className="size-4" />
+    </button>
+  ) : null
+  if (!preview) {
+    const displayName = nickname || name
+    return (
+      <div className={cn('flex min-w-0 flex-col gap-3.5', className)}>
+        <div className={profileHeroBannerVariants({ placement })}>
+          <ProfileBanner strip bannerKey={bannerKey} imageUrl={bannerImageUrl} />
+          {bannerPencil}
+        </div>
+        <div className="relative z-1 -mt-14 flex min-w-0 flex-col items-start gap-2.5">
+          <span className="relative block flex-none">
+            <Avatar
+              name={name}
+              src={pictureSrc ?? undefined}
+              size={88}
+              tone={pictureSrc ? 'neutral' : 'accent'}
+              onView={onViewPicture}
+              className="shadow-[0_0_0_5px_var(--surface)]"
+            />
+            {onChangePicture ? <PicturePencil onClick={onChangePicture} /> : null}
+          </span>
+          <div className="flex min-w-0 flex-col gap-0.5">
+            <h1 className="text-2xl [overflow-wrap:anywhere]">{displayName}</h1>
+            {nickname ? <p className="m-0 text-fg2 [overflow-wrap:anywhere]">{name}</p> : null}
+            {badges ? <div className="flex flex-wrap items-center gap-2">{badges}</div> : null}
+          </div>
+        </div>
+        {children}
+      </div>
+    )
+  }
   return (
     <Wrapper
-      aria-label={preview ? 'Profile card preview' : undefined}
+      aria-label="Profile card preview"
       className={cn('flex min-w-0 flex-col gap-3.5', className)}
     >
       <div className={profileHeroBannerVariants({ placement })}>
@@ -70,17 +131,7 @@ export function ProfileHero({
           imageUrl={bannerImageUrl}
           className="aspect-[5/2] w-full"
         />
-        {onChangeBanner ? (
-          <button
-            type="button"
-            aria-label="Change banner"
-            title="Change banner"
-            onClick={onChangeBanner}
-            className={cn(PENCIL, 'top-2.5 right-2.5')}
-          >
-            <Icon name="edit" className="size-4" />
-          </button>
-        ) : null}
+        {bannerPencil}
       </div>
       <div className="flex min-w-0 items-center gap-3.5">
         <span className="relative block flex-none">
@@ -91,24 +142,10 @@ export function ProfileHero({
             tone={pictureSrc ? 'neutral' : 'accent'}
             onView={onViewPicture}
           />
-          {onChangePicture ? (
-            <button
-              type="button"
-              aria-label="Change profile picture"
-              title="Change profile picture"
-              onClick={onChangePicture}
-              className={cn(PENCIL, '-right-1.5 -bottom-1.5')}
-            >
-              <Icon name="edit" className="size-4" />
-            </button>
-          ) : null}
+          {onChangePicture ? <PicturePencil onClick={onChangePicture} /> : null}
         </span>
         <div className="flex min-w-0 flex-col gap-2">
-          {preview ? (
-            <b className="text-[20px] font-extrabold [overflow-wrap:anywhere]">{name}</b>
-          ) : (
-            <h1 className="[overflow-wrap:anywhere]">{name}</h1>
-          )}
+          <b className="text-[20px] font-extrabold [overflow-wrap:anywhere]">{name}</b>
           {nickname ? <p className="m-0 text-fg2 [overflow-wrap:anywhere]">“{nickname}”</p> : null}
           {badges ? <div className="flex flex-wrap items-center gap-2">{badges}</div> : null}
         </div>

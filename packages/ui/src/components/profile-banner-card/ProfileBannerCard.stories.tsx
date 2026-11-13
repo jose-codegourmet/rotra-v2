@@ -88,6 +88,31 @@ export const NoGamesThisYear: Story = {
     children: <ProfileStatsSection year={2026} stats={null} />,
   },
 }
+/** Latest stats: a low win rate keeps the fire to an ember */
+export const LowWinRate: Story = {
+  args: {
+    tonight: null,
+    children: <ProfileStatsSection year={2026} stats={{ games: 25, wins: 3, losses: 22, winRate: 12 }} />,
+  },
+}
+/** 100%: the largest fire (above the number under 420 px) */
+export const PerfectWinRate: Story = {
+  args: {
+    tonight: null,
+    children: <ProfileStatsSection year={2026} stats={{ games: 9, wins: 9, losses: 0, winRate: 100 }} />,
+  },
+}
+export const PerfectWinRatePhoneLight: Story = {
+  ...PerfectWinRate,
+  globals: { theme: 'light', viewport: { value: 'phone' } },
+}
+/** 0%: no fire */
+export const ZeroWinRate: Story = {
+  args: {
+    tonight: null,
+    children: <ProfileStatsSection year={2026} stats={{ games: 4, wins: 0, losses: 4, winRate: 0 }} />,
+  },
+}
 export const NightBanner: Story = { args: { bannerKey: 'night' } }
 export const StripeBanner: Story = { args: { bannerKey: 'stripe' }, globals: { theme: 'light' } }
 export const Light: Story = { globals: { theme: 'light' } }

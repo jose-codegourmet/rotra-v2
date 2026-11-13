@@ -34,9 +34,9 @@ export type ParticipantProfileSheetProps = {
   registeredCity: string | null
   /** The Copy RTR ID button under the name */
   rtrId: string | null
-  /** The calendar year the stats count (Stats · YEAR) */
+  /** The calendar year the stats count (Latest stats) */
   year: number
-  /** Stats · YEAR; null is “No games yet this year” */
+  /** Latest stats; null is “No games yet this year” */
   stats: ParticipantStats | null
   /** While the stats read is loading */
   statsLoading?: boolean
@@ -55,7 +55,7 @@ export type ParticipantProfileSheetProps = {
  * D-PARTICIPANT-PROFILE, full card: the session page's participant profile for a signed-in ROTRA
  * Player. Header-less banner card with the name block (display name, new-tab icon, full name, Copy
  * RTR ID), the Registered chip and level badge, the status pill while live, boxed About (Registered
- * in) and Stats · YEAR; footer Close, Share profile and Open ROTRA profile (new tab).
+ * in) and Latest stats; footer Close, Share profile and Open ROTRA profile (new tab).
  */
 export function ParticipantProfileSheet({
   open,

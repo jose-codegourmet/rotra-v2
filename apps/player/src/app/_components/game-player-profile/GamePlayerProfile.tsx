@@ -1,6 +1,6 @@
 'use client'
 import { registeredCity } from '@rotra/data/club-player/fetchers'
-import { statsYear } from '@rotra/data/player/rules'
+import { countYearCountedWins, statsYear } from '@rotra/data/player/rules'
 import { PLAYING_LEVELS } from '@rotra/data/player/types'
 import { usePlayerGames } from '@rotra/data/player/usePlayerGames'
 import { usePlayerProfile } from '@rotra/data/player/usePlayerProfile'
@@ -14,8 +14,6 @@ import { PhotoViewer } from '@rotra/ui/photo-viewer'
 import { PrivateProfileCard } from '@rotra/ui/private-profile-card'
 import { useRouter } from 'next/navigation'
 import { pictureSrc } from '../profile-picture/pictureSrc'
-
-const WINDOW_MS = 90 * 864e5
 
 /**
  * The profile card a face on a game court opens (2026-11-13 game row log, pass 3): the full card
@@ -58,11 +56,8 @@ export function GamePlayerProfile({
   let card: ClubMemberProfile
   if (hidden) card = { kind: 'private', name: maskPublicName(player.name), picture }
   else {
-    const since = Date.now() - WINDOW_MS
-    const counted = (games.data ?? [])
-      .filter((s) => Date.parse(s.finishedAt) >= since)
-      .flatMap((s) => s.games.filter((g) => g.counting === 'counted'))
-    const wins = counted.filter((g) => g.result === 'won').length
+    // Latest stats: counted games this calendar year (Asia/Manila), reset on January 1.
+    const year = countYearCountedWins(games.data ?? [], Date.now())
     const rtrId = profile.data?.rtrId ?? null
     const levelIndex = rank.data?.levelIndex ?? null
     card = {
@@ -77,7 +72,7 @@ export function GamePlayerProfile({
       isYou: !!viewerId && viewerId === id,
       registeredCity: registeredCity(rtrId),
       rtrId,
-      stats: games.data ? { games: counted.length, wins, losses: counted.length - wins } : null,
+      stats: games.data ? { ...year, losses: year.games - year.wins } : null,
     }
   }
   return (
@@ -88,6 +83,8 @@ export function GamePlayerProfile({
         profile={card}
         year={statsYear(Date.now())}
         loading={!hidden && (games.isPending || profile.isPending)}
+        // Show my profile stats off hides Latest stats from everyone but the player.
+        showStats={profile.data?.showProfileStats !== false || (!!viewerId && viewerId === id)}
         profileHref={`/players/${id}`}
         onOpenFullProfile={() => router.push(`/players/${id}`)}
         onViewPhoto={picture ? () => photo.show({ src: picture, name: player.name }) : undefined}

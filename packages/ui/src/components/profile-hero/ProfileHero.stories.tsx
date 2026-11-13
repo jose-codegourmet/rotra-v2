@@ -56,6 +56,9 @@ export const LongName: Story = {
     pictureSrc: playerProfileScenarios.longNames.picture,
   },
 }
+/** No nickname: the full name is the heading alone */
+export const NoNickname: Story = { args: { nickname: null } }
+export const NoNicknameLight: Story = { args: { nickname: null }, globals: { theme: 'light' } }
 export const NightBanner: Story = { args: { bannerKey: 'night' } }
 export const EmberBannerLight: Story = { args: { bannerKey: 'ember' }, globals: { theme: 'light' } }
 export const StripeBanner: Story = { args: { bannerKey: 'stripe' } }

@@ -437,6 +437,7 @@
     "./player/visibility": "./src/player/visibility.ts",
     "./player-account/useSetProfileVisibility": "./src/player-account/useSetProfileVisibility.ts",
     "./player-account/useSetHiddenFromDirectory": "./src/player-account/useSetHiddenFromDirectory.ts",
+    "./player-account/useSetStatsVisibility": "./src/player-account/useSetStatsVisibility.ts",
     "./player/visibility-rules": "./src/player/visibility.rules.ts",
     "./player/useMySessions": "./src/player/useMySessions.ts",
     "./player/mySessions": "./src/player/mySessions.ts",

@@ -2,7 +2,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const adminPlayerQuickViewMeta = {
   name: 'AdminPlayerQuickView',
   description:
-    'Compact Admin side panel. Quick view is the banner profile card edge to edge (ProfileBannerCard: the player’s banner, else the default; 72 px picture; display name with the new-tab icon, full name, Copy RTR ID; level and Registered/Unclaimed chips), then private contacts, profile socials, Stats · YEAR and two session summaries; footer Edit, Full history, Share profile, Full profile. Embedded Edit (AdminEditPlayerForm, submitted by the footer Save changes) and registration invite keep the title bar.',
+    'Compact Admin side panel. Quick view is the banner profile card edge to edge (ProfileBannerCard: the player’s banner, else the default; 72 px picture; display name with the new-tab icon, full name, Copy RTR ID; level and Registered/Unclaimed chips), then private contacts, profile socials, Latest stats and two session summaries; footer Edit, Full history, Share profile, Full profile. Embedded Edit (AdminEditPlayerForm, submitted by the footer Save changes) and registration invite keep the title bar.',
   variants: [
     'registered',
     'unclaimed',

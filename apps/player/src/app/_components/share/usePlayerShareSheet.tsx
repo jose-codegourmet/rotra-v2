@@ -1,4 +1,5 @@
 'use client'
+import { statsYear } from '@rotra/data/player/rules'
 import { PLAYING_LEVELS } from '@rotra/data/player/types'
 import { usePlayerProfileShareData } from '@rotra/data/player/usePlayerProfileShareData'
 import { usePlayerShareData } from '@rotra/data/player/usePlayerShareData'
@@ -116,6 +117,7 @@ export function usePlayerShareSheet(playerId: string | null) {
             }
             position={profileShare.position}
             wins={profileShare.wins}
+            year={statsYear(Date.now())}
           />
         ) : (
           <Notice>No share card is available.</Notice>

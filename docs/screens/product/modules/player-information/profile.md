@@ -6,7 +6,7 @@
 
 ## P-PUBLIC-PROFILE — Public identity
 
-Accessible without login, subject to the player's [profile visibility](#profile-states). The top of the profile card is a 5:2 **banner** (see [Profile banner](#profile-banner)) with nothing over it, then the circular picture with the name and nickname beside it; the same card is used for your own profile and for another player's. Show player full/display name, nickname, optional avatar, permanent RTR ID, skill label, and overall leaderboard position only when eligible. Provide readable rank-status explanation rather than a fake position of zero.
+Accessible without login, subject to the player's [profile visibility](#profile-states). The top of the profile card is the top half of the **banner** as a 5:1 strip (see [Profile banner](#profile-banner)), the circular picture centred on its bottom edge, then the display name (nickname first) with the full name under it, like the profile dialog; the same card is used for your own profile and for another player's. Show player full/display name, nickname, optional avatar, permanent RTR ID, skill label, and overall leaderboard position only when eligible. Provide readable rank-status explanation rather than a fake position of zero.
 
 Supporting sections: permitted personal/playing-style information, optional experience, supported social links subject to the final visibility policy, and a read-only match-history entry point. Keep the product lean; do not add posts, followers, private messaging, equipment commerce, or club-discovery maps.
 

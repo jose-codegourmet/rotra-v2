@@ -34,6 +34,51 @@ export type WeeklyPerformanceChartProps = {
 
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
+/** Who can see your weekly chart: Show my weekly performance off is `hidden`, else the profile's visibility. */
+export type WeeklyVisibility = 'public' | 'signed-in' | 'only-you' | 'hidden'
+
+const VISIBILITY: Record<WeeklyVisibility, [string, string]> = {
+  public: ['Public', 'Anyone who opens your profile can see this.'],
+  'signed-in': ['Signed-in players', 'Players signed in to ROTRA can see this on your profile.'],
+  'only-you': ['Only you', 'Only you can see this. Your profile is always private.'],
+  hidden: ['Hidden', 'Only you can see this. Turn it back on in Privacy and contact.'],
+}
+
+/**
+ * The visibility chip on your own Weekly Performance (2026-11-13-player-stats-visibility, pass 2):
+ * a button (Public in the accent; Signed-in players, Only you, Hidden muted) that opens Privacy and
+ * contact at Show my weekly performance. Pass it as the chart's `visibility`.
+ */
+export function WeeklyVisibilityChip({
+  visibility,
+  onOpenSetting,
+}: {
+  visibility: WeeklyVisibility
+  /** Opens Privacy and contact with the Show my weekly performance row highlighted */
+  onOpenSetting: () => void
+}) {
+  const [label, text] = VISIBILITY[visibility]
+  const pub = visibility === 'public'
+  return (
+    <button
+      type="button"
+      onClick={onOpenSetting}
+      title={`${text} Change it in Privacy and contact.`}
+      aria-label={`Visibility: ${label}. ${text} Change it in Privacy and contact`}
+      className={cn(
+        'inline-flex min-h-6 cursor-pointer items-center gap-1.5 rounded-full border bg-transparent px-2.5 py-0.5 text-xs font-semibold',
+        'hover:border-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent',
+        pub
+          ? 'border-[color-mix(in_srgb,var(--accent)_45%,transparent)] text-accent'
+          : 'border-border-strong text-fg2',
+      )}
+    >
+      <i aria-hidden className={cn('size-[7px] rounded-full', pub ? 'bg-accent' : 'bg-fg3')} />
+      {label}
+    </button>
+  )
+}
+
 /** Highest win rate with at least 3 games; -1 when no weekday qualifies. */
 function bestDay(days: WeeklyPerformanceDay[]) {
   let best = -1

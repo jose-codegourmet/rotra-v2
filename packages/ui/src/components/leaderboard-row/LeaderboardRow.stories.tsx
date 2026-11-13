@@ -30,6 +30,8 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
+/** Opened from a profile's Overall box: the row flashes once */
+export const Flash: Story = { args: { flash: true } }
 export const Me: Story = {
   args: {
     position: josePosition,

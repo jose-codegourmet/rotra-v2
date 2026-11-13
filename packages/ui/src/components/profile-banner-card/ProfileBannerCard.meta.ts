@@ -3,7 +3,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const profileBannerCardMeta = {
   name: 'ProfileBannerCard',
   description:
-    'The one profile card of all three apps (D-PARTICIPANT-PROFILE, D-CLUB-PROFILE, Admin Quick view): no title bar; the top half of the player’s banner as a 5:1 strip from the top edge; the round picture (64 px, Admin 72 px) centred on its bottom edge with a surface ring, the eye on hover when it opens the full photo, and the status pill while live; the name block (display name with the profile icon, the full name under it when there is a nickname, the tiny Copy RTR ID button); a chip row, an optional identity line, then boxed sections. Exports ProfileCardSection, ProfileLevelBadge, ProfileStatTiles, ProfileStatsSection (Stats · YEAR), ProfileIdCopyButton, profileStats, tonightText and tonightPillLabel.',
+    'The one profile card of all three apps (D-PARTICIPANT-PROFILE, D-CLUB-PROFILE, Admin Quick view): no title bar; the top half of the player’s banner as a 5:1 strip from the top edge; the round picture (64 px, Admin 72 px) centred on its bottom edge with a surface ring, the eye on hover when it opens the full photo, and the status pill while live; the name block (display name with the profile icon, the full name under it when there is a nickname, the tiny Copy RTR ID button); a chip row, an optional identity line, then boxed sections. Exports ProfileCardSection, ProfileLevelBadge, ProfileLatestStats, ProfileStatsSection (Latest stats: the win rate with its pixel fire, Games, Wins, Losses on the podium grid; the year chip), ProfileIdCopyButton, profileStats, tonightText and tonightPillLabel.',
   usage: [
     'Put it in a Sheet with `headerless` (the × floats on the banner; the visually hidden title is the display name). Shared by ParticipantProfileSheet, PrivateProfileCard, PlayerProfileSheet, ClubMemberProfileSheet, ClubProfileCard and AdminPlayerQuickView.',
     'Display name: nickname, else full name. With a nickname the full name sits under it in muted 14 px; `subline` fills that line otherwise (the club card).',
@@ -16,7 +16,10 @@ export const profileBannerCardMeta = {
     file: 'apps/mockup/queue-app/rotra-queue.html',
     screen: 'SHEETS.profile and SHEETS.pubProfile (.pp-card, .pp-banner, .pp-name, .pp-rtr, .pp-pill)',
   },
-  docs: ['docs/screens/product/dialogs.md#d-participant-profile--participant-profile-card'],
+  docs: [
+    'docs/screens/product/dialogs.md#d-participant-profile--participant-profile-card',
+    'docs/mockup-changes/2026-11-13-profile-stats-redesign.md',
+  ],
   related: [
     'ParticipantProfileSheet',
     'PrivateProfileCard',

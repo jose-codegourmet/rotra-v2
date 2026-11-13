@@ -8,6 +8,7 @@ export const leaderboardRowMeta = {
     'Supports visitor privacy states for Player Information.',
     'Use inside LeaderboardList for the overall ROTRA leaderboard.',
     'Pass isMe for the signed-in player.',
+    'flash: the row a profile’s Overall box jumped to gets an accent wash that fades out (about 1.6 s; none with reduced motion).',
   ],
   prototype: {
     file: 'apps/mockup/player-app/rotra-player.html',

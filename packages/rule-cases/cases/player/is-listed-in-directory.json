@@ -1,0 +1,46 @@
+{
+  "rule": "player/is-listed-in-directory",
+  "version": 1,
+  "cases": [
+    {
+      "name": "Hide me from Player Information › lists a profile unless the switch is on, including profiles without the flag (visibility) #1",
+      "input": {
+        "args": [
+          {
+            "$undefined": true
+          }
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "Hide me from Player Information › lists a profile unless the switch is on, including profiles without the flag (visibility) #2",
+      "input": {
+        "args": [{}]
+      },
+      "expected": true
+    },
+    {
+      "name": "Hide me from Player Information › lists a profile unless the switch is on, including profiles without the flag (visibility) #3",
+      "input": {
+        "args": [
+          {
+            "hiddenFromDirectory": false
+          }
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "Hide me from Player Information › lists a profile unless the switch is on, including profiles without the flag (visibility) #4",
+      "input": {
+        "args": [
+          {
+            "hiddenFromDirectory": true
+          }
+        ]
+      },
+      "expected": false
+    }
+  ]
+}

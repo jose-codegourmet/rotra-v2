@@ -1,0 +1,183 @@
+{
+  "rule": "profile-banner/profile-banner-below-minimum",
+  "version": 1,
+  "cases": [
+    {
+      "name": "minimum shown banners › refuses hiding or deleting a shown banner only at the minimum (profileBanner) #1",
+      "input": {
+        "args": [
+          {
+            "id": "court",
+            "image": "",
+            "shown": true,
+            "uploadedAt": 1794355200000,
+            "number": 1
+          },
+          [
+            {
+              "id": "court",
+              "image": "",
+              "shown": true,
+              "uploadedAt": 1794355200000,
+              "number": 1
+            },
+            {
+              "id": "night",
+              "image": "",
+              "shown": true,
+              "uploadedAt": 1794355200001,
+              "number": 2
+            },
+            {
+              "id": "dusk",
+              "image": "",
+              "shown": true,
+              "uploadedAt": 1794355200002,
+              "number": 3
+            },
+            {
+              "id": "ember",
+              "image": "",
+              "shown": false,
+              "uploadedAt": 1794355200003,
+              "number": 4
+            },
+            {
+              "id": "sun",
+              "image": "",
+              "shown": false,
+              "uploadedAt": 1794355200004,
+              "number": 5
+            },
+            {
+              "id": "stripe",
+              "image": "",
+              "shown": false,
+              "uploadedAt": 1794355200005,
+              "number": 6
+            }
+          ]
+        ]
+      },
+      "expected": false
+    },
+    {
+      "name": "minimum shown banners › refuses hiding or deleting a shown banner only at the minimum (profileBanner) #2",
+      "input": {
+        "args": [
+          {
+            "id": "court",
+            "image": "",
+            "shown": true,
+            "uploadedAt": 1794355200000,
+            "number": 1
+          },
+          [
+            {
+              "id": "court",
+              "image": "",
+              "shown": true,
+              "uploadedAt": 1794355200000,
+              "number": 1
+            },
+            {
+              "id": "night",
+              "image": "",
+              "shown": true,
+              "uploadedAt": 1794355200001,
+              "number": 2
+            },
+            {
+              "id": "dusk",
+              "image": "",
+              "shown": false,
+              "uploadedAt": 1794355200002,
+              "number": 3
+            },
+            {
+              "id": "ember",
+              "image": "",
+              "shown": false,
+              "uploadedAt": 1794355200003,
+              "number": 4
+            },
+            {
+              "id": "sun",
+              "image": "",
+              "shown": false,
+              "uploadedAt": 1794355200004,
+              "number": 5
+            },
+            {
+              "id": "stripe",
+              "image": "",
+              "shown": false,
+              "uploadedAt": 1794355200005,
+              "number": 6
+            }
+          ]
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "minimum shown banners › always lets a hidden banner go (profileBanner)",
+      "input": {
+        "args": [
+          {
+            "id": "sun",
+            "image": "",
+            "shown": false,
+            "uploadedAt": 1794355200004,
+            "number": 5
+          },
+          [
+            {
+              "id": "court",
+              "image": "",
+              "shown": true,
+              "uploadedAt": 1794355200000,
+              "number": 1
+            },
+            {
+              "id": "night",
+              "image": "",
+              "shown": true,
+              "uploadedAt": 1794355200001,
+              "number": 2
+            },
+            {
+              "id": "dusk",
+              "image": "",
+              "shown": false,
+              "uploadedAt": 1794355200002,
+              "number": 3
+            },
+            {
+              "id": "ember",
+              "image": "",
+              "shown": false,
+              "uploadedAt": 1794355200003,
+              "number": 4
+            },
+            {
+              "id": "sun",
+              "image": "",
+              "shown": false,
+              "uploadedAt": 1794355200004,
+              "number": 5
+            },
+            {
+              "id": "stripe",
+              "image": "",
+              "shown": false,
+              "uploadedAt": 1794355200005,
+              "number": 6
+            }
+          ]
+        ]
+      },
+      "expected": false
+    }
+  ]
+}

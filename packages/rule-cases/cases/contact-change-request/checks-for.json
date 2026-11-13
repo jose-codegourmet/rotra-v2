@@ -1,0 +1,1657 @@
+{
+  "rule": "contact-change-request/checks-for",
+  "version": 1,
+  "cases": [
+    {
+      "name": "checks before approving (rotra-admin.html checks()) › returns the four checks in ContactChecksList order (derived, contactChangeRequest)",
+      "input": {
+        "args": [
+          {
+            "requestId": "contact-request-r1",
+            "playerId": "bc4c3446-0131-591b-ab03-af19225dbe8a",
+            "field": "phone",
+            "fromValue": "+63 918 555 0377",
+            "toValue": "+63 927 555 0198",
+            "status": "pending",
+            "requestedAt": 1793059200000,
+            "source": "app",
+            "originalContactRevision": "+639185550377",
+            "providerOperationRef": null
+          },
+          [
+            {
+              "id": "2c7f6a7b-eed9-5051-9426-6dbce5133fbc",
+              "fullName": "Jose",
+              "rtrId": "RTR-PH-CEB-031526-0001",
+              "playerId": "2c7f6a7b-eed9-5051-9426-6dbce5133fbc",
+              "phone": "+639175550142",
+              "email": "jose@example.com",
+              "avatarPreviousRef": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20fill%3D%22%2374488a%22%2F%3E%3Cpath%20d%3D%22M7%2064C9%2049%2021%2044%2032%2044S55%2049%2057%2064Z%22%20fill%3D%22%23ff6b6b%22%2F%3E%3Crect%20x%3D%2227%22%20y%3D%2237%22%20width%3D%2210%22%20height%3D%229%22%20rx%3D%223%22%20fill%3D%22%23f6dcc4%22%2F%3E%3Cellipse%20cx%3D%2219.5%22%20cy%3D%2229%22%20rx%3D%222.4%22%20ry%3D%223.2%22%20fill%3D%22%23f6dcc4%22%2F%3E%3Cellipse%20cx%3D%2244.5%22%20cy%3D%2229%22%20rx%3D%222.4%22%20ry%3D%223.2%22%20fill%3D%22%23f6dcc4%22%2F%3E%3Cellipse%20cx%3D%2232%22%20cy%3D%2228%22%20rx%3D%2212.5%22%20ry%3D%2214.5%22%20fill%3D%22%23f6dcc4%22%2F%3E%3Cpath%20d%3D%22M20%2024C21%2015%2043%2015%2044%2024C38%2020%2026%2020%2020%2024Z%22%20fill%3D%22%234a3021%22%20opacity%3D%22.85%22%2F%3E%3Cpath%20d%3D%22M25%2025.5h4M35%2025.5h4%22%20stroke%3D%22%234a3021%22%20stroke-width%3D%221.5%22%20stroke-linecap%3D%22round%22%2F%3E%3Ccircle%20cx%3D%2227%22%20cy%3D%2229.5%22%20r%3D%221.6%22%20fill%3D%22%231b1817%22%2F%3E%3Ccircle%20cx%3D%2237%22%20cy%3D%2229.5%22%20r%3D%221.6%22%20fill%3D%22%231b1817%22%2F%3E%3Cpath%20d%3D%22M27.5%2035.5Q32%2039%2036.5%2035.5%22%20fill%3D%22none%22%20stroke%3D%22%237a3e2e%22%20stroke-width%3D%221.6%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E",
+              "phoneHidden": true,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "bc4c3446-0131-591b-ab03-af19225dbe8a",
+              "fullName": "Raymark",
+              "rtrId": "RTR-PH-CEB-040226-0007",
+              "playerId": "bc4c3446-0131-591b-ab03-af19225dbe8a",
+              "phone": "+639185550377",
+              "email": "raymark@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "a22725ed-0ae7-5f29-9ca8-edf1c775b833",
+              "fullName": "Jasper",
+              "rtrId": "RTR-PH-CEB-081326-0040",
+              "playerId": "a22725ed-0ae7-5f29-9ca8-edf1c775b833",
+              "phone": "+639175550566",
+              "email": "jasper@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "d720c601-da89-5474-9351-00e2fb966e56",
+              "fullName": "Karl",
+              "rtrId": "RTR-PH-DVO-070926-0031",
+              "playerId": "d720c601-da89-5474-9351-00e2fb966e56",
+              "phone": "+639265550149",
+              "email": "karl@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "f5a63c91-34fd-53ec-948d-0ef644b5aeac",
+              "fullName": "Mikee Abellana",
+              "rtrId": "RTR-PH-CEB-040226-0011",
+              "playerId": "f5a63c91-34fd-53ec-948d-0ef644b5aeac",
+              "phone": "+639205550458",
+              "email": "mikee.abellana@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "9f83495f-9359-5f7f-82ad-4cf01b826471",
+              "fullName": "Emji",
+              "rtrId": "RTR-PH-MNL-081326-0042",
+              "playerId": "9f83495f-9359-5f7f-82ad-4cf01b826471",
+              "phone": "+639055550297",
+              "email": "emji@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "80861dfd-99c7-57bb-a46c-d8c76e9a8dcc",
+              "fullName": "Dalton",
+              "rtrId": "RTR-PH-CEB-061126-0021",
+              "playerId": "80861dfd-99c7-57bb-a46c-d8c76e9a8dcc",
+              "phone": "+639155550814",
+              "email": "dalton@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            }
+          ],
+          [
+            {
+              "requestId": "contact-request-r1",
+              "playerId": "bc4c3446-0131-591b-ab03-af19225dbe8a",
+              "field": "phone",
+              "fromValue": "+63 918 555 0377",
+              "toValue": "+63 927 555 0198",
+              "status": "pending",
+              "requestedAt": 1793059200000,
+              "source": "app",
+              "originalContactRevision": "+639185550377",
+              "providerOperationRef": null
+            },
+            {
+              "requestId": "contact-request-r2",
+              "playerId": "a22725ed-0ae7-5f29-9ca8-edf1c775b833",
+              "field": "phone",
+              "fromValue": "+63 917 555 0566",
+              "toValue": "+63 917 555 0142",
+              "status": "pending",
+              "requestedAt": 1793048400000,
+              "source": "app",
+              "originalContactRevision": "+639175550566",
+              "providerOperationRef": null
+            },
+            {
+              "requestId": "contact-request-r3",
+              "playerId": "d720c601-da89-5474-9351-00e2fb966e56",
+              "field": "email",
+              "fromValue": "karl@example.com",
+              "toValue": "karl.matina@example.com",
+              "status": "pending",
+              "requestedAt": 1792807200000,
+              "source": "app",
+              "originalContactRevision": "karl@example.com",
+              "providerOperationRef": null
+            },
+            {
+              "requestId": "contact-request-r4",
+              "playerId": "d720c601-da89-5474-9351-00e2fb966e56",
+              "field": "email",
+              "fromValue": "karl@example.com",
+              "toValue": "karl.dvo@example.com",
+              "status": "pending",
+              "requestedAt": 1792987200000,
+              "source": "app",
+              "originalContactRevision": "karl@example.com",
+              "providerOperationRef": null
+            },
+            {
+              "requestId": "contact-request-r5",
+              "playerId": "f5a63c91-34fd-53ec-948d-0ef644b5aeac",
+              "field": "email",
+              "fromValue": "mikee.abellana@example.com",
+              "toValue": "mikee.abellana.smash@example.com",
+              "status": "pending",
+              "requestedAt": 1792972800000,
+              "source": "owner",
+              "originalContactRevision": "mikee.abellana@example.com",
+              "providerOperationRef": null
+            },
+            {
+              "requestId": "contact-request-r6",
+              "playerId": "9f83495f-9359-5f7f-82ad-4cf01b826471",
+              "field": "phone",
+              "fromValue": "+63 905 555 0297",
+              "toValue": "+63 905 555 0415",
+              "status": "applying",
+              "requestedAt": 1792958400000,
+              "source": "app",
+              "originalContactRevision": "+639055550297",
+              "providerOperationRef": "provider-op-r6",
+              "approvedAt": 1793065680000
+            },
+            {
+              "requestId": "contact-request-r7",
+              "playerId": "80861dfd-99c7-57bb-a46c-d8c76e9a8dcc",
+              "field": "phone",
+              "fromValue": "+63 915 555 0814",
+              "toValue": "+63 915 555 0990",
+              "status": "failed",
+              "requestedAt": 1792893600000,
+              "source": "app",
+              "originalContactRevision": "+639155550814",
+              "providerOperationRef": "provider-op-r7",
+              "approvedAt": 1792980000000,
+              "error": "The sign-in provider didn't accept the new number."
+            },
+            {
+              "requestId": "contact-request-r8",
+              "playerId": "f5a63c91-34fd-53ec-948d-0ef644b5aeac",
+              "field": "email",
+              "fromValue": "mikee@example.com",
+              "toValue": "mikee.abellana@example.com",
+              "status": "applied",
+              "requestedAt": 1792720800000,
+              "source": "app",
+              "originalContactRevision": "mikee@example.com",
+              "providerOperationRef": "provider-op-r8",
+              "approvedAt": 1792807200000,
+              "appliedAt": 1792807240000
+            },
+            {
+              "requestId": "contact-request-r9",
+              "playerId": "bc4c3446-0131-591b-ab03-af19225dbe8a",
+              "field": "email",
+              "fromValue": "raymark@example.com",
+              "toValue": "raymark.m@example.com",
+              "status": "rejected",
+              "requestedAt": 1792548000000,
+              "source": "app",
+              "originalContactRevision": "raymark@example.com",
+              "providerOperationRef": null,
+              "decidedAt": 1792634400000
+            }
+          ]
+        ]
+      },
+      "expected": [
+        {
+          "kind": "linked-elsewhere",
+          "ok": true
+        },
+        {
+          "kind": "newer-request",
+          "ok": true
+        },
+        {
+          "kind": "original-changed",
+          "ok": true
+        },
+        {
+          "kind": "in-progress",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "name": "checks before approving (rotra-admin.html checks()) › r2 is blocked: the number is linked to another player (Jose), named by name and RTR ID (derived, contactChangeRequest)",
+      "input": {
+        "args": [
+          {
+            "requestId": "contact-request-r2",
+            "playerId": "a22725ed-0ae7-5f29-9ca8-edf1c775b833",
+            "field": "phone",
+            "fromValue": "+63 917 555 0566",
+            "toValue": "+63 917 555 0142",
+            "status": "pending",
+            "requestedAt": 1793048400000,
+            "source": "app",
+            "originalContactRevision": "+639175550566",
+            "providerOperationRef": null
+          },
+          [
+            {
+              "id": "2c7f6a7b-eed9-5051-9426-6dbce5133fbc",
+              "fullName": "Jose",
+              "rtrId": "RTR-PH-CEB-031526-0001",
+              "playerId": "2c7f6a7b-eed9-5051-9426-6dbce5133fbc",
+              "phone": "+639175550142",
+              "email": "jose@example.com",
+              "avatarPreviousRef": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20fill%3D%22%2374488a%22%2F%3E%3Cpath%20d%3D%22M7%2064C9%2049%2021%2044%2032%2044S55%2049%2057%2064Z%22%20fill%3D%22%23ff6b6b%22%2F%3E%3Crect%20x%3D%2227%22%20y%3D%2237%22%20width%3D%2210%22%20height%3D%229%22%20rx%3D%223%22%20fill%3D%22%23f6dcc4%22%2F%3E%3Cellipse%20cx%3D%2219.5%22%20cy%3D%2229%22%20rx%3D%222.4%22%20ry%3D%223.2%22%20fill%3D%22%23f6dcc4%22%2F%3E%3Cellipse%20cx%3D%2244.5%22%20cy%3D%2229%22%20rx%3D%222.4%22%20ry%3D%223.2%22%20fill%3D%22%23f6dcc4%22%2F%3E%3Cellipse%20cx%3D%2232%22%20cy%3D%2228%22%20rx%3D%2212.5%22%20ry%3D%2214.5%22%20fill%3D%22%23f6dcc4%22%2F%3E%3Cpath%20d%3D%22M20%2024C21%2015%2043%2015%2044%2024C38%2020%2026%2020%2020%2024Z%22%20fill%3D%22%234a3021%22%20opacity%3D%22.85%22%2F%3E%3Cpath%20d%3D%22M25%2025.5h4M35%2025.5h4%22%20stroke%3D%22%234a3021%22%20stroke-width%3D%221.5%22%20stroke-linecap%3D%22round%22%2F%3E%3Ccircle%20cx%3D%2227%22%20cy%3D%2229.5%22%20r%3D%221.6%22%20fill%3D%22%231b1817%22%2F%3E%3Ccircle%20cx%3D%2237%22%20cy%3D%2229.5%22%20r%3D%221.6%22%20fill%3D%22%231b1817%22%2F%3E%3Cpath%20d%3D%22M27.5%2035.5Q32%2039%2036.5%2035.5%22%20fill%3D%22none%22%20stroke%3D%22%237a3e2e%22%20stroke-width%3D%221.6%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E",
+              "phoneHidden": true,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "bc4c3446-0131-591b-ab03-af19225dbe8a",
+              "fullName": "Raymark",
+              "rtrId": "RTR-PH-CEB-040226-0007",
+              "playerId": "bc4c3446-0131-591b-ab03-af19225dbe8a",
+              "phone": "+639185550377",
+              "email": "raymark@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "a22725ed-0ae7-5f29-9ca8-edf1c775b833",
+              "fullName": "Jasper",
+              "rtrId": "RTR-PH-CEB-081326-0040",
+              "playerId": "a22725ed-0ae7-5f29-9ca8-edf1c775b833",
+              "phone": "+639175550566",
+              "email": "jasper@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "d720c601-da89-5474-9351-00e2fb966e56",
+              "fullName": "Karl",
+              "rtrId": "RTR-PH-DVO-070926-0031",
+              "playerId": "d720c601-da89-5474-9351-00e2fb966e56",
+              "phone": "+639265550149",
+              "email": "karl@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "f5a63c91-34fd-53ec-948d-0ef644b5aeac",
+              "fullName": "Mikee Abellana",
+              "rtrId": "RTR-PH-CEB-040226-0011",
+              "playerId": "f5a63c91-34fd-53ec-948d-0ef644b5aeac",
+              "phone": "+639205550458",
+              "email": "mikee.abellana@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "9f83495f-9359-5f7f-82ad-4cf01b826471",
+              "fullName": "Emji",
+              "rtrId": "RTR-PH-MNL-081326-0042",
+              "playerId": "9f83495f-9359-5f7f-82ad-4cf01b826471",
+              "phone": "+639055550297",
+              "email": "emji@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "80861dfd-99c7-57bb-a46c-d8c76e9a8dcc",
+              "fullName": "Dalton",
+              "rtrId": "RTR-PH-CEB-061126-0021",
+              "playerId": "80861dfd-99c7-57bb-a46c-d8c76e9a8dcc",
+              "phone": "+639155550814",
+              "email": "dalton@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            }
+          ],
+          [
+            {
+              "requestId": "contact-request-r1",
+              "playerId": "bc4c3446-0131-591b-ab03-af19225dbe8a",
+              "field": "phone",
+              "fromValue": "+63 918 555 0377",
+              "toValue": "+63 927 555 0198",
+              "status": "pending",
+              "requestedAt": 1793059200000,
+              "source": "app",
+              "originalContactRevision": "+639185550377",
+              "providerOperationRef": null
+            },
+            {
+              "requestId": "contact-request-r2",
+              "playerId": "a22725ed-0ae7-5f29-9ca8-edf1c775b833",
+              "field": "phone",
+              "fromValue": "+63 917 555 0566",
+              "toValue": "+63 917 555 0142",
+              "status": "pending",
+              "requestedAt": 1793048400000,
+              "source": "app",
+              "originalContactRevision": "+639175550566",
+              "providerOperationRef": null
+            },
+            {
+              "requestId": "contact-request-r3",
+              "playerId": "d720c601-da89-5474-9351-00e2fb966e56",
+              "field": "email",
+              "fromValue": "karl@example.com",
+              "toValue": "karl.matina@example.com",
+              "status": "pending",
+              "requestedAt": 1792807200000,
+              "source": "app",
+              "originalContactRevision": "karl@example.com",
+              "providerOperationRef": null
+            },
+            {
+              "requestId": "contact-request-r4",
+              "playerId": "d720c601-da89-5474-9351-00e2fb966e56",
+              "field": "email",
+              "fromValue": "karl@example.com",
+              "toValue": "karl.dvo@example.com",
+              "status": "pending",
+              "requestedAt": 1792987200000,
+              "source": "app",
+              "originalContactRevision": "karl@example.com",
+              "providerOperationRef": null
+            },
+            {
+              "requestId": "contact-request-r5",
+              "playerId": "f5a63c91-34fd-53ec-948d-0ef644b5aeac",
+              "field": "email",
+              "fromValue": "mikee.abellana@example.com",
+              "toValue": "mikee.abellana.smash@example.com",
+              "status": "pending",
+              "requestedAt": 1792972800000,
+              "source": "owner",
+              "originalContactRevision": "mikee.abellana@example.com",
+              "providerOperationRef": null
+            },
+            {
+              "requestId": "contact-request-r6",
+              "playerId": "9f83495f-9359-5f7f-82ad-4cf01b826471",
+              "field": "phone",
+              "fromValue": "+63 905 555 0297",
+              "toValue": "+63 905 555 0415",
+              "status": "applying",
+              "requestedAt": 1792958400000,
+              "source": "app",
+              "originalContactRevision": "+639055550297",
+              "providerOperationRef": "provider-op-r6",
+              "approvedAt": 1793065680000
+            },
+            {
+              "requestId": "contact-request-r7",
+              "playerId": "80861dfd-99c7-57bb-a46c-d8c76e9a8dcc",
+              "field": "phone",
+              "fromValue": "+63 915 555 0814",
+              "toValue": "+63 915 555 0990",
+              "status": "failed",
+              "requestedAt": 1792893600000,
+              "source": "app",
+              "originalContactRevision": "+639155550814",
+              "providerOperationRef": "provider-op-r7",
+              "approvedAt": 1792980000000,
+              "error": "The sign-in provider didn't accept the new number."
+            },
+            {
+              "requestId": "contact-request-r8",
+              "playerId": "f5a63c91-34fd-53ec-948d-0ef644b5aeac",
+              "field": "email",
+              "fromValue": "mikee@example.com",
+              "toValue": "mikee.abellana@example.com",
+              "status": "applied",
+              "requestedAt": 1792720800000,
+              "source": "app",
+              "originalContactRevision": "mikee@example.com",
+              "providerOperationRef": "provider-op-r8",
+              "approvedAt": 1792807200000,
+              "appliedAt": 1792807240000
+            },
+            {
+              "requestId": "contact-request-r9",
+              "playerId": "bc4c3446-0131-591b-ab03-af19225dbe8a",
+              "field": "email",
+              "fromValue": "raymark@example.com",
+              "toValue": "raymark.m@example.com",
+              "status": "rejected",
+              "requestedAt": 1792548000000,
+              "source": "app",
+              "originalContactRevision": "raymark@example.com",
+              "providerOperationRef": null,
+              "decidedAt": 1792634400000
+            }
+          ]
+        ]
+      },
+      "expected": [
+        {
+          "kind": "linked-elsewhere",
+          "ok": false,
+          "otherPlayer": {
+            "id": "2c7f6a7b-eed9-5051-9426-6dbce5133fbc",
+            "fullName": "Jose",
+            "rtrId": "RTR-PH-CEB-031526-0001"
+          }
+        },
+        {
+          "kind": "newer-request",
+          "ok": true
+        },
+        {
+          "kind": "original-changed",
+          "ok": true
+        },
+        {
+          "kind": "in-progress",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "name": "checks before approving (rotra-admin.html checks()) › r3 is blocked by the newer r4, which itself passes (derived, contactChangeRequest) #1",
+      "input": {
+        "args": [
+          {
+            "requestId": "contact-request-r3",
+            "playerId": "d720c601-da89-5474-9351-00e2fb966e56",
+            "field": "email",
+            "fromValue": "karl@example.com",
+            "toValue": "karl.matina@example.com",
+            "status": "pending",
+            "requestedAt": 1792807200000,
+            "source": "app",
+            "originalContactRevision": "karl@example.com",
+            "providerOperationRef": null
+          },
+          [
+            {
+              "id": "2c7f6a7b-eed9-5051-9426-6dbce5133fbc",
+              "fullName": "Jose",
+              "rtrId": "RTR-PH-CEB-031526-0001",
+              "playerId": "2c7f6a7b-eed9-5051-9426-6dbce5133fbc",
+              "phone": "+639175550142",
+              "email": "jose@example.com",
+              "avatarPreviousRef": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20fill%3D%22%2374488a%22%2F%3E%3Cpath%20d%3D%22M7%2064C9%2049%2021%2044%2032%2044S55%2049%2057%2064Z%22%20fill%3D%22%23ff6b6b%22%2F%3E%3Crect%20x%3D%2227%22%20y%3D%2237%22%20width%3D%2210%22%20height%3D%229%22%20rx%3D%223%22%20fill%3D%22%23f6dcc4%22%2F%3E%3Cellipse%20cx%3D%2219.5%22%20cy%3D%2229%22%20rx%3D%222.4%22%20ry%3D%223.2%22%20fill%3D%22%23f6dcc4%22%2F%3E%3Cellipse%20cx%3D%2244.5%22%20cy%3D%2229%22%20rx%3D%222.4%22%20ry%3D%223.2%22%20fill%3D%22%23f6dcc4%22%2F%3E%3Cellipse%20cx%3D%2232%22%20cy%3D%2228%22%20rx%3D%2212.5%22%20ry%3D%2214.5%22%20fill%3D%22%23f6dcc4%22%2F%3E%3Cpath%20d%3D%22M20%2024C21%2015%2043%2015%2044%2024C38%2020%2026%2020%2020%2024Z%22%20fill%3D%22%234a3021%22%20opacity%3D%22.85%22%2F%3E%3Cpath%20d%3D%22M25%2025.5h4M35%2025.5h4%22%20stroke%3D%22%234a3021%22%20stroke-width%3D%221.5%22%20stroke-linecap%3D%22round%22%2F%3E%3Ccircle%20cx%3D%2227%22%20cy%3D%2229.5%22%20r%3D%221.6%22%20fill%3D%22%231b1817%22%2F%3E%3Ccircle%20cx%3D%2237%22%20cy%3D%2229.5%22%20r%3D%221.6%22%20fill%3D%22%231b1817%22%2F%3E%3Cpath%20d%3D%22M27.5%2035.5Q32%2039%2036.5%2035.5%22%20fill%3D%22none%22%20stroke%3D%22%237a3e2e%22%20stroke-width%3D%221.6%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E",
+              "phoneHidden": true,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "bc4c3446-0131-591b-ab03-af19225dbe8a",
+              "fullName": "Raymark",
+              "rtrId": "RTR-PH-CEB-040226-0007",
+              "playerId": "bc4c3446-0131-591b-ab03-af19225dbe8a",
+              "phone": "+639185550377",
+              "email": "raymark@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "a22725ed-0ae7-5f29-9ca8-edf1c775b833",
+              "fullName": "Jasper",
+              "rtrId": "RTR-PH-CEB-081326-0040",
+              "playerId": "a22725ed-0ae7-5f29-9ca8-edf1c775b833",
+              "phone": "+639175550566",
+              "email": "jasper@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "d720c601-da89-5474-9351-00e2fb966e56",
+              "fullName": "Karl",
+              "rtrId": "RTR-PH-DVO-070926-0031",
+              "playerId": "d720c601-da89-5474-9351-00e2fb966e56",
+              "phone": "+639265550149",
+              "email": "karl@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "f5a63c91-34fd-53ec-948d-0ef644b5aeac",
+              "fullName": "Mikee Abellana",
+              "rtrId": "RTR-PH-CEB-040226-0011",
+              "playerId": "f5a63c91-34fd-53ec-948d-0ef644b5aeac",
+              "phone": "+639205550458",
+              "email": "mikee.abellana@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "9f83495f-9359-5f7f-82ad-4cf01b826471",
+              "fullName": "Emji",
+              "rtrId": "RTR-PH-MNL-081326-0042",
+              "playerId": "9f83495f-9359-5f7f-82ad-4cf01b826471",
+              "phone": "+639055550297",
+              "email": "emji@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "80861dfd-99c7-57bb-a46c-d8c76e9a8dcc",
+              "fullName": "Dalton",
+              "rtrId": "RTR-PH-CEB-061126-0021",
+              "playerId": "80861dfd-99c7-57bb-a46c-d8c76e9a8dcc",
+              "phone": "+639155550814",
+              "email": "dalton@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            }
+          ],
+          [
+            {
+              "requestId": "contact-request-r1",
+              "playerId": "bc4c3446-0131-591b-ab03-af19225dbe8a",
+              "field": "phone",
+              "fromValue": "+63 918 555 0377",
+              "toValue": "+63 927 555 0198",
+              "status": "pending",
+              "requestedAt": 1793059200000,
+              "source": "app",
+              "originalContactRevision": "+639185550377",
+              "providerOperationRef": null
+            },
+            {
+              "requestId": "contact-request-r2",
+              "playerId": "a22725ed-0ae7-5f29-9ca8-edf1c775b833",
+              "field": "phone",
+              "fromValue": "+63 917 555 0566",
+              "toValue": "+63 917 555 0142",
+              "status": "pending",
+              "requestedAt": 1793048400000,
+              "source": "app",
+              "originalContactRevision": "+639175550566",
+              "providerOperationRef": null
+            },
+            {
+              "requestId": "contact-request-r3",
+              "playerId": "d720c601-da89-5474-9351-00e2fb966e56",
+              "field": "email",
+              "fromValue": "karl@example.com",
+              "toValue": "karl.matina@example.com",
+              "status": "pending",
+              "requestedAt": 1792807200000,
+              "source": "app",
+              "originalContactRevision": "karl@example.com",
+              "providerOperationRef": null
+            },
+            {
+              "requestId": "contact-request-r4",
+              "playerId": "d720c601-da89-5474-9351-00e2fb966e56",
+              "field": "email",
+              "fromValue": "karl@example.com",
+              "toValue": "karl.dvo@example.com",
+              "status": "pending",
+              "requestedAt": 1792987200000,
+              "source": "app",
+              "originalContactRevision": "karl@example.com",
+              "providerOperationRef": null
+            },
+            {
+              "requestId": "contact-request-r5",
+              "playerId": "f5a63c91-34fd-53ec-948d-0ef644b5aeac",
+              "field": "email",
+              "fromValue": "mikee.abellana@example.com",
+              "toValue": "mikee.abellana.smash@example.com",
+              "status": "pending",
+              "requestedAt": 1792972800000,
+              "source": "owner",
+              "originalContactRevision": "mikee.abellana@example.com",
+              "providerOperationRef": null
+            },
+            {
+              "requestId": "contact-request-r6",
+              "playerId": "9f83495f-9359-5f7f-82ad-4cf01b826471",
+              "field": "phone",
+              "fromValue": "+63 905 555 0297",
+              "toValue": "+63 905 555 0415",
+              "status": "applying",
+              "requestedAt": 1792958400000,
+              "source": "app",
+              "originalContactRevision": "+639055550297",
+              "providerOperationRef": "provider-op-r6",
+              "approvedAt": 1793065680000
+            },
+            {
+              "requestId": "contact-request-r7",
+              "playerId": "80861dfd-99c7-57bb-a46c-d8c76e9a8dcc",
+              "field": "phone",
+              "fromValue": "+63 915 555 0814",
+              "toValue": "+63 915 555 0990",
+              "status": "failed",
+              "requestedAt": 1792893600000,
+              "source": "app",
+              "originalContactRevision": "+639155550814",
+              "providerOperationRef": "provider-op-r7",
+              "approvedAt": 1792980000000,
+              "error": "The sign-in provider didn't accept the new number."
+            },
+            {
+              "requestId": "contact-request-r8",
+              "playerId": "f5a63c91-34fd-53ec-948d-0ef644b5aeac",
+              "field": "email",
+              "fromValue": "mikee@example.com",
+              "toValue": "mikee.abellana@example.com",
+              "status": "applied",
+              "requestedAt": 1792720800000,
+              "source": "app",
+              "originalContactRevision": "mikee@example.com",
+              "providerOperationRef": "provider-op-r8",
+              "approvedAt": 1792807200000,
+              "appliedAt": 1792807240000
+            },
+            {
+              "requestId": "contact-request-r9",
+              "playerId": "bc4c3446-0131-591b-ab03-af19225dbe8a",
+              "field": "email",
+              "fromValue": "raymark@example.com",
+              "toValue": "raymark.m@example.com",
+              "status": "rejected",
+              "requestedAt": 1792548000000,
+              "source": "app",
+              "originalContactRevision": "raymark@example.com",
+              "providerOperationRef": null,
+              "decidedAt": 1792634400000
+            }
+          ]
+        ]
+      },
+      "expected": [
+        {
+          "kind": "linked-elsewhere",
+          "ok": true
+        },
+        {
+          "kind": "newer-request",
+          "ok": false,
+          "newerRequestId": "contact-request-r4",
+          "sentAt": 1792987200000
+        },
+        {
+          "kind": "original-changed",
+          "ok": true
+        },
+        {
+          "kind": "in-progress",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "name": "checks before approving (rotra-admin.html checks()) › r3 is blocked by the newer r4, which itself passes (derived, contactChangeRequest) #2",
+      "input": {
+        "args": [
+          {
+            "requestId": "contact-request-r4",
+            "playerId": "d720c601-da89-5474-9351-00e2fb966e56",
+            "field": "email",
+            "fromValue": "karl@example.com",
+            "toValue": "karl.dvo@example.com",
+            "status": "pending",
+            "requestedAt": 1792987200000,
+            "source": "app",
+            "originalContactRevision": "karl@example.com",
+            "providerOperationRef": null
+          },
+          [
+            {
+              "id": "2c7f6a7b-eed9-5051-9426-6dbce5133fbc",
+              "fullName": "Jose",
+              "rtrId": "RTR-PH-CEB-031526-0001",
+              "playerId": "2c7f6a7b-eed9-5051-9426-6dbce5133fbc",
+              "phone": "+639175550142",
+              "email": "jose@example.com",
+              "avatarPreviousRef": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20fill%3D%22%2374488a%22%2F%3E%3Cpath%20d%3D%22M7%2064C9%2049%2021%2044%2032%2044S55%2049%2057%2064Z%22%20fill%3D%22%23ff6b6b%22%2F%3E%3Crect%20x%3D%2227%22%20y%3D%2237%22%20width%3D%2210%22%20height%3D%229%22%20rx%3D%223%22%20fill%3D%22%23f6dcc4%22%2F%3E%3Cellipse%20cx%3D%2219.5%22%20cy%3D%2229%22%20rx%3D%222.4%22%20ry%3D%223.2%22%20fill%3D%22%23f6dcc4%22%2F%3E%3Cellipse%20cx%3D%2244.5%22%20cy%3D%2229%22%20rx%3D%222.4%22%20ry%3D%223.2%22%20fill%3D%22%23f6dcc4%22%2F%3E%3Cellipse%20cx%3D%2232%22%20cy%3D%2228%22%20rx%3D%2212.5%22%20ry%3D%2214.5%22%20fill%3D%22%23f6dcc4%22%2F%3E%3Cpath%20d%3D%22M20%2024C21%2015%2043%2015%2044%2024C38%2020%2026%2020%2020%2024Z%22%20fill%3D%22%234a3021%22%20opacity%3D%22.85%22%2F%3E%3Cpath%20d%3D%22M25%2025.5h4M35%2025.5h4%22%20stroke%3D%22%234a3021%22%20stroke-width%3D%221.5%22%20stroke-linecap%3D%22round%22%2F%3E%3Ccircle%20cx%3D%2227%22%20cy%3D%2229.5%22%20r%3D%221.6%22%20fill%3D%22%231b1817%22%2F%3E%3Ccircle%20cx%3D%2237%22%20cy%3D%2229.5%22%20r%3D%221.6%22%20fill%3D%22%231b1817%22%2F%3E%3Cpath%20d%3D%22M27.5%2035.5Q32%2039%2036.5%2035.5%22%20fill%3D%22none%22%20stroke%3D%22%237a3e2e%22%20stroke-width%3D%221.6%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E",
+              "phoneHidden": true,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "bc4c3446-0131-591b-ab03-af19225dbe8a",
+              "fullName": "Raymark",
+              "rtrId": "RTR-PH-CEB-040226-0007",
+              "playerId": "bc4c3446-0131-591b-ab03-af19225dbe8a",
+              "phone": "+639185550377",
+              "email": "raymark@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "a22725ed-0ae7-5f29-9ca8-edf1c775b833",
+              "fullName": "Jasper",
+              "rtrId": "RTR-PH-CEB-081326-0040",
+              "playerId": "a22725ed-0ae7-5f29-9ca8-edf1c775b833",
+              "phone": "+639175550566",
+              "email": "jasper@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "d720c601-da89-5474-9351-00e2fb966e56",
+              "fullName": "Karl",
+              "rtrId": "RTR-PH-DVO-070926-0031",
+              "playerId": "d720c601-da89-5474-9351-00e2fb966e56",
+              "phone": "+639265550149",
+              "email": "karl@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "f5a63c91-34fd-53ec-948d-0ef644b5aeac",
+              "fullName": "Mikee Abellana",
+              "rtrId": "RTR-PH-CEB-040226-0011",
+              "playerId": "f5a63c91-34fd-53ec-948d-0ef644b5aeac",
+              "phone": "+639205550458",
+              "email": "mikee.abellana@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "9f83495f-9359-5f7f-82ad-4cf01b826471",
+              "fullName": "Emji",
+              "rtrId": "RTR-PH-MNL-081326-0042",
+              "playerId": "9f83495f-9359-5f7f-82ad-4cf01b826471",
+              "phone": "+639055550297",
+              "email": "emji@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "80861dfd-99c7-57bb-a46c-d8c76e9a8dcc",
+              "fullName": "Dalton",
+              "rtrId": "RTR-PH-CEB-061126-0021",
+              "playerId": "80861dfd-99c7-57bb-a46c-d8c76e9a8dcc",
+              "phone": "+639155550814",
+              "email": "dalton@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            }
+          ],
+          [
+            {
+              "requestId": "contact-request-r1",
+              "playerId": "bc4c3446-0131-591b-ab03-af19225dbe8a",
+              "field": "phone",
+              "fromValue": "+63 918 555 0377",
+              "toValue": "+63 927 555 0198",
+              "status": "pending",
+              "requestedAt": 1793059200000,
+              "source": "app",
+              "originalContactRevision": "+639185550377",
+              "providerOperationRef": null
+            },
+            {
+              "requestId": "contact-request-r2",
+              "playerId": "a22725ed-0ae7-5f29-9ca8-edf1c775b833",
+              "field": "phone",
+              "fromValue": "+63 917 555 0566",
+              "toValue": "+63 917 555 0142",
+              "status": "pending",
+              "requestedAt": 1793048400000,
+              "source": "app",
+              "originalContactRevision": "+639175550566",
+              "providerOperationRef": null
+            },
+            {
+              "requestId": "contact-request-r3",
+              "playerId": "d720c601-da89-5474-9351-00e2fb966e56",
+              "field": "email",
+              "fromValue": "karl@example.com",
+              "toValue": "karl.matina@example.com",
+              "status": "pending",
+              "requestedAt": 1792807200000,
+              "source": "app",
+              "originalContactRevision": "karl@example.com",
+              "providerOperationRef": null
+            },
+            {
+              "requestId": "contact-request-r4",
+              "playerId": "d720c601-da89-5474-9351-00e2fb966e56",
+              "field": "email",
+              "fromValue": "karl@example.com",
+              "toValue": "karl.dvo@example.com",
+              "status": "pending",
+              "requestedAt": 1792987200000,
+              "source": "app",
+              "originalContactRevision": "karl@example.com",
+              "providerOperationRef": null
+            },
+            {
+              "requestId": "contact-request-r5",
+              "playerId": "f5a63c91-34fd-53ec-948d-0ef644b5aeac",
+              "field": "email",
+              "fromValue": "mikee.abellana@example.com",
+              "toValue": "mikee.abellana.smash@example.com",
+              "status": "pending",
+              "requestedAt": 1792972800000,
+              "source": "owner",
+              "originalContactRevision": "mikee.abellana@example.com",
+              "providerOperationRef": null
+            },
+            {
+              "requestId": "contact-request-r6",
+              "playerId": "9f83495f-9359-5f7f-82ad-4cf01b826471",
+              "field": "phone",
+              "fromValue": "+63 905 555 0297",
+              "toValue": "+63 905 555 0415",
+              "status": "applying",
+              "requestedAt": 1792958400000,
+              "source": "app",
+              "originalContactRevision": "+639055550297",
+              "providerOperationRef": "provider-op-r6",
+              "approvedAt": 1793065680000
+            },
+            {
+              "requestId": "contact-request-r7",
+              "playerId": "80861dfd-99c7-57bb-a46c-d8c76e9a8dcc",
+              "field": "phone",
+              "fromValue": "+63 915 555 0814",
+              "toValue": "+63 915 555 0990",
+              "status": "failed",
+              "requestedAt": 1792893600000,
+              "source": "app",
+              "originalContactRevision": "+639155550814",
+              "providerOperationRef": "provider-op-r7",
+              "approvedAt": 1792980000000,
+              "error": "The sign-in provider didn't accept the new number."
+            },
+            {
+              "requestId": "contact-request-r8",
+              "playerId": "f5a63c91-34fd-53ec-948d-0ef644b5aeac",
+              "field": "email",
+              "fromValue": "mikee@example.com",
+              "toValue": "mikee.abellana@example.com",
+              "status": "applied",
+              "requestedAt": 1792720800000,
+              "source": "app",
+              "originalContactRevision": "mikee@example.com",
+              "providerOperationRef": "provider-op-r8",
+              "approvedAt": 1792807200000,
+              "appliedAt": 1792807240000
+            },
+            {
+              "requestId": "contact-request-r9",
+              "playerId": "bc4c3446-0131-591b-ab03-af19225dbe8a",
+              "field": "email",
+              "fromValue": "raymark@example.com",
+              "toValue": "raymark.m@example.com",
+              "status": "rejected",
+              "requestedAt": 1792548000000,
+              "source": "app",
+              "originalContactRevision": "raymark@example.com",
+              "providerOperationRef": null,
+              "decidedAt": 1792634400000
+            }
+          ]
+        ]
+      },
+      "expected": [
+        {
+          "kind": "linked-elsewhere",
+          "ok": true
+        },
+        {
+          "kind": "newer-request",
+          "ok": true
+        },
+        {
+          "kind": "original-changed",
+          "ok": true
+        },
+        {
+          "kind": "in-progress",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "name": "checks before approving (rotra-admin.html checks()) › r5 (entered by the owner) passes; the applied r8 before it is not in the way (derived, contactChangeRequest)",
+      "input": {
+        "args": [
+          {
+            "requestId": "contact-request-r5",
+            "playerId": "f5a63c91-34fd-53ec-948d-0ef644b5aeac",
+            "field": "email",
+            "fromValue": "mikee.abellana@example.com",
+            "toValue": "mikee.abellana.smash@example.com",
+            "status": "pending",
+            "requestedAt": 1792972800000,
+            "source": "owner",
+            "originalContactRevision": "mikee.abellana@example.com",
+            "providerOperationRef": null
+          },
+          [
+            {
+              "id": "2c7f6a7b-eed9-5051-9426-6dbce5133fbc",
+              "fullName": "Jose",
+              "rtrId": "RTR-PH-CEB-031526-0001",
+              "playerId": "2c7f6a7b-eed9-5051-9426-6dbce5133fbc",
+              "phone": "+639175550142",
+              "email": "jose@example.com",
+              "avatarPreviousRef": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20fill%3D%22%2374488a%22%2F%3E%3Cpath%20d%3D%22M7%2064C9%2049%2021%2044%2032%2044S55%2049%2057%2064Z%22%20fill%3D%22%23ff6b6b%22%2F%3E%3Crect%20x%3D%2227%22%20y%3D%2237%22%20width%3D%2210%22%20height%3D%229%22%20rx%3D%223%22%20fill%3D%22%23f6dcc4%22%2F%3E%3Cellipse%20cx%3D%2219.5%22%20cy%3D%2229%22%20rx%3D%222.4%22%20ry%3D%223.2%22%20fill%3D%22%23f6dcc4%22%2F%3E%3Cellipse%20cx%3D%2244.5%22%20cy%3D%2229%22%20rx%3D%222.4%22%20ry%3D%223.2%22%20fill%3D%22%23f6dcc4%22%2F%3E%3Cellipse%20cx%3D%2232%22%20cy%3D%2228%22%20rx%3D%2212.5%22%20ry%3D%2214.5%22%20fill%3D%22%23f6dcc4%22%2F%3E%3Cpath%20d%3D%22M20%2024C21%2015%2043%2015%2044%2024C38%2020%2026%2020%2020%2024Z%22%20fill%3D%22%234a3021%22%20opacity%3D%22.85%22%2F%3E%3Cpath%20d%3D%22M25%2025.5h4M35%2025.5h4%22%20stroke%3D%22%234a3021%22%20stroke-width%3D%221.5%22%20stroke-linecap%3D%22round%22%2F%3E%3Ccircle%20cx%3D%2227%22%20cy%3D%2229.5%22%20r%3D%221.6%22%20fill%3D%22%231b1817%22%2F%3E%3Ccircle%20cx%3D%2237%22%20cy%3D%2229.5%22%20r%3D%221.6%22%20fill%3D%22%231b1817%22%2F%3E%3Cpath%20d%3D%22M27.5%2035.5Q32%2039%2036.5%2035.5%22%20fill%3D%22none%22%20stroke%3D%22%237a3e2e%22%20stroke-width%3D%221.6%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E",
+              "phoneHidden": true,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "bc4c3446-0131-591b-ab03-af19225dbe8a",
+              "fullName": "Raymark",
+              "rtrId": "RTR-PH-CEB-040226-0007",
+              "playerId": "bc4c3446-0131-591b-ab03-af19225dbe8a",
+              "phone": "+639185550377",
+              "email": "raymark@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "a22725ed-0ae7-5f29-9ca8-edf1c775b833",
+              "fullName": "Jasper",
+              "rtrId": "RTR-PH-CEB-081326-0040",
+              "playerId": "a22725ed-0ae7-5f29-9ca8-edf1c775b833",
+              "phone": "+639175550566",
+              "email": "jasper@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "d720c601-da89-5474-9351-00e2fb966e56",
+              "fullName": "Karl",
+              "rtrId": "RTR-PH-DVO-070926-0031",
+              "playerId": "d720c601-da89-5474-9351-00e2fb966e56",
+              "phone": "+639265550149",
+              "email": "karl@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "f5a63c91-34fd-53ec-948d-0ef644b5aeac",
+              "fullName": "Mikee Abellana",
+              "rtrId": "RTR-PH-CEB-040226-0011",
+              "playerId": "f5a63c91-34fd-53ec-948d-0ef644b5aeac",
+              "phone": "+639205550458",
+              "email": "mikee.abellana@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "9f83495f-9359-5f7f-82ad-4cf01b826471",
+              "fullName": "Emji",
+              "rtrId": "RTR-PH-MNL-081326-0042",
+              "playerId": "9f83495f-9359-5f7f-82ad-4cf01b826471",
+              "phone": "+639055550297",
+              "email": "emji@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "80861dfd-99c7-57bb-a46c-d8c76e9a8dcc",
+              "fullName": "Dalton",
+              "rtrId": "RTR-PH-CEB-061126-0021",
+              "playerId": "80861dfd-99c7-57bb-a46c-d8c76e9a8dcc",
+              "phone": "+639155550814",
+              "email": "dalton@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            }
+          ],
+          [
+            {
+              "requestId": "contact-request-r1",
+              "playerId": "bc4c3446-0131-591b-ab03-af19225dbe8a",
+              "field": "phone",
+              "fromValue": "+63 918 555 0377",
+              "toValue": "+63 927 555 0198",
+              "status": "pending",
+              "requestedAt": 1793059200000,
+              "source": "app",
+              "originalContactRevision": "+639185550377",
+              "providerOperationRef": null
+            },
+            {
+              "requestId": "contact-request-r2",
+              "playerId": "a22725ed-0ae7-5f29-9ca8-edf1c775b833",
+              "field": "phone",
+              "fromValue": "+63 917 555 0566",
+              "toValue": "+63 917 555 0142",
+              "status": "pending",
+              "requestedAt": 1793048400000,
+              "source": "app",
+              "originalContactRevision": "+639175550566",
+              "providerOperationRef": null
+            },
+            {
+              "requestId": "contact-request-r3",
+              "playerId": "d720c601-da89-5474-9351-00e2fb966e56",
+              "field": "email",
+              "fromValue": "karl@example.com",
+              "toValue": "karl.matina@example.com",
+              "status": "pending",
+              "requestedAt": 1792807200000,
+              "source": "app",
+              "originalContactRevision": "karl@example.com",
+              "providerOperationRef": null
+            },
+            {
+              "requestId": "contact-request-r4",
+              "playerId": "d720c601-da89-5474-9351-00e2fb966e56",
+              "field": "email",
+              "fromValue": "karl@example.com",
+              "toValue": "karl.dvo@example.com",
+              "status": "pending",
+              "requestedAt": 1792987200000,
+              "source": "app",
+              "originalContactRevision": "karl@example.com",
+              "providerOperationRef": null
+            },
+            {
+              "requestId": "contact-request-r5",
+              "playerId": "f5a63c91-34fd-53ec-948d-0ef644b5aeac",
+              "field": "email",
+              "fromValue": "mikee.abellana@example.com",
+              "toValue": "mikee.abellana.smash@example.com",
+              "status": "pending",
+              "requestedAt": 1792972800000,
+              "source": "owner",
+              "originalContactRevision": "mikee.abellana@example.com",
+              "providerOperationRef": null
+            },
+            {
+              "requestId": "contact-request-r6",
+              "playerId": "9f83495f-9359-5f7f-82ad-4cf01b826471",
+              "field": "phone",
+              "fromValue": "+63 905 555 0297",
+              "toValue": "+63 905 555 0415",
+              "status": "applying",
+              "requestedAt": 1792958400000,
+              "source": "app",
+              "originalContactRevision": "+639055550297",
+              "providerOperationRef": "provider-op-r6",
+              "approvedAt": 1793065680000
+            },
+            {
+              "requestId": "contact-request-r7",
+              "playerId": "80861dfd-99c7-57bb-a46c-d8c76e9a8dcc",
+              "field": "phone",
+              "fromValue": "+63 915 555 0814",
+              "toValue": "+63 915 555 0990",
+              "status": "failed",
+              "requestedAt": 1792893600000,
+              "source": "app",
+              "originalContactRevision": "+639155550814",
+              "providerOperationRef": "provider-op-r7",
+              "approvedAt": 1792980000000,
+              "error": "The sign-in provider didn't accept the new number."
+            },
+            {
+              "requestId": "contact-request-r8",
+              "playerId": "f5a63c91-34fd-53ec-948d-0ef644b5aeac",
+              "field": "email",
+              "fromValue": "mikee@example.com",
+              "toValue": "mikee.abellana@example.com",
+              "status": "applied",
+              "requestedAt": 1792720800000,
+              "source": "app",
+              "originalContactRevision": "mikee@example.com",
+              "providerOperationRef": "provider-op-r8",
+              "approvedAt": 1792807200000,
+              "appliedAt": 1792807240000
+            },
+            {
+              "requestId": "contact-request-r9",
+              "playerId": "bc4c3446-0131-591b-ab03-af19225dbe8a",
+              "field": "email",
+              "fromValue": "raymark@example.com",
+              "toValue": "raymark.m@example.com",
+              "status": "rejected",
+              "requestedAt": 1792548000000,
+              "source": "app",
+              "originalContactRevision": "raymark@example.com",
+              "providerOperationRef": null,
+              "decidedAt": 1792634400000
+            }
+          ]
+        ]
+      },
+      "expected": [
+        {
+          "kind": "linked-elsewhere",
+          "ok": true
+        },
+        {
+          "kind": "newer-request",
+          "ok": true
+        },
+        {
+          "kind": "original-changed",
+          "ok": true
+        },
+        {
+          "kind": "in-progress",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "name": "checks before approving (rotra-admin.html checks()) › flags a contact that changed since the request, shown in display form (derived, contactChangeRequest)",
+      "input": {
+        "args": [
+          {
+            "requestId": "contact-request-r1",
+            "playerId": "bc4c3446-0131-591b-ab03-af19225dbe8a",
+            "field": "phone",
+            "fromValue": "+63 918 555 0377",
+            "toValue": "+63 927 555 0198",
+            "status": "pending",
+            "requestedAt": 1793059200000,
+            "source": "app",
+            "originalContactRevision": "+639185550377",
+            "providerOperationRef": null
+          },
+          [
+            {
+              "id": "2c7f6a7b-eed9-5051-9426-6dbce5133fbc",
+              "fullName": "Jose",
+              "rtrId": "RTR-PH-CEB-031526-0001",
+              "playerId": "2c7f6a7b-eed9-5051-9426-6dbce5133fbc",
+              "phone": "+639175550142",
+              "email": "jose@example.com",
+              "avatarPreviousRef": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20fill%3D%22%2374488a%22%2F%3E%3Cpath%20d%3D%22M7%2064C9%2049%2021%2044%2032%2044S55%2049%2057%2064Z%22%20fill%3D%22%23ff6b6b%22%2F%3E%3Crect%20x%3D%2227%22%20y%3D%2237%22%20width%3D%2210%22%20height%3D%229%22%20rx%3D%223%22%20fill%3D%22%23f6dcc4%22%2F%3E%3Cellipse%20cx%3D%2219.5%22%20cy%3D%2229%22%20rx%3D%222.4%22%20ry%3D%223.2%22%20fill%3D%22%23f6dcc4%22%2F%3E%3Cellipse%20cx%3D%2244.5%22%20cy%3D%2229%22%20rx%3D%222.4%22%20ry%3D%223.2%22%20fill%3D%22%23f6dcc4%22%2F%3E%3Cellipse%20cx%3D%2232%22%20cy%3D%2228%22%20rx%3D%2212.5%22%20ry%3D%2214.5%22%20fill%3D%22%23f6dcc4%22%2F%3E%3Cpath%20d%3D%22M20%2024C21%2015%2043%2015%2044%2024C38%2020%2026%2020%2020%2024Z%22%20fill%3D%22%234a3021%22%20opacity%3D%22.85%22%2F%3E%3Cpath%20d%3D%22M25%2025.5h4M35%2025.5h4%22%20stroke%3D%22%234a3021%22%20stroke-width%3D%221.5%22%20stroke-linecap%3D%22round%22%2F%3E%3Ccircle%20cx%3D%2227%22%20cy%3D%2229.5%22%20r%3D%221.6%22%20fill%3D%22%231b1817%22%2F%3E%3Ccircle%20cx%3D%2237%22%20cy%3D%2229.5%22%20r%3D%221.6%22%20fill%3D%22%231b1817%22%2F%3E%3Cpath%20d%3D%22M27.5%2035.5Q32%2039%2036.5%2035.5%22%20fill%3D%22none%22%20stroke%3D%22%237a3e2e%22%20stroke-width%3D%221.6%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E",
+              "phoneHidden": true,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "bc4c3446-0131-591b-ab03-af19225dbe8a",
+              "fullName": "Raymark",
+              "rtrId": "RTR-PH-CEB-040226-0007",
+              "playerId": "bc4c3446-0131-591b-ab03-af19225dbe8a",
+              "phone": "+639185550999",
+              "email": "raymark@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "a22725ed-0ae7-5f29-9ca8-edf1c775b833",
+              "fullName": "Jasper",
+              "rtrId": "RTR-PH-CEB-081326-0040",
+              "playerId": "a22725ed-0ae7-5f29-9ca8-edf1c775b833",
+              "phone": "+639175550566",
+              "email": "jasper@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "d720c601-da89-5474-9351-00e2fb966e56",
+              "fullName": "Karl",
+              "rtrId": "RTR-PH-DVO-070926-0031",
+              "playerId": "d720c601-da89-5474-9351-00e2fb966e56",
+              "phone": "+639265550149",
+              "email": "karl@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "f5a63c91-34fd-53ec-948d-0ef644b5aeac",
+              "fullName": "Mikee Abellana",
+              "rtrId": "RTR-PH-CEB-040226-0011",
+              "playerId": "f5a63c91-34fd-53ec-948d-0ef644b5aeac",
+              "phone": "+639205550458",
+              "email": "mikee.abellana@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "9f83495f-9359-5f7f-82ad-4cf01b826471",
+              "fullName": "Emji",
+              "rtrId": "RTR-PH-MNL-081326-0042",
+              "playerId": "9f83495f-9359-5f7f-82ad-4cf01b826471",
+              "phone": "+639055550297",
+              "email": "emji@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "80861dfd-99c7-57bb-a46c-d8c76e9a8dcc",
+              "fullName": "Dalton",
+              "rtrId": "RTR-PH-CEB-061126-0021",
+              "playerId": "80861dfd-99c7-57bb-a46c-d8c76e9a8dcc",
+              "phone": "+639155550814",
+              "email": "dalton@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            }
+          ],
+          [
+            {
+              "requestId": "contact-request-r1",
+              "playerId": "bc4c3446-0131-591b-ab03-af19225dbe8a",
+              "field": "phone",
+              "fromValue": "+63 918 555 0377",
+              "toValue": "+63 927 555 0198",
+              "status": "pending",
+              "requestedAt": 1793059200000,
+              "source": "app",
+              "originalContactRevision": "+639185550377",
+              "providerOperationRef": null
+            },
+            {
+              "requestId": "contact-request-r2",
+              "playerId": "a22725ed-0ae7-5f29-9ca8-edf1c775b833",
+              "field": "phone",
+              "fromValue": "+63 917 555 0566",
+              "toValue": "+63 917 555 0142",
+              "status": "pending",
+              "requestedAt": 1793048400000,
+              "source": "app",
+              "originalContactRevision": "+639175550566",
+              "providerOperationRef": null
+            },
+            {
+              "requestId": "contact-request-r3",
+              "playerId": "d720c601-da89-5474-9351-00e2fb966e56",
+              "field": "email",
+              "fromValue": "karl@example.com",
+              "toValue": "karl.matina@example.com",
+              "status": "pending",
+              "requestedAt": 1792807200000,
+              "source": "app",
+              "originalContactRevision": "karl@example.com",
+              "providerOperationRef": null
+            },
+            {
+              "requestId": "contact-request-r4",
+              "playerId": "d720c601-da89-5474-9351-00e2fb966e56",
+              "field": "email",
+              "fromValue": "karl@example.com",
+              "toValue": "karl.dvo@example.com",
+              "status": "pending",
+              "requestedAt": 1792987200000,
+              "source": "app",
+              "originalContactRevision": "karl@example.com",
+              "providerOperationRef": null
+            },
+            {
+              "requestId": "contact-request-r5",
+              "playerId": "f5a63c91-34fd-53ec-948d-0ef644b5aeac",
+              "field": "email",
+              "fromValue": "mikee.abellana@example.com",
+              "toValue": "mikee.abellana.smash@example.com",
+              "status": "pending",
+              "requestedAt": 1792972800000,
+              "source": "owner",
+              "originalContactRevision": "mikee.abellana@example.com",
+              "providerOperationRef": null
+            },
+            {
+              "requestId": "contact-request-r6",
+              "playerId": "9f83495f-9359-5f7f-82ad-4cf01b826471",
+              "field": "phone",
+              "fromValue": "+63 905 555 0297",
+              "toValue": "+63 905 555 0415",
+              "status": "applying",
+              "requestedAt": 1792958400000,
+              "source": "app",
+              "originalContactRevision": "+639055550297",
+              "providerOperationRef": "provider-op-r6",
+              "approvedAt": 1793065680000
+            },
+            {
+              "requestId": "contact-request-r7",
+              "playerId": "80861dfd-99c7-57bb-a46c-d8c76e9a8dcc",
+              "field": "phone",
+              "fromValue": "+63 915 555 0814",
+              "toValue": "+63 915 555 0990",
+              "status": "failed",
+              "requestedAt": 1792893600000,
+              "source": "app",
+              "originalContactRevision": "+639155550814",
+              "providerOperationRef": "provider-op-r7",
+              "approvedAt": 1792980000000,
+              "error": "The sign-in provider didn't accept the new number."
+            },
+            {
+              "requestId": "contact-request-r8",
+              "playerId": "f5a63c91-34fd-53ec-948d-0ef644b5aeac",
+              "field": "email",
+              "fromValue": "mikee@example.com",
+              "toValue": "mikee.abellana@example.com",
+              "status": "applied",
+              "requestedAt": 1792720800000,
+              "source": "app",
+              "originalContactRevision": "mikee@example.com",
+              "providerOperationRef": "provider-op-r8",
+              "approvedAt": 1792807200000,
+              "appliedAt": 1792807240000
+            },
+            {
+              "requestId": "contact-request-r9",
+              "playerId": "bc4c3446-0131-591b-ab03-af19225dbe8a",
+              "field": "email",
+              "fromValue": "raymark@example.com",
+              "toValue": "raymark.m@example.com",
+              "status": "rejected",
+              "requestedAt": 1792548000000,
+              "source": "app",
+              "originalContactRevision": "raymark@example.com",
+              "providerOperationRef": null,
+              "decidedAt": 1792634400000
+            }
+          ]
+        ]
+      },
+      "expected": [
+        {
+          "kind": "linked-elsewhere",
+          "ok": true
+        },
+        {
+          "kind": "newer-request",
+          "ok": true
+        },
+        {
+          "kind": "original-changed",
+          "ok": false,
+          "currentValue": "+63 918 555 0999"
+        },
+        {
+          "kind": "in-progress",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "name": "checks before approving (rotra-admin.html checks()) › flags another change for the same player still being applied (derived, contactChangeRequest)",
+      "input": {
+        "args": [
+          {
+            "requestId": "contact-request-r1",
+            "playerId": "bc4c3446-0131-591b-ab03-af19225dbe8a",
+            "field": "phone",
+            "fromValue": "+63 918 555 0377",
+            "toValue": "+63 927 555 0198",
+            "status": "pending",
+            "requestedAt": 1793059200000,
+            "source": "app",
+            "originalContactRevision": "+639185550377",
+            "providerOperationRef": null
+          },
+          [
+            {
+              "id": "2c7f6a7b-eed9-5051-9426-6dbce5133fbc",
+              "fullName": "Jose",
+              "rtrId": "RTR-PH-CEB-031526-0001",
+              "playerId": "2c7f6a7b-eed9-5051-9426-6dbce5133fbc",
+              "phone": "+639175550142",
+              "email": "jose@example.com",
+              "avatarPreviousRef": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20fill%3D%22%2374488a%22%2F%3E%3Cpath%20d%3D%22M7%2064C9%2049%2021%2044%2032%2044S55%2049%2057%2064Z%22%20fill%3D%22%23ff6b6b%22%2F%3E%3Crect%20x%3D%2227%22%20y%3D%2237%22%20width%3D%2210%22%20height%3D%229%22%20rx%3D%223%22%20fill%3D%22%23f6dcc4%22%2F%3E%3Cellipse%20cx%3D%2219.5%22%20cy%3D%2229%22%20rx%3D%222.4%22%20ry%3D%223.2%22%20fill%3D%22%23f6dcc4%22%2F%3E%3Cellipse%20cx%3D%2244.5%22%20cy%3D%2229%22%20rx%3D%222.4%22%20ry%3D%223.2%22%20fill%3D%22%23f6dcc4%22%2F%3E%3Cellipse%20cx%3D%2232%22%20cy%3D%2228%22%20rx%3D%2212.5%22%20ry%3D%2214.5%22%20fill%3D%22%23f6dcc4%22%2F%3E%3Cpath%20d%3D%22M20%2024C21%2015%2043%2015%2044%2024C38%2020%2026%2020%2020%2024Z%22%20fill%3D%22%234a3021%22%20opacity%3D%22.85%22%2F%3E%3Cpath%20d%3D%22M25%2025.5h4M35%2025.5h4%22%20stroke%3D%22%234a3021%22%20stroke-width%3D%221.5%22%20stroke-linecap%3D%22round%22%2F%3E%3Ccircle%20cx%3D%2227%22%20cy%3D%2229.5%22%20r%3D%221.6%22%20fill%3D%22%231b1817%22%2F%3E%3Ccircle%20cx%3D%2237%22%20cy%3D%2229.5%22%20r%3D%221.6%22%20fill%3D%22%231b1817%22%2F%3E%3Cpath%20d%3D%22M27.5%2035.5Q32%2039%2036.5%2035.5%22%20fill%3D%22none%22%20stroke%3D%22%237a3e2e%22%20stroke-width%3D%221.6%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E",
+              "phoneHidden": true,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "bc4c3446-0131-591b-ab03-af19225dbe8a",
+              "fullName": "Raymark",
+              "rtrId": "RTR-PH-CEB-040226-0007",
+              "playerId": "bc4c3446-0131-591b-ab03-af19225dbe8a",
+              "phone": "+639185550377",
+              "email": "raymark@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "a22725ed-0ae7-5f29-9ca8-edf1c775b833",
+              "fullName": "Jasper",
+              "rtrId": "RTR-PH-CEB-081326-0040",
+              "playerId": "a22725ed-0ae7-5f29-9ca8-edf1c775b833",
+              "phone": "+639175550566",
+              "email": "jasper@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "d720c601-da89-5474-9351-00e2fb966e56",
+              "fullName": "Karl",
+              "rtrId": "RTR-PH-DVO-070926-0031",
+              "playerId": "d720c601-da89-5474-9351-00e2fb966e56",
+              "phone": "+639265550149",
+              "email": "karl@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "f5a63c91-34fd-53ec-948d-0ef644b5aeac",
+              "fullName": "Mikee Abellana",
+              "rtrId": "RTR-PH-CEB-040226-0011",
+              "playerId": "f5a63c91-34fd-53ec-948d-0ef644b5aeac",
+              "phone": "+639205550458",
+              "email": "mikee.abellana@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "9f83495f-9359-5f7f-82ad-4cf01b826471",
+              "fullName": "Emji",
+              "rtrId": "RTR-PH-MNL-081326-0042",
+              "playerId": "9f83495f-9359-5f7f-82ad-4cf01b826471",
+              "phone": "+639055550297",
+              "email": "emji@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            },
+            {
+              "id": "80861dfd-99c7-57bb-a46c-d8c76e9a8dcc",
+              "fullName": "Dalton",
+              "rtrId": "RTR-PH-CEB-061126-0021",
+              "playerId": "80861dfd-99c7-57bb-a46c-d8c76e9a8dcc",
+              "phone": "+639155550814",
+              "email": "dalton@example.com",
+              "phoneHidden": false,
+              "claimed": true,
+              "emailConfirmedAt": "2026-11-01T00:00:00Z"
+            }
+          ],
+          [
+            {
+              "requestId": "contact-request-r1",
+              "playerId": "bc4c3446-0131-591b-ab03-af19225dbe8a",
+              "field": "phone",
+              "fromValue": "+63 918 555 0377",
+              "toValue": "+63 927 555 0198",
+              "status": "pending",
+              "requestedAt": 1793059200000,
+              "source": "app",
+              "originalContactRevision": "+639185550377",
+              "providerOperationRef": null
+            },
+            {
+              "requestId": "contact-request-r2",
+              "playerId": "a22725ed-0ae7-5f29-9ca8-edf1c775b833",
+              "field": "phone",
+              "fromValue": "+63 917 555 0566",
+              "toValue": "+63 917 555 0142",
+              "status": "pending",
+              "requestedAt": 1793048400000,
+              "source": "app",
+              "originalContactRevision": "+639175550566",
+              "providerOperationRef": null
+            },
+            {
+              "requestId": "contact-request-r3",
+              "playerId": "d720c601-da89-5474-9351-00e2fb966e56",
+              "field": "email",
+              "fromValue": "karl@example.com",
+              "toValue": "karl.matina@example.com",
+              "status": "pending",
+              "requestedAt": 1792807200000,
+              "source": "app",
+              "originalContactRevision": "karl@example.com",
+              "providerOperationRef": null
+            },
+            {
+              "requestId": "contact-request-r4",
+              "playerId": "d720c601-da89-5474-9351-00e2fb966e56",
+              "field": "email",
+              "fromValue": "karl@example.com",
+              "toValue": "karl.dvo@example.com",
+              "status": "pending",
+              "requestedAt": 1792987200000,
+              "source": "app",
+              "originalContactRevision": "karl@example.com",
+              "providerOperationRef": null
+            },
+            {
+              "requestId": "contact-request-r5",
+              "playerId": "f5a63c91-34fd-53ec-948d-0ef644b5aeac",
+              "field": "email",
+              "fromValue": "mikee.abellana@example.com",
+              "toValue": "mikee.abellana.smash@example.com",
+              "status": "pending",
+              "requestedAt": 1792972800000,
+              "source": "owner",
+              "originalContactRevision": "mikee.abellana@example.com",
+              "providerOperationRef": null
+            },
+            {
+              "requestId": "contact-request-r6",
+              "playerId": "9f83495f-9359-5f7f-82ad-4cf01b826471",
+              "field": "phone",
+              "fromValue": "+63 905 555 0297",
+              "toValue": "+63 905 555 0415",
+              "status": "applying",
+              "requestedAt": 1792958400000,
+              "source": "app",
+              "originalContactRevision": "+639055550297",
+              "providerOperationRef": "provider-op-r6",
+              "approvedAt": 1793065680000
+            },
+            {
+              "requestId": "contact-request-r7",
+              "playerId": "80861dfd-99c7-57bb-a46c-d8c76e9a8dcc",
+              "field": "phone",
+              "fromValue": "+63 915 555 0814",
+              "toValue": "+63 915 555 0990",
+              "status": "failed",
+              "requestedAt": 1792893600000,
+              "source": "app",
+              "originalContactRevision": "+639155550814",
+              "providerOperationRef": "provider-op-r7",
+              "approvedAt": 1792980000000,
+              "error": "The sign-in provider didn't accept the new number."
+            },
+            {
+              "requestId": "contact-request-r8",
+              "playerId": "f5a63c91-34fd-53ec-948d-0ef644b5aeac",
+              "field": "email",
+              "fromValue": "mikee@example.com",
+              "toValue": "mikee.abellana@example.com",
+              "status": "applied",
+              "requestedAt": 1792720800000,
+              "source": "app",
+              "originalContactRevision": "mikee@example.com",
+              "providerOperationRef": "provider-op-r8",
+              "approvedAt": 1792807200000,
+              "appliedAt": 1792807240000
+            },
+            {
+              "requestId": "contact-request-r9",
+              "playerId": "bc4c3446-0131-591b-ab03-af19225dbe8a",
+              "field": "email",
+              "fromValue": "raymark@example.com",
+              "toValue": "raymark.m@example.com",
+              "status": "rejected",
+              "requestedAt": 1792548000000,
+              "source": "app",
+              "originalContactRevision": "raymark@example.com",
+              "providerOperationRef": null,
+              "decidedAt": 1792634400000
+            },
+            {
+              "requestId": "other",
+              "playerId": "bc4c3446-0131-591b-ab03-af19225dbe8a",
+              "field": "email",
+              "fromValue": "+63 918 555 0377",
+              "toValue": "+63 927 555 0198",
+              "status": "applying",
+              "requestedAt": 1793059200000,
+              "source": "app",
+              "originalContactRevision": "+639185550377",
+              "providerOperationRef": null
+            }
+          ]
+        ]
+      },
+      "expected": [
+        {
+          "kind": "linked-elsewhere",
+          "ok": true
+        },
+        {
+          "kind": "newer-request",
+          "ok": true
+        },
+        {
+          "kind": "original-changed",
+          "ok": true
+        },
+        {
+          "kind": "in-progress",
+          "ok": false
+        }
+      ]
+    }
+  ]
+}

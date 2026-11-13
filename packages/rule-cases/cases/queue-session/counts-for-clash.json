@@ -1,0 +1,72 @@
+{
+  "rule": "queue-session/counts-for-clash",
+  "version": 1,
+  "cases": [
+    {
+      "name": "clashes › ignores invalid and cancelled sessions and counts every other state (queueSession) #1",
+      "input": {
+        "args": [
+          {
+            "state": "invalid"
+          }
+        ]
+      },
+      "expected": false
+    },
+    {
+      "name": "clashes › ignores invalid and cancelled sessions and counts every other state (queueSession) #2",
+      "input": {
+        "args": [
+          {
+            "state": "cancelled"
+          }
+        ]
+      },
+      "expected": false
+    },
+    {
+      "name": "clashes › ignores invalid and cancelled sessions and counts every other state (queueSession) #3",
+      "input": {
+        "args": [
+          {
+            "state": "prepared"
+          }
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "clashes › ignores invalid and cancelled sessions and counts every other state (queueSession) #4",
+      "input": {
+        "args": [
+          {
+            "state": "active"
+          }
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "clashes › ignores invalid and cancelled sessions and counts every other state (queueSession) #5",
+      "input": {
+        "args": [
+          {
+            "state": "finalizing"
+          }
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "clashes › ignores invalid and cancelled sessions and counts every other state (queueSession) #6",
+      "input": {
+        "args": [
+          {
+            "state": "completed"
+          }
+        ]
+      },
+      "expected": true
+    }
+  ]
+}

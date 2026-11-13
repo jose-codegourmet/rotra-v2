@@ -1,0 +1,493 @@
+{
+  "rule": "feature-flag/add-feature-flag-errors",
+  "version": 1,
+  "cases": [
+    {
+      "name": "addFeatureFlagErrors › accepts a complete, unique flag (featureFlag) #1",
+      "input": {
+        "args": [
+          {
+            "name": "Session cost estimate",
+            "key": "session_cost_estimate",
+            "description": "Shows the estimated cost per player before the session starts.",
+            "on": false
+          },
+          []
+        ]
+      },
+      "expected": {}
+    },
+    {
+      "name": "addFeatureFlagErrors › accepts a complete, unique flag (featureFlag) #2",
+      "input": {
+        "args": [
+          {
+            "name": "Other",
+            "key": "other_flag",
+            "description": "Shows the estimated cost per player before the session starts.",
+            "on": false
+          },
+          [
+            {
+              "key": "session_cost_estimate",
+              "name": "Session cost estimate",
+              "description": "Shows the estimated cost per player before the session starts.",
+              "on": false,
+              "revision": 1,
+              "createdAt": "2026-10-29T19:52:00+08:00",
+              "createdByEmail": "owner@rotra.example",
+              "changedAt": "2026-10-29T19:52:00+08:00",
+              "changedByEmail": "owner@rotra.example"
+            }
+          ]
+        ]
+      },
+      "expected": {}
+    },
+    {
+      "name": "addFeatureFlagErrors › requires a name of up to 50 characters (featureFlag) #1",
+      "input": {
+        "args": [
+          {
+            "name": "",
+            "key": "session_cost_estimate",
+            "description": "Shows the estimated cost per player before the session starts.",
+            "on": false
+          },
+          []
+        ],
+        "select": "name"
+      },
+      "expected": "Enter a name."
+    },
+    {
+      "name": "addFeatureFlagErrors › requires a name of up to 50 characters (derived, featureFlag) #1",
+      "input": {
+        "args": [
+          {
+            "name": "",
+            "key": "session_cost_estimate",
+            "description": "Shows the estimated cost per player before the session starts.",
+            "on": false
+          },
+          []
+        ]
+      },
+      "expected": {
+        "name": "Enter a name."
+      }
+    },
+    {
+      "name": "addFeatureFlagErrors › requires a name of up to 50 characters (derived, featureFlag) #2",
+      "input": {
+        "args": [
+          {
+            "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "key": "session_cost_estimate",
+            "description": "Shows the estimated cost per player before the session starts.",
+            "on": false
+          },
+          []
+        ]
+      },
+      "expected": {}
+    },
+    {
+      "name": "addFeatureFlagErrors › requires a name of up to 50 characters (featureFlag) #2",
+      "input": {
+        "args": [
+          {
+            "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "key": "session_cost_estimate",
+            "description": "Shows the estimated cost per player before the session starts.",
+            "on": false
+          },
+          []
+        ],
+        "select": "name"
+      },
+      "expected": "Keep the name under 50 characters."
+    },
+    {
+      "name": "addFeatureFlagErrors › refuses a taken name ignoring case and accents (featureFlag) #1",
+      "input": {
+        "args": [
+          {
+            "name": "SÉSSION cost Estimate",
+            "key": "other_flag",
+            "description": "Shows the estimated cost per player before the session starts.",
+            "on": false
+          },
+          [
+            {
+              "key": "session_cost_estimate",
+              "name": "Session cost estimate",
+              "description": "Shows the estimated cost per player before the session starts.",
+              "on": false,
+              "revision": 1,
+              "createdAt": "2026-10-29T19:52:00+08:00",
+              "createdByEmail": "owner@rotra.example",
+              "changedAt": "2026-10-29T19:52:00+08:00",
+              "changedByEmail": "owner@rotra.example"
+            }
+          ]
+        ]
+      },
+      "expected": {
+        "name": "A flag with this name already exists."
+      }
+    },
+    {
+      "name": "addFeatureFlagErrors › refuses a taken name ignoring case and accents (featureFlag) #2",
+      "input": {
+        "args": [
+          {
+            "name": "Session cost estimate",
+            "key": "ab",
+            "description": "Shows the estimated cost per player before the session starts.",
+            "on": false
+          },
+          []
+        ],
+        "select": "key"
+      },
+      "expected": "Use 3 to 40 lowercase letters, numbers and underscores, starting with a letter."
+    },
+    {
+      "name": "addFeatureFlagErrors › refuses a taken name ignoring case and accents (featureFlag) #3",
+      "input": {
+        "args": [
+          {
+            "name": "Session cost estimate",
+            "key": "1abc",
+            "description": "Shows the estimated cost per player before the session starts.",
+            "on": false
+          },
+          []
+        ],
+        "select": "key"
+      },
+      "expected": "Use 3 to 40 lowercase letters, numbers and underscores, starting with a letter."
+    },
+    {
+      "name": "addFeatureFlagErrors › refuses a taken name ignoring case and accents (featureFlag) #4",
+      "input": {
+        "args": [
+          {
+            "name": "Session cost estimate",
+            "key": "_abc",
+            "description": "Shows the estimated cost per player before the session starts.",
+            "on": false
+          },
+          []
+        ],
+        "select": "key"
+      },
+      "expected": "Use 3 to 40 lowercase letters, numbers and underscores, starting with a letter."
+    },
+    {
+      "name": "addFeatureFlagErrors › refuses a taken name ignoring case and accents (featureFlag) #5",
+      "input": {
+        "args": [
+          {
+            "name": "Session cost estimate",
+            "key": "Abc",
+            "description": "Shows the estimated cost per player before the session starts.",
+            "on": false
+          },
+          []
+        ],
+        "select": "key"
+      },
+      "expected": "Use 3 to 40 lowercase letters, numbers and underscores, starting with a letter."
+    },
+    {
+      "name": "addFeatureFlagErrors › refuses a taken name ignoring case and accents (featureFlag) #6",
+      "input": {
+        "args": [
+          {
+            "name": "Session cost estimate",
+            "key": "has-dash",
+            "description": "Shows the estimated cost per player before the session starts.",
+            "on": false
+          },
+          []
+        ],
+        "select": "key"
+      },
+      "expected": "Use 3 to 40 lowercase letters, numbers and underscores, starting with a letter."
+    },
+    {
+      "name": "addFeatureFlagErrors › refuses a taken name ignoring case and accents (featureFlag) #7",
+      "input": {
+        "args": [
+          {
+            "name": "Session cost estimate",
+            "key": "has space",
+            "description": "Shows the estimated cost per player before the session starts.",
+            "on": false
+          },
+          []
+        ],
+        "select": "key"
+      },
+      "expected": "Use 3 to 40 lowercase letters, numbers and underscores, starting with a letter."
+    },
+    {
+      "name": "addFeatureFlagErrors › refuses a taken name ignoring case and accents (featureFlag) #8",
+      "input": {
+        "args": [
+          {
+            "name": "Session cost estimate",
+            "key": "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "description": "Shows the estimated cost per player before the session starts.",
+            "on": false
+          },
+          []
+        ],
+        "select": "key"
+      },
+      "expected": "Use 3 to 40 lowercase letters, numbers and underscores, starting with a letter."
+    },
+    {
+      "name": "addFeatureFlagErrors › refuses a taken name ignoring case and accents (derived, featureFlag) #1",
+      "input": {
+        "args": [
+          {
+            "name": "Session cost estimate",
+            "key": "ab",
+            "description": "Shows the estimated cost per player before the session starts.",
+            "on": false
+          },
+          []
+        ]
+      },
+      "expected": {
+        "key": "Use 3 to 40 lowercase letters, numbers and underscores, starting with a letter."
+      }
+    },
+    {
+      "name": "addFeatureFlagErrors › refuses a taken name ignoring case and accents (derived, featureFlag) #2",
+      "input": {
+        "args": [
+          {
+            "name": "Session cost estimate",
+            "key": "1abc",
+            "description": "Shows the estimated cost per player before the session starts.",
+            "on": false
+          },
+          []
+        ]
+      },
+      "expected": {
+        "key": "Use 3 to 40 lowercase letters, numbers and underscores, starting with a letter."
+      }
+    },
+    {
+      "name": "addFeatureFlagErrors › refuses a taken name ignoring case and accents (derived, featureFlag) #3",
+      "input": {
+        "args": [
+          {
+            "name": "Session cost estimate",
+            "key": "_abc",
+            "description": "Shows the estimated cost per player before the session starts.",
+            "on": false
+          },
+          []
+        ]
+      },
+      "expected": {
+        "key": "Use 3 to 40 lowercase letters, numbers and underscores, starting with a letter."
+      }
+    },
+    {
+      "name": "addFeatureFlagErrors › refuses a taken name ignoring case and accents (derived, featureFlag) #4",
+      "input": {
+        "args": [
+          {
+            "name": "Session cost estimate",
+            "key": "Abc",
+            "description": "Shows the estimated cost per player before the session starts.",
+            "on": false
+          },
+          []
+        ]
+      },
+      "expected": {
+        "key": "Use 3 to 40 lowercase letters, numbers and underscores, starting with a letter."
+      }
+    },
+    {
+      "name": "addFeatureFlagErrors › refuses a taken name ignoring case and accents (derived, featureFlag) #5",
+      "input": {
+        "args": [
+          {
+            "name": "Session cost estimate",
+            "key": "has-dash",
+            "description": "Shows the estimated cost per player before the session starts.",
+            "on": false
+          },
+          []
+        ]
+      },
+      "expected": {
+        "key": "Use 3 to 40 lowercase letters, numbers and underscores, starting with a letter."
+      }
+    },
+    {
+      "name": "addFeatureFlagErrors › refuses a taken name ignoring case and accents (derived, featureFlag) #6",
+      "input": {
+        "args": [
+          {
+            "name": "Session cost estimate",
+            "key": "has space",
+            "description": "Shows the estimated cost per player before the session starts.",
+            "on": false
+          },
+          []
+        ]
+      },
+      "expected": {
+        "key": "Use 3 to 40 lowercase letters, numbers and underscores, starting with a letter."
+      }
+    },
+    {
+      "name": "addFeatureFlagErrors › refuses a taken name ignoring case and accents (derived, featureFlag) #7",
+      "input": {
+        "args": [
+          {
+            "name": "Session cost estimate",
+            "key": "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "description": "Shows the estimated cost per player before the session starts.",
+            "on": false
+          },
+          []
+        ]
+      },
+      "expected": {
+        "key": "Use 3 to 40 lowercase letters, numbers and underscores, starting with a letter."
+      }
+    },
+    {
+      "name": "addFeatureFlagErrors › refuses a taken name ignoring case and accents (derived, featureFlag) #8",
+      "input": {
+        "args": [
+          {
+            "name": "Session cost estimate",
+            "key": "abc",
+            "description": "Shows the estimated cost per player before the session starts.",
+            "on": false
+          },
+          []
+        ]
+      },
+      "expected": {}
+    },
+    {
+      "name": "addFeatureFlagErrors › refuses a taken name ignoring case and accents (derived, featureFlag) #9",
+      "input": {
+        "args": [
+          {
+            "name": "Session cost estimate",
+            "key": "a_1",
+            "description": "Shows the estimated cost per player before the session starts.",
+            "on": false
+          },
+          []
+        ]
+      },
+      "expected": {}
+    },
+    {
+      "name": "addFeatureFlagErrors › refuses a taken name ignoring case and accents (derived, featureFlag) #10",
+      "input": {
+        "args": [
+          {
+            "name": "Session cost estimate",
+            "key": "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "description": "Shows the estimated cost per player before the session starts.",
+            "on": false
+          },
+          []
+        ]
+      },
+      "expected": {}
+    },
+    {
+      "name": "addFeatureFlagErrors › requires a key and refuses a taken one (featureFlag) #1",
+      "input": {
+        "args": [
+          {
+            "name": "Session cost estimate",
+            "key": "",
+            "description": "Shows the estimated cost per player before the session starts.",
+            "on": false
+          },
+          []
+        ],
+        "select": "key"
+      },
+      "expected": "Enter a key."
+    },
+    {
+      "name": "addFeatureFlagErrors › requires a key and refuses a taken one (featureFlag) #2",
+      "input": {
+        "args": [
+          {
+            "name": "Other",
+            "key": "session_cost_estimate",
+            "description": "Shows the estimated cost per player before the session starts.",
+            "on": false
+          },
+          [
+            {
+              "key": "session_cost_estimate",
+              "name": "Session cost estimate",
+              "description": "Shows the estimated cost per player before the session starts.",
+              "on": false,
+              "revision": 1,
+              "createdAt": "2026-10-29T19:52:00+08:00",
+              "createdByEmail": "owner@rotra.example",
+              "changedAt": "2026-10-29T19:52:00+08:00",
+              "changedByEmail": "owner@rotra.example"
+            }
+          ]
+        ]
+      },
+      "expected": {
+        "key": "That key is already used."
+      }
+    },
+    {
+      "name": "addFeatureFlagErrors › asks for a description of at least 10 characters (featureFlag) #1",
+      "input": {
+        "args": [
+          {
+            "name": "Session cost estimate",
+            "key": "session_cost_estimate",
+            "description": "Too short",
+            "on": false
+          },
+          []
+        ],
+        "select": "description"
+      },
+      "expected": "Describe what the flag does, so it is clear when to use it."
+    },
+    {
+      "name": "addFeatureFlagErrors › asks for a description of at least 10 characters (featureFlag) #2",
+      "input": {
+        "args": [
+          {
+            "name": "Session cost estimate",
+            "key": "session_cost_estimate",
+            "description": "Long enough",
+            "on": false
+          },
+          []
+        ]
+      },
+      "expected": {}
+    }
+  ]
+}

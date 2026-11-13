@@ -1,0 +1,27 @@
+{
+  "rule": "contact-change-request/matches-contact-request-filter",
+  "version": 1,
+  "cases": [
+    {
+      "name": "counts and filters › 'applying' also holds approved-but-not-applied requests (contactChangeRequest) #1",
+      "input": {
+        "args": ["approved", "applying"]
+      },
+      "expected": true
+    },
+    {
+      "name": "counts and filters › 'applying' also holds approved-but-not-applied requests (contactChangeRequest) #2",
+      "input": {
+        "args": ["approved", "pending"]
+      },
+      "expected": false
+    },
+    {
+      "name": "counts and filters › 'applying' also holds approved-but-not-applied requests (contactChangeRequest) #3",
+      "input": {
+        "args": ["rejected"]
+      },
+      "expected": true
+    }
+  ]
+}

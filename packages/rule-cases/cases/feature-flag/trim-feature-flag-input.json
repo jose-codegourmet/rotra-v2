@@ -1,0 +1,25 @@
+{
+  "rule": "feature-flag/trim-feature-flag-input",
+  "version": 1,
+  "cases": [
+    {
+      "name": "trimFeatureFlagInput › trims the text fields and keeps the value (featureFlag)",
+      "input": {
+        "args": [
+          {
+            "name": "  Name ",
+            "key": " key_one ",
+            "description": " Does. ",
+            "on": false
+          }
+        ]
+      },
+      "expected": {
+        "name": "Name",
+        "key": "key_one",
+        "description": "Does.",
+        "on": false
+      }
+    }
+  ]
+}

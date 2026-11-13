@@ -1,0 +1,658 @@
+{
+  "rule": "sales/club-sales-report",
+  "version": 1,
+  "cases": [
+    {
+      "name": "clubSalesReport › estimates cost from the configured cost per session (derived, sales)",
+      "input": {
+        "args": [
+          {
+            "today": "2026-11-08",
+            "clubs": [
+              {
+                "id": "a",
+                "name": "Alpha Club",
+                "pricing": "paid",
+                "monthlyListMinor": 150000
+              },
+              {
+                "id": "b",
+                "name": "Beta Club",
+                "pricing": "free",
+                "monthlyListMinor": 100000
+              }
+            ],
+            "payments": [
+              {
+                "termId": "T3",
+                "clubId": "a",
+                "plan": "Monthly",
+                "paidOn": "2026-11-03",
+                "amountMinor": 150000,
+                "startsAt": "2026-11-03"
+              },
+              {
+                "termId": "T2",
+                "clubId": "a",
+                "plan": "Monthly",
+                "paidOn": "2026-10-03",
+                "amountMinor": 150000,
+                "startsAt": "2026-10-03"
+              },
+              {
+                "termId": "T1",
+                "clubId": "a",
+                "plan": "Yearly",
+                "paidOn": "2026-08-01",
+                "amountMinor": 1500000,
+                "startsAt": "2024-01-01"
+              },
+              {
+                "termId": "T4",
+                "clubId": "b",
+                "plan": "Monthly",
+                "paidOn": "2026-11-01",
+                "amountMinor": 0,
+                "startsAt": "2026-11-01"
+              }
+            ],
+            "sessions": [
+              {
+                "clubId": "a",
+                "startedOn": "2026-11-08",
+                "matches": 10
+              },
+              {
+                "clubId": "a",
+                "startedOn": "2026-11-02",
+                "matches": 12
+              },
+              {
+                "clubId": "a",
+                "startedOn": "2026-10-30",
+                "matches": 9
+              },
+              {
+                "clubId": "b",
+                "startedOn": "2026-11-05",
+                "matches": 20
+              }
+            ]
+          },
+          "a",
+          {
+            "amountMinor": 1500,
+            "currency": "PHP"
+          }
+        ]
+      },
+      "expected": {
+        "clubId": "a",
+        "today": "2026-11-08",
+        "pricing": "paid",
+        "monthlyListPrice": {
+          "amountMinor": 150000,
+          "currency": "PHP"
+        },
+        "costPerSession": {
+          "amountMinor": 1500,
+          "currency": "PHP"
+        },
+        "months": [
+          {
+            "month": "2026-06",
+            "paid": {
+              "amountMinor": 0,
+              "currency": "PHP"
+            },
+            "sessions": 0,
+            "matches": 0,
+            "paidPerSession": null,
+            "estimatedCost": {
+              "amountMinor": 0,
+              "currency": "PHP"
+            },
+            "leftOver": {
+              "amountMinor": 0,
+              "currency": "PHP"
+            }
+          },
+          {
+            "month": "2026-07",
+            "paid": {
+              "amountMinor": 0,
+              "currency": "PHP"
+            },
+            "sessions": 0,
+            "matches": 0,
+            "paidPerSession": null,
+            "estimatedCost": {
+              "amountMinor": 0,
+              "currency": "PHP"
+            },
+            "leftOver": {
+              "amountMinor": 0,
+              "currency": "PHP"
+            }
+          },
+          {
+            "month": "2026-08",
+            "paid": {
+              "amountMinor": 1500000,
+              "currency": "PHP"
+            },
+            "sessions": 0,
+            "matches": 0,
+            "paidPerSession": null,
+            "estimatedCost": {
+              "amountMinor": 0,
+              "currency": "PHP"
+            },
+            "leftOver": {
+              "amountMinor": 1500000,
+              "currency": "PHP"
+            }
+          },
+          {
+            "month": "2026-09",
+            "paid": {
+              "amountMinor": 0,
+              "currency": "PHP"
+            },
+            "sessions": 0,
+            "matches": 0,
+            "paidPerSession": null,
+            "estimatedCost": {
+              "amountMinor": 0,
+              "currency": "PHP"
+            },
+            "leftOver": {
+              "amountMinor": 0,
+              "currency": "PHP"
+            }
+          },
+          {
+            "month": "2026-10",
+            "paid": {
+              "amountMinor": 150000,
+              "currency": "PHP"
+            },
+            "sessions": 1,
+            "matches": 9,
+            "paidPerSession": {
+              "amountMinor": 150000,
+              "currency": "PHP"
+            },
+            "estimatedCost": {
+              "amountMinor": 1500,
+              "currency": "PHP"
+            },
+            "leftOver": {
+              "amountMinor": 148500,
+              "currency": "PHP"
+            }
+          },
+          {
+            "month": "2026-11",
+            "paid": {
+              "amountMinor": 150000,
+              "currency": "PHP"
+            },
+            "sessions": 2,
+            "matches": 22,
+            "paidPerSession": {
+              "amountMinor": 75000,
+              "currency": "PHP"
+            },
+            "estimatedCost": {
+              "amountMinor": 3000,
+              "currency": "PHP"
+            },
+            "leftOver": {
+              "amountMinor": 147000,
+              "currency": "PHP"
+            }
+          }
+        ],
+        "totals": {
+          "paid": {
+            "amountMinor": 1800000,
+            "currency": "PHP"
+          },
+          "sessions": 3,
+          "matches": 31,
+          "paidPerSession": {
+            "amountMinor": 600000,
+            "currency": "PHP"
+          },
+          "estimatedCost": {
+            "amountMinor": 4500,
+            "currency": "PHP"
+          },
+          "leftOver": {
+            "amountMinor": 1795500,
+            "currency": "PHP"
+          }
+        }
+      }
+    },
+    {
+      "name": "clubSalesReport › estimates cost from the configured cost per session (sales)",
+      "input": {
+        "args": [
+          {
+            "today": "2026-11-08",
+            "clubs": [
+              {
+                "id": "a",
+                "name": "Alpha Club",
+                "pricing": "paid",
+                "monthlyListMinor": 150000
+              },
+              {
+                "id": "b",
+                "name": "Beta Club",
+                "pricing": "free",
+                "monthlyListMinor": 100000
+              }
+            ],
+            "payments": [
+              {
+                "termId": "T3",
+                "clubId": "a",
+                "plan": "Monthly",
+                "paidOn": "2026-11-03",
+                "amountMinor": 150000,
+                "startsAt": "2026-11-03"
+              },
+              {
+                "termId": "T2",
+                "clubId": "a",
+                "plan": "Monthly",
+                "paidOn": "2026-10-03",
+                "amountMinor": 150000,
+                "startsAt": "2026-10-03"
+              },
+              {
+                "termId": "T1",
+                "clubId": "a",
+                "plan": "Yearly",
+                "paidOn": "2026-08-01",
+                "amountMinor": 1500000,
+                "startsAt": "2024-01-01"
+              },
+              {
+                "termId": "T4",
+                "clubId": "b",
+                "plan": "Monthly",
+                "paidOn": "2026-11-01",
+                "amountMinor": 0,
+                "startsAt": "2026-11-01"
+              }
+            ],
+            "sessions": [
+              {
+                "clubId": "a",
+                "startedOn": "2026-11-08",
+                "matches": 10
+              },
+              {
+                "clubId": "a",
+                "startedOn": "2026-11-02",
+                "matches": 12
+              },
+              {
+                "clubId": "a",
+                "startedOn": "2026-10-30",
+                "matches": 9
+              },
+              {
+                "clubId": "b",
+                "startedOn": "2026-11-05",
+                "matches": 20
+              }
+            ]
+          },
+          "a",
+          {
+            "amountMinor": 1500,
+            "currency": "PHP"
+          }
+        ],
+        "select": "months.5"
+      },
+      "expected": {
+        "month": "2026-11",
+        "paid": {
+          "amountMinor": 150000,
+          "currency": "PHP"
+        },
+        "sessions": 2,
+        "matches": 22,
+        "paidPerSession": {
+          "amountMinor": 75000,
+          "currency": "PHP"
+        },
+        "estimatedCost": {
+          "amountMinor": 3000,
+          "currency": "PHP"
+        },
+        "leftOver": {
+          "amountMinor": 147000,
+          "currency": "PHP"
+        }
+      }
+    },
+    {
+      "name": "clubSalesReport › shows a negative left over for a tester club (derived, sales)",
+      "input": {
+        "args": [
+          {
+            "today": "2026-11-08",
+            "clubs": [
+              {
+                "id": "a",
+                "name": "Alpha Club",
+                "pricing": "paid",
+                "monthlyListMinor": 150000
+              },
+              {
+                "id": "b",
+                "name": "Beta Club",
+                "pricing": "free",
+                "monthlyListMinor": 100000
+              }
+            ],
+            "payments": [
+              {
+                "termId": "T3",
+                "clubId": "a",
+                "plan": "Monthly",
+                "paidOn": "2026-11-03",
+                "amountMinor": 150000,
+                "startsAt": "2026-11-03"
+              },
+              {
+                "termId": "T2",
+                "clubId": "a",
+                "plan": "Monthly",
+                "paidOn": "2026-10-03",
+                "amountMinor": 150000,
+                "startsAt": "2026-10-03"
+              },
+              {
+                "termId": "T1",
+                "clubId": "a",
+                "plan": "Yearly",
+                "paidOn": "2026-08-01",
+                "amountMinor": 1500000,
+                "startsAt": "2024-01-01"
+              },
+              {
+                "termId": "T4",
+                "clubId": "b",
+                "plan": "Monthly",
+                "paidOn": "2026-11-01",
+                "amountMinor": 0,
+                "startsAt": "2026-11-01"
+              }
+            ],
+            "sessions": [
+              {
+                "clubId": "a",
+                "startedOn": "2026-11-08",
+                "matches": 10
+              },
+              {
+                "clubId": "a",
+                "startedOn": "2026-11-02",
+                "matches": 12
+              },
+              {
+                "clubId": "a",
+                "startedOn": "2026-10-30",
+                "matches": 9
+              },
+              {
+                "clubId": "b",
+                "startedOn": "2026-11-05",
+                "matches": 20
+              }
+            ]
+          },
+          "b",
+          {
+            "amountMinor": 1500,
+            "currency": "PHP"
+          }
+        ]
+      },
+      "expected": {
+        "clubId": "b",
+        "today": "2026-11-08",
+        "pricing": "free",
+        "monthlyListPrice": null,
+        "costPerSession": {
+          "amountMinor": 1500,
+          "currency": "PHP"
+        },
+        "months": [
+          {
+            "month": "2026-06",
+            "paid": {
+              "amountMinor": 0,
+              "currency": "PHP"
+            },
+            "sessions": 0,
+            "matches": 0,
+            "paidPerSession": null,
+            "estimatedCost": {
+              "amountMinor": 0,
+              "currency": "PHP"
+            },
+            "leftOver": {
+              "amountMinor": 0,
+              "currency": "PHP"
+            }
+          },
+          {
+            "month": "2026-07",
+            "paid": {
+              "amountMinor": 0,
+              "currency": "PHP"
+            },
+            "sessions": 0,
+            "matches": 0,
+            "paidPerSession": null,
+            "estimatedCost": {
+              "amountMinor": 0,
+              "currency": "PHP"
+            },
+            "leftOver": {
+              "amountMinor": 0,
+              "currency": "PHP"
+            }
+          },
+          {
+            "month": "2026-08",
+            "paid": {
+              "amountMinor": 0,
+              "currency": "PHP"
+            },
+            "sessions": 0,
+            "matches": 0,
+            "paidPerSession": null,
+            "estimatedCost": {
+              "amountMinor": 0,
+              "currency": "PHP"
+            },
+            "leftOver": {
+              "amountMinor": 0,
+              "currency": "PHP"
+            }
+          },
+          {
+            "month": "2026-09",
+            "paid": {
+              "amountMinor": 0,
+              "currency": "PHP"
+            },
+            "sessions": 0,
+            "matches": 0,
+            "paidPerSession": null,
+            "estimatedCost": {
+              "amountMinor": 0,
+              "currency": "PHP"
+            },
+            "leftOver": {
+              "amountMinor": 0,
+              "currency": "PHP"
+            }
+          },
+          {
+            "month": "2026-10",
+            "paid": {
+              "amountMinor": 0,
+              "currency": "PHP"
+            },
+            "sessions": 0,
+            "matches": 0,
+            "paidPerSession": null,
+            "estimatedCost": {
+              "amountMinor": 0,
+              "currency": "PHP"
+            },
+            "leftOver": {
+              "amountMinor": 0,
+              "currency": "PHP"
+            }
+          },
+          {
+            "month": "2026-11",
+            "paid": {
+              "amountMinor": 0,
+              "currency": "PHP"
+            },
+            "sessions": 1,
+            "matches": 20,
+            "paidPerSession": null,
+            "estimatedCost": {
+              "amountMinor": 1500,
+              "currency": "PHP"
+            },
+            "leftOver": {
+              "amountMinor": -1500,
+              "currency": "PHP"
+            }
+          }
+        ],
+        "totals": {
+          "paid": {
+            "amountMinor": 0,
+            "currency": "PHP"
+          },
+          "sessions": 1,
+          "matches": 20,
+          "paidPerSession": {
+            "amountMinor": 0,
+            "currency": "PHP"
+          },
+          "estimatedCost": {
+            "amountMinor": 1500,
+            "currency": "PHP"
+          },
+          "leftOver": {
+            "amountMinor": -1500,
+            "currency": "PHP"
+          }
+        }
+      }
+    },
+    {
+      "name": "clubSalesReport › is null for an unknown club (sales)",
+      "input": {
+        "args": [
+          {
+            "today": "2026-11-08",
+            "clubs": [
+              {
+                "id": "a",
+                "name": "Alpha Club",
+                "pricing": "paid",
+                "monthlyListMinor": 150000
+              },
+              {
+                "id": "b",
+                "name": "Beta Club",
+                "pricing": "free",
+                "monthlyListMinor": 100000
+              }
+            ],
+            "payments": [
+              {
+                "termId": "T3",
+                "clubId": "a",
+                "plan": "Monthly",
+                "paidOn": "2026-11-03",
+                "amountMinor": 150000,
+                "startsAt": "2026-11-03"
+              },
+              {
+                "termId": "T2",
+                "clubId": "a",
+                "plan": "Monthly",
+                "paidOn": "2026-10-03",
+                "amountMinor": 150000,
+                "startsAt": "2026-10-03"
+              },
+              {
+                "termId": "T1",
+                "clubId": "a",
+                "plan": "Yearly",
+                "paidOn": "2026-08-01",
+                "amountMinor": 1500000,
+                "startsAt": "2024-01-01"
+              },
+              {
+                "termId": "T4",
+                "clubId": "b",
+                "plan": "Monthly",
+                "paidOn": "2026-11-01",
+                "amountMinor": 0,
+                "startsAt": "2026-11-01"
+              }
+            ],
+            "sessions": [
+              {
+                "clubId": "a",
+                "startedOn": "2026-11-08",
+                "matches": 10
+              },
+              {
+                "clubId": "a",
+                "startedOn": "2026-11-02",
+                "matches": 12
+              },
+              {
+                "clubId": "a",
+                "startedOn": "2026-10-30",
+                "matches": 9
+              },
+              {
+                "clubId": "b",
+                "startedOn": "2026-11-05",
+                "matches": 20
+              }
+            ]
+          },
+          "missing",
+          {
+            "amountMinor": 1500,
+            "currency": "PHP"
+          }
+        ]
+      },
+      "expected": null
+    }
+  ]
+}
